@@ -1,0 +1,401 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-materialization-acquisition-plan.v2",
+  "status": "FROZEN_PRE_ACQUISITION_CHECKPOINT",
+  "supersedes": {
+    "path": "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V1.json",
+    "plan_sha256": "69e59ffd14d2402f838a86519b22c2362e96c76470bb847a4754cf41b2517971",
+    "preserved_unchanged": true,
+    "reason": "STRUCTURAL_RAW_CAPTURE_DEDUPLICATION_ONLY_NO_CANDIDATE_OR_ECONOMIC_CHANGE"
+  },
+  "authority": {
+    "requirements": "data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json",
+    "requirements_git_blob_sha": "66281f5866d9fc59ebc008a6bb6a4507cb5ee87f",
+    "wave": "discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json",
+    "central_data_manifest": "data/DATA_MANIFEST.json"
+  },
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "protected_evidence_opened": false,
+  "acquisition_contract": {
+    "manifest_driven_only": true,
+    "source_environment": "Pepperstone - Europe LIVE",
+    "read_only_broker_access_only": true,
+    "orders_forbidden": true,
+    "account_mutation_forbidden": true,
+    "candidate_identity_changes_forbidden": true,
+    "strategy_threshold_or_economic_logic_in_collector_forbidden": true,
+    "exact_manifest_resolution_and_interval_required": true,
+    "closed_completed_bars_only": true,
+    "preserve_real_missing_bars_maintenance_gaps": true,
+    "no_resample_no_synthetic_fill_no_forward_fill": true,
+    "raw_component_hashes_and_provenance_required": true,
+    "metadata_or_expected_hash_is_not_availability": true,
+    "no_protected_forward_rows": true,
+    "no_unrelated_universe_download": true,
+    "capture_each_unique_raw_series_once": true,
+    "candidate_bindings_reference_shared_raw_capture": true,
+    "auxiliary_evidence_is_separate_from_raw_ohlc_identity": true,
+    "download_freshness_is_not_evidence_freshness": true
+  },
+  "raw_capture_identity_contract": {
+    "candidate_id_in_raw_identity": false,
+    "identity_components": [
+      "raw_capture_defaults.source_environment",
+      "canonical_instrument",
+      "resolution",
+      "raw_capture_defaults.interval",
+      "raw_capture_defaults.timezone",
+      "raw_capture_defaults.raw_broker_semantics_profile"
+    ],
+    "must_remain_distinct_when_any_identity_component_differs": true,
+    "actual_raw_bytes_hashed_once_after_capture": true,
+    "candidate_bindings_must_reference_same_raw_hash_for_shared_capture": true
+  },
+  "unique_raw_capture_tasks": [
+    {
+      "raw_capture_id": "PW02-RAW-AAPL-D1-a92aa4b6fe92e94f",
+      "raw_identity_sha256": "a92aa4b6fe92e94f58fd0ab954a1299f16b7f186493bda4710cb3dd01970a699",
+      "canonical_instrument": "AAPL",
+      "resolution": "D1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-AMZN-D1-08b3bafc8f8e2812",
+      "raw_identity_sha256": "08b3bafc8f8e281239eda09439ecdd55116985214edb16675278f86ecafd5695",
+      "canonical_instrument": "AMZN",
+      "resolution": "D1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-AUDJPY-D1-9c2e88c72cb890fb",
+      "raw_identity_sha256": "9c2e88c72cb890fb42cd293b662b6b492b23dfb3e34a9ab7e4a9480a34403fc9",
+      "canonical_instrument": "AUDJPY",
+      "resolution": "D1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-BTCUSD-H1-a538f2b2dc0b39d6",
+      "raw_identity_sha256": "a538f2b2dc0b39d6e940b23a2dad8df967dda0ef49074838600ad769c62cfcb8",
+      "canonical_instrument": "BTCUSD",
+      "resolution": "H1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-META-D1-ea5a78a0d3fb2e14",
+      "raw_identity_sha256": "ea5a78a0d3fb2e1477782b1acfdf06be21b0203239853d781d845c681ce09c8c",
+      "canonical_instrument": "META",
+      "resolution": "D1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-MSFT-D1-8fb724c0124bb2e1",
+      "raw_identity_sha256": "8fb724c0124bb2e161a159770d59753ec47919d99ad1f0db14db6651a48e80ba",
+      "canonical_instrument": "MSFT",
+      "resolution": "D1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-NAS100-M15-39767256a903ce32",
+      "raw_identity_sha256": "39767256a903ce32fed18209ead0cb5df02c69498258802305093175efcb5cd5",
+      "canonical_instrument": "NAS100",
+      "resolution": "M15",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-NVDA-D1-30863e6ca71cc858",
+      "raw_identity_sha256": "30863e6ca71cc858dfc2682fb6f1b3589aaf8e2004b9d9e5ef610e76857837a7",
+      "canonical_instrument": "NVDA",
+      "resolution": "D1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-US500-M15-a7856539f970beef",
+      "raw_identity_sha256": "a7856539f970beefb930c707bfa9203d83861c8ff9416e0b661816276aa663be",
+      "canonical_instrument": "US500",
+      "resolution": "M15",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-WTIUSD-H1-d73dba174aeefe26",
+      "raw_identity_sha256": "d73dba174aeefe263cd68748670de89e70dd0d77d901c914caf080824a3d1384",
+      "canonical_instrument": "WTIUSD",
+      "resolution": "H1",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    },
+    {
+      "raw_capture_id": "PW02-RAW-XAUUSD-H4-792f9b537f6aeae2",
+      "raw_identity_sha256": "792f9b537f6aeae29a1d6a3c931ed81c1ae61c44ce53432a8e6134925f7d64a3",
+      "canonical_instrument": "XAUUSD",
+      "resolution": "H4",
+      "broker_symbol_state": "UNRESOLVED_PENDING_ONE_TO_ONE_ENABLED_MAPPING",
+      "actual_bytes_sha256": null
+    }
+  ],
+  "candidate_dataset_bindings": [
+    {
+      "binding_id": "PW02-BIND-V2-C006-US500-M15",
+      "candidate_id": "V2-C006",
+      "spec_hash": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+      "dataset_id": "PW02-V2-C006-US500-M15-b1e13657bc1de784",
+      "canonical_instrument": "US500",
+      "resolution": "M15",
+      "raw_capture_id": "PW02-RAW-US500-M15-a7856539f970beef",
+      "raw_identity_sha256": "a7856539f970beefb930c707bfa9203d83861c8ff9416e0b661816276aa663be",
+      "semantic_requirements_sha256": "e24de813748d345e1a68cddb7253e5fc4f8279431b82c9e387d9a5e5f4215765"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C007-XAUUSD-H4",
+      "candidate_id": "V2-C007",
+      "spec_hash": "d0e35a07a4b947aee5114dbf8f8bdd226ae525781cc54be12cfbf2a18e1d2fba",
+      "dataset_id": "PW02-V2-C007-XAUUSD-H4-e9183dede0fe0cfc",
+      "canonical_instrument": "XAUUSD",
+      "resolution": "H4",
+      "raw_capture_id": "PW02-RAW-XAUUSD-H4-792f9b537f6aeae2",
+      "raw_identity_sha256": "792f9b537f6aeae29a1d6a3c931ed81c1ae61c44ce53432a8e6134925f7d64a3",
+      "semantic_requirements_sha256": "b2d60e44f97adf79a8ec52c65d397f871af4a7053601329816cb449070000d8a"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C008-WTIUSD-H1",
+      "candidate_id": "V2-C008",
+      "spec_hash": "2df6728c2a9fe135f5a6908301a5378234a2ab08cb0c93046c3290c38f766370",
+      "dataset_id": "PW02-V2-C008-WTIUSD-H1-f7f9236243ccd764",
+      "canonical_instrument": "WTIUSD",
+      "resolution": "H1",
+      "raw_capture_id": "PW02-RAW-WTIUSD-H1-d73dba174aeefe26",
+      "raw_identity_sha256": "d73dba174aeefe263cd68748670de89e70dd0d77d901c914caf080824a3d1384",
+      "semantic_requirements_sha256": "36e609794c17d82be08aa4dae94ec0e1962925b2c495a645d976ab8cf2afa79d"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C009-BTCUSD-H1",
+      "candidate_id": "V2-C009",
+      "spec_hash": "f276ade8d32e17957ab036676c14c913fa8825d8c1254c994249224c79f38856",
+      "dataset_id": "PW02-V2-C009-BTCUSD-H1-b3f2869b15c87851",
+      "canonical_instrument": "BTCUSD",
+      "resolution": "H1",
+      "raw_capture_id": "PW02-RAW-BTCUSD-H1-a538f2b2dc0b39d6",
+      "raw_identity_sha256": "a538f2b2dc0b39d6e940b23a2dad8df967dda0ef49074838600ad769c62cfcb8",
+      "semantic_requirements_sha256": "2a326bc861506861c4446f81e45d30518dc6ddfa05df52ea955dce5d3487a6cc"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C010-AUDJPY-D1",
+      "candidate_id": "V2-C010",
+      "spec_hash": "810670fbe6ed57c704a499c32799e6750417a431928eb55f8766b1ff87e46fc1",
+      "dataset_id": "PW02-V2-C010-AUDJPY-D1-8b9ab55efd998699",
+      "canonical_instrument": "AUDJPY",
+      "resolution": "D1",
+      "raw_capture_id": "PW02-RAW-AUDJPY-D1-9c2e88c72cb890fb",
+      "raw_identity_sha256": "9c2e88c72cb890fb42cd293b662b6b492b23dfb3e34a9ab7e4a9480a34403fc9",
+      "semantic_requirements_sha256": "55ddef74a91dabeca749da4bd68e59d964e8223769ba90abf9ee0f4190221fc8"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C011-AAPL-D1",
+      "candidate_id": "V2-C011",
+      "spec_hash": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+      "dataset_id": "PW02-V2-C011-AAPL-D1-f0daee00acd6d0b8",
+      "canonical_instrument": "AAPL",
+      "resolution": "D1",
+      "raw_capture_id": "PW02-RAW-AAPL-D1-a92aa4b6fe92e94f",
+      "raw_identity_sha256": "a92aa4b6fe92e94f58fd0ab954a1299f16b7f186493bda4710cb3dd01970a699",
+      "semantic_requirements_sha256": "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C011-MSFT-D1",
+      "candidate_id": "V2-C011",
+      "spec_hash": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+      "dataset_id": "PW02-V2-C011-MSFT-D1-84e625c4c297d111",
+      "canonical_instrument": "MSFT",
+      "resolution": "D1",
+      "raw_capture_id": "PW02-RAW-MSFT-D1-8fb724c0124bb2e1",
+      "raw_identity_sha256": "8fb724c0124bb2e161a159770d59753ec47919d99ad1f0db14db6651a48e80ba",
+      "semantic_requirements_sha256": "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C011-NVDA-D1",
+      "candidate_id": "V2-C011",
+      "spec_hash": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+      "dataset_id": "PW02-V2-C011-NVDA-D1-b9558775c217edce",
+      "canonical_instrument": "NVDA",
+      "resolution": "D1",
+      "raw_capture_id": "PW02-RAW-NVDA-D1-30863e6ca71cc858",
+      "raw_identity_sha256": "30863e6ca71cc858dfc2682fb6f1b3589aaf8e2004b9d9e5ef610e76857837a7",
+      "semantic_requirements_sha256": "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C011-AMZN-D1",
+      "candidate_id": "V2-C011",
+      "spec_hash": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+      "dataset_id": "PW02-V2-C011-AMZN-D1-b5b5728aaf5e7105",
+      "canonical_instrument": "AMZN",
+      "resolution": "D1",
+      "raw_capture_id": "PW02-RAW-AMZN-D1-08b3bafc8f8e2812",
+      "raw_identity_sha256": "08b3bafc8f8e281239eda09439ecdd55116985214edb16675278f86ecafd5695",
+      "semantic_requirements_sha256": "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C011-META-D1",
+      "candidate_id": "V2-C011",
+      "spec_hash": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+      "dataset_id": "PW02-V2-C011-META-D1-f0189fddf8afbc76",
+      "canonical_instrument": "META",
+      "resolution": "D1",
+      "raw_capture_id": "PW02-RAW-META-D1-ea5a78a0d3fb2e14",
+      "raw_identity_sha256": "ea5a78a0d3fb2e1477782b1acfdf06be21b0203239853d781d845c681ce09c8c",
+      "semantic_requirements_sha256": "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C012-US500-M15",
+      "candidate_id": "V2-C012",
+      "spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+      "dataset_id": "PW02-V2-C012-US500-M15-72aa8a235a557cab",
+      "canonical_instrument": "US500",
+      "resolution": "M15",
+      "raw_capture_id": "PW02-RAW-US500-M15-a7856539f970beef",
+      "raw_identity_sha256": "a7856539f970beefb930c707bfa9203d83861c8ff9416e0b661816276aa663be",
+      "semantic_requirements_sha256": "9385ea17a8f3e1e5868f16b9c394b7207b7027330cd41e2e11ada2b17e0c7859"
+    },
+    {
+      "binding_id": "PW02-BIND-V2-C012-NAS100-M15",
+      "candidate_id": "V2-C012",
+      "spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+      "dataset_id": "PW02-V2-C012-NAS100-M15-bc3a6eebde66bef4",
+      "canonical_instrument": "NAS100",
+      "resolution": "M15",
+      "raw_capture_id": "PW02-RAW-NAS100-M15-39767256a903ce32",
+      "raw_identity_sha256": "39767256a903ce32fed18209ead0cb5df02c69498258802305093175efcb5cd5",
+      "semantic_requirements_sha256": "9385ea17a8f3e1e5868f16b9c394b7207b7027330cd41e2e11ada2b17e0c7859"
+    }
+  ],
+  "legacy_contamination_boundary": {
+    "allowed_input_classes": [
+      "COMPETITION_TRUTH",
+      "CONTAMINATION_PRIOR_ATTEMPT_ACCOUNTING",
+      "INDEPENDENTLY_VERIFIED_BROKER_TRUTH",
+      "RAW_DEVELOPMENT_MARKET_BYTES",
+      "VERIFIED_EXECUTION_SEMANTICS"
+    ],
+    "forbidden_input_classes": [
+      "CANDIDATE_RESCUE",
+      "ECONOMIC_CONCLUSION",
+      "ENTRY_EXIT_LOGIC",
+      "LEGACY_ALLOCATOR",
+      "LEGACY_CANDIDATE_LOGIC",
+      "LEGACY_ECONOMIC_RESULT",
+      "LEGACY_PERFORMANCE_CONCLUSION",
+      "LEGACY_STRATEGY_CODE",
+      "LOOKBACK",
+      "MECHANISM_SELECTION",
+      "PARAMETER",
+      "PORTFOLIO_SELECTION",
+      "RANKING",
+      "SIGNAL_DEFINITION",
+      "SURVIVOR_DECISION",
+      "THRESHOLD",
+      "V2_CANDIDATE_SELECTION"
+    ],
+    "raw_development_bytes_rule": "ALLOWED_ONLY_WITH_VALID_IMMUTABLE_PROVENANCE_HASH_AND_DEVELOPMENT_CLASSIFICATION",
+    "legacy_may_never_influence_v2_research_choices_or_economic_conclusions": true,
+    "forbidden_named_reconstruction_or_import": [
+      "A-series strategy logic",
+      "PF01",
+      "PF02",
+      "BNY",
+      "legacy allocators",
+      "old experts",
+      "old signals",
+      "old thresholds",
+      "old candidate rankings",
+      "old economic outcomes"
+    ]
+  },
+  "data_classification_rule": {
+    "basis": "HISTORICAL_TIMESTAMP_NOT_DOWNLOAD_DATE",
+    "pre_protected_history_classification": "DEVELOPMENT",
+    "fresh_reacquisition_does_not_create_untouched_or_oos_evidence": true,
+    "protected_forward_start_immutable": "2026-09-17T12:02:58Z"
+  },
+  "broker_universe_rule": {
+    "allowed_purposes": [
+      "BROKER_STRUCTURAL_FEASIBILITY",
+      "CANONICAL_SYMBOL_MAPPING",
+      "ENABLED_STATUS",
+      "EXECUTABLE_SYMBOL_IDENTITY",
+      "VOLUME_MARGIN_EXECUTION_METADATA"
+    ],
+    "forbidden_purposes": [
+      "CANDIDATE_RANKING",
+      "ECONOMIC_SEARCH_UNIVERSE",
+      "PRIMARY_WAVE_02_RESELECTION",
+      "WHOLE_UNIVERSE_BACKTEST"
+    ],
+    "broker_universe_may_not_change_primary_wave_02_selection": true,
+    "whole_universe_backtest_forbidden": true
+  },
+  "historical_live_parity": {
+    "discovery": "CAUSAL_DEVELOPMENT_EVALUATION_VECTORIZED_ONLY_WHEN_MATHEMATICALLY_EQUIVALENT_AND_CAUSAL",
+    "certification": "STRICT_INCREMENTAL_CHRONOLOGICAL_REPLAY_AS_IF_TIME_WERE_FLOWING_LIVE",
+    "information_at_t_only": true,
+    "future_bars_forbidden": true,
+    "future_normalization_forbidden": true,
+    "hindsight_forbidden": true,
+    "retrospective_fills_forbidden": true,
+    "future_broker_state_forbidden": true,
+    "future_regime_knowledge_forbidden": true,
+    "final_architecture": [
+      "SHARED_DETERMINISTIC_ECONOMIC_CORE",
+      "HISTORICAL_REPLAY_ADAPTER",
+      "CTRADER_LIVE_ADAPTER"
+    ]
+  },
+  "requirement_driven_auxiliary_evidence": {
+    "derive_verbatim_per_candidate_from_requirements_keys": [
+      "session_semantics",
+      "synchronization",
+      "currency_conversion",
+      "contract_roll",
+      "corporate_actions",
+      "short_side_requirements",
+      "special_requirement"
+    ],
+    "separate_from_raw_market_capture": true
+  },
+  "current_execution_block": {
+    "state": "BLOCKED_EXTERNAL_BROKER_READ_ONLY_CAPTURE_REQUIRED",
+    "user_action_required": true,
+    "required_external_capability": "Authorized read-only Pepperstone cTrader capture returning exact historical bytes plus immutable provenance/hash evidence; no orders or account mutation.",
+    "forbidden_substitutions": [
+      "public-price proxies",
+      "approximate margin estimates",
+      "current spread/swap snapshots as VERIFIED historical evidence",
+      "legacy strategy/economic outputs"
+    ]
+  },
+  "state_invariants": {
+    "result_recorded_count": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "economic_outcomes_opened": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING"
+  },
+  "plan_sha256": "da9e9a65f5c8b3e9a3edb0189de6d60bee2b5cc922d0a3ea99c1dc14ef5066fa",
+  "raw_capture_defaults": {
+    "source_environment": "Pepperstone - Europe LIVE",
+    "interval": {
+      "classification": "DEVELOPMENT_ONLY",
+      "end_utc": "2026-09-16T23:59:59Z",
+      "protected_boundary_excluded": true,
+      "start_utc": "2022-01-03T00:00:00Z"
+    },
+    "timezone": "UTC",
+    "raw_broker_semantics_profile": "BROKER_NATIVE_COMPLETED_BARS_PRESERVE_SOURCE_GAPS_NO_RESAMPLE_V1"
+  }
+}
