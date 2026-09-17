@@ -38,5 +38,10 @@ class M4FreezeAuthorities(unittest.TestCase):
         s=load("CURRENT_STATE.json"); self.assertEqual(s["phase"], "M4_COMPLETE"); self.assertEqual(s["m4"]["status"], "COMPLETE"); self.assertEqual(s["v2_search_budget"], 84); self.assertEqual(s["v2_attempts_used"], 0); self.assertEqual(s["v2_evaluated_identities"], 0); self.assertIsNone(s["latest_economic_outcome"]); self.assertEqual(s["m5"]["status"], "PENDING")
     def test_m4_08_protected_timestamp_matches_state(self):
         p=load("V2_PROTECTED_FORWARD_START.json"); s=load("CURRENT_STATE.json"); self.assertEqual(s["v2_protected_forward_start"], p["V2_PROTECTED_FORWARD_START"]); self.assertEqual(s["legacy_prior_attempts"], 16); self.assertEqual(s["global_attempts_seen"], 16)
+    def test_m4_09_single_name_equity_coverage_correction(self):
+        h=load("HYPOTHESIS_SPACE_V1.json"); classes=h["dimensions"]["market_asset_class"]
+        self.assertIn("SINGLE_NAME_EQUITY_OR_SHARE_CFD", classes); self.assertIn("EQUITY_INDEX", classes); self.assertNotEqual(classes.index("SINGLE_NAME_EQUITY_OR_SHARE_CFD"), classes.index("EQUITY_INDEX"))
+        self.assertEqual(load("V2_SEARCH_BUDGET_V1.json")["v2_budget"], 84); self.assertEqual(load("V2_PROTECTED_FORWARD_START.json")["V2_PROTECTED_FORWARD_START"], "2026-09-17T12:02:58Z")
+        self.assertEqual((ROOT / "discovery" / "ledger.jsonl").read_text(encoding="utf-8"), ""); self.assertEqual(load("CURRENT_STATE.json")["m5"]["status"], "PENDING")
 
 if __name__ == "__main__": unittest.main(verbosity=2)
