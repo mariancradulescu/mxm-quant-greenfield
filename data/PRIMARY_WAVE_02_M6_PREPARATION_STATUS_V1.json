@@ -1,0 +1,51 @@
+{
+  "schema": "mxm.greenfield.v2.m6-preparation-status.v1",
+  "status_role": "NON_AUTHORITATIVE_DERIVED_CHECKPOINT",
+  "authoritative_data_manifest": "data/DATA_MANIFEST.json",
+  "authoritative_requirements": "data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json",
+  "authoritative_wave": "discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json",
+  "reconciled_from_main_head": "a1fb3aa93f2724d21ea8241ee32228f3f38ccfea",
+  "pre_economic_integrity": {
+    "result_recorded_count": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "economic_outcomes_opened": 0,
+    "protected_evidence_opened": false,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "m6_status": "PENDING"
+  },
+  "active_candidate_hashes": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C007": "d0e35a07a4b947aee5114dbf8f8bdd226ae525781cc54be12cfbf2a18e1d2fba",
+    "V2-C008": "2df6728c2a9fe135f5a6908301a5378234a2ab08cb0c93046c3290c38f766370",
+    "V2-C009": "f276ade8d32e17957ab036676c14c913fa8825d8c1254c994249224c79f38856",
+    "V2-C010": "810670fbe6ed57c704a499c32799e6750417a431928eb55f8766b1ff87e46fc1",
+    "V2-C011": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "inventory_findings": {
+    "v2_market_bytes_present": false,
+    "v2_materialization_cache_present": false,
+    "legacy_reference_head": "11c2c3bfaaadc19d4f8890604f80e6f533a82cc9",
+    "legacy_registered_pack": "A116_CADJPY_V2_H1_SOURCE_PACK_V1_STRICT",
+    "legacy_source_manifest_present": true,
+    "legacy_pack_bytes_present_at_frozen_ref": false,
+    "legacy_pack_candidate_match": false,
+    "legacy_pack_series": ["CADJPY", "EURJPY", "USDCAD", "USDJPY"],
+    "legacy_pack_resolution": "H1",
+    "note": "The frozen legacy directory contains SOURCE_MANIFEST.json only. Metadata and expected hashes are not data bytes, and the registered series do not satisfy the frozen PRIMARY_WAVE_02 instruments/resolutions."
+  },
+  "candidate_data_state": {
+    "V2-C006": {"state": "BLOCKED", "missing": ["US500 M15 broker bars", "cash-session mapping", "USD/EUR causal conversion evidence"]},
+    "V2-C007": {"state": "BLOCKED", "missing": ["XAUUSD H4 broker bars", "exact broker H4 partition/session mapping", "USD/EUR causal conversion evidence"]},
+    "V2-C008": {"state": "BLOCKED", "missing": ["WTIUSD H1 broker bars", "continuous-CFD/contract-roll semantics", "USD/EUR causal conversion evidence"]},
+    "V2-C009": {"state": "BLOCKED", "missing": ["BTCUSD H1 broker bars retaining real maintenance/gaps", "USD/EUR causal conversion evidence"]},
+    "V2-C010": {"state": "BLOCKED", "missing": ["AUDJPY D1 broker bars", "historically effective financing/rollover evidence", "JPY/EUR causal conversion evidence"]},
+    "V2-C011": {"state": "BLOCKED", "missing": ["AAPL/MSFT/NVDA/AMZN/META D1 broker bars", "common executable-session alignment", "point-in-time corporate-action evidence", "short-eligibility evidence", "USD/EUR causal conversion evidence"]},
+    "V2-C012": {"state": "BLOCKED", "missing": ["US500 and NAS100 synchronized M15 broker bars", "common tradable-session mapping", "USD/EUR causal conversion evidence"]}
+  },
+  "central_data_manifest_updated": false,
+  "economic_attempt_consumed": false,
+  "economic_outcome_opened": false,
+  "protected_evidence_opened": false
+}
