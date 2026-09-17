@@ -1,5 +1,48 @@
 {
   "schema_version": 1,
-  "status": "M0_PLACEHOLDER_PENDING_M2",
-  "datasets": []
+  "status": "FROZEN_M2_KNOWN_REUSABLE_ONLY",
+  "policy": {
+    "pre_v2_data_classification": "DEVELOPMENT_ONLY",
+    "no_untouched_oos_claim": true,
+    "reuse_requires_provenance_and_hash": true,
+    "m2_recollection_performed": false
+  },
+  "datasets": [
+    {
+      "dataset_id": "A116_CADJPY_V2_H1_SOURCE_PACK_V1_STRICT",
+      "state": "KNOWN_REUSABLE_NOT_MATERIALIZED_IN_V2",
+      "classification": "DEVELOPMENT_ONLY_PRE_V2",
+      "source_repository": "mariancradulescu/mxm-quant-director",
+      "source_ref": "11c2c3bfaaadc19d4f8890604f80e6f533a82cc9",
+      "source_manifest": "research/data_packs/a116_cadjpy_v2_h1_source_pack_v1/SOURCE_MANIFEST.json",
+      "pack_sha256": "8355abc88f282a6321c0beed248f31f89e5cb44359cd7f7ee73b357c2591bee9",
+      "resolution": "H1",
+      "interval": {
+        "start_utc": "2024-03-01T15:00:00Z",
+        "end_utc": "2026-08-31T13:00:00Z",
+        "note": "USDJPY begins 2024-03-04T10:00:00Z"
+      },
+      "environment": "historical development evidence",
+      "columns": ["time_utc", "open", "high", "low", "close", "tick_volume"],
+      "series": {
+        "CADJPY": {"rows": 15513, "csv_sha256": "6d7a0e0d721539cc3e5b794ea3ccfd8c9f17ec1ea580082a97b698cfc433fc91"},
+        "EURJPY": {"rows": 15513, "csv_sha256": "b724ef463df82d1c6f1da1bf6485d22a70554aea6e567656c57897cd79799e22"},
+        "USDCAD": {"rows": 15513, "csv_sha256": "ece28f1c18406613f0c191e727632c93b0e7525cc8ca26a96a1613ce006550f7"},
+        "USDJPY": {"rows": 15494, "csv_sha256": "5010451b18dad54912bb2392593301ede554ef4afcda8da01cf311c384092703"}
+      },
+      "completeness": "SOURCE_MANIFEST_HASHED; PACK_BYTES_NOT_PRESENT_IN_V2_REPOSITORY",
+      "causal_session_timezone_semantics": "UTC timestamps; OHLC completed-bar use must enforce causal cutoff; exact broker session/holiday semantics are not established by this pack"
+    }
+  ],
+  "missing_data": [
+    "historical bid/ask or spread path sufficient for Certification",
+    "historical exact commission path sufficient for Certification",
+    "historical exact swap schedule/rates sufficient for Certification",
+    "historical slippage/delay/gap evidence sufficient for Certification",
+    "symbol-specific executable volume constraints for future candidate instruments",
+    "symbol-specific currency-conversion truth for future candidate instruments",
+    "symbol-specific sessions/holidays for future candidate instruments",
+    "broader reusable market history beyond the four registered H1 FX series"
+  ],
+  "synthetic_fixture_note": "M2 fixtures are deterministic generated test inputs, not market evidence and not a reusable economic dataset."
 }

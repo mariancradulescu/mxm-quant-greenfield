@@ -2,11 +2,18 @@
   "schema_version": 1,
   "program": "MXM_QUANT_GREENFIELD_V2",
   "authoritative_branch": "main",
-  "phase": "M1_COMPLETE",
-  "primary_run_objective": "BOOTSTRAP",
+  "phase": "M2_COMPLETE",
+  "primary_run_objective": "M2_EXECUTION",
   "m0": {"status":"COMPLETE","verified_clean_parent_head":"a21fb9b206839c7b384ddc45e216c9a01496e142","clean_room":true},
   "m1": {"status":"COMPLETE","legacy_reference_head":"11c2c3bfaaadc19d4f8890604f80e6f533a82cc9","import_scope":"bounded facts only"},
-  "m2": {"status":"PENDING"},
+  "m2": {
+    "status":"COMPLETE",
+    "synthetic_fixture_count":13,
+    "tests_passed":13,
+    "tests_failed":0,
+    "broker_semantics":{"VERIFIED":7,"CONSERVATIVE_BOUND":0,"UNRESOLVED":8},
+    "candidate_economic_outcomes_opened":false
+  },
   "m3": {"status":"PENDING"},
   "m4": {"status":"PENDING"},
   "m5": {"status":"PENDING"},
@@ -22,5 +29,5 @@
   "live_orders_authorized":false,
   "competition_start_authorized":false,
   "user_action_required":false,
-  "next_action":"M2: freeze data manifest and broker semantics; implement and PASS synthetic evaluator fixtures"
+  "next_action":"M3 generic Discovery engine"
 }
