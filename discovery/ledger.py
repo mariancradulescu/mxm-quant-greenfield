@@ -16,7 +16,12 @@ from typing import Any, Mapping, Optional
 
 from .canonical import canonical_json
 
-ALLOWED_ENTRY_TYPES = {"CANDIDATE_FROZEN", "RESULT_RECORDED", "IMPLEMENTATION_CORRECTION"}
+ALLOWED_ENTRY_TYPES = {
+    "CANDIDATE_FROZEN",
+    "CANDIDATE_REFROZEN_PRE_OUTCOME",
+    "RESULT_RECORDED",
+    "IMPLEMENTATION_CORRECTION",
+}
 
 
 def _entry_hash(entry_without_hash: Mapping[str, Any]) -> str:

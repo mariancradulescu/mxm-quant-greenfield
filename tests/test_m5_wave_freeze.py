@@ -13,8 +13,8 @@ class M5WaveFreeze(unittest.TestCase):
             spec=load(f"discovery/candidates/{cid}.json"); self.assertTrue(verify_spec_hash(spec)); self.assertEqual(spec["spec_hash"],w["candidate_spec_hashes"][cid]); self.assertEqual(spec["cost_state"]["state"],"UNRESOLVED")
     def test_m5_03_materially_distinct_and_no_grid(self):
         w=load("discovery/WAVE_01_V1.json"); fam=w["materially_distinct_families"]; self.assertEqual(len(fam),5); self.assertEqual(len(set(fam)),5); self.assertEqual(set(fam),{"TREND_MOMENTUM","MEAN_REVERSION","BREAKOUT_VOLATILITY_EXPANSION","CROSS_SECTIONAL_RANKING","RELATIVE_VALUE_COINTEGRATION"})
-    def test_m5_04_ledger_only_freezes_candidates(self):
-        entries=read_ledger(ROOT/"discovery/ledger.jsonl"); self.assertEqual(len(entries),5); self.assertTrue(all(e["entry_type"]=="CANDIDATE_FROZEN" for e in entries)); self.assertFalse(any(e["entry_type"]=="RESULT_RECORDED" for e in entries))
+    def test_m5_04_ledger_preserves_original_freezes_and_has_no_results(self):
+        entries=read_ledger(ROOT/"discovery/ledger.jsonl"); freezes=[e for e in entries if e["entry_type"]=="CANDIDATE_FROZEN"]; self.assertEqual(len(freezes),5); self.assertEqual([e["sequence"] for e in freezes],[1,2,3,4,5]); self.assertFalse(any(e["entry_type"]=="RESULT_RECORDED" for e in entries))
     def test_m5_05_budget_and_protected_boundary_unchanged(self):
         w=load("discovery/WAVE_01_V1.json"); self.assertEqual(w["search_budget"],84); self.assertEqual(w["v2_attempts_used"],0); self.assertEqual(w["protected_forward_start"],"2026-09-17T12:02:58Z")
     def test_m5_06_state_complete_m6_pending_no_outcome(self):
