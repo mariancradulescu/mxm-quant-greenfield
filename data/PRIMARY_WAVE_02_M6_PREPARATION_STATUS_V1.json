@@ -33,7 +33,7 @@
     "legacy_pack_candidate_match": false,
     "legacy_pack_series": ["CADJPY", "EURJPY", "USDCAD", "USDJPY"],
     "legacy_pack_resolution": "H1",
-    "note": "The frozen legacy directory contains SOURCE_MANIFEST.json only. Metadata and expected hashes are not data bytes, and the registered series do not satisfy the frozen PRIMARY_WAVE_02 instruments/resolutions."
+    "note": "Closed inventory finding retained only for checkpoint continuity. Do not retry A116 for PRIMARY_WAVE_02; it is not a candidate match and its bytes are unavailable at the frozen reference."
   },
   "candidate_data_state": {
     "V2-C006": {"state": "BLOCKED", "missing": ["US500 M15 broker bars", "cash-session mapping", "USD/EUR causal conversion evidence"]},
@@ -43,6 +43,24 @@
     "V2-C010": {"state": "BLOCKED", "missing": ["AUDJPY D1 broker bars", "historically effective financing/rollover evidence", "JPY/EUR causal conversion evidence"]},
     "V2-C011": {"state": "BLOCKED", "missing": ["AAPL/MSFT/NVDA/AMZN/META D1 broker bars", "common executable-session alignment", "point-in-time corporate-action evidence", "short-eligibility evidence", "USD/EUR causal conversion evidence"]},
     "V2-C012": {"state": "BLOCKED", "missing": ["US500 and NAS100 synchronized M15 broker bars", "common tradable-session mapping", "USD/EUR causal conversion evidence"]}
+  },
+  "acquisition_infrastructure_checkpoint": {
+    "state": "BLOCKED_EXTERNAL_BROKER_READ_ONLY_CAPTURE_REQUIRED",
+    "staging_parent_head": "802608d4a231f1017b206f356dbccaf317a9c148",
+    "implementation": "m6/acquisition.py",
+    "plan": "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V1.json",
+    "plan_sha256": "69e59ffd14d2402f838a86519b22c2362e96c76470bb847a4754cf41b2517971",
+    "primary_dataset_task_count": 12,
+    "generic_only": true,
+    "candidate_specific_collector_logic": false,
+    "actual_broker_capture_executed": false,
+    "actual_data_bytes_materialized": false,
+    "broker_mapping_promoted_without_evidence": false,
+    "approximate_margin_accepted": false,
+    "current_snapshot_promoted_to_verified_history": false,
+    "user_action_required_for_actual_capture": true,
+    "user_action_reason": "No authenticated Pepperstone/cTrader historical-data or expected-margin connector is available in the current ChatGPT toolset, and plugin discovery returned no cTrader/Pepperstone connector.",
+    "required_external_action": "Execute an authorized read-only Pepperstone cTrader capture against the frozen plan/request, with no orders or account mutation, and return the resulting raw bytes plus provenance/hash evidence for verification."
   },
   "central_data_manifest_updated": false,
   "economic_attempt_consumed": false,
