@@ -1,21 +1,28 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "mxm.greenfield.v2.discovery.result.schema.v1",
-  "title": "MXM Greenfield V2 Discovery Result",
-  "type": "object",
-  "required": ["candidate_id","spec_hash","stage","status","implementation_validity","metrics","eur200_feasibility","cost_confidence","data_completeness","provenance"],
-  "properties": {
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"mxm.greenfield.v2.discovery.result.schema.v2",
+  "title":"MXM Greenfield V2 Discovery Result",
+  "type":"object",
+  "required":["candidate_id","spec_hash","stage","status","implementation_validity","metrics","eur200_feasibility","cost_confidence","data_completeness","provenance"],
+  "properties":{
     "candidate_id":{"type":"string","pattern":"^V2-C[0-9]{3,}$"},
     "spec_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},
     "stage":{"enum":["A","B"]},
     "status":{"enum":["IMPLEMENTATION_INVALID","DATA_INSUFFICIENT","STRUCTURALLY_INFEASIBLE","GROSS_EDGE_FAIL","COARSE_NET_FAIL","COST_UNRESOLVED","DISCOVERY_SURVIVOR"]},
-    "implementation_validity":{"type":"object"},
-    "metrics":{"type":"object"},
-    "eur200_feasibility":{"type":"object"},
-    "cost_confidence":{"type":"object"},
-    "data_completeness":{"type":"object"},
-    "provenance":{"type":"object"},
+    "implementation_validity":{"$ref":"#/$defs/implementationEnvelope"},
+    "cost_confidence":{"$ref":"#/$defs/costEnvelope"},
+    "data_completeness":{"$ref":"#/$defs/dataEnvelope"},
+    "eur200_feasibility":{"$ref":"#/$defs/eur200Envelope"},
+    "metrics":{"type":"object","minProperties":21,"required":["event_count","gross_pnl","coarse_net_pnl","gross_return","coarse_net_return","gross_per_event","net_per_event","cost_burden","turnover","weekly_events","active_weeks","longest_inactive_gap","weekday_distribution","session_distribution","hold_duration","exposure","drawdown","symbol_contribution","direction_contribution","subperiod_contribution","regime_contribution"],"properties":{"event_count":{},"gross_pnl":{},"coarse_net_pnl":{},"gross_return":{},"coarse_net_return":{},"gross_per_event":{},"net_per_event":{},"cost_burden":{},"turnover":{},"weekly_events":{},"active_weeks":{},"longest_inactive_gap":{},"weekday_distribution":{},"session_distribution":{},"hold_duration":{},"exposure":{},"drawdown":{},"symbol_contribution":{},"direction_contribution":{},"subperiod_contribution":{},"regime_contribution":{},"capital_realization":{"type":"object","required":["continuous_capital_path","weekly_final_equity_distribution","monthly_final_equity_distribution","capital_occupancy","margin_blockers","executed_trade_distribution"],"minProperties":6}},"additionalProperties":false},
+    "provenance":{"type":"object","required":["data_evidence","cost_evidence","evaluator"],"properties":{"data_evidence":{"type":"object","required":["identity","binding"],"properties":{"identity":{"type":"string","minLength":1},"binding":{"type":"object","required":["type","sha256"],"properties":{"type":{"enum":["DATASET_SHA256","MANIFEST_SHA256"]},"sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}}}}},"cost_evidence":{"type":"object","required":["identity","state","sha256"],"properties":{"identity":{"type":"string","minLength":1},"state":{"enum":["VERIFIED","CONSERVATIVE_BOUND","UNRESOLVED"]},"sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}}},"evaluator":{"type":"object","required":["version","sha256"],"properties":{"version":{"type":"string","minLength":1},"sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}}}}},
     "result_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"}
   },
-  "additionalProperties": false
+  "$defs":{
+    "implementationEnvelope":{"type":"object","required":["state"],"minProperties":1,"properties":{"state":{"enum":["VALID","INVALID","UNRESOLVED"]},"reason":{"type":"string","minLength":1}}},
+    "costEnvelope":{"type":"object","required":["state"],"minProperties":1,"properties":{"state":{"enum":["VERIFIED","CONSERVATIVE_BOUND","UNRESOLVED"]},"reason":{"type":"string","minLength":1}}},
+    "dataEnvelope":{"type":"object","required":["state"],"minProperties":1,"properties":{"state":{"enum":["SUFFICIENT","INSUFFICIENT","UNRESOLVED"]},"reason":{"type":"string","minLength":1}}},
+    "eur200Envelope":{"type":"object","required":["state"],"minProperties":1,"properties":{"state":{"enum":["FEASIBLE","INFEASIBLE","NOT_EVALUATED","UNRESOLVED"]},"reason":{"type":"string","minLength":1}}}
+  },
+  "additionalProperties":false,
+  "allOf":[{"if":{"properties":{"stage":{"const":"B"}},"required":["stage"]},"then":{"properties":{"metrics":{"required":["capital_realization"]}}}}]
 }
