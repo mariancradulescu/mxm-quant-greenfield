@@ -5,8 +5,8 @@ from discovery.ledger import read_ledger
 ROOT=Path(__file__).resolve().parents[1]
 def load(p): return json.loads((ROOT/p).read_text())
 class M5WaveFreeze(unittest.TestCase):
- def test_m5_01_original_wave_is_preserved_and_deferred_pre_outcome(self):
-  w=load('discovery/WAVE_01_V1.json'); self.assertEqual(w['status'],'DEFERRED_PRE_OUTCOME_DATA_AVAILABILITY_ANCHOR'); self.assertEqual(len(w['candidate_ids']),5); self.assertEqual(len(set(w['candidate_ids'])),5); self.assertEqual(w['economic_outcomes_opened'],0); self.assertFalse(w['deferral']['economic_failure']); self.assertFalse(w['deferral']['contamination'])
+ def test_m5_01_original_wave_freeze_preserved_and_separate_deferral_exists(self):
+  w=load('discovery/WAVE_01_V1.json'); d=load('discovery/WAVE_01_DEFERRAL_V1.json'); self.assertEqual(w['status'],'FROZEN_BEFORE_ANY_V2_ECONOMIC_OUTCOME'); self.assertEqual(len(w['candidate_ids']),5); self.assertEqual(len(set(w['candidate_ids'])),5); self.assertEqual(w['economic_outcomes_opened'],0); self.assertEqual(d['state'],'DEFERRED_PRE_OUTCOME_DATA_AVAILABILITY_ANCHOR'); self.assertFalse(d['economic_failure']); self.assertFalse(d['contamination']); self.assertEqual(d['attempts_consumed'],0)
  def test_m5_02_original_candidates_validate_hashes_and_match_wave(self):
   w=load('discovery/WAVE_01_V1.json')
   for cid in w['candidate_ids']:
