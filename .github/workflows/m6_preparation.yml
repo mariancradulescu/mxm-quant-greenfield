@@ -13,5 +13,34 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install pinned M6 capture runtime
+        run: python -m pip install -r tools/requirements-m6-capture.txt
+      - name: Compile actual Pydroid runtime files
+        run: python -m py_compile M6_CAPTURE_RUN.py M6_CAPTURE_RUN_BASE.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/_ctrader_openapi_base.py
+      - name: No-credential runtime import and SDK heartbeat preflight
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import m6.ctrader_capture as core
+          import m6.ctrader_openapi as runtime
+          report = runtime.runtime_sdk_preflight()
+          assert report["ctrader_open_api_version"] == "0.9.2", report
+          assert report["tcp_protocol_heartbeat_available"] is True, report
+          assert report["sdk_idle_heartbeat_path_verified"] is True, report
+          assert report["network_connection_attempted"] is False, report
+          assert report["credentials_used"] is False, report
+          assert 4.7 < core.HISTORICAL_TARGET_RPS < 4.8
+          print("RUNTIME_PREFLIGHT_PASS", report)
+          PY
       - name: Full repository unittest suite
         run: PYTHONPATH=. python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Build deterministic Pydroid deployment package
+        run: |
+          PYTHONPATH=. python tools/build_m6_pydroid_package.py
+          sha256sum dist/MXM_M6_CAPTURE_PYDROID_PACKAGE.zip
+      - name: Upload Pydroid deployment package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_M6_CAPTURE_PYDROID_PACKAGE
+          path: dist/MXM_M6_CAPTURE_PYDROID_PACKAGE.zip
+          if-no-files-found: error
+          retention-days: 30
