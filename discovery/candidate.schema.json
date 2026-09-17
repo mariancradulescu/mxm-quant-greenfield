@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mxm.greenfield.v2.discovery.candidate.schema.v1",
+  "title": "MXM Greenfield V2 Discovery Candidate",
+  "type": "object",
+  "required": ["id","mechanism","rationale","universe","data","causal_availability","features","lookbacks","normalization_training","timing","direction","entry","exit","maximum_hold","execution_assumptions","filters","parameters","capital_semantics","cost_state","cloud_portability","no_rescue_rule","spec_hash","provenance"],
+  "properties": {
+    "id":{"type":"string","pattern":"^V2-C[0-9]{3,}$"},
+    "mechanism":{},
+    "rationale":{"type":"string"},
+    "universe":{"type":"array","minItems":1},
+    "data":{"type":"object"},
+    "causal_availability":{"type":"object"},
+    "features":{"type":"array"},
+    "lookbacks":{"type":"array"},
+    "normalization_training":{"type":"object"},
+    "timing":{"type":"object"},
+    "direction":{},
+    "entry":{"type":"object"},
+    "exit":{"type":"object"},
+    "maximum_hold":{"type":"object"},
+    "execution_assumptions":{"type":"object"},
+    "filters":{"type":"array"},
+    "parameters":{"type":"object"},
+    "capital_semantics":{"type":"object"},
+    "cost_state":{"type":"object"},
+    "cloud_portability":{"type":"object"},
+    "no_rescue_rule":{"type":"object"},
+    "spec_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "provenance":{"type":"object"}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mxm.greenfield.v2.discovery.result.schema.v1",
+  "title": "MXM Greenfield V2 Discovery Result",
+  "type": "object",
+  "required": ["candidate_id","spec_hash","stage","status","implementation_validity","metrics","eur200_feasibility","cost_confidence","data_completeness","provenance"],
+  "properties": {
+    "candidate_id":{"type":"string","pattern":"^V2-C[0-9]{3,}$"},
+    "spec_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "stage":{"enum":["A","B"]},
+    "status":{"enum":["IMPLEMENTATION_INVALID","DATA_INSUFFICIENT","STRUCTURALLY_INFEASIBLE","GROSS_EDGE_FAIL","COARSE_NET_FAIL","COST_UNRESOLVED","DISCOVERY_SURVIVOR"]},
+    "implementation_validity":{"type":"object"},
+    "metrics":{"type":"object"},
+    "eur200_feasibility":{"type":"object"},
+    "cost_confidence":{"type":"object"},
+    "data_completeness":{"type":"object"},
+    "provenance":{"type":"object"},
+    "result_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}
