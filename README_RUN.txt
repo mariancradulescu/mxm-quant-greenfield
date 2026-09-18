@@ -44,70 +44,70 @@ Never return ~/.mxm_quant/, app_credentials.json, oauth_state.json,
 account_selection.json, access/refresh tokens, authorization code or client secret.
 
 
-LIVE SYMBOL MAPPING
--------------------
-All 11 frozen canonical instruments are resolved from the currently authorized
-Pepperstone LIVE symbol list. Mechanical broker suffix/punctuation differences may be
-auto-resolved only when exactly one enabled LIVE symbol is structurally supported.
+LIVE BROKER PRODUCT PREFLIGHT
+-----------------------------
+After LIVE account authorization the collector performs ONE complete structural preflight
+before any ExpectedMargin, conversion-history or primary historical market-data request.
 
-If mapping is zero/ambiguous, Pydroid prints a numbered local list. Enter the number of
-the correct broker identity, or 0 to BLOCK. A user-selected mapping is saved locally
-only after full symbol metadata confirms it is enabled/tradable. The saved mapping is
-bound to the LIVE environment + broker symbolId + exact broker symbol name and is
-revalidated on every run. If it becomes stale/disabled, it is cleared and selection is
-requested again.
+It loads and caches for this run:
+- Pepperstone LIVE trader/account truth
+- all assets
+- all asset classes
+- all symbol categories
+- the complete current light-symbol universe
+- archived-symbol records returned by cTrader
+- full current symbol metadata for every structurally relevant broker product
 
-No V1/legacy strategy result, PnL, ranking or economic information participates in
-mapping.
+The resolver treats broker products as different identities, not aliases. It distinguishes:
+FX spot/margin CFDs; spot metals; spot energies; spot crypto; cash index CFDs;
+index/commodity forwards or futures CFDs; standard cash share CFDs; extended-hours share
+CFDs; index/share/commodity perpetual CFDs; other perpetual CFDs; other CFDs; unknown.
 
+PERPETUAL and FORWARD/FUTURES identity is resolved before generic index/share/commodity
+classification. A contradictory broker record blocks instead of being guessed.
 
-BROKER PRODUCT / SESSION SEMANTICS
-----------------------------------
-Names that share the same underlying are NOT assumed to be aliases.
+The frozen current bridge expects:
+US500 -> standard cash US500 index CFD
+NAS100 -> standard cash NAS100 index CFD
+XAUUSD -> standard spot-gold CFD
+WTIUSD -> standard spot WTI/crude-oil CFD (currently publicly corroborated as SpotCrude;
+          LIVE symbol metadata remains authoritative)
+BTCUSD -> standard BTCUSD crypto CFD
+AUDJPY -> standard AUDJPY margin-FX product
+AAPL/MSFT/NVDA/AMZN/META -> each standard cash-session US share CFD
 
-Before raw capture, the client fetches current full cTrader metadata for every credible
-LIVE broker product and profiles:
-- exact weekly schedule + scheduleTimeZone
-- tradingMode
-- enableShortSelling
-- min/max/step volume
-- holidays
-- base/quote/category identity
+Products such as US500-F, NAS100-F, XAUUSD-F, Crude-F, -24 shares and perpetual products
+are retained as structural alternatives/exclusions; they are never substituted merely
+to obtain more history or trading hours.
 
-For the frozen V2-C011 share basket, the active binding requires the common executable
-US equity cash-session semantics. A standard cash-session share CFD and a 24/5 share CFD
-are therefore different broker products. The client selects only the unique current LIVE
-product whose actual schedule is compatible with the frozen cash-session requirement.
-The user is NOT asked to choose between products with different session semantics.
+Before historical capture the console prints ALL 11 rows with:
+CANONICAL | BROKER SYMBOL | SYMBOL ID | PRODUCT FAMILY | CATEGORY | ASSET CLASS |
+ENABLED | TRADING MODE | MAPPING POLICY | MAPPING EVIDENCE | STATUS
 
-Manual local selection remains available only when two broker identities have the same
-structural/session semantic fingerprint and the frozen requirements do not distinguish
-them.
+Only:
+BROKER PRODUCT PREFLIGHT: 11/11 PASS
+allows the run to continue.
 
-Current schedule metadata is mapping evidence only; it is never relabelled as historical
-session truth.
+Any other result prints:
+BROKER PRODUCT PREFLIGHT: X/11 PASS — CAPTURE NOT STARTED
+and produces a blocked evidence bundle with diagnostics for every canonical identity.
+There is no manual symbol-product selection between different structural products.
 
+Archived symbols are lineage evidence only and can never replace a current enabled product.
+Current schedules/categories/asset classes are current mapping evidence only; they are not
+promoted to historical 2022-2026 truth.
 
-INDEX / FUTURES PRODUCT-FAMILY GATE
------------------------------------
-The broker mapping stage now obtains the current cTrader Symbol Category and Asset Class
-catalogs in addition to the full symbol schedule.
+READ-ONLY AUXILIARY EVIDENCE
+----------------------------
+After 11/11 mapping PASS, broker-native SymbolsForConversion is used for USD->EUR and
+JPY->EUR conversion-chain binding and ExpectedMargin is queried for the mapped symbols.
+Neither operation places an order or requests trading scope.
 
-Products on the same underlying are not treated as aliases merely because their prices
-refer to the same market. In particular, a cash/spot index CFD and a futures/forward CFD
-are separate broker products.
+Historical trendbars start only after the complete broker-product preflight passes.
+Historical tick data is NOT bulk-downloaded in this build because no frozen Discovery
+cost requirement justifies that acquisition yet.
 
-For frozen V2-C006/V2-C012, raw US500/NAS100 acquisition uses the non-futures cash index
-CFD product. The broker-native feed may trade for extended hours; candidate cash-session
-rules are a separate semantic binding and are NOT inferred from total weekly broker
-hours.
-
-For frozen V2-C007/V2-C008/V2-C009/V2-C010, a futures/forward product is likewise not
-silently substituted for the frozen spot/continuous/non-futures identity.
-
-A local user choice is never used to choose between products with different
-contract/session semantics. Such differences are resolved by frozen semantics + current
-LIVE structural broker evidence or fail closed.
-
-Current category/schedule/holiday metadata is captured as current mapping evidence only.
-It is not promoted to historical truth.
+C008 remains historically UNRESOLVED for continuous-CFD/roll construction until causal
+roll-effective timestamps and adjustment semantics can be proved. C011 historical
+corporate actions, financing, short eligibility and historical session versions likewise
+remain UNRESOLVED unless point-in-time evidence is actually obtained.
