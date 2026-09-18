@@ -2,7 +2,7 @@
 
 Android/Pydroid rules:
 - local callback server owns 127.0.0.1:8765 for the entire OAuth exchange;
-- no browser intent:// deep link is used;
+- no browser browser deep-link deep link is used;
 - no Play Store routing is used;
 - best-effort return to the already-installed Pydroid app uses Android's local activity
   manager only after the authorization code has been received and exchanged;
@@ -269,7 +269,7 @@ def _open_browser(url: str) -> None:
 def _best_effort_return_to_pydroid() -> bool:
     """Ask Android to foreground the already-installed Pydroid launcher activity.
 
-    This does not use an intent:// browser URL and therefore cannot intentionally route
+    This does not use an browser deep-link browser URL and therefore cannot intentionally route
     through Google Play. Failure is non-fatal; the user can return via Android Recents.
     """
     try:

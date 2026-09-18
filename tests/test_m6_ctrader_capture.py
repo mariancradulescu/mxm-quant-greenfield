@@ -486,7 +486,9 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertIn("_fresh_browser_authorization()", ensure)
         self.assertIn("FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION", ensure)
         self.assertIn("ru.iiec.pydroid3", source)
-        self.assertIn("intent://#Intent;package=ru.iiec.pydroid3;end", source)
+        self.assertIn('"am", "start"', source)
+        self.assertIn('"android.intent.category.LAUNCHER"', source)
+        self.assertNotIn("intent://", source)
 
     def test_33_funded_demo_is_ignored_and_unfunded_live_is_selected(self):
         accounts = [
