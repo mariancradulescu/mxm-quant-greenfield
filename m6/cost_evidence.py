@@ -39,9 +39,10 @@ DEVELOPMENT_END_DATE = date(2026, 9, 16)
 CASH_SESSION_TZ = ZoneInfo("America/New_York")
 CASH_OPEN_LOCAL = dtime(9, 30)
 CASH_CLOSE_LOCAL = dtime(16, 0)
-POST_BOUNDARY_MAX_WAIT_MS = 15 * 60 * 1000
-COST_PLAN_REL = "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json"
+QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS = 15 * 60 * 1000
+COST_PLAN_REL = "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
 COST_CALENDAR_REL = "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json"
+CALIBRATION_PROTOCOL_REL = "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json"
 
 COST_PACKAGE_FILES = (
     "M6_COST_EVIDENCE_RUN.py",
@@ -61,8 +62,9 @@ COST_PACKAGE_FILES = (
     "m6/ctrader_proto/OpenApiMessages_pb2.py",
     "m6/ctrader_proto/LICENSE_SPOTWARE_OPENAPIPY.txt",
     "tools/requirements-m6-capture.txt",
-    "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+    "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
     "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
     "README_COST_EVIDENCE.txt",
 )
 
@@ -94,6 +96,28 @@ class CausalQuoteState:
     bid_timestamp_ms: int
     ask_timestamp_ms: int
     spread: float
+
+
+@dataclass(frozen=True)
+class BoundaryCausalState:
+    boundary_ms: int
+    bid: float | None
+    ask: float | None
+    bid_timestamp_ms: int | None
+    ask_timestamp_ms: int | None
+    bid_age_ms: int | None
+    ask_age_ms: int | None
+    spread: float | None
+    availability: str
+
+
+@dataclass(frozen=True)
+class FirstAnyQuoteEvent:
+    timestamp_ms: int
+    side: str
+    bid_price: float | None
+    ask_price: float | None
+    delay_ms: int
 
 
 def _iso_ms(ms: int) -> str:
@@ -276,20 +300,101 @@ def quote_state_at_or_before(
     return eligible[-1]
 
 
-def first_fresh_two_sided_state_at_or_after(
+def latest_tick_at_or_before(
+    ticks: Sequence[DecodedTick],
+    boundary_ms: int,
+) -> DecodedTick | None:
+    """Latest observed one-sided quote at/before boundary; never consult a future event."""
+    eligible = [x for x in ticks if x.timestamp_ms <= boundary_ms]
+    if not eligible:
+        return None
+    return max(eligible, key=lambda x: x.timestamp_ms)
+
+
+def causal_state_at_boundary(
+    bid_ticks: Sequence[DecodedTick],
+    ask_ticks: Sequence[DecodedTick],
+    boundary_ms: int,
+) -> BoundaryCausalState:
+    """Candidate-independent causally known quote state exactly at a generic boundary.
+
+    A side observed before the boundary remains the current causal state until that side
+    changes. This is evidence only and is not an executed-fill assertion.
+    """
+    bid = latest_tick_at_or_before(bid_ticks, boundary_ms)
+    ask = latest_tick_at_or_before(ask_ticks, boundary_ms)
+    if bid is None and ask is None:
+        availability = "MISSING_BOTH_SIDES"
+    elif bid is None:
+        availability = "MISSING_BID"
+    elif ask is None:
+        availability = "MISSING_ASK"
+    else:
+        availability = "CAUSAL_TWO_SIDED_AVAILABLE"
+    return BoundaryCausalState(
+        boundary_ms=boundary_ms,
+        bid=None if bid is None else bid.price,
+        ask=None if ask is None else ask.price,
+        bid_timestamp_ms=None if bid is None else bid.timestamp_ms,
+        ask_timestamp_ms=None if ask is None else ask.timestamp_ms,
+        bid_age_ms=None if bid is None else boundary_ms-bid.timestamp_ms,
+        ask_age_ms=None if ask is None else boundary_ms-ask.timestamp_ms,
+        spread=None if bid is None or ask is None else ask.price-bid.price,
+        availability=availability,
+    )
+
+
+def first_tick_at_or_after(
+    ticks: Sequence[DecodedTick],
+    boundary_ms: int,
+) -> DecodedTick | None:
+    """First observed one-sided quote event at/after boundary in the captured raw tape."""
+    eligible = [x for x in ticks if x.timestamp_ms >= boundary_ms]
+    if not eligible:
+        return None
+    return min(eligible, key=lambda x: x.timestamp_ms)
+
+
+def first_any_quote_event_at_or_after(
+    bid_ticks: Sequence[DecodedTick],
+    ask_ticks: Sequence[DecodedTick],
+    boundary_ms: int,
+) -> FirstAnyQuoteEvent | None:
+    """Earliest BID and/or ASK event at/after boundary, preserving same-ms simultaneity."""
+    bid = first_tick_at_or_after(bid_ticks, boundary_ms)
+    ask = first_tick_at_or_after(ask_ticks, boundary_ms)
+    if bid is None and ask is None:
+        return None
+    stamps = [x.timestamp_ms for x in (bid, ask) if x is not None]
+    stamp = min(stamps)
+    bid_here = bid if bid is not None and bid.timestamp_ms == stamp else None
+    ask_here = ask if ask is not None and ask.timestamp_ms == stamp else None
+    side = (
+        "BID_AND_ASK"
+        if bid_here is not None and ask_here is not None
+        else "BID"
+        if bid_here is not None
+        else "ASK"
+    )
+    return FirstAnyQuoteEvent(
+        timestamp_ms=stamp,
+        side=side,
+        bid_price=None if bid_here is None else bid_here.price,
+        ask_price=None if ask_here is None else ask_here.price,
+        delay_ms=stamp-boundary_ms,
+    )
+
+
+def first_both_sides_refreshed_diagnostic(
     states: Sequence[CausalQuoteState],
     boundary_ms: int,
     *,
-    max_wait_ms: int = POST_BOUNDARY_MAX_WAIT_MS,
+    diagnostic_window_ms: int = QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
 ) -> CausalQuoteState:
-    """First executable two-sided state after a boundary with both sides refreshed.
-
-    A stale pre-boundary side can never be carried into POST_BOUNDARY_EXECUTABLE.
-    The frozen wait interval is [boundary, boundary + max_wait_ms).
-    """
-    if max_wait_ms <= 0:
-        raise CaptureContractError("post-boundary maximum wait must be positive")
-    cutoff = boundary_ms + max_wait_ms
+    """Quote-refresh diagnostic only; never a fill time or execution-delay authority."""
+    if diagnostic_window_ms <= 0:
+        raise CaptureContractError("quote-refresh diagnostic window must be positive")
+    cutoff = boundary_ms + diagnostic_window_ms
     for state in states:
         if state.timestamp_ms < boundary_ms:
             continue
@@ -301,8 +406,9 @@ def first_fresh_two_sided_state_at_or_after(
         ):
             return state
     raise CaptureContractError(
-        "no fresh causal two-sided executable quote within post-boundary wait"
+        "both quote sides did not independently refresh within diagnostic window"
     )
+
 
 
 def cost_resume_contract(
@@ -315,7 +421,7 @@ def cost_resume_contract(
     interval = plan["development_interval"]
     acquisition = plan["acquisition_domain"]
     binding = {
-        "schema": "mxm.greenfield.v2.m6-cost-resume-contract.v2",
+        "schema": "mxm.greenfield.v2.m6-cost-resume-contract.v3",
         "plan_schema": plan["schema"],
         "plan_file_sha256": sha256_file(plan_path),
         "tool_version": str(tool_version),
@@ -340,6 +446,9 @@ def cost_resume_contract(
             ),
             "no_return_conditioned_windows": bool(
                 acquisition["no_return_conditioned_windows"]
+            ),
+            "no_candidate_pnl_conditioned_windows": bool(
+                acquisition.get("no_candidate_pnl_conditioned_windows", False)
             ),
         },
     }
@@ -377,7 +486,7 @@ def prepare_contract_bound_resume(
     if work_dir.exists():
         mismatch = (
             existing is None
-            or existing.get("schema") != "mxm.greenfield.v2.m6-cost-resume.v2"
+            or existing.get("schema") != "mxm.greenfield.v2.m6-cost-resume.v3"
             or existing.get("contract") != expected
             or not isinstance(existing.get("completed"), dict)
         )
@@ -401,7 +510,7 @@ def prepare_contract_bound_resume(
     work_dir.mkdir(parents=True, exist_ok=True)
     if existing is None:
         existing = {
-            "schema": "mxm.greenfield.v2.m6-cost-resume.v2",
+            "schema": "mxm.greenfield.v2.m6-cost-resume.v3",
             "contract": expected,
             "completed": {},
         }
