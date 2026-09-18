@@ -6,6 +6,7 @@ service_identity, cryptography, or ctrader_open_api.
 """
 from __future__ import annotations
 
+import json
 import sys
 import time
 from pathlib import Path
@@ -1008,6 +1009,19 @@ class OpenApiCaptureRunner:
             self._mapping,
         )
         atomic_write_json(
+            evidence / "broker_product_catalog_current.json",
+            drop_secret_fields(self._broker_product_catalog),
+        )
+        source_path = self.repo_root / "evidence" / "BROKER_PRODUCT_IDENTITY_SOURCES_V1.json"
+        if not source_path.is_file():
+            raise CaptureContractError(
+                "broker product public-source provenance artifact missing from runtime package"
+            )
+        atomic_write_json(
+            evidence / "BROKER_PRODUCT_IDENTITY_SOURCES_V1.json",
+            json.loads(source_path.read_text(encoding="utf-8")),
+        )
+        atomic_write_json(
             evidence / "symbol_metadata_current.json",
             drop_secret_fields(self._full_symbols),
         )
@@ -1065,7 +1079,9 @@ class OpenApiCaptureRunner:
             "source_environment": "Pepperstone - Europe LIVE",
             "transport": "PYTHON_STDLIB_TLS_SOCKET",
             "protobuf_messages_source":
-                "spotware/OpenApiPy tag 0.9.2 generated messages",
+                "packaged spotware/OpenApiPy tag 0.9.2 generated messages; "
+                "required read-only message compatibility checked 2026-09-18 "
+                "against current spotware/openapi-proto-messages",
             "oauth_scope": "accounts",
             "read_only": True,
             "orders_sent": 0,
