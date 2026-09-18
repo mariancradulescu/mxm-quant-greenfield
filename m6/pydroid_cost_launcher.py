@@ -28,7 +28,7 @@ from .pydroid_oauth import (
 )
 
 ROOT=Path(__file__).resolve().parents[1]
-PLAN_PATH=ROOT/"data"/"M6_TIER1_COST_EVIDENCE_PLAN_V2.json"
+PLAN_PATH=ROOT/"data"/"M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
 OUTPUT_ROOT=ROOT/"cost_capture_output"
 WORK_ROOT=ROOT/".m6_cost_evidence_work"
 
@@ -72,8 +72,8 @@ def local_preflight():
     if not PLAN_PATH.is_file():
         raise CaptureContractError("cost-evidence plan missing")
     plan=json.loads(PLAN_PATH.read_text(encoding="utf-8"))
-    if plan.get("status")!="PRE_OUTCOME_CORRECTED_REFREEZE_READ_ONLY_ACQUISITION_PLAN":
-        raise CaptureContractError("corrected cost-evidence plan is not active/frozen")
+    if plan.get("status")!="PRE_OUTCOME_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_SEPARATED_READ_ONLY_ACQUISITION_PLAN":
+        raise CaptureContractError("Tier-1 V3 cost-evidence plan is not active/frozen")
     if plan.get("oauth_scope")!="accounts" or plan.get("orders") is not False:
         raise CaptureContractError("cost-evidence plan violates read-only contract")
     if set(plan["targets"])!={"US500","NAS100"}:
@@ -104,9 +104,9 @@ def local_preflight():
 
 
 def main():
-    print("MXM Quant Greenfield V2 — PRE-M6 Tier-1 historical BID/ASK cost evidence")
+    print("MXM Quant Greenfield V2 — PRE-M6 Tier-1 V3 historical BID/ASK quote evidence")
     print("Contract: accounts/view-only | US500=127 + NAS100=126 | orders=NO | economics=NO")
-    print("Existing OHLC capture is NOT rerun.")
+    print("Existing OHLC capture is NOT rerun. Quote evidence is NOT an automatic fill rule.")
 
     try:
         report=local_preflight()
