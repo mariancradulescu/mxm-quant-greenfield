@@ -82,15 +82,40 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         )
         self.assertTrue(e["conversion_evidence"]["economic_conversion_adapter_ready"])
 
-    def test_06_tick_page_absolute_plus_delta_decoding(self):
+    def test_06_tick_page_absolute_plus_signed_delta_decoding(self):
         rows=[
             {"timestamp":1000,"tick":1000000},
-            {"timestamp":100,"tick":999000},
-            {"timestamp":200,"tick":998000},
+            {"timestamp":-100,"tick":1000},
+            {"timestamp":-200,"tick":-500},
         ]
         got=decode_ctrader_tick_page(rows)
         self.assertEqual([x.timestamp_ms for x in got],[700,900,1000])
-        self.assertEqual([x.raw_tick for x in got],[998000,999000,1000000])
+        self.assertEqual([x.raw_tick for x in got],[1000500,1001000,1000000])
+
+    def test_06b_real_ctrader_relative_fixture_reconstructs_timestamp_and_price(self):
+        rows=[
+            {"timestamp":1420235941367,"tick":120015},
+            {"timestamp":-505,"tick":1},
+            {"timestamp":-2668,"tick":-2},
+            {"timestamp":-729,"tick":-1},
+            {"timestamp":-1277,"tick":1},
+        ]
+        got=decode_ctrader_tick_page(rows)
+        self.assertEqual(
+            [x.timestamp_ms for x in got],
+            [1420235936188,1420235937465,1420235938194,1420235940862,1420235941367],
+        )
+        self.assertEqual(
+            [x.raw_tick for x in got],
+            [120014,120013,120014,120016,120015],
+        )
+
+    def test_06c_positive_subsequent_timestamp_delta_fails_closed(self):
+        with self.assertRaisesRegex(Exception,"positive cTrader tick timestamp delta"):
+            decode_ctrader_tick_page([
+                {"timestamp":1000,"tick":1000000},
+                {"timestamp":1,"tick":0},
+            ])
 
     def test_07_tick_hasmore_pagination_moves_backward_and_stall_falls_back_1ms(self):
         page=[DecodedTick(700,1),DecodedTick(900,2),DecodedTick(1000,3)]
