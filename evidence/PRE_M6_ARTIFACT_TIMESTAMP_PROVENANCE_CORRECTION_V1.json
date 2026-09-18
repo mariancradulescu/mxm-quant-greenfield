@@ -1,0 +1,71 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-artifact-timestamp-provenance-correction.v1",
+  "status": "APPEND_ONLY_METADATA_PROVENANCE_CORRECTION",
+  "purpose": "Internal recorded/frozen/retrieved timestamps that post-date the Git commit introducing their artifact are non-authoritative. Semantic freeze/introduction order is established by immutable Git commit history.",
+  "correction_entries": [
+    {
+      "artifact_path": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
+      "introducing_commit_sha": "7842cdfcb1d0ce2a3f5f631a0a52593a4c8fa2f5",
+      "actual_git_commit_utc": "2026-09-18T09:08:25Z",
+      "original_internal_field": "frozen_utc",
+      "original_internal_timestamp": "2026-09-18T09:10:00Z",
+      "authoritative_occurrence_time": "2026-09-18T09:08:25Z",
+      "semantic_order_authority": "GIT_COMMIT_HISTORY"
+    },
+    {
+      "artifact_path": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+      "introducing_commit_sha": "5e65ebbbea9a0e25824e44d7c5418d00a1f093a6",
+      "actual_git_commit_utc": "2026-09-18T09:11:42Z",
+      "original_internal_field": "generated_utc",
+      "original_internal_timestamp": "2026-09-18T09:15:00Z",
+      "authoritative_occurrence_time": "2026-09-18T09:11:42Z",
+      "semantic_order_authority": "GIT_COMMIT_HISTORY"
+    },
+    {
+      "artifact_path": "data/M6_TIER1_COST_EVIDENCE_PLAN_V1.json",
+      "introducing_commit_sha": "0a9a0ba31182e263effad9c739d1a75ebaa9cd8b",
+      "actual_git_commit_utc": "2026-09-18T09:16:08Z",
+      "original_internal_field": "frozen_utc",
+      "original_internal_timestamp": "2026-09-18T09:20:00Z",
+      "authoritative_occurrence_time": "2026-09-18T09:16:08Z",
+      "semantic_order_authority": "GIT_COMMIT_HISTORY"
+    },
+    {
+      "artifact_path": "evidence/TIER1_COST_EVIDENCE_SOURCES_V1.json",
+      "introducing_commit_sha": "cc24424d3fab1e7d0e1a6d0f3e9b2cc897d23b5f",
+      "actual_git_commit_utc": "2026-09-18T09:20:29Z",
+      "original_internal_field": "retrieved_utc",
+      "original_internal_timestamp": "2026-09-18T09:25:00Z",
+      "authoritative_occurrence_time": "2026-09-18T09:20:29Z",
+      "semantic_order_authority": "GIT_COMMIT_HISTORY"
+    },
+    {
+      "artifact_path": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V1.json",
+      "introducing_commit_sha": "5fdf9dde9dfc32b1b711c3054b4da7c10a9c6e3d",
+      "actual_git_commit_utc": "2026-09-18T09:23:43Z",
+      "original_internal_field": "recorded_utc",
+      "original_internal_timestamp": "2026-09-18T09:35:00Z",
+      "authoritative_occurrence_time": "2026-09-18T09:23:43Z",
+      "semantic_order_authority": "GIT_COMMIT_HISTORY"
+    }
+  ],
+  "unaffected_timestamp_examples": [
+    {
+      "artifact_path": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+      "field": "source.catalog_capture_utc",
+      "value": "2026-09-18T07:09:39.435493Z",
+      "role": "EXTERNAL_CAPTURE_EVENT_TIMESTAMP",
+      "correction_required": false
+    }
+  ],
+  "research_integrity": {
+    "all_corrected_artifacts_introduced_before_any_v2_economic_outcome": true,
+    "economic_outcomes_seen": 0,
+    "attempts_consumed": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "candidate_specs_changed": false
+  },
+  "rule": "Original artifacts remain byte-history-visible. Consumers must use Git commit UTC above for occurrence/freeze ordering and must not treat the superseded internal timestamp as authoritative."
+}
