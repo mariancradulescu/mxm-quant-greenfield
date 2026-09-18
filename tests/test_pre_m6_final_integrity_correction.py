@@ -136,7 +136,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
     def test_06_c006_missing_1245_early_close_prior_bar_blocks_gap(self):
         # 2024-11-29 is an official 13:00 ET early close; 2024-12-02 is next session.
         cal = self._calendar_v2()
-        days = weekday_sessions(cal, date(2024, 10, 24), 25)
+        days = weekday_sessions(cal, date(2024, 10, 24), 32)
         self.assertIn(date(2024, 11, 29), days)
         current_day = date(2024, 12, 2)
         self.assertIn(current_day, days)
@@ -247,7 +247,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
             tool_version="TEST_TOOL_V2",
         )
         required = {
-            "plan_schema","plan_file_sha256","tool_version","development_interval",
+            "schema","plan_schema","plan_file_sha256","tool_version","development_interval",
             "protected_forward_boundary","target_symbol_ids","quote_types",
             "acquisition_domain_rule","binding_sha256",
         }
