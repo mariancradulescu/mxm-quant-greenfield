@@ -3,7 +3,11 @@ import unittest
 from pathlib import Path
 
 from m6.ctrader_proto.OpenApiCommonMessages_pb2 import ProtoHeartbeatEvent
-from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAApplicationAuthReq
+from m6.ctrader_proto.OpenApiMessages_pb2 import (
+    ProtoOAApplicationAuthReq,
+    ProtoOAGetTickDataReq,
+    ProtoOAGetTickDataRes,
+)
 from m6.ctrader_transport import (
     LIVE_HOST,
     LIVE_PORT,
@@ -11,6 +15,7 @@ from m6.ctrader_transport import (
     encode_envelope,
     extract_payload,
     runtime_transport_preflight,
+    StdlibCTraderTransport,
 )
 
 
@@ -67,6 +72,61 @@ class M6StdlibTransportTests(unittest.TestCase):
             "m6/ctrader_proto/LICENSE_SPOTWARE_OPENAPIPY.txt",
         ):
             self.assertTrue((root / rel).is_file(), rel)
+
+
+    def test_05_request_batch_correlates_out_of_order_responses_on_one_connection(self):
+        class FakeBatchTransport(StdlibCTraderTransport):
+            def __init__(self):
+                super().__init__()
+                self._sock = object()
+                self.sent_ids = []
+                self._queued = None
+
+            def _send_bytes(self, payload):
+                size = struct.unpack("!I", payload[:4])[0]
+                envelope = decode_envelope(payload[4:4+size])
+                self.sent_ids.append(envelope.clientMsgId)
+
+            def receive_envelope(self, *, deadline):
+                if self._queued is None:
+                    self._queued = []
+                    for index, client_id in reversed(list(enumerate(self.sent_ids))):
+                        response = ProtoOAGetTickDataRes()
+                        response.hasMore = bool(index % 2)
+                        framed = encode_envelope(response, client_id)
+                        self._queued.append(decode_envelope(framed[4:]))
+                return self._queued.pop(0)
+
+            def close(self):
+                self._sock = None
+
+        transport = FakeBatchTransport()
+        requests = [
+            ProtoOAGetTickDataReq(
+                ctidTraderAccountId=1,
+                symbolId=127,
+                type=1,
+                fromTimestamp=1000+i,
+                toTimestamp=2000+i,
+            )
+            for i in range(4)
+        ]
+        responses = transport.request_batch(
+            requests,
+            timeout=1,
+            min_interval_seconds=0,
+        )
+        self.assertEqual(len(transport.sent_ids), 4)
+        self.assertEqual([bool(x.hasMore) for x in responses], [False, True, False, True])
+
+    def test_06_batch_transport_keeps_single_connection_and_client_msg_ids_unique(self):
+        source = (Path(__file__).resolve().parents[1] / "m6/ctrader_transport.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("def request_batch(", source)
+        self.assertIn("pending[client_msg_id]", source)
+        self.assertIn("return [pending[msg_id] for msg_id in ordered_ids]", source)
+        self.assertNotIn("ThreadPoolExecutor", source)
 
 
 if __name__ == "__main__":
