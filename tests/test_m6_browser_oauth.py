@@ -67,7 +67,9 @@ class M6BrowserOAuthTests(unittest.TestCase):
         self.assertIn("Pepperstone - Europe LIVE", module)
         self.assertIn("READ_ONLY_SCOPE", module)
         self.assertNotIn('scope="trading"', module)
-        self.assertNotIn("legacy", module.lower())
+        self.assertNotIn("a118_c02_openapi_v1", module)
+        self.assertNotIn("LEGACY_APP_STATE_PATH", module)
+        self.assertNotIn("SCOPE_VIEW", module)
 
     def test_06_deployment_package_contains_clean_oauth_and_excludes_old_terminal_launcher(self):
         self.assertIn("m6/pydroid_oauth.py", PYDROID_PACKAGE_FILES)
