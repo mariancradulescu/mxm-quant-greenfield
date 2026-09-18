@@ -76,11 +76,11 @@ class M6CaptureAcceptanceTests(unittest.TestCase):
         )
         self.assertEqual(
             s["m6"]["auxiliary_evidence"]["state"],
-            "PARTIAL_EVIDENCE_BOUND_M6_ECONOMICS_BLOCKED",
+            "CANDIDATE_SPECIFIC_PRE_COST_CAPTURE",
         )
         self.assertEqual(
-            s["m6"]["auxiliary_evidence"]["register_ref"],
-            "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
+            s["m6"]["auxiliary_evidence"]["active_readiness_ref"],
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
         )
         self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
         self.assertFalse(s["m6"]["economics_run"])
