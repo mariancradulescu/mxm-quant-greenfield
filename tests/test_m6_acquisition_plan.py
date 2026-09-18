@@ -255,8 +255,8 @@ class M6AcquisitionPlanTests(unittest.TestCase):
         ])
 
     def test_14_frozen_acquisition_plan_stays_unchanged_after_actual_bytes_bind_central_manifest(self):
-        manifest = load("data/DATA_MANIFEST.json")
-        acceptance = load("data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json")
+        manifest = load(ROOT / "data/DATA_MANIFEST.json")
+        acceptance = load(ROOT / "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json")
         self.assertEqual(
             manifest["status"],
             "PRIMARY_WAVE_02_RAW_COMPONENTS_MATERIALIZED_HASH_VERIFIED_AUXILIARY_GATES_PARTIAL",
