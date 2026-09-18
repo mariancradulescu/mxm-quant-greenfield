@@ -296,7 +296,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(e["research_state"]["protected_evidence_opened"])
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"',
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
             runtime,
         )
         self.assertIn(
@@ -325,7 +325,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_23_pipeline_tool_only_resume_migration_preserves_only_hash_verified_chunks(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -362,7 +362,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_24_pipeline_resume_migration_refuses_bad_chunk_hash(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -407,7 +407,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
         )
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["pipeline_batch_size"],
@@ -419,7 +419,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         e = load("evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json")
         self.assertEqual(
             e["corrected_runtime"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
         )
         self.assertEqual(e["corrected_runtime"]["max_initial_batch_size"], 4)
         self.assertEqual(
@@ -435,6 +435,44 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             "evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json",
             COST_PACKAGE_FILES,
         )
+
+
+    def test_28_dns_resilient_pipeline3_preserves_v3_contract_and_zero_economics(self):
+        e = load("evidence/PRE_M6_TIER1_DNS_RESILIENT_RECONNECT_CORRECTION_V1.json")
+        self.assertEqual(
+            e["corrected_runtime"]["tool_version"],
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+        )
+        self.assertEqual(e["corrected_runtime"]["pipeline_batch_size"], 4)
+        self.assertEqual(e["corrected_runtime"]["pipeline_fallback"], "4->2->1")
+        self.assertEqual(
+            e["corrected_runtime"]["automatic_network_recovery"]["maximum_seconds"],
+            1800,
+        )
+        self.assertFalse(e["unchanged_research_contract"]["raw_acquisition_domain_changed"])
+        self.assertFalse(e["unchanged_research_contract"]["candidate_specs_changed"])
+        self.assertEqual(e["research_state"]["economic_outcomes_opened"], 0)
+        self.assertEqual(e["research_state"]["v2_attempts_used"], 0)
+        self.assertEqual(e["research_state"]["result_recorded"], 0)
+        self.assertFalse(e["research_state"]["protected_evidence_opened"])
+        self.assertIn(
+            "evidence/PRE_M6_TIER1_DNS_RESILIENT_RECONNECT_CORRECTION_V1.json",
+            COST_PACKAGE_FILES,
+        )
+
+    def test_29_current_state_activates_pipeline3_dns_cache_runtime(self):
+        state = load("CURRENT_STATE.json")
+        cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
+        self.assertEqual(
+            cap["tool_version"],
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+        )
+        self.assertEqual(cap["pipeline_batch_size"], 4)
+        self.assertIn("DNS_CACHE", cap["network_recovery"])
+        self.assertEqual(state["economic_outcomes_opened"], 0)
+        self.assertEqual(state["v2_attempts_used"], 0)
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertFalse(state["m6"]["economics_run"])
 
 
 
