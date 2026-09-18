@@ -1,0 +1,132 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-pre-m6-readiness.v1",
+  "status": "CANDIDATE_SPECIFIC_NO_GLOBAL_ALL_SEVEN_GATE",
+  "recorded_utc": "2026-09-18T09:35:00Z",
+  "governing_law": [
+    "ONE_BLOCKED_CANDIDATE_DOES_NOT_BLOCK_AN_INDEPENDENTLY_READY_CANDIDATE",
+    "BLOCKED_EVIDENCE_IS_NOT_ECONOMIC_FAILURE",
+    "NO_STAGE_A_OUTCOME_OPENS_IN_THIS_CHECKPOINT",
+    "STAGE_B_EUR200_IS_DEFERRED_UNTIL_DISCOVERY_SURVIVOR"
+  ],
+  "evidence_refs": {
+    "raw_manifest": "data/DATA_MANIFEST.json",
+    "capture_acceptance": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "causal_conversion_and_session": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
+    "tier1_cost_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V1.json",
+    "tier1_cost_sources": "evidence/TIER1_COST_EVIDENCE_SOURCES_V1.json",
+    "c008": "evidence/C008_SPOTCRUDE_CONTINUOUS_CONSTRUCTION_V1.json",
+    "c010": "evidence/C010_AUDJPY_FINANCING_V1.json",
+    "c011": "evidence/C011_POINT_IN_TIME_CORPORATE_ACTIONS_V1.json"
+  },
+  "evidence_acquisition_priority": {
+    "basis": "STRUCTURAL_AND_EVIDENCE_COMPLEXITY_PLUS_OPPORTUNITY_COVERAGE_ONLY_NOT_EXPECTED_RETURN",
+    "tier_1": [
+      "V2-C006",
+      "V2-C012"
+    ],
+    "tier_2": [
+      "V2-C009",
+      "V2-C007"
+    ],
+    "tier_3": [
+      "V2-C008",
+      "V2-C010",
+      "V2-C011"
+    ]
+  },
+  "candidates": {
+    "V2-C006": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_US500_127_CASH_INDEX_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_REFERENCE_CASH_CALENDAR_INTERSECT_OBSERVED_US500_M15_NO_SYNTHETIC_BARS",
+      "candidate_specific_auxiliary_evidence": "PASS_NO_ADDITIONAL_NONCOST_AUXILIARY_BLOCKER_FOR_STAGE_A",
+      "discovery_cost_evidence": {
+        "separate_commission": "PASS_VERIFIED_NO_SEPARATE_INDEX_COMMISSION_EMBEDDED_IN_SPREAD",
+        "spread": "BLOCKED_PENDING_HISTORICAL_BID_ASK_CAPTURE",
+        "slippage_delay": "BLOCKED_PENDING_CANDIDATE_INDEPENDENT_QUOTE_DYNAMICS_REVIEW",
+        "overnight_financing": "PASS_NOT_APPLICABLE_FROZEN_INTRADAY_HOLD"
+      },
+      "implementation_validity": "PASS_PRE_ECONOMIC_C006_REPLAY_IMPLEMENTED_NO_PNL",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_EVIDENCE"
+    },
+    "V2-C007": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_XAUUSD_41_SPOT_METAL_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_OBSERVED_H4_EVENT_REPLAY_NO_SYNTHETIC_BARS",
+      "candidate_specific_auxiliary_evidence": "PASS_CONTRACT_ROLL_NOT_APPLICABLE_TO_ACCEPTED_SPOT_METAL_IDENTITY",
+      "discovery_cost_evidence": "BLOCKED_TIER2_SPREAD_FINANCING_SLIPPAGE_EVIDENCE",
+      "implementation_validity": "BLOCKED_TIER2_CANDIDATE_REPLAY_NOT_MATERIALIZED",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_AND_IMPLEMENTATION_EVIDENCE"
+    },
+    "V2-C008": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_SPOTCRUDE_250_SPOT_ENERGY_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "BLOCKED_EXACT_CONTINUOUS_CONSTRUCTION_INTERACTS_WITH_HISTORICAL_EVENT_IDENTITY",
+      "candidate_specific_auxiliary_evidence": "BLOCKED_C008_HISTORICAL_SPOTCRUDE_CONTINUOUS_ROLL_CONSTRUCTION",
+      "discovery_cost_evidence": "UNRESOLVED_TIER3",
+      "implementation_validity": "DEFERRED_BEHIND_C008_AUXILIARY_BLOCKER",
+      "m6_stage_a_readiness": "BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION"
+    },
+    "V2-C009": {
+      "raw_data": "PASS_HASH_VERIFIED_REAL_GAPS_RETAINED",
+      "current_product_identity": "PASS_BTCUSD_124_SPOT_CRYPTO_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_OBSERVED_H1_EVENTS_AND_REAL_GAPS_SUFFICIENT_FOR_SESSION_AGNOSTIC_STAGE_A",
+      "candidate_specific_auxiliary_evidence": "PASS_NO_WRITTEN_MAINTENANCE_ARCHIVE_REQUIRED_FOR_CAUSAL_EVENT_REPLAY",
+      "discovery_cost_evidence": "BLOCKED_TIER2_CRYPTO_SPREAD_FINANCING_SLIPPAGE_EVIDENCE",
+      "implementation_validity": "BLOCKED_TIER2_CANDIDATE_REPLAY_NOT_MATERIALIZED",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_AND_IMPLEMENTATION_EVIDENCE"
+    },
+    "V2-C010": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_AUDJPY_11_FX_SPOT_OR_MARGIN_CFD",
+      "causal_conversion": "PASS_JPY_TO_EUR_CAUSAL_EURJPY_M15",
+      "session_event_semantics": "BLOCKED_HISTORICAL_FINANCING_ROLLOVER_SCHEDULE_IS_SIGNAL_MATERIAL",
+      "candidate_specific_auxiliary_evidence": "BLOCKED_C010_HISTORICALLY_EFFECTIVE_FINANCING_RATES_AND_MULTIPLIERS",
+      "discovery_cost_evidence": "UNRESOLVED_TIER3",
+      "implementation_validity": "DEFERRED_BEHIND_C010_FINANCING_BLOCKER",
+      "m6_stage_a_readiness": "BLOCKED_C010_HISTORICAL_FINANCING"
+    },
+    "V2-C011": {
+      "raw_data": "PASS_HASH_VERIFIED_FIVE_SHARES",
+      "current_product_identity": "PASS_FIVE_STANDARD_CASH_SHARE_CFDS",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "BLOCKED_EXACT_BROKER_SHARE_CFD_EXECUTION_SESSION_EVIDENCE_REMAINS_MATERIAL",
+      "candidate_specific_auxiliary_evidence": "BLOCKED_C011_BROKER_CFD_CORPORATE_ACTION_ADJUSTMENTS_SHORT_ELIGIBILITY_FINANCING",
+      "discovery_cost_evidence": "UNRESOLVED_TIER3",
+      "implementation_validity": "DEFERRED_BEHIND_C011_AUXILIARY_BLOCKER",
+      "m6_stage_a_readiness": "BLOCKED_C011_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
+    },
+    "V2-C012": {
+      "raw_data": "PASS_HASH_VERIFIED_US500_NAS100_M15",
+      "current_product_identity": "PASS_US500_127_NAS100_126_CASH_INDEX_CFDS",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_REFERENCE_CASH_CALENDAR_STRICT_SYNCHRONIZED_OBSERVED_M15_INTERSECTION",
+      "candidate_specific_auxiliary_evidence": "PASS_NO_ADDITIONAL_NONCOST_AUXILIARY_BLOCKER_FOR_STAGE_A",
+      "discovery_cost_evidence": {
+        "separate_commission": "PASS_VERIFIED_NO_SEPARATE_INDEX_COMMISSION_EMBEDDED_IN_SPREAD",
+        "spread": "BLOCKED_PENDING_HISTORICAL_BID_ASK_CAPTURE",
+        "slippage_delay": "BLOCKED_PENDING_CANDIDATE_INDEPENDENT_QUOTE_DYNAMICS_REVIEW",
+        "overnight_financing": "PASS_NOT_APPLICABLE_FROZEN_INTRADAY_HOLD"
+      },
+      "implementation_validity": "PASS_PRE_ECONOMIC_C012_REPLAY_IMPLEMENTED_NO_PNL",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_EVIDENCE"
+    }
+  },
+  "ready_candidates": [],
+  "global_m6_economics_authorized": false,
+  "exact_next_action": "Run the separate bounded MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once to capture Tier-1 US500/NAS100 BID/ASK evidence. Do not rerun OHLC.",
+  "invariants": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  }
+}
