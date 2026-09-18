@@ -402,6 +402,120 @@ class BrokerProductIdentityTests(unittest.TestCase):
         self.assertIn("shutil.rmtree(self.bundle_dir)", run_block)
         self.assertIn('(self.bundle_dir / "BLOCKED.json").unlink(missing_ok=True)', source)
 
+    def _accepted_live_fixture(self):
+        fixture = json.loads(
+            (ROOT / "tests/fixtures/PEPPERSTONE_LIVE_PRODUCT_IDENTITY_SANITIZED_V1.json")
+            .read_text(encoding="utf-8")
+        )
+        assets = build_catalog(fixture["assets"], ("assetId",))
+        categories = build_catalog(fixture["symbol_categories"], ("id",))
+        classes = build_catalog(fixture["asset_classes"], ("id",))
+        full = {int(k): v for k, v in fixture["full_by_id"].items()}
+        return fixture, assets, categories, classes, full
+
+    def test_23_accepted_live_mappings_remain_exactly_unchanged(self):
+        fixture, assets, categories, classes, full = self._accepted_live_fixture()
+        result = resolve_all_11(
+            fixture["light_symbols"],
+            full,
+            archived_symbols=fixture["archived_symbols"],
+            assets_by_id=assets,
+            categories_by_id=categories,
+            asset_classes_by_id=classes,
+        )
+        self.assertTrue(result["all_current_mappings_pass"])
+        actual = {
+            canonical: {
+                "symbol_name": item["selected_current_product"]["symbol_name"],
+                "symbol_id": int(item["selected_current_product"]["symbol_id"]),
+            }
+            for canonical, item in result["bridge"].items()
+        }
+        self.assertEqual(actual, fixture["accepted_mappings"])
+
+    def test_24_real_btcusd_bchusd_collision_is_ineligible_not_lower_ranked(self):
+        fixture, assets, categories, classes, full = self._accepted_live_fixture()
+        result = resolve_all_11(
+            fixture["light_symbols"], full,
+            assets_by_id=assets, categories_by_id=categories, asset_classes_by_id=classes,
+        )
+        btc = result["bridge"]["BTCUSD"]
+        bch = next(
+            row for row in btc["excluded_materially_different_products"]
+            if row["broker_symbol"] == "BCHUSD"
+        )
+        self.assertIn("DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY", bch["reasons"])
+        self.assertNotIn("AMBIGUOUS_MULTIPLE_STRUCTURALLY_ELIGIBLE_CURRENT_PRODUCTS", bch["reasons"])
+
+        without_btc = [
+            row for row in fixture["light_symbols"] if row["symbolName"] != "BTCUSD"
+        ]
+        blocked = resolve_all_11(
+            without_btc, full,
+            assets_by_id=assets, categories_by_id=categories, asset_classes_by_id=classes,
+        )
+        self.assertEqual(blocked["bridge"]["BTCUSD"]["status"], "BLOCKED")
+        self.assertIsNone(blocked["bridge"]["BTCUSD"]["selected_current_product"])
+
+    def test_25_real_xauusd_quote_and_underlying_collisions_are_ineligible(self):
+        fixture, assets, categories, classes, full = self._accepted_live_fixture()
+        result = resolve_all_11(
+            fixture["light_symbols"], full,
+            assets_by_id=assets, categories_by_id=categories, asset_classes_by_id=classes,
+        )
+        xau = result["bridge"]["XAUUSD"]
+        excluded = {
+            row["broker_symbol"]: set(row["reasons"])
+            for row in xau["excluded_materially_different_products"]
+        }
+        for name in ("XAUAUD", "XAUCHF", "XAUEUR", "XAUGBP", "XAUJPY"):
+            self.assertIn("DIFFERENT_QUOTE_CURRENCY", excluded[name])
+            self.assertNotIn(
+                "AMBIGUOUS_MULTIPLE_STRUCTURALLY_ELIGIBLE_CURRENT_PRODUCTS",
+                excluded[name],
+            )
+        for name in ("PAXGUSD", "XAUTUSD"):
+            self.assertIn("DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY", excluded[name])
+            self.assertNotIn(
+                "AMBIGUOUS_MULTIPLE_STRUCTURALLY_ELIGIBLE_CURRENT_PRODUCTS",
+                excluded[name],
+            )
+
+    def test_26_removing_exact_xauusd_cannot_substitute_gold_description_products(self):
+        fixture, assets, categories, classes, full = self._accepted_live_fixture()
+        without_xauusd = [
+            row for row in fixture["light_symbols"] if row["symbolName"] != "XAUUSD"
+        ]
+        result = resolve_all_11(
+            without_xauusd, full,
+            assets_by_id=assets, categories_by_id=categories, asset_classes_by_id=classes,
+        )
+        bridge = result["bridge"]["XAUUSD"]
+        self.assertEqual(bridge["status"], "BLOCKED")
+        self.assertIsNone(bridge["selected_current_product"])
+        excluded = {row["broker_symbol"] for row in bridge["excluded_materially_different_products"]}
+        self.assertTrue(
+            {"PAXGUSD", "XAUAUD", "XAUCHF", "XAUEUR", "XAUGBP", "XAUJPY", "XAUTUSD"}
+            <= excluded
+        )
+
+    def test_27_binding_identity_uses_asset_metadata_not_description_aliases(self):
+        fixture, assets, categories, classes, full = self._accepted_live_fixture()
+        profiles = {
+            row["symbolName"]: product_profile(
+                row, full[int(row["symbolId"])],
+                assets_by_id=assets,
+                categories_by_id=categories,
+                asset_classes_by_id=classes,
+            )
+            for row in fixture["light_symbols"]
+        }
+        from m6.broker_product_identity import identity_match
+        self.assertTrue(identity_match("BTCUSD", profiles["BTCUSD"]))
+        self.assertFalse(identity_match("BTCUSD", profiles["BCHUSD"]))
+        self.assertTrue(identity_match("XAUUSD", profiles["XAUUSD"]))
+        self.assertFalse(identity_match("XAUUSD", profiles["PAXGUSD"]))
+        self.assertFalse(identity_match("XAUUSD", profiles["XAUEUR"]))
 
 
 if __name__ == "__main__":
