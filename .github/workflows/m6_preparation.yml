@@ -21,7 +21,7 @@ jobs:
         run: |
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile actual Pydroid runtime files
-        run: python -m py_compile M6_CAPTURE_RUN.py m6/pydroid_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
+        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
       - name: No-credential Android-safe runtime preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -61,5 +61,16 @@ jobs:
         with:
           name: MXM_M6_CAPTURE_PYDROID_PACKAGE
           path: dist/MXM_M6_CAPTURE_PYDROID_PACKAGE.zip
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build deterministic Tier-1 cost-evidence Pydroid package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_m6_cost_evidence_pydroid_package.py
+          sha256sum dist/MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip
+      - name: Upload Tier-1 cost-evidence Pydroid package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE
+          path: dist/MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip
           if-no-files-found: error
           retention-days: 30
