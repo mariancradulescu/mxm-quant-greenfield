@@ -183,12 +183,12 @@
         "commission_state": "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
         "discovery_execution_cost_rule": "PENDING_CANDIDATE_INDEPENDENT_POST_CAPTURE_CALIBRATION",
         "m6_stage_a_economics_authorized": false,
-        "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+        "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
         "last_user_run": {
-          "state": "BLOCKED_SAFELY_BEFORE_COMPLETED_CHUNK",
-          "error": "negative cTrader tick timestamp delta",
-          "orders": false,
-          "account_mutation": false,
+          "state": "RUNNING_BUT_UNSTABLE_PIPELINE1",
+          "resume_chunks_migrated": 70,
+          "repeated_pipeline_retries": true,
+          "observed_effective_completed_request_rate_per_second": 1.48,
           "economics": false,
           "outcome_opened": false,
           "attempt_consumed": false,
@@ -196,17 +196,18 @@
         },
         "resume_after_decoder_fix": "OLD_V3_WORK_ARCHIVED_AUTOMATICALLY_BY_TOOL_VERSION_BINDING_MISMATCH_START_CLEAN",
         "transport_mode": "SINGLE_LIVE_CONNECTION_PIPELINED_BATCHES",
-        "pipeline_batch_size": 16,
+        "pipeline_batch_size": 4,
         "historical_request_send_interval_seconds": 0.21,
         "official_historical_request_ceiling_per_second_per_connection": 5,
-        "resume_after_pipeline_optimization": "EXPLICIT_HASH_VERIFIED_TOOL_ONLY_MIGRATION_FROM_V3_TICKDELTA1_WHEN_ALL_SEMANTIC_CONTRACT_FIELDS_MATCH"
+        "resume_after_pipeline_optimization": "EXPLICIT_HASH_VERIFIED_TOOL_ONLY_MIGRATION_FROM_V3_TICKDELTA1_WHEN_ALL_SEMANTIC_CONTRACT_FIELDS_MATCH",
+        "pipeline_fallback": "4_TO_2_TO_1_ON_REPEATED_BATCH_FAILURE"
       },
       "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
       "m6_stage_a_economics_authorized": false
     },
     "economics_run": false
   },
-  "next_action": "Run the rebuilt pipelined V3 MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It preserves hash-verified chunks from the stopped V3_TICKDELTA1 run when the exact V3 raw acquisition contract matches. Do not rerun accepted OHLC capture. Return only MXM_M6_TIER1_COST_EVIDENCE_V3.zip. Do not run M6 economics.",
+  "next_action": "Run the rebuilt V3 PIPELINE2 MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It reuses hash-verified chunks from V3_TICKDELTA1 or V3_PIPELINE1 when the exact V3 semantic contract matches, starts with batch 4, and automatically falls back 4->2->1 on repeated transport/server failures. Do not rerun accepted OHLC capture. Return only MXM_M6_TIER1_COST_EVIDENCE_V3.zip. Do not run M6 economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
@@ -328,5 +329,6 @@
   "tier1_discovery_execution_cost_calibration_protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
   "pre_m6_quote_evidence_execution_authority_correction_authority": "evidence/PRE_M6_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_CORRECTION_V1.json",
   "pre_m6_ctrader_tick_delta_decoder_correction_authority": "evidence/PRE_M6_CTRADER_TICK_DELTA_DECODER_CORRECTION_V1.json",
-  "pre_m6_tier1_pipeline_throughput_optimization_authority": "evidence/PRE_M6_TIER1_PIPELINE_THROUGHPUT_OPTIMIZATION_V1.json"
+  "pre_m6_tier1_pipeline_throughput_optimization_authority": "evidence/PRE_M6_TIER1_PIPELINE_THROUGHPUT_OPTIMIZATION_V1.json",
+  "pre_m6_tier1_pipeline_stability_correction_authority": "evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json"
 }
