@@ -60,7 +60,7 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "candidate_ids": ["V2-C007"],
         "preferred_broker_symbols": ["XAUUSD"],
         "aliases": ["XAUUSD", "XAU/USD", "GOLD"],
-        "source_ids": ["PEPPERSTONE_FORWARD_CURRENT"],
+        "source_ids": ["PEPPERSTONE_COMMODITIES_CURRENT", "PEPPERSTONE_FORWARD_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_SPOT_GOLD_CFD",
     },
     "WTIUSD": {
@@ -68,7 +68,7 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "candidate_ids": ["V2-C008"],
         "preferred_broker_symbols": ["SPOTCRUDE", "WTIUSD"],
         "aliases": ["WTIUSD", "WTI/USD", "WTI", "SPOTCRUDE", "CRUDE"],
-        "source_ids": ["PEPPERSTONE_FORWARD_CURRENT", "PEPPERSTONE_PERPETUAL_CURRENT"],
+        "source_ids": ["PEPPERSTONE_COMMODITIES_CURRENT", "PEPPERSTONE_SPOTCRUDE_CURRENT_SYMBOL_CORROBORATION", "PEPPERSTONE_FORWARD_CURRENT", "PEPPERSTONE_PERPETUAL_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_SPOT_WTI_CRUDE_CFD_CURRENT_MAPPING_ONLY",
     },
     "BTCUSD": {
