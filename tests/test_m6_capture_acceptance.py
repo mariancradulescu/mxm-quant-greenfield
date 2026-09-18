@@ -74,7 +74,15 @@ class M6CaptureAcceptanceTests(unittest.TestCase):
             s["m6"]["raw_materialization"]["state"],
             "PASS_HASH_VERIFIED_PRIMARY_WAVE_02_RAW_COMPONENTS",
         )
-        self.assertEqual(s["m6"]["auxiliary_evidence"]["state"], "INCOMPLETE")
+        self.assertEqual(
+            s["m6"]["auxiliary_evidence"]["state"],
+            "PARTIAL_EVIDENCE_BOUND_M6_ECONOMICS_BLOCKED",
+        )
+        self.assertEqual(
+            s["m6"]["auxiliary_evidence"]["register_ref"],
+            "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
+        )
+        self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
         self.assertFalse(s["m6"]["economics_run"])
         self.assertEqual(s["economic_outcomes_opened"], 0)
         self.assertEqual(s["v2_attempts_used"], 0)
