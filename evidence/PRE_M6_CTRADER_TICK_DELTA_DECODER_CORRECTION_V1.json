@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-ctrader-tick-delta-decoder-correction.v1",
+  "status": "PRE_OUTCOME_IMPLEMENTATION_CORRECTION_AFTER_SAFE_CAPTURE_BLOCK",
+  "observed_failure": "negative cTrader tick timestamp delta",
+  "failure_stage": "TIER1_V3_READ_ONLY_COST_CAPTURE_BEFORE_ANY_COMPLETED_CHUNK",
+  "root_cause": "ProtoOAGetTickDataRes historical ticks are newest-first and delta-compressed after the first element. The implementation incorrectly rejected negative timestamp deltas and incorrectly treated later tick values as absolute raw prices.",
+  "corrected_semantics": {
+    "first_element": {
+      "timestamp": "ABSOLUTE_UNIX_MS",
+      "tick": "ABSOLUTE_RAW_PRICE"
+    },
+    "subsequent_elements": {
+      "timestamp": "SIGNED_DELTA_FROM_IMMEDIATELY_PREVIOUS_ENCODED_TICK_ADDED_CUMULATIVELY",
+      "tick": "SIGNED_RAW_PRICE_DELTA_FROM_IMMEDIATELY_PREVIOUS_ENCODED_TICK_ADDED_CUMULATIVELY"
+    },
+    "normalized_output": "OLDEST_FIRST_ABSOLUTE_TIMESTAMP_AND_ABSOLUTE_RAW_PRICE",
+    "zero_timestamp_delta_allowed": true,
+    "positive_subsequent_timestamp_delta": "FAIL_CLOSED_AS_NEWEST_FIRST_PROTOCOL_VIOLATION"
+  },
+  "sources": [
+    {
+      "organization": "Spotware / cTrader",
+      "title": "Open API ProtoOAGetTickDataRes",
+      "url": "https://help.ctrader.com/open-api/messages/",
+      "fact": "tickData is newest-first; first timestamp is absolute Unix milliseconds and later timestamps are time differences from the previous/current tick."
+    },
+    {
+      "organization": "Spotware / cTrader",
+      "title": "Attain symbol data - historical tick data",
+      "url": "https://help.ctrader.com/open-api/symbol-data/",
+      "fact": "Historical tick data is returned in relative format and must be transformed to actual symbol prices."
+    },
+    {
+      "organization": "cTrader Community / Spotware support context",
+      "title": "ProtoOAGetTickDataReq Assistance",
+      "url": "https://community.ctrader.com/forum/connect-api-support/32156/",
+      "fact": "Spotware support states timestamp deltas are distances from the previous tick and must be cumulatively added from the first tick."
+    },
+    {
+      "organization": "cTrader Community",
+      "title": "Help me,About ProtoOAGetTickDataRes",
+      "url": "https://community.ctrader.com/forum/connect-api-support/21566/",
+      "fact": "Protocol example shows first absolute timestamp/price followed by negative timestamp deltas and small signed price deltas; relative values are applied cumulatively."
+    }
+  ],
+  "resume_safety": {
+    "tool_version_bumped": true,
+    "same_v3_plan": true,
+    "v3_work_contract_binding_changes": true,
+    "prior_failed_v3_work_reused": false,
+    "behavior": "Existing V3 work directory is archived automatically on tool-version binding mismatch and capture starts clean."
+  },
+  "preserved": {
+    "active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "candidate_specs_changed": false,
+    "candidate_hashes_changed": false,
+    "accepted_ohlc_changed": false,
+    "raw_acquisition_domain_changed": false,
+    "calibration_protocol_changed": false,
+    "ledger_changed": false,
+    "search_budget_changed": false,
+    "protected_boundary_changed": false
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}
