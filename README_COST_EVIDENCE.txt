@@ -102,3 +102,23 @@ Verified chunks from both V3_TICKDELTA1 and V3_PIPELINE1 are eligible for explic
 resume migration only when the complete V3 semantic contract matches and every referenced
 chunk passes SHA256 verification. No accepted OHLC data, candidate semantics, economics,
 or protected evidence are touched.
+
+
+V3 PIPELINE3 DNS-RESILIENT RECONNECT:
+The user's PIPELINE2 run resumed 1130 verified chunks and reached 1170 chunks, then a
+historical batch timeout was followed by Android/mobile DNS failure:
+gaierror [Errno 7] No address associated with hostname.
+
+PIPELINE3 keeps the same V3 raw evidence contract, one LIVE connection, batch 4 and
+4->2->1 fallback. It now caches cTrader LIVE resolved IP endpoint(s) after a successful
+connection. If fresh DNS later fails, reconnect can use the cached IP while still passing
+live.ctraderapi.com as TLS server_hostname, so certificate verification remains hostname-
+based. The endpoint cache is operational only, stored under .m6_cost_evidence_work, and is
+not research evidence.
+
+Transient network/DNS failures no longer immediately terminate the collector. It will
+pause and retry automatically with exponential backoff (1,2,4,8,16,30s capped at 30s)
+for up to 30 minutes. Valid completed chunks remain SHA256-verified and resumable.
+
+The user must not edit package files, delete work state, or manually repair anything.
+Extract the package and run M6_COST_EVIDENCE_RUN.py.
