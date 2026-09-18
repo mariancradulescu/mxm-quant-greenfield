@@ -1279,6 +1279,10 @@ def build_pydroid_package(repo_root: Path | str, zip_path: Path | str) -> str:
 
 def _validate_transfer_names(names: Iterable[str]) -> dict[str, int]:
     normalized = {str(name).replace("\\", "/").lstrip("/") for name in names}
+    if "BLOCKED.json" in normalized:
+        raise CaptureContractError(
+            "successful transferable bundle must not contain BLOCKED.json"
+        )
     missing = sorted(TRANSFERABLE_REQUIRED_FILES - normalized)
     if missing:
         raise CaptureContractError(f"final evidence bundle missing transferable artifacts: {missing}")
