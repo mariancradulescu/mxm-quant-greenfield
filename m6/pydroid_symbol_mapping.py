@@ -57,6 +57,10 @@ def load_symbol_overrides() -> dict[str, dict[str, Any]]:
             "broker_symbol": name,
             "source_environment": SYMBOL_MAPPING_SOURCE_ENVIRONMENT,
             "account_fingerprint_sha256": item.get("account_fingerprint_sha256"),
+            "product_semantic_fingerprint_sha256": item.get(
+                "product_semantic_fingerprint_sha256"
+            ),
+            "mapping_policy": item.get("mapping_policy"),
         }
     return out
 
@@ -83,6 +87,10 @@ def save_symbol_override(canonical: str, mapping: Mapping[str, Any]) -> None:
         "broker_symbol": str(mapping["broker_symbol"]),
         "source_environment": SYMBOL_MAPPING_SOURCE_ENVIRONMENT,
         "account_fingerprint_sha256": mapping.get("account_fingerprint_sha256"),
+        "product_semantic_fingerprint_sha256": mapping.get(
+            "product_semantic_fingerprint_sha256"
+        ),
+        "mapping_policy": mapping.get("mapping_policy"),
     }
     _write_mappings(current)
 
@@ -97,7 +105,8 @@ def clear_symbol_override(canonical: str) -> None:
 
 def choose_symbol_locally(canonical: str, discovery: Mapping[str, Any]):
     candidates = (
-        discovery.get("credible_candidates")
+        discovery.get("candidate_product_profiles")
+        or discovery.get("credible_candidates")
         or discovery.get("related_candidates")
         or []
     )
@@ -109,7 +118,9 @@ def choose_symbol_locally(canonical: str, discovery: Mapping[str, Any]):
             print(
                 f"{index}. {row['symbol_name']} — "
                 f"{row.get('description') or '-'} — symbolId {row['symbol_id']} "
-                f"— enabled={row['enabled']}"
+                f"— enabled={row.get('enabled', row.get('light_enabled'))}"
+                f" — session={row.get('session_class', '-')}"
+                f" — weekly={row.get('weekly_open_hours', '-')}h"
             )
     else:
         print("(no structurally related enabled LIVE candidates)")

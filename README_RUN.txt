@@ -59,3 +59,30 @@ requested again.
 
 No V1/legacy strategy result, PnL, ranking or economic information participates in
 mapping.
+
+
+BROKER PRODUCT / SESSION SEMANTICS
+----------------------------------
+Names that share the same underlying are NOT assumed to be aliases.
+
+Before raw capture, the client fetches current full cTrader metadata for every credible
+LIVE broker product and profiles:
+- exact weekly schedule + scheduleTimeZone
+- tradingMode
+- enableShortSelling
+- min/max/step volume
+- holidays
+- base/quote/category identity
+
+For the frozen V2-C011 share basket, the active binding requires the common executable
+US equity cash-session semantics. A standard cash-session share CFD and a 24/5 share CFD
+are therefore different broker products. The client selects only the unique current LIVE
+product whose actual schedule is compatible with the frozen cash-session requirement.
+The user is NOT asked to choose between products with different session semantics.
+
+Manual local selection remains available only when two broker identities have the same
+structural/session semantic fingerprint and the frozen requirements do not distinguish
+them.
+
+Current schedule metadata is mapping evidence only; it is never relabelled as historical
+session truth.

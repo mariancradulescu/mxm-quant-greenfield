@@ -508,6 +508,347 @@ def format_symbol_mapping_diagnostic(discovery: Mapping[str, Any]) -> list[str]:
     return lines
 
 
+
+C011_ACTIVE_SPEC_HASH = "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd"
+C011_SEMANTIC_REQUIREMENTS_SHA256 = "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
+MAPPING_POLICY_GENERIC = "GENERIC_STRUCTURAL_IDENTITY"
+MAPPING_POLICY_US_EQUITY_CASH = "COMMON_EXECUTABLE_US_EQUITY_CASH_SESSION"
+
+
+def mapping_semantic_policy(plan: Mapping[str, Any], canonical: str) -> str:
+    bindings = [
+        item
+        for item in plan.get("candidate_dataset_bindings", [])
+        if item.get("canonical_instrument") == canonical
+    ]
+    for binding in bindings:
+        if binding.get("candidate_id") != "V2-C011":
+            continue
+        if binding.get("spec_hash") != C011_ACTIVE_SPEC_HASH:
+            raise CaptureContractError(
+                f"{canonical}: V2-C011 active spec hash mismatch during symbol mapping"
+            )
+        if binding.get("semantic_requirements_sha256") != C011_SEMANTIC_REQUIREMENTS_SHA256:
+            raise CaptureContractError(
+                f"{canonical}: V2-C011 semantic binding hash mismatch during symbol mapping"
+            )
+        return MAPPING_POLICY_US_EQUITY_CASH
+    return MAPPING_POLICY_GENERIC
+
+
+def _full_field(full_symbol: Mapping[str, Any], camel: str, snake: str | None = None, default: Any = None) -> Any:
+    if camel in full_symbol:
+        return full_symbol[camel]
+    if snake and snake in full_symbol:
+        return full_symbol[snake]
+    return default
+
+
+def _normalized_schedule(full_symbol: Mapping[str, Any]) -> tuple[list[dict[str, int]], bool]:
+    raw = _full_field(full_symbol, "schedule", default=[]) or []
+    intervals: list[dict[str, int]] = []
+    valid = True
+    for item in raw:
+        try:
+            start = int(item.get("startSecond", item.get("start_second")))
+            end = int(item.get("endSecond", item.get("end_second")))
+        except (AttributeError, TypeError, ValueError):
+            valid = False
+            continue
+        if start < 0 or end <= start or end > 7 * 24 * 60 * 60:
+            valid = False
+            continue
+        intervals.append({"start_second": start, "end_second": end})
+    intervals.sort(key=lambda x: (x["start_second"], x["end_second"]))
+    if not intervals:
+        valid = False
+    return intervals, valid
+
+
+def broker_product_profile(
+    light_symbol: Mapping[str, Any],
+    full_symbol: Mapping[str, Any] | None,
+    *,
+    assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    assets_by_id = assets_by_id or {}
+    sid = _symbol_id(light_symbol)
+    base_id = light_symbol.get("baseAssetId", light_symbol.get("base_asset_id"))
+    quote_id = light_symbol.get("quoteAssetId", light_symbol.get("quote_asset_id"))
+    base = assets_by_id.get(int(base_id), {}) if str(base_id or "").isdigit() else {}
+    quote = assets_by_id.get(int(quote_id), {}) if str(quote_id or "").isdigit() else {}
+    name = _symbol_name(light_symbol)
+    description = str(light_symbol.get("description", "") or "")
+
+    if full_symbol is None:
+        return {
+            "symbol_id": sid,
+            "symbol_name": name,
+            "description": description,
+            "light_enabled": _symbol_enabled(light_symbol),
+            "full_metadata_available": False,
+            "trading_mode": None,
+            "enable_short_selling": None,
+            "schedule_timezone": None,
+            "schedule": [],
+            "weekly_open_hours": None,
+            "max_interval_hours": None,
+            "session_class": "UNKNOWN_FULL_METADATA_MISSING",
+            "explicit_24h_marker": False,
+            "base_asset_id": base_id,
+            "base_asset_name": base.get("name") or base.get("displayName"),
+            "quote_asset_id": quote_id,
+            "quote_asset_name": quote.get("name") or quote.get("displayName"),
+            "symbol_category_id": light_symbol.get("symbolCategoryId", light_symbol.get("symbol_category_id")),
+            "session_fingerprint_sha256": None,
+            "product_semantic_fingerprint_sha256": None,
+        }
+
+    intervals, schedule_valid = _normalized_schedule(full_symbol)
+    weekly_seconds = sum(item["end_second"] - item["start_second"] for item in intervals)
+    max_seconds = max((item["end_second"] - item["start_second"] for item in intervals), default=0)
+    weekly_hours = weekly_seconds / 3600.0 if schedule_valid else None
+    max_hours = max_seconds / 3600.0 if schedule_valid else None
+    marker_text = (name + " " + description).upper()
+    explicit_24h_marker = (
+        "-24" in name.upper()
+        or "(24 HOURS)" in marker_text
+        or "24 HOURS" in marker_text
+        or "24/5" in marker_text
+    )
+
+    if not schedule_valid:
+        session_class = "UNKNOWN_SCHEDULE"
+    elif weekly_hours is not None and (weekly_hours >= 80.0 or max_hours >= 18.0):
+        session_class = "EXTENDED_24_5_LIKE"
+    elif (
+        weekly_hours is not None
+        and 20.0 <= weekly_hours <= 50.0
+        and max_hours is not None
+        and max_hours <= 12.0
+        and not explicit_24h_marker
+    ):
+        session_class = "US_CASH_SESSION_LIKE"
+    else:
+        session_class = "OTHER_SESSION_PROFILE"
+
+    trading_mode = _full_field(full_symbol, "tradingMode", "trading_mode")
+    short_enabled = _full_field(full_symbol, "enableShortSelling", "enable_short_selling")
+    session_identity = {
+        "schedule_timezone": _full_field(full_symbol, "scheduleTimeZone", "schedule_time_zone"),
+        "schedule": intervals,
+        "trading_mode": trading_mode,
+    }
+    product_identity = {
+        "base_asset_id": base_id,
+        "quote_asset_id": quote_id,
+        "symbol_category_id": light_symbol.get("symbolCategoryId", light_symbol.get("symbol_category_id")),
+        "session_identity": session_identity,
+    }
+    return {
+        "symbol_id": sid,
+        "symbol_name": name,
+        "description": description,
+        "light_enabled": _symbol_enabled(light_symbol),
+        "full_metadata_available": True,
+        "trading_mode": trading_mode,
+        "enable_short_selling": short_enabled,
+        "schedule_timezone": session_identity["schedule_timezone"],
+        "schedule": intervals,
+        "weekly_open_hours": round(weekly_hours, 4) if weekly_hours is not None else None,
+        "max_interval_hours": round(max_hours, 4) if max_hours is not None else None,
+        "session_class": session_class,
+        "explicit_24h_marker": explicit_24h_marker,
+        "base_asset_id": base_id,
+        "base_asset_name": base.get("name") or base.get("displayName"),
+        "quote_asset_id": quote_id,
+        "quote_asset_name": quote.get("name") or quote.get("displayName"),
+        "symbol_category_id": product_identity["symbol_category_id"],
+        "min_volume": _full_field(full_symbol, "minVolume", "min_volume"),
+        "max_volume": _full_field(full_symbol, "maxVolume", "max_volume"),
+        "step_volume": _full_field(full_symbol, "stepVolume", "step_volume"),
+        "holiday_count": len(_full_field(full_symbol, "holiday", default=[]) or []),
+        "session_fingerprint_sha256": sha256_bytes(canonical_json_bytes(session_identity)),
+        "product_semantic_fingerprint_sha256": sha256_bytes(canonical_json_bytes(product_identity)),
+    }
+
+
+def _profile_is_enabled_tradable(profile: Mapping[str, Any]) -> bool:
+    if not profile.get("light_enabled") or not profile.get("full_metadata_available"):
+        return False
+    return profile.get("trading_mode") in (0, "0", "ENABLED", None)
+
+
+def profiled_mapping_candidates(
+    discovery: Mapping[str, Any],
+    light_symbols: Sequence[Mapping[str, Any]],
+    full_by_id: Mapping[int, Mapping[str, Any]],
+    *,
+    assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    rows = discovery.get("credible_candidates") or discovery.get("related_candidates") or []
+    profiles = []
+    for row in rows:
+        sid = int(row["symbol_id"])
+        light = _find_symbol_by_id(light_symbols, sid)
+        if light is None:
+            continue
+        profiles.append(
+            broker_product_profile(light, full_by_id.get(sid), assets_by_id=assets_by_id)
+        )
+    return profiles
+
+
+def format_broker_product_profiles(
+    canonical: str,
+    policy: str,
+    profiles: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    lines = [
+        f"[PRODUCT PROFILE] {canonical} | policy={policy} | current LIVE variants={len(profiles)}"
+    ]
+    for profile in profiles:
+        hours = profile.get("weekly_open_hours")
+        max_hours = profile.get("max_interval_hours")
+        hours_text = "?" if hours is None else f"{hours:.2f}h/week"
+        max_text = "?" if max_hours is None else f"{max_hours:.2f}h max-session"
+        lines.append(
+            "  - "
+            f"{profile.get('symbol_name')} | {profile.get('description') or '-'} | "
+            f"symbolId {profile.get('symbol_id')} | "
+            f"session={profile.get('session_class')} | "
+            f"{hours_text} | {max_text} | "
+            f"tz={profile.get('schedule_timezone') or '-'} | "
+            f"short={profile.get('enable_short_selling')} | "
+            f"tradingMode={profile.get('trading_mode')}"
+        )
+    return lines
+
+
+def resolve_profiled_broker_product(
+    canonical: str,
+    plan: Mapping[str, Any],
+    discovery: Mapping[str, Any],
+    light_symbols: Sequence[Mapping[str, Any]],
+    full_by_id: Mapping[int, Mapping[str, Any]],
+    *,
+    assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    saved_override: Mapping[str, Any] | None = None,
+    selector: Any = None,
+    clear_saved: Any = None,
+) -> tuple[Mapping[str, Any], Mapping[str, Any], str, str, list[dict[str, Any]]]:
+    policy = mapping_semantic_policy(plan, canonical)
+    profiles = profiled_mapping_candidates(
+        discovery, light_symbols, full_by_id, assets_by_id=assets_by_id
+    )
+    by_id = {int(profile["symbol_id"]): profile for profile in profiles}
+
+    if saved_override is not None:
+        try:
+            saved_light = validate_saved_symbol_override(canonical, saved_override, light_symbols)
+            saved_id = _symbol_id(saved_light)
+            saved_profile = by_id.get(saved_id)
+            if saved_profile is None or not _profile_is_enabled_tradable(saved_profile):
+                raise MappingError(f"{canonical}: saved broker product full metadata invalid")
+            if policy == MAPPING_POLICY_US_EQUITY_CASH:
+                if saved_profile.get("session_class") != "US_CASH_SESSION_LIKE":
+                    raise MappingError(
+                        f"{canonical}: saved broker product violates frozen cash-session semantics"
+                    )
+            else:
+                current_fp = saved_profile.get("product_semantic_fingerprint_sha256")
+                saved_fp = saved_override.get("product_semantic_fingerprint_sha256")
+                distinct = {
+                    p.get("product_semantic_fingerprint_sha256")
+                    for p in profiles
+                    if _profile_is_enabled_tradable(p)
+                }
+                distinct.discard(None)
+                if len(distinct) > 1 and saved_fp != current_fp:
+                    raise MappingError(
+                        f"{canonical}: saved mapping lacks current product-semantic binding"
+                    )
+            return saved_light, saved_profile, "PERSISTED_LOCAL_OVERRIDE", policy, profiles
+        except MappingError:
+            if callable(clear_saved):
+                clear_saved(canonical)
+
+    valid_profiles = [p for p in profiles if _profile_is_enabled_tradable(p)]
+
+    if policy == MAPPING_POLICY_US_EQUITY_CASH:
+        if any(not p.get("full_metadata_available") for p in profiles):
+            raise MappingError(
+                f"{canonical}: full LIVE metadata missing for at least one same-underlying "
+                "broker product; cash-session semantic selection cannot be proven"
+            )
+        compatible = [
+            p for p in valid_profiles
+            if p.get("session_class") == "US_CASH_SESSION_LIKE"
+        ]
+        if len(compatible) != 1:
+            raise MappingError(
+                f"{canonical}: frozen V2-C011 requires one current LIVE "
+                f"US cash-session share-CFD product; found {len(compatible)}"
+            )
+        profile = compatible[0]
+        light = _find_symbol_by_id(light_symbols, int(profile["symbol_id"]))
+        if light is None:
+            raise MappingError(f"{canonical}: selected cash-session product disappeared")
+        return light, profile, "AUTO_FROZEN_C011_CASH_SESSION", policy, profiles
+
+    credible_ids = {
+        int(row["symbol_id"]) for row in discovery.get("credible_candidates", [])
+    }
+    valid_credible = [
+        p for p in valid_profiles if int(p["symbol_id"]) in credible_ids
+    ]
+    if len(valid_credible) == 1:
+        profile = valid_credible[0]
+        light = _find_symbol_by_id(light_symbols, int(profile["symbol_id"]))
+        return light, profile, "AUTO_LIVE_STRUCTURAL", policy, profiles
+
+    candidates_for_choice = valid_credible or valid_profiles
+    fingerprints = {
+        p.get("product_semantic_fingerprint_sha256")
+        for p in candidates_for_choice
+        if p.get("product_semantic_fingerprint_sha256")
+    }
+    if len(fingerprints) > 1:
+        raise MappingError(
+            f"{canonical}: multiple LIVE broker products have different execution/session "
+            "semantics; frozen requirements do not select one"
+        )
+
+    if not candidates_for_choice:
+        raise MappingError(
+            f"{canonical}: no enabled/tradable LIVE broker product has sufficient structural support"
+        )
+    if not callable(selector):
+        raise MappingError(f"{canonical}: equivalent broker identity selection required")
+
+    context = dict(discovery)
+    context["candidate_product_profiles"] = candidates_for_choice
+    selected_id = selector(canonical, context)
+    if selected_id in (None, 0, "0"):
+        raise MappingError(f"{canonical}: local user selected BLOCK / none")
+    try:
+        selected_id = int(selected_id)
+    except (TypeError, ValueError):
+        raise MappingError(f"{canonical}: invalid local mapping selection") from None
+    profile = next(
+        (p for p in candidates_for_choice if int(p["symbol_id"]) == selected_id),
+        None,
+    )
+    if profile is None:
+        raise MappingError(
+            f"{canonical}: local selection was not among semantically equivalent LIVE products"
+        )
+    light = _find_symbol_by_id(light_symbols, selected_id)
+    if light is None:
+        raise MappingError(f"{canonical}: locally selected product disappeared")
+    return light, profile, "LOCAL_EQUIVALENT_PRODUCT_SELECTION", policy, profiles
+
+
 TRANSFERABLE_REQUIRED_FILES = frozenset({
     "provenance_manifest.json",
     "bundle_manifest.json",

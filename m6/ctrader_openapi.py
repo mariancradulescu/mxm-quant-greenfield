@@ -22,8 +22,10 @@ from .ctrader_capture import (
     atomic_write_json,
     canonical_json_bytes,
     deterministic_zip,
+    discover_symbol_mapping,
     drop_secret_fields,
     ensure_full_symbol_enabled,
+    format_broker_product_profiles,
     format_capture_progress,
     format_symbol_mapping_diagnostic,
     gap_diagnostics,
@@ -35,7 +37,7 @@ from .ctrader_capture import (
     normalize_trendbars,
     raw_csv_bytes,
     record_completed_chunk,
-    resolve_or_select_symbol_mapping,
+    resolve_profiled_broker_product,
     redact_text,
     require_read_only_request,
     scan_bundle_for_secrets,
@@ -387,7 +389,7 @@ class OpenApiCaptureRunner:
         )
         self._assets = [_plain(a) for a in assets_res.asset]
 
-        self._stage("[2/5] Resolving ENABLED Pepperstone LIVE symbols from broker metadata")
+        self._stage("[2/5] Profiling and resolving Pepperstone LIVE broker products")
         symbols_res = self._send(
             ProtoOASymbolsListReq(
                 ctidTraderAccountId=account_id,
@@ -400,13 +402,44 @@ class OpenApiCaptureRunner:
         selector = self.config.get("symbol_selector")
         saver = self.config.get("symbol_override_saver")
         clearer = self.config.get("symbol_override_clearer")
-        mapping_sources: dict[str, str] = {}
+
+        discoveries: dict[str, dict[str, Any]] = {}
+        candidate_ids: set[int] = set()
+        for raw in self.plan["unique_raw_capture_tasks"]:
+            canonical = raw["canonical_instrument"]
+            discovery = discover_symbol_mapping(
+                canonical, light, assets_by_id=assets_by_id
+            )
+            discoveries[canonical] = discovery
+            rows = discovery["credible_candidates"] or discovery["related_candidates"] or []
+            for row in rows:
+                candidate_ids.add(int(row["symbol_id"]))
+            saved = overrides.get(canonical)
+            if isinstance(saved, Mapping):
+                try:
+                    candidate_ids.add(int(saved.get("symbol_id")))
+                except (TypeError, ValueError):
+                    pass
+
+        full_plain_by_id: dict[int, dict[str, Any]] = {}
+        sorted_ids = sorted(candidate_ids)
+        for offset in range(0, len(sorted_ids), 64):
+            batch = sorted_ids[offset : offset + 64]
+            req = ProtoOASymbolByIdReq(ctidTraderAccountId=account_id)
+            req.symbolId.extend(batch)
+            res = self._send(req)
+            for symbol in res.symbol:
+                full_plain_by_id[int(symbol.symbolId)] = _plain(symbol)
 
         for raw in self.plan["unique_raw_capture_tasks"]:
             canonical = raw["canonical_instrument"]
-            mapped, source, discovery = resolve_or_select_symbol_mapping(
+            discovery = discoveries[canonical]
+            mapped, profile, source, policy, profiles = resolve_profiled_broker_product(
                 canonical,
+                self.plan,
+                discovery,
                 light,
+                full_plain_by_id,
                 assets_by_id=assets_by_id,
                 saved_override=overrides.get(canonical),
                 selector=selector,
@@ -414,10 +447,18 @@ class OpenApiCaptureRunner:
             )
             for line in format_symbol_mapping_diagnostic(discovery):
                 self._stage(line)
+            for line in format_broker_product_profiles(canonical, policy, profiles):
+                self._stage(line)
 
             symbol_id = int(mapped["symbolId"])
+            full_plain = full_plain_by_id.get(symbol_id)
+            if full_plain is None:
+                raise MappingError(f"{canonical}: selected full symbol metadata missing")
+            ensure_full_symbol_enabled(full_plain)
+
             self._light_symbols[canonical] = mapped
-            mapping_sources[canonical] = source
+            self._full_symbols[canonical] = full_plain
+
             evidence = {
                 "canonical_instrument": canonical,
                 "broker_symbol": mapped.get("symbolName"),
@@ -428,6 +469,9 @@ class OpenApiCaptureRunner:
                 "quote_asset_id": mapped.get("quoteAssetId"),
                 "symbol_category_id": mapped.get("symbolCategoryId"),
                 "mapping_source": source,
+                "mapping_policy": policy,
+                "selected_product_profile": profile,
+                "candidate_product_profiles": profiles,
                 "raw_capture_id": raw["raw_capture_id"],
                 "raw_identity_sha256": raw["raw_identity_sha256"],
                 "resolution": raw["resolution"],
@@ -437,32 +481,23 @@ class OpenApiCaptureRunner:
             )
             self._mapping[canonical] = evidence
 
-        full_req = ProtoOASymbolByIdReq(ctidTraderAccountId=account_id)
-        full_req.symbolId.extend(
-            [int(v["symbol_id"]) for v in self._mapping.values()]
-        )
-        full_res = self._send(full_req)
-        by_id = {int(s.symbolId): s for s in full_res.symbol}
-        for canonical, mapped in self._mapping.items():
-            sid = int(mapped["symbol_id"])
-            if sid not in by_id:
-                raise MappingError(f"{canonical}: full symbol metadata missing")
-            plain = _plain(by_id[sid])
-            ensure_full_symbol_enabled(plain)
-            self._full_symbols[canonical] = plain
-
-            if mapping_sources.get(canonical) == "LOCAL_USER_SELECTION" and callable(saver):
+            if source == "LOCAL_EQUIVALENT_PRODUCT_SELECTION" and callable(saver):
                 saver(canonical, {
-                    "symbol_id": sid,
-                    "broker_symbol": mapped["broker_symbol"],
+                    "symbol_id": symbol_id,
+                    "broker_symbol": mapped.get("symbolName"),
                     "account_fingerprint_sha256": self._account_evidence[
                         "account_fingerprint_sha256"
                     ],
+                    "product_semantic_fingerprint_sha256": profile.get(
+                        "product_semantic_fingerprint_sha256"
+                    ),
+                    "mapping_policy": policy,
                 })
 
             self._stage(
-                f"[MAPPING PASS] {canonical} -> {mapped['broker_symbol']} | "
-                f"symbolId {sid} | source={mapping_sources.get(canonical)}"
+                f"[MAPPING PASS] {canonical} -> {mapped.get('symbolName')} | "
+                f"symbolId {symbol_id} | session={profile.get('session_class')} | "
+                f"source={source}"
             )
 
         self._stage("[3/5] Capturing read-only structural / auxiliary evidence")

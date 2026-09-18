@@ -42,16 +42,16 @@ class M6LiveSymbolMappingTests(unittest.TestCase):
         selected = resolve_symbol_mapping("AAPL", rows)
         self.assertEqual(selected["symbolId"], 1)
 
-    def test_02_mechanical_suffix_punctuation_variant_resolves_uniquely(self):
-        rows = [sym(7, "AAPL.US-24", description="Apple Inc")]
-        discovery = discover_symbol_mapping("AAPL", rows)
+    def test_02_mechanical_suffix_punctuation_variant_resolves_identity_only(self):
+        rows = [sym(7, "FOO.US", description="Foo Inc")]
+        discovery = discover_symbol_mapping("FOO", rows)
         self.assertEqual(len(discovery["exact_candidates"]), 0)
         self.assertEqual(len(discovery["relaxed_candidates"]), 1)
         self.assertIn(
             "CANONICAL_FIRST_BROKER_TOKEN",
             discovery["relaxed_candidates"][0]["support"],
         )
-        selected = resolve_symbol_mapping("AAPL", rows)
+        selected = resolve_symbol_mapping("FOO", rows)
         self.assertEqual(selected["symbolId"], 7)
 
     def test_03_asset_identity_can_support_generic_mapping(self):
