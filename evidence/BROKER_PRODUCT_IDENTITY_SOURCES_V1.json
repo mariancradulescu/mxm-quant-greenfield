@@ -8,7 +8,10 @@
       "organization": "Spotware / cTrader",
       "title": "Getting started - Open API",
       "url": "https://help.ctrader.com/open-api/",
-      "purpose": ["RATE_LIMITS", "OPEN_API_CURRENT_REFERENCE"],
+      "purpose": [
+        "RATE_LIMITS",
+        "OPEN_API_CURRENT_REFERENCE"
+      ],
       "current_vs_historical": "CURRENT_API_DOCUMENTATION",
       "exact_facts_supported": [
         "Maximum 50 non-historical requests per second per connection.",
@@ -18,11 +21,35 @@
       "content_hash": null
     },
     {
+      "source_id": "CTRADER_HEARTBEAT_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "Open API FAQ",
+      "url": "https://help.ctrader.com/open-api/faq/",
+      "purpose": [
+        "HEARTBEAT",
+        "RATE_LIMIT_BACKOFF"
+      ],
+      "current_vs_historical": "CURRENT_API_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Send a heartbeat at least once every 10 seconds to avoid inactivity disconnects.",
+        "HTTP/protocol rate-limit errors require respecting the current request-rate limitations."
+      ],
+      "snapshot_reference": "official current documentation; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
       "source_id": "CTRADER_MESSAGES_PROTO_CURRENT",
       "organization": "Spotware / cTrader",
       "title": "OpenApiMessages.proto",
       "url": "https://github.com/spotware/openapi-proto-messages/blob/main/OpenApiMessages.proto",
-      "purpose": ["MESSAGE_SCHEMA", "ARCHIVED_SYMBOLS", "CONVERSION", "EXPECTED_MARGIN", "TRENDBARS", "TICKS"],
+      "purpose": [
+        "MESSAGE_SCHEMA",
+        "ARCHIVED_SYMBOLS",
+        "CONVERSION",
+        "EXPECTED_MARGIN",
+        "TRENDBARS",
+        "TICKS"
+      ],
       "current_vs_historical": "CURRENT_PROTOCOL_SCHEMA",
       "exact_facts_supported": [
         "ProtoOASymbolsListReq supports includeArchivedSymbols.",
@@ -40,7 +67,13 @@
       "organization": "Spotware / cTrader",
       "title": "OpenApiModelMessages.proto",
       "url": "https://github.com/spotware/openapi-proto-messages/blob/main/OpenApiModelMessages.proto",
-      "purpose": ["LIGHT_SYMBOL", "FULL_SYMBOL", "ARCHIVED_SYMBOL", "TREND_BAR", "QUOTE_TYPE"],
+      "purpose": [
+        "LIGHT_SYMBOL",
+        "FULL_SYMBOL",
+        "ARCHIVED_SYMBOL",
+        "TREND_BAR",
+        "QUOTE_TYPE"
+      ],
       "current_vs_historical": "CURRENT_PROTOCOL_SCHEMA",
       "exact_facts_supported": [
         "Current model schema defines light, full and archived symbol structures used by structural mapping.",
@@ -51,29 +84,35 @@
       "content_hash": null
     },
     {
-      "source_id": "CTRADER_HEARTBEAT_CURRENT",
-      "organization": "Spotware / cTrader",
-      "title": "Open API FAQ",
-      "url": "https://help.ctrader.com/open-api/faq/",
-      "purpose": ["HEARTBEAT", "RATE_LIMIT_BACKOFF"],
-      "current_vs_historical": "CURRENT_API_DOCUMENTATION",
-      "exact_facts_supported": [
-        "Send a heartbeat at least once every 10 seconds to avoid inactivity disconnects.",
-        "HTTP/protocol rate-limit errors require respecting the current request-rate limitations."
+      "source_id": "PEPPERSTONE_BTCUSD_CURRENT",
+      "organization": "Pepperstone",
+      "title": "BTC/USD",
+      "url": "https://pepperstone.com/en/markets/cryptocurrencies/btc-usd",
+      "purpose": [
+        "BTCUSD_STANDARD_CRYPTO_CFD_IDENTITY"
       ],
-      "snapshot_reference": "official current documentation; retrieved 2026-09-18",
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "BTC/USD is offered as a standard cryptocurrency CFD product."
+      ],
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
       "content_hash": null
     },
     {
-      "source_id": "PEPPERSTONE_INDEX_CURRENT",
+      "source_id": "PEPPERSTONE_COMMODITIES_CURRENT",
       "organization": "Pepperstone",
-      "title": "Index CFD trading: trade global indices",
-      "url": "https://pepperstone.com/en/markets/indices",
-      "purpose": ["US500_IDENTITY", "NAS100_IDENTITY", "INDEX_FORWARD_DISTINCTION"],
+      "title": "Commodity CFD trading: gold, oil and metals",
+      "url": "https://pepperstone.com/en/markets/commodities",
+      "purpose": [
+        "XAUUSD_SPOT_IDENTITY",
+        "WTI_SPOT_ENERGY_IDENTITY",
+        "SPOT_VS_FORWARD_DISTINCTION"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
-        "US500 and NAS100 are listed as standard index CFDs.",
-        "US500-F and NAS100-F are separately listed futures/forwards-style products."
+        "Pepperstone distinguishes spot commodity markets from forward CFD contracts.",
+        "Current energies offering includes spot WTI crude oil, Brent crude oil, gasoline and natural gas, with Brent and WTI forwards separately offered.",
+        "Current precious-metals offering includes spot gold."
       ],
       "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
       "content_hash": null
@@ -83,7 +122,9 @@
       "organization": "Pepperstone",
       "title": "Index/commodity futures-forward trading-hours table",
       "url": "https://pepperstone.com/en/markets/indices",
-      "purpose": ["FORWARD_SUFFIX_AND_FAMILY"],
+      "purpose": [
+        "FORWARD_SUFFIX_AND_FAMILY"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
         "Crude-F and Brent-F are separately listed forward/futures-style energy CFDs.",
@@ -93,30 +134,36 @@
       "content_hash": null
     },
     {
-      "source_id": "PEPPERSTONE_SHARE_24H_CURRENT",
-      "organization": "Pepperstone",
-      "title": "24-hour share CFDs",
-      "url": "https://pepperstone.com/en/markets/shares/24-hour-trading",
-      "purpose": ["STANDARD_VS_EXTENDED_SHARE_IDENTITY"],
+      "source_id": "PEPPERSTONE_FX_CURRENT",
+      "organization": "Pepperstone Europe",
+      "title": "Pepperstone Europe market overview",
+      "url": "https://pepperstone.com/en-eu/",
+      "purpose": [
+        "AUDJPY_STANDARD_FX_IDENTITY"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
-        "Pepperstone uses the -24 suffix for 24-hour share products.",
-        "AAPL.US is described as the cash-session product while AAPL.US-24 trades 24/5."
+        "AUD/JPY is listed among Pepperstone's current FX instruments."
       ],
-      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
+      "snapshot_reference": "official Pepperstone Europe page; retrieved 2026-09-18",
       "content_hash": null
     },
     {
-      "source_id": "PEPPERSTONE_US_SHARES_CURRENT",
-      "organization": "Pepperstone Europe",
-      "title": "US Share CFD Trading",
-      "url": "https://pepperstone.com/en-eu/trading/instruments/share-cfds/us-shares/",
-      "purpose": ["C011_CURRENT_SHARE_FAMILY", "EXTENDED_VARIANTS"],
+      "source_id": "PEPPERSTONE_INDEX_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Index CFD trading: trade global indices",
+      "url": "https://pepperstone.com/en/markets/indices",
+      "purpose": [
+        "US500_IDENTITY",
+        "NAS100_IDENTITY",
+        "INDEX_FORWARD_DISTINCTION"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
-        "Pepperstone Europe lists US share CFDs and separate -24 extended-hours variants including AAPL, MSFT, NVDA, AMZN and META."
+        "US500 and NAS100 are listed as standard index CFDs.",
+        "US500-F and NAS100-F are separately listed futures/forwards-style products."
       ],
-      "snapshot_reference": "official Pepperstone Europe product page; retrieved 2026-09-18",
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
       "content_hash": null
     },
     {
@@ -124,7 +171,9 @@
       "organization": "Pepperstone",
       "title": "Perpetual CFDs: trade 24/7 with no expiry",
       "url": "https://pepperstone.com/en/markets/perpetual-cfds",
-      "purpose": ["PERPETUAL_PRODUCT_DISTINCTION"],
+      "purpose": [
+        "PERPETUAL_PRODUCT_DISTINCTION"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
         "Perpetual CFDs are a distinct product family with no expiry.",
@@ -134,29 +183,50 @@
       "content_hash": null
     },
     {
-      "source_id": "PEPPERSTONE_BTCUSD_CURRENT",
+      "source_id": "PEPPERSTONE_SHARE_24H_CURRENT",
       "organization": "Pepperstone",
-      "title": "BTC/USD",
-      "url": "https://pepperstone.com/en/markets/cryptocurrencies/btc-usd",
-      "purpose": ["BTCUSD_STANDARD_CRYPTO_CFD_IDENTITY"],
+      "title": "24-hour share CFDs",
+      "url": "https://pepperstone.com/en/markets/shares/24-hour-trading",
+      "purpose": [
+        "STANDARD_VS_EXTENDED_SHARE_IDENTITY"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
-        "BTC/USD is offered as a standard cryptocurrency CFD product."
+        "Pepperstone uses the -24 suffix for 24-hour share products.",
+        "AAPL.US is described as the cash-session product while AAPL.US-24 trades 24/5."
       ],
       "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
       "content_hash": null
     },
     {
-      "source_id": "PEPPERSTONE_FX_CURRENT",
+      "source_id": "PEPPERSTONE_SPOTCRUDE_CURRENT_SYMBOL_CORROBORATION",
+      "organization": "Pepperstone",
+      "title": "Current Pepperstone WTI market-analysis chart reference",
+      "url": "https://pepperstone.com/en-au/insights/market-analysis/commodities/wti-crude-oil-price-outlook-geopolitical-risks-put-80-back-in-focus",
+      "purpose": [
+        "WTI_SPOTCRUDE_BROKER_NAME_CORROBORATION"
+      ],
+      "current_vs_historical": "CURRENT_PUBLIC_SYMBOL_CORROBORATION",
+      "exact_facts_supported": [
+        "Pepperstone current WTI analysis identifies the WTI spot-crude instrument using the SPOTCRUDE chart/symbol label."
+      ],
+      "snapshot_reference": "official Pepperstone current publication; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_US_SHARES_CURRENT",
       "organization": "Pepperstone Europe",
-      "title": "Pepperstone Europe market overview",
-      "url": "https://pepperstone.com/en-eu/",
-      "purpose": ["AUDJPY_STANDARD_FX_IDENTITY"],
+      "title": "US Share CFD Trading",
+      "url": "https://pepperstone.com/en-eu/trading/instruments/share-cfds/us-shares/",
+      "purpose": [
+        "C011_CURRENT_SHARE_FAMILY",
+        "EXTENDED_VARIANTS"
+      ],
       "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
       "exact_facts_supported": [
-        "AUD/JPY is listed among Pepperstone's current FX instruments."
+        "Pepperstone Europe lists US share CFDs and separate -24 extended-hours variants including AAPL, MSFT, NVDA, AMZN and META."
       ],
-      "snapshot_reference": "official Pepperstone Europe page; retrieved 2026-09-18",
+      "snapshot_reference": "official Pepperstone Europe product page; retrieved 2026-09-18",
       "content_hash": null
     }
   ],
