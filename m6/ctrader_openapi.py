@@ -1021,6 +1021,15 @@ class OpenApiCaptureRunner:
             evidence / "BROKER_PRODUCT_IDENTITY_SOURCES_V1.json",
             json.loads(source_path.read_text(encoding="utf-8")),
         )
+        bridge_policy_path = self.repo_root / "evidence" / "BROKER_PRODUCT_IDENTITY_BRIDGE_V1.json"
+        if not bridge_policy_path.is_file():
+            raise CaptureContractError(
+                "broker product bridge policy artifact missing from runtime package"
+            )
+        atomic_write_json(
+            evidence / "BROKER_PRODUCT_IDENTITY_BRIDGE_V1.json",
+            json.loads(bridge_policy_path.read_text(encoding="utf-8")),
+        )
         atomic_write_json(
             evidence / "symbol_metadata_current.json",
             drop_secret_fields(self._full_symbols),
