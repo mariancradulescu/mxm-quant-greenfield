@@ -39,6 +39,9 @@ DEVELOPMENT_END_DATE = date(2026, 9, 16)
 CASH_SESSION_TZ = ZoneInfo("America/New_York")
 CASH_OPEN_LOCAL = dtime(9, 30)
 CASH_CLOSE_LOCAL = dtime(16, 0)
+POST_BOUNDARY_MAX_WAIT_MS = 15 * 60 * 1000
+COST_PLAN_REL = "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json"
+COST_CALENDAR_REL = "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json"
 
 COST_PACKAGE_FILES = (
     "M6_COST_EVIDENCE_RUN.py",
@@ -48,6 +51,7 @@ COST_PACKAGE_FILES = (
     "m6/ctrader_transport.py",
     "m6/cost_evidence.py",
     "m6/cost_evidence_openapi.py",
+    "m6/session_replay.py",
     "m6/pydroid_cost_launcher.py",
     "m6/pydroid_oauth.py",
     "m6/ctrader_proto/__init__.py",
@@ -57,7 +61,8 @@ COST_PACKAGE_FILES = (
     "m6/ctrader_proto/OpenApiMessages_pb2.py",
     "m6/ctrader_proto/LICENSE_SPOTWARE_OPENAPIPY.txt",
     "tools/requirements-m6-capture.txt",
-    "data/M6_TIER1_COST_EVIDENCE_PLAN_V1.json",
+    "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+    "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
     "README_COST_EVIDENCE.txt",
 )
 
@@ -269,6 +274,139 @@ def quote_state_at_or_before(
     if not eligible:
         raise CaptureContractError("no causal two-sided quote at or before boundary")
     return eligible[-1]
+
+
+def first_fresh_two_sided_state_at_or_after(
+    states: Sequence[CausalQuoteState],
+    boundary_ms: int,
+    *,
+    max_wait_ms: int = POST_BOUNDARY_MAX_WAIT_MS,
+) -> CausalQuoteState:
+    """First executable two-sided state after a boundary with both sides refreshed.
+
+    A stale pre-boundary side can never be carried into POST_BOUNDARY_EXECUTABLE.
+    The frozen wait interval is [boundary, boundary + max_wait_ms).
+    """
+    if max_wait_ms <= 0:
+        raise CaptureContractError("post-boundary maximum wait must be positive")
+    cutoff = boundary_ms + max_wait_ms
+    for state in states:
+        if state.timestamp_ms < boundary_ms:
+            continue
+        if state.timestamp_ms >= cutoff:
+            break
+        if (
+            state.bid_timestamp_ms >= boundary_ms
+            and state.ask_timestamp_ms >= boundary_ms
+        ):
+            return state
+    raise CaptureContractError(
+        "no fresh causal two-sided executable quote within post-boundary wait"
+    )
+
+
+def cost_resume_contract(
+    plan_path: Path,
+    *,
+    tool_version: str,
+) -> dict[str, Any]:
+    """Build the immutable binding that controls whether historical chunks are reusable."""
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    interval = plan["development_interval"]
+    acquisition = plan["acquisition_domain"]
+    binding = {
+        "schema": "mxm.greenfield.v2.m6-cost-resume-contract.v2",
+        "plan_schema": plan["schema"],
+        "plan_file_sha256": sha256_file(plan_path),
+        "tool_version": str(tool_version),
+        "development_interval": {
+            "start_date": interval["start_date"],
+            "end_date": interval["end_date"],
+        },
+        "protected_forward_boundary": interval["protected_forward_start"],
+        "target_symbol_ids": {
+            key: int(plan["targets"][key]["symbol_id"])
+            for key in sorted(plan["targets"])
+        },
+        "quote_types": list(plan["quote_types"]),
+        "acquisition_domain_rule": {
+            "timezone": acquisition["timezone"],
+            "weekday_envelope_local": list(acquisition["weekday_envelope_local"]),
+            "weekday_rule": acquisition["weekday_rule"],
+            "holidays": acquisition["holidays"],
+            "early_closes": acquisition["early_closes"],
+            "no_signal_conditioned_windows": bool(
+                acquisition["no_signal_conditioned_windows"]
+            ),
+            "no_return_conditioned_windows": bool(
+                acquisition["no_return_conditioned_windows"]
+            ),
+        },
+    }
+    binding["binding_sha256"] = hashlib.sha256(
+        canonical_json_bytes(binding)
+    ).hexdigest()
+    return binding
+
+
+def prepare_contract_bound_resume(
+    work_dir: Path,
+    binding: Mapping[str, Any],
+) -> tuple[Path, dict[str, Any], Path | None]:
+    """Initialize/reuse resume state only under an exact contract binding.
+
+    Any malformed or mismatched work directory is archived atomically to a versioned
+    sibling path and a fresh empty state is created. Chunks from the old contract are
+    therefore physically outside the active work directory.
+    """
+    import shutil
+
+    resume_path = work_dir / "resume.json"
+    archived: Path | None = None
+    existing: dict[str, Any] | None = None
+    if resume_path.is_file():
+        try:
+            candidate = json.loads(resume_path.read_text(encoding="utf-8"))
+            if isinstance(candidate, dict):
+                existing = candidate
+        except (OSError, json.JSONDecodeError):
+            existing = None
+
+    expected = dict(binding)
+    mismatch = False
+    if work_dir.exists():
+        mismatch = (
+            existing is None
+            or existing.get("schema") != "mxm.greenfield.v2.m6-cost-resume.v2"
+            or existing.get("contract") != expected
+            or not isinstance(existing.get("completed"), dict)
+        )
+
+    if mismatch:
+        parent = work_dir.parent
+        parent.mkdir(parents=True, exist_ok=True)
+        old_tag = "unknown"
+        if isinstance(existing, dict):
+            old_tag = str(
+                (existing.get("contract") or {}).get("binding_sha256") or "unknown"
+            )[:12]
+        archived = parent / f"{work_dir.name}.stale_{old_tag}"
+        suffix = 1
+        while archived.exists():
+            archived = parent / f"{work_dir.name}.stale_{old_tag}_{suffix}"
+            suffix += 1
+        work_dir.rename(archived)
+        existing = None
+
+    work_dir.mkdir(parents=True, exist_ok=True)
+    if existing is None:
+        existing = {
+            "schema": "mxm.greenfield.v2.m6-cost-resume.v2",
+            "contract": expected,
+            "completed": {},
+        }
+        atomic_write_json(resume_path, existing)
+    return resume_path, existing, archived
 
 
 def tick_csv_bytes(rows: Sequence[Mapping[str, Any]]) -> bytes:
