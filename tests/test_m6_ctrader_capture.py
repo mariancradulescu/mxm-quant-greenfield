@@ -422,10 +422,13 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertFalse(report["credentials_used"])
 
     def test_28_launcher_preflight_precedes_oauth_token_acquisition(self):
-        source = (ROOT / "M6_CAPTURE_RUN.py").read_text(encoding="utf-8")
+        source = (ROOT / "m6/pydroid_launcher.py").read_text(encoding="utf-8")
         main = source[source.index("def main()") :]
-        self.assertLess(main.index("local_preflight(config)"), main.index("_base._access_token(config)"))
+        self.assertLess(main.index("local_preflight()"), main.index("ensure_v2_authorization()"))
         self.assertIn("STOPPED before OAuth and before broker capture", source)
+        entry = (ROOT / "M6_CAPTURE_RUN.py").read_text(encoding="utf-8")
+        self.assertNotIn("input(", entry)
+        self.assertNotIn("getpass", entry)
 
     def test_29_workflow_installs_runtime_imports_preflights_and_builds_package(self):
         workflow = (ROOT / ".github/workflows/m6_preparation.yml").read_text(encoding="utf-8")

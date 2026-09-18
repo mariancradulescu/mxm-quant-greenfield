@@ -22,9 +22,10 @@ HISTORICAL_TARGET_RPS = 1.0 / HISTORICAL_MIN_INTERVAL
 
 PYDROID_PACKAGE_FILES = (
     "M6_CAPTURE_RUN.py",
-    "M6_CAPTURE_RUN_BASE.py",
     "m6/__init__.py",
     "m6/ctrader_capture.py",
+    "m6/pydroid_oauth.py",
+    "m6/pydroid_launcher.py",
     "m6/_ctrader_capture_base.py",
     "m6/ctrader_openapi.py",
     "m6/_ctrader_openapi_base.py",

@@ -2,88 +2,80 @@ MXM QUANT GREENFIELD V2 — M6 PYDROID READ-ONLY CAPTURE
 ======================================================
 
 THIS PACKAGE DOES NOT CONTAIN CREDENTIALS OR TOKENS.
-It performs data/evidence capture only. It does NOT run M6 economics and cannot place orders.
+It captures broker/data evidence only. It does NOT run M6 economics and cannot place orders.
 
-1) EXTRACT THIS ZIP
-Extract MXM_M6_CAPTURE_PYDROID_PACKAGE.zip to one folder on your Android phone.
-Keep the internal folders m6/, data/, and tools/ exactly as they are.
+1) EXTRACT
+Extract MXM_M6_CAPTURE_PYDROID_PACKAGE.zip to one Android folder.
+Keep m6/, data/, and tools/ exactly as packaged.
 
-2) INSTALL THE PINNED PACKAGES IN PYDROID 3
-Open Pydroid 3 -> Terminal, change to the extracted folder, then run:
-
+2) INSTALL
+In Pydroid Terminal, from that folder:
 python -m pip install -r tools/requirements-m6-capture.txt
 
-Required versions are checked again automatically before OAuth.
+3) RUN
+Open M6_CAPTURE_RUN.py and tap RUN.
 
-3) RUN ONE FILE
-Open M6_CAPTURE_RUN.py in Pydroid and tap RUN.
-Do not edit Python internals.
+RUN does NOT ask for cTrader/cTID username/password in Pydroid.
+RUN does NOT ask for Client ID/Secret in Pydroid.
+An old package-local m6_capture_local.json is ignored.
 
-4) FIRST RUN — LOCAL OPEN API APP CONFIG ONLY
-Enter only the values belonging to your already-approved cTrader Open API application:
-- Open API Client ID
-- Open API Client Secret (hidden input)
-- registered Redirect URI
+4) FIRST V2 AUTHORIZATION — ONCE
+Frozen target: Pepperstone - Europe LIVE.
 
-DO NOT enter your cTrader username or password into Python.
-The app configuration is saved locally in m6_capture_local.json and is never placed in the transferable evidence ZIP.
+If this phone still has the previously validated Open API APPLICATION credentials at:
+~/.mxm_quant/a118_c02_openapi_v1/credentials.json
 
-5) AUTOMATIC LOCAL PREFLIGHT OCCURS BEFORE OAUTH
-The script stops before opening the browser if any of these fail:
-- pinned Python dependencies/imports
-- frozen acquisition plan and canonical SHA256
-- writable output/work directories
-- redirect URI and loopback callback-port bindability
-- ZIP/SHA256 functionality
-- secret-transfer guard
-- accounts/read-only protocol allowlist and mutation denylist
-- official cTrader SDK runtime import and idle-heartbeat path
+V2 reuses ONLY that application's Client ID and Client Secret.
+It does NOT reuse the old DEMO/LIVE account grant, old access token, or old refresh token.
 
-CI also performs the same no-credential runtime import/preflight. CI does NOT connect to your broker account.
+RUN opens the official cTrader authorization page. In the browser:
+- log in with cTID/cTrader credentials;
+- select ONLY the intended Pepperstone LIVE account;
+- grant the requested view-only permission;
+- tap Allow access / OK.
 
-6) OFFICIAL BROWSER OAUTH
-After preflight PASS, the official cTrader authorization page opens in the browser.
-Log in to cTrader THERE, not in Python, and grant the requested VIEW/ACCOUNTS access.
-The client requests scope=accounts only. It does not automatically escalate to trading scope.
+OAuth scope is accounts only. Trading scope is never requested.
 
-If your approved redirect is a loopback URI such as http://127.0.0.1:8765/callback,
-the local callback returns control automatically to Pydroid.
-If your approved redirect is non-loopback, paste the FULL final redirect URL into the hidden prompt when asked.
-The authorization code is used immediately and is not placed in the output bundle.
+If application credentials are no longer available locally, RUN still opens the browser,
+but first shows a LOCAL page at http://127.0.0.1:8765/setup. Enter the approved Open API
+Client ID and Client Secret there once. That local page redirects directly to cTrader.
 
-7) CAPTURE PROGRESS
-Pydroid displays a compact live progress line after each historical request/chunk, including:
-overall %, stage, instrument/timeframe, series %, completed windows/chunks, rows,
-historical request count, effective req/s, elapsed time, and reused resume chunks.
-Normal historical pacing is 0.21 seconds/request, approximately 4.76 requests/sec,
-below the official cTrader historical ceiling of 5 requests/sec/connection.
-No artificial sleeps are added; additional waits occur only for retry/backoff/reconnect/rate protection.
-The official SDK transport heartbeat remains enabled; no trading or spot subscription is created for keepalive.
+5) AUTOMATIC CALLBACK
+Registered redirect:
+http://127.0.0.1:8765/callback
 
-8) RESUME
-If Android/Pydroid stops, RUN M6_CAPTURE_RUN.py again.
-Hash-verified completed chunks under .m6_capture_work/ are reused; missing work continues.
-Do not send .m6_capture_work/ to ChatGPT.
+After Allow access, cTrader redirects to localhost. Pydroid receives the code, exchanges
+it immediately for the token, stores V2 private state at:
+~/.mxm_quant/m6_ctrader_capture_v2/credentials.json
 
-9) EXACT DEVELOPMENT CAUSAL BOUNDARY
-A trendbar is included only if its COMPLETION timestamp (bar open + timeframe) is:
-- <= the exact frozen DEVELOPMENT end 2026-09-16T23:59:59Z, AND
-- < protected-forward start 2026-09-17T12:02:58Z.
-A bar is never included merely because its OPEN timestamp is before the DEVELOPMENT end.
+and continues automatically. Android may leave the browser visually in front; Pydroid is
+already continuing, so switch back only to watch progress.
 
-10) RETURN ONE FILE ONLY
-After successful capture, return ONLY:
+6) LATER RUNS — REMEMBERED
+After the first successful V2 authorization, RUN reuses the V2 access token while valid
+and refreshes it automatically when needed.
+Browser authorization is repeated only if the V2 authorization is absent, invalid,
+revoked, or cannot be refreshed.
 
+7) PREFLIGHT
+Before OAuth/capture the script verifies dependencies, frozen plan/hash, writable paths,
+callback port, ZIP/SHA, secret guards, read-only protocol allowlist/mutation denylist,
+and official cTrader SDK heartbeat availability.
+
+8) PROGRESS
+Normal historical pacing: 0.21 s/request, about 4.76 req/s, below the official 5 req/s
+historical ceiling.
+
+9) RESUME
+If Pydroid stops, RUN again. Verified chunks are reused and remembered V2 authorization
+is reused/refreshed.
+
+10) DEVELOPMENT BOUNDARY
+Trendbars are included only when completion <= 2026-09-16T23:59:59Z and completion is
+strictly < protected-forward start 2026-09-17T12:02:58Z.
+
+11) RETURN ONLY
 capture_output/MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8.zip
 
-Do NOT return:
-- m6_capture_local.json
-- .m6_secrets/
-- .m6_capture_work/
-- client secret
-- access/refresh tokens
-- authorization code
-
-The final evidence ZIP contains the transferable raw market data, auxiliary raw data actually captured,
-broker mapping/account-symbol evidence with sensitive values removed, expected-margin evidence/status,
-gap diagnostics, provenance, candidate bindings, bundle manifest, and checksums.
+Do NOT return anything under ~/.mxm_quant/, .m6_capture_work/, client secret,
+access/refresh tokens, authorization code, or m6_capture_local.json.

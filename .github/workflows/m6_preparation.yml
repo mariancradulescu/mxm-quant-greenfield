@@ -16,7 +16,7 @@ jobs:
       - name: Install pinned M6 capture runtime
         run: python -m pip install -r tools/requirements-m6-capture.txt
       - name: Compile actual Pydroid runtime files
-        run: python -m py_compile M6_CAPTURE_RUN.py M6_CAPTURE_RUN_BASE.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/_ctrader_openapi_base.py
+        run: python -m py_compile M6_CAPTURE_RUN.py m6/pydroid_launcher.py m6/pydroid_oauth.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/_ctrader_openapi_base.py
       - name: No-credential runtime import and SDK heartbeat preflight
         run: |
           PYTHONPATH=. python - <<'PY'
