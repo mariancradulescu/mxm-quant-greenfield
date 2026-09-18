@@ -1,0 +1,101 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-final-integrity-correction.v1",
+  "status": "COMPLETE_PRE_OUTCOME_READY_FOR_TIER1_COST_CAPTURE",
+  "scope": "PRE_M6_INFRASTRUCTURE_AND_EVIDENCE_ONLY",
+  "authorities": {
+    "future_wave_policy": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
+    "structural_future_universe": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+    "reference_calendar": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "calendar_correction": "evidence/PRE_M6_NASDAQ_CALENDAR_CORRECTION_V1.json",
+    "causal_conversion": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
+    "readiness": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+    "tier1_cost_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+    "tier1_cost_plan_correction": "evidence/PRE_M6_TIER1_COST_PLAN_CORRECTION_V1.json",
+    "tier1_cost_sources": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
+    "timestamp_provenance_correction": "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json"
+  },
+  "corrections": {
+    "nasdaq_calendar": {
+      "full_development_interval_reaudited": true,
+      "2025-11-27": "CLOSED",
+      "2025-11-28": "EARLY_CLOSE_13_00_ET",
+      "2025-12-24": "EARLY_CLOSE_13_00_ET",
+      "2025-12-25": "CLOSED",
+      "2025-01-09": "CLOSED_CARTER_NATIONAL_DAY_OF_MOURNING"
+    },
+    "C006_session_completeness": {
+      "exact_0930_open_required": true,
+      "exact_prior_scheduled_close_required": true,
+      "regular_final_m15_open_et": "15:45",
+      "early_close_final_m15_open_et": "12:45",
+      "regular_expected_m15_bars": 26,
+      "early_close_expected_m15_bars": 14,
+      "full_grid_required_for_atr_session": true,
+      "may_scan_farther_back_for_20_valid_sessions": true,
+      "synthetic_fill": false
+    },
+    "C012": {
+      "strict_observed_synchronization_preserved": true,
+      "no_fabricated_bars": true,
+      "next_common_valid_event_preserved": true
+    },
+    "tier1_boundary_cost_evidence": {
+      "pre_boundary": true,
+      "post_boundary_executable": true,
+      "post_requires_both_sides_refreshed_at_or_after_boundary": true,
+      "post_maximum_wait_ms": 900000,
+      "first_0930_boundary_included": true,
+      "completed_bar_close_uses_pre_boundary_only": true,
+      "raw_capture_signal_blind": true
+    },
+    "resume_contract": {
+      "exact_plan_sha_bound": true,
+      "tool_version_bound": true,
+      "development_interval_bound": true,
+      "protected_boundary_bound": true,
+      "target_symbol_ids_bound": true,
+      "quote_types_bound": true,
+      "acquisition_domain_bound": true,
+      "mismatch_archives_old_work_and_starts_empty": true,
+      "successful_output_directory_recreated_clean": true
+    },
+    "commission": {
+      "US500": "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+      "NAS100": "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+      "zero_commission_assumed_for_unknown_intervals": false
+    }
+  },
+  "package_contract": {
+    "filename": "MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip",
+    "run_file": "M6_COST_EVIDENCE_RUN.py",
+    "targets": {
+      "US500": 127,
+      "NAS100": 126
+    },
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "economics": false,
+    "accepted_ohlc_rerun": false,
+    "development_only": true,
+    "protected_excluded": true,
+    "resumable": true
+  },
+  "research_invariants": {
+    "candidate_specs_changed": false,
+    "accepted_ohlc_capture_changed": false,
+    "data_manifest_raw_bindings_changed": false,
+    "ledger_changed": false,
+    "search_budget_changed": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "m6_economics_run": false,
+    "live_orders": false,
+    "competition_start": false
+  },
+  "exact_next_action": "User runs corrected MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid and returns only MXM_M6_TIER1_COST_EVIDENCE_V2.zip. Do not rerun accepted OHLC capture."
+}
