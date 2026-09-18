@@ -77,32 +77,37 @@ class M6BrowserOAuthTests(unittest.TestCase):
         self.assertEqual(token, "NEW")
         self.assertEqual(app["client_id"], "APP")
 
-    def test_04_remembered_authorization_skips_fresh_browser(self):
+    def test_04_remembered_authorization_never_skips_fresh_browser(self):
         remembered = (
             {"client_id": "APP", "client_secret": "SECRET", "scope": "accounts"},
-            "ACCESS",
+            "OLD_ACCESS",
+        )
+        fresh_value = (
+            {"client_id": "APP", "client_secret": "SECRET", "scope": "accounts"},
+            "FRESH_ACCESS",
         )
         with patch.object(
             oauth, "_remembered_v2_authorization", return_value=remembered
-        ), patch.object(oauth, "_fresh_browser_authorization") as fresh:
+        ) as remembered_call, patch.object(
+            oauth, "_fresh_browser_authorization", return_value=fresh_value
+        ) as fresh:
             app, token, mode = oauth.ensure_v2_authorization()
-        fresh.assert_not_called()
-        self.assertEqual(token, "ACCESS")
-        self.assertEqual(mode, "REMEMBERED_V2_AUTHORIZATION")
+        remembered_call.assert_not_called()
+        fresh.assert_called_once()
+        self.assertEqual(token, "FRESH_ACCESS")
+        self.assertEqual(mode, "FRESH_BROWSER_AUTHORIZATION_EVERY_RUN")
 
-    def test_05_first_v2_run_forces_fresh_browser_grant(self):
+    def test_05_every_v2_run_forces_fresh_browser_grant(self):
         fresh_value = (
             {"client_id": "APP", "client_secret": "SECRET", "scope": "accounts"},
             "ACCESS",
         )
         with patch.object(
-            oauth, "_remembered_v2_authorization", return_value=None
-        ), patch.object(
             oauth, "_fresh_browser_authorization", return_value=fresh_value
         ) as fresh:
             app, token, mode = oauth.ensure_v2_authorization()
         fresh.assert_called_once()
-        self.assertEqual(mode, "FRESH_BROWSER_AUTHORIZATION")
+        self.assertEqual(mode, "FRESH_BROWSER_AUTHORIZATION_EVERY_RUN")
         self.assertEqual(token, "ACCESS")
 
     def test_06_browser_flow_is_live_read_only_and_no_terminal_credentials(self):
