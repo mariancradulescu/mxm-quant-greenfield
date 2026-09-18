@@ -97,6 +97,7 @@ class StdlibCTraderTransport:
         response_timeout: float = DEFAULT_RESPONSE_TIMEOUT,
         socket_factory=socket.create_connection,
         ssl_context_factory=ssl.create_default_context,
+        resolver=socket.getaddrinfo,
         clock=time.monotonic,
     ):
         self.host = host
@@ -105,8 +106,11 @@ class StdlibCTraderTransport:
         self.response_timeout = float(response_timeout)
         self._socket_factory = socket_factory
         self._ssl_context_factory = ssl_context_factory
+        self._resolver = resolver
         self._clock = clock
         self._sock = None
+        self._cached_endpoints: list[tuple[str, int]] = []
+        self._last_connected_endpoint: tuple[str, int] | None = None
         self._sequence = 0
         self._last_send = 0.0
         self._last_rate_limited_request_send = 0.0
@@ -115,24 +119,111 @@ class StdlibCTraderTransport:
     def connected(self) -> bool:
         return self._sock is not None
 
+    @property
+    def cached_endpoints(self) -> tuple[tuple[str, int], ...]:
+        return tuple(self._cached_endpoints)
+
+    @property
+    def last_connected_endpoint(self) -> tuple[str, int] | None:
+        return self._last_connected_endpoint
+
+    def seed_cached_endpoints(self, endpoints) -> None:
+        normalized: list[tuple[str, int]] = []
+        for endpoint in endpoints or ():
+            try:
+                host = str(endpoint[0]).strip()
+                port = int(endpoint[1])
+            except (TypeError, ValueError, IndexError):
+                continue
+            if not host or port != self.port:
+                continue
+            item = (host, port)
+            if item not in normalized:
+                normalized.append(item)
+        if normalized:
+            self._cached_endpoints = normalized
+
+    def _resolve_endpoints(self) -> list[tuple[str, int]]:
+        infos = self._resolver(
+            self.host,
+            self.port,
+            type=socket.SOCK_STREAM,
+        )
+        endpoints: list[tuple[str, int]] = []
+        for _family, _socktype, _proto, _canonname, sockaddr in infos:
+            try:
+                item = (str(sockaddr[0]), int(sockaddr[1]))
+            except (TypeError, ValueError, IndexError):
+                continue
+            if item not in endpoints:
+                endpoints.append(item)
+        if not endpoints:
+            raise socket.gaierror(f"no address resolved for {self.host}")
+        return endpoints
+
     def connect(self) -> None:
         self.close()
+        fresh_error: Exception | None = None
+        fresh: list[tuple[str, int]] = []
         try:
-            raw = self._socket_factory((self.host, self.port), timeout=self.connect_timeout)
-            try:
-                raw.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-            except OSError:
-                pass
-            context = self._ssl_context_factory()
-            tls = context.wrap_socket(raw, server_hostname=self.host)
-            tls.settimeout(min(5.0, self.response_timeout))
-            self._sock = tls
-            self._last_send = self._clock()
+            fresh = self._resolve_endpoints()
         except Exception as exc:
-            self.close()
+            fresh_error = exc
+
+        candidates: list[tuple[str, int]] = []
+        for endpoint in fresh + self._cached_endpoints:
+            if endpoint not in candidates:
+                candidates.append(endpoint)
+        if fresh:
+            self._cached_endpoints = list(fresh)
+
+        if not candidates:
+            exc = fresh_error or socket.gaierror(
+                f"no address resolved for {self.host}"
+            )
             raise TransportError(
-                f"cTrader LIVE TLS connection failed: {type(exc).__name__}: {redact_text(str(exc))}"
+                f"cTrader LIVE DNS resolution failed: "
+                f"{type(exc).__name__}: {redact_text(str(exc))}"
             ) from None
+
+        failures: list[str] = []
+        for endpoint in candidates:
+            raw = None
+            try:
+                raw = self._socket_factory(endpoint, timeout=self.connect_timeout)
+                try:
+                    raw.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                except OSError:
+                    pass
+                context = self._ssl_context_factory()
+                tls = context.wrap_socket(raw, server_hostname=self.host)
+                raw = None
+                tls.settimeout(min(5.0, self.response_timeout))
+                self._sock = tls
+                self._last_connected_endpoint = endpoint
+                self._last_send = self._clock()
+                if endpoint not in self._cached_endpoints:
+                    self._cached_endpoints.append(endpoint)
+                return
+            except Exception as exc:
+                if raw is not None:
+                    try:
+                        raw.close()
+                    except OSError:
+                        pass
+                failures.append(
+                    f"{type(exc).__name__}: {redact_text(str(exc))}"
+                )
+                self.close()
+
+        dns_note = ""
+        if fresh_error is not None and self._cached_endpoints:
+            dns_note = " DNS failed; cached endpoint fallback also failed."
+        detail = failures[-1] if failures else "unknown connection failure"
+        raise TransportError(
+            f"cTrader LIVE TLS connection failed after {len(candidates)} endpoint(s)."
+            f"{dns_note} Last error: {detail}"
+        ) from None
 
     def close(self) -> None:
         sock = self._sock
