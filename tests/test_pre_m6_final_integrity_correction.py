@@ -6,13 +6,13 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from m6.cost_evidence import (
-    POST_BOUNDARY_MAX_WAIT_MS,
+    QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
     DecodedTick,
     causal_merge_bid_ask,
+    causal_state_at_boundary,
     cost_resume_contract,
-    first_fresh_two_sided_state_at_or_after,
+    first_both_sides_refreshed_diagnostic,
     prepare_contract_bound_resume,
-    quote_state_at_or_before,
 )
 from m6.session_replay import (
     NasdaqCashCalendar,
@@ -203,48 +203,50 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         stamps = [a["time_utc"] for a,_ in got]
         self.assertEqual(stamps, [rows[1]["time_utc"], rows[2]["time_utc"]])
 
-    def test_11_pre_boundary_and_post_boundary_executable_are_distinct(self):
+    def test_11_boundary_state_can_keep_pre_boundary_sides(self):
+        bids = [DecodedTick(900, 1000000), DecodedTick(1010, 1010000)]
+        asks = [DecodedTick(950, 1020000), DecodedTick(1020, 1030000)]
+        state = causal_state_at_boundary(bids, asks, 1000)
+        self.assertEqual(state.bid_timestamp_ms, 900)
+        self.assertEqual(state.ask_timestamp_ms, 950)
+        self.assertEqual(state.bid_age_ms, 100)
+        self.assertEqual(state.ask_age_ms, 50)
+        self.assertEqual(state.availability, "CAUSAL_TWO_SIDED_AVAILABLE")
+
+    def test_12_both_sides_refresh_is_diagnostic_only(self):
         bids = [DecodedTick(900, 1000000), DecodedTick(1010, 1010000)]
         asks = [DecodedTick(950, 1020000), DecodedTick(1020, 1030000)]
         states = causal_merge_bid_ask(bids, asks)
-        pre = quote_state_at_or_before(states, 1000)
-        self.assertEqual(pre.bid_timestamp_ms, 900)
-        self.assertEqual(pre.ask_timestamp_ms, 950)
-        post = first_fresh_two_sided_state_at_or_after(states, 1000, max_wait_ms=100)
-        self.assertEqual(post.timestamp_ms, 1020)
-        self.assertGreaterEqual(post.bid_timestamp_ms, 1000)
-        self.assertGreaterEqual(post.ask_timestamp_ms, 1000)
-
-    def test_12_stale_opposite_side_cannot_make_post_boundary_execution(self):
-        bids = [DecodedTick(900, 1000000), DecodedTick(1010, 1010000)]
-        asks = [DecodedTick(950, 1020000)]
-        states = causal_merge_bid_ask(bids, asks)
-        with self.assertRaisesRegex(Exception, "fresh causal two-sided"):
-            first_fresh_two_sided_state_at_or_after(states, 1000, max_wait_ms=100)
-
-    def test_13_post_boundary_wait_is_prospectively_frozen_one_m15(self):
-        self.assertEqual(POST_BOUNDARY_MAX_WAIT_MS, 900000)
-        plan = load("data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json")
-        self.assertEqual(
-            plan["spread_reconstruction"]["POST_BOUNDARY_EXECUTABLE"]["maximum_wait_ms"],
-            900000,
+        diagnostic = first_both_sides_refreshed_diagnostic(
+            states, 1000, diagnostic_window_ms=100
         )
-        self.assertEqual(
-            plan["spread_reconstruction"]["POST_BOUNDARY_EXECUTABLE"]["interval_semantics"],
-            "[boundary, boundary+15m)",
-        )
+        self.assertEqual(diagnostic.timestamp_ms, 1020)
+        plan = load("data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json")
+        d = plan["generic_boundary_evidence"]["BOTH_SIDES_REFRESHED_AFTER_BOUNDARY"]
+        self.assertEqual(d["classification"], "QUOTE_REFRESH_DIAGNOSTIC_ONLY")
+        self.assertFalse(d["economic_fill_authority"])
 
-    def test_14_0930_boundary_and_completed_close_distinction_are_implemented(self):
+    def test_13_refresh_window_is_diagnostic_not_fill_authority(self):
+        self.assertEqual(QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS, 900000)
+        plan = load("data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json")
+        d = plan["generic_boundary_evidence"]["BOTH_SIDES_REFRESHED_AFTER_BOUNDARY"]
+        self.assertEqual(d["diagnostic_window_ms"], 900000)
+        self.assertFalse(d["candidate_entry_time"])
+        self.assertFalse(d["fill_time"])
+        self.assertFalse(d["mandatory_delay_assumption"])
+
+    def test_14_0930_boundary_and_close_evidence_are_implemented_without_fill_claim(self):
         source = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn("boundary=int(session.open_utc.timestamp()*1000)", source)
-        self.assertIn('POST_BOUNDARY_EXECUTABLE_FRESH_TWO_SIDED', source)
-        self.assertIn('NOT_USED_COMPLETED_BAR_CLOSE', source)
-        self.assertIn("if boundary==close_ms", source)
+        self.assertIn("CAUSAL_TWO_SIDED_AVAILABLE", source)
+        self.assertIn("QUOTE_REFRESH_DIAGNOSTIC_ONLY", source)
+        self.assertIn('"SESSION_CLOSE_BOUNDARY" if boundary==close_ms', source)
+        self.assertNotIn("POST_BOUNDARY_EXECUTABLE_FRESH_TWO_SIDED", source)
 
     def test_15_resume_contract_contains_all_required_binding_fields(self):
         binding = cost_resume_contract(
-            ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
-            tool_version="TEST_TOOL_V2",
+            ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+            tool_version="TEST_TOOL_V3",
         )
         required = {
             "schema","plan_schema","plan_file_sha256","tool_version","development_interval",
@@ -252,12 +254,13 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
             "acquisition_domain_rule","binding_sha256",
         }
         self.assertEqual(set(binding), required)
+        self.assertEqual(binding["schema"], "mxm.greenfield.v2.m6-cost-resume-contract.v3")
         self.assertEqual(binding["target_symbol_ids"], {"NAS100":126,"US500":127})
 
     def test_16_resume_contract_mismatch_archives_and_starts_empty(self):
         with tempfile.TemporaryDirectory() as td:
-            work = Path(td) / "tier1_v2"
-            plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json"
+            work = Path(td) / "tier1_v3"
+            plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
             first = cost_resume_contract(plan, tool_version="TOOL_A")
             resume_path, state, archived = prepare_contract_bound_resume(work, first)
             self.assertIsNone(archived)
@@ -320,7 +323,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
     def test_20_current_state_points_only_to_corrected_active_pre_m6_authorities(self):
         s = load("CURRENT_STATE.json")
         self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_COST_CAPTURE_READY")
+        self.assertEqual(s["pre_m6_operational_state"], "TIER1_V3_QUOTE_CAPTURE_READY")
         self.assertEqual(
             s["future_wave_opportunity_coverage_authority"],
             "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
@@ -335,11 +338,11 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         )
         self.assertEqual(
             s["pre_m6_readiness_authority"],
-            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json",
         )
         self.assertEqual(
             s["tier1_cost_evidence_plan_authority"],
-            "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+            "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
         )
         self.assertEqual(
             s["tier1_cost_evidence_sources_authority"],
@@ -363,7 +366,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         self.assertFalse(s["competition_start_authorized"])
 
     def test_21_active_readiness_uses_corrected_calendar_cost_plan_and_commission_state(self):
-        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json")
+        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json")
         self.assertEqual(
             r["authorities"]["reference_calendar"],
             "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
