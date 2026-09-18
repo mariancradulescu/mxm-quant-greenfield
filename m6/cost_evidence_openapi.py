@@ -59,7 +59,7 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
     ProtoOASymbolsListReq,
     ProtoOATraderReq,
 )
-from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
+from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport, TransportError
 from .session_replay import NasdaqCashCalendar
 
 TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
@@ -205,7 +205,7 @@ class CostEvidenceRunner:
                         f"cached endpoints {len(self.transport.cached_endpoints)}"
                     )
                 return
-            except Exception as exc:
+            except TransportError as exc:
                 elapsed=time.monotonic()-started
                 if elapsed>=NETWORK_RECOVERY_MAX_SECONDS:
                     raise CaptureContractError(
