@@ -349,6 +349,10 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
             s["pre_m6_timestamp_provenance_correction_authority"],
             "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
         )
+        self.assertEqual(
+            s["pre_m6_final_integrity_correction_authority"],
+            "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json",
+        )
         self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
         self.assertFalse(s["m6"]["economics_run"])
         self.assertEqual(s["economic_outcomes_opened"], 0)
