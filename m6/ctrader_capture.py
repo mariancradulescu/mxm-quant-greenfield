@@ -108,6 +108,7 @@ PYDROID_PACKAGE_FILES = (
     "m6/ctrader_capture.py",
     "m6/pydroid_oauth.py",
     "m6/pydroid_launcher.py",
+    "m6/pydroid_symbol_mapping.py",
     "m6/_ctrader_capture_base.py",
     "m6/ctrader_openapi.py",
     "m6/ctrader_transport.py",
@@ -121,6 +122,391 @@ PYDROID_PACKAGE_FILES = (
     "tools/requirements-m6-capture.txt",
     "README_RUN.txt",
 )
+
+
+SYMBOL_MAPPING_SOURCE_ENVIRONMENT = "Pepperstone - Europe LIVE"
+
+
+def _symbol_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes"}
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return False
+
+
+def _symbol_name(symbol: Mapping[str, Any]) -> str:
+    return str(symbol.get("symbolName", symbol.get("symbol_name", "")) or "").strip()
+
+
+def _symbol_id(symbol: Mapping[str, Any]) -> int:
+    try:
+        return int(symbol.get("symbolId", symbol.get("symbol_id", 0)) or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _symbol_enabled(symbol: Mapping[str, Any]) -> bool:
+    return _symbol_bool(symbol.get("enabled", False))
+
+
+def _symbol_parts(value: str) -> list[str]:
+    return [part for part in __import__("re").findall(r"[A-Z0-9]+", str(value).upper()) if part]
+
+
+def build_asset_catalog(assets: Sequence[Mapping[str, Any]]) -> dict[int, Mapping[str, Any]]:
+    out: dict[int, Mapping[str, Any]] = {}
+    for asset in assets:
+        try:
+            aid = int(asset.get("assetId", asset.get("asset_id", 0)) or 0)
+        except (TypeError, ValueError):
+            continue
+        if aid > 0:
+            out[aid] = asset
+    return out
+
+
+def _asset_norms(asset_id: Any, assets_by_id: Mapping[int, Mapping[str, Any]]) -> set[str]:
+    try:
+        asset = assets_by_id.get(int(asset_id or 0), {})
+    except (TypeError, ValueError):
+        asset = {}
+    out = set()
+    for key in ("name", "displayName", "display_name"):
+        value = str(asset.get(key, "") or "").strip()
+        if value:
+            out.add(_base._norm_symbol(value))
+    return {value for value in out if value}
+
+
+def _candidate_row(
+    symbol: Mapping[str, Any],
+    *,
+    support: Sequence[str],
+    assets_by_id: Mapping[int, Mapping[str, Any]],
+) -> dict[str, Any]:
+    base_id = symbol.get("baseAssetId", symbol.get("base_asset_id"))
+    quote_id = symbol.get("quoteAssetId", symbol.get("quote_asset_id"))
+    base = assets_by_id.get(int(base_id), {}) if str(base_id or "").isdigit() else {}
+    quote = assets_by_id.get(int(quote_id), {}) if str(quote_id or "").isdigit() else {}
+    return {
+        "symbol_id": _symbol_id(symbol),
+        "symbol_name": _symbol_name(symbol),
+        "description": str(symbol.get("description", "") or ""),
+        "enabled": _symbol_enabled(symbol),
+        "base_asset_id": base_id,
+        "base_asset_name": base.get("name") or base.get("displayName"),
+        "quote_asset_id": quote_id,
+        "quote_asset_name": quote.get("name") or quote.get("displayName"),
+        "symbol_category_id": symbol.get("symbolCategoryId", symbol.get("symbol_category_id")),
+        "support": sorted(set(str(x) for x in support if x)),
+    }
+
+
+def discover_symbol_mapping(
+    canonical: str,
+    light_symbols: Sequence[Mapping[str, Any]],
+    *,
+    assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Discover structural LIVE mapping candidates without aliases or economic information."""
+    assets_by_id = assets_by_id or {}
+    canonical_text = str(canonical).strip().upper()
+    canonical_norm = _base._norm_symbol(canonical_text)
+    exact: list[tuple[Mapping[str, Any], list[str]]] = []
+    relaxed: list[tuple[Mapping[str, Any], list[str]]] = []
+    related_scored: list[tuple[int, Mapping[str, Any], list[str]]] = []
+    disabled_supported: list[tuple[Mapping[str, Any], list[str]]] = []
+
+    for symbol in light_symbols:
+        name = _symbol_name(symbol)
+        if not name or _symbol_id(symbol) <= 0:
+            continue
+        name_upper = name.upper()
+        name_norm = _base._norm_symbol(name)
+        parts = _symbol_parts(name)
+        base_norms = _asset_norms(
+            symbol.get("baseAssetId", symbol.get("base_asset_id")), assets_by_id
+        )
+        quote_norms = _asset_norms(
+            symbol.get("quoteAssetId", symbol.get("quote_asset_id")), assets_by_id
+        )
+        enabled = _symbol_enabled(symbol)
+        reasons: list[str] = []
+        is_exact = name_upper == canonical_text
+
+        if not is_exact and name_norm == canonical_norm:
+            reasons.append("PUNCTUATION_EQUIVALENT")
+        if not is_exact and parts and _base._norm_symbol(parts[0]) == canonical_norm:
+            reasons.append("CANONICAL_FIRST_BROKER_TOKEN")
+        if canonical_norm in base_norms:
+            reasons.append("BASE_ASSET_IDENTITY")
+        if any(base + quote == canonical_norm for base in base_norms for quote in quote_norms):
+            reasons.append("BASE_QUOTE_ASSET_IDENTITY")
+
+        if is_exact:
+            exact_reasons = ["EXACT_SYMBOL_NAME"]
+            if enabled:
+                exact.append((symbol, exact_reasons))
+            else:
+                disabled_supported.append((symbol, exact_reasons))
+            continue
+
+        if reasons:
+            if enabled:
+                relaxed.append((symbol, reasons))
+            else:
+                disabled_supported.append((symbol, reasons))
+            continue
+
+        # Related candidates are never auto-selected. They exist only to give the local
+        # user a short structural LIVE list when the strict automatic evidence is zero.
+        score = 0
+        related_reasons: list[str] = []
+        description_norm = _base._norm_symbol(str(symbol.get("description", "") or ""))
+        if canonical_norm and canonical_norm in name_norm:
+            score += 5
+            related_reasons.append("CANONICAL_IN_BROKER_NAME")
+        if canonical_norm and canonical_norm in description_norm:
+            score += 3
+            related_reasons.append("CANONICAL_IN_DESCRIPTION")
+        for asset_norm in base_norms:
+            if len(asset_norm) >= 3 and (
+                asset_norm in canonical_norm or canonical_norm in asset_norm
+            ):
+                score += 4
+                related_reasons.append("BASE_ASSET_TEXT_OVERLAP")
+                break
+        for base in base_norms:
+            for quote in quote_norms:
+                pair = base + quote
+                if len(pair) >= 4 and (
+                    pair in canonical_norm or canonical_norm in pair
+                ):
+                    score += 4
+                    related_reasons.append("BASE_QUOTE_TEXT_OVERLAP")
+                    break
+            if "BASE_QUOTE_TEXT_OVERLAP" in related_reasons:
+                break
+        if enabled and score > 0:
+            related_scored.append((score, symbol, related_reasons))
+
+    def unique_rows(items):
+        seen = set()
+        rows = []
+        for symbol, reasons in items:
+            sid = _symbol_id(symbol)
+            if sid in seen:
+                continue
+            seen.add(sid)
+            rows.append(
+                _candidate_row(symbol, support=reasons, assets_by_id=assets_by_id)
+            )
+        return rows
+
+    exact_rows = unique_rows(exact)
+    relaxed_rows = unique_rows(relaxed)
+    credible_ids = {row["symbol_id"] for row in exact_rows + relaxed_rows}
+    related_rows = []
+    seen_related = set()
+    for score, symbol, reasons in sorted(
+        related_scored,
+        key=lambda item: (-item[0], _symbol_name(item[1]).upper(), _symbol_id(item[1])),
+    ):
+        sid = _symbol_id(symbol)
+        if sid in credible_ids or sid in seen_related:
+            continue
+        seen_related.add(sid)
+        row = _candidate_row(symbol, support=reasons, assets_by_id=assets_by_id)
+        row["related_score"] = score
+        related_rows.append(row)
+        if len(related_rows) >= 12:
+            break
+
+    disabled_rows = unique_rows(disabled_supported)
+    credible_rows = sorted(
+        exact_rows + relaxed_rows,
+        key=lambda row: (row["symbol_name"].upper(), row["symbol_id"]),
+    )
+    return {
+        "canonical": canonical,
+        "exact_candidates": exact_rows,
+        "relaxed_candidates": relaxed_rows,
+        "credible_candidates": credible_rows,
+        "related_candidates": related_rows,
+        "disabled_supported_candidates": disabled_rows,
+    }
+
+
+def _find_symbol_by_id(
+    light_symbols: Sequence[Mapping[str, Any]], symbol_id: int
+) -> Mapping[str, Any] | None:
+    for symbol in light_symbols:
+        if _symbol_id(symbol) == int(symbol_id):
+            return symbol
+    return None
+
+
+def validate_saved_symbol_override(
+    canonical: str,
+    saved_override: Mapping[str, Any],
+    light_symbols: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    if str(saved_override.get("source_environment") or "") != SYMBOL_MAPPING_SOURCE_ENVIRONMENT:
+        raise MappingError(f"{canonical}: saved mapping environment mismatch")
+    try:
+        sid = int(saved_override.get("symbol_id"))
+    except (TypeError, ValueError):
+        raise MappingError(f"{canonical}: saved mapping symbolId invalid") from None
+    expected_name = str(saved_override.get("broker_symbol") or "")
+    current = _find_symbol_by_id(light_symbols, sid)
+    if current is None:
+        raise MappingError(f"{canonical}: saved mapping symbolId no longer exists")
+    if not _symbol_enabled(current):
+        raise MappingError(f"{canonical}: saved mapping symbol is no longer enabled")
+    if expected_name and _symbol_name(current) != expected_name:
+        raise MappingError(f"{canonical}: saved mapping broker symbol name changed")
+    return current
+
+
+def resolve_symbol_mapping(
+    canonical: str,
+    light_symbols: Sequence[Mapping[str, Any]],
+    *,
+    exact_override: str | None = None,
+    saved_override: Mapping[str, Any] | None = None,
+    assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+) -> Mapping[str, Any]:
+    if saved_override is not None:
+        return validate_saved_symbol_override(canonical, saved_override, light_symbols)
+
+    if exact_override:
+        matches = [
+            symbol
+            for symbol in light_symbols
+            if _symbol_name(symbol) == exact_override and _symbol_enabled(symbol)
+        ]
+        if len(matches) != 1:
+            raise MappingError(
+                f"{canonical}: exact local override {exact_override!r} is not one enabled LIVE symbol"
+            )
+        return matches[0]
+
+    discovery = discover_symbol_mapping(
+        canonical, light_symbols, assets_by_id=assets_by_id
+    )
+    candidates = discovery["credible_candidates"]
+    if len(candidates) != 1:
+        raise MappingError(
+            f"{canonical}: automatic LIVE mapping unresolved; "
+            f"exact={len(discovery['exact_candidates'])} "
+            f"relaxed={len(discovery['relaxed_candidates'])}"
+        )
+    selected = _find_symbol_by_id(light_symbols, candidates[0]["symbol_id"])
+    if selected is None:
+        raise MappingError(f"{canonical}: selected LIVE symbol disappeared")
+    return selected
+
+
+def resolve_or_select_symbol_mapping(
+    canonical: str,
+    light_symbols: Sequence[Mapping[str, Any]],
+    *,
+    assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    saved_override: Mapping[str, Any] | None = None,
+    selector: Any = None,
+    clear_saved: Any = None,
+) -> tuple[Mapping[str, Any], str, dict[str, Any]]:
+    discovery = discover_symbol_mapping(
+        canonical, light_symbols, assets_by_id=assets_by_id
+    )
+
+    stale_saved_override = False
+    if saved_override is not None:
+        try:
+            return (
+                validate_saved_symbol_override(canonical, saved_override, light_symbols),
+                "PERSISTED_LOCAL_OVERRIDE",
+                discovery,
+            )
+        except MappingError:
+            stale_saved_override = True
+            if callable(clear_saved):
+                clear_saved(canonical)
+
+    if not stale_saved_override:
+        try:
+            return (
+                resolve_symbol_mapping(
+                    canonical,
+                    light_symbols,
+                    assets_by_id=assets_by_id,
+                ),
+                "AUTO_LIVE_STRUCTURAL",
+                discovery,
+            )
+        except MappingError:
+            pass
+
+    if not callable(selector):
+        raise MappingError(
+            f"{canonical}: local broker identity selection is required"
+        )
+
+    selected_id = selector(canonical, discovery)
+    if selected_id in (None, 0, "0"):
+        raise MappingError(f"{canonical}: local user selected BLOCK / none")
+
+    try:
+        selected_id = int(selected_id)
+    except (TypeError, ValueError):
+        raise MappingError(f"{canonical}: invalid local mapping selection") from None
+
+    allowed_rows = (
+        discovery["credible_candidates"]
+        if discovery["credible_candidates"]
+        else discovery["related_candidates"]
+    )
+    allowed_ids = {int(row["symbol_id"]) for row in allowed_rows}
+    if selected_id not in allowed_ids:
+        raise MappingError(
+            f"{canonical}: local selection was not among current LIVE structural candidates"
+        )
+    selected = _find_symbol_by_id(light_symbols, selected_id)
+    if selected is None or not _symbol_enabled(selected):
+        raise MappingError(f"{canonical}: locally selected symbol is not currently enabled")
+    return selected, "LOCAL_USER_SELECTION", discovery
+
+
+def format_symbol_mapping_diagnostic(discovery: Mapping[str, Any]) -> list[str]:
+    canonical = discovery["canonical"]
+    lines = [
+        f"[MAPPING DIAG] {canonical} | "
+        f"exact={len(discovery['exact_candidates'])} | "
+        f"relaxed={len(discovery['relaxed_candidates'])} | "
+        f"related={len(discovery['related_candidates'])} | "
+        f"disabled-supported={len(discovery['disabled_supported_candidates'])}"
+    ]
+    rows = (
+        discovery["credible_candidates"]
+        or discovery["related_candidates"]
+        or discovery["disabled_supported_candidates"]
+    )
+    for row in rows:
+        lines.append(
+            "  - "
+            f"{row['symbol_name']} | {row['description'] or '-'} | "
+            f"symbolId {row['symbol_id']} | enabled={row['enabled']} | "
+            f"base={row.get('base_asset_name') or '-'} | "
+            f"quote={row.get('quote_asset_name') or '-'} | "
+            f"support={','.join(row.get('support') or []) or '-'}"
+        )
+    if not rows:
+        lines.append("  - no structurally related LIVE broker symbols found")
+    return lines
+
 
 TRANSFERABLE_REQUIRED_FILES = frozenset({
     "provenance_manifest.json",

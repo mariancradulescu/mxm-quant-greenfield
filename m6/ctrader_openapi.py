@@ -25,6 +25,7 @@ from .ctrader_capture import (
     drop_secret_fields,
     ensure_full_symbol_enabled,
     format_capture_progress,
+    format_symbol_mapping_diagnostic,
     gap_diagnostics,
     historical_windows,
     load_resume_state,
@@ -34,11 +35,13 @@ from .ctrader_capture import (
     normalize_trendbars,
     raw_csv_bytes,
     record_completed_chunk,
+    resolve_or_select_symbol_mapping,
     redact_text,
     require_read_only_request,
     scan_bundle_for_secrets,
     select_live_pepperstone_account,
     sha256_bytes,
+    build_asset_catalog,
     sha256_file,
     validate_capture_plan,
     validate_transferable_bundle,
@@ -384,7 +387,7 @@ class OpenApiCaptureRunner:
         )
         self._assets = [_plain(a) for a in assets_res.asset]
 
-        self._stage("[2/5] Resolving exact ENABLED Pepperstone symbols")
+        self._stage("[2/5] Resolving ENABLED Pepperstone LIVE symbols from broker metadata")
         symbols_res = self._send(
             ProtoOASymbolsListReq(
                 ctidTraderAccountId=account_id,
@@ -392,23 +395,39 @@ class OpenApiCaptureRunner:
             )
         )
         light = [_plain(s) for s in symbols_res.symbol]
+        assets_by_id = build_asset_catalog(self._assets)
         overrides = self.config.get("symbol_overrides") or {}
-        from .ctrader_capture import resolve_symbol_mapping
+        selector = self.config.get("symbol_selector")
+        saver = self.config.get("symbol_override_saver")
+        clearer = self.config.get("symbol_override_clearer")
+        mapping_sources: dict[str, str] = {}
 
         for raw in self.plan["unique_raw_capture_tasks"]:
             canonical = raw["canonical_instrument"]
-            mapped = resolve_symbol_mapping(
+            mapped, source, discovery = resolve_or_select_symbol_mapping(
                 canonical,
                 light,
-                exact_override=overrides.get(canonical),
+                assets_by_id=assets_by_id,
+                saved_override=overrides.get(canonical),
+                selector=selector,
+                clear_saved=clearer,
             )
+            for line in format_symbol_mapping_diagnostic(discovery):
+                self._stage(line)
+
             symbol_id = int(mapped["symbolId"])
             self._light_symbols[canonical] = mapped
+            mapping_sources[canonical] = source
             evidence = {
                 "canonical_instrument": canonical,
                 "broker_symbol": mapped.get("symbolName"),
+                "description": mapped.get("description"),
                 "symbol_id": symbol_id,
                 "enabled": bool(mapped.get("enabled")),
+                "base_asset_id": mapped.get("baseAssetId"),
+                "quote_asset_id": mapped.get("quoteAssetId"),
+                "symbol_category_id": mapped.get("symbolCategoryId"),
+                "mapping_source": source,
                 "raw_capture_id": raw["raw_capture_id"],
                 "raw_identity_sha256": raw["raw_identity_sha256"],
                 "resolution": raw["resolution"],
@@ -431,6 +450,20 @@ class OpenApiCaptureRunner:
             plain = _plain(by_id[sid])
             ensure_full_symbol_enabled(plain)
             self._full_symbols[canonical] = plain
+
+            if mapping_sources.get(canonical) == "LOCAL_USER_SELECTION" and callable(saver):
+                saver(canonical, {
+                    "symbol_id": sid,
+                    "broker_symbol": mapped["broker_symbol"],
+                    "account_fingerprint_sha256": self._account_evidence[
+                        "account_fingerprint_sha256"
+                    ],
+                })
+
+            self._stage(
+                f"[MAPPING PASS] {canonical} -> {mapped['broker_symbol']} | "
+                f"symbolId {sid} | source={mapping_sources.get(canonical)}"
+            )
 
         self._stage("[3/5] Capturing read-only structural / auxiliary evidence")
         self._capture_expected_margin(account_id)

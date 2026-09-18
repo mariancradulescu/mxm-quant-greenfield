@@ -42,3 +42,20 @@ capture_output/MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8.zip
 
 Never return ~/.mxm_quant/, app_credentials.json, oauth_state.json,
 account_selection.json, access/refresh tokens, authorization code or client secret.
+
+
+LIVE SYMBOL MAPPING
+-------------------
+All 11 frozen canonical instruments are resolved from the currently authorized
+Pepperstone LIVE symbol list. Mechanical broker suffix/punctuation differences may be
+auto-resolved only when exactly one enabled LIVE symbol is structurally supported.
+
+If mapping is zero/ambiguous, Pydroid prints a numbered local list. Enter the number of
+the correct broker identity, or 0 to BLOCK. A user-selected mapping is saved locally
+only after full symbol metadata confirms it is enabled/tradable. The saved mapping is
+bound to the LIVE environment + broker symbolId + exact broker symbol name and is
+revalidated on every run. If it becomes stale/disabled, it is cleared and selection is
+requested again.
+
+No V1/legacy strategy result, PnL, ranking or economic information participates in
+mapping.

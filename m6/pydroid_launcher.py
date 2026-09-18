@@ -31,6 +31,12 @@ from .pydroid_oauth import (
     ensure_v2_authorization,
     load_saved_account_id,
 )
+from .pydroid_symbol_mapping import (
+    choose_symbol_locally,
+    clear_symbol_override,
+    load_symbol_overrides,
+    save_symbol_override,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "data" / "PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json"
@@ -203,7 +209,10 @@ def main():
         "ctid_trader_account_id": load_saved_account_id(),
         "account_selection_path": str(ACCOUNT_SELECTION_PATH),
         "account_selector": choose_live_account_locally,
-        "symbol_overrides": {},
+        "symbol_overrides": load_symbol_overrides(),
+        "symbol_selector": choose_symbol_locally,
+        "symbol_override_saver": save_symbol_override,
+        "symbol_override_clearer": clear_symbol_override,
     }
 
     try:
