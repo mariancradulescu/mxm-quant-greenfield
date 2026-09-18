@@ -14,7 +14,7 @@ from google.protobuf.json_format import MessageToDict
 
 from .cost_evidence import (
     HISTORICAL_MIN_INTERVAL_SECONDS,
-    POST_BOUNDARY_MAX_WAIT_MS,
+    QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
     QUOTE_TYPES,
     TIER1_SYMBOLS,
     CausalQuoteState,
@@ -22,13 +22,15 @@ from .cost_evidence import (
     atomic_write_bytes,
     canonical_tick_rows,
     causal_merge_bid_ask,
+    causal_state_at_boundary,
     cost_resume_contract,
     decode_ctrader_tick_page,
     deterministic_zip_directory,
-    first_fresh_two_sided_state_at_or_after,
+    first_any_quote_event_at_or_after,
+    first_both_sides_refreshed_diagnostic,
+    first_tick_at_or_after,
     next_tick_page_to_ms,
     prepare_contract_bound_resume,
-    quote_state_at_or_before,
     signal_blind_cash_session_windows,
     tick_csv_bytes,
     validate_tick_request_window,
@@ -59,8 +61,8 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V2"
-BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v2"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3"
+BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
 
 
 def _plain(message: Any) -> dict[str, Any]:
@@ -102,18 +104,18 @@ class CostEvidenceRunner:
         self.repo_root=Path(repo_root)
         self.progress=progress
         self.transport=transport or StdlibCTraderTransport(LIVE_HOST,LIVE_PORT,response_timeout=60)
-        self.plan_path=self.repo_root/"data"/"M6_TIER1_COST_EVIDENCE_PLAN_V2.json"
+        self.plan_path=self.repo_root/"data"/"M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         self.calendar_path=self.repo_root/"data"/"NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json"
         if not self.plan_path.is_file() or not self.calendar_path.is_file():
             raise CaptureContractError("active Tier-1 cost plan/calendar authority missing")
         self.resume_contract=cost_resume_contract(
             self.plan_path, tool_version=TOOL_VERSION
         )
-        self.work_dir=self.repo_root/".m6_cost_evidence_work"/"tier1_us500_nas100_v2"
+        self.work_dir=self.repo_root/".m6_cost_evidence_work"/"tier1_us500_nas100_v3"
         self.resume_path,self.resume,self._archived_resume_dir=prepare_contract_bound_resume(
             self.work_dir,self.resume_contract
         )
-        self.output_dir=self.repo_root/"cost_capture_output"/"MXM_M6_TIER1_COST_EVIDENCE_V2"
+        self.output_dir=self.repo_root/"cost_capture_output"/"MXM_M6_TIER1_COST_EVIDENCE_V3"
         self.windows=signal_blind_cash_session_windows()
         self.calendar=NasdaqCashCalendar.from_artifact(self.calendar_path)
         self._last_historical_send=None
@@ -371,29 +373,50 @@ class CostEvidenceRunner:
         return {"path":path.relative_to(self.output_dir).as_posix(),"rows":rows,"sha256":sha256_file(path)}
 
     def _write_boundary_quotes(self,symbol:str)->dict[str,Any]:
-        out_path=self.output_dir/"derived"/f"{symbol}_M15_BOUNDARY_QUOTES.csv"
+        """Persist candidate-independent quote evidence; never assert an executed fill."""
+        out_path=self.output_dir/"derived"/f"{symbol}_M15_BOUNDARY_QUOTE_EVIDENCE.csv"
         out_path.parent.mkdir(parents=True,exist_ok=True)
         tmp=out_path.with_suffix(".csv.tmp")
         rows=0
-        missing_pre=0
-        missing_post=0
+        missing_causal=0
+        missing_bid_event=0
+        missing_ask_event=0
+        missing_any_event=0
+        missing_refresh_diagnostic=0
         negative_spread=0
-        first_boundary_seen=None
+
+        def price(value):
+            if value is None:
+                return ""
+            return format(value,".10f").rstrip("0").rstrip(".")
+
         with tmp.open("w",encoding="utf-8",newline="") as out:
             writer=csv.writer(out,lineterminator="\n")
             writer.writerow((
-                "session_date","boundary_utc","boundary_timestamp_ms",
-                "pre_bid","pre_ask","pre_spread","pre_bid_timestamp_ms","pre_ask_timestamp_ms","pre_state",
-                "post_bid","post_ask","post_spread","post_bid_timestamp_ms","post_ask_timestamp_ms",
-                "post_state","post_delay_ms"
+                "session_date","boundary_utc","boundary_timestamp_ms","boundary_role",
+                "causal_bid","causal_ask","causal_spread",
+                "causal_bid_timestamp_ms","causal_ask_timestamp_ms",
+                "causal_bid_age_ms","causal_ask_age_ms","causal_state_availability",
+                "first_post_boundary_bid_timestamp_ms","first_post_boundary_bid_price",
+                "first_post_boundary_bid_delay_ms",
+                "first_post_boundary_ask_timestamp_ms","first_post_boundary_ask_price",
+                "first_post_boundary_ask_delay_ms",
+                "first_post_boundary_any_timestamp_ms","first_post_boundary_any_side",
+                "first_post_boundary_any_bid_price","first_post_boundary_any_ask_price",
+                "first_post_boundary_any_delay_ms",
+                "both_sides_refreshed_state_timestamp_ms",
+                "both_sides_refreshed_bid","both_sides_refreshed_ask",
+                "both_sides_refreshed_spread",
+                "both_sides_refreshed_bid_timestamp_ms",
+                "both_sides_refreshed_ask_timestamp_ms",
+                "both_sides_refreshed_delay_ms",
+                "both_sides_refreshed_classification"
             ))
             for window in self.windows:
                 session=self.calendar.session(
                     datetime.fromisoformat(window.session_date).date()
                 )
                 if session is None:
-                    # Raw holiday envelope remains hash-preserved; no official cash-session
-                    # boundary row is invented for a closed exchange day.
                     continue
                 bid=_read_chunk_ticks(self._chunk_path(symbol,"BID",window.session_date))
                 ask=_read_chunk_ticks(self._chunk_path(symbol,"ASK",window.session_date))
@@ -401,45 +424,33 @@ class CostEvidenceRunner:
                 boundary=int(session.open_utc.timestamp()*1000)
                 close_ms=int(session.close_utc.timestamp()*1000)
                 while boundary<=close_ms:
-                    if first_boundary_seen is None:
-                        first_boundary_seen=boundary
-                    pre_fields=["","","","","","MISSING_PRE_BOUNDARY_TWO_SIDED_QUOTE"]
-                    try:
-                        pre=quote_state_at_or_before(states,boundary)
-                        if pre.spread<0:
-                            negative_spread+=1
-                        pre_fields=[
-                            format(pre.bid,".10f").rstrip("0").rstrip("."),
-                            format(pre.ask,".10f").rstrip("0").rstrip("."),
-                            format(pre.spread,".10f").rstrip("0").rstrip("."),
-                            pre.bid_timestamp_ms,
-                            pre.ask_timestamp_ms,
-                            "PRE_BOUNDARY_CAUSAL_TWO_SIDED",
-                        ]
-                    except CaptureContractError:
-                        missing_pre+=1
+                    causal=causal_state_at_boundary(bid,ask,boundary)
+                    if causal.availability!="CAUSAL_TWO_SIDED_AVAILABLE":
+                        missing_causal+=1
+                    elif causal.spread is not None and causal.spread<0:
+                        negative_spread+=1
 
-                    if boundary==close_ms:
-                        post_fields=["","","","","","NOT_USED_COMPLETED_BAR_CLOSE",""]
-                    else:
-                        post_fields=["","","","","","MISSING_POST_BOUNDARY_EXECUTABLE",""]
-                        try:
-                            post=first_fresh_two_sided_state_at_or_after(
-                                states,boundary,max_wait_ms=POST_BOUNDARY_MAX_WAIT_MS
-                            )
-                            if post.spread<0:
-                                negative_spread+=1
-                            post_fields=[
-                                format(post.bid,".10f").rstrip("0").rstrip("."),
-                                format(post.ask,".10f").rstrip("0").rstrip("."),
-                                format(post.spread,".10f").rstrip("0").rstrip("."),
-                                post.bid_timestamp_ms,
-                                post.ask_timestamp_ms,
-                                "POST_BOUNDARY_EXECUTABLE_FRESH_TWO_SIDED",
-                                post.timestamp_ms-boundary,
-                            ]
-                        except CaptureContractError:
-                            missing_post+=1
+                    post_bid=first_tick_at_or_after(bid,boundary)
+                    if post_bid is None:
+                        missing_bid_event+=1
+                    post_ask=first_tick_at_or_after(ask,boundary)
+                    if post_ask is None:
+                        missing_ask_event+=1
+                    post_any=first_any_quote_event_at_or_after(bid,ask,boundary)
+                    if post_any is None:
+                        missing_any_event+=1
+
+                    refresh=None
+                    try:
+                        refresh=first_both_sides_refreshed_diagnostic(
+                            states,
+                            boundary,
+                            diagnostic_window_ms=QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
+                        )
+                        if refresh.spread<0:
+                            negative_spread+=1
+                    except CaptureContractError:
+                        missing_refresh_diagnostic+=1
 
                     writer.writerow((
                         window.session_date,
@@ -447,8 +458,36 @@ class CostEvidenceRunner:
                             timespec="milliseconds"
                         ).replace("+00:00","Z"),
                         boundary,
-                        *pre_fields,
-                        *post_fields,
+                        "SESSION_CLOSE_BOUNDARY" if boundary==close_ms else "GENERIC_M15_BOUNDARY",
+                        price(causal.bid),price(causal.ask),price(causal.spread),
+                        "" if causal.bid_timestamp_ms is None else causal.bid_timestamp_ms,
+                        "" if causal.ask_timestamp_ms is None else causal.ask_timestamp_ms,
+                        "" if causal.bid_age_ms is None else causal.bid_age_ms,
+                        "" if causal.ask_age_ms is None else causal.ask_age_ms,
+                        causal.availability,
+                        "" if post_bid is None else post_bid.timestamp_ms,
+                        "" if post_bid is None else price(post_bid.price),
+                        "" if post_bid is None else post_bid.timestamp_ms-boundary,
+                        "" if post_ask is None else post_ask.timestamp_ms,
+                        "" if post_ask is None else price(post_ask.price),
+                        "" if post_ask is None else post_ask.timestamp_ms-boundary,
+                        "" if post_any is None else post_any.timestamp_ms,
+                        "" if post_any is None else post_any.side,
+                        "" if post_any is None else price(post_any.bid_price),
+                        "" if post_any is None else price(post_any.ask_price),
+                        "" if post_any is None else post_any.delay_ms,
+                        "" if refresh is None else refresh.timestamp_ms,
+                        "" if refresh is None else price(refresh.bid),
+                        "" if refresh is None else price(refresh.ask),
+                        "" if refresh is None else price(refresh.spread),
+                        "" if refresh is None else refresh.bid_timestamp_ms,
+                        "" if refresh is None else refresh.ask_timestamp_ms,
+                        "" if refresh is None else refresh.timestamp_ms-boundary,
+                        (
+                            "MISSING_WITHIN_DIAGNOSTIC_WINDOW"
+                            if refresh is None
+                            else "QUOTE_REFRESH_DIAGNOSTIC_ONLY"
+                        ),
                     ))
                     rows+=1
                     boundary+=15*60*1000
@@ -456,11 +495,16 @@ class CostEvidenceRunner:
         return {
             "path":out_path.relative_to(self.output_dir).as_posix(),
             "rows":rows,
-            "missing_pre_boundary_quotes":missing_pre,
-            "missing_post_boundary_executable_quotes":missing_post,
+            "missing_causal_two_sided_states":missing_causal,
+            "missing_first_post_boundary_bid_events":missing_bid_event,
+            "missing_first_post_boundary_ask_events":missing_ask_event,
+            "missing_first_post_boundary_any_events":missing_any_event,
+            "missing_both_sides_refresh_diagnostics":missing_refresh_diagnostic,
             "negative_spread_states":negative_spread,
             "first_generic_boundary_includes_session_open":True,
-            "post_boundary_max_wait_ms":POST_BOUNDARY_MAX_WAIT_MS,
+            "both_sides_refresh_diagnostic_window_ms":QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
+            "both_sides_refresh_classification":"QUOTE_REFRESH_DIAGNOSTIC_ONLY",
+            "fill_authority":False,
             "sha256":sha256_file(out_path),
         }
 
@@ -482,7 +526,7 @@ class CostEvidenceRunner:
         atomic_write_json(evidence/"account.json",drop_secret_fields(self._account_evidence))
         atomic_write_json(evidence/"symbol_verification.json",self._symbol_evidence)
         atomic_write_json(evidence/"request_manifest.json",{
-            "schema":"mxm.greenfield.v2.m6-tier1-cost-request-manifest.v2",
+            "schema":"mxm.greenfield.v2.m6-tier1-cost-request-manifest.v3",
             "official_max_request_window_ms":604800000,
             "historical_limit_per_second":5,
             "implemented_min_interval_seconds":HISTORICAL_MIN_INTERVAL_SECONDS,
@@ -494,27 +538,46 @@ class CostEvidenceRunner:
             "resume_contract_sha256":self.resume_contract["binding_sha256"],
             "records":records,
         })
-        atomic_write_json(evidence/"spread_reconstruction_policy.json",{
-            "schema":"mxm.greenfield.v2.causal-bid-ask-boundary-evidence.v2",
+        atomic_write_json(evidence/"quote_boundary_evidence_policy.json",{
+            "schema":"mxm.greenfield.v2.causal-bid-ask-boundary-evidence.v3",
+            "classification":"EVIDENCE_ONLY_NO_EXECUTION_FILL_AUTHORITY",
             "event_order":"CHRONOLOGICAL",
             "spread":"ASK_MINUS_BID",
             "future_side_fill":False,
             "generic_boundaries":"OFFICIAL_CASH_SESSION_M15_BOUNDARIES_INCLUDING_09_30",
-            "pre_boundary":{
-                "rule":"LATEST_CAUSAL_TWO_SIDED_STATE_AT_OR_BEFORE_BOUNDARY",
-                "market_proxy_entry_authority":False,
+            "causal_state_at_boundary":{
+                "bid":"LATEST_OBSERVED_BID_AT_OR_BEFORE_BOUNDARY",
+                "ask":"LATEST_OBSERVED_ASK_AT_OR_BEFORE_BOUNDARY",
+                "quote_age_recorded":True,
+                "pre_boundary_side_may_remain_current":True,
+                "executed_fill_authority":False,
             },
-            "post_boundary_executable":{
-                "rule":"FIRST_CAUSAL_TWO_SIDED_STATE_AT_OR_AFTER_BOUNDARY_WITH_BOTH_SIDES_REFRESHED_AT_OR_AFTER_BOUNDARY",
-                "maximum_wait_ms":POST_BOUNDARY_MAX_WAIT_MS,
-                "interval":"[BOUNDARY,BOUNDARY_PLUS_15M)",
-                "on_missing":"NO_EXECUTION_INVENTED",
+            "first_post_boundary_events":{
+                "bid":"FIRST_OBSERVED_BID_AT_OR_AFTER_BOUNDARY",
+                "ask":"FIRST_OBSERVED_ASK_AT_OR_AFTER_BOUNDARY",
+                "any":"EARLIEST_OBSERVED_BID_AND_OR_ASK_AT_OR_AFTER_BOUNDARY",
+                "executed_fill_authority":False,
+            },
+            "both_sides_refreshed":{
+                "classification":"QUOTE_REFRESH_DIAGNOSTIC_ONLY",
+                "diagnostic_window_ms":QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
+                "candidate_entry_time":False,
+                "fill_time":False,
+                "stage_a_execution_truth":False,
+                "mandatory_delay_assumption":False,
+                "economic_fill_authority":False,
             },
             "completed_bar_close":{
-                "rule":"PRE_BOUNDARY_ONLY",
-                "after_close_quote_mixed_into_close":False,
+                "causal_state_at_or_before_close":True,
+                "quote_ages":True,
+                "first_bid_event_at_or_after_close_boundary":True,
+                "first_ask_event_at_or_after_close_boundary":True,
+                "post_close_quote_mixed_into_frozen_close_proxy":False,
             },
+            "market_proxy_rule":"CANDIDATE_OHLC_MARKET_PROXY_TIMING_REMAINS_SEPARATE_FROM_QUOTE_COST_EVIDENCE",
+            "numeric_quote_age_or_fill_delay_rule":"NOT_FROZEN_PRE_CAPTURE",
             "signal_conditioned_selection":False,
+            "candidate_pnl_conditioned_selection":False,
         })
         atomic_write_json(self.output_dir/"provenance_manifest.json",{
             "schema":BUNDLE_SCHEMA,
@@ -529,14 +592,17 @@ class CostEvidenceRunner:
             "protected_evidence_opened":False,
             "targets":self._symbol_evidence,
             "acquisition_domain":"ALL_WEEKDAY_09_30_TO_16_00_AMERICA_NEW_YORK_ENVELOPES_SIGNAL_BLIND",
-            "active_plan":"data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+            "active_plan":"data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+            "calibration_protocol":"data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
             "active_calendar":"data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
             "resume_contract":self.resume_contract,
             "archived_incompatible_resume_dir":(
                 self._archived_resume_dir.name if self._archived_resume_dir else None
             ),
             "raw_tapes":tapes,
-            "boundary_quotes":boundaries,
+            "boundary_quote_evidence":boundaries,
+            "execution_fill_rule_frozen":False,
+            "candidate_market_proxy_mutated":False,
             "historical_requests_completed":self._historical_requests,
             "resume_chunks_reused":self._reused_chunks,
         })
@@ -570,7 +636,7 @@ class CostEvidenceRunner:
         (self.output_dir/"CHECKSUMS.sha256").write_text(
             "\n".join(checksum_lines)+"\n",encoding="utf-8"
         )
-        target=self.output_dir.parent/"MXM_M6_TIER1_COST_EVIDENCE_V2.zip"
+        target=self.output_dir.parent/"MXM_M6_TIER1_COST_EVIDENCE_V3.zip"
         deterministic_zip_directory(self.output_dir,target)
         self._stage(f"[DONE] {target}")
         self._stage(f"[SHA256] {sha256_file(target)}")
