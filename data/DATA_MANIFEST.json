@@ -1,11 +1,14 @@
 {
   "schema_version": 1,
-  "status": "FROZEN_M2_KNOWN_REUSABLE_ONLY",
+  "status": "PRIMARY_WAVE_02_RAW_COMPONENTS_MATERIALIZED_HASH_VERIFIED_AUXILIARY_GATES_PARTIAL",
   "policy": {
     "pre_v2_data_classification": "DEVELOPMENT_ONLY",
     "no_untouched_oos_claim": true,
     "reuse_requires_provenance_and_hash": true,
-    "m2_recollection_performed": false
+    "m2_recollection_performed": false,
+    "primary_wave_02_capture_acceptance": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "primary_wave_02_actual_bytes_hash_verified": true,
+    "primary_wave_02_candidate_economics_opened": false
   },
   "datasets": [
     {
@@ -23,26 +26,634 @@
         "note": "USDJPY begins 2024-03-04T10:00:00Z"
       },
       "environment": "historical development evidence",
-      "columns": ["time_utc", "open", "high", "low", "close", "tick_volume"],
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
       "series": {
-        "CADJPY": {"rows": 15513, "csv_sha256": "6d7a0e0d721539cc3e5b794ea3ccfd8c9f17ec1ea580082a97b698cfc433fc91"},
-        "EURJPY": {"rows": 15513, "csv_sha256": "b724ef463df82d1c6f1da1bf6485d22a70554aea6e567656c57897cd79799e22"},
-        "USDCAD": {"rows": 15513, "csv_sha256": "ece28f1c18406613f0c191e727632c93b0e7525cc8ca26a96a1613ce006550f7"},
-        "USDJPY": {"rows": 15494, "csv_sha256": "5010451b18dad54912bb2392593301ede554ef4afcda8da01cf311c384092703"}
+        "CADJPY": {
+          "rows": 15513,
+          "csv_sha256": "6d7a0e0d721539cc3e5b794ea3ccfd8c9f17ec1ea580082a97b698cfc433fc91"
+        },
+        "EURJPY": {
+          "rows": 15513,
+          "csv_sha256": "b724ef463df82d1c6f1da1bf6485d22a70554aea6e567656c57897cd79799e22"
+        },
+        "USDCAD": {
+          "rows": 15513,
+          "csv_sha256": "ece28f1c18406613f0c191e727632c93b0e7525cc8ca26a96a1613ce006550f7"
+        },
+        "USDJPY": {
+          "rows": 15494,
+          "csv_sha256": "5010451b18dad54912bb2392593301ede554ef4afcda8da01cf311c384092703"
+        }
       },
       "completeness": "SOURCE_MANIFEST_HASHED; PACK_BYTES_NOT_PRESENT_IN_V2_REPOSITORY",
       "causal_session_timezone_semantics": "UTC timestamps; OHLC completed-bar use must enforce causal cutoff; exact broker session/holiday semantics are not established by this pack"
+    },
+    {
+      "dataset_id": "PW02-RAW-AAPL-D1-a92aa4b6fe92e94f",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "AAPL",
+      "broker_symbol": "AAPL.US",
+      "broker_symbol_id": 804,
+      "broker_product_family": "STANDARD_CASH_SHARE_CFD",
+      "resolution": "D1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T22:00:00Z",
+        "last_timestamp_utc": "2026-09-15T21:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 1179,
+      "csv_sha256": "8aba1da1b93615a42cff96703eb2b83d118f8e19876c79b7a5b26c7174a5c1d9",
+      "gap_count": 258,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-AMZN-D1-08b3bafc8f8e2812",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "AMZN",
+      "broker_symbol": "AMZN.US",
+      "broker_symbol_id": 803,
+      "broker_product_family": "STANDARD_CASH_SHARE_CFD",
+      "resolution": "D1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T22:00:00Z",
+        "last_timestamp_utc": "2026-09-15T21:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 1180,
+      "csv_sha256": "5b6b25e3b06492a9ed5dc93ffa4e115d87ab37510baafdb486f23a481451df99",
+      "gap_count": 258,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-AUDJPY-D1-9c2e88c72cb890fb",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "AUDJPY",
+      "broker_symbol": "AUDJPY",
+      "broker_symbol_id": 11,
+      "broker_product_family": "FX_SPOT_OR_MARGIN_CFD",
+      "resolution": "D1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T22:00:00Z",
+        "last_timestamp_utc": "2026-09-15T21:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 1221,
+      "csv_sha256": "cc80a219a15c830b00ef843063886eb9dd41a17161f436fd7bfa12b951a51bc4",
+      "gap_count": 249,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-BTCUSD-H1-a538f2b2dc0b39d6",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "BTCUSD",
+      "broker_symbol": "BTCUSD",
+      "broker_symbol_id": 124,
+      "broker_product_family": "SPOT_CRYPTO_CFD",
+      "resolution": "H1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T00:00:00Z",
+        "last_timestamp_utc": "2026-09-16T22:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 40044,
+      "csv_sha256": "ca8beb4f4766b3abaf183784edfeb35486ab60a90be040493756240e7c0be4f5",
+      "gap_count": 419,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-META-D1-ea5a78a0d3fb2e14",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "META",
+      "broker_symbol": "META.US",
+      "broker_symbol_id": 799,
+      "broker_product_family": "STANDARD_CASH_SHARE_CFD",
+      "resolution": "D1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T22:00:00Z",
+        "last_timestamp_utc": "2026-09-15T21:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 1179,
+      "csv_sha256": "1220cab923627c6868ed3d07b85dc80b85c1c7101fefe50cad2723a79d991f38",
+      "gap_count": 258,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-MSFT-D1-8fb724c0124bb2e1",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "MSFT",
+      "broker_symbol": "MSFT.US",
+      "broker_symbol_id": 802,
+      "broker_product_family": "STANDARD_CASH_SHARE_CFD",
+      "resolution": "D1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T22:00:00Z",
+        "last_timestamp_utc": "2026-09-15T21:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 1179,
+      "csv_sha256": "c9a6a105685c3ae8eb6896279d11ab10210e6961bd8bf3dcb538efd56ba93ec6",
+      "gap_count": 258,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-NAS100-M15-39767256a903ce32",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "NAS100",
+      "broker_symbol": "NAS100",
+      "broker_symbol_id": 126,
+      "broker_product_family": "CASH_INDEX_CFD",
+      "resolution": "M15",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T00:00:00Z",
+        "last_timestamp_utc": "2026-09-16T23:30:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 111129,
+      "csv_sha256": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "gap_count": 1222,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-NVDA-D1-30863e6ca71cc858",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "NVDA",
+      "broker_symbol": "NVDA.US",
+      "broker_symbol_id": 808,
+      "broker_product_family": "STANDARD_CASH_SHARE_CFD",
+      "resolution": "D1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T22:00:00Z",
+        "last_timestamp_utc": "2026-09-15T21:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 1179,
+      "csv_sha256": "f0a20a093d3c23507c6a7db924d9c907a3f1bcacbb349dc232b449e25ed0ca93",
+      "gap_count": 258,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-US500-M15-a7856539f970beef",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "US500",
+      "broker_symbol": "US500",
+      "broker_symbol_id": 127,
+      "broker_product_family": "CASH_INDEX_CFD",
+      "resolution": "M15",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T00:00:00Z",
+        "last_timestamp_utc": "2026-09-16T23:30:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 112290,
+      "csv_sha256": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "gap_count": 975,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-WTIUSD-H1-d73dba174aeefe26",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "WTIUSD",
+      "broker_symbol": "SpotCrude",
+      "broker_symbol_id": 250,
+      "broker_product_family": "SPOT_ENERGY_CFD",
+      "resolution": "H1",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T00:00:00Z",
+        "last_timestamp_utc": "2026-09-16T22:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 27842,
+      "csv_sha256": "9378565e093af5c4982c6fc9e74a1c30753a9b97523779caebb48ef29026ce9a",
+      "gap_count": 1216,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-RAW-XAUUSD-H4-792f9b537f6aeae2",
+      "state": "MATERIALIZED_HASH_VERIFIED_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "XAUUSD",
+      "broker_symbol": "XAUUSD",
+      "broker_symbol_id": 41,
+      "broker_product_family": "SPOT_METAL_CFD",
+      "resolution": "H4",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T02:00:00Z",
+        "last_timestamp_utc": "2026-09-16T17:00:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 7286,
+      "csv_sha256": "1121a184f38aa8e30b4d093ae49e7f0bbdc5e5b3ed439a1d41ba5b0f3a74ec93",
+      "gap_count": 249,
+      "completed_bars_only": true,
+      "gaps_reported_not_filled": true,
+      "resampling_performed": false,
+      "synthetic_fill_performed": false,
+      "forward_fill_performed": false,
+      "protected_forward_rows_included": false,
+      "completeness": "RAW_OHLCV_COMPONENT_CAPTURED; CANDIDATE_SPECIFIC_AUXILIARY_REQUIREMENTS_REMAIN_SEPARATE"
+    },
+    {
+      "dataset_id": "PW02-AUX-CONV-EURUSD-M15-S1",
+      "state": "MATERIALIZED_HASH_VERIFIED_AUXILIARY_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "EURUSD",
+      "broker_symbol": "EURUSD",
+      "broker_symbol_id": 1,
+      "resolution": "M15",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T00:00:00Z",
+        "last_timestamp_utc": "2026-09-16T23:30:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 116910,
+      "csv_sha256": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+      "gap_count": 299,
+      "purpose": "CURRENT_BROKER_CONVERSION_CHAIN_CONSTITUENT_RAW_SERIES",
+      "historical_chain_point_in_time_validity": "UNRESOLVED_CURRENT_CHAIN_NOT_PROVEN_HISTORICALLY_EFFECTIVE",
+      "protected_forward_rows_included": false
+    },
+    {
+      "dataset_id": "PW02-AUX-CONV-EURJPY-M15-S3",
+      "state": "MATERIALIZED_HASH_VERIFIED_AUXILIARY_RAW_COMPONENT",
+      "classification": "DEVELOPMENT_ONLY",
+      "source_environment": "Pepperstone - Europe LIVE",
+      "source_capture_bundle": {
+        "name": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+        "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+        "original_capture_sha256": "540513555ea66fd67f1c641679618b03d6e6d50b836b06f6f5d0d5ed551ea2a9",
+        "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        "repository_storage": "BYTES_NOT_STORED_IN_GIT_REPOSITORY_HASH_BOUND_EXTERNAL_CAPTURE_ARTIFACT"
+      },
+      "canonical_instrument": "EURJPY",
+      "broker_symbol": "EURJPY",
+      "broker_symbol_id": 3,
+      "resolution": "M15",
+      "requested_interval": {
+        "start_utc": "2022-01-03T00:00:00Z",
+        "end_utc": "2026-09-16T23:59:59Z",
+        "protected_boundary_excluded": true
+      },
+      "observed_interval": {
+        "first_timestamp_utc": "2022-01-03T00:00:00Z",
+        "last_timestamp_utc": "2026-09-16T23:30:00Z"
+      },
+      "columns": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "rows": 117140,
+      "csv_sha256": "2f25be36c7599937e120f9bd1f5cf44a62b3edf383e8735214f3bd58370009cf",
+      "gap_count": 253,
+      "purpose": "CURRENT_BROKER_CONVERSION_CHAIN_CONSTITUENT_RAW_SERIES",
+      "historical_chain_point_in_time_validity": "UNRESOLVED_CURRENT_CHAIN_NOT_PROVEN_HISTORICALLY_EFFECTIVE",
+      "protected_forward_rows_included": false
     }
   ],
   "missing_data": [
-    "historical bid/ask or spread path sufficient for Certification",
-    "historical exact commission path sufficient for Certification",
-    "historical exact swap schedule/rates sufficient for Certification",
-    "historical slippage/delay/gap evidence sufficient for Certification",
-    "symbol-specific executable volume constraints for future candidate instruments",
-    "symbol-specific currency-conversion truth for future candidate instruments",
-    "symbol-specific sessions/holidays for future candidate instruments",
-    "broader reusable market history beyond the four registered H1 FX series"
+    "historical bid/ask or spread evidence or prospectively frozen defensible conservative Discovery bound for applicable candidates",
+    "historical exact commission path where required for Certification; Discovery may use only a prospectively frozen defensible bound when permitted",
+    "historical exact swap/financing schedules and rates required by V2-C010 and applicable overnight candidates",
+    "historical slippage/delay/gap evidence or prospectively frozen defensible conservative Discovery bound",
+    "point-in-time corporate actions/symbol changes/dividends for V2-C011",
+    "point-in-time short-entry eligibility/close-only and share-CFD financing/dividend-adjustment evidence for V2-C011",
+    "historical continuous-CFD/contract-roll construction, roll timestamps and adjustment semantics for V2-C008",
+    "historical broker session/holiday/maintenance/rollover semantic versions required by PRIMARY_WAVE_02 candidates",
+    "historical point-in-time validity of the currently observed EURUSD/EURJPY conversion chains",
+    "exact Stage-B EUR200 feasibility at causal executable quantities; current minimum-volume ExpectedMargin evidence alone is insufficient"
   ],
-  "synthetic_fixture_note": "M2 fixtures are deterministic generated test inputs, not market evidence and not a reusable economic dataset."
+  "synthetic_fixture_note": "M2 fixtures are deterministic generated test inputs, not market evidence and not a reusable economic dataset.",
+  "primary_wave_02_materialization": {
+    "state": "RAW_COMPONENTS_HASH_VERIFIED_AUXILIARY_EVIDENCE_INCOMPLETE",
+    "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "raw_primary_series_materialized": 11,
+    "auxiliary_conversion_series_materialized": 2,
+    "broker_product_preflight": "11/11 PASS",
+    "actual_data_manifest_binding_complete_for_raw_components": true,
+    "candidate_ready_for_economic_outcome": false,
+    "reason": "Frozen candidate-specific session/roll/corporate-action/financing/cost evidence gates remain unresolved.",
+    "economic_outcomes_opened": 0,
+    "protected_evidence_opened": false
+  }
 }
