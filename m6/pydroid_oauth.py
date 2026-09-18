@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -45,11 +46,15 @@ def _load_json(path: Path):
     return value if isinstance(value, dict) else None
 
 
-def _normalize_app_credentials(raw):
+def _normalize_app_credentials(raw, *, allow_legacy_view_scope=False):
     if not isinstance(raw, dict):
         return None
     scope = raw.get("scope")
-    if scope not in (None, "", READ_ONLY_SCOPE):
+    scope_text = "" if scope is None else str(scope).strip().lower()
+    allowed_scopes = {"", READ_ONLY_SCOPE}
+    if allow_legacy_view_scope:
+        allowed_scopes.update({"scope_view", "view", "read_only", "readonly"})
+    if scope_text not in allowed_scopes:
         return None
     client_id = str(raw.get("client_id") or raw.get("clientId") or "").replace("\\x00", "").strip()
     client_secret = str(raw.get("client_secret") or raw.get("clientSecret") or "").replace("\\x00", "").strip()
@@ -90,7 +95,9 @@ def _app_credentials_for_fresh_auth():
     if current is not None:
         return current, "V2_PRIVATE_APP_CREDENTIALS"
 
-    legacy = _normalize_app_credentials(_load_json(LEGACY_APP_STATE_PATH))
+    legacy = _normalize_app_credentials(
+        _load_json(LEGACY_APP_STATE_PATH), allow_legacy_view_scope=True
+    )
     if legacy is not None:
         return legacy, "LEGACY_APP_CREDENTIALS_ONLY"
     return None, None
@@ -197,8 +204,14 @@ def _callback_html():
 <title>MXM authorization received</title></head>
 <body style="font-family:sans-serif;max-width:640px;margin:24px auto;padding:0 16px">
 <h2>Authorization received.</h2>
-<p>Pydroid is continuing automatically. You can return to Pydroid now.</p>
-<script>setTimeout(function(){try{window.close();}catch(e){}},500);</script>
+<p>Pydroid is continuing automatically.</p>
+<p><a href="intent://#Intent;package=ru.iiec.pydroid3;end">Return to Pydroid</a></p>
+<script>
+setTimeout(function(){
+  try { window.location.href = "intent://#Intent;package=ru.iiec.pydroid3;end"; }
+  catch(e) { try { window.close(); } catch(_e) {} }
+}, 350);
+</script>
 </body></html>"""
 
 
@@ -277,6 +290,22 @@ def _open_browser(url: str) -> None:
         )
 
 
+def _best_effort_return_to_pydroid() -> bool:
+    """Bring Pydroid back to foreground after OAuth when Android permits it."""
+    try:
+        subprocess.Popen(
+            [
+                "am", "start", "-n",
+                "ru.iiec.pydroid3/ru.iiec.pydroid.MainActivity",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except (OSError, ValueError):
+        return False
+
+
 def _fresh_browser_authorization(timeout_seconds=300):
     server = HTTPServer(("127.0.0.1", 8765), BrowserOAuthHandler)
     server.timeout = 1
@@ -317,6 +346,7 @@ def _fresh_browser_authorization(timeout_seconds=300):
                 "OAuth callback timed out. Keep Pydroid running during authorization and "
                 "verify redirect URI is exactly http://127.0.0.1:8765/callback"
             )
+        _best_effort_return_to_pydroid()
         app = server.app_credentials
         if app is None:
             raise OAuthError("Open API application credentials were not established")
@@ -338,10 +368,10 @@ def _fresh_browser_authorization(timeout_seconds=300):
 
 
 def ensure_v2_authorization():
-    """One fresh V2 browser grant, then remember/refresh it on later runs."""
-    remembered = _remembered_v2_authorization()
-    if remembered is not None:
-        app, access_token = remembered
-        return app, access_token, "REMEMBERED_V2_AUTHORIZATION"
+    """Open the official cTrader browser authorization on every RUN.
+
+    Local application Client ID/Secret may be reused, but remembered access/refresh
+    tokens and prior account grants never bypass the user-visible account/permission chooser.
+    """
     app, access_token = _fresh_browser_authorization()
-    return app, access_token, "FRESH_BROWSER_AUTHORIZATION"
+    return app, access_token, "FRESH_BROWSER_AUTHORIZATION_EVERY_RUN"

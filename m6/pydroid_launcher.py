@@ -205,16 +205,10 @@ def main():
         print("OAuth BLOCKED safely:", redact_text(str(exc)))
         raise SystemExit(1) from None
 
-    if auth_mode == "REMEMBERED_V2_AUTHORIZATION":
-        print(
-            "[OAUTH] Remembered V2 authorization is valid/refreshed. "
-            "Browser login not required."
-        )
-    else:
-        print(
-            "[OAUTH] Fresh V2 LIVE browser authorization saved privately "
-            "for future runs."
-        )
+    print(
+        "[OAUTH] Browser authorization complete. Capture target is Pepperstone LIVE. "
+        "Any authorized DEMO account is ignored by LIVE account selection."
+    )
 
     config = {
         "redirect_uri": REDIRECT_URI,

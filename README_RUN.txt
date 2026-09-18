@@ -19,20 +19,24 @@ RUN does NOT ask for cTrader/cTID username/password in Pydroid.
 RUN does NOT ask for Client ID/Secret in Pydroid.
 An old package-local m6_capture_local.json is ignored.
 
-4) FIRST V2 AUTHORIZATION — ONCE
+4) AUTHORIZATION — EVERY RUN
 Frozen target: Pepperstone - Europe LIVE.
 
 If this phone still has the previously validated Open API APPLICATION credentials at:
 ~/.mxm_quant/a118_c02_openapi_v1/credentials.json
 
 V2 reuses ONLY that application's Client ID and Client Secret.
-It does NOT reuse the old DEMO/LIVE account grant, old access token, or old refresh token.
+Legacy SCOPE_VIEW is accepted only to recover those application credentials.
+Old DEMO/LIVE grants and old access/refresh tokens are NOT used to skip the browser.
 
-RUN opens the official cTrader authorization page. In the browser:
+Every RUN opens the official cTrader authorization page. In the browser:
 - log in with cTID/cTrader credentials;
-- select ONLY the intended Pepperstone LIVE account;
+- select the intended Pepperstone LIVE account;
 - grant the requested view-only permission;
 - tap Allow access / OK.
+
+If LIVE and DEMO are both authorized, the capture still selects only Pepperstone LIVE.
+The LIVE account may be unfunded; balance is not an account-selection criterion.
 
 OAuth scope is accounts only. Trading scope is never requested.
 
@@ -48,14 +52,14 @@ After Allow access, cTrader redirects to localhost. Pydroid receives the code, e
 it immediately for the token, stores V2 private state at:
 ~/.mxm_quant/m6_ctrader_capture_v2/credentials.json
 
-and continues automatically. Android may leave the browser visually in front; Pydroid is
-already continuing, so switch back only to watch progress.
+and continues automatically. The callback page attempts to return Android to Pydroid
+automatically. If Android/browser policy blocks the foreground switch, Pydroid is already
+continuing and the callback page provides a Return to Pydroid link.
 
-6) LATER RUNS — REMEMBERED
-After the first successful V2 authorization, RUN reuses the V2 access token while valid
-and refreshes it automatically when needed.
-Browser authorization is repeated only if the V2 authorization is absent, invalid,
-revoked, or cannot be refreshed.
+6) LATER RUNS
+Browser authorization is intentionally repeated on every RUN so account and permission
+selection remains explicit. The Open API application Client ID/Secret may be reused
+locally, but a remembered access/refresh token never bypasses the browser.
 
 7) PREFLIGHT
 Before OAuth/capture the script verifies dependencies, frozen plan/hash, writable paths,
@@ -67,8 +71,8 @@ Normal historical pacing: 0.21 s/request, about 4.76 req/s, below the official 5
 historical ceiling.
 
 9) RESUME
-If Pydroid stops, RUN again. Verified chunks are reused and remembered V2 authorization
-is reused/refreshed.
+If Pydroid stops, RUN again. Verified chunks are reused. Browser authorization is
+performed again before the resumed broker session.
 
 10) DEVELOPMENT BOUNDARY
 Trendbars are included only when completion <= 2026-09-16T23:59:59Z and completion is

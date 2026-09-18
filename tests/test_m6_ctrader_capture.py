@@ -51,6 +51,7 @@ PLAN_PATH = ROOT / "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json"
 STATUS_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_PREPARATION_STATUS_V1.json"
 CHECKPOINT_V1_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V1.json"
 CHECKPOINT_V2_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V2.json"
+CHECKPOINT_V4_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V4.json"
 LEDGER_PATH = ROOT / "discovery/ledger.jsonl"
 
 
@@ -463,6 +464,72 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertFalse(actual["live_orders"])
         self.assertFalse(actual["competition_start"])
         self.assertEqual(actual["m6_status"], "PENDING")
+
+
+    def test_31_legacy_scope_view_app_credentials_are_accepted_without_legacy_tokens(self):
+        from m6.pydroid_oauth import _normalize_app_credentials
+        legacy = {
+            "client_id": "APP",
+            "client_secret": "SECRET",
+            "scope": "SCOPE_VIEW",
+            "access_token": "OLD",
+            "refresh_token": "OLD_REFRESH",
+        }
+        self.assertIsNone(_normalize_app_credentials(legacy))
+        app = _normalize_app_credentials(legacy, allow_legacy_view_scope=True)
+        self.assertEqual(app["client_id"], "APP")
+        self.assertEqual(app["scope"], "accounts")
+        self.assertNotIn("access_token", app)
+        self.assertNotIn("refresh_token", app)
+
+    def test_32_every_run_forces_browser_authorization_and_attempts_pydroid_return(self):
+        source = (ROOT / "m6/pydroid_oauth.py").read_text(encoding="utf-8")
+        ensure = source[source.index("def ensure_v2_authorization()") :]
+        self.assertIn("_fresh_browser_authorization()", ensure)
+        self.assertIn("FRESH_BROWSER_AUTHORIZATION_EVERY_RUN", ensure)
+        self.assertNotIn("_remembered_v2_authorization()", ensure)
+        self.assertIn("ru.iiec.pydroid3", source)
+        self.assertIn("intent://#Intent;package=ru.iiec.pydroid3;end", source)
+
+    def test_33_funded_demo_is_ignored_and_unfunded_live_is_selected(self):
+        accounts = [
+            {
+                "ctidTraderAccountId": 101,
+                "isLive": False,
+                "brokerTitleShort": "Pepperstone EU",
+                "balance": 20000,
+            },
+            {
+                "ctidTraderAccountId": 202,
+                "isLive": True,
+                "brokerTitleShort": "Pepperstone EU",
+                "balance": 0,
+            },
+        ]
+        selected = select_live_pepperstone_account(accounts)
+        self.assertEqual(selected["ctidTraderAccountId"], 202)
+        self.assertTrue(selected["isLive"])
+        self.assertEqual(selected["balance"], 0)
+
+    def test_34_direct_browser_live_only_checkpoint_preserves_zero_economics(self):
+        cp = load(CHECKPOINT_V4_PATH)
+        self.assertEqual(cp["staging_parent_head"], "a4812279ad963c2218a21d4a53b14b38e0235905")
+        self.assertEqual(cp["oauth"]["scope"], "accounts")
+        self.assertTrue(cp["oauth"]["browser_authorization_every_run"])
+        self.assertTrue(cp["oauth"]["legacy_scope_view_app_credentials_accepted"])
+        self.assertFalse(cp["oauth"]["legacy_access_refresh_tokens_imported"])
+        self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
+        self.assertFalse(cp["account_target"]["demo_used_for_capture"])
+        self.assertFalse(cp["account_target"]["balance_used_as_selection_criterion"])
+        actual = cp["actual_execution"]
+        self.assertFalse(actual["broker_capture_run"])
+        self.assertFalse(actual["m6_economics_run"])
+        self.assertEqual(actual["economic_outcomes_opened"], 0)
+        self.assertEqual(actual["v2_attempts_used"], 0)
+        self.assertEqual(actual["result_recorded"], 0)
+        self.assertFalse(actual["protected_evidence_opened"])
+        self.assertFalse(actual["live_orders"])
+        self.assertFalse(actual["competition_start"])
 
 
 if __name__ == "__main__":
