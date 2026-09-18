@@ -7,6 +7,7 @@ service_identity, cryptography, or ctrader_open_api.
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -297,6 +298,12 @@ class OpenApiCaptureRunner:
         )
 
     def run(self) -> Path:
+        # The deterministic bundle path is reused across retries/reruns. The resumable
+        # request chunks live under work_dir, not bundle_dir, so the published bundle
+        # directory must start clean to prevent stale BLOCKED/final artifacts from a
+        # previous attempt contaminating the current run.
+        if self.bundle_dir.exists():
+            shutil.rmtree(self.bundle_dir)
         self.bundle_dir.mkdir(parents=True, exist_ok=True)
         self.work_dir.mkdir(parents=True, exist_ok=True)
         self._stage(
@@ -1090,6 +1097,8 @@ class OpenApiCaptureRunner:
         )
 
     def _write_final_bundle(self) -> None:
+        # A successful bundle may never carry a stale failure marker.
+        (self.bundle_dir / "BLOCKED.json").unlink(missing_ok=True)
         self._common_evidence_files()
         provenance = {
             "schema": BUNDLE_SCHEMA,
@@ -1153,6 +1162,11 @@ class OpenApiCaptureRunner:
 
     def _write_partial_bundle(self, reason: str) -> None:
         try:
+            # Partial output is explicitly blocked; remove any final-success manifests
+            # that could have been left by an interrupted attempt in this process.
+            (self.bundle_dir / "provenance_manifest.json").unlink(missing_ok=True)
+            (self.bundle_dir / "bundle_manifest.json").unlink(missing_ok=True)
+            (self.bundle_dir / "CHECKSUMS.sha256").unlink(missing_ok=True)
             self._common_evidence_files()
             atomic_write_json(
                 self.bundle_dir / "BLOCKED.json",
