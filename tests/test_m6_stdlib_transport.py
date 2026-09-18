@@ -1,3 +1,4 @@
+import socket
 import struct
 import unittest
 from pathlib import Path
@@ -127,6 +128,96 @@ class M6StdlibTransportTests(unittest.TestCase):
         self.assertIn("pending[client_msg_id]", source)
         self.assertIn("return [pending[msg_id] for msg_id in ordered_ids]", source)
         self.assertNotIn("ThreadPoolExecutor", source)
+
+    def test_07_dns_failure_reconnect_uses_cached_ip_and_keeps_tls_hostname(self):
+        class FakeRaw:
+            def __init__(self):
+                self.closed=False
+                self.timeouts=[]
+            def setsockopt(self,*args):
+                pass
+            def settimeout(self,value):
+                self.timeouts.append(value)
+            def close(self):
+                self.closed=True
+
+        class FakeContext:
+            def __init__(self):
+                self.server_names=[]
+            def wrap_socket(self,raw,*,server_hostname):
+                self.server_names.append(server_hostname)
+                return raw
+
+        class Resolver:
+            def __init__(self):
+                self.calls=0
+            def __call__(self,host,port,*,type):
+                self.calls+=1
+                if self.calls==1:
+                    return [
+                        (socket.AF_INET,socket.SOCK_STREAM,6,"",("203.0.113.10",port))
+                    ]
+                raise socket.gaierror(7,"No address associated with hostname")
+
+        resolver=Resolver()
+        context=FakeContext()
+        endpoints=[]
+        def factory(endpoint,timeout):
+            endpoints.append(endpoint)
+            return FakeRaw()
+
+        transport=StdlibCTraderTransport(
+            socket_factory=factory,
+            ssl_context_factory=lambda:context,
+            resolver=resolver,
+        )
+        transport.connect()
+        self.assertEqual(
+            transport.cached_endpoints,
+            (("203.0.113.10",LIVE_PORT),),
+        )
+        transport.close()
+        transport.connect()
+        self.assertEqual(
+            endpoints,
+            [("203.0.113.10",LIVE_PORT),("203.0.113.10",LIVE_PORT)],
+        )
+        self.assertEqual(
+            context.server_names,
+            [LIVE_HOST,LIVE_HOST],
+        )
+
+    def test_08_persisted_cached_ip_can_bootstrap_when_dns_is_temporarily_down(self):
+        class FakeRaw:
+            def setsockopt(self,*args):
+                pass
+            def settimeout(self,value):
+                pass
+            def close(self):
+                pass
+
+        class FakeContext:
+            def __init__(self):
+                self.server_name=None
+            def wrap_socket(self,raw,*,server_hostname):
+                self.server_name=server_hostname
+                return raw
+
+        def resolver(*args,**kwargs):
+            raise socket.gaierror(7,"No address associated with hostname")
+
+        used=[]
+        context=FakeContext()
+        transport=StdlibCTraderTransport(
+            socket_factory=lambda endpoint,timeout: (used.append(endpoint) or FakeRaw()),
+            ssl_context_factory=lambda:context,
+            resolver=resolver,
+        )
+        transport.seed_cached_endpoints([["203.0.113.20",LIVE_PORT]])
+        transport.connect()
+        self.assertEqual(used,[("203.0.113.20",LIVE_PORT)])
+        self.assertEqual(context.server_name,LIVE_HOST)
+
 
 
 if __name__ == "__main__":
