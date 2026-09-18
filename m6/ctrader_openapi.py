@@ -13,6 +13,13 @@ from typing import Any, Mapping
 
 from google.protobuf.json_format import MessageToDict
 
+from .broker_product_identity import (
+    build_catalog as build_identity_catalog,
+    build_current_catalog_artifact,
+    format_preflight_matrix,
+    relevant_symbol_ids,
+    resolve_all_11,
+)
 from .ctrader_capture import (
     HISTORICAL_TARGET_RPS,
     PROTECTED_FORWARD_START,
@@ -146,6 +153,9 @@ class OpenApiCaptureRunner:
         self._assets: list[dict[str, Any]] = []
         self._symbol_categories: list[dict[str, Any]] = []
         self._asset_classes: list[dict[str, Any]] = []
+        self._archived_symbols: list[dict[str, Any]] = []
+        self._broker_product_preflight: dict[str, Any] = {}
+        self._broker_product_catalog: dict[str, Any] = {}
 
         self._run_started_monotonic = time.monotonic()
         self._historical_started_monotonic: float | None = None
@@ -409,40 +419,36 @@ class OpenApiCaptureRunner:
             _plain(x) for x in asset_classes_res.assetClass
         ]
 
-        self._stage("[2/5] Profiling and resolving Pepperstone LIVE broker products")
+        self._stage("[2/5] Building complete Pepperstone LIVE structural broker-product preflight")
         symbols_res = self._send(
             ProtoOASymbolsListReq(
                 ctidTraderAccountId=account_id,
-                includeArchivedSymbols=False,
+                includeArchivedSymbols=True,
             )
         )
         light = [_plain(s) for s in symbols_res.symbol]
-        assets_by_id = build_asset_catalog(self._assets)
-        categories_by_id = build_symbol_category_catalog(self._symbol_categories)
-        asset_classes_by_id = build_asset_class_catalog(self._asset_classes)
-        overrides = self.config.get("symbol_overrides") or {}
-        selector = self.config.get("symbol_selector")
-        saver = self.config.get("symbol_override_saver")
-        clearer = self.config.get("symbol_override_clearer")
+        self._archived_symbols = [
+            _plain(s) for s in getattr(symbols_res, "archivedSymbol", [])
+        ]
+        assets_by_id = build_identity_catalog(
+            self._assets, ("assetId", "asset_id", "id")
+        )
+        categories_by_id = build_identity_catalog(
+            self._symbol_categories, ("id", "symbolCategoryId", "symbol_category_id")
+        )
+        asset_classes_by_id = build_identity_catalog(
+            self._asset_classes, ("id", "assetClassId", "asset_class_id")
+        )
 
-        discoveries: dict[str, dict[str, Any]] = {}
-        candidate_ids: set[int] = set()
-        for raw in self.plan["unique_raw_capture_tasks"]:
-            canonical = raw["canonical_instrument"]
-            discovery = discover_symbol_mapping(
-                canonical, light, assets_by_id=assets_by_id
-            )
-            discoveries[canonical] = discovery
-            rows = discovery["credible_candidates"] or discovery["related_candidates"] or []
-            for row in rows:
-                candidate_ids.add(int(row["symbol_id"]))
-            saved = overrides.get(canonical)
-            if isinstance(saved, Mapping):
-                try:
-                    candidate_ids.add(int(saved.get("symbol_id")))
-                except (TypeError, ValueError):
-                    pass
-
+        # Structural relevance is evaluated over the complete CURRENT light-symbol
+        # universe. Historical prices are not requested here and broker availability
+        # cannot change PRIMARY_WAVE_02 membership.
+        candidate_ids = relevant_symbol_ids(
+            light,
+            assets_by_id=assets_by_id,
+            categories_by_id=categories_by_id,
+            asset_classes_by_id=asset_classes_by_id,
+        )
         full_plain_by_id: dict[int, dict[str, Any]] = {}
         sorted_ids = sorted(candidate_ids)
         for offset in range(0, len(sorted_ids), 64):
@@ -453,76 +459,109 @@ class OpenApiCaptureRunner:
             for symbol in res.symbol:
                 full_plain_by_id[int(symbol.symbolId)] = _plain(symbol)
 
-        for raw in self.plan["unique_raw_capture_tasks"]:
-            canonical = raw["canonical_instrument"]
-            discovery = discoveries[canonical]
-            mapped, profile, source, policy, profiles = resolve_profiled_broker_product(
-                canonical,
-                self.plan,
-                discovery,
-                light,
-                full_plain_by_id,
-                assets_by_id=assets_by_id,
-                categories_by_id=categories_by_id,
-                asset_classes_by_id=asset_classes_by_id,
-                saved_override=overrides.get(canonical),
-                selector=selector,
-                clear_saved=clearer,
-            )
-            for line in format_symbol_mapping_diagnostic(discovery):
-                self._stage(line)
-            for line in format_broker_product_profiles(canonical, policy, profiles):
-                self._stage(line)
+        preflight = resolve_all_11(
+            light,
+            full_plain_by_id,
+            archived_symbols=self._archived_symbols,
+            assets_by_id=assets_by_id,
+            categories_by_id=categories_by_id,
+            asset_classes_by_id=asset_classes_by_id,
+        )
+        self._broker_product_preflight = preflight
+        self._broker_product_catalog = build_current_catalog_artifact(
+            account_environment="Pepperstone - Europe LIVE",
+            broker="Pepperstone",
+            account_fingerprint_sha256=self._account_evidence.get(
+                "account_fingerprint_sha256"
+            ),
+            assets=self._assets,
+            asset_classes=self._asset_classes,
+            symbol_categories=self._symbol_categories,
+            light_symbols=light,
+            archived_symbols=self._archived_symbols,
+            full_by_id=full_plain_by_id,
+            preflight=preflight,
+        )
 
-            symbol_id = int(mapped["symbolId"])
+        # Always print all 11 rows. One failure blocks auxiliary and historical capture.
+        for line in format_preflight_matrix(preflight):
+            self._stage(line)
+
+        raw_by_canonical = {
+            item["canonical_instrument"]: item
+            for item in self.plan["unique_raw_capture_tasks"]
+        }
+        by_light_id = {
+            int(item["symbolId"]): item
+            for item in light
+            if item.get("symbolId") is not None
+        }
+        for row in preflight["matrix"]:
+            canonical = row["canonical"]
+            bridge = preflight["bridge"][canonical]
+            selected = bridge.get("selected_current_product")
+            if row["status"] != "PASS" or not selected:
+                continue
+            symbol_id = int(selected["symbol_id"])
+            mapped = by_light_id.get(symbol_id)
             full_plain = full_plain_by_id.get(symbol_id)
-            if full_plain is None:
-                raise MappingError(f"{canonical}: selected full symbol metadata missing")
+            if mapped is None or full_plain is None:
+                # This is a structural inconsistency after preflight and must fail closed.
+                bridge["status"] = "BLOCKED"
+                bridge["confidence"] = "UNRESOLVED"
+                row["status"] = "BLOCKED"
+                row["mapping_evidence"] = "selected product disappeared after structural preflight"
+                continue
             ensure_full_symbol_enabled(full_plain)
-
             self._light_symbols[canonical] = mapped
             self._full_symbols[canonical] = full_plain
-
+            raw = raw_by_canonical[canonical]
             evidence = {
                 "canonical_instrument": canonical,
                 "broker_symbol": mapped.get("symbolName"),
                 "description": mapped.get("description"),
                 "symbol_id": symbol_id,
+                "product_family": selected.get("product_family"),
                 "enabled": bool(mapped.get("enabled")),
                 "base_asset_id": mapped.get("baseAssetId"),
                 "quote_asset_id": mapped.get("quoteAssetId"),
                 "symbol_category_id": mapped.get("symbolCategoryId"),
-                "mapping_source": source,
-                "mapping_policy": policy,
-                "selected_product_profile": profile,
-                "candidate_product_profiles": profiles,
+                "category_name": selected.get("category_name"),
+                "asset_class_id": selected.get("asset_class_id"),
+                "asset_class_name": selected.get("asset_class_name"),
+                "trading_mode": selected.get("trading_mode"),
+                "mapping_source": bridge.get("selection_basis"),
+                "mapping_policy": bridge.get("frozen_mapping_policy"),
+                "supporting_official_public_source_ids": bridge.get(
+                    "supporting_official_public_source_ids"
+                ),
+                "excluded_materially_different_products": bridge.get(
+                    "excluded_materially_different_products"
+                ),
+                "selected_product_profile": selected,
                 "raw_capture_id": raw["raw_capture_id"],
                 "raw_identity_sha256": raw["raw_identity_sha256"],
                 "resolution": raw["resolution"],
+                "current_mapping_is_not_historical_metadata": True,
             }
             evidence["mapping_evidence_sha256"] = sha256_bytes(
                 canonical_json_bytes(evidence)
             )
             self._mapping[canonical] = evidence
 
-            if source == "LOCAL_EQUIVALENT_PRODUCT_SELECTION" and callable(saver):
-                saver(canonical, {
-                    "symbol_id": symbol_id,
-                    "broker_symbol": mapped.get("symbolName"),
-                    "account_fingerprint_sha256": self._account_evidence[
-                        "account_fingerprint_sha256"
-                    ],
-                    "product_semantic_fingerprint_sha256": profile.get(
-                        "product_semantic_fingerprint_sha256"
-                    ),
-                    "mapping_policy": policy,
-                })
-
-            self._stage(
-                f"[MAPPING PASS] {canonical} -> {mapped.get('symbolName')} | "
-                f"symbolId {symbol_id} | session={profile.get('session_class')} | "
-                f"source={source}"
+        passed_after_binding = sum(
+            1 for row in preflight["matrix"] if row["status"] == "PASS"
+        )
+        if passed_after_binding != len(preflight["matrix"]):
+            raise MappingError(
+                f"BROKER PRODUCT PREFLIGHT: {passed_after_binding}/"
+                f"{len(preflight['matrix'])} PASS — CAPTURE NOT STARTED"
             )
+        if len(self._mapping) != 11:
+            raise MappingError(
+                f"BROKER PRODUCT PREFLIGHT: {len(self._mapping)}/11 PASS — CAPTURE NOT STARTED"
+            )
+        self._stage("BROKER PRODUCT PREFLIGHT: 11/11 PASS — historical capture gate opened")
 
         self._stage("[3/5] Capturing read-only structural / auxiliary evidence")
         self._capture_expected_margin(account_id)
