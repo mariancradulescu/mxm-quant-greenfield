@@ -43,6 +43,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "CASH_INDEX_CFD",
         "candidate_ids": ["V2-C006", "V2-C012"],
         "preferred_broker_symbols": ["US500"],
+        "binding_underlying_asset_tokens": ["US500"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["US500", "SP500", "S&P500", "S&P 500"],
         "source_ids": ["PEPPERSTONE_INDEX_CURRENT", "PEPPERSTONE_PERPETUAL_CURRENT"],
         "mapping_policy": "FROZEN_CASH_INDEX_CFD_FULL_FEED_CANDIDATE_SESSION_FILTER_LATER",
@@ -51,6 +53,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "CASH_INDEX_CFD",
         "candidate_ids": ["V2-C012"],
         "preferred_broker_symbols": ["NAS100"],
+        "binding_underlying_asset_tokens": ["USTEC", "NAS100"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["NAS100", "NASDAQ100", "NASDAQ 100"],
         "source_ids": ["PEPPERSTONE_INDEX_CURRENT", "PEPPERSTONE_PERPETUAL_CURRENT"],
         "mapping_policy": "FROZEN_CASH_INDEX_CFD_FULL_FEED_CANDIDATE_SESSION_FILTER_LATER",
@@ -59,6 +63,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "SPOT_METAL_CFD",
         "candidate_ids": ["V2-C007"],
         "preferred_broker_symbols": ["XAUUSD"],
+        "binding_underlying_asset_tokens": ["XAU", "GOLD"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["XAUUSD", "XAU/USD", "GOLD"],
         "source_ids": ["PEPPERSTONE_COMMODITIES_CURRENT", "PEPPERSTONE_FORWARD_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_SPOT_GOLD_CFD",
@@ -67,6 +73,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "SPOT_ENERGY_CFD",
         "candidate_ids": ["V2-C008"],
         "preferred_broker_symbols": ["SPOTCRUDE", "WTIUSD"],
+        "binding_underlying_asset_tokens": ["SPOTCRUDE", "WTI", "WTICRUDE"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["WTIUSD", "WTI/USD", "WTI", "SPOTCRUDE", "CRUDE"],
         "source_ids": ["PEPPERSTONE_COMMODITIES_CURRENT", "PEPPERSTONE_SPOTCRUDE_CURRENT_SYMBOL_CORROBORATION", "PEPPERSTONE_FORWARD_CURRENT", "PEPPERSTONE_PERPETUAL_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_SPOT_WTI_CRUDE_CFD_CURRENT_MAPPING_ONLY",
@@ -75,6 +83,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "SPOT_CRYPTO_CFD",
         "candidate_ids": ["V2-C009"],
         "preferred_broker_symbols": ["BTCUSD"],
+        "binding_underlying_asset_tokens": ["BTC", "BITCOIN"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["BTCUSD", "BTC/USD", "BITCOIN"],
         "source_ids": ["PEPPERSTONE_BTCUSD_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_BTCUSD_CRYPTO_CFD",
@@ -83,6 +93,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "FX_SPOT_OR_MARGIN_CFD",
         "candidate_ids": ["V2-C010"],
         "preferred_broker_symbols": ["AUDJPY"],
+        "binding_underlying_asset_tokens": ["AUD"],
+        "binding_quote_asset_tokens": ["JPY"],
         "aliases": ["AUDJPY", "AUD/JPY"],
         "source_ids": ["PEPPERSTONE_FX_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_AUDJPY_MARGIN_FX",
@@ -91,6 +103,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "STANDARD_CASH_SHARE_CFD",
         "candidate_ids": ["V2-C011"],
         "preferred_broker_symbols": ["AAPL.US"],
+        "binding_underlying_asset_tokens": ["AAPLUS", "AAPL"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["AAPL"],
         "source_ids": ["PEPPERSTONE_US_SHARES_CURRENT", "PEPPERSTONE_SHARE_24H_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_US_SHARE_CASH_SESSION_PRODUCT",
@@ -99,6 +113,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "STANDARD_CASH_SHARE_CFD",
         "candidate_ids": ["V2-C011"],
         "preferred_broker_symbols": ["MSFT.US"],
+        "binding_underlying_asset_tokens": ["MSFTUS", "MSFT"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["MSFT"],
         "source_ids": ["PEPPERSTONE_US_SHARES_CURRENT", "PEPPERSTONE_SHARE_24H_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_US_SHARE_CASH_SESSION_PRODUCT",
@@ -107,6 +123,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "STANDARD_CASH_SHARE_CFD",
         "candidate_ids": ["V2-C011"],
         "preferred_broker_symbols": ["NVDA.US"],
+        "binding_underlying_asset_tokens": ["NVDAUS", "NVDA"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["NVDA"],
         "source_ids": ["PEPPERSTONE_US_SHARES_CURRENT", "PEPPERSTONE_SHARE_24H_CURRENT", "PEPPERSTONE_PERPETUAL_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_US_SHARE_CASH_SESSION_PRODUCT",
@@ -115,6 +133,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "STANDARD_CASH_SHARE_CFD",
         "candidate_ids": ["V2-C011"],
         "preferred_broker_symbols": ["AMZN.US"],
+        "binding_underlying_asset_tokens": ["AMZNUS", "AMZN"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["AMZN"],
         "source_ids": ["PEPPERSTONE_US_SHARES_CURRENT", "PEPPERSTONE_SHARE_24H_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_US_SHARE_CASH_SESSION_PRODUCT",
@@ -123,6 +143,8 @@ CANONICAL_REQUIREMENTS: dict[str, dict[str, Any]] = {
         "expected_family": "STANDARD_CASH_SHARE_CFD",
         "candidate_ids": ["V2-C011"],
         "preferred_broker_symbols": ["META.US"],
+        "binding_underlying_asset_tokens": ["METAUS", "FBUS", "META", "FB"],
+        "binding_quote_asset_tokens": ["USD"],
         "aliases": ["META"],
         "source_ids": ["PEPPERSTONE_US_SHARES_CURRENT", "PEPPERSTONE_SHARE_24H_CURRENT"],
         "mapping_policy": "FROZEN_STANDARD_US_SHARE_CASH_SESSION_PRODUCT",
@@ -189,6 +211,19 @@ def _asset_text(asset_id: Any, assets_by_id: Mapping[int, Mapping[str, Any]]) ->
     return " ".join(str(row.get(k) or "") for k in ("name", "displayName", "display_name")).strip()
 
 
+def _asset_identity_tokens(
+    asset_id: Any,
+    assets_by_id: Mapping[int, Mapping[str, Any]],
+) -> list[str]:
+    row = assets_by_id.get(_int(asset_id), {})
+    tokens = {
+        _norm(row.get(key))
+        for key in ("name", "displayName", "display_name")
+        if str(row.get(key) or "").strip()
+    }
+    return sorted(token for token in tokens if token)
+
+
 def structural_text(
     light: Mapping[str, Any],
     full: Mapping[str, Any] | None,
@@ -209,6 +244,8 @@ def structural_text(
     asset_class_name = str(asset_class.get("name") or "")
     base_text = _asset_text(base_id, assets_by_id)
     quote_text = _asset_text(quote_id, assets_by_id)
+    base_tokens = _asset_identity_tokens(base_id, assets_by_id)
+    quote_tokens = _asset_identity_tokens(quote_id, assets_by_id)
     measurement = str(_field(full or {}, "measurementUnits", "measurement_units", "") or "")
     joined = " | ".join((name, description, category_name, asset_class_name, base_text, quote_text, measurement))
     return {
@@ -220,8 +257,10 @@ def structural_text(
         "asset_class_name": asset_class_name,
         "base_asset_id": base_id,
         "base_asset_name": base_text,
+        "base_asset_tokens": base_tokens,
         "quote_asset_id": quote_id,
         "quote_asset_name": quote_text,
+        "quote_asset_tokens": quote_tokens,
         "measurement_units": measurement,
         "joined_upper": joined.upper(),
     }
@@ -369,8 +408,10 @@ def product_profile(
         "classification_conflicts": conflicts,
         "base_asset_id": s["base_asset_id"],
         "base_asset_name": s["base_asset_name"],
+        "base_asset_tokens": list(s["base_asset_tokens"]),
         "quote_asset_id": s["quote_asset_id"],
         "quote_asset_name": s["quote_asset_name"],
+        "quote_asset_tokens": list(s["quote_asset_tokens"]),
         "symbol_category_id": s["category_id"],
         "category_name": s["category_name"],
         "asset_class_id": s["asset_class_id"],
@@ -392,62 +433,68 @@ def product_profile(
     }
 
 
-def _base_quote_match(canonical: str, profile: Mapping[str, Any]) -> bool:
-    base = _norm(profile.get("base_asset_name"))
-    quote = _norm(profile.get("quote_asset_name"))
-    if canonical == "AUDJPY":
-        return base == "AUD" and quote == "JPY"
-    if canonical == "BTCUSD":
-        return base in {"BTC", "BITCOIN"} and quote == "USD"
-    if canonical == "XAUUSD":
-        return base in {"XAU", "GOLD"} and quote == "USD"
-    return False
+def canonical_binding_mismatch_reasons(
+    canonical: str,
+    profile: Mapping[str, Any],
+) -> list[str]:
+    """Return structural canonical-identity failures.
+
+    Binding eligibility is deliberately narrower than diagnostic relevance. Symbol names,
+    descriptions and loose aliases may help discover nearby products, but they cannot
+    establish economic/canonical identity. When broker asset metadata is present, an
+    eligible product must prove the intended underlying, quote and frozen product family.
+    """
+    req = CANONICAL_REQUIREMENTS[canonical]
+    required_underlying = {_norm(x) for x in req["binding_underlying_asset_tokens"]}
+    required_quote = {_norm(x) for x in req["binding_quote_asset_tokens"]}
+    actual_underlying = {
+        _norm(x) for x in (profile.get("base_asset_tokens") or []) if _norm(x)
+    }
+    actual_quote = {
+        _norm(x) for x in (profile.get("quote_asset_tokens") or []) if _norm(x)
+    }
+    reasons: list[str] = []
+    if not actual_underlying:
+        reasons.append("STRUCTURAL_UNDERLYING_ASSET_IDENTITY_MISSING")
+    elif actual_underlying.isdisjoint(required_underlying):
+        reasons.append("DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY")
+    if not actual_quote:
+        reasons.append("STRUCTURAL_QUOTE_ASSET_IDENTITY_MISSING")
+    elif actual_quote.isdisjoint(required_quote):
+        reasons.append("DIFFERENT_QUOTE_CURRENCY")
+    if profile.get("product_family") != req["expected_family"]:
+        reasons.append("MATERIALLY_DIFFERENT_PRODUCT_FAMILY")
+    return sorted(set(reasons))
 
 
 def identity_match(canonical: str, profile: Mapping[str, Any]) -> bool:
-    req = CANONICAL_REQUIREMENTS[canonical]
-    name = str(profile.get("symbol_name") or "").upper()
-    name_norm = _norm(name)
-    text_norm = _norm(" ".join([
-        name,
-        str(profile.get("description") or ""),
-        str(profile.get("base_asset_name") or ""),
-    ]))
-
-    if canonical in {"AAPL", "MSFT", "NVDA", "AMZN", "META"}:
-        return (
-            name_norm == canonical
-            or name_norm.startswith(canonical + "US")
-            or name_norm.startswith(canonical + "N")
-            or _norm(profile.get("base_asset_name")) == canonical
-        )
-    if _base_quote_match(canonical, profile):
-        return True
-    if canonical == "WTIUSD":
-        if any(x in text_norm for x in ("BRENT", "GASOLINE", "NATGAS", "NATURALGAS")):
-            return False
-        return any(_norm(alias) in text_norm for alias in req["aliases"])
-    return any(_norm(alias) in text_norm for alias in req["aliases"])
+    return not canonical_binding_mismatch_reasons(canonical, profile)
 
 
 def structurally_relevant(
     canonical: str,
     profile: Mapping[str, Any],
 ) -> bool:
+    """Broad diagnostic discovery only; never binding eligibility."""
     if identity_match(canonical, profile):
         return True
-    family = str(profile.get("product_family") or "")
+    req = CANONICAL_REQUIREMENTS[canonical]
     text = _norm(" ".join([
         str(profile.get("symbol_name") or ""),
         str(profile.get("description") or ""),
+        str(profile.get("base_asset_name") or ""),
+        str(profile.get("quote_asset_name") or ""),
         str(profile.get("asset_class_name") or ""),
         str(profile.get("category_name") or ""),
     ]))
+    aliases = {_norm(x) for x in req["aliases"] if _norm(x)}
+    if any(alias in text for alias in aliases):
+        return True
     if canonical == "WTIUSD":
-        return family in {
-            "SPOT_ENERGY_CFD", "COMMODITY_FORWARD_OR_FUTURES_CFD",
-            "PERPETUAL_COMMODITY_CFD", "OTHER_PERPETUAL_CFD",
-        } and any(x in text for x in ("WTI", "CRUDE", "BRENT", "GASOLINE", "NATGAS", "NATURALGAS"))
+        return any(
+            marker in text
+            for marker in ("WTI", "CRUDE", "BRENT", "GASOLINE", "NATGAS", "NATURALGAS")
+        )
     return False
 
 
@@ -489,10 +536,7 @@ def _exclusion_reasons(canonical: str, profile: Mapping[str, Any]) -> list[str]:
         reasons.append("FULL_CURRENT_METADATA_MISSING")
     if profile.get("classification_conflicts"):
         reasons.append("CONTRADICTORY_BROKER_METADATA")
-    if not identity_match(canonical, profile):
-        reasons.append("DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY")
-    if profile.get("product_family") != req["expected_family"]:
-        reasons.append("MATERIALLY_DIFFERENT_PRODUCT_FAMILY")
+    reasons.extend(canonical_binding_mismatch_reasons(canonical, profile))
     if not _tradable(profile):
         reasons.append("NOT_CURRENTLY_TRADABLE_BY_STRUCTURAL_METADATA")
     return sorted(set(reasons))
