@@ -133,9 +133,9 @@
       "historical_register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
       "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
       "active_session_conversion_ref": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
-      "active_readiness_ref": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+      "active_readiness_ref": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json",
       "active_reference_calendar_ref": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
-      "active_tier1_cost_plan_ref": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+      "active_tier1_cost_plan_ref": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
       "active_tier1_cost_sources_ref": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
       "evidence_refs": {
         "C008": "evidence/C008_SPOTCRUDE_CONTINUOUS_CONSTRUCTION_V1.json",
@@ -159,26 +159,37 @@
         "C011": "BLOCKED_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
       },
       "tier1_cost_capture": {
-        "state": "READY_FOR_USER_READ_ONLY_CAPTURE_NOT_RUN",
+        "state": "READY_FOR_USER_READ_ONLY_V3_QUOTE_CAPTURE_NOT_RUN",
         "package_filename": "MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip",
+        "returned_evidence_zip": "MXM_M6_TIER1_COST_EVIDENCE_V3.zip",
         "targets": {
           "US500": 127,
           "NAS100": 126
         },
         "historical_bid_ask": "PENDING_USER_CAPTURE",
-        "pre_boundary_evidence": "IMPLEMENTED",
-        "post_boundary_executable_evidence": "IMPLEMENTED_FRESH_BOTH_SIDES_MAX_WAIT_ONE_M15",
-        "boundary_0930_included": true,
+        "causal_state_at_boundary": "IMPLEMENTED_EVIDENCE_ONLY",
+        "quote_ages": "IMPLEMENTED",
+        "first_post_boundary_bid": "IMPLEMENTED_EVIDENCE_ONLY",
+        "first_post_boundary_ask": "IMPLEMENTED_EVIDENCE_ONLY",
+        "first_post_boundary_any": "IMPLEMENTED_EVIDENCE_ONLY",
+        "both_sides_refreshed": "QUOTE_REFRESH_DIAGNOSTIC_ONLY",
+        "both_sides_refresh_diagnostic_window_ms": 900000,
+        "diagnostic_window_fill_authority": false,
+        "candidate_market_proxy_mutated": false,
+        "numeric_execution_rule_frozen_pre_capture": false,
+        "calibration_protocol": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
         "resume_contract_bound": true,
+        "resume_generation": "tier1_us500_nas100_v3",
         "commission_state": "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
-        "slippage_bound": "NOT_FROZEN_PENDING_QUOTE_DYNAMICS"
+        "discovery_execution_cost_rule": "PENDING_CANDIDATE_INDEPENDENT_POST_CAPTURE_CALIBRATION",
+        "m6_stage_a_economics_authorized": false
       },
       "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
       "m6_stage_a_economics_authorized": false
     },
     "economics_run": false
   },
-  "next_action": "Run corrected MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It must capture read-only historical BID/ASK only for accepted US500 symbolId 127 and NAS100 symbolId 126 under data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json. Do not rerun accepted OHLC capture. Return only MXM_M6_TIER1_COST_EVIDENCE_V2.zip. Do not run M6 economics.",
+  "next_action": "Run V3 MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It captures read-only raw BID/ASK and generic quote-boundary evidence only. Do not rerun accepted OHLC capture. Return only MXM_M6_TIER1_COST_EVIDENCE_V3.zip. Do not run M6 economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
@@ -291,10 +302,12 @@
   "future_broker_structural_universe_authority": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
   "reference_cash_session_calendar_authority": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
   "reference_cash_session_calendar_correction_authority": "evidence/PRE_M6_NASDAQ_CALENDAR_CORRECTION_V1.json",
-  "pre_m6_readiness_authority": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
-  "tier1_cost_evidence_plan_authority": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+  "pre_m6_readiness_authority": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json",
+  "tier1_cost_evidence_plan_authority": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
   "tier1_cost_evidence_sources_authority": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
   "pre_m6_timestamp_provenance_correction_authority": "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
-  "pre_m6_operational_state": "TIER1_COST_CAPTURE_READY",
-  "pre_m6_final_integrity_correction_authority": "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json"
+  "pre_m6_operational_state": "TIER1_V3_QUOTE_CAPTURE_READY",
+  "pre_m6_final_integrity_correction_authority": "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json",
+  "tier1_discovery_execution_cost_calibration_protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "pre_m6_quote_evidence_execution_authority_correction_authority": "evidence/PRE_M6_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_CORRECTION_V1.json"
 }
