@@ -85,7 +85,7 @@ class M6BrokerProductSemanticTests(unittest.TestCase):
             )
         self.assertEqual(
             mapping_semantic_policy(PLAN, "XAUUSD"),
-            MAPPING_POLICY_GENERIC,
+            "NON_FUTURES_BROKER_PRODUCT",
         )
 
     def test_02_cash_and_24h_are_distinct_broker_products(self):

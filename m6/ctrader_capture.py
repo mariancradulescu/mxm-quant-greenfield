@@ -927,6 +927,8 @@ def resolve_profiled_broker_product(
     full_by_id: Mapping[int, Mapping[str, Any]],
     *,
     assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    categories_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    asset_classes_by_id: Mapping[int, Mapping[str, Any]] | None = None,
     saved_override: Mapping[str, Any] | None = None,
     selector: Any = None,
     clear_saved: Any = None,
