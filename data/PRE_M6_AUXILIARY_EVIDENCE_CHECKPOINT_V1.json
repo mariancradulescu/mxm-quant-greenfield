@@ -1,0 +1,60 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-auxiliary-evidence-checkpoint.v1",
+  "status": "PASS_EVIDENCE_REVIEW_COMPLETE_AVAILABLE_PUBLIC_SOURCES_M6_STILL_BLOCKED",
+  "recorded_date_utc": "2026-09-18",
+  "structural_correction_ref": "data/PRE_M6_CANONICAL_IDENTITY_HARDENING_V1.json",
+  "auxiliary_register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
+  "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+  "accepted_capture": {
+    "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "data_manifest_ref": "data/DATA_MANIFEST.json",
+    "data_manifest_git_blob_sha_preserved": "5cb5cb837d18406153021a0d96e56ae91636716b",
+    "capture_acceptance_git_blob_sha_preserved": "1d59b64a8619d8c62de0a5564208cabd5c590bd0",
+    "primary_raw_series_preserved": 11,
+    "auxiliary_conversion_series_preserved": 2,
+    "reacquisition": false
+  },
+  "evidence_states": {
+    "C008": "UNRESOLVED_HISTORICAL_CONTINUOUS_CONSTRUCTION",
+    "C010": "UNRESOLVED_HISTORICAL_FINANCING",
+    "C011": "UNRESOLVED_PARTIAL_POINT_IN_TIME_EVIDENCE",
+    "reference_nasdaq_cash_session": "VERIFIED_REFERENCE_RULE",
+    "official_nasdaq_2022_2026_calendar_source_set": "VERIFIED_EXCHANGE_REFERENCE_SOURCE_SET",
+    "exact_historical_pepperstone_product_sessions": "UNRESOLVED",
+    "historical_conversion_raw_bytes": "PASS_HASH_VERIFIED",
+    "historical_conversion_chain_effectiveness": "UNRESOLVED",
+    "discovery_costs": "UNRESOLVED_NO_VERIFIED_HISTORICAL_PATH_OR_DEFENSIBLE_COMPLETE_CONSERVATIVE_BOUND",
+    "exact_stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR"
+  },
+  "official_underlying_events_bound": {
+    "AAPL": "NO_SPLIT_2022_2026_OFFICIAL_SPLIT_HISTORY",
+    "MSFT": "NO_SPLIT_2022_2026_OFFICIAL_SPLIT_HISTORY",
+    "NVDA": "10_FOR_1_EFFECTIVE_2024_06_07_SPLIT_ADJUSTED_TRADING_2024_06_10",
+    "AMZN": "20_FOR_1_EFFECTIVE_2022_05_27_SPLIT_ADJUSTED_TRADING_2022_06_06",
+    "META": "FB_TO_META_BEFORE_MARKET_OPEN_2022_06_09_SAME_CUSIP"
+  },
+  "non_promotions": [
+    "Current Pepperstone metadata/schedules/swaps/commissions are not backfilled as historical truth.",
+    "Issuer dividend amounts are not treated as exact Pepperstone CFD cash adjustments.",
+    "Recent spread averages/minimums are not treated as historical verified paths or upper conservative bounds.",
+    "No arbitrary slippage or financing bound was frozen.",
+    "Current ExpectedMargin minimum-volume snapshots are not Stage-B EUR200 conclusions."
+  ],
+  "m6_economics_authorized": false,
+  "frozen_invariants": {
+    "candidate_refreeze": false,
+    "candidate_specs_changed": false,
+    "ledger_entries": 20,
+    "result_recorded": 0,
+    "v2_search_budget": 84,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "economic_outcomes_opened": 0,
+    "protected_evidence_opened": false,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  },
+  "exact_next_action": "Obtain authoritative point-in-time broker historical evidence for unresolved gates. If unavailable, preserve UNRESOLVED and do not run M6 economics."
+}
