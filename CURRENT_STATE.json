@@ -129,20 +129,41 @@
       "data_manifest_mutated_with_actual_hashes": true
     },
     "auxiliary_evidence": {
-      "state": "INCOMPLETE",
+      "state": "PARTIAL_EVIDENCE_BOUND_M6_ECONOMICS_BLOCKED",
+      "register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
+      "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+      "evidence_refs": {
+        "C008": "evidence/C008_SPOTCRUDE_CONTINUOUS_CONSTRUCTION_V1.json",
+        "C010": "evidence/C010_AUDJPY_FINANCING_V1.json",
+        "C011": "evidence/C011_POINT_IN_TIME_CORPORATE_ACTIONS_V1.json",
+        "session_conversion_stage_b": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V1.json",
+        "discovery_costs": "evidence/PRE_M6_DISCOVERY_COST_EVIDENCE_V1.json"
+      },
+      "canonical_identity_hardening_ref": "data/PRE_M6_CANONICAL_IDENTITY_HARDENING_V1.json",
+      "public_official_evidence_review": "COMPLETED_TO_AVAILABLE_SOURCES_2026_09_18",
+      "material_progress": [
+        "C008 current SpotCrude cash-product construction methodology bound; exact historical roll/continuous ledger remains unresolved.",
+        "C010 current financing policy/snapshot separation proven; historical financing remains unresolved.",
+        "C011 official underlying split/ticker events materially bound for AAPL/MSFT/NVDA/AMZN/META; broker-specific historical adjustments/short/financing/session evidence remains unresolved.",
+        "Nasdaq regular cash-session rule and official 2022-2026 exchange calendar source set bound; exact historical Pepperstone product-session mapping remains unresolved.",
+        "Historical EURUSD/EURJPY conversion raw bytes remain hash-bound; point-in-time broker chain effectiveness remains unresolved.",
+        "Discovery cost evidence reviewed; no verified historical complete path or defensible complete conservative bound available, so no bound was invented.",
+        "Stage-B EUR200 remains deferred until a Discovery survivor exists under frozen candidate semantics."
+      ],
       "unresolved_classes": [
-        "DISCOVERY_COST_EVIDENCE_OR_CONSERVATIVE_BOUND",
+        "DISCOVERY_COST_EVIDENCE_OR_DEFENSIBLE_COMPLETE_CONSERVATIVE_BOUND",
         "V2_C008_HISTORICAL_CONTINUOUS_CFD_ROLL_SEMANTICS",
         "V2_C010_HISTORICAL_FINANCING_AND_ROLLOVER",
-        "V2_C011_POINT_IN_TIME_CORPORATE_ACTION_SHORT_FINANCING_SESSION_EVIDENCE",
-        "HISTORICAL_SESSION_HOLIDAY_MAINTENANCE_SEMANTICS",
-        "HISTORICAL_CONVERSION_CHAIN_POINT_IN_TIME_VALIDITY",
-        "EXACT_CAUSAL_STAGE_B_EUR200_FEASIBILITY"
-      ]
+        "V2_C011_EXACT_PEPPERSTONE_CFD_DIVIDEND_ADJUSTMENTS_SHORT_ELIGIBILITY_FINANCING_SESSION_EVIDENCE",
+        "HISTORICAL_PEPPERSTONE_PRODUCT_SESSION_HOLIDAY_MAINTENANCE_SEMANTICS",
+        "HISTORICAL_CONVERSION_CHAIN_POINT_IN_TIME_VALIDITY"
+      ],
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
+      "m6_stage_a_economics_authorized": false
     },
     "economics_run": false
   },
-  "next_action": "Resolve and immutably bind the remaining PRIMARY_WAVE_02 candidate-specific auxiliary evidence and applicable VERIFIED historical Discovery cost evidence or prospectively frozen defensible CONSERVATIVE_BOUND evidence. Do not open M6 economic outcomes until those gates are sufficient.",
+  "next_action": "M6 economics remains blocked. Obtain authoritative point-in-time Pepperstone/cTrader historical evidence for the unresolved auxiliary classes (especially Discovery costs, C008 SpotCrude continuous construction/roll events, C010 financing, C011 broker CFD adjustments/short/financing/sessions, and historical conversion-chain effectiveness). If such evidence cannot be obtained, keep the affected gate UNRESOLVED; do not consume a V2 attempt or open an economic outcome.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
