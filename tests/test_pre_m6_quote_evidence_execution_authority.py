@@ -281,6 +281,26 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             "DISABLED_USER_HAS_NOT_RUN_V2_START_V3_CLEAN",
         )
 
+    def test_21_tick_decoder_correction_is_pre_outcome_and_tool_binding_bumped(self):
+        e = load("evidence/PRE_M6_CTRADER_TICK_DELTA_DECODER_CORRECTION_V1.json")
+        self.assertEqual(
+            e["status"],
+            "PRE_OUTCOME_IMPLEMENTATION_CORRECTION_AFTER_SAFE_CAPTURE_BLOCK",
+        )
+        self.assertEqual(e["research_state"]["economic_outcomes_opened"], 0)
+        self.assertEqual(e["research_state"]["v2_attempts_used"], 0)
+        self.assertFalse(e["research_state"]["protected_evidence_opened"])
+        runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
+        self.assertIn(
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"',
+            runtime,
+        )
+        self.assertIn(
+            "evidence/PRE_M6_CTRADER_TICK_DELTA_DECODER_CORRECTION_V1.json",
+            COST_PACKAGE_FILES,
+        )
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
