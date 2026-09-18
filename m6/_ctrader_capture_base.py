@@ -45,6 +45,7 @@ READ_ONLY_PROTO_REQUESTS = frozenset({
     "ProtoOASymbolByIdReq",
     "ProtoOASymbolsForConversionReq",
     "ProtoOAGetTrendbarsReq",
+    "ProtoOAGetTickDataReq",
     "ProtoOAExpectedMarginReq",
 })
 FORBIDDEN_MUTATION_PROTO_REQUESTS = frozenset({
