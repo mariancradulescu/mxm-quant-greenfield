@@ -62,9 +62,11 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
 PIPELINE_BATCH_SIZE = 4
+NETWORK_RECOVERY_MAX_SECONDS = 1800.0
+NETWORK_RECOVERY_MAX_BACKOFF_SECONDS = 30.0
 
 
 def _plain(message: Any) -> dict[str, Any]:
@@ -124,11 +126,14 @@ class CostEvidenceRunner:
             allowed_previous_tool_versions=(
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+                "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
             ),
         )
         self.resume_path,self.resume,self._archived_resume_dir=prepare_contract_bound_resume(
             self.work_dir,self.resume_contract
         )
+        self.network_endpoint_cache_path=self.work_dir/"network_endpoint_cache.json"
+        self._load_network_endpoint_cache()
         self.output_dir=self.repo_root/"cost_capture_output"/"MXM_M6_TIER1_COST_EVIDENCE_V3"
         self.windows=signal_blind_cash_session_windows()
         self.calendar=NasdaqCashCalendar.from_artifact(self.calendar_path)
@@ -144,17 +149,39 @@ class CostEvidenceRunner:
     def _stage(self,text:str)->None:
         self.progress(text)
 
-    def _transport_request(self, request):
-        require_read_only_request(type(request).__name__)
-        response=self.transport.request(request,timeout=60)
-        if type(response).__name__=="ProtoOAErrorRes":
-            raise CaptureContractError(
-                f"cTrader API error: {getattr(response,'errorCode','UNKNOWN')}"
-            )
-        return response
+    def _load_network_endpoint_cache(self)->None:
+        path=self.network_endpoint_cache_path
+        if not path.is_file():
+            return
+        try:
+            value=json.loads(path.read_text(encoding="utf-8"))
+        except (OSError,json.JSONDecodeError):
+            return
+        if value.get("host")!=LIVE_HOST or int(value.get("port",0))!=LIVE_PORT:
+            return
+        endpoints=value.get("endpoints")
+        if not isinstance(endpoints,list):
+            return
+        self.transport.seed_cached_endpoints(endpoints)
+
+    def _persist_network_endpoint_cache(self)->None:
+        endpoints=[
+            [host,int(port)]
+            for host,port in self.transport.cached_endpoints
+        ]
+        if not endpoints:
+            return
+        atomic_write_json(self.network_endpoint_cache_path,{
+            "schema":"mxm.greenfield.v2.ctrader-live-endpoint-cache.v1",
+            "host":LIVE_HOST,
+            "port":LIVE_PORT,
+            "endpoints":endpoints,
+            "role":"OPERATIONAL_RECONNECT_CACHE_NOT_RESEARCH_EVIDENCE",
+        })
 
     def _restore(self):
         self.transport.connect()
+        self._persist_network_endpoint_cache()
         if self._app_authorized:
             self._transport_request(ProtoOAApplicationAuthReq(
                 clientId=self.client_id,clientSecret=self.client_secret
@@ -164,6 +191,47 @@ class CostEvidenceRunner:
                 ctidTraderAccountId=self._authorized_account_id,
                 accessToken=self.access_token,
             ))
+
+    def _restore_resilient(self, *, context:str)->None:
+        started=time.monotonic()
+        attempt=0
+        while True:
+            attempt+=1
+            try:
+                self._restore()
+                if attempt>1:
+                    self._stage(
+                        f"[NETWORK RECOVERED] {context} after {attempt} attempts | "
+                        f"cached endpoints {len(self.transport.cached_endpoints)}"
+                    )
+                return
+            except Exception as exc:
+                elapsed=time.monotonic()-started
+                if elapsed>=NETWORK_RECOVERY_MAX_SECONDS:
+                    raise CaptureContractError(
+                        f"network recovery exceeded {NETWORK_RECOVERY_MAX_SECONDS:.0f}s: "
+                        f"{redact_text(str(exc))}"
+                    ) from None
+                delay=min(
+                    NETWORK_RECOVERY_MAX_BACKOFF_SECONDS,
+                    float(2**min(attempt-1,5)),
+                )
+                remaining=max(0.0,NETWORK_RECOVERY_MAX_SECONDS-elapsed)
+                self._stage(
+                    f"[NETWORK WAIT] {context} | {redact_text(type(exc).__name__+': '+str(exc))} | "
+                    f"cached endpoints {len(self.transport.cached_endpoints)} | "
+                    f"retry in {delay:.0f}s | recovery budget {remaining:.0f}s"
+                )
+                time.sleep(delay)
+
+    def _transport_request(self, request):
+        require_read_only_request(type(request).__name__)
+        response=self.transport.request(request,timeout=60)
+        if type(response).__name__=="ProtoOAErrorRes":
+            raise CaptureContractError(
+                f"cTrader API error: {getattr(response,'errorCode','UNKNOWN')}"
+            )
+        return response
 
     def _send(self, request, *, historical=False, retries=3):
         require_read_only_request(type(request).__name__)
@@ -193,7 +261,7 @@ class CostEvidenceRunner:
                 time.sleep(delay)
                 try:
                     self.transport.close()
-                    self._restore()
+                    self._restore_resilient(context="request reconnect")
                 except Exception as reconnect_exc:
                     last=reconnect_exc
         raise CaptureContractError(
@@ -240,7 +308,7 @@ class CostEvidenceRunner:
                 time.sleep(delay)
                 try:
                     self.transport.close()
-                    self._restore()
+                    self._restore_resilient(context="historical pipeline reconnect")
                 except Exception as reconnect_exc:
                     last=reconnect_exc
         if len(requests)>1:
@@ -259,7 +327,7 @@ class CostEvidenceRunner:
 
     def _authenticate_and_verify_targets(self)->int:
         self._stage("[1/3] Read-only Pepperstone LIVE authorization")
-        self.transport.connect()
+        self._restore_resilient(context="initial LIVE connection")
         self._send(ProtoOAApplicationAuthReq(
             clientId=self.client_id,clientSecret=self.client_secret
         ))
