@@ -48,10 +48,11 @@ def _session_groups(rows:Sequence[Mapping[str,Any]],calendar:NasdaqCashCalendar)
     groups=[]
     current_day=None
     current=[]
+    from zoneinfo import ZoneInfo
+    market_tz=ZoneInfo("America/New_York")
     for row in bars:
-        day=_utc(row["time_utc"]).astimezone(calendar.session(_utc(row["time_utc"]).astimezone(__import__("zoneinfo").ZoneInfo("America/New_York")).date()).open_utc.tzinfo).date()
         # Group by authoritative local market date without inventing missing bars.
-        local_day=_utc(row["time_utc"]).astimezone(__import__("zoneinfo").ZoneInfo("America/New_York")).date()
+        local_day=_utc(row["time_utc"]).astimezone(market_tz).date()
         if current_day is None or local_day==current_day:
             current_day=local_day
             current.append(row)
