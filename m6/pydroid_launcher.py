@@ -206,8 +206,8 @@ def main():
         raise SystemExit(1) from None
 
     print(
-        "[OAUTH] Browser authorization complete. Capture target is Pepperstone LIVE. "
-        "Any authorized DEMO account is ignored by LIVE account selection."
+        "[OAUTH] Clean browser authorization complete. Target=Pepperstone LIVE. "
+        "DEMO accounts are not eligible for this capture."
     )
 
     config = {

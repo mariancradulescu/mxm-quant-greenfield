@@ -20,6 +20,14 @@ jobs:
       - name: No-credential runtime import and SDK heartbeat preflight
         run: |
           PYTHONPATH=. python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          spec = importlib.util.spec_from_file_location("m6_bootstrap_ci", Path("M6_CAPTURE_RUN.py"))
+          bootstrap = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(bootstrap)
+          assert bootstrap.runtime_dependency_status()["ready"] is True
+          print("PYDROID_BOOTSTRAP_PREFLIGHT_PASS", bootstrap.runtime_dependency_status())
+
           import m6.ctrader_capture as core
           import m6.ctrader_openapi as runtime
           report = runtime.runtime_sdk_preflight()

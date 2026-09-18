@@ -1,0 +1,77 @@
+{
+  "schema": "mxm.greenfield.v2.m6-ctrader-clean-start-self-bootstrap-checkpoint.v5",
+  "status": "CLEAN_START_SELF_BOOTSTRAP_BROWSER_OAUTH_READY_EXTERNAL_PYDROID_EXECUTION_REQUIRED",
+  "staging_parent_head": "8b54a7d65a4fb67641d447b2fd9ec5714a733968",
+  "supersedes": {
+    "path": "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V4.json",
+    "preserved_unchanged": true,
+    "reason": "FRESH_LOCAL_AUTH_AND_PYDROID_SELF_BOOTSTRAP_ONLY_NO_CAPTURE_NO_ECONOMICS"
+  },
+  "active_plan": "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json",
+  "active_plan_sha256": "da9e9a65f5c8b3e9a3edb0189de6d60bee2b5cc922d0a3ea99c1dc14ef5066fa",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "development_interval_end": "2026-09-16T23:59:59Z",
+  "runtime": {
+    "automatic_dependency_bootstrap": true,
+    "requirements": "tools/requirements-m6-capture.txt",
+    "bootstrap_before_m6_runtime_import": true,
+    "same_python_interpreter_pip": true,
+    "pinned_ctrader_open_api": "0.9.2",
+    "pinned_requests": "2.32.3",
+    "service_identity_range": ">=24.1.0,<25",
+    "manual_pip_step_required": false
+  },
+  "oauth": {
+    "provider": "cTrader Open API",
+    "clean_start": true,
+    "legacy_auth_read_or_imported": false,
+    "old_package_local_config_read": false,
+    "clean_private_root": "~/.mxm_quant/m6_ctrader_capture_clean_v1",
+    "first_run_local_browser_setup": true,
+    "application_credentials_saved_locally": true,
+    "ctid_credentials_entered_only_on_official_ctrader_page": true,
+    "browser_authorization_every_run": true,
+    "scope": "accounts",
+    "trading_scope_requested": false,
+    "automatic_scope_escalation": false,
+    "callback": "http://127.0.0.1:8765/callback",
+    "automatic_return_to_pydroid_best_effort": true
+  },
+  "account_target": {
+    "environment": "Pepperstone - Europe LIVE",
+    "endpoint": "live.ctraderapi.com:5035",
+    "live_required": true,
+    "demo_used_for_capture": false,
+    "live_zero_balance_permitted": true,
+    "balance_used_as_selection_criterion": false,
+    "multiple_live_pepperstone_accounts_fail_closed": true
+  },
+  "frozen_rules_preserved": {
+    "unique_primary_raw_series": 11,
+    "candidate_bindings": 12,
+    "c006_c012_shared_us500_m15": true,
+    "exact_development_completion_boundary": true,
+    "legacy_contamination_boundary": true,
+    "development_classification": true,
+    "protected_timestamp": true,
+    "candidate_identities": true,
+    "economic_logic": true,
+    "search_budget": true,
+    "read_only_accounts_scope": true
+  },
+  "actual_execution": {
+    "broker_capture_run": false,
+    "actual_broker_bytes_materialized": false,
+    "data_manifest_mutated": false,
+    "m6_economics_run": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false,
+    "m6_status": "PENDING"
+  },
+  "expected_final_capture_zip": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8.zip"
+}
