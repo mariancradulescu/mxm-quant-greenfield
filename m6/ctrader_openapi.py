@@ -590,6 +590,9 @@ class OpenApiCaptureRunner:
             if min_volume is None:
                 self._expected_margin[canonical] = {
                     "state": "UNRESOLVED_NO_MIN_VOLUME_METADATA",
+                    "eur200_feasibility": "UNRESOLVED",
+                    "approximate_formula_used": False,
+                    "order_placed": False,
                     "economic_conclusion": "NOT_EVALUATED",
                 }
                 continue
@@ -602,9 +605,16 @@ class OpenApiCaptureRunner:
                 res = self._send(req)
                 self._expected_margin[canonical] = {
                     "state": "CAPTURED_BROKER_NATIVE_READ_ONLY_CURRENT",
+                    "requested_executable_volumes_cents": [int(min_volume)],
                     "volume_cents": int(min_volume),
                     "margin": [_plain(x) for x in res.margin],
                     "money_digits": getattr(res, "moneyDigits", None),
+                    "eur200_feasibility": "UNRESOLVED_MINIMUM_EXECUTABLE_VOLUME_MARGIN_ONLY",
+                    "eur200_feasibility_reason":
+                        "The broker-native minimum-volume margin is current structural evidence. "
+                        "Exact frozen Stage-B EUR200 feasibility depends on the causal executable "
+                        "quantity at the applicable entry price/conversion state and is not inferred "
+                        "with approximate leverage arithmetic.",
                     "approximate_formula_used": False,
                     "order_placed": False,
                     "economic_conclusion": "NOT_EVALUATED",
@@ -613,6 +623,8 @@ class OpenApiCaptureRunner:
                 self._expected_margin[canonical] = {
                     "state": "UNRESOLVED_READ_ONLY_SCOPE_OR_API_REJECTION",
                     "reason": redact_text(str(exc)),
+                    "eur200_feasibility": "UNRESOLVED",
+                    "approximate_formula_used": False,
                     "scope_escalated": False,
                     "order_placed": False,
                     "economic_conclusion": "NOT_EVALUATED",
