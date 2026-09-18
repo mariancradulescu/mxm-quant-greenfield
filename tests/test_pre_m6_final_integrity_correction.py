@@ -319,7 +319,8 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
 
     def test_20_current_state_points_only_to_corrected_active_pre_m6_authorities(self):
         s = load("CURRENT_STATE.json")
-        self.assertEqual(s["phase"], "PRE_M6_TIER1_COST_CAPTURE_READY")
+        self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
+        self.assertEqual(s["pre_m6_operational_state"], "TIER1_COST_CAPTURE_READY")
         self.assertEqual(
             s["future_wave_opportunity_coverage_authority"],
             "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
