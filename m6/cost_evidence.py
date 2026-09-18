@@ -481,6 +481,86 @@ def cost_resume_contract(
     return binding
 
 
+def migrate_compatible_resume_tool_version(
+    work_dir: Path,
+    new_binding: Mapping[str, Any],
+    *,
+    allowed_previous_tool_versions: Sequence[str],
+) -> tuple[bool, int, str | None]:
+    """Explicitly migrate verified chunks when ONLY the tool version changed.
+
+    This is intentionally narrow. The exact plan SHA, DEVELOPMENT interval, protected
+    boundary, target IDs, quote types and acquisition-domain contract must match. Every
+    completed chunk referenced by resume state must pass SHA256 verification. No V2/V3
+    plan migration and no acquisition-semantic migration is performed here.
+    """
+    resume_path = work_dir / "resume.json"
+    if not resume_path.is_file():
+        return False, 0, None
+    try:
+        state = json.loads(resume_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False, 0, None
+    if not isinstance(state, dict) or state.get("schema") != "mxm.greenfield.v2.m6-cost-resume.v3":
+        return False, 0, None
+    old = state.get("contract")
+    completed = state.get("completed")
+    if not isinstance(old, dict) or not isinstance(completed, dict):
+        return False, 0, None
+    old_tool = str(old.get("tool_version") or "")
+    if old_tool not in set(allowed_previous_tool_versions):
+        return False, 0, None
+
+    def semantic_contract(value: Mapping[str, Any]) -> dict[str, Any]:
+        return {
+            key: value.get(key)
+            for key in (
+                "schema",
+                "plan_schema",
+                "plan_file_sha256",
+                "development_interval",
+                "protected_forward_boundary",
+                "target_symbol_ids",
+                "quote_types",
+                "acquisition_domain_rule",
+            )
+        }
+
+    if semantic_contract(old) != semantic_contract(new_binding):
+        return False, 0, old_tool
+
+    verified = 0
+    for key, record in completed.items():
+        if not isinstance(record, dict):
+            return False, 0, old_tool
+        try:
+            symbol = str(record["symbol"])
+            quote_type = str(record["quote_type"])
+            session_date = str(record["session_date"])
+            expected_sha = str(record["sha256"])
+        except KeyError:
+            return False, 0, old_tool
+        expected_key = f"{symbol}:{quote_type}:{session_date}"
+        if key != expected_key:
+            return False, 0, old_tool
+        path = work_dir / "chunks" / symbol / quote_type / f"{session_date}.csv"
+        if not verified_resume_chunk(path, expected_sha):
+            return False, 0, old_tool
+        verified += 1
+
+    state["contract"] = dict(new_binding)
+    migrations = state.setdefault("compatible_tool_migrations", [])
+    migrations.append({
+        "from_tool_version": old_tool,
+        "to_tool_version": str(new_binding.get("tool_version")),
+        "verified_chunk_count": verified,
+        "plan_file_sha256": str(new_binding.get("plan_file_sha256")),
+        "semantic_contract_identical": True,
+    })
+    atomic_write_json(resume_path, state)
+    return True, verified, old_tool
+
+
 def prepare_contract_bound_resume(
     work_dir: Path,
     binding: Mapping[str, Any],
