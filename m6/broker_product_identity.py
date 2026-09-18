@@ -703,7 +703,11 @@ def build_current_catalog_artifact(
         "asset_classes": list(asset_classes),
         "symbol_categories": list(symbol_categories),
         "relevant_current_symbols": relevant_current,
-        "relevant_archived_symbol_records": list(archived_symbols),
+        "relevant_archived_symbol_records": [
+            row
+            for item in preflight["bridge"].values()
+            for row in item.get("archived_lineage_evidence", [])
+        ],
         "full_metadata_for_relevant_current_products": {
             str(sid): dict(full_by_id[sid]) for sid in sorted(relevant_ids) if sid in full_by_id
         },
