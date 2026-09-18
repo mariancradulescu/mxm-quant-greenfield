@@ -33,6 +33,7 @@ from m6.session_replay import (
     observed_cash_bars,
     synchronized_observed_cash_bars,
 )
+from m6.tier1_candidate_replay import c006_replay_intents, c012_replay_intents
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -261,6 +262,76 @@ class PreM6FinalReadinessTests(unittest.TestCase):
             s["tier1_component_states_before_tick_capture"]["NAS100"]["historical_spread"],
             "PENDING_BID_ASK_CAPTURE",
         )
+
+    def _synthetic_cash_bars(self, sessions, bars_per_session=13, current_gap=False):
+        from datetime import date, timedelta, datetime
+        from zoneinfo import ZoneInfo
+        ny=ZoneInfo("America/New_York")
+        rows=[]
+        day=date(2024,1,2)
+        made=0
+        while made<sessions:
+            if day.weekday()<5:
+                for i in range(bars_per_session):
+                    opened=datetime(day.year,day.month,day.day,9,30,tzinfo=ny)+timedelta(minutes=15*i)
+                    is_current=current_gap and made==sessions-1
+                    op=102.0 if is_current else 100.0
+                    rows.append({
+                        "time_utc":opened.astimezone(timezone.utc).isoformat().replace("+00:00","Z"),
+                        "open":str(op),"high":str(max(op,101.0)),"low":str(min(op,99.0)),"close":"100.0",
+                    })
+                made+=1
+            day+=timedelta(days=1)
+        return rows
+
+    def test_25_c006_pre_economic_replay_is_deterministic_and_emits_no_pnl(self):
+        cal=NasdaqCashCalendar([],[])
+        rows=self._synthetic_cash_bars(22,current_gap=True)
+        intents=c006_replay_intents(rows,cal)
+        self.assertEqual(len(intents),1)
+        intent=intents[0]
+        self.assertEqual(intent.candidate_id,"V2-C006")
+        self.assertEqual(intent.direction,"SHORT")
+        self.assertGreaterEqual(intent.evidence["gap_atr_ratio"],0.75)
+        self.assertEqual(intent.entry_utc,intent.decision_utc)
+        self.assertFalse(hasattr(intent,"pnl"))
+
+    def test_26_c012_pre_economic_replay_uses_synchronized_rolling_state_only(self):
+        from datetime import date, timedelta, datetime
+        from zoneinfo import ZoneInfo
+        ny=ZoneInfo("America/New_York")
+        timestamps=[]
+        day=date(2024,1,2)
+        while len(timestamps)<526:
+            if day.weekday()<5:
+                for i in range(26):
+                    if len(timestamps)>=526: break
+                    timestamps.append(
+                        (datetime(day.year,day.month,day.day,9,30,tzinfo=ny)+timedelta(minutes=15*i))
+                        .astimezone(timezone.utc)
+                    )
+            day+=timedelta(days=1)
+
+        lr=[None,None]+[0.001 if i%2==0 else -0.001 for i in range(2,521)]+[0.01]+[0.0]*4
+        rr=[None,None]+[0.001 if i%2==0 else -0.001 for i in range(2,521)]+[0.0]+[0.0]*4
+        leader=[100.0,100.0]; lagger=[100.0,100.0]
+        for i in range(2,526):
+            leader.append(leader[i-2]*(1.0+lr[i]))
+            lagger.append(lagger[i-2]*(1.0+rr[i]))
+        us=[]; nas=[]
+        for i,ts in enumerate(timestamps):
+            stamp=ts.isoformat().replace("+00:00","Z")
+            us.append({"time_utc":stamp,"open":str(leader[i]),"high":str(leader[i]),"low":str(leader[i]),"close":str(leader[i])})
+            nas.append({"time_utc":stamp,"open":str(lagger[i]),"high":str(lagger[i]),"low":str(lagger[i]),"close":str(lagger[i])})
+        cal=NasdaqCashCalendar([],[])
+        intents=c012_replay_intents(us,nas,cal)
+        self.assertGreaterEqual(len(intents),1)
+        first=intents[0]
+        self.assertEqual(first.candidate_id,"V2-C012")
+        self.assertEqual(first.direction,"LONG_NAS100")
+        self.assertGreaterEqual(first.evidence["leader_z"],1.5)
+        self.assertLessEqual(first.evidence["lagger_z"],0.5)
+        self.assertFalse(hasattr(first,"pnl"))
 
 
 if __name__=="__main__":
