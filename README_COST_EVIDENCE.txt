@@ -57,3 +57,15 @@ cost_capture_output/MXM_M6_TIER1_COST_EVIDENCE_V3.zip
 Do not send:
 ~/.mxm_quant/
 .m6_cost_evidence_work/
+
+
+V3 TICK-DELTA DECODER CORRECTION:
+cTrader historical ProtoOAGetTickDataRes is newest-first and delta-compressed after the
+first element. The first timestamp/raw price are absolute. Every later timestamp and raw
+price value is a signed delta from the immediately previous encoded tick and is added
+cumulatively. Negative timestamp deltas are expected and valid.
+
+The first V3 user run blocked safely before any completed chunk because the older decoder
+incorrectly rejected negative timestamp deltas. The corrected package bumps TOOL_VERSION,
+so any prior V3 work directory is contract-mismatched, archived automatically, and the
+corrected run starts clean. Do not reuse the old package.
