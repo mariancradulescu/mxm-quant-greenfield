@@ -296,7 +296,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(e["research_state"]["protected_evidence_opened"])
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"',
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"',
             runtime,
         )
         self.assertIn(
@@ -312,9 +312,12 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_22_pipeline_runtime_uses_one_live_connection_and_bounded_batch(self):
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         transport = (ROOT / "m6/ctrader_transport.py").read_text(encoding="utf-8")
-        self.assertIn("PIPELINE_BATCH_SIZE = 16", runtime)
+        self.assertIn("PIPELINE_BATCH_SIZE = 4", runtime)
         self.assertIn("self.transport.request_batch(", runtime)
         self.assertIn("min_interval_seconds=HISTORICAL_MIN_INTERVAL_SECONDS", runtime)
+        self.assertIn("[PIPELINE FALLBACK]", runtime)
+        self.assertIn("left=self._send_historical_batch", runtime)
+        self.assertIn("right=self._send_historical_batch", runtime)
         self.assertIn("def request_batch(", transport)
         self.assertNotIn("ThreadPoolExecutor", runtime + transport)
         self.assertNotIn("multiprocessing", runtime + transport)
@@ -322,7 +325,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_23_pipeline_tool_only_resume_migration_preserves_only_hash_verified_chunks(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -359,7 +362,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_24_pipeline_resume_migration_refuses_bad_chunk_hash(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -404,11 +407,33 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
         )
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["pipeline_batch_size"],
-            16,
+            4,
+        )
+
+
+    def test_27_pipeline2_stability_correction_is_zero_economics_and_adaptive(self):
+        e = load("evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json")
+        self.assertEqual(
+            e["corrected_runtime"]["tool_version"],
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
+        )
+        self.assertEqual(e["corrected_runtime"]["max_initial_batch_size"], 4)
+        self.assertEqual(
+            e["corrected_runtime"]["adaptive_fallback"],
+            "4 -> 2 -> 1 on repeated batch failure",
+        )
+        self.assertFalse(e["corrected_runtime"]["raw_acquisition_contract_changed"])
+        self.assertEqual(e["research_state"]["economic_outcomes_opened"], 0)
+        self.assertEqual(e["research_state"]["v2_attempts_used"], 0)
+        self.assertEqual(e["research_state"]["result_recorded"], 0)
+        self.assertFalse(e["research_state"]["protected_evidence_opened"])
+        self.assertIn(
+            "evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json",
+            COST_PACKAGE_FILES,
         )
 
 
