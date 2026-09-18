@@ -319,7 +319,11 @@ class BrokerProductIdentityTests(unittest.TestCase):
         self.assertIn("ProtoOAExpectedMarginReq", source)
         self.assertIn('"order_placed": False', source)
         oauth = (ROOT / "m6/pydroid_oauth.py").read_text(encoding="utf-8")
-        self.assertIn('READ_ONLY_SCOPE = "accounts"', oauth)
+        capture = (ROOT / "m6/ctrader_capture.py").read_text(encoding="utf-8")
+        self.assertIn('READ_ONLY_SCOPE = "accounts"', capture)
+        self.assertIn("READ_ONLY_SCOPE,", oauth)
+        self.assertIn('"eur200_feasibility": "UNRESOLVED_MINIMUM_EXECUTABLE_VOLUME_MARGIN_ONLY"', source)
+        self.assertIn('"approximate_formula_used": False', source)
         for forbidden in (
             "ProtoOANewOrderReq", "ProtoOACancelOrderReq", "ProtoOAAmendOrderReq",
             "ProtoOAClosePositionReq",
