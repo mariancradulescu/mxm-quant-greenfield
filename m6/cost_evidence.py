@@ -65,6 +65,7 @@ COST_PACKAGE_FILES = (
     "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
     "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
     "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+    "evidence/PRE_M6_CTRADER_TICK_DELTA_DECODER_CORRECTION_V1.json",
     "README_COST_EVIDENCE.txt",
 )
 
@@ -178,27 +179,49 @@ def validate_tick_request_window(from_ms: int, to_ms: int) -> None:
 
 
 def decode_ctrader_tick_page(rows: Sequence[Mapping[str, Any]]) -> list[DecodedTick]:
-    """Decode cTrader's newest-first absolute+delta timestamp representation."""
+    """Decode cTrader historical tick absolute+signed-delta compression.
+
+    ProtoOAGetTickDataRes is newest-first. The first element contains absolute timestamp
+    and absolute raw price. Every later element is relative to the immediately previous
+    encoded tick: timestamp is a signed millisecond delta (normally <= 0 because the list
+    walks backward in time) and tick is a signed raw-price delta. Both deltas are therefore
+    cumulatively ADDED, not treated as independent absolute values.
+
+    The returned list is normalized to chronological oldest-first DecodedTick objects.
+    """
     if not rows:
         return []
     decoded_newest_first: list[DecodedTick] = []
     current_ms: int | None = None
+    current_raw_tick: int | None = None
     for i, row in enumerate(rows):
         try:
-            stamp = int(row.get("timestamp"))
-            raw_tick = int(row.get("tick"))
+            stamp_or_delta = int(row.get("timestamp"))
+            tick_or_delta = int(row.get("tick"))
         except (TypeError, ValueError) as exc:
             raise CaptureContractError("malformed cTrader historical tick row") from exc
+
         if i == 0:
-            current_ms = stamp
+            current_ms = stamp_or_delta
+            current_raw_tick = tick_or_delta
+            if current_ms < 0:
+                raise CaptureContractError(
+                    "first cTrader historical tick timestamp must be absolute Unix ms"
+                )
         else:
-            if stamp < 0:
-                raise CaptureContractError("negative cTrader tick timestamp delta")
-            assert current_ms is not None
-            current_ms -= stamp
+            assert current_ms is not None and current_raw_tick is not None
+            if stamp_or_delta > 0:
+                raise CaptureContractError(
+                    "positive cTrader tick timestamp delta violates newest-first encoding"
+                )
+            current_ms += stamp_or_delta
+            current_raw_tick += tick_or_delta
+
+        assert current_ms is not None and current_raw_tick is not None
         if current_ms < 0:
             raise CaptureContractError("decoded cTrader tick timestamp before epoch")
-        decoded_newest_first.append(DecodedTick(current_ms, raw_tick))
+        decoded_newest_first.append(DecodedTick(current_ms, current_raw_tick))
+
     decoded = list(reversed(decoded_newest_first))
     if any(a.timestamp_ms > b.timestamp_ms for a, b in zip(decoded, decoded[1:])):
         raise CaptureContractError("decoded tick page is not chronological")
