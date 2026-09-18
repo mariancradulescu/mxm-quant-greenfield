@@ -23,7 +23,14 @@ from .ctrader_capture import (
     sha256_file,
     validate_capture_plan,
 )
-from .pydroid_oauth import PRIVATE_ROOT, REDIRECT_URI, ensure_v2_authorization
+from .pydroid_oauth import (
+    ACCOUNT_SELECTION_PATH,
+    PRIVATE_ROOT,
+    REDIRECT_URI,
+    choose_live_account_locally,
+    ensure_v2_authorization,
+    load_saved_account_id,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "data" / "PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json"
@@ -183,14 +190,19 @@ def main():
         print("OAuth BLOCKED safely:", redact_text(str(exc)))
         raise SystemExit(1) from None
 
-    print(
-        "[OAUTH] Browser authorization complete. Target=Pepperstone LIVE. "
-        "DEMO accounts are not eligible for capture."
-    )
+    if auth_mode == "REUSED_SAVED_ACCESS_TOKEN":
+        print("[OAUTH] Saved authorization reused. Browser/login not required.")
+    elif auth_mode == "REFRESHED_SAVED_ACCESS_TOKEN":
+        print("[OAUTH] Saved authorization refreshed automatically. Browser/login not required.")
+    else:
+        print("[OAUTH] First authorization saved locally for automatic future reuse.")
+    print("[OAUTH] Target=Pepperstone LIVE. DEMO accounts are not eligible for capture.")
 
     config = {
         "redirect_uri": REDIRECT_URI,
-        "ctid_trader_account_id": None,
+        "ctid_trader_account_id": load_saved_account_id(),
+        "account_selection_path": str(ACCOUNT_SELECTION_PATH),
+        "account_selector": choose_live_account_locally,
         "symbol_overrides": {},
     }
 

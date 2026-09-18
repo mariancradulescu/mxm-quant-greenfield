@@ -28,6 +28,7 @@ from .ctrader_capture import (
     gap_diagnostics,
     historical_windows,
     load_resume_state,
+    live_account_candidates,
     merge_chunk_rows,
     next_pagination_to_ms,
     normalize_trendbars,
@@ -314,10 +315,21 @@ class OpenApiCaptureRunner:
             ProtoOAGetAccountListByAccessTokenReq(accessToken=self.access_token)
         )
         accounts = [_plain(a) for a in accounts_res.ctidTraderAccount]
-        account = select_live_pepperstone_account(
-            accounts,
-            account_override=self.config.get("ctid_trader_account_id"),
-        )
+        saved_account_id = self.config.get("ctid_trader_account_id")
+        try:
+            account = select_live_pepperstone_account(
+                accounts,
+                account_override=saved_account_id,
+            )
+        except MappingError:
+            selector = self.config.get("account_selector")
+            if saved_account_id is not None or not callable(selector):
+                raise
+            selected_id = int(selector(live_account_candidates(accounts)))
+            account = select_live_pepperstone_account(
+                accounts,
+                account_override=selected_id,
+            )
         account_id = int(account["ctidTraderAccountId"])
         self._authorized_account_id = account_id
         self._account_evidence = {
@@ -342,6 +354,24 @@ class OpenApiCaptureRunner:
             account.get("brokerTitleShort", "")
         ).lower():
             raise MappingError("authorized LIVE account is not verifiably Pepperstone")
+
+        selection_path = self.config.get("account_selection_path")
+        if selection_path:
+            local_selection = Path(selection_path)
+            local_selection.parent.mkdir(parents=True, exist_ok=True)
+            atomic_write_json(local_selection, {
+                "schema": "mxm.greenfield.v2.local-ctrader-account-selection.v1",
+                "environment": "LIVE",
+                "broker": "Pepperstone",
+                "ctid_trader_account_id": account_id,
+                "saved_at_unix": int(time.time()),
+                "transferable": False,
+            })
+            try:
+                local_selection.chmod(0o600)
+            except OSError:
+                pass
+
         self._account_evidence.update({
             "broker_name": broker_name,
             "deposit_asset_id": trader.get("depositAssetId"),

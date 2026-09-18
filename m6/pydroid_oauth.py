@@ -38,6 +38,8 @@ LOCAL_SETUP_URI = "http://127.0.0.1:8765/setup"
 PRIVATE_ROOT = Path.home() / ".mxm_quant" / "m6_ctrader_capture_clean_v3"
 APP_CONFIG_PATH = PRIVATE_ROOT / "app_credentials.json"
 TOKEN_STATE_PATH = PRIVATE_ROOT / "oauth_state.json"
+ACCOUNT_SELECTION_PATH = PRIVATE_ROOT / "account_selection.json"
+TOKEN_REUSE_SAFETY_SECONDS = 300
 
 
 def _load_json(path: Path):
@@ -90,6 +92,54 @@ def _save_app_credentials(app: dict) -> None:
     _secure_write_json(APP_CONFIG_PATH, clean)
 
 
+def _load_token_state():
+    state = _load_json(TOKEN_STATE_PATH)
+    if not isinstance(state, dict):
+        return None
+    if str(state.get("scope") or "").strip().lower() != READ_ONLY_SCOPE:
+        return None
+    access_token = str(state.get("access_token") or "").strip()
+    refresh_token = str(state.get("refresh_token") or "").strip()
+    if not access_token:
+        return None
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token or None,
+        "expires_at_unix": int(state.get("expires_at_unix") or 0),
+        "scope": READ_ONLY_SCOPE,
+        "redirect_uri": REDIRECT_URI,
+    }
+
+
+def load_saved_account_id():
+    state = _load_json(ACCOUNT_SELECTION_PATH)
+    if not isinstance(state, dict):
+        return None
+    try:
+        account_id = int(state.get("ctid_trader_account_id"))
+    except (TypeError, ValueError):
+        return None
+    if account_id <= 0:
+        return None
+    if str(state.get("environment") or "").upper() != "LIVE":
+        return None
+    return account_id
+
+
+def save_saved_account_id(account_id: int) -> None:
+    account_id = int(account_id)
+    if account_id <= 0:
+        raise OAuthError("invalid LIVE account id")
+    _secure_write_json(ACCOUNT_SELECTION_PATH, {
+        "schema": "mxm.greenfield.v2.local-ctrader-account-selection.v1",
+        "environment": "LIVE",
+        "broker": "Pepperstone",
+        "ctid_trader_account_id": account_id,
+        "saved_at_unix": int(time.time()),
+        "transferable": False,
+    })
+
+
 def _save_token_state(token: dict) -> None:
     now = int(time.time())
     expires_in = int(token.get("expiresIn") or 0)
@@ -107,10 +157,15 @@ def _save_token_state(token: dict) -> None:
 
 def _token_request(params: dict) -> dict:
     url = TOKEN_URL + "?" + urllib.parse.urlencode(params)
+    method = "POST" if params.get("grant_type") == "refresh_token" else "GET"
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "MXM-M6-Pydroid-Capture/1.0"},
-        method="GET",
+        headers={
+            "User-Agent": "MXM-M6-Pydroid-Capture/1.0",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+        method=method,
     )
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
@@ -387,6 +442,157 @@ def _fresh_browser_authorization(timeout_seconds=300):
         _stop_callback_server(server, thread)
 
 
+def _reuse_or_refresh_authorization():
+    app = _load_app_credentials()
+    state = _load_token_state()
+    if app is None or state is None:
+        return None
+
+    now = int(time.time())
+    if state["expires_at_unix"] > now + TOKEN_REUSE_SAFETY_SECONDS:
+        return app, state["access_token"], "REUSED_SAVED_ACCESS_TOKEN"
+
+    refresh_token = state.get("refresh_token")
+    if not refresh_token:
+        return None
+
+    try:
+        token = _token_request({
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": app["client_id"],
+            "client_secret": app["client_secret"],
+        })
+    except OAuthError:
+        return None
+
+    _save_token_state(token)
+    return app, str(token["accessToken"]), "REFRESHED_SAVED_ACCESS_TOKEN"
+
+
+def _account_choice_html(candidates):
+    rows = []
+    for item in candidates:
+        aid = int(item["ctidTraderAccountId"])
+        title = str(item.get("brokerTitleShort") or "LIVE account")
+        login = str(item.get("traderLogin") or "")
+        label = f"{title} — LIVE"
+        if login:
+            label += f" — login {login}"
+        rows.append(
+            f'<label style="display:block;padding:12px 0">'
+            f'<input type="radio" name="account_id" value="{aid}" required> '
+            f'{label}</label>'
+        )
+    return f"""<!doctype html><html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Select Pepperstone LIVE account</title></head>
+<body style="font-family:sans-serif;max-width:680px;margin:24px auto;padding:0 16px">
+<h2>Select the Pepperstone LIVE account</h2>
+<p>This is a one-time local choice. Future runs reuse it automatically.</p>
+<form method="post" action="/account">{''.join(rows)}
+<button type="submit" style="padding:13px 18px">Use this LIVE account</button>
+</form></body></html>"""
+
+
+class AccountSelectionHandler(BaseHTTPRequestHandler):
+    server_version = "MXMM6AccountSelect/1.0"
+
+    def _send_html(self, body, status=200):
+        data = body.encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_GET(self):
+        if urlparse(self.path).path != "/account":
+            self._send_html("<html><body>Not found</body></html>", 404)
+            return
+        self._send_html(_account_choice_html(self.server.candidates))
+
+    def do_POST(self):
+        if urlparse(self.path).path != "/account":
+            self._send_html("<html><body>Not found</body></html>", 404)
+            return
+        try:
+            length = min(max(int(self.headers.get("Content-Length", "0")), 0), 65536)
+        except ValueError:
+            length = 0
+        form = parse_qs(self.rfile.read(length).decode("utf-8", "replace"))
+        try:
+            selected = int((form.get("account_id") or [""])[0])
+        except ValueError:
+            selected = 0
+        allowed = {int(x["ctidTraderAccountId"]) for x in self.server.candidates}
+        if selected not in allowed:
+            self._send_html("<html><body>Invalid LIVE account selection.</body></html>", 400)
+            return
+        self.server.selected_account_id = selected
+        self._send_html(
+            "<html><body><h2>LIVE account saved.</h2>"
+            "<p>Return to Pydroid. Future runs reuse this account automatically.</p>"
+            "</body></html>"
+        )
+        self.server.selection_event.set()
+
+    def log_message(self, fmt, *args):
+        return
+
+
+def choose_live_account_locally(candidates, timeout_seconds=180):
+    cleaned = []
+    seen = set()
+    for account in candidates:
+        aid = int(account.get("ctidTraderAccountId") or 0)
+        if aid <= 0 or aid in seen:
+            continue
+        seen.add(aid)
+        cleaned.append({
+            "ctidTraderAccountId": aid,
+            "brokerTitleShort": account.get("brokerTitleShort"),
+            "traderLogin": account.get("traderLogin"),
+            "isLive": True,
+        })
+
+    if len(cleaned) == 1:
+        selected = cleaned[0]["ctidTraderAccountId"]
+        save_saved_account_id(selected)
+        return selected
+    if not cleaned:
+        raise OAuthError("no authorized LIVE accounts were returned by cTrader")
+
+    server = OAuthHTTPServer(("127.0.0.1", 8765), AccountSelectionHandler)
+    server.candidates = cleaned
+    server.selected_account_id = None
+    server.selection_event = threading.Event()
+    thread = threading.Thread(
+        target=server.serve_forever,
+        kwargs={"poll_interval": 0.1},
+        daemon=True,
+        name="mxm-live-account-selector",
+    )
+    thread.start()
+    try:
+        print("[ACCOUNT] Multiple LIVE accounts are authorized; opening one-time selector.")
+        _open_browser("http://127.0.0.1:8765/account")
+        if not server.selection_event.wait(timeout_seconds):
+            raise OAuthError("local LIVE account selection timed out")
+        selected = int(server.selected_account_id)
+        save_saved_account_id(selected)
+        _best_effort_return_to_pydroid()
+        return selected
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=3)
+
+
 def ensure_v2_authorization():
+    remembered = _reuse_or_refresh_authorization()
+    if remembered is not None:
+        return remembered
     app, access_token = _fresh_browser_authorization()
     return app, access_token, "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION"

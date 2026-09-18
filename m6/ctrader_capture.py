@@ -20,6 +20,88 @@ from ._ctrader_capture_base import *  # noqa: F401,F403 - deliberate accepted-ba
 HISTORICAL_MIN_INTERVAL = 0.21
 HISTORICAL_TARGET_RPS = 1.0 / HISTORICAL_MIN_INTERVAL
 
+
+def _account_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes"}
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return False
+
+
+def live_account_candidates(accounts: Sequence[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+    unique: dict[int, Mapping[str, Any]] = {}
+    for account in accounts:
+        aid = int(
+            account.get(
+                "ctidTraderAccountId",
+                account.get("ctid_trader_account_id", 0),
+            )
+            or 0
+        )
+        if aid <= 0 or not _account_bool(
+            account.get("isLive", account.get("is_live", False))
+        ):
+            continue
+        unique[aid] = account
+    return [unique[key] for key in sorted(unique)]
+
+
+def select_live_pepperstone_account(
+    accounts: Sequence[Mapping[str, Any]], *, account_override: int | None = None,
+) -> Mapping[str, Any]:
+    """Select the persisted authorized LIVE account without relying on lightweight title metadata.
+
+    Pepperstone broker identity is verified immediately afterwards from ProtoOATraderRes
+    before any market-data acquisition is accepted.
+    """
+    live = live_account_candidates(accounts)
+
+    if account_override is not None:
+        selected = [
+            account
+            for account in live
+            if int(
+                account.get(
+                    "ctidTraderAccountId",
+                    account.get("ctid_trader_account_id", 0),
+                )
+                or 0
+            )
+            == int(account_override)
+        ]
+        if len(selected) != 1:
+            raise MappingError(
+                "saved LIVE account is no longer authorized; one-time local reselection required"
+            )
+        return selected[0]
+
+    pepperstone_named = [
+        account
+        for account in live
+        if "pepperstone"
+        in str(
+            account.get(
+                "brokerTitleShort",
+                account.get("broker_title_short", ""),
+            )
+        ).lower()
+    ]
+    if len(pepperstone_named) == 1:
+        return pepperstone_named[0]
+
+    # Some account-list responses omit brokerTitleShort. One authorized LIVE account is
+    # still unambiguous; the full trader response must then prove Pepperstone identity.
+    if len(pepperstone_named) == 0 and len(live) == 1:
+        return live[0]
+
+    raise MappingError(
+        f"authorized LIVE account selection is ambiguous ({len(live)} LIVE candidates); "
+        "one-time local account selection required"
+    )
+
 PYDROID_PACKAGE_FILES = (
     "M6_CAPTURE_RUN.py",
     "m6/__init__.py",

@@ -28,6 +28,7 @@ from m6.ctrader_capture import (
     gap_diagnostics,
     historical_windows,
     load_resume_state,
+    live_account_candidates,
     merge_chunk_rows,
     new_resume_state,
     next_pagination_to_ms,
@@ -55,6 +56,7 @@ CHECKPOINT_V4_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V
 CHECKPOINT_V5_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V5.json"
 CHECKPOINT_V6_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V6.json"
 CHECKPOINT_V7_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V7.json"
+CHECKPOINT_V8_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V8.json"
 LEDGER_PATH = ROOT / "discovery/ledger.jsonl"
 
 
@@ -190,16 +192,36 @@ class CTraderCaptureCoreTests(unittest.TestCase):
                 "XAUUSD", [{"symbolId": 4, "symbolName": "XAUUSD", "enabled": False}]
             )
 
-    def test_10_live_pepperstone_account_selection_fail_closed(self):
+    def test_10_live_account_selection_persisted_override_and_ambiguity(self):
         accounts = [
             {"ctidTraderAccountId": 1, "isLive": True, "brokerTitleShort": "Pepperstone EU"},
             {"ctidTraderAccountId": 2, "isLive": True, "brokerTitleShort": "Pepperstone EU"},
+            {"ctidTraderAccountId": 3, "isLive": False, "brokerTitleShort": "Pepperstone EU"},
         ]
+        self.assertEqual(len(live_account_candidates(accounts)), 2)
         with self.assertRaises(MappingError):
             select_live_pepperstone_account(accounts)
         self.assertEqual(
             select_live_pepperstone_account(accounts, account_override=2)["ctidTraderAccountId"], 2
         )
+
+    def test_10b_single_live_without_lightweight_broker_title_is_provisionally_selected(self):
+        accounts = [
+            {"ctidTraderAccountId": "11", "isLive": True},
+            {"ctidTraderAccountId": "12", "isLive": False, "brokerTitleShort": "Pepperstone EU"},
+        ]
+        selected = select_live_pepperstone_account(accounts)
+        self.assertEqual(int(selected["ctidTraderAccountId"]), 11)
+
+    def test_10c_live_candidate_dedup_and_string_false_handling(self):
+        accounts = [
+            {"ctidTraderAccountId": "21", "isLive": "true", "brokerTitleShort": "Pepperstone EU"},
+            {"ctidTraderAccountId": "21", "isLive": True, "brokerTitleShort": "Pepperstone EU"},
+            {"ctidTraderAccountId": "22", "isLive": "false", "brokerTitleShort": "Pepperstone EU"},
+        ]
+        live = live_account_candidates(accounts)
+        self.assertEqual(len(live), 1)
+        self.assertEqual(int(live[0]["ctidTraderAccountId"]), 21)
 
     def test_11_resume_reuses_only_hash_verified_chunks(self):
         with tempfile.TemporaryDirectory() as td:
@@ -480,15 +502,19 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertNotIn("LEGACY_APP_STATE_PATH", source)
         self.assertNotIn("SCOPE_VIEW", source)
 
-    def test_32_every_run_forces_browser_authorization_and_attempts_pydroid_return(self):
+    def test_32_saved_oauth_and_account_are_reused_before_browser(self):
         source = (ROOT / "m6/pydroid_oauth.py").read_text(encoding="utf-8")
         ensure = source[source.index("def ensure_v2_authorization()") :]
-        self.assertIn("_fresh_browser_authorization()", ensure)
-        self.assertIn("FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION", ensure)
-        self.assertIn("ru.iiec.pydroid3", source)
-        self.assertIn('"am", "start"', source)
-        self.assertIn('"android.intent.category.LAUNCHER"', source)
-        self.assertNotIn("intent://", source)
+        self.assertLess(
+            ensure.index("_reuse_or_refresh_authorization()"),
+            ensure.index("_fresh_browser_authorization()"),
+        )
+        self.assertIn("REUSED_SAVED_ACCESS_TOKEN", source)
+        self.assertIn("REFRESHED_SAVED_ACCESS_TOKEN", source)
+        launcher = (ROOT / "m6/pydroid_launcher.py").read_text(encoding="utf-8")
+        self.assertIn("load_saved_account_id()", launcher)
+        self.assertIn("account_selection_path", launcher)
+        self.assertIn("account_selector", launcher)
 
     def test_33_funded_demo_is_ignored_and_unfunded_live_is_selected(self):
         accounts = [
@@ -576,6 +602,26 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertFalse(cp["oauth"]["browser_intent_deep_link"])
         self.assertFalse(cp["oauth"]["play_store_routing"])
         self.assertEqual(cp["oauth"]["scope"], "accounts")
+        self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
+        actual = cp["actual_execution"]
+        self.assertFalse(actual["broker_capture_run"])
+        self.assertFalse(actual["m6_economics_run"])
+        self.assertEqual(actual["economic_outcomes_opened"], 0)
+        self.assertEqual(actual["v2_attempts_used"], 0)
+        self.assertEqual(actual["result_recorded"], 0)
+        self.assertFalse(actual["protected_evidence_opened"])
+        self.assertFalse(actual["live_orders"])
+        self.assertFalse(actual["competition_start"])
+
+
+    def test_38_persistent_auth_account_checkpoint_preserves_zero_economics(self):
+        cp = load(CHECKPOINT_V8_PATH)
+        self.assertEqual(cp["staging_parent_head"], "96c6988f338ca66f9e042f8b191d59b61a628f5b")
+        self.assertTrue(cp["oauth"]["saved_access_token_reused"])
+        self.assertTrue(cp["oauth"]["refresh_token_automatic"])
+        self.assertFalse(cp["oauth"]["browser_required_each_run"])
+        self.assertTrue(cp["account_selection"]["saved_locally"])
+        self.assertTrue(cp["account_selection"]["reused_on_later_runs"])
         self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
         actual = cp["actual_execution"]
         self.assertFalse(actual["broker_capture_run"])
