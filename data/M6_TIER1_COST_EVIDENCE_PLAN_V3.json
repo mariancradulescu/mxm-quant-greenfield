@@ -1,0 +1,209 @@
+{
+  "schema": "mxm.greenfield.v2.m6-tier1-cost-evidence-plan.v3",
+  "status": "PRE_OUTCOME_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_SEPARATED_READ_ONLY_ACQUISITION_PLAN",
+  "supersedes": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+  "correction_scope": "NARROW_DERIVED_QUOTE_EVIDENCE_SEMANTICS_ONLY",
+  "purpose": "Candidate-independent Tier-1 raw BID/ASK acquisition and generic boundary quote-dynamics evidence for later Discovery execution-cost calibration. This plan does not define candidate fills, does not replace MARKET_PROXY timing, and does not inspect candidate signals/returns/PnL.",
+  "target_environment": "Pepperstone - Europe LIVE",
+  "oauth_scope": "accounts",
+  "orders": false,
+  "account_mutation": false,
+  "economics": false,
+  "targets": {
+    "US500": {
+      "canonical": "US500",
+      "broker_symbol": "US500",
+      "symbol_id": 127,
+      "required_family": "CASH_INDEX_CFD",
+      "candidate_ids": [
+        "V2-C006"
+      ]
+    },
+    "NAS100": {
+      "canonical": "NAS100",
+      "broker_symbol": "NAS100",
+      "symbol_id": 126,
+      "required_family": "CASH_INDEX_CFD",
+      "candidate_ids": [
+        "V2-C012"
+      ]
+    }
+  },
+  "quote_types": [
+    "BID",
+    "ASK"
+  ],
+  "development_interval": {
+    "start_date": "2022-01-03",
+    "end_date": "2026-09-16",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "protected_boundary_excluded": true
+  },
+  "reference_calendar": {
+    "authority": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "role": "DERIVED_GENERIC_BOUNDARY_DOMAIN_ONLY",
+    "raw_capture_rule": "RAW REQUESTS REMAIN ALL WEEKDAY 09:30-16:00 ET ENVELOPES, INCLUDING HOLIDAYS/EARLY-CLOSE TAILS; NO RETURNED QUOTE IS REMOVED OR FABRICATED"
+  },
+  "acquisition_domain": {
+    "timezone": "America/New_York",
+    "weekday_envelope_local": [
+      "09:30:00",
+      "16:00:00"
+    ],
+    "weekday_rule": "MONDAY_THROUGH_FRIDAY_INCLUSIVE",
+    "holidays": "RAW ENVELOPE STILL REQUESTED; EMPTY BROKER RESPONSE IS PRESERVED",
+    "early_closes": "RAW REGULAR ENVELOPE STILL REQUESTED; DERIVED OFFICIAL CASH-SESSION BOUNDARIES STOP AT OFFICIAL EARLY CLOSE",
+    "full_session_tape": true,
+    "all_raw_bid_events": true,
+    "all_raw_ask_events": true,
+    "exact_event_timestamps": true,
+    "raw_hashes": true,
+    "no_signal_conditioned_windows": true,
+    "no_return_conditioned_windows": true,
+    "no_candidate_pnl_conditioned_windows": true
+  },
+  "official_ctrader_contract": {
+    "request": "ProtoOAGetTickDataReq",
+    "response": "ProtoOAGetTickDataRes",
+    "quote_enum": {
+      "BID": 1,
+      "ASK": 2
+    },
+    "max_request_window_ms": 604800000,
+    "response_order": "NEWEST_FIRST_ABSOLUTE_TIMESTAMP_THEN_BACKWARD_DELTAS",
+    "pagination": "hasMore",
+    "historical_request_limit_per_second_per_connection": 5,
+    "implemented_min_request_interval_seconds": 0.21
+  },
+  "pagination_policy": {
+    "method": "BACKWARD_TIMESTAMP_WINDOW_WITH_OLDEST_TIMESTAMP_OVERLAP",
+    "rule": "When hasMore=true, re-request ending at the oldest decoded timestamp to retain boundary-ms evidence. If oldest timestamp fails to move on the next page, decrement by 1ms to guarantee progress and record the fallback.",
+    "dedupe": "EXACT_TIMESTAMP_PLUS_RAW_TICK_STATE_ONLY",
+    "no_future_fill": true
+  },
+  "generic_boundary_evidence": {
+    "boundaries": "EVERY OFFICIAL M15 CASH-SESSION BOUNDARY FROM 09:30 THROUGH OFFICIAL SESSION CLOSE INCLUSIVE",
+    "CAUSAL_STATE_AT_BOUNDARY": {
+      "definition": "Latest causally observed BID at or before boundary plus latest causally observed ASK at or before boundary, independently. A pre-boundary side remains current until an observed update changes that side.",
+      "fields": [
+        "bid",
+        "ask",
+        "bid_timestamp_ms",
+        "ask_timestamp_ms",
+        "bid_age_ms",
+        "ask_age_ms",
+        "spread",
+        "state_availability"
+      ],
+      "future_event_population_forbidden": true,
+      "executed_fill_authority": false
+    },
+    "FIRST_POST_BOUNDARY_BID_EVENT": {
+      "definition": "First observed BID event at or after the generic boundary within the preserved raw acquisition tape.",
+      "fields": [
+        "timestamp_ms",
+        "price",
+        "delay_ms"
+      ],
+      "executed_fill_authority": false
+    },
+    "FIRST_POST_BOUNDARY_ASK_EVENT": {
+      "definition": "First observed ASK event at or after the generic boundary within the preserved raw acquisition tape.",
+      "fields": [
+        "timestamp_ms",
+        "price",
+        "delay_ms"
+      ],
+      "executed_fill_authority": false
+    },
+    "FIRST_POST_BOUNDARY_ANY_QUOTE_EVENT": {
+      "definition": "Earliest observed BID and/or ASK event timestamp at or after the generic boundary.",
+      "fields": [
+        "timestamp_ms",
+        "side",
+        "bid_price_if_same_event_ms",
+        "ask_price_if_same_event_ms",
+        "delay_ms"
+      ],
+      "executed_fill_authority": false
+    },
+    "BOTH_SIDES_REFRESHED_AFTER_BOUNDARY": {
+      "classification": "QUOTE_REFRESH_DIAGNOSTIC_ONLY",
+      "definition": "First causal two-sided state for which BID and ASK have each independently refreshed at or after boundary.",
+      "diagnostic_window_ms": 900000,
+      "diagnostic_interval": "[boundary,boundary+15m)",
+      "candidate_entry_time": false,
+      "fill_time": false,
+      "stage_a_execution_truth": false,
+      "mandatory_delay_assumption": false,
+      "economic_fill_authority": false
+    },
+    "completed_bar_close_boundary": {
+      "causal_state_at_or_before_close": true,
+      "quote_ages": true,
+      "first_bid_event_at_or_after_close_boundary": true,
+      "first_ask_event_at_or_after_close_boundary": true,
+      "post_close_quote_mixed_into_frozen_close_proxy": false,
+      "evidence_is_fill_rule": false
+    }
+  },
+  "market_proxy_separation": {
+    "C006_frozen_entry": {
+      "timing": "NEXT_VALID_M15_OPEN",
+      "type": "MARKET_PROXY"
+    },
+    "C012_frozen_entry": {
+      "timing": "NEXT_COMMON_VALID_M15_OPEN",
+      "type": "SINGLE_LEG_MARKET_PROXY"
+    },
+    "rule": "Candidate MARKET_PROXY price/timing and spread/slippage/delay evidence remain conceptually separate. Derived quote events do not silently replace candidate OHLC entry or exit proxies.",
+    "if_not_credibly_approximable": "BLOCKED_OR_COST_UNRESOLVED_DO_NOT_MUTATE_CANDIDATE_IDENTITY"
+  },
+  "calibration_protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "numeric_execution_rule_pre_capture": {
+    "quote_age_threshold": "NOT_FROZEN",
+    "fill_delay_rule": "NOT_FROZEN",
+    "slippage_rule": "NOT_FROZEN",
+    "reason": "Freeze the candidate-independent calibration process before capture; choose no numeric economic execution rule until generic quote dynamics are observed without candidate signals/returns/PnL."
+  },
+  "resume_contract_binding": {
+    "schema": "mxm.greenfield.v2.m6-cost-resume-contract.v3",
+    "required_fields": [
+      "plan_schema",
+      "plan_file_sha256",
+      "tool_version",
+      "development_interval",
+      "protected_forward_boundary",
+      "target_symbol_ids",
+      "quote_types",
+      "acquisition_domain_rule"
+    ],
+    "work_directory_generation": "tier1_us500_nas100_v3",
+    "v2_migration": "DISABLED_USER_HAS_NOT_RUN_V2_START_V3_CLEAN",
+    "mismatch_policy": "ARCHIVE INCOMPATIBLE WORK DIRECTORY AND START EMPTY; NEVER SILENTLY REUSE CHUNKS",
+    "chunk_hash": "SHA256"
+  },
+  "output_contract": {
+    "successful_output_directory": "CLEAN_RECREATED_BEFORE_FINALIZATION",
+    "deterministic_zip": true,
+    "credentials_in_bundle": false,
+    "returned_evidence_zip": "MXM_M6_TIER1_COST_EVIDENCE_V3.zip"
+  },
+  "economic_constraints": {
+    "no_candidate_signal_input": true,
+    "no_candidate_return_input": true,
+    "no_candidate_pnl_input": true,
+    "no_candidate_outcome": true,
+    "no_attempt_consumed": true,
+    "no_result_recorded": true,
+    "no_protected_evidence": true,
+    "no_execution_rule_selected_by_candidate_pnl": true
+  },
+  "research_state_at_refreeze": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false
+  }
+}
