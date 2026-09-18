@@ -1,4 +1,6 @@
+import hashlib
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -9,6 +11,8 @@ from m6.cost_evidence import (
     causal_merge_bid_ask,
     causal_state_at_boundary,
     cost_resume_contract,
+    migrate_compatible_resume_tool_version,
+    prepare_contract_bound_resume,
     first_any_quote_event_at_or_after,
     first_both_sides_refreshed_diagnostic,
     first_tick_at_or_after,
@@ -298,6 +302,109 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertIn(
             "evidence/PRE_M6_CTRADER_TICK_DELTA_DECODER_CORRECTION_V1.json",
             COST_PACKAGE_FILES,
+        )
+
+
+    def test_22_pipeline_runtime_uses_one_live_connection_and_bounded_batch(self):
+        runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
+        transport = (ROOT / "m6/ctrader_transport.py").read_text(encoding="utf-8")
+        self.assertIn("PIPELINE_BATCH_SIZE = 16", runtime)
+        self.assertIn("self.transport.request_batch(", runtime)
+        self.assertIn("min_interval_seconds=HISTORICAL_MIN_INTERVAL_SECONDS", runtime)
+        self.assertIn("def request_batch(", transport)
+        self.assertNotIn("ThreadPoolExecutor", runtime + transport)
+        self.assertNotIn("multiprocessing", runtime + transport)
+
+    def test_23_pipeline_tool_only_resume_migration_preserves_only_hash_verified_chunks(self):
+        plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
+        old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td) / "tier1_us500_nas100_v3"
+            old_binding = cost_resume_contract(plan, tool_version=old_tool)
+            resume_path, state, archived = prepare_contract_bound_resume(work, old_binding)
+            self.assertIsNone(archived)
+            chunk = work / "chunks" / "US500" / "BID" / "2022-01-03.csv"
+            chunk.parent.mkdir(parents=True, exist_ok=True)
+            payload = b"time_utc,timestamp_ms,raw_tick,price\n"
+            chunk.write_bytes(payload)
+            sha = hashlib.sha256(payload).hexdigest()
+            state["completed"]["US500:BID:2022-01-03"] = {
+                "symbol": "US500",
+                "quote_type": "BID",
+                "session_date": "2022-01-03",
+                "sha256": sha,
+            }
+            resume_path.write_text(json.dumps(state), encoding="utf-8")
+
+            new_binding = cost_resume_contract(plan, tool_version=new_tool)
+            migrated, count, previous = migrate_compatible_resume_tool_version(
+                work,
+                new_binding,
+                allowed_previous_tool_versions=(old_tool,),
+            )
+            self.assertTrue(migrated)
+            self.assertEqual(count, 1)
+            self.assertEqual(previous, old_tool)
+            after = json.loads(resume_path.read_text(encoding="utf-8"))
+            self.assertEqual(after["contract"], new_binding)
+            self.assertEqual(
+                after["compatible_tool_migrations"][-1]["verified_chunk_count"], 1
+            )
+
+    def test_24_pipeline_resume_migration_refuses_bad_chunk_hash(self):
+        plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
+        old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td) / "tier1_us500_nas100_v3"
+            old_binding = cost_resume_contract(plan, tool_version=old_tool)
+            resume_path, state, _ = prepare_contract_bound_resume(work, old_binding)
+            chunk = work / "chunks" / "US500" / "BID" / "2022-01-03.csv"
+            chunk.parent.mkdir(parents=True, exist_ok=True)
+            chunk.write_bytes(b"actual")
+            state["completed"]["US500:BID:2022-01-03"] = {
+                "symbol": "US500",
+                "quote_type": "BID",
+                "session_date": "2022-01-03",
+                "sha256": hashlib.sha256(b"different").hexdigest(),
+            }
+            resume_path.write_text(json.dumps(state), encoding="utf-8")
+            new_binding = cost_resume_contract(plan, tool_version=new_tool)
+            migrated, count, previous = migrate_compatible_resume_tool_version(
+                work,
+                new_binding,
+                allowed_previous_tool_versions=(old_tool,),
+            )
+            self.assertFalse(migrated)
+            self.assertEqual(count, 0)
+            self.assertEqual(previous, old_tool)
+
+    def test_25_pipeline_optimization_keeps_research_state_zero_and_raw_contract_unchanged(self):
+        e = load("evidence/PRE_M6_TIER1_PIPELINE_THROUGHPUT_OPTIMIZATION_V1.json")
+        self.assertFalse(e["raw_evidence_contract"]["acquisition_domain_changed"])
+        self.assertFalse(e["raw_evidence_contract"]["target_symbols_changed"])
+        self.assertFalse(e["raw_evidence_contract"]["quote_types_changed"])
+        self.assertFalse(e["raw_evidence_contract"]["pagination_semantics_changed"])
+        self.assertFalse(e["raw_evidence_contract"]["candidate_specs_changed"])
+        self.assertEqual(e["research_state"]["economic_outcomes_opened"], 0)
+        self.assertEqual(e["research_state"]["v2_attempts_used"], 0)
+        self.assertEqual(e["research_state"]["result_recorded"], 0)
+        self.assertFalse(e["research_state"]["protected_evidence_opened"])
+
+    def test_26_pipeline_provenance_is_inside_pydroid_package_source_set(self):
+        self.assertIn(
+            "evidence/PRE_M6_TIER1_PIPELINE_THROUGHPUT_OPTIMIZATION_V1.json",
+            COST_PACKAGE_FILES,
+        )
+        state = load("CURRENT_STATE.json")
+        self.assertEqual(
+            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["tool_version"],
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+        )
+        self.assertEqual(
+            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["pipeline_batch_size"],
+            16,
         )
 
 
