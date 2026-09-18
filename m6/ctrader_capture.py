@@ -121,6 +121,7 @@ PYDROID_PACKAGE_FILES = (
     "m6/ctrader_proto/LICENSE_SPOTWARE_OPENAPIPY.txt",
     "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json",
     "evidence/BROKER_PRODUCT_IDENTITY_SOURCES_V1.json",
+    "evidence/BROKER_PRODUCT_IDENTITY_BRIDGE_V1.json",
     "tools/requirements-m6-capture.txt",
     "README_RUN.txt",
 )
@@ -1142,6 +1143,7 @@ TRANSFERABLE_REQUIRED_FILES = frozenset({
     "evidence/broker_mapping.json",
     "evidence/broker_product_catalog_current.json",
     "evidence/BROKER_PRODUCT_IDENTITY_SOURCES_V1.json",
+    "evidence/BROKER_PRODUCT_IDENTITY_BRIDGE_V1.json",
     "evidence/symbol_metadata_current.json",
     "evidence/assets.json",
     "evidence/symbol_categories.json",
