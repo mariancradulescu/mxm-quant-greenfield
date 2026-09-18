@@ -1,0 +1,170 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-canonical-identity-hardening.v1",
+  "status": "PASS_PROSPECTIVE_RESOLVER_HARDENING_ACCEPTED_CAPTURE_UNCHANGED",
+  "recorded_utc": "2026-09-18T08:13:30Z",
+  "scope": "PRE_ECONOMIC_STRUCTURAL_ONLY",
+  "accepted_capture": {
+    "acceptance_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "reconciled_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+    "raw_series_preserved": 11,
+    "auxiliary_conversion_series_preserved": 2,
+    "raw_bytes_rewritten": false,
+    "reacquisition_performed": false,
+    "economic_reinterpretation_performed": false
+  },
+  "defect": {
+    "law_before_fix": "Loose descriptive aliases could establish identity after exact base/quote matching failed.",
+    "law_after_fix": "Aliases/descriptions/categories may widen diagnostic relevance only; binding eligibility requires exact structural underlying asset identity, exact quote asset identity, required product family and current tradability.",
+    "preferred_name_rescue_for_different_underlying_or_quote": false
+  },
+  "accepted_mappings_before_after": {
+    "US500": {
+      "before": [
+        "US500",
+        127
+      ],
+      "after": [
+        "US500",
+        127
+      ]
+    },
+    "NAS100": {
+      "before": [
+        "NAS100",
+        126
+      ],
+      "after": [
+        "NAS100",
+        126
+      ]
+    },
+    "XAUUSD": {
+      "before": [
+        "XAUUSD",
+        41
+      ],
+      "after": [
+        "XAUUSD",
+        41
+      ]
+    },
+    "WTIUSD": {
+      "before": [
+        "SpotCrude",
+        250
+      ],
+      "after": [
+        "SpotCrude",
+        250
+      ]
+    },
+    "BTCUSD": {
+      "before": [
+        "BTCUSD",
+        124
+      ],
+      "after": [
+        "BTCUSD",
+        124
+      ]
+    },
+    "AUDJPY": {
+      "before": [
+        "AUDJPY",
+        11
+      ],
+      "after": [
+        "AUDJPY",
+        11
+      ]
+    },
+    "AAPL": {
+      "before": [
+        "AAPL.US",
+        804
+      ],
+      "after": [
+        "AAPL.US",
+        804
+      ]
+    },
+    "MSFT": {
+      "before": [
+        "MSFT.US",
+        802
+      ],
+      "after": [
+        "MSFT.US",
+        802
+      ]
+    },
+    "NVDA": {
+      "before": [
+        "NVDA.US",
+        808
+      ],
+      "after": [
+        "NVDA.US",
+        808
+      ]
+    },
+    "AMZN": {
+      "before": [
+        "AMZN.US",
+        803
+      ],
+      "after": [
+        "AMZN.US",
+        803
+      ]
+    },
+    "META": {
+      "before": [
+        "META.US",
+        799
+      ],
+      "after": [
+        "META.US",
+        799
+      ]
+    }
+  },
+  "negative_regressions": {
+    "BTCUSD": {
+      "BCHUSD": "INELIGIBLE_DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY",
+      "remove_BTCUSD": "BLOCK_NO_SUBSTITUTION"
+    },
+    "XAUUSD": {
+      "PAXGUSD": "INELIGIBLE_DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY",
+      "XAUAUD": "INELIGIBLE_DIFFERENT_QUOTE_CURRENCY",
+      "XAUCHF": "INELIGIBLE_DIFFERENT_QUOTE_CURRENCY",
+      "XAUEUR": "INELIGIBLE_DIFFERENT_QUOTE_CURRENCY",
+      "XAUGBP": "INELIGIBLE_DIFFERENT_QUOTE_CURRENCY",
+      "XAUJPY": "INELIGIBLE_DIFFERENT_QUOTE_CURRENCY",
+      "XAUTUSD": "INELIGIBLE_DIFFERENT_UNDERLYING_OR_CANONICAL_IDENTITY",
+      "remove_XAUUSD": "BLOCK_NO_SUBSTITUTION"
+    }
+  },
+  "fixture": "tests/fixtures/PEPPERSTONE_LIVE_PRODUCT_IDENTITY_SANITIZED_V1.json",
+  "verification": {
+    "github_actions_run_id": 35323218767,
+    "tests_passed": 261,
+    "tests_failed": 0
+  },
+  "frozen_research_invariants": {
+    "candidate_refreeze_performed": false,
+    "ledger_mutated": false,
+    "search_budget_mutated": false,
+    "protected_forward_mutated": false,
+    "data_manifest_raw_bindings_mutated": false,
+    "capture_acceptance_mutated": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded_count": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  }
+}
