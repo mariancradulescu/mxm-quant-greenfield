@@ -129,43 +129,58 @@
       "data_manifest_mutated_with_actual_hashes": true
     },
     "auxiliary_evidence": {
-      "state": "PARTIAL_EVIDENCE_BOUND_M6_ECONOMICS_BLOCKED",
-      "register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
+      "state": "CANDIDATE_SPECIFIC_PRE_COST_CAPTURE",
+      "historical_register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
       "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+      "active_session_conversion_ref": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
+      "active_readiness_ref": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+      "active_reference_calendar_ref": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+      "active_tier1_cost_plan_ref": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+      "active_tier1_cost_sources_ref": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
       "evidence_refs": {
         "C008": "evidence/C008_SPOTCRUDE_CONTINUOUS_CONSTRUCTION_V1.json",
         "C010": "evidence/C010_AUDJPY_FINANCING_V1.json",
         "C011": "evidence/C011_POINT_IN_TIME_CORPORATE_ACTIONS_V1.json",
-        "session_conversion_stage_b": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V1.json",
-        "discovery_costs": "evidence/PRE_M6_DISCOVERY_COST_EVIDENCE_V1.json"
+        "canonical_identity_hardening": "data/PRE_M6_CANONICAL_IDENTITY_HARDENING_V1.json"
       },
-      "canonical_identity_hardening_ref": "data/PRE_M6_CANONICAL_IDENTITY_HARDENING_V1.json",
-      "public_official_evidence_review": "COMPLETED_TO_AVAILABLE_SOURCES_2026_09_18",
-      "material_progress": [
-        "C008 current SpotCrude cash-product construction methodology bound; exact historical roll/continuous ledger remains unresolved.",
-        "C010 current financing policy/snapshot separation proven; historical financing remains unresolved.",
-        "C011 official underlying split/ticker events materially bound for AAPL/MSFT/NVDA/AMZN/META; broker-specific historical adjustments/short/financing/session evidence remains unresolved.",
-        "Nasdaq regular cash-session rule and official 2022-2026 exchange calendar source set bound; exact historical Pepperstone product-session mapping remains unresolved.",
-        "Historical EURUSD/EURJPY conversion raw bytes remain hash-bound; point-in-time broker chain effectiveness remains unresolved.",
-        "Discovery cost evidence reviewed; no verified historical complete path or defensible complete conservative bound available, so no bound was invented.",
-        "Stage-B EUR200 remains deferred until a Discovery survivor exists under frozen candidate semantics."
-      ],
-      "unresolved_classes": [
-        "DISCOVERY_COST_EVIDENCE_OR_DEFENSIBLE_COMPLETE_CONSERVATIVE_BOUND",
-        "V2_C008_HISTORICAL_CONTINUOUS_CFD_ROLL_SEMANTICS",
-        "V2_C010_HISTORICAL_FINANCING_AND_ROLLOVER",
-        "V2_C011_EXACT_PEPPERSTONE_CFD_DIVIDEND_ADJUSTMENTS_SHORT_ELIGIBILITY_FINANCING_SESSION_EVIDENCE",
-        "HISTORICAL_PEPPERSTONE_PRODUCT_SESSION_HOLIDAY_MAINTENANCE_SEMANTICS",
-        "HISTORICAL_CONVERSION_CHAIN_POINT_IN_TIME_VALIDITY"
-      ],
+      "causal_conversion": {
+        "USD_to_EUR": "PASS_ACCEPTED_EURUSD_M15_LATEST_COMPLETED_AT_OR_BEFORE_CASHFLOW",
+        "JPY_to_EUR": "PASS_ACCEPTED_EURJPY_M15_LATEST_COMPLETED_AT_OR_BEFORE_CASHFLOW",
+        "current_symbols_for_conversion_historical_membership_required": false,
+        "conversion_cost_fee": "SEPARATE_COST_COMPONENT"
+      },
+      "session_event_semantics": {
+        "C006": "PASS_EXACT_0930_OPEN_EXACT_PRIOR_CLOSE_FULL_ATR_SESSION_GRIDS",
+        "C012": "PASS_STRICT_SYNCHRONIZED_OBSERVED_M15_INTERSECTION_CORRECTED_CALENDAR",
+        "C009": "PASS_OBSERVED_H1_REAL_GAPS_RETAINED",
+        "C007": "PASS_OBSERVED_H4_EVENT_REPLAY",
+        "C008": "BLOCKED_HISTORICAL_CONTINUOUS_CONSTRUCTION",
+        "C010": "BLOCKED_HISTORICAL_FINANCING",
+        "C011": "BLOCKED_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
+      },
+      "tier1_cost_capture": {
+        "state": "READY_FOR_USER_READ_ONLY_CAPTURE_NOT_RUN",
+        "package_filename": "MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip",
+        "targets": {
+          "US500": 127,
+          "NAS100": 126
+        },
+        "historical_bid_ask": "PENDING_USER_CAPTURE",
+        "pre_boundary_evidence": "IMPLEMENTED",
+        "post_boundary_executable_evidence": "IMPLEMENTED_FRESH_BOTH_SIDES_MAX_WAIT_ONE_M15",
+        "boundary_0930_included": true,
+        "resume_contract_bound": true,
+        "commission_state": "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+        "slippage_bound": "NOT_FROZEN_PENDING_QUOTE_DYNAMICS"
+      },
       "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
       "m6_stage_a_economics_authorized": false
     },
     "economics_run": false
   },
-  "next_action": "M6 economics remains blocked. Obtain authoritative point-in-time Pepperstone/cTrader historical evidence for the unresolved auxiliary classes (especially Discovery costs, C008 SpotCrude continuous construction/roll events, C010 financing, C011 broker CFD adjustments/short/financing/sessions, and historical conversion-chain effectiveness). If such evidence cannot be obtained, keep the affected gate UNRESOLVED; do not consume a V2 attempt or open an economic outcome.",
+  "next_action": "Run corrected MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It must capture read-only historical BID/ASK only for accepted US500 symbolId 127 and NAS100 symbolId 126 under data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json. Do not rerun accepted OHLC capture. Return only MXM_M6_TIER1_COST_EVIDENCE_V2.zip. Do not run M6 economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
+  "phase": "PRE_M6_TIER1_COST_CAPTURE_READY",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -261,15 +276,23 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "PRE_M6_INTEGRITY_CORRECTION_02",
+  "primary_run_objective": "PRE_M6_FINAL_INTEGRITY_CORRECTION_BEFORE_TIER1_COST_CAPTURE",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": true,
-  "user_action_required": false,
+  "user_action_required": true,
   "v2_attempts_used": 0,
   "v2_evaluated_identities": 0,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
-  "v2_search_budget": 84
+  "v2_search_budget": 84,
+  "future_wave_opportunity_coverage_authority": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
+  "future_broker_structural_universe_authority": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+  "reference_cash_session_calendar_authority": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+  "reference_cash_session_calendar_correction_authority": "evidence/PRE_M6_NASDAQ_CALENDAR_CORRECTION_V1.json",
+  "pre_m6_readiness_authority": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+  "tier1_cost_evidence_plan_authority": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+  "tier1_cost_evidence_sources_authority": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
+  "pre_m6_timestamp_provenance_correction_authority": "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json"
 }
