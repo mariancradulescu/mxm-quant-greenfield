@@ -296,7 +296,11 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(e["research_state"]["protected_evidence_opened"])
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"',
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"',
+            runtime,
+        )
+        self.assertIn(
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
             runtime,
         )
         self.assertIn(
