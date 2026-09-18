@@ -13,14 +13,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - name: Install Android-safe M6 runtime
         run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile actual Pydroid runtime files
-        run: |
-          python -m py_compile M6_CAPTURE_RUN.py m6/pydroid_launcher.py m6/pydroid_oauth.py \
-            m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py \
-            m6/ctrader_transport.py m6/ctrader_proto/*.py
+        run: python -m py_compile M6_CAPTURE_RUN.py m6/pydroid_launcher.py m6/pydroid_oauth.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
       - name: No-credential Android-safe runtime preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -33,7 +30,7 @@ jobs:
           assert status["ready"] is True, status
           assert status["rust_required"] is False, status
           assert status["cryptography_required"] is False, status
-          print("PYDROID_BOOTSTRAP_PREFLIGHT_PASS", status)
+          print("PYDROID_PY313_BOOTSTRAP_PASS", status)
 
           import m6.ctrader_capture as core
           import m6.ctrader_openapi as runtime
@@ -49,7 +46,7 @@ jobs:
           assert 4.7 < core.HISTORICAL_TARGET_RPS < 4.8
           print("RUNTIME_PREFLIGHT_PASS", report)
           PY
-      - name: Full repository unittest suite
+      - name: Full repository unittest suite on Python 3.13
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest discover -s tests -p 'test_*.py' -v
       - name: Build deterministic Pydroid deployment package
         run: |
@@ -62,25 +59,3 @@ jobs:
           path: dist/MXM_M6_CAPTURE_PYDROID_PACKAGE.zip
           if-no-files-found: error
           retention-days: 30
-
-  pydroid-python313-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Install only universal protobuf wheel
-        run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-      - name: Python 3.13 Android-runtime smoke
-        run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest \
-            tests.test_m6_pydroid_bootstrap tests.test_m6_stdlib_transport tests.test_m6_browser_oauth -v
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
-          import m6.ctrader_openapi as runtime
-          report = runtime.runtime_sdk_preflight()
-          assert report["transport"] == "python_stdlib_ssl_socket"
-          assert report["cryptography_required"] is False
-          assert report["rust_required"] is False
-          print("PYTHON_313_PYDROID_RUNTIME_PASS", report)
-          PY
