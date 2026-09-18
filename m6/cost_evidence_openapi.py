@@ -243,8 +243,17 @@ class CostEvidenceRunner:
                     self._restore()
                 except Exception as reconnect_exc:
                     last=reconnect_exc
+        if len(requests)>1:
+            midpoint=max(1,len(requests)//2)
+            self._stage(
+                f"[PIPELINE FALLBACK] batch_size={len(requests)} -> "
+                f"{midpoint}+{len(requests)-midpoint}; preserving request order"
+            )
+            left=self._send_historical_batch(requests[:midpoint],retries=2)
+            right=self._send_historical_batch(requests[midpoint:],retries=2)
+            return left+right
         raise CaptureContractError(
-            f"historical request batch size {len(requests)} failed after {retries} attempts: "
+            f"historical single request failed after {retries} attempts: "
             f"{redact_text(str(last))}"
         )
 
