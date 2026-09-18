@@ -2,6 +2,12 @@ import json
 import unittest
 from pathlib import Path
 
+from m6.ctrader_capture import (
+    CaptureContractError,
+    TRANSFERABLE_REQUIRED_FILES,
+    _validate_transfer_names,
+)
+
 from m6.broker_product_identity import (
     CANONICAL_ORDER,
     PRODUCT_FAMILIES,
@@ -377,6 +383,25 @@ class BrokerProductIdentityTests(unittest.TestCase):
         source = (ROOT / "m6/ctrader_openapi.py").read_text(encoding="utf-8")
         self.assertIn("Structural relevance is evaluated over the complete CURRENT light-symbol", source)
         self.assertNotIn("whole universe backtest", source.lower())
+
+
+    def test_21_success_bundle_rejects_stale_blocked_marker(self):
+        names = set(TRANSFERABLE_REQUIRED_FILES)
+        names.update({f"raw/series_{i:02d}.csv" for i in range(11)})
+        with self.assertRaisesRegex(
+            CaptureContractError,
+            "must not contain BLOCKED.json",
+        ):
+            _validate_transfer_names(names | {"BLOCKED.json"})
+
+    def test_22_runtime_cleans_deterministic_bundle_dir_before_rerun(self):
+        source = (ROOT / "m6/ctrader_openapi.py").read_text(encoding="utf-8")
+        run_start = source.index("def run(self) -> Path:")
+        workflow = source.index("def _workflow(self) -> None:")
+        run_block = source[run_start:workflow]
+        self.assertIn("shutil.rmtree(self.bundle_dir)", run_block)
+        self.assertIn('(self.bundle_dir / "BLOCKED.json").unlink(missing_ok=True)', source)
+
 
 
 if __name__ == "__main__":
