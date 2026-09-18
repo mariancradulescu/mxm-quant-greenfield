@@ -203,8 +203,10 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertEqual(v3["targets"], v2["targets"])
         self.assertEqual(v3["quote_types"], v2["quote_types"])
         self.assertEqual(v3["development_interval"], v2["development_interval"])
-        for key in ("timezone","weekday_envelope_local","weekday_rule","holidays","early_closes","full_session_tape","no_signal_conditioned_windows","no_return_conditioned_windows"):
+        for key in ("timezone","weekday_envelope_local","weekday_rule","full_session_tape","no_signal_conditioned_windows","no_return_conditioned_windows"):
             self.assertEqual(v3["acquisition_domain"][key], v2["acquisition_domain"][key])
+        self.assertIn("RAW ENVELOPE STILL REQUESTED", v3["acquisition_domain"]["holidays"])
+        self.assertIn("RAW REGULAR ENVELOPE STILL REQUESTED", v3["acquisition_domain"]["early_closes"])
 
     def test_16_active_plan_is_v3_and_resume_binding_changes(self):
         state = load("CURRENT_STATE.json")
