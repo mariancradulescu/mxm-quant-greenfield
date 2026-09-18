@@ -91,7 +91,7 @@ class M6StdlibTransportTests(unittest.TestCase):
                 if self._queued is None:
                     self._queued = []
                     for index, client_id in reversed(list(enumerate(self.sent_ids))):
-                        response = ProtoOAGetTickDataRes()
+                        response = ProtoOAGetTickDataRes(ctidTraderAccountId=1)
                         response.hasMore = bool(index % 2)
                         framed = encode_envelope(response, client_id)
                         self._queued.append(decode_envelope(framed[4:]))
