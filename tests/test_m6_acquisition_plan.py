@@ -254,14 +254,27 @@ class M6AcquisitionPlanTests(unittest.TestCase):
             "CTRADER_LIVE_ADAPTER",
         ])
 
-    def test_14_data_manifest_not_mutated_without_actual_bytes(self):
+    def test_14_frozen_acquisition_plan_stays_unchanged_after_actual_bytes_bind_central_manifest(self):
+        manifest = load("data/DATA_MANIFEST.json")
+        acceptance = load("data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json")
         self.assertEqual(
-            git_blob_sha(ROOT / "data/DATA_MANIFEST.json"),
-            "491d5bc6d682538d9967a792cc8dbe81ed973b8d",
+            manifest["status"],
+            "PRIMARY_WAVE_02_RAW_COMPONENTS_MATERIALIZED_HASH_VERIFIED_AUXILIARY_GATES_PARTIAL",
         )
+        self.assertEqual(
+            manifest["primary_wave_02_materialization"]["acceptance_ref"],
+            "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+        )
+        self.assertEqual(len(acceptance["raw_components"]), 11)
         self.assertFalse((ROOT / "data/materialized").exists())
+        # The frozen pre-acquisition plan remains immutable. Actual byte hashes are bound
+        # through DATA_MANIFEST + the capture-acceptance receipt, not back-written into it.
         self.assertTrue(
             all(t["actual_bytes_sha256"] is None for t in self.plan["unique_raw_capture_tasks"])
+        )
+        self.assertEqual(
+            self.plan["status"],
+            "FROZEN_PRE_ACQUISITION_CHECKPOINT",
         )
 
     def test_15_zero_economic_state_and_m6_pending(self):
