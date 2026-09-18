@@ -61,7 +61,7 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
 
 
