@@ -62,9 +62,9 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
-PIPELINE_BATCH_SIZE = 16
+PIPELINE_BATCH_SIZE = 4
 
 
 def _plain(message: Any) -> dict[str, Any]:
@@ -123,6 +123,7 @@ class CostEvidenceRunner:
             self.resume_contract,
             allowed_previous_tool_versions=(
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
+                "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
             ),
         )
         self.resume_path,self.resume,self._archived_resume_dir=prepare_contract_bound_resume(
@@ -200,7 +201,13 @@ class CostEvidenceRunner:
         )
 
     def _send_historical_batch(self, requests, retries=3):
-        """Send a bounded historical batch over one LIVE connection near the 5 req/s ceiling."""
+        """Send a small bounded historical batch over one LIVE connection.
+
+        Historical tick responses can be large. A small in-flight set preserves much of
+        the latency-hiding benefit without allowing a large response backlog to destabilize
+        the TLS connection. Failures are surfaced with a sanitized reason and retried with
+        reconnect/backoff; the caller never loses completed hash-verified chunks.
+        """
         if not requests:
             return []
         last=None
@@ -208,23 +215,27 @@ class CostEvidenceRunner:
             try:
                 responses=self.transport.request_batch(
                     list(requests),
-                    timeout=90,
+                    timeout=120,
                     min_interval_seconds=HISTORICAL_MIN_INTERVAL_SECONDS,
                 )
                 for response in responses:
                     if type(response).__name__=="ProtoOAErrorRes":
+                        code=getattr(response,"errorCode","UNKNOWN")
+                        description=getattr(response,"description","")
                         raise CaptureContractError(
-                            f"cTrader API error: {getattr(response,'errorCode','UNKNOWN')}"
+                            f"cTrader API error {code}: {description}"
                         )
                 self._historical_requests+=len(requests)
                 return responses
             except Exception as exc:
                 last=exc
+                reason=redact_text(f"{type(exc).__name__}: {exc}")
                 if attempt>=retries:
                     break
                 delay=min(8.0,float(2**(attempt-1)))
                 self._stage(
-                    f"[PIPELINE RETRY] batch {attempt}/{retries}; reconnect in {delay:.0f}s"
+                    f"[PIPELINE RETRY] batch_size={len(requests)} attempt {attempt}/{retries} | "
+                    f"{reason} | reconnect in {delay:.0f}s"
                 )
                 time.sleep(delay)
                 try:
@@ -233,7 +244,8 @@ class CostEvidenceRunner:
                 except Exception as reconnect_exc:
                     last=reconnect_exc
         raise CaptureContractError(
-            f"historical request batch failed after {retries} attempts: {redact_text(str(last))}"
+            f"historical request batch size {len(requests)} failed after {retries} attempts: "
+            f"{redact_text(str(last))}"
         )
 
     def _authenticate_and_verify_targets(self)->int:
