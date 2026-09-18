@@ -84,9 +84,15 @@ class M6PydroidBootstrapTests(unittest.TestCase):
         for forbidden in (
             "ctrader-open-api==",
             "Twisted==",
-            "pyOpenSSL",
-            "service_identity",
+            "pyOpenSSL==",
+            "service_identity>=",
             "cryptography==",
+            "import twisted",
+            "from twisted",
+            "import OpenSSL",
+            "from OpenSSL",
+            "import cryptography",
+            "from cryptography",
         ):
             self.assertNotIn(forbidden, source)
 
