@@ -86,3 +86,19 @@ The stopped V3_TICKDELTA1 run can be resumed safely. Before reuse, every recorde
 SHA256-verified and the complete V3 semantic resume contract must match exactly except for
 the tool version. If any semantic field or chunk hash differs, migration is refused and the
 existing work is archived instead of silently reused.
+
+
+V3 PIPELINE2 STABILITY CORRECTION:
+The user's live PIPELINE1 run proved that batch 16 was too aggressive for large historical
+tick responses: 70 prior chunks migrated correctly, but repeated batch retries reduced the
+effective completed-request rate to about 1.48 req/s.
+
+PIPELINE2 keeps ONE LIVE connection and the same V3 raw acquisition contract, but starts
+with at most 4 historical requests in flight. Requests are still paced at 0.21 seconds.
+If a batch repeatedly fails, the collector automatically splits it 4 -> 2 -> 1, preserves
+request order, reconnects with backoff, and prints the sanitized exact failure reason.
+
+Verified chunks from both V3_TICKDELTA1 and V3_PIPELINE1 are eligible for explicit tool-only
+resume migration only when the complete V3 semantic contract matches and every referenced
+chunk passes SHA256 verification. No accepted OHLC data, candidate semantics, economics,
+or protected evidence are touched.
