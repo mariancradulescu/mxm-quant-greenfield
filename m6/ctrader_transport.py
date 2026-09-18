@@ -109,6 +109,7 @@ class StdlibCTraderTransport:
         self._sock = None
         self._sequence = 0
         self._last_send = 0.0
+        self._last_rate_limited_request_send = 0.0
 
     @property
     def connected(self) -> bool:
@@ -195,6 +196,74 @@ class StdlibCTraderTransport:
             raise TransportError(f"invalid cTrader protobuf frame length: {size}")
         body = self._recv_exact(size, deadline=deadline)
         return decode_envelope(body)
+
+    def request_batch(
+        self,
+        requests: list[Any],
+        *,
+        timeout: float | None = None,
+        min_interval_seconds: float = 0.21,
+    ) -> list[Any]:
+        """Pipeline a bounded read-only request batch over one LIVE connection.
+
+        Requests are serialized on the wire at the caller-supplied minimum interval and
+        responses are then drained/correlated by clientMsgId. This avoids concurrent
+        send/receive operations while allowing multiple historical requests to be in
+        flight, matching cTrader's message-queue guidance and preserving one LIVE
+        connection.
+        """
+        if not requests:
+            return []
+        if min_interval_seconds < 0:
+            raise TransportError("batch request interval cannot be negative")
+        for request in requests:
+            require_read_only_request(type(request).__name__)
+        if not self.connected:
+            self.connect()
+
+        ordered_ids: list[str] = []
+        pending: dict[str, Any] = {}
+        heartbeat_type = int(ProtoHeartbeatEvent().payloadType)
+
+        for request in requests:
+            now = self._clock()
+            if self._last_rate_limited_request_send > 0.0:
+                wait = min_interval_seconds - (
+                    now - self._last_rate_limited_request_send
+                )
+                if wait > 0:
+                    time.sleep(wait)
+            self._sequence += 1
+            client_msg_id = f"mxm-{self._sequence:012d}"
+            self._send_bytes(encode_envelope(request, client_msg_id))
+            self._last_rate_limited_request_send = self._clock()
+            ordered_ids.append(client_msg_id)
+            pending[client_msg_id] = None
+
+        deadline = self._clock() + float(timeout or self.response_timeout)
+        while any(value is None for value in pending.values()):
+            try:
+                envelope = self.receive_envelope(deadline=deadline)
+            except TimeoutError:
+                missing = sum(value is None for value in pending.values())
+                raise TransportError(
+                    f"historical batch timed out with {missing}/{len(requests)} "
+                    f"responses pending after {float(timeout or self.response_timeout):.1f}s"
+                ) from None
+
+            if int(envelope.payloadType) == heartbeat_type:
+                self.send_heartbeat()
+                continue
+
+            client_msg_id = str(getattr(envelope, "clientMsgId", ""))
+            if client_msg_id not in pending:
+                # Unsolicited event or stale response from an earlier failed batch.
+                continue
+            if pending[client_msg_id] is not None:
+                continue
+            pending[client_msg_id] = extract_payload(envelope)
+
+        return [pending[msg_id] for msg_id in ordered_ids]
 
     def request(self, request: Any, *, timeout: float | None = None):
         require_read_only_request(type(request).__name__)
