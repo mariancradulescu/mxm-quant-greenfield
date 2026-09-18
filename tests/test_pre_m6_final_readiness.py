@@ -154,7 +154,7 @@ class PreM6FinalReadinessTests(unittest.TestCase):
             self.assertNotIn(token,launcher)
         self.assertIn("scope=accounts",launcher)
         self.assertNotIn("symbol_selector",launcher)
-        plan=load("data/M6_TIER1_COST_EVIDENCE_PLAN_V1.json")
+        plan=load("data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json")
         self.assertEqual(plan["targets"]["US500"]["symbol_id"],127)
         self.assertEqual(plan["targets"]["NAS100"]["symbol_id"],126)
 
@@ -195,15 +195,15 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         self.assertNotIn("2026-09-17",c["closures"]+c["early_closes"])
 
     def test_18_candidate_specific_readiness_has_no_global_all_seven_gate(self):
-        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V1.json")
-        self.assertEqual(r["status"],"CANDIDATE_SPECIFIC_NO_GLOBAL_ALL_SEVEN_GATE")
+        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json")
+        self.assertEqual(r["status"],"CANDIDATE_SPECIFIC_PRE_COST_CAPTURE_NO_GLOBAL_ALL_SEVEN_GATE")
         self.assertEqual(r["candidates"]["V2-C006"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_EVIDENCE")
         self.assertEqual(r["candidates"]["V2-C012"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_EVIDENCE")
         self.assertEqual(r["candidates"]["V2-C008"]["m6_stage_a_readiness"],"BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION")
         self.assertEqual(r["ready_candidates"],[])
 
     def test_19_c008_c010_c011_blockers_do_not_change_c006_c012_gate_state(self):
-        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V1.json")["candidates"]
+        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json")["candidates"]
         self.assertNotIn("C008",r["V2-C006"]["m6_stage_a_readiness"])
         self.assertNotIn("C010",r["V2-C012"]["m6_stage_a_readiness"])
         self.assertNotIn("C011",r["V2-C006"]["m6_stage_a_readiness"])
@@ -255,17 +255,20 @@ class PreM6FinalReadinessTests(unittest.TestCase):
                 self.assertNotIn(".m6_cost_evidence_work", "\n".join(zf.namelist()))
 
     def test_24_cost_source_provenance_has_2022_official_commission_policy_and_tick_api(self):
-        s=load("evidence/TIER1_COST_EVIDENCE_SOURCES_V1.json")
+        s=load("evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json")
         ids={x["source_id"] for x in s["sources"]}
         self.assertIn("PEPPERSTONE_EU_COSTS_2022_V2",ids)
+        self.assertIn("PEPPERSTONE_EU_COSTS_2023_V3",ids)
+        self.assertIn("PEPPERSTONE_EU_COSTS_2024_V5",ids)
+        self.assertIn("PEPPERSTONE_EU_COSTS_2025_V12",ids)
         self.assertIn("CTRADER_HISTORICAL_TICK_DATA_CURRENT",ids)
         self.assertEqual(
-            s["tier1_component_states_before_tick_capture"]["US500"]["separate_commission"],
-            "VERIFIED_NO_SEPARATE_INDEX_COMMISSION_EMBEDDED_IN_SPREAD_POLICY_2022_AND_CURRENT",
+            s["commission_continuity_assessment"]["US500"]["state"],
+            "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT",
         )
         self.assertEqual(
-            s["tier1_component_states_before_tick_capture"]["NAS100"]["historical_spread"],
-            "PENDING_BID_ASK_CAPTURE",
+            s["pre_tick_component_states"]["NAS100"]["historical_bid_ask_spread"],
+            "PENDING_CORRECTED_TIER1_CAPTURE",
         )
 
     def _synthetic_cash_bars(self, sessions, bars_per_session=26, current_gap=False):
