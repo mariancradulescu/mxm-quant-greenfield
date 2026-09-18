@@ -1,18 +1,26 @@
-"""Clean browser-first OAuth for the M6 read-only cTrader capture.
+"""Robust browser-first OAuth for the M6 read-only cTrader capture.
 
-Uses only Python standard-library HTTPS. No legacy auth state and no requests/pyOpenSSL.
+Android/Pydroid rules:
+- local callback server owns 127.0.0.1:8765 for the entire OAuth exchange;
+- no browser intent:// deep link is used;
+- no Play Store routing is used;
+- best-effort return to the already-installed Pydroid app uses Android's local activity
+  manager only after the authorization code has been received and exchanged;
+- if Android blocks foreground switching, the browser page tells the user to return via
+  Recents and explicitly not to press RUN again.
 """
 from __future__ import annotations
 
 import json
 import os
 import subprocess
+import threading
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import webbrowser
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -27,7 +35,7 @@ from .ctrader_capture import (
 REDIRECT_URI = "http://127.0.0.1:8765/callback"
 LOCAL_SETUP_URI = "http://127.0.0.1:8765/setup"
 
-PRIVATE_ROOT = Path.home() / ".mxm_quant" / "m6_ctrader_capture_clean_v2"
+PRIVATE_ROOT = Path.home() / ".mxm_quant" / "m6_ctrader_capture_clean_v3"
 APP_CONFIG_PATH = PRIVATE_ROOT / "app_credentials.json"
 TOKEN_STATE_PATH = PRIVATE_ROOT / "oauth_state.json"
 
@@ -147,6 +155,8 @@ def _setup_html():
 </form>
 <p>Next, the official cTrader page opens. Sign in there, select the intended
 <b>Pepperstone LIVE</b> account, keep account/view access, then Allow access.</p>
+<p><b>Important:</b> keep this Pydroid run alive while the browser is open.
+Do not press RUN a second time.</p>
 </body></html>"""
 
 
@@ -156,19 +166,20 @@ def _callback_html():
 <title>MXM authorization received</title></head>
 <body style="font-family:sans-serif;max-width:640px;margin:24px auto;padding:0 16px">
 <h2>Authorization received.</h2>
-<p>Pydroid is continuing automatically with the Pepperstone LIVE read-only capture.</p>
-<p><a href="intent://#Intent;package=ru.iiec.pydroid3;end">Return to Pydroid</a></p>
-<script>
-setTimeout(function(){
-  try { window.location.href = "intent://#Intent;package=ru.iiec.pydroid3;end"; }
-  catch(e) { try { window.close(); } catch(_e) {} }
-}, 350);
-</script>
+<p>The local callback reached the running Pydroid script successfully.</p>
+<p>The script is exchanging the authorization code and will continue automatically.</p>
+<p><b>Return to Pydroid using Android Recents if it does not come to the foreground automatically.</b></p>
+<p><b>Do not press RUN again.</b></p>
 </body></html>"""
 
 
+class OAuthHTTPServer(ThreadingHTTPServer):
+    daemon_threads = True
+    allow_reuse_address = True
+
+
 class BrowserOAuthHandler(BaseHTTPRequestHandler):
-    server_version = "MXMM6CleanOAuth/2.0"
+    server_version = "MXMM6CleanOAuth/3.0"
 
     def _send_html(self, body, status=200):
         data = body.encode("utf-8")
@@ -179,6 +190,10 @@ class BrowserOAuthHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
+        try:
+            self.wfile.flush()
+        except OSError:
+            pass
 
     def do_GET(self):
         parsed = urlparse(self.path)
@@ -187,9 +202,15 @@ class BrowserOAuthHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/callback":
             query = parse_qs(parsed.query, keep_blank_values=True)
-            self.server.oauth_code = (query.get("code") or [None])[0]
-            self.server.oauth_error = (query.get("error") or [None])[0]
+            code = (query.get("code") or [None])[0]
+            error = (query.get("error") or [None])[0]
+            self.server.oauth_code = code
+            self.server.oauth_error = error
             self._send_html(_callback_html())
+            self.server.oauth_event.set()
+            return
+        if parsed.path == "/health":
+            self._send_html("<html><body>MXM OAuth callback server: OK</body></html>")
             return
         self._send_html("<html><body>Not found</body></html>", 404)
 
@@ -217,6 +238,7 @@ class BrowserOAuthHandler(BaseHTTPRequestHandler):
                 400,
             )
             return
+
         _save_app_credentials(app)
         self.server.app_credentials = app
         auth_url = build_authorization_url(
@@ -245,22 +267,62 @@ def _open_browser(url: str) -> None:
 
 
 def _best_effort_return_to_pydroid() -> bool:
+    """Ask Android to foreground the already-installed Pydroid launcher activity.
+
+    This does not use an intent:// browser URL and therefore cannot intentionally route
+    through Google Play. Failure is non-fatal; the user can return via Android Recents.
+    """
     try:
-        subprocess.Popen(
-            ["am", "start", "-n", "ru.iiec.pydroid3/ru.iiec.pydroid.MainActivity"],
+        completed = subprocess.run(
+            [
+                "am", "start",
+                "-a", "android.intent.action.MAIN",
+                "-c", "android.intent.category.LAUNCHER",
+                "-p", "ru.iiec.pydroid3",
+            ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            timeout=3,
+            check=False,
         )
-        return True
-    except (OSError, ValueError):
+        return completed.returncode == 0
+    except (OSError, subprocess.SubprocessError):
         return False
 
 
-def _fresh_browser_authorization(timeout_seconds=300):
-    server = HTTPServer(("127.0.0.1", 8765), BrowserOAuthHandler)
-    server.timeout = 1
+def _start_callback_server(host="127.0.0.1", port=8765):
+    server = OAuthHTTPServer((host, port), BrowserOAuthHandler)
     server.oauth_code = None
     server.oauth_error = None
+    server.app_credentials = None
+    server.oauth_event = threading.Event()
+    thread = threading.Thread(
+        target=server.serve_forever,
+        kwargs={"poll_interval": 0.1},
+        name="mxm-oauth-callback",
+        daemon=True,
+    )
+    thread.start()
+    return server, thread
+
+
+def _stop_callback_server(server, thread):
+    try:
+        server.shutdown()
+    finally:
+        server.server_close()
+        thread.join(timeout=3)
+
+
+def _fresh_browser_authorization(timeout_seconds=300):
+    try:
+        server, thread = _start_callback_server()
+    except OSError as exc:
+        raise OAuthError(
+            "OAuth callback server could not bind 127.0.0.1:8765. "
+            "Close any older MXM/Pydroid run and RUN once."
+        ) from exc
+
     app = _load_app_credentials()
     server.app_credentials = app
 
@@ -277,21 +339,17 @@ def _fresh_browser_authorization(timeout_seconds=300):
                 )
             )
 
-        deadline = time.monotonic() + timeout_seconds
-        while (
-            time.monotonic() < deadline
-            and not server.oauth_code
-            and not server.oauth_error
-        ):
-            server.handle_request()
+        if not server.oauth_event.wait(timeout_seconds):
+            raise OAuthError(
+                "OAuth callback timed out. Keep the original Pydroid RUN alive while "
+                "authorizing and verify redirect URI is exactly "
+                "http://127.0.0.1:8765/callback"
+            )
 
         if server.oauth_error:
             raise OAuthError(f"cTrader authorization denied: {server.oauth_error}")
         if not server.oauth_code:
-            raise OAuthError(
-                "OAuth callback timed out. Keep Pydroid running and verify redirect URI "
-                "is exactly http://127.0.0.1:8765/callback"
-            )
+            raise OAuthError("OAuth callback arrived without an authorization code")
 
         app = server.app_credentials
         if app is None:
@@ -311,11 +369,22 @@ def _fresh_browser_authorization(timeout_seconds=300):
             server.oauth_code = None
 
         _save_token_state(token)
-        _best_effort_return_to_pydroid()
+
+        if _best_effort_return_to_pydroid():
+            print("[OAUTH] Authorization received. Android foreground return requested.")
+        else:
+            print(
+                "[OAUTH] Authorization received. Return to the SAME Pydroid run via "
+                "Android Recents. Do NOT press RUN again."
+            )
+
+        # Keep localhost alive briefly after successful code exchange so Chrome cannot
+        # immediately hit a closed callback socket while finishing navigation.
+        time.sleep(2.0)
         return app, str(token["accessToken"])
     finally:
         server.oauth_code = None
-        server.server_close()
+        _stop_callback_server(server, thread)
 
 
 def ensure_v2_authorization():

@@ -54,6 +54,7 @@ CHECKPOINT_V2_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V
 CHECKPOINT_V4_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V4.json"
 CHECKPOINT_V5_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V5.json"
 CHECKPOINT_V6_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V6.json"
+CHECKPOINT_V7_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V7.json"
 LEDGER_PATH = ROOT / "discovery/ledger.jsonl"
 
 
@@ -474,7 +475,7 @@ class CTraderCaptureCoreTests(unittest.TestCase):
 
     def test_31_clean_oauth_has_no_legacy_auth_import(self):
         source = (ROOT / "m6/pydroid_oauth.py").read_text(encoding="utf-8")
-        self.assertIn("m6_ctrader_capture_clean_v2", source)
+        self.assertIn("m6_ctrader_capture_clean_v3", source)
         self.assertNotIn("a118_c02_openapi_v1", source)
         self.assertNotIn("LEGACY_APP_STATE_PATH", source)
         self.assertNotIn("SCOPE_VIEW", source)
@@ -552,6 +553,26 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertFalse(cp["android_runtime"]["cryptography"])
         self.assertFalse(cp["android_runtime"]["rust"])
         self.assertEqual(cp["transport"]["implementation"], "PYTHON_STDLIB_SSL_SOCKET")
+        self.assertEqual(cp["oauth"]["scope"], "accounts")
+        self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
+        actual = cp["actual_execution"]
+        self.assertFalse(actual["broker_capture_run"])
+        self.assertFalse(actual["m6_economics_run"])
+        self.assertEqual(actual["economic_outcomes_opened"], 0)
+        self.assertEqual(actual["v2_attempts_used"], 0)
+        self.assertEqual(actual["result_recorded"], 0)
+        self.assertFalse(actual["protected_evidence_opened"])
+        self.assertFalse(actual["live_orders"])
+        self.assertFalse(actual["competition_start"])
+
+
+    def test_37_callback_lifecycle_checkpoint_preserves_zero_economics(self):
+        cp = load(CHECKPOINT_V7_PATH)
+        self.assertEqual(cp["staging_parent_head"], "aea9446746548640da411a84d4953e5e0014a2b8")
+        self.assertTrue(cp["oauth"]["threaded_callback_server"])
+        self.assertTrue(cp["oauth"]["callback_server_alive_through_token_exchange"])
+        self.assertFalse(cp["oauth"]["browser_intent_deep_link"])
+        self.assertFalse(cp["oauth"]["play_store_routing"])
         self.assertEqual(cp["oauth"]["scope"], "accounts")
         self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
         actual = cp["actual_execution"]

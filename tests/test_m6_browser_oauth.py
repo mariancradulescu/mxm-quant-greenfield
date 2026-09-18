@@ -11,7 +11,7 @@ from m6.ctrader_capture import PYDROID_PACKAGE_FILES
 class M6BrowserOAuthTests(unittest.TestCase):
     def test_01_clean_state_uses_new_private_root_and_no_legacy_path(self):
         source = Path(oauth.__file__).read_text(encoding="utf-8")
-        self.assertIn("m6_ctrader_capture_clean_v2", source)
+        self.assertIn("m6_ctrader_capture_clean_v3", source)
         self.assertNotIn("a118_c02_openapi_v1", source)
         self.assertNotIn("LEGACY_APP_STATE_PATH", source)
         self.assertNotIn("SCOPE_VIEW", source)
@@ -72,13 +72,50 @@ class M6BrowserOAuthTests(unittest.TestCase):
         self.assertNotIn("a118_c02_openapi_v1", module)
         self.assertNotIn("LEGACY_APP_STATE_PATH", module)
         self.assertNotIn("SCOPE_VIEW", module)
+        self.assertNotIn("intent://", module)
+        self.assertNotIn("play.google.com", module)
 
     def test_06_deployment_package_contains_clean_oauth_and_excludes_old_terminal_launcher(self):
         self.assertIn("m6/pydroid_oauth.py", PYDROID_PACKAGE_FILES)
         self.assertIn("m6/pydroid_launcher.py", PYDROID_PACKAGE_FILES)
         self.assertNotIn("M6_CAPTURE_RUN_BASE.py", PYDROID_PACKAGE_FILES)
 
-    def test_07_token_state_is_separate_from_app_secret(self):
+    def test_07_callback_html_never_deep_links_or_routes_to_store(self):
+        html = oauth._callback_html()
+        self.assertIn("Authorization received", html)
+        self.assertIn("Do not press RUN again", html)
+        self.assertNotIn("intent://", html)
+        self.assertNotIn("play.google.com", html)
+        self.assertNotIn("window.location", html)
+
+    def test_08_callback_server_receives_code_and_remains_alive_until_shutdown(self):
+        import urllib.request
+
+        server, thread = oauth._start_callback_server(host="127.0.0.1", port=0)
+        try:
+            port = server.server_address[1]
+            url = f"http://127.0.0.1:{port}/callback?code=TEST_CODE"
+            with urllib.request.urlopen(url, timeout=2) as response:
+                body = response.read().decode("utf-8")
+            self.assertIn("Authorization received", body)
+            self.assertTrue(server.oauth_event.wait(1))
+            self.assertEqual(server.oauth_code, "TEST_CODE")
+            with urllib.request.urlopen(
+                f"http://127.0.0.1:{port}/health", timeout=2
+            ) as response:
+                health = response.read().decode("utf-8")
+            self.assertIn("callback server: OK", health)
+        finally:
+            oauth._stop_callback_server(server, thread)
+
+    def test_09_android_return_uses_local_activity_manager_not_browser_intent(self):
+        source = Path(oauth.__file__).read_text(encoding="utf-8")
+        self.assertIn('"am", "start"', source)
+        self.assertIn('"android.intent.category.LAUNCHER"', source)
+        self.assertIn('"ru.iiec.pydroid3"', source)
+        self.assertNotIn("intent://", source)
+
+    def test_10_token_state_is_separate_from_app_secret(self):
         with tempfile.TemporaryDirectory() as td:
             token_path = Path(td) / "oauth_state.json"
             with patch.object(oauth, "TOKEN_STATE_PATH", token_path):
