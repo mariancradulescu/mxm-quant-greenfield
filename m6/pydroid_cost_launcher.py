@@ -28,7 +28,7 @@ from .pydroid_oauth import (
 )
 
 ROOT=Path(__file__).resolve().parents[1]
-PLAN_PATH=ROOT/"data"/"M6_TIER1_COST_EVIDENCE_PLAN_V1.json"
+PLAN_PATH=ROOT/"data"/"M6_TIER1_COST_EVIDENCE_PLAN_V2.json"
 OUTPUT_ROOT=ROOT/"cost_capture_output"
 WORK_ROOT=ROOT/".m6_cost_evidence_work"
 
@@ -72,8 +72,8 @@ def local_preflight():
     if not PLAN_PATH.is_file():
         raise CaptureContractError("cost-evidence plan missing")
     plan=json.loads(PLAN_PATH.read_text(encoding="utf-8"))
-    if plan.get("status")!="FROZEN_PRE_OUTCOME_READ_ONLY_ACQUISITION_PLAN":
-        raise CaptureContractError("cost-evidence plan is not frozen")
+    if plan.get("status")!="PRE_OUTCOME_CORRECTED_REFREEZE_READ_ONLY_ACQUISITION_PLAN":
+        raise CaptureContractError("corrected cost-evidence plan is not active/frozen")
     if plan.get("oauth_scope")!="accounts" or plan.get("orders") is not False:
         raise CaptureContractError("cost-evidence plan violates read-only contract")
     if set(plan["targets"])!={"US500","NAS100"}:
