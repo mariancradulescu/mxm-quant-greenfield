@@ -1,10 +1,6 @@
 """Clean browser-first OAuth for the M6 read-only cTrader capture.
 
-No legacy credentials, grants, tokens, or account selections are imported.
-On the first run this module opens a local browser setup page for the approved
-Open API application's Client ID/Secret, stores them only in a new private local
-directory, then redirects to the official cTrader OAuth page. Every run performs
-a fresh user-visible cTrader authorization with scope=accounts.
+Uses only Python standard-library HTTPS. No legacy auth state and no requests/pyOpenSSL.
 """
 from __future__ import annotations
 
@@ -12,12 +8,13 @@ import json
 import os
 import subprocess
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
-
-import requests
 
 from .ctrader_capture import (
     READ_ONLY_SCOPE,
@@ -30,8 +27,7 @@ from .ctrader_capture import (
 REDIRECT_URI = "http://127.0.0.1:8765/callback"
 LOCAL_SETUP_URI = "http://127.0.0.1:8765/setup"
 
-# Deliberately new clean state. Nothing from prior MXM/cTrader auth folders is read.
-PRIVATE_ROOT = Path.home() / ".mxm_quant" / "m6_ctrader_capture_clean_v1"
+PRIVATE_ROOT = Path.home() / ".mxm_quant" / "m6_ctrader_capture_clean_v2"
 APP_CONFIG_PATH = PRIVATE_ROOT / "app_credentials.json"
 TOKEN_STATE_PATH = PRIVATE_ROOT / "oauth_state.json"
 
@@ -65,9 +61,7 @@ def _normalize_app_credentials(raw):
     scope = str(raw.get("scope") or READ_ONLY_SCOPE).strip().lower()
     if not client_id or not client_secret:
         return None
-    if redirect_uri != REDIRECT_URI:
-        return None
-    if scope != READ_ONLY_SCOPE:
+    if redirect_uri != REDIRECT_URI or scope != READ_ONLY_SCOPE:
         return None
     return {
         "client_id": client_id,
@@ -91,7 +85,7 @@ def _save_app_credentials(app: dict) -> None:
 def _save_token_state(token: dict) -> None:
     now = int(time.time())
     expires_in = int(token.get("expiresIn") or 0)
-    state = {
+    _secure_write_json(TOKEN_STATE_PATH, {
         "scope": READ_ONLY_SCOPE,
         "redirect_uri": REDIRECT_URI,
         "target_environment": "Pepperstone - Europe LIVE",
@@ -100,20 +94,30 @@ def _save_token_state(token: dict) -> None:
         "expires_at_unix": now + expires_in if expires_in > 0 else 0,
         "saved_at_unix": now,
         "authorization_source": "FRESH_BROWSER_AUTHORIZATION",
-    }
-    _secure_write_json(TOKEN_STATE_PATH, state)
+    })
 
 
 def _token_request(params: dict) -> dict:
+    url = TOKEN_URL + "?" + urllib.parse.urlencode(params)
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "MXM-M6-Pydroid-Capture/1.0"},
+        method="GET",
+    )
     try:
-        response = requests.get(TOKEN_URL, params=params, timeout=30)
-    except requests.RequestException:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            status = int(getattr(response, "status", 200))
+            raw = response.read()
+    except urllib.error.HTTPError as exc:
+        raise OAuthError(f"cTrader token endpoint HTTP {exc.code}") from None
+    except (urllib.error.URLError, TimeoutError, OSError):
         raise OAuthError("cTrader token endpoint transport failure") from None
-    if response.status_code != 200:
-        raise OAuthError(f"cTrader token endpoint HTTP {response.status_code}")
+
+    if status != 200:
+        raise OAuthError(f"cTrader token endpoint HTTP {status}")
     try:
-        data = response.json()
-    except ValueError:
+        data = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
         raise OAuthError("cTrader token endpoint returned malformed JSON") from None
     if not isinstance(data, dict) or not data.get("accessToken"):
         detail = data.get("description") if isinstance(data, dict) else None
@@ -125,18 +129,13 @@ def _token_request(params: dict) -> dict:
 
 def _setup_html():
     return """<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MXM cTrader setup</title>
-</head>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MXM cTrader setup</title></head>
 <body style="font-family:sans-serif;max-width:680px;margin:24px auto;padding:0 16px">
 <h2>MXM cTrader Open API — first setup</h2>
-<p>This page is local on <b>127.0.0.1</b>. Start from the Credentials page of your
-approved cTrader Open API application.</p>
-<p>Enter the <b>Open API Client ID</b> and <b>Open API Client Secret</b> below.
-These are application credentials, not your cTID password. They are saved only on
-this phone under a private MXM folder and are never included in the capture ZIP.</p>
+<p>This page is local on <b>127.0.0.1</b>.</p>
+<p>Enter your approved Open API application's <b>Client ID</b> and
+<b>Client Secret</b>. They are saved only on this phone and never enter the capture ZIP.</p>
 <p>Registered redirect must be exactly:
 <code>http://127.0.0.1:8765/callback</code></p>
 <form method="post" action="/setup" autocomplete="off">
@@ -147,17 +146,14 @@ this phone under a private MXM folder and are never included in the capture ZIP.
 <button type="submit" style="padding:13px 18px">Save locally and continue to cTrader</button>
 </form>
 <p>Next, the official cTrader page opens. Sign in there, select the intended
-<b>Pepperstone LIVE</b> account, keep view-only/account access, then Allow access.</p>
+<b>Pepperstone LIVE</b> account, keep account/view access, then Allow access.</p>
 </body></html>"""
 
 
 def _callback_html():
-    return """<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MXM authorization received</title>
-</head>
+    return """<!doctype html><html>
+<head><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MXM authorization received</title></head>
 <body style="font-family:sans-serif;max-width:640px;margin:24px auto;padding:0 16px">
 <h2>Authorization received.</h2>
 <p>Pydroid is continuing automatically with the Pepperstone LIVE read-only capture.</p>
@@ -172,7 +168,7 @@ setTimeout(function(){
 
 
 class BrowserOAuthHandler(BaseHTTPRequestHandler):
-    server_version = "MXMM6CleanOAuth/1.0"
+    server_version = "MXMM6CleanOAuth/2.0"
 
     def _send_html(self, body, status=200):
         data = body.encode("utf-8")
@@ -202,7 +198,6 @@ class BrowserOAuthHandler(BaseHTTPRequestHandler):
         if parsed.path != "/setup":
             self._send_html("<html><body>Not found</body></html>", 404)
             return
-
         try:
             length = min(max(int(self.headers.get("Content-Length", "0")), 0), 65536)
         except ValueError:
@@ -222,8 +217,6 @@ class BrowserOAuthHandler(BaseHTTPRequestHandler):
                 400,
             )
             return
-
-        # Save application credentials immediately, before leaving the local page.
         _save_app_credentials(app)
         self.server.app_credentials = app
         auth_url = build_authorization_url(
@@ -268,18 +261,16 @@ def _fresh_browser_authorization(timeout_seconds=300):
     server.timeout = 1
     server.oauth_code = None
     server.oauth_error = None
-
     app = _load_app_credentials()
     server.app_credentials = app
 
     try:
         if app is None:
-            print("[OAUTH] First clean setup: opening the browser now...")
-            print("[OAUTH] Enter Open API Client ID/Secret on the LOCAL setup page.")
+            print("[OAUTH] First clean setup: opening the local browser form...")
             _open_browser(LOCAL_SETUP_URI)
         else:
             print("[OAUTH] Local Open API application credentials found.")
-            print("[OAUTH] Opening the official cTrader authorization page...")
+            print("[OAUTH] Opening official cTrader authorization...")
             _open_browser(
                 build_authorization_url(
                     app["client_id"], REDIRECT_URI, scope=READ_ONLY_SCOPE
@@ -298,9 +289,8 @@ def _fresh_browser_authorization(timeout_seconds=300):
             raise OAuthError(f"cTrader authorization denied: {server.oauth_error}")
         if not server.oauth_code:
             raise OAuthError(
-                "OAuth callback timed out. Keep Pydroid running while authorizing and "
-                "verify the registered redirect URI is exactly "
-                "http://127.0.0.1:8765/callback"
+                "OAuth callback timed out. Keep Pydroid running and verify redirect URI "
+                "is exactly http://127.0.0.1:8765/callback"
             )
 
         app = server.app_credentials
@@ -329,6 +319,5 @@ def _fresh_browser_authorization(timeout_seconds=300):
 
 
 def ensure_v2_authorization():
-    """Perform a fresh browser authorization on every run, using only clean local state."""
     app, access_token = _fresh_browser_authorization()
-    return app, access_token, "FRESH_CLEAN_BROWSER_AUTHORIZATION"
+    return app, access_token, "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION"

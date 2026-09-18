@@ -22,28 +22,24 @@ class M6PydroidBootstrapTests(unittest.TestCase):
             main.index("from m6.pydroid_launcher import main as launcher_main"),
         )
 
-    def test_02_missing_sdk_triggers_same_interpreter_pip_install(self):
+    def test_02_missing_protobuf_installs_binary_only_no_deps(self):
         not_ready = {
             "ready": False,
-            "packages": {
-                "ctrader-open-api": None,
-                "requests": "2.32.3",
-                "service-identity": "24.2.0",
-            },
-            "problems": ["ctrader-open-api: installed=missing required=0.9.2"],
+            "packages": {"protobuf": None},
+            "problems": ["protobuf missing"],
+            "rust_required": False,
+            "cryptography_required": False,
         }
         ready = {
             "ready": True,
-            "packages": {
-                "ctrader-open-api": "0.9.2",
-                "requests": "2.32.3",
-                "service-identity": "24.2.0",
-            },
+            "packages": {"protobuf": "3.20.1"},
             "problems": [],
+            "rust_required": False,
+            "cryptography_required": False,
         }
         with tempfile.TemporaryDirectory() as td:
             req = Path(td) / "requirements.txt"
-            req.write_text("ctrader-open-api==0.9.2\n", encoding="utf-8")
+            req.write_text("protobuf==3.20.1\n", encoding="utf-8")
             with patch.object(entry, "REQUIREMENTS_PATH", req), patch.object(
                 entry, "runtime_dependency_status", side_effect=[not_ready, ready]
             ), patch.object(
@@ -52,21 +48,24 @@ class M6PydroidBootstrapTests(unittest.TestCase):
                 return_value=subprocess.CompletedProcess(["pip"], 0),
             ) as run:
                 entry._ensure_runtime_dependencies()
-        run.assert_called_once()
         command = run.call_args.args[0]
         self.assertEqual(command[0], entry.sys.executable)
         self.assertEqual(command[1:4], ["-m", "pip", "install"])
+        self.assertIn("--only-binary=:all:", command)
+        self.assertIn("--no-deps", command)
         self.assertIn("-r", command)
 
-    def test_03_failed_auto_install_stops_before_runtime_import(self):
+    def test_03_failed_wheel_install_stops_before_runtime_import(self):
         not_ready = {
             "ready": False,
-            "packages": {},
-            "problems": ["ctrader-open-api missing"],
+            "packages": {"protobuf": None},
+            "problems": ["protobuf missing"],
+            "rust_required": False,
+            "cryptography_required": False,
         }
         with tempfile.TemporaryDirectory() as td:
             req = Path(td) / "requirements.txt"
-            req.write_text("ctrader-open-api==0.9.2\n", encoding="utf-8")
+            req.write_text("protobuf==3.20.1\n", encoding="utf-8")
             with patch.object(entry, "REQUIREMENTS_PATH", req), patch.object(
                 entry, "runtime_dependency_status", return_value=not_ready
             ), patch.object(
@@ -77,11 +76,19 @@ class M6PydroidBootstrapTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     entry._ensure_runtime_dependencies()
 
-    def test_04_service_identity_range(self):
-        self.assertTrue(entry._service_identity_compatible("24.1.0"))
-        self.assertTrue(entry._service_identity_compatible("24.9.1"))
-        self.assertFalse(entry._service_identity_compatible("23.9.0"))
-        self.assertFalse(entry._service_identity_compatible("25.0.0"))
+    def test_04_bootstrap_source_forbids_rust_crypto_stack(self):
+        source = ENTRY_PATH.read_text(encoding="utf-8")
+        self.assertIn('PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python"', source)
+        self.assertIn("--only-binary=:all:", source)
+        self.assertIn("--no-deps", source)
+        for forbidden in (
+            "ctrader-open-api==",
+            "Twisted==",
+            "pyOpenSSL",
+            "service_identity",
+            "cryptography==",
+        ):
+            self.assertNotIn(forbidden, source)
 
 
 if __name__ == "__main__":

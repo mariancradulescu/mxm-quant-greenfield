@@ -1,0 +1,79 @@
+{
+  "schema": "mxm.greenfield.v2.m6-ctrader-android-stdlib-transport-checkpoint.v6",
+  "status": "ANDROID_PYTHON313_NO_RUST_RUNTIME_READY_EXTERNAL_PYDROID_EXECUTION_REQUIRED",
+  "staging_parent_head": "9e6a5176f13ab3e13d08f084f1a6fd9815a1b0b9",
+  "supersedes": {
+    "path": "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V5.json",
+    "preserved_unchanged": true,
+    "reason": "PYDROID_PYTHON313_CRYPTOGRAPHY_RUST_INSTALL_FAILURE_RUNTIME_CORRECTION_ONLY_NO_CAPTURE_NO_ECONOMICS"
+  },
+  "active_plan": "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json",
+  "active_plan_sha256": "da9e9a65f5c8b3e9a3edb0189de6d60bee2b5cc922d0a3ea99c1dc14ef5066fa",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "development_interval_end": "2026-09-16T23:59:59Z",
+  "android_runtime": {
+    "python_target": "3.13",
+    "only_pip_dependency": "protobuf==3.20.1",
+    "protobuf_binary_only_install": true,
+    "protobuf_no_deps_install": true,
+    "pure_python_protobuf_backend": true,
+    "twisted": false,
+    "pyopenssl": false,
+    "service_identity": false,
+    "cryptography": false,
+    "rust": false,
+    "requests": false
+  },
+  "transport": {
+    "implementation": "PYTHON_STDLIB_SSL_SOCKET",
+    "endpoint": "live.ctraderapi.com:5035",
+    "tls_hostname_verification": true,
+    "protobuf_framing": "INT32_BIG_ENDIAN_LENGTH_PREFIX",
+    "official_generated_messages_source": "spotware/OpenApiPy tag 0.9.2",
+    "heartbeat": true,
+    "reconnect_retry": true
+  },
+  "oauth": {
+    "clean_private_root": "~/.mxm_quant/m6_ctrader_capture_clean_v2",
+    "legacy_auth_read_or_imported": false,
+    "browser_authorization_every_run": true,
+    "scope": "accounts",
+    "trading_scope_requested": false,
+    "callback": "http://127.0.0.1:8765/callback"
+  },
+  "account_target": {
+    "environment": "Pepperstone - Europe LIVE",
+    "live_required": true,
+    "demo_used_for_capture": false,
+    "live_zero_balance_permitted": true,
+    "balance_used_as_selection_criterion": false
+  },
+  "frozen_rules_preserved": {
+    "unique_primary_raw_series": 11,
+    "candidate_bindings": 12,
+    "c006_c012_shared_us500_m15": true,
+    "exact_development_completion_boundary": true,
+    "legacy_contamination_boundary": true,
+    "development_classification": true,
+    "protected_timestamp": true,
+    "candidate_identities": true,
+    "economic_logic": true,
+    "search_budget": true,
+    "read_only_accounts_scope": true
+  },
+  "actual_execution": {
+    "broker_capture_run": false,
+    "actual_broker_bytes_materialized": false,
+    "data_manifest_mutated": false,
+    "m6_economics_run": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false,
+    "m6_status": "PENDING"
+  },
+  "expected_final_capture_zip": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8.zip"
+}

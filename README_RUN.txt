@@ -1,102 +1,79 @@
-MXM QUANT GREENFIELD V2 — M6 PYDROID READ-ONLY CAPTURE
-======================================================
+MXM QUANT GREENFIELD V2 — ANDROID-SAFE M6 CAPTURE
+=====================================================
 
-THIS PACKAGE STARTS CLEAN.
-It does NOT import or reuse any previous MXM/cTrader authentication folder, token,
-refresh token, account grant, or old package-local configuration.
+USE THIS PACKAGE, NOT ANY EARLIER PACKAGE.
 
-It captures broker/data evidence only. It does NOT run M6 economics and cannot place orders.
+WHY THIS BUILD IS DIFFERENT
+The earlier package depended on cTrader's Twisted/pyOpenSSL Python SDK stack. On
+Pydroid Python 3.13/aarch64 that stack tried to compile cryptography with Rust.
 
-1) EXTRACT
-Extract MXM_M6_CAPTURE_PYDROID_PACKAGE.zip to a NEW Android folder.
-Keep m6/, data/, and tools/ exactly as packaged.
+This build does NOT install or import:
+- ctrader-open-api
+- Twisted
+- pyOpenSSL
+- service_identity
+- cryptography
+- requests
 
-2) RUN — NO MANUAL PIP STEP REQUIRED
+It uses:
+- Python standard-library ssl/socket/urllib
+- official cTrader generated protobuf messages from Spotware OpenApiPy 0.9.2
+- protobuf==3.20.1 (universal pure-Python wheel)
+
+1) EXTRACT TO A NEW FOLDER
+Extract MXM_M6_CAPTURE_PYDROID_PACKAGE.zip to a completely new Android folder.
+
+2) RUN
 Open M6_CAPTURE_RUN.py in Pydroid and tap RUN.
+Do NOT install anything manually first.
 
-The launcher first checks the exact cTrader runtime packages. If they are missing or
-incompatible, it automatically runs Pydroid's Python pip against:
-tools/requirements-m6-capture.txt
+If protobuf 3.20.1 is missing, RUN installs only that package using:
+--only-binary=:all: --no-deps
+so source compilation/Rust is disabled.
 
-The installation output is visible in the console. After a successful first install,
-the same RUN continues automatically.
-
-3) FIRST CLEAN BROWSER SETUP
-After preflight, the browser opens automatically at a LOCAL page:
+3) FIRST CLEAN SETUP
+After preflight the browser opens:
 http://127.0.0.1:8765/setup
 
 Enter:
 - Open API Client ID
 - Open API Client Secret
 
-Use the credentials of your approved cTrader Open API application.
-Do NOT enter your cTID username/password on this local page.
+They are saved locally only at:
+~/.mxm_quant/m6_ctrader_capture_clean_v2/app_credentials.json
 
-The app credentials are saved only on this phone at:
-~/.mxm_quant/m6_ctrader_capture_clean_v1/app_credentials.json
+No previous MXM/cTrader authentication folder is read or imported.
 
-NO old ~/.mxm_quant authentication folder is read or imported.
-
-The registered redirect URI in the cTrader application must be exactly:
+Registered redirect in your approved cTrader application:
 http://127.0.0.1:8765/callback
 
-4) OFFICIAL CTRADER AUTHORIZATION
-After Save locally and continue to cTrader, the browser redirects automatically to
-the official cTrader OAuth page.
+4) OFFICIAL CTRADER OAUTH
+The local form redirects to cTrader.
+Sign in there, choose the intended Pepperstone LIVE account, keep accounts/view-only
+permission, and tap Allow access / OK.
 
-There:
-- sign in with your cTID/cTrader credentials;
-- choose the intended Pepperstone LIVE account;
-- grant view-only/account access;
-- tap Allow access / OK.
+The LIVE account can have zero balance. DEMO is not used.
 
-OAuth scope is accounts only. Trading scope is never requested.
-
-If LIVE and DEMO accounts both exist, this capture uses only LIVE.
-The LIVE account may have zero balance; balance is not a selection criterion.
-The runtime connects only to live.ctraderapi.com:5035.
-
-5) AUTOMATIC CALLBACK
+5) CALLBACK
 cTrader redirects to:
 http://127.0.0.1:8765/callback
 
-Pydroid receives the authorization code, exchanges it immediately for an access token,
-stores OAuth state only locally at:
-~/.mxm_quant/m6_ctrader_capture_clean_v1/oauth_state.json
+Pydroid receives the code and continues automatically.
+The callback page also has a Return to Pydroid link.
 
-and continues automatically. The callback page attempts to bring Pydroid back to the
-foreground and also contains a Return to Pydroid link.
+6) CAPTURE
+Transport:
+Python stdlib TLS -> live.ctraderapi.com:5035
+Protocol:
+official cTrader protobuf messages, 32-bit big-endian length framing
+Historical pacing:
+about 4.76 req/s, below the official 5 req/s historical ceiling
 
-6) LATER RUNS
-The saved Open API Client ID/Secret are reused from the NEW clean local folder so you do
-not type them again. The official cTrader browser authorization still opens on every RUN,
-so account/permission selection remains explicit.
+No orders. No account mutation. No M6 economics.
 
-7) PREFLIGHT
-Before OAuth/capture the script verifies the frozen plan/hash, writable paths, callback
-port, ZIP/SHA, secret guards, read-only request allowlist, mutation denylist and SDK
-heartbeat availability.
+7) RESUME
+If interrupted, RUN the same M6_CAPTURE_RUN.py again.
+Verified chunks are reused.
 
-8) PROGRESS
-Normal historical pacing remains 0.21 s/request, about 4.76 requests/sec, below the
-official cTrader historical limit of 5 requests/sec/connection.
-
-9) RESUME
-If Pydroid stops, RUN M6_CAPTURE_RUN.py again. Verified chunks are reused. Authorization
-is performed again in the browser before the resumed LIVE broker session.
-
-10) DEVELOPMENT BOUNDARY
-Trendbars are included only when completion <= 2026-09-16T23:59:59Z and completion is
-strictly < protected-forward start 2026-09-17T12:02:58Z.
-
-11) RETURN ONLY
+8) RETURN ONLY
 capture_output/MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8.zip
-
-Do NOT return:
-~/.mxm_quant/
-.m6_capture_work/
-app_credentials.json
-oauth_state.json
-client secret
-access/refresh tokens
-authorization code

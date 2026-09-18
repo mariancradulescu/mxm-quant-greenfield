@@ -1,4 +1,4 @@
-"""Active Pydroid launcher/runtime for the M6 read-only cTrader capture."""
+"""Active Pydroid launcher for the Android-safe M6 cTrader capture."""
 from __future__ import annotations
 
 import inspect
@@ -32,36 +32,15 @@ WORK_ROOT = ROOT / ".m6_capture_work"
 
 
 def _require_versions():
-    expected_exact = {"ctrader-open-api": "0.9.2", "requests": "2.32.3"}
-    found = {}
-    for package, expected in expected_exact.items():
-        try:
-            actual = package_version(package)
-        except PackageNotFoundError as exc:
-            raise CaptureContractError(
-                f"missing required package {package}; run: python -m pip install -r tools/requirements-m6-capture.txt"
-            ) from exc
-        if actual != expected:
-            raise CaptureContractError(
-                f"{package} version {actual} is incompatible; required exactly {expected}"
-            )
-        found[package] = actual
     try:
-        service_identity = package_version("service-identity")
+        actual = package_version("protobuf")
     except PackageNotFoundError as exc:
-        raise CaptureContractError("missing service-identity; reinstall requirements") from exc
-    try:
-        major, minor = (int(part) for part in service_identity.split(".")[:2])
-    except ValueError as exc:
+        raise CaptureContractError("missing protobuf 3.20.1; rerun M6_CAPTURE_RUN.py") from exc
+    if actual != "3.20.1":
         raise CaptureContractError(
-            f"cannot parse service-identity version {service_identity}"
-        ) from exc
-    if major != 24 or minor < 1:
-        raise CaptureContractError(
-            f"service-identity {service_identity} is outside required >=24.1.0,<25"
+            f"protobuf version {actual} is incompatible; required exactly 3.20.1"
         )
-    found["service-identity"] = service_identity
-    return found
+    return {"protobuf": actual}
 
 
 def _probe_writable_directory(path: Path):
@@ -79,9 +58,7 @@ def _probe_writable_directory(path: Path):
 
 def _validate_callback_port():
     if not is_loopback_redirect(REDIRECT_URI):
-        raise CaptureContractError(
-            "V2 requires approved redirect http://127.0.0.1:8765/callback"
-        )
+        raise CaptureContractError("V2 requires http://127.0.0.1:8765/callback")
     parsed = urlparse(REDIRECT_URI)
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -137,22 +114,25 @@ def local_preflight():
             raise CaptureContractError("ZIP/SHA256 preflight failed")
 
     from . import ctrader_openapi
-    sdk = ctrader_openapi.runtime_sdk_preflight()
-    if sdk.get("network_connection_attempted") is not False:
-        raise CaptureContractError("runtime SDK preflight unexpectedly used network")
-    if sdk.get("credentials_used") is not False:
-        raise CaptureContractError("runtime SDK preflight unexpectedly used credentials")
+    transport = ctrader_openapi.runtime_sdk_preflight()
+    if transport.get("network_connection_attempted") is not False:
+        raise CaptureContractError("runtime preflight unexpectedly used network")
+    if transport.get("credentials_used") is not False:
+        raise CaptureContractError("runtime preflight unexpectedly used credentials")
+    if transport.get("cryptography_required") is not False:
+        raise CaptureContractError("Android runtime unexpectedly requires cryptography")
+    if transport.get("rust_required") is not False:
+        raise CaptureContractError("Android runtime unexpectedly requires Rust")
 
-    source = inspect.getsource(ctrader_openapi) + inspect.getsource(ctrader_openapi._base)
-    forbidden = (
+    source = inspect.getsource(ctrader_openapi)
+    for token in (
         "ProtoOANewOrderReq",
         "ProtoOACancelOrderReq",
         "ProtoOAClosePositionReq",
         "ProtoOAAmendOrderReq",
         'scope="trading"',
         "scope='trading'",
-    )
-    for token in forbidden:
+    ):
         if token in source:
             raise CaptureContractError(
                 f"runtime adapter contains forbidden trading/mutation token: {token}"
@@ -162,15 +142,12 @@ def local_preflight():
         "packages": versions,
         "plan": plan_result,
         "callback": callback,
-        "sdk": sdk,
+        "transport": transport,
         "scope": READ_ONLY_SCOPE,
         "orders_permitted": False,
         "account_mutation_permitted": False,
-        "output_writable": True,
-        "work_writable": True,
-        "private_state_writable": True,
-        "zip_sha256_operational": True,
-        "secret_transfer_probe": "PASS",
+        "cryptography_required": False,
+        "rust_required": False,
     }
 
 
@@ -180,8 +157,9 @@ def main():
         "Contract: scope=accounts | target=Pepperstone LIVE | "
         "orders=NO | account mutation=NO | economics=NO"
     )
+    print("Android runtime: stdlib TLS/socket + official cTrader protobuf messages")
 
-    print("\n[LOCAL PREFLIGHT] Validating pinned runtime before authorization...")
+    print("\n[LOCAL PREFLIGHT] Validating Android-safe runtime before authorization...")
     try:
         plan, report = local_preflight()
     except Exception as exc:
@@ -190,13 +168,13 @@ def main():
         raise SystemExit(2) from None
 
     print(
-        "[PREFLIGHT PASS] dependencies | frozen plan/hash | writable paths | "
-        "callback | ZIP/SHA | secret boundary | accounts/read-only | SDK heartbeat"
+        "[PREFLIGHT PASS] protobuf | frozen plan/hash | writable paths | callback | "
+        "ZIP/SHA | accounts/read-only | stdlib TLS/protobuf heartbeat"
     )
     print(
-        f"[PREFLIGHT PASS] cTrader SDK {report['sdk']['ctrader_open_api_version']} | "
-        f"LIVE {report['sdk']['live_host']}:{report['sdk']['live_port']} | "
-        "network test=NO | credentials used=NO"
+        f"[PREFLIGHT PASS] protobuf {report['packages']['protobuf']} | "
+        f"LIVE {report['transport']['live_host']}:{report['transport']['live_port']} | "
+        "Twisted=NO | cryptography=NO | Rust=NO"
     )
 
     try:
@@ -206,8 +184,8 @@ def main():
         raise SystemExit(1) from None
 
     print(
-        "[OAUTH] Clean browser authorization complete. Target=Pepperstone LIVE. "
-        "DEMO accounts are not eligible for this capture."
+        "[OAUTH] Browser authorization complete. Target=Pepperstone LIVE. "
+        "DEMO accounts are not eligible for capture."
     )
 
     config = {
@@ -218,7 +196,6 @@ def main():
 
     try:
         from .ctrader_openapi import OpenApiCaptureRunner
-
         runner = OpenApiCaptureRunner(
             plan=plan,
             client_id=app["client_id"],
@@ -231,7 +208,6 @@ def main():
     except Exception as exc:
         print("\nCapture BLOCKED safely:", redact_text(str(exc)))
         print("No order was placed. No M6 economics were run.")
-        print("If a partial ZIP exists in capture_output, return it only for diagnosis.")
         raise SystemExit(1) from None
     finally:
         access_token = None

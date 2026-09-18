@@ -11,7 +11,7 @@ from m6.ctrader_capture import PYDROID_PACKAGE_FILES
 class M6BrowserOAuthTests(unittest.TestCase):
     def test_01_clean_state_uses_new_private_root_and_no_legacy_path(self):
         source = Path(oauth.__file__).read_text(encoding="utf-8")
-        self.assertIn("m6_ctrader_capture_clean_v1", source)
+        self.assertIn("m6_ctrader_capture_clean_v2", source)
         self.assertNotIn("a118_c02_openapi_v1", source)
         self.assertNotIn("LEGACY_APP_STATE_PATH", source)
         self.assertNotIn("SCOPE_VIEW", source)
@@ -54,7 +54,7 @@ class M6BrowserOAuthTests(unittest.TestCase):
             app, token, mode = oauth.ensure_v2_authorization()
         fresh.assert_called_once()
         self.assertEqual(token, "ACCESS")
-        self.assertEqual(mode, "FRESH_CLEAN_BROWSER_AUTHORIZATION")
+        self.assertEqual(mode, "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION")
 
     def test_05_browser_flow_is_accounts_only_and_no_terminal_credentials(self):
         root = Path(__file__).resolve().parents[1]
@@ -67,6 +67,8 @@ class M6BrowserOAuthTests(unittest.TestCase):
         self.assertIn("Pepperstone - Europe LIVE", module)
         self.assertIn("READ_ONLY_SCOPE", module)
         self.assertNotIn('scope="trading"', module)
+        self.assertNotIn("import requests", module)
+        self.assertIn("urllib.request", module)
         self.assertNotIn("a118_c02_openapi_v1", module)
         self.assertNotIn("LEGACY_APP_STATE_PATH", module)
         self.assertNotIn("SCOPE_VIEW", module)

@@ -53,6 +53,7 @@ CHECKPOINT_V1_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V
 CHECKPOINT_V2_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V2.json"
 CHECKPOINT_V4_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V4.json"
 CHECKPOINT_V5_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V5.json"
+CHECKPOINT_V6_PATH = ROOT / "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V6.json"
 LEDGER_PATH = ROOT / "discovery/ledger.jsonl"
 
 
@@ -272,7 +273,7 @@ class CTraderCaptureCoreTests(unittest.TestCase):
                 scan_bundle_for_secrets(root)
 
     def test_17_runtime_source_never_imports_order_messages(self):
-        for rel in ("m6/ctrader_openapi.py", "m6/_ctrader_openapi_base.py"):
+        for rel in ("m6/ctrader_openapi.py", "m6/ctrader_transport.py"):
             source = (ROOT / rel).read_text(encoding="utf-8")
             for forbidden in (
                 "ProtoOANewOrderReq", "ProtoOACancelOrderReq", "ProtoOAClosePositionReq",
@@ -417,9 +418,13 @@ class CTraderCaptureCoreTests(unittest.TestCase):
     def test_27_actual_runtime_adapter_import_and_sdk_heartbeat_smoke(self):
         import m6.ctrader_openapi as runtime
         report = runtime.runtime_sdk_preflight()
-        self.assertEqual(report["ctrader_open_api_version"], "0.9.2")
+        self.assertEqual(report["ctrader_open_api_version"], "PROTO_MESSAGES_VENDOR_0.9.2")
+        self.assertEqual(report["transport"], "python_stdlib_ssl_socket")
         self.assertTrue(report["tcp_protocol_heartbeat_available"])
-        self.assertTrue(report["sdk_idle_heartbeat_path_verified"])
+        self.assertFalse(report["twisted_required"])
+        self.assertFalse(report["pyopenssl_required"])
+        self.assertFalse(report["cryptography_required"])
+        self.assertFalse(report["rust_required"])
         self.assertFalse(report["network_connection_attempted"])
         self.assertFalse(report["credentials_used"])
 
@@ -434,7 +439,7 @@ class CTraderCaptureCoreTests(unittest.TestCase):
 
     def test_29_workflow_installs_runtime_imports_preflights_and_builds_package(self):
         workflow = (ROOT / ".github/workflows/m6_preparation.yml").read_text(encoding="utf-8")
-        self.assertIn("pip install -r tools/requirements-m6-capture.txt", workflow)
+        self.assertIn("pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt", workflow)
         self.assertIn("python -m py_compile", workflow)
         self.assertIn("runtime_sdk_preflight", workflow)
         self.assertIn("RUNTIME_PREFLIGHT_PASS", workflow)
@@ -469,7 +474,7 @@ class CTraderCaptureCoreTests(unittest.TestCase):
 
     def test_31_clean_oauth_has_no_legacy_auth_import(self):
         source = (ROOT / "m6/pydroid_oauth.py").read_text(encoding="utf-8")
-        self.assertIn("m6_ctrader_capture_clean_v1", source)
+        self.assertIn("m6_ctrader_capture_clean_v2", source)
         self.assertNotIn("a118_c02_openapi_v1", source)
         self.assertNotIn("LEGACY_APP_STATE_PATH", source)
         self.assertNotIn("SCOPE_VIEW", source)
@@ -478,7 +483,7 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         source = (ROOT / "m6/pydroid_oauth.py").read_text(encoding="utf-8")
         ensure = source[source.index("def ensure_v2_authorization()") :]
         self.assertIn("_fresh_browser_authorization()", ensure)
-        self.assertIn("FRESH_CLEAN_BROWSER_AUTHORIZATION", ensure)
+        self.assertIn("FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION", ensure)
         self.assertIn("ru.iiec.pydroid3", source)
         self.assertIn("intent://#Intent;package=ru.iiec.pydroid3;end", source)
 
@@ -526,6 +531,29 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
         self.assertFalse(cp["account_target"]["demo_used_for_capture"])
         self.assertFalse(cp["account_target"]["balance_used_as_selection_criterion"])
+        actual = cp["actual_execution"]
+        self.assertFalse(actual["broker_capture_run"])
+        self.assertFalse(actual["m6_economics_run"])
+        self.assertEqual(actual["economic_outcomes_opened"], 0)
+        self.assertEqual(actual["v2_attempts_used"], 0)
+        self.assertEqual(actual["result_recorded"], 0)
+        self.assertFalse(actual["protected_evidence_opened"])
+        self.assertFalse(actual["live_orders"])
+        self.assertFalse(actual["competition_start"])
+
+
+    def test_36_android_safe_checkpoint_preserves_zero_economics(self):
+        cp = load(CHECKPOINT_V6_PATH)
+        self.assertEqual(cp["staging_parent_head"], "9e6a5176f13ab3e13d08f084f1a6fd9815a1b0b9")
+        self.assertEqual(cp["android_runtime"]["python_target"], "3.13")
+        self.assertEqual(cp["android_runtime"]["only_pip_dependency"], "protobuf==3.20.1")
+        self.assertFalse(cp["android_runtime"]["twisted"])
+        self.assertFalse(cp["android_runtime"]["pyopenssl"])
+        self.assertFalse(cp["android_runtime"]["cryptography"])
+        self.assertFalse(cp["android_runtime"]["rust"])
+        self.assertEqual(cp["transport"]["implementation"], "PYTHON_STDLIB_SSL_SOCKET")
+        self.assertEqual(cp["oauth"]["scope"], "accounts")
+        self.assertEqual(cp["account_target"]["environment"], "Pepperstone - Europe LIVE")
         actual = cp["actual_execution"]
         self.assertFalse(actual["broker_capture_run"])
         self.assertFalse(actual["m6_economics_run"])
