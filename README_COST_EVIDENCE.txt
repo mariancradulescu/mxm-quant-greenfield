@@ -69,3 +69,20 @@ The first V3 user run blocked safely before any completed chunk because the olde
 incorrectly rejected negative timestamp deltas. The corrected package bumps TOOL_VERSION,
 so any prior V3 work directory is contract-mismatched, archived automatically, and the
 corrected run starts clean. Do not reuse the old package.
+
+
+V3 PIPELINED THROUGHPUT OPTIMIZATION:
+The raw acquisition contract is unchanged. The collector now keeps up to 16 independent
+historical tick-page requests in flight over ONE Pepperstone LIVE cTrader TLS connection.
+Requests are serialized at 0.21 seconds between sends (the official historical ceiling is
+5 requests/second/connection), then responses are drained and correlated by clientMsgId.
+
+This replaces the old SEND -> WAIT RESPONSE -> NEXT SEND pattern that achieved only about
+1.7-2.3 completed requests/second in the user's live run. It does not add another LIVE
+connection, does not change symbols, dates, BID/ASK semantics, pagination, hashes, boundary
+evidence, candidate semantics, or economics.
+
+The stopped V3_TICKDELTA1 run can be resumed safely. Before reuse, every recorded chunk is
+SHA256-verified and the complete V3 semantic resume contract must match exactly except for
+the tool version. If any semantic field or chunk hash differs, migration is refused and the
+existing work is archived instead of silently reused.
