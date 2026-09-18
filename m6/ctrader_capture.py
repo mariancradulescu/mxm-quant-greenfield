@@ -415,6 +415,8 @@ def resolve_or_select_symbol_mapping(
     light_symbols: Sequence[Mapping[str, Any]],
     *,
     assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    categories_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    asset_classes_by_id: Mapping[int, Mapping[str, Any]] | None = None,
     saved_override: Mapping[str, Any] | None = None,
     selector: Any = None,
     clear_saved: Any = None,
@@ -513,27 +515,93 @@ C011_ACTIVE_SPEC_HASH = "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810
 C011_SEMANTIC_REQUIREMENTS_SHA256 = "e36c32a8948342f8760164efc7e8b90ebbd54b01374537d50432a50039270e8f"
 MAPPING_POLICY_GENERIC = "GENERIC_STRUCTURAL_IDENTITY"
 MAPPING_POLICY_US_EQUITY_CASH = "COMMON_EXECUTABLE_US_EQUITY_CASH_SESSION"
+MAPPING_POLICY_INDEX_CASH_CFD = "CASH_INDEX_CFD_FULL_FEED_WITH_CANDIDATE_CASH_SESSION_FILTER"
+MAPPING_POLICY_NON_FUTURES_CFD = "NON_FUTURES_BROKER_PRODUCT"
+
+C006_ACTIVE_SPEC_HASH = "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49"
+C012_ACTIVE_SPEC_HASH = "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+C006_SEMANTIC_REQUIREMENTS_SHA256 = "e24de813748d345e1a68cddb7253e5fc4f8279431b82c9e387d9a5e5f4215765"
+C012_SEMANTIC_REQUIREMENTS_SHA256 = "9385ea17a8f3e1e5868f16b9c394b7207b7027330cd41e2e11ada2b17e0c7859"
+C007_ACTIVE_SPEC_HASH = "d0e35a07a4b947aee5114dbf8f8bdd226ae525781cc54be12cfbf2a18e1d2fba"
+C008_ACTIVE_SPEC_HASH = "2df6728c2a9fe135f5a6908301a5378234a2ab08cb0c93046c3290c38f766370"
+C009_ACTIVE_SPEC_HASH = "f276ade8d32e17957ab036676c14c913fa8825d8c1254c994249224c79f38856"
+C010_ACTIVE_SPEC_HASH = "810670fbe6ed57c704a499c32799e6750417a431928eb55f8766b1ff87e46fc1"
+C007_SEMANTIC_REQUIREMENTS_SHA256 = "b2d60e44f97adf79a8ec52c65d397f871af4a7053601329816cb449070000d8a"
+C008_SEMANTIC_REQUIREMENTS_SHA256 = "36e609794c17d82be08aa4dae94ec0e1962925b2c495a645d976ab8cf2afa79d"
+C009_SEMANTIC_REQUIREMENTS_SHA256 = "2a326bc861506861c4446f81e45d30518dc6ddfa05df52ea955dce5d3487a6cc"
+C010_SEMANTIC_REQUIREMENTS_SHA256 = "55ddef74a91dabeca749da4bd68e59d964e8223769ba90abf9ee0f4190221fc8"
 
 
 def mapping_semantic_policy(plan: Mapping[str, Any], canonical: str) -> str:
+    """Bind broker-product selection to frozen candidate semantics only."""
     bindings = [
         item
         for item in plan.get("candidate_dataset_bindings", [])
         if item.get("canonical_instrument") == canonical
     ]
+    policies = set()
     for binding in bindings:
-        if binding.get("candidate_id") != "V2-C011":
+        candidate_id = binding.get("candidate_id")
+        spec_hash = binding.get("spec_hash")
+        semantic_hash = binding.get("semantic_requirements_sha256")
+
+        if candidate_id == "V2-C011":
+            if spec_hash != C011_ACTIVE_SPEC_HASH:
+                raise CaptureContractError(
+                    f"{canonical}: V2-C011 active spec hash mismatch during symbol mapping"
+                )
+            if semantic_hash != C011_SEMANTIC_REQUIREMENTS_SHA256:
+                raise CaptureContractError(
+                    f"{canonical}: V2-C011 semantic binding hash mismatch during symbol mapping"
+                )
+            policies.add(MAPPING_POLICY_US_EQUITY_CASH)
             continue
-        if binding.get("spec_hash") != C011_ACTIVE_SPEC_HASH:
-            raise CaptureContractError(
-                f"{canonical}: V2-C011 active spec hash mismatch during symbol mapping"
-            )
-        if binding.get("semantic_requirements_sha256") != C011_SEMANTIC_REQUIREMENTS_SHA256:
-            raise CaptureContractError(
-                f"{canonical}: V2-C011 semantic binding hash mismatch during symbol mapping"
-            )
-        return MAPPING_POLICY_US_EQUITY_CASH
-    return MAPPING_POLICY_GENERIC
+
+        if candidate_id == "V2-C006":
+            if spec_hash != C006_ACTIVE_SPEC_HASH:
+                raise CaptureContractError(
+                    f"{canonical}: V2-C006 active spec hash mismatch during symbol mapping"
+                )
+            if semantic_hash != C006_SEMANTIC_REQUIREMENTS_SHA256:
+                raise CaptureContractError(
+                    f"{canonical}: V2-C006 semantic binding hash mismatch during symbol mapping"
+                )
+            policies.add(MAPPING_POLICY_INDEX_CASH_CFD)
+            continue
+
+        if candidate_id == "V2-C012":
+            if spec_hash != C012_ACTIVE_SPEC_HASH:
+                raise CaptureContractError(
+                    f"{canonical}: V2-C012 active spec hash mismatch during symbol mapping"
+                )
+            if semantic_hash != C012_SEMANTIC_REQUIREMENTS_SHA256:
+                raise CaptureContractError(
+                    f"{canonical}: V2-C012 semantic binding hash mismatch during symbol mapping"
+                )
+            policies.add(MAPPING_POLICY_INDEX_CASH_CFD)
+            continue
+
+        if candidate_id in {"V2-C007", "V2-C008", "V2-C009", "V2-C010"}:
+            expected = {
+                "V2-C007": (C007_ACTIVE_SPEC_HASH, C007_SEMANTIC_REQUIREMENTS_SHA256),
+                "V2-C008": (C008_ACTIVE_SPEC_HASH, C008_SEMANTIC_REQUIREMENTS_SHA256),
+                "V2-C009": (C009_ACTIVE_SPEC_HASH, C009_SEMANTIC_REQUIREMENTS_SHA256),
+                "V2-C010": (C010_ACTIVE_SPEC_HASH, C010_SEMANTIC_REQUIREMENTS_SHA256),
+            }[candidate_id]
+            if spec_hash != expected[0] or semantic_hash != expected[1]:
+                raise CaptureContractError(
+                    f"{canonical}: {candidate_id} frozen binding mismatch during symbol mapping"
+                )
+            policies.add(MAPPING_POLICY_NON_FUTURES_CFD)
+            continue
+
+    if not policies:
+        return MAPPING_POLICY_GENERIC
+    if len(policies) != 1:
+        raise CaptureContractError(
+            f"{canonical}: frozen candidate bindings imply conflicting broker-product policies"
+        )
+    return next(iter(policies))
 
 
 def _full_field(full_symbol: Mapping[str, Any], camel: str, snake: str | None = None, default: Any = None) -> Any:
@@ -565,13 +633,90 @@ def _normalized_schedule(full_symbol: Mapping[str, Any]) -> tuple[list[dict[str,
     return intervals, valid
 
 
+def build_symbol_category_catalog(
+    categories: Sequence[Mapping[str, Any]],
+) -> dict[int, Mapping[str, Any]]:
+    out: dict[int, Mapping[str, Any]] = {}
+    for item in categories:
+        try:
+            cid = int(item.get("id", 0) or 0)
+        except (TypeError, ValueError):
+            continue
+        if cid > 0:
+            out[cid] = item
+    return out
+
+
+def build_asset_class_catalog(
+    asset_classes: Sequence[Mapping[str, Any]],
+) -> dict[int, Mapping[str, Any]]:
+    out: dict[int, Mapping[str, Any]] = {}
+    for item in asset_classes:
+        try:
+            aid = int(item.get("id", 0) or 0)
+        except (TypeError, ValueError):
+            continue
+        if aid > 0:
+            out[aid] = item
+    return out
+
+
+def _contract_family(
+    light_symbol: Mapping[str, Any],
+    *,
+    categories_by_id: Mapping[int, Mapping[str, Any]],
+    asset_classes_by_id: Mapping[int, Mapping[str, Any]],
+) -> tuple[str, list[str]]:
+    name = _symbol_name(light_symbol)
+    description = str(light_symbol.get("description", "") or "")
+    try:
+        category_id = int(
+            light_symbol.get(
+                "symbolCategoryId",
+                light_symbol.get("symbol_category_id", 0),
+            )
+            or 0
+        )
+    except (TypeError, ValueError):
+        category_id = 0
+    category = categories_by_id.get(category_id, {})
+    category_name = str(category.get("name", "") or "")
+    try:
+        asset_class_id = int(
+            category.get("assetClassId", category.get("asset_class_id", 0)) or 0
+        )
+    except (TypeError, ValueError):
+        asset_class_id = 0
+    asset_class_name = str(asset_classes_by_id.get(asset_class_id, {}).get("name", "") or "")
+
+    evidence_text = " ".join([name, description, category_name, asset_class_name]).upper()
+    reasons: list[str] = []
+    if any(token in evidence_text for token in ("FUTURE", "FUTURES", "FORWARD", "FORWARDS")):
+        reasons.append("BROKER_CATEGORY_OR_DESCRIPTION_FUTURES_FORWARD")
+    upper_name = name.upper()
+    if upper_name.endswith("-F") or upper_name.endswith("_F") or upper_name.endswith(".F"):
+        reasons.append("BROKER_F_SUFFIX_FUTURES_FORWARD")
+    if reasons:
+        return "FUTURES_FORWARD_LIKE", sorted(set(reasons))
+
+    if "INDEX" in evidence_text or "INDICES" in evidence_text:
+        reasons.append("BROKER_CATEGORY_OR_ASSET_CLASS_INDEX")
+        return "CASH_SPOT_INDEX_CFD_LIKE", reasons
+
+    return "UNKNOWN", reasons
+
+
 def broker_product_profile(
     light_symbol: Mapping[str, Any],
     full_symbol: Mapping[str, Any] | None,
     *,
     assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    categories_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    asset_classes_by_id: Mapping[int, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     assets_by_id = assets_by_id or {}
+    categories_by_id = categories_by_id or {}
+    asset_classes_by_id = asset_classes_by_id or {}
     sid = _symbol_id(light_symbol)
     base_id = light_symbol.get("baseAssetId", light_symbol.get("base_asset_id"))
     quote_id = light_symbol.get("quoteAssetId", light_symbol.get("quote_asset_id"))
@@ -579,6 +724,30 @@ def broker_product_profile(
     quote = assets_by_id.get(int(quote_id), {}) if str(quote_id or "").isdigit() else {}
     name = _symbol_name(light_symbol)
     description = str(light_symbol.get("description", "") or "")
+    try:
+        category_id = int(
+            light_symbol.get(
+                "symbolCategoryId",
+                light_symbol.get("symbol_category_id", 0),
+            )
+            or 0
+        )
+    except (TypeError, ValueError):
+        category_id = 0
+    category = categories_by_id.get(category_id, {})
+    try:
+        asset_class_id = int(
+            category.get("assetClassId", category.get("asset_class_id", 0)) or 0
+        )
+    except (TypeError, ValueError):
+        asset_class_id = 0
+    category_name = str(category.get("name", "") or "")
+    asset_class_name = str(asset_classes_by_id.get(asset_class_id, {}).get("name", "") or "")
+    contract_family, contract_family_support = _contract_family(
+        light_symbol,
+        categories_by_id=categories_by_id,
+        asset_classes_by_id=asset_classes_by_id,
+    )
 
     if full_symbol is None:
         return {
@@ -599,7 +768,12 @@ def broker_product_profile(
             "base_asset_name": base.get("name") or base.get("displayName"),
             "quote_asset_id": quote_id,
             "quote_asset_name": quote.get("name") or quote.get("displayName"),
-            "symbol_category_id": light_symbol.get("symbolCategoryId", light_symbol.get("symbol_category_id")),
+            "symbol_category_id": category_id,
+            "symbol_category_name": category_name,
+            "asset_class_id": asset_class_id,
+            "asset_class_name": asset_class_name,
+            "contract_family": contract_family,
+            "contract_family_support": contract_family_support,
             "session_fingerprint_sha256": None,
             "product_semantic_fingerprint_sha256": None,
         }
@@ -642,7 +816,11 @@ def broker_product_profile(
     product_identity = {
         "base_asset_id": base_id,
         "quote_asset_id": quote_id,
-        "symbol_category_id": light_symbol.get("symbolCategoryId", light_symbol.get("symbol_category_id")),
+        "symbol_category_id": category_id,
+        "symbol_category_name": category_name,
+        "asset_class_id": asset_class_id,
+        "asset_class_name": asset_class_name,
+        "contract_family": contract_family,
         "session_identity": session_identity,
     }
     return {
@@ -663,7 +841,12 @@ def broker_product_profile(
         "base_asset_name": base.get("name") or base.get("displayName"),
         "quote_asset_id": quote_id,
         "quote_asset_name": quote.get("name") or quote.get("displayName"),
-        "symbol_category_id": product_identity["symbol_category_id"],
+        "symbol_category_id": category_id,
+        "symbol_category_name": category_name,
+        "asset_class_id": asset_class_id,
+        "asset_class_name": asset_class_name,
+        "contract_family": contract_family,
+        "contract_family_support": contract_family_support,
         "min_volume": _full_field(full_symbol, "minVolume", "min_volume"),
         "max_volume": _full_field(full_symbol, "maxVolume", "max_volume"),
         "step_volume": _full_field(full_symbol, "stepVolume", "step_volume"),
@@ -685,6 +868,8 @@ def profiled_mapping_candidates(
     full_by_id: Mapping[int, Mapping[str, Any]],
     *,
     assets_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    categories_by_id: Mapping[int, Mapping[str, Any]] | None = None,
+    asset_classes_by_id: Mapping[int, Mapping[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     rows = discovery.get("credible_candidates") or discovery.get("related_candidates") or []
     profiles = []
@@ -694,7 +879,13 @@ def profiled_mapping_candidates(
         if light is None:
             continue
         profiles.append(
-            broker_product_profile(light, full_by_id.get(sid), assets_by_id=assets_by_id)
+            broker_product_profile(
+                light,
+                full_by_id.get(sid),
+                assets_by_id=assets_by_id,
+                categories_by_id=categories_by_id,
+                asset_classes_by_id=asset_classes_by_id,
+            )
         )
     return profiles
 
@@ -719,6 +910,9 @@ def format_broker_product_profiles(
             f"session={profile.get('session_class')} | "
             f"{hours_text} | {max_text} | "
             f"tz={profile.get('schedule_timezone') or '-'} | "
+            f"category={profile.get('symbol_category_name') or '-'} | "
+            f"assetClass={profile.get('asset_class_name') or '-'} | "
+            f"family={profile.get('contract_family') or '-'} | "
             f"short={profile.get('enable_short_selling')} | "
             f"tradingMode={profile.get('trading_mode')}"
         )
@@ -739,7 +933,12 @@ def resolve_profiled_broker_product(
 ) -> tuple[Mapping[str, Any], Mapping[str, Any], str, str, list[dict[str, Any]]]:
     policy = mapping_semantic_policy(plan, canonical)
     profiles = profiled_mapping_candidates(
-        discovery, light_symbols, full_by_id, assets_by_id=assets_by_id
+        discovery,
+        light_symbols,
+        full_by_id,
+        assets_by_id=assets_by_id,
+        categories_by_id=categories_by_id,
+        asset_classes_by_id=asset_classes_by_id,
     )
     by_id = {int(profile["symbol_id"]): profile for profile in profiles}
 
@@ -754,6 +953,12 @@ def resolve_profiled_broker_product(
                 if saved_profile.get("session_class") != "US_CASH_SESSION_LIKE":
                     raise MappingError(
                         f"{canonical}: saved broker product violates frozen cash-session semantics"
+                    )
+            elif policy in {MAPPING_POLICY_INDEX_CASH_CFD, MAPPING_POLICY_NON_FUTURES_CFD}:
+                if saved_profile.get("contract_family") == "FUTURES_FORWARD_LIKE":
+                    raise MappingError(
+                        f"{canonical}: saved broker product is futures/forward-like but frozen "
+                        "raw identity requires a non-futures broker product"
                     )
             else:
                 current_fp = saved_profile.get("product_semantic_fingerprint_sha256")
@@ -795,6 +1000,82 @@ def resolve_profiled_broker_product(
         if light is None:
             raise MappingError(f"{canonical}: selected cash-session product disappeared")
         return light, profile, "AUTO_FROZEN_C011_CASH_SESSION", policy, profiles
+
+    if policy == MAPPING_POLICY_INDEX_CASH_CFD:
+        if any(not p.get("full_metadata_available") for p in profiles):
+            raise MappingError(
+                f"{canonical}: full LIVE metadata missing for at least one same-underlying "
+                "index broker product; cash-index selection cannot be proven"
+            )
+        non_futures = [
+            p
+            for p in valid_profiles
+            if p.get("contract_family") != "FUTURES_FORWARD_LIKE"
+        ]
+        explicit_cash_index = [
+            p
+            for p in non_futures
+            if p.get("contract_family") == "CASH_SPOT_INDEX_CFD_LIKE"
+        ]
+        compatible = explicit_cash_index or non_futures
+        exact_name = [
+            p
+            for p in compatible
+            if str(p.get("symbol_name", "")).upper() == str(canonical).upper()
+        ]
+        if len(exact_name) == 1:
+            compatible = exact_name
+        if len(compatible) != 1:
+            raise MappingError(
+                f"{canonical}: frozen index-CFD requirements require one current LIVE "
+                f"non-futures broker product; found {len(compatible)}"
+            )
+        profile = compatible[0]
+        light = _find_symbol_by_id(light_symbols, int(profile["symbol_id"]))
+        if light is None:
+            raise MappingError(f"{canonical}: selected cash index product disappeared")
+        return (
+            light,
+            profile,
+            "AUTO_FROZEN_INDEX_CASH_CFD",
+            policy,
+            profiles,
+        )
+
+    if policy == MAPPING_POLICY_NON_FUTURES_CFD:
+        if any(not p.get("full_metadata_available") for p in profiles):
+            raise MappingError(
+                f"{canonical}: full LIVE metadata missing for at least one same-underlying "
+                "broker product; non-futures selection cannot be proven"
+            )
+        compatible = [
+            p
+            for p in valid_profiles
+            if p.get("contract_family") != "FUTURES_FORWARD_LIKE"
+        ]
+        exact_name = [
+            p
+            for p in compatible
+            if str(p.get("symbol_name", "")).upper() == str(canonical).upper()
+        ]
+        if len(exact_name) == 1:
+            compatible = exact_name
+        if len(compatible) != 1:
+            raise MappingError(
+                f"{canonical}: frozen requirements require one current LIVE non-futures "
+                f"broker product; found {len(compatible)}"
+            )
+        profile = compatible[0]
+        light = _find_symbol_by_id(light_symbols, int(profile["symbol_id"]))
+        if light is None:
+            raise MappingError(f"{canonical}: selected non-futures product disappeared")
+        return (
+            light,
+            profile,
+            "AUTO_FROZEN_NON_FUTURES_PRODUCT",
+            policy,
+            profiles,
+        )
 
     credible_ids = {
         int(row["symbol_id"]) for row in discovery.get("credible_candidates", [])
@@ -857,6 +1138,8 @@ TRANSFERABLE_REQUIRED_FILES = frozenset({
     "evidence/broker_mapping.json",
     "evidence/symbol_metadata_current.json",
     "evidence/assets.json",
+    "evidence/symbol_categories.json",
+    "evidence/asset_classes.json",
     "evidence/expected_margin.json",
     "evidence/auxiliary_status.json",
     "evidence/gap_diagnostics.json",

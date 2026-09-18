@@ -44,6 +44,8 @@ from .ctrader_capture import (
     select_live_pepperstone_account,
     sha256_bytes,
     build_asset_catalog,
+    build_asset_class_catalog,
+    build_symbol_category_catalog,
     sha256_file,
     validate_capture_plan,
     validate_transferable_bundle,
@@ -54,11 +56,13 @@ from .ctrader_capture import (
 from .ctrader_proto.OpenApiMessages_pb2 import (
     ProtoOAAccountAuthReq,
     ProtoOAApplicationAuthReq,
+    ProtoOAAssetClassListReq,
     ProtoOAAssetListReq,
     ProtoOAExpectedMarginReq,
     ProtoOAGetAccountListByAccessTokenReq,
     ProtoOAGetTrendbarsReq,
     ProtoOASymbolByIdReq,
+    ProtoOASymbolCategoryListReq,
     ProtoOASymbolsForConversionReq,
     ProtoOASymbolsListReq,
     ProtoOATraderReq,
@@ -140,6 +144,8 @@ class OpenApiCaptureRunner:
         self._conversion_raw_results: dict[str, Any] = {}
         self._account_evidence: dict[str, Any] = {}
         self._assets: list[dict[str, Any]] = []
+        self._symbol_categories: list[dict[str, Any]] = []
+        self._asset_classes: list[dict[str, Any]] = []
 
         self._run_started_monotonic = time.monotonic()
         self._historical_started_monotonic: float | None = None
@@ -389,6 +395,20 @@ class OpenApiCaptureRunner:
         )
         self._assets = [_plain(a) for a in assets_res.asset]
 
+        categories_res = self._send(
+            ProtoOASymbolCategoryListReq(ctidTraderAccountId=account_id)
+        )
+        self._symbol_categories = [
+            _plain(x) for x in categories_res.symbolCategory
+        ]
+
+        asset_classes_res = self._send(
+            ProtoOAAssetClassListReq(ctidTraderAccountId=account_id)
+        )
+        self._asset_classes = [
+            _plain(x) for x in asset_classes_res.assetClass
+        ]
+
         self._stage("[2/5] Profiling and resolving Pepperstone LIVE broker products")
         symbols_res = self._send(
             ProtoOASymbolsListReq(
@@ -398,6 +418,8 @@ class OpenApiCaptureRunner:
         )
         light = [_plain(s) for s in symbols_res.symbol]
         assets_by_id = build_asset_catalog(self._assets)
+        categories_by_id = build_symbol_category_catalog(self._symbol_categories)
+        asset_classes_by_id = build_asset_class_catalog(self._asset_classes)
         overrides = self.config.get("symbol_overrides") or {}
         selector = self.config.get("symbol_selector")
         saver = self.config.get("symbol_override_saver")
@@ -441,6 +463,8 @@ class OpenApiCaptureRunner:
                 light,
                 full_plain_by_id,
                 assets_by_id=assets_by_id,
+                categories_by_id=categories_by_id,
+                asset_classes_by_id=asset_classes_by_id,
                 saved_override=overrides.get(canonical),
                 selector=selector,
                 clear_saved=clearer,
@@ -951,6 +975,14 @@ class OpenApiCaptureRunner:
         atomic_write_json(
             evidence / "assets.json",
             self._assets,
+        )
+        atomic_write_json(
+            evidence / "symbol_categories.json",
+            self._symbol_categories,
+        )
+        atomic_write_json(
+            evidence / "asset_classes.json",
+            self._asset_classes,
         )
         atomic_write_json(
             evidence / "expected_margin.json",

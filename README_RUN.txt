@@ -86,3 +86,28 @@ them.
 
 Current schedule metadata is mapping evidence only; it is never relabelled as historical
 session truth.
+
+
+INDEX / FUTURES PRODUCT-FAMILY GATE
+-----------------------------------
+The broker mapping stage now obtains the current cTrader Symbol Category and Asset Class
+catalogs in addition to the full symbol schedule.
+
+Products on the same underlying are not treated as aliases merely because their prices
+refer to the same market. In particular, a cash/spot index CFD and a futures/forward CFD
+are separate broker products.
+
+For frozen V2-C006/V2-C012, raw US500/NAS100 acquisition uses the non-futures cash index
+CFD product. The broker-native feed may trade for extended hours; candidate cash-session
+rules are a separate semantic binding and are NOT inferred from total weekly broker
+hours.
+
+For frozen V2-C007/V2-C008/V2-C009/V2-C010, a futures/forward product is likewise not
+silently substituted for the frozen spot/continuous/non-futures identity.
+
+A local user choice is never used to choose between products with different
+contract/session semantics. Such differences are resolved by frozen semantics + current
+LIVE structural broker evidence or fail closed.
+
+Current category/schedule/holiday metadata is captured as current mapping evidence only.
+It is not promoted to historical truth.

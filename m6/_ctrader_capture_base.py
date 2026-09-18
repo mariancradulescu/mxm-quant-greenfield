@@ -39,6 +39,8 @@ READ_ONLY_PROTO_REQUESTS = frozenset({
     "ProtoOAVersionReq",
     "ProtoOATraderReq",
     "ProtoOAAssetListReq",
+    "ProtoOAAssetClassListReq",
+    "ProtoOASymbolCategoryListReq",
     "ProtoOASymbolsListReq",
     "ProtoOASymbolByIdReq",
     "ProtoOASymbolsForConversionReq",
