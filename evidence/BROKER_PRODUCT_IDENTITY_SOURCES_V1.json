@@ -1,0 +1,172 @@
+{
+  "schema": "mxm.greenfield.v2.broker-product-identity-sources.v1",
+  "retrieved_utc": "2026-09-18T06:29:00Z",
+  "classification": "CURRENT_PUBLIC_STRUCTURAL_EVIDENCE_ONLY_NOT_HISTORICAL_2022_2026_TRUTH",
+  "sources": [
+    {
+      "source_id": "CTRADER_GETTING_STARTED_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "Getting started - Open API",
+      "url": "https://help.ctrader.com/open-api/",
+      "purpose": ["RATE_LIMITS", "OPEN_API_CURRENT_REFERENCE"],
+      "current_vs_historical": "CURRENT_API_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Maximum 50 non-historical requests per second per connection.",
+        "Maximum 5 historical requests per second per connection."
+      ],
+      "snapshot_reference": "official current documentation; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "CTRADER_MESSAGES_PROTO_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "OpenApiMessages.proto",
+      "url": "https://github.com/spotware/openapi-proto-messages/blob/main/OpenApiMessages.proto",
+      "purpose": ["MESSAGE_SCHEMA", "ARCHIVED_SYMBOLS", "CONVERSION", "EXPECTED_MARGIN", "TRENDBARS", "TICKS"],
+      "current_vs_historical": "CURRENT_PROTOCOL_SCHEMA",
+      "exact_facts_supported": [
+        "ProtoOASymbolsListReq supports includeArchivedSymbols.",
+        "ProtoOASymbolsListRes returns current light symbols and archived-symbol records.",
+        "ProtoOASymbolByIdReq/Res returns full symbol entities and can return archived-symbol records.",
+        "ProtoOASymbolsForConversionReq/Res returns broker conversion-chain symbols.",
+        "ProtoOAExpectedMarginReq is a margin-estimation request and does not place an order.",
+        "ProtoOAGetTrendbarsReq and ProtoOAGetTickDataReq provide historical market-data requests."
+      ],
+      "snapshot_reference": "Spotware maintained openapi-proto-messages main; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "CTRADER_MODEL_PROTO_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "OpenApiModelMessages.proto",
+      "url": "https://github.com/spotware/openapi-proto-messages/blob/main/OpenApiModelMessages.proto",
+      "purpose": ["LIGHT_SYMBOL", "FULL_SYMBOL", "ARCHIVED_SYMBOL", "TREND_BAR", "QUOTE_TYPE"],
+      "current_vs_historical": "CURRENT_PROTOCOL_SCHEMA",
+      "exact_facts_supported": [
+        "Current model schema defines light, full and archived symbol structures used by structural mapping.",
+        "Trendbar timestamps identify bar-open time; bar completion must be enforced by the capture client.",
+        "Historical tick quote type distinguishes BID and ASK."
+      ],
+      "snapshot_reference": "Spotware maintained openapi-proto-messages main; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "CTRADER_HEARTBEAT_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "Open API FAQ",
+      "url": "https://help.ctrader.com/open-api/faq/",
+      "purpose": ["HEARTBEAT", "RATE_LIMIT_BACKOFF"],
+      "current_vs_historical": "CURRENT_API_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Send a heartbeat at least once every 10 seconds to avoid inactivity disconnects.",
+        "HTTP/protocol rate-limit errors require respecting the current request-rate limitations."
+      ],
+      "snapshot_reference": "official current documentation; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_INDEX_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Index CFD trading: trade global indices",
+      "url": "https://pepperstone.com/en/markets/indices",
+      "purpose": ["US500_IDENTITY", "NAS100_IDENTITY", "INDEX_FORWARD_DISTINCTION"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "US500 and NAS100 are listed as standard index CFDs.",
+        "US500-F and NAS100-F are separately listed futures/forwards-style products."
+      ],
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_FORWARD_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Index/commodity futures-forward trading-hours table",
+      "url": "https://pepperstone.com/en/markets/indices",
+      "purpose": ["FORWARD_SUFFIX_AND_FAMILY"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Crude-F and Brent-F are separately listed forward/futures-style energy CFDs.",
+        "XAUUSD-F is separately listed as a forward/futures-style gold CFD."
+      ],
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_SHARE_24H_CURRENT",
+      "organization": "Pepperstone",
+      "title": "24-hour share CFDs",
+      "url": "https://pepperstone.com/en/markets/shares/24-hour-trading",
+      "purpose": ["STANDARD_VS_EXTENDED_SHARE_IDENTITY"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Pepperstone uses the -24 suffix for 24-hour share products.",
+        "AAPL.US is described as the cash-session product while AAPL.US-24 trades 24/5."
+      ],
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_US_SHARES_CURRENT",
+      "organization": "Pepperstone Europe",
+      "title": "US Share CFD Trading",
+      "url": "https://pepperstone.com/en-eu/trading/instruments/share-cfds/us-shares/",
+      "purpose": ["C011_CURRENT_SHARE_FAMILY", "EXTENDED_VARIANTS"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Pepperstone Europe lists US share CFDs and separate -24 extended-hours variants including AAPL, MSFT, NVDA, AMZN and META."
+      ],
+      "snapshot_reference": "official Pepperstone Europe product page; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_PERPETUAL_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Perpetual CFDs: trade 24/7 with no expiry",
+      "url": "https://pepperstone.com/en/markets/perpetual-cfds",
+      "purpose": ["PERPETUAL_PRODUCT_DISTINCTION"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "Perpetual CFDs are a distinct product family with no expiry.",
+        "Current perpetual range includes equity indices such as NAS100/SP500, commodities such as WTI/BRENT/Gold, and selected individual equities."
+      ],
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_BTCUSD_CURRENT",
+      "organization": "Pepperstone",
+      "title": "BTC/USD",
+      "url": "https://pepperstone.com/en/markets/cryptocurrencies/btc-usd",
+      "purpose": ["BTCUSD_STANDARD_CRYPTO_CFD_IDENTITY"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "BTC/USD is offered as a standard cryptocurrency CFD product."
+      ],
+      "snapshot_reference": "official Pepperstone current product page; retrieved 2026-09-18",
+      "content_hash": null
+    },
+    {
+      "source_id": "PEPPERSTONE_FX_CURRENT",
+      "organization": "Pepperstone Europe",
+      "title": "Pepperstone Europe market overview",
+      "url": "https://pepperstone.com/en-eu/",
+      "purpose": ["AUDJPY_STANDARD_FX_IDENTITY"],
+      "current_vs_historical": "CURRENT_PRODUCT_DOCUMENTATION",
+      "exact_facts_supported": [
+        "AUD/JPY is listed among Pepperstone's current FX instruments."
+      ],
+      "snapshot_reference": "official Pepperstone Europe page; retrieved 2026-09-18",
+      "content_hash": null
+    }
+  ],
+  "protobuf_packaged_schema_note": {
+    "repository_runtime_provenance": "spotware/OpenApiPy tag 0.9.2 generated messages",
+    "current_official_schema_authority": "spotware/openapi-proto-messages main + cTrader Open API documentation",
+    "required_message_presence_checked": true,
+    "required_messages_missing_from_packaged_runtime": [],
+    "generated_message_files_replaced": false,
+    "reason_not_replaced": "All read-only messages required by this checkpoint are present in the packaged Android-safe schema. Runtime structural fields are fail-closed; provenance age is documented rather than cosmetically regenerating generated code without a demonstrated schema requirement."
+  },
+  "historical_truth_warning": "These sources corroborate CURRENT product/API identity only. They do not establish point-in-time Pepperstone product, roll, session, financing, corporate-action or short-eligibility state for 2022-2026."
+}
