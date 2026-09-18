@@ -419,7 +419,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         e = load("evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json")
         self.assertEqual(
             e["corrected_runtime"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
         )
         self.assertEqual(e["corrected_runtime"]["max_initial_batch_size"], 4)
         self.assertEqual(
@@ -473,6 +473,19 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertEqual(state["v2_attempts_used"], 0)
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["m6"]["economics_run"])
+
+
+    def test_30_pipeline3_accepts_hash_verified_pipeline2_resume_lineage(self):
+        runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
+        self.assertIn(
+            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"',
+            runtime,
+        )
+        state = load("CURRENT_STATE.json")
+        self.assertIn(
+            "PIPELINE2",
+            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["resume_after_dns_correction"],
+        )
 
 
 
