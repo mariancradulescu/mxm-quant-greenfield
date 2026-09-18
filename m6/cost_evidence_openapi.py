@@ -29,6 +29,7 @@ from .cost_evidence import (
     first_any_quote_event_at_or_after,
     first_both_sides_refreshed_diagnostic,
     first_tick_at_or_after,
+    migrate_compatible_resume_tool_version,
     next_tick_page_to_ms,
     prepare_contract_bound_resume,
     signal_blind_cash_session_windows,
@@ -61,8 +62,9 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
+PIPELINE_BATCH_SIZE = 16
 
 
 def _plain(message: Any) -> dict[str, Any]:
@@ -112,6 +114,17 @@ class CostEvidenceRunner:
             self.plan_path, tool_version=TOOL_VERSION
         )
         self.work_dir=self.repo_root/".m6_cost_evidence_work"/"tier1_us500_nas100_v3"
+        (
+            self._resume_tool_migrated,
+            self._resume_migrated_chunks,
+            self._resume_previous_tool_version,
+        )=migrate_compatible_resume_tool_version(
+            self.work_dir,
+            self.resume_contract,
+            allowed_previous_tool_versions=(
+                "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
+            ),
+        )
         self.resume_path,self.resume,self._archived_resume_dir=prepare_contract_bound_resume(
             self.work_dir,self.resume_contract
         )
@@ -184,6 +197,43 @@ class CostEvidenceRunner:
                     last=reconnect_exc
         raise CaptureContractError(
             f"{type(request).__name__} failed after {retries} attempts: {redact_text(str(last))}"
+        )
+
+    def _send_historical_batch(self, requests, retries=3):
+        """Send a bounded historical batch over one LIVE connection near the 5 req/s ceiling."""
+        if not requests:
+            return []
+        last=None
+        for attempt in range(1,retries+1):
+            try:
+                responses=self.transport.request_batch(
+                    list(requests),
+                    timeout=90,
+                    min_interval_seconds=HISTORICAL_MIN_INTERVAL_SECONDS,
+                )
+                for response in responses:
+                    if type(response).__name__=="ProtoOAErrorRes":
+                        raise CaptureContractError(
+                            f"cTrader API error: {getattr(response,'errorCode','UNKNOWN')}"
+                        )
+                self._historical_requests+=len(requests)
+                return responses
+            except Exception as exc:
+                last=exc
+                if attempt>=retries:
+                    break
+                delay=min(8.0,float(2**(attempt-1)))
+                self._stage(
+                    f"[PIPELINE RETRY] batch {attempt}/{retries}; reconnect in {delay:.0f}s"
+                )
+                time.sleep(delay)
+                try:
+                    self.transport.close()
+                    self._restore()
+                except Exception as reconnect_exc:
+                    last=reconnect_exc
+        raise CaptureContractError(
+            f"historical request batch failed after {retries} attempts: {redact_text(str(last))}"
         )
 
     def _authenticate_and_verify_targets(self)->int:
@@ -331,27 +381,160 @@ class CostEvidenceRunner:
 
     def _capture_all(self,account_id:int)->list[dict[str,Any]]:
         self._stage(
-            f"[2/3] Capturing historical BID/ASK | {len(self.windows)} weekday cash-session envelopes | "
-            "US500/NAS100 | signal-blind"
+            f"[2/3] Capturing historical BID/ASK PIPELINED | {len(self.windows)} weekday cash-session envelopes | "
+            f"US500/NAS100 | batch {PIPELINE_BATCH_SIZE} | signal-blind"
         )
-        total=len(self.windows)*len(TIER1_SYMBOLS)*len(QUOTE_TYPES)
-        completed=0
-        records=[]
+        tasks=[]
         for canonical in ("US500","NAS100"):
             for quote_type in ("BID","ASK"):
                 for window in self.windows:
-                    record=self._capture_chunk(account_id,canonical,quote_type,window)
-                    records.append(record)
+                    tasks.append((canonical,quote_type,window))
+
+        total=len(tasks)
+        record_by_key={}
+        missing=[]
+        completed=0
+
+        for canonical,quote_type,window in tasks:
+            key=_tick_chunk_key(canonical,quote_type,window.session_date)
+            path=self._chunk_path(canonical,quote_type,window.session_date)
+            saved=self.resume["completed"].get(key)
+            if isinstance(saved,dict) and verified_resume_chunk(path,str(saved.get("sha256") or "")):
+                self._reused_chunks+=1
+                record_by_key[key]=dict(saved)
+                completed+=1
+            else:
+                missing.append((canonical,quote_type,window))
+
+        if self._resume_tool_migrated:
+            self._stage(
+                f"[RESUME MIGRATED] {self._resume_migrated_chunks} verified chunks preserved "
+                f"from {self._resume_previous_tool_version} -> {TOOL_VERSION}"
+            )
+
+        def new_state(task):
+            canonical,quote_type,window=task
+            validate_tick_request_window(window.from_ms,window.to_ms)
+            return {
+                "symbol":canonical,
+                "quote_type":quote_type,
+                "window":window,
+                "page_to":int(window.to_ms),
+                "previous_oldest":None,
+                "ticks":[],
+                "pages":0,
+                "fallback_count":0,
+            }
+
+        def finalize_state(state):
+            canonical=state["symbol"]
+            quote_type=state["quote_type"]
+            window=state["window"]
+            key=_tick_chunk_key(canonical,quote_type,window.session_date)
+            path=self._chunk_path(canonical,quote_type,window.session_date)
+            rows=canonical_tick_rows(
+                state["ticks"],
+                requested_from_ms=window.from_ms,
+                requested_to_ms=window.to_ms,
+            )
+            payload=tick_csv_bytes(rows)
+            atomic_write_bytes(path,payload)
+            record={
+                "key":key,
+                "symbol":canonical,
+                "symbol_id":int(TIER1_SYMBOLS[canonical]["symbol_id"]),
+                "quote_type":quote_type,
+                "session_date":window.session_date,
+                "from_ms":window.from_ms,
+                "to_ms":window.to_ms,
+                "row_count":len(rows),
+                "page_count":state["pages"],
+                "pagination_boundary_fallback_count":state["fallback_count"],
+                "sha256":hashlib.sha256(payload).hexdigest(),
+            }
+            self.resume["completed"][key]=record
+            atomic_write_json(self.resume_path,self.resume)
+            return record
+
+        cursor=0
+        active=[]
+        while cursor<len(missing) or active:
+            while cursor<len(missing) and len(active)<PIPELINE_BATCH_SIZE:
+                active.append(new_state(missing[cursor]))
+                cursor+=1
+
+            requests=[]
+            for state in active:
+                window=state["window"]
+                requests.append(ProtoOAGetTickDataReq(
+                    ctidTraderAccountId=account_id,
+                    symbolId=int(TIER1_SYMBOLS[state["symbol"]]["symbol_id"]),
+                    type=int(QUOTE_TYPES[state["quote_type"]]),
+                    fromTimestamp=int(window.from_ms),
+                    toTimestamp=int(state["page_to"]),
+                ))
+
+            responses=self._send_historical_batch(requests)
+            keep=[]
+            for state,response in zip(active,responses):
+                state["pages"]+=1
+                page=decode_ctrader_tick_page([
+                    {"timestamp":int(x.timestamp),"tick":int(x.tick)}
+                    for x in response.tickData
+                ])
+                state["ticks"].extend(page)
+
+                done=not bool(response.hasMore)
+                if not done:
+                    if not page:
+                        raise CaptureContractError(
+                            f"{state['symbol']} {state['quote_type']} "
+                            f"{state['window'].session_date}: hasMore with empty page"
+                        )
+                    oldest=min(x.timestamp_ms for x in page)
+                    next_to=next_tick_page_to_ms(
+                        page,
+                        current_from_ms=state["window"].from_ms,
+                        previous_oldest_ms=state["previous_oldest"],
+                    )
+                    if next_to is None:
+                        done=True
+                    else:
+                        if (
+                            state["previous_oldest"] is not None
+                            and next_to==oldest-1
+                        ):
+                            state["fallback_count"]+=1
+                        if next_to>=state["page_to"]:
+                            next_to=state["page_to"]-1
+                            state["fallback_count"]+=1
+                        state["previous_oldest"]=oldest
+                        state["page_to"]=next_to
+                        if state["page_to"]<state["window"].from_ms:
+                            done=True
+
+                if done:
+                    record=finalize_state(state)
+                    record_by_key[record["key"]]=record
                     completed+=1
                     if completed==1 or completed%10==0 or completed==total:
                         elapsed=max(1e-9,time.monotonic()-self._started)
                         self.progress(
-                            f"[COST {100.0*completed/total:5.1f}%] {canonical} {quote_type} "
-                            f"{window.session_date} | chunks {completed}/{total} | "
-                            f"hist req {self._historical_requests} | "
-                            f"{self._historical_requests/elapsed:.2f} req/s | resume {self._reused_chunks}"
+                            f"[COST {100.0*completed/total:5.1f}%] {state['symbol']} "
+                            f"{state['quote_type']} {state['window'].session_date} | "
+                            f"chunks {completed}/{total} | hist req {self._historical_requests} | "
+                            f"{self._historical_requests/elapsed:.2f} req/s | "
+                            f"resume {self._reused_chunks} | inflight {len(active)}"
                         )
-        return records
+                else:
+                    keep.append(state)
+            active=keep
+
+        ordered=[]
+        for canonical,quote_type,window in tasks:
+            key=_tick_chunk_key(canonical,quote_type,window.session_date)
+            ordered.append(record_by_key[key])
+        return ordered
 
     def _write_consolidated_tape(self, symbol:str, quote_type:str)->dict[str,Any]:
         path=self.output_dir/"raw_ticks"/f"{symbol}_{quote_type}.csv"
@@ -648,6 +831,11 @@ class CostEvidenceRunner:
             self._stage(
                 f"[RESUME RESET] incompatible prior work archived as "
                 f"{self._archived_resume_dir.name}; no stale chunk was reused"
+            )
+        elif self._resume_tool_migrated:
+            self._stage(
+                f"[RESUME SAFE MIGRATION] {self._resume_migrated_chunks} chunks hash-verified; "
+                f"raw acquisition contract unchanged"
             )
         self._stage(
             "[RATE] historical tick pacing 0.21s; official ceiling 5 historical req/s/connection"
