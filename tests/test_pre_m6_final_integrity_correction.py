@@ -373,7 +373,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         )
         self.assertEqual(
             r["authorities"]["tier1_cost_plan"],
-            "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+            "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
         )
         self.assertEqual(
             r["authorities"]["tier1_cost_sources"],
