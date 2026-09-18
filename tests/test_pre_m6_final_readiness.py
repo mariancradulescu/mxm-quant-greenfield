@@ -182,11 +182,16 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         self.assertEqual(len(got),1)
         self.assertEqual(got[0][0]["time_utc"],"2025-01-08T14:30:00Z")
 
-    def test_17_reference_calendar_contains_special_closure_and_early_close(self):
-        c=load("data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V1.json")
+    def test_17_corrected_reference_calendar_contains_special_closure_and_early_closes(self):
+        c=load("data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json")
+        self.assertEqual(c["status"],"PRE_OUTCOME_CORRECTED_REFREEZE")
         self.assertIn("2025-01-09",c["closures"])
+        self.assertIn("2025-11-27",c["closures"])
+        self.assertIn("2025-12-25",c["closures"])
         self.assertIn("2022-11-25",c["early_closes"])
         self.assertIn("2025-07-03",c["early_closes"])
+        self.assertIn("2025-11-28",c["early_closes"])
+        self.assertIn("2025-12-24",c["early_closes"])
         self.assertNotIn("2026-09-17",c["closures"]+c["early_closes"])
 
     def test_18_candidate_specific_readiness_has_no_global_all_seven_gate(self):
@@ -263,7 +268,7 @@ class PreM6FinalReadinessTests(unittest.TestCase):
             "PENDING_BID_ASK_CAPTURE",
         )
 
-    def _synthetic_cash_bars(self, sessions, bars_per_session=13, current_gap=False):
+    def _synthetic_cash_bars(self, sessions, bars_per_session=26, current_gap=False):
         from datetime import date, timedelta, datetime
         from zoneinfo import ZoneInfo
         ny=ZoneInfo("America/New_York")
