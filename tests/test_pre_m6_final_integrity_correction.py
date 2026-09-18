@@ -294,6 +294,97 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
             )
             self.assertEqual(state["conservative_unknown_period_commission_bound"], "NOT_FROZEN")
 
+    def test_19_timestamp_provenance_correction_binds_git_authority(self):
+        e = load("evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json")
+        by_path = {x["artifact_path"]: x for x in e["correction_entries"]}
+        expected = {
+            "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json":
+                ("7842cdfcb1d0ce2a3f5f631a0a52593a4c8fa2f5","2026-09-18T09:08:25Z"),
+            "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json":
+                ("5e65ebbbea9a0e25824e44d7c5418d00a1f093a6","2026-09-18T09:11:42Z"),
+            "data/M6_TIER1_COST_EVIDENCE_PLAN_V1.json":
+                ("0a9a0ba31182e263effad9c739d1a75ebaa9cd8b","2026-09-18T09:16:08Z"),
+            "evidence/TIER1_COST_EVIDENCE_SOURCES_V1.json":
+                ("cc24424d3fab1e7d0e1a6d0f3e9b2cc897d23b5f","2026-09-18T09:20:29Z"),
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V1.json":
+                ("5fdf9dde9dfc32b1b711c3054b4da7c10a9c6e3d","2026-09-18T09:23:43Z"),
+        }
+        self.assertEqual(set(by_path), set(expected))
+        for path, (sha, when) in expected.items():
+            self.assertEqual(by_path[path]["introducing_commit_sha"], sha)
+            self.assertEqual(by_path[path]["actual_git_commit_utc"], when)
+            self.assertEqual(by_path[path]["semantic_order_authority"], "GIT_COMMIT_HISTORY")
+        self.assertEqual(e["research_integrity"]["economic_outcomes_seen"], 0)
+        self.assertEqual(e["research_integrity"]["attempts_consumed"], 0)
+
+    def test_20_current_state_points_only_to_corrected_active_pre_m6_authorities(self):
+        s = load("CURRENT_STATE.json")
+        self.assertEqual(s["phase"], "PRE_M6_TIER1_COST_CAPTURE_READY")
+        self.assertEqual(
+            s["future_wave_opportunity_coverage_authority"],
+            "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
+        )
+        self.assertEqual(
+            s["future_broker_structural_universe_authority"],
+            "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+        )
+        self.assertEqual(
+            s["reference_cash_session_calendar_authority"],
+            "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+        )
+        self.assertEqual(
+            s["pre_m6_readiness_authority"],
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+        )
+        self.assertEqual(
+            s["tier1_cost_evidence_plan_authority"],
+            "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+        )
+        self.assertEqual(
+            s["tier1_cost_evidence_sources_authority"],
+            "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
+        )
+        self.assertEqual(
+            s["pre_m6_timestamp_provenance_correction_authority"],
+            "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
+        )
+        self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
+        self.assertFalse(s["m6"]["economics_run"])
+        self.assertEqual(s["economic_outcomes_opened"], 0)
+        self.assertEqual(s["v2_attempts_used"], 0)
+        self.assertEqual(s["v2_evaluated_identities"], 0)
+        self.assertFalse(s["protected_evidence_opened"])
+        self.assertFalse(s["live_orders_authorized"])
+        self.assertFalse(s["competition_start_authorized"])
+
+    def test_21_active_readiness_uses_corrected_calendar_cost_plan_and_commission_state(self):
+        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json")
+        self.assertEqual(
+            r["authorities"]["reference_calendar"],
+            "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+        )
+        self.assertEqual(
+            r["authorities"]["tier1_cost_plan"],
+            "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+        )
+        self.assertEqual(
+            r["authorities"]["tier1_cost_sources"],
+            "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
+        )
+        self.assertEqual(
+            r["candidates"]["V2-C006"]["session_event_semantics"],
+            "PASS_EXACT_0930_OPEN_EXACT_PRIOR_SCHEDULED_CLOSE_FULL_26_OR_14_BAR_ATR_SESSIONS_NO_SYNTHETIC_FILL",
+        )
+        self.assertEqual(
+            r["candidates"]["V2-C006"]["discovery_cost_evidence"]["commission"],
+            "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+        )
+        self.assertEqual(
+            r["candidates"]["V2-C012"]["m6_stage_a_readiness"],
+            "BLOCKED_DISCOVERY_COST_EVIDENCE",
+        )
+        self.assertEqual(r["ready_candidates"], [])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
