@@ -80,7 +80,7 @@ class M6CaptureAcceptanceTests(unittest.TestCase):
         )
         self.assertEqual(
             s["m6"]["auxiliary_evidence"]["active_readiness_ref"],
-            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V2.json",
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json",
         )
         self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
         self.assertFalse(s["m6"]["economics_run"])
