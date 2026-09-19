@@ -6,6 +6,7 @@ from pathlib import Path
 
 from m6.cost_evidence import (
     QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
+    BoundaryQuoteIndex,
     DecodedTick,
     COST_PACKAGE_FILES,
     causal_merge_bid_ask,
@@ -296,7 +297,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(e["research_state"]["protected_evidence_opened"])
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED"',
             runtime,
         )
         self.assertIn(
@@ -325,7 +326,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_23_pipeline_tool_only_resume_migration_preserves_only_hash_verified_chunks(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -407,7 +408,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
         )
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["pipeline_batch_size"],
@@ -460,16 +461,16 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             COST_PACKAGE_FILES,
         )
 
-    def test_29_current_state_activates_compact1_finalization(self):
+    def test_29_current_state_activates_compact2_indexed_finalization(self):
         state = load("CURRENT_STATE.json")
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
         self.assertEqual(
             cap["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
         )
         self.assertEqual(
             cap["state"],
-            "RAW_CAPTURE_COMPLETE_COMPACT_FINALIZATION_PENDING_USER_RUN",
+            "RAW_CAPTURE_COMPLETE_INDEXED_COMPACT_FINALIZATION_PENDING_USER_RUN",
         )
         self.assertEqual(
             cap["historical_bid_ask"],
@@ -484,16 +485,16 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(state["m6"]["economics_run"])
 
 
-    def test_30_compact1_accepts_hash_verified_pipeline3_resume_lineage(self):
+    def test_30_compact2_accepts_hash_verified_compact1_resume_lineage(self):
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
+            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
             runtime,
         )
         state = load("CURRENT_STATE.json")
         self.assertIn(
-            "PIPELINE3_DNSCACHE1",
-            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["resume_after_compact_finalizer"],
+            "COMPACT1",
+            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["resume_after_indexed_finalizer"],
         )
 
 
@@ -530,6 +531,92 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertIn(
             '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
             runtime,
+        )
+
+
+    def test_34_indexed_boundary_lookup_matches_frozen_helpers(self):
+        bids=[
+            DecodedTick(900,1000000),
+            DecodedTick(990,1005000),
+            DecodedTick(1010,1010000),
+            DecodedTick(1040,1015000),
+        ]
+        asks=[
+            DecodedTick(850,1020000),
+            DecodedTick(995,1025000),
+            DecodedTick(1030,1030000),
+            DecodedTick(1050,1035000),
+        ]
+        boundary=1000
+        idx=BoundaryQuoteIndex(bids,asks)
+
+        expected=causal_state_at_boundary(bids,asks,boundary)
+        got=idx.causal_state_at_boundary(boundary)
+        self.assertEqual(got,expected)
+
+        self.assertEqual(
+            idx.first_post_bid(boundary),
+            first_tick_at_or_after(bids,boundary),
+        )
+        self.assertEqual(
+            idx.first_post_ask(boundary),
+            first_tick_at_or_after(asks,boundary),
+        )
+        self.assertEqual(
+            idx.first_post_any(boundary),
+            first_any_quote_event_at_or_after(bids,asks,boundary),
+        )
+
+        states=causal_merge_bid_ask(bids,asks)
+        expected_refresh=first_both_sides_refreshed_diagnostic(
+            states,boundary,diagnostic_window_ms=100
+        )
+        got_refresh=idx.both_sides_refreshed_diagnostic(
+            boundary,diagnostic_window_ms=100
+        )
+        self.assertEqual(got_refresh,expected_refresh)
+
+    def test_35_indexed_lookup_forbids_future_state_and_preserves_quote_age(self):
+        idx=BoundaryQuoteIndex(
+            [DecodedTick(900,1000000),DecodedTick(1100,1100000)],
+            [DecodedTick(950,1020000),DecodedTick(1200,1200000)],
+        )
+        state=idx.causal_state_at_boundary(1000)
+        self.assertEqual(state.bid_timestamp_ms,900)
+        self.assertEqual(state.ask_timestamp_ms,950)
+        self.assertEqual(state.bid_age_ms,100)
+        self.assertEqual(state.ask_age_ms,50)
+        self.assertNotEqual(state.bid_timestamp_ms,1100)
+        self.assertNotEqual(state.ask_timestamp_ms,1200)
+
+    def test_36_compact2_has_finalization_heartbeat_and_no_full_scan_helpers(self):
+        runtime=(ROOT/"m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
+        writer=runtime[runtime.index("def _write_boundary_quotes"):runtime.index("def _finalize")]
+        self.assertIn("BoundaryQuoteIndex(bid,ask)",writer)
+        self.assertIn("[FINALIZE HEARTBEAT]",writer)
+        self.assertIn("window_index%25==0",writer)
+        self.assertNotIn("causal_merge_bid_ask(",writer)
+        self.assertNotIn("causal_state_at_boundary(bid,ask,boundary)",writer)
+        self.assertNotIn("first_tick_at_or_after(bid,boundary)",writer)
+
+    def test_37_indexed_finalizer_correction_is_pre_outcome_and_packaged(self):
+        e=load("evidence/PRE_M6_TIER1_COMPACT_FINALIZER_INDEXING_V1.json")
+        self.assertEqual(
+            e["corrected_runtime"]["tool_version"],
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
+        )
+        self.assertFalse(e["corrected_runtime"]["raw_reacquisition"])
+        self.assertTrue(e["corrected_runtime"]["local_raw_chunks_reused"])
+        self.assertEqual(
+            e["corrected_runtime"]["boundary_lookup"],
+            "BoundaryQuoteIndex using bisect",
+        )
+        self.assertEqual(e["research_state"]["economic_outcomes_opened"],0)
+        self.assertEqual(e["research_state"]["v2_attempts_used"],0)
+        self.assertFalse(e["research_state"]["protected_evidence_opened"])
+        self.assertIn(
+            "evidence/PRE_M6_TIER1_COMPACT_FINALIZER_INDEXING_V1.json",
+            COST_PACKAGE_FILES,
         )
 
 
