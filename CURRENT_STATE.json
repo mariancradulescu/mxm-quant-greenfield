@@ -159,14 +159,14 @@
         "C011": "BLOCKED_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
       },
       "tier1_cost_capture": {
-        "state": "READY_FOR_USER_READ_ONLY_V3_QUOTE_CAPTURE_NOT_RUN",
+        "state": "RAW_CAPTURE_COMPLETE_COMPACT_FINALIZATION_PENDING_USER_RUN",
         "package_filename": "MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip",
         "returned_evidence_zip": "MXM_M6_TIER1_COST_EVIDENCE_V3.zip",
         "targets": {
           "US500": 127,
           "NAS100": 126
         },
-        "historical_bid_ask": "PENDING_USER_CAPTURE",
+        "historical_bid_ask": "CAPTURE_COMPLETE_4912_LOCAL_HASH_VERIFIED_CHUNKS",
         "causal_state_at_boundary": "IMPLEMENTED_EVIDENCE_ONLY",
         "quote_ages": "IMPLEMENTED",
         "first_post_boundary_bid": "IMPLEMENTED_EVIDENCE_ONLY",
@@ -183,12 +183,16 @@
         "commission_state": "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
         "discovery_execution_cost_rule": "PENDING_CANDIDATE_INDEPENDENT_POST_CAPTURE_CALIBRATION",
         "m6_stage_a_economics_authorized": false,
-        "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+        "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
         "last_user_run": {
-          "state": "BLOCKED_SAFELY_ON_TRANSIENT_DNS_RECONNECT_FAILURE",
-          "resume_chunks_reused": 1130,
-          "last_progress_chunks": 1170,
-          "error": "gaierror [Errno 7] No address associated with hostname",
+          "state": "RAW_CAPTURE_COMPLETE_FINALIZATION_PARTIAL_MULTI_GB_OUTPUT",
+          "chunks_completed": 4912,
+          "raw_capture_percent": 100,
+          "observed_partial_consolidated_files": [
+            "US500_BID.csv approximately 1.67 GB",
+            "US500_ASK.csv approximately 1.67 GB"
+          ],
+          "observed_boundary_temp": "US500_M15_BOUNDARY_QUOTE_EVIDENCE.csv.tmp approximately 1.90 MB",
           "economics": false,
           "outcome_opened": false,
           "attempt_consumed": false,
@@ -203,14 +207,24 @@
         "pipeline_fallback": "4_TO_2_TO_1_ON_REPEATED_BATCH_FAILURE",
         "network_recovery": "DNS_CACHE_PLUS_AUTOMATIC_TRANSPORT_RECOVERY_UP_TO_1800_SECONDS",
         "endpoint_cache": "LOCAL_WORKDIR_ONLY_NOT_RESEARCH_EVIDENCE",
-        "resume_after_dns_correction": "EXPLICIT_HASH_VERIFIED_TOOL_ONLY_MIGRATION_FROM_V3_PIPELINE2_WHEN_EXACT_V3_SEMANTIC_CONTRACT_MATCHES"
+        "resume_after_dns_correction": "EXPLICIT_HASH_VERIFIED_TOOL_ONLY_MIGRATION_FROM_V3_PIPELINE2_WHEN_EXACT_V3_SEMANTIC_CONTRACT_MATCHES",
+        "compact_transfer": {
+          "raw_consolidated_csv_files_created": false,
+          "raw_chunks_retained_locally": true,
+          "raw_chunks_embedded_in_transfer_zip": false,
+          "local_raw_chunk_count_expected": 4912,
+          "cryptographic_binding": "PER_CHUNK_SHA256_PLUS_STREAM_AND_OVERALL_ORDERED_MANIFEST_DIGESTS",
+          "transferred_boundary_files": 2,
+          "expected_transfer_scale": "MB_TO_TENS_OF_MB_NOT_MULTI_GB"
+        },
+        "resume_after_compact_finalizer": "EXPLICIT_HASH_VERIFIED_TOOL_ONLY_MIGRATION_FROM_PIPELINE3_DNSCACHE1_WHEN_EXACT_V3_SEMANTIC_CONTRACT_MATCHES"
       },
       "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
       "m6_stage_a_economics_authorized": false
     },
     "economics_run": false
   },
-  "next_action": "Run the rebuilt V3 PIPELINE3_DNSCACHE1 MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It hash-verifies and reuses current V3 chunks, caches the successfully resolved cTrader LIVE endpoint locally for DNS-failure reconnects, and automatically waits/reconnects for transient network outages. Do not edit files, do not delete work state, do not rerun accepted OHLC capture. Return only MXM_M6_TIER1_COST_EVIDENCE_V3.zip. Do not run M6 economics.",
+  "next_action": "Stop the old multi-GB finalizer. Run the rebuilt V3 COMPACT1 MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip once in Pydroid. It must reuse the already captured 4912 hash-verified local chunks, delete only the partial transfer-output directory, derive the two compact boundary-evidence files, bind all raw chunks by deterministic SHA256 manifests, and create MXM_M6_TIER1_COST_EVIDENCE_V3.zip without embedding multi-GB raw tapes. Keep .m6_cost_evidence_work on the phone. Do not rerun OHLC or M6 economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
@@ -334,5 +348,6 @@
   "pre_m6_ctrader_tick_delta_decoder_correction_authority": "evidence/PRE_M6_CTRADER_TICK_DELTA_DECODER_CORRECTION_V1.json",
   "pre_m6_tier1_pipeline_throughput_optimization_authority": "evidence/PRE_M6_TIER1_PIPELINE_THROUGHPUT_OPTIMIZATION_V1.json",
   "pre_m6_tier1_pipeline_stability_correction_authority": "evidence/PRE_M6_TIER1_PIPELINE_STABILITY_CORRECTION_V1.json",
-  "pre_m6_tier1_dns_resilient_reconnect_correction_authority": "evidence/PRE_M6_TIER1_DNS_RESILIENT_RECONNECT_CORRECTION_V1.json"
+  "pre_m6_tier1_dns_resilient_reconnect_correction_authority": "evidence/PRE_M6_TIER1_DNS_RESILIENT_RECONNECT_CORRECTION_V1.json",
+  "pre_m6_tier1_compact_transfer_finalization_authority": "evidence/PRE_M6_TIER1_COMPACT_TRANSFER_FINALIZATION_V1.json"
 }
