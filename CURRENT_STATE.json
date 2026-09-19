@@ -232,7 +232,20 @@
         "c006_global_max_role": "STRESS_DIAGNOSTIC_ONLY",
         "c012_primary_cost_application": "TRANSACTION_LOCAL_SAME_ROW",
         "c012_global_max_role": "STRESS_DIAGNOSTIC_ONLY",
-        "c012_transaction_local_cost_rule": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json"
+        "c012_transaction_local_cost_rule": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+        "raw_local_full_byte_rehash": "PASS_4912_OF_4912",
+        "raw_local_full_byte_rehash_bytes": 15653401714,
+        "raw_local_rehash_vs_resume_sha256": "4912_OF_4912_PASS",
+        "raw_local_aggregate_commitment_reconstruction": "PASS",
+        "raw_local_stream_commitment_reconstruction": "PASS",
+        "raw_bytes_external_full_rehash": false,
+        "preopen_raw_local_full_byte_rehash": "PASS_4912_OF_4912",
+        "preopen_raw_local_full_byte_rehash_bytes": 399211376,
+        "preopen_raw_local_rehash_vs_resume_sha256": "4912_OF_4912_PASS",
+        "preopen_raw_local_aggregate_commitment_reconstruction": "PASS",
+        "preopen_raw_local_stream_commitment_reconstruction": "PASS",
+        "preopen_raw_bytes_external_full_rehash": false,
+        "local_full_raw_byte_rehash_reconciliation_ref": "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json"
       },
       "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
       "m6_stage_a_economics_authorized": false,
@@ -258,7 +271,7 @@
       "results_created": false
     }
   },
-  "next_action": "First V2-C006/V2-C012 M6 Stage-A runner is PREPARED but NOT RUN. The next economic action requires a separate explicit Stage-A execution authorization; until then do not execute economics or inspect protected evidence.",
+  "next_action": "Evidence-integrity reconciliation is complete. The prepared V2-C006/V2-C012 Stage-A runner remains NOT RUN and economics remain unauthorized in this task.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
@@ -356,7 +369,7 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "FINAL_PRE_OUTCOME_TRANSACTION_LOCAL_COST_APPLICATION_FROZEN_STAGE_A_RUNNER_PREPARED",
+  "primary_run_objective": "LARGE_DATA_EVIDENCE_INTEGRITY_RECONCILED_NO_ECONOMICS",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
@@ -394,5 +407,17 @@
   "tier1_preopen_0930_supplement_acceptance_authority": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
   "c012_discovery_cost_applicability_gate_authority": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
   "tier1_discovery_transaction_local_cost_rule_authority": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
-  "m6_stage_a_tier1_runner_prep_authority": "data/M6_STAGE_A_TIER1_RUNNER_PREP_V1.json"
+  "m6_stage_a_tier1_runner_prep_authority": "data/M6_STAGE_A_TIER1_RUNNER_PREP_V1.json",
+  "large_data_audit_protocol_authority": "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V1.json",
+  "tier1_local_full_raw_byte_rehash_reconciliation_authority": "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json",
+  "large_data_audit_runtime": "m6/large_data_audit.py",
+  "large_data_audit_pydroid_entrypoint": "LARGE_DATA_AUDIT_RUN.py",
+  "large_data_audit_state": {
+    "protocol": "FROZEN_APPEND_ONLY_PROJECT_AUTHORITY",
+    "current_tier1_local_full_raw_byte_rehash": "PASS",
+    "current_raw_chunks_reconciled": "9824/9824",
+    "raw_bytes_externally_transferred": false,
+    "external_full_raw_byte_rehash": false,
+    "raw_retention_deletion_authorized": false
+  }
 }
