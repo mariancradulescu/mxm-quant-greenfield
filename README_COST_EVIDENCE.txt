@@ -145,3 +145,23 @@ normal provenance/policy/checksum files.
 
 Keep .m6_cost_evidence_work on the phone until ChatGPT explicitly says it can be deleted.
 Return only MXM_M6_TIER1_COST_EVIDENCE_V3.zip. No manual editing or file selection is needed.
+
+
+V3 COMPACT2 INDEXED FINALIZER:
+The COMPACT1 finalizer correctly avoided multi-GB transfer tapes, but its boundary derivation
+still performed repeated full-list scans for every M15 boundary and provided no progress
+heartbeat. On the user's Android run, all 4912 raw chunks were already verified while
+US500 boundary evidence advanced only slowly.
+
+COMPACT2 does NOT recapture any market data. It reuses the same 4912 local raw chunks after
+SHA256 verification, deletes only the partial transfer-output directory, and builds one
+timestamp index per BID/ASK daily chunk. Every generic M15 boundary lookup is then O(log n)
+via bisect instead of repeated O(n) scans.
+
+During US500 and NAS100 derivation it prints:
+[FINALIZE HEARTBEAT] <symbol> | <percent> | sessions X/1228 | rows Y | elapsed Zm
+every 25 weekday windows, plus the first and final window.
+
+Raw chunks remain local under .m6_cost_evidence_work and are not embedded in the compact
+transfer ZIP. No economics, candidate signals, protected evidence, or candidate identities
+are touched.
