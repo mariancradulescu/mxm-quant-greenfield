@@ -1,0 +1,101 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-cost-evidence-capture-acceptance.v1",
+  "status": "ACCEPTED_HASH_VERIFIED_COMPACT_BUNDLE",
+  "scope": "PRE_M6_TIER1_US500_NAS100_QUOTE_EVIDENCE_NO_ECONOMICS",
+  "source_uploaded_bundle": {
+    "filename": "MXM_M6_TIER1_COST_EVIDENCE_V3.zip",
+    "sha256": "f187010d55a6f444827592e23158187c3985c5c3af4631f4e31c53c8a84a1360",
+    "size_bytes": 3761394,
+    "wrapper_form": "ANDROID_REWRAP_WITH_ROOT_DIRECTORY_AND_NONDETERMINISTIC_FILE_TIMESTAMPS",
+    "content_acceptance": "ACCEPTED_BECAUSE_ALL_INNER_CHECKSUMS_AND_MANIFEST_COMMITMENTS_VERIFY"
+  },
+  "canonical_repack": {
+    "filename": "MXM_M6_TIER1_COST_EVIDENCE_V3_CANONICAL.zip",
+    "sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad",
+    "construction": "EXACT_ACCEPTED_INNER_BYTES_REPACKED_SORTED_WITH_1980_01_01_TIMESTAMPS_AND_NO_WRAPPER_DIRECTORY",
+    "semantic_change": false
+  },
+  "internal_integrity": {
+    "checksums_file": "CHECKSUMS.sha256",
+    "checksum_entries_verified": 8,
+    "checksum_failures": 0,
+    "required_targets": {
+      "US500": 127,
+      "NAS100": 126
+    },
+    "broker_product_family": "CASH_INDEX_CFD",
+    "source_environment": "Pepperstone - Europe LIVE",
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "economics": false,
+    "protected_boundary_excluded": true,
+    "raw_account_id_in_bundle": false,
+    "secret_keyword_scan": "PASS_NO_ACCESS_TOKEN_CLIENT_SECRET_REFRESH_TOKEN_OR_BEARER_MATERIAL"
+  },
+  "raw_commitment": {
+    "schema": "mxm.greenfield.v2.tier1-local-raw-chunk-commitment.v1",
+    "chunk_count": 4912,
+    "total_rows": 272842293,
+    "ordered_manifest_sha256": "119d05376bf4f5e67ddea6553221f80c01e9b137762c7df3cc3804d0e1633cd3",
+    "recomputed_ordered_manifest_sha256": "119d05376bf4f5e67ddea6553221f80c01e9b137762c7df3cc3804d0e1633cd3",
+    "recomputed_match": true,
+    "streams": {
+      "US500_BID": {
+        "chunk_count": 1228,
+        "row_count": 29876955,
+        "manifest_sha256": "e9003477d5038f4fb3e81edf26ec2826dfb13f92834d1578533392d349e68395"
+      },
+      "US500_ASK": {
+        "chunk_count": 1228,
+        "row_count": 29876377,
+        "manifest_sha256": "46bf76d01416f71973924ac95041028d763d6d921de360daeea9fe0928de53ca"
+      },
+      "NAS100_BID": {
+        "chunk_count": 1228,
+        "row_count": 106545929,
+        "manifest_sha256": "910829ea4d2af6e65349f8e278b1786af7c803e63966ce3802f837e0b1f4e57e"
+      },
+      "NAS100_ASK": {
+        "chunk_count": 1228,
+        "row_count": 106543032,
+        "manifest_sha256": "6800e05f69fd04c03a119806a738a32a7da11005c9de28b71a5ef518acd28811"
+      }
+    },
+    "raw_bytes_transferred": false,
+    "raw_bytes_retained_locally": true,
+    "local_retention_path": ".m6_cost_evidence_work/tier1_us500_nas100_v3/chunks",
+    "deletion_authorized": false
+  },
+  "derived_evidence": {
+    "US500": {
+      "path": "derived/US500_M15_BOUNDARY_QUOTE_EVIDENCE.csv",
+      "rows": 31752,
+      "sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6"
+    },
+    "NAS100": {
+      "path": "derived/NAS100_M15_BOUNDARY_QUOTE_EVIDENCE.csv",
+      "rows": 31752,
+      "sha256": "717dba5d37bf2c87ba10036eb4cc997ec7876c2d8059e6dded5e8b6122b900be"
+    }
+  },
+  "provenance": {
+    "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
+    "plan_schema": "mxm.greenfield.v2.m6-tier1-cost-evidence-plan.v3",
+    "plan_file_sha256": "2278736bfeefe30efdcb338629da06b980d801ea9c099077aa301bf6fff4be11",
+    "resume_contract_sha256": "a9c7db5b91cea6488760cef093cd0118135d857c8d62c898b6eec1d54e033b4e",
+    "development_start_date": "2022-01-03",
+    "development_end_date": "2026-09-16",
+    "weekday_session_envelopes": 1228,
+    "resume_chunks_reused": 4912,
+    "historical_requests_in_final_compact_run": 0
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}
