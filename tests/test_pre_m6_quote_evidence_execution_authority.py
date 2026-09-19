@@ -255,17 +255,18 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertEqual(s["m6"]["status"], "PENDING")
         self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger))
 
-    def test_19_active_readiness_is_v3_and_still_blocks_tier1_on_cost(self):
+    def test_19_active_readiness_is_v4_and_still_blocks_tier1_on_cost(self):
         r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
         self.assertEqual(
             r["tier1_cost_capture"]["active_plan"],
             "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
         )
         self.assertEqual(
-            r["tier1_cost_capture"]["both_sides_refreshed_after_boundary"],
-            "QUOTE_REFRESH_DIAGNOSTIC_ONLY",
+            r["tier1_cost_capture"]["calibration_result"],
+            "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V1.json",
         )
-        self.assertFalse(r["tier1_cost_capture"]["diagnostic_window_is_fill_authority"])
+        self.assertEqual(r["tier1_cost_capture"]["execution_fill_rule"], "UNRESOLVED")
+        self.assertFalse(r["tier1_cost_capture"]["numeric_conservative_execution_bound_frozen"])
         self.assertFalse(r["tier1_cost_capture"]["candidate_market_proxy_mutated"])
         self.assertEqual(
             r["candidates"]["V2-C006"]["m6_stage_a_readiness"],
@@ -406,13 +407,11 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             COST_PACKAGE_FILES,
         )
         state = load("CURRENT_STATE.json")
+        cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
+        self.assertEqual(cap["raw_chunk_count"], 4912)
         self.assertEqual(
-            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
-        )
-        self.assertEqual(
-            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["raw_chunk_count"],
-            4912,
+            cap["capture_acceptance"],
+            "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
         )
 
 
@@ -464,10 +463,6 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_29_current_state_records_accepted_capture_and_unresolved_cost_rule(self):
         state = load("CURRENT_STATE.json")
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
-        self.assertEqual(
-            cap["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
-        )
         self.assertEqual(
             cap["state"],
             "ACCEPTED_HASH_VERIFIED_CALIBRATION_COMPLETE_UNRESOLVED",
