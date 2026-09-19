@@ -525,11 +525,15 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_33_compact_finalizer_tool_version_is_active_and_pipeline3_is_migratable(self):
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED"',
             runtime,
         )
         self.assertIn(
             '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
+            runtime,
+        )
+        self.assertIn(
+            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
             runtime,
         )
 
