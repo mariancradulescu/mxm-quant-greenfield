@@ -61,15 +61,15 @@ class Tier1AcceptedEvidenceTests(unittest.TestCase):
         self.assertEqual(x["slippage_delay_gap_effects"]["state"],"UNRESOLVED")
         self.assertEqual(x["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_RULE")
 
-    def test_06_readiness_v4_and_current_state_are_consistent(self):
+    def test_06_v4_is_preserved_but_current_state_points_to_corrected_v5(self):
         r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
         s=load("CURRENT_STATE.json")
         self.assertEqual(r["status"],"CANDIDATE_SPECIFIC_POST_TIER1_QUOTE_CAPTURE_COST_CALIBRATION_UNRESOLVED")
         self.assertEqual(r["candidates"]["V2-C006"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_RULE")
         self.assertEqual(r["candidates"]["V2-C012"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_RULE")
         self.assertEqual(r["ready_candidates"],[])
-        self.assertEqual(s["pre_m6_readiness_authority"],"data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
-        self.assertEqual(s["pre_m6_operational_state"],"TIER1_QUOTE_CAPTURE_ACCEPTED_COST_RULE_UNRESOLVED")
+        self.assertEqual(s["pre_m6_readiness_authority"],"data/PRIMARY_WAVE_02_PRE_M6_READINESS_V5.json")
+        self.assertEqual(s["pre_m6_operational_state"],"C006_READY_C012_PREOPEN_SUPPLEMENT_REQUIRED_NO_ECONOMICS")
         self.assertEqual(s["economic_outcomes_opened"],0)
         self.assertEqual(s["v2_attempts_used"],0)
         self.assertEqual(s["v2_evaluated_identities"],0)

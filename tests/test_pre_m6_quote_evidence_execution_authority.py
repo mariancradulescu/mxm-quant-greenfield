@@ -246,7 +246,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             if x.strip()
         ]
         self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_QUOTE_CAPTURE_ACCEPTED_COST_RULE_UNRESOLVED")
+        self.assertEqual(s["pre_m6_operational_state"], "C006_READY_C012_PREOPEN_SUPPLEMENT_REQUIRED_NO_ECONOMICS")
         self.assertEqual(s["economic_outcomes_opened"], 0)
         self.assertEqual(s["v2_attempts_used"], 0)
         self.assertEqual(s["v2_evaluated_identities"], 0)
@@ -460,19 +460,19 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             COST_PACKAGE_FILES,
         )
 
-    def test_29_current_state_records_accepted_capture_and_unresolved_cost_rule(self):
+    def test_29_current_state_records_corrected_pre_outcome_cost_methodology(self):
         state = load("CURRENT_STATE.json")
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
         self.assertEqual(
             cap["state"],
-            "ACCEPTED_HASH_VERIFIED_CALIBRATION_COMPLETE_UNRESOLVED",
+            "ACCEPTED_COMMITMENT_VERIFIED_METHOD_CORRECTED_C006_READY_C012_PREOPEN_REQUIRED",
         )
         self.assertEqual(cap["historical_bid_ask"], "PASS_HASH_VERIFIED")
         self.assertEqual(cap["raw_chunk_count"], 4912)
         self.assertEqual(cap["raw_tick_rows"], 272842293)
         self.assertTrue(cap["raw_chunks_retained_locally"])
         self.assertFalse(cap["raw_local_deletion_authorized"])
-        self.assertEqual(cap["execution_fill_rule"], "UNRESOLVED")
+        self.assertEqual(cap["execution_fill_rule"], "CONSERVATIVE_BOUND_DISCOVERY_ONLY")\n        self.assertFalse(cap["raw_bytes_independently_recomputed"])\n        self.assertEqual(cap["c006_readiness"], "READY_PRE_OUTCOME")\n        self.assertEqual(cap["c012_readiness"], "BLOCKED_PREOPEN_0930_SUPPLEMENT")
         self.assertEqual(state["economic_outcomes_opened"], 0)
         self.assertEqual(state["v2_attempts_used"], 0)
         self.assertFalse(state["protected_evidence_opened"])

@@ -1,0 +1,82 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-pre-m6-readiness.v5",
+  "status": "C006_READY_C012_PREOPEN_SUPPLEMENT_REQUIRED_NO_ECONOMICS",
+  "supersedes": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json",
+  "authorities": {
+    "prior_readiness": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json",
+    "calibration_protocol": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+    "calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V2.json",
+    "commission_policy": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
+    "raw_commitment_correction": "evidence/TIER1_RAW_COMMITMENT_VERIFICATION_CORRECTION_V1.json",
+    "preopen_plan": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json",
+    "tier2_next_path": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json"
+  },
+  "governing_law": [
+    "Discovery may use a prospectively frozen adverse candidate-independent conservative cost bound without claiming Certification fill truth.",
+    "Candidate signals, returns, PnL, outcomes and protected evidence remain forbidden calibration inputs.",
+    "The C012 09:30 gap is acquisition-domain insufficiency until the bounded pre-open supplement is attempted.",
+    "No candidate economic outcome is opened by this checkpoint."
+  ],
+  "candidates": {
+    "V2-C006": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "quote_evidence": "PASS_1180_OF_1180_CAUSAL_TWO_SIDED_AT_0945_AND_1245",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
+      "execution_slippage": "CONSERVATIVE_BOUND_ROUND_TRIP_13_3_INDEX_POINTS_DISCOVERY_ONLY",
+      "financing": "NOT_APPLICABLE_INTRADAY",
+      "implementation_validity": "PASS_PRE_ECONOMIC_REPLAY",
+      "m6_stage_a_readiness": "READY_PRE_OUTCOME"
+    },
+    "V2-C007": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "blocker": "TIER2_XAUUSD_SPREAD_COMMISSION_FINANCING_BOUND_AND_REPLAY_MATERIALIZATION",
+      "next_path_ref": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json",
+      "m6_stage_a_readiness": "BLOCKED_TIER2_EVIDENCE"
+    },
+    "V2-C008": {
+      "blocker": "C008_HISTORICAL_SPOTCRUDE_CONTINUOUS_ROLL_CONSTRUCTION",
+      "m6_stage_a_readiness": "BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION"
+    },
+    "V2-C009": {
+      "raw_data": "PASS_HASH_VERIFIED_REAL_GAPS_RETAINED",
+      "blocker": "TIER2_BTCUSD_SPREAD_COMMISSION_FINANCING_BOUND_AND_REPLAY_MATERIALIZATION",
+      "next_path_ref": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json",
+      "m6_stage_a_readiness": "BLOCKED_TIER2_EVIDENCE"
+    },
+    "V2-C010": {
+      "blocker": "C010_HISTORICALLY_EFFECTIVE_FINANCING_RATES_AND_MULTIPLIERS",
+      "m6_stage_a_readiness": "BLOCKED_C010_HISTORICAL_FINANCING"
+    },
+    "V2-C011": {
+      "blocker": "C011_BROKER_CFD_CORPORATE_ACTIONS_SHORT_ELIGIBILITY_FINANCING",
+      "m6_stage_a_readiness": "BLOCKED_C011_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
+    },
+    "V2-C012": {
+      "raw_data": "PASS_EXISTING_0930_TO_1600_HASH_COMMITMENT_VERIFIED",
+      "quote_evidence": "PREOPEN_0930_CAUSAL_STATE_REQUIRED",
+      "missing_state_classification": "ACQUISITION_DOMAIN_INSUFFICIENCY_NOT_IRREDUCIBLE",
+      "supplemental_plan": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
+      "execution_slippage": "CONSERVATIVE_BOUND_METHOD_FROZEN_PENDING_SUPPLEMENTAL_INPUT",
+      "financing": "NOT_APPLICABLE_INTRADAY",
+      "implementation_validity": "PASS_PRE_ECONOMIC_REPLAY",
+      "m6_stage_a_readiness": "BLOCKED_PREOPEN_0930_SUPPLEMENT"
+    }
+  },
+  "ready_candidates": [
+    "V2-C006"
+  ],
+  "global_m6_economics_authorized": false,
+  "user_action_required": true,
+  "exact_next_action": "Run exactly one small signal-blind 09:15-09:30 ET Tier-1 pre-open supplemental Pydroid capture; return its compact deterministic ZIP; preserve the existing V3 raw chunks. Do not run M6 economics.",
+  "invariants": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  }
+}

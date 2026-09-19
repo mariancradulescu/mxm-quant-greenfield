@@ -1,0 +1,90 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-discovery-execution-cost-calibration-result.v2",
+  "status": "PRE_OUTCOME_METHOD_CORRECTED_C006_BOUND_FROZEN_C012_SUPPLEMENT_REQUIRED",
+  "supersedes_methodological_conclusion": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V1.json",
+  "protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+  "commission_policy": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
+  "raw_commitment_correction": "evidence/TIER1_RAW_COMMITMENT_VERIFICATION_CORRECTION_V1.json",
+  "protocol_interpretation_corrected": true,
+  "correction": "The frozen protocol deliberately permits post-capture candidate-independent numeric calibration. Lack of a pre-capture numeric value is not by itself grounds for UNRESOLVED; the procedure, input domain and anti-leakage constraints were pre-frozen.",
+  "forbidden_inputs_used": {
+    "signals": false,
+    "returns": false,
+    "pnl": false,
+    "candidate_outcomes": false,
+    "protected_evidence": false
+  },
+  "discovery_bound_method": {
+    "state": "CONSERVATIVE_BOUND",
+    "discovery_only": true,
+    "exact_fill_truth_claimed": false,
+    "market_proxy_timing_mutated": false,
+    "transaction_formula": "CONSERVATIVE_COST_POINTS = FULL_CAUSAL_SPREAD_POINTS + ABS_MID_DISPLACEMENT_TO_FIRST_BILATERAL_QUOTE_REFRESH",
+    "semantic_notes": [
+      "The bilateral refresh remains quote-dynamics evidence, not a fill timestamp and not a replacement for the frozen OHLC MARKET_PROXY.",
+      "Charging the full spread per transaction avoids a favorable assumption about where the MARKET_PROXY lies inside the bid/ask interval.",
+      "The absolute mid displacement is direction-independent and can only add cost.",
+      "For a fixed-boundary candidate, a constant empirical envelope may use the full DEVELOPMENT maximum of each adverse component at that exact boundary; this is a support envelope, not an arbitrary percentile.",
+      "For a variable-boundary candidate, the same rule must be finalized over the complete generic entry domain before outcomes; missing causal state or unresolved refresh evidence blocks that affected context rather than being imputed favorably."
+    ],
+    "percentile_selection_used": false,
+    "candidate_sign_selection_used": false
+  },
+  "products": {
+    "US500": {
+      "state": "CONSERVATIVE_BOUND",
+      "applicable_candidate": "V2-C006",
+      "boundaries_et": {
+        "entry": "09:45",
+        "exit": "12:45"
+      },
+      "coverage": {
+        "entry_causal_two_sided": "1180/1180",
+        "exit_causal_two_sided": "1180/1180"
+      },
+      "observed_adverse_support_points": {
+        "entry": {
+          "causal_spread_max": 1.4,
+          "absolute_mid_displacement_to_refresh_max": 9.7,
+          "transaction_envelope": 11.1
+        },
+        "exit": {
+          "causal_spread_max": 0.5,
+          "absolute_mid_displacement_to_refresh_max": 1.7,
+          "transaction_envelope": 2.2
+        },
+        "round_trip_envelope": 13.3
+      },
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE_ZERO_SEPARATE_INDEX_COMMISSION",
+      "overnight_financing": "NOT_APPLICABLE_FROZEN_INTRADAY_HOLD",
+      "readiness": "READY_PRE_OUTCOME",
+      "certification_truth": "NOT_ESTABLISHED"
+    },
+    "NAS100": {
+      "state": "CONSERVATIVE_BOUND_METHOD_FROZEN_PENDING_INPUT_COMPLETION",
+      "applicable_candidate": "V2-C012",
+      "current_0930_causal_state": "ACQUISITION_DOMAIN_INSUFFICIENCY_1172_OF_1180_MISSING_BECAUSE_EXISTING_RAW_STARTS_AT_0930",
+      "supplemental_plan": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE_ZERO_SEPARATE_INDEX_COMMISSION",
+      "overnight_financing": "NOT_APPLICABLE_FROZEN_INTRADAY_HOLD",
+      "readiness": "BLOCKED_PREOPEN_0930_SUPPLEMENT",
+      "irreducible_execution_unknown": false,
+      "certification_truth": "NOT_ESTABLISHED"
+    }
+  },
+  "c006_exact_fill_requirement": "NOT_REQUIRED_FOR_STAGE_A_DISCOVERY_WHEN_THE_FROZEN_ADVERSE_BOUND_IS_APPLIED",
+  "c012_classification_order": [
+    "ACQUISITION_DOMAIN_INSUFFICIENCY",
+    "RUN_BOUNDED_PREOPEN_SUPPLEMENT",
+    "ONLY_IF_SUPPLEMENT_CANNOT_ESTABLISH_CAUSAL_STATE_CLASSIFY_REMAINING_LIMITATION"
+  ],
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}
