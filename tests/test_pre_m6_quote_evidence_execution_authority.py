@@ -296,7 +296,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(e["research_state"]["protected_evidence_opened"])
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
             runtime,
         )
         self.assertIn(
@@ -325,7 +325,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_23_pipeline_tool_only_resume_migration_preserves_only_hash_verified_chunks(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -362,7 +362,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_24_pipeline_resume_migration_refuses_bad_chunk_hash(self):
         plan = ROOT / "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
         old_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1"
-        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
+        new_tool = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"
         with tempfile.TemporaryDirectory() as td:
             work = Path(td) / "tier1_us500_nas100_v3"
             old_binding = cost_resume_contract(plan, tool_version=old_tool)
@@ -407,7 +407,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
         )
         self.assertEqual(
             state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["pipeline_batch_size"],
@@ -460,31 +460,76 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             COST_PACKAGE_FILES,
         )
 
-    def test_29_current_state_activates_pipeline3_dns_cache_runtime(self):
+    def test_29_current_state_activates_compact1_finalization(self):
         state = load("CURRENT_STATE.json")
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
         self.assertEqual(
             cap["tool_version"],
-            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+            "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
         )
-        self.assertEqual(cap["pipeline_batch_size"], 4)
-        self.assertIn("DNS_CACHE", cap["network_recovery"])
+        self.assertEqual(
+            cap["state"],
+            "RAW_CAPTURE_COMPLETE_COMPACT_FINALIZATION_PENDING_USER_RUN",
+        )
+        self.assertEqual(
+            cap["historical_bid_ask"],
+            "CAPTURE_COMPLETE_4912_LOCAL_HASH_VERIFIED_CHUNKS",
+        )
+        self.assertFalse(cap["compact_transfer"]["raw_consolidated_csv_files_created"])
+        self.assertTrue(cap["compact_transfer"]["raw_chunks_retained_locally"])
+        self.assertFalse(cap["compact_transfer"]["raw_chunks_embedded_in_transfer_zip"])
         self.assertEqual(state["economic_outcomes_opened"], 0)
         self.assertEqual(state["v2_attempts_used"], 0)
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["m6"]["economics_run"])
 
 
-    def test_30_pipeline3_accepts_hash_verified_pipeline2_resume_lineage(self):
+    def test_30_compact1_accepts_hash_verified_pipeline3_resume_lineage(self):
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
-            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"',
+            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
             runtime,
         )
         state = load("CURRENT_STATE.json")
         self.assertIn(
-            "PIPELINE2",
-            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["resume_after_dns_correction"],
+            "PIPELINE3_DNSCACHE1",
+            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["resume_after_compact_finalizer"],
+        )
+
+
+    def test_31_compact_finalizer_does_not_create_or_embed_multi_gb_raw_tapes(self):
+        runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
+        finalize = runtime[runtime.index("def _finalize"):runtime.index("def run(self)")]
+        self.assertNotIn("_write_consolidated_tape(", finalize)
+        self.assertNotIn('"raw_ticks"', finalize)
+        self.assertIn('"raw_chunk_commitment.json"', finalize)
+        self.assertIn('"raw_chunks_embedded_in_transfer_bundle":False', finalize)
+        self.assertIn("[FINALIZE 1/4]", finalize)
+        self.assertIn("[FINALIZE 4/4]", finalize)
+
+    def test_32_compact_transfer_policy_is_pre_outcome_and_preserves_local_raw(self):
+        e = load("evidence/PRE_M6_TIER1_COMPACT_TRANSFER_FINALIZATION_V1.json")
+        self.assertTrue(e["corrected_transfer_contract"]["raw_chunks_retained_locally"])
+        self.assertFalse(e["corrected_transfer_contract"]["raw_consolidated_csv_files_created"])
+        self.assertFalse(e["corrected_transfer_contract"]["raw_bytes_embedded_in_transfer_zip"])
+        self.assertEqual(e["corrected_transfer_contract"]["raw_capture_complete_chunks_expected"], 4912)
+        self.assertEqual(e["research_state"]["economic_outcomes_opened"], 0)
+        self.assertEqual(e["research_state"]["v2_attempts_used"], 0)
+        self.assertFalse(e["research_state"]["protected_evidence_opened"])
+        self.assertIn(
+            "evidence/PRE_M6_TIER1_COMPACT_TRANSFER_FINALIZATION_V1.json",
+            COST_PACKAGE_FILES,
+        )
+
+    def test_33_compact_finalizer_tool_version_is_active_and_pipeline3_is_migratable(self):
+        runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
+        self.assertIn(
+            'TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
+            runtime,
+        )
+        self.assertIn(
+            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"',
+            runtime,
         )
 
 
