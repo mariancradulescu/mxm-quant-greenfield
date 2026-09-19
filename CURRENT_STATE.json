@@ -271,7 +271,7 @@
       "results_created": false
     }
   },
-  "next_action": "Evidence-integrity reconciliation is complete. The prepared V2-C006/V2-C012 Stage-A runner remains NOT RUN and economics remain unauthorized in this task.",
+  "next_action": "Infrastructure safety correction complete pending exact-head CI. The prepared V2-C006/V2-C012 Stage-A runner remains PREPARED_NOT_RUN; do not execute economics or inspect protected evidence in this task.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
@@ -369,7 +369,7 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "LARGE_DATA_EVIDENCE_INTEGRITY_RECONCILED_NO_ECONOMICS",
+  "primary_run_objective": "POST_AUDIT_LARGE_DATA_VERIFIER_SAFETY_FAIL_CLOSED_CORRECTION_NO_ECONOMICS",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
@@ -408,16 +408,27 @@
   "c012_discovery_cost_applicability_gate_authority": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
   "tier1_discovery_transaction_local_cost_rule_authority": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
   "m6_stage_a_tier1_runner_prep_authority": "data/M6_STAGE_A_TIER1_RUNNER_PREP_V1.json",
-  "large_data_audit_protocol_authority": "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V1.json",
+  "large_data_audit_protocol_authority": "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V2.json",
   "tier1_local_full_raw_byte_rehash_reconciliation_authority": "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json",
   "large_data_audit_runtime": "m6/large_data_audit.py",
   "large_data_audit_pydroid_entrypoint": "LARGE_DATA_AUDIT_RUN.py",
   "large_data_audit_state": {
-    "protocol": "FROZEN_APPEND_ONLY_PROJECT_AUTHORITY",
-    "current_tier1_local_full_raw_byte_rehash": "PASS",
+    "protocol": "FROZEN_APPEND_ONLY_PROJECT_AUTHORITY_V2",
+    "correction_scope": "REUSABLE_VERIFIER_SAFETY_FAIL_CLOSED_ONLY",
+    "current_tier1_local_full_raw_byte_rehash": "PASS_UNCHANGED_NOT_RERUN",
     "current_raw_chunks_reconciled": "9824/9824",
+    "aggregate_commitment_reconstruction": "PASS_UNCHANGED",
+    "stream_commitment_reconstruction": "PASS_UNCHANGED",
     "raw_bytes_externally_transferred": false,
     "external_full_raw_byte_rehash": false,
-    "raw_retention_deletion_authorized": false
-  }
+    "raw_retention_deletion_authorized": false,
+    "output_path_read_only_by_construction": true,
+    "output_no_clobber": true,
+    "aggregate_row_total_in_pass_law": true,
+    "certified_pass_requires_frozen_authority_file_sha256": true,
+    "unbound_success_status": "UNBOUND_LOCAL_CHECK"
+  },
+  "large_data_audit_verifier_safety_correction_authority": "evidence/LARGE_DATA_AUDIT_VERIFIER_SAFETY_CORRECTION_V1.json",
+  "large_data_audit_runtime_version": "MXM_CONTENT_ADDRESSED_LARGE_DATA_AUDIT_V2",
+  "large_data_audit_runtime_git_blob_sha1": "f5f53196bddcab8a8a0198d004bffae4bb5db8d6"
 }

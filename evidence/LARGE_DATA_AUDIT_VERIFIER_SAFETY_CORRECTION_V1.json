@@ -1,0 +1,53 @@
+{
+  "schema": "mxm.greenfield.v2.large-data-audit-verifier-safety-correction.v1",
+  "status": "PRE_ECONOMIC_INFRASTRUCTURE_CORRECTION",
+  "prior_staging_head": "e33eb1ddfb933a676837d55839e32350f4f80cde",
+  "prior_exact_head_ci": {
+    "run_id": 35456431761,
+    "tests_passed": 412,
+    "tests_failed": 0,
+    "conclusion": "SUCCESS"
+  },
+  "prior_runtime": {
+    "path": "m6/large_data_audit.py",
+    "git_blob_sha1": "e724980d7f672220e05b567cdf0db27797de3e2d",
+    "version": "MXM_CONTENT_ADDRESSED_LARGE_DATA_AUDIT_V1"
+  },
+  "corrected_runtime": {
+    "path": "m6/large_data_audit.py",
+    "git_blob_sha1": "f5f53196bddcab8a8a0198d004bffae4bb5db8d6",
+    "version": "MXM_CONTENT_ADDRESSED_LARGE_DATA_AUDIT_V2"
+  },
+  "corrected_protocol": {
+    "path": "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V2.json",
+    "git_blob_sha1": "324aa8dd13dec3c04b28267d227b0fa4ed9105c4"
+  },
+  "correction_scope": [
+    "OUTPUT_PATH_READ_ONLY_BY_CONSTRUCTION",
+    "EXCLUSIVE_NO_CLOBBER_CAPSULE_WRITE",
+    "WHOLE_DATASET_ROW_TOTAL_IN_PASS_LAW",
+    "INTERNAL_AUTHORITY_TOTAL_CONSISTENCY",
+    "EXACT_AUTHORITY_FILE_SHA256_CERTIFICATION_BINDING",
+    "CANONICAL_OBJECT_SHA_SEPARATED_FROM_EXTERNAL_FILE_BYTE_BINDING"
+  ],
+  "accepted_reconciliation": {
+    "authority": "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json",
+    "reopened": false,
+    "rerun": false,
+    "changed": false,
+    "local_full_raw_byte_rehash": "PASS",
+    "per_chunk": "9824/9824 PASS",
+    "aggregate": "PASS",
+    "streams": "PASS",
+    "raw_bytes_externally_transferred": false,
+    "external_full_raw_byte_rehash": false
+  },
+  "preserved_project_semantics": {
+    "candidate_specs_changed": false,
+    "transaction_local_cost_methodology_changed": false,
+    "economics_run": false,
+    "protected_evidence_opened": false,
+    "attempt_consumed": false,
+    "result_recorded": false
+  }
+}
