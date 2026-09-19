@@ -73,7 +73,7 @@ class PreM6CostMethodologyResolutionTests(unittest.TestCase):
         launcher=(ROOT/"m6/pydroid_preopen_launcher.py").read_text(encoding="utf-8")
         self.assertIn("_capture_chunk",runtime)
         self.assertIn("ETA",runtime)
-        self.assertIn("existing V3 chunks are read locally only",launcher)
+        self.assertIn("existing v3 chunks are read locally only",launcher.lower())
         self.assertNotIn("ProtoOANewOrderReq",runtime+launcher)
 
     def test_07_raw_commitments_are_not_misreported_as_external_raw_byte_recomputation(self):

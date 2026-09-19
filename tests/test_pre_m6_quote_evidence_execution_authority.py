@@ -467,7 +467,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             cap["state"],
             "ACCEPTED_COMMITMENT_VERIFIED_METHOD_CORRECTED_C006_READY_C012_PREOPEN_REQUIRED",
         )
-        self.assertEqual(cap["historical_bid_ask"], "PASS_HASH_VERIFIED")
+        self.assertEqual(cap["historical_bid_ask"], "PASS_COMMITMENT_VERIFIED_RAW_BYTES_RETAINED_LOCAL_NOT_EXTERNALLY_RECOMPUTED")
         self.assertEqual(cap["raw_chunk_count"], 4912)
         self.assertEqual(cap["raw_tick_rows"], 272842293)
         self.assertTrue(cap["raw_chunks_retained_locally"])
