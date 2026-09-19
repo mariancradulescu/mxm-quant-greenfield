@@ -62,7 +62,7 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport, TransportError
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
 PIPELINE_BATCH_SIZE = 4
 NETWORK_RECOVERY_MAX_SECONDS = 1800.0
@@ -127,6 +127,7 @@ class CostEvidenceRunner:
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
+                "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
             ),
         )
         self.resume_path,self.resume,self._archived_resume_dir=prepare_contract_bound_resume(
@@ -625,24 +626,83 @@ class CostEvidenceRunner:
             ordered.append(record_by_key[key])
         return ordered
 
-    def _write_consolidated_tape(self, symbol:str, quote_type:str)->dict[str,Any]:
-        path=self.output_dir/"raw_ticks"/f"{symbol}_{quote_type}.csv"
-        path.parent.mkdir(parents=True,exist_ok=True)
-        tmp=path.with_suffix(".csv.tmp")
-        rows=0
-        with tmp.open("w",encoding="utf-8",newline="") as out:
-            writer=csv.writer(out,lineterminator="\n")
-            writer.writerow(("time_utc","timestamp_ms","raw_tick","price"))
-            for window in self.windows:
-                chunk=self._chunk_path(symbol,quote_type,window.session_date)
-                with chunk.open("r",encoding="utf-8",newline="") as fh:
-                    reader=csv.reader(fh)
-                    next(reader,None)
-                    for row in reader:
-                        writer.writerow(row)
-                        rows+=1
-        tmp.replace(path)
-        return {"path":path.relative_to(self.output_dir).as_posix(),"rows":rows,"sha256":sha256_file(path)}
+    def _raw_chunk_commitment(self, records:list[dict[str,Any]])->dict[str,Any]:
+        """Cryptographically bind all retained local raw chunks without transferring GBs.
+
+        Each chunk has already been SHA256-verified by _capture_all. This manifest commits
+        to the exact ordered acquisition records and per-stream subsets. Raw bytes remain
+        local under the V3 work directory for audit/reprocessing; no economics are run.
+        """
+        if len(records)!=len(self.windows)*4:
+            raise CaptureContractError(
+                f"compact finalization requires all {len(self.windows)*4} raw chunks; "
+                f"got {len(records)}"
+            )
+
+        def canonical_payload(items):
+            payload=[]
+            for record in sorted(items,key=lambda x:str(x["key"])):
+                payload.append({
+                    "key":str(record["key"]),
+                    "symbol":str(record["symbol"]),
+                    "symbol_id":int(record["symbol_id"]),
+                    "quote_type":str(record["quote_type"]),
+                    "session_date":str(record["session_date"]),
+                    "from_ms":int(record["from_ms"]),
+                    "to_ms":int(record["to_ms"]),
+                    "row_count":int(record["row_count"]),
+                    "page_count":int(record["page_count"]),
+                    "pagination_boundary_fallback_count":int(
+                        record["pagination_boundary_fallback_count"]
+                    ),
+                    "sha256":str(record["sha256"]),
+                })
+            return payload
+
+        all_items=canonical_payload(records)
+        streams={}
+        total_rows=0
+        for symbol in ("US500","NAS100"):
+            for quote_type in ("BID","ASK"):
+                subset=[
+                    r for r in records
+                    if r["symbol"]==symbol and r["quote_type"]==quote_type
+                ]
+                if len(subset)!=len(self.windows):
+                    raise CaptureContractError(
+                        f"{symbol} {quote_type}: expected {len(self.windows)} chunks, "
+                        f"got {len(subset)}"
+                    )
+                payload=canonical_payload(subset)
+                rows=sum(int(x["row_count"]) for x in payload)
+                total_rows+=rows
+                digest=hashlib.sha256(
+                    json.dumps(
+                        payload,sort_keys=True,separators=(",",":"),ensure_ascii=True
+                    ).encode("utf-8")
+                ).hexdigest()
+                streams[f"{symbol}_{quote_type}"]={
+                    "chunk_count":len(payload),
+                    "row_count":rows,
+                    "manifest_sha256":digest,
+                }
+
+        overall=hashlib.sha256(
+            json.dumps(
+                all_items,sort_keys=True,separators=(",",":"),ensure_ascii=True
+            ).encode("utf-8")
+        ).hexdigest()
+        return {
+            "schema":"mxm.greenfield.v2.tier1-local-raw-chunk-commitment.v1",
+            "raw_bytes_transferred":False,
+            "raw_bytes_retained_locally":True,
+            "local_retention_path":".m6_cost_evidence_work/tier1_us500_nas100_v3/chunks",
+            "chunk_count":len(all_items),
+            "total_rows":total_rows,
+            "ordered_manifest_sha256":overall,
+            "streams":streams,
+            "records":all_items,
+        }
 
     def _write_boundary_quotes(self,symbol:str)->dict[str,Any]:
         """Persist candidate-independent quote evidence; never assert an executed fill."""
@@ -781,22 +841,26 @@ class CostEvidenceRunner:
         }
 
     def _finalize(self,records:list[dict[str,Any]])->Path:
-        self._stage("[3/3] Finalizing deterministic cost-evidence bundle")
+        self._stage("[3/3] Finalizing COMPACT deterministic cost-evidence bundle")
         if self.output_dir.exists():
             import shutil
             shutil.rmtree(self.output_dir)
         self.output_dir.mkdir(parents=True)
-        tapes={}
+
+        self._stage("[FINALIZE 1/4] Binding all 4912 local raw chunks by SHA256 manifest")
+        raw_commitment=self._raw_chunk_commitment(records)
+
         boundaries={}
-        for symbol in ("US500","NAS100"):
-            for quote_type in ("BID","ASK"):
-                tapes[f"{symbol}_{quote_type}"]=self._write_consolidated_tape(symbol,quote_type)
-            boundaries[symbol]=self._write_boundary_quotes(symbol)
+        self._stage("[FINALIZE 2/4] Deriving US500 generic M15 boundary quote evidence")
+        boundaries["US500"]=self._write_boundary_quotes("US500")
+        self._stage("[FINALIZE 3/4] Deriving NAS100 generic M15 boundary quote evidence")
+        boundaries["NAS100"]=self._write_boundary_quotes("NAS100")
 
         evidence=self.output_dir/"evidence"
         evidence.mkdir()
         atomic_write_json(evidence/"account.json",drop_secret_fields(self._account_evidence))
         atomic_write_json(evidence/"symbol_verification.json",self._symbol_evidence)
+        atomic_write_json(evidence/"raw_chunk_commitment.json",raw_commitment)
         atomic_write_json(evidence/"request_manifest.json",{
             "schema":"mxm.greenfield.v2.m6-tier1-cost-request-manifest.v3",
             "official_max_request_window_ms":604800000,
@@ -808,6 +872,8 @@ class CostEvidenceRunner:
             "weekday_regular_session_envelopes":len(self.windows),
             "plan_file_sha256":self.resume_contract["plan_file_sha256"],
             "resume_contract_sha256":self.resume_contract["binding_sha256"],
+            "raw_transfer_policy":"LOCAL_RAW_CHUNKS_RETAINED_NOT_EMBEDDED_IN_TRANSFER_ZIP",
+            "raw_ordered_manifest_sha256":raw_commitment["ordered_manifest_sha256"],
             "records":records,
         })
         atomic_write_json(evidence/"quote_boundary_evidence_policy.json",{
@@ -871,7 +937,15 @@ class CostEvidenceRunner:
             "archived_incompatible_resume_dir":(
                 self._archived_resume_dir.name if self._archived_resume_dir else None
             ),
-            "raw_tapes":tapes,
+            "raw_transfer_mode":"COMPACT_COMMITMENT_ONLY",
+            "raw_chunk_commitment":{
+                "chunk_count":raw_commitment["chunk_count"],
+                "total_rows":raw_commitment["total_rows"],
+                "ordered_manifest_sha256":raw_commitment["ordered_manifest_sha256"],
+                "streams":raw_commitment["streams"],
+            },
+            "raw_chunks_retained_locally":True,
+            "raw_chunks_embedded_in_transfer_bundle":False,
             "boundary_quote_evidence":boundaries,
             "execution_fill_rule_frozen":False,
             "candidate_market_proxy_mutated":False,
@@ -883,32 +957,34 @@ class CostEvidenceRunner:
             self.output_dir,[self.client_id,self.client_secret,self.access_token]
         )
 
-        # Checksums cover every member except the checksum file itself.
-        checksum_lines=[]
-        for path in sorted(p for p in self.output_dir.rglob("*") if p.is_file()):
-            rel=path.relative_to(self.output_dir).as_posix()
-            checksum_lines.append(f"{sha256_file(path)}  {rel}")
-        (self.output_dir/"CHECKSUMS.sha256").write_text(
-            "\n".join(checksum_lines)+"\n",encoding="utf-8"
-        )
         atomic_write_json(self.output_dir/"bundle_manifest.json",{
             "schema":BUNDLE_SCHEMA,
+            "transfer_mode":"COMPACT",
             "required_targets":["US500","NAS100"],
-            "raw_tape_count":4,
+            "local_raw_chunk_count":raw_commitment["chunk_count"],
+            "local_raw_commitment_sha256":raw_commitment["ordered_manifest_sha256"],
+            "raw_tick_files_embedded":0,
             "derived_boundary_quote_files":2,
             "protected_boundary_excluded":True,
-            "transfer_instruction":"Return this ZIP to ChatGPT; do not send local OAuth/work directories.",
+            "local_raw_retention_required":True,
+            "transfer_instruction":"Return only this compact ZIP to ChatGPT. Keep .m6_cost_evidence_work on the phone until explicitly told it can be deleted.",
         })
 
-        # Refresh checksums after bundle manifest.
         checksum_lines=[]
-        for path in sorted(p for p in self.output_dir.rglob("*") if p.is_file() and p.name!="CHECKSUMS.sha256"):
+        for path in sorted(
+            p for p in self.output_dir.rglob("*")
+            if p.is_file() and p.name!="CHECKSUMS.sha256"
+        ):
             rel=path.relative_to(self.output_dir).as_posix()
             checksum_lines.append(f"{sha256_file(path)}  {rel}")
         (self.output_dir/"CHECKSUMS.sha256").write_text(
             "\n".join(checksum_lines)+"\n",encoding="utf-8"
         )
+
+        self._stage("[FINALIZE 4/4] Compressing compact transfer bundle")
         target=self.output_dir.parent/"MXM_M6_TIER1_COST_EVIDENCE_V3.zip"
+        if target.exists():
+            target.unlink()
         deterministic_zip_directory(self.output_dir,target)
         self._stage(f"[DONE] {target}")
         self._stage(f"[SHA256] {sha256_file(target)}")
