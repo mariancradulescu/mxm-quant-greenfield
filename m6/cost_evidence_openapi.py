@@ -17,6 +17,7 @@ from .cost_evidence import (
     QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
     QUOTE_TYPES,
     TIER1_SYMBOLS,
+    BoundaryQuoteIndex,
     CausalQuoteState,
     DecodedTick,
     atomic_write_bytes,
@@ -62,7 +63,7 @@ from .ctrader_proto.OpenApiMessages_pb2 import (
 from .ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport, TransportError
 from .session_replay import NasdaqCashCalendar
 
-TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"
+TOOL_VERSION = "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-tier1-cost-evidence-bundle.v3"
 PIPELINE_BATCH_SIZE = 4
 NETWORK_RECOVERY_MAX_SECONDS = 1800.0
@@ -128,6 +129,7 @@ class CostEvidenceRunner:
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
                 "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+                "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
             ),
         )
         self.resume_path,self.resume,self._archived_resume_dir=prepare_contract_bound_resume(
@@ -705,7 +707,7 @@ class CostEvidenceRunner:
         }
 
     def _write_boundary_quotes(self,symbol:str)->dict[str,Any]:
-        """Persist candidate-independent quote evidence; never assert an executed fill."""
+        """Persist candidate-independent quote evidence with indexed boundary lookups."""
         out_path=self.output_dir/"derived"/f"{symbol}_M15_BOUNDARY_QUOTE_EVIDENCE.csv"
         out_path.parent.mkdir(parents=True,exist_ok=True)
         tmp=out_path.with_suffix(".csv.tmp")
@@ -716,6 +718,7 @@ class CostEvidenceRunner:
         missing_any_event=0
         missing_refresh_diagnostic=0
         negative_spread=0
+        started=time.monotonic()
 
         def price(value):
             if value is None:
@@ -744,85 +747,98 @@ class CostEvidenceRunner:
                 "both_sides_refreshed_delay_ms",
                 "both_sides_refreshed_classification"
             ))
-            for window in self.windows:
+            total_windows=len(self.windows)
+            for window_index,window in enumerate(self.windows,1):
                 session=self.calendar.session(
                     datetime.fromisoformat(window.session_date).date()
                 )
-                if session is None:
-                    continue
-                bid=_read_chunk_ticks(self._chunk_path(symbol,"BID",window.session_date))
-                ask=_read_chunk_ticks(self._chunk_path(symbol,"ASK",window.session_date))
-                states=causal_merge_bid_ask(bid,ask)
-                boundary=int(session.open_utc.timestamp()*1000)
-                close_ms=int(session.close_utc.timestamp()*1000)
-                while boundary<=close_ms:
-                    causal=causal_state_at_boundary(bid,ask,boundary)
-                    if causal.availability!="CAUSAL_TWO_SIDED_AVAILABLE":
-                        missing_causal+=1
-                    elif causal.spread is not None and causal.spread<0:
-                        negative_spread+=1
-
-                    post_bid=first_tick_at_or_after(bid,boundary)
-                    if post_bid is None:
-                        missing_bid_event+=1
-                    post_ask=first_tick_at_or_after(ask,boundary)
-                    if post_ask is None:
-                        missing_ask_event+=1
-                    post_any=first_any_quote_event_at_or_after(bid,ask,boundary)
-                    if post_any is None:
-                        missing_any_event+=1
-
-                    refresh=None
-                    try:
-                        refresh=first_both_sides_refreshed_diagnostic(
-                            states,
-                            boundary,
-                            diagnostic_window_ms=QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
-                        )
-                        if refresh.spread<0:
+                if session is not None:
+                    bid=_read_chunk_ticks(self._chunk_path(symbol,"BID",window.session_date))
+                    ask=_read_chunk_ticks(self._chunk_path(symbol,"ASK",window.session_date))
+                    index=BoundaryQuoteIndex(bid,ask)
+                    boundary=int(session.open_utc.timestamp()*1000)
+                    close_ms=int(session.close_utc.timestamp()*1000)
+                    while boundary<=close_ms:
+                        causal=index.causal_state_at_boundary(boundary)
+                        if causal.availability!="CAUSAL_TWO_SIDED_AVAILABLE":
+                            missing_causal+=1
+                        elif causal.spread is not None and causal.spread<0:
                             negative_spread+=1
-                    except CaptureContractError:
-                        missing_refresh_diagnostic+=1
 
-                    writer.writerow((
-                        window.session_date,
-                        datetime.fromtimestamp(boundary/1000,tz=timezone.utc).isoformat(
-                            timespec="milliseconds"
-                        ).replace("+00:00","Z"),
-                        boundary,
-                        "SESSION_CLOSE_BOUNDARY" if boundary==close_ms else "GENERIC_M15_BOUNDARY",
-                        price(causal.bid),price(causal.ask),price(causal.spread),
-                        "" if causal.bid_timestamp_ms is None else causal.bid_timestamp_ms,
-                        "" if causal.ask_timestamp_ms is None else causal.ask_timestamp_ms,
-                        "" if causal.bid_age_ms is None else causal.bid_age_ms,
-                        "" if causal.ask_age_ms is None else causal.ask_age_ms,
-                        causal.availability,
-                        "" if post_bid is None else post_bid.timestamp_ms,
-                        "" if post_bid is None else price(post_bid.price),
-                        "" if post_bid is None else post_bid.timestamp_ms-boundary,
-                        "" if post_ask is None else post_ask.timestamp_ms,
-                        "" if post_ask is None else price(post_ask.price),
-                        "" if post_ask is None else post_ask.timestamp_ms-boundary,
-                        "" if post_any is None else post_any.timestamp_ms,
-                        "" if post_any is None else post_any.side,
-                        "" if post_any is None else price(post_any.bid_price),
-                        "" if post_any is None else price(post_any.ask_price),
-                        "" if post_any is None else post_any.delay_ms,
-                        "" if refresh is None else refresh.timestamp_ms,
-                        "" if refresh is None else price(refresh.bid),
-                        "" if refresh is None else price(refresh.ask),
-                        "" if refresh is None else price(refresh.spread),
-                        "" if refresh is None else refresh.bid_timestamp_ms,
-                        "" if refresh is None else refresh.ask_timestamp_ms,
-                        "" if refresh is None else refresh.timestamp_ms-boundary,
-                        (
-                            "MISSING_WITHIN_DIAGNOSTIC_WINDOW"
-                            if refresh is None
-                            else "QUOTE_REFRESH_DIAGNOSTIC_ONLY"
-                        ),
-                    ))
-                    rows+=1
-                    boundary+=15*60*1000
+                        post_bid=index.first_post_bid(boundary)
+                        if post_bid is None:
+                            missing_bid_event+=1
+                        post_ask=index.first_post_ask(boundary)
+                        if post_ask is None:
+                            missing_ask_event+=1
+                        post_any=index.first_post_any(boundary)
+                        if post_any is None:
+                            missing_any_event+=1
+
+                        refresh=None
+                        try:
+                            refresh=index.both_sides_refreshed_diagnostic(
+                                boundary,
+                                diagnostic_window_ms=QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
+                            )
+                            if refresh.spread<0:
+                                negative_spread+=1
+                        except CaptureContractError:
+                            missing_refresh_diagnostic+=1
+
+                        writer.writerow((
+                            window.session_date,
+                            datetime.fromtimestamp(boundary/1000,tz=timezone.utc).isoformat(
+                                timespec="milliseconds"
+                            ).replace("+00:00","Z"),
+                            boundary,
+                            "SESSION_CLOSE_BOUNDARY" if boundary==close_ms else "GENERIC_M15_BOUNDARY",
+                            price(causal.bid),price(causal.ask),price(causal.spread),
+                            "" if causal.bid_timestamp_ms is None else causal.bid_timestamp_ms,
+                            "" if causal.ask_timestamp_ms is None else causal.ask_timestamp_ms,
+                            "" if causal.bid_age_ms is None else causal.bid_age_ms,
+                            "" if causal.ask_age_ms is None else causal.ask_age_ms,
+                            causal.availability,
+                            "" if post_bid is None else post_bid.timestamp_ms,
+                            "" if post_bid is None else price(post_bid.price),
+                            "" if post_bid is None else post_bid.timestamp_ms-boundary,
+                            "" if post_ask is None else post_ask.timestamp_ms,
+                            "" if post_ask is None else price(post_ask.price),
+                            "" if post_ask is None else post_ask.timestamp_ms-boundary,
+                            "" if post_any is None else post_any.timestamp_ms,
+                            "" if post_any is None else post_any.side,
+                            "" if post_any is None else price(post_any.bid_price),
+                            "" if post_any is None else price(post_any.ask_price),
+                            "" if post_any is None else post_any.delay_ms,
+                            "" if refresh is None else refresh.timestamp_ms,
+                            "" if refresh is None else price(refresh.bid),
+                            "" if refresh is None else price(refresh.ask),
+                            "" if refresh is None else price(refresh.spread),
+                            "" if refresh is None else refresh.bid_timestamp_ms,
+                            "" if refresh is None else refresh.ask_timestamp_ms,
+                            "" if refresh is None else refresh.timestamp_ms-boundary,
+                            (
+                                "MISSING_WITHIN_DIAGNOSTIC_WINDOW"
+                                if refresh is None
+                                else "QUOTE_REFRESH_DIAGNOSTIC_ONLY"
+                            ),
+                        ))
+                        rows+=1
+                        boundary+=15*60*1000
+
+                if (
+                    window_index==1
+                    or window_index%25==0
+                    or window_index==total_windows
+                ):
+                    elapsed=max(0.001,time.monotonic()-started)
+                    self._stage(
+                        f"[FINALIZE HEARTBEAT] {symbol} | "
+                        f"{100.0*window_index/total_windows:5.1f}% | "
+                        f"sessions {window_index}/{total_windows} | rows {rows} | "
+                        f"elapsed {elapsed/60.0:.1f}m"
+                    )
+
         tmp.replace(out_path)
         return {
             "path":out_path.relative_to(self.output_dir).as_posix(),
@@ -837,6 +853,8 @@ class CostEvidenceRunner:
             "both_sides_refresh_diagnostic_window_ms":QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
             "both_sides_refresh_classification":"QUOTE_REFRESH_DIAGNOSTIC_ONLY",
             "fill_authority":False,
+            "lookup_algorithm":"INDEXED_BISECT_O_LOG_N_PER_BOUNDARY",
+            "heartbeat_every_weekday_windows":25,
             "sha256":sha256_file(out_path),
         }
 
