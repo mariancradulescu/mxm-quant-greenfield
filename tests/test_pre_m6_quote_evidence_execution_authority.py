@@ -246,7 +246,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             if x.strip()
         ]
         self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_V3_QUOTE_CAPTURE_READY")
+        self.assertEqual(s["pre_m6_operational_state"], "TIER1_QUOTE_CAPTURE_ACCEPTED_COST_RULE_UNRESOLVED")
         self.assertEqual(s["economic_outcomes_opened"], 0)
         self.assertEqual(s["v2_attempts_used"], 0)
         self.assertEqual(s["v2_evaluated_identities"], 0)
@@ -256,7 +256,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger))
 
     def test_19_active_readiness_is_v3_and_still_blocks_tier1_on_cost(self):
-        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json")
+        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
         self.assertEqual(
             r["tier1_cost_capture"]["active_plan"],
             "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
@@ -269,11 +269,11 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(r["tier1_cost_capture"]["candidate_market_proxy_mutated"])
         self.assertEqual(
             r["candidates"]["V2-C006"]["m6_stage_a_readiness"],
-            "BLOCKED_DISCOVERY_COST_EVIDENCE",
+            "BLOCKED_DISCOVERY_COST_RULE",
         )
         self.assertEqual(
             r["candidates"]["V2-C012"]["m6_stage_a_readiness"],
-            "BLOCKED_DISCOVERY_COST_EVIDENCE",
+            "BLOCKED_DISCOVERY_COST_RULE",
         )
 
     def test_20_deployment_output_is_v3_and_v2_work_is_not_migrated(self):
@@ -411,8 +411,8 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
         )
         self.assertEqual(
-            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["pipeline_batch_size"],
-            4,
+            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["raw_chunk_count"],
+            4912,
         )
 
 
@@ -461,7 +461,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             COST_PACKAGE_FILES,
         )
 
-    def test_29_current_state_activates_compact2_indexed_finalization(self):
+    def test_29_current_state_records_accepted_capture_and_unresolved_cost_rule(self):
         state = load("CURRENT_STATE.json")
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
         self.assertEqual(
@@ -470,15 +470,14 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         )
         self.assertEqual(
             cap["state"],
-            "RAW_CAPTURE_COMPLETE_INDEXED_COMPACT_FINALIZATION_PENDING_USER_RUN",
+            "ACCEPTED_HASH_VERIFIED_CALIBRATION_COMPLETE_UNRESOLVED",
         )
-        self.assertEqual(
-            cap["historical_bid_ask"],
-            "CAPTURE_COMPLETE_4912_LOCAL_HASH_VERIFIED_CHUNKS",
-        )
-        self.assertFalse(cap["compact_transfer"]["raw_consolidated_csv_files_created"])
-        self.assertTrue(cap["compact_transfer"]["raw_chunks_retained_locally"])
-        self.assertFalse(cap["compact_transfer"]["raw_chunks_embedded_in_transfer_zip"])
+        self.assertEqual(cap["historical_bid_ask"], "PASS_HASH_VERIFIED")
+        self.assertEqual(cap["raw_chunk_count"], 4912)
+        self.assertEqual(cap["raw_tick_rows"], 272842293)
+        self.assertTrue(cap["raw_chunks_retained_locally"])
+        self.assertFalse(cap["raw_local_deletion_authorized"])
+        self.assertEqual(cap["execution_fill_rule"], "UNRESOLVED")
         self.assertEqual(state["economic_outcomes_opened"], 0)
         self.assertEqual(state["v2_attempts_used"], 0)
         self.assertFalse(state["protected_evidence_opened"])
@@ -491,10 +490,9 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
             runtime,
         )
-        state = load("CURRENT_STATE.json")
         self.assertIn(
-            "COMPACT1",
-            state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]["resume_after_indexed_finalizer"],
+            '"MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1"',
+            runtime,
         )
 
 
