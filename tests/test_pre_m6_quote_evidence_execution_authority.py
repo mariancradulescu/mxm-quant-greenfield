@@ -246,7 +246,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             if x.strip()
         ]
         self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "C006_READY_C012_PREOPEN_SUPPLEMENT_REQUIRED_NO_ECONOMICS")
+        self.assertEqual(s["pre_m6_operational_state"], "TIER1_PREOUTCOME_COST_METHOD_RESOLVED_C006_C012_READY_NO_USER_CAPTURE")
         self.assertEqual(s["economic_outcomes_opened"], 0)
         self.assertEqual(s["v2_attempts_used"], 0)
         self.assertEqual(s["v2_evaluated_identities"], 0)
@@ -465,7 +465,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
         self.assertEqual(
             cap["state"],
-            "ACCEPTED_COMMITMENT_VERIFIED_METHOD_CORRECTED_C006_READY_C012_PREOPEN_REQUIRED",
+            "PREOPEN_SUPPLEMENT_ACCEPTED_C006_C012_PREOUTCOME_READY",
         )
         self.assertEqual(cap["historical_bid_ask"], "PASS_COMMITMENT_VERIFIED_RAW_BYTES_RETAINED_LOCAL_NOT_EXTERNALLY_RECOMPUTED")
         self.assertEqual(cap["raw_chunk_count"], 4912)
@@ -475,7 +475,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertEqual(cap["execution_fill_rule"], "CONSERVATIVE_BOUND_DISCOVERY_ONLY")
         self.assertFalse(cap["raw_bytes_independently_recomputed"])
         self.assertEqual(cap["c006_readiness"], "READY_PRE_OUTCOME")
-        self.assertEqual(cap["c012_readiness"], "BLOCKED_PREOPEN_0930_SUPPLEMENT")
+        self.assertEqual(cap["c012_readiness"], "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE")
         self.assertEqual(state["economic_outcomes_opened"], 0)
         self.assertEqual(state["v2_attempts_used"], 0)
         self.assertFalse(state["protected_evidence_opened"])

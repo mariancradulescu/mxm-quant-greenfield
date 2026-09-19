@@ -129,11 +129,11 @@
       "data_manifest_mutated_with_actual_hashes": true
     },
     "auxiliary_evidence": {
-      "state": "COST_METHODOLOGY_RESOLVED_PREOPEN_SUPPLEMENT_PENDING",
+      "state": "TIER1_PREOUTCOME_COST_METHOD_RESOLVED_C006_C012_READY",
       "historical_register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
       "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
       "active_session_conversion_ref": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
-      "active_readiness_ref": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V5.json",
+      "active_readiness_ref": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V6.json",
       "active_reference_calendar_ref": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
       "active_tier1_cost_plan_ref": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
       "active_tier1_cost_sources_ref": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
@@ -159,11 +159,11 @@
         "C011": "BLOCKED_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
       },
       "tier1_cost_capture": {
-        "state": "ACCEPTED_COMMITMENT_VERIFIED_METHOD_CORRECTED_C006_READY_C012_PREOPEN_REQUIRED",
+        "state": "PREOPEN_SUPPLEMENT_ACCEPTED_C006_C012_PREOUTCOME_READY",
         "package_filename": "MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE.zip",
         "returned_evidence_zip": "MXM_M6_TIER1_COST_EVIDENCE_V3.zip",
         "capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
-        "calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V2.json",
+        "calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json",
         "source_uploaded_bundle_sha256": "f187010d55a6f444827592e23158187c3985c5c3af4631f4e31c53c8a84a1360",
         "canonical_repack_sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad",
         "targets": {
@@ -179,8 +179,8 @@
         "historical_quote_spread_evidence": "PASS_VERIFIED_QUOTE_EVIDENCE",
         "execution_fill_rule": "CONSERVATIVE_BOUND_DISCOVERY_ONLY",
         "commission_state": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
-        "slippage_delay_state": "C006_BOUND_FROZEN_C012_METHOD_FROZEN_PENDING_PREOPEN_INPUT",
-        "numeric_execution_rule_frozen": false,
+        "slippage_delay_state": "C006_BOUND_FROZEN_C012_BOUND_FROZEN_WITH_FAIL_CLOSED_APPLICABILITY_GATE",
+        "numeric_execution_rule_frozen": true,
         "candidate_market_proxy_mutated": false,
         "calibration_used_candidate_signals": false,
         "calibration_used_candidate_returns": false,
@@ -193,23 +193,53 @@
         "c006_numeric_execution_bound_frozen": true,
         "c006_round_trip_envelope_points": 13.3,
         "c006_readiness": "READY_PRE_OUTCOME",
-        "c012_numeric_execution_bound_frozen": false,
-        "c012_readiness": "BLOCKED_PREOPEN_0930_SUPPLEMENT",
-        "c012_missing_state_classification": "ACQUISITION_DOMAIN_INSUFFICIENCY_NOT_IRREDUCIBLE",
+        "c012_numeric_execution_bound_frozen": true,
+        "c012_readiness": "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE",
+        "c012_missing_state_classification": "PREOPEN_0930_RESOLVED_1180_OF_1180_REAL_SESSIONS",
         "preopen_supplement_plan": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json",
         "commission_policy": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
         "raw_commitment_correction": "evidence/TIER1_RAW_COMMITMENT_VERIFICATION_CORRECTION_V1.json",
-        "exact_fill_truth_claimed": false
+        "exact_fill_truth_claimed": false,
+        "preopen_supplement_acceptance": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+        "preopen_source_bundle_sha256": "8171ce2d68fef0ac0241b88e914725c16a301e36ae836f766efff4da8aabe798",
+        "preopen_raw_chunk_commitments_verified": true,
+        "preopen_raw_bytes_transferred": false,
+        "preopen_raw_bytes_independently_recomputed": false,
+        "preopen_raw_chunk_count": 4912,
+        "preopen_raw_tick_rows": 6951290,
+        "preopen_raw_ordered_manifest_sha256": "3b472e6a6a2ebd0ffc4e228f834e28ff8d09e2cd9a1812c2ee8ecfa2d2c876d3",
+        "preopen_0930_real_session_two_sided_coverage": "US500_1180_OF_1180__NAS100_1180_OF_1180",
+        "c012_transaction_envelope_points": 95.3,
+        "c012_nominal_round_trip_envelope_points": 190.6,
+        "c012_cost_applicability_gate": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
+        "c012_unresolved_generic_boundaries": [
+          {
+            "session_date": "2024-12-31",
+            "boundary_local_et": "15:00",
+            "boundary_timestamp_ms": 1735675200000
+          },
+          {
+            "session_date": "2025-12-31",
+            "boundary_local_et": "15:00",
+            "boundary_timestamp_ms": 1767211200000
+          }
+        ]
       },
       "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
       "m6_stage_a_economics_authorized": false,
-      "active_tier1_calibration_result_ref": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V2.json",
+      "active_tier1_calibration_result_ref": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json",
       "active_tier1_commission_policy_ref": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
-      "active_tier1_preopen_plan_ref": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json"
+      "active_tier1_preopen_plan_ref": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json",
+      "active_tier1_preopen_acceptance_ref": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+      "active_c012_cost_applicability_gate_ref": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
+      "first_clean_stage_a_ready_candidates": [
+        "V2-C006",
+        "V2-C012"
+      ]
     },
     "economics_run": false
   },
-  "next_action": "Run exactly one small signal-blind 09:15-09:30 ET US500/NAS100 BID/ASK Pydroid supplement from the exact-head CI artifact, return only MXM_M6_TIER1_PREOPEN_0930_SUPPLEMENT_V1.zip, and preserve .m6_cost_evidence_work/tier1_us500_nas100_v3/chunks. Do not run M6 economics.",
+  "next_action": "No additional user capture. Prepare the first clean M6 Stage-A economic runner for V2-C006 and V2-C012 using the frozen conservative bounds and the C012 fail-closed cost-applicability gate. Keep C007/C009 on their frozen minimum evidence paths and C008/C010/C011 blocked. Do not inspect protected evidence.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
   "pre_m6_closure": {
@@ -307,13 +337,13 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "PRE_M6_COST_METHODOLOGY_RESOLVED_C012_PREOPEN_SUPPLEMENT_PENDING",
+  "primary_run_objective": "PRE_M6_TIER1_SUPPLEMENT_ACCEPTED_STAGE_A_RUNNER_PREPARATION_NEXT",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": true,
-  "user_action_required": true,
+  "user_action_required": false,
   "v2_attempts_used": 0,
   "v2_evaluated_identities": 0,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
@@ -322,11 +352,11 @@
   "future_broker_structural_universe_authority": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
   "reference_cash_session_calendar_authority": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
   "reference_cash_session_calendar_correction_authority": "evidence/PRE_M6_NASDAQ_CALENDAR_CORRECTION_V1.json",
-  "pre_m6_readiness_authority": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V5.json",
+  "pre_m6_readiness_authority": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V6.json",
   "tier1_cost_evidence_plan_authority": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
   "tier1_cost_evidence_sources_authority": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
   "pre_m6_timestamp_provenance_correction_authority": "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
-  "pre_m6_operational_state": "C006_READY_C012_PREOPEN_SUPPLEMENT_REQUIRED_NO_ECONOMICS",
+  "pre_m6_operational_state": "TIER1_PREOUTCOME_COST_METHOD_RESOLVED_C006_C012_READY_NO_USER_CAPTURE",
   "pre_m6_final_integrity_correction_authority": "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json",
   "tier1_discovery_execution_cost_calibration_protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
   "pre_m6_quote_evidence_execution_authority_correction_authority": "evidence/PRE_M6_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_CORRECTION_V1.json",
@@ -337,9 +367,11 @@
   "pre_m6_tier1_compact_transfer_finalization_authority": "evidence/PRE_M6_TIER1_COMPACT_TRANSFER_FINALIZATION_V1.json",
   "pre_m6_tier1_compact_finalizer_indexing_authority": "evidence/PRE_M6_TIER1_COMPACT_FINALIZER_INDEXING_V1.json",
   "tier1_cost_evidence_capture_acceptance_authority": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
-  "tier1_discovery_execution_cost_calibration_result_authority": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V2.json",
+  "tier1_discovery_execution_cost_calibration_result_authority": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json",
   "tier1_discovery_commission_policy_coverage_authority": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
   "tier1_raw_commitment_verification_correction_authority": "evidence/TIER1_RAW_COMMITMENT_VERIFICATION_CORRECTION_V1.json",
   "tier1_preopen_0930_supplement_plan_authority": "data/TIER1_PREOPEN_0930_SUPPLEMENT_PLAN_V1.json",
-  "c007_c009_tier2_cost_evidence_path_authority": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json"
+  "c007_c009_tier2_cost_evidence_path_authority": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json",
+  "tier1_preopen_0930_supplement_acceptance_authority": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+  "c012_discovery_cost_applicability_gate_authority": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json"
 }

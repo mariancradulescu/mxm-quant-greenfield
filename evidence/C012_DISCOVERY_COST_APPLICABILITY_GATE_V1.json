@@ -1,0 +1,70 @@
+{
+  "schema": "mxm.greenfield.v2.c012-discovery-cost-applicability-gate.v1",
+  "status": "FROZEN_PRE_OUTCOME_FAIL_CLOSED",
+  "candidate_id": "V2-C012",
+  "candidate_spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+  "evidence_authority": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+  "calibration_protocol": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "rule": {
+    "cost_confidence_when_applicable": "CONSERVATIVE_BOUND",
+    "transaction_cost_envelope_points": 95.3,
+    "nominal_round_trip_two_transaction_envelope_points": 190.6,
+    "transaction_formula": "FULL_CAUSAL_SPREAD + ABS_MID_DISPLACEMENT_TO_FIRST_BILATERAL_QUOTE_REFRESH",
+    "constant_envelope_construction": "COMPONENTWISE_MAXIMA_OVER_ALL_VALID_SIGNAL_BLIND_C012_GENERIC_ENTRY_DOMAIN_ROWS; MAXIMA NEED NOT CO-OCCUR",
+    "apply_same_envelope_to_entry_and_exit": true,
+    "commission": "ZERO_SEPARATE_INDEX_COMMISSION_UNDER_VERIFIED_DISCOVERY_POLICY_COVERAGE",
+    "financing": "NOT_APPLICABLE_TO_FROZEN_INTRADAY_HOLD",
+    "candidate_direction_independent": true,
+    "candidate_pnl_independent": true,
+    "candidate_signal_independent_at_freeze": true,
+    "discovery_only": true,
+    "certification_fill_truth": false
+  },
+  "applicability_domain": {
+    "source_domain": "OFFICIAL_CASH_SESSION_GENERIC_M15_BOUNDARIES_09_30_THROUGH_SESSION_CLOSE_MINUS_60_MINUTES",
+    "real_reference_sessions": 1180,
+    "domain_rows": 27032,
+    "valid_rows": 27030,
+    "unresolved_rows": 2,
+    "valid_0930_after_preopen_supplement": "1180/1180",
+    "unresolved_exact_boundaries": [
+      {
+        "session_date": "2024-12-31",
+        "boundary_local_et": "15:00",
+        "boundary_timestamp_ms": 1735675200000
+      },
+      {
+        "session_date": "2025-12-31",
+        "boundary_local_et": "15:00",
+        "boundary_timestamp_ms": 1767211200000
+      }
+    ]
+  },
+  "fail_closed_application": [
+    "Before computing coarse-net economics, derive every C012 entry and exit transaction timestamp under the frozen replay semantics.",
+    "A transaction timestamp is cost-applicable only if it belongs to the frozen valid generic-support domain represented by this artifact.",
+    "If any required transaction timestamp is outside the supported domain, including a late-session exit beyond session_close_minus_60_minutes or either explicit unresolved boundary, do not impute a favorable cost and do not use the 95.3-point envelope for that unsupported context.",
+    "If any required transaction context is unsupported, classify the candidate cost confidence UNRESOLVED and the Stage-A result COST_UNRESOLVED; do not promote, do not reinterpret the boundary after seeing PnL, and do not rescue under the same identity.",
+    "If every required transaction context is supported, apply 95.3 NAS100 index points per transaction uniformly, independent of direction or realized PnL."
+  ],
+  "methodological_reason": [
+    "C012 entry timing is signal-selected, so a single pre-frozen constant envelope avoids post-signal boundary selection.",
+    "Using componentwise maxima rather than a percentile creates an adverse empirical stress envelope over 27,030 valid candidate-independent DEVELOPMENT boundaries.",
+    "The fail-closed domain rule prevents the two missing refresh contexts and uncalibrated late-session exits from being silently assigned favorable costs.",
+    "The rule is intentionally coarse Discovery screening and makes no claim about Certification-grade historical fills."
+  ],
+  "forbidden_inputs_used": {
+    "signals": false,
+    "returns": false,
+    "pnl": false,
+    "outcomes": false,
+    "protected": false
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false
+  }
+}
