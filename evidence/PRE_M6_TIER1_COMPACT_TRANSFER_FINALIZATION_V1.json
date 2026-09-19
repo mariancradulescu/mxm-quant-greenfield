@@ -1,0 +1,69 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-tier1-compact-transfer-finalization.v1",
+  "status": "PRE_OUTCOME_TRANSFER_ONLY_OPTIMIZATION_RAW_EVIDENCE_RETAINED_LOCALLY",
+  "problem": {
+    "observed_partial_output": [
+      "US500_BID.csv approximately 1.67 GB",
+      "US500_ASK.csv approximately 1.67 GB",
+      "US500 boundary evidence temporary file approximately 1.90 MB"
+    ],
+    "risk": "Consolidating all four raw tapes would create multi-GB output, require repeated full-file hashing/compression on Android, and exceed practical chat upload limits without adding Stage-A information beyond the retained hash-verified chunks and generic boundary evidence."
+  },
+  "corrected_transfer_contract": {
+    "raw_capture_complete_chunks_expected": 4912,
+    "raw_chunks_retained_locally": true,
+    "local_retention_path": ".m6_cost_evidence_work/tier1_us500_nas100_v3/chunks",
+    "raw_consolidated_csv_files_created": false,
+    "raw_bytes_embedded_in_transfer_zip": false,
+    "cryptographic_binding": "Every raw chunk remains individually SHA256-bound in a deterministic ordered manifest; four per-stream manifest digests and one overall manifest digest are included.",
+    "transferred_derived_files": [
+      "derived/US500_M15_BOUNDARY_QUOTE_EVIDENCE.csv",
+      "derived/NAS100_M15_BOUNDARY_QUOTE_EVIDENCE.csv"
+    ],
+    "transferred_manifests": [
+      "evidence/raw_chunk_commitment.json",
+      "evidence/request_manifest.json",
+      "evidence/account.json",
+      "evidence/symbol_verification.json",
+      "evidence/quote_boundary_evidence_policy.json",
+      "provenance_manifest.json",
+      "bundle_manifest.json",
+      "CHECKSUMS.sha256"
+    ],
+    "output_zip": "MXM_M6_TIER1_COST_EVIDENCE_V3.zip"
+  },
+  "rationale": [
+    "Discovery calibration protocol consumes candidate-independent quote dynamics at generic M15 boundaries, which are deterministically derived locally from the retained raw chunks.",
+    "The complete raw evidence is not discarded; it stays on-device for later reprocessing/audit until explicit deletion authorization.",
+    "The transfer bundle commits cryptographically to every local raw chunk but avoids redundant multi-GB concatenation.",
+    "No candidate signal/return/PnL is used and no economic outcome is opened."
+  ],
+  "unchanged": {
+    "active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "raw_acquisition_domain": true,
+    "raw_chunk_bytes": true,
+    "target_symbol_ids": {
+      "US500": 127,
+      "NAS100": 126
+    },
+    "quote_types": [
+      "BID",
+      "ASK"
+    ],
+    "boundary_evidence_semantics": true,
+    "calibration_protocol": true,
+    "candidate_specs": true,
+    "accepted_ohlc": true,
+    "ledger": true,
+    "search_budget": true,
+    "protected_boundary": true
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}
