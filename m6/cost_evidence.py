@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+from bisect import bisect_left, bisect_right
 import io
 import json
 import math
@@ -436,6 +437,171 @@ def first_both_sides_refreshed_diagnostic(
         "both quote sides did not independently refresh within diagnostic window"
     )
 
+
+
+class BoundaryQuoteIndex:
+    """Efficient immutable lookup index for one session's chronological BID/ASK ticks.
+
+    This preserves the already-frozen boundary semantics while avoiding repeated full-list
+    scans for every M15 boundary. Construction is O(n); each boundary lookup is O(log n).
+    """
+
+    def __init__(
+        self,
+        bid_ticks: Sequence[DecodedTick],
+        ask_ticks: Sequence[DecodedTick],
+    ):
+        self.bid_ticks = bid_ticks
+        self.ask_ticks = ask_ticks
+        self.bid_ts = [x.timestamp_ms for x in bid_ticks]
+        self.ask_ts = [x.timestamp_ms for x in ask_ticks]
+        if any(a > b for a, b in zip(self.bid_ts, self.bid_ts[1:])):
+            raise CaptureContractError("BID ticks are not chronological")
+        if any(a > b for a, b in zip(self.ask_ts, self.ask_ts[1:])):
+            raise CaptureContractError("ASK ticks are not chronological")
+
+    @staticmethod
+    def _first_at_latest_timestamp_at_or_before(
+        ticks: Sequence[DecodedTick],
+        stamps: Sequence[int],
+        boundary_ms: int,
+    ) -> DecodedTick | None:
+        right = bisect_right(stamps, boundary_ms)
+        if right <= 0:
+            return None
+        latest_stamp = stamps[right - 1]
+        return ticks[bisect_left(stamps, latest_stamp)]
+
+    @staticmethod
+    def _first_at_or_after(
+        ticks: Sequence[DecodedTick],
+        stamps: Sequence[int],
+        boundary_ms: int,
+    ) -> DecodedTick | None:
+        index = bisect_left(stamps, boundary_ms)
+        return None if index >= len(ticks) else ticks[index]
+
+    @staticmethod
+    def _last_at_or_before(
+        ticks: Sequence[DecodedTick],
+        stamps: Sequence[int],
+        boundary_ms: int,
+    ) -> DecodedTick | None:
+        index = bisect_right(stamps, boundary_ms) - 1
+        return None if index < 0 else ticks[index]
+
+    @staticmethod
+    def _last_strictly_before(
+        ticks: Sequence[DecodedTick],
+        stamps: Sequence[int],
+        boundary_ms: int,
+    ) -> DecodedTick | None:
+        index = bisect_left(stamps, boundary_ms) - 1
+        return None if index < 0 else ticks[index]
+
+    def causal_state_at_boundary(self, boundary_ms: int) -> BoundaryCausalState:
+        bid = self._first_at_latest_timestamp_at_or_before(
+            self.bid_ticks, self.bid_ts, boundary_ms
+        )
+        ask = self._first_at_latest_timestamp_at_or_before(
+            self.ask_ticks, self.ask_ts, boundary_ms
+        )
+        if bid is None and ask is None:
+            availability = "MISSING_BOTH_SIDES"
+        elif bid is None:
+            availability = "MISSING_BID"
+        elif ask is None:
+            availability = "MISSING_ASK"
+        else:
+            availability = "CAUSAL_TWO_SIDED_AVAILABLE"
+        return BoundaryCausalState(
+            boundary_ms=boundary_ms,
+            bid=None if bid is None else bid.price,
+            ask=None if ask is None else ask.price,
+            bid_timestamp_ms=None if bid is None else bid.timestamp_ms,
+            ask_timestamp_ms=None if ask is None else ask.timestamp_ms,
+            bid_age_ms=None if bid is None else boundary_ms-bid.timestamp_ms,
+            ask_age_ms=None if ask is None else boundary_ms-ask.timestamp_ms,
+            spread=None if bid is None or ask is None else ask.price-bid.price,
+            availability=availability,
+        )
+
+    def first_post_bid(self, boundary_ms: int) -> DecodedTick | None:
+        return self._first_at_or_after(self.bid_ticks, self.bid_ts, boundary_ms)
+
+    def first_post_ask(self, boundary_ms: int) -> DecodedTick | None:
+        return self._first_at_or_after(self.ask_ticks, self.ask_ts, boundary_ms)
+
+    def first_post_any(self, boundary_ms: int) -> FirstAnyQuoteEvent | None:
+        bid = self.first_post_bid(boundary_ms)
+        ask = self.first_post_ask(boundary_ms)
+        if bid is None and ask is None:
+            return None
+        stamps = [x.timestamp_ms for x in (bid, ask) if x is not None]
+        stamp = min(stamps)
+        bid_here = bid if bid is not None and bid.timestamp_ms == stamp else None
+        ask_here = ask if ask is not None and ask.timestamp_ms == stamp else None
+        side = (
+            "BID_AND_ASK"
+            if bid_here is not None and ask_here is not None
+            else "BID"
+            if bid_here is not None
+            else "ASK"
+        )
+        return FirstAnyQuoteEvent(
+            timestamp_ms=stamp,
+            side=side,
+            bid_price=None if bid_here is None else bid_here.price,
+            ask_price=None if ask_here is None else ask_here.price,
+            delay_ms=stamp-boundary_ms,
+        )
+
+    def both_sides_refreshed_diagnostic(
+        self,
+        boundary_ms: int,
+        *,
+        diagnostic_window_ms: int = QUOTE_REFRESH_DIAGNOSTIC_WINDOW_MS,
+    ) -> CausalQuoteState:
+        if diagnostic_window_ms <= 0:
+            raise CaptureContractError("quote-refresh diagnostic window must be positive")
+        first_bid = self.first_post_bid(boundary_ms)
+        first_ask = self.first_post_ask(boundary_ms)
+        if first_bid is None or first_ask is None:
+            raise CaptureContractError(
+                "both quote sides did not independently refresh within diagnostic window"
+            )
+
+        refresh_ms = max(first_bid.timestamp_ms, first_ask.timestamp_ms)
+        if refresh_ms >= boundary_ms + diagnostic_window_ms:
+            raise CaptureContractError(
+                "both quote sides did not independently refresh within diagnostic window"
+            )
+
+        if first_bid.timestamp_ms < first_ask.timestamp_ms:
+            # Trigger is first ASK at refresh_ms. All same-ms BID events precede ASK.
+            bid = self._last_at_or_before(self.bid_ticks, self.bid_ts, refresh_ms)
+            ask = first_ask
+        elif first_ask.timestamp_ms < first_bid.timestamp_ms:
+            # Trigger is first BID at refresh_ms. Same-ms ASK events have not occurred yet.
+            bid = first_bid
+            ask = self._last_strictly_before(self.ask_ticks, self.ask_ts, refresh_ms)
+        else:
+            # Same-ms first refreshes: cTrader causal merge orders all BID events before ASK.
+            bid = self._last_at_or_before(self.bid_ticks, self.bid_ts, refresh_ms)
+            ask = first_ask
+
+        if bid is None or ask is None:
+            raise CaptureContractError(
+                "both quote sides did not independently refresh within diagnostic window"
+            )
+        return CausalQuoteState(
+            timestamp_ms=refresh_ms,
+            bid=bid.price,
+            ask=ask.price,
+            bid_timestamp_ms=bid.timestamp_ms,
+            ask_timestamp_ms=ask.timestamp_ms,
+            spread=ask.price-bid.price,
+        )
 
 
 def cost_resume_contract(
