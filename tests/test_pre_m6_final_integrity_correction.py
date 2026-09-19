@@ -323,7 +323,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
     def test_20_current_state_points_only_to_corrected_active_pre_m6_authorities(self):
         s = load("CURRENT_STATE.json")
         self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_V3_QUOTE_CAPTURE_READY")
+        self.assertEqual(s["pre_m6_operational_state"], "TIER1_QUOTE_CAPTURE_ACCEPTED_COST_RULE_UNRESOLVED")
         self.assertEqual(
             s["future_wave_opportunity_coverage_authority"],
             "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
@@ -338,7 +338,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         )
         self.assertEqual(
             s["pre_m6_readiness_authority"],
-            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json",
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json",
         )
         self.assertEqual(
             s["tier1_cost_evidence_plan_authority"],
@@ -366,7 +366,7 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         self.assertFalse(s["competition_start_authorized"])
 
     def test_21_active_readiness_uses_corrected_calendar_cost_plan_and_commission_state(self):
-        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json")
+        r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
         self.assertEqual(
             r["authorities"]["reference_calendar"],
             "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
@@ -385,11 +385,11 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         )
         self.assertEqual(
             r["candidates"]["V2-C006"]["discovery_cost_evidence"]["commission"],
-            "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+            "BLOCKED_EXACT_INTERVENING_HISTORICAL_CONTINUITY_UNRESOLVED",
         )
         self.assertEqual(
             r["candidates"]["V2-C012"]["m6_stage_a_readiness"],
-            "BLOCKED_DISCOVERY_COST_EVIDENCE",
+            "BLOCKED_DISCOVERY_COST_RULE",
         )
         self.assertEqual(r["ready_candidates"], [])
 
