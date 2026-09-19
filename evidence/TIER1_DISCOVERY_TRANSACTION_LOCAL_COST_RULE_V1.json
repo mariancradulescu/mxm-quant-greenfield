@@ -1,0 +1,158 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-discovery-transaction-local-cost-rule.v1",
+  "status": "FROZEN_PRE_OUTCOME_TRANSACTION_LOCAL_PRIMARY_COST_WITH_STRESS_DIAGNOSTICS",
+  "scope": "C006_C012_DISCOVERY_COST_APPLICATION_ONLY",
+  "frozen_before_any_affected_candidate_economic_outcome": true,
+  "candidate_specs_mutated": false,
+  "new_capture_required": false,
+  "supersedes_application_semantics_only": [
+    {
+      "authority": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json",
+      "prior_semantic": "C006 historical maximum envelopes used as constant primary transaction costs",
+      "replacement": "C006 transaction-local same-row primary cost; prior maxima retained as stress diagnostics only"
+    },
+    {
+      "authority": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
+      "prior_semantic": "95.3 NAS100 points applied uniformly to each supported transaction",
+      "replacement": "C012 transaction-local same-row primary cost; 95.3/190.6 retained as stress diagnostics only; fail-closed unsupported-domain law preserved"
+    }
+  ],
+  "primary_discovery_cost": {
+    "name": "TRANSACTION_LOCAL_SAME_ROW_ADVERSE_PROXY",
+    "formula": "FULL_CAUSAL_SPREAD_AT_BOUNDARY + ABS_MID_DISPLACEMENT_TO_FIRST_BILATERAL_QUOTE_REFRESH",
+    "same_row_required": true,
+    "exact_transaction_boundary_lookup_required": true,
+    "candidate_direction_changes_cost_sign_or_magnitude": false,
+    "percentile_selection_used": false,
+    "cross_row_component_maxima_used_as_primary": false,
+    "missing_or_unsupported_row": "COST_UNRESOLVED",
+    "favorable_imputation_forbidden": true,
+    "calibration_inputs": {
+      "candidate_signals": false,
+      "candidate_returns": false,
+      "candidate_pnl": false,
+      "candidate_outcomes": false,
+      "protected_evidence": false
+    }
+  },
+  "evidence_sources": {
+    "US500": {
+      "candidate": "V2-C006",
+      "source_capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+      "derived_path": "derived/US500_M15_BOUNDARY_QUOTE_EVIDENCE.csv",
+      "derived_sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+      "row_count": 31752,
+      "required_fields": [
+        "session_date",
+        "boundary_timestamp_ms",
+        "causal_bid",
+        "causal_ask",
+        "causal_spread",
+        "both_sides_refreshed_state_timestamp_ms",
+        "both_sides_refreshed_bid",
+        "both_sides_refreshed_ask",
+        "both_sides_refreshed_classification"
+      ]
+    },
+    "NAS100": {
+      "candidate": "V2-C012",
+      "source_preopen_acceptance": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+      "derived_path": "derived/NAS100_C012_GENERIC_BOUND_COST_SUPPORT.csv",
+      "derived_sha256": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999",
+      "row_count": 27032,
+      "valid_rows": 27030,
+      "required_fields": [
+        "session_date",
+        "boundary_timestamp_ms",
+        "causal_bid",
+        "causal_ask",
+        "causal_spread",
+        "refresh_timestamp_ms",
+        "refresh_bid",
+        "refresh_ask",
+        "absolute_mid_displacement_points",
+        "state"
+      ]
+    }
+  },
+  "same_row_evidence_binding": [
+    "instrument",
+    "exact_transaction_boundary_timestamp",
+    "causal_bid",
+    "causal_ask",
+    "causal_spread",
+    "first_bilateral_refresh_evidence",
+    "absolute_mid_displacement",
+    "transaction_cost_proxy",
+    "evidence_availability_state"
+  ],
+  "candidates": {
+    "V2-C006": {
+      "spec_hash": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+      "primary_cost": "TRANSACTION_LOCAL",
+      "transaction_boundaries_et": {
+        "entry": "09:45",
+        "exit": "12:45"
+      },
+      "application": "For each frozen replay trade, select US500 generic evidence at that exact session/timestamp for entry and exit and apply the same-row formula independently.",
+      "unsupported_required_row": "COST_UNRESOLVED",
+      "readiness": "READY_PRE_OUTCOME",
+      "worst_observed_stress_diagnostic": {
+        "entry_points": 11.1,
+        "exit_points": 2.2,
+        "round_trip_points": 13.3,
+        "role": "STRESS_DIAGNOSTIC_ONLY_NOT_PRIMARY_COST"
+      }
+    },
+    "V2-C012": {
+      "spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+      "primary_cost": "TRANSACTION_LOCAL",
+      "application": "For each frozen replay trade, select the already-precomputed NAS100 generic evidence at the exact entry boundary and exact exit boundary and apply the same-row formula independently.",
+      "candidate_signal_role": "SELECTS_ONLY_WHICH_PRECOMPUTED_GENERIC_ROW_APPLIES; DOES_NOT_CALIBRATE_OR_MODIFY_FORMULA",
+      "unsupported_required_row": "COST_UNRESOLVED",
+      "preserved_fail_closed_boundaries": [
+        {
+          "session_date": "2024-12-31",
+          "boundary_local_et": "15:00",
+          "boundary_timestamp_ms": 1735675200000
+        },
+        {
+          "session_date": "2025-12-31",
+          "boundary_local_et": "15:00",
+          "boundary_timestamp_ms": 1767211200000
+        }
+      ],
+      "outside_calibrated_generic_domain": "COST_UNRESOLVED",
+      "readiness": "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE",
+      "worst_observed_stress_diagnostic": {
+        "componentwise_transaction_points": 95.3,
+        "nominal_round_trip_points": 190.6,
+        "construction": "MAX_CAUSAL_SPREAD_ACROSS_VALID_ROWS + MAX_ABS_MID_DISPLACEMENT_ACROSS_VALID_ROWS; MAXIMA_NEED_NOT_CO_OCCUR",
+        "role": "STRESS_DIAGNOSTIC_ONLY_NOT_PRIMARY_COST"
+      }
+    }
+  },
+  "execution_truth_separation": {
+    "quote_refresh_is_historical_fill_assertion": false,
+    "refresh_mid_displacement_role": "ADVERSE_DISCOVERY_UNCERTAINTY_PROXY_ONLY",
+    "candidate_market_proxy_timing_mutated": false,
+    "candidate_market_proxy_price_mutated": false,
+    "certification_execution_truth_established": false
+  },
+  "stress_policy": {
+    "retain_global_max_envelopes": true,
+    "primary_cost_replacement_forbidden": true,
+    "future_outcome_sensitivity_may_modify_primary_rule": false,
+    "percentile_primary_rule_forbidden": true
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}

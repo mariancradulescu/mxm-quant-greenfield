@@ -1,0 +1,74 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-pre-m6-readiness.v7",
+  "status": "TIER1_TRANSACTION_LOCAL_COST_RULE_FROZEN_FIRST_RUNNER_PREPARATION_ALLOWED_NO_ECONOMICS",
+  "supersedes": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V6.json",
+  "authorities": {
+    "prior_readiness": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V6.json",
+    "calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V4.json",
+    "transaction_local_cost_rule": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "original_capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+    "preopen_acceptance": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+    "c012_domain_gate": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
+    "commission_policy": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json"
+  },
+  "candidates": {
+    "V2-C006": {
+      "primary_execution_cost": "TRANSACTION_LOCAL_SAME_ROW_US500_0945_ENTRY_1245_EXIT",
+      "worst_observed_global_max": "13_3_POINTS_STRESS_DIAGNOSTIC_ONLY",
+      "unsupported_required_row": "COST_UNRESOLVED",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
+      "financing": "NOT_APPLICABLE",
+      "m6_stage_a_readiness": "READY_PRE_OUTCOME"
+    },
+    "V2-C007": {
+      "blocker": "TIER2_XAUUSD_SPREAD_COMMISSION_FINANCING_BOUND_AND_REPLAY_MATERIALIZATION",
+      "m6_stage_a_readiness": "BLOCKED_TIER2_EVIDENCE"
+    },
+    "V2-C008": {
+      "blocker": "C008_HISTORICAL_SPOTCRUDE_CONTINUOUS_ROLL_CONSTRUCTION",
+      "m6_stage_a_readiness": "BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION"
+    },
+    "V2-C009": {
+      "blocker": "TIER2_BTCUSD_SPREAD_COMMISSION_FINANCING_BOUND_AND_REPLAY_MATERIALIZATION",
+      "m6_stage_a_readiness": "BLOCKED_TIER2_EVIDENCE"
+    },
+    "V2-C010": {
+      "blocker": "C010_HISTORICALLY_EFFECTIVE_FINANCING_RATES_AND_MULTIPLIERS",
+      "m6_stage_a_readiness": "BLOCKED_C010_HISTORICAL_FINANCING"
+    },
+    "V2-C011": {
+      "blocker": "C011_BROKER_CFD_CORPORATE_ACTIONS_SHORT_ELIGIBILITY_FINANCING",
+      "m6_stage_a_readiness": "BLOCKED_C011_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
+    },
+    "V2-C012": {
+      "primary_execution_cost": "TRANSACTION_LOCAL_SAME_ROW_NAS100_EXACT_ENTRY_AND_EXIT_BOUNDARIES",
+      "stress_transaction_points": "95_3_STRESS_DIAGNOSTIC_ONLY",
+      "stress_nominal_round_trip_points": "190_6_STRESS_DIAGNOSTIC_ONLY",
+      "fail_closed_unsupported_boundaries_preserved": true,
+      "unsupported_or_outside_domain": "COST_UNRESOLVED",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
+      "financing": "NOT_APPLICABLE",
+      "m6_stage_a_readiness": "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE"
+    }
+  },
+  "ready_for_first_clean_stage_a": [
+    "V2-C006",
+    "V2-C012"
+  ],
+  "first_runner_preparation_authorized": true,
+  "first_runner_execution_authorized": false,
+  "global_full_wave_complete": false,
+  "user_action_required": false,
+  "exact_next_action": "Prepare and exact-head test the deterministic V2-C006/V2-C012 Stage-A runner against the frozen transaction-local cost rule. Do not execute candidate economics and do not inspect protected evidence.",
+  "invariants": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "m6_economics_run": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}

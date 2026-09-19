@@ -246,7 +246,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
             if x.strip()
         ]
         self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_PREOUTCOME_COST_METHOD_RESOLVED_C006_C012_READY_NO_USER_CAPTURE")
+        self.assertEqual(s["pre_m6_operational_state"], "TIER1_TRANSACTION_LOCAL_COST_FROZEN_STAGE_A_RUNNER_PREPARED_NOT_RUN")
         self.assertEqual(s["economic_outcomes_opened"], 0)
         self.assertEqual(s["v2_attempts_used"], 0)
         self.assertEqual(s["v2_evaluated_identities"], 0)
@@ -465,14 +465,14 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
         self.assertEqual(
             cap["state"],
-            "PREOPEN_SUPPLEMENT_ACCEPTED_C006_C012_PREOUTCOME_READY",
+            "TRANSACTION_LOCAL_PRIMARY_COST_FROZEN_C006_C012_PREOUTCOME_READY",
         )
         self.assertEqual(cap["historical_bid_ask"], "PASS_COMMITMENT_VERIFIED_RAW_BYTES_RETAINED_LOCAL_NOT_EXTERNALLY_RECOMPUTED")
         self.assertEqual(cap["raw_chunk_count"], 4912)
         self.assertEqual(cap["raw_tick_rows"], 272842293)
         self.assertTrue(cap["raw_chunks_retained_locally"])
         self.assertFalse(cap["raw_local_deletion_authorized"])
-        self.assertEqual(cap["execution_fill_rule"], "CONSERVATIVE_BOUND_DISCOVERY_ONLY")
+        self.assertEqual(cap["execution_fill_rule"], "TRANSACTION_LOCAL_SAME_ROW_ADVERSE_DISCOVERY_PROXY")
         self.assertFalse(cap["raw_bytes_independently_recomputed"])
         self.assertEqual(cap["c006_readiness"], "READY_PRE_OUTCOME")
         self.assertEqual(cap["c012_readiness"], "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE")

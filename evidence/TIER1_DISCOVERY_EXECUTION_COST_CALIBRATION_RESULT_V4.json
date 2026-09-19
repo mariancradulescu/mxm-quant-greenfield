@@ -1,0 +1,87 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-discovery-execution-cost-calibration-result.v4",
+  "status": "PRE_OUTCOME_TRANSACTION_LOCAL_PRIMARY_COST_FROZEN",
+  "supersedes": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json",
+  "supersession_scope": "COST_APPLICATION_SEMANTICS_ONLY; ACQUISITION_ACCEPTANCE_CALIBRATION_FORMULA_COMMISSION_AND_FAIL_CLOSED_DOMAIN_PRESERVED",
+  "transaction_local_cost_authority": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+  "protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "original_capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+  "preopen_supplement_acceptance": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+  "commission_policy": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
+  "c012_historical_gate_preserved_for_domain": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
+  "selected_state": "CONSERVATIVE_BOUND_TRANSACTION_LOCAL",
+  "primary_formula": "FULL_CAUSAL_SPREAD_AT_BOUNDARY + ABS_MID_DISPLACEMENT_TO_FIRST_BILATERAL_QUOTE_REFRESH_FROM_SAME_ROW",
+  "candidate_inputs_used": {
+    "signals": false,
+    "returns": false,
+    "pnl": false,
+    "outcomes": false,
+    "protected": false
+  },
+  "products": {
+    "US500": {
+      "applicable_candidate": "V2-C006",
+      "primary_cost": "TRANSACTION_LOCAL_SAME_ROW",
+      "entry_boundary_et": "09:45",
+      "exit_boundary_et": "12:45",
+      "evidence_source_sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+      "missing_required_row": "COST_UNRESOLVED",
+      "worst_observed_stress_diagnostic": {
+        "entry_points": 11.1,
+        "exit_points": 2.2,
+        "round_trip_points": 13.3,
+        "role": "STRESS_DIAGNOSTIC_ONLY"
+      },
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE_ZERO_SEPARATE_INDEX_COMMISSION",
+      "financing": "NOT_APPLICABLE_INTRADAY",
+      "readiness": "READY_PRE_OUTCOME",
+      "certification_fill_truth": false
+    },
+    "NAS100": {
+      "applicable_candidate": "V2-C012",
+      "primary_cost": "TRANSACTION_LOCAL_SAME_ROW",
+      "preopen_0930_causal_state": "PASS_1180_OF_1180_REAL_REFERENCE_SESSIONS",
+      "evidence_source_sha256": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999",
+      "valid_generic_rows": 27030,
+      "unresolved_generic_rows": 2,
+      "missing_or_outside_required_row": "COST_UNRESOLVED",
+      "preserved_unsupported_boundaries": [
+        {
+          "session_date": "2024-12-31",
+          "boundary_local_et": "15:00",
+          "boundary_timestamp_ms": 1735675200000
+        },
+        {
+          "session_date": "2025-12-31",
+          "boundary_local_et": "15:00",
+          "boundary_timestamp_ms": 1767211200000
+        }
+      ],
+      "worst_observed_stress_diagnostic": {
+        "componentwise_transaction_points": 95.3,
+        "nominal_round_trip_points": 190.6,
+        "role": "STRESS_DIAGNOSTIC_ONLY"
+      },
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE_ZERO_SEPARATE_INDEX_COMMISSION",
+      "financing": "NOT_APPLICABLE_INTRADAY",
+      "readiness": "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE",
+      "certification_fill_truth": false
+    }
+  },
+  "execution_truth_separation": {
+    "post_boundary_refresh_is_fill": false,
+    "midpoint_displacement_is_discovery_uncertainty_proxy": true,
+    "market_proxy_timing_unchanged": true,
+    "market_proxy_price_unchanged": true
+  },
+  "percentile_primary_rule": false,
+  "global_componentwise_max_primary_rule": false,
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

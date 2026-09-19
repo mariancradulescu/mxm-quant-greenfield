@@ -79,7 +79,7 @@ class PreM6PreopenSupplementAcceptanceTests(unittest.TestCase):
 
     def test_08_current_state_points_to_v6_v3_and_keeps_research_invariants_zero(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["pre_m6_readiness_authority"],"data/PRIMARY_WAVE_02_PRE_M6_READINESS_V6.json")
+        self.assertEqual(s["pre_m6_readiness_authority"],"data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json")
         self.assertEqual(s["tier1_discovery_execution_cost_calibration_result_authority"],"evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json")
         self.assertEqual(s["tier1_preopen_0930_supplement_acceptance_authority"],"data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json")
         self.assertEqual(s["c012_discovery_cost_applicability_gate_authority"],"evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json")

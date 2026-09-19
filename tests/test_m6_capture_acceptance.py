@@ -76,11 +76,11 @@ class M6CaptureAcceptanceTests(unittest.TestCase):
         )
         self.assertEqual(
             s["m6"]["auxiliary_evidence"]["state"],
-            "TIER1_PREOUTCOME_COST_METHOD_RESOLVED_C006_C012_READY",
+            "TIER1_TRANSACTION_LOCAL_COST_FROZEN_STAGE_A_RUNNER_PREPARED_NOT_RUN",
         )
         self.assertEqual(
             s["m6"]["auxiliary_evidence"]["active_readiness_ref"],
-            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V6.json",
+            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json",
         )
         self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
         self.assertFalse(s["m6"]["economics_run"])
