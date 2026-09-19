@@ -220,15 +220,15 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         self.assertNotIn("2026-09-17",c["closures"]+c["early_closes"])
 
     def test_18_candidate_specific_readiness_has_no_global_all_seven_gate(self):
-        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json")
-        self.assertEqual(r["status"],"CANDIDATE_SPECIFIC_PRE_V3_QUOTE_CAPTURE_NO_GLOBAL_ALL_SEVEN_GATE")
-        self.assertEqual(r["candidates"]["V2-C006"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_EVIDENCE")
-        self.assertEqual(r["candidates"]["V2-C012"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_EVIDENCE")
+        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
+        self.assertEqual(r["status"],"CANDIDATE_SPECIFIC_POST_TIER1_QUOTE_CAPTURE_COST_CALIBRATION_UNRESOLVED")
+        self.assertEqual(r["candidates"]["V2-C006"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_RULE")
+        self.assertEqual(r["candidates"]["V2-C012"]["m6_stage_a_readiness"],"BLOCKED_DISCOVERY_COST_RULE")
         self.assertEqual(r["candidates"]["V2-C008"]["m6_stage_a_readiness"],"BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION")
         self.assertEqual(r["ready_candidates"],[])
 
     def test_19_c008_c010_c011_blockers_do_not_change_c006_c012_gate_state(self):
-        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json")["candidates"]
+        r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")["candidates"]
         self.assertNotIn("C008",r["V2-C006"]["m6_stage_a_readiness"])
         self.assertNotIn("C010",r["V2-C012"]["m6_stage_a_readiness"])
         self.assertNotIn("C011",r["V2-C006"]["m6_stage_a_readiness"])
