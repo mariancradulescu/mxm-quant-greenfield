@@ -122,3 +122,26 @@ for up to 30 minutes. Valid completed chunks remain SHA256-verified and resumabl
 
 The user must not edit package files, delete work state, or manually repair anything.
 Extract the package and run M6_COST_EVIDENCE_RUN.py.
+
+
+V3 COMPACT1 FINALIZATION:
+The Tier-1 raw capture has completed all 4912 local BID/ASK chunks. The older finalizer
+unnecessarily concatenated those chunks into multi-GB raw CSV tapes (observed US500 BID
+and ASK about 1.67 GB each), which is unsuitable for Android finalization and chat transfer.
+
+COMPACT1 does NOT recapture ticks. On launch it SHA256-verifies/reuses the existing V3
+chunks, removes only the partial cost_capture_output/MXM_M6_TIER1_COST_EVIDENCE_V3
+transfer directory, and derives the two generic boundary-evidence CSVs directly from the
+retained daily chunks.
+
+Raw tick bytes remain under:
+.m6_cost_evidence_work/tier1_us500_nas100_v3/chunks
+
+The transferable ZIP intentionally does NOT embed consolidated raw tick CSVs. Instead it
+contains a deterministic raw_chunk_commitment manifest with all 4912 individual chunk
+SHA256 values, row counts, request windows, four per-stream manifest digests and one
+overall ordered-manifest digest, plus the two derived boundary evidence files and the
+normal provenance/policy/checksum files.
+
+Keep .m6_cost_evidence_work on the phone until ChatGPT explicitly says it can be deleted.
+Return only MXM_M6_TIER1_COST_EVIDENCE_V3.zip. No manual editing or file selection is needed.
