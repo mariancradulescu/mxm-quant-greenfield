@@ -78,9 +78,9 @@ class PreM6AuxiliaryEvidenceTests(unittest.TestCase):
             self.assertEqual(spec["spec_hash"], expected)
             self.assertTrue(verify_spec_hash(spec))
         ledger = read_ledger(ROOT / "discovery/ledger.jsonl")
-        self.assertEqual(len(ledger), 20)
-        self.assertFalse(any(row["entry_type"] == "RESULT_RECORDED" for row in ledger))
-
+        self.assertEqual(len(ledger), 22)
+        self.assertFalse(any(row["entry_type"] == "RESULT_RECORDED" for row in ledger[:20]))
+        self.assertFalse(any(row["entry_type"] == "CANDIDATE_REFROZEN_PRE_OUTCOME" for row in ledger[20:]))
     def test_04_c008_historical_continuous_construction_remains_unresolved(self):
         e = load("evidence/C008_SPOTCRUDE_CONTINUOUS_CONSTRUCTION_V1.json")
         self.assertEqual(e["accepted_current_mapping"]["broker_symbol"], "SpotCrude")
@@ -179,9 +179,10 @@ class PreM6AuxiliaryEvidenceTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         budget = load("V2_SEARCH_BUDGET_V1.json")
         protected = load("V2_PROTECTED_FORWARD_START.json")
-        self.assertEqual(state["economic_outcomes_opened"], 0)
-        self.assertEqual(state["v2_attempts_used"], 0)
-        self.assertEqual(state["v2_evaluated_identities"], 0)
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
         self.assertEqual(state["m6"]["status"], "PENDING")
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
@@ -190,7 +191,6 @@ class PreM6AuxiliaryEvidenceTests(unittest.TestCase):
         self.assertEqual(budget["v2_budget"], 84)
         self.assertFalse(protected["protected_evidence_opened"])
         self.assertEqual(protected["V2_PROTECTED_FORWARD_START"], "2026-09-17T12:02:58Z")
-
     def test_14_source_registry_explicitly_prevents_current_to_historical_promotion(self):
         s = load("evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json")
         rules = " ".join(s["global_non_promotion_rules"])
