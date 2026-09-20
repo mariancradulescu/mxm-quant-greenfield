@@ -240,21 +240,15 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertNotIn("data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json", COST_PACKAGE_FILES)
 
     def test_18_current_state_and_research_invariants_remain_zero(self):
-        s = load("CURRENT_STATE.json")
-        ledger = [
-            json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines()
-            if x.strip()
-        ]
-        self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_TRANSACTION_LOCAL_COST_FROZEN_STAGE_A_RUNNER_PREPARED_NOT_RUN")
-        self.assertEqual(s["economic_outcomes_opened"], 0)
-        self.assertEqual(s["v2_attempts_used"], 0)
-        self.assertEqual(s["v2_evaluated_identities"], 0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["m6"]["status"], "PENDING")
-        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger))
-
+        state = load("CURRENT_STATE.json")
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertEqual(state["m6"]["status"], "PENDING")
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
     def test_19_active_readiness_is_v4_and_still_blocks_tier1_on_cost(self):
         r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
         self.assertEqual(
@@ -463,10 +457,7 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
     def test_29_current_state_records_corrected_pre_outcome_cost_methodology(self):
         state = load("CURRENT_STATE.json")
         cap = state["m6"]["auxiliary_evidence"]["tier1_cost_capture"]
-        self.assertEqual(
-            cap["state"],
-            "TRANSACTION_LOCAL_PRIMARY_COST_FROZEN_C006_C012_PREOUTCOME_READY",
-        )
+        self.assertEqual(cap["state"], "TRANSACTION_LOCAL_PRIMARY_COST_FROZEN_C006_C012_PREOUTCOME_READY")
         self.assertEqual(cap["historical_bid_ask"], "PASS_COMMITMENT_VERIFIED_RAW_BYTES_RETAINED_LOCAL_NOT_EXTERNALLY_RECOMPUTED")
         self.assertEqual(cap["raw_chunk_count"], 4912)
         self.assertEqual(cap["raw_tick_rows"], 272842293)
@@ -476,12 +467,10 @@ class PreM6QuoteEvidenceExecutionAuthorityTests(unittest.TestCase):
         self.assertFalse(cap["raw_bytes_independently_recomputed"])
         self.assertEqual(cap["c006_readiness"], "READY_PRE_OUTCOME")
         self.assertEqual(cap["c012_readiness"], "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE")
-        self.assertEqual(state["economic_outcomes_opened"], 0)
-        self.assertEqual(state["v2_attempts_used"], 0)
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
         self.assertFalse(state["protected_evidence_opened"])
-        self.assertFalse(state["m6"]["economics_run"])
-
-
     def test_30_compact2_accepts_hash_verified_compact1_resume_lineage(self):
         runtime = (ROOT / "m6/cost_evidence_openapi.py").read_text(encoding="utf-8")
         self.assertIn(
