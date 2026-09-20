@@ -320,12 +320,15 @@
       "protected_evidence_opened": false,
       "stage_b_required": true,
       "stage_b_authorized": false,
-      "stage_b_run": false
+      "stage_b_run": false,
+      "persistence_integrity_independent_audit": "PASS",
+      "persistence_integrity_audit_ref": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
+      "stage_b_preparation_allowed": true
     }
   },
-  "next_action": "Require exact-head full-suite SUCCESS for this persistence-integrity correction, then independent audit. Do not run Stage-B until that audit accepts the corrected state.",
+  "next_action": "Prepare and exact-head test a frozen Stage-B EUR200 causal-realization evaluator for V2-C006 and V2-C012 using only accepted unprotected evidence. Do not open a Stage-B economic outcome until the preparation is frozen and green.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTED",
+  "phase": "M6_STAGE_A_PERSISTENCE_INTEGRITY_INDEPENDENTLY_AUDITED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -421,7 +424,7 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTED_STAGE_B_BLOCKED_PENDING_INDEPENDENT_AUDIT",
+  "primary_run_objective": "M6_STAGE_B_EUR200_STRUCTURAL_PREPARATION_ONLY_NO_STAGE_B_OUTCOME",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
@@ -489,5 +492,6 @@
   "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
   "v2_search_budget_remaining": 82,
   "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
-  "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json"
+  "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
+  "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json"
 }

@@ -1,0 +1,95 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-post-outcome-persistence-integrity-independent-audit.v1",
+  "status": "PASS_INDEPENDENT_AUDIT",
+  "audited_head": "4d24ffeba9311e333ed1c391c4ede913dca5408d",
+  "audited_branch": "m6-prep-materialization-20260917",
+  "audit_scope": "POST_STAGE_A_PERSISTENCE_INTEGRITY_ONLY_NO_ECONOMIC_REEVALUATION",
+  "live_reconciliation": {
+    "main": "a1fb3aa93f2724d21ea8241ee32228f3f38ccfea",
+    "staging": "4d24ffeba9311e333ed1c391c4ede913dca5408d",
+    "staging_exact_head_confirmed": true
+  },
+  "failed_state_reference": {
+    "failed_result_commit": "7b53284834dc9097c414ac696319af6c1196c8ca",
+    "failed_ci_run_id": 35502923344,
+    "tests_run": 446,
+    "failures": 25,
+    "errors": 15
+  },
+  "independent_byte_recomputation": {
+    "c006_result_hash": {
+      "stored": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+      "recomputed": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+      "pass": true
+    },
+    "c012_result_hash": {
+      "stored": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+      "recomputed": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+      "pass": true,
+      "weekly_events_2022_W05_key_count": 1,
+      "weekly_events_2022_W35_key_count": 1
+    },
+    "ledger_sequence_21": {
+      "stored": "c8e743f28c933ab286bc548ab20a2ec0fea9437c541b3b925c22dd27c04cf4a9",
+      "recomputed": "c8e743f28c933ab286bc548ab20a2ec0fea9437c541b3b925c22dd27c04cf4a9",
+      "pass": true
+    },
+    "ledger_sequence_22": {
+      "stored": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614",
+      "recomputed": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614",
+      "previous_entry_hash": "c8e743f28c933ab286bc548ab20a2ec0fea9437c541b3b925c22dd27c04cf4a9",
+      "pass": true
+    },
+    "ledger_entries_1_20": {
+      "historical_ref_commit": "d74cffb4f5ebec3f5fc7772ab9de45fcb8e91b66",
+      "historical_git_blob_sha1": "dcc4cf0b4ef39d63eff153d3ca6d151dafe26201",
+      "byte_identical_to_current_prefix": true
+    }
+  },
+  "unchanged_frozen_semantics": {
+    "c006_candidate_blob_sha1": "a5a6e4865206a0f85afcae28a65004e1e24a8277",
+    "c012_candidate_blob_sha1": "a9a8464d9cf161c3dcae39536280089058e882d9",
+    "transaction_local_cost_authority_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "stage_a_evaluator_blob_sha1": "05220fcadae6a74a7036e46f64ee1ad1411dc26f",
+    "stage_a_runner_blob_sha1": "d7b07ad28b973005d1183faa0decc458e806d3c6",
+    "historical_result_acceptance_v1_blob_sha1": "3bbad4baaa79ca0a29f31bfb08a8134fd0c93426",
+    "all_unchanged_from_failed_result_commit": true
+  },
+  "corrected_authorities": {
+    "correction_ref": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
+    "correction_blob_sha1": "0d45aaa98b31bea3870f00793e2539e0b7e8d755",
+    "acceptance_ref": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
+    "acceptance_blob_sha1": "657f2732fd151103bf5071c3540d65e7f6d8f957",
+    "ledger_blob_sha1": "c2ca9eb4d6d3d523b3d5443d5b7fe6993abaaa80",
+    "c012_result_blob_sha1": "d3a747e5292e87e180a9399d8ca762249dcc3dd8"
+  },
+  "exact_head_ci": {
+    "run_id": 35506538404,
+    "head_sha": "4d24ffeba9311e333ed1c391c4ede913dca5408d",
+    "conclusion": "SUCCESS",
+    "tests_passed": 460,
+    "tests_failed": 0,
+    "errors": 0
+  },
+  "accounting": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "search_budget_total": 84,
+    "search_budget_remaining": 82
+  },
+  "boundaries": {
+    "protected_evidence_opened": false,
+    "certification_survivors": [],
+    "stage_b_result_exists": false,
+    "live_orders": false,
+    "competition_start": false
+  },
+  "conclusion": {
+    "persistence_integrity_accepted": true,
+    "economic_re_evaluation_performed": false,
+    "new_attempt_consumed": false,
+    "stage_b_preparation_may_begin": true,
+    "stage_b_economic_execution_authorized_by_this_audit": false
+  }
+}
