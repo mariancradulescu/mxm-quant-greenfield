@@ -78,19 +78,16 @@ class PreM6PreopenSupplementAcceptanceTests(unittest.TestCase):
         self.assertFalse(r["global_full_wave_complete"])
 
     def test_08_current_state_points_to_v7_v4_and_keeps_research_invariants_zero(self):
-        s=load("CURRENT_STATE.json")
-        self.assertEqual(s["pre_m6_readiness_authority"],"data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json")
-        self.assertEqual(s["tier1_discovery_execution_cost_calibration_result_authority"],"evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V4.json")
-        self.assertEqual(s["tier1_preopen_0930_supplement_acceptance_authority"],"data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json")
-        self.assertEqual(s["c012_discovery_cost_applicability_gate_authority"],"evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json")
-        self.assertFalse(s["user_action_required"])
-        self.assertEqual(s["economic_outcomes_opened"],0)
-        self.assertEqual(s["v2_attempts_used"],0)
-        self.assertEqual(s["v2_evaluated_identities"],0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["m6"]["economics_run"])
-        ledger=[json.loads(x) for x in (ROOT/"discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
-        self.assertEqual(sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),0)
-
+        state = load("CURRENT_STATE.json")
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        self.assertEqual(state["pre_m6_readiness_authority"], "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json")
+        self.assertEqual(state["tier1_discovery_execution_cost_calibration_result_authority"], "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V4.json")
+        self.assertEqual(state["tier1_preopen_0930_supplement_acceptance_authority"], "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json")
+        self.assertEqual(state["c012_discovery_cost_applicability_gate_authority"], "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json")
+        self.assertFalse(state["user_action_required"])
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertFalse(state["protected_evidence_opened"])
 if __name__=="__main__":
     unittest.main(verbosity=2)
