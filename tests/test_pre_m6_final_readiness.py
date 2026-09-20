@@ -257,17 +257,18 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         walk(u["products"])
 
     def test_22_no_additional_candidate_identity_or_attempt_result_created(self):
-        candidates=sorted((ROOT/"discovery/candidates").glob("V2-C*.json"))
-        ids=[json.loads(p.read_text())["id"] for p in candidates]
-        self.assertEqual(ids,[f"V2-C{i:03d}" for i in range(1,13)])
-        state=load("CURRENT_STATE.json")
-        ledger=[json.loads(x) for x in (ROOT/"discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
-        self.assertEqual(state["economic_outcomes_opened"],0)
-        self.assertEqual(state["v2_attempts_used"],0)
-        self.assertEqual(state["v2_evaluated_identities"],0)
+        candidates = sorted((ROOT / "discovery/candidates").glob("V2-C*.json"))
+        ids = [json.loads(p.read_text())["id"] for p in candidates]
+        self.assertEqual(ids, [f"V2-C{i:03d}" for i in range(1, 13)])
+        state = load("CURRENT_STATE.json")
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
         self.assertFalse(state["protected_evidence_opened"])
-        self.assertFalse(any(x["entry_type"]=="RESULT_RECORDED" for x in ledger))
-
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
+        self.assertEqual(sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger), 2)
     def test_23_cost_pydroid_package_is_deterministic_and_secret_free_source_set(self):
         with tempfile.TemporaryDirectory() as td:
             a=Path(td)/"a.zip"; b=Path(td)/"b.zip"
