@@ -317,10 +317,23 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
             acceptance["package"]["package_sha256"],
             "404af12c0d43e72f4e8bfde9eac113c3624e52411ac951c1e17dd83cc9fb09e9",
         )
-        self.assertTrue(state["user_action_required"])
-        self.assertTrue(
-            state["m6"]["stage_b"]["margin_history_package"]["user_action_required"]
-        )
+        capture_ref = state.get("m6_stage_b_margin_history_capture_acceptance_authority")
+        if capture_ref:
+            capture = load(capture_ref)
+            self.assertEqual(
+                capture["status"],
+                "PASS_CAPTURE_VALID_MARGIN_AUTHORITY_UNRESOLVED",
+            )
+            self.assertFalse(state["user_action_required"])
+            self.assertFalse(
+                state["m6"]["stage_b"]["margin_history_package"]["user_action_required"]
+            )
+            self.assertFalse(capture["conclusion"]["margin_gate_resolved"])
+        else:
+            self.assertTrue(state["user_action_required"])
+            self.assertTrue(
+                state["m6"]["stage_b"]["margin_history_package"]["user_action_required"]
+            )
         self.assertFalse(state["m6"]["stage_b"]["execution_authorized"])
         self.assertFalse(state["m6"]["stage_b"]["economics_run"])
         self.assertEqual(state["m6"]["stage_b"]["stage_b_outcomes_opened"], 0)
