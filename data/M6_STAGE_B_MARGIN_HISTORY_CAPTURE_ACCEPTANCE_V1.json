@@ -1,0 +1,122 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-margin-history-capture-acceptance.v1",
+  "status": "PASS_CAPTURE_VALID_MARGIN_AUTHORITY_UNRESOLVED",
+  "scope": "READ_ONLY_STAGE_B_MARGIN_EVIDENCE_ONLY_NO_STAGE_B_ECONOMICS",
+  "package_authority_ref": "data/M6_STAGE_B_MARGIN_HISTORY_PACKAGE_ACCEPTANCE_V1.json",
+  "package_sha256": "404af12c0d43e72f4e8bfde9eac113c3624e52411ac951c1e17dd83cc9fb09e9",
+  "source_uploaded_bundle": {
+    "filename": "MXM_M6_STAGE_B_MARGIN_HISTORY_EVIDENCE_V1.zip",
+    "sha256": "b216c9e6f44defd8c01ad0131a2eced593a100b8f82e92f231e2740f0d8fa523",
+    "transport_wrapper_detected": true,
+    "wrapper_effect": "NON_SEMANTIC_TOP_LEVEL_DIRECTORY_ONLY",
+    "unsafe_zip_paths": false
+  },
+  "canonical_repack": {
+    "filename": "MXM_M6_STAGE_B_MARGIN_HISTORY_EVIDENCE_V1_CANONICAL.zip",
+    "sha256": "e31b053489c04f610635ce1a70064bc3b5f64ffa48d59e497f6d73a1213b1546",
+    "canonical_member_order": [
+      "capture_summary.json",
+      "content_commitments.json",
+      "current_structural_diagnostics.json",
+      "historical_margin_observations.jsonl",
+      "manifest.json"
+    ],
+    "file_timestamp": "1980-01-01T00:00:00",
+    "semantic_content_changed": false
+  },
+  "component_sha256": {
+    "capture_summary.json": "9e0ca82d24e23b26ed903931d2887850c913b5314cedef2071b957a72c9b9f60",
+    "content_commitments.json": "20890b276221a5b2ac3bc8ac50a261eb2dd11ed5ec0dcbf5950dddaf4bb13793",
+    "current_structural_diagnostics.json": "b5cd80de578f28f284429f271cf3626d844d1b54c93a941fefc3f9a59eb0e030",
+    "historical_margin_observations.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest.json": "1e715e67eb91dc5c71e6b89681c0c1ff045f1204b6d8f4f94c96c2f1a109dd2e"
+  },
+  "commitment_verification": {
+    "transferable_files_sha256_all_match": true,
+    "manifest_content_commitments_sha256_matches": true,
+    "historical_observation_bytes": 0,
+    "historical_observation_rows": 0,
+    "historical_observation_empty_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "capture_contract": {
+    "development_start_ms": 1641168000000,
+    "development_end_ms": 1789603199999,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "initial_window_count": 56,
+    "complete_leaf_window_count": 56,
+    "deal_list_request_count": 56,
+    "recursive_split_count": 0,
+    "has_more_response_count": 0,
+    "target_symbols": {
+      "US500": 127,
+      "NAS100": 126
+    },
+    "oauth_scope": "accounts",
+    "orders_placed": false,
+    "account_mutation_present": false,
+    "live_economic_execution": false,
+    "protected_evidence_opened": false
+  },
+  "privacy_audit": {
+    "forbidden_identity_or_credential_keys_detected": [],
+    "pass": true
+  },
+  "current_structural_diagnostics": {
+    "classification": "CURRENT_ONLY_NOT_HISTORICAL_AUTHORITY",
+    "leverage_id": 53592,
+    "dynamic_leverage_tiers": [
+      {
+        "volume_cents": 100,
+        "leverage_in_cents": 2000
+      }
+    ],
+    "current_symbol_min_volume_cents": {
+      "US500": 10,
+      "NAS100": 10
+    },
+    "current_symbol_step_volume_cents": {
+      "US500": 10,
+      "NAS100": 10
+    },
+    "current_trader_leverage_in_cents": 3000,
+    "current_total_margin_calculation_type": 0,
+    "current_margin_call_thresholds": [
+      {
+        "type": 61,
+        "threshold": 1.5
+      },
+      {
+        "type": 62,
+        "threshold": 1
+      },
+      {
+        "type": 63,
+        "threshold": 0.8
+      }
+    ],
+    "historical_authority_claimed": false
+  },
+  "historical_observation_result": {
+    "US500": {
+      "target_deal_records": 0,
+      "filled_or_partially_filled_records": 0,
+      "records_with_margin_rate": 0,
+      "state": "UNRESOLVED_NO_ACCOUNT_NATIVE_HISTORICAL_MARGIN_OBSERVATIONS"
+    },
+    "NAS100": {
+      "target_deal_records": 0,
+      "filled_or_partially_filled_records": 0,
+      "records_with_margin_rate": 0,
+      "state": "UNRESOLVED_NO_ACCOUNT_NATIVE_HISTORICAL_MARGIN_OBSERVATIONS"
+    }
+  },
+  "conclusion": {
+    "capture_valid": true,
+    "historical_margin_authority_frozen": false,
+    "margin_gate_resolved": false,
+    "stage_b_execution_authorized": false,
+    "stage_b_economics_run": false,
+    "stage_b_outcomes_opened": 0,
+    "new_v2_attempt_consumed": false
+  }
+}

@@ -339,7 +339,7 @@
         "V2-C006": 10,
         "V2-C012": 10
       },
-      "historical_margin_gate": "UNRESOLVED",
+      "historical_margin_gate": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
       "execution_authorized": false,
       "economics_run": false,
       "results_created": false,
@@ -360,18 +360,23 @@
         "github_artifact_id": 10608586863,
         "github_artifact_archive_digest": "sha256:4226f7adafdafaef45216936a6c2bf1e77b2f5e946112ddc761a50a14fd6c04e",
         "output_evidence_filename": "MXM_M6_STAGE_B_MARGIN_HISTORY_EVIDENCE_V1.zip",
-        "user_capture_required": true,
-        "user_action_required": true,
+        "user_capture_required": false,
+        "user_action_required": false,
         "execution_authorized": false,
         "stage_b_economics_run": false,
         "stage_b_outcomes_opened": 0,
-        "protected_evidence_opened": false
-      }
+        "protected_evidence_opened": false,
+        "capture_completed": true,
+        "source_uploaded_bundle_sha256": "b216c9e6f44defd8c01ad0131a2eced593a100b8f82e92f231e2740f0d8fa523",
+        "canonical_repack_sha256": "e31b053489c04f610635ce1a70064bc3b5f64ffa48d59e497f6d73a1213b1546",
+        "capture_acceptance_ref": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json"
+      },
+      "historical_margin_authority_frozen": false
     }
   },
-  "next_action": "USER ACTION: on Android/Pydroid extract and run MXM_M6_STAGE_B_MARGIN_HISTORY_PYDROID_PACKAGE.zip, then upload only MXM_M6_STAGE_B_MARGIN_HISTORY_EVIDENCE_V1.zip. Do not run Stage-B economics.",
+  "next_action": "Obtain and independently audit broker-specific historical point-in-time margin schedule or another defensible conservative historical upper bound for US500/NAS100 at frozen 10-cent volume over DEVELOPMENT. Do not rerun the same account-native capture; do not run Stage-B economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_B_MARGIN_HISTORY_USER_CAPTURE_REQUIRED",
+  "phase": "M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTED_GATE_UNRESOLVED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -467,13 +472,13 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "OBTAIN_READ_ONLY_STAGE_B_HISTORICAL_MARGIN_EVIDENCE_NO_STAGE_B_ECONOMICS",
+  "primary_run_objective": "RESOLVE_HISTORICAL_MARGIN_UPPER_BOUND_PRE_STAGE_B_ECONOMICS",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": true,
-  "user_action_required": true,
+  "user_action_required": false,
   "v2_attempts_used": 2,
   "v2_evaluated_identities": 2,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
@@ -540,5 +545,7 @@
   "m6_stage_b_tier1_evaluator_policy_authority": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
   "m6_stage_b_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_B_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_b_tier1_runner_prep_authority": "data/M6_STAGE_B_TIER1_RUNNER_PREP_V1.json",
-  "m6_stage_b_margin_history_package_acceptance_authority": "data/M6_STAGE_B_MARGIN_HISTORY_PACKAGE_ACCEPTANCE_V1.json"
+  "m6_stage_b_margin_history_package_acceptance_authority": "data/M6_STAGE_B_MARGIN_HISTORY_PACKAGE_ACCEPTANCE_V1.json",
+  "m6_stage_b_margin_history_capture_acceptance_authority": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json",
+  "m6_stage_b_historical_margin_authority_resolution": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json"
 }
