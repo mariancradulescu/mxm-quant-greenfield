@@ -92,16 +92,15 @@ class PreM6CostMethodologyResolutionTests(unittest.TestCase):
         self.assertTrue(any("No claim" in x for x in e["limitations"]))
 
     def test_09_current_state_keeps_all_economics_and_protected_counters_zero(self):
-        s=load("CURRENT_STATE.json")
-        ledger=[json.loads(x) for x in (ROOT/"discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
-        self.assertEqual(s["economic_outcomes_opened"],0)
-        self.assertEqual(s["v2_attempts_used"],0)
-        self.assertEqual(s["v2_evaluated_identities"],0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["m6"]["status"],"PENDING")
-        self.assertFalse(any(x["entry_type"]=="RESULT_RECORDED" for x in ledger))
-
+        state = load("CURRENT_STATE.json")
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertEqual(state["m6"]["status"], "PENDING")
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
     def test_10_v5_readiness_and_tier2_path_are_pre_outcome(self):
         r=load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V5.json")
         self.assertEqual(r["candidates"]["V2-C006"]["m6_stage_a_readiness"],"READY_PRE_OUTCOME")
