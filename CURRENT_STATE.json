@@ -139,7 +139,7 @@
       "data_manifest_mutated_with_actual_hashes": true
     },
     "auxiliary_evidence": {
-      "state": "TIER1_TRANSACTION_LOCAL_COST_FROZEN_STAGE_A_RUNNER_PREPARED_NOT_RUN",
+      "state": "STAGE_A_EXECUTED_RESULTS_PERSISTENCE_CORRECTED",
       "historical_register_ref": "data/PRIMARY_WAVE_02_AUXILIARY_EVIDENCE_REGISTER_V1.json",
       "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
       "active_session_conversion_ref": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
@@ -257,7 +257,7 @@
         "preopen_raw_bytes_external_full_rehash": false,
         "local_full_raw_byte_rehash_reconciliation_ref": "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json"
       },
-      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
+      "stage_b_eur200": "NOT_EVALUATED_STAGE_B_NOT_RUN",
       "m6_stage_a_economics_authorized": true,
       "active_tier1_calibration_result_ref": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V4.json",
       "active_tier1_commission_policy_ref": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
@@ -273,8 +273,8 @@
       "first_stage_a_runner_state": "EXECUTED_RESULTS_RECORDED",
       "stage_a_evaluator_policy_ref": "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json",
       "stage_a_pre_economic_materialization_ref": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
-      "first_stage_a_runner_preparation_detail": "FULL_EVALUATOR_EXECUTED",
-      "stage_a_result_acceptance_ref": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json"
+      "first_stage_a_runner_preparation_detail": "FULL_EVALUATOR_EXECUTED_RESULTS_PERSISTENCE_CORRECTED",
+      "stage_a_result_acceptance_ref": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json"
     },
     "economics_run": true,
     "first_stage_a_runner": {
@@ -290,7 +290,7 @@
       "unresolved_transaction_cost_contexts": 0,
       "execution_authorized": true,
       "results_created": true,
-      "preparation_detail": "FULL_EVALUATOR_PREPARED_NOT_RUN",
+      "preparation_detail": "FULL_EVALUATOR_EXECUTED_RESULTS_PERSISTENCE_CORRECTED",
       "authorization_ref": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
       "execution_authorization_frozen": true,
       "authorization_consumed": true,
@@ -304,8 +304,8 @@
       }
     },
     "tier1_stage_a": {
-      "state": "TWO_RESULTS_RECORDED",
-      "result_acceptance_ref": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
+      "state": "TWO_RESULTS_PERSISTENCE_CORRECTED_STAGE_B_BLOCKED_PENDING_INDEPENDENT_AUDIT",
+      "result_acceptance_ref": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
       "candidates": [
         "V2-C006",
         "V2-C012"
@@ -318,12 +318,14 @@
       "result_recorded": 2,
       "ledger_entries": 22,
       "protected_evidence_opened": false,
-      "stage_b_required": true
+      "stage_b_required": true,
+      "stage_b_authorized": false,
+      "stage_b_run": false
     }
   },
-  "next_action": "Prepare and run Stage-B EUR200 causal capital realization for V2-C006 and V2-C012 using only unprotected accepted evidence. Do not open protected forward evidence. C007-C011 remain blocked on their frozen evidence paths.",
+  "next_action": "Require exact-head full-suite SUCCESS for this persistence-integrity correction, then independent audit. Do not run Stage-B until that audit accepts the corrected state.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PRIMARY_WAVE_FROZEN_PRE_M6",
+  "phase": "M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -419,7 +421,7 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "M6_STAGE_A_TIER1_RESULTS_RECORDED_STAGE_B_PREPARATION_NEXT",
+  "primary_run_objective": "M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTED_STAGE_B_BLOCKED_PENDING_INDEPENDENT_AUDIT",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
@@ -438,7 +440,7 @@
   "tier1_cost_evidence_plan_authority": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
   "tier1_cost_evidence_sources_authority": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
   "pre_m6_timestamp_provenance_correction_authority": "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
-  "pre_m6_operational_state": "TIER1_STAGE_A_TWO_DISCOVERY_SURVIVORS_RECORDED_STAGE_B_REQUIRED",
+  "pre_m6_operational_state": "STAGE_A_RESULTS_PERSISTENCE_CORRECTED_STAGE_B_BLOCKED_PENDING_INDEPENDENT_AUDIT",
   "pre_m6_final_integrity_correction_authority": "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json",
   "tier1_discovery_execution_cost_calibration_protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
   "pre_m6_quote_evidence_execution_authority_correction_authority": "evidence/PRE_M6_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_CORRECTION_V1.json",
@@ -484,5 +486,8 @@
   "m6_stage_a_tier1_evaluator_policy_authority": "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json",
   "m6_stage_a_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_a_execution_authorization_authority": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
-  "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json"
+  "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
+  "v2_search_budget_remaining": 82,
+  "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
+  "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json"
 }

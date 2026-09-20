@@ -1,0 +1,87 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-post-outcome-persistence-integrity-correction.v1",
+  "status": "PERSISTENCE_CORRECTED_REQUIRES_EXACT_HEAD_FULL_SUITE_FOR_EXTERNAL_ACCEPTANCE",
+  "scope": "POST_OUTCOME_PERSISTENCE_AND_TEST_INTEGRITY_ONLY_NO_ECONOMIC_REEVALUATION",
+  "failed_persistence_state": {
+    "result_commit_sha": "7b53284834dc9097c414ac696319af6c1196c8ca",
+    "exact_head_ci_run_id": 35502923344,
+    "tests_run": 446,
+    "failures": 25,
+    "errors": 15,
+    "prior_result_acceptance_ref": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
+    "prior_result_acceptance_git_blob_sha1": "3bbad4baaa79ca0a29f31bfb08a8134fd0c93426",
+    "prior_c012_result_git_blob_sha1": "e5e62e7f890ee40db1f75bebcdf27f894bde1fc3",
+    "prior_ledger_git_blob_sha1": "94ed6198bf2f32dcb95d62d6d1f33aaf7813793b"
+  },
+  "c012_result_repair": {
+    "defect": "RAW_JSON_WEEKLY_EVENTS_DUPLICATED_2022_W05_BETWEEN_2022_W34_AND_2022_W36_AND_OMITTED_2022_W35",
+    "corrupt_parse_recomputed_result_hash": "5a494dcacbe6e399f063557e46931158c52fcb2e90d830cf89ce30cc99a2c895",
+    "mechanical_repair": "RESTORE_2022_W35_ZERO_EVENT_KEY_IN_THE_FROZEN_EVALUATOR_GENERATED_COMPLETE_ISO_WEEK_GRID",
+    "corrected_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+    "corrected_result_git_blob_sha1": "d3a747e5292e87e180a9399d8ca762249dcc3dd8",
+    "economic_metrics_changed": false,
+    "candidate_identity_changed": false,
+    "thresholds_changed": false,
+    "economic_logic_changed": false
+  },
+  "c006_result": {
+    "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+    "git_blob_sha1": "5303ba8bc5435e39a0075be071d2c14f0eb6f1ff",
+    "economic_metrics_changed": false
+  },
+  "ledger_repair": {
+    "reason": "INVALID_UNACCEPTED_RESULT_RECORD_BYTES_REPAIRED_IN_PLACE_AFTER_FAILED_EXACT_HEAD_CI",
+    "entries_1_20_git_blob_sha1": "dcc4cf0b4ef39d63eff153d3ca6d151dafe26201",
+    "entries_1_20_preserved_byte_for_byte": true,
+    "line_20_entry_hash": "4b63368c36bf048df5456d48f3cd80c6fae61d60cb79e4f1e5774cdf4e4809ad",
+    "prior_sequence_21_stored_entry_hash": "c8e743f28c933ab286bc548ab20a2ec0fea9437c541b3b925c22dd27c04cf4a9",
+    "prior_sequence_22_stored_entry_hash": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614",
+    "defect": "EMBEDDED_RESULT_NUMERIC_REPRESENTATION_DRIFTED_FROM_AUTHORITATIVE_STANDALONE_RESULTS_INCLUDING_HOLD_DURATION_FLOATS_TO_INTS; C012_EMBEDDED_WEEK_GRID_ALSO_OMITTED_2022_W35",
+    "corrected_sequence_21_entry_hash": "c8e743f28c933ab286bc548ab20a2ec0fea9437c541b3b925c22dd27c04cf4a9",
+    "corrected_sequence_22_entry_hash": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614",
+    "corrected_final_ledger_head": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614",
+    "corrected_ledger_git_blob_sha1": "c2ca9eb4d6d3d523b3d5443d5b7fe6993abaaa80",
+    "authoritative_result_embedding": "EXACT_STANDALONE_RESULT_OBJECT_BYTES_SEMANTICS",
+    "result_entries": 2,
+    "final_entries": 22
+  },
+  "frozen_semantics": {
+    "candidate_spec_hashes": {
+      "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+      "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+    },
+    "transaction_local_cost_authority_ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "transaction_local_cost_authority_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "evaluator_policy_ref": "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json",
+    "evaluator_policy_git_blob_sha1": "6c9999a7641b8f2299f1c4c5aab7ccb9e57c784a",
+    "pre_economic_materialization_ref": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+    "pre_economic_materialization_git_blob_sha1": "f6b2407d0f8a5a42b239a9fd5953c70a83a09b88"
+  },
+  "recovery_semantics": {
+    "economic_evaluation_reexecuted": false,
+    "pnl_recomputed": false,
+    "outcome_selection_reopened": false,
+    "persistence_reconstructed_mechanically_from_frozen_evaluator_representation_and_already_opened_results": true,
+    "post_outcome_tuning": false,
+    "rescue": false,
+    "new_attempt_consumed": false
+  },
+  "accounting": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "search_budget_total": 84,
+    "search_budget_remaining": 82
+  },
+  "protected_boundary": {
+    "protected_evidence_opened": false,
+    "protected_evidence_used": false
+  },
+  "stage_b": {
+    "run": false,
+    "authorized_in_this_correction": false,
+    "blocked_until_corrected_exact_head_is_green_and_independently_audited": true
+  },
+  "live_orders": false,
+  "competition_start": false
+}
