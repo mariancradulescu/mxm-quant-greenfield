@@ -304,7 +304,28 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["m6"]["stage_b"]["protected_evidence_opened"])
 
-    def test_22_runtime_source_has_no_trading_request_classes(self):
+    def test_22_user_action_is_gated_by_green_package_acceptance(self):
+        state = load("CURRENT_STATE.json")
+        acceptance = load("data/M6_STAGE_B_MARGIN_HISTORY_PACKAGE_ACCEPTANCE_V1.json")
+        self.assertEqual(
+            acceptance["status"],
+            "PASS_PACKAGE_COMPLETE_EXACT_HEAD_GREEN_USER_CAPTURE_REQUIRED",
+        )
+        self.assertEqual(acceptance["source_ci"]["conclusion"], "SUCCESS")
+        self.assertEqual(acceptance["source_ci"]["tests_failed"], 0)
+        self.assertEqual(
+            acceptance["package"]["package_sha256"],
+            "404af12c0d43e72f4e8bfde9eac113c3624e52411ac951c1e17dd83cc9fb09e9",
+        )
+        self.assertTrue(state["user_action_required"])
+        self.assertTrue(
+            state["m6"]["stage_b"]["margin_history_package"]["user_action_required"]
+        )
+        self.assertFalse(state["m6"]["stage_b"]["execution_authorized"])
+        self.assertFalse(state["m6"]["stage_b"]["economics_run"])
+        self.assertEqual(state["m6"]["stage_b"]["stage_b_outcomes_opened"], 0)
+
+    def test_23_runtime_source_has_no_trading_request_classes(self):
         import m6.stage_b_margin_openapi as runtime
         source = inspect.getsource(runtime)
         for token in (
