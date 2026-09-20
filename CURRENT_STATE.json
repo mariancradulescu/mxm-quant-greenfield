@@ -372,12 +372,15 @@
         "capture_acceptance_ref": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json"
       },
       "historical_margin_authority_frozen": false,
-      "historical_margin_authority_resolution_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json"
+      "historical_margin_authority_resolution_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+      "historical_margin_public_source_search_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_PUBLIC_SOURCE_SEARCH_V1.json",
+      "broker_confirmation_request_ref": "data/M6_STAGE_B_HISTORICAL_MARGIN_BROKER_CONFIRMATION_REQUEST_V1.txt",
+      "broker_confirmation_required": true
     }
   },
-  "next_action": "Seek broker-specific historical point-in-time margin schedule or another defensible conservative historical upper bound for US500/NAS100 at frozen 10-cent volume over DEVELOPMENT. Do not rerun the same account-native capture; do not run Stage-B economics.",
+  "next_action": "Send the frozen Pepperstone EU historical-margin confirmation request and return the complete written broker response. Do not rerun Android capture. Do not run Stage-B economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_B_MARGIN_AUTHORITY_V2_CORRECTED_GATE_UNRESOLVED",
+  "phase": "M6_STAGE_B_MARGIN_PUBLIC_SOURCE_EXHAUSTED_BROKER_CONFIRMATION_REQUIRED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -473,13 +476,13 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "RESOLVE_HISTORICAL_MARGIN_UPPER_BOUND_PRE_STAGE_B_ECONOMICS",
+  "primary_run_objective": "OBTAIN_BROKER_SPECIFIC_HISTORICAL_MARGIN_UPPER_BOUND_PRE_STAGE_B_ECONOMICS",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": true,
-  "user_action_required": false,
+  "user_action_required": true,
   "v2_attempts_used": 2,
   "v2_evaluated_identities": 2,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
@@ -549,5 +552,7 @@
   "m6_stage_b_margin_history_package_acceptance_authority": "data/M6_STAGE_B_MARGIN_HISTORY_PACKAGE_ACCEPTANCE_V1.json",
   "m6_stage_b_margin_history_capture_acceptance_authority": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json",
   "m6_stage_b_historical_margin_authority_resolution": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
-  "m6_stage_b_historical_margin_authority_resolution_historical_v1": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json"
+  "m6_stage_b_historical_margin_authority_resolution_historical_v1": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json",
+  "m6_stage_b_historical_margin_public_source_search": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_PUBLIC_SOURCE_SEARCH_V1.json",
+  "m6_stage_b_historical_margin_broker_confirmation_request": "data/M6_STAGE_B_HISTORICAL_MARGIN_BROKER_CONFIRMATION_REQUEST_V1.txt"
 }
