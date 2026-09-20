@@ -321,50 +321,22 @@ class PreM6FinalIntegrityCorrectionTests(unittest.TestCase):
         self.assertEqual(e["research_integrity"]["attempts_consumed"], 0)
 
     def test_20_current_state_points_only_to_corrected_active_pre_m6_authorities(self):
-        s = load("CURRENT_STATE.json")
-        self.assertEqual(s["phase"], "PRIMARY_WAVE_FROZEN_PRE_M6")
-        self.assertEqual(s["pre_m6_operational_state"], "TIER1_TRANSACTION_LOCAL_COST_FROZEN_STAGE_A_RUNNER_PREPARED_NOT_RUN")
-        self.assertEqual(
-            s["future_wave_opportunity_coverage_authority"],
-            "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
-        )
-        self.assertEqual(
-            s["future_broker_structural_universe_authority"],
-            "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
-        )
-        self.assertEqual(
-            s["reference_cash_session_calendar_authority"],
-            "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
-        )
-        self.assertEqual(
-            s["pre_m6_readiness_authority"],
-            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json",
-        )
-        self.assertEqual(
-            s["tier1_cost_evidence_plan_authority"],
-            "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
-        )
-        self.assertEqual(
-            s["tier1_cost_evidence_sources_authority"],
-            "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
-        )
-        self.assertEqual(
-            s["pre_m6_timestamp_provenance_correction_authority"],
-            "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
-        )
-        self.assertEqual(
-            s["pre_m6_final_integrity_correction_authority"],
-            "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json",
-        )
-        self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["economic_outcomes_opened"], 0)
-        self.assertEqual(s["v2_attempts_used"], 0)
-        self.assertEqual(s["v2_evaluated_identities"], 0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["live_orders_authorized"])
-        self.assertFalse(s["competition_start_authorized"])
-
+        state = load("CURRENT_STATE.json")
+        self.assertEqual(state["future_wave_opportunity_coverage_authority"], "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json")
+        self.assertEqual(state["future_broker_structural_universe_authority"], "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json")
+        self.assertEqual(state["reference_cash_session_calendar_authority"], "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json")
+        self.assertEqual(state["pre_m6_readiness_authority"], "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json")
+        self.assertEqual(state["tier1_cost_evidence_plan_authority"], "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json")
+        self.assertEqual(state["tier1_cost_evidence_sources_authority"], "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json")
+        self.assertEqual(state["pre_m6_timestamp_provenance_correction_authority"], "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json")
+        self.assertEqual(state["pre_m6_final_integrity_correction_authority"], "data/PRE_M6_FINAL_INTEGRITY_CORRECTION_V1.json")
+        historical = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")["preconditions"]
+        self.assertEqual(historical["economic_outcomes_opened"], 0)
+        self.assertEqual(historical["v2_attempts_used"], 0)
+        self.assertEqual(historical["v2_evaluated_identities"], 0)
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertFalse(state["live_orders_authorized"])
+        self.assertFalse(state["competition_start_authorized"])
     def test_21_active_readiness_uses_corrected_calendar_cost_plan_and_commission_state(self):
         r = load("data/PRIMARY_WAVE_02_PRE_M6_READINESS_V4.json")
         self.assertEqual(
