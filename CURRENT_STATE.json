@@ -324,11 +324,32 @@
       "persistence_integrity_independent_audit": "PASS",
       "persistence_integrity_audit_ref": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
       "stage_b_preparation_allowed": true
+    },
+    "stage_b": {
+      "state": "PREPARED_NOT_RUN_MARGIN_GATE_UNRESOLVED",
+      "policy_ref": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
+      "pre_economic_materialization_ref": "evidence/M6_STAGE_B_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+      "runner_prep_ref": "data/M6_STAGE_B_TIER1_RUNNER_PREP_V1.json",
+      "candidates": [
+        "V2-C006",
+        "V2-C012"
+      ],
+      "starting_capital_eur": 200,
+      "fixed_volume_cents": {
+        "V2-C006": 10,
+        "V2-C012": 10
+      },
+      "historical_margin_gate": "UNRESOLVED",
+      "execution_authorized": false,
+      "economics_run": false,
+      "results_created": false,
+      "stage_b_outcomes_opened": 0,
+      "protected_evidence_opened": false
     }
   },
-  "next_action": "Prepare and exact-head test a frozen Stage-B EUR200 causal-realization evaluator for V2-C006 and V2-C012 using only accepted unprotected evidence. Do not open a Stage-B economic outcome until the preparation is frozen and green.",
+  "next_action": "Resolve and freeze only the generic applicable historical Stage-B margin authority for the already-frozen minimum-volume EUR200 law. Then exact-head test and separately authorize Stage-B execution. Do not open protected evidence.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_A_PERSISTENCE_INTEGRITY_INDEPENDENTLY_AUDITED",
+  "phase": "M6_STAGE_B_TIER1_STRUCTURAL_PREPARATION",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -424,7 +445,7 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "M6_STAGE_B_EUR200_STRUCTURAL_PREPARATION_ONLY_NO_STAGE_B_OUTCOME",
+  "primary_run_objective": "M6_STAGE_B_EUR200_PREPARED_NOT_RUN_MARGIN_GATE_UNRESOLVED",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
@@ -493,5 +514,8 @@
   "v2_search_budget_remaining": 82,
   "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
-  "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json"
+  "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
+  "m6_stage_b_tier1_evaluator_policy_authority": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
+  "m6_stage_b_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_B_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+  "m6_stage_b_tier1_runner_prep_authority": "data/M6_STAGE_B_TIER1_RUNNER_PREP_V1.json"
 }
