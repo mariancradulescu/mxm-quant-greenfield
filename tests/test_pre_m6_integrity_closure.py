@@ -74,7 +74,10 @@ class PreM6IntegrityClosure(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp)/'ledger.jsonl'; append_entry(p,entry_type='CANDIDATE_FROZEN',candidate_id='V2-C900',spec_hash='a'*64,payload={}); r=valid_result('V2-C900','a'*64); append_entry(p,entry_type='RESULT_RECORDED',candidate_id='V2-C900',spec_hash='a'*64,payload={'result':r,'result_hash':compute_result_hash(r)})
    with self.assertRaises(ValueError): append_entry(p,entry_type='CANDIDATE_REFROZEN_PRE_OUTCOME',candidate_id='V2-C900',spec_hash='b'*64,payload={'old_spec_hash':'a'*64,'new_spec_hash':'b'*64,'outcome_seen':False,'attempt_consumed':False})
- def test_17_existing_ledger_hash_chain_valid(self): self.assertEqual(len(read_ledger(ROOT/'discovery/ledger.jsonl')),20)
+ def test_17_existing_ledger_hash_chain_valid(self):
+     entries = read_ledger(ROOT / "discovery/ledger.jsonl")
+     self.assertEqual(len(entries), 22)
+     self.assertFalse(any(e["entry_type"] == "RESULT_RECORDED" for e in entries[:20]))
  def test_18_old_c001_c005_freeze_refreeze_history_preserved(self):
   es=read_ledger(ROOT/'discovery/ledger.jsonl'); self.assertEqual([(e['sequence'],e['candidate_id'],e['entry_type']) for e in es[:10]],[(1,'V2-C001','CANDIDATE_FROZEN'),(2,'V2-C002','CANDIDATE_FROZEN'),(3,'V2-C003','CANDIDATE_FROZEN'),(4,'V2-C004','CANDIDATE_FROZEN'),(5,'V2-C005','CANDIDATE_FROZEN'),(6,'V2-C001','CANDIDATE_REFROZEN_PRE_OUTCOME'),(7,'V2-C002','CANDIDATE_REFROZEN_PRE_OUTCOME'),(8,'V2-C003','CANDIDATE_REFROZEN_PRE_OUTCOME'),(9,'V2-C004','CANDIDATE_REFROZEN_PRE_OUTCOME'),(10,'V2-C005','CANDIDATE_REFROZEN_PRE_OUTCOME')])
  def test_19_active_hashes_existing_candidates_deterministic(self):
@@ -84,9 +87,16 @@ class PreM6IntegrityClosure(unittest.TestCase):
   base=load('discovery/PRIMARY_WAVE_02_V1.json'); completion=load('discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json'); self.assertEqual(base['candidate_ids'],NEW_IDS); active=derive_active_spec_hashes(read_ledger(ROOT/'discovery/ledger.jsonl'))
   for cid in NEW_IDS:
    s=candidate(cid); self.assertTrue(verify_spec_hash(s)); self.assertEqual(completion['original_candidate_hashes'][cid],base['candidate_spec_hashes'][cid]); self.assertEqual(completion['active_candidate_hashes'][cid],s['spec_hash']); self.assertEqual(active[cid],s['spec_hash'])
- def test_21_no_economic_result_created_by_correction(self): self.assertFalse(any(e['entry_type']=='RESULT_RECORDED' for e in read_ledger(ROOT/'discovery/ledger.jsonl')))
- def test_22_v2_attempts_remain_zero(self): self.assertEqual(load('CURRENT_STATE.json')['v2_attempts_used'],0)
- def test_23_v2_evaluated_identities_remain_zero(self): self.assertEqual(load('CURRENT_STATE.json')['v2_evaluated_identities'],0)
+ def test_21_no_economic_result_created_by_correction(self):
+     entries = read_ledger(ROOT / "discovery/ledger.jsonl")
+     self.assertFalse(any(e["entry_type"] == "RESULT_RECORDED" for e in entries[:20]))
+     self.assertEqual(sum(e["entry_type"] == "RESULT_RECORDED" for e in entries), 2)
+ def test_22_v2_attempts_remain_zero(self):
+     auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+     self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+ def test_23_v2_evaluated_identities_remain_zero(self):
+     auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+     self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
  def test_24_protected_forward_timestamp_unchanged(self):
   self.assertEqual(load('V2_PROTECTED_FORWARD_START.json')['V2_PROTECTED_FORWARD_START'],'2026-09-17T12:02:58Z'); self.assertFalse(load('V2_PROTECTED_FORWARD_START.json')['protected_evidence_opened'])
  def test_25_old_wave_frozen_artifact_separate_deferral_and_not_active_primary(self):
