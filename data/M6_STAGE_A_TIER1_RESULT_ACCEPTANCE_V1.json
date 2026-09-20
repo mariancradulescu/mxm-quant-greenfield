@@ -1,0 +1,100 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-tier1-result-acceptance.v1",
+  "status": "TWO_STAGE_A_OUTCOMES_RECORDED",
+  "scope": "V2-C006_V2-C012_STAGE_A_DEVELOPMENT_ONLY",
+  "authorization": {
+    "ref": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
+    "git_blob_sha1": "761ab0ec65f86872f8a6e11b2cef588c614a2c4b",
+    "authorized_head": "a8d8c96e045d772b7091fdd015a229d6d83b2649",
+    "authorization_commit": "d74cffb4f5ebec3f5fc7772ab9de45fcb8e91b66",
+    "exact_head_ci_run": 35502464501,
+    "exact_head_ci_tests_passed": 438,
+    "exact_head_ci_tests_failed": 0
+  },
+  "evaluator": {
+    "policy_ref": "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json",
+    "policy_git_blob_sha1": "6c9999a7641b8f2299f1c4c5aab7ccb9e57c784a",
+    "runtime": "m6/stage_a_evaluator.py",
+    "runtime_git_blob_sha1": "05220fcadae6a74a7036e46f64ee1ad1411dc26f",
+    "runtime_sha256": "16e302dd3a9b58983cbfcb68ca0934c920ea8007fd11e9577685fa95f879874e",
+    "version": "MXM_STAGE_A_TIER1_EVALUATOR_V1"
+  },
+  "pre_economic_materialization": {
+    "ref": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+    "git_blob_sha1": "f6b2407d0f8a5a42b239a9fd5953c70a83a09b88",
+    "c006_intents": 108,
+    "c012_intents": 35,
+    "transaction_cost_contexts": 286,
+    "unresolved_transaction_cost_contexts": 0,
+    "combined_intent_manifest_sha256": "a897c7cd5310e6ccaf8ab28d225fd5c16b1ebf0f043a18242efa9c74981656e7"
+  },
+  "transaction_local_cost_methodology": {
+    "ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "changed_after_outcome": false
+  },
+  "results": {
+    "V2-C006": {
+      "path": "discovery/results/V2-C006_STAGE_A_V1.json",
+      "git_blob_sha1": "5303ba8bc5435e39a0075be071d2c14f0eb6f1ff",
+      "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+      "status": "DISCOVERY_SURVIVOR",
+      "event_count": 108,
+      "gross_pnl_eur": 154.16920204753237,
+      "coarse_net_pnl_eur": 124.72483885922844,
+      "gross_return": 0.0014274926115512255,
+      "coarse_net_return": 0.00115485961906693,
+      "cost_burden": 0.0002726329924842955,
+      "drawdown_eur": 53.07545164351332,
+      "eur200_feasibility": "NOT_EVALUATED",
+      "stage_b_required": true
+    },
+    "V2-C012": {
+      "path": "discovery/results/V2-C012_STAGE_A_V1.json",
+      "git_blob_sha1": "e5e62e7f890ee40db1f75bebcdf27f894bde1fc3",
+      "result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+      "status": "DISCOVERY_SURVIVOR",
+      "event_count": 35,
+      "gross_pnl_eur": 47.10259401875881,
+      "coarse_net_pnl_eur": 40.881179572198114,
+      "gross_return": 0.0013457884005359658,
+      "coarse_net_return": 0.0011680337020628033,
+      "cost_burden": 0.00017775469847316266,
+      "drawdown_eur": 37.97260992760511,
+      "eur200_feasibility": "NOT_EVALUATED",
+      "stage_b_required": true
+    }
+  },
+  "discovery_survivors": [
+    "V2-C006",
+    "V2-C012"
+  ],
+  "certification_survivors": [],
+  "promotion_semantics": "Stage-A DISCOVERY_SURVIVOR is not Certification promotion and does not establish EUR200 feasibility or exact execution truth.",
+  "ledger": {
+    "prior_entries": 20,
+    "result_recorded_added": 2,
+    "final_entries": 22,
+    "sequence_21_entry_hash": "c8e743f28c933ab286bc548ab20a2ec0fea9437c541b3b925c22dd27c04cf4a9",
+    "sequence_22_entry_hash": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614",
+    "final_ledger_head": "eb0e76934fc41f590a8dc25a506b948f7bb10d4787ab28dac07595d8d67e5614"
+  },
+  "accounting": {
+    "v2_attempts_consumed": 2,
+    "v2_evaluated_identities": 2,
+    "economic_outcomes_opened": 2,
+    "result_recorded": 2,
+    "search_budget_total": 84,
+    "search_budget_remaining": 82
+  },
+  "integrity": {
+    "post_outcome_tuning": false,
+    "candidate_specs_mutated": false,
+    "transaction_local_cost_methodology_mutated": false,
+    "protected_evidence_opened": false,
+    "protected_evidence_used": false,
+    "live_orders": false,
+    "competition_start": false
+  },
+  "exact_next_action": "Run Stage-B EUR200 causal capital realization for the two Stage-A Discovery survivors using only already-unprotected accepted evidence or minimum newly required unprotected structural evidence. Do not open protected forward evidence."
+}
