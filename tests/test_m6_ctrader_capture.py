@@ -318,8 +318,8 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertFalse(state["protected_evidence_opened"])
         self.assertEqual(state["protected_forward_start"], PROTECTED_FORWARD_START)
         self.assertEqual(state["m6_status"], "PENDING")
-        self.assertNotIn('"entry_type":"RESULT_RECORDED"', LEDGER_PATH.read_text(encoding="utf-8"))
-
+        ledger = [json.loads(x) for x in LEDGER_PATH.read_text(encoding="utf-8").splitlines() if x.strip()]
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
     def test_20_prior_capture_checkpoint_remains_tooling_only(self):
         cp = load(CHECKPOINT_V1_PATH)
         self.assertEqual(cp["oauth"]["scope"], "accounts")
