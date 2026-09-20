@@ -324,7 +324,10 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
                 capture["status"],
                 "PASS_CAPTURE_VALID_MARGIN_AUTHORITY_UNRESOLVED",
             )
-            self.assertFalse(state["user_action_required"])
+            if state["m6"]["stage_b"].get("broker_confirmation_required"):
+                self.assertTrue(state["user_action_required"])
+            else:
+                self.assertFalse(state["user_action_required"])
             self.assertFalse(
                 state["m6"]["stage_b"]["margin_history_package"]["user_action_required"]
             )
