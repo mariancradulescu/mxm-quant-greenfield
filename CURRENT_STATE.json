@@ -344,12 +344,25 @@
       "economics_run": false,
       "results_created": false,
       "stage_b_outcomes_opened": 0,
-      "protected_evidence_opened": false
+      "protected_evidence_opened": false,
+      "margin_history_package": {
+        "state": "IMPLEMENTED_PENDING_EXACT_HEAD_CI",
+        "plan_ref": "data/M6_STAGE_B_MARGIN_HISTORY_SUPPLEMENT_PLAN_V1.json",
+        "evidence_resolution_ref": "evidence/M6_STAGE_B_MARGIN_EVIDENCE_RESOLUTION_V1.json",
+        "package_filename": "MXM_M6_STAGE_B_MARGIN_HISTORY_PYDROID_PACKAGE.zip",
+        "output_evidence_filename": "MXM_M6_STAGE_B_MARGIN_HISTORY_EVIDENCE_V1.zip",
+        "user_capture_required_after_green": true,
+        "user_action_required": false,
+        "execution_authorized": false,
+        "stage_b_economics_run": false,
+        "stage_b_outcomes_opened": 0,
+        "protected_evidence_opened": false
+      }
     }
   },
-  "next_action": "Resolve and freeze only the generic applicable historical Stage-B margin authority for the already-frozen minimum-volume EUR200 law. Then exact-head test and separately authorize Stage-B execution. Do not open protected evidence.",
+  "next_action": "Run exact-head full CI for the complete Stage-B historical-margin Pydroid package. If green and the distinct artifact exists, transition to USER ACTION REQUIRED for read-only Android/Pydroid capture only. Do not run Stage-B economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_B_TIER1_STRUCTURAL_PREPARATION",
+  "phase": "M6_STAGE_B_MARGIN_HISTORY_PACKAGE_PREPARATION",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -445,12 +458,12 @@
     "wave_01_original_artifact_restored": true,
     "wave_01_original_git_blob_sha": "36da471054fa59ac12596e5a6b0cac98ce06b5e4"
   },
-  "primary_run_objective": "M6_STAGE_B_EUR200_PREPARED_NOT_RUN_MARGIN_GATE_UNRESOLVED",
+  "primary_run_objective": "COMPLETE_STAGE_B_HISTORICAL_MARGIN_READ_ONLY_PACKAGE_NO_STAGE_B_ECONOMICS",
   "program": "MXM_QUANT_GREENFIELD_V2",
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
-  "structural_only_since_previous_economic_outcome": false,
+  "structural_only_since_previous_economic_outcome": true,
   "user_action_required": false,
   "v2_attempts_used": 2,
   "v2_evaluated_identities": 2,

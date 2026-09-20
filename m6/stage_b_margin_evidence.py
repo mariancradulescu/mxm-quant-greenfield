@@ -1,13 +1,12 @@
 """Pure helpers for the read-only Stage-B historical margin evidence supplement."""
 from __future__ import annotations
 
-import hashlib
 import json
 import zipfile
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from .ctrader_capture import CaptureContractError, sha256_file
 
@@ -24,6 +23,8 @@ PLAN_REL = "data/M6_STAGE_B_MARGIN_HISTORY_SUPPLEMENT_PLAN_V1.json"
 PLAN_SCHEMA = "mxm.greenfield.v2.m6-stage-b-margin-history-supplement-plan.v1"
 BUNDLE_SCHEMA = "mxm.greenfield.v2.m6-stage-b-margin-history-evidence-bundle.v1"
 TOOL_VERSION = "MXM_M6_STAGE_B_MARGIN_HISTORY_ANDROID_STDLIB_V1"
+OUTPUT_FILENAME = "MXM_M6_STAGE_B_MARGIN_HISTORY_EVIDENCE_V1.zip"
+TRANSFERABLE_FULL_ROWS_MAX_BYTES = 50 * 1024 * 1024
 
 MARGIN_HISTORY_PACKAGE_FILES = (
     "M6_STAGE_B_MARGIN_HISTORY_RUN.py",
@@ -58,6 +59,22 @@ class HistoryWindow:
             raise CaptureContractError("invalid historical deal window")
 
 
+@dataclass(frozen=True)
+class WindowCaptureStats:
+    request_count: int
+    split_count: int
+    complete_leaf_windows: int
+    has_more_responses: int
+
+    def plus(self, other: "WindowCaptureStats") -> "WindowCaptureStats":
+        return WindowCaptureStats(
+            self.request_count + other.request_count,
+            self.split_count + other.split_count,
+            self.complete_leaf_windows + other.complete_leaf_windows,
+            self.has_more_responses + other.has_more_responses,
+        )
+
+
 def epoch_ms(value: datetime) -> int:
     if value.tzinfo is None:
         raise CaptureContractError("timestamp must be timezone-aware")
@@ -75,6 +92,16 @@ DEVELOPMENT_END_MS = epoch_ms(DEVELOPMENT_END_UTC)
 PROTECTED_FORWARD_START_MS = epoch_ms(PROTECTED_FORWARD_START_UTC)
 
 
+def validate_development_window(window: HistoryWindow) -> HistoryWindow:
+    if window.from_ms < DEVELOPMENT_START_MS:
+        raise CaptureContractError("historical deal request starts before frozen DEVELOPMENT interval")
+    if window.to_ms > DEVELOPMENT_END_MS:
+        raise CaptureContractError("historical deal request exceeds frozen DEVELOPMENT interval")
+    if window.to_ms >= PROTECTED_FORWARD_START_MS:
+        raise CaptureContractError("historical deal request reaches protected-forward boundary")
+    return window
+
+
 def validate_plan(plan: Mapping[str, Any]) -> bool:
     if plan.get("schema") != PLAN_SCHEMA:
         raise CaptureContractError("Stage-B margin supplement plan schema mismatch")
@@ -82,13 +109,25 @@ def validate_plan(plan: Mapping[str, Any]) -> bool:
         raise CaptureContractError("Stage-B margin supplement plan is not frozen/active")
     if plan.get("oauth_scope") != "accounts" or plan.get("orders") is not False:
         raise CaptureContractError("Stage-B margin supplement violates view-only contract")
+    if plan.get("account_mutation") is not False:
+        raise CaptureContractError("Stage-B margin supplement permits account mutation")
+    if plan.get("protected_evidence_opened") is not False:
+        raise CaptureContractError("protected evidence must remain unopened")
     targets = plan.get("target_products") or {}
     for name, symbol_id in TARGET_SYMBOLS.items():
         if int((targets.get(name) or {}).get("symbol_id", -1)) != symbol_id:
             raise CaptureContractError(f"{name} target symbolId drift")
     interval = plan.get("development_interval") or {}
+    if interval.get("from_utc") != "2022-01-03T00:00:00Z":
+        raise CaptureContractError("DEVELOPMENT start drift")
+    if interval.get("to_utc") != "2026-09-16T23:59:59.999Z":
+        raise CaptureContractError("DEVELOPMENT end drift")
     if interval.get("protected_forward_start") != "2026-09-17T12:02:58Z":
         raise CaptureContractError("protected-forward boundary drift")
+    if int((plan.get("historical_deal_capture") or {}).get("max_rows_per_request", -1)) != MAX_ROWS:
+        raise CaptureContractError("maxRows drift")
+    if int((plan.get("historical_deal_capture") or {}).get("initial_window_days", -1)) != INITIAL_WINDOW_DAYS:
+        raise CaptureContractError("initial window size drift")
     return True
 
 
@@ -105,18 +144,54 @@ def initial_windows(
     cursor = start_ms
     while cursor <= end_ms:
         right = min(end_ms, cursor + width - 1)
-        out.append(HistoryWindow(cursor, right))
+        out.append(validate_development_window(HistoryWindow(cursor, right)))
         cursor = right + 1
+    for left, right in zip(out, out[1:]):
+        if left.to_ms + 1 != right.from_ms:
+            raise CaptureContractError("initial deal windows overlap or contain a gap")
     return out
 
 
 def bisect_window(window: HistoryWindow) -> tuple[HistoryWindow, HistoryWindow]:
+    validate_development_window(window)
     if window.from_ms == window.to_ms:
         raise CaptureContractError("cannot bisect one-millisecond deal window")
     midpoint = (window.from_ms + window.to_ms) // 2
-    return (
-        HistoryWindow(window.from_ms, midpoint),
-        HistoryWindow(midpoint + 1, window.to_ms),
+    left = HistoryWindow(window.from_ms, midpoint)
+    right = HistoryWindow(midpoint + 1, window.to_ms)
+    if left.to_ms + 1 != right.from_ms:
+        raise CaptureContractError("bisection overlap/gap invariant failed")
+    return validate_development_window(left), validate_development_window(right)
+
+
+def exhaust_window(
+    window: HistoryWindow,
+    fetch_page: Callable[[HistoryWindow], tuple[Sequence[Mapping[str, Any]], bool]],
+) -> tuple[list[Mapping[str, Any]], WindowCaptureStats]:
+    """Return only records from complete leaf windows.
+
+    If a broad response reports hasMore, its returned records are deliberately discarded
+    and the interval is recursively split into non-overlapping children. This prevents a
+    truncated broad page from being mixed with complete child pages.
+    """
+    validate_development_window(window)
+    records, has_more = fetch_page(window)
+    base = WindowCaptureStats(1, 0, 0, 1 if has_more else 0)
+    if not has_more:
+        return list(records), WindowCaptureStats(1, 0, 1, 0)
+    if window.from_ms == window.to_ms:
+        raise CaptureContractError(
+            "ProtoOADealListRes.hasMore remained true for a one-millisecond interval"
+        )
+    left, right = bisect_window(window)
+    left_rows, left_stats = exhaust_window(left, fetch_page)
+    right_rows, right_stats = exhaust_window(right, fetch_page)
+    children = left_stats.plus(right_stats)
+    return left_rows + right_rows, WindowCaptureStats(
+        base.request_count + children.request_count,
+        1 + children.split_count,
+        children.complete_leaf_windows,
+        1 + children.has_more_responses,
     )
 
 
@@ -162,6 +237,17 @@ def sanitize_deal(deal: Mapping[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def deal_sort_key(row: Mapping[str, Any]) -> tuple[Any, ...]:
+    return tuple(
+        row.get(key)
+        for key in (
+            "execution_timestamp_ms", "symbol_id", "trade_side", "deal_status",
+            "volume_cents", "filled_volume_cents", "execution_price", "margin_rate",
+            "base_to_usd_conversion_rate", "money_digits",
+        )
+    )
+
+
 def summarize_observations(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     out = {}
     for symbol in TARGET_SYMBOLS:
@@ -199,11 +285,20 @@ def assert_transferable_privacy(value: Any) -> None:
         for key, item in value.items():
             normalized = "".join(ch for ch in str(key).lower() if ch.isalnum())
             if normalized in FORBIDDEN_EXPORTED_KEYS:
-                raise CaptureContractError(f"forbidden account/trade identity field in transferable evidence: {key}")
+                raise CaptureContractError(
+                    f"forbidden account/trade identity field in transferable evidence: {key}"
+                )
             assert_transferable_privacy(item)
     elif isinstance(value, (list, tuple)):
         for item in value:
             assert_transferable_privacy(item)
+
+
+def jsonl_bytes(rows: Sequence[Mapping[str, Any]]) -> bytes:
+    return "".join(
+        json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n"
+        for row in rows
+    ).encode("utf-8")
 
 
 def deterministic_zip_directory(root: Path, target: Path) -> str:
@@ -214,7 +309,10 @@ def deterministic_zip_directory(root: Path, target: Path) -> str:
             info = zipfile.ZipInfo(rel, date_time=(1980, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o644 << 16
-            zf.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            zf.writestr(
+                info, path.read_bytes(),
+                compress_type=zipfile.ZIP_DEFLATED, compresslevel=9
+            )
     return sha256_file(target)
 
 
@@ -229,8 +327,11 @@ def build_margin_history_pydroid_package(repo_root: Path | str, zip_path: Path |
             info = zipfile.ZipInfo(rel, date_time=(1980, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o644 << 16
-            zf.writestr(info, (root / rel).read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            zf.writestr(
+                info, (root / rel).read_bytes(),
+                compress_type=zipfile.ZIP_DEFLATED, compresslevel=9
+            )
     with zipfile.ZipFile(target) as zf:
-        if set(zf.namelist()) != set(MARGIN_HISTORY_PACKAGE_FILES):
-            raise CaptureContractError("Stage-B margin Pydroid package member mismatch")
+        if tuple(zf.namelist()) != MARGIN_HISTORY_PACKAGE_FILES:
+            raise CaptureContractError("Stage-B margin Pydroid package member/order mismatch")
     return sha256_file(target)

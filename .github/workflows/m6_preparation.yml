@@ -21,7 +21,7 @@ jobs:
         run: |
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile actual Pydroid runtime files
-        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py M6_PREOPEN_SUPPLEMENT_RUN.py m6/preopen_supplement.py m6/preopen_evidence_openapi.py m6/pydroid_preopen_launcher.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/session_replay.py m6/tier1_candidate_replay.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
+        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py M6_PREOPEN_SUPPLEMENT_RUN.py M6_STAGE_B_MARGIN_HISTORY_RUN.py m6/preopen_supplement.py m6/preopen_evidence_openapi.py m6/pydroid_preopen_launcher.py m6/stage_b_margin_evidence.py m6/stage_b_margin_openapi.py m6/pydroid_stage_b_margin_launcher.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/session_replay.py m6/tier1_candidate_replay.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
       - name: No-credential Android-safe runtime preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -49,6 +49,18 @@ jobs:
           assert report["credentials_used"] is False, report
           assert 4.7 < core.HISTORICAL_TARGET_RPS < 4.8
           print("RUNTIME_PREFLIGHT_PASS", report)
+          PY
+      - name: Stage-B historical-margin no-credential preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from m6.pydroid_stage_b_margin_launcher import local_preflight
+          report = local_preflight()
+          assert report["network_connection_attempted"] is False, report
+          assert report["credentials_used"] is False, report
+          assert report["orders_permitted"] is False, report
+          assert report["account_mutation_permitted"] is False, report
+          assert report["targets"] == {"US500": 127, "NAS100": 126}, report
+          print("STAGE_B_MARGIN_PREFLIGHT_PASS", report)
           PY
       - name: Full repository unittest suite on Python 3.13
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest discover -s tests -p 'test_*.py' -v
@@ -84,5 +96,17 @@ jobs:
         with:
           name: MXM_M6_PREOPEN_SUPPLEMENT_PYDROID_PACKAGE
           path: dist/MXM_M6_PREOPEN_SUPPLEMENT_PYDROID_PACKAGE.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Build deterministic Stage-B historical-margin Pydroid package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_m6_stage_b_margin_history_pydroid_package.py
+          sha256sum dist/MXM_M6_STAGE_B_MARGIN_HISTORY_PYDROID_PACKAGE.zip
+      - name: Upload Stage-B historical-margin Pydroid package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_M6_STAGE_B_MARGIN_HISTORY_PYDROID_PACKAGE
+          path: dist/MXM_M6_STAGE_B_MARGIN_HISTORY_PYDROID_PACKAGE.zip
           if-no-files-found: error
           retention-days: 30
