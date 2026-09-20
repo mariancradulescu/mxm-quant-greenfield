@@ -44,16 +44,65 @@ class StageBMarginHistoryCaptureAcceptanceTests(unittest.TestCase):
         self.assertFalse(a["canonical_repack"]["semantic_content_changed"])
 
     def test_public_evidence_does_not_promote_minimum_to_upper_bound(self):
-        r=load("evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json")
+        historical=load("evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json")
+        r=load("evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json")
+        self.assertFalse(
+            historical["reasoning"]["using_5_percent_as_historical_exact_margin_would_be_optimistic"]
+        )
+        self.assertEqual(
+            r["supersedes"]["ref"],
+            "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json",
+        )
+        self.assertEqual(
+            r["supersedes"]["git_blob_sha1"],
+            "7d9535f6cd766ebc1c14a90b38b5045b365a1031",
+        )
         self.assertEqual(r["status"],"UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND")
-        self.assertTrue(r["reasoning"]["regulatory_5_percent_is_a_minimum_required_margin_not_a_maximum_required_margin"])
-        self.assertTrue(r["reasoning"]["current_margin_or_leverage_backfill_into_2022_2026_forbidden"])
-        self.assertTrue(r["reasoning"]["broker_could_have_required_more_margin_historically"])
-        self.assertTrue(r["reasoning"]["therefore_conservative_historical_max_required_margin_eur_not_proven"])
+        reasoning=r["reasoning"]
+        self.assertTrue(reasoning["regulatory_5_percent_is_a_minimum_required_margin_not_a_maximum_required_margin"])
+        self.assertTrue(reasoning["using_5_percent_as_historical_exact_margin_would_be_optimistic"])
+        self.assertTrue(reasoning["current_margin_or_leverage_backfill_into_2022_2026_forbidden"])
+        self.assertTrue(reasoning["broker_could_have_required_more_margin_historically"])
+        self.assertTrue(reasoning["therefore_conservative_historical_max_required_margin_eur_not_proven"])
+        premises=(
+            reasoning["regulatory_5_percent_is_a_minimum_required_margin_not_a_maximum_required_margin"]
+            and reasoning["broker_could_have_required_more_margin_historically"]
+            and reasoning["using_5_percent_as_historical_exact_margin_would_be_optimistic"]
+        )
+        self.assertTrue(premises)
+        self.assertEqual(
+            r["logical_consistency"]["implication"],
+            "HISTORICAL_UPPER_BOUND_REMAINS_UNRESOLVED",
+        )
+        self.assertTrue(r["logical_consistency"]["implication_satisfied"])
+        self.assertTrue(reasoning["therefore_conservative_historical_max_required_margin_eur_not_proven"])
         self.assertFalse(r["conclusion"]["historical_margin_authority_frozen"])
         self.assertFalse(r["conclusion"]["stage_b_execution_authorized"])
         self.assertFalse(r["conclusion"]["stage_b_economics_may_run"])
         self.assertFalse(r["conclusion"]["user_recapture_same_package_required"])
+
+    def test_active_authority_is_v2_and_gate_stays_fail_closed(self):
+        s=load("CURRENT_STATE.json")
+        self.assertEqual(
+            s["m6_stage_b_historical_margin_authority_resolution"],
+            "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+        )
+        self.assertEqual(
+            s["m6_stage_b_historical_margin_authority_resolution_historical_v1"],
+            "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json",
+        )
+        self.assertEqual(
+            s["m6"]["stage_b"]["historical_margin_authority_resolution_ref"],
+            "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+        )
+        self.assertEqual(
+            s["m6"]["stage_b"]["historical_margin_gate"],
+            "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+        )
+        self.assertFalse(s["m6"]["stage_b"]["historical_margin_authority_frozen"])
+        self.assertFalse(s["m6"]["stage_b"]["execution_authorized"])
+        self.assertFalse(s["m6"]["stage_b"]["economics_run"])
+        self.assertEqual(s["m6"]["stage_b"]["stage_b_outcomes_opened"],0)
 
     def test_accounting_and_protected_boundary_are_unchanged(self):
         s=load("CURRENT_STATE.json")
