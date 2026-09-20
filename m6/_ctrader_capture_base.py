@@ -47,6 +47,9 @@ READ_ONLY_PROTO_REQUESTS = frozenset({
     "ProtoOAGetTrendbarsReq",
     "ProtoOAGetTickDataReq",
     "ProtoOAExpectedMarginReq",
+    "ProtoOADealListReq",
+    "ProtoOAGetDynamicLeverageByIDReq",
+    "ProtoOAMarginCallListReq",
 })
 FORBIDDEN_MUTATION_PROTO_REQUESTS = frozenset({
     "ProtoOANewOrderReq", "ProtoOACancelOrderReq", "ProtoOAAmendOrderReq",

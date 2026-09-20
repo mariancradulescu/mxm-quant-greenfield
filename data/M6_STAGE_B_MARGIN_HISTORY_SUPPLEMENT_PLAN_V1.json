@@ -1,0 +1,130 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-margin-history-supplement-plan.v1",
+  "status": "FROZEN_READ_ONLY_MINIMAL_GENERIC_EXTENSION_PRE_STAGE_B_OUTCOME",
+  "scope": "V2-C006_V2-C012_STAGE_B_MARGIN_EVIDENCE_ONLY_NO_ECONOMICS",
+  "frozen_after_stage_b_structural_prep_head": "db0136d40503bd73c2d7e4b1255ba2e5f7e83543",
+  "stage_b_structural_prep_exact_head_ci": {
+    "run_id": 35515094475,
+    "tests_passed": 470,
+    "tests_failed": 0,
+    "conclusion": "SUCCESS"
+  },
+  "purpose": "Acquire the minimum generic broker-native evidence that can inform whether a defensible historical margin authority exists for the already-frozen Stage-B EUR200 law.",
+  "oauth_scope": "accounts",
+  "environment": "Pepperstone - Europe LIVE",
+  "orders": false,
+  "account_mutation": false,
+  "protected_evidence_opened": false,
+  "candidate_outcomes_used_to_choose_requests": false,
+  "development_interval": {
+    "from_utc": "2022-01-03T00:00:00Z",
+    "to_utc": "2026-09-16T23:59:59.999Z",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "target_products": {
+    "US500": {
+      "symbol_id": 127,
+      "candidate_id": "V2-C006"
+    },
+    "NAS100": {
+      "symbol_id": 126,
+      "candidate_id": "V2-C012"
+    }
+  },
+  "read_only_requests": [
+    "ProtoOAApplicationAuthReq",
+    "ProtoOAGetAccountListByAccessTokenReq",
+    "ProtoOAAccountAuthReq",
+    "ProtoOATraderReq",
+    "ProtoOASymbolsListReq",
+    "ProtoOASymbolByIdReq",
+    "ProtoOADealListReq",
+    "ProtoOAGetDynamicLeverageByIDReq",
+    "ProtoOAMarginCallListReq"
+  ],
+  "historical_deal_capture": {
+    "request": "ProtoOADealListReq",
+    "reason": "ProtoOADeal exposes executionTimestamp, symbolId, volume, executionPrice and optional marginRate recorded at execution.",
+    "max_rows_per_request": 1000,
+    "initial_window_days": 31,
+    "pagination": "NON_OVERLAPPING_RECURSIVE_TIME_BISECTION_WHEN_HAS_MORE_TRUE",
+    "fail_closed_rule": "IF_HAS_MORE_REMAINS_TRUE_AT_ONE_MILLISECOND_WINDOW_STOP_WITH_UNRESOLVED",
+    "historical_rate_limit_target_requests_per_second": 4.75,
+    "relevant_deal_statuses": [
+      2,
+      3
+    ],
+    "exported_fields": [
+      "execution_utc",
+      "execution_timestamp_ms",
+      "symbol",
+      "symbol_id",
+      "volume_cents",
+      "filled_volume_cents",
+      "execution_price",
+      "trade_side",
+      "deal_status",
+      "margin_rate",
+      "margin_rate_state",
+      "base_to_usd_conversion_rate",
+      "money_digits"
+    ],
+    "explicitly_not_exported": [
+      "ctidTraderAccountId",
+      "traderLogin",
+      "dealId",
+      "orderId",
+      "positionId",
+      "label",
+      "comment"
+    ]
+  },
+  "current_structural_diagnostics": {
+    "dynamic_leverage": {
+      "request": "ProtoOAGetDynamicLeverageByIDReq",
+      "classification": "CURRENT_ONLY_NOT_HISTORICAL_AUTHORITY"
+    },
+    "margin_calls": {
+      "request": "ProtoOAMarginCallListReq",
+      "classification": "CURRENT_ONLY_NOT_HISTORICAL_AUTHORITY"
+    },
+    "trader_metadata": {
+      "request": "ProtoOATraderReq",
+      "exported_fields": [
+        "depositAssetId",
+        "accessRights",
+        "accountType",
+        "registrationTimestamp",
+        "moneyDigits",
+        "leverageInCents",
+        "totalMarginCalculationType",
+        "maxLeverage",
+        "isLimitedRisk",
+        "limitedRiskMarginCalculationStrategy",
+        "fairStopOut",
+        "stopOutStrategy"
+      ],
+      "excluded_fields": [
+        "ctidTraderAccountId",
+        "traderLogin",
+        "balance",
+        "managerBonus",
+        "ibBonus",
+        "nonWithdrawableBonus"
+      ]
+    }
+  },
+  "interpretation": {
+    "observations_do_not_automatically_create_margin_authority": true,
+    "no_relevant_historical_deals": "UNRESOLVED_NO_ACCOUNT_NATIVE_HISTORICAL_MARGIN_OBSERVATIONS",
+    "relevant_deals_without_margin_rate": "UNRESOLVED_MARGIN_RATE_NOT_RECORDED",
+    "relevant_margin_rate_observations": "OBSERVATIONS_CAPTURED_REQUIRES_SEPARATE_FAIL_CLOSED_AUTHORITY_ASSESSMENT",
+    "current_dynamic_leverage_may_not_be_backfilled_into_history": true,
+    "approximate_leverage_arithmetic_forbidden": true
+  },
+  "official_public_sources": [
+    "https://help.ctrader.com/open-api/messages/",
+    "https://help.ctrader.com/open-api/model-messages/",
+    "https://help.ctrader.com/trading-with-ctrader/dynamic-leverage/"
+  ]
+}
