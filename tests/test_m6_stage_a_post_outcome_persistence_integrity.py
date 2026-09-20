@@ -28,7 +28,7 @@ def load(rel):
 
 
 def git_blob_sha_bytes(data):
-    return hashlib.sha1(b"blob " + str(len(data)).encode("ascii") + b"\\0" + data).hexdigest()
+    return hashlib.sha1(b"blob " + str(len(data)).encode("ascii") + bytes([0]) + data).hexdigest()
 
 
 def no_duplicate_object_pairs(pairs):
