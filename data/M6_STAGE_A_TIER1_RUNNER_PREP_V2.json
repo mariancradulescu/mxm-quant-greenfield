@@ -1,0 +1,73 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-tier1-runner-prep.v2",
+  "status": "FULL_STAGE_A_EVALUATOR_PREPARED_NOT_RUN",
+  "supersedes": "data/M6_STAGE_A_TIER1_RUNNER_PREP_V1.json",
+  "runner": {
+    "path": "m6/stage_a_tier1_runner.py",
+    "git_blob_sha1": "3c49124c1549c9fa6be040a7d4d2cf169bfbb134",
+    "source_sha256": "e3fd99f861e9535ba746a20f23b26a964c2a3804eb3cbe90c17437759a9a9232"
+  },
+  "evaluator": {
+    "policy": "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json",
+    "policy_git_blob_sha1": "9193a388dff625ac6ea14aedba29c254d369dba1",
+    "runtime": "m6/stage_a_evaluator.py",
+    "runtime_git_blob_sha1": "438e305b757196c101461572bd3463dac4b8e5dc",
+    "runtime_sha256": "92209f5c2f60e469a3cc443dce1cc65c51285894fe635cb8086becc2f4c82363",
+    "version": "MXM_STAGE_A_TIER1_EVALUATOR_V1"
+  },
+  "pre_economic_materialization": {
+    "authority": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+    "authority_git_blob_sha1": "f6b2407d0f8a5a42b239a9fd5953c70a83a09b88",
+    "c006_intents": 108,
+    "c012_intents": 35,
+    "c006_manifest_sha256": "6e320849ba49136b5491ecab75bc0ce5c36715a2c2202ade9d97443b41b9a515",
+    "c012_manifest_sha256": "f9d0ba61346bbd9a1602fe84e73d4d374d27e9fdec0217906b2ac29f24218c8d",
+    "combined_manifest_sha256": "a897c7cd5310e6ccaf8ab28d225fd5c16b1ebf0f043a18242efa9c74981656e7",
+    "required_transaction_contexts": 286,
+    "unresolved_transaction_contexts": 0
+  },
+  "transaction_local_cost": {
+    "authority": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "authority_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "methodology_changed": false
+  },
+  "candidates": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "external_input_sha256": {
+    "US500_M15": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+    "NAS100_M15": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+    "EURUSD_M15": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+    "US500_TRANSACTION_LOCAL_COST": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+    "NAS100_C012_TRANSACTION_LOCAL_COST": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+  },
+  "integrity_contract": [
+    "Reject repository authority Git-blob mismatch.",
+    "Reject candidate semantic hash mismatch.",
+    "Reject accepted external input SHA256 mismatch.",
+    "Recompute frozen C006/C012 intent manifests before economics and reject mismatch.",
+    "Require every selected transaction-local entry/exit evidence row to match the exact transaction timestamp and be supported.",
+    "Reject C012 known unsupported 15:00 contexts and any outside-domain context before PnL.",
+    "Require causal USD-to-EUR conversion at entry and exit.",
+    "Validate complete Stage-A result schema after computation.",
+    "Require a separate explicit Stage-A execution authorization artifact before any economics."
+  ],
+  "current_execution_authorized": false,
+  "current_execution_performed": false,
+  "result_files_created": false,
+  "protected_evidence_opened": false,
+  "economics_run": false,
+  "cli_economic_execution_enabled": false,
+  "exact_next_action": "Exact-head test this complete Stage-A evaluator/runner preparation. Only after PASS may a separate explicit execution authorization be created and the first V2-C006/V2-C012 economic outcomes opened.",
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "m6_status": "PENDING",
+    "m6_economics_run": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}
