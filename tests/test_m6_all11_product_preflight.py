@@ -360,20 +360,18 @@ class BrokerProductIdentityTests(unittest.TestCase):
     def test_19_zero_economics_protected_boundary_and_m6_pending(self):
         state = json.loads((ROOT / "CURRENT_STATE.json").read_text(encoding="utf-8"))
         protected = json.loads((ROOT / "V2_PROTECTED_FORWARD_START.json").read_text(encoding="utf-8"))
-        ledger = [
-            json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text(encoding="utf-8").splitlines()
-            if x.strip()
-        ]
-        self.assertEqual(state["economic_outcomes_opened"], 0)
-        self.assertEqual(state["v2_attempts_used"], 0)
-        self.assertEqual(state["v2_evaluated_identities"], 0)
+        auth = json.loads((ROOT / "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json").read_text(encoding="utf-8"))
+        ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text(encoding="utf-8").splitlines() if x.strip()]
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertEqual(auth["preconditions"]["ledger_entries"], 20)
         self.assertEqual(state["m6"]["status"], "PENDING")
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
         self.assertFalse(state["competition_start_authorized"])
         self.assertFalse(protected["protected_evidence_opened"])
-        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger))
-
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
     def test_20_relevant_full_metadata_scope_covers_material_variants_without_whole_market_history(self):
         rows = universe()
         ids = relevant_symbol_ids(
