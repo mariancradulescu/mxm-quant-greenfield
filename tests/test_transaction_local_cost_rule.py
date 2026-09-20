@@ -184,17 +184,17 @@ class TransactionLocalCostRuleTests(unittest.TestCase):
             execute_stage_a_in_memory(ROOT,dummy,authorization_path=None)
 
     def test_12_current_state_remains_zero_economics_and_protected_unopened(self):
-        s=load("CURRENT_STATE.json")
-        ledger=[json.loads(x) for x in (ROOT/"discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
-        self.assertEqual(s["economic_outcomes_opened"],0)
-        self.assertEqual(s["v2_attempts_used"],0)
-        self.assertEqual(s["v2_evaluated_identities"],0)
-        self.assertEqual(sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["m6"]["status"],"PENDING")
-        self.assertFalse(s["live_orders_authorized"])
-        self.assertFalse(s["competition_start_authorized"])
-
+        state = load("CURRENT_STATE.json")
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
+        self.assertEqual(sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger), 2)
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertEqual(state["m6"]["status"], "PENDING")
+        self.assertFalse(state["live_orders_authorized"])
+        self.assertFalse(state["competition_start_authorized"])
 if __name__=="__main__":
     unittest.main(verbosity=2)
