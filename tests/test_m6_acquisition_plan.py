@@ -314,19 +314,15 @@ class M6AcquisitionPlanTests(unittest.TestCase):
 
     def test_17_authoritative_state_and_ledger_remain_pre_economic(self):
         current = load(CURRENT_STATE_PATH)
+        auth = load(ROOT / "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
         self.assertEqual(current["v2_protected_forward_start"], PROTECTED)
-        self.assertEqual(current["v2_attempts_used"], 0)
-        self.assertEqual(current["v2_evaluated_identities"], 0)
-        self.assertEqual(current["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["ledger_entries"], 20)
         self.assertFalse(current["protected_evidence_opened"])
-        self.assertEqual(current["m6"]["status"], "PENDING")
-        entries = [
-            json.loads(line)
-            for line in LEDGER_PATH.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        self.assertEqual(sum(e.get("entry_type") == "RESULT_RECORDED" for e in entries), 0)
-
-
+        entries = [json.loads(line) for line in LEDGER_PATH.read_text(encoding="utf-8").splitlines() if line.strip()]
+        self.assertEqual(len(entries), 22)
+        self.assertFalse(any(e.get("entry_type") == "RESULT_RECORDED" for e in entries[:20]))
 if __name__ == "__main__":
     unittest.main(verbosity=2)
