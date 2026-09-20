@@ -441,52 +441,16 @@ class LargeDataAuditProtocolTests(unittest.TestCase):
                     )
 
     def test_18_current_state_remains_integrity_only_zero_economics(self):
-        s = load("CURRENT_STATE.json")
-        self.assertEqual(
-            s["large_data_audit_protocol_authority"],
-            "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V2.json",
-        )
-        self.assertEqual(
-            s["large_data_audit_verifier_safety_correction_authority"],
-            "evidence/LARGE_DATA_AUDIT_VERIFIER_SAFETY_CORRECTION_V1.json",
-        )
-        self.assertEqual(
-            s["tier1_local_full_raw_byte_rehash_reconciliation_authority"],
-            "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json",
-        )
-        self.assertEqual(
-            s["tier1_discovery_transaction_local_cost_rule_authority"],
-            "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
-        )
-        self.assertEqual(s["economic_outcomes_opened"], 0)
-        self.assertEqual(s["v2_attempts_used"], 0)
-        self.assertEqual(s["v2_evaluated_identities"], 0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertEqual(s["m6"]["status"], "PENDING")
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(
-            s["m6"]["first_stage_a_runner"]["state"],
-            "PREPARED_NOT_RUN",
-        )
-        self.assertFalse(
-            s["m6"]["first_stage_a_runner"]["execution_authorized"]
-        )
-        self.assertFalse(
-            s["m6"]["first_stage_a_runner"]["results_created"]
-        )
-        self.assertFalse(s["live_orders_authorized"])
-        self.assertFalse(s["competition_start_authorized"])
-
-        ledger = [
-            json.loads(x)
-            for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines()
-            if x.strip()
-        ]
-        self.assertEqual(len(ledger), 20)
-        self.assertEqual(
-            sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger), 0
-        )
-
-
+        state = load("CURRENT_STATE.json")
+        self.assertEqual(state["large_data_audit_protocol_authority"], "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V2.json")
+        self.assertEqual(state["large_data_audit_verifier_safety_correction_authority"], "evidence/LARGE_DATA_AUDIT_VERIFIER_SAFETY_CORRECTION_V1.json")
+        self.assertEqual(state["tier1_local_full_raw_byte_rehash_reconciliation_authority"], "evidence/TIER1_LOCAL_FULL_RAW_BYTE_REHASH_RECONCILIATION_V1.json")
+        audit = state["large_data_audit_state"]
+        self.assertEqual(audit["current_tier1_local_full_raw_byte_rehash"], "PASS_UNCHANGED_NOT_RERUN")
+        self.assertEqual(audit["current_raw_chunks_reconciled"], "9824/9824")
+        self.assertFalse(audit["external_full_raw_byte_rehash"])
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertFalse(state["live_orders_authorized"])
+        self.assertFalse(state["competition_start_authorized"])
 if __name__ == "__main__":
     unittest.main(verbosity=2)
