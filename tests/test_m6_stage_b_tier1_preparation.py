@@ -89,8 +89,10 @@ class StageBTier1PreparationTests(unittest.TestCase):
     def test_05_synthetic_continuous_capital_never_resizes(self):
         now=datetime(2026,1,2,15,0,tzinfo=timezone.utc)
         spec="75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49"
-        t=Prepared(Intent("V2-C006",spec,"LONG",now,now+timedelta(minutes=180),100.0,110.0),Cost(Decimal("1")),Cost(Decimal("1")),Decimal("1"),Decimal("1"))
-        c=Candidate("V2-C006",spec,"CONSERVATIVE_BOUND",(t,t))
+        t1=Prepared(Intent("V2-C006",spec,"LONG",now,now+timedelta(minutes=180),100.0,110.0),Cost(Decimal("1")),Cost(Decimal("1")),Decimal("1"),Decimal("1"))
+        later=now+timedelta(days=1)
+        t2=Prepared(Intent("V2-C006",spec,"LONG",later,later+timedelta(minutes=180),100.0,110.0),Cost(Decimal("1")),Cost(Decimal("1")),Decimal("1"),Decimal("1"))
+        c=Candidate("V2-C006",spec,"CONSERVATIVE_BOUND",(t1,t2))
         auth={
           "schema":"mxm.greenfield.v2.m6-stage-b-margin-authority.v1",
           "status":"FROZEN_CONSERVATIVE_HISTORICAL_MARGIN_BOUND",
