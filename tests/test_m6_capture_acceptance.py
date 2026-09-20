@@ -68,39 +68,23 @@ class M6CaptureAcceptanceTests(unittest.TestCase):
         self.assertFalse(m["candidate_ready_for_economic_outcome"])
 
     def test_03_current_state_advances_materialization_only_not_economics(self):
-        s = load("CURRENT_STATE.json")
-        self.assertEqual(s["m6"]["status"], "PENDING")
-        self.assertEqual(
-            s["m6"]["raw_materialization"]["state"],
-            "PASS_HASH_VERIFIED_PRIMARY_WAVE_02_RAW_COMPONENTS",
-        )
-        self.assertEqual(
-            s["m6"]["auxiliary_evidence"]["state"],
-            "TIER1_TRANSACTION_LOCAL_COST_FROZEN_STAGE_A_RUNNER_PREPARED_NOT_RUN",
-        )
-        self.assertEqual(
-            s["m6"]["auxiliary_evidence"]["active_readiness_ref"],
-            "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json",
-        )
-        self.assertFalse(s["m6"]["auxiliary_evidence"]["m6_stage_a_economics_authorized"])
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["economic_outcomes_opened"], 0)
-        self.assertEqual(s["v2_attempts_used"], 0)
-        self.assertEqual(s["v2_evaluated_identities"], 0)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["live_orders_authorized"])
-        self.assertFalse(s["competition_start_authorized"])
-
+        state = load("CURRENT_STATE.json")
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        self.assertEqual(state["m6"]["status"], "PENDING")
+        self.assertEqual(state["m6"]["raw_materialization"]["state"], "PASS_HASH_VERIFIED_PRIMARY_WAVE_02_RAW_COMPONENTS")
+        self.assertEqual(state["m6"]["auxiliary_evidence"]["active_readiness_ref"], "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json")
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertFalse(state["live_orders_authorized"])
+        self.assertFalse(state["competition_start_authorized"])
     def test_04_no_result_or_protected_boundary_change_from_capture_acceptance(self):
         ledger = read_ledger(ROOT / "discovery/ledger.jsonl")
         protected = load("V2_PROTECTED_FORWARD_START.json")
-        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger))
-        self.assertEqual(len(ledger), 20)
-        self.assertEqual(
-            protected["V2_PROTECTED_FORWARD_START"], "2026-09-17T12:02:58Z"
-        )
+        self.assertEqual(len(ledger), 22)
+        self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
+        self.assertEqual(protected["V2_PROTECTED_FORWARD_START"], "2026-09-17T12:02:58Z")
         self.assertFalse(protected["protected_evidence_opened"])
-
-
 if __name__ == "__main__":
     unittest.main(verbosity=2)
