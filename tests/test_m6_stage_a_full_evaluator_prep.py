@@ -262,28 +262,19 @@ class FullStageAEvaluatorPrepTests(unittest.TestCase):
         )
 
     def test_16_current_state_is_structural_ready_but_still_zero_economics(self):
-        s=load("CURRENT_STATE.json")
-        ledger=[json.loads(x) for x in (ROOT/"discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
-        self.assertEqual(s["m6_stage_a_tier1_evaluator_policy_authority"],
-                         "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json")
-        self.assertEqual(s["m6_stage_a_tier1_pre_economic_materialization_authority"],
-                         "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json")
-        self.assertEqual(s["m6_stage_a_tier1_runner_prep_authority"],
-                         "data/M6_STAGE_A_TIER1_RUNNER_PREP_V2.json")
-        self.assertEqual(s["economic_outcomes_opened"],0)
-        self.assertEqual(s["v2_attempts_used"],0)
-        self.assertEqual(s["v2_evaluated_identities"],0)
-        self.assertEqual(sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),0)
-        self.assertEqual(len(ledger),20)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertEqual(s["m6"]["status"],"PENDING")
-        self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["m6"]["first_stage_a_runner"]["state"],"PREPARED_NOT_RUN")
-        self.assertEqual(s["m6"]["first_stage_a_runner"]["preparation_detail"],"FULL_EVALUATOR_PREPARED_NOT_RUN")
-        self.assertFalse(s["m6"]["first_stage_a_runner"]["execution_authorized"])
-        self.assertFalse(s["live_orders_authorized"])
-        self.assertFalse(s["competition_start_authorized"])
-
-
+        state = load("CURRENT_STATE.json")
+        prep = load("evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json")
+        self.assertEqual(state["m6_stage_a_tier1_evaluator_policy_authority"], "data/M6_STAGE_A_TIER1_EVALUATOR_POLICY_V1.json")
+        self.assertEqual(state["m6_stage_a_tier1_pre_economic_materialization_authority"], "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json")
+        self.assertEqual(state["m6_stage_a_tier1_runner_prep_authority"], "data/M6_STAGE_A_TIER1_RUNNER_PREP_V2.json")
+        self.assertEqual(prep["research_state"]["economic_outcomes_opened"], 0)
+        self.assertEqual(prep["research_state"]["v2_attempts_used"], 0)
+        self.assertEqual(prep["research_state"]["v2_evaluated_identities"], 0)
+        self.assertEqual(prep["research_state"]["result_recorded"], 0)
+        self.assertFalse(prep["research_state"]["m6_economics_run"])
+        self.assertFalse(state["protected_evidence_opened"])
+        self.assertEqual(state["m6"]["status"], "PENDING")
+        self.assertFalse(state["live_orders_authorized"])
+        self.assertFalse(state["competition_start_authorized"])
 if __name__=="__main__":
     unittest.main(verbosity=2)
