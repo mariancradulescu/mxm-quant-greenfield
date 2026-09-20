@@ -156,7 +156,9 @@ def settle_prepared_trade(prepared_trade: Any) -> dict[str, Any]:
     exit_cost_eur = Decimal(exit_points) * quantity * exit_rate
     cost_eur = entry_cost_eur + exit_cost_eur
     net_eur = gross_eur - cost_eur
-    entry_notional_eur = entry_price * quantity * entry_rate
+    # The Stage-A economic unit is exactly EUR 1000 by frozen definition.
+    # Do not re-multiply a repeating Decimal quotient and introduce representational drift.
+    entry_notional_eur = ENTRY_NOTIONAL_EUR
     exit_notional_eur = abs(exit_price * quantity * exit_rate)
     hold_minutes = int((intent.exit_utc - intent.entry_utc).total_seconds() // 60)
     if hold_minutes <= 0:

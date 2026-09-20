@@ -12,8 +12,8 @@
   },
   "evaluator": {
     "runtime": "m6/stage_a_evaluator.py",
-    "runtime_git_blob_sha1": "438e305b757196c101461572bd3463dac4b8e5dc",
-    "runtime_sha256": "92209f5c2f60e469a3cc443dce1cc65c51285894fe635cb8086becc2f4c82363",
+    "runtime_git_blob_sha1": "05220fcadae6a74a7036e46f64ee1ad1411dc26f",
+    "runtime_sha256": "16e302dd3a9b58983cbfcb68ca0934c920ea8007fd11e9577685fa95f879874e",
     "version": "MXM_STAGE_A_TIER1_EVALUATOR_V1"
   },
   "frozen_candidate_hashes": {
@@ -25,7 +25,8 @@
     "absolute_entry_notional_eur_per_event": 1000,
     "quantity_formula": "1000 / (MARKET_PROXY_ENTRY_PRICE_IN_USD * CAUSAL_USD_TO_EUR_RATE_AT_ENTRY)",
     "post_outcome_resizing_allowed": false,
-    "stage_b_eur200_realization_separate": true
+    "stage_b_eur200_realization_separate": true,
+    "entry_notional_accounting": "EXACT_EUR_1000_BY_DEFINITION_NO_REMULTIPLICATION_DRIFT"
   },
   "settlement": {
     "gross_quote_pnl": "DIRECTION_SIGN * (MARKET_PROXY_EXIT_PRICE - MARKET_PROXY_ENTRY_PRICE) * QUANTITY",

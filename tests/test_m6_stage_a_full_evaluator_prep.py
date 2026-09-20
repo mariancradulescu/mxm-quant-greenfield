@@ -30,7 +30,7 @@ from m6.tier1_candidate_replay import ReplayIntent
 from m6.transaction_local_cost import TransactionCostEvidence
 
 ROOT=Path(__file__).resolve().parents[1]
-RUNNER_SOURCE_SHA256="e3fd99f861e9535ba746a20f23b26a964c2a3804eb3cbe90c17437759a9a9232"
+RUNNER_SOURCE_SHA256="84a4e588300053fe8583ff36dde3db885d77727f811212d161bdac770c5919df"
 
 
 def load(rel):
@@ -278,7 +278,7 @@ class FullStageAEvaluatorPrepTests(unittest.TestCase):
         self.assertFalse(s["protected_evidence_opened"])
         self.assertEqual(s["m6"]["status"],"PENDING")
         self.assertFalse(s["m6"]["economics_run"])
-        self.assertEqual(s["m6"]["first_stage_a_runner"]["state"],"FULL_EVALUATOR_PREPARED_NOT_RUN")
+        self.assertEqual(s["m6"]["first_stage_a_runner"]["state"],"PREPARED_NOT_RUN")\n        self.assertEqual(s["m6"]["first_stage_a_runner"]["preparation_detail"],"FULL_EVALUATOR_PREPARED_NOT_RUN")
         self.assertFalse(s["m6"]["first_stage_a_runner"]["execution_authorized"])
         self.assertFalse(s["live_orders_authorized"])
         self.assertFalse(s["competition_start_authorized"])
