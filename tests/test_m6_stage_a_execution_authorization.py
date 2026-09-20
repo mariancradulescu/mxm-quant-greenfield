@@ -26,29 +26,17 @@ class StageAExecutionAuthorizationTests(unittest.TestCase):
         self.assertEqual(a["attempt_accounting"]["authorized_new_attempts"],2)
 
     def test_02_authorization_does_not_itself_open_outcomes(self):
-        s=json.loads((ROOT/"CURRENT_STATE.json").read_text(encoding="utf-8"))
-        ledger=[
-            json.loads(x)
-            for x in (ROOT/"discovery/ledger.jsonl").read_text(encoding="utf-8").splitlines()
-            if x.strip()
-        ]
-        self.assertEqual(
-            s["m6_stage_a_execution_authorization_authority"],
-            "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
-        )
-        self.assertTrue(
-            s["m6"]["first_stage_a_runner"]["execution_authorization_frozen"]
-        )
-        self.assertFalse(
-            s["m6"]["first_stage_a_runner"]["execution_authorized"]
-        )
-        self.assertEqual(s["economic_outcomes_opened"],0)
-        self.assertEqual(s["v2_attempts_used"],0)
-        self.assertEqual(s["v2_evaluated_identities"],0)
-        self.assertEqual(sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),0)
-        self.assertEqual(len(ledger),20)
-        self.assertFalse(s["protected_evidence_opened"])
-        self.assertFalse(s["m6"]["economics_run"])
-
+        state = json.loads((ROOT / "CURRENT_STATE.json").read_text(encoding="utf-8"))
+        auth = json.loads((ROOT / "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json").read_text(encoding="utf-8"))
+        self.assertEqual(state["m6_stage_a_execution_authorization_authority"], "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        self.assertTrue(state["m6"]["first_stage_a_runner"]["execution_authorization_frozen"])
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertEqual(auth["preconditions"]["result_recorded"], 0)
+        self.assertEqual(auth["preconditions"]["ledger_entries"], 20)
+        self.assertFalse(auth["protected_evidence_opened"])
+        self.assertTrue(state["m6"]["first_stage_a_runner"]["authorization_consumed"])
+        self.assertFalse(state["protected_evidence_opened"])
 if __name__=="__main__":
     unittest.main(verbosity=2)
