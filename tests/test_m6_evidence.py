@@ -299,13 +299,12 @@ class M6EvidenceTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         completion = load("discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json")
         req = load("data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json")
-        self.assertEqual(state["v2_attempts_used"], 0)
-        self.assertEqual(state["v2_evaluated_identities"], 0)
-        self.assertEqual(state["economic_outcomes_opened"], 0)
-        self.assertFalse(state["protected_evidence_opened"])
+        auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
+        self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
+        self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
+        self.assertEqual(auth["preconditions"]["economic_outcomes_opened"], 0)
         self.assertEqual(completion["result_recorded_count"], 0)
         self.assertEqual(req["candidate_spec_hashes"], completion["active_candidate_hashes"])
-
-
+        self.assertFalse(state["protected_evidence_opened"])
 if __name__ == "__main__":
     unittest.main(verbosity=2)
