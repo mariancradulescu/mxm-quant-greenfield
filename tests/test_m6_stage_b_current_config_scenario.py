@@ -195,7 +195,10 @@ class StageBCurrentConfigurationScenarioTests(unittest.TestCase):
         self.assertEqual(s["v2_search_budget_remaining"], 82)
         self.assertFalse(s["protected_evidence_opened"])
         track = s["m6"]["stage_b_current_configuration"]
-        self.assertFalse(track["execution_authorized"])
+        if track["state"] == "AUTHORIZED_NOT_RUN":
+            self.assertTrue(track["execution_authorized"])
+        else:
+            self.assertFalse(track["execution_authorized"])
         self.assertFalse(track["economics_run"])
         self.assertFalse(track["results_created"])
         self.assertEqual(track["stage_b_current_config_outcomes_opened"], 0)

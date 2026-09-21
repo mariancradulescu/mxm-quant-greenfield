@@ -18,13 +18,14 @@ class StageBCurrentConfigRunnerStateMachineCorrectionTests(unittest.TestCase):
 
     def test_02_audited_pre_authorization_state_is_now_valid(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(
+        self.assertIn(
             s["m6"]["stage_b_current_configuration"]["state"],
-            "AUDITED_PENDING_SINGLE_USE_AUTHORIZATION",
+            {"AUDITED_PENDING_SINGLE_USE_AUTHORIZATION","AUTHORIZED_NOT_RUN"},
         )
         result=verify_repository_current_config_authorities(ROOT)
         self.assertEqual(result["current_config_outcomes_opened"],0)
-        self.assertFalse(s["m6"]["stage_b_current_configuration"]["execution_authorized"])
+        expected_auth = s["m6"]["stage_b_current_configuration"]["state"] == "AUTHORIZED_NOT_RUN"
+        self.assertEqual(s["m6"]["stage_b_current_configuration"]["execution_authorized"], expected_auth)
         self.assertFalse(s["m6"]["stage_b_current_configuration"]["economics_run"])
 
     def test_03_runner_prep_v2_binds_new_runner_and_audit(self):
