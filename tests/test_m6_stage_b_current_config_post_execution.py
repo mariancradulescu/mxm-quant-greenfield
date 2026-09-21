@@ -191,8 +191,8 @@ class StageBCurrentConfigPostExecutionTests(unittest.TestCase):
             "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json":"47c1f081bdce0dec92dd40543d6627ae224f6f8d",
         }
         for ref,sha in expected.items(): self.assertEqual(git_blob_sha1(ref),sha,ref)
-        lines=(ROOT/"discovery/ledger.jsonl").read_bytes().splitlines(keepends=True)
-        prefix22=b"".join(lines[:22])
+        lines=(ROOT/"discovery/ledger.jsonl").read_bytes().splitlines()
+        prefix22=b"\n".join(lines[:22])
         historical_blob=hashlib.sha1(f"blob {len(prefix22)}\\0".encode("ascii")+prefix22).hexdigest()
         self.assertEqual(historical_blob,"c2ca9eb4d6d3d523b3d5443d5b7fe6993abaaa80")
 
