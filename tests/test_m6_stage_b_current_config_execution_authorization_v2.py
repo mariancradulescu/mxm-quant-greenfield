@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from m6.stage_b_current_config_tier1_runner import (
+    CurrentConfigExecutionNotAuthorized,
     validate_execution_authorization,
     verify_repository_current_config_authorities,
 )
@@ -13,14 +14,16 @@ def load(rel):
     return json.loads((ROOT/rel).read_text(encoding="utf-8"))
 
 class StageBCurrentConfigExecutionAuthorizationV2Tests(unittest.TestCase):
-    def test_01_authorization_is_active_single_use_after_audit(self):
+    def test_01_v2_is_preserved_as_failed_exact_head_binding_artifact(self):
         a=load("data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V2.json")
         self.assertEqual(a["status"],"AUTHORIZED")
         self.assertTrue(a["single_use"])
         self.assertFalse(a["consumed"])
         self.assertTrue(a["execution_authorized"])
         self.assertTrue(a["independent_audit_pass"])
-        validate_execution_authorization(a)
+        self.assertNotIn("current_config_stage_b_outcomes_before_authorization",a)
+        with self.assertRaises(CurrentConfigExecutionNotAuthorized):
+            validate_execution_authorization(a)
 
     def test_02_authorization_binds_green_corrected_head(self):
         a=load("data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V2.json")
