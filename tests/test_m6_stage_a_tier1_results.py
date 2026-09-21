@@ -90,7 +90,7 @@ class M6StageATier1ResultsTests(unittest.TestCase):
         self.assertEqual(load("discovery/candidates/V2-C006.json")["spec_hash"],C006_HASH)
         self.assertEqual(load("discovery/candidates/V2-C012.json")["spec_hash"],C012_HASH)
 
-    def test_06_result_acceptance_and_state_accounting_are_exact(self):
+    def test_06_result_acceptance_history_and_live_accounting_are_exact(self):
         a=load("data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json")
         s=load("CURRENT_STATE.json")
         self.assertEqual(a["status"],"TWO_STAGE_A_OUTCOMES_RECORDED")
@@ -101,7 +101,7 @@ class M6StageATier1ResultsTests(unittest.TestCase):
         self.assertEqual(a["accounting"]["result_recorded"],2)
         self.assertEqual(a["ledger"]["final_entries"],22)
 
-        self.assertEqual(s["economic_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertEqual(s["v2_attempts_used"],2)
         self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["discovery_survivors"],["V2-C006","V2-C012"])

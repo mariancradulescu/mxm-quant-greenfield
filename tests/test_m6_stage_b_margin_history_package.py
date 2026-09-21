@@ -271,9 +271,9 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
                 payload = b"\n".join(zf.read(x) for x in names)
                 self.assertNotIn(b"MXM_TEST_REAL_SECRET_VALUE", payload)
 
-    def test_18_stage_a_results_and_attempt_accounting_unchanged(self):
+    def test_18_stage_a_results_attempts_unchanged_while_live_outcome_total_is_four(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["economic_outcomes_opened"], 2)
+        self.assertEqual(state["economic_outcomes_opened"], 4)
         self.assertEqual(state["v2_attempts_used"], 2)
         self.assertEqual(state["v2_evaluated_identities"], 2)
         self.assertEqual(state["v2_search_budget"], 84)

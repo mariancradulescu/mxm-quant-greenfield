@@ -57,9 +57,9 @@ class StageBHistoricalMarginPublicSourceSearchTests(unittest.TestCase):
         self.assertEqual(s["m6"]["stage_b"]["stage_b_outcomes_opened"],0)
         self.assertFalse(s["protected_evidence_opened"])
 
-    def test_accounting_is_unchanged(self):
+    def test_attempt_accounting_is_unchanged_and_live_outcome_total_is_four(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertEqual(s["v2_attempts_used"],2)
         self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["v2_search_budget"],84)

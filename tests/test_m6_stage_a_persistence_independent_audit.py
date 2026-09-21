@@ -25,9 +25,9 @@ class StageAPersistenceIndependentAuditTests(unittest.TestCase):
         self.assertTrue(a["conclusion"]["stage_b_preparation_may_begin"])
         self.assertFalse(a["conclusion"]["stage_b_economic_execution_authorized_by_this_audit"])
 
-    def test_live_state_preserves_two_attempts_and_stage_b_not_run(self):
+    def test_live_state_preserves_two_attempts_and_records_post_stage_b_total(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"], 2)
+        self.assertEqual(s["economic_outcomes_opened"], 4)
         self.assertEqual(s["v2_attempts_used"], 2)
         self.assertEqual(s["v2_evaluated_identities"], 2)
         self.assertEqual(s["v2_search_budget_remaining"], 82)

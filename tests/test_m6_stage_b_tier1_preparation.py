@@ -130,9 +130,9 @@ class StageBTier1PreparationTests(unittest.TestCase):
         self.assertEqual(p["stage_b_outcomes_opened"],0)
         self.assertEqual(p["new_attempts_consumed"],0)
 
-    def test_08_live_accounting_and_ledger_remain_stage_a_only(self):
+    def test_08_live_total_includes_current_config_while_historical_track_stays_unrun(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertEqual(s["v2_attempts_used"],2)
         self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["v2_search_budget_remaining"],82)

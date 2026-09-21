@@ -108,9 +108,9 @@ class StageAPostOutcomePersistenceIntegrityTests(unittest.TestCase):
         cost_bytes = (ROOT / "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json").read_bytes()
         self.assertEqual(git_blob_sha_bytes(cost_bytes), COST_RULE_BLOB)
 
-    def test_08_live_accounting_is_two_and_budget_remaining_82(self):
+    def test_08_live_accounting_is_four_and_budget_remaining_82(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["economic_outcomes_opened"], 2)
+        self.assertEqual(state["economic_outcomes_opened"], 4)
         self.assertEqual(state["v2_attempts_used"], 2)
         self.assertEqual(state["v2_evaluated_identities"], 2)
         self.assertEqual(state["v2_search_budget"], 84)

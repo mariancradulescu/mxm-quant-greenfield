@@ -104,9 +104,9 @@ class StageBMarginHistoryCaptureAcceptanceTests(unittest.TestCase):
         self.assertFalse(s["m6"]["stage_b"]["economics_run"])
         self.assertEqual(s["m6"]["stage_b"]["stage_b_outcomes_opened"],0)
 
-    def test_accounting_and_protected_boundary_are_unchanged(self):
+    def test_accounting_includes_current_config_outcomes_and_protected_boundary_is_unchanged(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertEqual(s["v2_attempts_used"],2)
         self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["v2_search_budget"],84)
