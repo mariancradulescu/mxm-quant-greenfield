@@ -116,10 +116,12 @@ class StageBMarginHistoryCaptureAcceptanceTests(unittest.TestCase):
         self.assertFalse(s["m6"]["stage_b"]["economics_run"])
         self.assertFalse(s["m6"]["stage_b"]["results_created"])
         self.assertFalse(s["protected_evidence_opened"])
-        if s["m6"]["stage_b"].get("broker_confirmation_required"):
-            self.assertTrue(s["user_action_required"])
-        else:
-            self.assertFalse(s["user_action_required"])
+        self.assertTrue(s["m6"]["stage_b"].get("broker_confirmation_required"))
+        self.assertFalse(s["m6"]["stage_b"]["broker_confirmation_blocks_current_configuration_scenario"])
+        self.assertFalse(s["user_action_required"])
+        self.assertTrue(
+            s["m6"]["stage_b_current_configuration"]["historical_broker_confirmation_optional_non_blocking"]
+        )
         self.assertEqual(
             s["m6"]["stage_b"]["historical_margin_gate"],
             "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",

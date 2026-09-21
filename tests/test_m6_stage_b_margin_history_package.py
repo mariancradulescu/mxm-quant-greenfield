@@ -324,10 +324,14 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
                 capture["status"],
                 "PASS_CAPTURE_VALID_MARGIN_AUTHORITY_UNRESOLVED",
             )
-            if state["m6"]["stage_b"].get("broker_confirmation_required"):
-                self.assertTrue(state["user_action_required"])
-            else:
-                self.assertFalse(state["user_action_required"])
+            self.assertTrue(state["m6"]["stage_b"].get("broker_confirmation_required"))
+            self.assertFalse(
+                state["m6"]["stage_b"]["broker_confirmation_blocks_current_configuration_scenario"]
+            )
+            self.assertFalse(state["user_action_required"])
+            self.assertTrue(
+                state["m6"]["stage_b_current_configuration"]["historical_broker_confirmation_optional_non_blocking"]
+            )
             self.assertFalse(
                 state["m6"]["stage_b"]["margin_history_package"]["user_action_required"]
             )

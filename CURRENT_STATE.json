@@ -375,12 +375,81 @@
       "historical_margin_authority_resolution_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
       "historical_margin_public_source_search_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_PUBLIC_SOURCE_SEARCH_V1.json",
       "broker_confirmation_request_ref": "data/M6_STAGE_B_HISTORICAL_MARGIN_BROKER_CONFIRMATION_REQUEST_V1.txt",
-      "broker_confirmation_required": true
+      "broker_confirmation_required": true,
+      "broker_confirmation_blocks_current_configuration_scenario": false,
+      "historical_track_remains_open": true,
+      "current_configuration_scenario_is_separate": true
+    },
+    "stage_b_current_configuration": {
+      "state": "PREPARED_NOT_RUN_AWAITING_INDEPENDENT_AUDIT",
+      "label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+      "authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+      "authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+      "policy_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
+      "policy_git_blob_sha1": "bf157e44a3f93e111fc02006bd035595ba4c6084",
+      "pre_economic_materialization_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+      "pre_economic_materialization_git_blob_sha1": "0ecfbc97617a6e6188fee350f830af2fe33e2a47",
+      "runner_prep_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V1.json",
+      "runner_prep_git_blob_sha1": "99a292b28581ffc00e1472a9098c291bd01414df",
+      "execution_authorization_ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json",
+      "execution_authorization_git_blob_sha1": "ea022baf13f48b7dd2eac9c91aa9b9d90346950e",
+      "evaluator_ref": "m6/stage_b_current_config_evaluator.py",
+      "evaluator_git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
+      "runner_ref": "m6/stage_b_current_config_tier1_runner.py",
+      "runner_git_blob_sha1": "b2e45d6b8e65cf136e4ddd1b44f7c1bee6c8bba6",
+      "candidates": [
+        "V2-C006",
+        "V2-C012"
+      ],
+      "starting_capital_eur": 200,
+      "fixed_volume_cents": {
+        "V2-C006": 10,
+        "V2-C012": 10
+      },
+      "current_expected_margin": {
+        "V2-C006": {
+          "symbol": "US500",
+          "symbol_id": 127,
+          "buy_margin_eur": 33.38,
+          "sell_margin_eur": 33.38,
+          "buy_margin_minor": 3338,
+          "sell_margin_minor": 3338,
+          "money_digits": 2
+        },
+        "V2-C012": {
+          "symbol": "NAS100",
+          "symbol_id": 126,
+          "buy_margin_eur": 129.04,
+          "sell_margin_eur": 129.03,
+          "buy_margin_minor": 12904,
+          "sell_margin_minor": 12903,
+          "money_digits": 2
+        }
+      },
+      "current_leverage_id": 53592,
+      "current_dynamic_leverage_tiers": [
+        {
+          "volume_cents": 100,
+          "leverage_in_cents": 2000
+        }
+      ],
+      "historical_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+      "historical_margin_authority_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+      "historical_margin_authority_git_blob_sha1": "63a959ef9c767956d92772102f3aae3ab3b58237",
+      "historical_margin_non_blocking_for_current_scenario": true,
+      "historical_broker_confirmation_optional_non_blocking": true,
+      "execution_authorized": false,
+      "authorization_consumed": false,
+      "economics_run": false,
+      "results_created": false,
+      "stage_b_current_config_outcomes_opened": 0,
+      "new_attempts_consumed": 0,
+      "protected_evidence_opened": false
     }
   },
-  "next_action": "Send the frozen Pepperstone EU historical-margin confirmation request and return the complete written broker response. Do not rerun Android capture. Do not run Stage-B economics.",
+  "next_action": "Independently audit the exact-head current-configuration Stage-B preparation. Do not activate the single-use authorization and do not execute current-configuration Stage-B economics before that audit.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_B_MARGIN_PUBLIC_SOURCE_EXHAUSTED_BROKER_CONFIRMATION_REQUIRED",
+  "phase": "M6_STAGE_B_CURRENT_CONFIGURATION_SCENARIO_PREPARED_AWAITING_INDEPENDENT_AUDIT",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -482,7 +551,7 @@
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": true,
-  "user_action_required": true,
+  "user_action_required": false,
   "v2_attempts_used": 2,
   "v2_evaluated_identities": 2,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
@@ -554,5 +623,10 @@
   "m6_stage_b_historical_margin_authority_resolution": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
   "m6_stage_b_historical_margin_authority_resolution_historical_v1": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json",
   "m6_stage_b_historical_margin_public_source_search": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_PUBLIC_SOURCE_SEARCH_V1.json",
-  "m6_stage_b_historical_margin_broker_confirmation_request": "data/M6_STAGE_B_HISTORICAL_MARGIN_BROKER_CONFIRMATION_REQUEST_V1.txt"
+  "m6_stage_b_historical_margin_broker_confirmation_request": "data/M6_STAGE_B_HISTORICAL_MARGIN_BROKER_CONFIRMATION_REQUEST_V1.txt",
+  "m6_stage_b_current_broker_configuration_authority": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+  "m6_stage_b_current_config_evaluator_policy_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
+  "m6_stage_b_current_config_pre_economic_materialization_authority": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+  "m6_stage_b_current_config_runner_prep_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V1.json",
+  "m6_stage_b_current_config_execution_authorization": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json"
 }

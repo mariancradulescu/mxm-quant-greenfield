@@ -39,10 +39,13 @@ class StageBHistoricalMarginPublicSourceSearchTests(unittest.TestCase):
         self.assertIn("NAS100",text)
         self.assertIn("0.1 unit",text)
 
-    def test_state_requires_broker_confirmation_but_not_economics(self):
+    def test_state_keeps_historical_broker_confirmation_non_blocking_for_current_scenario(self):
         s=load("CURRENT_STATE.json")
-        self.assertTrue(s["user_action_required"])
+        self.assertFalse(s["user_action_required"])
         self.assertTrue(s["m6"]["stage_b"]["broker_confirmation_required"])
+        self.assertFalse(s["m6"]["stage_b"]["broker_confirmation_blocks_current_configuration_scenario"])
+        self.assertTrue(s["m6"]["stage_b"]["historical_track_remains_open"])
+        self.assertTrue(s["m6"]["stage_b"]["current_configuration_scenario_is_separate"])
         self.assertEqual(
             s["m6"]["stage_b"]["historical_margin_gate"],
             "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",

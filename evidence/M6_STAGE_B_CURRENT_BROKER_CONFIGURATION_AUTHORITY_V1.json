@@ -1,0 +1,128 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-broker-configuration-authority.v1",
+  "status": "VERIFIED_CURRENT_BROKER_CONFIGURATION_SCENARIO",
+  "scope": "V2-C006_V2-C012_CURRENT_DEPLOYMENT_CONFIGURATION_CAPITAL_FEASIBILITY",
+  "frozen_from_head": "a262a458bb8c08850ce661e6392a2b98f8460c59",
+  "decision_basis": "USER_EXPLICIT_POST_STAGE_A_METHODOLOGICAL_DECISION_SEPARATE_CURRENT_DEPLOYMENT_FEASIBILITY_FROM_UNRESOLVED_HISTORICAL_POINT_IN_TIME_MARGIN",
+  "broker_context": {
+    "broker": "Pepperstone EU Limited",
+    "environment": "Pepperstone - Europe LIVE",
+    "client_class": "RETAIL",
+    "platform": "cTrader"
+  },
+  "source_evidence": {
+    "reconciled_capture_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+    "expected_margin_sha256": "08a5643687d4be0fb4f97422e13104c5b9eb08357932bad2463388c368140c9d",
+    "symbol_metadata_sha256": "6427658afc8e3c7e710e843f4b1b2421dca4da9984f427dd966888f15314a583",
+    "pre_economic_materialization_ref": "evidence/M6_STAGE_B_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+    "margin_capture_acceptance_ref": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json",
+    "expected_margin_semantics": "BROKER_NATIVE_PROTO_OA_EXPECTED_MARGIN_AT_FROZEN_VOLUME_PRIMARY_CURRENT_MARGIN_AUTHORITY",
+    "manual_leverage_reconstruction_used": false
+  },
+  "candidate_spec_hashes": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "candidate_git_blob_sha1": {
+    "V2-C006": "a5a6e4865206a0f85afcae28a65004e1e24a8277",
+    "V2-C012": "a9a8464d9cf161c3dcae39536280089058e882d9"
+  },
+  "volume_cents": {
+    "V2-C006": 10,
+    "V2-C012": 10
+  },
+  "quantity_units": {
+    "V2-C006": 0.1,
+    "V2-C012": 0.1
+  },
+  "current_expected_margin": {
+    "V2-C006": {
+      "symbol": "US500",
+      "symbol_id": 127,
+      "volume_cents": 10,
+      "buy_margin_minor": 3338,
+      "sell_margin_minor": 3338,
+      "money_digits": 2,
+      "buy_margin_eur": 33.38,
+      "sell_margin_eur": 33.38
+    },
+    "V2-C012": {
+      "symbol": "NAS100",
+      "symbol_id": 126,
+      "volume_cents": 10,
+      "buy_margin_minor": 12904,
+      "sell_margin_minor": 12903,
+      "money_digits": 2,
+      "buy_margin_eur": 129.04,
+      "sell_margin_eur": 129.03
+    }
+  },
+  "current_symbol_configuration": {
+    "minimum_volume_cents": {
+      "US500": 10,
+      "NAS100": 10
+    },
+    "step_volume_cents": {
+      "US500": 10,
+      "NAS100": 10
+    },
+    "leverage_id": 53592,
+    "dynamic_leverage_tiers": [
+      {
+        "volume_cents": 100,
+        "leverage_in_cents": 2000
+      }
+    ],
+    "trader_leverage_in_cents": 3000,
+    "total_margin_calculation_type": 0,
+    "role": "CURRENT_STRUCTURAL_CROSS_CHECK_ONLY_EXPECTED_MARGIN_VALUES_ARE_PRIMARY"
+  },
+  "scenario_law": {
+    "name": "CURRENT_BROKER_CONFIGURATION_CAPITAL_FEASIBILITY",
+    "result_label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+    "application": "APPLY_EXACT_CURRENT_BUY_OR_SELL_EXPECTED_MARGIN_TO_EACH_FROZEN_DEVELOPMENT_ENTRY_AT_0_1_UNIT",
+    "long_uses": "BUY_EXPECTED_MARGIN",
+    "short_uses": "SELL_EXPECTED_MARGIN",
+    "starting_capital_eur": 200,
+    "continuous_capital_path": true,
+    "synthetic_resize_below_broker_minimum": false,
+    "future_pnl_borrowing": false,
+    "transaction_local_cost_methodology_changed": false
+  },
+  "historical_boundary": {
+    "historical_authority_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+    "historical_authority_git_blob_sha1": "63a959ef9c767956d92772102f3aae3ab3b58237",
+    "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+    "historical_invariance_verified": false,
+    "no_historical_change_record_found_in_completed_investigation": true,
+    "absence_of_found_change_promoted_to_invariance": false,
+    "current_configuration_is_historical_fact": false,
+    "pepperstone_written_confirmation_may_resolve_historical_track_later": true
+  },
+  "post_stage_a_chronology": {
+    "stage_a_outcomes_already_known": true,
+    "economic_outcomes_opened_before_this_authority": 2,
+    "v2_attempts_used_before_this_authority": 2,
+    "result_recorded_before_this_authority": 2,
+    "ledger_entries_before_this_authority": 22,
+    "current_config_stage_b_outcomes_opened_at_freeze": 0,
+    "policy_change_claimed_pre_stage_a": false
+  },
+  "immutability": {
+    "transaction_local_cost_rule_ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "transaction_local_cost_rule_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "historical_stage_b_policy_v1_ref": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
+    "historical_stage_b_policy_v1_git_blob_sha1": "c0538732cd8a51c309d663baccbd919462aff4a2",
+    "historical_stage_b_evaluator_v1_git_blob_sha1": "8996a683a28ef84d5e7c91db870f0e8a1aca8fe1",
+    "historical_stage_b_runner_v1_git_blob_sha1": "89b6f59e41c000afca81036b20ecde9fd9ee2a18",
+    "candidate_parameters_changed": false,
+    "signals_changed": false,
+    "thresholds_changed": false,
+    "event_selection_changed": false,
+    "development_data_changed": false
+  },
+  "post_outcome_tuning": false,
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}
