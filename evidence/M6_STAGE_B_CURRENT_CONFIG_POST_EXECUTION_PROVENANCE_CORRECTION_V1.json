@@ -1,0 +1,83 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-post-execution-provenance-correction.v1",
+  "status": "PASS_APPEND_ONLY_POST_EXECUTION_PROVENANCE_CORRECTION",
+  "classification": "METADATA_REFERENCE_CORRECTION_NO_ECONOMIC_EFFECT",
+  "recorded_utc": "2026-09-21T16:32:00Z",
+  "accepted_results_immutable": true,
+  "accepted_result_bindings": {
+    "V2-C006": {
+      "ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+      "git_blob_sha1": "0234d84f09a168ff70da4c07b9ccde49159010fc",
+      "result_sha256": "72e1c6dd94969add768d5640c245a3cd400fa4e5777fd518b3cf09de872e8d6f"
+    },
+    "V2-C012": {
+      "ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
+      "git_blob_sha1": "8c3b1fcdad6b43fcfed2af0919f3ddffd3b541f7",
+      "result_sha256": "51edfcc76693425a07c24962f7b3c060fa2e7bb127385233f28f4fc1233edcaa"
+    }
+  },
+  "corrected_reference": {
+    "field": "execution_provenance.current_broker_configuration_authority_ref",
+    "persisted_incorrect_value": "data/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+    "authoritative_correct_value": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+    "authoritative_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+    "correction_mode": "APPEND_ONLY_DO_NOT_REWRITE_ACCEPTED_RESULTS",
+    "economic_effect": "NONE"
+  },
+  "extra_metadata_lineage": {
+    "classification": "POST_EXECUTION_METADATA_PROVENANCE_UNVERIFIED",
+    "observed_fields": [
+      "execution_provenance.external_input_sha256",
+      "execution_result_sha256",
+      "frozen_reporting.capital_path_persistence.full_execution_result_sha256",
+      "frozen_reporting.capital_path_persistence.full_path_event_count",
+      "frozen_reporting.capital_path_persistence.full_path_retained_at_execution",
+      "persistence_format"
+    ],
+    "observed_external_input_sha256": {
+      "eurusd": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+      "nas100": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "nascost": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999",
+      "us500": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "uscost": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6"
+    },
+    "observed_execution_result_sha256": {
+      "V2-C006": "ad11540b23ad7c40ab1c3c461c2107646e4cad60ba15e6ddaa505883543beec0",
+      "V2-C012": "8cc248def5564c58bf31d374e2100081751f272c714ac099d6b7e8eb6c971923"
+    },
+    "immutable_evidence_searched": {
+      "execution_generator": {
+        "ref": "m6/stage_b_current_config_execute.py",
+        "execution_head": "1a395746a5f1351fd239a612131faec975f6f060",
+        "git_blob_sha1_at_execution_head": "bb4aecfcabfa4e928bfbb7b22e3b0706f9724357",
+        "finding": "COMMITTED_GENERATOR_DOES_NOT_VISIBLY_EMIT_ALL_OBSERVED_EXTRA_METADATA_FIELDS"
+      },
+      "result_persistence_commits": {
+        "V2-C006": "ae49a7b1d8a00a6301767de3c12dc665c630eadd",
+        "V2-C012": "45f77198230aae6e2d51a68b1b9acde087ca8825",
+        "finding": "COMMITS_PROVE_FIELDS_WERE_PERSISTED_BUT_DO_NOT_PROVE_THEIR_DERIVATION"
+      },
+      "run_record": {
+        "commit": "66671478b073ac3a3296542419f014f6f2fd5952",
+        "git_blob_sha1": "04df816b7c460045808bba61ba2c7662566fef38",
+        "finding": "BINDS_FULL_EXECUTION_RESULT_SHA256_VALUES_BUT_NOT_THEIR_GENERATION_LINEAGE"
+      },
+      "execution_exact_head_ci": {
+        "run_id": 35595820997,
+        "head": "1a395746a5f1351fd239a612131faec975f6f060",
+        "conclusion": "SUCCESS",
+        "artifacts": [
+          "MXM_M6_CAPTURE_PYDROID_PACKAGE",
+          "MXM_M6_STAGE_B_MARGIN_HISTORY_PYDROID_PACKAGE",
+          "MXM_M6_PREOPEN_SUPPLEMENT_PYDROID_PACKAGE",
+          "MXM_M6_COST_EVIDENCE_PYDROID_PACKAGE"
+        ],
+        "finding": "NO_IMMUTABLE_STAGE_B_EXECUTION_RESULT_OR_FULL_PATH_ARTIFACT_PRESENT"
+      }
+    },
+    "conservative_resolution": "NO_EXISTING_IMMUTABLE_EVIDENCE_LOCATED_THAT_PROVES_DERIVATION_OF_ALL_EXTRA_METADATA_FIELDS",
+    "accepted_economic_metrics_invalidated": false,
+    "accepted_result_hashes_invalidated": false
+  },
+  "protected_evidence_opened": false
+}

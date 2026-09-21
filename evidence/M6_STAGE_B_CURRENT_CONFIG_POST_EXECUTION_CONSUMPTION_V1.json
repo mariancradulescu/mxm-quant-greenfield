@@ -1,0 +1,84 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-post-execution-consumption.v1",
+  "status": "CONSUMED_EXECUTED_EXACTLY_ONCE",
+  "scope": "V2-C006_V2-C012_STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+  "recorded_utc": "2026-09-21T16:32:00Z",
+  "authorization": {
+    "ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V4.json",
+    "git_blob_sha1": "f08832e1f7b5eb399ec806ac9690a63f2fa1f3b4",
+    "historical_status": "AUTHORIZED",
+    "historical_consumed_field": false,
+    "historical_execution_authorized_field": true,
+    "interpretation": "IMMUTABLE_PRE_EXECUTION_PROVENANCE_SUPERSEDED_BY_THIS_APPEND_ONLY_CONSUMPTION_AUTHORITY"
+  },
+  "execution": {
+    "run_record_ref": "m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json",
+    "run_record_git_blob_sha1": "04df816b7c460045808bba61ba2c7662566fef38",
+    "execution_head": "1a395746a5f1351fd239a612131faec975f6f060",
+    "exact_head_ci": {
+      "run_id": 35595820997,
+      "conclusion": "SUCCESS",
+      "tests_passed": 544,
+      "tests_failed": 0
+    },
+    "execution_count": 1
+  },
+  "accepted_results": {
+    "V2-C006": {
+      "ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+      "git_blob_sha1": "0234d84f09a168ff70da4c07b9ccde49159010fc",
+      "result_sha256": "72e1c6dd94969add768d5640c245a3cd400fa4e5777fd518b3cf09de872e8d6f",
+      "full_execution_result_sha256": "ad11540b23ad7c40ab1c3c461c2107646e4cad60ba15e6ddaa505883543beec0"
+    },
+    "V2-C012": {
+      "ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
+      "git_blob_sha1": "8c3b1fcdad6b43fcfed2af0919f3ddffd3b541f7",
+      "result_sha256": "51edfcc76693425a07c24962f7b3c060fa2e7bb127385233f28f4fc1233edcaa",
+      "full_execution_result_sha256": "8cc248def5564c58bf31d374e2100081751f272c714ac099d6b7e8eb6c971923"
+    }
+  },
+  "immutable_economic_inputs": {
+    "V2-C006_candidate": {
+      "ref": "discovery/candidates/V2-C006.json",
+      "git_blob_sha1": "a5a6e4865206a0f85afcae28a65004e1e24a8277"
+    },
+    "V2-C012_candidate": {
+      "ref": "discovery/candidates/V2-C012.json",
+      "git_blob_sha1": "a9a8464d9cf161c3dcae39536280089058e882d9"
+    },
+    "transaction_local_cost_authority": {
+      "ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+      "git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a"
+    },
+    "historical_margin_v2": {
+      "ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+      "git_blob_sha1": "63a959ef9c767956d92772102f3aae3ab3b58237"
+    },
+    "current_broker_configuration_authority": {
+      "ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+      "git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d"
+    },
+    "discovery_ledger": {
+      "ref": "discovery/ledger.jsonl",
+      "git_blob_sha1": "c2ca9eb4d6d3d523b3d5443d5b7fe6993abaaa80"
+    }
+  },
+  "accounting_after_execution": {
+    "current_config_stage_b_outcomes_opened": 2,
+    "economic_outcomes_opened_total": 4,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "v2_search_budget_total": 84,
+    "v2_search_budget_remaining": 82,
+    "discovery_ledger_entries": 22,
+    "discovery_result_recorded_entries": 2
+  },
+  "historical_margin": {
+    "state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+    "certification_effect": "NONE",
+    "blocks_current_operational_work": false
+  },
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}

@@ -47,16 +47,16 @@ class StageBCurrentConfigPreExecutionAuditTests(unittest.TestCase):
         self.assertFalse(auth["execution_authorized"])
         self.assertFalse(auth["consumed"])
         self.assertTrue(s["m6"]["stage_b_current_configuration"]["independent_audit_pass"])
-        self.assertIn(
+        self.assertEqual(
             s["m6"]["stage_b_current_configuration"]["state"],
-            {"AUDITED_PENDING_SINGLE_USE_AUTHORIZATION","AUTHORIZED_NOT_RUN"},
+            "EXECUTED_RESULTS_PERSISTED",
         )
-        self.assertFalse(s["m6"]["stage_b_current_configuration"]["economics_run"])
+        self.assertTrue(s["m6"]["stage_b_current_configuration"]["economics_run"])
         self.assertFalse(s["protected_evidence_opened"])
 
     def test_05_attempt_and_search_accounting_is_unchanged(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertEqual(s["v2_attempts_used"],2)
         self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["v2_search_budget"],84)

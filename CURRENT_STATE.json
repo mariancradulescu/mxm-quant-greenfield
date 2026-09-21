@@ -9,7 +9,7 @@
     "V2-C006",
     "V2-C012"
   ],
-  "economic_outcomes_opened": 2,
+  "economic_outcomes_opened": 4,
   "global_attempts_seen": 16,
   "integrity_correction_02_test_result_authority": "tests/PRE_M6_INTEGRITY_CORRECTION_02_TEST_RESULTS.json",
   "latest_economic_outcome": {
@@ -381,7 +381,7 @@
       "current_configuration_scenario_is_separate": true
     },
     "stage_b_current_configuration": {
-      "state": "AUTHORIZED_NOT_RUN",
+      "state": "EXECUTED_RESULTS_PERSISTED",
       "label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
       "authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
       "authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
@@ -438,11 +438,11 @@
       "historical_margin_authority_git_blob_sha1": "63a959ef9c767956d92772102f3aae3ab3b58237",
       "historical_margin_non_blocking_for_current_scenario": true,
       "historical_broker_confirmation_optional_non_blocking": true,
-      "execution_authorized": true,
-      "authorization_consumed": false,
-      "economics_run": false,
-      "results_created": false,
-      "stage_b_current_config_outcomes_opened": 0,
+      "execution_authorized": false,
+      "authorization_consumed": true,
+      "economics_run": true,
+      "results_created": true,
+      "stage_b_current_config_outcomes_opened": 2,
       "new_attempts_consumed": 0,
       "protected_evidence_opened": false,
       "independent_audit_ref": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
@@ -469,7 +469,51 @@
       "reporting_module_git_blob_sha1": "49851e3ce8d82a3d7661639d76625987b6815638",
       "reporting_completeness_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
       "reporting_completeness_git_blob_sha1": "dc7d339d50accbcd30e7560e9a6a74466fe7f8f9",
-      "execution_deferred_pending_v4_reporting_binding": false
+      "execution_deferred_pending_v4_reporting_binding": false,
+      "execution_count": 1,
+      "historical_margin_blocks_current_operational_work": false,
+      "post_execution_consumption_authority_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_CONSUMPTION_V1.json",
+      "post_execution_provenance_correction_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_PROVENANCE_CORRECTION_V1.json",
+      "run_record_ref": "m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json",
+      "result_refs": [
+        "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+        "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json"
+      ],
+      "result_sha256": {
+        "V2-C006": "72e1c6dd94969add768d5640c245a3cd400fa4e5777fd518b3cf09de872e8d6f",
+        "V2-C012": "51edfcc76693425a07c24962f7b3c060fa2e7bb127385233f28f4fc1233edcaa"
+      },
+      "post_execution_accounting": {
+        "economic_outcomes_opened": 4,
+        "current_config_stage_b_outcomes_opened": 2,
+        "v2_attempts_used": 2,
+        "v2_evaluated_identities": 2,
+        "v2_search_budget_total": 84,
+        "v2_search_budget_remaining": 82,
+        "discovery_ledger_entries": 22,
+        "discovery_result_recorded_entries": 2
+      }
+    },
+    "stage_b_current_config_post_execution_closure": {
+      "status": "CONSUMED_EXECUTED_EXACTLY_ONCE",
+      "consumption_authority_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_CONSUMPTION_V1.json",
+      "provenance_correction_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_PROVENANCE_CORRECTION_V1.json",
+      "run_record_ref": "m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json",
+      "execution_count": 1,
+      "economic_outcomes_opened": 4,
+      "current_config_stage_b_outcomes_opened": 2,
+      "v2_attempts_used": 2,
+      "v2_evaluated_identities": 2,
+      "v2_search_budget_total": 84,
+      "v2_search_budget_remaining": 82,
+      "discovery_ledger_entries": 22,
+      "discovery_result_recorded_entries": 2,
+      "historical_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+      "historical_margin_certification_effect": "NONE",
+      "historical_margin_blocks_current_operational_work": false,
+      "protected_evidence_opened": false,
+      "live_orders": false,
+      "competition_start": false
     }
   },
   "next_action": "Exact-head test V4, which binds the complete current-configuration Stage-B economic and reporting stack. Only after SUCCESS execute exactly once and persist two separate scenario outcomes.",
@@ -658,5 +702,10 @@
   "m6_stage_b_current_config_runner_state_machine_correction": "evidence/M6_STAGE_B_CURRENT_CONFIG_RUNNER_STATE_MACHINE_CORRECTION_V1.json",
   "m6_stage_b_current_config_authorization_binding_correction": "evidence/M6_STAGE_B_CURRENT_CONFIG_AUTHORIZATION_BINDING_CORRECTION_V1.json",
   "m6_stage_b_current_config_reporting_policy": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
-  "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json"
+  "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
+  "current_config_stage_b_outcomes_opened": 2,
+  "discovery_ledger_entries": 22,
+  "discovery_result_recorded_entries": 2,
+  "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "historical_margin_blocks_current_operational_work": false
 }

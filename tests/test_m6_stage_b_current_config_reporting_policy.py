@@ -113,13 +113,14 @@ class StageBCurrentConfigReportingPolicyTests(unittest.TestCase):
         self.assertEqual(x["margin_blockers"]["count"],1)
         self.assertFalse(x["continuous_capital"]["full_development_sequence_executed"])
 
-    def test_05_live_state_has_zero_current_config_outcomes(self):
+    def test_05_live_state_records_two_persisted_current_config_outcomes(self):
         s=load("CURRENT_STATE.json")
         t=s["m6"]["stage_b_current_configuration"]
         self.assertFalse(t["execution_deferred_pending_v4_reporting_binding"])
-        self.assertFalse(t["economics_run"])
-        self.assertFalse(t["results_created"])
-        self.assertEqual(t["stage_b_current_config_outcomes_opened"],0)
+        self.assertTrue(t["economics_run"])
+        self.assertTrue(t["results_created"])
+        self.assertEqual(t["stage_b_current_config_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertFalse(s["protected_evidence_opened"])
 
 if __name__=="__main__":

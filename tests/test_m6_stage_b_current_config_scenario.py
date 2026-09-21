@@ -167,14 +167,17 @@ class StageBCurrentConfigurationScenarioTests(unittest.TestCase):
         )
         self.assertEqual(p["result_semantics"]["historical_certification_effect"], "NONE")
 
-    def test_08_repository_validation_binds_new_track_and_preserves_history(self):
-        result = verify_repository_current_config_authorities(ROOT)
-        self.assertEqual(result["authority_status"], CURRENT_CONFIG_AUTHORITY_STATUS)
+    def test_08_pre_execution_authorities_remain_immutable_after_live_state_closure(self):
+        authority = load("evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json")
+        historical = load("evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json")
+        self.assertEqual(authority["status"], CURRENT_CONFIG_AUTHORITY_STATUS)
         self.assertEqual(
-            result["historical_margin_state"],
+            historical["status"],
             "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
         )
-        self.assertEqual(result["current_config_outcomes_opened"], 0)
+        track = load("CURRENT_STATE.json")["m6"]["stage_b_current_configuration"]
+        self.assertEqual(track["state"], "EXECUTED_RESULTS_PERSISTED")
+        self.assertEqual(track["stage_b_current_config_outcomes_opened"], 2)
 
     def test_09_single_use_authorization_is_frozen_but_inactive_before_audit(self):
         a = load("data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json")
@@ -188,20 +191,19 @@ class StageBCurrentConfigurationScenarioTests(unittest.TestCase):
 
     def test_10_accounting_and_protected_boundary_remain_unchanged(self):
         s = load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"], 2)
+        self.assertEqual(s["economic_outcomes_opened"], 4)
         self.assertEqual(s["v2_attempts_used"], 2)
         self.assertEqual(s["v2_evaluated_identities"], 2)
         self.assertEqual(s["v2_search_budget"], 84)
         self.assertEqual(s["v2_search_budget_remaining"], 82)
         self.assertFalse(s["protected_evidence_opened"])
         track = s["m6"]["stage_b_current_configuration"]
-        if track["state"] == "AUTHORIZED_NOT_RUN":
-            self.assertTrue(track["execution_authorized"])
-        else:
-            self.assertFalse(track["execution_authorized"])
-        self.assertFalse(track["economics_run"])
-        self.assertFalse(track["results_created"])
-        self.assertEqual(track["stage_b_current_config_outcomes_opened"], 0)
+        self.assertEqual(track["state"], "EXECUTED_RESULTS_PERSISTED")
+        self.assertFalse(track["execution_authorized"])
+        self.assertTrue(track["authorization_consumed"])
+        self.assertTrue(track["economics_run"])
+        self.assertTrue(track["results_created"])
+        self.assertEqual(track["stage_b_current_config_outcomes_opened"], 2)
         ledger = [
             json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text(encoding="utf-8").splitlines()
             if x.strip()

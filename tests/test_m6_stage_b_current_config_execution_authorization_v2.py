@@ -48,21 +48,24 @@ class StageBCurrentConfigExecutionAuthorizationV2Tests(unittest.TestCase):
         self.assertEqual(x["discovery_result_recorded_after"],2)
         self.assertEqual(x["discovery_ledger_entries_after"],22)
 
-    def test_04_live_state_is_authorized_but_still_not_run(self):
+    def test_04_v2_authorization_history_is_preserved_after_execution(self):
+        a=load("data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V2.json")
         s=load("CURRENT_STATE.json")
         t=s["m6"]["stage_b_current_configuration"]
-        self.assertEqual(t["state"],"AUTHORIZED_NOT_RUN")
-        self.assertTrue(t["execution_authorized"])
-        self.assertFalse(t["authorization_consumed"])
-        self.assertFalse(t["economics_run"])
-        self.assertFalse(t["results_created"])
-        self.assertEqual(t["stage_b_current_config_outcomes_opened"],0)
-        self.assertEqual(s["economic_outcomes_opened"],2)
+        self.assertEqual(a["status"],"AUTHORIZED")
+        self.assertFalse(a["consumed"])
+        self.assertTrue(a["execution_authorized"])
+        self.assertEqual(t["state"],"EXECUTED_RESULTS_PERSISTED")
+        self.assertFalse(t["execution_authorized"])
+        self.assertTrue(t["authorization_consumed"])
+        self.assertTrue(t["economics_run"])
+        self.assertTrue(t["results_created"])
+        self.assertEqual(t["stage_b_current_config_outcomes_opened"],2)
+        self.assertEqual(s["economic_outcomes_opened"],4)
         self.assertEqual(s["v2_attempts_used"],2)
         self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["v2_search_budget_remaining"],82)
         self.assertFalse(s["protected_evidence_opened"])
-        verify_repository_current_config_authorities(ROOT)
 
     def test_05_historical_margin_is_explicitly_non_blocking_not_resolved(self):
         a=load("data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V2.json")

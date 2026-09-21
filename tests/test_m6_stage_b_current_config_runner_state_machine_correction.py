@@ -16,17 +16,15 @@ class StageBCurrentConfigRunnerStateMachineCorrectionTests(unittest.TestCase):
         self.assertTrue(all(v is False for v in c["methodology_unchanged"].values()))
         self.assertFalse(c["protected_evidence_opened"])
 
-    def test_02_audited_pre_authorization_state_is_now_valid(self):
+    def test_02_pre_execution_state_machine_history_is_preserved_after_execution(self):
         s=load("CURRENT_STATE.json")
-        self.assertIn(
-            s["m6"]["stage_b_current_configuration"]["state"],
-            {"AUDITED_PENDING_SINGLE_USE_AUTHORIZATION","AUTHORIZED_NOT_RUN"},
-        )
-        result=verify_repository_current_config_authorities(ROOT)
-        self.assertEqual(result["current_config_outcomes_opened"],0)
-        expected_auth = s["m6"]["stage_b_current_configuration"]["state"] == "AUTHORIZED_NOT_RUN"
-        self.assertEqual(s["m6"]["stage_b_current_configuration"]["execution_authorized"], expected_auth)
-        self.assertFalse(s["m6"]["stage_b_current_configuration"]["economics_run"])
+        t=s["m6"]["stage_b_current_configuration"]
+        self.assertEqual(t["state"],"EXECUTED_RESULTS_PERSISTED")
+        self.assertFalse(t["execution_authorized"])
+        self.assertTrue(t["authorization_consumed"])
+        self.assertTrue(t["economics_run"])
+        self.assertTrue(t["results_created"])
+        self.assertEqual(t["stage_b_current_config_outcomes_opened"],2)
 
     def test_03_runner_prep_v2_binds_new_runner_and_audit(self):
         p=load("data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V2.json")

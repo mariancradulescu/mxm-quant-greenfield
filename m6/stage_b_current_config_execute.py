@@ -48,6 +48,48 @@ RESULT_FILENAMES = {
     "V2-C006": "V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
     "V2-C012": "V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
 }
+RUN_RECORD_REF = "m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json"
+POST_EXECUTION_CONSUMPTION_REF = (
+    "evidence/M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_CONSUMPTION_V1.json"
+)
+CANONICAL_RESULT_REFS = {
+    cid: f"m6/results/{filename}" for cid, filename in RESULT_FILENAMES.items()
+}
+
+
+class CurrentConfigScenarioAlreadyExecuted(CurrentConfigRunnerIntegrityError):
+    """Raised before any economic work when authoritative evidence proves Stage-B already ran."""
+
+
+def assert_current_config_scenario_not_already_executed(repo_root: Path | str) -> None:
+    """Fail closed on every authoritative post-execution marker before touching economics."""
+    root = Path(repo_root)
+
+    run_path = root / RUN_RECORD_REF
+    if run_path.exists():
+        run = _load_json(run_path)
+        if run.get("status") == "EXECUTED_EXACTLY_ONCE":
+            raise CurrentConfigScenarioAlreadyExecuted(
+                "Stage-B CURRENT configuration scenario already executed: run record is authoritative"
+            )
+
+    consumption_path = root / POST_EXECUTION_CONSUMPTION_REF
+    if consumption_path.exists():
+        consumption = _load_json(consumption_path)
+        if (
+            consumption.get("status") == "CONSUMED_EXECUTED_EXACTLY_ONCE"
+            and consumption.get("execution_count") == 1
+        ):
+            raise CurrentConfigScenarioAlreadyExecuted(
+                "Stage-B CURRENT configuration scenario already executed: consumption authority is authoritative"
+            )
+
+    existing = [ref for ref in CANONICAL_RESULT_REFS.values() if (root / ref).exists()]
+    if existing:
+        raise CurrentConfigScenarioAlreadyExecuted(
+            "Stage-B CURRENT configuration scenario already executed: canonical result exists: "
+            + ", ".join(existing)
+        )
 
 
 def _load_json(path: Path | str) -> dict[str, Any]:
@@ -194,6 +236,9 @@ def execute_authorized_current_config(
     execution_ci_run_id: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     root = Path(repo_root)
+
+    # First repository-state gate: before preflight, materialization, realization, PnL or capital path.
+    assert_current_config_scenario_not_already_executed(root)
 
     preflight = verify_repository_current_config_authorities(root)
     authorization = _load_json(root / AUTHORIZATION_REF)
