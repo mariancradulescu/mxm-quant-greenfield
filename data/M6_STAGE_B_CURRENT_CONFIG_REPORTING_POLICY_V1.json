@@ -1,0 +1,74 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-reporting-policy.v1",
+  "status": "FROZEN_PRE_OUTCOME_REPORTING_COMPLETENESS",
+  "scope": "V2-C006_V2-C012_STAGE_B_CURRENT_CONFIGURATION_SCENARIO_REPORTING",
+  "research_contract_ref": "RESEARCH_CONTRACT_V2.md",
+  "contract_requirement": "Stage B reports continuous capital, weekly/monthly final equity distributions, capital occupancy, margin blockers, and executed-trade distribution.",
+  "reporter": {
+    "path": "m6/stage_b_current_config_reporting.py",
+    "git_blob_sha1": "49851e3ce8d82a3d7661639d76625987b6815638"
+  },
+  "economic_core": {
+    "evaluator_ref": "m6/stage_b_current_config_evaluator.py",
+    "evaluator_git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
+    "changed": false,
+    "margin_admission_changed": false,
+    "pnl_settlement_changed": false,
+    "cost_methodology_changed": false,
+    "candidate_logic_changed": false
+  },
+  "development_domain": {
+    "start_utc": "2022-01-03T00:00:00Z",
+    "end_utc": "2026-09-16T23:59:59.999Z",
+    "protected_forward_used": false
+  },
+  "weekly_final_equity": {
+    "period_definition": "UTC ISO week Monday 00:00 through Sunday 23:59:59.999999, clipped to DEVELOPMENT at the final partial week.",
+    "equity_rule": "Starting EUR200 carried forward; each executed trade changes equity only at its frozen exit close; period final equity is equity after all executed closes at or before that period end.",
+    "zero_trade_periods_retained": true
+  },
+  "monthly_final_equity": {
+    "period_definition": "UTC calendar month, clipped to DEVELOPMENT at first/final partial month.",
+    "equity_rule": "Starting EUR200 carried forward; each executed trade changes equity only at its frozen exit close; period final equity is equity after all executed closes at or before that period end.",
+    "zero_trade_periods_retained": true
+  },
+  "capital_occupancy": {
+    "occupied_minutes": "SUM(exit_utc-entry_utc) over actually executed trades only.",
+    "development_minutes": "wall-clock minutes over the frozen DEVELOPMENT domain.",
+    "time_occupancy_ratio": "occupied_minutes / development_minutes.",
+    "time_weighted_margin_eur_over_development": "SUM(current broker-native side-specific required_margin_eur * executed hold minutes) / development_minutes.",
+    "maximum_required_margin_eur": "MAX side-specific current ExpectedMargin among executed trades.",
+    "maximum_required_margin_pct_starting_capital": "maximum_required_margin_eur / 200."
+  },
+  "margin_blockers": {
+    "count_rule": "Count every frozen intent rejected because causal equity at entry is below the side-specific verified current ExpectedMargin.",
+    "events_retained": true,
+    "blocked_intent_does_not_create_occupancy_or_pnl": true
+  },
+  "executed_trade_distribution": {
+    "entry_time_basis": "frozen executed entry timestamp",
+    "weekly": "UTC ISO week counts",
+    "monthly": "UTC calendar month counts",
+    "yearly": "UTC calendar year counts",
+    "direction_counts": true
+  },
+  "capital_path_metrics": {
+    "minimum_closed_equity_eur": true,
+    "maximum_closed_equity_eur": true,
+    "maximum_drawdown_eur": "peak-to-subsequent-trough on starting EUR200 plus executed close-equity path",
+    "full_development_sequence_executed": "true iff zero margin-blocked intents",
+    "positive_capital_rule": "minimum close-equity path value > 0"
+  },
+  "feasibility_status_law": {
+    "SURVIVES_CURRENT_CONFIG_EUR200": "zero margin blockers AND minimum close-equity > 0",
+    "CURRENT_CONFIG_MARGIN_BLOCKED": "one or more frozen intents rejected for insufficient current-config margin",
+    "CURRENT_CONFIG_CAPITAL_EXHAUSTED": "zero margin blockers but minimum close-equity <= 0",
+    "survival_conclusion": "SURVIVES EUR200 CAPITAL REALIZATION UNDER VERIFIED CURRENT PEPPERSTONE CONFIGURATION APPLIED TO DEVELOPMENT SEQUENCE",
+    "historical_certification_effect": "NONE"
+  },
+  "post_outcome_selection_or_tuning": false,
+  "current_config_outcomes_opened_at_freeze": 0,
+  "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "historical_margin_blocks_reporting_or_scenario": false,
+  "protected_evidence_opened": false
+}
