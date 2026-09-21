@@ -381,7 +381,7 @@
       "current_configuration_scenario_is_separate": true
     },
     "stage_b_current_configuration": {
-      "state": "PREPARED_NOT_RUN_AWAITING_INDEPENDENT_AUDIT",
+      "state": "AUDITED_PENDING_SINGLE_USE_AUTHORIZATION",
       "label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
       "authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
       "authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
@@ -444,12 +444,16 @@
       "results_created": false,
       "stage_b_current_config_outcomes_opened": 0,
       "new_attempts_consumed": 0,
-      "protected_evidence_opened": false
+      "protected_evidence_opened": false,
+      "independent_audit_ref": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
+      "independent_audit_git_blob_sha1": "c8af3cdea18358be4b98309b28c5b25eac1e67e8",
+      "independent_audit_pass": true,
+      "operational_margin_truth": "VERIFIED_CURRENT_BROKER_NATIVE_CONFIGURATION"
     }
   },
-  "next_action": "Independently audit the exact-head current-configuration Stage-B preparation. Do not activate the single-use authorization and do not execute current-configuration Stage-B economics before that audit.",
+  "next_action": "Activate the separately frozen single-use current-configuration Stage-B authorization in a distinct commit, exact-head test it, then execute only after SUCCESS. Historical point-in-time margin remains unresolved and non-blocking for this track.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_B_CURRENT_CONFIGURATION_SCENARIO_PREPARED_AWAITING_INDEPENDENT_AUDIT",
+  "phase": "M6_STAGE_B_CURRENT_CONFIGURATION_AUDITED_PENDING_SINGLE_USE_AUTHORIZATION",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -628,5 +632,6 @@
   "m6_stage_b_current_config_evaluator_policy_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
   "m6_stage_b_current_config_pre_economic_materialization_authority": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_b_current_config_runner_prep_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V1.json",
-  "m6_stage_b_current_config_execution_authorization": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json"
+  "m6_stage_b_current_config_execution_authorization": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json",
+  "m6_stage_b_current_config_pre_execution_audit": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json"
 }

@@ -1,0 +1,100 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-pre-execution-audit.v1",
+  "status": "PASS_CURRENT_CONFIGURATION_TRACK_READY_FOR_SEPARATE_AUTHORIZATION",
+  "scope": "V2-C006_V2-C012_STAGE_B_CURRENT_CONFIGURATION_PRE_EXECUTION",
+  "audited_head": "cd55ffdc4f4b8876dc59013eb21bec44211fbdb4",
+  "audited_tree": "29dbe4eabda3125761b26f0bc9cdfacd67585bd7",
+  "exact_head_ci": {
+    "run_id": 35578736226,
+    "conclusion": "SUCCESS",
+    "tests_passed": 515,
+    "tests_failed": 0
+  },
+  "semantic_audit": {
+    "current_configuration_is_operational_authority_for_this_track": true,
+    "current_authority_status": "VERIFIED_CURRENT_BROKER_CONFIGURATION_SCENARIO",
+    "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+    "historical_uncertainty_blocks_current_scenario": false,
+    "historical_invariance_claimed": false,
+    "historical_authority_mutated": false,
+    "current_and_historical_authority_types_are_non_interchangeable": true,
+    "current_evaluator_has_no_historical_margin_gate_dependency": true
+  },
+  "broker_native_current_margin": {
+    "V2-C006": {
+      "symbol": "US500",
+      "symbol_id": 127,
+      "volume_cents": 10,
+      "buy_margin_minor": 3338,
+      "sell_margin_minor": 3338,
+      "money_digits": 2
+    },
+    "V2-C012": {
+      "symbol": "NAS100",
+      "symbol_id": 126,
+      "volume_cents": 10,
+      "buy_margin_minor": 12904,
+      "sell_margin_minor": 12903,
+      "money_digits": 2
+    },
+    "expected_margin_sha256": "08a5643687d4be0fb4f97422e13104c5b9eb08357932bad2463388c368140c9d",
+    "symbol_metadata_sha256": "6427658afc8e3c7e710e843f4b1b2421dca4da9984f427dd966888f15314a583",
+    "manual_leverage_reconstruction_used": false
+  },
+  "execution_input_reconciliation": {
+    "reconciled_capture_bundle": {
+      "filename": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+      "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+      "available": true
+    },
+    "tier1_cost_bundle": {
+      "filename": "MXM_M6_TIER1_COST_EVIDENCE_V3_CANONICAL.zip",
+      "sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad",
+      "available": true
+    },
+    "preopen_bundle": {
+      "filename": "MXM_M6_TIER1_PREOPEN_0930_SUPPLEMENT_V1.zip",
+      "sha256": "8171ce2d68fef0ac0241b88e914725c16a301e36ae836f766efff4da8aabe798",
+      "available": true
+    },
+    "component_hashes_verified": {
+      "US500_M15": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "NAS100_M15": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "EURUSD_M15": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+      "US500_TRANSACTION_LOCAL_COST": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+      "NAS100_TRANSACTION_LOCAL_COST": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+    },
+    "all_five_frozen_execution_inputs_match": true,
+    "new_capture_required": false
+  },
+  "immutability_audit": {
+    "V2-C006_candidate_git_blob_sha1": "a5a6e4865206a0f85afcae28a65004e1e24a8277",
+    "V2-C012_candidate_git_blob_sha1": "a9a8464d9cf161c3dcae39536280089058e882d9",
+    "transaction_local_cost_rule_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "historical_margin_authority_v2_git_blob_sha1": "63a959ef9c767956d92772102f3aae3ab3b58237",
+    "current_config_authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+    "current_config_policy_git_blob_sha1": "bf157e44a3f93e111fc02006bd035595ba4c6084",
+    "current_config_evaluator_git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
+    "current_config_runner_git_blob_sha1": "b2e45d6b8e65cf136e4ddd1b44f7c1bee6c8bba6"
+  },
+  "authorization_at_audited_head": {
+    "status": "FROZEN_SINGLE_USE_PENDING_INDEPENDENT_AUDIT",
+    "execution_authorized": false,
+    "consumed": false
+  },
+  "accounting_at_audit": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "v2_search_budget_remaining": 82,
+    "ledger_entries": 22,
+    "result_recorded": 2,
+    "current_config_stage_b_outcomes_opened": 0,
+    "new_attempt_consumed": false
+  },
+  "protected_evidence_opened": false,
+  "audit_opened_economic_outcome": false,
+  "live_orders": false,
+  "competition_start": false,
+  "conclusion": "CURRENT_CONFIGURATION_TRACK_IS_AUDITED_AND_MAY_RECEIVE_A_SEPARATE_SINGLE_USE_EXECUTION_AUTHORIZATION_WITH_HISTORICAL_MARGIN_REMAINING_UNRESOLVED_AND_NON_BLOCKING"
+}
