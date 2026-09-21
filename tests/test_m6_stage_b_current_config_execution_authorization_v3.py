@@ -49,21 +49,16 @@ class StageBCurrentConfigExecutionAuthorizationV3Tests(unittest.TestCase):
         self.assertEqual(x["discovery_ledger_entries_after"],22)
         self.assertEqual(x["discovery_result_recorded_after"],2)
 
-    def test_04_live_state_points_to_v3_and_remains_not_run(self):
-        s=load("CURRENT_STATE.json")
-        t=s["m6"]["stage_b_current_configuration"]
-        self.assertEqual(
-            t["execution_authorization_ref"],
-            "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V3.json",
-        )
-        self.assertEqual(t["state"],"AUTHORIZED_NOT_RUN")
-        self.assertTrue(t["execution_authorized"])
-        self.assertFalse(t["authorization_consumed"])
-        self.assertFalse(t["economics_run"])
-        self.assertFalse(t["results_created"])
-        self.assertEqual(t["stage_b_current_config_outcomes_opened"],0)
-        self.assertFalse(s["protected_evidence_opened"])
-        verify_repository_current_config_authorities(ROOT)
+    def test_04_v3_was_green_and_unconsumed_before_reporting_v4(self):
+        a=load("data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V3.json")
+        e=load("evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json")
+        self.assertEqual(a["status"],"AUTHORIZED")
+        self.assertFalse(a["consumed"])
+        self.assertFalse(e["resolution"]["authorization_v3_consumed"])
+        self.assertEqual(e["last_green_authorization"]["head"],
+                         "41f7ca14b22c1a06c5d0d3bab320dd38d31821b2")
+        self.assertEqual(e["last_green_authorization"]["ci_run"],35589983786)
+        self.assertEqual(e["last_green_authorization"]["conclusion"],"SUCCESS")
 
     def test_05_failed_v2_binding_is_explicitly_superseded(self):
         c=load("evidence/M6_STAGE_B_CURRENT_CONFIG_AUTHORIZATION_BINDING_CORRECTION_V1.json")

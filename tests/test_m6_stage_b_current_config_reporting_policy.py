@@ -116,7 +116,7 @@ class StageBCurrentConfigReportingPolicyTests(unittest.TestCase):
     def test_05_live_state_has_zero_current_config_outcomes(self):
         s=load("CURRENT_STATE.json")
         t=s["m6"]["stage_b_current_configuration"]
-        self.assertTrue(t["execution_deferred_pending_v4_reporting_binding"])
+        self.assertFalse(t["execution_deferred_pending_v4_reporting_binding"])
         self.assertFalse(t["economics_run"])
         self.assertFalse(t["results_created"])
         self.assertEqual(t["stage_b_current_config_outcomes_opened"],0)

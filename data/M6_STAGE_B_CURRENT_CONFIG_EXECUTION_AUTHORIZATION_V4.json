@@ -1,0 +1,81 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-execution-authorization.v1",
+  "status": "AUTHORIZED",
+  "revision": "V4_BINDS_COMPLETE_STAGE_B_REPORTING_CONTRACT",
+  "supersedes": {
+    "ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V3.json",
+    "git_blob_sha1": "480590199c176851fc7ffaf4523f803b67ada6b4",
+    "reason": "V3 was exact-head green and unconsumed, but before economics the Stage-B reporting contract was completed and frozen; V4 binds that reporting stack without changing the economic core."
+  },
+  "scope": "V2-C006_V2-C012_STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+  "single_use": true,
+  "consumed": false,
+  "execution_authorized": true,
+  "independent_audit_pass": true,
+  "current_config_stage_b_outcomes_before_authorization": 0,
+  "candidate_spec_hashes": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "current_authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+  "current_authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+  "current_policy_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
+  "current_policy_git_blob_sha1": "bf157e44a3f93e111fc02006bd035595ba4c6084",
+  "pre_economic_materialization_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+  "pre_economic_materialization_git_blob_sha1": "0ecfbc97617a6e6188fee350f830af2fe33e2a47",
+  "pre_execution_audit_ref": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
+  "pre_execution_audit_git_blob_sha1": "c8af3cdea18358be4b98309b28c5b25eac1e67e8",
+  "runner_ref": "m6/stage_b_current_config_tier1_runner.py",
+  "runner_git_blob_sha1": "eab768456b02ecb3b200d71266b540a446843ed5",
+  "evaluator_ref": "m6/stage_b_current_config_evaluator.py",
+  "evaluator_git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
+  "reporting_policy_ref": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
+  "reporting_policy_git_blob_sha1": "e0419b33a7d3dfc5b6ee94b0038093fefcf9c599",
+  "reporting_module_ref": "m6/stage_b_current_config_reporting.py",
+  "reporting_module_git_blob_sha1": "49851e3ce8d82a3d7661639d76625987b6815638",
+  "reporting_completeness_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
+  "reporting_completeness_git_blob_sha1": "dc7d339d50accbcd30e7560e9a6a74466fe7f8f9",
+  "transaction_local_cost_rule_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+  "reporting_stack_precondition_ci": {
+    "head": "406cb7adeaaeb240ce7e0f138aaddf35119bf87c",
+    "run_id": 35590368467,
+    "conclusion": "SUCCESS",
+    "tests_passed": 539,
+    "tests_failed": 0
+  },
+  "historical_margin_authority_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "historical_margin_authority_changed": false,
+  "historical_margin_blocks_this_execution": false,
+  "accounting_semantics": {
+    "same_existing_v2_identities": true,
+    "new_v2_attempts_authorized": 0,
+    "new_v2_evaluated_identities_authorized": 0,
+    "search_budget_units_authorized": 0,
+    "v2_attempts_used_before": 2,
+    "v2_attempts_used_after_execution": 2,
+    "v2_evaluated_identities_before": 2,
+    "v2_evaluated_identities_after_execution": 2,
+    "v2_search_budget_remaining_before": 82,
+    "v2_search_budget_remaining_after_execution": 82,
+    "current_config_stage_b_outcomes_authorized": 2,
+    "economic_outcomes_opened_before": 2,
+    "economic_outcomes_opened_after_two_scenario_results": 4,
+    "discovery_result_recorded_before": 2,
+    "discovery_result_recorded_after": 2,
+    "discovery_ledger_entries_before": 22,
+    "discovery_ledger_entries_after": 22
+  },
+  "result_semantics": {
+    "required_label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+    "result_files_must_be_separate_from_stage_a": true,
+    "historical_certification_effect": "NONE",
+    "certification_survivor_promotion_authorized": false
+  },
+  "execution_gate": {
+    "this_v4_authorization_commit_must_receive_exact_head_ci_success_before_execution": true,
+    "execute_exactly_once_after_success": true
+  },
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}
