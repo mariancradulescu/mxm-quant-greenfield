@@ -67,7 +67,7 @@ class M6StageATier1ResultsTests(unittest.TestCase):
 
     def test_04_ledger_records_exactly_two_results_and_chain(self):
         ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
-        self.assertEqual(len(ledger),22)
+        self.assertEqual(len(ledger),26)
         results=[x for x in ledger if x["entry_type"]=="RESULT_RECORDED"]
         self.assertEqual(len(results),2)
         e21,e22=results

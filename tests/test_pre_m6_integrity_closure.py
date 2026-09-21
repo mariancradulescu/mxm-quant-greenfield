@@ -76,7 +76,7 @@ class PreM6IntegrityClosure(unittest.TestCase):
    with self.assertRaises(ValueError): append_entry(p,entry_type='CANDIDATE_REFROZEN_PRE_OUTCOME',candidate_id='V2-C900',spec_hash='b'*64,payload={'old_spec_hash':'a'*64,'new_spec_hash':'b'*64,'outcome_seen':False,'attempt_consumed':False})
  def test_17_existing_ledger_hash_chain_valid(self):
      entries = read_ledger(ROOT / "discovery/ledger.jsonl")
-     self.assertEqual(len(entries), 22)
+     self.assertEqual(len(entries), 26)
      self.assertFalse(any(e["entry_type"] == "RESULT_RECORDED" for e in entries[:20]))
  def test_18_old_c001_c005_freeze_refreeze_history_preserved(self):
   es=read_ledger(ROOT/'discovery/ledger.jsonl'); self.assertEqual([(e['sequence'],e['candidate_id'],e['entry_type']) for e in es[:10]],[(1,'V2-C001','CANDIDATE_FROZEN'),(2,'V2-C002','CANDIDATE_FROZEN'),(3,'V2-C003','CANDIDATE_FROZEN'),(4,'V2-C004','CANDIDATE_FROZEN'),(5,'V2-C005','CANDIDATE_FROZEN'),(6,'V2-C001','CANDIDATE_REFROZEN_PRE_OUTCOME'),(7,'V2-C002','CANDIDATE_REFROZEN_PRE_OUTCOME'),(8,'V2-C003','CANDIDATE_REFROZEN_PRE_OUTCOME'),(9,'V2-C004','CANDIDATE_REFROZEN_PRE_OUTCOME'),(10,'V2-C005','CANDIDATE_REFROZEN_PRE_OUTCOME')])

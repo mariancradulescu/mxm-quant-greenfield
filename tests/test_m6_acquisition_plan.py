@@ -322,7 +322,7 @@ class M6AcquisitionPlanTests(unittest.TestCase):
         self.assertEqual(auth["preconditions"]["ledger_entries"], 20)
         self.assertFalse(current["protected_evidence_opened"])
         entries = [json.loads(line) for line in LEDGER_PATH.read_text(encoding="utf-8").splitlines() if line.strip()]
-        self.assertEqual(len(entries), 22)
+        self.assertEqual(len(entries), 26)
         self.assertFalse(any(e.get("entry_type") == "RESULT_RECORDED" for e in entries[:20]))
 if __name__ == "__main__":
     unittest.main(verbosity=2)

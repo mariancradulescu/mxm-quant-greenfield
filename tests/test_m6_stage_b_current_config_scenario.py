@@ -208,7 +208,7 @@ class StageBCurrentConfigurationScenarioTests(unittest.TestCase):
             json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text(encoding="utf-8").splitlines()
             if x.strip()
         ]
-        self.assertEqual(len(ledger), 22)
+        self.assertEqual(len(ledger), 26)
         self.assertEqual(sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger), 2)
         self.assertFalse(any((ROOT / "discovery/results").glob("*STAGE_B_CURRENT_CONFIG*")))
 

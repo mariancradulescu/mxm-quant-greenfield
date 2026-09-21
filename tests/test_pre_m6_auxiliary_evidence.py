@@ -78,7 +78,7 @@ class PreM6AuxiliaryEvidenceTests(unittest.TestCase):
             self.assertEqual(spec["spec_hash"], expected)
             self.assertTrue(verify_spec_hash(spec))
         ledger = read_ledger(ROOT / "discovery/ledger.jsonl")
-        self.assertEqual(len(ledger), 22)
+        self.assertEqual(len(ledger), 26)
         self.assertFalse(any(row["entry_type"] == "RESULT_RECORDED" for row in ledger[:20]))
         self.assertFalse(any(row["entry_type"] == "CANDIDATE_REFROZEN_PRE_OUTCOME" for row in ledger[20:]))
     def test_04_c008_historical_continuous_construction_remains_unresolved(self):

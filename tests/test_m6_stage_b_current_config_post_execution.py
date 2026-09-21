@@ -50,7 +50,7 @@ class StageBCurrentConfigPostExecutionTests(unittest.TestCase):
         self.assertEqual(a["discovery_ledger_entries"],22)
         self.assertEqual(a["discovery_result_recorded_entries"],2)
         ledger=[json.loads(x) for x in (ROOT/"discovery/ledger.jsonl").read_text(encoding="utf-8").splitlines() if x.strip()]
-        self.assertEqual(len(ledger),22)
+        self.assertEqual(len(ledger),26)
         self.assertEqual(sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),2)
 
     def test_03_accepted_results_are_hash_valid_and_unchanged(self):
@@ -109,7 +109,7 @@ class StageBCurrentConfigPostExecutionTests(unittest.TestCase):
         self.assertEqual(s["economic_outcomes_opened"],4); self.assertEqual(s["current_config_stage_b_outcomes_opened"],2)
         self.assertEqual(s["v2_attempts_used"],2); self.assertEqual(s["v2_evaluated_identities"],2)
         self.assertEqual(s["v2_search_budget"],84); self.assertEqual(s["v2_search_budget_remaining"],82)
-        self.assertEqual(s["discovery_ledger_entries"],22); self.assertEqual(s["discovery_result_recorded_entries"],2)
+        self.assertEqual(s["discovery_ledger_entries"],26); self.assertEqual(s["discovery_result_recorded_entries"],2)
         self.assertEqual(s["historical_point_in_time_margin_state"],"UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND")
         self.assertFalse(s["historical_margin_blocks_current_operational_work"])
         self.assertFalse(s["protected_evidence_opened"]); self.assertFalse(s["live_orders_authorized"]); self.assertFalse(s["competition_start_authorized"])
@@ -189,9 +189,12 @@ class StageBCurrentConfigPostExecutionTests(unittest.TestCase):
             "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json":"64bc7a000e750cd29710b372c4e5587f1610668a",
             "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json":"63a959ef9c767956d92772102f3aae3ab3b58237",
             "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json":"47c1f081bdce0dec92dd40543d6627ae224f6f8d",
-            "discovery/ledger.jsonl":"c2ca9eb4d6d3d523b3d5443d5b7fe6993abaaa80",
         }
         for ref,sha in expected.items(): self.assertEqual(git_blob_sha1(ref),sha,ref)
+        lines=(ROOT/"discovery/ledger.jsonl").read_bytes().splitlines(keepends=True)
+        prefix22=b"".join(lines[:22])
+        historical_blob=hashlib.sha1(f"blob {len(prefix22)}\\0".encode("ascii")+prefix22).hexdigest()
+        self.assertEqual(historical_blob,"c2ca9eb4d6d3d523b3d5443d5b7fe6993abaaa80")
 
     def test_11_historical_certification_and_protected_boundary_remain_closed(self):
         run=load("m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json")

@@ -259,7 +259,8 @@ class PreM6FinalReadinessTests(unittest.TestCase):
     def test_22_no_additional_candidate_identity_or_attempt_result_created(self):
         candidates = sorted((ROOT / "discovery/candidates").glob("V2-C*.json"))
         ids = [json.loads(p.read_text())["id"] for p in candidates]
-        self.assertEqual(ids, [f"V2-C{i:03d}" for i in range(1, 13)])
+        self.assertEqual(ids[:12], [f"V2-C{i:03d}" for i in range(1, 13)])
+        self.assertEqual(ids[12:], ["V2-C013","V2-C014","V2-C015","V2-C016"])
         state = load("CURRENT_STATE.json")
         auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
         ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
