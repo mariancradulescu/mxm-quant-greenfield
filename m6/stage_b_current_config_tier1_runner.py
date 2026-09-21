@@ -103,9 +103,17 @@ def verify_repository_current_config_authorities(repo_root: Path | str) -> dict[
 
     state = _load_json(root / "CURRENT_STATE.json")
     track = state.get("m6", {}).get("stage_b_current_configuration", {})
-    if track.get("state") != "PREPARED_NOT_RUN_AWAITING_INDEPENDENT_AUDIT":
+    allowed_pre_execution_states = {
+        "PREPARED_NOT_RUN_AWAITING_INDEPENDENT_AUDIT": False,
+        "AUDITED_PENDING_SINGLE_USE_AUTHORIZATION": False,
+        "AUTHORIZED_NOT_RUN": True,
+    }
+    state_name = track.get("state")
+    if state_name not in allowed_pre_execution_states:
         raise CurrentConfigRunnerIntegrityError("current-config track state drift")
-    if track.get("execution_authorized") is not False or track.get("economics_run") is not False:
+    if track.get("execution_authorized") is not allowed_pre_execution_states[state_name]:
+        raise CurrentConfigRunnerIntegrityError("current-config authorization/state mismatch")
+    if track.get("economics_run") is not False:
         raise CurrentConfigRunnerIntegrityError("current-config economics must remain unopened")
     if track.get("stage_b_current_config_outcomes_opened") != 0:
         raise CurrentConfigRunnerIntegrityError("unexpected current-config outcome")

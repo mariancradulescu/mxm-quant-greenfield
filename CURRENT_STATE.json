@@ -389,14 +389,14 @@
       "policy_git_blob_sha1": "bf157e44a3f93e111fc02006bd035595ba4c6084",
       "pre_economic_materialization_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
       "pre_economic_materialization_git_blob_sha1": "0ecfbc97617a6e6188fee350f830af2fe33e2a47",
-      "runner_prep_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V1.json",
-      "runner_prep_git_blob_sha1": "99a292b28581ffc00e1472a9098c291bd01414df",
+      "runner_prep_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V2.json",
+      "runner_prep_git_blob_sha1": "5cb3372c9ed8245ca42bdb05c6702f5d69c70c54",
       "execution_authorization_ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json",
       "execution_authorization_git_blob_sha1": "ea022baf13f48b7dd2eac9c91aa9b9d90346950e",
       "evaluator_ref": "m6/stage_b_current_config_evaluator.py",
       "evaluator_git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
       "runner_ref": "m6/stage_b_current_config_tier1_runner.py",
-      "runner_git_blob_sha1": "b2e45d6b8e65cf136e4ddd1b44f7c1bee6c8bba6",
+      "runner_git_blob_sha1": "eab768456b02ecb3b200d71266b540a446843ed5",
       "candidates": [
         "V2-C006",
         "V2-C012"
@@ -448,12 +448,14 @@
       "independent_audit_ref": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
       "independent_audit_git_blob_sha1": "c8af3cdea18358be4b98309b28c5b25eac1e67e8",
       "independent_audit_pass": true,
-      "operational_margin_truth": "VERIFIED_CURRENT_BROKER_NATIVE_CONFIGURATION"
+      "operational_margin_truth": "VERIFIED_CURRENT_BROKER_NATIVE_CONFIGURATION",
+      "runner_state_machine_correction_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_RUNNER_STATE_MACHINE_CORRECTION_V1.json",
+      "runner_state_machine_correction_git_blob_sha1": "74fc789b7935200878f32c004fc22041b6897024"
     }
   },
-  "next_action": "Activate the separately frozen single-use current-configuration Stage-B authorization in a distinct commit, exact-head test it, then execute only after SUCCESS. Historical point-in-time margin remains unresolved and non-blocking for this track.",
+  "next_action": "Exact-head test the phase-aware current-configuration runner correction. After SUCCESS activate a separate single-use authorization; do not execute economics before that activation is itself exact-head green.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "M6_STAGE_B_CURRENT_CONFIGURATION_AUDITED_PENDING_SINGLE_USE_AUTHORIZATION",
+  "phase": "M6_STAGE_B_CURRENT_CONFIGURATION_RUNNER_CORRECTED_PENDING_EXACT_HEAD_CI",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -631,7 +633,8 @@
   "m6_stage_b_current_broker_configuration_authority": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
   "m6_stage_b_current_config_evaluator_policy_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
   "m6_stage_b_current_config_pre_economic_materialization_authority": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
-  "m6_stage_b_current_config_runner_prep_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V1.json",
+  "m6_stage_b_current_config_runner_prep_authority": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V2.json",
   "m6_stage_b_current_config_execution_authorization": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json",
-  "m6_stage_b_current_config_pre_execution_audit": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json"
+  "m6_stage_b_current_config_pre_execution_audit": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
+  "m6_stage_b_current_config_runner_state_machine_correction": "evidence/M6_STAGE_B_CURRENT_CONFIG_RUNNER_STATE_MACHINE_CORRECTION_V1.json"
 }
