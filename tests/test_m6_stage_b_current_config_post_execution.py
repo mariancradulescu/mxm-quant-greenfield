@@ -1,6 +1,7 @@
 import hashlib
 import json
 import unittest
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -130,6 +131,56 @@ class StageBCurrentConfigPostExecutionTests(unittest.TestCase):
             for m in mocks: m.assert_not_called()
         finally:
             for p in reversed(ps): p.stop()
+
+    def test_09b_consumption_authority_alone_blocks_before_economics(self):
+        with tempfile.TemporaryDirectory() as td:
+            isolated_root=Path(td)
+            authority_path=isolated_root/"evidence"/"M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_CONSUMPTION_V1.json"
+            authority_path.parent.mkdir(parents=True)
+            authority_path.write_text(
+                (ROOT/"evidence"/"M6_STAGE_B_CURRENT_CONFIG_POST_EXECUTION_CONSUMPTION_V1.json").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            self.assertFalse((isolated_root/"m6"/"results"/"STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json").exists())
+            self.assertFalse((isolated_root/"m6"/"results"/"V2-C006_STAGE_B_CURRENT_CONFIG_V1.json").exists())
+            self.assertFalse((isolated_root/"m6"/"results"/"V2-C012_STAGE_B_CURRENT_CONFIG_V1.json").exists())
+
+            missing=isolated_root/"__must_not_be_read__"
+            paths=StageAInputPaths(
+                us500_m15=missing,
+                nas100_m15=missing,
+                eurusd_m15=missing,
+                us500_transaction_local_cost=missing,
+                nas100_c012_transaction_local_cost=missing,
+            )
+            names=(
+                "verify_repository_current_config_authorities",
+                "build_pre_economic_plan",
+                "verify_pre_economic_materialization",
+                "execute_current_config_scenario_in_memory",
+                "_augment_economic_detail",
+            )
+            ps=[
+                patch(
+                    f"m6.stage_b_current_config_execute.{name}",
+                    side_effect=AssertionError(f"{name} must not be reached"),
+                )
+                for name in names
+            ]
+            mocks=[p.start() for p in ps]
+            try:
+                with self.assertRaises(CurrentConfigScenarioAlreadyExecuted):
+                    execute_authorized_current_config(
+                        isolated_root,
+                        paths,
+                        execution_head="must-not-matter",
+                        execution_ci_run_id=0,
+                    )
+                for m in mocks:
+                    m.assert_not_called()
+            finally:
+                for p in reversed(ps):
+                    p.stop()
 
     def test_10_immutable_candidate_cost_margin_and_ledger_blobs_are_unchanged(self):
         expected={

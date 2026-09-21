@@ -76,10 +76,16 @@ def assert_current_config_scenario_not_already_executed(repo_root: Path | str) -
     consumption_path = root / POST_EXECUTION_CONSUMPTION_REF
     if consumption_path.exists():
         consumption = _load_json(consumption_path)
-        if (
-            consumption.get("status") == "CONSUMED_EXECUTED_EXACTLY_ONCE"
-            and consumption.get("execution_count") == 1
-        ):
+        if consumption.get("status") == "CONSUMED_EXECUTED_EXACTLY_ONCE":
+            execution = consumption.get("execution")
+            if not isinstance(execution, Mapping):
+                raise CurrentConfigRunnerIntegrityError(
+                    "consumed Stage-B authority has invalid execution structure"
+                )
+            if execution.get("execution_count") != 1:
+                raise CurrentConfigRunnerIntegrityError(
+                    "consumed Stage-B authority execution_count drift"
+                )
             raise CurrentConfigScenarioAlreadyExecuted(
                 "Stage-B CURRENT configuration scenario already executed: consumption authority is authoritative"
             )
