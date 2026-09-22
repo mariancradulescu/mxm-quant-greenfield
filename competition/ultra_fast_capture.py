@@ -858,6 +858,102 @@ class UltraFastCaptureRunner:
             "current_or_future_rate_substitution":False,
         }
 
+    def _checkpoint_binding(self):
+        friction_spec={
+            "latest_4_week_diagnostic":self.plan["latest_4_week_diagnostic"],
+            "friction_screen":self.protocol["friction_screen"],
+            "selection_law":self.protocol["selection_law"],
+        }
+        return {
+            "plan_sha256":EXPECTED_PLAN_SHA,
+            "protocol_authority":PROTOCOL_REL,
+            "protocol_sha256":_json_sha(self.protocol),
+            "account_fingerprint_sha256":self.plan["account_fingerprint_sha256"],
+            "source_environment":self.plan["source_environment"],
+            "shortlist_sha256":_json_sha(self.plan["shortlist"]),
+            "friction_spec_sha256":_json_sha(friction_spec),
+            "conversion_authority":"CTRADER_PROTO_OA_SYMBOLS_FOR_CONVERSION_SAME_WINDOW_HISTORICAL",
+        }
+
+    def _persist_friction_checkpoint(self,friction,conversion_summary,initial,alternates):
+        if self.checkpoint_dir.exists():
+            shutil.rmtree(self.checkpoint_dir)
+        self.checkpoint_dir.mkdir(parents=True)
+        friction_doc={
+            "schema":"mxm.greenfield.v2.ultra-fast-friction-summary.v3",
+            "raw_ticks_transferred":False,"raw_conversion_ticks_transferred":False,
+            "source_weeks":"2026-W34..2026-W37",
+            "implementation_failure_is_market_failure":False,
+            "tail_semantics":"TRUE_INTRA_WINDOW_QUANTILES_WINDOW_BALANCED_QUALIFICATION",
+            "results":friction,
+        }
+        selection_doc={
+            "schema":"mxm.greenfield.v2.ultra-fast-stage-a-initial-selection.v4",
+            "initial_selected":[x["broker_symbol"] for x in initial],
+            "alternates":alternates,
+            "alpha_outcomes_used":False,"user_manual_replacements":False,
+            "family_quotas_role":"FIRST_WAVE_INFORMATION_DIVERSITY_ONLY",
+        }
+        manifest={
+            "schema":CHECKPOINT_SCHEMA,
+            "status":"FRICTION_CONVERSION_SELECTION_CHECKPOINT_COMPLETE",
+            "binding":self._checkpoint_binding(),
+            "friction_shortlist_count":len(friction),
+            "initial_selected_count":len(initial),
+            "raw_ticks_transferred":False,"raw_conversion_ticks_transferred":False,
+            "credentials_persisted":False,"orders_placed":False,"account_mutation":False,
+            "economic_outcomes_opened":0,"v2_attempts_consumed":0,
+        }
+        atomic_write_json(self.checkpoint_dir/"friction_summary.json",friction_doc)
+        atomic_write_json(self.checkpoint_dir/"historical_conversion_summary.json",conversion_summary)
+        atomic_write_json(self.checkpoint_dir/"selection_initial.json",selection_doc)
+        atomic_write_json(self.checkpoint_dir/"checkpoint_manifest.json",manifest)
+        _write_checksums(self.checkpoint_dir)
+        _verify_checksums(self.checkpoint_dir)
+        scan_bundle_for_secrets(self.checkpoint_dir,[self.client_secret,self.access_token])
+        self.progress(f"[CHECKPOINT SAVED] {self.checkpoint_dir}")
+
+    def _load_friction_checkpoint(self):
+        if not self.checkpoint_dir.exists():
+            return None
+        try:
+            _verify_checksums(self.checkpoint_dir)
+            manifest=json.loads((self.checkpoint_dir/"checkpoint_manifest.json").read_text(encoding="utf-8"))
+            friction_doc=json.loads((self.checkpoint_dir/"friction_summary.json").read_text(encoding="utf-8"))
+            conversion=json.loads((self.checkpoint_dir/"historical_conversion_summary.json").read_text(encoding="utf-8"))
+            selection=json.loads((self.checkpoint_dir/"selection_initial.json").read_text(encoding="utf-8"))
+        except (OSError,json.JSONDecodeError,ValueError,KeyError) as exc:
+            raise CheckpointInvalid(f"checkpoint parse/checksum failure: {redact_text(str(exc))}") from exc
+        if manifest.get("schema")!=CHECKPOINT_SCHEMA or manifest.get("status")!="FRICTION_CONVERSION_SELECTION_CHECKPOINT_COMPLETE":
+            raise CheckpointInvalid("checkpoint schema/status mismatch")
+        if manifest.get("binding")!=self._checkpoint_binding():
+            raise CheckpointInvalid("checkpoint authority binding mismatch")
+        if manifest.get("raw_ticks_transferred") is not False or manifest.get("raw_conversion_ticks_transferred") is not False or manifest.get("credentials_persisted") is not False:
+            raise CheckpointInvalid("checkpoint safety binding invalid")
+        if manifest.get("economic_outcomes_opened")!=0 or manifest.get("v2_attempts_consumed")!=0:
+            raise CheckpointInvalid("checkpoint is economically contaminated")
+        friction=list(friction_doc.get("results") or [])
+        if len(friction)!=32 or len({x.get("broker_symbol") for x in friction})!=32:
+            raise CheckpointInvalid("checkpoint friction shortlist incomplete")
+        expected={x["broker_symbol"] for x in self.plan["shortlist"]}
+        if {x.get("broker_symbol") for x in friction}!=expected:
+            raise CheckpointInvalid("checkpoint friction identities mismatch")
+        names=list(selection.get("initial_selected") or [])
+        if len(names)>self.plan["max_stage_a_markets"] or len(names)!=len(set(names)):
+            raise CheckpointInvalid("checkpoint initial selection invalid")
+        index={x["broker_symbol"]:x for x in friction}
+        try:
+            initial=[index[x] for x in names]
+        except KeyError as exc:
+            raise CheckpointInvalid("checkpoint selected symbol absent from friction evidence") from exc
+        if any(not _eligible_for_selection(x) for x in initial):
+            raise CheckpointInvalid("checkpoint selected market no longer eligible under frozen law")
+        if conversion.get("raw_conversion_ticks_transferred") is not False or conversion.get("current_or_future_rate_substitution") is not False:
+            raise CheckpointInvalid("checkpoint conversion authority invalid")
+        scan_bundle_for_secrets(self.checkpoint_dir,[self.client_secret,self.access_token])
+        self.progress(f"[CHECKPOINT REUSED] {self.checkpoint_dir}")
+        return friction,conversion,initial,selection.get("alternates") or {}
+
     def _workflow(self):
         self.progress("[1/5] Pepperstone LIVE read-only account binding")
         self._send(ProtoOAApplicationAuthReq(clientId=self.client_id,clientSecret=self.client_secret));self._app=True
@@ -888,14 +984,27 @@ class UltraFastCaptureRunner:
             if not li or not fu or li.get("symbolName")!=candidate["broker_symbol"] or li.get("enabled") is False or int(fu.get("tradingMode",-1))!=0:
                 raise MappingError(f"shortlist mapping/tradability mismatch {candidate['broker_symbol']}")
 
-        self.progress("[2/5] 4-week true-tail friction + same-window broker conversion chains")
-        friction=[]
-        for i,candidate in enumerate(self.plan["shortlist"],1):
-            metrics=self._friction(aid,candidate,full[candidate["symbol_id"]],self._light[candidate["symbol_id"]])
-            friction.append(metrics)
-            self.progress(f"[FRICTION {i}/32] {candidate['broker_symbol']} {metrics['friction_state']} cost={metrics['cost_confidence_state']} coverage={metrics['two_sided_window_coverage']:.0%}")
+        checkpoint=None
+        try:
+            checkpoint=self._load_friction_checkpoint()
+        except CheckpointInvalid as exc:
+            self.progress(f"[CHECKPOINT INVALID -> RECAPTURE FRICTION] {redact_text(str(exc))}")
+            shutil.rmtree(self.checkpoint_dir,ignore_errors=True)
 
-        initial,alternates=select_stage_a(friction,self.protocol["selection_law"])
+        if checkpoint is None:
+            self.progress("[2/5] 4-week true-tail friction + same-window broker conversion chains")
+            friction=[]
+            for i,candidate in enumerate(self.plan["shortlist"],1):
+                metrics=self._friction(aid,candidate,full[candidate["symbol_id"]],self._light[candidate["symbol_id"]])
+                friction.append(metrics)
+                self.progress(f"[FRICTION {i}/32] {candidate['broker_symbol']} {metrics['friction_state']} cost={metrics['cost_confidence_state']} coverage={metrics['two_sided_window_coverage']:.0%}")
+            initial,alternates=select_stage_a(friction,self.protocol["selection_law"])
+            conversion_summary=self._conversion_summary()
+            self._persist_friction_checkpoint(friction,conversion_summary,initial,alternates)
+        else:
+            friction,conversion_summary,initial,alternates=checkpoint
+            self.progress("[2/5] friction/conversion reused from authority-bound local checkpoint")
+
         self.progress(f"[3/5] selector admitted {len(initial)}/12 initial markets")
         ranked=sorted([x for x in friction if _eligible_for_selection(x)],key=_rank)
         chosen=[];series=[];replacements=[];used=set();counts=defaultdict(int);minrows=int(self.plan["capture_law"]["min_stage_a_m5_rows"])
