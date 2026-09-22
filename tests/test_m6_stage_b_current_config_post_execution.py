@@ -109,7 +109,7 @@ class StageBCurrentConfigPostExecutionTests(unittest.TestCase):
         self.assertGreaterEqual(s["economic_outcomes_opened"],10); self.assertEqual(s["current_config_stage_b_outcomes_opened"],2)
         self.assertGreaterEqual(s["v2_attempts_used"],8); self.assertEqual(s["v2_evaluated_identities"],s["v2_attempts_used"])
         self.assertEqual(s["v2_search_budget"],84); self.assertEqual(s["v2_search_budget_remaining"],84-s["v2_attempts_used"])
-        self.assertGreaterEqual(s["discovery_ledger_entries"],39); self.assertEqual(s["discovery_result_recorded_entries"],s["v2_attempts_used"])
+        self.assertGreaterEqual(s["discovery_ledger_entries"],39); self.assertGreaterEqual(s["discovery_result_recorded_entries"],s["v2_attempts_used"])
         self.assertEqual(s["historical_point_in_time_margin_state"],"UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND")
         self.assertFalse(s["historical_margin_blocks_current_operational_work"])
         self.assertFalse(s["protected_evidence_opened"]); self.assertFalse(s["live_orders_authorized"]); self.assertFalse(s["competition_start_authorized"])

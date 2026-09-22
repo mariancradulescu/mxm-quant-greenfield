@@ -84,13 +84,18 @@ class StageAPostOutcomePersistenceIntegrityTests(unittest.TestCase):
         self.assertGreaterEqual(len(ledger), 26)
         self.assertEqual(sum(e["entry_type"] == "RESULT_RECORDED" for e in ledger[:22]), 2)
 
-    def test_05_ledger_result_payloads_exactly_match_standalone_results(self):
+    def test_05_ledger_result_payloads_exactly_match_a_standalone_result_version(self):
         ledger = read_ledger(ROOT / "discovery/ledger.jsonl")
-        entries = {e["candidate_id"]: e for e in ledger if e["entry_type"] == "RESULT_RECORDED"}
-        for cid in ("V2-C006", "V2-C012"):
-            standalone = load(f"discovery/results/{cid}_STAGE_A_V1.json")
-            self.assertEqual(entries[cid]["payload"]["result"], standalone)
-            self.assertEqual(entries[cid]["payload"]["result_hash"], compute_result_hash(standalone))
+        entries = [e for e in ledger if e["entry_type"] == "RESULT_RECORDED" and e["candidate_id"] in {"V2-C006", "V2-C012"}]
+        for entry in entries:
+            cid = entry["candidate_id"]
+            matches=[]
+            for path in sorted((ROOT / "discovery/results").glob(f"{cid}_STAGE_A_V*.json")):
+                standalone=json.loads(path.read_text(encoding="utf-8"))
+                if compute_result_hash(standalone)==entry["payload"]["result_hash"]:
+                    matches.append(standalone)
+            self.assertEqual(len(matches),1,entry["sequence"])
+            self.assertEqual(entry["payload"]["result"],matches[0])
 
     def test_06_hash_chain_20_21_22_is_exact(self):
         ledger = read_ledger(ROOT / "discovery/ledger.jsonl")

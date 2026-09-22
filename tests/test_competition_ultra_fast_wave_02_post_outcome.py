@@ -36,6 +36,8 @@ class UltraFastWave02PostOutcomeTests(unittest.TestCase):
   x=c['stage_a_results'][CID];self.assertEqual(x['result_hash'],RESULT_HASH);self.assertAlmostEqual(x['gross_pnl_eur'],-86.67661227016303);self.assertAlmostEqual(x['transaction_cost_eur'],112.35157779178611);self.assertAlmostEqual(x['coarse_net_pnl_eur'],-199.02819006194892)
  def test_05_live_accounting_is_repository_derived_after_later_corrections(self):
   d=assert_current_state_matches_repository(ROOT);s=load('CURRENT_STATE.json')
-  self.assertIn(CID,d['evaluated_candidate_ids']);self.assertEqual(d['latest_economic_outcome']['candidate_id'],CID);self.assertEqual(d['latest_economic_outcome']['result_hash'],RESULT_HASH)
+  self.assertIn(CID,d['evaluated_candidate_ids'])
+  led=read_ledger(ROOT/'discovery/ledger.jsonl'); c23=[e for e in led if e['entry_type']=='RESULT_RECORDED' and e['candidate_id']==CID]
+  self.assertEqual(len(c23),1);self.assertEqual(c23[0]['payload']['result_hash'],RESULT_HASH)
   self.assertFalse(s['protected_evidence_opened']);self.assertFalse(s['live_orders_authorized']);self.assertFalse(s['competition_start_authorized'])
 if __name__=='__main__':unittest.main()

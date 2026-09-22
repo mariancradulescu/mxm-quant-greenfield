@@ -56,8 +56,8 @@ class UltraFastPostOutcomeReconciliationTests(unittest.TestCase):
  def test_04_final_wave_accounting_and_safety_are_exact(self):
   s=load('CURRENT_STATE.json');p=load('data/COMPETITION_ULTRA_FAST_WAVE_01_EXECUTION_PROGRESS_V1.json')
   self.assertEqual(s['v2_evaluated_identities'],s['v2_attempts_used']);self.assertEqual(s['v2_search_budget_remaining'],84-s['v2_attempts_used'])
-  self.assertEqual(s['global_attempts_seen'],16+s['v2_attempts_used']);self.assertEqual(s['economic_outcomes_opened'],s['v2_attempts_used']+2)
-  self.assertGreaterEqual(s['v2_attempts_used'],8);self.assertGreaterEqual(s['discovery_ledger_entries'],38);self.assertEqual(s['discovery_result_recorded_entries'],s['v2_attempts_used'])
+  self.assertEqual(s['global_attempts_seen'],16+s['v2_attempts_used']);self.assertEqual(s['economic_outcomes_opened'],s['discovery_result_recorded_entries']+s['current_config_stage_b_outcomes_opened'])
+  self.assertGreaterEqual(s['v2_attempts_used'],8);self.assertGreaterEqual(s['discovery_ledger_entries'],38);self.assertGreaterEqual(s['discovery_result_recorded_entries'],s['v2_attempts_used'])
   self.assertEqual(load('discovery/results/V2-C022_STAGE_A_V1.json')['result_hash'],HASHES['V2-C022'])
   self.assertEqual((p['accounting_after_reconciliation']['v2_evaluated_identities'],p['accounting_after_reconciliation']['v2_attempts_used'],p['accounting_after_reconciliation']['v2_search_budget_remaining']),(8,8,76))
   self.assertEqual(p['accounting_after_reconciliation']['double_counted_attempts'],0)

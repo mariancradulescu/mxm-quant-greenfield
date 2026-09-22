@@ -50,16 +50,29 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
         self.assertTrue((ROOT / a["invalidated_downstream"]["stage_b_result_ref"]).is_file())
         self.assertTrue((ROOT / a["invalidated_downstream"]["run_record_ref"]).is_file())
 
-    def test_03_current_state_excludes_invalid_c012(self):
+    def test_03_current_state_tracks_c012_correction_lifecycle(self):
         state = load("CURRENT_STATE.json")
         self.assertEqual(state["authoritative_branch"], "competition-performance-v1-20260921")
-        self.assertNotIn("V2-C012", state["discovery_survivors"])
-        self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
         self.assertIn("V2-C012", state["implementation_invalid_consumed_identities"])
-        self.assertEqual(
-            state["current_result_authority"]["V2-C012"]["stage_b_current_config"]["state"],
-            "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
-        )
+        correction = state["c012_same_identity_corrected_rerun"]
+        stage_a = state["current_result_authority"]["V2-C012"]["stage_a"]
+        stage_b = state["current_result_authority"]["V2-C012"]["stage_b_current_config"]
+        if correction["status"] == "CORRECTED_STAGE_A_RECORDED_SURVIVOR":
+            self.assertIn("V2-C012", state["discovery_survivors"])
+            self.assertIn("V2-C012", state["current_stage_b_survivor_input_set"])
+            self.assertEqual(stage_a["state"], "VALID_CORRECTED_SUCCESSOR")
+            self.assertEqual(
+                stage_a["corrected_successor_ref"],
+                "discovery/results/V2-C012_STAGE_A_V2.json",
+            )
+            self.assertIn("PENDING_CORRECTED_SUCCESSOR", stage_b["state"])
+        else:
+            self.assertNotIn("V2-C012", state["discovery_survivors"])
+            self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
+            self.assertEqual(
+                stage_b["state"],
+                "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+            )
 
     def test_04_active_refs_and_dependency_semantics_fail_closed(self):
         state = load("CURRENT_STATE.json")
@@ -153,6 +166,23 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
                     execution_head=auth["execution_gate_head"],
                     execution_ci_run_id=auth["execution_gate_ci_run_id"],
                 )
+
+    def test_08_corrected_stage_a_successor_is_canonical_and_same_identity(self):
+        state = load("CURRENT_STATE.json")
+        correction = state["c012_same_identity_corrected_rerun"]
+        if correction["status"] != "CORRECTED_STAGE_A_RECORDED_SURVIVOR":
+            self.skipTest("corrected successor not persisted yet")
+        from discovery.canonical import compute_result_hash
+        from discovery.schema import validate_result
+        result = load("discovery/results/V2-C012_STAGE_A_V2.json")
+        self.assertTrue(validate_result(result))
+        self.assertEqual(result["candidate_id"], "V2-C012")
+        self.assertEqual(result["spec_hash"], "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845")
+        self.assertEqual(result["metrics"]["event_count"], 34)
+        self.assertEqual(result["result_hash"], compute_result_hash(result))
+        self.assertEqual(result["result_hash"], correction["corrected_stage_a_result_hash"])
+        self.assertFalse(correction["new_v2_attempt_consumed"])
+        self.assertEqual(correction["search_budget_decrement"], 0)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

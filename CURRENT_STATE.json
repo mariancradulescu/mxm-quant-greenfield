@@ -6,18 +6,19 @@
   "certification_survivors": [],
   "competition_start_authorized": false,
   "discovery_survivors": [
-    "V2-C006"
+    "V2-C006",
+    "V2-C012"
   ],
-  "economic_outcomes_opened": 11,
+  "economic_outcomes_opened": 12,
   "global_attempts_seen": 25,
   "integrity_correction_02_test_result_authority": "tests/PRE_M6_INTEGRITY_CORRECTION_02_TEST_RESULTS.json",
   "latest_economic_outcome": {
-    "candidate_id": "V2-C023",
+    "candidate_id": "V2-C012",
     "stage": "A",
-    "status": "GROSS_EDGE_FAIL",
-    "result_hash": "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98",
-    "result_ref": "discovery/results/V2-C023_STAGE_A_V1.json",
-    "recorded_utc": "2026-09-22T12:24:29Z"
+    "status": "DISCOVERY_SURVIVOR",
+    "result_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
+    "result_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
+    "recorded_utc": "2026-09-22T18:13:27Z"
   },
   "legacy_prior_attempts": 16,
   "live_orders_authorized": false,
@@ -518,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Promote forensic work branch fast-forward to competition operational branch; require operational exact-head GREEN; then reproduce and canonically persist corrected same-identity C012 Stage-A once.",
+  "next_action": "Build and persist corrected C012 Stage-B current-configuration realization from the corrected 34-intent stream; do not reuse historical invalid Stage-B V1 economics. Then resume unopened-candidate readiness and prospective discovery.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -545,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "C012_RUNTIME_BINDING_FIXED_EXACT_HEAD_GREEN_AUTHORIZED_PRE_OUTCOME",
+  "phase": "C012_CORRECTED_STAGE_A_RECORDED_SURVIVOR_STAGE_B_REQUIRED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -731,8 +732,8 @@
   "m6_stage_b_current_config_reporting_policy": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
   "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
   "current_config_stage_b_outcomes_opened": 2,
-  "discovery_ledger_entries": 41,
-  "discovery_result_recorded_entries": 9,
+  "discovery_ledger_entries": 42,
+  "discovery_result_recorded_entries": 10,
   "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
   "historical_margin_blocks_current_operational_work": false,
   "post_stage_b_final_closure_independent_audit_authority": "data/POST_STAGE_B_FINAL_CLOSURE_INDEPENDENT_AUDIT_V1.json",
@@ -934,7 +935,7 @@
     "V2-C012"
   ],
   "c012_same_identity_corrected_rerun": {
-    "status": "AUTHORIZED_AFTER_RUNTIME_BINDING_FIX_EXACT_HEAD_GREEN_PENDING_OPERATIONAL_PROMOTION",
+    "status": "CORRECTED_STAGE_A_RECORDED_SURVIVOR",
     "candidate_spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
     "invalidated_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
     "correction_ref": "evidence/C012_SAME_IDENTITY_IMPLEMENTATION_CORRECTION_V1.json",
@@ -960,7 +961,18 @@
       "tests_passed": 667,
       "tests_failed": 0,
       "tests_error": 0
-    }
+    },
+    "operational_promoted_head": "4746d1e163e7aea90a3fa5f86beab7ec08c38862",
+    "operational_exact_head_ci_run_id": 35765184945,
+    "operational_exact_head_tests_passed": 667,
+    "corrected_stage_a_result_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
+    "corrected_stage_a_result_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
+    "corrected_stage_a_event_count": 34,
+    "corrected_stage_a_gross_pnl_eur": 53.61206658802402,
+    "corrected_stage_a_costs_eur": 6.093149157555949,
+    "corrected_stage_a_net_pnl_eur": 47.51891743046807,
+    "corrected_stage_a_status": "DISCOVERY_SURVIVOR",
+    "corrected_result_ledger_sequence": 42
   },
   "operational_branch_authority": {
     "branch": "competition-performance-v1-20260921",
@@ -970,7 +982,8 @@
     "main_merge_required_for_current_work": false
   },
   "current_stage_b_survivor_input_set": [
-    "V2-C006"
+    "V2-C006",
+    "V2-C012"
   ],
   "current_result_authority": {
     "V2-C006": {
@@ -986,16 +999,19 @@
     },
     "V2-C012": {
       "stage_a": {
-        "state": "INVALIDATED_PENDING_SAME_IDENTITY_CORRECTED_SUCCESSOR",
+        "state": "VALID_CORRECTED_SUCCESSOR",
         "historical_result_ref": "discovery/results/V2-C012_STAGE_A_V1.json",
         "historical_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
-        "corrected_successor_ref": null
+        "corrected_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
+        "corrected_successor_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
+        "corrected_event_count": 34
       },
       "stage_b_current_config": {
-        "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+        "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A_PENDING_CORRECTED_SUCCESSOR",
         "historical_result_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
         "invalidation_ref": "evidence/C012_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
-        "corrected_successor_ref": null
+        "corrected_successor_ref": null,
+        "corrected_stage_a_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json"
       }
     }
   },
