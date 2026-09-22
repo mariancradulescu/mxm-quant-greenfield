@@ -5,6 +5,7 @@ from pathlib import Path
 from m6.ctrader_capture import CaptureContractError,FORBIDDEN_MUTATION_PROTO_REQUESTS,require_read_only_request,redact_text
 from m6.pydroid_oauth import ACCOUNT_SELECTION_PATH,choose_live_account_locally,ensure_v2_authorization,load_saved_account_id
 from m6.ctrader_proto.OpenApiModelMessages_pb2 import ProtoOATrendbarPeriod
+from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAGetTrendbarsRes
 from .ultra_fast_capture import UltraFastCaptureRunner,PLAN_REL,PROTOCOL_REL,validate_plan,friction_windows
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -36,7 +37,7 @@ def local_preflight():
     }
 
 def main():
-    print("MXM Ultra-Fast Competition Discovery V3 | READ ONLY | broker-conversion=HISTORICAL | tails=TRUE_INTRA_WINDOW | Stage-A=13 complete weeks M5 | raw ticks transfer=NO")
+    print("MXM Ultra-Fast Competition Discovery V4 | READ ONLY | trendbar-pagination=VERSION_COMPATIBLE | friction-checkpoint=RESUMABLE | Stage-A=13 complete weeks M5")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization();print("[OAUTH]",mode)
