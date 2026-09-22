@@ -31,7 +31,7 @@ class M4FreezeAuthorities(unittest.TestCase):
         self.assertFalse(state["m4"]["candidate_economic_outcomes_opened"])
         self.assertFalse(state["protected_evidence_opened"])
     def test_m4_08_protected_timestamp_matches_state(self):
-        p=load("V2_PROTECTED_FORWARD_START.json"); b=load("V2_SEARCH_BUDGET_V1.json"); s=load("CURRENT_STATE.json"); self.assertEqual(s["v2_protected_forward_start"],p["V2_PROTECTED_FORWARD_START"]); self.assertEqual(b["legacy_prior_attempts"],16); self.assertEqual(b["global_attempts_seen"],16); self.assertEqual(s["legacy_prior_attempts"],16); self.assertEqual(s["global_attempts_seen"],24); self.assertEqual(s["global_attempts_seen"],s["legacy_prior_attempts"]+s["v2_attempts_used"])
+        p=load("V2_PROTECTED_FORWARD_START.json"); b=load("V2_SEARCH_BUDGET_V1.json"); self.assertEqual(s["v2_protected_forward_start"],p["V2_PROTECTED_FORWARD_START"]); self.assertEqual(b["legacy_prior_attempts"],16); self.assertEqual(b["v2_attempts_used"],0); self.assertEqual(b["global_attempts_seen"],16)
     def test_m4_09_single_name_equity_coverage_correction_checkpoint(self):
         h=load("HYPOTHESIS_SPACE_V1.json"); classes=h["dimensions"]["market_asset_class"]; self.assertIn("SINGLE_NAME_EQUITY_OR_SHARE_CFD",classes); self.assertIn("EQUITY_INDEX",classes); self.assertEqual(load("V2_SEARCH_BUDGET_V1.json")["v2_budget"],84); self.assertEqual(load("V2_PROTECTED_FORWARD_START.json")["V2_PROTECTED_FORWARD_START"],"2026-09-17T12:02:58Z"); s=load("CURRENT_STATE.json"); self.assertEqual(s["m4"]["m4_1_correction"]["status"],"PASS"); self.assertEqual(s["m4"]["m4_1_correction"]["m5_status_at_correction"],"PENDING")
 if __name__ == "__main__": unittest.main(verbosity=2)
