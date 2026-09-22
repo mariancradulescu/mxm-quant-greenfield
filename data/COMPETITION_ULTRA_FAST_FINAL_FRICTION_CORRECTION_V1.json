@@ -1,0 +1,50 @@
+{
+  "schema": "mxm.greenfield.v2.ultra-fast-final-friction-conversion-tail-correction.v1",
+  "status": "CORRECTION_COMPLETE_PENDING_ONE_AUTHENTICATED_USER_CAPTURE",
+  "parent_head": "d334c9b4229ffbf58fe4618ffbcafc236c48c07d",
+  "preserved": {
+    "exhaustive_broker_universe": true,
+    "factor_100_margin_correction": true,
+    "runtime_normalize_contract_correction": true,
+    "fail_closed_exception_semantics": true,
+    "type_aware_commission": true,
+    "type_aware_minimum_commission": true,
+    "structural_shortlist_count": 32,
+    "max_stage_a_markets": 12,
+    "friction_weeks": "2026-W34..2026-W37",
+    "stage_a_weeks": "2026-W25..2026-W37",
+    "raw_tick_transfer": false,
+    "bulk_2022_2026_first_pass": false,
+    "family_quotas_role": "DISCOVERY_ONLY",
+    "v2_budget_total": 84,
+    "v2_evaluated": 2,
+    "v2_attempts_used": 2,
+    "v2_remaining": 82,
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "official_conversion_authority": {
+    "request": "ProtoOASymbolsForConversionReq",
+    "response": "ProtoOASymbolsForConversionRes",
+    "purpose": "broker-native shortest conversion path between assets when direct conversion is unavailable",
+    "historical_application": "same friction-window historical BID/ASK only",
+    "executable_leg_direction": "base->quote at BID; quote->base at inverse ASK",
+    "chain_cache": "firstAssetId,lastAssetId",
+    "window_cache": "firstAssetId,lastAssetId,from_ms,to_ms"
+  },
+  "corrected_tail_semantics": {
+    "per_window": "median/p75/p90/p95 are quantiles of all causal spread states inside each 10-minute window",
+    "pooled_state_quantiles": "diagnostic only",
+    "qualification": "median of per-window p75/range and p75 of per-window p95/range, repeated after same-window round-trip commission",
+    "worst_window": "preserved as diagnostic; not sole pre-alpha kill rule"
+  },
+  "cross_fx_examples": "EURJPY/AUDJPY/CADJPY/MXNJPY/ZARJPY/NOKSEK may use broker-native USD->quote conversion chain instead of being mechanically unresolved because USD is absent from the traded pair.",
+  "no_current_rate_substitution": true,
+  "no_raw_conversion_ticks_returned": true,
+  "economic_effect": {
+    "new_economic_outcomes_opened": 0,
+    "new_v2_attempts_consumed": 0
+  },
+  "next_action": "RUN_ONE_ULTRA_FAST_V3_PYDROID_CAPTURE; ACCEPT/HASH; FREEZE_EXACT_STAGE_A_IDENTITIES; EXECUTE_FIRST_REAL_ECONOMIC_WAVE_IMMEDIATELY"
+}
