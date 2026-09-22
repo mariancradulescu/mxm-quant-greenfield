@@ -337,7 +337,7 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         ny=ZoneInfo("America/New_York")
         timestamps=[]
         day=date(2024,1,2)
-        while len(timestamps)<526:
+        while len(timestamps)<527:
             if day.weekday()<5:
                 for i in range(26):
                     if len(timestamps)>=526: break
@@ -347,10 +347,11 @@ class PreM6FinalReadinessTests(unittest.TestCase):
                     )
             day+=timedelta(days=1)
 
-        lr=[None,None]+[0.001 if i%2==0 else -0.001 for i in range(2,521)]+[0.01]+[0.0]*4
-        rr=[None,None]+[0.001 if i%2==0 else -0.001 for i in range(2,521)]+[0.0]+[0.0]*4
+        # Exactly 520 prior finite synchronized returns must exist before the signal return.
+        lr=[None,None]+[0.001 if i%2==0 else -0.001 for i in range(2,522)]+[0.01]+[0.0]*4
+        rr=[None,None]+[0.001 if i%2==0 else -0.001 for i in range(2,522)]+[0.0]+[0.0]*4
         leader=[100.0,100.0]; lagger=[100.0,100.0]
-        for i in range(2,526):
+        for i in range(2,527):
             leader.append(leader[i-2]*(1.0+lr[i]))
             lagger.append(lagger[i-2]*(1.0+rr[i]))
         us=[]; nas=[]
