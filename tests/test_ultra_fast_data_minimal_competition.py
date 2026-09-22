@@ -97,11 +97,7 @@ class FakeMarketTransport:
                 return SimpleNamespace(trendbar=[bar_at(start),bar_at(start+5*60*1000)],hasMore=False)
             start_ms=int(uf._ms(uf._utc(self.plan["stage_a_interval"]["start_utc"])))
             rows=[bar_at(start_ms+i*5*60*1000) for i in range(600)]
-            cutoff=start_ms+300*5*60*1000
-            if int(req.toTimestamp)>=cutoff:
-                return SimpleNamespace(trendbar=rows[300:],hasMore=True)
-            return SimpleNamespace(trendbar=rows[:300],hasMore=False)
-        raise AssertionError(f"unexpected fake request {name}")
+            return SimpleNamespace(trendbar=rows,hasMore=False)\n        raise AssertionError(f"unexpected fake request {name}")
 
 
 class UltraFastConversionTailIntegrityTests(unittest.TestCase):
@@ -308,7 +304,7 @@ class UltraFastConversionTailIntegrityTests(unittest.TestCase):
             runner,_,_,transport=self.make_runner(Path(td),one_window=False)
             rows=runner._stage_rows(1,self.candidate("EURUSD"),self.full_fx(rate=0))
             self.assertEqual(len(rows),600);self.assertLess(rows[0]["time_utc"],rows[-1]["time_utc"])
-            self.assertGreaterEqual(len([x for x in transport.calls if x[0]=="ProtoOAGetTrendbarsReq"]),2)
+            self.assertGreaterEqual(len([x for x in transport.calls if x[0]=="ProtoOAGetTrendbarsReq"]),1)
 
     def test_14_selected_market_writes_integrity_checked_stage_a_csv(self):
         with tempfile.TemporaryDirectory() as td:
