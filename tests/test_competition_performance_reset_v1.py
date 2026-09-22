@@ -67,12 +67,12 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
         self.assertEqual(a["accounting"]["correction_economic_outcomes_opened"],0)
         self.assertEqual(a["old_frontier"]["state"],"PRESERVED_HISTORICAL_PROSPECTIVE_ARTIFACT_SUSPENDED_BEFORE_OWN_OUTCOMES")
         self.assertFalse(a["old_frontier"]["execute_before_exhaustive_universe"])
-        self.assertEqual(s["active_competition_frontier_authority"],"discovery/COMPETITION_FRONTIER_WAVE_01_V2.json")
+        self.assertEqual(s["active_competition_frontier_authority"],"discovery/COMPETITION_FRONTIER_WAVE_01_V3.json")
         self.assertEqual(s["active_competition_universe_audit_correction"],"COMPETITION_UNIVERSE_AUDIT_CORRECTION_V1.json")
         self.assertFalse(s["competition_first_reset"]["first_frontier_execution_authorized"])
         self.assertTrue(s["competition_first_reset"]["exhaustive_account_native_universe_required_before_new_economics"])
         self.assertEqual(s["competition_first_reset"]["broker_native_universe_state"],"ACCEPTED_EXHAUSTIVE_CURRENT_ACCOUNT_NATIVE_DIRECTIONAL")
-        self.assertEqual(s["competition_first_reset"]["successor_frontier_authority"],"discovery/COMPETITION_FRONTIER_WAVE_01_V2.json")
+        self.assertEqual(s["competition_first_reset"]["successor_frontier_authority"],"discovery/COMPETITION_FRONTIER_WAVE_01_V3.json")
 
     def test_frontier_is_preserved_but_not_economically_opened(self):
         f=json.loads((ROOT/"discovery"/"COMPETITION_FRONTIER_WAVE_01_V1.json").read_text())
