@@ -35,9 +35,9 @@ class PerformanceResearchV3BootstrapTests(unittest.TestCase):
             self.assertEqual([x["entry_type"] for x in rows],["CANDIDATE_FROZEN"])
             self.assertEqual(rows[0]["spec_hash"],HASHES[cid])
 
-    def test_04_real_entry_path_fails_before_economics_while_pending(self):
+    def test_04_real_entry_path_fails_before_economics_without_matching_gate(self):
         auth=load(AUTH_REF)
-        self.assertEqual(auth["status"],"PENDING_EXACT_HEAD_GREEN")
+        self.assertIn(auth["status"],{"PENDING_EXACT_HEAD_GREEN","AUTHORIZED_AFTER_EXACT_HEAD_GREEN"})
         with patch("research_v3.wave01_execute.execute_wave",side_effect=AssertionError("economics must not run")) as economic:
             with self.assertRaises(V3ExecutionNotAuthorized):
                 execute_authorized(ROOT,us500_m15="missing",nas100_m15="missing",eurusd_m15="missing",us500_cost="missing",nas100_cost="missing",execution_head="x",execution_ci_run_id=0)
