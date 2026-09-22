@@ -7,6 +7,11 @@ from typing import Iterable, Mapping
 
 D=Decimal
 STARTING_EQUITY_EUR=D("200")
+FEASIBLE="EUR200_MIN_VOLUME_FEASIBLE"
+INFEASIBLE="EUR200_MIN_VOLUME_INFEASIBLE"
+UNRESOLVED="BROKER_OR_MARGIN_UNRESOLVED"
+ACCOUNT_TYPES={"HEDGED","NETTED"}
+MARGIN_TYPES={"MAX","SUM","NET"}
 
 class ReplayContractError(ValueError):
     pass
@@ -25,6 +30,7 @@ def _t(s):
 class ReplayEvent:
     timestamp_utc:str; kind:str; candidate_id:str; symbol:str; position_id:str
     priority:int=100; direction:str|None=None
+    direction_feasibility:str|None=None
     volume_cents:int|None=None; min_volume_cents:int|None=None
     step_volume_cents:int|None=None; max_volume_cents:int|None=None
     margin_eur:object=D("0"); transaction_cost_eur:object=D("0")
@@ -56,7 +62,20 @@ def _volume(e):
     if lo<=0 or step<=0 or hi<lo or v<lo or v>hi or (v-lo)%step:
         raise ReplayContractError("non-executable volume")
 
-def _state(cash,pos,mtm,timestamp_utc):
+def _used_margin(pos,margin_type):
+    if margin_type not in MARGIN_TYPES: raise ReplayContractError("unsupported total margin calculation type")
+    by_symbol={}
+    for p in pos.values():
+        side=by_symbol.setdefault(p.symbol,{"LONG":D("0"),"SHORT":D("0")})
+        side[p.direction]+=p.margin_eur
+    total=D("0")
+    for side in by_symbol.values():
+        if margin_type=="SUM": total+=side["LONG"]+side["SHORT"]
+        elif margin_type=="MAX": total+=max(side["LONG"],side["SHORT"])
+        else: total+=abs(side["LONG"]-side["SHORT"])
+    return total
+
+def _state(cash,pos,mtm,timestamp_utc,margin_type):
     now=_t(timestamp_utc)
     values=[]
     for k,p in sorted(pos.items()):
@@ -70,17 +89,24 @@ def _state(cash,pos,mtm,timestamp_utc):
         else:
             raise ReplayContractError("missing causal MTM for active position")
         values.append(value)
-    # Extra MTM keys are harmless candidate-stream context and are ignored. This
-    # lets independent opportunity streams share a timestamp without knowing
-    # which earlier same-timestamp entries the portfolio will admit.
     eq=cash+sum(values,D("0"))
-    used=sum((p.margin_eur for p in pos.values()),D("0"))
+    used=_used_margin(pos,margin_type)
     return eq,used,eq-used
 
-def replay_shared_eur200(events:Iterable[ReplayEvent],starting_equity_eur=STARTING_EQUITY_EUR,
-                         max_active_positions_per_symbol:int=1)->ReplayResult:
+def _stop_out_breached(eq,used,threshold_pct):
+    if threshold_pct is None or used<=0:return False
+    t=_d(threshold_pct)
+    if t<0: raise ReplayContractError("invalid stop-out threshold")
+    return (eq/used)*D("100")<=t
+
+def replay_shared_eur200(events:Iterable[ReplayEvent],starting_equity_eur=STARTING_EQUITY_EUR,*,
+                         account_type:str,total_margin_calculation_type:str,
+                         stop_out_margin_level_pct=None)->ReplayResult:
     cash=_d(starting_equity_eur)
-    if cash<=0 or max_active_positions_per_symbol<1: raise ReplayContractError("invalid account contract")
+    account_type=str(account_type).upper()
+    margin_type=str(total_margin_calculation_type).upper()
+    if cash<=0 or account_type not in ACCOUNT_TYPES or margin_type not in MARGIN_TYPES:
+        raise ReplayContractError("invalid account execution contract")
     seq=list(enumerate(events))
     for _,e in seq:
         if e.kind not in {"EXIT","ENTRY"} or not e.causal_state: raise ReplayContractError("invalid/non-causal event")
@@ -96,29 +122,42 @@ def replay_shared_eur200(events:Iterable[ReplayEvent],starting_equity_eur=STARTI
                 raise ReplayContractError("exit identity mismatch")
             cash+=_d(e.realized_gross_pnl_eur)-cost
             del pos[e.position_id]
-            eq,used,free=_state(cash,pos,e.active_position_mtm_eur,e.timestamp_utc)
+            eq,used,free=_state(cash,pos,e.active_position_mtm_eur,e.timestamp_utc,margin_type)
             decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,True,"EXIT_APPLIED",cash,used,eq,free))
             continue
         _volume(e)
         if e.direction not in {"LONG","SHORT"}: raise ReplayContractError("entry direction must be LONG or SHORT")
+        if e.direction_feasibility not in {FEASIBLE,INFEASIBLE,UNRESOLVED}:
+            raise ReplayContractError("direction feasibility missing or invalid")
         if e.position_id in pos: raise ReplayContractError("duplicate position")
+        if account_type=="NETTED" and any(p.symbol==e.symbol for p in pos.values()):
+            raise ReplayContractError("NETTED account requires pre-netted same-symbol order stream")
         margin=_d(e.margin_eur)
         if margin<=0: raise ReplayContractError("margin must be positive")
-        eq,used,free=_state(cash,pos,e.active_position_mtm_eur,e.timestamp_utc)
-        same=sum(p.symbol==e.symbol for p in pos.values())
+        eq,used,free=_state(cash,pos,e.active_position_mtm_eur,e.timestamp_utc,margin_type)
+        if e.direction_feasibility==UNRESOLVED:
+            rejected+=1
+            decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,False,"REJECT_DIRECTION_FEASIBILITY_UNRESOLVED",cash,used,eq,free))
+            continue
+        if e.direction_feasibility==INFEASIBLE:
+            rejected+=1
+            decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,False,"REJECT_DIRECTION_INFEASIBLE",cash,used,eq,free))
+            continue
+        trial=dict(pos)
+        trial[e.position_id]=OpenPosition(e.position_id,e.candidate_id,e.symbol,str(e.direction),int(e.volume_cents),margin,e.timestamp_utc)
+        trial_mtm=dict(e.active_position_mtm_eur); trial_mtm[e.position_id]=D("0")
+        trial_cash=cash-cost
+        trial_eq,trial_used,trial_free=_state(trial_cash,trial,trial_mtm,e.timestamp_utc,margin_type)
         reason="ACCEPTED"
-        if same>=max_active_positions_per_symbol: reason="REJECT_SAME_SYMBOL_CONCURRENCY"
-        elif free-cost<margin: reason="REJECT_INSUFFICIENT_FREE_MARGIN"
+        if trial_free<0: reason="REJECT_INSUFFICIENT_FREE_MARGIN"
+        elif _stop_out_breached(trial_eq,trial_used,stop_out_margin_level_pct): reason="REJECT_STOP_OUT_MARGIN_LEVEL"
         if reason!="ACCEPTED":
             rejected+=1
             decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,False,reason,cash,used,eq,free))
             continue
-        cash-=cost
-        pos[e.position_id]=OpenPosition(e.position_id,e.candidate_id,e.symbol,str(e.direction),int(e.volume_cents),margin,e.timestamp_utc)
+        cash=trial_cash; pos=trial
         accepted+=1
         iso=_t(e.timestamp_utc).isocalendar(); key=f"{iso.year}-W{iso.week:02d}"; weeks[key]=weeks.get(key,0)+1
-        mtm=dict(e.active_position_mtm_eur); mtm[e.position_id]=D("0")
-        eq,used,free=_state(cash,pos,mtm,e.timestamp_utc)
-        decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,True,reason,cash,used,eq,free))
+        decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,True,reason,cash,trial_used,trial_eq,trial_free))
     if pos: raise ReplayContractError("terminal open positions")
     return ReplayResult(_d(starting_equity_eur),cash,cash,accepted,rejected,tuple(decisions),dict(sorted(weeks.items())))
