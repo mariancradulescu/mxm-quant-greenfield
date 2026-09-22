@@ -51,11 +51,11 @@ class UltraFastEconomicWave02FreezeTests(unittest.TestCase):
    q=[]
    strength=0.00001*(si+1)
    if s=="GBPUSD": strength=0.001
-   for i in range(110):
+   for i in range(160):
     px=100.0*(1.0+strength*i)
     q.append({"t":start+timedelta(minutes=5*i),"o":px,"h":px*1.0001,"l":px*0.9999,"c":px})
    rows[s]=q
   t=generate_trades(rows)
-  self.assertEqual(len(t),1);self.assertEqual(t[0]["s"],"GBPUSD");self.assertEqual(t[0]["e"],start+timedelta(hours=4));self.assertEqual(t[0]["x"],start+timedelta(hours=8))
+  self.assertEqual(len(t),1);self.assertEqual(t[0]["s"],"GBPUSD");self.assertEqual(t[0]["e"],start+timedelta(hours=8));self.assertEqual(t[0]["x"],start+timedelta(hours=12))
 
 if __name__=="__main__": unittest.main()
