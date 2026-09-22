@@ -186,11 +186,11 @@ jobs:
       - name: Build deterministic ultra-fast capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_competition_ultra_fast_capture_package.py
-          sha256sum dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V2.zip
+          sha256sum dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V3.zip
       - name: Upload ultra-fast capture package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V2
-          path: dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V2.zip
+          name: MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V3
+          path: dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V3.zip
           if-no-files-found: error
           retention-days: 30
