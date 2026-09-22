@@ -57,9 +57,9 @@ class UltraFastRateLimitRecoveryTests(unittest.TestCase):
         )
 
     def test_01_effective_historical_pacing_has_material_headroom_below_official_five_rps(self):
-        self.assertGreater(uf.MIN_INTERVAL,0.25)
-        self.assertGreater(1.0/uf.MIN_INTERVAL,3.8)
-        self.assertLess(1.0/uf.MIN_INTERVAL,4.0)
+        self.assertGreater(uf.HISTORICAL_MIN_INTERVAL_SECONDS,0.25)
+        self.assertGreater(1.0/uf.HISTORICAL_MIN_INTERVAL_SECONDS,3.8)
+        self.assertLess(1.0/uf.HISTORICAL_MIN_INTERVAL_SECONDS,4.0)
 
     def test_02_blocked_payload_type_is_not_capture_contract_value_error(self):
         with tempfile.TemporaryDirectory() as td:

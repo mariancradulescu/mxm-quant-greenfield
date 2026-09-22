@@ -70,7 +70,8 @@ QUOTE_TYPES={"BID":1,"ASK":2}
 RAW_HEADER=("time_utc","open","high","low","close","tick_volume")
 # Official cTrader historical-data limit is 5 requests/second/connection.
 # Keep deterministic headroom for scheduler/network jitter and additionally honor server retryAfter.
-MIN_INTERVAL=0.26
+HISTORICAL_MIN_INTERVAL_SECONDS=0.26
+MIN_INTERVAL=HISTORICAL_MIN_INTERVAL_SECONDS
 RATE_LIMIT_FALLBACK_SECONDS=2.0
 RATE_LIMIT_GUARD_SECONDS=0.25
 RATE_LIMIT_RETRY_BUDGET=8
