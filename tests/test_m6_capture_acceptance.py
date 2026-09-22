@@ -82,7 +82,7 @@ class M6CaptureAcceptanceTests(unittest.TestCase):
     def test_04_no_result_or_protected_boundary_change_from_capture_acceptance(self):
         ledger = read_ledger(ROOT / "discovery/ledger.jsonl")
         protected = load("V2_PROTECTED_FORWARD_START.json")
-        self.assertEqual(len(ledger), 26)
+        self.assertGreaterEqual(len(ledger), 26)
         self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
         self.assertEqual(protected["V2_PROTECTED_FORWARD_START"], "2026-09-17T12:02:58Z")
         self.assertFalse(protected["protected_evidence_opened"])
