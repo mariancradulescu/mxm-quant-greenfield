@@ -1,0 +1,55 @@
+{
+  "schema": "mxm.greenfield.v2.real-android-ultra-fast-v4-rate-limit-failure.v1",
+  "status": "ACCEPTED_IMPLEMENTATION_RATE_LIMIT_HANDLING_FAILURE_NO_ECONOMIC_OUTCOME",
+  "source_package": "MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V4.zip",
+  "source_package_sha256": "2d249d9a83e619510b9951e30f3bdaf384013e3415d3d84b42d15c678645b516",
+  "observed_runtime": "Android / Pydroid / Pepperstone LIVE read-only",
+  "preflight": {
+    "plan_sha256": "bb80361bbfdd732529a50d62a290d57d5ec256308e508c686a6a26c376079520",
+    "trendbar_has_more_descriptor": false,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "economic_outcomes_opened": false
+  },
+  "completed_before_failure": [
+    {
+      "broker_symbol": "EURUSD",
+      "friction_state": "FRICTION_FAIL",
+      "cost_state": "FULL_FRICTION_RESOLVED",
+      "two_sided_window_coverage": 0.95
+    },
+    {
+      "broker_symbol": "USDJPY",
+      "friction_state": "FRICTION_PASS",
+      "cost_state": "FULL_FRICTION_RESOLVED",
+      "two_sided_window_coverage": 0.95
+    }
+  ],
+  "failure": {
+    "stage": "FRICTION_3_OF_32_OR_NEXT_HISTORICAL_TICK_REQUEST_BEFORE_THIRD_RESULT",
+    "request_type": "ProtoOAGetTickDataReq",
+    "exact_console": "[CAPTURE BLOCKED SAFELY] IMPLEMENTATION_INVALID: ProtoOAGetTickDataReq implementation/contract failure: cTrader API error: BLOCKED_PAYLOAD_TYPE",
+    "classification": "IMPLEMENTATION_RATE_LIMIT_HANDLING_FAILURE",
+    "economic_outcome": false,
+    "v2_attempt_consumed": false,
+    "protected_evidence_opened": false
+  },
+  "diagnosis": {
+    "official_error_semantics": "BLOCKED_PAYLOAD_TYPE means message blocked by server or rate limit reached; ProtoOAErrorRes.retryAfter carries cooldown seconds when rate-limited.",
+    "official_historical_limit": "MAX_5_REQUESTS_PER_SECOND_PER_CONNECTION",
+    "v4_operational_target_rps": 4.7,
+    "v4_defect": "Runtime ignored ProtoOAErrorRes.retryAfter; CaptureContractError subclasses ValueError and was therefore reclassified as IMPLEMENTATION_INVALID before retry/backoff could recover.",
+    "economic_or_market_failure": false
+  },
+  "console_only_friction_observation": {
+    "threshold_retuning_permitted": false,
+    "shortlist_retuning_permitted": false,
+    "economic_selection_outcome_opened": false
+  },
+  "accounting_after_failure": {
+    "v2_search_budget_total": 84,
+    "v2_evaluated_identities": 2,
+    "v2_attempts_used": 2,
+    "v2_remaining": 82
+  }
+}

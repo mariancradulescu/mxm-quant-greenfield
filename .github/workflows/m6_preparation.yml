@@ -110,6 +110,9 @@ jobs:
           assert report["orders_permitted"] is False, report
           assert report["account_mutation_permitted"] is False, report
           assert report["economic_outcomes_opened"] is False, report
+          assert 3.8 < report["effective_historical_request_rps"] < 4.0, report
+          assert report["rate_limit_retry_after_honored"] is True, report
+          assert report["rate_limit_retry_budget"] == 8, report
           print("COMPETITION_ULTRA_FAST_PREFLIGHT_PASS", report)
           PY
       - name: Full repository unittest suite on Python 3.13
@@ -186,11 +189,11 @@ jobs:
       - name: Build deterministic ultra-fast capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_competition_ultra_fast_capture_package.py
-          sha256sum dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V4.zip
+          sha256sum dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5.zip
       - name: Upload ultra-fast capture package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V4
-          path: dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V4.zip
+          name: MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5
+          path: dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5.zip
           if-no-files-found: error
           retention-days: 30

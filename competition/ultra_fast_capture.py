@@ -1,4 +1,4 @@
-"""Compact read-only friction qualification + 13-week M5 Stage-A capture V3.
+"""Compact read-only friction qualification + 13-week M5 Stage-A capture V5.
 
 Evidence-integrity law:
 - one canonical M5 normalizer;
@@ -64,16 +64,21 @@ from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 PLAN_REL="data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json"
 PROTOCOL_REL="data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json"
 EXPECTED_PLAN_SHA="bb80361bbfdd732529a50d62a290d57d5ec256308e508c686a6a26c376079520"
-OUTPUT_FILENAME="MXM_COMPETITION_ULTRA_FAST_STAGE_A_V4.zip"
-TOOL_VERSION="MXM_COMPETITION_ULTRA_FAST_ANDROID_STDLIB_V4_TRENDBAR_PAGINATION_CHECKPOINT"
+OUTPUT_FILENAME="MXM_COMPETITION_ULTRA_FAST_STAGE_A_V5.zip"
+TOOL_VERSION="MXM_COMPETITION_ULTRA_FAST_ANDROID_STDLIB_V5_RATE_LIMIT_RECOVERY"
 QUOTE_TYPES={"BID":1,"ASK":2}
 RAW_HEADER=("time_utc","open","high","low","close","tick_volume")
-MIN_INTERVAL=1/4.7
+# Official cTrader historical-data limit is 5 requests/second/connection.
+# Keep deterministic headroom for scheduler/network jitter and additionally honor server retryAfter.
+MIN_INTERVAL=0.26
+RATE_LIMIT_FALLBACK_SECONDS=2.0
+RATE_LIMIT_GUARD_SECONDS=0.25
+RATE_LIMIT_RETRY_BUDGET=8
 PROTECTED_UTC="2026-09-17T12:02:58Z"
 ELIGIBLE_COST_STATES={FULL_FRICTION_RESOLVED,SPREAD_RESOLVED_COMMISSION_BOUNDED}
 VALID_FRICTION_STATES={"FRICTION_PASS","FRICTION_WATCH","FRICTION_FAIL",FRICTION_UNRESOLVED}
 STAGE_COMPLETION_REASONS={"HAS_MORE_FALSE","SHORT_PAGE_INTERVAL_EXHAUSTED","FROM_BOUNDARY_REACHED","EMPTY_FINAL_PAGE_AFTER_FULL_PAGE","EMPTY_INTERVAL"}
-CHECKPOINT_SCHEMA="mxm.greenfield.v2.ultra-fast-friction-checkpoint.v4"
+CHECKPOINT_SCHEMA="mxm.greenfield.v2.ultra-fast-friction-checkpoint.v5"
 
 
 class ImplementationInvalid(CaptureContractError):
@@ -86,6 +91,19 @@ class ConversionUnavailable(Exception):
 
 class CheckpointInvalid(CaptureContractError):
     """Local checkpoint cannot be reused; recapture friction without trusting it."""
+
+
+class PayloadRateLimited(Exception):
+    """Server-side payload block/rate limit. Retry only after the broker-provided cooldown."""
+
+    def __init__(self,retry_after=0.0,description=""):
+        try:
+            value=float(retry_after or 0.0)
+        except (TypeError,ValueError):
+            value=0.0
+        self.retry_after=max(0.0,value)
+        self.description=str(description or "")
+        super().__init__(f"BLOCKED_PAYLOAD_TYPE retry_after={self.retry_after:g}s")
 
 
 def _plain(message):
@@ -140,11 +158,11 @@ def margin_pct_eur200(value):
 
 def validate_plan(plan,protocol):
     if plan.get("schema")!="mxm.greenfield.v2.ultra-fast-competition-capture-plan.v4":
-        raise ImplementationInvalid("invalid ultra-fast V3 plan schema")
+        raise ImplementationInvalid("invalid ultra-fast V4 plan schema")
     if plan.get("status")!="FROZEN_PRE_CAPTURE_PRE_OUTCOME_TRENDBAR_PAGINATION_CHECKPOINT_CORRECTED":
         raise ImplementationInvalid("ultra-fast V4 plan not frozen")
     if plan.get("plan_sha256")!=EXPECTED_PLAN_SHA or _canon(plan)!=EXPECTED_PLAN_SHA:
-        raise ImplementationInvalid("ultra-fast V3 plan hash mismatch")
+        raise ImplementationInvalid("ultra-fast V4 plan hash mismatch")
     if protocol.get("schema")!="mxm.greenfield.v2.ultra-fast-data-minimal-discovery-protocol.v3":
         raise ImplementationInvalid("invalid ultra-fast V3 protocol schema")
     if protocol.get("status")!="FROZEN_PRE_FRICTION_PRE_STAGE_A_OUTCOME_CONVERSION_TAIL_INTEGRITY_CORRECTED":
@@ -426,7 +444,7 @@ class UltraFastCaptureRunner:
         self.access_token=access_token;self.config=dict(config);self.root=Path(repo_root);self.progress=progress
         self.transport=transport or StdlibCTraderTransport(LIVE_HOST,LIVE_PORT,response_timeout=60)
         self.bundle=self.root/"competition_ultra_fast_output"/"MXM_COMPETITION_ULTRA_FAST_STAGE_A_V4"
-        self.checkpoint_dir=self.root/"competition_ultra_fast_checkpoint"/"MXM_COMPETITION_ULTRA_FAST_FRICTION_CHECKPOINT_V4"
+        self.checkpoint_dir=self.root/"competition_ultra_fast_checkpoint"/"MXM_COMPETITION_ULTRA_FAST_FRICTION_CHECKPOINT_V5"
         self.zip_path=self.root/OUTPUT_FILENAME
         self._app=False;self._account=None;self._last=None;self._requests=0
         self._tick_cache={}
@@ -445,7 +463,12 @@ class UltraFastCaptureRunner:
             self._last=time.monotonic()
         response=self.transport.request(request,timeout=60)
         if type(response).__name__=="ProtoOAErrorRes":
-            raise CaptureContractError(f"cTrader API error: {getattr(response,'errorCode','UNKNOWN')}")
+            code=str(getattr(response,"errorCode","UNKNOWN"))
+            if code=="BLOCKED_PAYLOAD_TYPE":
+                retry_after=getattr(response,"retryAfter",0)
+                description=getattr(response,"description","")
+                raise PayloadRateLimited(retry_after=retry_after,description=description)
+            raise CaptureContractError(f"cTrader API error: {code}")
         if historical:
             self._requests+=1
         return response
@@ -459,16 +482,33 @@ class UltraFastCaptureRunner:
 
     def _send(self,request,historical=False,retries=4):
         last=None
-        for n in range(retries):
+        transport_attempt=0
+        rate_limit_hits=0
+        while transport_attempt<retries:
             try:
                 return self._request(request,historical)
+            except PayloadRateLimited as exc:
+                rate_limit_hits+=1
+                if rate_limit_hits>RATE_LIMIT_RETRY_BUDGET:
+                    raise CaptureContractError(
+                        f"{type(request).__name__} rate-limit retry budget exhausted after {RATE_LIMIT_RETRY_BUDGET} broker blocks"
+                    ) from exc
+                delay=max(RATE_LIMIT_FALLBACK_SECONDS,exc.retry_after+RATE_LIMIT_GUARD_SECONDS)
+                self.progress(
+                    f"[RATE LIMIT BACKOFF] {type(request).__name__} block {rate_limit_hits}/{RATE_LIMIT_RETRY_BUDGET}; "
+                    f"retry_after={exc.retry_after:g}s wait={delay:g}s"
+                )
+                time.sleep(delay)
+                self._last=None
+                continue
             except (TypeError,AssertionError,KeyError,ValueError) as exc:
                 raise ImplementationInvalid(f"{type(request).__name__} implementation/contract failure: {redact_text(str(exc))}") from exc
             except Exception as exc:
                 last=exc
-                if n+1==retries:
+                transport_attempt+=1
+                if transport_attempt>=retries:
                     break
-                time.sleep(min(8,2**n))
+                time.sleep(min(8,2**(transport_attempt-1)))
                 try:
                     self.transport.close();self._restore()
                 except Exception as reconnect:

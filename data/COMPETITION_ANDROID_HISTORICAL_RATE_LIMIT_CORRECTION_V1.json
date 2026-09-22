@@ -1,0 +1,47 @@
+{
+  "schema": "mxm.greenfield.v2.android-historical-rate-limit-recovery-correction.v1",
+  "status": "IMPLEMENTATION_RATE_LIMIT_RECOVERY_COMPLETE_PENDING_ONE_V5_USER_RUN",
+  "parent_head": "eb79aec1b5bffa51f032610b64d6385f1f424c73",
+  "failure_evidence": "evidence/REAL_ANDROID_ULTRA_FAST_V4_RATE_LIMIT_FAILURE_V1.json",
+  "official_authority": {
+    "rate_limit_documentation": "https://help.ctrader.com/open-api/",
+    "error_message_documentation": "https://help.ctrader.com/open-api/messages/",
+    "historical_requests_max_per_second_per_connection": 5,
+    "blocked_payload_type_semantics": "MESSAGE_BLOCKED_BY_SERVER_OR_RATE_LIMIT_REACHED",
+    "retry_after_semantics": "SECONDS_UNTIL_RELATED_PAYLOAD_TYPE_IS_UNLOCKED"
+  },
+  "preserved": {
+    "discovery_protocol": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json",
+    "capture_plan": "data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json",
+    "plan_sha256": "bb80361bbfdd732529a50d62a290d57d5ec256308e508c686a6a26c376079520",
+    "structural_shortlist_count": 32,
+    "max_stage_a_markets": 12,
+    "friction_weeks": "2026-W34..2026-W37",
+    "stage_a_weeks": "2026-W25..2026-W37",
+    "friction_thresholds_unchanged": true,
+    "shortlist_unchanged": true,
+    "trendbar_pagination_v4_preserved": true,
+    "checkpoint_before_stage_a_preserved": true,
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "v5_runtime_correction": {
+    "package_filename": "MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5.zip",
+    "expected_return_filename": "MXM_COMPETITION_ULTRA_FAST_STAGE_A_V5.zip",
+    "minimum_inter_historical_request_seconds": 0.26,
+    "effective_nominal_historical_rps": 3.846153846153846,
+    "rate_limit_retry_budget": 8,
+    "retry_after_honored": true,
+    "retry_after_guard_seconds": 0.25,
+    "missing_retry_after_fallback_seconds": 2,
+    "blocked_payload_type_reconnect_forbidden": true,
+    "blocked_payload_type_consumes_transport_retry": false,
+    "failed_v4_friction_observations_used_to_retune_thresholds": false
+  },
+  "economic_effect": {
+    "new_economic_outcomes_opened": 0,
+    "new_v2_attempts_consumed": 0
+  },
+  "next_action": "RUN_ONE_REPLACEMENT_ULTRA_FAST_V5_PYDROID_CAPTURE; ACCEPT/HASH; FREEZE_IDENTITIES; EXECUTE_FIRST_REAL_ECONOMIC_WAVE"
+}

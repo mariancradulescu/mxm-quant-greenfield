@@ -6,7 +6,7 @@ from m6.ctrader_capture import CaptureContractError,FORBIDDEN_MUTATION_PROTO_REQ
 from m6.pydroid_oauth import ACCOUNT_SELECTION_PATH,choose_live_account_locally,ensure_v2_authorization,load_saved_account_id
 from m6.ctrader_proto.OpenApiModelMessages_pb2 import ProtoOATrendbarPeriod
 from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAGetTrendbarsRes
-from .ultra_fast_capture import UltraFastCaptureRunner,PLAN_REL,PROTOCOL_REL,validate_plan,friction_windows
+from .ultra_fast_capture import UltraFastCaptureRunner,PLAN_REL,PROTOCOL_REL,validate_plan,friction_windows,MIN_INTERVAL,RATE_LIMIT_RETRY_BUDGET
 
 ROOT=Path(__file__).resolve().parents[1]
 ALLOWED=frozenset({"ProtoOAApplicationAuthReq","ProtoOAGetAccountListByAccessTokenReq","ProtoOAAccountAuthReq","ProtoOATraderReq","ProtoOAAssetListReq","ProtoOASymbolsListReq","ProtoOASymbolByIdReq","ProtoOASymbolsForConversionReq","ProtoOAGetTickDataReq","ProtoOAGetTrendbarsReq"})
@@ -34,11 +34,14 @@ def local_preflight():
       "regional_windows":len(friction_windows(protocol,"US_REGIONAL")),"stage_a_interval":plan["stage_a_interval"],
       "raw_ticks_transferred":False,"network_connection_attempted":False,"credentials_used":False,"orders_permitted":False,
       "account_mutation_permitted":False,"economic_outcomes_opened":False,
-      "trendbar_has_more_descriptor":"hasMore" in ProtoOAGetTrendbarsRes.DESCRIPTOR.fields_by_name
+      "trendbar_has_more_descriptor":"hasMore" in ProtoOAGetTrendbarsRes.DESCRIPTOR.fields_by_name,
+      "effective_historical_request_rps":1.0/MIN_INTERVAL,
+      "rate_limit_retry_after_honored":True,
+      "rate_limit_retry_budget":RATE_LIMIT_RETRY_BUDGET
     }
 
 def main():
-    print("MXM Ultra-Fast Competition Discovery V4 | READ ONLY | trendbar-pagination=VERSION_COMPATIBLE | friction-checkpoint=RESUMABLE | Stage-A=13 complete weeks M5")
+    print("MXM Ultra-Fast Competition Discovery V5 | READ ONLY | rate-limit=RETRY_AFTER_RESILIENT | trendbar-pagination=VERSION_COMPATIBLE | friction-checkpoint=RESUMABLE | Stage-A=13 complete weeks M5")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization();print("[OAUTH]",mode)
