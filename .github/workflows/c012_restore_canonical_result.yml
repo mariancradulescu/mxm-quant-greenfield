@@ -1,0 +1,56 @@
+name: c012-restore-canonical-result
+on:
+  push:
+    branches:
+      - forensic-stabilization-20260922
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: competition-performance-v1-20260921
+          fetch-depth: 0
+      - name: Rebuild standalone C012 V2 from canonical ledger payload
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from discovery.canonical import compute_result_hash
+          from discovery.ledger import read_ledger
+
+          root=Path(".")
+          entries=read_ledger(root/"discovery/ledger.jsonl")
+          matches=[
+              e for e in entries
+              if e["sequence"]==42
+              and e["entry_type"]=="RESULT_RECORDED"
+              and e["candidate_id"]=="V2-C012"
+          ]
+          assert len(matches)==1, len(matches)
+          result=matches[0]["payload"]["result"]
+          expected=matches[0]["payload"]["result_hash"]
+          assert result["result_hash"]==expected
+          assert compute_result_hash(result)==expected
+          out=root/"discovery/results/V2-C012_STAGE_A_V2.json"
+          out.write_text(
+              json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False)+"\n",
+              encoding="utf-8",
+          )
+          reread=json.loads(out.read_text(encoding="utf-8"))
+          assert compute_result_hash(reread)==expected
+          print("CANONICAL_RESULT_HASH",expected)
+          PY
+      - name: Commit only canonical serialization repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add discovery/results/V2-C012_STAGE_A_V2.json
+          git diff --cached --exit-code && { echo "No repair needed"; exit 0; } || true
+          git commit -m "Restore canonical Python serialization for C012 Stage-A V2"
+          git push origin HEAD:competition-performance-v1-20260921
