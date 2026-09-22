@@ -56,9 +56,24 @@ def _volume(e):
     if lo<=0 or step<=0 or hi<lo or v<lo or v>hi or (v-lo)%step:
         raise ReplayContractError("non-executable volume")
 
-def _state(cash,pos,mtm):
-    if set(pos)!=set(mtm): raise ReplayContractError("causal MTM key mismatch")
-    eq=cash+sum((_d(mtm[k]) for k in sorted(mtm)),D("0"))
+def _state(cash,pos,mtm,timestamp_utc):
+    now=_t(timestamp_utc)
+    values=[]
+    for k,p in sorted(pos.items()):
+        opened=_t(p.opened_utc)
+        if k in mtm:
+            value=_d(mtm[k])
+            if opened==now and value!=0:
+                raise ReplayContractError("same-timestamp position MTM must be zero")
+        elif opened==now:
+            value=D("0")
+        else:
+            raise ReplayContractError("missing causal MTM for active position")
+        values.append(value)
+    # Extra MTM keys are harmless candidate-stream context and are ignored. This
+    # lets independent opportunity streams share a timestamp without knowing
+    # which earlier same-timestamp entries the portfolio will admit.
+    eq=cash+sum(values,D("0"))
     used=sum((p.margin_eur for p in pos.values()),D("0"))
     return eq,used,eq-used
 
@@ -81,14 +96,15 @@ def replay_shared_eur200(events:Iterable[ReplayEvent],starting_equity_eur=STARTI
                 raise ReplayContractError("exit identity mismatch")
             cash+=_d(e.realized_gross_pnl_eur)-cost
             del pos[e.position_id]
-            eq,used,free=_state(cash,pos,e.active_position_mtm_eur)
+            eq,used,free=_state(cash,pos,e.active_position_mtm_eur,e.timestamp_utc)
             decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,True,"EXIT_APPLIED",cash,used,eq,free))
             continue
         _volume(e)
+        if e.direction not in {"LONG","SHORT"}: raise ReplayContractError("entry direction must be LONG or SHORT")
         if e.position_id in pos: raise ReplayContractError("duplicate position")
         margin=_d(e.margin_eur)
         if margin<=0: raise ReplayContractError("margin must be positive")
-        eq,used,free=_state(cash,pos,e.active_position_mtm_eur)
+        eq,used,free=_state(cash,pos,e.active_position_mtm_eur,e.timestamp_utc)
         same=sum(p.symbol==e.symbol for p in pos.values())
         reason="ACCEPTED"
         if same>=max_active_positions_per_symbol: reason="REJECT_SAME_SYMBOL_CONCURRENCY"
@@ -98,7 +114,7 @@ def replay_shared_eur200(events:Iterable[ReplayEvent],starting_equity_eur=STARTI
             decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,False,reason,cash,used,eq,free))
             continue
         cash-=cost
-        pos[e.position_id]=OpenPosition(e.position_id,e.candidate_id,e.symbol,str(e.direction or "UNKNOWN"),int(e.volume_cents),margin,e.timestamp_utc)
+        pos[e.position_id]=OpenPosition(e.position_id,e.candidate_id,e.symbol,str(e.direction),int(e.volume_cents),margin,e.timestamp_utc)
         accepted+=1
         iso=_t(e.timestamp_utc).isocalendar(); key=f"{iso.year}-W{iso.week:02d}"; weeks[key]=weeks.get(key,0)+1
         mtm=dict(e.active_position_mtm_eur); mtm[e.position_id]=D("0")
