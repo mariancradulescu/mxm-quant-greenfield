@@ -156,6 +156,12 @@ def _sample_std(values:Sequence[float])->float:
     return sqrt(ss/(len(values)-1))
 
 
+def _prior_finite_window(values:Sequence[float], current_index:int, count:int)->list[float]:
+    """Return exactly prior finite observations; never include the current observation."""
+    start=max(0,current_index-count)
+    return [x for x in values[start:current_index] if x==x]
+
+
 def c012_replay_intents(
     us500_rows:Sequence[Mapping[str,Any]],
     nas100_rows:Sequence[Mapping[str,Any]],
@@ -175,11 +181,14 @@ def c012_replay_intents(
         lr=_f(leader,"close")/_f(pairs[i-2][0],"close")-1.0
         rr=_f(lagger,"close")/_f(pairs[i-2][1],"close")-1.0
         leader_ret2.append(lr); lagger_ret2.append(rr)
-        valid_l=[x for x in leader_ret2[max(2,i-519):i+1] if x==x]
-        valid_r=[x for x in lagger_ret2[max(2,i-519):i+1] if x==x]
+        # Frozen C012 semantics require the rolling normalization state to use only
+        # PRIOR synchronized completed returns. The current return_t is the numerator
+        # and must not leak into its own 520-observation scale estimate.
+        valid_l=_prior_finite_window(leader_ret2,i,520)
+        valid_r=_prior_finite_window(lagger_ret2,i,520)
         if len(valid_l)<520 or len(valid_r)<520:
             continue
-        lstd=_sample_std(valid_l[-520:]); rstd=_sample_std(valid_r[-520:])
+        lstd=_sample_std(valid_l); rstd=_sample_std(valid_r)
         if lstd<=0 or rstd<=0:
             continue
         lz=lr/lstd; rz=rr/rstd
