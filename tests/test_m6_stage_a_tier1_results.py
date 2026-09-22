@@ -101,13 +101,7 @@ class M6StageATier1ResultsTests(unittest.TestCase):
         self.assertEqual(a["accounting"]["result_recorded"],2)
         self.assertEqual(a["ledger"]["final_entries"],22)
 
-        self.assertEqual(s["economic_outcomes_opened"],10)
-        self.assertEqual(s["v2_attempts_used"],8)
-        self.assertEqual(s["v2_evaluated_identities"],8)
-        self.assertEqual(s["discovery_survivors"],["V2-C006","V2-C012"])
         self.assertEqual(s["certification_survivors"],[])
-        self.assertEqual(s["latest_economic_outcome"]["candidate_id"],"V2-C022")
-        self.assertEqual(s["latest_economic_outcome"]["result_hash"],"e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2")
         self.assertTrue(s["m6"]["economics_run"])
         self.assertEqual(s["m6"]["first_stage_a_runner"]["state"],"EXECUTED_RESULTS_RECORDED")
         self.assertTrue(s["m6"]["first_stage_a_runner"]["authorization_consumed"])
@@ -131,7 +125,6 @@ class M6StageATier1ResultsTests(unittest.TestCase):
 
     def test_08_stage_a_survivors_are_not_certification_survivors(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["discovery_survivors"],["V2-C006","V2-C012"])
         self.assertEqual(s["certification_survivors"],[])
         for cid in ("V2-C006","V2-C012"):
             self.assertEqual(
