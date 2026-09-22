@@ -4,11 +4,16 @@ on:
     branches:
       - m6-prep-materialization-20260917
       - competition-performance-v1-20260921
+      - forensic-stabilization-20260922
       - main
   pull_request:
     branches:
       - main
   workflow_dispatch:
+
+concurrency:
+  group: m6-preparation-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   full-suite:
@@ -117,6 +122,8 @@ jobs:
           assert report["checkpoint_v5_reusable"] is True, report
           print("COMPETITION_ULTRA_FAST_PREFLIGHT_PASS", report)
           PY
+      - name: Validate authoritative repository invariants
+        run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/validate_authoritative_promotion.py
       - name: Full repository unittest suite on Python 3.13
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest discover -s tests -p 'test_*.py' -v
       - name: Build deterministic Pydroid deployment package
