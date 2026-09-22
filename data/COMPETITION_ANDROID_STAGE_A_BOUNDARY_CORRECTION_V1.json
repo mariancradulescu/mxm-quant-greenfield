@@ -1,0 +1,45 @@
+{
+  "schema": "mxm.greenfield.v2.android-stage-a-lower-boundary-compatibility-correction.v1",
+  "status": "IMPLEMENTATION_STAGE_A_BOUNDARY_CORRECTION_COMPLETE_PENDING_ONE_V6_USER_RUN",
+  "parent_head": "189499fce88a0a117e3a3ffa04645dce1abc6ff4",
+  "failure_evidence": "evidence/REAL_ANDROID_ULTRA_FAST_V5_STAGE_A_BOUNDARY_FAILURE_V1.json",
+  "official_authority": {
+    "messages": "https://help.ctrader.com/open-api/messages/",
+    "model_messages": "https://help.ctrader.com/open-api/model-messages/",
+    "get_trendbars_count_semantics": "LIMIT_NUMBER_OF_TRENDBARS_IN_RESPONSE_BACK_FROM_TO_TIMESTAMP",
+    "trendbar_time_semantics": "UTC_TIMESTAMP_IN_MINUTES_OF_BAR_OPEN_TICK"
+  },
+  "preserved": {
+    "discovery_protocol": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json",
+    "capture_plan": "data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json",
+    "plan_sha256": "bb80361bbfdd732529a50d62a290d57d5ec256308e508c686a6a26c376079520",
+    "structural_shortlist_count": 32,
+    "max_stage_a_markets": 12,
+    "friction_thresholds_unchanged": true,
+    "shortlist_unchanged": true,
+    "friction_results_not_used_to_retune": true,
+    "trendbar_hasmore_compatibility_preserved": true,
+    "rate_limit_v5_recovery_preserved": true,
+    "checkpoint_schema_preserved": "mxm.greenfield.v2.ultra-fast-friction-checkpoint.v5",
+    "checkpoint_reuse_required": true,
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "v6_runtime_correction": {
+    "package_filename": "MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V6.zip",
+    "expected_return_filename": "MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6.zip",
+    "lower_boundary_overfetch": "ALLOWED_ONLY_BELOW_FROZEN_FROM_TIMESTAMP",
+    "lower_boundary_action": "COUNT_IN_PAGINATION_EVIDENCE_CLIP_FROM_NORMALIZED_STAGE_A_ROWS",
+    "lower_boundary_completion": "OLDEST_AT_OR_BELOW_FROM_TIMESTAMP_PROVES_FROM_BOUNDARY_REACHED",
+    "upper_boundary_overfetch": "FORBIDDEN_FAIL_CLOSED",
+    "minimum_row_floor_is_completeness": false,
+    "exact_interval_normalizer_preserved": true,
+    "checkpoint_v5_reused": true
+  },
+  "economic_effect": {
+    "new_economic_outcomes_opened": 0,
+    "new_v2_attempts_consumed": 0
+  },
+  "next_action": "RUN_ONE_REPLACEMENT_ULTRA_FAST_V6_PYDROID_CAPTURE_USING_SAVED_V5_FRICTION_CHECKPOINT; ACCEPT/HASH; FREEZE_IDENTITIES; EXECUTE_FIRST_REAL_ECONOMIC_WAVE"
+}
