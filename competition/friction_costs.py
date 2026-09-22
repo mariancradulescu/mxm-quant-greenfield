@@ -85,7 +85,8 @@ def required_conversion_currencies(
         try: mtype=int(full_symbol.get("minCommissionType")) if full_symbol.get("minCommissionType") is not None else None
         except (TypeError,ValueError): mtype=None
         if mtype==1:
-            asset=str(full_symbol.get("minCommissionAsset") or "").upper()
+            raw=full_symbol.get("minCommissionAsset")
+            asset=str(asset_names.get(str(raw),raw) or "").upper()
             if asset and asset!=quote:
                 out.add(asset)
         elif mtype not in (2,):
@@ -173,7 +174,8 @@ def type_aware_roundtrip_commission(
     try: mtype=int(mtype_raw) if mtype_raw is not None else None
     except (TypeError,ValueError): mtype=None
     mtype_name=MIN_COMMISSION_TYPES.get(mtype)
-    min_asset=full_symbol.get("minCommissionAsset")
+    min_asset_raw=full_symbol.get("minCommissionAsset")
+    min_asset=asset_names.get(str(min_asset_raw),min_asset_raw)
     min_conv=Conversion(0.0,"RESOLVED_ZERO")
     if min_raw!=0:
         if mtype==2:
