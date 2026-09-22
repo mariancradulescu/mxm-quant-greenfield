@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-TARGET=ROOT/"dist"/"MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V1.zip"
+TARGET=ROOT/"dist"/"MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2.zip"
 FILES=("COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py","competition/__init__.py","competition/broker_universe_capture.py","competition/pydroid_broker_universe_launcher.py","m6/__init__.py","m6/_ctrader_capture_base.py","m6/ctrader_capture.py","m6/ctrader_transport.py","m6/pydroid_oauth.py","m6/ctrader_proto/__init__.py","m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py","m6/ctrader_proto/OpenApiCommonMessages_pb2.py","m6/ctrader_proto/OpenApiModelMessages_pb2.py","m6/ctrader_proto/OpenApiMessages_pb2.py","m6/ctrader_proto/LICENSE_SPOTWARE_OPENAPIPY.txt","tools/requirements-m6-capture.txt")
 def main():
     missing=[x for x in FILES if not (ROOT/x).is_file()]
