@@ -1,0 +1,154 @@
+import json
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+from m6.c012_corrected_stage_a_runner import C012CorrectionInputPaths
+from m6.c012_corrected_stage_b_runner import (
+    AUTHORIZATION_REF,
+    CORRECTED_STAGE_A_RESULT_HASH,
+    CORRECTED_STAGE_B_REF,
+    HISTORICAL_STAGE_B_GIT_BLOB,
+    HISTORICAL_STAGE_B_REF,
+    _load_correction_authorization,
+    execute_corrected_c012_stage_b_in_memory,
+    git_blob_sha1,
+    verify_corrected_c012_stage_b_pre_economic,
+)
+from m6.stage_b_current_config_execute import _sha256_without_result_hash
+from m6.stage_b_current_config_tier1_runner import CurrentConfigExecutionNotAuthorized
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def load(rel):
+    return json.loads((ROOT / rel).read_text(encoding="utf-8"))
+
+
+class C012CorrectedStageBRecoveryTests(unittest.TestCase):
+    def test_01_pre_economic_authorities_bind_corrected_successor_without_pnl(self):
+        x = verify_corrected_c012_stage_b_pre_economic(ROOT)
+        self.assertEqual(x["candidate_id"], "V2-C012")
+        self.assertEqual(x["corrected_stage_a_result_hash"], CORRECTED_STAGE_A_RESULT_HASH)
+        self.assertEqual(x["corrected_intent_count"], 34)
+        self.assertFalse(x["economics_computed"])
+        self.assertFalse(x["new_v2_attempt_consumed"])
+        self.assertEqual(x["search_budget_decrement"], 0)
+
+    def test_02_historical_stage_b_v1_is_byte_preserved(self):
+        self.assertEqual(git_blob_sha1(ROOT / HISTORICAL_STAGE_B_REF), HISTORICAL_STAGE_B_GIT_BLOB)
+        old = load(HISTORICAL_STAGE_B_REF)
+        self.assertEqual(old["economic_summary"]["executed_trades"], 35)
+        self.assertEqual(old["result_sha256"], "51edfcc76693425a07c24962f7b3c060fa2e7bb127385233f28f4fc1233edcaa")
+
+    def test_03_authorization_binds_real_runner_and_exact_gate(self):
+        auth_path = ROOT / AUTHORIZATION_REF
+        auth = load(AUTHORIZATION_REF)
+        self.assertEqual(auth["runner_git_blob_sha1"], git_blob_sha1(ROOT / auth["runner_ref"]))
+        self.assertEqual(auth["corrected_stage_a_result_hash"], CORRECTED_STAGE_A_RESULT_HASH)
+        self.assertEqual(auth["corrected_intent_count"], 34)
+        self.assertFalse(auth["new_v2_attempt_consumed"])
+        self.assertEqual(auth["search_budget_decrement"], 0)
+        if auth["status"] == "AUTHORIZED_AFTER_EXACT_HEAD_GREEN":
+            loaded = _load_correction_authorization(
+                ROOT,
+                auth_path,
+                execution_head=auth["execution_gate_head"],
+                execution_ci_run_id=auth["execution_gate_ci_run_id"],
+            )
+            self.assertEqual(loaded["runner_git_blob_sha1"], auth["runner_git_blob_sha1"])
+        else:
+            self.assertEqual(auth["status"], "PENDING_EXACT_HEAD_GREEN")
+            with self.assertRaises(CurrentConfigExecutionNotAuthorized):
+                _load_correction_authorization(
+                    ROOT,
+                    auth_path,
+                    execution_head="not-authorized",
+                    execution_ci_run_id=0,
+                )
+
+    def test_04_real_execution_entry_reaches_authorization_before_economics(self):
+        auth = load(AUTHORIZATION_REF)
+        auth_path = ROOT / AUTHORIZATION_REF
+        missing = ROOT / "tests/fixtures/__c012_corrected_stage_b_must_not_read__.csv"
+        paths = C012CorrectionInputPaths(
+            us500_m15=missing,
+            nas100_m15=missing,
+            eurusd_m15=missing,
+            nas100_c012_transaction_local_cost=missing,
+        )
+        if auth["status"] != "AUTHORIZED_AFTER_EXACT_HEAD_GREEN":
+            names = (
+                "build_corrected_c012_pre_economic_candidate",
+                "realize_current_configuration_capital",
+                "summarize_current_config_realization",
+                "_augment_economic_detail",
+            )
+            ps = [
+                patch(
+                    f"m6.c012_corrected_stage_b_runner.{name}",
+                    side_effect=AssertionError(f"{name} must not be reached"),
+                )
+                for name in names
+            ]
+            mocks = [p.start() for p in ps]
+            try:
+                with self.assertRaises(CurrentConfigExecutionNotAuthorized):
+                    execute_corrected_c012_stage_b_in_memory(
+                        ROOT,
+                        paths,
+                        authorization_path=auth_path,
+                        execution_head="not-authorized",
+                        execution_ci_run_id=0,
+                    )
+                for m in mocks:
+                    m.assert_not_called()
+            finally:
+                for p in reversed(ps):
+                    p.stop()
+            return
+
+        class ReachedPostAuthorization(RuntimeError):
+            pass
+
+        with patch(
+            "m6.c012_corrected_stage_b_runner.build_corrected_c012_pre_economic_candidate",
+            side_effect=ReachedPostAuthorization("corrected Stage-B gate passed"),
+        ):
+            with self.assertRaisesRegex(ReachedPostAuthorization, "gate passed"):
+                execute_corrected_c012_stage_b_in_memory(
+                    ROOT,
+                    paths,
+                    authorization_path=auth_path,
+                    execution_head=auth["execution_gate_head"],
+                    execution_ci_run_id=auth["execution_gate_ci_run_id"],
+                )
+
+    def test_05_corrected_successor_lifecycle_is_append_only(self):
+        target = ROOT / CORRECTED_STAGE_B_REF
+        state = load("CURRENT_STATE.json")
+        downstream = state["current_result_authority"]["V2-C012"]["stage_b_current_config"]
+        if not target.exists():
+            self.assertIsNone(downstream.get("corrected_successor_ref"))
+            return
+        result = load(CORRECTED_STAGE_B_REF)
+        self.assertEqual(result["candidate_id"], "V2-C012")
+        self.assertEqual(result["execution_provenance"]["corrected_intent_count"], 34)
+        self.assertEqual(result["result_sha256"], _sha256_without_result_hash(result))
+        self.assertEqual(downstream.get("corrected_successor_ref"), CORRECTED_STAGE_B_REF)
+        self.assertEqual(downstream.get("corrected_successor_hash"), result["result_sha256"])
+        self.assertEqual(git_blob_sha1(ROOT / HISTORICAL_STAGE_B_REF), HISTORICAL_STAGE_B_GIT_BLOB)
+
+    def test_06_accounting_is_same_identity_no_attempt_or_budget_delta(self):
+        state = load("CURRENT_STATE.json")
+        self.assertEqual(state["v2_attempts_used"], 9)
+        self.assertEqual(state["v2_evaluated_identities"], 9)
+        self.assertEqual(state["v2_search_budget_remaining"], 75)
+        self.assertFalse(state["protected_evidence_opened"])
+        correction = state["c012_same_identity_corrected_rerun"]
+        self.assertFalse(correction["new_v2_attempt_consumed"])
+        self.assertEqual(correction["search_budget_decrement"], 0)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
