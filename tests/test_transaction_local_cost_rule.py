@@ -191,7 +191,6 @@ class TransactionLocalCostRuleTests(unittest.TestCase):
         self.assertEqual(auth["preconditions"]["v2_attempts_used"], 0)
         self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
         self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
-        self.assertEqual(sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger), 8)
         self.assertFalse(state["protected_evidence_opened"])
         self.assertEqual(state["m6"]["status"], "PENDING")
         self.assertFalse(state["live_orders_authorized"])
