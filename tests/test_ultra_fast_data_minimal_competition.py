@@ -412,7 +412,7 @@ class UltraFastConversionTailIntegrityTests(unittest.TestCase):
 
     def test_21_accounting_and_protection_remain_unchanged(self):
         s=json.loads((ROOT/"CURRENT_STATE.json").read_text())
-        self.assertEqual(s["v2_search_budget"],84);self.assertEqual(s["v2_evaluated_identities"],2);self.assertEqual(s["v2_attempts_used"],2)
+        self.assertEqual(s["v2_search_budget"],84);self.assertEqual(s["v2_evaluated_identities"],6);self.assertEqual(s["v2_attempts_used"],6);self.assertEqual(s["v2_search_budget_remaining"],78)
         self.assertFalse(s["protected_evidence_opened"]);self.assertFalse(s["live_orders_authorized"]);self.assertFalse(s["competition_start_authorized"])
 
 
