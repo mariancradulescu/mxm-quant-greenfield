@@ -9,16 +9,16 @@
     "V2-C006",
     "V2-C012"
   ],
-  "economic_outcomes_opened": 4,
-  "global_attempts_seen": 16,
+  "economic_outcomes_opened": 8,
+  "global_attempts_seen": 22,
   "integrity_correction_02_test_result_authority": "tests/PRE_M6_INTEGRITY_CORRECTION_02_TEST_RESULTS.json",
   "latest_economic_outcome": {
-    "candidate_id": "V2-C012",
+    "candidate_id": "V2-C020",
     "stage": "A",
-    "status": "DISCOVERY_SURVIVOR",
-    "result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
-    "result_ref": "discovery/results/V2-C012_STAGE_A_V1.json",
-    "recorded_utc": "2026-09-20T09:31:59Z"
+    "status": "GROSS_EDGE_FAIL",
+    "result_hash": "28b9fac70c1b39e7d782103324327c5c6249452868293c5a9bcc4fa137a7b8c2",
+    "result_ref": "discovery/results/V2-C020_STAGE_A_V1.json",
+    "recorded_utc": "2026-09-22T10:44:14Z"
   },
   "legacy_prior_attempts": 16,
   "live_orders_authorized": false,
@@ -516,9 +516,9 @@
       "competition_start": false
     }
   },
-  "next_action": "REQUIRE EXACT-HEAD FULL-SUITE CI FOR THE FROZEN C017-C022 WAVE; IF PASS, EXECUTE THE FIRST REAL 13-WEEK ECONOMIC WAVE ON THE ACCEPTED V6 CAPTURE; OPEN NO PROTECTED EVIDENCE.",
+  "next_action": "RUN COMPLETE EXACT-HEAD FULL-SUITE CI FOR THE PARTIAL WAVE AUTHORITY RECONCILIATION; REQUIRE SUCCESS/0 FAIL; ONLY THEN EXECUTE FROZEN C021/C022 WITHOUT RETUNING OR DATA CHANGES.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "COMPETITION_PERFORMANCE_EXPANSION_WAVE_01_FROZEN_PENDING_EXACT_HEAD_CI",
+  "phase": "COMPETITION_ULTRA_FAST_WAVE_01_PARTIAL_C017_C020_RECORDED_C021_C022_UNOPENED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -619,10 +619,10 @@
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
-  "structural_only_since_previous_economic_outcome": true,
+  "structural_only_since_previous_economic_outcome": false,
   "user_action_required": false,
-  "v2_attempts_used": 2,
-  "v2_evaluated_identities": 2,
+  "v2_attempts_used": 6,
+  "v2_evaluated_identities": 6,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
   "v2_search_budget": 84,
   "future_wave_opportunity_coverage_authority": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
@@ -680,7 +680,7 @@
   "m6_stage_a_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_a_execution_authorization_authority": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
   "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
-  "v2_search_budget_remaining": 82,
+  "v2_search_budget_remaining": 78,
   "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
@@ -704,8 +704,8 @@
   "m6_stage_b_current_config_reporting_policy": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
   "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
   "current_config_stage_b_outcomes_opened": 2,
-  "discovery_ledger_entries": 26,
-  "discovery_result_recorded_entries": 2,
+  "discovery_ledger_entries": 36,
+  "discovery_result_recorded_entries": 6,
   "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
   "historical_margin_blocks_current_operational_work": false,
   "post_stage_b_final_closure_independent_audit_authority": "data/POST_STAGE_B_FINAL_CLOSURE_INDEPENDENT_AUDIT_V1.json",
@@ -738,7 +738,9 @@
     "discovery_result_recorded_entries": 2,
     "protected_evidence_opened": false,
     "live_orders": false,
-    "competition_start": false
+    "competition_start": false,
+    "accounting_snapshot_scope": "HISTORICAL_BEFORE_ULTRA_FAST_C017_C020_OUTCOMES",
+    "current_accounting_superseded_by": "competition_ultra_fast_economic_wave"
   },
   "active_competition_performance_authority": "COMPETITION_PERFORMANCE_AUTHORITY_V1.json",
   "active_broker_native_competition_universe_authority": "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
@@ -842,7 +844,8 @@
   "active_competition_stage_a_cost_authority": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
   "active_competition_economic_wave": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_01_V1.json",
   "competition_ultra_fast_economic_wave": {
-    "status": "C017_C022_FROZEN_PRE_OUTCOME_PENDING_EXACT_HEAD_CI",
+    "status": "C017_C020_RECORDED_C021_C022_UNOPENED",
+    "frozen_wave_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_01_V1.json",
     "capture_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
     "candidate_ids": [
       "V2-C017",
@@ -852,14 +855,33 @@
       "V2-C021",
       "V2-C022"
     ],
+    "opened_candidate_ids": [
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020"
+    ],
+    "unopened_candidate_ids": [
+      "V2-C021",
+      "V2-C022"
+    ],
     "frozen_identity_count": 6,
-    "evaluated_new_identities": 0,
-    "new_attempts_consumed": 0,
-    "v2_attempts_used_before_execution": 2,
-    "v2_search_budget_remaining_before_execution": 82,
+    "evaluated_new_identities": 4,
+    "new_attempts_consumed": 4,
+    "v2_attempts_used": 6,
+    "v2_search_budget_remaining": 78,
+    "economic_outcomes_opened_total": 8,
+    "ledger_entries": 36,
+    "result_recorded_entries": 6,
+    "pre_outcome_gate": {
+      "head_sha": "ad072b5929479d4215c07924534a098ec4b176f0",
+      "workflow_run_id": 35716960856,
+      "conclusion": "SUCCESS"
+    },
     "protected_evidence_opened": false,
     "live_orders": false,
     "competition_start": false,
-    "exact_next_action": "REQUIRE_EXACT_HEAD_FULL_SUITE_CI_SUCCESS_THEN_EXECUTE_FROZEN_C017_C022_ON_ACCEPTED_V6_CAPTURE"
-  }
+    "exact_next_action": "RUN_EXACT_HEAD_FULL_SUITE_AND_REQUIRE_SUCCESS_BEFORE_EXECUTING_FROZEN_C021_C022"
+  },
+  "competition_ultra_fast_execution_progress_authority": "data/COMPETITION_ULTRA_FAST_WAVE_01_EXECUTION_PROGRESS_V1.json"
 }
