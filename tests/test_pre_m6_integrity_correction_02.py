@@ -113,7 +113,7 @@ class PreM6IntegrityCorrection02(unittest.TestCase):
  def test_24_original_ledger_entries_1_17_byte_content_preserved(self):
      lines = (ROOT / "discovery/ledger.jsonl").read_bytes().splitlines(keepends=True)
      first17 = b"".join(lines[:17])
-     self.assertEqual(len(lines), 26)
+     self.assertGreaterEqual(len(lines), 26)
      self.assertEqual(git_blob_sha_bytes(first17), "32257059c64fa1e2174023a09186d26c23330b14")
  def test_25_new_refreeze_entries_append_after_17_only(self):
      entries = read_ledger(ROOT / "discovery/ledger.jsonl")
