@@ -1,0 +1,120 @@
+{
+  "schema": "mxm.greenfield.v2.competition-frontier-wave-01.v1",
+  "wave_id": "BROKER_NATIVE_COMPETITION_WAVE_01",
+  "status": "FROZEN_STRUCTURAL_FRONTIER_NO_ECONOMIC_OUTCOME",
+  "recorded_utc": "2026-09-22T01:42:00Z",
+  "selection_basis": [
+    "CURRENT_ACCOUNT_NATIVE_EUR200_MIN_VOLUME_FEASIBILITY",
+    "BROAD_TIME_COVERAGE",
+    "MULTIPLE_MARKET_DRIVERS",
+    "NATURAL_OPPORTUNITY_DENSITY",
+    "SESSION_COMPLEMENTARITY",
+    "COST_FEASIBILITY_CAN_BE_ESTABLISHED_CAUSALLY",
+    "SELECTION_NOT_DEFINED_BY_EXISTING_HISTORICAL_FILE_AVAILABILITY"
+  ],
+  "selected_traded_markets": [
+    {
+      "canonical": "AUDJPY",
+      "broker_symbol": "AUDJPY",
+      "symbol_id": 11,
+      "asset_class": "FX",
+      "current_margin_percent_eur200": 15.51,
+      "structural_role": "ASIA_EUROPE_US_MULTI_SESSION_FX_OPPORTUNITY_SURFACE",
+      "development_data_already_available": [
+        "D1 2022-01-03 through 2026-09-15",
+        "EURJPY M15 causal conversion series"
+      ],
+      "development_data_required": [
+        "AUDJPY M15 2022-01-03 through 2026-09-16",
+        "candidate-independent transaction-local BID/ASK cost evidence for prospective entry/exit boundaries"
+      ],
+      "why": "Adds an FX driver and broad multi-session coverage at moderate minimum-volume margin."
+    },
+    {
+      "canonical": "WTIUSD",
+      "broker_symbol": "SpotCrude",
+      "symbol_id": 250,
+      "asset_class": "ENERGY",
+      "current_margin_percent_eur200": 4.365,
+      "structural_role": "NEAR_23H_X5_ENERGY_OPPORTUNITY_SURFACE",
+      "development_data_already_available": [
+        "SpotCrude/WTIUSD H1 2022-01-03 through 2026-09-16",
+        "EURUSD M15 causal conversion series"
+      ],
+      "development_data_required": [
+        "SpotCrude M15 2022-01-03 through 2026-09-16",
+        "candidate-independent transaction-local BID/ASK cost evidence for prospective entry/exit boundaries"
+      ],
+      "why": "Adds an energy driver, broad weekday coverage, and low current minimum-volume margin consumption."
+    },
+    {
+      "canonical": "XAUUSD",
+      "broker_symbol": "XAUUSD",
+      "symbol_id": 41,
+      "asset_class": "METALS",
+      "current_margin_percent_eur200": 95.655,
+      "structural_role": "NEAR_23H_X5_METAL_OPPORTUNITY_SURFACE_WITH_CAPITAL_EFFICIENCY_WATCH",
+      "development_data_already_available": [
+        "XAUUSD H4 2022-01-03 through 2026-09-16",
+        "EURUSD M15 causal conversion series"
+      ],
+      "development_data_required": [
+        "XAUUSD M15 2022-01-03 through 2026-09-16",
+        "candidate-independent transaction-local BID/ASK cost evidence for prospective entry/exit boundaries"
+      ],
+      "why": "Adds a distinct metal driver and broad weekday coverage; it remains technically feasible but high margin consumption must be tested in shared-capital replay rather than hidden by an arbitrary margin cap."
+    }
+  ],
+  "explicit_nonselection": {
+    "BTCUSD": "CURRENT_MINIMUM_VOLUME_MARGIN_EXCEEDS_EUR200; do not synthesize a smaller volume.",
+    "US500_NAS100": "Existing baseline and frozen C013-C016 remain available as later portfolio/context components, but the first new competition frontier deliberately does not create more index-only variants.",
+    "STANDARD_US_SHARES": "Technically feasible examples exist, but intraday candidate-independent cost/commission evidence and limited cash-session coverage make them a later frontier, not the first broad-time-coverage wave.",
+    "EXTENDED_HOURS_SHARES_AND_OTHER_SYMBOLS": "Persisted accepted evidence lacks exhaustive minimum-volume ExpectedMargin; keep unresolved until the one generic broker-universe capture closes this current-fact gap."
+  },
+  "resolution_decision": {
+    "first_screen_resolution": "M15",
+    "universal_resolution_law": false,
+    "why": "M15 is chosen only for this first frontier to obtain competition-relevant opportunity density across broad sessions while avoiding an immediate M1/M5 noise/cost burden. Existing D1/H1/H4 data are too coarse for the first density screen.",
+    "future_M1_M5_H1_or_other_resolution_allowed": true
+  },
+  "prospective_mechanism_scope": {
+    "AUDJPY": [
+      "SEASONALITY_SESSION_TIME",
+      "BREAKOUT_VOLATILITY_EXPANSION"
+    ],
+    "WTIUSD": [
+      "BREAKOUT_VOLATILITY_EXPANSION",
+      "TREND_MOMENTUM"
+    ],
+    "XAUUSD": [
+      "TREND_MOMENTUM",
+      "MEAN_REVERSION",
+      "SEASONALITY_SESSION_TIME"
+    ],
+    "rule": "This is a bounded mechanism pool, not a parameter grid. Exact economic identities must be prospectively frozen before their first outcomes are opened."
+  },
+  "first_economic_wave_identity_budget": {
+    "maximum_new_identities": 4,
+    "purpose": "Broad first-pass information gathering across distinct market/mechanism contexts, not threshold/lookback spam.",
+    "all_count_against_v2_budget_when_outcome_opened": true
+  },
+  "data_acquisition_after_audit": {
+    "one_bounded_action": true,
+    "acquire_only_missing_development_market_and_cost_data": true,
+    "protected_boundary_excluded": true,
+    "then_freeze_exact_identities_and_execute_without_another_preparation_only_checkpoint": true
+  },
+  "competition_relevance_contract": {
+    "authority_ref": "COMPETITION_PERFORMANCE_AUTHORITY_V1.json",
+    "edge_state_separate": true,
+    "early_shared_eur200_replay_required_for_edge_pass_components": true,
+    "hard21_opportunity_accounting_required": true
+  },
+  "C013_C016": {
+    "status": "UNCHANGED_UNOPENED_OPTIONAL_LATER_FRONTIER_MEMBERS",
+    "execute_in_wave_01": false
+  },
+  "economic_outcomes_opened": 0,
+  "v2_attempts_consumed": 0,
+  "protected_evidence_opened": false
+}
