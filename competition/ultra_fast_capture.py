@@ -392,6 +392,17 @@ def validate_capture_postconditions(*,plan,friction_results,selection,series,bun
             raise ImplementationInvalid(f"selected Stage-A market below minimum rows {symbol}")
         if record["row_count"]!=inspected["row_count"] or record["sha256"]!=inspected["sha256"]:
             raise ImplementationInvalid(f"Stage-A manifest/hash mismatch {symbol}")
+        pagination=record.get("pagination") or {}
+        if pagination.get("request_interval_exhausted") is not True:
+            raise ImplementationInvalid(f"Stage-A interval completeness missing {symbol}")
+        if pagination.get("completion_reason") not in STAGE_COMPLETION_REASONS:
+            raise ImplementationInvalid(f"Stage-A pagination completion reason invalid {symbol}")
+        if pagination.get("normalized_unique_completed_bars")!=record["row_count"]:
+            raise ImplementationInvalid(f"Stage-A pagination unique-bar count mismatch {symbol}")
+        if pagination.get("conflicts")!=0:
+            raise ImplementationInvalid(f"Stage-A pagination conflicts nonzero {symbol}")
+        if pagination.get("first_timestamp_utc")!=record["first_timestamp_utc"] or pagination.get("last_timestamp_utc")!=record["last_timestamp_utc"]:
+            raise ImplementationInvalid(f"Stage-A pagination boundary metadata mismatch {symbol}")
 
     if final and manifest.get("status")!="COMPACT_FRICTION_AND_STAGE_A_DEVELOPMENT_CAPTURE_COMPLETE":
         raise ImplementationInvalid("non-empty Stage-A bundle has wrong completion status")
