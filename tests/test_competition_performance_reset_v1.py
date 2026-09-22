@@ -14,6 +14,7 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
         self.assertEqual(a["reset_effect"]["economic_outcomes_opened"],0)
         self.assertEqual(a["reset_effect"]["v2_attempts_consumed"],0)
         self.assertFalse(a["reset_effect"]["protected_evidence_opened"])
+        self.assertEqual(a["competition_objective"]["hard21"],">=21 ACTUALLY EXECUTED entry trades in EVERY certified UTC ISO competition week")
 
     def test_universe_is_fail_closed(self):
         u=json.loads((ROOT/"data"/"BROKER_NATIVE_COMPETITION_UNIVERSE_V1.json").read_text())
