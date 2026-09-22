@@ -7,7 +7,7 @@ from m6.pydroid_oauth import ACCOUNT_SELECTION_PATH,choose_live_account_locally,
 from .broker_universe_capture import BrokerUniverseCaptureRunner
 
 ROOT=Path(__file__).resolve().parents[1]
-ALLOWED=frozenset({"ProtoOAApplicationAuthReq","ProtoOAGetAccountListByAccessTokenReq","ProtoOAAccountAuthReq","ProtoOATraderReq","ProtoOAAssetListReq","ProtoOAAssetClassListReq","ProtoOASymbolCategoryListReq","ProtoOASymbolsListReq","ProtoOASymbolByIdReq","ProtoOAExpectedMarginReq","ProtoOAGetDynamicLeverageByIDReq"})
+ALLOWED=frozenset({"ProtoOAApplicationAuthReq","ProtoOAGetAccountListByAccessTokenReq","ProtoOAAccountAuthReq","ProtoOATraderReq","ProtoOAAssetListReq","ProtoOAAssetClassListReq","ProtoOASymbolCategoryListReq","ProtoOASymbolsListReq","ProtoOASymbolByIdReq","ProtoOAExpectedMarginReq","ProtoOAGetDynamicLeverageByIDReq","ProtoOAMarginCallListReq"})
 
 def local_preflight():
     for name in ALLOWED:require_read_only_request(name)
