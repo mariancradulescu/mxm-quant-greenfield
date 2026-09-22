@@ -33,7 +33,7 @@ class UltraFastWave02PostOutcomeTests(unittest.TestCase):
  def test_04_completion_is_no_survivor_with_natural_hard21(self):
   c=load('data/COMPETITION_ULTRA_FAST_WAVE_02_COMPLETION_V1.json');self.assertEqual(c['status'],'COMPLETE_NO_STAGE_A_SURVIVOR');self.assertEqual(c['promotion']['stage_a_survivor_ids'],[]);self.assertEqual(c['promotion']["stage_b_26_week_extension_ids"],[])
   h=c['natural_hard21'];self.assertEqual(h['weeks_ge_21'],13);self.assertEqual(h['weeks_lt_21'],0);self.assertGreaterEqual(h['minimum_entries_week'],21)
-  x=c['stage_a_results'][CID];self.assertEqual(x['result_hash'],RESULT_HASH);self.assertAlmostEqual(x['gross_pnl'],-86.67661227016303);self.assertAlmostEqual(x['transaction_cost_eur'],112.35157779178611);self.assertAlmostEqual(x['coarse_net_pnl'],-199.02819006194892)
+  x=c['stage_a_results'][CID];self.assertEqual(x['result_hash'],RESULT_HASH);self.assertAlmostEqual(x['gross_pnl_eur'],-86.67661227016303);self.assertAlmostEqual(x['transaction_cost_eur'],112.35157779178611);self.assertAlmostEqual(x['coarse_net_pnl_eur'],-199.02819006194892)
  def test_05_live_accounting_is_repository_derived_after_later_corrections(self):
   d=assert_current_state_matches_repository(ROOT);s=load('CURRENT_STATE.json')
   self.assertIn(CID,d['evaluated_candidate_ids']);self.assertEqual(d['latest_economic_outcome']['candidate_id'],CID);self.assertEqual(d['latest_economic_outcome']['result_hash'],RESULT_HASH)
