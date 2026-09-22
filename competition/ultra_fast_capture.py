@@ -184,15 +184,33 @@ class UltraFastCaptureRunner:
         for i,c in enumerate(self.plan["shortlist"],1):
             m=self._friction(aid,c,full[c["symbol_id"]],assets);fr.append(m);self.progress(f"[FRICTION {i}/32] {c['broker_symbol']} {m['friction_state']} coverage={m['two_sided_window_coverage']:.0%}")
         initial,alternates=select_stage_a(fr,self.protocol["selection_law"]);self.progress(f"[3/5] selector admitted {len(initial)}/12 initial markets")
-        ranked=sorted([x for x in fr if x["friction_state"] in {"FRICTION_PASS","FRICTION_WATCH"}],key=_rank);queue=initial+[x for x in ranked if x not in initial];chosen=[];series=[];repl=[];used=set();minrows=self.plan["capture_law"]["min_stage_a_m5_rows"]
-        for c in queue:
-            if len(chosen)>=12:break
-            if c["broker_symbol"] in used or (c["friction_state"]=="FRICTION_WATCH" and float(c.get("movement_to_p75_spread") or 0)<2):continue
+        ranked=sorted([x for x in fr if x["friction_state"] in {"FRICTION_PASS","FRICTION_WATCH"}],key=_rank)
+        chosen=[];series=[];repl=[];used=set();counts=defaultdict(int);minrows=self.plan["capture_law"]["min_stage_a_m5_rows"]
+        target_counts=defaultdict(int)
+        for x in initial:target_counts[x["family"]]+=1
+        def try_capture(c):
+            if c["broker_symbol"] in used:return False
+            if c["friction_state"]=="FRICTION_WATCH" and float(c.get("movement_to_p75_spread") or 0)<2:return False
             try:
                 rows=self._stage_rows(aid,c,full[c["symbol_id"]])
                 if len(rows)<minrows:raise CaptureContractError(f"only {len(rows)} M5 rows < {minrows}")
-                series.append(self._write_rows(c,rows));chosen.append(c);used.add(c["broker_symbol"]);self.progress(f"[STAGE-A {len(chosen)}/12] {c['broker_symbol']} rows={len(rows):,}")
-            except Exception as e:used.add(c["broker_symbol"]);repl.append({"broker_symbol":c["broker_symbol"],"family":c["family"],"reason":redact_text(str(e)),"alpha_consulted":False})
+                series.append(self._write_rows(c,rows));chosen.append(c);used.add(c["broker_symbol"]);counts[c["family"]]+=1
+                self.progress(f"[STAGE-A {len(chosen)}/12] {c['broker_symbol']} rows={len(rows):,}")
+                return True
+            except Exception as e:
+                used.add(c["broker_symbol"]);repl.append({"broker_symbol":c["broker_symbol"],"family":c["family"],"reason":redact_text(str(e)),"alpha_consulted":False})
+                return False
+        for c in initial:
+            try_capture(c)
+        for c in ranked:
+            if len(chosen)>=12:break
+            if counts[c["family"]]>=target_counts[c["family"]]:continue
+            try_capture(c)
+        if len(chosen)<12:
+            for c in ranked:
+                if len(chosen)>=12:break
+                if c["friction_state"]!="FRICTION_PASS" or counts[c["family"]]>=4:continue
+                try_capture(c)
         self.progress("[4/5] compact evidence only");atomic_write_json(self.bundle/"friction_summary.json",{"schema":"mxm.greenfield.v2.ultra-fast-friction-summary.v1","raw_ticks_transferred":False,"source_weeks":"2026-W34..2026-W37","results":fr});atomic_write_json(self.bundle/"selection.json",{"schema":"mxm.greenfield.v2.ultra-fast-stage-a-selection.v1","initial_selected":[x["broker_symbol"] for x in initial],"final_selected":[x["broker_symbol"] for x in chosen],"alternates":alternates,"data_availability_replacements":repl,"alpha_outcomes_used":False,"user_manual_replacements":False})
         atomic_write_json(self.bundle/"capture_manifest.json",{"schema":"mxm.greenfield.v2.ultra-fast-stage-a-capture-bundle.v1","status":"COMPACT_FRICTION_AND_STAGE_A_DEVELOPMENT_CAPTURE_COMPLETE","captured_utc":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"tool_version":TOOL_VERSION,"plan_sha256":EXPECTED_PLAN_SHA,"source_broker_universe_zip_sha256":self.plan["source_broker_universe_zip_sha256"],"account_fingerprint_sha256":self.plan["account_fingerprint_sha256"],"source_environment":self.plan["source_environment"],"friction_shortlist_count":len(fr),"stage_a_selected_count":len(chosen),"stage_a_interval":self.plan["stage_a_interval"],"latest_4_week_diagnostic":self.plan["latest_4_week_diagnostic"],"series":series,"historical_requests":self._requests,"raw_ticks_transferred":False,"orders_placed":False,"account_mutation":False,"protected_evidence_opened":False,"economic_outcomes_opened":0,"v2_attempts_consumed":0})
         checks=[f"{_sha(p)}  {p.relative_to(self.bundle).as_posix()}" for p in sorted(x for x in self.bundle.rglob("*") if x.is_file() and x.name!="CHECKSUMS.sha256")];(self.bundle/"CHECKSUMS.sha256").write_text("\n".join(checks)+"\n",encoding="utf-8");scan_bundle_for_secrets(self.bundle,[self.client_secret,self.access_token]);self.progress("[5/5] deterministic phone-friendly ZIP")
