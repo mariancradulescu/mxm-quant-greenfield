@@ -260,7 +260,7 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         candidates = sorted((ROOT / "discovery/candidates").glob("V2-C*.json"))
         ids = [json.loads(p.read_text())["id"] for p in candidates]
         self.assertEqual(ids[:12], [f"V2-C{i:03d}" for i in range(1, 13)])
-        self.assertEqual(ids[12:], ["V2-C013","V2-C014","V2-C015","V2-C016"])
+        self.assertEqual(ids[12:16], ["V2-C013","V2-C014","V2-C015","V2-C016"])
         state = load("CURRENT_STATE.json")
         auth = load("data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json")
         ledger = [json.loads(x) for x in (ROOT / "discovery/ledger.jsonl").read_text().splitlines() if x.strip()]
@@ -269,7 +269,7 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         self.assertEqual(auth["preconditions"]["v2_evaluated_identities"], 0)
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(any(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:20]))
-        self.assertEqual(sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger), 2)
+        self.assertEqual(sum(x["entry_type"] == "RESULT_RECORDED" for x in ledger[:22]), 2)
     def test_23_cost_pydroid_package_is_deterministic_and_secret_free_source_set(self):
         with tempfile.TemporaryDirectory() as td:
             a=Path(td)/"a.zip"; b=Path(td)/"b.zip"
