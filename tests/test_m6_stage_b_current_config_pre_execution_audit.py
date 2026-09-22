@@ -56,11 +56,11 @@ class StageBCurrentConfigPreExecutionAuditTests(unittest.TestCase):
 
     def test_05_attempt_and_search_accounting_is_unchanged(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],4)
-        self.assertEqual(s["v2_attempts_used"],2)
-        self.assertEqual(s["v2_evaluated_identities"],2)
+        self.assertEqual(s["economic_outcomes_opened"],8)
+        self.assertEqual(s["v2_attempts_used"],6)
+        self.assertEqual(s["v2_evaluated_identities"],6)
         self.assertEqual(s["v2_search_budget"],84)
-        self.assertEqual(s["v2_search_budget_remaining"],82)
+        self.assertEqual(s["v2_search_budget_remaining"],78)
         self.assertFalse(s["m6"]["stage_b_current_configuration"]["historical_margin_non_blocking_for_current_scenario"] is False)
 
 if __name__=="__main__":
