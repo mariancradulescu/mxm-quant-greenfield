@@ -97,7 +97,8 @@ class FakeMarketTransport:
                 return SimpleNamespace(trendbar=[bar_at(start),bar_at(start+5*60*1000)],hasMore=False)
             start_ms=int(uf._ms(uf._utc(self.plan["stage_a_interval"]["start_utc"])))
             rows=[bar_at(start_ms+i*5*60*1000) for i in range(600)]
-            return SimpleNamespace(trendbar=rows,hasMore=False)\n        raise AssertionError(f"unexpected fake request {name}")
+            return SimpleNamespace(trendbar=rows,hasMore=False)
+        raise AssertionError(f"unexpected fake request {name}")
 
 
 class UltraFastConversionTailIntegrityTests(unittest.TestCase):
