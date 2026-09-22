@@ -271,19 +271,16 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
                 payload = b"\n".join(zf.read(x) for x in names)
                 self.assertNotIn(b"MXM_TEST_REAL_SECRET_VALUE", payload)
 
-    def test_18_stage_a_results_attempts_unchanged_while_live_outcome_total_is_four(self):
-        state = load("CURRENT_STATE.json")
-        self.assertEqual(state["economic_outcomes_opened"], 10)
-        self.assertEqual(state["v2_attempts_used"], 8)
-        self.assertEqual(state["v2_evaluated_identities"], 8)
-        self.assertEqual(state["v2_search_budget"], 84)
-        self.assertEqual(state["v2_search_budget_remaining"], 76)
+    def test_18_stage_a_historical_results_are_immutable_snapshot_evidence(self):
+        acceptance = load("data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json")
+        self.assertEqual(acceptance["accounting"]["v2_attempts_consumed"], 2)
+        self.assertEqual(acceptance["accounting"]["search_budget_remaining"], 82)
         self.assertEqual(
-            state["m6"]["first_stage_a_runner"]["result_hashes"]["V2-C006"],
+            acceptance["results"]["V2-C006"]["result_hash"],
             "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
         )
         self.assertEqual(
-            state["m6"]["first_stage_a_runner"]["result_hashes"]["V2-C012"],
+            acceptance["results"]["V2-C012"]["result_hash"],
             "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
         )
 
