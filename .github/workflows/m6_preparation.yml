@@ -67,14 +67,14 @@ jobs:
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
           from competition.pydroid_broker_universe_launcher import local_preflight
-          from competition.broker_universe_capture import classify_margin
+          from competition.broker_universe_capture import FEASIBLE,INFEASIBLE,UNRESOLVED,classify_direction,directional_summary
           report = local_preflight()
           assert report["network_connection_attempted"] is False, report
           assert report["credentials_used"] is False, report
           assert report["orders_permitted"] is False, report
           assert report["account_mutation_permitted"] is False, report
-          assert classify_margin(199.0, 200.0) == "EUR200_MIN_VOLUME_FEASIBLE"
-          assert classify_margin(201.0, 10.0) == "EUR200_MIN_VOLUME_INFEASIBLE"
+          assert classify_direction(199.0, True) == FEASIBLE
+          assert classify_direction(201.0, True) == INFEASIBLE\n          assert classify_direction(10.0, False) == INFEASIBLE\n          assert classify_direction(None, True) == UNRESOLVED\n          assert directional_summary(FEASIBLE, INFEASIBLE) == "BUY_ONLY"
           print("COMPETITION_BROKER_UNIVERSE_PREFLIGHT_PASS", report)
           PY
       - name: Full repository unittest suite on Python 3.13
@@ -129,11 +129,11 @@ jobs:
       - name: Build deterministic competition broker-universe capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_competition_broker_universe_capture_package.py
-          sha256sum dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V1.zip
+          sha256sum dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2.zip
       - name: Upload competition broker-universe capture package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V1
-          path: dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V1.zip
+          name: MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2
+          path: dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2.zip
           if-no-files-found: error
           retention-days: 30
