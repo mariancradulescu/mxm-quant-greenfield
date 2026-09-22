@@ -3,12 +3,12 @@ from __future__ import annotations
 import hashlib,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-TARGET=ROOT/"dist"/"MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5.zip"
+TARGET=ROOT/"dist"/"MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V6.zip"
 FILES=(
 "COMPETITION_ULTRA_FAST_CAPTURE_RUN.py",
 "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json","data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json",
-"data/COMPETITION_ANDROID_TRENDBAR_PAGINATION_CORRECTION_V1.json","data/COMPETITION_ANDROID_HISTORICAL_RATE_LIMIT_CORRECTION_V1.json",
-"evidence/REAL_ANDROID_ULTRA_FAST_V3_TRENDBAR_PAGINATION_FAILURE_V1.json","evidence/REAL_ANDROID_ULTRA_FAST_V4_RATE_LIMIT_FAILURE_V1.json",
+"data/COMPETITION_ANDROID_TRENDBAR_PAGINATION_CORRECTION_V1.json","data/COMPETITION_ANDROID_HISTORICAL_RATE_LIMIT_CORRECTION_V1.json","data/COMPETITION_ANDROID_STAGE_A_BOUNDARY_CORRECTION_V1.json",
+"evidence/REAL_ANDROID_ULTRA_FAST_V3_TRENDBAR_PAGINATION_FAILURE_V1.json","evidence/REAL_ANDROID_ULTRA_FAST_V4_RATE_LIMIT_FAILURE_V1.json","evidence/REAL_ANDROID_ULTRA_FAST_V5_STAGE_A_BOUNDARY_FAILURE_V1.json",
 "competition/__init__.py","competition/ultra_fast_capture.py","competition/friction_costs.py","competition/pydroid_ultra_fast_launcher.py","competition/frontier_data_capture.py",
 "m6/__init__.py","m6/_ctrader_capture_base.py","m6/ctrader_capture.py","m6/ctrader_transport.py","m6/pydroid_oauth.py","m6/cost_evidence.py",
 "m6/ctrader_proto/__init__.py","m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py","m6/ctrader_proto/OpenApiCommonMessages_pb2.py",
