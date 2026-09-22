@@ -1,0 +1,232 @@
+{
+  "schema": "mxm.greenfield.v2.broker-native-competition-universe.v1",
+  "status": "CURRENT_ACCOUNT_NATIVE_LOWER_BOUND_WITH_ONE_EXHAUSTIVE_CAPTURE_PATH_PENDING",
+  "recorded_utc": "2026-09-22T01:42:00Z",
+  "starting_equity_eur": 200,
+  "source_authority": {
+    "accepted_capture_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "accepted_reconciled_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+    "capture_timestamp_utc": "2026-09-18T07:09:39.435493Z",
+    "environment": "Pepperstone - Europe LIVE",
+    "structural_derivative_ref": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+    "library_reuse_filename": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+    "recomputed_bundle_sha256_match": true
+  },
+  "scope": {
+    "full_account_universe_claimed": false,
+    "reason": "The accepted capture queried the complete current light-symbol list but persisted full metadata only for symbols selected by the earlier structural-relevance filter. The persisted catalog therefore cannot defensibly prove the exhaustive account-native symbol count.",
+    "persisted_relevant_current_products": 158,
+    "persisted_enabled_products": 49,
+    "confirmed_current_tradable_products_with_full_metadata": 47,
+    "confirmed_accessible_symbol_lower_bound": 47,
+    "exhaustive_current_accessible_symbol_count": null,
+    "economic_outcomes_opened_by_this_artifact": 0,
+    "v2_attempts_consumed_by_this_artifact": 0,
+    "protected_evidence_opened": false
+  },
+  "classification_law": {
+    "EUR200_MIN_VOLUME_FEASIBLE": "Both broker-native current BUY and SELL ExpectedMargin at the exact broker minimum executable volume are <= EUR200.",
+    "EUR200_MIN_VOLUME_INFEASIBLE": "At least one broker-native current BUY or SELL ExpectedMargin at the exact broker minimum executable volume is > EUR200.",
+    "BROKER_OR_MARGIN_UNRESOLVED": "Current tradability or broker-native minimum-volume ExpectedMargin is not fully established in persisted evidence.",
+    "synthetic_subminimum_volume_forbidden": true,
+    "arbitrary_margin_cap_forbidden": true,
+    "current_margin_not_historical_margin": true
+  },
+  "persisted_enabled_subset_summary": {
+    "count": 49,
+    "eur200_min_volume_feasible": 10,
+    "eur200_min_volume_infeasible": 1,
+    "broker_or_margin_unresolved": 38,
+    "confirmed_tradable_margin_unresolved": 36,
+    "non_normal_trading_mode_unresolved": 2,
+    "asset_class_distribution_confirmed_tradable": {
+      "Metals (Spot)": 6,
+      "Energies (Spot)": 4,
+      "US Equities": 14,
+      "Forwards - Commodities": 3,
+      "Perpetual Index": 2,
+      "Perpetual Commodity": 3,
+      "Forwards - Indices": 2,
+      "Crypto Currency (Spot)": 4,
+      "Forex (Spot)": 1,
+      "Indices (Spot)": 2,
+      "Perpetual Stock": 1,
+      "ETFs": 3,
+      "GB Equities": 1,
+      "AU Equities": 1
+    },
+    "feasible_margin_percent_eur200_distribution": {
+      "count": 10,
+      "min": 1.91,
+      "median": 5.155,
+      "mean": 21.4055,
+      "max": 95.655
+    }
+  },
+  "resolved_minimum_margin_records": [
+    {
+      "broker_symbol": "XAUUSD",
+      "symbol_id": 41,
+      "asset_class": "Metals (Spot)",
+      "min_volume_cents": 100,
+      "buy_margin_eur": 191.31,
+      "sell_margin_eur": 191.28,
+      "margin_percent_eur200": 95.655,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 6886.1
+    },
+    {
+      "broker_symbol": "META.US",
+      "symbol_id": 799,
+      "asset_class": "US Equities",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 11.89,
+      "sell_margin_eur": 11.89,
+      "margin_percent_eur200": 5.945,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 1936.1
+    },
+    {
+      "broker_symbol": "SpotCrude",
+      "symbol_id": 250,
+      "asset_class": "Energies (Spot)",
+      "min_volume_cents": 100,
+      "buy_margin_eur": 8.73,
+      "sell_margin_eur": 8.73,
+      "margin_percent_eur200": 4.365,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 6891.1
+    },
+    {
+      "broker_symbol": "MSFT.US",
+      "symbol_id": 802,
+      "asset_class": "US Equities",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 8.67,
+      "sell_margin_eur": 8.67,
+      "margin_percent_eur200": 4.335,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 1936.1
+    },
+    {
+      "broker_symbol": "AMZN.US",
+      "symbol_id": 803,
+      "asset_class": "US Equities",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 4.38,
+      "sell_margin_eur": 4.38,
+      "margin_percent_eur200": 2.19,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 1936.1
+    },
+    {
+      "broker_symbol": "BTCUSD",
+      "symbol_id": 124,
+      "asset_class": "Crypto Currency (Spot)",
+      "min_volume_cents": 1,
+      "buy_margin_eur": 337.58,
+      "sell_margin_eur": 337.51,
+      "margin_percent_eur200": 168.79,
+      "feasibility": "EUR200_MIN_VOLUME_INFEASIBLE",
+      "current_schedule_minutes_week": 10066.1
+    },
+    {
+      "broker_symbol": "AAPL.US",
+      "symbol_id": 804,
+      "asset_class": "US Equities",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 5.87,
+      "sell_margin_eur": 5.87,
+      "margin_percent_eur200": 2.935,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 1936.1
+    },
+    {
+      "broker_symbol": "AUDJPY",
+      "symbol_id": 11,
+      "asset_class": "Forex (Spot)",
+      "min_volume_cents": 100000,
+      "buy_margin_eur": 31.02,
+      "sell_margin_eur": 31.02,
+      "margin_percent_eur200": 15.51,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 7186.1
+    },
+    {
+      "broker_symbol": "US500",
+      "symbol_id": 127,
+      "asset_class": "Indices (Spot)",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 33.38,
+      "sell_margin_eur": 33.38,
+      "margin_percent_eur200": 16.69,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 6891.1
+    },
+    {
+      "broker_symbol": "NAS100",
+      "symbol_id": 126,
+      "asset_class": "Indices (Spot)",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 129.04,
+      "sell_margin_eur": 129.03,
+      "margin_percent_eur200": 64.52,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 6891.1
+    },
+    {
+      "broker_symbol": "NVDA.US",
+      "symbol_id": 808,
+      "asset_class": "US Equities",
+      "min_volume_cents": 10,
+      "buy_margin_eur": 3.82,
+      "sell_margin_eur": 3.82,
+      "margin_percent_eur200": 1.91,
+      "feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "current_schedule_minutes_week": 1936.1
+    }
+  ],
+  "structural_fields_for_all_persisted_enabled_products": {
+    "authority_ref": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+    "join_key": "symbol_id",
+    "fields_available": "broker symbol/id, asset class/product type, base/quote, enabled/trading mode, min/step/max volume, lot/pip/digits, commission/swap, current weekday schedule and leverage id where present"
+  },
+  "opportunity_surface": {
+    "known_broad_24x5_feasible": [
+      "AUDJPY",
+      "SpotCrude",
+      "XAUUSD",
+      "US500",
+      "NAS100"
+    ],
+    "known_us_cash_session_feasible": [
+      "AAPL.US",
+      "AMZN.US",
+      "META.US",
+      "MSFT.US",
+      "NVDA.US"
+    ],
+    "known_weekend_capable": [
+      "BTCUSD"
+    ],
+    "known_weekend_capable_eur200_feasible": [],
+    "interpretation": "Trading hours define opportunity surface only; they are not alpha or filler-trade permission."
+  },
+  "exhaustive_capture_path": {
+    "needed": true,
+    "why": "No transferable current evidence persists the exhaustive current light-symbol inventory plus minimum-volume ExpectedMargin for every tradable symbol, and repository credentials are intentionally absent.",
+    "single_generic_capture_only": true,
+    "entry_point": "COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py",
+    "runtime": "competition/broker_universe_capture.py",
+    "launcher": "competition/pydroid_broker_universe_launcher.py",
+    "package_builder": "tools/build_competition_broker_universe_capture_package.py",
+    "expected_package": "dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V1.zip",
+    "expected_output": "MXM_COMPETITION_BROKER_UNIVERSE_V1.zip",
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "market_history": false,
+    "economics": false,
+    "protected_evidence": false
+  }
+}
