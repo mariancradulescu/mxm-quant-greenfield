@@ -108,17 +108,16 @@ class StageAPostOutcomePersistenceIntegrityTests(unittest.TestCase):
         cost_bytes = (ROOT / "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json").read_bytes()
         self.assertEqual(git_blob_sha_bytes(cost_bytes), COST_RULE_BLOB)
 
-    def test_08_live_accounting_is_four_and_budget_remaining_82(self):
-        state = load("CURRENT_STATE.json")
-        self.assertEqual(state["economic_outcomes_opened"], 10)
-        self.assertEqual(state["v2_attempts_used"], 8)
-        self.assertEqual(state["v2_evaluated_identities"], 8)
-        self.assertEqual(state["v2_search_budget"], 84)
-        self.assertEqual(state["v2_search_budget_remaining"], 76)
+    def test_08_historical_stage_a_acceptance_keeps_its_own_accounting(self):
+        acceptance = load("data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json")
+        self.assertEqual(acceptance["accounting"]["v2_attempts_consumed"], 2)
+        self.assertEqual(acceptance["accounting"]["v2_evaluated_identities"], 2)
+        self.assertEqual(acceptance["accounting"]["search_budget_remaining"], 82)
 
-    def test_09_survivors_are_stage_a_only_and_protected_remains_closed(self):
+    def test_09_historical_stage_a_survivors_remain_in_immutable_results(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["discovery_survivors"], ["V2-C006", "V2-C012"])
+        acceptance = load("data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json")
+        self.assertEqual(acceptance["survivor_ids"], ["V2-C006", "V2-C012"])
         self.assertEqual(state["certification_survivors"], [])
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
