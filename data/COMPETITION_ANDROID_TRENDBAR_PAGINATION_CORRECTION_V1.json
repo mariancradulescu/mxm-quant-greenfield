@@ -1,0 +1,90 @@
+{
+  "schema": "mxm.greenfield.v2.android-trendbar-pagination-checkpoint-correction.v1",
+  "status": "IMPLEMENTATION_PROTOCOL_COMPATIBILITY_CORRECTION_COMPLETE_PENDING_ONE_REPLACEMENT_USER_RUN",
+  "parent_head": "9018ab723b6e0afa9df7545fef53c9784e2f4a59",
+  "failure_evidence": "evidence/REAL_ANDROID_ULTRA_FAST_V3_TRENDBAR_PAGINATION_FAILURE_V1.json",
+  "preserved": {
+    "exhaustive_broker_universe": true,
+    "frontier_v5_friction_law_unchanged": true,
+    "structural_shortlist_count": 32,
+    "max_stage_a_markets": 12,
+    "friction_weeks": "2026-W34..2026-W37",
+    "stage_a_weeks": "2026-W25..2026-W37",
+    "true_spread_tails": true,
+    "broker_native_historical_conversion_chains": true,
+    "raw_tick_transfer": false,
+    "bulk_2022_2026_first_pass": false,
+    "family_quotas_role": "DISCOVERY_ONLY",
+    "v2_budget_total": 84,
+    "v2_evaluated": 2,
+    "v2_attempts_used": 2,
+    "v2_remaining": 82,
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "real_runtime_protocol_fact": {
+    "vendored_proto": "m6/ctrader_proto/OpenApiMessages_pb2.py",
+    "packaged_ProtoOAGetTrendbarsRes_hasMore_descriptor": false,
+    "official_current_schema_hasMore": "OPTIONAL",
+    "fix": "Paginator does not require hasMore; uses it when present and count/boundary strict backward traversal when absent."
+  },
+  "pagination_contract": {
+    "request_count": 5000,
+    "from_timestamp": "FROZEN_STAGE_A_START_ON_EVERY_PAGE",
+    "to_timestamp": "STRICTLY_DECREASING_OLDEST_RETURNED_BAR_OPEN_MS_MINUS_1",
+    "no_hasMore_full_page": "CONTINUE",
+    "no_hasMore_short_page": "SHORT_PAGE_INTERVAL_EXHAUSTED",
+    "exactly_full_terminal": "ALLOW_ONE_EXTRA_EMPTY_REQUEST_TO_PROVE_EXHAUSTION",
+    "hasMore_false": "HAS_MORE_FALSE",
+    "boundary_reached": "FROM_BOUNDARY_REACHED",
+    "minimum_500_rows": "AVAILABILITY_FLOOR_ONLY_NOT_COMPLETENESS",
+    "duplicate_identical": "DEDUPLICATE_AND_COUNT",
+    "duplicate_conflict": "IMPLEMENTATION_INVALID"
+  },
+  "pagination_metadata_required": [
+    "requested start/end",
+    "page size/page limit",
+    "pages",
+    "raw bars returned",
+    "unique completed bars",
+    "first/last timestamp",
+    "completion reason",
+    "hasMore descriptor exposure",
+    "full/short/empty page counts",
+    "identical duplicates",
+    "conflicts=0",
+    "per-page compact log"
+  ],
+  "checkpoint_contract": {
+    "persisted_before_first_stage_a_request": true,
+    "includes": [
+      "friction_summary",
+      "historical_conversion_summary",
+      "initial_selection",
+      "binding manifest",
+      "checksums"
+    ],
+    "exact_bindings": [
+      "plan sha",
+      "protocol sha",
+      "account fingerprint",
+      "environment",
+      "shortlist sha",
+      "friction spec sha",
+      "conversion authority",
+      "checksums"
+    ],
+    "invalid_checkpoint": "NOT_REUSED_RECAPTURE_FRICTION",
+    "successful_checkpoint_can_resume_stage_a": true,
+    "no_credentials": true,
+    "no_raw_ticks": true,
+    "no_economic_outcomes": true
+  },
+  "failed_v3_console_friction_status": "OBSERVATIONAL_ONLY_NOT_PROMOTED_NOT_USED_TO_RETUNE_THRESHOLDS",
+  "economic_effect": {
+    "new_economic_outcomes_opened": 0,
+    "new_v2_attempts_consumed": 0
+  },
+  "next_action": "RUN_ONE_REPLACEMENT_ULTRA_FAST_V4_PYDROID_CAPTURE; IF_CHECKPOINT_COMPLETES_LATER_STAGE_FAILURES_RESUME_WITHOUT_FRICTION_RERUN; ACCEPT/HASH; FREEZE_IDENTITIES; EXECUTE_FIRST_REAL_ECONOMIC_WAVE"
+}
