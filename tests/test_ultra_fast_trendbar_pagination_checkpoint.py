@@ -284,12 +284,12 @@ class TrendbarPaginationCheckpointTests(unittest.TestCase):
         self.assertFalse(ev["failure"]["v2_attempt_consumed"])
         self.assertFalse(ev["console_only_friction_observation"]["threshold_retuning_permitted"])
 
-    def test_16_accounting_remains_84_2_2_82(self):
+    def test_16_capture_non_economic_history_and_current_accounting_reconcile(self):
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
         self.assertEqual(state["v2_search_budget"],84)
-        self.assertEqual(state["v2_evaluated_identities"],2)
-        self.assertEqual(state["v2_attempts_used"],2)
-        self.assertEqual(state["v2_search_budget"]-state["v2_attempts_used"],82)
+        self.assertEqual(state["v2_evaluated_identities"],6)
+        self.assertEqual(state["v2_attempts_used"],6)
+        self.assertEqual(state["v2_search_budget"]-state["v2_attempts_used"],78)
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
         self.assertFalse(state["competition_start_authorized"])
