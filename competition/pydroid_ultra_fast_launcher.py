@@ -37,11 +37,13 @@ def local_preflight():
       "trendbar_has_more_descriptor":"hasMore" in ProtoOAGetTrendbarsRes.DESCRIPTOR.fields_by_name,
       "effective_historical_request_rps":1.0/MIN_INTERVAL,
       "rate_limit_retry_after_honored":True,
-      "rate_limit_retry_budget":RATE_LIMIT_RETRY_BUDGET
+      "rate_limit_retry_budget":RATE_LIMIT_RETRY_BUDGET,
+      "stage_a_lower_boundary_overfetch_clipped":True,
+      "checkpoint_v5_reusable":True
     }
 
 def main():
-    print("MXM Ultra-Fast Competition Discovery V5 | READ ONLY | rate-limit=RETRY_AFTER_RESILIENT | trendbar-pagination=VERSION_COMPATIBLE | friction-checkpoint=RESUMABLE | Stage-A=13 complete weeks M5")
+    print("MXM Ultra-Fast Competition Discovery V6 | READ ONLY | rate-limit=RETRY_AFTER_RESILIENT | trendbar-pagination=LOWER_BOUNDARY_CLIP | friction-checkpoint=V5_REUSABLE | Stage-A=13 complete weeks M5")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization();print("[OAUTH]",mode)
