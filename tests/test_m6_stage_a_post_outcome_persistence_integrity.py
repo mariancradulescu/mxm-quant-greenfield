@@ -117,7 +117,7 @@ class StageAPostOutcomePersistenceIntegrityTests(unittest.TestCase):
     def test_09_historical_stage_a_survivors_remain_in_immutable_results(self):
         state = load("CURRENT_STATE.json")
         acceptance = load("data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json")
-        self.assertEqual(acceptance["survivor_ids"], ["V2-C006", "V2-C012"])
+        self.assertEqual([cid for cid, item in acceptance["results"].items() if item["status"]=="DISCOVERY_SURVIVOR"], ["V2-C006", "V2-C012"])
         self.assertEqual(state["certification_survivors"], [])
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
