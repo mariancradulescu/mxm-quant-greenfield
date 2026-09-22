@@ -54,4 +54,21 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
         self.assertEqual(r.terminal_equity_eur,Decimal("203"))
         self.assertEqual(r.decisions[1].reason,"REJECT_INSUFFICIENT_FREE_MARGIN")
 
+    def test_shared_replay_same_timestamp_cross_symbol_concurrency(self):
+        r=replay_shared_eur200([
+            ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",priority=10,direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,active_position_mtm_eur={}),
+            ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-B","SpotCrude","p2",priority=20,direction="SHORT",volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=500000,margin_eur=8.73,active_position_mtm_eur={}),
+            ReplayEvent("2026-01-05T09:00:00Z","EXIT","TEST-A","AUDJPY","p1",realized_gross_pnl_eur=2,active_position_mtm_eur={"p1":0,"p2":0}),
+            ReplayEvent("2026-01-05T09:00:00Z","EXIT","TEST-B","SpotCrude","p2",realized_gross_pnl_eur=3,active_position_mtm_eur={"p1":0,"p2":0}),
+        ])
+        self.assertEqual((r.accepted_entries,r.rejected_entries),(2,0))
+        self.assertEqual(r.entries_by_iso_week,{"2026-W02":2})
+        self.assertEqual(r.terminal_equity_eur,Decimal("205"))
+
+    def test_shared_replay_rejects_unknown_entry_direction(self):
+        with self.assertRaisesRegex(ValueError,"direction"):
+            replay_shared_eur200([
+                ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,active_position_mtm_eur={}),
+            ])
+
 if __name__=="__main__":unittest.main()
