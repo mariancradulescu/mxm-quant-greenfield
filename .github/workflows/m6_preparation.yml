@@ -74,7 +74,10 @@ jobs:
           assert report["orders_permitted"] is False, report
           assert report["account_mutation_permitted"] is False, report
           assert classify_direction(199.0, True) == FEASIBLE
-          assert classify_direction(201.0, True) == INFEASIBLE\n          assert classify_direction(10.0, False) == INFEASIBLE\n          assert classify_direction(None, True) == UNRESOLVED\n          assert directional_summary(FEASIBLE, INFEASIBLE) == "BUY_ONLY"
+          assert classify_direction(201.0, True) == INFEASIBLE
+          assert classify_direction(10.0, False) == INFEASIBLE
+          assert classify_direction(None, True) == UNRESOLVED
+          assert directional_summary(FEASIBLE, INFEASIBLE) == "BUY_ONLY"
           print("COMPETITION_BROKER_UNIVERSE_PREFLIGHT_PASS", report)
           PY
       - name: Full repository unittest suite on Python 3.13
