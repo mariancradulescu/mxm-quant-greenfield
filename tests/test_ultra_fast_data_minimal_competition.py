@@ -303,15 +303,16 @@ class UltraFastConversionTailIntegrityTests(unittest.TestCase):
     def test_13_stage_rows_uses_canonical_normalizer_and_paginates(self):
         with tempfile.TemporaryDirectory() as td:
             runner,_,_,transport=self.make_runner(Path(td),one_window=False)
-            rows=runner._stage_rows(1,self.candidate("EURUSD"),self.full_fx(rate=0))
+            rows,pagination=runner._stage_rows(1,self.candidate("EURUSD"),self.full_fx(rate=0))
             self.assertEqual(len(rows),600);self.assertLess(rows[0]["time_utc"],rows[-1]["time_utc"])
+            self.assertTrue(pagination["request_interval_exhausted"])
             self.assertGreaterEqual(len([x for x in transport.calls if x[0]=="ProtoOAGetTrendbarsReq"]),1)
 
     def test_14_selected_market_writes_integrity_checked_stage_a_csv(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td);runner,_,_,_=self.make_runner(root,one_window=False);runner.bundle.mkdir(parents=True,exist_ok=True)
-            candidate=self.candidate("EURUSD");rows=runner._stage_rows(1,candidate,self.full_fx(rate=0))
-            record=runner._write_rows(candidate,rows);path=runner.bundle/record["file"]
+            candidate=self.candidate("EURUSD");rows,pagination=runner._stage_rows(1,candidate,self.full_fx(rate=0))
+            record=runner._write_rows(candidate,rows,pagination);path=runner.bundle/record["file"]
             self.assertTrue(path.is_file());self.assertEqual(record["row_count"],600);self.assertEqual(record["sha256"],uf._sha(path))
 
     def test_15_selector_never_admits_unresolved_commission(self):
