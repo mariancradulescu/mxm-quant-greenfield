@@ -4,8 +4,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from m6.c012_corrected_stage_a_runner import C012CorrectionInputPaths
+from discovery.canonical import compute_result_hash
 from m6.c012_corrected_stage_b_runner import (
     AUTHORIZATION_REF,
+    RESULT_SCHEMA_V2,
     CORRECTED_STAGE_A_RESULT_HASH,
     CORRECTED_STAGE_B_REF,
     HISTORICAL_STAGE_B_GIT_BLOB,
@@ -13,9 +15,10 @@ from m6.c012_corrected_stage_b_runner import (
     _load_correction_authorization,
     execute_corrected_c012_stage_b_in_memory,
     git_blob_sha1,
+    project_current_state_after_successor,
+    validate_corrected_c012_stage_b_result,
     verify_corrected_c012_stage_b_pre_economic,
 )
-from m6.stage_b_current_config_execute import _sha256_without_result_hash
 from m6.stage_b_current_config_tier1_runner import CurrentConfigExecutionNotAuthorized
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -134,12 +137,53 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
         result = load(CORRECTED_STAGE_B_REF)
         self.assertEqual(result["candidate_id"], "V2-C012")
         self.assertEqual(result["execution_provenance"]["corrected_intent_count"], 34)
-        self.assertEqual(result["result_sha256"], _sha256_without_result_hash(result))
+        self.assertEqual(result["result_hash"], compute_result_hash(result))
+        self.assertTrue(validate_corrected_c012_stage_b_result(result))
         self.assertEqual(downstream.get("corrected_successor_ref"), CORRECTED_STAGE_B_REF)
-        self.assertEqual(downstream.get("corrected_successor_hash"), result["result_sha256"])
+        self.assertEqual(downstream.get("corrected_successor_hash"), result["result_hash"])
         self.assertEqual(git_blob_sha1(ROOT / HISTORICAL_STAGE_B_REF), HISTORICAL_STAGE_B_GIT_BLOB)
 
-    def test_06_accounting_is_same_identity_no_attempt_or_budget_delta(self):
+    def test_06_canonical_result_schema_and_state_projection_rehearsal(self):
+        fixture = {
+            "schema": RESULT_SCHEMA_V2,
+            "label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+            "candidate_id": "V2-C012",
+            "execution_provenance": {
+                "corrected_intent_count": 34,
+                "protected_evidence_opened": False,
+            },
+            "scenario_boundary": {
+                "current_configuration_applied_to_development": True,
+                "historical_point_in_time_margin_certification": False,
+            },
+            "economic_summary": {
+                "starting_equity_eur": 200.0,
+                "final_equity_eur": 201.0,
+            },
+            "frozen_reporting": {},
+            "performance_metrics": {
+                "starting_equity_eur": 200.0,
+                "terminal_equity_eur": 201.0,
+                "executed_entries": 34,
+                "margin_rejected_entries": 0,
+            },
+        }
+        fixture["result_hash"] = compute_result_hash(fixture)
+        self.assertTrue(validate_corrected_c012_stage_b_result(fixture))
+        self.assertEqual(fixture["result_hash"], compute_result_hash(fixture))
+        projected = project_current_state_after_successor(load("CURRENT_STATE.json"), fixture)
+        downstream = projected["current_result_authority"]["V2-C012"]["stage_b_current_config"]
+        self.assertEqual(downstream["state"], "VALID_CORRECTED_SUCCESSOR")
+        self.assertEqual(downstream["corrected_successor_ref"], CORRECTED_STAGE_B_REF)
+        self.assertEqual(downstream["corrected_successor_hash"], fixture["result_hash"])
+        self.assertEqual(
+            projected["active_result_pointers"]["V2-C012_STAGE_B_CURRENT_CONFIG"],
+            CORRECTED_STAGE_B_REF,
+        )
+        self.assertEqual(projected["v2_attempts_used"], 9)
+        self.assertEqual(projected["v2_search_budget_remaining"], 75)
+
+    def test_07_accounting_is_same_identity_no_attempt_or_budget_delta(self):
         state = load("CURRENT_STATE.json")
         self.assertEqual(state["v2_attempts_used"], 9)
         self.assertEqual(state["v2_evaluated_identities"], 9)
