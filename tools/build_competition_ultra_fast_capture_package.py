@@ -3,11 +3,11 @@ from __future__ import annotations
 import hashlib,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-TARGET=ROOT/"dist"/"MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V1.zip"
+TARGET=ROOT/"dist"/"MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V2.zip"
 FILES=(
 "COMPETITION_ULTRA_FAST_CAPTURE_RUN.py",
-"data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V1.json","data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V1.json",
-"competition/__init__.py","competition/ultra_fast_capture.py","competition/pydroid_ultra_fast_launcher.py","competition/frontier_data_capture.py",
+"data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V2.json","data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V2.json",
+"competition/__init__.py","competition/ultra_fast_capture.py","competition/friction_costs.py","competition/pydroid_ultra_fast_launcher.py","competition/frontier_data_capture.py",
 "m6/__init__.py","m6/_ctrader_capture_base.py","m6/ctrader_capture.py","m6/ctrader_transport.py","m6/pydroid_oauth.py","m6/cost_evidence.py",
 "m6/ctrader_proto/__init__.py","m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py","m6/ctrader_proto/OpenApiCommonMessages_pb2.py",
 "m6/ctrader_proto/OpenApiModelMessages_pb2.py","m6/ctrader_proto/OpenApiMessages_pb2.py","m6/ctrader_proto/LICENSE_SPOTWARE_OPENAPIPY.txt",
