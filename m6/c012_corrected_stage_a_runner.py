@@ -14,7 +14,7 @@ from typing import Any, Mapping
 from discovery.schema import validate_result
 from .causal_conversion import CausalConversionSeries
 from .session_replay import NasdaqCashCalendar
-from .stage_a_evaluator import EVALUATOR_RUNTIME_SHA256, evaluate_prepared_candidate
+from .stage_a_evaluator import evaluate_prepared_candidate
 from .stage_a_tier1_runner import (
     C012_KNOWN_UNSUPPORTED_BOUNDARIES_MS,
     PreparedCandidate,
