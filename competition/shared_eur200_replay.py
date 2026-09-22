@@ -118,7 +118,7 @@ def replay_shared_eur200(events:Iterable[ReplayEvent],starting_equity_eur=STARTI
         accepted+=1
         iso=_t(e.timestamp_utc).isocalendar(); key=f"{iso.year}-W{iso.week:02d}"; weeks[key]=weeks.get(key,0)+1
         mtm=dict(e.active_position_mtm_eur); mtm[e.position_id]=D("0")
-        eq,used,free=_state(cash,pos,mtm)
+        eq,used,free=_state(cash,pos,mtm,e.timestamp_utc)
         decisions.append(ReplayDecision(e.timestamp_utc,e.kind,e.candidate_id,e.symbol,e.position_id,True,reason,cash,used,eq,free))
     if pos: raise ReplayContractError("terminal open positions")
     return ReplayResult(_d(starting_equity_eur),cash,cash,accepted,rejected,tuple(decisions),dict(sorted(weeks.items())))
