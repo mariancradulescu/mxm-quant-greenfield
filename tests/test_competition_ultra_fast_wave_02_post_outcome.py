@@ -1,6 +1,7 @@
 import hashlib,json,unittest
 from pathlib import Path
 from discovery.canonical import compute_result_hash
+from discovery.accounting import assert_current_state_matches_repository
 from discovery.ledger import read_ledger
 from discovery.schema import validate_result
 ROOT=Path(__file__).resolve().parents[1]
@@ -30,10 +31,11 @@ class UltraFastWave02PostOutcomeTests(unittest.TestCase):
   p=load('data/COMPETITION_ULTRA_FAST_WAVE_02_EXECUTION_PROGRESS_V1.json');g=p['pre_outcome_execution_gate'];self.assertEqual(g['head_sha'],PRE_HEAD);self.assertEqual(g['workflow_run_id'],PRE_RUN);self.assertEqual(g['conclusion'],'SUCCESS');self.assertEqual((g['tests_passed'],g['tests_failed']),(652,0))
   a=p['immutable_pre_outcome_authorities'];self.assertEqual(a['capture_zip_sha256'],CAP);self.assertEqual(a['candidate_spec_hash'],SPEC_HASH);self.assertEqual(a['evaluator_sha256'],EVAL_SHA);self.assertEqual(a['cost_authority_sha256'],COST_SHA)
  def test_04_completion_is_no_survivor_with_natural_hard21(self):
-  c=load('data/COMPETITION_ULTA_FAST_WAVE_02_COMPLETION_V1.json');self.assertEqual(c['status'],'COMPLETE_NO_STAGE_A_SURVIVOR');self.assertEqual(c['promotion']['stage_a_survivor_ids'],[]);self.assertEqual(c['promotion']["stage_b_26_week_extension_ids"],[])
+  c=load('data/COMPETITION_ULTRA_FAST_WAVE_02_COMPLETION_V1.json');self.assertEqual(c['status'],'COMPLETE_NO_STAGE_A_SURVIVOR');self.assertEqual(c['promotion']['stage_a_survivor_ids'],[]);self.assertEqual(c['promotion']["stage_b_26_week_extension_ids"],[])
   h=c['natural_hard21'];self.assertEqual(h['weeks_ge_21'],13);self.assertEqual(h['weeks_lt_21'],0);self.assertGreaterEqual(h['minimum_entries_week'],21)
   x=c['stage_a_results'][CID];self.assertEqual(x['result_hash'],RESULT_HASH);self.assertAlmostEqual(x['gross_pnl'],-86.67661227016303);self.assertAlmostEqual(x['transaction_cost_eur'],112.35157779178611);self.assertAlmostEqual(x['coarse_net_pnl'],-199.02819006194892)
- def test_05_live_accounting_consumes_exactly_one_new_identity(self):
-  s=load('CURRENT_STATE.json');self.assertEqual((s['v2_attempts_used'],s['v2_evaluated_identities'],s['v2_search_budget_remaining']),(9,9,75));self.assertEqual((s['global_attempts_seen'],s['economic_outcomes_opened']),(25,11));self.assertEqual((s['discovery_ledger_entries'],s['discovery_result_recorded_entries']),(40,9));self.assertEqual(s['latest_economic_outcome']['candidate_id'],CID);self.assertEqual(s['latest_economic_outcome']['result_hash'],RESULT_HASH)
+ def test_05_live_accounting_is_repository_derived_after_later_corrections(self):
+  d=assert_current_state_matches_repository(ROOT);s=load('CURRENT_STATE.json')
+  self.assertIn(CID,d['evaluated_candidate_ids']);self.assertEqual(d['latest_economic_outcome']['candidate_id'],CID);self.assertEqual(d['latest_economic_outcome']['result_hash'],RESULT_HASH)
   self.assertFalse(s['protected_evidence_opened']);self.assertFalse(s['live_orders_authorized']);self.assertFalse(s['competition_start_authorized'])
 if __name__=='__main__':unittest.main()
