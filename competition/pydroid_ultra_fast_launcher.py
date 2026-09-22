@@ -8,7 +8,7 @@ from m6.ctrader_proto.OpenApiModelMessages_pb2 import ProtoOATrendbarPeriod
 from .ultra_fast_capture import UltraFastCaptureRunner,PLAN_REL,PROTOCOL_REL,validate_plan,friction_windows
 
 ROOT=Path(__file__).resolve().parents[1]
-ALLOWED=frozenset({"ProtoOAApplicationAuthReq","ProtoOAGetAccountListByAccessTokenReq","ProtoOAAccountAuthReq","ProtoOATraderReq","ProtoOAAssetListReq","ProtoOASymbolsListReq","ProtoOASymbolByIdReq","ProtoOAGetTickDataReq","ProtoOAGetTrendbarsReq"})
+ALLOWED=frozenset({"ProtoOAApplicationAuthReq","ProtoOAGetAccountListByAccessTokenReq","ProtoOAAccountAuthReq","ProtoOATraderReq","ProtoOAAssetListReq","ProtoOASymbolsListReq","ProtoOASymbolByIdReq","ProtoOASymbolsForConversionReq","ProtoOAGetTickDataReq","ProtoOAGetTrendbarsReq"})
 
 def load_authorities():
     plan=json.loads((ROOT/PLAN_REL).read_text(encoding="utf-8"))
@@ -36,7 +36,7 @@ def local_preflight():
     }
 
 def main():
-    print("MXM Ultra-Fast Competition Discovery V2 | READ ONLY | runtime-integrity=FAIL-CLOSED | friction=TYPE-AWARE | Stage-A=13 complete weeks M5 | raw ticks transfer=NO")
+    print("MXM Ultra-Fast Competition Discovery V3 | READ ONLY | broker-conversion=HISTORICAL | tails=TRUE_INTRA_WINDOW | Stage-A=13 complete weeks M5 | raw ticks transfer=NO")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization();print("[OAUTH]",mode)
