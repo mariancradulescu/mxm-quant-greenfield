@@ -1,0 +1,95 @@
+{
+  "accepted_capture": {
+    "capture_schema": "mxm.greenfield.v2.broker-native-competition-universe-capture.v2",
+    "capture_status": "CURRENT_ACCOUNT_NATIVE_EXHAUSTIVE_READ_ONLY_CAPTURE_DIRECTIONAL",
+    "captured_utc": "2026-09-22T04:12:43.448107Z",
+    "external_name": "MXM_COMPETITION_BROKER_UNIVERSE_V2.zip",
+    "internal_json_path": "MXM_COMPETITION_BROKER_UNIVERSE_V2/BROKER_NATIVE_COMPETITION_UNIVERSE_CAPTURE_V2.json",
+    "internal_json_sha256": "d144494113106c1ab65c7ae0bcb45a60176a1bccadf13ad7c3051e2ca40f9f69",
+    "internal_json_size_bytes": 12245086,
+    "source_environment": "Pepperstone - Europe LIVE",
+    "starting_capital_eur": 200.0,
+    "tool_version": "MXM_COMPETITION_BROKER_UNIVERSE_ANDROID_STDLIB_V2",
+    "zip_crc_test": "PASS",
+    "zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+    "zip_size_bytes": 425415
+  },
+  "account_execution_semantics": {
+    "access_rights": {"name":"FULL_ACCESS","raw":0,"state":"CAPTURED"},
+    "account_type": {"name":"HEDGED","raw":0,"state":"CAPTURED"},
+    "deposit_currency":"EUR",
+    "fair_stop_out":{"state":"UNKNOWN","value":null},
+    "is_limited_risk":false,
+    "leverage_in_cents":3000,
+    "limited_risk_margin_calculation_strategy":null,
+    "margin_call_thresholds":{"items":[
+      {"marginCallType":61,"marginLevelThreshold":1.5,"utcLastUpdateTimestamp":"1788872276747"},
+      {"marginCallType":62,"marginLevelThreshold":1.0,"utcLastUpdateTimestamp":"1788872276759"},
+      {"marginCallType":63,"marginLevelThreshold":0.8,"utcLastUpdateTimestamp":"1788872276753"}
+    ],"state":"CAPTURED"},
+    "max_leverage":null,
+    "source":"ProtoOATrader + ProtoOAMarginCallListRes",
+    "stop_out_margin_level_threshold":{"state":"UNKNOWN_NOT_IDENTIFIED_BY_PROTOOA_TRADER_OR_MARGIN_CALL_LIST","value":null},
+    "stop_out_strategy":{"name":null,"raw":null,"state":"UNKNOWN"},
+    "swap_free":false,
+    "total_margin_calculation_type":{"name":"MAX","raw":0,"state":"CAPTURED"}
+  },
+  "account_identity": {
+    "account_fingerprint_sha256":"b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "continuity_state":"FIRST_PERSISTED_ACCOUNT_FINGERPRINT_ANCHOR_WITH_INDIRECT_PRIOR_CONTINUITY",
+    "cryptographic_continuity_to_prior_capture_claimed":false,
+    "indirect_continuity_evidence":{
+      "accepted_prior_product_identity_matches":11,
+      "accepted_prior_product_identity_required":11,
+      "environment_match":"Pepperstone - Europe LIVE",
+      "matched_symbol_ids":{"AAPL.US":804,"AMZN.US":803,"AUDJPY":11,"BTCUSD":124,"META.US":799,"MSFT.US":802,"NAS100":126,"NVDA.US":808,"SpotCrude":250,"US500":127,"XAUUSD":41}
+    },
+    "law":"Future account-native captures must match this fingerprint unless a prospectively recorded account migration is explicitly accepted.",
+    "prior_greenfield_account_fingerprint_available":false
+  },
+  "directional_feasibility":{
+    "accessible_buy_feasible":1649,
+    "accessible_directional_unresolved":0,
+    "accessible_neither_feasible":41,
+    "accessible_sell_feasible":1609,
+    "both_feasible":1609,
+    "buy_only":40,
+    "forex_spot_accessible":93,
+    "forex_spot_both_feasible":93,
+    "sell_only":0
+  },
+  "inventory_integrity":{
+    "all_current_symbol_record_stream_sha256":"83e2f6efe416ea25d906d0f99ba7a892b39889591e6330b959e4a49f129d9f2c",
+    "archived_symbol_count":1707,
+    "current_accessible_record_stream_sha256":"5bb6447e274ff751c16a29719e65ad92155ec5ffa510a43f98bb58d1834ca344",
+    "current_new_entry_accessible_count":1690,
+    "current_symbol_count":5324,
+    "expected_margin_exact_min_volume_binding_accessible":{"failed":0,"passed":1690},
+    "full_account_current_symbol_inventory_claimed":true,
+    "symbol_id_unique_count":5324,
+    "symbol_name_unique_count":5324,
+    "volume_lattice_integrity_accessible":{"failed":0,"passed":1690}
+  },
+  "margin_call_semantics":{
+    "captured":[
+      {"marginCallType":61,"marginLevelThreshold":1.5,"official_enum":"MARGIN_LEVEL_THRESHOLD1"},
+      {"marginCallType":62,"marginLevelThreshold":1.0,"official_enum":"MARGIN_LEVEL_THRESHOLD2"},
+      {"marginCallType":63,"marginLevelThreshold":0.8,"official_enum":"MARGIN_LEVEL_THRESHOLD3"}
+    ],
+    "certification_gate":"Resolve or conservatively bind exact forced-liquidation behavior before any exact shared-capital Certification result whose path could depend on stop-out.",
+    "official_semantics":"cTrader documents all three as similar margin-call notification thresholds; numbering does not identify broker liquidation/stop-out.",
+    "public_broker_reference":"Pepperstone public cTrader materials describe Smart Stop Out as normally 50%; not promoted here to account-specific Certification authority.",
+    "stop_out_margin_level":"UNKNOWN_FOR_ACCOUNT_SPECIFIC_CERTIFICATION"
+  },
+  "research_effect":{
+    "new_economic_outcomes_opened_by_acceptance":0,
+    "new_v2_attempts_consumed_by_acceptance":0,
+    "old_frontier_execution_authorized":false,
+    "old_frontier_state":"SUPERSEDED_PENDING_SUCCESSOR_AUTHORITY_WITHOUT_OPENED_OUTCOME_OR_ATTEMPT",
+    "protected_evidence_opened":false
+  },
+  "safety":{"account_mutation":false,"economic_outcomes_opened":0,"historical_margin_authority_claimed":false,"orders_placed":false,"protected_evidence_opened":false},
+  "schema":"mxm.greenfield.v2.broker-native-competition-universe-acceptance.v2",
+  "status":"ACCEPTED_EXHAUSTIVE_CURRENT_ACCOUNT_NATIVE_DIRECTIONAL_UNIVERSE_FOR_COMPETITION_RESEARCH",
+  "test_products":{"accessible_asset_class_TEST_count":8,"economic_frontier_eligible":false,"law":"Exclude until authoritative broker identity classification resolves the TEST asset-class ambiguity; descriptions alone do not reclassify."}
+}
