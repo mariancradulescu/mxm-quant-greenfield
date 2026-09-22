@@ -273,11 +273,11 @@ class StageBMarginHistoryPackageTests(unittest.TestCase):
 
     def test_18_stage_a_results_attempts_unchanged_while_live_outcome_total_is_four(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["economic_outcomes_opened"], 4)
-        self.assertEqual(state["v2_attempts_used"], 2)
-        self.assertEqual(state["v2_evaluated_identities"], 2)
+        self.assertEqual(state["economic_outcomes_opened"], 8)
+        self.assertEqual(state["v2_attempts_used"], 6)
+        self.assertEqual(state["v2_evaluated_identities"], 6)
         self.assertEqual(state["v2_search_budget"], 84)
-        self.assertEqual(state["v2_search_budget_remaining"], 82)
+        self.assertEqual(state["v2_search_budget_remaining"], 78)
         self.assertEqual(
             state["m6"]["first_stage_a_runner"]["result_hashes"]["V2-C006"],
             "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
