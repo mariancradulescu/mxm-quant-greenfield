@@ -1,8 +1,8 @@
 {
   "schema": "mxm.greenfield.v2.competition-ultra-fast-wave-01-execution-progress.v1",
-  "status": "C017_C022_RECORDED_WAVE_01_COMPLETE_NO_SURVIVOR",
+  "status": "COMPLETE_NO_STAGE_A_SURVIVOR_PENDING_EXACT_HEAD_CI",
   "reconciled_utc": "2026-09-22T11:25:00Z",
-  "purpose": "ATOMIC_C022_OUTCOME_PERSISTENCE_COMPLETE_WAVE_01",
+  "purpose": "COMPLETE_C017_C022_WAVE_01_RECONCILIATION",
   "immutable_pre_outcome_authorities": {
     "capture_acceptance_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json",
     "capture_acceptance_git_blob_sha1": "b1fd069563e0e9940b193f70744787c4a9692470",
@@ -87,7 +87,8 @@
       "result_hash": "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2",
       "opened_utc": "2026-09-22T11:25:00Z",
       "ledger_sequence": 38,
-      "ledger_entry_hash": "5c93b265b44d1ceaa2897ddf62bf8630b8d3deee1823d20cbedd4575f096d7fb"
+      "ledger_entry_hash": "5c93b265b44d1ceaa2897ddf62bf8630b8d3deee1823d20cbedd4575f096d7fb",
+      "original_persistence_commit": "a68e4da292141c788639919163422bbfcea4c610"
     }
   },
   "ledger": {
@@ -135,6 +136,7 @@
     "c021_opened": true,
     "c022_opened": true
   },
-  "next_action": "RECONCILE_COMPLETE_WAVE_01; RUN_EXACT_HEAD_FULL_SUITE; THEN_FREEZE_NEXT_MATERIALLY_DISTINCT_PROSPECTIVE_FRONTIER",
-  "wave_01_stage_a_survivor_ids": []
+  "next_action": "RUN_EXACT_HEAD_FULL_SUITE; IF_GREEN_FREEZE_NEXT_MATERIALLY_DISTINCT_PROSPECTIVE_FRONTIER; NO_26_WEEK_EXTENSION",
+  "wave_01_stage_a_survivor_ids": [],
+  "completion_ref": "data/COMPETITION_ULTRA_FAST_WAVE_01_COMPLETION_V1.json"
 }
