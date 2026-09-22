@@ -132,10 +132,10 @@ class StageBTier1PreparationTests(unittest.TestCase):
 
     def test_08_live_total_includes_current_config_while_historical_track_stays_unrun(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],4)
-        self.assertEqual(s["v2_attempts_used"],2)
-        self.assertEqual(s["v2_evaluated_identities"],2)
-        self.assertEqual(s["v2_search_budget_remaining"],82)
+        self.assertEqual(s["economic_outcomes_opened"],8)
+        self.assertEqual(s["v2_attempts_used"],6)
+        self.assertEqual(s["v2_evaluated_identities"],6)
+        self.assertEqual(s["v2_search_budget_remaining"],78)
         self.assertFalse(s["protected_evidence_opened"])
         self.assertFalse(s["m6"]["stage_b"]["execution_authorized"])
         self.assertFalse(s["m6"]["stage_b"]["economics_run"])
