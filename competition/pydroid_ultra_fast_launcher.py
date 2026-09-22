@@ -33,7 +33,8 @@ def local_preflight():
       "global_windows":len(friction_windows(protocol,"GLOBAL_24X5")),"crypto_windows":len(friction_windows(protocol,"CRYPTO_24X7")),
       "regional_windows":len(friction_windows(protocol,"US_REGIONAL")),"stage_a_interval":plan["stage_a_interval"],
       "raw_ticks_transferred":False,"network_connection_attempted":False,"credentials_used":False,"orders_permitted":False,
-      "account_mutation_permitted":False,"economic_outcomes_opened":False
+      "account_mutation_permitted":False,"economic_outcomes_opened":False,
+      "trendbar_has_more_descriptor":"hasMore" in ProtoOAGetTrendbarsRes.DESCRIPTOR.fields_by_name
     }
 
 def main():
