@@ -61,17 +61,17 @@ from m6.ctrader_proto.OpenApiMessages_pb2 import (
 from m6.ctrader_proto.OpenApiModelMessages_pb2 import ProtoOATrendbarPeriod
 from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 
-PLAN_REL="data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V3.json"
+PLAN_REL="data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json"
 PROTOCOL_REL="data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json"
-EXPECTED_PLAN_SHA="4a32d84f6f6f72f1c8de6ce3d3c4d26b7072be744d01761466299e0972e5a115"
-OUTPUT_FILENAME="MXM_COMPETITION_ULTRA_FAST_STAGE_A_V3.zip"
-TOOL_VERSION="MXM_COMPETITION_ULTRA_FAST_ANDROID_STDLIB_V3_CONVERSION_TAIL_INTEGRITY"
+EXPECTED_PLAN_SHA="bb80361bbfdd732529a50d62a290d57d5ec256308e508c686a6a26c376079520"
+OUTPUT_FILENAME="MXM_COMPETITION_ULTRA_FAST_STAGE_A_V4.zip"
+TOOL_VERSION="MXM_COMPETITION_ULTRA_FAST_ANDROID_STDLIB_V4_TRENDBAR_PAGINATION_CHECKPOINT"
 QUOTE_TYPES={"BID":1,"ASK":2}
 RAW_HEADER=("time_utc","open","high","low","close","tick_volume")
 MIN_INTERVAL=1/4.7
 PROTECTED_UTC="2026-09-17T12:02:58Z"
 ELIGIBLE_COST_STATES={FULL_FRICTION_RESOLVED,SPREAD_RESOLVED_COMMISSION_BOUNDED}
-VALID_FRICTION_STATES={"FRICTION_PASS","FRICTION_WATCH","FRICTION_FAIL",FRICTION_UNRESOLVED}
+VALID_FRICTION_STATES={"FRICTION_PASS","FRICTION_WATCH","FRICTION_FAIL",FRICTION_UNRESOLVED}\nSTAGE_COMPLETION_REASONS={"HAS_MORE_FALSE","SHORT_PAGE_INTERVAL_EXHAUSTED","FROM_BOUNDARY_REACHED","EMPTY_FINAL_PAGE_AFTER_FULL_PAGE","EMPTY_INTERVAL"}\nCHECKPOINT_SCHEMA="mxm.greenfield.v2.ultra-fast-friction-checkpoint.v4"
 
 
 class ImplementationInvalid(CaptureContractError):
@@ -114,15 +114,29 @@ def _canon(obj):
     return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
 
 
+def _json_sha(obj):
+    return hashlib.sha256(json.dumps(obj,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
+
+
+def _trendbar_has_more(response):
+    descriptor=getattr(response,"DESCRIPTOR",None)
+    fields=getattr(descriptor,"fields_by_name",{}) if descriptor is not None else {}
+    if "hasMore" in fields:
+        return True,bool(getattr(response,"hasMore"))
+    if hasattr(response,"hasMore"):
+        return True,bool(getattr(response,"hasMore"))
+    return False,None
+
+
 def margin_pct_eur200(value):
     return float(Decimal(str(value))/Decimal("2"))
 
 
 def validate_plan(plan,protocol):
-    if plan.get("schema")!="mxm.greenfield.v2.ultra-fast-competition-capture-plan.v3":
+    if plan.get("schema")!="mxm.greenfield.v2.ultra-fast-competition-capture-plan.v4":
         raise ImplementationInvalid("invalid ultra-fast V3 plan schema")
-    if plan.get("status")!="FROZEN_PRE_CAPTURE_PRE_OUTCOME_CONVERSION_TAIL_INTEGRITY_CORRECTED":
-        raise ImplementationInvalid("ultra-fast V3 plan not frozen")
+    if plan.get("status")!="FROZEN_PRE_CAPTURE_PRE_OUTCOME_TRENDBAR_PAGINATION_CHECKPOINT_CORRECTED":
+        raise ImplementationInvalid("ultra-fast V4 plan not frozen")
     if plan.get("plan_sha256")!=EXPECTED_PLAN_SHA or _canon(plan)!=EXPECTED_PLAN_SHA:
         raise ImplementationInvalid("ultra-fast V3 plan hash mismatch")
     if protocol.get("schema")!="mxm.greenfield.v2.ultra-fast-data-minimal-discovery-protocol.v3":
@@ -702,43 +716,118 @@ class UltraFastCaptureRunner:
 
     def _stage_rows(self,account_id,candidate,full_symbol):
         interval=self.plan["stage_a_interval"];frm=_ms(_utc(interval["start_utc"]));to=_ms(_utc(interval["end_utc"]))
-        page_to=to;rows={};pages=0
+        page_size=int(self.plan["capture_law"]["trendbar_pagination"]["page_count"])
+        page_limit=int(self.plan["capture_law"]["max_stage_a_pages_per_symbol"])
+        page_to=to;rows={};pages=0;raw_total=0;full_pages=0;short_pages=0;empty_pages=0;duplicates=0
+        completion=None;schema_exposes=None;previous_was_full=False;page_log=[]
         while page_to>=frm:
-            if pages>=int(self.plan["capture_law"]["max_stage_a_pages_per_symbol"]):
-                raise ImplementationInvalid("Stage-A page limit exceeded")
+            if pages>=page_limit:
+                raise ImplementationInvalid("Stage-A page limit exceeded before interval exhaustion")
+            request_to=page_to
             response=self._send(ProtoOAGetTrendbarsReq(
                 ctidTraderAccountId=account_id,symbolId=candidate["symbol_id"],period=ProtoOATrendbarPeriod.Value("M5"),
-                fromTimestamp=frm,toTimestamp=page_to,count=5000,
+                fromTimestamp=frm,toTimestamp=request_to,count=page_size,
             ),historical=True)
-            pages+=1;bars=[_plain(x) for x in response.trendbar]
-            for row in normalize_m5(
+            pages+=1
+            raw=list(response.trendbar)
+            bars=[_plain(x) for x in raw]
+            count=len(bars);raw_total+=count
+            supports,has_more=_trendbar_has_more(response)
+            if schema_exposes is None:
+                schema_exposes=supports
+            elif schema_exposes!=supports:
+                raise ImplementationInvalid("ProtoOAGetTrendbarsRes hasMore schema exposure changed mid-capture")
+            if count>page_size:
+                raise ImplementationInvalid("Stage-A response exceeded requested page count")
+
+            if not bars:
+                empty_pages+=1
+                if supports and has_more:
+                    raise ImplementationInvalid("Stage-A empty page cannot advertise hasMore=true")
+                if pages==1:
+                    completion="EMPTY_INTERVAL"
+                elif previous_was_full:
+                    completion="EMPTY_FINAL_PAGE_AFTER_FULL_PAGE"
+                else:
+                    raise ImplementationInvalid("unexpected empty Stage-A page before defensible exhaustion")
+                page_log.append({"page":pages,"request_to_ms":request_to,"raw_bars":0,"has_more_exposed":supports,"has_more":has_more})
+                break
+
+            try:
+                raw_times=[int(x["utcTimestampInMinutes"])*60000 for x in bars]
+            except (TypeError,ValueError,KeyError) as exc:
+                raise ImplementationInvalid("malformed Stage-A trendbar timestamp") from exc
+            if any(t<frm or t>request_to for t in raw_times):
+                raise ImplementationInvalid("Stage-A response bar outside requested page boundaries")
+            oldest=min(raw_times);newest=max(raw_times)
+            normalized=normalize_m5(
                 bars,digits=int(full_symbol.get("digits",5)),start_utc=interval["start_utc"],
                 end_utc=interval["end_utc"],protected_utc=PROTECTED_UTC,
-            ):
+            )
+            for row in normalized:
                 key=row["time_utc"]
-                if key in rows and rows[key]!=row:
-                    raise ImplementationInvalid("conflicting Stage-A duplicate")
-                rows[key]=row
-            if not response.hasMore:
-                break
-            if not bars:
-                raise ImplementationInvalid("Stage-A hasMore with empty page")
-            try:
-                nxt=min(int(x["utcTimestampInMinutes"])*60000 for x in bars)-1
-            except (TypeError,ValueError,KeyError) as exc:
-                raise ImplementationInvalid("malformed Stage-A pagination timestamp") from exc
-            if nxt>=page_to:
-                raise ImplementationInvalid("Stage-A pagination did not advance")
-            page_to=nxt
-        return [rows[k] for k in sorted(rows)]
+                if key in rows:
+                    if rows[key]!=row:
+                        raise ImplementationInvalid("conflicting Stage-A duplicate")
+                    duplicates+=1
+                else:
+                    rows[key]=row
 
-    def _write_rows(self,candidate,rows):
+            is_full=count==page_size
+            full_pages+=int(is_full);short_pages+=int(not is_full)
+            page_log.append({
+                "page":pages,"request_to_ms":request_to,"raw_bars":count,
+                "oldest_bar_open_ms":oldest,"newest_bar_open_ms":newest,
+                "has_more_exposed":supports,"has_more":has_more,
+            })
+
+            if oldest<=frm:
+                completion="FROM_BOUNDARY_REACHED"
+                break
+            if supports:
+                if has_more is False:
+                    completion="HAS_MORE_FALSE"
+                    break
+                if has_more is True and not is_full:
+                    raise ImplementationInvalid("Stage-A hasMore=true on a short page")
+            elif not is_full:
+                completion="SHORT_PAGE_INTERVAL_EXHAUSTED"
+                break
+
+            nxt=oldest-1
+            if nxt>=request_to or nxt<frm-1:
+                raise ImplementationInvalid("Stage-A pagination did not make strict backward progress")
+            page_to=nxt
+            previous_was_full=is_full
+
+        if completion not in STAGE_COMPLETION_REASONS:
+            raise ImplementationInvalid("Stage-A interval did not reach an explicit completion state")
+        ordered=[rows[k] for k in sorted(rows)]
+        meta={
+            "requested_start_utc":interval["start_utc"],"requested_end_utc":interval["end_utc"],
+            "page_size":page_size,"page_limit":page_limit,"pages":pages,
+            "raw_bars_returned":raw_total,"normalized_unique_completed_bars":len(ordered),
+            "first_timestamp_utc":ordered[0]["time_utc"] if ordered else None,
+            "last_timestamp_utc":ordered[-1]["time_utc"] if ordered else None,
+            "completion_reason":completion,"request_interval_exhausted":True,
+            "response_schema_exposed_has_more":bool(schema_exposes),
+            "full_pages":full_pages,"short_pages":short_pages,"empty_pages":empty_pages,
+            "identical_duplicate_count":duplicates,"conflicts":0,
+            "page_log":page_log,
+        }
+        return ordered,meta
+
+    def _write_rows(self,candidate,rows,pagination):
         d=self.bundle/"stage_a_m5";d.mkdir(parents=True,exist_ok=True);path=d/(candidate["broker_symbol"].replace("/","_")+"_M5.csv")
         with path.open("w",encoding="utf-8",newline="") as f:
             writer=csv.DictWriter(f,fieldnames=RAW_HEADER,lineterminator="\n");writer.writeheader()
             writer.writerows([{k:x[k] for k in RAW_HEADER} for x in rows])
         inspected=_inspect_stage_csv(path,self.plan)
-        return {"broker_symbol":candidate["broker_symbol"],"symbol_id":candidate["symbol_id"],"family":candidate["family"],**inspected,"file":path.relative_to(self.bundle).as_posix()}
+        if pagination.get("request_interval_exhausted") is not True or pagination.get("completion_reason") not in STAGE_COMPLETION_REASONS:
+            raise ImplementationInvalid("Stage-A CSV cannot be written from incomplete pagination")
+        if inspected["row_count"]!=pagination.get("normalized_unique_completed_bars"):
+            raise ImplementationInvalid("Stage-A CSV row count disagrees with pagination evidence")
+        return {"broker_symbol":candidate["broker_symbol"],"symbol_id":candidate["symbol_id"],"family":candidate["family"],**inspected,"pagination":pagination,"file":path.relative_to(self.bundle).as_posix()}
 
     def _conversion_summary(self):
         chains=[]
