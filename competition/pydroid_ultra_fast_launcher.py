@@ -36,7 +36,7 @@ def local_preflight():
     }
 
 def main():
-    print("MXM Ultra-Fast Competition Discovery | READ ONLY | friction=LOCAL_AGGREGATE | Stage-A=13 complete weeks M5 | raw ticks transfer=NO")
+    print("MXM Ultra-Fast Competition Discovery V2 | READ ONLY | runtime-integrity=FAIL-CLOSED | friction=TYPE-AWARE | Stage-A=13 complete weeks M5 | raw ticks transfer=NO")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization();print("[OAUTH]",mode)
