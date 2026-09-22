@@ -9,16 +9,16 @@
     "V2-C006",
     "V2-C012"
   ],
-  "economic_outcomes_opened": 10,
-  "global_attempts_seen": 24,
+  "economic_outcomes_opened": 11,
+  "global_attempts_seen": 25,
   "integrity_correction_02_test_result_authority": "tests/PRE_M6_INTEGRITY_CORRECTION_02_TEST_RESULTS.json",
   "latest_economic_outcome": {
-    "candidate_id": "V2-C022",
+    "candidate_id": "V2-C023",
     "stage": "A",
     "status": "GROSS_EDGE_FAIL",
-    "result_hash": "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2",
-    "result_ref": "discovery/results/V2-C022_STAGE_A_V1.json",
-    "recorded_utc": "2026-09-22T11:25:00Z"
+    "result_hash": "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98",
+    "result_ref": "discovery/results/V2-C023_STAGE_A_V1.json",
+    "recorded_utc": "2026-09-22T12:24:29Z"
   },
   "legacy_prior_attempts": 16,
   "live_orders_authorized": false,
@@ -516,24 +516,34 @@
       "competition_start": false
     }
   },
-  "next_action": "REQUIRE EXACT-HEAD FULL-SUITE CI GREEN FOR FROZEN V2-C023; ONLY THEN OPEN C023 STAGE-A ECONOMICS ON ACCEPTED V6 WITHOUT RERUNNING C017-C022.",
+  "next_action": "RUN COMPLETE EXACT-HEAD FULL-SUITE CI FOR THE IMMUTABLE C023 RESULT PERSISTENCE; REQUIRE 0 FAIL / 0 ERROR; THEN FREEZE THE NEXT MATERIALLY DISTINCT PROSPECTIVE FRONTIER.",
   "competition_ultra_fast_economic_wave_02": {
-    "state": "FROZEN_PRE_OUTCOME_PENDING_EXACT_HEAD_CI",
+    "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
+    "progress_ref": "data/COMPETITION_ULTRA_FAST_WAVE_02_EXECUTION_PROGRESS_V1.json",
+    "completion_ref": "data/COMPETITION_ULTRA_FAST_WAVE_02_COMPLETION_V1.json",
     "candidate_ids": [
       "V2-C023"
     ],
-    "opened_candidate_ids": [],
-    "v2_attempts_used": 8,
-    "v2_search_budget_remaining": 76,
-    "ledger_entries": 39,
-    "result_recorded_entries": 8,
+    "opened_candidate_ids": [
+      "V2-C023"
+    ],
+    "stage_a_survivor_ids": [],
+    "v2_attempts_used": 9,
+    "v2_search_budget_remaining": 75,
+    "ledger_entries": 40,
+    "result_recorded_entries": 9,
+    "pre_outcome_gate": {
+      "head_sha": "60fef8e658c4c6c81bd3e3bc1f6f6ca587000930",
+      "workflow_run_id": 35726820195,
+      "conclusion": "SUCCESS"
+    },
     "protected_evidence_opened": false,
     "live_orders": false,
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "COMPETITION_ULTRA_FAST_WAVE_01_COMPLETE_NO_SURVIVOR_PERSISTENCE_CORRECTED_PENDING_EXACT_HEAD_CI",
+  "phase": "COMPETITION_ULTRA_FAST_WAVE_02_COMPLETE_NO_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -636,8 +646,8 @@
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": false,
   "user_action_required": false,
-  "v2_attempts_used": 8,
-  "v2_evaluated_identities": 8,
+  "v2_attempts_used": 9,
+  "v2_evaluated_identities": 9,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
   "v2_search_budget": 84,
   "future_wave_opportunity_coverage_authority": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
@@ -695,7 +705,7 @@
   "m6_stage_a_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_a_execution_authorization_authority": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
   "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
-  "v2_search_budget_remaining": 76,
+  "v2_search_budget_remaining": 75,
   "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
@@ -719,8 +729,8 @@
   "m6_stage_b_current_config_reporting_policy": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
   "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
   "current_config_stage_b_outcomes_opened": 2,
-  "discovery_ledger_entries": 39,
-  "discovery_result_recorded_entries": 8,
+  "discovery_ledger_entries": 40,
+  "discovery_result_recorded_entries": 9,
   "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
   "historical_margin_blocks_current_operational_work": false,
   "post_stage_b_final_closure_independent_audit_authority": "data/POST_STAGE_B_FINAL_CLOSURE_INDEPENDENT_AUDIT_V1.json",
