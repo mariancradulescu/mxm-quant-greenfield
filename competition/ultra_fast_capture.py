@@ -1,4 +1,4 @@
-"""Compact read-only friction qualification + 13-week M5 Stage-A capture V5.
+"""Compact read-only friction qualification + 13-week M5 Stage-A capture V6.
 
 Evidence-integrity law:
 - one canonical M5 normalizer;
@@ -64,8 +64,8 @@ from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 PLAN_REL="data/COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json"
 PROTOCOL_REL="data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json"
 EXPECTED_PLAN_SHA="bb80361bbfdd732529a50d62a290d57d5ec256308e508c686a6a26c376079520"
-OUTPUT_FILENAME="MXM_COMPETITION_ULTRA_FAST_STAGE_A_V5.zip"
-TOOL_VERSION="MXM_COMPETITION_ULTRA_FAST_ANDROID_STDLIB_V5_RATE_LIMIT_RECOVERY"
+OUTPUT_FILENAME="MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6.zip"
+TOOL_VERSION="MXM_COMPETITION_ULTRA_FAST_ANDROID_STDLIB_V6_STAGE_A_LOWER_BOUNDARY_CLIP"
 QUOTE_TYPES={"BID":1,"ASK":2}
 RAW_HEADER=("time_utc","open","high","low","close","tick_volume")
 # Official cTrader historical-data limit is 5 requests/second/connection.
@@ -778,6 +778,7 @@ class UltraFastCaptureRunner:
         page_size=int(self.plan["capture_law"]["trendbar_pagination"]["page_count"])
         page_limit=int(self.plan["capture_law"]["max_stage_a_pages_per_symbol"])
         page_to=to;rows={};pages=0;raw_total=0;full_pages=0;short_pages=0;empty_pages=0;duplicates=0
+        lower_boundary_overfetch=0
         completion=None;schema_exposes=None;previous_was_full=False;page_log=[]
         while page_to>=frm:
             if pages>=page_limit:
@@ -816,8 +817,10 @@ class UltraFastCaptureRunner:
                 raw_times=[int(x["utcTimestampInMinutes"])*60000 for x in bars]
             except (TypeError,ValueError,KeyError) as exc:
                 raise ImplementationInvalid("malformed Stage-A trendbar timestamp") from exc
-            if any(t<frm or t>request_to for t in raw_times):
-                raise ImplementationInvalid("Stage-A response bar outside requested page boundaries")
+            if any(t>request_to for t in raw_times):
+                raise ImplementationInvalid("Stage-A response bar above requested page upper boundary")
+            page_lower_overfetch=sum(1 for t in raw_times if t<frm)
+            lower_boundary_overfetch+=page_lower_overfetch
             page_seen={}
             for item,t in zip(bars,raw_times):
                 if t in page_seen:
@@ -845,6 +848,7 @@ class UltraFastCaptureRunner:
             page_log.append({
                 "page":pages,"request_to_ms":request_to,"raw_bars":count,
                 "oldest_bar_open_ms":oldest,"newest_bar_open_ms":newest,
+                "below_requested_start_bars":page_lower_overfetch,
                 "has_more_exposed":supports,"has_more":has_more,
             })
 
@@ -879,6 +883,8 @@ class UltraFastCaptureRunner:
             "completion_reason":completion,"request_interval_exhausted":True,
             "response_schema_exposed_has_more":bool(schema_exposes),
             "full_pages":full_pages,"short_pages":short_pages,"empty_pages":empty_pages,
+            "lower_boundary_overfetch_bars":lower_boundary_overfetch,
+            "lower_boundary_overfetch_policy":"CLIP_BEFORE_FROZEN_START_AND_COUNT_AS_BOUNDARY_EXHAUSTION_EVIDENCE",
             "identical_duplicate_count":duplicates,"conflicts":0,
             "page_log":page_log,
         }
