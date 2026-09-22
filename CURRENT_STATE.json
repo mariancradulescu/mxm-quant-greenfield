@@ -516,7 +516,7 @@
       "competition_start": false
     }
   },
-  "next_action": "RUN COMPLETE EXACT-HEAD FULL-SUITE CI FOR THE POST-OUTCOME PERSISTENCE-INTEGRITY CORRECTION; REQUIRE 0 FAIL / 0 ERROR BEFORE ANY NEXT FRONTIER.",
+  "next_action": "RUN COMPLETE EXACT-HEAD FULL-SUITE CI FOR THE CORRECTED LEDGER PAYLOAD TYPE-FIDELITY REPAIR; REQUIRE 0 FAIL / 0 ERROR BEFORE ANY NEXT FRONTIER.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "phase": "COMPETITION_ULTRA_FAST_WAVE_01_COMPLETE_NO_SURVIVOR_PERSISTENCE_CORRECTED_PENDING_EXACT_HEAD_CI",
   "pre_m6_closure": {
@@ -885,11 +885,15 @@
     "completion_ref": "data/COMPETITION_ULTRA_FAST_WAVE_01_COMPLETION_V1.json",
     "persistence_integrity_correction": {
       "classification": "POST_OUTCOME_PERSISTENCE_INTEGRITY_ONLY",
-      "failed_head": "61b385053d70e779dd10b2cd5bc651c8c63b5c5b",
-      "failed_ci_run": 35722361609,
-      "sequence_37_corrected_entry_hash": "1aba29fbce05603977f54a0dfa7eb9874a0b0daffbe92fa5ee3e16d605d0c9fc",
-      "sequence_38_corrected_previous_entry_hash": "1aba29fbce05603977f54a0dfa7eb9874a0b0daffbe92fa5ee3e16d605d0c9fc",
-      "sequence_38_corrected_entry_hash": "200207dc2de7b6ad40c0456454001a2e43989604864c176ea91881e72938d4ac",
+      "original_failed_head": "61b385053d70e779dd10b2cd5bc651c8c63b5c5b",
+      "original_failed_ci_run": 35722361609,
+      "first_correction_head": "40a56db4cfbd34907f00762343dd4d249fc2e91f",
+      "first_correction_ci_run": 35723649281,
+      "first_correction_failure": "LEDGER_EMBEDDED_RESULT_NUMERIC_TYPE_DRIFT_FROM_JAVASCRIPT_RESERIALIZATION",
+      "canonical_sequence_37_entry_hash": "d75f44b6a85161fcb9745d58744925decca34a40c508afcd78adfb995496389b",
+      "canonical_sequence_38_previous_entry_hash": "d75f44b6a85161fcb9745d58744925decca34a40c508afcd78adfb995496389b",
+      "canonical_sequence_38_entry_hash": "5c93b265b44d1ceaa2897ddf62bf8630b8d3deee1823d20cbedd4575f096d7fb",
+      "correction_rule": "LEDGER_EMBEDDED_RESULT_PAYLOAD_MUST_PARSE_IDENTICALLY_TO_IMMUTABLE_STANDALONE_RESULT_PAYLOAD",
       "c021_result_bytes_changed": false,
       "c022_result_bytes_changed": false,
       "economic_rerun_performed": false,
