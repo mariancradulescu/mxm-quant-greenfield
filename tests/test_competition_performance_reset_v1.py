@@ -59,6 +59,20 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
         self.assertEqual(s["deposit_currency"],"EUR")
         self.assertEqual(s["stop_out_margin_level_threshold"]["state"],"UNKNOWN_NOT_IDENTIFIED_BY_PROTOOA_TRADER_OR_MARGIN_CALL_LIST")
 
+    def test_material_audit_correction_blocks_old_frontier(self):
+        a=json.loads((ROOT/"COMPETITION_UNIVERSE_AUDIT_CORRECTION_V1.json").read_text())
+        s=json.loads((ROOT/"CURRENT_STATE.json").read_text())
+        self.assertEqual(a["accounting"]["remaining"],82)
+        self.assertEqual(a["accounting"]["correction_attempts_consumed"],0)
+        self.assertEqual(a["accounting"]["correction_economic_outcomes_opened"],0)
+        self.assertEqual(a["old_frontier"]["state"],"PRESERVED_HISTORICAL_PROSPECTIVE_ARTIFACT_SUSPENDED_BEFORE_OWN_OUTCOMES")
+        self.assertFalse(a["old_frontier"]["execute_before_exhaustive_universe"])
+        self.assertIsNone(s["active_competition_frontier_authority"])
+        self.assertEqual(s["active_competition_universe_audit_correction"],"COMPETITION_UNIVERSE_AUDIT_CORRECTION_V1.json")
+        self.assertFalse(s["competition_first_reset"]["first_frontier_execution_authorized"])
+        self.assertTrue(s["competition_first_reset"]["exhaustive_account_native_universe_required_before_new_economics"])
+        self.assertEqual(s["competition_first_reset"]["generic_broker_universe_capture_package"],"dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2.zip")
+
     def test_frontier_is_preserved_but_not_economically_opened(self):
         f=json.loads((ROOT/"discovery"/"COMPETITION_FRONTIER_WAVE_01_V1.json").read_text())
         self.assertEqual([x["broker_symbol"] for x in f["selected_traded_markets"]],["AUDJPY","SpotCrude","XAUUSD"])
