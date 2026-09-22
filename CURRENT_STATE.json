@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Validate the post-recovery cleanup exact head; after GREEN fast-forward the operational competition branch to that exact tree, then create Performance Research V3 from the GREEN operational head and resume prospective discovery.",
+  "next_action": "Obtain exact-head GREEN for the minimal V3 contract/controller and C013-C016 fail-closed authorization path; then bind authorization to that GREEN head and execute the already-frozen unopened batch once using existing hash-valid evidence.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "C012_CORRECTED_STAGE_B_GREEN_CLEANUP_PENDING_EXACT_HEAD_CI",
+  "phase": "PERFORMANCE_RESEARCH_V3_BOOTSTRAP_PENDING_EXACT_HEAD_GREEN",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -1023,9 +1023,9 @@
   },
   "operational_branch_authority": {
     "branch": "competition-performance-v1-20260921",
-    "work_branch": "c012-stage-b-persist-staging-20260922",
-    "reconciled_parent_head": "67228568317621ffe536b7744537beb7398f2c74",
-    "authority_rule": "COMPETITION_BRANCH_IS_OPERATIONAL; C012_STAGE_B_PERSIST_STAGING_BRANCH_IS_CURRENT_PRE_PROMOTION_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
+    "work_branch": "performance-research-v3-20260922",
+    "reconciled_parent_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
+    "authority_rule": "COMPETITION_BRANCH_IS_GREEN_OPERATIONAL_BASE; PERFORMANCE_RESEARCH_V3_BRANCH_IS_CURRENT_PRE_OUTCOME_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
     "main_merge_required_for_current_work": false
   },
   "current_stage_b_survivor_input_set": [
@@ -1084,5 +1084,26 @@
     "m6/c012_corrected_stage_b_runner.py",
     "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
-  ]
+  ],
+  "performance_research_v3": {
+    "status": "BOOTSTRAP_PENDING_EXACT_HEAD_GREEN",
+    "branch": "performance-research-v3-20260922",
+    "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
+    "base_operational_exact_head_ci_run_id": 35782496459,
+    "contract_ref": "research_v3/RESEARCH_CONTRACT_V3.json",
+    "controller_ref": "research_v3/controller.py",
+    "readiness_inventory_ref": "research_v3/UNOPENED_READINESS_V1.json",
+    "wave01_gate_ref": "research_v3/WAVE_01_PRE_OUTCOME_GATE_V1.json",
+    "wave01_authorization_ref": "research_v3/WAVE_01_EXECUTION_AUTHORIZATION_V1.json",
+    "wave01_wrapper_ref": "research_v3/wave01_execute.py",
+    "selected_unopened_candidate_ids": [
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016"
+    ],
+    "candidate_own_outcomes_opened": false,
+    "user_action_required": false,
+    "protected_evidence_opened": false
+  }
 }
