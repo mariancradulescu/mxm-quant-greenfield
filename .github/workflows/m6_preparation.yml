@@ -209,3 +209,55 @@ jobs:
           path: dist/MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V6.zip
           if-no-files-found: error
           retention-days: 30
+
+      - name: Build deterministic Performance Research V3 Wave01 source bundle
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          paths = [
+              "research_v3/RESEARCH_CONTRACT_V3.json",
+              "research_v3/UNOPENED_READINESS_V1.json",
+              "research_v3/WAVE_01_PRE_OUTCOME_GATE_V1.json",
+              "research_v3/WAVE_01_EXECUTION_AUTHORIZATION_V1.json",
+              "research_v3/controller.py",
+              "research_v3/wave01_execute.py",
+              "research_v3/__init__.py",
+              "m7/competition_expansion_index_m15.py",
+              "m6/stage_a_evaluator.py",
+              "m6/tier1_candidate_replay.py",
+              "m6/transaction_local_cost.py",
+              "m6/causal_conversion.py",
+              "m6/session_replay.py",
+              "m6/__init__.py",
+              "discovery/canonical.py",
+              "discovery/schema.py",
+              "discovery/__init__.py",
+              "discovery/ledger.py",
+              "discovery/candidates/V2-C013.json",
+              "discovery/candidates/V2-C014.json",
+              "discovery/candidates/V2-C015.json",
+              "discovery/candidates/V2-C016.json",
+              "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+              "CURRENT_STATE.json",
+          ]
+          out = Path("dist/MXM_PERFORMANCE_RESEARCH_V3_WAVE01_SOURCE.zip")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+              for rel in paths:
+                  p = Path(rel)
+                  info = zipfile.ZipInfo(rel)
+                  info.date_time = (1980,1,1,0,0,0)
+                  info.compress_type = zipfile.ZIP_DEFLATED
+                  info.external_attr = 0o100644 << 16
+                  z.writestr(info, p.read_bytes())
+          print(out)
+          PY
+          sha256sum dist/MXM_PERFORMANCE_RESEARCH_V3_WAVE01_SOURCE.zip
+      - name: Upload deterministic Performance Research V3 Wave01 source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_PERFORMANCE_RESEARCH_V3_WAVE01_SOURCE
+          path: dist/MXM_PERFORMANCE_RESEARCH_V3_WAVE01_SOURCE.zip
+          if-no-files-found: error
+          retention-days: 30

@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Obtain exact-head GREEN for the minimal V3 contract/controller and C013-C016 fail-closed authorization path; then bind authorization to that GREEN head and execute the already-frozen unopened batch once using existing hash-valid evidence.",
+  "next_action": "Execute V3 Wave01 C013-C016 exactly once as one authorized batch using the already hash-bound DEVELOPMENT M15 and transaction-local cost evidence; then persist canonical results, append RESULT_RECORDED ledger entries, project CURRENT_STATE, and continue discovery.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_BOOTSTRAP_PENDING_EXACT_HEAD_GREEN",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE01_AUTHORIZED_READY_FOR_EXECUTION",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -1086,7 +1086,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "BOOTSTRAP_PENDING_EXACT_HEAD_GREEN",
+    "status": "WAVE01_AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1104,6 +1104,15 @@
     ],
     "candidate_own_outcomes_opened": false,
     "user_action_required": false,
-    "protected_evidence_opened": false
+    "protected_evidence_opened": false,
+    "execution_gate_head": "a8c905dec2208c7531d9ed97401d7b54c54d6129",
+    "execution_gate_ci_run_id": 35784512199,
+    "execution_gate_ci_conclusion": "SUCCESS",
+    "execution_gate_tests_passed": 680,
+    "wave01_authorized": true,
+    "v2_attempts_used_before_wave01": 9,
+    "v2_search_budget_remaining_before_wave01": 75,
+    "expected_attempt_delta_on_execution": 4,
+    "expected_budget_after_execution": 71
   }
 }
