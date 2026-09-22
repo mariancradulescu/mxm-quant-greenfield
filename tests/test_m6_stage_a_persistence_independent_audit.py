@@ -27,10 +27,10 @@ class StageAPersistenceIndependentAuditTests(unittest.TestCase):
 
     def test_live_state_preserves_two_attempts_and_records_post_stage_b_total(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"], 4)
-        self.assertEqual(s["v2_attempts_used"], 2)
-        self.assertEqual(s["v2_evaluated_identities"], 2)
-        self.assertEqual(s["v2_search_budget_remaining"], 82)
+        self.assertEqual(s["economic_outcomes_opened"], 8)
+        self.assertEqual(s["v2_attempts_used"], 6)
+        self.assertEqual(s["v2_evaluated_identities"], 6)
+        self.assertEqual(s["v2_search_budget_remaining"], 78)
         self.assertEqual(s["discovery_survivors"], ["V2-C006", "V2-C012"])
         self.assertEqual(s["certification_survivors"], [])
         self.assertFalse(s["protected_evidence_opened"])
