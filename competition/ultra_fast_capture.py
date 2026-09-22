@@ -770,6 +770,14 @@ class UltraFastCaptureRunner:
                 raise ImplementationInvalid("malformed Stage-A trendbar timestamp") from exc
             if any(t<frm or t>request_to for t in raw_times):
                 raise ImplementationInvalid("Stage-A response bar outside requested page boundaries")
+            page_seen={}
+            for item,t in zip(bars,raw_times):
+                if t in page_seen:
+                    if page_seen[t]!=item:
+                        raise ImplementationInvalid("conflicting Stage-A duplicate inside response page")
+                    duplicates+=1
+                else:
+                    page_seen[t]=item
             oldest=min(raw_times);newest=max(raw_times)
             normalized=normalize_m5(
                 bars,digits=int(full_symbol.get("digits",5)),start_utc=interval["start_utc"],
