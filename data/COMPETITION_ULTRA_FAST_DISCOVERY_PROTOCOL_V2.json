@@ -170,7 +170,9 @@
         "requires_positive_median_m5_range": true,
         "max_p75_spread_over_median_m5_range": 0.35,
         "max_p95_spread_over_median_m5_range": 0.75,
-        "max_median_spread_over_mid": 0.005
+        "max_median_spread_over_mid": 0.005,
+        "max_p75_effective_friction_over_median_range": 0.35,
+        "max_p95_effective_friction_over_median_range": 0.75
       },
       "FRICTION_WATCH": {
         "min_two_sided_window_coverage": 0.5,
@@ -178,7 +180,9 @@
         "requires_positive_median_m5_range": true,
         "max_p75_spread_over_median_m5_range": 0.5,
         "max_p95_spread_over_median_m5_range": 1,
-        "max_median_spread_over_mid": 0.01
+        "max_median_spread_over_mid": 0.01,
+        "max_p75_effective_friction_over_median_range": 0.5,
+        "max_p95_effective_friction_over_median_range": 1
       },
       "otherwise": "FRICTION_FAIL",
       "evidence_floor": {
@@ -208,7 +212,7 @@
     "candidate_priority": "FRICTION_PASS before FRICTION_WATCH; FULL_FRICTION_RESOLVED before conservatively bounded; then descending movement_to_effective_p75_friction; ascending accepted_min_margin_pct_eur200; descending schedule_minutes_per_week; ascending p95_spread_over_median_range; broker_symbol lexical",
     "effective_p75_friction": "p75 spread plus minimum-volume open+close commission in price-equivalent units. No zero-commission fallback is allowed when material commission conversion is unresolved.",
     "variant_rule": "one broker variant_family maximum unless no distinct qualified alternative exists",
-    "watch_use": "WATCH may fill a family target only when no PASS remains and movement_to_p75_spread >= 2.0",
+    "watch_use": "WATCH may fill a family target only when no PASS remains and movement_to_effective_p75_friction >= 2.0",
     "vacancy_fill": "unfilled family slots are filled from remaining PASS globally subject to max 4 symbols per family and variant uniqueness",
     "alpha_used": false,
     "user_manual_replacement": false,
