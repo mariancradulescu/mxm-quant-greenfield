@@ -1,0 +1,485 @@
+{
+  "schema": "mxm.greenfield.v2.competition-frontier-wave-01.v2",
+  "status": "PROSPECTIVE_STRUCTURAL_FRONTIER_FROZEN_PRE_DATA_ACQUISITION_PRE_OUTCOME",
+  "supersedes": "discovery/COMPETITION_FRONTIER_WAVE_01_V1.json",
+  "supersession_reason": "V1 selected from a non-exhaustive 47-symbol lower-bound catalog. V2 is selected from the accepted exhaustive 5324-symbol account-native capture with 1649 BUY-feasible symbols, 1609 SELL-feasible symbols and 93 two-sided EUR200-feasible FX pairs.",
+  "selection_authorities": {
+    "broker_universe_acceptance": "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
+    "structural_map_summary": "data/BROKER_NATIVE_COMPETITION_STRUCTURAL_MAP_SUMMARY_V2.json",
+    "source_capture_zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+    "structural_map_csv_sha256": "c2b16c3fc0419ec335ebbd67e0af09043e60a476516db01c55550d661b5f4130"
+  },
+  "selection_law": {
+    "alpha_outcomes_used": false,
+    "existing_historical_data_defines_universe": false,
+    "structural_factors": [
+      "EUR200 directional feasibility",
+      "minimum margin burden",
+      "volume granularity",
+      "session coverage and complementarity",
+      "weekend availability",
+      "captured commission/minimum-commission/conversion-fee structure",
+      "financing/swap fields",
+      "asset/driver diversification",
+      "data-acquisition burden",
+      "execution-cost resolvability",
+      "shared-EUR200 concurrency potential",
+      "product-variant duplication avoidance"
+    ],
+    "test_asset_class_products_allowed": false,
+    "metals_first_wave": "DEFERRED_STRUCTURALLY_NOT_REJECTED_FOR_ALPHA: cheapest feasible spot metals currently require roughly 56%+ of EUR200 at minimum volume; XAUUSD requires roughly 94.5%, while materially more capital-efficient independent opportunity sources exist.",
+    "btc_first_wave": "EXCLUDED_STRUCTURALLY: BTCUSD is neither BUY nor SELL EUR200-feasible at broker minimum volume in the accepted capture.",
+    "hard21_role": "Breadth supplies genuine opportunity surface; no filler trades, threshold loosening or order splitting.",
+    "return_ceiling": null
+  },
+  "selected_markets": [
+    {
+      "broker_symbol": "EURUSD",
+      "symbol_id": 1,
+      "asset_class": "Forex (Spot)",
+      "product_type": "FX_SPOT_OR_MARGIN_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 33.33,
+      "min_sell_margin_eur": 33.33,
+      "min_margin_pct_eur200": 1666.5,
+      "min_volume_cents": 100000,
+      "step_volume_cents": 100000,
+      "max_volume_cents": 1000000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 7186,
+      "shortable": true,
+      "leverage_id": 53591
+    },
+    {
+      "broker_symbol": "USDJPY",
+      "symbol_id": 4,
+      "asset_class": "Forex (Spot)",
+      "product_type": "FX_SPOT_OR_MARGIN_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 29.05,
+      "min_sell_margin_eur": 29.05,
+      "min_margin_pct_eur200": 1452.5,
+      "min_volume_cents": 100000,
+      "step_volume_cents": 100000,
+      "max_volume_cents": 1000000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 7186,
+      "shortable": true,
+      "leverage_id": 53591
+    },
+    {
+      "broker_symbol": "AUDJPY",
+      "symbol_id": 11,
+      "asset_class": "Forex (Spot)",
+      "product_type": "FX_SPOT_OR_MARGIN_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 31.04,
+      "min_sell_margin_eur": 31.04,
+      "min_margin_pct_eur200": 1552,
+      "min_volume_cents": 100000,
+      "step_volume_cents": 100000,
+      "max_volume_cents": 1000000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 7186,
+      "shortable": true,
+      "leverage_id": 53592
+    },
+    {
+      "broker_symbol": "MXNJPY",
+      "symbol_id": 2778,
+      "asset_class": "Forex (Spot)",
+      "product_type": "FX_SPOT_OR_MARGIN_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 2.53,
+      "min_sell_margin_eur": 2.53,
+      "min_margin_pct_eur200": 126.5,
+      "min_volume_cents": 100000,
+      "step_volume_cents": 100000,
+      "max_volume_cents": 1000000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 7186,
+      "shortable": true,
+      "leverage_id": 53592
+    },
+    {
+      "broker_symbol": "NOKSEK",
+      "symbol_id": 87,
+      "asset_class": "Forex (Spot)",
+      "product_type": "FX_SPOT_OR_MARGIN_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 4.62,
+      "min_sell_margin_eur": 4.62,
+      "min_margin_pct_eur200": 231,
+      "min_volume_cents": 100000,
+      "step_volume_cents": 100000,
+      "max_volume_cents": 1000000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 7186,
+      "shortable": true,
+      "leverage_id": 53592
+    },
+    {
+      "broker_symbol": "VIX",
+      "symbol_id": 152,
+      "asset_class": "Indices (Spot)",
+      "product_type": "CASH_INDEX_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 0.14,
+      "min_sell_margin_eur": 0.14,
+      "min_margin_pct_eur200": 7,
+      "min_volume_cents": 10,
+      "step_volume_cents": 10,
+      "max_volume_cents": 100000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6891,
+      "shortable": true,
+      "leverage_id": 53590
+    },
+    {
+      "broker_symbol": "HSTECH",
+      "symbol_id": 7371,
+      "asset_class": "Indices (Spot)",
+      "product_type": "CASH_INDEX_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 0.5,
+      "min_sell_margin_eur": 0.49,
+      "min_margin_pct_eur200": 24.5,
+      "min_volume_cents": 1,
+      "step_volume_cents": 1,
+      "max_volume_cents": 14000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6891,
+      "shortable": true,
+      "leverage_id": 53590
+    },
+    {
+      "broker_symbol": "US400",
+      "symbol_id": 7372,
+      "asset_class": "Indices (Spot)",
+      "product_type": "CASH_INDEX_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 3.19,
+      "min_sell_margin_eur": 3.19,
+      "min_margin_pct_eur200": 159.5,
+      "min_volume_cents": 1,
+      "step_volume_cents": 1,
+      "max_volume_cents": 6000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6891,
+      "shortable": true,
+      "leverage_id": 53590
+    },
+    {
+      "broker_symbol": "Gasoline",
+      "symbol_id": 309,
+      "asset_class": "Energies (Spot)",
+      "product_type": "SPOT_ENERGY_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 2.85,
+      "min_sell_margin_eur": 2.84,
+      "min_margin_pct_eur200": 142,
+      "min_volume_cents": 1000,
+      "step_volume_cents": 1000,
+      "max_volume_cents": 10000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6891,
+      "shortable": true,
+      "leverage_id": 53590
+    },
+    {
+      "broker_symbol": "SpotCrude",
+      "symbol_id": 250,
+      "asset_class": "Energies (Spot)",
+      "product_type": "SPOT_ENERGY_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 8.53,
+      "min_sell_margin_eur": 8.52,
+      "min_margin_pct_eur200": 426,
+      "min_volume_cents": 100,
+      "step_volume_cents": 100,
+      "max_volume_cents": 500000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6891,
+      "shortable": true,
+      "leverage_id": 53590
+    },
+    {
+      "broker_symbol": "Copper",
+      "symbol_id": 111,
+      "asset_class": "Commodities (Cash)",
+      "product_type": "OTHER_OR_TEST_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 11.95,
+      "min_sell_margin_eur": 11.94,
+      "min_margin_pct_eur200": 597,
+      "min_volume_cents": 2000,
+      "step_volume_cents": 2000,
+      "max_volume_cents": 20000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6886,
+      "shortable": true,
+      "leverage_id": 53590
+    },
+    {
+      "broker_symbol": "USTN2YR-F",
+      "symbol_id": 7295,
+      "asset_class": "Forwards - Treasuries",
+      "product_type": "FORWARD_OR_FUTURES_STYLE_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 17.76,
+      "min_sell_margin_eur": 17.76,
+      "min_margin_pct_eur200": 888,
+      "min_volume_cents": 100,
+      "step_volume_cents": 100,
+      "max_volume_cents": 1000000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 6891,
+      "shortable": true,
+      "leverage_id": 53601
+    },
+    {
+      "broker_symbol": "ETHUSD",
+      "symbol_id": 129,
+      "asset_class": "Crypto Currency (Spot)",
+      "product_type": "SPOT_CRYPTO_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 11.94,
+      "min_sell_margin_eur": 11.93,
+      "min_margin_pct_eur200": 596.5,
+      "min_volume_cents": 1,
+      "step_volume_cents": 1,
+      "max_volume_cents": 56000,
+      "coverage_bucket": "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+      "schedule_minutes_per_week": 10065.983,
+      "shortable": true,
+      "leverage_id": 53589
+    },
+    {
+      "broker_symbol": "ADAUSD",
+      "symbol_id": 325,
+      "asset_class": "Crypto Currency (Spot)",
+      "product_type": "SPOT_CRYPTO_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 1.1,
+      "min_sell_margin_eur": 1.08,
+      "min_margin_pct_eur200": 54,
+      "min_volume_cents": 1000,
+      "step_volume_cents": 1000,
+      "max_volume_cents": 1000000,
+      "coverage_bucket": "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+      "schedule_minutes_per_week": 10065.983,
+      "shortable": true,
+      "leverage_id": 53589
+    },
+    {
+      "broker_symbol": "AAPL.US-24",
+      "symbol_id": 2999,
+      "asset_class": "US Equities",
+      "product_type": "EXTENDED_HOURS_SHARE_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 5.9,
+      "min_sell_margin_eur": 5.9,
+      "min_margin_pct_eur200": 295,
+      "min_volume_cents": 10,
+      "step_volume_cents": 10,
+      "max_volume_cents": 25000,
+      "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 7007,
+      "shortable": true,
+      "leverage_id": 53588
+    },
+    {
+      "broker_symbol": "TLT.US",
+      "symbol_id": 4504,
+      "asset_class": "ETFs",
+      "product_type": "ETF_CFD",
+      "buy_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "sell_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+      "min_buy_margin_eur": 1.43,
+      "min_sell_margin_eur": 1.43,
+      "min_margin_pct_eur200": 71.5,
+      "min_volume_cents": 10,
+      "step_volume_cents": 10,
+      "max_volume_cents": 25000,
+      "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+      "schedule_minutes_per_week": 1936,
+      "shortable": true,
+      "leverage_id": 53588
+    }
+  ],
+  "research_slots": [
+    {
+      "slot": "R01",
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "market_group": "FX_5",
+      "resolution_plan": [
+        "M5",
+        "M15_RESAMPLED",
+        "H1_RESAMPLED"
+      ],
+      "intent": "cross-sectional relative strength with causal ranking and capital-aware admission"
+    },
+    {
+      "slot": "R02",
+      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "market_group": "FX_5",
+      "resolution_plan": [
+        "M5",
+        "M15_RESAMPLED"
+      ],
+      "intent": "session/overlap breakout across distinct FX clusters"
+    },
+    {
+      "slot": "R03",
+      "mechanism_family": "MEAN_REVERSION",
+      "market_group": "FX_5",
+      "resolution_plan": [
+        "M5"
+      ],
+      "intent": "short-horizon completed-bar reversion without parameter grid"
+    },
+    {
+      "slot": "R04",
+      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "market_group": "INDEX_3",
+      "resolution_plan": [
+        "M5",
+        "M15_RESAMPLED"
+      ],
+      "intent": "session/volatility expansion across VIX, HSTECH and US400"
+    },
+    {
+      "slot": "R05",
+      "mechanism_family": "MEAN_REVERSION",
+      "market_group": "INDEX_3",
+      "resolution_plan": [
+        "M5"
+      ],
+      "intent": "short-horizon index reversion with separate market contributions"
+    },
+    {
+      "slot": "R06",
+      "mechanism_family": "TREND_MOMENTUM",
+      "market_group": "ENERGY_COMMODITY_3",
+      "resolution_plan": [
+        "M15_RESAMPLED",
+        "H1_RESAMPLED"
+      ],
+      "intent": "intraday trend across gasoline, crude and copper"
+    },
+    {
+      "slot": "R07",
+      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "market_group": "ENERGY_COMMODITY_3",
+      "resolution_plan": [
+        "M5",
+        "M15_RESAMPLED"
+      ],
+      "intent": "volatility expansion complementary to R06"
+    },
+    {
+      "slot": "R08",
+      "mechanism_family": "TREND_MOMENTUM",
+      "market_group": "RATES_1",
+      "resolution_plan": [
+        "M15_RESAMPLED",
+        "H1_RESAMPLED"
+      ],
+      "intent": "rate-sensitive trend/session component on USTN2YR-F"
+    },
+    {
+      "slot": "R09",
+      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "market_group": "CRYPTO_2",
+      "resolution_plan": [
+        "M5",
+        "M15_RESAMPLED"
+      ],
+      "intent": "24x7/weekend volatility expansion"
+    },
+    {
+      "slot": "R10",
+      "mechanism_family": "MEAN_REVERSION",
+      "market_group": "CRYPTO_2",
+      "resolution_plan": [
+        "M5"
+      ],
+      "intent": "short-horizon crypto reversion, distinct from R09"
+    },
+    {
+      "slot": "R11",
+      "mechanism_family": "SEASONALITY_SESSION_TIME",
+      "market_group": "EXTENDED_EQUITY_1",
+      "resolution_plan": [
+        "M5",
+        "M15_RESAMPLED"
+      ],
+      "intent": "extended-hours vs regular-session structure on AAPL.US-24"
+    },
+    {
+      "slot": "R12",
+      "mechanism_family": "TREND_MOMENTUM",
+      "market_group": "ETF_1",
+      "resolution_plan": [
+        "M15_RESAMPLED",
+        "H1_RESAMPLED"
+      ],
+      "intent": "rate-sensitive ETF trend/session component on TLT.US"
+    }
+  ],
+  "identity_accounting": {
+    "candidate_ids_frozen_at_frontier": 0,
+    "economic_identities_opened": 0,
+    "v2_attempts_consumed": 0,
+    "prospective_slots": 12,
+    "old_arbitrary_max_new_identities_4_applies": false,
+    "rule": "After required DEVELOPMENT bars are accepted, freeze one exact identity per justified slot (or fewer if data quality makes a slot non-executable) before opening outcomes. No lookback/threshold grids."
+  },
+  "development_acquisition": {
+    "base_resolution": "M5",
+    "reason": "M5 is the cheapest single broad intraday base that preserves short-horizon/session opportunity and can causally aggregate to M15/H1; M1/ticks are deferred until a survivor proves information value.",
+    "start_utc": "2022-01-03T00:00:00Z",
+    "end_utc": "2026-09-16T23:59:59Z",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "symbols": [
+      "EURUSD",
+      "USDJPY",
+      "AUDJPY",
+      "MXNJPY",
+      "NOKSEK",
+      "VIX",
+      "HSTECH",
+      "US400",
+      "Gasoline",
+      "SpotCrude",
+      "Copper",
+      "USTN2YR-F",
+      "ETHUSD",
+      "ADAUSD",
+      "AAPL.US-24",
+      "TLT.US"
+    ],
+    "higher_resolution_policy": "M15/H1 are resampled only from completed M5 bars. M1/tick/candidate-specific transaction-local cost evidence is acquired only for credible survivors when required.",
+    "economics_before_data_acceptance": false
+  },
+  "C013_C016": {
+    "execute_in_wave_v2": false,
+    "state": "UNCHANGED_FROZEN_UNOPENED_OPTIONAL_HISTORY"
+  },
+  "protected_evidence_opened": false
+}
