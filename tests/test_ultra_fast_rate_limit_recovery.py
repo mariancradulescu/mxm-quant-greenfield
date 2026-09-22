@@ -118,9 +118,9 @@ class UltraFastRateLimitRecoveryTests(unittest.TestCase):
 
     def test_08_v5_package_and_output_supersede_v4_runtime_only(self):
         build=(ROOT/"tools"/"build_competition_ultra_fast_capture_package.py").read_text()
-        self.assertIn("MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5.zip",build)
+        self.assertIn("MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V6.zip",build)
         self.assertIn("COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json",build)
-        self.assertEqual(uf.OUTPUT_FILENAME,"MXM_COMPETITION_ULTRA_FAST_STAGE_A_V5.zip")
+        self.assertEqual(uf.OUTPUT_FILENAME,"MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6.zip")
         self.assertEqual(uf.CHECKPOINT_SCHEMA,"mxm.greenfield.v2.ultra-fast-friction-checkpoint.v5")
 
 
