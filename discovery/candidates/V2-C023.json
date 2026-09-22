@@ -1,0 +1,161 @@
+{
+  "id": "V2-C023",
+  "mechanism": {
+    "family": "CROSS_SECTIONAL_RANKING",
+    "subfamily": "CROSS_MARKET_4H_MOVE_TO_COST_LEADER_CONTINUATION"
+  },
+  "rationale": "Test whether selecting only the strongest absolute four-hour move relative to frozen roundtrip friction, once every four hours, preserves cross-market directional information while sharply reducing turnover versus Wave 01 dense per-symbol primitives.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "source_capture_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z",
+      "iso_weeks": "2026-W25..2026-W37"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "missing_bars": "DO_NOT_FABRICATE",
+    "bar_availability": "AT_M5_CLOSE",
+    "synchronization": "CROSS_SYMBOL_DECISION_GRID_WITH_SYMBOL_LOCAL_CONTIGUITY"
+  },
+  "causal_availability": {
+    "decision_uses": "completed M5 bars only through the four-hour boundary",
+    "entry_uses": "exact observed M5 open at the decision boundary after the completed signal bar",
+    "future_information_forbidden": true,
+    "selection_cost_input": "frozen pre-outcome per-symbol roundtrip cost fraction only",
+    "rolling_state": "only current and prior completed observations"
+  },
+  "features": [
+    {
+      "name": "return_4h",
+      "formula": "close_t / close_t_minus_48 - 1"
+    },
+    {
+      "name": "move_to_cost_score",
+      "formula": "abs(return_4h) / frozen_symbol_roundtrip_cost_fraction"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "return_4h",
+      "bars": 48
+    }
+  ],
+  "normalization_training": {
+    "mode": "FROZEN_COST_NORMALIZATION_ONLY",
+    "future_normalization": false
+  },
+  "timing": {
+    "decision": "EACH_COMPLETED_M5_CLOSE_AT_UTC_00_04_08_12_16_20_BOUNDARY",
+    "entry": "EXACT_OBSERVED_M5_OPEN_AT_DECISION_BOUNDARY",
+    "candidate_frequency": "MAX_ONE_ENTRY_EVERY_FOUR_HOURS"
+  },
+  "direction": {
+    "LONG": "selected_symbol_return_4h > 0",
+    "SHORT": "selected_symbol_return_4h < 0",
+    "NO_OP": "no_eligible_symbol_or_selected_return_4h == 0"
+  },
+  "entry": {
+    "type": "SINGLE_LEG_CROSS_MARKET_SELECTED_MARKET_PROXY",
+    "selection": "MAX_MOVE_TO_COST_SCORE_ACROSS_ELIGIBLE_SYMBOLS",
+    "price": "exact_observed_M5_open_at_decision_boundary"
+  },
+  "exit": {
+    "type": "PRE_SCHEDULED_TIME_EXIT",
+    "intent_time": "entry_timestamp_plus_4_hours",
+    "price": "first_observed_M5_open_at_or_after_scheduled_exit_intent",
+    "missing_at_intent": "keep exit intent pending until first later observed M5 open"
+  },
+  "maximum_hold": {
+    "unit": "SCHEDULED_CLOCK_HOURS_TO_EXIT_INTENT",
+    "value": 4,
+    "realized_hold_may_extend_only_until_first_later_observed_M5_open": true
+  },
+  "execution_assumptions": {
+    "discovery_only": true,
+    "protected_evidence_used": false,
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "decision_grid": "FIXED_FOUR_HOUR_UTC_BOUNDARIES",
+    "entry_exit_grid": "REQUIRE_CONTIGUOUS_5_MINUTE_HISTORY_FOR_SIGNAL_AND_EXACT_ENTRY_OPEN; EXIT_IS_PRE_SCHEDULED_AND_FILLED_AT_FIRST_OBSERVED_OPEN_AT_OR_AFTER_INTENT",
+    "missing_required_grid": "SYMBOL_INELIGIBLE_ONLY_WHEN_SIGNAL_HISTORY_OR_BOUNDARY_ENTRY_OPEN_IS_UNAVAILABLE",
+    "ohlc_only": true
+  },
+  "filters": [
+    "48_BAR_CONTIGUOUS_SIGNAL_LOOKBACK_REQUIRED",
+    "EXACT_ENTRY_OPEN_AT_DECISION_BOUNDARY_REQUIRED",
+    "GLOBAL_MAX_ONE_ACTIVE_CANDIDATE_INSTANCE",
+    "FROZEN_COARSE_COST_REQUIRED"
+  ],
+  "parameters": {
+    "return_bars": 48,
+    "hold_bars": null,
+    "decision_interval_hours": 4,
+    "selection_count": 1,
+    "selection_score": "ABS_RETURN_4H_DIV_ROUNDTRIP_COST_FRACTION",
+    "return_threshold": 0,
+    "scheduled_hold_hours": 4
+  },
+  "capital_semantics": {
+    "stage_a": "ONE_SELECTED_SYMBOL_FIXED_UNIT_NOTIONAL_NO_ALLOCATOR_OR_SIZING_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "authority": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json"
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_ROLLING_STATE_NO_EXTERNAL_RUNTIME"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "position_admission_policy": {
+    "max_simultaneous_active_positions_global": 1,
+    "max_simultaneous_candidate_instances_global": 1,
+    "new_signal_while_active": "IGNORE_NO_QUEUE",
+    "same_boundary_tie_break": "LEXICOGRAPHIC_SYMBOL_AFTER_EQUAL_SCORE",
+    "same_direction_pyramiding_allowed": false,
+    "scope": "PER_CANDIDATE_GLOBAL"
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_selected_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "provenance": {
+    "frozen_before_candidate_own_economic_outcome": true,
+    "candidate_own_return_or_pnl_used": false,
+    "protected_evidence_used": false,
+    "wave01_negative_information_used_only_for_material_distinction": true,
+    "phase": "COMPETITION_ULTRA_FAST_SECOND_ECONOMIC_FRONTIER",
+    "wave": "COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02"
+  },
+  "spec_hash": "c2b8ec06c54743b38168980c7746c50401f563ebee45c55b876654423807b34a"
+}

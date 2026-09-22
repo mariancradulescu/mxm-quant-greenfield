@@ -1,0 +1,70 @@
+{
+  "schema": "mxm.greenfield.v2.competition-ultra-fast-economic-wave-02.v1",
+  "wave_id": "COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02",
+  "status": "FROZEN_BEFORE_C023_ECONOMIC_OUTCOME_PENDING_EXACT_HEAD_CI",
+  "frozen_utc": "2026-09-22T12:13:29Z",
+  "predecessor_completion_ref": "data/COMPETITION_ULTRA_FAST_WAVE_01_COMPLETION_V1.json",
+  "predecessor_status": "COMPLETE_NO_STAGE_A_SURVIVOR",
+  "capture_acceptance_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json",
+  "capture_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
+  "cost_authority_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+  "cost_authority_sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9",
+  "evaluator_ref": "m7/competition_ultra_fast_stage_a_frontier_v2_evaluator.py",
+  "evaluator_sha256": "0f82fe738963058923163403e73bf214c1c17bd45c954e90428b5202c0c2bb39",
+  "candidate_ids": [
+    "V2-C023"
+  ],
+  "candidate_spec_hashes": {
+    "V2-C023": "c2b8ec06c54743b38168980c7746c50401f563ebee45c55b876654423807b34a"
+  },
+  "material_distinction": {
+    "wave01_negative_information_used": true,
+    "wave01_realized_pnl_used_for_parameter_fit": false,
+    "not_a_symmetric_transform_batch": true,
+    "new_structure": [
+      "CROSS_MARKET_SELECTION_INSTEAD_OF_PER_SYMBOL_ALWAYS_ON_SIGNALS",
+      "FOUR_HOUR_SIGNAL_AND_HOLD_HORIZON",
+      "FROZEN_COST_NORMALIZED_RANKING",
+      "GLOBAL_ONE_ACTIVE_POSITION"
+    ]
+  },
+  "selection_basis": [
+    "WAVE_01_DENSE_SIGN_BREAKOUT_AND_15M_VOL_EXPANSION_FAILED",
+    "PREFER_LOWER_TURNOVER_CROSS_MARKET_SELECTION_WITH_NATURAL_HARD21_POTENTIAL",
+    "USE_ONLY_ACCEPTED_V6_AND_PRE_OUTCOME_FROZEN_COSTS",
+    "NO_PARAMETER_GRID_OR_POST_OUTCOME_TUNING"
+  ],
+  "stage_a": {
+    "interval": "2026-W25..2026-W37",
+    "latest_4_week_diagnostic": "2026-W34..2026-W37",
+    "base_resolution": "M5",
+    "fixed_abs_entry_notional_eur": 1000,
+    "maximum_candidate_frequency": "ONE_ENTRY_PER_FOUR_HOUR_UTC_BOUNDARY",
+    "shared_allocator_or_sizing_rescue": false
+  },
+  "hard21_reporting": "ACTUAL_STAGE_A_ANALYTIC_EXECUTED_ENTRIES_BY_CERTIFIED_UTC_ISO_WEEK; NOT_A_SIGNAL_FILTER; NOT_SHARED_EUR200_BROKER_EXECUTIONS",
+  "promotion_law": {
+    "stage_b_26_week_extension": "ONLY_STAGE_A_DISCOVERY_SURVIVOR",
+    "latest_4_week_diagnostic_used_for_promotion": false,
+    "post_outcome_parameter_tuning_same_identity": false
+  },
+  "shared_eur200_stage_a": "NOT_EVALUATED_UNLESS_C023_SURVIVES_STAGE_A; NEVER_SYNTHESIZE_EXECUTABLE_SIZING",
+  "execution_gate": "REQUIRE_EXACT_HEAD_FULL_SUITE_CI_SUCCESS_AFTER_THIS_FREEZE_BEFORE_READING_ANY_C023_REAL_PRICE_OUTCOME",
+  "accounting_before_execution": {
+    "v2_search_budget_total": 84,
+    "v2_attempts_used": 8,
+    "v2_evaluated_identities": 8,
+    "remaining": 76,
+    "new_frozen_identities": 1,
+    "new_attempts_consumed": 0,
+    "economic_outcomes_opened_total": 10,
+    "discovery_result_recorded_entries": 8
+  },
+  "safety": {
+    "c017_c022_rerun": false,
+    "v6_modified": false,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}

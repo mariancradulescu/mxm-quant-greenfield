@@ -40,7 +40,7 @@ class UltraFastPostOutcomeReconciliationTests(unittest.TestCase):
   for cid in ('V2-C019','V2-C020','V2-C021','V2-C022'):
    self.assertEqual(load(f'discovery/results/{cid}_STAGE_A_V1.json')['status'],'GROSS_EDGE_FAIL')
  def test_02_ledger_prefix_is_immutable_and_wave_results_append_once(self):
-  raw=(ROOT/'discovery/ledger.jsonl').read_bytes().splitlines(keepends=True);self.assertEqual(len(raw),38)
+  raw=(ROOT/'discovery/ledger.jsonl').read_bytes().splitlines(keepends=True);self.assertGreaterEqual(len(raw),38)
   self.assertEqual(git_blob_sha1(b''.join(raw[:32])),'b6f9d9b5e9ed26cd3497ac5ed4d5ac1387bc5d79')
   led=read_ledger(ROOT/'discovery/ledger.jsonl');tail=led[32:38]
   self.assertEqual([e['sequence'] for e in tail],list(range(33,39)))
@@ -55,10 +55,10 @@ class UltraFastPostOutcomeReconciliationTests(unittest.TestCase):
   self.assertEqual(p['immutable_pre_outcome_authorities']['evaluator_sha256'],'b9b8fdecd7b415116149e611ff09961fe92793c66ec3d42796afa12946a46c6d')
  def test_04_final_wave_accounting_and_safety_are_exact(self):
   s=load('CURRENT_STATE.json');p=load('data/COMPETITION_ULTRA_FAST_WAVE_01_EXECUTION_PROGRESS_V1.json')
-  self.assertEqual((s['v2_evaluated_identities'],s['v2_attempts_used'],s['v2_search_budget_remaining']),(8,8,76))
-  self.assertEqual((s['global_attempts_seen'],s['economic_outcomes_opened']),(24,10))
-  self.assertEqual((s['discovery_ledger_entries'],s['discovery_result_recorded_entries']),(38,8))
-  self.assertEqual(s['latest_economic_outcome']['candidate_id'],'V2-C022');self.assertEqual(s['latest_economic_outcome']['result_hash'],HASHES['V2-C022'])
+  self.assertEqual(s['v2_evaluated_identities'],s['v2_attempts_used']);self.assertEqual(s['v2_search_budget_remaining'],84-s['v2_attempts_used'])
+  self.assertEqual(s['global_attempts_seen'],16+s['v2_attempts_used']);self.assertEqual(s['economic_outcomes_opened'],s['v2_attempts_used']+2)
+  self.assertGreaterEqual(s['v2_attempts_used'],8);self.assertGreaterEqual(s['discovery_ledger_entries'],38);self.assertEqual(s['discovery_result_recorded_entries'],s['v2_attempts_used'])
+  self.assertEqual(load('discovery/results/V2-C022_STAGE_A_V1.json')['result_hash'],HASHES['V2-C022'])
   self.assertEqual((p['accounting_after_reconciliation']['v2_evaluated_identities'],p['accounting_after_reconciliation']['v2_attempts_used'],p['accounting_after_reconciliation']['v2_search_budget_remaining']),(8,8,76))
   self.assertEqual(p['accounting_after_reconciliation']['double_counted_attempts'],0)
   self.assertFalse(s['protected_evidence_opened']);self.assertFalse(s['live_orders_authorized']);self.assertFalse(s['competition_start_authorized'])
