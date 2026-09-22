@@ -1,0 +1,73 @@
+{
+  "schema": "mxm.greenfield.v2.consumed-identity-forensic-audit.v1",
+  "status": "COMPLETE_C012_IMPLEMENTATION_INVALID_CORRECTION_REQUIRED",
+  "baseline_head": "f8a8fad5499257dc3708a996ad3727460f65e3f5",
+  "recorded_utc": "2026-09-22T13:05:00Z",
+  "no_alternative_semantic_pnl_opened": true,
+  "protected_evidence_opened": false,
+  "result_bytes_frozen": {
+    "V2-C006": ["5303ba8bc5435e39a0075be071d2c14f0eb6f1ff", "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a"],
+    "V2-C012": ["d3a747e5292e87e180a9399d8ca762249dcc3dd8", "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c"],
+    "V2-C017": ["a94e58260acd9cd284611107e162af3a511c158a", "9870baf130d12e9864489c6d0ebe83a80b4fa3a38f1b2c5321ac03e1dc64029b"],
+    "V2-C018": ["218efe67a4a7fd8d5d7fc6402aa33c3d07855b52", "f1a647f633d46d26dfa2b9d971b72e4bf3c53dd4eef9971ed0503cd2018fe69c"],
+    "V2-C019": ["2f600c9c43966c3f02d218df2c305ba82d329611", "65cf8e6358da6f304cce53a9f3ec3abfb922525c8de2f2a59ca0ce1fe637e9c6"],
+    "V2-C020": ["1e232658666522b99892297c4ccf95fcb760eb9e", "28b9fac70c1b39e7d782103324327c5c6249452868293c5a9bcc4fa137a7b8c2"],
+    "V2-C021": ["f55eb5071b0aa81c243921b3a983cd2d3594abdb", "ab2b23edb01a913cc2aace95591bf004d6458cc3b3d254eca26625d211e5d1a2"],
+    "V2-C022": ["69fe74716fb8eaee50cd2c795b96e9526825e704", "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2"],
+    "V2-C023": ["dfd4c980638604a92fd80f34ae69bb9c61d776b8", "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98"]
+  },
+  "classifications": {
+    "V2-C006": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+    "V2-C012": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C017": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT",
+    "V2-C018": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT",
+    "V2-C019": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT",
+    "V2-C020": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT",
+    "V2-C021": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT",
+    "V2-C022": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT",
+    "V2-C023": "VALID_BUT_SEMANTICALLY_RESTRICTED_EXPERIMENT"
+  },
+  "c012_defect": {
+    "frozen_rule": "rolling_state uses only prior synchronized completed bars",
+    "executed_old_runtime": "return_t was appended before rolling_sample_std_520 and included in the denominator window",
+    "old_runtime_git_blob_sha1": "028fa4b5bdac1058afa5ffb3e21f40ab299bf1f7",
+    "candidate_spec_changed": false,
+    "raw_data_invalid": false,
+    "cost_evidence_invalid": false,
+    "old_economic_verdict_authoritative": false,
+    "same_identity_corrected_rerun_required": true,
+    "new_v2_attempt_consumed": false,
+    "search_budget_decrement": 0
+  },
+  "validated_common_dimensions": [
+    "frozen_candidate_spec_and_active_hash",
+    "evaluator_binding",
+    "dataset_binding",
+    "cost_authority_binding",
+    "signal_and_lookback_formula",
+    "completed_bar_causality",
+    "decision_entry_exit_timing",
+    "missing_bar_and_session_behavior",
+    "position_admission_and_suppression",
+    "direction_mapping",
+    "cost_application",
+    "notional_normalization",
+    "result_hash",
+    "ledger_result_correspondence"
+  ],
+  "semantic_restriction_finding": {
+    "C017_C022": "per-symbol one-active/no-queue/fixed-hold rules are frozen identity semantics, not global research laws",
+    "C023": "4h boundary, selection_count=1 and global one-active are frozen C023 semantics only",
+    "broader_mechanism_families_closed": false
+  },
+  "attempt_accounting": {
+    "v2_budget_total": 84,
+    "distinct_evaluated_identities": 9,
+    "remaining": 75,
+    "c012_corrected_rerun_attempt_delta": 0
+  },
+  "safety": {
+    "live_orders": false,
+    "competition_start": false
+  }
+}
