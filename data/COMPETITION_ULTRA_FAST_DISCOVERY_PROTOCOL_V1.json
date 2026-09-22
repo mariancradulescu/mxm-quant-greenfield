@@ -61,7 +61,8 @@
     "m1_tick_policy": "ONLY_SURVIVORS_WHEN_INFORMATION_VALUE_JUSTIFIES",
     "raw_tick_transfer": false,
     "years_of_raw_bar_transfer": false,
-    "streaming_old_history_preferred": true
+    "streaming_old_history_preferred": true,
+    "initial_return_artifact_expectation": "MB_TO_TENS_OF_MB_NOT_HUNDREDS_OF_MB_OR_GB"
   },
   "friction_screen": {
     "purpose": "NON_ALPHA_MARKET_QUALIFICATION_BEFORE_13_WEEK_BAR_DOWNLOAD",
@@ -198,7 +199,8 @@
     "watch_use": "WATCH may fill a family target only when no PASS remains and movement_to_p75_spread >= 2.0",
     "vacancy_fill": "unfilled family slots are filled from remaining PASS globally subject to max 4 symbols per family and variant uniqueness",
     "alpha_used": false,
-    "user_manual_replacement": false
+    "user_manual_replacement": false,
+    "stage_a_data_availability_replacement": "If an initially selected market cannot return at least 500 completed causal M5 bars for the frozen 13-week interval after bounded retries, replace it deterministically with the next friction-qualified unused candidate from the same family; then use the global PASS vacancy order. No alpha outcome is consulted."
   },
   "stage_a_evidence_rule": {
     "all_first_wave_candidates_begin_on_13_weeks": true,
