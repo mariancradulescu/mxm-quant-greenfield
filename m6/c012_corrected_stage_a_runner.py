@@ -17,6 +17,7 @@ from .session_replay import NasdaqCashCalendar
 from .stage_a_evaluator import evaluate_prepared_candidate
 from .stage_a_tier1_runner import (
     C012_KNOWN_UNSUPPORTED_BOUNDARIES_MS,
+    EVALUATOR_RUNTIME_SHA256,
     PreparedCandidate,
     StageAExecutionNotAuthorized,
     StageARunnerIntegrityError,
