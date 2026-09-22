@@ -340,7 +340,7 @@ class PreM6FinalReadinessTests(unittest.TestCase):
         while len(timestamps)<527:
             if day.weekday()<5:
                 for i in range(26):
-                    if len(timestamps)>=526: break
+                    if len(timestamps)>=527: break
                     timestamps.append(
                         (datetime(day.year,day.month,day.day,9,30,tzinfo=ny)+timedelta(minutes=15*i))
                         .astimezone(timezone.utc)
