@@ -65,7 +65,19 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
                 stage_a["corrected_successor_ref"],
                 "discovery/results/V2-C012_STAGE_A_V2.json",
             )
-            self.assertIn("PENDING_CORRECTED_SUCCESSOR", stage_b["state"])
+            corrected_stage_b = correction.get("corrected_stage_b", {})
+            if corrected_stage_b.get("economics_run") is True:
+                self.assertEqual(stage_b["state"], "VALID_CORRECTED_SUCCESSOR")
+                self.assertEqual(
+                    stage_b["corrected_successor_ref"],
+                    "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
+                )
+                self.assertEqual(
+                    stage_b["corrected_successor_hash"],
+                    corrected_stage_b["corrected_stage_b_result_hash"],
+                )
+            else:
+                self.assertIn("PENDING_CORRECTED_SUCCESSOR", stage_b["state"])
         else:
             self.assertNotIn("V2-C012", state["discovery_survivors"])
             self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
