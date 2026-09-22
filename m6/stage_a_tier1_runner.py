@@ -49,6 +49,8 @@ EVALUATOR_POLICY_GIT_BLOB = "6c9999a7641b8f2299f1c4c5aab7ccb9e57c784a"
 EVALUATOR_RUNTIME_GIT_BLOB = "05220fcadae6a74a7036e46f64ee1ad1411dc26f"
 EVALUATOR_RUNTIME_SHA256 = "16e302dd3a9b58983cbfcb68ca0934c920ea8007fd11e9577685fa95f879874e"
 PRE_ECONOMIC_MATERIALIZATION_GIT_BLOB = "f6b2407d0f8a5a42b239a9fd5953c70a83a09b88"
+CORRECTED_C012_REPLAY_GIT_BLOB = "b4cc3f2b56bb586edefe5c8821225225e79f27ca"
+C012_CORRECTION_AUTHORITY = "evidence/C012_SAME_IDENTITY_IMPLEMENTATION_CORRECTION_V1.json"
 
 EXPECTED_INTENT_COUNTS = {"V2-C006": 108, "V2-C012": 35}
 EXPECTED_INTENT_MANIFEST_SHA256 = {
@@ -184,6 +186,23 @@ def verify_repository_authorities(repo_root: Path | str) -> None:
             raise StageARunnerIntegrityError(f"missing authority: {rel}")
         actual = _git_blob_sha_bytes(path.read_bytes())
         if actual != expected:
+            if rel == "m6/tier1_candidate_replay.py" and actual == CORRECTED_C012_REPLAY_GIT_BLOB:
+                correction_path = root / C012_CORRECTION_AUTHORITY
+                if not correction_path.is_file():
+                    raise StageARunnerIntegrityError("corrected C012 replay lacks correction authority")
+                correction = json.loads(correction_path.read_text(encoding="utf-8"))
+                if (
+                    correction.get("candidate_id") != "V2-C012"
+                    or correction.get("candidate_spec_hash") != C012_HASH
+                    or correction.get("historical_replay_git_blob_sha1") != expected
+                    or correction.get("corrected_replay_git_blob_sha1") != actual
+                    or correction.get("semantic_change") is not False
+                    or correction.get("same_identity") is not True
+                    or correction.get("new_v2_attempt_consumed") is not False
+                    or correction.get("corrected_economic_outcome_opened") is not False
+                ):
+                    raise StageARunnerIntegrityError("invalid corrected C012 replay authority")
+                continue
             raise StageARunnerIntegrityError(
                 f"authority blob mismatch {rel}: expected {expected}, got {actual}"
             )
