@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.greenfield.v2.competition-universe-audit-correction.v1",
+  "status": "MATERIAL_AUDIT_CORRECTION_BLOCKS_NEW_ECONOMICS_PENDING_EXHAUSTIVE_CAPTURE",
+  "recorded_utc": "2026-09-22T04:00:00Z",
+  "branch": "competition-performance-v1-20260921",
+  "accepted_live_parent": "1112122bea8c13296bbcad77621003c470daf8e7",
+  "defect": {
+    "old_universe_authority": "data/BROKER_NATIVE_COMPETITION_UNIVERSE_V1.json",
+    "full_account_universe_claimed": false,
+    "exhaustive_current_accessible_symbol_count": null,
+    "confirmed_accessible_lower_bound": 47,
+    "persisted_forex_spot_count": 1,
+    "interpretation": "ONE_PERSISTED_FX_SYMBOL_IS_A_FILTERED-CAPTURE_LIMITATION_NOT_A_BROKER-UNIVERSE_FACT"
+  },
+  "historical_preservation": {
+    "C006_C012": "UNCHANGED_ACCEPTED_BASELINE",
+    "C013_C016": "UNCHANGED_FROZEN_UNOPENED",
+    "protected_evidence_opened": false,
+    "transaction_local_cost_methodology_changed": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "accounting": {
+    "v2_budget_total": 84,
+    "evaluated_identities": 2,
+    "attempts_consumed": 2,
+    "remaining": 82,
+    "correction_attempts_consumed": 0,
+    "correction_economic_outcomes_opened": 0
+  },
+  "old_frontier": {
+    "authority": "discovery/COMPETITION_FRONTIER_WAVE_01_V1.json",
+    "symbols": [
+      "AUDJPY",
+      "SpotCrude",
+      "XAUUSD"
+    ],
+    "state": "PRESERVED_HISTORICAL_PROSPECTIVE_ARTIFACT_SUSPENDED_BEFORE_OWN_OUTCOMES",
+    "execute_before_exhaustive_universe": false,
+    "supersession_rule": "CREATE_A_NEW_SUCCESSOR_FRONTIER_AFTER_ACCEPTED_EXHAUSTIVE_ACCOUNT_NATIVE_CAPTURE; DO_NOT_MUTATE_OLD_ARTIFACT"
+  },
+  "exhaustive_capture_v2": {
+    "runtime": "competition/broker_universe_capture.py",
+    "entrypoint": "COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py",
+    "deployment_package": "dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2.zip",
+    "expected_return_zip": "MXM_COMPETITION_BROKER_UNIVERSE_V2.zip",
+    "read_only": true,
+    "one_capture_only": true,
+    "symbol_inventory": "FULL_CURRENT_ACCOUNT_NATIVE_LIGHT_SYMBOL_LIST_PLUS_FULL_METADATA",
+    "directional_feasibility_authoritative": true,
+    "buy_sell_separate": true,
+    "shortability_bound": true,
+    "account_execution_semantics_bound": true,
+    "margin_call_thresholds_bound_where_exposed": true,
+    "unknown_fields_remain_unknown": true
+  },
+  "shared_replay_correction": {
+    "implementation": "competition/shared_eur200_replay.py",
+    "account_type_required": true,
+    "total_margin_calculation_type_required": true,
+    "hedged_same_symbol_positions_not_artificially_banned": true,
+    "netted_same_symbol_stream_must_be_pre_netted_by_allocator": true,
+    "total_margin_types": [
+      "MAX",
+      "SUM",
+      "NET"
+    ],
+    "directional_feasibility_required_for_execution": true
+  },
+  "next_action": "RUN_EXACT_HEAD_TESTS_AND_CI_THEN_EXECUTE_ONE_AUTHENTICATED_READ_ONLY_EXHAUSTIVE_BROKER_CAPTURE; NO_NEW_ECONOMIC_IDENTITY_MAY_OPEN_BEFORE_ACCEPTANCE",
+  "after_capture": "PERSIST_EXHAUSTIVE_DIRECTIONAL_UNIVERSE -> DERIVE_FULL_STRUCTURAL_OPPORTUNITY_CAPITAL_EFFICIENCY_MAP -> FREEZE_SUCCESSOR_BROAD_FRONTIER -> ACQUIRE_ONLY_REQUIRED_DEVELOPMENT_DATA -> FREEZE_IDENTITIES -> EXECUTE_FIRST_REAL_COMPETITION_WAVE_WITHOUT_ANOTHER_GENERIC_PREPARATION_LOOP"
+}
