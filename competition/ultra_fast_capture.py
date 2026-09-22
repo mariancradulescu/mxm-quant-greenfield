@@ -425,7 +425,8 @@ class UltraFastCaptureRunner:
         self.plan=dict(plan);self.protocol=dict(protocol);self.client_id=client_id;self.client_secret=client_secret
         self.access_token=access_token;self.config=dict(config);self.root=Path(repo_root);self.progress=progress
         self.transport=transport or StdlibCTraderTransport(LIVE_HOST,LIVE_PORT,response_timeout=60)
-        self.bundle=self.root/"competition_ultra_fast_output"/"MXM_COMPETITION_ULTRA_FAST_STAGE_A_V3"
+        self.bundle=self.root/"competition_ultra_fast_output"/"MXM_COMPETITION_ULTRA_FAST_STAGE_A_V4"
+        self.checkpoint_dir=self.root/"competition_ultra_fast_checkpoint"/"MXM_COMPETITION_ULTRA_FAST_FRICTION_CHECKPOINT_V4"
         self.zip_path=self.root/OUTPUT_FILENAME
         self._app=False;self._account=None;self._last=None;self._requests=0
         self._tick_cache={}
