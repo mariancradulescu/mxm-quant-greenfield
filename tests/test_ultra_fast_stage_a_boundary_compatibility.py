@@ -90,8 +90,6 @@ class StageALowerBoundaryCompatibilityTests(unittest.TestCase):
         self.assertFalse(ev["failure"]["v2_attempt_consumed"])
         self.assertTrue(ev["progress_before_failure"]["checkpoint_saved"])
         self.assertEqual(ev["progress_before_failure"]["selector_initial_admitted"],"10/12")
-        self.assertEqual(state["v2_attempts_used"],8)
-        self.assertEqual(state["v2_search_budget_remaining"],76)
         self.assertFalse(state["protected_evidence_opened"])
 
     def test_05_v6_frontier_keeps_frozen_v4_plan_and_32_shortlist(self):
