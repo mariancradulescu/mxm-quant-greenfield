@@ -26,10 +26,11 @@ class UltraFastEconomicWaveFreezeTests(unittest.TestCase):
  def test_05_execution_gate_and_accounting_authority_remain_historically_pre_outcome(self):
   w=json.loads((ROOT/'discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_01_V1.json').read_text());s=json.loads((ROOT/'CURRENT_STATE.json').read_text())
   self.assertIn('REQUIRE_EXACT_HEAD',w['execution_gate']);self.assertEqual(w['accounting_before_execution']['new_attempts_consumed'],0);self.assertEqual(w['accounting_before_execution']['v2_attempts_used'],2);self.assertEqual(w['accounting_before_execution']['remaining'],82);self.assertFalse(w['protected_evidence_opened']);self.assertFalse(s['protected_evidence_opened'])
- def test_06_historical_freeze_authority_stays_pre_outcome_and_c021_c022_are_unopened(self):
-  w=json.loads((ROOT/'discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_01_V1.json').read_text())
+ def test_06_historical_freeze_authority_stays_pre_outcome_without_claiming_live_results_absent(self):
+  w=json.loads((ROOT/'discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_01_V1.json').read_text());s=json.loads((ROOT/'CURRENT_STATE.json').read_text())
   self.assertEqual(w['status'],'FROZEN_BEFORE_C017_C022_ECONOMIC_OUTCOMES_PENDING_EXACT_HEAD_CI');self.assertEqual(w['accounting_before_execution']['economic_outcomes_opened'],0)
-  for cid in ('V2-C021','V2-C022'):self.assertFalse(any((ROOT/'discovery/results').glob(f'{cid}_*')))
+  self.assertEqual(w['accounting_before_execution']['v2_attempts_used'],2);self.assertEqual(w['accounting_before_execution']['remaining'],82)
+  self.assertEqual(s['competition_ultra_fast_economic_wave']['opened_candidate_ids'],list(IDS));self.assertEqual(s['competition_ultra_fast_economic_wave']['unopened_candidate_ids'],[])
  def test_07_synthetic_momentum_is_next_open_fixed_hold_and_costed(self):
   t=datetime(2026,1,1,tzinfo=timezone.utc);q=[{'t':t+timedelta(minutes=5*i),'o':100+i,'h':101+i,'l':99+i,'c':100.5+i} for i in range(40)]
   x=single(q,'V2-C017','MOM',0.001)[0];self.assertEqual(x['e'],q[13]['t']);self.assertEqual(x['x'],q[24]['t']+timedelta(minutes=5));self.assertEqual(x['d'],'LONG');self.assertEqual(x['costf']*1000,1.0)

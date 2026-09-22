@@ -287,9 +287,9 @@ class TrendbarPaginationCheckpointTests(unittest.TestCase):
     def test_16_capture_non_economic_history_and_current_accounting_reconcile(self):
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
         self.assertEqual(state["v2_search_budget"],84)
-        self.assertEqual(state["v2_evaluated_identities"],6)
-        self.assertEqual(state["v2_attempts_used"],6)
-        self.assertEqual(state["v2_search_budget"]-state["v2_attempts_used"],78)
+        self.assertEqual(state["v2_evaluated_identities"],8)
+        self.assertEqual(state["v2_attempts_used"],8)
+        self.assertEqual(state["v2_search_budget"]-state["v2_attempts_used"],76)
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
         self.assertFalse(state["competition_start_authorized"])

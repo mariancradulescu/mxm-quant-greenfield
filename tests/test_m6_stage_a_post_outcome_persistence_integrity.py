@@ -110,11 +110,11 @@ class StageAPostOutcomePersistenceIntegrityTests(unittest.TestCase):
 
     def test_08_live_accounting_is_four_and_budget_remaining_82(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["economic_outcomes_opened"], 8)
-        self.assertEqual(state["v2_attempts_used"], 6)
-        self.assertEqual(state["v2_evaluated_identities"], 6)
+        self.assertEqual(state["economic_outcomes_opened"], 10)
+        self.assertEqual(state["v2_attempts_used"], 8)
+        self.assertEqual(state["v2_evaluated_identities"], 8)
         self.assertEqual(state["v2_search_budget"], 84)
-        self.assertEqual(state["v2_search_budget_remaining"], 78)
+        self.assertEqual(state["v2_search_budget_remaining"], 76)
 
     def test_09_survivors_are_stage_a_only_and_protected_remains_closed(self):
         state = load("CURRENT_STATE.json")

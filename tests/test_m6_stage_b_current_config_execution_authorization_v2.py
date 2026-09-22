@@ -61,10 +61,10 @@ class StageBCurrentConfigExecutionAuthorizationV2Tests(unittest.TestCase):
         self.assertTrue(t["economics_run"])
         self.assertTrue(t["results_created"])
         self.assertEqual(t["stage_b_current_config_outcomes_opened"],2)
-        self.assertEqual(s["economic_outcomes_opened"],8)
-        self.assertEqual(s["v2_attempts_used"],6)
-        self.assertEqual(s["v2_evaluated_identities"],6)
-        self.assertEqual(s["v2_search_budget_remaining"],78)
+        self.assertEqual(s["economic_outcomes_opened"],10)
+        self.assertEqual(s["v2_attempts_used"],8)
+        self.assertEqual(s["v2_evaluated_identities"],8)
+        self.assertEqual(s["v2_search_budget_remaining"],76)
         self.assertFalse(s["protected_evidence_opened"])
 
     def test_05_historical_margin_is_explicitly_non_blocking_not_resolved(self):

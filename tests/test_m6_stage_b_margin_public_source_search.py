@@ -59,11 +59,11 @@ class StageBHistoricalMarginPublicSourceSearchTests(unittest.TestCase):
 
     def test_attempt_accounting_is_unchanged_and_live_outcome_total_is_four(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["economic_outcomes_opened"],8)
-        self.assertEqual(s["v2_attempts_used"],6)
-        self.assertEqual(s["v2_evaluated_identities"],6)
+        self.assertEqual(s["economic_outcomes_opened"],10)
+        self.assertEqual(s["v2_attempts_used"],8)
+        self.assertEqual(s["v2_evaluated_identities"],8)
         self.assertEqual(s["v2_search_budget"],84)
-        self.assertEqual(s["v2_search_budget_remaining"],78)
+        self.assertEqual(s["v2_search_budget_remaining"],76)
         self.assertFalse(s["competition_start_authorized"])
         self.assertFalse(s["live_orders_authorized"])
 
