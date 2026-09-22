@@ -120,7 +120,7 @@ class StageBCurrentConfigReportingPolicyTests(unittest.TestCase):
         self.assertTrue(t["economics_run"])
         self.assertTrue(t["results_created"])
         self.assertEqual(t["stage_b_current_config_outcomes_opened"],2)
-        self.assertEqual(s["economic_outcomes_opened"],4)
+        self.assertEqual(s["economic_outcomes_opened"],8)
         self.assertFalse(s["protected_evidence_opened"])
 
 if __name__=="__main__":
