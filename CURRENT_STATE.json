@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Run exact-head full suite; after GREEN preserve C012 as valid EUR200-realizable primitive, remove temporary persistence scaffolding, promote the exact GREEN operational tree, and bootstrap Performance Research V3 without consuming another V2 attempt.",
+  "next_action": "Validate the post-recovery cleanup exact head; after GREEN fast-forward the operational competition branch to that exact tree, then create Performance Research V3 from the GREEN operational head and resume prospective discovery.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "C012_CORRECTED_STAGE_B_RECORDED_PENDING_EXACT_HEAD_GREEN",
+  "phase": "C012_CORRECTED_STAGE_B_GREEN_CLEANUP_PENDING_EXACT_HEAD_CI",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -981,7 +981,7 @@
       "reason": "Standalone JSON serialization changed integral-valued floats; restored from canonical ledger payload with Python json.dumps. Result payload/hash/economics unchanged."
     },
     "corrected_stage_b": {
-      "status": "CORRECTED_STAGE_B_RECORDED_CURRENT_SUCCESSOR_PENDING_EXACT_HEAD_GREEN",
+      "status": "CORRECTED_STAGE_B_RECORDED_CURRENT_SUCCESSOR_GREEN_CLEANUP_PENDING",
       "authorization_ref": "data/C012_CORRECTED_STAGE_B_CURRENT_CONFIG_AUTHORIZATION_V1.json",
       "corrected_stage_a_result_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
       "corrected_stage_a_result_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
@@ -1008,14 +1008,24 @@
         "ledger_mutation_required": false,
         "ledger_sha256_unchanged": "184ab0f659f69b977822c1a3705770150598a7b4ada888e4085480dbb3de995d"
       },
-      "economic_rerun_performed": false
+      "economic_rerun_performed": false,
+      "staging_exact_head_green": {
+        "head": "262fad09ef707f25ba5f32c0931d151ebed9b472",
+        "workflow_run_id": 35782237215,
+        "conclusion": "SUCCESS",
+        "tests_passed": 675,
+        "tests_failed": 0,
+        "tests_error": 0,
+        "persistence_recovery_job": "SUCCESS_NOOP_VERIFIED"
+      },
+      "temporary_persistence_scaffolding_cleanup": "PENDING_EXACT_HEAD_GREEN"
     }
   },
   "operational_branch_authority": {
     "branch": "competition-performance-v1-20260921",
     "work_branch": "c012-stage-b-persist-staging-20260922",
     "reconciled_parent_head": "67228568317621ffe536b7744537beb7398f2c74",
-    "authority_rule": "COMPETITION_BRANCH_IS_OPERATIONAL; FORENSIC_BRANCH_IS_PRE_PROMOTION_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
+    "authority_rule": "COMPETITION_BRANCH_IS_OPERATIONAL; C012_STAGE_B_PERSIST_STAGING_BRANCH_IS_CURRENT_PRE_PROMOTION_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
     "main_merge_required_for_current_work": false
   },
   "current_stage_b_survivor_input_set": [
@@ -1072,6 +1082,7 @@
     "data/C012_SAME_IDENTITY_STAGE_A_RERUN_AUTHORIZATION_V1.json",
     "data/C012_CORRECTED_STAGE_B_CURRENT_CONFIG_AUTHORIZATION_V1.json",
     "m6/c012_corrected_stage_b_runner.py",
-    "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json"
+    "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
+    "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ]
 }
