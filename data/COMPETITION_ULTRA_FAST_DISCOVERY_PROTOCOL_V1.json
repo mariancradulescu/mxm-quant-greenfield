@@ -1,0 +1,214 @@
+{
+  "schema": "mxm.greenfield.v2.ultra-fast-data-minimal-discovery-protocol.v1",
+  "status": "FROZEN_PRE_FRICTION_PRE_STAGE_A_OUTCOME",
+  "objective": "MAXIMIZE_REALIZABLE_EQUITY_GROWTH_RATE_WEEKLY_MONTHLY_TERMINAL_EQUITY_AND_CAPITAL_VELOCITY_FROM_ONE_CONTINUOUS_EUR200_ACCOUNT_WITHOUT_RUIN",
+  "source_authorities": {
+    "broker_universe_acceptance": "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
+    "structural_map_summary": "data/BROKER_NATIVE_COMPETITION_STRUCTURAL_MAP_SUMMARY_V2.json",
+    "structural_map_csv_sha256": "c2b16c3fc0419ec335ebbd67e0af09043e60a476516db01c55550d661b5f4130",
+    "broker_capture_zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77"
+  },
+  "margin_percentage_law": {
+    "formula": "100 * margin_eur / 200 = margin_eur / 2",
+    "regression_examples": {
+      "33.33": 16.665,
+      "29.05": 14.525,
+      "2.53": 1.265,
+      "0.14": 0.07
+    },
+    "factor_100_bug_scope": "COMPETITION_FRONTIER_WAVE_01_V2 selected_markets.min_margin_pct_eur200 only",
+    "exhaustive_structural_csv_affected": false,
+    "structural_ranking_affected": false,
+    "capital_efficiency_metric_affected": false,
+    "reason": "Exhaustive structural ranking used absolute minimum ExpectedMargin EUR and schedule_minutes_per_margin_eur; CSV percentage fields were already correct.",
+    "frontier_v2_reporting_affected": true,
+    "frontier_v2_selection_semantics_affected": "NO_RANKING_EFFECT_BUT_FRONTIER_V2_IS_SUPERSEDED_FOR_DATA_MINIMAL_AND_FRICTION_QUALIFICATION_REASONS"
+  },
+  "development_windows": {
+    "protected_boundary": "2026-09-17T12:02:58Z",
+    "stage_a_latest_13_complete_iso_weeks": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z",
+      "iso_weeks": "2026-W25..2026-W37"
+    },
+    "latest_4_week_diagnostic": {
+      "start_utc": "2026-08-17T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z",
+      "iso_weeks": "2026-W34..2026-W37",
+      "selection_or_tuning_role": "DIAGNOSTIC_ONLY"
+    },
+    "stage_b_survivor_extension": {
+      "new_earlier_interval_start_utc": "2026-03-16T00:00:00Z",
+      "new_earlier_interval_end_utc": "2026-06-14T23:59:59Z",
+      "combined_latest_26_weeks": "2026-W12..2026-W37"
+    },
+    "stage_c_serious_survivor_extension": {
+      "new_earlier_interval_start_utc": "2025-09-15T00:00:00Z",
+      "new_earlier_interval_end_utc": "2026-03-15T23:59:59Z",
+      "combined_latest_52_weeks": "2025-W38..2026-W37"
+    },
+    "stage_d_old_regime_stress": "ONLY_FINAL_SERIOUS_PORTFOLIO_CANDIDATES; STREAMING_LOCAL_EVALUATION_PREFERRED; RAW_HISTORY_TRANSFER_NOT_DEFAULT"
+  },
+  "data_minimal_law": {
+    "optimization": [
+      "INFORMATION_VALUE_PER_BYTE",
+      "INFORMATION_VALUE_PER_API_REQUEST",
+      "INFORMATION_VALUE_PER_USER_ACTION",
+      "TIME_TO_FIRST_ECONOMIC_RESULT"
+    ],
+    "initial_bar_resolution": "M5",
+    "m15_h1_policy": "CAUSAL_RESAMPLE_FROM_COMPLETED_M5",
+    "m1_tick_policy": "ONLY_SURVIVORS_WHEN_INFORMATION_VALUE_JUSTIFIES",
+    "raw_tick_transfer": false,
+    "years_of_raw_bar_transfer": false,
+    "streaming_old_history_preferred": true
+  },
+  "friction_screen": {
+    "purpose": "NON_ALPHA_MARKET_QUALIFICATION_BEFORE_13_WEEK_BAR_DOWNLOAD",
+    "sample_weeks": "2026-W34..2026-W37",
+    "profiles": {
+      "GLOBAL_24X5": {
+        "sample_dates": [
+          "2026-08-18",
+          "2026-08-26",
+          "2026-09-03",
+          "2026-09-11"
+        ],
+        "utc_windows": [
+          {
+            "label": "ASIA",
+            "start": "01:00",
+            "end": "01:10"
+          },
+          {
+            "label": "EUROPE",
+            "start": "08:00",
+            "end": "08:10"
+          },
+          {
+            "label": "EU_US_OVERLAP",
+            "start": "13:30",
+            "end": "13:40"
+          },
+          {
+            "label": "US_ACTIVE",
+            "start": "16:00",
+            "end": "16:10"
+          },
+          {
+            "label": "LOW_LIQUIDITY",
+            "start": "21:30",
+            "end": "21:40"
+          }
+        ]
+      },
+      "CRYPTO_24X7": {
+        "inherit": "GLOBAL_24X5",
+        "weekend_windows_per_week": [
+          {
+            "weekday": "SATURDAY",
+            "start": "12:00",
+            "end": "12:10",
+            "label": "WEEKEND_ACTIVE"
+          },
+          {
+            "weekday": "SUNDAY",
+            "start": "02:00",
+            "end": "02:10",
+            "label": "WEEKEND_QUIET"
+          }
+        ]
+      },
+      "US_REGIONAL": {
+        "sample_dates": [
+          "2026-08-18",
+          "2026-08-26",
+          "2026-09-03",
+          "2026-09-11"
+        ],
+        "utc_windows": [
+          {
+            "label": "US_EARLY",
+            "start": "14:00",
+            "end": "14:10"
+          },
+          {
+            "label": "US_AFTERNOON",
+            "start": "18:00",
+            "end": "18:10"
+          }
+        ]
+      }
+    },
+    "returned_tick_data": "COMPACT_AGGREGATES_ONLY_RAW_BID_ASK_DISCARDED_AFTER_LOCAL_AGGREGATION",
+    "metrics": [
+      "observation_count",
+      "sampled_windows",
+      "two_sided_window_coverage",
+      "median_spread",
+      "p75_spread",
+      "p90_spread",
+      "p95_spread",
+      "median_mid",
+      "median_spread_over_price",
+      "p95_spread_over_price",
+      "median_sampled_M5_high_low_range",
+      "p75_spread_over_median_range",
+      "p95_spread_over_median_range",
+      "movement_to_p75_spread",
+      "movement_to_p95_spread",
+      "commission_structure",
+      "minimum_commission",
+      "conversion_fee",
+      "approx_min_volume_roundtrip_friction_where_dimensionally_resolvable"
+    ],
+    "qualification": {
+      "FRICTION_PASS": {
+        "min_two_sided_window_coverage": 0.6,
+        "min_quote_states": 20,
+        "requires_positive_median_m5_range": true,
+        "max_p75_spread_over_median_m5_range": 0.35,
+        "max_p95_spread_over_median_m5_range": 0.75,
+        "max_median_spread_over_mid": 0.005
+      },
+      "FRICTION_WATCH": {
+        "min_two_sided_window_coverage": 0.5,
+        "min_quote_states": 10,
+        "requires_positive_median_m5_range": true,
+        "max_p75_spread_over_median_m5_range": 0.5,
+        "max_p95_spread_over_median_m5_range": 1,
+        "max_median_spread_over_mid": 0.01
+      },
+      "otherwise": "FRICTION_FAIL"
+    }
+  },
+  "selection_law": {
+    "max_stage_a_markets": 12,
+    "family_target_quotas": {
+      "FX": 4,
+      "INDEX": 2,
+      "ENERGY_COMMODITY": 2,
+      "CRYPTO": 2,
+      "EQUITY_ETF": 1,
+      "RATES": 1
+    },
+    "candidate_priority": "FRICTION_PASS before FRICTION_WATCH; then descending movement_to_effective_p75_friction; ascending accepted_min_margin_pct_eur200; descending schedule_minutes_per_week; ascending p95_spread_over_median_range; broker_symbol lexical",
+    "effective_p75_friction": "p75 spread plus round-trip commission converted to price units when dimensionally resolvable; otherwise p75 spread with commission reported separately and used as a family-level structural tie-breaker",
+    "variant_rule": "one broker variant_family maximum unless no distinct qualified alternative exists",
+    "watch_use": "WATCH may fill a family target only when no PASS remains and movement_to_p75_spread >= 2.0",
+    "vacancy_fill": "unfilled family slots are filled from remaining PASS globally subject to max 4 symbols per family and variant uniqueness",
+    "alpha_used": false,
+    "user_manual_replacement": false
+  },
+  "stage_a_evidence_rule": {
+    "all_first_wave_candidates_begin_on_13_weeks": true,
+    "latest_4_weeks_reported_separately": true,
+    "insufficient_independent_events_state": "EVIDENCE_INSUFFICIENT_FOR_PROMOTION",
+    "stage_b_trigger": "ONLY_PROSPECTIVELY_DEFINED_STAGE_A_SURVIVORS_OR_EVENT_DENSITY_INSUFFICIENT_WITH_NONNEGATIVE_CREDIBLE_EDGE",
+    "stage_c_trigger": "ONLY_SERIOUS_26_WEEK_SURVIVORS",
+    "annual_seasonality_from_13_weeks_permitted": false
+  },
+  "economic_outcomes_opened": 0,
+  "v2_attempts_consumed": 0,
+  "protected_evidence_opened": false
+}
