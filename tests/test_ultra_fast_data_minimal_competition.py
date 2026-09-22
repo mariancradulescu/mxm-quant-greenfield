@@ -107,7 +107,7 @@ class FakeMarketTransport:
 class UltraFastConversionTailIntegrityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.plan=json.loads((ROOT/"data"/"COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V3.json").read_text())
+        cls.plan=json.loads((ROOT/"data"/"COMPETITION_ULTRA_FAST_CAPTURE_PLAN_V4.json").read_text())
         cls.protocol=json.loads((ROOT/"data"/"COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json").read_text())
 
     def make_runner(self,tmp,*,one_window=True):
@@ -345,7 +345,7 @@ class UltraFastConversionTailIntegrityTests(unittest.TestCase):
 
     def _synthetic_postcondition_fixture(self,root):
         runner,plan,_,_=self.make_runner(root,one_window=False);runner.bundle.mkdir(parents=True,exist_ok=True)
-        candidate=self.candidate("EURUSD");rows=runner._stage_rows(1,candidate,self.full_fx(rate=0));record=runner._write_rows(candidate,rows)
+        candidate=self.candidate("EURUSD");rows,pagination=runner._stage_rows(1,candidate,self.full_fx(rate=0));record=runner._write_rows(candidate,rows,pagination)
         friction=[]
         for x in plan["shortlist"]:
             y=copy.deepcopy(x);y.update({
