@@ -82,6 +82,10 @@ class ConversionUnavailable(Exception):
     """Broker-native conversion chain/rate is legitimately unavailable for a sampled window."""
 
 
+class CheckpointInvalid(CaptureContractError):
+    """Local checkpoint cannot be reused; recapture friction without trusting it."""
+
+
 def _plain(message):
     return MessageToDict(message,preserving_proto_field_name=False,use_integers_for_enums=True)
 
