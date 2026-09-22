@@ -103,8 +103,8 @@ class UltraFastRateLimitRecoveryTests(unittest.TestCase):
         self.assertFalse(ev["failure"]["economic_outcome"])
         self.assertFalse(ev["failure"]["v2_attempt_consumed"])
         self.assertEqual(state["v2_search_budget"],84)
-        self.assertEqual(state["v2_attempts_used"],2)
-        self.assertEqual(state["v2_search_budget_remaining"],82)
+        self.assertEqual(state["v2_attempts_used"],6)
+        self.assertEqual(state["v2_search_budget_remaining"],78)
 
     def test_07_v5_correction_preserves_v4_plan_and_frozen_discovery_law(self):
         corr=json.loads((ROOT/"data"/"COMPETITION_ANDROID_HISTORICAL_RATE_LIMIT_CORRECTION_V1.json").read_text())
