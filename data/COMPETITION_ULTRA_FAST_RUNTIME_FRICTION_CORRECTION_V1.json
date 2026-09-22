@@ -1,0 +1,68 @@
+{
+  "schema": "mxm.greenfield.v2.ultra-fast-runtime-friction-integrity-correction.v1",
+  "status": "IMPLEMENTATION_EVIDENCE_INTEGRITY_CORRECTION_COMPLETE_PENDING_ONE_AUTHENTICATED_USER_CAPTURE",
+  "parent_head": "cdca117a3889125ec30056bbd3ce42a74a749237",
+  "preserved": {
+    "exhaustive_broker_universe": true,
+    "broker_universe_acceptance": "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
+    "factor_100_correction": true,
+    "stage_a_weeks": "2026-W25..2026-W37",
+    "friction_weeks": "2026-W34..2026-W37",
+    "structural_shortlist_count": 32,
+    "max_stage_a_markets": 12,
+    "raw_tick_transfer": false,
+    "v2_budget_total": 84,
+    "v2_evaluated": 2,
+    "v2_attempts_used": 2,
+    "v2_remaining": 82,
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "defects_corrected": {
+    "normalize_m5_call_contract": "Both friction M5 sampling and Stage-A historical acquisition now call the one canonical normalizer with digits/start_utc/end_utc/protected_utc.",
+    "exception_semantics": "Programming/schema/normalization/pagination/internal invariant failures abort capture; only valid Stage-A data insufficiency can trigger deterministic replacement.",
+    "false_success_guard": "32-symbol friction accounting, valid evidence states, selected/series/manifest reconciliation, chronological completed-bar validation, hashes and CHECKSUMS are mandatory postconditions.",
+    "commission_scaling": "commissionType 1/2/4 use preciseTradingCommissionRate / 1e8; type 3 uses /1e5 percentage units.",
+    "minimum_commission": "preciseMinCommission / 1e8 interpreted by minCommissionType CURRENCY vs QUOTE_CURRENCY and converted dimensionally.",
+    "unresolved_cost": "Material unresolved commission becomes COMMISSION_CONVERSION_UNRESOLVED and is not Stage-A eligible.",
+    "effective_friction": "PASS/WATCH thresholds and ranking include resolved minimum-volume open+close commission in price-equivalent friction."
+  },
+  "official_ctrader_semantics_bound": {
+    "commission_types": {
+      "1": "USD_PER_MILLION_USD",
+      "2": "USD_PER_LOT",
+      "3": "PERCENTAGE_OF_VALUE",
+      "4": "QUOTE_CCY_PER_LOT"
+    },
+    "min_commission_types": {
+      "1": "CURRENCY",
+      "2": "QUOTE_CURRENCY"
+    },
+    "precise_nonpercentage_scale": 100000000,
+    "precise_percentage_scale": 100000,
+    "precise_min_commission_scale": 100000000,
+    "pnl_conversion_fee_rate_semantics": "1 = 0.01% of realized gross profit when applicable"
+  },
+  "test_authority": "tests/test_ultra_fast_data_minimal_competition.py",
+  "mocked_authenticated_path_coverage": [
+    "valid BID+ASK+M5 friction window",
+    "spread statistics",
+    "commission types 1/2/3/4",
+    "minimum commission types",
+    "unresolved commission",
+    "valid PASS",
+    "high effective friction FAIL",
+    "programming error cannot become FRICTION_FAIL",
+    "13-week M5 pagination",
+    "Stage-A CSV write/integrity",
+    "selection excludes unresolved material commission",
+    "manifest/selection/series/checksum reconciliation",
+    "systemic unresolved capture cannot claim completion"
+  ],
+  "economic_effect": {
+    "new_economic_outcomes_opened": 0,
+    "new_v2_attempts_consumed": 0
+  },
+  "next_action": "RUN_ONE_REPLACEMENT_ULTRA_FAST_V2_PYDROID_CAPTURE; ACCEPT/HASH; FREEZE_EXACT_STAGE_A_IDENTITIES; EXECUTE_FIRST_REAL_ECONOMIC_WAVE_IMMEDIATELY"
+}
