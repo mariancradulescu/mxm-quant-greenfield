@@ -1030,13 +1030,19 @@ class UltraFastCaptureRunner:
         def try_capture(candidate):
             if candidate["broker_symbol"] in used or not _eligible_for_selection(candidate):
                 return False
-            rows=self._stage_rows(aid,candidate,full[candidate["symbol_id"]])
+            rows,pagination=self._stage_rows(aid,candidate,full[candidate["symbol_id"]])
+            if pagination.get("request_interval_exhausted") is not True:
+                raise ImplementationInvalid("Stage-A minimum-row gate reached before interval completeness")
             if len(rows)<minrows:
                 used.add(candidate["broker_symbol"])
-                replacements.append({"broker_symbol":candidate["broker_symbol"],"family":candidate["family"],"state":"STAGE_A_DATA_INSUFFICIENT","row_count":len(rows),"minimum_required":minrows,"alpha_consulted":False})
+                replacements.append({
+                    "broker_symbol":candidate["broker_symbol"],"family":candidate["family"],
+                    "state":"STAGE_A_DATA_INSUFFICIENT","row_count":len(rows),"minimum_required":minrows,
+                    "pagination":pagination,"alpha_consulted":False
+                })
                 return False
-            series.append(self._write_rows(candidate,rows));chosen.append(candidate);used.add(candidate["broker_symbol"]);counts[candidate["family"]]+=1
-            self.progress(f"[STAGE-A {len(chosen)}/12] {candidate['broker_symbol']} rows={len(rows):,}")
+            series.append(self._write_rows(candidate,rows,pagination));chosen.append(candidate);used.add(candidate["broker_symbol"]);counts[candidate["family"]]+=1
+            self.progress(f"[STAGE-A {len(chosen)}/12] {candidate['broker_symbol']} rows={len(rows):,} pages={pagination['pages']} completion={pagination['completion_reason']}")
             return True
 
         for candidate in initial:
