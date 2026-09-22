@@ -1,0 +1,144 @@
+{
+  "id": "V2-C017",
+  "mechanism": {
+    "family": "TREND_MOMENTUM",
+    "subfamily": "MULTI_MARKET_60M_SIGN_CONTINUATION_ZERO_THRESHOLD"
+  },
+  "rationale": "Test a dense session-agnostic one-hour sign continuation primitive across all friction-qualified broker-native Stage-A markets without a threshold grid.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "source_capture_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z",
+      "iso_weeks": "2026-W25..2026-W37"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "missing_bars": "DO_NOT_FABRICATE",
+    "bar_availability": "AT_M5_CLOSE",
+    "synchronization": "SINGLE_SYMBOL"
+  },
+  "causal_availability": {
+    "decision_uses": "completed M5 bars only",
+    "entry_uses": "next exact observed M5 open after decision",
+    "future_information_forbidden": true,
+    "rolling_state": "only current and prior completed observations"
+  },
+  "features": [
+    {
+      "name": "return_12",
+      "formula": "close_t / close_t_minus_12 - 1"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "return_12",
+      "bars": 12
+    }
+  ],
+  "normalization_training": {
+    "mode": "NONE",
+    "future_normalization": false
+  },
+  "timing": {
+    "decision": "EACH_ELIGIBLE_COMPLETED_M5_CLOSE",
+    "entry": "NEXT_EXACT_OBSERVED_M5_OPEN"
+  },
+  "direction": {
+    "LONG": "return_12 > 0",
+    "SHORT": "return_12 < 0",
+    "NO_OP": "return_12 == 0_or_unavailable"
+  },
+  "entry": {
+    "type": "SINGLE_LEG_MARKET_PROXY",
+    "price": "next_exact_observed_M5_open"
+  },
+  "exit": {
+    "type": "FIXED_OBSERVED_BAR_HOLD",
+    "price": "close_of_12th_contiguous_M5_bar_including_entry"
+  },
+  "maximum_hold": {
+    "unit": "CONTIGUOUS_M5_BARS_INCLUDING_ENTRY",
+    "value": 12
+  },
+  "execution_assumptions": {
+    "discovery_only": true,
+    "protected_evidence_used": false,
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "entry_exit_grid": "REQUIRE_EXACT_CONTIGUOUS_5_MINUTE_OBSERVED_BARS_FOR_LOOKBACK_ENTRY_AND_HOLD",
+    "missing_required_grid": "NO_SIGNAL",
+    "ohlc_only": true
+  },
+  "filters": [
+    "CONTIGUOUS_5_MINUTE_GRID_REQUIRED",
+    "NO_SIGNAL_WHILE_ACTIVE",
+    "FROZEN_COARSE_COST_REQUIRED"
+  ],
+  "parameters": {
+    "return_bars": 12,
+    "hold_bars": 12,
+    "return_threshold": 0
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_UNIT_NOTIONAL_NO_ALLOCATOR_OR_SIZING_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "authority": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json"
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_ROLLING_STATE_NO_EXTERNAL_RUNTIME"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "position_admission_policy": {
+    "max_simultaneous_active_positions_per_symbol": 1,
+    "max_simultaneous_candidate_instances_per_symbol": 1,
+    "new_signal_while_active": "IGNORE_NO_QUEUE",
+    "opposite_signal_while_active": "IGNORE_NO_REVERSE_NO_COEXIST",
+    "same_direction_pyramiding_allowed": false,
+    "scope": "PER_CANDIDATE_PER_TRADED_SYMBOL"
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "spec_hash": "ac981d5475a0dbd1cd65d2a33d9e84f7035eb8fc9831179712e3d5a1c19d2b2a",
+  "provenance": {
+    "frozen_before_candidate_own_economic_outcome": true,
+    "candidate_own_return_or_pnl_used": false,
+    "protected_evidence_used": false,
+    "phase": "COMPETITION_ULTRA_FAST_FIRST_ECONOMIC_WAVE",
+    "wave": "COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_01"
+  }
+}
