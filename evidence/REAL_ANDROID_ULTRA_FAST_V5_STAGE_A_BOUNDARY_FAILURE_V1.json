@@ -1,0 +1,44 @@
+{
+  "schema": "mxm.greenfield.v2.real-android-ultra-fast-v5-stage-a-boundary-failure.v1",
+  "status": "ACCEPTED_IMPLEMENTATION_STAGE_A_BOUNDARY_COMPATIBILITY_FAILURE_NO_ECONOMIC_OUTCOME",
+  "source_package": "MXM_COMPETITION_ULTRA_FAST_CAPTURE_PACKAGE_V5.zip",
+  "source_package_sha256": "a81c6d008bd153d9e271804f64a6e0b30a41bd0601a40536020321f2c1aa98be",
+  "observed_runtime": "Android / Pydroid / Pepperstone LIVE read-only",
+  "progress_before_failure": {
+    "friction_completed": "32/32",
+    "checkpoint_saved": true,
+    "checkpoint_schema": "mxm.greenfield.v2.ultra-fast-friction-checkpoint.v5",
+    "selector_initial_admitted": "10/12",
+    "stage_a_output_zip_created": false
+  },
+  "failure": {
+    "stage": "STAGE_A_PAGINATION",
+    "exact_console": "[CAPTURE BLOCKED SAFELY] IMPLEMENTATION_INVALID: Stage-A response bar outside requested page boundaries",
+    "classification": "IMPLEMENTATION_STAGE_A_LOWER_BOUNDARY_COMPATIBILITY_FAILURE",
+    "economic_outcome": false,
+    "v2_attempt_consumed": false,
+    "protected_evidence_opened": false
+  },
+  "diagnosis": {
+    "official_get_trendbars_count_semantics": "count limits the number of trend bars returned backwards from toTimestamp.",
+    "official_trendbar_timestamp_semantics": "utcTimestampInMinutes is the Unix timestamp in minutes of the bar open tick.",
+    "v5_defect": "V5 rejected raw trendbars below frozen fromTimestamp even though the canonical normalizer clips bars opened before the frozen start. A terminal count-backfilled page can therefore be valid completeness evidence while containing lower-boundary overfetch.",
+    "upper_boundary_policy": "A bar above the requested page toTimestamp remains IMPLEMENTATION_INVALID.",
+    "economic_or_market_failure": false
+  },
+  "checkpoint_reuse": {
+    "permitted": true,
+    "reason": "V6 preserves the V5 checkpoint schema, directory, plan SHA, protocol SHA, shortlist, friction specification, conversion authority and account fingerprint bindings."
+  },
+  "console_only_friction_observation": {
+    "threshold_retuning_permitted": false,
+    "shortlist_retuning_permitted": false,
+    "economic_selection_outcome_opened": false
+  },
+  "accounting_after_failure": {
+    "v2_search_budget_total": 84,
+    "v2_evaluated_identities": 2,
+    "v2_attempts_used": 2,
+    "v2_remaining": 82
+  }
+}
