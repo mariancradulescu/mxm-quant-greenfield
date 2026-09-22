@@ -1,8 +1,8 @@
 {
   "schema": "mxm.greenfield.v2.competition-ultra-fast-wave-01-execution-progress.v1",
-  "status": "C017_C020_RECORDED_C021_C022_UNOPENED",
-  "reconciled_utc": "2026-09-22T10:50:00Z",
-  "purpose": "APPEND_ONLY_AUTHORITY_RECONCILIATION_AFTER_ALREADY_OPENED_C017_C020_OUTCOMES",
+  "status": "C017_C021_RECORDED_C022_UNOPENED",
+  "reconciled_utc": "2026-09-22T11:24:00Z",
+  "purpose": "ATOMIC_C021_OUTCOME_PERSISTENCE_C022_REMAINS_FROZEN",
   "immutable_pre_outcome_authorities": {
     "capture_acceptance_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json",
     "capture_acceptance_git_blob_sha1": "b1fd069563e0e9940b193f70744787c4a9692470",
@@ -67,6 +67,16 @@
       "opened_utc": "2026-09-22T10:44:14Z",
       "ledger_sequence": 36,
       "ledger_entry_hash": "c24fc66ddfacb754442c654519408087c46be2d78938310122f9d226bc26a974"
+    },
+    "V2-C021": {
+      "result_ref": "discovery/results/V2-C021_STAGE_A_V1.json",
+      "git_blob_sha1": "f55eb5071b0aa81c243921b3a983cd2d3594abdb",
+      "spec_hash": "8e10fa83d33dfa69aa463cd1ead657a03b0f1d02cb7f68ab40fcacf4629dfa06",
+      "status": "GROSS_EDGE_FAIL",
+      "result_hash": "ab2b23edb01a913cc2aace95591bf004d6458cc3b3d254eca26625d211e5d1a2",
+      "opened_utc": "2026-09-22T11:24:00Z",
+      "ledger_sequence": 37,
+      "ledger_entry_hash": "d75f44b6a85161fcb9745d58744925decca34a40c508afcd78adfb995496389b"
     }
   },
   "ledger": {
@@ -76,14 +86,14 @@
       33,
       34,
       35,
-      36
+      36,
+      37
     ],
-    "total_entries_after_reconciliation": 36,
-    "total_result_recorded_entries_after_reconciliation": 6
+    "total_entries_after_reconciliation": 37,
+    "total_result_recorded_entries_after_reconciliation": 7
   },
   "remaining_frozen_unopened": {
     "candidate_ids": [
-      "V2-C021",
       "V2-C022"
     ],
     "result_files_present": false,
@@ -91,17 +101,17 @@
     "parameter_change": false,
     "evaluator_change": false,
     "cost_method_change": false,
-    "execution_gate": "DO_NOT_OPEN_UNTIL_RECONCILIATION_EXACT_HEAD_FULL_SUITE_SUCCESS"
+    "execution_gate": "C021_PERSISTED_C022_REMAINS_FROZEN_AND_UNMODIFIED"
   },
   "accounting_after_reconciliation": {
     "legacy_prior_attempts": 16,
     "v2_search_budget_total": 84,
-    "v2_evaluated_identities": 6,
-    "v2_attempts_used": 6,
-    "v2_search_budget_remaining": 78,
-    "global_attempts_seen": 22,
-    "economic_outcomes_opened_total": 8,
-    "newly_reconciled_result_identities": 4,
+    "v2_evaluated_identities": 7,
+    "v2_attempts_used": 7,
+    "v2_search_budget_remaining": 77,
+    "global_attempts_seen": 23,
+    "economic_outcomes_opened_total": 9,
+    "newly_reconciled_result_identities": 5,
     "double_counted_attempts": 0
   },
   "safety": {
@@ -111,7 +121,9 @@
     "c021_c022_opened": false,
     "protected_evidence_opened": false,
     "live_orders": false,
-    "competition_start": false
+    "competition_start": false,
+    "c021_opened": true,
+    "c022_opened": false
   },
-  "next_action": "RUN_COMPLETE_EXACT_HEAD_SUITE; REQUIRE_SUCCESS_ZERO_FAIL; ONLY_THEN_EXECUTE_FROZEN_C021_C022"
+  "next_action": "EXECUTE_FROZEN_C022_EXACTLY_ONCE_WITHOUT_RETUNING_OR_USING_C021_TO_MODIFY_IDENTITY"
 }
