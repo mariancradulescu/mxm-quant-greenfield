@@ -1,0 +1,42 @@
+{
+  "schema": "mxm.greenfield.v2.c012-stage-b-downstream-invalidation.v1",
+  "status": "CURRENT_AUTHORITY_INVALIDATED_HISTORICAL_BYTES_PRESERVED",
+  "authority_scope": "ACTIVE_CURRENT",
+  "candidate_id": "V2-C012",
+  "candidate_spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+  "causal_chain": [
+    "evidence/C012_SAME_IDENTITY_IMPLEMENTATION_CORRECTION_V1.json",
+    "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
+    "m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json"
+  ],
+  "invalidated_upstream": {
+    "stage_a_result_ref": "discovery/results/V2-C012_STAGE_A_V1.json",
+    "stage_a_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+    "reason": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE"
+  },
+  "invalidated_downstream": {
+    "stage_b_result_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
+    "stage_b_result_git_blob_sha1": "8c3b1fcdad6b43fcfed2af0919f3ddffd3b541f7",
+    "stage_b_persisted_result_sha256": "51edfcc76693425a07c24962f7b3c060fa2e7bb127385233f28f4fc1233edcaa",
+    "old_combined_intent_manifest_sha256": "a897c7cd5310e6ccaf8ab28d225fd5c16b1ebf0f043a18242efa9c74981656e7",
+    "run_record_ref": "m6/results/STAGE_B_CURRENT_CONFIG_RUN_RECORD_V1.json",
+    "run_record_git_blob_sha1": "04df816b7c460045808bba61ba2c7662566fef38",
+    "authority_effect": "HISTORICAL_NON_AUTHORITATIVE_FOR_CURRENT_C012_PERFORMANCE_ALLOCATOR_PORTFOLIO_OR_SURVIVOR_USE"
+  },
+  "unaffected": {
+    "V2_C006_stage_a": true,
+    "V2_C006_stage_b": true
+  },
+  "current_effect": {
+    "c012_stage_b_current_authority": "INVALIDATED_PENDING_VALID_CORRECTED_STAGE_A_SUCCESSOR",
+    "allocator_input_permitted": false,
+    "portfolio_comparison_input_permitted": false,
+    "discovery_survivor_evidence_permitted": false,
+    "eur200_performance_evidence_permitted": false
+  },
+  "historical_bytes_deleted": false,
+  "historical_bytes_overwritten": false,
+  "new_v2_attempt_consumed": false,
+  "search_budget_decrement": 0,
+  "protected_evidence_opened": false
+}

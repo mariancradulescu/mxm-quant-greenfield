@@ -2,7 +2,7 @@
   "active_data_requirements_authority": "data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json",
   "active_primary_wave_authority": "discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json",
   "active_primary_wave_id": "PRIMARY_WAVE_02",
-  "authoritative_branch": "main",
+  "authoritative_branch": "competition-performance-v1-20260921",
   "certification_survivors": [],
   "competition_start_authorized": false,
   "discovery_survivors": [
@@ -300,7 +300,8 @@
       "result_hashes": {
         "V2-C006": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
         "V2-C012": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c"
-      }
+      },
+      "authority_scope": "HISTORICAL_ORIGINAL_EXECUTION_SNAPSHOT_NOT_CURRENT_C012_AUTHORITY"
     },
     "tier1_stage_a": {
       "state": "TWO_RESULTS_PERSISTENCE_CORRECTED_STAGE_B_BLOCKED_PENDING_INDEPENDENT_AUDIT",
@@ -322,7 +323,8 @@
       "stage_b_run": false,
       "persistence_integrity_independent_audit": "PASS",
       "persistence_integrity_audit_ref": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
-      "stage_b_preparation_allowed": true
+      "stage_b_preparation_allowed": true,
+      "authority_scope": "HISTORICAL_ORIGINAL_EXECUTION_SNAPSHOT_NOT_CURRENT_C012_AUTHORITY"
     },
     "stage_b": {
       "state": "PREPARED_NOT_RUN_MARGIN_GATE_UNRESOLVED",
@@ -377,7 +379,8 @@
       "broker_confirmation_required": true,
       "broker_confirmation_blocks_current_configuration_scenario": false,
       "historical_track_remains_open": true,
-      "current_configuration_scenario_is_separate": true
+      "current_configuration_scenario_is_separate": true,
+      "authority_scope": "HISTORICAL_PREPARATION_SNAPSHOT_NOT_CURRENT_C012_AUTHORITY"
     },
     "stage_b_current_configuration": {
       "state": "EXECUTED_RESULTS_PERSISTED",
@@ -515,7 +518,7 @@
       "competition_start": false
     }
   },
-  "next_action": "RUN COMPLETE EXACT-HEAD FULL-SUITE CI FOR THE IMMUTABLE C023 RESULT PERSISTENCE; REQUIRE 0 FAIL / 0 ERROR; THEN FREEZE THE NEXT MATERIALLY DISTINCT PROSPECTIVE FRONTIER.",
+  "next_action": "C012 obtain exact-head GREEN on correction-only runner/authority guards, freeze exact-green authorization, then execute corrected same-identity Stage-A once",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -542,7 +545,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "COMPETITION_ULTRA_FAST_WAVE_02_COMPLETE_NO_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
+  "phase": "C012_SAME_IDENTITY_CORRECTION_PRE_ECONOMIC_FROZEN",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -931,11 +934,73 @@
     "V2-C012"
   ],
   "c012_same_identity_corrected_rerun": {
-    "status": "REQUIRED_ZERO_NEW_ATTEMPT_PENDING_EXISTING_INPUT_REPLAY",
+    "status": "PRE_ECONOMIC_FROZEN_AWAITING_EXACT_HEAD_GREEN_AND_AUTHORIZATION",
     "candidate_spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
     "invalidated_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+    "correction_ref": "evidence/C012_SAME_IDENTITY_IMPLEMENTATION_CORRECTION_V1.json",
+    "corrected_runner_ref": "m6/c012_corrected_stage_a_runner.py",
+    "corrected_pre_economic_materialization_ref": "evidence/C012_SAME_IDENTITY_CORRECTED_STAGE_A_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+    "downstream_stage_b_invalidation_ref": "evidence/C012_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+    "corrected_intent_count": 34,
+    "historical_invalid_intent_count": 35,
+    "signal_count_delta": -1,
+    "corrected_intent_manifest_sha256": "645e1d89a5a61c6f757fc4ac1e7f5a7729d847efab9e207c6a02da72e4d9995a",
     "new_v2_attempt_consumed": false,
     "search_budget_decrement": 0,
     "protected_evidence_opened": false
-  }
+  },
+  "operational_branch_authority": {
+    "branch": "competition-performance-v1-20260921",
+    "work_branch": "forensic-stabilization-20260922",
+    "reconciled_parent_head": "6142032ff86317c3310c07b4c16568fe0759d7ec",
+    "authority_rule": "COMPETITION_BRANCH_IS_OPERATIONAL; FORENSIC_BRANCH_IS_PRE_PROMOTION_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
+    "main_merge_required_for_current_work": false
+  },
+  "current_stage_b_survivor_input_set": [
+    "V2-C006"
+  ],
+  "current_result_authority": {
+    "V2-C006": {
+      "stage_a": {
+        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "result_ref": "discovery/results/V2-C006_STAGE_A_V1.json",
+        "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a"
+      },
+      "stage_b_current_config": {
+        "state": "VALID_UNAFFECTED",
+        "result_ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json"
+      }
+    },
+    "V2-C012": {
+      "stage_a": {
+        "state": "INVALIDATED_PENDING_SAME_IDENTITY_CORRECTED_SUCCESSOR",
+        "historical_result_ref": "discovery/results/V2-C012_STAGE_A_V1.json",
+        "historical_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+        "corrected_successor_ref": null
+      },
+      "stage_b_current_config": {
+        "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+        "historical_result_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
+        "invalidation_ref": "evidence/C012_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+        "corrected_successor_ref": null
+      }
+    }
+  },
+  "active_result_pointers": {
+    "V2-C006_STAGE_A": "discovery/results/V2-C006_STAGE_A_V1.json",
+    "V2-C006_STAGE_B_CURRENT_CONFIG": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+    "V2-C012_STAGE_A": null,
+    "V2-C012_STAGE_B_CURRENT_CONFIG": null
+  },
+  "superseded_or_invalid_historical_result_pointers": {
+    "V2-C012_STAGE_A_V1": "discovery/results/V2-C012_STAGE_A_V1.json",
+    "V2-C012_STAGE_B_CURRENT_CONFIG_V1": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json"
+  },
+  "current_authority_refs": [
+    "evidence/C012_SAME_IDENTITY_IMPLEMENTATION_CORRECTION_V1.json",
+    "evidence/C012_SAME_IDENTITY_CORRECTED_STAGE_A_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+    "evidence/C012_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+    "m6/c012_corrected_stage_a_runner.py",
+    "tools/validate_authoritative_promotion.py"
+  ]
 }

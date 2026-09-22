@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import compileall
 import json
+import os
 from pathlib import Path
 
 from discovery.accounting import assert_current_state_matches_repository
@@ -31,6 +32,87 @@ def _walk_refs(value):
         yield value
 
 
+
+def _validate_repository_local_ref(ref: str, *, source: Path) -> None:
+    if not ref.startswith(PATH_PREFIXES):
+        return
+    if any(token in ref for token in ("*", "{", "}")):
+        return
+    if not ref.endswith((".json", ".py", ".txt")):
+        return
+    if not (ROOT / ref).exists():
+        raise ValueError(
+            f"repository-local reference missing from {source.relative_to(ROOT)}: {ref}"
+        )
+
+
+def _validate_active_authority_references(state):
+    sources = [(ROOT / "CURRENT_STATE.json", state)]
+    for path in _json_files():
+        if path == ROOT / "CURRENT_STATE.json":
+            continue
+        value = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(value, dict) and value.get("authority_scope") == "ACTIVE_CURRENT":
+            sources.append((path, value))
+    for source, value in sources:
+        for ref in _walk_refs(value):
+            _validate_repository_local_ref(ref, source=source)
+
+
+def _validate_current_dependency_semantics(state):
+    branch = state.get("authoritative_branch")
+    operational = state.get("operational_branch_authority")
+    if not isinstance(operational, dict):
+        raise ValueError("missing operational_branch_authority")
+    if branch != operational.get("branch"):
+        raise ValueError("authoritative_branch contradicts operational branch authority")
+    if operational.get("work_branch") == branch:
+        raise ValueError("work branch must remain distinct from operational branch")
+
+    invalid = set(state.get("implementation_invalid_consumed_identities", []))
+    survivors = set(state.get("discovery_survivors", []))
+    stage_b_inputs = set(state.get("current_stage_b_survivor_input_set", []))
+    current = state.get("current_result_authority")
+    if not isinstance(current, dict):
+        raise ValueError("missing current_result_authority")
+
+    for cid in invalid:
+        node = current.get(cid)
+        if not isinstance(node, dict):
+            raise ValueError(f"implementation-invalid identity lacks current authority node: {cid}")
+        stage_a = node.get("stage_a")
+        if not isinstance(stage_a, dict):
+            raise ValueError(f"implementation-invalid identity lacks Stage-A authority: {cid}")
+        corrected = stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR"
+        if not corrected and cid in survivors:
+            raise ValueError(f"current survivor list contains invalidated identity without corrected successor: {cid}")
+        if not corrected and cid in stage_b_inputs:
+            raise ValueError(f"current Stage-B input set contains invalidated identity without corrected successor: {cid}")
+
+        downstream = node.get("stage_b_current_config")
+        if not isinstance(downstream, dict):
+            raise ValueError(f"implementation-invalid identity lacks downstream authority: {cid}")
+        if not corrected and downstream.get("state") != "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A":
+            raise ValueError(f"current downstream result not invalidated for implementation-invalid upstream: {cid}")
+        if not corrected:
+            ref = downstream.get("invalidation_ref")
+            if not isinstance(ref, str) or not (ROOT / ref).exists():
+                raise ValueError(f"missing explicit downstream invalidation authority: {cid}")
+
+    correction = state.get("c012_same_identity_corrected_rerun")
+    if not isinstance(correction, dict):
+        raise ValueError("missing C012 corrected rerun state")
+    pending = correction.get("status") not in {
+        "CORRECTED_STAGE_A_RECORDED_SURVIVOR",
+        "CORRECTED_STAGE_A_RECORDED_NON_SURVIVOR",
+    }
+    if pending:
+        if "V2-C012" in survivors or "V2-C012" in stage_b_inputs:
+            raise ValueError("C012 cannot be current survivor/Stage-B input before corrected Stage-A successor")
+        if "C012" not in str(state.get("phase", "")) or "C012" not in str(state.get("next_action", "")):
+            raise ValueError("branch/action pointers contradict pending C012 correction state")
+
+
 def main() -> int:
     if not compileall.compile_dir(str(ROOT), quiet=1, force=True):
         raise SystemExit("Python compilation failed")
@@ -51,15 +133,8 @@ def main() -> int:
     accounting = assert_current_state_matches_repository(ROOT)
 
     state = json.loads((ROOT / "CURRENT_STATE.json").read_text(encoding="utf-8"))
-    for ref in _walk_refs(state):
-        if not ref.startswith(PATH_PREFIXES):
-            continue
-        if any(token in ref for token in ("*", "{", "}")):
-            continue
-        if not ref.endswith((".json", ".py", ".txt")):
-            continue
-        if not (ROOT / ref).exists():
-            raise ValueError(f"repository-local reference missing: {ref}")
+    _validate_active_authority_references(state)
+    _validate_current_dependency_semantics(state)
 
     print("AUTHORITATIVE_PROMOTION_VALIDATION_PASS", accounting)
     return 0

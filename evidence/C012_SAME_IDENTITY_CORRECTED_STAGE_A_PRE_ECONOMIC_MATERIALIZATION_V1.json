@@ -1,0 +1,61 @@
+{
+  "schema": "mxm.greenfield.v2.c012-same-identity-corrected-stage-a-pre-economic-materialization.v1",
+  "status": "PASS_CORRECTED_SAME_IDENTITY_PRE_ECONOMIC_NO_PNL",
+  "authority_scope": "ACTIVE_CURRENT",
+  "candidate_id": "V2-C012",
+  "candidate_spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+  "same_identity": true,
+  "semantic_change": false,
+  "correction_ref": "evidence/C012_SAME_IDENTITY_IMPLEMENTATION_CORRECTION_V1.json",
+  "historical_invalid_result": {
+    "ref": "discovery/results/V2-C012_STAGE_A_V1.json",
+    "result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+    "historical_only": true
+  },
+  "source_semantics": {
+    "corrected_replay_path": "m6/tier1_candidate_replay.py",
+    "corrected_replay_git_blob_sha1": "b4cc3f2b56bb586edefe5c8821225225e79f27ca",
+    "calendar_ref": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "transaction_local_cost_rule_ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "evaluator_ref": "m6/stage_a_evaluator.py",
+    "evaluator_sha256": "16e302dd3a9b58983cbfcb68ca0934c920ea8007fd11e9577685fa95f879874e"
+  },
+  "accepted_original_inputs": {
+    "reconciled_capture_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+    "tier1_cost_evidence_canonical_bundle_sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad",
+    "preopen_supplement_bundle_sha256": "8171ce2d68fef0ac0241b88e914725c16a301e36ae836f766efff4da8aabe798",
+    "files": {
+      "US500_M15": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "NAS100_M15": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "EURUSD_M15": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+      "NAS100_C012_TRANSACTION_LOCAL_COST": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+    }
+  },
+  "corrected_replay_materialization": {
+    "intent_count": 34,
+    "full_intent_manifest_sha256": "645e1d89a5a61c6f757fc4ac1e7f5a7729d847efab9e207c6a02da72e4d9995a",
+    "required_transaction_cost_contexts": 68,
+    "unresolved_transaction_cost_contexts": 0,
+    "causal_eurusd_conversion_gaps": 0,
+    "readiness": "FULLY_MATERIALIZED_PRE_ECONOMIC"
+  },
+  "invalid_implementation_comparison": {
+    "historical_intent_count": 35,
+    "historical_intent_manifest_sha256": "f9d0ba61346bbd9a1602fe84e73d4d374d27e9fdec0217906b2ac29f24218c8d",
+    "corrected_minus_historical_intent_count": -1,
+    "role": "FORENSIC_SIGNAL_STREAM_DIAGNOSTIC_ONLY_NOT_ECONOMIC_OUTCOME"
+  },
+  "forbidden_during_materialization": {
+    "candidate_pnl_computed": false,
+    "candidate_returns_computed": false,
+    "outcome_status_computed": false,
+    "allocator_run": false,
+    "stage_b_rerun": false,
+    "protected_evidence_opened": false
+  },
+  "accounting": {
+    "distinct_v2_identity_delta": 0,
+    "v2_attempt_delta": 0,
+    "search_budget_delta": 0
+  }
+}
