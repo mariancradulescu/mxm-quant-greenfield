@@ -1050,7 +1050,7 @@ class UltraFastCaptureRunner:
             "results":friction,
         }
         selection_doc={
-            "schema":"mxm.greenfield.v2.ultra-fast-stage-a-selection.v3",
+            "schema":"mxm.greenfield.v2.ultra-fast-stage-a-selection.v4",
             "initial_selected":[x["broker_symbol"] for x in initial],"final_selected":[x["broker_symbol"] for x in chosen],
             "alternates":alternates,"data_availability_replacements":replacements,
             "alpha_outcomes_used":False,"user_manual_replacements":False,
@@ -1058,7 +1058,7 @@ class UltraFastCaptureRunner:
         }
         status="COMPACT_FRICTION_AND_STAGE_A_DEVELOPMENT_CAPTURE_COMPLETE" if chosen else "FRICTION_QUALIFICATION_COMPLETE_NO_STAGE_A_MARKETS"
         manifest={
-            "schema":"mxm.greenfield.v2.ultra-fast-stage-a-capture-bundle.v3","status":status,
+            "schema":"mxm.greenfield.v2.ultra-fast-stage-a-capture-bundle.v4","status":status,
             "captured_utc":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),
             "tool_version":TOOL_VERSION,"plan_sha256":EXPECTED_PLAN_SHA,
             "source_broker_universe_zip_sha256":self.plan["source_broker_universe_zip_sha256"],
@@ -1066,7 +1066,7 @@ class UltraFastCaptureRunner:
             "friction_shortlist_count":len(friction),"stage_a_selected_count":len(chosen),
             "stage_a_interval":self.plan["stage_a_interval"],"latest_4_week_diagnostic":self.plan["latest_4_week_diagnostic"],
             "series":series,"historical_requests":self._requests,
-            "conversion_chain_count":conversion_summary["chain_count"],"conversion_window_rate_count":conversion_summary["window_rate_count"],
+            "conversion_chain_count":conversion_summary["chain_count"],"conversion_window_rate_count":conversion_summary["window_rate_count"],\n            "friction_checkpoint_reused":checkpoint is not None,"friction_checkpoint_authority":str(self.checkpoint_dir),
             "raw_ticks_transferred":False,"raw_conversion_ticks_transferred":False,
             "orders_placed":False,"account_mutation":False,"protected_evidence_opened":False,
             "economic_outcomes_opened":0,"v2_attempts_consumed":0,"implementation_invalid_conditions":0,
