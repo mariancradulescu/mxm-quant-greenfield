@@ -2,10 +2,17 @@ import json
 import unittest
 from decimal import Decimal
 from pathlib import Path
-from competition.broker_universe_capture import classify_margin
-from competition.shared_eur200_replay import ReplayEvent,replay_shared_eur200
+from competition.broker_universe_capture import (
+    FEASIBLE,INFEASIBLE,UNRESOLVED,
+    account_execution_semantics,classify_direction,directional_summary,entry_eligibility,
+)
+from competition.shared_eur200_replay import ReplayContractError,ReplayEvent,replay_shared_eur200
 
 ROOT=Path(__file__).resolve().parents[1]
+
+def ev(*args,**kwargs):
+    kwargs.setdefault("direction_feasibility",FEASIBLE)
+    return ReplayEvent(*args,**kwargs)
 
 class CompetitionPerformanceResetV1Tests(unittest.TestCase):
     def test_authority_state(self):
@@ -21,15 +28,38 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
         self.assertFalse(u["scope"]["full_account_universe_claimed"])
         self.assertIsNone(u["scope"]["exhaustive_current_accessible_symbol_count"])
         self.assertEqual(u["scope"]["confirmed_accessible_symbol_lower_bound"],47)
-        s=u["persisted_enabled_subset_summary"]
-        self.assertEqual((s["count"],s["eur200_min_volume_feasible"],s["eur200_min_volume_infeasible"],s["broker_or_margin_unresolved"]),(49,10,1,38))
 
-    def test_margin_classification_three_states(self):
-        self.assertEqual(classify_margin(10,11),"EUR200_MIN_VOLUME_FEASIBLE")
-        self.assertEqual(classify_margin(201,10),"EUR200_MIN_VOLUME_INFEASIBLE")
-        self.assertEqual(classify_margin(None,10),"BROKER_OR_MARGIN_UNRESOLVED")
+    def test_directional_margin_classification(self):
+        self.assertEqual(classify_direction(10,True),FEASIBLE)
+        self.assertEqual(classify_direction(201,True),INFEASIBLE)
+        self.assertEqual(classify_direction(None,True),UNRESOLVED)
+        self.assertEqual(classify_direction(10,False),INFEASIBLE)
+        self.assertEqual(classify_direction(10,None),UNRESOLVED)
+        self.assertEqual(directional_summary(FEASIBLE,FEASIBLE),"BOTH_FEASIBLE")
+        self.assertEqual(directional_summary(FEASIBLE,INFEASIBLE),"BUY_ONLY")
+        self.assertEqual(directional_summary(INFEASIBLE,FEASIBLE),"SELL_ONLY")
+        self.assertEqual(directional_summary(INFEASIBLE,INFEASIBLE),"NEITHER_FEASIBLE")
+        self.assertEqual(directional_summary(FEASIBLE,UNRESOLVED),"UNRESOLVED")
 
-    def test_frontier_is_not_index_anchored(self):
+    def test_shortability_is_directional(self):
+        self.assertEqual(entry_eligibility({"enabled":True},{"tradingMode":0,"enableShortSelling":False}),(True,False))
+        self.assertEqual(entry_eligibility({"enabled":True},{"tradingMode":0,"enableShortSelling":True}),(True,True))
+        self.assertEqual(entry_eligibility({"enabled":True},{"tradingMode":0}),(True,None))
+        self.assertEqual(entry_eligibility({"enabled":True},{"tradingMode":3,"enableShortSelling":True}),(False,False))
+
+    def test_account_semantics_are_normalized_without_guessing_stopout_level(self):
+        s=account_execution_semantics({
+            "accountType":0,"totalMarginCalculationType":2,"fairStopOut":False,
+            "stopOutStrategy":1,"accessRights":0,"leverageInCents":3000,
+            "isLimitedRisk":False,
+        },"EUR",{"state":"CAPTURED","items":[{"marginCallType":61,"marginLevelThreshold":100.0}]})
+        self.assertEqual(s["account_type"]["name"],"HEDGED")
+        self.assertEqual(s["total_margin_calculation_type"]["name"],"NET")
+        self.assertEqual(s["stop_out_strategy"]["name"],"MOST_LOSING_FIRST")
+        self.assertEqual(s["deposit_currency"],"EUR")
+        self.assertEqual(s["stop_out_margin_level_threshold"]["state"],"UNKNOWN_NOT_IDENTIFIED_BY_PROTOOA_TRADER_OR_MARGIN_CALL_LIST")
+
+    def test_frontier_is_preserved_but_not_economically_opened(self):
         f=json.loads((ROOT/"discovery"/"COMPETITION_FRONTIER_WAVE_01_V1.json").read_text())
         self.assertEqual([x["broker_symbol"] for x in f["selected_traded_markets"]],["AUDJPY","SpotCrude","XAUUSD"])
         self.assertFalse(f["C013_C016"]["execute_in_wave_01"])
@@ -45,10 +75,10 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
 
     def test_shared_replay_margin_rejection_and_continuity(self):
         r=replay_shared_eur200([
-            ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,transaction_cost_eur=1,active_position_mtm_eur={}),
-            ReplayEvent("2026-01-05T09:00:00Z","ENTRY","TEST-B","XAUUSD","p2",direction="LONG",volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=100000,margin_eur=191.31,active_position_mtm_eur={"p1":0}),
+            ev("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,transaction_cost_eur=1,active_position_mtm_eur={}),
+            ev("2026-01-05T09:00:00Z","ENTRY","TEST-B","XAUUSD","p2",direction="LONG",volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=100000,margin_eur=191.31,active_position_mtm_eur={"p1":0}),
             ReplayEvent("2026-01-05T10:00:00Z","EXIT","TEST-A","AUDJPY","p1",realized_gross_pnl_eur=5,transaction_cost_eur=1,active_position_mtm_eur={}),
-        ])
+        ],account_type="HEDGED",total_margin_calculation_type="SUM")
         self.assertEqual((r.accepted_entries,r.rejected_entries),(1,1))
         self.assertEqual(r.entries_by_iso_week,{"2026-W02":1})
         self.assertEqual(r.terminal_equity_eur,Decimal("203"))
@@ -56,19 +86,43 @@ class CompetitionPerformanceResetV1Tests(unittest.TestCase):
 
     def test_shared_replay_same_timestamp_cross_symbol_concurrency(self):
         r=replay_shared_eur200([
-            ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",priority=10,direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,active_position_mtm_eur={}),
-            ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-B","SpotCrude","p2",priority=20,direction="SHORT",volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=500000,margin_eur=8.73,active_position_mtm_eur={}),
+            ev("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",priority=10,direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,active_position_mtm_eur={}),
+            ev("2026-01-05T08:00:00Z","ENTRY","TEST-B","SpotCrude","p2",priority=20,direction="SHORT",volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=500000,margin_eur=8.73,active_position_mtm_eur={}),
             ReplayEvent("2026-01-05T09:00:00Z","EXIT","TEST-A","AUDJPY","p1",realized_gross_pnl_eur=2,active_position_mtm_eur={"p1":0,"p2":0}),
             ReplayEvent("2026-01-05T09:00:00Z","EXIT","TEST-B","SpotCrude","p2",realized_gross_pnl_eur=3,active_position_mtm_eur={"p1":0,"p2":0}),
-        ])
+        ],account_type="HEDGED",total_margin_calculation_type="SUM")
         self.assertEqual((r.accepted_entries,r.rejected_entries),(2,0))
         self.assertEqual(r.entries_by_iso_week,{"2026-W02":2})
         self.assertEqual(r.terminal_equity_eur,Decimal("205"))
 
+    def test_hedged_same_symbol_uses_real_margin_aggregation(self):
+        r=replay_shared_eur200([
+            ev("2026-01-05T08:00:00Z","ENTRY","A","AUDJPY","p1",priority=10,direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=40,active_position_mtm_eur={}),
+            ev("2026-01-05T08:00:00Z","ENTRY","B","AUDJPY","p2",priority=20,direction="SHORT",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=30,active_position_mtm_eur={}),
+            ReplayEvent("2026-01-05T09:00:00Z","EXIT","A","AUDJPY","p1",active_position_mtm_eur={"p1":0,"p2":0}),
+            ReplayEvent("2026-01-05T09:00:00Z","EXIT","B","AUDJPY","p2",active_position_mtm_eur={"p1":0,"p2":0}),
+        ],account_type="HEDGED",total_margin_calculation_type="MAX")
+        self.assertEqual((r.accepted_entries,r.rejected_entries),(2,0))
+        self.assertEqual(r.decisions[1].used_margin_eur_after,Decimal("40"))
+
+    def test_netted_same_symbol_requires_allocator_netting(self):
+        with self.assertRaisesRegex(ReplayContractError,"pre-netted"):
+            replay_shared_eur200([
+                ev("2026-01-05T08:00:00Z","ENTRY","A","AUDJPY","p1",direction="LONG",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=40,active_position_mtm_eur={}),
+                ev("2026-01-05T08:01:00Z","ENTRY","B","AUDJPY","p2",direction="SHORT",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=30,active_position_mtm_eur={"p1":0}),
+            ],account_type="NETTED",total_margin_calculation_type="NET")
+
+    def test_directional_infeasibility_cannot_execute(self):
+        r=replay_shared_eur200([
+            ReplayEvent("2026-01-05T08:00:00Z","ENTRY","A","X","p1",direction="SHORT",direction_feasibility=INFEASIBLE,volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=1000,margin_eur=1,active_position_mtm_eur={}),
+        ],account_type="HEDGED",total_margin_calculation_type="SUM")
+        self.assertEqual((r.accepted_entries,r.rejected_entries),(0,1))
+        self.assertEqual(r.decisions[0].reason,"REJECT_DIRECTION_INFEASIBLE")
+
     def test_shared_replay_rejects_unknown_entry_direction(self):
         with self.assertRaisesRegex(ValueError,"direction"):
             replay_shared_eur200([
-                ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,active_position_mtm_eur={}),
-            ])
+                ReplayEvent("2026-01-05T08:00:00Z","ENTRY","TEST-A","AUDJPY","p1",direction_feasibility=FEASIBLE,volume_cents=100000,min_volume_cents=100000,step_volume_cents=100000,max_volume_cents=10000000,margin_eur=31.02,active_position_mtm_eur={}),
+            ],account_type="HEDGED",total_margin_calculation_type="SUM")
 
 if __name__=="__main__":unittest.main()
