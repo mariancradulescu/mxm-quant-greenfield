@@ -1,5 +1,6 @@
 import json, unittest
 from pathlib import Path
+from discovery.accounting import derive_current_accounting
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -25,9 +26,10 @@ class LiveEquivalentStageBInputEquivalenceRevalidationTests(unittest.TestCase):
 
     def test_current_state_uses_revalidated_stage_b_authority_without_new_outcome(self):
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["v2_attempts_used"],16)
-        self.assertEqual(s["v2_search_budget_remaining"],68)
-        self.assertEqual(s["economic_outcomes_opened"],23)
+        current=derive_current_accounting(ROOT)
+        self.assertEqual(s["v2_attempts_used"],current["v2_attempts_used"])
+        self.assertEqual(s["v2_search_budget_remaining"],current["v2_search_budget_remaining"])
+        self.assertEqual(s["economic_outcomes_opened"],current["economic_outcomes_opened"])
         self.assertEqual(s["stage_b_revalidation_required_candidate_ids"],[])
         self.assertEqual(s["current_stage_b_survivor_input_set"],["V2-C006","V2-C012"])
         self.assertEqual(s["current_live_equivalent_stage_b_authoritative_candidate_ids"],["V2-C006","V2-C012"])
