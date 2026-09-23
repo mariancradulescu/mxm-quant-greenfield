@@ -7,6 +7,7 @@ from pathlib import Path
 from discovery.canonical import verify_spec_hash
 from discovery.ledger import read_ledger
 from m6.session_replay import NY, NasdaqCashCalendar
+from research_v3.lifecycle import repository_lifecycle_summary
 from m7.competition_expansion_index_m15 import (
     CANDIDATE_HASHES,
     opening_range_breakout_intents,
@@ -131,8 +132,17 @@ class CompetitionExpansionWave01FreezeTests(unittest.TestCase):
         self.assertEqual(s["v2_search_budget"],84)
         self.assertEqual(s["v2_search_budget_remaining"],84-s["v2_attempts_used"])
         self.assertGreaterEqual(s["discovery_ledger_entries"],39)
-        self.assertGreaterEqual(s["discovery_result_recorded_entries"],s["v2_attempts_used"])
-        self.assertEqual(s["discovery_result_recorded_entries"]-s["v2_attempts_used"], 1 if s.get("c012_same_identity_corrected_rerun",{}).get("status") in {"CORRECTED_STAGE_A_RECORDED_SURVIVOR","CORRECTED_STAGE_A_RECORDED_NON_SURVIVOR"} else 0)
+        lifecycle=repository_lifecycle_summary(ROOT)
+        self.assertEqual(s["discovery_result_recorded_entries"],lifecycle["stage_a_result_recorded_entries"])
+        self.assertEqual(s["v2_attempts_used"],lifecycle["distinct_identity_outcomes_opened"])
+        self.assertEqual(
+            s["discovery_result_recorded_entries"]-s["v2_attempts_used"],
+            lifecycle["same_identity_successor_result_entries"],
+        )
+        self.assertEqual(
+            lifecycle["implementation_correction_entries"],
+            lifecycle["same_identity_successor_result_entries"],
+        )
         self.assertFalse(s["protected_evidence_opened"])
         self.assertFalse(s["live_orders_authorized"])
         self.assertFalse(s["competition_start_authorized"])
