@@ -24,6 +24,7 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
             self.assertEqual(committed["attempt_accounting"][key],generated["attempt_accounting"][key])
 
     def test_current_state_separates_historical_exposure_from_budget_charge(self):
+        generated=build_audit(ROOT)
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
         self.assertEqual(state["forensic_consumed_identity_audit_authority"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json")
         self.assertEqual(set(state["implementation_invalid_consumed_identities"]),set(IMPLEMENTATION_ONLY))
