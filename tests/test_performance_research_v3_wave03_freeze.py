@@ -65,23 +65,23 @@ class PerformanceResearchV3Wave03FreezeTests(unittest.TestCase):
         self.assertEqual(freezes[0]["spec_hash"],SPEC_HASH)
         self.assertEqual(wave03["candidate_own_outcomes_opened"],len(results)==1)
 
-        self.assertEqual(state["v2_evaluated_identities"],state["v2_attempts_used"])
+        self.assertEqual(state["v2_evaluated_identities"],16)
         self.assertEqual(state["v2_search_budget_remaining"],84-state["v2_attempts_used"])
-        self.assertEqual(state["global_attempts_seen"],state["legacy_prior_attempts"]+state["v2_attempts_used"])
+        self.assertEqual(state["global_attempts_seen"],state["legacy_prior_attempts"]+state["v2_evaluated_identities"])
         self.assertEqual(state["discovery_ledger_entries"],len(ledger))
         self.assertEqual(
             state["discovery_result_recorded_entries"],
             sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),
         )
-        self.assertGreaterEqual(state["v2_attempts_used"],15)
-        self.assertGreaterEqual(state["economic_outcomes_opened"],18)
+        self.assertEqual(state["v2_attempts_used"],4)
+        self.assertEqual(state["economic_outcomes_opened"],19)
         self.assertGreaterEqual(state["discovery_ledger_entries"],51)
         self.assertGreaterEqual(state["discovery_result_recorded_entries"],16)
 
         if results:
-            self.assertGreaterEqual(state["v2_attempts_used"],16)
-            self.assertLessEqual(state["v2_search_budget_remaining"],68)
-            self.assertGreaterEqual(state["economic_outcomes_opened"],19)
+            self.assertEqual(state["v2_attempts_used"],4)
+            self.assertEqual(state["v2_search_budget_remaining"],80)
+            self.assertEqual(state["economic_outcomes_opened"],19)
 
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])

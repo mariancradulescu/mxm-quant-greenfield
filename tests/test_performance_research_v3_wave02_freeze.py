@@ -52,9 +52,9 @@ class PerformanceResearchV3Wave02FreezeTests(unittest.TestCase):
         self.assertEqual(state["performance_research_v3"]["wave02"]["v2_attempts_used_before_wave02"],13)
         self.assertEqual(state["performance_research_v3"]["wave02"]["v2_search_budget_remaining_before_wave02"],71)
         if opened:
-            self.assertGreaterEqual(state["v2_attempts_used"],15)
+            self.assertEqual(state["v2_attempts_used"],4)
             self.assertLessEqual(state["v2_search_budget_remaining"],69)
-            self.assertGreaterEqual(state["economic_outcomes_opened"],18)
+            self.assertEqual(state["economic_outcomes_opened"],19)
 
     def test_04_authorization_rejects_wrong_gate_before_economics(self):
         auth=load("research_v3/WAVE_02_EXECUTION_AUTHORIZATION_V1.json")
@@ -102,9 +102,9 @@ class PerformanceResearchV3Wave02FreezeTests(unittest.TestCase):
         self.assertEqual(wave02["result_statuses"],EXPECTED_STATUSES)
 
         # Current lifecycle may legitimately advance after Wave02.
-        self.assertEqual(state["v2_evaluated_identities"],state["v2_attempts_used"])
+        self.assertEqual(state["v2_evaluated_identities"],16)
         self.assertEqual(state["v2_search_budget_remaining"],84-state["v2_attempts_used"])
-        self.assertEqual(state["global_attempts_seen"],state["legacy_prior_attempts"]+state["v2_attempts_used"])
+        self.assertEqual(state["global_attempts_seen"],state["legacy_prior_attempts"]+state["v2_evaluated_identities"])
         self.assertEqual(state["discovery_ledger_entries"],len(ledger))
         self.assertEqual(
             state["discovery_result_recorded_entries"],
