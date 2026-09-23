@@ -2,6 +2,7 @@ import json
 import unittest
 from pathlib import Path
 from research_v3.forensic_classifier_v3 import ALL, IMPLEMENTATION_ONLY, SPEC_INVALID, build_audit
+from discovery.accounting import derive_current_accounting
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -23,28 +24,35 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
         for key in ("historical_evaluated_candidate_ids","budget_charged_candidate_ids","v2_attempts_used","v2_search_budget_remaining","pending_same_identity_correction_candidate_ids","invalid_frozen_spec_candidate_ids","refunded_candidate_ids"):
             self.assertEqual(committed["attempt_accounting"][key],generated["attempt_accounting"][key])
 
-    def test_current_state_separates_historical_exposure_from_current_result_authority(self):
+    def test_current_state_separates_frozen_forensic_cohort_from_later_current_exposure(self):
         generated=build_audit(ROOT)
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
+        current=derive_current_accounting(ROOT)
         self.assertEqual(state["forensic_consumed_identity_audit_authority"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json")
         self.assertEqual(set(state["implementation_invalid_consumed_identities"]),set(IMPLEMENTATION_ONLY))
         self.assertEqual(set(state["frozen_spec_invalid_consumed_identities"]),set(SPEC_INVALID))
-        self.assertEqual(state["v2_attempts_used"],16)
-        self.assertEqual(state["v2_evaluated_identities"],16)
-        self.assertEqual(state["v2_search_budget_remaining"],68)
-        self.assertEqual(state["global_attempts_seen"],32)
+
+        # Frozen forensic V3 remains the exact 16-identity cohort it classified.
+        self.assertEqual(set(state["v2_historical_evaluated_candidate_ids"]),set(ALL))
+        self.assertEqual(generated["attempt_accounting"]["v2_attempts_used"],16)
+        self.assertEqual(generated["attempt_accounting"]["v2_search_budget_remaining"],68)
+
+        # Current research may legitimately advance beyond that forensic snapshot.
+        self.assertEqual(state["v2_attempts_used"],current["v2_attempts_used"])
+        self.assertEqual(state["v2_evaluated_identities"],current["v2_evaluated_identities"])
+        self.assertEqual(state["v2_search_budget_remaining"],current["v2_search_budget_remaining"])
+        self.assertEqual(state["global_attempts_seen"],current["global_attempts_seen"])
+        self.assertEqual(state["distinct_identity_outcomes_opened"],current["distinct_identity_outcomes_opened"])
+        self.assertEqual(set(state["v2_budget_charged_candidate_ids"]),set(current["budget_charged_candidate_ids"]))
+        self.assertTrue(set(ALL) < set(current["budget_charged_candidate_ids"]))
         self.assertEqual(
             state["economic_outcomes_opened"],
             state["stage_a_result_recorded_entries"]+state["stage_b_current_config_economic_observations"],
         )
-        self.assertEqual(state["distinct_identity_outcomes_opened"],16)
-        self.assertEqual(set(state["v2_budget_charged_candidate_ids"]),set(ALL))
+
         self.assertEqual(set(state["invalid_frozen_spec_candidate_ids"]),set(SPEC_INVALID))
         self.assertEqual(state["pending_same_identity_correction_candidate_ids"],[])
-        self.assertEqual(
-            set(state["current_live_equivalent_authoritative_candidate_ids"]),
-            set(IMPLEMENTATION_ONLY),
-        )
+        self.assertTrue(set(IMPLEMENTATION_ONLY) <= set(state["current_live_equivalent_authoritative_candidate_ids"]))
         self.assertEqual(state["stage_b_revalidation_required_candidate_ids"],[])
         self.assertEqual(set(state["discovery_survivors"]),{"V2-C006","V2-C012"})
         self.assertEqual(set(state["live_equivalent_discovery_survivors"]),{"V2-C006","V2-C012"})
@@ -61,10 +69,6 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
             self.assertEqual(a["live_equivalent_replay_state"],"FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY")
             self.assertFalse(a["same_identity_correction_allowed"])
             self.assertTrue(a["new_identity_required"])
-        self.assertEqual(
-            generated["attempt_accounting"]["v2_attempts_used"],
-            state["v2_attempts_used"],
-        )
 
     def test_v2_audit_is_preserved_but_superseded(self):
         old=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json").read_text())
