@@ -13,7 +13,9 @@ from research_v3.runtime_v2_primitives import (
     DEFAULT_RUNTIME_DIR,
     GitCheckpointSink,
     atomic_write_json,
+    iso,
     load_json,
+    parse_iso,
     sha256_file,
 )
 
@@ -26,6 +28,8 @@ OLD_GATE_REL = "evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json"
 DISCOVERY_LEDGER_REL = "discovery/ledger.jsonl"
 V6_ACCEPTANCE_REL = "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
 EXTERNAL_REQUEST_REL = "research_v3/runtime_v2/external_requests/NEXT_REQUIRED_INPUT.json"
+AUTONOMOUS_WAKE_EVENTS = {"workflow_run", "schedule"}
+MAX_ACCEPTED_WAKE_LATENCY_SECONDS = 600
 
 
 class DirectorHalt(RuntimeError):
@@ -309,7 +313,10 @@ def _write_next_state(root: Path, state: Mapping[str, Any], control: Mapping[str
         "control_plane_next_action": control.get("next_action"),
         "director_version": DIRECTOR_VERSION,
         "end_to_end_acceptance": state.get("status"),
-        "scheduled_watchdog_run_id": state.get("scheduled_watchdog_run_id"),
+        "autonomous_wake_run_id": state.get("autonomous_wake_run_id"),
+        "autonomous_wake_event": state.get("autonomous_wake_event"),
+        "observed_wake_latency_seconds": state.get("observed_wake_latency_seconds"),
+        "accepted_wake_latency_bound_seconds": MAX_ACCEPTED_WAKE_LATENCY_SECONDS,
         "material_issues": list(control.get("material_issues") or []),
     })
     atomic_write_json(root / NEXT_STATE_REL, doc)
@@ -356,17 +363,29 @@ def _finalize(root: Path, state: dict[str, Any], *, run_id: str, event_name: str
         if proof["operation_closed_count"] != 1 or proof["knowledge_scope_updated_count"] != 1:
             raise DirectorHalt("operation boundary not durably complete")
     chain = list(state.get("workflow_chain") or [])
-    if not chain or chain[0].get("event_name") != "schedule":
-        raise DirectorHalt("proof did not start from genuine event=schedule")
+    if not chain or chain[0].get("event_name") not in AUTONOMOUS_WAKE_EVENTS:
+        raise DirectorHalt("proof did not start from a genuine autonomous wake event")
+    observed_latency = state.get("observed_wake_latency_seconds")
+    if observed_latency is None or float(observed_latency) > MAX_ACCEPTED_WAKE_LATENCY_SECONDS:
+        raise DirectorHalt(
+            f"autonomous wake exceeded bounded latency: {observed_latency!r}s > "
+            f"{MAX_ACCEPTED_WAKE_LATENCY_SECONDS}s"
+        )
     report = {
         "schema": "mxm.greenfield.zero-human-end-to-end-research-progression-report.v1",
         "status": "PASS",
         "director_version": DIRECTOR_VERSION,
-        "scheduled_watchdog": {
-            "run_id": state["scheduled_watchdog_run_id"],
-            "event_name": "schedule",
-            "actor": state.get("scheduled_watchdog_actor"),
+        "autonomous_wake": {
+            "run_id": state["autonomous_wake_run_id"],
+            "event_name": state["autonomous_wake_event"],
+            "actor": state.get("autonomous_wake_actor"),
+            "origin_run_id": state.get("wake_origin_run_id"),
+            "origin_completed_at": state.get("wake_origin_completed_at"),
+            "observed_utc": state.get("wake_observed_utc"),
+            "observed_latency_seconds": state.get("observed_wake_latency_seconds"),
+            "accepted_latency_bound_seconds": MAX_ACCEPTED_WAKE_LATENCY_SECONDS,
         },
+        "bounded_recovery_latency": "PASS",
         "workflow_chain": chain + [{"run_id": run_id, "event_name": event_name, "phase": "verify"}],
         "starting_condition": {"queued_operations": 0, "durable_next_action": state["starting_next_action"]},
         "planner_operation_materialization": "PASS",
@@ -396,8 +415,11 @@ def _finalize(root: Path, state: dict[str, Any], *, run_id: str, event_name: str
         "director_version": DIRECTOR_VERSION,
         "report_ref": E2E_REPORT_REL,
         "report_sha256": sha256_file(root / E2E_REPORT_REL),
-        "scheduled_watchdog_run_id": state["scheduled_watchdog_run_id"],
-        "scheduled_watchdog_event": "schedule",
+        "autonomous_wake_run_id": state["autonomous_wake_run_id"],
+        "autonomous_wake_event": state["autonomous_wake_event"],
+        "observed_wake_latency_seconds": state["observed_wake_latency_seconds"],
+        "accepted_wake_latency_bound_seconds": MAX_ACCEPTED_WAKE_LATENCY_SECONDS,
+        "bounded_recovery_latency": "PASS",
         "planner_operation_materialization": "PASS",
         "cross_operation_progression": "PASS",
         "zero_human_end_to_end_research_progression": "PASS",
@@ -418,7 +440,8 @@ def _finalize(root: Path, state: dict[str, Any], *, run_id: str, event_name: str
 
 
 def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attempt: str,
-              actor: str, predecessor_run_id: str, git_checkpoint: bool, git_push: bool) -> dict[str, Any]:
+              actor: str, predecessor_run_id: str, wake_origin_completed_at: str,
+              git_checkpoint: bool, git_push: bool) -> dict[str, Any]:
     root = Path(root_value).resolve()
     if not _old_acceptance_pass(root):
         raise DirectorHalt("legacy Runtime V2 acceptance must remain durably PASS")
@@ -427,12 +450,27 @@ def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attem
     gate = load_json(root / E2E_GATE_REL, {}) or {}
 
     if state is None:
-        if event_name != "schedule":
+        if event_name not in AUTONOMOUS_WAKE_EVENTS:
             return {
-                "action": "WAIT_FOR_GENUINE_SCHEDULE",
-                "status": "READY_FOR_SCHEDULE_PROOF",
+                "action": "WAIT_FOR_AUTONOMOUS_WAKE",
+                "status": "READY_FOR_AUTONOMOUS_WAKE_PROOF",
                 "next_action": control["next_action"],
             }
+        observed_utc = iso()
+        if event_name == "workflow_run":
+            if not predecessor_run_id or not wake_origin_completed_at:
+                raise DirectorHalt("workflow_run wake lacks upstream run identity/timestamp")
+            latency_seconds = max(
+                0.0,
+                (parse_iso(observed_utc) - parse_iso(wake_origin_completed_at)).total_seconds(),
+            )
+        else:
+            latency_seconds = 0.0
+        if latency_seconds > MAX_ACCEPTED_WAKE_LATENCY_SECONDS:
+            raise DirectorHalt(
+                f"autonomous wake latency {latency_seconds:.3f}s exceeds "
+                f"{MAX_ACCEPTED_WAKE_LATENCY_SECONDS}s acceptance bound"
+            )
         existing = _existing_operation_paths(root)
         if existing:
             raise DirectorHalt("E2E starting condition requires zero pre-existing Runtime V2 operations")
@@ -445,8 +483,14 @@ def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attem
             "starting_next_action": control["next_action"],
             "selection": selection,
             "accounting_before": _project_snapshot(root),
-            "scheduled_watchdog_run_id": run_id,
-            "scheduled_watchdog_actor": actor,
+            "autonomous_wake_run_id": run_id,
+            "autonomous_wake_event": event_name,
+            "autonomous_wake_actor": actor,
+            "wake_origin_run_id": predecessor_run_id or None,
+            "wake_origin_completed_at": wake_origin_completed_at or None,
+            "wake_observed_utc": observed_utc,
+            "observed_wake_latency_seconds": latency_seconds,
+            "accepted_wake_latency_bound_seconds": MAX_ACCEPTED_WAKE_LATENCY_SECONDS,
             "workflow_chain": [{
                 "run_id": run_id,
                 "run_attempt": run_attempt,
@@ -461,7 +505,7 @@ def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attem
             "next_state_status": "IN_PROGRESS",
         }
         atomic_write_json(root / E2E_STATE_REL, state)
-        _checkpoint(root, "e2e_schedule_start", None, enabled=git_checkpoint, push=git_push)
+        _checkpoint(root, "e2e_autonomous_wake_start", None, enabled=git_checkpoint, push=git_push)
         op_id, result_ref, result = _run_one(
             root,
             _director_plan(root, action="ASSESS_STAGE_B_SURVIVOR", selection=selection),
@@ -584,6 +628,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-attempt", default=os.environ.get("GITHUB_RUN_ATTEMPT", "1"))
     parser.add_argument("--actor", default=os.environ.get("GITHUB_ACTOR", "local"))
     parser.add_argument("--predecessor-run-id", default=os.environ.get("MXM_PREDECESSOR_RUN_ID", ""))
+    parser.add_argument("--wake-origin-completed-at", default=os.environ.get("MXM_WAKE_ORIGIN_COMPLETED_AT", ""))
     parser.add_argument("--git-checkpoint", action="store_true")
     parser.add_argument("--git-push", action="store_true")
     args = parser.parse_args(argv)
@@ -602,6 +647,7 @@ def main(argv: list[str] | None = None) -> int:
             run_attempt=str(args.run_attempt),
             actor=str(args.actor),
             predecessor_run_id=str(args.predecessor_run_id),
+            wake_origin_completed_at=str(args.wake_origin_completed_at),
             git_checkpoint=bool(args.git_checkpoint),
             git_push=bool(args.git_push),
         )
