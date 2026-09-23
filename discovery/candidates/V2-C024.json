@@ -1,0 +1,170 @@
+{
+  "id": "V2-C024",
+  "mechanism": {
+    "family": "CROSS_SECTIONAL_RANKING",
+    "subfamily": "CROSS_MARKET_15M_VOL_NORMALIZED_RESIDUAL_REVERSION_DYNAMIC_EXIT"
+  },
+  "rationale": "Prospectively test whether the most idiosyncratic short-horizon move across the accepted broker-native frontier mean-reverts after removing each market\u2019s own recent volatility scale and the contemporaneous cross-sectional median. This changes both information structure and exit law relative to earlier absolute-sign and 4h continuation candidates; no threshold/lookback grid is used.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "features": [
+    {
+      "name": "return_3",
+      "formula": "close_t / close_t_minus_3 - 1"
+    },
+    {
+      "name": "prior_median_abs_return_3_36",
+      "formula": "median(abs(return_3_j)) over exactly prior 36 completed M5 observations, excluding current"
+    },
+    {
+      "name": "vol_normalized_return",
+      "formula": "return_3 / prior_median_abs_return_3_36"
+    },
+    {
+      "name": "cross_sectional_residual",
+      "formula": "vol_normalized_return - median(vol_normalized_return across currently eligible markets)"
+    },
+    {
+      "name": "selection_score",
+      "formula": "abs(cross_sectional_residual) / frozen_roundtrip_cost_fraction"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "return_3",
+      "bars": 3
+    },
+    {
+      "feature": "prior_median_abs_return_3_36",
+      "observations": 36
+    }
+  ],
+  "normalization_training": {
+    "mode": "ROLLING_PRIOR_ONLY_MEDIAN_ABSOLUTE_RETURN",
+    "future_normalization": false,
+    "window_observations": 36,
+    "cross_sectional_centering": "CURRENT_COMPLETED_BAR_ELIGIBLE_MARKETS_ONLY"
+  },
+  "timing": {
+    "decision": "EACH_COMPLETED_M5_CLOSE_AT_15_MINUTE_BOUNDARY",
+    "entry": "NEXT_EXACT_OBSERVED_M5_OPEN",
+    "exit_decision": "FIRST_COMPLETED_M5_CLOSE_WHERE_SELECTED_SYMBOL_RESIDUAL_REACHES_OR_CROSSES_ZERO; OTHERWISE MAXIMUM_HOLD"
+  },
+  "direction": {
+    "SHORT": "selected cross_sectional_residual > 0",
+    "LONG": "selected cross_sectional_residual < 0",
+    "NO_OP": "fewer_than_4_eligible_markets_or_zero_residual_or_invalid_scale"
+  },
+  "entry": {
+    "type": "SINGLE_LEG_CROSS_MARKET_SELECTED_MARKET_PROXY",
+    "selection": "MAX_SELECTION_SCORE_ACROSS_ELIGIBLE_MARKETS",
+    "price": "selected_symbol_next_exact_observed_M5_open"
+  },
+  "exit": {
+    "type": "CAUSAL_RESIDUAL_REVERSION_OR_MAX_HOLD",
+    "dynamic_exit": "next exact observed M5 open after first completed bar with residual sign zero/cross versus entry residual sign",
+    "fallback": "close_of_12th_contiguous_M5_bar_including_entry"
+  },
+  "maximum_hold": {
+    "unit": "CONTIGUOUS_M5_BARS_INCLUDING_ENTRY",
+    "value": 12
+  },
+  "filters": [
+    "MINIMUM_4_ELIGIBLE_MARKETS_AT_DECISION",
+    "EXACT_3_BAR_RETURN_AND_36_PRIOR_SCALE_OBSERVATIONS_REQUIRED",
+    "CONTIGUOUS_SELECTED_SYMBOL_ENTRY_TO_EXIT_GRID_REQUIRED",
+    "FROZEN_COARSE_COST_REQUIRED"
+  ],
+  "parameters": {
+    "return_bars": 3,
+    "prior_scale_observations": 36,
+    "decision_interval_minutes": 15,
+    "minimum_cross_section_markets": 4,
+    "maximum_hold_bars": 12,
+    "selection_count": 1,
+    "residual_threshold": 0
+  },
+  "position_admission_policy": {
+    "max_simultaneous_active_positions_global": 1,
+    "max_simultaneous_candidate_instances_global": 1,
+    "new_signal_while_active": "IGNORE_NO_QUEUE",
+    "same_boundary_tie_break": "LEXICOGRAPHIC_SYMBOL_AFTER_EQUAL_SCORE",
+    "same_direction_pyramiding_allowed": false,
+    "scope": "PER_CANDIDATE_GLOBAL",
+    "same_timestamp_exit_and_new_entry_opportunity": "EXIT_FIRST; NEW_ENTRY_OPPORTUNITY_AT_THAT_TIMESTAMP_IS_IGNORED_WITH_NO_QUEUE"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "resolution": "M5",
+    "accepted_capture_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
+  },
+  "causal_availability": {
+    "future_information_forbidden": true,
+    "decision_uses": "completed observed M5 bars only",
+    "entry_uses": "next exact observed M5 open",
+    "training_or_normalization": "prior observations only"
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "cost_model": "frozen per-symbol conservative roundtrip fraction"
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use the prospectively frozen candidate-independent per-symbol roundtrip cost fraction from COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1; no candidate PnL calibrates cost."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_CAUSAL_STATE_WITH_JSON_SERIALIZABLE_PARAMETERS"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "wave": "PERFORMANCE_RESEARCH_V3_WAVE02",
+    "selection_basis": "MATERIALLY_DISTINCT_INFORMATION_STRUCTURE_AFTER_V3_WAVE01_NO_SURVIVOR; NO_OWN_OUTCOME_USED",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "ae239c3db7908cf68e73170f2bc34c6b3039585d46b3fc7f6549db2fb5f98b04"
+}

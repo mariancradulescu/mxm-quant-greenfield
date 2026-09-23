@@ -1,0 +1,186 @@
+{
+  "id": "V2-C025",
+  "mechanism": {
+    "family": "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+    "subfamily": "ROLLING_FINITE_STATE_COST_HURDLED_FORWARD_RETURN_MODEL"
+  },
+  "rationale": "Prospectively test an adaptive causal finite-state predictor rather than a fixed directional rule. Each market learns only from its own trailing four calendar weeks of fully realized prior examples; a state is tradable only when the one-standard-error lower confidence bound on expected 15-minute absolute return exceeds the frozen roundtrip cost. This directly targets realizable net edge and adaptation without protected data, random shuffle, or post-outcome tuning.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "features": [
+    {
+      "name": "return_1_sign",
+      "formula": "sign(close_t / close_t_minus_1 - 1)"
+    },
+    {
+      "name": "return_3_sign",
+      "formula": "sign(close_t / close_t_minus_3 - 1)"
+    },
+    {
+      "name": "return_12_sign",
+      "formula": "sign(close_t / close_t_minus_12 - 1)"
+    },
+    {
+      "name": "volatility_state",
+      "formula": "HIGH if abs(return_3_t) > median(abs(return_3_j)) over prior 144 completed observations else LOW"
+    },
+    {
+      "name": "utc_session_bucket",
+      "formula": "ASIA_00_08, EUROPE_08_14, US_14_21, LATE_21_24 by decision completion UTC"
+    },
+    {
+      "name": "state_expected_forward_return",
+      "formula": "mean of realized next-entry-open to third-M5-close returns for matching state in trailing 28 calendar days whose exits completed before current decision"
+    },
+    {
+      "name": "state_standard_error",
+      "formula": "sample standard deviation / sqrt(n) over the same matching-state prior examples"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "return_12_sign",
+      "bars": 12
+    },
+    {
+      "feature": "prior_volatility_median",
+      "observations": 144
+    },
+    {
+      "feature": "state_training_window",
+      "calendar_days": 28
+    }
+  ],
+  "normalization_training": {
+    "mode": "CAUSAL_ROLLING_FINITE_STATE",
+    "future_normalization": false,
+    "training_window_calendar_days": 28,
+    "retraining_schedule": "EVERY_ELIGIBLE_15_MINUTE_DECISION",
+    "inner_validation": "NONE_FIXED_STATE_MODEL",
+    "random_temporal_shuffle": false,
+    "purge_embargo": "EXAMPLES_ADMITTED_ONLY_AFTER_THEIR_TARGET_EXIT_COMPLETES"
+  },
+  "timing": {
+    "decision": "EACH_COMPLETED_M5_CLOSE_AT_15_MINUTE_BOUNDARY",
+    "entry": "NEXT_EXACT_OBSERVED_M5_OPEN",
+    "target_horizon": "THREE_CONTIGUOUS_M5_BARS_FROM_ENTRY",
+    "exit": "CLOSE_OF_THIRD_CONTIGUOUS_M5_BAR_INCLUDING_ENTRY"
+  },
+  "direction": {
+    "LONG": "state_expected_forward_return > 0 and abs(mean)-standard_error > frozen_roundtrip_cost_fraction",
+    "SHORT": "state_expected_forward_return < 0 and abs(mean)-standard_error > frozen_roundtrip_cost_fraction",
+    "NO_OP": "insufficient_completed_state_examples_or_cost_hurdle_not_met"
+  },
+  "entry": {
+    "type": "PER_SYMBOL_MARKET_PROXY",
+    "price": "next_exact_observed_M5_open"
+  },
+  "exit": {
+    "type": "FROZEN_TARGET_HORIZON",
+    "price": "close_of_3rd_contiguous_M5_bar_including_entry"
+  },
+  "maximum_hold": {
+    "unit": "CONTIGUOUS_M5_BARS_INCLUDING_ENTRY",
+    "value": 3
+  },
+  "filters": [
+    "DECISION_ONLY_AT_15_MINUTE_BOUNDARY",
+    "CURRENT_AND_FEATURE_BARS_CONTIGUOUS",
+    "TRAINING_EXAMPLES_TARGET_EXIT_MUST_PRECEDE_CURRENT_DECISION",
+    "AT_LEAST_2_MATCHING_STATE_TRAINING_EXAMPLES_FOR_STANDARD_ERROR",
+    "FROZEN_COARSE_COST_HURDLE_REQUIRED"
+  ],
+  "parameters": {
+    "return_1_bars": 1,
+    "return_3_bars": 3,
+    "return_12_bars": 12,
+    "volatility_prior_observations": 144,
+    "training_window_calendar_days": 28,
+    "target_hold_bars": 3,
+    "confidence_hurdle_standard_errors": 1,
+    "minimum_state_examples": 2,
+    "decision_interval_minutes": 15
+  },
+  "position_admission_policy": {
+    "max_simultaneous_active_positions_per_symbol": 1,
+    "new_signal_while_symbol_active": "IGNORE_NO_QUEUE",
+    "cross_symbol_concurrency_allowed_in_stage_a": true,
+    "same_direction_pyramiding_per_symbol_allowed": false,
+    "scope": "PER_CANDIDATE_PER_TRADED_SYMBOL",
+    "same_timestamp_exit_and_new_entry_opportunity": "EXIT_FIRST; NEW_ENTRY_OPPORTUNITY_AT_THAT_TIMESTAMP_IS_IGNORED_WITH_NO_QUEUE"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "resolution": "M5",
+    "accepted_capture_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
+  },
+  "causal_availability": {
+    "future_information_forbidden": true,
+    "decision_uses": "completed observed M5 bars only",
+    "entry_uses": "next exact observed M5 open",
+    "training_or_normalization": "prior observations only"
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "cost_model": "frozen per-symbol conservative roundtrip fraction"
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use the prospectively frozen candidate-independent per-symbol roundtrip cost fraction from COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1; no candidate PnL calibrates cost."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_CAUSAL_STATE_WITH_JSON_SERIALIZABLE_PARAMETERS"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "wave": "PERFORMANCE_RESEARCH_V3_WAVE02",
+    "selection_basis": "MATERIALLY_DISTINCT_INFORMATION_STRUCTURE_AFTER_V3_WAVE01_NO_SURVIVOR; NO_OWN_OUTCOME_USED",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "d357125ce183a2bd377c5c1b209e9ed7e382751042aa2b0162c6d88bd1efcf27"
+}

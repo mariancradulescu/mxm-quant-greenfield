@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Run exact-head full CI and T+1/T+2 persistence validation; after GREEN, use C013-C016 negative/COST_UNRESOLVED information to freeze the next materially distinct prospective performance hypotheses without rescue tuning.",
+  "next_action": "Require exact-head full CI GREEN for the prospectively frozen V3 Wave02 C024-C025 tree; then bind execution authorization to that exact head/run and execute the two-candidate economic batch once.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE01_PERSISTED_PENDING_EXACT_HEAD_GREEN",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE02_FROZEN_PENDING_EXACT_HEAD_GREEN",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -647,7 +647,7 @@
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
-  "structural_only_since_previous_economic_outcome": false,
+  "structural_only_since_previous_economic_outcome": true,
   "user_action_required": false,
   "v2_attempts_used": 13,
   "v2_evaluated_identities": 13,
@@ -732,7 +732,7 @@
   "m6_stage_b_current_config_reporting_policy": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
   "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
   "current_config_stage_b_outcomes_opened": 2,
-  "discovery_ledger_entries": 46,
+  "discovery_ledger_entries": 48,
   "discovery_result_recorded_entries": 14,
   "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
   "historical_margin_blocks_current_operational_work": false,
@@ -1122,7 +1122,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE01_PERSISTED_POST_OUTCOME_RECOVERY_PENDING_EXACT_HEAD_GREEN",
+    "status": "WAVE02_FROZEN_PENDING_EXACT_HEAD_GREEN",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1179,6 +1179,42 @@
       "V2-C015": 45,
       "V2-C016": 46
     },
-    "ledger_tail_entry_hash": "30b40a07ee741a2961185d3faf4c2d70f2c3579fcd78ea45d8cc71cf46200b6d"
+    "ledger_tail_entry_hash": "30b40a07ee741a2961185d3faf4c2d70f2c3579fcd78ea45d8cc71cf46200b6d",
+    "wave01_recovery_validation_head": "5a6b4206ba36a65f3ff0b9c6b92899508b5c0aa6",
+    "wave01_recovery_validation_ci_run_id": 35815449284,
+    "wave01_recovery_validation_conclusion": "SUCCESS",
+    "wave01_recovery_validation_tests_passed": 681,
+    "wave02": {
+      "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+      "freeze_ref": "research_v3/WAVE_02_PRE_OUTCOME_FREEZE_V1.json",
+      "authorization_ref": "research_v3/WAVE_02_EXECUTION_AUTHORIZATION_V1.json",
+      "wrapper_ref": "research_v3/wave02_execute.py",
+      "evaluator_ref": "m7/competition_performance_v3_wave02_evaluator.py",
+      "evaluator_sha256": "353e3f8895cf78c9f3113536f7049ce00359ca97e7359dd43bffa67f4d536ae4",
+      "evaluator_git_blob_sha1": "cfc1feabf0b8b251940d3e7b17f01d915bdc214a",
+      "wrapper_git_blob_sha1": "30d02649960c69d2b8629eead8d38c8cfde9b3ce",
+      "candidate_ids": [
+        "V2-C024",
+        "V2-C025"
+      ],
+      "candidate_spec_hashes": {
+        "V2-C024": "ae239c3db7908cf68e73170f2bc34c6b3039585d46b3fc7f6549db2fb5f98b04",
+        "V2-C025": "d357125ce183a2bd377c5c1b209e9ed7e382751042aa2b0162c6d88bd1efcf27"
+      },
+      "candidate_own_outcomes_opened": false,
+      "v2_attempts_used_before_wave02": 13,
+      "v2_search_budget_remaining_before_wave02": 71,
+      "expected_attempt_delta_on_execution": 2,
+      "expected_v2_attempts_after_execution": 15,
+      "expected_budget_after_execution": 69,
+      "ledger_freeze_sequences": {
+        "V2-C024": 47,
+        "V2-C025": 48
+      },
+      "ledger_tail_entry_hash": "c44b3d9bd7e47cbb3b5bf943de57a8abd735c53cb3c064065a565c720f743a24",
+      "protected_evidence_opened": false,
+      "live_orders": false,
+      "competition_start": false
+    }
   }
 }
