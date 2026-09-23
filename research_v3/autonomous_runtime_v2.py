@@ -673,6 +673,12 @@ class RuntimeV2:
             raise MaterialIntegrityHalt(
                 "ZERO_HUMAN_END_TO_END_RESEARCH_PROGRESSION is not durably PASS; real economics remain forbidden"
             )
+        ai_gate_path = self.root / "evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json"
+        ai_gate = load_json(ai_gate_path, {})
+        if ai_gate.get("status") != "PASS" or ai_gate.get("economics_opened_during_acceptance") != 0:
+            raise MaterialIntegrityHalt(
+                "GENERAL_AI_RESEARCH_DIRECTOR acceptance is not durably PASS; real economics remain forbidden"
+            )
 
     def execute_operation(self, plan: Mapping[str, Any]) -> str:
         op = str(plan["operation_id"])
