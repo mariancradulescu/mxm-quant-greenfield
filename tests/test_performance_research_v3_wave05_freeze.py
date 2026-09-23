@@ -3,6 +3,8 @@ from pathlib import Path
 from unittest.mock import patch
 from discovery.canonical import verify_spec_hash
 from discovery.ledger import read_ledger
+from discovery.accounting import assert_current_state_matches_repository
+from research_v3.lifecycle import candidate_lifecycle
 from research_v3.wave05_execute import V3Wave05ExecutionNotAuthorized, execute_authorized
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -29,13 +31,25 @@ class Wave05FreezeTests(unittest.TestCase):
         self.assertEqual(f["new_attempts_consumed_by_freeze"],0)
         self.assertFalse(f["candidate_own_outcomes_opened"])
         ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
-        for cid,seq in (("V2-C029",63),("V2-C030",64)):
-            rows=[x for x in ledger if x.get("candidate_id")==cid]
-            self.assertEqual(len(rows),1); self.assertEqual(rows[0]["entry_type"],"CANDIDATE_FROZEN")
-            self.assertEqual(rows[0]["sequence"],seq); self.assertEqual(rows[0]["spec_hash"],HASHES[cid])
         s=load("CURRENT_STATE.json")
-        self.assertEqual(s["v2_attempts_used"],16); self.assertEqual(s["v2_search_budget_remaining"],68)
-        self.assertEqual(s["economic_outcomes_opened"],23); self.assertEqual(s["discovery_ledger_entries"],64)
+        for cid,seq in (("V2-C029",63),("V2-C030",64)):
+            lc=candidate_lifecycle(ledger,cid)
+            freezes=[x for x in lc.freezes if x["entry_type"]=="CANDIDATE_FROZEN"]
+            self.assertEqual(len(freezes),1)
+            self.assertEqual(freezes[0]["sequence"],seq); self.assertEqual(freezes[0]["spec_hash"],HASHES[cid])
+            self.assertLessEqual(len(lc.results),1)
+        accounting=assert_current_state_matches_repository(ROOT)
+        if s["performance_research_v3"]["wave05"]["candidate_own_outcomes_opened"]:
+            self.assertEqual(s["v2_attempts_used"],18); self.assertEqual(s["v2_search_budget_remaining"],66)
+            self.assertEqual(s["economic_outcomes_opened"],25)
+            self.assertEqual(accounting["stage_a_result_recorded_entries"],23)
+            self.assertEqual(accounting["distinct_identity_outcomes_opened"],18)
+        else:
+            self.assertEqual(s["v2_attempts_used"],16); self.assertEqual(s["v2_search_budget_remaining"],68)
+            self.assertEqual(s["economic_outcomes_opened"],23)
+            self.assertEqual(accounting["stage_a_result_recorded_entries"],21)
+            self.assertEqual(accounting["distinct_identity_outcomes_opened"],16)
+        self.assertEqual(s["discovery_ledger_entries"],len(ledger))
 
     def test_execution_gate_is_lifecycle_aware_and_rejects_wrong_head_before_economics(self):
         auth_path=ROOT/"research_v3/WAVE_05_EXECUTION_AUTHORIZATION_V1.json"
