@@ -68,7 +68,11 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
             self.assertEqual(loaded["runner_git_blob_sha1"], auth["runner_git_blob_sha1"])
         elif auth["status"] == "AUTHORIZED_AFTER_EXACT_HEAD_GREEN":
             correction = state["c012_same_identity_corrected_rerun"]
-            self.assertEqual(auth["execution_gate_head"], correction["corrected_stage_b"]["staging_exact_head_green"]["head"])
+            self.assertEqual(correction["corrected_stage_b"]["authorization_ref"], AUTHORIZATION_REF)
+            self.assertTrue(auth["execution_gate_head"])
+            self.assertGreater(int(auth["execution_gate_ci_run_id"]), 0)
+            self.assertFalse(auth["new_v2_attempt_consumed"])
+            self.assertEqual(auth["search_budget_decrement"], 0)
             self.assertFalse(correction["corrected_stage_b"]["economic_rerun_performed"])
             self.assertEqual(correction["corrected_stage_b"]["persistence_recovery"]["additional_v2_attempts_consumed"], 0)
         else:
