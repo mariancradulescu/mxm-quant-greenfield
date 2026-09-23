@@ -1,0 +1,25 @@
+{
+  "schema": "mxm.greenfield.live-equivalent-stage-b-downstream-invalidation.v1",
+  "status": "ACTIVE",
+  "recorded_utc": "2026-09-23T06:38:00Z",
+  "trigger_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json",
+  "live_equivalent_contract_ref": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
+  "upstream_stage_a_candidate_ids": [
+    "V2-C006",
+    "V2-C012"
+  ],
+  "reason": "The current Stage-B results consume Stage-A/replay outputs whose historical admission path is implementation-invalid under the live-equivalent replay contract. Stage-B bytes remain preserved but cannot be current deployable authority until same-identity Stage-A correction and downstream revalidation.",
+  "preserved_historical_results": {
+    "V2-C006": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+    "V2-C012": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json"
+  },
+  "accounting": {
+    "additional_v2_attempts_consumed": 0,
+    "stage_b_outcomes_deleted": 0
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}

@@ -5,10 +5,7 @@
   "authoritative_branch": "competition-performance-v1-20260921",
   "certification_survivors": [],
   "competition_start_authorized": false,
-  "discovery_survivors": [
-    "V2-C006",
-    "V2-C012"
-  ],
+  "discovery_survivors": [],
   "economic_outcomes_opened": 19,
   "global_attempts_seen": 32,
   "integrity_correction_02_test_result_authority": "tests/PRE_M6_INTEGRITY_CORRECTION_02_TEST_RESULTS.json",
@@ -1043,10 +1040,7 @@
     "authority_rule": "COMPETITION_BRANCH_IS_GREEN_OPERATIONAL_BASE; PERFORMANCE_RESEARCH_V3_BRANCH_IS_CURRENT_PRE_OUTCOME_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
     "main_merge_required_for_current_work": false
   },
-  "current_stage_b_survivor_input_set": [
-    "V2-C006",
-    "V2-C012"
-  ],
+  "current_stage_b_survivor_input_set": [],
   "current_result_authority": {
     "V2-C006": {
       "stage_a": {
@@ -1057,9 +1051,11 @@
         "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       },
       "stage_b_current_config": {
-        "state": "VALID_UNAFFECTED",
+        "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
         "result_ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
-        "live_equivalent_replay_state": "DOWNSTREAM_REVALIDATION_REQUIRED_AFTER_STAGE_A_REPLAY_CORRECTION"
+        "live_equivalent_replay_state": "DOWNSTREAM_REVALIDATION_REQUIRED_AFTER_STAGE_A_REPLAY_CORRECTION",
+        "historical_state_before_live_equivalent_invalidation": "VALID_UNAFFECTED",
+        "invalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json"
       }
     },
     "V2-C012": {
@@ -1074,13 +1070,14 @@
         "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       },
       "stage_b_current_config": {
-        "state": "VALID_CORRECTED_SUCCESSOR",
+        "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
         "historical_result_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json",
-        "invalidation_ref": "evidence/C012_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+        "invalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
         "corrected_successor_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
         "corrected_stage_a_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
         "corrected_successor_hash": "91c9306b594110a2ae8cac25acdd10ecb6d7949f2cda7f2331ae9f514059f287",
-        "live_equivalent_replay_state": "DOWNSTREAM_REVALIDATION_REQUIRED_AFTER_STAGE_A_REPLAY_CORRECTION"
+        "live_equivalent_replay_state": "DOWNSTREAM_REVALIDATION_REQUIRED_AFTER_STAGE_A_REPLAY_CORRECTION",
+        "historical_state_before_live_equivalent_invalidation": "VALID_CORRECTED_SUCCESSOR"
       }
     },
     "V2-C013": {
@@ -1497,5 +1494,6 @@
     "V2-C025",
     "V2-C026"
   ],
-  "live_equivalent_discovery_survivors": []
+  "live_equivalent_discovery_survivors": [],
+  "live_equivalent_stage_b_downstream_invalidation_authority": "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json"
 }

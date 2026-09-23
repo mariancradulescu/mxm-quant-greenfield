@@ -37,6 +37,17 @@ class ConsumedIdentityForensicAuditV2Tests(unittest.TestCase):
         self.assertEqual(state["live_equivalent_discovery_survivors"],[])
         self.assertEqual(state["v2_attempts_used"],16)
         self.assertEqual(state["v2_search_budget_remaining"],68)
+        self.assertEqual(state["discovery_survivors"],[])
+        self.assertEqual(state["current_stage_b_survivor_input_set"],[])
+        for cid in ("V2-C006","V2-C012"):
+            self.assertEqual(
+                state["current_result_authority"][cid]["stage_b_current_config"]["state"],
+                "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+            )
+            self.assertEqual(
+                state["current_result_authority"][cid]["stage_b_current_config"]["invalidation_ref"],
+                "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+            )
         for cid in IDS:
             self.assertIn(cid,state["current_result_authority"])
             self.assertIn(f"{cid}_STAGE_A",state["active_result_pointers"])

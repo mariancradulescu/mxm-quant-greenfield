@@ -83,21 +83,25 @@ def _validate_current_dependency_semantics(state):
         stage_a = node.get("stage_a")
         if not isinstance(stage_a, dict):
             raise ValueError(f"implementation-invalid identity lacks Stage-A authority: {cid}")
-        corrected = stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR"
+        replay_invalid = stage_a.get("live_equivalent_replay_state") == "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE"
+        corrected = stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR" and not replay_invalid
         if not corrected and cid in survivors:
             raise ValueError(f"current survivor list contains invalidated identity without corrected successor: {cid}")
         if not corrected and cid in stage_b_inputs:
             raise ValueError(f"current Stage-B input set contains invalidated identity without corrected successor: {cid}")
 
+        # Only identities that actually reached Stage B require downstream
+        # invalidation. Stage-A-only identities must not fabricate a Stage-B node.
         downstream = node.get("stage_b_current_config")
-        if not isinstance(downstream, dict):
-            raise ValueError(f"implementation-invalid identity lacks downstream authority: {cid}")
-        if not corrected and downstream.get("state") != "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A":
-            raise ValueError(f"current downstream result not invalidated for implementation-invalid upstream: {cid}")
-        if not corrected:
-            ref = downstream.get("invalidation_ref")
-            if not isinstance(ref, str) or not (ROOT / ref).exists():
-                raise ValueError(f"missing explicit downstream invalidation authority: {cid}")
+        if downstream is not None:
+            if not isinstance(downstream, dict):
+                raise ValueError(f"invalid downstream authority node: {cid}")
+            if not corrected and downstream.get("state") != "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A":
+                raise ValueError(f"current downstream result not invalidated for implementation-invalid upstream: {cid}")
+            if not corrected:
+                ref = downstream.get("invalidation_ref")
+                if not isinstance(ref, str) or not (ROOT / ref).exists():
+                    raise ValueError(f"missing explicit downstream invalidation authority: {cid}")
 
     correction = state.get("c012_same_identity_corrected_rerun")
     if not isinstance(correction, dict):
