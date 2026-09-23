@@ -13,6 +13,12 @@ class C031RuntimeTransportTests(unittest.TestCase):
   self.assertEqual((len(d['base']),len(d['stress'])),(1666,1666))
  def test_loader_is_non_economic(self):
   d=_load_pack(pathlib.Path('.')); self.assertTrue(d['pre_economic'])
- def test_no_envelope_authorized_before_transport_acceptance(self):
-  self.assertFalse(pathlib.Path('research_v3/ai_director/economic_operations/C031_STAGE_B_RUNTIME_OPERATION_V1.json').exists())
+ def test_envelope_exists_but_remains_pre_execution_pending_exact_head(self):
+  p=pathlib.Path('research_v3/ai_director/economic_operations/C031_STAGE_B_RUNTIME_OPERATION_V1.json')
+  self.assertTrue(p.exists())
+  d=json.loads(p.read_text())
+  self.assertEqual(d['status'],'PENDING_EXACT_HEAD_GREEN')
+  n=json.loads(pathlib.Path('research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json').read_text())
+  self.assertNotIn('runtime_operation_envelope_ref',n)
+  self.assertEqual(n['status'],'PENDING_EXACT_HEAD_GREEN_C031_STAGE_B_ECONOMIC_ENVELOPE')
 if __name__=='__main__': unittest.main()
