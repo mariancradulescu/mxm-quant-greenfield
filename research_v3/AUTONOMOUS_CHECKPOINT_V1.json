@@ -1,11 +1,11 @@
 {
   "accounting": {
-    "v2_attempts_used": 18,
-    "v2_evaluated_identities": 18,
-    "v2_search_budget_remaining": 66,
-    "economic_outcomes_opened": 25,
-    "discovery_ledger_entries": 67,
-    "discovery_result_recorded_entries": 23
+    "v2_attempts_used": 19,
+    "v2_evaluated_identities": 19,
+    "v2_search_budget_remaining": 65,
+    "economic_outcomes_opened": 26,
+    "discovery_ledger_entries": 68,
+    "discovery_result_recorded_entries": 24
   },
   "blocked_invalid_wave": {
     "attempts_consumed": 0,
@@ -39,10 +39,10 @@
     "same_identity_successor_result_entries": 5
   },
   "live_equivalent_stage_b_revalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json",
-  "next_action": "EXECUTE_AUTHORIZED_WAVE",
+  "next_action": "REQUIRE_POST_PERSISTENCE_EXACT_HEAD_GREEN",
   "pending_same_identity_correction_candidate_ids": [],
   "persistence_commit": "3ef3aee7852bdb816a75cc00e7ea6d83614de53b",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_AUTHORIZED_NOT_EXECUTED",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_RESULTS_RECORDED_PENDING_EXACT_HEAD_GREEN",
   "recovery": {
     "authority_ref": "evidence/WAVE_05_POST_OUTCOME_RECOVERY_V1.json",
     "canonical_persistence_complete": true,
@@ -65,9 +65,9 @@
     "protected_evidence_opened": false
   },
   "schema": "mxm.greenfield.autonomous-research-checkpoint.v1",
-  "source_head": "e28f8a1dfce506c89e3bf6d7f34a85cf805d248b",
+  "source_head": "10195b455093fde8c3682043f7fca8c772d44183",
   "stage_b_revalidation_required_candidate_ids": [],
-  "status": "WAVE06_AUTHORIZED_NOT_EXECUTED",
+  "status": "WAVE06_RESULTS_RECORDED_PENDING_EXACT_HEAD_GREEN",
   "wave05": {
     "attempts_consumed": 2,
     "candidate_ids": [
@@ -101,7 +101,7 @@
     "conclusion": "SUCCESS"
   },
   "wave06": {
-    "status": "AUTHORIZED_NOT_EXECUTED",
+    "status": "RESULTS_RECORDED_PENDING_EXACT_HEAD_GREEN",
     "freeze_ref": "research_v3/WAVE_06_PRE_OUTCOME_FREEZE_V1.json",
     "candidate_ids": [
       "V2-C031"
@@ -109,7 +109,7 @@
     "candidate_spec_hashes": {
       "V2-C031": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1"
     },
-    "candidate_own_outcomes_opened": false,
+    "candidate_own_outcomes_opened": true,
     "ledger_freeze_sequence": 67,
     "expected_attempt_delta_on_execution": 1,
     "protected_evidence_opened": false,
@@ -118,7 +118,23 @@
     "authorization_ref": "research_v3/WAVE_06_EXECUTION_AUTHORIZATION_V1.json",
     "execution_gate_head": "e28f8a1dfce506c89e3bf6d7f34a85cf805d248b",
     "execution_gate_ci_run_id": 35859575398,
-    "execution_gate_ci_conclusion": "SUCCESS"
+    "execution_gate_ci_conclusion": "SUCCESS",
+    "result_statuses": {
+      "V2-C031": "DISCOVERY_SURVIVOR"
+    },
+    "result_hashes": {
+      "V2-C031": "dc6bf2bb102336ea3b6d2952f91b4c6d87b94bd32becb86ad30263741fb58345"
+    },
+    "result_refs": {
+      "V2-C031": "discovery/results/V2-C031_STAGE_A_V1.json"
+    },
+    "execution_result_ref": "research_v3/WAVE_06_EXECUTION_RESULT_V1.json",
+    "ledger_result_sequence": 68,
+    "ledger_tail_entry_hash": "cf03d6f51566431f378fd9f705795a0354ac04e57da864a16107019807b72bbc",
+    "stage_b_extension_candidates": [
+      "V2-C031"
+    ],
+    "persistence_additional_attempts_consumed": 0
   },
   "user_action_required": false
 }

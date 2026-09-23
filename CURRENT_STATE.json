@@ -39,7 +39,7 @@
     "V2-C026_STAGE_A": null,
     "V2-C029_STAGE_A": "discovery/results/V2-C029_STAGE_A_V1.json",
     "V2-C030_STAGE_A": "discovery/results/V2-C030_STAGE_A_V1.json",
-    "V2-C031_STAGE_A": null
+    "V2-C031_STAGE_A": "discovery/results/V2-C031_STAGE_A_V1.json"
   },
   "authoritative_branch": "competition-performance-v1-20260921",
   "c007_c009_tier2_cost_evidence_path_authority": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json",
@@ -383,7 +383,8 @@
     "V2-C023",
     "V2-C025",
     "V2-C029",
-    "V2-C030"
+    "V2-C030",
+    "V2-C031"
   ],
   "current_live_equivalent_stage_b_authoritative_candidate_ids": [
     "V2-C006",
@@ -698,20 +699,32 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "status": "DATA_INSUFFICIENT"
       }
+    },
+    "V2-C031": {
+      "stage_a": {
+        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "result_ref": "discovery/results/V2-C031_STAGE_A_V1.json",
+        "result_hash": "dc6bf2bb102336ea3b6d2952f91b4c6d87b94bd32becb86ad30263741fb58345",
+        "status": "DISCOVERY_SURVIVOR",
+        "live_equivalent_replay_state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "current_live_equivalent_authoritative": true,
+        "same_identity_correction_allowed": false,
+        "new_identity_required": false
+      }
     }
   },
   "current_stage_b_survivor_input_set": [
     "V2-C006",
     "V2-C012"
   ],
-  "discovery_ledger_entries": 67,
-  "discovery_result_recorded_entries": 23,
+  "discovery_ledger_entries": 68,
+  "discovery_result_recorded_entries": 24,
   "discovery_survivors": [
     "V2-C006",
     "V2-C012"
   ],
-  "distinct_identity_outcomes_opened": 18,
-  "economic_outcomes_opened": 25,
+  "distinct_identity_outcomes_opened": 19,
+  "economic_outcomes_opened": 26,
   "forensic_consumed_identity_audit_authority": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
   "frozen_spec_invalid_consumed_identities": [
     "V2-C013",
@@ -729,7 +742,7 @@
   ],
   "future_broker_structural_universe_authority": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
   "future_wave_opportunity_coverage_authority": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
-  "global_attempts_seen": 34,
+  "global_attempts_seen": 35,
   "historical_margin_blocks_current_operational_work": false,
   "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
   "implementation_invalid_consumed_identities": [
@@ -794,12 +807,12 @@
   },
   "large_data_audit_verifier_safety_correction_authority": "evidence/LARGE_DATA_AUDIT_VERIFIER_SAFETY_CORRECTION_V1.json",
   "latest_economic_outcome": {
-    "candidate_id": "V2-C030",
-    "recorded_utc": "2026-09-23T11:22:00Z",
-    "result_hash": "4de6fdf5cc8c2eab41cbfb1b9802dc41402f6663d56aca3cb3c9b52c6ffe0cf0",
-    "result_ref": "discovery/results/V2-C030_STAGE_A_V1.json",
+    "candidate_id": "V2-C031",
     "stage": "A",
-    "status": "DATA_INSUFFICIENT"
+    "status": "DISCOVERY_SURVIVOR",
+    "result_hash": "dc6bf2bb102336ea3b6d2952f91b4c6d87b94bd32becb86ad30263741fb58345",
+    "result_ref": "discovery/results/V2-C031_STAGE_A_V1.json",
+    "recorded_utc": "2026-09-23T12:22:00Z"
   },
   "legacy_prior_attempts": 16,
   "live_equivalent_correction_required_candidate_ids": [
@@ -1366,7 +1379,7 @@
   "m6_stage_b_tier1_evaluator_policy_authority": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
   "m6_stage_b_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_B_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_b_tier1_runner_prep_authority": "data/M6_STAGE_B_TIER1_RUNNER_PREP_V1.json",
-  "next_action": "Execute authorized Wave06 C031 exactly once using the frozen evaluator and accepted V6 capture; then persist through the generic idempotent persistence path.",
+  "next_action": "Require exact-head full CI GREEN for canonically persisted WAVE06 outcomes; then continue prospective research without rerunning already-opened economics.",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "operational_branch_authority": {
     "authority_rule": "COMPETITION_BRANCH_IS_GREEN_OPERATIONAL_BASE; PERFORMANCE_RESEARCH_V3_BRANCH_IS_CURRENT_PRE_OUTCOME_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
@@ -1407,7 +1420,7 @@
       "V2-C015",
       "V2-C016"
     ],
-    "status": "WAVE06_AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
+    "status": "WAVE06_RESULTS_RECORDED_PENDING_EXACT_HEAD_GREEN",
     "user_action_required": false,
     "v2_attempts_used_after_wave01": 13,
     "v2_attempts_used_before_wave01": 9,
@@ -1666,7 +1679,7 @@
       "lifecycle_closure_ref": "research_v3/WAVE_05_POST_PERSISTENCE_GREEN_CLOSURE_V1.json"
     },
     "wave06": {
-      "status": "AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
+      "status": "RESULTS_RECORDED_PENDING_EXACT_HEAD_GREEN",
       "freeze_ref": "research_v3/WAVE_06_PRE_OUTCOME_FREEZE_V1.json",
       "candidate_ids": [
         "V2-C031"
@@ -1674,7 +1687,7 @@
       "candidate_spec_hashes": {
         "V2-C031": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1"
       },
-      "candidate_own_outcomes_opened": false,
+      "candidate_own_outcomes_opened": true,
       "evaluator_ref": "m7/competition_performance_v3_wave06_c031_evaluator.py",
       "evaluator_sha256": "90bfa75c44ba6d281b2e84e5aa81b0fddeadcf3b7b5f4ec19bcd70c311ca0344",
       "evaluator_git_blob_sha1": "ed1a8f67b65f52018f0d067ed9afc9e7d10f4081",
@@ -1697,10 +1710,32 @@
       "authorization_ref": "research_v3/WAVE_06_EXECUTION_AUTHORIZATION_V1.json",
       "execution_gate_head": "e28f8a1dfce506c89e3bf6d7f34a85cf805d248b",
       "execution_gate_ci_run_id": 35859575398,
-      "execution_gate_ci_conclusion": "SUCCESS"
+      "execution_gate_ci_conclusion": "SUCCESS",
+      "result_statuses": {
+        "V2-C031": "DISCOVERY_SURVIVOR"
+      },
+      "result_hashes": {
+        "V2-C031": "dc6bf2bb102336ea3b6d2952f91b4c6d87b94bd32becb86ad30263741fb58345"
+      },
+      "result_refs": {
+        "V2-C031": "discovery/results/V2-C031_STAGE_A_V1.json"
+      },
+      "v2_attempts_used_after_wave06": 19,
+      "v2_search_budget_remaining_after_wave06": 65,
+      "economic_outcomes_opened_after_wave06": 26,
+      "economic_attempt_delta": 1,
+      "persistence_additional_attempts_consumed": 0,
+      "execution_result_ref": "research_v3/WAVE_06_EXECUTION_RESULT_V1.json",
+      "stage_b_extension_candidates": [
+        "V2-C031"
+      ],
+      "ledger_result_sequences": {
+        "V2-C031": 68
+      },
+      "ledger_tail_entry_hash": "cf03d6f51566431f378fd9f705795a0354ac04e57da864a16107019807b72bbc"
     }
   },
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_AUTHORIZED_NOT_EXECUTED",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_RESULTS_RECORDED_PENDING_EXACT_HEAD_GREEN",
   "post_stage_b_final_closure_independent_audit_authority": "data/POST_STAGE_B_FINAL_CLOSURE_INDEPENDENT_AUDIT_V1.json",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
@@ -1878,7 +1913,7 @@
     }
   },
   "schema_version": 1,
-  "stage_a_result_recorded_entries": 23,
+  "stage_a_result_recorded_entries": 24,
   "stage_b_current_config_economic_observations": 2,
   "stage_b_revalidation_required_candidate_ids": [],
   "structural_only_since_previous_economic_outcome": false,
@@ -1903,7 +1938,7 @@
   "tier1_raw_commitment_verification_correction_authority": "evidence/TIER1_RAW_COMMITMENT_VERIFICATION_CORRECTION_V1.json",
   "user_action_required": false,
   "v2_attempt_budget_accounting_authority": "V2_SEARCH_BUDGET_V1.json + immutable distinct RESULT_RECORDED identity exposure",
-  "v2_attempts_used": 18,
+  "v2_attempts_used": 19,
   "v2_budget_charged_candidate_ids": [
     "V2-C006",
     "V2-C012",
@@ -1922,9 +1957,10 @@
     "V2-C025",
     "V2-C026",
     "V2-C029",
-    "V2-C030"
+    "V2-C030",
+    "V2-C031"
   ],
-  "v2_evaluated_identities": 18,
+  "v2_evaluated_identities": 19,
   "v2_historical_evaluated_candidate_ids": [
     "V2-C006",
     "V2-C012",
@@ -1947,5 +1983,5 @@
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
   "v2_same_identity_correction_slot_count": 4,
   "v2_search_budget": 84,
-  "v2_search_budget_remaining": 66
+  "v2_search_budget_remaining": 65
 }
