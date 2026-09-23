@@ -57,10 +57,10 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
         correction = state["c012_same_identity_corrected_rerun"]
         stage_a = state["current_result_authority"]["V2-C012"]["stage_a"]
         stage_b = state["current_result_authority"]["V2-C012"]["stage_b_current_config"]
-        replay_invalid = (
-            stage_a.get("live_equivalent_replay_state")
-            == "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE"
-        )
+        replay_invalid = stage_a.get("live_equivalent_replay_state") in {
+            "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+            "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+        }
         if correction["status"] == "CORRECTED_STAGE_A_RECORDED_SURVIVOR":
             # Historical C012 correction facts remain immutable, but later
             # forensic findings may invalidate its current live-equivalent
