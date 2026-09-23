@@ -113,15 +113,26 @@ def _validate_current_dependency_semantics(state):
     if audit_ref != "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json":
         raise ValueError("current forensic authority is not V3")
     audit = json.loads((ROOT / audit_ref).read_text(encoding="utf-8"))
+    historical = set(audit["attempt_accounting"]["historical_evaluated_candidate_ids"])
     charged = set(audit["attempt_accounting"]["budget_charged_candidate_ids"])
-    if charged != implementation_invalid:
-        raise ValueError("budget-charged identities must equal pending same-identity implementation corrections")
-    if state.get("v2_attempts_used") != len(charged):
-        raise ValueError("current V2 budget charge does not match consumed-identity law")
-    if state.get("v2_evaluated_identities") != len(audit["attempt_accounting"]["historical_evaluated_candidate_ids"]):
+    if charged != historical:
+        raise ValueError("every historically opened V2 identity must remain budget-charged")
+    if historical != implementation_invalid | frozen_spec_invalid:
+        raise ValueError("forensic remediation classes do not cover historical V2 exposure set")
+    if set(audit["attempt_accounting"]["pending_same_identity_correction_candidate_ids"]) != implementation_invalid:
+        raise ValueError("pending same-identity correction set mismatch")
+    if set(audit["attempt_accounting"]["invalid_frozen_spec_candidate_ids"]) != frozen_spec_invalid:
+        raise ValueError("frozen-spec-invalid set mismatch")
+    if audit["attempt_accounting"].get("refunded_candidate_ids"):
+        raise ValueError("observed V2 identities must not be retroactively refunded")
+    if state.get("v2_attempts_used") != len(historical):
+        raise ValueError("current V2 budget charge does not match distinct opened identity exposure")
+    if state.get("v2_evaluated_identities") != len(historical):
         raise ValueError("historical evaluated identity count mismatch")
     if state.get("global_attempts_seen") != state.get("legacy_prior_attempts",0) + state.get("v2_evaluated_identities",0):
         raise ValueError("global information-exposure attempt count mismatch")
+    if set(state.get("current_live_equivalent_authoritative_candidate_ids", [])) & (implementation_invalid | frozen_spec_invalid):
+        raise ValueError("invalid forensic identities cannot be current live-equivalent authorities")
 
     correction = state.get("c012_same_identity_corrected_rerun")
     if not isinstance(correction, dict):
