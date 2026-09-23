@@ -76,6 +76,8 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
             recoverable.append({"class":"WAVE_LEDGER_AHEAD_OF_STATE","wave_key":key,"result_counts":result_counts})
         elif not opened and not revoked and wave.get("authorization_bound") is True:
             recoverable.append({"class":"AUTHORIZED_WAVE_UNOPENED","wave_key":key,"candidate_ids":candidate_ids})
+        elif not opened and not revoked and "FROZEN_PENDING_EXACT_HEAD_GREEN" in status:
+            recoverable.append({"class":"FROZEN_WAVE_PENDING_AUTHORIZATION","wave_key":key,"candidate_ids":candidate_ids})
         elif not opened and revoked:
             blocked.append({"class":"INVALID_OR_REVOKED_WAVE","wave_key":key,"candidate_ids":candidate_ids})
 
@@ -96,6 +98,10 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
         next_action = "RESUME_IDEMPOTENT_PERSISTENCE"
     elif pending:
         next_action = "RESUME_SAME_IDENTITY_CORRECTION"
+    elif any(x["class"]=="AUTHORIZED_WAVE_UNOPENED" for x in recoverable):
+        next_action = "EXECUTE_AUTHORIZED_WAVE"
+    elif any(x["class"]=="FROZEN_WAVE_PENDING_AUTHORIZATION" for x in recoverable):
+        next_action = "REQUIRE_EXACT_HEAD_GREEN_AND_BIND_AUTHORIZATION"
     elif stage_b:
         next_action = "REVALIDATE_STAGE_B"
     else:

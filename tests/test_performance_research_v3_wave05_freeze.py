@@ -37,12 +37,19 @@ class Wave05FreezeTests(unittest.TestCase):
         self.assertEqual(s["v2_attempts_used"],16); self.assertEqual(s["v2_search_budget_remaining"],68)
         self.assertEqual(s["economic_outcomes_opened"],23); self.assertEqual(s["discovery_ledger_entries"],64)
 
-    def test_execution_fails_closed_before_separate_authorization(self):
-        auth=ROOT/"research_v3/WAVE_05_EXECUTION_AUTHORIZATION_V1.json"
-        self.assertFalse(auth.exists())
+    def test_execution_gate_is_lifecycle_aware_and_rejects_wrong_head_before_economics(self):
+        auth_path=ROOT/"research_v3/WAVE_05_EXECUTION_AUTHORIZATION_V1.json"
         with patch("research_v3.wave05_execute.execute_wave",side_effect=AssertionError("economics must not run")) as economic:
-            with self.assertRaises(V3Wave05ExecutionNotAuthorized):
-                execute_authorized(ROOT,"missing.zip",execution_head="0"*40,execution_ci_run_id=0)
+            if auth_path.exists():
+                auth=load("research_v3/WAVE_05_EXECUTION_AUTHORIZATION_V1.json")
+                self.assertEqual(auth["status"],"AUTHORIZED_AFTER_EXACT_HEAD_GREEN")
+                self.assertEqual(auth["candidate_spec_hashes"],HASHES)
+                self.assertFalse(auth["candidate_own_outcomes_opened"])
+                with self.assertRaises(V3Wave05ExecutionNotAuthorized):
+                    execute_authorized(ROOT,"missing.zip",execution_head="0"*40,execution_ci_run_id=0)
+            else:
+                with self.assertRaises(V3Wave05ExecutionNotAuthorized):
+                    execute_authorized(ROOT,"missing.zip",execution_head="0"*40,execution_ci_run_id=0)
             economic.assert_not_called()
 
 if __name__=="__main__": unittest.main(verbosity=2)

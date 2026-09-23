@@ -529,7 +529,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Require exact-head GREEN on Wave05 freeze, then bind execution authorization to that exact head/run before any C029/C030 economic outcome.",
+  "next_action": "Execute authorized Wave05 C029/C030 exactly once on accepted DEVELOPMENT V6, then persist results atomically/idempotently; do not open protected evidence.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -556,7 +556,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE05_FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE05_AUTHORIZED_NOT_EXECUTED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -1388,7 +1388,7 @@
     "discovery/results/V2-C025_STAGE_A_V2.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE05_FROZEN_PENDING_EXACT_HEAD_GREEN",
+    "status": "WAVE05_AUTHORIZED_NOT_EXECUTED",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1612,7 +1612,7 @@
       "new_identity_required": true
     },
     "wave05": {
-      "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+      "status": "AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
       "freeze_ref": "research_v3/WAVE_05_PRE_OUTCOME_FREEZE_V1.json",
       "authorization_ref": "research_v3/WAVE_05_EXECUTION_AUTHORIZATION_V1.json",
       "wrapper_ref": "research_v3/wave05_execute.py",
@@ -1644,7 +1644,10 @@
       "protected_evidence_opened": false,
       "live_orders": false,
       "competition_start": false,
-      "authorization_bound": false
+      "authorization_bound": true,
+      "execution_gate_head": "d8c00d74a9e9d47d5f88b14ff7197274c2ca9c2c",
+      "execution_gate_ci_run_id": 35850221336,
+      "execution_gate_ci_conclusion": "SUCCESS"
     }
   },
   "live_equivalent_historical_replay_contract": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",

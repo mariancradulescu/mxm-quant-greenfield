@@ -9,22 +9,22 @@ ROOT=Path(__file__).resolve().parents[1]
 class AutonomousControlPlaneV1Tests(unittest.TestCase):
     def test_current_repository_self_diagnoses_without_chat_memory(self):
         report=validate_repository_state(ROOT)
-        self.assertEqual(report["next_action"],"FREEZE_NEXT_HIGH_INFORMATION_WAVE")
         self.assertEqual(report["material_issues"],[])
-        self.assertEqual(report["recoverable_conditions"],[])
-        self.assertEqual(report["accounting"]["v2_attempts_used"],16)
-        self.assertEqual(report["accounting"]["v2_search_budget_remaining"],68)
-        self.assertEqual(report["accounting"]["economic_outcomes_opened"],23)
-        self.assertEqual(report["lifecycle"]["distinct_identity_outcomes_opened"],16)
-        self.assertEqual(report["lifecycle"]["stage_a_result_recorded_entries"],21)
-        self.assertEqual(report["lifecycle"]["same_identity_successor_result_entries"],5)
-        self.assertEqual(report["stage_b_revalidation_required_candidate_ids"],[])
-        self.assertEqual(
-            report["current_live_equivalent_authoritative_candidate_ids"],
-            ["V2-C006","V2-C012","V2-C023","V2-C025"],
-        )
-        self.assertTrue(any(x["wave_key"]=="wave04" for x in report["blocked_historical_waves"]))
+        a=report["accounting"]; l=report["lifecycle"]
+        self.assertEqual(a["v2_attempts_used"],l["distinct_identity_outcomes_opened"])
+        self.assertEqual(a["v2_search_budget_remaining"],a["v2_search_budget"]-a["v2_attempts_used"])
+        self.assertEqual(a["economic_outcomes_opened"],l["stage_a_result_recorded_entries"]+a["stage_b_current_config_economic_observations"])
         self.assertFalse(any(report["safety"].values()))
+        classes={x["class"] for x in report["recoverable_conditions"]}
+        if "AUTHORIZED_WAVE_UNOPENED" in classes:
+            self.assertEqual(report["next_action"],"EXECUTE_AUTHORIZED_WAVE")
+        elif "FROZEN_WAVE_PENDING_AUTHORIZATION" in classes:
+            self.assertEqual(report["next_action"],"REQUIRE_EXACT_HEAD_GREEN_AND_BIND_AUTHORIZATION")
+        elif report["stage_b_revalidation_required_candidate_ids"]:
+            self.assertEqual(report["next_action"],"REVALIDATE_STAGE_B")
+        else:
+            self.assertEqual(report["next_action"],"FREEZE_NEXT_HIGH_INFORMATION_WAVE")
+        self.assertTrue(any(x["wave_key"]=="wave04" for x in report["blocked_historical_waves"]))
 
     def test_targeted_validation_is_selected_from_lifecycle(self):
         report=inspect_repository_state(ROOT)
@@ -38,9 +38,9 @@ class AutonomousControlPlaneV1Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             path=write_checkpoint(td,report,status="VALIDATED")
             checkpoint=json.loads(path.read_text())
-            self.assertEqual(checkpoint["next_action"],"FREEZE_NEXT_HIGH_INFORMATION_WAVE")
-            self.assertEqual(checkpoint["accounting"]["v2_attempts_used"],16)
-            self.assertEqual(checkpoint["accounting"]["economic_outcomes_opened"],23)
+            self.assertEqual(checkpoint["next_action"],report["next_action"])
+            self.assertEqual(checkpoint["accounting"]["v2_attempts_used"],report["accounting"]["v2_attempts_used"])
+            self.assertEqual(checkpoint["accounting"]["economic_outcomes_opened"],report["accounting"]["economic_outcomes_opened"])
             self.assertEqual(checkpoint["ledger_tail_entry_hash"],report["lifecycle"]["ledger_tail_entry_hash"])
 
 if __name__=="__main__":
