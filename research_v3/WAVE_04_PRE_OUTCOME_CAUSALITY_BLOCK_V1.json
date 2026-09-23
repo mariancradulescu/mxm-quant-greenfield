@@ -1,0 +1,80 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave04-pre-outcome-causality-block.v1",
+  "status": "BLOCKED_PRE_OUTCOME_LIVE_EQUIVALENCE_VIOLATION",
+  "recorded_utc": "2026-09-23T06:15:00Z",
+  "classification": "IMPLEMENTATION_CONTROL_PATH_INVALID_BEFORE_ECONOMIC_OUTCOME",
+  "candidate_ids": [
+    "V2-C027",
+    "V2-C028"
+  ],
+  "candidate_spec_hashes": {
+    "V2-C027": "6c2945d22af7d10156786a823dca7df21afbbb2c96fa92e060e70e58857de8e2",
+    "V2-C028": "f0a0b7c78010232bda8035bb2ab4215e1f37624a17e8eb094e2515daeb2f6e5c"
+  },
+  "frozen_authority_ref": "research_v3/WAVE_04_PRE_OUTCOME_FREEZE_V1.json",
+  "authorization_ref": "research_v3/WAVE_04_EXECUTION_AUTHORIZATION_V1.json",
+  "evaluator": {
+    "ref": "m7/competition_performance_v3_wave04_c027_c028_evaluator.py",
+    "sha256": "3df4629a7bf2aaa6b9008df364f05b134f2c2b1c2fe68f1022932f5dbf786789",
+    "git_blob_sha1": "a298083ed479c767e9b522dce027c02d7ee70ff1"
+  },
+  "wrapper": {
+    "ref": "research_v3/wave04_execute.py",
+    "git_blob_sha1": "0275edd571daf65b23c9e634a89206d196792057"
+  },
+  "prior_execution_gate": {
+    "head": "1e3c82f69ce8ded9389899754bafa6ad39110cde",
+    "ci_run_id": 35823035539,
+    "conclusion": "SUCCESS"
+  },
+  "forensic_recovery": {
+    "github_result_c027_absent": true,
+    "github_result_c028_absent": true,
+    "github_execution_result_absent": true,
+    "surviving_local_wave04_artifacts_are_pre_authorization": true,
+    "surviving_local_ledger_append_contains_freezes_only": true,
+    "known_orphan_blobs_are_candidate_specs_only": true,
+    "economic_outcomes_opened": false,
+    "determination": "NEITHER_C027_NOR_C028_OUTCOME_WAS_OPENED"
+  },
+  "defects": {
+    "V2-C027": {
+      "class": "FUTURE_EXIT_AVAILABILITY_USED_IN_ADMISSION_PATH",
+      "control_path": "c027_trades",
+      "evidence": [
+        "Decision-time contiguity check spans from i-144 through i+37 before trade admission.",
+        "The i+37 portion is future to the decision at rows[i].time + M5 and therefore cannot be known by a live-equivalent replay."
+      ],
+      "frozen_semantics_implication": "Exact future exit availability must not be queried to decide whether an entry exists at historical decision time T."
+    },
+    "V2-C028": {
+      "class": "FUTURE_EXIT_AVAILABILITY_USED_IN_ADMISSION_PATH",
+      "control_path": "c028_trades",
+      "evidence": [
+        "Decision-time admission checks li+12 existence/contiguity and exact future exit timestamp before admitting the trade.",
+        "The future laggard exit open is read before the historical decision is finalized."
+      ],
+      "frozen_semantics_implication": "Future target-bar availability/price may be used only after a position has been causally admitted, never to retroactively suppress the entry."
+    }
+  },
+  "consumed_identity_law": {
+    "semantics_prospectively_frozen": true,
+    "data_invalid": false,
+    "economic_outcome_opened": false,
+    "attempts_consumed": 0,
+    "v2_attempts_used_remains": 16,
+    "v2_search_budget_remaining_remains": 68,
+    "economic_outcomes_opened_remains": 19
+  },
+  "disposition": {
+    "authorization_revoked": true,
+    "execute_frozen_wave04": false,
+    "mutate_c027_c028_semantics": false,
+    "preserve_historical_freeze": true,
+    "future_corrected_semantics_require_new_candidate_identity": true,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false
+  },
+  "governing_contract_ref": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json"
+}

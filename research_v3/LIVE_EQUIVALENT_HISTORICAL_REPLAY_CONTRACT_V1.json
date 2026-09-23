@@ -1,0 +1,74 @@
+{
+  "schema": "mxm.greenfield.live-equivalent-historical-replay-contract.v1",
+  "status": "ACTIVE",
+  "frozen_utc": "2026-09-23T06:15:00Z",
+  "scope": "ALL_FUTURE_RESEARCH_EVALUATORS_STAGE_A_STAGE_B_AND_FINAL_CERTIFICATION",
+  "core_rule": "AT_HISTORICAL_TIME_T_THE_SYSTEM_MAY_USE_ONLY_INFORMATION_AVAILABLE_BY_T",
+  "prohibitions": [
+    "FUTURE_BARS_IN_DECISION_OR_ADMISSION",
+    "FUTURE_RETURNS_IN_PREDICTORS",
+    "FUTURE_NORMALIZED_STATISTICS",
+    "HINDSIGHT_REGIME_LABELS",
+    "OUTCOME_INFORMED_THRESHOLDS_UNDER_SAME_IDENTITY",
+    "FUTURE_SESSION_OR_EVENT_INFORMATION_NOT_CAUSALLY_AVAILABLE_AT_T",
+    "PROTECTED_FORWARD_LEAKAGE",
+    "RANDOM_TEMPORAL_SHUFFLE_FOR_TIME_SERIES_LEARNING"
+  ],
+  "decision_boundary_rules": {
+    "predictors": "Only state whose timestamp/availability is <= decision time T.",
+    "current_bar": "May be used only when the frozen spec explicitly defines it as completed/available by T.",
+    "entry": "Entry price/event must be causally observable at or after the frozen decision boundary exactly as specified.",
+    "future_exit": "A scheduled/target exit may be evaluated after a position is admitted; future exit-bar existence or price must never be queried to decide admission at T.",
+    "right_censoring": "Sample-end or later data absence is an evaluation/data-boundary condition, not a retroactive NO_TRADE, unless deterministic availability was causally known at T and frozen in the spec.",
+    "missing_bars": "No synthetic or forward-filled execution knowledge unless explicitly justified and causally available."
+  },
+  "adaptive_or_learned_logic": {
+    "chronological_incremental_state_update": true,
+    "training_history_must_be_available_before_fit": true,
+    "temporal_walk_forward_or_equivalent": true,
+    "training_and_retraining_procedure_frozen_before_outer_outcome": true,
+    "deterministic_state_transitions_where_practical": true,
+    "future_target_admission_only_after_target_realization": true,
+    "random_temporal_shuffle": false
+  },
+  "stage_a": {
+    "purpose": "PRIMITIVE_ALPHA_DISCOVERY",
+    "fixed_or_analytic_notional_allowed": true,
+    "live_equivalent_information_timing_required": true,
+    "deployable_eur200_proof": false
+  },
+  "stage_b": {
+    "purpose": "SHARED_CONTINUOUS_EUR200_REALIZABILITY",
+    "required": [
+      "ONE_CONTINUOUS_ACCOUNT",
+      "CHRONOLOGICAL_EQUITY_EVOLUTION",
+      "BROKER_EXECUTABLE_VOLUME_LATTICE",
+      "REALISTIC_TRANSACTION_COSTS",
+      "MARGIN_AND_FREE_MARGIN",
+      "CONCURRENCY_AND_OVERLAPS",
+      "CAPITAL_ALLOCATION_AND_LEVERAGE",
+      "COMPOUNDING",
+      "DRAWDOWN_RECOVERY_AND_CAPITAL_PRESERVATION",
+      "CAUSAL_OPPORTUNITY_ADMISSION_REJECTION"
+    ]
+  },
+  "final_certification": {
+    "requires": [
+      "EXACT_INCREMENTAL_REPLAY",
+      "LIVE_EQUIVALENT_STATE_SEMANTICS",
+      "DEFENSIBLE_BROKER_EXECUTION_SEMANTICS",
+      "CONTINUOUS_CAPITAL",
+      "REALISTIC_COSTS",
+      "MARGIN_FREE_MARGIN_AND_CONCURRENCY",
+      "STRESS",
+      "PROTECTED_VALIDATION_ONLY_IF_EXPLICITLY_AUTHORIZED",
+      "DETERMINISTIC_CORE_PARITY_WITH_EVENTUAL_CTRADER_CSHARP_IMPLEMENTATION"
+    ],
+    "discovery_survivor_is_final_system": false
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}

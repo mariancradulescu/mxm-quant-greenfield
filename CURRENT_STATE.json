@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Validate the Wave04 authorization commit, then execute the already-frozen C027-C028 batch exactly once against accepted V6 and persist both outcomes canonically.",
+  "next_action": "Validate the Wave04 pre-outcome causality block at exact head; implement reusable idempotent persistence and the one-time consumed-identity forensic audit under the live-equivalent replay contract before freezing corrected future identities.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE04_AUTHORIZED_NOT_EXECUTED",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE04_BLOCKED_PRE_OUTCOME_CAUSALITY",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -1149,7 +1149,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE04_AUTHORIZED_NOT_EXECUTED",
+    "status": "WAVE04_BLOCKED_PRE_OUTCOME_CAUSALITY",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1321,7 +1321,7 @@
       "post_persistence_validation_conclusion": "SUCCESS"
     },
     "wave04": {
-      "status": "AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
+      "status": "BLOCKED_PRE_OUTCOME_LIVE_EQUIVALENCE_VIOLATION",
       "freeze_ref": "research_v3/WAVE_04_PRE_OUTCOME_FREEZE_V1.json",
       "authorization_ref": "research_v3/WAVE_04_EXECUTION_AUTHORIZATION_V1.json",
       "wrapper_ref": "research_v3/wave04_execute.py",
@@ -1355,7 +1355,16 @@
       "execution_gate_head": "1e3c82f69ce8ded9389899754bafa6ad39110cde",
       "execution_gate_ci_run_id": 35823035539,
       "execution_gate_ci_conclusion": "SUCCESS",
-      "authorization_bound": true
+      "authorization_bound": false,
+      "authorization_revoked": true,
+      "pre_outcome_causality_block_ref": "research_v3/WAVE_04_PRE_OUTCOME_CAUSALITY_BLOCK_V1.json",
+      "live_equivalent_replay_contract_ref": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
+      "economic_attempt_delta": 0,
+      "persistence_additional_attempts_consumed": 0,
+      "v2_attempts_used_after_block": 16,
+      "v2_search_budget_remaining_after_block": 68,
+      "economic_outcomes_opened_after_block": 19
     }
-  }
+  },
+  "live_equivalent_historical_replay_contract": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json"
 }
