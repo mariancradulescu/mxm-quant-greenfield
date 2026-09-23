@@ -57,16 +57,34 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
         correction = state["c012_same_identity_corrected_rerun"]
         stage_a = state["current_result_authority"]["V2-C012"]["stage_a"]
         stage_b = state["current_result_authority"]["V2-C012"]["stage_b_current_config"]
+        replay_invalid = (
+            stage_a.get("live_equivalent_replay_state")
+            == "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE"
+        )
         if correction["status"] == "CORRECTED_STAGE_A_RECORDED_SURVIVOR":
-            self.assertIn("V2-C012", state["discovery_survivors"])
-            self.assertIn("V2-C012", state["current_stage_b_survivor_input_set"])
+            # Historical C012 correction facts remain immutable, but later
+            # forensic findings may invalidate its current live-equivalent
+            # authority without rewriting that successful correction history.
             self.assertEqual(stage_a["state"], "VALID_CORRECTED_SUCCESSOR")
             self.assertEqual(
                 stage_a["corrected_successor_ref"],
                 "discovery/results/V2-C012_STAGE_A_V2.json",
             )
             corrected_stage_b = correction.get("corrected_stage_b", {})
-            if corrected_stage_b.get("economics_run") is True:
+            if replay_invalid:
+                self.assertNotIn("V2-C012", state["discovery_survivors"])
+                self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
+                self.assertEqual(
+                    stage_b["state"],
+                    "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+                )
+                self.assertEqual(
+                    stage_b["invalidation_ref"],
+                    "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+                )
+            elif corrected_stage_b.get("economics_run") is True:
+                self.assertIn("V2-C012", state["discovery_survivors"])
+                self.assertIn("V2-C012", state["current_stage_b_survivor_input_set"])
                 self.assertEqual(stage_b["state"], "VALID_CORRECTED_SUCCESSOR")
                 self.assertEqual(
                     stage_b["corrected_successor_ref"],
