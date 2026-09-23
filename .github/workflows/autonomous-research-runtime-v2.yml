@@ -1,0 +1,71 @@
+name: Autonomous Research Runtime V2
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Runtime entry mode
+        required: true
+        default: resume
+        type: choice
+        options:
+          - resume
+          - acceptance
+  schedule:
+    # Low-frequency watchdog only; the state machine decides whether any action is legal.
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: performance-research-v3-20260922
+  MXM_RUNTIME_TARGET_BRANCH: performance-research-v3-20260922
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  runtime-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout authoritative research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Configure durable checkpoint identity
+        run: |
+          git config user.name "mxm-runtime-v2[bot]"
+          git config user.email "mxm-runtime-v2@users.noreply.github.com"
+
+      - name: Runtime V2 focused tests
+        run: python -m unittest -v tests.test_autonomous_runtime_v2
+
+      - name: Zero-human continuation acceptance demonstration
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'acceptance' }}
+        run: |
+          mkdir -p research_v3/runtime_v2_acceptance
+          python research_v3/autonomous_runtime_v2.py acceptance \
+            --report research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
+
+      - name: Resume durable autonomous research state machine
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'resume') }}
+        run: |
+          python research_v3/autonomous_runtime_v2.py run \
+            --root . \
+            --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --lease-seconds 900 \
+            --max-operations 25 \
+            --git-checkpoint \
+            --git-push
