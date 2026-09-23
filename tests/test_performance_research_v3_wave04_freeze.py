@@ -12,7 +12,7 @@ SPEC_HASHES={"V2-C027":"6c2945d22af7d10156786a823dca7df21afbbb2c96fa92e060e70e58
 EVAL_SHA256="3df4629a7bf2aaa6b9008df364f05b134f2c2b1c2fe68f1022932f5dbf786789"
 EVAL_BLOB="a298083ed479c767e9b522dce027c02d7ee70ff1"
 WRAPPER_BLOB="0275edd571daf65b23c9e634a89206d196792057"
-BLOCK_REF="research_v3/WAVE_04_PRE_OUTCOME_CAUSALITY_BLOCK_V1.json"
+BLOCK_REF="research_v3/WAVE_04_PRE_OUTCOME_CAUSALITY_BLOCK_V1.json"\nCURRENT_BLOCK_REF="research_v3/WAVE_04_PRE_OUTCOME_CAUSALITY_BLOCK_V2.json"
 CONTRACT_REF="research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json"
 
 def load(rel): return json.loads((ROOT/rel).read_text(encoding="utf-8"))
@@ -65,9 +65,9 @@ class PerformanceResearchV3Wave04FreezeTests(unittest.TestCase):
         self.assertTrue(w["authorization_revoked"])
         self.assertFalse(w["candidate_own_outcomes_opened"])
         self.assertEqual(w["economic_attempt_delta"],0)
-        self.assertEqual(state["v2_attempts_used"],16)
+        self.assertEqual(state["v2_attempts_used"],4)
         self.assertEqual(state["v2_evaluated_identities"],16)
-        self.assertEqual(state["v2_search_budget_remaining"],68)
+        self.assertEqual(state["v2_search_budget_remaining"],80)
         self.assertEqual(state["economic_outcomes_opened"],19)
         self.assertEqual(state["discovery_ledger_entries"],len(ledger))
         self.assertEqual(state["discovery_result_recorded_entries"],sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger))
@@ -97,7 +97,7 @@ class PerformanceResearchV3Wave04FreezeTests(unittest.TestCase):
         self.assertEqual(block["consumed_identity_law"]["attempts_consumed"],0)
         self.assertEqual(block["consumed_identity_law"]["v2_attempts_used_remains"],16)
         self.assertTrue(block["disposition"]["authorization_revoked"])
-        self.assertFalse(block["disposition"]["execute_frozen_wave04"])
+        self.assertFalse(block["disposition"]["execute_frozen_wave04"])\n        current=load(CURRENT_BLOCK_REF)\n        self.assertEqual(current["status"],"BLOCKED_PRE_OUTCOME_FROZEN_SPEC_CAUSALLY_INVALID")\n        self.assertTrue(all(v=="FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY" for v in current["classifications"].values()))\n        self.assertEqual(current["attempts_consumed"],0)
 
     def test_06_live_equivalent_contract_forbids_future_exit_admission(self):
         contract=load(CONTRACT_REF)
