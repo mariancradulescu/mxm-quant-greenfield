@@ -26,6 +26,11 @@ class WavePersistenceTests(unittest.TestCase):
             "v2_search_budget_remaining":84,"economic_outcomes_opened":0,
             "legacy_prior_attempts":16,"global_attempts_seen":16,
             "discovery_ledger_entries":2,"discovery_result_recorded_entries":0,
+            "stage_a_result_recorded_entries":0,"distinct_identity_outcomes_opened":0,
+            "stage_b_current_config_economic_observations":0,
+            "v2_budget_charged_candidate_ids":[],"v2_historical_evaluated_candidate_ids":[],
+            "current_live_equivalent_authoritative_candidate_ids":[],
+            "current_invalid_result_authority_candidate_ids":[],
             "protected_evidence_opened":False,"live_orders_authorized":False,
             "competition_start_authorized":False,"structural_only_since_previous_economic_outcome":True,
             "current_result_authority":{},"active_result_pointers":{},
@@ -61,6 +66,9 @@ class WavePersistenceTests(unittest.TestCase):
         recovered=json.loads((root/"CURRENT_STATE.json").read_text())
         self.assertEqual(recovered["v2_attempts_used"],2)
         self.assertEqual(recovered["discovery_result_recorded_entries"],2)
+        self.assertEqual(recovered["stage_a_result_recorded_entries"],2)
+        self.assertEqual(recovered["distinct_identity_outcomes_opened"],2)
+        self.assertEqual(recovered["v2_budget_charged_candidate_ids"],["V2-C024","V2-C025"])
         self.assertEqual(sum(e["entry_type"]=="RESULT_RECORDED" for e in read_ledger(root/"discovery/ledger.jsonl")),2)
 
     def test_partial_one_then_second_converges_without_duplicate(self):
@@ -73,6 +81,23 @@ class WavePersistenceTests(unittest.TestCase):
         rows=read_ledger(root/"discovery/ledger.jsonl")
         for cid in ("V2-C024","V2-C025"):
             self.assertEqual(sum(e["entry_type"]=="RESULT_RECORDED" and e["candidate_id"]==cid for e in rows),1)
+
+    def test_explicit_live_equivalent_authority_is_projected_without_changing_budget_law(self):
+        tmp,root,r24,_,_=self.fixture()
+        self.addCleanup(tmp.cleanup)
+        persist_wave_results(
+            root,wave_key="wave99",results={"V2-C024":r24},
+            recorded_utc="2026-01-02T00:00:00Z",
+            execution_result_ref="research_v3/WAVE_99_EXECUTION_RESULT_V1.json",
+            live_equivalent_candidate_ids=["V2-C024"],
+        )
+        state=json.loads((root/"CURRENT_STATE.json").read_text())
+        self.assertEqual(state["v2_attempts_used"],1)
+        self.assertEqual(state["distinct_identity_outcomes_opened"],1)
+        self.assertEqual(state["current_live_equivalent_authoritative_candidate_ids"],["V2-C024"])
+        authority=state["current_result_authority"]["V2-C024"]["stage_a"]
+        self.assertTrue(authority["current_live_equivalent_authoritative"])
+        self.assertEqual(authority["live_equivalent_replay_state"],"VALID_AS_FROZEN_AND_IMPLEMENTED")
 
     def test_conflicting_partial_result_fails_closed(self):
         tmp,root,r24,_,_=self.fixture()
