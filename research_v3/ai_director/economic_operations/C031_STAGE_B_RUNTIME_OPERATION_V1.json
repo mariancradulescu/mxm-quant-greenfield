@@ -1,0 +1,77 @@
+{
+  "schema": "mxm.greenfield.ai-authorized-runtime-operation-envelope.v1",
+  "status": "PENDING_EXACT_HEAD_GREEN",
+  "envelope_id": "C031_STAGE_B_RUNTIME_OPERATION_V1",
+  "ai_authorization": {
+    "proposal_id": "GAI-C031-STAGEB-EXACTLY-ONCE-AUTHORIZATION-20260923",
+    "proposal_ref": "research_v3/ai_director/proposals/C031_STAGE_B_EXECUTION_AUTHORIZATION_V1.json",
+    "proposal_hash": "594fc8e2abd7795727e1f4cb641e3c4f9178d3549b7d7d73563c34c063f29609",
+    "runtime_decision_operation_id": "op_d564674cb94e61eabe9dd23015062b6d"
+  },
+  "basis_accounting": {
+    "v2_attempts_used": 19,
+    "v2_search_budget_remaining": 65,
+    "economic_outcomes_opened": 26
+  },
+  "expected_operation_id": "op_cdcf9d2bae1f2bc2355e79efbbcdaf50",
+  "expected_economic_execution_id": "econ_561ca1cabbc351f3fdde2e0bddaed830",
+  "runtime_plan": {
+    "candidate_spec_hash": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1",
+    "dataset_hash": "d0de9ec40d8d1f4268f678fa750886eb4ee561303e18043188fc050a324c4ffc",
+    "evaluator_hash": "a2b068867e108c6ea920fc2a019e428b5b6ab718",
+    "cost_authority_hash": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9",
+    "execution_semantics_version": "MXM_C031_STAGE_B_RUNTIME_V2_ADAPTER_V1",
+    "lifecycle_phase": "STAGE_B_CURRENT_CONFIG_SHARED_ACCOUNT",
+    "evaluator": {
+      "kind": "python_callable",
+      "module": "m7.c031_stage_b_runtime_v2_adapter",
+      "function": "evaluate_runtime_v2"
+    },
+    "post_result_projector": {
+      "kind": "python_callable",
+      "module": "m7.c031_stage_b_runtime_v2_adapter",
+      "function": "project_canonical_state"
+    },
+    "result_path": "m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json",
+    "pre_outcome_gate": {
+      "status": "PASS",
+      "candidate_id": "V2-C031",
+      "same_v2_identity": true,
+      "new_v2_attempt": false,
+      "stage_a_result_ref": "discovery/results/V2-C031_STAGE_A_V1.json",
+      "pre_economic_acceptance_ref": "evidence/C031_STAGE_B_PRE_ECONOMIC_ACCEPTANCE_V1.json",
+      "runtime_transport_acceptance_ref": "evidence/C031_STAGE_B_RUNTIME_TRANSPORT_ACCEPTANCE_V1.json",
+      "transport_exact_head_green": true,
+      "transport_exact_head_ci_run_id": 35921867751,
+      "ai_authorization_operation_id": "op_d564674cb94e61eabe9dd23015062b6d",
+      "current_config_development_scenario": true,
+      "historical_point_in_time_margin_certification": false,
+      "v2_attempt_delta": 0
+    },
+    "safety": {
+      "live_orders_authorized": false,
+      "protected_evidence_opened": false,
+      "competition_start_authorized": false
+    },
+    "external_data": {
+      "required": false
+    },
+    "project_accounting_contract": {
+      "same_v2_identity": true,
+      "v2_attempt_delta": 0,
+      "expected_economic_outcome_delta": 1
+    }
+  },
+  "prospective_law": {
+    "same_identity_stage_b_observation": true,
+    "new_v2_identity": false,
+    "new_v2_attempt": false,
+    "open_exactly_once_after_envelope_exact_head_green": true,
+    "no_post_outcome_parameter_change": true
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
