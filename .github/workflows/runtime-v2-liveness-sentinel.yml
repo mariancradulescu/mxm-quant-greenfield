@@ -72,3 +72,10 @@ jobs:
             --git-checkpoint \
             --git-push
 
+      - name: Materialize any explicitly AI-authorized economic envelope
+        run: |
+          python -m research_v3.economic_operation_materializer materialize \
+            --root . \
+            --git-checkpoint \
+            --git-push
+
