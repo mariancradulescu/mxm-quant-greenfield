@@ -148,6 +148,7 @@ def persist_wave_results(
     recorded_utc: str,
     result_refs: Mapping[str, str] | None = None,
     execution_result_ref: str | None = None,
+    live_equivalent_candidate_ids: list[str] | tuple[str, ...] | set[str] | None = None,
 ) -> dict:
     """Persist already-opened results and safely resume any partial persistence."""
     root = Path(root)
@@ -269,9 +270,19 @@ def persist_wave_results(
         opened_ids = [cid for cid in candidate_ids if cid in docs]
         before_attempts = int(before["v2_attempts_used"])
         before_outcomes = int(before["economic_outcomes_opened"])
-        after_attempts = before_attempts + len(opened_ids)
-        after_outcomes = before_outcomes + len(opened_ids)
+
+        # Current accounting is derived from immutable repository exposure, not from
+        # the historical forensic-authority subset or a one-result-per-identity rule.
+        final_result_count = sum(e.get("entry_type") == "RESULT_RECORDED" for e in desired_ledger)
+        exposed_v2_ids = sorted({
+            e["candidate_id"] for e in desired_ledger
+            if e.get("entry_type") == "RESULT_RECORDED"
+            and str(e.get("candidate_id", "")).startswith("V2-C")
+        })
+        after_attempts = len(exposed_v2_ids)
         after_budget = int(state.get("v2_search_budget", 84)) - after_attempts
+        stage_b_observations = int(state.get("stage_b_current_config_economic_observations", 0))
+        after_outcomes = final_result_count + stage_b_observations
 
         current_attempts = int(state.get("v2_attempts_used", before_attempts))
         current_outcomes = int(state.get("economic_outcomes_opened", before_outcomes))
@@ -279,10 +290,12 @@ def persist_wave_results(
             raise WavePersistenceError("CURRENT_STATE attempts are outside recoverable wave bounds")
         if not before_outcomes <= current_outcomes <= after_outcomes:
             raise WavePersistenceError("CURRENT_STATE economic outcomes are outside recoverable wave bounds")
-
-        final_result_count = sum(e.get("entry_type") == "RESULT_RECORDED" for e in desired_ledger)
         if int(state.get("discovery_result_recorded_entries", 0)) > final_result_count:
             raise WavePersistenceError("CURRENT_STATE result count is ahead of recoverable ledger")
+
+        live_equivalent = set(live_equivalent_candidate_ids or ())
+        if not live_equivalent <= set(opened_ids):
+            raise WavePersistenceError("live-equivalent authority may only be assigned to opened wave identities")
 
         state["v2_attempts_used"] = after_attempts
         state["v2_evaluated_identities"] = after_attempts
@@ -291,21 +304,38 @@ def persist_wave_results(
         state["global_attempts_seen"] = int(state.get("legacy_prior_attempts", 0)) + after_attempts
         state["discovery_ledger_entries"] = len(desired_ledger)
         state["discovery_result_recorded_entries"] = final_result_count
+        state["stage_a_result_recorded_entries"] = final_result_count
+        state["distinct_identity_outcomes_opened"] = after_attempts
+        state["stage_b_current_config_economic_observations"] = stage_b_observations
+        state["v2_budget_charged_candidate_ids"] = exposed_v2_ids
+        state["v2_historical_evaluated_candidate_ids"] = exposed_v2_ids
         state["structural_only_since_previous_economic_outcome"] = False
         state.setdefault("current_result_authority", {})
         state.setdefault("active_result_pointers", {})
 
+        current_live = set(state.get("current_live_equivalent_authoritative_candidate_ids", []))
+        current_invalid = set(state.get("current_invalid_result_authority_candidate_ids", []))
         for cid in opened_ids:
             result = docs[cid]
-            state["current_result_authority"][cid] = {
-                "stage_a": {
-                    "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
-                    "result_ref": refs[cid],
-                    "result_hash": result["result_hash"],
-                    "status": result["status"],
-                }
+            stage_a_authority = {
+                "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+                "result_ref": refs[cid],
+                "result_hash": result["result_hash"],
+                "status": result["status"],
             }
+            if cid in live_equivalent:
+                stage_a_authority.update({
+                    "live_equivalent_replay_state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+                    "current_live_equivalent_authoritative": True,
+                    "same_identity_correction_allowed": False,
+                    "new_identity_required": False,
+                })
+                current_live.add(cid)
+                current_invalid.discard(cid)
+            state["current_result_authority"][cid] = {"stage_a": stage_a_authority}
             state["active_result_pointers"][f"{cid}_STAGE_A"] = refs[cid]
+        state["current_live_equivalent_authoritative_candidate_ids"] = sorted(current_live)
+        state["current_invalid_result_authority_candidate_ids"] = sorted(current_invalid)
 
         last_cid = opened_ids[-1]
         last = docs[last_cid]
@@ -360,6 +390,7 @@ def persist_wave_results(
                 "same_frozen_semantics": True,
                 "rescue_tuning": False,
                 "protected_evidence_used": False,
+                "live_equivalent_candidate_ids": sorted(live_equivalent),
             },
             "results": {
                 cid: {
