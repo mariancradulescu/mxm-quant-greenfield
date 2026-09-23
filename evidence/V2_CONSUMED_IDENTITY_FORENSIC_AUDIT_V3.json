@@ -1,0 +1,587 @@
+{
+  "schema": "mxm.greenfield.v2.consumed-identity-forensic-audit.v3",
+  "status": "COMPLETE_PER_IDENTITY_CLASSIFICATION",
+  "recorded_utc": "2026-09-23T07:38:00Z",
+  "baseline_head": "5049d09f484f3215198f389c4099ec1c2079f217",
+  "supersedes_for_current_classification": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json",
+  "historical_audit_v2_preserved": true,
+  "contracts": {
+    "base": "RESEARCH_CONTRACT_V2.md",
+    "v3_extension": "research_v3/RESEARCH_CONTRACT_V3.json",
+    "durable_live_equivalent": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
+    "controlling_rule": "AT_HISTORICAL_TIME_T_ONLY_INFORMATION_AVAILABLE_BY_T_MAY_AFFECT_DECISION_OR_ADMISSION"
+  },
+  "methodology": {
+    "batch_classification_by_source_code_string_presence": false,
+    "candidate_by_candidate_frozen_spec_inspection": true,
+    "active_spec_hash_verified": true,
+    "historical_contract_checked": true,
+    "evaluator_control_path_checked": true,
+    "dataset_boundary_behavior_checked": true,
+    "missing_bar_behavior_checked": true,
+    "result_ledger_accounting_checked": true,
+    "dynamic_control_path_test_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+  },
+  "classifications": {
+    "V2-C006": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C012": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C013": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C014": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C015": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C016": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C017": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C018": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C019": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C020": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C021": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C022": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C023": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C024": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C025": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C026": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY"
+  },
+  "per_identity": {
+    "V2-C006": {
+      "candidate_id": "V2-C006",
+      "frozen_spec_validity": "CAUSALLY_VALID",
+      "implementation_validity": "INVALID_FUTURE_AVAILABILITY_PRE_ADMISSION",
+      "live_equivalence_validity": "INVALID_CURRENT_RESULT_PENDING_SAME_IDENTITY_CORRECTION",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_FOR_LIVE_EQUIVALENT_USE",
+      "same_identity_correction_allowed": true,
+      "new_identity_required": false,
+      "attempt_accounting_effect": "RETAIN_ONE_BUDGET_SLOT_PENDING_ZERO_DELTA_SAME_IDENTITY_CORRECTION",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "future_information_forbidden=true",
+        "fixed_hold_intent=SCHEDULED_AT_ENTRY",
+        "missing_bars=do_not_fabricate",
+        "no frozen future-exit NO_TRADE admission rule"
+      ],
+      "implementation_control_path": {
+        "source": "m6/tier1_candidate_replay.py",
+        "function": "c006_replay_intents",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C012": {
+      "candidate_id": "V2-C012",
+      "frozen_spec_validity": "CAUSALLY_VALID",
+      "implementation_validity": "INVALID_FUTURE_AVAILABILITY_PRE_ADMISSION",
+      "live_equivalence_validity": "INVALID_CURRENT_RESULT_PENDING_SAME_IDENTITY_CORRECTION",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_FOR_LIVE_EQUIVALENT_USE",
+      "same_identity_correction_allowed": true,
+      "new_identity_required": false,
+      "attempt_accounting_effect": "RETAIN_ONE_BUDGET_SLOT_PENDING_ZERO_DELTA_SAME_IDENTITY_CORRECTION",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "future_information_forbidden=true",
+        "NO_OP concerns signal/synchronization at decision",
+        "fixed_hold_intent=SCHEDULED_AT_ENTRY",
+        "no frozen future-exit NO_TRADE admission rule"
+      ],
+      "implementation_control_path": {
+        "source": "m6/tier1_candidate_replay.py",
+        "function": "c012_replay_intents",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C013": {
+      "candidate_id": "V2-C013",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "SESSION_MUST_HAVE_COMPLETE_OFFICIAL_M15_GRID is a frozen filter",
+        "session_requires_complete_grid=true",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_expansion_index_m15.py",
+        "function": "sign_replay_intents",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C014": {
+      "candidate_id": "V2-C014",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "SESSION_MUST_HAVE_COMPLETE_OFFICIAL_M15_GRID is a frozen filter",
+        "session_requires_complete_grid=true",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_expansion_index_m15.py",
+        "function": "sign_replay_intents",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C015": {
+      "candidate_id": "V2-C015",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "SESSION_MUST_HAVE_COMPLETE_OFFICIAL_M15_GRID is a frozen filter",
+        "session_requires_complete_grid=true",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_expansion_index_m15.py",
+        "function": "opening_range_breakout_intents",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C016": {
+      "candidate_id": "V2-C016",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "BOTH_INDEX_SESSIONS_MUST_HAVE_COMPLETE_OFFICIAL_M15_GRID is a frozen filter",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_expansion_index_m15.py",
+        "function": "relative_value_intents",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C017": {
+      "candidate_id": "V2-C017",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "entry_exit_grid requires exact contiguous bars for LOOKBACK_ENTRY_AND_HOLD",
+        "missing_required_grid=NO_SIGNAL",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_evaluator.py",
+        "function": "single",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C018": {
+      "candidate_id": "V2-C018",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "entry_exit_grid requires exact contiguous bars for LOOKBACK_ENTRY_AND_HOLD",
+        "missing_required_grid=NO_SIGNAL",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_evaluator.py",
+        "function": "single",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C019": {
+      "candidate_id": "V2-C019",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "entry_exit_grid requires exact contiguous bars for LOOKBACK_ENTRY_AND_HOLD",
+        "missing_required_grid=NO_SIGNAL",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_evaluator.py",
+        "function": "single",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C020": {
+      "candidate_id": "V2-C020",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "entry_exit_grid requires exact contiguous bars for LOOKBACK_ENTRY_AND_HOLD",
+        "missing_required_grid=NO_SIGNAL",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_evaluator.py",
+        "function": "single",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C021": {
+      "candidate_id": "V2-C021",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "entry_exit_grid requires exact contiguous bars for LOOKBACK_ENTRY_AND_HOLD",
+        "missing_required_grid=NO_SIGNAL",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_evaluator.py",
+        "function": "cross",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C022": {
+      "candidate_id": "V2-C022",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "entry_exit_grid requires exact contiguous bars for LOOKBACK_ENTRY_AND_HOLD",
+        "missing_required_grid=NO_SIGNAL",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_evaluator.py",
+        "function": "cross",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C023": {
+      "candidate_id": "V2-C023",
+      "frozen_spec_validity": "CAUSALLY_VALID",
+      "implementation_validity": "INVALID_FUTURE_AVAILABILITY_PRE_ADMISSION",
+      "live_equivalence_validity": "INVALID_CURRENT_RESULT_PENDING_SAME_IDENTITY_CORRECTION",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_FOR_LIVE_EQUIVALENT_USE",
+      "same_identity_correction_allowed": true,
+      "new_identity_required": false,
+      "attempt_accounting_effect": "RETAIN_ONE_BUDGET_SLOT_PENDING_ZERO_DELTA_SAME_IDENTITY_CORRECTION",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md"
+      ],
+      "frozen_spec_proof": [
+        "exit missing_at_intent keeps exit pending",
+        "missing_required_grid only invalidates missing signal history or boundary entry",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_ultra_fast_stage_a_frontier_v2_evaluator.py",
+        "function": "generate_trades",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C024": {
+      "candidate_id": "V2-C024",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md",
+        "research_v3/RESEARCH_CONTRACT_V3.json"
+      ],
+      "frozen_spec_proof": [
+        "CONTIGUOUS_SELECTED_SYMBOL_ENTRY_TO_EXIT_GRID_REQUIRED is a frozen filter",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_performance_v3_wave02_evaluator.py",
+        "function": "c024_trades",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C025": {
+      "candidate_id": "V2-C025",
+      "frozen_spec_validity": "CAUSALLY_VALID",
+      "implementation_validity": "INVALID_FUTURE_AVAILABILITY_PRE_ADMISSION",
+      "live_equivalence_validity": "INVALID_CURRENT_RESULT_PENDING_SAME_IDENTITY_CORRECTION",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_FOR_LIVE_EQUIVALENT_USE",
+      "same_identity_correction_allowed": true,
+      "new_identity_required": false,
+      "attempt_accounting_effect": "RETAIN_ONE_BUDGET_SLOT_PENDING_ZERO_DELTA_SAME_IDENTITY_CORRECTION",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md",
+        "research_v3/RESEARCH_CONTRACT_V3.json"
+      ],
+      "frozen_spec_proof": [
+        "future_information_forbidden=true",
+        "training examples are admitted only after target completion",
+        "no frozen future current-trade exit availability NO_TRADE rule"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_performance_v3_wave02_evaluator.py",
+        "function": "c025_trades",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    },
+    "V2-C026": {
+      "candidate_id": "V2-C026",
+      "frozen_spec_validity": "CAUSALLY_INVALID_INTERNAL_CONTRADICTION",
+      "implementation_validity": "IMPLEMENTS_OR_REINFORCES_FUTURE_AVAILABILITY_ADMISSION",
+      "live_equivalence_validity": "INVALID_IDENTITY_AND_HISTORICAL_VERDICT",
+      "current_result_authority": "HISTORICAL_BYTES_PRESERVED_NON_AUTHORITATIVE_INVALID_FROZEN_SPEC",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true,
+      "attempt_accounting_effect": "REMOVE_INVALID_IDENTITY_FROM_BUDGET_CHARGE; REPLACEMENT_NEW_IDENTITY_CHARGED_ONLY_WHEN_ITS_VALID_OUTCOME_OPENS",
+      "governing_contract_refs": [
+        "RESEARCH_CONTRACT_V2.md",
+        "research_v3/RESEARCH_CONTRACT_V3.json"
+      ],
+      "frozen_spec_proof": [
+        "direction.NO_OP includes exit_boundary_missing",
+        "missing_exact_exit_boundary=NO_TRADE_FOR_THAT_SEGMENT",
+        "missing_exit_boundary=NO_TRADE_AT_ENTRY_BOUNDARY",
+        "future_information_forbidden=true"
+      ],
+      "implementation_control_path": {
+        "source": "m7/competition_performance_v3_wave03_c026_evaluator.py",
+        "function": "build_symbol_trades",
+        "proof_ref": "tests/test_live_equivalent_forensic_control_paths_v3.py"
+      }
+    }
+  },
+  "groups": {
+    "implementation_only_same_semantics_correctable": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C023",
+      "V2-C025"
+    ],
+    "frozen_spec_causally_invalid_requires_new_identity": [
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C024",
+      "V2-C026"
+    ],
+    "valid_with_post_entry_settlement_or_right_censoring": [],
+    "unresolved_requires_targeted_proof": []
+  },
+  "result_authority": {
+    "V2-C006": {
+      "result_ref": "discovery/results/V2-C006_STAGE_A_V1.json",
+      "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+      "historical_status": "DISCOVERY_SURVIVOR"
+    },
+    "V2-C012": {
+      "result_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
+      "result_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
+      "historical_status": "DISCOVERY_SURVIVOR"
+    },
+    "V2-C013": {
+      "result_ref": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "67fc835c7196e7dbc7645ffb278276056736c2150198c865232d120ffcadf16a",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C014": {
+      "result_ref": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "bb6b276a429b75a690237686c1cb10eb3b5412f934e806fef333a6c346ef70e8",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C015": {
+      "result_ref": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "e4d1d06983f54d945e8e959ba4210ec7c08ea59030e20667d22a78ed69e06601",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C016": {
+      "result_ref": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "d39ef973330d9c0fbb7f2605a78673d844271328b47e4f33318200918a6e641d",
+      "historical_status": "COST_UNRESOLVED"
+    },
+    "V2-C017": {
+      "result_ref": "discovery/results/V2-C017_STAGE_A_V1.json",
+      "result_hash": "9870baf130d12e9864489c6d0ebe83a80b4fa3a38f1b2c5321ac03e1dc64029b",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C018": {
+      "result_ref": "discovery/results/V2-C018_STAGE_A_V1.json",
+      "result_hash": "f1a647f633d46d26dfa2b9d971b72e4bf3c53dd4eef9971ed0503cd2018fe69c",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C019": {
+      "result_ref": "discovery/results/V2-C019_STAGE_A_V1.json",
+      "result_hash": "65cf8e6358da6f304cce53a9f3ec3abfb922525c8de2f2a59ca0ce1fe637e9c6",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C020": {
+      "result_ref": "discovery/results/V2-C020_STAGE_A_V1.json",
+      "result_hash": "28b9fac70c1b39e7d782103324327c5c6249452868293c5a9bcc4fa137a7b8c2",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C021": {
+      "result_ref": "discovery/results/V2-C021_STAGE_A_V1.json",
+      "result_hash": "ab2b23edb01a913cc2aace95591bf004d6458cc3b3d254eca26625d211e5d1a2",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C022": {
+      "result_ref": "discovery/results/V2-C022_STAGE_A_V1.json",
+      "result_hash": "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C023": {
+      "result_ref": "discovery/results/V2-C023_STAGE_A_V1.json",
+      "result_hash": "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C024": {
+      "result_ref": "discovery/results/V2-C024_STAGE_A_V1.json",
+      "result_hash": "c02de6e3d98ce1abd32e2e189a4d12225c6a6feef8f45f7c5d24061144a01224",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C025": {
+      "result_ref": "discovery/results/V2-C025_STAGE_A_V1.json",
+      "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C026": {
+      "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
+      "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
+      "historical_status": "COARSE_NET_FAIL"
+    }
+  },
+  "attempt_accounting": {
+    "rule": "Causally valid implementation-only identities retain one slot pending zero-delta same-identity correction; frozen-spec-invalid identities do not charge the V2 budget and any corrected semantics must use a new identity.",
+    "v2_budget_total": 84,
+    "historical_evaluated_candidate_ids": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C023",
+      "V2-C024",
+      "V2-C025",
+      "V2-C026"
+    ],
+    "historical_evaluated_identity_count": 16,
+    "budget_charged_candidate_ids": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C023",
+      "V2-C025"
+    ],
+    "v2_attempts_used": 4,
+    "v2_search_budget_remaining": 80,
+    "released_invalid_spec_candidate_ids": [
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C024",
+      "V2-C026"
+    ],
+    "released_invalid_spec_slot_count": 12,
+    "same_identity_zero_delta_correction_ids": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C023",
+      "V2-C025"
+    ],
+    "global_attempts_seen_for_information_exposure": 32,
+    "economic_outcomes_opened_historical": 19,
+    "historical_bytes_deleted": false
+  },
+  "stage_b": {
+    "current_valid_stage_b_inputs": [],
+    "c006_c012_downstream_status": "INVALIDATED_PENDING_VALID_LIVE_EQUIVALENT_STAGE_A_AUTHORITY"
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}

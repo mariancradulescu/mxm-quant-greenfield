@@ -1,0 +1,49 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave04-pre-outcome-causality-block.v2",
+  "status": "BLOCKED_PRE_OUTCOME_FROZEN_SPEC_CAUSALLY_INVALID",
+  "recorded_utc": "2026-09-23T07:38:00Z",
+  "supersedes_classification_only": "research_v3/WAVE_04_PRE_OUTCOME_CAUSALITY_BLOCK_V1.json",
+  "preserves_v1_forensic_recovery": true,
+  "candidate_ids": [
+    "V2-C027",
+    "V2-C028"
+  ],
+  "candidate_spec_hashes": {
+    "V2-C027": "6c2945d22af7d10156786a823dca7df21afbbb2c96fa92e060e70e58857de8e2",
+    "V2-C028": "f0a0b7c78010232bda8035bb2ab4215e1f37624a17e8eb094e2515daeb2f6e5c"
+  },
+  "classifications": {
+    "V2-C027": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+    "V2-C028": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY"
+  },
+  "proofs": {
+    "V2-C027": [
+      "direction.NO_OP=otherwise_or_missing_exact_entry_exit",
+      "exit.missing_exact_exit=NO_TRADE",
+      "filters includes EXACT_NEXT_M5_ENTRY_AND_180M_EXIT_REQUIRED",
+      "future_information_forbidden=true"
+    ],
+    "V2-C028": [
+      "direction.NO_OP=otherwise_or_missing_exact_laggard_entry_exit",
+      "exit.missing_exact_exit=NO_TRADE_AND_NO_TRAINING_EXAMPLE",
+      "filters includes EXACT_LAGGARD_ENTRY_AND_EXIT_REQUIRED",
+      "future_information_forbidden=true"
+    ]
+  },
+  "outcome_state": {
+    "C027": "NOT_OPENED",
+    "C028": "NOT_OPENED"
+  },
+  "attempts_consumed": 0,
+  "disposition": {
+    "execute_current_frozen_specs": false,
+    "same_identity_semantic_mutation": false,
+    "prospectively_freeze_new_corrected_identities": true,
+    "replacement_attempt_charged_only_on_valid_outcome_open": true
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}
