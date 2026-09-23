@@ -22,6 +22,10 @@ class AutonomousControlPlaneV1Tests(unittest.TestCase):
             self.assertEqual(report["next_action"],"EXECUTE_AUTHORIZED_WAVE")
         elif "FROZEN_WAVE_PENDING_AUTHORIZATION" in classes:
             self.assertEqual(report["next_action"],"REQUIRE_EXACT_HEAD_GREEN_AND_BIND_AUTHORIZATION")
+        elif "RESEARCH_SCOPE_GOVERNANCE_MISSING" in classes:
+            self.assertEqual(report["next_action"],"IMPLEMENT_RESEARCH_SCOPE_UNIVERSE_GOVERNANCE")
+        elif "RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN" in classes:
+            self.assertEqual(report["next_action"],"REQUIRE_SCOPE_GOVERNANCE_EXACT_HEAD_GREEN")
         elif report["stage_b_revalidation_required_candidate_ids"]:
             self.assertEqual(report["next_action"],"REVALIDATE_STAGE_B")
         else:
