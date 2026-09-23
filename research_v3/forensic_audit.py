@@ -131,7 +131,23 @@ def build_audit(root):
             raise ValueError(f"{cid} dataset binding is not traceable")
 
         cost_sha=result["provenance"]["cost_evidence"]["sha256"]
-        cost_trace=(cost_sha==V6_COST_SHA) or contains_value(state,cost_sha)
+        if cost_sha == V6_COST_SHA:
+            cost_trace = True
+        else:
+            # Tier-1 cost identities are derived evidence commitments. They are
+            # authoritative through the frozen pre-economic materialization and
+            # transaction-local cost-rule authorities; they need not be copied
+            # redundantly into mutable CURRENT_STATE.
+            tier1_materialization = json.loads(
+                (root/"evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json").read_text(encoding="utf-8")
+            )
+            tier1_cost_rule = json.loads(
+                (root/"evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json").read_text(encoding="utf-8")
+            )
+            cost_trace = (
+                contains_value(tier1_materialization, cost_sha)
+                and contains_value(tier1_cost_rule, cost_sha)
+            )
         if not cost_trace:
             raise ValueError(f"{cid} cost binding is not traceable")
 
