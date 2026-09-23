@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mxm.greenfield.ai-authorized-runtime-operation-envelope.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "status",
+    "envelope_id",
+    "ai_authorization",
+    "basis_accounting",
+    "runtime_plan"
+  ],
+  "properties": {
+    "schema": {
+      "const": "mxm.greenfield.ai-authorized-runtime-operation-envelope.v1"
+    },
+    "status": {
+      "const": "AUTHORIZED_EXACT_HEAD_GREEN"
+    },
+    "envelope_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ai_authorization": {
+      "type": "object"
+    },
+    "basis_accounting": {
+      "type": "object"
+    },
+    "runtime_plan": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

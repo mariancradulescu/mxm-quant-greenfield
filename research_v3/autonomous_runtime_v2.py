@@ -507,6 +507,39 @@ class RuntimeV2:
         self._boundary("result_file_persistence")
         return result
 
+    def _run_post_result_projector(self, plan: Mapping[str, Any], result: Path, digest: str) -> None:
+        """Apply an optional idempotent repository projection after canonical result persistence.
+
+        This is execution plumbing, not research intelligence. The frozen plan names a callable;
+        Runtime V2 invokes it only after result bytes are durable and before lifecycle closure.
+        Recovery may invoke it again, so projectors MUST be idempotent and must never rerun economics.
+        """
+        projector = plan.get("post_result_projector")
+        if not projector:
+            return
+        if not isinstance(projector, Mapping) or projector.get("kind") != "python_callable":
+            raise MaterialIntegrityHalt("post_result_projector must be a python_callable")
+        module_name = projector.get("module")
+        function_name = projector.get("function")
+        if not isinstance(module_name, str) or not isinstance(function_name, str):
+            raise MaterialIntegrityHalt("post_result_projector requires module/function")
+        fn = getattr(importlib.import_module(module_name), function_name)
+        payload = fn(self.root, dict(plan), result, digest)
+        if payload is None:
+            payload = {"status": "PASS"}
+        if not isinstance(payload, Mapping):
+            raise MaterialIntegrityHalt("post_result_projector must return a mapping or None")
+        op = plan["operation_id"]
+        if not self.journal.has(op, "PROJECT_ACCOUNTING_PROJECTED"):
+            self.journal.append(
+                "PROJECT_ACCOUNTING_PROJECTED",
+                run_id=self.run_id,
+                operation_id=op,
+                state="PERSIST_RESULT",
+                payload={"projection": dict(payload)},
+            )
+        self._boundary("project_accounting_projection")
+
     def _append_runtime_ledger(self, plan: Mapping[str, Any], result: Path, digest: str) -> None:
         op = plan["operation_id"]
         rows = self._validate_runtime_ledger()
@@ -713,6 +746,7 @@ class RuntimeV2:
             spool, digest = self._execute_economics_exactly_once(plan)
         self._set_state("PERSIST_RESULT", next_action="VALIDATE_ACCOUNTING_LEDGER_HASHES")
         result = self._persist_result(plan, spool, digest)
+        self._run_post_result_projector(plan, result, digest)
         self._append_runtime_ledger(plan, result, digest)
         self._project_accounting(plan)
         self._project_current_state(plan, digest)
