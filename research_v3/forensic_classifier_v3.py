@@ -71,8 +71,20 @@ def build_audit(root):
             raise ValueError(f"{cid}: result/ledger mismatch")
     implementation_only=sorted(cid for cid,c in classes.items() if c=="IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE")
     spec_invalid=sorted(cid for cid,c in classes.items() if c=="FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY")
+    corrected_same_identity=[]
+    current=state.get("current_result_authority",{})
+    for cid in implementation_only:
+        stage=(current.get(cid) or {}).get("stage_a") or {}
+        if (
+            stage.get("state")=="VALID_CORRECTED_SUCCESSOR"
+            and stage.get("live_equivalent_replay_state")=="CORRECTED_SAME_IDENTITY_CURRENT_AUTHORITY"
+            and stage.get("current_live_equivalent_authoritative") is True
+        ):
+            corrected_same_identity.append(cid)
+    pending_same_identity=sorted(set(implementation_only)-set(corrected_same_identity))
+    invalid_result_authority=sorted(set(spec_invalid)|set(pending_same_identity))
     charged=list(ALL)
     return {"status":"COMPLETE_PER_IDENTITY_CLASSIFICATION_AND_EXPOSURE_ACCOUNTING","candidate_ids":ALL,"classifications":classes,
       "groups":{"implementation_only_same_semantics_correctable":implementation_only,"frozen_spec_causally_invalid_requires_new_identity":spec_invalid,"valid_with_post_entry_settlement_or_right_censoring":[],"unresolved_requires_targeted_proof":[]},
-      "attempt_accounting":{"v2_budget_total":int(state["v2_search_budget"]),"historical_evaluated_candidate_ids":ALL,"historical_evaluated_identity_count":len(ALL),"budget_charged_candidate_ids":charged,"v2_attempts_used":len(ALL),"v2_search_budget_remaining":int(state["v2_search_budget"])-len(ALL),"pending_same_identity_correction_candidate_ids":implementation_only,"invalid_frozen_spec_candidate_ids":spec_invalid,"invalid_result_authority_candidate_ids":ALL,"refunded_candidate_ids":[],"refunded_slot_count":0,"replacement_new_identity_required_for":spec_invalid,"global_attempts_seen_for_information_exposure":int(state["legacy_prior_attempts"])+len(ALL),"distinct_identity_outcomes_opened":len(ALL),"stage_a_result_recorded_entries":len(result_rows),"stage_b_current_config_economic_observations":int(state.get("stage_b_current_config_economic_observations",2)),"economic_outcomes_opened_historical":int(state["economic_outcomes_opened"]),"historical_bytes_deleted":False},
+      "attempt_accounting":{"v2_budget_total":int(state["v2_search_budget"]),"historical_evaluated_candidate_ids":ALL,"historical_evaluated_identity_count":len(ALL),"budget_charged_candidate_ids":charged,"v2_attempts_used":len(ALL),"v2_search_budget_remaining":int(state["v2_search_budget"])-len(ALL),"pending_same_identity_correction_candidate_ids":pending_same_identity,"corrected_same_identity_candidate_ids":sorted(corrected_same_identity),"invalid_frozen_spec_candidate_ids":spec_invalid,"invalid_result_authority_candidate_ids":invalid_result_authority,"current_live_equivalent_authoritative_candidate_ids":sorted(corrected_same_identity),"refunded_candidate_ids":[],"refunded_slot_count":0,"replacement_new_identity_required_for":spec_invalid,"global_attempts_seen_for_information_exposure":int(state["legacy_prior_attempts"])+len(ALL),"distinct_identity_outcomes_opened":len(ALL),"stage_a_result_recorded_entries":len(result_rows),"stage_b_current_config_economic_observations":int(state.get("stage_b_current_config_economic_observations",2)),"economic_outcomes_opened_historical":int(state["economic_outcomes_opened"]),"historical_bytes_deleted":False},
       "safety":{"protected_evidence_opened":bool(state["protected_evidence_opened"]),"live_orders_authorized":bool(state["live_orders_authorized"]),"competition_start_authorized":bool(state["competition_start_authorized"])}}
