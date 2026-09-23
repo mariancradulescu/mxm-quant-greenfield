@@ -133,8 +133,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python tools/validate_authoritative_promotion.py
-          python -m unittest -v             tests.test_performance_research_v3_persistence             tests.test_performance_research_v3_wave05_freeze             tests.test_current_accounting_integrity
+          PYTHONPATH=. python tools/validate_authoritative_promotion.py
+          PYTHONPATH=. python -m unittest -v \
+            tests.test_performance_research_v3_persistence \
+            tests.test_performance_research_v3_wave05_freeze \
+            tests.test_current_accounting_integrity
       - name: Commit and push canonical persistence
         shell: bash
         run: |
