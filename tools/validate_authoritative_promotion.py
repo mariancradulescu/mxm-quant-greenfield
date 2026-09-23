@@ -69,7 +69,9 @@ def _validate_current_dependency_semantics(state):
     if operational.get("work_branch") == branch:
         raise ValueError("work branch must remain distinct from operational branch")
 
-    invalid = set(state.get("implementation_invalid_consumed_identities", []))
+    implementation_invalid = set(state.get("implementation_invalid_consumed_identities", []))
+    frozen_spec_invalid = set(state.get("frozen_spec_invalid_consumed_identities", []))
+    invalid = implementation_invalid | frozen_spec_invalid
     survivors = set(state.get("discovery_survivors", []))
     stage_b_inputs = set(state.get("current_stage_b_survivor_input_set", []))
     current = state.get("current_result_authority")
@@ -83,8 +85,12 @@ def _validate_current_dependency_semantics(state):
         stage_a = node.get("stage_a")
         if not isinstance(stage_a, dict):
             raise ValueError(f"implementation-invalid identity lacks Stage-A authority: {cid}")
-        replay_invalid = stage_a.get("live_equivalent_replay_state") == "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE"
-        corrected = stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR" and not replay_invalid
+        replay_state = stage_a.get("live_equivalent_replay_state")
+        if cid in implementation_invalid and replay_state != "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE":
+            raise ValueError(f"implementation-only identity has wrong forensic state: {cid}")
+        if cid in frozen_spec_invalid and replay_state != "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY":
+            raise ValueError(f"frozen-spec-invalid identity has wrong forensic state: {cid}")
+        corrected = stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR" and cid not in invalid
         if not corrected and cid in survivors:
             raise ValueError(f"current survivor list contains invalidated identity without corrected successor: {cid}")
         if not corrected and cid in stage_b_inputs:
@@ -102,6 +108,20 @@ def _validate_current_dependency_semantics(state):
                 ref = downstream.get("invalidation_ref")
                 if not isinstance(ref, str) or not (ROOT / ref).exists():
                     raise ValueError(f"missing explicit downstream invalidation authority: {cid}")
+
+    audit_ref = state.get("forensic_consumed_identity_audit_authority")
+    if audit_ref != "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json":
+        raise ValueError("current forensic authority is not V3")
+    audit = json.loads((ROOT / audit_ref).read_text(encoding="utf-8"))
+    charged = set(audit["attempt_accounting"]["budget_charged_candidate_ids"])
+    if charged != implementation_invalid:
+        raise ValueError("budget-charged identities must equal pending same-identity implementation corrections")
+    if state.get("v2_attempts_used") != len(charged):
+        raise ValueError("current V2 budget charge does not match consumed-identity law")
+    if state.get("v2_evaluated_identities") != len(audit["attempt_accounting"]["historical_evaluated_candidate_ids"]):
+        raise ValueError("historical evaluated identity count mismatch")
+    if state.get("global_attempts_seen") != state.get("legacy_prior_attempts",0) + state.get("v2_evaluated_identities",0):
+        raise ValueError("global information-exposure attempt count mismatch")
 
     correction = state.get("c012_same_identity_corrected_rerun")
     if not isinstance(correction, dict):
