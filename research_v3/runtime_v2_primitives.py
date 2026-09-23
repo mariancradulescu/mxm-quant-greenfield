@@ -306,8 +306,10 @@ class GitCheckpointSink:
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=self.root)
         if diff.returncode == 0:
             return
-        msg = f"Runtime V2 checkpoint {boundary} {operation_id or 'runtime'}"
+        msg = f"[skip ci] Runtime V2 checkpoint {boundary} {operation_id or 'runtime'}"
         subprocess.run(["git", "commit", "-m", msg], cwd=self.root, check=True)
         if self.push:
-            subprocess.run(["git", "push", "origin", "HEAD"], cwd=self.root, check=True)
+            target = os.environ.get("MXM_RUNTIME_TARGET_BRANCH")
+            refspec = f"HEAD:refs/heads/{target}" if target else "HEAD"
+            subprocess.run(["git", "push", "origin", refspec], cwd=self.root, check=True)
 
