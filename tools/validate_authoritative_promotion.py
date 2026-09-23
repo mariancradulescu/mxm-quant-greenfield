@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from discovery.accounting import assert_current_state_matches_repository
+from discovery.accounting import assert_current_state_matches_repository, derive_current_accounting
 from discovery.canonical import compute_result_hash, verify_spec_hash
 from discovery.ledger import read_ledger
 from discovery.schema import validate_result
@@ -145,10 +145,17 @@ def _validate_current_dependency_semantics(state):
         raise ValueError("frozen-spec-invalid set mismatch")
     if audit["attempt_accounting"].get("refunded_candidate_ids"):
         raise ValueError("observed V2 identities must not be retroactively refunded")
-    if state.get("v2_attempts_used") != len(historical):
+    current_accounting = derive_current_accounting(ROOT)
+    current_exposed = set(current_accounting["evaluated_candidate_ids"])
+    if not historical <= current_exposed:
+        raise ValueError("historical forensic exposure disappeared from current ledger")
+    state_charged = set(state.get("v2_budget_charged_candidate_ids", current_exposed))
+    if state_charged != current_exposed:
+        raise ValueError("current budget-charged identity set does not match repository exposure")
+    if state.get("v2_attempts_used") != len(current_exposed):
         raise ValueError("current V2 budget charge does not match distinct opened identity exposure")
-    if state.get("v2_evaluated_identities") != len(historical):
-        raise ValueError("historical evaluated identity count mismatch")
+    if state.get("v2_evaluated_identities") != len(current_exposed):
+        raise ValueError("current evaluated identity count mismatch")
     if state.get("global_attempts_seen") != state.get("legacy_prior_attempts",0) + state.get("v2_evaluated_identities",0):
         raise ValueError("global information-exposure attempt count mismatch")
     if current_live & currently_invalid:
