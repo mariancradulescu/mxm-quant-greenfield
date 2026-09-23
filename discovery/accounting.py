@@ -66,7 +66,22 @@ def derive_current_accounting(root: str | Path) -> dict[str, Any]:
 
     v2_budget = int(budget["v2_budget"])
     legacy_prior_attempts = int(budget["legacy_prior_attempts"])
-    v2_attempts_used = len(evaluated_ids)
+
+    forensic_path = root / "evidence" / "V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json"
+    if forensic_path.is_file():
+        forensic = _load(forensic_path)
+        if forensic.get("status") != "COMPLETE_PER_IDENTITY_CLASSIFICATION":
+            raise ValueError("forensic V3 accounting authority is not complete")
+        charged_ids = sorted(forensic["attempt_accounting"]["budget_charged_candidate_ids"])
+        historical_ids = sorted(forensic["attempt_accounting"]["historical_evaluated_candidate_ids"])
+        if historical_ids != evaluated_ids:
+            raise ValueError("forensic V3 historical identity set does not match ledger")
+        if not set(charged_ids).issubset(set(evaluated_ids)):
+            raise ValueError("forensic V3 charged identity set is not a ledger subset")
+    else:
+        charged_ids = evaluated_ids
+
+    v2_attempts_used = len(charged_ids)
     remaining = v2_budget - v2_attempts_used
     if remaining < 0:
         raise ValueError("V2 search budget exhausted below zero")
@@ -86,14 +101,15 @@ def derive_current_accounting(root: str | Path) -> dict[str, Any]:
         "v2_search_budget": v2_budget,
         "legacy_prior_attempts": legacy_prior_attempts,
         "v2_attempts_used": v2_attempts_used,
-        "v2_evaluated_identities": v2_attempts_used,
+        "v2_evaluated_identities": len(evaluated_ids),
         "v2_search_budget_remaining": remaining,
-        "global_attempts_seen": legacy_prior_attempts + v2_attempts_used,
+        "global_attempts_seen": legacy_prior_attempts + len(evaluated_ids),
         "economic_outcomes_opened": len(result_entries) + len(stage_b_current_config_ids),
         "discovery_ledger_entries": len(entries),
         "discovery_result_recorded_entries": len(result_entries),
         "implementation_correction_entries": len(correction_entries),
         "evaluated_candidate_ids": evaluated_ids,
+        "budget_charged_candidate_ids": charged_ids,
         "stage_b_current_config_candidate_ids": sorted(stage_b_current_config_ids),
         "latest_economic_outcome": latest_outcome,
     }

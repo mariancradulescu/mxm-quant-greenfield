@@ -15,7 +15,9 @@
     "status": "COARSE_NET_FAIL",
     "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
     "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
-    "recorded_utc": "2026-09-23T05:14:00Z"
+    "recorded_utc": "2026-09-23T05:14:00Z",
+    "authority_state": "HISTORICAL_PRESERVED_NON_AUTHORITATIVE_FROZEN_SPEC_INVALID",
+    "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json"
   },
   "legacy_prior_attempts": 16,
   "live_orders_authorized": false,
@@ -516,7 +518,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Correct the proven future-admission replay defect under the same identities with zero additional attempts, preserving historical bytes; revalidate each corrected result before resuming new economic identities.",
+  "next_action": "Obtain exact-head GREEN for per-identity forensic classification and consumed-attempt accounting; then correct C006/C012/C023/C025 under the same identity with zero additional attempts, and prospectively freeze new identities for the 12 frozen-spec-invalid experiments before any replacement outcome.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -543,7 +545,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_FORENSIC_LIVE_EQUIVALENT_CORRECTION_REQUIRED",
+  "phase": "PERFORMANCE_RESEARCH_V3_FORENSIC_IDENTITY_CLASSIFICATION_CORRECTED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -646,7 +648,7 @@
   "schema_version": 1,
   "structural_only_since_previous_economic_outcome": true,
   "user_action_required": false,
-  "v2_attempts_used": 16,
+  "v2_attempts_used": 4,
   "v2_evaluated_identities": 16,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
   "v2_search_budget": 84,
@@ -705,7 +707,7 @@
   "m6_stage_a_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_a_execution_authorization_authority": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
   "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
-  "v2_search_budget_remaining": 68,
+  "v2_search_budget_remaining": 80,
   "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
@@ -927,24 +929,12 @@
     }
   },
   "competition_ultra_fast_execution_progress_authority": "data/COMPETITION_ULTRA_FAST_WAVE_01_EXECUTION_PROGRESS_V1.json",
-  "forensic_consumed_identity_audit_authority": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json",
+  "forensic_consumed_identity_audit_authority": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
   "implementation_invalid_consumed_identities": [
     "V2-C006",
     "V2-C012",
-    "V2-C013",
-    "V2-C014",
-    "V2-C015",
-    "V2-C016",
-    "V2-C017",
-    "V2-C018",
-    "V2-C019",
-    "V2-C020",
-    "V2-C021",
-    "V2-C022",
     "V2-C023",
-    "V2-C024",
-    "V2-C025",
-    "V2-C026"
+    "V2-C025"
   ],
   "c012_same_identity_corrected_rerun": {
     "status": "CORRECTED_STAGE_A_RECORDED_SURVIVOR",
@@ -1044,11 +1034,13 @@
   "current_result_authority": {
     "V2-C006": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
         "result_ref": "discovery/results/V2-C006_STAGE_A_V1.json",
         "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": true,
+        "new_identity_required": false
       },
       "stage_b_current_config": {
         "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
@@ -1060,14 +1052,16 @@
     },
     "V2-C012": {
       "stage_a": {
-        "state": "VALID_CORRECTED_SUCCESSOR",
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
         "historical_result_ref": "discovery/results/V2-C012_STAGE_A_V1.json",
         "historical_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
         "corrected_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
         "corrected_successor_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
         "corrected_event_count": 34,
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": true,
+        "new_identity_required": false
       },
       "stage_b_current_config": {
         "state": "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
@@ -1082,132 +1076,158 @@
     },
     "V2-C013": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "67fc835c7196e7dbc7645ffb278276056736c2150198c865232d120ffcadf16a",
         "status": "COARSE_NET_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C014": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "bb6b276a429b75a690237686c1cb10eb3b5412f934e806fef333a6c346ef70e8",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C015": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "e4d1d06983f54d945e8e959ba4210ec7c08ea59030e20667d22a78ed69e06601",
         "status": "COARSE_NET_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C016": {
       "stage_a": {
-        "state": "VALID_COST_UNRESOLVED_FAIL_CLOSED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "d39ef973330d9c0fbb7f2605a78673d844271328b47e4f33318200918a6e641d",
         "status": "COST_UNRESOLVED",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C024": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C024_STAGE_A_V1.json",
         "result_hash": "c02de6e3d98ce1abd32e2e189a4d12225c6a6feef8f45f7c5d24061144a01224",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C025": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
         "result_ref": "discovery/results/V2-C025_STAGE_A_V1.json",
         "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
         "status": "COARSE_NET_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": true,
+        "new_identity_required": false
       }
     },
     "V2-C026": {
       "stage_a": {
-        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
         "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
         "status": "COARSE_NET_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C017": {
       "stage_a": {
-        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C017_STAGE_A_V1.json",
         "result_hash": "9870baf130d12e9864489c6d0ebe83a80b4fa3a38f1b2c5321ac03e1dc64029b",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C018": {
       "stage_a": {
-        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C018_STAGE_A_V1.json",
         "result_hash": "f1a647f633d46d26dfa2b9d971b72e4bf3c53dd4eef9971ed0503cd2018fe69c",
         "status": "COARSE_NET_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C019": {
       "stage_a": {
-        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C019_STAGE_A_V1.json",
         "result_hash": "65cf8e6358da6f304cce53a9f3ec3abfb922525c8de2f2a59ca0ce1fe637e9c6",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C020": {
       "stage_a": {
-        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C020_STAGE_A_V1.json",
         "result_hash": "28b9fac70c1b39e7d782103324327c5c6249452868293c5a9bcc4fa137a7b8c2",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C021": {
       "stage_a": {
-        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C021_STAGE_A_V1.json",
         "result_hash": "ab2b23edb01a913cc2aace95591bf004d6458cc3b3d254eca26625d211e5d1a2",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C022": {
       "stage_a": {
-        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "state": "HISTORICAL_RESULT_PRESERVED_FROZEN_SPEC_CAUSALLY_INVALID",
         "result_ref": "discovery/results/V2-C022_STAGE_A_V1.json",
         "result_hash": "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": false,
+        "new_identity_required": true
       }
     },
     "V2-C023": {
@@ -1216,30 +1236,32 @@
         "result_ref": "discovery/results/V2-C023_STAGE_A_V1.json",
         "result_hash": "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98",
         "status": "GROSS_EDGE_FAIL",
-        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+        "live_equivalent_replay_state": "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+        "same_identity_correction_allowed": true,
+        "new_identity_required": false
       }
     }
   },
   "active_result_pointers": {
-    "V2-C006_STAGE_A": "discovery/results/V2-C006_STAGE_A_V1.json",
+    "V2-C006_STAGE_A": null,
     "V2-C006_STAGE_B_CURRENT_CONFIG": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
-    "V2-C012_STAGE_A": "discovery/results/V2-C012_STAGE_A_V2.json",
+    "V2-C012_STAGE_A": null,
     "V2-C012_STAGE_B_CURRENT_CONFIG": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
-    "V2-C013_STAGE_A": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
-    "V2-C014_STAGE_A": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
-    "V2-C015_STAGE_A": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
-    "V2-C016_STAGE_A": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
-    "V2-C024_STAGE_A": "discovery/results/V2-C024_STAGE_A_V1.json",
-    "V2-C025_STAGE_A": "discovery/results/V2-C025_STAGE_A_V1.json",
-    "V2-C026_STAGE_A": "discovery/results/V2-C026_STAGE_A_V1.json",
-    "V2-C017_STAGE_A": "discovery/results/V2-C017_STAGE_A_V1.json",
-    "V2-C018_STAGE_A": "discovery/results/V2-C018_STAGE_A_V1.json",
-    "V2-C019_STAGE_A": "discovery/results/V2-C019_STAGE_A_V1.json",
-    "V2-C020_STAGE_A": "discovery/results/V2-C020_STAGE_A_V1.json",
-    "V2-C021_STAGE_A": "discovery/results/V2-C021_STAGE_A_V1.json",
-    "V2-C022_STAGE_A": "discovery/results/V2-C022_STAGE_A_V1.json",
-    "V2-C023_STAGE_A": "discovery/results/V2-C023_STAGE_A_V1.json"
+    "V2-C013_STAGE_A": null,
+    "V2-C014_STAGE_A": null,
+    "V2-C015_STAGE_A": null,
+    "V2-C016_STAGE_A": null,
+    "V2-C024_STAGE_A": null,
+    "V2-C025_STAGE_A": null,
+    "V2-C026_STAGE_A": null,
+    "V2-C017_STAGE_A": null,
+    "V2-C018_STAGE_A": null,
+    "V2-C019_STAGE_A": null,
+    "V2-C020_STAGE_A": null,
+    "V2-C021_STAGE_A": null,
+    "V2-C022_STAGE_A": null,
+    "V2-C023_STAGE_A": null
   },
   "superseded_or_invalid_historical_result_pointers": {
     "V2-C012_STAGE_A_V1": "discovery/results/V2-C012_STAGE_A_V1.json",
@@ -1258,7 +1280,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "FORENSIC_LIVE_EQUIVALENT_CORRECTION_REQUIRED",
+    "status": "FORENSIC_IDENTITY_CLASSIFICATION_CORRECTED_PENDING_REMEDIATION",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1472,7 +1494,14 @@
       "persistence_additional_attempts_consumed": 0,
       "v2_attempts_used_after_block": 16,
       "v2_search_budget_remaining_after_block": 68,
-      "economic_outcomes_opened_after_block": 19
+      "economic_outcomes_opened_after_block": 19,
+      "spec_validity_classification": {
+        "V2-C027": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY",
+        "V2-C028": "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY"
+      },
+      "pre_outcome_causality_block_current_ref": "research_v3/WAVE_04_PRE_OUTCOME_CAUSALITY_BLOCK_V2.json",
+      "same_identity_correction_allowed": false,
+      "new_identity_required": true
     }
   },
   "live_equivalent_historical_replay_contract": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
@@ -1495,5 +1524,78 @@
     "V2-C026"
   ],
   "live_equivalent_discovery_survivors": [],
-  "live_equivalent_stage_b_downstream_invalidation_authority": "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json"
+  "live_equivalent_stage_b_downstream_invalidation_authority": "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+  "v2_attempt_budget_accounting_authority": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json",
+  "frozen_spec_invalid_consumed_identities": [
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C024",
+    "V2-C026"
+  ],
+  "invalid_consumed_identities": [
+    "V2-C006",
+    "V2-C012",
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C023",
+    "V2-C024",
+    "V2-C025",
+    "V2-C026"
+  ],
+  "replacement_identity_required_for": [
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C024",
+    "V2-C026"
+  ],
+  "v2_budget_charged_candidate_ids": [
+    "V2-C006",
+    "V2-C012",
+    "V2-C023",
+    "V2-C025"
+  ],
+  "v2_historical_evaluated_candidate_ids": [
+    "V2-C006",
+    "V2-C012",
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C023",
+    "V2-C024",
+    "V2-C025",
+    "V2-C026"
+  ],
+  "v2_invalid_spec_slot_release_count": 12,
+  "v2_same_identity_correction_slot_count": 4
 }
