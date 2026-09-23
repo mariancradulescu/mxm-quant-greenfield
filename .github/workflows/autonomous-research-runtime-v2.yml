@@ -21,7 +21,7 @@ on:
         type: string
   schedule:
     # Recovery watchdog only. The inner runtime executes multiple safe transitions per invocation.
-    - cron: "*/15 * * * *"
+    - cron: "1,6,11,16,21,26,31,36,41,46,51,56 * * * *"
   push:
     branches:
       - main
@@ -167,53 +167,45 @@ jobs:
           payload="$(jq -nc             --arg ref "main"             --arg mode "${next_mode}"             --arg predecessor "${GITHUB_RUN_ID}"             '{ref:$ref,inputs:{mode:$mode,predecessor_run_id:$predecessor}}')"
           curl --fail-with-body             -X POST             -H "Accept: application/vnd.github+json"             -H "Authorization: Bearer ${GH_TOKEN}"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches"             -d "${payload}"
 
-      - name: Reconcile autonomous research control plane after acceptance
+      - name: Reconcile autonomous research control plane before director
         if: ${{ steps.mode.outputs.mode == 'resume' }}
-        shell: bash
-        run: |
-          test -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
-          test -f evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json
-          python -m research_v3.autonomous_control_plane validate > /tmp/runtime_v2_control_plane.json
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from research_v3.autonomous_control_plane import validate_repository_state
-          from research_v3.runtime_v2_primitives import atomic_write_json
-          report = validate_repository_state(".")
-          doc = {
-              "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v1",
-              "status": "READY",
-              "next_action": report["next_action"],
-              "accounting": {
-                  "v2_attempts_used": report["accounting"]["v2_attempts_used"],
-                  "v2_search_budget_remaining": report["accounting"]["v2_search_budget_remaining"],
-                  "economic_outcomes_opened": report["accounting"]["economic_outcomes_opened"],
-              },
-              "safety": report["safety"],
-              "material_issues": report["material_issues"],
-              "recoverable_conditions": report["recoverable_conditions"],
-          }
-          atomic_write_json(Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json"), doc)
-          print(json.dumps(doc, sort_keys=True, indent=2))
-          PY
-          git add research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json
-          if ! git diff --cached --quiet; then
-            git commit -m "[skip ci] Persist Runtime V2 next autonomous state"
-            if ! git push origin "HEAD:refs/heads/${TARGET_BRANCH}"; then
-              git fetch origin "${TARGET_BRANCH}"
-              git rebase "origin/${TARGET_BRANCH}"
-              git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
-            fi
-          fi
+        run: python -m research_v3.autonomous_control_plane validate
 
-      - name: Resume queued Runtime V2 operations
+      - name: Runtime V2 end-to-end director focused tests
         if: ${{ steps.mode.outputs.mode == 'resume' }}
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2
+
+      - name: Drive autonomous planning and operation materialization
+        id: director
+        if: ${{ steps.mode.outputs.mode == 'resume' }}
+        env:
+          MXM_PREDECESSOR_RUN_ID: ${{ inputs.predecessor_run_id }}
         shell: bash
         run: |
-          shopt -s nullglob
-          ops=(.runtime_v2/operations/op_*.json)
-          if (( ${#ops[@]} == 0 )); then
-            echo "No queued Runtime V2 operation; watchdog clean NOOP after control-plane reconciliation."
-            exit 0
-          fi
-          python -m research_v3.autonomous_runtime_v2 run             --root .             --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"             --lease-seconds 900             --max-operations 25             --git-checkpoint             --git-push
+          python -m research_v3.autonomous_director_v2 supervise \
+            --root . \
+            --event-name "${GITHUB_EVENT_NAME}" \
+            --run-id "${GITHUB_RUN_ID}" \
+            --run-attempt "${GITHUB_RUN_ATTEMPT}" \
+            --actor "${GITHUB_ACTOR}" \
+            --predecessor-run-id "${MXM_PREDECESSOR_RUN_ID}" \
+            --git-checkpoint \
+            --git-push
+
+      - name: Dispatch autonomous director continuation
+        if: ${{ steps.director.outputs.action == 'DISPATCH_CONTINUE' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          payload="$(jq -nc \
+            --arg ref "main" \
+            --arg predecessor "${GITHUB_RUN_ID}" \
+            '{ref:$ref,inputs:{mode:"resume",predecessor_run_id:$predecessor}}')"
+          curl --fail-with-body \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches" \
+            -d "${payload}"
