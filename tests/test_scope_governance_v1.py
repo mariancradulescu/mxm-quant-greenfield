@@ -23,10 +23,13 @@ class ScopeGovernanceTests(unittest.TestCase):
         self.assertTrue(g["diagnosis"]["research_universe_too_narrow_for_mechanism_level_inference"])
         self.assertFalse(g["constraints"]["blind_test_all_1600"])
         self.assertFalse(g["constraints"]["permanent_restriction_to_current_10"])
-    def test_gate_is_fail_closed_before_green(self):
+    def test_gate_is_closed_from_exact_head_green_and_capital_contract_is_simulation_only(self):
         s=json.loads((ROOT/"CURRENT_STATE.json").read_text())
-        self.assertEqual(s["research_scope_governance"]["status"],"PENDING_EXACT_HEAD_GREEN")
-        self.assertFalse(s["research_scope_governance"]["new_identity_creation_allowed"])
+        g=s["research_scope_governance"]
+        self.assertEqual(g["status"],"EXACT_HEAD_GREEN")
+        self.assertTrue(g["exact_head_green"])
+        self.assertTrue(g["new_identity_creation_allowed"])
+        self.assertEqual(g["exact_head_green_evidence"]["conclusion"],"SUCCESS")
         c=json.loads((ROOT/"data/CAPITAL_FLOW_AWARE_CAUSAL_GOVERNOR_V1.json").read_text())
         self.assertTrue(c["research_simulation_only"])
         self.assertFalse(c["live_order_logic"])

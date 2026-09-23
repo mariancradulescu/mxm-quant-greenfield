@@ -21,7 +21,10 @@
     "V2-C006",
     "V2-C012",
     "V2-C023",
-    "V2-C025"
+    "V2-C025",
+    "V2-C029",
+    "V2-C030",
+    "V2-C031"
   ],
   "current_stage_b_survivor_input_set": [
     "V2-C006",
@@ -32,17 +35,17 @@
     "failure_class": "STALE_HISTORICAL_LIFECYCLE_ASSUMPTIONS",
     "run_id": 35844381275
   },
-  "ledger_tail_entry_hash": "8bf62729a41509faa3d6dbee5bc9ea319aa8158cba6b86bb5dac999b62378b9b",
+  "ledger_tail_entry_hash": "cf03d6f51566431f378fd9f705795a0354ac04e57da864a16107019807b72bbc",
   "lifecycle": {
     "implementation_correction_entries": 5,
     "incomplete_corrections": {},
     "same_identity_successor_result_entries": 5
   },
   "live_equivalent_stage_b_revalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json",
-  "next_action": "REQUIRE_EXACT_HEAD_GREEN_FOR_SCOPE_GOVERNANCE_BEFORE_ANY_NEW_V2_IDENTITY",
+  "next_action": "ASSESS_C031_STAGE_B_RESEARCH_REALIZATION",
   "pending_same_identity_correction_candidate_ids": [],
   "persistence_commit": "3ef3aee7852bdb816a75cc00e7ea6d83614de53b",
-  "phase": "RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN",
+  "phase": "RESEARCH_SCOPE_GOVERNANCE_EXACT_HEAD_GREEN_C031_STAGE_B_ASSESSMENT",
   "recovery": {
     "authority_ref": "evidence/WAVE_05_POST_OUTCOME_RECOVERY_V1.json",
     "canonical_persistence_complete": true,
@@ -65,9 +68,9 @@
     "protected_evidence_opened": false
   },
   "schema": "mxm.greenfield.autonomous-research-checkpoint.v1",
-  "source_head": "15075817487ed11783933a447c97762395587b23",
+  "source_head": "3797ac6e1c84743e5aced423ae419bfa4d875aa2",
   "stage_b_revalidation_required_candidate_ids": [],
-  "status": "RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN",
+  "status": "RESEARCH_SCOPE_GOVERNANCE_EXACT_HEAD_GREEN",
   "wave05": {
     "attempts_consumed": 2,
     "candidate_ids": [
@@ -96,8 +99,8 @@
     "lifecycle_closure_ref": "research_v3/WAVE_05_POST_PERSISTENCE_GREEN_CLOSURE_V1.json"
   },
   "last_exact_head_green": {
-    "head": "64750c6044540871e28ad9ccf5491f347cff3025",
-    "workflow_run_id": 35860959413,
+    "head": "3797ac6e1c84743e5aced423ae419bfa4d875aa2",
+    "workflow_run_id": 35865806863,
     "conclusion": "SUCCESS"
   },
   "wave06": {
@@ -142,9 +145,9 @@
   },
   "user_action_required": false,
   "research_scope_governance": {
-    "status": "PENDING_EXACT_HEAD_GREEN",
-    "exact_head_green": false,
-    "new_identity_creation_allowed": false,
+    "status": "EXACT_HEAD_GREEN",
+    "exact_head_green": true,
+    "new_identity_creation_allowed": true,
     "root_cause": "RESEARCH_SCOPE_TOO_NARROW_FOR_MECHANISM_LEVEL_INFERENCE",
     "gate_ref": "data/RESEARCH_SCOPE_GOVERNANCE_V1.json",
     "required_authorities": [
@@ -157,6 +160,13 @@
     ],
     "consumed_identity_scope_count": 19,
     "mechanism_family_closed_count": 0,
-    "next_after_green": "ASSESS_C031_STAGE_B_RESEARCH_REALIZATION"
+    "next_after_green": "ASSESS_C031_STAGE_B_RESEARCH_REALIZATION",
+    "implementation_gate_ref": "data/RESEARCH_SCOPE_GOVERNANCE_V1.json",
+    "green_closure_ref": "evidence/RESEARCH_SCOPE_GOVERNANCE_GREEN_CLOSURE_V1.json",
+    "exact_head_green_evidence": {
+      "head": "3797ac6e1c84743e5aced423ae419bfa4d875aa2",
+      "workflow_run_id": 35865806863,
+      "conclusion": "SUCCESS"
+    }
   }
 }

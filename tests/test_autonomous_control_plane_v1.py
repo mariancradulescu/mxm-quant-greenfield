@@ -28,6 +28,8 @@ class AutonomousControlPlaneV1Tests(unittest.TestCase):
             self.assertEqual(report["next_action"],"REQUIRE_SCOPE_GOVERNANCE_EXACT_HEAD_GREEN")
         elif report["stage_b_revalidation_required_candidate_ids"]:
             self.assertEqual(report["next_action"],"REVALIDATE_STAGE_B")
+        elif report.get("stage_b_survivors"):
+            self.assertEqual(report["next_action"],"ASSESS_STAGE_B_SURVIVOR")
         else:
             self.assertEqual(report["next_action"],"FREEZE_NEXT_HIGH_INFORMATION_WAVE")
         self.assertTrue(any(x["wave_key"]=="wave04" for x in report["blocked_historical_waves"]))
