@@ -39,16 +39,24 @@ class Wave05FreezeTests(unittest.TestCase):
             self.assertEqual(freezes[0]["sequence"],seq); self.assertEqual(freezes[0]["spec_hash"],HASHES[cid])
             self.assertLessEqual(len(lc.results),1)
         accounting=assert_current_state_matches_repository(ROOT)
+        before=f["accounting_before"]
+        expected=f["expected_if_both_legitimately_opened"]
+        self.assertEqual(before["v2_attempts_used"],16)
+        self.assertEqual(before["v2_search_budget_remaining"],68)
+        self.assertEqual(before["economic_outcomes_opened"],23)
         if s["performance_research_v3"]["wave05"]["candidate_own_outcomes_opened"]:
-            self.assertEqual(s["v2_attempts_used"],18); self.assertEqual(s["v2_search_budget_remaining"],66)
-            self.assertEqual(s["economic_outcomes_opened"],25)
-            self.assertEqual(accounting["stage_a_result_recorded_entries"],23)
-            self.assertEqual(accounting["distinct_identity_outcomes_opened"],18)
+            # Historical Wave05 freeze invariants must remain true even after later
+            # research waves legitimately advance repository-derived totals.
+            self.assertTrue(all(len(candidate_lifecycle(ledger,cid).results)==1 for cid in IDS))
+            self.assertGreaterEqual(s["v2_attempts_used"],expected["v2_attempts_used"])
+            self.assertLessEqual(s["v2_search_budget_remaining"],expected["v2_search_budget_remaining"])
+            self.assertGreaterEqual(s["economic_outcomes_opened"],expected["economic_outcomes_opened"])
+            self.assertGreaterEqual(accounting["stage_a_result_recorded_entries"],expected["discovery_result_recorded_entries"])
+            self.assertGreaterEqual(accounting["distinct_identity_outcomes_opened"],expected["v2_evaluated_identities"])
         else:
-            self.assertEqual(s["v2_attempts_used"],16); self.assertEqual(s["v2_search_budget_remaining"],68)
-            self.assertEqual(s["economic_outcomes_opened"],23)
-            self.assertEqual(accounting["stage_a_result_recorded_entries"],21)
-            self.assertEqual(accounting["distinct_identity_outcomes_opened"],16)
+            self.assertEqual(s["v2_attempts_used"],before["v2_attempts_used"])
+            self.assertEqual(s["v2_search_budget_remaining"],before["v2_search_budget_remaining"])
+            self.assertEqual(s["economic_outcomes_opened"],before["economic_outcomes_opened"])
         self.assertEqual(s["discovery_ledger_entries"],len(ledger))
 
     def test_execution_gate_is_lifecycle_aware_and_rejects_wrong_head_before_economics(self):
