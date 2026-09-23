@@ -1,0 +1,92 @@
+name: Runtime V2 Liveness Sentinel
+
+on:
+  workflow_run:
+    workflows:
+      - Autonomous Research Runtime V2 Supervisor
+    types:
+      - completed
+  schedule:
+    # Secondary best-effort fallback only; primary liveness is event-driven workflow_run.
+    - cron: "4,19,34,49 * * * *"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: performance-research-v3-20260922
+  MXM_RUNTIME_TARGET_BRANCH: performance-research-v3-20260922
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout authoritative research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Configure durable checkpoint identity
+        run: |
+          git config user.name "mxm-runtime-v2[bot]"
+          git config user.email "mxm-runtime-v2@users.noreply.github.com"
+
+      - name: Reconcile durable control plane
+        run: python -m research_v3.autonomous_control_plane validate
+
+      - name: Focused Runtime V2 liveness tests
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2
+
+      - name: Autonomous liveness wake and director progression
+        id: director
+        shell: bash
+        run: |
+          predecessor=""
+          origin_completed=""
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_run" ]]; then
+            predecessor="${{ github.event.workflow_run.id }}"
+            origin_completed="${{ github.event.workflow_run.updated_at }}"
+          fi
+
+          python -m research_v3.autonomous_director_v2 supervise \
+            --root . \
+            --event-name "${GITHUB_EVENT_NAME}" \
+            --run-id "${GITHUB_RUN_ID}" \
+            --run-attempt "${GITHUB_RUN_ATTEMPT}" \
+            --actor "${GITHUB_ACTOR}" \
+            --predecessor-run-id "${predecessor}" \
+            --wake-origin-completed-at "${origin_completed}" \
+            --git-checkpoint \
+            --git-push
+
+      - name: Dispatch next supervisor run when legal continuation exists
+        if: ${{ steps.director.outputs.action == 'DISPATCH_CONTINUE' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          payload="$(jq -nc \
+            --arg ref "main" \
+            --arg predecessor "${GITHUB_RUN_ID}" \
+            '{ref:$ref,inputs:{mode:"resume",predecessor_run_id:$predecessor}}')"
+          curl --fail-with-body \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches" \
+            -d "${payload}"
