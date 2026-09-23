@@ -98,7 +98,11 @@ class PerformanceResearchV3Wave04FreezeTests(unittest.TestCase):
         self.assertEqual(block["consumed_identity_law"]["attempts_consumed"],0)
         self.assertEqual(block["consumed_identity_law"]["v2_attempts_used_remains"],16)
         self.assertTrue(block["disposition"]["authorization_revoked"])
-        self.assertFalse(block["disposition"]["execute_frozen_wave04"])\n        current=load(CURRENT_BLOCK_REF)\n        self.assertEqual(current["status"],"BLOCKED_PRE_OUTCOME_FROZEN_SPEC_CAUSALLY_INVALID")\n        self.assertTrue(all(v=="FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY" for v in current["classifications"].values()))\n        self.assertEqual(current["attempts_consumed"],0)
+        self.assertFalse(block["disposition"]["execute_frozen_wave04"])
+        current=load(CURRENT_BLOCK_REF)
+        self.assertEqual(current["status"],"BLOCKED_PRE_OUTCOME_FROZEN_SPEC_CAUSALLY_INVALID")
+        self.assertTrue(all(v=="FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY" for v in current["classifications"].values()))
+        self.assertEqual(current["attempts_consumed"],0)
 
     def test_06_live_equivalent_contract_forbids_future_exit_admission(self):
         contract=load(CONTRACT_REF)
