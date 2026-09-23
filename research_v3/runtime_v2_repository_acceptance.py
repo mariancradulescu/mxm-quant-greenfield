@@ -25,6 +25,7 @@ from research_v3.runtime_v2_primitives import (
 
 STATE_REL = "research_v3/runtime_v2_acceptance/REPOSITORY_LIVENESS_STATE.json"
 REPORT_REL = "research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json"
+GATE_REL = "evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json"
 CHECKPOINT_REL = "research_v3/AUTONOMOUS_CHECKPOINT_V1.json"
 DISCOVERY_LEDGER_REL = "discovery/ledger.jsonl"
 SCHEMA = "mxm.greenfield.runtime-v2-repository-liveness.v1"
@@ -202,16 +203,37 @@ def verify(root: Path) -> dict[str, Any]:
     if report.get("economics_opened_during_fix") != 0:
         raise RuntimeError("acceptance indicates project economics changed")
     current = _assert_unchanged(root, dict(state.get("baseline_accounting") or {}))
-    if state.get("report_sha256") != sha256_file(root / REPORT_REL):
+    report_hash = sha256_file(root / REPORT_REL)
+    if state.get("report_sha256") != report_hash:
         raise RuntimeError("persisted acceptance report hash mismatch")
+    verification_run_id = _ctx()["run_id"]
+    gate = {
+        "schema": "mxm.greenfield.autonomous-research-runtime-v2-acceptance-gate.v1",
+        "runtime_version": RUNTIME_VERSION,
+        "status": "PASS",
+        "economic_resume_gate_open": True,
+        "report_ref": REPORT_REL,
+        "report_sha256": report_hash,
+        "repository_level_liveness": "PASS",
+        "zero_human_continuation": "PASS",
+        "economics_opened_during_fix": 0,
+        "verification_run_id": verification_run_id,
+        "verified_utc": iso(),
+    }
+    atomic_write_json(root / GATE_REL, gate)
+    state["status"] = "VERIFIED_GREEN_PENDING_SUPERVISOR_COMPLETION"
+    state["phase"] = 3
+    state["verification_run_id"] = verification_run_id
+    state["verified_utc"] = iso()
+    atomic_write_json(root / STATE_REL, state)
     return {
         "action": "VERIFIED",
         "status": "PASS",
-        "report_sha256": sha256_file(root / REPORT_REL),
+        "report_sha256": report_hash,
         "accounting": current,
         "first_run_id": state.get("first_run_id"),
         "resume_run_id": state.get("resume_run_id"),
-        "verification_run_id": _ctx()["run_id"],
+        "verification_run_id": verification_run_id,
     }
 
 
