@@ -59,6 +59,9 @@ class SameIdentityPersistenceV1Tests(unittest.TestCase):
           "performance_research_v3":{"status":"PENDING"},
           "discovery_survivors":[],"current_stage_b_survivor_input_set":[],"live_equivalent_discovery_survivors":[],
         }
+        c12=state["current_result_authority"]["V2-C012"]["stage_a"]
+        c12["corrected_successor_ref"]=c12.pop("result_ref")
+        c12["corrected_successor_hash"]=c12.pop("result_hash")
         (self.root/"CURRENT_STATE.json").write_text(json.dumps(state,indent=2)+"\n")
         audit={"status":"X","groups":{"implementation_only_same_semantics_correctable":list(CORRECTION_IDS)},"attempt_accounting":{"historical_evaluated_candidate_ids":list(CORRECTION_IDS),"budget_charged_candidate_ids":list(CORRECTION_IDS),"pending_same_identity_correction_candidate_ids":list(CORRECTION_IDS)}}
         (self.root/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json").write_text(json.dumps(audit,indent=2)+"\n")
@@ -74,6 +77,7 @@ class SameIdentityPersistenceV1Tests(unittest.TestCase):
         self.assertEqual(s["stage_a_result_recorded_entries"],8); self.assertEqual(s["economic_outcomes_opened"],10)
         self.assertEqual(s["pending_same_identity_correction_candidate_ids"],[])
         self.assertEqual(set(s["current_live_equivalent_authoritative_candidate_ids"]),set(CORRECTION_IDS))
+        self.assertEqual(s["current_result_authority"]["V2-C012"]["stage_a"]["historical_result_ref"],"discovery/results/V2-C012_STAGE_A_V1.json")
         rows=read_ledger(self.root/"discovery/ledger.jsonl")
         self.assertEqual(sum(r["entry_type"]=="IMPLEMENTATION_CORRECTION" and r.get("payload",{}).get("correction_id")==CORRECTION_ID for r in rows),4)
         self.assertEqual(sum(r["entry_type"]=="RESULT_RECORDED" and r.get("payload",{}).get("correction_id")==CORRECTION_ID for r in rows),4)
