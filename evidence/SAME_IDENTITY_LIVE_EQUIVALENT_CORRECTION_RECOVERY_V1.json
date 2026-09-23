@@ -1,0 +1,155 @@
+{
+  "schema": "mxm.greenfield.same-identity-live-equivalent-post-outcome-recovery.v1",
+  "status": "POST_OUTCOME_ARTIFACT_LOSS_RECONSTRUCTED_WITHOUT_ECONOMIC_REEXECUTION",
+  "recorded_utc": "2026-09-23T09:36:00Z",
+  "correction_id": "SAME_IDENTITY_LIVE_EQUIVALENT_CORRECTION_V1",
+  "exact_head_green_gate": {
+    "head": "136377a6c8a63489e9c4b4469353ac8810a50b39",
+    "run_id": 35843803545,
+    "conclusion": "SUCCESS"
+  },
+  "correction_code": {
+    "ref": "research_v3/same_identity_live_equivalent_correction_v1.py",
+    "sha256": "1b3ed935e9bdf51f22901d7666a49f11d5a65fd6ba95915b758116d69d6f97e0",
+    "git_blob_sha1": "84454b89a4c79f398c67390e7def96ed05d1e8c3"
+  },
+  "persistence": {
+    "ref": "research_v3/same_identity_persistence_v1.py",
+    "same_identity": true,
+    "semantic_change": false,
+    "additional_v2_attempt_delta": 0,
+    "idempotent": true
+  },
+  "input_authorities": {
+    "pw02_reconciled_dataset_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+    "v6_dataset_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
+    "us500_cost_sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+    "nas100_c012_cost_sha256": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+  },
+  "candidates": {
+    "V2-C006": {
+      "outcome_already_observed_before_stall": true,
+      "reconstruction": "HISTORICAL_ECONOMICS_IDENTICAL_AFTER_CAUSAL_CONTROL_FLOW_CORRECTION",
+      "admitted_entries": 108,
+      "settled_entries": 108,
+      "right_censored_entries": 0,
+      "semantic_replay_manifest_sha256": "c25d60d19abca607360c86ef01072429431882350d36d9db740f4546544219a0",
+      "historical_result_sequence": 21,
+      "corrected_result_ref": "discovery/results/V2-C006_STAGE_A_V2.json",
+      "corrected_result_hash": "ded8e570ff089c27e711d4e2187b182cb921fba7d6a7320ff07ef381b1f65e2d",
+      "status": "DISCOVERY_SURVIVOR"
+    },
+    "V2-C012": {
+      "outcome_already_observed_before_stall": true,
+      "reconstruction": "HISTORICAL_ECONOMICS_IDENTICAL_AFTER_CAUSAL_CONTROL_FLOW_CORRECTION",
+      "admitted_entries": 34,
+      "settled_entries": 34,
+      "right_censored_entries": 0,
+      "semantic_replay_manifest_sha256": "e64188f8ea77c3e24585fddc0d65afca308ca090df1e34e2066317727c76774e",
+      "historical_result_sequence": 42,
+      "corrected_result_ref": "discovery/results/V2-C012_STAGE_A_V3.json",
+      "corrected_result_hash": "897eb0d6787b38470c72040cf6109397b398d77ecf9a7a65eb9c287bab1fac8e",
+      "status": "DISCOVERY_SURVIVOR"
+    },
+    "V2-C023": {
+      "outcome_already_observed_before_stall": true,
+      "reconstruction": "HISTORICAL_ECONOMICS_IDENTICAL_AFTER_CAUSAL_PENDING_EXIT_CORRECTION",
+      "admitted_entries": 386,
+      "settled_entries": 386,
+      "right_censored_entries": 0,
+      "settled_trade_manifest_sha256": "1933ac85f29962ceece712457134906f55967c527cb5852a640ad151c60a3b95",
+      "historical_result_sequence": 40,
+      "corrected_result_ref": "discovery/results/V2-C023_STAGE_A_V2.json",
+      "corrected_result_hash": "7a2ddce8a2bad2ec8baeca3d21494e30ea235cbaea64ebce367e9658f639be25",
+      "status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C025": {
+      "outcome_already_observed_before_stall": true,
+      "reconstruction": "DATA_INSUFFICIENT_FROM_CAUSALLY_ADMITTED_POST_ENTRY_SETTLEMENT_GAPS",
+      "admitted_entries": 1586,
+      "settled_entries": 1583,
+      "right_censored_entries": 0,
+      "post_entry_settlement_invalid_count": 3,
+      "settled_trade_manifest_sha256": "2ed7220daa0aff6b915c1cdc3f16c200d5ea9a926c718a59340bd1c5660b17e6",
+      "training_examples_with_invalid_post_entry_settlement": 115,
+      "pending_training_examples_at_end": 1,
+      "invalid_entries": [
+        {
+          "symbol": "GBPUSD",
+          "entry_time": "2026-08-14T20:45:00+00:00",
+          "expected_target_bar_time": "2026-08-14T20:55:00+00:00",
+          "classification": "POST_ENTRY_SETTLEMENT_DATA_INVALID"
+        },
+        {
+          "symbol": "USDCHF",
+          "entry_time": "2026-07-31T20:45:00+00:00",
+          "expected_target_bar_time": "2026-07-31T20:55:00+00:00",
+          "classification": "POST_ENTRY_SETTLEMENT_DATA_INVALID"
+        },
+        {
+          "symbol": "ETHUSD",
+          "entry_time": "2026-08-21T20:45:00+00:00",
+          "expected_target_bar_time": "2026-08-21T20:55:00+00:00",
+          "classification": "POST_ENTRY_SETTLEMENT_DATA_INVALID"
+        }
+      ],
+      "corrected_result_ref": "discovery/results/V2-C025_STAGE_A_V2.json",
+      "corrected_result_hash": "73f5c13fd72c118cf533430063351cef18060c3ac4e739c8b5e3b285a4bc9336",
+      "status": "DATA_INSUFFICIENT"
+    }
+  },
+  "accounting": {
+    "before": {
+      "v2_attempts_used": 16,
+      "v2_search_budget_remaining": 68,
+      "v2_evaluated_identities": 16,
+      "economic_outcomes_opened": 19,
+      "stage_a_result_recorded_entries": 17,
+      "stage_b_current_config_economic_observations": 2
+    },
+    "after": {
+      "v2_attempts_used": 16,
+      "v2_search_budget_remaining": 68,
+      "v2_evaluated_identities": 16,
+      "economic_outcomes_opened": 23,
+      "stage_a_result_recorded_entries": 21,
+      "stage_b_current_config_economic_observations": 2,
+      "distinct_identity_outcomes_opened": 16
+    },
+    "decomposition": "21 Stage-A RESULT_RECORDED observations + 2 Stage-B current-config observations = 23 economic outcomes; search budget remains 16 distinct V2 identities."
+  },
+  "ledger": {
+    "before_entries": 54,
+    "after_entries": 62,
+    "sequences": {
+      "V2-C006": {
+        "correction_sequence": 55,
+        "result_sequence": 56,
+        "result_entry_hash": "84620f7223fe1ffefeef53c96e023ab5eb830a7ef3bfcd976002c8068b8d0238"
+      },
+      "V2-C012": {
+        "correction_sequence": 57,
+        "result_sequence": 58,
+        "result_entry_hash": "d24ca194be43e312e323897b85ef1c29bf283c68a46e19829ebe543e66291e83"
+      },
+      "V2-C023": {
+        "correction_sequence": 59,
+        "result_sequence": 60,
+        "result_entry_hash": "8993854ab7fdeeabf230f291cf6afb1f2dfeeea823ba2aea75e255041ff69a3d"
+      },
+      "V2-C025": {
+        "correction_sequence": 61,
+        "result_sequence": 62,
+        "result_entry_hash": "69d99c52e7486e1a2c6271437ae5b159e942f10b013ccae3e6a5e477affea250"
+      }
+    },
+    "new_tail_entry_hash": "69d99c52e7486e1a2c6271437ae5b159e942f10b013ccae3e6a5e477affea250"
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "rescue_tuning": false,
+    "new_candidate_identity_created": false
+  }
+}

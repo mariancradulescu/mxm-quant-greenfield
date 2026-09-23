@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.v2.consumed-identity-forensic-audit.v3",
-  "status": "COMPLETE_PER_IDENTITY_CLASSIFICATION_AND_EXPOSURE_ACCOUNTING",
+  "status": "COMPLETE_PER_IDENTITY_CLASSIFICATION_EXPOSURE_ACCOUNTING_AND_CORRECTION_LIFECYCLE",
   "recorded_utc": "2026-09-23T07:38:00Z",
   "baseline_head": "5049d09f484f3215198f389c4099ec1c2079f217",
   "supersedes_for_current_classification": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json",
@@ -562,12 +562,7 @@
     ],
     "v2_attempts_used": 16,
     "v2_search_budget_remaining": 68,
-    "pending_same_identity_correction_candidate_ids": [
-      "V2-C006",
-      "V2-C012",
-      "V2-C023",
-      "V2-C025"
-    ],
+    "pending_same_identity_correction_candidate_ids": [],
     "invalid_frozen_spec_candidate_ids": [
       "V2-C013",
       "V2-C014",
@@ -583,8 +578,6 @@
       "V2-C026"
     ],
     "invalid_result_authority_candidate_ids": [
-      "V2-C006",
-      "V2-C012",
       "V2-C013",
       "V2-C014",
       "V2-C015",
@@ -595,9 +588,7 @@
       "V2-C020",
       "V2-C021",
       "V2-C022",
-      "V2-C023",
       "V2-C024",
-      "V2-C025",
       "V2-C026"
     ],
     "refunded_candidate_ids": [],
@@ -618,10 +609,22 @@
     ],
     "global_attempts_seen_for_information_exposure": 32,
     "distinct_identity_outcomes_opened": 16,
-    "stage_a_result_recorded_entries": 17,
+    "stage_a_result_recorded_entries": 21,
     "stage_b_current_config_economic_observations": 2,
-    "economic_outcomes_opened_historical": 19,
-    "historical_bytes_deleted": false
+    "economic_outcomes_opened_historical": 23,
+    "historical_bytes_deleted": false,
+    "corrected_same_identity_candidate_ids": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C023",
+      "V2-C025"
+    ],
+    "current_live_equivalent_authoritative_candidate_ids": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C023",
+      "V2-C025"
+    ]
   },
   "stage_b": {
     "current_valid_stage_b_inputs": [],
@@ -636,7 +639,26 @@
     "data_validity": "ORTHOGONAL_TO_OUTCOME_EXPOSURE_AND_RESULT_AUTHORITY",
     "outcome_exposure": "17_STAGE_A_RESULT_RECORDS_PLUS_2_STAGE_B_CURRENT_CONFIG_OBSERVATIONS",
     "search_budget_identity_consumption": "16_DISTINCT_V2_STAGE_A_IDENTITIES_WITH_OPENED_OUTCOMES",
-    "current_live_equivalent_economic_result_authority": "NONE_PENDING_REMEDIATION",
-    "protected_forward_opened": false
+    "current_live_equivalent_economic_result_authority": [
+      "V2-C006",
+      "V2-C012",
+      "V2-C023",
+      "V2-C025"
+    ],
+    "protected_forward_opened": false,
+    "current_invalid_result_authority_candidate_ids": [
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C024",
+      "V2-C026"
+    ]
   }
 }
