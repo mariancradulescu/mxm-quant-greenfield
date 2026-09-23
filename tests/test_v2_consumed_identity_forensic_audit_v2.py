@@ -36,7 +36,7 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
         self.assertEqual(state["discovery_survivors"],[])
         self.assertEqual(state["current_stage_b_survivor_input_set"],[])
         self.assertEqual(set(state["v2_budget_charged_candidate_ids"]),set(ALL))
-        self.assertEqual(set(state["pending_same_identity_correction_candidate_ids"]),set(IMPLEMENTATION_ONLY))
+        self.assertEqual(set(state["pending_same_identity_correction_candidate_ids"]),set(generated["attempt_accounting"]["pending_same_identity_correction_candidate_ids"]))
         self.assertEqual(set(state["invalid_frozen_spec_candidate_ids"]),set(SPEC_INVALID))
         self.assertEqual(state["current_live_equivalent_authoritative_candidate_ids"],[])
         self.assertEqual(state["distinct_identity_outcomes_opened"],16)
