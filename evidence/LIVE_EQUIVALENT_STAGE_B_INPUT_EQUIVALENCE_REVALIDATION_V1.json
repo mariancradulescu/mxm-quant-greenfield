@@ -1,0 +1,88 @@
+{
+  "schema": "mxm.greenfield.live-equivalent-stage-b-input-equivalence-revalidation.v1",
+  "status": "PASS_EXISTING_STAGE_B_RESULTS_REVALIDATED_NO_ECONOMIC_RERUN",
+  "recorded_utc": "2026-09-23T10:25:00Z",
+  "exact_head_green_before_revalidation": {
+    "head": "d93de1904ba90f75207585347e4b6dbd1d7a1141",
+    "workflow_run_id": 35847998022,
+    "conclusion": "SUCCESS"
+  },
+  "governing_contract_ref": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
+  "upstream_correction_ref": "evidence/SAME_IDENTITY_LIVE_EQUIVALENT_CORRECTION_RECOVERY_V1.json",
+  "downstream_invalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+  "method": "PRE_ECONOMIC_INPUT_EQUIVALENCE_ONLY",
+  "economics_rerun_performed": false,
+  "new_economic_outcomes_opened": 0,
+  "additional_v2_attempts_consumed": 0,
+  "candidates": {
+    "V2-C006": {
+      "current_stage_a_ref": "discovery/results/V2-C006_STAGE_A_V2.json",
+      "current_stage_a_result_hash": "ded8e570ff089c27e711d4e2187b182cb921fba7d6a7320ff07ef381b1f65e2d",
+      "current_live_equivalent_intent_count": 108,
+      "current_live_equivalent_stage_b_serialized_intent_manifest_sha256": "6e320849ba49136b5491ecab75bc0ce5c36715a2c2202ade9d97443b41b9a515",
+      "stage_b_original_input_manifest_sha256": "6e320849ba49136b5491ecab75bc0ce5c36715a2c2202ade9d97443b41b9a515",
+      "exact_manifest_match": true,
+      "stage_b_result_ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+      "stage_b_result_sha256": "72e1c6dd94969add768d5640c245a3cd400fa4e5777fd518b3cf09de872e8d6f",
+      "stage_b_executed_trades": 108,
+      "stage_b_starting_equity_eur": 200,
+      "stage_b_terminal_equity_eur": 258.6947216647057,
+      "stage_b_net_pnl_eur": 58.6947216647057
+    },
+    "V2-C012": {
+      "current_stage_a_ref": "discovery/results/V2-C012_STAGE_A_V3.json",
+      "current_stage_a_result_hash": "897eb0d6787b38470c72040cf6109397b398d77ecf9a7a65eb9c287bab1fac8e",
+      "current_live_equivalent_intent_count": 34,
+      "current_live_equivalent_stage_b_serialized_intent_manifest_sha256": "645e1d89a5a61c6f757fc4ac1e7f5a7729d847efab9e207c6a02da72e4d9995a",
+      "prior_corrected_stage_b_input_manifest_sha256": "645e1d89a5a61c6f757fc4ac1e7f5a7729d847efab9e207c6a02da72e4d9995a",
+      "exact_manifest_match": true,
+      "stage_b_result_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
+      "stage_b_result_hash": "91c9306b594110a2ae8cac25acdd10ecb6d7949f2cda7f2331ae9f514059f287",
+      "stage_b_executed_trades": 34,
+      "stage_b_starting_equity_eur": 200,
+      "stage_b_terminal_equity_eur": 275.0412454262676,
+      "stage_b_net_pnl_eur": 75.0412454262676
+    }
+  },
+  "unchanged_stage_b_semantics": {
+    "transaction_cost_rule_ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "us500_transaction_local_cost_sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+    "nas100_transaction_local_cost_sha256": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999",
+    "current_margin_authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+    "current_margin_authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+    "current_evaluator_ref": "m6/stage_b_current_config_evaluator.py",
+    "current_evaluator_git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
+    "C006_margin_eur": {
+      "buy": 33.38,
+      "sell": 33.38
+    },
+    "C012_margin_eur": {
+      "buy": 129.04,
+      "sell": 129.03
+    },
+    "starting_capital_eur": 200
+  },
+  "conclusion": {
+    "C006": "REVALIDATE_EXISTING_STAGE_B_V1_BY_EXACT_INPUT_EQUIVALENCE",
+    "C012": "REVALIDATE_EXISTING_STAGE_B_V2_BY_EXACT_INPUT_EQUIVALENCE",
+    "economic_rerun_required": false,
+    "reason": "Corrected live-equivalent Stage-A emits the exact Stage-B serialized intent manifests previously consumed by the cited Stage-B outcomes; frozen cost, evaluator, broker-current margin and EUR200 capital semantics are unchanged."
+  },
+  "accounting_before": {
+    "v2_attempts_used": 16,
+    "v2_search_budget_remaining": 68,
+    "v2_evaluated_identities": 16,
+    "economic_outcomes_opened": 23
+  },
+  "accounting_after": {
+    "v2_attempts_used": 16,
+    "v2_search_budget_remaining": 68,
+    "v2_evaluated_identities": 16,
+    "economic_outcomes_opened": 23
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
