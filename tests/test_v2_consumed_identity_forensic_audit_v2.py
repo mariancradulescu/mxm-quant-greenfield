@@ -8,19 +8,19 @@ ROOT=Path(__file__).resolve().parents[1]
 class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
     def test_candidate_by_candidate_classification_and_accounting(self):
         generated=build_audit(ROOT)
-        self.assertEqual(generated["status"],"COMPLETE_PER_IDENTITY_CLASSIFICATION")
+        self.assertEqual(generated["status"],"COMPLETE_PER_IDENTITY_CLASSIFICATION_AND_EXPOSURE_ACCOUNTING")
         self.assertEqual(generated["groups"]["implementation_only_same_semantics_correctable"],sorted(IMPLEMENTATION_ONLY))
         self.assertEqual(generated["groups"]["frozen_spec_causally_invalid_requires_new_identity"],sorted(SPEC_INVALID))
         self.assertEqual(generated["attempt_accounting"]["historical_evaluated_identity_count"],16)
-        self.assertEqual(generated["attempt_accounting"]["v2_attempts_used"],4)
-        self.assertEqual(generated["attempt_accounting"]["v2_search_budget_remaining"],80)
-        self.assertEqual(generated["attempt_accounting"]["released_invalid_spec_slot_count"],12)
+        self.assertEqual(generated["attempt_accounting"]["v2_attempts_used"],16)
+        self.assertEqual(generated["attempt_accounting"]["v2_search_budget_remaining"],68)
+        self.assertEqual(generated["attempt_accounting"]["refunded_slot_count"],0)
 
     def test_committed_authority_matches_generated_classification(self):
         generated=build_audit(ROOT)
         committed=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json").read_text())
         self.assertEqual(committed["classifications"],generated["classifications"])
-        for key in ("historical_evaluated_candidate_ids","budget_charged_candidate_ids","v2_attempts_used","v2_search_budget_remaining","released_invalid_spec_candidate_ids"):
+        for key in ("historical_evaluated_candidate_ids","budget_charged_candidate_ids","v2_attempts_used","v2_search_budget_remaining","pending_same_identity_correction_candidate_ids","invalid_frozen_spec_candidate_ids","refunded_candidate_ids"):
             self.assertEqual(committed["attempt_accounting"][key],generated["attempt_accounting"][key])
 
     def test_current_state_separates_historical_exposure_from_budget_charge(self):
@@ -28,15 +28,20 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
         self.assertEqual(state["forensic_consumed_identity_audit_authority"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json")
         self.assertEqual(set(state["implementation_invalid_consumed_identities"]),set(IMPLEMENTATION_ONLY))
         self.assertEqual(set(state["frozen_spec_invalid_consumed_identities"]),set(SPEC_INVALID))
-        self.assertEqual(state["v2_attempts_used"],4)
+        self.assertEqual(state["v2_attempts_used"],16)
         self.assertEqual(state["v2_evaluated_identities"],16)
-        self.assertEqual(state["v2_search_budget_remaining"],80)
+        self.assertEqual(state["v2_search_budget_remaining"],68)
         self.assertEqual(state["global_attempts_seen"],32)
         self.assertEqual(state["economic_outcomes_opened"],19)
         self.assertEqual(state["discovery_survivors"],[])
         self.assertEqual(state["current_stage_b_survivor_input_set"],[])
-        for cid in ALL:
-            self.assertIsNone(state["active_result_pointers"][f"{cid}_STAGE_A"])
+        self.assertEqual(set(state["v2_budget_charged_candidate_ids"]),set(ALL))
+        self.assertEqual(set(state["pending_same_identity_correction_candidate_ids"]),set(IMPLEMENTATION_ONLY))
+        self.assertEqual(set(state["invalid_frozen_spec_candidate_ids"]),set(SPEC_INVALID))
+        self.assertEqual(state["current_live_equivalent_authoritative_candidate_ids"],[])
+        self.assertEqual(state["distinct_identity_outcomes_opened"],16)
+        self.assertEqual(state["stage_a_result_recorded_entries"],17)
+        self.assertEqual(state["stage_b_current_config_economic_observations"],2)
         for cid in IMPLEMENTATION_ONLY:
             a=state["current_result_authority"][cid]["stage_a"]
             self.assertEqual(a["live_equivalent_replay_state"],"IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE")
