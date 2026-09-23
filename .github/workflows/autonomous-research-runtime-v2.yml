@@ -1,22 +1,36 @@
-name: Autonomous Research Runtime V2
+name: Autonomous Research Runtime V2 Supervisor
 
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Runtime entry mode
+        description: Supervisor entry mode
         required: true
-        default: resume
+        default: auto
         type: choice
         options:
-          - resume
+          - auto
           - acceptance
+          - acceptance_continue
+          - acceptance_verify
+          - resume
+      predecessor_run_id:
+        description: Internal predecessor run id for zero-human continuation proof
+        required: false
+        default: ""
+        type: string
   schedule:
-    # Low-frequency watchdog only; the state machine decides whether any action is legal.
-    - cron: "17 */6 * * *"
+    # Recovery watchdog only. The inner runtime executes multiple safe transitions per invocation.
+    - cron: "*/15 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/autonomous-research-runtime-v2.yml"
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
@@ -28,7 +42,7 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  runtime-v2:
+  supervisor:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -49,23 +63,153 @@ jobs:
           git config user.name "mxm-runtime-v2[bot]"
           git config user.email "mxm-runtime-v2@users.noreply.github.com"
 
-      - name: Runtime V2 focused tests
+      - name: Resolve supervisor mode
+        id: mode
+        shell: bash
+        run: |
+          requested="${{ inputs.mode }}"
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            mode="acceptance"
+          elif [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
+            if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
+              mode="resume"
+            else
+              mode="acceptance"
+            fi
+          elif [[ -z "${requested}" || "${requested}" == "auto" ]]; then
+            if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
+              mode="resume"
+            else
+              mode="acceptance"
+            fi
+          else
+            mode="${requested}"
+          fi
+          echo "mode=${mode}" >> "${GITHUB_OUTPUT}"
+          echo "Resolved mode: ${mode}"
+
+      - name: Runtime V2 focused acceptance tests
+        if: ${{ startsWith(steps.mode.outputs.mode, 'acceptance') }}
         run: python -m unittest -v tests.test_autonomous_runtime_v2
 
-      - name: Zero-human continuation acceptance demonstration
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'acceptance' }}
+      - name: Advance repository-level liveness acceptance
+        id: acceptance
+        if: ${{ steps.mode.outputs.mode == 'acceptance' || steps.mode.outputs.mode == 'acceptance_continue' }}
+        shell: bash
         run: |
-          mkdir -p research_v3/runtime_v2_acceptance
-          python research_v3/autonomous_runtime_v2.py acceptance \
-            --report research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
+          origin=""
+          if [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
+            origin="scheduled_watchdog"
+          elif [[ "${{ steps.mode.outputs.mode }}" == "acceptance_continue" ]]; then
+            origin="predecessor_workflow_dispatch"
+          fi
+          MXM_PREDECESSOR_RUN_ID="${{ inputs.predecessor_run_id }}"           MXM_CONTINUATION_ORIGIN="${origin}"           python research_v3/runtime_v2_repository_acceptance.py advance --root .
 
-      - name: Resume durable autonomous research state machine
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'resume') }}
+      - name: Persist liveness acceptance checkpoint
+        if: ${{ steps.acceptance.outputs.action == 'DISPATCH_CONTINUE' || steps.acceptance.outputs.action == 'DISPATCH_VERIFY' }}
+        shell: bash
         run: |
-          python research_v3/autonomous_runtime_v2.py run \
-            --root . \
-            --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --lease-seconds 900 \
-            --max-operations 25 \
-            --git-checkpoint \
-            --git-push
+          git add research_v3/runtime_v2_acceptance
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "[skip ci] Runtime V2 repository liveness checkpoint"
+          if ! git push origin "HEAD:refs/heads/${TARGET_BRANCH}"; then
+            git fetch origin "${TARGET_BRANCH}"
+            git rebase "origin/${TARGET_BRANCH}"
+            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          fi
+
+      - name: Verify persisted repository-level acceptance
+        id: verify
+        if: ${{ steps.mode.outputs.mode == 'acceptance_verify' }}
+        env:
+          MXM_PREDECESSOR_RUN_ID: ${{ inputs.predecessor_run_id }}
+          MXM_CONTINUATION_ORIGIN: predecessor_workflow_dispatch
+        run: python research_v3/runtime_v2_repository_acceptance.py verify --root .
+
+      - name: Persist verified Runtime V2 acceptance gate
+        if: ${{ steps.verify.outputs.action == 'VERIFIED' }}
+        shell: bash
+        run: |
+          git add research_v3/runtime_v2_acceptance evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "[skip ci] Verify Runtime V2 repository liveness acceptance"
+          if ! git push origin "HEAD:refs/heads/${TARGET_BRANCH}"; then
+            git fetch origin "${TARGET_BRANCH}"
+            git rebase "origin/${TARGET_BRANCH}"
+            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          fi
+
+      - name: Dispatch explicit continuation
+        if: ${{ steps.acceptance.outputs.action == 'DISPATCH_CONTINUE' || steps.acceptance.outputs.action == 'DISPATCH_VERIFY' || steps.verify.outputs.action == 'VERIFIED' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          action="${{ steps.acceptance.outputs.action }}"
+          if [[ "${{ steps.verify.outputs.action }}" == "VERIFIED" ]]; then
+            next_mode="resume"
+          elif [[ "${action}" == "DISPATCH_CONTINUE" ]]; then
+            next_mode="acceptance_continue"
+          elif [[ "${action}" == "DISPATCH_VERIFY" ]]; then
+            next_mode="acceptance_verify"
+          else
+            echo "No continuation required"
+            exit 0
+          fi
+          payload="$(jq -nc             --arg ref "main"             --arg mode "${next_mode}"             --arg predecessor "${GITHUB_RUN_ID}"             '{ref:$ref,inputs:{mode:$mode,predecessor_run_id:$predecessor}}')"
+          curl --fail-with-body             -X POST             -H "Accept: application/vnd.github+json"             -H "Authorization: Bearer ${GH_TOKEN}"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches"             -d "${payload}"
+
+      - name: Reconcile autonomous research control plane after acceptance
+        if: ${{ steps.mode.outputs.mode == 'resume' }}
+        shell: bash
+        run: |
+          test -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
+          test -f evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json
+          python research_v3/autonomous_control_plane.py validate > /tmp/runtime_v2_control_plane.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research_v3.autonomous_control_plane import validate_repository_state
+          from research_v3.runtime_v2_primitives import atomic_write_json
+          report = validate_repository_state(".")
+          doc = {
+              "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v1",
+              "status": "READY",
+              "next_action": report["next_action"],
+              "accounting": {
+                  "v2_attempts_used": report["accounting"]["v2_attempts_used"],
+                  "v2_search_budget_remaining": report["accounting"]["v2_search_budget_remaining"],
+                  "economic_outcomes_opened": report["accounting"]["economic_outcomes_opened"],
+              },
+              "safety": report["safety"],
+              "material_issues": report["material_issues"],
+              "recoverable_conditions": report["recoverable_conditions"],
+          }
+          atomic_write_json(Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json"), doc)
+          print(json.dumps(doc, sort_keys=True, indent=2))
+          PY
+          git add research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json
+          if ! git diff --cached --quiet; then
+            git commit -m "[skip ci] Persist Runtime V2 next autonomous state"
+            if ! git push origin "HEAD:refs/heads/${TARGET_BRANCH}"; then
+              git fetch origin "${TARGET_BRANCH}"
+              git rebase "origin/${TARGET_BRANCH}"
+              git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+            fi
+          fi
+
+      - name: Resume queued Runtime V2 operations
+        if: ${{ steps.mode.outputs.mode == 'resume' }}
+        shell: bash
+        run: |
+          shopt -s nullglob
+          ops=(.runtime_v2/operations/op_*.json)
+          if (( ${#ops[@]} == 0 )); then
+            echo "No queued Runtime V2 operation; watchdog clean NOOP after control-plane reconciliation."
+            exit 0
+          fi
+          python research_v3/autonomous_runtime_v2.py run             --root .             --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"             --lease-seconds 900             --max-operations 25             --git-checkpoint             --git-push
