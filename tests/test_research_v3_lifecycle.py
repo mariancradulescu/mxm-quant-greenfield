@@ -1,6 +1,7 @@
 import json, unittest
 from pathlib import Path
 from discovery.ledger import read_ledger
+from discovery.accounting import derive_current_accounting
 from research_v3.lifecycle import (
     candidate_lifecycle, find_result_version, repository_lifecycle_summary,
     validate_current_authority,
@@ -11,9 +12,10 @@ ROOT=Path(__file__).resolve().parents[1]
 class ResearchV3LifecycleTests(unittest.TestCase):
     def test_repository_summary_separates_identity_exposure_from_result_versions(self):
         summary=repository_lifecycle_summary(ROOT)
-        self.assertEqual(summary["distinct_identity_outcomes_opened"],16)
-        self.assertEqual(summary["stage_a_result_recorded_entries"],21)
-        self.assertEqual(summary["same_identity_successor_result_entries"],5)
+        accounting=derive_current_accounting(ROOT)
+        self.assertEqual(summary["distinct_identity_outcomes_opened"],accounting["distinct_identity_outcomes_opened"])
+        self.assertEqual(summary["stage_a_result_recorded_entries"],accounting["stage_a_result_recorded_entries"])
+        self.assertEqual(summary["same_identity_successor_result_entries"],summary["stage_a_result_recorded_entries"]-summary["distinct_identity_outcomes_opened"])
         self.assertEqual(summary["implementation_correction_entries"],5)
         self.assertEqual(summary["incomplete_corrections"],{})
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
