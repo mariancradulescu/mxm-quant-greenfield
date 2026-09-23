@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from research_v3.autonomous_director_v2 import _candidate_score
+from research_v3.autonomous_director_v2 import (AUTONOMOUS_WAKE_EVENTS, MAX_ACCEPTED_WAKE_LATENCY_SECONDS, _candidate_score)
 from research_v3.autonomous_runtime_v2 import RuntimeV2
 from research_v3.runtime_v2_primitives import load_json
 
@@ -18,6 +18,12 @@ class AutonomousDirectorV2UnitTests(unittest.TestCase):
             "metrics": {"active_weeks": 12, "event_count": 500, "coarse_net_pnl": 99.0},
         }
         self.assertGreater(_candidate_score(a), _candidate_score(b))
+
+    def test_event_driven_wake_is_primary_acceptance_source(self):
+        self.assertIn("workflow_run", AUTONOMOUS_WAKE_EVENTS)
+        self.assertIn("schedule", AUTONOMOUS_WAKE_EVENTS)
+        self.assertNotIn("push", AUTONOMOUS_WAKE_EVENTS)
+        self.assertEqual(MAX_ACCEPTED_WAKE_LATENCY_SECONDS, 600)
 
     def test_runtime_non_economic_plan_does_not_open_runtime_economics(self):
         with tempfile.TemporaryDirectory() as td:
