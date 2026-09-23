@@ -67,21 +67,7 @@ def derive_current_accounting(root: str | Path) -> dict[str, Any]:
     v2_budget = int(budget["v2_budget"])
     legacy_prior_attempts = int(budget["legacy_prior_attempts"])
 
-    forensic_path = root / "evidence" / "V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json"
-    if forensic_path.is_file():
-        forensic = _load(forensic_path)
-        if forensic.get("status") != "COMPLETE_PER_IDENTITY_CLASSIFICATION":
-            raise ValueError("forensic V3 accounting authority is not complete")
-        charged_ids = sorted(forensic["attempt_accounting"]["budget_charged_candidate_ids"])
-        historical_ids = sorted(forensic["attempt_accounting"]["historical_evaluated_candidate_ids"])
-        if historical_ids != evaluated_ids:
-            raise ValueError("forensic V3 historical identity set does not match ledger")
-        if not set(charged_ids).issubset(set(evaluated_ids)):
-            raise ValueError("forensic V3 charged identity set is not a ledger subset")
-    else:
-        charged_ids = evaluated_ids
-
-    v2_attempts_used = len(charged_ids)
+    v2_attempts_used = len(evaluated_ids)
     remaining = v2_budget - v2_attempts_used
     if remaining < 0:
         raise ValueError("V2 search budget exhausted below zero")
@@ -105,11 +91,14 @@ def derive_current_accounting(root: str | Path) -> dict[str, Any]:
         "v2_search_budget_remaining": remaining,
         "global_attempts_seen": legacy_prior_attempts + len(evaluated_ids),
         "economic_outcomes_opened": len(result_entries) + len(stage_b_current_config_ids),
+        "distinct_identity_outcomes_opened": len(evaluated_ids),
+        "stage_a_result_recorded_entries": len(result_entries),
+        "stage_b_current_config_economic_observations": len(stage_b_current_config_ids),
         "discovery_ledger_entries": len(entries),
         "discovery_result_recorded_entries": len(result_entries),
         "implementation_correction_entries": len(correction_entries),
         "evaluated_candidate_ids": evaluated_ids,
-        "budget_charged_candidate_ids": charged_ids,
+        "budget_charged_candidate_ids": evaluated_ids,
         "stage_b_current_config_candidate_ids": sorted(stage_b_current_config_ids),
         "latest_economic_outcome": latest_outcome,
     }
@@ -129,6 +118,9 @@ def assert_current_state_matches_repository(root: str | Path) -> dict[str, Any]:
         "economic_outcomes_opened",
         "discovery_ledger_entries",
         "discovery_result_recorded_entries",
+        "distinct_identity_outcomes_opened",
+        "stage_a_result_recorded_entries",
+        "stage_b_current_config_economic_observations",
     ):
         if state.get(key) != derived[key]:
             raise ValueError(f"CURRENT_STATE {key}={state.get(key)!r} != derived {derived[key]!r}")
