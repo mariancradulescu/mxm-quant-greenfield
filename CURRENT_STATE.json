@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Require exact-head full CI GREEN for Wave04 freeze, then bind C027-C028 execution authorization to that exact GREEN head/run and execute the already-frozen batch exactly once.",
+  "next_action": "Validate the Wave04 authorization commit, then execute the already-frozen C027-C028 batch exactly once against accepted V6 and persist both outcomes canonically.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE04_FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE04_AUTHORIZED_NOT_EXECUTED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -1149,7 +1149,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE04_FROZEN_PENDING_EXACT_HEAD_GREEN",
+    "status": "WAVE04_AUTHORIZED_NOT_EXECUTED",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1321,7 +1321,7 @@
       "post_persistence_validation_conclusion": "SUCCESS"
     },
     "wave04": {
-      "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+      "status": "AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
       "freeze_ref": "research_v3/WAVE_04_PRE_OUTCOME_FREEZE_V1.json",
       "authorization_ref": "research_v3/WAVE_04_EXECUTION_AUTHORIZATION_V1.json",
       "wrapper_ref": "research_v3/wave04_execute.py",
@@ -1352,10 +1352,10 @@
       "protected_evidence_opened": false,
       "live_orders": false,
       "competition_start": false,
-      "execution_gate_head": null,
-      "execution_gate_ci_run_id": null,
-      "execution_gate_ci_conclusion": null,
-      "authorization_bound": false
+      "execution_gate_head": "1e3c82f69ce8ded9389899754bafa6ad39110cde",
+      "execution_gate_ci_run_id": 35823035539,
+      "execution_gate_ci_conclusion": "SUCCESS",
+      "authorization_bound": true
     }
   }
 }
