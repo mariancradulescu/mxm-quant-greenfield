@@ -216,4 +216,4 @@ jobs:
             echo "No queued Runtime V2 operation; watchdog clean NOOP after control-plane reconciliation."
             exit 0
           fi
-          python research_v3/autonomous_runtime_v2.py run             --root .             --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"             --lease-seconds 900             --max-operations 25             --git-checkpoint             --git-push
+          python -m research_v3.autonomous_runtime_v2 run             --root .             --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"             --lease-seconds 900             --max-operations 25             --git-checkpoint             --git-push
