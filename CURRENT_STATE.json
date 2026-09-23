@@ -9,16 +9,16 @@
     "V2-C006",
     "V2-C012"
   ],
-  "economic_outcomes_opened": 18,
-  "global_attempts_seen": 31,
+  "economic_outcomes_opened": 19,
+  "global_attempts_seen": 32,
   "integrity_correction_02_test_result_authority": "tests/PRE_M6_INTEGRITY_CORRECTION_02_TEST_RESULTS.json",
   "latest_economic_outcome": {
-    "candidate_id": "V2-C025",
+    "candidate_id": "V2-C026",
     "stage": "A",
     "status": "COARSE_NET_FAIL",
-    "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
-    "result_ref": "discovery/results/V2-C025_STAGE_A_V1.json",
-    "recorded_utc": "2026-09-23T04:29:57Z"
+    "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
+    "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
+    "recorded_utc": "2026-09-23T05:14:00Z"
   },
   "legacy_prior_attempts": 16,
   "live_orders_authorized": false,
@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Execute the already-frozen C026 Wave03 economic evaluation exactly once using the accepted V6 capture and frozen coarse-cost authority; then persist the outcome canonically and validate exact-head.",
+  "next_action": "Require exact-head full CI GREEN for the canonically persisted C026 outcome; then use its gross-positive but cost-dominated information prospectively to freeze materially distinct next hypotheses without rescue tuning.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE03_AUTHORIZED_NOT_EXECUTED",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE03_RESULT_RECORDED_PENDING_EXACT_HEAD_GREEN",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -647,10 +647,10 @@
   "protected_evidence_opened": false,
   "research_contract_correction_authority": "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md",
   "schema_version": 1,
-  "structural_only_since_previous_economic_outcome": true,
+  "structural_only_since_previous_economic_outcome": false,
   "user_action_required": false,
-  "v2_attempts_used": 15,
-  "v2_evaluated_identities": 15,
+  "v2_attempts_used": 16,
+  "v2_evaluated_identities": 16,
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
   "v2_search_budget": 84,
   "future_wave_opportunity_coverage_authority": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
@@ -708,7 +708,7 @@
   "m6_stage_a_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_A_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_a_execution_authorization_authority": "data/M6_STAGE_A_EXECUTION_AUTHORIZATION_V1.json",
   "m6_stage_a_tier1_result_acceptance_authority": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V2.json",
-  "v2_search_budget_remaining": 69,
+  "v2_search_budget_remaining": 68,
   "m6_stage_a_tier1_result_acceptance_historical_v1": "data/M6_STAGE_A_TIER1_RESULT_ACCEPTANCE_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_correction_authority": "evidence/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_CORRECTION_V1.json",
   "m6_stage_a_post_outcome_persistence_integrity_independent_audit_authority": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
@@ -732,8 +732,8 @@
   "m6_stage_b_current_config_reporting_policy": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
   "m6_stage_b_current_config_reporting_completeness": "evidence/M6_STAGE_B_CURRENT_CONFIG_REPORTING_COMPLETENESS_V1.json",
   "current_config_stage_b_outcomes_opened": 2,
-  "discovery_ledger_entries": 51,
-  "discovery_result_recorded_entries": 16,
+  "discovery_ledger_entries": 52,
+  "discovery_result_recorded_entries": 17,
   "historical_point_in_time_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
   "historical_margin_blocks_current_operational_work": false,
   "post_stage_b_final_closure_independent_audit_authority": "data/POST_STAGE_B_FINAL_CLOSURE_INDEPENDENT_AUDIT_V1.json",
@@ -1109,6 +1109,14 @@
         "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
         "status": "COARSE_NET_FAIL"
       }
+    },
+    "V2-C026": {
+      "stage_a": {
+        "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
+        "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
+        "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
+        "status": "COARSE_NET_FAIL"
+      }
     }
   },
   "active_result_pointers": {
@@ -1121,7 +1129,8 @@
     "V2-C015_STAGE_A": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
     "V2-C016_STAGE_A": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
     "V2-C024_STAGE_A": "discovery/results/V2-C024_STAGE_A_V1.json",
-    "V2-C025_STAGE_A": "discovery/results/V2-C025_STAGE_A_V1.json"
+    "V2-C025_STAGE_A": "discovery/results/V2-C025_STAGE_A_V1.json",
+    "V2-C026_STAGE_A": "discovery/results/V2-C026_STAGE_A_V1.json"
   },
   "superseded_or_invalid_historical_result_pointers": {
     "V2-C012_STAGE_A_V1": "discovery/results/V2-C012_STAGE_A_V1.json",
@@ -1140,7 +1149,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE03_AUTHORIZED_NOT_EXECUTED",
+    "status": "WAVE03_RESULT_RECORDED_PENDING_EXACT_HEAD_GREEN",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1265,7 +1274,7 @@
       "post_persistence_validation_conclusion": "SUCCESS"
     },
     "wave03": {
-      "status": "AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
+      "status": "RESULT_RECORDED_PENDING_EXACT_HEAD_GREEN",
       "freeze_ref": "research_v3/WAVE_03_PRE_OUTCOME_FREEZE_V1.json",
       "authorization_ref": "research_v3/WAVE_03_EXECUTION_AUTHORIZATION_V1.json",
       "wrapper_ref": "research_v3/wave03_execute.py",
@@ -1279,7 +1288,7 @@
       "candidate_spec_hashes": {
         "V2-C026": "41880f453efd363da860024e8f9b7b299bd14b9f2367156779f3f193f9abc9e9"
       },
-      "candidate_own_outcomes_opened": false,
+      "candidate_own_outcomes_opened": true,
       "v2_attempts_used_before_wave03": 15,
       "v2_search_budget_remaining_before_wave03": 69,
       "expected_attempt_delta_on_execution": 1,
@@ -1288,14 +1297,25 @@
       "ledger_freeze_sequences": {
         "V2-C026": 51
       },
-      "ledger_tail_entry_hash": "979ca118548e279df87bee9aded2c05d4e2899deba0d563bdf2c257e0a3b4bc5",
+      "ledger_tail_entry_hash": "a8fbdf107bd7bb95921f709470daea1f5f3bb6ce2bd6ea8dc88bc8d5305059f1",
       "protected_evidence_opened": false,
       "live_orders": false,
       "competition_start": false,
       "execution_gate_head": "77305723afe07ec05288ce27931c493819c497f2",
       "execution_gate_ci_run_id": 35820984359,
       "execution_gate_ci_conclusion": "SUCCESS",
-      "authorization_bound": true
+      "authorization_bound": true,
+      "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
+      "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
+      "result_status": "COARSE_NET_FAIL",
+      "v2_attempts_used_after_wave03": 16,
+      "v2_search_budget_remaining_after_wave03": 68,
+      "economic_outcomes_opened_after_wave03": 19,
+      "economic_attempt_delta": 1,
+      "persistence_additional_attempts_consumed": 0,
+      "execution_result_ref": "research_v3/WAVE_03_EXECUTION_RESULT_V1.json",
+      "stage_b_extension_candidates": [],
+      "ledger_result_sequence": 52
     }
   }
 }
