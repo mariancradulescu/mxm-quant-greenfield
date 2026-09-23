@@ -219,9 +219,10 @@ class RuntimeV2:
         # Validate every result marker against durable bytes.
         for plan in self.plans():
             op = plan["operation_id"]
-            avail = self.journal.last_event(op, "ECONOMIC_RESULT_AVAILABLE")
+            available_event = "NON_ECONOMIC_RESULT_AVAILABLE" if self._is_non_economic(plan) else "ECONOMIC_RESULT_AVAILABLE"
+            avail = self.journal.last_event(op, available_event)
             result_persisted = self.journal.last_event(op, "RESULT_FILE_PERSISTED")
-            spool = self.spool_dir / f"{plan['economic_execution_id']}.json"
+            spool = self._spool_path(plan)
             result = self._result_path(plan)
             if avail:
                 expected = avail["payload"].get("result_sha256")
@@ -256,6 +257,15 @@ class RuntimeV2:
         return rows
 
     # ---------------- operation execution ----------------
+    @staticmethod
+    def _is_non_economic(plan: Mapping[str, Any]) -> bool:
+        return str(plan.get("operation_kind", "")).upper() == "NON_ECONOMIC_DIRECTOR"
+
+    def _spool_path(self, plan: Mapping[str, Any]) -> Path:
+        if self._is_non_economic(plan):
+            return self.spool_dir / f"{plan['operation_id']}.non_economic.json"
+        return self.spool_dir / f"{plan['economic_execution_id']}.json"
+
     def _result_path(self, plan: Mapping[str, Any]) -> Path:
         rel = plan.get("result_path")
         if rel:
@@ -440,6 +450,46 @@ class RuntimeV2:
         self._boundary("result_generation_before_result_persistence")
         return spool, digest
 
+    def _execute_non_economic_exactly_once(self, plan: Mapping[str, Any]) -> tuple[Path, str]:
+        op = plan["operation_id"]
+        spool = self._spool_path(plan)
+        result_available = self.journal.last_event(op, "NON_ECONOMIC_RESULT_AVAILABLE")
+        persisted = self.journal.has(op, "RESULT_FILE_PERSISTED") or self.journal.has(op, "OPERATION_CLOSED")
+        if result_available or persisted:
+            if not spool.exists():
+                result = self._result_path(plan)
+                if result.exists() and persisted:
+                    expected = self.journal.last_event(op, "RESULT_FILE_PERSISTED")["payload"]["result_sha256"]
+                    if sha256_file(result) != expected:
+                        raise MaterialIntegrityHalt(f"{op}: canonical non-economic result hash drift")
+                    return result, expected
+                raise MaterialIntegrityHalt(f"{op}: durable non-economic result marker exists but no result bytes survive")
+            digest = sha256_file(spool)
+            expected = result_available["payload"].get("result_sha256") if result_available else digest
+            if expected != digest:
+                raise MaterialIntegrityHalt(f"{op}: non-economic result spool hash drift")
+            return spool, digest
+
+        if not self.journal.has(op, "NON_ECONOMIC_EXECUTION_STARTED"):
+            self.journal.append(
+                "NON_ECONOMIC_EXECUTION_STARTED", run_id=self.run_id, operation_id=op,
+                state="EXECUTE_NON_ECONOMIC_ACTION",
+                payload={"execution_id": plan["economic_execution_id"], "economic_outcome_opened": False},
+            )
+            self._checkpoint("non_economic_execution_start_marker")
+
+        if not spool.exists():
+            self._invoke_evaluator(plan, spool)
+        digest = sha256_file(spool)
+        if not self.journal.has(op, "NON_ECONOMIC_RESULT_AVAILABLE"):
+            self.journal.append(
+                "NON_ECONOMIC_RESULT_AVAILABLE", run_id=self.run_id, operation_id=op,
+                state="EXECUTE_NON_ECONOMIC_ACTION",
+                payload={"execution_id": plan["economic_execution_id"], "result_sha256": digest,
+                         "economic_outcome_opened": False},
+            )
+        return spool, digest
+
     def _persist_result(self, plan: Mapping[str, Any], spool: Path, digest: str) -> Path:
         op = plan["operation_id"]
         result = self._result_path(plan)
@@ -460,7 +510,8 @@ class RuntimeV2:
     def _append_runtime_ledger(self, plan: Mapping[str, Any], result: Path, digest: str) -> None:
         op = plan["operation_id"]
         rows = self._validate_runtime_ledger()
-        existing = [r for r in rows if r.get("operation_id") == op and r.get("entry_type") == "RESULT_RECORDED"]
+        entry_type = "NON_ECONOMIC_RESULT_RECORDED" if self._is_non_economic(plan) else "RESULT_RECORDED"
+        existing = [r for r in rows if r.get("operation_id") == op and r.get("entry_type") == entry_type]
         if existing:
             if len(existing) != 1 or existing[0].get("result_sha256") != digest:
                 raise MaterialIntegrityHalt(f"{op}: duplicate/drifting runtime ledger result")
@@ -468,7 +519,7 @@ class RuntimeV2:
         prev = rows[-1]["entry_hash"] if rows else "GENESIS"
         row: dict[str, Any] = {
             "sequence": len(rows) + 1,
-            "entry_type": "RESULT_RECORDED",
+            "entry_type": entry_type,
             "operation_id": op,
             "economic_execution_id": plan["economic_execution_id"],
             "result_path": str(result.relative_to(self.root)),
@@ -493,21 +544,33 @@ class RuntimeV2:
         acc = load_json(self.accounting_path, {
             "schema": "mxm.greenfield.runtime-v2-accounting.v1",
             "completed_operation_ids": [],
+            "non_economic_operation_ids": [],
             "economic_execution_ids": [],
             "economic_outcomes_opened": 0,
         })
-        if op not in acc["completed_operation_ids"]:
-            acc["completed_operation_ids"].append(op)
-        econ = plan["economic_execution_id"]
-        if econ not in acc["economic_execution_ids"]:
-            acc["economic_execution_ids"].append(econ)
-        acc["completed_operation_ids"] = sorted(set(acc["completed_operation_ids"]))
-        acc["economic_execution_ids"] = sorted(set(acc["economic_execution_ids"]))
-        acc["economic_outcomes_opened"] = len(acc["economic_execution_ids"])
+        completed = set(acc.get("completed_operation_ids", []))
+        completed.add(op)
+        acc["completed_operation_ids"] = sorted(completed)
+        if self._is_non_economic(plan):
+            non_economic = set(acc.get("non_economic_operation_ids", []))
+            non_economic.add(op)
+            acc["non_economic_operation_ids"] = sorted(non_economic)
+        else:
+            econ_ids = set(acc.get("economic_execution_ids", []))
+            econ_ids.add(plan["economic_execution_id"])
+            acc["economic_execution_ids"] = sorted(econ_ids)
+        acc.setdefault("economic_execution_ids", [])
+        acc.setdefault("non_economic_operation_ids", [])
+        acc["economic_outcomes_opened"] = len(set(acc["economic_execution_ids"]))
         atomic_write_json(self.accounting_path, acc)
         if not self.journal.has(op, "ACCOUNTING_PROJECTED"):
-            self.journal.append("ACCOUNTING_PROJECTED", run_id=self.run_id, operation_id=op,
-                                state="PERSIST_RESULT", payload={"economic_outcomes_opened": acc["economic_outcomes_opened"]})
+            self.journal.append(
+                "ACCOUNTING_PROJECTED", run_id=self.run_id, operation_id=op, state="PERSIST_RESULT",
+                payload={
+                    "economic_outcomes_opened": acc["economic_outcomes_opened"],
+                    "non_economic_operation": self._is_non_economic(plan),
+                },
+            )
         self._boundary("accounting_update")
 
     def _project_current_state(self, plan: Mapping[str, Any], digest: str) -> None:
@@ -554,16 +617,20 @@ class RuntimeV2:
         closure = {
             "schema": "mxm.greenfield.runtime-v2-lifecycle-closure.v1",
             "operation_id": op,
-            "economic_execution_id": plan["economic_execution_id"],
+            "execution_id": plan["economic_execution_id"],
             "result_sha256": digest,
+            "economic_outcome_opened": not self._is_non_economic(plan),
             "status": "CLOSED_POST_VALIDATION_GREEN",
         }
         closure_path = self.closure_dir / f"{op}.json"
         if not closure_path.exists():
             atomic_write_json(closure_path, closure)
         if not self.journal.has(op, "OPERATION_CLOSED"):
-            self.journal.append("OPERATION_CLOSED", run_id=self.run_id, operation_id=op,
-                                state="CLOSE_LIFECYCLE", payload={"closure_sha256": sha256_file(closure_path)})
+            self.journal.append(
+                "OPERATION_CLOSED", run_id=self.run_id, operation_id=op, state="CLOSE_LIFECYCLE",
+                payload={"closure_sha256": sha256_file(closure_path),
+                         "economic_outcome_opened": not self._is_non_economic(plan)},
+            )
         self._boundary("lifecycle_closure")
 
     def _update_knowledge_scope(self, plan: Mapping[str, Any]) -> None:
@@ -588,6 +655,8 @@ class RuntimeV2:
         return self.journal.has(op, "OPERATION_CLOSED") and self.journal.has(op, "KNOWLEDGE_SCOPE_UPDATED")
 
     def _assert_runtime_acceptance_gate(self, plan: Mapping[str, Any]) -> None:
+        if self._is_non_economic(plan):
+            return
         if (plan.get("identity_binding") or {}).get("lifecycle_phase") == "SYNTHETIC_ACCEPTANCE":
             return
         gate_path = self.root / "evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json"
@@ -597,7 +666,13 @@ class RuntimeV2:
                 "AUTONOMOUS_RESEARCH_RUNTIME_V2 acceptance gate is not durably PASS; real economics remain forbidden"
             )
         if gate.get("economic_resume_gate_open") is not True:
-            raise MaterialIntegrityHalt("Runtime V2 acceptance evidence does not open the economic resume gate")
+            raise MaterialIntegrityHalt("Runtime V2 partial acceptance evidence does not open its legacy resume gate")
+        e2e_path = self.root / "evidence/ZERO_HUMAN_END_TO_END_RESEARCH_PROGRESSION_V1.json"
+        e2e = load_json(e2e_path, {})
+        if e2e.get("status") != "PASS" or e2e.get("economics_opened_during_fix") != 0:
+            raise MaterialIntegrityHalt(
+                "ZERO_HUMAN_END_TO_END_RESEARCH_PROGRESSION is not durably PASS; real economics remain forbidden"
+            )
 
     def execute_operation(self, plan: Mapping[str, Any]) -> str:
         op = str(plan["operation_id"])
@@ -621,10 +696,15 @@ class RuntimeV2:
         self._freeze(plan)
         self._set_state("PRE_OUTCOME_VALIDATE", next_action="AUTHORIZE")
         self._pre_outcome_validate(plan)
-        self._set_state("AUTHORIZE", next_action="EXECUTE_ECONOMICS_EXACTLY_ONCE")
+        next_exec = "EXECUTE_NON_ECONOMIC_ACTION" if self._is_non_economic(plan) else "EXECUTE_ECONOMICS_EXACTLY_ONCE"
+        self._set_state("AUTHORIZE", next_action=next_exec)
         self._authorize(plan)
-        self._set_state("EXECUTE_ECONOMICS_EXACTLY_ONCE", next_action="PERSIST_RESULT")
-        spool, digest = self._execute_economics_exactly_once(plan)
+        if self._is_non_economic(plan):
+            self._set_state("EXECUTE_NON_ECONOMIC_ACTION", next_action="PERSIST_RESULT")
+            spool, digest = self._execute_non_economic_exactly_once(plan)
+        else:
+            self._set_state("EXECUTE_ECONOMICS_EXACTLY_ONCE", next_action="PERSIST_RESULT")
+            spool, digest = self._execute_economics_exactly_once(plan)
         self._set_state("PERSIST_RESULT", next_action="VALIDATE_ACCOUNTING_LEDGER_HASHES")
         result = self._persist_result(plan, spool, digest)
         self._append_runtime_ledger(plan, result, digest)
