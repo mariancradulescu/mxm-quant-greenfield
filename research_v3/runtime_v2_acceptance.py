@@ -1,6 +1,7 @@
 """Chaos/recovery acceptance proof for Autonomous Research Runtime V2."""
 from __future__ import annotations
 
+import json
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -77,7 +78,14 @@ def zero_human_continuation_demo() -> dict[str, Any]:
             blocked = True
         if not blocked:
             raise AssertionError("double executor start was not blocked")
-        lease_rt1.release_lease()
+        lease_doc = json.loads(lease_rt1.lease_path.read_text(encoding="utf-8"))
+        lease_doc["expires_utc"] = "2000-01-01T00:00:00Z"
+        atomic_write_json(lease_rt1.lease_path, lease_doc)
+        takeover = RuntimeV2(lease_case, lease_seconds=600, owner_token="owner-b")
+        reclaimed = takeover.acquire_lease()
+        if reclaimed.get("retry_metadata", {}).get("reason") != "STALE_LEASE_TAKEOVER":
+            raise AssertionError("stale lease was not reclaimed with durable takeover metadata")
+        takeover.release_lease()
 
         repeat = Path(td) / "repeat"; repeat.mkdir()
         repeat_rt = RuntimeV2(repeat, lease_seconds=1)
@@ -130,7 +138,8 @@ def zero_human_continuation_demo() -> dict[str, Any]:
             "status": "PASS",
             "zero_human_continuation": "PASS",
             "synthetic_cycles": 3,
-            "chaos_failure_points": chaos,
+            "chaos_failure_points": "PASS",
+            "chaos_failure_point_details": chaos,
             "external_data_wait_resume": "PASS",
             "stale_lease_takeover": "PASS",
             "double_executor_start": "PASS",
