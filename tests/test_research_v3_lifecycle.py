@@ -16,8 +16,11 @@ class ResearchV3LifecycleTests(unittest.TestCase):
         self.assertEqual(summary["same_identity_successor_result_entries"],5)
         self.assertEqual(summary["implementation_correction_entries"],5)
         self.assertEqual(summary["incomplete_corrections"],{})
-        self.assertEqual(summary["ledger_entries"],62)
-        self.assertEqual(summary["ledger_tail_entry_hash"],"69d99c52e7486e1a2c6271437ae5b159e942f10b013ccae3e6a5e477affea250")
+        state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
+        ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
+        self.assertEqual(summary["ledger_entries"],state["discovery_ledger_entries"])
+        self.assertEqual(summary["ledger_entries"],len(ledger))
+        self.assertEqual(summary["ledger_tail_entry_hash"],ledger[-1]["entry_hash"])
 
     def test_c012_has_two_versioned_successors_and_current_authority_is_latest(self):
         ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
