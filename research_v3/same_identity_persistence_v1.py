@@ -280,12 +280,15 @@ def persist_same_identity_corrections(
     aa = audit.setdefault("attempt_accounting", {})
     aa["pending_same_identity_correction_candidate_ids"] = sorted(pending)
     aa["corrected_same_identity_candidate_ids"] = sorted(corrected_now & set(CORRECTION_IDS))
+    aa["invalid_result_authority_candidate_ids"] = sorted(set(aa.get("invalid_frozen_spec_candidate_ids", [])) | pending)
+    aa["current_live_equivalent_authoritative_candidate_ids"] = sorted(corrected_now)
     aa["v2_attempts_used"] = len(v2_ids)
     aa["v2_search_budget_remaining"] = v2_budget - len(v2_ids)
     aa["distinct_identity_outcomes_opened"] = len(v2_ids)
     aa["stage_a_result_recorded_entries"] = len(result_rows)
     aa["stage_b_current_config_economic_observations"] = stage_b_observations
     aa["economic_outcomes_opened_historical"] = len(result_rows) + stage_b_observations
+    audit.setdefault("authority_separation", {})["current_live_equivalent_economic_result_authority"] = sorted(corrected_now)
     audit["status"] = "COMPLETE_PER_IDENTITY_CLASSIFICATION_EXPOSURE_ACCOUNTING_AND_CORRECTION_LIFECYCLE"
 
     tx = root / ".mxm_persistence/same_identity_live_equivalent_v1/manifest.json"
