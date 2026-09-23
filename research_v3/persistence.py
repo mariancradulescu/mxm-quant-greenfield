@@ -308,7 +308,6 @@ def persist_wave_results(
         state["distinct_identity_outcomes_opened"] = after_attempts
         state["stage_b_current_config_economic_observations"] = stage_b_observations
         state["v2_budget_charged_candidate_ids"] = exposed_v2_ids
-        state["v2_historical_evaluated_candidate_ids"] = exposed_v2_ids
         state["structural_only_since_previous_economic_outcome"] = False
         state.setdefault("current_result_authority", {})
         state.setdefault("active_result_pointers", {})
