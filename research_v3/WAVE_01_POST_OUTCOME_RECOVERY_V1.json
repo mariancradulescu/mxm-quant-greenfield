@@ -1,0 +1,94 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave01-post-outcome-recovery.v1",
+  "status": "PERSISTED_POST_OUTCOME_RECOVERY",
+  "recorded_utc": "2026-09-23T03:31:00Z",
+  "source_head_before_persistence": "6c1a6ecdecc256494472a86f3ade8b65f86cd5dd",
+  "authorization": {
+    "ref": "research_v3/WAVE_01_EXECUTION_AUTHORIZATION_V1.json",
+    "gate_head": "a8c905dec2208c7531d9ed97401d7b54c54d6129",
+    "gate_ci_run_id": 35784512199,
+    "gate_conclusion": "SUCCESS"
+  },
+  "recovery_classification": "POST_OUTCOME_PERSISTENCE_STALL",
+  "outcomes_already_opened_before_canonical_persistence": true,
+  "all_four_same_authorized_batch": true,
+  "results": {
+    "V2-C013": {
+      "status": "COARSE_NET_FAIL",
+      "result_hash": "67fc835c7196e7dbc7645ffb278276056736c2150198c865232d120ffcadf16a",
+      "result_ref": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "git_blob_sha1": "09f1aaae4979eff9c905ee5bb5ef84a09d653a74",
+      "recovery": "ORPHAN_BLOB_RECOVERED_BYTE_EXACT"
+    },
+    "V2-C014": {
+      "status": "GROSS_EDGE_FAIL",
+      "result_hash": "bb6b276a429b75a690237686c1cb10eb3b5412f934e806fef333a6c346ef70e8",
+      "result_ref": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "git_blob_sha1": "4ed361dbe3abaaeac41c8b61fcc44aa10fac40c1",
+      "recovery": "ORPHAN_BLOB_RECOVERED_BYTE_EXACT"
+    },
+    "V2-C015": {
+      "status": "COARSE_NET_FAIL",
+      "result_hash": "e4d1d06983f54d945e8e959ba4210ec7c08ea59030e20667d22a78ed69e06601",
+      "result_ref": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "git_blob_sha1": "60b5137e679831fca34cd1f40ec52d7495c5d746",
+      "recovery": "DETERMINISTIC_SAME_SEMANTICS_RECONSTRUCTION",
+      "rejected_corrupt_orphan_blob_sha1": "5c6988d4bcb4fbe18d002b8d6c1dc942e89d6794",
+      "corruption": "POST_RESULT_TRANSFER_DRIFT: ET_13:45 COUNT 12->16 AND EVALUATOR VERSION TYPO; EMBEDDED RESULT HASH WAS FROM VALID PRE-CORRUPTION RESULT"
+    },
+    "V2-C016": {
+      "status": "COST_UNRESOLVED",
+      "result_hash": "d39ef973330d9c0fbb7f2605a78673d844271328b47e4f33318200918a6e641d",
+      "result_ref": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "git_blob_sha1": "f13f3907205e1ade1299b939a70d6c76e50ef085",
+      "recovery": "FAIL_CLOSED_COST_UNRESOLVED_RESULT_MATERIALIZATION",
+      "frozen_intent_count": 3522,
+      "missing_required_cost_boundaries": 9,
+      "missing_exit_dates": [
+        "2022-11-25",
+        "2023-07-03",
+        "2023-11-24",
+        "2024-07-03",
+        "2024-11-29",
+        "2024-12-24",
+        "2025-07-03",
+        "2025-11-28",
+        "2025-12-24"
+      ]
+    }
+  },
+  "accounting": {
+    "before": {
+      "v2_attempts_used": 9,
+      "v2_search_budget_remaining": 75
+    },
+    "after": {
+      "v2_attempts_used": 13,
+      "v2_search_budget_remaining": 71
+    },
+    "original_authorized_batch_attempt_delta": 4,
+    "recovery_additional_attempts_consumed": 0,
+    "fresh_discovery_attempt_performed_during_recovery": false
+  },
+  "ledger": {
+    "previous_tail_sequence": 42,
+    "new_sequences": [
+      43,
+      44,
+      45,
+      46
+    ],
+    "entry_hashes": {
+      "V2-C013": "ccf81de51cef93b6c36607bb41bf0d20de8940aaed65af5baa79c2cd6b7386e3",
+      "V2-C014": "97eff9bd66d9d83842dbed54388e4f3ea5c0fb28b9807333d20d41f0aa512505",
+      "V2-C015": "d5c0977b3f7038f0924f2944bd25886e516c181c5b22ee4cee8c761189bdf190",
+      "V2-C016": "30b40a07ee741a2961185d3faf4c2d70f2c3579fcd78ea45d8cc71cf46200b6d"
+    },
+    "new_tail_entry_hash": "30b40a07ee741a2961185d3faf4c2d70f2c3579fcd78ea45d8cc71cf46200b6d"
+  },
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false,
+  "semantic_mutation": false,
+  "rescue_tuning": false
+}

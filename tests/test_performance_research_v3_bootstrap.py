@@ -3,21 +3,21 @@ from pathlib import Path
 from unittest.mock import patch
 from discovery.canonical import compute_result_hash
 from discovery.ledger import read_ledger
-from research_v3.controller import CIDS, HASHES, project_post_batch_state, validate_bootstrap
+from research_v3.controller import CIDS, HASHES, RESULT_REFS, project_post_batch_state, validate_bootstrap
 from research_v3.wave01_execute import AUTH_REF, V3ExecutionNotAuthorized, execute_authorized
 
 ROOT=Path(__file__).resolve().parents[1]
 def load(rel): return json.loads((ROOT/rel).read_text(encoding="utf-8"))
 
 class PerformanceResearchV3BootstrapTests(unittest.TestCase):
-    def test_01_bootstrap_is_restartable_and_unopened(self):
+    def test_01_control_plane_is_restartable_in_current_lifecycle(self):
         r=validate_bootstrap(ROOT)
-        self.assertEqual(r["candidate_ids"],list(CIDS))
-        self.assertEqual(r["v2_attempts_used"],9)
-        self.assertEqual(r["v2_search_budget_remaining"],75)
-        self.assertFalse(r["economic_outcomes_opened"])
+        self.assertTrue(r["economic_outcomes_opened"])
+        self.assertEqual(r["v2_attempts_used"],13)
+        self.assertEqual(r["v2_search_budget_remaining"],71)
+        self.assertEqual(r["result_statuses"],{"V2-C013":"COARSE_NET_FAIL","V2-C014":"GROSS_EDGE_FAIL","V2-C015":"COARSE_NET_FAIL","V2-C016":"COST_UNRESOLVED"})
 
-    def test_02_inventory_classifications_are_exact(self):
+    def test_02_inventory_classifications_remain_frozen(self):
         inv=load("research_v3/UNOPENED_READINESS_V1.json")["classifications"]
         for cid in ("V2-C001","V2-C002","V2-C003","V2-C004","V2-C005"):
             self.assertEqual(inv[cid]["classification"],"DEFERRED_FOR_INDEPENDENT_REASON")
@@ -28,28 +28,46 @@ class PerformanceResearchV3BootstrapTests(unittest.TestCase):
         for cid in CIDS:
             self.assertEqual(inv[cid]["classification"],"READY_NOW_WITH_EXISTING_EVIDENCE")
 
-    def test_03_c013_c016_are_frozen_without_result(self):
+    def test_03_each_wave01_identity_has_exactly_one_result_and_payload_matches(self):
         ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
         for cid in CIDS:
             rows=[x for x in ledger if x["candidate_id"]==cid]
-            self.assertEqual([x["entry_type"] for x in rows],["CANDIDATE_FROZEN"])
+            self.assertEqual([x["entry_type"] for x in rows],["CANDIDATE_FROZEN","RESULT_RECORDED"])
             self.assertEqual(rows[0]["spec_hash"],HASHES[cid])
+            result=load(RESULT_REFS[cid])
+            self.assertEqual(result["result_hash"],compute_result_hash(result))
+            self.assertEqual(rows[1]["payload"]["result"],result)
+            self.assertEqual(rows[1]["payload"]["result_hash"],result["result_hash"])
 
     def test_04_real_entry_path_fails_before_economics_without_matching_gate(self):
         auth=load(AUTH_REF)
-        self.assertIn(auth["status"],{"PENDING_EXACT_HEAD_GREEN","AUTHORIZED_AFTER_EXACT_HEAD_GREEN"})
+        self.assertEqual(auth["status"],"AUTHORIZED_AFTER_EXACT_HEAD_GREEN")
         with patch("research_v3.wave01_execute.execute_wave",side_effect=AssertionError("economics must not run")) as economic:
             with self.assertRaises(V3ExecutionNotAuthorized):
                 execute_authorized(ROOT,us500_m15="missing",nas100_m15="missing",eurusd_m15="missing",us500_cost="missing",nas100_cost="missing",execution_head="x",execution_ci_run_id=0)
             economic.assert_not_called()
 
-    def test_05_t2_fixture_result_hash_and_state_projection(self):
-        results={}
-        for cid in CIDS:
-            x={"candidate_id":cid,"spec_hash":HASHES[cid],"stage":"A","status":"GROSS_EDGE_FAIL","implementation_validity":{"state":"VALID","reason":"fixture"},"metrics":{"event_count":1,"gross_pnl":-1.0,"coarse_net_pnl":-1.0,"gross_return":-0.001,"coarse_net_return":-0.001,"gross_per_event":-1.0,"net_per_event":-1.0,"cost_burden":0.0,"turnover":2000.0,"weekly_events":{"2026-W01":1},"active_weeks":1,"longest_inactive_gap":0,"weekday_distribution":{"MON":1},"session_distribution":{"FIXTURE":1},"hold_duration":{"min_minutes":15.0,"median_minutes":15.0,"mean_minutes":15.0,"max_minutes":15.0},"exposure":0.0,"drawdown":1.0,"symbol_contribution":{"FIXTURE":{"event_count":1,"gross_pnl_eur":-1.0,"transaction_cost_eur":0.0,"coarse_net_pnl_eur":-1.0}},"direction_contribution":{"LONG":{"event_count":1,"gross_pnl_eur":-1.0,"transaction_cost_eur":0.0,"coarse_net_pnl_eur":-1.0}},"subperiod_contribution":{"2026":{"event_count":1,"gross_pnl_eur":-1.0,"transaction_cost_eur":0.0,"coarse_net_pnl_eur":-1.0}},"regime_contribution":{"state":"NOT_APPLICABLE","reason":"fixture"}},"eur200_feasibility":{"state":"NOT_EVALUATED","reason":"fixture"},"cost_confidence":{"state":"CONSERVATIVE_BOUND","reason":"fixture"},"data_completeness":{"state":"SUFFICIENT","reason":"fixture"},"provenance":{"data_evidence":{"identity":"fixture","binding":{"type":"DATASET_SHA256","sha256":"0"*64}},"cost_evidence":{"identity":"fixture","state":"CONSERVATIVE_BOUND","sha256":"1"*64},"evaluator":{"version":"fixture","sha256":"2"*64}}}
-            x["result_hash"]=compute_result_hash(x); self.assertEqual(x["result_hash"],compute_result_hash(x)); results[cid]=x
-        state=project_post_batch_state(load("CURRENT_STATE.json"),results)
-        self.assertEqual(state["performance_research_v3"]["status"],"WAVE01_RESULTS_RECORDED")
-        self.assertEqual(load("CURRENT_STATE.json")["v2_attempts_used"],9)
+    def test_05_post_batch_projection_is_idempotent_and_accounting_is_exact(self):
+        state=load("CURRENT_STATE.json")
+        results={cid:load(RESULT_REFS[cid]) for cid in CIDS}
+        projected=project_post_batch_state(state,results)
+        self.assertEqual(projected["v2_attempts_used"],13)
+        self.assertEqual(projected["v2_search_budget_remaining"],71)
+        self.assertEqual(projected["v2_evaluated_identities"],13)
+        self.assertEqual(projected["global_attempts_seen"],29)
+        self.assertEqual(projected["economic_outcomes_opened"],16)
+        self.assertEqual(projected["discovery_ledger_entries"],46)
+        self.assertEqual(projected["discovery_result_recorded_entries"],14)
+
+    def test_06_recovery_authority_records_zero_extra_attempts_and_c016_fail_closed(self):
+        a=load("research_v3/WAVE_01_POST_OUTCOME_RECOVERY_V1.json")
+        self.assertEqual(a["recovery_classification"],"POST_OUTCOME_PERSISTENCE_STALL")
+        self.assertEqual(a["accounting"]["recovery_additional_attempts_consumed"],0)
+        self.assertFalse(a["accounting"]["fresh_discovery_attempt_performed_during_recovery"])
+        self.assertEqual(a["results"]["V2-C016"]["status"],"COST_UNRESOLVED")
+        self.assertEqual(a["results"]["V2-C016"]["missing_required_cost_boundaries"],9)
+        self.assertFalse(a["protected_evidence_opened"])
+        self.assertFalse(a["live_orders"])
+        self.assertFalse(a["competition_start"])
 
 if __name__=="__main__": unittest.main(verbosity=2)
