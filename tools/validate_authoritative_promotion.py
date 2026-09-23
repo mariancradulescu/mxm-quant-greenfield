@@ -69,35 +69,55 @@ def _validate_current_dependency_semantics(state):
     if operational.get("work_branch") == branch:
         raise ValueError("work branch must remain distinct from operational branch")
 
-    implementation_invalid = set(state.get("implementation_invalid_consumed_identities", []))
+    implementation_class = set(state.get("implementation_invalid_consumed_identities", []))
     frozen_spec_invalid = set(state.get("frozen_spec_invalid_consumed_identities", []))
-    invalid = implementation_invalid | frozen_spec_invalid
+    pending_same_identity = set(state.get("pending_same_identity_correction_candidate_ids", implementation_class))
+    if not pending_same_identity <= implementation_class:
+        raise ValueError("pending same-identity set is outside historical implementation-correction class")
+    corrected_same_identity = implementation_class - pending_same_identity
+    currently_invalid = pending_same_identity | frozen_spec_invalid
+    historical_forensic = implementation_class | frozen_spec_invalid
     survivors = set(state.get("discovery_survivors", []))
     stage_b_inputs = set(state.get("current_stage_b_survivor_input_set", []))
+    current_live = set(state.get("current_live_equivalent_authoritative_candidate_ids", []))
     current = state.get("current_result_authority")
     if not isinstance(current, dict):
         raise ValueError("missing current_result_authority")
 
-    for cid in invalid:
+    for cid in historical_forensic:
         node = current.get(cid)
         if not isinstance(node, dict):
-            raise ValueError(f"implementation-invalid identity lacks current authority node: {cid}")
+            raise ValueError(f"forensic identity lacks current authority node: {cid}")
         stage_a = node.get("stage_a")
         if not isinstance(stage_a, dict):
-            raise ValueError(f"implementation-invalid identity lacks Stage-A authority: {cid}")
+            raise ValueError(f"forensic identity lacks Stage-A authority: {cid}")
         replay_state = stage_a.get("live_equivalent_replay_state")
-        if cid in implementation_invalid and replay_state != "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE":
-            raise ValueError(f"implementation-only identity has wrong forensic state: {cid}")
-        if cid in frozen_spec_invalid and replay_state != "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY":
-            raise ValueError(f"frozen-spec-invalid identity has wrong forensic state: {cid}")
-        corrected = stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR" and cid not in invalid
+        if cid in frozen_spec_invalid:
+            if replay_state != "FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY":
+                raise ValueError(f"frozen-spec-invalid identity has wrong forensic state: {cid}")
+            corrected = False
+        elif cid in pending_same_identity:
+            if replay_state != "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE":
+                raise ValueError(f"pending implementation-only identity has wrong forensic state: {cid}")
+            if stage_a.get("current_live_equivalent_authoritative") is not False:
+                raise ValueError(f"pending same-identity correction already claims live-equivalent authority: {cid}")
+            corrected = False
+        else:
+            corrected = (
+                stage_a.get("state") == "VALID_CORRECTED_SUCCESSOR"
+                and replay_state == "CORRECTED_SAME_IDENTITY_CURRENT_AUTHORITY"
+                and stage_a.get("current_live_equivalent_authoritative") is True
+            )
+            if not corrected:
+                raise ValueError(f"completed same-identity correction lacks corrected successor authority: {cid}")
+            if cid not in current_live:
+                raise ValueError(f"corrected same-identity result missing current live-equivalent authority membership: {cid}")
+
         if not corrected and cid in survivors:
             raise ValueError(f"current survivor list contains invalidated identity without corrected successor: {cid}")
         if not corrected and cid in stage_b_inputs:
             raise ValueError(f"current Stage-B input set contains invalidated identity without corrected successor: {cid}")
 
-        # Only identities that actually reached Stage B require downstream
-        # invalidation. Stage-A-only identities must not fabricate a Stage-B node.
         downstream = node.get("stage_b_current_config")
         if downstream is not None:
             if not isinstance(downstream, dict):
@@ -117,9 +137,9 @@ def _validate_current_dependency_semantics(state):
     charged = set(audit["attempt_accounting"]["budget_charged_candidate_ids"])
     if charged != historical:
         raise ValueError("every historically opened V2 identity must remain budget-charged")
-    if historical != implementation_invalid | frozen_spec_invalid:
-        raise ValueError("forensic remediation classes do not cover historical V2 exposure set")
-    if set(audit["attempt_accounting"]["pending_same_identity_correction_candidate_ids"]) != implementation_invalid:
+    if historical != historical_forensic:
+        raise ValueError("forensic classes do not cover historical V2 exposure set")
+    if set(audit["attempt_accounting"]["pending_same_identity_correction_candidate_ids"]) != pending_same_identity:
         raise ValueError("pending same-identity correction set mismatch")
     if set(audit["attempt_accounting"]["invalid_frozen_spec_candidate_ids"]) != frozen_spec_invalid:
         raise ValueError("frozen-spec-invalid set mismatch")
@@ -131,8 +151,10 @@ def _validate_current_dependency_semantics(state):
         raise ValueError("historical evaluated identity count mismatch")
     if state.get("global_attempts_seen") != state.get("legacy_prior_attempts",0) + state.get("v2_evaluated_identities",0):
         raise ValueError("global information-exposure attempt count mismatch")
-    if set(state.get("current_live_equivalent_authoritative_candidate_ids", [])) & (implementation_invalid | frozen_spec_invalid):
-        raise ValueError("invalid forensic identities cannot be current live-equivalent authorities")
+    if current_live & currently_invalid:
+        raise ValueError("currently invalid forensic identities cannot be live-equivalent authorities")
+    if not corrected_same_identity <= current_live:
+        raise ValueError("completed same-identity corrections are missing live-equivalent authority")
 
     correction = state.get("c012_same_identity_corrected_rerun")
     if not isinstance(correction, dict):
