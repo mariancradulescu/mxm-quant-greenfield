@@ -16,7 +16,9 @@ class AutonomousControlPlaneV1Tests(unittest.TestCase):
         self.assertEqual(a["economic_outcomes_opened"],l["stage_a_result_recorded_entries"]+a["stage_b_current_config_economic_observations"])
         self.assertFalse(any(report["safety"].values()))
         classes={x["class"] for x in report["recoverable_conditions"]}
-        if "AUTHORIZED_WAVE_UNOPENED" in classes:
+        if "OPENED_WAVE_PENDING_EXACT_HEAD_GREEN_RECONCILIATION" in classes:
+            self.assertEqual(report["next_action"],"RECONCILE_EXISTING_EXACT_HEAD_GREEN_AND_CLOSE_WAVE")
+        elif "AUTHORIZED_WAVE_UNOPENED" in classes:
             self.assertEqual(report["next_action"],"EXECUTE_AUTHORIZED_WAVE")
         elif "FROZEN_WAVE_PENDING_AUTHORIZATION" in classes:
             self.assertEqual(report["next_action"],"REQUIRE_EXACT_HEAD_GREEN_AND_BIND_AUTHORIZATION")

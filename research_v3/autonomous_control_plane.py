@@ -80,6 +80,12 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
             recoverable.append({"class":"FROZEN_WAVE_PENDING_AUTHORIZATION","wave_key":key,"candidate_ids":candidate_ids})
         elif not opened and revoked:
             blocked.append({"class":"INVALID_OR_REVOKED_WAVE","wave_key":key,"candidate_ids":candidate_ids})
+        elif opened and "PENDING_EXACT_HEAD_GREEN" in status:
+            recoverable.append({
+                "class":"OPENED_WAVE_PENDING_EXACT_HEAD_GREEN_RECONCILIATION",
+                "wave_key":key,
+                "candidate_ids":candidate_ids,
+            })
 
     stage_b = sorted(state.get("stage_b_revalidation_required_candidate_ids", []))
     current_live = sorted(state.get("current_live_equivalent_authoritative_candidate_ids", []))
@@ -98,6 +104,8 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
         next_action = "RESUME_IDEMPOTENT_PERSISTENCE"
     elif pending:
         next_action = "RESUME_SAME_IDENTITY_CORRECTION"
+    elif any(x["class"]=="OPENED_WAVE_PENDING_EXACT_HEAD_GREEN_RECONCILIATION" for x in recoverable):
+        next_action = "RECONCILE_EXISTING_EXACT_HEAD_GREEN_AND_CLOSE_WAVE"
     elif any(x["class"]=="AUTHORIZED_WAVE_UNOPENED" for x in recoverable):
         next_action = "EXECUTE_AUTHORIZED_WAVE"
     elif any(x["class"]=="FROZEN_WAVE_PENDING_AUTHORIZATION" for x in recoverable):
