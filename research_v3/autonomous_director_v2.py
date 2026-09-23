@@ -19,7 +19,7 @@ from research_v3.runtime_v2_primitives import (
     sha256_file,
 )
 
-DIRECTOR_VERSION = "MXM_AUTONOMOUS_RESEARCH_DIRECTOR_V2"
+DIRECTOR_VERSION = "MXM_AUTONOMOUS_RESEARCH_DIRECTOR_V3"
 E2E_STATE_REL = "research_v3/runtime_v2_acceptance/END_TO_END_PROGRESSION_STATE.json"
 E2E_REPORT_REL = "research_v3/runtime_v2_acceptance/END_TO_END_PROGRESSION_REPORT.json"
 E2E_GATE_REL = "evidence/ZERO_HUMAN_END_TO_END_RESEARCH_PROGRESSION_V1.json"
@@ -28,6 +28,7 @@ OLD_GATE_REL = "evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json"
 DISCOVERY_LEDGER_REL = "discovery/ledger.jsonl"
 V6_ACCEPTANCE_REL = "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
 EXTERNAL_REQUEST_REL = "research_v3/runtime_v2/external_requests/NEXT_REQUIRED_INPUT.json"
+SUPERSEDED_E2E_STATE_REL = "research_v3/runtime_v2_acceptance/END_TO_END_PROGRESSION_SUPERSEDED_V2.json"
 AUTONOMOUS_WAKE_EVENTS = {"workflow_run", "schedule"}
 MAX_ACCEPTED_WAKE_LATENCY_SECONDS = 600
 
@@ -76,9 +77,13 @@ def _old_acceptance_pass(root: Path) -> bool:
     )
 
 
-def _existing_operation_paths(root: Path) -> list[Path]:
-    ops_dir = root / DEFAULT_RUNTIME_DIR / "operations"
-    return sorted(ops_dir.glob("op_*.json")) if ops_dir.is_dir() else []
+def _pending_operation_paths(root: Path) -> list[Path]:
+    runtime = RuntimeV2(root, lease_seconds=1, owner_token="director-pending-inspector")
+    pending: list[Path] = []
+    for plan in runtime.plans():
+        if not runtime._operation_complete(plan):
+            pending.append(runtime.operations_dir / f"{plan['operation_id']}.json")
+    return sorted(pending)
 
 
 def _candidate_result_ref(root: Path, candidate_id: str) -> str:
@@ -448,6 +453,16 @@ def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attem
     control = validate_repository_state(root)
     state = load_json(root / E2E_STATE_REL, None)
     gate = load_json(root / E2E_GATE_REL, {}) or {}
+    if state is not None and state.get("director_version") != DIRECTOR_VERSION and state.get("status") != "PASS":
+        superseded = dict(state)
+        superseded.update({
+            "status": "SUPERSEDED_INCOMPLETE_PROOF",
+            "superseded_by_director_version": DIRECTOR_VERSION,
+            "superseded_reason": "Recursive wake dependency discovered during acceptance; fresh proof required.",
+        })
+        atomic_write_json(root / SUPERSEDED_E2E_STATE_REL, superseded)
+        state = None
+        gate = {}
 
     if state is None:
         if event_name not in AUTONOMOUS_WAKE_EVENTS:
@@ -471,9 +486,12 @@ def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attem
                 f"autonomous wake latency {latency_seconds:.3f}s exceeds "
                 f"{MAX_ACCEPTED_WAKE_LATENCY_SECONDS}s acceptance bound"
             )
-        existing = _existing_operation_paths(root)
+        existing = _pending_operation_paths(root)
         if existing:
-            raise DirectorHalt("E2E starting condition requires zero pre-existing Runtime V2 operations")
+            raise DirectorHalt(
+                "E2E starting condition requires zero queued/pending Runtime V2 operations: "
+                + ",".join(str(path.relative_to(root)) for path in existing)
+            )
         selection = choose_concrete_research_action(root, control)
         state = {
             "schema": "mxm.greenfield.zero-human-end-to-end-research-progression-state.v1",
@@ -609,6 +627,42 @@ def supervise(root_value: str | Path, *, event_name: str, run_id: str, run_attem
     raise DirectorHalt(f"unsupported durable E2E state: status={state.get('status')} phase={state.get('phase')}")
 
 
+def supervise_until_gate(
+    root_value: str | Path,
+    *,
+    event_name: str,
+    run_id: str,
+    run_attempt: str,
+    actor: str,
+    predecessor_run_id: str,
+    wake_origin_completed_at: str,
+    git_checkpoint: bool,
+    git_push: bool,
+    max_steps: int = 8,
+) -> dict[str, Any]:
+    history: list[dict[str, Any]] = []
+    for _ in range(max_steps):
+        payload = supervise(
+            root_value,
+            event_name=event_name,
+            run_id=run_id,
+            run_attempt=run_attempt,
+            actor=actor,
+            predecessor_run_id=predecessor_run_id,
+            wake_origin_completed_at=wake_origin_completed_at,
+            git_checkpoint=git_checkpoint,
+            git_push=git_push,
+        )
+        history.append(dict(payload))
+        if payload.get("action") == "DISPATCH_CONTINUE":
+            continue
+        final = dict(payload)
+        final["autonomous_loop_steps"] = history
+        final["autonomous_loop_step_count"] = len(history)
+        return final
+    raise DirectorHalt(f"autonomous director exceeded bounded loop of {max_steps} steps")
+
+
 def _emit(payload: Mapping[str, Any]) -> None:
     print(json.dumps(dict(payload), sort_keys=True, indent=2))
     output = os.environ.get("GITHUB_OUTPUT")
@@ -621,7 +675,7 @@ def _emit(payload: Mapping[str, Any]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=DIRECTOR_VERSION)
-    parser.add_argument("command", choices=("supervise", "inspect"))
+    parser.add_argument("command", choices=("supervise", "supervise-loop", "inspect"))
     parser.add_argument("--root", default=".")
     parser.add_argument("--event-name", default=os.environ.get("GITHUB_EVENT_NAME", "local"))
     parser.add_argument("--run-id", default=os.environ.get("GITHUB_RUN_ID", "LOCAL"))
@@ -639,6 +693,18 @@ def main(argv: list[str] | None = None) -> int:
             "e2e_state": load_json(root / E2E_STATE_REL, None),
             "e2e_gate": load_json(root / E2E_GATE_REL, None),
         }
+    elif args.command == "supervise-loop":
+        payload = supervise_until_gate(
+            root,
+            event_name=str(args.event_name),
+            run_id=str(args.run_id),
+            run_attempt=str(args.run_attempt),
+            actor=str(args.actor),
+            predecessor_run_id=str(args.predecessor_run_id),
+            wake_origin_completed_at=str(args.wake_origin_completed_at),
+            git_checkpoint=bool(args.git_checkpoint),
+            git_push=bool(args.git_push),
+        )
     else:
         payload = supervise(
             root,
