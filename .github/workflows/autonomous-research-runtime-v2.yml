@@ -69,7 +69,11 @@ jobs:
         run: |
           requested="${{ inputs.mode }}"
           if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-            mode="acceptance"
+            if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
+              mode="resume"
+            else
+              mode="acceptance"
+            fi
           elif [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
             if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
               mode="resume"
@@ -169,7 +173,7 @@ jobs:
         run: |
           test -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
           test -f evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json
-          python research_v3/autonomous_control_plane.py validate > /tmp/runtime_v2_control_plane.json
+          python -m research_v3.autonomous_control_plane validate > /tmp/runtime_v2_control_plane.json
           python - <<'PY'
           import json
           from pathlib import Path
