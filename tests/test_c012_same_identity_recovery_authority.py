@@ -74,18 +74,28 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
         self.assertIn("V2-C012", state["discovery_survivors"])
         self.assertIn("V2-C012", state["live_equivalent_discovery_survivors"])
 
-        # Stage-A is current authority, but old Stage-B remains invalid until
-        # downstream revalidation completes.  Survivor != Stage-B input.
-        self.assertIn("V2-C012", state["stage_b_revalidation_required_candidate_ids"])
-        self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
-        self.assertEqual(
-            stage_b["state"],
-            "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
-        )
-        self.assertEqual(
-            stage_b["invalidation_ref"],
-            "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
-        )
+        # Historical invalidation remains recorded, but current Stage-B
+        # authority may be restored only by explicit post-correction revalidation.
+        if stage_b.get("state") == "VALID_REVALIDATED_BY_LIVE_EQUIVALENT_INPUT_EQUIVALENCE":
+            self.assertNotIn("V2-C012", state["stage_b_revalidation_required_candidate_ids"])
+            self.assertIn("V2-C012", state["current_stage_b_survivor_input_set"])
+            self.assertTrue(stage_b["current_live_equivalent_authoritative"])
+            self.assertEqual(
+                stage_b["revalidation_ref"],
+                "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json",
+            )
+            self.assertFalse(stage_b["economic_rerun_performed"])
+        else:
+            self.assertIn("V2-C012", state["stage_b_revalidation_required_candidate_ids"])
+            self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
+            self.assertEqual(
+                stage_b["state"],
+                "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+            )
+            self.assertEqual(
+                stage_b["invalidation_ref"],
+                "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+            )
 
     def test_04_active_refs_and_dependency_semantics_fail_closed(self):
         state = load("CURRENT_STATE.json")
