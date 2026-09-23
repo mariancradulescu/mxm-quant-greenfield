@@ -5,6 +5,7 @@ from unittest.mock import patch
 from discovery.canonical import compute_result_hash, verify_spec_hash
 from discovery.ledger import read_ledger
 from research_v3.wave04_execute import V3Wave04ExecutionNotAuthorized, execute_authorized
+from discovery.accounting import assert_current_state_matches_repository
 
 ROOT=Path(__file__).resolve().parents[1]
 IDS=("V2-C027","V2-C028")
@@ -68,7 +69,12 @@ class PerformanceResearchV3Wave04FreezeTests(unittest.TestCase):
         self.assertEqual(state["v2_attempts_used"],16)
         self.assertEqual(state["v2_evaluated_identities"],16)
         self.assertEqual(state["v2_search_budget_remaining"],68)
-        self.assertEqual(state["economic_outcomes_opened"],19)
+        accounting=assert_current_state_matches_repository(ROOT)
+        self.assertEqual(state["economic_outcomes_opened"],accounting["economic_outcomes_opened"])
+        self.assertEqual(
+            state["economic_outcomes_opened"],
+            state["stage_a_result_recorded_entries"]+state["stage_b_current_config_economic_observations"],
+        )
         self.assertEqual(state["discovery_ledger_entries"],len(ledger))
         self.assertEqual(state["discovery_result_recorded_entries"],sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger))
         self.assertFalse(state["protected_evidence_opened"])
