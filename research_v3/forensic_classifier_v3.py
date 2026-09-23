@@ -56,8 +56,11 @@ def classify_spec(spec):
 def build_audit(root):
     root=Path(root); state=load(root,"CURRENT_STATE.json"); ledger=read_ledger(root/"discovery/ledger.jsonl")
     active=derive_active_spec_hashes(ledger); result_rows=[e for e in ledger if e.get("entry_type")=="RESULT_RECORDED"]
-    historical=sorted({e["candidate_id"] for e in result_rows})
-    if historical!=ALL: raise ValueError(f"historical set mismatch {historical}")
+    current_opened=sorted({e["candidate_id"] for e in result_rows})
+    historical=sorted(state.get("v2_historical_evaluated_candidate_ids", ALL))
+    if historical!=ALL: raise ValueError(f"forensic historical cohort mismatch {historical}")
+    if not set(ALL) <= set(current_opened):
+        raise ValueError(f"forensic historical cohort disappeared from current ledger {current_opened}")
     classes={}
     for cid in ALL:
         spec=load(root,f"discovery/candidates/{cid}.json"); verify_spec_hash(spec)
