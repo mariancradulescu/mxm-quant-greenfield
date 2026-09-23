@@ -75,15 +75,28 @@ def project_post_batch_state(state, results):
     statuses={cid:results[cid]["status"] for cid in CIDS}
     hashes={cid:results[cid]["result_hash"] for cid in CIDS}
     perf=out.setdefault("performance_research_v3",{})
-    if perf.get("candidate_own_outcomes_opened") is not True:
-        if out.get("v2_attempts_used")!=9 or out.get("v2_search_budget_remaining")!=75: raise ValueError("cannot project Wave01 from non-preoutcome accounting")
-        out["v2_attempts_used"]=13
-        out["v2_search_budget_remaining"]=71
-        out["v2_evaluated_identities"]=int(out.get("v2_evaluated_identities",9))+4
-        out["global_attempts_seen"]=int(out.get("legacy_prior_attempts",16))+13
-        out["economic_outcomes_opened"]=int(out.get("economic_outcomes_opened",12))+4
-        out["discovery_ledger_entries"]=int(out.get("discovery_ledger_entries",42))+4
-        out["discovery_result_recorded_entries"]=int(out.get("discovery_result_recorded_entries",10))+4
+
+    # Historical/current separation: once Wave01 is already persisted, this
+    # projector is validation-only. Later Wave02/Wave03 lifecycle growth must
+    # remain untouched rather than being projected back onto the Wave01 snapshot.
+    if perf.get("candidate_own_outcomes_opened") is True:
+        if perf.get("v2_attempts_used_after_wave01")!=13 or perf.get("v2_search_budget_remaining_after_wave01")!=71:
+            raise ValueError("Wave01 historical accounting projection drift")
+        if perf.get("wave01_result_statuses")!=statuses or perf.get("wave01_result_hashes")!=hashes:
+            raise ValueError("Wave01 historical result projection drift")
+        if out.get("v2_attempts_used",0)<13 or out.get("v2_search_budget_remaining",84)>71:
+            raise ValueError("current accounting regressed behind persisted Wave01")
+        return out
+
+    if out.get("v2_attempts_used")!=9 or out.get("v2_search_budget_remaining")!=75:
+        raise ValueError("cannot project Wave01 from non-preoutcome accounting")
+    out["v2_attempts_used"]=13
+    out["v2_search_budget_remaining"]=71
+    out["v2_evaluated_identities"]=int(out.get("v2_evaluated_identities",9))+4
+    out["global_attempts_seen"]=int(out.get("legacy_prior_attempts",16))+13
+    out["economic_outcomes_opened"]=int(out.get("economic_outcomes_opened",12))+4
+    out["discovery_ledger_entries"]=int(out.get("discovery_ledger_entries",42))+4
+    out["discovery_result_recorded_entries"]=int(out.get("discovery_result_recorded_entries",10))+4
     perf["candidate_own_outcomes_opened"]=True
     perf["v2_attempts_used_after_wave01"]=13
     perf["v2_search_budget_remaining_after_wave01"]=71
