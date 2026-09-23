@@ -1,0 +1,144 @@
+{
+  "schema": "mxm.greenfield.c031-stage-b-pre-economic-freeze.v1",
+  "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "frozen_from_research_head": "6404fec6ea9afacef4bb30c4cfc29f1a3744c1cc",
+  "candidate": {
+    "id": "V2-C031",
+    "spec_hash": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1",
+    "stage_a_result_ref": "discovery/results/V2-C031_STAGE_A_V1.json",
+    "stage_a_status": "DISCOVERY_SURVIVOR"
+  },
+  "implementation": {
+    "replay_ref": "competition/continuous_account_replay_v2.py",
+    "replay_git_blob_sha1": "9e6f818534aea8ed2b1cd34d5ef728e127e7d43d",
+    "evaluator_ref": "m7/c031_stage_b_frozen_v1.py",
+    "evaluator_git_blob_sha1": "fa4627f674fbf3029b0dfec467b3104250e8c8a0",
+    "evaluator_execution_is_fail_closed_without_separate_exact_head_green_authorization": true
+  },
+  "materialization": {
+    "role": "PRE_ECONOMIC_DERIVED_INPUTS_FROM_ALREADY_OPENED_STAGE_A_AND_EXISTING_ACCEPTED_DATA",
+    "counts": {
+      "intents": 129,
+      "market_path_bars": 1666,
+      "conversion_rows_per_market": 1587,
+      "conversion_markets": 3,
+      "broker_symbols": 10,
+      "maximum_cross_symbol_concurrency": 8
+    },
+    "artifacts": [
+      {
+        "name": "C031_STAGE_B_PRE_ECONOMIC_INTENTS_V1.json.gz",
+        "library_path": "/MXM_QUANT_DIRECTOR/C031_STAGE_B_PRE_ECONOMIC/C031_STAGE_B_PRE_ECONOMIC_INTENTS_V1.json.gz",
+        "library_file_id": "libfile_b5f5cc7ba52c819189f0d25ee5deefe7",
+        "gzip_sha256": "8ee0c9626fa567cdff0f4d1152c0b74760f31ead19fecafdcf8c909e4e69dbcb",
+        "raw_sha256": "de1e6aaf92dff31e16ec9374a3e9bde2b419fffdb77d720ff9cf04ee06310bb3"
+      },
+      {
+        "name": "C031_STAGE_B_PRE_ECONOMIC_MARKET_PATH_V1.json.gz",
+        "library_path": "/MXM_QUANT_DIRECTOR/C031_STAGE_B_PRE_ECONOMIC/C031_STAGE_B_PRE_ECONOMIC_MARKET_PATH_V1.json.gz",
+        "library_file_id": "libfile_713b85f7b43c819196de962dc739fc3d",
+        "gzip_sha256": "475f98f62c4091aa5a71800424fa9e4f206a6aeb5c44b6a30cf050dbbab9fff6",
+        "raw_sha256": "f0f389083bad73d0728648016e3e9c6fbb200bd6d63d582b13d0005ad9ef636b"
+      },
+      {
+        "name": "C031_STAGE_B_CAUSAL_CONVERSION_H1_V1.json.gz",
+        "library_path": "/MXM_QUANT_DIRECTOR/C031_STAGE_B_PRE_ECONOMIC/C031_STAGE_B_CAUSAL_CONVERSION_H1_V1.json.gz",
+        "library_file_id": "libfile_06345fc5f87c819198bed9b8edeb8c68",
+        "gzip_sha256": "9aa8ecf6c953fbb0c7e4e402140e58f383f0d49752908370b1fd7b57bb8c29bb",
+        "raw_sha256": "04a6e63ca5192f35b1ca3d2eba3c76e1d16374f51a69d450a100360fcbac8cfe"
+      },
+      {
+        "name": "C031_STAGE_B_BROKER_BINDINGS_V1.json.gz",
+        "library_path": "/MXM_QUANT_DIRECTOR/C031_STAGE_B_PRE_ECONOMIC/C031_STAGE_B_BROKER_BINDINGS_V1.json.gz",
+        "library_file_id": "libfile_b91c615625b081919e07bd844dd46954",
+        "gzip_sha256": "d8fc967fca473bfc34187df19ffbd39fa4311aa4bb3850c641ecbc7272e6283d",
+        "raw_sha256": "8a5e4e9b812c239c661e4f33eb3cbda85f334a107047196ddb8d3cc8d295e46a"
+      }
+    ],
+    "source_artifacts": {
+      "v6": {
+        "filename": "MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6.zip",
+        "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+      },
+      "broker_universe": {
+        "filename": "MXM_COMPETITION_BROKER_UNIVERSE_V2.zip",
+        "sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77"
+      },
+      "causal_conversion": {
+        "filename": "MXM_G2_T1_DEVELOPMENT_ECONOMICS_EVIDENCE_V1_SEND_TO_CHATGPT.zip",
+        "sha256": "2b945f1a9f609a155b236ae2cae6510eb31097c15866802b19a92b32ff05ef3e",
+        "reuse_scope": "RAW_H1_EURUSD_EURJPY_EURCHF_ONLY_NO_PRIOR_ECONOMIC_OUTCOME_REUSE"
+      }
+    }
+  },
+  "causal_semantics": {
+    "stage_a_signal_semantics_unchanged": true,
+    "chronological_replay": true,
+    "causal_entry_admission": true,
+    "intratrade_marks": "ACCEPTED_V6_M5_OBSERVED_BARS_ONLY",
+    "conversion": "LATEST_COMPLETED_H1_CLOSE_ONLY",
+    "conversion_formulas": {
+      "USD_to_EUR": "1/EURUSD",
+      "JPY_to_EUR": "1/EURJPY",
+      "CHF_to_EUR": "1/EURCHF"
+    },
+    "same_timestamp_mark_processing": "ATOMIC_BEFORE_STOP_OUT_VALIDITY_GUARD",
+    "same_timestamp_entry_tiebreak": "priority_then_symbol_then_position_id",
+    "same_symbol_overlap": false,
+    "cross_symbol_concurrency": true
+  },
+  "capital_semantics": {
+    "one_continuous_account": true,
+    "starting_equity_eur": 200,
+    "weekly_reset": false,
+    "monthly_reset": false,
+    "position_size": "BROKER_MINIMUM_EXECUTABLE_VOLUME_BASELINE",
+    "sizing_role": "REALIZABILITY_BASELINE_NOT_FINAL_PERFORMANCE_OPTIMIZER",
+    "realized_profit_loss_carries_forward": true,
+    "deposits_withdrawals": "SUPPORTED_AS_EXTERNAL_CASHFLOW_AND_EXCLUDED_FROM_STRATEGY_NAV",
+    "margin": "CURRENT_ACCOUNT_NATIVE_EXPECTED_MARGIN_AT_MIN_EXECUTABLE_VOLUME",
+    "margin_authority_boundary": "CURRENT_CONFIGURATION_DEVELOPMENT_SCENARIO_NOT_HISTORICAL_POINT_IN_TIME_CERTIFICATION",
+    "free_margin": true,
+    "capital_occupancy": true,
+    "drawdown_and_recovery_metrics": true,
+    "weekly_monthly_equity": true
+  },
+  "costs": {
+    "authority_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "law": "FULL_FROZEN_CONSERVATIVE_ROUNDTRIP_FRACTION_TIMES_ACTUAL_ENTRY_NOTIONAL_EUR_CHARGED_AT_ENTRY_FOR_PATH_CONSERVATISM",
+    "post_outcome_tuning": false
+  },
+  "financing": {
+    "state": "EXACT_ZERO_FOR_FROZEN_C031_PATH",
+    "rollover_crossings": 0,
+    "proof": "All 129 frozen positions close before their broker-captured 21:00 UTC swap rollover; any path drift creating a crossing invalidates this proof."
+  },
+  "stop_out": {
+    "exact_account_specific_forced_liquidation_level": "UNRESOLVED",
+    "captured_margin_call_ratios": [
+      1.5,
+      1,
+      0.8
+    ],
+    "fail_closed_guard_ratio": 1.5,
+    "law": "Do not fabricate stop-out. Reject a prospective entry that would reach the 1.5 guard; invalidate/halt if base or adverse-bar stress path reaches it. If neither path reaches the guard, unknown lower stop-out semantics cannot change this frozen path."
+  },
+  "adverse_path_guard": {
+    "role": "MATERIALITY_VALIDITY_GUARD_NOT_ALPHA_TUNING",
+    "long_mark": "observed_M5_low",
+    "short_mark": "observed_M5_high",
+    "decision_use": "NONE"
+  },
+  "execution_authorized": false,
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "v2_search_budget_remaining": 65,
+    "discovery_ledger_changed": false
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
