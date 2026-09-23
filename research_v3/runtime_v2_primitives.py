@@ -311,5 +311,35 @@ class GitCheckpointSink:
         if self.push:
             target = os.environ.get("MXM_RUNTIME_TARGET_BRANCH")
             refspec = f"HEAD:refs/heads/{target}" if target else "HEAD"
-            subprocess.run(["git", "push", "origin", refspec], cwd=self.root, check=True)
+            first = subprocess.run(
+                ["git", "push", "origin", refspec],
+                cwd=self.root, text=True, capture_output=True,
+            )
+            if first.returncode == 0:
+                return
+            if not target:
+                raise RuntimeV2Error(
+                    "checkpoint push failed without MXM_RUNTIME_TARGET_BRANCH; "
+                    f"stderr={first.stderr.strip()}"
+                )
+            subprocess.run(["git", "fetch", "origin", target], cwd=self.root, check=True)
+            rebase = subprocess.run(
+                ["git", "rebase", f"origin/{target}"],
+                cwd=self.root, text=True, capture_output=True,
+            )
+            if rebase.returncode != 0:
+                subprocess.run(["git", "rebase", "--abort"], cwd=self.root, check=False)
+                raise MaterialIntegrityHalt(
+                    "checkpoint push conflict could not be reconciled cleanly; "
+                    f"stderr={rebase.stderr.strip()}"
+                )
+            second = subprocess.run(
+                ["git", "push", "origin", refspec],
+                cwd=self.root, text=True, capture_output=True,
+            )
+            if second.returncode != 0:
+                raise RuntimeV2Error(
+                    "checkpoint push failed after one fetch/rebase retry; "
+                    f"stderr={second.stderr.strip()}"
+                )
 
