@@ -1,0 +1,164 @@
+{
+  "id": "V2-C031",
+  "mechanism": {
+    "family": "SESSION_GAP_REVERSION",
+    "subfamily": "BROKER_NATIVE_OBSERVED_GAP_SHOCK_REVERSION_CAUSAL_VOLATILITY_AND_COST_HURDLE"
+  },
+  "rationale": "High-information prospective extension of the currently valid C006 gap-reversion family into the accepted broker-native V6 frontier. The identity tests whether large observed reopening/session gaps mean-revert across asset classes while preserving live-equivalent admission, gap-safe executable settlement, fixed pre-outcome parameters, and the unchanged conservative cost authority. It does not tune to Wave05 candidate PnL and does not use protected-forward evidence.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "features": [
+    {
+      "name": "observed_gap_minutes",
+      "formula": "minutes between the current observed M5 bar open and the immediately previous observed M5 bar open"
+    },
+    {
+      "name": "gap_return",
+      "formula": "current observed M5 open / immediately previous observed M5 close - 1"
+    },
+    {
+      "name": "prior_contiguous_abs_return_scale",
+      "formula": "median of the 288 most recent absolute close-to-close returns whose adjacent observed M5 timestamps were exactly 5 minutes apart; only values completed before the current signal bar are eligible"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "prior_contiguous_abs_return_scale",
+      "most_recent_exact_m5_returns": 288,
+      "minimum_required": 144
+    }
+  ],
+  "normalization_training": {
+    "mode": "CAUSAL_ROLLING_MEDIAN_ABSOLUTE_EXACT_M5_RETURN",
+    "future_normalization": false,
+    "retraining_schedule": "EACH_OBSERVED_M5_BAR_CLOSE",
+    "inner_validation": "NONE_FIXED_RULE",
+    "random_temporal_shuffle": false,
+    "purge_embargo": "CURRENT_GAP_AND_ALL_POST_DECISION_OBSERVATIONS_EXCLUDED_FROM_SCALE"
+  },
+  "timing": {
+    "decision": "AFTER_FIRST_OBSERVED_M5_BAR_FOLLOWING_AN_OBSERVED_GAP_COMPLETES",
+    "entry": "FIRST_LATER_OBSERVED_M5_OPEN_AFTER_CAUSAL_SIGNAL_ADMISSION",
+    "scheduled_target_horizon_minutes": 60,
+    "exit": "FIRST_OBSERVED_M5_OPEN_AT_OR_AFTER_SCHEDULED_TARGET_PROCESSED_ONLY_AFTER_ENTRY"
+  },
+  "direction": {
+    "LONG": "gap_return < 0 AND abs(gap_return) > 3.0*prior_contiguous_abs_return_scale AND abs(gap_return) > 4.0*frozen_roundtrip_cost_fraction",
+    "SHORT": "gap_return > 0 under the same scale and cost hurdles",
+    "NO_OP": "otherwise_or_fewer_than_144_prior_exact_M5_returns_or_existing_same_symbol_position_or_pending_entry"
+  },
+  "entry": {
+    "type": "NEXT_OBSERVED_M5_OPEN_AFTER_COMPLETED_GAP_SIGNAL",
+    "price": "first later observed M5 open after the completed signal bar; signal admission never queries whether that future open exists"
+  },
+  "exit": {
+    "type": "SCHEDULED_60_MINUTE_TARGET_FIRST_OBSERVED_OPEN_SETTLEMENT",
+    "price": "first observed M5 open at or after entry_timestamp_plus_60_minutes",
+    "missing_target_within_market_closure": "wait until first later observed M5 open, matching live executable semantics",
+    "capture_end_before_entry_or_exit": "RIGHT_CENSORED_NON_ECONOMIC_WITHOUT_RETROACTIVE_SIGNAL_SUPPRESSION"
+  },
+  "maximum_hold": {
+    "unit": "SCHEDULED_MINUTES_BEFORE_FIRST_LATER_EXECUTABLE_OBSERVED_OPEN",
+    "value": 60
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "market-closure gaps are preserved; no synthetic or forward-filled prices",
+    "ohlc_only": true,
+    "cost_model": "frozen per-symbol conservative roundtrip fraction"
+  },
+  "filters": [
+    "OBSERVED_GAP_MINIMUM_30_MINUTES",
+    "ABS_GAP_RETURN_GT_3X_PRIOR_CAUSAL_MEDIAN_ABS_EXACT_M5_RETURN",
+    "ABS_GAP_RETURN_GT_4X_FROZEN_ROUNDTRIP_COST",
+    "MINIMUM_144_PRIOR_EXACT_M5_RETURNS",
+    "NO_SAME_SYMBOL_OVERLAP_OR_PENDING_ENTRY",
+    "POST_ENTRY_TARGET_AVAILABILITY_NEVER_CONTROLS_ADMISSION",
+    "NO_SYNTHETIC_OR_FORWARDFILLED_PRICES"
+  ],
+  "parameters": {
+    "minimum_observed_gap_minutes": 30,
+    "scale_window_exact_m5_returns": 288,
+    "minimum_scale_observations": 144,
+    "shock_scale_multiple": 3.0,
+    "minimum_signal_move_cost_multiple": 4.0,
+    "scheduled_hold_minutes": 60
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use the unchanged prospectively frozen candidate-independent V6 per-symbol roundtrip cost fraction; no C031 outcome calibrates cost."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_PER_SYMBOL_CAUSAL_ROLLING_STATE_WITH_PENDING_ENTRY_AND_SCHEDULED_EXIT_INTENT"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "position_admission_policy": {
+    "cross_symbol_concurrency_allowed_in_stage_a": true,
+    "same_symbol_overlap": false,
+    "same_symbol_pyramiding_allowed": false,
+    "scope": "PER_CANDIDATE_PER_TRADED_SYMBOL",
+    "future_entry_or_exit_availability_may_affect_signal_admission": false
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "resolution": "M5",
+    "accepted_capture_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
+  },
+  "causal_availability": {
+    "future_information_forbidden": true,
+    "decision_uses": "current completed signal bar plus rolling state containing only earlier exact-M5 returns",
+    "entry_uses": "pending intent filled only when the first later observed M5 open actually arrives",
+    "exit_uses": "scheduled target created at entry; filled only when an observed M5 open at or after target arrives",
+    "training_or_normalization": "rolling median uses only prior exact-M5 close-to-close returns and is snapshotted before current-bar update",
+    "sample_end": "unfilled pending entry or open trade at capture end is right-censored and never retroactively changes admission"
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "wave": "PERFORMANCE_RESEARCH_V3_WAVE06",
+    "selection_basis": "CURRENT_VALID_C006_GAP_REVERSION_FAMILY_PLUS_WAVE05_DATA_SUFFICIENCY_INFORMATION; GENERALIZE_CAUSALLY_TO_BROKER_NATIVE_V6_WITH_GAP_SAFE_LIVE_EXECUTABLE_SETTLEMENT; NO_NUMERIC_FIT_TO_C031_OUTCOME",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1"
+}

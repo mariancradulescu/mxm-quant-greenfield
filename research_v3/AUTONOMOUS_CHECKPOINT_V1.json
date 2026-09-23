@@ -1,12 +1,11 @@
 {
   "accounting": {
-    "distinct_identity_outcomes_opened": 18,
-    "economic_outcomes_opened": 25,
-    "stage_a_result_recorded_entries": 23,
-    "stage_b_current_config_economic_observations": 2,
     "v2_attempts_used": 18,
     "v2_evaluated_identities": 18,
-    "v2_search_budget_remaining": 66
+    "v2_search_budget_remaining": 66,
+    "economic_outcomes_opened": 25,
+    "discovery_ledger_entries": 67,
+    "discovery_result_recorded_entries": 23
   },
   "blocked_invalid_wave": {
     "attempts_consumed": 0,
@@ -40,10 +39,10 @@
     "same_identity_successor_result_entries": 5
   },
   "live_equivalent_stage_b_revalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json",
-  "next_action": "FREEZE_NEXT_HIGH_INFORMATION_WAVE",
+  "next_action": "REQUIRE_EXACT_HEAD_GREEN_AND_BIND_WAVE06_AUTHORIZATION",
   "pending_same_identity_correction_candidate_ids": [],
   "persistence_commit": "3ef3aee7852bdb816a75cc00e7ea6d83614de53b",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE05_RESULTS_RECORDED_EXACT_HEAD_GREEN_READY_WAVE06",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_FROZEN_PENDING_EXACT_HEAD_GREEN",
   "recovery": {
     "authority_ref": "evidence/WAVE_05_POST_OUTCOME_RECOVERY_V1.json",
     "canonical_persistence_complete": true,
@@ -66,9 +65,9 @@
     "protected_evidence_opened": false
   },
   "schema": "mxm.greenfield.autonomous-research-checkpoint.v1",
-  "source_head": "4797a0db1bc4e2961520574073cea7db8e0715ab",
+  "source_head": "cfdc7ec589693786ea6562a1af674a1e18efde44",
   "stage_b_revalidation_required_candidate_ids": [],
-  "status": "VALIDATED_WAVE05_CLOSED_EXACT_HEAD_GREEN",
+  "status": "WAVE06_FROZEN_PENDING_EXACT_HEAD_GREEN",
   "wave05": {
     "attempts_consumed": 2,
     "candidate_ids": [
@@ -100,5 +99,22 @@
     "head": "4797a0db1bc4e2961520574073cea7db8e0715ab",
     "workflow_run_id": 35855088214,
     "conclusion": "SUCCESS"
-  }
+  },
+  "wave06": {
+    "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+    "freeze_ref": "research_v3/WAVE_06_PRE_OUTCOME_FREEZE_V1.json",
+    "candidate_ids": [
+      "V2-C031"
+    ],
+    "candidate_spec_hashes": {
+      "V2-C031": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1"
+    },
+    "candidate_own_outcomes_opened": false,
+    "ledger_freeze_sequence": 67,
+    "expected_attempt_delta_on_execution": 1,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false
+  },
+  "user_action_required": false
 }

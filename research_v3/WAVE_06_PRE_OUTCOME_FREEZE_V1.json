@@ -1,0 +1,86 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave06-pre-outcome-freeze.v1",
+  "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "frozen_utc": "2026-09-23T12:08:00Z",
+  "predecessor_control_plane_validation": {
+    "head": "cfdc7ec589693786ea6562a1af674a1e18efde44",
+    "ci_run_id": 35857912591,
+    "conclusion": "SUCCESS",
+    "wave05_status": "RESULTS_RECORDED_EXACT_HEAD_GREEN"
+  },
+  "candidate_ids": [
+    "V2-C031"
+  ],
+  "candidate_spec_hashes": {
+    "V2-C031": "4a57910026bc8df63446fa8024ac86a18ce8a732039a9388f704a50bbccfc4e1"
+  },
+  "candidate_git_blob_sha1": {
+    "V2-C031": "994f03f7536874e2a59dc279196cf4b1c80e6dc4"
+  },
+  "material_distinction": {
+    "current_valid_family_evidence_used": true,
+    "source_authority_candidate": "V2-C006",
+    "source_authority_stage_b_terminal_equity_eur": 258.6947216647057,
+    "wave05_data_sufficiency_information_used": true,
+    "candidate_own_outcome_used": false,
+    "new_identity_required": true,
+    "new_structure": [
+      "BROKER_NATIVE_OBSERVED_REOPENING_OR_SESSION_GAP_EVENT",
+      "CAUSAL_ROLLING_MEDIAN_OF_PRIOR_EXACT_M5_RETURNS",
+      "MEAN_REVERSION_DIRECTION_WITH_VOLATILITY_AND_COST_HURDLES",
+      "PENDING_ENTRY_FILLED_ONLY_ON_FIRST_LATER_OBSERVED_M5_OPEN",
+      "SCHEDULED_60M_EXIT_FILLED_ON_FIRST_OBSERVED_OPEN_AT_OR_AFTER_TARGET",
+      "CROSS_ASSET_V6_GENERALIZATION_OF_VALID_GAP_REVERSION_FAMILY"
+    ]
+  },
+  "selection_basis": [
+    "C006_CURRENT_VALID_STAGE_A_AND_STAGE_B_AUTHORITY_SUPPORTS_GAP_REVERSION_FAMILY_AS_HIGH_INFORMATION_PRIOR",
+    "C029_C030_DATA_INSUFFICIENT_SHOWED_EXACT_TARGET_GRID_SETTLEMENT_IS_LOW_VALUE_FOR_NEXT_WAVE",
+    "TEST_GENERALIZATION_ACROSS_ACCEPTED_V6_BROKER_NATIVE_FRONTIER_WITHOUT_FITTING_C031_PNL",
+    "ONE_IDENTITY_ONLY_TO_MAXIMIZE_INFORMATION_PER_ATTEMPT",
+    "NO_PROTECTED_FORWARD_EVIDENCE"
+  ],
+  "capture": {
+    "ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json",
+    "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+  },
+  "cost_authority": {
+    "ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9"
+  },
+  "evaluator": {
+    "ref": "m7/competition_performance_v3_wave06_c031_evaluator.py",
+    "sha256": "90bfa75c44ba6d281b2e84e5aa81b0fddeadcf3b7b5f4ec19bcd70c311ca0344",
+    "git_blob_sha1": "ed1a8f67b65f52018f0d067ed9afc9e7d10f4081"
+  },
+  "wrapper": {
+    "ref": "research_v3/wave06_execute.py",
+    "sha256": "4472d38ab113473964258db1fa51095f0dadaa35ef11ac26634f2cd1619e64df",
+    "git_blob_sha1": "bf76d1a8fabb313f5d5252446e3f75dab14e466f"
+  },
+  "control_test_ref": "tests/test_performance_research_v3_wave06_control.py",
+  "accounting_before": {
+    "v2_attempts_used": 18,
+    "v2_search_budget_remaining": 66,
+    "v2_evaluated_identities": 18,
+    "economic_outcomes_opened": 25,
+    "discovery_ledger_entries": 66,
+    "discovery_result_recorded_entries": 23
+  },
+  "expected_if_c031_later_legitimately_opened": {
+    "v2_attempts_used": 19,
+    "v2_search_budget_remaining": 65,
+    "v2_evaluated_identities": 19,
+    "economic_outcomes_opened": 26,
+    "discovery_result_recorded_entries": 24
+  },
+  "ledger_freeze_sequences": {
+    "V2-C031": 67
+  },
+  "new_attempts_consumed_by_freeze": 0,
+  "candidate_own_outcomes_opened": false,
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false,
+  "execution_gate": "REQUIRE_EXACT_HEAD_FULL_SUITE_GREEN_AFTER_THIS_FREEZE_THEN_BIND_SEPARATE_AUTHORIZATION"
+}
