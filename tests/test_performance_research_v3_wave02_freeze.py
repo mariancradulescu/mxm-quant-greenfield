@@ -4,6 +4,7 @@ from unittest.mock import patch
 from discovery.canonical import compute_result_hash, verify_spec_hash
 from discovery.ledger import read_ledger
 from research_v3.wave02_execute import V3Wave02ExecutionNotAuthorized, execute_authorized
+from research_v3.lifecycle import candidate_lifecycle, find_result_version
 
 ROOT=Path(__file__).resolve().parents[1]
 IDS=("V2-C024","V2-C025")
@@ -41,14 +42,21 @@ class PerformanceResearchV3Wave02FreezeTests(unittest.TestCase):
         self.assertEqual(wave["new_attempts_consumed_by_freeze"],0)
         self.assertFalse(wave["candidate_own_outcomes_opened"])
 
-    def test_03_current_ledger_lifecycle_has_no_duplicates(self):
+    def test_03_current_ledger_lifecycle_is_versioned_not_duplicate(self):
         ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
         state=load("CURRENT_STATE.json")
         opened=state["performance_research_v3"]["wave02"]["candidate_own_outcomes_opened"]
         for cid in IDS:
-            rows=[x for x in ledger if x.get("candidate_id")==cid]
-            expected=["CANDIDATE_FROZEN","RESULT_RECORDED"] if opened else ["CANDIDATE_FROZEN"]
-            self.assertEqual([x["entry_type"] for x in rows],expected)
+            lc=candidate_lifecycle(ledger,cid)
+            self.assertEqual(len([x for x in lc.freezes if x["entry_type"]=="CANDIDATE_FROZEN"]),1)
+            if opened:
+                historical_hash=state["performance_research_v3"]["wave02"]["result_hashes"][cid]
+                historical=find_result_version(lc,historical_hash)
+                self.assertEqual(historical.result["candidate_id"],cid)
+                self.assertEqual(historical.result["spec_hash"],HASHES[cid])
+                self.assertEqual(lc.incomplete_corrections,())
+            else:
+                self.assertEqual(len(lc.results),0)
         self.assertEqual(state["performance_research_v3"]["wave02"]["v2_attempts_used_before_wave02"],13)
         self.assertEqual(state["performance_research_v3"]["wave02"]["v2_search_budget_remaining_before_wave02"],71)
         if opened:
@@ -66,7 +74,7 @@ class PerformanceResearchV3Wave02FreezeTests(unittest.TestCase):
                 execute_authorized(ROOT,"missing.zip",execution_head="not-authorized",execution_ci_run_id=0)
             economic.assert_not_called()
 
-    def test_05_persisted_results_and_ledger_payloads_are_canonical(self):
+    def test_05_persisted_historical_results_remain_canonical_with_later_successors(self):
         state=load("CURRENT_STATE.json")
         wave02=state["performance_research_v3"]["wave02"]
         self.assertTrue(wave02["candidate_own_outcomes_opened"])
@@ -77,11 +85,12 @@ class PerformanceResearchV3Wave02FreezeTests(unittest.TestCase):
             self.assertEqual(result["spec_hash"],HASHES[cid])
             self.assertEqual(result["status"],EXPECTED_STATUSES[cid])
             self.assertEqual(result["result_hash"],compute_result_hash(result))
-            rec=[x for x in ledger if x["candidate_id"]==cid and x["entry_type"]=="RESULT_RECORDED"]
-            self.assertEqual(len(rec),1)
-            self.assertEqual(rec[0]["payload"]["result"],result)
-            self.assertEqual(rec[0]["payload"]["result_hash"],result["result_hash"])
+            lc=candidate_lifecycle(ledger,cid)
+            rec=find_result_version(lc,result["result_hash"]).row
+            self.assertEqual(rec["payload"]["result"],result)
+            self.assertEqual(rec["payload"]["result_hash"],result["result_hash"])
             self.assertEqual(wave02["result_hashes"][cid],result["result_hash"])
+            self.assertEqual(lc.incomplete_corrections,())
         self.assertEqual(wave02["v2_attempts_used_after_wave02"],15)
         self.assertEqual(wave02["v2_search_budget_remaining_after_wave02"],69)
         self.assertEqual(wave02["economic_attempt_delta"],2)
