@@ -1,152 +1,22 @@
 {
   "candidate_id": "V2-C023",
-  "cost_confidence": {
-    "reason": "Uses the unchanged pre-outcome V6 per-symbol coarse roundtrip cost authority.",
-    "state": "CONSERVATIVE_BOUND"
-  },
-  "data_completeness": {
-    "reason": "Accepted V6 13-week M5 capture with checksum-bound complete Stage-A series.",
-    "state": "SUFFICIENT"
-  },
-  "eur200_feasibility": {
-    "reason": "Stage A uses fixed EUR1000 analytic normalization; shared EUR200 replay is required only for a Stage-A survivor and must not synthesize volume or margin.",
-    "state": "NOT_EVALUATED"
-  },
+  "spec_hash": "c2b8ec06c54743b38168980c7746c50401f563ebee45c55b876654423807b34a",
+  "stage": "A",
+  "status": "GROSS_EDGE_FAIL",
   "implementation_validity": {
     "reason": "Live-equivalent admission/settlement control-flow correction only; frozen identity, signal semantics, data domain and cost semantics are unchanged. The corrected economic outcome was already observed locally before artifact loss and is deterministically reconstructed without rescue tuning.",
     "state": "VALID"
   },
   "metrics": {
-    "active_weeks": 13,
-    "coarse_net_pnl": -199.02819006194892,
-    "coarse_net_return": -0.0005156170726993496,
-    "cost_burden": 0.0002910662637092903,
-    "direction_contribution": {
-      "LONG": {
-        "coarse_net_pnl_eur": -180.5459607043919,
-        "event_count": 189,
-        "gross_pnl_eur": -121.69115620306073,
-        "transaction_cost_eur": 58.85480450133109
-      },
-      "SHORT": {
-        "coarse_net_pnl_eur": -18.482229357557294,
-        "event_count": 197,
-        "gross_pnl_eur": 35.014543932897666,
-        "transaction_cost_eur": 53.496773290454925
-      }
-    },
-    "drawdown": 392.40212969177975,
     "event_count": 386,
-    "exposure": 0.9844322344322345,
-    "gross_per_event": -0.22455080899005966,
     "gross_pnl": -86.67661227016303,
+    "coarse_net_pnl": -199.02819006194892,
     "gross_return": -0.00022455080899005969,
-    "hold_duration": {
-      "max_minutes": 3240,
-      "mean_minutes": 334.1968911917098,
-      "median_minutes": 240,
-      "min_minutes": 240
-    },
-    "longest_inactive_gap": 3,
+    "coarse_net_return": -0.0005156170726993496,
+    "gross_per_event": -0.22455080899005966,
     "net_per_event": -0.5156170726993495,
-    "regime_contribution": {
-      "reason": "No prospectively frozen regime taxonomy in Wave 02.",
-      "state": "NOT_APPLICABLE"
-    },
-    "session_distribution": {
-      "UTC_00_03": 64,
-      "UTC_03_06": 64,
-      "UTC_06_09": 65,
-      "UTC_12_15": 65,
-      "UTC_15_18": 65,
-      "UTC_18_21": 63
-    },
-    "subperiod_contribution": {
-      "EARLY_9W": {
-        "coarse_net_pnl_eur": -187.870460849003,
-        "event_count": 266,
-        "gross_pnl_eur": -109.23284706880288,
-        "transaction_cost_eur": 78.63761378020024
-      },
-      "LATEST_4W": {
-        "coarse_net_pnl_eur": -11.157729212946009,
-        "event_count": 120,
-        "gross_pnl_eur": 22.556234798639853,
-        "transaction_cost_eur": 33.71396401158581
-      }
-    },
-    "symbol_contribution": {
-      "AUDUSD": {
-        "coarse_net_pnl_eur": 6.377809513929497,
-        "event_count": 24,
-        "gross_pnl_eur": 9.403077429030647,
-        "transaction_cost_eur": 3.0252679151011503
-      },
-      "Copper": {
-        "coarse_net_pnl_eur": -21.33399807775597,
-        "event_count": 12,
-        "gross_pnl_eur": -15.01201828940739,
-        "transaction_cost_eur": 6.321979788348577
-      },
-      "ETHUSD": {
-        "coarse_net_pnl_eur": -118.52510309163709,
-        "event_count": 41,
-        "gross_pnl_eur": -80.94662155007585,
-        "transaction_cost_eur": 37.57848154156124
-      },
-      "GBPUSD": {
-        "coarse_net_pnl_eur": 2.187610676451715,
-        "event_count": 11,
-        "gross_pnl_eur": 3.0817509571244552,
-        "transaction_cost_eur": 0.8941402806727392
-      },
-      "SpotBrent": {
-        "coarse_net_pnl_eur": 28.39582282561481,
-        "event_count": 8,
-        "gross_pnl_eur": 32.49596880806533,
-        "transaction_cost_eur": 4.100145982450514
-      },
-      "SpotCrude": {
-        "coarse_net_pnl_eur": -13.640911338696293,
-        "event_count": 98,
-        "gross_pnl_eur": 27.59221008032065,
-        "transaction_cost_eur": 41.23312141901689
-      },
-      "US2000": {
-        "coarse_net_pnl_eur": -41.566295392887284,
-        "event_count": 29,
-        "gross_pnl_eur": -36.80104493870208,
-        "transaction_cost_eur": 4.765250454185206
-      },
-      "US500": {
-        "coarse_net_pnl_eur": -52.71237407097643,
-        "event_count": 109,
-        "gross_pnl_eur": -43.79252426235008,
-        "transaction_cost_eur": 8.919849808626306
-      },
-      "USDCHF": {
-        "coarse_net_pnl_eur": 11.109707701169615,
-        "event_count": 16,
-        "gross_pnl_eur": 12.861841257937131,
-        "transaction_cost_eur": 1.7521335567675147
-      },
-      "USDJPY": {
-        "coarse_net_pnl_eur": 0.6795411928382946,
-        "event_count": 38,
-        "gross_pnl_eur": 4.4407482378942715,
-        "transaction_cost_eur": 3.761207045055982
-      }
-    },
-    "turnover": 772000,
-    "weekday_distribution": {
-      "FRI": 76,
-      "MON": 76,
-      "SAT": 0,
-      "SUN": 0,
-      "THU": 78,
-      "TUE": 78,
-      "WED": 78
-    },
+    "cost_burden": 0.0002910662637092903,
+    "turnover": 772000.0,
     "weekly_events": {
       "2026-W25": 27,
       "2026-W26": 30,
@@ -161,28 +31,158 @@
       "2026-W35": 30,
       "2026-W36": 30,
       "2026-W37": 30
+    },
+    "active_weeks": 13,
+    "longest_inactive_gap": 3,
+    "weekday_distribution": {
+      "MON": 76,
+      "TUE": 78,
+      "WED": 78,
+      "THU": 78,
+      "FRI": 76,
+      "SAT": 0,
+      "SUN": 0
+    },
+    "session_distribution": {
+      "UTC_06_09": 65,
+      "UTC_12_15": 65,
+      "UTC_15_18": 65,
+      "UTC_18_21": 63,
+      "UTC_00_03": 64,
+      "UTC_03_06": 64
+    },
+    "hold_duration": {
+      "min_minutes": 240.0,
+      "median_minutes": 240.0,
+      "mean_minutes": 334.1968911917098,
+      "max_minutes": 3240.0
+    },
+    "exposure": 0.9844322344322345,
+    "drawdown": 392.40212969177975,
+    "symbol_contribution": {
+      "AUDUSD": {
+        "event_count": 24,
+        "gross_pnl_eur": 9.403077429030647,
+        "transaction_cost_eur": 3.0252679151011503,
+        "coarse_net_pnl_eur": 6.377809513929497
+      },
+      "ETHUSD": {
+        "event_count": 41,
+        "gross_pnl_eur": -80.94662155007585,
+        "transaction_cost_eur": 37.57848154156124,
+        "coarse_net_pnl_eur": -118.52510309163709
+      },
+      "US500": {
+        "event_count": 109,
+        "gross_pnl_eur": -43.79252426235008,
+        "transaction_cost_eur": 8.919849808626306,
+        "coarse_net_pnl_eur": -52.71237407097643
+      },
+      "SpotCrude": {
+        "event_count": 98,
+        "gross_pnl_eur": 27.59221008032065,
+        "transaction_cost_eur": 41.23312141901689,
+        "coarse_net_pnl_eur": -13.640911338696293
+      },
+      "USDJPY": {
+        "event_count": 38,
+        "gross_pnl_eur": 4.4407482378942715,
+        "transaction_cost_eur": 3.761207045055982,
+        "coarse_net_pnl_eur": 0.6795411928382946
+      },
+      "USDCHF": {
+        "event_count": 16,
+        "gross_pnl_eur": 12.861841257937131,
+        "transaction_cost_eur": 1.7521335567675147,
+        "coarse_net_pnl_eur": 11.109707701169615
+      },
+      "US2000": {
+        "event_count": 29,
+        "gross_pnl_eur": -36.80104493870208,
+        "transaction_cost_eur": 4.765250454185206,
+        "coarse_net_pnl_eur": -41.566295392887284
+      },
+      "GBPUSD": {
+        "event_count": 11,
+        "gross_pnl_eur": 3.0817509571244552,
+        "transaction_cost_eur": 0.8941402806727392,
+        "coarse_net_pnl_eur": 2.187610676451715
+      },
+      "Copper": {
+        "event_count": 12,
+        "gross_pnl_eur": -15.01201828940739,
+        "transaction_cost_eur": 6.321979788348577,
+        "coarse_net_pnl_eur": -21.33399807775597
+      },
+      "SpotBrent": {
+        "event_count": 8,
+        "gross_pnl_eur": 32.49596880806533,
+        "transaction_cost_eur": 4.100145982450514,
+        "coarse_net_pnl_eur": 28.39582282561481
+      }
+    },
+    "direction_contribution": {
+      "SHORT": {
+        "event_count": 197,
+        "gross_pnl_eur": 35.014543932897666,
+        "transaction_cost_eur": 53.496773290454925,
+        "coarse_net_pnl_eur": -18.482229357557294
+      },
+      "LONG": {
+        "event_count": 189,
+        "gross_pnl_eur": -121.69115620306073,
+        "transaction_cost_eur": 58.85480450133109,
+        "coarse_net_pnl_eur": -180.5459607043919
+      }
+    },
+    "subperiod_contribution": {
+      "EARLY_9W": {
+        "event_count": 266,
+        "gross_pnl_eur": -109.23284706880288,
+        "transaction_cost_eur": 78.63761378020024,
+        "coarse_net_pnl_eur": -187.870460849003
+      },
+      "LATEST_4W": {
+        "event_count": 120,
+        "gross_pnl_eur": 22.556234798639853,
+        "transaction_cost_eur": 33.71396401158581,
+        "coarse_net_pnl_eur": -11.157729212946009
+      }
+    },
+    "regime_contribution": {
+      "state": "NOT_APPLICABLE",
+      "reason": "No prospectively frozen regime taxonomy in Wave 02."
     }
   },
+  "eur200_feasibility": {
+    "state": "NOT_EVALUATED",
+    "reason": "Stage A uses fixed EUR1000 analytic normalization; shared EUR200 replay is required only for a Stage-A survivor and must not synthesize volume or margin."
+  },
+  "cost_confidence": {
+    "state": "CONSERVATIVE_BOUND",
+    "reason": "Uses the unchanged pre-outcome V6 per-symbol coarse roundtrip cost authority."
+  },
+  "data_completeness": {
+    "state": "SUFFICIENT",
+    "reason": "Accepted V6 13-week M5 capture with checksum-bound complete Stage-A series."
+  },
   "provenance": {
+    "data_evidence": {
+      "identity": "MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6",
+      "binding": {
+        "type": "DATASET_SHA256",
+        "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+      }
+    },
     "cost_evidence": {
       "identity": "COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1",
-      "sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9",
-      "state": "CONSERVATIVE_BOUND"
-    },
-    "data_evidence": {
-      "binding": {
-        "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
-        "type": "DATASET_SHA256"
-      },
-      "identity": "MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6"
+      "state": "CONSERVATIVE_BOUND",
+      "sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9"
     },
     "evaluator": {
       "sha256": "1b3ed935e9bdf51f22901d7666a49f11d5a65fd6ba95915b758116d69d6f97e0",
       "version": "MXM_SAME_IDENTITY_LIVE_EQUIVALENT_CORRECTION_V1"
     }
   },
-  "result_hash": "7a2ddce8a2bad2ec8baeca3d21494e30ea235cbaea64ebce367e9658f639be25",
-  "spec_hash": "c2b8ec06c54743b38168980c7746c50401f563ebee45c55b876654423807b34a",
-  "stage": "A",
-  "status": "GROSS_EDGE_FAIL"
+  "result_hash": "7a2ddce8a2bad2ec8baeca3d21494e30ea235cbaea64ebce367e9658f639be25"
 }
