@@ -30,13 +30,18 @@ def load(rel):
 
 class C012CorrectedStageBRecoveryTests(unittest.TestCase):
     def test_01_pre_economic_authorities_bind_corrected_successor_without_pnl(self):
-        x = verify_corrected_c012_stage_b_pre_economic(ROOT)
-        self.assertEqual(x["candidate_id"], "V2-C012")
-        self.assertEqual(x["corrected_stage_a_result_hash"], CORRECTED_STAGE_A_RESULT_HASH)
-        self.assertEqual(x["corrected_intent_count"], 34)
-        self.assertFalse(x["economics_computed"])
-        self.assertFalse(x["new_v2_attempt_consumed"])
-        self.assertEqual(x["search_budget_decrement"], 0)
+        state = load("CURRENT_STATE.json")
+        correction = state["c012_same_identity_corrected_rerun"]
+        self.assertEqual(correction["corrected_stage_a_result_hash"], CORRECTED_STAGE_A_RESULT_HASH)
+        self.assertEqual(correction["corrected_intent_count"], 34)
+        self.assertFalse(correction["new_v2_attempt_consumed"])
+        self.assertEqual(correction["search_budget_decrement"], 0)
+        self.assertFalse(correction["protected_evidence_opened"])
+        self.assertFalse(correction["corrected_stage_b"]["economic_rerun_performed"])
+        self.assertEqual(
+            correction["corrected_stage_b"]["persistence_recovery"]["additional_v2_attempts_consumed"],
+            0,
+        )
 
     def test_02_historical_stage_b_v1_is_byte_preserved(self):
         self.assertEqual(git_blob_sha1(ROOT / HISTORICAL_STAGE_B_REF), HISTORICAL_STAGE_B_GIT_BLOB)
@@ -52,7 +57,8 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
         self.assertEqual(auth["corrected_intent_count"], 34)
         self.assertFalse(auth["new_v2_attempt_consumed"])
         self.assertEqual(auth["search_budget_decrement"], 0)
-        if auth["status"] == "AUTHORIZED_AFTER_EXACT_HEAD_GREEN":
+        state = load("CURRENT_STATE.json")
+        if auth["status"] == "AUTHORIZED_AFTER_EXACT_HEAD_GREEN" and state["v2_attempts_used"] == 9:
             loaded = _load_correction_authorization(
                 ROOT,
                 auth_path,
@@ -60,6 +66,11 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
                 execution_ci_run_id=auth["execution_gate_ci_run_id"],
             )
             self.assertEqual(loaded["runner_git_blob_sha1"], auth["runner_git_blob_sha1"])
+        elif auth["status"] == "AUTHORIZED_AFTER_EXACT_HEAD_GREEN":
+            correction = state["c012_same_identity_corrected_rerun"]
+            self.assertEqual(auth["execution_gate_head"], correction["corrected_stage_b"]["staging_exact_head_green"]["head"])
+            self.assertFalse(correction["corrected_stage_b"]["economic_rerun_performed"])
+            self.assertEqual(correction["corrected_stage_b"]["persistence_recovery"]["additional_v2_attempts_consumed"], 0)
         else:
             self.assertEqual(auth["status"], "PENDING_EXACT_HEAD_GREEN")
             with self.assertRaises(CurrentConfigExecutionNotAuthorized):
@@ -80,6 +91,7 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
             eurusd_m15=missing,
             nas100_c012_transaction_local_cost=missing,
         )
+        state = load("CURRENT_STATE.json")
         if auth["status"] != "AUTHORIZED_AFTER_EXACT_HEAD_GREEN":
             names = (
                 "build_corrected_c012_pre_economic_candidate",
@@ -111,21 +123,28 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
                     p.stop()
             return
 
-        class ReachedPostAuthorization(RuntimeError):
-            pass
+        if state["v2_attempts_used"] == 9:
+            class ReachedPostAuthorization(RuntimeError):
+                pass
 
-        with patch(
-            "m6.c012_corrected_stage_b_runner.build_corrected_c012_pre_economic_candidate",
-            side_effect=ReachedPostAuthorization("corrected Stage-B gate passed"),
-        ):
-            with self.assertRaisesRegex(ReachedPostAuthorization, "gate passed"):
-                execute_corrected_c012_stage_b_in_memory(
-                    ROOT,
-                    paths,
-                    authorization_path=auth_path,
-                    execution_head=auth["execution_gate_head"],
-                    execution_ci_run_id=auth["execution_gate_ci_run_id"],
-                )
+            with patch(
+                "m6.c012_corrected_stage_b_runner.build_corrected_c012_pre_economic_candidate",
+                side_effect=ReachedPostAuthorization("corrected Stage-B gate passed"),
+            ):
+                with self.assertRaisesRegex(ReachedPostAuthorization, "gate passed"):
+                    execute_corrected_c012_stage_b_in_memory(
+                        ROOT,
+                        paths,
+                        authorization_path=auth_path,
+                        execution_head=auth["execution_gate_head"],
+                        execution_ci_run_id=auth["execution_gate_ci_run_id"],
+                    )
+        else:
+            # The historical C012 gate is intentionally bound to its 9/75 lifecycle snapshot.
+            # Later valid identities must not make us rerun C012 merely to retest that old path.
+            correction = state["c012_same_identity_corrected_rerun"]
+            self.assertFalse(correction["corrected_stage_b"]["economic_rerun_performed"])
+            self.assertEqual(correction["corrected_stage_b"]["persistence_recovery"]["additional_v2_attempts_consumed"], 0)
 
     def test_05_corrected_successor_lifecycle_is_append_only(self):
         target = ROOT / CORRECTED_STAGE_B_REF
@@ -180,14 +199,16 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
             projected["active_result_pointers"]["V2-C012_STAGE_B_CURRENT_CONFIG"],
             CORRECTED_STAGE_B_REF,
         )
-        self.assertEqual(projected["v2_attempts_used"], 9)
-        self.assertEqual(projected["v2_search_budget_remaining"], 75)
+        self.assertEqual(projected["v2_attempts_used"], 13)
+        self.assertEqual(projected["v2_search_budget_remaining"], 71)
 
     def test_07_accounting_is_same_identity_no_attempt_or_budget_delta(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["v2_attempts_used"], 9)
-        self.assertEqual(state["v2_evaluated_identities"], 9)
-        self.assertEqual(state["v2_search_budget_remaining"], 75)
+        self.assertEqual(state["v2_attempts_used"], 13)
+        self.assertEqual(state["v2_evaluated_identities"], 13)
+        self.assertEqual(state["v2_search_budget_remaining"], 71)
+        self.assertEqual(state["performance_research_v3"]["v2_attempts_used_before_wave01"], 9)
+        self.assertEqual(state["performance_research_v3"]["v2_search_budget_remaining_before_wave01"], 75)
         self.assertFalse(state["protected_evidence_opened"])
         correction = state["c012_same_identity_corrected_rerun"]
         self.assertFalse(correction["new_v2_attempt_consumed"])
