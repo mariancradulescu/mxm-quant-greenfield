@@ -1,0 +1,81 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave02-execution-result.v1",
+  "status": "PERSISTED_PENDING_EXACT_HEAD_GREEN",
+  "recorded_utc": "2026-09-23T04:29:57Z",
+  "classification": "AUTHORIZED_ECONOMIC_BATCH_COMPLETE_POST_OUTCOME_PERSISTENCE",
+  "authorization": {
+    "ref": "research_v3/WAVE_02_EXECUTION_AUTHORIZATION_V1.json",
+    "execution_gate_head": "09cf04c51d649da83a46b5a4d5ff373ae8abaff6",
+    "execution_gate_ci_run_id": 35818302991,
+    "execution_gate_ci_conclusion": "SUCCESS"
+  },
+  "batch": {
+    "candidate_ids": [
+      "V2-C024",
+      "V2-C025"
+    ],
+    "opened_once": true,
+    "authorized_attempt_delta": 2,
+    "persistence_additional_attempts": 0,
+    "same_frozen_semantics": true,
+    "rescue_tuning": false,
+    "protected_evidence_used": false
+  },
+  "results": {
+    "V2-C024": {
+      "status": "GROSS_EDGE_FAIL",
+      "result_hash": "c02de6e3d98ce1abd32e2e189a4d12225c6a6feef8f45f7c5d24061144a01224",
+      "result_ref": "discovery/results/V2-C024_STAGE_A_V1.json",
+      "git_blob_sha1": "97b712a128c9bb4aab80579db1485389193f6a29",
+      "event_count": 3045,
+      "gross_pnl": -38.97667555733784,
+      "coarse_net_pnl": -356.51103990300965
+    },
+    "V2-C025": {
+      "status": "COARSE_NET_FAIL",
+      "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
+      "result_ref": "discovery/results/V2-C025_STAGE_A_V1.json",
+      "git_blob_sha1": "b901da71137598a41497c44b5b0240ad86cb6b96",
+      "event_count": 1583,
+      "gross_pnl": 5.355550857465629,
+      "coarse_net_pnl": -405.02387629286966
+    }
+  },
+  "stage_b_extension_candidates": [],
+  "accounting": {
+    "before": {
+      "v2_attempts_used": 13,
+      "v2_search_budget_remaining": 71,
+      "v2_evaluated_identities": 13,
+      "economic_outcomes_opened": 16
+    },
+    "after": {
+      "v2_attempts_used": 15,
+      "v2_search_budget_remaining": 69,
+      "v2_evaluated_identities": 15,
+      "economic_outcomes_opened": 18
+    },
+    "persistence_additional_attempts_consumed": 0
+  },
+  "ledger": {
+    "previous_tail_sequence": 48,
+    "new_sequences": [
+      49,
+      50
+    ],
+    "entry_hashes": {
+      "V2-C024": "2d51893d8822d829685f8c18c2ff88afe4e52460475ba64b2cee8132184bb0b9",
+      "V2-C025": "26c3a7e0da87fccce036f93272cf82223c7ddd8ccf5c03555612095fe69c2765"
+    },
+    "new_tail_entry_hash": "26c3a7e0da87fccce036f93272cf82223c7ddd8ccf5c03555612095fe69c2765"
+  },
+  "bindings": {
+    "capture_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
+    "cost_authority_sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9",
+    "evaluator_sha256": "353e3f8895cf78c9f3113536f7049ce00359ca97e7359dd43bffa67f4d536ae4",
+    "evaluator_git_blob_sha1": "cfc1feabf0b8b251940d3e7b17f01d915bdc214a"
+  },
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}
