@@ -23,7 +23,7 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
         for key in ("historical_evaluated_candidate_ids","budget_charged_candidate_ids","v2_attempts_used","v2_search_budget_remaining","pending_same_identity_correction_candidate_ids","invalid_frozen_spec_candidate_ids","refunded_candidate_ids"):
             self.assertEqual(committed["attempt_accounting"][key],generated["attempt_accounting"][key])
 
-    def test_current_state_separates_historical_exposure_from_budget_charge(self):
+    def test_current_state_separates_historical_exposure_from_current_result_authority(self):
         generated=build_audit(ROOT)
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
         self.assertEqual(state["forensic_consumed_identity_audit_authority"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json")
@@ -33,26 +33,37 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
         self.assertEqual(state["v2_evaluated_identities"],16)
         self.assertEqual(state["v2_search_budget_remaining"],68)
         self.assertEqual(state["global_attempts_seen"],32)
-        self.assertEqual(state["economic_outcomes_opened"],19)
-        self.assertEqual(state["discovery_survivors"],[])
-        self.assertEqual(state["current_stage_b_survivor_input_set"],[])
-        self.assertEqual(set(state["v2_budget_charged_candidate_ids"]),set(ALL))
-        self.assertEqual(set(state["pending_same_identity_correction_candidate_ids"]),set(generated["attempt_accounting"]["pending_same_identity_correction_candidate_ids"]))
-        self.assertEqual(set(state["invalid_frozen_spec_candidate_ids"]),set(SPEC_INVALID))
-        self.assertEqual(state["current_live_equivalent_authoritative_candidate_ids"],[])
+        self.assertEqual(
+            state["economic_outcomes_opened"],
+            state["stage_a_result_recorded_entries"]+state["stage_b_current_config_economic_observations"],
+        )
         self.assertEqual(state["distinct_identity_outcomes_opened"],16)
-        self.assertEqual(state["stage_a_result_recorded_entries"],17)
-        self.assertEqual(state["stage_b_current_config_economic_observations"],2)
+        self.assertEqual(set(state["v2_budget_charged_candidate_ids"]),set(ALL))
+        self.assertEqual(set(state["invalid_frozen_spec_candidate_ids"]),set(SPEC_INVALID))
+        self.assertEqual(state["pending_same_identity_correction_candidate_ids"],[])
+        self.assertEqual(
+            set(state["current_live_equivalent_authoritative_candidate_ids"]),
+            set(IMPLEMENTATION_ONLY),
+        )
+        self.assertEqual(set(state["stage_b_revalidation_required_candidate_ids"]),{"V2-C006","V2-C012"})
+        self.assertEqual(set(state["discovery_survivors"]),{"V2-C006","V2-C012"})
+        self.assertEqual(set(state["live_equivalent_discovery_survivors"]),{"V2-C006","V2-C012"})
+        self.assertEqual(state["current_stage_b_survivor_input_set"],[])
         for cid in IMPLEMENTATION_ONLY:
             a=state["current_result_authority"][cid]["stage_a"]
-            self.assertEqual(a["live_equivalent_replay_state"],"IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE")
-            self.assertTrue(a["same_identity_correction_allowed"])
+            self.assertEqual(a["live_equivalent_replay_state"],"CORRECTED_SAME_IDENTITY_CURRENT_AUTHORITY")
+            self.assertTrue(a["current_live_equivalent_authoritative"])
+            self.assertFalse(a["same_identity_correction_allowed"])
             self.assertFalse(a["new_identity_required"])
         for cid in SPEC_INVALID:
             a=state["current_result_authority"][cid]["stage_a"]
             self.assertEqual(a["live_equivalent_replay_state"],"FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY")
             self.assertFalse(a["same_identity_correction_allowed"])
             self.assertTrue(a["new_identity_required"])
+        self.assertEqual(
+            generated["attempt_accounting"]["v2_attempts_used"],
+            state["v2_attempts_used"],
+        )
 
     def test_v2_audit_is_preserved_but_superseded(self):
         old=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json").read_text())
