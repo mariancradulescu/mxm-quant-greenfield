@@ -88,14 +88,33 @@ class PerformanceResearchV3Wave02FreezeTests(unittest.TestCase):
         self.assertEqual(wave02["persistence_additional_attempts_consumed"],0)
         self.assertEqual(wave02["stage_b_extension_candidates"],[])
 
-    def test_06_current_accounting_and_safety_are_exact(self):
+    def test_06_current_lifecycle_preserves_exact_historical_wave02_accounting(self):
         state=load("CURRENT_STATE.json")
-        self.assertEqual(state["v2_attempts_used"],15)
-        self.assertEqual(state["v2_search_budget_remaining"],69)
-        self.assertEqual(state["v2_evaluated_identities"],15)
-        self.assertEqual(state["economic_outcomes_opened"],18)
-        self.assertEqual(state["discovery_ledger_entries"],50)
-        self.assertEqual(state["discovery_result_recorded_entries"],16)
+        wave02=state["performance_research_v3"]["wave02"]
+        ledger=read_ledger(ROOT/"discovery/ledger.jsonl")
+
+        # Historical Wave02 closure is immutable.
+        self.assertEqual(wave02["v2_attempts_used_after_wave02"],15)
+        self.assertEqual(wave02["v2_search_budget_remaining_after_wave02"],69)
+        self.assertEqual(wave02["economic_outcomes_opened_after_wave02"],18)
+        self.assertEqual(wave02["economic_attempt_delta"],2)
+        self.assertEqual(wave02["persistence_additional_attempts_consumed"],0)
+        self.assertEqual(wave02["result_statuses"],EXPECTED_STATUSES)
+
+        # Current lifecycle may legitimately advance after Wave02.
+        self.assertEqual(state["v2_evaluated_identities"],state["v2_attempts_used"])
+        self.assertEqual(state["v2_search_budget_remaining"],84-state["v2_attempts_used"])
+        self.assertEqual(state["global_attempts_seen"],state["legacy_prior_attempts"]+state["v2_attempts_used"])
+        self.assertEqual(state["discovery_ledger_entries"],len(ledger))
+        self.assertEqual(
+            state["discovery_result_recorded_entries"],
+            sum(x["entry_type"]=="RESULT_RECORDED" for x in ledger),
+        )
+        self.assertGreaterEqual(state["v2_attempts_used"],15)
+        self.assertGreaterEqual(state["economic_outcomes_opened"],18)
+        self.assertGreaterEqual(state["discovery_ledger_entries"],50)
+        self.assertGreaterEqual(state["discovery_result_recorded_entries"],16)
+
         self.assertFalse(state["protected_evidence_opened"])
         self.assertFalse(state["live_orders_authorized"])
         self.assertFalse(state["competition_start_authorized"])
