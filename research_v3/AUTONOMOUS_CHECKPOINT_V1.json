@@ -1,16 +1,16 @@
 {
   "schema": "mxm.greenfield.autonomous-research-checkpoint.v1",
   "control_plane_version": "MXM_AUTONOMOUS_CONTROL_PLANE_V1",
-  "status": "VALIDATED_STAGE_B_REVALIDATED_READY_FOR_NEXT_DISCOVERY",
-  "source_head": "d93de1904ba90f75207585347e4b6dbd1d7a1141",
+  "status": "WAVE05_FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "source_head": "97b8547b05cef11cd4394fd595ddf7b42c99baa9",
   "last_failed_ci": {
     "run_id": 35844381275,
     "conclusion": "FAILURE",
     "failure_class": "STALE_HISTORICAL_LIFECYCLE_ASSUMPTIONS"
   },
-  "phase": "PERFORMANCE_RESEARCH_V3_LIVE_EQUIVALENT_STAGE_B_REVALIDATED",
-  "next_action": "FREEZE_NEXT_HIGH_INFORMATION_WAVE",
-  "ledger_tail_entry_hash": "69d99c52e7486e1a2c6271437ae5b159e942f10b013ccae3e6a5e477affea250",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE05_FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "next_action": "REQUIRE_EXACT_HEAD_GREEN_THEN_AUTHORIZE_WAVE05",
+  "ledger_tail_entry_hash": "58ff7b51052467eaa506a9830d62181f7499fc3fa8a55d78f90c59578c14fb57",
   "accounting": {
     "v2_attempts_used": 16,
     "v2_evaluated_identities": 16,
@@ -61,5 +61,18 @@
     "V2-C006",
     "V2-C012"
   ],
-  "live_equivalent_stage_b_revalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json"
+  "live_equivalent_stage_b_revalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json",
+  "wave05": {
+    "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+    "candidate_ids": [
+      "V2-C029",
+      "V2-C030"
+    ],
+    "candidate_spec_hashes": {
+      "V2-C029": "fec1489eb0ae538497b7b70ef1c0ff6b47233fda24cce46a290922b4e713ce61",
+      "V2-C030": "1e6d96b8338867d38ef600acba6c218cee2ed020941e5e3a2695408eeb6c4a27"
+    },
+    "outcomes_opened": false,
+    "attempts_consumed_by_freeze": 0
+  }
 }
