@@ -96,10 +96,10 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
         c = state["c012_same_identity_corrected_rerun"]
         self.assertFalse(c["new_v2_attempt_consumed"])
         self.assertEqual(c["search_budget_decrement"], 0)
-        self.assertEqual(state["v2_attempts_used"], 13)
-        self.assertEqual(state["v2_search_budget_remaining"], 71)
-        self.assertEqual(state["performance_research_v3"]["v2_attempts_used_before_wave01"], 9)
-        self.assertEqual(state["performance_research_v3"]["v2_search_budget_remaining_before_wave01"], 75)
+        self.assertFalse(c["protected_evidence_opened"])
+        self.assertEqual(state["v2_evaluated_identities"], state["v2_attempts_used"])
+        self.assertEqual(state["v2_search_budget_remaining"], 84 - state["v2_attempts_used"])
+        self.assertEqual(state["global_attempts_seen"], state["legacy_prior_attempts"] + state["v2_attempts_used"])
 
 
     def test_06_authorized_control_path_binds_real_evaluator_and_runner(self):

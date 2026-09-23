@@ -194,7 +194,8 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
         fixture["result_hash"] = compute_result_hash(fixture)
         self.assertTrue(validate_corrected_c012_stage_b_result(fixture))
         self.assertEqual(fixture["result_hash"], compute_result_hash(fixture))
-        projected = project_current_state_after_successor(load("CURRENT_STATE.json"), fixture)
+        current = load("CURRENT_STATE.json")
+        projected = project_current_state_after_successor(current, fixture)
         downstream = projected["current_result_authority"]["V2-C012"]["stage_b_current_config"]
         self.assertEqual(downstream["state"], "VALID_CORRECTED_SUCCESSOR")
         self.assertEqual(downstream["corrected_successor_ref"], CORRECTED_STAGE_B_REF)
@@ -203,20 +204,49 @@ class C012CorrectedStageBRecoveryTests(unittest.TestCase):
             projected["active_result_pointers"]["V2-C012_STAGE_B_CURRENT_CONFIG"],
             CORRECTED_STAGE_B_REF,
         )
-        self.assertEqual(projected["v2_attempts_used"], 13)
-        self.assertEqual(projected["v2_search_budget_remaining"], 71)
+        for field in (
+            "v2_attempts_used",
+            "v2_evaluated_identities",
+            "v2_search_budget_remaining",
+            "global_attempts_seen",
+            "economic_outcomes_opened",
+            "discovery_ledger_entries",
+            "discovery_result_recorded_entries",
+        ):
+            self.assertEqual(projected[field], current[field])
+
+        # Regression guard: later prospective Wave03+ accounting must also pass
+        # through this historical C012 projector unchanged.
+        future = json.loads(json.dumps(current))
+        future["v2_attempts_used"] += 5
+        future["v2_evaluated_identities"] += 5
+        future["v2_search_budget_remaining"] -= 5
+        future["global_attempts_seen"] += 5
+        future["economic_outcomes_opened"] += 5
+        future["discovery_ledger_entries"] += 10
+        future["discovery_result_recorded_entries"] += 5
+        future_projected = project_current_state_after_successor(future, fixture)
+        for field in (
+            "v2_attempts_used",
+            "v2_evaluated_identities",
+            "v2_search_budget_remaining",
+            "global_attempts_seen",
+            "economic_outcomes_opened",
+            "discovery_ledger_entries",
+            "discovery_result_recorded_entries",
+        ):
+            self.assertEqual(future_projected[field], future[field])
 
     def test_07_accounting_is_same_identity_no_attempt_or_budget_delta(self):
         state = load("CURRENT_STATE.json")
-        self.assertEqual(state["v2_attempts_used"], 13)
-        self.assertEqual(state["v2_evaluated_identities"], 13)
-        self.assertEqual(state["v2_search_budget_remaining"], 71)
-        self.assertEqual(state["performance_research_v3"]["v2_attempts_used_before_wave01"], 9)
-        self.assertEqual(state["performance_research_v3"]["v2_search_budget_remaining_before_wave01"], 75)
-        self.assertFalse(state["protected_evidence_opened"])
         correction = state["c012_same_identity_corrected_rerun"]
         self.assertFalse(correction["new_v2_attempt_consumed"])
         self.assertEqual(correction["search_budget_decrement"], 0)
+        self.assertFalse(correction["protected_evidence_opened"])
+        self.assertEqual(state["v2_evaluated_identities"], state["v2_attempts_used"])
+        self.assertEqual(state["v2_search_budget_remaining"], 84 - state["v2_attempts_used"])
+        self.assertEqual(state["global_attempts_seen"], state["legacy_prior_attempts"] + state["v2_attempts_used"])
+        self.assertFalse(state["protected_evidence_opened"])
 
 
 if __name__ == "__main__":
