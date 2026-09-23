@@ -13,12 +13,16 @@ class C031RuntimeTransportTests(unittest.TestCase):
   self.assertEqual((len(d['base']),len(d['stress'])),(1666,1666))
  def test_loader_is_non_economic(self):
   d=_load_pack(pathlib.Path('.')); self.assertTrue(d['pre_economic'])
- def test_envelope_exists_but_remains_pre_execution_pending_exact_head(self):
+ def test_envelope_lifecycle_is_fail_closed_and_exact_head_bound(self):
   p=pathlib.Path('research_v3/ai_director/economic_operations/C031_STAGE_B_RUNTIME_OPERATION_V1.json')
   self.assertTrue(p.exists())
   d=json.loads(p.read_text())
-  self.assertEqual(d['status'],'PENDING_EXACT_HEAD_GREEN')
   n=json.loads(pathlib.Path('research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json').read_text())
-  self.assertNotIn('runtime_operation_envelope_ref',n)
-  self.assertEqual(n['status'],'PENDING_EXACT_HEAD_GREEN_C031_STAGE_B_ECONOMIC_ENVELOPE')
+  self.assertIn(d['status'],{'PENDING_EXACT_HEAD_GREEN','AUTHORIZED_EXACT_HEAD_GREEN'})
+  if d['status']=='PENDING_EXACT_HEAD_GREEN':
+   self.assertNotIn('runtime_operation_envelope_ref',n)
+  else:
+   self.assertEqual(d['exact_head_authorization']['run_id'],35922246231)
+   self.assertEqual(n['runtime_operation_envelope_ref'],str(p))
+   self.assertEqual(n['expected_operation_id'],'op_cdcf9d2bae1f2bc2355e79efbbcdaf50')
 if __name__=='__main__': unittest.main()
