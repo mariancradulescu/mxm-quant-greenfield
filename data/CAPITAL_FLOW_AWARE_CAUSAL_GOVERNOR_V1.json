@@ -1,0 +1,42 @@
+{
+  "schema": "mxm.greenfield.capital-flow-aware-causal-research-contract.v1",
+  "status": "PENDING_EXACT_HEAD_GREEN",
+  "source_head": "15075817487ed11783933a447c97762395587b23",
+  "research_simulation_only": true,
+  "live_order_logic": false,
+  "initial_strategy_capital_eur": 200,
+  "continuous_capital": true,
+  "weekly_monthly_reset": false,
+  "event_types": [
+    "TRADE_ENTRY",
+    "TRADE_EXIT",
+    "DEPOSIT",
+    "WITHDRAWAL",
+    "BROKER_COST",
+    "FINANCING",
+    "CAUSAL_MARK_TO_MARKET",
+    "MARGIN_STATE_CHANGE"
+  ],
+  "cashflow_neutrality": {
+    "deposit_is_strategy_profit": false,
+    "withdrawal_is_strategy_loss": false,
+    "broker_balance_equity_tracks_external_cashflows": true,
+    "strategy_nav_excludes_external_cashflows": true
+  },
+  "drawdown_rule": "NEVER_RESET_TO_EUR200; CONTINUE_RESEARCH_REPLAY_FROM_CAUSAL_REMAINING_EQUITY",
+  "certification_capital_states_eur": [
+    80,
+    200,
+    350,
+    1000,
+    5000
+  ],
+  "research_outputs_required": [
+    "BROKER_EQUITY",
+    "FREE_MARGIN",
+    "EXTERNAL_CASHFLOW_NET",
+    "CASHFLOW_NEUTRAL_STRATEGY_NAV",
+    "CAPITAL_OCCUPANCY",
+    "MARGIN_BLOCKERS"
+  ]
+}

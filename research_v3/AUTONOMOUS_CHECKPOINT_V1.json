@@ -39,10 +39,10 @@
     "same_identity_successor_result_entries": 5
   },
   "live_equivalent_stage_b_revalidation_ref": "evidence/LIVE_EQUIVALENT_STAGE_B_INPUT_EQUIVALENCE_REVALIDATION_V1.json",
-  "next_action": "ASSESS_C031_STAGE_B_CURRENT_MARGIN_AND_VOLUME_AUTHORITY",
+  "next_action": "REQUIRE_EXACT_HEAD_GREEN_FOR_SCOPE_GOVERNANCE_BEFORE_ANY_NEW_V2_IDENTITY",
   "pending_same_identity_correction_candidate_ids": [],
   "persistence_commit": "3ef3aee7852bdb816a75cc00e7ea6d83614de53b",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_RESULTS_RECORDED_EXACT_HEAD_GREEN_STAGE_B_ASSESSMENT",
+  "phase": "RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN",
   "recovery": {
     "authority_ref": "evidence/WAVE_05_POST_OUTCOME_RECOVERY_V1.json",
     "canonical_persistence_complete": true,
@@ -65,9 +65,9 @@
     "protected_evidence_opened": false
   },
   "schema": "mxm.greenfield.autonomous-research-checkpoint.v1",
-  "source_head": "64750c6044540871e28ad9ccf5491f347cff3025",
+  "source_head": "15075817487ed11783933a447c97762395587b23",
   "stage_b_revalidation_required_candidate_ids": [],
-  "status": "VALIDATED_WAVE06_CLOSED_EXACT_HEAD_GREEN",
+  "status": "RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN",
   "wave05": {
     "attempts_consumed": 2,
     "candidate_ids": [
@@ -140,5 +140,23 @@
     "post_persistence_validation_conclusion": "SUCCESS",
     "lifecycle_closure_ref": "research_v3/WAVE_06_POST_PERSISTENCE_GREEN_CLOSURE_V1.json"
   },
-  "user_action_required": false
+  "user_action_required": false,
+  "research_scope_governance": {
+    "status": "PENDING_EXACT_HEAD_GREEN",
+    "exact_head_green": false,
+    "new_identity_creation_allowed": false,
+    "root_cause": "RESEARCH_SCOPE_TOO_NARROW_FOR_MECHANISM_LEVEL_INFERENCE",
+    "gate_ref": "data/RESEARCH_SCOPE_GOVERNANCE_V1.json",
+    "required_authorities": [
+      "evidence/MECHANISM_SCOPE_REGISTRY_V1.json",
+      "evidence/V2_CONSUMED_IDENTITY_SCOPE_AUDIT_V1.json",
+      "data/AUTONOMOUS_UNIVERSE_GOVERNOR_V1.json",
+      "data/ADAPTIVE_DATA_ACQUISITION_POLICY_V1.json",
+      "data/CAPITAL_FLOW_AWARE_CAUSAL_GOVERNOR_V1.json",
+      "research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json"
+    ],
+    "consumed_identity_scope_count": 19,
+    "mechanism_family_closed_count": 0,
+    "next_after_green": "ASSESS_C031_STAGE_B_RESEARCH_REALIZATION"
+  }
 }

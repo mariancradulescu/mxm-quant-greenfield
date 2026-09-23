@@ -92,6 +92,17 @@ def validate_lifecycle_append(entries: list[dict], *, entry_type: str, candidate
 def append_entry(path, *, entry_type: str, candidate_id: str, spec_hash: str,
                  payload: Mapping[str,Any], timestamp_utc: Optional[str]=None) -> dict:
     path=Path(path); path.parent.mkdir(parents=True,exist_ok=True); entries=read_ledger(path)
+    if entry_type=="CANDIDATE_FROZEN":
+        root=path.parent.parent
+        governance=root/"data/RESEARCH_SCOPE_GOVERNANCE_V1.json"
+        if governance.is_file():
+            state_path=root/"CURRENT_STATE.json"
+            if not state_path.is_file():
+                raise ValueError("new candidate freeze blocked: CURRENT_STATE missing under scope governance")
+            state=json.loads(state_path.read_text(encoding="utf-8"))
+            gate=state.get("research_scope_governance") or {}
+            if gate.get("status")!="EXACT_HEAD_GREEN" or gate.get("exact_head_green") is not True or gate.get("new_identity_creation_allowed") is not True:
+                raise ValueError("new candidate freeze blocked until research scope/universe governance exact-head GREEN")
     validate_lifecycle_append(entries,entry_type=entry_type,candidate_id=candidate_id,spec_hash=spec_hash,payload=payload)
     sequence=len(entries)+1; previous_hash=entries[-1]["entry_hash"] if entries else None
     timestamp=timestamp_utc or datetime.now(timezone.utc).isoformat().replace("+00:00","Z")

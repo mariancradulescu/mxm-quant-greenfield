@@ -95,6 +95,14 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
         "live_orders_authorized": bool(state.get("live_orders_authorized")),
         "competition_start_authorized": bool(state.get("competition_start_authorized")),
     }
+    scope_governance = state.get("research_scope_governance") or {}
+    required_scope_refs = list(scope_governance.get("required_authorities") or [])
+    missing_scope_refs = sorted(ref for ref in required_scope_refs if not (root / ref).is_file())
+    if missing_scope_refs:
+        recoverable.append({"class":"RESEARCH_SCOPE_GOVERNANCE_MISSING","refs":missing_scope_refs})
+    elif scope_governance.get("status") != "EXACT_HEAD_GREEN" or scope_governance.get("exact_head_green") is not True:
+        recoverable.append({"class":"RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN"})
+    stage_b_survivors = sorted(set((((state.get("performance_research_v3") or {}).get("wave06") or {}).get("stage_b_extension_candidates") or [])))
     if any(safety.values()):
         issues.append({"class":"EXTERNAL_SAFETY_GATE_DRIFT","detail":safety})
 
@@ -110,8 +118,14 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
         next_action = "EXECUTE_AUTHORIZED_WAVE"
     elif any(x["class"]=="FROZEN_WAVE_PENDING_AUTHORIZATION" for x in recoverable):
         next_action = "REQUIRE_EXACT_HEAD_GREEN_AND_BIND_AUTHORIZATION"
+    elif any(x["class"]=="RESEARCH_SCOPE_GOVERNANCE_MISSING" for x in recoverable):
+        next_action = "IMPLEMENT_RESEARCH_SCOPE_UNIVERSE_GOVERNANCE"
+    elif any(x["class"]=="RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN" for x in recoverable):
+        next_action = "REQUIRE_SCOPE_GOVERNANCE_EXACT_HEAD_GREEN"
     elif stage_b:
         next_action = "REVALIDATE_STAGE_B"
+    elif stage_b_survivors:
+        next_action = "ASSESS_STAGE_B_SURVIVOR"
     else:
         next_action = "FREEZE_NEXT_HIGH_INFORMATION_WAVE"
 
@@ -126,6 +140,8 @@ def inspect_repository_state(root: str | Path = ".") -> dict[str, Any]:
         "pending_same_identity_correction_candidate_ids":pending,
         "stage_b_revalidation_required_candidate_ids":stage_b,
         "invalid_frozen_spec_candidate_ids":invalid_specs,
+        "research_scope_governance":scope_governance,
+        "stage_b_survivors":stage_b_survivors,
         "recoverable_conditions":recoverable,
         "blocked_historical_waves":blocked,
         "material_issues":issues,

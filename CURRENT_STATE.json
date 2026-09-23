@@ -1379,7 +1379,7 @@
   "m6_stage_b_tier1_evaluator_policy_authority": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
   "m6_stage_b_tier1_pre_economic_materialization_authority": "evidence/M6_STAGE_B_TIER1_PRE_ECONOMIC_MATERIALIZATION_V1.json",
   "m6_stage_b_tier1_runner_prep_authority": "data/M6_STAGE_B_TIER1_RUNNER_PREP_V1.json",
-  "next_action": "Assess whether existing durable broker-native V6 evidence is sufficient to prospectively bind C031 Stage-B current margin, executable volume lattice, concurrency and free-margin semantics. Do not open Stage-B economics until that authority is frozen and exact-head GREEN.",
+  "next_action": "REQUIRE_EXACT_HEAD_GREEN_FOR_SCOPE_GOVERNANCE_BEFORE_ANY_NEW_V2_IDENTITY",
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
   "operational_branch_authority": {
     "authority_rule": "COMPETITION_BRANCH_IS_GREEN_OPERATIONAL_BASE; PERFORMANCE_RESEARCH_V3_BRANCH_IS_CURRENT_PRE_OUTCOME_WORK_BRANCH; STALE_MAIN_POINTER_IS_NON_AUTHORITATIVE",
@@ -1739,7 +1739,7 @@
       "lifecycle_closure_ref": "research_v3/WAVE_06_POST_PERSISTENCE_GREEN_CLOSURE_V1.json"
     }
   },
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE06_RESULTS_RECORDED_EXACT_HEAD_GREEN_STAGE_B_ASSESSMENT",
+  "phase": "RESEARCH_SCOPE_GOVERNANCE_PENDING_EXACT_HEAD_GREEN",
   "post_stage_b_final_closure_independent_audit_authority": "data/POST_STAGE_B_FINAL_CLOSURE_INDEPENDENT_AUDIT_V1.json",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
@@ -1987,5 +1987,23 @@
   "v2_protected_forward_start": "2026-09-17T12:02:58Z",
   "v2_same_identity_correction_slot_count": 4,
   "v2_search_budget": 84,
-  "v2_search_budget_remaining": 65
+  "v2_search_budget_remaining": 65,
+  "research_scope_governance": {
+    "status": "PENDING_EXACT_HEAD_GREEN",
+    "exact_head_green": false,
+    "new_identity_creation_allowed": false,
+    "root_cause": "RESEARCH_SCOPE_TOO_NARROW_FOR_MECHANISM_LEVEL_INFERENCE",
+    "gate_ref": "data/RESEARCH_SCOPE_GOVERNANCE_V1.json",
+    "required_authorities": [
+      "evidence/MECHANISM_SCOPE_REGISTRY_V1.json",
+      "evidence/V2_CONSUMED_IDENTITY_SCOPE_AUDIT_V1.json",
+      "data/AUTONOMOUS_UNIVERSE_GOVERNOR_V1.json",
+      "data/ADAPTIVE_DATA_ACQUISITION_POLICY_V1.json",
+      "data/CAPITAL_FLOW_AWARE_CAUSAL_GOVERNOR_V1.json",
+      "research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json"
+    ],
+    "consumed_identity_scope_count": 19,
+    "mechanism_family_closed_count": 0,
+    "next_after_green": "ASSESS_C031_STAGE_B_RESEARCH_REALIZATION"
+  }
 }
