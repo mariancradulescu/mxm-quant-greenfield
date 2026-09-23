@@ -1,57 +1,58 @@
 import json
 import unittest
 from pathlib import Path
-
-from research_v3.forensic_audit import IDS, build_audit
+from research_v3.forensic_classifier_v3 import ALL, IMPLEMENTATION_ONLY, SPEC_INVALID, build_audit
 
 ROOT=Path(__file__).resolve().parents[1]
 
-class ConsumedIdentityForensicAuditV2Tests(unittest.TestCase):
-    def test_automated_audit_covers_exact_current_consumed_identity_set(self):
-        audit=build_audit(ROOT)
-        self.assertEqual(audit["status"],"COMPLETE_LIVE_EQUIVALENT_CORRECTIONS_REQUIRED")
-        self.assertEqual(audit["distinct_consumed_identities"],16)
-        self.assertEqual(audit["result_recorded_entries"],17)
-        self.assertEqual(set(audit["candidate_ids"]),set(IDS))
-        self.assertTrue(all(v=="IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE" for v in audit["classifications"].values()))
-        self.assertEqual(audit["attempt_accounting"]["v2_attempts_used"],16)
-        self.assertEqual(audit["attempt_accounting"]["v2_search_budget_remaining"],68)
-        self.assertFalse(audit["safety"]["protected_evidence_opened"])
-        self.assertFalse(audit["safety"]["live_orders_authorized"])
-        self.assertFalse(audit["safety"]["competition_start_authorized"])
-
-    def test_committed_authority_matches_automated_accounting_and_classifications(self):
+class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
+    def test_candidate_by_candidate_classification_and_accounting(self):
         generated=build_audit(ROOT)
-        committed=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json").read_text())
-        self.assertEqual(committed["distinct_consumed_identities"],generated["distinct_consumed_identities"])
-        self.assertEqual(committed["result_recorded_entries"],generated["result_recorded_entries"])
-        self.assertEqual(committed["classifications"],generated["classifications"])
-        self.assertEqual(committed["attempt_accounting"],generated["attempt_accounting"])
-        self.assertEqual(committed["projection_drift"]["classification"],"PERSISTENCE_ONLY_DEFECT")
-        self.assertTrue(committed["projection_drift"]["repaired_by_this_audit"])
+        self.assertEqual(generated["status"],"COMPLETE_PER_IDENTITY_CLASSIFICATION")
+        self.assertEqual(generated["groups"]["implementation_only_same_semantics_correctable"],sorted(IMPLEMENTATION_ONLY))
+        self.assertEqual(generated["groups"]["frozen_spec_causally_invalid_requires_new_identity"],sorted(SPEC_INVALID))
+        self.assertEqual(generated["attempt_accounting"]["historical_evaluated_identity_count"],16)
+        self.assertEqual(generated["attempt_accounting"]["v2_attempts_used"],4)
+        self.assertEqual(generated["attempt_accounting"]["v2_search_budget_remaining"],80)
+        self.assertEqual(generated["attempt_accounting"]["released_invalid_spec_slot_count"],12)
 
-    def test_current_state_projects_all_historical_results_but_blocks_live_equivalent_authority(self):
+    def test_committed_authority_matches_generated_classification(self):
+        generated=build_audit(ROOT)
+        committed=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json").read_text())
+        self.assertEqual(committed["classifications"],generated["classifications"])
+        for key in ("historical_evaluated_candidate_ids","budget_charged_candidate_ids","v2_attempts_used","v2_search_budget_remaining","released_invalid_spec_candidate_ids"):
+            self.assertEqual(committed["attempt_accounting"][key],generated["attempt_accounting"][key])
+
+    def test_current_state_separates_historical_exposure_from_budget_charge(self):
         state=json.loads((ROOT/"CURRENT_STATE.json").read_text())
-        self.assertEqual(state["forensic_consumed_identity_audit_authority"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json")
-        self.assertEqual(set(state["implementation_invalid_consumed_identities"]),set(IDS))
-        self.assertEqual(state["live_equivalent_discovery_survivors"],[])
-        self.assertEqual(state["v2_attempts_used"],16)
-        self.assertEqual(state["v2_search_budget_remaining"],68)
+        self.assertEqual(state["forensic_consumed_identity_audit_authority"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json")
+        self.assertEqual(set(state["implementation_invalid_consumed_identities"]),set(IMPLEMENTATION_ONLY))
+        self.assertEqual(set(state["frozen_spec_invalid_consumed_identities"]),set(SPEC_INVALID))
+        self.assertEqual(state["v2_attempts_used"],4)
+        self.assertEqual(state["v2_evaluated_identities"],16)
+        self.assertEqual(state["v2_search_budget_remaining"],80)
+        self.assertEqual(state["global_attempts_seen"],32)
+        self.assertEqual(state["economic_outcomes_opened"],19)
         self.assertEqual(state["discovery_survivors"],[])
         self.assertEqual(state["current_stage_b_survivor_input_set"],[])
-        for cid in ("V2-C006","V2-C012"):
-            self.assertEqual(
-                state["current_result_authority"][cid]["stage_b_current_config"]["state"],
-                "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
-            )
-            self.assertEqual(
-                state["current_result_authority"][cid]["stage_b_current_config"]["invalidation_ref"],
-                "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
-            )
-        for cid in IDS:
-            self.assertIn(cid,state["current_result_authority"])
-            self.assertIn(f"{cid}_STAGE_A",state["active_result_pointers"])
-            self.assertEqual(state["current_result_authority"][cid]["stage_a"]["live_equivalent_replay_state"],"IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE")
+        for cid in ALL:
+            self.assertIsNone(state["active_result_pointers"][f"{cid}_STAGE_A"])
+        for cid in IMPLEMENTATION_ONLY:
+            a=state["current_result_authority"][cid]["stage_a"]
+            self.assertEqual(a["live_equivalent_replay_state"],"IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE")
+            self.assertTrue(a["same_identity_correction_allowed"])
+            self.assertFalse(a["new_identity_required"])
+        for cid in SPEC_INVALID:
+            a=state["current_result_authority"][cid]["stage_a"]
+            self.assertEqual(a["live_equivalent_replay_state"],"FROZEN_SPEC_CAUSALLY_INVALID_REQUIRES_NEW_IDENTITY")
+            self.assertFalse(a["same_identity_correction_allowed"])
+            self.assertTrue(a["new_identity_required"])
+
+    def test_v2_audit_is_preserved_but_superseded(self):
+        old=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json").read_text())
+        new=json.loads((ROOT/"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json").read_text())
+        self.assertEqual(old["status"],"COMPLETE_LIVE_EQUIVALENT_CORRECTIONS_REQUIRED")
+        self.assertEqual(new["supersedes_for_current_classification"],"evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json")
 
 if __name__=="__main__":
     unittest.main(verbosity=2)
