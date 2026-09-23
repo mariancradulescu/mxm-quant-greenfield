@@ -7,6 +7,8 @@ from tools.validate_authoritative_promotion import (
     _validate_active_authority_references,
     _validate_current_dependency_semantics,
 )
+from discovery.ledger import read_ledger
+from research_v3.lifecycle import candidate_lifecycle, validate_current_authority
 from m6.c012_corrected_stage_a_runner import (
     C012CorrectionInputPaths,
     EVALUATOR_RUNTIME_SHA256,
@@ -54,55 +56,36 @@ class C012SameIdentityRecoveryAuthorityTests(unittest.TestCase):
         state = load("CURRENT_STATE.json")
         self.assertEqual(state["authoritative_branch"], "competition-performance-v1-20260921")
         self.assertIn("V2-C012", state["implementation_invalid_consumed_identities"])
-        correction = state["c012_same_identity_corrected_rerun"]
+
+        lifecycle = candidate_lifecycle(read_ledger(ROOT / "discovery/ledger.jsonl"), "V2-C012")
+        current = validate_current_authority(ROOT, state, lifecycle)
         stage_a = state["current_result_authority"]["V2-C012"]["stage_a"]
         stage_b = state["current_result_authority"]["V2-C012"]["stage_b_current_config"]
-        replay_invalid = stage_a.get("live_equivalent_replay_state") in {
-            "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
-            "IMPLEMENTATION_ONLY_SAME_SEMANTICS_CORRECTABLE",
-        }
-        if correction["status"] == "CORRECTED_STAGE_A_RECORDED_SURVIVOR":
-            # Historical C012 correction facts remain immutable, but later
-            # forensic findings may invalidate its current live-equivalent
-            # authority without rewriting that successful correction history.
-            self.assertEqual(stage_a["state"], "VALID_CORRECTED_SUCCESSOR")
-            self.assertEqual(
-                stage_a["corrected_successor_ref"],
-                "discovery/results/V2-C012_STAGE_A_V2.json",
-            )
-            corrected_stage_b = correction.get("corrected_stage_b", {})
-            if replay_invalid:
-                self.assertNotIn("V2-C012", state["discovery_survivors"])
-                self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
-                self.assertEqual(
-                    stage_b["state"],
-                    "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
-                )
-                self.assertEqual(
-                    stage_b["invalidation_ref"],
-                    "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
-                )
-            elif corrected_stage_b.get("economics_run") is True:
-                self.assertIn("V2-C012", state["discovery_survivors"])
-                self.assertIn("V2-C012", state["current_stage_b_survivor_input_set"])
-                self.assertEqual(stage_b["state"], "VALID_CORRECTED_SUCCESSOR")
-                self.assertEqual(
-                    stage_b["corrected_successor_ref"],
-                    "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
-                )
-                self.assertEqual(
-                    stage_b["corrected_successor_hash"],
-                    corrected_stage_b["corrected_stage_b_result_hash"],
-                )
-            else:
-                self.assertIn("PENDING_CORRECTED_SUCCESSOR", stage_b["state"])
-        else:
-            self.assertNotIn("V2-C012", state["discovery_survivors"])
-            self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
-            self.assertEqual(
-                stage_b["state"],
-                "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
-            )
+
+        self.assertIsNotNone(current)
+        self.assertEqual(current.result_hash, stage_a["result_hash"])
+        self.assertEqual(stage_a["state"], "VALID_CORRECTED_SUCCESSOR")
+        self.assertEqual(
+            stage_a["live_equivalent_replay_state"],
+            "CORRECTED_SAME_IDENTITY_CURRENT_AUTHORITY",
+        )
+        self.assertTrue(stage_a["current_live_equivalent_authoritative"])
+        self.assertIn("V2-C012", state["current_live_equivalent_authoritative_candidate_ids"])
+        self.assertIn("V2-C012", state["discovery_survivors"])
+        self.assertIn("V2-C012", state["live_equivalent_discovery_survivors"])
+
+        # Stage-A is current authority, but old Stage-B remains invalid until
+        # downstream revalidation completes.  Survivor != Stage-B input.
+        self.assertIn("V2-C012", state["stage_b_revalidation_required_candidate_ids"])
+        self.assertNotIn("V2-C012", state["current_stage_b_survivor_input_set"])
+        self.assertEqual(
+            stage_b["state"],
+            "INVALIDATED_DOWNSTREAM_OF_IMPLEMENTATION_INVALID_STAGE_A",
+        )
+        self.assertEqual(
+            stage_b["invalidation_ref"],
+            "evidence/LIVE_EQUIVALENT_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
+        )
 
     def test_04_active_refs_and_dependency_semantics_fail_closed(self):
         state = load("CURRENT_STATE.json")
