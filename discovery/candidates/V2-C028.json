@@ -1,0 +1,188 @@
+{
+  "id": "V2-C028",
+  "mechanism": {
+    "family": "CROSS_MARKET_LEAD_LAG",
+    "subfamily": "CAUSAL_STRUCTURAL_LEADER_SHOCK_TO_LAGGARD_60M_COST_HURDLED"
+  },
+  "rationale": "Prospectively test cross-market information transfer instead of recurring same-symbol drift. Two economically structural leader-laggard relationships are frozen ex ante: US500 to US2000 and SpotCrude to SpotBrent. A laggard trade is allowed only after a large causal leader 30-minute shock and only when fully realized prior same-direction shocks over 28 days show a one-standard-error aligned 60-minute laggard expectation above the frozen laggard roundtrip cost. No C026 winning symbol/direction subset is reused.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "features": [
+    {
+      "name": "leader_30m_return",
+      "formula": "leader completed close / leader close 6 M5 bars earlier - 1 at each 15m decision"
+    },
+    {
+      "name": "leader_shock_scale",
+      "formula": "median absolute leader 30m return across prior 96 fully completed 15m decision observations"
+    },
+    {
+      "name": "leader_shock_score",
+      "formula": "abs(current leader 30m return) / causal prior median absolute leader 30m return"
+    },
+    {
+      "name": "aligned_laggard_60m_return",
+      "formula": "sign(leader_shock) * (laggard exact open at +60m / laggard exact entry open - 1) for fully realized prior shocks"
+    },
+    {
+      "name": "causal_expected_aligned_lag",
+      "formula": "mean and one-standard-error lower bound over trailing 28 calendar days of fully realized prior same-direction shock examples"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "leader_shock_scale",
+      "decision_observations": 96
+    },
+    {
+      "feature": "aligned_lag_training",
+      "calendar_days": 28
+    },
+    {
+      "feature": "minimum_same_direction_examples",
+      "count": 8
+    }
+  ],
+  "normalization_training": {
+    "mode": "CAUSAL_ROLLING_STRUCTURAL_PAIR_LEAD_LAG",
+    "future_normalization": false,
+    "training_window_calendar_days": 28,
+    "retraining_schedule": "EACH_15_MINUTE_LEADER_DECISION",
+    "inner_validation": "NONE_FIXED_PAIR_MODEL",
+    "random_temporal_shuffle": false,
+    "purge_embargo": "TRAINING_EXAMPLE_ADMITTED_ONLY_AT_OR_AFTER_ITS_EXACT_60M_EXIT_OPEN"
+  },
+  "timing": {
+    "decision": "EVERY_15_MINUTES_AFTER_LEADER_M5_BAR_CLOSES",
+    "entry": "LAGGARD_EXACT_M5_OPEN_AT_DECISION_TIME",
+    "target_horizon_minutes": 60,
+    "exit": "LAGGARD_EXACT_M5_OPEN_60_MINUTES_AFTER_ENTRY"
+  },
+  "direction": {
+    "LONG": "leader shock positive, shock_score > 2.0, >=8 prior same-direction realized examples, and mean_aligned-SE > laggard frozen roundtrip cost",
+    "SHORT": "leader shock negative under same causal evidence hurdle",
+    "NO_OP": "otherwise_or_missing_exact_laggard_entry_exit"
+  },
+  "entry": {
+    "type": "LAGGARD_OPEN_AT_CAUSAL_LEADER_DECISION",
+    "price": "exact observed laggard M5 open at decision time"
+  },
+  "exit": {
+    "type": "FIXED_60_MINUTE_LAGGARD_OPEN_TO_OPEN",
+    "price": "exact observed laggard M5 open 60 minutes after entry",
+    "missing_exact_exit": "NO_TRADE_AND_NO_TRAINING_EXAMPLE"
+  },
+  "maximum_hold": {
+    "unit": "MINUTES",
+    "value": 60
+  },
+  "filters": [
+    "FROZEN_STRUCTURAL_PAIRS_US500_TO_US2000_AND_SPOTCRUDE_TO_SPOTBRENT",
+    "LEADER_SHOCK_SCORE_GT_2",
+    "AT_LEAST_8_FULLY_REALIZED_PRIOR_SAME_DIRECTION_SHOCK_EXAMPLES",
+    "ONE_STANDARD_ERROR_ALIGNED_EXPECTATION_GT_LAGGARD_FROZEN_COST",
+    "EXACT_LAGGARD_ENTRY_AND_EXIT_REQUIRED",
+    "NO_PAIR_OVERLAP",
+    "NO_SYNTHETIC_OR_FORWARDFILLED_PRICES"
+  ],
+  "parameters": {
+    "decision_interval_minutes": 15,
+    "leader_return_minutes": 30,
+    "shock_scale_prior_decisions": 96,
+    "shock_score_threshold": 2,
+    "training_window_calendar_days": 28,
+    "minimum_same_direction_examples": 8,
+    "confidence_hurdle_standard_errors": 1,
+    "hold_minutes": 60,
+    "pairs": [
+      {
+        "leader": "US500",
+        "laggard": "US2000"
+      },
+      {
+        "leader": "SpotCrude",
+        "laggard": "SpotBrent"
+      }
+    ]
+  },
+  "position_admission_policy": {
+    "cross_pair_concurrency_allowed_in_stage_a": true,
+    "same_pair_overlap": false,
+    "same_laggard_pyramiding_allowed": false,
+    "scope": "PER_CANDIDATE_PER_FROZEN_PAIR"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "resolution": "M5",
+    "accepted_capture_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
+  },
+  "causal_availability": {
+    "future_information_forbidden": true,
+    "decision_uses": "leader completed bars plus only fully realized prior aligned laggard outcomes",
+    "entry_uses": "laggard exact observed M5 open at causal decision time",
+    "training_or_normalization": "prior leader shock scale and laggard outcomes admitted only after target exit is observable"
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "cost_model": "frozen per-symbol conservative roundtrip fraction"
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use the unchanged prospectively frozen candidate-independent V6 per-symbol roundtrip cost fraction; no Wave03 or candidate-own PnL calibrates cost."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_CAUSAL_CROSS_MARKET_LEAD_LAG_STATE_WITH_JSON_SERIALIZABLE_PARAMETERS"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "wave": "PERFORMANCE_RESEARCH_V3_WAVE04",
+    "selection_basis": "C026_COST_DOMINANCE_USED_ONLY_TO_PRIORITIZE_LOW_EVENT_DENSITY_STRUCTURAL_INFORMATION_TRANSFER; FIXED_PAIRS_AND_THRESHOLDS_NOT_FIT_TO_C026_OR_CANDIDATE_OUTCOMES",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "f0a0b7c78010232bda8035bb2ab4215e1f37624a17e8eb094e2515daeb2f6e5c"
+}

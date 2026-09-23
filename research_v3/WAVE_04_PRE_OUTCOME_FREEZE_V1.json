@@ -1,0 +1,85 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave04-pre-outcome-freeze.v1",
+  "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "frozen_utc": "2026-09-23T05:22:00Z",
+  "predecessor_wave03_validation": {
+    "head": "a617a4fa063e68cbbf7e743d42c0b42de690ac2c",
+    "ci_run_id": 35821857301,
+    "conclusion": "SUCCESS",
+    "wave03_status": "COARSE_NET_FAIL",
+    "wave03_gross_pnl": 98.5807892235443,
+    "wave03_coarse_net_pnl": -26.327021851542135,
+    "stage_a_survivors": []
+  },
+  "candidate_ids": [
+    "V2-C027",
+    "V2-C028"
+  ],
+  "candidate_spec_hashes": {
+    "V2-C027": "6c2945d22af7d10156786a823dca7df21afbbb2c96fa92e060e70e58857de8e2",
+    "V2-C028": "f0a0b7c78010232bda8035bb2ab4215e1f37624a17e8eb094e2515daeb2f6e5c"
+  },
+  "batch_size_rationale": "Two candidates maximize current information gain per exact-head gate by sharing the same accepted V6/cost evidence while testing two orthogonal mechanism families; this is a wave choice, not a global candidate-count cap.",
+  "material_distinction": {
+    "wave03_information_used": true,
+    "wave03_numeric_outcome_used_for_parameter_fit": false,
+    "no_wave03_winner_filtering": true,
+    "families": [
+      "VOLATILITY_EXPANSION_BREAKOUT",
+      "CROSS_MARKET_LEAD_LAG"
+    ],
+    "new_structure": [
+      "EVENT_DRIVEN_COMPLETED_BAR_CHANNEL_BREAKOUT_WITH_FIXED_3H_PAYOFF",
+      "STRUCTURAL_LEADER_SHOCK_TO_LAGGARD_INFORMATION_TRANSFER",
+      "NO_RECURRING_SAME_SYMBOL_SESSION_DRIFT_RESCUE"
+    ]
+  },
+  "selection_basis": [
+    "C026_RETAINED_GROSS_EDGE_BUT_FAILED_AFTER_CONSERVATIVE_COSTS",
+    "C026_LATEST_4W_WEAKNESS_ARGUES_AGAINST_RESCUE_TUNING_SESSION_DRIFT",
+    "C027_TESTS_EVENT_DRIVEN_EXPANSION_WITH_LOWER_NATURAL_TURNOVER",
+    "C028_TESTS_ORTHOGONAL_CROSS_MARKET_INFORMATION_TRANSFER",
+    "NO_C026_SYMBOL_DIRECTION_OR_NUMERIC_THRESHOLD_FIT",
+    "NO_PROTECTED_EVIDENCE"
+  ],
+  "capture": {
+    "ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json",
+    "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+  },
+  "cost_authority": {
+    "ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9"
+  },
+  "evaluator": {
+    "ref": "m7/competition_performance_v3_wave04_c027_c028_evaluator.py",
+    "sha256": "3df4629a7bf2aaa6b9008df364f05b134f2c2b1c2fe68f1022932f5dbf786789",
+    "git_blob_sha1": "a298083ed479c767e9b522dce027c02d7ee70ff1",
+    "base_reporting_dependency_ref": "m7/competition_performance_v3_wave02_evaluator.py",
+    "base_reporting_dependency_git_blob_sha1": "cfc1feabf0b8b251940d3e7b17f01d915bdc214a"
+  },
+  "wrapper": {
+    "ref": "research_v3/wave04_execute.py",
+    "sha256": "f6e0bea83d8e1addac37d6ebc9dc30ca1af4b74dfb38aa784044cbb5d7a397f6",
+    "git_blob_sha1": "0275edd571daf65b23c9e634a89206d196792057"
+  },
+  "accounting_before": {
+    "v2_attempts_used": 16,
+    "v2_search_budget_remaining": 68,
+    "v2_evaluated_identities": 16,
+    "economic_outcomes_opened": 19,
+    "discovery_ledger_entries": 52,
+    "discovery_result_recorded_entries": 17
+  },
+  "expected_if_wave04_legitimately_opened": {
+    "v2_attempts_used": 18,
+    "v2_search_budget_remaining": 66,
+    "v2_evaluated_identities": 18,
+    "economic_outcomes_opened": 21
+  },
+  "new_attempts_consumed_by_freeze": 0,
+  "candidate_own_outcomes_opened": false,
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false,
+  "execution_gate": "REQUIRE_EXACT_HEAD_FULL_SUITE_GREEN_AFTER_THIS_FREEZE_BEFORE_ANY_C027_C028_ECONOMIC_OUTCOME"
+}

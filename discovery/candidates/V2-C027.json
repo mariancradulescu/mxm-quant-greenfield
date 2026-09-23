@@ -1,0 +1,166 @@
+{
+  "id": "V2-C027",
+  "mechanism": {
+    "family": "VOLATILITY_EXPANSION_BREAKOUT",
+    "subfamily": "CAUSAL_6H_CHANNEL_BREAKOUT_WITH_30M_EXPANSION_AND_COST_SCALE_HURDLE"
+  },
+  "rationale": "Prospectively test a materially distinct event-driven volatility-expansion mechanism after C026 showed gross-positive but cost-dominated recurring session drift. C027 does not filter or retune C026 winners. It uses only completed-bar 6-hour channel structure plus a fixed 30-minute expansion condition and a cost-scaled minimum move, then holds for a fixed 3-hour horizon. Parameters are frozen before C027 outcome and were not fitted to C026 numeric PnL.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "features": [
+    {
+      "name": "prior_6h_channel",
+      "formula": "highest high and lowest low over the 72 M5 bars completed immediately before the signal bar"
+    },
+    {
+      "name": "current_30m_return",
+      "formula": "current completed close / close 6 M5 bars earlier - 1"
+    },
+    {
+      "name": "prior_30m_abs_return_scale",
+      "formula": "median absolute 30m return across 24 non-overlapping fully completed 30m observations before current signal"
+    },
+    {
+      "name": "breakout_direction",
+      "formula": "LONG when current completed close > prior 6h high; SHORT when current completed close < prior 6h low"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "channel",
+      "bars_m5": 72
+    },
+    {
+      "feature": "volatility_scale",
+      "non_overlapping_30m_observations": 24
+    }
+  ],
+  "normalization_training": {
+    "mode": "CAUSAL_ROLLING_PRICE_AND_VOLATILITY_SCALE",
+    "future_normalization": false,
+    "retraining_schedule": "EACH_30_MINUTE_DECISION_BOUNDARY",
+    "inner_validation": "NONE_FIXED_RULE",
+    "random_temporal_shuffle": false,
+    "purge_embargo": "ALL_CHANNEL_AND_SCALE_INPUTS_MUST_BE_COMPLETED_BEFORE_SIGNAL_DECISION"
+  },
+  "timing": {
+    "decision": "EVERY_30_MINUTES_AFTER_CURRENT_M5_BAR_CLOSES",
+    "entry": "NEXT_EXACT_M5_OPEN",
+    "target_horizon_minutes": 180,
+    "exit": "EXACT_OBSERVED_M5_OPEN_180_MINUTES_AFTER_ENTRY"
+  },
+  "direction": {
+    "LONG": "completed_close > prior_6h_high AND abs_30m_return > 1.5*prior_median_abs_30m_return AND abs_30m_return > 3*frozen_roundtrip_cost_fraction",
+    "SHORT": "completed_close < prior_6h_low under same expansion and cost-scale hurdles",
+    "NO_OP": "otherwise_or_missing_exact_entry_exit"
+  },
+  "entry": {
+    "type": "NEXT_M5_OPEN_AFTER_COMPLETED_BREAKOUT_SIGNAL",
+    "price": "exact observed M5 open"
+  },
+  "exit": {
+    "type": "FIXED_180_MINUTE_OPEN_TO_OPEN",
+    "price": "exact observed M5 open 180 minutes after entry",
+    "missing_exact_exit": "NO_TRADE"
+  },
+  "maximum_hold": {
+    "unit": "MINUTES",
+    "value": 180
+  },
+  "filters": [
+    "PRIOR_6H_CHANNEL_EXCLUDES_SIGNAL_BAR",
+    "30M_EXPANSION_GT_1_5X_PRIOR_MEDIAN",
+    "30M_ABS_MOVE_GT_3X_FROZEN_ROUNDTRIP_COST",
+    "EXACT_NEXT_M5_ENTRY_AND_180M_EXIT_REQUIRED",
+    "NO_SAME_SYMBOL_OVERLAP",
+    "NO_SYNTHETIC_OR_FORWARDFILLED_PRICES"
+  ],
+  "parameters": {
+    "decision_interval_minutes": 30,
+    "channel_bars_m5": 72,
+    "volatility_scale_observations_30m": 24,
+    "expansion_multiple": 1.5,
+    "minimum_signal_move_cost_multiple": 3,
+    "hold_minutes": 180
+  },
+  "position_admission_policy": {
+    "cross_symbol_concurrency_allowed_in_stage_a": true,
+    "same_symbol_overlap": false,
+    "same_symbol_pyramiding_allowed": false,
+    "scope": "PER_CANDIDATE_PER_TRADED_SYMBOL"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "resolution": "M5",
+    "accepted_capture_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
+  },
+  "causal_availability": {
+    "future_information_forbidden": true,
+    "decision_uses": "only completed M5 bars through the signal bar",
+    "entry_uses": "next exact observed M5 open after signal decision",
+    "training_or_normalization": "rolling channel and volatility scale from prior completed bars only"
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "cost_model": "frozen per-symbol conservative roundtrip fraction"
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use the unchanged prospectively frozen candidate-independent V6 per-symbol roundtrip cost fraction; no Wave03 or candidate-own PnL calibrates cost."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_CAUSAL_VOLATILITY_BREAKOUT_STATE_WITH_JSON_SERIALIZABLE_PARAMETERS"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "wave": "PERFORMANCE_RESEARCH_V3_WAVE04",
+    "selection_basis": "C026_GROSS_POSITIVE_BUT_COST_DOMINATED_USED_ONLY_TO_MOTIVATE_MATERIAL_SHIFT_TO_EVENT_DRIVEN_EXPANSION; NO_C026_SYMBOL_DIRECTION_OR_NUMERIC_PNL_FILTERING",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "6c2945d22af7d10156786a823dca7df21afbbb2c96fa92e060e70e58857de8e2"
+}
