@@ -212,9 +212,15 @@ def persist_same_identity_corrections(
         if old.get("correction_id") == CORRECTION_ID:
             old_ref = old.get("historical_result_ref")
             old_hash = old.get("historical_result_hash")
-        else:
+        elif old.get("result_ref") and old.get("result_hash"):
             old_ref = old.get("result_ref")
             old_hash = old.get("result_hash")
+        elif old.get("corrected_successor_ref") and old.get("corrected_successor_hash"):
+            old_ref = old.get("corrected_successor_ref")
+            old_hash = old.get("corrected_successor_hash")
+        else:
+            old_ref = old.get("historical_result_ref")
+            old_hash = old.get("historical_result_hash")
         if old_ref:
             key = f"{cid}_STAGE_A_PRE_LIVE_EQUIVALENT_CORRECTION"
             state["superseded_or_invalid_historical_result_pointers"].setdefault(key, old_ref)
