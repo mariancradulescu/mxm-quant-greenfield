@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.v2.consumed-identity-forensic-audit.v3",
-  "status": "COMPLETE_PER_IDENTITY_CLASSIFICATION",
+  "status": "COMPLETE_PER_IDENTITY_CLASSIFICATION_AND_EXPOSURE_ACCOUNTING",
   "recorded_utc": "2026-09-23T07:38:00Z",
   "baseline_head": "5049d09f484f3215198f389c4099ec1c2079f217",
   "supersedes_for_current_classification": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json",
@@ -521,7 +521,7 @@
     }
   },
   "attempt_accounting": {
-    "rule": "Causally valid implementation-only identities retain one slot pending zero-delta same-identity correction; frozen-spec-invalid identities do not charge the V2 budget and any corrected semantics must use a new identity.",
+    "rule": "Search-budget consumption is historical outcome exposure: every distinct V2 DEVELOPMENT identity whose Stage-A outcome was opened remains consumed even if its current economic result authority is later invalidated. Same-identity implementation correction adds zero attempts; corrected semantics under a new identity consume one attempt only when that new outcome opens.",
     "v2_budget_total": 84,
     "historical_evaluated_candidate_ids": [
       "V2-C006",
@@ -545,12 +545,30 @@
     "budget_charged_candidate_ids": [
       "V2-C006",
       "V2-C012",
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C023",
+      "V2-C024",
+      "V2-C025",
+      "V2-C026"
+    ],
+    "v2_attempts_used": 16,
+    "v2_search_budget_remaining": 68,
+    "pending_same_identity_correction_candidate_ids": [
+      "V2-C006",
+      "V2-C012",
       "V2-C023",
       "V2-C025"
     ],
-    "v2_attempts_used": 4,
-    "v2_search_budget_remaining": 80,
-    "released_invalid_spec_candidate_ids": [
+    "invalid_frozen_spec_candidate_ids": [
       "V2-C013",
       "V2-C014",
       "V2-C015",
@@ -564,14 +582,44 @@
       "V2-C024",
       "V2-C026"
     ],
-    "released_invalid_spec_slot_count": 12,
-    "same_identity_zero_delta_correction_ids": [
+    "invalid_result_authority_candidate_ids": [
       "V2-C006",
       "V2-C012",
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
       "V2-C023",
-      "V2-C025"
+      "V2-C024",
+      "V2-C025",
+      "V2-C026"
+    ],
+    "refunded_candidate_ids": [],
+    "refunded_slot_count": 0,
+    "replacement_new_identity_required_for": [
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016",
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C024",
+      "V2-C026"
     ],
     "global_attempts_seen_for_information_exposure": 32,
+    "distinct_identity_outcomes_opened": 16,
+    "stage_a_result_recorded_entries": 17,
+    "stage_b_current_config_economic_observations": 2,
     "economic_outcomes_opened_historical": 19,
     "historical_bytes_deleted": false
   },
@@ -583,5 +631,12 @@
     "protected_evidence_opened": false,
     "live_orders_authorized": false,
     "competition_start_authorized": false
+  },
+  "authority_separation": {
+    "data_validity": "ORTHOGONAL_TO_OUTCOME_EXPOSURE_AND_RESULT_AUTHORITY",
+    "outcome_exposure": "17_STAGE_A_RESULT_RECORDS_PLUS_2_STAGE_B_CURRENT_CONFIG_OBSERVATIONS",
+    "search_budget_identity_consumption": "16_DISTINCT_V2_STAGE_A_IDENTITIES_WITH_OPENED_OUTCOMES",
+    "current_live_equivalent_economic_result_authority": "NONE_PENDING_REMEDIATION",
+    "protected_forward_opened": false
   }
 }
