@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Require exact-head full CI GREEN for the prospectively frozen V3 Wave02 C024-C025 tree; then bind execution authorization to that exact head/run and execute the two-candidate economic batch once.",
+  "next_action": "Execute the already-frozen C024-C025 Wave02 economic batch exactly once using the accepted V6 capture and frozen coarse-cost authority; then persist outcomes canonically.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE02_FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "phase": "PERFORMANCE_RESEARCH_V3_WAVE02_AUTHORIZED_NOT_EXECUTED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -1122,7 +1122,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE02_FROZEN_PENDING_EXACT_HEAD_GREEN",
+    "status": "WAVE02_AUTHORIZED_NOT_EXECUTED",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1185,7 +1185,7 @@
     "wave01_recovery_validation_conclusion": "SUCCESS",
     "wave01_recovery_validation_tests_passed": 681,
     "wave02": {
-      "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+      "status": "AUTHORIZED_AFTER_EXACT_HEAD_GREEN",
       "freeze_ref": "research_v3/WAVE_02_PRE_OUTCOME_FREEZE_V1.json",
       "authorization_ref": "research_v3/WAVE_02_EXECUTION_AUTHORIZATION_V1.json",
       "wrapper_ref": "research_v3/wave02_execute.py",
@@ -1214,7 +1214,11 @@
       "ledger_tail_entry_hash": "c44b3d9bd7e47cbb3b5bf943de57a8abd735c53cb3c064065a565c720f743a24",
       "protected_evidence_opened": false,
       "live_orders": false,
-      "competition_start": false
+      "competition_start": false,
+      "execution_gate_head": "09cf04c51d649da83a46b5a4d5ff373ae8abaff6",
+      "execution_gate_ci_run_id": 35818302991,
+      "execution_gate_ci_conclusion": "SUCCESS",
+      "authorization_bound": true
     }
   }
 }
