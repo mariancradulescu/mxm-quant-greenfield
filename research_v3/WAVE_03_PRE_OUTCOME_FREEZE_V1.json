@@ -1,0 +1,80 @@
+{
+  "schema": "mxm.greenfield.performance-research-v3.wave03-pre-outcome-freeze.v1",
+  "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "frozen_utc": "2026-09-23T04:46:00Z",
+  "predecessor_wave02_validation": {
+    "head": "36b2b26b4d7ff01a9f5dd0a5ecd360ec21ca9ac5",
+    "ci_run_id": 35819512741,
+    "conclusion": "SUCCESS",
+    "wave02_statuses": {
+      "V2-C024": "GROSS_EDGE_FAIL",
+      "V2-C025": "COARSE_NET_FAIL"
+    },
+    "stage_a_survivors": []
+  },
+  "candidate_ids": [
+    "V2-C026"
+  ],
+  "candidate_spec_hashes": {
+    "V2-C026": "41880f453efd363da860024e8f9b7b299bd14b9f2367156779f3f193f9abc9e9"
+  },
+  "material_distinction": {
+    "wave02_negative_information_used": true,
+    "wave02_candidate_outcomes_used_for_numeric_parameter_fit": false,
+    "new_mechanism_family": "SEASONALITY_SESSION_TIME",
+    "new_structure": [
+      "RECURRING_UTC_LIQUIDITY_SEGMENT_EXPECTED_RETURN",
+      "MULTI_HOUR_STRUCTURAL_SEGMENT_PAYOFF_INSTEAD_OF_15M_TARGET",
+      "CAUSAL_SAME_SEGMENT_ROLLING_TRAINING",
+      "COST_HURDLE_APPLIED_TO_EXPECTED_SEGMENT_RETURN",
+      "NO_SHORT_HORIZON_STATE_OR_CROSS_SECTIONAL_RESIDUAL_SELECTION"
+    ]
+  },
+  "selection_basis": [
+    "C024_GROSS_NEGATIVE_REJECTS_CROSS_SECTIONAL_RESIDUAL_REVERSION_IDENTITY",
+    "C025_POSITIVE_BUT_TINY_GROSS_EDGE_WAS_OVERWHELMED_BY_ROUNDTRIP_COST",
+    "SHIFT_TO_STRUCTURALLY_LOWER_CHURN_SESSION_SCALE_NOT_PARAMETER_RESCUE",
+    "USE_ONLY_ACCEPTED_V6_AND_PRE_OUTCOME_FROZEN_COST_AUTHORITY",
+    "NO_PROTECTED_EVIDENCE_OR_C026_OUTCOME"
+  ],
+  "capture": {
+    "ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json",
+    "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+  },
+  "cost_authority": {
+    "ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "sha256": "b7ca6191b5570c1cc22f644feb6b0124c6bec0f00fc5ad5a8c772419bcb481b9"
+  },
+  "evaluator": {
+    "ref": "m7/competition_performance_v3_wave03_c026_evaluator.py",
+    "sha256": "29b250904fa4b3de8e4ce0292ab38332670e624cff9a01ab649ee831fffe057f",
+    "git_blob_sha1": "7c07c1d39053baa1e31ed4eb3d552520d809ccd7",
+    "base_reporting_dependency_ref": "m7/competition_performance_v3_wave02_evaluator.py",
+    "base_reporting_dependency_git_blob_sha1": "cfc1feabf0b8b251940d3e7b17f01d915bdc214a"
+  },
+  "wrapper": {
+    "ref": "research_v3/wave03_execute.py",
+    "sha256": "549f987c3310c59b5cdb618d5c7ef873c0df13f70d0f2ac37fdf9155cd10dab7",
+    "git_blob_sha1": "747d522e23c1621bb138de4d8495973232c837e1"
+  },
+  "accounting_before": {
+    "v2_attempts_used": 15,
+    "v2_search_budget_remaining": 69,
+    "v2_evaluated_identities": 15,
+    "economic_outcomes_opened": 18,
+    "discovery_ledger_entries": 50,
+    "discovery_result_recorded_entries": 16
+  },
+  "expected_if_c026_later_legitimately_opened": {
+    "v2_attempts_used": 16,
+    "v2_search_budget_remaining": 68,
+    "v2_evaluated_identities": 16,
+    "economic_outcomes_opened": 19
+  },
+  "new_attempts_consumed_by_freeze": 0,
+  "candidate_own_outcomes_opened": false,
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false,
+  "execution_gate": "REQUIRE_EXACT_HEAD_FULL_SUITE_GREEN_AFTER_THIS_FREEZE_BEFORE_ANY_C026_ECONOMIC_OUTCOME"
+}

@@ -1,0 +1,176 @@
+{
+  "id": "V2-C026",
+  "mechanism": {
+    "family": "SEASONALITY_SESSION_TIME",
+    "subfamily": "CAUSAL_ROLLING_UTC_SEGMENT_DRIFT_COST_HURDLED"
+  },
+  "rationale": "Prospectively test a low-churn session-time drift mechanism after Wave02 showed that short-horizon adaptive activity did not clear conservative roundtrip friction. The candidate estimates each symbol's recurring return over four structurally defined UTC liquidity segments using only fully realized prior same-segment examples, and trades only when a one-standard-error lower bound on absolute expected segment return exceeds the frozen roundtrip cost. The segment structure and cost hurdle are frozen before C026's own outcome; no C024/C025 parameter rescue or protected evidence is used.",
+  "universe": [
+    "USDJPY",
+    "GBPUSD",
+    "USDCHF",
+    "AUDUSD",
+    "US500",
+    "US2000",
+    "SpotCrude",
+    "SpotBrent",
+    "ETHUSD",
+    "Copper"
+  ],
+  "features": [
+    {
+      "name": "utc_liquidity_segment",
+      "formula": "SEG_00_08, SEG_08_14, SEG_14_21, SEG_21_00 from exact UTC entry boundary to next exact UTC boundary"
+    },
+    {
+      "name": "same_segment_forward_return",
+      "formula": "exact observed M5 open at segment end / exact observed M5 open at segment start - 1"
+    },
+    {
+      "name": "segment_expected_return",
+      "formula": "mean of fully realized prior same-symbol same-segment returns whose exits completed before current entry, limited to trailing 28 calendar days"
+    },
+    {
+      "name": "segment_standard_error",
+      "formula": "sample standard deviation / sqrt(n) over the same causal training examples"
+    }
+  ],
+  "lookbacks": [
+    {
+      "feature": "segment_training_window",
+      "calendar_days": 28
+    },
+    {
+      "feature": "minimum_completed_same_segment_examples",
+      "count": 5
+    }
+  ],
+  "normalization_training": {
+    "mode": "CAUSAL_ROLLING_SAME_SEGMENT_EXPECTED_RETURN",
+    "future_normalization": false,
+    "training_window_calendar_days": 28,
+    "retraining_schedule": "EACH_EXACT_UTC_SEGMENT_ENTRY_BOUNDARY",
+    "inner_validation": "NONE_FIXED_SESSION_TIME_MODEL",
+    "random_temporal_shuffle": false,
+    "purge_embargo": "TRAINING_EXAMPLE_ADMITTED_ONLY_AFTER_ITS_SEGMENT_EXIT_HAS_COMPLETED"
+  },
+  "timing": {
+    "decision": "EXACT_OBSERVED_M5_OPEN_AT_UTC_00_00_08_00_14_00_21_00_BOUNDARIES",
+    "entry": "SAME_EXACT_OBSERVED_M5_OPEN_AT_DECISION_BOUNDARY",
+    "target_horizon": "CURRENT_UTC_LIQUIDITY_SEGMENT_UNTIL_NEXT_FROZEN_BOUNDARY",
+    "exit": "EXACT_OBSERVED_M5_OPEN_AT_NEXT_SEGMENT_BOUNDARY"
+  },
+  "direction": {
+    "LONG": "segment_expected_return > 0 and abs(mean)-standard_error > frozen_roundtrip_cost_fraction",
+    "SHORT": "segment_expected_return < 0 and abs(mean)-standard_error > frozen_roundtrip_cost_fraction",
+    "NO_OP": "boundary_missing_or_exit_boundary_missing_or_insufficient_completed_same_segment_examples_or_cost_hurdle_not_met"
+  },
+  "entry": {
+    "type": "PER_SYMBOL_SESSION_TIME_MARKET_PROXY",
+    "price": "exact_observed_M5_open_at_current_segment_boundary"
+  },
+  "exit": {
+    "type": "NEXT_FROZEN_SESSION_SEGMENT_BOUNDARY",
+    "price": "exact_observed_M5_open_at_next_segment_boundary",
+    "missing_exact_exit_boundary": "NO_TRADE_FOR_THAT_SEGMENT"
+  },
+  "maximum_hold": {
+    "unit": "STRUCTURAL_UTC_LIQUIDITY_SEGMENT",
+    "boundaries_utc": [
+      "00:00",
+      "08:00",
+      "14:00",
+      "21:00"
+    ],
+    "maximum_scheduled_hours": 8
+  },
+  "filters": [
+    "EXACT_ENTRY_AND_NEXT_SEGMENT_EXIT_BOUNDARY_REQUIRED",
+    "TRAINING_EXAMPLES_EXIT_MUST_PRECEDE_CURRENT_ENTRY",
+    "AT_LEAST_5_COMPLETED_SAME_SYMBOL_SAME_SEGMENT_TRAINING_EXAMPLES",
+    "FROZEN_COARSE_COST_HURDLE_REQUIRED",
+    "NO_SYNTHETIC_OR_FORWARDFILLED_BOUNDARY_PRICES"
+  ],
+  "parameters": {
+    "utc_segment_boundaries": [
+      "00:00",
+      "08:00",
+      "14:00",
+      "21:00"
+    ],
+    "training_window_calendar_days": 28,
+    "minimum_training_examples": 5,
+    "confidence_hurdle_standard_errors": 1
+  },
+  "position_admission_policy": {
+    "cross_symbol_concurrency_allowed_in_stage_a": true,
+    "same_symbol_segment_overlap": "IMPOSSIBLE_BY_STRUCTURAL_NEXT_BOUNDARY_EXIT_WHEN_EXACT_BOUNDARIES_EXIST",
+    "missing_exit_boundary": "NO_TRADE_AT_ENTRY_BOUNDARY",
+    "same_direction_pyramiding_per_symbol_allowed": false,
+    "scope": "PER_CANDIDATE_PER_TRADED_SYMBOL"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "resolution": "M5",
+    "accepted_capture_ref": "data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"
+  },
+  "causal_availability": {
+    "future_information_forbidden": true,
+    "decision_uses": "current exact boundary open plus fully realized prior same-segment returns only",
+    "entry_uses": "current exact observed M5 boundary open",
+    "training_or_normalization": "prior fully realized examples only"
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "cost_model": "frozen per-symbol conservative roundtrip fraction"
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use the prospectively frozen candidate-independent per-symbol roundtrip cost fraction from COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1; no C026 or prior candidate PnL calibrates cost."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_CAUSAL_SESSION_TIME_STATE_WITH_JSON_SERIALIZABLE_PARAMETERS"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "stage_a_economic_unit": {
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "gross_pnl_formula": "direction_sign * ((exit_price-entry_price)/entry_price) * 1000",
+    "cost_formula": "1000 * frozen_symbol_roundtrip_cost_fraction",
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR_WITH_VOLUME_LATTICE_AND_CAUSAL_MARGIN",
+    "post_outcome_resizing_allowed": false
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "wave": "PERFORMANCE_RESEARCH_V3_WAVE03",
+    "selection_basis": "WAVE02_NEGATIVE_INFORMATION_USED_ONLY_FOR_MATERIAL_FAMILY_SHIFT_TO_LOWER_CHURN_SESSION_SCALE; NO_C026_OUTCOME_OR_PROTECTED_EVIDENCE_USED",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "41880f453efd363da860024e8f9b7b299bd14b9f2367156779f3f193f9abc9e9"
+}
