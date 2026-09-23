@@ -168,24 +168,29 @@ jobs:
         if: ${{ steps.mode.outputs.mode == 'resume' }}
         run: python -m research_v3.autonomous_control_plane validate
 
-      - name: Runtime V2 end-to-end director focused tests
+      - name: Runtime V2 and general AI director focused tests
         if: ${{ steps.mode.outputs.mode == 'resume' }}
-        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge
 
-      - name: Drive autonomous planning and operation materialization
-        id: director
+      - name: Prove general AI research director boundary if required
         if: ${{ steps.mode.outputs.mode == 'resume' }}
-        env:
-          MXM_PREDECESSOR_RUN_ID: ${{ inputs.predecessor_run_id }}
         shell: bash
         run: |
-          python -m research_v3.autonomous_director_v2 supervise \
+          if [[ -f evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json ]] && \
+             [[ "$(jq -r '.status // empty' evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json)" == "PASS" ]]; then
+            echo "General AI director already accepted"
+          else
+            python -m research_v3.general_ai_director_acceptance prove \
+              --root . \
+              --git-checkpoint \
+              --git-push
+          fi
+
+      - name: Drain provider-neutral AI research proposals
+        if: ${{ steps.mode.outputs.mode == 'resume' }}
+        run: |
+          python -m research_v3.general_ai_director_bridge drain \
             --root . \
-            --event-name "${GITHUB_EVENT_NAME}" \
-            --run-id "${GITHUB_RUN_ID}" \
-            --run-attempt "${GITHUB_RUN_ATTEMPT}" \
-            --actor "${GITHUB_ACTOR}" \
-            --predecessor-run-id "${MXM_PREDECESSOR_RUN_ID}" \
             --git-checkpoint \
             --git-push
 

@@ -49,28 +49,26 @@ jobs:
       - name: Reconcile durable control plane
         run: python -m research_v3.autonomous_control_plane validate
 
-      - name: Focused Runtime V2 liveness tests
-        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2
+      - name: Focused Runtime V2 and general AI director tests
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge
 
-      - name: Autonomous liveness wake and director progression
-        id: director
+      - name: Prove general AI research director boundary if not yet accepted
         shell: bash
         run: |
-          predecessor=""
-          origin_completed=""
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_run" ]]; then
-            predecessor="${{ github.event.workflow_run.id }}"
-            origin_completed="${{ github.event.workflow_run.updated_at }}"
+          if [[ -f evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json ]] && \
+             [[ "$(jq -r '.status // empty' evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json)" == "PASS" ]]; then
+            echo "General AI director already accepted"
+          else
+            python -m research_v3.general_ai_director_acceptance prove \
+              --root . \
+              --git-checkpoint \
+              --git-push
           fi
 
-          python -m research_v3.autonomous_director_v2 supervise-loop \
+      - name: Drain auditable AI research proposals through Runtime V2
+        run: |
+          python -m research_v3.general_ai_director_bridge drain \
             --root . \
-            --event-name "${GITHUB_EVENT_NAME}" \
-            --run-id "${GITHUB_RUN_ID}" \
-            --run-attempt "${GITHUB_RUN_ATTEMPT}" \
-            --actor "${GITHUB_ACTOR}" \
-            --predecessor-run-id "${predecessor}" \
-            --wake-origin-completed-at "${origin_completed}" \
             --git-checkpoint \
             --git-push
 
