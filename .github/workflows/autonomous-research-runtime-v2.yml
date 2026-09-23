@@ -103,7 +103,7 @@ jobs:
           elif [[ "${{ steps.mode.outputs.mode }}" == "acceptance_continue" ]]; then
             origin="predecessor_workflow_dispatch"
           fi
-          MXM_PREDECESSOR_RUN_ID="${{ inputs.predecessor_run_id }}"           MXM_CONTINUATION_ORIGIN="${origin}"           python research_v3/runtime_v2_repository_acceptance.py advance --root .
+          MXM_PREDECESSOR_RUN_ID="${{ inputs.predecessor_run_id }}"           MXM_CONTINUATION_ORIGIN="${origin}"           python -m research_v3.runtime_v2_repository_acceptance advance --root .
 
       - name: Persist liveness acceptance checkpoint
         if: ${{ steps.acceptance.outputs.action == 'DISPATCH_CONTINUE' || steps.acceptance.outputs.action == 'DISPATCH_VERIFY' }}
@@ -126,7 +126,7 @@ jobs:
         env:
           MXM_PREDECESSOR_RUN_ID: ${{ inputs.predecessor_run_id }}
           MXM_CONTINUATION_ORIGIN: predecessor_workflow_dispatch
-        run: python research_v3/runtime_v2_repository_acceptance.py verify --root .
+        run: python -m research_v3.runtime_v2_repository_acceptance verify --root .
 
       - name: Persist verified Runtime V2 acceptance gate
         if: ${{ steps.verify.outputs.action == 'VERIFIED' }}
