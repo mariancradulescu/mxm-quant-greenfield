@@ -1,0 +1,178 @@
+{
+  "schema": "mxm.greenfield.v2.consumed-identity-forensic-audit.v2",
+  "status": "COMPLETE_LIVE_EQUIVALENT_CORRECTIONS_REQUIRED",
+  "recorded_utc": "2026-09-23T06:33:00Z",
+  "baseline_head": "7862dfa3c36a5b60caf414f400d2591b5929620e",
+  "supersedes_for_current_replay_validity": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V1.json",
+  "live_equivalent_contract_ref": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
+  "distinct_consumed_identities": 16,
+  "result_recorded_entries": 17,
+  "candidate_ids": [
+    "V2-C006",
+    "V2-C012",
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C023",
+    "V2-C024",
+    "V2-C025",
+    "V2-C026"
+  ],
+  "classifications": {
+    "V2-C006": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C012": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C013": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C014": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C015": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C016": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C017": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C018": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C019": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C020": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C021": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C022": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C023": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C024": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C025": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+    "V2-C026": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE"
+  },
+  "material_common_finding": "Every currently consumed identity has a frozen evaluator/replay path that queries future exit availability, future session completeness, or a future target row before historical entry admission is finalized. This violates the active live-equivalent replay contract even where the signal formula itself is causal.",
+  "identity_groups": {
+    "V2-C006_V2-C012": "m6/tier1_candidate_replay.py",
+    "V2-C013_V2-C016": "m7/competition_expansion_index_m15.py",
+    "V2-C017_V2-C022": "m7/competition_ultra_fast_stage_a_evaluator.py",
+    "V2-C023": "m7/competition_ultra_fast_stage_a_frontier_v2_evaluator.py",
+    "V2-C024_V2-C025": "m7/competition_performance_v3_wave02_evaluator.py",
+    "V2-C026": "m7/competition_performance_v3_wave03_c026_evaluator.py"
+  },
+  "result_authority": {
+    "V2-C006": {
+      "result_ref": "discovery/results/V2-C006_STAGE_A_V1.json",
+      "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+      "historical_status": "DISCOVERY_SURVIVOR"
+    },
+    "V2-C012": {
+      "result_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
+      "result_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
+      "historical_status": "DISCOVERY_SURVIVOR"
+    },
+    "V2-C013": {
+      "result_ref": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "67fc835c7196e7dbc7645ffb278276056736c2150198c865232d120ffcadf16a",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C014": {
+      "result_ref": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "bb6b276a429b75a690237686c1cb10eb3b5412f934e806fef333a6c346ef70e8",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C015": {
+      "result_ref": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "e4d1d06983f54d945e8e959ba4210ec7c08ea59030e20667d22a78ed69e06601",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C016": {
+      "result_ref": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
+      "result_hash": "d39ef973330d9c0fbb7f2605a78673d844271328b47e4f33318200918a6e641d",
+      "historical_status": "COST_UNRESOLVED"
+    },
+    "V2-C017": {
+      "result_ref": "discovery/results/V2-C017_STAGE_A_V1.json",
+      "result_hash": "9870baf130d12e9864489c6d0ebe83a80b4fa3a38f1b2c5321ac03e1dc64029b",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C018": {
+      "result_ref": "discovery/results/V2-C018_STAGE_A_V1.json",
+      "result_hash": "f1a647f633d46d26dfa2b9d971b72e4bf3c53dd4eef9971ed0503cd2018fe69c",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C019": {
+      "result_ref": "discovery/results/V2-C019_STAGE_A_V1.json",
+      "result_hash": "65cf8e6358da6f304cce53a9f3ec3abfb922525c8de2f2a59ca0ce1fe637e9c6",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C020": {
+      "result_ref": "discovery/results/V2-C020_STAGE_A_V1.json",
+      "result_hash": "28b9fac70c1b39e7d782103324327c5c6249452868293c5a9bcc4fa137a7b8c2",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C021": {
+      "result_ref": "discovery/results/V2-C021_STAGE_A_V1.json",
+      "result_hash": "ab2b23edb01a913cc2aace95591bf004d6458cc3b3d254eca26625d211e5d1a2",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C022": {
+      "result_ref": "discovery/results/V2-C022_STAGE_A_V1.json",
+      "result_hash": "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C023": {
+      "result_ref": "discovery/results/V2-C023_STAGE_A_V1.json",
+      "result_hash": "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C024": {
+      "result_ref": "discovery/results/V2-C024_STAGE_A_V1.json",
+      "result_hash": "c02de6e3d98ce1abd32e2e189a4d12225c6a6feef8f45f7c5d24061144a01224",
+      "historical_status": "GROSS_EDGE_FAIL"
+    },
+    "V2-C025": {
+      "result_ref": "discovery/results/V2-C025_STAGE_A_V1.json",
+      "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
+      "historical_status": "COARSE_NET_FAIL"
+    },
+    "V2-C026": {
+      "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
+      "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
+      "historical_status": "COARSE_NET_FAIL"
+    }
+  },
+  "c012_history": {
+    "prior_normalization_defect_preserved": true,
+    "old_invalid_result_ref": "discovery/results/V2-C012_STAGE_A_V1.json",
+    "corrected_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
+    "new_live_equivalent_defect_is_independent_of_prior_rolling_window_fix": true
+  },
+  "projection_drift": {
+    "candidates_missing_from_current_result_authority_before_v2_audit": [
+      "V2-C017",
+      "V2-C018",
+      "V2-C019",
+      "V2-C020",
+      "V2-C021",
+      "V2-C022",
+      "V2-C023"
+    ],
+    "classification": "PERSISTENCE_ONLY_DEFECT",
+    "repaired_by_this_audit": true,
+    "additional_attempts_consumed": 0
+  },
+  "attempt_accounting": {
+    "v2_budget_total": 84,
+    "v2_attempts_used": 16,
+    "v2_search_budget_remaining": 68,
+    "action": "KEEP_ONE_SLOT_PER_DISTINCT_IDENTITY; SAME_IDENTITY_CORRECTION_CONSUMES_ZERO_ADDITIONAL_ATTEMPTS"
+  },
+  "correction_policy": {
+    "same_candidate_identity": true,
+    "same_spec_hash": true,
+    "additional_v2_attempts": 0,
+    "rescue_tuning": false,
+    "protected_evidence": false,
+    "historical_invalid_bytes_preserved": true,
+    "authority_must_be_superseded_not_deleted": true,
+    "post_entry_missing_target_data": "SETTLEMENT_OR_DATA_VALIDITY_EVENT_NOT_RETROACTIVE_NO_TRADE"
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}

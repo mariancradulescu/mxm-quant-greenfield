@@ -519,7 +519,7 @@
       "competition_start": false
     }
   },
-  "next_action": "Validate the Wave04 pre-outcome causality block at exact head; implement reusable idempotent persistence and the one-time consumed-identity forensic audit under the live-equivalent replay contract before freezing corrected future identities.",
+  "next_action": "Correct the proven future-admission replay defect under the same identities with zero additional attempts, preserving historical bytes; revalidate each corrected result before resuming new economic identities.",
   "competition_ultra_fast_economic_wave_02": {
     "state": "COMPLETE_NO_STAGE_A_SURVIVOR_PERSISTED_PENDING_EXACT_HEAD_CI",
     "authority_ref": "discovery/COMPETITION_ULTRA_FAST_ECONOMIC_WAVE_02_V1.json",
@@ -546,7 +546,7 @@
     "competition_start": false
   },
   "old_wave_01_deferral_authority": "discovery/WAVE_01_DEFERRAL_V1.json",
-  "phase": "PERFORMANCE_RESEARCH_V3_WAVE04_BLOCKED_PRE_OUTCOME_CAUSALITY",
+  "phase": "PERFORMANCE_RESEARCH_V3_FORENSIC_LIVE_EQUIVALENT_CORRECTION_REQUIRED",
   "pre_m6_closure": {
     "active_hash_lifecycle_enforced": true,
     "authoritative_ledger_entries": 17,
@@ -930,9 +930,24 @@
     }
   },
   "competition_ultra_fast_execution_progress_authority": "data/COMPETITION_ULTRA_FAST_WAVE_01_EXECUTION_PROGRESS_V1.json",
-  "forensic_consumed_identity_audit_authority": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V1.json",
+  "forensic_consumed_identity_audit_authority": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json",
   "implementation_invalid_consumed_identities": [
-    "V2-C012"
+    "V2-C006",
+    "V2-C012",
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C023",
+    "V2-C024",
+    "V2-C025",
+    "V2-C026"
   ],
   "c012_same_identity_corrected_rerun": {
     "status": "CORRECTED_STAGE_A_RECORDED_SURVIVOR",
@@ -1037,11 +1052,14 @@
       "stage_a": {
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C006_STAGE_A_V1.json",
-        "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a"
+        "result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       },
       "stage_b_current_config": {
         "state": "VALID_UNAFFECTED",
-        "result_ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json"
+        "result_ref": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
+        "live_equivalent_replay_state": "DOWNSTREAM_REVALIDATION_REQUIRED_AFTER_STAGE_A_REPLAY_CORRECTION"
       }
     },
     "V2-C012": {
@@ -1051,7 +1069,9 @@
         "historical_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
         "corrected_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
         "corrected_successor_hash": "01a0a9b7d44f0ed22d628538d243e3f8118233cdfb3383016490b4aa5240c503",
-        "corrected_event_count": 34
+        "corrected_event_count": 34,
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       },
       "stage_b_current_config": {
         "state": "VALID_CORRECTED_SUCCESSOR",
@@ -1059,7 +1079,8 @@
         "invalidation_ref": "evidence/C012_STAGE_B_DOWNSTREAM_INVALIDATION_V1.json",
         "corrected_successor_ref": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
         "corrected_stage_a_successor_ref": "discovery/results/V2-C012_STAGE_A_V2.json",
-        "corrected_successor_hash": "91c9306b594110a2ae8cac25acdd10ecb6d7949f2cda7f2331ae9f514059f287"
+        "corrected_successor_hash": "91c9306b594110a2ae8cac25acdd10ecb6d7949f2cda7f2331ae9f514059f287",
+        "live_equivalent_replay_state": "DOWNSTREAM_REVALIDATION_REQUIRED_AFTER_STAGE_A_REPLAY_CORRECTION"
       }
     },
     "V2-C013": {
@@ -1067,7 +1088,9 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "67fc835c7196e7dbc7645ffb278276056736c2150198c865232d120ffcadf16a",
-        "status": "COARSE_NET_FAIL"
+        "status": "COARSE_NET_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     },
     "V2-C014": {
@@ -1075,7 +1098,9 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "bb6b276a429b75a690237686c1cb10eb3b5412f934e806fef333a6c346ef70e8",
-        "status": "GROSS_EDGE_FAIL"
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     },
     "V2-C015": {
@@ -1083,7 +1108,9 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C015_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "e4d1d06983f54d945e8e959ba4210ec7c08ea59030e20667d22a78ed69e06601",
-        "status": "COARSE_NET_FAIL"
+        "status": "COARSE_NET_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     },
     "V2-C016": {
@@ -1091,7 +1118,9 @@
         "state": "VALID_COST_UNRESOLVED_FAIL_CLOSED",
         "result_ref": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
         "result_hash": "d39ef973330d9c0fbb7f2605a78673d844271328b47e4f33318200918a6e641d",
-        "status": "COST_UNRESOLVED"
+        "status": "COST_UNRESOLVED",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     },
     "V2-C024": {
@@ -1099,7 +1128,9 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C024_STAGE_A_V1.json",
         "result_hash": "c02de6e3d98ce1abd32e2e189a4d12225c6a6feef8f45f7c5d24061144a01224",
-        "status": "GROSS_EDGE_FAIL"
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     },
     "V2-C025": {
@@ -1107,7 +1138,9 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C025_STAGE_A_V1.json",
         "result_hash": "f4c4e63952cf5c7a66b11a127d2a6dda057436f8091b0b59ba6897347c1fa077",
-        "status": "COARSE_NET_FAIL"
+        "status": "COARSE_NET_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     },
     "V2-C026": {
@@ -1115,14 +1148,86 @@
         "state": "VALID_AS_FROZEN_AND_IMPLEMENTED",
         "result_ref": "discovery/results/V2-C026_STAGE_A_V1.json",
         "result_hash": "d604bb44c1d4f82e5c9ace6a16d4cdb8e034de932e50aca06f3dda43b5d0c491",
-        "status": "COARSE_NET_FAIL"
+        "status": "COARSE_NET_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C017": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C017_STAGE_A_V1.json",
+        "result_hash": "9870baf130d12e9864489c6d0ebe83a80b4fa3a38f1b2c5321ac03e1dc64029b",
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C018": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C018_STAGE_A_V1.json",
+        "result_hash": "f1a647f633d46d26dfa2b9d971b72e4bf3c53dd4eef9971ed0503cd2018fe69c",
+        "status": "COARSE_NET_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C019": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C019_STAGE_A_V1.json",
+        "result_hash": "65cf8e6358da6f304cce53a9f3ec3abfb922525c8de2f2a59ca0ce1fe637e9c6",
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C020": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C020_STAGE_A_V1.json",
+        "result_hash": "28b9fac70c1b39e7d782103324327c5c6249452868293c5a9bcc4fa137a7b8c2",
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C021": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C021_STAGE_A_V1.json",
+        "result_hash": "ab2b23edb01a913cc2aace95591bf004d6458cc3b3d254eca26625d211e5d1a2",
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C022": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C022_STAGE_A_V1.json",
+        "result_hash": "e9ff00de31092034959980248779dde9b080482757a170bd3a8383081122c3d2",
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
+      }
+    },
+    "V2-C023": {
+      "stage_a": {
+        "state": "HISTORICAL_RESULT_PRESERVED_IMPLEMENTATION_CORRECTION_REQUIRED",
+        "result_ref": "discovery/results/V2-C023_STAGE_A_V1.json",
+        "result_hash": "e11ea2b1d8b66a1dcae565e3067d5bbba2a49ab9fb401ebf476a6d14ec476d98",
+        "status": "GROSS_EDGE_FAIL",
+        "live_equivalent_replay_state": "IMPLEMENTATION_INVALID_SAME_SEMANTICS_CORRECTABLE",
+        "forensic_audit_ref": "evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V2.json"
       }
     }
   },
   "active_result_pointers": {
     "V2-C006_STAGE_A": "discovery/results/V2-C006_STAGE_A_V1.json",
     "V2-C006_STAGE_B_CURRENT_CONFIG": "m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json",
-    "V2-C012_STAGE_A": null,
+    "V2-C012_STAGE_A": "discovery/results/V2-C012_STAGE_A_V2.json",
     "V2-C012_STAGE_B_CURRENT_CONFIG": "m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json",
     "V2-C013_STAGE_A": "discovery/results/V2-C013_STAGE_A_COMPETITION_EXPANSION_V1.json",
     "V2-C014_STAGE_A": "discovery/results/V2-C014_STAGE_A_COMPETITION_EXPANSION_V1.json",
@@ -1130,7 +1235,14 @@
     "V2-C016_STAGE_A": "discovery/results/V2-C016_STAGE_A_COMPETITION_EXPANSION_V1.json",
     "V2-C024_STAGE_A": "discovery/results/V2-C024_STAGE_A_V1.json",
     "V2-C025_STAGE_A": "discovery/results/V2-C025_STAGE_A_V1.json",
-    "V2-C026_STAGE_A": "discovery/results/V2-C026_STAGE_A_V1.json"
+    "V2-C026_STAGE_A": "discovery/results/V2-C026_STAGE_A_V1.json",
+    "V2-C017_STAGE_A": "discovery/results/V2-C017_STAGE_A_V1.json",
+    "V2-C018_STAGE_A": "discovery/results/V2-C018_STAGE_A_V1.json",
+    "V2-C019_STAGE_A": "discovery/results/V2-C019_STAGE_A_V1.json",
+    "V2-C020_STAGE_A": "discovery/results/V2-C020_STAGE_A_V1.json",
+    "V2-C021_STAGE_A": "discovery/results/V2-C021_STAGE_A_V1.json",
+    "V2-C022_STAGE_A": "discovery/results/V2-C022_STAGE_A_V1.json",
+    "V2-C023_STAGE_A": "discovery/results/V2-C023_STAGE_A_V1.json"
   },
   "superseded_or_invalid_historical_result_pointers": {
     "V2-C012_STAGE_A_V1": "discovery/results/V2-C012_STAGE_A_V1.json",
@@ -1149,7 +1261,7 @@
     "evidence/C012_CORRECTED_STAGE_B_EXACT_HEAD_GREEN_CLOSURE_V1.json"
   ],
   "performance_research_v3": {
-    "status": "WAVE04_BLOCKED_PRE_OUTCOME_CAUSALITY",
+    "status": "FORENSIC_LIVE_EQUIVALENT_CORRECTION_REQUIRED",
     "branch": "performance-research-v3-20260922",
     "base_operational_green_head": "ce8ce031579fb940656e7cc3d60cf5a07a630db5",
     "base_operational_exact_head_ci_run_id": 35782496459,
@@ -1366,5 +1478,24 @@
       "economic_outcomes_opened_after_block": 19
     }
   },
-  "live_equivalent_historical_replay_contract": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json"
+  "live_equivalent_historical_replay_contract": "research_v3/LIVE_EQUIVALENT_HISTORICAL_REPLAY_CONTRACT_V1.json",
+  "live_equivalent_correction_required_candidate_ids": [
+    "V2-C006",
+    "V2-C012",
+    "V2-C013",
+    "V2-C014",
+    "V2-C015",
+    "V2-C016",
+    "V2-C017",
+    "V2-C018",
+    "V2-C019",
+    "V2-C020",
+    "V2-C021",
+    "V2-C022",
+    "V2-C023",
+    "V2-C024",
+    "V2-C025",
+    "V2-C026"
+  ],
+  "live_equivalent_discovery_survivors": []
 }
