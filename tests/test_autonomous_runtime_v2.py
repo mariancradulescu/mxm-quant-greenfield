@@ -1,4 +1,6 @@
 import json
+import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,6 +14,7 @@ from research_v3.autonomous_runtime_v2 import (
     make_synthetic_plan,
     zero_human_continuation_demo,
 )
+from research_v3.runtime_v2_primitives import GitCheckpointSink
 
 
 class AutonomousRuntimeV2Tests(unittest.TestCase):
@@ -19,7 +22,8 @@ class AutonomousRuntimeV2Tests(unittest.TestCase):
         report = zero_human_continuation_demo()
         self.assertEqual(report["status"], "PASS")
         self.assertEqual(report["zero_human_continuation"], "PASS")
-        self.assertEqual(len(report["chaos_failure_points"]), 12)
+        self.assertEqual(report["chaos_failure_points"], "PASS")
+        self.assertEqual(len(report["chaos_failure_point_details"]), 12)
         self.assertTrue(report["same_final_canonical_bytes"])
         self.assertEqual(report["duplicate_economic_outcome"], 0)
         self.assertEqual(report["lost_result"], 0)
@@ -82,6 +86,45 @@ class AutonomousRuntimeV2Tests(unittest.TestCase):
             recovered = b.acquire_lease()
             self.assertEqual(recovered["attempt"], 2)
             self.assertEqual(recovered["retry_metadata"]["reason"], "STALE_LEASE_TAKEOVER")
+
+    def test_checkpoint_push_conflict_rebases_and_retries(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "work"
+            remote = Path(td) / "remote.git"
+            other = Path(td) / "other"
+            subprocess.run(["git", "init", "--bare", str(remote)], check=True, capture_output=True)
+            root.mkdir()
+            subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "runtime-test"], cwd=root, check=True)
+            subprocess.run(["git", "config", "user.email", "runtime-test@example.invalid"], cwd=root, check=True)
+            (root / "base.txt").write_text("base\n", encoding="utf-8")
+            subprocess.run(["git", "add", "."], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-m", "base"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "remote", "add", "origin", str(remote)], cwd=root, check=True)
+            subprocess.run(["git", "push", "-u", "origin", "HEAD:research"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "clone", "--branch", "research", str(remote), str(other)], check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "other-test"], cwd=other, check=True)
+            subprocess.run(["git", "config", "user.email", "other-test@example.invalid"], cwd=other, check=True)
+            (other / "remote.txt").write_text("remote advance\n", encoding="utf-8")
+            subprocess.run(["git", "add", "."], cwd=other, check=True)
+            subprocess.run(["git", "commit", "-m", "remote advance"], cwd=other, check=True, capture_output=True)
+            subprocess.run(["git", "push", "origin", "HEAD:research"], cwd=other, check=True, capture_output=True)
+            (root / "checkpoint.txt").write_text("checkpoint\n", encoding="utf-8")
+            previous = os.environ.get("MXM_RUNTIME_TARGET_BRANCH")
+            os.environ["MXM_RUNTIME_TARGET_BRANCH"] = "research"
+            try:
+                GitCheckpointSink(root, enabled=True, push=True).checkpoint("conflict-test", None)
+            finally:
+                if previous is None:
+                    os.environ.pop("MXM_RUNTIME_TARGET_BRANCH", None)
+                else:
+                    os.environ["MXM_RUNTIME_TARGET_BRANCH"] = previous
+            local_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+            remote_head = subprocess.check_output(
+                ["git", "--git-dir", str(remote), "rev-parse", "refs/heads/research"], text=True
+            ).strip()
+            self.assertEqual(local_head, remote_head)
+            self.assertTrue((root / "remote.txt").exists())
 
     def test_real_operation_is_blocked_until_acceptance_evidence_exists(self):
         with tempfile.TemporaryDirectory() as td:
