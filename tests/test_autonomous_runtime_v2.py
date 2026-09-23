@@ -126,6 +126,23 @@ class AutonomousRuntimeV2Tests(unittest.TestCase):
             self.assertEqual(local_head, remote_head)
             self.assertTrue((root / "remote.txt").exists())
 
+    def test_non_economic_director_operation_opens_no_economic_outcome(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            plan = make_synthetic_plan("director-non-economic")
+            plan["operation_kind"] = "NON_ECONOMIC_DIRECTOR"
+            plan["lifecycle_phase"] = "AUTONOMY_ACCEPTANCE_NON_ECONOMIC"
+            rt = RuntimeV2(root, lease_seconds=1)
+            op, _ = rt.submit_operation(plan)
+            outcome = rt.run()
+            self.assertEqual(outcome.status, "COMPLETE")
+            self.assertTrue(rt.journal.has(op, "NON_ECONOMIC_RESULT_AVAILABLE"))
+            self.assertFalse(rt.journal.has(op, "ECONOMIC_EXECUTION_STARTED"))
+            self.assertFalse(rt.journal.has(op, "ECONOMIC_RESULT_AVAILABLE"))
+            accounting = json.loads((root / "research_v3/runtime_v2/accounting.json").read_text())
+            self.assertEqual(accounting["economic_outcomes_opened"], 0)
+            self.assertIn(op, accounting["non_economic_operation_ids"])
+
     def test_real_operation_is_blocked_until_acceptance_evidence_exists(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
