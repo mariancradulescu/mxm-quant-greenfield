@@ -1,0 +1,56 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "72223d1ac1f9caf367c32f406b251e78474eb363b36abc1a65ca4843cf29e36b",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "FREEZE_AND_EXECUTE_PROSPECTIVE_SELECTED_SIX_SCREEN",
+    "expected_output": "A reproducible prospective screen specification and structural result ledger identifying which panel members are eligible for later economic study, inconclusive, or structurally unsupported; no live orders and no economic outcome opening.",
+    "implementation_id": "c031-structural-extension-selected-six-panel-freeze-v1",
+    "methodology": {
+      "controls": [
+        "freeze features, thresholds, target, execution semantics, friction model, missing-data law, tie-break law, and retraining policy before outcomes",
+        "preserve symbol-level and panel-level multiple-testing accounting",
+        "report gross and cost-adjusted results separately",
+        "retain low-sample symbols as inconclusive rather than treating them as failures",
+        "apply shared-account margin, concurrency, conflict, capital-flow, and anti-ruin simulation only after structural eligibility"
+      ],
+      "outer_evaluation": "prospective chronological evaluation on the remaining eligible observations after the frozen capture boundary",
+      "promotion_rule": "No economic candidate or protected evidence is opened unless the frozen screen passes reproducibility, coverage, cost sufficiency, and prospective validation gates."
+    },
+    "research_mode": "STRUCTURAL_NON_ECONOMIC",
+    "scope": {
+      "evaluation_horizon_minutes": 60,
+      "mechanism_family": "SESSION_GAP_REVERSION",
+      "minimum_active_weeks": 6,
+      "minimum_gap_minutes": 30,
+      "minimum_schedule_adjusted_observation_coverage": 0.97,
+      "panel_source": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+      "universe_rule": "Use only the already frozen selected-six panel; do not add symbols adaptively from observed outcomes."
+    }
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "next_action": "EXECUTE_FROZEN_SELECTED_SIX_PROSPECTIVE_STRUCTURAL_SCREEN",
+    "research_mode": "STRUCTURAL_NON_ECONOMIC",
+    "source_implementation_id": "c031-structural-extension-selected-six-panel-freeze-v1",
+    "status": "PROSPECTIVE_SCREEN_FROZEN_PENDING_EXECUTION",
+    "success_condition": "The frozen panel is evaluated chronologically with complete coverage, explicit friction and execution semantics, and corrected multiple-testing accounting before any economic candidate is considered.",
+    "user_action_required": false
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Convert the completed non-economic session-gap structural evidence into a prospective, independently evaluated screen before considering any economic candidate.",
+    "information_gain_rationale": "The 12-symbol extension shows heterogeneous event density and directional behavior but no cost-adjusted edge. A pre-registered selected-panel screen with chronology, minimum-coverage, execution-cost, and multiple-testing controls distinguishes repeatable structure from sparse-sample selection without rerunning C031 Stage-B or any observed exact identity."
+  },
+  "operation_id": "op_739990135e4e8626cd9da0650d452091",
+  "proposal_hash": "d6b68c91383a5b9337e427b4064351f57037fab2076ceeb320cc1a7f4ae1a0cf",
+  "proposal_id": "P-20260924-C031-PROSPECTIVE-SCREEN-FREEZE-03",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_6f2ba063039b60e8bd1db9f20ab3a66f.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
