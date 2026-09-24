@@ -16,10 +16,7 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         joined="\n".join(PROTECTED_PREFIXES)
         for item in ("CURRENT_STATE.json","discovery/ledger.jsonl","research_v3/runtime_v2/","m6/results/","PROPOSAL_REGISTRY_V1.json",".github/workflows/"):
             self.assertIn(item,joined)
-    def test_research_reasoning_model_is_explicit_not_auto(self):
-        self.assertNotEqual(DEFAULT_MODEL,"auto")
-        self.assertEqual(DEFAULT_MODEL,"gpt-5.4")
-    def test_implementation_model_is_explicit_and_available_tier(self):
-        self.assertNotEqual(IMPLEMENTATION_MODEL,"auto")
-        self.assertEqual(IMPLEMENTATION_MODEL,"gpt-5.4")
+    def test_account_policy_falls_back_transparently_to_auto(self):
+        self.assertEqual(DEFAULT_MODEL,"auto")
+        self.assertEqual(IMPLEMENTATION_MODEL,"auto")
 if __name__=="__main__": unittest.main()

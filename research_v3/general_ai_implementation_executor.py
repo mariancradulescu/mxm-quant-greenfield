@@ -16,7 +16,7 @@ VERSION="MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V1"
 REQUEST_REL=Path("research_v3/ai_director/IMPLEMENTATION_REQUEST.json")
 RESPONSE_REL=Path("research_v3/ai_director/IMPLEMENTATION_RESPONSE.json")
 GATE_REL=Path("research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json")
-DEFAULT_MODEL="gpt-5.4"
+DEFAULT_MODEL="auto"
 PROTECTED_PREFIXES=(
     "CURRENT_STATE.json","V2_SEARCH_BUDGET_V1.json","V2_PROTECTED_FORWARD_START.json",
     "discovery/ledger.jsonl","m6/results/","research_v3/runtime_v2/",
@@ -139,7 +139,14 @@ def _transport(root:Path,prompt:str,token:str,model:str)->tuple[dict[str,Any],di
     env=dict(os.environ); env["GITHUB_TOKEN"]=token; env["COPILOT_GITHUB_TOKEN"]=token
     p=subprocess.run(cmd,cwd=root,env=env,text=True,capture_output=True,timeout=300)
     if p.returncode!=0: raise ImplementationRejected("Copilot implementation failed: "+(p.stderr+"\n"+p.stdout)[-2400:])
-    return _extract_json(p.stdout),{"provider":"github-copilot-cli","model":model,"cli":"@github/copilot"}
+    return _extract_json(p.stdout),{
+        "provider":"github-copilot-cli","model":model,
+        "model_selection":"AUTO_ACCOUNT_AVAILABLE" if model=="auto" else "EXPLICIT",
+        "actual_model_identity":None if model=="auto" else model,
+        "actual_model_identity_known":model!="auto",
+        "model_identity_limitation":"Explicit gpt-5.3-codex and gpt-5.4 were rejected as unavailable by this Copilot connection; Auto is the proven available route, and silent mode does not expose the selected identity." if model=="auto" else None,
+        "cli":"@github/copilot",
+    }
 
 def _validate_output(root:Path,out:Mapping[str,Any])->None:
     status=str(out.get("status") or "")
