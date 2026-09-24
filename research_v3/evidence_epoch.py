@@ -1,0 +1,155 @@
+"""Durable research-evidence epoch and stale-General-AI guard.
+
+General AI owns research judgment. Runtime V2 may execute already-authorized mechanical
+work, but a newer material evidence epoch invalidates an older authorization for any
+new mechanism/panel/universe/horizon research judgment.
+"""
+from __future__ import annotations
+import json
+from pathlib import Path
+from typing import Any, Mapping, Iterable
+from research_v3.runtime_v2_primitives import atomic_write_json, canonical_bytes, sha256_bytes, sha256_file
+
+EPOCH_REL=Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
+SCHEMA="mxm.greenfield.research-evidence-epoch.v1"
+MATERIAL_EVENT_CLASSES=frozenset({
+    "AUTHENTICATED_MARKET_DATA_ACCEPTED",
+    "MATERIAL_DEVELOPMENT_STRUCTURAL_EVIDENCE_ACCEPTED",
+    "INDEPENDENT_OUTER_OUTCOME_OPENED",
+    "BROKER_FRICTION_COST_MARGIN_EXECUTION_EVIDENCE_ACCEPTED",
+    "HISTORICAL_VALIDITY_INTERPRETATION_CHANGED",
+    "BROKER_UNIVERSE_FEASIBILITY_AUTHORITY_CHANGED",
+    "MATERIAL_DATA_IMPLEMENTATION_CORRECTION",
+    "MATERIAL_EVIDENCE_SUPERSESSION",
+})
+
+class EvidenceEpochError(RuntimeError):
+    pass
+
+def _load(root:Path)->dict[str,Any]:
+    path=root/EPOCH_REL
+    if not path.is_file():
+        raise EvidenceEpochError(f"research evidence epoch missing: {EPOCH_REL}")
+    doc=json.loads(path.read_text(encoding="utf-8"))
+    if doc.get("schema")!=SCHEMA:
+        raise EvidenceEpochError("unsupported research evidence epoch schema")
+    epoch=doc.get("current_epoch")
+    if not isinstance(epoch,int) or epoch<1:
+        raise EvidenceEpochError("invalid current research evidence epoch")
+    return doc
+
+def current_evidence_epoch(root_value:str|Path=".")->int:
+    return int(_load(Path(root_value).resolve())["current_epoch"])
+
+def _unique_refs(values:Iterable[Any])->list[str]:
+    out=[]; seen=set()
+    for raw in values:
+        rel=str(raw)
+        if rel and rel not in seen:
+            seen.add(rel); out.append(rel)
+    return out
+
+def current_evidence_binding(root_value:str|Path=".")->dict[str,Any]:
+    root=Path(root_value).resolve(); doc=_load(root)
+    refs=_unique_refs(doc.get("authoritative_evidence_refs") or [])
+    rows=[]
+    for rel in refs:
+        path=root/rel
+        if not path.is_file():
+            raise EvidenceEpochError(f"epoch authority missing: {rel}")
+        rows.append({"ref":rel,"sha256":sha256_file(path)})
+    provisional=[]
+    for rel in _unique_refs(doc.get("provisional_research_artifacts") or []):
+        path=root/rel
+        if not path.is_file():
+            raise EvidenceEpochError(f"provisional epoch artifact missing: {rel}")
+        provisional.append({"ref":rel,"sha256":sha256_file(path),"authority_role":"PROVISIONAL_NOT_OPENED"})
+    hypothesis=json.loads((root/"HYPOTHESIS_SPACE_V1.json").read_text(encoding="utf-8"))
+    open_families=list((hypothesis.get("dimensions") or {}).get("mechanism_family") or [])
+    structural=json.loads((root/"data/BROKER_NATIVE_COMPETITION_STRUCTURAL_MAP_SUMMARY_V2.json").read_text(encoding="utf-8"))
+    feasibility=json.loads((root/"data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json").read_text(encoding="utf-8"))
+    universe_basis={
+        "current_products":int(structural.get("current_products") or structural.get("current_symbols") or 5324),
+        "accessible_symbols":int(structural.get("accessible_symbols") or feasibility.get("current_accessible_symbols_indexed") or 1690),
+        "feasible_non_test_symbols":int(structural.get("feasible_non_test_symbols") or 1641),
+        "both_direction_eur200_feasible":int(structural.get("both_direction_eur200_feasible") or 1609),
+        "buy_only_eur200_feasible":int(structural.get("buy_only_eur200_feasible") or 40),
+        "structural_representatives_with_accepted_13w_data":40,
+        "structural_representation_is_not_economic_equivalence":True,
+    }
+    bundle_payload={"epoch":doc["current_epoch"],"authorities":rows,"provisional":provisional}
+    return {
+        "evidence_epoch":int(doc["current_epoch"]),
+        "epoch_status":doc.get("status"),
+        "epoch_reason":doc.get("reason"),
+        "authoritative_evidence_refs_and_hashes":rows,
+        "provisional_research_artifacts":provisional,
+        "evidence_bundle_sha256":sha256_bytes(canonical_bytes(bundle_payload)),
+        "universe_basis":universe_basis,
+        "current_open_mechanism_families":open_families,
+    }
+
+def advance_evidence_epoch(root_value:str|Path,*,event_class:str,refs:list[str],reason:str,advanced_utc:str)->dict[str,Any]:
+    root=Path(root_value).resolve()
+    if event_class not in MATERIAL_EVENT_CLASSES:
+        raise EvidenceEpochError(f"event class does not advance research evidence epoch: {event_class}")
+    if not refs or not reason or not advanced_utc:
+        raise EvidenceEpochError("epoch advancement requires refs, reason and advanced_utc")
+    doc=_load(root)
+    for rel in refs:
+        if not (root/rel).is_file():
+            raise EvidenceEpochError(f"cannot advance epoch with missing ref: {rel}")
+    nxt=int(doc["current_epoch"])+1
+    doc["current_epoch"]=nxt
+    doc["advanced_utc"]=advanced_utc
+    doc["reason"]=reason
+    doc["trigger_event"]={"event_class":event_class,"refs":list(refs)}
+    doc["authoritative_evidence_refs"]=_unique_refs(list(doc.get("authoritative_evidence_refs") or [])+list(refs))
+    doc.setdefault("history",[]).append({
+        "epoch":nxt,"advanced_utc":advanced_utc,"event_class":event_class,
+        "reason":reason,"refs":list(refs),
+    })
+    atomic_write_json(root/EPOCH_REL,doc)
+    return doc
+
+def state_requires_research_judgment(state:Mapping[str,Any])->bool:
+    return state.get("research_judgment_required") is True
+
+def stale_reasoning_redirect(root_value:str|Path,state:Mapping[str,Any])->dict[str,Any]|None:
+    root=Path(root_value).resolve()
+    if not state_requires_research_judgment(state):
+        return None
+    current=current_evidence_epoch(root)
+    try:
+        seen=int(state.get("authorizing_evidence_epoch",0) or 0)
+    except (TypeError,ValueError):
+        seen=0
+    if seen>=current:
+        return None
+    return {
+        "status":"FRESH_GENERAL_AI_REASONING_REQUIRED",
+        "next_action":"AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+        "ai_reasoning_required":True,
+        "user_action_required":False,
+        "research_judgment_required":True,
+        "current_research_evidence_epoch":current,
+        "authorizing_evidence_epoch":seen,
+        "external_data_gate":None,
+        "stale_reasoning_guard":{
+            "status":"STALE_FOR_NEW_RESEARCH_JUDGMENT",
+            "current_evidence_epoch":current,
+            "authorizing_evidence_epoch":seen,
+            "previous_status":state.get("status"),
+            "previous_next_action":state.get("next_action"),
+            "previous_external_data_gate":state.get("external_data_gate"),
+            "law":"Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances."
+        },
+    }
+
+def proposal_evidence_binding_is_current(root_value:str|Path,proposal:Mapping[str,Any])->bool:
+    current=current_evidence_binding(root_value)
+    binding=proposal.get("evidence_binding") or {}
+    return (
+        int(binding.get("evidence_epoch_seen",0) or 0)==current["evidence_epoch"]
+        and binding.get("evidence_bundle_sha256")==current["evidence_bundle_sha256"]
+    )

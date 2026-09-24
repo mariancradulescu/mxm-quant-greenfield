@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from research_v3.autonomous_control_plane import validate_repository_state
+from research_v3.evidence_epoch import current_evidence_binding, proposal_evidence_binding_is_current
 from research_v3.autonomous_runtime_v2 import RuntimeV2
 from research_v3.runtime_v2_primitives import (
     GitCheckpointSink,
@@ -424,6 +425,16 @@ def _validate_authoritative_data_contract(root: Path, proposal: Mapping[str, Any
 
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)
+    binding=proposal.get("evidence_binding") or {}
+    current_evidence=current_evidence_binding(root)
+    if not binding:
+        raise AIProposalRejected("proposal lacks research evidence epoch binding")
+    if int(binding.get("evidence_epoch_seen",0) or 0)!=current_evidence["evidence_epoch"]:
+        raise AIProposalRejected("proposal is stale for new research judgment: evidence epoch drift")
+    if binding.get("evidence_bundle_sha256")!=current_evidence["evidence_bundle_sha256"]:
+        raise AIProposalRejected("proposal is stale for new research judgment: evidence bundle drift")
+    if binding.get("authoritative_evidence_refs_and_hashes")!=current_evidence["authoritative_evidence_refs_and_hashes"]:
+        raise AIProposalRejected("proposal authoritative evidence binding drift")
     _validate_authoritative_data_contract(root, proposal)
     _reject_completed_outer_as_unseen(root, proposal)
     _reject_duplicate_accepted_capture(root, proposal)
@@ -504,6 +515,8 @@ def compile_runtime_plan(
             "proposal_id": proposal["proposal_id"],
             "objective_class": proposal["objective"]["class"],
             "protocol_version": PROTOCOL_VERSION,
+            "evidence_epoch_seen": int((proposal.get("evidence_binding") or {})["evidence_epoch_seen"]),
+            "evidence_bundle_sha256": (proposal.get("evidence_binding") or {})["evidence_bundle_sha256"],
         },
         "pre_outcome_gate": {
             "status": "PASS",
@@ -736,6 +749,9 @@ def materialize_proposal(
             next_doc.pop(key, None)
         next_doc.update(dict(proposal["next_research_state"]))
         next_doc["user_action_required"] = bool(proposal["next_research_state"].get("user_action_required", False))
+        evidence_binding=proposal.get("evidence_binding") or {}
+        next_doc["authorizing_evidence_epoch"]=int(evidence_binding.get("evidence_epoch_seen",0) or 0)
+        next_doc.setdefault("research_judgment_required",False)
         next_doc.update({
             "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v3",
             "director_protocol": PROTOCOL_VERSION,

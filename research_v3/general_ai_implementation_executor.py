@@ -8,6 +8,7 @@ import argparse, hashlib, json, os, shutil, subprocess
 from pathlib import Path
 from typing import Any, Mapping
 from research_v3.autonomous_control_plane import validate_repository_state
+from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot, proposal_hash
 from research_v3.general_ai_reasoning_provider import reasoning_required
 from research_v3.runtime_v2_primitives import GitCheckpointSink, atomic_write_json, canonical_bytes, iso, load_json, sha256_bytes, sha256_file
@@ -351,6 +352,15 @@ def _normal_commit_push(root:Path,message:str)->str:
 
 def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve(); next_state=_next(root)
+    stale=stale_reasoning_redirect(root,next_state)
+    if stale is not None:
+        before=project_snapshot(root)
+        doc=dict(next_state); doc.update(stale)
+        atomic_write_json(root/NEXT_STATE_REL,doc)
+        if project_snapshot(root)!=before:
+            raise ImplementationRejected("stale-reasoning redirect changed economic/accounting snapshot")
+        GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("stale_reasoning_fail_closed",None)
+        return {"status":"AI_REASONING_REQUIRED","next_state":doc,"stale_reasoning_guard":stale["stale_reasoning_guard"]}
     if not implementation_required(next_state): return {"status":"NO_IMPLEMENTATION_REQUIRED"}
     redirect=authoritative_reasoning_requirement(root,next_state)
     if redirect is not None:

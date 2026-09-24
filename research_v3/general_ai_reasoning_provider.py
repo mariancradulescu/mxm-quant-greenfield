@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from research_v3.autonomous_control_plane import validate_repository_state
+from research_v3.evidence_epoch import current_evidence_binding
 from research_v3.general_ai_director_bridge import (
     PROPOSAL_SCHEMA,
     PROTOCOL_VERSION,
@@ -96,6 +97,13 @@ def reasoning_required(next_state:Mapping[str,Any])->bool:
 
 def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
     refs=list(BASE_AUTHORITIES)
+    epoch_binding=current_evidence_binding(root)
+    for row in epoch_binding["authoritative_evidence_refs_and_hashes"]:
+        if row["ref"] not in refs:
+            refs.append(row["ref"])
+    for row in epoch_binding["provisional_research_artifacts"]:
+        if row["ref"] not in refs:
+            refs.append(row["ref"])
     for key in (
         "result_ref","pre_economic_acceptance_ref","freeze_ref",
         "source_freeze_ref","authoritative_freeze_ref",
@@ -140,6 +148,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     snapshot=project_snapshot(root)
     report=validate_repository_state(root)
     authorities,refs=_authority_context(root,next_state)
+    evidence=current_evidence_binding(root)
     core={
         "provider_version":PROVIDER_VERSION,
         "research_head":_head(root),
@@ -154,6 +163,10 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
             "safety":report.get("safety",{}),
         },
         "authority_hashes":[{"ref":x["ref"],"sha256":x["sha256"]} for x in authorities],
+        "evidence_epoch_seen":evidence["evidence_epoch"],
+        "evidence_bundle_sha256":evidence["evidence_bundle_sha256"],
+        "universe_basis":evidence["universe_basis"],
+        "current_open_mechanism_families":evidence["current_open_mechanism_families"],
     }
     request_id="reason_"+sha256_bytes(canonical_bytes(core))[:32]
     return {
@@ -168,11 +181,18 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "control_plane":core["control_plane"],
         "authority_refs":refs,
         "authority_hashes":core["authority_hashes"],
+        "evidence_epoch_seen":core["evidence_epoch_seen"],
+        "evidence_bundle_sha256":core["evidence_bundle_sha256"],
+        "authoritative_evidence_refs_and_hashes":evidence["authoritative_evidence_refs_and_hashes"],
+        "provisional_research_artifacts":evidence["provisional_research_artifacts"],
+        "universe_basis":core["universe_basis"],
+        "current_open_mechanism_families":core["current_open_mechanism_families"],
         "created_utc":iso(),
     }
 
 def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
     authorities,_=_authority_context(root,request["next_state"])
+    evidence=current_evidence_binding(root)
     return {
         "request":{
             "request_id":request["request_id"],
@@ -180,8 +200,14 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
             "project_snapshot":request["project_snapshot"],
             "next_state":request["next_state"],
             "control_plane":request["control_plane"],
+            "evidence_epoch_seen":request["evidence_epoch_seen"],
+            "evidence_bundle_sha256":request["evidence_bundle_sha256"],
+            "accounting_basis":request["project_snapshot"],
+            "universe_basis":request["universe_basis"],
+            "current_open_mechanism_families":request["current_open_mechanism_families"],
         },
         "authorities":authorities,
+        "provisional_research_artifacts":evidence["provisional_research_artifacts"],
         "non_negotiable_objective":{
             "broker":"Pepperstone",
             "execution_target":"cTrader Algo / one continuous account",
@@ -230,6 +256,11 @@ Important boundaries:
 - The newer feasibility audit V2 superseded the later twelve-symbol proposal before capture: GER30 is absent from the current account, and XAGUSD, BTCUSD and US30 cannot enter at minimum volume with initial EUR200. Do not reactivate either superseded proposal from the immutable registry. You must verify every proposed symbol against the index before submission; the deterministic bridge enforces this.
 - Evaluate the broader feasible broker-native universe without treating a narrow six-symbol result as a family-level closure, and do not predetermine mechanism family, panel size or screening procedure.
 - Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
+- Current accepted structural representatives establish structural/data-surface coverage only, not economic equivalence for all members sharing a signature.
+- Explicitly decide whether the accepted 40 representative series are sufficient for the NEXT research decision. Do not assume either sufficiency or insufficiency.
+- Explicitly assess whether additional prospective exploration inside the broader eligible broker-native universe has positive expected information gain before narrowing to a mechanism-specific outer.
+- A provisional four-panel SESSION_GAP outer may be reauthorized or superseded; do not treat its existence as authorization.
+- Never let an older proposal silently inherit authority across a newer research evidence epoch.
 - If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
 - Treat every supplied prospective freeze/data plan as authoritative. If it fixes panel membership, resolution, or an unopened outer-data scope, do not substitute symbols or dates unless a separate durable prospective supersession authority is explicitly supplied in context.
 - Source/development bytes that were used to select a panel may not be reused as independent outer evidence when an authoritative freeze requires disjoint unopened data.
@@ -334,6 +365,10 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
     if not isinstance(closure,list):
         raise AIProposalRejected("mechanism_family_closure_claims must be list")
     pid=str(candidate.get("proposal_id") or f"AUTO-{request['request_id']}").strip()
+    response_id="reason_response_"+sha256_bytes(canonical_bytes({"request_id":request["request_id"],"candidate":candidate}))[:32]
+    proposed_next=dict(next_state)
+    proposed_next.setdefault("research_judgment_required",False)
+    proposed_next["authorizing_evidence_epoch"]=int(request["evidence_epoch_seen"])
     proposal={
         "schema":PROPOSAL_SCHEMA,
         "proposal_id":pid,
@@ -341,7 +376,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
         "basis":{"research_head":request["research_head"],"accounting":{"v2_attempts_used":request["project_snapshot"]["v2_attempts_used"],"v2_search_budget_remaining":request["project_snapshot"]["v2_search_budget_remaining"],"economic_outcomes_opened":request["project_snapshot"]["economic_outcomes_opened"]},"discovery_ledger_sha256":request["project_snapshot"]["discovery_ledger_sha256"]},
         "objective":dict(objective),
         "decision":dict(decision),
-        "next_research_state":dict(next_state),
+        "next_research_state":proposed_next,
         "authority_refs":refs,
         "data_bindings":candidate.get("data_bindings") or [],
         "artifact_attestation_refs":candidate.get("artifact_attestation_refs") or [],
@@ -351,6 +386,16 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
         "data_policy":data_policy,
         "causal_contract":{"chronological_incremental_replay":True,"causal_entry_admission":True,"future_information_forbidden":True,"protected_forward_leakage_forbidden":True,"learned_procedure_freeze_before_outer_outcome":True},
         "publication":{"apply_to_next_state":True},
+        "evidence_binding":{
+            "reasoning_request_id":request["request_id"],
+            "reasoning_response_id":response_id,
+            "evidence_epoch_seen":int(request["evidence_epoch_seen"]),
+            "evidence_bundle_sha256":request["evidence_bundle_sha256"],
+            "authoritative_evidence_refs_and_hashes":list(request["authoritative_evidence_refs_and_hashes"]),
+            "accounting_basis":dict(request["project_snapshot"]),
+            "universe_basis":dict(request["universe_basis"]),
+            "current_open_mechanism_families":list(request["current_open_mechanism_families"]),
+        },
     }
     validate_proposal(root,proposal)
     return proposal
@@ -402,7 +447,16 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
 
     path.parent.mkdir(parents=True,exist_ok=True)
     atomic_write_json(path,proposal)
-    response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1","status":"PROPOSAL_GENERATED_PENDING_RUNTIME_V2_MATERIALIZATION","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_sha256":sha256_file(path),"provider":{"kind":"github-copilot-cli",**dict(chosen_meta or {})},"economic_outcome_opened":False,"v2_attempt_consumed":0,"created_utc":iso()}
+    binding=proposal["evidence_binding"]; created=iso()
+    response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1","status":"PROPOSAL_GENERATED_PENDING_RUNTIME_V2_MATERIALIZATION",
+              "request_id":request["request_id"],"response_id":binding["reasoning_response_id"],
+              "proposal_ref":str(rel),"proposal_sha256":sha256_file(path),
+              "provider":{"kind":"github-copilot-cli",**dict(chosen_meta or {})},
+              "evidence_epoch_seen":binding["evidence_epoch_seen"],"evidence_bundle_sha256":binding["evidence_bundle_sha256"],
+              "authoritative_evidence_refs_and_hashes":binding["authoritative_evidence_refs_and_hashes"],
+              "accounting_basis":binding["accounting_basis"],"universe_basis":binding["universe_basis"],
+              "current_open_mechanism_families":binding["current_open_mechanism_families"],
+              "economic_outcome_opened":False,"v2_attempt_consumed":0,"created_utc":created}
     atomic_write_json(root/RESPONSE_REL,response)
     if (root/GATE_REL).exists():
         (root/GATE_REL).unlink()

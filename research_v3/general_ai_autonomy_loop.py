@@ -3,10 +3,11 @@ from __future__ import annotations
 import argparse, json
 from pathlib import Path
 from research_v3.autonomous_control_plane import validate_repository_state
+from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import drain
 from research_v3.general_ai_implementation_executor import execute as implement, implementation_required
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required
-from research_v3.runtime_v2_primitives import load_json
+from research_v3.runtime_v2_primitives import load_json, atomic_write_json
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 
 VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V1"
@@ -16,6 +17,11 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
     for cycle in range(1,max_cycles+1):
         validate_repository_state(root)
         state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
+        stale=stale_reasoning_redirect(root,state)
+        if stale is not None:
+            state.update(stale); atomic_write_json(root/NEXT_STATE_REL,state)
+            trace.append({"cycle":cycle,"kind":"STALE_REASONING_GUARD","status":"FRESH_GENERAL_AI_REASONING_REQUIRED",
+                          "current_evidence_epoch":state.get("current_research_evidence_epoch")})
         if state.get("user_action_required") is True:
             return {"status":"EXTERNAL_USER_ACTION_REQUIRED","cycles":cycle-1,"trace":trace,"next_state":state}
         if reasoning_required(state):
