@@ -58,6 +58,7 @@ BASE_AUTHORITIES=(
     "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json",
     "evidence/POST_OUTER_DUPLICATE_CAPTURE_SUPERSESSION_V1.json",
     "evidence/AI_SELECTED_SCOPE_FEASIBILITY_AUDIT_V1.json",
+    "evidence/AI_SELECTED_SCOPE_FEASIBILITY_AUDIT_V2.json",
     "evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json",
     "research_v3/ai_director/GENERAL_AI_DIRECTOR_ARCHITECTURE_V1.json",
 )
@@ -205,6 +206,7 @@ Important boundaries:
 - The accepted C031 twelve-symbol M5 extension for 2026-07-20 through 2026-09-13 and its structural report already exist. The previous AI proposal asking for those same bytes was superseded. Reuse its accepted, hash-bound evidence without another collector or screen; do not ask the user to upload it again.
 - An independent account-native minimum-volume audit found BTCUSD, US30, and XAGUSD infeasible in both directions at initial EUR200 in the later pre-capture proposal. That exact proposal was superseded before capture. Do not treat these as initially tradable EUR200 opportunities. You may consider later higher-equity feasibility only with explicit prospective rationale; independently choose the revised direction from the full evidence and verify any claimed broker feasibility.
 - Before proposing any new capture symbols, use the accepted account-native feasibility index to verify exact symbol names, product identity, TEST exclusion and EUR200 directional feasibility. A symbol infeasible at initial EUR200 requires an explicitly declared future_equity_only_scope with symbols, prospective_rationale and initial_eur200_tradable false; do not imply it is currently executable. Do not invent a broker symbol spelling.
+- The newer feasibility audit V2 superseded the later twelve-symbol proposal before capture: GER30 is absent from the current account, and XAGUSD, BTCUSD and US30 cannot enter at minimum volume with initial EUR200. Do not reactivate either superseded proposal from the immutable registry. You must verify every proposed symbol against the index before submission; the deterministic bridge enforces this.
 - Evaluate the broader feasible broker-native universe without treating a narrow six-symbol result as a family-level closure, and do not predetermine mechanism family, panel size or screening procedure.
 - Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
 - If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
