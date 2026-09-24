@@ -120,6 +120,7 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
 
 def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
     root=Path(root_value).resolve(); trace=[]
+    initial_epoch=(load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")
     for cycle in range(1,max_cycles+1):
         validate_repository_state(root)
         state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -129,11 +130,11 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             trace.append({"cycle":cycle,"kind":"STALE_REASONING_GUARD","status":"FRESH_GENERAL_AI_REASONING_REQUIRED",
                           "current_evidence_epoch":state.get("current_research_evidence_epoch")})
         if state.get("user_action_required") is True:
-            return {"status":"EXTERNAL_USER_ACTION_REQUIRED","cycles":cycle-1,"trace":trace,"next_state":state}
+            return {"status":"EXTERNAL_USER_ACTION_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
         if reasoning_required(state):
             blocked=_provider_unavailable(root,state,"GENERAL_AI_REASONING")
             if blocked is not None:
-                return {"status":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
+                return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
             try:
                 r=reason(root,git_checkpoint=git_checkpoint,git_push=git_push)
             except Exception as exc:
@@ -142,7 +143,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_REASONING",git_checkpoint=git_checkpoint,git_push=git_push)
                 _record_invocation(root,state,"GENERAL_AI_REASONING",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_REASONING","recovery":recovery})
-                return {"status":recovery["status"],"cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+                return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             d=drain(root,git_checkpoint=git_checkpoint,git_push=git_push)
             _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
@@ -163,10 +164,10 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
-                return {"status":out["status"],"cycles":cycle,"trace":trace,"result":out}
+                return {"status":out["status"],"progress_class":"LEGITIMATE_EXTERNAL_GATE" if out["status"]=="EXTERNAL_DATA_REQUIRED" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"result":out}
             continue
-        return {"status":"QUIESCENT_NO_ACTION","cycles":cycle-1,"trace":trace,"next_state":state}
-    return {"status":"BOUNDED_CONTINUATION_CHECKPOINT","cycles":max_cycles,"trace":trace,
+        return {"status":"QUIESCENT_NO_ACTION","progress_class":"MATERIAL_PROGRESS" if (load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")!=initial_epoch else "SAFE_NO_PROGRESS","cycles":cycle-1,"trace":trace,"next_state":state}
+    return {"status":"BOUNDED_CONTINUATION_CHECKPOINT","progress_class":"MATERIAL_PROGRESS" if (load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")!=initial_epoch else "SAFE_NO_PROGRESS","cycles":max_cycles,"trace":trace,
             "next_state":dict(load_json(root/NEXT_STATE_REL,{}) or {})}
 
 def main(argv=None):
