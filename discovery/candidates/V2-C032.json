@@ -1,0 +1,169 @@
+{
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_EUR1000_GROSS_NOTIONAL_PER_EXECUTED_TRADE_NO_SHARED_ALLOCATOR_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_SHARED_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "causal_availability": {
+    "cost_uses": "entry and exit transaction-local cost evidence is applied only after the corresponding execution boundary exists; it never controls event admission",
+    "decision_uses": "current completed event bar plus the preceding 24 strictly consecutive M5 bars only",
+    "entry_uses": "pending intent fills only when the first later observed M5 open arrives",
+    "exit_uses": "30-minute target is scheduled at entry and settles only when an observed M5 open at or after target arrives",
+    "future_information_forbidden": true,
+    "sample_end": "unfilled pending entry/open trade at capture end is right-censored and never retroactively changes signal admission"
+  },
+  "cloud_portability": {
+    "representation": "FINITE_DETERMINISTIC_SINGLE_SYMBOL_CAUSAL_STATE_WITH_ACTIVE_UNTIL_AND_FIXED_EVENT_LAW",
+    "required": true
+  },
+  "cost_state": {
+    "rule": "Every admitted Stage-A execution must bind a TRANSACTION_LOCAL_COST_RESOLVED row from the accepted hash-bound NETH25 capture; any admitted unresolved row halts before economic outcome opening. Suppressed signals do not require execution cost because they are rejected solely by prior active-state causality.",
+    "state": "VERIFIED"
+  },
+  "data": {
+    "accepted_capture_ref": "evidence/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_ACCEPTANCE_V1.json",
+    "classification": "INDEPENDENT_PRE_PROTECTED_OUTER",
+    "dataset_binding": {
+      "source_bundle_sha256": "801b863d396a117d787b73dd673003cf79a4c9ffa178a38d0c928aba241243f0"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume",
+      "event_bar_time_utc",
+      "event_direction",
+      "entry_boundary_utc",
+      "entry_execution_state_utc",
+      "entry_spread",
+      "entry_one_side_commission_price_equivalent",
+      "exit_boundary_utc",
+      "exit_execution_state_utc",
+      "exit_spread",
+      "exit_one_side_commission_price_equivalent",
+      "roundtrip_cost_price_equivalent",
+      "cost_state"
+    ],
+    "resolution": "M5"
+  },
+  "direction": {
+    "LONG": "completed event closes below prior_24_low and current_range >= 1.5 * prior_24_median_range",
+    "NO_OP": "otherwise, or fewer than 24 prior strictly consecutive M5 bars, or candidate already has an active/pending NETH25 position",
+    "SHORT": "completed event closes above prior_24_high and current_range >= 1.5 * prior_24_median_range"
+  },
+  "entry": {
+    "price": "first later observed NETH25 M5 open after the completed event; admission never queries future return or exit price",
+    "type": "NEXT_OBSERVED_M5_OPEN_AFTER_COMPLETED_EVENT"
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_ACCEPTANCE_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "cost_model": "hash-bound transaction-local entry+exit spread and broker-native commission price-equivalent; any admitted trade lacking a resolved cost blocks outcome opening",
+    "discovery_only": true,
+    "missing_bars": "market-closure gaps are preserved; no synthetic or forward-filled prices",
+    "ohlc_execution_proxy": "M5 OPEN at the prospectively defined entry and exit settlement timestamps"
+  },
+  "exit": {
+    "capture_end_before_exit": "RIGHT_CENSORED_NON_ECONOMIC_WITHOUT_RETROACTIVE_SIGNAL_SUPPRESSION",
+    "market_closure_semantics": "wait for first later observed M5 open; never suppress an admitted trade based on future exit availability",
+    "price": "first observed NETH25 M5 open at or after entry_timestamp_plus_30_minutes",
+    "type": "SCHEDULED_30_MINUTE_TARGET_FIRST_OBSERVED_OPEN_SETTLEMENT"
+  },
+  "features": [
+    {
+      "formula": "maximum high across the immediately preceding 24 strictly consecutive M5 bars",
+      "name": "prior_24_high"
+    },
+    {
+      "formula": "minimum low across the immediately preceding 24 strictly consecutive M5 bars",
+      "name": "prior_24_low"
+    },
+    {
+      "formula": "median(high-low) across the immediately preceding 24 strictly consecutive M5 bars",
+      "name": "prior_24_median_range"
+    },
+    {
+      "formula": "current completed M5 high-low",
+      "name": "current_range"
+    }
+  ],
+  "filters": [
+    "STRICT_24_BAR_M5_CONTIGUITY",
+    "CURRENT_RANGE_GTE_1_5X_PRIOR_24_MEDIAN_RANGE",
+    "CLOSE_BREAKS_PRIOR_24_HIGH_OR_LOW",
+    "CANDIDATE_SPECIFIC_NO_OVERLAPPING_NETH25_POSITION_OR_PENDING_ENTRY",
+    "NO_SYNTHETIC_OR_FORWARD_FILLED_PRICES",
+    "NO_EXIT_AVAILABILITY_FILTER_AT_SIGNAL_ADMISSION"
+  ],
+  "id": "V2-C032",
+  "lookbacks": [
+    {
+      "bars": 24,
+      "feature": "prior_24_high_low_and_median_range",
+      "resolution": "M5",
+      "strict_contiguity_seconds": 300
+    }
+  ],
+  "maximum_hold": {
+    "unit": "SCHEDULED_MINUTES_BEFORE_FIRST_LATER_EXECUTABLE_OBSERVED_OPEN",
+    "value": 30
+  },
+  "mechanism": {
+    "family": "BREAKOUT_VOLATILITY_REVERSAL",
+    "subfamily": "BROKER_NATIVE_NETH25_EXPANSION_BREAKOUT_FADE_30M_TRANSACTION_LOCAL_COST"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "normalization_training": {
+    "future_normalization": false,
+    "inner_validation": "NONE_FIXED_RULE",
+    "mode": "NONE_FIXED_DETERMINISTIC_RULE",
+    "purge_embargo": "NOT_APPLICABLE_FIXED_RULE",
+    "random_temporal_shuffle": false,
+    "retraining_schedule": "NONE"
+  },
+  "parameters": {
+    "event_lookback_bars": 24,
+    "scheduled_hold_minutes": 30,
+    "volatility_expansion_ratio": 1.5
+  },
+  "position_admission_policy": {
+    "cross_symbol_concurrency_allowed_in_stage_a": true,
+    "future_entry_or_exit_availability_may_affect_signal_admission": false,
+    "same_symbol_overlap": false,
+    "same_symbol_pyramiding_allowed": false,
+    "scope": "CANDIDATE_SPECIFIC_NETH25_STATE_MACHINE_NOT_A_GENERIC_RESEARCH_CAP"
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "PERFORMANCE_RESEARCH_V3",
+    "protected_evidence_used": false,
+    "selected_without_candidate_own_return_or_pnl": true,
+    "selection_basis": "EPOCH17 AGGREGATE 40-SYMBOL REVERSAL PERSISTENCE PLUS EPOCH18 EUR200 REALIZABILITY AND PRE-OUTCOME NETH25 FRICTION_PASS/COST-EVIDENCE AVAILABILITY; NO NETH25 RETURN OR PNL USED",
+    "wave": "BREAKOUT_EPOCH19_C032"
+  },
+  "rationale": "Prospectively test whether the aggregate reversal persistence observed at fixed 15m and 30m horizons generalizes economically to one EUR200-feasible, pre-outcome friction-pass broker-native index using a fixed breakout-expansion law, causal next-open entry, fixed 30-minute scheduled exit, candidate-specific same-symbol no-overlap, and hash-bound transaction-local costs. The identity is deliberately narrow and cannot close the family or the 1578-symbol frontier.",
+  "spec_hash": "96a752ab7c91401f569527b0a21c7757e4418002cc918e0663589e6ae4044936",
+  "stage_a_economic_unit": {
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "cost_formula": "(transaction_local_roundtrip_cost_price_equivalent / entry_open) * 1000",
+    "eur200_shared_account_realization": "NOT_EVALUATED_UNTIL_STAGE_B_SURVIVOR; broker-native feasibility authority already marks NETH25 BOTH_FEASIBLE",
+    "gross_pnl_formula": "direction_sign * ((exit_open-entry_open)/entry_open) * 1000",
+    "mode": "FIXED_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_trade_absolute_entry_notional_eur": 1000,
+    "post_outcome_resizing_allowed": false
+  },
+  "timing": {
+    "decision": "AFTER_BREAKOUT_EXPANSION_EVENT_M5_BAR_COMPLETES",
+    "entry": "FIRST_LATER_OBSERVED_M5_OPEN_AFTER_CAUSAL_EVENT_DECISION",
+    "exit": "FIRST_OBSERVED_M5_OPEN_AT_OR_AFTER_ENTRY_TIMESTAMP_PLUS_30_MINUTES",
+    "scheduled_target_horizon_minutes": 30
+  },
+  "universe": [
+    "NETH25"
+  ]
+}

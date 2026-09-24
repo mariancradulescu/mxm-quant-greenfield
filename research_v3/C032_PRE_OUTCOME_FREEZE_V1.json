@@ -1,0 +1,82 @@
+{
+  "accounting_before": {
+    "discovery_ledger_entries": 68,
+    "discovery_result_recorded_entries": 24,
+    "economic_outcomes_opened": 27,
+    "v2_attempts_used": 19,
+    "v2_evaluated_identities": 19,
+    "v2_search_budget_remaining": 65
+  },
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "candidate_git_blob_sha1": "17689c99768ab9fe9d1d94b25359e4bb47654466",
+  "candidate_id": "V2-C032",
+  "candidate_own_outcome_opened": false,
+  "candidate_spec_hash": "96a752ab7c91401f569527b0a21c7757e4418002cc918e0663589e6ae4044936",
+  "capture": {
+    "acceptance_ref": "evidence/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_ACCEPTANCE_V1.json",
+    "development_end_utc": "2026-09-13T23:59:59Z",
+    "outer_event_analysis_end_utc": "2026-09-17T11:20:00Z",
+    "outer_start_utc": "2026-09-14T00:00:00Z",
+    "protected_evidence_opened": false,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "zip_sha256": "801b863d396a117d787b73dd673003cf79a4c9ffa178a38d0c928aba241243f0"
+  },
+  "competition_start": false,
+  "control_test_ref": "tests/test_c032_control.py",
+  "cost_authority": {
+    "acceptance_ref": "evidence/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_ACCEPTANCE_V1.json",
+    "rule": "Evaluator must establish causal admission/suppression before checking the corresponding cost state; any admitted unresolved transaction-local cost halts before outcome opening.",
+    "source_zip_sha256": "801b863d396a117d787b73dd673003cf79a4c9ffa178a38d0c928aba241243f0",
+    "state": "VERIFIED_FOR_ADMITTED_EXECUTIONS_OR_FAIL_CLOSED"
+  },
+  "evaluator": {
+    "git_blob_sha1": "16c72a92c71707ddbf5efae367278705c68cfa51",
+    "ref": "m7/competition_performance_v3_c032_evaluator.py",
+    "sha256": "88034ea95dc05d6bbcd7aca95cc94b8d94ffaaf9871a0885d8299a8ac6a08cc7",
+    "version": "MXM_BREAKOUT_EPOCH19_C032_EVALUATOR_V1"
+  },
+  "evidence_epoch": 19,
+  "execution_gate": "REQUIRE_EXACT_HEAD_FULL_SUITE_GREEN_AFTER_THIS_FREEZE_THEN_BIND_SEPARATE_AUTHORIZATION",
+  "expected_if_c032_later_legitimately_opened": {
+    "discovery_result_recorded_entries": 25,
+    "economic_outcomes_opened": 28,
+    "v2_attempts_used": 20,
+    "v2_evaluated_identities": 20,
+    "v2_search_budget_remaining": 64
+  },
+  "family_exhaustion_claimed": false,
+  "frozen_utc": "2026-09-24T19:04:00Z",
+  "ledger_freeze_sequence": 69,
+  "live_orders": false,
+  "material_distinction": {
+    "candidate_own_outcome_used": false,
+    "development_basis": "40-symbol breakout-expansion direction-only evidence showed descriptively persistent reversal at separately frozen 15m and 30m horizons",
+    "execution_structure": [
+      "FIXED_24_M5_LOOKBACK",
+      "FIXED_1_5X_RANGE_EXPANSION",
+      "BREAKOUT_FADE_DIRECTION",
+      "NEXT_OBSERVED_M5_OPEN_ENTRY",
+      "FIXED_30M_SCHEDULED_EXIT_FIRST_OBSERVED_OPEN",
+      "CANDIDATE_SPECIFIC_SAME_SYMBOL_NO_OVERLAP",
+      "TRANSACTION_LOCAL_ENTRY_EXIT_COST"
+    ],
+    "new_identity_required": true,
+    "realizability_basis": "NETH25 is BOTH_FEASIBLE for EUR200 and was selected prospectively as the minimal pre-outcome friction-pass cost-resolution probe"
+  },
+  "new_attempts_consumed_by_freeze": 0,
+  "protected_evidence_opened": false,
+  "schema": "mxm.greenfield.performance-research-v3.c032-pre-outcome-freeze.v1",
+  "selection_basis": [
+    "EPOCH17_AGGREGATE_40_SYMBOL_REVERSAL_PERSISTENCE_WITHOUT_NETH25_PNL",
+    "EPOCH18_EUR200_REALIZABILITY_AND_PRE_OUTCOME_FRICTION_PASS",
+    "EPOCH19_HASH_VERIFIED_INDEPENDENT_M5_AND_TRANSACTION_LOCAL_COST_BYTES",
+    "NO_CANDIDATE_RETURN_PNL_OR_ECONOMIC_OUTCOME_OPENED_BEFORE_THIS_FREEZE",
+    "ONE_NARROW_IDENTITY_ONLY; NO_FAMILY_CLOSURE OR 1578_UNIVERSE_NARROWING"
+  ],
+  "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "wrapper": {
+    "git_blob_sha1": "64148a99ade5afc165e34bb6d6e18eceb496a522",
+    "ref": "research_v3/c032_execute.py",
+    "sha256": "9e42e5534290f0e6b71994350b70015c57649386933411133d254f1ab4bbbf7f"
+  }
+}
