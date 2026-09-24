@@ -1,4 +1,56 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "88e7bc970fc7eb062a2842ffec13f11354487536",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "88e7bc970fc7eb062a2842ffec13f11354487536",
+    "predecessor_run_id": 36032531347
+  },
+  "accepted_output": {
+    "decision": {
+      "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
+      "economic_outcomes_opened": 0,
+      "expected_common_timestamps": 9558,
+      "expected_consecutive_pairs": 9470,
+      "external_data_required": false,
+      "implementation_assessment": "IMPLEMENTATION_CORRECTED",
+      "interval": {
+        "end_utc": "2026-07-19T23:59:59Z",
+        "start_utc": "2026-05-25T00:00:00Z"
+      },
+      "protected_forward_opened": false,
+      "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
+      "research_family": "CROSS_MARKET_LEAD_LAG",
+      "resolution": "M5",
+      "screen": "All twelve ordered source-target pairs use only strictly consecutive broker-native five-minute timestamps; source direction at t is compared with target direction at t+5m. Gaps, incomplete windows, synthetic fills, forward fills, returns, costs, PnL, inference, promotion, and economic identity opening remain prohibited.",
+      "source_capture_ref": "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
+      "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
+      "symbols": [
+        "AUDJPY",
+        "AUS200",
+        "Brent-F",
+        "BCHUSD"
+      ],
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "cross-market-lead-lag-screen-v2",
+    "next_research_state": {
+      "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+      "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
+      "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_THE_CORRECTED_NON_ECONOMIC_SCREEN",
+      "outer_authorization": "NONE",
+      "research_judgment_required": false,
+      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Corrected the non-economic one-bar lead-lag screen to consume the accepted hash-bound disjoint AUDJPY, AUS200, Brent-F, and BCHUSD M5 capture rather than the superseded CROSSALIGN window. The implementation now binds the accepted capture hash, plan, interval, archive namespace, single-price OHLC fields, and non-economic manifest constraints. No external data is required.",
+    "tests_requested": [
+      "tests/test_cross_market_lead_lag_screen.py",
+      "tests/test_crossalign_four_symbol_capture.py",
+      "tests/test_general_ai_implementation_executor.py"
+    ]
+  },
   "basis_next_state_sha256": "4688461851001c25629b393e09455e8022ecf98f2ac383284b255a0c3b0ed66a",
   "changed_paths": [
     "research_v3/cross_market_lead_lag_screen.py",
@@ -67,5 +119,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
