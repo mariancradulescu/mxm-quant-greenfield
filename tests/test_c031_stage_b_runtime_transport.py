@@ -23,7 +23,10 @@ class C031RuntimeTransportTests(unittest.TestCase):
    self.assertNotIn('runtime_operation_envelope_ref',n)
   else:
    self.assertEqual(d['exact_head_authorization']['run_id'],35922246231)
-   if n.get('result_ref')=='m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json' and n.get('economic_execution_id')=='econ_561ca1cabbc351f3fdde2e0bddaed830':
+   result=pathlib.Path('m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json')
+   if result.exists():
+    r=json.loads(result.read_text())
+    self.assertEqual(r['economic_execution_id'],'econ_561ca1cabbc351f3fdde2e0bddaed830')
     self.assertNotIn('runtime_operation_envelope_ref',n)
     self.assertNotIn('expected_operation_id',n)
    else:

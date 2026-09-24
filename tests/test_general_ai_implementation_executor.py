@@ -7,12 +7,16 @@ ROOT=Path(__file__).resolve().parents[1]
 class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_current_state_routes_screen_or_external_gate_correctly(self):
         s=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        self.assertIn(s["status"],{"READY_FOR_MINIMAL_STRUCTURAL_SCREENING","WAITING_EXTERNAL_AUTHENTICATED_DATA"})
-        if s["status"]=="READY_FOR_MINIMAL_STRUCTURAL_SCREENING":
-            self.assertTrue(implementation_required(s))
-        else:
+        self.assertIn(s["status"],{
+            "READY_FOR_MINIMAL_STRUCTURAL_SCREENING",
+            "WAITING_EXTERNAL_AUTHENTICATED_DATA",
+            "PENDING_EXACT_HEAD_GREEN_STRUCTURAL_EXTENSION_WAVE_01_SCREEN",
+        })
+        if s["status"]=="WAITING_EXTERNAL_AUTHENTICATED_DATA":
             self.assertTrue(s["user_action_required"])
             self.assertFalse(implementation_required(s))
+        else:
+            self.assertTrue(implementation_required(s))
     def test_arbitrary_non_reasoning_action_is_not_finite_mapped(self):
         self.assertTrue(implementation_required({"status":"ANY_FUTURE_STATE","next_action":"SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
         self.assertFalse(implementation_required({"status":"WAIT","next_action":"EXTERNAL","user_action_required":True}))
