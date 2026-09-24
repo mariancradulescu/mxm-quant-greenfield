@@ -1,0 +1,30 @@
+{
+  "schema": "mxm.greenfield.github-models-retirement-root-cause.v1",
+  "status": "ROOT_CAUSE_CONFIRMED_AND_SUPERSEDED",
+  "failed_liveness_run_id": 35952514757,
+  "failed_adapter": "GITHUB_MODELS_INFERENCE_API",
+  "retired_service": {
+    "retirement_effective_date": "2026-07-30",
+    "state": "FULLY_RETIRED",
+    "inference_api_available": false
+  },
+  "observed": {
+    "github_token_present": true,
+    "models_read_permission_present": true,
+    "historical_proposals_drain_idempotently": true,
+    "economics_opened_during_failed_provider_wake": 0,
+    "v2_attempts_consumed_during_failed_provider_wake": 0
+  },
+  "replacement": {
+    "adapter": "GITHUB_COPILOT_CLI",
+    "authentication": "BUILT_IN_GITHUB_TOKEN",
+    "required_permission": "copilot-requests: write",
+    "model_selection": "auto",
+    "external_secret_required_if_personal_repo_has_copilot_access": false
+  },
+  "safety": {
+    "c031_stage_b_rerun": false,
+    "protected_forward_opened": false,
+    "live_orders_authorized": false
+  }
+}

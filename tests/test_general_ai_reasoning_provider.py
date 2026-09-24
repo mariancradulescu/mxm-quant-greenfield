@@ -1,11 +1,16 @@
-import json
 import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.general_ai_reasoning_provider import DEFAULT_MODELS, build_reasoning_request, reasoning_required, wake
+from research_v3.general_ai_reasoning_provider import (
+    PROVIDER_KIND,
+    PROVIDER_VERSION,
+    build_reasoning_request,
+    reasoning_required,
+    wake,
+)
 
 class GeneralAIReasoningProviderTests(unittest.TestCase):
     def test_current_pending_c031_state_requires_general_reasoning(self):
@@ -22,8 +27,9 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertFalse(reasoning_required({"next_action":"IMPLEMENT_SOMETHING","user_action_required":False}))
         self.assertFalse(reasoning_required({"ai_reasoning_required":True,"user_action_required":True}))
 
-    def test_default_provider_prefers_frontier_reasoning_model(self):
-        self.assertEqual(DEFAULT_MODELS[0],"openai/gpt-5.6-sol")
+    def test_active_provider_is_copilot_cli_not_retired_models_api(self):
+        self.assertEqual(PROVIDER_KIND,"GITHUB_COPILOT_CLI")
+        self.assertEqual(PROVIDER_VERSION,"MXM_GENERAL_AI_REASONING_PROVIDER_V2")
 
     def test_missing_token_creates_explicit_gate_without_secret(self):
         with tempfile.TemporaryDirectory() as td:

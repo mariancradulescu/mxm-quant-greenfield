@@ -1,8 +1,8 @@
 """Unattended provider-neutral general-AI reasoning wake for MXM Research V3.
 
-The provider creates NON_ECONOMIC research proposals only. It never opens economics,
-never mutates V2 attempt accounting, and never substitutes a finite next-action table
-for general reasoning. Runtime V2 remains the deterministic authority after proposal creation.
+The active unattended adapter is GitHub Copilot CLI running programmatically in Actions.
+The provider creates NON_ECONOMIC research proposals only. Runtime V2 remains the
+deterministic safety, accounting, persistence and exactly-once economic authority.
 """
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ import argparse
 import json
 import os
 import re
-import urllib.error
-import urllib.request
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -32,20 +32,13 @@ from research_v3.runtime_v2_primitives import (
     sha256_file,
 )
 
-PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V1"
-ENDPOINT="https://models.github.ai/inference/chat/completions"
+PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V2"
+PROVIDER_KIND="GITHUB_COPILOT_CLI"
 NEXT_REL=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
 REQUEST_REL=Path("research_v3/ai_director/AI_REASONING_REQUEST.json")
 RESPONSE_REL=Path("research_v3/ai_director/AI_REASONING_RESPONSE.json")
 GATE_REL=Path("research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json")
 PROPOSAL_DIR=Path("research_v3/ai_director/proposals")
-
-DEFAULT_MODELS=(
-    "openai/gpt-5.6-sol",
-    "openai/gpt-5.5",
-    "openai/gpt-5.4",
-    "openai/gpt-4o",
-)
 
 BASE_AUTHORITIES=(
     "research_v3/RESEARCH_CONTRACT_V3.json",
@@ -70,7 +63,6 @@ def _load(root:Path,rel:str|Path)->dict[str,Any]:
     return json.loads(p.read_text(encoding="utf-8"))
 
 def _head(root:Path)->str:
-    import subprocess
     return subprocess.check_output(["git","rev-parse","HEAD"],cwd=root,text=True).strip()
 
 def reasoning_required(next_state:Mapping[str,Any])->bool:
@@ -80,6 +72,7 @@ def reasoning_required(next_state:Mapping[str,Any])->bool:
         return True
     action=str(next_state.get("next_action") or "").upper()
     status=str(next_state.get("status") or "").upper()
+    # Wake detection only. This never maps a state to a research decision.
     return action.startswith("AI_") or "PENDING_AI_INTERPRETATION" in status or "AI_REASONING_REQUIRED" in status
 
 def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
@@ -98,7 +91,7 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         try:
             item["content"]=json.loads(raw)
         except Exception:
-            item["content_text"]=raw.decode("utf-8",errors="replace")[:20000]
+            item["content_text"]=raw.decode("utf-8",errors="replace")[:16000]
         rows.append(item); kept.append(rel)
     return rows,kept
 
@@ -190,7 +183,7 @@ Important boundaries:
 """
 
 def _user_prompt(context:Mapping[str,Any], correction:str|None=None)->str:
-    base="AUTHORITATIVE REPOSITORY CONTEXT:\n"+json.dumps(context,sort_keys=True,separators=(",",":"),ensure_ascii=False)
+    base=_system_prompt()+"\n\nAUTHORITATIVE REPOSITORY CONTEXT:\n"+json.dumps(context,sort_keys=True,separators=(",",":"),ensure_ascii=False)
     if correction:
         base+="\n\nYOUR PREVIOUS JSON WAS REJECTED BY DETERMINISTIC VALIDATION. CORRECT IT WITHOUT CHANGING THE RESEARCH GOAL:\n"+correction
     return base
@@ -212,44 +205,55 @@ def _extract_json(text:str)->dict[str,Any]:
         raise AIReasoningProviderError("provider response is not a JSON object")
     return obj
 
-def _models()->list[str]:
-    raw=os.environ.get("MXM_AI_MODELS","").strip()
-    return [x.strip() for x in raw.split(",") if x.strip()] or list(DEFAULT_MODELS)
-
-def github_models_transport(token:str,model:str,system_prompt:str,user_prompt:str)->tuple[dict[str,Any],dict[str,Any]]:
-    payload={
-        "model":model,
-        "messages":[{"role":"system","content":system_prompt},{"role":"user","content":user_prompt}],
-        "max_tokens":8000,
-        "reasoning_effort":"high",
-    }
-    req=urllib.request.Request(
-        ENDPOINT,
-        data=json.dumps(payload,separators=(",",":")).encode("utf-8"),
-        headers={"Content-Type":"application/json","Authorization":f"Bearer {token}","Accept":"application/json"},
-        method="POST",
+def _looks_external_gate(text:str)->bool:
+    s=text.lower()
+    markers=(
+        "copilot requests permission",
+        "copilot-requests",
+        "not entitled",
+        "no copilot",
+        "copilot subscription",
+        "copilot plan",
+        "authentication failed",
+        "unauthorized",
+        "forbidden",
+        "billing",
+        "policy",
     )
-    try:
-        with urllib.request.urlopen(req,timeout=180) as resp:
-            data=json.loads(resp.read())
-    except urllib.error.HTTPError as exc:
-        body=exc.read().decode("utf-8",errors="replace")
-        if exc.code in (401,403):
-            raise AIReasoningExternalGate(f"GITHUB_MODELS_AUTHORIZATION_{exc.code}: {body[:800]}") from exc
-        raise AIReasoningProviderError(f"GitHub Models HTTP {exc.code}: {body[:1200]}") from exc
-    except Exception as exc:
-        raise AIReasoningProviderError(f"GitHub Models transport failure: {exc}") from exc
-    choices=data.get("choices") or []
-    if not choices:
-        raise AIReasoningProviderError("GitHub Models response has no choices")
-    content=((choices[0].get("message") or {}).get("content"))
-    if not isinstance(content,str) or not content.strip():
-        raise AIReasoningProviderError("GitHub Models response has no text content")
-    return _extract_json(content),{
-        "provider":"github-models",
+    return any(x in s for x in markers)
+
+def copilot_cli_transport(token:str,model:str,prompt:str,*,root:Path)->tuple[dict[str,Any],dict[str,Any]]:
+    if not shutil.which("copilot"):
+        raise AIReasoningProviderError("GitHub Copilot CLI executable is not installed")
+    cmd=[
+        "copilot",
+        "-p",prompt,
+        "-s",
+        "--model="+model,
+        "--no-ask-user",
+        "--no-auto-update",
+        "--no-color",
+        "--no-custom-instructions",
+        "--deny-tool=shell",
+        "--deny-tool=write",
+        "--deny-tool=url",
+    ]
+    env=dict(os.environ)
+    env["GITHUB_TOKEN"]=token
+    env["COPILOT_GITHUB_TOKEN"]=token
+    proc=subprocess.run(cmd,cwd=root,env=env,text=True,capture_output=True,timeout=240)
+    if proc.returncode!=0:
+        detail=(proc.stderr+"\n"+proc.stdout).strip()
+        if _looks_external_gate(detail):
+            raise AIReasoningExternalGate(detail[:1600])
+        raise AIReasoningProviderError("Copilot CLI failed: "+detail[:2000])
+    output=proc.stdout.strip()
+    if not output:
+        raise AIReasoningProviderError("Copilot CLI returned empty output")
+    return _extract_json(output),{
+        "provider":"github-copilot-cli",
         "model":model,
-        "response_id":data.get("id"),
-        "usage":data.get("usage"),
+        "cli":"@github/copilot",
     }
 
 def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider_meta:Mapping[str,Any])->dict[str,Any]:
@@ -275,7 +279,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
     proposal={
         "schema":PROPOSAL_SCHEMA,
         "proposal_id":pid,
-        "provider":{"kind":"GITHUB_MODELS_GENERAL_REASONING","vendor":"GitHub Models","model":provider_meta.get("model"),"provider_version":PROVIDER_VERSION,"reasoning_request_id":request["request_id"]},
+        "provider":{"kind":"GITHUB_COPILOT_CLI_GENERAL_REASONING","vendor":"GitHub Copilot","model":provider_meta.get("model"),"provider_version":PROVIDER_VERSION,"reasoning_request_id":request["request_id"]},
         "basis":{"research_head":request["research_head"],"accounting":{"v2_attempts_used":request["project_snapshot"]["v2_attempts_used"],"v2_search_budget_remaining":request["project_snapshot"]["v2_search_budget_remaining"],"economic_outcomes_opened":request["project_snapshot"]["economic_outcomes_opened"]},"discovery_ledger_sha256":request["project_snapshot"]["discovery_ledger_sha256"]},
         "objective":dict(objective),
         "decision":dict(decision),
@@ -296,7 +300,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
 def _proposal_ref(request_id:str)->Path:
     return PROPOSAL_DIR/f"AUTO_{request_id}.json"
 
-def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[[str,str,str,str],tuple[dict[str,Any],dict[str,Any]]]=github_models_transport,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
+def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tuple[dict[str,Any],dict[str,Any]]]=copilot_cli_transport,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     request=build_reasoning_request(root)
     atomic_write_json(root/REQUEST_REL,request)
@@ -312,38 +316,38 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[[str,s
         sink.checkpoint("general_ai_reasoning_reused",None)
         return {"status":"PROPOSAL_ALREADY_DURABLE","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_hash":sha256_file(path)}
 
-    token=token or os.environ.get("GITHUB_TOKEN")
+    token=token or os.environ.get("GITHUB_TOKEN") or os.environ.get("COPILOT_GITHUB_TOKEN")
     if not token:
-        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-models","required":"GITHUB_TOKEN with GitHub Models inference access (models: read)","request_id":request["request_id"],"created_utc":iso()}
+        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-copilot-cli","required":"GITHUB_TOKEN with copilot-requests: write and repository-owner Copilot access","request_id":request["request_id"],"created_utc":iso()}
         atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
         return gate
 
     context=_context_payload(root,request)
     correction=None; errors=[]; chosen_meta=None; proposal=None
-    for model in _models():
-        for attempt in range(2):
-            try:
-                candidate,meta=transport(token,model,_system_prompt(),_user_prompt(context,correction))
-                proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
-                break
-            except AIReasoningExternalGate as exc:
-                gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-models","request_id":request["request_id"],"detail":str(exc),"created_utc":iso()}
-                atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
-                return gate
-            except Exception as exc:
-                correction=f"{type(exc).__name__}: {exc}"
-                errors.append({"model":model,"attempt":attempt+1,"error":correction})
-        if proposal is not None:
+    model=os.environ.get("MXM_COPILOT_MODEL","auto").strip() or "auto"
+    for attempt in range(2):
+        try:
+            candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
+            proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
             break
+        except AIReasoningExternalGate as exc:
+            gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"detail":str(exc),"created_utc":iso()}
+            atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
+            return gate
+        except Exception as exc:
+            correction=f"{type(exc).__name__}: {exc}"
+            errors.append({"model":model,"attempt":attempt+1,"error":correction})
     if proposal is None:
-        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"PROVIDER_RETRY_REQUIRED","provider":"github-models","request_id":request["request_id"],"errors":errors[-6:],"created_utc":iso()}
+        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"PROVIDER_RETRY_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"errors":errors[-4:],"created_utc":iso()}
         atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_provider_retry",None)
-        raise AIReasoningProviderError("all configured general reasoning model attempts failed")
+        raise AIReasoningProviderError("all configured general reasoning attempts failed")
 
     path.parent.mkdir(parents=True,exist_ok=True)
     atomic_write_json(path,proposal)
-    response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1","status":"PROPOSAL_GENERATED_PENDING_RUNTIME_V2_MATERIALIZATION","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_sha256":sha256_file(path),"provider":{"kind":"github-models","endpoint":ENDPOINT,**dict(chosen_meta or {})},"economic_outcome_opened":False,"v2_attempt_consumed":0,"created_utc":iso()}
+    response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1","status":"PROPOSAL_GENERATED_PENDING_RUNTIME_V2_MATERIALIZATION","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_sha256":sha256_file(path),"provider":{"kind":"github-copilot-cli",**dict(chosen_meta or {})},"economic_outcome_opened":False,"v2_attempt_consumed":0,"created_utc":iso()}
     atomic_write_json(root/RESPONSE_REL,response)
+    if (root/GATE_REL).exists():
+        (root/GATE_REL).unlink()
     sink.checkpoint("general_ai_reasoning_response",None)
     return response
 

@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.general-ai-research-director-architecture.v1",
-  "status": "PASS_EXACT_HEAD_GREEN_PENDING_LIVE_REASONING_WAKE",
+  "status": "COPILOT_CLI_PROVIDER_IMPLEMENTED_PENDING_EXACT_HEAD_GREEN",
   "decision": "PROVIDER_NEUTRAL_AI_REASONING_PROTOCOL_PLUS_DETERMINISTIC_RUNTIME_V2_GUARD",
   "separation": {
     "ai_research_director": [
@@ -45,18 +45,23 @@
       "GITHUB_AGENTIC_WORKFLOW_WITH_GITHUB_COPILOT",
       "OTHER_SCHEMA_COMPATIBLE_AGENT"
     ],
-    "rule": "Provider adapters may originate general research proposals but may not bypass the deterministic bridge or Runtime V2.",
+    "rule": "Copilot CLI may originate general research proposals only; deterministic bridge and Runtime V2 remain mandatory.",
     "github_personal_repo_note": "Unattended provider execution requires a configured provider secret/token; no secret is assumed or fabricated.",
     "unattended_active_adapter": {
-      "kind": "GITHUB_MODELS",
-      "auth": "GITHUB_TOKEN + models:read",
-      "external_secret_required": false,
-      "interface": "mxm.greenfield.general-ai-research-proposal.v1"
+      "kind": "GITHUB_COPILOT_CLI",
+      "auth": "GITHUB_TOKEN + copilot-requests:write",
+      "model": "auto",
+      "external_secret_required": "ONLY_IF_REPOSITORY_OWNER_LACKS_REQUIRED_COPILOT_ACCESS"
     },
     "github_models_docs_verified_utc": "2026-09-24",
     "live_activation_main_head": "6ac08310fbdd1e94c0cec2710e150f824d5916ec",
     "provider_acceptance_ci_run_id": 35952306331,
-    "live_wake_required": true
+    "live_wake_required": true,
+    "retired_adapter": {
+      "kind": "GITHUB_MODELS",
+      "retired_effective_date": "2026-07-30",
+      "do_not_use": true
+    }
   },
   "anti_hardcoding": {
     "objective_class_enum": false,
