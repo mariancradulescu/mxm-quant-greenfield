@@ -16,6 +16,8 @@
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
+  "ai_reasoning_required": true,
+  "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "authorizing_evidence_epoch": 4,
   "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
   "broader_universe_status": "OPEN",
@@ -60,7 +62,7 @@
   "implementation_executor": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
   "market_data_capture_required": false,
-  "next_action": "AI_INTERPRET_ADAPTIVE_BREADTH_TRIAGE_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+  "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
   "outer_authorization": "NONE",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
   "outer_capture_integrity": {
@@ -102,6 +104,17 @@
   },
   "reason": "The authorized adaptive breadth triage has been deterministically executed on the accepted 40-symbol M5 development capture and persisted. It performed no returns/PnL/economic ranking. The result is material new structural/data-sufficiency evidence and advances the research evidence epoch, so fresh General AI judgment is required before any new mechanism-specific scope, new capture, outer, or economic identity.",
   "recorded_utc": "2026-09-24T10:55:00Z",
+  "recovery_binding": {
+    "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
+    "accepted_proposal_hash": "cd90596142bc486245d309530ec557ac3d2aec1754d48414d4610e8f1283e707",
+    "accepted_proposal_id": "P-20260924-ADAPTIVE-BREADTH-TRIAGE-03",
+    "attempts_changed": false,
+    "economics_changed": false,
+    "original_failed_liveness_run_id": 35997976163,
+    "root_cause": "The implementation loop correctly detected no durable progress when the already-green adaptive breadth triage implementation repeated the same executable next_action instead of materializing its output. After triage output was materialized, the first exact-head CI exposed a secondary state-binding mismatch: source_ai_proposal_hash and source_runtime_operation_id referred to incompatible proposal/operation identities. This checkpoint binds the post-triage state to the actually accepted TRIAGE-03 registry row without changing research semantics.",
+    "status": "RECOVERED_FROM_EPOCH4_IMPLEMENTATION_LIVENESS_STALL",
+    "valid_evidence_discarded": false
+  },
   "research_action": {
     "broader_universe_remains_open": true,
     "classification": "FOUR_PANEL_OUTER_COMPLETE_FRESH_GENERAL_AI_REASSESSMENT_REQUIRED",
@@ -146,13 +159,15 @@
   "source_ai_proposal_id": "P-20260924-ADAPTIVE-BREADTH-TRIAGE-03",
   "source_runtime_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
   "stale_reasoning_guard": {
-    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT_AFTER_MATERIAL_TRIAGE_EVIDENCE",
-    "current_evidence_epoch": 5,
     "authorizing_evidence_epoch": 4,
-    "last_authorizing_proposal_id": "P-20260924-ADAPTIVE-BREADTH-TRIAGE-03",
-    "law_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"
+    "current_evidence_epoch": 5,
+    "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
+    "previous_external_data_gate": null,
+    "previous_next_action": "AI_INTERPRET_ADAPTIVE_BREADTH_TRIAGE_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+    "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_ADAPTIVE_BREADTH_TRIAGE",
+    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_ADAPTIVE_BREADTH_TRIAGE",
+  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
   "superseded_general_ai_proposal": {
     "economic_outcome_opened": false,
     "proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
@@ -170,25 +185,13 @@
     "declared prerequisite matrix for all open mechanism families",
     "no returns, PnL, promotion statistics, or economic ranking"
   ],
-  "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
-  "user_action_required": false,
-  "ai_reasoning_required": true,
   "triage_result_ref": "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
-  "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "triage_summary": {
-    "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-    "symbols_screened": 40,
-    "rows_read": 392181,
     "aligned_series": false,
-    "selected_families": [
-      "BREAKOUT_VOLATILITY_EXPANSION",
-      "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
-      "MEAN_REVERSION",
-      "REGIME_CONTEXT_CONDITIONED",
-      "SEASONALITY_SESSION_TIME",
-      "TREND_MOMENTUM"
-    ],
     "insufficient_under_current_prerequisite_diagnostic": {
+      "CARRY_TERM_STRUCTURE": [
+        "term_structure_metadata"
+      ],
       "CROSS_MARKET_LEAD_LAG": [
         "aligned_timestamps"
       ],
@@ -197,22 +200,21 @@
       ],
       "RELATIVE_VALUE_COINTEGRATION": [
         "aligned_timestamps"
-      ],
-      "CARRY_TERM_STRUCTURE": [
-        "term_structure_metadata"
       ]
     },
-    "interpretation_boundary": "No economic ranking, promotion, or mechanism-family closure. Global endpoint alignment is only a current prerequisite diagnostic and may be reconsidered prospectively."
+    "interpretation_boundary": "No economic ranking, promotion, or mechanism-family closure. Global endpoint alignment is only a current prerequisite diagnostic and may be reconsidered prospectively.",
+    "rows_read": 392181,
+    "selected_families": [
+      "BREAKOUT_VOLATILITY_EXPANSION",
+      "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+      "MEAN_REVERSION",
+      "REGIME_CONTEXT_CONDITIONED",
+      "SEASONALITY_SESSION_TIME",
+      "TREND_MOMENTUM"
+    ],
+    "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "symbols_screened": 40
   },
-  "recovery_binding": {
-    "status": "RECOVERED_FROM_EPOCH4_IMPLEMENTATION_LIVENESS_STALL",
-    "original_failed_liveness_run_id": 35997976163,
-    "root_cause": "The implementation loop correctly detected no durable progress when the already-green adaptive breadth triage implementation repeated the same executable next_action instead of materializing its output. After triage output was materialized, the first exact-head CI exposed a secondary state-binding mismatch: source_ai_proposal_hash and source_runtime_operation_id referred to incompatible proposal/operation identities. This checkpoint binds the post-triage state to the actually accepted TRIAGE-03 registry row without changing research semantics.",
-    "accepted_proposal_id": "P-20260924-ADAPTIVE-BREADTH-TRIAGE-03",
-    "accepted_proposal_hash": "cd90596142bc486245d309530ec557ac3d2aec1754d48414d4610e8f1283e707",
-    "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
-    "economics_changed": false,
-    "attempts_changed": false,
-    "valid_evidence_discarded": false
-  }
+  "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
+  "user_action_required": false
 }
