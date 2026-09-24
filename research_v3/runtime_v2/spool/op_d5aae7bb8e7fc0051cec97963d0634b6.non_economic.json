@@ -1,0 +1,64 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "0fdb4ddcaa9b3ffc874c0b8c640a5ef22830384548733c780e6d97d1d1b1b32c",
+  "competition_start_authorized": false,
+  "decision": {
+    "data_interval": {
+      "end_utc": "2026-09-13T23:59:59Z",
+      "start_utc": "2026-07-20T00:00:00Z"
+    },
+    "mechanism_family": "CROSS_MARKET_LEAD_LAG",
+    "outputs": [
+      "pairwise and four-way aligned observation counts",
+      "lag direction and sign diagnostics",
+      "coverage and chronology diagnostics",
+      "declared prerequisite pass/fail by cross-market family"
+    ],
+    "panel": [
+      "AUDJPY",
+      "AUS200",
+      "Brent-F",
+      "BCHUSD"
+    ],
+    "prohibitions": [
+      "no returns-based economic outcome",
+      "no PnL, costs, promotion, or ranking",
+      "no outer authorization",
+      "no reuse of the completed SESSION_GAP outer as confirmatory evidence",
+      "no new market-data capture"
+    ],
+    "research_scope": "NON_ECONOMIC_STRUCTURAL_PREREQUISITE",
+    "resolution": "M5",
+    "signal_law": "For each strictly consecutive common pair t and t+5 minutes, evaluate only a prospectively frozen one-bar lag relationship using broker-native observations available at t; exclude gaps and sessions without complete observations and apply no forward fill, synthetic fill, or future availability assumption.",
+    "stop_rule": "If the exact prerequisite fails, preserve the failure as structural evidence and reassess the broader frontier; do not infer family-level exhaustion."
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "accepted_development_capture_sufficient_for_current_decision": true,
+    "accepted_development_capture_sufficient_for_mechanism_specific_outer": false,
+    "authorizing_evidence_epoch": 10,
+    "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+    "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
+    "next_action": "Freeze the exact one-bar cross-market lead-lag event and availability specification, execute it only on the accepted four-symbol M5 capture, and report prerequisite diagnostics without opening an economic identity or outer.",
+    "outer_authorization": "NONE",
+    "prospective_exploration_assessment": "POSITIVE_EXPECTED_INFORMATION_GAIN_BEFORE_MECHANISM_SPECIFIC_OUTER",
+    "research_judgment_required": false,
+    "status": "PROSPECTIVE_NON_ECONOMIC_SCREEN_AUTHORIZED"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Freeze and execute a non-economic, prospective one-bar cross-market lead-lag prerequisite screen on the accepted AUDJPY, AUS200, Brent-F, and BCHUSD M5 capture.",
+    "information_gain_rationale": "The accepted four-way alignment contains 9,455 strictly consecutive common M5 pairs, making this the highest-information legal next step without new acquisition. It tests whether a precisely defined cross-market dependency survives exact timestamp availability while preserving the broader 1,578-candidate frontier. The accepted 40 representative series are sufficient for the current prerequisite decision, but not sufficient to authorize a mechanism-specific outer; broader exploration remains positive expected information gain before narrowing economically."
+  },
+  "operation_id": "op_d5aae7bb8e7fc0051cec97963d0634b6",
+  "proposal_hash": "8c0e3939c3e3fc3851b51b01fa826d9f0b06dede539411683ded3a08ae0c22be",
+  "proposal_id": "P-20260924-CROSSMARKET-ONEBAR-SCREEN-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_75bd45deddc7db8d8bde9e4efa05585c.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
