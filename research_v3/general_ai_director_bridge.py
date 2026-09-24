@@ -165,9 +165,11 @@ def validate_proposal_shape(proposal: Mapping[str, Any]) -> None:
         raise AIProposalRejected("user may not become research/data scheduler")
     if data_policy.get("new_market_data_requested") is True:
         req = data_policy.get("minimal_acquisition_request") or {}
-        for key in ("symbols", "resolution", "start_utc", "end_utc", "fields", "information_gain_justification"):
+        for key in ("source_domain", "symbols", "resolution", "start_utc", "end_utc", "fields", "information_gain_justification"):
             if key not in req:
                 raise AIProposalRejected(f"new data request missing prospectively required field: {key}")
+        if req["source_domain"] != "PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API":
+            raise AIProposalRejected("empirical market data must be broker-native Pepperstone/cTrader Open API")
         if not isinstance(req["symbols"], list) or not req["symbols"]:
             raise AIProposalRejected("new data request requires explicit AI-selected symbols")
         if not isinstance(req["fields"], list) or not req["fields"]:
@@ -186,6 +188,47 @@ def validate_proposal_shape(proposal: Mapping[str, Any]) -> None:
             raise AIProposalRejected(f"causal contract not affirmed: {key}")
 
 
+def _completed_outer_authority(root: Path, state: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Verify the persisted capture/result/interpretation chain before releasing its old acquisition contract."""
+    capture_ref = state.get("capture_acceptance_ref")
+    result_ref = state.get("result_ref")
+    interpretation_ref = state.get("interpretation_ref")
+    if not all(isinstance(x, str) and x for x in (capture_ref, result_ref, interpretation_ref)):
+        return None
+    capture = _load(root, capture_ref)
+    result = _load(root, result_ref)
+    interpretation = _load(root, interpretation_ref)
+    if not str(result.get("status") or "").endswith("_COMPLETE"):
+        raise AIProposalRejected("claimed completed outer has no completed result")
+    if "INTERPRETED" not in str(interpretation.get("status") or ""):
+        raise AIProposalRejected("claimed completed outer has no interpretation")
+    if interpretation.get("source_result_ref") != result_ref or interpretation.get("source_capture_acceptance_ref") != capture_ref:
+        raise AIProposalRejected("completed outer interpretation authority mismatch")
+    if result.get("source_capture_sha256") != (capture.get("source_capture") or {}).get("sha256"):
+        raise AIProposalRejected("completed outer capture/result hash mismatch")
+    if state.get("outer_data_binding_ref") != capture_ref:
+        raise AIProposalRejected("completed outer binding does not point to accepted capture")
+    return {"capture_ref": capture_ref, "result_ref": result_ref, "interpretation_ref": interpretation_ref}
+
+
+def _reject_completed_outer_as_unseen(root: Path, proposal: Mapping[str, Any]) -> None:
+    """Observed outer evidence may inform research but cannot be declared unseen confirmation again."""
+    completed = _completed_outer_authority(root, load_json(root / NEXT_STATE_REL, {}) or {})
+    if completed is None:
+        return
+    observed = set(completed.values())
+    for binding in proposal.get("data_bindings") or []:
+        if not isinstance(binding, Mapping):
+            continue
+        role = str(binding.get("role") or binding.get("authority_role") or "").upper()
+        ref = binding.get("ref") or binding.get("source_ref") or binding.get("result_ref") or binding.get("artifact_ref")
+        if ref in observed and any(x in role for x in ("UNSEEN", "UNOPENED", "INDEPENDENT_CONFIRM")):
+            raise AIProposalRejected("completed outer cannot be reused as unseen confirmation")
+    decision = proposal.get("decision") or {}
+    if decision.get("unseen_confirmation_ref") in observed:
+        raise AIProposalRejected("completed outer cannot be reused as unseen confirmation")
+
+
 def _active_authoritative_data_contract(root: Path) -> dict[str, Any] | None:
     """Resolve a still-unsatisfied prospective data contract from durable state.
 
@@ -194,6 +237,9 @@ def _active_authoritative_data_contract(root: Path) -> dict[str, Any] | None:
     state = load_json(root / NEXT_STATE_REL, {}) or {}
     binding = state.get("outer_data_binding_ref") or state.get("independent_outer_data_ref")
     if binding:
+        if state.get("result_ref") or state.get("interpretation_ref"):
+            if _completed_outer_authority(root, state) is None:
+                raise AIProposalRejected("completed outer evidence chain incomplete")
         return None
 
     freeze_rel = (
@@ -324,6 +370,7 @@ def _validate_authoritative_data_contract(root: Path, proposal: Mapping[str, Any
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)
     _validate_authoritative_data_contract(root, proposal)
+    _reject_completed_outer_as_unseen(root, proposal)
     basis = proposal.get("basis") or {}
     basis_head = _nonempty(basis.get("research_head"), "basis.research_head")
     if not _is_ancestor(root, basis_head):
