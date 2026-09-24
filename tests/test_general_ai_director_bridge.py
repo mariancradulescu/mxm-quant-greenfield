@@ -14,6 +14,7 @@ from research_v3.general_ai_director_bridge import (
     _validate_authoritative_data_contract,
     _active_authoritative_data_contract,
     _reject_completed_outer_as_unseen,
+    _reject_duplicate_accepted_capture,
     compile_runtime_plan,
     drain,
     materialize_proposal,
@@ -248,6 +249,30 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         proposal["data_policy"]["minimal_acquisition_request"]["source_domain"] = "YAHOO_FINANCE"
         with self.assertRaisesRegex(AIProposalRejected, "broker-native"):
             validate_proposal_shape(proposal)
+
+    def test_accepted_structural_capture_cannot_be_requested_again(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); state = self._outer_fixture(root, completed=True)
+            plan_ref = "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json"
+            capture_ref = "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json"
+            report_ref = "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json"
+            for rel in (plan_ref, capture_ref, report_ref):
+                dest = root / rel
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(Path(rel), dest)
+            state.update(completed_capture_plan_ref=plan_ref, completed_capture_ref=capture_ref,
+                         completed_structural_report_ref=report_ref)
+            (root / "research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").write_text(json.dumps(state))
+            plan = json.loads((root / plan_ref).read_text())
+            proposal = self._new_broker_native_scope()
+            request = proposal["data_policy"]["minimal_acquisition_request"]
+            request.update(symbols=[x["broker_symbol"] for x in plan["symbols"]],
+                           resolution=plan["resolution"], start_utc=plan["interval"]["start_utc"],
+                           end_utc=plan["interval"]["end_utc"])
+            with self.assertRaisesRegex(AIProposalRejected, "already accepted and screened"):
+                _reject_duplicate_accepted_capture(root, proposal)
+            request["symbols"] = ["DIFFERENT_BROKER_NATIVE_SYMBOL"]
+            _reject_duplicate_accepted_capture(root, proposal)
 
     def test_state_transition_preserves_outer_economics_and_attempts(self):
         with tempfile.TemporaryDirectory() as td:
