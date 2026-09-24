@@ -1,0 +1,89 @@
+{
+  "schema": "mxm.greenfield.breakout-fade-neth25-transaction-local-cost-capture-acceptance.v1",
+  "status": "ACCEPTED_HASH_VERIFIED_INDEPENDENT_PRE_OUTCOME_COST_AND_M5_CAPTURE",
+  "accepted_utc": "2026-09-24T18:59:00Z",
+  "source": {
+    "external_name": "MXM_BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_V1.zip",
+    "zip_sha256": "801b863d396a117d787b73dd673003cf79a4c9ffa178a38d0c928aba241243f0",
+    "zip_size_bytes": 22477,
+    "plan_sha256": "2afa8dc853068442cd36e3f02653f034e21183e15e06745e023a561f59e238a9",
+    "tool_version": "MXM_BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_ANDROID_V1",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "source_environment": "Pepperstone - Europe LIVE"
+  },
+  "canonical_files": {
+    "capture_manifest.json": "dc8eec7f7bf8a5a9a56a595be5b59ea33110dc0eb4cd83d62fa017b45ff3d726",
+    "event_boundary_costs.csv": "82d27bd4df57f9635c27542f45592cf8fda1402a0cce2b780038ae6906a92418",
+    "historical_conversion_summary.json": "2f0e132b9d66293c07f197900a58f87b05f6ef9116479dd4a1e76b2a288c1c7c",
+    "stage_a_m5/NETH25_M5.csv": "ce7c370b5194846ccf969316e99e43b6bc5a49587b5f7f642b52b0fa0de4eb0a"
+  },
+  "duplicate_wrapper_audit": {
+    "status": "PASS_BYTE_IDENTICAL_DUPLICATES_IGNORED",
+    "duplicated_prefix": "MXM_BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_V1/",
+    "canonical_file_count": 5,
+    "all_duplicate_file_hashes_equal": true,
+    "semantic_capture_count": 1
+  },
+  "temporal_integrity": {
+    "development_authority_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_end_utc": "2026-09-13T23:59:59Z",
+    "independent_capture_start_utc": "2026-09-14T00:00:00Z",
+    "independent_capture_end_utc": "2026-09-17T11:56:00Z",
+    "event_analysis_end_utc": "2026-09-17T11:20:00Z",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "strictly_disjoint_from_development": true,
+    "strictly_pre_protected_forward": true,
+    "protected_evidence_opened": false
+  },
+  "m5_integrity": {
+    "symbol": "NETH25",
+    "symbol_id": 269,
+    "row_count": 575,
+    "first_timestamp_utc": "2026-09-14T06:00:00Z",
+    "last_timestamp_utc": "2026-09-17T11:50:00Z",
+    "timestamps_strictly_increasing": true,
+    "request_interval_exhausted": true,
+    "completion_reason": "FROM_BOUNDARY_REACHED",
+    "identical_duplicate_count": 0,
+    "conflicts": 0,
+    "lower_boundary_overfetch_bars_clipped": 4424
+  },
+  "event_and_cost_integrity": {
+    "frozen_event_law_reproduced_exactly": true,
+    "events_detected": 18,
+    "transaction_local_cost_resolved": 16,
+    "transaction_local_cost_unresolved": 2,
+    "resolved_fraction": 0.8888888888888888,
+    "unresolved_event_bar_times_utc": [
+      "2026-09-14T19:25:00Z",
+      "2026-09-14T19:35:00Z"
+    ],
+    "resolved_roundtrip_cost_price_equivalent": {
+      "min": 0.16999999999995907,
+      "median": 0.24250000000000682,
+      "max": 0.7450000000000045
+    },
+    "all_resolved_entry_and_exit_quote_delays_within_60_seconds": true,
+    "favorable_imputation_used": false,
+    "current_or_future_conversion_substitution": false,
+    "commission_conversion_chain_count": 0,
+    "commission_window_rate_count": 0
+  },
+  "safety": {
+    "orders_placed": false,
+    "account_mutation": false,
+    "raw_ticks_transferred": false,
+    "raw_conversion_ticks_transferred": false,
+    "price_levels_transferred_in_cost_rows": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  },
+  "interpretation_boundary": "Capture and transaction-local cost evidence are accepted before any candidate-specific economic PnL/outcome is computed. Event timestamps and costs may be used to freeze a prospective independent-outer identity; return/PnL remains unopened at this acceptance boundary.",
+  "accounting": {
+    "v2_attempts_used": 19,
+    "v2_search_budget_remaining": 65,
+    "economic_outcomes_opened": 27
+  },
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "family_exhaustion_claimed": false
+}
