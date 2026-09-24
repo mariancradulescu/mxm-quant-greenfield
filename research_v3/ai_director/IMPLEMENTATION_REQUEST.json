@@ -1,12 +1,12 @@
 {
-  "basis_next_state_sha256": "f642c079ded68b5c6d66eadde7df9ca0c6e3151c3f82314b48741d0722dad88e",
-  "created_utc": "2026-09-24T12:36:49Z",
+  "basis_next_state_sha256": "b25ce528f37f9fd9d01a5cbb6f5391ebe631701df19869f6f1c1c196858a8492",
+  "created_utc": "2026-09-24T12:41:24Z",
   "exact_head": {
     "green": false,
-    "head": "68640dc6da311a042322eb95438732aef0681908",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "f01ff27716958ec721509220f2b347b4fca7baf0",
-    "predecessor_run_id": 35999854020
+    "head": "badc0f3dadfec812d3c035303e02148fe4928a33",
+    "predecessor_conclusion": "failure",
+    "predecessor_head": "badc0f3dadfec812d3c035303e02148fe4928a33",
+    "predecessor_run_id": 36000545574
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "next_state": {
@@ -27,6 +27,7 @@
       "v2_attempts_used": 19,
       "v2_search_budget_remaining": 65
     },
+    "ai_reasoning_required": false,
     "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
     "authorizing_evidence_epoch": 5,
     "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
@@ -75,10 +76,25 @@
     "family_exhaustion_claimed": false,
     "fresh_evidence_epoch_required": true,
     "implementation_executor": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+    "implementation_repair": {
+      "accepted_raw_data_invalidated": false,
+      "attempts_refunded": 0,
+      "classification": "DETERMINISTIC_IMPLEMENTATION_REPAIR_NO_RESEARCH_SEMANTIC_CHANGE",
+      "correction": "Use high >= max(open,close) and low <= min(open,close); tick_volume is excluded from the OHLC invariant.",
+      "economic_outcomes_opened_delta": 0,
+      "fresh_general_ai_required_for_repair": false,
+      "preserved_operation_id": "op_d441be66be3d6e2a05abd4012498d5d8",
+      "preserved_proposal_hash": "cd8eec4dda3e40f62457982ab7ac6c05a5fa2cda0549ee3a78ad45c42ff8fbca",
+      "preserved_proposal_id": "P-20260924-BREAKOUT-STRUCTURAL-GATE-01",
+      "protected_forward_opened": false,
+      "regression_test": "tests/test_adaptive_breadth_triage.py::test_univariate_gate_ohlc_validation_is_independent_of_tick_volume",
+      "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
+      "v2_attempts_consumed_delta": 0
+    },
     "interpretation_boundary": "Structural sufficiency is not economic evidence, promotion, or mechanism-family closure.",
     "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
     "market_data_capture_required": false,
-    "next_action": "EXECUTE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
+    "next_action": "VALIDATE_OHLC_VALIDATOR_REPAIR_THEN_EXECUTE_HASH_BOUND_UNIVARIATE_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
     "outer_authorization": "NONE",
     "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
     "outer_capture_integrity": {
@@ -193,7 +209,7 @@
       "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_ADAPTIVE_BREADTH_TRIAGE",
       "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
     },
-    "status": "NON_ECONOMIC_IMPLEMENTATION_COMPLETE_READY_FOR_EXECUTION",
+    "status": "RECOVERING_UNIVARIATE_STRUCTURAL_GATE_OHLC_VALIDATOR",
     "superseded_general_ai_proposal": {
       "economic_outcome_opened": false,
       "proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
@@ -250,6 +266,6 @@
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
-  "research_head": "68640dc6da311a042322eb95438732aef0681908",
+  "research_head": "badc0f3dadfec812d3c035303e02148fe4928a33",
   "schema": "mxm.greenfield.general-ai-implementation-request.v1"
 }
