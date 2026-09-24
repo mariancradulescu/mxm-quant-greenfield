@@ -1,0 +1,76 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "c728421556541d455288d50f564c88fb20cce463eb8d64a47c8912bb90af2de2",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "RUN_NON_ECONOMIC_CROSS_SYMBOL_PREREQUISITE_SCREEN",
+    "economic_effect": "NONE",
+    "families": [
+      "CROSS_MARKET_LEAD_LAG",
+      "CROSS_SECTIONAL_RANKING",
+      "RELATIVE_VALUE_COINTEGRATION"
+    ],
+    "implementation_semantics": {
+      "evaluate_mechanism_specific_event_availability": true,
+      "no_confirmatory_outer": true,
+      "no_economic_ranking": true,
+      "no_execution_simulation": true,
+      "no_family_exhaustion_claim": true,
+      "no_pnl": true,
+      "no_promotion": true,
+      "no_returns": true,
+      "no_symbol_substitution": true,
+      "reuse_only_accepted_hash_bound_bytes": true,
+      "verify_four_way_common_timestamps": true,
+      "verify_pairwise_overlap_and_causal_lag_windows": true
+    },
+    "interval": {
+      "end_utc": "2026-09-13T23:59:59Z",
+      "start_utc": "2026-07-20T00:00:00Z"
+    },
+    "resolution": "M5",
+    "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+    "symbols": [
+      "AUDJPY",
+      "AUS200",
+      "Brent-F",
+      "BCHUSD"
+    ],
+    "universe_judgment": {
+      "accepted_40_representatives_sufficient_for_mechanism_specific_outer": false,
+      "accepted_40_representatives_sufficient_for_next_decision": true,
+      "additional_broader_prospective_exploration_expected_information_gain": "POSITIVE_AFTER_THIS_PREREQUISITE_SCREEN",
+      "broader_eligible_universe_remains_open": true,
+      "reason": "The existing four-series capture resolves a previously missing alignment prerequisite at lower cost than a new capture; broader exploration should resume only after its diagnostic outcome, and structural representatives are not economic equivalents."
+    }
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "account_mutation": "NOT_AUTHORIZED",
+    "authorizing_evidence_epoch": 8,
+    "broader_universe": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+    "data_requirement": "NO_NEW_MARKET_DATA",
+    "next_action": "Materialize the deterministic prerequisite diagnostics from the accepted AUDJPY/AUS200/Brent-F/BCHUSD capture, then reassess the highest-information prospective mechanism-specific action without opening an economic identity.",
+    "outer": "NOT_AUTHORIZED",
+    "promotion": "NOT_AUTHORIZED",
+    "research_judgment_required": false,
+    "research_scope": "Four-symbol broker-native M5 cross-symbol alignment and event-availability diagnostics",
+    "status": "NON_ECONOMIC_CROSS_SYMBOL PREREQUISITE SCREEN AUTHORIZED"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Use the accepted four-series broker-native M5 capture to evaluate the minimum prerequisites for cross-market lead-lag, cross-sectional ranking, and relative-value cointegration without opening economics.",
+    "information_gain_rationale": "The 40-series structural triage used strict global endpoint alignment and therefore could not resolve cross-symbol feasibility. The accepted AUDJPY, AUS200, Brent-F, and BCHUSD capture has verified four-way M5 overlap, chronology, and integrity, so a deterministic event-availability and alignment screen can resolve the immediate dependency without new market data, parameter mining, returns, PnL, or an outer outcome."
+  },
+  "operation_id": "op_a58a16d48d62ce42b9dfb1847a1b6f77",
+  "proposal_hash": "85b5508fa8bc7cc0b9b50e506b6955b55b19017fabff46fd8d368118a5e83dbc",
+  "proposal_id": "P-20260924-CROSSALIGN-FOUR-PREREQUISITE-03",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_433032cb0ebf4a84b67553d0504d8fb9.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
