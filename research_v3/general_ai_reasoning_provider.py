@@ -442,6 +442,8 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         except Exception as exc:
             correction=f"{type(exc).__name__}: {exc}"
             errors.append({"model":model,"attempt":attempt+1,"error":correction})
+            if "monthly quota" in correction.lower() or "exceeded your quota" in correction.lower():
+                raise AIReasoningProviderError("monthly quota exhausted; no duplicate provider retries") from exc
     if proposal is None:
         gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"PROVIDER_RETRY_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"errors":errors[-8:],"created_utc":iso()}
         atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_provider_retry",None)
