@@ -1,14 +1,14 @@
 {
-  "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
-  "changed_paths": [
-    "research_v3/cross_market_lead_lag_screen.py",
-    "research_v3/ai_director/IMPLEMENTATION_RESPONSE.json",
-    "tests/test_cross_market_lead_lag_screen.py"
-  ],
-  "created_utc": "2026-09-24T17:42:15Z",
-  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
-  "implementation_output": {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "198e985e55f4436a0550f5ccddb6aec74c597a26",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "198e985e55f4436a0550f5ccddb6aec74c597a26",
+    "predecessor_run_id": 36036364323
+  },
+  "accepted_output": {
     "decision": {
+      "byte_verified_library_file_id": "libfile_31e78fbe86888191a6f75d22c04467c6",
       "changed_paths": [
         "research_v3/cross_market_lead_lag_screen.py",
         "tests/test_cross_market_lead_lag_screen.py"
@@ -32,8 +32,78 @@
         "Brent-F",
         "BCHUSD"
       ],
-      "v2_attempts_consumed": 0,
-      "byte_verified_library_file_id": "libfile_31e78fbe86888191a6f75d22c04467c6"
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "cross-market-lead-lag-screen-v2",
+    "next_research_state": {
+      "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_BYTE_VERIFIED_9475_PAIR_SCREEN",
+      "status": "EXACT_HEAD_VALIDATION_REQUIRED"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Fail-closed correction from the authoritative accepted ZIP bytes: SHA256 db4ec267...18fed9 contains 9558 four-way common timestamps and 9475 strictly consecutive common M5 pairs. The 9539/9455 values belong to the superseded CROSSALIGN capture and must not be applied to the accepted disjoint ZIP. No recapture, economic outcome, protected-forward opening, or V2 attempt is involved.",
+    "tests_requested": [
+      "tests/test_cross_market_lead_lag_screen.py",
+      "tests/test_crossalign_four_symbol_capture.py",
+      "tests/test_general_ai_implementation_executor.py"
+    ]
+  },
+  "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
+  "byte_validation": {
+    "accepted_evidence_invalidated": false,
+    "classification": "AUTHORITATIVE_ACCEPTED_CAPTURE_DIRECT_BYTE_VALIDATION",
+    "common_timestamps": 9558,
+    "economic_outcomes_opened_delta": 0,
+    "external_recapture_required": false,
+    "library_file_id": "libfile_31e78fbe86888191a6f75d22c04467c6",
+    "per_symbol_rows": {
+      "AUDJPY": 11484,
+      "AUS200": 9705,
+      "BCHUSD": 16099,
+      "Brent-F": 10139
+    },
+    "strictly_consecutive_m5_pairs": 9475,
+    "superseded_crossalign_counts_rejected": {
+      "common_timestamps": 9539,
+      "strictly_consecutive_m5_pairs": 9455
+    },
+    "v2_attempts_consumed_delta": 0,
+    "zip_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9"
+  },
+  "changed_paths": [
+    "research_v3/cross_market_lead_lag_screen.py",
+    "research_v3/ai_director/IMPLEMENTATION_RESPONSE.json",
+    "tests/test_cross_market_lead_lag_screen.py"
+  ],
+  "created_utc": "2026-09-24T17:42:15Z",
+  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+  "implementation_output": {
+    "decision": {
+      "byte_verified_library_file_id": "libfile_31e78fbe86888191a6f75d22c04467c6",
+      "changed_paths": [
+        "research_v3/cross_market_lead_lag_screen.py",
+        "tests/test_cross_market_lead_lag_screen.py"
+      ],
+      "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
+      "economic_outcomes_opened": 0,
+      "expected_common_timestamps": 9558,
+      "expected_consecutive_pairs": 9475,
+      "live_orders_authorized": false,
+      "new_market_data_required": false,
+      "ordered_pairs": 12,
+      "protected_forward_opened": false,
+      "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
+      "research_family": "CROSS_MARKET_LEAD_LAG",
+      "resolution": "M5",
+      "source_capture_ref": "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
+      "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
+      "symbols": [
+        "AUDJPY",
+        "AUS200",
+        "Brent-F",
+        "BCHUSD"
+      ],
+      "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
     "implementation_id": "cross-market-lead-lag-screen-v2",
@@ -65,26 +135,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN",
-  "byte_validation": {
-    "classification": "AUTHORITATIVE_ACCEPTED_CAPTURE_DIRECT_BYTE_VALIDATION",
-    "library_file_id": "libfile_31e78fbe86888191a6f75d22c04467c6",
-    "zip_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
-    "per_symbol_rows": {
-      "AUDJPY": 11484,
-      "AUS200": 9705,
-      "Brent-F": 10139,
-      "BCHUSD": 16099
-    },
-    "common_timestamps": 9558,
-    "strictly_consecutive_m5_pairs": 9475,
-    "superseded_crossalign_counts_rejected": {
-      "common_timestamps": 9539,
-      "strictly_consecutive_m5_pairs": 9455
-    },
-    "accepted_evidence_invalidated": false,
-    "external_recapture_required": false,
-    "economic_outcomes_opened_delta": 0,
-    "v2_attempts_consumed_delta": 0
-  }
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
