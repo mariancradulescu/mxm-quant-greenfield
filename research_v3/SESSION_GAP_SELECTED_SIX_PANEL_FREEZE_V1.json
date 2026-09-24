@@ -1,0 +1,86 @@
+{
+  "schema": "mxm.greenfield.session-gap-selected-six-panel-freeze.v1",
+  "status": "FROZEN_PROSPECTIVE_NON_ECONOMIC_METHODOLOGY",
+  "source_result_ref": "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json",
+  "source_capture_acceptance_ref": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+  "source_canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
+  "mechanism_family": "SESSION_GAP_REVERSION",
+  "panel": {
+    "symbols": [
+      "MXNJPY",
+      "USDCAD",
+      "EURUSD",
+      "IWM.US",
+      "TLT.US",
+      "NVDA.US-24"
+    ],
+    "selection_rule": "Fixed before any panel-level outer outcome; retain heterogeneous positive, mixed, and negative/control structural cases. Do not rank, discard, or replace symbols using panel outcomes.",
+    "asset_exposure": {
+      "positive_structural_cases": [
+        "MXNJPY",
+        "USDCAD",
+        "EURUSD"
+      ],
+      "mixed_or_neutral_case": [
+        "IWM.US"
+      ],
+      "negative_or_control_cases": [
+        "TLT.US",
+        "NVDA.US-24"
+      ]
+    }
+  },
+  "data_scope": {
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-07-20T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "development_only": true,
+    "source_bytes_are_existing_accepted_capture": true,
+    "protected_forward_start_not_used": true,
+    "no_new_market_data_required": true
+  },
+  "causal_methodology": {
+    "gap_definition": "Consecutive observed bars separated by at least 30 minutes; no synthetic bars or forward fill.",
+    "prior_scale_window_exact_m5_returns": 288,
+    "minimum_scale_observations": 144,
+    "shock_scale_multiple": 3.0,
+    "admission": "Use only rows observed before the signal; admit a shock only when the prior scale is available and finite.",
+    "entry": "Next observed M5 open at or after signal time plus one M5 decision delay.",
+    "measurement_horizon_minutes": 60,
+    "exit": "First observed open at or after the scheduled measurement target.",
+    "overlap": "At most one active measurement per symbol; no synthetic fill and no same-symbol overlap.",
+    "right_censoring": "Pending or active observations without a valid exit remain reported as censored and are excluded from settled response summaries."
+  },
+  "analysis_discipline": {
+    "primary_outputs": [
+      "gap-event counts and chronology/coverage",
+      "settled directional response distribution by symbol",
+      "response persistence by symbol and asset class",
+      "heterogeneity and dependence diagnostics",
+      "cost-hurdle readiness assessment"
+    ],
+    "aggregation": "Report per-symbol distributions first; report the panel aggregate only as descriptive, sample-weighted structural information.",
+    "multiple_testing": "Treat all six symbols and all exploratory summaries as descriptive structural tests; do not select an economic identity or claim significance from unadjusted outcomes. Any later confirmatory claim requires a separately frozen correction and prospective outer evaluation.",
+    "tie_break": "If a descriptive ordering is required, sort by settled sample count, active-week coverage, then median directional response; ties resolve by broker symbol lexicographic order. This ordering cannot alter panel membership.",
+    "minimum_coverage": {
+      "minimum_active_weeks_per_symbol": 6,
+      "minimum_schedule_adjusted_observation_coverage": 0.97,
+      "maximum_unresolved_chronology_conflicts": 0
+    }
+  },
+  "economic_boundary": {
+    "cost_hurdle_applied": false,
+    "notional_pnl_computed": false,
+    "shared_account_realization": false,
+    "economic_candidate_identity_created": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "mechanism_family_closed": false,
+    "exact_c031_rerun": false
+  }
+}

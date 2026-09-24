@@ -1,57 +1,45 @@
 {
   "basis_next_state_sha256": "2089c5162438ee8050af2563bff2ffdda7c17705c3c1cb6a1e3905d3d35cab33",
-  "changed_paths": [],
-  "created_utc": "2026-09-24T05:31:49Z",
-  "exact_head": {
-    "green": false,
-    "head": "8ba6281bec6e53ddd454418ea11ca8677523f98a",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "fac9855e73b4b322eda773d03851f34b83894332",
-    "predecessor_run_id": 35960174770
-  },
+  "changed_paths": [
+    "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+    "tests/test_session_gap_selected_six_panel_freeze.py"
+  ],
+  "created_utc": "2026-09-24T05:32:59Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V1",
   "implementation_output": {
     "decision": {
-      "canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
-      "capture_acceptance_ref": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
-      "capture_plan_ref": "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json",
-      "collector_ref": "research_v3/c031_structural_extension_capture.py",
-      "economic_effect": {
-        "economic_candidate_identity_created": false,
-        "economic_outcomes_opened": 0,
-        "v2_attempts_consumed": 0
-      },
-      "freeze_ref": "research_v3/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_FREEZE_V1.json",
-      "implementation_changes_required": false,
-      "methodology_ref": "research_v3/session_gap_structural_screen_v1.py",
-      "safety": {
-        "competition_start_authorized": false,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false
-      },
-      "scope": {
-        "exact_c031_rerun": false,
-        "global_universe_claim": false,
-        "interval": {
-          "end_utc": "2026-09-13T23:59:59Z",
-          "start_utc": "2026-07-20T00:00:00Z"
-        },
-        "mechanism_family_closed": false,
-        "resolution": "M5",
-        "symbol_count": 12
-      }
+      "competition_start_authorized": false,
+      "economic_candidate_identity_created": false,
+      "economic_outcomes_opened": 0,
+      "exact_c031_rerun": false,
+      "live_orders_authorized": false,
+      "mechanism_family_closed": false,
+      "methodology_ref": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+      "new_market_data_required": false,
+      "protected_forward_opened": false,
+      "selected_symbols": [
+        "MXNJPY",
+        "USDCAD",
+        "EURUSD",
+        "IWM.US",
+        "TLT.US",
+        "NVDA.US-24"
+      ],
+      "source_canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
+      "test_ref": "tests/test_session_gap_selected_six_panel_freeze.py",
+      "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "c031-structural-extension-non-economic-screen-v1",
+    "implementation_id": "c031-structural-extension-selected-six-panel-freeze-v1",
     "next_research_state": {
-      "next_action": "COMPILE_AND_VALIDATE_THE_FROZEN_METHODOLOGY_FOR_THE_SELECTED_SIX_SYMBOL_PANEL_USING_EXISTING_CAPTURED_DATA_ONLY",
-      "status": "READY_FOR_FROZEN_METHODOLOGY_COMPILATION_AND_VALIDATION"
+      "next_action": "VALIDATE_THE_FROZEN_SELECTED_SIX_PANEL_METHODOLOGY_ON_THE_CURRENT_EXACT_HEAD_WITHOUT_OPENING_ECONOMICS",
+      "status": "PENDING_EXACT_HEAD_GREEN"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The repository already implements the frozen SESSION_GAP_REVERSION structural screen, its read-only minimal collector, exact 12-symbol M5 capture plan, canonical capture validation, causal chronology controls, and non-economic safety gates. The authenticated data dependency is satisfied by the accepted canonical capture; no code, test, manifest, or evidence edits are required.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a frozen non-economic specification for the selected six-symbol SESSION_GAP_REVERSION panel using existing accepted M5 capture bytes. The specification fixes panel membership, causal chronology, coverage thresholds, descriptive aggregation, multiple-testing discipline, and all economic/safety boundaries without requiring new market data.",
     "tests_requested": [
-      "tests/test_session_gap_structural_extension_wave01.py",
-      "tests/test_c031_structural_extension_capture.py"
+      "python -m unittest tests/test_session_gap_selected_six_panel_freeze.py",
+      "python -m unittest tests/test_session_gap_structural_extension_wave01.py tests/test_c031_structural_extension_capture.py"
     ]
   },
   "project_snapshot": {
@@ -70,5 +58,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
