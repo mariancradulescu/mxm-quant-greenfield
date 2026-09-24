@@ -1,4 +1,43 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "e4c20e292f618f0cb12307055dd34f117009a579",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "e4c20e292f618f0cb12307055dd34f117009a579",
+    "predecessor_run_id": 36018502807
+  },
+  "accepted_output": {
+    "decision": {
+      "action": "MATERIALIZE_NON_ECONOMIC_BREAKOUT_EVENT_AVAILABILITY_GATE",
+      "broader_universe_remains_open": true,
+      "economic_outcomes_opened": 0,
+      "family_exhaustion_claimed": false,
+      "implementation_ref": "research_v3/adaptive_breadth_triage.py",
+      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "protected_forward_opened": false,
+      "regression_test_ref": "tests/test_adaptive_breadth_triage.py::test_breakout_event_gate_is_causal_and_non_economic",
+      "source_capture": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+      "source_plan": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "mxm-breakout-event-availability-gate-v1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
+      ],
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a hash-bound, non-economic breakout/volatility-expansion availability gate for the accepted 40-symbol M5 development capture. The gate uses 12 consecutive prior M5 bars, detects rolling high/low breaks with current-range expansion, records causal event counts, spacing, clustering, missing-history exclusions, and chronology, and performs no returns, PnL, ranking, promotion, order, or economic identity work.",
+    "tests_requested": [
+      "python -m unittest tests.test_adaptive_breadth_triage",
+      "python -m unittest tests.test_general_ai_implementation_executor"
+    ]
+  },
   "basis_next_state_sha256": "99e46570a0ce7a3bcd6da5008f083b94acacf91350f7a31500d02272d6dc5548",
   "changed_paths": [
     "research_v3/adaptive_breadth_triage.py",
@@ -53,5 +92,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
