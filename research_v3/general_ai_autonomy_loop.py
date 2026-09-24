@@ -133,7 +133,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                     raise
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
-                return {"status":"PROVIDER_RETRY_REQUIRED","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+                return {"status":recovery["status"],"cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
                 return {"status":out["status"],"cycles":cycle,"trace":trace,"result":out}
