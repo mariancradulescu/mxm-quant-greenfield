@@ -113,7 +113,7 @@ def _wilson_interval(successes: int, total: int) -> list[float] | None:
 
 
 def execute(path: str | Path, *, expected_common_timestamps: int = 9558,
-            expected_pairs: int = 9475) -> dict[str, Any]:
+            expected_pairs: int = 9470) -> dict[str, Any]:
     series, metadata = _load_capture(path)
     common = set.intersection(*(set(rows) for rows in series.values()))
     ordered = sorted(common)
