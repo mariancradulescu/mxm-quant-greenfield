@@ -1,0 +1,117 @@
+{
+  "schema": "mxm.greenfield.crossalign-four-symbol-prerequisite-gate.v1",
+  "status": "COMPLETE_NON_ECONOMIC_STRUCTURAL_PREREQUISITE_SCREEN",
+  "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
+  "source_ai_proposal_id": "P-20260924-CROSSALIGN-FOUR-PREREQUISITE-03",
+  "source_runtime_operation_id": "op_a58a16d48d62ce42b9dfb1847a1b6f77",
+  "authorized_symbols": [
+    "AUDJPY",
+    "AUS200",
+    "Brent-F",
+    "BCHUSD"
+  ],
+  "per_symbol_diagnostics": {
+    "AUDJPY": {
+      "active_utc_dates": 48,
+      "chronology_invalid": 0,
+      "first_utc": "2026-07-20T00:00:00Z",
+      "grid_gap_events_24x7_reference": 23,
+      "grid_missing_bars_24x7_reference": 4653,
+      "last_utc": "2026-09-13T23:50:00Z",
+      "off_grid": 0,
+      "ohlc_invalid": 0,
+      "pagination": "FROM_BOUNDARY_REACHED",
+      "rows": 11474,
+      "sha256": "7020ac63bf30fbce17318907b9942a63bcb481c1ba184490117b976ffe0b0cde",
+      "symbol_id": 11
+    },
+    "AUS200": {
+      "active_utc_dates": 48,
+      "chronology_invalid": 0,
+      "first_utc": "2026-07-20T00:00:00Z",
+      "grid_gap_events_24x7_reference": 87,
+      "grid_missing_bars_24x7_reference": 6296,
+      "last_utc": "2026-09-13T23:50:00Z",
+      "off_grid": 0,
+      "ohlc_invalid": 0,
+      "pagination": "FROM_BOUNDARY_REACHED",
+      "rows": 9831,
+      "sha256": "b86fae0d8daae778c4a4cb7bf23b294d984dbe71af5829767dcc5b5aa47f3b90",
+      "symbol_id": 117
+    },
+    "BCHUSD": {
+      "active_utc_dates": 56,
+      "chronology_invalid": 0,
+      "first_utc": "2026-07-20T00:00:00Z",
+      "grid_gap_events_24x7_reference": 9,
+      "grid_missing_bars_24x7_reference": 60,
+      "last_utc": "2026-09-13T23:50:00Z",
+      "off_grid": 0,
+      "ohlc_invalid": 0,
+      "pagination": "FROM_BOUNDARY_REACHED",
+      "rows": 16067,
+      "sha256": "57a255b92d16a72d4f0c1b759f9e5f5a91e34347e705c0d91841f6e7df75ea74",
+      "symbol_id": 326
+    },
+    "Brent-F": {
+      "active_utc_dates": 47,
+      "chronology_invalid": 0,
+      "first_utc": "2026-07-20T00:00:00Z",
+      "grid_gap_events_24x7_reference": 40,
+      "grid_missing_bars_24x7_reference": 6124,
+      "last_utc": "2026-09-13T23:50:00Z",
+      "off_grid": 0,
+      "ohlc_invalid": 0,
+      "pagination": "FROM_BOUNDARY_REACHED",
+      "rows": 10003,
+      "sha256": "9dd1f8712571072f64c740498f8dbe0d2105ed011039ce10c0f505517046f5fc",
+      "symbol_id": 2923
+    }
+  },
+  "alignment": {
+    "four_way_common_m5_timestamps": 9539,
+    "four_way_adjacent_common_m5_pairs": 9455,
+    "union_m5_timestamps": 16068,
+    "pairwise_common_m5_timestamps": {
+      "AUDJPY|AUS200": 9831,
+      "AUDJPY|BCHUSD": 11474,
+      "AUDJPY|Brent-F": 10002,
+      "AUS200|BCHUSD": 9831,
+      "AUS200|Brent-F": 9539,
+      "Brent-F|BCHUSD": 10002
+    }
+  },
+  "per_family": {
+    "CROSS_MARKET_LEAD_LAG": {
+      "chronological_common_history": "AVAILABLE",
+      "causal_one_bar_lag_common_pairs": 9455,
+      "mechanism_event_law": "UNDEFINED",
+      "economic_outcomes": "UNOPENED"
+    },
+    "CROSS_SECTIONAL_RANKING": {
+      "simultaneous_four_symbol_bars": 9539,
+      "stable_fixed_panel": "FOUR_SERIES_OBSERVED",
+      "rank_signal_law": "UNDEFINED",
+      "economic_outcomes": "UNOPENED"
+    },
+    "RELATIVE_VALUE_COINTEGRATION": {
+      "simultaneous_four_symbol_bars": 9539,
+      "product_comparability": "UNRESOLVED",
+      "stationarity_or_cointegration_test": "NOT_RUN",
+      "economic_outcomes": "UNOPENED"
+    }
+  },
+  "limitations": [
+    "24x7 grid gaps do not establish missing broker-session bars",
+    "Cross-symbol alignment does not imply statistical predictability or economic equivalence",
+    "Four sampled products do not narrow the open 1578-symbol universe",
+    "Development observations cannot be reused as prospective outer outcomes"
+  ],
+  "next_research_decision": "Fresh General AI must choose and freeze the smallest prospective mechanism-specific screen or justify a minimal broker-native extension. No economic outer is authorized here.",
+  "accounting_delta": {
+    "v2_attempts_used": 0,
+    "economic_outcomes_opened": 0
+  },
+  "protected_forward_opened": false
+}
