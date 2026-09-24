@@ -5,12 +5,61 @@ from pathlib import Path
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import drain
-from research_v3.general_ai_implementation_executor import execute as implement, implementation_required
-from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required
-from research_v3.runtime_v2_primitives import load_json, atomic_write_json
+from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
+from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
+from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 
-VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V1"
+VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
+PROVIDER_RECOVERY_REL=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
+
+def _recoverable_provider_failure(exc: Exception) -> bool:
+    detail=f"{type(exc).__name__}: {exc}".lower()
+    markers=(
+        "monthly quota",
+        "quota",
+        "rate limit",
+        "rate-limit",
+        "too many requests",
+        "http 429",
+        "status 429",
+        "temporarily unavailable",
+        "service unavailable",
+        "copilot implementation failed",
+        "copilot cli failed",
+        "all configured general reasoning attempts failed",
+    )
+    if isinstance(exc, AIReasoningProviderError):
+        return True
+    if isinstance(exc, ImplementationRejected):
+        return any(marker in detail for marker in markers)
+    return False
+
+def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_checkpoint: bool, git_push: bool) -> dict:
+    state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
+    prior=dict(load_json(root/PROVIDER_RECOVERY_REL,{}) or {})
+    attempts=int(prior.get("consecutive_recoverable_failures") or 0)+1
+    payload={
+        "schema":"mxm.greenfield.provider-recovery-state.v1",
+        "status":"PROVIDER_RETRY_REQUIRED",
+        "provider":"github-copilot-cli",
+        "failure_class":type(exc).__name__,
+        "phase":phase,
+        "detail":str(exc)[-1600:],
+        "consecutive_recoverable_failures":attempts,
+        "current_evidence_epoch":state.get("current_research_evidence_epoch"),
+        "pending_status":state.get("status"),
+        "pending_next_action":state.get("next_action"),
+        "user_action_required":False,
+        "economic_outcomes_opened_delta":0,
+        "v2_attempts_consumed_delta":0,
+        "search_budget_change":0,
+        "retry_policy":"RETRY_ON_NEXT_LIVENESS_WAKE_WITHOUT_MUTATING_RESEARCH_STATE",
+        "updated_utc":iso(),
+    }
+    atomic_write_json(root/PROVIDER_RECOVERY_REL,payload)
+    GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_provider_recovery",None)
+    return payload
 
 def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
     root=Path(root_value).resolve(); trace=[]
@@ -25,12 +74,26 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
         if state.get("user_action_required") is True:
             return {"status":"EXTERNAL_USER_ACTION_REQUIRED","cycles":cycle-1,"trace":trace,"next_state":state}
         if reasoning_required(state):
-            r=reason(root,git_checkpoint=git_checkpoint,git_push=git_push)
+            try:
+                r=reason(root,git_checkpoint=git_checkpoint,git_push=git_push)
+            except Exception as exc:
+                if not _recoverable_provider_failure(exc):
+                    raise
+                recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_REASONING",git_checkpoint=git_checkpoint,git_push=git_push)
+                trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_REASONING","recovery":recovery})
+                return {"status":"PROVIDER_RETRY_REQUIRED","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             d=drain(root,git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
             continue
         if implementation_required(state):
-            out=implement(root,git_checkpoint=git_checkpoint,git_push=git_push)
+            try:
+                out=implement(root,git_checkpoint=git_checkpoint,git_push=git_push)
+            except Exception as exc:
+                if not _recoverable_provider_failure(exc):
+                    raise
+                recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=git_checkpoint,git_push=git_push)
+                trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
+                return {"status":"PROVIDER_RETRY_REQUIRED","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
                 return {"status":out["status"],"cycles":cycle,"trace":trace,"result":out}

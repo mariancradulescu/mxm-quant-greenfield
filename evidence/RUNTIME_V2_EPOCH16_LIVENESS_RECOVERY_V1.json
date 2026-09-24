@@ -1,0 +1,29 @@
+{
+  "schema": "mxm.greenfield.runtime-v2-liveness-recovery.v1",
+  "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+  "incident": "EPOCH16_PROVIDER_QUOTA_LIVENESS_FAILURE",
+  "observed_failed_run_id": 36038741648,
+  "failed_step": "Continue general AI reasoning and implementation autonomously",
+  "root_cause": {
+    "immediate": "GitHub Copilot CLI implementation transport returned monthly quota exhaustion; general_ai_autonomy_loop propagated ImplementationRejected and the Sentinel job failed.",
+    "secondary": "Scheduled GitHub Actions is best-effort and observed schedule runs were materially delayed, so cron alone cannot be treated as a punctual recovery guarantee.",
+    "research_integrity_effect": "NONE",
+    "accounting_effect": "NONE"
+  },
+  "durable_fix": [
+    "Classify only provider quota/rate-limit/service-unavailable failures as recoverable.",
+    "Persist PROVIDER_RETRY_REQUIRED checkpoint with unchanged pending research state and zero accounting deltas.",
+    "Return process success so Sentinel can complete and future wake paths can retry.",
+    "Keep semantic/integrity ImplementationRejected failures fatal.",
+    "Add redundant wake triggers on default-branch workflow without changing research semantics."
+  ],
+  "preserved": {
+    "evidence_epoch": 16,
+    "v2_attempts_used": 19,
+    "v2_search_budget_remaining": 65,
+    "economic_outcomes_opened": 27,
+    "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES"
+  },
+  "exact_head_validation_required": true,
+  "user_action_required": false
+}
