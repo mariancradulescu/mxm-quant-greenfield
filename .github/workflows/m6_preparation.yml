@@ -457,3 +457,26 @@ jobs:
           path: dist/MXM_PERFORMANCE_RESEARCH_V3_WAVE02_SOURCE.zip
           if-no-files-found: error
           retention-days: 30
+
+      - name: Crossalign four-symbol M5 read-only preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from research_v3.pydroid_crossalign_four_symbol_launcher import local_preflight
+          r = local_preflight()
+          assert r['symbols'] == 4 and r['resolution'] == 'M5', r
+          assert r['network_connection_attempted'] is False and r['credentials_used'] is False, r
+          assert r['orders_permitted'] is False and r['account_mutation_permitted'] is False, r
+          assert r['economic_outcomes_opened'] is False and r['v2_attempts_consumed'] == 0, r
+          print('CROSSALIGN_FOUR_SYMBOL_PREFLIGHT_PASS', r)
+          PY
+      - name: Build deterministic crossalign four-symbol capture package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_crossalign_four_symbol_capture_package.py
+          sha256sum dist/MXM_CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PACKAGE_V1.zip
+      - name: Upload crossalign four-symbol capture package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PACKAGE_V1
+          path: dist/MXM_CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PACKAGE_V1.zip
+          if-no-files-found: error
+          retention-days: 30
