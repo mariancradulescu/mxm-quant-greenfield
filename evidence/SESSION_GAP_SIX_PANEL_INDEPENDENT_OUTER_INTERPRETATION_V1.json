@@ -1,0 +1,34 @@
+{
+  "schema": "mxm.greenfield.session-gap-six-panel-independent-outer-interpretation.v1",
+  "status": "OUTER_INTERPRETED_NO_ECONOMIC_PROMOTION",
+  "source_result_ref": "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
+  "source_capture_acceptance_ref": "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
+  "source_freeze_ref": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+  "confirmatory_facts": {
+    "holm_rejections": 1,
+    "confirmed_symbol": "MXNJPY",
+    "confirmed_symbol_nonzero_signs": "13 positive / 0 negative",
+    "confirmed_symbol_raw_p": 0.0001220703125,
+    "other_symbols_holm_rejected": false,
+    "panel_aggregate_descriptive_only": true
+  },
+  "friction_overlay": {
+    "MXNJPY": "FRICTION_FAIL",
+    "USDCAD": "FRICTION_WATCH",
+    "EURUSD": "FRICTION_PASS",
+    "IWM.US": "FRICTION_FAIL",
+    "TLT.US": "FRICTION_FAIL",
+    "NVDA.US-24": "FRICTION_FAIL",
+    "authority_state_all_symbols": "FULL_FRICTION_RESOLVED"
+  },
+  "decision": {
+    "economic_promotion_now": false,
+    "reason": "The only familywise-confirmed structural member is MXNJPY, but its prospectively captured broker-realistic friction state is FRICTION_FAIL. The other five fixed-panel members do not pass the frozen Holm-Bonferroni confirmatory test. This does not justify opening a new economic identity from this six-panel result.",
+    "mechanism_family_closed": false,
+    "reason_family_not_closed": "This first independent outer applies only to the frozen six-symbol panel selected from Wave01. The broker-native feasible universe remains much broader, so failure or friction on this panel cannot establish family-wide exhaustion.",
+    "exact_c031_rerun": false,
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0
+  },
+  "next_action": "GENERAL_AI_SELECT_HIGHEST_INFORMATION_NON_ECONOMIC_NEXT_ACTION_FROM_THE_BROADER_BROKER_NATIVE_UNIVERSE_WITHOUT_REUSING_THIS_OUTER_AS_A_NEW_CONFIRMATORY_DATASET"
+}
