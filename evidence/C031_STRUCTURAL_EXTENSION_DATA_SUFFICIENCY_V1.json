@@ -1,0 +1,81 @@
+{
+  "schema": "mxm.greenfield.c031-structural-extension-data-sufficiency.v1",
+  "status": "INSUFFICIENT_EXISTING_ACCEPTED_BYTES_EXTERNAL_READ_ONLY_CAPTURE_REQUIRED",
+  "assessed_against": {
+    "source_ai_proposal_id": "P-20260924-C031-GAP-WAVE-01",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-07-20T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "symbols": [
+      "USTN2YR-F",
+      "TLT.US",
+      "NVDA.US-24",
+      "VIX",
+      "HSTECH",
+      "ADAUSD",
+      "Gasoline",
+      "EURUSD",
+      "USDCAD",
+      "MXNJPY",
+      "IWM.US",
+      "DOTUSD"
+    ],
+    "required_fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  "accepted_current_broker_binding": {
+    "ref": "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
+    "external_artifact": "MXM_COMPETITION_BROKER_UNIVERSE_V2.zip",
+    "zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "selected_symbol_identity_count_verified": 12
+  },
+  "reusable_artifact_inspection": [
+    {
+      "artifact": "MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6.zip",
+      "sha256": "dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d",
+      "finding": "M5 bytes exist for 10 different Stage-A symbols; zero of the AI-selected 12 have exact required M5 series in this bundle."
+    },
+    {
+      "artifact": "MXM_G2_NONFX_STRUCTURAL_CAPTURE_EVIDENCE_V1_SEND_TO_CHATGPT.zip",
+      "sha256": "d408500a6cd86a6d5a3bae521934b6b97ed38a573b3cfbef2e544525c3d8eb6f",
+      "finding": "Contains H1 structural data including NVDA.US-24, not exact M5 and not the 12-symbol selected scope."
+    },
+    {
+      "artifact": "MXM_G2_WAVE07_BROAD_FRONTIER_STRUCTURAL_CAPTURE_EVIDENCE_V1_1_SEND_TO_CHATGPT.zip",
+      "sha256": "7bd8c5ecf51ca234af2b58fb5193687dccb269321afa1c621e8457bf4125823f",
+      "finding": "Contains D1/H1/H4 data for a different equity frontier, not the selected M5 scope."
+    },
+    {
+      "artifact": "EURUSD.zip",
+      "sha256": "c015aae1df786a0041da0db94ab074686c8e16771a01402e09a300cba2ddc104",
+      "finding": "Bid/ask tick archive overlaps the interval for EURUSD only; it does not satisfy the exact 12-symbol M5 OHLCV bundle requirement."
+    }
+  ],
+  "conclusion": {
+    "complete_selected_m5_series_available": 0,
+    "selected_symbols_required": 12,
+    "exact_external_capture_required": true,
+    "recapture_scope": "ONLY_AI_SELECTED_12_SYMBOLS_M5_8_WEEKS",
+    "old_16_symbol_multi_year_frontier_recapture_forbidden": true,
+    "user_selects_symbols_or_horizon": false
+  },
+  "required_capture_plan_ref": "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json",
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "new_v2_identity": false
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
