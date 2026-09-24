@@ -76,9 +76,9 @@ class AdaptiveBreadthTriageTests(unittest.TestCase):
 
     def test_univariate_gate_ohlc_validation_is_independent_of_tick_volume(self):
         raw = (
-            "time_utc,open,high,low,close,tick_volume\\n"
-            "2026-06-15T00:00:00Z,100,101,99,100.5,0\\n"
-            "2026-06-15T00:05:00Z,100.5,102,100,101.5,0\\n"
+            "time_utc,open,high,low,close,tick_volume\n"
+            "2026-06-15T00:00:00Z,100,101,99,100.5,0\n"
+            "2026-06-15T00:05:00Z,100.5,102,100,101.5,0\n"
         ).encode()
         start = datetime(2026, 6, 15, tzinfo=timezone.utc)
         end = datetime(2026, 6, 16, tzinfo=timezone.utc)
