@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.runtime-v2-liveness-recovery.v1",
-  "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+  "status": "RECOVERED_AND_PROVEN_LIVE",
   "incident": "EPOCH16_PROVIDER_QUOTA_LIVENESS_FAILURE",
   "observed_failed_run_id": 36038741648,
   "failed_step": "Continue general AI reasoning and implementation autonomously",
@@ -25,5 +25,34 @@
     "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES"
   },
   "exact_head_validation_required": true,
-  "user_action_required": false
+  "user_action_required": false,
+  "exact_head_green": {
+    "head": "2a8ae518e03857e8c24e2edc6931e84ac30cfd7e",
+    "workflow": "m6-preparation",
+    "run_id": 36041881620,
+    "conclusion": "success"
+  },
+  "live_proof": {
+    "event_driven_sentinel": {
+      "run_id": 36041993610,
+      "conclusion": "success"
+    },
+    "watchdog": {
+      "run_id": 36042107763,
+      "conclusion": "success",
+      "pending_detected": true,
+      "dispatch_succeeded": true
+    },
+    "watchdog_dispatched_sentinel": {
+      "run_id": 36042123195,
+      "conclusion": "success"
+    },
+    "provider_failure_checkpoint_head": "81b8a9b8cc44b46ed28a2d6b1651dad2ea804a85"
+  },
+  "fresh_reasoning_recovery": {
+    "evidence_epoch": 16,
+    "decision_ref": "research_v3/EPOCH16_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_DECISION_V1.json",
+    "status": "FRESH_REASONING_PERSISTED_AFTER_LIVENESS_RECOVERY",
+    "provider": "OpenAI GPT-5.6 Sol"
+  }
 }
