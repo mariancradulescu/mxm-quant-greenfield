@@ -12,7 +12,7 @@ from pathlib import Path
 from google.protobuf.json_format import MessageToDict
 
 from competition.ultra_fast_capture import QUOTE_TYPES
-from m6.cost_evidence import decode_ctrader_tick_page, next_tick_page_to_ms
+from m6.cost_evidence import DecodedTick, decode_ctrader_tick_page, next_tick_page_to_ms
 from m6.ctrader_capture import (
     CaptureContractError, MappingError, account_fingerprint, atomic_write_json,
     require_read_only_request,
@@ -86,18 +86,21 @@ def validate_plan(plan):
 
 
 def _bucket_ticks(ticks, start_ms, end_ms):
+    """Canonicalize decoded broker ticks; ambiguous same-ms prices cannot define OHLC."""
     buckets = {}
-    seen = set()
-    for tick in sorted(ticks, key=lambda item: (int(item.timestamp_ms), int(item.raw_tick))):
-        identity = (int(tick.timestamp_ms), int(tick.raw_tick))
-        if identity in seen:
-            continue
-        seen.add(identity)
-        timestamp = int(tick.timestamp_ms)
+    by_stamp = {}
+    for tick in ticks:
+        if not isinstance(tick, DecodedTick):
+            raise CaptureContractError("expected cTrader DecodedTick with raw_tick")
+        timestamp, raw_price = tick.timestamp_ms, tick.raw_tick
         if timestamp < start_ms or timestamp >= end_ms:
             continue
+        previous = by_stamp.setdefault(timestamp, raw_price)
+        if previous != raw_price:
+            raise CaptureContractError("conflicting quote observations at the same millisecond")
+    for timestamp, raw_price in sorted(by_stamp.items()):
         bucket = start_ms + ((timestamp - start_ms) // 300000) * 300000
-        buckets.setdefault(bucket, []).append(float(tick.price))
+        buckets.setdefault(bucket, []).append(raw_price / 100000.0)
     return buckets
 
 
@@ -157,7 +160,7 @@ class FrontierWave02CaptureRunner:
                 if not bool(response.hasMore): break
                 if not page: raise CaptureContractError("hasMore returned with an empty tick page")
                 next_to = next_tick_page_to_ms(page, current_from_ms=window_start, previous_oldest_ms=previous)
-                if next_to is None or next_to >= page_to: raise CaptureContractError("tick pagination did not advance")
+                if next_to is None or next_to >= page_to: raise CaptureContractError("tick pagination incomplete or did not advance")
                 previous = min(x.timestamp_ms for x in page); page_to = next_to
             window_start = window_end + 1
         return out

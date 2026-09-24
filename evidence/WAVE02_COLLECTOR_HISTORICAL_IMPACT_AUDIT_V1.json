@@ -1,0 +1,86 @@
+{
+  "schema": "mxm.greenfield.wave02-collector-historical-impact-audit.v1",
+  "status": "CODE_PATH_AUDIT_COMPLETE_PRIOR_OUTPUT_SEMANTICS_REQUIRE_TARGETED_VALIDATION",
+  "base_research_head": "85fe7241edf7b5e10c80a0e0470c41b689db5d42",
+  "defects": [
+    {
+      "defect": "Wave02 paginated decoded ticks appended backward before OHLC",
+      "path": "research_v3/session_gap_frontier_wave02_capture.py:_ticks -> align_bid_ask_m5",
+      "scope": "pre-capture only; no Wave02 ZIP returned",
+      "data_validity": "NOT_APPLICABLE",
+      "implementation_validity": "DEFECT_FIXED_PROSPECTIVELY"
+    },
+    {
+      "defect": "Wave02 generic session marker was not historical broker schedule",
+      "path": "Wave02 plan/manifest",
+      "scope": "current snapshot explicitly labeled historical_schedule_verified=false; structural screening must not treat it as historical truth",
+      "data_validity": "NOT_APPLICABLE"
+    }
+  ],
+  "code_path_tracing": [
+    {
+      "path": "m6/cost_evidence.py:decode_ctrader_tick_page",
+      "finding": "DecodedTick contains timestamp_ms and raw_tick; decoder reverses each newest-first page into chronological order."
+    },
+    {
+      "path": "competition/ultra_fast_capture.py:_ticks",
+      "finding": "Previous friction sampler already sorts and deduplicates across pages by timestamp_ms/raw_tick before causal_merge_bid_ask; does not use Wave02 OHLC aggregator. Raw friction ticks are not transferred."
+    },
+    {
+      "path": "competition/frontier_data_capture.py:normalize_m5; research_v3/c031_structural_extension_capture.py:_capture_one; competition/ultra_fast_capture.py:_stage_rows",
+      "finding": "Prior M5 OHLC derives from broker ProtoOAGetTrendbarsReq, not Wave02 tick aggregation. Timestamp keyed normalization sorts, and conflicting duplicate bars fail closed."
+    },
+    {
+      "path": "research_v3/session_gap_six_panel_outer_capture.py",
+      "finding": "Inherits ultra_fast_capture M5/trendbar and friction tick paths; does not call Wave02 aggregator."
+    },
+    {
+      "path": "m6/_ctrader_capture_base.py:normalize_trendbars",
+      "finding": "Separate broker trendbar path, sorted by timestamp, conflicting duplicates rejected."
+    },
+    {
+      "path": "research_v3/session_gap_structural_screen_v1.py:screen_symbol",
+      "finding": "Infers gaps from observed M5 timestamps; does not query historical symbol schedule; interprets structural signals from native bars."
+    }
+  ],
+  "artifact_classification": {
+    "UNAFFECTED": [
+      {
+        "artifact": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json and hash-bound original/canonical ZIPs",
+        "reason": "Native trendbar path, lossless byte-equivalent duplicate canonicalization already documented; no Wave02 tick aggregator."
+      },
+      {
+        "artifact": "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json and hash-bound ZIP",
+        "reason": "Native M5 trendbars plus prior independent friction tick sorter; no Wave02 aggregator. Source bytes remain intact."
+      },
+      {
+        "artifact": "Prior accepted native trendbar M5 captures",
+        "reason": "Same independent trendbar code paths; Wave02 collector has not produced data."
+      }
+    ],
+    "RAW_DATA_VALID_REPROCESS_ONLY": [
+      {
+        "artifact": "Any historical-schedule-adjusted coverage derived from six-panel outer, including schedule_adjusted_coverage in evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
+        "reason": "Denominator in acceptance is based on a frozen assumed broker-active calendar and weekday maxima, not authenticated historical cTrader schedule metadata. Broker M5 timestamps and source checksums remain valid. Recompute or relabel this derived coverage as calendar-model coverage; check whether minimum threshold and conclusions change. Do not rewrite original evidence.",
+        "status": "REINTERPRETATION_PENDING_SOURCE_ZIP_AND_DOWNSTREAM_DEPENDENCY_REVIEW"
+      }
+    ],
+    "PARTIAL_MINIMAL_RECAPTURE_REQUIRED": [],
+    "DATA_INVALID_OR_UNRECOVERABLE": []
+  },
+  "unresolved": [
+    "Historical broker schedule truth is not established from current symbol schedule snapshot or absent bars. If a future decision genuinely requires historical schedule truth, seek exact broker-native historical evidence if exposed; otherwise restrict claim to observed timestamps and calendar-model denominators.",
+    "Existing economic outcomes potentially relying on outer schedule-adjusted coverage require dependency-level review before declaring economic validity unaffected; do not rerun or refund attempts."
+  ],
+  "preservation": {
+    "raw_bytes_discarded": false,
+    "existing_acceptances_mutated": false,
+    "prior_economic_results_reopened": false,
+    "recapture_authorized": false,
+    "v2_attempts_consumed": 0
+  },
+  "wave02_gate": {
+    "status": "NOT_YET_AUTHORIZED",
+    "reason": "Requires exact-head-green, executable package, schedule semantics, and demonstrable collector completion/integrity before user capture."
+  }
+}
