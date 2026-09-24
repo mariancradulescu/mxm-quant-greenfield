@@ -1,28 +1,38 @@
 {
-  "basis_next_state_sha256": "54580a9746bba94d995bcfd0ffca70ecc283d4ef9dd26cc45e86411f525af1fd",
-  "changed_paths": [
-    "research_v3/cross_market_lead_lag_screen.py",
-    "tests/test_cross_market_lead_lag_screen.py"
-  ],
-  "created_utc": "2026-09-24T15:27:49Z",
+  "basis_next_state_sha256": "56146bebeb9f77c297946b9ddbb86dc2a42a92e708ae71d22c4ee5317cfc434e",
+  "changed_paths": [],
+  "created_utc": "2026-09-24T15:44:35Z",
+  "exact_head": {
+    "green": true,
+    "head": "d3fea24470a46a07cc71f4a2536fa21c4a61347c",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "d3fea24470a46a07cc71f4a2536fa21c4a61347c",
+    "predecessor_run_id": 36022153864
+  },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "changed_paths": [
-        "research_v3/cross_market_lead_lag_screen.py",
-        "tests/test_cross_market_lead_lag_screen.py"
-      ],
+      "account_mutation": false,
+      "bid_ask_or_spread": false,
+      "collector_ref": "research_v3/crossmarket_four_symbol_disjoint_capture.py",
       "economic_outcomes_opened": 0,
-      "expected_common_timestamps": 9539,
-      "expected_strict_pairs": 9455,
-      "implementation_assessment": "IMPLEMENTATION_ADDED",
+      "fields": [
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close"
+      ],
+      "implementation_assessment": "IMPLEMENTATION_SUFFICIENT",
+      "interval": {
+        "end_utc": "2026-07-19T23:59:59Z",
+        "start_utc": "2026-05-25T00:00:00Z"
+      },
       "mechanism_family": "CROSS_MARKET_LEAD_LAG",
-      "outer_authorization": "NONE",
-      "plan_ref": "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
+      "plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
       "protected_forward_opened": false,
+      "research_classification": "NON_ECONOMIC_PROSPECTIVE_OUTER_PREREQUISITE",
       "resolution": "M5",
-      "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-      "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
       "symbols": [
         "AUDJPY",
         "AUS200",
@@ -31,17 +41,23 @@
       ],
       "v2_attempts_consumed": 0
     },
-    "external_data_gate": null,
-    "implementation_id": "crossmarket-onebar-screen-v2",
-    "next_research_state": {
-      "next_action": "Run exact-head CI for the new non-economic cross-market evaluator, then materialize the screen against the accepted hash-bound Library ZIP and return a fresh evidence-based decision before any outer or economic identity.",
-      "status": "PENDING_EXACT_HEAD_GREEN"
+    "external_data_gate": {
+      "collector_build_ref": "tools/build_crossmarket_disjoint_capture_package.py",
+      "collector_package_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.zip",
+      "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
+      "expected_return_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1.zip",
+      "reason": "The exact disjoint authenticated Pepperstone cTrader M5 bytes are not present in the repository or accepted hash-bound Library artifacts. Existing captures use different frozen symbol and window scopes and cannot satisfy this proposal."
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a deterministic non-economic cross-market one-bar lead-lag evaluator bound to the accepted four-symbol M5 capture hash, exact interval, symbols, resolution, and alignment counts. It reports ordered-pair direction contingencies, contiguous segments, descriptive Wilson intervals, and preserves all economic/protected-forward safety boundaries. The accepted Library ZIP is not unavailable; no new capture gate was created.",
+    "implementation_id": "crossmarket-four-symbol-disjoint-capture-v1",
+    "next_research_state": {
+      "next_action": "AWAIT_READ_ONLY_CAPTURE_ZIP_RETURN_TO_AI_DIRECTOR",
+      "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA"
+    },
+    "status": "EXTERNAL_DATA_REQUIRED",
+    "summary": "The exact non-economic collector and frozen capture plan are already implemented for AUDJPY, AUS200, Brent-F, and BCHUSD at M5 over 2026-05-25 through 2026-07-19. The accepted development capture is a different window and cannot satisfy this disjoint proposal; authenticated broker-native bytes are still required.",
     "tests_requested": [
-      "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
+      "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_general_ai_implementation_executor.py"
     ]
   },
@@ -61,5 +77,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }

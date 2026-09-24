@@ -37,6 +37,8 @@
     "total_rows": 47375
   },
   "capture_required": false,
+  "collector_build_ref": "tools/build_crossmarket_disjoint_capture_package.py",
+  "collector_package_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.zip",
   "cross_market_one_bar_directional_screen_ref": "evidence/CROSS_MARKET_ONE_BAR_DIRECTIONAL_AVAILABILITY_V1.json",
   "cross_market_one_bar_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
   "cross_symbol_families": "DEFERRED_PENDING_ALIGNED_TIMESTAMP_OR_OTHER_EXPLICIT_PREREQUISITE",
@@ -73,7 +75,9 @@
     "validated_implementation_head": "c6d0a8ad24efe9bc680e89a7b59637a0cfa1c904",
     "workflow": "m6-preparation"
   },
+  "expected_return_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1.zip",
   "external_data_gate": null,
+  "external_data_gate_ref": "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json",
   "external_data_required": false,
   "external_gate": null,
   "family_exhaustion": "NOT_CLAIMED",
@@ -112,7 +116,7 @@
   ],
   "mechanism_family": "CROSS_MARKET_LEAD_LAG",
   "new_market_data_required": false,
-  "next_action": "Acquire and validate the exact four-symbol disjoint M5 capture, then execute only the frozen lead-lag structural prerequisite.",
+  "next_action": "AWAIT_READ_ONLY_CAPTURE_ZIP_RETURN_TO_AI_DIRECTOR",
   "outer": "NOT_AUTHORIZED",
   "outer_authorization": "NON_ECONOMIC_PREREQUISITE_ONLY",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
@@ -226,6 +230,7 @@
   "source_ai_proposal_hash": "595bea24f29acc9e375453ad7f2ac66674994c0d9cc381316ad4451e39d3bc4e",
   "source_ai_proposal_id": "P-20260924-CROSSMARKET-LAG-OUTER-01",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_implementation_id": "crossmarket-four-symbol-disjoint-capture-v1",
   "source_runtime_operation_id": "op_4eae641c1c40103738dd744a0ec1ec86",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 11,
@@ -236,7 +241,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_FIXED_15M_SCREEN",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "PROSPECTIVE_NON_ECONOMIC_OUTER_CAPTURE_REQUIRED",
+  "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
   "stop_condition": "no_family_clear_prerequisite_gate",
   "superseded_general_ai_proposal": {
     "economic_outcome_opened": false,
@@ -296,5 +301,5 @@
     "v2_attempts_consumed": 0
   },
   "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
-  "user_action_required": false
+  "user_action_required": true
 }
