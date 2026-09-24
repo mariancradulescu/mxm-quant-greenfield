@@ -118,7 +118,11 @@
     },
     {
       "ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
-      "sha256": "79e6dd44f1ce36a71e65d6410d55fb5a4637c7c84f58303a09d156e8dae98799"
+      "sha256": "340499dc9bd8e6e78857e1cafe255a1e70a4fbef76e7532c71ca71e09ff47692"
+    },
+    {
+      "ref": "evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json",
+      "sha256": "980ed1fcf40b89788af254ae83dd261393c7e73c75cf71f969f0784a77e973f2"
     }
   ],
   "authority_hashes": [
@@ -292,7 +296,11 @@
     },
     {
       "ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
-      "sha256": "79e6dd44f1ce36a71e65d6410d55fb5a4637c7c84f58303a09d156e8dae98799"
+      "sha256": "340499dc9bd8e6e78857e1cafe255a1e70a4fbef76e7532c71ca71e09ff47692"
+    },
+    {
+      "ref": "evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json",
+      "sha256": "980ed1fcf40b89788af254ae83dd261393c7e73c75cf71f969f0784a77e973f2"
     }
   ],
   "authority_refs": [
@@ -338,7 +346,8 @@
     "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
     "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
     "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
-    "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json"
+    "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
+    "evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json"
   ],
   "control_plane": {
     "material_issues": [],
@@ -352,7 +361,7 @@
     "stage_b_revalidation_required_candidate_ids": [],
     "stage_b_survivors": []
   },
-  "created_utc": "2026-09-24T12:35:02Z",
+  "created_utc": "2026-09-24T12:49:14Z",
   "current_open_mechanism_families": [
     "TREND_MOMENTUM",
     "MEAN_REVERSION",
@@ -365,8 +374,8 @@
     "REGIME_CONTEXT_CONDITIONED",
     "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL"
   ],
-  "evidence_bundle_sha256": "6c791ce59a33c4ea70ca41e05db983a793419b9250f2c80c97b553615ca6dba6",
-  "evidence_epoch_seen": 5,
+  "evidence_bundle_sha256": "742a29a778e1658d6eeef6b537c4110626810a64d3d1c768a72fff231460c862",
+  "evidence_epoch_seen": 6,
   "next_state": {
     "accepted_development_capture_sufficient_for_current_decision": true,
     "accepted_development_capture_sufficient_for_mechanism_specific_outer": false,
@@ -389,6 +398,7 @@
     "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
     "authorizing_evidence_epoch": 5,
     "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
+    "broader_universe_state": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
     "broader_universe_status": "OPEN",
     "capture_integrity": {
       "duplicate_timestamps": 0,
@@ -412,10 +422,11 @@
       "valid_source_data_discarded": false
     },
     "current_outer_reuse": "Completed four-panel SESSION_GAP outer remains historical evidence only and cannot be reused as a new confirmatory dataset",
-    "current_research_evidence_epoch": 5,
+    "current_research_evidence_epoch": 6,
+    "data_requirement": "NO_NEW_MARKET_DATA_FOR_THIS_GATE",
     "decision_basis": "Current accepted development evidence is sufficient for a higher-information no-capture prerequisite screen; no mechanism-specific outer or economic identity is authorized.",
     "director_protocol": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
-    "economic_progression": "No economic outcome, promotion, competition start, or protected-forward access",
+    "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
     "economic_promotion_authorized": false,
     "evidence_epoch": 4,
     "evidence_epoch_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
@@ -431,14 +442,26 @@
     "external_gate": null,
     "family_exhaustion_claimed": false,
     "fresh_evidence_epoch_required": true,
-    "green_implementation_artifacts": [
-      "research_v3/adaptive_breadth_triage.py",
-      "tests/test_adaptive_breadth_triage.py"
-    ],
     "implementation_executor": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+    "implementation_repair": {
+      "accepted_raw_data_invalidated": false,
+      "attempts_refunded": 0,
+      "classification": "DETERMINISTIC_IMPLEMENTATION_REPAIR_NO_RESEARCH_SEMANTIC_CHANGE",
+      "correction": "Use high >= max(open,close) and low <= min(open,close); tick_volume is excluded from the OHLC invariant.",
+      "economic_outcomes_opened_delta": 0,
+      "fresh_general_ai_required_for_repair": false,
+      "preserved_operation_id": "op_d441be66be3d6e2a05abd4012498d5d8",
+      "preserved_proposal_hash": "cd8eec4dda3e40f62457982ab7ac6c05a5fa2cda0549ee3a78ad45c42ff8fbca",
+      "preserved_proposal_id": "P-20260924-BREAKOUT-STRUCTURAL-GATE-01",
+      "protected_forward_opened": false,
+      "regression_test": "tests/test_adaptive_breadth_triage.py::test_univariate_gate_ohlc_validation_is_independent_of_tick_volume",
+      "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
+      "v2_attempts_consumed_delta": 0
+    },
+    "interpretation_boundary": "Structural sufficiency is not economic evidence, promotion, or mechanism-family closure.",
     "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
     "market_data_capture_required": false,
-    "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+    "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
     "outer_authorization": "NONE",
     "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
     "outer_capture_integrity": {
@@ -467,6 +490,7 @@
     "outer_result_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
     "post_triage_decision_rule": "Prefer reuse of existing valid evidence; otherwise choose a minimal authenticated broker-native extension from the verified feasibility frontier with explicit information-gain justification.",
     "promotion": "No economic promotion or confirmatory outer may be inferred from this triage.",
+    "prospective_exploration_assessment": "POSITIVE_EXPECTED_INFORMATION_GAIN_BEFORE_ANY_MECHANISM_SPECIFIC_OUTER",
     "provisional_four_panel_outer": {
       "capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
       "capture_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
@@ -478,7 +502,7 @@
       "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
       "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION"
     },
-    "reason": "The authorized adaptive breadth triage has been deterministically executed on the accepted 40-symbol M5 development capture and persisted. It performed no returns/PnL/economic ranking. The result is material new structural/data-sufficiency evidence and advances the research evidence epoch, so fresh General AI judgment is required before any new mechanism-specific scope, new capture, outer, or economic identity.",
+    "reason": "The accepted 40-symbol capture is sufficient for all six authorized univariate families at the prerequisite level. This gate intentionally did not define or count strategy-specific breakout events and did not authorize an outer or economic identity. Material structural evidence advanced to epoch 6, so fresh General AI must choose the next exact research scope.",
     "recorded_utc": "2026-09-24T10:55:00Z",
     "recovery_binding": {
       "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
@@ -520,7 +544,8 @@
       ],
       "v2_attempts_to_consume": 0
     },
-    "research_judgment_required": false,
+    "research_epoch": "CURRENT_EVIDENCE_EPOCH_5",
+    "research_judgment_required": true,
     "runtime_repair": {
       "current_entry_tradability_required": false,
       "failed_runtime_attempt_consumed": 0,
@@ -538,20 +563,20 @@
     "scope_integrity": "No symbol substitution, interval substitution, development-byte reuse, synthetic fill, forward fill, account mutation, or order placement.",
     "search_budget_change": 0,
     "selection_rule": "Prioritize the family that best matches the current dependency diagnostics and yields the highest expected information gain per minimal incremental evidence, not broad economics or stale outer reuse.",
-    "source_ai_proposal_hash": "1433f4b21a590bb3b0d18a20cb4edd3c583d39e680bcf6b932547c77c128ffef",
-    "source_ai_proposal_id": "P-20260924-UNIVARIATE-STRUCTURAL-GATE-01",
+    "source_ai_proposal_hash": "cd8eec4dda3e40f62457982ab7ac6c05a5fa2cda0549ee3a78ad45c42ff8fbca",
+    "source_ai_proposal_id": "P-20260924-BREAKOUT-STRUCTURAL-GATE-01",
     "source_implementation_id": "univariate-structural-gate-v1",
-    "source_runtime_operation_id": "op_d662477511f9d4d160e7ddee2e36b57b",
+    "source_runtime_operation_id": "op_d441be66be3d6e2a05abd4012498d5d8",
     "stale_reasoning_guard": {
-      "authorizing_evidence_epoch": 4,
-      "current_evidence_epoch": 5,
+      "authorizing_evidence_epoch": 5,
+      "current_evidence_epoch": 6,
       "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
       "previous_external_data_gate": null,
-      "previous_next_action": "AI_INTERPRET_ADAPTIVE_BREADTH_TRIAGE_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_ADAPTIVE_BREADTH_TRIAGE",
+      "previous_next_action": "AI_INTERPRET_UNIVARIATE_PREREQUISITE_GATE_AND_FREEZE_HIGHEST_INFORMATION_LEGAL_NEXT_RESEARCH_SCOPE",
+      "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_UNIVARIATE_STRUCTURAL_GATE",
       "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
     },
-    "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
+    "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "superseded_general_ai_proposal": {
       "economic_outcome_opened": false,
       "proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
@@ -599,6 +624,16 @@
       "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
       "symbols_screened": 40
     },
+    "univariate_structural_gate_ref": "evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json",
+    "univariate_structural_gate_summary": {
+      "all_six_univariate_families_prerequisite_sufficient": true,
+      "breakout_event_law_evaluated": false,
+      "broader_1578_universe_remains_open": true,
+      "economic_outcomes_opened": 0,
+      "rows_read": 392181,
+      "symbols_screened": 40,
+      "v2_attempts_consumed": 0
+    },
     "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
     "user_action_required": false
   },
@@ -611,8 +646,8 @@
   "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
   "provider_version": "MXM_GENERAL_AI_REASONING_PROVIDER_V2",
   "provisional_research_artifacts": [],
-  "request_id": "reason_d2aa1973a8f78456599fdc4126bb5cbc",
-  "research_head": "150078acf95e9925a40f2e1bfcb421ef6e5ae528",
+  "request_id": "reason_a65eb6e6a9ff2003a550f538a006e505",
+  "research_head": "c1622cc0aa60289412dce50668ae5840cd257649",
   "schema": "mxm.greenfield.general-ai-reasoning-request.v2",
   "status": "AI_REASONING_REQUIRED",
   "universe_basis": {
