@@ -1,0 +1,49 @@
+{
+  "schema": "mxm.greenfield.session-gap-frontier-four-panel-freeze.v1",
+  "status": "FROZEN_BEFORE_INDEPENDENT_OUTER_CAPTURE",
+  "frozen_utc": "2026-09-24T10:55:00Z",
+  "source_development_screen_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_SESSION_GAP_STRUCTURAL_SCREEN_V1.json",
+  "source_development_capture_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+  "source_development_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+  "selected_symbols": [
+    "ZARJPY",
+    "US400",
+    "XPDUSD",
+    "NETH25"
+  ],
+  "mechanism": {
+    "family": "SESSION_GAP_REVERSION",
+    "minimum_observed_gap_minutes": 30,
+    "scale_window_exact_m5_returns": 288,
+    "minimum_scale_observations": 144,
+    "shock_scale_multiple": 3,
+    "scheduled_measurement_horizon_minutes": 60,
+    "decision": "AFTER_FIRST_OBSERVED_M5_BAR_FOLLOWING_AN_OBSERVED_GAP_COMPLETES",
+    "entry": "FIRST_LATER_OBSERVED_M5_OPEN_AFTER_CAUSAL_SIGNAL_ADMISSION",
+    "exit": "FIRST_OBSERVED_M5_OPEN_AT_OR_AFTER_ENTRY_PLUS_60_MINUTES",
+    "missing_bar_law": "WAIT_FOR_FIRST_LATER_OBSERVED_OPEN; NO_SYNTHETIC_OR_FORWARD_FILL",
+    "future_availability_may_control_admission": false
+  },
+  "confirmatory_outer": {
+    "per_symbol_test": "ONE_SIDED_EXACT_SIGN_TEST_POSITIVE_DIRECTIONAL_60M_REVERSION",
+    "multiplicity": "HOLM_BONFERRONI_ALPHA_0_05_ACROSS_EXACTLY_FOUR_FIXED_SYMBOLS",
+    "panel_aggregate_role": "DESCRIPTIVE_ONLY",
+    "parameters_may_change_after_outer": false,
+    "development_bytes_may_be_outer": false
+  },
+  "friction_gate": {
+    "capture_before_outer_interpretation": true,
+    "method": "V6_TRUE_INTRA_WINDOW_SPREAD_TAILS_PLUS_SAME_WINDOW_BROKER_NATIVE_COMMISSION_CONVERSION",
+    "friction_fail_blocks_economic_promotion": true,
+    "friction_pass_or_watch_does_not_automatically_authorize_economics": true
+  },
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}

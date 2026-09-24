@@ -1,0 +1,155 @@
+{
+  "schema": "mxm.greenfield.session-gap-frontier-four-panel-independent-outer-capture-plan.v1",
+  "status": "FROZEN_PRE_CAPTURE_PRE_OUTER_OUTCOME",
+  "source_freeze_ref": "research_v3/SESSION_GAP_FRONTIER_FOUR_PANEL_FREEZE_V1.json",
+  "source_development_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+  "source_development_interval": {
+    "start_utc": "2026-06-15T00:00:00Z",
+    "end_utc": "2026-09-13T23:59:59Z"
+  },
+  "outer_interval": {
+    "start_utc": "2026-03-16T00:00:00Z",
+    "end_utc": "2026-06-14T23:59:59Z"
+  },
+  "resolution": "M5",
+  "symbols": [
+    {
+      "broker_symbol": "ZARJPY",
+      "symbol_id": 98,
+      "family": "FX",
+      "friction_profile": "GLOBAL_24X5"
+    },
+    {
+      "broker_symbol": "US400",
+      "symbol_id": 7372,
+      "family": "INDEX",
+      "friction_profile": "GLOBAL_24X5"
+    },
+    {
+      "broker_symbol": "XPDUSD",
+      "symbol_id": 95,
+      "family": "METAL",
+      "friction_profile": "GLOBAL_24X5"
+    },
+    {
+      "broker_symbol": "NETH25",
+      "symbol_id": 269,
+      "family": "INDEX",
+      "friction_profile": "GLOBAL_24X5"
+    }
+  ],
+  "outer_selection_rationale": {
+    "development_only_selection": true,
+    "outer_profitability_used": false,
+    "rule": "Freeze the four strongest DEVELOPMENT structural members by one-sided positive-reversion sign-test p-value among symbols with nonzero settled samples and positive median directional 60-minute reversion. The development ranking is selection evidence only and carries no confirmatory claim.",
+    "selected_development_evidence": {
+      "ZARJPY": {
+        "samples": 13,
+        "positive_reversions": 12,
+        "positive_reversion_fraction": 0.9230769230769231,
+        "raw_one_sided_sign_p": 0.001708984375,
+        "median_directional_60m_return": 0.0017466351587382967,
+        "active_signal_weeks": 13
+      },
+      "US400": {
+        "samples": 35,
+        "positive_reversions": 25,
+        "positive_reversion_fraction": 0.7142857142857143,
+        "raw_one_sided_sign_p": 0.008336923900060356,
+        "median_directional_60m_return": 0.0005046212684585161,
+        "active_signal_weeks": 13
+      },
+      "XPDUSD": {
+        "samples": 47,
+        "positive_reversions": 30,
+        "positive_reversion_fraction": 0.6382978723404256,
+        "raw_one_sided_sign_p": 0.03947034684074424,
+        "median_directional_60m_return": 0.0010544263471978788,
+        "active_signal_weeks": 13
+      },
+      "NETH25": {
+        "samples": 46,
+        "positive_reversions": 29,
+        "positive_reversion_fraction": 0.6304347826086957,
+        "raw_one_sided_sign_p": 0.051902677752053705,
+        "median_directional_60m_return": 0.0007346638968420138,
+        "active_signal_weeks": 13
+      }
+    },
+    "multiple_testing_boundary": "No DEVELOPMENT p-value is treated as familywise confirmatory. Independent outer uses four pre-fixed per-symbol one-sided sign tests with Holm-Bonferroni across exactly four hypotheses.",
+    "why_13_weeks": "The least-dense selected DEVELOPMENT member ZARJPY produced 13 settled samples in 13 weeks. A disjoint 13-week outer is expected to provide sufficient event opportunity while minimizing new data; seven all-positive nonzero signs would already be capable in principle of crossing the strictest Holm first step 0.05/4."
+  },
+  "friction_authority": {
+    "method": "V6_TRUE_INTRA_WINDOW_SPREAD_TAILS_PLUS_SAME_WINDOW_BROKER_NATIVE_COMMISSION_CONVERSION",
+    "sample_dates": [
+      "2026-03-24",
+      "2026-04-21",
+      "2026-05-19",
+      "2026-06-09"
+    ],
+    "GLOBAL_24X5_windows": [
+      {
+        "label": "ASIA",
+        "start": "01:00",
+        "end": "01:10"
+      },
+      {
+        "label": "EUROPE",
+        "start": "08:00",
+        "end": "08:10"
+      },
+      {
+        "label": "EU_US_OVERLAP",
+        "start": "13:30",
+        "end": "13:40"
+      },
+      {
+        "label": "US_ACTIVE",
+        "start": "16:00",
+        "end": "16:10"
+      },
+      {
+        "label": "LOW_LIQUIDITY",
+        "start": "21:30",
+        "end": "21:40"
+      }
+    ],
+    "qualification_ref": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json#friction_screen.qualification",
+    "commission_ref": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json#commission_authority",
+    "conversion_ref": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json#conversion_chain_law",
+    "raw_tick_transfer": false,
+    "current_or_future_rate_substitution": false
+  },
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "protected_rows_permitted": false,
+    "synthetic_fill_permitted": false,
+    "forward_fill_permitted": false,
+    "historical_request_target_rps": 3.84,
+    "max_tick_pages_per_side_window": 50,
+    "trendbar_page_count": 5000,
+    "max_stage_a_pages_per_symbol": 100,
+    "identical_duplicate_timestamp_rows": "DEDUPLICATE",
+    "conflicting_duplicate_timestamp_rows": "FAIL_CLOSED"
+  },
+  "outer_contract": {
+    "source_development_bytes_may_be_outer": false,
+    "outer_disjoint_from_development": true,
+    "outer_unopened_before_freeze": true,
+    "panel_membership_fixed": true,
+    "parameters_fixed": true,
+    "protected_forward_closed": true,
+    "no_outer_result_opened_by_capture": true,
+    "cost_authority_captured_before_outer_interpretation": true,
+    "per_symbol_one_sided_sign_test": true,
+    "familywise_method": "HOLM_BONFERRONI_ALPHA_0_05_ACROSS_FOUR_FIXED_SYMBOLS"
+  },
+  "economic_outcomes_opened": 0,
+  "v2_attempts_consumed": 0,
+  "plan_sha256": "1cddfd3e8a21a992bd3ab756ecf191c0c3e83487a35b266e714388252476ee3f"
+}

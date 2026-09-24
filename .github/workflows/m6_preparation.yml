@@ -315,6 +315,31 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Four-panel frontier independent outer preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from research_v3.pydroid_session_gap_frontier_four_panel_outer_launcher import local_preflight
+          r=local_preflight()
+          assert r["symbols"] == 4 and r["resolution"] == "M5", r
+          assert r["disjoint"] is True, r
+          assert r["network_connection_attempted"] is False and r["credentials_used"] is False, r
+          assert r["orders_permitted"] is False and r["account_mutation_permitted"] is False, r
+          assert r["outer_outcome_opened"] is False and r["economic_outcomes_opened"] is False, r
+          assert r["v2_attempts_consumed"] == 0, r
+          print("SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_PREFLIGHT_PASS",r)
+          PY
+      - name: Build deterministic four-panel frontier outer package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_session_gap_frontier_four_panel_outer_capture_package.py
+          sha256sum dist/MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip
+      - name: Upload deterministic four-panel frontier outer package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1
+          path: dist/MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Build deterministic C031 structural-extension capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_c031_structural_extension_capture_package.py

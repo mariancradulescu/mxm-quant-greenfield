@@ -1,0 +1,112 @@
+{
+  "schema": "mxm.greenfield.session-gap-frontier-40-development-structural-screen.v1",
+  "status": "NON_ECONOMIC_DEVELOPMENT_STRUCTURAL_SCREEN_COMPLETE",
+  "recorded_utc": "2026-09-24T10:55:00Z",
+  "source_capture_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+  "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+  "mechanism_semantics": {
+    "family": "SESSION_GAP_REVERSION",
+    "minimum_gap_minutes": 30,
+    "prior_scale_window_exact_m5_returns": 288,
+    "minimum_scale_observations": 144,
+    "shock_scale_multiple": 3,
+    "measurement_horizon_minutes": 60,
+    "cost_hurdle_applied": false,
+    "notional_pnl_computed": false,
+    "shared_account_realization": false,
+    "implementation_reference": "research_v3/session_gap_structural_screen_v1.py"
+  },
+  "aggregate": {
+    "symbols": 40,
+    "settled_structural_samples": 1388,
+    "weighted_positive_reversion_fraction": 0.49855907780979825,
+    "symbols_with_at_least_4_settled_samples": 35,
+    "symbols_with_positive_median_directional_60m_return": 18
+  },
+  "interpretation": {
+    "broad_40_symbol_reversion_claim": false,
+    "reason": "The 40-symbol aggregate is approximately balanced, so a broad economic identity would not be justified by this DEVELOPMENT screen.",
+    "development_p_values_are_confirmatory": false,
+    "mechanism_family_closed": false
+  },
+  "selection_for_independent_outer": {
+    "rule": "Development-select the four strongest nonzero-sample symbols by one-sided positive-reversion sign-test p-value, requiring positive median directional 60-minute reversion; selection creates no confirmatory claim.",
+    "fixed_before_outer": true,
+    "selected": [
+      "ZARJPY",
+      "US400",
+      "XPDUSD",
+      "NETH25"
+    ],
+    "selected_evidence": {
+      "ZARJPY": {
+        "samples": 13,
+        "positive_reversions": 12,
+        "positive_reversion_fraction": 0.9230769230769231,
+        "raw_one_sided_sign_p": 0.001708984375,
+        "median_directional_60m_return": 0.0017466351587382967,
+        "active_signal_weeks": 13
+      },
+      "US400": {
+        "samples": 35,
+        "positive_reversions": 25,
+        "positive_reversion_fraction": 0.7142857142857143,
+        "raw_one_sided_sign_p": 0.008336923900060356,
+        "median_directional_60m_return": 0.0005046212684585161,
+        "active_signal_weeks": 13
+      },
+      "XPDUSD": {
+        "samples": 47,
+        "positive_reversions": 30,
+        "positive_reversion_fraction": 0.6382978723404256,
+        "raw_one_sided_sign_p": 0.03947034684074424,
+        "median_directional_60m_return": 0.0010544263471978788,
+        "active_signal_weeks": 13
+      },
+      "NETH25": {
+        "samples": 46,
+        "positive_reversions": 29,
+        "positive_reversion_fraction": 0.6304347826086957,
+        "raw_one_sided_sign_p": 0.051902677752053705,
+        "median_directional_60m_return": 0.0007346638968420138,
+        "active_signal_weeks": 13
+      }
+    },
+    "next_unselected_boundary": {
+      "broker_symbol": "USTN5YR-F",
+      "samples": 13,
+      "positive_reversions": 9,
+      "raw_one_sided_sign_p": 0.1334228515625,
+      "median_directional_60m_return": 0.00014918414918430045
+    },
+    "multiple_testing_boundary": "Development ranking is selection-only. Independent outer uses Holm-Bonferroni alpha 0.05 across exactly four frozen per-symbol hypotheses."
+  },
+  "eur200_context": {
+    "ZARJPY": {
+      "min_margin_eur": 2.68,
+      "min_margin_pct_eur200": 1.34
+    },
+    "US400": {
+      "min_margin_eur": 3.19,
+      "min_margin_pct_eur200": 1.595
+    },
+    "XPDUSD": {
+      "min_margin_eur": 112.76,
+      "min_margin_pct_eur200": 56.38,
+      "capital_efficiency_note": "High minimum-margin burden; outer research is allowed, but any later shared-EUR200 realization must explicitly preserve free-margin/recovery capacity."
+    },
+    "NETH25": {
+      "min_margin_eur": 11.38,
+      "min_margin_pct_eur200": 5.69
+    }
+  },
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
