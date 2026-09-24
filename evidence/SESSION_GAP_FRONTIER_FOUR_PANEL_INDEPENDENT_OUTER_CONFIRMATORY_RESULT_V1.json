@@ -1,0 +1,127 @@
+{
+  "schema": "mxm.greenfield.session-gap-frontier-four-panel-independent-outer-confirmatory-result.v1",
+  "status": "NON_ECONOMIC_CONFIRMATORY_OUTER_COMPLETE",
+  "version": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_EVALUATOR_V1",
+  "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
+  "source_plan_sha256": "1cddfd3e8a21a992bd3ab756ecf191c0c3e83487a35b266e714388252476ee3f",
+  "source_capture_manifest_status": "CAPTURE_COMPLETE_OUTER_UNOPENED",
+  "fixed_symbols": [
+    "ZARJPY",
+    "US400",
+    "XPDUSD",
+    "NETH25"
+  ],
+  "frozen_test": {
+    "primary_endpoint": "sign of causal directional_60m_return",
+    "null_hypothesis": "P(directional_60m_return > 0) <= 0.5",
+    "per_symbol_test": "ONE_SIDED_EXACT_BINOMIAL_SIGN_TEST",
+    "exact_zeros_excluded": true,
+    "familywise_correction": "HOLM_BONFERRONI",
+    "familywise_alpha": 0.05,
+    "family_size": 4
+  },
+  "parameters": {
+    "minimum_observed_gap_minutes": 30,
+    "scale_window_exact_m5_returns": 288,
+    "minimum_scale_observations": 144,
+    "shock_scale_multiple": 3,
+    "scheduled_measurement_horizon_minutes": 60
+  },
+  "per_symbol": {
+    "ZARJPY": {
+      "settled_structural_samples": 13,
+      "active_signal_weeks": 12,
+      "positive": 10,
+      "negative": 3,
+      "exact_zero_excluded": 0,
+      "confirmatory_nonzero_n": 13,
+      "positive_fraction_nonzero": 0.7692307692307693,
+      "one_sided_exact_binomial_p": 0.046142578125,
+      "median_directional_60m_return": 0.001330195436406445,
+      "mean_directional_60m_return": 0.0013763229712336217,
+      "observed_gap_events": 14,
+      "shock_scale_hurdle_passes": 13,
+      "admitted_structural_signals": 13,
+      "holm_rank": 3,
+      "holm_threshold": 0.025,
+      "holm_reject_null": false
+    },
+    "US400": {
+      "settled_structural_samples": 24,
+      "active_signal_weeks": 13,
+      "positive": 16,
+      "negative": 8,
+      "exact_zero_excluded": 0,
+      "confirmatory_nonzero_n": 24,
+      "positive_fraction_nonzero": 0.6666666666666666,
+      "one_sided_exact_binomial_p": 0.07579481601715088,
+      "median_directional_60m_return": 0.0005525857966802716,
+      "mean_directional_60m_return": 0.0009206114181832259,
+      "observed_gap_events": 68,
+      "shock_scale_hurdle_passes": 24,
+      "admitted_structural_signals": 24,
+      "holm_rank": 4,
+      "holm_threshold": 0.05,
+      "holm_reject_null": false
+    },
+    "XPDUSD": {
+      "settled_structural_samples": 36,
+      "active_signal_weeks": 12,
+      "positive": 26,
+      "negative": 10,
+      "exact_zero_excluded": 0,
+      "confirmatory_nonzero_n": 36,
+      "positive_fraction_nonzero": 0.7222222222222222,
+      "one_sided_exact_binomial_p": 0.005665492091793567,
+      "median_directional_60m_return": 0.00160723303675403,
+      "mean_directional_60m_return": 0.0024721248785324027,
+      "observed_gap_events": 64,
+      "shock_scale_hurdle_passes": 36,
+      "admitted_structural_signals": 36,
+      "holm_rank": 1,
+      "holm_threshold": 0.0125,
+      "holm_reject_null": true
+    },
+    "NETH25": {
+      "settled_structural_samples": 47,
+      "active_signal_weeks": 13,
+      "positive": 30,
+      "negative": 17,
+      "exact_zero_excluded": 0,
+      "confirmatory_nonzero_n": 47,
+      "positive_fraction_nonzero": 0.6382978723404256,
+      "one_sided_exact_binomial_p": 0.03947034684074424,
+      "median_directional_60m_return": 0.0007215007215006786,
+      "mean_directional_60m_return": 0.0006644383876288936,
+      "observed_gap_events": 61,
+      "shock_scale_hurdle_passes": 47,
+      "admitted_structural_signals": 47,
+      "holm_rank": 2,
+      "holm_threshold": 0.016666666666666666,
+      "holm_reject_null": false
+    }
+  },
+  "aggregate_descriptive_only": {
+    "settled_structural_samples": 120,
+    "confirmatory_nonzero_samples": 120,
+    "sample_weighted_positive_fraction_nonzero": 0.6833333333333333,
+    "holm_rejections": 1
+  },
+  "interpretation_boundary": {
+    "panel_aggregate_is_descriptive_only": true,
+    "mechanism_family_closed": false,
+    "economic_candidate_identity_created": false,
+    "cost_aware_economic_conclusion_opened": false,
+    "exact_c031_rerun": false
+  },
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "result_sha256": "61f2431d9dde896debefd62a326cd4d2e1fb08ed7a4e3d69d4762298352fee08"
+}
