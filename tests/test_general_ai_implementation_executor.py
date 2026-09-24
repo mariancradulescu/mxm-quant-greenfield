@@ -69,12 +69,12 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
             root=Path(td); plan_ref="plan.json"; build_ref="build.py"
             plan={"symbols":[{"broker_symbol":"OLD_SYMBOL"}],"resolution":"M5",
                   "interval":{"start_utc":"2026-07-20T00:00:00Z","end_utc":"2026-09-13T23:59:59Z"},
-                  "output_artifact_name":"old.zip"}
+                  "output_artifact_name":"old.zip","fields":["timestamp_utc"]}
             (root/plan_ref).write_text(json.dumps(plan))
             (root/build_ref).write_text('PLAN_REF="plan.json"')
             proposal={"data_policy":{"new_market_data_requested":True,"minimal_acquisition_request":{
                 "symbols":["NEW_SYMBOL"],"resolution":"M5",
-                "start_utc":"2026-07-20T00:00:00Z","end_utc":"2026-09-13T23:59:59Z"}}}
+                "start_utc":"2026-07-20T00:00:00Z","end_utc":"2026-09-13T23:59:59Z","fields":["timestamp_utc"]}}}
             out={"implementation_id":"test","status":"EXTERNAL_DATA_REQUIRED",
                  "next_research_state":{"status":"WAITING","next_action":"CAPTURE"},
                  "external_data_gate":{"collector_build_ref":build_ref,"collector_plan_ref":plan_ref,
@@ -87,4 +87,8 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
                 plan["symbols"]=[{"broker_symbol":"NEW_SYMBOL"}]
                 (root/plan_ref).write_text(json.dumps(plan))
                 _validate_output(root,out)
+                plan["fields"]=["invented_bid"]
+                (root/plan_ref).write_text(json.dumps(plan))
+                with self.assertRaisesRegex(ImplementationRejected,"fields do not match"):
+                    _validate_output(root,out)
 if __name__=="__main__": unittest.main()
