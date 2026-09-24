@@ -33,7 +33,8 @@ from research_v3.runtime_v2_primitives import (
 )
 
 PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V2"
-PROVIDER_KIND="GITHUB_COPILOT_CLI"\nDEFAULT_MODEL="gpt-5.4"
+PROVIDER_KIND="GITHUB_COPILOT_CLI"
+DEFAULT_MODEL="gpt-5.4"
 NEXT_REL=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
 REQUEST_REL=Path("research_v3/ai_director/AI_REASONING_REQUEST.json")
 RESPONSE_REL=Path("research_v3/ai_director/AI_REASONING_RESPONSE.json")
