@@ -151,7 +151,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
         if implementation_required(state):
             blocked=_provider_unavailable(root,state,"GENERAL_AI_IMPLEMENTATION")
             if blocked is not None:
-                return {"status":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
+                return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
             try:
                 out=implement(root,git_checkpoint=git_checkpoint,git_push=git_push)
             except Exception as exc:
@@ -160,7 +160,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=git_checkpoint,git_push=git_push)
                 _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
-                return {"status":recovery["status"],"cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+                return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
