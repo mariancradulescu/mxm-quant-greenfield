@@ -1,0 +1,55 @@
+{
+  "schema": "mxm.greenfield.breakout-volatility-30m-directional-persistence.v1",
+  "status": "COMPLETE_NON_ECONOMIC_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_SCREEN",
+  "source_capture_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+  "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+  "source_decision_ref": "research_v3/EPOCH16_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_DECISION_V1.json",
+  "validated_implementation": {
+    "head": "8b39d8e307c896a89a3815300b4e57c48f3519d1",
+    "workflow": "m6-preparation",
+    "run_id": 36042444136,
+    "conclusion": "success"
+  },
+  "frozen_law": {
+    "event_lookback_bars": 24,
+    "event_volatility_expansion_ratio": 1.5,
+    "followthrough_horizon_bars": 6,
+    "followthrough_horizon": "30m",
+    "parameter_variation": "NONE"
+  },
+  "aggregate": {
+    "symbols": 40,
+    "rows": 392181,
+    "events_detected": 11919,
+    "events_with_valid_followthrough": 11345,
+    "events_without_valid_followthrough": 574,
+    "up_events": 5912,
+    "down_events": 6007,
+    "up_continuation": 2582,
+    "up_reversal": 2928,
+    "up_flat": 142,
+    "down_continuation": 2636,
+    "down_reversal": 2925,
+    "down_flat": 132,
+    "continuation": 5218,
+    "reversal": 5853,
+    "flat": 274,
+    "continuation_fraction_nonflat": 0.4713214705085358
+  },
+  "comparison_to_epoch16_15m": {
+    "fifteen_minute_continuation": 5292,
+    "fifteen_minute_reversal": 5891,
+    "fifteen_minute_flat": 415,
+    "fifteen_minute_continuation_fraction_nonflat": 0.4732182777430028,
+    "interpretation": "Both frozen horizons show reversals more frequent than continuations in aggregate development data. This is descriptive persistence only; no significance, profitability, ranking or parameter selection is claimed."
+  },
+  "interpretation_boundary": "Directional persistence counts only. No return magnitude, PnL, costs, execution assumptions, ranking, promotion, inferential rejection, economic identity, family closure, independent outer, or protected-forward evidence.",
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "structural_representatives_are_not_economic_equivalence": true,
+  "family_exhaustion_claimed": false
+}
