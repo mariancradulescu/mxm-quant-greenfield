@@ -6,10 +6,12 @@ from pathlib import Path
 from research_v3.crossalign_four_symbol_capture import (
     EXPECTED_SYMBOLS,
     OUTPUT_FILENAME,
+    CrossAlignmentCaptureRunner,
     PLAN_REL,
     validate_plan,
 )
 from research_v3.pydroid_crossalign_four_symbol_launcher import local_preflight
+from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAGetTrendbarsReq
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -47,6 +49,27 @@ class CrossAlignCaptureTests(unittest.TestCase):
             self.assertNotIn(token, source)
         self.assertNotIn('"bid"', source)
         self.assertNotIn('"ask"', source)
+
+    def test_first_historical_request_initializes_rate_limiter(self):
+        class FakeTransport:
+            def __init__(self):
+                self.requests = 0
+
+            def request(self, request, timeout):
+                self.requests += 1
+                return object()
+
+        fake = FakeTransport()
+        plan = json.loads((ROOT / PLAN_REL).read_text())
+        runner = CrossAlignmentCaptureRunner(
+            plan=plan, client_id="local-test", client_secret="local-test",
+            access_token="local-test", config={}, repo_root=ROOT,
+            transport=fake,
+        )
+        self.assertIsNone(runner._last_hist)
+        runner._send(ProtoOAGetTrendbarsReq(), historical=True, retries=1)
+        self.assertEqual(fake.requests, 1)
+        self.assertIsNotNone(runner._last_hist)
 
     def test_package_binds_exact_plan(self):
         source = (ROOT / "tools/build_crossalign_four_symbol_capture_package.py").read_text()
