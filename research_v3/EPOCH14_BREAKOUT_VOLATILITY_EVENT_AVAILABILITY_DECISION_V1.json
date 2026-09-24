@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.greenfield.fresh-general-ai-research-decision.v1",
+  "status": "AUTHORIZED_NON_ECONOMIC_STRUCTURAL_SCREEN",
+  "decision_id": "EPOCH14-BREAKOUT-VOLATILITY-EVENT-AVAILABILITY-01",
+  "created_utc": "2026-09-24T17:51:00Z",
+  "provider": {
+    "kind": "EXTERNAL_CHATGPT_GENERAL_REASONING",
+    "vendor": "OpenAI",
+    "model": "GPT-5.6 Sol",
+    "context": "FRESH_CHAT_AUTONOMOUS_RECOVERY"
+  },
+  "evidence_epoch_seen": 14,
+  "authority_refs": [
+    "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
+    "evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json",
+    "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json"
+  ],
+  "source_capture": {
+    "ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "library_file_id": "libfile_f31adb42d4e88191b7b372af4f3f077a",
+    "zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "symbols": 40,
+    "total_rows": 392181,
+    "resolution": "M5",
+    "protected_forward_rows": 0
+  },
+  "research_family": "BREAKOUT_VOLATILITY_EXPANSION",
+  "rationale": "The epoch-14 evidence leaves an explicit unresolved structural gap: the accepted 40-symbol univariate gate establishes prerequisite sufficiency but records breakout_event_law_evaluated=false. The accepted raw 13-week bytes are available and hash-bound, so the highest-information legal next step is to resolve this gap without acquiring data or opening economics.",
+  "prospective_event_law": {
+    "lookback_bars": 24,
+    "lookback_duration": "2h at M5",
+    "contiguous_window_required": true,
+    "breakout_up": "close_t > max(high) over the immediately preceding 24 strictly consecutive M5 bars",
+    "breakout_down": "close_t < min(low) over the immediately preceding 24 strictly consecutive M5 bars",
+    "range_definition": "high_t - low_t",
+    "prior_range_reference": "median(high-low) over the immediately preceding 24 strictly consecutive M5 bars",
+    "volatility_expansion_threshold": 1.5,
+    "event_up": "breakout_up AND current_range >= 1.5 * prior_range_reference",
+    "event_down": "breakout_down AND current_range >= 1.5 * prior_range_reference",
+    "gap_policy": "reject windows containing any non-300-second timestamp interval",
+    "zero_prior_median_policy": "expansion true only if current_range > 0",
+    "parameter_variation": "NONE"
+  },
+  "required_outputs": [
+    "per-symbol eligible contiguous windows",
+    "per-symbol breakout-only counts",
+    "per-symbol range-expansion counts",
+    "per-symbol up/down combined breakout-expansion event counts",
+    "per-symbol event availability rate",
+    "aggregate event-availability counts only"
+  ],
+  "prohibitions": [
+    "no post-event returns or PnL",
+    "no costs or friction claims",
+    "no symbol ranking or promotion",
+    "no inferential rejection or significance testing",
+    "no economic identity or V2 attempt",
+    "no mechanism-family closure",
+    "no protected-forward evidence"
+  ],
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "structural_representatives_are_not_economic_equivalence": true,
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "external_data_required": false,
+  "user_action_required": false,
+  "next_action": "IMPLEMENT_VALIDATE_AND_EXECUTE_FROZEN_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_SCREEN"
+}
