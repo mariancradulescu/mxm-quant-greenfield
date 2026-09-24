@@ -1,0 +1,364 @@
+"""Unattended provider-neutral general-AI reasoning wake for MXM Research V3.
+
+The provider creates NON_ECONOMIC research proposals only. It never opens economics,
+never mutates V2 attempt accounting, and never substitutes a finite next-action table
+for general reasoning. Runtime V2 remains the deterministic authority after proposal creation.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import urllib.error
+import urllib.request
+from pathlib import Path
+from typing import Any, Callable, Mapping
+
+from research_v3.autonomous_control_plane import validate_repository_state
+from research_v3.general_ai_director_bridge import (
+    PROPOSAL_SCHEMA,
+    PROTOCOL_VERSION,
+    AIProposalRejected,
+    project_snapshot,
+    validate_proposal,
+)
+from research_v3.runtime_v2_primitives import (
+    GitCheckpointSink,
+    atomic_write_json,
+    canonical_bytes,
+    iso,
+    sha256_bytes,
+    sha256_file,
+)
+
+PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V1"
+ENDPOINT="https://models.github.ai/inference/chat/completions"
+NEXT_REL=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
+REQUEST_REL=Path("research_v3/ai_director/AI_REASONING_REQUEST.json")
+RESPONSE_REL=Path("research_v3/ai_director/AI_REASONING_RESPONSE.json")
+GATE_REL=Path("research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json")
+PROPOSAL_DIR=Path("research_v3/ai_director/proposals")
+
+DEFAULT_MODELS=(
+    "openai/gpt-5.6-sol",
+    "openai/gpt-5.5",
+    "openai/gpt-5.4",
+    "openai/gpt-4o",
+)
+
+BASE_AUTHORITIES=(
+    "research_v3/RESEARCH_CONTRACT_V3.json",
+    "data/RESEARCH_SCOPE_GOVERNANCE_V1.json",
+    "evidence/MECHANISM_SCOPE_REGISTRY_V1.json",
+    "evidence/V2_CONSUMED_IDENTITY_SCOPE_AUDIT_V1.json",
+    "data/AUTONOMOUS_UNIVERSE_GOVERNOR_V1.json",
+    "data/ADAPTIVE_DATA_ACQUISITION_POLICY_V1.json",
+    "data/CAPITAL_FLOW_AWARE_CAUSAL_GOVERNOR_V1.json",
+    "research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json",
+    "evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json",
+    "research_v3/ai_director/GENERAL_AI_DIRECTOR_ARCHITECTURE_V1.json",
+)
+
+class AIReasoningProviderError(RuntimeError): pass
+class AIReasoningExternalGate(RuntimeError): pass
+
+def _load(root:Path,rel:str|Path)->dict[str,Any]:
+    p=root/Path(rel)
+    if not p.is_file():
+        raise AIReasoningProviderError(f"required reasoning authority missing: {p.relative_to(root)}")
+    return json.loads(p.read_text(encoding="utf-8"))
+
+def _head(root:Path)->str:
+    import subprocess
+    return subprocess.check_output(["git","rev-parse","HEAD"],cwd=root,text=True).strip()
+
+def reasoning_required(next_state:Mapping[str,Any])->bool:
+    if next_state.get("user_action_required") is True:
+        return False
+    if next_state.get("ai_reasoning_required") is True:
+        return True
+    action=str(next_state.get("next_action") or "").upper()
+    status=str(next_state.get("status") or "").upper()
+    return action.startswith("AI_") or "PENDING_AI_INTERPRETATION" in status or "AI_REASONING_REQUIRED" in status
+
+def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
+    refs=list(BASE_AUTHORITIES)
+    for key in ("result_ref","pre_economic_acceptance_ref","freeze_ref"):
+        value=next_state.get(key)
+        if isinstance(value,str) and value and value not in refs:
+            refs.append(value)
+    rows=[]; kept=[]
+    for rel in refs:
+        p=root/rel
+        if not p.is_file():
+            continue
+        raw=p.read_bytes()
+        item={"ref":rel,"sha256":sha256_bytes(raw)}
+        try:
+            item["content"]=json.loads(raw)
+        except Exception:
+            item["content_text"]=raw.decode("utf-8",errors="replace")[:20000]
+        rows.append(item); kept.append(rel)
+    return rows,kept
+
+def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
+    root=Path(root_value).resolve()
+    next_state=_load(root,NEXT_REL)
+    snapshot=project_snapshot(root)
+    report=validate_repository_state(root)
+    authorities,refs=_authority_context(root,next_state)
+    core={
+        "provider_version":PROVIDER_VERSION,
+        "research_head":_head(root),
+        "project_snapshot":snapshot,
+        "next_state":next_state,
+        "control_plane":{
+            "next_action":report.get("next_action"),
+            "stage_b_survivors":report.get("stage_b_survivors",[]),
+            "stage_b_revalidation_required_candidate_ids":report.get("stage_b_revalidation_required_candidate_ids",[]),
+            "material_issues":report.get("material_issues",[]),
+            "recoverable_conditions":report.get("recoverable_conditions",[]),
+            "safety":report.get("safety",{}),
+        },
+        "authority_hashes":[{"ref":x["ref"],"sha256":x["sha256"]} for x in authorities],
+    }
+    request_id="reason_"+sha256_bytes(canonical_bytes(core))[:32]
+    return {
+        "schema":"mxm.greenfield.general-ai-reasoning-request.v2",
+        "status":"AI_REASONING_REQUIRED" if reasoning_required(next_state) else "NO_AI_REASONING_REQUIRED",
+        "protocol_version":PROTOCOL_VERSION,
+        "provider_version":PROVIDER_VERSION,
+        "request_id":request_id,
+        "research_head":core["research_head"],
+        "project_snapshot":snapshot,
+        "next_state":next_state,
+        "control_plane":core["control_plane"],
+        "authority_refs":refs,
+        "authority_hashes":core["authority_hashes"],
+        "created_utc":iso(),
+    }
+
+def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
+    authorities,_=_authority_context(root,request["next_state"])
+    return {
+        "request":{
+            "request_id":request["request_id"],
+            "research_head":request["research_head"],
+            "project_snapshot":request["project_snapshot"],
+            "next_state":request["next_state"],
+            "control_plane":request["control_plane"],
+        },
+        "authorities":authorities,
+        "non_negotiable_objective":{
+            "broker":"Pepperstone",
+            "execution_target":"cTrader Algo / one continuous account",
+            "starting_capital_eur":200,
+            "optimize":"maximum realizable compounded equity growth with practical anti-ruin and recovery capacity",
+            "hard21":"floor where applicable; never an arbitrary frequency ceiling",
+            "scope":"broader broker-native universe remains open; 10-symbol V6 is not global universe",
+        },
+    }
+
+def _system_prompt()->str:
+    return """You are the autonomous general AI Research Director for MXM Quant Greenfield V2.
+You own advanced research reasoning: interpretation, hypothesis/mechanism generation, universe reasoning,
+data sufficiency, research prioritization, methodology design and the highest-information legal next action.
+Do NOT behave like a finite state machine and do NOT merely echo next_action. Infer the best research action
+from the authoritative context.
+
+Return ONE JSON object only, with these keys:
+proposal_id: concise unique string
+objective: object with class, goal, information_gain_rationale
+decision: arbitrary JSON object expressing your actual research decision and enough implementation semantics
+next_research_state: arbitrary JSON object with at least status and next_action; do not include protected accounting/safety keys
+authority_refs: non-empty list chosen only from refs provided in context
+data_bindings: optional list
+artifact_attestation_refs: optional list
+data_policy: object with new_market_data_requested boolean, and if true minimal_acquisition_request with symbols,resolution,start_utc,end_utc,fields,information_gain_justification
+mechanism_family_closure_claims: list; normally empty unless prospective exhaustion authority exists
+
+Important boundaries:
+- The reasoning proposal itself is NON_ECONOMIC; do not claim it opened an outcome or consumed an attempt.
+- Do not rerun C031 Stage-B or any already observed exact identity.
+- Do not infer mechanism-family exhaustion from narrow exact-scope failures.
+- Preserve one continuous account, realistic free margin/margin, capital-flow accounting and anti-ruin.
+- Prefer structural screening and minimal justified incremental data before expensive broad economics.
+- Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
+- If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
+- Never output chain-of-thought. Put only concise decision rationale in information_gain_rationale/decision.
+"""
+
+def _user_prompt(context:Mapping[str,Any], correction:str|None=None)->str:
+    base="AUTHORITATIVE REPOSITORY CONTEXT:\n"+json.dumps(context,sort_keys=True,separators=(",",":"),ensure_ascii=False)
+    if correction:
+        base+="\n\nYOUR PREVIOUS JSON WAS REJECTED BY DETERMINISTIC VALIDATION. CORRECT IT WITHOUT CHANGING THE RESEARCH GOAL:\n"+correction
+    return base
+
+def _extract_json(text:str)->dict[str,Any]:
+    s=text.strip()
+    fence=chr(96)*3
+    if s.startswith(fence):
+        s=re.sub("^"+re.escape(fence)+r"(?:json)?\s*","",s,flags=re.I)
+        s=re.sub(r"\s*"+re.escape(fence)+r"$","",s)
+    try:
+        obj=json.loads(s)
+    except Exception:
+        a=s.find("{"); b=s.rfind("}")
+        if a<0 or b<=a:
+            raise AIReasoningProviderError("provider response contains no JSON object")
+        obj=json.loads(s[a:b+1])
+    if not isinstance(obj,dict):
+        raise AIReasoningProviderError("provider response is not a JSON object")
+    return obj
+
+def _models()->list[str]:
+    raw=os.environ.get("MXM_AI_MODELS","").strip()
+    return [x.strip() for x in raw.split(",") if x.strip()] or list(DEFAULT_MODELS)
+
+def github_models_transport(token:str,model:str,system_prompt:str,user_prompt:str)->tuple[dict[str,Any],dict[str,Any]]:
+    payload={
+        "model":model,
+        "messages":[{"role":"system","content":system_prompt},{"role":"user","content":user_prompt}],
+        "max_tokens":8000,
+        "reasoning_effort":"high",
+    }
+    req=urllib.request.Request(
+        ENDPOINT,
+        data=json.dumps(payload,separators=(",",":")).encode("utf-8"),
+        headers={"Content-Type":"application/json","Authorization":f"Bearer {token}","Accept":"application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req,timeout=180) as resp:
+            data=json.loads(resp.read())
+    except urllib.error.HTTPError as exc:
+        body=exc.read().decode("utf-8",errors="replace")
+        if exc.code in (401,403):
+            raise AIReasoningExternalGate(f"GITHUB_MODELS_AUTHORIZATION_{exc.code}: {body[:800]}") from exc
+        raise AIReasoningProviderError(f"GitHub Models HTTP {exc.code}: {body[:1200]}") from exc
+    except Exception as exc:
+        raise AIReasoningProviderError(f"GitHub Models transport failure: {exc}") from exc
+    choices=data.get("choices") or []
+    if not choices:
+        raise AIReasoningProviderError("GitHub Models response has no choices")
+    content=((choices[0].get("message") or {}).get("content"))
+    if not isinstance(content,str) or not content.strip():
+        raise AIReasoningProviderError("GitHub Models response has no text content")
+    return _extract_json(content),{
+        "provider":"github-models",
+        "model":model,
+        "response_id":data.get("id"),
+        "usage":data.get("usage"),
+    }
+
+def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider_meta:Mapping[str,Any])->dict[str,Any]:
+    objective=candidate.get("objective"); decision=candidate.get("decision"); next_state=candidate.get("next_research_state")
+    if not isinstance(objective,Mapping) or not isinstance(decision,Mapping) or not isinstance(next_state,Mapping):
+        raise AIProposalRejected("provider candidate missing objective/decision/next_research_state objects")
+    allowed=set(request["authority_refs"])
+    refs=candidate.get("authority_refs") or []
+    if not isinstance(refs,list) or not refs:
+        raise AIProposalRejected("provider candidate authority_refs must be non-empty")
+    refs=[str(x) for x in refs]
+    if any(x not in allowed for x in refs):
+        raise AIProposalRejected("provider candidate referenced authority outside supplied context")
+    raw_policy=candidate.get("data_policy") or {}
+    new_data=bool(raw_policy.get("new_market_data_requested"))
+    data_policy={"no_default_multi_year_download":True,"user_selects_symbols_or_horizon":False,"new_market_data_requested":new_data}
+    if new_data:
+        data_policy["minimal_acquisition_request"]=raw_policy.get("minimal_acquisition_request") or {}
+    closure=candidate.get("mechanism_family_closure_claims") or []
+    if not isinstance(closure,list):
+        raise AIProposalRejected("mechanism_family_closure_claims must be list")
+    pid=str(candidate.get("proposal_id") or f"AUTO-{request['request_id']}").strip()
+    proposal={
+        "schema":PROPOSAL_SCHEMA,
+        "proposal_id":pid,
+        "provider":{"kind":"GITHUB_MODELS_GENERAL_REASONING","vendor":"GitHub Models","model":provider_meta.get("model"),"provider_version":PROVIDER_VERSION,"reasoning_request_id":request["request_id"]},
+        "basis":{"research_head":request["research_head"],"accounting":{"v2_attempts_used":request["project_snapshot"]["v2_attempts_used"],"v2_search_budget_remaining":request["project_snapshot"]["v2_search_budget_remaining"],"economic_outcomes_opened":request["project_snapshot"]["economic_outcomes_opened"]},"discovery_ledger_sha256":request["project_snapshot"]["discovery_ledger_sha256"]},
+        "objective":dict(objective),
+        "decision":dict(decision),
+        "next_research_state":dict(next_state),
+        "authority_refs":refs,
+        "data_bindings":candidate.get("data_bindings") or [],
+        "artifact_attestation_refs":candidate.get("artifact_attestation_refs") or [],
+        "economic_effect":{"open_economic_outcome":False,"consume_v2_attempt":0,"create_new_v2_identity":False},
+        "safety":{"protected_forward_opened":False,"live_orders_authorized":False,"competition_start_authorized":False},
+        "scope_law":{"rerun_exact_observed_identity":False,"refund_observed_attempts":False,"mechanism_family_closure_claims":closure},
+        "data_policy":data_policy,
+        "causal_contract":{"chronological_incremental_replay":True,"causal_entry_admission":True,"future_information_forbidden":True,"protected_forward_leakage_forbidden":True,"learned_procedure_freeze_before_outer_outcome":True},
+        "publication":{"apply_to_next_state":True},
+    }
+    validate_proposal(root,proposal)
+    return proposal
+
+def _proposal_ref(request_id:str)->Path:
+    return PROPOSAL_DIR/f"AUTO_{request_id}.json"
+
+def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[[str,str,str,str],tuple[dict[str,Any],dict[str,Any]]]=github_models_transport,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
+    root=Path(root_value).resolve()
+    request=build_reasoning_request(root)
+    atomic_write_json(root/REQUEST_REL,request)
+    sink=GitCheckpointSink(root,enabled=git_checkpoint,push=git_push)
+    if request["status"]!="AI_REASONING_REQUIRED":
+        sink.checkpoint("general_ai_reasoning_request_noop",None)
+        return {"status":"NO_AI_REASONING_REQUIRED","request_id":request["request_id"]}
+
+    rel=_proposal_ref(request["request_id"]); path=root/rel
+    if path.is_file():
+        proposal=json.loads(path.read_text(encoding="utf-8"))
+        validate_proposal(root,proposal)
+        sink.checkpoint("general_ai_reasoning_reused",None)
+        return {"status":"PROPOSAL_ALREADY_DURABLE","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_hash":sha256_file(path)}
+
+    token=token or os.environ.get("GITHUB_TOKEN")
+    if not token:
+        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-models","required":"GITHUB_TOKEN with GitHub Models inference access (models: read)","request_id":request["request_id"],"created_utc":iso()}
+        atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
+        return gate
+
+    context=_context_payload(root,request)
+    correction=None; errors=[]; chosen_meta=None; proposal=None
+    for model in _models():
+        for attempt in range(2):
+            try:
+                candidate,meta=transport(token,model,_system_prompt(),_user_prompt(context,correction))
+                proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
+                break
+            except AIReasoningExternalGate as exc:
+                gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-models","request_id":request["request_id"],"detail":str(exc),"created_utc":iso()}
+                atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
+                return gate
+            except Exception as exc:
+                correction=f"{type(exc).__name__}: {exc}"
+                errors.append({"model":model,"attempt":attempt+1,"error":correction})
+        if proposal is not None:
+            break
+    if proposal is None:
+        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"PROVIDER_RETRY_REQUIRED","provider":"github-models","request_id":request["request_id"],"errors":errors[-6:],"created_utc":iso()}
+        atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_provider_retry",None)
+        raise AIReasoningProviderError("all configured general reasoning model attempts failed")
+
+    path.parent.mkdir(parents=True,exist_ok=True)
+    atomic_write_json(path,proposal)
+    response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1","status":"PROPOSAL_GENERATED_PENDING_RUNTIME_V2_MATERIALIZATION","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_sha256":sha256_file(path),"provider":{"kind":"github-models","endpoint":ENDPOINT,**dict(chosen_meta or {})},"economic_outcome_opened":False,"v2_attempt_consumed":0,"created_utc":iso()}
+    atomic_write_json(root/RESPONSE_REL,response)
+    sink.checkpoint("general_ai_reasoning_response",None)
+    return response
+
+def main(argv=None)->int:
+    p=argparse.ArgumentParser(description=PROVIDER_VERSION)
+    p.add_argument("command",choices=("request","wake"))
+    p.add_argument("--root",default=".")
+    p.add_argument("--git-checkpoint",action="store_true")
+    p.add_argument("--git-push",action="store_true")
+    a=p.parse_args(argv)
+    if a.command=="request":
+        payload=build_reasoning_request(a.root)
+        atomic_write_json(Path(a.root)/REQUEST_REL,payload)
+    else:
+        payload=wake(a.root,git_checkpoint=a.git_checkpoint,git_push=a.git_push)
+    print(json.dumps(payload,sort_keys=True,indent=2))
+    return 0
+if __name__=="__main__": raise SystemExit(main())

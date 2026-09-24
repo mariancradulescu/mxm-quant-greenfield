@@ -1,0 +1,45 @@
+{
+  "schema": "mxm.greenfield.general-ai-unattended-reasoning-provider-freeze.v1",
+  "status": "FROZEN_PENDING_EXACT_HEAD_GREEN",
+  "provider_interface": "PROVIDER_NEUTRAL_GENERAL_AI_PROPOSAL_V1",
+  "active_adapter": {
+    "kind": "GITHUB_MODELS_INFERENCE_API",
+    "endpoint": "https://models.github.ai/inference/chat/completions",
+    "authentication": "GITHUB_ACTIONS_BUILT_IN_GITHUB_TOKEN",
+    "required_workflow_permission": "models: read",
+    "default_model_preference": [
+      "openai/gpt-5.6-sol",
+      "openai/gpt-5.5",
+      "openai/gpt-5.4",
+      "openai/gpt-4o"
+    ],
+    "external_secret_required": false
+  },
+  "architecture": {
+    "general_ai_selects_research_action": true,
+    "finite_next_action_table": false,
+    "deterministic_bridge_validates_new_proposals": true,
+    "runtime_v2_remains_exactly_once_economic_executor": true,
+    "provider_can_open_economics_directly": false,
+    "provider_can_consume_v2_attempt_directly": false
+  },
+  "current_gate": {
+    "expected_accounting": {
+      "v2_attempts_used": 19,
+      "v2_search_budget_remaining": 65,
+      "economic_outcomes_opened": 27
+    },
+    "c031_stage_b_rerun_forbidden": true,
+    "next_state_expected": "STAGE_B_OUTCOME_OPENED_PENDING_AI_INTERPRETATION"
+  },
+  "activation": "ONLY_AFTER_THIS_IMPLEMENTATION_IS_EXACT_HEAD_GREEN",
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  }
+}

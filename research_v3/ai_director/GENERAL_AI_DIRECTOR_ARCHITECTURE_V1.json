@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.general-ai-research-director-architecture.v1",
-  "status": "PROSPECTIVE_PRE_ACCEPTANCE",
+  "status": "GENERAL_AI_REASONING_PROVIDER_IMPLEMENTED_PENDING_EXACT_HEAD_GREEN",
   "decision": "PROVIDER_NEUTRAL_AI_REASONING_PROTOCOL_PLUS_DETERMINISTIC_RUNTIME_V2_GUARD",
   "separation": {
     "ai_research_director": [
@@ -45,8 +45,15 @@
       "GITHUB_AGENTIC_WORKFLOW_WITH_GITHUB_COPILOT",
       "OTHER_SCHEMA_COMPATIBLE_AGENT"
     ],
-    "rule": "Provider adapters may generate proposals but may not bypass the deterministic bridge or Runtime V2.",
-    "github_personal_repo_note": "Unattended provider execution requires a configured provider secret/token; no secret is assumed or fabricated."
+    "rule": "Provider adapters may originate general research proposals but may not bypass the deterministic bridge or Runtime V2.",
+    "github_personal_repo_note": "Unattended provider execution requires a configured provider secret/token; no secret is assumed or fabricated.",
+    "unattended_active_adapter": {
+      "kind": "GITHUB_MODELS",
+      "auth": "GITHUB_TOKEN + models:read",
+      "external_secret_required": false,
+      "interface": "mxm.greenfield.general-ai-research-proposal.v1"
+    },
+    "github_models_docs_verified_utc": "2026-09-24"
   },
   "anti_hardcoding": {
     "objective_class_enum": false,
