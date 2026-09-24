@@ -154,15 +154,18 @@ def execute(path: str | Path, *, expected_common_timestamps: int = EXPECTED_COMM
                     "direction_contingency": dict(sorted(local.items())),
                 })
             same = counts.get("1,1", 0) + counts.get("-1,-1", 0)
-            nonzero = sum(value for key, value in counts.items()
-                          if key.split(",") != ["0", "0"])
+            opposite = counts.get("1,-1", 0) + counts.get("-1,1", 0)
+            both_nonzero = same + opposite
+            zero_in_either = sum(counts.values()) - both_nonzero
             pair_results[f"{source}|{target}"] = {
                 "source": source,
                 "target": target,
                 "pairs": sum(counts.values()),
                 "direction_contingency": dict(sorted(counts.items())),
-                "same_direction_fraction_nonzero": same / nonzero if nonzero else None,
-                "same_direction_fraction_95ci": _wilson_interval(same, nonzero),
+                "same_nonzero_direction_count": same,
+                "opposite_nonzero_direction_count": opposite,
+                "zero_in_either_count": zero_in_either,
+                "same_direction_fraction_both_nonzero": same / both_nonzero if both_nonzero else None,
                 "contiguous_segments": segment_counts,
             }
     result = {

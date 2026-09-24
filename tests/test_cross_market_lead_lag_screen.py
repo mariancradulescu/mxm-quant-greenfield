@@ -22,6 +22,16 @@ class CrossMarketLeadLagScreenTests(unittest.TestCase):
         self.assertEqual(EXPECTED_COMMON_TIMESTAMPS, 9558)
         self.assertEqual(EXPECTED_CONSECUTIVE_PAIRS, 9475)
 
+    def test_directional_summary_excludes_one_sided_zeros(self):
+        import inspect
+
+        source = inspect.getsource(execute)
+        self.assertIn('"same_nonzero_direction_count": same', source)
+        self.assertIn('"opposite_nonzero_direction_count": opposite', source)
+        self.assertIn('"zero_in_either_count": zero_in_either', source)
+        self.assertIn('"same_direction_fraction_both_nonzero": same / both_nonzero', source)
+        self.assertNotIn("same_direction_fraction_95ci", source)
+
     def test_series_uses_single_price_ohlc_and_rejects_invalid_invariant(self):
         raw = io.StringIO()
         writer = csv.writer(raw)
