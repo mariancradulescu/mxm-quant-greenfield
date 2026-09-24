@@ -229,6 +229,35 @@ def _reject_completed_outer_as_unseen(root: Path, proposal: Mapping[str, Any]) -
         raise AIProposalRejected("completed outer cannot be reused as unseen confirmation")
 
 
+def _reject_duplicate_accepted_capture(root: Path, proposal: Mapping[str, Any]) -> None:
+    """A new authenticated capture must not repeat an accepted exact broker-native scope."""
+    request = (proposal.get("data_policy") or {}).get("minimal_acquisition_request") or {}
+    if (proposal.get("data_policy") or {}).get("new_market_data_requested") is not True:
+        return
+    state = load_json(root / NEXT_STATE_REL, {}) or {}
+    plan_ref = state.get("completed_capture_plan_ref")
+    capture_ref = state.get("completed_capture_ref")
+    report_ref = state.get("completed_structural_report_ref")
+    if not all(isinstance(x, str) and x for x in (plan_ref, capture_ref, report_ref)):
+        return
+    plan = _load(root, plan_ref)
+    capture = _load(root, capture_ref)
+    report = _load(root, report_ref)
+    if (capture.get("source_capture") or {}).get("plan_sha256") != plan.get("plan_sha256"):
+        raise AIProposalRejected("accepted capture plan authority mismatch")
+    if (report.get("canonical_capture") or {}).get("sha256") != (capture.get("canonical_capture") or {}).get("sha256"):
+        raise AIProposalRejected("accepted capture structural report authority mismatch")
+    if not str(report.get("status") or "").endswith("_COMPLETE"):
+        raise AIProposalRejected("accepted capture lacks completed structural report")
+    symbols = [x.get("broker_symbol") if isinstance(x, Mapping) else x for x in plan.get("symbols") or []]
+    interval = plan.get("interval") or {}
+    if (request.get("symbols") == symbols
+            and request.get("resolution") == plan.get("resolution")
+            and request.get("start_utc") == interval.get("start_utc")
+            and request.get("end_utc") == interval.get("end_utc")):
+        raise AIProposalRejected("exact broker-native capture already accepted and screened; reuse existing evidence")
+
+
 def _active_authoritative_data_contract(root: Path) -> dict[str, Any] | None:
     """Resolve a still-unsatisfied prospective data contract from durable state.
 
@@ -371,6 +400,7 @@ def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]
     validate_proposal_shape(proposal)
     _validate_authoritative_data_contract(root, proposal)
     _reject_completed_outer_as_unseen(root, proposal)
+    _reject_duplicate_accepted_capture(root, proposal)
     basis = proposal.get("basis") or {}
     basis_head = _nonempty(basis.get("research_head"), "basis.research_head")
     if not _is_ancestor(root, basis_head):
