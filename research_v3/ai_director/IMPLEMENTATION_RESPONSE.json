@@ -1,25 +1,21 @@
 {
   "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
-  "changed_paths": [],
-  "created_utc": "2026-09-24T17:41:35Z",
-  "exact_head": {
-    "green": false,
-    "head": "cb67dc325d6ff5a11eb8ccb44a07dbee67953899",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "f3059aa3ec3a964b3c8b245726bf41e20b225d91",
-    "predecessor_run_id": 36035669331
-  },
+  "changed_paths": [
+    "research_v3/cross_market_lead_lag_screen.py",
+    "tests/test_cross_market_lead_lag_screen.py"
+  ],
+  "created_utc": "2026-09-24T17:42:15Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
+      "changed_paths": [
+        "research_v3/cross_market_lead_lag_screen.py",
+        "tests/test_cross_market_lead_lag_screen.py"
+      ],
       "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
       "economic_outcomes_opened": 0,
-      "expected_common_timestamps": 9558,
-      "expected_consecutive_pairs": 9470,
-      "interval": {
-        "end_utc": "2026-07-19T23:59:59Z",
-        "start_utc": "2026-05-25T00:00:00Z"
-      },
+      "expected_common_timestamps": 9539,
+      "expected_consecutive_pairs": 9455,
       "live_orders_authorized": false,
       "new_market_data_required": false,
       "ordered_pairs": 12,
@@ -41,10 +37,10 @@
     "implementation_id": "cross-market-lead-lag-screen-v2",
     "next_research_state": {
       "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_THE_CORRECTED_NON_ECONOMIC_SCREEN",
-      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
+      "status": "EXACT_HEAD_VALIDATION_REQUIRED"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The accepted non-economic implementation is sufficient by inspection. It binds the exact Library-backed AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 capture, validates single-price OHLC data and integrity constraints, evaluates all twelve ordered pairs using strictly consecutive timestamps, and preserves zero economic outcomes and zero V2-attempt consumption. No code, manifest, collector, or external-data changes are required. Exact-head authority is not currently green, so execution remains gated.",
+    "summary": "Corrected the non-economic screen defaults to match the hash-bound accepted capture and authoritative structural gate: 9,539 common timestamps and 9,455 strictly consecutive pairs. Added a regression test for these scope constants. No external data, collector, economic identity, outcome, promotion, or V2 accounting change is required.",
     "tests_requested": [
       "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
@@ -67,5 +63,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }

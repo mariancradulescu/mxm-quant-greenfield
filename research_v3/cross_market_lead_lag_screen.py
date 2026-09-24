@@ -16,6 +16,8 @@ SOURCE_CAPTURE_SHA256 = "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb
 SOURCE_CAPTURE_REF = "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json"
 PLAN_REF = "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json"
 SYMBOLS = ("AUDJPY", "AUS200", "Brent-F", "BCHUSD")
+EXPECTED_COMMON_TIMESTAMPS = 9539
+EXPECTED_CONSECUTIVE_PAIRS = 9455
 INTERVAL = {
     "start_utc": "2026-05-25T00:00:00Z",
     "end_utc": "2026-07-19T23:59:59Z",
@@ -112,8 +114,8 @@ def _wilson_interval(successes: int, total: int) -> list[float] | None:
     return [max(0.0, centre - radius), min(1.0, centre + radius)]
 
 
-def execute(path: str | Path, *, expected_common_timestamps: int = 9558,
-            expected_pairs: int = 9470) -> dict[str, Any]:
+def execute(path: str | Path, *, expected_common_timestamps: int = EXPECTED_COMMON_TIMESTAMPS,
+            expected_pairs: int = EXPECTED_CONSECUTIVE_PAIRS) -> dict[str, Any]:
     series, metadata = _load_capture(path)
     common = set.intersection(*(set(rows) for rows in series.values()))
     ordered = sorted(common)
