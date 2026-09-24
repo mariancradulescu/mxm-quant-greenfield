@@ -16,6 +16,7 @@
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
+  "ai_reasoning_required": true,
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "authorizing_evidence_epoch": 6,
   "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
@@ -23,19 +24,20 @@
   "broader_universe_state": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
   "broader_universe_status": "OPEN",
   "capture_integrity": {
-    "status": "ACCEPTED_COMPLETE_NON_ECONOMIC_DEVELOPMENT_CAPTURE",
+    "duplicate_timestamps": 0,
+    "ohlc_failures": 0,
+    "out_of_interval_rows": 0,
+    "protected_forward_rows": 0,
     "returned_zip_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
     "series_complete": 4,
     "series_total": 4,
-    "total_rows": 47375,
-    "protected_forward_rows": 0,
-    "duplicate_timestamps": 0,
-    "ohlc_failures": 0,
-    "out_of_interval_rows": 0
+    "status": "ACCEPTED_COMPLETE_NON_ECONOMIC_DEVELOPMENT_CAPTURE",
+    "total_rows": 47375
   },
   "capture_required": false,
   "collector_build_ref": "tools/build_crossalign_four_symbol_capture_package.py",
   "collector_package_artifact_name": "MXM_CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PACKAGE_V1.zip",
+  "crossalign_capture_acceptance_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
   "current_development_evidence_sufficient_for_cross_symbol_families": false,
   "current_development_evidence_sufficient_for_univariate_families": true,
   "current_integrity": {
@@ -66,6 +68,7 @@
   "expected_return_artifact_name": "MXM_CROSSALIGN_FOUR_SYMBOL_M5_NON_ECONOMIC_V1.zip",
   "external_data_gate": null,
   "external_data_gate_ref": "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json",
+  "external_data_required": false,
   "external_gate": null,
   "family_exhaustion_claimed": false,
   "fresh_evidence_epoch_required": true,
@@ -199,13 +202,13 @@
   "source_implementation_id": "crossalign-four-symbol-m5-capture-v1",
   "source_runtime_operation_id": "op_957b7fe366c184269a7809366416434a",
   "stale_reasoning_guard": {
-    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT",
-    "current_evidence_epoch": 7,
     "authorizing_evidence_epoch": 6,
-    "previous_status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
-    "previous_next_action": "AWAIT_READ_ONLY_CAPTURE_ZIP_RETURN_TO_AI_DIRECTOR",
-    "previous_external_data_gate": "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json",
-    "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon research judgment after material evidence advances."
+    "current_evidence_epoch": 7,
+    "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
+    "previous_external_data_gate": null,
+    "previous_next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+    "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
+    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
   "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
   "superseded_general_ai_proposal": {
@@ -266,8 +269,5 @@
     "v2_attempts_consumed": 0
   },
   "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
-  "user_action_required": false,
-  "ai_reasoning_required": true,
-  "external_data_required": false,
-  "crossalign_capture_acceptance_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json"
+  "user_action_required": false
 }
