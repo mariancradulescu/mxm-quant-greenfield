@@ -1,6 +1,6 @@
 {
-  "schema": "mxm.greenfield.session-gap-selected-six-panel-freeze.v1",
-  "status": "FROZEN_PROSPECTIVE_NON_ECONOMIC_METHODOLOGY",
+  "schema": "mxm.greenfield.session-gap-selected-six-panel-freeze.v2",
+  "status": "FROZEN_PROSPECTIVE_NON_ECONOMIC_METHODOLOGY_PENDING_INDEPENDENT_OUTER_DATA",
   "source_result_ref": "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json",
   "source_capture_acceptance_ref": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
   "source_canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
@@ -39,13 +39,14 @@
     "development_only": true,
     "source_bytes_are_existing_accepted_capture": true,
     "protected_forward_start_not_used": true,
-    "no_new_market_data_required": true
+    "methodology_compilation_uses_observed_wave01": true,
+    "no_new_market_data_required_for_methodology_compilation": true
   },
   "causal_methodology": {
     "gap_definition": "Consecutive observed bars separated by at least 30 minutes; no synthetic bars or forward fill.",
     "prior_scale_window_exact_m5_returns": 288,
     "minimum_scale_observations": 144,
-    "shock_scale_multiple": 3.0,
+    "shock_scale_multiple": 3,
     "admission": "Use only rows observed before the signal; admit a shock only when the prior scale is available and finite.",
     "entry": "Next observed M5 open at or after signal time plus one M5 decision delay.",
     "measurement_horizon_minutes": 60,
@@ -68,6 +69,21 @@
       "minimum_active_weeks_per_symbol": 6,
       "minimum_schedule_adjusted_observation_coverage": 0.97,
       "maximum_unresolved_chronology_conflicts": 0
+    },
+    "confirmatory_outer_testing": {
+      "primary_endpoint": "Per-symbol sign of causal directional_60m_return after the frozen session-gap shock admission rule",
+      "null_hypothesis": "P(directional_60m_return > 0) <= 0.5",
+      "per_symbol_test": "ONE_SIDED_EXACT_BINOMIAL_SIGN_TEST; exact zero returns excluded prospectively",
+      "familywise_correction": "HOLM_BONFERRONI",
+      "familywise_alpha": 0.05,
+      "family_size": 6,
+      "secondary_magnitude_outputs": "Median/mean directional return and event-density diagnostics remain descriptive unless separately frozen.",
+      "no_symbol_replacement_after_outer_open": true
+    },
+    "cost_authority_before_outer": {
+      "required": true,
+      "rule": "Before any cost-aware or economic conclusion, bind candidate-independent broker-realistic friction authority for all six symbols prospectively. Wave01 structural returns may not tune the cost model.",
+      "missing_cost_authority_behavior": "FAIL_CLOSED_FOR_COST_AWARE_OR_ECONOMIC_INTERPRETATION"
     }
   },
   "economic_boundary": {
@@ -81,6 +97,25 @@
     "live_orders_authorized": false,
     "competition_start_authorized": false,
     "mechanism_family_closed": false,
-    "exact_c031_rerun": false
+    "exact_c031_rerun": false,
+    "outer_economic_execution_authorized": false
+  },
+  "independent_outer_contract": {
+    "required": true,
+    "rationale": "The six-symbol panel and methodology were selected after observing Wave01 structural summaries. Wave01 bytes remain DEVELOPMENT and cannot serve as an independent outer evaluation.",
+    "source_wave01_canonical_capture_may_be_outer": false,
+    "outer_dataset_must_be_disjoint_from_source_capture": true,
+    "outer_dataset_must_be_unopened_when_exact_scope_and_hash_authority_are_frozen": true,
+    "protected_forward_must_remain_closed": true,
+    "user_does_not_select_symbols_or_window": true,
+    "exact_symbols_fixed_for_first_outer": [
+      "MXNJPY",
+      "USDCAD",
+      "EURUSD",
+      "IWM.US",
+      "TLT.US",
+      "NVDA.US-24"
+    ],
+    "next_step": "GENERAL_AI_SELECT_MINIMAL_DISJOINT_OUTER_WINDOW_AND_REQUIRED_COST_AUTHORITY_BEFORE_ANY_OUTER_OUTCOME"
   }
 }
