@@ -1,10 +1,10 @@
 {
   "basis_next_state_sha256": "2089c5162438ee8050af2563bff2ffdda7c17705c3c1cb6a1e3905d3d35cab33",
   "changed_paths": [],
-  "created_utc": "2026-09-24T05:31:10Z",
+  "created_utc": "2026-09-24T05:31:29Z",
   "exact_head": {
     "green": false,
-    "head": "ccd4183c23919a27debb2f0a1ff3c047ac77cce5",
+    "head": "3e8ed9a7d3999cb452f5c4f309ace76ade53d9ca",
     "predecessor_conclusion": "success",
     "predecessor_head": "fac9855e73b4b322eda773d03851f34b83894332",
     "predecessor_run_id": 35960174770
@@ -14,7 +14,6 @@
     "decision": {
       "capture_acceptance_ref": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
       "capture_plan_ref": "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json",
-      "collector_launcher_ref": "research_v3/pydroid_c031_structural_extension_launcher.py",
       "collector_ref": "research_v3/c031_structural_extension_capture.py",
       "economic_effect": {
         "candidate_identity_created": false,
@@ -22,8 +21,8 @@
         "v2_attempts_consumed": 0
       },
       "freeze_ref": "research_v3/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_FREEZE_V1.json",
-      "implementation_ref": "research_v3/session_gap_structural_screen_v1.py",
-      "methodology": "Compile and validate the frozen structural-only screen using existing captured data; do not open economics, create an identity, rerun C031 Stage-B, open protected evidence, or authorize orders.",
+      "implementation_changes_required": false,
+      "methodology_ref": "research_v3/session_gap_structural_screen_v1.py",
       "safety": {
         "competition_start_authorized": false,
         "live_orders_authorized": false,
@@ -37,7 +36,7 @@
       "status": "READY_FOR_FROZEN_METHODOLOGY_COMPILATION_AND_VALIDATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The repository already contains the frozen non-economic SESSION_GAP_REVERSION structural screen, exact 12-symbol M5 capture plan, read-only collector, canonical capture acceptance controls, and dedicated tests. No code, manifest, test, or evidence edits are required for frozen methodology compilation and validation.",
+    "summary": "The repository already implements the frozen non-economic SESSION_GAP_REVERSION structural methodology, including the read-only collector, exact capture plan, canonical capture acceptance, causal screening logic, safety controls, and dedicated tests. Existing captured data satisfies the external data requirement; no code, test, manifest, or evidence edits are required.",
     "tests_requested": [
       "tests/test_session_gap_structural_extension_wave01.py",
       "tests/test_c031_structural_extension_capture.py"
