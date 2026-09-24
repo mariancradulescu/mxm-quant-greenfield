@@ -1,4 +1,52 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "d6988bd358d8d6f18cbc4e097980ae85b1d8526f",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "d6988bd358d8d6f18cbc4e097980ae85b1d8526f",
+    "predecessor_run_id": 35960840328
+  },
+  "accepted_output": {
+    "decision": {
+      "competition_start_authorized": false,
+      "economic_candidate_identity_created": false,
+      "economic_outcomes_opened": 0,
+      "exact_c031_rerun": false,
+      "live_orders_authorized": false,
+      "mechanism_family_closed": false,
+      "methodology_ref": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+      "new_market_data_required": false,
+      "protected_forward_opened": false,
+      "selected_symbols": [
+        "MXNJPY",
+        "USDCAD",
+        "EURUSD",
+        "IWM.US",
+        "TLT.US",
+        "NVDA.US-24"
+      ],
+      "source_canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
+      "test_ref": "tests/test_session_gap_selected_six_panel_freeze.py",
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "c031-structural-extension-selected-six-panel-freeze-v1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+        "tests/test_session_gap_selected_six_panel_freeze.py"
+      ],
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a frozen non-economic specification for the selected six-symbol SESSION_GAP_REVERSION panel using existing accepted M5 capture bytes. The specification fixes panel membership, causal chronology, coverage thresholds, descriptive aggregation, multiple-testing discipline, and all economic/safety boundaries without requiring new market data.",
+    "tests_requested": [
+      "python -m unittest tests/test_session_gap_selected_six_panel_freeze.py",
+      "python -m unittest tests/test_session_gap_structural_extension_wave01.py tests/test_c031_structural_extension_capture.py"
+    ]
+  },
   "basis_next_state_sha256": "2089c5162438ee8050af2563bff2ffdda7c17705c3c1cb6a1e3905d3d35cab33",
   "changed_paths": [
     "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
@@ -58,5 +106,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
