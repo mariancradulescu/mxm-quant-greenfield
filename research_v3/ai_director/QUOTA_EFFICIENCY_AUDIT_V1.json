@@ -1,0 +1,48 @@
+{
+  "schema": "mxm.greenfield.quota-efficiency-audit.v1",
+  "status": "INFRASTRUCTURE_REPAIR_PENDING_EXACT_HEAD_GREEN",
+  "observed_pre_repair": {
+    "provider": "github-copilot-cli",
+    "legacy_recoverable_failure_checkpoints": 8,
+    "exact_credits_consumed": null,
+    "root_cause": "Quota errors were reattempted on every liveness wake; reasoning provider could retry a known exhausted quota up to five times within one wake. A successful sentinel exit was mistaken for forward research liveness."
+  },
+  "call_gate": {
+    "authority": "evidence epoch, accepted evidence hashes, pending decision, research contract and universe",
+    "monthly_quota": "GLOBAL_PROVIDER_UNAVAILABLE_UNTIL_CONFIRMED_RESET",
+    "duplicate_call": "BLOCKED_WITHOUT_PROVIDER_INVOCATION",
+    "transient_failure": "RETRYABLE",
+    "semantic_integrity_failure": "FATAL"
+  },
+  "execution_split": {
+    "deterministic": [
+      "ledger and accounting",
+      "hashes",
+      "exact head CI",
+      "persistence",
+      "idempotent recovery"
+    ],
+    "semantic": [
+      "new research hypothesis",
+      "material interpretation"
+    ]
+  },
+  "context": "Current provider context uses hash-bound summaries for artifacts larger than 3000 bytes; retains authoritative refs and next state.",
+  "progress_classes": [
+    "MATERIAL_PROGRESS",
+    "SAFE_NO_PROGRESS",
+    "LEGITIMATE_EXTERNAL_GATE",
+    "PROVIDER_UNAVAILABLE",
+    "MATERIAL_FAILURE"
+  ],
+  "telemetry": {
+    "path": "research_v3/ai_director/PROVIDER_USAGE_V1.json",
+    "scope": "runtime provider invocations",
+    "actual_cli_calls_when_internal_retries_occur": null,
+    "actual_credits": null,
+    "model_identity_if_auto": null
+  },
+  "economic_semantics_changed": false,
+  "c032_rerun": false,
+  "attempts_consumed": 0
+}
