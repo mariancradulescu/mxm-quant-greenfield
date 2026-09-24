@@ -51,7 +51,7 @@ jobs:
         run: python -m research_v3.autonomous_control_plane validate
 
       - name: Focused Runtime V2 and general AI director tests
-        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider tests.test_general_ai_implementation_executor tests.test_c031_structural_extension_capture
 
       - name: Prove general AI research director boundary if not yet accepted
         shell: bash
@@ -76,23 +76,21 @@ jobs:
       - name: Install GitHub Copilot CLI for unattended reasoning
         run: npm install -g @github/copilot
 
-      - name: Wake general AI reasoning when the durable state requires it
+      - name: Continue general AI reasoning and implementation autonomously
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ github.token }}
-          MXM_COPILOT_MODEL: auto
+          MXM_COPILOT_MODEL: gpt-5.4
+          MXM_COPILOT_IMPLEMENTATION_MODEL: gpt-5.3-codex
+          MXM_PREDECESSOR_CI_HEAD: ${{ github.event.workflow_run.head_sha }}
+          MXM_PREDECESSOR_CI_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          MXM_PREDECESSOR_CI_RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
-          python -m research_v3.general_ai_reasoning_provider wake \
+          python -m research_v3.general_ai_autonomy_loop continue \
             --root . \
             --git-checkpoint \
-            --git-push
-
-      - name: Drain newly generated AI proposal through Runtime V2
-        run: |
-          python -m research_v3.general_ai_director_bridge drain \
-            --root . \
-            --git-checkpoint \
-            --git-push
+            --git-push \
+            --max-cycles 8
 
       - name: Materialize any explicitly AI-authorized economic envelope
         run: |

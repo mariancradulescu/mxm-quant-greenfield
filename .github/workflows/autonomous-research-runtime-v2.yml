@@ -28,6 +28,7 @@ on:
 permissions:
   contents: write
   actions: write
+  copilot-requests: write
 
 concurrency:
   group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
@@ -170,7 +171,7 @@ jobs:
 
       - name: Runtime V2 and general AI director focused tests
         if: ${{ steps.mode.outputs.mode == 'resume' }}
-        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider tests.test_general_ai_implementation_executor
 
       - name: Prove general AI research director boundary if required
         if: ${{ steps.mode.outputs.mode == 'resume' }}
@@ -193,4 +194,22 @@ jobs:
             --root . \
             --git-checkpoint \
             --git-push
+
+      - name: Install GitHub Copilot CLI for autonomous continuation
+        if: ${{ steps.mode.outputs.mode == 'resume' }}
+        run: npm install -g @github/copilot
+
+      - name: Continue general AI reasoning and implementation
+        if: ${{ steps.mode.outputs.mode == 'resume' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ github.token }}
+          MXM_COPILOT_MODEL: gpt-5.4
+          MXM_COPILOT_IMPLEMENTATION_MODEL: gpt-5.3-codex
+        run: |
+          python -m research_v3.general_ai_autonomy_loop continue \
+            --root . \
+            --git-checkpoint \
+            --git-push \
+            --max-cycles 8
 
