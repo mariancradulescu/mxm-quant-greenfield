@@ -11,8 +11,7 @@ from pathlib import Path
 
 from google.protobuf.json_format import MessageToDict
 
-from competition.ultra_fast_capture import QUOTE_TYPES
-from m6.cost_evidence import DecodedTick, decode_ctrader_tick_page, next_tick_page_to_ms
+from m6.cost_evidence import QUOTE_TYPES, DecodedTick, decode_ctrader_tick_page, next_tick_page_to_ms
 from m6.ctrader_capture import (
     CaptureContractError, MappingError, account_fingerprint, atomic_write_json,
     require_read_only_request,
