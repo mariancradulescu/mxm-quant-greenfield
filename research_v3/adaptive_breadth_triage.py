@@ -20,6 +20,7 @@ ACCEPTANCE_REL = "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.j
 PLAN_REL = "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json"
 ACCEPTED_STATUS = "ACCEPTED_COMPLETE_NON_ECONOMIC_DEVELOPMENT_CAPTURE"
 M5_SECONDS = 300
+BREAKOUT_HISTORY_BARS = 12
 FAMILIES = (
     ("TREND_MOMENTUM", "TIME_SERIES", ("ordered_ohlc", "sufficient_history")),
     ("MEAN_REVERSION", "TIME_SERIES", ("ordered_ohlc", "sufficient_history")),
@@ -195,6 +196,174 @@ def run_univariate_structural_gate(
             "additional_authenticated_data_required": False,
             "selection_basis": "non-economic prerequisite coverage and observed chronology/session availability",
             "economic_identity_authorized": False,
+        },
+        "economic_effect": {
+            "economic_outcomes_opened": 0,
+            "v2_attempts_consumed": 0,
+            "returns_or_pnl_computed": False,
+            "promotion_claimed": False,
+        },
+        "safety": {
+            "protected_forward_opened": False,
+            "live_orders_authorized": False,
+            "parameter_mining": False,
+        },
+    }
+
+
+def _breakout_event_diagnostics(
+    raw: bytes, start: datetime, end: datetime
+) -> dict[str, Any]:
+    """Evaluate one fixed causal breakout/volatility-expansion event law.
+
+    An event is admitted at bar t only when the immediately preceding
+    BREAKOUT_HISTORY_BARS bars are observed at the expected M5 cadence and
+    bar t breaks their high or low while its range exceeds their mean range.
+    This is an availability screen only; it does not assign direction or
+    evaluate a subsequent response.
+    """
+    reader = csv.DictReader(io.StringIO(raw.decode("utf-8")))
+    expected = ("time_utc", "open", "high", "low", "close", "tick_volume")
+    if tuple(reader.fieldnames or ()) != expected:
+        raise TriageError("breakout gate requires single-price OHLC and tick volume")
+    bars: list[tuple[datetime, float, float, float, float]] = []
+    for row in reader:
+        timestamp = _utc(str(row["time_utc"]))
+        if not start <= timestamp <= end:
+            raise TriageError("series contains a row outside the frozen interval")
+        try:
+            open_, high, low, close = (
+                float(row[key]) for key in ("open", "high", "low", "close")
+            )
+            float(row["tick_volume"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise TriageError("series contains a non-numeric OHLCV field") from exc
+        values = (open_, high, low, close)
+        if not all(value == value and abs(value) != float("inf") for value in values):
+            raise TriageError("series contains a non-finite OHLC field")
+        if high < max(open_, close) or low > min(open_, close) or low > high:
+            raise TriageError("series contains an invalid OHLC invariant")
+        bars.append((timestamp, open_, high, low, close))
+    if any(left >= right for left, right in zip((bar[0] for bar in bars), (bar[0] for bar in bars[1:]))):
+        raise TriageError("series timestamps are not strictly increasing")
+
+    missing_history = 0
+    eligible_bars = 0
+    events = 0
+    event_timestamps: list[datetime] = []
+    for index in range(BREAKOUT_HISTORY_BARS, len(bars)):
+        history = bars[index - BREAKOUT_HISTORY_BARS:index]
+        current = bars[index]
+        if any(
+            (right[0] - left[0]).total_seconds() != M5_SECONDS
+            for left, right in zip(history, history[1:])
+        ) or (current[0] - history[-1][0]).total_seconds() != M5_SECONDS:
+            missing_history += 1
+            continue
+        eligible_bars += 1
+        prior_high = max(bar[2] for bar in history)
+        prior_low = min(bar[3] for bar in history)
+        prior_mean_range = sum(bar[2] - bar[3] for bar in history) / len(history)
+        current_range = current[2] - current[3]
+        if (current[2] > prior_high or current[3] < prior_low) and current_range > prior_mean_range:
+            events += 1
+            event_timestamps.append(current[0])
+    spacings = [
+        int((right - left).total_seconds() // M5_SECONDS)
+        for left, right in zip(event_timestamps, event_timestamps[1:])
+    ]
+    return {
+        "rows": len(bars),
+        "first_utc": bars[0][0].isoformat().replace("+00:00", "Z") if bars else None,
+        "last_utc": bars[-1][0].isoformat().replace("+00:00", "Z") if bars else None,
+        "minimum_history_bars": BREAKOUT_HISTORY_BARS,
+        "eligible_bars": eligible_bars,
+        "missing_history_exclusions": missing_history,
+        "event_count": events,
+        "event_timestamps_utc": [
+            timestamp.isoformat().replace("+00:00", "Z") for timestamp in event_timestamps
+        ],
+        "event_spacing_m5": spacings,
+        "event_clustering": {
+            "adjacent_event_pairs": sum(spacing == 1 for spacing in spacings),
+            "minimum_spacing_m5": min(spacings, default=None),
+            "maximum_spacing_m5": max(spacings, default=None),
+        },
+        "chronology_valid": True,
+        "economic_evaluation": "NOT_PERFORMED",
+    }
+
+
+def run_breakout_event_availability_gate(
+    zip_path: str | Path,
+    *,
+    repository_root: str | Path = ".",
+    accepted_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Run the accepted 40-symbol causal breakout availability gate."""
+    root = Path(repository_root)
+    acceptance = _load_json(root, ACCEPTANCE_REL)
+    plan = _load_json(root, PLAN_REL)
+    if acceptance.get("status") != ACCEPTED_STATUS:
+        raise TriageError("development capture acceptance is not complete")
+    expected_sha = accepted_sha256 or str((acceptance.get("source") or {}).get("zip_sha256") or "")
+    observed_sha = _sha256(Path(zip_path))
+    if not expected_sha or observed_sha != expected_sha:
+        raise TriageError("development ZIP hash does not match accepted capture")
+    if plan.get("resolution") != "M5":
+        raise TriageError("breakout gate requires M5 capture")
+    interval = plan.get("interval") or {}
+    start, end = _utc(str(interval["start_utc"])), _utc(str(interval["end_utc"]))
+    symbols = {str(item["broker_symbol"]): item for item in plan.get("symbols") or []}
+    if len(symbols) != 40:
+        raise TriageError("breakout gate requires the exact accepted 40-symbol capture")
+    with zipfile.ZipFile(zip_path) as archive:
+        try:
+            manifest = json.loads(archive.read("capture_manifest.json"))
+        except (KeyError, json.JSONDecodeError) as exc:
+            raise TriageError("capture manifest is missing or invalid") from exc
+        if manifest.get("plan_sha256") != plan.get("plan_sha256"):
+            raise TriageError("capture manifest plan hash mismatch")
+        if manifest.get("economic_outcomes_opened") != 0 or manifest.get("v2_attempts_consumed") != 0:
+            raise TriageError("capture manifest is economically contaminated")
+        manifest_rows = _manifest_series(manifest)
+        if set(manifest_rows) != set(symbols):
+            raise TriageError("capture series set does not match frozen development plan")
+        diagnostics = {
+            symbol: _breakout_event_diagnostics(archive.read(str(item["file"])), start, end)
+            for symbol, item in sorted(manifest_rows.items())
+        }
+    eligible = [
+        symbol for symbol, value in diagnostics.items() if value["event_count"] > 0
+    ]
+    return {
+        "schema": "mxm.greenfield.broker-native-breakout-event-availability-gate.v1",
+        "status": "COMPLETE_NON_ECONOMIC_BREAKOUT_EVENT_AVAILABILITY_GATE",
+        "source": {
+            "acceptance_ref": ACCEPTANCE_REL,
+            "plan_ref": PLAN_REL,
+            "zip_sha256": observed_sha,
+            "resolution": "M5",
+            "symbols_screened": len(diagnostics),
+        },
+        "scope": {
+            "family": "BREAKOUT_VOLATILITY_EXPANSION",
+            "event_law": {
+                "history_bars": BREAKOUT_HISTORY_BARS,
+                "breakout": "current high above prior rolling high or current low below prior rolling low",
+                "volatility_expansion": "current high-low range above prior rolling mean range",
+                "causal_observation_rule": "all prior history bars and current bar must be observed at consecutive M5 cadence",
+            },
+            "rows_read": sum(value["rows"] for value in diagnostics.values()),
+            "per_symbol": diagnostics,
+        },
+        "prospective_recommendation": {
+            "kind": "PROSPECTIVE_MECHANISM_SPECIFICATION_IF_EVENT_AVAILABILITY_SUFFICIENT",
+            "eligible_symbol_count": len(eligible),
+            "eligible_symbols": eligible,
+            "additional_authenticated_data_required": False,
+            "economic_identity_authorized": False,
+            "family_exhaustion_claimed": False,
         },
         "economic_effect": {
             "economic_outcomes_opened": 0,

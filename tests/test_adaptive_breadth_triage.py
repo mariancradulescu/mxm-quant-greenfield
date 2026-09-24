@@ -11,6 +11,7 @@ from pathlib import Path
 from research_v3.adaptive_breadth_triage import (
     _read_gate_series,
     run_triage,
+    run_breakout_event_availability_gate,
     run_univariate_structural_gate,
     select_primary_family,
 )
@@ -137,6 +138,48 @@ class AdaptiveBreadthTriageTests(unittest.TestCase):
             )
             self.assertEqual(result["economic_effect"]["economic_outcomes_opened"], 0)
             self.assertFalse(result["economic_effect"]["returns_or_pnl_computed"])
+
+    def test_breakout_event_gate_is_causal_and_non_economic(self):
+        root = Path(__file__).resolve().parents[1]
+        plan = json.loads(
+            (root / "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json").read_text()
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "capture.zip"
+            manifest = {
+                "plan_sha256": plan["plan_sha256"],
+                "economic_outcomes_opened": 0,
+                "v2_attempts_consumed": 0,
+                "series": [],
+            }
+            with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as archive:
+                for spec in plan["symbols"]:
+                    name = f"{spec['symbol_id']}_{spec['broker_symbol']}_M5.csv"
+                    stream = io.StringIO()
+                    writer = csv.writer(stream)
+                    writer.writerow(("time_utc", "open", "high", "low", "close", "tick_volume"))
+                    origin = datetime(2026, 6, 15, tzinfo=timezone.utc)
+                    for step in range(20):
+                        timestamp = origin + timedelta(minutes=5 * step)
+                        high = 2 if step < 12 else (3 if step == 12 else 2)
+                        low = 1
+                        writer.writerow(
+                            (timestamp.isoformat().replace("+00:00", "Z"), "1", high, low, "1.5", "0")
+                        )
+                    archive.writestr(name, stream.getvalue())
+                    manifest["series"].append({"broker_symbol": spec["broker_symbol"], "file": name})
+                archive.writestr("capture_manifest.json", json.dumps(manifest))
+            observed = hashlib.sha256(path.read_bytes()).hexdigest()
+            result = run_breakout_event_availability_gate(
+                path, repository_root=root, accepted_sha256=observed
+            )
+            self.assertEqual(
+                result["status"], "COMPLETE_NON_ECONOMIC_BREAKOUT_EVENT_AVAILABILITY_GATE"
+            )
+            self.assertEqual(result["scope"]["per_symbol"]["VER.AT"]["event_count"], 1)
+            self.assertEqual(result["scope"]["per_symbol"]["VER.AT"]["missing_history_exclusions"], 0)
+            self.assertFalse(result["economic_effect"]["returns_or_pnl_computed"])
+            self.assertFalse(result["prospective_recommendation"]["family_exhaustion_claimed"])
 
 
 if __name__ == "__main__":
