@@ -7,7 +7,7 @@ from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import drain
 from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
-from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso
+from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso, sha256_file
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 
 VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
@@ -41,7 +41,10 @@ def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
     authority={
         "phase":phase,
         "epoch":epoch.get("current_epoch"),
-        "evidence_refs":epoch.get("authoritative_evidence_refs"),
+        "evidence_refs_and_hashes":[
+            {"ref":rel,"sha256":sha256_file(root/rel) if (root/rel).is_file() else "MISSING"}
+            for rel in epoch.get("authoritative_evidence_refs",[])
+        ],
         "trigger":epoch.get("trigger_event"),
         "decision":state.get("next_action"),
         "status":state.get("status"),
