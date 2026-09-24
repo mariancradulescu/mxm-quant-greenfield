@@ -1,53 +1,74 @@
 {
-  "basis_next_state_sha256": "1cb213430c39218660bc55a7a84c00ac03d6529c24ff10e57a6bf1034a59a63b",
-  "changed_paths": [],
-  "created_utc": "2026-09-24T12:42:09Z",
-  "exact_head": {
-    "green": false,
-    "head": "05ac1812bfba891ea7e31c2b8d74a3bb1966e539",
-    "predecessor_conclusion": "failure",
-    "predecessor_head": "badc0f3dadfec812d3c035303e02148fe4928a33",
-    "predecessor_run_id": 36000545574
-  },
+  "basis_next_state_sha256": "67448f5c2bd25037f0f0f5f02ae95f9cdce1b0dbfeb17419c926a71817ba1e8b",
+  "changed_paths": [
+    "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
+    "research_v3/crossalign_four_symbol_capture.py",
+    "research_v3/pydroid_crossalign_four_symbol_launcher.py",
+    "tests/test_crossalign_four_symbol_capture.py",
+    "tools/build_crossalign_four_symbol_capture_package.py"
+  ],
+  "created_utc": "2026-09-24T12:52:34Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "RETAIN_EXISTING_IMPLEMENTATION",
-      "capture_binding": {
-        "acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "accepted_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-        "plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
-        "resolution": "M5",
-        "symbols_screened": 40
+      "action": "AWAIT_READ_ONLY_CAPTURE_ZIP_RETURN_TO_AI_DIRECTOR",
+      "bid_ask_or_spread_requested": false,
+      "classification": "MINIMAL_AUTHENTICATED_NON_ECONOMIC_ALIGNMENT_CAPTURE_REQUIRED",
+      "collector_scope_is_distinct_from_existing_captures": true,
+      "economic_outcomes_to_open": 0,
+      "fields": [
+        "timestamp_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "interval": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "start_utc": "2026-07-20T00:00:00Z"
       },
-      "economic_identity_created": false,
-      "economic_outcomes_opened": 0,
-      "external_data_required": false,
-      "implementation_changes": [],
-      "implementation_ref": "research_v3/adaptive_breadth_triage.py",
-      "live_orders_authorized": false,
-      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
-      "protected_forward_opened": false,
-      "test_ref": "tests/test_adaptive_breadth_triage.py",
-      "v2_attempts_consumed": 0
+      "resolution": "M5",
+      "symbols": [
+        {
+          "broker_symbol": "AUDJPY",
+          "symbol_id": 11
+        },
+        {
+          "broker_symbol": "AUS200",
+          "symbol_id": 117
+        },
+        {
+          "broker_symbol": "Brent-F",
+          "symbol_id": 2923
+        },
+        {
+          "broker_symbol": "BCHUSD",
+          "symbol_id": 326
+        }
+      ],
+      "v2_attempts_to_consume": 0
     },
-    "external_data_gate": null,
-    "implementation_id": "univariate-structural-gate-v1",
+    "external_data_gate": {
+      "collector_build_ref": "tools/build_crossalign_four_symbol_capture_package.py",
+      "collector_package_artifact_name": "MXM_CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PACKAGE_V1.zip",
+      "collector_plan_ref": "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
+      "expected_return_artifact_name": "MXM_CROSSALIGN_FOUR_SYMBOL_M5_NON_ECONOMIC_V1.zip",
+      "reason": "The exact four-symbol M5 broker-native bytes are not present in accepted repository or hash-bound Library artifacts. Existing captures use different frozen symbol/window scopes and cannot satisfy this proposal."
+    },
+    "implementation_id": "crossalign-four-symbol-m5-capture-v1",
     "next_research_state": {
-      "data_requirement": "NO_NEW_MARKET_DATA_FOR_THIS_GATE",
-      "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
-      "next_action": "EXECUTE_BREAKOUT_VOLATILITY_EXPANSION_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
-      "outer_authorization": "NONE",
-      "research_judgment_required": false,
-      "status": "NON_ECONOMIC_IMPLEMENTATION_COMPLETE_READY_FOR_EXECUTION"
+      "next_action": "Run the exact-scope read-only cTrader collector and upload the returned ZIP to the GPT/Director chat for hash, chronology, and non-economic alignment-gate validation.",
+      "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
+      "user_action_required": true
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The accepted non-economic BREAKOUT_VOLATILITY_EXPANSION structural gate is already implemented generically in research_v3/adaptive_breadth_triage.py. It validates the hash-bound accepted 40-symbol M5 capture, ordered single-price OHLC integrity, chronology/cadence, causal observation availability, event sufficiency, session coverage, missingness diagnostics, and per-family prerequisite status without returns, PnL, economic ranking, promotion, or new data acquisition. Existing tests cover hash binding, exact 40-symbol scope, non-economic safeguards, malformed inputs, and the tick-volume/OHLC validation regression.",
+    "status": "EXTERNAL_DATA_REQUIRED",
+    "summary": "Added and inspected an exact-scope, read-only cTrader trendbar collector for AUDJPY, AUS200, Brent-F, and BCHUSD over 2026-07-20 through 2026-09-13 at M5 resolution. The repository has no accepted artifact for this exact symbol/window scope, so authenticated broker-native market bytes remain required. The collector uses single-price OHLC and tick volume only, complete backward pagination, chronology validation, per-series error preservation, deterministic ZIP output, and non-economic safety controls.",
     "tests_requested": [
-      "tests/test_adaptive_breadth_triage.py::test_univariate_gate_is_hash_bound_and_non_economic",
-      "tests/test_adaptive_breadth_triage.py::test_univariate_gate_ohlc_validation_is_independent_of_tick_volume",
-      "tests/test_adaptive_breadth_triage.py::test_hash_mismatch_fails_closed",
-      "tests/test_general_ai_implementation_executor.py::test_arbitrary_non_reasoning_action_is_not_finite_mapped"
+      "tests/test_crossalign_four_symbol_capture.py::CrossAlignCaptureTests::test_exact_scope_is_frozen_and_trendbar_only",
+      "tests/test_crossalign_four_symbol_capture.py::CrossAlignCaptureTests::test_preflight_is_local_and_non_economic",
+      "tests/test_crossalign_four_symbol_capture.py::CrossAlignCaptureTests::test_collector_has_no_order_or_bid_ask_contract",
+      "tests/test_crossalign_four_symbol_capture.py::CrossAlignCaptureTests::test_package_binds_exact_plan"
     ]
   },
   "project_snapshot": {
@@ -66,5 +87,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
