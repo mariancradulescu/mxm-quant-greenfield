@@ -1,93 +1,57 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "d6988bd358d8d6f18cbc4e097980ae85b1d8526f",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "d6988bd358d8d6f18cbc4e097980ae85b1d8526f",
-    "predecessor_run_id": 35960840328
+  "basis_next_state_sha256": "418706854938a133da43f3204941c50c3307326b24fc8410f82f604f31301a5d",
+  "changed_paths": [],
+  "created_utc": "2026-09-24T08:04:04Z",
+  "exact_head": {
+    "green": false,
+    "head": "f74739de7f54c331f78bb1472fd9fe794eea1d5b",
+    "predecessor_conclusion": "cancelled",
+    "predecessor_head": "6013a345040caf1a404fa60670bd57c447cefdcc",
+    "predecessor_run_id": 35972891691
   },
-  "accepted_output": {
-    "decision": {
-      "competition_start_authorized": false,
-      "economic_candidate_identity_created": false,
-      "economic_outcomes_opened": 0,
-      "exact_c031_rerun": false,
-      "live_orders_authorized": false,
-      "mechanism_family_closed": false,
-      "methodology_ref": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
-      "new_market_data_required": false,
-      "protected_forward_opened": false,
-      "selected_symbols": [
-        "MXNJPY",
-        "USDCAD",
-        "EURUSD",
-        "IWM.US",
-        "TLT.US",
-        "NVDA.US-24"
-      ],
-      "source_canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
-      "test_ref": "tests/test_session_gap_selected_six_panel_freeze.py",
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": null,
-    "implementation_id": "c031-structural-extension-selected-six-panel-freeze-v1",
-    "next_research_state": {
-      "ai_reasoning_required": true,
-      "green_implementation_artifacts": [
-        "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
-        "tests/test_session_gap_selected_six_panel_freeze.py"
-      ],
-      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a frozen non-economic specification for the selected six-symbol SESSION_GAP_REVERSION panel using existing accepted M5 capture bytes. The specification fixes panel membership, causal chronology, coverage thresholds, descriptive aggregation, multiple-testing discipline, and all economic/safety boundaries without requiring new market data.",
-    "tests_requested": [
-      "python -m unittest tests/test_session_gap_selected_six_panel_freeze.py",
-      "python -m unittest tests/test_session_gap_structural_extension_wave01.py tests/test_c031_structural_extension_capture.py"
-    ]
-  },
-  "basis_next_state_sha256": "2089c5162438ee8050af2563bff2ffdda7c17705c3c1cb6a1e3905d3d35cab33",
-  "changed_paths": [
-    "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
-    "tests/test_session_gap_selected_six_panel_freeze.py"
-  ],
-  "created_utc": "2026-09-24T05:32:59Z",
-  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V1",
+  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "competition_start_authorized": false,
-      "economic_candidate_identity_created": false,
+      "action": "REQUEST_MINIMAL_READ_ONLY_BROKER_NATIVE_CAPTURE",
       "economic_outcomes_opened": 0,
-      "exact_c031_rerun": false,
-      "live_orders_authorized": false,
-      "mechanism_family_closed": false,
-      "methodology_ref": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
-      "new_market_data_required": false,
-      "protected_forward_opened": false,
-      "selected_symbols": [
-        "MXNJPY",
-        "USDCAD",
-        "EURUSD",
-        "IWM.US",
-        "TLT.US",
-        "NVDA.US-24"
-      ],
-      "source_canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
-      "test_ref": "tests/test_session_gap_selected_six_panel_freeze.py",
+      "next_processing_gate": "Validate provenance, completeness, chronology, and disjointness before any price-derived structural interpretation.",
+      "protected_evidence_opened": false,
+      "scope": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "resolution": "M5",
+        "start_utc": "2026-07-20T00:00:00Z",
+        "symbols": [
+          "USTN2YR-F",
+          "TLT.US",
+          "NVDA.US-24",
+          "VIX",
+          "HSTECH",
+          "ADAUSD",
+          "Gasoline",
+          "EURUSD",
+          "USDCAD",
+          "MXNJPY",
+          "IWM.US",
+          "DOTUSD"
+        ]
+      },
       "v2_attempts_consumed": 0
     },
-    "external_data_gate": null,
-    "implementation_id": "c031-structural-extension-selected-six-panel-freeze-v1",
-    "next_research_state": {
-      "next_action": "VALIDATE_THE_FROZEN_SELECTED_SIX_PANEL_METHODOLOGY_ON_THE_CURRENT_EXACT_HEAD_WITHOUT_OPENING_ECONOMICS",
-      "status": "PENDING_EXACT_HEAD_GREEN"
+    "external_data_gate": {
+      "collector_build_ref": "C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py",
+      "collector_package_artifact_name": "MXM_C031_STRUCTURAL_EXTENSION_M5_8W_CAPTURE_PACKAGE.zip",
+      "expected_return_artifact_name": "MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE.zip",
+      "reason": "The required authenticated Pepperstone account-native M5 OHLCV bytes for the frozen 12-symbol interval are not available in the repository. The existing collector must be run read-only and its returned ZIP uploaded to the GPT/Director chat without modification."
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a frozen non-economic specification for the selected six-symbol SESSION_GAP_REVERSION panel using existing accepted M5 capture bytes. The specification fixes panel membership, causal chronology, coverage thresholds, descriptive aggregation, multiple-testing discipline, and all economic/safety boundaries without requiring new market data.",
+    "implementation_id": "c031-structural-extension-m5-capture-v1",
+    "next_research_state": {
+      "next_action": "CAPTURE_AND_HASH_BIND_THE_FROZEN_12_SYMBOL_M5_EXTENSION_THEN_RUN_PRE_OUTCOME_STRUCTURAL_VALIDATION",
+      "status": "WAITING_FOR_AUTHENTICATED_BROKER_NATIVE_CAPTURE"
+    },
+    "status": "EXTERNAL_DATA_REQUIRED",
+    "summary": "The repository already contains the exact read-only, non-economic Pepperstone cTrader collector for the frozen 12-symbol M5, eight-week extension, including account-fingerprint binding, chronology-safe capture, protected-forward exclusion, deterministic ZIP packaging, and fail-closed safety checks. No code or manifest changes are required. Authenticated market bytes are not present in the repository and must be collected externally.",
     "tests_requested": [
-      "python -m unittest tests/test_session_gap_selected_six_panel_freeze.py",
-      "python -m unittest tests/test_session_gap_structural_extension_wave01.py tests/test_c031_structural_extension_capture.py"
+      "tests/test_c031_structural_extension_capture.py"
     ]
   },
   "project_snapshot": {
@@ -106,5 +70,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }
