@@ -1,10 +1,10 @@
 {
-  "basis_next_state_sha256": "45960ee8c5aacda1c503a5d07ca270009c89d7addc924f192a4411f102c0dc1c",
+  "basis_next_state_sha256": "2089c5162438ee8050af2563bff2ffdda7c17705c3c1cb6a1e3905d3d35cab33",
   "changed_paths": [],
-  "created_utc": "2026-09-24T05:30:48Z",
+  "created_utc": "2026-09-24T05:31:10Z",
   "exact_head": {
-    "green": true,
-    "head": "fac9855e73b4b322eda773d03851f34b83894332",
+    "green": false,
+    "head": "ccd4183c23919a27debb2f0a1ff3c047ac77cce5",
     "predecessor_conclusion": "success",
     "predecessor_head": "fac9855e73b4b322eda773d03851f34b83894332",
     "predecessor_run_id": 35960174770
@@ -12,24 +12,22 @@
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V1",
   "implementation_output": {
     "decision": {
-      "canonical_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
-      "capture_acceptance_reference": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
-      "external_data_currently_required": false,
-      "freeze_reference": "research_v3/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_FREEZE_V1.json",
-      "implementation_sufficient": true,
-      "mechanism_family": "SESSION_GAP_REVERSION",
-      "research_mode": "STRUCTURAL_NON_ECONOMIC",
-      "screen_reference": "research_v3/session_gap_structural_screen_v1.py",
-      "validation_basis": {
-        "chronological_incremental_replay": true,
-        "competition_start_authorized": false,
-        "cost_hurdle_applied": false,
-        "economic_candidate_identity_created": false,
+      "capture_acceptance_ref": "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+      "capture_plan_ref": "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json",
+      "collector_launcher_ref": "research_v3/pydroid_c031_structural_extension_launcher.py",
+      "collector_ref": "research_v3/c031_structural_extension_capture.py",
+      "economic_effect": {
+        "candidate_identity_created": false,
         "economic_outcomes_opened": 0,
-        "future_information_forbidden": true,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false,
         "v2_attempts_consumed": 0
+      },
+      "freeze_ref": "research_v3/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_FREEZE_V1.json",
+      "implementation_ref": "research_v3/session_gap_structural_screen_v1.py",
+      "methodology": "Compile and validate the frozen structural-only screen using existing captured data; do not open economics, create an identity, rerun C031 Stage-B, open protected evidence, or authorize orders.",
+      "safety": {
+        "competition_start_authorized": false,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false
       }
     },
     "external_data_gate": null,
@@ -39,7 +37,7 @@
       "status": "READY_FOR_FROZEN_METHODOLOGY_COMPILATION_AND_VALIDATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The repository already contains the frozen non-economic SESSION_GAP_REVERSION structural screen, exact 12-symbol M5 capture plan and collector, canonical captured-data acceptance, and protected non-economic accounting controls. No code, manifest, test, or evidence edits are required. Existing accepted captured data is sufficient for compiling and validating the frozen methodology.",
+    "summary": "The repository already contains the frozen non-economic SESSION_GAP_REVERSION structural screen, exact 12-symbol M5 capture plan, read-only collector, canonical capture acceptance controls, and dedicated tests. No code, manifest, test, or evidence edits are required for frozen methodology compilation and validation.",
     "tests_requested": [
       "tests/test_session_gap_structural_extension_wave01.py",
       "tests/test_c031_structural_extension_capture.py"
