@@ -1,0 +1,68 @@
+{
+  "schema": "mxm.greenfield.fresh-general-ai-research-decision.v1",
+  "status": "AUTHORIZED_NON_ECONOMIC_STRUCTURAL_SCREEN",
+  "decision_id": "EPOCH15-BREAKOUT-15M-DIRECTIONAL-FOLLOWTHROUGH-01",
+  "created_utc": "2026-09-24T18:02:00Z",
+  "provider": {
+    "kind": "EXTERNAL_CHATGPT_GENERAL_REASONING",
+    "vendor": "OpenAI",
+    "model": "GPT-5.6 Sol",
+    "context": "FRESH_CHAT_AUTONOMOUS_RECOVERY"
+  },
+  "evidence_epoch_seen": 15,
+  "authority_refs": [
+    "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
+    "research_v3/EPOCH14_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_DECISION_V1.json",
+    "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+    "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json"
+  ],
+  "research_family": "BREAKOUT_VOLATILITY_EXPANSION",
+  "rationale": "The prospectively fixed breakout-plus-range-expansion law generated 11919 events across 246477 eligible windows, with at least one event on 37 of 40 structural representatives. This is sufficient to evaluate one fixed short-horizon directional follow-through diagnostic on the same development bytes without selecting symbols, varying parameters or opening economics.",
+  "source_capture": {
+    "ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "library_file_id": "libfile_f31adb42d4e88191b7b372af4f3f077a",
+    "zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "resolution": "M5",
+    "protected_forward_rows": 0
+  },
+  "frozen_event_law_ref": "research_v3/EPOCH14_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_DECISION_V1.json",
+  "prospective_followthrough_law": {
+    "horizon_bars": 3,
+    "horizon_duration": "15m at M5",
+    "anchor_price": "close of the breakout-expansion event bar t",
+    "future_price": "close at t+3",
+    "future_contiguity": "t,t+1,t+2,t+3 must all be exactly 300 seconds apart",
+    "up_event_continuation": "close(t+3) > close(t)",
+    "up_event_reversal": "close(t+3) < close(t)",
+    "down_event_continuation": "close(t+3) < close(t)",
+    "down_event_reversal": "close(t+3) > close(t)",
+    "flat": "close(t+3) == close(t)",
+    "overlap_policy": "events may overlap; no independence or significance claim is made",
+    "parameter_variation": "NONE"
+  },
+  "required_outputs": [
+    "per-symbol events with valid 15m follow-through",
+    "per-symbol continuation/reversal/flat counts split by event direction",
+    "aggregate continuation/reversal/flat counts",
+    "coverage loss from non-contiguous future bars"
+  ],
+  "prohibitions": [
+    "no return magnitude or normalized return",
+    "no PnL, costs, entry/exit execution assumption or position sizing",
+    "no symbol ranking, selection or promotion",
+    "no inferential rejection or significance testing",
+    "no economic identity or V2 attempt",
+    "no mechanism-family closure",
+    "no protected-forward evidence"
+  ],
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "structural_representatives_are_not_economic_equivalence": true,
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "external_data_required": false,
+  "user_action_required": false,
+  "next_action": "IMPLEMENT_VALIDATE_AND_EXECUTE_FROZEN_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_SCREEN"
+}
