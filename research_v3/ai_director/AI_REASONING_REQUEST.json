@@ -151,6 +151,18 @@
     {
       "ref": "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
       "sha256": "1d8440e60b3048bb007421b192f50a7e91b9447fc1aece9ffb7e33ec4a918994"
+    },
+    {
+      "ref": "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json",
+      "sha256": "8eeb9ee0b1746e9f0ba9beb131041ed1b0908f36dcfd530c1fbe27954597c1e8"
+    },
+    {
+      "ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+      "sha256": "118eef5c1f84e675e11dac981be407be23adfad8838b29d74a3f408fd8b11399"
+    },
+    {
+      "ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
+      "sha256": "6a8b310949dbc2e6069e3f2ed7d9371fc7a27a2a6e7f74a1f20b5daf29acb526"
     }
   ],
   "authority_hashes": [
@@ -359,8 +371,16 @@
       "sha256": "1d8440e60b3048bb007421b192f50a7e91b9447fc1aece9ffb7e33ec4a918994"
     },
     {
-      "ref": "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json",
-      "sha256": "81240a3df4de13333b2a99e3dc2c82bfc964b2cad5891daa0dc81c355b0c32e2"
+      "ref": "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json",
+      "sha256": "8eeb9ee0b1746e9f0ba9beb131041ed1b0908f36dcfd530c1fbe27954597c1e8"
+    },
+    {
+      "ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+      "sha256": "118eef5c1f84e675e11dac981be407be23adfad8838b29d74a3f408fd8b11399"
+    },
+    {
+      "ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
+      "sha256": "6a8b310949dbc2e6069e3f2ed7d9371fc7a27a2a6e7f74a1f20b5daf29acb526"
     }
   ],
   "authority_refs": [
@@ -415,7 +435,9 @@
     "evidence/CROSS_MARKET_ONE_BAR_DIRECTIONAL_AVAILABILITY_V1.json",
     "evidence/CROSS_MARKET_FIXED_15M_DIRECTIONAL_SCREEN_V1.json",
     "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
-    "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json"
+    "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json",
+    "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+    "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json"
   ],
   "control_plane": {
     "material_issues": [],
@@ -429,7 +451,7 @@
     "stage_b_revalidation_required_candidate_ids": [],
     "stage_b_survivors": []
   },
-  "created_utc": "2026-09-24T17:06:29Z",
+  "created_utc": "2026-09-24T18:33:28Z",
   "current_open_mechanism_families": [
     "TREND_MOMENTUM",
     "MEAN_REVERSION",
@@ -442,8 +464,8 @@
     "REGIME_CONTEXT_CONDITIONED",
     "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL"
   ],
-  "evidence_bundle_sha256": "99efc810d9723946c69c18715cad2c589d46344ba3709b93f15b64ea24526ede",
-  "evidence_epoch_seen": 13,
+  "evidence_bundle_sha256": "c787d63fad2516f3d9ccda6c5268a58c785da2ee31fa6642c67db1f419b9e012",
+  "evidence_epoch_seen": 16,
   "next_state": {
     "accepted_development_capture_sufficient_for_current_decision": true,
     "accepted_development_capture_sufficient_for_mechanism_specific_outer": false,
@@ -464,9 +486,33 @@
       "v2_attempts_used": 19,
       "v2_search_budget_remaining": 65
     },
-    "ai_reasoning_required": true,
     "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
-    "authorizing_evidence_epoch": 12,
+    "authorizing_evidence_epoch": 16,
+    "breakout_15m_followthrough_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
+    "breakout_15m_followthrough_summary": {
+      "continuation": 5292,
+      "continuation_fraction_nonflat": 0.4732182777430028,
+      "events_detected": 11919,
+      "events_with_valid_followthrough": 11598,
+      "events_without_valid_followthrough": 321,
+      "flat": 415,
+      "interpretation": "DESCRIPTIVE_DIRECTION_ONLY_NO_INFERENCE_OR_ECONOMIC_CLAIM",
+      "reversal": 5891
+    },
+    "breakout_volatility_event_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+    "breakout_volatility_event_availability_summary": {
+      "aggregate_event_availability_rate": 0.04835745323093027,
+      "eligible_contiguous_windows": 246477,
+      "event_down": 6007,
+      "event_up": 5912,
+      "events": 11919,
+      "interpretation": "STRUCTURAL_EVENT_AVAILABILITY_ONLY_NO_POST_EVENT_OUTCOME",
+      "rows": 392181,
+      "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+      "symbols": 40,
+      "symbols_with_at_least_one_event": 37,
+      "symbols_with_zero_events": 3
+    },
     "broader_universe": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
     "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
     "broader_universe_remains_open": true,
@@ -484,8 +530,6 @@
       "total_rows": 47375
     },
     "capture_required": false,
-    "collector_build_ref": "tools/build_crossmarket_disjoint_capture_package.py",
-    "collector_package_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.zip",
     "collector_package_artifact_ref": "research_v3/ai_director/artifact_attestations/MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.json",
     "cross_market_one_bar_directional_screen_ref": "evidence/CROSS_MARKET_ONE_BAR_DIRECTIONAL_AVAILABILITY_V1.json",
     "cross_market_one_bar_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
@@ -503,10 +547,10 @@
       "valid_source_data_discarded": false
     },
     "current_outer_reuse": "Completed four-panel SESSION_GAP outer remains historical evidence only and cannot be reused as a new confirmatory dataset",
-    "current_research_evidence_epoch": 13,
+    "current_research_evidence_epoch": 16,
     "data_capture": "NO_NEW_MARKET_DATA",
-    "data_requirement": "NO_NEW_MARKET_DATA",
-    "decision_basis": "Current accepted development evidence is sufficient for a higher-information no-capture prerequisite screen; no mechanism-specific outer or economic identity is authorized.",
+    "data_requirement": "NO_NEW_MARKET_DATA_FOR_CURRENT_REASSESSMENT",
+    "decision_basis": "Epoch 16 shows more 15-minute reversals than continuations in the aggregate fixed breakout-expansion sample, while individual structural representatives are heterogeneous. This does not establish significance, profitability or a tradable identity; it does justify fresh reasoning about a prospectively frozen breakout-fade development identity and whether broker-realistic friction evidence is sufficient before any independent outer.",
     "development_evidence_sufficient_for_current_decision": true,
     "development_evidence_sufficient_for_mechanism_specific_outer": false,
     "director_protocol": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
@@ -522,27 +566,37 @@
       "strict_windows": 9233,
       "total_rows": 47427
     },
+    "disjoint_one_bar_directional_screen_ref": "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json",
+    "disjoint_one_bar_directional_summary": {
+      "common_four_way_timestamps": 9558,
+      "contiguous_valid_segments": 81,
+      "interpretation": "DESCRIPTIVE_ONLY_NO_CAUSAL_OR_ECONOMIC_INFERENCE",
+      "ordered_pairs": 12,
+      "same_direction_fraction_both_nonzero_range": [
+        0.4918230710130611,
+        0.5161574942097717
+      ],
+      "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
+      "strict_consecutive_pairs": 9475
+    },
     "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
     "economic_promotion": "NOT_AUTHORIZED",
     "economic_promotion_authorized": false,
-    "evidence_epoch": 10,
+    "evidence_epoch": 16,
     "evidence_epoch_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
     "exact_head_green_authority": {
       "conclusion": "success",
-      "package_artifact_id": 10817202074,
-      "package_inner_sha256": "2ec1147f0bace6ce54b56e80ad66f012b8039011a9f395cdba088514b3c826fc",
-      "run_id": 36022153864,
-      "validated_implementation_head": "d3fea24470a46a07cc71f4a2536fa21c4a61347c",
+      "run_id": 36038640212,
+      "validated_implementation_head": "6beda9c0d70f02c02bfde4e13fec43734466a9fd",
       "workflow": "m6-preparation"
     },
-    "expected_return_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1.zip",
     "external_data_gate": null,
-    "external_data_gate_ref": "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json",
     "external_data_required": false,
     "external_gate": null,
     "family_exhaustion": "NOT_CLAIMED",
     "family_exhaustion_claimed": false,
     "fixed15m_directional_screen_ref": "evidence/CROSS_MARKET_FIXED_15M_DIRECTIONAL_SCREEN_V1.json",
+    "fresh_director_decision_ref": "research_v3/EPOCH15_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_DECISION_V1.json",
     "fresh_evidence_epoch_required": true,
     "implementation_constraints": [
       "Preserve exact broker symbol identities and account fingerprint.",
@@ -574,11 +628,11 @@
       "CROSS_SECTIONAL_RANKING",
       "RELATIVE_VALUE_COINTEGRATION"
     ],
-    "mechanism_family": "CROSS_MARKET_LEAD_LAG",
+    "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
     "new_market_data_required": false,
-    "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+    "next_action": "FRESH_GENERAL_AI_REASSESS_BREAKOUT_REVERSAL_STRUCTURE_AND_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_EPOCH_16",
     "outer": "NOT_AUTHORIZED",
-    "outer_authorization": "NON_ECONOMIC_PREREQUISITE_ONLY",
+    "outer_authorization": "NONE",
     "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
     "outer_capture_integrity": {
       "all_pagination_exhausted": true,
@@ -619,8 +673,8 @@
       "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
       "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION"
     },
-    "reason": "Accepted the complete authenticated four-symbol disjoint M5 capture (47427 rows) and materialized the authorized fixed 15-minute descriptive stability prerequisite (9233 strict five-timestamp windows across 79 contiguous segments). No economic outcome, attempt, promotion or protected-forward evidence opened; Holm rejection remains unavailable because its null/test/dependence/threshold were not frozen.",
-    "recorded_utc": "2026-09-24T17:05:03Z",
+    "reason": "Materialized the epoch-13 authorized non-economic disjoint one-bar directional screen directly from the accepted hash-bound four-symbol M5 ZIP: 9558 common timestamps, 9475 strictly consecutive pairs, 81 contiguous segments and 12 ordered-pair contingency tables. No economic outcome, V2 attempt, protected-forward observation, promotion or family closure opened.",
+    "recorded_utc": "2026-09-24T18:06:00Z",
     "recovery_binding": {
       "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
       "accepted_proposal_hash": "cd90596142bc486245d309530ec557ac3d2aec1754d48414d4610e8f1283e707",
@@ -632,11 +686,12 @@
       "status": "RECOVERED_FROM_EPOCH4_IMPLEMENTATION_LIVENESS_STALL",
       "valid_evidence_discarded": false
     },
+    "required_interpretation": "Assess structural sufficiency and dependence diagnostics only; if sufficient, freeze a finite lead-lag methodology prospectively before considering any independent outer.",
     "required_outputs": [
-      "Interpret the accepted disjoint descriptive stability across all twelve ordered pairs without causal/economic claims",
-      "Decide a legal prospectively frozen next mechanism screen or explicitly justify the smallest genuine authenticated data extension",
-      "Resolve the unspecified Holm null/statistic/dependence/threshold before any inferential rejection; do not invent retroactive significance",
-      "Keep the 1578-symbol universe open and V2 accounting unchanged"
+      "Do not treat 5891 versus 5292 as significance or profitability",
+      "Determine whether existing broker-realistic feasibility/cost evidence is sufficient to freeze a finite breakout-fade development identity without opening an outcome",
+      "If sufficient, freeze the identity and identify the smallest independent unopened outer required; otherwise surface the exact missing authenticated evidence",
+      "Keep the 1578 frontier open and do not rank the 40 representatives by development outcome"
     ],
     "research_action": {
       "broader_universe_remains_open": true,
@@ -661,9 +716,9 @@
       ],
       "v2_attempts_to_consume": 0
     },
-    "research_epoch": "CURRENT_EVIDENCE_EPOCH_5",
+    "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
     "research_judgment_required": true,
-    "research_scope": "Four-symbol broker-native M5 cross-symbol alignment and event-availability diagnostics",
+    "research_scope": "Post-disjoint one-bar cross-market structural reassessment from evidence epoch 14",
     "runtime_repair": {
       "current_entry_tradability_required": false,
       "failed_runtime_attempt_consumed": 0,
@@ -678,31 +733,27 @@
       "protected_evidence_opened": false
     },
     "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v3",
-    "scope": "AUDJPY|AUS200|Brent-F|BCHUSD M5 only",
-    "scope_integrity": "No symbol substitution, interval substitution, development-byte reuse, synthetic fill, forward fill, account mutation, or order placement.",
+    "scope": "40 accepted M5 structural representatives; frozen breakout event law plus fixed 15m directional follow-through only",
+    "scope_integrity": "No symbol filtering, parameter sweep, return magnitude, economic execution, synthetic fill or protected-forward use.",
     "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
     "search_budget_change": 0,
     "selected_families": [
-      "CROSS_MARKET_LEAD_LAG",
-      "CROSS_SECTIONAL_RANKING",
-      "RELATIVE_VALUE_COINTEGRATION"
+      "BREAKOUT_VOLATILITY_EXPANSION"
     ],
     "selection_rule": "Prioritize the family that best matches the current dependency diagnostics and yields the highest expected information gain per minimal incremental evidence, not broad economics or stale outer reuse.",
-    "source_ai_proposal_hash": "595bea24f29acc9e375453ad7f2ac66674994c0d9cc381316ad4451e39d3bc4e",
-    "source_ai_proposal_id": "P-20260924-CROSSMARKET-LAG-OUTER-01",
+    "source_ai_proposal_hash": "6cea9bbb5e6b1f671e7b6e7062c18f62880151deb913d7e3886993f44db8125c",
+    "source_ai_proposal_id": "P-20260924-CROSSMARKET-LAG-STRUCTURAL-02",
     "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-    "source_implementation_id": "crossmarket-four-symbol-disjoint-capture-v1",
-    "source_runtime_operation_id": "op_4eae641c1c40103738dd744a0ec1ec86",
+    "source_implementation_id": "cross-market-lead-lag-screen-v2",
+    "source_runtime_operation_id": "op_04e2d4a38beba808aaef2403ce9d2946",
     "stale_reasoning_guard": {
-      "authorizing_evidence_epoch": 12,
-      "current_evidence_epoch": 13,
-      "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
-      "previous_external_data_gate": null,
-      "previous_next_action": "AI_INTERPRET_DISJOINT_15M_DESCRIPTIVE_STABILITY_AND_SELECT_SMALLEST_LEGAL_NEXT_ACTION",
-      "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_DISJOINT_CAPTURE",
+      "authorizing_evidence_epoch": 15,
+      "current_evidence_epoch": 16,
+      "law": "Historical reasoning remains evidence but cannot authorize a new economic identity, outer, panel, cost law, horizon or selection after material evidence advances.",
+      "previous_decision_ref": "research_v3/EPOCH15_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_DECISION_V1.json",
       "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
     },
-    "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
+    "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_BREAKOUT_15M_FOLLOWTHROUGH",
     "stop_condition": "no_family_clear_prerequisite_gate",
     "superseded_general_ai_proposal": {
       "economic_outcome_opened": false,
@@ -762,6 +813,7 @@
       "v2_attempts_consumed": 0
     },
     "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
+    "universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
     "user_action_required": false
   },
   "project_snapshot": {
@@ -773,8 +825,8 @@
   "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
   "provider_version": "MXM_GENERAL_AI_REASONING_PROVIDER_V2",
   "provisional_research_artifacts": [],
-  "request_id": "reason_6391748342efe8d81d658294999db18a",
-  "research_head": "09f3cb79c715fb518b0b85049beecf305fdc0689",
+  "request_id": "reason_f0a088a65b30e77eb31b1ab8b9944d13",
+  "research_head": "2a8ae518e03857e8c24e2edc6931e84ac30cfd7e",
   "schema": "mxm.greenfield.general-ai-reasoning-request.v2",
   "status": "AI_REASONING_REQUIRED",
   "universe_basis": {
