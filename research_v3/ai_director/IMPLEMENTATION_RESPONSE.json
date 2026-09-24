@@ -1,10 +1,10 @@
 {
   "basis_next_state_sha256": "4c0b05d80082af9535563702a0aea9c752d656b84457852aeddd7a67ef20d989",
   "changed_paths": [],
-  "created_utc": "2026-09-24T17:45:48Z",
+  "created_utc": "2026-09-24T17:46:11Z",
   "exact_head": {
     "green": false,
-    "head": "74b81d2412752c073caa1c97668ff0d6af2439f9",
+    "head": "96eecb01f1f80fd5e19c74b51d4af3341fcf0c36",
     "predecessor_conclusion": "success",
     "predecessor_head": "198e985e55f4436a0550f5ccddb6aec74c597a26",
     "predecessor_run_id": 36036364323
@@ -14,7 +14,6 @@
     "decision": {
       "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
       "economic_outcomes_opened": 0,
-      "exact_head_validation_required": true,
       "expected_common_timestamps": 9558,
       "expected_consecutive_pairs": 9475,
       "implementation_changed": false,
@@ -22,7 +21,6 @@
       "new_market_data_required": false,
       "ordered_pairs": 12,
       "protected_forward_opened": false,
-      "reason": "The implementation and regression tests are already sufficient, but the persisted current execution state reports the implementation head as not exact-head green.",
       "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
       "research_family": "CROSS_MARKET_LEAD_LAG",
       "resolution": "M5",
@@ -43,7 +41,7 @@
       "status": "EXACT_HEAD_VALIDATION_REQUIRED"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The exact non-economic implementation is already present and correctly bound to the accepted four-symbol M5 capture. It uses single-price OHLC, rejects invalid chronology and OHLC rows, excludes gaps and fills, computes all twelve ordered pairs, and preserves zero economic effects. No external data or code change is required; persisted execution state still requires exact-head validation.",
+    "summary": "The exact non-economic implementation is already present and correctly bound to the accepted four-symbol M5 capture. It validates single-price OHLC chronology and integrity, excludes gaps and fills, computes all twelve ordered pairs with descriptive directional diagnostics, and preserves zero economic effects. No code or external data change is required; persisted execution state still requires exact-head validation.",
     "tests_requested": [
       "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
