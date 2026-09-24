@@ -1,0 +1,70 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "4cbc94dae440b815ba006b6aac2aecfbe7bac47143521f0baa2a3d5ee6cb8c6c",
+  "competition_start_authorized": false,
+  "decision": {
+    "candidate_id": "V2-C031",
+    "economic_gate": "No outer result may be scored or used for activation until the deterministic bridge validates the data audit, cost completeness, authority bindings, and exact-head governance.",
+    "mechanism_family": "SESSION_GAP_REVERSION",
+    "panel_symbols": [
+      "USTN2YR-F",
+      "TLT.US",
+      "NVDA.US-24",
+      "VIX",
+      "HSTECH",
+      "ADAUSD"
+    ],
+    "pre_outcome_freeze": {
+      "costs": [
+        "bid_ask_or_effective_spread",
+        "commission",
+        "financing_or_swap",
+        "contract_specification",
+        "volume_and_margin_constraints"
+      ],
+      "execution": "broker-native executable prices with timestamped signal-to-fill sequencing",
+      "features": "session-gap definition and normalized reversion measurements from the authoritative freeze only",
+      "missing_data": "fail closed per symbol or interval; no imputation across executable gaps",
+      "validation": "preserve causal ordering and reserve the outer result from tuning"
+    },
+    "research_action": "FREEZE_MINIMAL_DISJOINT_OUTER_DATA_AND_COST_BINDING",
+    "window": {
+      "chronology": "strictly_before_existing_c031_capture_start",
+      "end_utc": "2026-06-14T23:59:59Z",
+      "resolution": "M5",
+      "start_utc": "2026-02-23T00:00:00Z"
+    }
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "candidate_id": "V2-C031",
+    "next_action": "IMPLEMENT_AND_VALIDATE_THE_FROZEN_SIX_PANEL_OUTER_CAPTURE_WITH_TIMESTAMPED_COST_AUTHORITY_BEFORE_ANY_OUTER_OUTCOME",
+    "required_checks": [
+      "strict_disjointness_from_prior_c031_data",
+      "schedule_adjusted_coverage_at_least_0.97",
+      "zero_unresolved_chronology_conflicts",
+      "complete_executable_friction_and_margin_metadata",
+      "causal_pre_outcome_integrity"
+    ],
+    "resolution": "M5",
+    "status": "AWAITING_DISJOINT_OUTER_CAPTURE_BINDING",
+    "window_end_utc": "2026-06-14T23:59:59Z",
+    "window_start_utc": "2026-02-23T00:00:00Z"
+  },
+  "objective": {
+    "class": "BROADER_UNIVERSE_INFORMATION_GAIN",
+    "goal": "Define the smallest legally valid disjoint outer-data wave for the frozen C031 session-gap six-panel evaluation, including executable friction authority, without opening economics.",
+    "information_gain_rationale": "A prospective 16-week M5 panel outside all previously observed C031 data tests whether the session-gap mechanism survives across structurally diverse broker-native instruments; binding spread, commission, financing, and contract metadata prevents a false edge caused by unresolved costs."
+  },
+  "operation_id": "op_45552c8e85267566eca58376af3b1583",
+  "proposal_hash": "0e26b315aba007798ed091a8576739d0eec8c30ec005ce7f22627a7dcc0e059a",
+  "proposal_id": "c031-session-gap-disjoint-outer-binding-v1",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_7aaaba6971bf182cbaabbccaa9380aa6.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
