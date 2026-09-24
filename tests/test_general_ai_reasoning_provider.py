@@ -72,4 +72,18 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
             self.assertNotIn("Bearer",raw)
             self.assertNotIn("ghp_",raw)
 
+
+    def test_monthly_quota_is_attempted_once(self):
+        from research_v3.general_ai_reasoning_provider import AIReasoningProviderError
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            calls=[]
+            def exhausted(*args,**kwargs):
+                calls.append(1)
+                raise AIReasoningProviderError("You have exceeded your monthly quota")
+            with patch("research_v3.general_ai_reasoning_provider.build_reasoning_request",return_value={"status":"AI_REASONING_REQUIRED","request_id":"reason_quota","next_state":{}}), patch("research_v3.general_ai_reasoning_provider._context_payload",return_value={}), patch("research_v3.general_ai_reasoning_provider.GitCheckpointSink.checkpoint",return_value=None):
+                with self.assertRaisesRegex(AIReasoningProviderError,"monthly quota"):
+                    wake(root,token="test-token",transport=exhausted)
+            self.assertEqual(len(calls),1)
+
 if __name__=="__main__": unittest.main()
