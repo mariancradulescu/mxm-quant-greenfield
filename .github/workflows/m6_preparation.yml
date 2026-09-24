@@ -163,6 +163,28 @@ jobs:
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/validate_authoritative_promotion.py
       - name: Full repository unittest suite on Python 3.13
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Wave02 authenticated read-only collector preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from research_v3.pydroid_session_gap_frontier_wave02_launcher import local_preflight
+          r = local_preflight()
+          assert r["symbols"] == 8 and r["resolution"] == "M5", r
+          assert r["orders_permitted"] is False and r["account_mutation_permitted"] is False, r
+          assert r["historical_schedule_verified"] is False, r
+          assert r["economic_outcomes_opened"] == 0 and r["v2_attempts_consumed"] == 0, r
+          print("WAVE02_PREFLIGHT_PASS", r)
+          PY
+      - name: Build deterministic Wave02 Android collector package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_session_gap_frontier_wave02_capture_package.py
+          sha256sum dist/MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip
+      - name: Upload Wave02 Android collector package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE
+          path: dist/MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip
+          if-no-files-found: error
+          retention-days: 30
       - name: Build deterministic Pydroid deployment package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_m6_pydroid_package.py
