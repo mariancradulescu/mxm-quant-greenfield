@@ -1,6 +1,6 @@
 import json, unittest
 from pathlib import Path
-from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, implementation_required
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, _post_green_output, _resolve_current_proposal, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -13,6 +13,21 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
             self.assertFalse(implementation_required(s))
         else:
             self.assertTrue(implementation_required(s))
+    def test_executor_binds_current_durable_ai_proposal(self):
+        state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+        ref,proposal,row=_resolve_current_proposal(ROOT,state)
+        self.assertEqual(proposal["proposal_id"],state["source_ai_proposal_id"])
+        if state.get("source_ai_proposal_hash"):
+            self.assertEqual(row["proposal_hash"],state["source_ai_proposal_hash"])
+        source=(ROOT/"research_v3/general_ai_implementation_executor.py").read_text()
+        self.assertNotIn("AUTO_reason_a8b81cef686ff74cf678e7e25193f43f.json",source)
+
+    def test_post_green_implementation_returns_to_reasoning(self):
+        out={"status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN","next_research_state":{"status":"PENDING_EXACT_HEAD_GREEN","next_action":"VALIDATE"}}
+        accepted=_post_green_output(out,["research_v3/example.json"])
+        self.assertTrue(accepted["next_research_state"]["ai_reasoning_required"])
+        self.assertEqual(accepted["next_research_state"]["green_implementation_artifacts"],["research_v3/example.json"])
+
     def test_arbitrary_non_reasoning_action_is_not_finite_mapped(self):
         self.assertTrue(implementation_required({"status":"ANY_FUTURE_STATE","next_action":"SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
         self.assertFalse(implementation_required({"status":"WAIT","next_action":"EXTERNAL","user_action_required":True}))
