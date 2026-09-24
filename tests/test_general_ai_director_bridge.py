@@ -15,6 +15,7 @@ from research_v3.general_ai_director_bridge import (
     _active_authoritative_data_contract,
     _reject_completed_outer_as_unseen,
     _reject_duplicate_accepted_capture,
+    _validate_broker_native_selection,
     compile_runtime_plan,
     drain,
     materialize_proposal,
@@ -273,6 +274,25 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
                 _reject_duplicate_accepted_capture(root, proposal)
             request["symbols"] = ["DIFFERENT_BROKER_NATIVE_SYMBOL"]
             _reject_duplicate_accepted_capture(root, proposal)
+
+    def test_broker_native_index_rejects_infeasible_and_unknown_ai_symbols(self):
+        proposal = self._new_broker_native_scope()
+        request = proposal["data_policy"]["minimal_acquisition_request"]
+        request["symbols"] = ["BTCUSD"]
+        with self.assertRaisesRegex(AIProposalRejected, "infeasible at initial EUR200"):
+            _validate_broker_native_selection(Path("."), proposal)
+        request["symbols"] = ["GER30"]
+        with self.assertRaisesRegex(AIProposalRejected, "identity absent"):
+            _validate_broker_native_selection(Path("."), proposal)
+        request["symbols"] = ["GER40"]
+        _validate_broker_native_selection(Path("."), proposal)
+        request["symbols"] = ["BTCUSD"]
+        proposal["data_policy"]["future_equity_only_scope"] = {
+            "symbols": ["BTCUSD"],
+            "prospective_rationale": "Observe broker-native structure for a future equity regime only.",
+            "initial_eur200_tradable": False,
+        }
+        _validate_broker_native_selection(Path("."), proposal)
 
     def test_state_transition_preserves_outer_economics_and_attempts(self):
         with tempfile.TemporaryDirectory() as td:
