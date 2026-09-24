@@ -14,6 +14,7 @@
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
+  "ai_reasoning_required": true,
   "authorizing_evidence_epoch": 2,
   "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
   "capture_integrity": {
@@ -55,41 +56,67 @@
   "external_data_gate_ref": "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json",
   "external_gate": null,
   "implementation_executor": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+  "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
   "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+  "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
+  "outer_capture_integrity": {
+    "all_pagination_exhausted": true,
+    "duplicate_timestamps": 0,
+    "ohlc_failures": 0,
+    "out_of_interval_rows": 0,
+    "protected_forward_rows": 0,
+    "series_complete": 4,
+    "total_m5_rows": 64349,
+    "zip_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404"
+  },
+  "outer_confirmatory_summary": {
+    "confirmed_symbol": "XPDUSD",
+    "confirmed_symbol_p": 0.005665492091793567,
+    "economic_promotion_now": false,
+    "friction_overlay": {
+      "NETH25": "FRICTION_PASS",
+      "US400": "FRICTION_FAIL",
+      "XPDUSD": "FRICTION_FAIL",
+      "ZARJPY": "FRICTION_FAIL"
+    },
+    "holm_rejections": 1,
+    "settled_structural_samples": 120
+  },
+  "outer_result_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
   "provisional_four_panel_outer": {
-    "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION",
-    "freeze_ref": "research_v3/SESSION_GAP_FRONTIER_FOUR_PANEL_FREEZE_V1.json",
-    "capture_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
     "capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
-    "result_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
+    "capture_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
+    "freeze_ref": "research_v3/SESSION_GAP_FRONTIER_FOUR_PANEL_FREEZE_V1.json",
     "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
-    "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
+    "reauthorized_at_evidence_epoch": 2,
     "reauthorized_by_proposal_id": "P-20260924-EPOCH2-SESSION-GAP-OUTER-01",
-    "reauthorized_at_evidence_epoch": 2
+    "result_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
+    "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
+    "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION"
   },
   "reason": "The epoch-2 authorized four-panel capture is accepted and the prospectively frozen outer has been opened non-economically. XPDUSD is the only Holm-confirmed member but fails broker-realistic friction; NETH25 passes friction but is not Holm-confirmed. No new economic identity is justified by this four-panel result. Because the independent outer outcome and friction evidence materially advance research evidence, fresh General AI reasoning is mandatory before any next research judgment.",
   "recorded_utc": "2026-09-24T10:55:00Z",
   "research_action": {
+    "broader_universe_remains_open": true,
     "classification": "FOUR_PANEL_OUTER_COMPLETE_FRESH_GENERAL_AI_REASSESSMENT_REQUIRED",
-    "source_ai_proposal_id": "P-20260924-EPOCH2-SESSION-GAP-OUTER-01",
+    "economic_outcomes_to_open": 0,
+    "economically_promotable_from_this_outer": [],
+    "friction_pass_symbols": [
+      "NETH25"
+    ],
+    "holm_confirmed_symbols": [
+      "XPDUSD"
+    ],
+    "mechanism_family_closed": false,
     "outer_evidence_epoch": 4,
+    "source_ai_proposal_id": "P-20260924-EPOCH2-SESSION-GAP-OUTER-01",
+    "structural_representatives_are_not_economic_equivalence": true,
     "symbols": [
       "ZARJPY",
       "US400",
       "XPDUSD",
       "NETH25"
     ],
-    "holm_confirmed_symbols": [
-      "XPDUSD"
-    ],
-    "friction_pass_symbols": [
-      "NETH25"
-    ],
-    "economically_promotable_from_this_outer": [],
-    "broader_universe_remains_open": true,
-    "structural_representatives_are_not_economic_equivalence": true,
-    "mechanism_family_closed": false,
-    "economic_outcomes_to_open": 0,
     "v2_attempts_to_consume": 0
   },
   "research_judgment_required": true,
@@ -113,15 +140,15 @@
   "source_implementation_id": "session-gap-frontier-four-panel-independent-outer-capture-v1",
   "source_runtime_operation_id": "op_6df776827cfe160c6b2264f8877a9d19",
   "stale_reasoning_guard": {
-    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT_AFTER_MATERIAL_OUTER_EVIDENCE",
-    "current_evidence_epoch": 4,
     "authorizing_evidence_epoch": 2,
-    "last_authorizing_request_id": "reason_4b82ab6af47c5f28deaa5b1bdc17b364",
-    "last_authorizing_response_id": "reason_response_4fdec95a0d3853665d533e800a1ab7ec",
-    "last_authorizing_proposal_id": "P-20260924-EPOCH2-SESSION-GAP-OUTER-01",
-    "law_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"
+    "current_evidence_epoch": 4,
+    "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
+    "previous_external_data_gate": null,
+    "previous_next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+    "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_FOUR_PANEL_OUTER",
+    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_FOUR_PANEL_OUTER",
+  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
   "superseded_general_ai_proposal": {
     "economic_outcome_opened": false,
     "proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
@@ -132,32 +159,5 @@
     "v2_attempt_consumed": 0
   },
   "supersession_ref": "evidence/POST_EPOCH1_FOUR_PANEL_REAUTH_PROPOSAL_VALIDATION_SUPERSESSION_V1.json",
-  "user_action_required": false,
-  "ai_reasoning_required": true,
-  "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
-  "outer_result_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
-  "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
-  "outer_capture_integrity": {
-    "zip_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
-    "total_m5_rows": 64349,
-    "series_complete": 4,
-    "duplicate_timestamps": 0,
-    "out_of_interval_rows": 0,
-    "protected_forward_rows": 0,
-    "ohlc_failures": 0,
-    "all_pagination_exhausted": true
-  },
-  "outer_confirmatory_summary": {
-    "settled_structural_samples": 120,
-    "holm_rejections": 1,
-    "confirmed_symbol": "XPDUSD",
-    "confirmed_symbol_p": 0.005665492091793567,
-    "friction_overlay": {
-      "ZARJPY": "FRICTION_FAIL",
-      "US400": "FRICTION_FAIL",
-      "XPDUSD": "FRICTION_FAIL",
-      "NETH25": "FRICTION_PASS"
-    },
-    "economic_promotion_now": false
-  }
+  "user_action_required": false
 }
