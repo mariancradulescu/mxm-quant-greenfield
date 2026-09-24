@@ -1,0 +1,70 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "fe3794593bd37edc2d8e8e795be851d7638ff7fad2d15e8cb9e0c51f83a55b98",
+  "competition_start_authorized": false,
+  "decision": {
+    "accepted_40_series_sufficiency": {
+      "for_mechanism_specific_outer": false,
+      "for_next_research_decision": true,
+      "reason": "The 40-series evidence supports univariate structural work, while strict global alignment is absent; the accepted four-symbol capture is the valid aligned prerequisite surface for this decision."
+    },
+    "implementation_semantics": {
+      "eligibility": "Require broker-native rows for every referenced timestamp; count only exact timestamps present in all four series; do not forward-fill, resample, synthesize, or cross session gaps.",
+      "outputs": [
+        "ordered-pair directional contingency tables",
+        "valid-window counts",
+        "contiguous-segment and coverage diagnostics"
+      ],
+      "predictor": "sign(close_source(t)-close_source(t-5m))",
+      "prohibitions": [
+        "no returns beyond the stated sign descriptors",
+        "no PnL, costs, margin, promotion, economic ranking, parameter search, or outer authorization",
+        "do not rerun the already observed one-bar directional identity"
+      ],
+      "target": "sign(close_target(t+15m)-close_target(t))"
+    },
+    "interpretation_rule": "Use the result only to decide whether a fixed delayed lead-lag prerequisite exists and whether a later prospectively frozen mechanism-specific design is justified; do not infer causal efficacy, economic viability, or family exhaustion.",
+    "new_capture_required": false,
+    "prospective_exploration_assessment": "POSITIVE_EXPECTED_INFORMATION_GAIN_BEFORE_ANY_MECHANISM_SPECIFIC_OUTER",
+    "research_classification": "NON_ECONOMIC_STRUCTURAL_PREREQUISITE",
+    "resolution": "M5",
+    "screen": "FIXED_15_MINUTE_CROSS_MARKET_DIRECTIONAL_SCREEN",
+    "selected_mechanism_family": "CROSS_MARKET_LEAD_LAG",
+    "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+    "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
+    "symbols": [
+      "AUDJPY",
+      "AUS200",
+      "Brent-F",
+      "BCHUSD"
+    ]
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 11,
+    "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
+    "family_exhaustion": "NOT_CLAIMED",
+    "next_action": "MATERIALIZE_FIXED_15M_CROSS_MARKET_DIRECTIONAL_SCREEN_FROM_ACCEPTED_HASH_BOUND_CAPTURE",
+    "outer_authorization": "NONE",
+    "research_judgment_required": false,
+    "scope": "AUDJPY|AUS200|Brent-F|BCHUSD M5 only",
+    "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+    "status": "FROZEN_NON_ECONOMIC_PROSPECTIVE_SCREEN"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Evaluate whether the accepted AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 series contain a fixed delayed cross-market directional relationship beyond the already observed one-bar screen, without opening economic outcomes.",
+    "information_gain_rationale": "The accepted 40-series development capture is sufficient for the immediate research decision but not for a mechanism-specific outer because its representatives lack global timestamp alignment. The accepted four-symbol capture provides 9,539 strict common timestamps and 9,372 valid three-bar windows; a single predeclared 15-minute response horizon tests delayed lead-lag structure using existing authenticated bytes, avoids repeating the observed one-bar identity, and is higher-information than acquiring more symbols before resolving whether this prerequisite has any directional structure."
+  },
+  "operation_id": "op_75f260c7b1157d5e5f9dabc49cdb9c52",
+  "proposal_hash": "ce36db3ca679443ee5e92d262d7215699a94913aa97839901a2c9157a99b5459",
+  "proposal_id": "P-20260924-CROSSMARKET-15M-STRUCTURAL-GATE-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_b903f6e33891577e7bedca89298786a0.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
