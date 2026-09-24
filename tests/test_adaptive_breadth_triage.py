@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from research_v3.adaptive_breadth_triage import (
+    _read_gate_series,
     run_triage,
     run_univariate_structural_gate,
     select_primary_family,
@@ -72,6 +73,18 @@ class AdaptiveBreadthTriageTests(unittest.TestCase):
             self.assertFalse(out["economic_effect"]["pnl_or_returns_computed"])
             self.assertIn("TREND_MOMENTUM", out["adaptive_selection"]["selected_families"])
             self.assertEqual(out["scope"]["series_with_rows"], 2)
+
+    def test_univariate_gate_ohlc_validation_is_independent_of_tick_volume(self):
+        raw = (
+            "time_utc,open,high,low,close,tick_volume\\n"
+            "2026-06-15T00:00:00Z,100,101,99,100.5,0\\n"
+            "2026-06-15T00:05:00Z,100.5,102,100,101.5,0\\n"
+        ).encode()
+        start = datetime(2026, 6, 15, tzinfo=timezone.utc)
+        end = datetime(2026, 6, 16, tzinfo=timezone.utc)
+        out = _read_gate_series(raw, start, end)
+        self.assertEqual(out["rows"], 2)
+        self.assertEqual(out["causal_observation_pairs"], 1)
 
     def test_hash_mismatch_fails_closed(self):
         root = Path(__file__).resolve().parents[1]

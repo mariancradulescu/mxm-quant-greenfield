@@ -67,7 +67,7 @@
   "interpretation_boundary": "Structural sufficiency is not economic evidence, promotion, or mechanism-family closure.",
   "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
   "market_data_capture_required": false,
-  "next_action": "EXECUTE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
+  "next_action": "VALIDATE_OHLC_VALIDATOR_REPAIR_THEN_EXECUTE_HASH_BOUND_UNIVARIATE_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
   "outer_authorization": "NONE",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
   "outer_capture_integrity": {
@@ -182,7 +182,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_ADAPTIVE_BREADTH_TRIAGE",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "NON_ECONOMIC_IMPLEMENTATION_COMPLETE_READY_FOR_EXECUTION",
+  "status": "RECOVERING_UNIVARIATE_STRUCTURAL_GATE_OHLC_VALIDATOR",
   "superseded_general_ai_proposal": {
     "economic_outcome_opened": false,
     "proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
@@ -231,5 +231,21 @@
     "symbols_screened": 40
   },
   "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
-  "user_action_required": false
+  "user_action_required": false,
+  "ai_reasoning_required": false,
+  "implementation_repair": {
+    "classification": "DETERMINISTIC_IMPLEMENTATION_REPAIR_NO_RESEARCH_SEMANTIC_CHANGE",
+    "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
+    "correction": "Use high >= max(open,close) and low <= min(open,close); tick_volume is excluded from the OHLC invariant.",
+    "regression_test": "tests/test_adaptive_breadth_triage.py::test_univariate_gate_ohlc_validation_is_independent_of_tick_volume",
+    "preserved_proposal_id": "P-20260924-BREAKOUT-STRUCTURAL-GATE-01",
+    "preserved_proposal_hash": "cd8eec4dda3e40f62457982ab7ac6c05a5fa2cda0549ee3a78ad45c42ff8fbca",
+    "preserved_operation_id": "op_d441be66be3d6e2a05abd4012498d5d8",
+    "fresh_general_ai_required_for_repair": false,
+    "economic_outcomes_opened_delta": 0,
+    "v2_attempts_consumed_delta": 0,
+    "attempts_refunded": 0,
+    "protected_forward_opened": false,
+    "accepted_raw_data_invalidated": false
+  }
 }

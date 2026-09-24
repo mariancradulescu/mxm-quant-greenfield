@@ -64,7 +64,7 @@ def _read_gate_series(raw: bytes, start: datetime, end: datetime) -> dict[str, A
             raise TriageError("series contains a non-numeric OHLCV field") from exc
         if not all(value == value and abs(value) != float("inf") for value in values):
             raise TriageError("series contains a non-finite OHLCV field")
-        if values[2] > min(values[1], values[4]) or values[1] < max(values[0], values[3]):
+        if values[1] < max(values[0], values[3]) or values[2] > min(values[0], values[3]):
             raise TriageError("series contains an invalid OHLC invariant")
         timestamps.append(timestamp)
     if any(left >= right for left, right in zip(timestamps, timestamps[1:])):
