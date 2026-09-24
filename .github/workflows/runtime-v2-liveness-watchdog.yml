@@ -1,0 +1,64 @@
+name: Runtime V2 Liveness Watchdog
+
+on:
+  schedule:
+    # Independent fallback cadence, offset from the Sentinel schedule.
+    - cron: "11,26,41,56 * * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: mxm-runtime-v2-liveness-watchdog
+  cancel-in-progress: true
+
+env:
+  TARGET_BRANCH: performance-research-v3-20260922
+
+jobs:
+  wake-if-pending:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout authoritative research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Decide whether autonomous work is pending
+        id: pending
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
+          state=json.loads(p.read_text(encoding="utf-8"))
+          pending = (
+              state.get("user_action_required") is not True
+              and state.get("external_data_required") is not True
+              and state.get("external_gate") in (None, "", {})
+              and bool(str(state.get("next_action") or "").strip())
+          )
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write(f"pending={'true' if pending else 'false'}\n")
+          print(json.dumps({
+              "pending":pending,
+              "status":state.get("status"),
+              "next_action":state.get("next_action"),
+              "epoch":state.get("current_research_evidence_epoch"),
+          },sort_keys=True))
+          PY
+
+      - name: Dispatch Runtime V2 Liveness Sentinel
+        if: steps.pending.outputs.pending == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          gh workflow run runtime-v2-liveness-sentinel.yml --repo "$GH_REPO"
