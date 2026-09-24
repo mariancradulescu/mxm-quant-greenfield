@@ -7,6 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "dist" / "MXM_CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PACKAGE_V1.zip"
 FILES = (
+    "CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_RUN.py",
+    "research_v3/__init__.py",
     "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
     "research_v3/crossalign_four_symbol_capture.py",
     "research_v3/pydroid_crossalign_four_symbol_launcher.py",
