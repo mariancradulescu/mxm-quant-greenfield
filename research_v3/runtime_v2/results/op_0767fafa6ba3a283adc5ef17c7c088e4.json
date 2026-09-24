@@ -1,0 +1,80 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "eb37d3f77218a733f667f04fca94fa909dd0d5ca02168ecabe237f91c68c3be8",
+  "competition_start_authorized": false,
+  "decision": {
+    "candidate_criteria": [
+      "ACCESSIBILITY",
+      "MIN_EXECUTABLE_VOLUME",
+      "DIRECTIONAL_MARGIN_FEASIBILITY",
+      "SHORTABILITY",
+      "DATA_AVAILABILITY",
+      "EXPECTED_INFORMATION_GAIN",
+      "REDUNDANCY",
+      "CONSERVATIVE_FRICTION"
+    ],
+    "identity_policy": "DO_NOT_RERUN_EXACT_IDENTITY_V2-C031_OR_ANY_OBSERVED_EXACT_IDENTITY",
+    "mechanism_family": "SESSION_GAP_REVERSION",
+    "must_not": [
+      "LIVE_ORDERS",
+      "COMPETITION_START",
+      "PROTECTED_FORWARD",
+      "NEW_ECONOMIC_OUTCOME",
+      "RERUN_EXACT_STAGE_B"
+    ],
+    "research_decision": "MINIMAL_STRUCTURAL_FRONTIER_EXPANSION",
+    "screening_policy": "BROKER_NATIVE_ADJACENT_SYMBOLS_ONLY",
+    "stop_conditions": [
+      "adjacent frontier fails data/feasibility gate",
+      "information gain drops below minimal expected threshold",
+      "family-level evidence indicates mechanism is structurally absent",
+      "budget or time exceeds policy"
+    ],
+    "universe_selection": {
+      "frequency": "M5",
+      "method": "same mechanism + same detection logic on structurally adjacent frontier; do not re-use prior exact candidate implementation",
+      "symbol_set": [
+        "USTN2YR-F",
+        "TLT.US",
+        "NVDA.US-24",
+        "VIX",
+        "HSTECH",
+        "ADAUSD",
+        "Gasoline",
+        "EURUSD",
+        "USDCAD",
+        "MXNJPY",
+        "IWM.US",
+        "DOTUSD"
+      ],
+      "window_utc": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "start_utc": "2026-07-20T00:00:00Z"
+      }
+    }
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "gating": "require current head green and data availability before feature generation",
+    "next_action": "SCREEN_ADJACENT_BROKER_SYMBOLS_FOR_SESSION_GAP_REVERSION_WITH_M5_8W_DATA_WITHOUT_RERUNNING_EXACT_C031",
+    "scope": "mechanism-family expansion only; no live orders; no economic outcome; no protected-forward; no exact rerun",
+    "status": "READY_FOR_MINIMAL_STRUCTURAL_SCREENING",
+    "wave": "STRUCTURAL_EXTENSION_WAVE_01"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Assess whether SESSION_GAP_REVERSION generalizes beyond the current 10-symbol V6 by minimal structural screening of adjacent broker-native symbols, without rerunning exact C031 or any observed identity.",
+    "information_gain_rationale": "C031 is the only discovery survivor among the current 10, but exact failures on broader families never close the family. The governing policy requires the highest information legal action: minimal frontier expansion around the same mechanism family, using the existing 8-week M5 acquisition rule and only structurally adjacent symbols. This maximizes information gain while preserving anti-ruin, avoiding duplicate exact tests, and staying within the non-economic research-only gate."
+  },
+  "operation_id": "op_0767fafa6ba3a283adc5ef17c7c088e4",
+  "proposal_hash": "49bfd93f7bac2b83f2b6775676312a169d8ff5974c4e4588e8872d2308f57118",
+  "proposal_id": "P-20260924-C031-GAP-WAVE-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_a8b81cef686ff74cf678e7e25193f43f.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
