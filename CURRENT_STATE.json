@@ -1785,10 +1785,20 @@
       "result_status": "GROSS_EDGE_FAIL",
       "result_hash": "ca0d338a007c300d9405f0d2ae18a9a8bdec3d67c7f9672c5d9426f7ea579e11",
       "result_ref": "discovery/results/V2-C032_STAGE_A_V1.json",
-      "result_git_blob_sha1": "4ca9edb954df6a42d66b85200c43b2c4879ba57e",
+      "result_git_blob_sha1": "c668f8e22b9561bc568c8d313a5be9b9028779a0",
       "ledger_result_sequence": 70,
       "ledger_tail_entry_hash": "3597f3e6deae15fd6e42c4eaed7d3d63b1f3dcc47d7033eac35f2508be8c78e3",
-      "persistence_additional_attempts_consumed": 0
+      "persistence_additional_attempts_consumed": 0,
+      "persistence_repair": {
+        "status": "CANONICAL_STANDALONE_SERIALIZATION_RESTORED_NO_ECONOMIC_RERUN",
+        "failed_head": "31f766c40c98d5980bfb9f2831a1c3d381436852",
+        "failed_ci_run_id": 36048358190,
+        "reason": "Standalone JSON was serialized through JavaScript, collapsing integral-valued floats (e.g. 22000.0 -> 22000) and causing semantic result_hash drift. Restored exact result object bytes from authoritative canonical ledger payload.",
+        "canonical_result_hash": "ca0d338a007c300d9405f0d2ae18a9a8bdec3d67c7f9672c5d9426f7ea579e11",
+        "ledger_entry_hash": "3597f3e6deae15fd6e42c4eaed7d3d63b1f3dcc47d7033eac35f2508be8c78e3",
+        "economic_rerun_performed": false,
+        "additional_v2_attempts_consumed": 0
+      }
     }
   },
   "phase": "RESEARCH_SCOPE_GOVERNANCE_EXACT_HEAD_GREEN_C031_STAGE_B_ASSESSMENT",
