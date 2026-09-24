@@ -14,6 +14,7 @@ on:
 permissions:
   contents: write
   actions: write
+  models: read
 
 concurrency:
   group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
@@ -50,7 +51,7 @@ jobs:
         run: python -m research_v3.autonomous_control_plane validate
 
       - name: Focused Runtime V2 and general AI director tests
-        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge
+        run: python -m unittest -v tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider
 
       - name: Prove general AI research director boundary if not yet accepted
         shell: bash
@@ -66,6 +67,23 @@ jobs:
           fi
 
       - name: Drain auditable AI research proposals through Runtime V2
+        run: |
+          python -m research_v3.general_ai_director_bridge drain \
+            --root . \
+            --git-checkpoint \
+            --git-push
+
+      - name: Wake general AI reasoning when the durable state requires it
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MXM_AI_MODELS: openai/gpt-5.6-sol,openai/gpt-5.5,openai/gpt-5.4,openai/gpt-4o
+        run: |
+          python -m research_v3.general_ai_reasoning_provider wake \
+            --root . \
+            --git-checkpoint \
+            --git-push
+
+      - name: Drain newly generated AI proposal through Runtime V2
         run: |
           python -m research_v3.general_ai_director_bridge drain \
             --root . \
