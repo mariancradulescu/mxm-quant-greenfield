@@ -5,6 +5,12 @@ on:
     # Independent fallback cadence, offset from the Sentinel schedule.
     - cron: "11,26,41,56 * * * *"
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/runtime-v2-liveness-watchdog.yml"
+      - ".github/workflows/runtime-v2-liveness-sentinel.yml"
 
 permissions:
   actions: write
