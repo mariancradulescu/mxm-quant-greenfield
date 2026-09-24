@@ -50,6 +50,11 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                 out=run(root,max_cycles=1)
             self.assertEqual(out["status"],"PROVIDER_UNAVAILABLE")
             self.assertEqual(out["cycles"],0)
+            changed={"status":"FRESH_GENERAL_AI_REASONING_REQUIRED","next_action":"AI_NEW_EPOCH_DECISION","current_research_evidence_epoch":21}
+            (root/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").write_text(json.dumps(changed))
+            with patch("research_v3.general_ai_autonomy_loop.validate_repository_state",return_value={}), patch("research_v3.general_ai_autonomy_loop.stale_reasoning_redirect",return_value=None), patch("research_v3.general_ai_autonomy_loop.reasoning_required",return_value=True), patch("research_v3.general_ai_autonomy_loop.reason",side_effect=AssertionError("exhausted account must not be called")):
+                across_phase=run(root,max_cycles=1)
+            self.assertEqual(across_phase["status"],"PROVIDER_UNAVAILABLE")
 
     def test_transient_provider_failure_remains_retryable(self):
         with tempfile.TemporaryDirectory() as td:
