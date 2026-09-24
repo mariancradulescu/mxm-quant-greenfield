@@ -62,6 +62,19 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertIn("live_orders_authorized",p)
         self.assertIn("MUST NOT contain",p)
 
+
+    def test_reasoning_request_id_ignores_head_and_nonmaterial_checkpoint_fields(self):
+        import json
+        from research_v3.general_ai_reasoning_provider import NEXT_REL
+        original=json.loads((Path(".")/NEXT_REL).read_text())
+        with patch("research_v3.general_ai_reasoning_provider._head",return_value="a"*40), patch("research_v3.general_ai_reasoning_provider._load",return_value=original):
+            first=build_reasoning_request(".")
+        changed=dict(original)
+        changed["last_liveness_wake_utc"]="later"
+        with patch("research_v3.general_ai_reasoning_provider._head",return_value="b"*40), patch("research_v3.general_ai_reasoning_provider._load",return_value=changed):
+            second=build_reasoning_request(".")
+        self.assertEqual(first["request_id"],second["request_id"])
+
     def test_missing_token_creates_explicit_gate_without_secret(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
