@@ -83,7 +83,10 @@ def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
                   and "monthly quota" in str(prior.get("detail","")).lower()
                   and prior.get("request_fingerprint") is None)
     if legacy_quota:
-        if prior.get("phase") == phase and prior.get("current_evidence_epoch") == state.get("current_research_evidence_epoch"):
+        if (prior.get("phase") == phase
+                and prior.get("current_evidence_epoch") == state.get("current_research_evidence_epoch")
+                and prior.get("pending_next_action") == state.get("next_action")
+                and prior.get("pending_status") == state.get("status")):
             return prior
         return None
     if prior.get("status") != "PROVIDER_UNAVAILABLE" or prior.get("failure_class") != "MONTHLY_QUOTA_EXHAUSTED":
