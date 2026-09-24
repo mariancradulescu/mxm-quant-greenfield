@@ -76,6 +76,10 @@ jobs:
       - name: Install GitHub Copilot CLI for unattended reasoning
         run: npm install -g @github/copilot
 
+      - name: Install full implementation-test runtime
+        run: |
+          python -m pip install --disable-pip-version-check --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
+
       - name: Continue general AI reasoning and implementation autonomously
         env:
           GITHUB_TOKEN: ${{ github.token }}
