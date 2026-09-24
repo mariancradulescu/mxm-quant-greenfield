@@ -1,0 +1,46 @@
+{
+  "schema": "mxm.greenfield.broker-native-frontier-13w-capture-impact-audit.v1",
+  "status": "RAW_DATA_VALID_PARTIAL_IMPLEMENTATION_INVALID_PAGINATION",
+  "recorded_utc": "2026-09-24T10:45:00Z",
+  "source": {
+    "external_name": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "zip_sha256": "bfbba5e7579ffd98bf917ab2aa4346cb6b67ab46e050dec38c647d38bbe81f51",
+    "zip_size_bytes": 3668210,
+    "plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a"
+  },
+  "integrity": {
+    "zip_crc": "PASS",
+    "checksums": "PASS",
+    "series": 40,
+    "valid_rows": 189722,
+    "series_with_4999_or_5000_rows_and_late_start": 34,
+    "duplicate_timestamps": 0,
+    "out_of_interval_rows": 0,
+    "protected_forward_rows": 0,
+    "ohlc_invariant_failures": 0,
+    "duplicate_packaging_tree_byte_identical": true
+  },
+  "root_cause": {
+    "collector_version": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ANDROID_V1",
+    "bug": "if not bool(getattr(response,'hasMore',False)): break",
+    "schema_fact": "The active ProtoOAGetTrendbarsRes schema does not expose hasMore; getattr therefore returned the default False and falsely terminated on the first page.",
+    "material_effect": "34 series are missing older prefixes; the returned suffix rows remain valid."
+  },
+  "preservation": {
+    "discard_valid_rows": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "attempts_refunded": 0,
+    "rerun_economics": false
+  },
+  "repair": {
+    "same_plan_identity": true,
+    "plan_changed": false,
+    "interval_changed": false,
+    "symbols_changed": false,
+    "package_version": "V2",
+    "reuse_previous_zip_or_cache": true,
+    "backfill_missing_prefix_only_when_seed_available": true,
+    "full_clean_capture_supported": true
+  }
+}

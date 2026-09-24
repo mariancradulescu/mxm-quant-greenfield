@@ -34,7 +34,7 @@ def local_preflight():
     }
 
 def main():
-    print("MXM Broker-Native Frontier DEVELOPMENT | 40 structural archetypes | M5 | 13 weeks | READ ONLY | economics=NO | protected=NO")
+    print("MXM Broker-Native Frontier DEVELOPMENT | 40 structural archetypes | M5 | 13 weeks | pagination repair V2 | READ ONLY | economics=NO | protected=NO")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization(); print("[OAUTH]",mode)

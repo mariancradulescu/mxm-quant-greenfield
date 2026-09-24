@@ -20,7 +20,7 @@ from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 PLAN_REL="data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json"
 OUTPUT_FILENAME="MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip"
 BUNDLE_DIR="MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1"
-TOOL_VERSION="MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ANDROID_V1"
+TOOL_VERSION="MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ANDROID_V2_PAGINATION_REPAIR"
 EXPECTED_PLAN_SHA="b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a"
 RAW_HEADER=("time_utc","open","high","low","close","tick_volume")
 MIN_REQUEST_INTERVAL=1.0/4.7
@@ -62,6 +62,27 @@ def current_symbol_state(spec,light,full):
         "current_entry_tradable":entry,
         "classification":("CURRENT_ENTRY_TRADABLE" if entry else "CURRENT_ENTRY_UNAVAILABLE_NONFATAL_FOR_HISTORICAL_PROBE"),
     }
+
+def _trendbar_has_more(response):
+    descriptor=getattr(response,"DESCRIPTOR",None)
+    fields=getattr(descriptor,"fields_by_name",{}) if descriptor is not None else {}
+    if "hasMore" in fields:
+        return True,bool(getattr(response,"hasMore"))
+    return False,None
+
+def _read_existing_rows(path):
+    rows={}
+    with Path(path).open("r",encoding="utf-8",newline="") as f:
+        reader=csv.DictReader(f)
+        if tuple(reader.fieldnames or ())!=RAW_HEADER:
+            raise CaptureContractError("existing cache CSV header mismatch")
+        for row in reader:
+            key=row["time_utc"]
+            clean={k:row[k] for k in RAW_HEADER}
+            if key in rows and rows[key]!=clean:
+                raise CaptureContractError(f"conflicting existing cache duplicate {key}")
+            rows[key]=clean
+    return rows
 
 def canonical_plan_sha(plan):
     body={k:v for k,v in plan.items() if k!="plan_sha256"}
@@ -135,27 +156,79 @@ class BrokerNativeFrontierDevelopmentRunner:
     def _capture_one(self,aid,spec,full,current_state):
         name=str(spec["broker_symbol"]); sid=int(spec["symbol_id"]); digits=int(full.get("digits",5))
         target=self.work/f"{sid}_{_safe(name)}_M5.csv"; meta_path=self.work/f"{sid}_{_safe(name)}_M5.meta.json"
-        if target.is_file() and meta_path.is_file():
-            meta=json.loads(meta_path.read_text(encoding="utf-8"))
-            if meta.get("sha256")==_sha_file(target) and meta.get("symbol_id")==sid and meta.get("broker_symbol")==name:
-                self.progress(f"[RESUME] {name} M5 rows={meta.get('row_count',0):,}"); return target,meta
         start=self.plan["interval"]["start_utc"]; end=self.plan["interval"]["end_utc"]
-        frm=_ms(_utc(start)); page_to=_ms(_utc(end)); all_rows={}
+        frm=_ms(_utc(start)); end_ms=_ms(_utc(end)); all_rows={}; seeded_rows=0
+        if target.is_file():
+            try:
+                all_rows=_read_existing_rows(target)
+                seeded_rows=len(all_rows)
+                if all_rows:
+                    self.progress(f"[RESUME-SEED] {name} valid cached rows={seeded_rows:,}")
+            except Exception:
+                all_rows={}; seeded_rows=0
+        if all_rows:
+            oldest_seed=min(_ms(_utc(k)) for k in all_rows)
+            page_to=oldest_seed-1
+        else:
+            page_to=end_ms
+        pages=0; raw_total=0; full_pages=0; short_pages=0; empty_pages=0; identical_duplicates=0
+        completion=None; schema_exposes=None; page_log=[]
+        if page_to<frm:
+            completion="CACHE_REACHED_FROM_BOUNDARY"
         while page_to>=frm:
-            q=ProtoOAGetTrendbarsReq(ctidTraderAccountId=aid,symbolId=sid,period=ProtoOATrendbarPeriod.Value("M5"),fromTimestamp=frm,toTimestamp=page_to,count=5000)
+            request_to=page_to
+            q=ProtoOAGetTrendbarsReq(ctidTraderAccountId=aid,symbolId=sid,period=ProtoOATrendbarPeriod.Value("M5"),fromTimestamp=frm,toTimestamp=request_to,count=5000)
             response=self._send(q,historical=True); bars=[_plain(x) for x in response.trendbar]
-            for row in normalize_m5(bars,digits=digits,start_utc=start,end_utc=end,protected_utc=self.plan["protected_forward_start"]):
+            pages+=1; count=len(bars); raw_total+=count
+            supports,has_more=_trendbar_has_more(response)
+            if schema_exposes is None: schema_exposes=supports
+            elif schema_exposes!=supports: raise CaptureContractError(f"{name}: hasMore schema exposure changed")
+            if count>5000: raise CaptureContractError(f"{name}: response exceeded page size")
+            if not bars:
+                empty_pages+=1
+                if supports and has_more: raise CaptureContractError(f"{name}: empty page with hasMore=true")
+                completion="EMPTY_PREFIX_OR_INTERVAL"
+                page_log.append({"page":pages,"request_to_ms":request_to,"raw_bars":0,"has_more_exposed":supports,"has_more":has_more})
+                break
+            raw_times=[int(x["utcTimestampInMinutes"])*60000 for x in bars]
+            if any(t>request_to for t in raw_times): raise CaptureContractError(f"{name}: bar above requested page boundary")
+            oldest=min(raw_times); newest=max(raw_times)
+            normalized=normalize_m5(bars,digits=digits,start_utc=start,end_utc=end,protected_utc=self.plan["protected_forward_start"])
+            for row in normalized:
                 key=row["time_utc"]
-                if key in all_rows and all_rows[key]!=row: raise CaptureContractError(f"{name}: conflicting M5 duplicate {key}")
-                all_rows[key]=row
-            if not bool(getattr(response,"hasMore",False)): break
-            if not bars: raise CaptureContractError(f"{name}: hasMore without trendbars")
-            nxt=min(int(x.get("utcTimestampInMinutes"))*60000 for x in bars)-1
-            if nxt>=page_to or nxt<frm: raise CaptureContractError(f"{name}: invalid M5 pagination")
+                if key in all_rows:
+                    if all_rows[key]!=row: raise CaptureContractError(f"{name}: conflicting M5 duplicate {key}")
+                    identical_duplicates+=1
+                else:
+                    all_rows[key]=row
+            is_full=count==5000
+            full_pages+=int(is_full); short_pages+=int(not is_full)
+            page_log.append({"page":pages,"request_to_ms":request_to,"raw_bars":count,"oldest_bar_open_ms":oldest,"newest_bar_open_ms":newest,"has_more_exposed":supports,"has_more":has_more})
+            if oldest<=frm:
+                completion="FROM_BOUNDARY_REACHED"; break
+            if supports:
+                if has_more is False:
+                    completion="HAS_MORE_FALSE"; break
+                if has_more is True and not is_full:
+                    raise CaptureContractError(f"{name}: hasMore=true on short page")
+            elif not is_full:
+                completion="SHORT_PAGE_INTERVAL_EXHAUSTED"; break
+            nxt=oldest-1
+            if nxt>=request_to or nxt<frm-1: raise CaptureContractError(f"{name}: pagination did not make strict backward progress")
             page_to=nxt
-        _write_rows(target,[all_rows[k] for k in sorted(all_rows)],"w")
+        if completion is None: raise CaptureContractError(f"{name}: pagination ended without explicit exhaustion")
+        ordered=[all_rows[k] for k in sorted(all_rows)]
+        _write_rows(target,ordered,"w")
         stats=_inspect_csv(target)
-        active_dates=len({row["time_utc"][:10] for row in all_rows.values()})
+        active_dates=len({row["time_utc"][:10] for row in ordered})
+        pagination={
+            "page_size":5000,"network_pages_this_run":pages,"seeded_valid_rows":seeded_rows,
+            "raw_bars_returned_this_run":raw_total,"full_pages":full_pages,"short_pages":short_pages,
+            "empty_pages":empty_pages,"identical_duplicate_count":identical_duplicates,
+            "response_schema_exposed_has_more":bool(schema_exposes),"completion_reason":completion,
+            "request_interval_exhausted":True,"page_log":page_log,
+            "pagination_law":"WHEN_HAS_MORE_IS_NOT_EXPOSED_CONTINUE_BACKWARD_FROM_OLDEST_BAR_AFTER_FULL_PAGE_UNTIL_SHORT_EMPTY_OR_FROM_BOUNDARY"
+        }
         meta={
             "broker_symbol":name,"symbol_id":sid,"structural_signature":spec["structural_signature"],
             "digits":digits,"resolution":"M5","requested_interval":self.plan["interval"],
@@ -166,11 +239,34 @@ class BrokerNativeFrontierDevelopmentRunner:
             "empty_series_classification":("NO_M5_ROWS_OBSERVED" if stats["row_count"]==0 else None),
             "synthetic_fill":False,"forward_fill":False,"schedule_adjusted_coverage_computed":False,
             "current_symbol_state":current_state,"capture_status":"SERIES_CAPTURE_COMPLETE",
+            "pagination":pagination,
         }
         atomic_write_json(meta_path,meta); return target,meta
 
+    def _import_previous_zip_cache(self):
+        if not self.zip_path.is_file(): return 0
+        imported=0
+        try:
+            import zipfile
+            with zipfile.ZipFile(self.zip_path) as z:
+                manifest=json.loads(z.read("capture_manifest.json"))
+                if manifest.get("plan_sha256")!=EXPECTED_PLAN_SHA: return 0
+                for item in manifest.get("series") or []:
+                    rel=item.get("file")
+                    if not rel or rel not in z.namelist(): continue
+                    name=str(item["broker_symbol"]); sid=int(item["symbol_id"])
+                    target=self.work/f"{sid}_{_safe(name)}_M5.csv"
+                    data=z.read(rel)
+                    if hashlib.sha256(data).hexdigest()!=item.get("sha256"): continue
+                    target.write_bytes(data); imported+=1
+            if imported: self.progress(f"[CACHE IMPORT] preserved valid series from previous ZIP={imported}")
+        except Exception as exc:
+            self.progress(f"[CACHE IMPORT SKIPPED] {redact_text(str(exc))}")
+        return imported
+
     def run(self):
         self.work.mkdir(parents=True,exist_ok=True)
+        self._import_previous_zip_cache()
         if self.bundle.exists(): shutil.rmtree(self.bundle)
         self.bundle.mkdir(parents=True); self.zip_path.unlink(missing_ok=True)
         try: self.transport.connect(); self._workflow()

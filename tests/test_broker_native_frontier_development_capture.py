@@ -1,6 +1,6 @@
 import inspect, json, unittest
 from pathlib import Path
-from research_v3.broker_native_frontier_development_capture import EXPECTED_PLAN_SHA, canonical_plan_sha, validate_plan
+from research_v3.broker_native_frontier_development_capture import EXPECTED_PLAN_SHA, _trendbar_has_more, canonical_plan_sha, validate_plan
 from research_v3.pydroid_broker_native_frontier_development_launcher import local_preflight
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -47,6 +47,18 @@ class BrokerNativeFrontierDevelopmentCaptureTests(unittest.TestCase):
         self.assertFalse(r["account_mutation_permitted"])
         self.assertFalse(r["economic_outcomes_opened"])
         self.assertFalse(r["schedule_adjusted_coverage_gate"])
+
+    def test_missing_has_more_descriptor_does_not_imply_false(self):
+        class Descriptor: fields_by_name={}
+        class Response: DESCRIPTOR=Descriptor()
+        self.assertEqual(_trendbar_has_more(Response()),(False,None))
+
+    def test_pagination_source_does_not_abort_on_implicit_has_more_false(self):
+        import research_v3.broker_native_frontier_development_capture as m
+        s=inspect.getsource(m.BrokerNativeFrontierDevelopmentRunner._capture_one)
+        self.assertIn("elif not is_full",s)
+        self.assertIn("nxt=oldest-1",s)
+        self.assertNotIn('if not bool(getattr(response,"hasMore",False)): break',s)
 
     def test_collector_contains_no_order_requests(self):
         import research_v3.broker_native_frontier_development_capture as m

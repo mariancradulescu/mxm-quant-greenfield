@@ -204,12 +204,12 @@ jobs:
       - name: Build deterministic broker-native 13-week DEVELOPMENT package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_broker_native_frontier_development_package.py
-          sha256sum dist/MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V1.zip
+          sha256sum dist/MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2.zip
       - name: Upload broker-native 13-week DEVELOPMENT package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V1
-          path: dist/MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V1.zip
+          name: MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2
+          path: dist/MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2.zip
           if-no-files-found: error
           retention-days: 30
       - name: Wave02 authenticated read-only collector preflight
