@@ -177,7 +177,7 @@ next_research_state: arbitrary JSON object with at least status and next_action;
 authority_refs: non-empty list chosen only from refs provided in context
 data_bindings: optional list
 artifact_attestation_refs: MUST be [] unless the supplied context explicitly identifies a document whose schema is mxm.greenfield.ai-director-artifact-attestation.v1 and status is VERIFIED
-data_policy: object with new_market_data_requested boolean, and if true minimal_acquisition_request with symbols,resolution,start_utc,end_utc,fields,information_gain_justification
+data_policy: object with new_market_data_requested boolean, and if true minimal_acquisition_request with source_domain exactly PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API, symbols,resolution,start_utc,end_utc,fields,information_gain_justification
 mechanism_family_closure_claims: list; normally empty unless prospective exhaustion authority exists
 
 The next_research_state object MUST NOT contain any of these deterministic/protected keys:
