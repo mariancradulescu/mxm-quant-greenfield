@@ -343,6 +343,76 @@ def _checkpoint(root: Path, boundary: str, op_id: str | None, enabled: bool, pus
     GitCheckpointSink(root, enabled=enabled, push=push).checkpoint(boundary, op_id)
 
 
+def _verify_already_materialized_entry(
+    root: Path,
+    proposal_ref: str,
+    proposal: Mapping[str, Any],
+    p_hash: str,
+    row: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Verify immutable historical acceptance without revalidating it against today's accounting."""
+    if row.get("proposal_hash") != p_hash:
+        raise AIProposalRejected("accepted registry proposal hash mismatch")
+    if row.get("proposal_ref") != proposal_ref:
+        raise AIProposalRejected("accepted registry proposal_ref/hash consistency failure")
+    if row.get("proposal_id") != proposal.get("proposal_id"):
+        raise AIProposalRejected("accepted registry proposal_id mismatch")
+    if row.get("economic_outcome_opened") is not False or int(row.get("v2_attempt_consumed", -1)) != 0:
+        raise AIProposalRejected("accepted AI reasoning row has invalid economic accounting")
+
+    op_id = _nonempty(row.get("operation_id"), "accepted.operation_id")
+    result_ref = _nonempty(row.get("result_ref"), "accepted.result_ref")
+    result_path = root / result_ref
+    if not result_path.is_file():
+        raise AIProposalRejected(f"accepted proposal result missing: {result_ref}")
+    observed_result_hash = sha256_file(result_path)
+    if observed_result_hash != row.get("result_sha256"):
+        raise AIProposalRejected("accepted proposal persisted result hash drift")
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    if (
+        result.get("proposal_hash") != p_hash
+        or result.get("proposal_ref") != proposal_ref
+        or result.get("proposal_id") != proposal.get("proposal_id")
+        or result.get("operation_id") != op_id
+        or result.get("economic_outcome_opened") is not False
+        or int(result.get("v2_attempt_consumed", -1)) != 0
+    ):
+        raise AIProposalRejected("accepted proposal persisted result identity/accounting drift")
+
+    runtime = RuntimeV2(root, lease_seconds=900, owner_token=f"ai-registry-verify-{p_hash[:16]}")
+    proof = _journal_proof(runtime, op_id)
+    recorded_proof = row.get("journal_proof")
+    if recorded_proof != proof:
+        raise AIProposalRejected("accepted proposal journal proof drift")
+
+    closure_ref = root / "research_v3/runtime_v2/closures" / f"{op_id}.json"
+    if not closure_ref.is_file():
+        raise AIProposalRejected("accepted proposal Runtime V2 closure missing")
+    closure = json.loads(closure_ref.read_text(encoding="utf-8"))
+    if (
+        closure.get("operation_id") != op_id
+        or closure.get("result_sha256") != observed_result_hash
+        or closure.get("economic_outcome_opened") is not False
+        or closure.get("status") != "CLOSED_POST_VALIDATION_GREEN"
+    ):
+        raise AIProposalRejected("accepted proposal Runtime V2 closure integrity drift")
+
+    ledger_rows = runtime._validate_runtime_ledger()
+    matches = [
+        x for x in ledger_rows
+        if x.get("operation_id") == op_id and x.get("entry_type") == "NON_ECONOMIC_RESULT_RECORDED"
+    ]
+    if len(matches) != 1 or matches[0].get("result_sha256") != observed_result_hash:
+        raise AIProposalRejected("accepted proposal Runtime V2 ledger integrity drift")
+    if any(
+        x.get("operation_id") == op_id and x.get("entry_type") == "RESULT_RECORDED"
+        for x in ledger_rows
+    ):
+        raise AIProposalRejected("accepted non-economic proposal has economic Runtime V2 ledger entry")
+
+    return {"status": "ALREADY_MATERIALIZED", **dict(row)}
+
+
 def materialize_proposal(
     root_value: str | Path,
     proposal_ref: str,
@@ -352,13 +422,22 @@ def materialize_proposal(
 ) -> dict[str, Any]:
     root = Path(root_value).resolve()
     proposal = _load(root, proposal_ref)
-    validation = validate_proposal(root, proposal)
     p_hash = proposal_hash(proposal)
+
+    # Historical accepted proposals are immutable decisions. Verify their durable identity,
+    # result, journal, closure and runtime-ledger proof BEFORE consulting today's accounting.
+    # This is the idempotent fast path: later legitimate economics must not stale old decisions.
     registry = _registry(root)
     existing = [x for x in registry.get("accepted", []) if x.get("proposal_hash") == p_hash]
     if existing:
-        return {"status": "ALREADY_MATERIALIZED", **existing[-1]}
+        if len(existing) != 1:
+            raise AIProposalRejected("duplicate accepted registry rows for immutable proposal hash")
+        return _verify_already_materialized_entry(root, proposal_ref, proposal, p_hash, existing[0])
 
+    # Only genuinely new or modified proposal bytes are validated against LIVE accounting,
+    # ledger, authorities and safety. A mutation of a historically accepted proposal changes
+    # its hash and therefore cannot enter the historical fast path.
+    validation = validate_proposal(root, proposal)
     before = project_snapshot(root)
     plan = compile_runtime_plan(root, proposal, validation, proposal_ref)
     runtime = RuntimeV2(

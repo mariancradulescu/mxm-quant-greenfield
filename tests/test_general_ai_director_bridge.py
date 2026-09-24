@@ -1,9 +1,17 @@
+import copy
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from research_v3.general_ai_director_bridge import (
     AIProposalRejected,
     PROPOSAL_SCHEMA,
     compile_runtime_plan,
+    drain,
+    materialize_proposal,
+    proposal_hash,
     validate_proposal_shape,
 )
 
@@ -94,6 +102,83 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "information_gain_justification": "Prospectively sufficient pilot.",
         }
         validate_proposal_shape(proposal)
+
+    def _real_historical_ref(self):
+        return "research_v3/ai_director/proposals/C031_STAGE_B_EXECUTION_AUTHORIZATION_V1.json"
+
+    def test_already_materialized_proposal_survives_later_accounting_change(self):
+        ref=self._real_historical_ref()
+        with patch("research_v3.general_ai_director_bridge.validate_proposal", side_effect=AssertionError("must not revalidate current accounting")):
+            out=materialize_proposal(".",ref)
+        self.assertEqual(out["status"],"ALREADY_MATERIALIZED")
+        self.assertEqual(out["economic_outcome_opened"],False)
+        self.assertEqual(out["v2_attempt_consumed"],0)
+
+    def test_already_materialized_proposal_does_not_create_duplicate_runtime_ledger_entry(self):
+        before=Path("research_v3/runtime_v2/runtime_ledger.jsonl").read_bytes()
+        out=materialize_proposal(".",self._real_historical_ref())
+        after=Path("research_v3/runtime_v2/runtime_ledger.jsonl").read_bytes()
+        self.assertEqual(out["status"],"ALREADY_MATERIALIZED")
+        self.assertEqual(before,after)
+
+    def test_already_materialized_proposal_does_not_open_duplicate_economics(self):
+        journal=Path("research_v3/runtime_v2/operation_journal.jsonl").read_text().splitlines()
+        ref=self._real_historical_ref()
+        proposal=json.loads(Path(ref).read_text())
+        p_hash=proposal_hash(proposal)
+        registry=json.loads(Path("research_v3/ai_director/PROPOSAL_REGISTRY_V1.json").read_text())
+        row=next(x for x in registry["accepted"] if x["proposal_hash"]==p_hash)
+        before=[json.loads(x) for x in journal if x.strip() and json.loads(x).get("operation_id")==row["operation_id"]]
+        materialize_proposal(".",ref)
+        after=[json.loads(x) for x in Path("research_v3/runtime_v2/operation_journal.jsonl").read_text().splitlines() if x.strip() and json.loads(x).get("operation_id")==row["operation_id"]]
+        self.assertEqual(before,after)
+        self.assertFalse(any(x.get("event")=="ECONOMIC_EXECUTION_STARTED" for x in after))
+
+    def test_already_materialized_proposal_does_not_consume_attempt(self):
+        before=json.loads(Path("CURRENT_STATE.json").read_text())["v2_attempts_used"]
+        materialize_proposal(".",self._real_historical_ref())
+        after=json.loads(Path("CURRENT_STATE.json").read_text())["v2_attempts_used"]
+        self.assertEqual((before,after),(19,19))
+
+    def test_unaccepted_stale_basis_proposal_is_still_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            # We only need to prove the new/unaccepted path still invokes strict validation.
+            root=Path(td); (root/"p.json").write_text(json.dumps(base_proposal()))
+            with patch("research_v3.general_ai_director_bridge._registry",return_value={"accepted":[]}), \
+                 patch("research_v3.general_ai_director_bridge.validate_proposal",side_effect=AIProposalRejected("proposal accounting basis drift")):
+                with self.assertRaisesRegex(AIProposalRejected,"accounting basis drift"):
+                    materialize_proposal(root,"p.json")
+
+    def test_modified_previously_accepted_proposal_is_not_silently_treated_as_accepted(self):
+        ref=self._real_historical_ref()
+        accepted=json.loads(Path(ref).read_text())
+        modified=copy.deepcopy(accepted); modified["objective"]["goal"] += " MODIFIED"
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); (root/"p.json").write_text(json.dumps(modified))
+            historical_hash=proposal_hash(accepted)
+            fake={"proposal_hash":historical_hash,"proposal_ref":"p.json"}
+            with patch("research_v3.general_ai_director_bridge._registry",return_value={"accepted":[fake]}), \
+                 patch("research_v3.general_ai_director_bridge.validate_proposal",side_effect=AIProposalRejected("strict validation reached")):
+                with self.assertRaisesRegex(AIProposalRejected,"strict validation reached"):
+                    materialize_proposal(root,"p.json")
+
+    def test_drain_is_order_independent_across_historical_and_new_proposals(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); d=root/"research_v3/ai_director/proposals"; d.mkdir(parents=True)
+            for name in ("Z.json","A.json"):
+                (d/name).write_text(json.dumps(base_proposal(name)))
+            with patch("research_v3.general_ai_director_bridge.materialize_proposal",side_effect=lambda root,rel,**k:{"status":"ALREADY_MATERIALIZED","proposal_ref":rel}):
+                out=drain(root)
+        self.assertEqual(out["count"],2)
+        self.assertEqual({x["proposal_ref"] for x in out["processed"]},{"research_v3/ai_director/proposals/A.json","research_v3/ai_director/proposals/Z.json"})
+
+    def test_scheduled_liveness_wake_from_current_27_outcome_state_reaches_completion(self):
+        out=materialize_proposal(".",self._real_historical_ref())
+        self.assertEqual(out["status"],"ALREADY_MATERIALIZED")
+        state=json.loads(Path("CURRENT_STATE.json").read_text())
+        self.assertEqual(state["economic_outcomes_opened"],27)
+        self.assertEqual(state["v2_attempts_used"],19)
+        self.assertEqual(state["v2_search_budget_remaining"],65)
 
 
 if __name__ == "__main__":
