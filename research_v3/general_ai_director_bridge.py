@@ -482,7 +482,20 @@ def materialize_proposal(
     publication = proposal.get("publication") or {}
     if publication.get("apply_to_next_state") is True:
         next_doc = dict(load_json(root / NEXT_STATE_REL, {}) or {})
+        # Routing metadata belongs to the action that created it. Never inherit it into
+        # a newly accepted AI decision unless that decision explicitly re-declares it.
+        for key in (
+            "ai_reasoning_required",
+            "green_implementation_artifacts",
+            "external_data_gate_ref",
+            "collector_build_ref",
+            "collector_package_artifact_name",
+            "expected_return_artifact_name",
+            "source_implementation_id",
+        ):
+            next_doc.pop(key, None)
         next_doc.update(dict(proposal["next_research_state"]))
+        next_doc["user_action_required"] = bool(proposal["next_research_state"].get("user_action_required", False))
         next_doc.update({
             "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v3",
             "director_protocol": PROTOCOL_VERSION,
