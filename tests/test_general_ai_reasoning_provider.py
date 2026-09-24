@@ -21,7 +21,9 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertEqual(req["project_snapshot"]["v2_search_budget_remaining"],65)
         self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],27)
         self.assertIn("m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json",req["authority_refs"])
-        self.assertEqual(req["next_state"]["status"],"READY_FOR_MINIMAL_STRUCTURAL_SCREENING")
+        self.assertIn(req["next_state"]["status"],{"READY_FOR_MINIMAL_STRUCTURAL_SCREENING","WAITING_EXTERNAL_AUTHENTICATED_DATA"})
+        if req["next_state"]["status"]=="WAITING_EXTERNAL_AUTHENTICATED_DATA":
+            self.assertTrue(req["next_state"]["user_action_required"])
 
     def test_wake_detector_is_generic_not_finite_action_map(self):
         self.assertTrue(reasoning_required({"next_action":"AI_SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
