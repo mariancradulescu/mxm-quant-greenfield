@@ -12,7 +12,7 @@ from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snaps
 from research_v3.general_ai_reasoning_provider import reasoning_required
 from research_v3.runtime_v2_primitives import GitCheckpointSink, atomic_write_json, canonical_bytes, iso, load_json, sha256_bytes, sha256_file
 
-VERSION="MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V1"
+VERSION="MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2"
 REQUEST_REL=Path("research_v3/ai_director/IMPLEMENTATION_REQUEST.json")
 RESPONSE_REL=Path("research_v3/ai_director/IMPLEMENTATION_RESPONSE.json")
 GATE_REL=Path("research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json")
@@ -37,6 +37,36 @@ def implementation_required(next_state:Mapping[str,Any])->bool:
     if next_state.get("user_action_required") is True: return False
     if not str(next_state.get("next_action") or "").strip(): return False
     return not reasoning_required(next_state)
+
+def authoritative_reasoning_requirement(root:Path,next_state:Mapping[str,Any])->dict[str,Any]|None:
+    """Return a generic reasoning redirect when an authoritative freeze forbids execution before a prerequisite."""
+    rel=next_state.get("source_freeze_ref") or next_state.get("freeze_ref")
+    if not isinstance(rel,str) or not rel:
+        return None
+    path=root/rel
+    if not path.is_file():
+        return None
+    try:
+        freeze=json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    contract=freeze.get("independent_outer_contract")
+    if not isinstance(contract,Mapping) or contract.get("required") is not True:
+        return None
+    binding=next_state.get("outer_data_binding_ref") or next_state.get("independent_outer_data_ref")
+    if binding:
+        return None
+    step=str(contract.get("next_step") or "").strip()
+    if not step:
+        raise ImplementationRejected("authoritative independent-outer contract has no next_step")
+    return {
+        "status":"AI_REASONING_REQUIRED_BY_AUTHORITATIVE_DATA_CONTRACT",
+        "next_action":step,
+        "ai_reasoning_required":True,
+        "authoritative_freeze_ref":rel,
+        "reason":"Authoritative freeze requires an unopened disjoint outer-data decision/binding before any executable outer screen.",
+        "user_action_required":False,
+    }
 
 def exact_head_green(root:Path)->dict[str,Any]:
     observed=_head(root)
@@ -171,6 +201,8 @@ proposals/registry, protected-forward authority, search budget, GitHub workflows
 Do not create a candidate economic identity, open economics, authorize live orders, open protected evidence,
 or rerun C031 Stage-B. Do not use network or shell tools. Do not ask the human to choose research parameters.
 
+Authoritative prospective freezes override an older proposal when they impose a stricter causal/data prerequisite.
+Never execute on source/development bytes if a bound freeze requires unopened disjoint outer data.
 If repository files already implement the selected action or exact collector, do not rewrite them. Validate by inspection.
 If external authenticated market bytes are genuinely required, return EXTERNAL_DATA_REQUIRED and bind the existing
 minimal collector build reference/artifact. The human's only permitted role is to run the read-only collector and upload
@@ -273,6 +305,21 @@ def _normal_commit_push(root:Path,message:str)->str:
 def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve(); next_state=_next(root)
     if not implementation_required(next_state): return {"status":"NO_IMPLEMENTATION_REQUIRED"}
+    redirect=authoritative_reasoning_requirement(root,next_state)
+    if redirect is not None:
+        before=project_snapshot(root)
+        out={
+            "implementation_id":"authoritative-data-contract-redirect",
+            "status":"COMPLETE_NON_ECONOMIC",
+            "summary":"Execution was superseded by an authoritative prerequisite requiring additional AI reasoning/data binding.",
+            "decision":{"classification":"ADDITIONAL_AI_REASONING_REQUIRED","authoritative_contract":redirect["authoritative_freeze_ref"]},
+            "next_research_state":redirect,
+            "external_data_gate":None,
+            "tests_requested":[],
+        }
+        published=_publish_next(root,out,before)
+        GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_reasoning_redirect",None)
+        return {"status":"AI_REASONING_REQUIRED","output":out,"next_state":published}
     before=project_snapshot(root); protected=protected_snapshot(root); state_hash=sha256_bytes(canonical_bytes(next_state))
     green=exact_head_green(root)
     pending=load_json(root/RESPONSE_REL,{}) or {}

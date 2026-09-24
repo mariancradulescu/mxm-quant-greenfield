@@ -1,0 +1,142 @@
+{
+  "schema": "mxm.greenfield.session-gap-six-panel-independent-outer-capture-plan.v1",
+  "status": "FROZEN_PRE_CAPTURE_PRE_OUTER_OUTCOME",
+  "source_freeze_ref": "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+  "source_wave01_capture_sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
+  "source_wave01_interval": {
+    "start_utc": "2026-07-20T00:00:00Z",
+    "end_utc": "2026-09-13T23:59:59Z"
+  },
+  "outer_interval": {
+    "start_utc": "2026-03-30T00:00:00Z",
+    "end_utc": "2026-07-19T23:59:59Z"
+  },
+  "resolution": "M5",
+  "symbols": [
+    {
+      "broker_symbol": "MXNJPY",
+      "symbol_id": 2778,
+      "family": "FX",
+      "friction_profile": "GLOBAL_24X5"
+    },
+    {
+      "broker_symbol": "USDCAD",
+      "symbol_id": 8,
+      "family": "FX",
+      "friction_profile": "GLOBAL_24X5"
+    },
+    {
+      "broker_symbol": "EURUSD",
+      "symbol_id": 1,
+      "family": "FX",
+      "friction_profile": "GLOBAL_24X5"
+    },
+    {
+      "broker_symbol": "IWM.US",
+      "symbol_id": 4476,
+      "family": "ETF",
+      "friction_profile": "US_REGIONAL"
+    },
+    {
+      "broker_symbol": "TLT.US",
+      "symbol_id": 4504,
+      "family": "ETF",
+      "friction_profile": "US_REGIONAL"
+    },
+    {
+      "broker_symbol": "NVDA.US-24",
+      "symbol_id": 3003,
+      "family": "EQUITY",
+      "friction_profile": "US_REGIONAL"
+    }
+  ],
+  "outer_selection_rationale": {
+    "chronology_only": true,
+    "profitability_not_used": true,
+    "rule": "Use the 16 complete calendar weeks immediately preceding Wave01. This doubles the development duration because the least-dense fixed panel members produced only 4-7 settled structural samples in 8 weeks; the extension targets event-count sufficiency and temporal/session diversity, not return magnitude.",
+    "minimum_target_nonzero_events_per_symbol": 7,
+    "why_16_weeks": "At the Wave01 event-density floor of 4 settled samples/8 weeks, 16 weeks targets approximately 8 observations, enough that an all-positive sign sequence could in principle cross the strictest Holm-Bonferroni first-step alpha 0.05/6 without selecting on outer returns."
+  },
+  "friction_authority": {
+    "method": "V6_TRUE_INTRA_WINDOW_SPREAD_TAILS_PLUS_SAME_WINDOW_BROKER_NATIVE_COMMISSION_CONVERSION",
+    "sample_dates": [
+      "2026-04-07",
+      "2026-05-05",
+      "2026-06-02",
+      "2026-07-07"
+    ],
+    "GLOBAL_24X5_windows": [
+      {
+        "label": "ASIA",
+        "start": "01:00",
+        "end": "01:10"
+      },
+      {
+        "label": "EUROPE",
+        "start": "08:00",
+        "end": "08:10"
+      },
+      {
+        "label": "EU_US_OVERLAP",
+        "start": "13:30",
+        "end": "13:40"
+      },
+      {
+        "label": "US_ACTIVE",
+        "start": "16:00",
+        "end": "16:10"
+      },
+      {
+        "label": "LOW_LIQUIDITY",
+        "start": "21:30",
+        "end": "21:40"
+      }
+    ],
+    "US_REGIONAL_windows": [
+      {
+        "label": "US_EARLY",
+        "start": "14:00",
+        "end": "14:10"
+      },
+      {
+        "label": "US_AFTERNOON",
+        "start": "18:00",
+        "end": "18:10"
+      }
+    ],
+    "qualification_ref": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json#friction_screen.qualification",
+    "commission_ref": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json#commission_authority",
+    "conversion_ref": "data/COMPETITION_ULTRA_FAST_DISCOVERY_PROTOCOL_V3.json#conversion_chain_law",
+    "raw_tick_transfer": false,
+    "current_or_future_rate_substitution": false
+  },
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "protected_rows_permitted": false,
+    "synthetic_fill_permitted": false,
+    "forward_fill_permitted": false,
+    "historical_request_target_rps": 3.84,
+    "max_tick_pages_per_side_window": 50,
+    "trendbar_page_count": 5000,
+    "max_stage_a_pages_per_symbol": 100,
+    "identical_duplicate_timestamp_rows": "DEDUPLICATE",
+    "conflicting_duplicate_timestamp_rows": "FAIL_CLOSED"
+  },
+  "outer_contract": {
+    "source_wave01_bytes_may_be_outer": false,
+    "outer_disjoint_from_wave01": true,
+    "outer_unopened_before_freeze": true,
+    "panel_membership_fixed": true,
+    "protected_forward_closed": true,
+    "no_outer_result_opened_by_capture": true,
+    "cost_authority_captured_before_outer_interpretation": true
+  },
+  "economic_outcomes_opened": 0,
+  "v2_attempts_consumed": 0,
+  "plan_sha256": "ffab3f8744bc76ee1b1745957bd29433c40c3443f168525bf5c7fbca9cf43806"
+}

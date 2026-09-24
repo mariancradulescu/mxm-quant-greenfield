@@ -30,7 +30,7 @@ jobs:
         run: |
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile actual Pydroid runtime files
-        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py M6_PREOPEN_SUPPLEMENT_RUN.py M6_STAGE_B_MARGIN_HISTORY_RUN.py COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py COMPETITION_FRONTIER_DATA_CAPTURE_RUN.py C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py COMPETITION_ULTRA_FAST_CAPTURE_RUN.py research_v3/c031_structural_extension_capture.py research_v3/pydroid_c031_structural_extension_launcher.py tools/build_c031_structural_extension_capture_package.py competition/broker_universe_capture.py competition/pydroid_broker_universe_launcher.py competition/frontier_data_capture.py competition/pydroid_frontier_data_launcher.py competition/ultra_fast_capture.py competition/friction_costs.py competition/pydroid_ultra_fast_launcher.py competition/shared_eur200_replay.py tools/build_competition_broker_universe_capture_package.py tools/build_competition_frontier_data_capture_package.py tools/build_competition_ultra_fast_capture_package.py m6/preopen_supplement.py m6/preopen_evidence_openapi.py m6/pydroid_preopen_launcher.py m6/stage_b_margin_evidence.py m6/stage_b_margin_openapi.py m6/pydroid_stage_b_margin_launcher.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/session_replay.py m6/tier1_candidate_replay.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
+        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py M6_PREOPEN_SUPPLEMENT_RUN.py M6_STAGE_B_MARGIN_HISTORY_RUN.py COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py COMPETITION_FRONTIER_DATA_CAPTURE_RUN.py SESSION_GAP_SIX_PANEL_OUTER_CAPTURE_RUN.py C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py COMPETITION_ULTRA_FAST_CAPTURE_RUN.py research_v3/c031_structural_extension_capture.py research_v3/pydroid_c031_structural_extension_launcher.py tools/build_c031_structural_extension_capture_package.py competition/broker_universe_capture.py competition/pydroid_broker_universe_launcher.py competition/frontier_data_capture.py competition/pydroid_frontier_data_launcher.py competition/ultra_fast_capture.py competition/friction_costs.py competition/pydroid_ultra_fast_launcher.py competition/shared_eur200_replay.py tools/build_competition_broker_universe_capture_package.py tools/build_competition_frontier_data_capture_package.py tools/build_competition_ultra_fast_capture_package.py m6/preopen_supplement.py m6/preopen_evidence_openapi.py m6/pydroid_preopen_launcher.py m6/stage_b_margin_evidence.py m6/stage_b_margin_openapi.py m6/pydroid_stage_b_margin_launcher.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/session_replay.py m6/tier1_candidate_replay.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
       - name: No-credential Android-safe runtime preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -101,6 +101,24 @@ jobs:
           assert report["account_mutation_permitted"] is False, report
           assert report["economic_outcomes_opened"] is False, report
           print("COMPETITION_FRONTIER_M5_PREFLIGHT_PASS", report)
+          PY
+      - name: Six-panel independent outer no-credential preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from research_v3.pydroid_session_gap_six_panel_outer_launcher import local_preflight
+          r=local_preflight()
+          assert r["symbols"] == 6, r
+          assert r["resolution"] == "M5", r
+          assert r["outer_interval"] == {"start_utc":"2026-03-30T00:00:00Z","end_utc":"2026-07-19T23:59:59Z"}, r
+          assert r["disjoint"] is True, r
+          assert r["network_connection_attempted"] is False, r
+          assert r["credentials_used"] is False, r
+          assert r["orders_permitted"] is False, r
+          assert r["account_mutation_permitted"] is False, r
+          assert r["outer_outcome_opened"] is False, r
+          assert r["economic_outcomes_opened"] is False, r
+          assert r["v2_attempts_consumed"] == 0, r
+          print("SIX_PANEL_OUTER_PREFLIGHT_PASS", r)
           PY
       - name: C031 structural-extension M5 no-credential preflight
         run: |
@@ -214,6 +232,18 @@ jobs:
           path: dist/MXM_COMPETITION_FRONTIER_WAVE_01_V2_M5_CAPTURE_PACKAGE.zip
           if-no-files-found: error
           retention-days: 30
+      - name: Build deterministic six-panel independent outer capture package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_session_gap_six_panel_outer_capture_package.py
+          sha256sum dist/MXM_SESSION_GAP_SIX_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip
+      - name: Upload deterministic six-panel independent outer capture package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_SESSION_GAP_SIX_PANEL_OUTER_CAPTURE_PACKAGE_V1
+          path: dist/MXM_SESSION_GAP_SIX_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Build deterministic C031 structural-extension capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_c031_structural_extension_capture_package.py

@@ -28,6 +28,17 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertTrue(accepted["next_research_state"]["ai_reasoning_required"])
         self.assertEqual(accepted["next_research_state"]["green_implementation_artifacts"],["research_v3/example.json"])
 
+    def test_authoritative_independent_outer_contract_redirects_before_execution(self):
+        s={"source_freeze_ref":"research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json","next_action":"ARBITRARY_EXECUTION","user_action_required":False}
+        r=authoritative_reasoning_requirement(ROOT,s)
+        self.assertIsNotNone(r)
+        self.assertTrue(r["ai_reasoning_required"])
+        self.assertEqual(r["next_action"],"GENERAL_AI_SELECT_MINIMAL_DISJOINT_OUTER_WINDOW_AND_REQUIRED_COST_AUTHORITY_BEFORE_ANY_OUTER_OUTCOME")
+
+    def test_outer_binding_satisfies_generic_redirect_guard(self):
+        s={"source_freeze_ref":"research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json","next_action":"ARBITRARY_EXECUTION","outer_data_binding_ref":"evidence/some_future_binding.json","user_action_required":False}
+        self.assertIsNone(authoritative_reasoning_requirement(ROOT,s))
+
     def test_arbitrary_non_reasoning_action_is_not_finite_mapped(self):
         self.assertTrue(implementation_required({"status":"ANY_FUTURE_STATE","next_action":"SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
         self.assertFalse(implementation_required({"status":"WAIT","next_action":"EXTERNAL","user_action_required":True}))

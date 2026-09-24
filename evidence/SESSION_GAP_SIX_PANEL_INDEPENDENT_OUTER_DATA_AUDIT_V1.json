@@ -1,0 +1,50 @@
+{
+  "schema": "mxm.greenfield.session-gap-six-panel-independent-outer-data-audit.v1",
+  "status": "NO_VALID_UNOPENED_DISJOINT_COMPLETE_SIX_SYMBOL_M5_OUTER_FOUND",
+  "searched_sources": [
+    "repository",
+    "durable Library/cache",
+    "current accessible workspace"
+  ],
+  "required": {
+    "symbols": [
+      "MXNJPY",
+      "USDCAD",
+      "EURUSD",
+      "IWM.US",
+      "TLT.US",
+      "NVDA.US-24"
+    ],
+    "resolution": "M5",
+    "strictly_disjoint_from_wave01": true,
+    "unopened_for_panel_outcome": true
+  },
+  "findings": [
+    {
+      "source": "Wave01 canonical capture",
+      "result": "FORBIDDEN_AS_OUTER",
+      "reason": "Panel and methodology were selected after its structural summaries were observed."
+    },
+    {
+      "source": "prior Library captures",
+      "result": "NOT_SUITABLE_COMPLETE_OUTER",
+      "reason": "Available indexed artifacts are other symbols/resolutions or previously inspected research evidence; no provenance-verified unopened disjoint M5 bundle covering all fixed six was found."
+    }
+  ],
+  "decision": "NEW_MINIMAL_AUTHENTICATED_READ_ONLY_CAPTURE_REQUIRED",
+  "selected_outer_interval": {
+    "start_utc": "2026-03-30T00:00:00Z",
+    "end_utc": "2026-07-19T23:59:59Z"
+  },
+  "selection_basis": [
+    "immediately preceding Wave01 chronology",
+    "16 complete weeks",
+    "event-count sufficiency floor",
+    "temporal/session diversity",
+    "no observed outer profitability"
+  ],
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  }
+}
