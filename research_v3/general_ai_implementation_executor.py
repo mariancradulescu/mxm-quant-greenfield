@@ -160,7 +160,9 @@ def _bound_context(root:Path,next_state:Mapping[str,Any],proposal:Mapping[str,An
     for rel in list(proposal.get("authority_refs") or []):
         if isinstance(rel,str):
             refs.append(rel)
-    for key in ("result_ref","capture_acceptance_ref","structural_screen_freeze_ref","freeze_ref"):
+    for key in ("result_ref","capture_acceptance_ref","structural_screen_freeze_ref","freeze_ref",
+                "completed_capture_plan_ref","completed_capture_ref","completed_structural_report_ref",
+                "duplicate_capture_supersession_ref"):
         rel=next_state.get(key)
         if isinstance(rel,str):
             refs.append(rel)
@@ -204,8 +206,17 @@ or rerun C031 Stage-B. Do not use network or shell tools. Do not ask the human t
 Authoritative prospective freezes override an older proposal when they impose a stricter causal/data prerequisite.
 Never execute on source/development bytes if a bound freeze requires unopened disjoint outer data.
 If repository files already implement the selected action or exact collector, do not rewrite them. Validate by inspection.
+An existing collector for a different frozen symbol/window scope does NOT implement this proposal.
+Before creating a new capture gate, verify existing accepted cTrader-derived repository and
+hash-bound Library artifacts against each requested symbol/window; acquire only a justified missing
+increment, and do not describe an already accepted capture as unavailable merely because its bytes
+are external to the Git repository.
+For any external data gate, build and test a collector for the accepted proposal's exact broker-native
+symbols, resolution, interval, and fields; bind collector_plan_ref and output filename to that new plan.
+The previously accepted C031 twelve-symbol extension has already been captured and structurally
+screened; its collector must never be used to satisfy a different twelve-symbol proposal.
 If external authenticated market bytes are genuinely required, return EXTERNAL_DATA_REQUIRED and bind the existing
-minimal collector build reference/artifact. The human's only permitted role is to run the read-only collector and upload
+exact-scope collector build reference/artifact. The human's only permitted role is to run the read-only collector and upload
 its returned ZIP to the GPT/Director chat; never tell the human to modify GitHub.
 
 Return ONE JSON object only:
@@ -215,9 +226,10 @@ Return ONE JSON object only:
  "summary":"...",
  "decision":{},
  "next_research_state":{"status":"...","next_action":"..."},
- "external_data_gate": null OR {
-   "reason":"...",
-   "collector_build_ref":"...",
+  "external_data_gate": null OR {
+    "reason":"...",
+    "collector_build_ref":"...",
+    "collector_plan_ref":"...",
    "collector_package_artifact_name":"...",
    "expected_return_artifact_name":"..."
  },
@@ -261,6 +273,23 @@ def _validate_output(root:Path,out:Mapping[str,Any])->None:
         if not isinstance(gate,Mapping): raise ImplementationRejected("external gate object required")
         build=str(gate.get("collector_build_ref") or "")
         if not build or not (root/build).is_file(): raise ImplementationRejected("external gate collector build ref missing")
+        plan_ref=str(gate.get("collector_plan_ref") or "")
+        if not plan_ref or not (root/plan_ref).is_file(): raise ImplementationRejected("external gate requires frozen collector_plan_ref")
+        plan=load_json(root/plan_ref,{}) or {}
+        _,proposal,_=_resolve_current_proposal(root,_next(root))
+        request=(proposal.get("data_policy") or {}).get("minimal_acquisition_request") or {}
+        if (proposal.get("data_policy") or {}).get("new_market_data_requested") is not True:
+            raise ImplementationRejected("external gate lacks authorized broker-native data request")
+        symbols=[x.get("broker_symbol") if isinstance(x,Mapping) else x for x in plan.get("symbols") or []]
+        interval=plan.get("interval") or {}
+        if (symbols!=request.get("symbols") or plan.get("resolution")!=request.get("resolution")
+                or interval.get("start_utc")!=request.get("start_utc")
+                or interval.get("end_utc")!=request.get("end_utc")):
+            raise ImplementationRejected("collector plan does not match accepted AI proposal scope")
+        if plan.get("output_artifact_name")!=gate.get("expected_return_artifact_name"):
+            raise ImplementationRejected("collector output artifact does not match frozen plan")
+        if plan_ref not in (root/build).read_text(encoding="utf-8"):
+            raise ImplementationRejected("collector build does not package the frozen AI plan")
         package=str(gate.get("collector_package_artifact_name") or "")
         returned=str(gate.get("expected_return_artifact_name") or "")
         if not package.endswith(".zip") or not returned.endswith(".zip"): raise ImplementationRejected("external gate ZIP names required")
