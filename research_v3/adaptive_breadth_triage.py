@@ -38,6 +38,48 @@ class TriageError(ValueError):
     """Raised when the accepted development artifact cannot be screened safely."""
 
 
+def select_primary_family(
+    triage: Mapping[str, Any],
+    preferred_family_order: tuple[str, ...] | list[str],
+) -> dict[str, Any]:
+    """Select one executable structural family without evaluating economics.
+
+    The preference order is supplied by the accepted AI decision rather than
+    inferred from returns or from a finite next-action dispatch table.
+    """
+    if triage.get("status") != "COMPLETE_NON_ECONOMIC_ADAPTIVE_TRIAGE":
+        raise TriageError("primary-family selection requires complete adaptive triage")
+    selection = triage.get("adaptive_selection")
+    ranking = triage.get("family_ranking")
+    if not isinstance(selection, Mapping) or not isinstance(ranking, list):
+        raise TriageError("adaptive triage is missing family selection diagnostics")
+    selected = selection.get("selected_families")
+    if not isinstance(selected, list) or not all(isinstance(item, str) for item in selected):
+        raise TriageError("adaptive triage has malformed selected families")
+    order = tuple(preferred_family_order)
+    if not order or len(set(order)) != len(order):
+        raise TriageError("preferred family order must be non-empty and unique")
+    ranking_by_family: dict[str, Mapping[str, Any]] = {}
+    for row in ranking:
+        if not isinstance(row, Mapping) or not isinstance(row.get("family"), str):
+            raise TriageError("adaptive triage has malformed family ranking")
+        ranking_by_family[row["family"]] = row
+    for family in order:
+        if family not in selected:
+            continue
+        row = ranking_by_family.get(family)
+        if row is None or row.get("missing_prerequisites"):
+            continue
+        return {
+            "primary_family": family,
+            "selection_basis": "accepted_preference_order_over_non_economic_prerequisite_sufficiency",
+            "candidate_families": list(selected),
+            "economic_evaluation": "NOT_PERFORMED",
+            "mechanism_family_closure_claimed": False,
+        }
+    raise TriageError("no preferred family satisfies the accepted non-economic prerequisites")
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:

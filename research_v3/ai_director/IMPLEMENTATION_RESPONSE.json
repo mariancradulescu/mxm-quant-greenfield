@@ -1,43 +1,37 @@
 {
-  "basis_next_state_sha256": "ae110f5917fd6c282ecd1a28050d7222c7ab058de109524f7baa6ed9b50fadb2",
-  "changed_paths": [],
-  "created_utc": "2026-09-24T12:17:38Z",
-  "exact_head": {
-    "green": false,
-    "head": "d29e66392d6317c420ea932d05c6c4785e25ec1b",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "76dca5948c7d696f3485fb06cbfcc4a87f90c4f0",
-    "predecessor_run_id": 35997899816
-  },
+  "basis_next_state_sha256": "08c13d8394d3e9cde78f43269c8c985b8132da9f2abb9567bfba11a3d4408a9e",
+  "changed_paths": [
+    "research_v3/adaptive_breadth_triage.py",
+    "tests/test_adaptive_breadth_triage.py"
+  ],
+  "created_utc": "2026-09-24T12:28:48Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
       "accepted_capture_reused": true,
-      "action": "REUSE_EXISTING_GENERIC_NON_ECONOMIC_IMPLEMENTATION",
-      "collector_created": false,
+      "action": "ADD_GENERIC_PRIMARY_MECHANISM_FAMILY_SELECTOR",
       "economic_outcomes_opened": 0,
       "external_data_required": false,
-      "implementation_ref": "research_v3/adaptive_breadth_triage.py",
-      "live_orders_authorized": false,
-      "new_market_data_required": false,
-      "plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
-      "protected_evidence_opened": false,
-      "source_capture_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-      "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-      "test_ref": "tests/test_adaptive_breadth_triage.py",
+      "implementation_refs": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
+      ],
+      "mechanism_family_closure_claimed": false,
+      "primary_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "source_triage_ref": "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "adaptive-breadth-triage-v1",
+    "implementation_id": "adaptive-breadth-primary-family-selection-v1",
     "next_research_state": {
-      "next_action": "RUN_ADAPTIVE_BREADTH_TRIAGE_ON_ACCEPTED_40_SYMBOL_M5_CAPTURE_THEN_INTERPRET_THE_STRUCTURAL_FAMILY_RANKING_AND_SELECT_THE_SMALLEST_JUSTIFIED_PROSPECTIVE_DATA_SCOPE",
-      "status": "AI_REASONING_REQUIRED_AFTER_NON_ECONOMIC_TRIAGE"
+      "next_action": "VALIDATE_EXACT_HEAD_GREEN",
+      "status": "PENDING_EXACT_HEAD_GREEN"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The bound generic adaptive breadth triage is already implemented and exact-head-green. It is hash-bound to the accepted 40-symbol M5 development capture and frozen plan, validates single-price OHLCV structure, interval bounds, chronology, cadence, alignment, manifest safety, and declared prerequisites, and performs no returns, PnL, economic ranking, promotion, order, or protected-evidence activity. No code, manifest, collector, or external data gate is required.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a read-only selector that chooses one primary mechanism family from the accepted adaptive breadth triage using the accepted AI preference order. It validates non-economic prerequisite sufficiency, fails closed when no preferred family is eligible, and claims no economic evaluation or family exhaustion. No external market data or collector is required.",
     "tests_requested": [
       "python -m unittest tests/test_adaptive_breadth_triage.py -v",
-      "python -m unittest tests/test_broker_native_frontier_development_capture.py tests/test_broker_native_adaptive_frontier.py -v"
+      "python -m unittest tests/test_general_ai_implementation_executor.py -v"
     ]
   },
   "project_snapshot": {
@@ -56,5 +50,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }

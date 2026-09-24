@@ -8,10 +8,32 @@ import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from research_v3.adaptive_breadth_triage import run_triage
+from research_v3.adaptive_breadth_triage import run_triage, select_primary_family
 
 
 class AdaptiveBreadthTriageTests(unittest.TestCase):
+    def test_primary_family_selection_is_non_economic_and_preference_bound(self):
+        root = Path(__file__).resolve().parents[1]
+        triage = json.loads(
+            (root / "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json").read_text()
+        )
+        selected = select_primary_family(
+            triage,
+            ["BREAKOUT_VOLATILITY_EXPANSION", "REGIME_CONTEXT_CONDITIONED", "MEAN_REVERSION"],
+        )
+        self.assertEqual(selected["primary_family"], "BREAKOUT_VOLATILITY_EXPANSION")
+        self.assertEqual(selected["economic_evaluation"], "NOT_PERFORMED")
+        self.assertFalse(selected["mechanism_family_closure_claimed"])
+
+    def test_primary_family_selection_fails_closed_without_sufficient_candidate(self):
+        triage = {
+            "status": "COMPLETE_NON_ECONOMIC_ADAPTIVE_TRIAGE",
+            "adaptive_selection": {"selected_families": []},
+            "family_ranking": [],
+        }
+        with self.assertRaisesRegex(ValueError, "no preferred family"):
+            select_primary_family(triage, ["BREAKOUT_VOLATILITY_EXPANSION"])
+
     def test_triage_is_hash_bound_causal_and_non_economic(self):
         root = Path(__file__).resolve().parents[1]
         plan = json.loads((root / "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json").read_text())
