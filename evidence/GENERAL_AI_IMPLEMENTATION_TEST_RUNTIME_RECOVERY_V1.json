@@ -1,0 +1,40 @@
+{
+  "schema": "mxm.greenfield.general-ai-implementation-test-runtime-recovery.v1",
+  "status": "RECOVERY_IMPLEMENTED_PENDING_EXACT_HEAD_GREEN",
+  "observed_failed_liveness_runs": [
+    35959826079,
+    35960027846
+  ],
+  "root_cause": "The generic AI implementation executor correctly runs the full repository unittest suite after AI-authored file changes, but Runtime V2 Liveness Sentinel had not installed the protobuf runtime required by existing M6/cTrader tests. The same suite is green in m6-preparation where tools/requirements-m6-capture.txt is installed.",
+  "correction": {
+    "main_head": "55f4eface6c286e746cd1fb55240eac97e4b6251",
+    "workflow": ".github/workflows/runtime-v2-liveness-sentinel.yml",
+    "action": "Install tools/requirements-m6-capture.txt before general_ai_autonomy_loop",
+    "tests_weakened": false,
+    "ai_decision_regenerated": false
+  },
+  "preserved_ai_decision": {
+    "proposal_id": "P-20260924-C031-STRUCTURAL-INTERPRETATION-02",
+    "runtime_operation_id": "op_582d8167b510c1dc76a00d6286552d81",
+    "status": "PENDING_PROSPECTIVE_SCREEN_FREEZE",
+    "selected_symbols": [
+      "MXNJPY",
+      "USDCAD",
+      "EURUSD",
+      "IWM.US",
+      "TLT.US",
+      "NVDA.US-24"
+    ]
+  },
+  "accounting": {
+    "v2_attempts_used": 19,
+    "v2_search_budget_remaining": 65,
+    "economic_outcomes_opened": 27
+  },
+  "c031_stage_b_rerun": false,
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
