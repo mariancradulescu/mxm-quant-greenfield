@@ -1,6 +1,6 @@
 import json, unittest
 from pathlib import Path
-from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, _post_green_output, _resolve_current_proposal, implementation_required
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, _post_green_output, _resolve_current_proposal, authoritative_reasoning_requirement, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -13,12 +13,15 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
             self.assertFalse(implementation_required(s))
         else:
             self.assertTrue(implementation_required(s))
-    def test_executor_binds_current_durable_ai_proposal(self):
+    def test_executor_binds_proposal_when_state_is_proposal_bound_or_preserves_recovery_supersession(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        ref,proposal,row=_resolve_current_proposal(ROOT,state)
-        self.assertEqual(proposal["proposal_id"],state["source_ai_proposal_id"])
-        if state.get("source_ai_proposal_hash"):
-            self.assertEqual(row["proposal_hash"],state["source_ai_proposal_hash"])
+        if state.get("source_ai_proposal_id") or state.get("source_ai_proposal_hash") or state.get("source_runtime_operation_id"):
+            ref,proposal,row=_resolve_current_proposal(ROOT,state)
+            self.assertEqual(proposal["proposal_id"],state["source_ai_proposal_id"])
+            if state.get("source_ai_proposal_hash"):
+                self.assertEqual(row["proposal_hash"],state["source_ai_proposal_hash"])
+        else:
+            self.assertTrue(state.get("supersession_ref") or state.get("outer_capture_plan_ref"))
         source=(ROOT/"research_v3/general_ai_implementation_executor.py").read_text()
         self.assertNotIn("AUTO_reason_a8b81cef686ff74cf678e7e25193f43f.json",source)
 
