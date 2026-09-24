@@ -108,9 +108,20 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         raw=p.read_bytes()
         item={"ref":rel,"sha256":sha256_bytes(raw)}
         try:
-            item["content"]=json.loads(raw)
+            doc=json.loads(raw)
+            if len(raw)>3000:
+                item["content_summary"]={
+                    "schema":doc.get("schema"),"status":doc.get("status"),
+                    "byte_length":len(raw),"available_via_repository_view":True,
+                    "top_level_keys":list(doc)[:24],
+                }
+                if rel.endswith("PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json"):
+                    item["content_summary"]["current_accessible_symbols_indexed"]=doc.get("current_accessible_symbols_indexed")
+                    item["content_summary"]["source_zip_sha256"]=doc.get("source_zip_sha256")
+            else:
+                item["content"]=doc
         except Exception:
-            item["content_text"]=raw.decode("utf-8",errors="replace")[:16000]
+            item["content_text"]=raw.decode("utf-8",errors="replace")[:3000]
         rows.append(item); kept.append(rel)
     return rows,kept
 
@@ -206,6 +217,7 @@ Important boundaries:
 - The accepted C031 twelve-symbol M5 extension for 2026-07-20 through 2026-09-13 and its structural report already exist. The previous AI proposal asking for those same bytes was superseded. Reuse its accepted, hash-bound evidence without another collector or screen; do not ask the user to upload it again.
 - An independent account-native minimum-volume audit found BTCUSD, US30, and XAGUSD infeasible in both directions at initial EUR200 in the later pre-capture proposal. That exact proposal was superseded before capture. Do not treat these as initially tradable EUR200 opportunities. You may consider later higher-equity feasibility only with explicit prospective rationale; independently choose the revised direction from the full evidence and verify any claimed broker feasibility.
 - Before proposing any new capture symbols, use the accepted account-native feasibility index to verify exact symbol names, product identity, TEST exclusion and EUR200 directional feasibility. A symbol infeasible at initial EUR200 requires an explicitly declared future_equity_only_scope with symbols, prospective_rationale and initial_eur200_tradable false; do not imply it is currently executable. Do not invent a broker symbol spelling.
+- Large authoritative files are supplied by hash and repository path rather than fully inlined. Use the repository view/search tools to read their relevant rows before deciding; never infer a selected symbol's feasibility from a short context summary.
 - The newer feasibility audit V2 superseded the later twelve-symbol proposal before capture: GER30 is absent from the current account, and XAGUSD, BTCUSD and US30 cannot enter at minimum volume with initial EUR200. Do not reactivate either superseded proposal from the immutable registry. You must verify every proposed symbol against the index before submission; the deterministic bridge enforces this.
 - Evaluate the broader feasible broker-native universe without treating a narrow six-symbol result as a family-level closure, and do not predetermine mechanism family, panel size or screening procedure.
 - Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
