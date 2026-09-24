@@ -1,6 +1,6 @@
 """Bounded zero-human continuation loop across AI reasoning and AI implementation."""
 from __future__ import annotations
-import argparse, json, hashlib
+import argparse, json, hashlib, os
 from pathlib import Path
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import stale_reasoning_redirect
@@ -12,6 +12,30 @@ from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 
 VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
 PROVIDER_RECOVERY_REL=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
+PROVIDER_USAGE_REL=Path("research_v3/ai_director/PROVIDER_USAGE_V1.json")
+
+def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retryable: bool, advanced: bool, *, git_checkpoint: bool=False, git_push: bool=False) -> None:
+    """Track runtime provider invocations without guessing CLI credits or selected model."""
+    doc=dict(load_json(root/PROVIDER_USAGE_REL,{}) or {})
+    rows=list(doc.get("invocations") or [])
+    rows.append({
+        "timestamp":iso(), "provider":"github-copilot-cli",
+        "model_requested":os.environ.get("MXM_COPILOT_MODEL" if phase=="GENERAL_AI_REASONING" else "MXM_COPILOT_IMPLEMENTATION_MODEL","auto"),
+        "actual_model_identity":None, "actual_credit_usage":None,
+        "request_fingerprint":_request_fingerprint(root,state,phase),
+        "purpose":phase, "evidence_epoch":state.get("current_research_evidence_epoch"),
+        "outcome":outcome, "retryable":retryable, "material_state_advancement":advanced,
+    })
+    atomic_write_json(root/PROVIDER_USAGE_REL,{
+        "schema":"mxm.greenfield.provider-usage.v1",
+        "measurement_scope":"runtime provider invocations; internal CLI attempts and credits unknown",
+        "provider_invocations":len(rows),
+        "successful_reasoning_invocations":sum(x["purpose"]=="GENERAL_AI_REASONING" and x["outcome"]=="SUCCESS" for x in rows),
+        "successful_implementation_invocations":sum(x["purpose"]=="GENERAL_AI_IMPLEMENTATION" and x["outcome"]=="SUCCESS" for x in rows),
+        "quota_failures":sum(x["outcome"]=="PROVIDER_UNAVAILABLE" for x in rows),
+        "invocations":rows,
+    })
+
 
 def _recoverable_provider_failure(exc: Exception) -> bool:
     detail=f"{type(exc).__name__}: {exc}".lower()
@@ -120,9 +144,11 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 if not _recoverable_provider_failure(exc):
                     raise
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_REASONING",git_checkpoint=git_checkpoint,git_push=git_push)
+                _record_invocation(root,state,"GENERAL_AI_REASONING",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_REASONING","recovery":recovery})
                 return {"status":recovery["status"],"cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             d=drain(root,git_checkpoint=git_checkpoint,git_push=git_push)
+            _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
             continue
         if implementation_required(state):
@@ -135,8 +161,10 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 if not _recoverable_provider_failure(exc):
                     raise
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=git_checkpoint,git_push=git_push)
+                _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
                 return {"status":recovery["status"],"cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+            _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
                 return {"status":out["status"],"cycles":cycle,"trace":trace,"result":out}
