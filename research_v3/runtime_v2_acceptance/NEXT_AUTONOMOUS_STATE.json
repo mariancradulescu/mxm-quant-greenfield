@@ -14,8 +14,7 @@
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
-  "ai_reasoning_required": true,
-  "authorizing_evidence_epoch": 0,
+  "authorizing_evidence_epoch": 1,
   "capture_integrity": {
     "duplicate_timestamps": 0,
     "ohlc_failures": 0,
@@ -28,6 +27,7 @@
     "total_rows": 392181,
     "valid_rows_reused_from_partial": 189722
   },
+  "capture_required": false,
   "current_integrity": {
     "attempts_refunded": 0,
     "audit_economic_reruns": 0,
@@ -37,6 +37,7 @@
     "valid_source_data_discarded": false
   },
   "current_research_evidence_epoch": 1,
+  "director_protocol": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
   "evidence_epoch_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
   "exact_head_green_authority": {
     "conclusion": "success",
@@ -47,7 +48,11 @@
     "workflow": "m6-preparation"
   },
   "external_data_gate": null,
-  "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+  "external_gate": "NONE",
+  "implementation_gate": "Verify exact broker symbol and symbol_id matches against the accepted account-native feasibility index, then run only the frozen outer evaluator.",
+  "insufficiency_rule": "If the preserved outer cannot be proven disjoint, complete, and hash-bound to the frozen plan, stop and return for fresh research reasoning rather than recapturing the same scope.",
+  "next_action": "EXECUTE_THE_PRESERVED_FOUR_PANEL_INDEPENDENT_OUTER_USING_THE_FROZEN_PLAN_AND_HASH_BOUND_CAPTURE",
+  "promotion_gate": "Require per-symbol frozen confirmatory tests, Holm correction, complete friction overlay, and explicit shared-account realizability analysis before any economic identity is considered.",
   "provisional_four_panel_outer": {
     "capture_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
     "freeze_ref": "research_v3/SESSION_GAP_FRONTIER_FOUR_PANEL_FREEZE_V1.json",
@@ -68,7 +73,7 @@
     "preserve_provisional_four_panel_artifacts": true,
     "v2_attempts_to_consume": 0
   },
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "runtime_repair": {
     "current_entry_tradability_required": false,
     "failed_runtime_attempt_consumed": 0,
@@ -80,9 +85,12 @@
   "safety": {
     "competition_start_authorized": false,
     "live_orders_authorized": false,
-    "protected_forward_opened": false
+    "protected_evidence_opened": false
   },
-  "schema": "mxm.greenfield.runtime-v2.next-autonomous-state.v2",
+  "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v3",
+  "source_ai_proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
+  "source_ai_proposal_id": "P-20260924-FRONTIER-OUTER-REAUTH-01",
+  "source_runtime_operation_id": "op_f69028439481088ef2a91370c68fe877",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 0,
     "current_evidence_epoch": 1,
@@ -92,7 +100,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_40_DEVELOPMENT",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
+  "status": "OUTER_REAUTHORIZATION_READY",
   "supersession_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_SESSION_GAP_STRUCTURAL_SCREEN_V1.json",
   "user_action_required": false
 }
