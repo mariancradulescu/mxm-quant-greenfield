@@ -52,6 +52,10 @@ BASE_AUTHORITIES=(
     "research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json",
     "data/BROKER_NATIVE_COMPETITION_STRUCTURAL_MAP_SUMMARY_V2.json",
     "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
+    "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json",
+    "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+    "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json",
+    "evidence/POST_OUTER_DUPLICATE_CAPTURE_SUPERSESSION_V1.json",
     "evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json",
     "research_v3/ai_director/GENERAL_AI_DIRECTOR_ARCHITECTURE_V1.json",
 )
@@ -86,6 +90,8 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         "outer_capture_plan_ref","outer_data_audit_ref","supersession_ref",
         "external_data_gate_ref","capture_acceptance_ref","structural_screen_freeze_ref",
         "outer_data_binding_ref","interpretation_ref","same_wave01_supersession_ref",
+        "completed_capture_ref","completed_capture_plan_ref",
+        "completed_structural_report_ref","duplicate_capture_supersession_ref",
     ):
         value=next_state.get(key)
         if isinstance(value,str) and value and value not in refs:
@@ -193,6 +199,7 @@ Important boundaries:
 - Prefer structural screening and minimal justified incremental data before expensive broad economics.
 - Use only authorized Pepperstone-account cTrader/Open API or previously hash-bound captures from that same broker account for empirical market, costs, margin, and execution evidence. Public official documentation may clarify semantics; no external market dataset is empirical authority.
 - The completed independent outer is observed evidence, not an unopened confirmation set; never re-open or rerun its exact outcome. If new authenticated broker-native data are unavoidable, define the smallest read-only capture and stop at that external gate.
+- The accepted C031 twelve-symbol M5 extension for 2026-07-20 through 2026-09-13 and its structural report already exist. The previous AI proposal asking for those same bytes was superseded. Reuse its accepted, hash-bound evidence without another collector or screen; do not ask the user to upload it again.
 - Evaluate the broader feasible broker-native universe without treating a narrow six-symbol result as a family-level closure, and do not predetermine mechanism family, panel size or screening procedure.
 - Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
 - If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
