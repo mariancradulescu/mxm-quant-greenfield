@@ -225,6 +225,10 @@ increment, and do not describe an already accepted capture as unavailable merely
 are external to the Git repository.
 For any external data gate, build and test a collector for the accepted proposal's exact broker-native
 symbols, resolution, interval, and fields; bind collector_plan_ref and output filename to that new plan.
+Historical cTrader trendbars expose a single OHLC and tick volume, not separate bid and ask OHLC.
+If the proposal requests bid/ask bars or spread, use exact historical bid and ask tick data with
+complete pagination and explicit alignment, or fail closed and return to AI reasoning for a
+prospective data-scope correction. Never label single-price bars as bid/ask or invent spreads.
 The previously accepted C031 twelve-symbol extension has already been captured and structurally
 screened; its collector must never be used to satisfy a different twelve-symbol proposal.
 If external authenticated market bytes are genuinely required, return EXTERNAL_DATA_REQUIRED and bind the existing
@@ -298,6 +302,8 @@ def _validate_output(root:Path,out:Mapping[str,Any])->None:
                 or interval.get("start_utc")!=request.get("start_utc")
                 or interval.get("end_utc")!=request.get("end_utc")):
             raise ImplementationRejected("collector plan does not match accepted AI proposal scope")
+        if plan.get("fields")!=request.get("fields"):
+            raise ImplementationRejected("collector plan fields do not match accepted AI proposal scope")
         if plan.get("output_artifact_name")!=gate.get("expected_return_artifact_name"):
             raise ImplementationRejected("collector output artifact does not match frozen plan")
         if plan_ref not in (root/build).read_text(encoding="utf-8"):
