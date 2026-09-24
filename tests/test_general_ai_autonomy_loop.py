@@ -22,7 +22,13 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                  patch("research_v3.general_ai_autonomy_loop.implement",side_effect=ImplementationRejected("Copilot implementation failed: You have exceeded your monthly quota")), \
                  patch("research_v3.general_ai_autonomy_loop.GitCheckpointSink.checkpoint",return_value=None):
                 out=run(root,max_cycles=1)
-            self.assertEqual(out["status"],"PROVIDER_RETRY_REQUIRED")
+            self.assertEqual(out["status"],"PROVIDER_UNAVAILABLE")
+            self.assertEqual(out["recovery"]["failure_class"],"MONTHLY_QUOTA_EXHAUSTED")
+            self.assertEqual(len(out["recovery"]["request_fingerprint"]),64)
+            with patch("research_v3.general_ai_autonomy_loop.validate_repository_state",return_value={}), patch("research_v3.general_ai_autonomy_loop.stale_reasoning_redirect",return_value=None), patch("research_v3.general_ai_autonomy_loop.reasoning_required",return_value=False), patch("research_v3.general_ai_autonomy_loop.implementation_required",return_value=True), patch("research_v3.general_ai_autonomy_loop.implement",side_effect=AssertionError("duplicate provider call")):
+                again=run(root,max_cycles=1)
+            self.assertEqual(again["status"],"PROVIDER_UNAVAILABLE")
+            self.assertEqual(again["cycles"],0)
             self.assertEqual(out["recovery"]["current_evidence_epoch"],16)
             self.assertEqual(out["recovery"]["v2_attempts_consumed_delta"],0)
             self.assertTrue((root/"research_v3/ai_director/PROVIDER_RECOVERY_STATE.json").is_file())
