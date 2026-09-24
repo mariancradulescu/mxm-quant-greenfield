@@ -1,10 +1,10 @@
 {
   "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
   "changed_paths": [],
-  "created_utc": "2026-09-24T17:40:11Z",
+  "created_utc": "2026-09-24T17:40:35Z",
   "exact_head": {
     "green": false,
-    "head": "7a7e22f95f86dd84ac878199800c024795d327ab",
+    "head": "ecbd5cfedfb1e2644a309fef87cb71b8eff803ce",
     "predecessor_conclusion": "success",
     "predecessor_head": "f3059aa3ec3a964b3c8b245726bf41e20b225d91",
     "predecessor_run_id": 36035669331
@@ -17,13 +17,14 @@
       "exact_head_green": false,
       "expected_common_timestamps": 9558,
       "expected_consecutive_pairs": 9470,
-      "external_data_required": false,
       "interval": {
         "end_utc": "2026-07-19T23:59:59Z",
         "start_utc": "2026-05-25T00:00:00Z"
       },
+      "live_orders_authorized": false,
+      "new_market_data_required": false,
       "ordered_pairs": 12,
-      "required_validation": "Run exact-head validation for the corrected non-economic screen before execution.",
+      "protected_forward_opened": false,
       "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
       "research_family": "CROSS_MARKET_LEAD_LAG",
       "resolution": "M5",
@@ -44,7 +45,7 @@
       "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The accepted non-economic implementation is already present and sufficient. It validates the exact hash-bound AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 capture, enforces single-price OHLC semantics, excludes gaps and synthetic or forward-filled rows, evaluates all twelve ordered pairs, and preserves zero economic outcomes and zero V2-attempt consumption. No external data is required. Exact-head authority is currently not green, so execution remains gated.",
+    "summary": "The exact non-economic implementation is already present and sufficient. It validates the hash-bound AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 capture, enforces single-price OHLC semantics, excludes gaps and synthetic or forward-filled rows, evaluates all twelve ordered pairs, and preserves zero economic outcomes and zero V2-attempt consumption. No external data or code changes are required. Exact-head authority is not currently green, so execution remains gated.",
     "tests_requested": [
       "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
