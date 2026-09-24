@@ -1,69 +1,78 @@
 {
-  "basis_next_state_sha256": "7b2f6fc1eb1598666cdeabbe64bd6e52ad24f49f2c971a0033ecc78d96817922",
-  "changed_paths": [],
-  "created_utc": "2026-09-24T08:10:02Z",
-  "exact_head": {
-    "green": false,
-    "head": "550066c9aff48abb15330da4848d5ff99194ad2f",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "45fcc783e09613441bd52b3a53934b45e3c07429",
-    "predecessor_run_id": 35973406514
-  },
+  "basis_next_state_sha256": "99d5e8690a358612ce582696f6ff7ce7dd94e5db705caf0c7066d5a4589ad69b",
+  "changed_paths": [
+    "SESSION_GAP_FRONTIER_WAVE_02_CAPTURE_RUN.py",
+    "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
+    "research_v3/session_gap_frontier_wave02_capture.py",
+    "tests/test_session_gap_frontier_wave02_capture.py",
+    "tools/build_session_gap_frontier_wave02_capture_package.py"
+  ],
+  "created_utc": "2026-09-24T08:39:45Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "REQUEST_MINIMAL_BROKER_NATIVE_READ_ONLY_CAPTURE",
+      "action": "IMPLEMENT_EXACT_SCOPE_READ_ONLY_BID_ASK_TICK_CAPTURE",
+      "collector_build_ref": "tools/build_session_gap_frontier_wave02_capture_package.py",
+      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip",
+      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
+      "collector_source_ref": "research_v3/session_gap_frontier_wave02_capture.py",
       "economic_boundary": "NON_ECONOMIC_ONLY",
       "economic_outcomes_opened": 0,
-      "exact_c031_stage_b_rerun": false,
+      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE.zip",
       "promotion_authorized": false,
       "protected_forward_opened": false,
       "scope": {
         "end_utc": "2026-09-13T23:59:59Z",
+        "fields": [
+          "timestamp_utc",
+          "symbol_id",
+          "broker_symbol",
+          "bid_open",
+          "bid_high",
+          "bid_low",
+          "bid_close",
+          "ask_open",
+          "ask_high",
+          "ask_low",
+          "ask_close",
+          "tick_volume",
+          "spread",
+          "trading_session_metadata"
+        ],
         "resolution": "M5",
         "start_utc": "2026-07-20T00:00:00Z",
         "symbols": [
+          "EURGBP",
+          "JPN225",
           "XAUUSD",
-          "BTCUSD",
-          "AAPL.US",
-          "AMZN.US",
-          "META.US",
-          "MSFT.US",
-          "US30",
-          "GER40",
-          "UK100",
-          "XAGUSD",
-          "AUDJPY",
-          "NZDUSD"
+          "SPY.US",
+          "AAPL.US-24",
+          "NatGas",
+          "DOGEUSD",
+          "UKGILT-F"
         ]
       },
-      "v2_attempts_consumed": 0,
-      "validation_required": [
-        "Accepted Pepperstone account fingerprint match",
-        "Exact broker symbol identity match",
-        "Strict frozen-interval containment",
-        "M5 timestamp alignment",
-        "Strict chronology",
-        "Duplicate and conflicting-row detection",
-        "No synthetic fills or forward filling",
-        "Read-only capture with no account mutation or orders"
-      ]
+      "v2_attempts_consumed": 0
     },
     "external_data_gate": {
-      "collector_build_ref": "C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py",
-      "collector_package_artifact_name": "MXM_C031_STRUCTURAL_EXTENSION_M5_8W_CAPTURE_PACKAGE.zip",
-      "expected_return_artifact_name": "MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE.zip",
-      "reason": "Authenticated Pepperstone account-native M5 OHLCV bytes for the frozen twelve-symbol interval are not available in the repository. Run the existing read-only collector and upload its returned ZIP to the GPT/Director chat without modification."
+      "collector_build_ref": "tools/build_session_gap_frontier_wave02_capture_package.py",
+      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip",
+      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
+      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE.zip",
+      "reason": "Authenticated account-bound BID and ASK tick bytes for the exact eight-symbol, M5, 2026-07-20 through 2026-09-13 scope are not present as accepted repository or hash-bound Library artifacts. The new collector must pass exact-head-green validation before the read-only capture package is run."
     },
-    "implementation_id": "c031-structural-extension-m5-capture-v1",
+    "implementation_id": "session-gap-frontier-wave02-bid-ask-capture-v1",
     "next_research_state": {
-      "next_action": "Capture the frozen twelve-symbol Pepperstone-native M5 development wave exactly once, accept it deterministically, then perform the non-economic structural report.",
-      "status": "EXTERNAL_READ_ONLY_DATA_GATE_REQUIRED"
+      "ai_reasoning_required": true,
+      "next_action": "VALIDATE_EXACT_SCOPE_WAVE02_COLLECTOR_AND_BUILD_PACKAGE_THEN_REQUEST_ACCOUNT_BOUND_CAPTURE",
+      "status": "PENDING_EXACT_HEAD_GREEN",
+      "user_action_required": false
     },
-    "status": "EXTERNAL_DATA_REQUIRED",
-    "summary": "The repository already implements the frozen non-economic 12-symbol Pepperstone-native M5 collector with account-fingerprint binding, exact symbol validation, read-only enforcement, protected-forward exclusion, pagination, duplicate/conflict detection, deterministic packaging, and fail-closed safety checks. The authenticated market bytes required by the current gate are not available as repository files; no code, test, or manifest edits are required.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a new exact-scope, non-economic Pepperstone cTrader collector and deterministic package definition for the accepted eight-symbol Wave 02 proposal. The collector validates the accepted account fingerprint and broker symbol IDs, uses paginated historical BID and ASK tick data in broker-safe seven-day windows, aligns quote observations into fixed M5 intervals, rejects missing quote sides, preserves duplicate-free raw observations, and emits the exact requested fields without using trendbars as bid/ask data. Existing C031 and six-panel collectors remain unchanged.",
     "tests_requested": [
-      "tests/test_c031_structural_extension_capture.py"
+      "tests/test_session_gap_frontier_wave02_capture.py",
+      "tests/test_general_ai_implementation_executor.py"
     ]
   },
   "project_snapshot": {
@@ -82,5 +91,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
