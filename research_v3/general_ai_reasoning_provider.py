@@ -168,7 +168,21 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "universe_basis":evidence["universe_basis"],
         "current_open_mechanism_families":evidence["current_open_mechanism_families"],
     }
-    request_id="reason_"+sha256_bytes(canonical_bytes(core))[:32]
+    # The repository HEAD and full mutable next-state document are transport context,
+    # not reasons to buy another semantic judgment on unchanged evidence.
+    decision_fingerprint={
+        "provider_version":PROVIDER_VERSION,
+        "protocol_version":PROTOCOL_VERSION,
+        "evidence_epoch":core["evidence_epoch_seen"],
+        "evidence_bundle_sha256":core["evidence_bundle_sha256"],
+        "authority_hashes":core["authority_hashes"],
+        "decision_class":str(next_state.get("next_action") or ""),
+        "pending_status":str(next_state.get("status") or ""),
+        "accounting":snapshot,
+        "universe_basis":core["universe_basis"],
+        "open_families":core["current_open_mechanism_families"],
+    }
+    request_id="reason_"+sha256_bytes(canonical_bytes(decision_fingerprint))[:32]
     return {
         "schema":"mxm.greenfield.general-ai-reasoning-request.v2",
         "status":"AI_REASONING_REQUIRED" if reasoning_required(next_state) else "NO_AI_REASONING_REQUIRED",
