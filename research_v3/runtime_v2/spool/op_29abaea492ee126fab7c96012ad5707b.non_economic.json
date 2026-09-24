@@ -1,0 +1,65 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "e7cad399a92b78036c99391588697756dde7633cef2850f89976a4a3fcba235d",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "RUN_NON_ECONOMIC_CROSS_SYMBOL_PREREQUISITE_SCREEN",
+    "family_assessment": {
+      "CARRY_TERM_STRUCTURE": "Remain insufficient unless broker-native term-structure metadata are separately available.",
+      "CROSS_MARKET_LEAD_LAG": "Evaluate aligned timestamp sufficiency for causal lag construction without testing returns or outcomes.",
+      "CROSS_SECTIONAL_RANKING": "Evaluate whether synchronized cross-sectional observations and a stable eligible set exist.",
+      "RELATIVE_VALUE_COINTEGRATION": "Evaluate synchronized-history sufficiency and asset/product comparability; do not infer cointegration from structural alignment alone."
+    },
+    "follow_on_rule": "If at least one cross-symbol family meets explicit common-observation and chronology thresholds, freeze the smallest prospective family-specific structural screen; otherwise retain the broader universe and select the next highest-information non-economic prerequisite without new economics.",
+    "guardrails": {
+      "economic_outcomes_opened": 0,
+      "no_development_to_outer_reuse": true,
+      "no_family_closure": true,
+      "no_outer_authorized": true,
+      "no_parameter_mining": true,
+      "v2_attempts_consumed": 0
+    },
+    "market_data_required": false,
+    "scope": {
+      "purpose": "Measure pairwise and four-way timestamp alignment, chronology, cadence, missingness, session overlap, and minimum usable common observations.",
+      "resolution": "M5",
+      "symbols": [
+        "MXNJPY",
+        "USDCAD",
+        "EURUSD",
+        "IWM.US"
+      ]
+    },
+    "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+    "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "accepted_development_capture_sufficient_for_current_decision": true,
+    "accepted_development_capture_sufficient_for_mechanism_specific_outer": false,
+    "authorizing_evidence_epoch": 7,
+    "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+    "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
+    "next_action": "Materialize deterministic alignment and coverage diagnostics from the accepted four-symbol capture, then reassess the smallest valid cross-symbol structural screen.",
+    "prospective_exploration_assessment": "POSITIVE_EXPECTED_INFORMATION_GAIN_BEFORE_MECHANISM_SPECIFIC_OUTER",
+    "research_judgment_required": false,
+    "research_scope": "Four-symbol broker-native M5 cross-symbol alignment prerequisite",
+    "status": "NON_ECONOMIC_CROSS_SYMBOL_PREREQUISITE_SCREEN_AUTHORIZED"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Use the accepted hash-bound four-symbol M5 development capture to determine whether cross-symbol alignment prerequisites are sufficient for lead-lag, cross-sectional ranking, and relative-value research before any mechanism-specific outer is considered.",
+    "information_gain_rationale": "The 40-series development evidence is sufficient for univariate structural families but lacks aligned timestamps for cross-symbol families. The accepted four-symbol capture is the smallest existing broker-native evidence surface that can test alignment, coverage, cadence, and usable common observations without recapture, economic outcomes, or broad parameter search. Its result will determine whether a minimal aligned extension is justified or whether cross-symbol exploration should be deprioritized."
+  },
+  "operation_id": "op_29abaea492ee126fab7c96012ad5707b",
+  "proposal_hash": "f077aabb2b655722fcc55a883738f1283af70123ea2603533a55c9c56d7c98ee",
+  "proposal_id": "P-20260924-CROSSALIGN-PREREQUISITE-SCREEN-02",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_a042abbf4c3c0e62fdf4948cb9f77b59.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
