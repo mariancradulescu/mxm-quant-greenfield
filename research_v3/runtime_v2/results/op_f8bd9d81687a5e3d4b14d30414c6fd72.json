@@ -1,0 +1,89 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "4cbc94dae440b815ba006b6aac2aecfbe7bac47143521f0baa2a3d5ee6cb8c6c",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "SELECT_DISJOINT_OUTER_DATA_BINDING",
+    "candidate_id": "V2-C031",
+    "cost_authority": "Use broker-native or verified reusable cost and margin metadata; acquire only missing fields required for executable friction and margin validation.",
+    "evaluation_boundary": "Capture and validate data, executable friction, margin, and schedule metadata only; do not open economic outcomes, protected evidence, live orders, or a new identity.",
+    "outer_window": {
+      "end_utc": "2026-06-14T23:59:59Z",
+      "resolution": "M5",
+      "start_utc": "2026-02-23T00:00:00Z",
+      "strictly_disjoint_from_prior_c031_data": true
+    },
+    "required_fields": [
+      "timestamp_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "bid",
+      "ask",
+      "spread",
+      "contract_size",
+      "pip_or_tick_size",
+      "swap_long",
+      "swap_short",
+      "trading_schedule",
+      "margin_requirements",
+      "minimum_executable_volume",
+      "symbol_metadata"
+    ],
+    "research_only": true,
+    "screening_requirements": {
+      "pre_outcome_integrity_required": true,
+      "schedule_adjusted_coverage_minimum": 0.97,
+      "unresolved_chronology_conflicts": 0
+    },
+    "symbols": [
+      "USTN2YR-F",
+      "TLT.US",
+      "NVDA.US-24",
+      "VIX",
+      "HSTECH",
+      "ADAUSD"
+    ]
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "candidate_id": "V2-C031",
+    "implementation_semantics": {
+      "minimal_incremental_acquisition": true,
+      "no_economic_outcome": true,
+      "no_exact_identity_rerun": true,
+      "no_parameter_tuning": true,
+      "reuse_verified_data_before_acquisition": true
+    },
+    "next_action": "CAPTURE_AND_AUDIT_THE_DISJOINT_SIX_SYMBOL_M5_WINDOW_BEFORE_ANY_OUTER_SCREEN",
+    "required_checks": [
+      "strict_disjointness_from_prior_c031_data",
+      "schedule_adjusted_coverage_at_least_0.97",
+      "zero_unresolved_chronology_conflicts",
+      "complete_executable_friction_and_margin_metadata",
+      "causal_pre_outcome_integrity"
+    ],
+    "resolution": "M5",
+    "status": "OUTER_DATA_BINDING_SELECTED_PENDING_CAPTURE",
+    "window_end_utc": "2026-06-14T23:59:59Z",
+    "window_start_utc": "2026-02-23T00:00:00Z"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Bind the smallest prospective, strictly disjoint M5 outer-data window for the frozen C031 session-gap reversion six-panel research screen before any outer outcome is evaluated.",
+    "information_gain_rationale": "C031 remains a discovery survivor, while the current ten-symbol scope is not globally representative. A disjoint six-symbol panel tests whether the session-gap mechanism transfers across structurally distinct broker-native instruments without rerunning the observed identity or consuming an additional V2 identity."
+  },
+  "operation_id": "op_f8bd9d81687a5e3d4b14d30414c6fd72",
+  "proposal_hash": "9d725d7b931c480e3ab1ec03698ea6ca69406237f619f46f84610fdc7ecf163e",
+  "proposal_id": "c031-disjoint-outer-binding-v3",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_775bd0bd1bf0dfaf58020fd2b7e01518.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
