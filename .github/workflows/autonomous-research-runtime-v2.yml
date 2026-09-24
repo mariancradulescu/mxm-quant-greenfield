@@ -204,8 +204,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ github.token }}
-          MXM_COPILOT_MODEL: gpt-5.4
-          MXM_COPILOT_IMPLEMENTATION_MODEL: gpt-5.4
+          MXM_COPILOT_MODEL: auto
+          MXM_COPILOT_IMPLEMENTATION_MODEL: auto
         run: |
           python -m research_v3.general_ai_autonomy_loop continue \
             --root . \
