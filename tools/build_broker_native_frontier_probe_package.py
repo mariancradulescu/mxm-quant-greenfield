@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-TARGET=ROOT/"dist"/"MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1.zip"
+TARGET=ROOT/"dist"/"MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V2.zip"
 FILES=(
 "BROKER_NATIVE_FRONTIER_PROBE_RUN.py",
 "data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json",

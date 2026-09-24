@@ -29,11 +29,12 @@ def local_preflight():
         "interval":plan["interval"],"network_connection_attempted":False,"credentials_used":False,
         "orders_permitted":False,"account_mutation_permitted":False,"economic_outcomes_opened":False,
         "v2_attempts_consumed":0,"protected_evidence_opened":False,
-        "schedule_adjusted_coverage_gate":False,
+        "schedule_adjusted_coverage_gate":False,"current_entry_tradability_required":False,
+        "per_symbol_capture_error_preservation":True,
     }
 
 def main():
-    print("MXM Broker-Native Adaptive Frontier | 41 structural archetypes | M5 | 2 weeks | READ ONLY | economics=NO | protected=NO")
+    print("MXM Broker-Native Adaptive Frontier | runtime V2 | 41 structural archetypes | M5 | 2 weeks | READ ONLY | economics=NO | protected=NO")
     try:
         print("[PREFLIGHT PASS]",local_preflight())
         app,token,mode=ensure_v2_authorization(); print("[OAUTH]",mode)

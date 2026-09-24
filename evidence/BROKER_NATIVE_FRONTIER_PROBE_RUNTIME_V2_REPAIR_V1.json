@@ -1,0 +1,40 @@
+{
+  "schema": "mxm.greenfield.broker-native-frontier-probe-runtime-v2-repair.v1",
+  "status": "IMPLEMENTATION_DEFECT_IDENTIFIED_AND_CORRECTED_PENDING_EXACT_HEAD_GREEN",
+  "recorded_utc": "2026-09-24T10:00:00Z",
+  "source": "USER_REPORTED_RUNTIME_STDOUT_NON_MARKET_DATA",
+  "observed_failure": {
+    "preflight_passed": true,
+    "oauth": "REUSED_SAVED_ACCESS_TOKEN",
+    "account_binding_started": true,
+    "blocker": "selected symbol not current new-entry tradable: SHEIN.HK-PERP",
+    "market_data_capture_started": false,
+    "returned_zip_created": false
+  },
+  "root_cause": {
+    "defect": "Runtime V1 required every frozen representative to be current new-entry tradable before any historical M5 request.",
+    "why_invalid_for_probe": "Current order-entry permission is dynamic broker metadata and is not a prerequisite in the frozen probe purpose, which is read-only historical M5 availability/timestamp topology.",
+    "official_semantics": "ProtoOATradingMode ENABLED=0; other values restrict trading. Runtime V2 records this field instead of using it as a global historical-read gate."
+  },
+  "correction": {
+    "frozen_plan_changed": false,
+    "symbol_replacement_permitted": false,
+    "current_trading_mode_recorded": true,
+    "current_entry_unavailable_nonfatal": true,
+    "exact_present_symbol_id_name_conflict_fail_closed": true,
+    "missing_current_mapping_preserved_without_request": true,
+    "per_symbol_capture_error_preserved": true,
+    "successful_series_preserved": true,
+    "output_bundle_status_partial_when_needed": true
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "attempts_refunded": 0
+  },
+  "safety": {
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "protected_forward_opened": false
+  }
+}

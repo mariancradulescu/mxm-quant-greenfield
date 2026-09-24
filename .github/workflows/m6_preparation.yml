@@ -173,16 +173,18 @@ jobs:
           assert r["orders_permitted"] is False and r["account_mutation_permitted"] is False, r
           assert r["economic_outcomes_opened"] is False and r["v2_attempts_consumed"] == 0, r
           assert r["schedule_adjusted_coverage_gate"] is False, r
+          assert r["current_entry_tradability_required"] is False, r
+          assert r["per_symbol_capture_error_preservation"] is True, r
           print("BROKER_NATIVE_FRONTIER_PROBE_PREFLIGHT_PASS", r)
           PY
       - name: Build deterministic broker-native frontier probe package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_broker_native_frontier_probe_package.py
-          sha256sum dist/MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1.zip
+          sha256sum dist/MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V2.zip
       - name: Upload broker-native frontier probe package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1
+          name: MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V2
           path: dist/MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1.zip
           if-no-files-found: error
           retention-days: 30

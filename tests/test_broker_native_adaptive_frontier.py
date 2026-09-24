@@ -1,7 +1,7 @@
 import inspect, json, unittest
 from pathlib import Path
 from research_v3.broker_native_information_frontier import select_frontier
-from research_v3.broker_native_frontier_probe_capture import EXPECTED_PLAN_SHA, canonical_plan_sha, validate_plan
+from research_v3.broker_native_frontier_probe_capture import EXPECTED_PLAN_SHA, canonical_plan_sha, current_symbol_state, validate_plan
 from research_v3.pydroid_broker_native_frontier_probe_launcher import local_preflight
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -31,6 +31,20 @@ class BrokerNativeInformationFrontierTests(unittest.TestCase):
         out2=select_frontier(rows,set())
         self.assertEqual({x["broker_symbol"] for x in out2},{"B","C"})
 
+    def test_current_entry_disabled_is_metadata_not_global_abort(self):
+        spec={"broker_symbol":"SHEIN.HK-PERP","symbol_id":7449}
+        s=current_symbol_state(spec,{"symbolName":"SHEIN.HK-PERP","enabled":True},{"tradingMode":1})
+        self.assertTrue(s["current_mapping_available"])
+        self.assertFalse(s["current_entry_tradable"])
+        self.assertEqual(s["current_trading_mode_name"],"DISABLED_WITHOUT_PENDINGS_EXECUTION")
+        self.assertEqual(s["classification"],"CURRENT_ENTRY_UNAVAILABLE_NONFATAL_FOR_HISTORICAL_PROBE")
+
+    def test_missing_current_mapping_is_preserved_not_identity_rewritten(self):
+        spec={"broker_symbol":"X","symbol_id":999}
+        s=current_symbol_state(spec,None,None)
+        self.assertFalse(s["current_mapping_available"])
+        self.assertEqual(s["classification"],"CURRENT_MAPPING_UNAVAILABLE")
+
     def test_probe_plan_is_hash_frozen_non_economic_and_pre_protected(self):
         p=json.loads((ROOT/"data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json").read_text())
         self.assertEqual(p["plan_sha256"],EXPECTED_PLAN_SHA)
@@ -51,6 +65,8 @@ class BrokerNativeInformationFrontierTests(unittest.TestCase):
         self.assertFalse(r["account_mutation_permitted"])
         self.assertFalse(r["economic_outcomes_opened"])
         self.assertFalse(r["schedule_adjusted_coverage_gate"])
+        self.assertFalse(r["current_entry_tradability_required"])
+        self.assertTrue(r["per_symbol_capture_error_preservation"])
 
     def test_collector_contains_no_order_requests(self):
         import research_v3.broker_native_frontier_probe_capture as m

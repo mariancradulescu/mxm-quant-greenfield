@@ -20,10 +20,11 @@ from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 PLAN_REL="data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json"
 OUTPUT_FILENAME="MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_V1.zip"
 BUNDLE_DIR="MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_V1"
-TOOL_VERSION="MXM_BROKER_NATIVE_FRONTIER_M5_PROBE_ANDROID_V1"
+TOOL_VERSION="MXM_BROKER_NATIVE_FRONTIER_M5_PROBE_ANDROID_V2"
 EXPECTED_PLAN_SHA="27e0d931d0f89e314857c1e77521d7118e66f834e9680c951c2cf8a452196fe8"
 RAW_HEADER=("time_utc","open","high","low","close","tick_volume")
 MIN_REQUEST_INTERVAL=1.0/4.7
+TRADING_MODE_NAMES={0:"ENABLED",1:"DISABLED_WITHOUT_PENDINGS_EXECUTION",2:"DISABLED_WITH_PENDINGS_EXECUTION",3:"CLOSE_ONLY_MODE"}
 
 def _plain(m):
     return MessageToDict(m,preserving_proto_field_name=False,use_integers_for_enums=True)
@@ -33,6 +34,34 @@ def _sha_file(path):
     with Path(path).open("rb") as f:
         for c in iter(lambda:f.read(1024*1024),b""): h.update(c)
     return h.hexdigest()
+
+def current_symbol_state(spec,light,full):
+    name=str(spec["broker_symbol"]); sid=int(spec["symbol_id"])
+    if light is None or full is None:
+        return {
+            "broker_symbol":name,"symbol_id":sid,
+            "current_mapping_available":False,
+            "current_light_enabled":None,
+            "current_trading_mode":None,
+            "current_trading_mode_name":"UNAVAILABLE",
+            "current_entry_tradable":False,
+            "classification":"CURRENT_MAPPING_UNAVAILABLE",
+        }
+    observed_name=str(light.get("symbolName",""))
+    if observed_name!=name:
+        raise MappingError(f"selected symbol identity conflict {name}/{sid} -> {observed_name}")
+    mode=int(full.get("tradingMode",-1))
+    enabled=light.get("enabled")
+    entry=(enabled is not False and mode==0)
+    return {
+        "broker_symbol":name,"symbol_id":sid,
+        "current_mapping_available":True,
+        "current_light_enabled":enabled,
+        "current_trading_mode":mode,
+        "current_trading_mode_name":TRADING_MODE_NAMES.get(mode,f"UNKNOWN_{mode}"),
+        "current_entry_tradable":entry,
+        "classification":("CURRENT_ENTRY_TRADABLE" if entry else "CURRENT_ENTRY_UNAVAILABLE_NONFATAL_FOR_HISTORICAL_PROBE"),
+    }
 
 def canonical_plan_sha(plan):
     body={k:v for k,v in plan.items() if k!="plan_sha256"}
@@ -103,7 +132,7 @@ class BrokerNativeFrontierProbeRunner:
                 except Exception as restore_exc: last=restore_exc
         raise CaptureContractError(f"{type(request).__name__} failed: {redact_text(str(last))}")
 
-    def _capture_one(self,aid,spec,full):
+    def _capture_one(self,aid,spec,full,current_state):
         name=str(spec["broker_symbol"]); sid=int(spec["symbol_id"]); digits=int(full.get("digits",5))
         target=self.work/f"{sid}_{_safe(name)}_M5.csv"; meta_path=self.work/f"{sid}_{_safe(name)}_M5.meta.json"
         if target.is_file() and meta_path.is_file():
@@ -136,6 +165,7 @@ class BrokerNativeFrontierProbeRunner:
             "gap_count_24x7_reference":stats["gap_count_24x7_reference"],"sha256":stats["sha256"],
             "empty_series_classification":("NO_M5_ROWS_OBSERVED" if stats["row_count"]==0 else None),
             "synthetic_fill":False,"forward_fill":False,"schedule_adjusted_coverage_computed":False,
+            "current_symbol_state":current_state,"capture_status":"SERIES_CAPTURE_COMPLETE",
         }
         atomic_write_json(meta_path,meta); return target,meta
 
@@ -169,21 +199,50 @@ class BrokerNativeFrontierProbeRunner:
         for i in range(0,len(ids),64):
             q=ProtoOASymbolByIdReq(ctidTraderAccountId=aid); q.symbolId.extend(ids[i:i+64])
             for x in self._send(q).symbol: full[int(x.symbolId)]=_plain(x)
+        states={}
         for spec in self.plan["symbols"]:
-            sid=int(spec["symbol_id"]); name=str(spec["broker_symbol"]); li=light_by.get(sid); fu=full.get(sid)
-            if li is None or fu is None or str(li.get("symbolName"))!=name:
-                raise MappingError(f"selected symbol mapping mismatch {name}/{sid}")
-            if li.get("enabled") is False or int(fu.get("tradingMode",-1))!=0:
-                raise MappingError(f"selected symbol not current new-entry tradable: {name}")
+            sid=int(spec["symbol_id"]); name=str(spec["broker_symbol"])
+            state=current_symbol_state(spec,light_by.get(sid),full.get(sid)); states[sid]=state
+            if state["current_entry_tradable"] is False:
+                self.progress(f"[SYMBOL STATE] {name}: {state['classification']} mode={state['current_trading_mode_name']}")
         self.progress("[2/3] Capturing 41 structural representatives / M5 / 2-week DEVELOPMENT probe")
-        raw_dir=self.bundle/"raw"; raw_dir.mkdir(parents=True); results=[]
+        raw_dir=self.bundle/"raw"; raw_dir.mkdir(parents=True); results=[]; errors=0; unavailable=0
         for i,spec in enumerate(self.plan["symbols"],1):
-            src,meta=self._capture_one(aid,spec,full[int(spec["symbol_id"])])
+            sid=int(spec["symbol_id"]); name=str(spec["broker_symbol"]); state=states[sid]
+            if not state["current_mapping_available"]:
+                unavailable+=1
+                m={
+                    "broker_symbol":name,"symbol_id":sid,"structural_signature":spec["structural_signature"],
+                    "resolution":"M5","requested_interval":self.plan["interval"],
+                    "classification":"DEVELOPMENT_ONLY_NON_ECONOMIC_STRUCTURAL_PROBE",
+                    "capture_status":"CURRENT_MAPPING_UNAVAILABLE_NO_REQUEST",
+                    "current_symbol_state":state,"row_count":0,
+                    "synthetic_fill":False,"forward_fill":False,"schedule_adjusted_coverage_computed":False,
+                }
+                results.append(m); self.progress(f"[SERIES {i}/41 SKIP] {name}: current mapping unavailable; preserved as observation")
+                continue
+            try:
+                src,meta=self._capture_one(aid,spec,full[sid],state)
+            except Exception as exc:
+                errors+=1
+                m={
+                    "broker_symbol":name,"symbol_id":sid,"structural_signature":spec["structural_signature"],
+                    "resolution":"M5","requested_interval":self.plan["interval"],
+                    "classification":"DEVELOPMENT_ONLY_NON_ECONOMIC_STRUCTURAL_PROBE",
+                    "capture_status":"SERIES_CAPTURE_ERROR_RETRYABLE",
+                    "current_symbol_state":state,"row_count":0,
+                    "error_type":type(exc).__name__,"error":redact_text(str(exc)),
+                    "synthetic_fill":False,"forward_fill":False,"schedule_adjusted_coverage_computed":False,
+                }
+                results.append(m); self.progress(f"[SERIES {i}/41 ERROR-PRESERVED] {name}: {m['error']}")
+                continue
             dest=raw_dir/src.name; shutil.copyfile(src,dest); m=dict(meta); m["file"]=dest.relative_to(self.bundle).as_posix(); results.append(m)
-            self.progress(f"[SERIES {i}/41] {spec['broker_symbol']} rows={m['row_count']:,}")
+            self.progress(f"[SERIES {i}/41 PASS] {name} rows={m['row_count']:,} current_entry_tradable={state['current_entry_tradable']}")
+        completed=sum(1 for x in results if x.get("capture_status")=="SERIES_CAPTURE_COMPLETE")
+        status=("NON_ECONOMIC_STRUCTURAL_PROBE_COMPLETE" if errors==0 and unavailable==0 else "NON_ECONOMIC_STRUCTURAL_PROBE_PARTIAL_RETRYABLE")
         manifest={
-            "schema":"mxm.greenfield.broker-native-frontier-m5-probe-bundle.v1",
-            "status":"NON_ECONOMIC_STRUCTURAL_PROBE_COMPLETE",
+            "schema":"mxm.greenfield.broker-native-frontier-m5-probe-bundle.v2",
+            "status":status,
             "captured_utc":datetime.utcnow().isoformat(timespec="seconds")+"Z",
             "tool_version":TOOL_VERSION,"plan_sha256":EXPECTED_PLAN_SHA,
             "source_frontier_sha256":self.plan["source_frontier_sha256"],
@@ -191,6 +250,8 @@ class BrokerNativeFrontierProbeRunner:
             "account_fingerprint_sha256":self.plan["account_fingerprint_sha256"],
             "source_environment":self.plan["source_environment"],"resolution":"M5",
             "requested_interval":self.plan["interval"],"series":results,
+            "series_summary":{"planned":41,"completed":completed,"retryable_errors":errors,"current_mapping_unavailable":unavailable,
+                              "current_entry_unavailable":sum(1 for x in results if not (x.get("current_symbol_state") or {}).get("current_entry_tradable",False))},
             "schedule_adjusted_coverage_computed":False,
             "economic_outcomes_opened":0,"v2_attempts_consumed":0,
             "orders_placed":False,"account_mutation":False,"protected_evidence_opened":False,
