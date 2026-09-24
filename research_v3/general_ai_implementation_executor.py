@@ -16,7 +16,7 @@ VERSION="MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V1"
 REQUEST_REL=Path("research_v3/ai_director/IMPLEMENTATION_REQUEST.json")
 RESPONSE_REL=Path("research_v3/ai_director/IMPLEMENTATION_RESPONSE.json")
 GATE_REL=Path("research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json")
-DEFAULT_MODEL="gpt-5.3-codex"
+DEFAULT_MODEL="gpt-5.4"
 PROTECTED_PREFIXES=(
     "CURRENT_STATE.json","V2_SEARCH_BUDGET_V1.json","V2_PROTECTED_FORWARD_START.json",
     "discovery/ledger.jsonl","m6/results/","research_v3/runtime_v2/",

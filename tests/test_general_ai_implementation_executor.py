@@ -1,6 +1,6 @@
 import json, unittest
 from pathlib import Path
-from research_v3.general_ai_implementation_executor import PROTECTED_PREFIXES, implementation_required
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -19,4 +19,7 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_research_reasoning_model_is_explicit_not_auto(self):
         self.assertNotEqual(DEFAULT_MODEL,"auto")
         self.assertEqual(DEFAULT_MODEL,"gpt-5.4")
+    def test_implementation_model_is_explicit_and_available_tier(self):
+        self.assertNotEqual(IMPLEMENTATION_MODEL,"auto")
+        self.assertEqual(IMPLEMENTATION_MODEL,"gpt-5.4")
 if __name__=="__main__": unittest.main()
