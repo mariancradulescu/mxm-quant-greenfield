@@ -32,7 +32,8 @@ class LiveEquivalentStageBInputEquivalenceRevalidationTests(unittest.TestCase):
         self.assertEqual(s["economic_outcomes_opened"],current["economic_outcomes_opened"])
         self.assertEqual(s["stage_b_revalidation_required_candidate_ids"],[])
         self.assertEqual(s["current_stage_b_survivor_input_set"],["V2-C006","V2-C012"])
-        self.assertEqual(s["current_live_equivalent_stage_b_authoritative_candidate_ids"],["V2-C006","V2-C012"])
+        self.assertTrue({"V2-C006","V2-C012"} <= set(s["current_live_equivalent_stage_b_authoritative_candidate_ids"]))
+        self.assertIn("V2-C031",s["current_live_equivalent_stage_b_authoritative_candidate_ids"])
         for cid in ("V2-C006","V2-C012"):
             b=s["current_result_authority"][cid]["stage_b_current_config"]
             self.assertEqual(b["state"],"VALID_REVALIDATED_BY_LIVE_EQUIVALENT_INPUT_EQUIVALENCE")

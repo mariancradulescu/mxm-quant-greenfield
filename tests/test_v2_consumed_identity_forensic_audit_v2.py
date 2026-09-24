@@ -57,7 +57,8 @@ class ConsumedIdentityForensicAuditV3Tests(unittest.TestCase):
         self.assertEqual(set(state["discovery_survivors"]),{"V2-C006","V2-C012"})
         self.assertEqual(set(state["live_equivalent_discovery_survivors"]),{"V2-C006","V2-C012"})
         self.assertEqual(set(state["current_stage_b_survivor_input_set"]),{"V2-C006","V2-C012"})
-        self.assertEqual(set(state["current_live_equivalent_stage_b_authoritative_candidate_ids"]),{"V2-C006","V2-C012"})
+        self.assertTrue({"V2-C006","V2-C012"} <= set(state["current_live_equivalent_stage_b_authoritative_candidate_ids"]))
+        self.assertIn("V2-C031",state["current_live_equivalent_stage_b_authoritative_candidate_ids"])
         for cid in IMPLEMENTATION_ONLY:
             a=state["current_result_authority"][cid]["stage_a"]
             self.assertEqual(a["live_equivalent_replay_state"],"CORRECTED_SAME_IDENTITY_CURRENT_AUTHORITY")

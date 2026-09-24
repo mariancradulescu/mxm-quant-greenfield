@@ -67,7 +67,11 @@ class Wave06ControlTests(unittest.TestCase):
         if lc.results:
             self.assertEqual(accounting["v2_attempts_used"],19)
             self.assertEqual(accounting["v2_search_budget_remaining"],65)
-            self.assertEqual(accounting["economic_outcomes_opened"],26)
+            self.assertEqual(
+                accounting["economic_outcomes_opened"],
+                accounting["stage_a_result_recorded_entries"]+accounting["stage_b_current_config_economic_observations"],
+            )
+            self.assertGreaterEqual(accounting["economic_outcomes_opened"],26)
         else:
             self.assertEqual(accounting["v2_attempts_used"],18)
             self.assertEqual(accounting["v2_search_budget_remaining"],66)

@@ -23,6 +23,11 @@ class C031RuntimeTransportTests(unittest.TestCase):
    self.assertNotIn('runtime_operation_envelope_ref',n)
   else:
    self.assertEqual(d['exact_head_authorization']['run_id'],35922246231)
-   self.assertEqual(n['runtime_operation_envelope_ref'],str(p))
-   self.assertEqual(n['expected_operation_id'],'op_cdcf9d2bae1f2bc2355e79efbbcdaf50')
+   if n.get('status')=='STAGE_B_OUTCOME_OPENED_PENDING_AI_INTERPRETATION':
+    self.assertNotIn('runtime_operation_envelope_ref',n)
+    self.assertEqual(n['result_ref'],'m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json')
+    self.assertEqual(n['economic_execution_id'],'econ_561ca1cabbc351f3fdde2e0bddaed830')
+   else:
+    self.assertEqual(n['runtime_operation_envelope_ref'],str(p))
+    self.assertEqual(n['expected_operation_id'],'op_cdcf9d2bae1f2bc2355e79efbbcdaf50')
 if __name__=='__main__': unittest.main()

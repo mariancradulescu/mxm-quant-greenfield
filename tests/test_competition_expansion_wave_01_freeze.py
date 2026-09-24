@@ -125,7 +125,8 @@ class CompetitionExpansionWave01FreezeTests(unittest.TestCase):
         hist=s["competition_performance_expansion"]
         self.assertEqual(hist["economic_outcomes_opened"],4); self.assertEqual(hist["v2_attempts_used"],2); self.assertEqual(hist["v2_search_budget_remaining"],82)
         self.assertEqual(hist["accounting_snapshot_scope"],"HISTORICAL_BEFORE_ULTRA_FAST_C017_C020_OUTCOMES")
-        self.assertEqual(s["current_config_stage_b_outcomes_opened"],2)
+        self.assertEqual(s["current_config_stage_b_outcomes_opened"],s["stage_b_current_config_economic_observations"])
+        self.assertGreaterEqual(s["current_config_stage_b_outcomes_opened"],2)
         self.assertGreaterEqual(s["economic_outcomes_opened"],10)
         self.assertGreaterEqual(s["v2_attempts_used"],8)
         self.assertEqual(s["v2_evaluated_identities"],s["v2_attempts_used"])
