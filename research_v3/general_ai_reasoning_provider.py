@@ -167,9 +167,14 @@ decision: arbitrary JSON object expressing your actual research decision and eno
 next_research_state: arbitrary JSON object with at least status and next_action; do not include protected accounting/safety keys
 authority_refs: non-empty list chosen only from refs provided in context
 data_bindings: optional list
-artifact_attestation_refs: optional list
+artifact_attestation_refs: MUST be [] unless the supplied context explicitly identifies a document whose schema is mxm.greenfield.ai-director-artifact-attestation.v1 and status is VERIFIED
 data_policy: object with new_market_data_requested boolean, and if true minimal_acquisition_request with symbols,resolution,start_utc,end_utc,fields,information_gain_justification
 mechanism_family_closure_claims: list; normally empty unless prospective exhaustion authority exists
+
+The next_research_state object MUST NOT contain any of these deterministic/protected keys:
+accounting, safety, economic_outcomes_opened, v2_attempts_used, v2_search_budget_remaining,
+protected_forward, live_orders, competition_start, competition_start_authorized, live_orders_authorized.
+Those values are injected and guarded outside the AI layer.
 
 Important boundaries:
 - The reasoning proposal itself is NON_ECONOMIC; do not claim it opened an outcome or consumed an attempt.
@@ -325,7 +330,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
     context=_context_payload(root,request)
     correction=None; errors=[]; chosen_meta=None; proposal=None
     model=os.environ.get("MXM_COPILOT_MODEL","auto").strip() or "auto"
-    for attempt in range(2):
+    for attempt in range(5):
         try:
             candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
             proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
@@ -338,7 +343,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             correction=f"{type(exc).__name__}: {exc}"
             errors.append({"model":model,"attempt":attempt+1,"error":correction})
     if proposal is None:
-        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"PROVIDER_RETRY_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"errors":errors[-4:],"created_utc":iso()}
+        gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"PROVIDER_RETRY_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"errors":errors[-8:],"created_utc":iso()}
         atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_provider_retry",None)
         raise AIReasoningProviderError("all configured general reasoning attempts failed")
 

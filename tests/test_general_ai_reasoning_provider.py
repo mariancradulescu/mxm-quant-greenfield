@@ -7,6 +7,7 @@ from unittest.mock import patch
 from research_v3.general_ai_reasoning_provider import (
     PROVIDER_KIND,
     PROVIDER_VERSION,
+    _system_prompt,
     build_reasoning_request,
     reasoning_required,
     wake,
@@ -30,6 +31,13 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
     def test_active_provider_is_copilot_cli_not_retired_models_api(self):
         self.assertEqual(PROVIDER_KIND,"GITHUB_COPILOT_CLI")
         self.assertEqual(PROVIDER_VERSION,"MXM_GENERAL_AI_REASONING_PROVIDER_V2")
+
+    def test_prompt_contract_explicitly_protects_deterministic_state(self):
+        p=_system_prompt()
+        self.assertIn("artifact_attestation_refs: MUST be []",p)
+        self.assertIn("competition_start_authorized",p)
+        self.assertIn("live_orders_authorized",p)
+        self.assertIn("MUST NOT contain",p)
 
     def test_missing_token_creates_explicit_gate_without_secret(self):
         with tempfile.TemporaryDirectory() as td:
