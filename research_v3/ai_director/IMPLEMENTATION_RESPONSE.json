@@ -1,4 +1,50 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "f8b791868ce0b4c0fdb81d240bb3e582ec477be0",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "f8b791868ce0b4c0fdb81d240bb3e582ec477be0",
+    "predecessor_run_id": 36036824331
+  },
+  "accepted_output": {
+    "decision": {
+      "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
+      "economic_outcomes_opened": 0,
+      "expected_common_timestamps": 9558,
+      "expected_consecutive_pairs": 9475,
+      "external_data_required": false,
+      "implementation_changed": false,
+      "live_orders_authorized": false,
+      "new_market_data_required": false,
+      "ordered_pairs": 12,
+      "protected_forward_opened": false,
+      "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
+      "research_family": "CROSS_MARKET_LEAD_LAG",
+      "resolution": "M5",
+      "source_capture_ref": "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
+      "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
+      "symbols": [
+        "AUDJPY",
+        "AUS200",
+        "Brent-F",
+        "BCHUSD"
+      ],
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "cross-market-lead-lag-screen-v2",
+    "next_research_state": {
+      "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_BYTE_VERIFIED_DESCRIPTIVE_SCREEN",
+      "status": "EXACT_HEAD_VALIDATION_REQUIRED"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Deterministic repair after direct byte validation: preserve 9558 common timestamps and 9475 strictly consecutive M5 pairs; compute same/opposite balance only when both source and target directions are nonzero, report one-sided/both-zero observations separately, and emit no unrequested confidence interval. No accepted evidence, economics, protected-forward data, or V2 accounting changes.",
+    "tests_requested": [
+      "tests/test_cross_market_lead_lag_screen.py",
+      "tests/test_crossalign_four_symbol_capture.py",
+      "tests/test_general_ai_implementation_executor.py"
+    ]
+  },
   "basis_next_state_sha256": "4c0b05d80082af9535563702a0aea9c752d656b84457852aeddd7a67ef20d989",
   "changed_paths": [
     "research_v3/cross_market_lead_lag_screen.py",
@@ -6,6 +52,18 @@
     "tests/test_cross_market_lead_lag_screen.py"
   ],
   "created_utc": "2026-09-24T17:46:53Z",
+  "descriptive_metric_repair": {
+    "accepted_evidence_invalidated": false,
+    "classification": "DETERMINISTIC_NON_ECONOMIC_IMPLEMENTATION_REPAIR",
+    "common_timestamps": 9558,
+    "correction": "same/opposite counts use only both-nonzero observations; zero-in-either is separate; no confidence interval",
+    "economic_outcomes_opened_delta": 0,
+    "external_recapture_required": false,
+    "prior_issue": "same_direction_fraction_nonzero denominator included observations with one zero direction; an unrequested Wilson interval was also emitted",
+    "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
+    "strictly_consecutive_m5_pairs": 9475,
+    "v2_attempts_consumed_delta": 0
+  },
   "exact_head": {
     "green": false,
     "head": "0277c46cd3df576bcaa0f831f4fc28569e425744",
@@ -42,8 +100,8 @@
     "external_data_gate": null,
     "implementation_id": "cross-market-lead-lag-screen-v2",
     "next_research_state": {
-      "status": "EXACT_HEAD_VALIDATION_REQUIRED",
-      "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_BYTE_VERIFIED_DESCRIPTIVE_SCREEN"
+      "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_BYTE_VERIFIED_DESCRIPTIVE_SCREEN",
+      "status": "EXACT_HEAD_VALIDATION_REQUIRED"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
     "summary": "Deterministic repair after direct byte validation: preserve 9558 common timestamps and 9475 strictly consecutive M5 pairs; compute same/opposite balance only when both source and target directions are nonzero, report one-sided/both-zero observations separately, and emit no unrequested confidence interval. No accepted evidence, economics, protected-forward data, or V2 accounting changes.",
@@ -69,17 +127,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN",
-  "descriptive_metric_repair": {
-    "classification": "DETERMINISTIC_NON_ECONOMIC_IMPLEMENTATION_REPAIR",
-    "prior_issue": "same_direction_fraction_nonzero denominator included observations with one zero direction; an unrequested Wilson interval was also emitted",
-    "correction": "same/opposite counts use only both-nonzero observations; zero-in-either is separate; no confidence interval",
-    "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
-    "common_timestamps": 9558,
-    "strictly_consecutive_m5_pairs": 9475,
-    "accepted_evidence_invalidated": false,
-    "external_recapture_required": false,
-    "economic_outcomes_opened_delta": 0,
-    "v2_attempts_consumed_delta": 0
-  }
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
