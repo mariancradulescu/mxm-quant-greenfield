@@ -87,7 +87,12 @@ def validate_plan(plan):
 
 def _bucket_ticks(ticks, start_ms, end_ms):
     buckets = {}
-    for tick in ticks:
+    seen = set()
+    for tick in sorted(ticks, key=lambda item: (int(item.timestamp_ms), int(item.raw_tick))):
+        identity = (int(tick.timestamp_ms), int(tick.raw_tick))
+        if identity in seen:
+            continue
+        seen.add(identity)
         timestamp = int(tick.timestamp_ms)
         if timestamp < start_ms or timestamp >= end_ms:
             continue
@@ -98,7 +103,7 @@ def _bucket_ticks(ticks, start_ms, end_ms):
 
 def align_bid_ask_m5(bid_ticks, ask_ticks, *, start_utc, end_utc, symbol_id, broker_symbol):
     """Align independently paginated quote ticks; missing sides remain missing."""
-    start, end = _ms(_utc(start_utc)), _ms(_utc(end_utc))
+    start, end = _ms(_utc(start_utc)), _ms(_utc(end_utc)) + 1000
     bid, ask = _bucket_ticks(bid_ticks, start, end), _bucket_ticks(ask_ticks, start, end)
     rows = []
     for bucket in sorted(set(bid) & set(ask)):
@@ -109,8 +114,8 @@ def align_bid_ask_m5(bid_ticks, ask_ticks, *, start_utc, end_utc, symbol_id, bro
             "bid_open": str(bp[0]), "bid_high": str(max(bp)), "bid_low": str(min(bp)), "bid_close": str(bp[-1]),
             "ask_open": str(ap[0]), "ask_high": str(max(ap)), "ask_low": str(min(ap)), "ask_close": str(ap[-1]),
             "tick_volume": str(len(bp) + len(ap)),
-            "spread": str(((ap[0] + ap[-1]) / 2) - ((bp[0] + bp[-1]) / 2)),
-            "trading_session_metadata": "BROKER_NATIVE_TICK_OBSERVATION",
+            "spread": str(ap[-1] - bp[-1]),
+            "trading_session_metadata": "CURRENT_ACCOUNT_SYMBOL_SCHEDULE_SNAPSHOT",
         }
         rows.append(row)
     return rows
@@ -189,7 +194,7 @@ class FrontierWave02CaptureRunner:
                 path = raw / f"{sid}_{name.replace('.', '_').replace('-', '_')}_M5_BID_ASK.csv"
                 with path.open("w", newline="", encoding="utf-8") as stream:
                     writer = csv.DictWriter(stream, fieldnames=HEADER); writer.writeheader(); writer.writerows(rows)
-                manifest["series"].append({"broker_symbol": name, "symbol_id": sid, "file": path.relative_to(self.bundle).as_posix(), "row_count": len(rows), "sha256": _sha(path), "bid_ask_aligned": True, "synthetic_fill": False, "forward_fill": False})
+                manifest["series"].append({"broker_symbol": name, "symbol_id": sid, "file": path.relative_to(self.bundle).as_posix(), "row_count": len(rows), "sha256": _sha(path), "bid_ask_aligned": True, "synthetic_fill": False, "forward_fill": False, "trading_session_metadata": {"source": "CURRENT_ACCOUNT_SYMBOL_SNAPSHOT", "schedule": full[sid].get("schedule"), "scheduleTimeZone": full[sid].get("scheduleTimeZone"), "holiday": full[sid].get("holiday"), "historical_schedule_verified": False}})
             atomic_write_json(self.bundle / "capture_manifest.json", manifest)
             checks = [f"{_sha(path)}  {path.relative_to(self.bundle).as_posix()}" for path in sorted(self.bundle.rglob("*")) if path.is_file()]
             (self.bundle / "CHECKSUMS.sha256").write_text("\n".join(checks) + "\n", encoding="utf-8")
