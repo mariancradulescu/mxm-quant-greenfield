@@ -1,74 +1,43 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "ee8c8ecac842df7cc6616cb3d0af2aef0f4cb3d4",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "ee8c8ecac842df7cc6616cb3d0af2aef0f4cb3d4",
-    "predecessor_run_id": 35999439280
-  },
-  "accepted_output": {
-    "decision": {
-      "accepted_capture_reused": true,
-      "action": "ADD_GENERIC_PRIMARY_MECHANISM_FAMILY_SELECTOR",
-      "economic_outcomes_opened": 0,
-      "external_data_required": false,
-      "implementation_refs": [
-        "research_v3/adaptive_breadth_triage.py",
-        "tests/test_adaptive_breadth_triage.py"
-      ],
-      "mechanism_family_closure_claimed": false,
-      "primary_family": "BREAKOUT_VOLATILITY_EXPANSION",
-      "source_triage_ref": "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": null,
-    "implementation_id": "adaptive-breadth-primary-family-selection-v1",
-    "next_research_state": {
-      "ai_reasoning_required": true,
-      "green_implementation_artifacts": [
-        "research_v3/adaptive_breadth_triage.py",
-        "tests/test_adaptive_breadth_triage.py"
-      ],
-      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a read-only selector that chooses one primary mechanism family from the accepted adaptive breadth triage using the accepted AI preference order. It validates non-economic prerequisite sufficiency, fails closed when no preferred family is eligible, and claims no economic evaluation or family exhaustion. No external market data or collector is required.",
-    "tests_requested": [
-      "python -m unittest tests/test_adaptive_breadth_triage.py -v",
-      "python -m unittest tests/test_general_ai_implementation_executor.py -v"
-    ]
-  },
-  "basis_next_state_sha256": "08c13d8394d3e9cde78f43269c8c985b8132da9f2abb9567bfba11a3d4408a9e",
+  "basis_next_state_sha256": "e27f80691b733af2f5ea277fa6bc150ff208a98ce65e5a3d27d420564fa862b2",
   "changed_paths": [
     "research_v3/adaptive_breadth_triage.py",
     "tests/test_adaptive_breadth_triage.py"
   ],
-  "created_utc": "2026-09-24T12:28:48Z",
+  "created_utc": "2026-09-24T12:33:13Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
       "accepted_capture_reused": true,
-      "action": "ADD_GENERIC_PRIMARY_MECHANISM_FAMILY_SELECTOR",
+      "action": "EXECUTE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE",
+      "economic_identity_authorized": false,
       "economic_outcomes_opened": 0,
-      "external_data_required": false,
+      "exact_symbol_scope_required": 40,
+      "families": [
+        "BREAKOUT_VOLATILITY_EXPANSION",
+        "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+        "MEAN_REVERSION",
+        "REGIME_CONTEXT_CONDITIONED",
+        "SEASONALITY_SESSION_TIME",
+        "TREND_MOMENTUM"
+      ],
       "implementation_refs": [
         "research_v3/adaptive_breadth_triage.py",
         "tests/test_adaptive_breadth_triage.py"
       ],
-      "mechanism_family_closure_claimed": false,
-      "primary_family": "BREAKOUT_VOLATILITY_EXPANSION",
-      "source_triage_ref": "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
+      "new_market_data_required": false,
+      "protected_forward_opened": false,
+      "resolution": "M5",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "adaptive-breadth-primary-family-selection-v1",
+    "implementation_id": "univariate-structural-gate-v1",
     "next_research_state": {
-      "next_action": "VALIDATE_EXACT_HEAD_GREEN",
+      "next_action": "VALIDATE_EXACT_HEAD_GREEN_AND_MATERIALIZE_HASH_BOUND_NON_ECONOMIC_GATE_RESULT",
       "status": "PENDING_EXACT_HEAD_GREEN"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a read-only selector that chooses one primary mechanism family from the accepted adaptive breadth triage using the accepted AI preference order. It validates non-economic prerequisite sufficiency, fails closed when no preferred family is eligible, and claims no economic evaluation or family exhaustion. No external market data or collector is required.",
+    "summary": "Added a generic read-only univariate structural gate for the accepted exact 40-symbol M5 development capture. It validates the frozen plan and capture hash, computes per-symbol chronology, cadence, missingness, session, and causal-observation diagnostics, emits prerequisite and event-availability matrices for all six authorized univariate families, and makes no economic, return, PnL, promotion, parameter-mining, or protected-forward decision.",
     "tests_requested": [
       "python -m unittest tests/test_adaptive_breadth_triage.py -v",
       "python -m unittest tests/test_general_ai_implementation_executor.py -v"
@@ -90,5 +59,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }

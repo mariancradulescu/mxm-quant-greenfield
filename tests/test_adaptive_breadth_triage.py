@@ -8,7 +8,11 @@ import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from research_v3.adaptive_breadth_triage import run_triage, select_primary_family
+from research_v3.adaptive_breadth_triage import (
+    run_triage,
+    run_univariate_structural_gate,
+    select_primary_family,
+)
 
 
 class AdaptiveBreadthTriageTests(unittest.TestCase):
@@ -74,6 +78,52 @@ class AdaptiveBreadthTriageTests(unittest.TestCase):
         with tempfile.NamedTemporaryFile(suffix=".zip") as handle:
             with self.assertRaisesRegex(ValueError, "hash"):
                 run_triage(handle.name, repository_root=root, accepted_sha256="0" * 64)
+
+    def test_univariate_gate_is_hash_bound_and_non_economic(self):
+        root = Path(__file__).resolve().parents[1]
+        plan = json.loads(
+            (root / "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json").read_text()
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "capture.zip"
+            manifest = {
+                "plan_sha256": plan["plan_sha256"],
+                "economic_outcomes_opened": 0,
+                "v2_attempts_consumed": 0,
+                "series": [],
+            }
+            with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as archive:
+                for spec in plan["symbols"]:
+                    name = f"{spec['symbol_id']}_{spec['broker_symbol']}_M5.csv"
+                    stream = io.StringIO()
+                    writer = csv.writer(stream)
+                    writer.writerow(("time_utc", "open", "high", "low", "close", "tick_volume"))
+                    origin = datetime(2026, 6, 15, tzinfo=timezone.utc)
+                    for step in range(300):
+                        timestamp = origin + timedelta(minutes=5 * step)
+                        writer.writerow(
+                            (timestamp.isoformat().replace("+00:00", "Z"), "1", "2", "1", "1.5", "1")
+                        )
+                    archive.writestr(name, stream.getvalue())
+                    manifest["series"].append(
+                        {"broker_symbol": spec["broker_symbol"], "file": name}
+                    )
+                archive.writestr("capture_manifest.json", json.dumps(manifest))
+            observed = hashlib.sha256(path.read_bytes()).hexdigest()
+            result = run_univariate_structural_gate(
+                path, repository_root=root, accepted_sha256=observed
+            )
+            self.assertEqual(
+                result["status"], "COMPLETE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE"
+            )
+            self.assertEqual(result["source"]["symbols_screened"], 40)
+            self.assertEqual(len(result["family_prerequisite_matrix"]), 6)
+            self.assertEqual(
+                result["prospective_recommendation"]["kind"],
+                "SMALLEST_MECHANISM_SPECIFIC_OUTER",
+            )
+            self.assertEqual(result["economic_effect"]["economic_outcomes_opened"], 0)
+            self.assertFalse(result["economic_effect"]["returns_or_pnl_computed"])
 
 
 if __name__ == "__main__":
