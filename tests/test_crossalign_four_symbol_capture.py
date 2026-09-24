@@ -52,6 +52,18 @@ class CrossAlignCaptureTests(unittest.TestCase):
         source = (ROOT / "tools/build_crossalign_four_symbol_capture_package.py").read_text()
         self.assertIn("data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json", source)
         self.assertIn("research_v3/crossalign_four_symbol_capture.py", source)
+        self.assertIn("CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_RUN.py", source)
+
+    def test_root_runner_resolves_pydroid_exec_location(self):
+        runner = ROOT / "CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_RUN.py"
+        scope = {
+            "__name__": "pydroid_stub",
+            "__file__": "/data/user/0/ru.iiec.pydroid3/files/accomp_files/iec_run/iec_run.py",
+            "mainpyfile": str(runner),
+        }
+        exec(compile(runner.read_text(), "<string>", "exec"), scope)
+        self.assertEqual(scope["ROOT"], ROOT)
+        self.assertEqual(scope["package_root"](), ROOT)
 
 
 if __name__ == "__main__":
