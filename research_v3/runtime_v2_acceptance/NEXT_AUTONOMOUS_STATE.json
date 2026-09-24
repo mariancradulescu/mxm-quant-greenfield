@@ -16,11 +16,14 @@
     "genuine_new_authenticated_read_only_ctrader_data_required": true,
     "package_artifact_name": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2",
     "returned_zip": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
-    "required_after_exact_head_green": true,
+    "required_after_exact_head_green": false,
     "user_action_required": true,
-    "user_action": "After exact-head CI is green, run the certified V2 pagination-repair package in the same folder if possible so it reuses the prior ZIP/cache; upload only the returned corrected ZIP."
+    "user_action": "After exact-head CI is green, run the certified V2 pagination-repair package in the same folder if possible so it reuses the prior ZIP/cache; upload only the returned corrected ZIP.",
+    "package_artifact_id": 10802859426,
+    "source_green_run_id": 35988932813,
+    "package_inner_sha256": "2524c250976fbd00f73884bd7cae954ccd2dd2a57c5f6c57126c76fb686a866e"
   },
-  "next_action": "AFTER_EXACT_HEAD_GREEN_RUN_CERTIFIED_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2_AND_UPLOAD_RETURNED_ZIP",
+  "next_action": "RUN_CERTIFIED_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2_AND_UPLOAD_CORRECTED_ZIP",
   "reason": "The returned V1 13-week ZIP is byte-valid but materially incomplete because 34/40 series hit the 4,999/5,000-bar page ceiling with first timestamps after the frozen start. Runtime V1 incorrectly treated implicit hasMore=False as interval exhaustion even though this cTrader protobuf schema does not expose hasMore. Valid captured suffix bytes are preserved; V2 imports them when available and backfills only missing prefixes, otherwise performs correct complete pagination.",
   "recorded_utc": "2026-09-24T10:20:00Z",
   "research_action": {
@@ -45,7 +48,7 @@
     "protected_forward_opened": false
   },
   "schema": "mxm.greenfield.runtime-v2.next-autonomous-state.v2",
-  "status": "EXTERNAL_AUTHENTICATED_READ_ONLY_CTRADER_FRONTIER_13W_PAGINATION_REPAIR_PENDING_EXACT_HEAD_GREEN",
+  "status": "EXTERNAL_AUTHENTICATED_READ_ONLY_CTRADER_FRONTIER_13W_PAGINATION_REPAIR_REQUIRED",
   "supersession_ref": "evidence/BROKER_NATIVE_FRONTIER_M5_TOPOLOGY_REPORT_V1.json",
   "user_action_required": true,
   "runtime_repair": {
@@ -78,5 +81,13 @@
     "protected_forward_rows": 0,
     "ohlc_failures": 0,
     "classification": "RAW_DATA_VALID_PARTIAL_IMPLEMENTATION_INVALID_PAGINATION"
+  },
+  "exact_head_green_authority": {
+    "validated_implementation_head": "eab63e5c2ddf9c73014446b1d9ce9393a5f213d3",
+    "workflow": "m6-preparation",
+    "run_id": 35988932813,
+    "conclusion": "success",
+    "package_artifact_id": 10802859426,
+    "package_inner_sha256": "2524c250976fbd00f73884bd7cae954ccd2dd2a57c5f6c57126c76fb686a866e"
   }
 }

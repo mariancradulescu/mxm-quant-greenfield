@@ -15,9 +15,12 @@
   "external_data_gate": {
     "package_artifact_name": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V2",
     "expected_output_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
-    "required_after_exact_head_green": true,
+    "required_after_exact_head_green": false,
     "reason": "Required historical prefixes are genuinely missing from 34 series due to implementation-invalid pagination, while the existing 189,722 rows remain valid.",
-    "user_only_action": "Run the certified V2 pagination-repair package and upload the corrected returned ZIP."
+    "user_only_action": "Run the certified V2 pagination-repair package and upload the corrected returned ZIP.",
+    "package_artifact_id": 10802859426,
+    "source_green_run_id": 35988932813,
+    "package_inner_sha256": "2524c250976fbd00f73884bd7cae954ccd2dd2a57c5f6c57126c76fb686a866e"
   },
   "implemented_utc": "2026-09-24T10:20:00Z",
   "material_changes": [
@@ -50,7 +53,7 @@
     "protected_forward_opened": false
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "FRONTIER_13W_V1_PARTIAL_PAGINATION_REPAIR_PENDING_EXACT_HEAD_GREEN",
+  "status": "FRONTIER_13W_V1_PARTIAL_PAGINATION_REPAIR_READY",
   "runtime_repair": {
     "observed_failure": "selected symbol not current new-entry tradable: SHEIN.HK-PERP",
     "root_cause": "Runtime V1 conflated current new-entry trading permission with historical M5 read availability.",
@@ -60,9 +63,9 @@
     "market_data_captured_by_failed_run": false
   },
   "exact_head_green_authority": {
-    "validated_implementation_head": "62221541c1bbdc6b80483ba47c12fd2f4e3b8d5e",
+    "validated_implementation_head": "eab63e5c2ddf9c73014446b1d9ce9393a5f213d3",
     "workflow": "m6-preparation",
-    "run_id": 35987643507,
+    "run_id": 35988932813,
     "conclusion": "success"
   }
 }
