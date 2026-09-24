@@ -14,30 +14,30 @@
   },
   "external_data_gate": {
     "genuine_new_authenticated_read_only_ctrader_data_required": true,
-    "package_artifact_name": "MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V2",
-    "returned_zip": "MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_V1.zip",
+    "package_artifact_name": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V1",
+    "returned_zip": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
     "required_after_exact_head_green": true,
     "user_action_required": true,
-    "user_action": "After exact-head CI is green, run the certified V2 Android/Pydroid package and upload only the returned ZIP; do not modify GitHub."
+    "user_action": "After exact-head CI is green, run the certified Android/Pydroid 13-week DEVELOPMENT package and upload only the returned ZIP; do not modify GitHub."
   },
-  "next_action": "AFTER_EXACT_HEAD_GREEN_RUN_CERTIFIED_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V2_AND_UPLOAD_RETURNED_ZIP",
-  "reason": "The first certified probe correctly authenticated but aborted before market-data capture because runtime V1 treated current new-entry tradability as a prerequisite for historical M5 access. Runtime V2 preserves the exact frozen 41-symbol plan, records current trading mode as metadata, does not replace SHEIN.HK-PERP post-hoc, and preserves per-symbol capture errors without discarding successful series.",
-  "recorded_utc": "2026-09-24T09:34:02Z",
+  "next_action": "AFTER_EXACT_HEAD_GREEN_RUN_CERTIFIED_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PACKAGE_V1_AND_UPLOAD_RETURNED_ZIP",
+  "reason": "The returned two-week structural probe is accepted 41/41 with 64,343 valid M5 rows, zero capture errors and zero protected rows. It proves all structural archetypes have usable historical M5 and validates the Runtime V2 trading-mode repair. The highest-information non-economic continuation is one reusable 13-week DEVELOPMENT capture across all 40 representatives that were current-entry-tradable in the accepted probe; the count is induced by the frozen pre-economic rule, not a fixed panel.",
+  "recorded_utc": "2026-09-24T10:20:00Z",
   "research_action": {
-    "classification": "DEVELOPMENT_ONLY_NON_ECONOMIC_STRUCTURAL_PROBE",
+    "classification": "DEVELOPMENT_ONLY_NON_ECONOMIC_BREADTH_CAPTURE",
     "fixed_panel_size": false,
-    "frontier_count": 41,
-    "frontier_ref": "data/BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1.json",
-    "frontier_sha256": "c634d6ffdbe674ac2a633c90b7bda53b235f626adeb4272b737223008c99bfd0",
+    "frontier_count": 40,
+    "resolution": "M5",
     "interval": {
-      "end_utc": "2026-09-13T23:59:59Z",
-      "start_utc": "2026-08-31T00:00:00Z"
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
     },
-    "market_data_outcomes_to_open": 0,
+    "source_probe_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_PROBE_ACCEPTANCE_V1.json",
+    "topology_report_ref": "evidence/BROKER_NATIVE_FRONTIER_M5_TOPOLOGY_REPORT_V1.json",
+    "capture_plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
+    "capture_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
     "new_v2_attempts": 0,
-    "probe_plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json",
-    "probe_plan_sha256": "27e0d931d0f89e314857c1e77521d7118e66f834e9680c951c2cf8a452196fe8",
-    "resolution": "M5"
+    "market_data_outcomes_to_open": 0
   },
   "safety": {
     "competition_start_authorized": false,
@@ -45,8 +45,8 @@
     "protected_forward_opened": false
   },
   "schema": "mxm.greenfield.runtime-v2.next-autonomous-state.v2",
-  "status": "EXTERNAL_AUTHENTICATED_READ_ONLY_CTRADER_FRONTIER_PROBE_RUNTIME_V2_PENDING_EXACT_HEAD_GREEN",
-  "supersession_ref": "evidence/BROKER_NATIVE_PANEL_SCREEN_AUDIT_V1.json",
+  "status": "EXTERNAL_AUTHENTICATED_READ_ONLY_CTRADER_FRONTIER_13W_DEVELOPMENT_CAPTURE_PENDING_EXACT_HEAD_GREEN",
+  "supersession_ref": "evidence/BROKER_NATIVE_FRONTIER_M5_TOPOLOGY_REPORT_V1.json",
   "user_action_required": true,
   "runtime_repair": {
     "supersedes_package": "MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1",
@@ -55,5 +55,15 @@
     "frozen_plan_changed": false,
     "current_entry_tradability_required": false,
     "per_symbol_capture_error_preservation": true
+  },
+  "accepted_probe": {
+    "zip_sha256": "a69d695ed819e82ed664ba56d7eae052b59121e59241620b7440430ba8865dd0",
+    "series_complete": 41,
+    "total_m5_rows": 64343,
+    "retryable_errors": 0,
+    "protected_forward_rows": 0,
+    "current_entry_unavailable": [
+      "SHEIN.HK-PERP"
+    ]
   }
 }

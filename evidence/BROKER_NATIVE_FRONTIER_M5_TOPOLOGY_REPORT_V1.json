@@ -1,0 +1,141 @@
+{
+  "schema": "mxm.greenfield.broker-native-frontier-m5-topology-report.v1",
+  "status": "COMPLETE_NON_ECONOMIC_INFORMATION_GAIN_REPORT",
+  "source_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_PROBE_ACCEPTANCE_V1.json",
+  "source_zip_sha256": "a69d695ed819e82ed664ba56d7eae052b59121e59241620b7440430ba8865dd0",
+  "purpose": "Use only observed M5 availability/timestamp topology plus pre-existing broker-native structural metadata to determine the next legal data-acquisition scope. No returns, PnL, direction, alpha or strategy outcome is computed.",
+  "population": {
+    "structural_archetypes": 41,
+    "current_entry_tradable": 40,
+    "current_entry_unavailable": 1,
+    "total_rows": 64343,
+    "coverage_buckets": {
+      "EXTENDED_MULTI_SESSION_SCHEDULE": {
+        "series": 6,
+        "rows": 11748,
+        "median_rows_per_active_day": 207.238889,
+        "current_entry_tradable_series": 6
+      },
+      "NEAR_24X5_MULTI_SESSION_SCHEDULE": {
+        "series": 9,
+        "rows": 22909,
+        "median_rows_per_active_day": 224.25,
+        "current_entry_tradable_series": 9
+      },
+      "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE": {
+        "series": 3,
+        "rows": 10659,
+        "median_rows_per_active_day": 268.285714,
+        "current_entry_tradable_series": 2
+      },
+      "REGIONAL_OR_CASH_SESSION_SCHEDULE": {
+        "series": 23,
+        "rows": 19027,
+        "median_rows_per_active_day": 94.9,
+        "current_entry_tradable_series": 23
+      }
+    }
+  },
+  "observed_extremes": {
+    "highest_rows": [
+      [
+        "WTOIL-PERP",
+        3980
+      ],
+      [
+        "SHEIN.HK-PERP",
+        3756
+      ],
+      [
+        "TRUMPUSD",
+        2923
+      ],
+      [
+        "ZARJPY",
+        2873
+      ],
+      [
+        "JPN225-F",
+        2755
+      ],
+      [
+        "XPDUSD",
+        2728
+      ],
+      [
+        "Crude-F",
+        2727
+      ],
+      [
+        "NatGas",
+        2691
+      ]
+    ],
+    "lowest_rows": [
+      [
+        "GEM.AU",
+        197
+      ],
+      [
+        "EIDO.US",
+        300
+      ],
+      [
+        "CGC.US",
+        499
+      ],
+      [
+        "MCG.GB",
+        603
+      ],
+      [
+        "1357.HK",
+        632
+      ],
+      [
+        "AT1d.DE",
+        667
+      ],
+      [
+        "CA60",
+        727
+      ],
+      [
+        "USDBRL",
+        809
+      ]
+    ]
+  },
+  "selection_law_for_next_data_extension": {
+    "fixed_n": false,
+    "rule": "retain every frozen structural representative whose accepted two-week probe recorded current_entry_tradable=true",
+    "current_entry_tradability_from_accepted_probe_required": true,
+    "keep_every_structural_representative_satisfying_that_rule": true,
+    "economic_outcomes_used": false,
+    "price_direction_used": false,
+    "returns_used": false,
+    "resulting_symbol_count": 40,
+    "excluded_only": [
+      {
+        "broker_symbol": "SHEIN.HK-PERP",
+        "reason": "CURRENT_ENTRY_UNAVAILABLE_CLOSE_ONLY_AT_ACCEPTED_PROBE_TIME; retained as structural evidence but not an immediate new-entry economic-development symbol."
+      }
+    ],
+    "rationale": "The two-week probe establishes usable M5 history for every archetype. One broader capture across every currently entry-tradable representative maximizes optionality and avoids repeated user data gates; count emerges from the pre-economic tradability rule rather than a hand-picked panel."
+  },
+  "next_data_interval": {
+    "start_utc": "2026-06-15T00:00:00Z",
+    "end_utc": "2026-09-13T23:59:59Z",
+    "resolution": "M5",
+    "basis": "Reuse the already-governed 13-complete-week DEVELOPMENT interval used by the accepted V6 Stage-A capture, ending before protected-forward."
+  },
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
