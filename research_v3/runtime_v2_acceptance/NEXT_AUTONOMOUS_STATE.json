@@ -18,9 +18,8 @@
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
-  "ai_reasoning_required": true,
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
-  "authorizing_evidence_epoch": 11,
+  "authorizing_evidence_epoch": 12,
   "broader_universe": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
   "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
   "broader_universe_remains_open": true,
@@ -82,10 +81,10 @@
   "fixed15m_directional_screen_ref": "evidence/CROSS_MARKET_FIXED_15M_DIRECTIONAL_SCREEN_V1.json",
   "fresh_evidence_epoch_required": true,
   "implementation_constraints": [
-    "preserve exact accepted symbols and source hash",
-    "no synthetic timestamps or forward fill",
-    "no economic statistics or outcome computation",
-    "report insufficient coverage explicitly rather than silently defaulting"
+    "Preserve exact broker symbol identities and account fingerprint.",
+    "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
+    "Reject incomplete, duplicated, out-of-interval, synthetic or forward-filled rows.",
+    "Stop at the external data gate if the exact capture cannot be returned and accepted."
   ],
   "implementation_executor": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_repair": {
@@ -113,9 +112,9 @@
   ],
   "mechanism_family": "CROSS_MARKET_LEAD_LAG",
   "new_market_data_required": false,
-  "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+  "next_action": "Acquire and validate the exact four-symbol disjoint M5 capture, then execute only the frozen lead-lag structural prerequisite.",
   "outer": "NOT_AUTHORIZED",
-  "outer_authorization": "NONE",
+  "outer_authorization": "NON_ECONOMIC_PREREQUISITE_ONLY",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
   "outer_capture_integrity": {
     "all_pagination_exhausted": true,
@@ -198,7 +197,7 @@
     "v2_attempts_to_consume": 0
   },
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_5",
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "research_scope": "Four-symbol broker-native M5 cross-symbol alignment and event-availability diagnostics",
   "runtime_repair": {
     "current_entry_tradability_required": false,
@@ -224,10 +223,10 @@
     "RELATIVE_VALUE_COINTEGRATION"
   ],
   "selection_rule": "Prioritize the family that best matches the current dependency diagnostics and yields the highest expected information gain per minimal incremental evidence, not broad economics or stale outer reuse.",
-  "source_ai_proposal_hash": "ce36db3ca679443ee5e92d262d7215699a94913aa97839901a2c9157a99b5459",
-  "source_ai_proposal_id": "P-20260924-CROSSMARKET-15M-STRUCTURAL-GATE-01",
+  "source_ai_proposal_hash": "595bea24f29acc9e375453ad7f2ac66674994c0d9cc381316ad4451e39d3bc4e",
+  "source_ai_proposal_id": "P-20260924-CROSSMARKET-LAG-OUTER-01",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-  "source_runtime_operation_id": "op_75f260c7b1157d5e5f9dabc49cdb9c52",
+  "source_runtime_operation_id": "op_4eae641c1c40103738dd744a0ec1ec86",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 11,
     "current_evidence_epoch": 12,
@@ -237,7 +236,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_POST_FIXED_15M_SCREEN",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
+  "status": "PROSPECTIVE_NON_ECONOMIC_OUTER_CAPTURE_REQUIRED",
   "stop_condition": "no_family_clear_prerequisite_gate",
   "superseded_general_ai_proposal": {
     "economic_outcome_opened": false,
