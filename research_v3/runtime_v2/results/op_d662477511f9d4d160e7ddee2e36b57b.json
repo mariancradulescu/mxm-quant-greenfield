@@ -1,0 +1,91 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "f8227e7b3e93249ee669e7f5480b4bfbdb7244e7c7554eac43914fb283156aa2",
+  "competition_start_authorized": false,
+  "decision": {
+    "account_and_safety": {
+      "competition_start_authorized": false,
+      "continuous_account": true,
+      "economic_outcomes_opened": 0,
+      "initial_capital_eur": 200,
+      "live_orders_authorized": false,
+      "v2_attempts_consumed": 0
+    },
+    "action": "FREEZE_AND_EXECUTE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE",
+    "broader_exploration": {
+      "eligible_universe": "1578 post-exclusion broker-native frontier candidates",
+      "expected_information_gain": "positive after this gate",
+      "rationale": "The current 40 representatives provide broad structural coverage, while additional capture should be targeted only once the univariate prerequisite and data-topology bottleneck are quantified.",
+      "timing": "reassess after the gate; do not request broad market data yet"
+    },
+    "market_data_reuse": {
+      "allowed": true,
+      "new_capture": false,
+      "recapture": false,
+      "source_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+      "source_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503"
+    },
+    "methodology": {
+      "compute_only": "causal event availability, minimum-history sufficiency, observed session/topology coverage, missingness and chronology diagnostics, and family-specific prerequisite coverage",
+      "economic_outcomes": false,
+      "parameter_mining": false,
+      "promotion": false,
+      "returns_or_pnl": false,
+      "selection_rule": "Choose the next mechanism-specific outer only after comparing information gain per unit of additional authenticated evidence; do not impose a fixed panel size or family closure."
+    },
+    "outer_boundary": {
+      "40_representatives_sufficient_for_mechanism_specific_outer": false,
+      "40_representatives_sufficient_for_next_decision": true,
+      "reason": "The accepted capture supports structural gating but has no economic outcome and does not establish broker-realistic friction or independent outer validity for any new identity."
+    },
+    "scope": {
+      "excluded_from_gate": [
+        "CARRY_TERM_STRUCTURE",
+        "CROSS_MARKET_LEAD_LAG",
+        "CROSS_SECTIONAL_RANKING",
+        "RELATIVE_VALUE_COINTEGRATION"
+      ],
+      "families": [
+        "BREAKOUT_VOLATILITY_EXPANSION",
+        "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+        "MEAN_REVERSION",
+        "REGIME_CONTEXT_CONDITIONED",
+        "SEASONALITY_SESSION_TIME",
+        "TREND_MOMENTUM"
+      ],
+      "resolution": "M5",
+      "symbols": "all 40 symbols in the accepted 13-week development capture"
+    }
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 5,
+    "decision_basis": "Current accepted development evidence is sufficient for a higher-information no-capture prerequisite screen; no mechanism-specific outer or economic identity is authorized.",
+    "economic_progression": "No economic outcome, promotion, competition start, or protected-forward access",
+    "next_action": "IMPLEMENT_AND_RUN_UNIVARIATE_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
+    "required_outputs": [
+      "hash-bound deterministic result",
+      "per-family prerequisite and event-availability matrix",
+      "per-symbol chronology/session/missingness diagnostics",
+      "explicit recommendation for the smallest prospective mechanism-specific outer or a minimal authenticated data extension"
+    ],
+    "research_judgment_required": false,
+    "status": "NON_ECONOMIC_STRUCTURAL_GATE_AUTHORIZED_PENDING_IMPLEMENTATION"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Use the accepted 40-symbol M5 development capture to perform a prospective, non-economic structural gate across the prerequisite-satisfied univariate families before selecting any mechanism-specific outer.",
+    "information_gain_rationale": "The 40 representatives are sufficient for the next decision because ordered OHLC and sufficient history are available for BREAKOUT_VOLATILITY_EXPANSION, CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL, MEAN_REVERSION, REGIME_CONTEXT_CONDITIONED, SEASONALITY_SESSION_TIME, and TREND_MOMENTUM. They are not sufficient for a cross-symbol outer under the current strict-alignment diagnostic or for carry without term-structure metadata. Reusing the accepted bytes avoids redundant acquisition while measuring event density, chronology robustness, session coverage, and non-economic data sufficiency across the eligible structural frontier."
+  },
+  "operation_id": "op_d662477511f9d4d160e7ddee2e36b57b",
+  "proposal_hash": "1433f4b21a590bb3b0d18a20cb4edd3c583d39e680bcf6b932547c77c128ffef",
+  "proposal_id": "P-20260924-UNIVARIATE-STRUCTURAL-GATE-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_7c42094352884caaf871774b0ba60fe4.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
