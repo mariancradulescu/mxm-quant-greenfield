@@ -1,0 +1,97 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "72223d1ac1f9caf367c32f406b251e78474eb363b36abc1a65ca4843cf29e36b",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "FREEZE_PROSPECTIVE_SESSION_GAP_PERSISTENCE_SCREEN",
+    "capital_flow_requirement": "Any later economic research must use one continuous EUR200 account, external-cashflow-neutral strategy NAV, realistic free margin, margin blockers, capital occupancy, and anti-ruin/recovery accounting.",
+    "methodology": {
+      "economic_gate": "Do not simulate shared-account economics, capital allocation, leverage, or live execution until the structural screen establishes adequate independent coverage and a frozen cost-aware methodology.",
+      "economic_status": "NON_ECONOMIC_SCREEN_ONLY",
+      "freeze_before_outer_outcome": [
+        "gap_definition",
+        "session_calendar",
+        "feature construction",
+        "eligibility and missing-data law",
+        "outer evaluation window",
+        "cost model",
+        "execution assumptions",
+        "symbol inclusion",
+        "aggregation rule",
+        "multiple-testing correction",
+        "tie-break rule"
+      ],
+      "gap_definition_minutes_min": 30,
+      "measurement_horizon_minutes": 60,
+      "mechanism": "SESSION_GAP_REVERSION",
+      "new_identity": "PROSPECTIVE_INDEPENDENT_OUTER_EVALUATION",
+      "prior_scale_observations": 288,
+      "required_outputs": [
+        "gap-event counts and coverage",
+        "directional response distribution",
+        "response persistence by symbol and asset class",
+        "heterogeneity and dependence diagnostics",
+        "cost-hurdle readiness assessment"
+      ],
+      "resolution": "M5",
+      "shock_scale_multiple": 3
+    },
+    "selected_symbols": [
+      "MXNJPY",
+      "USDCAD",
+      "EURUSD",
+      "IWM.US",
+      "TLT.US",
+      "NVDA.US-24"
+    ],
+    "selection_rationale": {
+      "design": "Retain heterogeneous asset and response exposure; do not rank or discard symbols using the observed structural outcomes alone.",
+      "mixed_or_neutral_case": [
+        "IWM.US"
+      ],
+      "negative_or_control_cases": [
+        "TLT.US",
+        "NVDA.US-24"
+      ],
+      "positive_structural_cases": [
+        "MXNJPY",
+        "USDCAD",
+        "EURUSD"
+      ]
+    },
+    "source_result": "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "data_status": "NO_NEW_MARKET_DATA_REQUIRED_FOR_THIS_FREEZE",
+    "next_action": "COMPILE_AND_VALIDATE_THE_FROZEN_METHODOLOGY_FOR_THE_SELECTED_SIX_SYMBOL_PANEL_USING_EXISTING_CAPTURED_DATA_ONLY",
+    "prohibited_actions": [
+      "RERUN_C031_STAGE_B",
+      "RERUN_ANY_ALREADY_OBSERVED_EXACT_IDENTITY",
+      "DECLARE_MECHANISM_FAMILY_EXHAUSTION",
+      "OPEN_PROTECTED_FORWARD",
+      "START_COMPETITION",
+      "PLACE_LIVE_ORDERS"
+    ],
+    "research_mode": "STRUCTURAL_NON_ECONOMIC",
+    "status": "PENDING_PROSPECTIVE_SCREEN_FREEZE",
+    "success_condition": "A reproducible prospective screen specification is frozen with explicit controls, chronology rules, multiple-testing discipline, and sufficient coverage criteria before any economic candidate is considered.",
+    "user_action_required": false
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Convert the completed C031 structural extension into a frozen, non-economic persistence-screen design for the most informative heterogeneous symbol panel without rerunning C031 Stage-B or opening a new economic outcome.",
+    "information_gain_rationale": "The extension shows materially different session-gap behavior across symbols, but sample counts and uncosted structural returns are insufficient for economic selection. A balanced panel containing strong positive, mixed, and negative structural responses provides more information about persistence and mechanism portability than selecting only apparent winners."
+  },
+  "operation_id": "op_582d8167b510c1dc76a00d6286552d81",
+  "proposal_hash": "9c5082ec81fdba1fdee2b5d55a1657468c67b6711b26d630bff3ada62ebf3152",
+  "proposal_id": "P-20260924-C031-STRUCTURAL-INTERPRETATION-02",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_615e06d81a403a528fcf30b994862043.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
