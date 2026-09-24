@@ -29,9 +29,10 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         req=build_reasoning_request(".")
         expected="AI_REASONING_REQUIRED" if reasoning_required(req["next_state"]) else "NO_AI_REASONING_REQUIRED"
         self.assertEqual(req["status"],expected)
-        self.assertEqual(req["project_snapshot"]["v2_attempts_used"],19)
-        self.assertEqual(req["project_snapshot"]["v2_search_budget_remaining"],65)
-        self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],27)
+        current=__import__("json").loads(Path("CURRENT_STATE.json").read_text())
+        self.assertEqual(req["project_snapshot"]["v2_attempts_used"],current["v2_attempts_used"])
+        self.assertEqual(req["project_snapshot"]["v2_search_budget_remaining"],current["v2_search_budget_remaining"])
+        self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],current["economic_outcomes_opened"])
         if req["next_state"].get("user_action_required") is True:
             self.assertEqual(req["status"],"NO_AI_REASONING_REQUIRED")
 

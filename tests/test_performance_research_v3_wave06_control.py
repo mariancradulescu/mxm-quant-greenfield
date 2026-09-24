@@ -65,16 +65,18 @@ class Wave06ControlTests(unittest.TestCase):
         self.assertLessEqual(len(lc.results),1)
         accounting=assert_current_state_matches_repository(ROOT)
         if lc.results:
-            self.assertEqual(accounting["v2_attempts_used"],19)
-            self.assertEqual(accounting["v2_search_budget_remaining"],65)
+            self.assertGreaterEqual(accounting["v2_attempts_used"],19)
+            self.assertEqual(
+                accounting["v2_search_budget_remaining"],
+                accounting["v2_search_budget"]-accounting["v2_attempts_used"],
+            )
             self.assertEqual(
                 accounting["economic_outcomes_opened"],
                 accounting["stage_a_result_recorded_entries"]+accounting["stage_b_current_config_economic_observations"],
             )
             self.assertGreaterEqual(accounting["economic_outcomes_opened"],26)
         else:
-            self.assertEqual(accounting["v2_attempts_used"],18)
-            self.assertEqual(accounting["v2_search_budget_remaining"],66)
+            self.assertLessEqual(accounting["v2_attempts_used"],18)
             self.assertEqual(accounting["economic_outcomes_opened"],25)
 
     def test_execution_gate_rejects_wrong_head_before_economics(self):

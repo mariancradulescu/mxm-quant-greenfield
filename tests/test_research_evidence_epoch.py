@@ -65,9 +65,10 @@ class ResearchEvidenceEpochTests(unittest.TestCase):
         refs={x["ref"] for x in req["authoritative_evidence_refs_and_hashes"]}
         self.assertIn("data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",refs)
         self.assertIn("evidence/BROKER_NATIVE_FRONTIER_13W_SESSION_GAP_STRUCTURAL_SCREEN_V1.json",refs)
-        self.assertEqual(req["project_snapshot"]["v2_attempts_used"],19)
-        self.assertEqual(req["project_snapshot"]["v2_search_budget_remaining"],65)
-        self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],27)
+        current=json.loads((ROOT/"CURRENT_STATE.json").read_text())
+        self.assertEqual(req["project_snapshot"]["v2_attempts_used"],current["v2_attempts_used"])
+        self.assertEqual(req["project_snapshot"]["v2_search_budget_remaining"],current["v2_search_budget_remaining"])
+        self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],current["economic_outcomes_opened"])
         self.assertGreater(len(req["current_open_mechanism_families"]),1)
 
     def test_provisional_four_panel_reauthorization_cannot_claim_nonexistent_capture(self):

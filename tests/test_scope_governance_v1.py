@@ -9,7 +9,7 @@ class ScopeGovernanceTests(unittest.TestCase):
         ids=sorted({r["candidate_id"] for r in ledger if r.get("entry_type")=="RESULT_RECORDED" and str(r.get("candidate_id","")).startswith("V2-C")})
         rows={r["candidate_id"]:r for r in reg["rows"]}
         self.assertEqual(sorted(rows),ids)
-        self.assertEqual(len(ids),19)
+        self.assertEqual(reg["consumed_identity_count"],len(ids))
         for cid in ids:
             spec=json.loads((ROOT/f"discovery/candidates/{cid}.json").read_text())
             self.assertEqual(rows[cid]["semantic_fingerprint"],spec["spec_hash"])

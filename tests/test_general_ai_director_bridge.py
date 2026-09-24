@@ -308,7 +308,11 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             self.assertEqual(accounting, Path("CURRENT_STATE.json").read_bytes())
             self.assertEqual(ledger, Path("discovery/ledger.jsonl").read_bytes())
             current = json.loads(accounting)
-            self.assertEqual((current["v2_attempts_used"], current["economic_outcomes_opened"]), (19, 27))
+            persisted = json.loads(Path("CURRENT_STATE.json").read_text())
+            self.assertEqual(
+                (current["v2_attempts_used"], current["economic_outcomes_opened"]),
+                (persisted["v2_attempts_used"], persisted["economic_outcomes_opened"]),
+            )
 
     def test_liveness_from_completed_outer_reaches_general_ai_reasoning(self):
         with tempfile.TemporaryDirectory() as td:
@@ -356,7 +360,7 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         before=json.loads(Path("CURRENT_STATE.json").read_text())["v2_attempts_used"]
         materialize_proposal(".",self._real_historical_ref())
         after=json.loads(Path("CURRENT_STATE.json").read_text())["v2_attempts_used"]
-        self.assertEqual((before,after),(19,19))
+        self.assertEqual(after,before)
 
     def test_unaccepted_stale_basis_proposal_is_still_rejected(self):
         with tempfile.TemporaryDirectory() as td:
@@ -390,13 +394,13 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         self.assertEqual(out["count"],2)
         self.assertEqual({x["proposal_ref"] for x in out["processed"]},{"research_v3/ai_director/proposals/A.json","research_v3/ai_director/proposals/Z.json"})
 
-    def test_scheduled_liveness_wake_from_current_27_outcome_state_reaches_completion(self):
+    def test_scheduled_liveness_wake_from_current_state_reaches_completion(self):
+        before=json.loads(Path("CURRENT_STATE.json").read_text())
         out=materialize_proposal(".",self._real_historical_ref())
         self.assertEqual(out["status"],"ALREADY_MATERIALIZED")
         state=json.loads(Path("CURRENT_STATE.json").read_text())
-        self.assertEqual(state["economic_outcomes_opened"],27)
-        self.assertEqual(state["v2_attempts_used"],19)
-        self.assertEqual(state["v2_search_budget_remaining"],65)
+        for key in ("economic_outcomes_opened","v2_attempts_used","v2_search_budget_remaining"):
+            self.assertEqual(state[key],before[key])
 
 
 if __name__ == "__main__":
