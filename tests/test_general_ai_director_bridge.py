@@ -8,6 +8,7 @@ from unittest.mock import patch
 from research_v3.general_ai_director_bridge import (
     AIProposalRejected,
     PROPOSAL_SCHEMA,
+    _validate_authoritative_data_contract,
     compile_runtime_plan,
     drain,
     materialize_proposal,
@@ -75,6 +76,47 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         proposal["decision"]["new_future_method"] = {"alpha": "not hardcoded"}
         proposal["next_research_state"]["unseen_future_field"] = 42
         validate_proposal_shape(proposal)
+
+    def test_authoritative_outer_contract_rejects_panel_substitution(self):
+        proposal = base_proposal()
+        proposal["data_policy"]["new_market_data_requested"] = True
+        proposal["data_policy"]["minimal_acquisition_request"] = {
+            "symbols": ["USTN2YR-F","TLT.US","NVDA.US-24","VIX","HSTECH","ADAUSD"],
+            "resolution": "M5",
+            "start_utc": "2026-03-30T00:00:00Z",
+            "end_utc": "2026-07-19T23:59:59Z",
+            "fields": ["time_utc","open","high","low","close"],
+            "information_gain_justification": "test",
+        }
+        with self.assertRaisesRegex(AIProposalRejected,"violates frozen outer panel"):
+            _validate_authoritative_data_contract(Path("."), proposal)
+
+    def test_authoritative_outer_contract_accepts_exact_frozen_scope(self):
+        proposal = base_proposal()
+        proposal["data_policy"]["new_market_data_requested"] = True
+        proposal["data_policy"]["minimal_acquisition_request"] = {
+            "symbols": ["MXNJPY","USDCAD","EURUSD","IWM.US","TLT.US","NVDA.US-24"],
+            "resolution": "M5",
+            "start_utc": "2026-03-30T00:00:00Z",
+            "end_utc": "2026-07-19T23:59:59Z",
+            "fields": ["time_utc","open","high","low","close"],
+            "information_gain_justification": "test",
+        }
+        _validate_authoritative_data_contract(Path("."), proposal)
+
+    def test_authoritative_outer_contract_rejects_interval_drift(self):
+        proposal = base_proposal()
+        proposal["data_policy"]["new_market_data_requested"] = True
+        proposal["data_policy"]["minimal_acquisition_request"] = {
+            "symbols": ["MXNJPY","USDCAD","EURUSD","IWM.US","TLT.US","NVDA.US-24"],
+            "resolution": "M5",
+            "start_utc": "2026-02-23T00:00:00Z",
+            "end_utc": "2026-06-14T23:59:59Z",
+            "fields": ["time_utc","open","high","low","close"],
+            "information_gain_justification": "test",
+        }
+        with self.assertRaisesRegex(AIProposalRejected,"frozen outer interval"):
+            _validate_authoritative_data_contract(Path("."), proposal)
 
     def test_ai_cannot_open_economics_through_bridge(self):
         proposal = base_proposal()

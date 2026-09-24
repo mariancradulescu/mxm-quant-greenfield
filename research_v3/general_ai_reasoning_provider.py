@@ -78,7 +78,12 @@ def reasoning_required(next_state:Mapping[str,Any])->bool:
 
 def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
     refs=list(BASE_AUTHORITIES)
-    for key in ("result_ref","pre_economic_acceptance_ref","freeze_ref"):
+    for key in (
+        "result_ref","pre_economic_acceptance_ref","freeze_ref",
+        "source_freeze_ref","authoritative_freeze_ref",
+        "outer_capture_plan_ref","outer_data_audit_ref","supersession_ref",
+        "external_data_gate_ref","capture_acceptance_ref","structural_screen_freeze_ref",
+    ):
         value=next_state.get(key)
         if isinstance(value,str) and value and value not in refs:
             refs.append(value)
@@ -185,6 +190,8 @@ Important boundaries:
 - Prefer structural screening and minimal justified incremental data before expensive broad economics.
 - Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
 - If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
+- Treat every supplied prospective freeze/data plan as authoritative. If it fixes panel membership, resolution, or an unopened outer-data scope, do not substitute symbols or dates unless a separate durable prospective supersession authority is explicitly supplied in context.
+- Source/development bytes that were used to select a panel may not be reused as independent outer evidence when an authoritative freeze requires disjoint unopened data.
 - Never output chain-of-thought. Put only concise decision rationale in information_gain_rationale/decision.
 """
 

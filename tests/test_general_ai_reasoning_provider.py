@@ -24,6 +24,15 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         if req["next_state"].get("user_action_required") is True:
             self.assertEqual(req["status"],"NO_AI_REASONING_REQUIRED")
 
+    def test_reasoning_context_includes_authoritative_outer_refs(self):
+        req=build_reasoning_request(".")
+        for rel in (
+            "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json",
+            "data/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
+            "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_DATA_AUDIT_V1.json",
+        ):
+            self.assertIn(rel,req["authority_refs"])
+
     def test_wake_detector_is_generic_not_finite_action_map(self):
         self.assertTrue(reasoning_required({"next_action":"AI_SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
         self.assertTrue(reasoning_required({"status":"ANY_PENDING_AI_INTERPRETATION_STATE","user_action_required":False}))

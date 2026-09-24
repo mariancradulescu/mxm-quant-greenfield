@@ -186,8 +186,146 @@ def validate_proposal_shape(proposal: Mapping[str, Any]) -> None:
             raise AIProposalRejected(f"causal contract not affirmed: {key}")
 
 
+def _active_authoritative_data_contract(root: Path) -> dict[str, Any] | None:
+    """Resolve a still-unsatisfied prospective data contract from durable state.
+
+    This is intentionally schema/authority driven rather than a next_action table.
+    """
+    state = load_json(root / NEXT_STATE_REL, {}) or {}
+    if state.get("user_action_required") is True:
+        return None
+    binding = state.get("outer_data_binding_ref") or state.get("independent_outer_data_ref")
+    if binding:
+        return None
+
+    freeze_rel = (
+        state.get("authoritative_freeze_ref")
+        or state.get("source_freeze_ref")
+        or state.get("freeze_ref")
+    )
+    freeze = None
+    contract = None
+    if isinstance(freeze_rel, str) and freeze_rel and (root / freeze_rel).is_file():
+        freeze = _load(root, freeze_rel)
+        raw = freeze.get("independent_outer_contract")
+        if isinstance(raw, Mapping) and raw.get("required") is True:
+            contract = dict(raw)
+
+    plan_rel = state.get("outer_capture_plan_ref")
+    plan = None
+    if isinstance(plan_rel, str) and plan_rel and (root / plan_rel).is_file():
+        plan = _load(root, plan_rel)
+
+    if contract is None and plan is None:
+        return None
+
+    fixed_symbols = []
+    if plan is not None:
+        for row in plan.get("symbols") or []:
+            if isinstance(row, Mapping) and row.get("broker_symbol"):
+                fixed_symbols.append(str(row["broker_symbol"]))
+            elif isinstance(row, str):
+                fixed_symbols.append(row)
+    if not fixed_symbols and contract is not None:
+        fixed_symbols = [str(x) for x in contract.get("exact_symbols_fixed_for_first_outer") or []]
+
+    resolution = None
+    interval = None
+    if plan is not None:
+        resolution = plan.get("resolution")
+        interval = plan.get("outer_interval")
+    if resolution is None and freeze is not None:
+        resolution = (freeze.get("data_scope") or {}).get("resolution")
+
+    return {
+        "freeze_ref": freeze_rel,
+        "freeze": freeze,
+        "contract": contract,
+        "plan_ref": plan_rel,
+        "plan": plan,
+        "fixed_symbols": fixed_symbols,
+        "resolution": resolution,
+        "outer_interval": interval,
+    }
+
+
+def _validate_authoritative_data_contract(root: Path, proposal: Mapping[str, Any]) -> None:
+    authority = _active_authoritative_data_contract(root)
+    if authority is None:
+        return
+
+    scope = proposal.get("scope_law") or {}
+    supersession_ref = scope.get("authoritative_contract_supersession_ref")
+    if supersession_ref:
+        rel = str(supersession_ref)
+        path = root / rel
+        if not path.is_file():
+            raise AIProposalRejected("authoritative data-contract supersession ref missing")
+        doc = _load(root, rel)
+        status = str(doc.get("status") or "")
+        if not status.startswith("FROZEN_"):
+            raise AIProposalRejected("authoritative data-contract supersession is not prospectively frozen")
+        if doc.get("supersedes_ref") not in {authority.get("freeze_ref"), authority.get("plan_ref")}:
+            raise AIProposalRejected("authoritative data-contract supersession does not bind current authority")
+        return
+
+    fixed = list(authority.get("fixed_symbols") or [])
+    resolution = authority.get("resolution")
+    interval = authority.get("outer_interval")
+    data_policy = proposal.get("data_policy") or {}
+    request = data_policy.get("minimal_acquisition_request") or {}
+
+    candidate_symbol_lists = []
+    if request.get("symbols") is not None:
+        candidate_symbol_lists.append(("data_policy.minimal_acquisition_request.symbols", request.get("symbols")))
+    decision = proposal.get("decision") or {}
+    for key in ("panel_symbols", "symbols"):
+        if decision.get(key) is not None:
+            candidate_symbol_lists.append((f"decision.{key}", decision.get(key)))
+    universe = decision.get("universe_selection")
+    if isinstance(universe, Mapping) and universe.get("symbol_set") is not None:
+        candidate_symbol_lists.append(("decision.universe_selection.symbol_set", universe.get("symbol_set")))
+
+    for label, values in candidate_symbol_lists:
+        if not isinstance(values, list):
+            raise AIProposalRejected(f"{label} must be a list under authoritative outer contract")
+        observed = [str(x) for x in values]
+        if fixed and observed != fixed:
+            raise AIProposalRejected(
+                f"{label} violates frozen outer panel: expected {fixed}, observed {observed}"
+            )
+
+    if request:
+        if resolution is not None and request.get("resolution") != resolution:
+            raise AIProposalRejected("new data request violates frozen outer resolution")
+        if interval is not None:
+            if request.get("start_utc") != interval.get("start_utc") or request.get("end_utc") != interval.get("end_utc"):
+                raise AIProposalRejected("new data request violates prospectively frozen outer interval")
+
+    next_state = proposal.get("next_research_state") or {}
+    if resolution is not None and next_state.get("resolution") is not None and next_state.get("resolution") != resolution:
+        raise AIProposalRejected("AI next state violates frozen outer resolution")
+    if interval is not None:
+        if next_state.get("window_start_utc") is not None and next_state.get("window_start_utc") != interval.get("start_utc"):
+            raise AIProposalRejected("AI next state violates frozen outer start")
+        if next_state.get("window_end_utc") is not None and next_state.get("window_end_utc") != interval.get("end_utc"):
+            raise AIProposalRejected("AI next state violates frozen outer end")
+
+    freeze = authority.get("freeze")
+    contract = authority.get("contract")
+    if freeze is not None and contract is not None:
+        source_interval = (freeze.get("data_scope") or {}).get("interval") or {}
+        req_start = request.get("start_utc")
+        req_end = request.get("end_utc")
+        if req_start and req_end and source_interval.get("start_utc") and source_interval.get("end_utc"):
+            disjoint = req_end < source_interval["start_utc"] or req_start > source_interval["end_utc"]
+            if contract.get("outer_dataset_must_be_disjoint_from_source_capture") is True and not disjoint:
+                raise AIProposalRejected("new data request overlaps outer-forbidden source capture")
+
+
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)
+    _validate_authoritative_data_contract(root, proposal)
     basis = proposal.get("basis") or {}
     basis_head = _nonempty(basis.get("research_head"), "basis.research_head")
     if not _is_ancestor(root, basis_head):
