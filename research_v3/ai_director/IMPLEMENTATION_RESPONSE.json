@@ -1,156 +1,39 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "8208eec9e8dd07f9b4fffc0271f4459526f88d65",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "8208eec9e8dd07f9b4fffc0271f4459526f88d65",
-    "predecessor_run_id": 35979415460
-  },
-  "accepted_output": {
-    "decision": {
-      "action": "IMPLEMENT_EXACT_SCOPE_READ_ONLY_BID_ASK_TICK_CAPTURE",
-      "collector_build_ref": "tools/build_session_gap_frontier_wave02_capture_package.py",
-      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip",
-      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
-      "collector_source_ref": "research_v3/session_gap_frontier_wave02_capture.py",
-      "economic_boundary": "NON_ECONOMIC_ONLY",
-      "economic_outcomes_opened": 0,
-      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE.zip",
-      "promotion_authorized": false,
-      "protected_forward_opened": false,
-      "scope": {
-        "end_utc": "2026-09-13T23:59:59Z",
-        "fields": [
-          "timestamp_utc",
-          "symbol_id",
-          "broker_symbol",
-          "bid_open",
-          "bid_high",
-          "bid_low",
-          "bid_close",
-          "ask_open",
-          "ask_high",
-          "ask_low",
-          "ask_close",
-          "tick_volume",
-          "spread",
-          "trading_session_metadata"
-        ],
-        "resolution": "M5",
-        "start_utc": "2026-07-20T00:00:00Z",
-        "symbols": [
-          "EURGBP",
-          "JPN225",
-          "XAUUSD",
-          "SPY.US",
-          "AAPL.US-24",
-          "NatGas",
-          "DOGEUSD",
-          "UKGILT-F"
-        ]
-      },
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": {
-      "collector_build_ref": "tools/build_session_gap_frontier_wave02_capture_package.py",
-      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip",
-      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
-      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE.zip",
-      "reason": "Authenticated account-bound BID and ASK tick bytes for the exact eight-symbol, M5, 2026-07-20 through 2026-09-13 scope are not present as accepted repository or hash-bound Library artifacts. The new collector must pass exact-head-green validation before the read-only capture package is run."
-    },
-    "implementation_id": "session-gap-frontier-wave02-bid-ask-capture-v1",
-    "next_research_state": {
-      "ai_reasoning_required": true,
-      "green_implementation_artifacts": [
-        "SESSION_GAP_FRONTIER_WAVE_02_CAPTURE_RUN.py",
-        "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
-        "research_v3/session_gap_frontier_wave02_capture.py",
-        "tests/test_session_gap_frontier_wave02_capture.py",
-        "tools/build_session_gap_frontier_wave02_capture_package.py"
-      ],
-      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a new exact-scope, non-economic Pepperstone cTrader collector and deterministic package definition for the accepted eight-symbol Wave 02 proposal. The collector validates the accepted account fingerprint and broker symbol IDs, uses paginated historical BID and ASK tick data in broker-safe seven-day windows, aligns quote observations into fixed M5 intervals, rejects missing quote sides, preserves duplicate-free raw observations, and emits the exact requested fields without using trendbars as bid/ask data. Existing C031 and six-panel collectors remain unchanged.",
-    "tests_requested": [
-      "tests/test_session_gap_frontier_wave02_capture.py",
-      "tests/test_general_ai_implementation_executor.py"
-    ]
-  },
-  "basis_next_state_sha256": "99d5e8690a358612ce582696f6ff7ce7dd94e5db705caf0c7066d5a4589ad69b",
+  "basis_next_state_sha256": "7940c232eaeae0596ba033f48ec660766b5f49dded357695491a64e373cf1b3e",
   "changed_paths": [
-    "SESSION_GAP_FRONTIER_WAVE_02_CAPTURE_RUN.py",
-    "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
-    "research_v3/session_gap_frontier_wave02_capture.py",
-    "tests/test_session_gap_frontier_wave02_capture.py",
-    "tools/build_session_gap_frontier_wave02_capture_package.py"
+    "research_v3/broker_native_panel_screen.py",
+    "tests/test_broker_native_panel_screen.py"
   ],
-  "created_utc": "2026-09-24T08:39:45Z",
+  "created_utc": "2026-09-24T09:12:41Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "IMPLEMENT_EXACT_SCOPE_READ_ONLY_BID_ASK_TICK_CAPTURE",
-      "collector_build_ref": "tools/build_session_gap_frontier_wave02_capture_package.py",
-      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip",
-      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
-      "collector_source_ref": "research_v3/session_gap_frontier_wave02_capture.py",
-      "economic_boundary": "NON_ECONOMIC_ONLY",
-      "economic_outcomes_opened": 0,
-      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE.zip",
-      "promotion_authorized": false,
-      "protected_forward_opened": false,
-      "scope": {
-        "end_utc": "2026-09-13T23:59:59Z",
-        "fields": [
-          "timestamp_utc",
-          "symbol_id",
-          "broker_symbol",
-          "bid_open",
-          "bid_high",
-          "bid_low",
-          "bid_close",
-          "ask_open",
-          "ask_high",
-          "ask_low",
-          "ask_close",
-          "tick_volume",
-          "spread",
-          "trading_session_metadata"
-        ],
-        "resolution": "M5",
-        "start_utc": "2026-07-20T00:00:00Z",
-        "symbols": [
-          "EURGBP",
-          "JPN225",
-          "XAUUSD",
-          "SPY.US",
-          "AAPL.US-24",
-          "NatGas",
-          "DOGEUSD",
-          "UKGILT-F"
-        ]
+      "action": "IMPLEMENT_DISJOINT_BROKER_NATIVE_FEASIBILITY_PANEL_SCREEN",
+      "implementation_ref": "research_v3/broker_native_panel_screen.py",
+      "protected_scope_unchanged": true,
+      "selection_policy": {
+        "both_direction_feasible_required": true,
+        "consumed_identities_excluded": true,
+        "economic_outcomes_opened": 0,
+        "market_data_read": false,
+        "test_products_excluded": true,
+        "v2_attempts_consumed": 0
       },
-      "v2_attempts_consumed": 0
+      "source_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
+      "test_ref": "tests/test_broker_native_panel_screen.py"
     },
-    "external_data_gate": {
-      "collector_build_ref": "tools/build_session_gap_frontier_wave02_capture_package.py",
-      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE_PACKAGE.zip",
-      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_WAVE_02_M5_CAPTURE_PLAN_V1.json",
-      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_WAVE_02_M5_BID_ASK_CAPTURE.zip",
-      "reason": "Authenticated account-bound BID and ASK tick bytes for the exact eight-symbol, M5, 2026-07-20 through 2026-09-13 scope are not present as accepted repository or hash-bound Library artifacts. The new collector must pass exact-head-green validation before the read-only capture package is run."
-    },
-    "implementation_id": "session-gap-frontier-wave02-bid-ask-capture-v1",
+    "external_data_gate": null,
+    "implementation_id": "broker-native-panel-screen-v1",
     "next_research_state": {
       "ai_reasoning_required": true,
-      "next_action": "VALIDATE_EXACT_SCOPE_WAVE02_COLLECTOR_AND_BUILD_PACKAGE_THEN_REQUEST_ACCOUNT_BOUND_CAPTURE",
+      "next_action": "Validate the non-economic broker-native panel screen and its tests at exact-head green; then return to AI reasoning for the next legal research action.",
       "status": "PENDING_EXACT_HEAD_GREEN",
       "user_action_required": false
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a new exact-scope, non-economic Pepperstone cTrader collector and deterministic package definition for the accepted eight-symbol Wave 02 proposal. The collector validates the accepted account fingerprint and broker symbol IDs, uses paginated historical BID and ASK tick data in broker-safe seven-day windows, aligns quote observations into fixed M5 intervals, rejects missing quote sides, preserves duplicate-free raw observations, and emits the exact requested fields without using trendbars as bid/ask data. Existing C031 and six-panel collectors remain unchanged.",
+    "summary": "Added a deterministic non-economic breadth screen over the accepted Pepperstone EUR200 feasibility index. It selects a reproducible disjoint panel using BOTH_FEASIBLE, non-test products while excluding consumed identities, and performs no market-data access, economic evaluation, or V2 consumption. No external data gate is required.",
     "tests_requested": [
-      "tests/test_session_gap_frontier_wave02_capture.py",
+      "tests/test_broker_native_panel_screen.py",
       "tests/test_general_ai_implementation_executor.py"
     ]
   },
@@ -170,5 +53,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
