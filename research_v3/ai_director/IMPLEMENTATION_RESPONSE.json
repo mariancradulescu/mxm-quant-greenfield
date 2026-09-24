@@ -1,20 +1,21 @@
 {
-  "basis_next_state_sha256": "418706854938a133da43f3204941c50c3307326b24fc8410f82f604f31301a5d",
+  "basis_next_state_sha256": "a360bd187f7e0dc3d67a374498148ff303aa407c3269fc9f38f88067e055c157",
   "changed_paths": [],
-  "created_utc": "2026-09-24T08:04:04Z",
+  "created_utc": "2026-09-24T08:07:14Z",
   "exact_head": {
     "green": false,
-    "head": "f74739de7f54c331f78bb1472fd9fe794eea1d5b",
+    "head": "e4b3634d24d0a2b006f198d40de46b5f65f0c657",
     "predecessor_conclusion": "cancelled",
-    "predecessor_head": "6013a345040caf1a404fa60670bd57c447cefdcc",
-    "predecessor_run_id": 35972891691
+    "predecessor_head": "80c5494101334ab3e9403a07d9928d70708be43a",
+    "predecessor_run_id": 35973209210
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "REQUEST_MINIMAL_READ_ONLY_BROKER_NATIVE_CAPTURE",
+      "action": "REQUEST_MINIMAL_BROKER_NATIVE_READ_ONLY_CAPTURE",
       "economic_outcomes_opened": 0,
-      "next_processing_gate": "Validate provenance, completeness, chronology, and disjointness before any price-derived structural interpretation.",
+      "next_processing_gate": "Validate account binding, completeness, chronology, duplicate/conflict handling, and data sufficiency before any price-derived structural interpretation.",
+      "promotion_authorized": false,
       "protected_evidence_opened": false,
       "scope": {
         "end_utc": "2026-09-13T23:59:59Z",
@@ -41,15 +42,15 @@
       "collector_build_ref": "C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py",
       "collector_package_artifact_name": "MXM_C031_STRUCTURAL_EXTENSION_M5_8W_CAPTURE_PACKAGE.zip",
       "expected_return_artifact_name": "MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE.zip",
-      "reason": "The required authenticated Pepperstone account-native M5 OHLCV bytes for the frozen 12-symbol interval are not available in the repository. The existing collector must be run read-only and its returned ZIP uploaded to the GPT/Director chat without modification."
+      "reason": "Authenticated Pepperstone account-native M5 OHLCV bytes for the frozen 12-symbol interval are unavailable in the repository. Run the existing read-only collector package and upload its returned ZIP to the GPT/Director chat without modification."
     },
     "implementation_id": "c031-structural-extension-m5-capture-v1",
     "next_research_state": {
-      "next_action": "CAPTURE_AND_HASH_BIND_THE_FROZEN_12_SYMBOL_M5_EXTENSION_THEN_RUN_PRE_OUTCOME_STRUCTURAL_VALIDATION",
+      "next_action": "EXECUTE_THE_FROZEN_12_SYMBOL_M5_READ_ONLY_CAPTURE_THEN_APPLY_PRE_OUTCOME_INTEGRITY_AND_DATA_SUFFICIENCY_GATES",
       "status": "WAITING_FOR_AUTHENTICATED_BROKER_NATIVE_CAPTURE"
     },
     "status": "EXTERNAL_DATA_REQUIRED",
-    "summary": "The repository already contains the exact read-only, non-economic Pepperstone cTrader collector for the frozen 12-symbol M5, eight-week extension, including account-fingerprint binding, chronology-safe capture, protected-forward exclusion, deterministic ZIP packaging, and fail-closed safety checks. No code or manifest changes are required. Authenticated market bytes are not present in the repository and must be collected externally.",
+    "summary": "The repository already implements the exact non-economic, read-only Pepperstone cTrader collector for the frozen 12-symbol M5 interval, including account-fingerprint binding, symbol identity checks, protected-forward exclusion, pagination, duplicate/conflict detection, deterministic packaging, and fail-closed safety checks. The required authenticated market bytes are not present in the repository, so no code, test, or manifest edits are required.",
     "tests_requested": [
       "tests/test_c031_structural_extension_capture.py"
     ]
