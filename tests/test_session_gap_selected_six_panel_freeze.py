@@ -12,14 +12,18 @@ class SelectedSixPanelFreezeTests(unittest.TestCase):
             (ROOT / "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json").read_text()
         )
         self.assertEqual(
-            document["status"], "FROZEN_PROSPECTIVE_NON_ECONOMIC_METHODOLOGY"
+            document["status"], "FROZEN_PROSPECTIVE_NON_ECONOMIC_METHODOLOGY_PENDING_INDEPENDENT_OUTER_DATA"
         )
         self.assertEqual(
             document["panel"]["symbols"],
             ["MXNJPY", "USDCAD", "EURUSD", "IWM.US", "TLT.US", "NVDA.US-24"],
         )
         self.assertEqual(document["data_scope"]["resolution"], "M5")
-        self.assertTrue(document["data_scope"]["no_new_market_data_required"])
+        self.assertTrue(document["data_scope"]["no_new_market_data_required_for_methodology_compilation"])
+        self.assertTrue(document["independent_outer_contract"]["required"])
+        self.assertFalse(document["independent_outer_contract"]["source_wave01_canonical_capture_may_be_outer"])
+        self.assertTrue(document["independent_outer_contract"]["outer_dataset_must_be_disjoint_from_source_capture"])
+        self.assertEqual(document["analysis_discipline"]["confirmatory_outer_testing"]["familywise_correction"], "HOLM_BONFERRONI")
         self.assertTrue(document["panel"]["selection_rule"].startswith("Fixed before"))
 
     def test_causal_controls_and_multiple_testing_discipline_are_explicit(self):
