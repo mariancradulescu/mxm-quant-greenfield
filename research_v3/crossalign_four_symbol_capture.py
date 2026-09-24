@@ -85,6 +85,7 @@ class CrossAlignmentCaptureRunner(BrokerNativeFrontierDevelopmentRunner):
         self.zip_path = self.root / OUTPUT_FILENAME
         self._app = False
         self._account = None
+        self._last_hist = None
 
     def _workflow(self):
         self.progress("[1/3] Pepperstone LIVE read-only account binding")
@@ -174,7 +175,9 @@ class CrossAlignmentCaptureRunner(BrokerNativeFrontierDevelopmentRunner):
 
         manifest = {
             "schema": "mxm.greenfield.crossalign-four-symbol-m5-bundle.v1",
-            "status": "CAPTURE_COMPLETE_NON_ECONOMIC",
+            "status": ("CAPTURE_COMPLETE_NON_ECONOMIC" if all(
+                x.get("capture_status") == "SERIES_CAPTURE_COMPLETE" for x in results
+            ) else "CAPTURE_INCOMPLETE_RETRYABLE"),
             "tool_version": TOOL_VERSION,
             "plan_ref": PLAN_REL,
             "resolution": "M5",
