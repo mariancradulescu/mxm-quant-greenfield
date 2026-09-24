@@ -1,73 +1,46 @@
 {
-  "basis_next_state_sha256": "e464564fbc8ddc4eb1acfce9dab56ba1041874ce647cfce85d30a5636cfea5d0",
-  "changed_paths": [],
-  "created_utc": "2026-09-24T15:22:53Z",
-  "exact_head": {
-    "green": false,
-    "head": "d834674e450434c77f2d20a4f571a2af34a1f326",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "52cd30c78ecd29c3bc0c39e3178b8be0f8a65289",
-    "predecessor_run_id": 36019141371
-  },
+  "basis_next_state_sha256": "54580a9746bba94d995bcfd0ffca70ecc283d4ef9dd26cc45e86411f525af1fd",
+  "changed_paths": [
+    "research_v3/cross_market_lead_lag_screen.py",
+    "tests/test_cross_market_lead_lag_screen.py"
+  ],
+  "created_utc": "2026-09-24T15:27:49Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "account_mutation": "NOT_AUTHORIZED",
-      "collector_build_ref": "tools/build_crossalign_four_symbol_capture_package.py",
-      "collector_plan_ref": "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
-      "data_integrity": {
-        "duplicate_timestamps": 0,
-        "ohlc_failures": 0,
-        "out_of_interval_rows": 0,
-        "protected_forward_rows": 0,
-        "retryable_errors": 0,
-        "status": "ACCEPTED_COMPLETE_NON_ECONOMIC_DEVELOPMENT_CAPTURE"
-      },
+      "changed_paths": [
+        "research_v3/cross_market_lead_lag_screen.py",
+        "tests/test_cross_market_lead_lag_screen.py"
+      ],
       "economic_outcomes_opened": 0,
-      "four_way_common_timestamps": 9539,
-      "implementation_assessment": "SUFFICIENT_BY_INSPECTION",
-      "interval": {
-        "end_utc": "2026-09-13T23:59:59Z",
-        "start_utc": "2026-07-20T00:00:00Z"
-      },
+      "expected_common_timestamps": 9539,
+      "expected_strict_pairs": 9455,
+      "implementation_assessment": "IMPLEMENTATION_ADDED",
       "mechanism_family": "CROSS_MARKET_LEAD_LAG",
       "outer_authorization": "NONE",
-      "pairwise_common_timestamp_counts": {
-        "AUDJPY|AUS200": 9831,
-        "AUDJPY|BCHUSD": 11474,
-        "AUDJPY|Brent-F": 10002,
-        "AUS200|BCHUSD": 9831,
-        "AUS200|Brent-F": 9539,
-        "Brent-F|BCHUSD": 10002
-      },
-      "panel": [
+      "plan_ref": "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
+      "protected_forward_opened": false,
+      "resolution": "M5",
+      "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+      "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
+      "symbols": [
         "AUDJPY",
         "AUS200",
         "Brent-F",
         "BCHUSD"
       ],
-      "prerequisite_gate_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_PREREQUISITE_GATE_V1.json",
-      "protected_evidence_opened": false,
-      "research_scope": "NON_ECONOMIC_STRUCTURAL_PREREQUISITE",
-      "resolution": "M5",
-      "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-      "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
-      "strict_one_bar_consecutive_common_pairs": 9455,
-      "structural_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "crossmarket-onebar-screen-existing-v1",
+    "implementation_id": "crossmarket-onebar-screen-v2",
     "next_research_state": {
-      "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
-      "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
-      "next_action": "AI_INTERPRET_THE_COMPLETED_CROSS_MARKET_PREREQUISITE_SCREEN_AND_SELECT_THE_HIGHEST_INFORMATION_LEGAL_NON_ECONOMIC_NEXT_DECISION",
-      "outer_authorization": "NONE",
-      "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_COMPLETE_NON_ECONOMIC_SCREEN"
+      "next_action": "Run exact-head CI for the new non-economic cross-market evaluator, then materialize the screen against the accepted hash-bound Library ZIP and return a fresh evidence-based decision before any outer or economic identity.",
+      "status": "PENDING_EXACT_HEAD_GREEN"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The accepted four-symbol broker-native M5 capture, exact-scope collector, read-only plan, prerequisite diagnostics, and one-bar structural gate are already implemented and hash-bound. The accepted capture contains 9,539 common timestamps and 9,455 strictly consecutive four-way M5 pairs; no new data, code rewrite, economic identity, outcome, outer, or protected evidence is required.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a deterministic non-economic cross-market one-bar lead-lag evaluator bound to the accepted four-symbol M5 capture hash, exact interval, symbols, resolution, and alignment counts. It reports ordered-pair direction contingencies, contiguous segments, descriptive Wilson intervals, and preserves all economic/protected-forward safety boundaries. The accepted Library ZIP is not unavailable; no new capture gate was created.",
     "tests_requested": [
+      "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
       "tests/test_general_ai_implementation_executor.py"
     ]
@@ -88,5 +61,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
