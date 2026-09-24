@@ -127,20 +127,25 @@ class C031StructuralExtensionCaptureRunner:
                 self.progress(f"[RESUME] {name} M5 {m.get('row_count',0):,} rows"); return done,m
         part=done.with_suffix(".part"); part.unlink(missing_ok=True)
         interval=self.plan["interval"]; windows=_windows(interval["start_utc"],interval["end_utc"],self.plan["capture_law"]["window_days"])
+        all_rows={}
         for wi,(frm,to) in enumerate(windows):
             page_to=to; window_rows={}
             while page_to>=frm:
                 q=ProtoOAGetTrendbarsReq(ctidTraderAccountId=aid,symbolId=sid,period=ProtoOATrendbarPeriod.Value("M5"),fromTimestamp=frm,toTimestamp=page_to,count=5000)
                 response=self._send(q,historical=True); bars=[_plain(x) for x in response.trendbar]
                 for row in normalize_m5(bars,digits=digits,start_utc=interval["start_utc"],end_utc=interval["end_utc"],protected_utc=self.plan["protected_forward_start"]):
-                    window_rows[row["time_utc"]]=row
+                    key=row["time_utc"]
+                    if key in all_rows and all_rows[key] != row:
+                        raise CaptureContractError(f"{name}: conflicting duplicate M5 row at {key}")
+                    window_rows[key]=row
                 if not bool(getattr(response,"hasMore",False)): break
                 if not bars: raise CaptureContractError(f"{name}: hasMore without trendbars")
                 nxt=min(int(x.get("utcTimestampInMinutes"))*60000 for x in bars)-1
                 if nxt>=page_to or nxt<frm: raise CaptureContractError(f"{name}: invalid M5 pagination")
                 page_to=nxt
-            _write_rows(part,[window_rows[k] for k in sorted(window_rows)],"w" if wi==0 else "a")
-            self.progress(f"[DATA] {name} windows {wi+1}/{len(windows)}")
+            all_rows.update(window_rows)
+            self.progress(f"[DATA] {name} windows {wi+1}/{len(windows)} unique_rows={len(all_rows):,}")
+        _write_rows(part,[all_rows[k] for k in sorted(all_rows)],"w")
         part.replace(done); stats=_inspect_csv(done)
         m={"broker_symbol":name,"symbol_id":sid,"digits":digits,"resolution":"M5","requested_interval":interval,
            "protected_forward_start":self.plan["protected_forward_start"],"classification":"DEVELOPMENT_ONLY",

@@ -1,0 +1,84 @@
+{
+  "schema": "mxm.greenfield.c031-structural-extension-wave01-capture-acceptance.v1",
+  "status": "ACCEPTED_AFTER_DETERMINISTIC_EXACT_DUPLICATE_CANONICALIZATION",
+  "source_ai_proposal_id": "P-20260924-C031-GAP-WAVE-01",
+  "source_capture": {
+    "filename": "MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE.zip",
+    "sha256": "e472673a6ec206a2bf0892949787841e71f16c45eb29e65fbfc2a0e0b88c18eb",
+    "size_bytes": 1876705,
+    "library_path": "/MXM_QUANT_DIRECTOR/C031_STRUCTURAL_EXTENSION_WAVE_01/MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE.zip",
+    "library_file_id": "libfile_c9e2f2f78f8c8191ae87b903a47b81ae",
+    "manifest_status": "M5_MINIMAL_STRUCTURAL_EXTENSION_CAPTURE_COMPLETE",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "source_broker_universe_zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+    "plan_sha256": "86cd4df00754f6a9a2032591fdfadd6bc5a16b7a25383cb206d2be77ee948aa0",
+    "internal_checksum_verification": "PASS",
+    "zip_crc": "PASS"
+  },
+  "validity_dimensions": {
+    "data_validity": "PASS_AFTER_LOSSLESS_CANONICALIZATION",
+    "implementation_validity": "CAPTURE_WINDOW_OVERLAP_DUPLICATION_BUG_FOUND_AND_FIXED_PROSPECTIVELY",
+    "economic_validity": "NOT_APPLICABLE_NO_ECONOMICS_OPENED",
+    "persistence_validity": "PASS_ORIGINAL_AND_CANONICAL_BYTES_DURABLE_IN_LIBRARY"
+  },
+  "duplicate_diagnosis": {
+    "cause": "Collector appended independently paginated 14-day window results even when broker responses overlapped adjacent request windows.",
+    "conflicting_duplicate_timestamp_groups": 0,
+    "repair_law": "For each symbol and time_utc, duplicate OHLCV rows must be byte-equivalent; keep one copy and sort by time_utc. Any conflicting duplicate would fail closed.",
+    "raw_data_discarded": false,
+    "recapture_required": false
+  },
+  "canonical_capture": {
+    "filename": "MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE_CANONICAL_V1.zip",
+    "sha256": "83df470fb760ec15ae05e5843686e8e4a4dcde84badcd0d4d27740042964afb0",
+    "size_bytes": 1188466,
+    "library_path": "/MXM_QUANT_DIRECTOR/C031_STRUCTURAL_EXTENSION_WAVE_01/MXM_C031_STRUCTURAL_EXTENSION_WAVE_01_M5_8W_CAPTURE_CANONICAL_V1.zip",
+    "library_file_id": "libfile_0d86f104ff2081918122655e763c019c",
+    "symbol_count": 12,
+    "active_weeks_each": 8,
+    "rows_after_canonicalization": {
+      "USTN2YR-F": 8498,
+      "TLT.US": 3022,
+      "NVDA.US-24": 10936,
+      "VIX": 7658,
+      "HSTECH": 10771,
+      "ADAUSD": 16034,
+      "Gasoline": 10993,
+      "EURUSD": 11512,
+      "USDCAD": 11505,
+      "MXNJPY": 11486,
+      "IWM.US": 3036,
+      "DOTUSD": 15750
+    },
+    "duplicate_rows_removed": {
+      "USTN2YR-F": 8029,
+      "TLT.US": 4644,
+      "NVDA.US-24": 6870,
+      "VIX": 8178,
+      "HSTECH": 6975,
+      "ADAUSD": 2983,
+      "Gasoline": 6759,
+      "EURUSD": 6365,
+      "USDCAD": 6372,
+      "MXNJPY": 6388,
+      "IWM.US": 4671,
+      "DOTUSD": 3193
+    }
+  },
+  "scope_law": {
+    "this_12_symbol_wave_is_not_the_global_broker_universe": true,
+    "broker_native_universe_remains_open": true,
+    "mechanism_family_closed": false,
+    "exact_C031_rerun": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "v2_search_budget_remaining": 65
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
