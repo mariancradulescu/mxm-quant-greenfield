@@ -52,6 +52,7 @@ BASE_AUTHORITIES=(
     "research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json",
     "data/BROKER_NATIVE_COMPETITION_STRUCTURAL_MAP_SUMMARY_V2.json",
     "data/BROKER_NATIVE_COMPETITION_UNIVERSE_ACCEPTANCE_V2.json",
+    "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
     "data/C031_STRUCTURAL_EXTENSION_WAVE_01_M5_CAPTURE_PLAN_V1.json",
     "evidence/C031_STRUCTURAL_EXTENSION_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
     "evidence/SESSION_GAP_STRUCTURAL_EXTENSION_WAVE_01_REPORT_V1.json",
@@ -203,6 +204,7 @@ Important boundaries:
 - The completed independent outer is observed evidence, not an unopened confirmation set; never re-open or rerun its exact outcome. If new authenticated broker-native data are unavoidable, define the smallest read-only capture and stop at that external gate.
 - The accepted C031 twelve-symbol M5 extension for 2026-07-20 through 2026-09-13 and its structural report already exist. The previous AI proposal asking for those same bytes was superseded. Reuse its accepted, hash-bound evidence without another collector or screen; do not ask the user to upload it again.
 - An independent account-native minimum-volume audit found BTCUSD, US30, and XAGUSD infeasible in both directions at initial EUR200 in the later pre-capture proposal. That exact proposal was superseded before capture. Do not treat these as initially tradable EUR200 opportunities. You may consider later higher-equity feasibility only with explicit prospective rationale; independently choose the revised direction from the full evidence and verify any claimed broker feasibility.
+- Before proposing any new capture symbols, use the accepted account-native feasibility index to verify exact symbol names, product identity, TEST exclusion and EUR200 directional feasibility. A symbol infeasible at initial EUR200 requires an explicitly declared future_equity_only_scope with symbols, prospective_rationale and initial_eur200_tradable false; do not imply it is currently executable. Do not invent a broker symbol spelling.
 - Evaluate the broader feasible broker-native universe without treating a narrow six-symbol result as a family-level closure, and do not predetermine mechanism family, panel size or screening procedure.
 - Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
 - If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
