@@ -79,21 +79,14 @@ def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
 
 def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
     prior=dict(load_json(root/PROVIDER_RECOVERY_REL,{}) or {})
+    if os.environ.get("MXM_COPILOT_QUOTA_RESET_CONFIRMED") == "1":
+        return None
     legacy_quota=(prior.get("status") == "PROVIDER_RETRY_REQUIRED"
-                  and "monthly quota" in str(prior.get("detail","")).lower()
-                  and prior.get("request_fingerprint") is None)
-    if legacy_quota:
-        if (prior.get("phase") == phase
-                and prior.get("current_evidence_epoch") == state.get("current_research_evidence_epoch")
-                and prior.get("pending_next_action") == state.get("next_action")
-                and prior.get("pending_status") == state.get("status")):
-            return prior
-        return None
-    if prior.get("status") != "PROVIDER_UNAVAILABLE" or prior.get("failure_class") != "MONTHLY_QUOTA_EXHAUSTED":
-        return None
-    if prior.get("request_fingerprint") != _request_fingerprint(root,state,phase):
-        return None
-    return prior
+                  and "monthly quota" in str(prior.get("detail","")).lower())
+    current_quota=(prior.get("status") == "PROVIDER_UNAVAILABLE"
+                   and prior.get("failure_class") == "MONTHLY_QUOTA_EXHAUSTED")
+    # Monthly account quota applies across phases and fingerprints until a real reset is confirmed.
+    return prior if legacy_quota or current_quota else None
 
 def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_checkpoint: bool, git_push: bool) -> dict:
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
