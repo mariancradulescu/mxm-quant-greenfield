@@ -1,0 +1,32 @@
+{
+  "schema": "mxm.greenfield.epoch4-adaptive-breadth-triage-liveness-recovery.v1",
+  "status": "RECOVERED_NON_ECONOMIC",
+  "failed_liveness_run_id": 35997976163,
+  "original_checkpoint_head": "bce4f976e720a0bb49a449937477462a1c53a493",
+  "triage_materialization_head": "ef6f6f47b03e2a55680c9e6c4d65ab845e19b173",
+  "root_causes": [
+    {
+      "class": "RUNTIME_LIVENESS_NO_DURABLE_PROGRESS",
+      "detail": "The implementation executor reused the already-green adaptive breadth triage implementation but repeated the same executable next_action without producing a durable triage result, triggering its fail-closed no-progress invariant."
+    },
+    {
+      "class": "POST_MATERIALIZATION_STATE_BINDING_MISMATCH",
+      "detail": "After deterministic triage materialization, state carried TRIAGE-03 proposal_id but a non-registry proposal SHA and the TRIAGE-02 runtime operation id, so _resolve_current_proposal correctly found zero exact accepted matches in full-suite CI."
+    }
+  ],
+  "recovery": {
+    "triage_result_ref": "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
+    "evidence_epoch_after_materialization": 5,
+    "accepted_proposal_id": "P-20260924-ADAPTIVE-BREADTH-TRIAGE-03",
+    "accepted_proposal_hash": "cd90596142bc486245d309530ec557ac3d2aec1754d48414d4610e8f1283e707",
+    "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
+    "research_restarted": false,
+    "market_data_recaptured": false,
+    "four_panel_outer_rerun": false,
+    "economic_outcomes_opened_delta": 0,
+    "v2_attempts_consumed_delta": 0,
+    "attempts_refunded": 0,
+    "protected_forward_opened": false,
+    "valid_evidence_discarded": false
+  }
+}
