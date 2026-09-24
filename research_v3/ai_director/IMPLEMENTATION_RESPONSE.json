@@ -1,78 +1,65 @@
 {
-  "accounting": {
+  "basis_next_state_sha256": "ff85dd9fddcde111754e9fffafd196f0d5b42f01ef3a51bafb1b64d6a4d7c985",
+  "changed_paths": [
+    "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json"
+  ],
+  "created_utc": "2026-09-24T11:47:37Z",
+  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+  "implementation_output": {
+    "decision": {
+      "action": "REQUIRE_AUTHENTICATED_READ_ONLY_OUTER_CAPTURE",
+      "collector_status": "EXACT_SCOPE_IMPLEMENTED_AND_PLAN_BOUND",
+      "economic_outcomes_opened": 0,
+      "economic_status": "NON_ECONOMIC_CAPTURE_ONLY",
+      "interval": {
+        "end_utc": "2026-06-14T23:59:59Z",
+        "start_utc": "2026-03-16T00:00:00Z"
+      },
+      "protected_forward_opened": false,
+      "resolution": "M5",
+      "symbols": [
+        "ZARJPY",
+        "US400",
+        "XPDUSD",
+        "NETH25"
+      ],
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": {
+      "collector_build_ref": "tools/build_session_gap_frontier_four_panel_outer_capture_package.py",
+      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip",
+      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
+      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_M5_13W_FRICTION_V1.zip",
+      "reason": "Authenticated Pepperstone account-native M5 trendbars plus exact historical bid/ask tick friction evidence for the frozen disjoint four-symbol outer are not available as accepted capture bytes in the repository."
+    },
+    "implementation_id": "session-gap-frontier-four-panel-independent-outer-capture-v1",
+    "next_research_state": {
+      "next_action": "RUN_THE_EXACT_FROZEN_FOUR_SYMBOL_M5_OUTER_CAPTURE_AND_RETURN_THE_READ_ONLY_ZIP_FOR_NON_ECONOMIC_VALIDATION",
+      "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
+      "user_action_required": true
+    },
+    "status": "EXTERNAL_DATA_REQUIRED",
+    "summary": "The exact-scope read-only collector and launcher already implement the frozen four-symbol M5 outer capture with historical bid/ask tick friction evidence. Corrected the stale external gate that referenced the superseded C031 collector; no economic or protected state was changed.",
+    "tests_requested": [
+      "tests/test_session_gap_frontier_four_panel_outer_capture.py",
+      "tests/test_general_ai_implementation_executor.py"
+    ]
+  },
+  "project_snapshot": {
+    "discovery_ledger_sha256": "e7c6fc2ff65e4e422cb00e482aa9aaf7eb5ce6282586a89fb16e016776a4773d",
     "economic_outcomes_opened": 27,
     "v2_attempts_used": 19,
     "v2_search_budget_remaining": 65
   },
-  "basis_head": "57d99580e2a8047bdac09460a6a71d4b86390606",
-  "decision": "ACCEPT_COMPLETE_40_SYMBOL_DEVELOPMENT_CAPTURE_AND_FREEZE_FOUR_PANEL_DISJOINT_OUTER_WITH_FRICTION",
-  "economic_effect": {
-    "economic_outcomes_opened": 0,
-    "economics_rerun": false,
-    "new_v2_identity": false,
-    "v2_attempts_consumed": 0
-  },
-  "external_data_gate": {
-    "package_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1",
-    "expected_output_filename": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_M5_13W_FRICTION_V1.zip",
-    "required_after_exact_head_green": false,
-    "reason": "Independent pre-development M5 evidence and candidate-independent historical friction for the four development-selected symbols do not yet exist in accepted bytes.",
-    "user_only_action": "Run the certified read-only four-panel outer package and upload the returned ZIP to the Director chat. Do not modify GitHub.",
-    "package_artifact_id": 10803768317,
-    "source_green_run_id": 35990872691,
-    "package_inner_sha256": "04a67c4dd8ddf09d8145cf9cc69d39846f1e21949927e6070d249ed14ef97ce8"
-  },
-  "implemented_utc": "2026-09-24T10:55:00Z",
-  "material_changes": [
-    "Accept corrected 13-week DEVELOPMENT capture: 40/40 complete, 392,181 valid M5 rows, 189,722 prior valid rows reused, zero protected rows.",
-    "Run the unchanged C031 structural semantics non-economically across all 40; aggregate positive reversion is approximately 49.9%, so do not force a broad 40-symbol economic identity.",
-    "Freeze ZARJPY, US400, XPDUSD and NETH25 as the four strongest development-selected structural members; DEVELOPMENT p-values are selection-only and not confirmatory.",
-    "Freeze a strictly disjoint 13-week pre-development outer from 2026-03-16 through 2026-06-14 with four-symbol Holm-Bonferroni confirmation and historical friction captured before interpretation.",
-    "Do not open economics or consume a V2 attempt."
-  ],
-  "refs": {
-    "adaptive_frontier": "data/BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1.json",
-    "adaptive_frontier_sha256": "c634d6ffdbe674ac2a633c90b7bda53b235f626adeb4272b737223008c99bfd0",
-    "historical_validity_audit": "evidence/RETROSPECTIVE_HISTORICAL_RESEARCH_VALIDITY_AUDIT_V1.json",
-    "panel_audit": "evidence/BROKER_NATIVE_PANEL_SCREEN_AUDIT_V1.json",
-    "probe_capture": "research_v3/broker_native_frontier_probe_capture.py",
-    "probe_launcher": "research_v3/pydroid_broker_native_frontier_probe_launcher.py",
-    "probe_plan": "data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json",
-    "probe_plan_sha256": "27e0d931d0f89e314857c1e77521d7118e66f834e9680c951c2cf8a452196fe8",
-    "schedule_review": "evidence/SESSION_GAP_SCHEDULE_COVERAGE_DEPENDENCY_REVIEW_V1.json",
-    "accepted_probe": "data/BROKER_NATIVE_FRONTIER_M5_PROBE_ACCEPTANCE_V1.json",
-    "topology_report": "evidence/BROKER_NATIVE_FRONTIER_M5_TOPOLOGY_REPORT_V1.json",
-    "development_capture_plan": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
-    "development_capture_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
-    "development_capture": "research_v3/broker_native_frontier_development_capture.py",
-    "development_launcher": "research_v3/pydroid_broker_native_frontier_development_launcher.py",
-    "development_capture_acceptance": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-    "development_structural_screen": "evidence/BROKER_NATIVE_FRONTIER_13W_SESSION_GAP_STRUCTURAL_SCREEN_V1.json",
-    "four_panel_freeze": "research_v3/SESSION_GAP_FRONTIER_FOUR_PANEL_FREEZE_V1.json",
-    "four_panel_outer_plan": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
-    "four_panel_outer_plan_sha256": "1cddfd3e8a21a992bd3ab756ecf191c0c3e83487a35b266e714388252476ee3f",
-    "four_panel_outer_capture": "research_v3/session_gap_frontier_four_panel_outer_capture.py",
-    "four_panel_outer_launcher": "research_v3/pydroid_session_gap_frontier_four_panel_outer_launcher.py"
-  },
-  "safety": {
-    "competition_start_authorized": false,
-    "live_orders_authorized": false,
-    "protected_forward_opened": false
+  "provider": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Explicit gpt-5.3-codex and gpt-5.4 were rejected as unavailable by this Copilot connection; Auto is the proven available route, and silent mode does not expose the selected identity.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "FRONTIER_13W_CAPTURE_ACCEPTED_FOUR_PANEL_OUTER_READY",
-  "runtime_repair": {
-    "observed_failure": "selected symbol not current new-entry tradable: SHEIN.HK-PERP",
-    "root_cause": "Runtime V1 conflated current new-entry trading permission with historical M5 read availability.",
-    "correction": "Preserve exact frozen 41-symbol plan; current trading mode is metadata only; exact symbol ID/name conflicts remain fail-closed; missing current mapping and per-symbol historical capture failures are preserved without discarding successful series.",
-    "economics_rerun": false,
-    "v2_attempts_consumed": 0,
-    "market_data_captured_by_failed_run": false
-  },
-  "exact_head_green_authority": {
-    "validated_implementation_head": "c6d0a8ad24efe9bc680e89a7b59637a0cfa1c904",
-    "workflow": "m6-preparation",
-    "run_id": 35990872691,
-    "conclusion": "success"
-  }
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
