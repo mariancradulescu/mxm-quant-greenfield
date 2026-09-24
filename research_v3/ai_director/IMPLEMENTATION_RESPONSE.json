@@ -1,10 +1,10 @@
 {
   "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
   "changed_paths": [],
-  "created_utc": "2026-09-24T17:41:03Z",
+  "created_utc": "2026-09-24T17:41:35Z",
   "exact_head": {
     "green": false,
-    "head": "6088eb96da586f02cd1a75bcbe03d1fa33107e01",
+    "head": "cb67dc325d6ff5a11eb8ccb44a07dbee67953899",
     "predecessor_conclusion": "success",
     "predecessor_head": "f3059aa3ec3a964b3c8b245726bf41e20b225d91",
     "predecessor_run_id": 36035669331
@@ -14,7 +14,6 @@
     "decision": {
       "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
       "economic_outcomes_opened": 0,
-      "exact_head_green": false,
       "expected_common_timestamps": 9558,
       "expected_consecutive_pairs": 9470,
       "interval": {
@@ -45,7 +44,7 @@
       "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The accepted non-economic implementation is already sufficient. It validates the hash-bound AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 capture, enforces single-price OHLC semantics, excludes gaps and synthetic or forward-filled rows, evaluates all twelve ordered pairs, and preserves zero economic outcomes and zero V2-attempt consumption. No external data or code changes are required. Exact-head authority is not green, so execution remains gated.",
+    "summary": "The accepted non-economic implementation is sufficient by inspection. It binds the exact Library-backed AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 capture, validates single-price OHLC data and integrity constraints, evaluates all twelve ordered pairs using strictly consecutive timestamps, and preserves zero economic outcomes and zero V2-attempt consumption. No code, manifest, collector, or external-data changes are required. Exact-head authority is not currently green, so execution remains gated.",
     "tests_requested": [
       "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
