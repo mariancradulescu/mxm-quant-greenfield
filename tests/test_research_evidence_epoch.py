@@ -70,6 +70,15 @@ class ResearchEvidenceEpochTests(unittest.TestCase):
         self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],27)
         self.assertGreater(len(req["current_open_mechanism_families"]),1)
 
+    def test_provisional_four_panel_reauthorization_cannot_claim_nonexistent_capture(self):
+        p=json.loads((ROOT/"research_v3/ai_director/proposals/AUTO_reason_707e1b9a5ef7cfe9e016dcca6cbd070f.json").read_text())
+        current=current_evidence_binding(ROOT)
+        p["evidence_binding"]["evidence_epoch_seen"]=current["evidence_epoch"]
+        p["evidence_binding"]["evidence_bundle_sha256"]=current["evidence_bundle_sha256"]
+        p["evidence_binding"]["authoritative_evidence_refs_and_hashes"]=current["authoritative_evidence_refs_and_hashes"]
+        with self.assertRaisesRegex(AIProposalRejected,"four-panel reauthorization"):
+            validate_proposal(ROOT,p)
+
     def test_epoch_advance_classes_cover_required_material_events(self):
         expected={
           "AUTHENTICATED_MARKET_DATA_ACCEPTED","MATERIAL_DEVELOPMENT_STRUCTURAL_EVIDENCE_ACCEPTED",

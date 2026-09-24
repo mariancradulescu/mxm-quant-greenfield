@@ -423,6 +423,57 @@ def _validate_authoritative_data_contract(root: Path, proposal: Mapping[str, Any
                 raise AIProposalRejected("new data request overlaps outer-forbidden source capture")
 
 
+def _validate_provisional_four_panel_reauthorization(root: Path, proposal: Mapping[str, Any]) -> None:
+    state=load_json(root / NEXT_STATE_REL,{}) or {}
+    provisional=state.get("provisional_four_panel_outer")
+    if not isinstance(provisional,Mapping):
+        return
+    freeze_ref=str(provisional.get("freeze_ref") or "")
+    plan_ref=str(provisional.get("capture_plan_ref") or "")
+    refs=set(str(x) for x in (proposal.get("authority_refs") or []))
+    binding_refs=set()
+    for row in proposal.get("data_bindings") or []:
+        if isinstance(row,Mapping):
+            for key in ("ref","source_ref","artifact_ref"):
+                if row.get(key):
+                    binding_refs.add(str(row.get(key)))
+    action=str((proposal.get("decision") or {}).get("action") or "").upper()
+    reauthorizes=("FOUR_PANEL" in action) or freeze_ref in refs or plan_ref in refs or freeze_ref in binding_refs or plan_ref in binding_refs
+    if not reauthorizes:
+        return
+    if not plan_ref or not (root/plan_ref).is_file():
+        raise AIProposalRejected("preserved four-panel reauthorization lacks frozen plan")
+    plan=_load(root,plan_ref)
+    expected_symbols=[str(x["broker_symbol"]) for x in plan.get("symbols") or []]
+    expected_interval=plan.get("outer_interval") or {}
+    decision=proposal.get("decision") or {}
+    if decision.get("resolution") is not None and decision.get("resolution")!=plan.get("resolution"):
+        raise AIProposalRejected("four-panel reauthorization resolution drifts from frozen plan")
+    if decision.get("outer_interval") is not None and decision.get("outer_interval")!=expected_interval:
+        raise AIProposalRejected("four-panel reauthorization outer interval drifts from frozen plan")
+    panel=decision.get("panel") or decision.get("symbols")
+    if panel is not None:
+        observed=[]
+        for row in panel:
+            observed.append(str(row.get("broker_symbol")) if isinstance(row,Mapping) else str(row))
+        if observed!=expected_symbols:
+            raise AIProposalRejected("four-panel reauthorization panel drifts from frozen plan")
+    accepted_capture_ref=str(provisional.get("accepted_capture_ref") or "")
+    accepted_capture_exists=bool(accepted_capture_ref and (root/accepted_capture_ref).is_file())
+    if decision.get("reuse_existing_hash_bound_capture") is True and not accepted_capture_exists:
+        raise AIProposalRejected("four-panel reauthorization falsely claims accepted outer capture bytes exist")
+    policy=proposal.get("data_policy") or {}
+    if not accepted_capture_exists:
+        if policy.get("new_market_data_requested") is not True:
+            raise AIProposalRejected("four-panel reauthorization requires authenticated read-only outer capture")
+        req=policy.get("minimal_acquisition_request") or {}
+        if req.get("symbols")!=expected_symbols or req.get("resolution")!=plan.get("resolution"):
+            raise AIProposalRejected("four-panel acquisition request drifts from frozen symbols/resolution")
+        if req.get("start_utc")!=expected_interval.get("start_utc") or req.get("end_utc")!=expected_interval.get("end_utc"):
+            raise AIProposalRejected("four-panel acquisition request drifts from frozen outer interval")
+        if not isinstance(req.get("fields"),list) or not req.get("fields"):
+            raise AIProposalRejected("four-panel acquisition request requires explicit fields")
+
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)
     binding=proposal.get("evidence_binding") or {}
@@ -436,6 +487,7 @@ def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]
     if binding.get("authoritative_evidence_refs_and_hashes")!=current_evidence["authoritative_evidence_refs_and_hashes"]:
         raise AIProposalRejected("proposal authoritative evidence binding drift")
     _validate_authoritative_data_contract(root, proposal)
+    _validate_provisional_four_panel_reauthorization(root, proposal)
     _reject_completed_outer_as_unseen(root, proposal)
     _reject_duplicate_accepted_capture(root, proposal)
     _validate_broker_native_selection(root, proposal)

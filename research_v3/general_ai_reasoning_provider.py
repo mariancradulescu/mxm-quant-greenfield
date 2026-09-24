@@ -261,6 +261,8 @@ Important boundaries:
 - Explicitly assess whether additional prospective exploration inside the broader eligible broker-native universe has positive expected information gain before narrowing to a mechanism-specific outer.
 - A provisional four-panel SESSION_GAP outer may be reauthorized or superseded; do not treat its existence as authorization.
 - Never let an older proposal silently inherit authority across a newer research evidence epoch.
+- A certified collector PACKAGE is not accepted market-data evidence. If a provisional outer has a collector package but no accepted returned capture, do not claim the outer bytes already exist.
+- If you reauthorize a preserved provisional outer, bind the exact frozen plan symbols/resolution/interval, set new_market_data_requested=true, and request the authenticated read-only capture. Reuse the already-built exact-scope collector rather than inventing a new scope or pretending capture bytes are available.
 - If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
 - Treat every supplied prospective freeze/data plan as authoritative. If it fixes panel membership, resolution, or an unopened outer-data scope, do not substitute symbols or dates unless a separate durable prospective supersession authority is explicitly supplied in context.
 - Source/development bytes that were used to select a panel may not be reused as independent outer evidence when an authoritative freeze requires disjoint unopened data.
