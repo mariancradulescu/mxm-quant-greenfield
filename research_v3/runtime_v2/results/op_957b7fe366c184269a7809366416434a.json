@@ -1,0 +1,93 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "5e34bda7262e62aa5d821d757b158cc2cc1406fc1a3b7bbfe7a8a6332ddc0dc7",
+  "competition_start_authorized": false,
+  "decision": {
+    "accounting_and_safety": {
+      "account_mutation": false,
+      "orders_placed": false,
+      "protected_forward_opened": false
+    },
+    "action": "AUTHORIZE_MINIMAL_READ_ONLY_ALIGNMENT_CAPTURE",
+    "economic_outcomes_to_open": 0,
+    "panel": [
+      {
+        "directional_feasibility": "BOTH_FEASIBLE",
+        "initial_eur200_tradable": true,
+        "symbol": "AUDJPY",
+        "symbol_id": 11
+      },
+      {
+        "directional_feasibility": "BOTH_FEASIBLE",
+        "initial_eur200_tradable": true,
+        "symbol": "AUS200",
+        "symbol_id": 117
+      },
+      {
+        "directional_feasibility": "BOTH_FEASIBLE",
+        "initial_eur200_tradable": true,
+        "symbol": "Brent-F",
+        "symbol_id": 2923
+      },
+      {
+        "directional_feasibility": "BOTH_FEASIBLE",
+        "initial_eur200_tradable": true,
+        "symbol": "BCHUSD",
+        "symbol_id": 326
+      }
+    ],
+    "selection_semantics": {
+      "basis": "Verified account-native exact identities, both-direction EUR200 feasibility, distinct asset/product exposure, and prospective schedule compatibility.",
+      "exclusions": "Exclude all previously observed identity scopes, TEST products, infeasible products, protected-forward rows, and any symbol lacking exact account-native identity.",
+      "forbidden_outputs": [
+        "returns or PnL",
+        "economic ranking",
+        "promotion",
+        "confirmatory outer authorization",
+        "family exhaustion claim"
+      ],
+      "outer_rule": "Only after this gate, and only with a fresh prospective freeze, may a mechanism-specific outer be considered.",
+      "required_outputs": [
+        "per-series chronology and cadence diagnostics",
+        "intersection and schedule-adjusted timestamp coverage",
+        "aligned-bar availability matrix",
+        "missingness and session-overlap diagnostics",
+        "prerequisite classification for CROSS_MARKET_LEAD_LAG, CROSS_SECTIONAL_RANKING, and RELATIVE_VALUE_COINTEGRATION"
+      ],
+      "screen_only": true
+    },
+    "v2_attempts_to_consume": 0
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 6,
+    "broader_universe_remains_open": true,
+    "current_development_evidence_sufficient_for_cross_symbol_families": false,
+    "current_development_evidence_sufficient_for_univariate_families": true,
+    "mechanism_families_under_test": [
+      "CROSS_MARKET_LEAD_LAG",
+      "CROSS_SECTIONAL_RANKING",
+      "RELATIVE_VALUE_COINTEGRATION"
+    ],
+    "next_action": "Capture the exact four-symbol M5 scope through the authorized Pepperstone account cTrader Open API, validate hashes and chronology, then run the non-economic alignment prerequisite gate.",
+    "research_judgment_required": false,
+    "research_scope": "Four-symbol cross-structure alignment diagnostic",
+    "status": "WAITING_FOR_MINIMAL_AUTHENTICATED_ALIGNMENT_CAPTURE"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Establish whether a small, broker-native, schedule-compatible panel supports aligned cross-market, cross-sectional, or relative-value prerequisite research before any mechanism-specific outer or economic identity.",
+    "information_gain_rationale": "The accepted 40-series development capture is sufficient for univariate prerequisites but fails strict global timestamp alignment, leaving three structurally distinct open families under-tested. A minimal four-symbol authenticated extension from the broader feasible universe directly tests whether alignment is attainable without broad economics, parameter mining, or family closure."
+  },
+  "operation_id": "op_957b7fe366c184269a7809366416434a",
+  "proposal_hash": "714233174a31ab4072d8df379ab1e5baf3c0d8726f5a76405e0fb1bbaf66a898",
+  "proposal_id": "P-20260924-CROSSALIGN-WAVE-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_a65eb6e6a9ff2003a550f538a006e505.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
