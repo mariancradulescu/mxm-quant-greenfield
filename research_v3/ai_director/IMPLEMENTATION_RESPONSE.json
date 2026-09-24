@@ -1,79 +1,75 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "e4c20e292f618f0cb12307055dd34f117009a579",
+  "basis_next_state_sha256": "e464564fbc8ddc4eb1acfce9dab56ba1041874ce647cfce85d30a5636cfea5d0",
+  "changed_paths": [],
+  "created_utc": "2026-09-24T15:22:53Z",
+  "exact_head": {
+    "green": false,
+    "head": "d834674e450434c77f2d20a4f571a2af34a1f326",
     "predecessor_conclusion": "success",
-    "predecessor_head": "e4c20e292f618f0cb12307055dd34f117009a579",
-    "predecessor_run_id": 36018502807
+    "predecessor_head": "52cd30c78ecd29c3bc0c39e3178b8be0f8a65289",
+    "predecessor_run_id": 36019141371
   },
-  "accepted_output": {
-    "decision": {
-      "action": "MATERIALIZE_NON_ECONOMIC_BREAKOUT_EVENT_AVAILABILITY_GATE",
-      "broader_universe_remains_open": true,
-      "economic_outcomes_opened": 0,
-      "family_exhaustion_claimed": false,
-      "implementation_ref": "research_v3/adaptive_breadth_triage.py",
-      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
-      "protected_forward_opened": false,
-      "regression_test_ref": "tests/test_adaptive_breadth_triage.py::test_breakout_event_gate_is_causal_and_non_economic",
-      "source_capture": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-      "source_plan": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": null,
-    "implementation_id": "mxm-breakout-event-availability-gate-v1",
-    "next_research_state": {
-      "ai_reasoning_required": true,
-      "green_implementation_artifacts": [
-        "research_v3/adaptive_breadth_triage.py",
-        "tests/test_adaptive_breadth_triage.py"
-      ],
-      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a hash-bound, non-economic breakout/volatility-expansion availability gate for the accepted 40-symbol M5 development capture. The gate uses 12 consecutive prior M5 bars, detects rolling high/low breaks with current-range expansion, records causal event counts, spacing, clustering, missing-history exclusions, and chronology, and performs no returns, PnL, ranking, promotion, order, or economic identity work.",
-    "tests_requested": [
-      "python -m unittest tests.test_adaptive_breadth_triage",
-      "python -m unittest tests.test_general_ai_implementation_executor"
-    ]
-  },
-  "basis_next_state_sha256": "99e46570a0ce7a3bcd6da5008f083b94acacf91350f7a31500d02272d6dc5548",
-  "changed_paths": [
-    "research_v3/adaptive_breadth_triage.py",
-    "tests/test_adaptive_breadth_triage.py"
-  ],
-  "created_utc": "2026-09-24T15:11:35Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "MATERIALIZE_NON_ECONOMIC_BREAKOUT_EVENT_AVAILABILITY_GATE",
-      "broader_universe_remains_open": true,
+      "account_mutation": "NOT_AUTHORIZED",
+      "collector_build_ref": "tools/build_crossalign_four_symbol_capture_package.py",
+      "collector_plan_ref": "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json",
+      "data_integrity": {
+        "duplicate_timestamps": 0,
+        "ohlc_failures": 0,
+        "out_of_interval_rows": 0,
+        "protected_forward_rows": 0,
+        "retryable_errors": 0,
+        "status": "ACCEPTED_COMPLETE_NON_ECONOMIC_DEVELOPMENT_CAPTURE"
+      },
       "economic_outcomes_opened": 0,
-      "family_exhaustion_claimed": false,
-      "implementation_ref": "research_v3/adaptive_breadth_triage.py",
-      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
-      "protected_forward_opened": false,
-      "regression_test_ref": "tests/test_adaptive_breadth_triage.py::test_breakout_event_gate_is_causal_and_non_economic",
-      "source_capture": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-      "source_plan": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
+      "four_way_common_timestamps": 9539,
+      "implementation_assessment": "SUFFICIENT_BY_INSPECTION",
+      "interval": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "start_utc": "2026-07-20T00:00:00Z"
+      },
+      "mechanism_family": "CROSS_MARKET_LEAD_LAG",
+      "outer_authorization": "NONE",
+      "pairwise_common_timestamp_counts": {
+        "AUDJPY|AUS200": 9831,
+        "AUDJPY|BCHUSD": 11474,
+        "AUDJPY|Brent-F": 10002,
+        "AUS200|BCHUSD": 9831,
+        "AUS200|Brent-F": 9539,
+        "Brent-F|BCHUSD": 10002
+      },
+      "panel": [
+        "AUDJPY",
+        "AUS200",
+        "Brent-F",
+        "BCHUSD"
+      ],
+      "prerequisite_gate_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_PREREQUISITE_GATE_V1.json",
+      "protected_evidence_opened": false,
+      "research_scope": "NON_ECONOMIC_STRUCTURAL_PREREQUISITE",
+      "resolution": "M5",
+      "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+      "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
+      "strict_one_bar_consecutive_common_pairs": 9455,
+      "structural_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "mxm-breakout-event-availability-gate-v1",
+    "implementation_id": "crossmarket-onebar-screen-existing-v1",
     "next_research_state": {
-      "data_requirement": "NO_NEW_MARKET_DATA",
+      "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
       "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
-      "next_action": "VALIDATE_EXACT_HEAD_GREEN_THEN_EXECUTE_BREAKOUT_EVENT_AVAILABILITY_GATE_ON_ACCEPTED_40_SYMBOL_M5_CAPTURE",
+      "next_action": "AI_INTERPRET_THE_COMPLETED_CROSS_MARKET_PREREQUISITE_SCREEN_AND_SELECT_THE_HIGHEST_INFORMATION_LEGAL_NON_ECONOMIC_NEXT_DECISION",
       "outer_authorization": "NONE",
-      "research_judgment_required": false,
-      "status": "PENDING_EXACT_HEAD_GREEN"
+      "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_COMPLETE_NON_ECONOMIC_SCREEN"
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a hash-bound, non-economic breakout/volatility-expansion availability gate for the accepted 40-symbol M5 development capture. The gate uses 12 consecutive prior M5 bars, detects rolling high/low breaks with current-range expansion, records causal event counts, spacing, clustering, missing-history exclusions, and chronology, and performs no returns, PnL, ranking, promotion, order, or economic identity work.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The accepted four-symbol broker-native M5 capture, exact-scope collector, read-only plan, prerequisite diagnostics, and one-bar structural gate are already implemented and hash-bound. The accepted capture contains 9,539 common timestamps and 9,455 strictly consecutive four-way M5 pairs; no new data, code rewrite, economic identity, outcome, outer, or protected evidence is required.",
     "tests_requested": [
-      "python -m unittest tests.test_adaptive_breadth_triage",
-      "python -m unittest tests.test_general_ai_implementation_executor"
+      "tests/test_crossalign_four_symbol_capture.py",
+      "tests/test_general_ai_implementation_executor.py"
     ]
   },
   "project_snapshot": {
@@ -92,5 +88,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }
