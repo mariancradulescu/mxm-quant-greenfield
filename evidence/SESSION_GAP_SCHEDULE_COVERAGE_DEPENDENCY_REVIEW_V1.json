@@ -1,0 +1,33 @@
+{
+  "affected_derivative": "schedule_adjusted_coverage",
+  "classification": "RAW_DATA_VALID_REPROCESS_ONLY",
+  "corrected_semantics": "calendar_model_coverage",
+  "dependency_review": {
+    "capture_acceptance_gate_used_original_coverage": true,
+    "confirmatory_result_depends_on_original_coverage_value": false,
+    "economic_promotion_decision_depends_on_original_coverage_value": false,
+    "friction_overlay_depends_on_original_coverage_value": false,
+    "holm_result_depends_on_original_coverage_value": false,
+    "minimum_recomputed_calendar_model_coverage": 0.9940958164642375,
+    "original_threshold": 0.97,
+    "outer_evaluator_inputs": "hash-bound M5 OHLC timestamps/prices only",
+    "outer_evaluator_reads_schedule_adjusted_coverage": false,
+    "threshold_would_still_pass_under_same_calendar_model": true
+  },
+  "future_rule": "If a future decision materially requires historical broker schedule truth, obtain the minimum broker-native evidence actually exposed by cTrader or restrict the claim to observed timestamps; do not infer historical schedule truth from a current schedule snapshot.",
+  "materiality": {"economic_result_reopened":false,"historical_schedule_truth_claim_allowed":false,"material_conclusion_changed":false,"outer_result_reopened":false,"recapture_required":false,"source_acceptance_mutated":false},
+  "reason": "The original denominator uses a frozen assumed active-calendar/session-maxima model. It is not authenticated historical cTrader schedule truth. Broker-native M5 timestamps and source bytes remain valid.",
+  "recomputed_from_existing_valid_bytes": {
+    "EURUSD":{"calendar_model_coverage":0.9991319444444444,"calendar_model_denominator":23040,"model":"FX_16_COMPLETE_BROKER_WEEKS_ASSUMED","rows":23020},
+    "IWM.US":{"calendar_model_coverage":0.9983130904183536,"calendar_model_denominator":5928,"model":"US_CASH_76_ASSUMED_ACTIVE_DATES_X_78","rows":5918},
+    "MXNJPY":{"calendar_model_coverage":0.9980902777777778,"calendar_model_denominator":23040,"model":"FX_16_COMPLETE_BROKER_WEEKS_ASSUMED","rows":22996},
+    "NVDA.US-24":{"calendar_model_coverage":0.9958891951230906,"calendar_model_denominator":21407,"model":"NVDA_EXTENDED_DAY_OF_WEEK_MAXIMA_ASSUMED","rows":21319},
+    "TLT.US":{"calendar_model_coverage":0.9940958164642375,"calendar_model_denominator":5928,"model":"US_CASH_76_ASSUMED_ACTIVE_DATES_X_78","rows":5893},
+    "USDCAD":{"calendar_model_coverage":0.9983072916666667,"calendar_model_denominator":23040,"model":"FX_16_COMPLETE_BROKER_WEEKS_ASSUMED","rows":23001}
+  },
+  "recorded_utc":"2026-09-24T09:34:02Z",
+  "safety":{"economic_outcomes_opened":0,"protected_forward_opened":false,"v2_attempts_consumed":0},
+  "schema":"mxm.greenfield.session-gap-schedule-coverage-dependency-review.v1",
+  "source_zip":{"expected_sha256":"1ae4f6722960bec8451f9912c32cc3de2c2f24cb7363ad678de7a0272bd70537","filename":"MXM_SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_M5_16W_FRICTION_V1.zip","library_file_id":"libfile_bf9b75f0342c8191bda743c6ecb1bbd2","observed_sha256":"1ae4f6722960bec8451f9912c32cc3de2c2f24cb7363ad678de7a0272bd70537","sha256_verified":true},
+  "status":"RAW_BYTES_VALID_DERIVATIVE_RELABELED_NO_MATERIAL_CONCLUSION_CHANGE"
+}

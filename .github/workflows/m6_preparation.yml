@@ -163,6 +163,29 @@ jobs:
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/validate_authoritative_promotion.py
       - name: Full repository unittest suite on Python 3.13
         run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Broker-native adaptive frontier probe preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from research_v3.pydroid_broker_native_frontier_probe_launcher import local_preflight
+          r = local_preflight()
+          assert r["symbols"] == 41 and r["resolution"] == "M5", r
+          assert r["network_connection_attempted"] is False and r["credentials_used"] is False, r
+          assert r["orders_permitted"] is False and r["account_mutation_permitted"] is False, r
+          assert r["economic_outcomes_opened"] is False and r["v2_attempts_consumed"] == 0, r
+          assert r["schedule_adjusted_coverage_gate"] is False, r
+          print("BROKER_NATIVE_FRONTIER_PROBE_PREFLIGHT_PASS", r)
+          PY
+      - name: Build deterministic broker-native frontier probe package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_broker_native_frontier_probe_package.py
+          sha256sum dist/MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1.zip
+      - name: Upload broker-native frontier probe package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1
+          path: dist/MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1.zip
+          if-no-files-found: error
+          retention-days: 30
       - name: Wave02 authenticated read-only collector preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'

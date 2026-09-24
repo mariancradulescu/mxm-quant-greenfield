@@ -1,0 +1,16 @@
+{
+  "audited_head": "57d99580e2a8047bdac09460a6a71d4b86390606",
+  "audited_implementation": "research_v3/broker_native_panel_screen.py",
+  "decision": "DO_NOT_USE_FIXED8_PROTOTYPE_TO_AUTHORIZE_NEW_MARKET_DATA_CAPTURE",
+  "findings": [
+    {"effect":"May truncate structural coverage arbitrarily.","finding":"DEFAULT_PANEL_SIZE=8 is a fixed count with no demonstrated information-gain optimum.","severity":"MATERIAL"},
+    {"effect":"Can misclassify products and underuse accepted structural information.","finding":"Asset buckets are inferred from broker-name syntax rather than accepted broker-native asset_class/product_type/schedule fields.","severity":"MATERIAL"},
+    {"effect":"A consumed exact-scope symbol could re-enter a supposedly disjoint panel.","finding":"Hard-coded exclusion set omits NAS100 even though V2-C012 used NAS100.","severity":"MATERIAL"},
+    {"effect":"Tie-breaking could dominate research scope without economic or structural justification.","finding":"Lexicographic fill is deterministic but not an expected-information-gain criterion.","severity":"MATERIAL"}
+  ],
+  "preservation":{"prototype_deleted":false,"prototype_economic_outcomes_opened":0,"prototype_market_data_opened":false,"prototype_v2_attempts_consumed":0},
+  "recorded_utc":"2026-09-24T09:34:02Z",
+  "schema":"mxm.greenfield.broker-native-panel-screen-audit.v1",
+  "status":"FIXED8_PROTOTYPE_SUPERSEDED_BEFORE_NEW_MARKET_DATA",
+  "supersession":{"authoritative_exclusion_rule":"derive exclusions from consumed-identity scope audit plus completed structural/outer observations; never maintain a hand-curated exclusion set as authority","replacement_count_basis":"emergent distinct broker-native structural signatures after authoritative exclusions","replacement_fixed_panel_size":false,"replacement_frontier_count":41,"replacement_ref":"data/BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1.json","source_map_sha256":"c2b16c3fc0419ec335ebbd67e0af09043e60a476516db01c55550d661b5f4130"}
+}

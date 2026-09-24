@@ -1,57 +1,13 @@
 {
-  "basis_next_state_sha256": "7940c232eaeae0596ba033f48ec660766b5f49dded357695491a64e373cf1b3e",
-  "changed_paths": [
-    "research_v3/broker_native_panel_screen.py",
-    "tests/test_broker_native_panel_screen.py"
-  ],
-  "created_utc": "2026-09-24T09:12:41Z",
-  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
-  "implementation_output": {
-    "decision": {
-      "action": "IMPLEMENT_DISJOINT_BROKER_NATIVE_FEASIBILITY_PANEL_SCREEN",
-      "implementation_ref": "research_v3/broker_native_panel_screen.py",
-      "protected_scope_unchanged": true,
-      "selection_policy": {
-        "both_direction_feasible_required": true,
-        "consumed_identities_excluded": true,
-        "economic_outcomes_opened": 0,
-        "market_data_read": false,
-        "test_products_excluded": true,
-        "v2_attempts_consumed": 0
-      },
-      "source_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
-      "test_ref": "tests/test_broker_native_panel_screen.py"
-    },
-    "external_data_gate": null,
-    "implementation_id": "broker-native-panel-screen-v1",
-    "next_research_state": {
-      "ai_reasoning_required": true,
-      "next_action": "Validate the non-economic broker-native panel screen and its tests at exact-head green; then return to AI reasoning for the next legal research action.",
-      "status": "PENDING_EXACT_HEAD_GREEN",
-      "user_action_required": false
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a deterministic non-economic breadth screen over the accepted Pepperstone EUR200 feasibility index. It selects a reproducible disjoint panel using BOTH_FEASIBLE, non-test products while excluding consumed identities, and performs no market-data access, economic evaluation, or V2 consumption. No external data gate is required.",
-    "tests_requested": [
-      "tests/test_broker_native_panel_screen.py",
-      "tests/test_general_ai_implementation_executor.py"
-    ]
-  },
-  "project_snapshot": {
-    "discovery_ledger_sha256": "e7c6fc2ff65e4e422cb00e482aa9aaf7eb5ce6282586a89fb16e016776a4773d",
-    "economic_outcomes_opened": 27,
-    "v2_attempts_used": 19,
-    "v2_search_budget_remaining": 65
-  },
-  "provider": {
-    "actual_model_identity": null,
-    "actual_model_identity_known": false,
-    "cli": "@github/copilot",
-    "model": "auto",
-    "model_identity_limitation": "Explicit gpt-5.3-codex and gpt-5.4 were rejected as unavailable by this Copilot connection; Auto is the proven available route, and silent mode does not expose the selected identity.",
-    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
-    "provider": "github-copilot-cli"
-  },
-  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "accounting":{"economic_outcomes_opened":27,"v2_attempts_used":19,"v2_search_budget_remaining":65},
+  "basis_head":"57d99580e2a8047bdac09460a6a71d4b86390606",
+  "decision":"SUPERSEDE_FIXED8_WITH_ADAPTIVE_STRUCTURAL_FRONTIER_AND_PREPARE_MINIMAL_READ_ONLY_M5_PROBE",
+  "economic_effect":{"economic_outcomes_opened":0,"economics_rerun":false,"new_v2_identity":false,"v2_attempts_consumed":0},
+  "external_data_gate":{"expected_output_filename":"MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_V1.zip","package_artifact_name":"MXM_BROKER_NATIVE_FRONTIER_M5_2W_PROBE_PACKAGE_V1","reason":"The accepted structural map is sufficient to choose a non-arbitrary broker-native frontier, but M5 availability/timestamp topology for the newly selected symbols is not present in accepted repository bytes. A minimal authenticated read-only cTrader probe is the highest-information next action before any new economic identity.","required_after_exact_head_green":true,"user_only_action":"Run the certified package on Android/Pydroid and upload the returned ZIP to the Director chat. Do not modify GitHub."},
+  "implemented_utc":"2026-09-24T09:34:02Z",
+  "material_changes":["Persist retrospective historical validity audit without rerunning economics or refunding attempts.","Reclassify six-panel schedule_adjusted_coverage as calendar-model coverage; recompute from existing valid bytes and prove no downstream outer-result dependency.","Supersede fixed-8/name-bucket panel before any new market-data outcome because count and lexicographic fill are not information-gain criteria and NAS100 was missing from the hard-coded exclusion set.","Use accepted 1641-row broker-native structural map to create 41 emergent structural-signature representatives with no fixed panel N.","Freeze a two-week M5 DEVELOPMENT-only read-only probe across those 41 representatives; no strategy outcomes, PnL, returns, costs or alpha are computed by capture."],
+  "refs":{"adaptive_frontier":"data/BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1.json","adaptive_frontier_sha256":"c634d6ffdbe674ac2a633c90b7bda53b235f626adeb4272b737223008c99bfd0","historical_validity_audit":"evidence/RETROSPECTIVE_HISTORICAL_RESEARCH_VALIDITY_AUDIT_V1.json","panel_audit":"evidence/BROKER_NATIVE_PANEL_SCREEN_AUDIT_V1.json","probe_capture":"research_v3/broker_native_frontier_probe_capture.py","probe_launcher":"research_v3/pydroid_broker_native_frontier_probe_launcher.py","probe_plan":"data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json","probe_plan_sha256":"27e0d931d0f89e314857c1e77521d7118e66f834e9680c951c2cf8a452196fe8","schedule_review":"evidence/SESSION_GAP_SCHEDULE_COVERAGE_DEPENDENCY_REVIEW_V1.json"},
+  "safety":{"competition_start_authorized":false,"live_orders_authorized":false,"protected_forward_opened":false},
+  "schema":"mxm.greenfield.general-ai-implementation-response.v1",
+  "status":"IMPLEMENTED_PENDING_EXACT_HEAD_GREEN"
 }
