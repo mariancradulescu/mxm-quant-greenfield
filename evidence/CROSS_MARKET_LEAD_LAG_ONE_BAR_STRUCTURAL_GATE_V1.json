@@ -1,0 +1,40 @@
+{
+  "schema": "mxm.greenfield.cross-market-lead-lag-one-bar-structural-gate.v1",
+  "status": "COMPLETE_NON_ECONOMIC_STRUCTURAL_GATE",
+  "source_capture_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_capture_sha256": "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49",
+  "prior_prerequisite_gate_ref": "evidence/CROSSALIGN_FOUR_SYMBOL_PREREQUISITE_GATE_V1.json",
+  "authorized_proposal_id": "P-20260924-CROSSMARKET-STRUCTURAL-GATE-01",
+  "authorized_operation_id": "op_fa0949f0c3281dc0932f9207ef4c43ec",
+  "symbols": [
+    "AUDJPY",
+    "AUS200",
+    "Brent-F",
+    "BCHUSD"
+  ],
+  "resolution": "M5",
+  "common_timestamps": 9539,
+  "strict_one_bar_consecutive_common_pairs": 9455,
+  "strict_pair_law": "Only count t and t+5m when every one of four source series has a broker-native row at both timestamps; neither gaps nor sessions are forward filled.",
+  "pairwise_same_timestamp_overlap": {
+    "AUDJPY|AUS200": 9831,
+    "AUDJPY|BCHUSD": 11474,
+    "AUDJPY|Brent-F": 10002,
+    "AUS200|BCHUSD": 9831,
+    "AUS200|Brent-F": 9539,
+    "Brent-F|BCHUSD": 10002
+  },
+  "prerequisite_status": "SUFFICIENT_TO_DEFINE_PROSPECTIVE_LAGGED_SCREEN",
+  "event_law": "NOT_FROZEN",
+  "lagged_predictor": "NOT_COMPUTED",
+  "economic_outcome": "UNOPENED",
+  "outer_authorization": "NONE",
+  "implementation_failure_recovery": {
+    "failed_sentinel_run_id": 36018590512,
+    "failure": "Generated test expected non-M5 gaps to be rejected, although session gaps should simply exclude nonconsecutive pairs; no implementation was published.",
+    "repair": "Independent deterministic scan of the accepted raw CSVs counted only truly consecutive shared timestamps; reused existing validated acceptance evidence.",
+    "economic_outcomes_opened_delta": 0,
+    "v2_attempts_used_delta": 0
+  },
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES"
+}
