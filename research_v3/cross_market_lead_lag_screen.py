@@ -12,13 +12,13 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-SOURCE_CAPTURE_SHA256 = "36de60e2991bec99596b5b11da43efe3d62dafa8747c043a25c394fd3f9a4d49"
-SOURCE_CAPTURE_REF = "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json"
-PLAN_REF = "data/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_PLAN_V1.json"
+SOURCE_CAPTURE_SHA256 = "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9"
+SOURCE_CAPTURE_REF = "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json"
+PLAN_REF = "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json"
 SYMBOLS = ("AUDJPY", "AUS200", "Brent-F", "BCHUSD")
 INTERVAL = {
-    "start_utc": "2026-07-20T00:00:00Z",
-    "end_utc": "2026-09-13T23:59:59Z",
+    "start_utc": "2026-05-25T00:00:00Z",
+    "end_utc": "2026-07-19T23:59:59Z",
 }
 M5 = timedelta(minutes=5)
 
@@ -41,14 +41,14 @@ def _direction(open_: float, close: float) -> int:
 
 def _read_series(raw: bytes, symbol: str) -> dict[datetime, tuple[float, float]]:
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8")))
-    expected = ("timestamp_utc", "open", "high", "low", "close", "tick_volume")
+    expected = ("timestamp", "open", "high", "low", "close")
     if tuple(reader.fieldnames or ()) != expected:
         raise LeadLagScreenError(f"{symbol}: single-price trendbar fields are required")
     rows: dict[datetime, tuple[float, float]] = {}
     previous: datetime | None = None
     for row in reader:
         try:
-            timestamp = _utc(str(row["timestamp_utc"]))
+            timestamp = _utc(str(row["timestamp"]))
             values = tuple(float(row[key]) for key in expected[1:])
         except (KeyError, TypeError, ValueError) as exc:
             raise LeadLagScreenError(f"{symbol}: invalid numeric or timestamp field") from exc
@@ -56,7 +56,7 @@ def _read_series(raw: bytes, symbol: str) -> dict[datetime, tuple[float, float]]
             raise LeadLagScreenError(f"{symbol}: timestamps are not strictly increasing")
         if not all(math.isfinite(value) for value in values):
             raise LeadLagScreenError(f"{symbol}: non-finite trendbar field")
-        open_, high, low, close, _volume = values
+        open_, high, low, close = values
         if high < max(open_, close) or low > min(open_, close):
             raise LeadLagScreenError(f"{symbol}: invalid OHLC invariant")
         if timestamp in rows:
@@ -72,15 +72,20 @@ def _load_capture(path: str | Path) -> tuple[dict[str, dict[datetime, tuple[floa
     path = Path(path)
     observed = hashlib.sha256(path.read_bytes()).hexdigest()
     if observed != SOURCE_CAPTURE_SHA256:
-        raise LeadLagScreenError("capture ZIP hash does not match accepted CROSSALIGN bytes")
+        raise LeadLagScreenError("capture ZIP hash does not match accepted disjoint bytes")
     with zipfile.ZipFile(path) as archive:
         try:
-            manifest = json.loads(archive.read("MXM_CROSSALIGN_FOUR_SYMBOL_M5_NON_ECONOMIC_V1/capture_manifest.json"))
+            manifest = json.loads(archive.read("MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1/capture_manifest.json"))
         except (KeyError, json.JSONDecodeError) as exc:
             raise LeadLagScreenError("accepted capture manifest is missing or invalid") from exc
         if manifest.get("economic_outcomes_opened") != 0 or manifest.get("v2_attempts_consumed") != 0:
             raise LeadLagScreenError("capture is economically contaminated")
-        if manifest.get("resolution") != "M5" or manifest.get("requested_interval") != INTERVAL:
+        if (
+            manifest.get("plan_ref") != PLAN_REF
+            or manifest.get("resolution") != "M5"
+            or manifest.get("requested_interval") != INTERVAL
+            or manifest.get("bid_ask_transferred") is not False
+        ):
             raise LeadLagScreenError("capture resolution or interval is not the accepted scope")
         series: dict[str, dict[datetime, tuple[float, float]]] = {}
         for item in manifest.get("series") or []:
@@ -88,7 +93,7 @@ def _load_capture(path: str | Path) -> tuple[dict[str, dict[datetime, tuple[floa
             if symbol in SYMBOLS and item.get("capture_status") == "SERIES_CAPTURE_COMPLETE":
                 rel = str(item["file"])
                 series[symbol] = _read_series(
-                    archive.read("MXM_CROSSALIGN_FOUR_SYMBOL_M5_NON_ECONOMIC_V1/" + rel),
+                    archive.read("MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1/" + rel),
                     symbol,
                 )
         if set(series) != set(SYMBOLS):
@@ -107,8 +112,8 @@ def _wilson_interval(successes: int, total: int) -> list[float] | None:
     return [max(0.0, centre - radius), min(1.0, centre + radius)]
 
 
-def execute(path: str | Path, *, expected_common_timestamps: int = 9539,
-            expected_pairs: int = 9455) -> dict[str, Any]:
+def execute(path: str | Path, *, expected_common_timestamps: int = 9558,
+            expected_pairs: int = 9470) -> dict[str, Any]:
     series, metadata = _load_capture(path)
     common = set.intersection(*(set(rows) for rows in series.values()))
     ordered = sorted(common)

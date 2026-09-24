@@ -19,8 +19,8 @@ class CrossMarketLeadLagScreenTests(unittest.TestCase):
     def test_series_uses_single_price_ohlc_and_rejects_invalid_invariant(self):
         raw = io.StringIO()
         writer = csv.writer(raw)
-        writer.writerow(["timestamp_utc", "open", "high", "low", "close", "tick_volume"])
-        writer.writerow(["2026-07-20T00:00:00Z", 2, 1, 2, 2, 100])
+        writer.writerow(["timestamp", "open", "high", "low", "close"])
+        writer.writerow(["2026-07-20T00:00:00Z", 2, 1, 2, 2])
         with self.assertRaises(LeadLagScreenError):
             _read_series(raw.getvalue().encode(), "AUDJPY")
 
@@ -33,10 +33,12 @@ class CrossMarketLeadLagScreenTests(unittest.TestCase):
                 "economic_outcomes_opened": 0,
                 "v2_attempts_consumed": 0,
                 "resolution": "M5",
+                "plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
                 "requested_interval": {
-                    "start_utc": "2026-07-20T00:00:00Z",
-                    "end_utc": "2026-09-13T23:59:59Z",
+                    "start_utc": "2026-05-25T00:00:00Z",
+                    "end_utc": "2026-07-19T23:59:59Z",
                 },
+                "bid_ask_transferred": False,
                 "series": [],
             }
             files = {}
@@ -44,12 +46,12 @@ class CrossMarketLeadLagScreenTests(unittest.TestCase):
                 rel = f"raw/{symbol}.csv"
                 output = io.StringIO()
                 writer = csv.writer(output)
-                writer.writerow(["timestamp_utc", "open", "high", "low", "close", "tick_volume"])
+                writer.writerow(["timestamp", "open", "high", "low", "close"])
                 for offset in (0, 5, 15):
                     timestamp = start + timedelta(minutes=offset)
                     close = 10 + index + offset
                     writer.writerow([timestamp.isoformat().replace("+00:00", "Z"),
-                                     close, close, close, close, 1])
+                                     close, close, close, close])
                 files[rel] = output.getvalue().encode()
                 manifest["series"].append({
                     "broker_symbol": symbol,
@@ -58,12 +60,12 @@ class CrossMarketLeadLagScreenTests(unittest.TestCase):
                 })
             with zipfile.ZipFile(path, "w") as archive:
                 archive.writestr(
-                    "MXM_CROSSALIGN_FOUR_SYMBOL_M5_NON_ECONOMIC_V1/capture_manifest.json",
+                    "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1/capture_manifest.json",
                     json.dumps(manifest),
                 )
                 for rel, data in files.items():
                     archive.writestr(
-                        "MXM_CROSSALIGN_FOUR_SYMBOL_M5_NON_ECONOMIC_V1/" + rel, data
+                        "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1/" + rel, data
                     )
             with patch(
                 "research_v3.cross_market_lead_lag_screen.SOURCE_CAPTURE_SHA256",
