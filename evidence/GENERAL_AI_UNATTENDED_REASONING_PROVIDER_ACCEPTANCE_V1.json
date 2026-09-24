@@ -1,0 +1,50 @@
+{
+  "schema": "mxm.greenfield.general-ai-unattended-reasoning-provider-acceptance.v1",
+  "status": "PASS_EXACT_HEAD_GREEN_PENDING_LIVE_REASONING_WAKE",
+  "accepted_head": "9d41e368e69c6edf3405e0672bf45c4d3fb3ed1e",
+  "exact_head_ci": {
+    "workflow": "m6-preparation",
+    "run_id": 35952306331,
+    "conclusion": "SUCCESS",
+    "head_sha": "9d41e368e69c6edf3405e0672bf45c4d3fb3ed1e"
+  },
+  "stale_proposal_liveness_fix": {
+    "implementation_commit": "de8c48e771a3c317500d6d9a1695eb5eef91c789",
+    "state_aware_test_commit": "272168772f213988a50cae96ede2494dec71c17e",
+    "root_cause": "Historical already-materialized proposal bytes were revalidated against current accounting before the immutable registry fast path, so legitimate 26-to-27 outcome advancement permanently broke later drains.",
+    "correction": "Hash proposal first; verify exact accepted registry/result/journal/closure/runtime-ledger integrity before current-state validation. Apply strict live accounting/ledger validation only to new or modified proposal hashes.",
+    "historical_proposal_current_basis_revalidation": false,
+    "new_or_modified_proposal_strict_validation": true
+  },
+  "general_ai_provider": {
+    "interface": "mxm.greenfield.general-ai-research-proposal.v1",
+    "implementation_ref": "research_v3/general_ai_reasoning_provider.py",
+    "adapter": "GITHUB_MODELS",
+    "endpoint": "https://models.github.ai/inference/chat/completions",
+    "auth": "BUILT_IN_GITHUB_ACTIONS_GITHUB_TOKEN",
+    "workflow_permission": "models: read",
+    "external_secret_required": false,
+    "finite_research_action_map": false,
+    "provider_can_open_economics": false,
+    "runtime_v2_remains_exactly_once_economic_authority": true
+  },
+  "pre_live_wake_accounting": {
+    "v2_attempts_used": 19,
+    "v2_search_budget_remaining": 65,
+    "economic_outcomes_opened": 27
+  },
+  "c031_integrity": {
+    "result_ref": "m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json",
+    "runtime_operation_id": "op_cdcf9d2bae1f2bc2355e79efbbcdaf50",
+    "economic_execution_id": "econ_561ca1cabbc351f3fdde2e0bddaed830",
+    "rerun_performed_during_repair": false,
+    "additional_v2_attempt_consumed_during_repair": false,
+    "additional_economic_outcome_opened_during_repair": false
+  },
+  "live_wake_required": true,
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
