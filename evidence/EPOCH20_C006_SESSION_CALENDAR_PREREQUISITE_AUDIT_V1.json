@@ -1,0 +1,37 @@
+{
+  "schema": "mxm.greenfield.epoch20-c006-calendar-availability-audit.v1",
+  "status": "NON_ECONOMIC_PREREQUISITE_GAP_CONFIRMED",
+  "decision_ref": "research_v3/EPOCH20_POST_C032_INFORMATION_GAIN_DECISION_V1.json",
+  "evidence_epoch_seen": 20,
+  "scope": {
+    "accepted_development_symbols": 40,
+    "structural_subset_products": 158,
+    "matched_symbols": 3,
+    "matched": [
+      "Crude-F",
+      "NatGas",
+      "WTOIL-PERP"
+    ],
+    "unmatched_count": 37,
+    "matched_metadata_only": "Current aggregate session minutes and timezone; no prospectively versioned cash-session open/close boundaries for the historical M5 interval",
+    "source_refs": [
+      "evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json",
+      "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+      "discovery/candidates/V2-C006.json"
+    ]
+  },
+  "finding": "The accepted M5 development data and persisted structural subset do not establish historical per-symbol cash-session boundaries required by the frozen C006 first completed cash-session bar law. Even the three overlapping products expose aggregate current weekly minutes, not historical open/close flags. Deriving the event law by assuming current hours or filling calendar gaps would break causal validity.",
+  "next_prerequisite": "Freeze a minimal authenticated read-only per-symbol historical session/calendar metadata capture or rigorously verify broker-provided historical cash-session flags for a prospectively selected subset before calculating C006 event availability. Scope selection must use broker metadata and coverage only, independent of any new C006 outcome.",
+  "economic_effect": {
+    "outcomes_opened": 0,
+    "attempts_consumed": 0,
+    "budget_change": 0
+  },
+  "safety": {
+    "c032_rerun": false,
+    "protected_forward_opened": false,
+    "synthetic_session_calendar": false
+  },
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "user_action_required_now": false
+}
