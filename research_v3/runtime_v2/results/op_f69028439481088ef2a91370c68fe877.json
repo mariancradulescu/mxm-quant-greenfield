@@ -1,0 +1,86 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "1a0e7ccd39881eaaa04777b272d85942b60f5101c595153cfaff9d1e68be6a66",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "OPEN_PRESERVED_FOUR_PANEL_INDEPENDENT_OUTER",
+    "economic_outcomes_to_open": 0,
+    "feasibility_basis": "All four symbols must be resolved by exact broker symbol identity in the accepted Pepperstone account-native feasibility index before execution; no substitutions or invented spellings are permitted.",
+    "mechanism_family": "SESSION_GAP_REVERSION",
+    "methodology": {
+      "entry": "FIRST_LATER_OBSERVED_M5_OPEN_AFTER_CAUSAL_SIGNAL_ADMISSION",
+      "exit": "FIRST_OBSERVED_M5_OPEN_AT_OR_AFTER_ENTRY_PLUS_60_MINUTES",
+      "friction_fail_blocks_promotion": true,
+      "friction_gate": "V6_TRUE_INTRA_WINDOW_SPREAD_TAILS_PLUS_SAME_WINDOW_BROKER_NATIVE_COMMISSION_CONVERSION",
+      "measurement_horizon_minutes": 60,
+      "minimum_observed_gap_minutes": 30,
+      "minimum_scale_observations": 144,
+      "missing_bar_law": "WAIT_FOR_FIRST_LATER_OBSERVED_OPEN; NO_SYNTHETIC_OR_FORWARD_FILL",
+      "multiplicity": "HOLM_BONFERRONI_ALPHA_0_05_ACROSS_EXACTLY_FOUR_FIXED_SYMBOLS",
+      "panel_aggregate_role": "DESCRIPTIVE_ONLY",
+      "prior_scale_window_exact_m5_returns": 288,
+      "shock_scale_multiple": 3
+    },
+    "new_market_data_capture": false,
+    "outer_interval": {
+      "end_utc": "2026-07-19T23:59:59Z",
+      "start_utc": "2026-03-30T00:00:00Z"
+    },
+    "panel": [
+      {
+        "broker_symbol": "ZARJPY",
+        "symbol_id_required_from_authoritative_account_index": true
+      },
+      {
+        "broker_symbol": "US400",
+        "symbol_id_required_from_authoritative_account_index": true
+      },
+      {
+        "broker_symbol": "XPDUSD",
+        "symbol_id_required_from_authoritative_account_index": true
+      },
+      {
+        "broker_symbol": "NETH25",
+        "symbol_id_required_from_authoritative_account_index": true
+      }
+    ],
+    "resolution": "M5",
+    "reuse_existing_hash_bound_capture": true,
+    "scope_constraints": {
+      "broader_broker_native_universe_remains_open": true,
+      "do_not_promote_economically_from_outer_alone": true,
+      "do_not_rerun_c031": true,
+      "do_not_reuse_development_bytes_as_outer": true,
+      "mechanism_family_remains_open": true,
+      "shared_account_realization_requires_continuous_capital_and_free_margin_accounting": true
+    }
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 1,
+    "capture_required": false,
+    "external_gate": "NONE",
+    "implementation_gate": "Verify exact broker symbol and symbol_id matches against the accepted account-native feasibility index, then run only the frozen outer evaluator.",
+    "insufficiency_rule": "If the preserved outer cannot be proven disjoint, complete, and hash-bound to the frozen plan, stop and return for fresh research reasoning rather than recapturing the same scope.",
+    "next_action": "EXECUTE_THE_PRESERVED_FOUR_PANEL_INDEPENDENT_OUTER_USING_THE_FROZEN_PLAN_AND_HASH_BOUND_CAPTURE",
+    "promotion_gate": "Require per-symbol frozen confirmatory tests, Holm correction, complete friction overlay, and explicit shared-account realizability analysis before any economic identity is considered.",
+    "research_judgment_required": false,
+    "status": "OUTER_REAUTHORIZATION_READY"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Reauthorize the preserved, prospectively frozen four-symbol SESSION_GAP_REVERSION independent outer as the next non-economic research action.",
+    "information_gain_rationale": "The accepted 40-symbol M5 development capture covers every currently entry-tradable structural representative selected by the emergent frontier rule. Its structural screen is approximately balanced overall but identifies a frozen four-symbol boundary with materially stronger development evidence. Additional broad structural exploration has lower immediate information gain than testing this already frozen, disjoint outer while preserving the broader universe and avoiding family-level closure."
+  },
+  "operation_id": "op_f69028439481088ef2a91370c68fe877",
+  "proposal_hash": "a6b4da6e81369be726b2a457ca3d668920f81cb497fe1598eb8ae4034582befd",
+  "proposal_id": "P-20260924-FRONTIER-OUTER-REAUTH-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_707e1b9a5ef7cfe9e016dcca6cbd070f.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
