@@ -2,9 +2,14 @@ name: Runtime V2 Liveness Watchdog
 
 on:
   schedule:
-    # Independent fallback cadence, offset from the Sentinel schedule.
+    # Best-effort platform fallback; not treated as punctual authority.
     - cron: "11,26,41,56 * * * *"
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Runtime V2 Liveness Sentinel
+    types:
+      - completed
   push:
     branches:
       - main
@@ -26,8 +31,12 @@ env:
 jobs:
   wake-if-pending:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
     steps:
+      - name: Delay after Sentinel completion before retrying
+        if: github.event_name == 'workflow_run'
+        run: sleep 300
+
       - name: Checkout authoritative research branch
         uses: actions/checkout@v4
         with:
