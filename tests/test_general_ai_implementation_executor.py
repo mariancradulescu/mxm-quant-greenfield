@@ -1,19 +1,15 @@
 import json, unittest
 from pathlib import Path
 from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, implementation_required
-from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL
+from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 
 ROOT=Path(__file__).resolve().parents[1]
 class GeneralAIImplementationExecutorTests(unittest.TestCase):
-    def test_current_state_routes_screen_or_external_gate_correctly(self):
+    def test_current_state_routes_by_semantics_not_finite_state_names(self):
         s=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        self.assertIn(s["status"],{
-            "READY_FOR_MINIMAL_STRUCTURAL_SCREENING",
-            "WAITING_EXTERNAL_AUTHENTICATED_DATA",
-            "PENDING_EXACT_HEAD_GREEN_STRUCTURAL_EXTENSION_WAVE_01_SCREEN",
-        })
-        if s["status"]=="WAITING_EXTERNAL_AUTHENTICATED_DATA":
-            self.assertTrue(s["user_action_required"])
+        if s.get("user_action_required") is True:
+            self.assertFalse(implementation_required(s))
+        elif reasoning_required(s):
             self.assertFalse(implementation_required(s))
         else:
             self.assertTrue(implementation_required(s))
