@@ -1,95 +1,49 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "5b1f67195bd50dfd022abee08df45e788257c893",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "5b1f67195bd50dfd022abee08df45e788257c893",
-    "predecessor_run_id": 35995277057
-  },
-  "accepted_output": {
-    "decision": {
-      "action": "REQUIRE_AUTHENTICATED_READ_ONLY_OUTER_CAPTURE",
-      "collector_status": "EXACT_SCOPE_IMPLEMENTED_AND_PLAN_BOUND",
-      "economic_outcomes_opened": 0,
-      "economic_status": "NON_ECONOMIC_CAPTURE_ONLY",
-      "interval": {
-        "end_utc": "2026-06-14T23:59:59Z",
-        "start_utc": "2026-03-16T00:00:00Z"
-      },
-      "protected_forward_opened": false,
-      "resolution": "M5",
-      "symbols": [
-        "ZARJPY",
-        "US400",
-        "XPDUSD",
-        "NETH25"
-      ],
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": {
-      "collector_build_ref": "tools/build_session_gap_frontier_four_panel_outer_capture_package.py",
-      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip",
-      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
-      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_M5_13W_FRICTION_V1.zip",
-      "reason": "Authenticated Pepperstone account-native M5 trendbars plus exact historical bid/ask tick friction evidence for the frozen disjoint four-symbol outer are not available as accepted capture bytes in the repository."
-    },
-    "implementation_id": "session-gap-frontier-four-panel-independent-outer-capture-v1",
-    "next_research_state": {
-      "next_action": "RUN_THE_EXACT_FROZEN_FOUR_SYMBOL_M5_OUTER_CAPTURE_AND_RETURN_THE_READ_ONLY_ZIP_FOR_NON_ECONOMIC_VALIDATION",
-      "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
-      "user_action_required": true
-    },
-    "status": "EXTERNAL_DATA_REQUIRED",
-    "summary": "The exact-scope read-only collector and launcher already implement the frozen four-symbol M5 outer capture with historical bid/ask tick friction evidence. Corrected the stale external gate that referenced the superseded C031 collector; no economic or protected state was changed.",
-    "tests_requested": [
-      "tests/test_session_gap_frontier_four_panel_outer_capture.py",
-      "tests/test_general_ai_implementation_executor.py"
-    ]
-  },
-  "basis_next_state_sha256": "ff85dd9fddcde111754e9fffafd196f0d5b42f01ef3a51bafb1b64d6a4d7c985",
+  "basis_next_state_sha256": "651e1e55c786043cfca55b52b313f368ecb68fb08211dd78d3d3f43eaba64247",
   "changed_paths": [
-    "research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json"
+    "research_v3/adaptive_breadth_triage.py",
+    "tests/test_adaptive_breadth_triage.py"
   ],
-  "created_utc": "2026-09-24T11:47:37Z",
+  "created_utc": "2026-09-24T12:13:44Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "REQUIRE_AUTHENTICATED_READ_ONLY_OUTER_CAPTURE",
-      "collector_status": "EXACT_SCOPE_IMPLEMENTED_AND_PLAN_BOUND",
-      "economic_outcomes_opened": 0,
-      "economic_status": "NON_ECONOMIC_CAPTURE_ONLY",
-      "interval": {
-        "end_utc": "2026-06-14T23:59:59Z",
-        "start_utc": "2026-03-16T00:00:00Z"
-      },
-      "protected_forward_opened": false,
-      "resolution": "M5",
-      "symbols": [
-        "ZARJPY",
-        "US400",
-        "XPDUSD",
-        "NETH25"
+      "accepted_capture_reused": true,
+      "action": "IMPLEMENT_GENERIC_NON_ECONOMIC_ADAPTIVE_CROSS_FAMILY_TRIAGE",
+      "changed_files": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
       ],
+      "economic_outcomes_opened": 0,
+      "external_data_required": false,
+      "live_orders_authorized": false,
+      "new_capture_gate_created": false,
+      "protected_evidence_opened": false,
+      "triage_properties": {
+        "causal_timestamp_ordering_enforced": true,
+        "economic_evaluation_performed": false,
+        "fixed_family_or_parameter_grid": false,
+        "frozen_40_symbol_scope_required": true,
+        "hash_bound_to_accepted_capture": true,
+        "single_price_ohlcv_only": true
+      },
       "v2_attempts_consumed": 0
     },
-    "external_data_gate": {
-      "collector_build_ref": "tools/build_session_gap_frontier_four_panel_outer_capture_package.py",
-      "collector_package_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_OUTER_CAPTURE_PACKAGE_V1.zip",
-      "collector_plan_ref": "data/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json",
-      "expected_return_artifact_name": "MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_M5_13W_FRICTION_V1.zip",
-      "reason": "Authenticated Pepperstone account-native M5 trendbars plus exact historical bid/ask tick friction evidence for the frozen disjoint four-symbol outer are not available as accepted capture bytes in the repository."
-    },
-    "implementation_id": "session-gap-frontier-four-panel-independent-outer-capture-v1",
+    "external_data_gate": null,
+    "implementation_id": "adaptive-breadth-triage-v1",
     "next_research_state": {
-      "next_action": "RUN_THE_EXACT_FROZEN_FOUR_SYMBOL_M5_OUTER_CAPTURE_AND_RETURN_THE_READ_ONLY_ZIP_FOR_NON_ECONOMIC_VALIDATION",
-      "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
-      "user_action_required": true
+      "ai_reasoning_required_after_green": true,
+      "capture_required": false,
+      "next_action": "Validate the changed non-economic triage implementation at the exact green head, then require fresh General AI interpretation of its structural family-ranking output.",
+      "outer_authorization": "NONE",
+      "promotion": "No economic promotion or confirmatory outer may be inferred from this triage.",
+      "status": "PENDING_EXACT_HEAD_GREEN"
     },
-    "status": "EXTERNAL_DATA_REQUIRED",
-    "summary": "The exact-scope read-only collector and launcher already implement the frozen four-symbol M5 outer capture with historical bid/ask tick friction evidence. Corrected the stale external gate that referenced the superseded C031 collector; no economic or protected state was changed.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a generic read-only adaptive cross-family structural triage for the accepted 40-symbol M5 development capture. It validates the accepted ZIP hash, frozen plan, manifest, single-price OHLCV schema, chronological ordering, interval bounds, and non-economic safety fields, then ranks mechanism families by causal data sufficiency without computing returns, PnL, outcomes, or promotion statistics.",
     "tests_requested": [
-      "tests/test_session_gap_frontier_four_panel_outer_capture.py",
-      "tests/test_general_ai_implementation_executor.py"
+      "python -m unittest tests/test_adaptive_breadth_triage.py -v",
+      "python -m unittest tests/test_broker_native_frontier_development_capture.py tests/test_broker_native_adaptive_frontier.py -v"
     ]
   },
   "project_snapshot": {
@@ -108,5 +62,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
