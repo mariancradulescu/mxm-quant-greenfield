@@ -1,0 +1,59 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "fe628fc81c2b8ffa6eced1cede5ba2ecaf68d3326e9f2240c26406bebe076f69",
+  "competition_start_authorized": false,
+  "decision": {
+    "decision": "PROCEED_WITH_BROADER_NON_ECONOMIC_PANEL_SCREEN_USING_ACCEPTED_ACCOUNT_NATIVE_FEASIBILITY_INDEX",
+    "future_equity_only_scope": {
+      "initial_eur200_tradable": false,
+      "prospective_rationale": "Higher-equity follow-up only after explicit capital increase and fresh margin feasibility revalidation; these symbols are not initially EUR200 tradable in both directions under the accepted account-native index.",
+      "symbols": [
+        "BTCUSD",
+        "US30",
+        "XAGUSD"
+      ]
+    },
+    "out_of_scope_non_current_symbols": [
+      {
+        "initial_eur200_tradable": false,
+        "reason": "Not present in the accepted current account-native index; not a valid current symbol for this research gate",
+        "symbol": "GER30"
+      }
+    ],
+    "panel_policy": {
+      "allow_new_market_data": false,
+      "minimum_initial_equity_eur": 200,
+      "research_class": "NON_ECONOMIC_DEVELOPMENT_ONLY",
+      "resolution": "M5"
+    },
+    "scope": "broader broker-native universe remains open; do not re-run C031 Stage-B or any exact consumed identity; no economic promotion or live orders authorized",
+    "selection_principles": [
+      "Use the accepted Pepperstone EUR200 feasibility index and structural map as the only authoritative universe boundary",
+      "Exclude all symbols already consumed in exact identities and all symbols with initial EUR200 infeasibility",
+      "Prefer diversity across asset classes/product types and schedule coverage over narrow panel concentration",
+      "Keep the selection disjoint from the accepted Wave01 capture and from the frozen six-symbol outer panel",
+      "Use the smallest sufficient M5 window and no new external market dataset unless a separate exact-head-green gate explicitly requires it"
+    ]
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "next_action": "Build a disjoint, non-economic higher-information broker-native panel from the accepted EUR200-feasible universe using the current feasibility index and structural summary, excluding all consumed exact identities and the frozen six-symbol outer panel; stop before any new capture unless a separate exact-head-green gate is satisfied.",
+    "status": "PROSPECTIVE_BROADER_UNIVERSE_SCREEN_READY"
+  },
+  "objective": {
+    "class": "BROKER_NATIVE_UNIVERSE_INFORMATION_GAIN_AND_DATA_SCOPE",
+    "goal": "Select the next legal, non-economic, broker-native research panel from the broader Pepperstone EUR200-feasible universe without reopening exact consumed identities or the C031 Stage-B scope while preserving anti-ruin and capital-flow discipline.",
+    "information_gain_rationale": "The accepted feasibility index and structural map show a broader accessible universe with 1,690 EUR200-feasible non-test symbols; the current 10-symbol V6 and the frozen six-panel outer only capture narrow slices. The highest-value next step is to screen the broader feasible universe for a disjoint, high-information panel while excluding all consumed identities, infeasible symbols, and any exact identity that would duplicate prior evidence. This maximizes information gain while staying within read-only, non-economic governance."
+  },
+  "operation_id": "op_fca037cd66432eae7365078ca20b3750",
+  "proposal_hash": "b9f3f4c98f56553f6e152438657d39b9d70735f14f09a7206156c4944482fb7e",
+  "proposal_id": "P-20260924-UNIVERSE-SELECT-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_6c3ec041d59c9fadfe5c74fb861b7d48.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
