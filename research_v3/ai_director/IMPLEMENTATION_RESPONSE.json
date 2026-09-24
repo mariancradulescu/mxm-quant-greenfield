@@ -1,60 +1,21 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "f3059aa3ec3a964b3c8b245726bf41e20b225d91",
+  "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
+  "changed_paths": [],
+  "created_utc": "2026-09-24T17:39:46Z",
+  "exact_head": {
+    "green": false,
+    "head": "57b52d19c6d336b3f8dbfec2cf829889ce74ed79",
     "predecessor_conclusion": "success",
     "predecessor_head": "f3059aa3ec3a964b3c8b245726bf41e20b225d91",
     "predecessor_run_id": 36035669331
   },
-  "accepted_output": {
-    "decision": {
-      "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
-      "economic_outcomes_opened": 0,
-      "expected_common_timestamps": 9558,
-      "expected_consecutive_pairs": 9470,
-      "external_data_required": false,
-      "interval": {
-        "end_utc": "2026-07-19T23:59:59Z",
-        "start_utc": "2026-05-25T00:00:00Z"
-      },
-      "protected_forward_opened": false,
-      "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
-      "research_family": "CROSS_MARKET_LEAD_LAG",
-      "resolution": "M5",
-      "source_capture_ref": "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
-      "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
-      "symbols": [
-        "AUDJPY",
-        "AUS200",
-        "Brent-F",
-        "BCHUSD"
-      ],
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": null,
-    "implementation_id": "cross-market-lead-lag-screen-v2",
-    "next_research_state": {
-      "next_action": "RUN_EXACT_HEAD_VALIDATION_FOR_THE_CORRECTED_NON_ECONOMIC_SCREEN",
-      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The accepted hash-bound AUDJPY, AUS200, Brent-F, and BCHUSD M5 capture and exact collector plan are present, so no external data is required. Corrected the executable screen's frozen consecutive-pair default from 9475 to the accepted value 9470; exact-head validation is required.",
-    "tests_requested": [
-      "tests/test_cross_market_lead_lag_screen.py",
-      "tests/test_crossalign_four_symbol_capture.py",
-      "tests/test_general_ai_implementation_executor.py"
-    ]
-  },
-  "basis_next_state_sha256": "2e4eba2c946cc584c12bc13549945cecf41128defdd008e626c208ec581d610a",
-  "changed_paths": [
-    "research_v3/cross_market_lead_lag_screen.py"
-  ],
-  "created_utc": "2026-09-24T17:12:56Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
       "collector_plan_ref": "data/CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PLAN_V1.json",
+      "current_head": "57b52d19c6d336b3f8dbfec2cf829889ce74ed79",
       "economic_outcomes_opened": 0,
+      "exact_head_green": false,
       "expected_common_timestamps": 9558,
       "expected_consecutive_pairs": 9470,
       "external_data_required": false,
@@ -62,7 +23,7 @@
         "end_utc": "2026-07-19T23:59:59Z",
         "start_utc": "2026-05-25T00:00:00Z"
       },
-      "protected_forward_opened": false,
+      "required_validation": "Run exact-head validation for the corrected non-economic screen before execution.",
       "research_classification": "NON_ECONOMIC_STRUCTURAL_LAGGED_DIRECTIONAL_SCREEN",
       "research_family": "CROSS_MARKET_LEAD_LAG",
       "resolution": "M5",
@@ -83,22 +44,12 @@
       "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The accepted hash-bound AUDJPY, AUS200, Brent-F, and BCHUSD M5 capture and exact collector plan are present, so no external data is required. Corrected the executable screen's frozen consecutive-pair default from 9475 to the accepted value 9470; exact-head validation is required.",
+    "summary": "The accepted non-economic implementation is present and sufficient by inspection. It uses the exact hash-bound AUDJPY, AUS200, Brent-F, and BCHUSD broker-native M5 capture, enforces single-price OHLC validation, excludes gaps and fills, evaluates all twelve ordered pairs, and opens no economic outcome or V2 attempt. No external data is required. The repository's current exact-head authority is not green, so execution remains gated pending exact-head validation.",
     "tests_requested": [
       "tests/test_cross_market_lead_lag_screen.py",
       "tests/test_crossalign_four_symbol_capture.py",
       "tests/test_general_ai_implementation_executor.py"
     ]
-  },
-  "metadata_integrity_recovery": {
-    "accepted_evidence_invalidated": false,
-    "authoritative_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
-    "classification": "RESPONSE_METADATA_CORRECTION_NO_EVIDENCE_OR_RESEARCH_SEMANTIC_CHANGE",
-    "corrected_from": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878878691709cb34518fed9",
-    "economic_outcomes_opened_delta": 0,
-    "executable_binding_verified": true,
-    "external_recapture_required": false,
-    "v2_attempts_consumed_delta": 0
   },
   "project_snapshot": {
     "discovery_ledger_sha256": "e7c6fc2ff65e4e422cb00e482aa9aaf7eb5ce6282586a89fb16e016776a4773d",
@@ -116,5 +67,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }
