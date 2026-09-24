@@ -192,8 +192,6 @@ def _active_authoritative_data_contract(root: Path) -> dict[str, Any] | None:
     This is intentionally schema/authority driven rather than a next_action table.
     """
     state = load_json(root / NEXT_STATE_REL, {}) or {}
-    if state.get("user_action_required") is True:
-        return None
     binding = state.get("outer_data_binding_ref") or state.get("independent_outer_data_ref")
     if binding:
         return None
