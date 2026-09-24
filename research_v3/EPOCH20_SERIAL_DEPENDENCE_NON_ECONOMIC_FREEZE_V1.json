@@ -1,0 +1,35 @@
+{
+  "schema": "mxm.greenfield.epoch20-serial-dependence-structural-freeze.v1",
+  "status": "FROZEN_NON_ECONOMIC_PENDING_EXACT_HEAD_GREEN",
+  "provider": {
+    "kind": "EXTERNAL_CHATGPT_GENERAL_REASONING",
+    "vendor": "OpenAI",
+    "model": null,
+    "model_identity_known": false
+  },
+  "evidence_epoch_seen": 20,
+  "trigger_ref": "evidence/EPOCH20_C006_SESSION_CALENDAR_PREREQUISITE_AUDIT_V1.json",
+  "source_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+  "scope": {
+    "symbols": 40,
+    "resolution": "M5",
+    "development_only": true,
+    "protected_forward_opened": false
+  },
+  "frozen_law": {
+    "metric": "Pearson correlation between signed close-to-close return ending at t and signed close-to-close return from t to t+h",
+    "horizon_bars": [
+      1,
+      3,
+      6
+    ],
+    "data_rule": "Require every M5 interval from t-1 through t+h to be exactly 300 seconds; skip gaps and zero-price rows. Use log returns. Report observation counts and correlations for every accepted symbol and aggregate pooled observations, with no parameter search.",
+    "interpretation": "Descriptive serial dependence for mean-reversion versus momentum mechanism availability only; no return magnitude/PnL, commission, economic candidate, symbol promotion, protected-forward inference or family closure."
+  },
+  "reasoning": "The accepted development M5 bytes support a schedule-independent structural screen while the C006 cash-session calendar prerequisite remains unresolved. Fixed natural M5/M15/M30 horizons quantify whether broad serial dependence is present without retuning C032 or consuming an attempt.",
+  "economic_effect": {
+    "outcomes_opened": 0,
+    "attempts_consumed": 0,
+    "budget_change": 0
+  }
+}
