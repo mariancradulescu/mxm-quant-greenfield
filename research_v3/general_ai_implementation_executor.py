@@ -8,7 +8,7 @@ import argparse, hashlib, json, os, shutil, subprocess
 from pathlib import Path
 from typing import Any, Mapping
 from research_v3.autonomous_control_plane import validate_repository_state
-from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot
+from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot, proposal_hash
 from research_v3.general_ai_reasoning_provider import reasoning_required
 from research_v3.runtime_v2_primitives import GitCheckpointSink, atomic_write_json, canonical_bytes, iso, load_json, sha256_bytes, sha256_file
 
@@ -90,10 +90,76 @@ def _extract_json(text:str)->dict[str,Any]:
     if not isinstance(obj,dict): raise ImplementationRejected("implementation response must be object")
     return obj
 
+def _resolve_current_proposal(root:Path,next_state:Mapping[str,Any])->tuple[str,dict[str,Any],dict[str,Any]]:
+    proposal_id=str(next_state.get("source_ai_proposal_id") or "").strip()
+    proposal_hash_hint=str(next_state.get("source_ai_proposal_hash") or "").strip()
+    operation_id=str(next_state.get("source_runtime_operation_id") or "").strip()
+    if not proposal_id and not proposal_hash_hint and not operation_id:
+        raise ImplementationRejected("implementation state is not bound to an accepted AI proposal")
+    registry=load_json(root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",{}) or {}
+    matches=[]
+    for raw in list(registry.get("accepted") or []):
+        row=dict(raw)
+        if proposal_id and row.get("proposal_id")!=proposal_id:
+            continue
+        if proposal_hash_hint and row.get("proposal_hash")!=proposal_hash_hint:
+            continue
+        if operation_id and row.get("operation_id")!=operation_id:
+            continue
+        matches.append(row)
+    if len(matches)!=1:
+        raise ImplementationRejected(f"durable state must resolve exactly one accepted AI proposal; got {len(matches)}")
+    row=matches[0]
+    if row.get("economic_outcome_opened") is not False or int(row.get("v2_attempt_consumed",-1))!=0:
+        raise ImplementationRejected("implementation source proposal must be non-economic")
+    proposal_ref=str(row.get("proposal_ref") or "").strip()
+    if not proposal_ref or not (root/proposal_ref).is_file():
+        raise ImplementationRejected("accepted proposal_ref missing")
+    proposal=dict(load_json(root/proposal_ref,{}) or {})
+    observed=proposal_hash(proposal)
+    if observed!=row.get("proposal_hash"):
+        raise ImplementationRejected("accepted implementation proposal hash drift")
+    if proposal_id and proposal.get("proposal_id")!=proposal_id:
+        raise ImplementationRejected("accepted implementation proposal_id drift")
+    if proposal_hash_hint and observed!=proposal_hash_hint:
+        raise ImplementationRejected("durable state proposal hash drift")
+    return proposal_ref,proposal,row
+
+def _bound_context(root:Path,next_state:Mapping[str,Any],proposal:Mapping[str,Any])->dict[str,Any]:
+    refs=[]
+    for rel in list(proposal.get("authority_refs") or []):
+        if isinstance(rel,str):
+            refs.append(rel)
+    for key in ("result_ref","capture_acceptance_ref","structural_screen_freeze_ref","freeze_ref"):
+        rel=next_state.get(key)
+        if isinstance(rel,str):
+            refs.append(rel)
+    docs={}
+    for rel in sorted(set(refs)):
+        p=root/rel
+        if not p.is_file() or p.stat().st_size>500_000:
+            continue
+        try:
+            docs[rel]=json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return docs
+
+def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,Any]:
+    payload=json.loads(json.dumps(out))
+    ns=dict(payload.get("next_research_state") or {})
+    if str(ns.get("status") or "").startswith("PENDING_EXACT_HEAD_GREEN"):
+        payload["next_research_state"]={
+            "status":"AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
+            "next_action":"AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+            "ai_reasoning_required":True,
+            "green_implementation_artifacts":list(changed_paths),
+        }
+    return payload
+
 def _prompt(root:Path,next_state:Mapping[str,Any])->str:
-    proposal_ref="research_v3/ai_director/proposals/AUTO_reason_a8b81cef686ff74cf678e7e25193f43f.json"
-    proposal=load_json(root/proposal_ref,{})
-    suff=load_json(root/"evidence/C031_STRUCTURAL_EXTENSION_DATA_SUFFICIENCY_V1.json",{})
+    proposal_ref,proposal,registry_row=_resolve_current_proposal(root,next_state)
+    bound_context=_bound_context(root,next_state,proposal)
     return """You are the GENERAL AI IMPLEMENTATION DIRECTOR for MXM Quant Greenfield V2.
 Implement the current valid NON_ECONOMIC research decision generically. There is NO finite next_action mapping.
 Inspect the repository with file view/search tools and decide whether implementation is already sufficient,
@@ -128,7 +194,7 @@ Return ONE JSON object only:
 No chain-of-thought.
 
 CURRENT_NEXT_STATE:
-"""+json.dumps(next_state,sort_keys=True,indent=2)+"\n\nACCEPTED_AI_DECISION:\n"+json.dumps(proposal,sort_keys=True,indent=2)+"\n\nDATA_SUFFICIENCY_AUTHORITY:\n"+json.dumps(suff,sort_keys=True,indent=2)
+"""+json.dumps(next_state,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_PROPOSAL_REF:\n"+proposal_ref+"\n\nBOUND_ACCEPTED_AI_DECISION:\n"+json.dumps(proposal,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_REGISTRY_ROW:\n"+json.dumps(registry_row,sort_keys=True,indent=2)+"\n\nBOUND_REPOSITORY_CONTEXT:\n"+json.dumps(bound_context,sort_keys=True,indent=2)
 
 def _transport(root:Path,prompt:str,token:str,model:str)->tuple[dict[str,Any],dict[str,Any]]:
     if not shutil.which("copilot"): raise ImplementationRejected("GitHub Copilot CLI executable missing")
@@ -213,9 +279,11 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
     if pending.get("status")=="PENDING_EXACT_HEAD_GREEN" and pending.get("basis_next_state_sha256")==state_hash:
         if not green["green"]: return {"status":"PENDING_EXACT_HEAD_GREEN","exact_head":green}
         out=pending["implementation_output"]; _validate_output(root,out)
-        if out["status"]=="EXTERNAL_DATA_REQUIRED": published=_publish_external_gate(root,out,before)
-        else: published=_publish_next(root,out,before)
+        accepted_out=_post_green_output(out,list(pending.get("changed_paths") or []))
+        if accepted_out["status"]=="EXTERNAL_DATA_REQUIRED": published=_publish_external_gate(root,accepted_out,before)
+        else: published=_publish_next(root,accepted_out,before)
         pending["status"]="ACCEPTED_AFTER_EXACT_HEAD_GREEN"; pending["accepted_exact_head"]=green
+        pending["accepted_output"]=accepted_out
         atomic_write_json(root/RESPONSE_REL,pending)
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_acceptance",None)
         return {"status":"IMPLEMENTATION_ACCEPTED","output":out,"next_state":published,"exact_head":green}
@@ -234,6 +302,10 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         out,provider=_transport(root,_prompt(root,next_state),token,model)
         _validate_output(root,out)
         changed=_changed_paths(root)
+        if not changed and out["status"]=="COMPLETE_NON_ECONOMIC":
+            ns=dict(out.get("next_research_state") or {})
+            if ns.get("next_action")==next_state.get("next_action") and implementation_required(ns):
+                raise ImplementationRejected("implementation made no durable progress and repeated the same executable next_action")
         bad=[p for p in changed if _is_protected(p)]
         if bad: raise ImplementationRejected("AI implementation touched protected paths: "+repr(bad))
         if project_snapshot(root)!=before: raise ImplementationRejected("AI implementation changed economic/accounting snapshot")
