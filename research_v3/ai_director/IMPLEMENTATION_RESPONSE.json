@@ -1,4 +1,44 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "ee8c8ecac842df7cc6616cb3d0af2aef0f4cb3d4",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "ee8c8ecac842df7cc6616cb3d0af2aef0f4cb3d4",
+    "predecessor_run_id": 35999439280
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_capture_reused": true,
+      "action": "ADD_GENERIC_PRIMARY_MECHANISM_FAMILY_SELECTOR",
+      "economic_outcomes_opened": 0,
+      "external_data_required": false,
+      "implementation_refs": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
+      ],
+      "mechanism_family_closure_claimed": false,
+      "primary_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "source_triage_ref": "evidence/BROKER_NATIVE_FRONTIER_40_ADAPTIVE_BREADTH_TRIAGE_V1.json",
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "adaptive-breadth-primary-family-selection-v1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
+      ],
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a read-only selector that chooses one primary mechanism family from the accepted adaptive breadth triage using the accepted AI preference order. It validates non-economic prerequisite sufficiency, fails closed when no preferred family is eligible, and claims no economic evaluation or family exhaustion. No external market data or collector is required.",
+    "tests_requested": [
+      "python -m unittest tests/test_adaptive_breadth_triage.py -v",
+      "python -m unittest tests/test_general_ai_implementation_executor.py -v"
+    ]
+  },
   "basis_next_state_sha256": "08c13d8394d3e9cde78f43269c8c985b8132da9f2abb9567bfba11a3d4408a9e",
   "changed_paths": [
     "research_v3/adaptive_breadth_triage.py",
@@ -50,5 +90,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
