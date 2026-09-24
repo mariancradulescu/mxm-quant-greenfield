@@ -1,10 +1,10 @@
 {
-  "basis_next_state_sha256": "b25ce528f37f9fd9d01a5cbb6f5391ebe631701df19869f6f1c1c196858a8492",
+  "basis_next_state_sha256": "1cb213430c39218660bc55a7a84c00ac03d6529c24ff10e57a6bf1034a59a63b",
   "changed_paths": [],
-  "created_utc": "2026-09-24T12:41:46Z",
+  "created_utc": "2026-09-24T12:42:09Z",
   "exact_head": {
     "green": false,
-    "head": "badc0f3dadfec812d3c035303e02148fe4928a33",
+    "head": "05ac1812bfba891ea7e31c2b8d74a3bb1966e539",
     "predecessor_conclusion": "failure",
     "predecessor_head": "badc0f3dadfec812d3c035303e02148fe4928a33",
     "predecessor_run_id": 36000545574
@@ -12,36 +12,42 @@
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_capture_reused": true,
-      "action": "EXECUTE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE",
-      "economic_identity_authorized": false,
+      "action": "RETAIN_EXISTING_IMPLEMENTATION",
+      "capture_binding": {
+        "acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "accepted_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+        "plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
+        "resolution": "M5",
+        "symbols_screened": 40
+      },
+      "economic_identity_created": false,
       "economic_outcomes_opened": 0,
-      "exact_symbol_scope_required": 40,
       "external_data_required": false,
-      "implementation_refs": [
-        "research_v3/adaptive_breadth_triage.py",
-        "tests/test_adaptive_breadth_triage.py",
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json"
-      ],
+      "implementation_changes": [],
+      "implementation_ref": "research_v3/adaptive_breadth_triage.py",
+      "live_orders_authorized": false,
       "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
-      "new_market_data_required": false,
       "protected_forward_opened": false,
-      "resolution": "M5",
-      "returns_or_pnl_computed": false,
+      "test_ref": "tests/test_adaptive_breadth_triage.py",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
     "implementation_id": "univariate-structural-gate-v1",
     "next_research_state": {
-      "next_action": "EXECUTE_NON_ECONOMIC_UNIVARIATE_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
+      "data_requirement": "NO_NEW_MARKET_DATA_FOR_THIS_GATE",
+      "economic_progression": "NO_ECONOMIC_IDENTITY_OR_OUTCOME_AUTHORIZED",
+      "next_action": "EXECUTE_BREAKOUT_VOLATILITY_EXPANSION_STRUCTURAL_GATE_ON_ACCEPTED_40_SYMBOL_CAPTURE",
+      "outer_authorization": "NONE",
+      "research_judgment_required": false,
       "status": "NON_ECONOMIC_IMPLEMENTATION_COMPLETE_READY_FOR_EXECUTION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The accepted non-economic BREAKOUT_VOLATILITY_EXPANSION decision is already implemented generically. The read-only gate is bound to the accepted 40-symbol M5 development plan and capture hash, validates single-price OHLC plus tick volume without inventing bid/ask data, computes chronology, cadence, missingness, session, and causal event-availability diagnostics, and emits prerequisite results without economic evaluation or new capture.",
+    "summary": "The accepted non-economic BREAKOUT_VOLATILITY_EXPANSION structural gate is already implemented generically in research_v3/adaptive_breadth_triage.py. It validates the hash-bound accepted 40-symbol M5 capture, ordered single-price OHLC integrity, chronology/cadence, causal observation availability, event sufficiency, session coverage, missingness diagnostics, and per-family prerequisite status without returns, PnL, economic ranking, promotion, or new data acquisition. Existing tests cover hash binding, exact 40-symbol scope, non-economic safeguards, malformed inputs, and the tick-volume/OHLC validation regression.",
     "tests_requested": [
-      "python -m unittest tests/test_adaptive_breadth_triage.py -v",
-      "python -m unittest tests/test_general_ai_implementation_executor.py -v"
+      "tests/test_adaptive_breadth_triage.py::test_univariate_gate_is_hash_bound_and_non_economic",
+      "tests/test_adaptive_breadth_triage.py::test_univariate_gate_ohlc_validation_is_independent_of_tick_volume",
+      "tests/test_adaptive_breadth_triage.py::test_hash_mismatch_fails_closed",
+      "tests/test_general_ai_implementation_executor.py::test_arbitrary_non_reasoning_action_is_not_finite_mapped"
     ]
   },
   "project_snapshot": {
