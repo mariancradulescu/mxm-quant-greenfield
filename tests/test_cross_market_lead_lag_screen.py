@@ -19,8 +19,8 @@ from research_v3.cross_market_lead_lag_screen import (
 
 class CrossMarketLeadLagScreenTests(unittest.TestCase):
     def test_defaults_match_hash_bound_structural_gate(self):
-        self.assertEqual(EXPECTED_COMMON_TIMESTAMPS, 9539)
-        self.assertEqual(EXPECTED_CONSECUTIVE_PAIRS, 9455)
+        self.assertEqual(EXPECTED_COMMON_TIMESTAMPS, 9558)
+        self.assertEqual(EXPECTED_CONSECUTIVE_PAIRS, 9475)
 
     def test_series_uses_single_price_ohlc_and_rejects_invalid_invariant(self):
         raw = io.StringIO()
