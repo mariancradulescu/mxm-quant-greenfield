@@ -1,0 +1,92 @@
+{
+  "schema": "mxm.greenfield.breakout-fade-neth25-transaction-local-cost-capture-plan.v1",
+  "status": "FROZEN_PRE_CAPTURE_PRE_ECONOMIC_OUTCOME",
+  "source_decision_ref": "research_v3/EPOCH18_BREAKOUT_FADE_NETH25_COST_EXTENSION_DECISION_V1.json",
+  "source_development_capture_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+  "source_development_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+  "source_event_law_ref": "research_v3/EPOCH14_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_DECISION_V1.json",
+  "source_30m_persistence_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_V1.json",
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "symbol": {
+    "broker_symbol": "NETH25",
+    "symbol_id": 269,
+    "family": "INDEX"
+  },
+  "resolution": "M5",
+  "capture_interval": {
+    "start_utc": "2026-09-14T00:00:00Z",
+    "end_utc": "2026-09-17T11:56:00Z"
+  },
+  "event_analysis_interval": {
+    "start_utc": "2026-09-14T00:00:00Z",
+    "end_utc": "2026-09-17T11:20:00Z"
+  },
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "event_law": {
+    "lookback_bars": 24,
+    "volatility_expansion_ratio": 1.5,
+    "breakout_up": "close_t > max(high) over immediately preceding 24 strictly consecutive M5 bars",
+    "breakout_down": "close_t < min(low) over immediately preceding 24 strictly consecutive M5 bars",
+    "range_reference": "median(high-low) over immediately preceding 24 strictly consecutive M5 bars",
+    "gap_policy": "reject any 25-bar event window containing a non-300-second interval",
+    "parameter_variation": "NONE"
+  },
+  "transaction_boundaries": {
+    "bar_timestamp_semantics": "M5 row timestamp is bar-open time; event close becomes causally known at t+5m",
+    "entry_boundary": "event bar open t + 5m",
+    "exit_boundary": "event bar open t + 35m (30m after event close)",
+    "quote_context_lookback_seconds": 300,
+    "first_bilateral_quote_deadline_seconds": 60,
+    "selection": "first causal bilateral BID/ASK state at or after each boundary, using only quote updates at or before the selected state",
+    "unresolved_policy": "if no bilateral state is available by boundary+60s, mark that boundary COST_UNRESOLVED; do not impute"
+  },
+  "cost_law": {
+    "entry_one_side_spread_cost": "0.5 * entry boundary spread",
+    "exit_one_side_spread_cost": "0.5 * exit boundary spread",
+    "commission": "entry one-side effective broker-native commission + exit one-side effective broker-native commission, each using historical conversion evidence no later than its selected execution state",
+    "transaction_local_roundtrip_cost_price_equivalent": "0.5*entry_spread + 0.5*exit_spread + entry_one_side_commission + exit_one_side_commission",
+    "future_or_current_conversion_substitution": false,
+    "favorable_imputation": false
+  },
+  "transfer_contract": {
+    "include_m5_rows": true,
+    "include_event_boundary_cost_rows": true,
+    "raw_ticks_transferred": false,
+    "raw_conversion_ticks_transferred": false,
+    "price_levels_transferred_in_cost_rows": false,
+    "fields": [
+      "event_bar_time_utc",
+      "event_direction",
+      "entry_boundary_utc",
+      "entry_execution_state_utc",
+      "entry_quote_delay_ms",
+      "entry_spread",
+      "entry_one_side_commission_price_equivalent",
+      "entry_cost_confidence_state",
+      "exit_boundary_utc",
+      "exit_execution_state_utc",
+      "exit_quote_delay_ms",
+      "exit_spread",
+      "exit_one_side_commission_price_equivalent",
+      "exit_cost_confidence_state",
+      "roundtrip_cost_price_equivalent",
+      "cost_state"
+    ]
+  },
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "max_tick_pages_per_boundary_side": 16,
+    "max_stage_a_pages_per_symbol": 64,
+    "trendbar_page_count": 5000
+  },
+  "output_artifact_name": "MXM_BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_V1.zip",
+  "economic_outcomes_opened": 0,
+  "v2_attempts_consumed": 0,
+  "protected_evidence_opened": false,
+  "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "family_exhaustion_claimed": false,
+  "plan_sha256": "2afa8dc853068442cd36e3f02653f034e21183e15e06745e023a561f59e238a9"
+}
