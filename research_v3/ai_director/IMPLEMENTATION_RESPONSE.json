@@ -1,4 +1,52 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "76dca5948c7d696f3485fb06cbfcc4a87f90c4f0",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "76dca5948c7d696f3485fb06cbfcc4a87f90c4f0",
+    "predecessor_run_id": 35997899816
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_capture_reused": true,
+      "action": "IMPLEMENT_GENERIC_NON_ECONOMIC_ADAPTIVE_CROSS_FAMILY_TRIAGE",
+      "changed_files": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
+      ],
+      "economic_outcomes_opened": 0,
+      "external_data_required": false,
+      "live_orders_authorized": false,
+      "new_capture_gate_created": false,
+      "protected_evidence_opened": false,
+      "triage_properties": {
+        "causal_timestamp_ordering_enforced": true,
+        "economic_evaluation_performed": false,
+        "fixed_family_or_parameter_grid": false,
+        "frozen_40_symbol_scope_required": true,
+        "hash_bound_to_accepted_capture": true,
+        "single_price_ohlcv_only": true
+      },
+      "v2_attempts_consumed": 0
+    },
+    "external_data_gate": null,
+    "implementation_id": "adaptive-breadth-triage-v1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/adaptive_breadth_triage.py",
+        "tests/test_adaptive_breadth_triage.py"
+      ],
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a generic read-only adaptive cross-family structural triage for the accepted 40-symbol M5 development capture. It validates the accepted ZIP hash, frozen plan, manifest, single-price OHLCV schema, chronological ordering, interval bounds, and non-economic safety fields, then ranks mechanism families by causal data sufficiency without computing returns, PnL, outcomes, or promotion statistics.",
+    "tests_requested": [
+      "python -m unittest tests/test_adaptive_breadth_triage.py -v",
+      "python -m unittest tests/test_broker_native_frontier_development_capture.py tests/test_broker_native_adaptive_frontier.py -v"
+    ]
+  },
   "basis_next_state_sha256": "651e1e55c786043cfca55b52b313f368ecb68fb08211dd78d3d3f43eaba64247",
   "changed_paths": [
     "research_v3/adaptive_breadth_triage.py",
@@ -62,5 +110,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
