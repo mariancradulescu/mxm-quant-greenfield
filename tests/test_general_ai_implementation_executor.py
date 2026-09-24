@@ -1,7 +1,7 @@
 import json, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
-from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, ImplementationRejected, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, ImplementationRejected, _bound_context, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -53,6 +53,16 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_account_policy_falls_back_transparently_to_auto(self):
         self.assertEqual(DEFAULT_MODEL,"auto")
         self.assertEqual(IMPLEMENTATION_MODEL,"auto")
+
+    def test_large_implementation_authority_is_bounded_and_retrievable(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); rel="data/large.json"; (root/"data").mkdir()
+            (root/rel).write_text(json.dumps({"schema":"test","status":"ACCEPTED","products":{"X":"x"*9000}}))
+            context=_bound_context(root,{},{"authority_refs":[rel]})
+            self.assertEqual(context[rel]["content_summary"]["schema"],"test")
+            self.assertTrue(context[rel]["content_summary"]["available_via_repository_view"])
+            self.assertEqual(len(context[rel]["sha256"]),64)
+            self.assertLess(len(json.dumps(context)),1000)
 
     def test_external_collector_must_match_accepted_ai_scope(self):
         with tempfile.TemporaryDirectory() as td:
