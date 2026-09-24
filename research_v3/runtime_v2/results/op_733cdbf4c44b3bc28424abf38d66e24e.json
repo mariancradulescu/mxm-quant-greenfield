@@ -1,0 +1,57 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "c705010fc42fd2f9412b684a4b82be1e10fa57fc0d4bf34ee1420fb3e093e8b9",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "AUTHORIZE_PRE_OUTCOME_OUTER_DATA_BINDING_ONLY",
+    "candidate_id": "V2-C031",
+    "disjointness": "Strictly disjoint from all prior C031 data.",
+    "economic_effect": "NON_ECONOMIC_PROPOSAL; opens no outcome and consumes no identity or search attempt.",
+    "execution_gate": "Run only structural/data-integrity validation first. Permit the outer economic screen only after causal pre-outcome integrity passes and all metadata are complete.",
+    "mechanism_family": "SESSION_GAP_REVERSION",
+    "required_metadata": [
+      "executable bid/ask or equivalent conservative friction",
+      "commission and financing",
+      "directional margin and volume-lattice rules",
+      "trading schedule and missing-data chronology",
+      "schedule-adjusted coverage >= 0.97",
+      "zero unresolved chronology conflicts"
+    ],
+    "resolution": "M5",
+    "symbol_binding": "Use exactly the six symbols defined by the authoritative C031 selected-six-panel freeze; do not expand, substitute, or tune the panel.",
+    "window_end_utc": "2026-06-14T23:59:59Z",
+    "window_start_utc": "2026-02-23T00:00:00Z"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "candidate_id": "V2-C031",
+    "next_action": "BIND_FROZEN_C031_SIX_PANEL_TO_DISJOINT_OUTER_WINDOW_AND_VALIDATE_DATA_COST_MARGIN_AND_CHRONOLOGY",
+    "required_checks": [
+      "strict_disjointness_from_prior_c031_data",
+      "schedule_adjusted_coverage_at_least_0.97",
+      "zero_unresolved_chronology_conflicts",
+      "complete_executable_friction_and_margin_metadata",
+      "causal_pre_outcome_integrity"
+    ],
+    "resolution": "M5",
+    "status": "OUTER_DATA_BINDING_REQUIRED",
+    "window_end_utc": "2026-06-14T23:59:59Z",
+    "window_start_utc": "2026-02-23T00:00:00Z"
+  },
+  "objective": {
+    "class": "BROADER_UNIVERSE_INFORMATION_GAIN_AND_CAUSAL_METHOD_DESIGN",
+    "goal": "Bind the smallest prospectively sufficient disjoint M5 outer window for the frozen C031 session-gap panel before any economic outcome.",
+    "information_gain_rationale": "A disjoint 2026-02-23 through 2026-06-14 window tests whether the session-gap mechanism survives an unseen regime while preserving causal chronology; requiring complete friction, margin, schedule, and coverage metadata prevents an uninterpretable outer result."
+  },
+  "operation_id": "op_733cdbf4c44b3bc28424abf38d66e24e",
+  "proposal_hash": "31fdb0af0d2af89d2548dfa0ad34b239864bfddfbf36ce68b2978ddb8744154f",
+  "proposal_id": "c031-disjoint-outer-binding-v2",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_94920a023d14ff82316247044e730fe9.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
