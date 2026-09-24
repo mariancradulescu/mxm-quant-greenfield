@@ -1,14 +1,19 @@
 import copy
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from research_v3.general_ai_reasoning_provider import reasoning_required
+from research_v3.general_ai_autonomy_loop import run as autonomous_loop
 from research_v3.general_ai_director_bridge import (
     AIProposalRejected,
     PROPOSAL_SCHEMA,
     _validate_authoritative_data_contract,
+    _active_authoritative_data_contract,
+    _reject_completed_outer_as_unseen,
     compile_runtime_plan,
     drain,
     materialize_proposal,
@@ -63,6 +68,55 @@ def base_proposal(objective_class="ARBITRARY_NEW_RESEARCH_CLASS"):
 
 
 class GeneralAIDirectorBridgeTests(unittest.TestCase):
+    def _outer_fixture(self, root, *, completed):
+        freeze = "research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json"
+        plan = "data/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_PLAN_V1.json"
+        capture = "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json"
+        result = "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json"
+        interpretation = "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json"
+        for rel in (freeze, plan, capture, result, interpretation):
+            dest = root / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(Path(rel), dest)
+        state = {
+            "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
+            "next_action": "AWAIT_INDEPENDENT_OUTER_CAPTURE",
+            "source_freeze_ref": freeze,
+            "outer_capture_plan_ref": plan,
+            "user_action_required": True,
+        }
+        if completed:
+            state.update({
+                "status": "AI_REASONING_REQUIRED_AFTER_COMPLETED_OUTER",
+                "next_action": "AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_COMPLETE_EVIDENCE",
+                "ai_reasoning_required": True,
+                "user_action_required": False,
+                "outer_data_binding_ref": capture,
+                "capture_acceptance_ref": capture,
+                "result_ref": result,
+                "interpretation_ref": interpretation,
+            })
+        dest = root / "research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(json.dumps(state))
+        return state
+
+    def _new_broker_native_scope(self):
+        proposal = base_proposal()
+        proposal["data_policy"].update({
+            "new_market_data_requested": True,
+            "minimal_acquisition_request": {
+                "source_domain": "PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API",
+                "symbols": ["FUTURE_BROKER_SYMBOL"],
+                "resolution": "M15",
+                "start_utc": "2026-08-03T00:00:00Z",
+                "end_utc": "2026-08-17T23:59:59Z",
+                "fields": ["time_utc", "open", "high", "low", "close"],
+                "information_gain_justification": "Illustrative prospectively specified scope; no acquisition or alpha claim.",
+            },
+        })
+        return proposal
+
     def test_objective_class_is_open_not_enum(self):
         for cls in (
             "TOTALLY_UNSEEN_CAUSAL_MODEL_FAMILY",
@@ -77,7 +131,7 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         proposal["next_research_state"]["unseen_future_field"] = 42
         validate_proposal_shape(proposal)
 
-    def test_authoritative_outer_contract_rejects_panel_substitution(self):
+    def test_pending_outer_rejects_panel_substitution(self):
         proposal = base_proposal()
         proposal["data_policy"]["new_market_data_requested"] = True
         proposal["data_policy"]["minimal_acquisition_request"] = {
@@ -88,10 +142,12 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "fields": ["time_utc","open","high","low","close"],
             "information_gain_justification": "test",
         }
-        with self.assertRaisesRegex(AIProposalRejected,"violates frozen outer panel"):
-            _validate_authoritative_data_contract(Path("."), proposal)
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self._outer_fixture(root, completed=False)
+            with self.assertRaisesRegex(AIProposalRejected,"violates frozen outer panel"):
+                _validate_authoritative_data_contract(root, proposal)
 
-    def test_authoritative_outer_contract_accepts_exact_frozen_scope(self):
+    def test_pending_outer_accepts_exact_frozen_scope(self):
         proposal = base_proposal()
         proposal["data_policy"]["new_market_data_requested"] = True
         proposal["data_policy"]["minimal_acquisition_request"] = {
@@ -102,9 +158,11 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "fields": ["time_utc","open","high","low","close"],
             "information_gain_justification": "test",
         }
-        _validate_authoritative_data_contract(Path("."), proposal)
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self._outer_fixture(root, completed=False)
+            _validate_authoritative_data_contract(root, proposal)
 
-    def test_authoritative_outer_contract_rejects_interval_drift(self):
+    def test_pending_outer_rejects_interval_drift(self):
         proposal = base_proposal()
         proposal["data_policy"]["new_market_data_requested"] = True
         proposal["data_policy"]["minimal_acquisition_request"] = {
@@ -115,8 +173,10 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "fields": ["time_utc","open","high","low","close"],
             "information_gain_justification": "test",
         }
-        with self.assertRaisesRegex(AIProposalRejected,"frozen outer interval"):
-            _validate_authoritative_data_contract(Path("."), proposal)
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self._outer_fixture(root, completed=False)
+            with self.assertRaisesRegex(AIProposalRejected,"frozen outer interval"):
+                _validate_authoritative_data_contract(root, proposal)
 
     def test_ai_cannot_open_economics_through_bridge(self):
         proposal = base_proposal()
@@ -136,6 +196,7 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         with self.assertRaises(AIProposalRejected):
             validate_proposal_shape(proposal)
         proposal["data_policy"]["minimal_acquisition_request"] = {
+            "source_domain": "PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API",
             "symbols": ["FUTURE_SYMBOL"],
             "resolution": "M5",
             "start_utc": "2026-01-01T00:00:00Z",
@@ -144,6 +205,76 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "information_gain_justification": "Prospectively sufficient pilot.",
         }
         validate_proposal_shape(proposal)
+
+    def test_completed_outer_does_not_reopen_old_data_contract(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self._outer_fixture(root, completed=True)
+            self.assertIsNone(_active_authoritative_data_contract(root))
+            path = root / "research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json"
+            malformed = json.loads(path.read_text())
+            malformed["interpretation_ref"] = "evidence/nonexistent.json"
+            path.write_text(json.dumps(malformed))
+            with self.assertRaises(AIProposalRejected):
+                _active_authoritative_data_contract(root)
+
+    def test_completed_outer_cannot_be_reused_as_unseen_confirmation(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); state = self._outer_fixture(root, completed=True)
+            proposal = base_proposal()
+            proposal["data_bindings"] = [{"ref": state["result_ref"], "role": "UNSEEN_CONFIRMATION"}]
+            with self.assertRaisesRegex(AIProposalRejected, "cannot be reused as unseen"):
+                _reject_completed_outer_as_unseen(root, proposal)
+            proposal["data_bindings"][0]["role"] = "OBSERVED_HISTORICAL_CONTEXT"
+            _reject_completed_outer_as_unseen(root, proposal)
+
+    def test_completed_outer_allows_new_prospective_broker_native_scope(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self._outer_fixture(root, completed=True)
+            proposal = self._new_broker_native_scope()
+            validate_proposal_shape(proposal)
+            _validate_authoritative_data_contract(root, proposal)
+            _reject_completed_outer_as_unseen(root, proposal)
+
+    def test_new_scope_still_requires_prospective_causal_data_contract(self):
+        proposal = self._new_broker_native_scope()
+        del proposal["data_policy"]["minimal_acquisition_request"]["information_gain_justification"]
+        with self.assertRaisesRegex(AIProposalRejected, "prospectively required field"):
+            validate_proposal_shape(proposal)
+        proposal = self._new_broker_native_scope()
+        proposal["causal_contract"]["future_information_forbidden"] = False
+        with self.assertRaisesRegex(AIProposalRejected, "causal contract"):
+            validate_proposal_shape(proposal)
+        proposal = self._new_broker_native_scope()
+        proposal["data_policy"]["minimal_acquisition_request"]["source_domain"] = "YAHOO_FINANCE"
+        with self.assertRaisesRegex(AIProposalRejected, "broker-native"):
+            validate_proposal_shape(proposal)
+
+    def test_state_transition_preserves_outer_economics_and_attempts(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); state = self._outer_fixture(root, completed=True)
+            files = [root / state[key] for key in ("capture_acceptance_ref", "result_ref", "interpretation_ref")]
+            before = [x.read_bytes() for x in files]
+            accounting = Path("CURRENT_STATE.json").read_bytes()
+            ledger = Path("discovery/ledger.jsonl").read_bytes()
+            proposal = self._new_broker_native_scope()
+            _validate_authoritative_data_contract(root, proposal)
+            _reject_completed_outer_as_unseen(root, proposal)
+            self.assertEqual(before, [x.read_bytes() for x in files])
+            self.assertEqual(accounting, Path("CURRENT_STATE.json").read_bytes())
+            self.assertEqual(ledger, Path("discovery/ledger.jsonl").read_bytes())
+            current = json.loads(accounting)
+            self.assertEqual((current["v2_attempts_used"], current["economic_outcomes_opened"]), (19, 27))
+
+    def test_liveness_from_completed_outer_reaches_general_ai_reasoning(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); state = self._outer_fixture(root, completed=True)
+            self.assertTrue(reasoning_required(state))
+            with patch("research_v3.general_ai_autonomy_loop.validate_repository_state", return_value={}), \
+                 patch("research_v3.general_ai_autonomy_loop.reason", return_value={"status": "PROPOSAL_GENERATED"}) as reason, \
+                 patch("research_v3.general_ai_autonomy_loop.drain", return_value={"status": "PASS"}):
+                out = autonomous_loop(root, max_cycles=1)
+            self.assertEqual(out["trace"][0]["kind"], "GENERAL_AI_REASONING")
+            reason.assert_called_once()
 
     def _real_historical_ref(self):
         return "research_v3/ai_director/proposals/C031_STAGE_B_EXECUTION_AUTHORIZATION_V1.json"
