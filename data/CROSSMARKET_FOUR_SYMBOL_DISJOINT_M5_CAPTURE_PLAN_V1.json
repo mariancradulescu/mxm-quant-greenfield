@@ -1,0 +1,90 @@
+{
+  "schema": "mxm.greenfield.crossmarket-four-symbol-disjoint-m5-capture-plan.v1",
+  "status": "FROZEN_PRE_CAPTURE_NON_ECONOMIC",
+  "source_proposal_id": "P-20260924-CROSSMARKET-LAG-OUTER-01",
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "resolution": "M5",
+  "interval": {
+    "start_utc": "2026-05-25T00:00:00Z",
+    "end_utc": "2026-07-19T23:59:59Z"
+  },
+  "fields": [
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "symbols": [
+    {
+      "broker_symbol": "AUDJPY",
+      "symbol_id": 11,
+      "family": "FX",
+      "structural_signature": {
+        "asset_class": "FX",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      }
+    },
+    {
+      "broker_symbol": "AUS200",
+      "symbol_id": 117,
+      "family": "INDEX",
+      "structural_signature": {
+        "asset_class": "AU Index",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "ASIA"
+      }
+    },
+    {
+      "broker_symbol": "Brent-F",
+      "symbol_id": 2923,
+      "family": "ENERGY",
+      "structural_signature": {
+        "asset_class": "Energy",
+        "coverage_bucket": "EXTENDED_MULTI_SESSION_SCHEDULE",
+        "session_regions": "EUROPE|US"
+      }
+    },
+    {
+      "broker_symbol": "BCHUSD",
+      "symbol_id": 326,
+      "family": "CRYPTO",
+      "structural_signature": {
+        "asset_class": "Crypto Currency (Spot)",
+        "coverage_bucket": "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      }
+    }
+  ],
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "protected_rows_permitted": false,
+    "synthetic_fill_permitted": false,
+    "forward_fill_permitted": false,
+    "max_count_per_request": 5000,
+    "per_symbol_capture_error_preservation": true,
+    "strict_timestamp_order_required_for_nonempty_series": true,
+    "historical_schedule_truth_required": false
+  },
+  "research_contract": {
+    "purpose": "Read-only disjoint four-symbol M5 capture for prospectively frozen 15-minute lead-lag structural stability assessment.",
+    "forbidden": [
+      "returns",
+      "PnL",
+      "economic ranking",
+      "promotion",
+      "protected forward evidence"
+    ],
+    "trendbars_are_single_price_ohlc": true,
+    "bid_ask_or_spread_requested": false
+  },
+  "economic_outcomes_opened": 0,
+  "v2_attempts_consumed": 0,
+  "protected_evidence_opened": false,
+  "output_artifact_name": "MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_NON_ECONOMIC_V1.zip"
+}
