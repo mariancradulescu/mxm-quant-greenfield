@@ -172,7 +172,19 @@ def _bound_context(root:Path,next_state:Mapping[str,Any],proposal:Mapping[str,An
         if not p.is_file() or p.stat().st_size>500_000:
             continue
         try:
-            docs[rel]=json.loads(p.read_text(encoding="utf-8"))
+            raw=p.read_bytes()
+            doc=json.loads(raw)
+            if len(raw)>3000:
+                docs[rel]={
+                    "sha256":sha256_bytes(raw),
+                    "content_summary":{
+                        "schema":doc.get("schema"),"status":doc.get("status"),
+                        "byte_length":len(raw),"available_via_repository_view":True,
+                        "top_level_keys":list(doc)[:24],
+                    },
+                }
+            else:
+                docs[rel]=doc
         except Exception:
             pass
     return docs
