@@ -1,7 +1,7 @@
 import json, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
-from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, ImplementationRejected, _bound_context, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, FOUR_PANEL_OUTER_ACQUISITION_FIELDS, FOUR_PANEL_OUTER_SCHEMA, PROTECTED_PREFIXES, ImplementationRejected, _bound_context, _collector_fields_match, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -63,6 +63,14 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
             self.assertTrue(context[rel]["content_summary"]["available_via_repository_view"])
             self.assertEqual(len(context[rel]["sha256"]),64)
             self.assertLess(len(json.dumps(context)),1000)
+
+    def test_legacy_four_panel_acquisition_fields_map_to_compact_transfer_contract(self):
+        plan={"schema":FOUR_PANEL_OUTER_SCHEMA}
+        self.assertTrue(_collector_fields_match(plan,FOUR_PANEL_OUTER_ACQUISITION_FIELDS))
+        self.assertFalse(_collector_fields_match(plan,["bid","ask"]))
+        explicit={"schema":"future.schema","fields":["time_utc","close"]}
+        self.assertTrue(_collector_fields_match(explicit,["time_utc","close"]))
+        self.assertFalse(_collector_fields_match(explicit,["timestamp","close"]))
 
     def test_external_collector_must_match_accepted_ai_scope(self):
         with tempfile.TemporaryDirectory() as td:

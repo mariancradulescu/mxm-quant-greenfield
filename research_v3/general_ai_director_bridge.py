@@ -31,6 +31,7 @@ from research_v3.runtime_v2_primitives import (
 PROTOCOL_VERSION = "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1"
 PROPOSAL_SCHEMA = "mxm.greenfield.general-ai-research-proposal.v1"
 ATTESTATION_SCHEMA = "mxm.greenfield.ai-director-artifact-attestation.v1"
+FOUR_PANEL_OUTER_ACQUISITION_FIELDS = ["timestamp","open","high","low","close","volume","bid","ask","broker_native_commission_or_cost_metadata"]
 PROPOSAL_DIR = Path("research_v3/ai_director/proposals")
 REGISTRY_REL = Path("research_v3/ai_director/PROPOSAL_REGISTRY_V1.json")
 REQUEST_REL = Path("research_v3/ai_director/AI_REASONING_REQUEST.json")
@@ -471,8 +472,8 @@ def _validate_provisional_four_panel_reauthorization(root: Path, proposal: Mappi
             raise AIProposalRejected("four-panel acquisition request drifts from frozen symbols/resolution")
         if req.get("start_utc")!=expected_interval.get("start_utc") or req.get("end_utc")!=expected_interval.get("end_utc"):
             raise AIProposalRejected("four-panel acquisition request drifts from frozen outer interval")
-        if not isinstance(req.get("fields"),list) or not req.get("fields"):
-            raise AIProposalRejected("four-panel acquisition request requires explicit fields")
+        if req.get("fields")!=FOUR_PANEL_OUTER_ACQUISITION_FIELDS:
+            raise AIProposalRejected("four-panel acquisition request fields drift from the certified collector acquisition contract")
 
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)

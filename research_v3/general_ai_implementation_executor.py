@@ -20,6 +20,7 @@ GATE_REL=Path("research_v3/ai_director/IMPLEMENTATION_EXTERNAL_GATE.json")
 DEFAULT_MODEL="auto"
 FOUR_PANEL_OUTER_SCHEMA="mxm.greenfield.session-gap-frontier-four-panel-independent-outer-capture-plan.v1"
 FOUR_PANEL_OUTER_FIELDS=["time_utc","open","high","low","close","tick_volume","historical_bid_ask_friction_summary","historical_conversion_summary"]
+FOUR_PANEL_OUTER_ACQUISITION_FIELDS=["timestamp","open","high","low","close","volume","bid","ask","broker_native_commission_or_cost_metadata"]
 FOUR_PANEL_OUTER_OUTPUT="MXM_SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_M5_13W_FRICTION_V1.zip"
 PROTECTED_PREFIXES=(
     "CURRENT_STATE.json","V2_SEARCH_BUDGET_V1.json","V2_PROTECTED_FORWARD_START.json",
@@ -278,6 +279,16 @@ def _transport(root:Path,prompt:str,token:str,model:str)->tuple[dict[str,Any],di
         "cli":"@github/copilot",
     }
 
+def _collector_fields_match(plan:Mapping[str,Any],request_fields:Any)->bool:
+    plan_fields=plan.get("fields")
+    if plan.get("schema")==FOUR_PANEL_OUTER_SCHEMA and plan_fields is None:
+        # The legacy frozen outer plan predates an explicit transferable fields key.
+        # Its collector contract acquires single-price M5 trendbars plus exact historical
+        # BID/ASK ticks and broker-native commission/conversion evidence, then transfers
+        # OHLCV + compact friction/conversion summaries (never raw tick streams).
+        return request_fields==FOUR_PANEL_OUTER_ACQUISITION_FIELDS
+    return plan_fields==request_fields
+
 def _validate_output(root:Path,out:Mapping[str,Any])->None:
     status=str(out.get("status") or "")
     if status not in {"COMPLETE_NON_ECONOMIC","EXTERNAL_DATA_REQUIRED","IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"}:
@@ -306,10 +317,7 @@ def _validate_output(root:Path,out:Mapping[str,Any])->None:
                 or interval.get("start_utc")!=request.get("start_utc")
                 or interval.get("end_utc")!=request.get("end_utc")):
             raise ImplementationRejected("collector plan does not match accepted AI proposal scope")
-        plan_fields=plan.get("fields")
-        if plan_fields is None and plan.get("schema")==FOUR_PANEL_OUTER_SCHEMA:
-            plan_fields=FOUR_PANEL_OUTER_FIELDS
-        if plan_fields!=request.get("fields"):
+        if not _collector_fields_match(plan,request.get("fields")):
             raise ImplementationRejected("collector plan fields do not match accepted AI proposal scope")
         expected_output=plan.get("output_artifact_name")
         if expected_output is None and plan.get("schema")==FOUR_PANEL_OUTER_SCHEMA:
