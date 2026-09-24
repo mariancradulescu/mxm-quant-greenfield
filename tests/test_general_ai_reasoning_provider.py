@@ -8,12 +8,23 @@ from research_v3.general_ai_reasoning_provider import (
     PROVIDER_KIND,
     PROVIDER_VERSION,
     _system_prompt,
+    _authority_context,
     build_reasoning_request,
     reasoning_required,
     wake,
 )
 
 class GeneralAIReasoningProviderTests(unittest.TestCase):
+    def test_large_broker_native_index_is_hash_bound_and_readable_without_oversized_cli_argument(self):
+        rows,refs=_authority_context(Path("."),{})
+        name="data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json"
+        self.assertIn(name,refs)
+        row=next(x for x in rows if x["ref"]==name)
+        self.assertEqual(row["content_summary"]["current_accessible_symbols_indexed"],1690)
+        self.assertTrue(row["content_summary"]["available_via_repository_view"])
+        self.assertNotIn("products",row)
+        self.assertNotIn("content",row)
+
     def test_current_state_reasoning_request_matches_generic_wake_semantics(self):
         req=build_reasoning_request(".")
         expected="AI_REASONING_REQUIRED" if reasoning_required(req["next_state"]) else "NO_AI_REASONING_REQUIRED"
