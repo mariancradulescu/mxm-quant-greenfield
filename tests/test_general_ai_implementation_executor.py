@@ -1,6 +1,7 @@
-import json, unittest
+import json, tempfile, unittest
 from pathlib import Path
-from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, _post_green_output, _resolve_current_proposal, authoritative_reasoning_requirement, implementation_required
+from unittest.mock import patch
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, PROTECTED_PREFIXES, ImplementationRejected, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -52,4 +53,28 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_account_policy_falls_back_transparently_to_auto(self):
         self.assertEqual(DEFAULT_MODEL,"auto")
         self.assertEqual(IMPLEMENTATION_MODEL,"auto")
+
+    def test_external_collector_must_match_accepted_ai_scope(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); plan_ref="plan.json"; build_ref="build.py"
+            plan={"symbols":[{"broker_symbol":"OLD_SYMBOL"}],"resolution":"M5",
+                  "interval":{"start_utc":"2026-07-20T00:00:00Z","end_utc":"2026-09-13T23:59:59Z"},
+                  "output_artifact_name":"old.zip"}
+            (root/plan_ref).write_text(json.dumps(plan))
+            (root/build_ref).write_text('PLAN_REF="plan.json"')
+            proposal={"data_policy":{"new_market_data_requested":True,"minimal_acquisition_request":{
+                "symbols":["NEW_SYMBOL"],"resolution":"M5",
+                "start_utc":"2026-07-20T00:00:00Z","end_utc":"2026-09-13T23:59:59Z"}}}
+            out={"implementation_id":"test","status":"EXTERNAL_DATA_REQUIRED",
+                 "next_research_state":{"status":"WAITING","next_action":"CAPTURE"},
+                 "external_data_gate":{"collector_build_ref":build_ref,"collector_plan_ref":plan_ref,
+                                       "collector_package_artifact_name":"package.zip",
+                                       "expected_return_artifact_name":"old.zip"}}
+            with patch("research_v3.general_ai_implementation_executor._resolve_current_proposal",
+                       return_value=("proposal.json",proposal,{})):
+                with self.assertRaisesRegex(ImplementationRejected,"does not match accepted AI proposal scope"):
+                    _validate_output(root,out)
+                plan["symbols"]=[{"broker_symbol":"NEW_SYMBOL"}]
+                (root/plan_ref).write_text(json.dumps(plan))
+                _validate_output(root,out)
 if __name__=="__main__": unittest.main()
