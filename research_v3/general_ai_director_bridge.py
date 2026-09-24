@@ -258,6 +258,32 @@ def _reject_duplicate_accepted_capture(root: Path, proposal: Mapping[str, Any]) 
         raise AIProposalRejected("exact broker-native capture already accepted and screened; reuse existing evidence")
 
 
+def _validate_broker_native_selection(root: Path, proposal: Mapping[str, Any]) -> None:
+    policy = proposal.get("data_policy") or {}
+    if policy.get("new_market_data_requested") is not True:
+        return
+    index = _load(root, "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json")
+    acceptance = _load(root, index["source_acceptance_ref"])
+    accepted = acceptance.get("accepted_capture") or {}
+    if (index.get("source_zip_sha256") != accepted.get("zip_sha256")
+            or index.get("source_internal_json_sha256") != accepted.get("internal_json_sha256")
+            or index.get("account_fingerprint_sha256") != (acceptance.get("account_identity") or {}).get("account_fingerprint_sha256")):
+        raise AIProposalRejected("broker-native feasibility index provenance mismatch")
+    request = policy.get("minimal_acquisition_request") or {}
+    exceptions = policy.get("future_equity_only_scope") or {}
+    for name in request.get("symbols") or []:
+        row = (index.get("products") or {}).get(name)
+        if row is None:
+            raise AIProposalRejected(f"broker-native symbol identity absent from current account: {name}")
+        if row[2]:
+            raise AIProposalRejected(f"TEST product cannot enter current economic research scope: {name}")
+        if row[1] == "NEITHER_FEASIBLE":
+            allowed = name in (exceptions.get("symbols") or [])
+            justified = bool(exceptions.get("prospective_rationale")) and exceptions.get("initial_eur200_tradable") is False
+            if not (allowed and justified):
+                raise AIProposalRejected(f"broker-native symbol infeasible at initial EUR200: {name}")
+
+
 def _active_authoritative_data_contract(root: Path) -> dict[str, Any] | None:
     """Resolve a still-unsatisfied prospective data contract from durable state.
 
@@ -401,6 +427,7 @@ def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]
     _validate_authoritative_data_contract(root, proposal)
     _reject_completed_outer_as_unseen(root, proposal)
     _reject_duplicate_accepted_capture(root, proposal)
+    _validate_broker_native_selection(root, proposal)
     basis = proposal.get("basis") or {}
     basis_head = _nonempty(basis.get("research_head"), "basis.research_head")
     if not _is_ancestor(root, basis_head):
