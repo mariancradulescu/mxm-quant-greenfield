@@ -39,11 +39,12 @@ def _head(root:Path)->str:
 def _next(root:Path)->dict[str,Any]:
     return dict(load_json(root/NEXT_STATE_REL,{}) or {})
 
-def implementation_required(next_state:Mapping[str,Any])->bool:
-    if next_state.get("status")=="MATERIAL_INTEGRITY_FAILURE" and next_state.get("integrity_gate"): return False
-    if next_state.get("user_action_required") is True: return False
-    if not str(next_state.get("next_action") or "").strip(): return False
-    return not reasoning_required(next_state)
+def implementation_required(next_state:Mapping[str,Any],root_value:str|Path=".")->bool:
+    """Compatibility wrapper around the explicit authority router.
+
+    next_action alone is never authority to spend an AI implementation call.
+    """
+    return routed_implementation_required(Path(root_value).resolve(),next_state)
 
 def authoritative_reasoning_requirement(root:Path,next_state:Mapping[str,Any])->dict[str,Any]|None:
     """Return a generic reasoning redirect when an authoritative freeze forbids execution before a prerequisite."""
@@ -380,7 +381,7 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
             raise ImplementationRejected("stale-reasoning redirect changed economic/accounting snapshot")
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("stale_reasoning_fail_closed",None)
         return {"status":"AI_REASONING_REQUIRED","next_state":doc,"stale_reasoning_guard":stale["stale_reasoning_guard"]}
-    if not implementation_required(next_state): return {"status":"NO_IMPLEMENTATION_REQUIRED"}
+    if not implementation_required(next_state,root): return {"status":"NO_IMPLEMENTATION_REQUIRED"}
     if next_state.get("source_ai_proposal_id"):
         superseded=load_json(root/"research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",{}) or {}
         if superseded.get("proposal_id")==next_state["source_ai_proposal_id"]:
@@ -439,7 +440,7 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         changed=_changed_paths(root)
         if not changed and out["status"]=="COMPLETE_NON_ECONOMIC":
             ns=dict(out.get("next_research_state") or {})
-            if ns.get("next_action")==next_state.get("next_action") and implementation_required(ns):
+            if ns.get("next_action")==next_state.get("next_action") and implementation_required(ns,root):
                 raise ImplementationRejected("implementation made no durable progress and repeated the same executable next_action")
         bad=[p for p in changed if _is_protected(p)]
         if bad: raise ImplementationRejected("AI implementation touched protected paths: "+repr(bad))
@@ -471,7 +472,7 @@ def main(argv=None)->int:
     p=argparse.ArgumentParser(description=VERSION); p.add_argument("command",choices=("inspect","execute")); p.add_argument("--root",default=".")
     p.add_argument("--git-checkpoint",action="store_true"); p.add_argument("--git-push",action="store_true"); a=p.parse_args(argv)
     root=Path(a.root)
-    payload={"status":"IMPLEMENTATION_REQUIRED" if implementation_required(_next(root)) else "NO_IMPLEMENTATION_REQUIRED",
+    payload={"status":"IMPLEMENTATION_REQUIRED" if implementation_required(_next(root),root) else "NO_IMPLEMENTATION_REQUIRED",
              "next_state":_next(root),"exact_head":exact_head_green(root)} if a.command=="inspect" else execute(root,git_checkpoint=a.git_checkpoint,git_push=a.git_push)
     print(json.dumps(payload,sort_keys=True,indent=2)); return 0
 if __name__=="__main__": raise SystemExit(main())

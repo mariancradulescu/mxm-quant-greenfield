@@ -9,11 +9,11 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_current_state_routes_by_semantics_not_finite_state_names(self):
         s=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
         if s.get("user_action_required") is True or not s.get("next_action") or (s.get("status")=="MATERIAL_INTEGRITY_FAILURE" and s.get("integrity_gate")):
-            self.assertFalse(implementation_required(s))
+            self.assertFalse(implementation_required(s,ROOT))
         elif reasoning_required(s):
             self.assertFalse(implementation_required(s))
         else:
-            self.assertTrue(implementation_required(s))
+            self.assertTrue(implementation_required(s,ROOT))
     def test_explicit_integrity_gate_blocks_implementation_even_with_next_action(self):
         self.assertFalse(implementation_required({"status":"MATERIAL_INTEGRITY_FAILURE","integrity_gate":"C032_CAPTURE_REUSE","next_action":"RUN_UNSAFE_SCREEN"}))
 
@@ -47,8 +47,8 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertIsNone(authoritative_reasoning_requirement(ROOT,s))
 
     def test_arbitrary_non_reasoning_action_is_not_finite_mapped(self):
-        self.assertTrue(implementation_required({"status":"ANY_FUTURE_STATE","next_action":"SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
-        self.assertFalse(implementation_required({"status":"WAIT","next_action":"EXTERNAL","user_action_required":True}))
+        self.assertFalse(implementation_required({"status":"ANY_FUTURE_STATE","next_action":"SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False},ROOT))
+        self.assertFalse(implementation_required({"status":"WAIT","next_action":"EXTERNAL","user_action_required":True},ROOT))
     def test_protected_authorities_include_economics_and_ledgers(self):
         joined="\n".join(PROTECTED_PREFIXES)
         for item in ("CURRENT_STATE.json","discovery/ledger.jsonl","research_v3/runtime_v2/","m6/results/","PROPOSAL_REGISTRY_V1.json",".github/workflows/"):

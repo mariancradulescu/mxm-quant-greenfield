@@ -1,0 +1,126 @@
+{
+  "schema": "mxm.greenfield.frontier-execution-prerequisite-capture-contract.v1",
+  "status": "FROZEN_DETERMINISTIC_READ_ONLY_CAPTURE_CONTRACT",
+  "evidence_epoch": 21,
+  "source_operation_ref": "research_v3/EPOCH21_NEXT_DETERMINISTIC_OPERATION_V1.json",
+  "source_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
+  "eligible_identity_count": 1578,
+  "scope_law": {
+    "economic_panel_selected": false,
+    "mechanism_family_selected": false,
+    "fixed_arbitrary_panel": false,
+    "structural_representatives_are_economic_equivalents": false,
+    "outcome_derived_selection_permitted": false
+  },
+  "required_fields": [
+    {
+      "field": "exact_broker_symbol_id_and_name",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "current_entry_trading_mode",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "current_bid_ask_or_equivalent_transaction_local_spread_authority",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "commission_and_structural_fee_authority",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "minimum_volume_and_step",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "current_directional_eur200_margin_or_expected_margin_binding",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "account_fingerprint_and_capture_timestamp",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    },
+    {
+      "field": "per_identity_capture_status_and_fail_closed_reason",
+      "contract_requirement": "REQUIRED_BEFORE_RELEVANT_ECONOMIC_ENVELOPE"
+    }
+  ],
+  "acquisition_tiers": [
+    {
+      "tier": "ALREADY_AUTHORIZED_IDENTITY_AND_DIRECTIONAL_FEASIBILITY",
+      "scope": "1578_ELIGIBLE_IDENTITIES",
+      "fields": [
+        "exact_broker_symbol_id_and_name",
+        "current_directional_eur200_feasibility_class"
+      ],
+      "authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
+      "external_capture_required": false
+    },
+    {
+      "tier": "COMPACT_STRUCTURAL_METADATA",
+      "scope": "SELECTOR_CONTROLLED",
+      "fields": [
+        "current_entry_trading_mode",
+        "commission_and_structural_fee_authority",
+        "minimum_volume_and_step",
+        "asset_class",
+        "product_type",
+        "schedule_surface",
+        "weekend_capability"
+      ],
+      "external_capture_required_if_hash_bound_source_bytes_unavailable": true,
+      "historical_price_download": false,
+      "bid_ask_history": false,
+      "purpose": "Fill structural/redundancy/microstructure missingness before choosing expensive execution-data batches."
+    },
+    {
+      "tier": "SELECTED_EXECUTION_SNAPSHOT",
+      "scope": "ONLY_IDENTITIES_OR_SUBSETS_SELECTED_BY_INFORMATION_GAIN",
+      "fields": [
+        "current_bid_ask_or_equivalent_transaction_local_spread_authority",
+        "current_directional_eur200_margin_or_expected_margin_binding",
+        "account_fingerprint_and_capture_timestamp",
+        "per_identity_capture_status_and_fail_closed_reason"
+      ],
+      "historical_price_download": false,
+      "economic_outcomes_opened": 0,
+      "v2_attempts_consumed": 0
+    },
+    {
+      "tier": "MECHANISM_LOCAL_TRANSACTION_COST",
+      "scope": "ONLY_AFTER_MECHANISM_SPECIFIC_PROSPECTIVE_SELECTION",
+      "fields": [
+        "transaction_local_bid_ask",
+        "commission",
+        "conversion_cost_if_applicable",
+        "slippage_or_execution_proxy_if_authorized"
+      ],
+      "rule": "Do not collect expensive transaction-local evidence for all 1578 merely because they are in the frontier."
+    }
+  ],
+  "fail_closed": {
+    "missing_field_state": "UNKNOWN_NOT_ZERO",
+    "stale_broker_identity": "BLOCK",
+    "missing_quote_side": "BLOCK",
+    "missing_margin_binding": "BLOCK",
+    "outcome_exposed_evidence_prospective_reuse": "BLOCK"
+  },
+  "prohibitions": [
+    "NO_RETURNS",
+    "NO_PNL",
+    "NO_ECONOMIC_RANKING",
+    "NO_POST_EVENT_FOLLOWTHROUGH_SELECTION",
+    "NO_C032_RERUN",
+    "NO_C032_CAPTURE_PROSPECTIVE_REUSE",
+    "NO_FIXED_ARBITRARY_PANEL",
+    "NO_PROTECTED_FORWARD",
+    "NO_LIVE_ORDERS",
+    "NO_ACCOUNT_MUTATION"
+  ],
+  "accounting_effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "copilot_reasoning_calls": 0
+  }
+}

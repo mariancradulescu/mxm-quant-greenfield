@@ -131,8 +131,15 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                           "current_evidence_epoch":state.get("current_research_evidence_epoch")})
         if state.get("status")=="MATERIAL_INTEGRITY_FAILURE" and state.get("integrity_gate"):
             return {"status":"MATERIAL_INTEGRITY_FAILURE","progress_class":"MATERIAL_FAILURE","cycles":cycle-1,"trace":trace,"next_state":state}
-        if state.get("user_action_required") is True:
-            return {"status":"EXTERNAL_USER_ACTION_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
+        if state.get("user_action_required") is True or state.get("external_data_required") is True or state.get("external_gate") not in (None,"",{},[]) or state.get("external_data_gate") not in (None,"",{},[]):
+            return {"status":"EXTERNAL_USER_ACTION_REQUIRED" if state.get("user_action_required") is True else "EXTERNAL_DATA_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
+        if deterministic_operation_required(root,state):
+            out=execute_deterministic_chain(root,max_operations=max_cycles-cycle+1,git_checkpoint=git_checkpoint,git_push=git_push)
+            trace.append({"cycle":cycle,"kind":"DETERMINISTIC_OPERATION","completed_operations":out.get("completed_operations"),"provider_calls_delta":out.get("provider_calls_delta",0)})
+            state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
+            if state.get("user_action_required") is True or state.get("external_data_required") is True:
+                return {"status":"EXTERNAL_USER_ACTION_REQUIRED" if state.get("user_action_required") is True else "EXTERNAL_DATA_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle,"trace":trace,"next_state":state,"result":out}
+            continue
         if reasoning_required(state):
             green=exact_head_green(root)
             if not green["green"]:
@@ -158,7 +165,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
             continue
-        if implementation_required(state):
+        if implementation_required(state,root):
             blocked=_provider_unavailable(root,state,"GENERAL_AI_IMPLEMENTATION")
             if blocked is not None:
                 return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}

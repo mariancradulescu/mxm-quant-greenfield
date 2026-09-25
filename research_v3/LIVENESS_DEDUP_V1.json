@@ -1,0 +1,14 @@
+{
+  "schema": "mxm.greenfield.liveness-dedup.v1",
+  "status": "ACTIVE_POLICY_INITIALIZED",
+  "dedup_key_components": [
+    "evidence_epoch",
+    "next_action",
+    "relevant_authority_hashes",
+    "external_gate_state"
+  ],
+  "last_completed_fingerprint": null,
+  "last_completed_operation": "MANUAL_RECONCILIATION_PRE_DURABLE_ROUTER_ACTIVATION",
+  "rule": "An identical completed liveness fingerprint must not create another material execution cycle. Deterministic executor writes the exact fingerprint on future durable operations.",
+  "external_gate_states_do_not_dispatch": true
+}

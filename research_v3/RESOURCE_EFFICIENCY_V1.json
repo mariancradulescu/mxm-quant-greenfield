@@ -1,0 +1,109 @@
+{
+  "schema": "mxm.greenfield.resource-efficiency.v1",
+  "status": "ACTIVE_CONTROL_PLANE_EFFICIENCY_GOVERNANCE",
+  "measurement_window_utc": {
+    "start": "2026-09-25T00:06:00Z",
+    "end": "2026-09-25T06:32:59Z"
+  },
+  "independently_reconciled_actions_baseline": {
+    "workflow_runs": 235,
+    "successful": 96,
+    "cancelled": 121,
+    "failed": 18,
+    "workflow_runs_by_type": {
+      "Runtime V2 Liveness Watchdog": {
+        "runs": 78,
+        "success": 8,
+        "cancelled": 70,
+        "failure": 0,
+        "approximate_rounded_job_minutes": 151
+      },
+      "Runtime V2 Liveness Sentinel": {
+        "runs": 80,
+        "success": 62,
+        "cancelled": 5,
+        "failure": 13,
+        "approximate_rounded_job_minutes": 105
+      },
+      "m6-preparation": {
+        "runs": 74,
+        "success": 23,
+        "cancelled": 46,
+        "failure": 5,
+        "approximate_rounded_job_minutes": 76
+      },
+      "MXM Read Only Copilot Quota Snapshot": {
+        "runs": 2,
+        "success": 2,
+        "cancelled": 0,
+        "failure": 0
+      },
+      "MXM Controlled Copilot Pro Entitlement Probe": {
+        "runs": 1,
+        "success": 1,
+        "cancelled": 0,
+        "failure": 0
+      }
+    },
+    "approximate_rounded_single_job_minutes_total": 336,
+    "cancelled_run_fraction": 0.5148936170212766
+  },
+  "resource_dimensions": {
+    "AI_CREDITS": {
+      "repository_provider_invocations": 4,
+      "actual_account_billed_credits": null,
+      "user_observed_account_total_baseline": 166,
+      "note": "Provider call count is not converted into billed AI credits."
+    },
+    "ACTIONS_RUNNER_MINUTES": {
+      "exact_account_billable_minutes": null,
+      "approximate_rounded_window_minutes": 336
+    },
+    "V2_ECONOMIC_ATTEMPTS": {
+      "lifetime_consumed": 20,
+      "base_remaining": 64,
+      "replacement_remaining": 15,
+      "future_available_capacity": 79
+    }
+  },
+  "policy_after": {
+    "primary_liveness": "EVENT_DRIVEN",
+    "recovery_fallback": "APPROXIMATELY_HOURLY",
+    "fallback_runner": "ubuntu-slim",
+    "paid_runner_sleep_normal_control_mechanism": false,
+    "sentinel_watchdog_feedback_loop": false,
+    "duplicate_unchanged_liveness_cycles": "BLOCK_BY_FINGERPRINT",
+    "heavy_setup_only_for": [
+      "SEMANTIC_REASONING",
+      "NOVEL_AI_IMPLEMENTATION",
+      "ECONOMIC_EXECUTION",
+      "CTRADER_BUILD_OR_CERTIFICATION"
+    ],
+    "no_work_exits_before_heavy_setup": true,
+    "ci_levels": {
+      "FAST_VALIDATION": "FOCUSED_AFFECTED_MODULES_AND_STATE_SCHEMA",
+      "AUTHORITY_CI": "FULL_REPOSITORY_SUITE_PLUS_AUTHORITATIVE_INVARIANTS"
+    },
+    "authority_ci_required_before": [
+      "ECONOMIC_OPEN",
+      "PROMOTION",
+      "RELEASE_OR_CERTIFICATION"
+    ],
+    "coalesce_related_deterministic_edits_before_authority_ci": true
+  },
+  "metrics_contract": [
+    "workflow_runs_by_type",
+    "success_failure_cancelled_counts",
+    "approximate_job_minutes",
+    "material_state_advances",
+    "exact_head_green_runs",
+    "no_op_liveness_runs",
+    "provider_invocations",
+    "provider_calls_per_material_epoch",
+    "provider_calls_per_accepted_semantic_decision",
+    "actions_minutes_per_material_state_advance",
+    "cancelled_run_fraction"
+  ],
+  "unsupported_account_level_billing_values_remain_null": true,
+  "storage_optimization_priority": "LOW_FOR_NOW"
+}

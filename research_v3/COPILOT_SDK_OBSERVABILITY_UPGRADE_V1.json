@@ -1,0 +1,38 @@
+{
+  "schema": "mxm.greenfield.copilot-sdk-observability-upgrade.v1",
+  "status": "DETERMINISTIC_INTEGRATION_PREPARED_NO_MODEL_CALL",
+  "evidence_epoch": 21,
+  "sdk_pin": "github-copilot-sdk==1.0.14",
+  "adapter_ref": "research_v3/copilot_sdk_observability.py",
+  "active_provider_transport": "GITHUB_COPILOT_CLI_PROVEN_FALLBACK",
+  "sdk_transport_activation": "OPT_IN_ONLY_AFTER_DETERMINISTIC_TESTS_AND_AT_NEXT_GENUINE_SEMANTIC_OR_NOVEL_IMPLEMENTATION_CALL",
+  "integration_provider_calls_consumed": 0,
+  "next_genuine_call_capture": [
+    "session_id",
+    "actual_model_if_exposed",
+    "per_model_call_input_tokens",
+    "per_model_call_output_tokens",
+    "reasoning_tokens_if_exposed",
+    "cache_read_tokens",
+    "cache_write_tokens",
+    "cost_multiplier",
+    "session_total_nano_aiu",
+    "session_total_premium_request_cost",
+    "per_model_session_breakdown",
+    "context_window_utilization",
+    "semantic_fingerprint",
+    "evidence_epoch",
+    "whether_material_state_advanced"
+  ],
+  "circuit_breaker_policy": {
+    "maxAiCredits": "OPTIONAL_PER_SESSION_CIRCUIT_BREAKER_ONLY",
+    "permanent_research_cap": false,
+    "duplicate_semantic_fingerprint_loop": false
+  },
+  "unsupported_or_unobservable_values": "PRESERVE_NULL_DO_NOT_INFER",
+  "current_repository_provider_invocations": 4,
+  "current_successful_reasoning_invocations": 2,
+  "current_successful_implementation_invocations": 0,
+  "user_observed_account_ai_credits_baseline": 166,
+  "account_level_attribution_limitation": "User-observed total cannot be retroactively attributed to individual CLI subprocess calls."
+}
