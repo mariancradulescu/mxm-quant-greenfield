@@ -1,0 +1,47 @@
+{
+  "schema": "mxm.greenfield.epoch24-relative-value-diagnostic-implementation-manifest.v1",
+  "status": "IMPLEMENTED_CODE_PENDING_EXACT_HEAD_GREEN",
+  "family": "RELATIVE_VALUE_COINTEGRATION",
+  "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
+  "accepted_proposal_hash": "443cc268b58665f167b5b3c502c85d1b6dd224f21c61d51f1290c2cfcbc6385b",
+  "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
+  "inputs": {
+    "frozen_plan_ref": "research_v3/EPOCH24_RELATIVE_VALUE_DIAGNOSTIC_PLAN_V1.json",
+    "pair_data_manifest_ref": "research_v3/EPOCH24_RELATIVE_VALUE_PAIR_DATA_IMPLEMENTATION_MANIFEST_V1.json",
+    "alignment_inventory_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
+    "accepted_original_capture_sha256": "64ea52126a31c527d202a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    "accepted_original_capture_sha256_correct": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "accepted_replacement_capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "implementation": {
+    "code_ref": "research_v3/relative_value_epoch24_diagnostic.py",
+    "test_ref": "tests/test_relative_value_epoch24_diagnostic.py",
+    "stdlib_only": true,
+    "chronological_split_fixed_before_execution": true,
+    "development_only_hedge_fit": true,
+    "validation_refit": false,
+    "holdout_refit": false,
+    "holdout_tuning": false,
+    "holdout_pair_exclusion": false,
+    "deterministic_stationarity_p_value": true,
+    "development_subwindow_stability": true,
+    "coefficient_perturbation_holdout_stability": true,
+    "complete_scope_enumeration_required": 820,
+    "pair_ranking": false,
+    "winning_pair_selection": false
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  },
+  "ci": {
+    "status": "PENDING_EXACT_HEAD_GREEN",
+    "required_suite": "python -m unittest discover -s tests -p test_*.py -v"
+  }
+}
