@@ -98,6 +98,12 @@ def reasoning_required(next_state:Mapping[str,Any])->bool:
 
 def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
     refs=list(BASE_AUTHORITIES)
+    for rel in ("research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+                "research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json",
+                "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json",
+                "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
+                "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json"):
+        if (root/rel).is_file() and rel not in refs: refs.append(rel)
     epoch_binding=current_evidence_binding(root)
     for row in epoch_binding["authoritative_evidence_refs_and_hashes"]:
         if row["ref"] not in refs:
