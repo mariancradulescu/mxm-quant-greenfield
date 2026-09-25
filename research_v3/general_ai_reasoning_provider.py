@@ -234,11 +234,12 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
              decision_class="FRESH_FRONTIER_LEVEL_RESEARCH",
              refs=request["authority_refs"],accounting=frontier["accounting"],
              universe=frontier["open_frontier"],
-             semantic_question="From the entire legal broker-native frontier, choose the highest-information prospective research wave for extremely fast and high realizable compounded EUR200 Pepperstone/cTrader equity growth with free-margin survival and recovery capacity. Select mechanism and breadth from reusable evidence, not the last candidate.",
+             semantic_question=(request.get("next_state") or {}).get("semantic_question") or "From the entire legal broker-native frontier, choose the highest-information prospective research wave for extremely fast and high realizable compounded EUR200 Pepperstone/cTrader equity growth with free-margin survival and recovery capacity. Select mechanism and breadth from reusable evidence, not the last candidate.",
              delta_refs=delta)
     p["allowed_authority_refs"]=[x["ref"] for x in
         p["admissible_inputs"]+p["historical_context"]+p["forbidden_inputs"]]
     return {"request_id":request["request_id"],"eligibility_packet":p,
+            "pending_decision":{k:(request.get("next_state") or {}).get(k) for k in ("status","next_action","reason","decision_contract","supersession_ref")},
             "historical_consumed_identity_summaries":scope,
             "valid_survivors":["V2-C006","V2-C012","V2-C031"],
             "unresolved_prerequisites":["C006 historical cash-session calendar",
@@ -393,6 +394,19 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
         raise AIProposalRejected("mechanism_family_closure_claims must be list")
     pid=str(candidate.get("proposal_id") or f"AUTO-{request['request_id']}").strip()
     response_id="reason_response_"+sha256_bytes(canonical_bytes({"request_id":request["request_id"],"candidate":candidate}))[:32]
+    contract=(request.get("next_state") or {}).get("decision_contract") or {}
+    if contract:
+        expected=contract.get("required_action")
+        if expected and decision.get("action")!=expected:
+            raise AIProposalRejected("proposal action does not resolve the pending decision contract")
+        selected=decision.get("selected_mechanism_family")
+        forbidden=set(contract.get("temporarily_unavailable_families") or [])
+        if not isinstance(selected,str) or selected not in request["current_open_mechanism_families"]:
+            raise AIProposalRejected("pending decision requires a named open mechanism family")
+        if selected in forbidden:
+            raise AIProposalRejected("selected family lacks a legal independent next step under the pending decision contract")
+        if next_state.get("implementation_ai_required") is True and not decision.get("implementation_scope"):
+            raise AIProposalRejected("pending decision cannot authorize implementation without explicit implementation scope")
     proposed_next=dict(next_state)
     proposed_next.setdefault("research_judgment_required",False)
     proposed_next["authorizing_evidence_epoch"]=int(request["evidence_epoch_seen"])
