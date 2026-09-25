@@ -38,7 +38,7 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
         self.assertEqual(request["next_state"]["status"],n["status"])
         self.assertEqual(request["next_state"]["next_action"],n["next_action"])
         self.assertEqual(
-            request["next_state"].get("current_research_evidence_epoch"),
+            request["next_state"].get("evidence_epoch"),
             n.get("current_research_evidence_epoch"),
         )
 
