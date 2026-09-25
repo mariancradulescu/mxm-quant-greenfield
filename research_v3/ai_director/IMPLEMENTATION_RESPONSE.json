@@ -1,68 +1,119 @@
 {
-  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN",
-  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
-  "basis_next_state_sha256": "ac28514d6764ad523c66a62252e37416776b536c3cdbddc242824381e9a7ba42",
-  "implementation_output": {
-    "implementation_id": "epoch24-relative-value-pair-data-comparability-v1",
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Implemented the bounded non-economic PAIR_DATA_AND_COMPARABILITY_CODE phase for the already accepted RELATIVE_VALUE_COINTEGRATION family. The accepted 820-pair timestamp inventory is reused as authority; price series are raw-hash-bound, synchronized by exact UTC intersection, missingness remains explicit with no fill/imputation, conflicting duplicates and broker identity mismatches fail closed, and product/quote-unit comparability is conservative with no symbol-name quote inference. No hedge, stationarity test, pair ranking, returns/PnL, protected-forward access, economics, or V2 attempt was opened.",
+  "accepted_exact_head": {
+    "green": true,
+    "head": "329a8c63b52e415f03c27b901a02b810c78db591",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "329a8c63b52e415f03c27b901a02b810c78db591",
+    "predecessor_run_id": 36146534998
+  },
+  "accepted_output": {
     "decision": {
-      "research_family": "RELATIVE_VALUE_COINTEGRATION",
-      "phase": "PAIR_DATA_AND_COMPARABILITY_CODE",
       "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
       "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_3feda52594b41fa520baac3db22226b9.json",
       "alignment_inventory_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
-      "implementation_changed": true,
-      "new_market_data_required": false,
-      "external_data_required": false,
       "economic_outcomes_opened": 0,
-      "v2_attempts_consumed": 0,
-      "protected_forward_opened": false,
+      "external_data_required": false,
+      "implementation_changed": true,
       "live_orders_authorized": false,
+      "new_market_data_required": false,
+      "phase": "PAIR_DATA_AND_COMPARABILITY_CODE",
+      "protected_forward_opened": false,
+      "research_family": "RELATIVE_VALUE_COINTEGRATION",
+      "v2_attempts_consumed": 0,
       "winning_pair_selected": false
     },
+    "external_data_gate": null,
+    "implementation_id": "epoch24-relative-value-pair-data-comparability-v1",
     "next_research_state": {
-      "status": "PAIR_DATA_AND_COMPARABILITY_CODE_GREEN_CONTINUE_BOUNDED_DIAGNOSTIC",
-      "next_action": "IMPLEMENT_REMAINING_ACCEPTED_HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_WITHOUT_FAMILY_RESELECTION",
-      "research_judgment_required": false,
       "implementation_ai_required": true,
-      "selected_family": "RELATIVE_VALUE_COINTEGRATION",
       "implementation_task_scope": {
-        "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
         "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
-        "repeat_semantic_family_selection": false,
         "deliverables": [
           "Implement deterministic chronological development, validation and holdout partitions before diagnostic execution; holdout-derived tuning, refitting or pair exclusion is forbidden.",
           "Estimate intercept and hedge coefficient on development only, then evaluate the frozen residual construction on validation and untouched holdout without refitting.",
           "Implement the accepted fixed stationarity diagnostics and explicit failure criteria plus stability checks over predefined chronological subwindows and coefficient perturbations.",
           "Preserve pair-data comparability fail-closed gates and emit only non-economic diagnostic/configuration/evidence artifacts; no winner selection, cost claim, economic outcome, protected-forward opening or V2 attempt."
-        ]
+        ],
+        "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
+        "repeat_semantic_family_selection": false
       },
-      "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates."
+      "next_action": "IMPLEMENT_REMAINING_ACCEPTED_HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_WITHOUT_FAMILY_RESELECTION",
+      "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
+      "research_judgment_required": false,
+      "selected_family": "RELATIVE_VALUE_COINTEGRATION",
+      "status": "PAIR_DATA_AND_COMPARABILITY_CODE_GREEN_CONTINUE_BOUNDED_DIAGNOSTIC"
     },
-    "external_data_gate": null,
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Implemented the bounded non-economic PAIR_DATA_AND_COMPARABILITY_CODE phase for the already accepted RELATIVE_VALUE_COINTEGRATION family. The accepted 820-pair timestamp inventory is reused as authority; price series are raw-hash-bound, synchronized by exact UTC intersection, missingness remains explicit with no fill/imputation, conflicting duplicates and broker identity mismatches fail closed, and product/quote-unit comparability is conservative with no symbol-name quote inference. No hedge, stationarity test, pair ranking, returns/PnL, protected-forward access, economics, or V2 attempt was opened.",
     "tests_requested": [
       "tests/test_relative_value_epoch24_pair_data.py",
       "tests/test_general_ai_implementation_executor.py"
     ]
   },
-  "provider": {
-    "provider": "openai-chatgpt",
-    "model": "GPT-5.6 Sol",
-    "transport": "connected-github-direct-recovery",
-    "role": "PRINCIPAL_AUTONOMOUS_RESEARCH_AND_IMPLEMENTATION_DIRECTOR"
-  },
+  "basis_next_state_sha256": "ac28514d6764ad523c66a62252e37416776b536c3cdbddc242824381e9a7ba42",
   "changed_paths": [
     "research_v3/relative_value_epoch24_prerequisite.py",
     "tests/test_relative_value_epoch24_pair_data.py",
     "research_v3/EPOCH24_RELATIVE_VALUE_PAIR_DATA_IMPLEMENTATION_MANIFEST_V1.json"
   ],
+  "created_utc": "2026-09-25T14:08:00Z",
+  "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+  "implementation_output": {
+    "decision": {
+      "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
+      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_3feda52594b41fa520baac3db22226b9.json",
+      "alignment_inventory_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
+      "economic_outcomes_opened": 0,
+      "external_data_required": false,
+      "implementation_changed": true,
+      "live_orders_authorized": false,
+      "new_market_data_required": false,
+      "phase": "PAIR_DATA_AND_COMPARABILITY_CODE",
+      "protected_forward_opened": false,
+      "research_family": "RELATIVE_VALUE_COINTEGRATION",
+      "v2_attempts_consumed": 0,
+      "winning_pair_selected": false
+    },
+    "external_data_gate": null,
+    "implementation_id": "epoch24-relative-value-pair-data-comparability-v1",
+    "next_research_state": {
+      "implementation_ai_required": true,
+      "implementation_task_scope": {
+        "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
+        "deliverables": [
+          "Implement deterministic chronological development, validation and holdout partitions before diagnostic execution; holdout-derived tuning, refitting or pair exclusion is forbidden.",
+          "Estimate intercept and hedge coefficient on development only, then evaluate the frozen residual construction on validation and untouched holdout without refitting.",
+          "Implement the accepted fixed stationarity diagnostics and explicit failure criteria plus stability checks over predefined chronological subwindows and coefficient perturbations.",
+          "Preserve pair-data comparability fail-closed gates and emit only non-economic diagnostic/configuration/evidence artifacts; no winner selection, cost claim, economic outcome, protected-forward opening or V2 attempt."
+        ],
+        "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
+        "repeat_semantic_family_selection": false
+      },
+      "next_action": "IMPLEMENT_REMAINING_ACCEPTED_HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_WITHOUT_FAMILY_RESELECTION",
+      "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
+      "research_judgment_required": false,
+      "selected_family": "RELATIVE_VALUE_COINTEGRATION",
+      "status": "PAIR_DATA_AND_COMPARABILITY_CODE_GREEN_CONTINUE_BOUNDED_DIAGNOSTIC"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Implemented the bounded non-economic PAIR_DATA_AND_COMPARABILITY_CODE phase for the already accepted RELATIVE_VALUE_COINTEGRATION family. The accepted 820-pair timestamp inventory is reused as authority; price series are raw-hash-bound, synchronized by exact UTC intersection, missingness remains explicit with no fill/imputation, conflicting duplicates and broker identity mismatches fail closed, and product/quote-unit comparability is conservative with no symbol-name quote inference. No hedge, stationarity test, pair ranking, returns/PnL, protected-forward access, economics, or V2 attempt was opened.",
+    "tests_requested": [
+      "tests/test_relative_value_epoch24_pair_data.py",
+      "tests/test_general_ai_implementation_executor.py"
+    ]
+  },
   "project_snapshot": {
     "discovery_ledger_sha256": "3beba7a0b606a0c25e7d300c40920324040d7a146249d298b582b1cebf92f9ac",
     "economic_outcomes_opened": 28,
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "created_utc": "2026-09-25T14:08:00Z"
+  "provider": {
+    "model": "GPT-5.6 Sol",
+    "provider": "openai-chatgpt",
+    "role": "PRINCIPAL_AUTONOMOUS_RESEARCH_AND_IMPLEMENTATION_DIRECTOR",
+    "transport": "connected-github-direct-recovery"
+  },
+  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }

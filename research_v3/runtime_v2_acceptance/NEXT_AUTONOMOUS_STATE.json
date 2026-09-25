@@ -252,6 +252,17 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
+  "implementation_task_scope": {
+    "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
+    "deliverables": [
+      "Implement deterministic chronological development, validation and holdout partitions before diagnostic execution; holdout-derived tuning, refitting or pair exclusion is forbidden.",
+      "Estimate intercept and hedge coefficient on development only, then evaluate the frozen residual construction on validation and untouched holdout without refitting.",
+      "Implement the accepted fixed stationarity diagnostics and explicit failure criteria plus stability checks over predefined chronological subwindows and coefficient perturbations.",
+      "Preserve pair-data comparability fail-closed gates and emit only non-economic diagnostic/configuration/evidence artifacts; no winner selection, cost claim, economic outcome, protected-forward opening or V2 attempt."
+    ],
+    "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
+    "repeat_semantic_family_selection": false
+  },
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -305,9 +316,9 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "Implement and test the hash-bound non-economic RELATIVE_VALUE_COINTEGRATION synchronized-pair alignment and hedge/stationarity/stability diagnostic, then materialize auditable evidence outputs.",
+  "next_action": "IMPLEMENT_REMAINING_ACCEPTED_HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_WITHOUT_FAMILY_RESELECTION",
   "next_deterministic_operation_ref": null,
-  "next_gate": "Deterministic structural diagnostic acceptance and independent validation; cost and economic feasibility remain later gates.",
+  "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "outer": "C032_ECONOMIC_OUTCOME_RECORDED_EXACTLY_ONCE",
   "outer_authorization": "CONSUMED_EXACTLY_ONCE",
@@ -431,6 +442,7 @@
   "source_ai_proposal_hash": "443cc268b58665f167b5b3c502c85d1b6dd224f21c61d51f1290c2cfcbc6385b",
   "source_ai_proposal_id": "rv-structural-diagnostic-epoch24-01",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_implementation_id": "epoch24-relative-value-pair-data-comparability-v1",
   "source_runtime_operation_id": "op_b16302ebd1d591c5304a904eecde4426",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 22,
@@ -441,7 +453,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_REPLACEMENT_HISTORY_ACCEPTANCE",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "IMPLEMENTATION_REQUIRED",
+  "status": "PAIR_DATA_AND_COMPARABILITY_CODE_GREEN_CONTINUE_BOUNDED_DIAGNOSTIC",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -512,14 +524,5 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true,
-  "implementation_task_scope": {
-    "phase": "PAIR_DATA_AND_COMPARABILITY_CODE",
-    "deliverables": [
-      "Extend research_v3/relative_value_epoch24_prerequisite.py with a reusable hash-bound synchronized-price series builder for accepted 41-representative M5 input. Existing complete timestamp inventory is durable and must be reused, not regenerated.",
-      "Implement pair-level UTC intersection, duplicate/conflicting-row rejection, explicit missingness, broker-symbol identities and conservative product/quote-unit comparability gates. Never assign a winning pair or calculate returns/PnL.",
-      "Add focused synthetic unit tests for alignment, duplicate rejection, identity and comparability failures. Emit a small auditable non-economic phase manifest; no economic attempt or outer data."
-    ],
-    "after_green": "Return to the remaining accepted hedge/stationarity/stability diagnostic as a separate bounded implementation phase; keep the same selected family and do not repeat semantic family selection."
-  }
+  "uses_only_existing_accepted_bytes": true
 }
