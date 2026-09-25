@@ -52,6 +52,8 @@ def execute(root:Path, run_id:str, token:str, transport=None)->dict:
         raise RuntimeError("Probe identity/run mismatch; refuse provider call")
     if doc.get("status")!="CLAIMED_CALL_CONSUMED":
         return {"action":"SKIP_PROBE_NOT_CLAIMED_OR_ALREADY_FINISHED","record":doc}
+    if transport is None and os.environ.get("MXM_PROBE_CLAIM_PERSISTED")!="1":
+        raise RuntimeError("Durable provider-call claim not confirmed")
     if not token or (not shutil.which("copilot") and transport is None):
         raise RuntimeError("Actions credential or Copilot CLI unavailable before probe")
     cmd=["copilot","-p","Reply with exactly "+REPLY+" and nothing else.",
