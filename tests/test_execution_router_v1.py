@@ -51,6 +51,22 @@ class ExecutionRouterV1Tests(unittest.TestCase):
         self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
         self.assertEqual(route["reason"],"UNROUTED_NONEMPTY_ACTION_FAIL_CLOSED")
 
+    def test_explicit_false_blocks_legacy_proposal_binding_from_becoming_ai_authority(self):
+        state={
+            "status":"READY",
+            "next_action":"VALIDATE_STRUCTURAL_GATE",
+            "implementation_ai_required":False,
+            "source_ai_proposal_id":"p1",
+            "source_ai_proposal_hash":"a"*64,
+            "source_runtime_operation_id":"op1",
+            "user_action_required":False,
+            "external_data_required":False,
+        }
+        self.assertFalse(implementation_required(ROOT,state))
+        route=classify_execution(ROOT,state)
+        self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+        self.assertEqual(route["reason"],"UNROUTED_NONEMPTY_ACTION_FAIL_CLOSED")
+
     def test_explicit_novel_ai_implementation_still_routes_to_ai(self):
         state={"status":"READY","next_action":"IMPLEMENT_NEW_VALIDATED_COLLECTOR","implementation_ai_required":True}
         self.assertTrue(implementation_required(ROOT,state))

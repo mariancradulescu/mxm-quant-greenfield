@@ -110,10 +110,12 @@ def implementation_required(root_value: str | Path, state: Mapping[str, Any]) ->
     doc = load_authorized_deterministic_operation(root_value, state)
     if doc is not None:
         return (doc.get("execution_policy") or {}).get("implementation_ai_required") is True
-    if state.get("implementation_ai_required") is True:
-        return True
-    # Backward-compatible authority for already accepted AI proposals.  The presence
-    # of an accepted proposal binding is authority; next_action alone is not.
+    # Explicit routing intent always wins over legacy proposal-binding inference.
+    # In particular, an accepted semantic proposal with implementation_ai_required=false
+    # is NOT implementation authority.
+    if "implementation_ai_required" in state:
+        return state.get("implementation_ai_required") is True
+    # Backward compatibility only for historical states that predate explicit routing.
     if state.get("source_ai_proposal_id") and (
         state.get("source_ai_proposal_hash") or state.get("source_runtime_operation_id")
     ):

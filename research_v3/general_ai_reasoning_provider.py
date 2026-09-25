@@ -266,7 +266,7 @@ Return ONE JSON object only, with these keys:
 proposal_id: concise unique string
 objective: object with class, goal, information_gain_rationale
 decision: arbitrary JSON object expressing your actual research decision and enough implementation semantics
-next_research_state: arbitrary JSON object with at least status and next_action; do not include protected accounting/safety keys
+next_research_state: arbitrary JSON object with at least status, next_action, research_judgment_required, and implementation_ai_required; do not include protected accounting/safety keys
 authority_refs: non-empty list chosen only from refs provided in context
 data_bindings: optional list
 artifact_attestation_refs: MUST be [] unless the supplied context explicitly identifies a document whose schema is mxm.greenfield.ai-director-artifact-attestation.v1 and status is VERIFIED
@@ -287,6 +287,8 @@ Important boundaries:
 - Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
 - Cite only supplied authority refs. If an additional authority is needed, return only status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, and rationale; the runtime will validate it before a new fingerprint.
 - Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
+- Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Set it false for validation, selection, state binding, or evidence materialization that can be deterministic.
+- If new broker data is genuinely required, express it through data_policy.new_market_data_requested=true with the exact minimal acquisition request; do not disguise a data gate as implementation AI.
 - The proposal itself is non-economic and consumes zero attempts. Return concise decision rationale, not chain-of-thought.
 """
 

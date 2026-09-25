@@ -797,6 +797,9 @@ def materialize_proposal(
         # a newly accepted AI decision unless that decision explicitly re-declares it.
         for key in (
             "ai_reasoning_required",
+            "implementation_ai_required",
+            "external_data_required",
+            "external_data_gate",
             "green_implementation_artifacts",
             "external_data_gate_ref",
             "collector_build_ref",
@@ -807,6 +810,22 @@ def materialize_proposal(
             next_doc.pop(key, None)
         next_doc.update(dict(proposal["next_research_state"]))
         next_doc["user_action_required"] = bool(proposal["next_research_state"].get("user_action_required", False))
+        next_doc["implementation_ai_required"] = bool(proposal["next_research_state"].get("implementation_ai_required", False))
+        data_policy=proposal.get("data_policy") or {}
+        if data_policy.get("new_market_data_requested") is True:
+            request=dict(data_policy.get("minimal_acquisition_request") or {})
+            next_doc["external_data_required"]=True
+            next_doc["user_action_required"]=True
+            next_doc["external_data_gate"]={
+                "classification":"AI_SELECTED_BROKER_NATIVE_MINIMAL_ACQUISITION",
+                "request":request,
+                "source_ai_proposal_id":proposal["proposal_id"],
+                "economic_outcomes_opened":0,
+                "v2_attempts_consumed":0,
+            }
+        else:
+            next_doc["external_data_required"]=False
+            next_doc["external_data_gate"]=None
         evidence_binding=proposal.get("evidence_binding") or {}
         next_doc["authorizing_evidence_epoch"]=int(evidence_binding.get("evidence_epoch_seen",0) or 0)
         next_doc.setdefault("research_judgment_required",False)

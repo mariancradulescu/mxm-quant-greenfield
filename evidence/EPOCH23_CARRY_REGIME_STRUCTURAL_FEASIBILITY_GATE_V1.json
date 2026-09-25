@@ -1,0 +1,69 @@
+{
+  "schema": "mxm.greenfield.epoch23-carry-regime-structural-feasibility-gate.v1",
+  "status": "COMPLETE_NON_ECONOMIC_DETERMINISTIC_STRUCTURAL_FEASIBILITY_GATE",
+  "evidence_epoch": 23,
+  "source_ai_decision_ref": "research_v3/ai_director/proposals/AUTO_reason_1472708eccef2bda24bc5e66b55d752b.json",
+  "source_ai_proposal_id": "frontier-ig-20260925-carry-regime-probe",
+  "source_ai_proposal_hash": "a88861c92fabe73afdab88049b4afb3351822d3a5c91f462419231db432292bb",
+  "source_current_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+  "source_feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+  "source_opportunity_map_ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
+  "source_feasibility_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+  "source_representative_history_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json",
+  "validation_scope": {
+    "current_eligible_post_exclusion_symbols": 1576,
+    "current_structural_signatures": 41,
+    "current_structural_representatives": 41,
+    "representatives_with_accepted_13w_history": 41,
+    "current_both_direction_eur200_feasible": 1607,
+    "commission_fee_metadata_known_current_eligible": 1576,
+    "schedule_metadata_known_current_eligible": 1576,
+    "full_transaction_local_cost_authority": 0
+  },
+  "primary_family": {
+    "family": "CARRY_TERM_STRUCTURE",
+    "broker_identity_and_current_margin_authority": "PASS",
+    "current_structural_metadata_authority": "PASS",
+    "current_representative_13w_history": "PASS_41_OF_41",
+    "commission_fee_metadata_presence": "PASS_METADATA_ONLY_NOT_TRANSACTION_LOCAL_COST",
+    "term_structure_metadata": "FAIL_CLOSED_UNRESOLVED",
+    "transaction_local_cost_authority": "DEFERRED_UNTIL_PROSPECTIVE_ECONOMIC_ENVELOPE",
+    "breadth_freeze": "NOT_AUTHORIZED",
+    "result": "CURRENT_REPOSITORY_EVIDENCE_INSUFFICIENT_TO_SPECIFY_OR_FREEZE_CARRY_TERM_STRUCTURE",
+    "rationale": "The accepted current broker capture supplies symbol, schedule, fee metadata and EUR200 directional margins, but no authoritative maturity/curve/term-structure relation is present. Inferring a carry curve from symbol names or product labels would synthesize unavailable broker evidence."
+  },
+  "secondary_family": {
+    "family": "REGIME_CONTEXT_CONDITIONED",
+    "broker_identity_and_current_margin_authority": "PASS",
+    "current_structural_metadata_authority": "PASS",
+    "current_representative_13w_history": "PASS_41_OF_41",
+    "chronology_and_sample_surface": "PASS_FOR_CURRENT_REPRESENTATIVE_LEVEL_NON_ECONOMIC_MECHANISM_DESIGN",
+    "transaction_local_cost_authority": "DEFERRED_UNTIL_PROSPECTIVE_ECONOMIC_ENVELOPE",
+    "exact_regime_definition": "FRESH_SEMANTIC_JUDGMENT_REQUIRED",
+    "breadth_freeze": "NOT_YET_AUTHORIZED",
+    "result": "ELIGIBLE_FOR_NEXT_SEMANTIC_MECHANISM_AND_BREADTH_SPECIFICATION",
+    "rationale": "The AI decision already established REGIME_CONTEXT_CONDITIONED as the secondary priority. Existing accepted causal history is sufficient to ask the semantic layer to define the prospective regime/context mechanism and breadth law without requesting another broad broker capture first."
+  },
+  "deterministic_decision": {
+    "carry_selected_for_economics": false,
+    "regime_selected_for_economics": false,
+    "new_market_data_requested": false,
+    "next_action": "AI_SPECIFY_REGIME_CONTEXT_CONDITIONED_PROSPECTIVE_MECHANISM_AND_BREADTH_FROM_EPOCH23_GATE",
+    "new_semantic_boundary": true,
+    "why_semantic": "Choosing the concrete regime state definition, contextual conditioning law and frontier-relative breadth is scientific research judgment. Deterministic validation may establish prerequisites but may not invent those semantics."
+  },
+  "economic_effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "new_v2_identity": false,
+    "returns_or_pnl_computed": false
+  },
+  "provider_effect": {
+    "copilot_calls_for_gate": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
