@@ -34,7 +34,14 @@ class EvidenceEligibilityTests(unittest.TestCase):
     def test_integrity_gate_makes_zero_provider_calls(self):
         self.assertFalse(implementation_required({"status":"MATERIAL_INTEGRITY_FAILURE",
              "integrity_gate":"C032_CAPTURE_REUSE","next_action":"RUN_UNSAFE_SCREEN"}))
-        with patch("research_v3.general_ai_autonomy_loop.reason") as reason, patch("research_v3.general_ai_autonomy_loop.implement") as implement:
+        from research_v3.general_ai_autonomy_loop import load_json as real_load
+        blocked={"status":"MATERIAL_INTEGRITY_FAILURE","integrity_gate":"C032_CAPTURE_REUSE",
+                 "next_action":"","ai_reasoning_required":False}
+        def fixture(path,default=None):
+            if str(path).endswith("NEXT_AUTONOMOUS_STATE.json"):
+                return blocked
+            return real_load(path,default)
+        with patch("research_v3.general_ai_autonomy_loop.load_json",side_effect=fixture), patch("research_v3.general_ai_autonomy_loop.reason") as reason, patch("research_v3.general_ai_autonomy_loop.implement") as implement:
             out=run(ROOT,max_cycles=1)
             self.assertEqual(out["status"],"MATERIAL_INTEGRITY_FAILURE")
             reason.assert_not_called()
