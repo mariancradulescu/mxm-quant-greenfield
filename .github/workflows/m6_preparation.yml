@@ -32,7 +32,7 @@ jobs:
         run: |
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile actual Pydroid runtime files
-        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py M6_PREOPEN_SUPPLEMENT_RUN.py M6_STAGE_B_MARGIN_HISTORY_RUN.py COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py COMPETITION_FRONTIER_DATA_CAPTURE_RUN.py SESSION_GAP_SIX_PANEL_OUTER_CAPTURE_RUN.py C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py COMPETITION_ULTRA_FAST_CAPTURE_RUN.py research_v3/c031_structural_extension_capture.py research_v3/pydroid_c031_structural_extension_launcher.py tools/build_c031_structural_extension_capture_package.py competition/broker_universe_capture.py competition/pydroid_broker_universe_launcher.py competition/frontier_data_capture.py competition/pydroid_frontier_data_launcher.py competition/ultra_fast_capture.py competition/friction_costs.py competition/pydroid_ultra_fast_launcher.py competition/shared_eur200_replay.py tools/build_competition_broker_universe_capture_package.py tools/build_competition_frontier_data_capture_package.py tools/build_competition_ultra_fast_capture_package.py m6/preopen_supplement.py m6/preopen_evidence_openapi.py m6/pydroid_preopen_launcher.py m6/stage_b_margin_evidence.py m6/stage_b_margin_openapi.py m6/pydroid_stage_b_margin_launcher.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/session_replay.py m6/tier1_candidate_replay.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
+        run: python -m py_compile M6_CAPTURE_RUN.py M6_COST_EVIDENCE_RUN.py M6_PREOPEN_SUPPLEMENT_RUN.py M6_STAGE_B_MARGIN_HISTORY_RUN.py COMPETITION_BROKER_UNIVERSE_CAPTURE_RUN.py COMPETITION_FRONTIER_DATA_CAPTURE_RUN.py SESSION_GAP_SIX_PANEL_OUTER_CAPTURE_RUN.py C031_STRUCTURAL_EXTENSION_CAPTURE_RUN.py COMPETITION_ULTRA_FAST_CAPTURE_RUN.py research_v3/c031_structural_extension_capture.py research_v3/pydroid_c031_structural_extension_launcher.py tools/build_c031_structural_extension_capture_package.py competition/broker_universe_capture.py competition/broker_universe_capture_v3.py competition/capture_runtime.py competition/pydroid_broker_universe_launcher.py research_v3/capture_identity.py research_v3/current_frontier_replacement_development_capture.py research_v3/pydroid_current_frontier_replacement_launcher.py CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_RUN.py tools/build_current_frontier_replacement_capture_package.py competition/frontier_data_capture.py competition/pydroid_frontier_data_launcher.py competition/ultra_fast_capture.py competition/friction_costs.py competition/pydroid_ultra_fast_launcher.py competition/shared_eur200_replay.py tools/build_competition_broker_universe_capture_package.py tools/build_competition_frontier_data_capture_package.py tools/build_competition_ultra_fast_capture_package.py m6/preopen_supplement.py m6/preopen_evidence_openapi.py m6/pydroid_preopen_launcher.py m6/stage_b_margin_evidence.py m6/stage_b_margin_openapi.py m6/pydroid_stage_b_margin_launcher.py m6/pydroid_launcher.py m6/pydroid_cost_launcher.py m6/pydroid_oauth.py m6/pydroid_symbol_mapping.py m6/broker_product_identity.py m6/causal_conversion.py m6/session_replay.py m6/tier1_candidate_replay.py m6/cost_evidence.py m6/cost_evidence_openapi.py m6/ctrader_capture.py m6/_ctrader_capture_base.py m6/ctrader_openapi.py m6/ctrader_transport.py m6/ctrader_proto/OpenApiCommonModelMessages_pb2.py m6/ctrader_proto/OpenApiCommonMessages_pb2.py m6/ctrader_proto/OpenApiModelMessages_pb2.py m6/ctrader_proto/OpenApiMessages_pb2.py
       - name: No-credential Android-safe runtime preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -89,6 +89,21 @@ jobs:
           assert classify_direction(None, True) == UNRESOLVED
           assert directional_summary(FEASIBLE, INFEASIBLE) == "BUY_ONLY"
           print("COMPETITION_BROKER_UNIVERSE_PREFLIGHT_PASS", report)
+          PY
+      - name: Epoch22 replacement-representative M5 no-credential preflight
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
+          from research_v3.pydroid_current_frontier_replacement_launcher import local_preflight
+          report = local_preflight()
+          assert report["symbols"] == 3, report
+          assert report["resolution"] == "M5", report
+          assert report["network_connection_attempted"] is False, report
+          assert report["credentials_used"] is False, report
+          assert report["orders_permitted"] is False, report
+          assert report["account_mutation_permitted"] is False, report
+          assert report["economic_outcomes_opened"] is False, report
+          assert report["v2_attempts_consumed"] is False, report
+          print("EPOCH22_REPLACEMENT_M5_PREFLIGHT_PASS", report)
           PY
       - name: Competition broad-frontier M5 no-credential preflight
         run: |
@@ -292,6 +307,17 @@ jobs:
         with:
           name: MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2
           path: dist/MXM_COMPETITION_BROKER_UNIVERSE_CAPTURE_V2.zip
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build deterministic Epoch22 replacement-representative M5 capture package
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_current_frontier_replacement_capture_package.py
+          sha256sum dist/MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PACKAGE_V1.zip
+      - name: Upload Epoch22 replacement-representative M5 capture package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PACKAGE_V1
+          path: dist/MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PACKAGE_V1.zip
           if-no-files-found: error
           retention-days: 30
       - name: Build deterministic broad-frontier M5 capture package

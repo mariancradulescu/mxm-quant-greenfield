@@ -31,7 +31,7 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
             self.assertIsNone(nxt[key])
         for key in ("candidate_id","target_symbol","mechanism_family","source_ai_proposal_id"):
             self.assertIsNone(nxt[key])
-        self.assertEqual(state["open_frontier"]["eligible_post_exclusion_symbols"],1578)
+        self.assertEqual(state["open_frontier"]["eligible_post_exclusion_symbols"],1576)
         self.assertEqual(len(state["open_frontier"]["mechanism_families"]),10)
         self.assertFalse(state["historical_context"]["V2_C032"]["active_target"])
 
@@ -99,7 +99,7 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
         self.assertNotIn("NETH25",prompt)
         self.assertNotIn("C031",prompt)
         self.assertNotIn("four-panel SESSION_GAP",prompt)
-        self.assertIn("complete 1578-symbol eligible frontier",prompt)
+        self.assertIn("complete current eligible frontier",prompt)
 
     def test_additional_authority_is_not_granted_to_unclassified_file(self):
         import tempfile

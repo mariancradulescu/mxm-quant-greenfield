@@ -279,7 +279,7 @@ protected_forward, live_orders, competition_start, competition_start_authorized,
 Those values are injected and guarded outside the AI layer.
 
 Important boundaries:
-- Begin with the complete 1578-symbol eligible frontier and every open mechanism family. No consumed candidate, historical symbol, old panel, or rejected proposal is an active default.
+- Begin with the complete current eligible frontier from CURRENT_RESEARCH_FRONTIER_V1.json and every open mechanism family. No consumed candidate, historical symbol, old panel, or rejected proposal is an active default.
 - Choose mechanism-specific breadth from non-economic structural heterogeneity, data availability, event independence, and expected information gain. Do not assume a fixed panel size.
 - One prospectively frozen economic experiment envelope may contain many symbols; do not authorize an economic outcome until causality, data sufficiency, cost, EUR200 margin feasibility, breadth, freeze, and exact-head CI all pass.
 - Historical survivors and failures remain valid context. Never rerun an opened identity, use outcome-exposed evidence as new prospective input, erase lifetime trial exposure, or retroactively select a winning subgroup.

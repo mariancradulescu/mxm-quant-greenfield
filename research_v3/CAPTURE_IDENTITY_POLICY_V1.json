@@ -1,0 +1,29 @@
+{
+  "schema": "mxm.greenfield.capture-identity-policy.v1",
+  "status": "ACTIVE",
+  "implementation_ref": "research_v3/capture_identity.py",
+  "manifest_name": "CAPTURE_MANIFEST.json",
+  "evidence_identity_rule": "CANONICAL_PAYLOAD_HASHES_PLUS_MANIFEST_SEMANTICS; OUTER_TRANSPORT_ZIP_HASH_IS_PROVENANCE_ONLY",
+  "duplicate_policy": "IDENTICAL_LOGICAL_DUPLICATES_ALLOWED_AND_CANONICALIZED; CONFLICTING_DUPLICATES_FAIL_CLOSED",
+  "wrapper_directory_policy": "IGNORED_FOR_EVIDENCE_IDENTITY",
+  "unknown_extra_files_policy": "INSPECT_AND_SECRET_SCAN_BEFORE_ACCEPTANCE",
+  "required_manifest_fields": [
+    "capture_session_id",
+    "capture_schema",
+    "tool_version",
+    "account_fingerprint",
+    "source_environment",
+    "capture_start_utc",
+    "capture_end_utc",
+    "completion_state",
+    "canonical_payload_paths",
+    "sha256_per_canonical_payload",
+    "original_collector_package_sha256",
+    "read_only_assertion",
+    "economic_outcomes_opened",
+    "orders_placed",
+    "account_mutation",
+    "protected_evidence_opened"
+  ],
+  "secret_scan_mandatory": true
+}

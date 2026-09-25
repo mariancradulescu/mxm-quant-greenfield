@@ -60,7 +60,7 @@ class FrontierInformationGainV1Tests(unittest.TestCase):
 
     def test_final_state_is_external_metadata_gate_not_ai_or_economics(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        self.assertEqual(n["status"],"INFORMATION_GAIN_ACQUISITION_PLAN_READY")
+        self.assertIn(n["status"],{"INFORMATION_GAIN_ACQUISITION_PLAN_READY","CURRENT_BROKER_EPOCH22_REBUILT_EXTERNAL_REPLACEMENT_HISTORY_GATE"})
         self.assertFalse(n["research_judgment_required"])
         self.assertFalse(n["ai_reasoning_required"])
         self.assertFalse(n["implementation_ai_required"])

@@ -1,0 +1,42 @@
+{
+  "schema": "mxm.greenfield.capture-runtime-reliability.v1",
+  "status": "IMPLEMENTED_FOR_FUTURE_BROKER_UNIVERSE_CAPTURES_NO_RECAPTURE_FOR_VALIDATION",
+  "implementation_refs": [
+    "competition/capture_runtime.py",
+    "competition/broker_universe_capture_v3.py",
+    "competition/pydroid_broker_universe_launcher.py"
+  ],
+  "heartbeat": {
+    "time_based_seconds_default": 15,
+    "work_unit_updates": true,
+    "fields": [
+      "phase",
+      "substage",
+      "completed_work_units",
+      "total_work_units",
+      "phase_percent",
+      "overall_percent",
+      "elapsed_seconds",
+      "current_rate_units_per_second",
+      "eta_seconds",
+      "retry_count",
+      "reconnect_count",
+      "last_success_age_seconds",
+      "current_identifier"
+    ]
+  },
+  "overall_progress_law": "ACTUAL_DYNAMIC_WORK_UNITS; NEVER_EQUAL_25_PERCENT_PHASE_WEIGHTS; 100_PERCENT_ONLY_AFTER_VALIDATION_SECRET_SCAN_AND_PACKAGING",
+  "resume": {
+    "checkpoint_storage": "LOCAL_ONLY_ATOMIC",
+    "credentials_allowed": false,
+    "universe_drift": "FAIL_CLOSED_BEFORE_SKIPPING_PRIOR_WORK",
+    "static_metadata_reusable": true,
+    "time_sensitive_expected_margin_refresh_after_coherence_tolerance": true,
+    "default_coherence_tolerance_seconds": 3600,
+    "partial_is_authoritative": false
+  },
+  "validation_method": "UNIT_AND_MOCKED_STATE_TESTS_ONLY; ACCEPTED_EPOCH22_CAPTURE_NOT_RERUN",
+  "provider_calls": 0,
+  "v2_attempts": 0,
+  "new_outcomes": 0
+}
