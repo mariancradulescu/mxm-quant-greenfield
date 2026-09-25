@@ -92,13 +92,37 @@ def _write_rows(path,rows,mode):
         if mode=="w":w.writeheader()
         for row in rows:w.writerow(row)
 
+def canonicalize_m5_csv(path):
+    """Deduplicate exact timestamp repeats across capture windows; conflicts fail closed."""
+    path=Path(path)
+    with path.open("r",encoding="utf-8",newline="") as f:
+        reader=csv.DictReader(f)
+        if tuple(reader.fieldnames or ())!=tuple(RAW_HEADER):
+            raise CaptureContractError("M5 CSV header mismatch")
+        by={}
+        for row in reader:
+            key=str(row.get("time_utc") or "")
+            if not key:
+                raise CaptureContractError("M5 CSV row missing timestamp")
+            previous=by.get(key)
+            if previous is not None and previous!=row:
+                raise CaptureContractError(f"conflicting cross-window M5 duplicate {key}")
+            by[key]=row
+    ordered=[by[k] for k in sorted(by)]
+    tmp=path.with_suffix(path.suffix+".canonical")
+    _write_rows(tmp,ordered,"w")
+    tmp.replace(path)
+    return {"rows_after":len(ordered)}
+
 def _inspect_csv(path):
     rows=0;first=last=None;prev=None;gaps=0
     with Path(path).open("r",encoding="utf-8",newline="") as f:
         for row in csv.DictReader(f):
             t=_utc(row["time_utc"]);rows+=1
             if first is None:first=row["time_utc"]
-            if prev is not None and (t-prev).total_seconds()>M5_MINUTES*60:gaps+=1
+            if prev is not None:
+                if t<=prev: raise CaptureContractError("M5 CSV timestamps are not strictly increasing")
+                if (t-prev).total_seconds()>M5_MINUTES*60:gaps+=1
             prev=t;last=row["time_utc"]
     return {"row_count":rows,"first_timestamp_utc":first,"last_timestamp_utc":last,"gap_count_24x7_reference":gaps,"sha256":_sha_file(path)}
 
@@ -171,6 +195,7 @@ class FrontierDataCaptureRunner:
                 page_to=nxt
             _write_rows(part,[window_rows[k] for k in sorted(window_rows)],"w" if wi==0 else "a")
             if (wi+1)%20==0 or wi+1==len(windows):self.progress(f"[DATA] {name} M5 windows {wi+1}/{len(windows)}")
+        canonicalize_m5_csv(part)
         part.replace(done);stats=_inspect_csv(done)
         m={"broker_symbol":name,"symbol_id":sid,"digits":digits,"resolution":"M5","requested_interval":interval,"protected_forward_start":self.plan["protected_forward_start"],"classification":"DEVELOPMENT_ONLY","completed_bars_only":True,"synthetic_fill":False,"forward_fill":False,**stats}
         atomic_write_json(meta,m);return done,m

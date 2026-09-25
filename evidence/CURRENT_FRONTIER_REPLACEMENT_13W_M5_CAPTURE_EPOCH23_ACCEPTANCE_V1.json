@@ -1,0 +1,144 @@
+{
+  "schema": "mxm.greenfield.current-frontier-replacement-13w-m5-capture-acceptance.v1",
+  "status": "ACCEPTED_AFTER_DETERMINISTIC_CANONICALIZATION_OF_IDENTICAL_DUPLICATES",
+  "evidence_epoch": 23,
+  "source_plan_ref": "data/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PLAN_EPOCH22_V1.json",
+  "source_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+  "capture_provenance": {
+    "returned_transport_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "returned_transport_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    "returned_transport_size_bytes": 2055633,
+    "source_collector_artifact_name": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PACKAGE_V1",
+    "source_workflow_run_id": 36114524587,
+    "source_artifact_id": 10854470998,
+    "source_artifact_wrapper_sha256": "12fc8b3de0d845e8eba7aa38814ba53c07587c0525e33e28193d187a9d2924d2",
+    "source_runnable_package_sha256": "3162fb193ccdb745a923ea125a783d7fb239c585efe540b8017d3060084e7158",
+    "logical_bundle_copies": 2,
+    "duplicate_bundle_files_byte_identical": true,
+    "wrapper_directory_difference_is_transport_only": true
+  },
+  "identity_manifest_observed": {
+    "schema": "mxm.greenfield.capture-manifest.v1",
+    "capture_session_id": "epoch22-replacement-a573cbcf19897c50",
+    "capture_schema": "mxm.greenfield.current-frontier-replacement-m5-bundle.v1",
+    "tool_version": "MXM_CURRENT_FRONTIER_REPLACEMENT_M5_ANDROID_STDLIB_V1",
+    "account_fingerprint": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "source_environment": "Pepperstone - Europe LIVE",
+    "capture_start_utc": "2026-06-15T00:00:00Z",
+    "capture_end_utc": "2026-09-25T09:18:22.695725Z",
+    "completion_state": "COMPLETE",
+    "read_only_assertion": true,
+    "economic_outcomes_opened": 0,
+    "orders_placed": false,
+    "account_mutation": false,
+    "protected_evidence_opened": false,
+    "observed_file_sha256": "8ac4c4b0f866d088f2d35e904b8841f07afe1c883913b495b875a0fd71ccc21a",
+    "recorded_pre_overwrite_payload_sha256": "a5631b1c836b7446b118053a6041ec0be19e30ad05a6cf6536e7668e448d7378"
+  },
+  "packaging_integrity": {
+    "checksums_file_sha256": "9cd9d9188b97426156c68a2eee7e8f1ea5746afd2dacdf5008c6d1809f2639d7",
+    "checksums_validate_all_three_raw_series": true,
+    "secret_scan": "PASS_NO_CREDENTIAL_PATTERN",
+    "manifest_casefold_collision_detected": true,
+    "manifest_casefold_collision_effect": "CAPTURE_MANIFEST.json overwrote capture_manifest.json on case-insensitive Android-visible storage; the identity manifest retained the pre-overwrite payload hash but the original payload JSON bytes were not present in the returned ZIP.",
+    "raw_market_bytes_invalidated": false
+  },
+  "canonicalization_repair": {
+    "reason": "The collector deduplicated within each request window but appended overlapping window responses without a global timestamp deduplication pass. All repeated timestamp rows are byte-equivalent at parsed-field level; no conflicting duplicate exists.",
+    "law": "For each exact symbol, identical timestamp duplicates are collapsed to one row and rows are sorted by UTC timestamp. Any conflicting duplicate would fail closed. No OHLC value, timestamp, volume, interval, or symbol identity is synthesized or changed.",
+    "conflicting_duplicate_timestamps": 0,
+    "out_of_interval_rows": 0,
+    "protected_forward_rows": 0,
+    "ohlc_failures": 0,
+    "forward_fill": false,
+    "synthetic_fill": false,
+    "recapture_required": false,
+    "canonical_evidence_identity_sha256": "d6c05d97fc41f1027d2db8acacdbc5d61cd7538da61dbd81f41fbf844f8ce30f"
+  },
+  "series": {
+    "CXMT.CN-PERP": {
+      "symbol_id": 7427,
+      "raw_path": "raw/7427_CXMT_CN_PERP_M5.csv",
+      "raw_sha256": "fe5d2bf776381036a00f166f57b8db8a2c26abb6e3400468072507d011da5ad3",
+      "raw_rows": 22172,
+      "identical_duplicate_rows_removed": 6012,
+      "conflicting_duplicate_timestamps": 0,
+      "canonical_rows": 16160,
+      "canonical_sha256": "6949046285831f65824febaa72ffcce7810bff38281cb8514f01e8f2f6290fcd",
+      "first_utc": "2026-07-19T09:55:00Z",
+      "last_utc": "2026-09-13T23:50:00Z",
+      "active_dates": 57,
+      "off_cadence_intervals": 0,
+      "largest_gap_seconds": 15900,
+      "ohlc_failures": 0,
+      "out_of_interval_rows": 0,
+      "protected_forward_rows": 0
+    },
+    "ERICB.SE": {
+      "symbol_id": 5352,
+      "raw_path": "raw/5352_ERICB_SE_M5.csv",
+      "raw_sha256": "2d767c1a0a17eb1b6583ac5a01da3cef67a5832575ddd68de335bdd9c127f28d",
+      "raw_rows": 24583,
+      "identical_duplicate_rows_removed": 18141,
+      "conflicting_duplicate_timestamps": 0,
+      "canonical_rows": 6442,
+      "canonical_sha256": "0a0e0a1f2909c9befb26810cb3ebbf34237a195111c6993ab7618f7a278d3402",
+      "first_utc": "2026-06-15T07:00:00Z",
+      "last_utc": "2026-09-11T15:15:00Z",
+      "active_dates": 64,
+      "off_cadence_intervals": 0,
+      "largest_gap_seconds": 315600,
+      "ohlc_failures": 0,
+      "out_of_interval_rows": 0,
+      "protected_forward_rows": 0
+    },
+    "XAUUSD-F": {
+      "symbol_id": 2924,
+      "raw_path": "raw/2924_XAUUSD_F_M5.csv",
+      "raw_sha256": "4b2a202d86d173c2ac86f0307aa6155863bb4d7eea1ef81ceab20a6060f39a3d",
+      "raw_rows": 32710,
+      "identical_duplicate_rows_removed": 14907,
+      "conflicting_duplicate_timestamps": 0,
+      "canonical_rows": 17803,
+      "canonical_sha256": "d20d499c5a5c5876dd6b04bc41494093385980282f2b5dc6be24e759e79d04d4",
+      "first_utc": "2026-06-15T00:00:00Z",
+      "last_utc": "2026-09-13T23:50:00Z",
+      "active_dates": 78,
+      "off_cadence_intervals": 0,
+      "largest_gap_seconds": 191100,
+      "ohlc_failures": 0,
+      "out_of_interval_rows": 0,
+      "protected_forward_rows": 0
+    }
+  },
+  "frozen_scope_validation": {
+    "exact_symbols": [
+      "CXMT.CN-PERP",
+      "ERICB.SE",
+      "XAUUSD-F"
+    ],
+    "exact_symbol_ids": [
+      7427,
+      5352,
+      2924
+    ],
+    "resolution": "M5",
+    "requested_interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "account_fingerprint_matches_epoch22_current_broker_authority": true,
+    "source_environment_matches": true
+  },
+  "accounting_effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "copilot_provider_calls": 0
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}

@@ -67,15 +67,43 @@ def current_evidence_binding(root_value:str|Path=".")->dict[str,Any]:
     hypothesis=json.loads((root/"HYPOTHESIS_SPACE_V1.json").read_text(encoding="utf-8"))
     open_families=list((hypothesis.get("dimensions") or {}).get("mechanism_family") or [])
     structural=json.loads((root/"data/BROKER_NATIVE_COMPETITION_STRUCTURAL_MAP_SUMMARY_V2.json").read_text(encoding="utf-8"))
-    feasibility=json.loads((root/"data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json").read_text(encoding="utf-8"))
+    current_frontier_path=root/"research_v3/CURRENT_RESEARCH_FRONTIER_V1.json"
+    current_frontier=json.loads(current_frontier_path.read_text(encoding="utf-8")) if current_frontier_path.is_file() else {}
+    current_feasibility_path=root/"data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json"
+    if current_feasibility_path.is_file():
+        feasibility=json.loads(current_feasibility_path.read_text(encoding="utf-8"))
+        counts=feasibility.get("current_counts") or {}
+        current_products=int(counts.get("current_symbols") or 0)
+        accessible_symbols=int(counts.get("current_new_entry_accessible") or 0)
+        both_direction=int(counts.get("both_direction_eur200_feasible") or 0)
+        buy_only=int(counts.get("buy_only_eur200_feasible") or 0)
+        test_both=int(counts.get("known_test_products_still_both_feasible") or 0)
+        feasible_non_test=max(0,both_direction-test_both)+buy_only
+        eligible_post_exclusion=int(counts.get("current_eligible_post_exclusion_frontier") or ((current_frontier.get("open_frontier") or {}).get("eligible_post_exclusion_symbols") or 0))
+    else:
+        feasibility=json.loads((root/"data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json").read_text(encoding="utf-8"))
+        current_products=int(structural.get("current_products") or structural.get("current_symbols") or 5324)
+        accessible_symbols=int(structural.get("accessible_symbols") or feasibility.get("current_accessible_symbols_indexed") or 1690)
+        both_direction=int(structural.get("both_direction_eur200_feasible") or 1609)
+        buy_only=int(structural.get("buy_only_eur200_feasible") or 40)
+        feasible_non_test=int(structural.get("feasible_non_test_symbols") or 1641)
+        eligible_post_exclusion=int((current_frontier.get("open_frontier") or {}).get("eligible_post_exclusion_symbols") or 0)
+    feature_ref=current_frontier.get("feature_store_ref")
+    feature={}
+    if isinstance(feature_ref,str) and feature_ref and (root/feature_ref).is_file():
+        feature=json.loads((root/feature_ref).read_text(encoding="utf-8"))
+    feature_summary=feature.get("summary") or {}
     universe_basis={
-        "current_products":int(structural.get("current_products") or structural.get("current_symbols") or 5324),
-        "accessible_symbols":int(structural.get("accessible_symbols") or feasibility.get("current_accessible_symbols_indexed") or 1690),
-        "feasible_non_test_symbols":int(structural.get("feasible_non_test_symbols") or 1641),
-        "both_direction_eur200_feasible":int(structural.get("both_direction_eur200_feasible") or 1609),
-        "buy_only_eur200_feasible":int(structural.get("buy_only_eur200_feasible") or 40),
-        "structural_representatives_with_accepted_13w_data":40,
+        "current_products":current_products,
+        "accessible_symbols":accessible_symbols,
+        "feasible_non_test_symbols":feasible_non_test,
+        "both_direction_eur200_feasible":both_direction,
+        "buy_only_eur200_feasible":buy_only,
+        "eligible_post_exclusion_symbols":eligible_post_exclusion,
+        "structural_representatives":int(feature_summary.get("current_structural_representatives") or 0),
+        "structural_representatives_with_accepted_13w_data":int(feature_summary.get("current_representatives_with_13w_history") or 0),
         "structural_representation_is_not_economic_equivalence":True,
+        "current_authority_ref":"data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json" if current_feasibility_path.is_file() else "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
     }
     bundle_payload={"epoch":doc["current_epoch"],"authorities":rows,"provisional":provisional}
     return {

@@ -1,0 +1,33 @@
+{
+  "schema": "mxm.greenfield.current-frontier-replacement-capture-implementation-repair.v1",
+  "status": "DETERMINISTIC_REPAIR_NO_RECAPTURE_NO_RESEARCH_SEMANTIC_CHANGE",
+  "evidence_epoch": 23,
+  "accepted_capture_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+  "defects": [
+    {
+      "id": "CASE_INSENSITIVE_MANIFEST_FILENAME_COLLISION",
+      "root_cause": "The collector used capture_manifest.json as a canonical payload and CAPTURE_MANIFEST.json as the transport identity manifest. On case-insensitive Android-visible storage these names collide, overwriting the data payload manifest.",
+      "repair": "Future replacement captures use REPLACEMENT_CAPTURE_PAYLOAD.json plus CAPTURE_MANIFEST.json, and generic manifest construction rejects case-insensitive canonical-payload collisions."
+    },
+    {
+      "id": "CROSS_WINDOW_IDENTICAL_TIMESTAMP_DUPLICATION",
+      "root_cause": "Each historical request window deduplicated internally, but the collector appended windows without a final global timestamp canonicalization. Broker responses may overlap window boundaries.",
+      "repair": "Generic frontier M5 capture now canonicalizes all final rows by timestamp across windows, preserves only row-identical repeats, and fails closed on conflicts; CSV inspection also requires strictly increasing timestamps."
+    }
+  ],
+  "returned_capture_disposition": {
+    "recapture_performed": false,
+    "recapture_required": false,
+    "raw_market_bytes_invalidated": false,
+    "canonicalization_possible": true,
+    "conflicting_duplicate_rows": 0,
+    "protected_forward_rows": 0,
+    "out_of_interval_rows": 0,
+    "economic_reexecution": false
+  },
+  "accounting_effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "copilot_provider_calls": 0
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "schema": "mxm.greenfield.current-frontier-replacement-13w-structural-coverage.v1",
+  "status": "COMPLETE_NON_ECONOMIC_CURRENT_REPRESENTATIVE_COVERAGE_RESTORED",
+  "evidence_epoch": 23,
+  "source_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+  "source_current_registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+  "current_representative_history_coverage": {
+    "before": 38,
+    "added": 3,
+    "after": 41,
+    "total_current_representatives": 41,
+    "status": "PASS_41_OF_41"
+  },
+  "canonical_series_diagnostics": {
+    "CXMT.CN-PERP": {
+      "rows": 16160,
+      "first_utc": "2026-07-19T09:55:00Z",
+      "last_utc": "2026-09-13T23:50:00Z",
+      "chronology_valid": true,
+      "duplicate_timestamps": 0,
+      "off_cadence_intervals": 0,
+      "missing_m5_slots_between_bounds": 136,
+      "largest_gap_seconds": 15900,
+      "active_dates": 57,
+      "utc_hour_buckets": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "weekday_buckets": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "causal_observation_pairs": 16159
+    },
+    "ERICB.SE": {
+      "rows": 6442,
+      "first_utc": "2026-06-15T07:00:00Z",
+      "last_utc": "2026-09-11T15:15:00Z",
+      "chronology_valid": true,
+      "duplicate_timestamps": 0,
+      "off_cadence_intervals": 0,
+      "missing_m5_slots_between_bounds": 19002,
+      "largest_gap_seconds": 315600,
+      "active_dates": 64,
+      "utc_hour_buckets": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "weekday_buckets": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "causal_observation_pairs": 6441
+    },
+    "XAUUSD-F": {
+      "rows": 17803,
+      "first_utc": "2026-06-15T00:00:00Z",
+      "last_utc": "2026-09-13T23:50:00Z",
+      "chronology_valid": true,
+      "duplicate_timestamps": 0,
+      "off_cadence_intervals": 0,
+      "missing_m5_slots_between_bounds": 8404,
+      "largest_gap_seconds": 191100,
+      "active_dates": 78,
+      "utc_hour_buckets": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23
+      ],
+      "weekday_buckets": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "causal_observation_pairs": 17802
+    }
+  },
+  "existing_frozen_breakout_event_law": {
+    "source_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+    "lookback_bars": 24,
+    "volatility_expansion_ratio": 1.5,
+    "resolution_seconds": 300,
+    "interpretation": "Event availability only; no post-event return, PnL, cost, ranking, inference, promotion or family closure."
+  },
+  "replacement_breakout_event_availability": {
+    "CXMT.CN-PERP": {
+      "rows": 16160,
+      "eligible_contiguous_windows": 15224,
+      "breakout_only_up": 750,
+      "breakout_only_down": 865,
+      "range_expansion_windows": 4327,
+      "event_up": 449,
+      "event_down": 462,
+      "events": 911,
+      "event_availability_rate": 0.059839726747241195
+    },
+    "ERICB.SE": {
+      "rows": 6442,
+      "eligible_contiguous_windows": 4695,
+      "breakout_only_up": 243,
+      "breakout_only_down": 295,
+      "range_expansion_windows": 1276,
+      "event_up": 144,
+      "event_down": 175,
+      "events": 319,
+      "event_availability_rate": 0.06794462193823216
+    },
+    "XAUUSD-F": {
+      "rows": 17803,
+      "eligible_contiguous_windows": 16220,
+      "breakout_only_up": 862,
+      "breakout_only_down": 930,
+      "range_expansion_windows": 3080,
+      "event_up": 448,
+      "event_down": 445,
+      "events": 893,
+      "event_availability_rate": 0.05505548705302096
+    }
+  },
+  "current_41_representative_breakout_aggregate": {
+    "basis": "38 retained current representatives from the accepted prior screen plus the 3 newly accepted replacement representatives; removed old representatives Crude-F and HEXAB.SE are excluded from the current aggregate.",
+    "symbols": 41,
+    "rows": 408342,
+    "eligible_contiguous_windows": 261723,
+    "breakout_only_up": 13520,
+    "breakout_only_down": 12835,
+    "range_expansion_windows": 55749,
+    "event_up": 6371,
+    "event_down": 6490,
+    "events": 12861,
+    "event_availability_rate": 0.04913973934274023
+  },
+  "mechanism_prerequisite_implications": {
+    "univariate_current_representative_history": "COMPLETE_41_OF_41",
+    "breakout_current_representative_event_availability": "COMPLETE_41_OF_41_UNDER_EXISTING_FROZEN_NON_ECONOMIC_EVENT_LAW",
+    "aligned_multi_symbol_history": "MECHANISM_SPECIFIC_NOT_GLOBALLY_ESTABLISHED",
+    "carry_term_structure_metadata": "UNRESOLVED_MECHANISM_SPECIFIC",
+    "transaction_local_cost_authority": "UNRESOLVED_FOR_ANY_FUTURE_PROSPECTIVELY_SELECTED_ECONOMIC_ENVELOPE"
+  },
+  "economic_effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "returns_or_pnl_computed": false,
+    "provider_calls": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false
+  }
+}

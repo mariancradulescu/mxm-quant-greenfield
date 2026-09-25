@@ -56,4 +56,17 @@ class CaptureIdentityV1Tests(unittest.TestCase):
         self.assertEqual(evidence_identity(a),evidence_identity(b))
         self.assertEqual(a["sha256_per_canonical_payload"],b["sha256_per_canonical_payload"])
 
+    def test_manifest_rejects_case_insensitive_payload_name_collision(self):
+        kwargs=dict(
+            capture_session_id="c1",capture_schema="schema",tool_version="tool",
+            account_fingerprint="fp",source_environment="env",
+            capture_start_utc="2026-09-25T00:00:00Z",capture_end_utc="2026-09-25T00:01:00Z",
+            completion_state="COMPLETE",canonical_payloads={"capture_manifest.json":b'{"x":1}\n'},
+            original_collector_package_sha256=None,read_only_assertion=True,
+            economic_outcomes_opened=0,orders_placed=False,account_mutation=False,
+            protected_evidence_opened=False,
+        )
+        with self.assertRaisesRegex(CaptureIdentityError,"collides case-insensitively"):
+            build_capture_manifest(**kwargs)
+
 if __name__=="__main__":unittest.main()

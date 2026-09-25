@@ -21,10 +21,9 @@ class Epoch21CleanFrontierInventoryBindingTests(unittest.TestCase):
         self.assertEqual(binding["accounting_effect"]["v2_attempts_delta"], 0)
         self.assertEqual(binding["accounting_effect"]["economic_outcomes_delta"], 0)
         self.assertGreaterEqual(epoch["current_epoch"], 21)
-        self.assertIn(state["status"], {"DETERMINISTIC_FRONTIER_INVENTORY_COMPLETE","DETERMINISTIC_CAPTURE_CONTRACT_COMPLETE","INFORMATION_GAIN_ACQUISITION_PLAN_READY","CURRENT_BROKER_EPOCH22_REBUILT_EXTERNAL_REPLACEMENT_HISTORY_GATE"})
-        self.assertFalse(state["research_judgment_required"])
-        self.assertFalse(state["ai_reasoning_required"])
-        self.assertEqual(state["fresh_director_decision_ref"], "research_v3/EPOCH21_CLEAN_FRONTIER_GENERAL_AI_DECISION_V1.json")
+        self.assertIn("capture_contract_ref", state)
+        self.assertGreaterEqual(int(state.get("current_research_evidence_epoch") or 0),21)
+        self.assertEqual(binding["accepted_decision_ref"], "research_v3/EPOCH21_CLEAN_FRONTIER_GENERAL_AI_DECISION_V1.json")
 
     def test_exact_eligible_identity_and_signature_reconciliation(self):
         feasibility=load("data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json")

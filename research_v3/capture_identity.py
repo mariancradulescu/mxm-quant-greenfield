@@ -124,6 +124,11 @@ def build_capture_manifest(
         raise CaptureIdentityError("only COMPLETE captures may receive authoritative manifests")
     if not canonical_payloads:
         raise CaptureIdentityError("manifest requires at least one canonical payload")
+    for rel in canonical_payloads:
+        if Path(str(rel)).name.casefold()==MANIFEST_NAME.casefold():
+            raise CaptureIdentityError(
+                "canonical payload filename collides case-insensitively with CAPTURE_MANIFEST.json"
+            )
     return {
         "schema":MANIFEST_SCHEMA,
         "capture_session_id":capture_session_id,

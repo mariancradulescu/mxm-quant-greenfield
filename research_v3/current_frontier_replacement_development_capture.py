@@ -21,7 +21,7 @@ from research_v3.capture_identity import build_capture_manifest
 PLAN_REL="data/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PLAN_EPOCH22_V1.json"
 OUTPUT_FILENAME="MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip"
 BUNDLE_DIR="MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1"
-TOOL_VERSION="MXM_CURRENT_FRONTIER_REPLACEMENT_M5_ANDROID_STDLIB_V1"
+TOOL_VERSION="MXM_CURRENT_FRONTIER_REPLACEMENT_M5_ANDROID_STDLIB_V2"
 EXPECTED_PLAN_SHA="a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f"
 EXPECTED_IDENTITIES=(("CXMT.CN-PERP",7427),("ERICB.SE",5352),("XAUUSD-F",2924))
 
@@ -98,13 +98,13 @@ class CurrentFrontierReplacementDevelopmentRunner(FrontierDataCaptureRunner):
             "resolution":"M5","requested_interval":self.plan["interval"],"series":results,
             "orders_placed":False,"account_mutation":False,"protected_evidence_opened":False,"economic_outcomes_opened":0,"v2_attempts_consumed":0
         }
-        payload_path=self.bundle/"capture_manifest.json";atomic_write_json(payload_path,manifest)
+        payload_path=self.bundle/"REPLACEMENT_CAPTURE_PAYLOAD.json";atomic_write_json(payload_path,manifest)
         identity_manifest=build_capture_manifest(
             capture_session_id=f"epoch22-replacement-{EXPECTED_PLAN_SHA[:16]}",
             capture_schema=manifest["schema"],tool_version=TOOL_VERSION,
             account_fingerprint=self.plan["account_fingerprint_sha256"],source_environment=self.plan["source_environment"],
             capture_start_utc=self.plan["interval"]["start_utc"],capture_end_utc=captured_utc,completion_state="COMPLETE",
-            canonical_payloads={"capture_manifest.json":payload_path.read_bytes()},
+            canonical_payloads={"REPLACEMENT_CAPTURE_PAYLOAD.json":payload_path.read_bytes()},
             original_collector_package_sha256=None,read_only_assertion=True,economic_outcomes_opened=0,
             orders_placed=False,account_mutation=False,protected_evidence_opened=False
         )

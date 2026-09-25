@@ -54,7 +54,9 @@ class Epoch22CurrentBrokerReconciliationTests(unittest.TestCase):
 
     def test_epoch_advanced_for_new_current_evidence_not_for_outcome(self):
         e=load("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
-        self.assertEqual(e["current_epoch"],22)
-        self.assertEqual(e["history"][-1]["event_class"],"CURRENT_BROKER_NATIVE_EXECUTION_FEASIBILITY_EVIDENCE_ACCEPTED")
+        self.assertGreaterEqual(e["current_epoch"],22)
+        epoch22=[x for x in e["history"] if x.get("epoch")==22]
+        self.assertEqual(len(epoch22),1)
+        self.assertEqual(epoch22[0]["event_class"],"CURRENT_BROKER_NATIVE_EXECUTION_FEASIBILITY_EVIDENCE_ACCEPTED")
 
 if __name__=="__main__":unittest.main()
