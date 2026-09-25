@@ -1,7 +1,7 @@
 import json,unittest
 from pathlib import Path
 
-from research_v3.general_ai_reasoning_provider import _system_prompt
+from research_v3.general_ai_reasoning_provider import _system_prompt, build_reasoning_request
 from research_v3.execution_router import classify_execution, implementation_required
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -23,11 +23,23 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
 
     def test_scope_recovery_routes_to_new_distinct_semantic_decision(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        self.assertEqual(n["status"], "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION")
+        self.assertEqual(n["scope_resolution_ref"], "research_v3/EPOCH23_SCOPE_RESOLUTION_V1.json")
         self.assertEqual(n["decision_contract"]["required_action"], "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE")
-        self.assertFalse(n["implementation_ai_required"])
-        self.assertFalse(n["user_action_required"])
-        self.assertEqual(classify_execution(ROOT,n)["execution_class"], "SEMANTIC_REASONING")
+        semantic=dict(n)
+        semantic.update(status="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION",
+                        next_action="AI_SELECT_DISTINCT_FRONTIER_WAVE_AFTER_REGIME_SCOPE_RESOLUTION",
+                        ai_reasoning_required=True, implementation_ai_required=False,
+                        user_action_required=False)
+        self.assertEqual(classify_execution(ROOT,semantic)["execution_class"], "SEMANTIC_REASONING")
+
+    def test_pending_decision_contract_reaches_reasoning_request(self):
+        n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
+        request=build_reasoning_request(ROOT)
+        projected=request["next_state"]
+        for field in ("semantic_question","decision_contract","scope_resolution_ref","reason"):
+            self.assertEqual(projected[field],n.get(field))
+        self.assertEqual(projected["decision_contract"]["required_action"],
+                         "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE")
 
     def test_router_does_not_reinterpret_accepted_proposal_as_implementation_authority(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
