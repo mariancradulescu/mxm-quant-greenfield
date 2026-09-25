@@ -10,6 +10,7 @@ import argparse, json
 from pathlib import Path
 from typing import Any, Mapping
 
+from research_v3.economic_envelope_governor import validate as validate_research_envelope, EnvelopeIneligible
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.autonomous_runtime_v2 import RuntimeV2
 from research_v3.runtime_v2_primitives import GitCheckpointSink, sha256_file
@@ -38,6 +39,11 @@ def validate_envelope(root: Path, envelope: Mapping[str, Any]) -> dict[str, Any]
         raise EconomicEnvelopeError("AI authorization is not uniquely accepted/non-economic")
     proposal=_load(root,str(ai.get("proposal_ref")))
     decision=proposal.get("decision") or {}
+    if int((proposal.get("evidence_binding") or {}).get("evidence_epoch_seen",0) or 0)>=21:
+        try:
+            validate_research_envelope(root,envelope.get("experiment_governance") or {})
+        except EnvelopeIneligible as exc:
+            raise EconomicEnvelopeError("epoch-21 economic envelope prerequisite/breadth gate: "+str(exc)) from exc
     if decision.get("execute_exactly_once") is not True or decision.get("economic_execution_must_use_runtime_v2") is not True:
         raise EconomicEnvelopeError("AI proposal did not authorize exactly-once Runtime V2 execution")
     report=validate_repository_state(root)
