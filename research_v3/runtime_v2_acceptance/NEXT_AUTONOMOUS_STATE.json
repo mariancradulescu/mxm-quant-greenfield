@@ -20,6 +20,10 @@
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
+  "active_candidate_id": null,
+  "active_mechanism_family": null,
+  "active_proposal_id": null,
+  "active_target_symbol": null,
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "authorizing_evidence_epoch": 21,
   "breakout_15m_followthrough_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
@@ -77,6 +81,7 @@
   "c032_result_status": "GROSS_EDGE_FAIL",
   "candidate_id": null,
   "candidate_spec_hash": null,
+  "canonical_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
   "capture_integrity": {
     "duplicate_timestamps": 0,
     "ohlc_failures": 0,
@@ -143,6 +148,7 @@
   "economic_progression": "C032_GROSS_EDGE_FAIL_RECORDED_EXACTLY_ONCE",
   "economic_promotion": "NOT_AUTHORIZED",
   "economic_promotion_authorized": false,
+  "evidence_eligibility_ref": "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
   "evidence_epoch": 21,
   "evidence_epoch_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
   "exact_head_green_authority": {
@@ -158,8 +164,10 @@
   "family_exhaustion": false,
   "family_exhaustion_claimed": false,
   "fixed15m_directional_screen_ref": "evidence/CROSS_MARKET_FIXED_15M_DIRECTIONAL_SCREEN_V1.json",
+  "follow_on_step": "Once the exact intersected symbol list is materialized from the cited artifacts, submit a subsequent proposal requesting fresh PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API data for those exact symbols to verify current cost/margin and compute exact-head CI before any freeze.",
   "fresh_director_decision_ref": null,
   "fresh_evidence_epoch_required": false,
+  "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -182,6 +190,7 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
+  "integrity_gate": null,
   "interpretation_boundary": "Structural sufficiency is not economic evidence, promotion, or mechanism-family closure.",
   "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
   "latest_material_structural_result_ref": "evidence/EPOCH20_SERIAL_DEPENDENCE_SCREEN_V1.json",
@@ -189,8 +198,10 @@
   "mechanism_families_under_test": [],
   "mechanism_family": null,
   "mechanism_family_under_test": null,
+  "minimum_breadth_threshold_symbols": 8,
+  "minimum_structural_clusters": 3,
   "new_market_data_required": false,
-  "next_action": "AI_SELECT_HIGHEST_INFORMATION_LEGAL_WAVE_FROM_FULL_EPOCH21_FRONTIER",
+  "next_action": "MATERIALIZE_BREADTH_ADEQUATE_BREAKOUT_VOLATILITY_REPLACEMENT_CANDIDATE_SET_FROM_CITED_STRUCTURAL_ARTIFACTS_THEN_REQUEST_FRESH_EUR200_FEASIBILITY_CONFIRMATION",
   "outer": "C032_ECONOMIC_OUTCOME_RECORDED_EXACTLY_ONCE",
   "outer_authorization": "CONSUMED_EXACTLY_ONCE",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
@@ -249,11 +260,13 @@
     "status": "RECOVERED_FROM_EPOCH4_IMPLEMENTATION_LIVENESS_STALL",
     "valid_evidence_discarded": false
   },
+  "rejection_ref": "research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json",
+  "replacement_capacity_audit_ref": "research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json",
   "required_interpretation": null,
   "required_outputs": [],
   "research_action": null,
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
   "runtime_repair": {
     "current_entry_tradability_required": false,
@@ -275,10 +288,10 @@
   "search_budget_change": -1,
   "selected_families": [],
   "selection_rule": null,
-  "source_ai_proposal_hash": null,
-  "source_ai_proposal_id": null,
+  "source_ai_proposal_hash": "0bf06677734cb23da863e986073bdc1c3490b636eaa4d7c0bcef0e189c9bc0ec",
+  "source_ai_proposal_id": "AI-DIR-EPOCH21-BREAKOUT-BREADTH-REPLACEMENT-001",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-  "source_runtime_operation_id": null,
+  "source_runtime_operation_id": "op_a2eb0e907eeb797d075015f94d8c4d0c",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 20,
     "current_evidence_epoch": 21,
@@ -288,7 +301,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
+  "status": "PROSPECTIVE_SCOPE_DESIGN_IN_PROGRESS",
   "stop_condition": null,
   "structural_representatives_are_not_economic_equivalence": true,
   "superseded_general_ai_proposal": {
@@ -301,6 +314,8 @@
     "v2_attempt_consumed": 0
   },
   "supersession_ref": "evidence/POST_EPOCH1_FOUR_PANEL_REAUTH_PROPOSAL_VALIDATION_SUPERSESSION_V1.json",
+  "target_design_class": "VALID_BREADTH_AND_SEMANTICS_SUFFICIENT",
+  "target_mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
   "target_symbol": null,
   "triage_output_requirements": [
     "hash and plan validation",
@@ -351,18 +366,7 @@
   },
   "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
   "universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
-  "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true,
-  "ai_reasoning_required": true,
-  "integrity_gate": null,
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
-  "evidence_eligibility_ref": "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
-  "rejection_ref": "research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json",
-  "active_candidate_id": null,
-  "active_target_symbol": null,
-  "active_mechanism_family": null,
-  "active_proposal_id": null,
-  "canonical_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
-  "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "replacement_capacity_audit_ref": "research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json"
+  "user_action_required": false,
+  "uses_only_existing_accepted_bytes": true
 }
