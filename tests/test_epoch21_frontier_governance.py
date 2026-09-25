@@ -5,7 +5,7 @@ from pathlib import Path
 from research_v3.economic_envelope_governor import (
     BREADTH_UNITS, REQUIRED_FREEZE, REQUIRED_GATES, EnvelopeIneligible,
     capacity, validate, account_first_open)
-from research_v3.general_ai_reasoning_provider import _context_payload
+from research_v3.general_ai_reasoning_provider import _context_payload, _system_prompt
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -93,3 +93,27 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
         self.assertEqual(packet["capacity"]["methodology_replacement_total"],15)
         self.assertTrue(any(x["ref"]=="discovery/results/V2-C032_STAGE_A_V1.json"
                             for x in packet["eligibility_packet"]["forbidden_inputs"]))
+
+    def test_prompt_does_not_privilege_prior_symbol_or_panel(self):
+        prompt=_system_prompt()
+        self.assertNotIn("NETH25",prompt)
+        self.assertNotIn("C031",prompt)
+        self.assertNotIn("four-panel SESSION_GAP",prompt)
+        self.assertIn("complete 1578-symbol eligible frontier",prompt)
+
+    def test_additional_authority_is_not_granted_to_unclassified_file(self):
+        import tempfile
+        from research_v3.additional_authority_governor import resolve
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            target=root/"evidence/UNKNOWN_UNREVIEWED_V1.json"
+            target.parent.mkdir(parents=True)
+            target.write_text('{"status":"ACCEPTED"}')
+            request=root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json"
+            request.parent.mkdir(parents=True)
+            request.write_text(json.dumps({"status":"ADDITIONAL_AUTHORITY_REQUIRED",
+                "requested_authority_or_class":"evidence/UNKNOWN_UNREVIEWED_V1.json"}))
+            registry=root/"research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json"
+            registry.write_text(json.dumps({"bindings":[]}))
+            self.assertEqual(resolve(root)["status"],"AUTHORITY_NOT_CLASSIFIED")
+            self.assertFalse((root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json").exists())
