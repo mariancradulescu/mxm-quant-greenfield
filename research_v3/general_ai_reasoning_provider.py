@@ -192,6 +192,9 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "authority_hashes":core["authority_hashes"],
         "decision_class":str(next_state.get("next_action") or ""),
         "pending_status":str(next_state.get("status") or ""),
+        "semantic_question":str(next_state.get("semantic_question") or ""),
+        "decision_contract":next_state.get("decision_contract") or {},
+        "scope_resolution_ref":str(next_state.get("scope_resolution_ref") or ""),
         "accounting":snapshot,
         "universe_basis":core["universe_basis"],
         "open_families":core["current_open_mechanism_families"],
@@ -206,6 +209,11 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "research_head":core["research_head"],
         "project_snapshot":snapshot,
         "next_state":{"status":next_state.get("status"),"next_action":next_state.get("next_action"),
+                      "semantic_question":next_state.get("semantic_question"),
+                      "decision_contract":next_state.get("decision_contract"),
+                      "scope_resolution_ref":next_state.get("scope_resolution_ref"),
+                      "reason":next_state.get("reason"),
+                      "supersession_ref":next_state.get("supersession_ref"),
                       "active_candidate_id":None,"active_target_symbol":None,
                       "active_mechanism_family":None,"active_proposal_id":None,
                       "evidence_epoch":evidence["evidence_epoch"],
@@ -406,6 +414,12 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
             raise AIProposalRejected("pending decision requires a named open mechanism family")
         if selected in forbidden:
             raise AIProposalRejected("selected family lacks a legal independent next step under the pending decision contract")
+        for field in ("selected_family","mechanism_family","active_mechanism_family"):
+            declared=next_state.get(field)
+            if declared is not None and declared!=selected:
+                raise AIProposalRejected("proposed next state contradicts selected mechanism family")
+        if contract.get("require_no_economic_opening") and (decision.get("open_economic_outcome") or next_state.get("economic_outcome_opened")):
+            raise AIProposalRejected("pending decision forbids an economic outcome")
         if next_state.get("implementation_ai_required") is True and not decision.get("implementation_scope"):
             raise AIProposalRejected("pending decision cannot authorize implementation without explicit implementation scope")
     proposed_next=dict(next_state)
