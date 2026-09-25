@@ -1,0 +1,90 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "35e61cd77e28668b0e03622db242cdc55aa82e1d5b99cb33e2e191b2e053b887",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "DEFINE_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC",
+    "implementation_scope": {
+      "accepted_inputs": [
+        "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+        "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+        "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json"
+      ],
+      "code": [
+        "Add a deterministic synchronized-pair builder that consumes the hash-bound 41-representative M5 capture, aligns timestamps using an explicit intersection policy, rejects duplicate or missing-bar contamination, and emits pair-level provenance.",
+        "Add product-comparability validation covering quote currency, contract/unit semantics, price scale, trading-session overlap, minimum aligned observations, and broker-symbol identity; failures must be explicit and auditable.",
+        "Add a predeclared diagnostic pipeline that estimates hedge parameters only on the development split, computes spread and stationarity diagnostics, and evaluates the frozen holdout split without refitting.",
+        "Add stability checks across predefined rolling subwindows and parameter perturbations; no pair ranking, winner selection, economic signal, order logic, or cost claim is permitted."
+      ],
+      "diagnostic_specification": {
+        "failure_criteria": [
+          "Insufficient aligned observations or excessive missingness.",
+          "Product-comparability validation failure.",
+          "Non-finite prices, returns, hedge estimates, or test statistics.",
+          "Failure of the predeclared stationarity threshold in development or holdout.",
+          "Material hedge or stationarity instability under the predeclared subwindow and perturbation checks.",
+          "Any leakage, refitting on holdout data, duplicate identity, or untraceable input hash."
+        ],
+        "hedge": "Estimate an intercept and hedge coefficient on the development partition only using the predeclared regression method; retain signed and absolute hedge diagnostics.",
+        "stability": "Repeat the fixed diagnostic over predeclared chronological subwindows and coefficient perturbations; report dispersion and sign consistency.",
+        "stationarity": "Run the predeclared residual stationarity test on development and untouched holdout partitions with fixed test settings and record statistic, p-value, and sample size.",
+        "synchronization": "Use only common UTC M5 timestamps from the accepted capture; preserve missingness indicators and reject pairs below the predeclared aligned-observation threshold.",
+        "time_split": "Chronological development, validation, and holdout partitions are fixed before execution; no holdout-derived tuning or pair exclusion is allowed."
+      },
+      "evidence_outputs": [
+        "A hash-bound structural diagnostic plan and configuration artifact.",
+        "A pair-alignment and product-comparability audit for all admissible pairs.",
+        "A diagnostic result artifact containing development, validation, holdout, stability, and failure fields without economic interpretation.",
+        "A machine-readable execution manifest recording input hashes, code version, test results, and rejection reasons."
+      ],
+      "novel_repository_code_required": true,
+      "scope_constraints": [
+        "Enumerate the complete accepted 41-representative input scope; do not select a winning pair or retroactively narrow the frontier.",
+        "Do not use consumed C032 evidence or any outcome-exposed artifact as prospective input.",
+        "Do not authorize economic execution, independent confirmation, transaction-cost analysis, or live trading."
+      ],
+      "tests": [
+        "Unit tests for UTC alignment, missing-bar handling, duplicate rejection, product-comparability guards, deterministic hashing, and chronological split boundaries.",
+        "Statistical fixture tests with synthetic cointegrated and non-cointegrated series verifying expected stationarity and failure classifications.",
+        "Leakage tests proving holdout data cannot alter hedge fitting, thresholds, pair inclusion, or diagnostic configuration.",
+        "Integration test over the accepted epoch23 capture verifying schema, provenance, deterministic output, and one record per admissible unordered pair.",
+        "Regression test proving no economic outcome, order, cost, margin, or protected-forward artifact is emitted."
+      ]
+    },
+    "later_gates": [
+      "Independent review of structural diagnostic validity and data sufficiency.",
+      "Authenticated Pepperstone symbol, cost, margin, and execution verification if a later economic envelope is proposed.",
+      "Prospective freeze and exact-head confidence-interval review before any economic outcome authorization."
+    ],
+    "selected_mechanism_family": "RELATIVE_VALUE_COINTEGRATION"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 23,
+    "economic_authorization": "NOT_REQUESTED",
+    "implementation_ai_required": true,
+    "next_action": "Implement and test the hash-bound non-economic RELATIVE_VALUE_COINTEGRATION synchronized-pair alignment and hedge/stationarity/stability diagnostic, then materialize auditable evidence outputs.",
+    "next_gate": "Deterministic structural diagnostic acceptance and independent validation; cost and economic feasibility remain later gates.",
+    "research_judgment_required": false,
+    "scope": "Complete accepted epoch23 41-representative M5 capture within the open 1576-identity frontier; no pair is selected as a winner.",
+    "selected_family": "RELATIVE_VALUE_COINTEGRATION",
+    "status": "IMPLEMENTATION_REQUIRED"
+  },
+  "objective": {
+    "class": "NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC",
+    "goal": "Implement and run a prospective, bounded relative-value cointegration diagnostic over the accepted epoch23 41-representative M5 capture without selecting a winning pair or opening an economic outcome.",
+    "information_gain_rationale": "This isolates whether synchronized product-comparable pairs exhibit stable hedge, stationarity, and out-of-sample persistence across structurally heterogeneous representatives. It resolves the prerequisite identified by epoch24 while preserving the complete 1576-identity frontier and avoiding outcome-driven scope narrowing."
+  },
+  "operation_id": "op_b16302ebd1d591c5304a904eecde4426",
+  "proposal_hash": "443cc268b58665f167b5b3c502c85d1b6dd224f21c61d51f1290c2cfcbc6385b",
+  "proposal_id": "rv-structural-diagnostic-epoch24-01",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_3feda52594b41fa520baac3db22226b9.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
