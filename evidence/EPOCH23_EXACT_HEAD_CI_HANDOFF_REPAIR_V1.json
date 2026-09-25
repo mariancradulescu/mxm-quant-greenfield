@@ -1,0 +1,29 @@
+{
+  "schema": "mxm.greenfield.exact-head-ci-semantic-handoff-repair.v1",
+  "status": "DETERMINISTIC_CONTROL_PLANE_REPAIR_NO_RESEARCH_SEMANTIC_CHANGE",
+  "evidence_epoch": 23,
+  "root_cause": "Runtime V2 Liveness Sentinel dispatched the semantic Supervisor without the completed m6-preparation head/conclusion/run-id. general_ai_autonomy_loop therefore correctly returned PENDING_EXACT_HEAD_GREEN before provider transport even though exact-head CI run 36122026849 had succeeded.",
+  "observed": {
+    "research_head": "cfd77eeec4975cbc337861d66aa8c79e941a9578",
+    "exact_head_ci_run_id": 36122026849,
+    "exact_head_ci_conclusion": "success",
+    "semantic_supervisor_run_id": 36122141949,
+    "semantic_supervisor_conclusion": "success",
+    "provider_transport_reached": false,
+    "provider_invocations_before": 4,
+    "provider_invocations_after": 4
+  },
+  "repair": {
+    "main_control_plane_commit": "5b1c523757fbfd6730459b705e92a402911261a5",
+    "sentinel_passes_exact_m6_head_conclusion_run_id": true,
+    "supervisor_accepts_predecessor_ci_inputs": true,
+    "semantic_dispatch_requires_m6_predecessor": true,
+    "economic_authorization_changed": false
+  },
+  "effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "copilot_provider_calls": 0
+  },
+  "purpose_of_this_research_commit": "Create one new logical exact-head Authority CI after the repaired handoff so the event-driven semantic continuation can prove green authority without fabricating or persisting stale CI."
+}
