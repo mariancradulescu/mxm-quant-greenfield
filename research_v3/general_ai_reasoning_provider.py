@@ -206,24 +206,37 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     }
 
 def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
-    evidence=current_evidence_binding(root)
+    frontier=json.loads((root/"research_v3/CURRENT_RESEARCH_FRONTIER_V1.json").read_text())
+    audit=json.loads((root/"research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json").read_text())
     epoch_doc=json.loads((root/"research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json").read_text())
     delta=list((epoch_doc.get("trigger_event") or {}).get("refs") or [])
-    prior=json.loads((root/"research_v3/EPOCH20_POST_C032_INFORMATION_GAIN_DECISION_V1.json").read_text())
-    calendar=json.loads((root/"evidence/EPOCH20_C006_SESSION_CALENDAR_PREREQUISITE_AUDIT_V1.json").read_text())
-    return {"prior_accepted_reasoning_summary":{"selected_action":prior["reasoning"].get("selected_action"),"scope":prior["reasoning"].get("scope")},
-            "resolved_prerequisite_summary":{"finding":calendar.get("finding"),"next_prerequisite":calendar.get("next_prerequisite")},
-            "c032_historical_summary":{"identity":"V2-C032","status":"GROSS_EDGE_FAIL","admitted_trades":11,"capture_reuse_forbidden":True},
-            "request_id":request["request_id"],
-            "eligibility_packet":packet(root,evidence_epoch=request["evidence_epoch_seen"],
-                decision_class=str(request["next_state"].get("next_action") or "FRESH_EPOCH21_RESEARCH"),
-                refs=request["authority_refs"],accounting=request["project_snapshot"],
-                universe=request["universe_basis"],
-                semantic_question="Choose the highest-information legal post-C032 action without reusing consumed NETH25 outcome capture as prospective evidence.",
-                delta_refs=delta),
-            "current_open_mechanism_families":request["current_open_mechanism_families"],
-            "causal_prohibitions":["NO_C032_RERUN","NO_C032_OUTCOME_CAPTURE_REUSE_AS_NEW_PROSPECTIVE_EVIDENCE",
-                "NO_PROTECTED_FORWARD_LEAKAGE","NO_RETROACTIVE_PARAMETER_TUNING"]}
+    scope=[{"id":row["candidate_id"],"family":row["mechanism_family"],
+            "symbols":row["exact_universe_size"],"design_class":row["classification"],
+            "replacement":row["replacement_eligible"],"result_ref":row["latest_result_ref"]}
+           for row in audit["per_identity"]]
+    p=packet(root,evidence_epoch=request["evidence_epoch_seen"],
+             decision_class="FRESH_FRONTIER_LEVEL_RESEARCH",
+             refs=request["authority_refs"],accounting=frontier["accounting"],
+             universe=frontier["open_frontier"],
+             semantic_question="From the entire legal broker-native frontier, choose the highest-information prospective research wave for extremely fast and high realizable compounded EUR200 Pepperstone/cTrader equity growth with free-margin survival and recovery capacity. Select mechanism and breadth from reusable evidence, not the last candidate.",
+             delta_refs=delta)
+    p["allowed_authority_refs"]=[x["ref"] for x in
+        p["admissible_inputs"]+p["historical_context"]+p["forbidden_inputs"]]
+    return {"request_id":request["request_id"],"eligibility_packet":p,
+            "historical_consumed_identity_summaries":scope,
+            "valid_survivors":["V2-C006","V2-C012","V2-C031"],
+            "unresolved_prerequisites":["C006 historical cash-session calendar",
+                "C029 development settlement coverage","C030 zero settled trade"],
+            "project_objective":{"broker":"Pepperstone","platform":"cTrader",
+                "starting_capital_eur":200,"account":"ONE_CONTINUOUS_ACCOUNT",
+                "goal":"EXTREMELY_HIGH_AND_FAST_REALIZABLE_COMPOUNDED_EQUITY_GROWTH",
+                "must_preserve":["free_margin","recovery_capacity","anti_ruin"]},
+            "capacity":{"base_remaining":64,"methodology_replacement_total":15,
+                "lifetime_economic_exposure":20,"outcomes_opened":28},
+            "causal_prohibitions":["NO_C032_RERUN","NO_C032_OUTCOME_CAPTURE_REUSE",
+                "NO_PROTECTED_FORWARD_LEAKAGE","NO_RETROACTIVE_TUNING",
+                "NO_OUTCOME_DRIVEN_SCOPE_SELECTION"],
+            "authority_protocol":"If a necessary ref is absent, return status ADDITIONAL_AUTHORITY_REQUIRED with requested_authority_or_class and rationale. Do not invent an allowed ref."}
 
 
 def _system_prompt()->str:
@@ -364,8 +377,10 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
     if not isinstance(refs,list) or not refs:
         raise AIProposalRejected("provider candidate authority_refs must be non-empty")
     refs=[str(x) for x in refs]
-    if any(x not in allowed for x in refs):
-        raise AIProposalRejected("provider candidate referenced authority outside supplied context")
+    unknown=[x for x in refs if x not in allowed]
+    if unknown:
+        sanitized=[x for x in unknown if re.fullmatch(r"[A-Za-z0-9_./-]{1,220}",x)]
+        raise AIProposalRejected("provider candidate referenced authority outside supplied context: "+json.dumps(sanitized[:8]))
     raw_policy=candidate.get("data_policy") or {}
     new_data=bool(raw_policy.get("new_market_data_requested"))
     data_policy={"no_default_multi_year_download":True,"user_selects_symbols_or_horizon":False,"new_market_data_requested":new_data}
@@ -441,6 +456,19 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
     for attempt in range(1):
         try:
             candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
+            if candidate.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED":
+                requested=str(candidate.get("requested_authority_or_class") or "")[:220]
+                rationale=str(candidate.get("rationale") or "")[:700]
+                if not requested or not rationale:
+                    raise AIProposalRejected("additional authority request lacks explicit ref/class or rationale")
+                requirement={"schema":"mxm.greenfield.additional-authority-request.v1",
+                             "status":"ADDITIONAL_AUTHORITY_REQUIRED",
+                             "requested_authority_or_class":requested,"rationale":rationale,
+                             "request_id":request["request_id"],"evidence_epoch":request["evidence_epoch_seen"],
+                             "no_economic_outcome":True,"created_utc":iso()}
+                atomic_write_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",requirement)
+                sink.checkpoint("general_ai_additional_authority_request",None)
+                return requirement
             proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
             break
         except AIProposalRejected as exc:
