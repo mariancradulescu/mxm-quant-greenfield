@@ -171,7 +171,8 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
                 return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
-            _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"},git_checkpoint=git_checkpoint,git_push=git_push)
+            if out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
+                _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,True,git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
                 return {"status":out["status"],"progress_class":"LEGITIMATE_EXTERNAL_GATE" if out["status"]=="EXTERNAL_DATA_REQUIRED" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"result":out}
