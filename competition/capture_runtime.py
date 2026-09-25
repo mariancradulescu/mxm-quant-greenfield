@@ -101,7 +101,7 @@ class CaptureProgress:
             "phase":self.phase,"substage":self.substage,
             "completed_work_units":phase_done,"total_work_units":phase_total,
             "phase_percent":round((100*phase_done/phase_total),2) if phase_total else None,
-            "overall_percent":100.0 if self.finalized else round(100*overall,2),
+            "overall_percent":100.0 if self.finalized else min(99.99,round(100*overall,2)),
             "elapsed_seconds":round(elapsed,1),
             "current_rate_units_per_second":round(rate,4) if rate else 0.0,
             "eta_seconds":round(eta,1) if eta is not None else None,
