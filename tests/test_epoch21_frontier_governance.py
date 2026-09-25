@@ -117,3 +117,21 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
             registry.write_text(json.dumps({"bindings":[]}))
             self.assertEqual(resolve(root)["status"],"AUTHORITY_NOT_CLASSIFIED")
             self.assertFalse((root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json").exists())
+
+    def test_rejected_breakout_proposal_never_passes_prospective_eligibility(self):
+        from research_v3.evidence_eligibility import validate_eligibility, EvidenceIneligible
+        proposal=json.loads((ROOT/"research_v3/ai_director/proposals/AUTO_reason_388458036df2ab11bb8cb7025f95aa74.json").read_text())
+        with self.assertRaisesRegex(EvidenceIneligible,"post-event directional followthrough"):
+            validate_eligibility(proposal)
+        clean=copy.deepcopy(proposal)
+        clean["data_bindings"]=[b for b in clean["data_bindings"] if "FOLLOWTHROUGH" not in b["ref"]]
+        clean["decision"]["candidate_construction_procedure"]=[]
+        with self.assertRaisesRegex(EvidenceIneligible,"fixed symbol/cluster minima"):
+            validate_eligibility(clean)
+
+    def test_mapping_of_consumed_capture_cannot_evade_role_check(self):
+        from research_v3.evidence_eligibility import validate_eligibility, EvidenceIneligible, C032_CAPTURE
+        proposal={"decision":{},"objective":{},
+            "data_bindings":[{"ref":C032_CAPTURE,"role":"STRUCTURAL_REUSABLE"}]}
+        with self.assertRaisesRegex(EvidenceIneligible,"OUTCOME_EXPOSED"):
+            validate_eligibility(proposal)
