@@ -57,10 +57,19 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
         self.assertIn("new_market_data_requested=true",p)
         self.assertIn("genuinely novel repository code",p)
 
-    def test_epoch_and_accounting_remain_unchanged_by_deterministic_gate(self):
+    def test_epoch23_gate_remains_historical_and_later_material_evidence_preserves_accounting(self):
         e=load("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        self.assertEqual(e["current_epoch"],23)
+        epoch23=[row for row in e["history"] if row["epoch"]==23]
+        self.assertEqual(len(epoch23),1)
+        self.assertEqual(epoch23[0]["event_class"],"AUTHENTICATED_MARKET_DATA_ACCEPTED")
+        self.assertGreaterEqual(e["current_epoch"],23)
+        if e["current_epoch"]>23:
+            self.assertEqual(e["history"][-1]["event_class"],"MATERIAL_DEVELOPMENT_STRUCTURAL_EVIDENCE_ACCEPTED")
+            self.assertIn(
+                "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+                e["history"][-1]["refs"],
+            )
         self.assertEqual(n["accounting"],{"v2_attempts_used":20,"v2_search_budget_remaining":64,"economic_outcomes_opened":28})
 
 if __name__=="__main__":
