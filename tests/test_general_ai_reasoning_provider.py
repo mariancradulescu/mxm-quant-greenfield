@@ -61,6 +61,8 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertIn("competition_start_authorized",p)
         self.assertIn("live_orders_authorized",p)
         self.assertIn("MUST NOT contain",p)
+        self.assertIn("do not immediately reparameterize or rerun that same family",p)
+        self.assertIn("different split, test statistic, lag rule, multiplicity correction, or threshold",p)
 
 
     def test_reasoning_request_id_ignores_head_and_nonmaterial_checkpoint_fields(self):
