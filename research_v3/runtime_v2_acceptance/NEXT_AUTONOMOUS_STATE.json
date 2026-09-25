@@ -1,4 +1,6 @@
 {
+  "accepted_capture_ref": "evidence/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_ACCEPTANCE_V1.json",
+  "accepted_capture_zip_sha256": "801b863d396a117d787b73dd673003cf79a4c9ffa178a38d0c928aba241243f0",
   "accepted_development_capture_sufficient_for_current_decision": true,
   "accepted_development_capture_sufficient_for_mechanism_specific_outer": false,
   "accepted_development_capture_sufficient_for_next_decision": true,
@@ -18,13 +20,64 @@
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
+  "ai_reasoning_required": true,
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "authorizing_evidence_epoch": 20,
+  "breakout_15m_followthrough_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
+  "breakout_15m_followthrough_summary": {
+    "continuation": 5292,
+    "continuation_fraction_nonflat": 0.4732182777430028,
+    "events_detected": 11919,
+    "events_with_valid_followthrough": 11598,
+    "events_without_valid_followthrough": 321,
+    "flat": 415,
+    "interpretation": "DESCRIPTIVE_DIRECTION_ONLY_NO_INFERENCE_OR_ECONOMIC_CLAIM",
+    "reversal": 5891
+  },
+  "breakout_30m_persistence_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_V1.json",
+  "breakout_30m_persistence_summary": {
+    "continuation": 5218,
+    "continuation_fraction_nonflat": 0.4713214705085358,
+    "down_continuation": 2636,
+    "down_events": 6007,
+    "down_flat": 132,
+    "down_reversal": 2925,
+    "events_detected": 11919,
+    "events_with_valid_followthrough": 11345,
+    "events_without_valid_followthrough": 574,
+    "flat": 274,
+    "reversal": 5853,
+    "rows": 392181,
+    "symbols": 40,
+    "up_continuation": 2582,
+    "up_events": 5912,
+    "up_flat": 142,
+    "up_reversal": 2928
+  },
+  "breakout_volatility_event_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+  "breakout_volatility_event_availability_summary": {
+    "aggregate_event_availability_rate": 0.04835745323093027,
+    "eligible_contiguous_windows": 246477,
+    "event_down": 6007,
+    "event_up": 5912,
+    "events": 11919,
+    "interpretation": "STRUCTURAL_EVENT_AVAILABILITY_ONLY_NO_POST_EVENT_OUTCOME",
+    "rows": 392181,
+    "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "symbols": 40,
+    "symbols_with_at_least_one_event": 37,
+    "symbols_with_zero_events": 3
+  },
   "broader_universe": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
   "broader_universe_policy": "Keep the 1578 eligible post-exclusion frontier candidates open; reassess broader prospective exploration after this outer unless capture failure or a material data-integrity issue changes the information ranking.",
   "broader_universe_remains_open": true,
   "broader_universe_state": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
   "broader_universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "c032_result_hash": "ca0d338a007c300d9405f0d2ae18a9a8bdec3d67c7f9672c5d9426f7ea579e11",
+  "c032_result_ref": "discovery/results/V2-C032_STAGE_A_V1.json",
+  "c032_result_status": "GROSS_EDGE_FAIL",
+  "candidate_id": "V2-C032",
+  "candidate_spec_hash": "96a752ab7c91401f569527b0a21c7757e4418002cc918e0663589e6ae4044936",
   "capture_integrity": {
     "duplicate_timestamps": 0,
     "ohlc_failures": 0,
@@ -36,7 +89,9 @@
     "status": "ACCEPTED_COMPLETE_NON_ECONOMIC_DEVELOPMENT_CAPTURE",
     "total_rows": 47375
   },
+  "capture_plan_ref": "data/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_PLAN_V1.json",
   "capture_required": false,
+  "collector_implementation_acceptance_ref": "evidence/BREAKOUT_FADE_NETH25_COST_COLLECTOR_IMPLEMENTATION_ACCEPTANCE_V1.json",
   "collector_package_artifact_ref": "research_v3/ai_director/artifact_attestations/MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.json",
   "cross_market_one_bar_directional_screen_ref": "evidence/CROSS_MARKET_ONE_BAR_DIRECTIONAL_AVAILABILITY_V1.json",
   "cross_market_one_bar_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
@@ -54,7 +109,7 @@
     "valid_source_data_discarded": false
   },
   "current_outer_reuse": "Completed four-panel SESSION_GAP outer remains historical evidence only and cannot be reused as a new confirmatory dataset",
-  "current_research_evidence_epoch": 20,
+  "current_research_evidence_epoch": 21,
   "data_capture": "ACCEPTED_HASH_VERIFIED_PRE_OUTCOME",
   "data_requirement": "NONE_FOR_FRESH_EPOCH19_REASSESSMENT",
   "decision_basis": "Two separately frozen development horizons show descriptively more reversal than continuation, but an economic breakout-fade identity cannot be opened until account feasibility and broker-realistic transaction-local cost authority are both proven for its exact symbols. The highest-information legal next action is therefore a zero-outcome realizability audit using existing accepted authorities. Audit result: 40/40 are EUR200 feasible, but 0/40 have current transaction-local cost authority.",
@@ -73,23 +128,38 @@
     "strict_windows": 9233,
     "total_rows": 47427
   },
+  "disjoint_one_bar_directional_screen_ref": "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json",
+  "disjoint_one_bar_directional_summary": {
+    "common_four_way_timestamps": 9558,
+    "contiguous_valid_segments": 81,
+    "interpretation": "DESCRIPTIVE_ONLY_NO_CAUSAL_OR_ECONOMIC_INFERENCE",
+    "ordered_pairs": 12,
+    "same_direction_fraction_both_nonzero_range": [
+      0.4918230710130611,
+      0.5161574942097717
+    ],
+    "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
+    "strict_consecutive_pairs": 9475
+  },
   "economic_progression": "C032_RESULT_RECORDED_PENDING_EXACT_HEAD_GREEN",
   "economic_promotion": "NOT_AUTHORIZED",
   "economic_promotion_authorized": false,
   "evidence_epoch": 20,
   "evidence_epoch_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
   "exact_head_green_authority": {
-    "workflow": "m6-preparation",
-    "run_id": 36047412568,
     "conclusion": "success",
-    "validated_head": "02dd8cc54028546268f86189cbe564aa3a4702e3"
+    "run_id": 36047412568,
+    "validated_head": "02dd8cc54028546268f86189cbe564aa3a4702e3",
+    "workflow": "m6-preparation"
   },
+  "execution_authorization_ref": "research_v3/C032_EXECUTION_AUTHORIZATION_V1.json",
   "external_data_gate": null,
   "external_data_required": false,
   "external_gate": null,
   "family_exhaustion": false,
   "family_exhaustion_claimed": false,
   "fixed15m_directional_screen_ref": "evidence/CROSS_MARKET_FIXED_15M_DIRECTIONAL_SCREEN_V1.json",
+  "fresh_director_decision_ref": "research_v3/EPOCH18_BREAKOUT_FADE_NETH25_COST_EXTENSION_DECISION_V1.json",
   "fresh_evidence_epoch_required": false,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
@@ -115,6 +185,7 @@
   },
   "interpretation_boundary": "Structural sufficiency is not economic evidence, promotion, or mechanism-family closure.",
   "interpretation_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_INTERPRETATION_V1.json",
+  "latest_material_structural_result_ref": "evidence/EPOCH20_SERIAL_DEPENDENCE_SCREEN_V1.json",
   "market_data_capture_required": false,
   "mechanism_families_under_test": [
     "CROSS_MARKET_LEAD_LAG",
@@ -123,7 +194,7 @@
   ],
   "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
   "new_market_data_required": false,
-  "next_action": "REQUIRE_C032_POST_PERSISTENCE_EXACT_HEAD_GREEN_THEN_FRESH_GENERAL_AI_REASONING_FROM_EPOCH_20",
+  "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
   "outer": "C032_ECONOMIC_OUTCOME_OPENED_EXACTLY_ONCE_PENDING_PERSISTENCE_GREEN",
   "outer_authorization": "CONSUMED_EXACTLY_ONCE",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
@@ -152,7 +223,10 @@
   },
   "outer_result_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CONFIRMATORY_RESULT_V1.json",
   "panel_status": "PREREQUISITE_SAMPLE_ONLY",
+  "post_c032_decision_acceptance_ref": "research_v3/EPOCH20_POST_C032_DECISION_ACCEPTANCE_V1.json",
   "post_triage_decision_rule": "Prefer reuse of existing valid evidence; otherwise choose a minimal authenticated broker-native extension from the verified feasibility frontier with explicit information-gain justification.",
+  "pre_economic_realizability_audit_ref": "evidence/BREAKOUT_FADE_PRE_ECONOMIC_REALIZABILITY_AUDIT_V1.json",
+  "pre_outcome_freeze_ref": "research_v3/C032_PRE_OUTCOME_FREEZE_V1.json",
   "promotion": "NOT_AUTHORIZED",
   "prospective_exploration_assessment": "POSITIVE_EXPECTED_INFORMATION_GAIN_BEFORE_MECHANISM_SPECIFIC_OUTER",
   "provisional_four_panel_outer": {
@@ -166,7 +240,7 @@
     "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
     "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION"
   },
-  "reason": "Materialized the epoch-13 authorized non-economic disjoint one-bar directional screen directly from the accepted hash-bound four-symbol M5 ZIP: 9558 common timestamps, 9475 strictly consecutive pairs, 81 contiguous segments and 12 ordered-pair contingency tables. No economic outcome, V2 attempt, protected-forward observation, promotion or family closure opened.",
+  "reason": "Accepted hash-bound external epoch-20 reasoning and completed non-economic 40-symbol M5 structural evidence. C032 remains gross-edge failed and closed only as an exact identity; new descriptive evidence requires one fresh semantic interpretation, without economic rerun or attempt.",
   "recorded_utc": "2026-09-24T18:59:00Z",
   "recovery_binding": {
     "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
@@ -210,7 +284,7 @@
     "v2_attempts_to_consume": 0
   },
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": false,
+  "research_judgment_required": true,
   "research_scope": "Post-disjoint one-bar cross-market structural reassessment from evidence epoch 14",
   "runtime_repair": {
     "current_entry_tradability_required": false,
@@ -239,7 +313,14 @@
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
   "source_implementation_id": "cross-market-lead-lag-screen-v2",
   "source_runtime_operation_id": "op_04e2d4a38beba808aaef2403ce9d2946",
-  "status": "C032_RESULT_RECORDED_PENDING_EXACT_HEAD_GREEN",
+  "stale_reasoning_guard": {
+    "authorizing_evidence_epoch": 19,
+    "current_evidence_epoch": 20,
+    "law": "Any epoch-19 reasoning is stale for post-C032 research judgment after the authorized independent economic outcome opened. No tuning or rescue under C032 is permitted.",
+    "previous_decision_ref": "research_v3/C032_PRE_OUTCOME_FREEZE_V1.json",
+    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
+  },
+  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
   "stop_condition": "no_family_clear_prerequisite_gate",
   "superseded_general_ai_proposal": {
     "economic_outcome_opened": false,
@@ -300,83 +381,5 @@
   },
   "universe_scope": "1578 eligible post-exclusion broker-native frontier candidates remain open",
   "universe_status": "OPEN_1578_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
-  "user_action_required": false,
-  "disjoint_one_bar_directional_screen_ref": "evidence/CROSSMARKET_DISJOINT_ONE_BAR_DIRECTIONAL_SCREEN_V1.json",
-  "disjoint_one_bar_directional_summary": {
-    "source_capture_sha256": "db4ec267b79df73a2d10fbefa66973f2c637a05b0abd878691709cb34518fed9",
-    "common_four_way_timestamps": 9558,
-    "strict_consecutive_pairs": 9475,
-    "contiguous_valid_segments": 81,
-    "ordered_pairs": 12,
-    "same_direction_fraction_both_nonzero_range": [
-      0.4918230710130611,
-      0.5161574942097717
-    ],
-    "interpretation": "DESCRIPTIVE_ONLY_NO_CAUSAL_OR_ECONOMIC_INFERENCE"
-  },
-  "fresh_director_decision_ref": "research_v3/EPOCH18_BREAKOUT_FADE_NETH25_COST_EXTENSION_DECISION_V1.json",
-  "breakout_volatility_event_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
-  "breakout_volatility_event_availability_summary": {
-    "source_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-    "symbols": 40,
-    "rows": 392181,
-    "eligible_contiguous_windows": 246477,
-    "events": 11919,
-    "event_up": 5912,
-    "event_down": 6007,
-    "symbols_with_at_least_one_event": 37,
-    "symbols_with_zero_events": 3,
-    "aggregate_event_availability_rate": 0.04835745323093027,
-    "interpretation": "STRUCTURAL_EVENT_AVAILABILITY_ONLY_NO_POST_EVENT_OUTCOME"
-  },
-  "breakout_15m_followthrough_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
-  "breakout_15m_followthrough_summary": {
-    "events_detected": 11919,
-    "events_with_valid_followthrough": 11598,
-    "events_without_valid_followthrough": 321,
-    "continuation": 5292,
-    "reversal": 5891,
-    "flat": 415,
-    "continuation_fraction_nonflat": 0.4732182777430028,
-    "interpretation": "DESCRIPTIVE_DIRECTION_ONLY_NO_INFERENCE_OR_ECONOMIC_CLAIM"
-  },
-  "breakout_30m_persistence_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_V1.json",
-  "breakout_30m_persistence_summary": {
-    "symbols": 40,
-    "rows": 392181,
-    "events_detected": 11919,
-    "events_with_valid_followthrough": 11345,
-    "events_without_valid_followthrough": 574,
-    "up_events": 5912,
-    "down_events": 6007,
-    "up_continuation": 2582,
-    "up_reversal": 2928,
-    "up_flat": 142,
-    "down_continuation": 2636,
-    "down_reversal": 2925,
-    "down_flat": 132,
-    "continuation": 5218,
-    "reversal": 5853,
-    "flat": 274,
-    "continuation_fraction_nonflat": 0.4713214705085358
-  },
-  "pre_economic_realizability_audit_ref": "evidence/BREAKOUT_FADE_PRE_ECONOMIC_REALIZABILITY_AUDIT_V1.json",
-  "capture_plan_ref": "data/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_PLAN_V1.json",
-  "collector_implementation_acceptance_ref": "evidence/BREAKOUT_FADE_NETH25_COST_COLLECTOR_IMPLEMENTATION_ACCEPTANCE_V1.json",
-  "accepted_capture_ref": "evidence/BREAKOUT_FADE_NETH25_TRANSACTION_LOCAL_COST_CAPTURE_ACCEPTANCE_V1.json",
-  "accepted_capture_zip_sha256": "801b863d396a117d787b73dd673003cf79a4c9ffa178a38d0c928aba241243f0",
-  "candidate_id": "V2-C032",
-  "candidate_spec_hash": "96a752ab7c91401f569527b0a21c7757e4418002cc918e0663589e6ae4044936",
-  "pre_outcome_freeze_ref": "research_v3/C032_PRE_OUTCOME_FREEZE_V1.json",
-  "execution_authorization_ref": "research_v3/C032_EXECUTION_AUTHORIZATION_V1.json",
-  "c032_result_ref": "discovery/results/V2-C032_STAGE_A_V1.json",
-  "c032_result_hash": "ca0d338a007c300d9405f0d2ae18a9a8bdec3d67c7f9672c5d9426f7ea579e11",
-  "c032_result_status": "GROSS_EDGE_FAIL",
-  "stale_reasoning_guard": {
-    "authorizing_evidence_epoch": 19,
-    "current_evidence_epoch": 20,
-    "law": "Any epoch-19 reasoning is stale for post-C032 research judgment after the authorized independent economic outcome opened. No tuning or rescue under C032 is permitted.",
-    "previous_decision_ref": "research_v3/C032_PRE_OUTCOME_FREEZE_V1.json",
-    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
-  }
+  "user_action_required": false
 }
