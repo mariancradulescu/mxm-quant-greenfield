@@ -53,10 +53,20 @@ def validate_eligibility(proposal: Mapping) -> None:
     if not isinstance(bindings, list) or not isinstance(sources, list):
         raise EvidenceIneligible("evidence references must be lists")
     prospective = _prospective(proposal)
-    for ref in bindings:
+    for binding in bindings:
+        ref = binding.get("ref") if isinstance(binding, Mapping) else binding
+        if not isinstance(ref, str) or not ref:
+            raise EvidenceIneligible("data binding must name a concrete evidence ref")
         role = role_for(ref, decision_class=str((proposal.get("objective") or {}).get("class", "")))
         if role in FORBIDDEN or role == "HISTORICAL_CONTEXT_ONLY":
             raise EvidenceIneligible(f"{ref}: {role} is forbidden as a new prospective data binding")
+    # Post-event directional magnitudes are observed outcomes for a new symbol-selection rule.
+    procedure=" ".join(str(x) for x in (decision.get("candidate_construction_procedure") or [])).lower()
+    if any("FOLLOWTHROUGH" in str((b.get("ref") if isinstance(b,Mapping) else b)).upper() for b in bindings) and ("retain only symbols" in procedure or "directional signal" in procedure):
+        raise EvidenceIneligible("post-event directional followthrough cannot filter prospective symbols without independent selection evidence")
+    nxt=proposal.get("next_research_state") or {}
+    if ("minimum_breadth_threshold_symbols" in nxt or "minimum_structural_clusters" in nxt) and not decision.get("prospective_breadth_threshold_derivation_ref"):
+        raise EvidenceIneligible("fixed symbol/cluster minima require a cited prospective structural derivation")
     if prospective:
         for ref in sources:
             if role_for(ref) in FORBIDDEN:
