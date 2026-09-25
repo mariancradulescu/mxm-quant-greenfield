@@ -730,11 +730,6 @@ ONE_SHOT_NEXT_STATE_KEYS = (
     "implementation_task_scope",
     "selected_family",
     "mechanism_family",
-    "active_mechanism_family",
-    "active_candidate_id",
-    "active_target_symbol",
-    "active_target_symbols",
-    "active_proposal_id",
     "reason",
     "supersession_ref",
     "selection_rule",
@@ -766,6 +761,11 @@ def _clean_next_state_for_new_ai_decision(
         *ONE_SHOT_NEXT_STATE_KEYS,
     ):
         doc.pop(key, None)
+    # These schema-level active target slots must remain explicit and neutral unless
+    # the newly accepted proposal itself intentionally re-declares them.
+    for key in ("active_candidate_id","active_target_symbol","active_mechanism_family","active_proposal_id","candidate_id","target_symbol"):
+        doc[key]=None
+    doc.pop("active_target_symbols",None)
     doc.update(dict(proposed_next))
     return doc
 
