@@ -653,7 +653,7 @@
     "stage_b_revalidation_required_candidate_ids": [],
     "stage_b_survivors": []
   },
-  "created_utc": "2026-09-25T12:11:41Z",
+  "created_utc": "2026-09-25T12:17:56Z",
   "current_open_mechanism_families": [
     "TREND_MOMENTUM",
     "MEAN_REVERSION",
@@ -674,9 +674,21 @@
     "active_proposal_id": null,
     "active_target_symbol": null,
     "current_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+    "decision_contract": {
+      "require_no_economic_opening": true,
+      "required_action": "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE",
+      "temporarily_unavailable_families": [
+        "REGIME_CONTEXT_CONDITIONED",
+        "CARRY_TERM_STRUCTURE"
+      ]
+    },
     "evidence_epoch": 23,
     "next_action": "AI_SELECT_DISTINCT_FRONTIER_WAVE_AFTER_REGIME_SCOPE_RESOLUTION",
-    "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION"
+    "reason": "Epoch24 repeated regime proposal is preserved as non-economic history and superseded for immediate routing by research_v3/EPOCH24_ROUTING_CONTRACT_REPAIR_V1.json; restore the pending distinct-family frontier decision under the transmitted contract.",
+    "scope_resolution_ref": "research_v3/EPOCH23_SCOPE_RESOLUTION_V1.json",
+    "semantic_question": "Resolve the epoch23 scope conflict without repeating the accepted regime reasoning. The ATR two-arm regime study is exploratory and cannot use its observed development counts for economic selection; carry term metadata is absent. Select one different open mechanism family with the highest prospective information per attempt and a legally executable next pre-economic step from existing accepted 41-representative 13W M5 history and current EUR200 broker feasibility. Preserve all valid prior outcomes, avoid an arbitrary fixed symbol count, and specify exact next action and evidence requirements. Do not select REGIME_CONTEXT_CONDITIONED or CARRY_TERM_STRUCTURE as the immediate family; neither is closed.",
+    "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH24_ROUTING_REPAIR",
+    "supersession_ref": "evidence/EPOCH23_REGIME_PROPOSAL_SCOPE_SUPERSESSION_V1.json"
   },
   "project_snapshot": {
     "discovery_ledger_sha256": "3beba7a0b606a0c25e7d300c40920324040d7a146249d298b582b1cebf92f9ac",
@@ -687,8 +699,8 @@
   "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
   "provider_version": "MXM_GENERAL_AI_REASONING_PROVIDER_V2",
   "provisional_research_artifacts": [],
-  "request_id": "reason_dea4465d4f75026472d487d87866026a",
-  "research_head": "91e580064334e89bfc99ee50731c04beb921751d",
+  "request_id": "reason_be09badf148768189e69b81cb7faf998",
+  "research_head": "4df8c7a4a600bfaca273218d6d46859fbcd8b32b",
   "schema": "mxm.greenfield.general-ai-reasoning-request.v2",
   "status": "AI_REASONING_REQUIRED",
   "universe_basis": {
