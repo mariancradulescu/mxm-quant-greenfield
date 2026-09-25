@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from research_v3.evidence_eligibility import packet, validate_eligibility, EvidenceIneligible
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import current_evidence_binding
 from research_v3.general_ai_director_bridge import (
@@ -205,32 +206,20 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     }
 
 def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
-    authorities,_=_authority_context(root,request["next_state"])
     evidence=current_evidence_binding(root)
-    return {
-        "request":{
-            "request_id":request["request_id"],
-            "research_head":request["research_head"],
-            "project_snapshot":request["project_snapshot"],
-            "next_state":request["next_state"],
-            "control_plane":request["control_plane"],
-            "evidence_epoch_seen":request["evidence_epoch_seen"],
-            "evidence_bundle_sha256":request["evidence_bundle_sha256"],
-            "accounting_basis":request["project_snapshot"],
-            "universe_basis":request["universe_basis"],
+    epoch_doc=json.loads((root/"research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json").read_text())
+    delta=list((epoch_doc.get("trigger_event") or {}).get("refs") or [])
+    return {"request_id":request["request_id"],
+            "eligibility_packet":packet(root,evidence_epoch=request["evidence_epoch_seen"],
+                decision_class=str(request["next_state"].get("next_action") or "FRESH_EPOCH21_RESEARCH"),
+                refs=request["authority_refs"],accounting=request["project_snapshot"],
+                universe=request["universe_basis"],
+                semantic_question="Choose the highest-information legal post-C032 action without reusing consumed NETH25 outcome capture as prospective evidence.",
+                delta_refs=delta),
             "current_open_mechanism_families":request["current_open_mechanism_families"],
-        },
-        "authorities":authorities,
-        "provisional_research_artifacts":evidence["provisional_research_artifacts"],
-        "non_negotiable_objective":{
-            "broker":"Pepperstone",
-            "execution_target":"cTrader Algo / one continuous account",
-            "starting_capital_eur":200,
-            "optimize":"maximum realizable compounded equity growth with practical anti-ruin and recovery capacity",
-            "hard21":"floor where applicable; never an arbitrary frequency ceiling",
-            "scope":"broader broker-native universe remains open; 10-symbol V6 is not global universe",
-        },
-    }
+            "causal_prohibitions":["NO_C032_RERUN","NO_C032_OUTCOME_CAPTURE_REUSE_AS_NEW_PROSPECTIVE_EVIDENCE",
+                "NO_PROTECTED_FORWARD_LEAKAGE","NO_RETROACTIVE_PARAMETER_TUNING"]}
+
 
 def _system_prompt()->str:
     return """You are the autonomous general AI Research Director for MXM Quant Greenfield V2.
@@ -463,6 +452,19 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_provider_retry",None)
         raise AIReasoningProviderError("all configured general reasoning attempts failed")
 
+    try:
+        validate_eligibility(proposal)
+    except EvidenceIneligible as exc:
+        rejection={"schema":"mxm.greenfield.ai-proposal-eligibility-rejection.v1",
+                   "status":"REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION",
+                   "reason":str(exc),"request_id":request["request_id"],
+                   "proposal_id":proposal.get("proposal_id"),
+                   "evidence_epoch":request["evidence_epoch_seen"],
+                   "economic_outcomes_opened_delta":0,"v2_attempts_consumed_delta":0,
+                   "implementation_provider_calls":0,"created_utc":iso()}
+        atomic_write_json(root/"research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",rejection)
+        sink.checkpoint("general_ai_eligibility_rejection",None)
+        return rejection
     path.parent.mkdir(parents=True,exist_ok=True)
     atomic_write_json(path,proposal)
     binding=proposal["evidence_binding"]; created=iso()
