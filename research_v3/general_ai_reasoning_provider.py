@@ -456,6 +456,17 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         sink.checkpoint("general_ai_reasoning_reused",None)
         return {"status":"PROPOSAL_ALREADY_DURABLE","request_id":request["request_id"],"proposal_ref":str(rel),"proposal_hash":sha256_file(path)}
 
+    external=root/"research_v3/ai_director/EXTERNAL_GENERAL_AI_PROPOSAL_V1.json"
+    if external.is_file():
+        candidate=json.loads(external.read_text(encoding="utf-8"))
+        binding=candidate.get("evidence_binding") or {}
+        if (candidate.get("provider") or {}).get("kind")=="EXTERNAL_CHATGPT_GENERAL_REASONING" and binding.get("reasoning_request_id")==request["request_id"] and binding.get("evidence_epoch_seen")==request["evidence_epoch_seen"]:
+            validate_proposal(root,candidate)
+            path.parent.mkdir(parents=True,exist_ok=True)
+            atomic_write_json(path,candidate)
+            sink.checkpoint("external_general_ai_reasoning_reused",None)
+            return {"status":"EXTERNAL_PROPOSAL_REUSED","proposal_ref":str(rel),
+                    "request_id":request["request_id"],"provider":candidate["provider"]}
     token=token or os.environ.get("GITHUB_TOKEN") or os.environ.get("COPILOT_GITHUB_TOKEN")
     if not token:
         gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-copilot-cli","required":"GITHUB_TOKEN with copilot-requests: write and repository-owner Copilot access","request_id":request["request_id"],"created_utc":iso()}
