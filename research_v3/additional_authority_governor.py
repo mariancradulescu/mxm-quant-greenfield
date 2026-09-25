@@ -21,8 +21,15 @@ def resolve(root:Path)->dict:
     path=(root/ref).resolve()
     if root.resolve() not in path.parents or not path.is_file():
         return {"status":"AUTHORITY_NOT_PRESENT","requested_ref":requested}
-    role=role_for(requested)
-    if role in FORBIDDEN or role=="HISTORICAL_CONTEXT_ONLY":
+    registry=json.loads((root/"research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json").read_text(encoding="utf-8"))
+    binding=next((row for row in registry.get("bindings",[]) if row.get("ref")==requested),None)
+    if binding is None:
+        return {"status":"AUTHORITY_NOT_CLASSIFIED","requested_ref":requested,
+                "reason":"An existing file is not automatically prospective authority; record an explicit evidence-role binding first."}
+    role=binding["role"]
+    if role != role_for(requested) and role_for(requested) in FORBIDDEN:
+        return {"status":"AUTHORITY_ROLE_CONFLICT","requested_ref":requested,"role":role}
+    if role in FORBIDDEN or role=="HISTORICAL_CONTEXT_ONLY" or binding.get("prospective_reuse") is not True:
         return {"status":"AUTHORITY_HISTORICAL_ONLY","requested_ref":requested,"role":role}
     doc={"schema":"mxm.greenfield.additional-authority-acceptance.v1",
          "status":"ELIGIBLE_AUTHORITY_ADDED_TO_NEW_PACKET",
