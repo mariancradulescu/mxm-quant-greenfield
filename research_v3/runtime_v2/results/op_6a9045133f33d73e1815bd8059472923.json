@@ -1,0 +1,62 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "73ffe9ebe0e6442d27301fb6cfe5346da15a0598edf26056eb237fef86544be7",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "SPECIFY_AND_STRUCTURALLY_SCREEN_REGIME_CONDITIONED_BREAKOUT_MECHANISM",
+    "expected_output_artifact": "A new non-economic structural evidence artifact (regime-conditioned breakout follow-through/persistence table across 41 representatives, 3 regime buckets) that either (a) shows no material regime-conditioning signal, closing this mechanism-family branch cheaply, or (b) surfaces a frontier-relative subset with materially different regime-conditioned persistence, which would then justify a subsequent, separately-authorized economic envelope proposal.",
+    "gating_before_any_economic_step": [
+      "causality (point-in-time regime label)",
+      "data sufficiency (13W history — already satisfied for all 41 reps)",
+      "cost (deferred)",
+      "EUR200 margin feasibility (already known per feature store)",
+      "breadth (frozen at 41, not outcome-selected)",
+      "exact-head CI"
+    ],
+    "mechanism_definition": {
+      "base_event_law": "Reuse the existing frozen BREAKOUT_VOLATILITY_EXPANSION event identification law already applied to produce accepted event counts per representative (e.g. CXMT.CN-PERP 911, ERICB.SE 319, XAUUSD-F 893) — no redefinition of the base trigger.",
+      "breadth": "All 41 current structural representatives (already deduplicated to one representative per structural signature spanning current asset-class/session heterogeneity) — no narrowing, no new symbol selection, no outcome-driven scope choice.",
+      "conditioning_law": "Partition existing breakout events by regime-at-onset tercile and recompute directional follow-through/persistence statistics (structural, non-PnL) separately per regime bucket, analogous in form to the existing 15M follow-through and 30M persistence structural artifacts but now regime-stratified.",
+      "prohibitions_respected": [
+        "NO_C032_REUSE",
+        "NO_OUTCOME_DERIVED_SELECTION",
+        "NO_PNL",
+        "NO_PROTECTED_FORWARD",
+        "NO_ARBITRARY_TOP_N"
+      ],
+      "regime_state_variable": "Rolling realized-range regime computed strictly from already-captured 13W M5 canonical bars per representative: at each breakout onset bar, classify the trailing 20-bar True Range relative to that representative's own trailing 13-week TR distribution into tercile buckets (LOW/MID/HIGH volatility-regime context). This uses only in-sample-to-date, point-in-time information (no forward leakage), computed identically across all 41 representatives."
+    },
+    "why_non_economic": "This produces a structural/informational screen (event counts, regime-conditioned follow-through/persistence deltas) only. No transaction-local cost, no PnL, no economic envelope, no new v2 identity is opened. Transaction-local cost acquisition remains correctly deferred until an economic envelope is prospectively frozen from this screen's output."
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "active_target_symbols": [
+      "all_41_current_structural_representatives_per_registry"
+    ],
+    "authorizing_evidence_epoch": 23,
+    "consumes_v2_attempts": 0,
+    "implementation_ai_required": true,
+    "implementation_ai_scope": "Novel repository code needed: (1) compute trailing 13-week rolling TR tercile regime label at each existing frozen breakout event's onset bar from already-captured 13W M5 canonical data, (2) stratify existing follow-through/persistence structural statistics by regime bucket per representative, (3) emit a new structural evidence artifact. No existing deterministic routine performs regime labeling or regime-stratified aggregation.",
+    "mechanism_family": "REGIME_CONTEXT_CONDITIONED",
+    "next_action": "BUILD_AND_RUN_REGIME_CONDITIONED_BREAKOUT_STRUCTURAL_SCREEN_OVER_41_CURRENT_REPRESENTATIVES",
+    "no_economic_outcome_opened_by_this_proposal": true,
+    "research_judgment_required": true,
+    "status": "REGIME_CONTEXT_CONDITIONED_MECHANISM_SPECIFIED_PENDING_STRUCTURAL_SCREEN_EXECUTION"
+  },
+  "objective": {
+    "class": "REGIME_CONTEXT_CONDITIONED",
+    "goal": "Specify and non-economically evaluate the exact regime/context conditioning law for the already-frozen BREAKOUT_VOLATILITY_EXPANSION event definition across all 41 current structural representatives, using only already-accepted 13W M5 history (0 new broker calls), to determine whether conditioning materially changes directional follow-through/persistence before any economic envelope is considered.",
+    "information_gain_rationale": "CARRY_TERM_STRUCTURE is fail-closed (no term-structure metadata in current authority; synthesizing one would fabricate broker evidence). The opportunity map and information-gain selection both certify a fresh semantic (non-deterministic) boundary: all cross-family shared structural/history gaps are closed (41/41 representatives with accepted 13W M5 history and breakout-event availability), so remaining uncertainty is mechanism-specific and requires a scientific choice of regime definition. Regime context conditioning is the only prospectively frozen family (per prior AI decision and structural registry) with sufficient existing evidence (13W M5 OHLC + already-computed breakout event counts) to be structurally specified with zero new data acquisition, maximizing information gain per marginal effort before any economic/cost-authority spend."
+  },
+  "operation_id": "op_6a9045133f33d73e1815bd8059472923",
+  "proposal_hash": "79e6d855879fc28216f4355844a9a482dd24409091d07eddf95dedd8d8a760de",
+  "proposal_id": "frontier-ig-epoch23-regime-context-conditioned-breakout-screen-v1",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_3dc4c50616ef4964778abbcec5c6f894.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
