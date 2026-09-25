@@ -32,8 +32,40 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_post_green_implementation_returns_to_reasoning(self):
         out={"status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN","next_research_state":{"status":"PENDING_EXACT_HEAD_GREEN","next_action":"VALIDATE"}}
         accepted=_post_green_output(out,["research_v3/example.json"])
-        self.assertTrue(accepted["next_research_state"]["ai_reasoning_required"])
-        self.assertEqual(accepted["next_research_state"]["green_implementation_artifacts"],["research_v3/example.json"])
+        ns=accepted["next_research_state"]
+        self.assertTrue(ns["ai_reasoning_required"])
+        self.assertTrue(ns["research_judgment_required"])
+        self.assertFalse(ns["implementation_ai_required"])
+        self.assertEqual(ns["green_implementation_artifacts"],["research_v3/example.json"])
+
+    def test_post_green_preserves_result_specific_reasoning_provenance(self):
+        out={
+            "status":"COMPLETE_NON_ECONOMIC",
+            "next_research_state":{
+                "status":"PENDING_EXACT_HEAD_GREEN_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE",
+                "next_action":"AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_RELATIVE_VALUE_STRUCTURAL_RESULT_AND_SELECT_THE_HIGHEST_INFORMATION_LEGAL_NEXT_FRONTIER_ACTION",
+                "completed_structural_report_ref":"evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+                "completed_family":"RELATIVE_VALUE_COINTEGRATION",
+                "family_result":"NO_PAIR_PASSED_FROZEN_NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC",
+                "implementation_ai_required":True,
+            },
+        }
+        accepted=_post_green_output(out,[])
+        ns=accepted["next_research_state"]
+        self.assertEqual(ns["status"],"AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN")
+        self.assertEqual(
+            ns["completed_structural_report_ref"],
+            "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+        )
+        self.assertEqual(
+            ns["family_result"],
+            "NO_PAIR_PASSED_FROZEN_NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC",
+        )
+        self.assertTrue(ns["ai_reasoning_required"])
+        self.assertTrue(ns["research_judgment_required"])
+        self.assertFalse(ns["implementation_ai_required"])
+        self.assertFalse(ns["user_action_required"])
+        self.assertEqual(ns["green_implementation_artifacts"],[])
 
     def test_authoritative_independent_outer_contract_redirects_before_execution(self):
         s={"source_freeze_ref":"research_v3/SESSION_GAP_SELECTED_SIX_PANEL_FREEZE_V1.json","next_action":"ARBITRARY_EXECUTION","user_action_required":False}
