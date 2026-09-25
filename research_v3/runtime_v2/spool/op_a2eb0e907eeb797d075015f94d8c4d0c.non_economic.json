@@ -1,0 +1,55 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "413b73d50cd05e01060a9e4e33d686273c3bd7b7a892f304c23756f6e8ba424a",
+  "competition_start_authorized": false,
+  "decision": {
+    "action_type": "NON_ECONOMIC_SCOPE_MATERIALIZATION",
+    "candidate_construction_procedure": [
+      "Take the survivor set from evidence/BROKER_NATIVE_FRONTIER_40_UNIVARIATE_STRUCTURAL_GATE_V1.json (non-economic structural gate over the open 1578-symbol frontier).",
+      "Intersect with symbols confirmed to have a qualifying breakout event rate in evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json.",
+      "Retain only symbols with consistent directional signal across BOTH evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json and evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_V1.json (independent horizons, reduces single-horizon overfit risk).",
+      "Apply evidence/BREAKOUT_FADE_PRE_ECONOMIC_REALIZABILITY_AUDIT_V1.json to drop any symbol failing pre-economic realizability.",
+      "Intersect the remainder with data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json to keep only EUR200-margin-feasible symbols.",
+      "Require the resulting set to span at least 3 structurally distinct clusters (e.g. FX-major, FX-cross/commodity-linked, index/metal) with a minimum of 8 total symbols, structurally justified (not outcome-driven), to avoid repeating C032's single-symbol breadth failure."
+    ],
+    "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+    "remaining_gates_before_any_economic_freeze": [
+      "Fresh cTrader Open API confirmation of exact broker symbol names, current spread/commission, and EUR200 margin for the materialized set (feasibility index may be stale).",
+      "Exact-head CI computation on the finalized, causally clean development window.",
+      "Cost-adjusted directional persistence re-check post transaction costs.",
+      "Explicit freeze of the envelope prior to any economic outcome opening."
+    ],
+    "replacement_semantics": "New design, not a rerun: C032's exact symbol/outcome-exposed evidence is excluded as OUTCOME_EXPOSED; only its structural family assignment (BREAKOUT_VOLATILITY_EXPANSION) and design_class finding (BREADTH_INSUFFICIENT_FOR_SCOPE_CHARGED) are used as the reason to widen breadth, not as prospective input.",
+    "replaces_identity": "V2-C032",
+    "serial_dependence_context": "evidence/EPOCH20_SERIAL_DEPENDENCE_SCREEN_V1.json pooled negative autocorrelation (h1=-0.145, h3=-0.066, h6=-0.032, n>300k) across the same 40-series pool is treated as descriptive-only corroboration of a fade/reversion directional prior; it is explicitly not used for candidate selection, significance, or PnL claims per its own interpretation_boundary.",
+    "unresolved_prerequisite_note": "C006 cash-session calendar, C029 settlement coverage, and C030 zero-settled-trade prerequisites belong to distinct, already-adjudicated identities (V2-C006, V2-C029, V2-C030) and are not reopened or required by this replacement design."
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 21,
+    "follow_on_step": "Once the exact intersected symbol list is materialized from the cited artifacts, submit a subsequent proposal requesting fresh PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API data for those exact symbols to verify current cost/margin and compute exact-head CI before any freeze.",
+    "minimum_breadth_threshold_symbols": 8,
+    "minimum_structural_clusters": 3,
+    "next_action": "MATERIALIZE_BREADTH_ADEQUATE_BREAKOUT_VOLATILITY_REPLACEMENT_CANDIDATE_SET_FROM_CITED_STRUCTURAL_ARTIFACTS_THEN_REQUEST_FRESH_EUR200_FEASIBILITY_CONFIRMATION",
+    "research_judgment_required": false,
+    "status": "PROSPECTIVE_SCOPE_DESIGN_IN_PROGRESS",
+    "target_design_class": "VALID_BREADTH_AND_SEMANTICS_SUFFICIENT",
+    "target_mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION"
+  },
+  "objective": {
+    "class": "MECHANISM_REPLACEMENT_SCOPE_DESIGN",
+    "goal": "Materialize a breadth-adequate, non-outcome-exposed replacement scope for the BREAKOUT_VOLATILITY_EXPANSION/FADE family (successor design to the breadth-insufficient V2-C032 identity) by intersecting already-accepted, reusable structural evidence — the 40-symbol frontier univariate structural gate, breakout event availability, 15M directional follow-through, 30M directional persistence, and the pre-economic realizability audit — with the EUR200 margin feasibility index, so the next economic-eligible candidate carries enough structurally heterogeneous symbols to clear the breadth gate that C032 failed on.",
+    "information_gain_rationale": "C032 was rejected as BREADTH_INSUFFICIENT_FOR_SCOPE_CHARGED (1 symbol) despite a mechanism family with the richest existing non-economic evidence stack in the eligibility packet (event availability + two independent directional-persistence horizons + a pre-economic realizability audit + a fresh pooled serial-dependence screen across 40 series showing consistent negative autocorrelation at h=1,3,6). Reassembling breadth from these already-accepted artifacts, rather than proposing a new mechanism from scratch, maximizes information gain per unit of scarce economic capacity: it reuses fully-vetted structural evidence, respects the causal prohibition on rerunning C032's opened identity, and produces the smallest remaining gap (fresh cost/margin/exact-head confirmation) before an economic freeze can be legally authorized."
+  },
+  "operation_id": "op_a2eb0e907eeb797d075015f94d8c4d0c",
+  "proposal_hash": "0bf06677734cb23da863e986073bdc1c3490b636eaa4d7c0bcef0e189c9bc0ec",
+  "proposal_id": "AI-DIR-EPOCH21-BREAKOUT-BREADTH-REPLACEMENT-001",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_388458036df2ab11bb8cb7025f95aa74.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
