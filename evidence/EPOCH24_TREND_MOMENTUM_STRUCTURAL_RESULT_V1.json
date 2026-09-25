@@ -1,0 +1,68 @@
+{
+  "schema": "mxm.greenfield.epoch24-trend-momentum-structural-result-acceptance.v1",
+  "status": "ACCEPTED_COMPLETE_NON_ECONOMIC_STRUCTURAL_RESULT",
+  "accepted_utc": "2026-09-25T19:35:00Z",
+  "evidence_epoch_source": 24,
+  "family": "TREND_MOMENTUM",
+  "freeze_ref": "research_v3/EPOCH24_TREND_MOMENTUM_FRONTIER_FREEZE_V1.json",
+  "evaluator_ref": "research_v3/trend_momentum_epoch24_screen.py",
+  "source_artifacts": {
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_transport_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    "replacement_canonicalization": "IDENTICAL_TIMESTAMP_DUPLICATES_COLLAPSED_FAIL_CLOSED_ON_CONFLICT"
+  },
+  "frozen_law": {
+    "resolution": "M5",
+    "lookback_bars": 12,
+    "response_bars": 12,
+    "anchor_stride_bars": 12,
+    "horizon_minutes": 60,
+    "per_symbol_test": "ONE_SIDED_EXACT_BINOMIAL_CONTINUATION_VS_0_5",
+    "multiplicity": "BENJAMINI_HOCHBERG_FDR",
+    "fdr_q": 0.05,
+    "minimum_both_nonzero_settled_per_chronological_half": 30
+  },
+  "execution": {
+    "frozen_representatives": 41,
+    "frozen_representatives_processed": 41,
+    "consumed_prior_trend_overlap": [],
+    "admitted_anchors": 26943,
+    "settled_anchors": 22991,
+    "both_nonzero_settled": 21924,
+    "continuation": 10806,
+    "reversal": 11118,
+    "right_censored_future_response": 3952,
+    "minimum_raw_one_sided_binomial_p": 0.109375,
+    "minimum_raw_p_symbol": "AT1d.DE",
+    "minimum_bh_adjusted_q": 1,
+    "supported_symbols_count": 0,
+    "supported_symbols": []
+  },
+  "interpretation_boundary": {
+    "result": "NO_SYMBOL_PASSED_FROZEN_NON_ECONOMIC_TREND_MOMENTUM_STRUCTURAL_CRITERIA",
+    "mechanism_family_closed": false,
+    "economic_promotion_authorized": false,
+    "note": "This is a frozen non-economic structural result only. It does not close TREND_MOMENTUM and does not select a winner."
+  },
+  "verification": {
+    "independent_recomputation": "PASS",
+    "independent_aggregate_match": true,
+    "source_hashes_match_accepted_authority": true,
+    "post_outcome_parameter_tuning": false,
+    "ranking_performed": false
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}

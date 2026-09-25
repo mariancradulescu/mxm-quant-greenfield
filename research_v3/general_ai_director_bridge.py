@@ -542,6 +542,100 @@ def proposal_hash(proposal: Mapping[str, Any]) -> str:
     return sha256_bytes(canonical_bytes(proposal))
 
 
+def _validate_proposed_next_state_routeability(root: Path, proposal: Mapping[str, Any]) -> None:
+    """Reject new AI publications that would strand Runtime V2 in an unroutable state.
+
+    A non-empty next_action is intent, not execution authority.  The proposal must
+    publish one of the explicit routes that the execution router can actually honor.
+    This guard applies to NEW proposals before registry/materialization; immutable
+    historical proposals remain verified through the existing accepted fast path.
+    """
+    state = dict(proposal.get("next_research_state") or {})
+    action = str(state.get("next_action") or "").strip()
+    if not action:
+        return
+
+    # Explicit external/user/data gates are valid stopping routes.  A fresh broker
+    # acquisition request is converted into the durable external-data gate by the
+    # bridge during publication.
+    if (
+        state.get("user_action_required") is True
+        or state.get("external_data_required") is True
+        or state.get("external_gate") not in (None, "", {}, [])
+        or state.get("external_data_gate") not in (None, "", {}, [])
+        or (proposal.get("data_policy") or {}).get("new_market_data_requested") is True
+    ):
+        return
+
+    status = str(state.get("status") or "").upper()
+
+    # Fresh semantic reasoning is an explicit route.
+    if (
+        state.get("ai_reasoning_required") is True
+        or action.upper().startswith("AI_")
+        or status == "AI_REASONING_REQUIRED"
+        or "PENDING_AI_INTERPRETATION" in status
+        or "FRESH_GENERAL_AI_REASONING_REQUIRED" in status
+    ):
+        return
+
+    # Novel implementation is an explicit route only with concrete scope.
+    if state.get("implementation_ai_required") is True:
+        decision = proposal.get("decision") or {}
+        scope = decision.get("implementation_scope") or state.get("implementation_task_scope")
+        if not scope:
+            raise AIProposalRejected(
+                "proposed next state requests implementation AI without explicit implementation scope"
+            )
+        return
+
+    # Explicit CI/economic/cTrader routes remain governed by their dedicated
+    # fail-closed executors.
+    if state.get("authority_ci_required") is True or status == "PENDING_EXACT_HEAD_GREEN":
+        return
+    if state.get("economic_execution_authorized") is True or state.get("economic_materialization_authorized") is True:
+        return
+    if state.get("ctrader_build_or_certification_required") is True:
+        return
+
+    # Deterministic work is executable only when it binds a real durable operation.
+    ref = state.get("next_deterministic_operation_ref")
+    embedded = state.get("deterministic_next_operation") or {}
+    if not ref and isinstance(embedded, Mapping):
+        ref = embedded.get("operation_ref")
+    if isinstance(ref, str) and ref.strip():
+        rel = ref.strip()
+        path = root / rel
+        if not path.is_file():
+            raise AIProposalRejected(f"proposed deterministic operation authority missing: {rel}")
+        op = json.loads(path.read_text(encoding="utf-8"))
+        if op.get("schema") != "mxm.greenfield.deterministic-next-operation.v1":
+            raise AIProposalRejected("proposed deterministic operation has unsupported schema")
+        if op.get("status") != "AUTHORIZED_DETERMINISTIC_NON_ECONOMIC_OPERATION":
+            raise AIProposalRejected("proposed deterministic operation is not authorized")
+        if str(op.get("operation_name") or "").strip() != action:
+            raise AIProposalRejected("proposed deterministic operation does not match next_action")
+        binding = proposal.get("evidence_binding") or {}
+        expected_epoch = int(binding.get("evidence_epoch_seen", 0) or 0)
+        if expected_epoch and int(op.get("evidence_epoch", 0) or 0) != expected_epoch:
+            raise AIProposalRejected("proposed deterministic operation evidence epoch mismatch")
+        policy = op.get("execution_policy") or {}
+        if (
+            policy.get("implementation_ai_required") is True
+            or policy.get("copilot_reasoning_required") is True
+            or policy.get("new_semantic_judgment_required") is True
+        ):
+            raise AIProposalRejected("proposed deterministic operation requests non-deterministic work")
+        effect = op.get("accounting_effect") or {}
+        if int(effect.get("v2_attempts") or 0) != 0 or int(effect.get("economic_outcomes") or 0) != 0:
+            raise AIProposalRejected("proposed deterministic operation declares economic accounting effect")
+        return
+
+    raise AIProposalRejected(
+        "proposed next state has non-empty next_action without executable routing authority"
+    )
+
+
 def compile_runtime_plan(
     root: Path,
     proposal: Mapping[str, Any],
@@ -795,6 +889,7 @@ def materialize_proposal(
     # ledger, authorities and safety. A mutation of a historically accepted proposal changes
     # its hash and therefore cannot enter the historical fast path.
     validation = validate_proposal(root, proposal)
+    _validate_proposed_next_state_routeability(root, proposal)
     before = project_snapshot(root)
     plan = compile_runtime_plan(root, proposal, validation, proposal_ref)
     runtime = RuntimeV2(

@@ -21,34 +21,35 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
         self.assertEqual(g["economic_effect"]["economic_outcomes"],0)
         self.assertEqual(g["provider_effect"]["copilot_calls_for_gate"],0)
 
-    def test_scope_recovery_routes_to_new_distinct_semantic_decision(self):
-        n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        self.assertEqual(n["scope_resolution_ref"], "research_v3/EPOCH23_SCOPE_RESOLUTION_V1.json")
-        self.assertIn(n["decision_contract"]["required_action"], ("SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE", "DEFINE_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC"))
-        semantic=dict(n)
-        semantic.update(status="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION",
-                        next_action="AI_SELECT_DISTINCT_FRONTIER_WAVE_AFTER_REGIME_SCOPE_RESOLUTION",
-                        ai_reasoning_required=True, implementation_ai_required=False,
-                        user_action_required=False)
-        self.assertEqual(classify_execution(ROOT,semantic)["execution_class"], "SEMANTIC_REASONING")
+    def test_historical_epoch23_semantic_state_routes_to_reasoning(self):
+        semantic={
+            "status":"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION",
+            "next_action":"AI_SELECT_DISTINCT_FRONTIER_WAVE_AFTER_REGIME_SCOPE_RESOLUTION",
+            "ai_reasoning_required":True,
+            "implementation_ai_required":False,
+            "research_judgment_required":True,
+            "user_action_required":False,
+        }
+        self.assertEqual(classify_execution(ROOT,semantic)["execution_class"],"SEMANTIC_REASONING")
 
-    def test_pending_decision_contract_reaches_reasoning_request(self):
+    def test_current_reasoning_request_uses_current_state_not_historical_epoch23_contract(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
         request=build_reasoning_request(ROOT)
-        projected=request["next_state"]
-        for field in ("semantic_question","decision_contract","scope_resolution_ref","reason"):
-            self.assertEqual(projected[field],n.get(field))
-        self.assertEqual(projected["decision_contract"],n["decision_contract"])
+        self.assertEqual(request["next_state"]["status"],n["status"])
+        self.assertEqual(request["next_state"]["next_action"],n["next_action"])
+        self.assertEqual(
+            request["next_state"].get("current_research_evidence_epoch"),
+            n.get("current_research_evidence_epoch"),
+        )
 
     def test_router_does_not_reinterpret_accepted_proposal_as_implementation_authority(self):
-        n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        semantic=dict(n)
-        semantic["ai_reasoning_required"]=False
-        semantic["research_judgment_required"]=False
-        semantic["status"]="STRUCTURAL_FEASIBILITY_GATE_REQUIRED"
-        semantic["next_action"]="VALIDATE_ALREADY_AUTHORIZED_STRUCTURAL_GATE"
-        semantic["implementation_ai_required"]=False
-        self.assertFalse(implementation_required(ROOT,semantic))
+        state={
+            "status":"STRUCTURAL_FEASIBILITY_GATE_REQUIRED",
+            "next_action":"VALIDATE_ALREADY_AUTHORIZED_STRUCTURAL_GATE",
+            "implementation_ai_required":False,
+            "research_judgment_required":False,
+        }
+        self.assertFalse(implementation_required(ROOT,state))
 
     def test_next_general_ai_prompt_requires_explicit_routing_intent(self):
         p=_system_prompt()
@@ -56,20 +57,16 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
         self.assertIn("research_judgment_required",p)
         self.assertIn("new_market_data_requested=true",p)
         self.assertIn("genuinely novel repository code",p)
+        self.assertIn("next_deterministic_operation_ref",p)
+        self.assertIn("Never publish an unrouted non-empty action",p)
 
-    def test_epoch23_gate_remains_historical_and_later_material_evidence_preserves_accounting(self):
+    def test_epoch23_history_is_immutable_and_later_evidence_preserves_accounting(self):
         e=load("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
         epoch23=[row for row in e["history"] if row["epoch"]==23]
         self.assertEqual(len(epoch23),1)
         self.assertEqual(epoch23[0]["event_class"],"AUTHENTICATED_MARKET_DATA_ACCEPTED")
         self.assertGreaterEqual(e["current_epoch"],23)
-        if e["current_epoch"]>23:
-            self.assertEqual(e["history"][-1]["event_class"],"MATERIAL_DEVELOPMENT_STRUCTURAL_EVIDENCE_ACCEPTED")
-            self.assertIn(
-                "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
-                e["history"][-1]["refs"],
-            )
         self.assertEqual(n["accounting"],{"v2_attempts_used":20,"v2_search_budget_remaining":64,"economic_outcomes_opened":28})
 
 if __name__=="__main__":

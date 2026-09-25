@@ -1,0 +1,42 @@
+{
+  "schema": "mxm.greenfield.epoch24-next-state-routeability-repair.v1",
+  "status": "IMPLEMENTED_REQUIRES_EXACT_HEAD_CI",
+  "recorded_utc": "2026-09-25T19:35:00Z",
+  "observed_head": "ecc1786ac74d4cefbbccc177211ed7b55abf4052",
+  "root_cause": {
+    "classification": "SEMANTIC_TO_EXECUTION_STATE_TRANSITION_CONTRACT_FAILURE",
+    "proposal_id": "trend-momentum-frontier-wave-epoch24",
+    "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_32b26f4af984bfc66330b2271827e90e.json",
+    "runtime_operation_id": "op_dd7dfa7576354f3a7997c5831fbb52bb",
+    "defect_1": "The accepted AI proposal published a non-empty deterministic-looking next_action with implementation_ai_required=false but no next_deterministic_operation_ref and no executable deterministic authority.",
+    "defect_2": "The TREND_MOMENTUM prospective freeze was then durably persisted, but NEXT_AUTONOMOUS_STATE remained at the pre-freeze action and therefore requested completed work again.",
+    "router_behavior": "CORRECT_FAIL_CLOSED_UNROUTED_NONEMPTY_ACTION",
+    "valid_research_invalidated": false,
+    "valid_market_data_invalidated": false,
+    "economics_changed": false
+  },
+  "systemic_repairs": [
+    "New AI proposals are rejected before publication if a non-empty next_action has no executable semantic, deterministic, implementation, external-data, CI, economic, or cTrader route.",
+    "Deterministic-looking work with no existing authorized executor must route as novel implementation AI with explicit implementation_scope rather than publishing an unexecutable state.",
+    "The General AI prompt now states the executable-route contract explicitly.",
+    "The current stale post-freeze state is superseded by the accepted TREND_MOMENTUM structural result and a fresh semantic boundary.",
+    "Epoch23 regression tests no longer force historical decision-local fields into the live current state."
+  ],
+  "current_research_preservation": {
+    "trend_freeze_ref": "research_v3/EPOCH24_TREND_MOMENTUM_FRONTIER_FREEZE_V1.json",
+    "trend_freeze_reselected": false,
+    "trend_freeze_repeated": false,
+    "prior_consumed_trend_symbols_reused": false,
+    "complete_1576_identity_frontier_remains_open": true
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}

@@ -24,6 +24,7 @@ from research_v3.general_ai_director_bridge import (
     AIProposalRejected,
     project_snapshot,
     validate_proposal,
+    _validate_proposed_next_state_routeability,
 )
 from research_v3.runtime_v2_primitives import (
     GitCheckpointSink,
@@ -299,7 +300,7 @@ Important boundaries:
 - Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
 - Cite only supplied authority refs. If an additional authority is needed, return only status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, and rationale; the runtime will validate it before a new fingerprint.
 - Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
-- Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Set it false for validation, selection, state binding, or evidence materialization that can be deterministic.
+- Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Deterministic-in-principle is NOT enough: if next_action is non-empty and implementation_ai_required=false, bind next_deterministic_operation_ref to an ALREADY EXISTING authorized deterministic operation that can execute that exact action. If no such executable authority exists, route the missing machinery as implementation AI with explicit implementation_scope. Never publish an unrouted non-empty action and never invent a deterministic-operation ref.
 - If new broker data is genuinely required, express it through data_policy.new_market_data_requested=true with the exact minimal acquisition request; do not disguise a data gate as implementation AI.
 - The proposal itself is non-economic and consumes zero attempts. Return concise decision rationale, not chain-of-thought.
 """
@@ -466,6 +467,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
         },
     }
     validate_proposal(root,proposal)
+    _validate_proposed_next_state_routeability(root, proposal)
     return proposal
 
 def _proposal_ref(request_id:str)->Path:
