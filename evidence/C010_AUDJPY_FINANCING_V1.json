@@ -1,0 +1,34 @@
+{
+  "schema": "mxm.greenfield.v2.c010-audjpy-financing-evidence.v1",
+  "candidate_id": "V2-C010",
+  "spec_hash": "810670fbe6ed57c704a499c32799e6750417a431928eb55f8766b1ff87e46fc1",
+  "canonical_instrument": "AUDJPY",
+  "accepted_current_mapping": {
+    "broker_symbol": "AUDJPY",
+    "symbol_id": 11,
+    "product_family": "FX_SPOT_OR_MARGIN_CFD"
+  },
+  "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+  "current_capture_evidence": {
+    "current_full_symbol_financing_metadata_present": true,
+    "current_metadata_is_historical_truth": false,
+    "broker_native_expected_margin_present": true,
+    "expected_margin_role": "CURRENT_STRUCTURAL_MINIMUM_VOLUME_EVIDENCE_ONLY"
+  },
+  "public_broker_facts": [
+    "Pepperstone states overnight funding/swap applies at the daily rollover cutoff.",
+    "Pepperstone states latest swap rates are shown on platform and are subject to change.",
+    "Pepperstone states swap rates may change daily and updates take effect immediately."
+  ],
+  "unresolved_historical_facts": [
+    "AUDJPY long financing rate effective at each applicable 2022-2026 decision/holding timestamp.",
+    "AUDJPY short financing rate effective at each applicable 2022-2026 decision/holding timestamp.",
+    "Historical financing effective timestamps.",
+    "Historical triple/skip/holiday rollover multipliers and exceptions.",
+    "Exact historical broker D1 cutoff/session versions where they affect financing."
+  ],
+  "positive_financing_credit_authorized": false,
+  "gate_state": "UNRESOLVED_HISTORICAL_FINANCING",
+  "economic_use_authorized": false,
+  "reason": "A current mutable swap snapshot cannot satisfy C010's frozen point-in-time historical financing signal/economic requirement."
+}

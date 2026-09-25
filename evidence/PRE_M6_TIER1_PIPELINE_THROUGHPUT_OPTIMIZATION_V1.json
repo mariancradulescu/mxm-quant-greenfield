@@ -1,0 +1,62 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-tier1-pipeline-throughput-optimization.v1",
+  "status": "PRE_OUTCOME_RUNTIME_OPTIMIZATION_RAW_EVIDENCE_SEMANTICS_UNCHANGED",
+  "reason": "The original V3 collector serialized historical requests as SEND->WAIT RESPONSE->NEXT SEND, producing only about 1.7-2.3 completed historical requests/s in the user's live run despite the official 5 historical requests/s/connection ceiling.",
+  "official_constraints": {
+    "source_rate_limits": "https://help.ctrader.com/open-api/",
+    "historical_requests_per_second_per_connection_max": 5,
+    "source_connection_guidance": "https://help.ctrader.com/open-api/connection/",
+    "connection_policy": "ONE_LIVE_CONNECTION_ONLY",
+    "message_queue_guidance": true,
+    "heartbeat_seconds": 10
+  },
+  "optimization": {
+    "transport": "SINGLE_LIVE_TLS_CONNECTION",
+    "method": "BOUNDED_MESSAGE_QUEUE_PIPELINING",
+    "batch_size": 16,
+    "send_interval_seconds": 0.21,
+    "theoretical_send_ceiling_per_second": 4.7619047619,
+    "request_correlation": "clientMsgId",
+    "concurrent_live_connections_added": 0,
+    "send_receive_concurrency": "NO_CONCURRENT_SOCKET_SEND_AND_RECEIVE; BATCH_SEND_THEN_CORRELATED_DRAIN",
+    "pagination_dependency": "ONE_PAGE_PER_ACTIVE_CHUNK_PER_PIPELINE_ROUND",
+    "active_chunks_in_flight_max": 16
+  },
+  "raw_evidence_contract": {
+    "active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "acquisition_domain_changed": false,
+    "target_symbols_changed": false,
+    "quote_types_changed": false,
+    "pagination_semantics_changed": false,
+    "raw_hash_semantics_changed": false,
+    "boundary_evidence_semantics_changed": false,
+    "calibration_protocol_changed": false,
+    "candidate_specs_changed": false
+  },
+  "resume_migration": {
+    "previous_tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
+    "new_tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+    "policy": "EXPLICIT_TOOL_ONLY_COMPATIBILITY_MIGRATION",
+    "required": "Exact V3 plan SHA and all semantic resume-contract fields must match except tool_version. Every completed chunk referenced in resume state must pass SHA256 verification.",
+    "on_success": "Update resume contract to new tool version and preserve verified chunks.",
+    "on_failure": "Archive incompatible work directory and start empty.",
+    "silent_reuse": false
+  },
+  "safety": {
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "economics": false,
+    "candidate_pnl_input": false,
+    "protected_evidence": false,
+    "accepted_ohlc_rerun": false
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

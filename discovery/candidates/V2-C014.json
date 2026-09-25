@@ -1,0 +1,140 @@
+{
+  "id": "V2-C014",
+  "mechanism": {
+    "family": "MEAN_REVERSION",
+    "subfamily": "ONE_HOUR_INTRADAY_TIME_SERIES_SIGN_REVERSAL"
+  },
+  "rationale": "Prospectively contrast dense intraday one-hour sign reversal against continuation at identical horizon/occupancy without a threshold grid; this is a distinct directional mechanism frozen before its own outcome.",
+  "universe": [
+    "US500"
+  ],
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+      "US500_M15_sha256": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "EURUSD_M15_sha256": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "resolution": "M15",
+    "session_domain": "NASDAQ_REFERENCE_CASH_SESSION_ONLY"
+  },
+  "causal_availability": {
+    "decision_uses": "completed exact-grid cash-session M15 bars only",
+    "entry_uses": "next exact expected M15 open at or after decision",
+    "future_information_forbidden": true,
+    "session_requires_complete_grid": true
+  },
+  "features": [
+    {
+      "name": "return_4",
+      "formula": "close_t / close_t_minus_4 - 1"
+    }
+  ],
+  "lookbacks": [
+    {
+      "bars": 4,
+      "feature": "return_4"
+    }
+  ],
+  "normalization_training": {
+    "mode": "NONE",
+    "future_normalization": false
+  },
+  "timing": {
+    "decision": "EACH_ELIGIBLE_CASH_SESSION_M15_BAR_CLOSE",
+    "entry": "NEXT_EXACT_EXPECTED_M15_OPEN"
+  },
+  "direction": {
+    "LONG": "return_4 < 0",
+    "SHORT": "return_4 > 0",
+    "NO_OP": "return_4 == 0_or_unavailable"
+  },
+  "entry": {
+    "type": "MARKET_PROXY",
+    "price": "next_exact_M15_open"
+  },
+  "exit": {
+    "type": "FIXED_HOLD",
+    "fixed_hold_intent": "SCHEDULED_AT_ENTRY",
+    "price": "close_of_4th_executable_M15_bar_including_entry"
+  },
+  "maximum_hold": {
+    "unit": "EXECUTABLE_M15_BARS_INCLUDING_ENTRY",
+    "value": 4
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_EXPANSION_INDEX_M15_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "transaction_local_cost_missing": "COST_UNRESOLVED"
+  },
+  "filters": [
+    "SESSION_MUST_HAVE_COMPLETE_OFFICIAL_M15_GRID",
+    "ENTRY_AND_EXIT_TRANSACTION_BOUNDARIES_ET_MUST_BE_BETWEEN_09_45_AND_14_45_INCLUSIVE",
+    "ENTRY_AND_EXIT_BOUNDARIES_MUST_HAVE_VALID_TRANSACTION_LOCAL_COST_EVIDENCE"
+  ],
+  "parameters": {
+    "return_bars": 4,
+    "hold_bars": 4,
+    "signal_threshold": 0
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_UNIT_NOTIONAL_NO_ALLOCATOR_OR_SIZING_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use exact-boundary candidate-independent generic BID/ASK evidence under evidence/COMPETITION_EXPANSION_INDEX_M15_COST_AUTHORITY_V1.json; any missing required row is COST_UNRESOLVED."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_ROLLING_RETURN_AND_SESSION_GRID"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "position_admission_policy": {
+    "max_simultaneous_active_positions_per_symbol": 1,
+    "max_simultaneous_candidate_instances": 1,
+    "new_signal_while_active": "IGNORE_NO_QUEUE",
+    "opposite_signal_while_active": "IGNORE_NO_REVERSE_NO_COEXIST",
+    "pending_exit_counts_as_active_until_fill": true,
+    "same_direction_pyramiding_allowed": false,
+    "same_timestamp_exit_and_new_entry_opportunity": "EXIT_FIRST; NEW_ENTRY_OPPORTUNITY_AT_THAT_TIMESTAMP_IS_IGNORED_WITH_NO_QUEUE",
+    "scope": "PER_CANDIDATE"
+  },
+  "stage_a_economic_unit": {
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "conversion_basis": "causal quote-currency-to-EUR conversion available at or before entry; if unavailable the economic outcome remains blocked",
+    "cost_scaling_rule": "Apply prospectively bound Competition Expansion transaction-local spread/slippage evidence to this exact analytic quantity; unresolved evidence blocks the economic outcome.",
+    "entry_price_basis": "candidate entry MARKET_PROXY price",
+    "executable_volume_fact_rule": "No broker min/step/max volume is silently assumed in Stage A; EUR200 executable-volume/margin feasibility is Stage B for Stage-A survivors.",
+    "leg_count": 1,
+    "mode": "FIXED_RELATIONSHIP_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_leg_absolute_entry_notional_eur": 1000,
+    "post_outcome_resizing_allowed": false,
+    "quantity_formula": "abs_units = 1000 / (entry_price_in_quote_currency * causal_quote_to_eur_rate_at_entry)",
+    "relationship_gross_absolute_entry_notional_eur": 1000
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "COMPETITION_PERFORMANCE_EXPANSION",
+    "wave": "COMPETITION_EXPANSION_WAVE_01",
+    "selection_basis": "FROZEN_FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_PLUS_HARD21_DENSITY_GAP",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "7bb7a21f40dd742357f4800f7762314724b73609c34c2de04b10329df2221e6d"
+}

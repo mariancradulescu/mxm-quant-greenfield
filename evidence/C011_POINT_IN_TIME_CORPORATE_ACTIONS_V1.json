@@ -1,0 +1,111 @@
+{
+  "schema": "mxm.greenfield.v2.c011-point-in-time-corporate-action-lineage.v1",
+  "candidate_id": "V2-C011",
+  "spec_hash": "6fcf1f3f665fe6412a434c8272b18c2a5156d70f723409bc1340810bea8080fd",
+  "instruments": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "META"
+  ],
+  "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+  "accepted_current_mappings": {
+    "AAPL": {
+      "broker_symbol": "AAPL.US",
+      "symbol_id": 804
+    },
+    "MSFT": {
+      "broker_symbol": "MSFT.US",
+      "symbol_id": 802
+    },
+    "NVDA": {
+      "broker_symbol": "NVDA.US",
+      "symbol_id": 808
+    },
+    "AMZN": {
+      "broker_symbol": "AMZN.US",
+      "symbol_id": 803
+    },
+    "META": {
+      "broker_symbol": "META.US",
+      "symbol_id": 799,
+      "current_base_asset_lineage_label": "FB.US"
+    }
+  },
+  "verified_underlying_events": [
+    {
+      "canonical": "AAPL",
+      "event_type": "NO_SPLIT_DURING_DEVELOPMENT_INTERVAL",
+      "evidence": "Apple official split history lists five splits, latest 4-for-1 in August 2020.",
+      "state": "VERIFIED_ISSUER_HISTORY"
+    },
+    {
+      "canonical": "MSFT",
+      "event_type": "NO_SPLIT_DURING_DEVELOPMENT_INTERVAL",
+      "evidence": "Microsoft official split history identifies February 2003 as the most recent split.",
+      "state": "VERIFIED_ISSUER_HISTORY"
+    },
+    {
+      "canonical": "NVDA",
+      "event_type": "TEN_FOR_ONE_SPLIT",
+      "effective_date": "2024-06-07",
+      "split_adjusted_trading_date": "2024-06-10",
+      "split_factor": 10,
+      "state": "VERIFIED_POINT_IN_TIME_ISSUER_EVENT"
+    },
+    {
+      "canonical": "AMZN",
+      "event_type": "TWENTY_FOR_ONE_SPLIT",
+      "amendment_effective_date": "2022-05-27",
+      "additional_shares_reflected_on_or_about": "2022-06-03",
+      "split_adjusted_trading_date": "2022-06-06",
+      "split_factor": 20,
+      "state": "VERIFIED_POINT_IN_TIME_REGULATORY_EVENT"
+    },
+    {
+      "canonical": "META",
+      "event_type": "TICKER_CHANGE",
+      "old_ticker": "FB",
+      "new_ticker": "META",
+      "effective_before_market_open": "2022-06-09",
+      "listing_unchanged": "NASDAQ",
+      "cusip_unchanged": true,
+      "state": "VERIFIED_POINT_IN_TIME_ISSUER_EVENT"
+    },
+    {
+      "canonical": "META",
+      "event_type": "QUARTERLY_DIVIDEND_INITIATION",
+      "declaration_date": "2024-02-01",
+      "amount_usd_per_share": 0.5,
+      "record_date": "2024-02-22",
+      "payable_date": "2024-03-26",
+      "state": "VERIFIED_POINT_IN_TIME_ISSUER_EVENT"
+    }
+  ],
+  "dividend_evidence_state": {
+    "issuer_event_history": "PARTIAL_TO_STRONG_BY_ISSUER_BUT_NOT_BOUND_AS_COMPLETE_CFD_LEDGER",
+    "broker_cfd_adjustment_history": "UNRESOLVED",
+    "reason": "Pepperstone states CFD cash adjustments can differ from the underlying dividend because of market conditions and withholding tax."
+  },
+  "broker_corporate_action_adjustment_state": {
+    "current_policy": "VERIFIED_CURRENT_POLICY",
+    "exact_2022_2026_adjustment_ledger": "UNRESOLVED"
+  },
+  "historical_short_eligibility": {
+    "current_live_full_metadata": "CURRENT_ENABLED_SHORT_METADATA_PRESENT",
+    "point_in_time_2022_2026": "UNRESOLVED",
+    "close_only_or_short_restriction_history": "UNRESOLVED"
+  },
+  "historical_financing": {
+    "point_in_time_share_cfd_financing_rates": "UNRESOLVED",
+    "exact_effective_timestamps": "UNRESOLVED"
+  },
+  "historical_sessions": {
+    "authoritative_nasdaq_reference_calendars_2022_2026": "AVAILABLE_AND_BOUND",
+    "exact_pepperstone_share_cfd_session_holiday_versions": "UNRESOLVED"
+  },
+  "gate_state": "UNRESOLVED_PARTIAL_POINT_IN_TIME_EVIDENCE",
+  "economic_use_authorized": false,
+  "reason": "Underlying split/ticker lineage is materially improved, but exact historical Pepperstone CFD dividend adjustments, short eligibility, financing, and broker session versions remain insufficient."
+}

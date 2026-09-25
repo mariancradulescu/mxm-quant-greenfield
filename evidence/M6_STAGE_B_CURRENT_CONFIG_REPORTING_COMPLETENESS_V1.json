@@ -1,0 +1,47 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-reporting-completeness.v1",
+  "status": "PASS_PRE_OUTCOME_REPORTING_COMPLETENESS_ADDED_NO_ECONOMICS",
+  "scope": "STAGE_B_CURRENT_CONFIGURATION_REPORTING_ONLY",
+  "discovered_before_any_current_config_outcome": true,
+  "contract_gap": "The economic core already produced the causal capital path, but RESEARCH_CONTRACT_V2 also requires frozen weekly/monthly final-equity distributions, capital occupancy, margin blockers and executed-trade distribution.",
+  "resolution": {
+    "reporting_policy_ref": "data/M6_STAGE_B_CURRENT_CONFIG_REPORTING_POLICY_V1.json",
+    "reporting_policy_git_blob_sha1": "e0419b33a7d3dfc5b6ee94b0038093fefcf9c599",
+    "reporter_ref": "m6/stage_b_current_config_reporting.py",
+    "reporter_git_blob_sha1": "49851e3ce8d82a3d7661639d76625987b6815638",
+    "economic_evaluator_changed": false,
+    "authorization_v3_consumed": false,
+    "current_config_outcomes_opened": 0
+  },
+  "last_green_authorization": {
+    "ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V3.json",
+    "git_blob_sha1": "480590199c176851fc7ffaf4523f803b67ada6b4",
+    "head": "41f7ca14b22c1a06c5d0d3bab320dd38d31821b2",
+    "ci_run": 35589983786,
+    "tests_passed": 534,
+    "tests_failed": 0,
+    "conclusion": "SUCCESS",
+    "consumed": false
+  },
+  "required_next_authorization": "V4 must bind the frozen reporting policy/module before the single economic execution.",
+  "methodology_unchanged": {
+    "candidate_specs": true,
+    "signals": true,
+    "thresholds": true,
+    "transaction_local_cost": true,
+    "current_expected_margin": true,
+    "fixed_volume": true,
+    "capital_admission": true,
+    "pnl_settlement": true
+  },
+  "accounting": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "v2_search_budget_remaining": 82,
+    "current_config_stage_b_outcomes_opened": 0
+  },
+  "historical_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "historical_margin_blocks_current_scenario": false,
+  "protected_evidence_opened": false
+}

@@ -1,0 +1,85 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-discovery-execution-cost-calibration-protocol.v1",
+  "status": "FROZEN_PRE_OUTCOME_BEFORE_TIER1_V3_CAPTURE",
+  "purpose": "Prospectively freeze the candidate-independent procedure for translating generic Tier-1 raw quote evidence into a Discovery execution-cost confidence rule without selecting a numeric fill/staleness/slippage rule before observing quote dynamics.",
+  "governing_authorities": {
+    "discovery_cost_model": "DISCOVERY_COST_MODEL_V1.json",
+    "tier1_raw_acquisition_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "candidate_C006": "discovery/candidates/V2-C006.json",
+    "candidate_C012": "discovery/candidates/V2-C012.json"
+  },
+  "allowed_inputs": [
+    "RAW_US500_BID_EVENTS_SYMBOL_127_DEVELOPMENT_ONLY",
+    "RAW_US500_ASK_EVENTS_SYMBOL_127_DEVELOPMENT_ONLY",
+    "RAW_NAS100_BID_EVENTS_SYMBOL_126_DEVELOPMENT_ONLY",
+    "RAW_NAS100_ASK_EVENTS_SYMBOL_126_DEVELOPMENT_ONLY",
+    "GENERIC_OFFICIAL_M15_CASH_SESSION_BOUNDARIES",
+    "CANDIDATE_INDEPENDENT_BOUNDARY_QUOTE_EVIDENCE_DERIVED_FROM_THE_RAW_TAPES"
+  ],
+  "forbidden_inputs": [
+    "C006_SIGNALS",
+    "C012_SIGNALS",
+    "C006_RETURNS",
+    "C012_RETURNS",
+    "C006_PNL",
+    "C012_PNL",
+    "ANY_CANDIDATE_OUTCOME",
+    "PROTECTED_FORWARD_EVIDENCE",
+    "POST_OUTCOME_THRESHOLD_SELECTION",
+    "PARAMETER_SELECTION_TO_MAKE_A_CANDIDATE_PASS"
+  ],
+  "permitted_measurements": [
+    "QUOTE_AGE_AT_GENERIC_BOUNDARY_BY_SIDE",
+    "BID_REFRESH_DELAY_FROM_GENERIC_BOUNDARY",
+    "ASK_REFRESH_DELAY_FROM_GENERIC_BOUNDARY",
+    "FIRST_ANY_QUOTE_EVENT_DELAY_FROM_GENERIC_BOUNDARY",
+    "BOTH_SIDES_REFRESH_DIAGNOSTIC_DELAY",
+    "CAUSAL_SPREAD_AT_GENERIC_BOUNDARY",
+    "SPREAD_DISTRIBUTION_ACROSS_GENERIC_BOUNDARIES",
+    "SPREAD_AROUND_GENERIC_BOUNDARIES",
+    "GENERIC_SESSION_OPEN_AND_GAP_QUOTE_DYNAMICS",
+    "MISSING_CAUSAL_TWO_SIDED_STATE_FREQUENCY",
+    "MISSING_POST_BOUNDARY_QUOTE_EVENT_FREQUENCY"
+  ],
+  "selection_process": [
+    "Summarize the permitted measurements across the complete candidate-independent DEVELOPMENT quote domain before opening C006/C012 economic outcomes.",
+    "Assess whether candidate MARKET_PROXY timing can be paired with a credible coarse spread/slippage/delay cost treatment without replacing the frozen OHLC MARKET_PROXY price/timing.",
+    "Prefer genuinely applicable verified evidence when the historical quote evidence supports it.",
+    "Otherwise define only a defensible adverse conservative bound supported by the generic evidence. Do not choose a bound from candidate economic sign, returns, PnL, or signals.",
+    "If reasonable execution-cost uncertainty can change economic sign, classify COST_UNRESOLVED.",
+    "Freeze the resulting Discovery execution-cost rule and its evidence provenance before any C006/C012 economic outcome is opened.",
+    "Exact Certification execution remains a later stricter gate and is not established by this protocol."
+  ],
+  "allowed_conclusion_states": [
+    "VERIFIED_APPLICABLE_RULE",
+    "CONSERVATIVE_BOUND",
+    "UNRESOLVED"
+  ],
+  "discovery_cost_model_mapping": {
+    "VERIFIED_APPLICABLE_RULE": "VERIFIED",
+    "CONSERVATIVE_BOUND": "CONSERVATIVE_BOUND",
+    "UNRESOLVED": "UNRESOLVED"
+  },
+  "conservative_rule_requirements": [
+    "Must be prospectively frozen before the affected candidate economic outcome.",
+    "Must be applicable to the candidate execution context while remaining distinct from the candidate MARKET_PROXY price/timing.",
+    "Must use an adverse credible treatment such that uncertainty cannot falsely promote a failing candidate.",
+    "May not credit favorable unverified execution, spread, delay, or slippage assumptions.",
+    "If reasonable uncertainty can change sign, the only permitted conclusion is UNRESOLVED."
+  ],
+  "pre_capture_numeric_rules": {
+    "quote_age_threshold": "NONE_FROZEN",
+    "mandatory_fill_delay": "NONE_FROZEN",
+    "slippage_number": "NONE_FROZEN",
+    "both_sides_refresh_15m_window": "DIAGNOSTIC_OBSERVATION_WINDOW_ONLY_NOT_FILL_AUTHORITY"
+  },
+  "candidate_identity_rule": "If credible Stage-A MARKET_PROXY execution-cost approximation cannot be established, readiness remains BLOCKED/COST_UNRESOLVED. Candidate entry definitions/hashes are not mutated.",
+  "certification_rule": "Certification requires later stricter exact execution/cost validation; Discovery calibration does not satisfy Certification execution truth.",
+  "research_state_at_freeze": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false
+  }
+}

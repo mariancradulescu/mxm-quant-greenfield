@@ -1,0 +1,44 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-tier1-runner-prep.v2",
+  "status": "AUDITED_PRE_EXECUTION_RUNNER_CORRECTED_NOT_AUTHORIZED",
+  "supersedes": {
+    "ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_RUNNER_PREP_V1.json",
+    "git_blob_sha1": "99a292b28581ffc00e1472a9098c291bd01414df"
+  },
+  "scope": "V2-C006_V2-C012_STAGE_B_CURRENT_CONFIGURATION_EUR200",
+  "pre_execution_audit_ref": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
+  "pre_execution_audit_git_blob_sha1": "c8af3cdea18358be4b98309b28c5b25eac1e67e8",
+  "runner_state_machine_correction_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_RUNNER_STATE_MACHINE_CORRECTION_V1.json",
+  "runner_state_machine_correction_git_blob_sha1": "74fc789b7935200878f32c004fc22041b6897024",
+  "policy_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
+  "policy_git_blob_sha1": "bf157e44a3f93e111fc02006bd035595ba4c6084",
+  "authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+  "authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+  "pre_economic_materialization_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+  "pre_economic_materialization_git_blob_sha1": "0ecfbc97617a6e6188fee350f830af2fe33e2a47",
+  "evaluator": {
+    "path": "m6/stage_b_current_config_evaluator.py",
+    "git_blob_sha1": "4a469e5722dd82f40b6351dccea6ed90811c2cf6",
+    "version": "MXM_STAGE_B_CURRENT_CONFIG_EUR200_V1"
+  },
+  "runner": {
+    "path": "m6/stage_b_current_config_tier1_runner.py",
+    "git_blob_sha1": "eab768456b02ecb3b200d71266b540a446843ed5",
+    "change_from_v1": "PRE_EXECUTION_STATE_MACHINE_ONLY",
+    "cli_economic_execution_disabled": true
+  },
+  "single_use_authorization_ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json",
+  "authorization_state": "FROZEN_SINGLE_USE_PENDING_INDEPENDENT_AUDIT",
+  "independent_audit_pass": true,
+  "execution_authorized": false,
+  "results_created": false,
+  "current_config_stage_b_outcomes_opened": 0,
+  "new_attempts_consumed": 0,
+  "historical_margin_track": {
+    "state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+    "preserved": true,
+    "blocking_current_config_scenario": false
+  },
+  "protected_evidence_opened": false,
+  "exact_next_action": "Exact-head test this phase-aware runner correction. After SUCCESS create a separate active single-use current-configuration authorization. Do not execute economics in this correction commit."
+}

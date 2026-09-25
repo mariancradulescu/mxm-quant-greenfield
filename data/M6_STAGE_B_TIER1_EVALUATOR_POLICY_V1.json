@@ -1,0 +1,126 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-tier1-evaluator-policy.v1",
+  "status": "FROZEN_POST_STAGE_A_PRE_STAGE_B_OUTCOME",
+  "scope": "V2-C006_V2-C012_STAGE_B_EUR200_DEVELOPMENT_REALIZABILITY",
+  "freeze_basis": {
+    "stage_a_persistence_independent_audit_ref": "data/M6_STAGE_A_POST_OUTCOME_PERSISTENCE_INTEGRITY_AUDIT_V1.json",
+    "stage_a_persistence_independent_audit_blob_sha1": "da419a1c3e14cd53da21d140d17ee6ac65d3724e",
+    "audited_stage_a_head": "4d24ffeba9311e333ed1c391c4ede913dca5408d",
+    "audit_closure_head": "94c1de6bb4c87cfe79d776788d81bf0d80c65ea8",
+    "audit_closure_ci_run": 35514781749,
+    "audit_closure_tests_passed": 462,
+    "audit_closure_tests_failed": 0
+  },
+  "research_contract": {
+    "ref": "RESEARCH_CONTRACT_V2.md",
+    "git_blob_sha1": "771ce30de94fd98614035792f13dc88e45e48dfb",
+    "stage_b_law": "Stage B only for Stage-A survivors: simple frozen EUR200 causal realization with continuous path, weekly/monthly final equity, occupancy, margin blockers, executed-trade distribution."
+  },
+  "survivors": {
+    "V2-C006": {
+      "spec_hash": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+      "stage_a_result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a"
+    },
+    "V2-C012": {
+      "spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+      "stage_a_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c"
+    }
+  },
+  "evaluator": {
+    "runtime": "m6/stage_b_evaluator.py",
+    "runtime_git_blob_sha1": "8996a683a28ef84d5e7c91db870f0e8a1aca8fe1",
+    "runtime_sha256": "c9a2eaa49ada85488df5d7427f9a2632532137cc751e7ad4d48f6277860baf53",
+    "version": "MXM_STAGE_B_TIER1_EUR200_V1"
+  },
+  "runner": {
+    "runtime": "m6/stage_b_tier1_runner.py",
+    "runtime_git_blob_sha1": "89b6f59e41c000afca81036b20ecde9fd9ee2a18",
+    "runtime_sha256": "46d082b84e18400edaf8c2e128237ed0e6e61924eb8ae23a2911e4f4c042f97a",
+    "state": "PREPARED_NOT_RUN",
+    "cli_economic_execution_disabled": true
+  },
+  "capital_law": {
+    "starting_capital_eur": 200,
+    "capital_continuous": true,
+    "reset_weekly": false,
+    "reset_monthly": false,
+    "deposits_withdrawals": false,
+    "evaluation_mode": "EACH_CANDIDATE_INDEPENDENTLY_NOT_PORTFOLIO",
+    "no_scaling_after_gains": true,
+    "no_resizing_after_losses": true,
+    "no_pyramiding": true,
+    "no_rescue": true
+  },
+  "sizing_law": {
+    "type": "FIXED_BROKER_MINIMUM_EXECUTABLE_VOLUME",
+    "volume_semantics": "CTRADER_OPEN_API_VOLUME_CENTS_100_EQUALS_1_UNIT",
+    "volume_cents": {
+      "V2-C006": 10,
+      "V2-C012": 10
+    },
+    "quantity_units": {
+      "V2-C006": 0.1,
+      "V2-C012": 0.1
+    },
+    "source": "ACCEPTED_CURRENT_BROKER_SYMBOL_METADATA",
+    "optimization_used": false,
+    "stage_a_outcome_magnitude_used_to_choose_sizing": false
+  },
+  "signal_execution_cost_law": {
+    "replay_runtime": "m6/tier1_candidate_replay.py",
+    "replay_runtime_git_blob_sha1": "028fa4b5bdac1058afa5ffb3e21f40ab299bf1f7",
+    "same_frozen_intents_as_stage_a": true,
+    "transaction_local_cost_authority": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+    "transaction_local_cost_authority_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+    "causal_conversion_runtime": "m6/causal_conversion.py",
+    "causal_conversion_runtime_git_blob_sha1": "ba29e02a2250294d2c48a3cfc7b15d1f298250be",
+    "post_outcome_threshold_change": false,
+    "post_outcome_cost_change": false
+  },
+  "margin_law": {
+    "state": "HISTORICAL_CAUSAL_MARGIN_AUTHORITY_REQUIRED_BEFORE_STAGE_B_OUTCOME",
+    "current_broker_native_expected_margin_diagnostic_only": true,
+    "approximate_leverage_arithmetic_forbidden": true,
+    "current_snapshot": {
+      "source_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+      "expected_margin_file_sha256": "08a5643687d4be0fb4f97422e13104c5b9eb08357932bad2463388c368140c9d",
+      "symbol_metadata_file_sha256": "6427658afc8e3c7e710e843f4b1b2421dca4da9984f427dd966888f15314a583",
+      "V2-C006": {
+        "symbol": "US500",
+        "symbol_id": 127,
+        "volume_cents": 10,
+        "buy_margin_eur": 33.38,
+        "sell_margin_eur": 33.38
+      },
+      "V2-C012": {
+        "symbol": "NAS100",
+        "symbol_id": 126,
+        "volume_cents": 10,
+        "buy_margin_eur": 129.04,
+        "sell_margin_eur": 129.03
+      }
+    },
+    "why_snapshot_is_not_historical_authority": "Current broker-native expected margin is read-only structural evidence at capture time. It does not prove point-in-time historical margin requirements for every 2022-2026 entry.",
+    "required_authority_schema": "mxm.greenfield.v2.m6-stage-b-margin-authority.v1",
+    "required_authority_status": "FROZEN_CONSERVATIVE_HISTORICAL_MARGIN_BOUND",
+    "false_promotion_forbidden": true
+  },
+  "official_protocol_semantics": {
+    "ctrader_model_messages_url": "https://help.ctrader.com/open-api/model-messages/",
+    "verified_current_facts": [
+      "Open API trade volume is represented in cents; 1000 means 10.00 units.",
+      "ProtoOAExpectedMargin returns buyMargin/sellMargin for a requested volume.",
+      "ProtoOASymbol leverageId references a dynamic-leverage entity."
+    ],
+    "current_documentation_is_not_historical_broker_state": true
+  },
+  "pre_outcome_invariants": {
+    "stage_b_economic_outcomes_opened": 0,
+    "new_v2_attempts_consumed": 0,
+    "total_v2_attempts_used": 2,
+    "protected_evidence_opened": false,
+    "certification_survivors": [],
+    "live_orders": false,
+    "competition_start": false
+  }
+}

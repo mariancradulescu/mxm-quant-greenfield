@@ -1,0 +1,36 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-authorization-binding-correction.v1",
+  "status": "PASS_PRE_EXECUTION_AUTHORIZATION_SCHEMA_BINDING_CORRECTION_NO_ECONOMICS",
+  "scope": "CURRENT_CONFIG_SINGLE_USE_AUTHORIZATION_VALIDATOR_BINDING_ONLY",
+  "failed_activation": {
+    "head": "035b5c39a39e81ded0944320f3e4512d83021470",
+    "ci_run": 35589787219,
+    "tests_run": 529,
+    "failure_count": 1,
+    "authorization_ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V2.json",
+    "authorization_git_blob_sha1": "273b2f3362d466b61e3091c8ffaf7964698619f6",
+    "failure": "current_config_stage_b_outcomes_before_authorization was nested under accounting_semantics while the frozen validator requires the field at authorization top-level."
+  },
+  "correction": {
+    "economic_semantics_changed": false,
+    "authorization_semantics_changed": false,
+    "required_top_level_field": "current_config_stage_b_outcomes_before_authorization",
+    "required_value": 0,
+    "v2_preserved_as_failed_exact_head_historical_artifact": true,
+    "v3_supersedes_v2": true
+  },
+  "accounting_unchanged": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "v2_search_budget_remaining": 82,
+    "discovery_ledger_entries": 22,
+    "discovery_result_recorded": 2,
+    "current_config_stage_b_outcomes_opened": 0
+  },
+  "historical_margin_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "historical_margin_blocks_current_scenario": false,
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}

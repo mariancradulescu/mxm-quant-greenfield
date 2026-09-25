@@ -1,0 +1,70 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-tier1-pre-economic-materialization.v1",
+  "status": "PASS_FROZEN_STAGE_B_INPUT_BINDINGS_MARGIN_GATE_UNRESOLVED_NO_STAGE_B_ECONOMICS",
+  "scope": "V2-C006_V2-C012_STAGE_B_PRE_OUTCOME",
+  "stage_a_survivor_bindings": {
+    "V2-C006": {
+      "spec_hash": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+      "stage_a_result_hash": "223e83c20b7bb64c07e27029510c5b05f9c63a771b6ad0342548949f348d500a",
+      "intent_count": 108,
+      "intent_manifest_sha256": "6e320849ba49136b5491ecab75bc0ce5c36715a2c2202ade9d97443b41b9a515"
+    },
+    "V2-C012": {
+      "spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+      "stage_a_result_hash": "70159f6b9b97ffb06d72510df2e1f5014967ac2ac8c94ccf1f69239e5500146c",
+      "intent_count": 35,
+      "intent_manifest_sha256": "f9d0ba61346bbd9a1602fe84e73d4d374d27e9fdec0217906b2ac29f24218c8d"
+    },
+    "combined_intent_manifest_sha256": "a897c7cd5310e6ccaf8ab28d225fd5c16b1ebf0f043a18242efa9c74981656e7"
+  },
+  "accepted_external_inputs": {
+    "reconciled_capture_bundle": {
+      "filename": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+      "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72"
+    },
+    "tier1_cost_evidence_bundle": {
+      "filename": "MXM_M6_TIER1_COST_EVIDENCE_V3_CANONICAL.zip",
+      "sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad"
+    },
+    "preopen_supplement_bundle": {
+      "filename": "MXM_M6_TIER1_PREOPEN_0930_SUPPLEMENT_V1.zip",
+      "sha256": "8171ce2d68fef0ac0241b88e914725c16a301e36ae836f766efff4da8aabe798"
+    },
+    "component_sha256": {
+      "US500_M15": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "NAS100_M15": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "EURUSD_M15": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+      "US500_TRANSACTION_LOCAL_COST": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+      "NAS100_C012_TRANSACTION_LOCAL_COST": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999",
+      "CURRENT_EXPECTED_MARGIN": "08a5643687d4be0fb4f97422e13104c5b9eb08357932bad2463388c368140c9d",
+      "CURRENT_SYMBOL_METADATA": "6427658afc8e3c7e710e843f4b1b2421dca4da9984f427dd966888f15314a583"
+    }
+  },
+  "frozen_stage_b_policy_ref": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
+  "current_margin_diagnostic": {
+    "V2-C006": {
+      "symbol": "US500",
+      "volume_cents": 10,
+      "buy_margin_eur": 33.38,
+      "sell_margin_eur": 33.38
+    },
+    "V2-C012": {
+      "symbol": "NAS100",
+      "volume_cents": 10,
+      "buy_margin_eur": 129.04,
+      "sell_margin_eur": 129.03
+    },
+    "applicability": "CURRENT_STRUCTURAL_DIAGNOSTIC_ONLY",
+    "exact_historical_causal_margin": "UNRESOLVED"
+  },
+  "forbidden_during_materialization": {
+    "stage_b_candidate_pnl_computed": false,
+    "stage_b_capital_path_computed": false,
+    "stage_b_terminal_status_computed": false,
+    "new_attempt_consumed": false,
+    "stage_b_result_recorded": false,
+    "protected_evidence_opened": false
+  },
+  "exact_blocker": "FROZEN_APPLICABLE_CONSERVATIVE_HISTORICAL_MARGIN_AUTHORITY_NOT_YET_PRESENT",
+  "next_action": "Resolve only the generic historical Stage-B margin authority. Do not alter candidate identities, sizing law, signals, costs, thresholds or protected boundary."
+}

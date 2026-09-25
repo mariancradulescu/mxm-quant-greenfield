@@ -1,0 +1,58 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-tier1-runner-prep.v1",
+  "status": "PREPARED_NOT_RUN",
+  "runner": "m6/stage_a_tier1_runner.py",
+  "runner_git_blob_sha": "acf18831747df2b546f24c5062f39f3dceaa2336",
+  "transaction_local_cost_runtime": "m6/transaction_local_cost.py",
+  "transaction_local_cost_runtime_git_blob_sha": "10db6e016139c29262bdce0ceb29db713f632edb",
+  "transaction_local_cost_authority": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+  "transaction_local_cost_authority_git_blob_sha": "64bc7a000e750cd29710b372c4e5587f1610668a",
+  "calibration_authority": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V4.json",
+  "calibration_authority_git_blob_sha": "fbcc1dbe911908796d1d2ea8f62853cfe7415736",
+  "readiness_authority": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V7.json",
+  "readiness_authority_git_blob_sha": "5633acefd42814ff6301a291825e0ca5ae514553",
+  "candidates": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "consumes": {
+    "accepted_ohlc_sha256": {
+      "US500_M15": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "NAS100_M15": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c"
+    },
+    "causal_conversion_sha256": {
+      "EURUSD_M15": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde"
+    },
+    "transaction_local_cost_sha256": {
+      "US500": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+      "NAS100_C012": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+    },
+    "corrected_calendar": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "causal_conversion_runtime": "m6/causal_conversion.py",
+    "frozen_replay_runtime": "m6/tier1_candidate_replay.py",
+    "c012_fail_closed_domain_gate": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json"
+  },
+  "integrity_contract": [
+    "Reject repository authority Git-blob mismatch.",
+    "Reject candidate semantic hash mismatch.",
+    "Reject accepted external CSV SHA256 mismatch.",
+    "Select transaction-local cost evidence by exact transaction timestamp only.",
+    "Reject unsupported transaction cost context as COST_UNRESOLVED before PnL.",
+    "Require a separate future explicit Stage-A execution authorization artifact before any economics."
+  ],
+  "current_execution_authorized": false,
+  "current_execution_performed": false,
+  "result_files_created": false,
+  "validation_command": "python -m m6.stage_a_tier1_runner --validate-repository-only",
+  "economic_execution_requires_future_authority_schema": "mxm.greenfield.v2.m6-stage-a-execution-authorization.v1",
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}

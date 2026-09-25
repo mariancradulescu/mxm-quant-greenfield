@@ -1,0 +1,105 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-session-conversion-stageb-evidence.v2",
+  "supersedes": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V1.json",
+  "correction_scope": "Apply frozen data requirement literally: causal conversion price series OR broker-native conversion evidence. Current SymbolsForConversion historical membership is not a universal blocker when accepted causal M15 series are available.",
+  "accepted_capture_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+  "data_manifest_ref": "data/DATA_MANIFEST.json",
+  "session_event_semantics": {
+    "reference_cash_session": {
+      "exchange": "Nasdaq",
+      "regular_hours_et": "09:30-16:00",
+      "state": "VERIFIED_REFERENCE_RULE",
+      "historical_calendar_source_set": "OFFICIAL_NASDAQ_2022_2026",
+      "causal_rule": "Known prospective exchange calendar defines candidate decision domain; actual accepted broker M15 events determine whether an executable observation exists. Missing broker bars are preserved and never fabricated."
+    },
+    "candidate_states": {
+      "V2-C006": {
+        "state": "SUFFICIENT_FOR_M6_STAGE_A",
+        "rule": "Authoritative cash-session calendar + actual observed US500 M15 availability/gaps. First completed cash-session M15 bar is causal; next valid observed M15 open is entry. No absent bar is synthesized.",
+        "historical_pepperstone_policy_archive_required": false
+      },
+      "V2-C012": {
+        "state": "SUFFICIENT_FOR_M6_STAGE_A",
+        "rule": "Authoritative cash-session calendar + strict same-timestamp observed US500/NAS100 M15 intersection. Rolling state advances only on synchronized completed observations; next common valid observed M15 open is entry.",
+        "historical_pepperstone_policy_archive_required": false
+      },
+      "V2-C009": {
+        "state": "SUFFICIENT_FOR_M6_STAGE_A",
+        "rule": "Accepted BTCUSD H1 event stream retains real missing bars. Candidate is session-agnostic and operates on completed observed events only; missing intervals are not fabricated.",
+        "written_historical_maintenance_archive_required": false
+      },
+      "V2-C007": {
+        "state": "SUFFICIENT_FOR_M6_STAGE_A_EVENT_REPLAY",
+        "rule": "Accepted XAUUSD H4 timestamps are the observed executable event partition. Candidate uses completed observed H4 bars and first later valid observed H4 open; DST/session partition shifts are carried by observed timestamps and no missing H4 bar is fabricated.",
+        "limitation": "Exact broker rollover/financing cost semantics remain separate cost/auxiliary evidence and are not resolved by event replay."
+      },
+      "V2-C008": {
+        "state": "BLOCKED_C008_CONTINUOUS_CONSTRUCTION",
+        "reason": "Exact historical SpotCrude continuous/roll construction remains materially required."
+      },
+      "V2-C010": {
+        "state": "BLOCKED_C010_HISTORICAL_FINANCING",
+        "reason": "Historically effective financing rates/schedules and rollover multipliers remain materially required."
+      },
+      "V2-C011": {
+        "state": "BLOCKED_C011_BROKER_SPECIFIC_AUXILIARY_EVIDENCE",
+        "reason": "Broker-specific corporate-action adjustments, short eligibility, financing and historical execution/session evidence remain materially required."
+      }
+    }
+  },
+  "conversion_evidence": {
+    "requirement_interpretation": "CAUSAL_CONVERSION_SERIES_OR_BROKER_NATIVE_CONVERSION_EVIDENCE",
+    "current_broker_native_chain": {
+      "USD_to_EUR": {
+        "chain_constituent": "EURUSD",
+        "symbol_id": 1,
+        "state": "VERIFIED_CURRENT_CORROBORATION_ONLY"
+      },
+      "JPY_to_EUR": {
+        "chain_constituent": "EURJPY",
+        "symbol_id": 3,
+        "state": "VERIFIED_CURRENT_CORROBORATION_ONLY"
+      }
+    },
+    "accepted_causal_series": {
+      "EURUSD": {
+        "dataset_id": "PW02-AUX-CONV-EURUSD-M15-S1",
+        "rows": 116910,
+        "csv_sha256": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+        "state": "PASS_HASH_VERIFIED_CAUSAL_CONVERSION_PRICE_SERIES"
+      },
+      "EURJPY": {
+        "dataset_id": "PW02-AUX-CONV-EURJPY-M15-S3",
+        "rows": 117140,
+        "csv_sha256": "2f25be36c7599937e120f9bd1f5cf44a62b3edf383e8735214f3bd58370009cf",
+        "state": "PASS_HASH_VERIFIED_CAUSAL_CONVERSION_PRICE_SERIES"
+      }
+    },
+    "frozen_adapter": "m6/causal_conversion.py",
+    "causal_rules": {
+      "observation_availability": "M15_BAR_OPEN_PLUS_15_MINUTES",
+      "selection": "LATEST_COMPLETED_M15_OBSERVATION_AT_OR_BEFORE_CASHFLOW_TIMESTAMP",
+      "future_observation": false,
+      "future_interpolation": false,
+      "later_backfill": false,
+      "missing_causal_observation": "BLOCK_CASHFLOW_OR_OUTCOME",
+      "USD_to_EUR_formula": "EUR_value = USD_value / EURUSD_close",
+      "JPY_to_EUR_formula": "EUR_value = JPY_value / EURJPY_close"
+    },
+    "price_conversion_gate": {
+      "USD_to_EUR": "PASS",
+      "JPY_to_EUR": "PASS"
+    },
+    "historical_current_chain_membership_requirement": "NOT_REQUIRED_WHEN_FROZEN_CAUSAL_SERIES_ALTERNATIVE_IS_SATISFIED",
+    "conversion_cost_fee": "SEPARATE_DISCOVERY_COST_COMPONENT_NOT_RESOLVED_BY_PRICE_SERIES",
+    "economic_conversion_adapter_ready": true
+  },
+  "stage_b_eur200": {
+    "current_expected_margin_snapshot": "STRUCTURAL_CURRENT_ONLY",
+    "applicability_state": "DEFERRED_NOT_APPLICABLE_UNTIL_A_DISCOVERY_SURVIVOR_EXISTS",
+    "exact_causal_eur200_feasibility": "NOT_EVALUATED_PRE_STAGE_B"
+  },
+  "economic_outcomes_opened": 0,
+  "attempts_consumed": 0,
+  "protected_evidence_opened": false
+}

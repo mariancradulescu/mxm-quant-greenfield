@@ -1,0 +1,119 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-historical-margin-public-source-search.v1",
+  "status": "PUBLIC_OFFICIAL_SEARCH_INSUFFICIENT_BROKER_CONFIRMATION_REQUIRED",
+  "scope": "PRE_STAGE_B_MARGIN_AUTHORITY_ONLY_NO_ECONOMICS",
+  "development_interval": {
+    "start": "2022-01-03T00:00:00Z",
+    "end": "2026-09-16T23:59:59.999Z"
+  },
+  "targets": {
+    "V2-C006": {
+      "symbol": "US500",
+      "symbol_id": 127,
+      "frozen_volume_cents": 10
+    },
+    "V2-C012": {
+      "symbol": "NAS100",
+      "symbol_id": 126,
+      "frozen_volume_cents": 10
+    }
+  },
+  "active_semantic_authority_ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V2.json",
+  "accepted_capture_ref": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json",
+  "official_sources": [
+    {
+      "publisher": "Pepperstone EU Limited",
+      "title": "Key Information Document - Contract for Differences (CFD) on a stock index",
+      "document_date": "2020-09-01",
+      "url": "https://files.pepperstone.com/legal/CYSEC/KID_CFD_stock_index.pdf",
+      "observations": [
+        "Uses a stock-index example with 20:1 leverage and a 5% minimum initial margin deposit.",
+        "The document describes the 5% amount as a minimum initial margin, not a broker-specific maximum margin requirement.",
+        "The worked example is FTSE 100 and does not establish point-in-time US500/NAS100 requirements over DEVELOPMENT."
+      ],
+      "authority_effect": "SUPPORTS_5_PERCENT_MINIMUM_EXAMPLE_ONLY_NOT_HISTORICAL_UPPER_BOUND"
+    },
+    {
+      "publisher": "Pepperstone EU Limited",
+      "title": "Terms and Conditions",
+      "version": "2",
+      "document_date": "2022-02",
+      "url": "https://files.pepperstone.com/Cyprus-Ts-and-Cs-February-2022-FINAL.pdf",
+      "observations": [
+        "Margin requirements are to be determined from the Platform.",
+        "Pepperstone reserves rights to adjust Margin requirements for a Contract.",
+        "Those rights can be exercised in abnormal trading conditions or where considered necessary for protection of Pepperstone's rights.",
+        "No finite maximum historical margin percentage for US500 or NAS100 is stated."
+      ],
+      "authority_effect": "BROKER_CONTRACT_PERMITS_MARGIN_VARIATION_NO_PUBLIC_UPPER_CEILING"
+    },
+    {
+      "publisher": "Pepperstone EU Limited",
+      "title": "What are the margin requirements?",
+      "url": "https://pepperstone.com/en-eu/support/what-are-the-margin-requirements/",
+      "observations": [
+        "Current initial margin depends on account leverage, trade size, instrument and account currency.",
+        "Current calculation is delegated to the secure-client-area Margin Calculator."
+      ],
+      "authority_effect": "CURRENT_ONLY_VARIABLE_INPUTS_NOT_HISTORICAL_AUTHORITY"
+    },
+    {
+      "publisher": "Pepperstone EU Limited",
+      "title": "Understanding margin in CFD trading",
+      "url": "https://pepperstone.com/en-eu/learn-to-trade/trading-guides/margin-in-cfd-trading/",
+      "observations": [
+        "Current guidance states indices are around 5% margin.",
+        "It explicitly states margin rates and leverage depend on market conditions, regulation, trade size, instrument and account currency."
+      ],
+      "authority_effect": "CURRENT_GENERAL_GUIDANCE_EXPLICITLY_VARIABLE_NOT_HISTORICAL_UPPER_BOUND"
+    },
+    {
+      "publisher": "Pepperstone EU Limited",
+      "title": "Contact us",
+      "url": "https://pepperstone.com/en-eu/help-and-support/contact-us/",
+      "observations": [
+        "Official Pepperstone EU support contact is support@pepperstone.com."
+      ],
+      "authority_effect": "BROKER_CONFIRMATION_ROUTE"
+    }
+  ],
+  "search_assessment": {
+    "official_public_point_in_time_schedule_found": false,
+    "broker_specific_us500_historical_upper_bound_found": false,
+    "broker_specific_nas100_historical_upper_bound_found": false,
+    "development_wide_upper_bound_found": false,
+    "public_5_percent_can_be_promoted_to_exact_historical_requirement": false,
+    "public_5_percent_can_be_promoted_to_historical_upper_bound": false,
+    "current_margin_or_leverage_backfill_allowed": false
+  },
+  "logic": {
+    "pepperstone_contract_permits_margin_adjustment": true,
+    "public_sources_do_not_state_a_finite_maximum_adjusted_margin": true,
+    "therefore_public_sources_cannot_prove_development_wide_conservative_upper_bound": true,
+    "historical_margin_gate_must_remain_unresolved": true
+  },
+  "required_external_confirmation": {
+    "route": "PEPPERSTONE_EU_SUPPORT_WRITTEN_CONFIRMATION",
+    "request_ref": "data/M6_STAGE_B_HISTORICAL_MARGIN_BROKER_CONFIRMATION_REQUEST_V1.txt",
+    "minimum_sufficient_response": [
+      "A point-in-time margin/leverage schedule for Pepperstone EU retail cTrader US500 and NAS100 covering DEVELOPMENT, including exceptional margin adjustments; or",
+      "A written broker statement of the maximum margin percentage / minimum leverage that could have applied to each target over DEVELOPMENT, including whether exceptional or event-specific increases could exceed it."
+    ],
+    "insufficient_responses": [
+      "A generic statement that major indices are normally 20:1 or 5%.",
+      "A current-only margin calculation.",
+      "A statement of regulatory maximum leverage without broker historical limits.",
+      "An answer that omits exceptional/event-specific margin increases."
+    ]
+  },
+  "conclusion": {
+    "historical_margin_gate": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+    "historical_margin_authority_frozen": false,
+    "stage_b_execution_authorized": false,
+    "stage_b_economics_may_run": false,
+    "new_v2_attempt_consumed": false,
+    "protected_evidence_opened": false,
+    "same_android_capture_should_be_rerun": false,
+    "broker_confirmation_required": true
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-tier1-dns-resilient-reconnect-correction.v1",
+  "status": "PRE_OUTCOME_RUNTIME_NETWORK_RESILIENCE_CORRECTION",
+  "observed_live_failure": {
+    "prior_tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
+    "resume_chunks_reused": 1130,
+    "last_progress_chunks": 1170,
+    "historical_batch_timeout_seconds": 120,
+    "reconnect_failure": "gaierror [Errno 7] No address associated with hostname",
+    "interpretation": "Transient Android/mobile DNS resolution failure during reconnect after a historical batch timeout. Saved chunks remained valid."
+  },
+  "corrected_runtime": {
+    "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE3_DNSCACHE1",
+    "live_connections": 1,
+    "pipeline_batch_size": 4,
+    "pipeline_fallback": "4->2->1",
+    "dns_resolution": "Resolve normally when available and cache resolved LIVE endpoints in memory.",
+    "dns_failure_reconnect": "If fresh DNS fails, retry cached resolved IP endpoint(s) while preserving original live.ctraderapi.com as TLS server_hostname for certificate verification.",
+    "endpoint_cache_persistence": "Persist cached endpoint list only inside .m6_cost_evidence_work/network_endpoint_cache.json for operational reconnects; never include credentials and never promote it to research evidence.",
+    "automatic_network_recovery": {
+      "maximum_seconds": 1800,
+      "exponential_backoff_seconds": "1,2,4,8,16,30... capped at 30",
+      "behavior": "Pause and reconnect automatically instead of terminating on transient transport/DNS errors."
+    }
+  },
+  "resume_migration": {
+    "allowed_previous_tool_versions": [
+      "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
+      "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+      "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2"
+    ],
+    "rule": "Exact V3 semantic contract must match and every referenced completed chunk must pass SHA256 verification.",
+    "preserves_current_progress": true,
+    "silent_reuse": false
+  },
+  "unchanged_research_contract": {
+    "active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "raw_acquisition_domain_changed": false,
+    "target_symbols_changed": false,
+    "quote_types_changed": false,
+    "boundary_evidence_semantics_changed": false,
+    "calibration_protocol_changed": false,
+    "candidate_specs_changed": false,
+    "accepted_ohlc_changed": false,
+    "ledger_changed": false,
+    "search_budget_changed": false,
+    "protected_boundary_changed": false
+  },
+  "safety": {
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "economics": false,
+    "candidate_pnl_input": false,
+    "protected_evidence": false
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-execution-authorization.v1",
+  "status": "AUTHORIZED",
+  "revision": "V2_POST_INDEPENDENT_AUDIT_AND_RUNNER_STATE_MACHINE_CORRECTION",
+  "supersedes": {
+    "ref": "data/M6_STAGE_B_CURRENT_CONFIG_EXECUTION_AUTHORIZATION_V1.json",
+    "git_blob_sha1": "ea022baf13f48b7dd2eac9c91aa9b9d90346950e",
+    "reason": "V1 was deliberately frozen inactive before independent audit."
+  },
+  "scope": "V2-C006_V2-C012_STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+  "authorization_basis": "Independent audit passed and the pre-execution runner phase-transition defect was corrected with exact-head CI success. Current broker-native Pepperstone configuration is the operational authority for this scenario; unresolved historical point-in-time margin is separate and non-blocking.",
+  "single_use": true,
+  "consumed": false,
+  "execution_authorized": true,
+  "independent_audit_pass": true,
+  "audit": {
+    "ref": "data/M6_STAGE_B_CURRENT_CONFIG_PRE_EXECUTION_AUDIT_V1.json",
+    "git_blob_sha1": "c8af3cdea18358be4b98309b28c5b25eac1e67e8",
+    "audited_head": "cd55ffdc4f4b8876dc59013eb21bec44211fbdb4"
+  },
+  "runner_correction": {
+    "ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_RUNNER_STATE_MACHINE_CORRECTION_V1.json",
+    "git_blob_sha1": "74fc789b7935200878f32c004fc22041b6897024",
+    "runner_git_blob_sha1": "eab768456b02ecb3b200d71266b540a446843ed5"
+  },
+  "activation_precondition_ci": {
+    "head": "551e51ea9debf36d1374665648e83f2c06c13d80",
+    "run_id": 35589599912,
+    "conclusion": "SUCCESS",
+    "tests_passed": 524,
+    "tests_failed": 0
+  },
+  "candidate_spec_hashes": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "current_authority_ref": "evidence/M6_STAGE_B_CURRENT_BROKER_CONFIGURATION_AUTHORITY_V1.json",
+  "current_authority_git_blob_sha1": "47c1f081bdce0dec92dd40543d6627ae224f6f8d",
+  "current_policy_ref": "data/M6_STAGE_B_CURRENT_CONFIG_TIER1_EVALUATOR_POLICY_V1.json",
+  "current_policy_git_blob_sha1": "bf157e44a3f93e111fc02006bd035595ba4c6084",
+  "pre_economic_materialization_ref": "evidence/M6_STAGE_B_CURRENT_CONFIG_PRE_ECONOMIC_MATERIALIZATION_V1.json",
+  "pre_economic_materialization_git_blob_sha1": "0ecfbc97617a6e6188fee350f830af2fe33e2a47",
+  "transaction_local_cost_rule_git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a",
+  "historical_margin_authority_state": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "historical_margin_authority_changed": false,
+  "historical_margin_blocks_this_execution": false,
+  "accounting_semantics": {
+    "stage_b_current_config_is_same_two_existing_v2_identities": true,
+    "new_v2_attempts_authorized": 0,
+    "new_v2_evaluated_identities_authorized": 0,
+    "search_budget_units_authorized": 0,
+    "v2_attempts_used_before": 2,
+    "v2_attempts_used_after_execution": 2,
+    "v2_evaluated_identities_before": 2,
+    "v2_evaluated_identities_after_execution": 2,
+    "v2_search_budget_remaining_before": 82,
+    "v2_search_budget_remaining_after_execution": 82,
+    "current_config_stage_b_outcomes_before_authorization": 0,
+    "current_config_stage_b_outcomes_authorized": 2,
+    "economic_outcomes_opened_before": 2,
+    "economic_outcomes_opened_after_two_scenario_results": 4,
+    "discovery_result_recorded_before": 2,
+    "discovery_result_recorded_after": 2,
+    "discovery_ledger_entries_before": 22,
+    "discovery_ledger_entries_after": 22,
+    "reason_discovery_ledger_unchanged": "Stage-B current-configuration scenario results are realizability outcomes for already-evaluated identities, not new Discovery search outcomes or identities."
+  },
+  "result_semantics": {
+    "required_label": "STAGE_B_CURRENT_CONFIGURATION_SCENARIO",
+    "result_files_must_be_separate_from_stage_a": true,
+    "historical_certification_effect": "NONE",
+    "certification_survivor_promotion_authorized": false
+  },
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}

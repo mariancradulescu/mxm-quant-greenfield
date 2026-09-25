@@ -1,0 +1,248 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-auxiliary-evidence-sources.v1",
+  "retrieved_date_utc": "2026-09-18",
+  "scope": "PUBLIC_OFFICIAL_AUXILIARY_EVIDENCE_ONLY_NO_ECONOMIC_OUTCOMES",
+  "priority_rule": "Accepted LIVE capture + official broker/exchange/issuer/regulator sources; current broker pages are not retroactively promoted to 2022-2026 point-in-time truth.",
+  "sources": [
+    {
+      "source_id": "PEPPERSTONE_CASH_COMMODITY_GUIDE",
+      "organization": "Pepperstone",
+      "title": "A home for commodity traders",
+      "url": "https://pepperstone.com/en-eu/learn-to-trade/trading-guides/a-home-for-commodity-traders/",
+      "evidence_class": "CURRENT_AND_LONG_LIVED_PUBLIC_PRODUCT_METHODOLOGY_PARTIAL_HISTORICAL_CORROBORATION",
+      "facts": [
+        "Pepperstone commodity cash CFDs are described as cash products derived from front-month futures.",
+        "Cash contracts are described as indefinite with continuous charting and no user contract roll.",
+        "Overnight funding applies to cash commodity positions."
+      ],
+      "limitation": "Does not publish the exact 2022-2026 underlying-contract switch timetable, roll-effective timestamps, LP-specific transition rule, or adjustment series required by frozen C008."
+    },
+    {
+      "source_id": "PEPPERSTONE_SPOT_CRUDE_PRICING_GUIDE",
+      "organization": "Pepperstone",
+      "title": "How our spot crude price is calculated",
+      "url": "https://pepperstone.com/en-eu/learn-to-trade/trading-guides/how-spot-crude-price-calculated/",
+      "evidence_class": "BROKER_PRICING_METHODOLOGY_PUBLISHED_BEFORE_DEVELOPMENT_INTERVAL",
+      "facts": [
+        "Pepperstone states that its liquidity provider creates a cash US crude price from the front-month or active crude future under normal market conditions.",
+        "Cash and futures prices converge toward expiry through interest/time adjustments.",
+        "Pepperstone explicitly warns that the normal pricing logic can change in disorderly underlying-market conditions."
+      ],
+      "limitation": "No immutable per-roll historical contract IDs/effective timestamps/adjustment values for 2022-2026."
+    },
+    {
+      "source_id": "PEPPERSTONE_COMMODITY_CURRENT_FEES",
+      "organization": "Pepperstone",
+      "title": "How much does commodity CFD trading cost?",
+      "url": "https://pepperstone.com/en-eu/markets/commodities/spreads/",
+      "evidence_class": "CURRENT_COST_STRUCTURE_NOT_HISTORICAL_PATH",
+      "facts": [
+        "Spot commodity markets and -F forward CFDs are separate product families.",
+        "Published spread statistics are recent-period statistics, not a 2022-2026 historical path.",
+        "Forward CFDs are automatically rolled; this does not establish SpotCrude's historical cash-series construction."
+      ],
+      "limitation": "Recent minimum/average spreads cannot be promoted to VERIFIED historical Discovery costs or an upper conservative bound."
+    },
+    {
+      "source_id": "PEPPERSTONE_TRADING_ACCOUNTS_CURRENT",
+      "organization": "Pepperstone Europe",
+      "title": "Trading accounts",
+      "url": "https://pepperstone.com/en-eu/ways-to-trade/trading-accounts/",
+      "evidence_class": "CURRENT_FUNDING_POLICY_NOT_HISTORICAL_RATES",
+      "facts": [
+        "Overnight funding applies to CFDs held past the daily cutoff.",
+        "Latest swap rates are shown on trading platforms.",
+        "Pepperstone states swap rates are subject to change with market volatility.",
+        "Slippage can occur when markets move quickly or gap."
+      ],
+      "limitation": "Does not establish historical AUDJPY financing rates/effective timestamps or bounded historical slippage."
+    },
+    {
+      "source_id": "PEPPERSTONE_COSTS_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Trading costs and fees",
+      "url": "https://pepperstone.com/en/trading/costs-and-fees",
+      "evidence_class": "CURRENT_COST_FORMULAS_AND_FEES_NOT_HISTORICAL_PATH",
+      "facts": [
+        "Current US share/ETF CFD commission is published as 0.02 USD per share with no minimum.",
+        "Pepperstone states swap rates may change daily and updates take effect immediately.",
+        "The online funding calculator is indicative and actual charges may differ."
+      ],
+      "limitation": "Current commissions/formulas and indicative rates do not prove exact 2022-2026 costs."
+    },
+    {
+      "source_id": "PEPPERSTONE_CORPORATE_ACTION_POLICY_CURRENT",
+      "organization": "Pepperstone Europe",
+      "title": "How does Pepperstone handle dividends and corporate actions?",
+      "url": "https://pepperstone.com/en-eu/help-and-support/understanding-trading-conditions/how-does-pepperstone-handle-dividends-and-corporate-actions/",
+      "evidence_class": "CURRENT_BROKER_POLICY",
+      "facts": [
+        "Share/index CFD positions held past ex-dividend are cash-adjusted.",
+        "Longs are credited and shorts debited.",
+        "Pepperstone states the cash adjustment may differ from the exact underlying dividend due to market conditions and withholding tax.",
+        "Corporate actions include stock splits and Pepperstone passes liquidity-provider adjustments through."
+      ],
+      "limitation": "Does not provide the exact historical CFD dividend/corporate-action adjustment ledger for the accepted account/products."
+    },
+    {
+      "source_id": "PEPPERSTONE_TRADING_HOURS_CURRENT",
+      "organization": "Pepperstone Europe",
+      "title": "Trading Hours During Market Times",
+      "url": "https://pepperstone.com/en-eu/ways-to-trade/trading-hours/",
+      "evidence_class": "CURRENT_SESSION_POLICY_AND_CURRENT_HOLIDAY_TABLE_NOT_FULL_HISTORICAL_ARCHIVE",
+      "facts": [
+        "Current server time follows GMT+3 during US daylight saving and GMT+2 otherwise.",
+        "Current product tables distinguish SpotCrude, US500, NAS100 and standard USA Shares sessions.",
+        "Pepperstone states hours are subject to seasonal and market changes."
+      ],
+      "limitation": "Current schedules/holiday table cannot be backfilled as exact historical Pepperstone session truth for 2022-2026."
+    },
+    {
+      "source_id": "NASDAQ_US_MARKET_HOURS_CURRENT",
+      "organization": "Nasdaq",
+      "title": "U.S. Stock Market Holiday Schedule and Trading Hours",
+      "url": "https://www.nasdaq.com/market-activity/stock-market-holiday-schedule",
+      "evidence_class": "AUTHORITATIVE_REFERENCE_SESSION_RULE",
+      "facts": [
+        "Nasdaq regular market hours are 09:30-16:00 Eastern Time.",
+        "Extended sessions are distinct from regular market hours."
+      ],
+      "limitation": "Broker share/index CFD feed hours remain separate from candidate decision-session semantics."
+    },
+    {
+      "source_id": "NASDAQ_TRADING_CALENDAR_2022",
+      "organization": "Nasdaq Trader",
+      "title": "Trading Calendar 2022",
+      "url": "https://www.nasdaqtrader.com/content/technicalsupport/2022tradingcalendar.pdf",
+      "evidence_class": "HISTORICAL_EXCHANGE_CALENDAR",
+      "facts": [
+        "Official 2022 Nasdaq exchange holiday/early-close calendar."
+      ],
+      "limitation": "Does not by itself prove Pepperstone product-specific trading availability."
+    },
+    {
+      "source_id": "NASDAQ_TRADING_CALENDAR_2023",
+      "organization": "Nasdaq Trader",
+      "title": "Trading Calendar 2023",
+      "url": "https://www.nasdaqtrader.com/content/technicalsupport/2023tradingcalendar.pdf",
+      "evidence_class": "HISTORICAL_EXCHANGE_CALENDAR",
+      "facts": [
+        "Official 2023 Nasdaq exchange holiday/early-close calendar."
+      ],
+      "limitation": "Does not by itself prove Pepperstone product-specific trading availability."
+    },
+    {
+      "source_id": "NASDAQ_TRADING_CALENDAR_2024",
+      "organization": "Nasdaq Trader",
+      "title": "Trading Calendar 2024",
+      "url": "https://www.nasdaqtrader.com/content/technicalsupport/2024tradingcalendar.pdf",
+      "evidence_class": "HISTORICAL_EXCHANGE_CALENDAR",
+      "facts": [
+        "Official 2024 Nasdaq exchange holiday/early-close calendar."
+      ],
+      "limitation": "Does not by itself prove Pepperstone product-specific trading availability."
+    },
+    {
+      "source_id": "NASDAQ_TRADING_CALENDAR_2025",
+      "organization": "Nasdaq Trader",
+      "title": "Trading Calendar 2025",
+      "url": "https://www.nasdaqtrader.com/content/technicalsupport/2025tradingcalendar.pdf",
+      "evidence_class": "HISTORICAL_EXCHANGE_CALENDAR",
+      "facts": [
+        "Official 2025 Nasdaq exchange holiday/early-close calendar."
+      ],
+      "limitation": "Does not by itself prove Pepperstone product-specific trading availability."
+    },
+    {
+      "source_id": "NASDAQ_TRADING_CALENDAR_2026",
+      "organization": "Nasdaq Trader",
+      "title": "Trading Calendar / U.S. Equity and Options Markets Holiday Schedule 2026",
+      "url": "https://nasdaqtrader.com/Trader.aspx?id=Calendar",
+      "evidence_class": "HISTORICAL_DEVELOPMENT_INTERVAL_EXCHANGE_CALENDAR",
+      "facts": [
+        "Official 2026 Nasdaq closures and early closes through the DEVELOPMENT interval."
+      ],
+      "limitation": "Does not by itself prove Pepperstone product-specific trading availability."
+    },
+    {
+      "source_id": "APPLE_SPLIT_AND_DIVIDEND_HISTORY",
+      "organization": "Apple",
+      "title": "Dividend History and Investor FAQ",
+      "url": "https://investor.apple.com/dividend-history/",
+      "secondary_url": "https://investor.apple.com/faq/",
+      "evidence_class": "OFFICIAL_ISSUER_POINT_IN_TIME_CORPORATE_ACTION_HISTORY",
+      "facts": [
+        "Apple's official history lists its five stock splits; latest was 4-for-1 in August 2020, so no Apple split occurs in the 2022-2026 DEVELOPMENT interval.",
+        "Apple publishes dated cash-dividend history covering the DEVELOPMENT interval."
+      ],
+      "limitation": "Underlying issuer dividend amounts do not equal exact Pepperstone share-CFD cash adjustments."
+    },
+    {
+      "source_id": "MICROSOFT_SPLIT_DIVIDEND_HISTORY",
+      "organization": "Microsoft",
+      "title": "Dividends and Stock History",
+      "url": "https://www.microsoft.com/en-us/Investor/dividends-and-stock-history",
+      "evidence_class": "OFFICIAL_ISSUER_RETROSPECTIVE_HISTORY",
+      "facts": [
+        "Microsoft identifies its most recent stock split as the February 2003 2-for-1 split; therefore no Microsoft split occurs in 2022-2026.",
+        "Microsoft publishes dividend history."
+      ],
+      "limitation": "Underlying issuer dividends do not prove Pepperstone historical CFD cash adjustments."
+    },
+    {
+      "source_id": "NVIDIA_2024_SPLIT",
+      "organization": "NVIDIA",
+      "title": "NVIDIA Announces Financial Results for First Quarter Fiscal 2025",
+      "url": "https://investor.nvidia.com/news/press-release-details/2024/NVIDIA-Announces-Financial-Results-for-First-Quarter-Fiscal-2025/",
+      "evidence_class": "OFFICIAL_ISSUER_POINT_IN_TIME_EVENT",
+      "facts": [
+        "NVIDIA announced a ten-for-one forward split effective June 7, 2024.",
+        "Record holders at June 6 receive nine additional shares after June 7 close.",
+        "Split-adjusted trading was expected to begin at market open June 10, 2024."
+      ],
+      "limitation": "Does not establish Pepperstone's exact historical CFD adjustment bookkeeping."
+    },
+    {
+      "source_id": "AMAZON_2022_SPLIT_SEC",
+      "organization": "U.S. SEC / Amazon filing",
+      "title": "Amazon Form 8-K, May 2022 stock split",
+      "url": "https://www.sec.gov/Archives/edgar/data/1018724/000110465922065872/tm2215904d1_8k.htm",
+      "evidence_class": "REGULATORY_POINT_IN_TIME_EVENT",
+      "facts": [
+        "Amazon 20-for-1 split amendment became effective May 27, 2022.",
+        "Additional shares were to appear on or about June 3, 2022.",
+        "Split-adjusted trading was expected to begin June 6, 2022."
+      ],
+      "limitation": "Does not establish Pepperstone's exact share-CFD corporate-action adjustment bookkeeping."
+    },
+    {
+      "source_id": "META_2022_TICKER_CHANGE",
+      "organization": "Meta Platforms",
+      "title": "Meta Platforms, Inc. to Change Ticker Symbol to META on June 9",
+      "url": "https://investor.atmeta.com/investor-news/press-release-details/2022/Meta-Platforms-Inc.-to-Change-Ticker-Symbol-to-META-on-June-9/default.aspx",
+      "evidence_class": "OFFICIAL_ISSUER_POINT_IN_TIME_SYMBOL_LINEAGE",
+      "facts": [
+        "Meta Class A stock changed Nasdaq ticker from FB to META prior to market open June 9, 2022.",
+        "The listing remained Nasdaq and the CUSIP remained unchanged."
+      ],
+      "limitation": "Does not prove Pepperstone's own broker-symbol migration timestamp beyond the underlying lineage."
+    },
+    {
+      "source_id": "META_2024_DIVIDEND_INITIATION",
+      "organization": "Meta Platforms",
+      "title": "Meta Reports Fourth Quarter and Full Year 2023 Results; Initiates Quarterly Dividend",
+      "url": "https://investor.atmeta.com/investor-news/press-release-details/2024/Meta-Reports-Fourth-Quarter-and-Full-Year-2023-Results-Initiates-Quarterly-Dividend/default.aspx",
+      "evidence_class": "OFFICIAL_ISSUER_POINT_IN_TIME_DIVIDEND_EVENT",
+      "facts": [
+        "Meta initiated its quarterly cash dividend in February 2024 at 0.50 USD per share, payable March 26, 2024 to holders of record February 22, 2024."
+      ],
+      "limitation": "Exact Pepperstone CFD cash adjustment remains separate and unproven historically."
+    }
+  ],
+  "global_non_promotion_rules": [
+    "Current Pepperstone schedules, spreads, commissions, swap snapshots and ExpectedMargin are not historical 2022-2026 truth.",
+    "Issuer dividends/splits/ticker changes establish underlying corporate events only; they do not manufacture broker-specific CFD cash adjustments.",
+    "No current/recent average spread statistic is an upper historical bound.",
+    "No unspecified slippage magnitude is converted into a finite conservative bound without evidence."
+  ]
+}

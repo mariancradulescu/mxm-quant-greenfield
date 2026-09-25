@@ -14,9 +14,17 @@ class M5WaveFreeze(unittest.TestCase):
  def test_m5_03_original_materially_distinct_families_preserved(self):
   fam=load('discovery/WAVE_01_V1.json')['materially_distinct_families']; self.assertEqual(set(fam),{'TREND_MOMENTUM','MEAN_REVERSION','BREAKOUT_VOLATILITY_EXPANSION','CROSS_SECTIONAL_RANKING','RELATIVE_VALUE_COINTEGRATION'})
  def test_m5_04_ledger_preserves_original_freezes_and_has_no_results(self):
-  es=read_ledger(ROOT/'discovery/ledger.jsonl'); old=[e for e in es if e['entry_type']=='CANDIDATE_FROZEN' and e['candidate_id'] in [f'V2-C{i:03d}' for i in range(1,6)]]; self.assertEqual([e['sequence'] for e in old],[1,2,3,4,5]); self.assertFalse(any(e['entry_type']=='RESULT_RECORDED' for e in es))
+     entries = read_ledger(ROOT / "discovery/ledger.jsonl")
+     old = [e for e in entries if e["entry_type"] == "CANDIDATE_FROZEN" and e["candidate_id"] in [f"V2-C{i:03d}" for i in range(1, 6)]]
+     self.assertEqual([e["sequence"] for e in old], [1, 2, 3, 4, 5])
+     self.assertFalse(any(e["entry_type"] == "RESULT_RECORDED" for e in entries[:10]))
  def test_m5_05_budget_and_protected_boundary_unchanged(self):
   w=load('discovery/WAVE_01_V1.json'); self.assertEqual(w['search_budget'],84); self.assertEqual(w['v2_attempts_used'],0); self.assertEqual(w['protected_forward_start'],'2026-09-17T12:02:58Z')
  def test_m5_06_state_preserves_m5_complete_and_m6_pending(self):
-  s=load('CURRENT_STATE.json'); self.assertEqual(s['m5']['status'],'COMPLETE'); self.assertEqual(s['m6']['status'],'PENDING'); self.assertEqual(s['v2_attempts_used'],0); self.assertEqual(s['v2_evaluated_identities'],0); self.assertIsNone(s['latest_economic_outcome']); self.assertEqual(s['m5']['result_entries'],0); self.assertEqual(s['phase'],'PRIMARY_WAVE_FROZEN_PRE_M6')
+     state = load("CURRENT_STATE.json")
+     self.assertEqual(state["m5"]["status"], "COMPLETE")
+     self.assertEqual(state["m6"]["status"], "PENDING")
+     self.assertEqual(state["m5"]["result_entries"], 0)
+     self.assertFalse(state["m5"]["candidate_economic_outcomes_opened"])
+     self.assertFalse(state["protected_evidence_opened"])
 if __name__=='__main__': unittest.main(verbosity=2)

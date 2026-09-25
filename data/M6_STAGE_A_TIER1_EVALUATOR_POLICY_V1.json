@@ -1,0 +1,104 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-tier1-evaluator-policy.v1",
+  "status": "FROZEN_PRE_OUTCOME_COMPLETE_STAGE_A_EVALUATOR_POLICY",
+  "scope": "V2-C006_V2-C012_STAGE_A_DEVELOPMENT_ONLY",
+  "frozen_before_any_v2_economic_outcome": true,
+  "candidate_inputs_used_to_choose_policy": {
+    "signals": false,
+    "returns": false,
+    "pnl": false,
+    "outcome_status": false,
+    "protected_evidence": false
+  },
+  "evaluator": {
+    "runtime": "m6/stage_a_evaluator.py",
+    "runtime_git_blob_sha1": "05220fcadae6a74a7036e46f64ee1ad1411dc26f",
+    "runtime_sha256": "16e302dd3a9b58983cbfcb68ca0934c920ea8007fd11e9577685fa95f879874e",
+    "version": "MXM_STAGE_A_TIER1_EVALUATOR_V1"
+  },
+  "frozen_candidate_hashes": {
+    "V2-C006": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+    "V2-C012": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845"
+  },
+  "economic_unit": {
+    "mode": "FIXED_RELATIONSHIP_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "absolute_entry_notional_eur_per_event": 1000,
+    "quantity_formula": "1000 / (MARKET_PROXY_ENTRY_PRICE_IN_USD * CAUSAL_USD_TO_EUR_RATE_AT_ENTRY)",
+    "post_outcome_resizing_allowed": false,
+    "stage_b_eur200_realization_separate": true,
+    "entry_notional_accounting": "EXACT_EUR_1000_BY_DEFINITION_NO_REMULTIPLICATION_DRIFT"
+  },
+  "settlement": {
+    "gross_quote_pnl": "DIRECTION_SIGN * (MARKET_PROXY_EXIT_PRICE - MARKET_PROXY_ENTRY_PRICE) * QUANTITY",
+    "gross_eur_pnl": "GROSS_QUOTE_PNL * CAUSAL_USD_TO_EUR_RATE_AT_EXIT",
+    "entry_cost_eur": "ENTRY_TRANSACTION_LOCAL_PROXY_POINTS * QUANTITY * CAUSAL_USD_TO_EUR_RATE_AT_ENTRY",
+    "exit_cost_eur": "EXIT_TRANSACTION_LOCAL_PROXY_POINTS * QUANTITY * CAUSAL_USD_TO_EUR_RATE_AT_EXIT",
+    "coarse_net_eur": "GROSS_EUR_PNL - ENTRY_COST_EUR - EXIT_COST_EUR",
+    "commission": "ZERO_SEPARATE_INDEX_COMMISSION_PER_FROZEN_DISCOVERY_POLICY",
+    "financing": "NOT_APPLICABLE_INTRADAY",
+    "transaction_local_cost_direction_can_reduce_cost": false
+  },
+  "terminal_status_law": {
+    "precedence": [
+      "IMPLEMENTATION_INVALID_IF_IMPLEMENTATION_NOT_VALID",
+      "DATA_INSUFFICIENT_IF_DATA_NOT_SUFFICIENT",
+      "COST_UNRESOLVED_IF_REQUIRED_TRANSACTION_COST_CONTEXT_UNRESOLVED_BEFORE_PNL",
+      "GROSS_EDGE_FAIL_IF_TOTAL_GROSS_PNL_EUR_LE_0",
+      "COARSE_NET_FAIL_IF_TOTAL_GROSS_PNL_EUR_GT_0_AND_TOTAL_COARSE_NET_PNL_EUR_LE_0",
+      "DISCOVERY_SURVIVOR_IF_TOTAL_GROSS_PNL_EUR_GT_0_AND_TOTAL_COARSE_NET_PNL_EUR_GT_0"
+    ],
+    "no_additional_post_outcome_threshold": true,
+    "gross_positive_alone_sufficient": false
+  },
+  "stage_a_metric_definitions": {
+    "event_count": "Count of frozen replay events.",
+    "gross_pnl": "Sum fixed-unit gross PnL in EUR.",
+    "coarse_net_pnl": "Sum fixed-unit gross PnL minus frozen transaction-local Discovery costs in EUR.",
+    "gross_return": "gross_pnl / total absolute entry notional EUR.",
+    "coarse_net_return": "coarse_net_pnl / total absolute entry notional EUR.",
+    "gross_per_event": "gross_pnl / event_count.",
+    "net_per_event": "coarse_net_pnl / event_count.",
+    "cost_burden": "total transaction cost EUR / total absolute entry notional EUR.",
+    "turnover": "Sum absolute entry and exit notionals in EUR using causal conversion rates.",
+    "weekly_events": "Entry-event count for every UTC ISO week intersecting DEVELOPMENT, including zero-event weeks.",
+    "active_weeks": "Count of UTC ISO weeks with at least one entry event.",
+    "longest_inactive_gap": "Longest consecutive UTC calendar-day interval with zero entries across full DEVELOPMENT, including leading/trailing boundaries.",
+    "weekday_distribution": "Entry-event counts by UTC weekday.",
+    "session_distribution": "Entry-event counts by America/New_York local entry clock HH:MM.",
+    "hold_duration": "Min/median/mean/max elapsed hold minutes.",
+    "exposure": "Sum event hold minutes / total official Nasdaq reference cash-session minutes across DEVELOPMENT.",
+    "drawdown": "Maximum peak-to-trough drawdown of cumulative fixed-unit coarse-net EUR PnL path starting at zero.",
+    "symbol_contribution": "Per traded symbol event_count/gross/cost/coarse-net EUR.",
+    "direction_contribution": "Per direction event_count/gross/cost/coarse-net EUR.",
+    "subperiod_contribution": "Per UTC calendar year event_count/gross/cost/coarse-net EUR.",
+    "regime_contribution": "NOT_APPLICABLE because no prospectively frozen regime taxonomy applies; no post-outcome regime binning."
+  },
+  "provenance_policy": {
+    "data_evidence_identity": "PRIMARY_WAVE_02_RECONCILED_US500_NAS100_EURUSD_M15_CAPTURE",
+    "data_binding_type": "DATASET_SHA256",
+    "data_binding_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+    "cost_evidence": {
+      "V2-C006": {
+        "identity": "US500_M15_TRANSACTION_LOCAL_SAME_ROW_DISCOVERY_COST",
+        "sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+        "state": "CONSERVATIVE_BOUND"
+      },
+      "V2-C012": {
+        "identity": "NAS100_C012_TRANSACTION_LOCAL_SAME_ROW_DISCOVERY_COST",
+        "sha256": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999",
+        "state": "CONSERVATIVE_BOUND"
+      }
+    }
+  },
+  "protected_boundary": {
+    "protected_evidence_opened": false,
+    "protected_data_used": false
+  },
+  "research_state_at_freeze": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "m6_economics_run": false
+  }
+}

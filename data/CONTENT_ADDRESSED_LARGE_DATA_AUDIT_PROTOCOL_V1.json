@@ -1,0 +1,163 @@
+{
+  "schema": "mxm.greenfield.v2.content-addressed-large-data-audit-protocol.v1",
+  "status": "FROZEN_APPEND_ONLY_PROJECT_AUTHORITY",
+  "name": "CONTENT_ADDRESSED_LARGE_DATA_AUDIT_CAPSULE",
+  "purpose": "Verify large datasets by complete local byte rehash while transferring only compact cryptographic evidence.",
+  "verifier": {
+    "version": "MXM_CONTENT_ADDRESSED_LARGE_DATA_AUDIT_V1",
+    "runtime": "m6/large_data_audit.py",
+    "runtime_git_blob_sha1": "e724980d7f672220e05b567cdf0db27797de3e2d",
+    "pydroid_entrypoint": "LARGE_DATA_AUDIT_RUN.py",
+    "entrypoint_git_blob_sha1": "c9a45069facded855aa3783bff965a989fd42163",
+    "dependencies": "PYTHON_STDLIB_ONLY",
+    "raw_access": "READ_ONLY",
+    "heartbeat_progress_eta": true,
+    "fail_closed": true,
+    "aggregate_reconstruction_source": "ACTUAL_REHASHED_RAW_SHA256_VALUES_SUBSTITUTED_INTO_FROZEN_COMMITMENT_RECORDS"
+  },
+  "architecture": {
+    "A_RAW_BULK": {
+      "rule": "Keep bulk raw bytes on durable user-controlled storage; ordinary research/audit must not require multi-GB chat transfer.",
+      "storage_location_is_identity": false,
+      "cryptographic_manifest_defines_identity": true
+    },
+    "B_PER_FILE_MANIFEST": {
+      "required_fields": [
+        "deterministic_relative_path",
+        "byte_size",
+        "sha256",
+        "deterministic_identity",
+        "row_or_event_count_when_applicable",
+        "acquisition_source_provenance",
+        "immutable_acquisition_metadata",
+        "commitment_record"
+      ],
+      "duplicate_path_or_identity": "FAIL_CLOSED"
+    },
+    "C_EXPLICIT_CANONICALIZATION": {
+      "required_fields": [
+        "sort_field",
+        "sort_keys",
+        "separators",
+        "ensure_ascii",
+        "terminal_newline",
+        "encoding",
+        "commitment_sha256_field",
+        "commitment_row_count_field"
+      ],
+      "rule": "Aggregate commitment authority must state exact byte-level canonicalization. Implicit canonicalization is forbidden."
+    },
+    "D_AGGREGATE_COMMITMENTS": {
+      "required": [
+        "whole_dataset_ordered_commitment",
+        "useful_substream_commitments",
+        "file_counts",
+        "byte_totals",
+        "row_or_event_totals"
+      ],
+      "hash": "SHA256",
+      "reconstruction": "Use recalculated local raw-file SHA256 values, and recalculated row/event counts when configured, in the frozen commitment records before hashing."
+    },
+    "E_LOCAL_FULL_BYTE_VERIFIER": {
+      "behavior": [
+        "Read every expected raw byte.",
+        "Recalculate every file SHA256 and compare directly with frozen expected SHA256.",
+        "Verify deterministic paths and identities.",
+        "Optionally recalculate row/event counts under an explicitly frozen mode.",
+        "Substitute actual rehashed SHA256 values into frozen commitment records and reconstruct whole-dataset and substream commitments using exact canonicalization.",
+        "Print heartbeat/progress/ETA.",
+        "Fail closed on missing, unexpected, SHA, byte-size, row-count, path, identity, aggregate or stream discrepancy.",
+        "Never modify raw evidence."
+      ]
+    },
+    "F_COMPACT_AUDIT_CAPSULE": {
+      "contents": [
+        "dataset authority/version",
+        "authority SHA256",
+        "verifier version and source SHA256",
+        "file/byte totals",
+        "per-file comparison results",
+        "aggregate reconstruction",
+        "stream reconstruction",
+        "provenance commitment",
+        "retention state"
+      ],
+      "excludes": [
+        "raw bulk data",
+        "credentials",
+        "tokens",
+        "secrets"
+      ],
+      "deterministic_zip": true,
+      "deterministic_zip_timestamp": "1980-01-01T00:00:00"
+    },
+    "G_RETENTION": {
+      "default": "RAW_EVIDENCE_PROTECTED_FROM_DELETION",
+      "deletion_requires": "EXPLICIT_RETENTION_OR_DELETION_AUTHORITY"
+    },
+    "H_OPTIONAL_REDUNDANT_STORAGE": {
+      "allowed": [
+        "external SSD",
+        "cloud object storage",
+        "NAS",
+        "other durable byte-identical copies"
+      ],
+      "rule": "Storage location is not identity; cryptographic manifest/commitments define identity."
+    }
+  },
+  "authority_schema_contract": {
+    "schema": "mxm.greenfield.v2.large-data-audit-dataset-authority.v1",
+    "embedded_files_manifest_required": true,
+    "commitment_record_required_per_file": true,
+    "exact_canonicalization_required": true,
+    "stream_selectors_required": true,
+    "retention_deletion_authorized_must_be_false_at_audit_time": true
+  },
+  "canonicalization_examples": {
+    "historical_tier1_original": {
+      "sort_field": "key",
+      "sort_keys": true,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "ensure_ascii": true,
+      "terminal_newline": false,
+      "encoding": "utf-8",
+      "commitment_sha256_field": "sha256",
+      "commitment_row_count_field": "row_count"
+    },
+    "historical_tier1_preopen": {
+      "sort_field": "key",
+      "sort_keys": true,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "ensure_ascii": false,
+      "terminal_newline": true,
+      "encoding": "utf-8",
+      "commitment_sha256_field": "sha256",
+      "commitment_row_count_field": "row_count"
+    }
+  },
+  "audit_semantics": {
+    "local_full_raw_byte_rehash": "PASS requires every expected raw byte to be read locally and every expected per-file SHA256 to match.",
+    "external_full_raw_byte_rehash": "May be declared only when complete raw bytes are actually transferred/read by the external verifier.",
+    "compact_capsule_reconciliation": "Does not imply external possession of raw bulk.",
+    "allowed_chain": "raw bytes locally rehashed -> compact capsule transferred -> frozen manifest/resume transferred or repository-bound -> per-file hashes reconciled -> canonical aggregate commitments reconstructed -> frozen commitment match"
+  },
+  "security": {
+    "credentials_in_authority_or_capsule": "FORBIDDEN",
+    "raw_payload_embedding": "FORBIDDEN",
+    "report_sensitive_key_scan": "ENFORCED"
+  },
+  "research_scope": {
+    "economics": false,
+    "candidate_signals": false,
+    "candidate_returns": false,
+    "candidate_pnl": false,
+    "candidate_specs_mutated": false,
+    "protected_evidence": false
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-pre-m6-readiness.v4",
+  "status": "CANDIDATE_SPECIFIC_POST_TIER1_QUOTE_CAPTURE_COST_CALIBRATION_UNRESOLVED",
+  "supersedes": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V3.json",
+  "correction_reason": "Accepted Tier-1 historical BID/ASK capture resolves historical quote evidence but the prospectively frozen execution-cost calibration protocol concludes UNRESOLVED for MARKET_PROXY slippage/delay and commission continuity. No economic outcome opened.",
+  "authorities": {
+    "raw_manifest": "data/DATA_MANIFEST.json",
+    "capture_acceptance": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "future_wave_policy": "discovery/FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_V1.json",
+    "structural_future_universe": "data/FUTURE_BROKER_STRUCTURAL_UNIVERSE_V1.json",
+    "reference_calendar": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "calendar_correction": "evidence/PRE_M6_NASDAQ_CALENDAR_CORRECTION_V1.json",
+    "causal_conversion_and_session": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V2.json",
+    "tier1_cost_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "tier1_cost_plan_correction": "evidence/PRE_M6_TIER1_COST_PLAN_CORRECTION_V1.json",
+    "tier1_cost_sources": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json",
+    "timestamp_provenance_correction": "evidence/PRE_M6_ARTIFACT_TIMESTAMP_PROVENANCE_CORRECTION_V1.json",
+    "tier1_quote_execution_semantic_correction": "evidence/PRE_M6_QUOTE_EVIDENCE_EXECUTION_AUTHORITY_CORRECTION_V1.json",
+    "tier1_execution_cost_calibration_protocol": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+    "tier1_cost_capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+    "tier1_cost_calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V1.json"
+  },
+  "governing_law": [
+    "ONE_BLOCKED_CANDIDATE_DOES_NOT_BLOCK_AN_INDEPENDENTLY_READY_CANDIDATE",
+    "BLOCKED_EVIDENCE_IS_NOT_ECONOMIC_FAILURE",
+    "NO_STAGE_A_OUTCOME_OPENS_IN_THIS_CHECKPOINT",
+    "STAGE_B_EUR200_IS_DEFERRED_UNTIL_DISCOVERY_SURVIVOR",
+    "C006_SESSION_STATE_MUST_BE_EXACTLY_REPRODUCIBLE_FROM_SCHEDULED_GRID_AND_OBSERVED_BARS",
+    "C012_STRICT_SYNCHRONIZED_OBSERVED_EVENT_SEMANTICS_UNCHANGED",
+    "GENERIC_QUOTE_REFRESH_EVIDENCE_IS_NOT_CANDIDATE_FILL_AUTHORITY",
+    "MARKET_PROXY_TIMING_AND_QUOTE_COST_EVIDENCE_REMAIN_DISTINCT",
+    "NO_NUMERIC_QUOTE_STALENESS_OR_FILL_DELAY_RULE_IS_SELECTED_PRE_CAPTURE",
+    "VALID_QUOTE_EVIDENCE_DOES_NOT_IMPLY_A_UNIQUE_EXECUTION_FILL_RULE",
+    "POST_CAPTURE_NUMERIC_EXECUTION_RULE_MUST_NOT_BE_INVENTED_OUTSIDE_THE_PREFROZEN_CALIBRATION_PROTOCOL"
+  ],
+  "candidates": {
+    "V2-C006": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_US500_127_CASH_INDEX_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_EXACT_0930_OPEN_EXACT_PRIOR_SCHEDULED_CLOSE_FULL_26_OR_14_BAR_ATR_SESSIONS_NO_SYNTHETIC_FILL",
+      "candidate_specific_auxiliary_evidence": "PASS_NO_ADDITIONAL_NONCOST_AUXILIARY_BLOCKER_FOR_STAGE_A",
+      "discovery_cost_evidence": {
+        "historical_bid_ask_quote_evidence": "PASS_VERIFIED_TIER1_CAPTURE",
+        "entry_0945_quote_coverage": "PASS_1180_OF_1180_CAUSAL_TWO_SIDED",
+        "exit_1245_quote_coverage": "PASS_1180_OF_1180_CAUSAL_TWO_SIDED",
+        "commission": "BLOCKED_EXACT_INTERVENING_HISTORICAL_CONTINUITY_UNRESOLVED",
+        "spread": "PASS_HISTORICAL_QUOTE_EVIDENCE_NOT_FILL_TRUTH",
+        "slippage_delay": "BLOCKED_NO_PREFROZEN_UNIQUE_MARKET_PROXY_EXECUTION_BOUND",
+        "overnight_financing": "PASS_NOT_APPLICABLE_FROZEN_INTRADAY_HOLD"
+      },
+      "implementation_validity": "PASS_PRE_ECONOMIC_C006_REPLAY_HARDENED_NO_PNL",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_RULE"
+    },
+    "V2-C007": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_XAUUSD_41_SPOT_METAL_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_OBSERVED_H4_EVENT_REPLAY_NO_SYNTHETIC_BARS",
+      "candidate_specific_auxiliary_evidence": "PASS_CONTRACT_ROLL_NOT_APPLICABLE_TO_ACCEPTED_SPOT_METAL_IDENTITY",
+      "discovery_cost_evidence": "BLOCKED_TIER2_SPREAD_FINANCING_SLIPPAGE_EVIDENCE",
+      "implementation_validity": "BLOCKED_TIER2_CANDIDATE_REPLAY_NOT_MATERIALIZED",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_AND_IMPLEMENTATION_EVIDENCE"
+    },
+    "V2-C008": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_SPOTCRUDE_250_SPOT_ENERGY_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "BLOCKED_EXACT_CONTINUOUS_CONSTRUCTION_INTERACTS_WITH_HISTORICAL_EVENT_IDENTITY",
+      "candidate_specific_auxiliary_evidence": "BLOCKED_C008_HISTORICAL_SPOTCRUDE_CONTINUOUS_ROLL_CONSTRUCTION",
+      "discovery_cost_evidence": "UNRESOLVED_TIER3",
+      "implementation_validity": "DEFERRED_BEHIND_C008_AUXILIARY_BLOCKER",
+      "m6_stage_a_readiness": "BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION"
+    },
+    "V2-C009": {
+      "raw_data": "PASS_HASH_VERIFIED_REAL_GAPS_RETAINED",
+      "current_product_identity": "PASS_BTCUSD_124_SPOT_CRYPTO_CFD",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_OBSERVED_H1_EVENTS_AND_REAL_GAPS_SUFFICIENT_FOR_SESSION_AGNOSTIC_STAGE_A",
+      "candidate_specific_auxiliary_evidence": "PASS_NO_WRITTEN_MAINTENANCE_ARCHIVE_REQUIRED_FOR_CAUSAL_EVENT_REPLAY",
+      "discovery_cost_evidence": "BLOCKED_TIER2_CRYPTO_SPREAD_FINANCING_SLIPPAGE_EVIDENCE",
+      "implementation_validity": "BLOCKED_TIER2_CANDIDATE_REPLAY_NOT_MATERIALIZED",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_AND_IMPLEMENTATION_EVIDENCE"
+    },
+    "V2-C010": {
+      "raw_data": "PASS_HASH_VERIFIED",
+      "current_product_identity": "PASS_AUDJPY_11_FX_SPOT_OR_MARGIN_CFD",
+      "causal_conversion": "PASS_JPY_TO_EUR_CAUSAL_EURJPY_M15",
+      "session_event_semantics": "BLOCKED_HISTORICAL_FINANCING_ROLLOVER_SCHEDULE_IS_SIGNAL_MATERIAL",
+      "candidate_specific_auxiliary_evidence": "BLOCKED_C010_HISTORICALLY_EFFECTIVE_FINANCING_RATES_AND_MULTIPLIERS",
+      "discovery_cost_evidence": "UNRESOLVED_TIER3",
+      "implementation_validity": "DEFERRED_BEHIND_C010_FINANCING_BLOCKER",
+      "m6_stage_a_readiness": "BLOCKED_C010_HISTORICAL_FINANCING"
+    },
+    "V2-C011": {
+      "raw_data": "PASS_HASH_VERIFIED_FIVE_SHARES",
+      "current_product_identity": "PASS_FIVE_STANDARD_CASH_SHARE_CFDS",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "BLOCKED_EXACT_BROKER_SHARE_CFD_EXECUTION_SESSION_EVIDENCE_REMAINS_MATERIAL",
+      "candidate_specific_auxiliary_evidence": "BLOCKED_C011_BROKER_CFD_CORPORATE_ACTION_ADJUSTMENTS_SHORT_ELIGIBILITY_FINANCING",
+      "discovery_cost_evidence": "UNRESOLVED_TIER3",
+      "implementation_validity": "DEFERRED_BEHIND_C011_AUXILIARY_BLOCKER",
+      "m6_stage_a_readiness": "BLOCKED_C011_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
+    },
+    "V2-C012": {
+      "raw_data": "PASS_HASH_VERIFIED_US500_NAS100_M15",
+      "current_product_identity": "PASS_US500_127_NAS100_126_CASH_INDEX_CFDS",
+      "causal_conversion": "PASS_USD_TO_EUR_CAUSAL_EURUSD_M15",
+      "session_event_semantics": "PASS_CORRECTED_REFERENCE_CASH_CALENDAR_STRICT_SYNCHRONIZED_OBSERVED_M15_INTERSECTION_NO_FABRICATED_BARS",
+      "candidate_specific_auxiliary_evidence": "PASS_NO_ADDITIONAL_NONCOST_AUXILIARY_BLOCKER_FOR_STAGE_A",
+      "discovery_cost_evidence": {
+        "historical_bid_ask_quote_evidence": "PASS_VERIFIED_TIER1_CAPTURE",
+        "generic_entry_domain_quote_coverage": "PASS_EXCEPT_CAUSAL_AT_BOUNDARY_0930_LIMITATION",
+        "open_0930_first_post_quote_evidence": "PASS_DIAGNOSTIC_ONLY_NOT_FILL_AUTHORITY",
+        "commission": "BLOCKED_EXACT_INTERVENING_HISTORICAL_CONTINUITY_UNRESOLVED",
+        "spread": "PASS_HISTORICAL_QUOTE_EVIDENCE_NOT_FILL_TRUTH",
+        "slippage_delay": "BLOCKED_NO_PREFROZEN_UNIQUE_MARKET_PROXY_EXECUTION_BOUND_AND_0930_CAUSAL_STATE_LIMITATION",
+        "overnight_financing": "PASS_NOT_APPLICABLE_FROZEN_INTRADAY_HOLD"
+      },
+      "implementation_validity": "PASS_PRE_ECONOMIC_C012_REPLAY_UNCHANGED_STRICT_SYNC_NO_PNL",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_RULE"
+    }
+  },
+  "ready_candidates": [],
+  "tier1_cost_capture": {
+    "state": "ACCEPTED_HASH_VERIFIED_CALIBRATION_COMPLETE_UNRESOLVED",
+    "capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+    "calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V1.json",
+    "source_uploaded_bundle_sha256": "f187010d55a6f444827592e23158187c3985c5c3af4631f4e31c53c8a84a1360",
+    "canonical_repack_sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad",
+    "raw_chunk_count": 4912,
+    "raw_tick_rows": 272842293,
+    "raw_chunks_retained_locally": true,
+    "raw_local_deletion_authorized": false,
+    "derived_boundary_files": 2,
+    "historical_quote_spread_evidence": "PASS",
+    "execution_fill_rule": "UNRESOLVED",
+    "numeric_conservative_execution_bound_frozen": false,
+    "commission_continuity": "UNRESOLVED",
+    "candidate_market_proxy_mutated": false,
+    "orders": false,
+    "account_mutation": false,
+    "economics": false,
+    "active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json"
+  },
+  "global_m6_economics_authorized": false,
+  "exact_next_action": "No further user capture is required. Preserve .m6_cost_evidence_work locally. Resolve the remaining pre-outcome Tier-1 execution-cost methodology/commission continuity blocker without using candidate signals, returns, PnL or protected evidence; otherwise keep C006/C012 BLOCKED. Do not run M6 economics.",
+  "invariants": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  }
+}

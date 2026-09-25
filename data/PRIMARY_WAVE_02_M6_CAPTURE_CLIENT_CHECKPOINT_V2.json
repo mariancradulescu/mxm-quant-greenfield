@@ -1,0 +1,113 @@
+{
+  "schema": "mxm.greenfield.v2.m6-ctrader-final-pre-run-hardening-checkpoint.v2",
+  "status": "FINAL_PRE_RUN_HARDENING_COMPLETE_EXTERNAL_PYDROID_EXECUTION_REQUIRED",
+  "staging_parent_head": "45fa613ce811510b4b3f43615f796342ce94c1fe",
+  "supersedes": {
+    "path": "data/PRIMARY_WAVE_02_M6_CAPTURE_CLIENT_CHECKPOINT_V1.json",
+    "preserved_unchanged": true,
+    "reason": "FINAL_PRE_RUN_RUNTIME_HARDENING_ONLY_NO_CAPTURE_NO_ECONOMICS"
+  },
+  "active_plan": "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json",
+  "active_plan_sha256": "da9e9a65f5c8b3e9a3edb0189de6d60bee2b5cc922d0a3ea99c1dc14ef5066fa",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "development_interval_end": "2026-09-16T23:59:59Z",
+  "oauth": {
+    "provider": "cTrader Open API",
+    "browser_authorization": true,
+    "scope": "accounts",
+    "trading_scope_requested": false,
+    "automatic_scope_escalation": false,
+    "username_password_collected_by_python": false
+  },
+  "source_environment": "Pepperstone - Europe LIVE",
+  "capture_contract": {
+    "unique_primary_raw_series": 11,
+    "candidate_bindings": 12,
+    "c006_c012_share_one_us500_m15_raw_capture": true,
+    "candidate_identities_modified": false,
+    "economic_logic_modified": false,
+    "exact_development_completion_boundary_enforced": true,
+    "bar_availability_rule": "BAR_COMPLETION_TIMESTAMP_LTE_EXACT_DEVELOPMENT_END_AND_LT_PROTECTED_FORWARD_START",
+    "completion_rule_applies_to": ["M15", "H1", "H4", "D1"],
+    "completed_bars_only": true,
+    "utc_timestamps": true,
+    "real_gaps_preserved": true,
+    "resampling": false,
+    "synthetic_bars": false,
+    "forward_fill": false,
+    "resume_hash_verified_chunks": true,
+    "read_only_accounts_scope": true,
+    "orders_forbidden": true,
+    "account_mutation_forbidden": true,
+    "protected_forward_opened": false
+  },
+  "runtime_hardening": {
+    "user_visible_chunk_progress": true,
+    "progress_fields": [
+      "overall_percent", "stage", "instrument", "timeframe", "series_percent",
+      "completed_windows", "completed_chunks", "historical_requests_completed",
+      "rows_captured", "elapsed", "effective_requests_per_second", "resume_reused_chunks"
+    ],
+    "eta_only_when_defensible": true,
+    "official_historical_limit_requests_per_second_per_connection": 5,
+    "normal_historical_request_interval_seconds": 0.21,
+    "normal_historical_target_requests_per_second": 4.761904761904762,
+    "arbitrary_extra_sleep_added": false,
+    "extra_wait_only_for": ["SERVER_API_BACKOFF", "RETRY_AFTER_ERROR", "RECONNECT", "RATE_LIMIT_PROTECTION"],
+    "official_sdk_idle_heartbeat_path_verified_in_preflight": true,
+    "heartbeat_requires_market_subscription": false,
+    "github_actions_installs_pinned_runtime_dependencies": true,
+    "github_actions_compiles_actual_runtime_files": true,
+    "github_actions_no_credential_runtime_import_preflight": true,
+    "real_broker_integration_test_claimed_in_ci": false,
+    "launcher_local_preflight_before_oauth": true,
+    "preflight_fail_closed_before_oauth_capture": true
+  },
+  "deployment_package": {
+    "name": "MXM_M6_CAPTURE_PYDROID_PACKAGE.zip",
+    "deterministic": true,
+    "credentials_included": false,
+    "tokens_included": false,
+    "local_config_included": false,
+    "work_cache_included": false,
+    "readme_run_included": true
+  },
+  "final_evidence_bundle": {
+    "required_single_transferable_zip": true,
+    "contains_primary_raw_market_data": true,
+    "contains_auxiliary_raw_data_actually_captured": true,
+    "contains_broker_mapping_evidence": true,
+    "contains_sanitized_account_symbol_evidence": true,
+    "contains_expected_margin_evidence_or_status": true,
+    "contains_gap_diagnostics": true,
+    "contains_provenance_manifest": true,
+    "contains_candidate_bindings": true,
+    "contains_bundle_manifest": true,
+    "contains_checksums": true,
+    "local_secret_work_cache_paths_forbidden": true
+  },
+  "expected_final_capture_zip": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8.zip",
+  "frozen_rules_preserved": {
+    "legacy_contamination_boundary": true,
+    "development_classification": true,
+    "protected_timestamp": true,
+    "pepperstone_live_target": true,
+    "search_budget": true,
+    "candidate_identities": true,
+    "shared_us500_raw_identity": true
+  },
+  "actual_execution": {
+    "broker_capture_run": false,
+    "actual_broker_bytes_materialized": false,
+    "data_manifest_mutated": false,
+    "m6_economics_run": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false,
+    "m6_status": "PENDING"
+  }
+}

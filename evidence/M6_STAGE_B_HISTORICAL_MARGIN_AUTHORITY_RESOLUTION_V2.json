@@ -1,0 +1,85 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-historical-margin-authority-resolution.v2",
+  "status": "UNRESOLVED_NO_DEFENSIBLE_HISTORICAL_MARGIN_UPPER_BOUND",
+  "scope": "V2-C006_V2-C012_STAGE_B_PRE_OUTCOME_MARGIN_ONLY",
+  "capture_acceptance_ref": "data/M6_STAGE_B_MARGIN_HISTORY_CAPTURE_ACCEPTANCE_V1.json",
+  "frozen_stage_b_policy_ref": "data/M6_STAGE_B_TIER1_EVALUATOR_POLICY_V1.json",
+  "evidence_assessment": {
+    "account_native_target_margin_rate_observations": 0,
+    "account_native_result": "UNRESOLVED_NO_ACCOUNT_NATIVE_HISTORICAL_MARGIN_OBSERVATIONS",
+    "current_expected_margin_classification": "CURRENT_ONLY_NOT_HISTORICAL_AUTHORITY",
+    "current_dynamic_leverage_classification": "CURRENT_ONLY_NOT_HISTORICAL_AUTHORITY"
+  },
+  "official_public_evidence": [
+    {
+      "authority": "CySEC PS-04-2019",
+      "url": "https://www.cysec.gov.cy/en-GB/public-info/policy-statements/84887/",
+      "fact": "CySEC adopted ESMA-equivalent retail leverage limits; major indices require at least 5% initial margin / maximum 20:1 leverage.",
+      "role": "REGULATORY_MINIMUM_MARGIN_ONLY_NOT_BROKER_HISTORICAL_UPPER_BOUND"
+    },
+    {
+      "authority": "ESMA CFD product intervention",
+      "url": "https://www.esma.europa.eu/press-news/esma-news/esma-adopts-final-product-intervention-measures-cfds-and-binary-options",
+      "fact": "Major indices are capped at 20:1 leverage for retail CFD opening positions.",
+      "role": "REGULATORY_MINIMUM_MARGIN_ONLY_NOT_BROKER_HISTORICAL_UPPER_BOUND"
+    },
+    {
+      "authority": "Pepperstone EU margin guide",
+      "url": "https://pepperstone.com/en-eu/learn-to-trade/trading-guides/margin-in-cfd-trading/",
+      "fact": "Pepperstone states index margin is around 5% and that margin/leverage can depend on market conditions, regulation, trade size, instrument and account currency.",
+      "role": "CURRENT_GENERAL_GUIDANCE_EXPLICITLY_VARIABLE_NOT_HISTORICAL_UPPER_BOUND"
+    }
+  ],
+  "reasoning": {
+    "regulatory_5_percent_is_a_minimum_required_margin_not_a_maximum_required_margin": true,
+    "using_5_percent_as_historical_exact_margin_would_be_optimistic": true,
+    "current_margin_or_leverage_backfill_into_2022_2026_forbidden": true,
+    "broker_could_have_required_more_margin_historically": true,
+    "therefore_conservative_historical_max_required_margin_eur_not_proven": true
+  },
+  "forbidden_promotions": [
+    "DO_NOT_TREAT_20_TO_1_REGULATORY_MAX_LEVERAGE_AS_PROOF_PEPPERSTONE_ALWAYS_OFFERED_20_TO_1",
+    "DO_NOT_TREAT_CURRENT_EXPECTED_MARGIN_AS_2022_2026_POINT_IN_TIME_MARGIN",
+    "DO_NOT_INFER_MISSING_MARGIN_RATE_FROM_CURRENT_DYNAMIC_LEVERAGE",
+    "DO_NOT_RUN_STAGE_B_ECONOMICS_WHILE_GATE_IS_UNRESOLVED"
+  ],
+  "exact_resolution_needed": "Broker-specific historical point-in-time margin schedule or another pre-outcome defensible conservative upper bound applicable to US500/NAS100 at the frozen 10-cent volume throughout 2022-01-03 through 2026-09-16.",
+  "accounting": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "v2_search_budget": 84,
+    "v2_search_budget_remaining": 82,
+    "stage_b_outcomes_opened": 0,
+    "new_attempt_consumed": false,
+    "protected_evidence_opened": false
+  },
+  "conclusion": {
+    "historical_margin_gate": "UNRESOLVED",
+    "historical_margin_authority_frozen": false,
+    "stage_b_execution_authorized": false,
+    "stage_b_economics_may_run": false,
+    "user_recapture_same_package_required": false
+  },
+  "supersedes": {
+    "ref": "evidence/M6_STAGE_B_HISTORICAL_MARGIN_AUTHORITY_RESOLUTION_V1.json",
+    "git_blob_sha1": "7d9535f6cd766ebc1c14a90b38b5045b365a1031",
+    "preservation": "APPEND_ONLY_V1_UNCHANGED"
+  },
+  "correction": {
+    "type": "EVIDENCE_AUTHORITY_SEMANTIC_CORRECTION",
+    "field": "reasoning.using_5_percent_as_historical_exact_margin_would_be_optimistic",
+    "v1_value": false,
+    "corrected_value": true,
+    "rationale": "A regulatory 5% initial-margin floor does not cap broker-required historical margin. Treating unknown historical margin as exactly 5% can understate required margin and make EUR200 feasibility easier, so the assumption is optimistic."
+  },
+  "logical_consistency": {
+    "premises": {
+      "regulatory_5_percent_is_minimum_only": true,
+      "broker_could_have_required_more_margin_historically": true,
+      "exact_5_percent_would_be_optimistic": true
+    },
+    "implication": "HISTORICAL_UPPER_BOUND_REMAINS_UNRESOLVED",
+    "implication_satisfied": true
+  }
+}

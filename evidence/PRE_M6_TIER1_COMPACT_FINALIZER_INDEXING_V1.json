@@ -1,0 +1,71 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-tier1-compact-finalizer-indexing.v1",
+  "status": "PRE_OUTCOME_FINALIZER_PERFORMANCE_CORRECTION_NO_RESEARCH_SEMANTIC_CHANGE",
+  "observed_behavior": {
+    "prior_tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
+    "raw_chunks_verified": 4912,
+    "stage": "FINALIZE_2_OF_4_US500_BOUNDARY_DERIVATION",
+    "visible_partial_tmp_bytes": 339000,
+    "issue": "No progress heartbeat and repeated full-list scans for each M15 boundary made derivation unnecessarily slow on Android."
+  },
+  "root_cause": {
+    "old_complexity": "Repeated O(n) list scans for latest-at/before, first-at/after and both-side refresh at each boundary, plus causal merged-state construction.",
+    "corrected_complexity": "O(n) per-session index construction plus O(log n) indexed lookups per generic M15 boundary.",
+    "evidence_semantics_changed": false
+  },
+  "corrected_runtime": {
+    "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT2_INDEXED",
+    "raw_reacquisition": false,
+    "local_raw_chunks_reused": true,
+    "boundary_lookup": "BoundaryQuoteIndex using bisect",
+    "causal_state_rule_unchanged": true,
+    "first_post_bid_rule_unchanged": true,
+    "first_post_ask_rule_unchanged": true,
+    "first_post_any_rule_unchanged": true,
+    "both_sides_refresh_classification": "QUOTE_REFRESH_DIAGNOSTIC_ONLY",
+    "heartbeat": {
+      "every_weekday_windows": 25,
+      "fields": [
+        "symbol",
+        "percent",
+        "sessions",
+        "rows",
+        "elapsed_minutes"
+      ]
+    }
+  },
+  "resume_migration": {
+    "allowed_previous_tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_COMPACT1",
+    "requirement": "Exact V3 semantic contract match plus SHA256 verification of every completed raw chunk.",
+    "expected_reused_chunks": 4912,
+    "partial_transfer_output_reused": false,
+    "behavior": "Partial transfer-output directory is deleted and compact derived evidence is regenerated from verified local raw chunks."
+  },
+  "unchanged": {
+    "active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+    "raw_chunk_bytes": true,
+    "raw_acquisition_domain": true,
+    "target_symbols": {
+      "US500": 127,
+      "NAS100": 126
+    },
+    "quote_types": [
+      "BID",
+      "ASK"
+    ],
+    "candidate_specs": true,
+    "calibration_protocol": true,
+    "ledger": true,
+    "search_budget": true,
+    "protected_boundary": true,
+    "economics": true
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

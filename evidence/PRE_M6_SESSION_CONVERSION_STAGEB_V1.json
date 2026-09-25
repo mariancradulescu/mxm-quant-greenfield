@@ -1,0 +1,98 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-session-conversion-stageb-evidence.v1",
+  "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+  "accepted_capture_ref": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+  "data_manifest_ref": "data/DATA_MANIFEST.json",
+  "session_evidence": {
+    "reference_cash_session": {
+      "exchange": "Nasdaq",
+      "regular_hours_et": "09:30-16:00",
+      "state": "VERIFIED_REFERENCE_RULE",
+      "historical_calendar_sources": {
+        "2022": "NASDAQ_TRADING_CALENDAR_2022",
+        "2023": "NASDAQ_TRADING_CALENDAR_2023",
+        "2024": "NASDAQ_TRADING_CALENDAR_2024",
+        "2025": "NASDAQ_TRADING_CALENDAR_2025",
+        "2026": "NASDAQ_TRADING_CALENDAR_2026"
+      },
+      "historical_calendar_source_set_state": "VERIFIED_EXCHANGE_REFERENCE_SOURCE_SET"
+    },
+    "current_pepperstone": {
+      "state": "VERIFIED_CURRENT_ONLY",
+      "facts": [
+        "Current Pepperstone server timezone policy follows GMT+3 during US daylight saving and GMT+2 otherwise.",
+        "Current standard US shares are a distinct session family from 24-hour shares.",
+        "Current SpotCrude, XAUUSD, US500 and NAS100 schedules are published and also fingerprinted in accepted LIVE metadata."
+      ]
+    },
+    "historical_pepperstone_product_specific_sessions": {
+      "state": "UNRESOLVED",
+      "reason": "Current schedules and exchange calendars do not prove every 2022-2026 Pepperstone product-specific session/holiday/maintenance version. Raw bars preserve observed gaps but cannot identify every historical schedule-rule change or cause of absence."
+    },
+    "candidate_states": {
+      "V2-C006": "PARTIAL_REFERENCE_CASH_SESSION_VERIFIED_BROKER_HISTORICAL_MAPPING_UNRESOLVED",
+      "V2-C007": "UNRESOLVED_HISTORICAL_BROKER_SESSION_ROLLOVER_CUTOFFS",
+      "V2-C008": "UNRESOLVED_HISTORICAL_BROKER_SESSION_MAINTENANCE_AND_ROLLOVER_CUTOFFS",
+      "V2-C009": "PARTIAL_RAW_GAPS_PRESERVED_EXACT_HISTORICAL_MAINTENANCE_POLICY_UNRESOLVED",
+      "V2-C010": "UNRESOLVED_HISTORICAL_D1_CUTOFF_HOLIDAY_ROLLOVER_POLICY",
+      "V2-C011": "PARTIAL_NASDAQ_CALENDAR_VERIFIED_EXACT_PEPPERSTONE_SHARE_CFD_HISTORICAL_SESSIONS_UNRESOLVED",
+      "V2-C012": "PARTIAL_REFERENCE_CASH_SESSION_VERIFIED_EXACT_PEPPERSTONE_COMMON_HISTORICAL_INTERSECTION_UNRESOLVED"
+    }
+  },
+  "conversion_evidence": {
+    "current_broker_native_chain": {
+      "USD_to_EUR": {
+        "chain_constituent": "EURUSD",
+        "symbol_id": 1,
+        "state": "VERIFIED_CURRENT_CHAIN"
+      },
+      "JPY_to_EUR": {
+        "chain_constituent": "EURJPY",
+        "symbol_id": 3,
+        "state": "VERIFIED_CURRENT_CHAIN"
+      }
+    },
+    "historical_raw_constituents": {
+      "EURUSD": {
+        "dataset_id": "PW02-AUX-CONV-EURUSD-M15-S1",
+        "rows": 116910,
+        "csv_sha256": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+        "interval": [
+          "2022-01-03T00:00:00Z",
+          "2026-09-16T23:30:00Z"
+        ],
+        "state": "MATERIALIZED_HASH_VERIFIED_DEVELOPMENT_RAW"
+      },
+      "EURJPY": {
+        "dataset_id": "PW02-AUX-CONV-EURJPY-M15-S3",
+        "rows": 117140,
+        "csv_sha256": "2f25be36c7599937e120f9bd1f5cf44a62b3edf383e8735214f3bd58370009cf",
+        "interval": [
+          "2022-01-03T00:00:00Z",
+          "2026-09-16T23:30:00Z"
+        ],
+        "state": "MATERIALIZED_HASH_VERIFIED_DEVELOPMENT_RAW"
+      }
+    },
+    "point_in_time_chain_validity": {
+      "state": "UNRESOLVED_CURRENT_CHAIN_NOT_PROVEN_HISTORICALLY_EFFECTIVE",
+      "reason": "Historical price bytes exist, but the current SymbolsForConversion chain does not prove that the same broker-native conversion-chain membership/effectiveness applied at every historical cashflow timestamp."
+    },
+    "economic_conversion_authorized": false,
+    "no_synthetic_conversion": true
+  },
+  "stage_b_eur200": {
+    "current_expected_margin_snapshot": {
+      "state": "CAPTURED_BROKER_NATIVE_READ_ONLY_CURRENT_FOR_ALL_11",
+      "authority": "accepted capture evidence/expected_margin.json",
+      "approximate_leverage_arithmetic_used": false,
+      "economic_conclusion": "NOT_EVALUATED"
+    },
+    "frozen_candidate_contract": "stage_b_if_survivor = FROZEN_EUR200_CONTINUOUS_CAUSAL_REALIZATION",
+    "applicability_state": "DEFERRED_NOT_APPLICABLE_UNTIL_A_DISCOVERY_SURVIVOR_EXISTS",
+    "exact_causal_eur200_feasibility": "NOT_EVALUATED_PRE_STAGE_B",
+    "reason": "No Stage-A economic outcome or survivor exists. Current minimum-volume ExpectedMargin snapshots are structural evidence only and cannot replace causal executable-volume/margin evaluation at future Stage-B timestamps."
+  },
+  "protected_evidence_opened": false,
+  "economic_outcomes_opened": 0
+}

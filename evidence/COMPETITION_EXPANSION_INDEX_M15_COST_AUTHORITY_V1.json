@@ -1,0 +1,57 @@
+{
+  "schema": "mxm.greenfield.v2.competition-expansion-index-m15-cost-authority.v1",
+  "status": "FROZEN_PRE_C013_C016_OUTCOME_CONSERVATIVE_BOUND_DISCOVERY_ONLY",
+  "recorded_utc": "2026-09-21T17:50:12Z",
+  "governing_existing_authorities": {
+    "transaction_local_formula": {
+      "ref": "evidence/TIER1_DISCOVERY_TRANSACTION_LOCAL_COST_RULE_V1.json",
+      "git_blob_sha1": "64bc7a000e750cd29710b372c4e5587f1610668a"
+    },
+    "commission_policy": {
+      "ref": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
+      "git_blob_sha1": "eb4810e0cf58c5495a8ffbbf766af4066403ed39"
+    },
+    "calibration_protocol": {
+      "ref": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+      "git_blob_sha1": "ffbfe7fb0c5c9b48d490a8f71863da32f91a5762"
+    }
+  },
+  "candidate_independent_sources": {
+    "tier1_cost_canonical_bundle_sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad",
+    "preopen_supplement_bundle_sha256": "8171ce2d68fef0ac0241b88e914725c16a301e36ae836f766efff4da8aabe798",
+    "US500_M15_BOUNDARY_QUOTE_EVIDENCE_sha256": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+    "NAS100_GENERIC_BOUND_COST_SUPPORT_sha256": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+  },
+  "scope": {
+    "candidate_ids": [
+      "V2-C013",
+      "V2-C014",
+      "V2-C015",
+      "V2-C016"
+    ],
+    "traded_symbol_by_candidate": {
+      "V2-C013": "US500",
+      "V2-C014": "US500",
+      "V2-C015": "US500",
+      "V2-C016": "NAS100"
+    },
+    "eligible_transaction_boundary_et": "09:45_THROUGH_14:45_INCLUSIVE",
+    "outside_eligible_boundary": "INELIGIBLE_BY_FROZEN_CANDIDATE_SEMANTICS",
+    "missing_required_evidence": "COST_UNRESOLVED_FAIL_CLOSED"
+  },
+  "transaction_cost_proxy_formula": "causal_spread_points + abs(both_sides_refresh_midpoint - causal_midpoint)",
+  "commission_eur_per_transaction": {
+    "US500": 0,
+    "NAS100": 0
+  },
+  "candidate_inputs_used_for_this_scope_extension": {
+    "signals": false,
+    "returns": false,
+    "pnl": false,
+    "outcomes": false,
+    "protected": false
+  },
+  "certification_effect": "NONE",
+  "exact_fill_truth_claimed": false,
+  "protected_evidence_opened": false
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-pre-m6-readiness.v6",
+  "status": "TIER1_PREOUTCOME_COST_METHOD_RESOLVED_NO_USER_CAPTURE_REQUIRED",
+  "supersedes": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V5.json",
+  "authorities": {
+    "prior_readiness": "data/PRIMARY_WAVE_02_PRE_M6_READINESS_V5.json",
+    "calibration_result": "evidence/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_RESULT_V3.json",
+    "preopen_acceptance": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json",
+    "c012_applicability_gate": "evidence/C012_DISCOVERY_COST_APPLICABILITY_GATE_V1.json",
+    "commission_policy": "evidence/TIER1_DISCOVERY_COMMISSION_POLICY_COVERAGE_V1.json",
+    "tier2_next_path": "evidence/C007_C009_TIER2_COST_EVIDENCE_PATH_V1.json"
+  },
+  "candidates": {
+    "V2-C006": {
+      "execution_cost": "CONSERVATIVE_BOUND_ROUND_TRIP_13_3_US500_POINTS",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
+      "financing": "NOT_APPLICABLE",
+      "m6_stage_a_readiness": "READY_PRE_OUTCOME"
+    },
+    "V2-C007": {
+      "blocker": "TIER2_XAUUSD_SPREAD_COMMISSION_FINANCING_BOUND_AND_REPLAY_MATERIALIZATION",
+      "m6_stage_a_readiness": "BLOCKED_TIER2_EVIDENCE"
+    },
+    "V2-C008": {
+      "blocker": "C008_HISTORICAL_SPOTCRUDE_CONTINUOUS_ROLL_CONSTRUCTION",
+      "m6_stage_a_readiness": "BLOCKED_C008_HISTORICAL_CONTINUOUS_CONSTRUCTION"
+    },
+    "V2-C009": {
+      "blocker": "TIER2_BTCUSD_SPREAD_COMMISSION_FINANCING_BOUND_AND_REPLAY_MATERIALIZATION",
+      "m6_stage_a_readiness": "BLOCKED_TIER2_EVIDENCE"
+    },
+    "V2-C010": {
+      "blocker": "C010_HISTORICALLY_EFFECTIVE_FINANCING_RATES_AND_MULTIPLIERS",
+      "m6_stage_a_readiness": "BLOCKED_C010_HISTORICAL_FINANCING"
+    },
+    "V2-C011": {
+      "blocker": "C011_BROKER_CFD_CORPORATE_ACTIONS_SHORT_ELIGIBILITY_FINANCING",
+      "m6_stage_a_readiness": "BLOCKED_C011_BROKER_SPECIFIC_AUXILIARY_EVIDENCE"
+    },
+    "V2-C012": {
+      "preopen_0930": "PASS_1180_OF_1180_REAL_REFERENCE_SESSIONS",
+      "execution_cost": "CONSERVATIVE_BOUND_95_3_NAS100_POINTS_PER_SUPPORTED_TRANSACTION",
+      "nominal_round_trip": "190_6_NAS100_POINTS",
+      "applicability": "FAIL_CLOSED_UNSUPPORTED_TRANSACTION_CONTEXT_YIELDS_COST_UNRESOLVED",
+      "commission": "VERIFIED_DISCOVERY_POLICY_COVERAGE",
+      "financing": "NOT_APPLICABLE",
+      "m6_stage_a_readiness": "READY_PRE_OUTCOME_WITH_FAIL_CLOSED_COST_APPLICABILITY_GATE"
+    }
+  },
+  "ready_for_first_clean_stage_a": [
+    "V2-C006",
+    "V2-C012"
+  ],
+  "still_preoutcome_blocked": [
+    "V2-C007",
+    "V2-C008",
+    "V2-C009",
+    "V2-C010",
+    "V2-C011"
+  ],
+  "global_full_wave_complete": false,
+  "user_action_required": false,
+  "exact_next_action": "No additional user capture. Prepare the first clean M6 Stage-A economic runner for V2-C006 and V2-C012 using the frozen bounds and C012 fail-closed applicability gate; keep C007/C009 on their frozen minimum evidence paths and C008/C010/C011 blocked. Do not inspect protected evidence.",
+  "invariants": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  }
+}

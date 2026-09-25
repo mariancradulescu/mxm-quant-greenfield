@@ -1,0 +1,91 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-preopen-0930-supplement-plan.v1",
+  "status": "FROZEN_PRE_OUTCOME_INCREMENTAL_SIGNAL_BLIND",
+  "purpose": "Fill only the acquisition-domain insufficiency immediately before the 09:30 America/New_York cash-session boundary for Tier-1 index quote state. No candidate signals, returns, PnL, outcomes, or protected evidence may be used.",
+  "targets": {
+    "US500": {
+      "broker_symbol": "US500",
+      "symbol_id": 127,
+      "product_family": "CASH_INDEX_CFD"
+    },
+    "NAS100": {
+      "broker_symbol": "NAS100",
+      "symbol_id": 126,
+      "product_family": "CASH_INDEX_CFD"
+    }
+  },
+  "quote_types": [
+    "BID",
+    "ASK"
+  ],
+  "development_interval": {
+    "start_date": "2022-01-03",
+    "end_date": "2026-09-16",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "protected_boundary_excluded": true
+  },
+  "acquisition_domain": {
+    "timezone": "America/New_York",
+    "weekday_envelope_local": [
+      "09:15:00.000",
+      "09:29:59.999"
+    ],
+    "weekday_rule": "MONDAY_THROUGH_FRIDAY_INCLUSIVE",
+    "holidays": "WINDOW IS REQUESTED SIGNAL-BLIND; EMPTY BROKER RESPONSE IS PRESERVED",
+    "early_closes": "SAME PREOPEN WINDOW; NO CANDIDATE-CONDITIONED SELECTION",
+    "full_session_tape": false,
+    "all_raw_bid_events": true,
+    "all_raw_ask_events": true,
+    "exact_event_timestamps": true,
+    "raw_hashes": true,
+    "no_signal_conditioned_windows": true,
+    "no_return_conditioned_windows": true,
+    "no_candidate_pnl_conditioned_windows": true
+  },
+  "window_rationale": [
+    "Exactly one M15 predecessor interval is aligned with the frozen M15 boundary semantics.",
+    "The existing candidate-independent Tier-1 diagnostics show ordinary quote-state ages measured in milliseconds/seconds, so a complete preceding 15-minute interval is a materially wider causal-state initialization window without reopening the full 09:30-16:00 capture.",
+    "The choice is independent of candidate signals, returns and PnL. It exists only to establish the latest BID and ASK strictly before 09:30."
+  ],
+  "official_ctrader_contract": {
+    "request": "ProtoOAGetTickDataReq",
+    "quote_enum": {
+      "BID": 1,
+      "ASK": 2
+    },
+    "max_request_window_ms": 604800000,
+    "historical_request_limit_per_second_per_connection": 5
+  },
+  "local_existing_raw": {
+    "retained_v3_path": ".m6_cost_evidence_work/tier1_us500_nas100_v3/chunks",
+    "deletion_authorized": false,
+    "optional_role": "LOCAL_DETERMINISTIC_GENERIC_BOUND_COST_FINALIZATION_ONLY; NEVER UPLOADED IN BULK"
+  },
+  "output_contract": {
+    "work_directory": ".m6_cost_evidence_work/tier1_preopen_0930_v1",
+    "returned_evidence_zip": "MXM_M6_TIER1_PREOPEN_0930_SUPPLEMENT_V1.zip",
+    "deterministic_zip": true,
+    "credentials_in_bundle": false,
+    "raw_preopen_chunks_embedded_in_transfer_zip": false,
+    "derived_preopen_0930_state_embedded": true
+  },
+  "economic_constraints": {
+    "no_candidate_signal_input": true,
+    "no_candidate_return_input": true,
+    "no_candidate_pnl_input": true,
+    "no_candidate_outcome": true,
+    "no_attempt_consumed": true,
+    "no_result_recorded": true,
+    "no_protected_evidence": true,
+    "no_orders": true,
+    "no_account_mutation": true
+  },
+  "research_state_at_freeze": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING"
+  }
+}

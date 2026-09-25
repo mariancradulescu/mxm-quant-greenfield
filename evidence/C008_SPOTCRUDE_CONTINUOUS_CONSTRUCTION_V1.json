@@ -1,0 +1,34 @@
+{
+  "schema": "mxm.greenfield.v2.c008-spotcrude-continuous-construction-evidence.v1",
+  "candidate_id": "V2-C008",
+  "spec_hash": "2df6728c2a9fe135f5a6908301a5378234a2ab08cb0c93046c3290c38f766370",
+  "canonical_instrument": "WTIUSD",
+  "accepted_current_mapping": {
+    "broker_symbol": "SpotCrude",
+    "symbol_id": 250,
+    "product_family": "SPOT_ENERGY_CFD"
+  },
+  "accepted_raw_binding_ref": "data/DATA_MANIFEST.json",
+  "source_registry_ref": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json",
+  "evidence": {
+    "verified_structural_facts": [
+      "Accepted Pepperstone LIVE identity is the SpotCrude cash/spot-energy CFD, not Crude-F or another energy product.",
+      "Pepperstone describes commodity cash CFDs as indefinite cash products derived from front-month futures with continuous charting.",
+      "Pepperstone's spot-crude methodology says normal cash US crude pricing is created by a liquidity provider from the front-month/active crude future.",
+      "Pepperstone explicitly states normal pricing logic can change under disorderly underlying-market conditions."
+    ],
+    "unresolved_historical_facts": [
+      "Exact underlying WTI futures contract/contract-id active at each historical timestamp in 2022-2026.",
+      "Exact contract-transition/roll effective timestamp for each switch in the accepted SpotCrude history.",
+      "Exact historical price-adjustment/convergence/continuity transformation applied at each switch.",
+      "Whether the applicable liquidity-provider construction changed during the DEVELOPMENT interval.",
+      "Point-in-time rule proving no future roll knowledge for each historical observation."
+    ]
+  },
+  "gate_state": "UNRESOLVED_HISTORICAL_CONTINUOUS_CONSTRUCTION",
+  "mapping_state": "PASS_CURRENT_PRODUCT_IDENTITY",
+  "raw_price_capture_state": "PASS_HASH_VERIFIED",
+  "economic_use_authorized": false,
+  "reason": "Current and published structural methodology does not supply the immutable per-event 2022-2026 roll/continuous-construction ledger required by the frozen C008 contract.",
+  "no_substitution": "Crude-F forward rollover semantics are a different broker product and may not be substituted for SpotCrude."
+}

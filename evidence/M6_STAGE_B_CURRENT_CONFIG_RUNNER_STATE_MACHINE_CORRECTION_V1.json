@@ -1,0 +1,48 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-current-config-runner-state-machine-correction.v1",
+  "status": "PASS_PRE_EXECUTION_INFRASTRUCTURE_CORRECTION_NO_ECONOMICS",
+  "scope": "CURRENT_CONFIG_RUNNER_PHASE_TRANSITION_VALIDATION_ONLY",
+  "trigger": {
+    "failed_head": "9fac6e44e1edc23f2b8ba538d07d8ba163e69f24",
+    "failed_ci_run": 35589364614,
+    "tests_run": 520,
+    "failure_count": 1,
+    "failing_test": "test_08_repository_validation_binds_new_track_and_preserves_history",
+    "failure_reason": "Runner validator accepted only PREPARED_NOT_RUN_AWAITING_INDEPENDENT_AUDIT and rejected the legitimate post-audit state AUDITED_PENDING_SINGLE_USE_AUTHORIZATION."
+  },
+  "correction": {
+    "runner_ref": "m6/stage_b_current_config_tier1_runner.py",
+    "old_runner_git_blob_sha1": "b2e45d6b8e65cf136e4ddd1b44f7c1bee6c8bba6",
+    "new_runner_git_blob_sha1": "eab768456b02ecb3b200d71266b540a446843ed5",
+    "allowed_pre_execution_states": {
+      "PREPARED_NOT_RUN_AWAITING_INDEPENDENT_AUDIT": false,
+      "AUDITED_PENDING_SINGLE_USE_AUTHORIZATION": false,
+      "AUTHORIZED_NOT_RUN": true
+    },
+    "meaning_of_boolean_values": "required execution_authorized value",
+    "economics_run_required_false_in_all_allowed_states": true,
+    "current_config_outcomes_required_zero_in_all_allowed_states": true
+  },
+  "methodology_unchanged": {
+    "current_margin_authority_changed": false,
+    "current_expected_margin_values_changed": false,
+    "candidate_specs_changed": false,
+    "signals_changed": false,
+    "thresholds_changed": false,
+    "cost_methodology_changed": false,
+    "capital_law_changed": false,
+    "sizing_changed": false,
+    "historical_margin_state_changed": false
+  },
+  "accounting": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "v2_search_budget_remaining": 82,
+    "current_config_stage_b_outcomes_opened": 0,
+    "new_attempt_consumed": false
+  },
+  "protected_evidence_opened": false,
+  "live_orders": false,
+  "competition_start": false
+}

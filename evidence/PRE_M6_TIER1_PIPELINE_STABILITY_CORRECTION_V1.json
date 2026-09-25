@@ -1,0 +1,52 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-tier1-pipeline-stability-correction.v1",
+  "status": "PRE_OUTCOME_RUNTIME_STABILITY_CORRECTION_RAW_EVIDENCE_SEMANTICS_UNCHANGED",
+  "observed_live_behavior": {
+    "previous_tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1",
+    "resume_migration_verified_chunks": 70,
+    "observed_repeated_pipeline_retries": true,
+    "observed_effective_completed_request_rate_per_second": 1.48,
+    "conclusion": "BATCH_16_SEND_THEN_DRAIN_WAS_TOO_AGGRESSIVE_FOR_LARGE_HISTORICAL_TICK_RESPONSES"
+  },
+  "corrected_runtime": {
+    "tool_version": "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE2",
+    "live_connections": 1,
+    "max_initial_batch_size": 4,
+    "send_interval_seconds": 0.21,
+    "response_timeout_seconds": 120,
+    "adaptive_fallback": "4 -> 2 -> 1 on repeated batch failure",
+    "exact_retry_error_visible": true,
+    "request_order_preserved": true,
+    "raw_acquisition_contract_changed": false
+  },
+  "resume_migration": {
+    "allowed_previous_tool_versions": [
+      "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_TICKDELTA1",
+      "MXM_M6_TIER1_COST_EVIDENCE_ANDROID_STDLIB_V3_PIPELINE1"
+    ],
+    "rule": "Reuse only when exact V3 semantic contract fields match and every completed chunk passes SHA256 verification.",
+    "silent_reuse": false
+  },
+  "official_constraints": {
+    "historical_request_ceiling_per_second_per_connection": 5,
+    "source": "https://help.ctrader.com/open-api/",
+    "connection_best_practice_source": "https://help.ctrader.com/open-api/connection/",
+    "one_live_connection_only": true
+  },
+  "safety": {
+    "orders": false,
+    "account_mutation": false,
+    "economics": false,
+    "candidate_pnl_input": false,
+    "protected_evidence": false,
+    "accepted_ohlc_rerun": false
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

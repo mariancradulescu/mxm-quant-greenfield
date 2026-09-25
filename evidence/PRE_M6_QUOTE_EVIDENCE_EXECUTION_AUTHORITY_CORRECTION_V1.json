@@ -1,0 +1,35 @@
+{
+  "schema": "mxm.greenfield.v2.pre-m6-quote-evidence-execution-authority-correction.v1",
+  "status": "NARROW_PRE_OUTCOME_SEMANTIC_CORRECTION",
+  "superseded_active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V2.json",
+  "corrected_active_plan": "data/M6_TIER1_COST_EVIDENCE_PLAN_V3.json",
+  "calibration_protocol": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "preserved_without_reopening": [
+    "NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2",
+    "C006_SESSION_COMPLETENESS",
+    "C012_SYNCHRONIZATION",
+    "CAUSAL_CONVERSION",
+    "FUTURE_WAVE_GOVERNANCE",
+    "BROKER_MAPPINGS",
+    "ACCEPTED_OHLC_DATA",
+    "CANDIDATE_SPECS_AND_HASHES",
+    "LEDGER",
+    "SEARCH_BUDGET",
+    "PROTECTED_FORWARD_BOUNDARY"
+  ],
+  "semantic_correction": [
+    "CAUSAL_STATE_AT_BOUNDARY is quote evidence, not an executed fill.",
+    "First post-boundary BID, ASK, and ANY quote events are stored independently.",
+    "BOTH_SIDES_REFRESHED_AFTER_BOUNDARY is QUOTE_REFRESH_DIAGNOSTIC_ONLY.",
+    "The 15-minute both-sides diagnostic window is not a fill-delay rule or execution authority.",
+    "No numeric quote-staleness, fill-delay, or slippage rule is frozen before candidate-independent quote dynamics are captured.",
+    "Candidate MARKET_PROXY timing/price remains distinct from cost evidence."
+  ],
+  "raw_acquisition_changed": false,
+  "candidate_specs_changed": false,
+  "candidate_hashes_changed": false,
+  "economic_outcomes_seen": 0,
+  "attempts_consumed": 0,
+  "result_recorded": 0,
+  "protected_evidence_opened": false
+}

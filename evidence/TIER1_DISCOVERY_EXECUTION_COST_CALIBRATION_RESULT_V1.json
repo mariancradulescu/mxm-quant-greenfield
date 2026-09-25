@@ -1,0 +1,269 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-discovery-execution-cost-calibration-result.v1",
+  "status": "COMPLETE_PRE_OUTCOME_CONCLUSION_UNRESOLVED",
+  "protocol_authority": "data/TIER1_DISCOVERY_EXECUTION_COST_CALIBRATION_PROTOCOL_V1.json",
+  "capture_acceptance": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json",
+  "rule_selection_used_candidate_signals": false,
+  "rule_selection_used_candidate_returns": false,
+  "rule_selection_used_candidate_pnl": false,
+  "protected_evidence_used": false,
+  "component_findings": {
+    "US500": {
+      "historical_quote_spread": {
+        "state": "VERIFIED_HISTORICAL_QUOTE_EVIDENCE_AT_GENERIC_CASH_SESSION_M15_BOUNDARIES",
+        "rows": 31752,
+        "session_dates": 1180,
+        "causal_two_sided_available": 30580,
+        "causal_two_sided_missing": 1172,
+        "negative_causal_spread_states": 0,
+        "causal_spread_points_quantiles": {
+          "p50": 0.4,
+          "p90": 0.4,
+          "p95": 0.4,
+          "p99": 0.5,
+          "p99_9": 0.7,
+          "max": 2
+        },
+        "limitation": "This verifies historical quote states, not executed fills and not a unique MARKET_PROXY execution rule."
+      },
+      "quote_dynamics": {
+        "first_post_any_available": 30573,
+        "first_post_any_missing": 1179,
+        "first_post_any_delay_ms_quantiles": {
+          "p50": 376,
+          "p90": 1731,
+          "p95": 3114.4,
+          "p99": 8151.48,
+          "p99_9": 17604.432,
+          "max": 338494
+        },
+        "refresh_available": 30573,
+        "refresh_missing": 1179,
+        "refresh_delay_ms_quantiles": {
+          "p50": 376,
+          "p90": 1732,
+          "p95": 3117.6,
+          "p99": 8164.96,
+          "p99_9": 17752.56,
+          "max": 338494
+        },
+        "negative_refresh_diagnostic_states": 2,
+        "interpretation": "Negative states occur only in asynchronous QUOTE_REFRESH_DIAGNOSTIC_ONLY evidence; they are not fill states and do not invalidate the raw capture."
+      },
+      "commission": {
+        "state": "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+        "authority": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json"
+      }
+    },
+    "NAS100": {
+      "historical_quote_spread": {
+        "state": "VERIFIED_HISTORICAL_QUOTE_EVIDENCE_AT_GENERIC_CASH_SESSION_M15_BOUNDARIES",
+        "rows": 31752,
+        "session_dates": 1180,
+        "causal_two_sided_available": 30580,
+        "causal_two_sided_missing": 1172,
+        "negative_causal_spread_states": 0,
+        "causal_spread_points_quantiles": {
+          "p50": 1,
+          "p90": 1.1,
+          "p95": 1.1,
+          "p99": 1.1,
+          "p99_9": 3.1,
+          "max": 12.5
+        },
+        "limitation": "This verifies historical quote states, not executed fills and not a unique MARKET_PROXY execution rule."
+      },
+      "quote_dynamics": {
+        "first_post_any_available": 30573,
+        "first_post_any_missing": 1179,
+        "first_post_any_delay_ms_quantiles": {
+          "p50": 139,
+          "p90": 383,
+          "p95": 476.4,
+          "p99": 861.28,
+          "p99_9": 3360.096,
+          "max": 3000517
+        },
+        "refresh_available": 30570,
+        "refresh_missing": 1182,
+        "refresh_delay_ms_quantiles": {
+          "p50": 139,
+          "p90": 384,
+          "p95": 477,
+          "p99": 862,
+          "p99_9": 3360.342,
+          "max": 336477
+        },
+        "negative_refresh_diagnostic_states": 4,
+        "interpretation": "Asynchronous refresh diagnostics include four crossed/negative states. This confirms why refresh evidence cannot be silently promoted to fill authority."
+      },
+      "commission": {
+        "state": "PARTIAL_VERIFIED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+        "authority": "evidence/TIER1_COST_EVIDENCE_SOURCES_V2.json"
+      }
+    }
+  },
+  "candidate_context_review": {
+    "V2-C006": {
+      "frozen_entry": "NEXT_VALID_M15_OPEN / MARKET_PROXY",
+      "structurally_implied_entry_boundary_et": "09:45",
+      "structurally_implied_fixed_hold_exit_boundary_et": "12:45",
+      "entry_quote_evidence": {
+        "sessions": 1180,
+        "causal_two_sided_available": 1180,
+        "negative_causal_spread_states": 0,
+        "causal_spread_points_quantiles": {
+          "p50": 0.4,
+          "p90": 0.4,
+          "p95": 0.4,
+          "p99": 0.4,
+          "p99_9": 1.2,
+          "max": 1.4
+        },
+        "causal_side_age_ms_quantiles": {
+          "p50": 400,
+          "p90": 2109.5,
+          "p95": 3368.85,
+          "p99": 6080.42,
+          "p99_9": 10097.958,
+          "max": 12480
+        },
+        "refresh_delay_ms_quantiles": {
+          "p50": 300.5,
+          "p90": 765.3,
+          "p95": 1022.05,
+          "p99": 1798.67,
+          "p99_9": 3774.596,
+          "max": 13021
+        },
+        "absolute_mid_move_to_refresh_points_diagnostic": {
+          "p50": 0.3,
+          "p90": 0.5,
+          "p95": 0.8,
+          "p99": 1.821,
+          "p99_9": 3.8642,
+          "max": 9.7
+        }
+      },
+      "exit_quote_evidence": {
+        "sessions": 1180,
+        "causal_two_sided_available": 1180,
+        "negative_causal_spread_states": 0,
+        "causal_spread_points_quantiles": {
+          "p50": 0.4,
+          "p90": 0.4,
+          "p95": 0.4,
+          "p99": 0.4,
+          "p99_9": 0.5,
+          "max": 0.5
+        },
+        "causal_side_age_ms_quantiles": {
+          "p50": 1192,
+          "p90": 6157.4,
+          "p95": 9968.85,
+          "p99": 17883.14,
+          "p99_9": 45505.184,
+          "max": 76667
+        },
+        "refresh_delay_ms_quantiles": {
+          "p50": 511.5,
+          "p90": 3541.8,
+          "p95": 6006.25,
+          "p99": 11008.61,
+          "p99_9": 14915.854,
+          "max": 23266
+        },
+        "absolute_mid_move_to_refresh_points_diagnostic": {
+          "p50": 0.2,
+          "p90": 0.3,
+          "p95": 0.5,
+          "p99": 0.721,
+          "p99_9": 1.2463,
+          "max": 1.7
+        }
+      },
+      "slippage_delay_gap_effects": {
+        "state": "UNRESOLVED",
+        "reason": "The frozen protocol explicitly classifies post-boundary refresh as diagnostic only. Historical quote dynamics are now measured, but there is no pre-outcome-authorized mapping from those diagnostics to a unique adverse MARKET_PROXY execution shortfall. Selecting one after seeing the data without a pre-frozen mapping would be a methodological invention."
+      },
+      "commission": "UNRESOLVED_CONTINUITY",
+      "discovery_cost_rule": "UNRESOLVED",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_RULE"
+    },
+    "V2-C012": {
+      "frozen_entry": "NEXT_COMMON_VALID_M15_OPEN / SINGLE_LEG_MARKET_PROXY",
+      "generic_candidate_independent_entry_domain": "09:30 through session_close_minus_60_minutes",
+      "entry_domain_rows": 27032,
+      "session_dates": 1180,
+      "open_0930_rows": 1180,
+      "causal_two_sided_available": 25860,
+      "causal_two_sided_missing": 1172,
+      "first_post_bid_available": 27030,
+      "first_post_ask_available": 27030,
+      "refresh_available": 27027,
+      "negative_refresh_diagnostic_states": 3,
+      "causal_spread_points_quantiles": {
+        "p50": 1,
+        "p90": 1.1,
+        "p95": 1.1,
+        "p99": 1.1,
+        "p99_9": 3.1,
+        "max": 12.5
+      },
+      "causal_side_age_ms_quantiles": {
+        "p50": 139,
+        "p90": 465,
+        "p95": 684,
+        "p99": 1374.41,
+        "p99_9": 3502.128,
+        "max": 2872484
+      },
+      "first_post_any_delay_ms_quantiles": {
+        "p50": 138,
+        "p90": 381,
+        "p95": 474,
+        "p99": 867,
+        "p99_9": 3816.84,
+        "max": 3000517
+      },
+      "refresh_delay_ms_quantiles": {
+        "p50": 138,
+        "p90": 382,
+        "p95": 474,
+        "p99": 867.74,
+        "p99_9": 3777.844,
+        "max": 336477
+      },
+      "open_0930_limitation": "At 09:30, causal pre-boundary two-sided state is absent in 1172/1180 sessions because the frozen raw acquisition domain begins at the cash-session boundary. First post-boundary quote evidence exists but is diagnostic and is not automatic fill authority.",
+      "slippage_delay_gap_effects": {
+        "state": "UNRESOLVED",
+        "reason": "No unique adverse MARKET_PROXY execution rule can be derived under the frozen protocol without promoting diagnostics into fill authority; 09:30 is additionally underdetermined by causal-at-boundary state."
+      },
+      "commission": "UNRESOLVED_CONTINUITY",
+      "discovery_cost_rule": "UNRESOLVED",
+      "m6_stage_a_readiness": "BLOCKED_DISCOVERY_COST_RULE"
+    }
+  },
+  "calibration_conclusion": {
+    "state": "UNRESOLVED",
+    "discovery_cost_model_mapping": "UNRESOLVED",
+    "spread_quote_evidence_acquired": true,
+    "executable_fill_truth_claimed": false,
+    "conservative_numeric_execution_bound_frozen": false,
+    "reason": [
+      "Historical BID/ASK evidence is valid and materially informative, but the pre-frozen protocol intentionally did not authorize treating quote refresh diagnostics as fills.",
+      "No pre-frozen deterministic transformation maps the observed refresh/age dynamics into a numeric MARKET_PROXY slippage/delay bound.",
+      "Index commission policy is repeatedly documented as no-separate-commission, but exact intervening historical continuity remains unresolved under the current authority.",
+      "C012 can enter at 09:30, where causal-at-boundary quote state is absent by acquisition design for almost all sessions."
+    ],
+    "no_candidate_economic_outcome_may_open": true
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

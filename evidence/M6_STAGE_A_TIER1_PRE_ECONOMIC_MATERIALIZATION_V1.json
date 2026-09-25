@@ -1,0 +1,94 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-a-tier1-pre-economic-materialization.v1",
+  "status": "PASS_FROZEN_PRE_ECONOMIC_INTENT_AND_COST_CONTEXT_MATERIALIZATION",
+  "scope": "V2-C006_V2-C012_DEVELOPMENT_ONLY_NO_PNL_NO_OUTCOME",
+  "source_semantics": {
+    "candidate_replay_runtime": "m6/tier1_candidate_replay.py",
+    "candidate_replay_runtime_git_blob_sha1": "028fa4b5bdac1058afa5ffb3e21f40ab299bf1f7",
+    "reference_calendar": "data/NASDAQ_CASH_SESSION_CALENDAR_2022_2026_V2.json",
+    "reference_calendar_git_blob_sha1": "7eb74ed9e97e7b2bf2c285737883f9b10d0432cf",
+    "causal_conversion_runtime": "m6/causal_conversion.py",
+    "causal_conversion_runtime_git_blob_sha1": "ba29e02a2250294d2c48a3cfc7b15d1f298250be",
+    "transaction_local_cost_runtime": "m6/transaction_local_cost.py",
+    "transaction_local_cost_runtime_git_blob_sha1": "10db6e016139c29262bdce0ceb29db713f632edb"
+  },
+  "accepted_inputs": {
+    "primary_reconciled_capture_bundle": {
+      "filename": "MXM_PW02_CTRADER_CAPTURE_da9e9a65f5c8_RECONCILED.zip",
+      "sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72"
+    },
+    "tier1_cost_evidence_canonical_bundle": {
+      "filename": "MXM_M6_TIER1_COST_EVIDENCE_V3_CANONICAL.zip",
+      "sha256": "43e2e1f01efa6ff06a8fa4af4aab7511d091721771637183db0be505c2174aad"
+    },
+    "preopen_supplement_bundle": {
+      "filename": "MXM_M6_TIER1_PREOPEN_0930_SUPPLEMENT_V1.zip",
+      "sha256": "8171ce2d68fef0ac0241b88e914725c16a301e36ae836f766efff4da8aabe798"
+    },
+    "files": {
+      "US500_M15": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "NAS100_M15": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "EURUSD_M15": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde",
+      "US500_TRANSACTION_LOCAL_COST": "601eedcb147021fff54f4d3bd2a43d831c455a821ddafa01a0036afe5c5485d6",
+      "NAS100_C012_TRANSACTION_LOCAL_COST": "dd4f6be917773fc580d4725d7c30ef4aabd5ec4ce19a30fdced8c5a85f4bd999"
+    }
+  },
+  "canonical_commitment_semantics": "SHA256_OVER_UTF8_CANONICAL_JSON_SORT_KEYS_TRUE_COMPACT_SEPARATORS_ENSURE_ASCII_FALSE_ALLOW_NAN_FALSE_NO_TERMINAL_NEWLINE",
+  "replay_materialization": {
+    "V2-C006": {
+      "spec_hash": "75b5cc238ed6be20e9b36201068143fa20e3c418ddb26fe7835af61039efcc49",
+      "intent_count": 108,
+      "full_intent_manifest_sha256": "6e320849ba49136b5491ecab75bc0ce5c36715a2c2202ade9d97443b41b9a515",
+      "required_transaction_cost_contexts": 216,
+      "unresolved_transaction_cost_contexts": 0,
+      "causal_eurusd_conversion_gaps": 0,
+      "readiness": "FULLY_MATERIALIZED_PRE_ECONOMIC"
+    },
+    "V2-C012": {
+      "spec_hash": "3be7fad78760ec4f37cf1473bcf2cc9696d591fad01290f2a8812e37865f9845",
+      "intent_count": 35,
+      "full_intent_manifest_sha256": "f9d0ba61346bbd9a1602fe84e73d4d374d27e9fdec0217906b2ac29f24218c8d",
+      "required_transaction_cost_contexts": 70,
+      "unresolved_transaction_cost_contexts": 0,
+      "causal_eurusd_conversion_gaps": 0,
+      "known_fail_closed_1500_context_hits": 0,
+      "readiness": "FULLY_MATERIALIZED_PRE_ECONOMIC"
+    },
+    "combined_full_intent_manifest_sha256": "a897c7cd5310e6ccaf8ab28d225fd5c16b1ebf0f043a18242efa9c74981656e7",
+    "transaction_cost_context_count": 286,
+    "transaction_cost_context_manifest_sha256": "02bf2744a6c41f6224d9913e95a36af1f2e35584e7847d3a0e79386b5a020faa"
+  },
+  "c012_fail_closed_preserved": {
+    "unsupported_boundaries": [
+      {
+        "session_date": "2024-12-31",
+        "boundary_local_et": "15:00",
+        "boundary_timestamp_ms": 1735675200000
+      },
+      {
+        "session_date": "2025-12-31",
+        "boundary_local_et": "15:00",
+        "boundary_timestamp_ms": 1767211200000
+      }
+    ],
+    "required_trade_hits": 0,
+    "outside_calibrated_domain_hits": 0,
+    "imputation_used": false
+  },
+  "forbidden_during_materialization": {
+    "candidate_pnl_computed": false,
+    "candidate_returns_computed": false,
+    "outcome_status_computed": false,
+    "attempt_consumed": false,
+    "result_recorded": false,
+    "protected_evidence_opened": false
+  },
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_economics_run": false
+  }
+}

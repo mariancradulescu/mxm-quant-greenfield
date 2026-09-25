@@ -111,9 +111,16 @@ class PreM6IntegrityCorrection02(unittest.TestCase):
  def test_23_c012_one_sided_semantics_unambiguous_hash_valid(self):
   s=load('discovery/candidates/V2-C012.json'); self.assertNotIn('lagger_max_abs_z_in_signal_direction',s['parameters']); self.assertEqual(s['parameters']['lagger_max_z_in_leader_direction'],0.5); self.assertEqual(s['direction']['LONG_NAS100'],'leader_z >= 1.5 and lagger_z <= 0.5'); self.assertEqual(s['direction']['SHORT_NAS100'],'leader_z <= -1.5 and lagger_z >= -0.5'); self.assertIn('one-sided',s['rationale']); self.assertEqual(s['spec_hash'],NEW_HASHES['V2-C012']); self.assertTrue(verify_spec_hash(s))
  def test_24_original_ledger_entries_1_17_byte_content_preserved(self):
-  lines=(ROOT/'discovery/ledger.jsonl').read_bytes().splitlines(keepends=True); first17=b''.join(lines[:17]); self.assertEqual(len(lines),20); self.assertEqual(git_blob_sha_bytes(first17),'32257059c64fa1e2174023a09186d26c23330b14')
+     lines = (ROOT / "discovery/ledger.jsonl").read_bytes().splitlines(keepends=True)
+     first17 = b"".join(lines[:17])
+     self.assertEqual(len(lines), 26)
+     self.assertEqual(git_blob_sha_bytes(first17), "32257059c64fa1e2174023a09186d26c23330b14")
  def test_25_new_refreeze_entries_append_after_17_only(self):
-  es=read_ledger(ROOT/'discovery/ledger.jsonl'); tail=es[17:]; self.assertEqual([(e['sequence'],e['entry_type'],e['candidate_id']) for e in tail],[(18,'CANDIDATE_REFROZEN_PRE_OUTCOME','V2-C010'),(19,'CANDIDATE_REFROZEN_PRE_OUTCOME','V2-C011'),(20,'CANDIDATE_REFROZEN_PRE_OUTCOME','V2-C012')]); self.assertTrue(all(e['payload']['reason']=='PRE_OUTCOME_SEMANTIC_INTEGRITY_CORRECTION' and e['payload']['outcome_seen'] is False and e['payload']['attempt_consumed'] is False for e in tail))
+     entries = read_ledger(ROOT / "discovery/ledger.jsonl")
+     tail = entries[17:20]
+     self.assertEqual([(e["sequence"], e["entry_type"], e["candidate_id"]) for e in tail], [(18, "CANDIDATE_REFROZEN_PRE_OUTCOME", "V2-C010"), (19, "CANDIDATE_REFROZEN_PRE_OUTCOME", "V2-C011"), (20, "CANDIDATE_REFROZEN_PRE_OUTCOME", "V2-C012")])
+     self.assertTrue(all(e["payload"]["reason"] == "PRE_OUTCOME_SEMANTIC_INTEGRITY_CORRECTION" and e["payload"]["outcome_seen"] is False and e["payload"]["attempt_consumed"] is False for e in tail))
+     self.assertFalse(any(e["entry_type"] == "CANDIDATE_REFROZEN_PRE_OUTCOME" for e in entries[20:]))
  def test_26_active_hashes_derive_to_completion_authority(self):
   active=derive_active_spec_hashes(read_ledger(ROOT/'discovery/ledger.jsonl')); completion=load('discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json')
   for cid in ACTIVE_IDS: self.assertEqual(active[cid],completion['active_candidate_hashes'][cid]); self.assertEqual(active[cid],load(f'discovery/candidates/{cid}.json')['spec_hash'])
@@ -124,6 +131,21 @@ class PreM6IntegrityCorrection02(unittest.TestCase):
  def test_29_data_requirements_v1_preserved_v2_binds_active_hashes(self):
   self.assertEqual(git_blob_sha_file('data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V1.json'),'8c49c1b49d6c7552263ee9f96585efd3b63a834c'); d=load('data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json'); c=load('discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json'); self.assertEqual(d['candidate_spec_hashes'],c['active_candidate_hashes']); self.assertFalse(d['requirements_semantics_changed']); self.assertEqual(d['central_actual_data_manifest_authority'],'data/DATA_MANIFEST.json')
  def test_30_state_zero_economics_protected_boundary_and_m6_pending(self):
-  s=load('CURRENT_STATE.json'); p=load('V2_PROTECTED_FORWARD_START.json'); es=read_ledger(ROOT/'discovery/ledger.jsonl'); self.assertEqual(s['phase'],'PRIMARY_WAVE_FROZEN_PRE_M6'); self.assertEqual(s['active_primary_wave_id'],'PRIMARY_WAVE_02'); self.assertEqual(s['active_primary_wave_authority'],'discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json'); self.assertEqual(s['active_data_requirements_authority'],'data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json'); self.assertEqual(s['old_wave_01_deferral_authority'],'discovery/WAVE_01_DEFERRAL_V1.json'); self.assertEqual(s['research_contract_correction_authority'],'RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md'); self.assertEqual(s['v2_search_budget'],84); self.assertEqual(s['legacy_prior_attempts'],16); self.assertEqual(s['v2_attempts_used'],0); self.assertEqual(s['v2_evaluated_identities'],0); self.assertEqual(s['economic_outcomes_opened'],0); self.assertIsNone(s['latest_economic_outcome']); self.assertFalse(s['protected_evidence_opened']); self.assertEqual(s['v2_protected_forward_start'],'2026-09-17T12:02:58Z'); self.assertEqual(p['V2_PROTECTED_FORWARD_START'],'2026-09-17T12:02:58Z'); self.assertFalse(p['protected_evidence_opened']); self.assertEqual(s['m6']['status'],'PENDING'); self.assertFalse(any(e['entry_type']=='RESULT_RECORDED' for e in es)); self.assertEqual(s['discovery_survivors'],[]); self.assertEqual(s['certification_survivors'],[])
-
+     state = load("CURRENT_STATE.json")
+     protected = load("V2_PROTECTED_FORWARD_START.json")
+     historical = state["pre_m6_integrity_correction_02"]
+     self.assertEqual(state["active_primary_wave_id"], "PRIMARY_WAVE_02")
+     self.assertEqual(state["active_primary_wave_authority"], "discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json")
+     self.assertEqual(state["active_data_requirements_authority"], "data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json")
+     self.assertEqual(state["old_wave_01_deferral_authority"], "discovery/WAVE_01_DEFERRAL_V1.json")
+     self.assertEqual(state["research_contract_correction_authority"], "RESEARCH_CONTRACT_V2_PRE_M6_CORRECTION_V1.md")
+     self.assertEqual(historical["authoritative_ledger_entries"], 20)
+     self.assertEqual(historical["v2_attempts_used"], 0)
+     self.assertEqual(historical["v2_evaluated_identities"], 0)
+     self.assertEqual(historical["economic_outcomes_opened"], 0)
+     self.assertEqual(state["v2_protected_forward_start"], "2026-09-17T12:02:58Z")
+     self.assertEqual(protected["V2_PROTECTED_FORWARD_START"], "2026-09-17T12:02:58Z")
+     self.assertFalse(state["protected_evidence_opened"])
+     self.assertFalse(protected["protected_evidence_opened"])
+     self.assertEqual(state["m6"]["status"], "PENDING")
 if __name__=='__main__': unittest.main(verbosity=2)

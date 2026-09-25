@@ -1,0 +1,152 @@
+{
+  "id": "V2-C016",
+  "mechanism": {
+    "family": "RELATIVE_VALUE_COINTEGRATION",
+    "subfamily": "CROSS_INDEX_RELATIVE_RETURN_DISPERSION_REVERSION_NO_COINTEGRATION_CLAIM"
+  },
+  "rationale": "Prospectively test dense cross-index relative-return dispersion reversion without fitting a cointegration model or threshold grid; US500 supplies context and NAS100 is the single traded leg, adding cross-market diversification and opportunity density.",
+  "universe": [
+    "US500",
+    "NAS100"
+  ],
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "dataset_binding": {
+      "source_bundle_sha256": "88c68f1724eba71ef58fe02a929c935dc1cbf4be432897db599be7b37fd4ae72",
+      "US500_M15_sha256": "e62aff5634ee2c3b9f3cbea3766a68d7a4a68b64ec9727aaa8cc757e2834fe87",
+      "NAS100_M15_sha256": "f92330927b0f41c3f6502951dbe512aa11449184916634c80e8f67f3c217eb7c",
+      "EURUSD_M15_sha256": "bce32af6ef251115d0628d746af16849a7ac23d7185a716670b0b22a4f09adde"
+    },
+    "fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "resolution": "M15",
+    "synchronization": "STRICT_SAME_OBSERVED_TIMESTAMP_INTERSECTION_IN_REFERENCE_CASH_SESSION"
+  },
+  "causal_availability": {
+    "decision_uses": "completed synchronized M15 bars only",
+    "entry_uses": "next common exact observed M15 open",
+    "future_information_forbidden": true,
+    "rolling_state": "only current and prior synchronized completed bars"
+  },
+  "features": [
+    {
+      "name": "us500_return_4",
+      "formula": "US500_close_t / US500_close_t_minus_4 - 1"
+    },
+    {
+      "name": "nas100_return_4",
+      "formula": "NAS100_close_t / NAS100_close_t_minus_4 - 1"
+    },
+    {
+      "name": "relative_return_4",
+      "formula": "nas100_return_4 - us500_return_4"
+    }
+  ],
+  "lookbacks": [
+    {
+      "bars": 4,
+      "feature": "cross_index_relative_return_4"
+    }
+  ],
+  "normalization_training": {
+    "mode": "NONE",
+    "future_normalization": false
+  },
+  "timing": {
+    "decision": "EACH_ELIGIBLE_SYNCHRONIZED_CASH_SESSION_M15_BAR_CLOSE",
+    "entry": "NEXT_COMMON_VALID_M15_OPEN"
+  },
+  "direction": {
+    "SHORT_NAS100": "relative_return_4 > 0",
+    "LONG_NAS100": "relative_return_4 < 0",
+    "NO_OP": "relative_return_4 == 0_or_unavailable"
+  },
+  "entry": {
+    "type": "SINGLE_LEG_MARKET_PROXY",
+    "traded_symbol": "NAS100",
+    "signal_context_symbol": "US500",
+    "price": "NAS100_next_common_valid_M15_open"
+  },
+  "exit": {
+    "type": "FIXED_HOLD",
+    "fixed_hold_intent": "SCHEDULED_AT_ENTRY",
+    "price": "NAS100_close_of_4th_common_executable_M15_bar_including_entry"
+  },
+  "maximum_hold": {
+    "unit": "COMMON_EXECUTABLE_M15_BARS_INCLUDING_ENTRY",
+    "value": 4
+  },
+  "execution_assumptions": {
+    "broker_cost_policy_ref": "evidence/COMPETITION_EXPANSION_INDEX_M15_COST_AUTHORITY_V1.json",
+    "broker_symbol_mapping_required_before_economics": true,
+    "discovery_only": true,
+    "missing_bars": "do_not_fabricate",
+    "ohlc_only": true,
+    "transaction_local_cost_missing": "COST_UNRESOLVED"
+  },
+  "filters": [
+    "BOTH_INDEX_SESSIONS_MUST_HAVE_COMPLETE_OFFICIAL_M15_GRID",
+    "ENTRY_AND_EXIT_TRANSACTION_BOUNDARIES_ET_MUST_BE_BETWEEN_09_45_AND_14_45_INCLUSIVE",
+    "ENTRY_AND_EXIT_BOUNDARIES_MUST_HAVE_VALID_NAS100_TRANSACTION_LOCAL_COST_EVIDENCE"
+  ],
+  "parameters": {
+    "return_bars": 4,
+    "hold_bars": 4,
+    "relative_return_threshold": 0
+  },
+  "capital_semantics": {
+    "stage_a": "PRIMITIVE_FIXED_UNIT_NOTIONAL_NO_ALLOCATOR_OR_SIZING_RESCUE",
+    "stage_b_if_survivor": "CURRENT_CONFIG_EUR200_CONTINUOUS_CAUSAL_REALIZATION"
+  },
+  "cost_state": {
+    "state": "CONSERVATIVE_BOUND",
+    "rule": "Use exact-boundary candidate-independent generic BID/ASK evidence under evidence/COMPETITION_EXPANSION_INDEX_M15_COST_AUTHORITY_V1.json; any missing required row is COST_UNRESOLVED."
+  },
+  "cloud_portability": {
+    "required": true,
+    "representation": "FINITE_DETERMINISTIC_SYNCHRONIZED_ROLLING_RETURN_STATE"
+  },
+  "no_rescue_rule": {
+    "material_semantic_change_requires_new_identity": true,
+    "post_outcome_parameter_tuning_under_same_identity": false
+  },
+  "position_admission_policy": {
+    "max_simultaneous_active_positions_per_symbol": 1,
+    "max_simultaneous_candidate_instances": 1,
+    "new_signal_while_active": "IGNORE_NO_QUEUE",
+    "opposite_signal_while_active": "IGNORE_NO_REVERSE_NO_COEXIST",
+    "pending_exit_counts_as_active_until_fill": true,
+    "same_direction_pyramiding_allowed": false,
+    "same_timestamp_exit_and_new_entry_opportunity": "EXIT_FIRST; NEW_ENTRY_OPPORTUNITY_AT_THAT_TIMESTAMP_IS_IGNORED_WITH_NO_QUEUE",
+    "scope": "PER_CANDIDATE"
+  },
+  "stage_a_economic_unit": {
+    "broker_executable_volume_rounding": "NONE_FOR_STAGE_A_ANALYTIC_NORMALIZATION",
+    "conversion_basis": "causal quote-currency-to-EUR conversion available at or before entry; if unavailable the economic outcome remains blocked",
+    "cost_scaling_rule": "Apply prospectively bound Competition Expansion transaction-local spread/slippage evidence to this exact analytic quantity; unresolved evidence blocks the economic outcome.",
+    "entry_price_basis": "candidate entry MARKET_PROXY price",
+    "executable_volume_fact_rule": "No broker min/step/max volume is silently assumed in Stage A; EUR200 executable-volume/margin feasibility is Stage B for Stage-A survivors.",
+    "leg_count": 1,
+    "mode": "FIXED_RELATIONSHIP_GROSS_ABSOLUTE_EUR_NOTIONAL_ANALYTIC_NORMALIZATION",
+    "normalization_currency": "EUR",
+    "per_leg_absolute_entry_notional_eur": 1000,
+    "post_outcome_resizing_allowed": false,
+    "quantity_formula": "abs_units = 1000 / (entry_price_in_quote_currency * causal_quote_to_eur_rate_at_entry)",
+    "relationship_gross_absolute_entry_notional_eur": 1000
+  },
+  "provenance": {
+    "frozen_before_own_economic_outcome": true,
+    "phase": "COMPETITION_PERFORMANCE_EXPANSION",
+    "wave": "COMPETITION_EXPANSION_WAVE_01",
+    "selection_basis": "FROZEN_FUTURE_WAVE_OPPORTUNITY_COVERAGE_POLICY_PLUS_HARD21_DENSITY_GAP",
+    "selected_without_candidate_own_return_or_pnl": true,
+    "protected_evidence_used": false
+  },
+  "spec_hash": "fdd6286d1a8fdbbe53610af45c91e3f949bb75805b7cc7ab790b997c77458783"
+}

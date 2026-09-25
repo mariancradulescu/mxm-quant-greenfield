@@ -1,0 +1,97 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-cost-evidence-source-provenance.v1",
+  "retrieved_utc": "2026-09-18T09:25:00Z",
+  "scope": "PRE_OUTCOME_TIER1_US500_NAS100_COST_EVIDENCE",
+  "sources": [
+    {
+      "source_id": "CTRADER_HISTORICAL_TICK_DATA_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "Attain symbol data - historical tick data",
+      "url": "https://help.ctrader.com/open-api/symbol-data/",
+      "classification": "CURRENT_OFFICIAL_API_DOCUMENTATION",
+      "facts": [
+        "ProtoOAGetTickDataReq accepts symbolId, BID/ASK quote type, fromTimestamp and toTimestamp.",
+        "One historical tick request may not span more than 604800000 milliseconds (one week).",
+        "ProtoOAGetTickDataRes returns tickData and hasMore when the backend response is truncated.",
+        "Historical tick prices are raw tick values divided by 100000."
+      ]
+    },
+    {
+      "source_id": "CTRADER_CURRENT_RATE_LIMITS",
+      "organization": "Spotware / cTrader",
+      "title": "Open API getting started / rate limits",
+      "url": "https://help.ctrader.com/open-api/",
+      "classification": "CURRENT_OFFICIAL_API_DOCUMENTATION",
+      "facts": [
+        "Historical requests are limited to 5 requests per second per connection."
+      ]
+    },
+    {
+      "source_id": "CTRADER_TICK_MODEL_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "OpenApiModelMessages / ProtoOATickData and ProtoOAQuoteType",
+      "url": "https://github.com/spotware/openapi-proto-messages/blob/main/OpenApiModelMessages.proto",
+      "classification": "CURRENT_OFFICIAL_PROTOCOL_SCHEMA",
+      "facts": [
+        "ProtoOAQuoteType BID=1 and ASK=2.",
+        "Tick response ordering is newest first; first timestamp is absolute and later timestamps are backward differences."
+      ]
+    },
+    {
+      "source_id": "PEPPERSTONE_EU_COSTS_2022_V2",
+      "organization": "Pepperstone EU Limited",
+      "title": "CY Costs and Charges Information & Examples, Version 2.0",
+      "url": "https://files.pepperstone.com/legal/CYSEC/Costs_and_Charges_Information_Examples.pdf",
+      "classification": "OFFICIAL_HISTORICAL_BROKER_COST_DOCUMENT",
+      "document_date": "2022-09-05",
+      "facts": [
+        "For cTrader and MetaTrader, commission on index markets is reflected in the spread with no separate commission charge.",
+        "The 2022 document publishes US500 and NAS100 time-of-day trading spreads and states spreads can vary with market conditions.",
+        "The document explicitly identifies DST applicability to index trading hours."
+      ],
+      "use": "HISTORICAL_POLICY_EVIDENCE_NOT_A_REPLACEMENT_FOR_TICK_BY_TICK_SPREAD"
+    },
+    {
+      "source_id": "PEPPERSTONE_INDEX_FEES_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Index trading fees and spreads",
+      "url": "https://pepperstone.com/en/markets/indices/index-fees",
+      "classification": "CURRENT_OFFICIAL_BROKER_COST_DOCUMENT",
+      "facts": [
+        "Pepperstone currently states no commission is charged on index CFDs.",
+        "Current US500/NAS100 spread tables are recent-period statistics and are not retroactively used as historical spread paths."
+      ]
+    },
+    {
+      "source_id": "PEPPERSTONE_INDEX_MARKET_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Index CFD trading",
+      "url": "https://pepperstone.com/en/markets/indices",
+      "classification": "CURRENT_OFFICIAL_BROKER_EXECUTION_CONTEXT",
+      "facts": [
+        "Pepperstone describes current index pricing as sourced from multiple liquidity providers.",
+        "Pepperstone publishes current execution-speed/fill-rate marketing statistics; these are not historical latency guarantees."
+      ]
+    }
+  ],
+  "tier1_component_states_before_tick_capture": {
+    "US500": {
+      "separate_commission": "VERIFIED_NO_SEPARATE_INDEX_COMMISSION_EMBEDDED_IN_SPREAD_POLICY_2022_AND_CURRENT",
+      "historical_spread": "PENDING_BID_ASK_CAPTURE",
+      "slippage_delay": "PENDING_QUOTE_DYNAMICS_NO_BOUND_FROZEN_YET",
+      "overnight_financing": "NOT_APPLICABLE_TO_FROZEN_C006_INTRADAY_HOLD_IF_EXIT_BEFORE_ROLLOVER"
+    },
+    "NAS100": {
+      "separate_commission": "VERIFIED_NO_SEPARATE_INDEX_COMMISSION_EMBEDDED_IN_SPREAD_POLICY_2022_AND_CURRENT",
+      "historical_spread": "PENDING_BID_ASK_CAPTURE",
+      "slippage_delay": "PENDING_QUOTE_DYNAMICS_NO_BOUND_FROZEN_YET",
+      "overnight_financing": "NOT_APPLICABLE_TO_FROZEN_C012_INTRADAY_HOLD"
+    }
+  },
+  "non_promotion_rules": [
+    "2022 published spreads are contextual historical documentation, not a complete tick-level spread path.",
+    "Current averages/minima are not historical truth or upper bounds.",
+    "Current execution speed is not a historical slippage guarantee.",
+    "No numeric slippage bound is selected before candidate-independent quote evidence is acquired."
+  ]
+}

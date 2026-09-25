@@ -1,0 +1,107 @@
+{
+  "schema": "mxm.greenfield.v2.m6-tier1-cost-evidence-plan.v1",
+  "status": "FROZEN_PRE_OUTCOME_READ_ONLY_ACQUISITION_PLAN",
+  "frozen_utc": "2026-09-18T09:20:00Z",
+  "purpose": "Minimum generic candidate-independent historical BID/ASK evidence for Tier-1 C006/C012 Discovery cost readiness; no candidate PnL/signals/returns are consulted.",
+  "target_environment": "Pepperstone - Europe LIVE",
+  "oauth_scope": "accounts",
+  "orders": false,
+  "account_mutation": false,
+  "economics": false,
+  "targets": {
+    "US500": {
+      "canonical": "US500",
+      "broker_symbol": "US500",
+      "symbol_id": 127,
+      "required_family": "CASH_INDEX_CFD",
+      "candidate_ids": [
+        "V2-C006"
+      ]
+    },
+    "NAS100": {
+      "canonical": "NAS100",
+      "broker_symbol": "NAS100",
+      "symbol_id": 126,
+      "required_family": "CASH_INDEX_CFD",
+      "candidate_ids": [
+        "V2-C012"
+      ]
+    }
+  },
+  "quote_types": [
+    "BID",
+    "ASK"
+  ],
+  "development_interval": {
+    "start_date": "2022-01-03",
+    "end_date": "2026-09-16",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "protected_boundary_excluded": true
+  },
+  "acquisition_domain": {
+    "timezone": "America/New_York",
+    "weekday_envelope_local": [
+      "09:30:00",
+      "16:00:00"
+    ],
+    "weekday_rule": "MONDAY_THROUGH_FRIDAY_INCLUSIVE",
+    "holidays": "NOT_REMOVED_FROM_REQUEST_PLAN_EMPTY_BROKER_RESPONSE_IS_PRESERVED",
+    "early_closes": "REGULAR_ENVELOPE_STILL_REQUESTED_NO_TICKS_ARE_FABRICATED_AFTER_ACTUAL_CLOSE",
+    "rationale": "This covers every generic potentially executable regular cash-session M15 boundary independently of candidate signals. It may acquire unused quotes, which is acceptable and prevents post-signal window selection.",
+    "full_session_tape": true,
+    "no_signal_conditioned_windows": true,
+    "no_return_conditioned_windows": true
+  },
+  "c006_use": {
+    "decision_domain": "authoritative regular US cash-session calendar intersected with actual observed US500 M15 event availability",
+    "cost_domain": "all generic regular-session quote events in frozen acquisition envelope",
+    "no_signal_selection": true
+  },
+  "c012_use": {
+    "decision_domain": "authoritative regular US cash-session calendar intersected with synchronized actual US500/NAS100 M15 observations",
+    "cost_domain": "all generic regular-session quote events for both broker products",
+    "no_signal_selection": true
+  },
+  "official_ctrader_contract": {
+    "request": "ProtoOAGetTickDataReq",
+    "response": "ProtoOAGetTickDataRes",
+    "quote_enum": {
+      "BID": 1,
+      "ASK": 2
+    },
+    "max_request_window_ms": 604800000,
+    "response_order": "NEWEST_FIRST_ABSOLUTE_TIMESTAMP_THEN_BACKWARD_DELTAS",
+    "pagination": "hasMore",
+    "historical_request_limit_per_second_per_connection": 5,
+    "implemented_min_request_interval_seconds": 0.21
+  },
+  "pagination_policy": {
+    "method": "BACKWARD_TIMESTAMP_WINDOW_WITH_OLDEST_TIMESTAMP_OVERLAP",
+    "rule": "When hasMore=true, re-request ending at the oldest decoded timestamp to retain boundary-ms evidence. If oldest timestamp fails to move on the next page, decrement by 1ms to guarantee progress and record the fallback.",
+    "dedupe": "EXACT_TIMESTAMP_PLUS_RAW_TICK_STATE_ONLY",
+    "no_future_fill": true
+  },
+  "spread_reconstruction": {
+    "event_order": "CHRONOLOGICAL",
+    "current_bid": "latest BID observation <= t only",
+    "current_ask": "latest ASK observation <= t only",
+    "emit_after_both_sides_seen": true,
+    "future_side_fill": false,
+    "spread_formula": "ask - bid"
+  },
+  "resume_and_provenance": {
+    "chunk_unit": "symbol x quote-side x session-date",
+    "chunk_hash": "SHA256",
+    "reuse_only_if_hash_matches": true,
+    "deterministic_final_zip": true,
+    "credentials_in_bundle": false
+  },
+  "economic_constraints": {
+    "no_candidate_outcome": true,
+    "no_attempt_consumed": true,
+    "no_result_recorded": true,
+    "no_protected_evidence": true,
+    "no_cost_bound_selected_by_candidate_pnl": true
+  },
+  "plan_sha256": null
+}

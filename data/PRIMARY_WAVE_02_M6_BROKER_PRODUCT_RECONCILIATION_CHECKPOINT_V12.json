@@ -1,0 +1,99 @@
+{
+  "schema": "mxm.greenfield.v2.m6-broker-product-reconciliation-checkpoint.v12",
+  "status": "STRUCTURAL_RECONCILIATION_COMPLETE_EXTERNAL_PEPPERSTONE_LIVE_PREFLIGHT_REQUIRED",
+  "staging_parent_head": "17c3a79ad7ec9b16dfc7d1c4d4c7d4c343efd080",
+  "authoritative_main_head_at_reconciliation": "a1fb3aa93f2724d21ea8241ee32228f3f38ccfea",
+  "active_plan": "data/PRIMARY_WAVE_02_MATERIALIZATION_PLAN_V2.json",
+  "active_plan_sha256": "da9e9a65f5c8b3e9a3edb0189de6d60bee2b5cc922d0a3ea99c1dc14ef5066fa",
+  "source_provenance": "evidence/BROKER_PRODUCT_IDENTITY_SOURCES_V1.json",
+  "broker_product_bridge_policy": "evidence/BROKER_PRODUCT_IDENTITY_BRIDGE_V1.json",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "implementation": {
+    "complete_current_light_symbol_inventory": true,
+    "include_archived_symbols": true,
+    "assets": true,
+    "asset_classes": true,
+    "symbol_categories": true,
+    "full_metadata_for_structurally_relevant_products": true,
+    "complete_product_taxonomy": true,
+    "perpetual_precedence": true,
+    "forward_futures_precedence": true,
+    "standard_vs_extended_share_separation": true,
+    "all_11_resolved_before_auxiliary_or_historical_capture": true,
+    "complete_all_11_matrix_on_success_or_failure": true,
+    "current_catalog_output": "evidence/broker_product_catalog_current.json",
+    "current_mapping_not_historical_truth": true,
+    "archived_never_replaces_current": true,
+    "conversion_chain": "ProtoOASymbolsForConversionReq",
+    "expected_margin": "ProtoOAExpectedMarginReq_CURRENT_MINIMUM_EXECUTABLE_VOLUME_STRUCTURAL_EVIDENCE_ONLY",
+    "eur200_feasibility": "UNRESOLVED_UNTIL_CAUSAL_EXECUTABLE_STAGE_B_QUANTITY",
+    "historical_market_data": "ProtoOAGetTrendbarsReq_ONLY_AFTER_11_OF_11_PASS",
+    "historical_tick_data": "REVIEWED_NOT_ACQUIRED_NO_CURRENT_FROZEN_JUSTIFICATION",
+    "oauth_scope": "accounts",
+    "trading_requests_present": false
+  },
+  "expected_current_public_name_bridge": {
+    "US500": "US500",
+    "NAS100": "NAS100",
+    "XAUUSD": "XAUUSD",
+    "WTIUSD": "SpotCrude",
+    "BTCUSD": "BTCUSD",
+    "AUDJPY": "AUDJPY",
+    "AAPL": "AAPL.US",
+    "MSFT": "MSFT.US",
+    "NVDA": "NVDA.US",
+    "AMZN": "AMZN.US",
+    "META": "META.US"
+  },
+  "live_binding_rule": "LIVE Pepperstone Europe account metadata is authoritative. Public names are corroboration only. Exact symbolId/product metadata are bound only during the external Pydroid preflight; ambiguity or contradiction blocks before history.",
+  "historical_evidence_still_unresolved": {
+    "V2-C006": [
+      "historical broker session/calendar versions where required"
+    ],
+    "V2-C007": [
+      "historical broker session/rollover cutoffs where required"
+    ],
+    "V2-C008": [
+      "continuous-CFD construction",
+      "underlying contract-change semantics",
+      "roll effective timestamps",
+      "adjustment semantics"
+    ],
+    "V2-C009": [
+      "historical maintenance/session gaps where not established by raw bars alone"
+    ],
+    "V2-C010": [
+      "historical financing rates/schedules",
+      "rollover multipliers",
+      "historical conversion-chain point-in-time validity"
+    ],
+    "V2-C011": [
+      "point-in-time splits",
+      "symbol changes",
+      "dividends",
+      "short eligibility",
+      "financing",
+      "historical session/holiday versions"
+    ],
+    "V2-C012": [
+      "historical broker session/calendar versions",
+      "historical conversion-chain point-in-time validity"
+    ]
+  },
+  "actual_execution": {
+    "broker_capture_run": false,
+    "actual_broker_bytes_materialized": false,
+    "data_manifest_mutated": false,
+    "m6_economics_run": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "live_orders": false,
+    "competition_start": false,
+    "m6_status": "PENDING"
+  },
+  "expected_pydroid_package": "MXM_M6_CAPTURE_PYDROID_PACKAGE.zip",
+  "promotion_to_main": false
+}

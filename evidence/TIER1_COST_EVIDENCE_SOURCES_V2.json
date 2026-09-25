@@ -1,0 +1,115 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-cost-evidence-source-provenance.v2",
+  "supersedes": "evidence/TIER1_COST_EVIDENCE_SOURCES_V1.json",
+  "scope": "PRE_OUTCOME_TIER1_US500_NAS100_COST_EVIDENCE",
+  "correction_reason": "V1 overclaimed universal historical no-separate-commission continuity from 2022 plus current endpoint evidence. V2 binds additional official annual Pepperstone EU documents and retains unresolved point-in-time continuity between documented versions.",
+  "sources": [
+    {
+      "source_id": "CTRADER_HISTORICAL_TICK_DATA_CURRENT",
+      "organization": "Spotware / cTrader",
+      "title": "Attain symbol data - historical tick data",
+      "url": "https://help.ctrader.com/open-api/symbol-data/",
+      "classification": "CURRENT_OFFICIAL_API_DOCUMENTATION",
+      "facts": [
+        "ProtoOAGetTickDataReq accepts symbolId, BID/ASK quote type, fromTimestamp and toTimestamp.",
+        "One historical tick request may not span more than 604800000 milliseconds (one week).",
+        "ProtoOAGetTickDataRes returns tickData and hasMore when the backend response is truncated.",
+        "Historical tick prices are raw tick values divided by 100000."
+      ]
+    },
+    {
+      "source_id": "CTRADER_CURRENT_RATE_LIMITS",
+      "organization": "Spotware / cTrader",
+      "title": "Open API getting started / rate limits",
+      "url": "https://help.ctrader.com/open-api/",
+      "classification": "CURRENT_OFFICIAL_API_DOCUMENTATION",
+      "facts": [
+        "Historical requests are limited to 5 requests per second per connection."
+      ]
+    },
+    {
+      "source_id": "PEPPERSTONE_EU_COSTS_2022_V2",
+      "organization": "Pepperstone EU Limited",
+      "title": "CY Costs and Charges Information & Examples, Version 2.0",
+      "url": "https://files.pepperstone.com/legal/CYSEC/Costs_and_Charges_Information_Examples.pdf?mtime=20220907114318",
+      "document_date": "2022-09-05",
+      "classification": "OFFICIAL_HISTORICAL_BROKER_COST_DOCUMENT",
+      "index_commission_fact": "For MetaTrader and cTrader, index-market commission is reflected in the spread with no separate commission charge."
+    },
+    {
+      "source_id": "PEPPERSTONE_EU_COSTS_2023_V3",
+      "organization": "Pepperstone EU Limited",
+      "title": "Costs and Charges Information & Examples, Version 3.0",
+      "url": "https://eu-assets.contentstack.com/v3/assets/bltaec35894448c7261/blte28195566b68f02b/63d89dc9b406216703ab23d1/Cost_and_Charges_-_20_January_2023.pdf",
+      "document_date": "2023-01-20",
+      "classification": "OFFICIAL_HISTORICAL_BROKER_COST_DOCUMENT",
+      "index_commission_fact": "For MetaTrader and cTrader, commission on index markets is reflected in the spread with no separate commission charge."
+    },
+    {
+      "source_id": "PEPPERSTONE_EU_COSTS_2024_V5",
+      "organization": "Pepperstone EU Limited",
+      "title": "Costs and Charges Information & Examples, Version 5.0",
+      "url": "https://eu-assets.contentstack.com/v3/assets/bltaec35894448c7261/blt37d7f8e0207bf840/675c4e780b15ee7821a1cb4d/Pepperstone_EU_Limited_Cost_and_Charges_-_December_2024_(1).pdf",
+      "document_date": "2024-12",
+      "classification": "OFFICIAL_HISTORICAL_BROKER_COST_DOCUMENT",
+      "index_commission_fact": "For all platforms, commission on index markets is reflected in the spread with no separate commission charge."
+    },
+    {
+      "source_id": "PEPPERSTONE_EU_COSTS_2025_V12",
+      "organization": "Pepperstone EU Limited",
+      "title": "Costs and Charges Information & Examples, Version 12/2025",
+      "url": "https://eu-assets.contentstack.com/v3/assets/bltaec35894448c7261/blte28195566b68f02b/Pepperstone%20EU%20Limited_%20Cost%20and%20Charges",
+      "document_date": "2025-12",
+      "classification": "OFFICIAL_HISTORICAL_BROKER_COST_DOCUMENT",
+      "index_commission_fact": "For all platforms, commission on index markets is reflected in the spread with no separate commission charge."
+    },
+    {
+      "source_id": "PEPPERSTONE_INDEX_FEES_CURRENT",
+      "organization": "Pepperstone",
+      "title": "Index trading fees and spreads",
+      "url": "https://pepperstone.com/en/markets/indices/index-fees",
+      "classification": "CURRENT_OFFICIAL_BROKER_COST_DOCUMENT",
+      "index_commission_fact": "Current policy states no commission is charged on index CFDs.",
+      "spread_limitation": "Current minimum/average spreads are recent-period statistics and are not historical DEVELOPMENT truth."
+    }
+  ],
+  "commission_continuity_assessment": {
+    "US500": {
+      "state": "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT",
+      "exact_intervening_point_in_time_continuity": "UNRESOLVED",
+      "conservative_unknown_period_commission_bound": "NOT_FROZEN",
+      "reason": "Multiple official annual/current documents consistently state no separate index commission, but this checkpoint does not possess an immutable effective-date archive proving that policy at every intervening timestamp."
+    },
+    "NAS100": {
+      "state": "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT",
+      "exact_intervening_point_in_time_continuity": "UNRESOLVED",
+      "conservative_unknown_period_commission_bound": "NOT_FROZEN",
+      "reason": "Multiple official annual/current documents consistently state no separate index commission, but this checkpoint does not possess an immutable effective-date archive proving that policy at every intervening timestamp."
+    }
+  },
+  "pre_tick_component_states": {
+    "US500": {
+      "historical_bid_ask_spread": "PENDING_CORRECTED_TIER1_CAPTURE",
+      "commission": "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+      "slippage_delay": "PENDING_CANDIDATE_INDEPENDENT_QUOTE_DYNAMICS_REVIEW",
+      "overnight_financing": "NOT_APPLICABLE_TO_FROZEN_C006_INTRADAY_HOLD_IF_EXIT_BEFORE_ROLLOVER"
+    },
+    "NAS100": {
+      "historical_bid_ask_spread": "PENDING_CORRECTED_TIER1_CAPTURE",
+      "commission": "PARTIAL_VERIFIED_DOCUMENTED_2022_2023_2024_2025_CURRENT_CONTINUITY_UNRESOLVED",
+      "slippage_delay": "PENDING_CANDIDATE_INDEPENDENT_QUOTE_DYNAMICS_REVIEW",
+      "overnight_financing": "NOT_APPLICABLE_TO_FROZEN_C012_INTRADAY_HOLD"
+    }
+  },
+  "non_promotion_rules": [
+    "Matching official policy snapshots are not silently treated as exact point-in-time continuity between document effective dates.",
+    "Current/recent average or minimum spreads are not historical paths or adverse upper bounds.",
+    "No numeric slippage bound is selected before candidate-independent quote evidence is acquired.",
+    "Unknown-period separate commission is not assumed to be zero merely because documented endpoints agree."
+  ],
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "attempts_consumed": 0,
+    "protected_evidence_opened": false
+  }
+}

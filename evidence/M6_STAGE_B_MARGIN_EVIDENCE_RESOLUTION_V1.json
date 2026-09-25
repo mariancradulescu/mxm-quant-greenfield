@@ -1,0 +1,44 @@
+{
+  "schema": "mxm.greenfield.v2.m6-stage-b-margin-evidence-resolution.v1",
+  "status": "MINIMAL_GENERIC_READ_ONLY_HISTORICAL_MARGIN_SUPPLEMENT_REQUIRED",
+  "scope": "STAGE_B_PRE_OUTCOME_STRUCTURAL_ONLY",
+  "stage_b_prep_head": "db0136d40503bd73c2d7e4b1255ba2e5f7e83543",
+  "stage_b_prep_ci_run": 35515094475,
+  "existing_evidence": {
+    "current_expected_margin": {
+      "US500_min_volume_eur": {
+        "buy": 33.38,
+        "sell": 33.38
+      },
+      "NAS100_min_volume_eur": {
+        "buy": 129.04,
+        "sell": 129.03
+      },
+      "classification": "CURRENT_BROKER_NATIVE_DIAGNOSTIC_ONLY"
+    },
+    "current_symbol_leverage_id": 53592,
+    "current_evidence_sufficient_for_2022_2026_causal_margin": false
+  },
+  "blocker": "Stage-B continuous EUR200 realization requires causal margin/free-margin admission at each historical entry. Current expected margin and current dynamic leverage cannot be retroactively asserted for 2022-2026.",
+  "minimum_extension": {
+    "plan_ref": "data/M6_STAGE_B_MARGIN_HISTORY_SUPPLEMENT_PLAN_V1.json",
+    "request_historical_deals": true,
+    "capture_proto_deal_margin_rate": true,
+    "capture_current_dynamic_leverage": true,
+    "capture_current_margin_calls": true,
+    "rerun_market_data": false,
+    "rerun_cost_evidence": false,
+    "rerun_stage_a": false,
+    "open_protected_evidence": false,
+    "open_stage_b_economics": false
+  },
+  "accounting": {
+    "economic_outcomes_opened": 2,
+    "v2_attempts_used": 2,
+    "v2_evaluated_identities": 2,
+    "search_budget_remaining": 82,
+    "new_attempt_consumed": false
+  },
+  "user_action_required": false,
+  "reason_user_action_not_yet_required": "The read-only supplement package must first be implemented and exact-head tested."
+}

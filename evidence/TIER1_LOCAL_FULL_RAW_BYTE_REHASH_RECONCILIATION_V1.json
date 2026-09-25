@@ -1,0 +1,189 @@
+{
+  "schema": "mxm.greenfield.v2.tier1-local-full-raw-byte-rehash-reconciliation.v1",
+  "status": "LOCAL_FULL_RAW_BYTE_REHASH_PASS_COMPACT_EXTERNAL_RECONCILIATION_PASS",
+  "scope": "EVIDENCE_INTEGRITY_ONLY_NO_ECONOMICS",
+  "attachments": {
+    "raw_audit_zip": {
+      "filename": "MXM_RAW_BYTES_LOCAL_AUDIT.zip",
+      "sha256": "e764ffec21f9854396be7720db33eeb0ced1a000a83c7621a2941f9241791f72",
+      "member": "MXM_RAW_BYTES_LOCAL_AUDIT.json",
+      "member_sha256": "c5e7779826121b42da2cec965fdaadb7932cb698eab4856d6c9baef786d8d4f9",
+      "member_bytes": 1942394
+    },
+    "resume_bundle_zip": {
+      "filename": "M6 V3.zip",
+      "sha256": "981b1bf8c53d707752787a3f14d1ae491ae633fe92241d078eb9d1fb90a20f73",
+      "resumes": {
+        "tier1_us500_nas100_v3/resume.json": {
+          "sha256": "68b7b8e0994290b733f00b7d38ab3279bfe728890a56730678787149b0fcd62c",
+          "bytes": 1623020
+        },
+        "tier1_preopen_0930_v1/resume.json": {
+          "sha256": "42a085b39c29c12578907fbd09bc6d37cae883fd15bd6182ff926c2e0ea0e87c",
+          "bytes": 1612274
+        }
+      }
+    }
+  },
+  "local_audit_report": {
+    "schema": "mxm.local-raw-bytes-audit.v1",
+    "completed": true,
+    "audit_method": {
+      "hash": "SHA256",
+      "raw_data_modified": false,
+      "chunk_read_bytes": 8388608,
+      "heartbeat_seconds": 5
+    },
+    "all_expected_target_directories_found": true,
+    "files_read_by_local_audit_total": 9828,
+    "bytes_read_by_local_audit_total": 16055848784,
+    "raw_chunk_files_in_reconciliation_scope": 9824,
+    "non_raw_metadata_files_also_read": 4,
+    "raw_chunk_bytes_in_reconciliation_scope": 16052613090,
+    "interpretation": "The local report enumerates 4912 raw CSV chunks plus resume.json and network_endpoint_cache.json per target. Raw reconciliation counts only the 9824 CSV chunks."
+  },
+  "reconciliation": {
+    "per_file": {
+      "raw_chunks_expected": 9824,
+      "raw_chunks_present_in_audit": 9824,
+      "raw_chunks_matched_to_original_resume_completed_records": 9824,
+      "sha256_matches": 9824,
+      "sha256_mismatches": 0,
+      "missing_chunks": 0,
+      "unexpected_chunks": 0,
+      "key_path_inconsistencies": 0,
+      "result": "PASS"
+    },
+    "tier1_original": {
+      "directory": ".m6_cost_evidence_work/tier1_us500_nas100_v3",
+      "raw_chunks": 4912,
+      "raw_chunk_bytes": 15653401714,
+      "total_committed_rows": 272842293,
+      "canonicalization": {
+        "record_sort": "key_lexicographic",
+        "json_sort_keys": true,
+        "separators": [
+          ",",
+          ":"
+        ],
+        "ensure_ascii": true,
+        "terminal_newline": false,
+        "encoding": "utf-8",
+        "source_runtime": "m6/cost_evidence_openapi.py::_raw_chunk_commitment"
+      },
+      "reconstructed_ordered_manifest_sha256": "119d05376bf4f5e67ddea6553221f80c01e9b137762c7df3cc3804d0e1633cd3",
+      "frozen_repository_ordered_manifest_sha256": "119d05376bf4f5e67ddea6553221f80c01e9b137762c7df3cc3804d0e1633cd3",
+      "aggregate_match": true,
+      "streams": {
+        "US500_BID": {
+          "chunks": 1228,
+          "rows": 29876955,
+          "reconstructed_sha256": "e9003477d5038f4fb3e81edf26ec2826dfb13f92834d1578533392d349e68395",
+          "frozen_sha256": "e9003477d5038f4fb3e81edf26ec2826dfb13f92834d1578533392d349e68395",
+          "match": true
+        },
+        "US500_ASK": {
+          "chunks": 1228,
+          "rows": 29876377,
+          "reconstructed_sha256": "46bf76d01416f71973924ac95041028d763d6d921de360daeea9fe0928de53ca",
+          "frozen_sha256": "46bf76d01416f71973924ac95041028d763d6d921de360daeea9fe0928de53ca",
+          "match": true
+        },
+        "NAS100_BID": {
+          "chunks": 1228,
+          "rows": 106545929,
+          "reconstructed_sha256": "910829ea4d2af6e65349f8e278b1786af7c803e63966ce3802f837e0b1f4e57e",
+          "frozen_sha256": "910829ea4d2af6e65349f8e278b1786af7c803e63966ce3802f837e0b1f4e57e",
+          "match": true
+        },
+        "NAS100_ASK": {
+          "chunks": 1228,
+          "rows": 106543032,
+          "reconstructed_sha256": "6800e05f69fd04c03a119806a738a32a7da11005c9de28b71a5ef518acd28811",
+          "frozen_sha256": "6800e05f69fd04c03a119806a738a32a7da11005c9de28b71a5ef518acd28811",
+          "match": true
+        }
+      },
+      "repository_authority": "data/TIER1_COST_EVIDENCE_CAPTURE_ACCEPTANCE_V1.json"
+    },
+    "tier1_preopen": {
+      "directory": ".m6_cost_evidence_work/tier1_preopen_0930_v1",
+      "raw_chunks": 4912,
+      "raw_chunk_bytes": 399211376,
+      "total_committed_rows": 6951290,
+      "canonicalization": {
+        "record_sort": "key_lexicographic",
+        "json_sort_keys": true,
+        "separators": [
+          ",",
+          ":"
+        ],
+        "ensure_ascii": false,
+        "terminal_newline": true,
+        "encoding": "utf-8",
+        "exact_expression": "(json.dumps(value, sort_keys=True, separators=(\\\",\\\", \\\":\\\"), ensure_ascii=False) + \\\"\\\\n\\\").encode(\\\"utf-8\\\")",
+        "source_runtime": "m6/_ctrader_capture_base.py::canonical_json_bytes + m6/preopen_evidence_openapi.py::_raw_commitment"
+      },
+      "reconstructed_ordered_manifest_sha256": "3b472e6a6a2ebd0ffc4e228f834e28ff8d09e2cd9a1812c2ee8ecfa2d2c876d3",
+      "frozen_repository_ordered_manifest_sha256": "3b472e6a6a2ebd0ffc4e228f834e28ff8d09e2cd9a1812c2ee8ecfa2d2c876d3",
+      "aggregate_match": true,
+      "streams": {
+        "US500_BID": {
+          "chunks": 1228,
+          "rows": 699737,
+          "reconstructed_sha256": "f21a75a5cdd1e13862ce993b3edee97cf26a7e8adc110004e1f80aaaa5d1eb16",
+          "frozen_sha256": "f21a75a5cdd1e13862ce993b3edee97cf26a7e8adc110004e1f80aaaa5d1eb16",
+          "match": true
+        },
+        "US500_ASK": {
+          "chunks": 1228,
+          "rows": 699707,
+          "reconstructed_sha256": "efc8123564cb186e17a3e7b68fca30888efa316e709d54fdfe260e0af37636a5",
+          "frozen_sha256": "efc8123564cb186e17a3e7b68fca30888efa316e709d54fdfe260e0af37636a5",
+          "match": true
+        },
+        "NAS100_BID": {
+          "chunks": 1228,
+          "rows": 2775876,
+          "reconstructed_sha256": "920ba18417bee3940fc777d32a8430ab32778b40e186979c2ff7b53b3d423ff2",
+          "frozen_sha256": "920ba18417bee3940fc777d32a8430ab32778b40e186979c2ff7b53b3d423ff2",
+          "match": true
+        },
+        "NAS100_ASK": {
+          "chunks": 1228,
+          "rows": 2775970,
+          "reconstructed_sha256": "54fbdc1284595fe29fa75f5f090748a7cd8986474a999090679741bb0c471e97",
+          "frozen_sha256": "54fbdc1284595fe29fa75f5f090748a7cd8986474a999090679741bb0c471e97",
+          "match": true
+        }
+      },
+      "repository_authority": "data/TIER1_PREOPEN_0930_SUPPLEMENT_ACCEPTANCE_V1.json"
+    }
+  },
+  "truthful_status": {
+    "LOCAL_FULL_RAW_BYTE_REHASH": "PASS",
+    "LOCAL_REHASH_VS_ORIGINAL_PER_CHUNK_SHA256": "9824/9824 PASS",
+    "FROZEN_AGGREGATE_COMMITMENT_RECONSTRUCTION": "PASS",
+    "FROZEN_PER_STREAM_COMMITMENT_RECONSTRUCTION": "PASS",
+    "RAW_BYTES_EXTERNALLY_TRANSFERRED": "NO",
+    "EXTERNAL_FULL_15GB_RAW_BYTE_REHASH": "NO",
+    "explanation": "The complete raw corpus remained local. The transferred compact audit report contains the locally recalculated per-file SHA256 values; the transferred original resume maps supply the frozen expected per-file SHA256 values. External reconciliation matched all 9824 pairs and independently reconstructed the historical aggregate and stream commitments."
+  },
+  "retention": {
+    "original_raw_deletion_authorized": false,
+    "preopen_raw_deletion_authorized": false,
+    "raw_evidence_must_be_preserved": true
+  },
+  "permanent_protocol": "data/CONTENT_ADDRESSED_LARGE_DATA_AUDIT_PROTOCOL_V1.json",
+  "research_state": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "m6_economics_run": false,
+    "live_orders": false,
+    "competition_start": false
+  }
+}

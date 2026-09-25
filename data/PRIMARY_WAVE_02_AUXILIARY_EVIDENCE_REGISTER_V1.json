@@ -1,0 +1,156 @@
+{
+  "schema": "mxm.greenfield.v2.primary-wave-02-auxiliary-evidence-register.v1",
+  "status": "PARTIAL_EVIDENCE_BOUND_M6_ECONOMICS_BLOCKED",
+  "recorded_date_utc": "2026-09-18",
+  "authorities": {
+    "active_wave": "discovery/PRIMARY_WAVE_02_PRE_OUTCOME_COMPLETION_V1.json",
+    "data_requirements": "data/PRIMARY_WAVE_02_DATA_REQUIREMENTS_V2.json",
+    "actual_data_manifest": "data/DATA_MANIFEST.json",
+    "capture_acceptance": "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json",
+    "discovery_cost_model": "DISCOVERY_COST_MODEL_V1.json",
+    "protected_forward": "V2_PROTECTED_FORWARD_START.json",
+    "source_registry": "evidence/PRE_M6_AUXILIARY_EVIDENCE_SOURCES_V1.json"
+  },
+  "evidence_artifacts": {
+    "C008": "evidence/C008_SPOTCRUDE_CONTINUOUS_CONSTRUCTION_V1.json",
+    "C010": "evidence/C010_AUDJPY_FINANCING_V1.json",
+    "C011": "evidence/C011_POINT_IN_TIME_CORPORATE_ACTIONS_V1.json",
+    "session_conversion_stage_b": "evidence/PRE_M6_SESSION_CONVERSION_STAGEB_V1.json",
+    "discovery_costs": "evidence/PRE_M6_DISCOVERY_COST_EVIDENCE_V1.json",
+    "canonical_identity_hardening": "data/PRE_M6_CANONICAL_IDENTITY_HARDENING_V1.json"
+  },
+  "capture": {
+    "state": "ACCEPTED_DO_NOT_RERUN",
+    "primary_raw_series": 11,
+    "auxiliary_conversion_series": 2,
+    "accepted_11_mappings_unchanged": true,
+    "actual_raw_hashes_unchanged": true
+  },
+  "gate_definitions": {
+    "PASS": "Frozen requirement established by applicable immutable evidence.",
+    "PARTIAL": "Some required facts established, but at least one material required fact remains unproven.",
+    "UNRESOLVED": "Evidence is insufficient; no assumption or current-state backfill is permitted.",
+    "DEFERRED_NOT_APPLICABLE": "Gate is not evaluated at the current stage under the frozen candidate contract."
+  },
+  "candidates": {
+    "V2-C006": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "reference_cash_session": "PASS",
+      "historical_pepperstone_session_mapping": "UNRESOLVED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    },
+    "V2-C007": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "contract_roll": "PASS_NOT_APPLICABLE_SPOT_METAL_PRODUCT",
+      "historical_broker_session_rollover_cutoffs": "UNRESOLVED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    },
+    "V2-C008": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "continuous_cfd_construction": "UNRESOLVED",
+      "historical_roll_effective_timestamps": "UNRESOLVED",
+      "historical_adjustment_semantics": "UNRESOLVED",
+      "historical_broker_session_maintenance": "UNRESOLVED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    },
+    "V2-C009": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "contract_roll": "PASS_NOT_APPLICABLE_SPOT_CRYPTO_PRODUCT",
+      "historical_maintenance_session_policy": "UNRESOLVED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    },
+    "V2-C010": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "historical_financing_rates": "UNRESOLVED",
+      "historical_financing_effective_timestamps": "UNRESOLVED",
+      "historical_rollover_multiplier": "UNRESOLVED",
+      "historical_d1_session_rollover_policy": "UNRESOLVED",
+      "positive_financing_credit": "FORBIDDEN_UNTIL_HISTORICALLY_VERIFIED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    },
+    "V2-C011": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "underlying_split_ticker_lineage": "PARTIAL_VERIFIED_MATERIAL_EVENTS",
+      "complete_point_in_time_dividend_event_timeline": "UNRESOLVED",
+      "exact_historical_pepperstone_cfd_dividend_adjustments": "UNRESOLVED",
+      "historical_short_eligibility_close_only": "UNRESOLVED",
+      "historical_share_financing": "UNRESOLVED",
+      "historical_pepperstone_share_sessions": "UNRESOLVED",
+      "raw_price_adjustment_reproducibility_without_future_leakage": "UNRESOLVED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    },
+    "V2-C012": {
+      "raw_market_data": "PASS",
+      "current_product_identity": "PASS",
+      "reference_cash_session": "PASS",
+      "exact_historical_pepperstone_common_session_intersection": "UNRESOLVED",
+      "currency_conversion": "UNRESOLVED",
+      "discovery_costs": "UNRESOLVED",
+      "stage_b_eur200": "DEFERRED_NOT_APPLICABLE",
+      "economic_readiness": "BLOCKED"
+    }
+  },
+  "cross_candidate_gates": {
+    "historical_conversion_chain_point_in_time_validity": "UNRESOLVED",
+    "verified_historical_discovery_costs": "UNRESOLVED",
+    "prospectively_frozen_defensible_conservative_cost_bound": "NOT_AVAILABLE_NOT_INVENTED",
+    "exact_stage_b_eur200": "DEFERRED_NOT_APPLICABLE_UNTIL_DISCOVERY_SURVIVOR",
+    "m6_stage_a_economics": "NOT_AUTHORIZED"
+  },
+  "exact_blocking_reasons": [
+    "Discovery cost confidence remains UNRESOLVED for every active PRIMARY_WAVE_02 candidate.",
+    "Historical conversion-chain point-in-time validity is not proven.",
+    "Candidate-specific historical broker session/holiday/maintenance semantics remain incomplete.",
+    "C008 continuous SpotCrude construction/roll-effective/adjustment evidence is incomplete.",
+    "C010 historical financing is incomplete and its signal cannot be evaluated honestly.",
+    "C011 broker-specific corporate-action cash adjustments, short eligibility, financing and historical sessions remain incomplete."
+  ],
+  "no_false_resolution_rules": [
+    "Current broker metadata is not historical metadata.",
+    "Current swap rates are not historical financing.",
+    "Issuer dividends are not exact Pepperstone CFD cash adjustments.",
+    "Current/recent average spreads are not historical VERIFIED paths or adverse upper bounds.",
+    "Raw missing bars are preserved but their cause is not inferred without evidence.",
+    "ExpectedMargin minimum-volume snapshots are not Stage-B EUR200 feasibility conclusions."
+  ],
+  "state_invariants": {
+    "candidate_specs_changed": false,
+    "candidate_refreeze_performed": false,
+    "ledger_mutated": false,
+    "search_budget_mutated": false,
+    "protected_forward_mutated": false,
+    "accepted_raw_bytes_mutated": false,
+    "economic_outcomes_opened": 0,
+    "v2_attempts_used": 0,
+    "v2_evaluated_identities": 0,
+    "result_recorded_count": 0,
+    "protected_evidence_opened": false,
+    "m6_status": "PENDING",
+    "live_orders": false,
+    "competition_start": false
+  }
+}
