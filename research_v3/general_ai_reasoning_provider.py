@@ -126,6 +126,7 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         "completed_capture_ref","completed_capture_plan_ref",
         "completed_structural_report_ref","duplicate_capture_supersession_ref",
         "selected_scope_feasibility_audit_ref","superseded_pre_capture_proposal_ref",
+        "scope_resolution_ref","exploratory_regime_screen_ref",
     ):
         value=next_state.get(key)
         if isinstance(value,str) and value and value not in refs:
