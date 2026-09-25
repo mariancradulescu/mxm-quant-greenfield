@@ -13,6 +13,7 @@ from research_v3.general_ai_director_bridge import (
     PROPOSAL_SCHEMA,
     _validate_authoritative_data_contract,
     _active_authoritative_data_contract,
+    _clean_next_state_for_new_ai_decision,
     _reject_completed_outer_as_unseen,
     _reject_duplicate_accepted_capture,
     _validate_broker_native_selection,
@@ -126,6 +127,33 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "FUTURE_RESEARCH_CLASS_NOT_KNOWN_TODAY",
         ):
             validate_proposal_shape(base_proposal(cls))
+
+    def test_new_ai_decision_does_not_inherit_one_shot_semantic_contract(self):
+        existing={
+            "status":"OLD",
+            "semantic_question":"old forced family question",
+            "decision_contract":{"required_family":"RELATIVE_VALUE_COINTEGRATION"},
+            "implementation_task_scope":{"phase":"OLD_PHASE"},
+            "selected_family":"RELATIVE_VALUE_COINTEGRATION",
+            "mechanism_family":"REGIME_CONTEXT_CONDITIONED",
+            "reason":"old decision-local reason",
+            "supersession_ref":"evidence/old.json",
+            "completed_structural_report_ref":"evidence/keep.json",
+            "family_result":"KEEP_RESULT_CONTEXT",
+            "accounting":{"v2_attempts_used":20},
+        }
+        proposed={"status":"NEW","next_action":"NEW_ACTION"}
+        out=_clean_next_state_for_new_ai_decision(existing,proposed)
+        for key in (
+            "semantic_question","decision_contract","implementation_task_scope",
+            "selected_family","mechanism_family","reason","supersession_ref",
+        ):
+            self.assertNotIn(key,out)
+        self.assertEqual(out["status"],"NEW")
+        self.assertEqual(out["next_action"],"NEW_ACTION")
+        self.assertEqual(out["completed_structural_report_ref"],"evidence/keep.json")
+        self.assertEqual(out["family_result"],"KEEP_RESULT_CONTEXT")
+        self.assertEqual(out["accounting"],{"v2_attempts_used":20})
 
     def test_free_form_decision_and_next_state_are_allowed(self):
         proposal = base_proposal()
