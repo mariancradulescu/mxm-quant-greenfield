@@ -39,6 +39,7 @@ def _next(root:Path)->dict[str,Any]:
     return dict(load_json(root/NEXT_STATE_REL,{}) or {})
 
 def implementation_required(next_state:Mapping[str,Any])->bool:
+    if next_state.get("status")=="MATERIAL_INTEGRITY_FAILURE" and next_state.get("integrity_gate"): return False
     if next_state.get("user_action_required") is True: return False
     if not str(next_state.get("next_action") or "").strip(): return False
     return not reasoning_required(next_state)
