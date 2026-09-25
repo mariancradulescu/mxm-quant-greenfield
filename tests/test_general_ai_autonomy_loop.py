@@ -70,6 +70,19 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                 out=run(root,max_cycles=1)
             self.assertEqual(out["status"],"PROVIDER_RETRY_REQUIRED")
 
+
+    def test_new_reasoning_waits_for_exact_head_green_without_provider_call(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            (root/"research_v3/runtime_v2_acceptance").mkdir(parents=True)
+            (root/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").write_text(
+                '{"status":"FRESH_GENERAL_AI_REASONING_REQUIRED","next_action":"AI_REASSESS","current_research_evidence_epoch":21}'
+            )
+            with patch("research_v3.general_ai_autonomy_loop.validate_repository_state",return_value={}), patch("research_v3.general_ai_autonomy_loop.stale_reasoning_redirect",return_value=None), patch("research_v3.general_ai_autonomy_loop.reasoning_required",return_value=True), patch("research_v3.general_ai_autonomy_loop.exact_head_green",return_value={"green":False}), patch("research_v3.general_ai_autonomy_loop.reason",side_effect=AssertionError("provider called before CI")):
+                out=run(root,max_cycles=1)
+            self.assertEqual(out["status"],"PENDING_EXACT_HEAD_GREEN")
+            self.assertEqual(out["progress_class"],"SAFE_NO_PROGRESS")
+
     def test_semantic_implementation_rejection_remains_fatal(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
