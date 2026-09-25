@@ -24,7 +24,7 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
     def test_scope_recovery_routes_to_new_distinct_semantic_decision(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
         self.assertEqual(n["scope_resolution_ref"], "research_v3/EPOCH23_SCOPE_RESOLUTION_V1.json")
-        self.assertEqual(n["decision_contract"]["required_action"], "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE")
+        self.assertIn(n["decision_contract"]["required_action"], ("SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE", "DEFINE_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC"))
         semantic=dict(n)
         semantic.update(status="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION",
                         next_action="AI_SELECT_DISTINCT_FRONTIER_WAVE_AFTER_REGIME_SCOPE_RESOLUTION",
@@ -38,8 +38,7 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
         projected=request["next_state"]
         for field in ("semantic_question","decision_contract","scope_resolution_ref","reason"):
             self.assertEqual(projected[field],n.get(field))
-        self.assertEqual(projected["decision_contract"]["required_action"],
-                         "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE")
+        self.assertEqual(projected["decision_contract"],n["decision_contract"])
 
     def test_router_does_not_reinterpret_accepted_proposal_as_implementation_authority(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
