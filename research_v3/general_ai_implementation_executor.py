@@ -202,12 +202,18 @@ def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,A
     payload=json.loads(json.dumps(out))
     ns=dict(payload.get("next_research_state") or {})
     if str(ns.get("status") or "").startswith("PENDING_EXACT_HEAD_GREEN"):
-        payload["next_research_state"]={
-            "status":"AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
-            "next_action":"AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-            "ai_reasoning_required":True,
-            "green_implementation_artifacts":list(changed_paths),
-        }
+        # Preserve result-specific provenance (completed report, family result, etc.)
+        # while closing implementation routing after an already-green exact head.
+        ns["status"]="AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
+        action=str(ns.get("next_action") or "")
+        if not action.upper().startswith("AI_"):
+            ns["next_action"]="AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION"
+        ns["ai_reasoning_required"]=True
+        ns["research_judgment_required"]=True
+        ns["implementation_ai_required"]=False
+        ns["user_action_required"]=False
+        ns["green_implementation_artifacts"]=list(changed_paths)
+        payload["next_research_state"]=ns
     return payload
 
 def _prompt(root:Path,next_state:Mapping[str,Any])->str:
@@ -467,16 +473,18 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
             atomic_write_json(root/RESPONSE_REL,response)
             sha=_normal_commit_push(root,"AI implement non-economic research continuation")
             return {"status":"PENDING_EXACT_HEAD_GREEN","implementation_commit":sha,"changed_paths":changed,"provider":provider}
+        accepted_out=_post_green_output(out,[])
         response={"schema":"mxm.greenfield.general-ai-implementation-response.v1","status":"IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE",
                   "executor_version":VERSION,"basis_next_state_sha256":state_hash,"implementation_output":out,
+                  "accepted_output":accepted_out,
                   "provider":provider,"changed_paths":[],"project_snapshot":before,"exact_head":green,"created_utc":iso()}
         atomic_write_json(root/RESPONSE_REL,response)
-        if out["status"]=="EXTERNAL_DATA_REQUIRED": published=_publish_external_gate(root,out,before)
-        else: published=_publish_next(root,out,before)
+        if accepted_out["status"]=="EXTERNAL_DATA_REQUIRED": published=_publish_external_gate(root,accepted_out,before)
+        else: published=_publish_next(root,accepted_out,before)
         if project_snapshot(root)!=before: raise ImplementationRejected("publication changed economic/accounting snapshot")
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_result",None)
-        return {"status":"EXTERNAL_DATA_REQUIRED" if out["status"]=="EXTERNAL_DATA_REQUIRED" else "IMPLEMENTATION_COMPLETE",
-                "output":out,"next_state":published,"provider":provider,"exact_head":green}
+        return {"status":"EXTERNAL_DATA_REQUIRED" if accepted_out["status"]=="EXTERNAL_DATA_REQUIRED" else "IMPLEMENTATION_COMPLETE",
+                "output":accepted_out,"next_state":published,"provider":provider,"exact_head":green}
     except Exception:
         _restore(root)
         raise
