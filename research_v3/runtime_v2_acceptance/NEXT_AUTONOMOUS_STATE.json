@@ -21,13 +21,6 @@
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "active_candidate_id": null,
-  "active_mechanism_family": null,
-  "active_proposal_id": null,
-  "active_target_symbol": null,
-  "active_target_symbols": [
-    "all_41_current_structural_representatives_per_registry"
-  ],
   "alignment_prerequisite_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
   "all_frontier_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
@@ -159,12 +152,10 @@
   "data_requirement": "NONE_NEW_REQUIRED_USES_EXISTING_13W_M5_CAPTURE",
   "decision_basis": "Outcome-blind governance and frontier authority; no new mechanism, symbol or panel prospectively selected.",
   "decision_contract": {
-    "require_implementation_ai": true,
+    "required_action": "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE",
     "require_no_economic_opening": true,
-    "required_action": "DEFINE_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC",
-    "required_family": "RELATIVE_VALUE_COINTEGRATION",
     "temporarily_unavailable_families": [
-      "REGIME_CONTEXT_CONDITIONED",
+      "RELATIVE_VALUE_COINTEGRATION",
       "CARRY_TERM_STRUCTURE"
     ]
   },
@@ -218,9 +209,7 @@
   },
   "execution_authorization_ref": "research_v3/C032_EXECUTION_AUTHORIZATION_V1.json",
   "exploratory_regime_screen_ref": "evidence/EPOCH23_REGIME_CONTEXT_CONDITIONED_EXPLORATORY_STRUCTURAL_SCREEN_V1.json",
-  "external_data_gate": null,
   "external_data_required": false,
-  "external_gate": null,
   "family_exhaustion": false,
   "family_exhaustion_claimed": false,
   "family_result": "NO_PAIR_PASSED_FROZEN_NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC",
@@ -232,7 +221,7 @@
   "frontier_opportunity_map_ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
   "frontier_scope": "The complete 1576-identity eligible frontier remains open; this action does not select a pair, close a mechanism family, or authorize an economic experiment.",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_ai_scope": "Novel repository code needed: (1) compute trailing 13-week rolling TR tercile regime label at each existing frozen breakout event's onset bar from already-captured 13W M5 canonical data, (2) stratify existing follow-through/persistence structural statistics by regime bucket per representative, (3) emit a new structural evidence artifact. No existing deterministic routine performs regime labeling or regime-stratified aggregation.",
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
@@ -255,17 +244,6 @@
     "regression_test": "tests/test_adaptive_breadth_triage.py::test_univariate_gate_ohlc_validation_is_independent_of_tick_volume",
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
-  },
-  "implementation_task_scope": {
-    "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
-    "deliverables": [
-      "Implement deterministic chronological development, validation and holdout partitions before diagnostic execution; holdout-derived tuning, refitting or pair exclusion is forbidden.",
-      "Estimate intercept and hedge coefficient on development only, then evaluate the frozen residual construction on validation and untouched holdout without refitting.",
-      "Implement the accepted fixed stationarity diagnostics and explicit failure criteria plus stability checks over predefined chronological subwindows and coefficient perturbations.",
-      "Preserve pair-data comparability fail-closed gates and emit only non-economic diagnostic/configuration/evidence artifacts; no winner selection, cost claim, economic outcome, protected-forward opening or V2 attempt."
-    ],
-    "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
-    "repeat_semantic_family_selection": false
   },
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
@@ -319,13 +297,12 @@
   "liveness_recovery_ref": "research_v3/EPOCH24_POST_RESULT_LIVENESS_RECOVERY_V1.json",
   "market_data_capture_required": false,
   "mechanism_families_under_test": [],
-  "mechanism_family": "REGIME_CONTEXT_CONDITIONED",
   "mechanism_family_under_test": null,
   "minimum_breadth_threshold_symbols": null,
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "Implement and test the specified non-economic diagnostic against the accepted epoch23 41-representative M5 capture and epoch24 alignment prerequisite; emit the complete hash-bound evidence output, then await exact-head acceptance before any later gate.",
+  "next_action": "AI_SELECT_DISTINCT_HIGHEST_INFORMATION_LEGAL_FRONTIER_ACTION_AFTER_EPOCH24_RELATIVE_VALUE_RESULT",
   "next_deterministic_operation_ref": null,
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
@@ -377,7 +354,7 @@
     "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION"
   },
   "rationale_for_implementation_ai_false": "Selection, binding, and Stage-A spec formalization from already-produced deterministic artifacts (feature store, opportunity map, information-gain ranking, repaired capture) require judgment-guided evidence synthesis, not novel repository machinery; existing Stage-A/capture pipeline capability is sufficient.",
-  "reason": "Distinct RELATIVE_VALUE_COINTEGRATION family was selected by the accepted epoch24 proposal. The non-economic, hash-bound 41-representative pair alignment inventory is complete. A new, narrower methodology and implementation specification is required before diagnostic code runs; no pair or economic envelope is frozen.",
+  "reason": "The prior fresh reasoning was constrained by stale one-shot Epoch-23/24 relative-value semantic fields that forced another same-family diagnostic after the completed frozen diagnostic returned 0/30 passes. That repeat proposal is superseded before implementation; select a distinct prospective frontier action from current evidence without closing the relative-value family permanently.",
   "recorded_utc": "2026-09-24T18:59:00Z",
   "recovery_binding": {
     "accepted_operation_id": "op_d65b85e1d86e4349b42cfebfd782b796",
@@ -408,7 +385,7 @@
   "required_outputs": [],
   "research_action": null,
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": false,
+  "research_judgment_required": true,
   "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
   "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
   "routing_repair_ref": "research_v3/EPOCH24_ROUTING_CONTRACT_REPAIR_V1.json",
@@ -432,10 +409,7 @@
   "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
   "search_budget_change": -1,
   "selected_families": [],
-  "selected_family": "RELATIVE_VALUE_COINTEGRATION",
   "selected_next_acquisition": null,
-  "selection_basis": "Epoch23 regime-scope resolution and exploratory structural evidence provide the strongest distinct prospective information opportunity, subject to comparison against every open family.",
-  "selection_rule": null,
   "semantic_completion_scope": {
     "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_332d3c0d20a735a1cff313e655f6df26.json",
     "attempt_delta": 0,
@@ -448,21 +422,12 @@
     ]
   },
   "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-  "semantic_question": "Within the already selected RELATIVE_VALUE_COINTEGRATION family, define one concrete, bounded NON_ECONOMIC diagnostic implementation using the accepted epoch23 41-representative M5 capture and evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json. Specify causal synchronized-pair construction, product-comparability checks, a predeclared hedge/stationarity/stability diagnostic with time split and failure criteria, and exact repository code/tests/evidence outputs. Use the inventory only for data availability and margin prerequisites; do not select a winning pair, infer economic edge, open protected forward/outer outcomes, or consume V2 attempts. The complete 1576-identity frontier remains open. Explicitly route novel implementation AI, and leave cost and independent validation as later gates.",
+  "semantic_question": "From the complete current 1576-identity eligible broker-native frontier and all still-open mechanism families, select the highest-information legal prospective NON_ECONOMIC next action after the accepted Epoch-24 RELATIVE_VALUE_COINTEGRATION diagnostic produced 0/30 passes under its frozen criteria. Do not reparameterize, rerun, or redesign the same relative-value diagnostic on the same observed bytes merely by changing split, ADF/statistical method, multiplicity correction, stability windows, or thresholds. RELATIVE_VALUE_COINTEGRATION remains open for a genuinely distinct future prospective hypothesis with new predeclared authority; CARRY_TERM_STRUCTURE remains temporarily unavailable until its required term-structure metadata is resolved. Do not open economics, protected-forward evidence, or a V2 attempt.",
   "source_ai_proposal_hash": "bf55cae8a5e7db4e10d3ffaa1419c2e1ea799e6d0876a1117fe0ee336c1bc94d",
   "source_ai_proposal_id": "rv-cointegration-structural-diagnostic-epoch24",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
   "source_runtime_operation_id": "op_ee0a14f38aac608c97f4ec14fc3e384f",
-  "stale_reasoning_guard": {
-    "authorizing_evidence_epoch": 23,
-    "current_evidence_epoch": 24,
-    "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
-    "previous_external_data_gate": null,
-    "previous_next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_RELATIVE_VALUE_STRUCTURAL_RESULT_AND_SELECT_THE_HIGHEST_INFORMATION_LEGAL_NEXT_FRONTIER_ACTION",
-    "previous_status": "PENDING_EXACT_HEAD_GREEN_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE",
-    "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
-  },
-  "status": "IMPLEMENTATION_REQUIRED",
+  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_SUPERSEDED_EPOCH24_RV_REPEAT",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -476,7 +441,7 @@
     "supersession_reason_ref": "evidence/POST_EPOCH1_FOUR_PANEL_REAUTH_PROPOSAL_VALIDATION_SUPERSESSION_V1.json",
     "v2_attempt_consumed": 0
   },
-  "supersession_ref": "evidence/EPOCH23_REGIME_PROPOSAL_SCOPE_SUPERSESSION_V1.json",
+  "supersession_ref": "evidence/EPOCH24_RELATIVE_VALUE_REPEAT_PROPOSAL_SUPERSESSION_V1.json",
   "target_design_class": null,
   "target_mechanism_family": null,
   "target_symbol": null,
@@ -533,5 +498,9 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true
+  "uses_only_existing_accepted_bytes": true,
+  "ai_reasoning_required": true,
+  "fresh_family_selection_required": true,
+  "external_data_gate": null,
+  "external_gate": null
 }
