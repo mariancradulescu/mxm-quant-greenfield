@@ -420,6 +420,9 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_acceptance",None)
         return {"status":"IMPLEMENTATION_ACCEPTED","output":out,"next_state":published,"exact_head":green}
 
+    if not green["green"]:
+        return {"status":"PENDING_EXACT_HEAD_GREEN","exact_head":green}
+
     request={"schema":"mxm.greenfield.general-ai-implementation-request.v1","executor_version":VERSION,
              "research_head":_head(root),"basis_next_state_sha256":state_hash,"next_state":next_state,
              "project_snapshot":before,"exact_head":green,"created_utc":iso()}
