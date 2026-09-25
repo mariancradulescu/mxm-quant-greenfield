@@ -209,7 +209,12 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
     evidence=current_evidence_binding(root)
     epoch_doc=json.loads((root/"research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json").read_text())
     delta=list((epoch_doc.get("trigger_event") or {}).get("refs") or [])
-    return {"request_id":request["request_id"],
+    prior=json.loads((root/"research_v3/EPOCH20_POST_C032_INFORMATION_GAIN_DECISION_V1.json").read_text())
+    calendar=json.loads((root/"evidence/EPOCH20_C006_SESSION_CALENDAR_PREREQUISITE_AUDIT_V1.json").read_text())
+    return {"prior_accepted_reasoning_summary":{"selected_action":prior["reasoning"].get("selected_action"),"scope":prior["reasoning"].get("scope")},
+            "resolved_prerequisite_summary":{"finding":calendar.get("finding"),"next_prerequisite":calendar.get("next_prerequisite")},
+            "c032_historical_summary":{"identity":"V2-C032","status":"GROSS_EDGE_FAIL","admitted_trades":11,"capture_reuse_forbidden":True},
+            "request_id":request["request_id"],
             "eligibility_packet":packet(root,evidence_epoch=request["evidence_epoch_seen"],
                 decision_class=str(request["next_state"].get("next_action") or "FRESH_EPOCH21_RESEARCH"),
                 refs=request["authority_refs"],accounting=request["project_snapshot"],
