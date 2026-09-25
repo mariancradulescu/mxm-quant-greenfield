@@ -23,7 +23,9 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
 
     def test_recovered_state_routes_to_one_fresh_semantic_boundary(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        self.assertTrue(n["status"].startswith("FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_CARRY_REGIME"))
+        self.assertTrue(n["status"].startswith(("FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_CARRY_REGIME", "AI_REASONING_REQUIRED_TO_COMPLETE_ACCEPTED_EPOCH23_REGIME_SPECIFICATION")))
+        if n["status"].startswith("AI_REASONING_REQUIRED_TO_COMPLETE"):
+            self.assertTrue(n["semantic_completion_scope"]["preserve_accepted_decisions"])
         self.assertTrue(n["research_judgment_required"])
         self.assertTrue(n["ai_reasoning_required"])
         self.assertFalse(n["implementation_ai_required"])
