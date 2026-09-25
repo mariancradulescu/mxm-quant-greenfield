@@ -275,31 +275,15 @@ protected_forward, live_orders, competition_start, competition_start_authorized,
 Those values are injected and guarded outside the AI layer.
 
 Important boundaries:
-- The reasoning proposal itself is NON_ECONOMIC; do not claim it opened an outcome or consumed an attempt.
-- Do not rerun C031 Stage-B or any already observed exact identity.
-- Do not infer mechanism-family exhaustion from narrow exact-scope failures.
-- Preserve one continuous account, realistic free margin/margin, capital-flow accounting and anti-ruin.
-- Prefer structural screening and minimal justified incremental data before expensive broad economics.
-- Use only authorized Pepperstone-account cTrader/Open API or previously hash-bound captures from that same broker account for empirical market, costs, margin, and execution evidence. Public official documentation may clarify semantics; no external market dataset is empirical authority.
-- The completed independent outer is observed evidence, not an unopened confirmation set; never re-open or rerun its exact outcome. If new authenticated broker-native data are unavoidable, define the smallest read-only capture and stop at that external gate.
-- The accepted C031 twelve-symbol M5 extension for 2026-07-20 through 2026-09-13 and its structural report already exist. The previous AI proposal asking for those same bytes was superseded. Reuse its accepted, hash-bound evidence without another collector or screen; do not ask the user to upload it again.
-- An independent account-native minimum-volume audit found BTCUSD, US30, and XAGUSD infeasible in both directions at initial EUR200 in the later pre-capture proposal. That exact proposal was superseded before capture. Do not treat these as initially tradable EUR200 opportunities. You may consider later higher-equity feasibility only with explicit prospective rationale; independently choose the revised direction from the full evidence and verify any claimed broker feasibility.
-- Before proposing any new capture symbols, use the accepted account-native feasibility index to verify exact symbol names, product identity, TEST exclusion and EUR200 directional feasibility. A symbol infeasible at initial EUR200 requires an explicitly declared future_equity_only_scope with symbols, prospective_rationale and initial_eur200_tradable false; do not imply it is currently executable. Do not invent a broker symbol spelling.
-- Large authoritative files are supplied by hash and repository path rather than fully inlined. Use the repository view/search tools to read their relevant rows before deciding; never infer a selected symbol's feasibility from a short context summary.
-- The newer feasibility audit V2 superseded the later twelve-symbol proposal before capture: GER30 is absent from the current account, and XAGUSD, BTCUSD and US30 cannot enter at minimum volume with initial EUR200. Do not reactivate either superseded proposal from the immutable registry. You must verify every proposed symbol against the index before submission; the deterministic bridge enforces this.
-- Evaluate the broader feasible broker-native universe without treating a narrow six-symbol result as a family-level closure, and do not predetermine mechanism family, panel size or screening procedure.
-- Do not ask the human to choose routine candidates, symbols, horizon, architecture or risk internals.
-- Current accepted structural representatives establish structural/data-surface coverage only, not economic equivalence for all members sharing a signature.
-- Explicitly decide whether the accepted 40 representative series are sufficient for the NEXT research decision. Do not assume either sufficiency or insufficiency.
-- Explicitly assess whether additional prospective exploration inside the broader eligible broker-native universe has positive expected information gain before narrowing to a mechanism-specific outer.
-- A provisional four-panel SESSION_GAP outer may be reauthorized or superseded; do not treat its existence as authorization.
-- Never let an older proposal silently inherit authority across a newer research evidence epoch.
-- A certified collector PACKAGE is not accepted market-data evidence. If a provisional outer has a collector package but no accepted returned capture, do not claim the outer bytes already exist.
-- If you reauthorize a preserved provisional outer, bind the exact frozen plan symbols/resolution/interval, set new_market_data_requested=true, and request the authenticated read-only capture. Reuse the already-built exact-scope collector rather than inventing a new scope or pretending capture bytes are available.
-- If a genuine external dependency is unavoidable, identify the minimum external gate explicitly.
-- Treat every supplied prospective freeze/data plan as authoritative. If it fixes panel membership, resolution, or an unopened outer-data scope, do not substitute symbols or dates unless a separate durable prospective supersession authority is explicitly supplied in context.
-- Source/development bytes that were used to select a panel may not be reused as independent outer evidence when an authoritative freeze requires disjoint unopened data.
-- Never output chain-of-thought. Put only concise decision rationale in information_gain_rationale/decision.
+- Begin with the complete 1578-symbol eligible frontier and every open mechanism family. No consumed candidate, historical symbol, old panel, or rejected proposal is an active default.
+- Choose mechanism-specific breadth from non-economic structural heterogeneity, data availability, event independence, and expected information gain. Do not assume a fixed panel size.
+- One prospectively frozen economic experiment envelope may contain many symbols; do not authorize an economic outcome until causality, data sufficiency, cost, EUR200 margin feasibility, breadth, freeze, and exact-head CI all pass.
+- Historical survivors and failures remain valid context. Never rerun an opened identity, use outcome-exposed evidence as new prospective input, erase lifetime trial exposure, or retroactively select a winning subgroup.
+- Distinguish structural representatives from economic equivalence; narrow scope only with explicit frontier-relative reasons independent of the new outcome.
+- Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
+- Cite only supplied authority refs. If an additional authority is needed, return only status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, and rationale; the runtime will validate it before a new fingerprint.
+- Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
+- The proposal itself is non-economic and consumes zero attempts. Return concise decision rationale, not chain-of-thought.
 """
 
 def _user_prompt(context:Mapping[str,Any], correction:str|None=None)->str:
