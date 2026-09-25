@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.epoch24-relative-value-diagnostic-implementation-manifest.v1",
-  "status": "IMPLEMENTED_CODE_REQUIRES_EXACT_HEAD_GREEN",
+  "status": "IMPLEMENTED_WITH_ACCEPTED_BROKER_METADATA_REQUIRES_EXACT_HEAD_GREEN",
   "family": "RELATIVE_VALUE_COINTEGRATION",
   "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
   "accepted_proposal_hash": "443cc268b58665f167b5b3c502c85d1b6dd224f21c61d51f1290c2cfcbc6385b",
@@ -10,7 +10,10 @@
     "pair_data_manifest_ref": "research_v3/EPOCH24_RELATIVE_VALUE_PAIR_DATA_IMPLEMENTATION_MANIFEST_V1.json",
     "alignment_inventory_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
     "accepted_replacement_capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-    "accepted_original_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503"
+    "accepted_original_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "accepted_current_broker_universe_zip_sha256": "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9",
+    "accepted_current_broker_universe_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
+    "product_comparability_law": "EXACT_BROKER_SYMBOL_ID_PRODUCT_TYPE_QUOTE_ASSET_LOT_SIZE_PLUS_NORMALIZED_CONTRACT_FAMILY"
   },
   "implementation": {
     "code_ref": "research_v3/relative_value_epoch24_diagnostic.py",
@@ -27,7 +30,17 @@
     "coefficient_perturbation_holdout_stability": true,
     "complete_scope_enumeration_required": 820,
     "pair_ranking": false,
-    "winning_pair_selection": false
+    "winning_pair_selection": false,
+    "broker_metadata_symbol_name_inference": false,
+    "current_broker_metadata_scope": 41,
+    "changed_paths": [
+      "research_v3/relative_value_epoch24_prerequisite.py",
+      "research_v3/relative_value_epoch24_diagnostic.py",
+      "research_v3/EPOCH24_RELATIVE_VALUE_DIAGNOSTIC_PLAN_V1.json",
+      "tests/test_relative_value_epoch24_pair_data.py",
+      "tests/test_relative_value_epoch24_diagnostic.py",
+      "tests/test_frontier_information_gain_v1.py"
+    ]
   },
   "accounting_effect": {
     "v2_attempts_consumed": 0,
@@ -40,7 +53,7 @@
     "account_mutation": false
   },
   "ci": {
-    "status": "REQUIRES_EXACT_HEAD_GREEN",
+    "status": "REQUIRES_EXACT_HEAD_GREEN_AFTER_BROKER_METADATA_BINDING",
     "required_suite": "python -m unittest discover -s tests -p test_*.py -v"
   }
 }
