@@ -1,0 +1,39 @@
+{
+  "schema": "mxm.greenfield.copilot-usage-observability-audit.v1",
+  "status": "SESSION_COST_UNMEASURED_FOR_EXISTING_CLI_TRANSPORT",
+  "externally_observed_dashboard_ai_credits_consumed": 148,
+  "dashboard_observation_scope": "USER_REPORTED_ACCOUNT_TOTAL_NOT_ATTRIBUTABLE_TO_ONE_RUNTIME_SESSION",
+  "repository_provider_invocations_persisted": 2,
+  "known_missing_invocation": "2026-09-25 implementation Copilot call completed in Actions job 36092743421 but its Git push was rejected; repository counters undercount invocations",
+  "per_call": {
+    "model": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_read_tokens": null,
+    "cache_write_tokens": null,
+    "cost_multiplier": null
+  },
+  "session": {
+    "session_id": null,
+    "total_nano_aiu": null,
+    "total_premium_request_cost": null,
+    "model_metrics": null
+  },
+  "account": {
+    "entitlement": "PRO_USER_REPORTED",
+    "used": null,
+    "remaining_percentage": null,
+    "reset_date": null
+  },
+  "official_interfaces": {
+    "assistant_usage": "Copilot SDK assistant.usage event",
+    "session_metrics": "Copilot SDK session.usage.getMetrics (experimental)",
+    "account_quota": "Copilot SDK account.getQuota",
+    "source": "https://docs.github.com/en/copilot/how-tos/copilot-sdk/features/usage-and-billing"
+  },
+  "implementation_boundary": "Current CLI subprocess is not an SDK-managed session; SDK session metrics cannot be attributed retroactively. Migrate transport only with pinned SDK and CLI versions and compatibility tests. Preserve null rather than infer billed credits from CLI call count.",
+  "economic_effect": {
+    "v2_attempts_consumed": 0,
+    "outcomes_opened": 0
+  }
+}
