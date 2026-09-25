@@ -128,7 +128,11 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         "completed_structural_report_ref","duplicate_capture_supersession_ref",
         "selected_scope_feasibility_audit_ref","superseded_pre_capture_proposal_ref",
         "scope_resolution_ref","exploratory_regime_screen_ref",
-        "alignment_prerequisite_ref",
+        "alignment_prerequisite_ref","all_frontier_inventory_ref","capture_contract_ref",
+        "feature_store_ref","opportunity_map_ref","information_gain_selection_ref",
+        "latest_material_structural_result_ref","latest_prospective_freeze_ref",
+        "frontier_selection_execution_authority_ref","additional_authority_request_ref",
+        "additional_authority_acceptance_ref",
     ):
         value=next_state.get(key)
         if isinstance(value,str) and value and value not in refs:
@@ -522,7 +526,17 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
                              "requested_authority_or_class":requested,"rationale":rationale,
                              "request_id":request["request_id"],"evidence_epoch":request["evidence_epoch_seen"],
                              "no_economic_outcome":True,"created_utc":iso()}
+                response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1",
+                          "status":"ADDITIONAL_AUTHORITY_REQUIRED",
+                          "request_id":request["request_id"],
+                          "provider":{"kind":"github-copilot-cli",**dict(meta or {})},
+                          "evidence_epoch_seen":request["evidence_epoch_seen"],
+                          "requested_authority_or_class":requested,
+                          "rationale":rationale,
+                          "economic_outcome_opened":False,"v2_attempt_consumed":0,
+                          "created_utc":requirement["created_utc"]}
                 atomic_write_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",requirement)
+                atomic_write_json(root/RESPONSE_REL,response)
                 sink.checkpoint("general_ai_additional_authority_request",None)
                 return requirement
             proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
