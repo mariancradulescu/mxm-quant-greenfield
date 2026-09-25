@@ -29,8 +29,14 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
         for key in ("active_candidate_id","active_target_symbol","active_mechanism_family","active_proposal_id"):
             self.assertIsNone(state[key])
             self.assertIsNone(nxt[key])
-        for key in ("candidate_id","target_symbol","mechanism_family","source_ai_proposal_id"):
+        for key in ("candidate_id","target_symbol","mechanism_family"):
             self.assertIsNone(nxt[key])
+        # source_ai_proposal_id is durable provenance for a later accepted semantic decision,
+        # not an active candidate/symbol/mechanism target.
+        if nxt.get("source_ai_proposal_id") is not None:
+            self.assertIsNone(nxt.get("active_candidate_id"))
+            self.assertIsNone(nxt.get("active_target_symbol"))
+            self.assertIsNone(nxt.get("active_mechanism_family"))
         self.assertEqual(state["open_frontier"]["eligible_post_exclusion_symbols"],1576)
         self.assertEqual(len(state["open_frontier"]["mechanism_families"]),10)
         self.assertFalse(state["historical_context"]["V2_C032"]["active_target"])
