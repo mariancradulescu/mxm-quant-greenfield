@@ -1,0 +1,67 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "1fd721664fe46cf4a2c770a76534b37c18c00afe5238bac2dbcfbd56ab896178",
+  "competition_start_authorized": false,
+  "decision": {
+    "action": "DEFINE_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC",
+    "diagnostic_specification": {
+      "causal_split": "For each pair, retain synchronized observations in chronological order and use one fixed 60%/40% split by timestamp: earliest 60% for development diagnostics and latest 40% for holdout diagnostics. Require at least 500 synchronized observations in each segment; otherwise fail for insufficient data. No split adjustment, pair-specific split, or look-ahead feature is permitted.",
+      "hedge_and_stationarity": "On the first segment only, fit OLS of log price of the first instrument on log price of the second with an intercept; freeze the coefficient and intercept for holdout spread construction. Run a two-sided Engle-Granger residual ADF test separately on the training spread and fixed-coefficient holdout spread, with intercept, AIC lag selection, and the predeclared maximum lag floor(12*(n/100)^0.25). Apply Benjamini-Hochberg correction at q=0.05 separately across all eligible pairs for each segment; report raw p-values and adjusted q-values.",
+      "pair_construction": "Build the candidate pair set deterministically from all unordered representative pairs. Before examining price relationships, require explicit compatible product/exposure metadata and the required product-comparability fields from the accepted prerequisite; missing or incompatible metadata fails that pair with a recorded reason. For each eligible pair, inner-join completed M5 bars by identical UTC bar-end timestamp. Use positive close prices, reject duplicate timestamps, do not forward-fill, interpolate, or use unfinished bars.",
+      "pass_and_failure_criteria": "A pair passes this non-economic diagnostic only if comparability and data gates pass, both training and holdout ADF adjusted q-values are at most 0.05, and every stated hedge-stability condition passes. Record each failed gate and metric; do not suppress failures. Missing required input schema, timestamps, prices, or comparability metadata is a run-level error, not a pass or silent fallback. A pass is a structural diagnostic result only.",
+      "stability": "Divide the holdout segment chronologically into five contiguous windows. Estimate an OLS hedge coefficient independently in each window solely as a stability diagnostic. Require at least three valid windows, consistent coefficient sign with the training coefficient in every valid window, median absolute relative deviation from the training coefficient no greater than 25%, and maximum deviation no greater than 50%. A zero or non-finite training coefficient fails stability."
+    },
+    "economic_authorization": "NONE. Do not open an economic outcome, use protected forward or outer outcomes, consume V2 attempts, or treat development-selected pairs as independent confirmation. Cost and independent validation remain later gates.",
+    "implementation_scope": {
+      "accepted_inputs": [
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+        "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json"
+      ],
+      "deliverables": [
+        "A deterministic diagnostic module that validates input schemas, constructs the full eligible pair set, aligns causal synchronized bars, applies the frozen split and diagnostics, and emits per-pair metrics and explicit failure reasons.",
+        "A command or existing pipeline integration that runs only this non-economic diagnostic on the accepted inputs and fails explicitly on invalid or missing required inputs.",
+        "Hash-bound machine-readable output at evidence/RELATIVE_VALUE_COINTEGRATION_STRUCTURAL_DIAGNOSTIC_EPOCH24_V1.json, including input hashes, method/version, complete pair accounting, per-pair metrics, failures, and an explicit non-economic/no-pair-selection declaration."
+      ],
+      "novel_repository_code_required": true,
+      "tests": [
+        "Verify exhaustive deterministic enumeration of unordered pairs and metadata comparability gates independent of price outcomes.",
+        "Verify exact timestamp intersection, UTC bar-end handling, duplicate rejection, no forward-fill, and exclusion of unfinished bars.",
+        "Verify fixed chronological split, minimum observations, training-only hedge fit, and holdout spread uses the frozen training coefficients.",
+        "Verify ADF configuration, separate per-segment Benjamini-Hochberg correction, five-window stability thresholds, and explicit failure reasons at threshold boundaries.",
+        "Verify incomplete or malformed required inputs fail the run, and outputs cannot designate a winner, authorize economics, or omit failed pairs."
+      ]
+    },
+    "scope": "Enumerate all unordered pairs among the accepted 41 representatives; apply only predeclared metadata, alignment, and data-sufficiency gates. Do not narrow to a pair based on observed outcomes, rank or freeze a pair, or treat diagnostic passes as evidence of economic edge or equivalence.",
+    "selected_mechanism_family": "RELATIVE_VALUE_COINTEGRATION"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 24,
+    "frontier_scope": "The complete 1576-identity eligible frontier remains open; this action does not select a pair, close a mechanism family, or authorize an economic experiment.",
+    "implementation_ai_required": true,
+    "later_gates": [
+      "Exact-head acceptance of the diagnostic implementation and evidence.",
+      "Separate cost and independent-validation prerequisites before any prospective economic envelope is considered."
+    ],
+    "next_action": "Implement and test the specified non-economic diagnostic against the accepted epoch23 41-representative M5 capture and epoch24 alignment prerequisite; emit the complete hash-bound evidence output, then await exact-head acceptance before any later gate.",
+    "research_judgment_required": false,
+    "selected_family": "RELATIVE_VALUE_COINTEGRATION",
+    "status": "IMPLEMENTATION_REQUIRED"
+  },
+  "objective": {
+    "class": "NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC",
+    "goal": "Implement a bounded, causal diagnostic of product comparability, hedge stability, and spread stationarity across the accepted 41-representative M5 capture, without selecting a winning pair or authorizing economic execution.",
+    "information_gain_rationale": "The accepted alignment prerequisite and capture enable a prospective, reproducible test of whether structurally comparable synchronized pairs exhibit stable, stationary relationships. Testing the complete eligible representative set, with multiplicity control and a fixed temporal split, informs whether this mechanism merits later gates without consuming an economic attempt."
+  },
+  "operation_id": "op_ee0a14f38aac608c97f4ec14fc3e384f",
+  "proposal_hash": "bf55cae8a5e7db4e10d3ffaa1419c2e1ea799e6d0876a1117fe0ee336c1bc94d",
+  "proposal_id": "rv-cointegration-structural-diagnostic-epoch24",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_78bbffdac3331c9a72c6ea9d8c113760.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
