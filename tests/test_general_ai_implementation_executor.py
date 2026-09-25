@@ -8,7 +8,7 @@ ROOT=Path(__file__).resolve().parents[1]
 class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_current_state_routes_by_semantics_not_finite_state_names(self):
         s=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        if s.get("user_action_required") is True or not s.get("next_action") or (s.get("status")=="MATERIAL_INTEGRITY_FAILURE" and s.get("integrity_gate")):
+        if s.get("user_action_required") is True or s.get("external_gate") or not s.get("next_action") or (s.get("status")=="MATERIAL_INTEGRITY_FAILURE" and s.get("integrity_gate")):
             self.assertFalse(implementation_required(s,ROOT))
         elif reasoning_required(s):
             self.assertFalse(implementation_required(s))
