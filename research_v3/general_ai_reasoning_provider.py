@@ -304,6 +304,9 @@ Important boundaries:
 
 def _user_prompt(context:Mapping[str,Any], correction:str|None=None)->str:
     base=_system_prompt()+"\n\nAUTHORITATIVE REPOSITORY CONTEXT:\n"+json.dumps(context,sort_keys=True,separators=(",",":"),ensure_ascii=False)
+    contract=(context.get("pending_decision") or {}).get("decision_contract") or {}
+    if contract:
+        base+="\n\nPENDING DECISION CONTRACT (MANDATORY): Set decision.action to required_action and decision.selected_mechanism_family to one current open family outside temporarily_unavailable_families. Set next_research_state.selected_family to that same family and specify an executable pre-economic next_action. This contract governs the immediate decision only; unavailable families remain open for later research. Do not request an economic outcome. A proposal missing these exact fields or selecting an excluded family will be rejected before implementation."
     if correction:
         base+="\n\nYOUR PREVIOUS JSON WAS REJECTED BY DETERMINISTIC VALIDATION. CORRECT IT WITHOUT CHANGING THE RESEARCH GOAL:\n"+correction
     return base
