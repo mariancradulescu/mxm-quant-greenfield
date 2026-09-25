@@ -44,14 +44,43 @@ jobs:
       - name: Dispatch exactly one supervisor when work is authorized
         if: >
           steps.route.outputs.dispatch_required == 'true' &&
-          (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+          (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success') &&
+          (steps.route.outputs.execution_class != 'SEMANTIC_REASONING' ||
+           (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'm6-preparation'))
         env:
           GH_TOKEN: ${{ github.token }}
+          PREDECESSOR_WORKFLOW: ${{ github.event.workflow_run.name }}
+          PREDECESSOR_HEAD: ${{ github.event.workflow_run.head_sha }}
+          PREDECESSOR_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          PREDECESSOR_RUN_ID: ${{ github.event.workflow_run.id }}
         shell: bash
         run: |
+          if [[ "${PREDECESSOR_WORKFLOW}" == "m6-preparation" ]]; then
+            ci_head="${PREDECESSOR_HEAD}"
+            ci_conclusion="${PREDECESSOR_CONCLUSION}"
+            ci_run_id="${PREDECESSOR_RUN_ID}"
+          else
+            ci_head=""
+            ci_conclusion=""
+            ci_run_id=""
+          fi
+          # Pass exact m6 authority only; Supervisor completions are not research-head CI authority.
+          payload="$(CI_HEAD="${ci_head}" CI_CONCLUSION="${ci_conclusion}" CI_RUN_ID="${ci_run_id}" python - <<'PY'
+          import json, os
+          print(json.dumps({
+              "ref":"main",
+              "inputs":{
+                  "mode":"resume",
+                  "predecessor_ci_head":os.environ.get("CI_HEAD",""),
+                  "predecessor_ci_conclusion":os.environ.get("CI_CONCLUSION",""),
+                  "predecessor_ci_run_id":os.environ.get("CI_RUN_ID",""),
+              }
+          },separators=(",",":")))
+          PY
+          )"
           curl --fail-with-body -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches" \
-            -d '{"ref":"main","inputs":{"mode":"resume"}}'
+            -d "${payload}"

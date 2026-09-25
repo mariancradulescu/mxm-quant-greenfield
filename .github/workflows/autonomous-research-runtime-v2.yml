@@ -19,6 +19,21 @@ on:
         required: false
         default: ""
         type: string
+      predecessor_ci_head:
+        description: Exact research HEAD validated by the predecessor authority CI
+        required: false
+        default: ""
+        type: string
+      predecessor_ci_conclusion:
+        description: Predecessor authority CI conclusion
+        required: false
+        default: ""
+        type: string
+      predecessor_ci_run_id:
+        description: Predecessor authority CI run id
+        required: false
+        default: ""
+        type: string
   push:
     branches:
       - main
@@ -220,6 +235,9 @@ jobs:
           COPILOT_GITHUB_TOKEN: ${{ github.token }}
           MXM_COPILOT_MODEL: auto
           MXM_COPILOT_IMPLEMENTATION_MODEL: auto
+          MXM_PREDECESSOR_CI_HEAD: ${{ inputs.predecessor_ci_head }}
+          MXM_PREDECESSOR_CI_CONCLUSION: ${{ inputs.predecessor_ci_conclusion }}
+          MXM_PREDECESSOR_CI_RUN_ID: ${{ inputs.predecessor_ci_run_id }}
         run: |
           python -m research_v3.general_ai_autonomy_loop continue \
             --root . \
