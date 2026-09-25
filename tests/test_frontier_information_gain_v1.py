@@ -61,7 +61,10 @@ class FrontierInformationGainV1Tests(unittest.TestCase):
     def test_final_state_is_external_gate_or_fresh_semantic_boundary_without_economics(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
         self.assertFalse(n["implementation_ai_required"])
-        if n["status"].startswith(("FRESH_GENERAL_AI_REASONING_REQUIRED", "AI_REASONING_REQUIRED_TO_COMPLETE_ACCEPTED_EPOCH23_REGIME_SPECIFICATION")):
+        if n["status"] == "RESEARCH_SCOPE_CONTRADICTION_FAIL_CLOSED":
+            self.assertEqual(n["external_gate"]["type"], "MATERIAL_RESEARCH_SCOPE_CONTRADICTION")
+            self.assertFalse(n["user_action_required"])
+        elif n["status"].startswith(("FRESH_GENERAL_AI_REASONING_REQUIRED", "AI_REASONING_REQUIRED_TO_COMPLETE_ACCEPTED_EPOCH23_REGIME_SPECIFICATION")):
             self.assertTrue(n["research_judgment_required"])
             self.assertTrue(n["ai_reasoning_required"])
             self.assertFalse(n["external_data_required"])
