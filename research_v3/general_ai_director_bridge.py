@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Mapping
 
+from research_v3.evidence_eligibility import validate_eligibility, EvidenceIneligible
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import current_evidence_binding, proposal_evidence_binding_is_current
 from research_v3.autonomous_runtime_v2 import RuntimeV2
@@ -477,6 +478,10 @@ def _validate_provisional_four_panel_reauthorization(root: Path, proposal: Mappi
 
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)
+    try:
+        validate_eligibility(proposal)
+    except EvidenceIneligible as exc:
+        raise AIProposalRejected(str(exc)) from exc
     binding=proposal.get("evidence_binding") or {}
     current_evidence=current_evidence_binding(root)
     if not binding:
