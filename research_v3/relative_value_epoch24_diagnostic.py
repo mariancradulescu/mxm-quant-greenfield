@@ -15,6 +15,7 @@ import random
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+from zipfile import ZipFile
 
 from research_v3.relative_value_epoch24_prerequisite import (
     PairDataError,
@@ -26,6 +27,9 @@ IMPLEMENTATION_VERSION = "MXM_EPOCH24_RELATIVE_VALUE_DIAGNOSTIC_V1"
 PLAN_SCHEMA = "mxm.greenfield.epoch24-relative-value-diagnostic-plan.v1"
 PLAN_STATUS = "FROZEN_NON_ECONOMIC_DIAGNOSTIC_PLAN"
 RESULT_SCHEMA = "mxm.greenfield.epoch24-relative-value-structural-diagnostic.v1"
+CURRENT_BROKER_UNIVERSE_ZIP_SHA256 = "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9"
+CURRENT_BROKER_UNIVERSE_PAYLOAD_SHA256 = "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452"
+CURRENT_BROKER_UNIVERSE_MEMBER = "BROKER_NATIVE_COMPETITION_UNIVERSE_CAPTURE_V2.json"
 
 
 class DiagnosticError(ValueError):
@@ -63,6 +67,81 @@ def validate_plan(plan: Mapping[str, Any]) -> None:
         raise DiagnosticError("stationarity Monte Carlo resolution is too low")
     if int(stability.get("development_subwindows") or 0) != 3:
         raise DiagnosticError("development stability subwindow count changed")
+
+
+
+def _normalized_contract_family(record: Mapping[str, Any]) -> str:
+    asset_class = str(record.get("asset_class") or "").strip()
+    product_type = str(record.get("product_type") or "").strip()
+    if asset_class.endswith(" Equities"):
+        return "EQUITY_CFD"
+    if asset_class == "Commodities (Cash)":
+        return "CASH_COMMODITY_CFD"
+    if product_type and product_type != "OTHER_OR_TEST_CFD":
+        return product_type
+    if product_type and asset_class:
+        return f"{product_type}|{asset_class}"
+    raise DiagnosticError("broker product metadata cannot resolve contract family")
+
+
+def build_broker_product_authority(
+    broker_universe_zip: Path,
+    registry: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Derive exact 41-representative comparability metadata from accepted broker capture."""
+    raw_zip = broker_universe_zip.read_bytes()
+    if hashlib.sha256(raw_zip).hexdigest() != CURRENT_BROKER_UNIVERSE_ZIP_SHA256:
+        raise DiagnosticError("current broker-universe transport hash mismatch")
+    with ZipFile(broker_universe_zip) as archive:
+        if archive.testzip():
+            raise DiagnosticError("current broker-universe zip CRC failure")
+        payload = archive.read(CURRENT_BROKER_UNIVERSE_MEMBER)
+    if hashlib.sha256(payload).hexdigest() != CURRENT_BROKER_UNIVERSE_PAYLOAD_SHA256:
+        raise DiagnosticError("current broker-universe canonical payload hash mismatch")
+    capture = json.loads(payload)
+    symbol_rows = {
+        str(row["broker_symbol"]): row for row in capture.get("symbols") or []
+    }
+    representatives = list(registry.get("representatives") or [])
+    if len(representatives) != 41:
+        raise DiagnosticError("broker product authority requires accepted 41 representatives")
+
+    authority: dict[str, dict[str, Any]] = {}
+    for representative in representatives:
+        symbol = str(representative["broker_symbol"])
+        row = symbol_rows.get(symbol)
+        if row is None:
+            raise DiagnosticError(f"broker product metadata missing: {symbol}")
+        if int(row["symbol_id"]) != int(representative["symbol_id"]):
+            raise DiagnosticError(f"broker product identity mismatch: {symbol}")
+        quote_asset = str(row.get("quote_asset") or "").strip().upper()
+        product_type = str(row.get("product_type") or "").strip()
+        lot_size = str(row.get("lot_size") or "").strip()
+        unit_family = _normalized_contract_family(row)
+        if not all((quote_asset, product_type, lot_size, unit_family)):
+            raise DiagnosticError(f"incomplete broker product metadata: {symbol}")
+        authority[symbol] = {
+            "symbol_id": int(row["symbol_id"]),
+            "product_type": product_type,
+            "unit_family": unit_family,
+            "asset_class": str(row.get("asset_class") or ""),
+            "base_asset": str(row.get("base_asset") or ""),
+            "quote_asset": quote_asset,
+            "lot_size": lot_size,
+            "measurement_units": row.get("measurement_units"),
+            "digits": row.get("digits"),
+            "pip_position": row.get("pip_position"),
+            "schedule_minutes_per_week": row.get("schedule_minutes_per_week"),
+            "schedule_time_zone": row.get("schedule_time_zone"),
+            "broker_metadata_complete": True,
+            "source_ref": (
+                "MXM_COMPETITION_BROKER_UNIVERSE_V2.zip#"
+                + CURRENT_BROKER_UNIVERSE_PAYLOAD_SHA256
+            ),
+        }
+    if len(authority) != 41:
+        raise DiagnosticError("broker product authority scope mismatch")
+    return authority
 
 
 def chronological_split(n: int, plan: Mapping[str, Any]) -> dict[str, tuple[int, int]]:
@@ -480,12 +559,13 @@ def run_complete_scope(
 def execute(
     old_zip: Path,
     replacement_zip: Path,
+    broker_universe_zip: Path,
     registry: Mapping[str, Any],
     replacement_acceptance: Mapping[str, Any],
     alignment_inventory: Mapping[str, Any],
-    quote_unit_authority: Mapping[str, Any],
     plan: Mapping[str, Any],
 ) -> dict[str, Any]:
+    product_authority = build_broker_product_authority(broker_universe_zip, registry)
     series = build_accepted_price_series(
         old_zip,
         replacement_zip,
@@ -494,7 +574,7 @@ def execute(
         alignment_inventory=alignment_inventory,
     )
     return run_complete_scope(
-        series, registry, alignment_inventory, quote_unit_authority, plan
+        series, registry, alignment_inventory, product_authority, plan
     )
 
 
@@ -502,10 +582,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=IMPLEMENTATION_VERSION)
     parser.add_argument("--old-zip", type=Path, required=True)
     parser.add_argument("--replacement-zip", type=Path, required=True)
+    parser.add_argument("--broker-universe-zip", type=Path, required=True)
     parser.add_argument("--registry", type=Path, required=True)
     parser.add_argument("--replacement-acceptance", type=Path, required=True)
     parser.add_argument("--alignment-inventory", type=Path, required=True)
-    parser.add_argument("--quote-unit-authority", type=Path, required=True)
     parser.add_argument("--plan", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -513,10 +593,10 @@ def main() -> None:
     result = execute(
         args.old_zip,
         args.replacement_zip,
+        args.broker_universe_zip,
         load(args.registry),
         load(args.replacement_acceptance),
         load(args.alignment_inventory),
-        load(args.quote_unit_authority),
         load(args.plan),
     )
     args.output.write_text(
