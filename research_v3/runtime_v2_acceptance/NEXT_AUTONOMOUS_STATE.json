@@ -25,6 +25,9 @@
   "active_mechanism_family": null,
   "active_proposal_id": null,
   "active_target_symbol": null,
+  "active_target_symbols": [
+    "all_41_current_structural_representatives_per_registry"
+  ],
   "all_frontier_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "authorizing_evidence_epoch": 23,
@@ -105,6 +108,7 @@
   "collector_implementation_acceptance_ref": "evidence/BREAKOUT_FADE_NETH25_COST_COLLECTOR_IMPLEMENTATION_ACCEPTANCE_V1.json",
   "collector_package_artifact_ref": "research_v3/ai_director/artifact_attestations/MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.json",
   "collector_runtime_reliability_ref": "research_v3/COLLECTOR_RUNTIME_RELIABILITY_V1.json",
+  "consumes_v2_attempts": 0,
   "cross_market_one_bar_directional_screen_ref": "evidence/CROSS_MARKET_ONE_BAR_DIRECTIONAL_AVAILABILITY_V1.json",
   "cross_market_one_bar_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
   "cross_symbol_families": "DEFERRED_PENDING_ALIGNED_TIMESTAMP_OR_OTHER_EXPLICIT_PREREQUISITE",
@@ -195,6 +199,7 @@
     "workflow": "m6-preparation"
   },
   "execution_authorization_ref": "research_v3/C032_EXECUTION_AUTHORIZATION_V1.json",
+  "exploratory_regime_screen_ref": "evidence/EPOCH23_REGIME_CONTEXT_CONDITIONED_EXPLORATORY_STRUCTURAL_SCREEN_V1.json",
   "external_data_gate": null,
   "external_data_required": false,
   "external_gate": null,
@@ -207,7 +212,8 @@
   "frontier_feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
   "frontier_opportunity_map_ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": false,
+  "implementation_ai_required": true,
+  "implementation_ai_scope": "Novel repository code needed: (1) compute trailing 13-week rolling TR tercile regime label at each existing frozen breakout event's onset bar from already-captured 13W M5 canonical data, (2) stratify existing follow-through/persistence structural statistics by regime bucket per representative, (3) emit a new structural evidence artifact. No existing deterministic routine performs regime labeling or regime-stratified aggregation.",
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -283,8 +289,9 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "AI_INTERPRET_HASH_BOUND_REGIME_STRUCTURAL_COUNTS_AND_DECIDE_PROSPECTIVE_NON_ECONOMIC_NEXT_STEP_WITHOUT_OUTCOME_DERIVED_SCOPE_SELECTION",
+  "next_action": "BUILD_AND_RUN_REGIME_CONDITIONED_BREAKOUT_STRUCTURAL_SCREEN_OVER_41_CURRENT_REPRESENTATIVES",
   "next_deterministic_operation_ref": null,
+  "no_economic_outcome_opened_by_this_proposal": true,
   "outer": "C032_ECONOMIC_OUTCOME_RECORDED_EXACTLY_ONCE",
   "outer_authorization": "CONSUMED_EXACTLY_ONCE",
   "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
@@ -391,10 +398,10 @@
     ]
   },
   "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-  "source_ai_proposal_hash": "1243a6b0807d6feb4d21aebe1b5626cd3f184b52e03dd92a6446c85b83402ad8",
-  "source_ai_proposal_id": "frontier-ig-20260925-regime-context-conditioned-scope",
+  "source_ai_proposal_hash": "79e6d855879fc28216f4355844a9a482dd24409091d07eddf95dedd8d8a760de",
+  "source_ai_proposal_id": "frontier-ig-epoch23-regime-context-conditioned-breakout-screen-v1",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-  "source_runtime_operation_id": "op_9f1608ab04df9b4ebfaf9deeefe311df",
+  "source_runtime_operation_id": "op_6a9045133f33d73e1815bd8059472923",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 22,
     "current_evidence_epoch": 23,
@@ -404,7 +411,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_REPLACEMENT_HISTORY_ACCEPTANCE",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_REGIME_EXPLORATORY_SCREEN",
+  "status": "REGIME_CONTEXT_CONDITIONED_MECHANISM_SPECIFIED_PENDING_STRUCTURAL_SCREEN_EXECUTION",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -470,11 +477,9 @@
   },
   "universe_scope": "1576 eligible post-exclusion broker-native frontier candidates remain open",
   "universe_status": "OPEN_1576_ELIGIBLE_POST_EXCLUSION_FRONTIER_CANDIDATES",
+  "unrelated_candidate_formalization_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_c9664f7645b4a4b76491b0f869ed189a.json",
+  "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true,
-  "ai_reasoning_required": true,
-  "exploratory_regime_screen_ref": "evidence/EPOCH23_REGIME_CONTEXT_CONDITIONED_EXPLORATORY_STRUCTURAL_SCREEN_V1.json",
-  "unrelated_candidate_formalization_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_c9664f7645b4a4b76491b0f869ed189a.json",
-  "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE"
+  "uses_only_existing_accepted_bytes": true
 }
