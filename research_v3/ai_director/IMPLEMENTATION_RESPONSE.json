@@ -1,69 +1,73 @@
 {
-  "basis_next_state_sha256": "71627d8e963197725b908976ae90865019a7b8a2e0426fd86daaeae3812efeab",
-  "changed_paths": [],
-  "created_utc": "2026-09-25T14:38:31Z",
-  "exact_head": {
-    "green": true,
-    "head": "e784a360c2ce88378fdc48b48d21c086163abbfe",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "e784a360c2ce88378fdc48b48d21c086163abbfe",
-    "predecessor_run_id": 36148342179
-  },
+  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
+  "status": "PENDING_EXACT_HEAD_GREEN",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+  "basis_next_state_sha256": "71627d8e963197725b908976ae90865019a7b8a2e0426fd86daaeae3812efeab",
   "implementation_output": {
+    "implementation_id": "epoch24-relative-value-hedge-stationarity-stability-v1",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Completed the bounded non-economic HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE phase for the already accepted RELATIVE_VALUE_COINTEGRATION family. Exact-head implementation e784a360c2ce88378fdc48b48d21c086163abbfe was green in m6-preparation run 36148342179. Using only exact accepted hash-bound development/replacement/broker-universe bytes and the frozen pre-outcome diagnostic plan, 30/820 pairs were broker-product comparable and sufficiently aligned; all 30 were executed and 0 met all predeclared structural criteria. Thresholds were not changed after observation. No pair ranking, economic edge, returns/PnL, cost claim, protected-forward access, V2 attempt, or live order was opened.",
     "decision": {
+      "classification": "COMPLETE_NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC_NO_PAIR_PASSED_FROZEN_CRITERIA",
+      "research_family": "RELATIVE_VALUE_COINTEGRATION",
+      "phase": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
       "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
-      "action": "VALIDATE_EXISTING_HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_IMPLEMENTATION_BY_INSPECTION",
-      "changes_made": "NONE_REQUIRED_ALREADY_COMPLIANT",
-      "code_refs_validated": [
-        "research_v3/relative_value_epoch24_diagnostic.py",
-        "research_v3/relative_value_epoch24_prerequisite.py"
-      ],
-      "manifest_refs_validated": [
-        "research_v3/EPOCH24_RELATIVE_VALUE_DIAGNOSTIC_PLAN_V1.json",
-        "research_v3/EPOCH24_RELATIVE_VALUE_DIAGNOSTIC_IMPLEMENTATION_MANIFEST_V1.json",
-        "research_v3/EPOCH24_RELATIVE_VALUE_PAIR_DATA_IMPLEMENTATION_MANIFEST_V1.json"
-      ],
-      "no_economic_outcome": true,
-      "no_pair_selection": true,
-      "no_protected_forward_touched": true,
-      "no_v2_attempt_consumed": true,
-      "phase_reviewed": "HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE",
-      "remaining_bounded_scope_preserved_for_later_step": "Later gates (independent structural-diagnostic validity review, authenticated cost/margin verification, prospective freeze and exact-head confidence-interval review) remain explicitly deferred per the accepted decision's later_gates list and are not addressed here.",
-      "test_refs_validated": [
-        "tests/test_relative_value_epoch24_diagnostic.py",
-        "tests/test_relative_value_epoch24_pair_data.py"
-      ]
+      "implementation_exact_head": "e784a360c2ce88378fdc48b48d21c086163abbfe",
+      "implementation_ci_run_id": 36148342179,
+      "diagnostic_acceptance_ref": "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+      "representatives": 41,
+      "authoritative_unordered_pairs": 820,
+      "broker_product_comparable_pairs": 30,
+      "diagnostics_executed": 30,
+      "pairs_meeting_all_frozen_structural_criteria": 0,
+      "failure_counts": {
+        "DEVELOPMENT_STATIONARITY_P_GT_ALPHA": 24,
+        "HOLDOUT_STATIONARITY_P_GT_ALPHA": 29,
+        "HEDGE_SIGN_INSTABILITY": 26,
+        "HEDGE_RELATIVE_DEVIATION_GT_LIMIT": 30,
+        "PERTURBED_HOLDOUT_STATIONARITY_P_GT_ALPHA": 28
+      },
+      "post_outcome_threshold_tuning_performed": false,
+      "pair_ranking_performed": false,
+      "winning_pair_selected": false,
+      "economic_outcomes_opened": 0,
+      "v2_attempts_consumed": 0,
+      "protected_forward_opened": false,
+      "live_orders_authorized": false
+    },
+    "next_research_state": {
+      "status": "PENDING_EXACT_HEAD_GREEN_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE",
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_RELATIVE_VALUE_STRUCTURAL_RESULT_AND_SELECT_THE_HIGHEST_INFORMATION_LEGAL_NEXT_FRONTIER_ACTION",
+      "ai_reasoning_required": true,
+      "research_judgment_required": true,
+      "completed_structural_report_ref": "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+      "completed_family": "RELATIVE_VALUE_COINTEGRATION",
+      "family_result": "NO_PAIR_PASSED_FROZEN_NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC",
+      "repeat_same_family_diagnostic_without_new_predeclared_authority": false,
+      "new_market_data_required": false,
+      "economic_authorization": "NOT_REQUESTED"
     },
     "external_data_gate": null,
-    "implementation_id": "impl_epoch24_rv_hedge_stationarity_stability_diagnostic_review_01",
-    "next_research_state": {
-      "next_action": "No further non-economic code change is required for rv-structural-diagnostic-epoch24-01's HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE phase; the repository's own exact-head-green CI gate (already declared PENDING in the diagnostic and pair-data implementation manifests) must pass before this phase can be treated as durably closed, after which the deferred later_gates (independent validity review, authenticated cost/margin verification, prospective freeze/confidence-interval review) remain the next research steps.",
-      "status": "IMPLEMENTATION_ALREADY_COMPLETE_PENDING_STANDING_CI_EXACT_HEAD_GREEN_GATE"
-    },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "By-inspection review of the bounded HEDGE_STATIONARITY_STABILITY_DIAGNOSTIC_CODE phase for rv-structural-diagnostic-epoch24-01 shows the code is already fully implemented and matches every deliverable. research_v3/relative_value_epoch24_diagnostic.py implements: fixed chronological development/validation/holdout split validation (validate_plan, chronological_split) with no holdout refit/tuning permitted; development-only OLS hedge fit (fit_development_hedge, orientation lexicographic-left-on-right); deterministic finite-simulation ADF lag-1 stationarity test applied identically to development, validation and holdout residuals (adf_stationarity, _adf_lag1_t_stat, _unit_root_null_distribution) with fixed seeds giving reproducible p-values; predeclared development subwindow stability (3 subwindows, sign-consistency and max relative deviation gates) and holdout coefficient-perturbation stability checks (+/-10%); explicit fail-closed failure_criteria classification with no pair ranking, winner selection, returns/PnL, cost claim, or protected-forward/live-order effect (economic_effect always zeroed/false); run_complete_scope enumerates the full accepted 820 unordered-pair inventory without narrowing. research_v3/relative_value_epoch24_prerequisite.py supplies the reused (not regenerated) alignment inventory binding, UTC-intersection-only synchronization with explicit missingness (no forward-fill/imputation), duplicate-conflict rejection, and quote/product comparability guards that fail closed on unknown or ambiguous metadata and never infer quote units from symbol name. Both modules are hash-bound to the already-accepted original and replacement 13W M5 capture (OLD_ZIP_SHA256/REPLACEMENT_ZIP_SHA256) and to the already-accepted current broker-universe metadata zip (CURRENT_BROKER_UNIVERSE_ZIP_SHA256/PAYLOAD_SHA256) rather than any new data source. tests/test_relative_value_epoch24_diagnostic.py and tests/test_relative_value_epoch24_pair_data.py already cover UTC alignment, missing-bar/duplicate handling, product-comparability guards, deterministic hashing, chronological split boundaries, synthetic cointegrated/non-cointegrated fixtures, holdout-mutation-cannot-change-hedge leakage proof, plan-mutation rejection (holdout_refit=True raises), and a no-economic-effect assertion on diagnose_pair output -- satisfying the required unit, fixture, leakage and regression tests. The remaining execution step (running execute()/main() against the accepted-but-git-external binary capture bytes to materialize the final diagnostic-result JSON) is not a new external data need -- those zips are already-accepted, hash-bound artifacts external to Git by design -- and is gated by the standing repository-wide 'PENDING_EXACT_HEAD_GREEN' CI validation already declared in EPOCH24_RELATIVE_VALUE_DIAGNOSTIC_IMPLEMENTATION_MANIFEST_V1.json and EPOCH24_RELATIVE_VALUE_PAIR_DATA_IMPLEMENTATION_MANIFEST_V1.json, not by any missing code, test, or manifest. No repository edits were made because none were required; no economic outcome, V2 attempt, protected-forward artifact, or winner selection was created or touched.",
     "tests_requested": [
-      "python -m unittest tests.test_relative_value_epoch24_pair_data -v",
-      "python -m unittest tests.test_relative_value_epoch24_diagnostic -v",
-      "python -m unittest discover -s tests -p test_*.py -v"
+      "tests/test_relative_value_epoch24_pair_data.py",
+      "tests/test_relative_value_epoch24_diagnostic.py",
+      "tests/test_frontier_information_gain_v1.py"
     ]
   },
+  "provider": {
+    "provider": "openai-chatgpt",
+    "model": "GPT-5.6 Sol",
+    "transport": "connected-github-fresh-chat-recovery",
+    "role": "PRINCIPAL_AUTONOMOUS_RESEARCH_AND_IMPLEMENTATION_DIRECTOR"
+  },
+  "changed_paths": [
+    "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json"
+  ],
   "project_snapshot": {
     "discovery_ledger_sha256": "3beba7a0b606a0c25e7d300c40920324040d7a146249d298b582b1cebf92f9ac",
     "economic_outcomes_opened": 28,
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "provider": {
-    "actual_model_identity": null,
-    "actual_model_identity_known": false,
-    "cli": "@github/copilot",
-    "model": "auto",
-    "model_identity_limitation": "Explicit gpt-5.3-codex and gpt-5.4 were rejected as unavailable by this Copilot connection; Auto is the proven available route, and silent mode does not expose the selected identity.",
-    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
-    "provider": "github-copilot-cli"
-  },
-  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "created_utc": "2026-09-25T14:40:00Z"
 }
