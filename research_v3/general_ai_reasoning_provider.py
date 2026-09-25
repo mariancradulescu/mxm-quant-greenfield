@@ -433,7 +433,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
     context=_context_payload(root,request)
     correction=None; errors=[]; chosen_meta=None; proposal=None
     model=os.environ.get("MXM_COPILOT_MODEL",DEFAULT_MODEL).strip() or DEFAULT_MODEL
-    for attempt in range(5):
+    for attempt in range(1):
         try:
             candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
             proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
