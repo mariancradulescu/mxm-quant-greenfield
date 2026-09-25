@@ -128,6 +128,8 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             state.update(stale); atomic_write_json(root/NEXT_STATE_REL,state)
             trace.append({"cycle":cycle,"kind":"STALE_REASONING_GUARD","status":"FRESH_GENERAL_AI_REASONING_REQUIRED",
                           "current_evidence_epoch":state.get("current_research_evidence_epoch")})
+        if state.get("status")=="MATERIAL_INTEGRITY_FAILURE" and state.get("integrity_gate"):
+            return {"status":"MATERIAL_INTEGRITY_FAILURE","progress_class":"MATERIAL_FAILURE","cycles":cycle-1,"trace":trace,"next_state":state}
         if state.get("user_action_required") is True:
             return {"status":"EXTERNAL_USER_ACTION_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
         if reasoning_required(state):
@@ -146,6 +148,10 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 _record_invocation(root,state,"GENERAL_AI_REASONING",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_REASONING","recovery":recovery})
                 return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+            if r.get("status")=="REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION":
+                _record_invocation(root,state,"GENERAL_AI_REASONING","REJECTED_BY_ELIGIBILITY",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
+                return {"status":"PROPOSAL_REJECTED_PRE_REGISTRY","progress_class":"MATERIAL_FAILURE",
+                        "cycles":cycle,"trace":trace,"rejection":r}
             d=drain(root,git_checkpoint=git_checkpoint,git_push=git_push)
             _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
