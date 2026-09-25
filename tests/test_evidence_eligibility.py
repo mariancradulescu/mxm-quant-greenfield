@@ -5,6 +5,8 @@ from unittest.mock import patch
 from research_v3.evidence_eligibility import C032_CAPTURE, C032_RESULT, EvidenceIneligible, packet, validate_eligibility
 from research_v3.general_ai_implementation_executor import implementation_required
 from research_v3.general_ai_autonomy_loop import run
+from research_v3.general_ai_director_bridge import AIProposalRejected
+from research_v3.general_ai_reasoning_provider import wake
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -30,6 +32,21 @@ class EvidenceEligibilityTests(unittest.TestCase):
         self.assertEqual(len(p["historical_context"]),2)
         self.assertEqual(len(p["forbidden_inputs"]),2)
         self.assertNotIn("content",str(p))
+
+    def test_semantic_rejection_makes_exactly_one_call_without_registry_insertion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            request={"status":"AI_REASONING_REQUIRED","request_id":"reason_semantic_rejection_test",
+                     "evidence_epoch_seen":21}
+            calls=[]
+            def transport(*args,**kwargs):
+                calls.append(1)
+                return {},{}
+            with patch("research_v3.general_ai_reasoning_provider.build_reasoning_request",return_value=request), patch("research_v3.general_ai_reasoning_provider._context_payload",return_value={}), patch("research_v3.general_ai_reasoning_provider._wrap",side_effect=AIProposalRejected("authority outside supplied context")):
+                result=wake(root,token="test-token",transport=transport)
+            self.assertEqual(result["status"],"REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION")
+            self.assertEqual(len(calls),1)
+            self.assertFalse((root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json").exists())
 
     def test_integrity_gate_makes_zero_provider_calls(self):
         self.assertFalse(implementation_required({"status":"MATERIAL_INTEGRITY_FAILURE",
