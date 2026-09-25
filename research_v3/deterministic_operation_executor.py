@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from research_v3.execution_router import (
-    deterministic_operation_required, load_authorized_deterministic_operation,
+    deterministic_operation_required, load_authorized_deterministic_operation, liveness_fingerprint,
 )
 from research_v3.frontier_information_gain import (
     CONTRACT_REL, FEATURE_REL, OPPORTUNITY_REL, SELECTOR_REL, ACQUISITION_REL,
@@ -19,6 +19,7 @@ VERSION="MXM_DETERMINISTIC_OPERATION_EXECUTOR_V1"
 ROUTING_REPAIR_REL=Path("research_v3/EPOCH21_DETERMINISTIC_ROUTING_REPAIR_V1.json")
 EXECUTION_RECORD_REL=Path("research_v3/EPOCH21_DETERMINISTIC_OPERATION_EXECUTION_V1.json")
 LAYER_OPERATION_REL=Path("research_v3/EPOCH21_FRONTIER_SELECTION_LAYER_OPERATION_V1.json")
+DEDUP_REL=Path("research_v3/LIVENESS_DEDUP_V1.json")
 
 class DeterministicOperationRejected(RuntimeError):
     pass

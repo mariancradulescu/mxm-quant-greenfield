@@ -12,6 +12,7 @@ from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot, proposal_hash
 from research_v3.general_ai_reasoning_provider import reasoning_required
+from research_v3.execution_router import implementation_required as routed_implementation_required
 from research_v3.runtime_v2_primitives import GitCheckpointSink, atomic_write_json, canonical_bytes, iso, load_json, sha256_bytes, sha256_file
 
 VERSION="MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2"
