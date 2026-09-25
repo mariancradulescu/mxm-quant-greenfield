@@ -1,0 +1,87 @@
+{
+  "schema": "mxm.greenfield.epoch24-relative-value-diagnostic-plan.v1",
+  "status": "FROZEN_NON_ECONOMIC_DIAGNOSTIC_PLAN",
+  "accepted_proposal_id": "rv-structural-diagnostic-epoch24-01",
+  "accepted_proposal_hash": "443cc268b58665f167b5b3c502c85d1b6dd224f21c61d51f1290c2cfcbc6385b",
+  "family": "RELATIVE_VALUE_COINTEGRATION",
+  "scope": {
+    "representatives": 41,
+    "unordered_pair_inventory": 820,
+    "alignment_inventory_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
+    "pair_data_implementation_ref": "research_v3/EPOCH24_RELATIVE_VALUE_PAIR_DATA_IMPLEMENTATION_MANIFEST_V1.json",
+    "minimum_aligned_observations": 300,
+    "minimum_common_utc_dates": 20,
+    "pair_order": "LEXICOGRAPHIC_BROKER_SYMBOL_UNORDERED",
+    "pair_selection": "FORBIDDEN"
+  },
+  "time_split": {
+    "law": "CHRONOLOGICAL_NO_SHUFFLE",
+    "development_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "holdout_fraction": 0.2,
+    "minimum_partition_observations": 40,
+    "holdout_refit": false,
+    "holdout_tuning": false,
+    "holdout_pair_exclusion": false
+  },
+  "hedge": {
+    "price_transform": "NATURAL_LOG_POSITIVE_CLOSE",
+    "orientation": "LEXICOGRAPHIC_LEFT_ON_RIGHT",
+    "fit": "OLS_WITH_INTERCEPT_DEVELOPMENT_ONLY",
+    "validation_refit": false,
+    "holdout_refit": false
+  },
+  "stationarity": {
+    "test": "ADF_LAG1_INTERCEPT_WITH_DETERMINISTIC_MONTE_CARLO_UNIT_ROOT_NULL",
+    "adf_lag": 1,
+    "alpha_development": 0.05,
+    "alpha_holdout": 0.05,
+    "monte_carlo_simulations": 199,
+    "monte_carlo_seed_base": 240925,
+    "null_length_bucket": 100,
+    "null_length_min": 200,
+    "null_length_max": 1000,
+    "p_value_law": "LOWER_TAIL_EMPIRICAL_WITH_PLUS_ONE_CORRECTION",
+    "validation_is_reported_not_tuned": true
+  },
+  "stability": {
+    "development_subwindows": 3,
+    "max_beta_relative_deviation": 0.5,
+    "require_beta_sign_consistency": true,
+    "coefficient_perturbation_factors": [0.9, 1.1],
+    "perturbation_holdout_alpha": 0.1
+  },
+  "diagnostics": {
+    "report_half_life_bars": true,
+    "report_residual_volatility": true,
+    "half_life_is_not_a_pass_fail_gate": true,
+    "residual_volatility_is_not_a_pass_fail_gate": true
+  },
+  "failure_criteria": [
+    "PAIR_DATA_OR_PRODUCT_COMPARABILITY_FAIL_CLOSED",
+    "INSUFFICIENT_ALIGNED_OBSERVATIONS_OR_COMMON_DATES",
+    "NON_FINITE_OR_NON_POSITIVE_PRICE",
+    "SINGULAR_OR_NON_FINITE_HEDGE_FIT",
+    "DEVELOPMENT_STATIONARITY_P_GT_ALPHA",
+    "HOLDOUT_STATIONARITY_P_GT_ALPHA",
+    "HEDGE_SIGN_INSTABILITY",
+    "HEDGE_RELATIVE_DEVIATION_GT_LIMIT",
+    "PERTURBED_HOLDOUT_STATIONARITY_P_GT_ALPHA",
+    "ANY_HOLDOUT_REFIT_TUNING_OR_PAIR_EXCLUSION"
+  ],
+  "interpretation_boundary": {
+    "economic_edge_inference": false,
+    "pair_ranking": false,
+    "winning_pair_selection": false,
+    "returns_or_pnl": false,
+    "transaction_cost_claim": false,
+    "economic_authorization": false,
+    "protected_forward_opening": false,
+    "live_orders": false
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  }
+}
