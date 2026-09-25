@@ -12,7 +12,28 @@
     "minimum_aligned_observations": 300,
     "minimum_common_utc_dates": 20,
     "pair_order": "LEXICOGRAPHIC_BROKER_SYMBOL_UNORDERED",
-    "pair_selection": "FORBIDDEN"
+    "pair_selection": "FORBIDDEN",
+    "product_comparability_authority": {
+      "source": "ACCEPTED_CURRENT_BROKER_UNIVERSE_EXACT_METADATA",
+      "source_zip_sha256": "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9",
+      "canonical_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
+      "identity_key": "broker_symbol+symbol_id",
+      "required_fields": [
+        "product_type",
+        "quote_asset",
+        "lot_size",
+        "asset_class"
+      ],
+      "normalized_contract_family_law": [
+        "ANY_*_EQUITIES=>EQUITY_CFD",
+        "COMMODITIES_(CASH)=>CASH_COMMODITY_CFD",
+        "OTHERWISE_NON_OTHER_PRODUCT_TYPE",
+        "OTHERWISE_PRODUCT_TYPE|ASSET_CLASS"
+      ],
+      "same_quote_asset_required": true,
+      "same_lot_size_required": true,
+      "symbol_name_quote_inference": false
+    }
   },
   "time_split": {
     "law": "CHRONOLOGICAL_NO_SHUFFLE",
@@ -48,7 +69,10 @@
     "development_subwindows": 3,
     "max_beta_relative_deviation": 0.5,
     "require_beta_sign_consistency": true,
-    "coefficient_perturbation_factors": [0.9, 1.1],
+    "coefficient_perturbation_factors": [
+      0.9,
+      1.1
+    ],
     "perturbation_holdout_alpha": 0.1
   },
   "diagnostics": {
