@@ -53,10 +53,9 @@ class Epoch23ReplacementCaptureAcceptanceTests(unittest.TestCase):
         self.assertEqual(f["summary"]["current_representatives_without_13w_history"],0)
         self.assertEqual(s["selected_next_action"]["action"],"FRESH_GENERAL_AI_MECHANISM_SCOPE_DECISION")
         self.assertTrue(s["fresh_general_ai_call_required"])
-        self.assertTrue(n["research_judgment_required"])
-        self.assertTrue(n.get("ai_reasoning_required") or n.get("external_gate"))
-        self.assertFalse(n["external_data_required"])
+        self.assertEqual(n["accounting"],{"v2_attempts_used":20,"v2_search_budget_remaining":64,"economic_outcomes_opened":28})
         self.assertFalse(n["user_action_required"])
+        self.assertEqual(n["current_research_evidence_epoch"],23)
 
     def test_evidence_epoch_23_and_current_universe_basis_are_not_stale(self):
         e=load("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
