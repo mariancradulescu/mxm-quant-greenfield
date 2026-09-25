@@ -133,6 +133,37 @@ class RelativeValueEpoch24PairDataTests(unittest.TestCase):
         self.assertFalse(out["comparable"])
         self.assertIn("AMBIGUOUS_PRODUCT_TYPE_FAIL_CLOSED", out["reasons"])
 
+    def test_exact_broker_product_metadata_resolves_coarse_registry_label(self):
+        authority = {
+            "AAA": {
+                "symbol_id": 1,
+                "product_type": "OTHER_OR_TEST_CFD",
+                "unit_family": "EQUITY_CFD",
+                "lot_size": "100",
+                "quote_asset": "EUR",
+                "broker_metadata_complete": True,
+                "source_ref": "accepted-current-broker-capture",
+            },
+            "BBB": {
+                "symbol_id": 2,
+                "product_type": "OTHER_OR_TEST_CFD",
+                "unit_family": "EQUITY_CFD",
+                "lot_size": "100",
+                "quote_asset": "EUR",
+                "broker_metadata_complete": True,
+                "source_ref": "accepted-current-broker-capture",
+            },
+        }
+        out = product_quote_comparability(
+            _rep("AAA", 1, asset="AT Equities", product="OTHER_OR_TEST_CFD"),
+            _rep("BBB", 2, asset="BE Equities", product="OTHER_OR_TEST_CFD"),
+            quote_unit_authority=authority,
+        )
+        self.assertTrue(out["comparable"])
+        self.assertTrue(out["rich_broker_product_metadata_used"])
+        self.assertTrue(out["same_contract_unit"])
+        self.assertFalse(out["quote_unit_inference_from_symbol_name"])
+
     def test_missingness_hash_is_order_invariant(self):
         a = _timestamp_set_sha256(
             {"2026-01-01T00:10:00Z", "2026-01-01T00:00:00Z"}
