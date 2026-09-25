@@ -231,7 +231,7 @@ def _explicit_quote_unit(
         unit = value.strip().upper()
         return (unit or None), "CALLER_EXPLICIT"
     if isinstance(value, Mapping):
-        unit = str(value.get("quote_unit") or "").strip().upper()
+        unit = str(value.get("quote_unit") or value.get("quote_asset") or "").strip().upper()
         source = (
             str(value.get("source_ref") or value.get("source") or "").strip()
             or "CALLER_EXPLICIT"
@@ -240,13 +240,52 @@ def _explicit_quote_unit(
     raise PairDataError(f"invalid quote-unit authority entry for {symbol}")
 
 
+def _explicit_product_metadata(
+    authority: Mapping[str, Any] | None,
+    symbol: str,
+    representative: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    if not authority or symbol not in authority:
+        return None
+    value = authority[symbol]
+    if not isinstance(value, Mapping):
+        return None
+    if value.get("symbol_id") is not None and int(value["symbol_id"]) != int(
+        representative["symbol_id"]
+    ):
+        raise PairDataError(f"product authority symbol-id mismatch: {symbol}")
+    product_type = str(value.get("product_type") or "").strip()
+    unit_family = str(value.get("unit_family") or "").strip()
+    lot_size = str(value.get("lot_size") or "").strip()
+    quote_unit = str(value.get("quote_unit") or value.get("quote_asset") or "").strip().upper()
+    complete = bool(value.get("broker_metadata_complete")) and all(
+        (product_type, unit_family, lot_size, quote_unit)
+    )
+    return {
+        "product_type": product_type,
+        "unit_family": unit_family,
+        "lot_size": lot_size,
+        "quote_unit": quote_unit,
+        "complete": complete,
+        "source_ref": str(value.get("source_ref") or value.get("source") or "").strip()
+        or "CALLER_EXPLICIT",
+    }
+
+
 def product_quote_comparability(
     left_rep: Mapping[str, Any],
     right_rep: Mapping[str, Any],
     *,
     quote_unit_authority: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Conservative comparability gate; quote units are never inferred from symbol names."""
+    """Fail-closed broker-product comparability without symbol-name inference.
+
+    A rich authority record derived from authenticated broker metadata may resolve a
+    coarse registry product label such as OTHER_OR_TEST_CFD. In that case the gate
+    requires the same normalized contract family, exact broker product type, quote
+    unit and lot size. Without rich metadata, the original conservative registry
+    rule remains in force.
+    """
     left_symbol = str(left_rep["broker_symbol"])
     right_symbol = str(right_rep["broker_symbol"])
     left_sig = list(left_rep.get("signature") or [])
@@ -254,14 +293,30 @@ def product_quote_comparability(
     if len(left_sig) < 2 or len(right_sig) < 2:
         raise PairDataError("structural signature missing product metadata")
 
-    left_asset, right_asset = str(left_sig[0]), str(right_sig[0])
-    left_product, right_product = str(left_sig[1]), str(right_sig[1])
+    left_meta = _explicit_product_metadata(quote_unit_authority, left_symbol, left_rep)
+    right_meta = _explicit_product_metadata(quote_unit_authority, right_symbol, right_rep)
+    rich_metadata = bool(
+        left_meta and right_meta and left_meta["complete"] and right_meta["complete"]
+    )
+
+    if rich_metadata:
+        left_asset, right_asset = left_meta["unit_family"], right_meta["unit_family"]
+        left_product, right_product = left_meta["product_type"], right_meta["product_type"]
+        left_lot, right_lot = left_meta["lot_size"], right_meta["lot_size"]
+        same_contract_unit = bool(left_lot and right_lot and left_lot == right_lot)
+        product_unambiguous = True
+    else:
+        left_asset, right_asset = str(left_sig[0]), str(right_sig[0])
+        left_product, right_product = str(left_sig[1]), str(right_sig[1])
+        left_lot = right_lot = None
+        same_contract_unit = True
+        product_unambiguous = (
+            left_product not in AMBIGUOUS_PRODUCT_TYPES
+            and right_product not in AMBIGUOUS_PRODUCT_TYPES
+        )
+
     same_asset_class = left_asset == right_asset
     same_product_type = left_product == right_product
-    product_unambiguous = (
-        left_product not in AMBIGUOUS_PRODUCT_TYPES
-        and right_product not in AMBIGUOUS_PRODUCT_TYPES
-    )
     left_quote, left_quote_source = _explicit_quote_unit(quote_unit_authority, left_symbol)
     right_quote, right_quote_source = _explicit_quote_unit(quote_unit_authority, right_symbol)
     quote_units_explicit = left_quote is not None and right_quote is not None
@@ -269,11 +324,15 @@ def product_quote_comparability(
 
     reasons = []
     if not same_asset_class:
-        reasons.append("ASSET_CLASS_MISMATCH")
+        reasons.append(
+            "CONTRACT_FAMILY_MISMATCH" if rich_metadata else "ASSET_CLASS_MISMATCH"
+        )
     if not same_product_type:
         reasons.append("PRODUCT_TYPE_MISMATCH")
     if same_product_type and not product_unambiguous:
         reasons.append("AMBIGUOUS_PRODUCT_TYPE_FAIL_CLOSED")
+    if rich_metadata and not same_contract_unit:
+        reasons.append("CONTRACT_UNIT_LOT_SIZE_MISMATCH")
     if not quote_units_explicit:
         reasons.append("QUOTE_UNIT_UNKNOWN_FAIL_CLOSED")
     elif not same_quote_unit:
@@ -283,17 +342,25 @@ def product_quote_comparability(
         same_asset_class
         and same_product_type
         and product_unambiguous
+        and same_contract_unit
         and quote_units_explicit
         and same_quote_unit
     )
     return {
         "status": "COMPARABLE" if comparable else "NOT_COMPARABLE_FAIL_CLOSED",
         "comparable": comparable,
+        "rich_broker_product_metadata_used": rich_metadata,
+        "same_asset_class_or_contract_family": same_asset_class,
         "same_asset_class": same_asset_class,
         "same_product_type": same_product_type,
+        "same_contract_unit": same_contract_unit,
         "product_type_unambiguous": product_unambiguous,
+        "left_contract_family": left_asset,
+        "right_contract_family": right_asset,
         "left_product_type": left_product,
         "right_product_type": right_product,
+        "left_lot_size": left_lot,
+        "right_lot_size": right_lot,
         "quote_units_explicit": quote_units_explicit,
         "same_quote_unit": same_quote_unit,
         "left_quote_unit": left_quote,
@@ -303,7 +370,6 @@ def product_quote_comparability(
         "reasons": reasons,
         "quote_unit_inference_from_symbol_name": False,
     }
-
 
 def synchronize_pair(
     left_series: Mapping[str, Any],
