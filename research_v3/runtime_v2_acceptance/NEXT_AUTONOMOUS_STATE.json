@@ -512,5 +512,14 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true
+  "uses_only_existing_accepted_bytes": true,
+  "implementation_task_scope": {
+    "phase": "PAIR_DATA_AND_COMPARABILITY_CODE",
+    "deliverables": [
+      "Extend research_v3/relative_value_epoch24_prerequisite.py with a reusable hash-bound synchronized-price series builder for accepted 41-representative M5 input. Existing complete timestamp inventory is durable and must be reused, not regenerated.",
+      "Implement pair-level UTC intersection, duplicate/conflicting-row rejection, explicit missingness, broker-symbol identities and conservative product/quote-unit comparability gates. Never assign a winning pair or calculate returns/PnL.",
+      "Add focused synthetic unit tests for alignment, duplicate rejection, identity and comparability failures. Emit a small auditable non-economic phase manifest; no economic attempt or outer data."
+    ],
+    "after_green": "Return to the remaining accepted hedge/stationarity/stability diagnostic as a separate bounded implementation phase; keep the same selected family and do not repeat semantic family selection."
+  }
 }
