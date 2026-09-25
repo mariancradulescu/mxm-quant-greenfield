@@ -55,12 +55,25 @@ class Epoch23ReplacementCaptureAcceptanceTests(unittest.TestCase):
         self.assertTrue(s["fresh_general_ai_call_required"])
         self.assertEqual(n["accounting"],{"v2_attempts_used":20,"v2_search_budget_remaining":64,"economic_outcomes_opened":28})
         self.assertFalse(n["user_action_required"])
-        self.assertEqual(n["current_research_evidence_epoch"],23)
-
-    def test_evidence_epoch_23_and_current_universe_basis_are_not_stale(self):
         e=load("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
-        self.assertEqual(e["current_epoch"],23)
-        self.assertEqual(e["history"][-1]["event_class"],"AUTHENTICATED_MARKET_DATA_ACCEPTED")
+        self.assertGreaterEqual(e["current_epoch"],23)
+        self.assertLessEqual(n["current_research_evidence_epoch"],e["current_epoch"])
+
+    def test_epoch23_capture_remains_authoritative_after_later_material_evidence(self):
+        e=load("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
+        self.assertGreaterEqual(e["current_epoch"],23)
+        epoch23=[row for row in e["history"] if row["epoch"]==23]
+        self.assertEqual(len(epoch23),1)
+        self.assertEqual(epoch23[0]["event_class"],"AUTHENTICATED_MARKET_DATA_ACCEPTED")
+        self.assertIn(
+            "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+            e["authoritative_evidence_refs"],
+        )
+        if e["current_epoch"]>=24:
+            self.assertIn(
+                "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+                e["authoritative_evidence_refs"],
+            )
         binding=current_evidence_binding(ROOT)
         u=binding["universe_basis"]
         self.assertEqual(u["accessible_symbols"],1689)
