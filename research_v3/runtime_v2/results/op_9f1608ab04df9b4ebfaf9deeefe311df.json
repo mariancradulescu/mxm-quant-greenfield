@@ -1,0 +1,65 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "e4b700c3aa1c52188baa2c99d1872463a5fd05cadce2c7e144dba5af0519b25b",
+  "competition_start_authorized": false,
+  "decision": {
+    "base_signal_reused_non_economically": {
+      "reuse_boundary": "Structural/non-economic screening statistics only; no PnL, cost, or opened economic identity from these refs is reused or reopened.",
+      "reused_structural_evidence": [
+        "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json",
+        "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
+        "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_V1.json"
+      ],
+      "signal": "BREAKOUT_VOLATILITY_EXPANSION directional follow-through / persistence"
+    },
+    "breadth": {
+      "narrowing_reason": "None applied; frontier evidence shows uniform structural/data coverage across all 41, so breadth is not reduced below the full frontier-relative representative set at this stage.",
+      "scope": "All 41 current structural representatives with accepted 13W history and known breakout-event availability (41/41 per epoch23 evidence)"
+    },
+    "conditioning_law": "Evaluate the existing breakout-event follow-through/persistence structural statistics separately within HIGH_VOL_EXPANDING bars versus LOW_VOL_COMPRESSED bars per representative, as two disjoint structural arms; no post-hoc collapsing of arms and no selection of the better-performing arm as the scope (that would be outcome-driven scope selection, which is prohibited).",
+    "explicit_exclusions": [
+      "No reuse or reopening of V2-C032 exact identity/outcome",
+      "No CARRY_TERM_STRUCTURE action pending term-structure metadata acquisition (deferred, not closed)",
+      "No economic envelope, transaction-local cost acquisition, margin freeze, or breadth freeze authorized at this step"
+    ],
+    "next_deterministic_step": "Build the REGIME_CONTEXT_CONDITIONED non-economic structural screen: causal regime-label pass plus per-arm conditional follow-through/persistence statistics for all 41 representatives, reusing already-captured 13W M5 bars. Output remains non-economic (no cost, no PnL, no live/protected-forward exposure).",
+    "regime_state_definition": {
+      "computation": "Per current structural representative, compute a strictly causal trailing ATR(14)-on-M5 percentile rank over a fixed trailing lookback window (no future bars, no whole-sample normalization), refreshed bar-by-bar, using only already-captured 13W M5 history.",
+      "leakage_controls": "Regime label at bar t depends only on bars <= t-1; classification thresholds fixed ex ante from the trailing window, not from the evaluation window; no outcome-derived thresholding.",
+      "states": [
+        "HIGH_VOL_EXPANDING",
+        "LOW_VOL_COMPRESSED"
+      ]
+    },
+    "selected_mechanism_family": "REGIME_CONTEXT_CONDITIONED"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "authorizing_evidence_epoch": 23,
+    "breadth_symbols_count": 41,
+    "carry_term_structure_state": "DEFERRED_FAIL_CLOSED_PENDING_TERM_STRUCTURE_METADATA_NOT_CLOSED",
+    "data_requirement": "NONE_NEW_REQUIRED_USES_EXISTING_13W_M5_CAPTURE",
+    "downstream_gate_expected": "Non-economic REGIME_CONTEXT_CONDITIONED structural screen acceptance, then a subsequent fresh AI judgment on whether/how to freeze a prospective economic envelope.",
+    "implementation_ai_required": false,
+    "mechanism_family": "REGIME_CONTEXT_CONDITIONED",
+    "next_action": "BUILD_CAUSAL_REGIME_LABEL_AND_CONDITIONAL_FOLLOWTHROUGH_STRUCTURAL_SCREEN_FOR_41_CURRENT_REPRESENTATIVES_USING_EXISTING_13W_M5_CAPTURE",
+    "research_judgment_required": true,
+    "status": "REGIME_CONTEXT_CONDITIONED_SCOPE_SPECIFIED_PENDING_STRUCTURAL_SCREEN"
+  },
+  "objective": {
+    "class": "REGIME_CONTEXT_CONDITIONED",
+    "goal": "Specify the exact regime-state definition, conditioning law, and frontier-relative breadth for the next legal non-economic prospective research wave, following the fail-closed CARRY_TERM_STRUCTURE boundary and the deterministic closure of the 41/41 current-representative 13W-history gap.",
+    "information_gain_rationale": "The opportunity map and information-gain selection show all cross-family deterministic shared gaps (structural signature, current margin, 13W history, breakout-event availability) are closed at 41/41. CARRY_TERM_STRUCTURE is fail-closed because no authoritative term-structure/maturity metadata exists in repository evidence and none may be synthesized. REGIME_CONTEXT_CONDITIONED was already flagged as the secondary priority with sufficient existing causal history to define semantics without another broad capture. Conditioning an already non-economically screened breakout-follow-through edge on a strictly causal (no-lookahead) trailing volatility regime maximizes information gain per unit of new deterministic work: it reuses existing 13W M5 captures and existing breakout event/follow-through/persistence structural evidence, and asks only the one remaining scientific question (what regime law conditions the edge) that a deterministic selector cannot answer on its own."
+  },
+  "operation_id": "op_9f1608ab04df9b4ebfaf9deeefe311df",
+  "proposal_hash": "1243a6b0807d6feb4d21aebe1b5626cd3f184b52e03dd92a6446c85b83402ad8",
+  "proposal_id": "frontier-ig-20260925-regime-context-conditioned-scope",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_332d3c0d20a735a1cff313e655f6df26.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
