@@ -35,6 +35,7 @@ def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retrya
         "quota_failures":sum(x["outcome"]=="PROVIDER_UNAVAILABLE" for x in rows),
         "invocations":rows,
     })
+    GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_provider_usage",None)
 
 
 def _recoverable_provider_failure(exc: Exception) -> bool:
