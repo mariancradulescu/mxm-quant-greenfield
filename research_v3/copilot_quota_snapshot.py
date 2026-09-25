@@ -24,7 +24,10 @@ async def fetch_account_quota():
     from copilot.rpc import AccountGetQuotaRequest
     async with CopilotClient() as client:
         result=await client.rpc.account.get_quota(AccountGetQuotaRequest())
-        return normalize((result.quota_snapshots or {}).get("premium_interactions"))
+        snapshots=result.quota_snapshots or {}
+        preferred=next((k for k in ("ai_credits","premium_interactions") if k in snapshots),None)
+        return {"available_quota_types":sorted(snapshots),
+                "selected_quota_type":preferred,**normalize(snapshots.get(preferred))}
 
 def record(root:Path,quota:dict,*,run_id:str)->dict:
     doc={"schema":"mxm.greenfield.copilot-account-quota.v1","sdk_pin":SDK_PIN,
