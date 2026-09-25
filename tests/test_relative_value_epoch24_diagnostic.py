@@ -11,6 +11,7 @@ from research_v3.relative_value_epoch24_diagnostic import (
     diagnose_pair,
     fit_development_hedge,
     validate_plan,
+    _normalized_contract_family,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,6 +64,26 @@ def _synthetic_pair(n=600, seed=7):
 
 
 class RelativeValueEpoch24DiagnosticTests(unittest.TestCase):
+    def test_contract_family_normalization_uses_broker_metadata_not_symbol_name(self):
+        self.assertEqual(
+            _normalized_contract_family(
+                {"asset_class": "AT Equities", "product_type": "OTHER_OR_TEST_CFD"}
+            ),
+            "EQUITY_CFD",
+        )
+        self.assertEqual(
+            _normalized_contract_family(
+                {"asset_class": "Commodities (Cash)", "product_type": "OTHER_OR_TEST_CFD"}
+            ),
+            "CASH_COMMODITY_CFD",
+        )
+        self.assertEqual(
+            _normalized_contract_family(
+                {"asset_class": "Forex (Spot)", "product_type": "FX_SPOT_OR_MARGIN_CFD"}
+            ),
+            "FX_SPOT_OR_MARGIN_CFD",
+        )
+
     def test_frozen_plan_is_non_economic_and_chronological(self):
         validate_plan(PLAN)
         split = chronological_split(500, PLAN)
