@@ -724,6 +724,52 @@ def _verify_already_materialized_entry(
     return {"status": "ALREADY_MATERIALIZED", **dict(row)}
 
 
+ONE_SHOT_NEXT_STATE_KEYS = (
+    "semantic_question",
+    "decision_contract",
+    "implementation_task_scope",
+    "selected_family",
+    "mechanism_family",
+    "active_mechanism_family",
+    "active_candidate_id",
+    "active_target_symbol",
+    "active_target_symbols",
+    "active_proposal_id",
+    "reason",
+    "supersession_ref",
+    "selection_rule",
+    "selection_basis",
+)
+
+def _clean_next_state_for_new_ai_decision(
+    existing: Mapping[str, Any],
+    proposed_next: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Drop prior decision-local semantic authority before publishing a new AI decision.
+
+    Durable evidence/result references remain available through the evidence epoch and
+    completed_* fields. One-shot questions/contracts/scopes must be explicitly
+    re-declared by the newly accepted proposal or they cannot constrain future reasoning.
+    """
+    doc=dict(existing)
+    for key in (
+        "ai_reasoning_required",
+        "implementation_ai_required",
+        "external_data_required",
+        "external_data_gate",
+        "green_implementation_artifacts",
+        "external_data_gate_ref",
+        "collector_build_ref",
+        "collector_package_artifact_name",
+        "expected_return_artifact_name",
+        "source_implementation_id",
+        *ONE_SHOT_NEXT_STATE_KEYS,
+    ):
+        doc.pop(key, None)
+    doc.update(dict(proposed_next))
+    return doc
+
+
 def materialize_proposal(
     root_value: str | Path,
     proposal_ref: str,
@@ -792,23 +838,10 @@ def materialize_proposal(
 
     publication = proposal.get("publication") or {}
     if publication.get("apply_to_next_state") is True:
-        next_doc = dict(load_json(root / NEXT_STATE_REL, {}) or {})
-        # Routing metadata belongs to the action that created it. Never inherit it into
-        # a newly accepted AI decision unless that decision explicitly re-declares it.
-        for key in (
-            "ai_reasoning_required",
-            "implementation_ai_required",
-            "external_data_required",
-            "external_data_gate",
-            "green_implementation_artifacts",
-            "external_data_gate_ref",
-            "collector_build_ref",
-            "collector_package_artifact_name",
-            "expected_return_artifact_name",
-            "source_implementation_id",
-        ):
-            next_doc.pop(key, None)
-        next_doc.update(dict(proposal["next_research_state"]))
+        next_doc = _clean_next_state_for_new_ai_decision(
+            dict(load_json(root / NEXT_STATE_REL, {}) or {}),
+            proposal["next_research_state"],
+        )
         next_doc["user_action_required"] = bool(proposal["next_research_state"].get("user_action_required", False))
         next_doc["implementation_ai_required"] = bool(proposal["next_research_state"].get("implementation_ai_required", False))
         data_policy=proposal.get("data_policy") or {}
