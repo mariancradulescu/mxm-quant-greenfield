@@ -443,6 +443,16 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
             proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
             break
+        except AIProposalRejected as exc:
+            rejection={"schema":"mxm.greenfield.ai-proposal-eligibility-rejection.v1",
+                       "status":"REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION",
+                       "reason":str(exc),"request_id":request["request_id"],
+                       "evidence_epoch":request["evidence_epoch_seen"],
+                       "economic_outcomes_opened_delta":0,"v2_attempts_consumed_delta":0,
+                       "implementation_provider_calls":0,"created_utc":iso()}
+            atomic_write_json(root/"research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",rejection)
+            sink.checkpoint("general_ai_semantic_rejection",None)
+            return rejection
         except AIReasoningExternalGate as exc:
             gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"detail":str(exc),"created_utc":iso()}
             atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
