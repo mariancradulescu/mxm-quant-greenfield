@@ -21,7 +21,7 @@ def normalize(snapshot):
 
 async def fetch_account_quota():
     from copilot import CopilotClient
-    from copilot.generated.rpc_types import AccountGetQuotaRequest
+    from copilot.rpc import AccountGetQuotaRequest
     async with CopilotClient() as client:
         result=await client.rpc.account.get_quota(AccountGetQuotaRequest())
         return normalize((result.quota_snapshots or {}).get("premium_interactions"))
