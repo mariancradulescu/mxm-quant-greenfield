@@ -7,6 +7,7 @@ from __future__ import annotations
 import argparse, hashlib, json, os, shutil, subprocess
 from pathlib import Path
 from typing import Any, Mapping
+from research_v3.evidence_eligibility import validate_eligibility, EvidenceIneligible
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot, proposal_hash
@@ -380,6 +381,15 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("stale_reasoning_fail_closed",None)
         return {"status":"AI_REASONING_REQUIRED","next_state":doc,"stale_reasoning_guard":stale["stale_reasoning_guard"]}
     if not implementation_required(next_state): return {"status":"NO_IMPLEMENTATION_REQUIRED"}
+    if next_state.get("source_ai_proposal_id"):
+        superseded=load_json(root/"research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",{}) or {}
+        if superseded.get("proposal_id")==next_state["source_ai_proposal_id"]:
+            raise ImplementationRejected("superseded proposal cannot invoke implementation provider")
+        _,bound_proposal,_=_resolve_current_proposal(root,next_state)
+        try:
+            validate_eligibility(bound_proposal)
+        except EvidenceIneligible as exc:
+            raise ImplementationRejected("pre-implementation evidence eligibility: "+str(exc)) from exc
     redirect=authoritative_reasoning_requirement(root,next_state)
     if redirect is not None:
         before=project_snapshot(root)
