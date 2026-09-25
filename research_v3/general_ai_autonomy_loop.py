@@ -83,10 +83,9 @@ def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
         return None
     legacy_quota=(prior.get("status") == "PROVIDER_RETRY_REQUIRED"
                   and "monthly quota" in str(prior.get("detail","")).lower())
-    current_quota=(prior.get("status") == "PROVIDER_UNAVAILABLE"
-                   and prior.get("failure_class") == "MONTHLY_QUOTA_EXHAUSTED")
-    # Monthly account quota applies across phases and fingerprints until a real reset is confirmed.
-    return prior if legacy_quota or current_quota else None
+    provider_blocked=prior.get("status") in {"PROVIDER_UNAVAILABLE","AUTH_OR_ENTITLEMENT_FAILURE","PROBE_INCONCLUSIVE"}
+    # Account entitlement is global across phases and fingerprints until a valid probe succeeds.
+    return prior if legacy_quota or provider_blocked else None
 
 def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_checkpoint: bool, git_push: bool) -> dict:
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
