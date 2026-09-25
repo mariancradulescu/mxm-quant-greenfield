@@ -5,7 +5,7 @@ from pathlib import Path
 from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import drain
-from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
+from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected, exact_head_green
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
 from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso, sha256_file
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
@@ -131,6 +131,9 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
         if state.get("user_action_required") is True:
             return {"status":"EXTERNAL_USER_ACTION_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
         if reasoning_required(state):
+            green=exact_head_green(root)
+            if not green["green"]:
+                return {"status":"PENDING_EXACT_HEAD_GREEN","progress_class":"SAFE_NO_PROGRESS","cycles":cycle-1,"trace":trace,"exact_head":green,"next_state":state}
             blocked=_provider_unavailable(root,state,"GENERAL_AI_REASONING")
             if blocked is not None:
                 return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
