@@ -29,8 +29,12 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
         for key in ("active_candidate_id","active_target_symbol","active_mechanism_family","active_proposal_id"):
             self.assertIsNone(state[key])
             self.assertIsNone(nxt[key])
-        for key in ("candidate_id","target_symbol","mechanism_family"):
+        for key in ("candidate_id","target_symbol"):
             self.assertIsNone(nxt[key])
+        # A named non-economic structural family is research scope, not an active trade target.
+        if nxt.get("mechanism_family") is not None:
+            self.assertEqual(nxt["mechanism_family"], "REGIME_CONTEXT_CONDITIONED")
+            self.assertFalse(nxt.get("economic_promotion_authorized", False))
         # source_ai_proposal_id is durable provenance for a later accepted semantic decision,
         # not an active candidate/symbol/mechanism target.
         if nxt.get("source_ai_proposal_id") is not None:
