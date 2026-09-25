@@ -72,7 +72,7 @@ def execute(root:Path, run_id:str, token:str, transport=None)->dict:
     else:
         code,stdout,stderr=transport()
     detail=(stderr+"\n"+stdout).lower()
-    if code==0 and REPLY in stdout:
+    if code==0 and stdout.strip()==REPLY:
         status="AVAILABLE"
     elif "monthly quota" in detail or "exceeded your quota" in detail:
         status="PROVIDER_UNAVAILABLE"
@@ -81,7 +81,7 @@ def execute(root:Path, run_id:str, token:str, transport=None)->dict:
     else:
         status="PROBE_INCONCLUSIVE"
     doc.update({"status":status,"completed_utc":iso(),"process_exit_code":code,
-                "provider_call_count":1,"response_marker_seen":REPLY in stdout,
+                "provider_call_count":1,"response_marker_seen":stdout.strip()==REPLY,
                 "raw_provider_output_persisted":False})
     atomic_write_json(path,doc)
     _record_usage(root,status)
