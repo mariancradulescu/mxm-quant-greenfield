@@ -77,6 +77,11 @@ def packet(root: Path, *, evidence_epoch: int, decision_class: str, refs: list[s
         elif role == "HISTORICAL_CONTEXT_ONLY":
             historical.append({**item,"summary":"Historical result; no prospective data binding."})
         else:
+            if ref in delta_refs and ref.endswith("EPOCH20_SERIAL_DEPENDENCE_SCREEN_V1.json"):
+                doc=json.loads(path.read_text(encoding="utf-8"))
+                item["material_summary"]={"pooled":doc.get("pooled"),"series_count":len(doc.get("series") or {}),
+                    "frozen_horizons_m5_bars":doc.get("frozen_horizons_m5_bars"),
+                    "interpretation_boundary":doc.get("interpretation_boundary")}
             allowed.append(item)
     return {"schema":"mxm.greenfield.semantic-eligibility-packet.v1","evidence_epoch":evidence_epoch,
             "material_delta_since_last_accepted_reasoning":delta_refs,
