@@ -154,7 +154,8 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 return {"status":"PROPOSAL_REJECTED_PRE_REGISTRY","progress_class":"MATERIAL_FAILURE",
                         "cycles":cycle,"trace":trace,"rejection":r}
             d=drain(root,git_checkpoint=git_checkpoint,git_push=git_push)
-            _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
+            if r.get("status")!="EXTERNAL_PROPOSAL_REUSED":
+                _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
             continue
         if implementation_required(state):
