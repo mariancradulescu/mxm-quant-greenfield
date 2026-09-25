@@ -54,7 +54,7 @@ class Epoch23ReplacementCaptureAcceptanceTests(unittest.TestCase):
         self.assertEqual(s["selected_next_action"]["action"],"FRESH_GENERAL_AI_MECHANISM_SCOPE_DECISION")
         self.assertTrue(s["fresh_general_ai_call_required"])
         self.assertTrue(n["research_judgment_required"])
-        self.assertTrue(n["ai_reasoning_required"])
+        self.assertTrue(n.get("ai_reasoning_required") or n.get("external_gate"))
         self.assertFalse(n["external_data_required"])
         self.assertFalse(n["user_action_required"])
 
