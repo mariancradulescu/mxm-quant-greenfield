@@ -21,13 +21,13 @@ class Epoch23LivenessRecoveryTests(unittest.TestCase):
         self.assertEqual(g["economic_effect"]["economic_outcomes"],0)
         self.assertEqual(g["provider_effect"]["copilot_calls_for_gate"],0)
 
-    def test_recovered_state_blocks_contradictory_implementation_without_economics(self):
+    def test_scope_recovery_routes_to_new_distinct_semantic_decision(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
-        self.assertEqual(n["status"], "RESEARCH_SCOPE_CONTRADICTION_FAIL_CLOSED")
-        self.assertEqual(n["external_gate"]["type"], "MATERIAL_RESEARCH_SCOPE_CONTRADICTION")
+        self.assertEqual(n["status"], "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH23_SCOPE_RESOLUTION")
+        self.assertEqual(n["decision_contract"]["required_action"], "SELECT_DISTINCT_PROSPECTIVE_FRONTIER_WAVE")
         self.assertFalse(n["implementation_ai_required"])
         self.assertFalse(n["user_action_required"])
-        self.assertEqual(classify_execution(ROOT,n)["execution_class"], "MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+        self.assertEqual(classify_execution(ROOT,n)["execution_class"], "SEMANTIC_REASONING")
 
     def test_router_does_not_reinterpret_accepted_proposal_as_implementation_authority(self):
         n=load("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
