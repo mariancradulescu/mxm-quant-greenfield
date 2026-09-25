@@ -213,6 +213,13 @@ def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,A
 def _prompt(root:Path,next_state:Mapping[str,Any])->str:
     proposal_ref,proposal,registry_row=_resolve_current_proposal(root,next_state)
     bound_context=_bound_context(root,next_state,proposal)
+    # Durable next-state documents accumulate historical telemetry. Transport only
+    # current implementation authority and safety context to the code provider.
+    context_keys=("status","next_action","selected_family","source_ai_proposal_id",
+                  "source_ai_proposal_hash","current_research_evidence_epoch",
+                  "implementation_task_scope","alignment_prerequisite_ref",
+                  "accounting","safety","external_gate")
+    current_context={k:next_state.get(k) for k in context_keys if k in next_state}
     return """You are the GENERAL AI IMPLEMENTATION DIRECTOR for MXM Quant Greenfield V2.
 Implement the current valid NON_ECONOMIC research decision generically. There is NO finite next_action mapping.
 Inspect the repository with file view/search tools and decide whether implementation is already sufficient,
@@ -261,9 +268,14 @@ Return ONE JSON object only:
  "tests_requested":["..."]
 }
 No chain-of-thought.
+If CURRENT_NEXT_STATE includes implementation_task_scope, deliver ONLY that bounded phase.
+Preserve the remainder of the accepted decision as an explicit later step.
+The already persisted relative-value alignment inventory is accepted; do not
+recompute it or repeat the mechanism choice. Do not claim that an internal
+development holdout is independent confirmation.
 
 CURRENT_NEXT_STATE:
-"""+json.dumps(next_state,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_PROPOSAL_REF:\n"+proposal_ref+"\n\nBOUND_ACCEPTED_AI_DECISION:\n"+json.dumps(proposal,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_REGISTRY_ROW:\n"+json.dumps(registry_row,sort_keys=True,indent=2)+"\n\nBOUND_REPOSITORY_CONTEXT:\n"+json.dumps(bound_context,sort_keys=True,indent=2)
+"""+json.dumps(current_context,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_PROPOSAL_REF:\n"+proposal_ref+"\n\nBOUND_ACCEPTED_AI_DECISION:\n"+json.dumps(proposal,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_REGISTRY_ROW:\n"+json.dumps(registry_row,sort_keys=True,indent=2)+"\n\nBOUND_REPOSITORY_CONTEXT:\n"+json.dumps(bound_context,sort_keys=True,indent=2)
 
 def _transport(root:Path,prompt:str,token:str,model:str)->tuple[dict[str,Any],dict[str,Any]]:
     if not shutil.which("copilot"): raise ImplementationRejected("GitHub Copilot CLI executable missing")
