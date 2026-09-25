@@ -104,6 +104,12 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
                 "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
                 "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json"):
         if (root/rel).is_file() and rel not in refs: refs.append(rel)
+    acceptance_path=root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json"
+    if acceptance_path.is_file():
+        accepted=json.loads(acceptance_path.read_text(encoding="utf-8"))
+        rel=accepted.get("requested_ref")
+        if accepted.get("status")=="ELIGIBLE_AUTHORITY_ADDED_TO_NEW_PACKET" and isinstance(rel,str) and (root/rel).is_file() and sha256_file(root/rel)==accepted.get("sha256") and rel not in refs:
+            refs.append(rel)
     epoch_binding=current_evidence_binding(root)
     for row in epoch_binding["authoritative_evidence_refs_and_hashes"]:
         if row["ref"] not in refs:
