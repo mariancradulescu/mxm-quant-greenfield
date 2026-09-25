@@ -8,12 +8,15 @@ ROOT=Path(__file__).resolve().parents[1]
 class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_current_state_routes_by_semantics_not_finite_state_names(self):
         s=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        if s.get("user_action_required") is True:
+        if s.get("user_action_required") is True or (s.get("status")=="MATERIAL_INTEGRITY_FAILURE" and s.get("integrity_gate")):
             self.assertFalse(implementation_required(s))
         elif reasoning_required(s):
             self.assertFalse(implementation_required(s))
         else:
             self.assertTrue(implementation_required(s))
+    def test_explicit_integrity_gate_blocks_implementation_even_with_next_action(self):
+        self.assertFalse(implementation_required({"status":"MATERIAL_INTEGRITY_FAILURE","integrity_gate":"C032_CAPTURE_REUSE","next_action":"RUN_UNSAFE_SCREEN"}))
+
     def test_executor_binds_proposal_when_state_is_proposal_bound_or_preserves_recovery_supersession(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
         if state.get("source_ai_proposal_id") or state.get("source_ai_proposal_hash") or state.get("source_runtime_operation_id"):
