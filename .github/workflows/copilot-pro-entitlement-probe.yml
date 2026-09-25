@@ -1,0 +1,81 @@
+name: MXM Controlled Copilot Pro Entitlement Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/copilot-pro-entitlement-probe.yml"
+
+permissions:
+  contents: write
+  copilot-requests: write
+
+concurrency:
+  group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout research branch with durable state
+        uses: actions/checkout@v4
+        with:
+          ref: performance-research-v3-20260922
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Configure checkpoint identity
+        run: |
+          git config user.name "mxm-runtime-v2[bot]"
+          git config user.email "mxm-runtime-v2@users.noreply.github.com"
+      - name: Install Copilot CLI before consuming probe claim
+        run: npm install -g @github/copilot
+      - name: Prepare and durably claim one probe
+        run: |
+          python -m research_v3.copilot_entitlement_probe prepare --run-id "$GITHUB_RUN_ID"
+          if [ "$(python -c 'import json;print(json.load(open("research_v3/ai_director/PRO_ENTITLEMENT_PROBE_V1.json"))["actions_run_id"])')" != "$GITHUB_RUN_ID" ]; then
+            echo "An earlier probe exists. Refusing another provider call."
+            exit 0
+          fi
+          if [ "$(python -c 'import json;print(json.load(open("research_v3/ai_director/PRO_ENTITLEMENT_PROBE_V1.json"))["status"])')" != "PREPARED_UNCONSUMED" ]; then
+            echo "Probe already consumed. Refusing another provider call."
+            exit 0
+          fi
+          git add research_v3/ai_director/PRO_ENTITLEMENT_PROBE_V1.json
+          git commit -m "[skip ci] Prepare controlled Copilot Pro probe"
+          git push origin HEAD:refs/heads/performance-research-v3-20260922
+          python -m research_v3.copilot_entitlement_probe claim --run-id "$GITHUB_RUN_ID"
+          git add research_v3/ai_director/PRO_ENTITLEMENT_PROBE_V1.json
+          git commit -m "[skip ci] Claim exactly one Copilot provider call"
+          git push origin HEAD:refs/heads/performance-research-v3-20260922
+          echo "MXM_PROBE_CLAIM_PERSISTED=1" >> "$GITHUB_ENV"
+      - name: Invoke one minimal provider probe
+        if: env.MXM_PROBE_CLAIM_PERSISTED == '1'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ github.token }}
+        run: python -m research_v3.copilot_entitlement_probe execute --run-id "$GITHUB_RUN_ID"
+      - name: Persist result and telemetry
+        if: env.MXM_PROBE_CLAIM_PERSISTED == '1'
+        run: |
+          git add research_v3/ai_director/PRO_ENTITLEMENT_PROBE_V1.json research_v3/ai_director/PROVIDER_RECOVERY_STATE.json research_v3/ai_director/PROVIDER_USAGE_V1.json
+          git commit -m "Record controlled Copilot Pro entitlement result"
+          git push origin HEAD:refs/heads/performance-research-v3-20260922
+      - name: Bind existing research and request fresh epoch reasoning
+        if: env.MXM_PROBE_CLAIM_PERSISTED == '1'
+        run: |
+          status="$(python -c 'import json;print(json.load(open("research_v3/ai_director/PRO_ENTITLEMENT_PROBE_V1.json"))["status"])')"
+          if [ "$status" != "AVAILABLE" ]; then
+            echo "Provider unavailable or inconclusive; keep the fail-closed state."
+            exit 0
+          fi
+          python -m research_v3.post_c032_epoch20_reconcile --root .
+          git add research_v3/EPOCH20_POST_C032_DECISION_ACCEPTANCE_V1.json research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json
+          git commit -m "Accept existing post-C032 evidence and advance to epoch 21"
+          git push origin HEAD:refs/heads/performance-research-v3-20260922
