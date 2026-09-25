@@ -127,6 +127,7 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         "completed_structural_report_ref","duplicate_capture_supersession_ref",
         "selected_scope_feasibility_audit_ref","superseded_pre_capture_proposal_ref",
         "scope_resolution_ref","exploratory_regime_screen_ref",
+        "alignment_prerequisite_ref",
     ):
         value=next_state.get(key)
         if isinstance(value,str) and value and value not in refs:
@@ -306,6 +307,8 @@ def _user_prompt(context:Mapping[str,Any], correction:str|None=None)->str:
     base=_system_prompt()+"\n\nAUTHORITATIVE REPOSITORY CONTEXT:\n"+json.dumps(context,sort_keys=True,separators=(",",":"),ensure_ascii=False)
     contract=(context.get("pending_decision") or {}).get("decision_contract") or {}
     if contract:
+        if contract.get("require_implementation_ai"):
+            base+="\n\nIMPLEMENTATION ROUTING REQUIRED: Set next_research_state.implementation_ai_required=true, next_research_state.research_judgment_required=false, and decision.implementation_scope to concrete non-economic repository code, accepted inputs and tests. Preserve the selected mechanism family; never authorize economic execution or use development-selected winning pairs as independent confirmation."
         base+="\n\nPENDING DECISION CONTRACT (MANDATORY): Set decision.action to required_action and decision.selected_mechanism_family to one current open family outside temporarily_unavailable_families. Set next_research_state.selected_family to that same family and specify an executable pre-economic next_action. This contract governs the immediate decision only; unavailable families remain open for later research. Do not request an economic outcome. A proposal missing these exact fields or selecting an excluded family will be rejected before implementation."
     if correction:
         base+="\n\nYOUR PREVIOUS JSON WAS REJECTED BY DETERMINISTIC VALIDATION. CORRECT IT WITHOUT CHANGING THE RESEARCH GOAL:\n"+correction
@@ -423,6 +426,11 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
                 raise AIProposalRejected("proposed next state contradicts selected mechanism family")
         if contract.get("require_no_economic_opening") and (decision.get("open_economic_outcome") or next_state.get("economic_outcome_opened")):
             raise AIProposalRejected("pending decision forbids an economic outcome")
+        required_family=contract.get("required_family")
+        if required_family and selected!=required_family:
+            raise AIProposalRejected("pending decision requires the already selected mechanism family")
+        if contract.get("require_implementation_ai") and next_state.get("implementation_ai_required") is not True:
+            raise AIProposalRejected("pending decision requires explicit novel implementation routing")
         if next_state.get("implementation_ai_required") is True and not decision.get("implementation_scope"):
             raise AIProposalRejected("pending decision cannot authorize implementation without explicit implementation scope")
     proposed_next=dict(next_state)
