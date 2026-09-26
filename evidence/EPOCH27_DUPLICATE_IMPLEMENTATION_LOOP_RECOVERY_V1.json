@@ -1,0 +1,49 @@
+{
+  "schema": "mxm.greenfield.epoch27-duplicate-implementation-loop-recovery.v1",
+  "status": "RECOVERED",
+  "defect_class": "POST_IMPLEMENTATION_STATE_AND_LIVENESS_ROUTING_FEEDBACK_LOOP",
+  "root_cause": "Implementation-complete/no-code states retained implementation_ai_required=true while no deterministic operation authority existed; provider/checkpoint-only commits changed HEAD and were falsely recorded as material progress, sustaining exact-head CI -> sentinel -> duplicate implementation AI.",
+  "provider_cutoff_before_fence": {
+    "provider_invocations": 74,
+    "successful_reasoning_invocations": 18,
+    "successful_implementation_invocations": 49,
+    "duplicate_fingerprints": [
+      "e6016bdf493fc4c28bf851374d302cd55af2e62a1d525cce40d97ae721c96815",
+      "5b217222693dd37916e1568efb6b6fa86a6047b398b74a8bcd3b1fc73606fac7"
+    ]
+  },
+  "repair": {
+    "no_code_implementation_satisfies_authority": true,
+    "identical_no_code_implementation_reused_without_provider": true,
+    "material_progress_excludes_provider_usage_and_checkpoint_only_churn": true,
+    "frozen_result_acceptance_routes_deterministically": true,
+    "deterministic_provider_calls_delta": 0
+  },
+  "structural_result": {
+    "source_evidence_epoch": 26,
+    "accepted_into_epoch": 27,
+    "family": "CROSS_SECTIONAL_RANKING",
+    "acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+    "full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
+    "representatives_processed": 41,
+    "eligible_panel_timestamps": 462,
+    "supported_representatives_count": 0
+  },
+  "validation": {
+    "focused_deterministic_supervisor_run_id": 36231038090,
+    "focused_validation": "SUCCESS",
+    "deterministic_chain": "SUCCESS",
+    "general_ai_steps": "SKIPPED",
+    "provider_invocations_after_deterministic_acceptance": 74
+  },
+  "accounting": {
+    "v2_attempts_used": 20,
+    "v2_search_budget_remaining": 64,
+    "economic_outcomes_opened": 28
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
