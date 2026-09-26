@@ -289,7 +289,7 @@ recompute it or repeat the mechanism choice. Do not claim that an internal
 development holdout is independent confirmation.
 
 CURRENT_NEXT_STATE:
-"""+json.dumps(current_context,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_PROPOSAL_REF:\n"+proposal_ref+"\n\nBOUND_ACCEPTED_AI_DECISION:\n"+json.dumps(proposal,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_REGISTRY_ROW:\n"+json.dumps(registry_row,sort_keys=True,indent=2)+"\n\nBOUND_REPOSITORY_CONTEXT:\n"+json.dumps(bound_context,sort_keys=True,indent=2)
+"""+json.dumps(current_context,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_PROPOSAL_REF:\n"+proposal_ref+"\n\nBOUND_ACCEPTED_PROPOSAL_FILE_SHA256:\n"+sha256_file(root/proposal_ref)+"\nUse this exact file-byte SHA for any freeze authority hash of the accepted proposal; do not substitute the semantic proposal hash.\n\nBOUND_ACCEPTED_AI_DECISION:\n"+json.dumps(proposal,sort_keys=True,indent=2)+"\n\nBOUND_ACCEPTED_REGISTRY_ROW:\n"+json.dumps(registry_row,sort_keys=True,indent=2)+"\n\nBOUND_REPOSITORY_CONTEXT:\n"+json.dumps(bound_context,sort_keys=True,indent=2)
 
 def _transport(root:Path,prompt:str,token:str,model:str)->tuple[dict[str,Any],dict[str,Any]]:
     if not shutil.which("copilot"): raise ImplementationRejected("GitHub Copilot CLI executable missing")
