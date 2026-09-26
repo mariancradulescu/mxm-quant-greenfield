@@ -5,6 +5,7 @@ from research_v3.execution_router import (
     classify_execution, deterministic_operation_required, implementation_required,
     liveness_fingerprint,
 )
+from research_v3.lightweight_dispatcher import classify as classify_dispatch
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -81,6 +82,33 @@ class ExecutionRouterV1Tests(unittest.TestCase):
         self.assertEqual(classify_execution(ROOT,{"status":"MATERIAL_INTEGRITY_FAILURE","next_action":"X"})["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
         self.assertEqual(classify_execution(ROOT,{"status":"WAIT","next_action":"X","external_data_required":True})["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
         self.assertEqual(classify_execution(ROOT,{"status":"WAIT","next_action":"X","user_action_required":True})["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+
+    def test_completed_dedup_does_not_suppress_new_frontier_action(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            (root/"research_v3/runtime_v2_acceptance").mkdir(parents=True)
+            state={
+                "status":"FRESH_GENERAL_AI_REASONING_REQUIRED",
+                "next_action":"AI_INTERPRET_NEW_RESULT",
+                "current_research_evidence_epoch":27,
+                "evidence_epoch":27,
+                "ai_reasoning_required":True,
+                "research_judgment_required":True,
+                "implementation_ai_required":False,
+                "user_action_required":False,
+                "external_data_required":False,
+            }
+            state_path=root/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json"
+            state_path.write_text(json.dumps(state),encoding="utf-8")
+            fp=liveness_fingerprint(root,state)
+            (root/"research_v3/LIVENESS_DEDUP_V1.json").write_text(json.dumps({
+                "last_completed_fingerprint":fp,
+                "last_completed_operation":"ACCEPT_PREVIOUS_STRUCTURAL_RESULT",
+            }),encoding="utf-8")
+            out=classify_dispatch(root)
+            self.assertFalse(out["duplicate_completed_fingerprint"])
+            self.assertTrue(out["dispatch_required"])
+            self.assertEqual(out["execution_class"],"SEMANTIC_REASONING")
 
     def test_liveness_fingerprint_is_deterministic(self):
         td,root,state=self._root_with_op()
