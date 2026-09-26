@@ -201,7 +201,8 @@ def _bound_context(root:Path,next_state:Mapping[str,Any],proposal:Mapping[str,An
 def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,Any]:
     payload=json.loads(json.dumps(out))
     ns=dict(payload.get("next_research_state") or {})
-    if str(ns.get("status") or "").startswith("PENDING_EXACT_HEAD_GREEN"):
+    status=str(ns.get("status") or "")
+    if status.startswith("PENDING_EXACT_HEAD_GREEN") or status.endswith("REQUIRES_EXACT_HEAD_GREEN"):
         # Preserve result-specific provenance (completed report, family result, etc.)
         # while closing implementation routing after an already-green exact head.
         ns["status"]="AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
