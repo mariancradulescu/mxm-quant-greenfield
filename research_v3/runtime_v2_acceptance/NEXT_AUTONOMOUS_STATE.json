@@ -158,7 +158,10 @@
   "data_capture": "ACCEPTED_HASH_VERIFIED_PRE_OUTCOME",
   "data_requirement": "NONE_NEW_REQUIRED_USES_EXISTING_13W_M5_CAPTURE",
   "decision_basis": "Outcome-blind governance and frontier authority; no new mechanism, symbol or panel prospectively selected.",
-  "deterministic_next_operation": null,
+  "deterministic_next_operation": {
+    "operation_ref": "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_DETERMINISTIC_OPERATION_V1.json",
+    "operation_name": "MATERIALIZE_AND_ACCEPT_FROZEN_EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT"
+  },
   "deterministic_operation_execution_ref": "research_v3/EPOCH21_DETERMINISTIC_OPERATION_EXECUTION_V1.json",
   "development_evidence_sufficient_for_current_decision": true,
   "development_evidence_sufficient_for_mechanism_specific_outer": false,
@@ -271,7 +274,7 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_ai_scope": "Novel repository code needed: (1) compute trailing 13-week rolling TR tercile regime label at each existing frozen breakout event's onset bar from already-captured 13W M5 canonical data, (2) stratify existing follow-through/persistence structural statistics by regime bucket per representative, (3) emit a new structural evidence artifact. No existing deterministic routine performs regime labeling or regime-stratified aggregation.",
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
@@ -295,9 +298,9 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": false,
+  "implementation_satisfied": true,
   "implementation_scope": "Build and test the new prospective non-economic regime-context structural evaluator, freeze its parameters before evaluation, bind only accepted frontier data, and emit machine-checkable result and verification artifacts.",
-  "implementation_scope_complete": false,
+  "implementation_scope_complete": true,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -365,8 +368,8 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "ADDITIONAL_AUTHORITY_REQUIRED",
-  "next_deterministic_operation_ref": null,
+  "next_action": "MATERIALIZE_AND_ACCEPT_FROZEN_EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT",
+  "next_deterministic_operation_ref": "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_DETERMINISTIC_OPERATION_V1.json",
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "no_economic_outcome_requested": true,
@@ -473,8 +476,8 @@
   "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
   "search_budget_change": -1,
   "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-  "source_ai_proposal_hash": "0af95724886b02549bb4cddd262af7f6c7fc8f19b468493b1109f12186426c53",
-  "source_ai_proposal_id": "frontier-authority-epoch32-relative-value",
+  "source_ai_proposal_hash": "589921e40e59174bd829c6d8f165ece49d193e878501fde04d46b42d85baee89",
+  "source_ai_proposal_id": "AUTO_epoch33_regime_frontier_screen_20260926",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
   "source_runtime_operation_id": "op_5c2af7091739cb18482688bf0f3d52d0",
   "stale_reasoning_guard": {
@@ -486,7 +489,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "ADDITIONAL_AUTHORITY_REQUIRED",
+  "status": "AUTHORIZED_DETERMINISTIC_EPOCH33_FROZEN_RESULT_MATERIALIZATION",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -554,5 +557,8 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true
+  "uses_only_existing_accepted_bytes": true,
+  "source_implementation_id": "MXM_EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN_V1",
+  "ai_reasoning_required": false,
+  "premature_post_green_reasoning_supersession_ref": "evidence/EPOCH33_PREMATURE_POST_GREEN_REASONING_SUPERSESSION_V1.json"
 }
