@@ -1,62 +1,52 @@
 {
-  "accepted_output": {
-    "decision": {
-      "action": "Reuse the existing implementation without changes.",
-      "implementation_refs": [
-        "research_v3/EPOCH30_SEASONALITY_SESSION_TIME_FRONTIER_FREEZE_V1.json",
-        "research_v3/seasonality_session_time_epoch30_screen.py",
-        "tests/test_seasonality_session_time_epoch30_screen.py"
-      ],
-      "later_step": "Run the frozen non-economic screen on the two bound accepted captures and report its descriptive result. Treat development data as neither independent confirmation nor grounds for economic promotion, symbol selection, or mechanism-family closure.",
-      "validation": "Inspected the freeze, evaluator, targeted tests, accepted capture records, and recorded exact-head-green implementation response. No code or test execution was performed."
-    },
-    "external_data_gate": null,
-    "implementation_id": "epoch30-seasonality-session-time-non-economic-screen-v1",
-    "next_research_state": {
-      "implementation_ai_required": false,
-      "implementation_satisfied": true,
-      "next_action": "RUN_FROZEN_EPOCH30_SEASONALITY_SESSION_TIME_SCREEN",
-      "status": "READY_FOR_FROZEN_SCREEN_EXECUTION",
-      "user_action_required": false
-    },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The prospective freeze, deterministic evaluator, and targeted tests already implement the bounded decision. Inspection confirms the freeze binds all 41 current representatives and the accepted M5 captures, with no new market data required. The recorded implementation response confirms exact-head-green; this screen has not been run.",
-    "tests_requested": [
-      "python -m unittest discover -s tests -p test_seasonality_session_time_epoch30_screen.py"
-    ]
-  },
-  "basis_next_state_sha256": "1a024992fb2d63747b5127f2787016b702fe779bfd8ae425303ca70077b3c153",
-  "changed_paths": [],
-  "created_utc": "2026-09-26T17:27:15Z",
-  "exact_head": {
-    "green": false,
-    "head": "52b709dac0d81dc4285954e88cb500e427180297",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "2041d59436c276fd066f475a840c798bfdaafdfa",
-    "predecessor_run_id": 36258997824
-  },
+  "basis_next_state_sha256": "c1b1c7f5035b1ae4eba0adccc9bc4275441b4f3d1aee5620125388080a144d4a",
+  "changed_paths": [
+    "research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json",
+    "research_v3/causal_ml_predictive_state_epoch31_screen.py",
+    "tests/test_causal_ml_predictive_state_epoch31_screen.py"
+  ],
+  "created_utc": "2026-09-26T17:41:01Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "Reuse the existing implementation without changes.",
-      "implementation_refs": [
-        "research_v3/EPOCH30_SEASONALITY_SESSION_TIME_FRONTIER_FREEZE_V1.json",
-        "research_v3/seasonality_session_time_epoch30_screen.py",
-        "tests/test_seasonality_session_time_epoch30_screen.py"
+      "causal_controls": [
+        "Past-only lagged features",
+        "Label observed only after prediction",
+        "Chronological expanding walk-forward evaluation",
+        "Gap-aware segment resets",
+        "Daily clustered inference",
+        "Holm family-wise multiplicity control across 41 representatives"
       ],
-      "later_step": "Run the frozen non-economic screen on the two bound accepted captures and report its descriptive result. Treat development data as neither independent confirmation nor grounds for economic promotion, symbol selection, or mechanism-family closure.",
-      "validation": "Inspected the freeze, evaluator, targeted tests, accepted capture records, and recorded exact-head-green implementation response. No code or test execution was performed."
+      "data_reuse": [
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+      ],
+      "economic_effect": {
+        "candidate_identity_created": false,
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "search_budget_change": 0,
+        "v2_attempts_consumed": 0
+      },
+      "freeze_ref": "research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json",
+      "implementation_ref": "research_v3/causal_ml_predictive_state_epoch31_screen.py",
+      "implementation_scope": "Bound non-economic causal ML predictive-state screen only",
+      "later_step": "After exact-head-green validation, run the frozen evaluator and publish only the resulting non-economic structural evidence; preserve the remainder of the accepted decision for subsequent research-state handling.",
+      "test_ref": "tests/test_causal_ml_predictive_state_epoch31_screen.py"
     },
     "external_data_gate": null,
-    "implementation_id": "epoch30-seasonality-session-time-non-economic-screen-v1",
+    "implementation_id": "epoch31-causal-ml-predictive-state-screen-v1",
     "next_research_state": {
-      "next_action": "RUN_FROZEN_EPOCH30_SEASONALITY_SESSION_TIME_SCREEN",
-      "status": "READY_FOR_FROZEN_SCREEN_EXECUTION"
+      "implementation_scope_complete": true,
+      "next_action": "RUN_TARGETED_EPOCH31_CAUSAL_STATE_TESTS_THEN_EXECUTE_THE_BOUND_FROZEN_EVALUATOR",
+      "research_judgment_required": false,
+      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The prospective freeze, deterministic evaluator, and targeted tests already implement the bounded decision. Inspection confirms the freeze binds all 41 current representatives and the accepted M5 captures, with no new market data required. The recorded implementation response confirms exact-head-green; this screen has not been run.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a prospective Epoch 31 freeze, deterministic causal online logistic predictive-state evaluator, ZIP-bound accepted-capture reuse, chronological walk-forward scoring, daily time-clustered sign-flip inference, Holm correction across all 41 representatives, and targeted tests. No external data gate is required because the accepted broker-native M5 captures cover the exact frozen scope.",
     "tests_requested": [
-      "python -m unittest discover -s tests -p test_seasonality_session_time_epoch30_screen.py"
+      "tests/test_causal_ml_predictive_state_epoch31_screen.py"
     ]
   },
   "project_snapshot": {
@@ -75,5 +65,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
