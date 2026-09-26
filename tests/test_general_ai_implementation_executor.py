@@ -72,6 +72,21 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertFalse(ns["user_action_required"])
         self.assertEqual(ns["green_implementation_artifacts"],["research_v3/evaluator.py","tests/test_evaluator.py"])
 
+    def test_complete_no_code_satisfies_implementation_authority(self):
+        out={
+            "status":"COMPLETE_NON_ECONOMIC",
+            "next_research_state":{
+                "status":"IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION",
+                "next_action":"EVALUATE_FROZEN_LAW",
+                "implementation_ai_required":True,
+            },
+        }
+        accepted=_post_green_output(out,[])
+        ns=accepted["next_research_state"]
+        self.assertFalse(ns["implementation_ai_required"])
+        self.assertTrue(ns["implementation_satisfied"])
+        self.assertEqual(ns["next_action"],"EVALUATE_FROZEN_LAW")
+
     def test_post_green_preserves_result_specific_reasoning_provenance(self):
         out={
             "status":"COMPLETE_NON_ECONOMIC",
