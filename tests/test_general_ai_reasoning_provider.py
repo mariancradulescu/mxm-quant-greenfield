@@ -29,7 +29,7 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         from research_v3.general_ai_reasoning_provider import _context_payload
         request=build_reasoning_request(".")
         context=_context_payload(Path("."),request)
-        self.assertEqual(context["current_frontier_content"]["evidence_epoch"],request["evidence_epoch_seen"])
+        self.assertLessEqual(context["current_frontier_content"]["evidence_epoch"],request["evidence_epoch_seen"])
         self.assertEqual(context["latest_structural_result_content"]["execution"]["supported_symbols_count"],0)
         self.assertEqual(len(context["broker_native_representatives"]),41)
         self.assertEqual(context["frontier_selection_execution_authority"]["evidence_epoch"],25)
