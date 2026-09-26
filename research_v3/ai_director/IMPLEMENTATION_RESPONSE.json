@@ -1,81 +1,89 @@
 {
   "accepted_output": {
     "decision": {
-      "accepted_data_bindings": {
-        "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-        "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-        "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-        "scope": "41 representatives; M5; 2026-06-15 through 2026-09-13"
+      "accepted_data_scope": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "new_market_data_required": false,
+        "representatives": 41,
+        "resolution": "M5",
+        "start_utc": "2026-06-15T00:00:00Z"
       },
-      "action": "REUSE_EXISTING_FROZEN_CROSS_SECTIONAL_RANKING_IMPLEMENTATION",
-      "economic_outcomes_opened": false,
-      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation_changed": false,
-      "implementation_manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "independent_confirmation": false,
-      "live_orders_authorized": false,
-      "new_market_data_required": false,
+      "action": "Reuse the existing frozen evaluator and accepted hash-bound data; do not rewrite the implementation or reacquire data.",
+      "economic_outcomes_opened": 0,
+      "evaluation_performed": false,
+      "evidence_refs": [
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+        "research_v3/cross_sectional_ranking_epoch26_screen.py",
+        "tests/test_cross_sectional_ranking_epoch26_screen.py",
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
+      ],
+      "implementation_scope_satisfied": true,
+      "preserved_later_step": "Run exact-head CI, then evaluate the frozen law on the accepted hash-bound data. Treat results as development structural evidence, not independent confirmation or economic promotion.",
       "protected_evidence_opened": false,
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence-inspection",
     "next_research_state": {
-      "next_action": "EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
-      "status": "IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION"
+      "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
+      "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The existing freeze, evaluator, targeted tests, and implementation manifest already implement the accepted 41-representative M5 screen, including synchronized cross-sectional ranks, causal windows, dependence-aware inference, multiplicity correction, and structural-only reporting. Accepted hash-bound captures cover the frozen scope, so no code, manifest, or new capture changes are needed. Validation was by inspection; tests and data evaluation were not run.",
+    "summary": "The bound decision is already implemented: the prospective freeze, exact-scope evaluator, manifest, and targeted tests are present. Accepted capture records and coverage bind all 41 representatives to the frozen M5 interval, so no new data gate or repository changes are needed. Evaluation remains pending; no results were opened.",
     "tests_requested": [
-      "Run tests/test_cross_sectional_ranking_epoch26_screen.py.",
-      "Evaluate the frozen screen using the accepted hash-bound development and replacement captures; report structural evidence only."
+      "tests/test_cross_sectional_ranking_epoch26_screen.py"
     ]
   },
   "basis_next_state_sha256": "79433dafa375f59e9b9a8e2ab7c973cb7b5ad33470aa59ee015027499fa9967f",
   "changed_paths": [],
-  "created_utc": "2026-09-26T07:55:53Z",
+  "created_utc": "2026-09-26T07:58:56Z",
   "exact_head": {
     "green": true,
-    "head": "8301ab53b6eb515f75b14d656580fdaa9ae6d013",
+    "head": "f200056c206161f527f055bc9311ca4aad260387",
     "predecessor_conclusion": "success",
-    "predecessor_head": "8301ab53b6eb515f75b14d656580fdaa9ae6d013",
-    "predecessor_run_id": 36228147776
+    "predecessor_head": "f200056c206161f527f055bc9311ca4aad260387",
+    "predecessor_run_id": 36228298137
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_data_bindings": {
-        "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-        "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-        "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-        "scope": "41 representatives; M5; 2026-06-15 through 2026-09-13"
+      "accepted_data_scope": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "new_market_data_required": false,
+        "representatives": 41,
+        "resolution": "M5",
+        "start_utc": "2026-06-15T00:00:00Z"
       },
-      "action": "REUSE_EXISTING_FROZEN_CROSS_SECTIONAL_RANKING_IMPLEMENTATION",
-      "economic_outcomes_opened": false,
-      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation_changed": false,
-      "implementation_manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "independent_confirmation": false,
-      "live_orders_authorized": false,
-      "new_market_data_required": false,
+      "action": "Reuse the existing frozen evaluator and accepted hash-bound data; do not rewrite the implementation or reacquire data.",
+      "economic_outcomes_opened": 0,
+      "evaluation_performed": false,
+      "evidence_refs": [
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+        "research_v3/cross_sectional_ranking_epoch26_screen.py",
+        "tests/test_cross_sectional_ranking_epoch26_screen.py",
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
+      ],
+      "implementation_scope_satisfied": true,
+      "preserved_later_step": "Run exact-head CI, then evaluate the frozen law on the accepted hash-bound data. Treat results as development structural evidence, not independent confirmation or economic promotion.",
       "protected_evidence_opened": false,
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence-inspection",
     "next_research_state": {
-      "next_action": "EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
-      "status": "IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION"
+      "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
+      "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The existing freeze, evaluator, targeted tests, and implementation manifest already implement the accepted 41-representative M5 screen, including synchronized cross-sectional ranks, causal windows, dependence-aware inference, multiplicity correction, and structural-only reporting. Accepted hash-bound captures cover the frozen scope, so no code, manifest, or new capture changes are needed. Validation was by inspection; tests and data evaluation were not run.",
+    "summary": "The bound decision is already implemented: the prospective freeze, exact-scope evaluator, manifest, and targeted tests are present. Accepted capture records and coverage bind all 41 representatives to the frozen M5 interval, so no new data gate or repository changes are needed. Evaluation remains pending; no results were opened.",
     "tests_requested": [
-      "Run tests/test_cross_sectional_ranking_epoch26_screen.py.",
-      "Evaluate the frozen screen using the accepted hash-bound development and replacement captures; report structural evidence only."
+      "tests/test_cross_sectional_ranking_epoch26_screen.py"
     ]
   },
   "project_snapshot": {
