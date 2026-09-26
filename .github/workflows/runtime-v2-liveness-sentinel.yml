@@ -1,14 +1,8 @@
 name: Runtime V2 Liveness Sentinel
 
+# Recovery-only tool. Normal research continuation never depends on this workflow.
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - Autonomous Research Runtime V2 Supervisor
-      - m6-preparation
-      - Research Fast Path Validation
-    types:
-      - completed
 
 permissions:
   actions: write
