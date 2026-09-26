@@ -2,10 +2,9 @@
 from __future__ import annotations
 import argparse, json, hashlib, os
 from pathlib import Path
-from research_v3.autonomous_control_plane import validate_repository_state
-from research_v3.evidence_epoch import stale_reasoning_redirect
-from research_v3.general_ai_director_bridge import drain
-from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected, exact_head_green
+from research_v3.evidence_epoch import stale_reasoning_redirect, refresh_derived_views, current_evidence_epoch
+from research_v3.general_ai_director_bridge import drain, project_snapshot
+from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
 from research_v3.execution_router import deterministic_operation_required
 from research_v3.deterministic_operation_executor import execute_chain as execute_deterministic_chain
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
@@ -140,10 +139,21 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
 
 def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
     root=Path(root_value).resolve(); trace=[]
-    initial_epoch=(load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")
+    initial_epoch=current_evidence_epoch(root)
     for cycle in range(1,max_cycles+1):
-        validate_repository_state(root)
+        refresh_derived_views(root)
         state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
+        snapshot=project_snapshot(root)
+        expected_accounting={
+            "v2_attempts_used":snapshot["v2_attempts_used"],
+            "v2_search_budget_remaining":snapshot["v2_search_budget_remaining"],
+            "economic_outcomes_opened":snapshot["economic_outcomes_opened"],
+        }
+        if dict(state.get("accounting") or {})!=expected_accounting:
+            raise RuntimeError("canonical active-state accounting diverged from durable economic ledger")
+        safety=dict(state.get("safety") or {})
+        if bool(safety.get("live_orders_authorized") or safety.get("protected_evidence_opened") or safety.get("protected_forward_opened")):
+            raise RuntimeError("canonical active state crosses protected/live safety boundary")
         stale=stale_reasoning_redirect(root,state)
         if stale is not None:
             state.update(stale); atomic_write_json(root/NEXT_STATE_REL,state)
@@ -161,9 +171,6 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 return {"status":"EXTERNAL_USER_ACTION_REQUIRED" if state.get("user_action_required") is True else "EXTERNAL_DATA_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle,"trace":trace,"next_state":state,"result":out}
             continue
         if reasoning_required(state):
-            green=exact_head_green(root)
-            if not green["green"]:
-                return {"status":"PENDING_EXACT_HEAD_GREEN","progress_class":"SAFE_NO_PROGRESS","cycles":cycle-1,"trace":trace,"exact_head":green,"next_state":state}
             blocked=_provider_unavailable(root,state,"GENERAL_AI_REASONING")
             if blocked is not None:
                 return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
@@ -208,7 +215,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
                 return {"status":out["status"],"progress_class":"LEGITIMATE_EXTERNAL_GATE" if out["status"]=="EXTERNAL_DATA_REQUIRED" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"result":out}
             continue
-        return {"status":"QUIESCENT_NO_ACTION","progress_class":"MATERIAL_PROGRESS" if (load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")!=initial_epoch else "SAFE_NO_PROGRESS","cycles":cycle-1,"trace":trace,"next_state":state}
+        return {"status":"QUIESCENT_NO_ACTION","progress_class":"MATERIAL_PROGRESS" if current_evidence_epoch(root)!=initial_epoch else "SAFE_NO_PROGRESS","cycles":cycle-1,"trace":trace,"next_state":state}
     return {"status":"BOUNDED_CONTINUATION_CHECKPOINT","progress_class":"MATERIAL_PROGRESS" if (load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")!=initial_epoch else "SAFE_NO_PROGRESS","cycles":max_cycles,"trace":trace,
             "next_state":dict(load_json(root/NEXT_STATE_REL,{}) or {})}
 

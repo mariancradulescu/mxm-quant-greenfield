@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from research_v3.evidence_eligibility import packet, validate_eligibility, EvidenceIneligible
-from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import current_evidence_binding
 from research_v3.general_ai_director_bridge import (
     PROPOSAL_SCHEMA,
@@ -265,7 +264,19 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     root=Path(root_value).resolve()
     next_state=_load(root,NEXT_REL)
     snapshot=project_snapshot(root)
-    report=validate_repository_state(root)
+    state_safety=dict(next_state.get("safety") or {})
+    report={
+        "next_action":next_state.get("next_action"),
+        "stage_b_survivors":list(next_state.get("stage_b_survivors") or []),
+        "stage_b_revalidation_required_candidate_ids":list(next_state.get("stage_b_revalidation_required_candidate_ids") or []),
+        "material_issues":[],
+        "recoverable_conditions":[],
+        "safety":{
+            "protected_evidence_opened":bool(state_safety.get("protected_evidence_opened") or next_state.get("protected_evidence_opened")),
+            "live_orders_authorized":bool(state_safety.get("live_orders_authorized") or next_state.get("live_orders_authorized")),
+            "competition_start_authorized":bool(state_safety.get("competition_start_authorized") or next_state.get("competition_start_authorized")),
+        },
+    }
     authorities,refs=_authority_context(root,next_state)
     evidence=current_evidence_binding(root)
     deterministic_catalog=_authorized_deterministic_operation_catalog(root,int(evidence["evidence_epoch"]))

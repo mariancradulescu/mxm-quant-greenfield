@@ -11,6 +11,8 @@ from typing import Any, Mapping, Iterable
 from research_v3.runtime_v2_primitives import atomic_write_json, canonical_bytes, sha256_bytes, sha256_file
 
 EPOCH_REL=Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json")
+NEXT_STATE_REL=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
+ACTIVE_PROJECTION_REL=Path("research_v3/ACTIVE_RESEARCH_PROJECTION_V1.json")
 SCHEMA="mxm.greenfield.research-evidence-epoch.v1"
 MATERIAL_EVENT_CLASSES=frozenset({
     "AUTHENTICATED_MARKET_DATA_ACCEPTED",
@@ -38,8 +40,80 @@ def _load(root:Path)->dict[str,Any]:
         raise EvidenceEpochError("invalid current research evidence epoch")
     return doc
 
+def _load_active_state(root:Path)->dict[str,Any]:
+    path=root/NEXT_STATE_REL
+    if not path.is_file():
+        return {}
+    doc=json.loads(path.read_text(encoding="utf-8"))
+    if doc.get("schema") not in (None,"mxm.greenfield.runtime-v2-next-autonomous-state.v3"):
+        raise EvidenceEpochError("unsupported canonical active research state schema")
+    return doc
+
+def _state_epoch(state:Mapping[str,Any])->int|None:
+    for key in ("current_research_evidence_epoch","evidence_epoch"):
+        value=state.get(key)
+        if isinstance(value,int) and value>=1:
+            return value
+    return None
+
 def current_evidence_epoch(root_value:str|Path=".")->int:
-    return int(_load(Path(root_value).resolve())["current_epoch"])
+    root=Path(root_value).resolve()
+    state=_load_active_state(root)
+    active=_state_epoch(state)
+    if active is not None:
+        return active
+    return int(_load(root)["current_epoch"])
+
+def derive_active_projection(root_value:str|Path=".")->dict[str,Any]:
+    """Pure derived view of the sole mutable active research state.
+
+    A stale projection is never authority and must never block canonical progress.
+    """
+    root=Path(root_value).resolve()
+    state=_load_active_state(root)
+    if not state:
+        raise EvidenceEpochError(f"canonical active research state missing: {NEXT_STATE_REL}")
+    epoch=current_evidence_epoch(root)
+    result_ref=state.get("latest_material_structural_result_ref") or state.get("completed_structural_report_ref")
+    if isinstance(result_ref,str) and result_ref and not (root/result_ref).is_file():
+        raise EvidenceEpochError(f"canonical latest material result missing: {result_ref}")
+    if state.get("ai_reasoning_required") is True or state.get("research_judgment_required") is True:
+        requirement="FRESH_GENERAL_AI_RESEARCH_JUDGMENT"
+        authority="CANONICAL_STATE_FRESH_REASONING"
+    elif state.get("next_deterministic_operation_ref") or state.get("deterministic_next_operation"):
+        requirement="DETERMINISTIC_NON_ECONOMIC_EXECUTION"
+        authority="CANONICAL_STATE_DETERMINISTIC_AUTHORITY"
+    elif state.get("implementation_ai_required") is True:
+        requirement="GENUINE_GENERAL_AI_IMPLEMENTATION"
+        authority="CANONICAL_STATE_IMPLEMENTATION_AUTHORITY"
+    elif state.get("external_data_required") is True or state.get("user_action_required") is True:
+        requirement="EXTERNAL_DATA_OR_USER_GATE"
+        authority="CANONICAL_STATE_EXTERNAL_GATE"
+    else:
+        requirement="QUIESCENT_OR_MACHINE_ROUTABLE"
+        authority="CANONICAL_STATE"
+    safety=dict(state.get("safety") or {})
+    return {
+        "schema":"mxm.greenfield.active-research-projection.v1",
+        "derived_from":str(NEXT_STATE_REL),
+        "authority":authority,
+        "evidence_epoch":epoch,
+        "execution_requirement":requirement,
+        "latest_accepted_material_result_ref":result_ref,
+        "accepted_semantic_decision_ref":state.get("fresh_director_decision_ref"),
+        "historical_frontier_ref":state.get("canonical_frontier_ref") or "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+        "accounting":dict(state.get("accounting") or {}),
+        "safety":{
+            "live_orders_authorized":bool(safety.get("live_orders_authorized") or state.get("live_orders_authorized")),
+            "protected_forward_opened":bool(safety.get("protected_forward_opened") or safety.get("protected_evidence_opened") or state.get("protected_forward_opened") or state.get("protected_evidence_opened")),
+        },
+    }
+
+def refresh_derived_views(root_value:str|Path=".")->dict[str,Any]:
+    root=Path(root_value).resolve()
+    projection=derive_active_projection(root)
+    atomic_write_json(root/ACTIVE_PROJECTION_REL,projection)
+    return projection
 
 def _unique_refs(values:Iterable[Any])->list[str]:
     out=[]; seen=set()
@@ -50,8 +124,12 @@ def _unique_refs(values:Iterable[Any])->list[str]:
     return out
 
 def current_evidence_binding(root_value:str|Path=".")->dict[str,Any]:
-    root=Path(root_value).resolve(); doc=_load(root)
-    refs=_unique_refs(doc.get("authoritative_evidence_refs") or [])
+    root=Path(root_value).resolve(); doc=_load(root); state=_load_active_state(root)
+    active_epoch=current_evidence_epoch(root)
+    refs=_unique_refs(list(doc.get("authoritative_evidence_refs") or []) + [
+        rel for rel in (state.get("latest_material_structural_result_ref"),state.get("completed_structural_report_ref"))
+        if isinstance(rel,str) and rel
+    ])
     rows=[]
     for rel in refs:
         path=root/rel
@@ -105,9 +183,9 @@ def current_evidence_binding(root_value:str|Path=".")->dict[str,Any]:
         "structural_representation_is_not_economic_equivalence":True,
         "current_authority_ref":"data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json" if current_feasibility_path.is_file() else "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
     }
-    bundle_payload={"epoch":doc["current_epoch"],"authorities":rows,"provisional":provisional}
+    bundle_payload={"epoch":active_epoch,"authorities":rows,"provisional":provisional}
     return {
-        "evidence_epoch":int(doc["current_epoch"]),
+        "evidence_epoch":active_epoch,
         "epoch_status":doc.get("status"),
         "epoch_reason":doc.get("reason"),
         "authoritative_evidence_refs_and_hashes":rows,
@@ -127,7 +205,7 @@ def advance_evidence_epoch(root_value:str|Path,*,event_class:str,refs:list[str],
     for rel in refs:
         if not (root/rel).is_file():
             raise EvidenceEpochError(f"cannot advance epoch with missing ref: {rel}")
-    nxt=int(doc["current_epoch"])+1
+    nxt=max(int(doc["current_epoch"]),current_evidence_epoch(root))+1
     doc["current_epoch"]=nxt
     doc["advanced_utc"]=advanced_utc
     doc["reason"]=reason
