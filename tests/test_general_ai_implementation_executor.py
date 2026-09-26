@@ -17,13 +17,26 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
     def test_explicit_integrity_gate_blocks_implementation_even_with_next_action(self):
         self.assertFalse(implementation_required({"status":"MATERIAL_INTEGRITY_FAILURE","integrity_gate":"C032_CAPTURE_REUSE","next_action":"RUN_UNSAFE_SCREEN"}))
 
-    def test_executor_binds_proposal_when_state_is_proposal_bound_or_preserves_recovery_supersession(self):
+    def test_executor_binds_active_proposal_or_preserves_historical_runtime_provenance(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        if state.get("source_ai_proposal_id") or state.get("source_ai_proposal_hash") or state.get("source_runtime_operation_id"):
+        if state.get("source_ai_proposal_id") or state.get("source_ai_proposal_hash"):
             ref,proposal,row=_resolve_current_proposal(ROOT,state)
             self.assertEqual(proposal["proposal_id"],state["source_ai_proposal_id"])
             if state.get("source_ai_proposal_hash"):
                 self.assertEqual(row["proposal_hash"],state["source_ai_proposal_hash"])
+        elif state.get("source_runtime_operation_id"):
+            # An operation-only binding at a fresh semantic boundary is historical
+            # provenance, not authority to reuse the predecessor AI proposal.
+            self.assertTrue(reasoning_required(state))
+            self.assertFalse(implementation_required(state,ROOT))
+            registry=json.loads((ROOT/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json").read_text())
+            matches=[
+                row for row in registry.get("accepted",[])
+                if row.get("operation_id")==state["source_runtime_operation_id"]
+            ]
+            self.assertEqual(len(matches),1)
+            self.assertIsNone(state.get("source_ai_proposal_id"))
+            self.assertIsNone(state.get("source_ai_proposal_hash"))
         else:
             self.assertTrue(state.get("supersession_ref") or state.get("outer_capture_plan_ref"))
         source=(ROOT/"research_v3/general_ai_implementation_executor.py").read_text()
