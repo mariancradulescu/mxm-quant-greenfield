@@ -1,0 +1,46 @@
+name: Frozen non-economic research spec execution
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_v3/EPOCH27_BREAKOUT_EVENT_TABLE_V1.b64
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
+  cancel-in-progress: false
+
+jobs:
+  structural-spec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: performance-research-v3-20260922
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify current frozen authority and focused runtime
+        run: |
+          python -m py_compile research_v3/research_spec_kernel.py research_v3/epoch27_close.py
+          python -m unittest -q tests.test_autonomous_runtime_v2
+      - name: Execute frozen structural spec and advance evidence
+        run: python -m research_v3.epoch27_close --root .
+      - name: Persist coherent non-economic result transaction
+        run: |
+          git config user.name "mxm-runtime-v2[bot]"
+          git config user.email "mxm-runtime-v2@users.noreply.github.com"
+          git add evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json research_v3/CURRENT_RESEARCH_FRONTIER_V1.json research_v3/ACTIVE_RESEARCH_PROJECTION_V1.json
+          git commit -m "[skip ci] Persist Epoch27 structural result and Epoch28 fresh reasoning boundary"
+          git push origin HEAD:performance-research-v3-20260922
+      - name: Request exact-head authority CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run m6_preparation.yml --ref performance-research-v3-20260922
