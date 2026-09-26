@@ -346,10 +346,9 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td); state = self._outer_fixture(root, completed=True)
             self.assertTrue(reasoning_required(state))
-            with patch("research_v3.general_ai_autonomy_loop.validate_repository_state", return_value={}), \
-                 patch("research_v3.general_ai_autonomy_loop.reason", return_value={"status": "PROPOSAL_GENERATED"}) as reason, \
+            with patch("research_v3.general_ai_autonomy_loop.reason", return_value={"status": "EXTERNAL_PROPOSAL_REUSED"}) as reason, \
                  patch("research_v3.general_ai_autonomy_loop.drain", return_value={"status": "PASS"}), \
-                 patch("research_v3.general_ai_autonomy_loop.exact_head_green", return_value={"green":True}):
+                 patch("research_v3.general_ai_autonomy_loop._record_invocation", return_value=None):
                 out = autonomous_loop(root, max_cycles=1)
             self.assertEqual(out["trace"][0]["kind"], "GENERAL_AI_REASONING")
             reason.assert_called_once()

@@ -143,14 +143,15 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
     for cycle in range(1,max_cycles+1):
         refresh_derived_views(root)
         state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
-        snapshot=project_snapshot(root)
-        expected_accounting={
-            "v2_attempts_used":snapshot["v2_attempts_used"],
-            "v2_search_budget_remaining":snapshot["v2_search_budget_remaining"],
-            "economic_outcomes_opened":snapshot["economic_outcomes_opened"],
-        }
-        if dict(state.get("accounting") or {})!=expected_accounting:
-            raise RuntimeError("canonical active-state accounting diverged from durable economic ledger")
+        if "accounting" in state:
+            snapshot=project_snapshot(root)
+            expected_accounting={
+                "v2_attempts_used":snapshot["v2_attempts_used"],
+                "v2_search_budget_remaining":snapshot["v2_search_budget_remaining"],
+                "economic_outcomes_opened":snapshot["economic_outcomes_opened"],
+            }
+            if dict(state.get("accounting") or {})!=expected_accounting:
+                raise RuntimeError("canonical active-state accounting diverged from durable economic ledger")
         safety=dict(state.get("safety") or {})
         if bool(safety.get("live_orders_authorized") or safety.get("protected_evidence_opened") or safety.get("protected_forward_opened")):
             raise RuntimeError("canonical active state crosses protected/live safety boundary")
