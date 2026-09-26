@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.greenfield.epoch26-cross-sectional-ranking-structural-acceptance.v1",
+  "status": "ACCEPTED_NON_ECONOMIC_STRUCTURAL_RESULT",
+  "source_evidence_epoch": 26,
+  "family": "CROSS_SECTIONAL_RANKING",
+  "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+  "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+  "implementation_manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+  "full_result": {
+    "filename": "EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_RESULT_V1.json",
+    "sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
+    "byte_length": 33059,
+    "schema": "mxm.greenfield.epoch26-cross-sectional-ranking-structural-result.v1",
+    "status": "COMPLETE_NON_ECONOMIC_STRUCTURAL_RESULT"
+  },
+  "source_artifacts": {
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "execution": {
+    "representatives_processed": 41,
+    "all_frozen_representatives_processed_exactly_once": true,
+    "total_admitted_anchors": 26943,
+    "total_right_censored_future_response": 3952,
+    "eligible_anchor_scores_after_panel_breadth": 7167,
+    "eligible_panel_timestamps": 462,
+    "omitted_timestamps_below_minimum_breadth": 8108,
+    "panel_breadth_minimum_observed": 10,
+    "panel_breadth_maximum_observed": 20
+  },
+  "inference": {
+    "test_family_size": 41,
+    "multiplicity": "BENJAMINI_YEKUTIELI_FDR",
+    "fdr_q": 0.05,
+    "block_unit": "UTC_CALENDAR_DAY",
+    "block_length_days": 5,
+    "bootstrap_resamples": 5000,
+    "bootstrap_seed": 260926,
+    "minimum_raw_p_symbol": "Lead",
+    "minimum_raw_p": 0.0629874025194961,
+    "all_by_adjusted_q_equal_one": true,
+    "supported_representatives_count": 0,
+    "supported_representatives": [],
+    "subset_ranking_performed": false
+  },
+  "validation": {
+    "exact_source_zip_hashes_match_accepted_authority": true,
+    "protected_forward_rows_opened": false,
+    "post_outcome_parameter_tuning": false,
+    "independent_recomputation": "PASS_41_OF_41",
+    "raw_bytes_source": "CHATGPT_LIBRARY_ACCEPTED_PRIOR_UPLOADS_REUSED_NO_RECAPTURE"
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "account_mutation": false
+  },
+  "interpretation_boundary": {
+    "economic_promotion_authorized": false,
+    "mechanism_family_closed": false,
+    "independent_confirmation": false,
+    "result": "NO_REPRESENTATIVE_PASSED_FROZEN_CROSS_SECTIONAL_RANKING_STRUCTURAL_CRITERIA"
+  }
+}
