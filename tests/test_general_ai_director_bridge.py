@@ -87,6 +87,7 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             "next_action": "AWAIT_INDEPENDENT_OUTER_CAPTURE",
             "current_research_evidence_epoch": 20,
             "evidence_epoch": 20,
+            "authorizing_evidence_epoch": 20,
             "source_freeze_ref": freeze,
             "outer_capture_plan_ref": plan,
             "user_action_required": True,
