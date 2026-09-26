@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, FOUR_PANEL_OUTER_ACQUISITION_FIELDS, FOUR_PANEL_OUTER_SCHEMA, PROTECTED_PREFIXES, ImplementationRejected, _bound_context, _collector_fields_match, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
+from research_v3.execution_router import deterministic_operation_required
 
 ROOT=Path(__file__).resolve().parents[1]
 class GeneralAIImplementationExecutorTests(unittest.TestCase):
@@ -11,7 +12,9 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         if s.get("user_action_required") is True or s.get("external_gate") or not s.get("next_action") or (s.get("status")=="MATERIAL_INTEGRITY_FAILURE" and s.get("integrity_gate")):
             self.assertFalse(implementation_required(s,ROOT))
         elif reasoning_required(s):
-            self.assertFalse(implementation_required(s))
+            self.assertFalse(implementation_required(s,ROOT))
+        elif deterministic_operation_required(ROOT,s):
+            self.assertFalse(implementation_required(s,ROOT))
         else:
             self.assertTrue(implementation_required(s,ROOT))
     def test_explicit_integrity_gate_blocks_implementation_even_with_next_action(self):
