@@ -1,4 +1,55 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "2041d59436c276fd066f475a840c798bfdaafdfa",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "2041d59436c276fd066f475a840c798bfdaafdfa",
+    "predecessor_run_id": 36258997824
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_proposal_hash": "05e487e2b13c3f45ad9af3cb7da64ea844266cd31a2dcc6357750a1e5202245c",
+      "accepted_proposal_id": "epoch30-session-time-structure",
+      "economic_effect": {
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
+      },
+      "implementation_refs": [
+        "research_v3/EPOCH30_SEASONALITY_SESSION_TIME_FRONTIER_FREEZE_V1.json",
+        "research_v3/seasonality_session_time_epoch30_screen.py",
+        "tests/test_seasonality_session_time_epoch30_screen.py"
+      ],
+      "later_step": "After exact-head-green checks, run the frozen screen on the accepted captures and report its descriptive result. The development screen is not independent confirmation and does not authorize economic research or symbol promotion.",
+      "methodology": "Daily-normalized absolute log close-to-close activity; fixed chronological split; minimum date/hour coverage and activity threshold; deterministic within-date hour randomization; stable unique peak required in both halves; Holm family-wise correction across all 41 symbols.",
+      "scope": {
+        "clock": "UTC hour of day, fixed 24 buckets",
+        "data_refs": [
+          "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+          "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+          "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
+        ],
+        "data_status": "ACCEPTED_41_OF_41_COVERAGE; replacement capture covers the three added representatives",
+        "interval": "2026-06-15T00:00:00Z/2026-09-13T23:59:59Z",
+        "representatives": 41,
+        "resolution": "M5"
+      },
+      "validation": "Inspected the freeze, evaluator, and targeted tests. Tests were not executed."
+    },
+    "external_data_gate": null,
+    "implementation_id": "epoch30-seasonality-session-time-non-economic-screen-v1",
+    "next_research_state": {
+      "next_action": "RUN_FROZEN_EPOCH30_SEASONALITY_SESSION_TIME_SCREEN",
+      "status": "READY_FOR_EXACT_HEAD_GREEN_THEN_FROZEN_SCREEN_EXECUTION"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added the prospective Epoch 30 freeze and deterministic non-economic evaluator for all 41 current representatives. The exact-scope M5 captures are already accepted and coverage-verified; no new data is required. The screen was not run.",
+    "tests_requested": [
+      "python -m unittest discover -s tests -p test_seasonality_session_time_epoch30_screen.py",
+      "Run the repository-required exact-head-green checks before accepting the implementation."
+    ]
+  },
   "basis_next_state_sha256": "1eb7965e675513c4d3c31e6cc75c49e9de951f1fb9e3c282fa942c98dd82136e",
   "changed_paths": [
     "research_v3/EPOCH30_SEASONALITY_SESSION_TIME_FRONTIER_FREEZE_V1.json",
@@ -67,5 +118,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
