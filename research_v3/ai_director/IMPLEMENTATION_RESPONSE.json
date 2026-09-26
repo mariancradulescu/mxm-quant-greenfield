@@ -1,67 +1,39 @@
 {
-  "accepted_output": {
-    "decision": {
-      "accepted_data_covers_scope": true,
-      "code_changed": false,
-      "economic_outcome_opened": false,
-      "implementation_sufficient": true,
-      "live_orders_authorized": false,
-      "mechanism_family_closed": false,
-      "new_market_data_required": false,
-      "preserve_later_step": "Run the targeted tests and evaluate the frozen law against the hash-bound accepted captures; report all representatives without ranking or economic promotion.",
-      "protected_forward_opened": false,
-      "result_generated": false,
-      "v2_attempt_consumed": false
-    },
-    "external_data_gate": null,
-    "implementation_id": "epoch25-mean-reversion-structural-screen-inspection",
-    "next_research_state": {
-      "next_action": "RUN_HASH_BOUND_MEAN_REVERSION_SCREEN",
-      "status": "FROZEN_SCREEN_EXECUTION_PENDING"
-    },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The existing evaluator, prospective freeze, implementation manifest, and focused tests cover the accepted 41-representative M5 screen. The accepted development and replacement captures are already hash-bound to this scope, so no new data gate or code changes are needed. I did not execute tests or the market-data evaluation: this session permits file inspection but no shell commands, so no structural result is claimed.",
-    "tests_requested": [
-      "tests/test_mean_reversion_epoch25_screen.py",
-      "Evaluate research_v3/mean_reversion_epoch25_screen.py using research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json and the accepted hash-bound development and replacement captures."
-    ]
-  },
-  "basis_next_state_sha256": "a2944bc2c41e8bfbb94816e8cce4b76fb862e5123c683b6206c8dc4369b3863e",
-  "changed_paths": [],
-  "created_utc": "2026-09-26T05:30:33Z",
-  "exact_head": {
-    "green": true,
-    "head": "f1bec08a784e75e5069321aad82187de4dcd997b",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "f1bec08a784e75e5069321aad82187de4dcd997b",
-    "predecessor_run_id": 36220887420
-  },
+  "basis_next_state_sha256": "c6af53589cd06dcf788330adc437e93b39afc792b0fe2cdbb6d98eb2b30841b3",
+  "changed_paths": [
+    "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+    "research_v3/cross_sectional_ranking_epoch26_screen.py",
+    "tests/test_cross_sectional_ranking_epoch26_screen.py"
+  ],
+  "created_utc": "2026-09-26T06:11:31Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_data_covers_scope": true,
-      "code_changed": false,
-      "economic_outcome_opened": false,
-      "implementation_sufficient": true,
-      "live_orders_authorized": false,
-      "mechanism_family_closed": false,
-      "new_market_data_required": false,
-      "preserve_later_step": "Run the targeted tests and evaluate the frozen law against the hash-bound accepted captures; report all representatives without ranking or economic promotion.",
-      "protected_forward_opened": false,
-      "result_generated": false,
-      "v2_attempt_consumed": false
+      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+      "later_step": "After exact-head CI is green, run the frozen evaluator against the already accepted hash-bound captures and audit the complete 41-representative result. No economic promotion or independent-confirmation claim is authorized.",
+      "method": "One-hour trailing and forward cross-sectional return percentiles; daily centered co-ranking scores; synchronized five-calendar-day moving-block inference; Benjamini-Yekutieli correction across the full 41-test family.",
+      "safety": {
+        "economic_outcomes_opened": false,
+        "live_orders_authorized": false,
+        "protected_evidence_opened": false,
+        "v2_attempts_consumed": 0
+      },
+      "scope": "All 41 current structural representatives using the accepted Epoch23 M5 captures and bound ZIP hashes.",
+      "selected_mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "test_ref": "tests/test_cross_sectional_ranking_epoch26_screen.py"
     },
     "external_data_gate": null,
-    "implementation_id": "epoch25-mean-reversion-structural-screen-inspection",
+    "implementation_id": "epoch26-cross-sectional-ranking-structural-wave",
     "next_research_state": {
-      "next_action": "RUN_HASH_BOUND_MEAN_REVERSION_SCREEN",
-      "status": "FROZEN_SCREEN_EXECUTION_PENDING"
+      "next_action": "RUN_EXACT_HEAD_CI_THEN_EXECUTE_FROZEN_NON_ECONOMIC_SCREEN",
+      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The existing evaluator, prospective freeze, implementation manifest, and focused tests cover the accepted 41-representative M5 screen. The accepted development and replacement captures are already hash-bound to this scope, so no new data gate or code changes are needed. I did not execute tests or the market-data evaluation: this session permits file inspection but no shell commands, so no structural result is claimed.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a prospective freeze, exact-scope evaluator, and targeted tests for non-economic cross-sectional ranking over all 41 accepted representatives. The accepted capture artifacts already bind the required M5 scope; no new collector or market-data acquisition is needed. The evaluator has not been run on those captures, and tests were not run because shell tools were prohibited.",
     "tests_requested": [
-      "tests/test_mean_reversion_epoch25_screen.py",
-      "Evaluate research_v3/mean_reversion_epoch25_screen.py using research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json and the accepted hash-bound development and replacement captures."
+      "python -m unittest discover -s tests -p test_cross_sectional_ranking_epoch26_screen.py",
+      "Exact-head CI green before evaluating the accepted captures"
     ]
   },
   "project_snapshot": {
@@ -80,5 +52,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
