@@ -2,38 +2,6 @@ name: Autonomous Research Runtime V2 Supervisor
 
 on:
   workflow_dispatch:
-    inputs:
-      mode:
-        description: Supervisor entry mode
-        required: true
-        default: auto
-        type: choice
-        options:
-          - auto
-          - acceptance
-          - acceptance_continue
-          - acceptance_verify
-          - resume
-      predecessor_run_id:
-        description: Internal predecessor run id for zero-human continuation proof
-        required: false
-        default: ""
-        type: string
-      predecessor_ci_head:
-        description: Exact research HEAD validated by the predecessor authority CI
-        required: false
-        default: ""
-        type: string
-      predecessor_ci_conclusion:
-        description: Predecessor authority CI conclusion
-        required: false
-        default: ""
-        type: string
-      predecessor_ci_run_id:
-        description: Predecessor authority CI run id
-        required: false
-        default: ""
-        type: string
   push:
     branches:
       - main
@@ -46,7 +14,7 @@ permissions:
   copilot-requests: write
 
 concurrency:
-  group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
+  group: mxm-minimal-autonomous-runtime-performance-research-v3-20260922
   cancel-in-progress: false
 
 env:
@@ -59,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Checkout authoritative research branch
+      - name: Checkout canonical research branch
         uses: actions/checkout@v4
         with:
           ref: ${{ env.TARGET_BRANCH }}
@@ -71,240 +39,109 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Configure durable checkpoint identity
+      - name: Configure durable commit identity
         run: |
           git config user.name "mxm-runtime-v2[bot]"
           git config user.email "mxm-runtime-v2@users.noreply.github.com"
 
-      - name: Resolve supervisor mode
-        id: mode
-        shell: bash
+      - name: Regenerate non-authoritative derived views
         run: |
-          requested="${{ inputs.mode }}"
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-            if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
-              mode="resume"
-            else
-              mode="acceptance"
-            fi
-          elif [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
-            if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
-              mode="resume"
-            else
-              mode="acceptance"
-            fi
-          elif [[ -z "${requested}" || "${requested}" == "auto" ]]; then
-            if [[ -f research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json ]]; then
-              mode="resume"
-            else
-              mode="acceptance"
-            fi
-          else
-            mode="${requested}"
-          fi
-          echo "mode=${mode}" >> "${GITHUB_OUTPUT}"
-          echo "Resolved mode: ${mode}"
+          python - <<'PY'
+          from research_v3.evidence_epoch import refresh_derived_views
+          print(refresh_derived_views("."))
+          PY
 
-      - name: Runtime V2 focused acceptance tests
-        if: ${{ startsWith(steps.mode.outputs.mode, 'acceptance') }}
-        run: python -m unittest -v tests.test_autonomous_runtime_v2
+      - name: Minimal fast-path validation
+        run: >
+          python -m unittest -v
+          tests.test_execution_router_v1
+          tests.test_deterministic_operation_executor_v1
+          tests.test_research_evidence_epoch
+          tests.test_active_research_projection
+          tests.test_research_fast_path
+          tests.test_general_ai_autonomy_loop
 
-      - name: Advance repository-level liveness acceptance
-        id: acceptance
-        if: ${{ steps.mode.outputs.mode == 'acceptance' || steps.mode.outputs.mode == 'acceptance_continue' }}
-        shell: bash
-        run: |
-          origin=""
-          if [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
-            origin="scheduled_watchdog"
-          elif [[ "${{ steps.mode.outputs.mode }}" == "acceptance_continue" ]]; then
-            origin="predecessor_workflow_dispatch"
-          fi
-          MXM_PREDECESSOR_RUN_ID="${{ inputs.predecessor_run_id }}"           MXM_CONTINUATION_ORIGIN="${origin}"           python -m research_v3.runtime_v2_repository_acceptance advance --root .
-
-      - name: Persist liveness acceptance checkpoint
-        if: ${{ steps.acceptance.outputs.action == 'DISPATCH_CONTINUE' || steps.acceptance.outputs.action == 'DISPATCH_VERIFY' }}
-        shell: bash
-        run: |
-          git add research_v3/runtime_v2_acceptance
-          if git diff --cached --quiet; then
-            exit 0
-          fi
-          git commit -m "[skip ci] Runtime V2 repository liveness checkpoint"
-          if ! git push origin "HEAD:refs/heads/${TARGET_BRANCH}"; then
-            git fetch origin "${TARGET_BRANCH}"
-            git rebase "origin/${TARGET_BRANCH}"
-            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
-          fi
-
-      - name: Verify persisted repository-level acceptance
-        id: verify
-        if: ${{ steps.mode.outputs.mode == 'acceptance_verify' }}
-        env:
-          MXM_PREDECESSOR_RUN_ID: ${{ inputs.predecessor_run_id }}
-          MXM_CONTINUATION_ORIGIN: predecessor_workflow_dispatch
-        run: python -m research_v3.runtime_v2_repository_acceptance verify --root .
-
-      - name: Persist verified Runtime V2 acceptance gate
-        if: ${{ steps.verify.outputs.action == 'VERIFIED' }}
-        shell: bash
-        run: |
-          git add research_v3/runtime_v2_acceptance evidence/AUTONOMOUS_RESEARCH_RUNTIME_V2_ACCEPTANCE_V1.json
-          if git diff --cached --quiet; then
-            exit 0
-          fi
-          git commit -m "[skip ci] Verify Runtime V2 repository liveness acceptance"
-          if ! git push origin "HEAD:refs/heads/${TARGET_BRANCH}"; then
-            git fetch origin "${TARGET_BRANCH}"
-            git rebase "origin/${TARGET_BRANCH}"
-            git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
-          fi
-
-      - name: Dispatch explicit continuation
-        if: ${{ steps.acceptance.outputs.action == 'DISPATCH_CONTINUE' || steps.acceptance.outputs.action == 'DISPATCH_VERIFY' || steps.verify.outputs.action == 'VERIFIED' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          action="${{ steps.acceptance.outputs.action }}"
-          if [[ "${{ steps.verify.outputs.action }}" == "VERIFIED" ]]; then
-            next_mode="resume"
-          elif [[ "${action}" == "DISPATCH_CONTINUE" ]]; then
-            next_mode="acceptance_continue"
-          elif [[ "${action}" == "DISPATCH_VERIFY" ]]; then
-            next_mode="acceptance_verify"
-          else
-            echo "No continuation required"
-            exit 0
-          fi
-          payload="$(jq -nc             --arg ref "main"             --arg mode "${next_mode}"             --arg predecessor "${GITHUB_RUN_ID}"             '{ref:$ref,inputs:{mode:$mode,predecessor_run_id:$predecessor}}')"
-          curl --fail-with-body             -X POST             -H "Accept: application/vnd.github+json"             -H "Authorization: Bearer ${GH_TOKEN}"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches"             -d "${payload}"
-
-      - name: Reconcile autonomous research control plane before dispatch
-        if: ${{ steps.mode.outputs.mode == 'resume' }}
-        run: python -m research_v3.autonomous_control_plane validate
-
-      - name: Classify current execution requirement
-        id: route
-        if: ${{ steps.mode.outputs.mode == 'resume' }}
-        shell: bash
-        run: python -m research_v3.lightweight_dispatcher classify --root . --github-output "${GITHUB_OUTPUT}"
-
-      - name: Record research HEAD before this continuation
-        id: start
-        if: ${{ steps.mode.outputs.mode == 'resume' }}
-        shell: bash
-        run: echo "head=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
-
-      - name: Fast validation for authorized deterministic work
-        if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'DETERMINISTIC_OPERATION' }}
-        run: python -m unittest -v tests.test_execution_router_v1 tests.test_deterministic_operation_executor_v1 tests.test_frontier_information_gain_v1 tests.test_general_ai_implementation_executor tests.test_research_fast_path tests.test_active_research_projection
-
-      - name: Execute authorized deterministic operation chain
-        if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'DETERMINISTIC_OPERATION' }}
-        run: python -m research_v3.deterministic_operation_executor execute-chain --root . --max-operations 8 --git-checkpoint --git-push
-
-      - name: Install runtime test dependency for implementation
-        if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION' }}
-        run: |
-          python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-
-      - name: General AI focused tests
-        if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
-        run: python -m unittest -v tests.test_execution_router_v1 tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider tests.test_general_ai_implementation_executor tests.test_copilot_sdk_observability_v1 tests.test_research_fast_path tests.test_active_research_projection
-
-      - name: Prove general AI research director boundary if required
-        if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
-        shell: bash
-        run: |
-          if [[ -f evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json ]] && \
-             [[ "$(jq -r '.status // empty' evidence/GENERAL_AI_RESEARCH_DIRECTOR_ACCEPTANCE_V1.json)" == "PASS" ]]; then
-            echo "General AI director already accepted"
-          else
-            python -m research_v3.general_ai_director_acceptance prove \
-              --root . \
-              --git-checkpoint \
-              --git-push
-          fi
-
-      - name: Drain provider-neutral AI research proposals
-        if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
-        run: |
-          python -m research_v3.general_ai_director_bridge drain \
-            --root . \
-            --git-checkpoint \
-            --git-push
-
-      - name: Install GitHub Copilot CLI only for genuine AI work
-        if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
+      - name: Install Copilot CLI once for genuine semantic work reached in this run
         run: npm install -g @github/copilot
 
-      - name: Continue genuine general AI reasoning or implementation
-        id: ai_continue
-        if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
+      - name: Run self-continuing minimal research engine
+        id: continuation
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ github.token }}
           MXM_COPILOT_MODEL: auto
           MXM_COPILOT_IMPLEMENTATION_MODEL: auto
-          MXM_PREDECESSOR_CI_HEAD: ${{ inputs.predecessor_ci_head }}
-          MXM_PREDECESSOR_CI_CONCLUSION: ${{ inputs.predecessor_ci_conclusion }}
-          MXM_PREDECESSOR_CI_RUN_ID: ${{ inputs.predecessor_ci_run_id }}
-        run: |
-          python -m research_v3.general_ai_autonomy_loop continue \
-            --root . \
-            --git-checkpoint \
-            --git-push \
-            --max-cycles 8 | tee /tmp/mxm-continuation.json
-          status="$(python - <<'PY'
-          import json
-          from pathlib import Path
-          raw=Path('/tmp/mxm-continuation.json').read_text()
-          start=raw.rfind("{"+chr(10)+'  "cycles"')
-          if start < 0:
-              raise SystemExit("No continuation result object in runtime output")
-          print(json.loads(raw[start:])["status"])
-          PY
-          )"
-          echo "continuation_status=${status}" >> "${GITHUB_OUTPUT}"
-          if [[ "${status}" == "PROPOSAL_REJECTED_PRE_REGISTRY" || "${status}" == "MATERIAL_INTEGRITY_FAILURE" ]]; then
-            echo "Technical recovery required: ${status}; no follow-on semantic dispatch."
-            exit 1
-          fi
-
-      - name: Continue from durable progress when work remains
-        if: ${{ steps.mode.outputs.mode == 'resume' && success() }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          START_HEAD: ${{ steps.start.outputs.head }}
-          CONTINUATION_STATUS: ${{ steps.ai_continue.outputs.continuation_status }}
         shell: bash
         run: |
-          git fetch origin "${TARGET_BRANCH}"
-          git checkout --detach "origin/${TARGET_BRANCH}"
-          current_head="$(git rev-parse HEAD)"
-          if [[ "${current_head}" == "${START_HEAD}" ]]; then
-            if [[ "${CONTINUATION_STATUS}" == "PENDING_EXACT_HEAD_GREEN" ]]; then
-              echo "Exact-head authority is pending for unchanged durable HEAD ${current_head}; dispatch sentinel once."
-              curl --fail-with-body -X POST \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer ${GH_TOKEN}" \
-                -H "X-GitHub-Api-Version: 2022-11-28" \
-                "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/runtime-v2-liveness-sentinel.yml/dispatches" \
-                -d '{"ref":"main"}'
-              exit 0
-            fi
-            echo "No persisted progress in this run; stop to prevent a dispatch loop."
-            exit 0
-          fi
-          required="$(python -m research_v3.lightweight_dispatcher classify --root . | python -c 'import json,sys; print(str(json.load(sys.stdin)["dispatch_required"]).lower())')"
-          if [[ "${required}" != "true" ]]; then
-            echo "No authorized follow-on work."
-            exit 0
-          fi
-          curl --fail-with-body -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/runtime-v2-liveness-sentinel.yml/dispatches" \
-            -d '{"ref":"main"}'
+          set -euo pipefail
+          final_status=""
+          for batch in 1 2 3; do
+            log="/tmp/mxm-minimal-runtime-${batch}.json"
+            python -m research_v3.general_ai_autonomy_loop continue               --root .               --git-checkpoint               --git-push               --max-cycles 12 | tee "${log}"
+            final_status="$(python - "${log}" <<'PY'
+          import json,sys
+          from pathlib import Path
+          raw=Path(sys.argv[1]).read_text()
+          starts=[i for i,c in enumerate(raw) if c=="{"]
+          payload=None
+          for i in reversed(starts):
+              try:
+                  candidate=json.loads(raw[i:])
+              except Exception:
+                  continue
+              if isinstance(candidate,dict) and "status" in candidate:
+                  payload=candidate
+                  break
+          if payload is None:
+              raise SystemExit("No runtime result object found")
+          print(payload["status"])
+          PY
+            )"
+            echo "batch=${batch} status=${final_status}"
+            case "${final_status}" in
+              BOUNDED_CONTINUATION_CHECKPOINT)
+                continue
+                ;;
+              *)
+                break
+                ;;
+            esac
+          done
+          echo "final_status=${final_status}" >> "${GITHUB_OUTPUT}"
+
+      - name: Refresh derived views after durable progress
+        run: |
+          python - <<'PY'
+          from research_v3.evidence_epoch import refresh_derived_views
+          print(refresh_derived_views("."))
+          PY
+
+      - name: Post-transition fast validation
+        run: >
+          python -m unittest -v
+          tests.test_execution_router_v1
+          tests.test_deterministic_operation_executor_v1
+          tests.test_research_evidence_epoch
+          tests.test_active_research_projection
+          tests.test_research_fast_path
+          tests.test_general_ai_autonomy_loop
+
+      - name: Report durable frontier
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+          usage=json.loads(Path("research_v3/ai_director/PROVIDER_USAGE_V1.json").read_text())
+          print(json.dumps({
+              "runtime_status":"${{ steps.continuation.outputs.final_status }}",
+              "canonical_status":state.get("status"),
+              "next_action":state.get("next_action"),
+              "evidence_epoch":state.get("current_research_evidence_epoch"),
+              "accounting":state.get("accounting"),
+              "provider_invocations":usage.get("provider_invocations"),
+              "successful_reasoning_invocations":usage.get("successful_reasoning_invocations"),
+              "successful_implementation_invocations":usage.get("successful_implementation_invocations"),
+          },sort_keys=True,indent=2))
+          PY
