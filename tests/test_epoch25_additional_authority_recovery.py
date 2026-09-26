@@ -53,6 +53,42 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
         missing=sorted(set(walk(state))-set(refs))
         self.assertEqual(missing,[])
 
+    def test_authority_packet_is_referentially_closed_over_exposed_refs(self):
+        state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+        authorities,refs=_authority_context(ROOT,state)
+        self.assertIn(
+            "evidence/EPOCH23_REGIME_PROPOSAL_SCOPE_SUPERSESSION_V1.json",
+            refs,
+        )
+
+        def refs_in_doc(value):
+            found=[]
+            if isinstance(value,dict):
+                for k,v in value.items():
+                    if k.endswith("_ref") and isinstance(v,str) and v and (ROOT/v).is_file():
+                        found.append(v)
+                    elif k.endswith("_refs") and isinstance(v,list):
+                        found.extend(x for x in v if isinstance(x,str) and x and (ROOT/x).is_file())
+                    found.extend(refs_in_doc(v))
+            elif isinstance(value,list):
+                for v in value:
+                    found.extend(refs_in_doc(v))
+            return found
+
+        missing=[]
+        for item in authorities:
+            path=ROOT/item["ref"]
+            if path.suffix.lower()!=".json":
+                continue
+            try:
+                doc=json.loads(path.read_text())
+            except Exception:
+                continue
+            for nested in refs_in_doc(doc):
+                if nested not in refs:
+                    missing.append((item["ref"],nested))
+        self.assertEqual(missing,[])
+
     def test_epoch25_authority_request_is_already_durable_and_resolved(self):
         request=json.loads((ROOT/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").read_text())
         acceptance=json.loads((ROOT/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json").read_text())

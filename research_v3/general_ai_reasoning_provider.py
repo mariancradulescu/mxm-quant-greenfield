@@ -169,6 +169,32 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         if rel not in refs and (root/rel).is_file():
             refs.append(rel)
 
+    # Referential closure over the authority packet itself.  Large authority
+    # documents are summarized to the model, but their durable *_ref / *_refs
+    # values can still be visible and legitimately cited.  A manually curated
+    # top-level list repeatedly rejected such citations (Epoch25).  Expand only
+    # existing repository JSON refs, fail closed on runaway graphs, and preserve
+    # stable insertion order.
+    cursor=0
+    max_authority_refs=512
+    while cursor < len(refs):
+        if len(refs) > max_authority_refs:
+            raise AIReasoningProviderError(
+                f"authority reference closure exceeded {max_authority_refs} files"
+            )
+        rel=refs[cursor]
+        cursor+=1
+        path=root/rel
+        if not path.is_file() or path.suffix.lower()!=".json":
+            continue
+        try:
+            doc=json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        for nested in _state_repository_refs(doc):
+            if nested not in refs and (root/nested).is_file():
+                refs.append(nested)
+
     rows=[]; kept=[]
     for rel in refs:
         p=root/rel

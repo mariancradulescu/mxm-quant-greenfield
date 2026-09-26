@@ -1,0 +1,27 @@
+{
+  "schema": "mxm.greenfield.epoch25-semantic-authority-referential-closure-repair.v1",
+  "status": "IMPLEMENTED_REQUIRES_EXACT_HEAD_CI",
+  "recorded_utc": "2026-09-26T03:45:00Z",
+  "observed_failure": {
+    "rejected_request_id": "reason_2786133deec4834dc2ba94e8245b35ab",
+    "rejection_ref": "research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",
+    "reason": "provider candidate referenced authority outside supplied context: evidence/EPOCH23_REGIME_PROPOSAL_SCOPE_SUPERSESSION_V1.json"
+  },
+  "root_cause": "The packet was closed over direct NEXT_AUTONOMOUS_STATE refs but not over refs nested inside authority documents already supplied to the semantic model. The model could therefore see a legitimate durable ref in supplied context while proposal validation forbade citing it.",
+  "repair": [
+    "Expand authority_refs to a fixed point over existing repository JSON *_ref and *_refs fields reachable from the supplied packet.",
+    "Cap the closure at 512 files and fail closed if the graph is unexpectedly large.",
+    "Keep proposal validation strict against refs outside the closed packet.",
+    "Regression-test the exact Epoch25 supersession ref and generic closure invariant."
+  ],
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}
