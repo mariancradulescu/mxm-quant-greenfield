@@ -585,11 +585,14 @@ def _normalize_candidate_routing(request:Mapping[str,Any],candidate:Mapping[str,
 
     status=str(next_state.get("status") or "").upper()
     if (
+        next_state.get("implementation_ai_required") is not True
+        and (
         next_state.get("ai_reasoning_required") is True
         or action.upper().startswith("AI_")
         or status=="AI_REASONING_REQUIRED"
         or "PENDING_AI_INTERPRETATION" in status
         or "FRESH_GENERAL_AI_REASONING_REQUIRED" in status
+        )
     ):
         return doc
 
