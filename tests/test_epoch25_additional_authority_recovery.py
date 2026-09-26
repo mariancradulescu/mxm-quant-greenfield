@@ -38,7 +38,6 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
     def test_unroutable_deterministic_guess_is_converted_to_bound_implementation(self):
         from research_v3.general_ai_reasoning_provider import _normalize_candidate_routing, build_reasoning_request
         request=build_reasoning_request(ROOT)
-        self.assertEqual(request["authorized_deterministic_operations_current_epoch"],[])
         candidate={
             "proposal_id":"deterministic-guess-normalization-test",
             "objective":{"class":"NON_ECONOMIC_STRUCTURAL_RESEARCH","goal":"test","information_gain_rationale":"test"},
@@ -59,13 +58,20 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
         self.assertTrue(normalized["next_research_state"]["implementation_ai_required"])
         self.assertIn("implementation_scope",normalized["decision"])
 
-    def test_current_epoch_has_no_preexisting_deterministic_operation_to_guess(self):
+    def test_current_epoch_exposes_only_explicit_authorized_deterministic_operations(self):
         from research_v3.evidence_epoch import current_evidence_binding
         from research_v3.general_ai_reasoning_provider import build_reasoning_request
         request=build_reasoning_request(ROOT)
         binding=current_evidence_binding(ROOT)
         self.assertEqual(request["evidence_epoch_seen"],binding["evidence_epoch"])
-        self.assertEqual(request["authorized_deterministic_operations_current_epoch"],[])
+        operations=request["authorized_deterministic_operations_current_epoch"]
+        self.assertTrue(any(
+            row.get("ref")=="research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_RESULT_ACCEPTANCE_OPERATION_V1.json"
+            for row in operations
+        ))
+        for row in operations:
+            self.assertEqual(row.get("evidence_epoch"),binding["evidence_epoch"])
+            self.assertFalse(row.get("implementation_ai_required"))
 
     def test_current_packet_includes_frontier_and_capture_authorities(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
