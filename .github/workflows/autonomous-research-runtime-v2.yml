@@ -254,7 +254,7 @@ jobs:
           import json
           from pathlib import Path
           raw=Path('/tmp/mxm-continuation.json').read_text()
-          start=raw.rfind("{",0,raw.rfind('"cycles"'))
+          start=raw.rfind(chr(10)+"{"+chr(10)+'  "cycles"')
           if start < 0:
               raise SystemExit("No continuation result object in runtime output")
           print(json.loads(raw[start+1:])["status"])
