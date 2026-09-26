@@ -1,22 +1,24 @@
 {
   "accepted_output": {
     "decision": {
-      "accepted_data_available": true,
-      "data_scope": "All 41 frozen representatives over the accepted 13-week M5 interval, bound to development ZIP SHA-256 64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503 and replacement ZIP SHA-256 d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-      "economic_outcomes_opened": false,
-      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "exact_head_ci": {
-        "head": "44c384e911bc717f242528a9a89228e0eb9eb3ee",
-        "run_id": 36225615156,
-        "status": "GREEN"
+      "action": "Reuse the existing implementation; do not rewrite it or create a new capture gate.",
+      "boundaries": {
+        "development_holdout_is_independent_confirmation": false,
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
       },
-      "files_changed": [],
+      "data_refs": [
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+      ],
+      "data_scope": "Accepted M5 history for all 41 frozen representatives, 2026-06-15 through 2026-09-13; development ZIP SHA-256 64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503 and replacement ZIP SHA-256 d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75.",
       "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation_already_sufficient": true,
-      "independent_confirmation_claimed": false,
-      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "protected_forward_opened": false,
-      "v2_attempts_consumed": 0
+      "implementation_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "implementation_validation": "Validated by repository inspection. Tests and exact-head CI were not run; no shell tools were used.",
+      "later_step": "Run exact-head CI, then evaluate the frozen law on the hash-bound accepted 41-symbol data. Report structural evidence only; do not open economic outcomes.",
+      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json"
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence",
@@ -25,41 +27,42 @@
       "status": "IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The accepted 41-representative M5 screen is already implemented by the frozen evaluator, prospective freeze, manifest, and targeted tests. Inspection confirms exact accepted data-hash bindings, synchronized session-eligible ranks, daily aggregation, dependence-aware bootstrap, full-family BY correction, and structural-only reporting. The accepted development and replacement captures cover the frozen scope; no code changes or external data gate are needed. The repository records exact-head CI as green; frozen-data evaluation remains pending.",
+    "summary": "Inspection confirms the frozen 41-representative M5 rank-persistence screen, evaluator, and targeted tests are already implemented. No code or manifests were changed. The exact-scope development and replacement captures are accepted and hash-bound for all 41 representatives; their bytes being outside the Git repository does not establish a missing data dependency.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py (covered by the recorded exact-head CI run; no rerun needed unless the head changes)",
-      "Evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data; report structural evidence only, not independent confirmation or economic promotion."
+      "tests/test_cross_sectional_ranking_epoch26_screen.py (run on exact HEAD before frozen-data evaluation)"
     ]
   },
-  "basis_next_state_sha256": "1171b4185d781468dbf9aca7f4c0e340db170439edf88b90b9d204ae5af3a20a",
+  "basis_next_state_sha256": "4a1b2ac21ee73df27502001430f6e11011464e0132f1e53f64cace242954fab6",
   "changed_paths": [],
-  "created_utc": "2026-09-26T07:09:06Z",
+  "created_utc": "2026-09-26T07:11:58Z",
   "exact_head": {
     "green": true,
-    "head": "b46eb1098b16d7572cf10a1ffd947d8c59fdb914",
+    "head": "e575cd8629e934c1d5e5f9adeaa4ed5864c68c13",
     "predecessor_conclusion": "success",
-    "predecessor_head": "b46eb1098b16d7572cf10a1ffd947d8c59fdb914",
-    "predecessor_run_id": 36225762076
+    "predecessor_head": "e575cd8629e934c1d5e5f9adeaa4ed5864c68c13",
+    "predecessor_run_id": 36225930174
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_data_available": true,
-      "data_scope": "All 41 frozen representatives over the accepted 13-week M5 interval, bound to development ZIP SHA-256 64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503 and replacement ZIP SHA-256 d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-      "economic_outcomes_opened": false,
-      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "exact_head_ci": {
-        "head": "44c384e911bc717f242528a9a89228e0eb9eb3ee",
-        "run_id": 36225615156,
-        "status": "GREEN"
+      "action": "Reuse the existing implementation; do not rewrite it or create a new capture gate.",
+      "boundaries": {
+        "development_holdout_is_independent_confirmation": false,
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
       },
-      "files_changed": [],
+      "data_refs": [
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+      ],
+      "data_scope": "Accepted M5 history for all 41 frozen representatives, 2026-06-15 through 2026-09-13; development ZIP SHA-256 64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503 and replacement ZIP SHA-256 d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75.",
       "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation_already_sufficient": true,
-      "independent_confirmation_claimed": false,
-      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "protected_forward_opened": false,
-      "v2_attempts_consumed": 0
+      "implementation_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "implementation_validation": "Validated by repository inspection. Tests and exact-head CI were not run; no shell tools were used.",
+      "later_step": "Run exact-head CI, then evaluate the frozen law on the hash-bound accepted 41-symbol data. Report structural evidence only; do not open economic outcomes.",
+      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json"
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence",
@@ -68,10 +71,9 @@
       "status": "IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The accepted 41-representative M5 screen is already implemented by the frozen evaluator, prospective freeze, manifest, and targeted tests. Inspection confirms exact accepted data-hash bindings, synchronized session-eligible ranks, daily aggregation, dependence-aware bootstrap, full-family BY correction, and structural-only reporting. The accepted development and replacement captures cover the frozen scope; no code changes or external data gate are needed. The repository records exact-head CI as green; frozen-data evaluation remains pending.",
+    "summary": "Inspection confirms the frozen 41-representative M5 rank-persistence screen, evaluator, and targeted tests are already implemented. No code or manifests were changed. The exact-scope development and replacement captures are accepted and hash-bound for all 41 representatives; their bytes being outside the Git repository does not establish a missing data dependency.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py (covered by the recorded exact-head CI run; no rerun needed unless the head changes)",
-      "Evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data; report structural evidence only, not independent confirmation or economic promotion."
+      "tests/test_cross_sectional_ranking_epoch26_screen.py (run on exact HEAD before frozen-data evaluation)"
     ]
   },
   "project_snapshot": {
