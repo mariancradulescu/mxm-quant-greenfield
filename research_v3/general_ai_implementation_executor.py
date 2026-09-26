@@ -238,16 +238,28 @@ def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,A
         ns["user_action_required"]=False
         payload["next_research_state"]=ns
     if status.startswith("PENDING_EXACT_HEAD_GREEN") or status.endswith("REQUIRES_EXACT_HEAD_GREEN"):
-        # Preserve result-specific provenance (completed report, family result, etc.)
-        # while closing implementation routing after an already-green exact head.
-        ns["status"]="AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
-        action=str(ns.get("next_action") or "")
-        if not action.upper().startswith("AI_"):
-            ns["next_action"]="AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION"
-        ns["ai_reasoning_required"]=True
-        ns["research_judgment_required"]=True
-        ns["implementation_ai_required"]=False
-        ns["user_action_required"]=False
+        # Exact-head green closes implementation authority. If implementation already
+        # published an explicit deterministic operation, preserve that zero-provider
+        # continuation instead of manufacturing a fresh semantic reasoning boundary.
+        deterministic_authority=bool(ns.get("next_deterministic_operation_ref") or ns.get("deterministic_next_operation"))
+        if deterministic_authority:
+            ns["status"]="DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN"
+            ns["ai_reasoning_required"]=False
+            ns["research_judgment_required"]=False
+            ns["implementation_ai_required"]=False
+            ns["implementation_satisfied"]=True
+            ns["implementation_scope_complete"]=True
+            ns["user_action_required"]=False
+        else:
+            # No explicit machine authority exists, so fresh reasoning is the safe fallback.
+            ns["status"]="AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN"
+            action=str(ns.get("next_action") or "")
+            if not action.upper().startswith("AI_"):
+                ns["next_action"]="AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION"
+            ns["ai_reasoning_required"]=True
+            ns["research_judgment_required"]=True
+            ns["implementation_ai_required"]=False
+            ns["user_action_required"]=False
         ns["green_implementation_artifacts"]=list(changed_paths)
         payload["next_research_state"]=ns
     return payload
@@ -276,6 +288,11 @@ or rerun C031 Stage-B. Do not use network or shell tools. Do not ask the human t
 Authoritative prospective freezes override an older proposal when they impose a stricter causal/data prerequisite.
 Never execute on source/development bytes if a bound freeze requires unopened disjoint outer data.
 If repository files already implement the selected action or exact collector, do not rewrite them. Validate by inspection.
+If a green implementation creates a prospectively frozen non-economic screen that requires no new semantic judgment,
+also create/bind an explicit authorized deterministic operation and return next_deterministic_operation_ref (or
+deterministic_next_operation) in next_research_state. Do not route to fresh reasoning merely because exact-head CI
+must occur first. If the exact accepted data bytes are external to Git but already hash-bound, distinguish transport
+materialization from new data acquisition; never invent new semantic authority.
 An existing collector for a different frozen symbol/window scope does NOT implement this proposal.
 Before creating a new capture gate, verify existing accepted cTrader-derived repository and
 hash-bound Library artifacts against each requested symbol/window; acquire only a justified missing

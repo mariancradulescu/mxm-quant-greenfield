@@ -54,6 +54,26 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertFalse(ns["implementation_ai_required"])
         self.assertEqual(ns["green_implementation_artifacts"],["research_v3/example.json"])
 
+    def test_post_green_preserves_explicit_deterministic_authority(self):
+        out={
+            "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+            "next_research_state":{
+                "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+                "next_action":"EXECUTE_FROZEN_SCREEN",
+                "next_deterministic_operation_ref":"research_v3/OP.json",
+                "deterministic_next_operation":{"operation_ref":"research_v3/OP.json","operation_name":"EXECUTE_FROZEN_SCREEN"},
+            },
+        }
+        accepted=_post_green_output(out,["research_v3/evaluator.py"])
+        ns=accepted["next_research_state"]
+        self.assertEqual(ns["status"],"DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN")
+        self.assertFalse(ns["ai_reasoning_required"])
+        self.assertFalse(ns["research_judgment_required"])
+        self.assertFalse(ns["implementation_ai_required"])
+        self.assertTrue(ns["implementation_satisfied"])
+        self.assertTrue(ns["implementation_scope_complete"])
+        self.assertEqual(ns["next_deterministic_operation_ref"],"research_v3/OP.json")
+
     def test_post_green_normalizes_implementation_changed_requires_exact_head_green(self):
         out={
             "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
