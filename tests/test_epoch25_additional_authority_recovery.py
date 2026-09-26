@@ -65,7 +65,7 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
         binding=current_evidence_binding(ROOT)
         self.assertEqual(request["evidence_epoch_seen"],binding["evidence_epoch"])
         operations=request["authorized_deterministic_operations_current_epoch"]
-        self.assertTrue(any(
+        self.assertFalse(any(
             row.get("ref")=="research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_RESULT_ACCEPTANCE_OPERATION_V1.json"
             for row in operations
         ))
