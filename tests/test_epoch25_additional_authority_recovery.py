@@ -139,7 +139,7 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
         self.assertEqual(missing,[])
 
     def test_epoch25_authority_request_is_already_durable_and_resolved(self):
-        request=json.loads((ROOT/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").read_text())
+        request=json.loads((ROOT/"research_v3/ai_director/history/ADDITIONAL_AUTHORITY_REQUEST_reason_bbc9d4431461be54a9df89ef6b79cade.json").read_text())
         acceptance=json.loads((ROOT/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json").read_text())
         self.assertEqual(request["request_id"],"reason_bbc9d4431461be54a9df89ef6b79cade")
         self.assertEqual(request["status"],"ADDITIONAL_AUTHORITY_REQUIRED")
