@@ -1,1 +1,98 @@
-{}
+{
+  "schema": "mxm.greenfield.declarative-structural-research-spec.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_NEW_EPOCH27_RESULT",
+  "evidence_epoch": 27,
+  "semantic_authority": {
+    "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_28dd435ea4bda79466309440870033b6.json",
+    "proposal_sha256": "46bf77f985137bf1f0c92d191247a75d22da6eec2a6c54f959de455602d4f799",
+    "request_id": "reason_28dd435ea4bda79466309440870033b6",
+    "family": "BREAKOUT_VOLATILITY_EXPANSION"
+  },
+  "research_question": "Does disjoint breakout-volatility 15-minute directional continuation have broad, chronologically stable structural support across the current broker-native representatives?",
+  "hypothesis": "Event onset is followed by continuation more frequently than 0.55 in both chronological halves for a material breadth of current representatives; failure is descriptive elimination of this particular structural law only.",
+  "scope": {
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "include": "ALL_CURRENT_REPRESENTATIVES_WITH_ACCEPTED_13W_M5_HISTORY",
+    "expected_representatives": 41,
+    "exclude_outcome_based_symbol_selection": true
+  },
+  "data_bindings": [
+    {
+      "capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+      "acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json"
+    },
+    {
+      "capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+      "acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+    }
+  ],
+  "event": {
+    "resolution_seconds": 300,
+    "lookback_bars": 24,
+    "close_breaks_prior_high_or_low": true,
+    "range_at_least_prior_median_multiple": 1.5,
+    "contiguous_25_bar_history": true,
+    "minimum_bars_between_selected_events_per_symbol": 6,
+    "selection_order": "CHRONOLOGICAL_EARLIEST_FIRST"
+  },
+  "outcome": {
+    "horizon_bars": 3,
+    "require_contiguous_future_bars": true,
+    "reference": "close_at_event_onset",
+    "continuation": "sign(close_t_plus_3-close_t)==event_direction",
+    "flat": "excluded_from_nonflat_denominator_but_reported",
+    "no_returns_or_pnl": true
+  },
+  "partition": {
+    "rule": "PER_SYMBOL_CHRONOLOGICAL_MEDIAN_OF_ALL_ELIGIBLE_EVENT_TIMESTAMPS",
+    "ties": "earlier half includes timestamp <= median; later half > median"
+  },
+  "statistic": {
+    "primitive": "BINARY_EVENT_CHRONOLOGICAL_STABILITY_BREADTH_V1",
+    "minimum_nonflat_events_per_half": 50,
+    "per_half_continuation_fraction_at_least": 0.55,
+    "max_absolute_half_difference": 0.1,
+    "breadth_fraction_at_least": 0.5,
+    "minimum_eligible_symbols": 10,
+    "denominator": "all symbols meeting predeclared minimum in both halves"
+  },
+  "multiplicity_dependence": {
+    "single_global_breadth_rule": true,
+    "all_eligible_symbols_reported": true,
+    "no_symbolwise_significance_claim": true,
+    "no_p_values": true,
+    "nonoverlapping_event_admission": true,
+    "chronological_half_stability_required": true,
+    "interpretation": "DESCRIPTIVE_DEVELOPMENT_ONLY; event and symbol dependence are not calibrated for inferential confidence"
+  },
+  "acceptance_schema": {
+    "required_fields": [
+      "spec_sha256",
+      "input_attestation",
+      "symbol_results",
+      "eligible_symbols",
+      "stable_symbols",
+      "breadth_fraction",
+      "structural_gate_status",
+      "interpretation_boundary",
+      "economic_effect"
+    ],
+    "possible_status": [
+      "DESCRIPTIVE_STRUCTURAL_GATE_MET",
+      "DESCRIPTIVE_STRUCTURAL_GATE_NOT_MET",
+      "INSUFFICIENT_DATA"
+    ]
+  },
+  "safety": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "independent_confirmation_claim": false
+  },
+  "execution": {
+    "capability": "BINARY_EVENT_CHRONOLOGICAL_STABILITY_BREADTH_V1",
+    "implementation": "GENERIC_SPEC_KERNEL",
+    "result_ref": "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json"
+  }
+}
