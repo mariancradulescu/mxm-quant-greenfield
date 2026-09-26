@@ -1,0 +1,118 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/RESEARCH_CONTRACT_V3.json",
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json",
+      "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "evidence/EPOCH24_TREND_MOMENTUM_STRUCTURAL_RESULT_V1.json",
+      "evidence/EPOCH25_MEAN_REVERSION_STRUCTURAL_ACCEPTANCE_V1.json",
+      "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+      "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
+      "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
+      "evidence/EPOCH30_SEASONALITY_SESSION_TIME_STRUCTURAL_RESULT_V1.json",
+      "evidence/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_STRUCTURAL_RESULT_V1.json",
+      "evidence/EPOCH32_RELATIVE_VALUE_PAIR_STRUCTURE_STRUCTURAL_RESULT_V1.json",
+      "evidence/EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
+      "research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json",
+      "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json"
+    ],
+    "data_bindings": [
+      "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "action": "AUTHOR_AND_IMPLEMENT_FRESH_PROSPECTIVE_COMPOSITE_STRUCTURAL_SCREEN",
+      "breadth": {
+        "justification": "Reuse of the existing accepted 13w M5 structural representative panel is explicitly authorized for new non-economic structural work; no new symbol selection or broker verification is required since no new symbols are being introduced.",
+        "panel": "all_41_frozen_structural_representatives",
+        "panel_size_not_fixed": true
+      },
+      "capacity_impact": "zero; this proposal and its implementation are non-economic and consume zero v2 attempts and zero economic outcomes.",
+      "design_semantics": {
+        "composite_test": "Freeze a single new predictive-state model (e.g., regularized logistic/ensemble classifier on out-of-sample walk-forward folds) that takes the above per-anchor structural features as covariates and predicts directional continuation over a pre-declared horizon, with pre-specified train/validation/holdout split, BH-FDR multiplicity correction across the 41 representatives, and no post-hoc feature selection based on this new run's own outcome.",
+        "inputs_reused_non_economic_only": [
+          "TREND_MOMENTUM continuation/reversal statistic (Epoch24)",
+          "MEAN_REVERSION deviation-response statistic (Epoch25)",
+          "CROSS_SECTIONAL_RANKING relative-rank statistic (Epoch26)",
+          "BREAKOUT_VOLATILITY_EXPANSION stability-breadth statistic (Epoch27)",
+          "REGIME_CONTEXT_CONDITIONED state labels (Epoch29 and Epoch33 waves)",
+          "SEASONALITY_SESSION_TIME session/time-of-day effect (Epoch30)",
+          "RELATIVE_VALUE_COINTEGRATION pair-structure statistic (Epoch32)"
+        ],
+        "no_economic_action": "This wave remains strictly non-economic; no economic outcome, live order, or protected-forward is opened by this proposal or its downstream execution.",
+        "prohibitions_respected": [
+          "NO_C032_RERUN",
+          "NO_C032_OUTCOME_CAPTURE_REUSE",
+          "NO_RETROACTIVE_TUNING",
+          "NO_OUTCOME_DRIVEN_SCOPE_SELECTION"
+        ]
+      },
+      "implementation_need": "No entry in authorized_deterministic_operations_current_epoch matches this composite multi-feature fusion operation, and none of the existing per-family screen scripts (research_v3/*_screen.py) implement cross-family feature fusion or a frozen composite predictive-state test. Genuinely new repository machinery is required to: (a) load and align the already-accepted per-family feature outputs across the 41 representatives, (b) freeze the composite model spec and split policy before any fit, and (c) run the walk-forward evaluation and BH-FDR multiplicity correction, producing an EPOCH34 structural result artifact.",
+      "implementation_scope": {
+        "new_files": [
+          "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_FRONTIER_FREEZE_V1.json (frozen spec: features, split policy, model family, multiplicity rule)",
+          "research_v3/composite_causal_ml_epoch34_screen.py (deterministic evaluator implementing the frozen spec against reused per-family feature outputs)",
+          "tests/test_composite_causal_ml_epoch34_screen.py (unit tests for feature alignment, split integrity, and multiplicity correction)"
+        ],
+        "no_new_broker_data_required": true,
+        "output_artifact": "evidence/EPOCH34_COMPOSITE_CAUSAL_ML_STRUCTURAL_RESULT_V1.json",
+        "reused_inputs": [
+          "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+          "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+          "evidence/EPOCH24_TREND_MOMENTUM_STRUCTURAL_RESULT_V1.json",
+          "evidence/EPOCH25_MEAN_REVERSION_STRUCTURAL_ACCEPTANCE_V1.json",
+          "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+          "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
+          "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
+          "evidence/EPOCH30_SEASONALITY_SESSION_TIME_STRUCTURAL_RESULT_V1.json",
+          "evidence/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_STRUCTURAL_RESULT_V1.json",
+          "evidence/EPOCH32_RELATIVE_VALUE_PAIR_STRUCTURE_STRUCTURAL_RESULT_V1.json",
+          "evidence/EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json"
+        ]
+      },
+      "mechanism_family": "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+      "no_economic_opening": true,
+      "scope_rationale": "Family is open, not in blocked_scope_set, and its natural role (state/predictive fusion) is the only legal home for a genuinely distinct multi-feature hypothesis; it does not reuse or rerun any previously opened identity or diagnostic outcome bytewise."
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "blocked_scopes_untouched": [
+        "CARRY_TERM_STRUCTURE",
+        "CROSS_MARKET_LEAD_LAG"
+      ],
+      "family_closed": false,
+      "fresh_semantic_boundary": true,
+      "implementation_ai_required": true,
+      "mechanism_family_targeted": "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+      "next_action": "DESIGN_AND_IMPLEMENT_EPOCH34_COMPOSITE_CAUSAL_ML_CROSS_MECHANISM_STRUCTURAL_SCREEN",
+      "post_implementation_follow_up": "Once EPOCH34_COMPOSITE_CAUSAL_ML_STRUCTURAL_RESULT_V1.json is produced, a fresh AI reasoning pass is required to interpret it before any economic promotion is considered; no ranking or economic panel selection is authorized by this proposal.",
+      "research_judgment_required": true,
+      "status": "COMPOSITE_STRUCTURAL_SCREEN_DESIGN_AUTHORIZED_PENDING_IMPLEMENTATION"
+    },
+    "objective": {
+      "class": "FRESH_FRONTIER_SELECTION_NON_ECONOMIC_STRUCTURAL_SYNTHESIS",
+      "goal": "Design and implement a genuinely distinct, prospectively frozen non-economic structural screen that fuses the already-accepted univariate structural feature outputs (trend-continuation, mean-reversion, breakout, cross-sectional rank, seasonality/session, relative-value alignment, and both regime-conditioning waves) into a single composite predictive-state model under the CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL family, evaluated on the 41 frozen structural representatives, to test whether joint conditioning surfaces structural edge that no single univariate family test could detect.",
+      "information_gain_rationale": "Every currently legal (non-blocked) mechanism family (TREND_MOMENTUM, MEAN_REVERSION, BREAKOUT_VOLATILITY_EXPANSION, SEASONALITY_SESSION_TIME, RELATIVE_VALUE_COINTEGRATION, CROSS_SECTIONAL_RANKING, REGIME_CONTEXT_CONDITIONED x2, CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL) has already completed one frozen univariate non-economic structural pass at the current 41-representative frontier (Epochs 24-33), and economic_outcomes_delta has remained 0 across all of them. Re-running any single family with retuned parameters on the same observed bytes is prohibited. The highest-information legal action outside the blocked scopes (CARRY_TERM_STRUCTURE, CROSS_MARKET_LEAD_LAG) is therefore a genuinely new hypothesis class: a joint/composite conditioning of already-frozen, reusable non-economic structural features, which has never been tested and does not reuse any single family's diagnostic outcome to redesign that same family's test. This is a legitimate fresh prospective hypothesis under CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL, not a reparameterization of any closed test."
+    },
+    "proposal_id": "EPOCH34_COMPOSITE_CAUSAL_ML_CROSS_MECHANISM_STRUCTURAL_SPEC_V1"
+  },
+  "captured_utc": "2026-09-26T21:42:25Z",
+  "evidence_bundle_sha256": "656d1b9c116eeca2a89e9fbc6b7634cefeab62bcc98615c0a3ffa1a623b3541b",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_a21d43d14c0ad471c92b1fa781cdd6d7"
+}
