@@ -1,17 +1,8 @@
 name: Runtime V2 Liveness Watchdog
 
+# Recovery-only tool. Normal research continuation never depends on this workflow.
 on:
-  schedule:
-    # Recovery-only fallback. Normal continuation is event-driven by Sentinel.
-    - cron: "17 * * * *"
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/runtime-v2-liveness-watchdog.yml"
-      - ".github/workflows/runtime-v2-liveness-sentinel.yml"
-      - ".github/workflows/autonomous-research-runtime-v2.yml"
 
 permissions:
   actions: write
