@@ -1,4 +1,58 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "d3fee85b1cc5f60e7e21b9fcce4589aeeded0078",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "d3fee85b1cc5f60e7e21b9fcce4589aeeded0078",
+    "predecessor_run_id": 36224085427
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_proposal_hash": "54fc2088aa8096060061db794662eb1ead631a6f78bb71087e56471bc2e4c162",
+      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_af40ea4c6489c9d4b4477dba4695a420.json",
+      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+      "implementation_manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "safety": {
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
+      },
+      "scope": {
+        "interval": {
+          "end_utc": "2026-09-13T23:59:59Z",
+          "start_utc": "2026-06-15T00:00:00Z"
+        },
+        "new_market_data_required": false,
+        "representatives": 41,
+        "resolution": "M5"
+      },
+      "test_ref": "tests/test_cross_sectional_ranking_epoch26_screen.py"
+    },
+    "external_data_gate": null,
+    "implementation_id": "epoch26-cross-sectional-ranking-non-economic-screen-v1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+        "research_v3/cross_sectional_ranking_epoch26_screen.py"
+      ],
+      "implementation_ai_required": false,
+      "later_step": "Evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data and preserve full-frontier reporting without subgroup selection or economic promotion.",
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "research_judgment_required": true,
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Existing frozen cross-sectional ranking evaluator and targeted tests were sufficient. Corrected the freeze and evaluator to bind the currently accepted proposal hash, and added the prospective implementation manifest. No external market data is required because the accepted 41-representative M5 history is already hash-bound.",
+    "tests_requested": [
+      "tests/test_cross_sectional_ranking_epoch26_screen.py"
+    ]
+  },
   "basis_next_state_sha256": "a16d7917ab878e19648bd69f3818a644c75206893c24deb0817de35648ac3faf",
   "changed_paths": [
     "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
@@ -61,5 +115,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
