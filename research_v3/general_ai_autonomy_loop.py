@@ -80,6 +80,24 @@ def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
     }
     return hashlib.sha256(json.dumps(authority,sort_keys=True,separators=(",",":"),default=str).encode()).hexdigest()
 
+def _material_state_signature(state: dict) -> str:
+    """Hash only routing/research state that can represent material progress.
+
+    Provider usage, checkpoint timestamps and Git HEAD churn are deliberately excluded.
+    """
+    keys=(
+        "status","next_action","current_research_evidence_epoch","evidence_epoch",
+        "authorizing_evidence_epoch","ai_reasoning_required","research_judgment_required",
+        "implementation_ai_required","next_deterministic_operation_ref",
+        "user_action_required","external_data_required","external_gate","external_data_gate",
+        "source_ai_proposal_id","source_ai_proposal_hash","source_runtime_operation_id",
+        "source_implementation_id","completed_family","completed_structural_report_ref",
+        "latest_material_structural_result_ref","family_result","accounting","safety",
+    )
+    payload={k:state.get(k) for k in keys if k in state}
+    return hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(",",":"),default=str).encode()).hexdigest()
+
+
 def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
     prior=dict(load_json(root/PROVIDER_RECOVERY_REL,{}) or {})
     if os.environ.get("MXM_COPILOT_QUOTA_RESET_CONFIRMED") == "1":
@@ -171,6 +189,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             blocked=_provider_unavailable(root,state,"GENERAL_AI_IMPLEMENTATION")
             if blocked is not None:
                 return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
+            before_material=_material_state_signature(state)
             try:
                 out=implement(root,git_checkpoint=git_checkpoint,git_push=git_push)
             except Exception as exc:
@@ -180,9 +199,12 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
                 return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
-            if out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
-                _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,True,git_checkpoint=git_checkpoint,git_push=git_push)
-            trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status")})
+            after_state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
+            advanced=_material_state_signature(after_state)!=before_material or bool(out.get("changed_paths"))
+            provider_called=out.get("provider_called") is not False and out.get("provider") is not None
+            if provider_called and out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
+                _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,advanced,git_checkpoint=git_checkpoint,git_push=git_push)
+            trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status"),"provider_called":provider_called,"material_state_advancement":advanced})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
                 return {"status":out["status"],"progress_class":"LEGITIMATE_EXTERNAL_GATE" if out["status"]=="EXTERNAL_DATA_REQUIRED" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"result":out}
             continue
