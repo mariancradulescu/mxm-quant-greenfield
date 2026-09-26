@@ -60,9 +60,11 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
         self.assertIn("implementation_scope",normalized["decision"])
 
     def test_current_epoch_has_no_preexisting_deterministic_operation_to_guess(self):
+        from research_v3.evidence_epoch import current_evidence_binding
         from research_v3.general_ai_reasoning_provider import build_reasoning_request
         request=build_reasoning_request(ROOT)
-        self.assertEqual(request["evidence_epoch_seen"],25)
+        binding=current_evidence_binding(ROOT)
+        self.assertEqual(request["evidence_epoch_seen"],binding["evidence_epoch"])
         self.assertEqual(request["authorized_deterministic_operations_current_epoch"],[])
 
     def test_current_packet_includes_frontier_and_capture_authorities(self):
