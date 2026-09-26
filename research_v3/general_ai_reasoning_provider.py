@@ -278,6 +278,8 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         },
     }
     authorities,refs=_authority_context(root,next_state)
+    blocker=_load(root,"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json") if (root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").is_file() else {}
+    blocked_scopes=sorted(set(blocker.get("blocked_scope_ids") or [])) if blocker.get("scope_status")=="PARKED_LOCAL_FRONTIER" and blocker.get("evidence_epoch")==next_state.get("current_research_evidence_epoch") else []
     evidence=current_evidence_binding(root)
     deterministic_catalog=_authorized_deterministic_operation_catalog(root,int(evidence["evidence_epoch"]))
     core={
@@ -298,6 +300,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "evidence_bundle_sha256":evidence["evidence_bundle_sha256"],
         "universe_basis":evidence["universe_basis"],
         "current_open_mechanism_families":evidence["current_open_mechanism_families"],
+        "blocked_scope_set":blocked_scopes,
     }
     # The repository HEAD and full mutable next-state document are transport context,
     # not reasons to buy another semantic judgment on unchanged evidence.
@@ -306,7 +309,8 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "protocol_version":PROTOCOL_VERSION,
         "evidence_epoch":core["evidence_epoch_seen"],
         "evidence_bundle_sha256":core["evidence_bundle_sha256"],
-        "authority_hashes":core["authority_hashes"],
+        "authority_hashes":[row for row in core["authority_hashes"] if row["ref"]!="research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json"],
+        "blocked_scope_set":blocked_scopes,
         "decision_class":str(next_state.get("next_action") or ""),
         "pending_status":str(next_state.get("status") or ""),
         "semantic_question":str(next_state.get("semantic_question") or ""),
@@ -345,6 +349,8 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "provisional_research_artifacts":evidence["provisional_research_artifacts"],
         "universe_basis":core["universe_basis"],
         "current_open_mechanism_families":core["current_open_mechanism_families"],
+        "blocked_scope_set":blocked_scopes,
+        "blocked_authority_request_id":blocker.get("request_id") if blocked_scopes else None,
         "authorized_deterministic_operations_current_epoch":deterministic_catalog,
         "created_utc":iso(),
     }
@@ -386,6 +392,8 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
             "capacity":{"base_remaining":64,"methodology_replacement_total":15,
                 "lifetime_economic_exposure":20,"outcomes_opened":28},
             "authorized_deterministic_operations_current_epoch":list(request.get("authorized_deterministic_operations_current_epoch") or []),
+            "blocked_scope_set":list(request.get("blocked_scope_set") or []),
+            "blocked_authority_request_id":request.get("blocked_authority_request_id"),
             "causal_prohibitions":["NO_C032_RERUN","NO_C032_OUTCOME_CAPTURE_REUSE",
                 "NO_PROTECTED_FORWARD_LEAKAGE","NO_RETROACTIVE_TUNING",
                 "NO_OUTCOME_DRIVEN_SCOPE_SELECTION"],
@@ -417,6 +425,7 @@ Those values are injected and guarded outside the AI layer.
 
 Important boundaries:
 - Begin with the complete current eligible frontier from CURRENT_RESEARCH_FRONTIER_V1.json and every open mechanism family. No consumed candidate, historical symbol, old panel, or rejected proposal is an active default.
+- Treat blocked_scope_set as local unavailable families. Select the highest-information legal ready action outside them. Do not request the same unresolved authority again. If no legal ready action remains, return ADDITIONAL_AUTHORITY_REQUIRED with a machine-checkable blocked_scope_id and explain why all remaining actions require it.
 - Choose mechanism-specific breadth from non-economic structural heterogeneity, data availability, event independence, and expected information gain. Do not assume a fixed panel size.
 - One prospectively frozen economic experiment envelope may contain many symbols; do not authorize an economic outcome until causality, data sufficiency, cost, EUR200 margin feasibility, breadth, freeze, and exact-head CI all pass.
 - Historical survivors and failures remain valid context. Never rerun an opened identity, use outcome-exposed evidence as new prospective input, erase lifetime trial exposure, or retroactively select a winning subgroup.

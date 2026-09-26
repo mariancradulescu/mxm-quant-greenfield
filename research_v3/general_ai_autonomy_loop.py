@@ -8,6 +8,7 @@ from research_v3.general_ai_implementation_executor import execute as implement,
 from research_v3.execution_router import deterministic_operation_required
 from research_v3.deterministic_operation_executor import execute_chain as execute_deterministic_chain
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
+from research_v3.general_ai_reasoning_provider import build_reasoning_request
 from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso, sha256_file
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 
@@ -85,11 +86,36 @@ def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
         "evidence_bundle_sha256":binding["evidence_bundle_sha256"],
         "material_input_hashes":binding["authoritative_evidence_refs_and_hashes"],
         "semantic_authority":semantic_authority,
+        "blocked_scope_set":_blocked_scopes(root),
         "required_capability":required_capability,
         "contract":load_json(root/Path("research_v3/RESEARCH_CONTRACT_V3.json"),{}),
         "universe":load_json(root/Path("data/AUTONOMOUS_UNIVERSE_GOVERNOR_V1.json"),{}),
     }
     return hashlib.sha256(json.dumps(authority,sort_keys=True,separators=(",",":"),default=str).encode()).hexdigest()
+
+def _blocked_scopes(root: Path) -> list[str]:
+    request=load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{}) or {}
+    if request.get("scope_status")!="PARKED_LOCAL_FRONTIER":
+        return []
+    return sorted(set(request.get("blocked_scope_ids") or []))
+
+def _park_authority(root: Path, state: dict, request: dict, *, git_checkpoint: bool, git_push: bool) -> bool:
+    """Scope a legacy request only when canonical state supplies one unambiguous blocked family."""
+    if request.get("scope_status")=="PARKED_LOCAL_FRONTIER":
+        return True
+    blocked=list(state.get("families_blocked_on_data") or [])
+    if (request.get("evidence_epoch")!=state.get("current_research_evidence_epoch")
+            or len(blocked)!=1 or not state.get("broader_universe_remains_open")
+            or state.get("family_exhaustion") is True):
+        return False
+    # Scope comes from canonical machine state, not free-text provider output.
+    parked=dict(request,scope_status="PARKED_LOCAL_FRONTIER",blocked_scope_ids=blocked,
+                scope_provenance={"canonical_state_ref":str(NEXT_STATE_REL),
+                                  "field":"families_blocked_on_data",
+                                  "source_request_id":request.get("request_id")})
+    atomic_write_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",parked)
+    GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("scoped_authority_blocker",None)
+    return True
 
 def _material_state_signature(state: dict) -> str:
     """Hash only routing/research state that can represent material progress.
@@ -189,8 +215,13 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             if (prior_authority.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED"
                     and prior_authority.get("evidence_epoch")==state.get("current_research_evidence_epoch")
                     and accepted_authority.get("source_request_id")!=prior_authority.get("request_id")):
-                return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_EXTERNAL_AUTHORITY",
-                        "cycles":cycle-1,"trace":trace,"request":prior_authority,"next_state":state}
+                if not _park_authority(root,state,prior_authority,git_checkpoint=git_checkpoint,git_push=git_push):
+                    return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_EXTERNAL_AUTHORITY",
+                            "cycles":cycle-1,"trace":trace,"request":prior_authority,"next_state":state}
+                prior_authority=load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{})
+                if build_reasoning_request(root)["request_id"]==prior_authority.get("request_id"):
+                    return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_EXTERNAL_AUTHORITY",
+                            "cycles":cycle-1,"trace":trace,"request":prior_authority,"next_state":state}
             blocked=_provider_unavailable(root,state,"GENERAL_AI_REASONING")
             if blocked is not None:
                 return {"status":"PROVIDER_UNAVAILABLE","progress_class":"PROVIDER_UNAVAILABLE","cycles":cycle-1,"trace":trace,"recovery":blocked,"next_state":state}
