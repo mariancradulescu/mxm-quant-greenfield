@@ -82,11 +82,18 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(Path(rel), dest)
         state = {
+            "schema": "mxm.greenfield.runtime-v2-next-autonomous-state.v3",
             "status": "WAITING_EXTERNAL_AUTHENTICATED_DATA",
             "next_action": "AWAIT_INDEPENDENT_OUTER_CAPTURE",
+            "current_research_evidence_epoch": 20,
+            "evidence_epoch": 20,
             "source_freeze_ref": freeze,
             "outer_capture_plan_ref": plan,
             "user_action_required": True,
+            "external_data_required": True,
+            "research_judgment_required": False,
+            "implementation_ai_required": False,
+            "safety": {"live_orders_authorized": False, "protected_evidence_opened": False},
         }
         if completed:
             state.update({

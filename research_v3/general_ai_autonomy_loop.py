@@ -2,7 +2,7 @@
 from __future__ import annotations
 import argparse, json, hashlib, os
 from pathlib import Path
-from research_v3.evidence_epoch import stale_reasoning_redirect, refresh_derived_views, current_evidence_epoch
+from research_v3.evidence_epoch import stale_reasoning_redirect, refresh_derived_views, current_evidence_epoch, current_evidence_binding
 from research_v3.general_ai_director_bridge import drain, project_snapshot
 from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
 from research_v3.execution_router import deterministic_operation_required
@@ -62,18 +62,30 @@ def _recoverable_provider_failure(exc: Exception) -> bool:
     return False
 
 def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
-    """Stable across timer wakes and CI updates; changes with research authority."""
-    epoch=load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}
+    """Bind provider spend to material authority, never CI/head/checkpoint churn."""
+    binding=current_evidence_binding(root)
+    semantic_authority={
+        "authorizing_evidence_epoch":state.get("authorizing_evidence_epoch"),
+        "source_ai_proposal_id":state.get("source_ai_proposal_id"),
+        "source_ai_proposal_hash":state.get("source_ai_proposal_hash"),
+        "fresh_director_decision_ref":state.get("fresh_director_decision_ref"),
+        "status":state.get("status"),
+        "next_action":state.get("next_action"),
+    }
+    required_capability=(
+        state.get("next_deterministic_operation_ref")
+        or state.get("implementation_task_scope")
+        or state.get("implementation_ai_scope")
+        or state.get("implementation_scope")
+        or state.get("next_action")
+    )
     authority={
         "phase":phase,
-        "epoch":epoch.get("current_epoch"),
-        "evidence_refs_and_hashes":[
-            {"ref":rel,"sha256":sha256_file(root/rel) if (root/rel).is_file() else "MISSING"}
-            for rel in epoch.get("authoritative_evidence_refs",[])
-        ],
-        "trigger":epoch.get("trigger_event"),
-        "decision":state.get("next_action"),
-        "status":state.get("status"),
+        "evidence_epoch":binding["evidence_epoch"],
+        "evidence_bundle_sha256":binding["evidence_bundle_sha256"],
+        "material_input_hashes":binding["authoritative_evidence_refs_and_hashes"],
+        "semantic_authority":semantic_authority,
+        "required_capability":required_capability,
         "contract":load_json(root/Path("research_v3/RESEARCH_CONTRACT_V3.json"),{}),
         "universe":load_json(root/Path("data/AUTONOMOUS_UNIVERSE_GOVERNOR_V1.json"),{}),
     }
