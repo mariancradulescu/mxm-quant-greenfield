@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.general_ai_reasoning_provider import (, _normalize_candidate_routing
+from research_v3.general_ai_reasoning_provider import (
+    _normalize_candidate_routing,
     PROVIDER_KIND,
     PROVIDER_VERSION,
     _system_prompt,
