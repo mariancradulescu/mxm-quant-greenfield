@@ -1,12 +1,12 @@
 {
-  "basis_next_state_sha256": "c1b1c7f5035b1ae4eba0adccc9bc4275441b4f3d1aee5620125388080a144d4a",
-  "created_utc": "2026-09-26T17:39:29Z",
+  "basis_next_state_sha256": "d633c4147da6835bc7da3fa2298cbc257e40c5c41bb1b8e5431827f8d716cbf3",
+  "created_utc": "2026-09-26T17:50:16Z",
   "exact_head": {
     "green": false,
-    "head": "3fbd8f6ea7ae774527348deaf4a8a1ec1b696812",
-    "predecessor_conclusion": null,
-    "predecessor_head": null,
-    "predecessor_run_id": null
+    "head": "8d9f2316bb522ff36b848c6a0eda9b513b791e44",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "bd705c9ab9619d55a60f90896469ae997ebfcdc5",
+    "predecessor_run_id": 36259897628
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "next_state": {
@@ -288,7 +288,8 @@
       "v2_attempts_consumed_delta": 0
     },
     "implementation_satisfied": true,
-    "implementation_scope": "Create the prospective freeze and deterministic evaluator for the specified fixed, low-complexity causal predictive-state screen on the 41 current structural representatives. Enforce past-only inputs, chronological out-of-sample evaluation, time-clustered inference, family-wide multiplicity control, and no parameter tuning or economic evaluation. Reuse accepted M5 history; do not introduce new market data or rerun prior-family diagnostics.",
+    "implementation_scope": "No deterministic operation is catalogued this epoch (authorized_deterministic_operations_current_epoch is empty), so this cannot be bound to a next_deterministic_operation_ref. The screen implementation (research_v3/causal_ml_predictive_state_epoch31_screen.py) and its unit test (tests/test_causal_ml_predictive_state_epoch31_screen.py) already exist and are green; the missing repository artifact is the actual run against the 41 frozen representatives' already-captured 13w M5 data and the acceptance/verification record. Implementation AI should: (1) execute causal_ml_predictive_state_epoch31_screen.py over the feature store data for the 41 representatives per the frozen law in research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json, (2) independently recompute/verify aggregates, (3) emit evidence/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_STRUCTURAL_RESULT_V1.json with the same schema/verification shape as EPOCH24-30 structural result acceptances, marking economic_promotion_authorized=false and mechanism_family_closed=false unless criteria are met. No account mutation, no live orders, no new market data.",
+    "implementation_scope_complete": true,
     "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
     "information_gain_summary": {
       "accepted_13w_history_current_eligible": 42,
@@ -356,10 +357,12 @@
     "minimum_structural_clusters": null,
     "new_market_data_required": false,
     "next_acquisition_plan_ref": null,
-    "next_action": "IMPLEMENT_CAUSAL_ML_PREDICTIVE_STATE_SCREEN",
+    "next_action": "EXECUTE_FROZEN_CAUSAL_ML_PREDICTIVE_STATE_STRUCTURAL_SCREEN_AND_PRODUCE_EPOCH31_RESULT",
     "next_deterministic_operation_ref": null,
     "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
     "no_economic_outcome_opened_by_this_proposal": true,
+    "no_economic_outcome_requested": true,
+    "no_family_closure_claimed": true,
     "outer": "C032_ECONOMIC_OUTCOME_RECORDED_EXACTLY_ONCE",
     "outer_authorization": "CONSUMED_EXACTLY_ONCE",
     "outer_capture_acceptance_ref": "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
@@ -437,7 +440,7 @@
       "prospective freeze record"
     ],
     "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-    "research_judgment_required": false,
+    "research_judgment_required": true,
     "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
     "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
     "result_sha256": "d693b062252d4ecb7a34192998bb65a5ba36b459ee21441ec240d187d582337b",
@@ -461,10 +464,10 @@
     "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
     "search_budget_change": -1,
     "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-    "source_ai_proposal_hash": "db7506fa3d89e3c4d17381c6554cf8ac7998b958435daa5f86b2c522caf8c75d",
-    "source_ai_proposal_id": "epoch31-causal-state-structure",
+    "source_ai_proposal_hash": "c5e32ae7b300d2c393a678f2a20bfec708a52f7c3607e1c449c9c64f6460db85",
+    "source_ai_proposal_id": "AUTO_epoch31_causal_ml_execute_frozen_screen_9f21ac4",
     "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-    "source_runtime_operation_id": "op_ce1becbce473d31db76722975294c2f4",
+    "source_runtime_operation_id": "op_ba3b06b118e4378a8c2faf59d73a049e",
     "stale_reasoning_guard": {
       "authorizing_evidence_epoch": 27,
       "current_evidence_epoch": 28,
@@ -474,7 +477,7 @@
       "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
       "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
     },
-    "status": "IMPLEMENTATION_AI_REQUIRED",
+    "status": "IMPLEMENTATION_EXECUTION_ROUTED_FOR_EPOCH31_CAUSAL_ML_STRUCTURAL_RESULT",
     "stop_condition": null,
     "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
     "structural_representatives_are_not_economic_equivalence": true,
@@ -550,6 +553,6 @@
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "research_head": "3fbd8f6ea7ae774527348deaf4a8a1ec1b696812",
+  "research_head": "8d9f2316bb522ff36b848c6a0eda9b513b791e44",
   "schema": "mxm.greenfield.general-ai-implementation-request.v1"
 }
