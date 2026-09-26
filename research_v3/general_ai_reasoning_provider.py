@@ -680,7 +680,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
             "reasoning_request_id":request["request_id"],
             "reasoning_response_id":response_id,
             "evidence_epoch_seen":int(request["evidence_epoch_seen"]),
-            "evidence_bundle_sha256":request["evidence_bundle_sha256"],
+            "evidence_bundle_sha256":request.get("evidence_bundle_sha256"),
             "authoritative_evidence_refs_and_hashes":list(request["authoritative_evidence_refs_and_hashes"]),
             "accounting_basis":dict(request["project_snapshot"]),
             "universe_basis":dict(request["universe_basis"]),
@@ -730,7 +730,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
     context=_context_payload(root,request)
     raw_path=root/RAW_CANDIDATE_DIR/f"{request['request_id']}.json"
     saved=json.loads(raw_path.read_text(encoding="utf-8")) if raw_path.is_file() else {}
-    if saved and (saved.get("request_id")!=request["request_id"] or saved.get("evidence_bundle_sha256")!=request["evidence_bundle_sha256"]):
+    if saved and (saved.get("request_id")!=request["request_id"] or saved.get("evidence_bundle_sha256")!=request.get("evidence_bundle_sha256")):
         raise AIProposalRejected("saved raw candidate has mismatched evidence binding")
     correction=None; errors=[]; chosen_meta=None; proposal=None
     model=os.environ.get("MXM_COPILOT_MODEL",DEFAULT_MODEL).strip() or DEFAULT_MODEL
@@ -741,7 +741,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             else:
                 candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
                 atomic_write_json(raw_path,{"request_id":request["request_id"],
-                    "evidence_bundle_sha256":request["evidence_bundle_sha256"],
+                    "evidence_bundle_sha256":request.get("evidence_bundle_sha256"),
                     "candidate":candidate,"provider_meta":meta or {},"captured_utc":iso()})
                 sink.checkpoint("general_ai_raw_candidate_before_routing",None)
             if candidate.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED":
