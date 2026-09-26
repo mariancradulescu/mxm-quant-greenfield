@@ -1,81 +1,69 @@
 {
   "accepted_output": {
     "decision": {
-      "accepted_data_scope": {
-        "end_utc": "2026-09-13T23:59:59Z",
-        "new_market_data_required": false,
-        "representatives": 41,
-        "resolution": "M5",
-        "start_utc": "2026-06-15T00:00:00Z"
-      },
-      "code_changed": false,
-      "data_bindings": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
-      ],
-      "economic_outcomes_opened": 0,
-      "evaluation_performed": false,
-      "implementation_scope_satisfied": true,
-      "preserved_later_step": "Run exact-head CI, then evaluate the frozen law on accepted hash-bound data. Treat results as development structural evidence, not independent confirmation or economic promotion.",
+      "action": "REUSE_EXISTING_IMPLEMENTATION",
+      "data_status": "ACCEPTED_HASH_BOUND_41_REPRESENTATIVE_M5_DATA; NEW_MARKET_DATA_NOT_REQUIRED",
+      "economic_outcomes_opened": false,
+      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+      "implementation_changes": false,
+      "independent_confirmation_claimed": false,
+      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+      "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_e283d6915fe79926049551e4bdfecf22.json",
       "protected_evidence_opened": false,
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "epoch26-cross-sectional-rank-persistence-inspection",
+    "implementation_id": "epoch26-cross-sectional-rank-persistence",
     "next_research_state": {
       "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
       "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The decision is already implemented by the frozen evaluator, prospective freeze, implementation manifest, and targeted tests. Inspection confirms the fixed 41-representative M5 scope, synchronized cross-sectional ranks with a minimum panel breadth, gap-safe windows, dependence-aware inference, and structural-only reporting. Accepted hash-bound captures cover all 41 representatives, so no code changes or new data gate are needed. The frozen evaluation remains a later step.",
+    "summary": "The accepted 41-representative screen, prospective freeze, implementation manifest, evaluator, and targeted tests are already present and bound to the accepted M5 data. No code or manifest changes, new capture, or external data gate are needed. Exact-head CI and frozen-law evaluation remain pending; the evaluation has not been run.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py"
+      "Run exact-head CI before frozen-law evaluation.",
+      "Run tests/test_cross_sectional_ranking_epoch26_screen.py.",
+      "After exact-head CI is green, evaluate the frozen law using the accepted hash-bound development and replacement ZIPs; do not treat development results as independent confirmation."
     ]
   },
   "basis_next_state_sha256": "d8b5c310f539a3b8f8e8fd523d08de8f9137bacb34d3a65ee020cbc740a28a3d",
   "changed_paths": [],
-  "created_utc": "2026-09-26T08:08:02Z",
+  "created_utc": "2026-09-26T08:10:45Z",
   "exact_head": {
     "green": true,
-    "head": "468290d765c007478dcce2eee425eab793286a06",
+    "head": "700a8591880aee726b3d1242066b9ed032bc89a2",
     "predecessor_conclusion": "success",
-    "predecessor_head": "468290d765c007478dcce2eee425eab793286a06",
-    "predecessor_run_id": 36228748783
+    "predecessor_head": "700a8591880aee726b3d1242066b9ed032bc89a2",
+    "predecessor_run_id": 36228887735
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_data_scope": {
-        "end_utc": "2026-09-13T23:59:59Z",
-        "new_market_data_required": false,
-        "representatives": 41,
-        "resolution": "M5",
-        "start_utc": "2026-06-15T00:00:00Z"
-      },
-      "code_changed": false,
-      "data_bindings": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
-      ],
-      "economic_outcomes_opened": 0,
-      "evaluation_performed": false,
-      "implementation_scope_satisfied": true,
-      "preserved_later_step": "Run exact-head CI, then evaluate the frozen law on accepted hash-bound data. Treat results as development structural evidence, not independent confirmation or economic promotion.",
+      "action": "REUSE_EXISTING_IMPLEMENTATION",
+      "data_status": "ACCEPTED_HASH_BOUND_41_REPRESENTATIVE_M5_DATA; NEW_MARKET_DATA_NOT_REQUIRED",
+      "economic_outcomes_opened": false,
+      "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+      "implementation_changes": false,
+      "independent_confirmation_claimed": false,
+      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+      "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_e283d6915fe79926049551e4bdfecf22.json",
       "protected_evidence_opened": false,
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "epoch26-cross-sectional-rank-persistence-inspection",
+    "implementation_id": "epoch26-cross-sectional-rank-persistence",
     "next_research_state": {
       "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
       "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The decision is already implemented by the frozen evaluator, prospective freeze, implementation manifest, and targeted tests. Inspection confirms the fixed 41-representative M5 scope, synchronized cross-sectional ranks with a minimum panel breadth, gap-safe windows, dependence-aware inference, and structural-only reporting. Accepted hash-bound captures cover all 41 representatives, so no code changes or new data gate are needed. The frozen evaluation remains a later step.",
+    "summary": "The accepted 41-representative screen, prospective freeze, implementation manifest, evaluator, and targeted tests are already present and bound to the accepted M5 data. No code or manifest changes, new capture, or external data gate are needed. Exact-head CI and frozen-law evaluation remain pending; the evaluation has not been run.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py"
+      "Run exact-head CI before frozen-law evaluation.",
+      "Run tests/test_cross_sectional_ranking_epoch26_screen.py.",
+      "After exact-head CI is green, evaluate the frozen law using the accepted hash-bound development and replacement ZIPs; do not treat development results as independent confirmation."
     ]
   },
   "project_snapshot": {
