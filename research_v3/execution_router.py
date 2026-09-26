@@ -57,7 +57,27 @@ def load_authorized_deterministic_operation(root_value: str | Path, state: Mappi
     root = _root(root_value)
     ref = deterministic_operation_ref(state)
     if not ref:
-        return None
+        # An implementation may publish a frozen-screen action after its
+        # exact-head validation without embedding a path in the canonical
+        # state. Resolve only a unique, explicitly authorized operation for
+        # that exact action and evidence epoch; ambiguity fails closed.
+        if state.get("status") != "READY_FOR_FROZEN_SCREEN_EXECUTION" or state.get("implementation_satisfied") is not True:
+            return None
+        action = str(state.get("next_action") or "").strip()
+        epoch = int(state.get("current_research_evidence_epoch") or state.get("evidence_epoch") or 0)
+        matches = []
+        for candidate in sorted((root / "research_v3").glob("*_DETERMINISTIC_OPERATION_V1.json")):
+            doc = json.loads(candidate.read_text(encoding="utf-8"))
+            if (doc.get("schema") == DETERMINISTIC_SCHEMA
+                    and doc.get("status") == AUTHORIZED_DETERMINISTIC_STATUS
+                    and doc.get("operation_name") == action
+                    and int(doc.get("evidence_epoch") or 0) == epoch):
+                matches.append(candidate)
+        if len(matches) > 1:
+            raise RoutingError(f"ambiguous deterministic authority for {action}")
+        if not matches:
+            return None
+        ref = str(matches[0].relative_to(root))
     path = root / ref
     if not path.is_file():
         raise RoutingError(f"deterministic operation authority missing: {ref}")
