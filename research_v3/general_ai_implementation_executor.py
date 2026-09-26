@@ -466,7 +466,17 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         if project_snapshot(root)!=before: raise ImplementationRejected("AI implementation changed economic/accounting snapshot")
         if protected_snapshot(root)!=protected: raise ImplementationRejected("AI implementation changed protected bytes")
         if changed:
-            subprocess.run(["python","-m","unittest","discover","-s","tests","-p","test_*.py","-v"],cwd=root,check=True)
+            # Validate the changed implementation locally. The full repository
+            # suite is the subsequent exact-head authority CI, after source and
+            # response are durable; unrelated historical capture imports must not
+            # erase a valid implementation in this runner.
+            python_paths=[p for p in changed if p.endswith(".py")]
+            if python_paths:
+                subprocess.run(["python","-m","py_compile",*python_paths],cwd=root,check=True)
+            test_modules=[p[:-3].replace("/",".") for p in changed
+                          if p.startswith("tests/test_") and p.endswith(".py")]
+            if test_modules:
+                subprocess.run(["python","-m","unittest","-v",*test_modules],cwd=root,check=True)
             response={"schema":"mxm.greenfield.general-ai-implementation-response.v1","status":"PENDING_EXACT_HEAD_GREEN",
                       "executor_version":VERSION,"basis_next_state_sha256":state_hash,"implementation_output":out,
                       "provider":provider,"changed_paths":changed,"project_snapshot":before,"created_utc":iso()}
