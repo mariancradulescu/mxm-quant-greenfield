@@ -35,7 +35,7 @@ from research_v3.runtime_v2_primitives import (
     sha256_file,
 )
 
-PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V2"
+PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V3"
 PROVIDER_KIND="GITHUB_COPILOT_CLI"
 DEFAULT_MODEL="auto"
 NEXT_REL=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
@@ -496,6 +496,110 @@ def copilot_cli_transport(token:str,model:str,prompt:str,*,root:Path)->tuple[dic
         "cli":"@github/copilot",
     }
 
+def _canonical_implementation_scope(request:Mapping[str,Any],candidate:Mapping[str,Any])->dict[str,Any]:
+    next_state=dict(candidate.get("next_research_state") or {})
+    decision=dict(candidate.get("decision") or {})
+    action=str(next_state.get("next_action") or "").strip()
+    selected=(
+        decision.get("selected_mechanism_family")
+        or next_state.get("selected_family")
+        or next_state.get("mechanism_family")
+        or next_state.get("active_mechanism_family")
+    )
+    return {
+        "scope_type":"NON_ECONOMIC_REPOSITORY_IMPLEMENTATION_FOR_BOUND_AI_DECISION",
+        "next_action":action,
+        "selected_mechanism_family":selected,
+        "research_semantics_source":"BOUND_ACCEPTED_AI_DECISION",
+        "authority_refs":list(candidate.get("authority_refs") or []),
+        "data_bindings":list(candidate.get("data_bindings") or []),
+        "requirements":[
+            "IMPLEMENT_ONLY_MACHINERY_REQUIRED_TO_EXECUTE_THE_BOUND_NON_ECONOMIC_DECISION",
+            "INSPECT_AND_REUSE_EXISTING_REPOSITORY_CAPABILITY_BEFORE_CREATING_NEW_CODE",
+            "ADD_OR_UPDATE_TARGETED_TESTS_AND_PROSPECTIVE_MANIFESTS_AS_NEEDED",
+            "PRESERVE_THE_ACCEPTED_RESEARCH_MECHANISM_SCOPE_AND_CAUSAL_BOUNDARIES",
+        ],
+        "prohibitions":[
+            "NO_NEW_RESEARCH_SELECTION_BY_IMPLEMENTATION_AGENT",
+            "NO_ECONOMIC_OUTCOME_OPENING",
+            "NO_V2_ATTEMPT_CONSUMPTION",
+            "NO_PROTECTED_FORWARD_OPENING",
+            "NO_LIVE_ORDER_AUTHORIZATION",
+        ],
+    }
+
+
+def _normalize_candidate_routing(request:Mapping[str,Any],candidate:Mapping[str,Any])->dict[str,Any]:
+    """Repair routing syntax without changing semantic research selection.
+
+    Provider output is semantic authority, but routing representation is an
+    implementation detail.  Do not spend another semantic call because the model
+    omitted a wrapper field or guessed a deterministic ref that is not in the
+    machine-derived executable catalog.
+    """
+    doc=json.loads(json.dumps(candidate))
+    next_state=doc.get("next_research_state")
+    decision=doc.get("decision")
+    if not isinstance(next_state,dict) or not isinstance(decision,dict):
+        return doc
+
+    action=str(next_state.get("next_action") or "").strip()
+    if not action:
+        return doc
+
+    data_policy=doc.get("data_policy") or {}
+    if isinstance(data_policy,Mapping) and data_policy.get("new_market_data_requested") is True:
+        return doc
+
+    status=str(next_state.get("status") or "").upper()
+    if (
+        next_state.get("ai_reasoning_required") is True
+        or action.upper().startswith("AI_")
+        or status=="AI_REASONING_REQUIRED"
+        or "PENDING_AI_INTERPRETATION" in status
+        or "FRESH_GENERAL_AI_REASONING_REQUIRED" in status
+    ):
+        return doc
+
+    catalog=list(request.get("authorized_deterministic_operations_current_epoch") or [])
+    ref=str(next_state.get("next_deterministic_operation_ref") or "").strip()
+    if ref:
+        exact=[
+            row for row in catalog
+            if row.get("ref")==ref and str(row.get("operation_name") or "").strip()==action
+        ]
+        if not exact:
+            next_state.pop("next_deterministic_operation_ref",None)
+            next_state.pop("deterministic_next_operation",None)
+            next_state["implementation_ai_required"]=True
+            next_state["research_judgment_required"]=False
+
+    if next_state.get("implementation_ai_required") is True:
+        if not decision.get("implementation_scope"):
+            decision["implementation_scope"]=_canonical_implementation_scope(request,doc)
+        return doc
+
+    if (
+        next_state.get("authority_ci_required") is True
+        or status=="PENDING_EXACT_HEAD_GREEN"
+        or next_state.get("economic_execution_authorized") is True
+        or next_state.get("economic_materialization_authorized") is True
+        or next_state.get("ctrader_build_or_certification_required") is True
+    ):
+        return doc
+
+    # A non-empty action with no legal current-epoch deterministic executor, no
+    # data gate, and no semantic/CI/economic route needs repository machinery.
+    # This conversion is routing-only: it preserves action, family, authorities,
+    # objective and all research semantics chosen by the provider.
+    next_state.pop("next_deterministic_operation_ref",None)
+    next_state.pop("deterministic_next_operation",None)
+    next_state["implementation_ai_required"]=True
+    next_state["research_judgment_required"]=False
+    decision["implementation_scope"]=_canonical_implementation_scope(request,doc)
+    return doc
+
+
 def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider_meta:Mapping[str,Any])->dict[str,Any]:
     objective=candidate.get("objective"); decision=candidate.get("decision"); next_state=candidate.get("next_research_state")
     if not isinstance(objective,Mapping) or not isinstance(decision,Mapping) or not isinstance(next_state,Mapping):
@@ -643,6 +747,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
                 atomic_write_json(root/RESPONSE_REL,response)
                 sink.checkpoint("general_ai_additional_authority_request",None)
                 return requirement
+            candidate=_normalize_candidate_routing(request,candidate)
             proposal=_wrap(root,request,candidate,meta); chosen_meta=meta
             break
         except AIProposalRejected as exc:

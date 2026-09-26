@@ -1,0 +1,29 @@
+{
+  "schema": "mxm.greenfield.epoch25-semantic-routing-normalization-repair.v1",
+  "status": "IMPLEMENTED_REQUIRES_EXACT_HEAD_CI",
+  "recorded_utc": "2026-09-26T03:50:00Z",
+  "observed_failure": {
+    "rejected_request_id": "reason_1d8904d1d59b072ea6fc6d350189e6d9",
+    "rejection_ref": "research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",
+    "reason": "proposed next state requests implementation AI without explicit implementation scope"
+  },
+  "root_cause": "Semantic provider output can select a valid non-economic research action yet omit or mis-encode the routing wrapper needed by Runtime V2. The old bridge treated a routing-format omission as a new semantic failure, causing repeated provider calls without changing the underlying research choice.",
+  "repair": [
+    "Normalize routing-only provider output before proposal validation while preserving semantic decision fields.",
+    "Inject a bounded canonical implementation_scope when implementation AI is selected but the wrapper is omitted.",
+    "Convert invalid/unavailable deterministic-operation guesses to bounded implementation AI only when no semantic, data, CI, economic, or cTrader route applies.",
+    "Bump provider version so the repaired contract receives a fresh request fingerprint.",
+    "Regression-test both missing-scope and invalid deterministic-ref cases."
+  ],
+  "provider_version_after_repair": "MXM_GENERAL_AI_REASONING_PROVIDER_V3",
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}

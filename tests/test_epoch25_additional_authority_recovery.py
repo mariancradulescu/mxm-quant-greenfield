@@ -10,6 +10,55 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
+    def test_missing_implementation_scope_is_normalized_without_semantic_recall(self):
+        from research_v3.general_ai_reasoning_provider import _normalize_candidate_routing, build_reasoning_request
+        request=build_reasoning_request(ROOT)
+        candidate={
+            "proposal_id":"routing-normalization-test",
+            "objective":{"class":"NON_ECONOMIC_STRUCTURAL_RESEARCH","goal":"test","information_gain_rationale":"test"},
+            "decision":{"selected_mechanism_family":"MEAN_REVERSION","research_choice":"preserve-me"},
+            "next_research_state":{
+                "status":"IMPLEMENTATION_REQUIRED",
+                "next_action":"BUILD_NEW_NON_ECONOMIC_MEAN_REVERSION_SCREEN",
+                "research_judgment_required":False,
+                "implementation_ai_required":True,
+                "selected_family":"MEAN_REVERSION",
+            },
+            "authority_refs":["research_v3/RESEARCH_CONTRACT_V3.json"],
+            "data_policy":{"new_market_data_requested":False},
+        }
+        normalized=_normalize_candidate_routing(request,candidate)
+        self.assertEqual(normalized["decision"]["research_choice"],"preserve-me")
+        self.assertTrue(normalized["next_research_state"]["implementation_ai_required"])
+        self.assertEqual(
+            normalized["decision"]["implementation_scope"]["next_action"],
+            "BUILD_NEW_NON_ECONOMIC_MEAN_REVERSION_SCREEN",
+        )
+
+    def test_unroutable_deterministic_guess_is_converted_to_bound_implementation(self):
+        from research_v3.general_ai_reasoning_provider import _normalize_candidate_routing, build_reasoning_request
+        request=build_reasoning_request(ROOT)
+        self.assertEqual(request["authorized_deterministic_operations_current_epoch"],[])
+        candidate={
+            "proposal_id":"deterministic-guess-normalization-test",
+            "objective":{"class":"NON_ECONOMIC_STRUCTURAL_RESEARCH","goal":"test","information_gain_rationale":"test"},
+            "decision":{"selected_mechanism_family":"MEAN_REVERSION"},
+            "next_research_state":{
+                "status":"DETERMINISTIC_WORK",
+                "next_action":"BUILD_SOMETHING_NEW",
+                "research_judgment_required":False,
+                "implementation_ai_required":False,
+                "selected_family":"MEAN_REVERSION",
+                "next_deterministic_operation_ref":"research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+            },
+            "authority_refs":["research_v3/RESEARCH_CONTRACT_V3.json"],
+            "data_policy":{"new_market_data_requested":False},
+        }
+        normalized=_normalize_candidate_routing(request,candidate)
+        self.assertNotIn("next_deterministic_operation_ref",normalized["next_research_state"])
+        self.assertTrue(normalized["next_research_state"]["implementation_ai_required"])
+        self.assertIn("implementation_scope",normalized["decision"])
+
     def test_current_epoch_has_no_preexisting_deterministic_operation_to_guess(self):
         from research_v3.general_ai_reasoning_provider import build_reasoning_request
         request=build_reasoning_request(ROOT)
