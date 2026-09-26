@@ -213,6 +213,11 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             return {"status":"MATERIAL_INTEGRITY_FAILURE","progress_class":"MATERIAL_FAILURE","cycles":cycle-1,"trace":trace,"next_state":state}
         if state.get("user_action_required") is True or state.get("external_data_required") is True or state.get("external_gate") not in (None,"",{},[]) or state.get("external_data_gate") not in (None,"",{},[]):
             return {"status":"EXTERNAL_USER_ACTION_REQUIRED" if state.get("user_action_required") is True else "EXTERNAL_DATA_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
+        if (state.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED"
+                and state.get("requested_authority_or_class")
+                and state.get("implementation_ai_required") is True):
+            return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_RESEARCH_AUTHORITY",
+                    "cycles":cycle-1,"trace":trace,"next_state":state}
         if deterministic_operation_required(root,state):
             out=execute_deterministic_chain(root,max_operations=max_cycles-cycle+1,git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"DETERMINISTIC_OPERATION","completed_operations":out.get("completed_operations"),"provider_calls_delta":out.get("provider_calls_delta",0)})
