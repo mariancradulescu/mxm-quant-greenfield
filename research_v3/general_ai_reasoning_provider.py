@@ -279,7 +279,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     }
     authorities,refs=_authority_context(root,next_state)
     blocker=_load(root,"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json") if (root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").is_file() else {}
-    blocked_scopes=sorted(set(blocker.get("blocked_scope_ids") or [])) if blocker.get("scope_status")=="PARKED_LOCAL_FRONTIER" and blocker.get("evidence_epoch")==next_state.get("current_research_evidence_epoch") else []
+    blocked_scopes=sorted(set(blocker.get("blocked_scope_ids") or []) & set(next_state.get("families_blocked_on_data") or [])) if blocker.get("scope_status")=="PARKED_LOCAL_FRONTIER" else []
     evidence=current_evidence_binding(root)
     deterministic_catalog=_authorized_deterministic_operation_catalog(root,int(evidence["evidence_epoch"]))
     core={
