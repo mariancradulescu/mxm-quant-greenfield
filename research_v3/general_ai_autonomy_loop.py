@@ -15,6 +15,7 @@ from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
 PROVIDER_RECOVERY_REL=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
 PROVIDER_USAGE_REL=Path("research_v3/ai_director/PROVIDER_USAGE_V1.json")
+BLOCKED_SCOPES_REL=Path("research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json")
 
 def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retryable: bool, advanced: bool, *, git_checkpoint: bool=False, git_push: bool=False) -> None:
     """Track runtime provider invocations without guessing CLI credits or selected model."""
@@ -94,26 +95,36 @@ def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
     return hashlib.sha256(json.dumps(authority,sort_keys=True,separators=(",",":"),default=str).encode()).hexdigest()
 
 def _blocked_scopes(root: Path) -> list[str]:
+    doc=load_json(root/BLOCKED_SCOPES_REL,{}) or {}
+    if doc.get("schema")=="mxm.greenfield.blocked-frontier-scopes.v1":
+        return sorted({row["scope_id"] for row in doc.get("items",[]) if row.get("status")=="PARKED_LOCAL_FRONTIER"})
     request=load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{}) or {}
-    if request.get("scope_status")!="PARKED_LOCAL_FRONTIER":
-        return []
-    return sorted(set(request.get("blocked_scope_ids") or []))
+    return sorted(set(request.get("blocked_scope_ids") or [])) if request.get("scope_status")=="PARKED_LOCAL_FRONTIER" else []
 
 def _park_authority(root: Path, state: dict, request: dict, *, git_checkpoint: bool, git_push: bool) -> bool:
     """Scope a legacy request only when canonical state supplies one unambiguous blocked family."""
     if request.get("scope_status")=="PARKED_LOCAL_FRONTIER":
         return True
-    blocked=list(state.get("families_blocked_on_data") or [])
+    blocked=list(request.get("blocked_scope_ids") or [])
+    open_families=set(current_evidence_binding(root).get("current_open_mechanism_families") or [])
     if (request.get("evidence_epoch")!=state.get("current_research_evidence_epoch")
-            or len(blocked)!=1 or not state.get("broader_universe_remains_open")
-            or state.get("family_exhaustion") is True):
+            or len(blocked)!=1 or blocked[0] not in open_families
+            or not state.get("broader_universe_remains_open")):
         return False
     # Scope comes from canonical machine state, not free-text provider output.
     parked=dict(request,scope_status="PARKED_LOCAL_FRONTIER",blocked_scope_ids=blocked,
-                scope_provenance={"canonical_state_ref":str(NEXT_STATE_REL),
-                                  "field":"families_blocked_on_data",
-                                  "source_request_id":request.get("request_id")})
+                scope_provenance={"source_request_id":request.get("request_id"),
+                                  "binding_class":"EXPLICIT_MACHINE_OWNED_FRONTIER_SCOPE"})
     atomic_write_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",parked)
+    document=dict(load_json(root/BLOCKED_SCOPES_REL,{}) or {})
+    items=list(document.get("items") or [])
+    if not any(row.get("source_request_id")==request.get("request_id") for row in items):
+        items.append({"scope_id":blocked[0],"status":"PARKED_LOCAL_FRONTIER",
+                      "source_request_id":request.get("request_id"),
+                      "source_evidence_epoch":request.get("evidence_epoch"),
+                      "requested_authority_or_class":request.get("requested_authority_or_class")})
+    atomic_write_json(root/BLOCKED_SCOPES_REL,{"schema":"mxm.greenfield.blocked-frontier-scopes.v1",
+                                             "status":"LOCAL_BLOCKERS_ONLY","items":items})
     GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("scoped_authority_blocker",None)
     return True
 

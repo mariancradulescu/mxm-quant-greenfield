@@ -124,6 +124,7 @@ def _state_repository_refs(value:Any, *, key:str|None=None)->list[str]:
 def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
     refs=list(BASE_AUTHORITIES)
     for rel in ("research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+                "research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json",
                 "research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json",
                 "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json",
                 "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
@@ -279,7 +280,8 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     }
     authorities,refs=_authority_context(root,next_state)
     blocker=_load(root,"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json") if (root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").is_file() else {}
-    blocked_scopes=sorted(set(blocker.get("blocked_scope_ids") or []) & set(next_state.get("families_blocked_on_data") or [])) if blocker.get("scope_status")=="PARKED_LOCAL_FRONTIER" else []
+    blocked_doc=json.loads((root/"research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json").read_text()) if (root/"research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json").is_file() else {}
+    blocked_scopes=sorted({row["scope_id"] for row in blocked_doc.get("items",[]) if row.get("status")=="PARKED_LOCAL_FRONTIER"}) if blocked_doc.get("schema")=="mxm.greenfield.blocked-frontier-scopes.v1" else (sorted(set(blocker.get("blocked_scope_ids") or [])) if blocker.get("scope_status")=="PARKED_LOCAL_FRONTIER" else [])
     evidence=current_evidence_binding(root)
     deterministic_catalog=_authorized_deterministic_operation_catalog(root,int(evidence["evidence_epoch"]))
     core={
@@ -432,7 +434,7 @@ Important boundaries:
 - When an authoritative structural result explicitly requires fresh family/frontier selection and forbids reuse/rerun of its diagnostic without new predeclared authority, do not immediately reparameterize or rerun that same family on the same observed bytes. A different split, test statistic, lag rule, multiplicity correction, or threshold after seeing the prior result is not a fresh prospective family decision. The same family may return only through a genuinely distinct prospectively justified hypothesis/authority that does not reuse the observed diagnostic outcome to redesign the test.
 - Distinguish structural representatives from economic equivalence; narrow scope only with explicit frontier-relative reasons independent of the new outcome.
 - Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
-- Cite only supplied authority refs. If an additional authority is needed, return only status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, and rationale; the runtime will validate it before a new fingerprint.
+- Cite only supplied authority refs. If an additional authority is needed, return status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, rationale, and a top-level blocked_scope_id equal to exactly one current_open_mechanism_families enum. Do not bury the scope inside rationale.
 - Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
 - Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Deterministic-in-principle is NOT enough.
 - next_deterministic_operation_ref may reference ONLY a ref listed in authorized_deterministic_operations_current_epoch, and its operation_name must exactly equal next_action. Evidence, context, freeze, selection, or routing-contract files are NEVER deterministic-operation refs merely because their names contain "authority" or "execution". If the catalog is empty or has no exact operation_name match, do not invent or repurpose a ref: route genuinely missing repository machinery as implementation AI with explicit implementation_scope, request exact new data through data_policy when data is the true dependency, or choose another legal routed action.
@@ -774,13 +776,18 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             if candidate.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED":
                 requested=str(candidate.get("requested_authority_or_class") or "")[:220]
                 rationale=str(candidate.get("rationale") or "")[:700]
+                scope=str(candidate.get("blocked_scope_id") or "").strip()
                 if not requested or not rationale:
                     raise AIProposalRejected("additional authority request lacks explicit ref/class or rationale")
+                if scope and (scope not in request["current_open_mechanism_families"] or scope in request.get("blocked_scope_set",[])):
+                    raise AIProposalRejected("additional authority blocked_scope_id is not a new open frontier family")
                 requirement={"schema":"mxm.greenfield.additional-authority-request.v1",
                              "status":"ADDITIONAL_AUTHORITY_REQUIRED",
                              "requested_authority_or_class":requested,"rationale":rationale,
                              "request_id":request["request_id"],"evidence_epoch":request["evidence_epoch_seen"],
                              "no_economic_outcome":True,"created_utc":iso()}
+                if scope:
+                    requirement["blocked_scope_ids"]=[scope]
                 response={"schema":"mxm.greenfield.general-ai-reasoning-response.v1",
                           "status":"ADDITIONAL_AUTHORITY_REQUIRED",
                           "request_id":request["request_id"],

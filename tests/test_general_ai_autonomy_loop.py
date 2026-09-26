@@ -37,15 +37,18 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                               families_blocked_on_data=["CARRY_TERM_STRUCTURE"],
                               broader_universe_remains_open=True,family_exhaustion=False)
             request={"status":"ADDITIONAL_AUTHORITY_REQUIRED","request_id":"old",
+                     "blocked_scope_ids":["CARRY_TERM_STRUCTURE"],
                      "evidence_epoch":31,"requested_authority_or_class":"opaque provider text"}
-            with patch("research_v3.general_ai_autonomy_loop.GitCheckpointSink.checkpoint",return_value=None):
+            with patch("research_v3.general_ai_autonomy_loop.current_evidence_binding",return_value={"current_open_mechanism_families":["CARRY_TERM_STRUCTURE"]}), \
+                 patch("research_v3.general_ai_autonomy_loop.GitCheckpointSink.checkpoint",return_value=None):
                 self.assertTrue(_park_authority(root,state,request,git_checkpoint=False,git_push=False))
             parked=json.loads((root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").read_text())
             self.assertEqual(parked["blocked_scope_ids"],["CARRY_TERM_STRUCTURE"])
             self.assertEqual(parked["scope_provenance"]["source_request_id"],"old")
             self.assertEqual(_blocked_scopes(root),["CARRY_TERM_STRUCTURE"])
-            self.assertFalse(_park_authority(root,{**state,"families_blocked_on_data":["A","B"]},
-                                             request,git_checkpoint=False,git_push=False))
+            with patch("research_v3.general_ai_autonomy_loop.current_evidence_binding",return_value={"current_open_mechanism_families":["CARRY_TERM_STRUCTURE"]}):
+                self.assertFalse(_park_authority(root,state,{**request,"blocked_scope_ids":["A","B"]},
+                                                 git_checkpoint=False,git_push=False))
 
     def test_quota_failure_is_checkpointed_as_retryable_not_fatal(self):
         with tempfile.TemporaryDirectory() as td:
