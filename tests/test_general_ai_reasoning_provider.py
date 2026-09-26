@@ -25,10 +25,11 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertNotIn("products",row)
         self.assertNotIn("content",row)
 
-    def test_epoch25_context_exposes_requested_frontier_content(self):
+    def test_current_context_exposes_requested_frontier_content(self):
         from research_v3.general_ai_reasoning_provider import _context_payload
-        context=_context_payload(Path("."),build_reasoning_request("."))
-        self.assertEqual(context["current_frontier_content"]["evidence_epoch"],25)
+        request=build_reasoning_request(".")
+        context=_context_payload(Path("."),request)
+        self.assertEqual(context["current_frontier_content"]["evidence_epoch"],request["evidence_epoch_seen"])
         self.assertEqual(context["latest_structural_result_content"]["execution"]["supported_symbols_count"],0)
         self.assertEqual(len(context["broker_native_representatives"]),41)
         self.assertEqual(context["frontier_selection_execution_authority"]["evidence_epoch"],25)
