@@ -229,7 +229,7 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 return {"status":out["status"],"progress_class":"LEGITIMATE_EXTERNAL_GATE" if out["status"]=="EXTERNAL_DATA_REQUIRED" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"result":out}
             continue
         return {"status":"QUIESCENT_NO_ACTION","progress_class":"MATERIAL_PROGRESS" if current_evidence_epoch(root)!=initial_epoch else "SAFE_NO_PROGRESS","cycles":cycle-1,"trace":trace,"next_state":state}
-    return {"status":"BOUNDED_CONTINUATION_CHECKPOINT","progress_class":"MATERIAL_PROGRESS" if (load_json(root/Path("research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json"),{}) or {}).get("current_epoch")!=initial_epoch else "SAFE_NO_PROGRESS","cycles":max_cycles,"trace":trace,
+    return {"status":"BOUNDED_CONTINUATION_CHECKPOINT","progress_class":"MATERIAL_PROGRESS" if current_evidence_epoch(root)!=initial_epoch else "SAFE_NO_PROGRESS","cycles":max_cycles,"trace":trace,
             "next_state":dict(load_json(root/NEXT_STATE_REL,{}) or {})}
 
 def main(argv=None):
