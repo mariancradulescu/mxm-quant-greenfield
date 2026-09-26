@@ -1,0 +1,111 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+      "evidence/EPOCH23_REGIME_CONTEXT_CONDITIONED_EXPLORATORY_STRUCTURAL_SCREEN_V1.json",
+      "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
+      "research_v3/EPOCH27_PROSPECTIVE_BREAKOUT_RESEARCH_SPEC_V1.json",
+      "evidence/EPOCH24_TREND_MOMENTUM_STRUCTURAL_RESULT_V1.json",
+      "evidence/EPOCH25_MEAN_REVERSION_STRUCTURAL_ACCEPTANCE_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
+      "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "research_v3/RESEARCH_CONTRACT_V3.json",
+      "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json",
+      "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json"
+    ],
+    "data_bindings": [
+      "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "action_type": "AUTHOR_AND_EXECUTE_FRESH_PROSPECTIVE_STRUCTURAL_SCREEN",
+      "data_bindings_reused": [
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+      ],
+      "implementation_required": {
+        "new_files": [
+          "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json (prospective frozen spec, authored before execution)",
+          "research_v3/regime_context_conditioned_epoch29_screen.py (deterministic executor implementing the frozen law)"
+        ],
+        "reason": "No existing deterministic operation or reusable frozen screen covers REGIME_CONTEXT_CONDITIONED; authorized_deterministic_operations_current_epoch is empty and the only prior artifact (Epoch23) is explicitly non-durable exploratory code, not a frozen executor. Genuinely new repository machinery is required, not a deterministic-in-principle rerun of existing tooling."
+      },
+      "mechanism_family": "REGIME_CONTEXT_CONDITIONED",
+      "no_economic_action": true,
+      "no_new_data_required": true,
+      "proposed_frozen_design_sketch": {
+        "closure": "descriptive elimination of this specific frozen law only; no ranking, no economic promotion, no family closure claimed regardless of outcome",
+        "event": "regime-conditioned directional continuation event, chronological earliest-first selection, non-overlapping spacing",
+        "multiplicity": "Benjamini-Hochberg FDR across all eligible representatives",
+        "regime_classifier": "ATR-percentile-rank based HIGH_VOL_EXPANDING vs LOW_VOL_COMPRESSED context, computed identically to Epoch23 params but frozen before any new observation",
+        "test": "per-symbol one-sided exact binomial continuation-vs-0.5 test evaluated independently within each chronological half, symbol counted supported only if both halves pass at a frozen threshold"
+      },
+      "scope": {
+        "exclude_outcome_based_symbol_selection": true,
+        "expected_representatives": 41,
+        "include": "ALL_CURRENT_REPRESENTATIVES_WITH_ACCEPTED_13W_M5_HISTORY",
+        "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
+      },
+      "why_fresh_not_reuse": "Epoch23 REGIME_CONTEXT_CONDITIONED evidence is explicitly design_status=EXPLORATORY_NON_ECONOMIC_DESCRIPTIVE_ONLY_NO_DURABLE_PRE_OUTCOME_FREEZE with interpretation_boundary stating no durable prospective freeze binds its thresholds and it cannot serve as independent confirmation. A new frontier freeze must therefore predeclare its own split/statistic/threshold/multiplicity rule independent of the Epoch23 observed regime fractions, mirroring the Epoch24-27 freeze->screen->result pattern, not reparameterizing Epoch23's diagnostic."
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "families_blocked_on_data": [
+        "CARRY_TERM_STRUCTURE"
+      ],
+      "families_exhausted_non_economically": [
+        "TREND_MOMENTUM",
+        "MEAN_REVERSION",
+        "BREAKOUT_VOLATILITY_EXPANSION"
+      ],
+      "families_with_valid_consumed_survivors": [
+        "CROSS_SECTIONAL_RANKING",
+        "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+        "SEASONALITY_SESSION_TIME(narrow)",
+        "CROSS_MARKET_LEAD_LAG(narrow)"
+      ],
+      "implementation_ai_required": true,
+      "implementation_scope": {
+        "constraints": [
+          "Freeze document must be authored and hashed before the screen is executed against data",
+          "No parameter selection may be informed by inspecting Epoch23 exploratory outcomes",
+          "Result is non-economic and confers no economic_outcomes_opened, v2_attempts, or protected_forward effect"
+        ],
+        "deliverables": [
+          "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
+          "research_v3/regime_context_conditioned_epoch29_screen.py",
+          "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json (produced by executing the frozen script against the already-accepted 13w M5 data, then accepted)"
+        ]
+      },
+      "mechanism_family_closed": false,
+      "next_action": "AUTHOR_REGIME_CONTEXT_CONDITIONED_PROSPECTIVE_FRONTIER_FREEZE_THEN_IMPLEMENT_AND_EXECUTE_FROZEN_NON_ECONOMIC_STRUCTURAL_SCREEN",
+      "research_judgment_required": true,
+      "status": "REGIME_CONTEXT_CONDITIONED_FRESH_FRONTIER_FREEZE_AND_IMPLEMENTATION_PENDING"
+    },
+    "objective": {
+      "class": "MECHANISM_FAMILY_STRUCTURAL_SCREEN_FORMALIZATION",
+      "goal": "Author a prospectively frozen, non-economic REGIME_CONTEXT_CONDITIONED structural stability spec and its deterministic screen implementation, then execute it across all currently eligible broker-native structural representatives with already-accepted 13-week M5 history, to determine whether this mechanism family exhibits any chronologically stable, breadth-material structural edge before any economic consideration.",
+      "information_gain_rationale": "TREND_MOMENTUM, MEAN_REVERSION and BREAKOUT_VOLATILITY_EXPANSION frozen structural screens (Epoch24/25/27) each returned zero supported/stable symbols across the full 41-representative frontier. CROSS_SECTIONAL_RANKING and CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL already produced valid, exact-identity-consumed survivors (V2-C023, V2-C025). CARRY_TERM_STRUCTURE remains blocked by an unresolved, fail-closed metadata authority gap (no new data justified yet). REGIME_CONTEXT_CONDITIONED is the only open mechanism family with (a) zero incremental data cost — full 13w M5 development data is already accepted for all 41 representatives — and (b) only non-durable, explicitly-declared exploratory descriptive evidence (Epoch23) that carries no prospective freeze and therefore cannot itself be reused as a structural result. Converting this exploratory evidence into a genuinely fresh, predeclared frozen law (distinct split-half design, thresholds, and multiplicity correction not derived from the Epoch23 observed outcome) is the highest-information legal next step: it closes the last cost-free open family gap without reusing any opened identity or outcome-exposed diagnostic."
+    },
+    "proposal_id": "AI_reason_0282192e6861bbbc8540e81125ce260a_regime_context_freeze_epoch29"
+  },
+  "captured_utc": "2026-09-26T12:31:52Z",
+  "evidence_bundle_sha256": "2b58ebde5cad97e701b1e2715c47c868b74591c110b5a611a99a701aa07108bf",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_0282192e6861bbbc8540e81125ce260a"
+}
