@@ -44,7 +44,14 @@ jobs:
       - name: Resolve exact-head authority and dispatch legal continuation
         if: >-
           steps.route.outputs.dispatch_required == 'true' &&
-          (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+          (
+            github.event_name != 'workflow_run' ||
+            github.event.workflow_run.conclusion == 'success' ||
+            (
+              github.event.workflow_run.name == 'Autonomous Research Runtime V2 Supervisor' &&
+              github.event.workflow_run.conclusion == 'failure'
+            )
+          )
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT_WORKFLOW: ${{ github.event.workflow_run.name }}
@@ -71,6 +78,10 @@ jobs:
               ci_run_id="$(jq -r '.id' <<< "${ci_run}")"
               if [[ "${ci_conclusion}" == "success" ]]; then
                 ci_head="${current_head}"
+                if [[ "${EVENT_WORKFLOW}" == "Autonomous Research Runtime V2 Supervisor" && "${EVENT_CONCLUSION}" == "failure" ]]; then
+                  echo "Failed supervisor is already based on exact-head green ${current_head}; stop automatic redispatch and require technical repair."
+                  exit 1
+                fi
               elif [[ "${ci_conclusion}" == "failure" ]]; then
                 echo "Exact-head authority CI failed at ${current_head}; technical repair required (run ${ci_run_id})."
                 exit 1
