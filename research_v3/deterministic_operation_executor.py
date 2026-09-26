@@ -203,7 +203,9 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     else:
         raise DeterministicOperationRejected(f"unsupported authorized deterministic materializer: {name}")
     _publish_state(root,new_state,before)
-    fingerprint=liveness_fingerprint(root,new_state)
+    # Dedup the execution input that was actually consumed, never the resulting
+    # frontier. Hashing new_state here can suppress the next legal action.
+    fingerprint=liveness_fingerprint(root,state)
     atomic_write_json(root/DEDUP_REL,{
         "schema":"mxm.greenfield.liveness-dedup.v1",
         "status":"ACTIVE",
