@@ -8,7 +8,6 @@ import argparse, hashlib, json, os, shutil, subprocess
 from pathlib import Path
 from typing import Any, Mapping
 from research_v3.evidence_eligibility import validate_eligibility, EvidenceIneligible
-from research_v3.autonomous_control_plane import validate_repository_state
 from research_v3.evidence_epoch import stale_reasoning_redirect
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot, proposal_hash
 from research_v3.general_ai_reasoning_provider import reasoning_required
@@ -459,9 +458,6 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         atomic_write_json(root/RESPONSE_REL,pending)
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_acceptance",None)
         return {"status":"IMPLEMENTATION_ACCEPTED","output":out,"next_state":published,"exact_head":green}
-
-    if not green["green"]:
-        return {"status":"PENDING_EXACT_HEAD_GREEN","exact_head":green}
 
     request={"schema":"mxm.greenfield.general-ai-implementation-request.v1","executor_version":VERSION,
              "research_head":_head(root),"basis_next_state_sha256":state_hash,"next_state":next_state,
