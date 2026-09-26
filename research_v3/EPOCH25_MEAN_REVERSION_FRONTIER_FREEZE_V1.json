@@ -1,0 +1,129 @@
+{
+  "schema": "mxm.greenfield.epoch25-mean-reversion-frontier-freeze.v1",
+  "status": "FROZEN_BEFORE_MEAN_REVERSION_STRUCTURAL_OUTCOME",
+  "evidence_epoch": 25,
+  "frozen_utc": "2026-09-26T05:12:23Z",
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_d3970e87882cde445c4ad3b2fda6c9bc.json",
+    "accepted_proposal_hash": "840428cfc8fd3acaccc9fd85df4f802c7c66e0c45c299fdc4aee9abd1ce28c1c",
+    "frontier_authority_ref": "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+    "hypothesis_space_ref": "HYPOTHESIS_SPACE_V1.json",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "family": "MEAN_REVERSION",
+  "scope": {
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "representative_count": 41,
+    "selection_law": "PROCESS_ALL_41_CURRENT_STRUCTURAL_REPRESENTATIVES_WITH_ACCEPTED_13W_M5_HISTORY_EXACTLY_ONCE",
+    "representatives_are_not_economically_equivalent": true,
+    "replacement_capture_symbol_ids": [7427, 5352, 2924],
+    "representatives": [
+      {"broker_symbol": "VER.AT", "symbol_id": 5268},
+      {"broker_symbol": "GEM.AU", "symbol_id": 3693},
+      {"broker_symbol": "UMI.BE", "symbol_id": 5120},
+      {"broker_symbol": "UBSG.CH", "symbol_id": 5275},
+      {"broker_symbol": "Lead", "symbol_id": 2791},
+      {"broker_symbol": "Corn", "symbol_id": 306},
+      {"broker_symbol": "LDSugar", "symbol_id": 148},
+      {"broker_symbol": "Sugar", "symbol_id": 106},
+      {"broker_symbol": "TRUMPUSD", "symbol_id": 5562},
+      {"broker_symbol": "JPYX", "symbol_id": 146},
+      {"broker_symbol": "AT1d.DE", "symbol_id": 3137},
+      {"broker_symbol": "ORSTED.DK", "symbol_id": 5314},
+      {"broker_symbol": "TEF.ES", "symbol_id": 5237},
+      {"broker_symbol": "EIDO.US", "symbol_id": 4442},
+      {"broker_symbol": "NatGas", "symbol_id": 251},
+      {"broker_symbol": "SAMPO.FI", "symbol_id": 5370},
+      {"broker_symbol": "STLAP.FR", "symbol_id": 5134},
+      {"broker_symbol": "USDCZK", "symbol_id": 56},
+      {"broker_symbol": "ZARJPY", "symbol_id": 98},
+      {"broker_symbol": "USDCLP", "symbol_id": 2759},
+      {"broker_symbol": "USDBRL", "symbol_id": 2755},
+      {"broker_symbol": "XAUUSD-F", "symbol_id": 2924},
+      {"broker_symbol": "JPN225-F", "symbol_id": 2917},
+      {"broker_symbol": "EUBobl-F", "symbol_id": 7290},
+      {"broker_symbol": "USTN5YR-F", "symbol_id": 7296},
+      {"broker_symbol": "UKGILT-F", "symbol_id": 7292},
+      {"broker_symbol": "MCG.GB", "symbol_id": 3377},
+      {"broker_symbol": "1357.HK", "symbol_id": 7238},
+      {"broker_symbol": "BIRG.IE", "symbol_id": 5386},
+      {"broker_symbol": "SCI25", "symbol_id": 150},
+      {"broker_symbol": "NETH25", "symbol_id": 269},
+      {"broker_symbol": "US400", "symbol_id": 7372},
+      {"broker_symbol": "CA60", "symbol_id": 266},
+      {"broker_symbol": "XPDUSD", "symbol_id": 95},
+      {"broker_symbol": "NHY.NO", "symbol_id": 5332},
+      {"broker_symbol": "BCP.PT", "symbol_id": 5217},
+      {"broker_symbol": "WTOIL-PERP", "symbol_id": 7393},
+      {"broker_symbol": "CXMT.CN-PERP", "symbol_id": 7427},
+      {"broker_symbol": "ERICB.SE", "symbol_id": 5352},
+      {"broker_symbol": "NIO.US-24", "symbol_id": 5479},
+      {"broker_symbol": "CGC.US", "symbol_id": 4120}
+    ]
+  },
+  "preregistered_structural_law": {
+    "hypothesis": "A completed M5 close unusually far above (below) its trailing price center is followed by a lower (higher) close one hour later.",
+    "signal": {
+      "window_bars": 12,
+      "window_includes_signal_bar": true,
+      "center": "ARITHMETIC_MEAN_OF_THE_12_CLOSES_ENDING_AT_SIGNAL_BAR",
+      "scale": "POPULATION_STANDARD_DEVIATION_OF_THE_SAME_12_CLOSES",
+      "threshold": 2.0,
+      "signal_rule": "If scale is zero, emit no signal. Otherwise z=(signal_close-center)/scale; z>=2.0 signals SHORT, z<=-2.0 signals LONG, and all other values emit no signal.",
+      "timing": "Signal is evaluated only after the current M5 bar is complete; it uses that bar and the immediately preceding 11 exact contiguous M5 closes."
+    },
+    "anchor_stride_bars": 12,
+    "anchor_lattice": "Within each exact-contiguous M5 segment, evaluate the first signal window at index 11 and then every 12 observed bars. Restart the lattice after every missing or off-cadence interval.",
+    "response": {
+      "bars": 12,
+      "horizon_minutes": 60,
+      "measure": "SIGNAL_DIRECTION_TIMES_CLOSE_AT_T_PLUS_12_MINUS_CLOSE_AT_T",
+      "success": "Strictly positive directional response",
+      "failure": "Strictly negative directional response",
+      "flat": "Exactly zero response; report separately and exclude from the binomial denominator."
+    },
+    "missing_data": "No forward fill, interpolation, resampling, or synthetic bars. A timestamp delta other than exactly 300 seconds starts a new segment; no response may cross a segment boundary.",
+    "censoring": "Every admitted signal remains counted. If the next 12 exact M5 bars are not observed in the same segment, classify it RIGHT_CENSORED_FUTURE_RESPONSE and exclude it from settled-outcome statistics.",
+    "duplicate_timestamps": "Collapse only rows with identical parsed OHLC and tick volume; any conflicting duplicate fails closed.",
+    "inference": {
+      "per_symbol_test": "ONE_SIDED_EXACT_BINOMIAL_SUCCESS_VS_0_5_ON_SETTLED_NONFLAT_SIGNALS",
+      "multiplicity": "BENJAMINI_HOCHBERG_FDR_ACROSS_ALL_41_REPRESENTATIVES",
+      "fdr_q": 0.05,
+      "minimum_settled_nonflat_signals_per_chronological_half": 30,
+      "chronological_halves": "Sort settled nonflat signal outcomes by signal timestamp; first floor(N/2) form half 1 and remaining observations form half 2.",
+      "stability": "Combined success fraction and each chronological-half success fraction must be strictly greater than 0.5.",
+      "structural_support": "BH-adjusted q<=0.05 AND minimum sample size in both halves AND stability.",
+      "interpretation": "Descriptive non-economic structural support only; the result is not an independent confirmation, trading edge, candidate identity, or economic promotion."
+    },
+    "no_parameter_search": true
+  },
+  "acceptance": {
+    "all_frozen_representatives_processed_exactly_once": true,
+    "report_all_symbols_without_ranking": true,
+    "no_returns_pnl_cost_margin_or_economic_outcome": true,
+    "no_trend_momentum_diagnostic_reuse_or_tuning": true,
+    "no_protected_forward_rows": true,
+    "no_candidate_identity_or_family_closure": true,
+    "no_live_orders_or_account_mutation": true
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
