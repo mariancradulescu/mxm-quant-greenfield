@@ -63,7 +63,7 @@ jobs:
             ci_head="${EVENT_HEAD}"
             ci_conclusion="success"
             ci_run_id="${EVENT_RUN_ID}"
-          elif [[ "${EXECUTION_CLASS}" == "SEMANTIC_REASONING" || "${EXECUTION_CLASS}" == "AUTHORITY_CI" ]]; then
+          elif [[ "${EXECUTION_CLASS}" == "SEMANTIC_REASONING" || "${EXECUTION_CLASS}" == "NOVEL_AI_IMPLEMENTATION" || "${EXECUTION_CLASS}" == "AUTHORITY_CI" ]]; then
             runs="$(curl --fail-with-body -sS -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${current_head}&per_page=100")"
             ci_run="$(jq -c '[.workflow_runs[] | select(.name == "m6-preparation")] | sort_by(.created_at) | last // empty' <<< "${runs}")"
             if [[ -n "${ci_run}" ]]; then
