@@ -1,7 +1,7 @@
 import json, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
-from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, FOUR_PANEL_OUTER_ACQUISITION_FIELDS, FOUR_PANEL_OUTER_SCHEMA, PROTECTED_PREFIXES, ImplementationRejected, _bound_context, _collector_fields_match, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required
+from research_v3.general_ai_implementation_executor import DEFAULT_MODEL as IMPLEMENTATION_MODEL, FOUR_PANEL_OUTER_ACQUISITION_FIELDS, FOUR_PANEL_OUTER_SCHEMA, PROTECTED_PREFIXES, ImplementationRejected, _bound_context, _collector_fields_match, _post_green_output, _resolve_current_proposal, _validate_output, authoritative_reasoning_requirement, implementation_required, _semantic_implementation_fingerprint, _response_matches_request
 from research_v3.general_ai_reasoning_provider import DEFAULT_MODEL, reasoning_required
 from research_v3.execution_router import deterministic_operation_required
 
@@ -186,4 +186,22 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
                 (root/plan_ref).write_text(json.dumps(plan))
                 with self.assertRaisesRegex(ImplementationRejected,"fields do not match"):
                     _validate_output(root,out)
+    def test_semantic_implementation_fingerprint_survives_routing_recovery_flags(self):
+        base={"source_ai_proposal_id":"P33","source_ai_proposal_hash":"h","authorizing_evidence_epoch":32,
+              "current_research_evidence_epoch":32,"next_action":"IMPLEMENT_X","implementation_scope":"scope",
+              "implementation_ai_required":True,"implementation_satisfied":True,
+              "implementation_scope_complete":True,"research_judgment_required":True}
+        repaired=dict(base,implementation_satisfied=False,implementation_scope_complete=False,
+                      research_judgment_required=False,ai_reasoning_required=False)
+        self.assertEqual(_semantic_implementation_fingerprint(base),_semantic_implementation_fingerprint(repaired))
+        changed=dict(repaired,source_ai_proposal_id="OTHER")
+        self.assertNotEqual(_semantic_implementation_fingerprint(base),_semantic_implementation_fingerprint(changed))
+
+    def test_stale_response_cannot_satisfy_current_durable_request_basis(self):
+        fingerprint="f"*64
+        self.assertFalse(_response_matches_request({"basis_next_state_sha256":"old"},"current",fingerprint))
+        self.assertTrue(_response_matches_request({"basis_next_state_sha256":"current"},"current",fingerprint))
+        self.assertTrue(_response_matches_request({"basis_next_state_sha256":"current","request_fingerprint":fingerprint},"current",fingerprint))
+        self.assertFalse(_response_matches_request({"basis_next_state_sha256":"current","request_fingerprint":"other"},"current",fingerprint))
+
 if __name__=="__main__": unittest.main()

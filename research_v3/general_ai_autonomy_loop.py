@@ -1,10 +1,10 @@
 """Bounded zero-human continuation loop across AI reasoning and AI implementation."""
 from __future__ import annotations
-import argparse, json, hashlib, os
+import argparse, json, hashlib, os, subprocess
 from pathlib import Path
 from research_v3.evidence_epoch import stale_reasoning_redirect, refresh_derived_views, current_evidence_epoch, current_evidence_binding
 from research_v3.general_ai_director_bridge import drain, project_snapshot
-from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
+from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected, ImplementationProviderAttemptError
 from research_v3.execution_router import deterministic_operation_required
 from research_v3.deterministic_operation_executor import execute_chain as execute_deterministic_chain
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
@@ -16,6 +16,10 @@ VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
 PROVIDER_RECOVERY_REL=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
 PROVIDER_USAGE_REL=Path("research_v3/ai_director/PROVIDER_USAGE_V1.json")
 BLOCKED_SCOPES_REL=Path("research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json")
+try:
+    MAX_RECOVERABLE_PROVIDER_FAILURES=max(2,min(5,int(os.environ.get("MXM_PROVIDER_MAX_RECOVERABLE_FAILURES","2"))))
+except ValueError:
+    MAX_RECOVERABLE_PROVIDER_FAILURES=2
 
 def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retryable: bool, advanced: bool, *, git_checkpoint: bool=False, git_push: bool=False) -> None:
     """Track runtime provider invocations without guessing CLI credits or selected model."""
@@ -31,10 +35,14 @@ def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retrya
     })
     atomic_write_json(root/PROVIDER_USAGE_REL,{
         "schema":"mxm.greenfield.provider-usage.v1",
-        "measurement_scope":"runtime provider invocations; internal CLI attempts and credits unknown",
+        "measurement_scope":"runtime provider attempts; all handled success, timeout, transport-failure and rejected attempts are counted; internal CLI credits and auto-selected model identity remain unknown",
         "provider_invocations":len(rows),
+        "provider_attempts":len(rows),
         "successful_reasoning_invocations":sum(x["purpose"]=="GENERAL_AI_REASONING" and x["outcome"]=="SUCCESS" for x in rows),
         "successful_implementation_invocations":sum(x["purpose"]=="GENERAL_AI_IMPLEMENTATION" and x["outcome"]=="SUCCESS" for x in rows),
+        "failed_or_timeout_invocations":sum(x.get("outcome")!="SUCCESS" for x in rows),
+        "timeout_invocations":sum("TIMEOUT" in str(x.get("outcome") or "").upper() for x in rows),
+        "material_state_advancing_invocations":sum(bool(x.get("material_state_advancement")) for x in rows),
         "quota_failures":sum(x["outcome"]=="PROVIDER_UNAVAILABLE" for x in rows),
         "invocations":rows,
     })
@@ -42,6 +50,8 @@ def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retrya
 
 
 def _recoverable_provider_failure(exc: Exception) -> bool:
+    if isinstance(exc,subprocess.TimeoutExpired):
+        return True
     detail=f"{type(exc).__name__}: {exc}".lower()
     markers=(
         "monthly quota",
@@ -56,12 +66,17 @@ def _recoverable_provider_failure(exc: Exception) -> bool:
         "copilot implementation failed",
         "copilot cli failed",
         "all configured general reasoning attempts failed",
+        "timed out",
+        "timeout",
     )
     if isinstance(exc, AIReasoningProviderError):
         return True
     if isinstance(exc, ImplementationRejected):
         return any(marker in detail for marker in markers)
     return False
+
+def _provider_attempt_was_started(exc:Exception)->bool:
+    return isinstance(exc,(subprocess.TimeoutExpired,ImplementationProviderAttemptError,AIReasoningProviderError))
 
 def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
     """Bind provider spend to material authority, never CI/head/checkpoint churn."""
@@ -153,25 +168,37 @@ def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
     legacy_quota=(prior.get("status") == "PROVIDER_RETRY_REQUIRED"
                   and "monthly quota" in str(prior.get("detail","")).lower())
     provider_blocked=prior.get("status") in {"PROVIDER_UNAVAILABLE","AUTH_OR_ENTITLEMENT_FAILURE","PROBE_INCONCLUSIVE"}
-    # Account entitlement is global across phases and fingerprints until a valid probe succeeds.
-    return prior if legacy_quota or provider_blocked else None
+    exhausted=(prior.get("status")=="PROVIDER_RETRY_BUDGET_EXHAUSTED"
+               and prior.get("phase")==phase
+               and prior.get("request_fingerprint")==_request_fingerprint(root,state,phase))
+    # Account entitlement is global across phases; bounded retry exhaustion is local to one semantic request.
+    return prior if legacy_quota or provider_blocked or exhausted else None
 
 def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_checkpoint: bool, git_push: bool) -> dict:
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
     prior=dict(load_json(root/PROVIDER_RECOVERY_REL,{}) or {})
-    attempts=int(prior.get("consecutive_recoverable_failures") or 0)+1
+    fingerprint=_request_fingerprint(root,state,phase)
+    same_request=prior.get("request_fingerprint")==fingerprint and prior.get("phase")==phase
+    previous_attempts=int(prior.get("consecutive_recoverable_failures") or 0) if same_request else 0
+    attempts=previous_attempts+1
     quota="quota" in str(exc).lower()
+    status=("PROVIDER_UNAVAILABLE" if quota else
+            "PROVIDER_RETRY_BUDGET_EXHAUSTED" if attempts>=MAX_RECOVERABLE_PROVIDER_FAILURES else
+            "PROVIDER_RETRY_REQUIRED")
     payload={
         "schema":"mxm.greenfield.provider-recovery-state.v1",
-        "status":"PROVIDER_UNAVAILABLE" if quota else "PROVIDER_RETRY_REQUIRED",
-        "request_fingerprint":_request_fingerprint(root,state,phase),
-        "first_failure_utc":prior.get("first_failure_utc") or iso(),
+        "status":status,
+        "request_fingerprint":fingerprint,
+        "first_failure_utc":(prior.get("first_failure_utc") or iso()) if same_request else iso(),
         "failure_class":"MONTHLY_QUOTA_EXHAUSTED" if quota else type(exc).__name__,
-        "retry_eligibility":"ONLY_AFTER_CONFIRMED_PROVIDER_RESET_OR_EXPLICIT_OPERATOR_OVERRIDE" if quota else "NEXT_LIVENESS_WAKE",
+        "retry_eligibility":("ONLY_AFTER_CONFIRMED_PROVIDER_RESET_OR_EXPLICIT_OPERATOR_OVERRIDE" if quota else
+                             "ONLY_AFTER_NEW_SEMANTIC_REQUEST_OR_PROVIDER_RECOVERY_SIGNAL" if status=="PROVIDER_RETRY_BUDGET_EXHAUSTED" else
+                             "NEXT_LIVENESS_WAKE"),
         "provider":"github-copilot-cli",
         "phase":phase,
         "detail":str(exc)[-1600:],
         "consecutive_recoverable_failures":attempts,
+        "max_recoverable_failures":MAX_RECOVERABLE_PROVIDER_FAILURES,
         "current_evidence_epoch":state.get("current_research_evidence_epoch"),
         "pending_status":state.get("status"),
         "pending_next_action":state.get("next_action"),
@@ -179,7 +206,9 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
         "economic_outcomes_opened_delta":0,
         "v2_attempts_consumed_delta":0,
         "search_budget_change":0,
-        "retry_policy":"NO_AUTOMATIC_RETRY_WHILE_QUOTA_EXHAUSTED" if quota else "RETRY_ON_NEXT_LIVENESS_WAKE",
+        "retry_policy":("NO_AUTOMATIC_RETRY_WHILE_QUOTA_EXHAUSTED" if quota else
+                        "FINITE_RETRY_BUDGET_EXHAUSTED" if status=="PROVIDER_RETRY_BUDGET_EXHAUSTED" else
+                        "RETRY_ON_NEXT_LIVENESS_WAKE"),
         "updated_utc":iso(),
     }
     atomic_write_json(root/PROVIDER_RECOVERY_REL,payload)
@@ -245,11 +274,15 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 r=reason(root,git_checkpoint=git_checkpoint,git_push=git_push)
             except Exception as exc:
                 if not _recoverable_provider_failure(exc):
+                    if _provider_attempt_was_started(exc):
+                        _record_invocation(root,state,"GENERAL_AI_REASONING","REJECTED_OR_FATAL",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
                     raise
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_REASONING",git_checkpoint=git_checkpoint,git_push=git_push)
-                _record_invocation(root,state,"GENERAL_AI_REASONING",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
+                outcome="TIMEOUT" if isinstance(exc,subprocess.TimeoutExpired) else recovery["status"]
+                _record_invocation(root,state,"GENERAL_AI_REASONING",outcome,recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_REASONING","recovery":recovery})
-                return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+                blocked=recovery["status"] in {"PROVIDER_UNAVAILABLE","PROVIDER_RETRY_BUDGET_EXHAUSTED"}
+                return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if blocked else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             if r.get("status")=="REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION":
                 _record_invocation(root,state,"GENERAL_AI_REASONING","REJECTED_BY_ELIGIBILITY",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
                 return {"status":"PROPOSAL_REJECTED_PRE_REGISTRY","progress_class":"MATERIAL_FAILURE",
@@ -270,15 +303,19 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 out=implement(root,git_checkpoint=git_checkpoint,git_push=git_push)
             except Exception as exc:
                 if not _recoverable_provider_failure(exc):
+                    if _provider_attempt_was_started(exc):
+                        _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","REJECTED_OR_FATAL",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
                     raise
                 recovery=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=git_checkpoint,git_push=git_push)
-                _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION",recovery["status"],recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
+                outcome="TIMEOUT" if isinstance(exc,subprocess.TimeoutExpired) else recovery["status"]
+                _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION",outcome,recovery["status"]=="PROVIDER_RETRY_REQUIRED",False,git_checkpoint=git_checkpoint,git_push=git_push)
                 trace.append({"cycle":cycle,"kind":"RECOVERABLE_PROVIDER_FAILURE","phase":"GENERAL_AI_IMPLEMENTATION","recovery":recovery})
-                return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if recovery["status"]=="PROVIDER_UNAVAILABLE" else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
+                blocked=recovery["status"] in {"PROVIDER_UNAVAILABLE","PROVIDER_RETRY_BUDGET_EXHAUSTED"}
+                return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if blocked else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             after_state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
             advanced=_material_state_signature(after_state)!=before_material or bool(out.get("changed_paths"))
             provider_called=out.get("provider_called") is not False and out.get("provider") is not None
-            if provider_called and out.get("status") not in {"NO_IMPLEMENTATION_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:
+            if provider_called:
                 _record_invocation(root,state,"GENERAL_AI_IMPLEMENTATION","SUCCESS",False,advanced,git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_IMPLEMENTATION","result_status":out.get("status"),"provider_called":provider_called,"material_state_advancement":advanced})
             if out.get("status") in {"EXTERNAL_DATA_REQUIRED","PENDING_EXACT_HEAD_GREEN"}:

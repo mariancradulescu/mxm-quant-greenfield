@@ -1,10 +1,11 @@
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.general_ai_autonomy_loop import run, _park_authority, _blocked_scopes
+from research_v3.general_ai_autonomy_loop import run, _park_authority, _blocked_scopes, _recoverable_provider_failure, _persist_provider_recovery, MAX_RECOVERABLE_PROVIDER_FAILURES
 from research_v3.general_ai_implementation_executor import ImplementationRejected
 
 
@@ -140,6 +141,24 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                 with self.assertRaises(ImplementationRejected):
                     run(root,max_cycles=1)
 
+
+    def test_provider_timeout_is_recoverable_and_bounded_per_semantic_request(self):
+        self.assertGreaterEqual(MAX_RECOVERABLE_PROVIDER_FAILURES,2)
+        exc=subprocess.TimeoutExpired(cmd=["copilot"],timeout=300)
+        self.assertTrue(_recoverable_provider_failure(exc))
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            write_state(root)
+            (root/"research_v3/ai_director").mkdir(parents=True,exist_ok=True)
+            with patch("research_v3.general_ai_autonomy_loop._request_fingerprint",return_value="f"*64), \
+                 patch("research_v3.general_ai_autonomy_loop.GitCheckpointSink.checkpoint",return_value=None):
+                first=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=False,git_push=False)
+                self.assertEqual(first["status"],"PROVIDER_RETRY_REQUIRED")
+                last=first
+                for _ in range(1,MAX_RECOVERABLE_PROVIDER_FAILURES):
+                    last=_persist_provider_recovery(root,exc,phase="GENERAL_AI_IMPLEMENTATION",git_checkpoint=False,git_push=False)
+                self.assertEqual(last["status"],"PROVIDER_RETRY_BUDGET_EXHAUSTED")
+                self.assertEqual(last["consecutive_recoverable_failures"],MAX_RECOVERABLE_PROVIDER_FAILURES)
 
 if __name__=="__main__":
     unittest.main()

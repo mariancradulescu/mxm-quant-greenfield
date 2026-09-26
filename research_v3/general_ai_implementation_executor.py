@@ -32,6 +32,7 @@ PROTECTED_PREFIXES=(
 )
 
 class ImplementationRejected(RuntimeError): pass
+class ImplementationProviderAttemptError(ImplementationRejected): pass
 
 def _head(root:Path)->str:
     return subprocess.check_output(["git","rev-parse","HEAD"],cwd=root,text=True).strip()
@@ -45,6 +46,33 @@ def implementation_required(next_state:Mapping[str,Any],root_value:str|Path=".")
     next_action alone is never authority to spend an AI implementation call.
     """
     return routed_implementation_required(Path(root_value).resolve(),next_state)
+
+_IMPLEMENTATION_SEMANTIC_KEYS=(
+    "source_ai_proposal_id","source_ai_proposal_hash","authorizing_evidence_epoch",
+    "current_research_evidence_epoch","evidence_epoch","selected_family","semantic_focus_family",
+    "next_action","implementation_task_scope","implementation_ai_scope","implementation_scope",
+)
+
+def _semantic_implementation_fingerprint(next_state:Mapping[str,Any])->str:
+    """Stable identity for one accepted implementation obligation."""
+    payload={k:next_state.get(k) for k in _IMPLEMENTATION_SEMANTIC_KEYS if k in next_state}
+    return sha256_bytes(canonical_bytes(payload))
+
+def _matching_durable_request(root:Path,next_state:Mapping[str,Any])->dict[str,Any]|None:
+    request=load_json(root/REQUEST_REL,{}) or {}
+    persisted=request.get("next_state")
+    basis=str(request.get("basis_next_state_sha256") or "")
+    if not isinstance(persisted,Mapping) or not basis:
+        return None
+    if _semantic_implementation_fingerprint(persisted)!=_semantic_implementation_fingerprint(next_state):
+        return None
+    return dict(request)
+
+def _response_matches_request(response:Mapping[str,Any],basis:str,fingerprint:str)->bool:
+    if response.get("basis_next_state_sha256")!=basis:
+        return False
+    recorded=response.get("request_fingerprint")
+    return recorded in (None,"",fingerprint)
 
 def authoritative_reasoning_requirement(root:Path,next_state:Mapping[str,Any])->dict[str,Any]|None:
     """Return a generic reasoning redirect when an authoritative freeze forbids execution before a prerequisite."""
@@ -434,11 +462,14 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_reasoning_redirect",None)
         return {"status":"AI_REASONING_REQUIRED","output":out,"next_state":published}
     before=project_snapshot(root); protected=protected_snapshot(root); state_hash=sha256_bytes(canonical_bytes(next_state))
+    semantic_fingerprint=_semantic_implementation_fingerprint(next_state)
+    durable_request=_matching_durable_request(root,next_state)
+    request_basis=str(durable_request.get("basis_next_state_sha256")) if durable_request else state_hash
     green=exact_head_green(root)
     pending=load_json(root/RESPONSE_REL,{}) or {}
     # Exact same semantic implementation request already completed with no code
     # change: normalize and reuse it without calling the provider again.
-    if pending.get("status")=="IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE" and pending.get("basis_next_state_sha256")==state_hash:
+    if pending.get("status")=="IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE" and _response_matches_request(pending,request_basis,semantic_fingerprint):
         out=pending.get("implementation_output") or {}
         _validate_output(root,out)
         accepted_out=_post_green_output(out,[])
@@ -447,7 +478,7 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         else:
             published=_publish_next(root,accepted_out,before)
         return {"status":"IMPLEMENTATION_ALREADY_SATISFIED_NO_PROVIDER","output":accepted_out,"next_state":published,"provider":None,"provider_called":False}
-    if pending.get("status")=="PENDING_EXACT_HEAD_GREEN" and pending.get("basis_next_state_sha256")==state_hash:
+    if pending.get("status")=="PENDING_EXACT_HEAD_GREEN" and _response_matches_request(pending,request_basis,semantic_fingerprint):
         if not green["green"]: return {"status":"PENDING_EXACT_HEAD_GREEN","exact_head":green}
         out=pending["implementation_output"]; _validate_output(root,out)
         accepted_out=_post_green_output(out,list(pending.get("changed_paths") or []))
@@ -459,17 +490,24 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_acceptance",None)
         return {"status":"IMPLEMENTATION_ACCEPTED","output":out,"next_state":published,"exact_head":green}
 
-    request={"schema":"mxm.greenfield.general-ai-implementation-request.v1","executor_version":VERSION,
-             "research_head":_head(root),"basis_next_state_sha256":state_hash,"next_state":next_state,
-             "project_snapshot":before,"exact_head":green,"created_utc":iso()}
-    atomic_write_json(root/REQUEST_REL,request)
-    # Do not let the request file count as an AI implementation edit.
-    GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_request",None)
+    if durable_request is None:
+        request={"schema":"mxm.greenfield.general-ai-implementation-request.v1","executor_version":VERSION,
+                 "research_head":_head(root),"basis_next_state_sha256":state_hash,
+                 "request_fingerprint":semantic_fingerprint,"next_state":next_state,
+                 "project_snapshot":before,"exact_head":green,"created_utc":iso()}
+        atomic_write_json(root/REQUEST_REL,request)
+        # Do not let the request file count as an AI implementation edit.
+        GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_request",None)
+        request_basis=state_hash
+    else:
+        request=durable_request
     protected=protected_snapshot(root)
     token=os.environ.get("GITHUB_TOKEN") or os.environ.get("COPILOT_GITHUB_TOKEN")
     if not token: raise ImplementationRejected("GITHUB_TOKEN/COPILOT_GITHUB_TOKEN required")
     model=os.environ.get("MXM_COPILOT_IMPLEMENTATION_MODEL",DEFAULT_MODEL).strip() or DEFAULT_MODEL
+    provider_attempted=False
     try:
+        provider_attempted=True
         out,provider=_transport(root,_prompt(root,next_state),token,model)
         _validate_output(root,out)
         changed=_changed_paths(root)
@@ -494,14 +532,16 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
             if test_modules:
                 subprocess.run(["python","-m","unittest","-v",*test_modules],cwd=root,check=True)
             response={"schema":"mxm.greenfield.general-ai-implementation-response.v1","status":"PENDING_EXACT_HEAD_GREEN",
-                      "executor_version":VERSION,"basis_next_state_sha256":state_hash,"implementation_output":out,
+                      "executor_version":VERSION,"basis_next_state_sha256":request_basis,
+                      "request_fingerprint":semantic_fingerprint,"implementation_output":out,
                       "provider":provider,"changed_paths":changed,"project_snapshot":before,"created_utc":iso()}
             atomic_write_json(root/RESPONSE_REL,response)
             sha=_normal_commit_push(root,"AI implement non-economic research continuation")
             return {"status":"PENDING_EXACT_HEAD_GREEN","implementation_commit":sha,"changed_paths":changed,"provider":provider}
         accepted_out=_post_green_output(out,[])
         response={"schema":"mxm.greenfield.general-ai-implementation-response.v1","status":"IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE",
-                  "executor_version":VERSION,"basis_next_state_sha256":state_hash,"implementation_output":out,
+                  "executor_version":VERSION,"basis_next_state_sha256":request_basis,
+                  "request_fingerprint":semantic_fingerprint,"implementation_output":out,
                   "accepted_output":accepted_out,
                   "provider":provider,"changed_paths":[],"project_snapshot":before,"exact_head":green,"created_utc":iso()}
         atomic_write_json(root/RESPONSE_REL,response)
@@ -511,8 +551,10 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_implementation_result",None)
         return {"status":"EXTERNAL_DATA_REQUIRED" if accepted_out["status"]=="EXTERNAL_DATA_REQUIRED" else "IMPLEMENTATION_COMPLETE",
                 "output":accepted_out,"next_state":published,"provider":provider,"exact_head":green}
-    except Exception:
+    except Exception as exc:
         _restore(root)
+        if provider_attempted and not isinstance(exc,(subprocess.TimeoutExpired,ImplementationProviderAttemptError)):
+            raise ImplementationProviderAttemptError(str(exc)) from exc
         raise
 
 def main(argv=None)->int:
