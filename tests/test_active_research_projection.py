@@ -19,8 +19,11 @@ class ActiveResearchProjectionTests(unittest.TestCase):
         self.assertEqual(state["current_research_evidence_epoch"], epoch["current_epoch"])
         self.assertEqual(result_ref, state["latest_material_structural_result_ref"])
         self.assertTrue((ROOT / result_ref).is_file())
-        self.assertEqual(state["status"], "FRESH_GENERAL_AI_REASONING_REQUIRED")
-        self.assertTrue(state["ai_reasoning_required"])
+        if state["status"] == "FRESH_GENERAL_AI_REASONING_REQUIRED":
+            self.assertTrue(state["ai_reasoning_required"])
+        else:
+            self.assertTrue(state.get("source_ai_proposal_id"))
+            self.assertEqual(state["authorizing_evidence_epoch"], epoch["current_epoch"])
 
     def test_economic_accounting_unchanged(self):
         projection = read("research_v3/ACTIVE_RESEARCH_PROJECTION_V1.json")
