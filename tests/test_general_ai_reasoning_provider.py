@@ -53,7 +53,7 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
 
     def test_active_provider_is_copilot_cli_not_retired_models_api(self):
         self.assertEqual(PROVIDER_KIND,"GITHUB_COPILOT_CLI")
-        self.assertEqual(PROVIDER_VERSION,"MXM_GENERAL_AI_REASONING_PROVIDER_V2")
+        self.assertEqual(PROVIDER_VERSION,"MXM_GENERAL_AI_REASONING_PROVIDER_V3")
 
     def test_prompt_contract_explicitly_protects_deterministic_state(self):
         p=_system_prompt()
