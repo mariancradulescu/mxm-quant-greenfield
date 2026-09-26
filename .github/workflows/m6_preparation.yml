@@ -1,0 +1,15 @@
+name: m6-preparation
+on:
+  workflow_dispatch:
+    inputs:
+      authority_head:
+        description: Research commit to validate; dispatch with ref set to that commit's branch
+        required: false
+        type: string
+jobs:
+  default-branch-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Dispatch this workflow with ref=performance-research-v3-20260922 so the research-branch authority suite runs."
+          exit 1
