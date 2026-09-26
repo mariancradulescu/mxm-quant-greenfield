@@ -21,7 +21,7 @@ def classify(root_value:str|Path=".")->dict[str,Any]:
     execution_class=route["execution_class"]
     dispatch_required=execution_class in {
         "DETERMINISTIC_OPERATION","SEMANTIC_REASONING","NOVEL_AI_IMPLEMENTATION",
-        "ECONOMIC_EXECUTION","CTRADER_BUILD_OR_CERTIFICATION",
+        "ECONOMIC_EXECUTION","CTRADER_BUILD_OR_CERTIFICATION","AUTHORITY_CI",
     } and not duplicate
     return {
         **route,
