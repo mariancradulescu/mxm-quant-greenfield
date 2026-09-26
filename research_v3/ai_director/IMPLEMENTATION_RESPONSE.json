@@ -1,4 +1,74 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "139e2581bd50e794bb9707785ed67e9a30b7a62c",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "139e2581bd50e794bb9707785ed67e9a30b7a62c",
+    "predecessor_run_id": 36273091689
+  },
+  "accepted_output": {
+    "decision": {
+      "data_scope": {
+        "history": "Accepted 13-week broker-native frontier history",
+        "replacement_capture_ids": [
+          7427,
+          5352,
+          2924
+        ],
+        "resolution": "M5",
+        "symbols": [
+          "VER.AT",
+          "GEM.AU",
+          "Lead",
+          "TRUMPUSD",
+          "NatGas",
+          "USDCZK",
+          "JPN225-F",
+          "EUBobl-F",
+          "SCI25",
+          "NIO.US-24",
+          "XPDUSD",
+          "WTOIL-PERP"
+        ]
+      },
+      "economic_effect": {
+        "economic_outcomes_opened": 0,
+        "search_budget_change": 0,
+        "v2_attempts_consumed": 0
+      },
+      "freeze_ref": "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
+      "implementation_ref": "research_v3/regime_context_conditioned_epoch33_screen.py",
+      "implementation_scope": "IMPLEMENT_FRESH_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN",
+      "safety": {
+        "competition_start_authorized": false,
+        "economic_promotion_authorized": false,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false
+      },
+      "test_ref": "tests/test_regime_context_conditioned_epoch33_screen.py"
+    },
+    "external_data_gate": null,
+    "implementation_id": "MXM_EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN_V1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
+        "research_v3/regime_context_conditioned_epoch33_screen.py",
+        "tests/test_regime_context_conditioned_epoch33_screen.py"
+      ],
+      "implementation_ai_required": false,
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "research_judgment_required": true,
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a separately frozen Epoch33 non-economic regime-context evaluator and focused tests. It processes the exact 12-symbol scope using accepted broker-native M5 captures, lagged volatility/activity ranks, UTC session-overlap state, chronological-half validation, exact binomial tests, state-selection correction, and BH correction across symbols. No external data gate is required; no economic identity, outcome, protected evidence, live order, or accounting artifact was modified.",
+    "tests_requested": [
+      "tests/test_regime_context_conditioned_epoch33_screen.py",
+      "Exact-head repository CI including Python compilation and the focused Epoch33 test"
+    ]
+  },
   "basis_next_state_sha256": "b9ff19621129925c8434aa326d972f27e688417590b9e74584b1ca27acd9f575",
   "changed_paths": [
     "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
@@ -78,5 +148,5 @@
   },
   "request_fingerprint": "b9e518cd77749cb8e4f54b21aa46d73631b6d2d832e08ae524d648198de54398",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
