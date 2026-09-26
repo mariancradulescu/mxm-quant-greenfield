@@ -86,6 +86,7 @@ jobs:
         id: continuation
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ github.token }}
           MXM_COPILOT_MODEL: auto
           MXM_COPILOT_IMPLEMENTATION_MODEL: auto
@@ -93,6 +94,15 @@ jobs:
         run: |
           set -euo pipefail
           final_status=""
+          initial_fingerprint="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          from research_v3.general_ai_autonomy_loop import _material_state_signature, _blocked_scopes
+          from research_v3.general_ai_director_bridge import NEXT_STATE_REL
+          state=json.loads(Path(NEXT_STATE_REL).read_text())
+          print(_material_state_signature(state)+':'+','.join(_blocked_scopes(Path('.'))))
+          PY
+          )"
           for batch in 1 2 3; do
             log="/tmp/mxm-minimal-runtime-${batch}.json"
             python -m research_v3.general_ai_autonomy_loop continue               --root .               --git-checkpoint               --git-push               --max-cycles 12 | tee "${log}"
@@ -121,7 +131,8 @@ jobs:
                 continue
                 ;;
               PENDING_EXACT_HEAD_GREEN)
-                gh workflow run research-fast-path-validation.yml --ref "${TARGET_BRANCH}"
+                gh workflow run research-fast-path-validation.yml --ref main \
+                  -f required_head="$(git rev-parse HEAD)"
                 break
                 ;;
               ADDITIONAL_AUTHORITY_REQUIRED)
@@ -143,6 +154,26 @@ jobs:
                 ;;
             esac
           done
+          if [[ "${final_status}" == "BOUNDED_CONTINUATION_CHECKPOINT" ]]; then
+            successor="$(python - "${initial_fingerprint}" <<'PY'
+          import sys,json
+          from pathlib import Path
+          from research_v3.general_ai_autonomy_loop import _material_state_signature,_blocked_scopes
+          from research_v3.general_ai_reasoning_provider import build_reasoning_request
+          from research_v3.general_ai_director_bridge import NEXT_STATE_REL
+          from research_v3.runtime_v2_primitives import load_json
+          state=load_json(Path('.')/NEXT_STATE_REL,{}) or {}
+          signature=_material_state_signature(state)+':'+','.join(_blocked_scopes(Path('.')))
+          blocked=state.get('user_action_required') or state.get('external_data_required') or state.get('external_gate') or state.get('external_data_gate') or state.get('status')=='MATERIAL_INTEGRITY_FAILURE'
+          request=load_json(Path('research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json'),{}) or {}
+          same_request=request.get('status')=='ADDITIONAL_AUTHORITY_REQUIRED' and request.get('evidence_epoch')==state.get('current_research_evidence_epoch') and request.get('request_id')==build_reasoning_request('.')['request_id']
+          print('yes' if signature!=sys.argv[1] and not blocked and not same_request else 'no')
+          PY
+            )"
+            if [[ "${successor}" == "yes" ]]; then
+              gh workflow run autonomous-research-runtime-v2.yml --ref main
+            fi
+          fi
           echo "final_status=${final_status}" >> "${GITHUB_OUTPUT}"
 
       - name: Refresh derived views after durable progress
