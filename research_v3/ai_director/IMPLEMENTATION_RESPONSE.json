@@ -1,97 +1,54 @@
 {
-  "accepted_output": {
-    "decision": {
-      "accepted_data_bindings_reused": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
-      ],
-      "accounting_effect": {
-        "economic_outcomes_opened": 0,
-        "search_budget_change": 0,
-        "v2_attempts_consumed": 0
-      },
-      "execution_blocker": "Shell tools are prohibited, so targeted tests and screen execution could not be run.",
-      "executor_ref": "research_v3/regime_context_conditioned_epoch29_screen.py",
-      "freeze_ref": "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
-      "implementation_changed": false,
-      "implementation_sufficient_by_inspection": true,
-      "independent_confirmation_claimed": false,
-      "mechanism_family_closed": false,
-      "new_data_required": false,
-      "result_generated": false,
-      "result_ref": "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
-      "safety": {
-        "competition_start_authorized": false,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false
-      },
-      "screen_executed": false,
-      "tests_ref": "tests/test_regime_context_conditioned_epoch29_screen.py"
-    },
-    "external_data_gate": null,
-    "implementation_id": "MXM_EPOCH29_REGIME_CONTEXT_CONDITIONED_SCREEN_V1",
-    "next_research_state": {
-      "next_action": "RUN_TARGETED_TESTS_AND_EXECUTE_FROZEN_NON_ECONOMIC_STRUCTURAL_SCREEN_THEN_ACCEPT_RESULT",
-      "status": "REGIME_CONTEXT_CONDITIONED_EPOCH29_IMPLEMENTATION_AUTHORED_SCREEN_EXECUTION_PENDING"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Inspection found the prospective freeze, deterministic executor, and targeted tests already in place and bound to the accepted 41-symbol captures. I made no changes. The accepted implementation response records an exact-head green, but the frozen screen has not been executed and its result is still missing; the accepted captures are not a new external-data dependency.",
-    "tests_requested": [
-      "python -m pytest tests/test_regime_context_conditioned_epoch29_screen.py",
-      "Execute research_v3/regime_context_conditioned_epoch29_screen.py using the frozen manifest, accepted structural registry, and already-accepted development and replacement ZIPs; write evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json."
-    ]
-  },
-  "basis_next_state_sha256": "11cbb43d7e3f16a185cdab964fda17a055d654f9158b1cc0a417452ca0dd19cb",
-  "changed_paths": [],
-  "created_utc": "2026-09-26T12:45:02Z",
-  "exact_head": {
-    "green": true,
-    "head": "5741cdbb5f2e4c37ae13f057de5206088b6465f0",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "5741cdbb5f2e4c37ae13f057de5206088b6465f0",
-    "predecessor_run_id": 36242756328
-  },
+  "basis_next_state_sha256": "1eb7965e675513c4d3c31e6cc75c49e9de951f1fb9e3c282fa942c98dd82136e",
+  "changed_paths": [
+    "research_v3/EPOCH30_SEASONALITY_SESSION_TIME_FRONTIER_FREEZE_V1.json",
+    "research_v3/seasonality_session_time_epoch30_screen.py",
+    "tests/test_seasonality_session_time_epoch30_screen.py"
+  ],
+  "created_utc": "2026-09-26T17:23:38Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_data_bindings_reused": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
-      ],
-      "accounting_effect": {
+      "accepted_proposal_hash": "05e487e2b13c3f45ad9af3cb7da64ea844266cd31a2dcc6357750a1e5202245c",
+      "accepted_proposal_id": "epoch30-session-time-structure",
+      "economic_effect": {
         "economic_outcomes_opened": 0,
-        "search_budget_change": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
         "v2_attempts_consumed": 0
       },
-      "execution_blocker": "Shell tools are prohibited, so targeted tests and screen execution could not be run.",
-      "executor_ref": "research_v3/regime_context_conditioned_epoch29_screen.py",
-      "freeze_ref": "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
-      "implementation_changed": false,
-      "implementation_sufficient_by_inspection": true,
-      "independent_confirmation_claimed": false,
-      "mechanism_family_closed": false,
-      "new_data_required": false,
-      "result_generated": false,
-      "result_ref": "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
-      "safety": {
-        "competition_start_authorized": false,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false
+      "implementation_refs": [
+        "research_v3/EPOCH30_SEASONALITY_SESSION_TIME_FRONTIER_FREEZE_V1.json",
+        "research_v3/seasonality_session_time_epoch30_screen.py",
+        "tests/test_seasonality_session_time_epoch30_screen.py"
+      ],
+      "later_step": "After exact-head-green checks, run the frozen screen on the accepted captures and report its descriptive result. The development screen is not independent confirmation and does not authorize economic research or symbol promotion.",
+      "methodology": "Daily-normalized absolute log close-to-close activity; fixed chronological split; minimum date/hour coverage and activity threshold; deterministic within-date hour randomization; stable unique peak required in both halves; Holm family-wise correction across all 41 symbols.",
+      "scope": {
+        "clock": "UTC hour of day, fixed 24 buckets",
+        "data_refs": [
+          "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+          "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+          "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
+        ],
+        "data_status": "ACCEPTED_41_OF_41_COVERAGE; replacement capture covers the three added representatives",
+        "interval": "2026-06-15T00:00:00Z/2026-09-13T23:59:59Z",
+        "representatives": 41,
+        "resolution": "M5"
       },
-      "screen_executed": false,
-      "tests_ref": "tests/test_regime_context_conditioned_epoch29_screen.py"
+      "validation": "Inspected the freeze, evaluator, and targeted tests. Tests were not executed."
     },
     "external_data_gate": null,
-    "implementation_id": "MXM_EPOCH29_REGIME_CONTEXT_CONDITIONED_SCREEN_V1",
+    "implementation_id": "epoch30-seasonality-session-time-non-economic-screen-v1",
     "next_research_state": {
-      "next_action": "RUN_TARGETED_TESTS_AND_EXECUTE_FROZEN_NON_ECONOMIC_STRUCTURAL_SCREEN_THEN_ACCEPT_RESULT",
-      "status": "REGIME_CONTEXT_CONDITIONED_EPOCH29_IMPLEMENTATION_AUTHORED_SCREEN_EXECUTION_PENDING"
+      "next_action": "RUN_FROZEN_EPOCH30_SEASONALITY_SESSION_TIME_SCREEN",
+      "status": "READY_FOR_EXACT_HEAD_GREEN_THEN_FROZEN_SCREEN_EXECUTION"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Inspection found the prospective freeze, deterministic executor, and targeted tests already in place and bound to the accepted 41-symbol captures. I made no changes. The accepted implementation response records an exact-head green, but the frozen screen has not been executed and its result is still missing; the accepted captures are not a new external-data dependency.",
+    "summary": "Added the prospective Epoch 30 freeze and deterministic non-economic evaluator for all 41 current representatives. The exact-scope M5 captures are already accepted and coverage-verified; no new data is required. The screen was not run.",
     "tests_requested": [
-      "python -m pytest tests/test_regime_context_conditioned_epoch29_screen.py",
-      "Execute research_v3/regime_context_conditioned_epoch29_screen.py using the frozen manifest, accepted structural registry, and already-accepted development and replacement ZIPs; write evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json."
+      "python -m unittest discover -s tests -p test_seasonality_session_time_epoch30_screen.py",
+      "Run the repository-required exact-head-green checks before accepting the implementation."
     ]
   },
   "project_snapshot": {
@@ -110,5 +67,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
