@@ -132,6 +132,14 @@ jobs:
               BOUNDED_CONTINUATION_CHECKPOINT)
                 continue
                 ;;
+              PROVIDER_RETRY_REQUIRED)
+                echo "Recoverable provider failure; retrying within the finite machine-owned request budget."
+                continue
+                ;;
+              PROVIDER_RETRY_BUDGET_EXHAUSTED|PROVIDER_UNAVAILABLE)
+                echo "Provider continuation is durably bounded for the current semantic request."
+                break
+                ;;
               PENDING_EXACT_HEAD_GREEN)
                 gh workflow run research-fast-path-validation.yml --ref main \
                   -f required_head="$(git rev-parse HEAD)"
