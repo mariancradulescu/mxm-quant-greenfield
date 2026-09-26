@@ -51,6 +51,27 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertFalse(ns["implementation_ai_required"])
         self.assertEqual(ns["green_implementation_artifacts"],["research_v3/example.json"])
 
+    def test_post_green_normalizes_implementation_changed_requires_exact_head_green(self):
+        out={
+            "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+            "next_research_state":{
+                "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+                "next_action":"RUN_EXACT_HEAD_CI_THEN_EXECUTE_FROZEN_NON_ECONOMIC_SCREEN",
+            },
+        }
+        accepted=_post_green_output(out,["research_v3/evaluator.py","tests/test_evaluator.py"])
+        ns=accepted["next_research_state"]
+        self.assertEqual(ns["status"],"AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN")
+        self.assertEqual(
+            ns["next_action"],
+            "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+        )
+        self.assertTrue(ns["ai_reasoning_required"])
+        self.assertTrue(ns["research_judgment_required"])
+        self.assertFalse(ns["implementation_ai_required"])
+        self.assertFalse(ns["user_action_required"])
+        self.assertEqual(ns["green_implementation_artifacts"],["research_v3/evaluator.py","tests/test_evaluator.py"])
+
     def test_post_green_preserves_result_specific_reasoning_provenance(self):
         out={
             "status":"COMPLETE_NON_ECONOMIC",
