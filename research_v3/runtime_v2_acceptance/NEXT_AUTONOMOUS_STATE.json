@@ -157,7 +157,15 @@
   "data_capture": "ACCEPTED_HASH_VERIFIED_PRE_OUTCOME",
   "data_requirement": "NONE_NEW_REQUIRED_USES_EXISTING_13W_M5_CAPTURE",
   "decision_basis": "Outcome-blind governance and frontier authority; no new mechanism, symbol or panel prospectively selected.",
-  "deterministic_next_operation": null,
+  "deterministic_next_operation": {
+    "operation_ref": "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_DETERMINISTIC_OPERATION_V1.json",
+    "operation_name": "MATERIALIZE_AND_ACCEPT_FROZEN_NON_ECONOMIC_STRUCTURAL_RESULT",
+    "implementation_ai_required": false,
+    "copilot_reasoning_required": false,
+    "new_semantic_judgment_required": false,
+    "v2_attempts": 0,
+    "economic_outcomes": 0
+  },
   "deterministic_operation_execution_ref": "research_v3/EPOCH21_DETERMINISTIC_OPERATION_EXECUTION_V1.json",
   "development_evidence_sufficient_for_current_decision": true,
   "development_evidence_sufficient_for_mechanism_specific_outer": false,
@@ -243,7 +251,7 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_ai_scope": "Novel repository code needed: (1) compute trailing 13-week rolling TR tercile regime label at each existing frozen breakout event's onset bar from already-captured 13W M5 canonical data, (2) stratify existing follow-through/persistence structural statistics by regime bucket per representative, (3) emit a new structural evidence artifact. No existing deterministic routine performs regime labeling or regime-stratified aggregation.",
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
@@ -267,7 +275,7 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": false,
+  "implementation_satisfied": true,
   "implementation_scope": {
     "constraints": [
       "Freeze document must be authored and hashed before the screen is executed against data",
@@ -347,8 +355,8 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "RUN_TARGETED_TESTS_AND_EXECUTE_FROZEN_NON_ECONOMIC_STRUCTURAL_SCREEN_THEN_ACCEPT_RESULT",
-  "next_deterministic_operation_ref": null,
+  "next_action": "MATERIALIZE_AND_ACCEPT_FROZEN_NON_ECONOMIC_STRUCTURAL_RESULT",
+  "next_deterministic_operation_ref": "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_DETERMINISTIC_OPERATION_V1.json",
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "outer": "C032_ECONOMIC_OUTCOME_RECORDED_EXACTLY_ONCE",
@@ -428,7 +436,7 @@
     "prospective freeze record"
   ],
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
   "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
   "result_sha256": "278babcec46cdb404057b9c0b8166a68ea987a1c9a8e7e19003eb9df32f7a2f8",
@@ -466,7 +474,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "REGIME_CONTEXT_CONDITIONED_EPOCH29_IMPLEMENTATION_AUTHORED_SCREEN_EXECUTION_PENDING",
+  "status": "EPOCH29_FROZEN_RESULT_DETERMINISTIC_ACCEPTANCE_READY",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -534,5 +542,15 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true
+  "uses_only_existing_accepted_bytes": true,
+  "ai_reasoning_required": false,
+  "fast_path_recovery": {
+    "classification": "POST_IMPLEMENTATION_FAST_PATH_INTEGRATION_GAP",
+    "implementation_response_ref": "research_v3/ai_director/IMPLEMENTATION_RESPONSE.json",
+    "implementation_sufficient_by_inspection": true,
+    "duplicate_reasoning_provider_call": false,
+    "duplicate_implementation_provider_call": false,
+    "deterministic_operation_ref": "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_DETERMINISTIC_OPERATION_V1.json",
+    "result_ref": "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json"
+  }
 }

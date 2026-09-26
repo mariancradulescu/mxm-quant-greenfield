@@ -1,6 +1,6 @@
 """Zero-provider executor for explicitly authorized deterministic research operations."""
 from __future__ import annotations
-import argparse, json
+import argparse, base64, gzip, json
 from pathlib import Path
 from typing import Any
 
@@ -116,6 +116,42 @@ def _execute_selection_layer(root:Path,state:dict[str,Any],op:dict[str,Any])->di
     })
     return state
 
+def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
+    """Materialize a hash-bound, transport-only JSON payload before deterministic acceptance.
+
+    The payload is not semantic authority. The operation document remains the authority
+    for schema/family/epoch validation, accounting boundaries and the follow-on state.
+    """
+    payload_ref=str(op.get("payload_ref") or "").strip()
+    result_ref=str(op.get("result_ref") or "").strip()
+    if not payload_ref or not result_ref:
+        raise DeterministicOperationRejected("embedded structural result operation missing payload_ref/result_ref")
+    payload_path=root/payload_ref
+    if not payload_path.is_file():
+        raise DeterministicOperationRejected("embedded structural result payload missing")
+    expected_payload_sha=str(op.get("payload_sha256") or "").strip()
+    if expected_payload_sha and sha256_file(payload_path)!=expected_payload_sha:
+        raise DeterministicOperationRejected("embedded structural result payload hash mismatch")
+    if op.get("payload_encoding")!="BASE64_GZIP_JSON":
+        raise DeterministicOperationRejected("unsupported embedded structural result payload encoding")
+    try:
+        packed=base64.b64decode(payload_path.read_text(encoding="ascii").strip(),validate=True)
+        result=json.loads(gzip.decompress(packed).decode("utf-8"))
+    except Exception as exc:
+        raise DeterministicOperationRejected(f"embedded structural result payload decode failed: {exc}") from exc
+    if not isinstance(result,dict):
+        raise DeterministicOperationRejected("embedded structural result payload must decode to a JSON object")
+    for field,file_ref in dict(op.get("sha256_attestations") or {}).items():
+        if not isinstance(field,str) or "." in field or not field:
+            raise DeterministicOperationRejected("sha256 attestation field must be a simple top-level JSON field")
+        bound=root/str(file_ref)
+        if not bound.is_file():
+            raise DeterministicOperationRejected(f"sha256 attestation authority missing: {file_ref}")
+        result[field]=sha256_file(bound)
+    atomic_write_json(root/result_ref,result)
+    return result_ref
+
+
 def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
     """Accept an already-materialized, explicitly bound non-economic structural result.
 
@@ -134,8 +170,12 @@ def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[st
     if expected.get("family") and result.get("family")!=expected["family"]:
         raise DeterministicOperationRejected("structural result family mismatch")
     source_epoch=int(result.get("source_evidence_epoch") or result.get("evidence_epoch") or 0)
-    if source_epoch!=int(op.get("evidence_epoch") or 0):
+    operation_epoch=int(op.get("evidence_epoch") or 0)
+    expected_result_epoch=int(expected.get("evidence_epoch") or operation_epoch)
+    if source_epoch!=expected_result_epoch:
         raise DeterministicOperationRejected("structural result evidence epoch mismatch")
+    if expected_result_epoch not in (operation_epoch,operation_epoch+1):
+        raise DeterministicOperationRejected("structural result target epoch is not current or next evidence epoch")
     effect=result.get("accounting_effect") or {}
     if any(int(effect.get(k) or 0)!=0 for k in ("v2_attempts_consumed","economic_outcomes_opened","search_budget_change")):
         raise DeterministicOperationRejected("structural result declares prohibited accounting effect")
@@ -194,7 +234,10 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     before=project_snapshot(root)
     provider_before=_provider_count(root)
     name=op["operation_name"]
-    if op.get("materializer")=="ACCEPT_EXISTING_NON_ECONOMIC_STRUCTURAL_RESULT":
+    if op.get("materializer")=="MATERIALIZE_BASE64_GZIP_NON_ECONOMIC_STRUCTURAL_RESULT":
+        _materialize_embedded_structural_result(root,op)
+        new_state=_execute_existing_structural_result(root,state,op)
+    elif op.get("materializer")=="ACCEPT_EXISTING_NON_ECONOMIC_STRUCTURAL_RESULT":
         new_state=_execute_existing_structural_result(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
