@@ -607,6 +607,14 @@ def _normalize_candidate_routing(request:Mapping[str,Any],candidate:Mapping[str,
             next_state["research_judgment_required"]=False
 
     if next_state.get("implementation_ai_required") is True:
+        # One canonical stage only: a proposal that hands off to implementation
+        # must not inherit or advertise fresh semantic reasoning/completion flags.
+        next_state["ai_reasoning_required"]=False
+        next_state["research_judgment_required"]=False
+        next_state["implementation_satisfied"]=False
+        next_state["implementation_scope_complete"]=False
+        next_state["user_action_required"]=False
+        next_state["external_data_required"]=False
         if not decision.get("implementation_scope"):
             decision["implementation_scope"]=_canonical_implementation_scope(request,doc)
         return doc
@@ -627,7 +635,12 @@ def _normalize_candidate_routing(request:Mapping[str,Any],candidate:Mapping[str,
     next_state.pop("next_deterministic_operation_ref",None)
     next_state.pop("deterministic_next_operation",None)
     next_state["implementation_ai_required"]=True
+    next_state["ai_reasoning_required"]=False
     next_state["research_judgment_required"]=False
+    next_state["implementation_satisfied"]=False
+    next_state["implementation_scope_complete"]=False
+    next_state["user_action_required"]=False
+    next_state["external_data_required"]=False
     decision["implementation_scope"]=_canonical_implementation_scope(request,doc)
     return doc
 

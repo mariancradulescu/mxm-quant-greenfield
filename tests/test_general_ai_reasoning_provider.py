@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.general_ai_reasoning_provider import (
+from research_v3.general_ai_reasoning_provider import (, _normalize_candidate_routing
     PROVIDER_KIND,
     PROVIDER_VERSION,
     _system_prompt,
@@ -110,5 +110,32 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
                 with self.assertRaisesRegex(AIReasoningProviderError,"monthly quota"):
                     wake(root,token="test-token",transport=exhausted)
             self.assertEqual(len(calls),1)
+
+    def test_implementation_handoff_is_single_coherent_stage(self):
+        request={"authorized_deterministic_operations_current_epoch":[]}
+        candidate={
+            "data_policy":{"new_market_data_requested":False},
+            "decision":{"implementation_scope":{"scope_type":"TEST"}},
+            "next_research_state":{
+                "status":"IMPLEMENTATION_REQUIRED",
+                "next_action":"IMPLEMENT_X",
+                "implementation_ai_required":True,
+                "ai_reasoning_required":True,
+                "research_judgment_required":True,
+                "implementation_satisfied":True,
+                "implementation_scope_complete":True,
+                "user_action_required":True,
+                "external_data_required":True,
+            },
+        }
+        normalized=_normalize_candidate_routing(request,candidate)
+        ns=normalized["next_research_state"]
+        self.assertTrue(ns["implementation_ai_required"])
+        self.assertFalse(ns["ai_reasoning_required"])
+        self.assertFalse(ns["research_judgment_required"])
+        self.assertFalse(ns["implementation_satisfied"])
+        self.assertFalse(ns["implementation_scope_complete"])
+        self.assertFalse(ns["user_action_required"])
+        self.assertFalse(ns["external_data_required"])
 
 if __name__=="__main__": unittest.main()
