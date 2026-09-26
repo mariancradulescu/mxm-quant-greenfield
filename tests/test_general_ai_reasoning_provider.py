@@ -57,7 +57,8 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
     def test_wake_detector_is_generic_not_finite_action_map(self):
         self.assertTrue(reasoning_required({"next_action":"AI_SOMETHING_NEVER_SEEN_BEFORE","user_action_required":False}))
         self.assertTrue(reasoning_required({"status":"ANY_PENDING_AI_INTERPRETATION_STATE","user_action_required":False}))
-        self.assertFalse(reasoning_required({"next_action":"IMPLEMENT_SOMETHING","user_action_required":False}))
+        self.assertTrue(reasoning_required({"research_judgment_required":True,"next_action":"RESEARCH_DECISION","user_action_required":False}))
+        self.assertFalse(reasoning_required({"next_action":"IMPLEMENT_SOMETHING","research_judgment_required":False,"user_action_required":False}))
         self.assertFalse(reasoning_required({"ai_reasoning_required":True,"user_action_required":True}))
 
     def test_active_provider_is_copilot_cli_not_retired_models_api(self):

@@ -92,6 +92,8 @@ def reasoning_required(next_state:Mapping[str,Any])->bool:
         return False
     if next_state.get("ai_reasoning_required") is True:
         return True
+    if next_state.get("research_judgment_required") is True:
+        return True
     action=str(next_state.get("next_action") or "").upper()
     status=str(next_state.get("status") or "").upper()
     # Wake detection only. This never maps a state to a research decision.

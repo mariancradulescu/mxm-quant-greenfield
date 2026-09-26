@@ -1,18 +1,11 @@
 name: m6-preparation
 on:
-  push:
-    branches:
-      - m6-prep-materialization-20260917
-      - competition-performance-v1-20260921
-      - forensic-stabilization-20260922
-      - c012-corrected-stage-b-20260922
-      - c012-stage-b-persist-staging-20260922
-      - performance-research-v3-20260922
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      authority_head:
+        description: Research commit for explicit material/shared-runtime full validation
+        required: false
+        type: string
 
 concurrency:
   group: m6-preparation-${{ github.ref }}
