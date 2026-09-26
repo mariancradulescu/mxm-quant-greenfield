@@ -124,6 +124,10 @@ jobs:
                 gh workflow run research-fast-path-validation.yml --ref "${TARGET_BRANCH}"
                 break
                 ;;
+              ADDITIONAL_AUTHORITY_REQUIRED)
+                echo "Research held at explicit missing authority; no provider retry."
+                break
+                ;;
               QUIESCENT_NO_ACTION)
                 python - <<'PY'
           import json
