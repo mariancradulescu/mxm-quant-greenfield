@@ -198,7 +198,7 @@ jobs:
 
       - name: Fast validation for authorized deterministic work
         if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'DETERMINISTIC_OPERATION' }}
-        run: python -m unittest -v tests.test_execution_router_v1 tests.test_deterministic_operation_executor_v1 tests.test_frontier_information_gain_v1 tests.test_general_ai_implementation_executor
+        run: python -m unittest -v tests.test_execution_router_v1 tests.test_deterministic_operation_executor_v1 tests.test_frontier_information_gain_v1 tests.test_general_ai_implementation_executor tests.test_research_fast_path tests.test_active_research_projection
 
       - name: Execute authorized deterministic operation chain
         if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'DETERMINISTIC_OPERATION' }}
@@ -211,7 +211,7 @@ jobs:
 
       - name: General AI focused tests
         if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
-        run: python -m unittest -v tests.test_execution_router_v1 tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider tests.test_general_ai_implementation_executor tests.test_copilot_sdk_observability_v1
+        run: python -m unittest -v tests.test_execution_router_v1 tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider tests.test_general_ai_implementation_executor tests.test_copilot_sdk_observability_v1 tests.test_research_fast_path tests.test_active_research_projection
 
       - name: Prove general AI research director boundary if required
         if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}

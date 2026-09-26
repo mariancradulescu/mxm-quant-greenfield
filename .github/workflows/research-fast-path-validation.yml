@@ -1,0 +1,40 @@
+name: Research Fast Path Validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+env:
+  TARGET_BRANCH: performance-research-v3-20260922
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  focused:
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate research fast path
+        run: |
+          python -m research_v3.autonomous_control_plane validate
+          python -m unittest -v \
+            tests.test_execution_router_v1 \
+            tests.test_deterministic_operation_executor_v1 \
+            tests.test_general_ai_director_bridge \
+            tests.test_general_ai_reasoning_provider \
+            tests.test_general_ai_implementation_executor \
+            tests.test_research_fast_path \
+            tests.test_active_research_projection
