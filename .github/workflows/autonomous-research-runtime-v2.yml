@@ -249,7 +249,12 @@ jobs:
             --root . \
             --git-checkpoint \
             --git-push \
-            --max-cycles 8
+            --max-cycles 8 | tee /tmp/mxm-continuation.json
+          status="$(jq -r '.status' /tmp/mxm-continuation.json)"
+          if [[ "${status}" == "PROPOSAL_REJECTED_PRE_REGISTRY" || "${status}" == "MATERIAL_INTEGRITY_FAILURE" ]]; then
+            echo "Technical recovery required: ${status}; no follow-on semantic dispatch."
+            exit 1
+          fi
 
       - name: Continue from durable progress when work remains
         if: ${{ steps.mode.outputs.mode == 'resume' && success() }}
