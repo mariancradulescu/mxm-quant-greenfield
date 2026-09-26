@@ -1,128 +1,67 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "d8c453d9ed3bbfddd9e294c4fe0e5d11af720f61",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "d8c453d9ed3bbfddd9e294c4fe0e5d11af720f61",
-    "predecessor_run_id": 36220386312
-  },
   "accepted_output": {
     "decision": {
-      "classification": "NON_ECONOMIC_IMPLEMENTATION_ADDED",
-      "economic_outcomes_opened": 0,
+      "economic_outcome_opened": false,
       "evaluator_ref": "research_v3/mean_reversion_epoch25_screen.py",
       "family": "MEAN_REVERSION",
       "freeze_ref": "research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json",
-      "frozen_law": {
-        "minimum_evidence": "At least 30 settled nonflat signals in each chronological half, with success fractions above 0.5 overall and in each half.",
-        "missing_data_and_censoring": "No fill or imputation; gaps split segments; preserve admitted signals without a full contiguous response as right-censored.",
-        "response": "Directional close-to-close response after 12 exact contiguous M5 bars.",
-        "signal": "12-close population-standard-deviation z-score, including the completed signal bar; threshold ±2; fade the excursion.",
-        "statistic": "One-sided exact binomial test on settled nonflat signals; Benjamini-Hochberg FDR across 41 representatives at q=0.05."
-      },
-      "implementation_manifest_ref": "research_v3/EPOCH25_MEAN_REVERSION_IMPLEMENTATION_MANIFEST_V1.json",
-      "independent_confirmation_claimed": false,
+      "later_step": "Run the targeted tests and frozen evaluator against the hash-bound accepted data; report the complete structural result without ranking, economic promotion, or family closure.",
       "live_orders_authorized": false,
-      "market_data_evaluation_run": false,
-      "new_market_data_required": false,
+      "manifest_ref": "research_v3/EPOCH25_MEAN_REVERSION_IMPLEMENTATION_MANIFEST_V1.json",
       "protected_forward_opened": false,
-      "scope": {
-        "data_bindings": {
-          "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-          "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-          "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-          "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
-        },
-        "interval": {
-          "end_utc": "2026-09-13T23:59:59Z",
-          "start_utc": "2026-06-15T00:00:00Z"
-        },
-        "representatives": 41,
-        "resolution": "M5"
-      },
-      "tests_run": false,
-      "v2_attempts_consumed": 0
+      "result_generated": false,
+      "scope": "All 41 frozen representatives using accepted M5 development history and the accepted three-symbol replacement capture.",
+      "test_ref": "tests/test_mean_reversion_epoch25_screen.py"
     },
     "external_data_gate": null,
-    "implementation_id": "epoch25-mean-reversion-frontier-screen-v1",
+    "implementation_id": "epoch25-mean-reversion-structural-screen-inspection",
     "next_research_state": {
-      "ai_reasoning_required": true,
-      "green_implementation_artifacts": [
-        "research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json",
-        "research_v3/EPOCH25_MEAN_REVERSION_IMPLEMENTATION_MANIFEST_V1.json",
-        "research_v3/mean_reversion_epoch25_screen.py",
-        "tests/test_mean_reversion_epoch25_screen.py"
-      ],
-      "implementation_ai_required": false,
-      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "research_judgment_required": true,
-      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
-      "user_action_required": false
+      "next_action": "RUN_HASH_BOUND_MEAN_REVERSION_SCREEN",
+      "status": "FROZEN_SCREEN_EXECUTION_PENDING"
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a separately frozen causal mean-reversion evaluator, focused tests, and an implementation manifest for all 41 current representatives. The accepted 13-week M5 captures are hash-bound and cover this scope, so no new data collector is required. Tests and data evaluation remain pending; no independent-confirmation or economic claim is made.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The frozen evaluator, exact 41-representative scope, targeted tests, and implementation manifest already exist and match the accepted screen requirements. No edits or new capture gate are needed; accepted development and replacement data cover the frozen scope. The test suite and data evaluation were not executed in this inspection-only session, so no structural result is claimed.",
     "tests_requested": [
-      "PYTHONPATH=. python -m unittest tests.test_mean_reversion_epoch25_screen tests.test_trend_momentum_epoch24_screen -v",
-      "Run the repository's standard exact-head CI suite before evaluating the accepted captures."
+      "tests/test_mean_reversion_epoch25_screen.py",
+      "Evaluate research_v3/mean_reversion_epoch25_screen.py with the frozen manifest and accepted development and replacement ZIPs."
     ]
   },
-  "basis_next_state_sha256": "b45f7ae15fa181d46f55f204cc999974705e34c80ec4c0fff1d2dc6a711a21c9",
-  "changed_paths": [
-    "research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json",
-    "research_v3/EPOCH25_MEAN_REVERSION_IMPLEMENTATION_MANIFEST_V1.json",
-    "research_v3/mean_reversion_epoch25_screen.py",
-    "tests/test_mean_reversion_epoch25_screen.py"
-  ],
-  "created_utc": "2026-09-26T05:15:36Z",
+  "basis_next_state_sha256": "e32b16d49f2b05be647dc4ea88e759442fe399ca2127f62767db918832ec6d1f",
+  "changed_paths": [],
+  "created_utc": "2026-09-26T05:27:48Z",
+  "exact_head": {
+    "green": true,
+    "head": "9963227620b1f369bd7e73355fcacae992f61ebf",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "9963227620b1f369bd7e73355fcacae992f61ebf",
+    "predecessor_run_id": 36220740304
+  },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "classification": "NON_ECONOMIC_IMPLEMENTATION_ADDED",
-      "economic_outcomes_opened": 0,
+      "economic_outcome_opened": false,
       "evaluator_ref": "research_v3/mean_reversion_epoch25_screen.py",
       "family": "MEAN_REVERSION",
       "freeze_ref": "research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json",
-      "frozen_law": {
-        "minimum_evidence": "At least 30 settled nonflat signals in each chronological half, with success fractions above 0.5 overall and in each half.",
-        "missing_data_and_censoring": "No fill or imputation; gaps split segments; preserve admitted signals without a full contiguous response as right-censored.",
-        "response": "Directional close-to-close response after 12 exact contiguous M5 bars.",
-        "signal": "12-close population-standard-deviation z-score, including the completed signal bar; threshold ±2; fade the excursion.",
-        "statistic": "One-sided exact binomial test on settled nonflat signals; Benjamini-Hochberg FDR across 41 representatives at q=0.05."
-      },
-      "implementation_manifest_ref": "research_v3/EPOCH25_MEAN_REVERSION_IMPLEMENTATION_MANIFEST_V1.json",
-      "independent_confirmation_claimed": false,
+      "later_step": "Run the targeted tests and frozen evaluator against the hash-bound accepted data; report the complete structural result without ranking, economic promotion, or family closure.",
       "live_orders_authorized": false,
-      "market_data_evaluation_run": false,
-      "new_market_data_required": false,
+      "manifest_ref": "research_v3/EPOCH25_MEAN_REVERSION_IMPLEMENTATION_MANIFEST_V1.json",
       "protected_forward_opened": false,
-      "scope": {
-        "data_bindings": {
-          "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-          "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-          "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-          "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
-        },
-        "interval": {
-          "end_utc": "2026-09-13T23:59:59Z",
-          "start_utc": "2026-06-15T00:00:00Z"
-        },
-        "representatives": 41,
-        "resolution": "M5"
-      },
-      "tests_run": false,
-      "v2_attempts_consumed": 0
+      "result_generated": false,
+      "scope": "All 41 frozen representatives using accepted M5 development history and the accepted three-symbol replacement capture.",
+      "test_ref": "tests/test_mean_reversion_epoch25_screen.py"
     },
     "external_data_gate": null,
-    "implementation_id": "epoch25-mean-reversion-frontier-screen-v1",
+    "implementation_id": "epoch25-mean-reversion-structural-screen-inspection",
     "next_research_state": {
-      "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
-      "status": "PENDING_EXACT_HEAD_GREEN_AND_ACCEPTED_DATA_EVALUATION"
+      "next_action": "RUN_HASH_BOUND_MEAN_REVERSION_SCREEN",
+      "status": "FROZEN_SCREEN_EXECUTION_PENDING"
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a separately frozen causal mean-reversion evaluator, focused tests, and an implementation manifest for all 41 current representatives. The accepted 13-week M5 captures are hash-bound and cover this scope, so no new data collector is required. Tests and data evaluation remain pending; no independent-confirmation or economic claim is made.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The frozen evaluator, exact 41-representative scope, targeted tests, and implementation manifest already exist and match the accepted screen requirements. No edits or new capture gate are needed; accepted development and replacement data cover the frozen scope. The test suite and data evaluation were not executed in this inspection-only session, so no structural result is claimed.",
     "tests_requested": [
-      "PYTHONPATH=. python -m unittest tests.test_mean_reversion_epoch25_screen tests.test_trend_momentum_epoch24_screen -v",
-      "Run the repository's standard exact-head CI suite before evaluating the accepted captures."
+      "tests/test_mean_reversion_epoch25_screen.py",
+      "Evaluate research_v3/mean_reversion_epoch25_screen.py with the frozen manifest and accepted development and replacement ZIPs."
     ]
   },
   "project_snapshot": {
@@ -141,5 +80,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }
