@@ -1,4 +1,5 @@
 {
+  "failed_or_timeout_invocations": 8,
   "invocations": [
     {
       "actual_credit_usage": null,
@@ -1472,33 +1473,44 @@
       "timestamp": "2026-09-26T20:00:39Z"
     },
     {
-      "timestamp": null,
-      "timestamp_limitation": "Exact subprocess start/end timestamp was not durably recorded; workflow run 36267653262 is the verified source.",
-      "provider": "github-copilot-cli",
-      "model_requested": "auto",
-      "actual_model_identity": null,
       "actual_credit_usage": null,
+      "actual_model_identity": null,
+      "durable_request_basis_next_state_sha256": "b9ff19621129925c8434aa326d972f27e688417590b9e74584b1ca27acd9f575",
+      "evidence_epoch": 32,
+      "historical_reconciliation": true,
+      "material_state_advancement": false,
+      "model_requested": "auto",
+      "outcome": "TIMEOUT_RECONCILED",
+      "provider": "github-copilot-cli",
+      "purpose": "GENERAL_AI_IMPLEMENTATION",
       "request_fingerprint": null,
       "request_fingerprint_limitation": "The timed-out attempt escaped before runtime invocation accounting; its exact forward fingerprint was not durably recorded.",
-      "purpose": "GENERAL_AI_IMPLEMENTATION",
-      "evidence_epoch": 32,
-      "outcome": "TIMEOUT_RECONCILED",
       "retryable": true,
-      "material_state_advancement": false,
-      "historical_reconciliation": true,
       "source_workflow_run_id": 36267653262,
-      "durable_request_basis_next_state_sha256": "b9ff19621129925c8434aa326d972f27e688417590b9e74584b1ca27acd9f575"
+      "timestamp": null,
+      "timestamp_limitation": "Exact subprocess start/end timestamp was not durably recorded; workflow run 36267653262 is the verified source."
+    },
+    {
+      "actual_credit_usage": null,
+      "actual_model_identity": null,
+      "evidence_epoch": 32,
+      "material_state_advancement": true,
+      "model_requested": "auto",
+      "outcome": "SUCCESS",
+      "provider": "github-copilot-cli",
+      "purpose": "GENERAL_AI_IMPLEMENTATION",
+      "request_fingerprint": "36703ad3bd3a6fe9751dbce0c707fe990c0d8fa24d9e4afd56e34f6e801e8b57",
+      "retryable": false,
+      "timestamp": "2026-09-26T21:29:08Z"
     }
   ],
-  "measurement_scope": "runtime provider attempts; one verified historical Epoch33 timeout reconciled from workflow evidence; forward handled success, timeout, transport-failure and rejected attempts are counted; internal CLI credits and auto-selected model identity remain unknown",
-  "provider_invocations": 114,
+  "material_state_advancing_invocations": 106,
+  "measurement_scope": "runtime provider attempts; all handled success, timeout, transport-failure and rejected attempts are counted; internal CLI credits and auto-selected model identity remain unknown",
+  "provider_attempts": 115,
+  "provider_invocations": 115,
   "quota_failures": 0,
   "schema": "mxm.greenfield.provider-usage.v1",
-  "successful_implementation_invocations": 56,
+  "successful_implementation_invocations": 57,
   "successful_reasoning_invocations": 50,
-  "provider_attempts": 114,
-  "failed_or_timeout_invocations": 8,
-  "timeout_invocations": 1,
-  "material_state_advancing_invocations": 105,
-  "historical_limitation": "Exact provider credit usage and actual auto-selected model identity for the reconciled timed-out Epoch33 attempt cannot be reconstructed and are intentionally left null."
+  "timeout_invocations": 1
 }
