@@ -35,3 +35,12 @@ jobs:
             tests.test_general_ai_reasoning_provider \
             tests.test_general_ai_implementation_executor
           python -m py_compile research_v3/research_spec_kernel.py research_v3/epoch27_close.py
+      - name: Release validated exact-head semantic continuation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run autonomous-research-runtime-v2.yml --ref main \
+            -f mode=resume \
+            -f predecessor_ci_head="${GITHUB_SHA}" \
+            -f predecessor_ci_conclusion=success \
+            -f predecessor_ci_run_id="${GITHUB_RUN_ID}"
