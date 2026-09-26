@@ -7,7 +7,7 @@ from research_v3.general_ai_director_bridge import drain, project_snapshot
 from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected
 from research_v3.execution_router import deterministic_operation_required
 from research_v3.deterministic_operation_executor import execute_chain as execute_deterministic_chain
-from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, build_reasoning_request, AIReasoningProviderError
+from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
 from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso, sha256_file
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
 
@@ -185,8 +185,10 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             continue
         if reasoning_required(state):
             prior_authority=load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{}) or {}
+            accepted_authority=load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json",{}) or {}
             if (prior_authority.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED"
-                    and prior_authority.get("request_id")==build_reasoning_request(root)["request_id"]):
+                    and prior_authority.get("evidence_epoch")==state.get("current_research_evidence_epoch")
+                    and accepted_authority.get("source_request_id")!=prior_authority.get("request_id")):
                 return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_EXTERNAL_AUTHORITY",
                         "cycles":cycle-1,"trace":trace,"request":prior_authority,"next_state":state}
             blocked=_provider_unavailable(root,state,"GENERAL_AI_REASONING")
