@@ -43,6 +43,7 @@ REQUEST_REL=Path("research_v3/ai_director/AI_REASONING_REQUEST.json")
 RESPONSE_REL=Path("research_v3/ai_director/AI_REASONING_RESPONSE.json")
 GATE_REL=Path("research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json")
 PROPOSAL_DIR=Path("research_v3/ai_director/proposals")
+RAW_CANDIDATE_DIR=Path("research_v3/ai_director/raw_candidates")
 
 BASE_AUTHORITIES=(
     "research_v3/RESEARCH_CONTRACT_V3.json",
@@ -609,6 +610,14 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
     if not isinstance(refs,list) or not refs:
         raise AIProposalRejected("provider candidate authority_refs must be non-empty")
     refs=[str(x) for x in refs]
+    # A guessed directory may be resolved only to a unique supplied basename.
+    # An existing artifact outside the packet remains forbidden.
+    for i, ref in enumerate(refs):
+        if ref in allowed or (root/ref).exists():
+            continue
+        matches=[known for known in allowed if Path(known).name==Path(ref).name]
+        if len(matches)==1:
+            refs[i]=matches[0]
     unknown=[x for x in refs if x not in allowed]
     if unknown:
         sanitized=[x for x in unknown if re.fullmatch(r"[A-Za-z0-9_./-]{1,220}",x)]
@@ -719,11 +728,22 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         return gate
 
     context=_context_payload(root,request)
+    raw_path=root/RAW_CANDIDATE_DIR/f"{request['request_id']}.json"
+    saved=json.loads(raw_path.read_text(encoding="utf-8")) if raw_path.is_file() else {}
+    if saved and (saved.get("request_id")!=request["request_id"] or saved.get("evidence_bundle_sha256")!=request["evidence_bundle_sha256"]):
+        raise AIProposalRejected("saved raw candidate has mismatched evidence binding")
     correction=None; errors=[]; chosen_meta=None; proposal=None
     model=os.environ.get("MXM_COPILOT_MODEL",DEFAULT_MODEL).strip() or DEFAULT_MODEL
     for attempt in range(1):
         try:
-            candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
+            if saved:
+                candidate,meta=saved["candidate"],saved["provider_meta"]
+            else:
+                candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
+                atomic_write_json(raw_path,{"request_id":request["request_id"],
+                    "evidence_bundle_sha256":request["evidence_bundle_sha256"],
+                    "candidate":candidate,"provider_meta":meta or {},"captured_utc":iso()})
+                sink.checkpoint("general_ai_raw_candidate_before_routing",None)
             if candidate.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED":
                 requested=str(candidate.get("requested_authority_or_class") or "")[:220]
                 rationale=str(candidate.get("rationale") or "")[:700]
