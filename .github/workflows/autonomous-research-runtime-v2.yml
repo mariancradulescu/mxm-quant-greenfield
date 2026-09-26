@@ -250,7 +250,16 @@ jobs:
             --git-checkpoint \
             --git-push \
             --max-cycles 8 | tee /tmp/mxm-continuation.json
-          status="$(jq -r '.status' /tmp/mxm-continuation.json)"
+          status="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          raw=Path('/tmp/mxm-continuation.json').read_text()
+          start=raw.rfind('\\n{\\n  "cycles"')
+          if start < 0:
+              raise SystemExit("No continuation result object in runtime output")
+          print(json.loads(raw[start+1:])["status"])
+          PY
+          )"
           if [[ "${status}" == "PROPOSAL_REJECTED_PRE_REGISTRY" || "${status}" == "MATERIAL_INTEGRITY_FAILURE" ]]; then
             echo "Technical recovery required: ${status}; no follow-on semantic dispatch."
             exit 1
