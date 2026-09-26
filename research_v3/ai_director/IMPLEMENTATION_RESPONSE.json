@@ -1,4 +1,81 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "3bf4342ef30414ee6350fde7b186a0b3fc9306d9",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "3bf4342ef30414ee6350fde7b186a0b3fc9306d9",
+    "predecessor_run_id": 36274408981
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_proposal_file_sha256": "af1e3d62b83f8265e92ebbdeec5d703fb524936dc08032a69fb651aac0ccb230",
+      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_de9da14ab5a5c49ceceaded07e20c776.json",
+      "data_scope": {
+        "accepted_capture_bytes_transport_materialization_only": true,
+        "frontier": "All 41 current structural representatives",
+        "interval_utc": {
+          "end": "2026-09-13T23:59:59Z",
+          "start": "2026-06-15T00:00:00Z"
+        },
+        "new_market_data_requested": false,
+        "resolution": "M5"
+      },
+      "freeze_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+      "implementation_ref": "research_v3/epoch34_composite_causal_ml_regime_screen.py",
+      "operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
+      "safety": {
+        "economic_outcome_opened": false,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempt_consumed": false
+      },
+      "selected_action": "Implement an Epoch34 composite causal-ML and regime-context structural screen.",
+      "test_refs": [
+        "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+        "tests/test_epoch34_deterministic_operation.py"
+      ]
+    },
+    "external_data_gate": null,
+    "implementation_id": "MXM_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_SCREEN_V1",
+    "next_research_state": {
+      "accepted_capture_transport_materialization_required": true,
+      "ai_reasoning_required": false,
+      "authority_ci_required": true,
+      "deterministic_next_operation": {
+        "copilot_reasoning_required": false,
+        "exact_head_green_required_before_execution": true,
+        "implementation_ai_required": false,
+        "new_semantic_judgment_required": false,
+        "operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json"
+      },
+      "external_data_gate": null,
+      "external_data_required": false,
+      "green_implementation_artifacts": [
+        "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
+        "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+        "research_v3/deterministic_operation_executor.py",
+        "research_v3/epoch34_composite_causal_ml_regime_screen.py",
+        "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+        "tests/test_epoch34_deterministic_operation.py"
+      ],
+      "implementation_ai_required": false,
+      "implementation_satisfied": true,
+      "implementation_scope_complete": true,
+      "later_step_after_epoch34_result": "Fresh AI reasoning interprets the accepted Epoch34 structural result and selects the next legal research step.",
+      "next_action": "RUN_FROZEN_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+      "next_deterministic_operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
+      "research_judgment_required": false,
+      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a prospectively frozen causal-ML-versus-regime-context screen across all 41 current representatives, with fail-closed frontier/history and capture-hash validation, targeted tests, and an authorized deterministic operation. The accepted 13-week captures are already hash-bound; their bytes may need transport materialization outside Git, which is not new data acquisition. Exact-head CI is still required; tests were not run because shell tools are prohibited.",
+    "tests_requested": [
+      "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+      "tests/test_epoch34_deterministic_operation.py",
+      "Exact-head CI for the changed files, including Python compilation and both targeted test modules"
+    ]
+  },
   "basis_next_state_sha256": "4de21fb73a2a7cb0c4513d960602623f006c99eae101f49092dd603ad5c68ad1",
   "changed_paths": [
     "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
@@ -85,5 +162,5 @@
   },
   "request_fingerprint": "1febc8a25d7645b33453267f26b024102d4a4d7776c3e23daa2e88059db25552",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }

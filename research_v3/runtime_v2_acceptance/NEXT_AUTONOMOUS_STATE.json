@@ -1,5 +1,6 @@
 {
   "accepted_capture_ref": "evidence/BROKER_NATIVE_COMPETITION_UNIVERSE_CAPTURE_EPOCH22_ACCEPTANCE_V1.json",
+  "accepted_capture_transport_materialization_required": true,
   "accepted_capture_zip_sha256": "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9",
   "accepted_current_broker_canonical_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
   "accepted_development_capture_sufficient_for_current_decision": true,
@@ -27,9 +28,11 @@
   "active_target_symbol": null,
   "additional_authority_acceptance_ref": "research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json",
   "additional_authority_request_ref": "research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",
+  "ai_reasoning_required": false,
   "alignment_prerequisite_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
   "all_frontier_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
+  "authority_ci_required": true,
   "authorizing_evidence_epoch": 33,
   "blocked_scope_id": "RELATIVE_VALUE_COINTEGRATION",
   "blocked_scopes_untouched": [
@@ -162,7 +165,13 @@
   "data_capture": "ACCEPTED_HASH_VERIFIED_PRE_OUTCOME",
   "data_requirement": "NONE_NEW_REQUIRED_USES_EXISTING_13W_M5_CAPTURE",
   "decision_basis": "Outcome-blind governance and frontier authority; no new mechanism, symbol or panel prospectively selected.",
-  "deterministic_next_operation": null,
+  "deterministic_next_operation": {
+    "copilot_reasoning_required": false,
+    "exact_head_green_required_before_execution": true,
+    "implementation_ai_required": false,
+    "new_semantic_judgment_required": false,
+    "operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json"
+  },
   "deterministic_operation_execution_ref": "research_v3/EPOCH21_DETERMINISTIC_OPERATION_EXECUTION_V1.json",
   "development_evidence_sufficient_for_current_decision": true,
   "development_evidence_sufficient_for_mechanism_specific_outer": false,
@@ -276,8 +285,16 @@
   "frozen_structural_evaluation_provider_calls_delta": 0,
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+  "green_implementation_artifacts": [
+    "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
+    "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+    "research_v3/deterministic_operation_executor.py",
+    "research_v3/epoch34_composite_causal_ml_regime_screen.py",
+    "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+    "tests/test_epoch34_deterministic_operation.py"
+  ],
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_ai_scope": "Novel repository code needed: (1) compute trailing 13-week rolling TR tercile regime label at each existing frozen breakout event's onset bar from already-captured 13W M5 canonical data, (2) stratify existing follow-through/persistence structural statistics by regime bucket per representative, (3) emit a new structural evidence artifact. No existing deterministic routine performs regime labeling or regime-stratified aggregation.",
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
@@ -301,9 +318,9 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": false,
+  "implementation_satisfied": true,
   "implementation_scope": "Add the missing repository machinery for the prospectively specified Epoch34 composite structural screen, its frozen specification, fail-closed frontier/history binding checks, and independent structural-result reporting. Keep it non-economic; do not acquire data or launch economic evaluation.",
-  "implementation_scope_complete": false,
+  "implementation_scope_complete": true,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -349,6 +366,7 @@
     "Separate cost and independent-validation prerequisites before any prospective economic envelope is considered."
   ],
   "later_step": "After result acceptance, obtain fresh AI_INTERPRET reasoning to select the next frontier action.",
+  "later_step_after_epoch34_result": "Fresh AI reasoning interprets the accepted Epoch34 structural result and selects the next legal research step.",
   "latest_material_structural_result_ref": "evidence/EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
   "latest_prospective_freeze_ref": "research_v3/EPOCH32_RELATIVE_VALUE_PAIR_STRUCTURE_FRONTIER_FREEZE_V1.json",
   "liveness_policy": {
@@ -372,8 +390,8 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "IMPLEMENT_EPOCH34_COMPOSITE_CAUSAL_ML_CROSS_MECHANISM_STRUCTURAL_SCREEN",
-  "next_deterministic_operation_ref": null,
+  "next_action": "RUN_FROZEN_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+  "next_deterministic_operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "no_economic_outcome_requested": true,
@@ -485,6 +503,7 @@
   "source_ai_proposal_hash": "e64f786d7a366a7d583c6ccc887231c1d39c4c48bbb5b19675aab30316eafa5c",
   "source_ai_proposal_id": "epoch34-causal-ml-regime-composite",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_implementation_id": "MXM_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_SCREEN_V1",
   "source_runtime_operation_id": "op_4cb258dcb0fa1d2b2e69bf3995ef250d",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 27,
@@ -495,7 +514,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "IMPLEMENTATION_REQUIRED",
+  "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -563,6 +582,5 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true,
-  "ai_reasoning_required": false
+  "uses_only_existing_accepted_bytes": true
 }
