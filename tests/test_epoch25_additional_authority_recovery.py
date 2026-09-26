@@ -10,6 +10,12 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
+    def test_current_epoch_has_no_preexisting_deterministic_operation_to_guess(self):
+        from research_v3.general_ai_reasoning_provider import build_reasoning_request
+        request=build_reasoning_request(ROOT)
+        self.assertEqual(request["evidence_epoch_seen"],25)
+        self.assertEqual(request["authorized_deterministic_operations_current_epoch"],[])
+
     def test_current_packet_includes_frontier_and_capture_authorities(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
         _,refs=_authority_context(ROOT,state)

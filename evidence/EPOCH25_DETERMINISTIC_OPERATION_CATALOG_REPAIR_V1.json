@@ -1,0 +1,29 @@
+{
+  "schema": "mxm.greenfield.epoch25-deterministic-operation-catalog-repair.v1",
+  "status": "IMPLEMENTED_REQUIRES_EXACT_HEAD_CI",
+  "recorded_utc": "2026-09-26T03:40:00Z",
+  "observed_failure": {
+    "rejected_request_id": "reason_191d29e9830013f0034094344011adbe",
+    "rejection_ref": "research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",
+    "reason": "proposed deterministic operation has unsupported schema"
+  },
+  "root_cause": "Semantic AI was told to bind an existing deterministic operation but was not given a machine-derived catalog of which repository refs actually satisfy the deterministic operation schema for the current evidence epoch. It therefore repurposed a non-operation authority/context ref and was correctly rejected.",
+  "repair": [
+    "Derive an exact current-evidence-epoch deterministic-operation catalog from repository bytes.",
+    "Expose that catalog in the reasoning request and authoritative context.",
+    "Permit next_deterministic_operation_ref only from that catalog with exact operation-name match.",
+    "Explicitly forbid repurposing evidence/context/freeze/routing authority files as deterministic operations.",
+    "When no matching operation exists, require explicit implementation AI, exact new-data gate, or another legally routed action."
+  ],
+  "current_epoch_catalog_expected_count": 0,
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}

@@ -194,6 +194,46 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         rows.append(item); kept.append(rel)
     return rows,kept
 
+def _authorized_deterministic_operation_catalog(root:Path,evidence_epoch:int)->list[dict[str,Any]]:
+    """Return only executable deterministic operation authorities for this epoch.
+
+    Semantic AI must never guess that an evidence/context file is a deterministic
+    operation.  The catalog is derived from repository bytes and is the sole set
+    of refs the model may place in next_deterministic_operation_ref.
+    """
+    rows:list[dict[str,Any]]=[]
+    research_root=root/"research_v3"
+    if not research_root.is_dir():
+        return rows
+    for path in research_root.rglob("*.json"):
+        try:
+            doc=json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if doc.get("schema")!="mxm.greenfield.deterministic-next-operation.v1":
+            continue
+        if doc.get("status")!="AUTHORIZED_DETERMINISTIC_NON_ECONOMIC_OPERATION":
+            continue
+        if int(doc.get("evidence_epoch") or 0)!=int(evidence_epoch):
+            continue
+        policy=doc.get("execution_policy") or {}
+        effect=doc.get("accounting_effect") or {}
+        if (
+            policy.get("new_semantic_judgment_required") is True
+            or policy.get("copilot_reasoning_required") is True
+            or int(effect.get("v2_attempts") or 0)!=0
+            or int(effect.get("economic_outcomes") or 0)!=0
+        ):
+            continue
+        rows.append({
+            "ref":str(path.relative_to(root)),
+            "operation_name":str(doc.get("operation_name") or ""),
+            "implementation_ai_required":policy.get("implementation_ai_required") is True,
+        })
+    rows.sort(key=lambda row:(row["operation_name"],row["ref"]))
+    return rows
+
+
 def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     root=Path(root_value).resolve()
     next_state=_load(root,NEXT_REL)
@@ -201,6 +241,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     report=validate_repository_state(root)
     authorities,refs=_authority_context(root,next_state)
     evidence=current_evidence_binding(root)
+    deterministic_catalog=_authorized_deterministic_operation_catalog(root,int(evidence["evidence_epoch"]))
     core={
         "provider_version":PROVIDER_VERSION,
         "research_head":_head(root),
@@ -236,6 +277,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "accounting":snapshot,
         "universe_basis":core["universe_basis"],
         "open_families":core["current_open_mechanism_families"],
+        "authorized_deterministic_operations_current_epoch":deterministic_catalog,
     }
     request_id="reason_"+sha256_bytes(canonical_bytes(decision_fingerprint))[:32]
     return {
@@ -265,6 +307,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "provisional_research_artifacts":evidence["provisional_research_artifacts"],
         "universe_basis":core["universe_basis"],
         "current_open_mechanism_families":core["current_open_mechanism_families"],
+        "authorized_deterministic_operations_current_epoch":deterministic_catalog,
         "created_utc":iso(),
     }
 
@@ -297,6 +340,7 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
                 "must_preserve":["free_margin","recovery_capacity","anti_ruin"]},
             "capacity":{"base_remaining":64,"methodology_replacement_total":15,
                 "lifetime_economic_exposure":20,"outcomes_opened":28},
+            "authorized_deterministic_operations_current_epoch":list(request.get("authorized_deterministic_operations_current_epoch") or []),
             "causal_prohibitions":["NO_C032_RERUN","NO_C032_OUTCOME_CAPTURE_REUSE",
                 "NO_PROTECTED_FORWARD_LEAKAGE","NO_RETROACTIVE_TUNING",
                 "NO_OUTCOME_DRIVEN_SCOPE_SELECTION"],
@@ -336,7 +380,9 @@ Important boundaries:
 - Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
 - Cite only supplied authority refs. If an additional authority is needed, return only status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, and rationale; the runtime will validate it before a new fingerprint.
 - Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
-- Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Deterministic-in-principle is NOT enough: if next_action is non-empty and implementation_ai_required=false, bind next_deterministic_operation_ref to an ALREADY EXISTING authorized deterministic operation that can execute that exact action. If no such executable authority exists, route the missing machinery as implementation AI with explicit implementation_scope. Never publish an unrouted non-empty action and never invent a deterministic-operation ref.
+- Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Deterministic-in-principle is NOT enough.
+- next_deterministic_operation_ref may reference ONLY a ref listed in authorized_deterministic_operations_current_epoch, and its operation_name must exactly equal next_action. Evidence, context, freeze, selection, or routing-contract files are NEVER deterministic-operation refs merely because their names contain "authority" or "execution". If the catalog is empty or has no exact operation_name match, do not invent or repurpose a ref: route genuinely missing repository machinery as implementation AI with explicit implementation_scope, request exact new data through data_policy when data is the true dependency, or choose another legal routed action.
+- Never publish an unrouted non-empty action.
 - If new broker data is genuinely required, express it through data_policy.new_market_data_requested=true with the exact minimal acquisition request; do not disguise a data gate as implementation AI.
 - The proposal itself is non-economic and consumes zero attempts. Return concise decision rationale, not chain-of-thought.
 """
