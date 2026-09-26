@@ -1,75 +1,89 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "7715be10593853c65edf777a5f952ea68837a945",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "7715be10593853c65edf777a5f952ea68837a945",
-    "predecessor_run_id": 36223028530
-  },
   "accepted_output": {
     "decision": {
       "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
       "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "later_step": "After exact-head CI is green, run the frozen evaluator against the already accepted hash-bound captures and audit the complete 41-representative result. No economic promotion or independent-confirmation claim is authorized.",
-      "method": "One-hour trailing and forward cross-sectional return percentiles; daily centered co-ranking scores; synchronized five-calendar-day moving-block inference; Benjamini-Yekutieli correction across the full 41-test family.",
+      "later_step": "After the targeted test is verified, run the frozen evaluator against the accepted hash-bound captures and audit coverage and output for all 41 representatives. Do not promote economically or describe development data as independent confirmation.",
       "safety": {
-        "economic_outcomes_opened": false,
+        "economic_outcome_opened": false,
+        "independent_confirmation_claimed": false,
         "live_orders_authorized": false,
         "protected_evidence_opened": false,
         "v2_attempts_consumed": 0
       },
-      "scope": "All 41 current structural representatives using the accepted Epoch23 M5 captures and bound ZIP hashes.",
-      "selected_mechanism_family": "CROSS_SECTIONAL_RANKING",
-      "test_ref": "tests/test_cross_sectional_ranking_epoch26_screen.py"
+      "scope": "All 41 current structural representatives, in authority order, using the accepted hash-bound Epoch23 M5 development and replacement captures.",
+      "test_ref": "tests/test_cross_sectional_ranking_epoch26_screen.py",
+      "verification": {
+        "accepted_capture_hash_bindings_present": true,
+        "event_independence_enforced_by_nonoverlapping_12_bar_anchor_stride": true,
+        "exact_head_ci": "GREEN",
+        "freeze_precedes_screen_result": true,
+        "full_41_test_family_multiplicity_enforced": "BENJAMINI_YEKUTIELI_FDR",
+        "new_external_data_required": false,
+        "screen_evaluator_run": false,
+        "synchronized_timestamps_and_minimum_panel_breadth_enforced": true
+      }
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-ranking-structural-wave",
     "next_research_state": {
-      "next_action": "RUN_EXACT_HEAD_CI_THEN_EXECUTE_FROZEN_NON_ECONOMIC_SCREEN",
-      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
+      "next_action": "RUN_FROZEN_CROSS_SECTIONAL_RANKING_SCREEN_AND_AUDIT_FULL_FRONTIER",
+      "status": "READY_FOR_FROZEN_NON_ECONOMIC_SCREEN_EXECUTION"
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a prospective freeze, exact-scope evaluator, and targeted tests for non-economic cross-sectional ranking over all 41 accepted representatives. The accepted capture artifacts already bind the required M5 scope; no new collector or market-data acquisition is needed. The evaluator has not been run on those captures, and tests were not run because shell tools were prohibited.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The frozen 41-representative cross-sectional screen, deterministic evaluator, and targeted tests are already present and bound to the accepted M5 captures. The accepted exact-head CI is green; no code changes or new market data are needed. The evaluator has not been run, and no research result is claimed.",
     "tests_requested": [
       "python -m unittest discover -s tests -p test_cross_sectional_ranking_epoch26_screen.py",
-      "Exact-head CI green before evaluating the accepted captures"
+      "Exact-head CI is already recorded green; execute the frozen evaluator only as the later research step."
     ]
   },
-  "basis_next_state_sha256": "c6af53589cd06dcf788330adc437e93b39afc792b0fe2cdbb6d98eb2b30841b3",
-  "changed_paths": [
-    "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-    "research_v3/cross_sectional_ranking_epoch26_screen.py",
-    "tests/test_cross_sectional_ranking_epoch26_screen.py"
-  ],
-  "created_utc": "2026-09-26T06:11:31Z",
+  "basis_next_state_sha256": "579ce78cd57b8f169004022c2965243626b66fa57e54e3464c8a60f6894aa7f7",
+  "changed_paths": [],
+  "created_utc": "2026-09-26T06:22:16Z",
+  "exact_head": {
+    "green": true,
+    "head": "199f7dd2cb22557cbbbb527f65d724537b25a9a4",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "199f7dd2cb22557cbbbb527f65d724537b25a9a4",
+    "predecessor_run_id": 36223423745
+  },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
       "evaluator_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
       "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "later_step": "After exact-head CI is green, run the frozen evaluator against the already accepted hash-bound captures and audit the complete 41-representative result. No economic promotion or independent-confirmation claim is authorized.",
-      "method": "One-hour trailing and forward cross-sectional return percentiles; daily centered co-ranking scores; synchronized five-calendar-day moving-block inference; Benjamini-Yekutieli correction across the full 41-test family.",
+      "later_step": "After the targeted test is verified, run the frozen evaluator against the accepted hash-bound captures and audit coverage and output for all 41 representatives. Do not promote economically or describe development data as independent confirmation.",
       "safety": {
-        "economic_outcomes_opened": false,
+        "economic_outcome_opened": false,
+        "independent_confirmation_claimed": false,
         "live_orders_authorized": false,
         "protected_evidence_opened": false,
         "v2_attempts_consumed": 0
       },
-      "scope": "All 41 current structural representatives using the accepted Epoch23 M5 captures and bound ZIP hashes.",
-      "selected_mechanism_family": "CROSS_SECTIONAL_RANKING",
-      "test_ref": "tests/test_cross_sectional_ranking_epoch26_screen.py"
+      "scope": "All 41 current structural representatives, in authority order, using the accepted hash-bound Epoch23 M5 development and replacement captures.",
+      "test_ref": "tests/test_cross_sectional_ranking_epoch26_screen.py",
+      "verification": {
+        "accepted_capture_hash_bindings_present": true,
+        "event_independence_enforced_by_nonoverlapping_12_bar_anchor_stride": true,
+        "exact_head_ci": "GREEN",
+        "freeze_precedes_screen_result": true,
+        "full_41_test_family_multiplicity_enforced": "BENJAMINI_YEKUTIELI_FDR",
+        "new_external_data_required": false,
+        "screen_evaluator_run": false,
+        "synchronized_timestamps_and_minimum_panel_breadth_enforced": true
+      }
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-ranking-structural-wave",
     "next_research_state": {
-      "next_action": "RUN_EXACT_HEAD_CI_THEN_EXECUTE_FROZEN_NON_ECONOMIC_SCREEN",
-      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
+      "next_action": "RUN_FROZEN_CROSS_SECTIONAL_RANKING_SCREEN_AND_AUDIT_FULL_FRONTIER",
+      "status": "READY_FOR_FROZEN_NON_ECONOMIC_SCREEN_EXECUTION"
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a prospective freeze, exact-scope evaluator, and targeted tests for non-economic cross-sectional ranking over all 41 accepted representatives. The accepted capture artifacts already bind the required M5 scope; no new collector or market-data acquisition is needed. The evaluator has not been run on those captures, and tests were not run because shell tools were prohibited.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The frozen 41-representative cross-sectional screen, deterministic evaluator, and targeted tests are already present and bound to the accepted M5 captures. The accepted exact-head CI is green; no code changes or new market data are needed. The evaluator has not been run, and no research result is claimed.",
     "tests_requested": [
       "python -m unittest discover -s tests -p test_cross_sectional_ranking_epoch26_screen.py",
-      "Exact-head CI green before evaluating the accepted captures"
+      "Exact-head CI is already recorded green; execute the frozen evaluator only as the later research step."
     ]
   },
   "project_snapshot": {
@@ -88,5 +102,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }
