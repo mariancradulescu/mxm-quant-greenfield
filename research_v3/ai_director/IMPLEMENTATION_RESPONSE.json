@@ -1,4 +1,61 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "bd705c9ab9619d55a60f90896469ae997ebfcdc5",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "bd705c9ab9619d55a60f90896469ae997ebfcdc5",
+    "predecessor_run_id": 36259897628
+  },
+  "accepted_output": {
+    "decision": {
+      "causal_controls": [
+        "Past-only lagged features",
+        "Label observed only after prediction",
+        "Chronological expanding walk-forward evaluation",
+        "Gap-aware segment resets",
+        "Daily clustered inference",
+        "Holm family-wise multiplicity control across 41 representatives"
+      ],
+      "data_reuse": [
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
+      ],
+      "economic_effect": {
+        "candidate_identity_created": false,
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "search_budget_change": 0,
+        "v2_attempts_consumed": 0
+      },
+      "freeze_ref": "research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json",
+      "implementation_ref": "research_v3/causal_ml_predictive_state_epoch31_screen.py",
+      "implementation_scope": "Bound non-economic causal ML predictive-state screen only",
+      "later_step": "After exact-head-green validation, run the frozen evaluator and publish only the resulting non-economic structural evidence; preserve the remainder of the accepted decision for subsequent research-state handling.",
+      "test_ref": "tests/test_causal_ml_predictive_state_epoch31_screen.py"
+    },
+    "external_data_gate": null,
+    "implementation_id": "epoch31-causal-ml-predictive-state-screen-v1",
+    "next_research_state": {
+      "ai_reasoning_required": true,
+      "green_implementation_artifacts": [
+        "research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json",
+        "research_v3/causal_ml_predictive_state_epoch31_screen.py",
+        "tests/test_causal_ml_predictive_state_epoch31_screen.py"
+      ],
+      "implementation_ai_required": false,
+      "implementation_scope_complete": true,
+      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
+      "research_judgment_required": true,
+      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a prospective Epoch 31 freeze, deterministic causal online logistic predictive-state evaluator, ZIP-bound accepted-capture reuse, chronological walk-forward scoring, daily time-clustered sign-flip inference, Holm correction across all 41 representatives, and targeted tests. No external data gate is required because the accepted broker-native M5 captures cover the exact frozen scope.",
+    "tests_requested": [
+      "tests/test_causal_ml_predictive_state_epoch31_screen.py"
+    ]
+  },
   "basis_next_state_sha256": "c1b1c7f5035b1ae4eba0adccc9bc4275441b4f3d1aee5620125388080a144d4a",
   "changed_paths": [
     "research_v3/EPOCH31_CAUSAL_ML_PREDICTIVE_STATE_FRONTIER_FREEZE_V1.json",
@@ -65,5 +122,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
