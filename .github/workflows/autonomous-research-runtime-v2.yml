@@ -206,7 +206,8 @@ jobs:
 
       - name: Install runtime test dependency for implementation
         if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION' }}
-        run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
+        run: |
+          python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
 
       - name: General AI focused tests
         if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
