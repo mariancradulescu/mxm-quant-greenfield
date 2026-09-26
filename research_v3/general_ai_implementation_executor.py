@@ -202,6 +202,14 @@ def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,A
     payload=json.loads(json.dumps(out))
     ns=dict(payload.get("next_research_state") or {})
     status=str(ns.get("status") or "")
+    # A successful no-code implementation inspection means the implementation
+    # requirement is satisfied. Never let provider/checkpoint metadata turn the
+    # same capability check back into implementation authority.
+    if payload.get("status")=="COMPLETE_NON_ECONOMIC" and not changed_paths:
+        ns["implementation_ai_required"]=False
+        ns["implementation_satisfied"]=True
+        ns["user_action_required"]=False
+        payload["next_research_state"]=ns
     if status.startswith("PENDING_EXACT_HEAD_GREEN") or status.endswith("REQUIRES_EXACT_HEAD_GREEN"):
         # Preserve result-specific provenance (completed report, family result, etc.)
         # while closing implementation routing after an already-green exact head.
@@ -429,6 +437,17 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
     before=project_snapshot(root); protected=protected_snapshot(root); state_hash=sha256_bytes(canonical_bytes(next_state))
     green=exact_head_green(root)
     pending=load_json(root/RESPONSE_REL,{}) or {}
+    # Exact same semantic implementation request already completed with no code
+    # change: normalize and reuse it without calling the provider again.
+    if pending.get("status")=="IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE" and pending.get("basis_next_state_sha256")==state_hash:
+        out=pending.get("implementation_output") or {}
+        _validate_output(root,out)
+        accepted_out=_post_green_output(out,[])
+        if accepted_out["status"]=="EXTERNAL_DATA_REQUIRED":
+            published=_publish_external_gate(root,accepted_out,before)
+        else:
+            published=_publish_next(root,accepted_out,before)
+        return {"status":"IMPLEMENTATION_ALREADY_SATISFIED_NO_PROVIDER","output":accepted_out,"next_state":published,"provider":None,"provider_called":False}
     if pending.get("status")=="PENDING_EXACT_HEAD_GREEN" and pending.get("basis_next_state_sha256")==state_hash:
         if not green["green"]: return {"status":"PENDING_EXACT_HEAD_GREEN","exact_head":green}
         out=pending["implementation_output"]; _validate_output(root,out)
