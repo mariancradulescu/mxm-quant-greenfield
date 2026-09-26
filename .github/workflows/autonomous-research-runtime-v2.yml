@@ -2,6 +2,19 @@ name: Autonomous Research Runtime V2 Supervisor
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        type: string
+        required: false
+      predecessor_ci_head:
+        type: string
+        required: false
+      predecessor_ci_conclusion:
+        type: string
+        required: false
+      predecessor_ci_run_id:
+        type: string
+        required: false
   push:
     branches:
       - main
@@ -21,6 +34,9 @@ env:
   TARGET_BRANCH: performance-research-v3-20260922
   MXM_RUNTIME_TARGET_BRANCH: performance-research-v3-20260922
   PYTHONUNBUFFERED: "1"
+  MXM_PREDECESSOR_CI_HEAD: ${{ inputs.predecessor_ci_head }}
+  MXM_PREDECESSOR_CI_CONCLUSION: ${{ inputs.predecessor_ci_conclusion }}
+  MXM_PREDECESSOR_CI_RUN_ID: ${{ inputs.predecessor_ci_run_id }}
 
 jobs:
   supervisor:
@@ -101,6 +117,10 @@ jobs:
             case "${final_status}" in
               BOUNDED_CONTINUATION_CHECKPOINT)
                 continue
+                ;;
+              PENDING_EXACT_HEAD_GREEN)
+                gh workflow run research-fast-path-validation.yml --ref "${TARGET_BRANCH}"
+                break
                 ;;
               *)
                 break
