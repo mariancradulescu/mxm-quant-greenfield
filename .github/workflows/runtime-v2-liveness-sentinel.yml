@@ -41,46 +41,49 @@ jobs:
         shell: bash
         run: python -m research_v3.lightweight_dispatcher classify --root . --github-output "${GITHUB_OUTPUT}"
 
-      - name: Dispatch exactly one supervisor when work is authorized
-        if: >
+      - name: Resolve exact-head authority and dispatch legal continuation
+        if: >-
           steps.route.outputs.dispatch_required == 'true' &&
-          (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success') &&
-          (steps.route.outputs.execution_class != 'SEMANTIC_REASONING' ||
-           (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'm6-preparation'))
+          (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
         env:
           GH_TOKEN: ${{ github.token }}
-          PREDECESSOR_WORKFLOW: ${{ github.event.workflow_run.name }}
-          PREDECESSOR_HEAD: ${{ github.event.workflow_run.head_sha }}
-          PREDECESSOR_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
-          PREDECESSOR_RUN_ID: ${{ github.event.workflow_run.id }}
+          EVENT_WORKFLOW: ${{ github.event.workflow_run.name }}
+          EVENT_HEAD: ${{ github.event.workflow_run.head_sha }}
+          EVENT_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          EVENT_RUN_ID: ${{ github.event.workflow_run.id }}
+          EXECUTION_CLASS: ${{ steps.route.outputs.execution_class }}
         shell: bash
         run: |
-          if [[ "${PREDECESSOR_WORKFLOW}" == "m6-preparation" ]]; then
-            ci_head="${PREDECESSOR_HEAD}"
-            ci_conclusion="${PREDECESSOR_CONCLUSION}"
-            ci_run_id="${PREDECESSOR_RUN_ID}"
-          else
-            ci_head=""
-            ci_conclusion=""
-            ci_run_id=""
+          set -euo pipefail
+          current_head="$(git rev-parse HEAD)"
+          ci_head=""
+          ci_conclusion=""
+          ci_run_id=""
+          if [[ "${EVENT_WORKFLOW}" == "m6-preparation" && "${EVENT_HEAD}" == "${current_head}" && "${EVENT_CONCLUSION}" == "success" ]]; then
+            ci_head="${EVENT_HEAD}"
+            ci_conclusion="success"
+            ci_run_id="${EVENT_RUN_ID}"
+          elif [[ "${EXECUTION_CLASS}" == "SEMANTIC_REASONING" || "${EXECUTION_CLASS}" == "AUTHORITY_CI" ]]; then
+            runs="$(curl --fail-with-body -fsS -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${current_head}&per_page=100")"
+            ci_run="$(jq -c '[.workflow_runs[] | select(.name == "m6-preparation")] | sort_by(.created_at) | last // empty' <<< "${runs}")"
+            if [[ -n "${ci_run}" ]]; then
+              ci_conclusion="$(jq -r '.conclusion // empty' <<< "${ci_run}")"
+              ci_run_id="$(jq -r '.id' <<< "${ci_run}")"
+              if [[ "${ci_conclusion}" == "success" ]]; then
+                ci_head="${current_head}"
+              elif [[ "${ci_conclusion}" == "failure" ]]; then
+                echo "Exact-head authority CI failed at ${current_head}; technical repair required (run ${ci_run_id})."
+                exit 1
+              else
+                echo "Exact-head authority CI is already queued or running (run ${ci_run_id})."
+                exit 0
+              fi
+            else
+              echo "Dispatching exact-head authority CI for ${current_head}."
+              payload="$(jq -nc --arg ref "${TARGET_BRANCH}" --arg head "${current_head}" '{ref:$ref,inputs:{authority_head:$head}}')"
+              curl --fail-with-body -fsS -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GH_TOKEN}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/m6_preparation.yml/dispatches" -d "${payload}"
+              exit 0
+            fi
           fi
-          # Pass exact m6 authority only; Supervisor completions are not research-head CI authority.
-          payload="$(CI_HEAD="${ci_head}" CI_CONCLUSION="${ci_conclusion}" CI_RUN_ID="${ci_run_id}" python - <<'PY'
-          import json, os
-          print(json.dumps({
-              "ref":"main",
-              "inputs":{
-                  "mode":"resume",
-                  "predecessor_ci_head":os.environ.get("CI_HEAD",""),
-                  "predecessor_ci_conclusion":os.environ.get("CI_CONCLUSION",""),
-                  "predecessor_ci_run_id":os.environ.get("CI_RUN_ID",""),
-              }
-          },separators=(",",":")))
-          PY
-          )"
-          curl --fail-with-body -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches" \
-            -d "${payload}"
+          payload="$(jq -nc --arg ref main --arg head "${ci_head}" --arg conclusion "${ci_conclusion}" --arg run_id "${ci_run_id}" '{ref:$ref,inputs:{mode:"resume",predecessor_ci_head:$head,predecessor_ci_conclusion:$conclusion,predecessor_ci_run_id:$run_id}}')"
+          curl --fail-with-body -fsS -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GH_TOKEN}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/autonomous-research-runtime-v2.yml/dispatches" -d "${payload}"
