@@ -35,7 +35,7 @@ from research_v3.runtime_v2_primitives import (
     sha256_file,
 )
 
-PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V3"
+PROVIDER_VERSION="MXM_GENERAL_AI_REASONING_PROVIDER_V4"
 PROVIDER_KIND="GITHUB_COPILOT_CLI"
 DEFAULT_MODEL="auto"
 NEXT_REL=Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json")
@@ -355,7 +355,14 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
              delta_refs=delta)
     p["allowed_authority_refs"]=[x["ref"] for x in
         p["admissible_inputs"]+p["historical_context"]+p["forbidden_inputs"]]
+    structural=json.loads((root/"evidence/EPOCH24_TREND_MOMENTUM_STRUCTURAL_RESULT_V1.json").read_text())
+    registry=json.loads((root/"research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json").read_text())
+    selection_authority=json.loads((root/"research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json").read_text())
     return {"request_id":request["request_id"],"eligibility_packet":p,
+            "current_frontier_content":frontier,
+            "latest_structural_result_content":structural,
+            "broker_native_representatives":registry["representatives"],
+            "frontier_selection_execution_authority":selection_authority,
             "pending_decision":{k:(request.get("next_state") or {}).get(k) for k in ("status","next_action","reason","decision_contract","supersession_ref")},
             "historical_consumed_identity_summaries":scope,
             "valid_survivors":["V2-C006","V2-C012","V2-C031"],
