@@ -2,6 +2,10 @@ name: Research Fast Path Validation
 
 on:
   workflow_dispatch:
+    inputs:
+      required_head:
+        type: string
+        required: true
 
 permissions:
   contents: read
@@ -13,7 +17,7 @@ env:
 
 jobs:
   focused:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout exact research branch
@@ -38,3 +42,35 @@ jobs:
             tests.test_general_ai_implementation_executor \
             tests.test_research_fast_path \
             tests.test_active_research_projection
+
+      - name: Resume supervisor after exact-head success
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUIRED_HEAD: ${{ inputs.required_head }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$REQUIRED_HEAD"
+          current_head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${TARGET_BRANCH}" --jq '.object.sha')"
+          test "$current_head" = "$REQUIRED_HEAD"
+          python - <<'PY'
+          from research_v3.general_ai_autonomy_loop import _material_state_signature, _blocked_scopes
+          from research_v3.runtime_v2_primitives import load_json
+          from research_v3.general_ai_reasoning_provider import build_reasoning_request
+          from research_v3.general_ai_director_bridge import NEXT_STATE_REL
+          from pathlib import Path
+          state=load_json(Path('.')/NEXT_STATE_REL,{}) or {}
+          if state.get('user_action_required') or state.get('external_data_required') or state.get('status')=='MATERIAL_INTEGRITY_FAILURE':
+              raise SystemExit('Fast CI green; durable state is externally gated')
+          if state.get('status')=='PENDING_EXACT_HEAD_GREEN':
+              print('Exact-head acceptance pending; resume supervisor')
+              raise SystemExit(0)
+          request=load_json(Path('research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json'),{}) or {}
+          if request.get('status')=='ADDITIONAL_AUTHORITY_REQUIRED' and request.get('evidence_epoch')==state.get('current_research_evidence_epoch') and request.get('request_id')==build_reasoning_request('.')['request_id']:
+              raise SystemExit('Fast CI green; unchanged authority request')
+          print('Internally actionable:',_material_state_signature(state),_blocked_scopes(Path('.')))
+          PY
+          gh workflow run autonomous-research-runtime-v2.yml --ref main \
+            -f predecessor_ci_head="$REQUIRED_HEAD" \
+            -f predecessor_ci_conclusion=success \
+            -f predecessor_ci_run_id="$GITHUB_RUN_ID"
