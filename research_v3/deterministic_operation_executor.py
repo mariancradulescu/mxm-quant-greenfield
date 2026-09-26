@@ -228,6 +228,66 @@ def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[st
     })
     return new_state
 
+def _run_epoch34_composite_screen(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    from research_v3.epoch34_composite_causal_ml_regime_screen import (
+        evaluate as evaluate_epoch34,
+        sha256_file as epoch34_sha256_file,
+    )
+
+    expected={
+        "implementation_ref":"research_v3/epoch34_composite_causal_ml_regime_screen.py",
+        "freeze_ref":"research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+        "registry_ref":"research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+        "development_zip_ref":"research_v3/runtime_v2_inputs/MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+        "replacement_zip_ref":"research_v3/runtime_v2_inputs/MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+        "result_ref":"evidence/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_RESULT_V1.json",
+        "operation_name":"RUN_FROZEN_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+        "development_zip_sha256":"64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+        "replacement_zip_sha256":"d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    }
+    for field,value in expected.items():
+        if op.get(field)!=value:
+            raise DeterministicOperationRejected(f"Epoch34 operation authority mismatch: {field}")
+    if op.get("materializer")!="RUN_FROZEN_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_SCREEN":
+        raise DeterministicOperationRejected("unsupported Epoch34 screen materializer")
+    if op.get("evidence_epoch")!=33 or (op.get("result_validation") or {}).get("evidence_epoch")!=34:
+        raise DeterministicOperationRejected("Epoch34 operation epoch binding mismatch")
+    expected_validation={
+        "schema":"mxm.greenfield.epoch34-composite-causal-ml-regime-structural-result.v1",
+        "status":"COMPLETE_NON_ECONOMIC_STRUCTURAL_RESULT",
+        "family":"CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL_CONDITIONAL_ON_REGIME_CONTEXT",
+        "evidence_epoch":34,
+    }
+    if op.get("operation_name")!=expected["operation_name"] or op.get("result_validation")!=expected_validation:
+        raise DeterministicOperationRejected("Epoch34 operation result authority mismatch")
+    policy=op.get("execution_policy") or {}
+    if any(policy.get(field) is not False for field in (
+        "implementation_ai_required","copilot_reasoning_required","new_semantic_judgment_required",
+    )):
+        raise DeterministicOperationRejected("Epoch34 operation is not explicitly deterministic and non-semantic")
+    if policy.get("exact_head_green_required_before_execution") is not True:
+        raise DeterministicOperationRejected("Epoch34 operation is missing its exact-head green prerequisite")
+    if state.get("exact_head_green") is not True:
+        raise DeterministicOperationRejected("Epoch34 screen execution is blocked until exact-head CI is green")
+    freeze_path=root/expected["freeze_ref"]
+    development_path=root/expected["development_zip_ref"]
+    replacement_path=root/expected["replacement_zip_ref"]
+    if not freeze_path.is_file():
+        raise DeterministicOperationRejected("Epoch34 prospective freeze is missing")
+    if not development_path.is_file() or not replacement_path.is_file():
+        raise DeterministicOperationRejected(
+            "accepted hash-bound capture bytes are not transport-materialized; no new market-data acquisition is required"
+        )
+    result=evaluate_epoch34(
+        json.loads(freeze_path.read_text(encoding="utf-8")),
+        development_path,
+        replacement_path,
+        root,
+    )
+    result["freeze_sha256"]=epoch34_sha256_file(freeze_path)
+    atomic_write_json(root/expected["result_ref"],result)
+    return _execute_existing_structural_result(root,state,op)
+
 
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
@@ -243,6 +303,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_execute_existing_structural_result(root,state,op)
     elif op.get("materializer")=="ACCEPT_EXISTING_NON_ECONOMIC_STRUCTURAL_RESULT":
         new_state=_execute_existing_structural_result(root,state,op)
+    elif op.get("materializer")=="RUN_FROZEN_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_SCREEN":
+        new_state=_run_epoch34_composite_screen(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":

@@ -1,134 +1,71 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "139e2581bd50e794bb9707785ed67e9a30b7a62c",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "139e2581bd50e794bb9707785ed67e9a30b7a62c",
-    "predecessor_run_id": 36273091689
-  },
-  "accepted_output": {
-    "decision": {
-      "data_scope": {
-        "history": "Accepted 13-week broker-native frontier history",
-        "replacement_capture_ids": [
-          7427,
-          5352,
-          2924
-        ],
-        "resolution": "M5",
-        "symbols": [
-          "VER.AT",
-          "GEM.AU",
-          "Lead",
-          "TRUMPUSD",
-          "NatGas",
-          "USDCZK",
-          "JPN225-F",
-          "EUBobl-F",
-          "SCI25",
-          "NIO.US-24",
-          "XPDUSD",
-          "WTOIL-PERP"
-        ]
-      },
-      "economic_effect": {
-        "economic_outcomes_opened": 0,
-        "search_budget_change": 0,
-        "v2_attempts_consumed": 0
-      },
-      "freeze_ref": "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
-      "implementation_ref": "research_v3/regime_context_conditioned_epoch33_screen.py",
-      "implementation_scope": "IMPLEMENT_FRESH_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN",
-      "safety": {
-        "competition_start_authorized": false,
-        "economic_promotion_authorized": false,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false
-      },
-      "test_ref": "tests/test_regime_context_conditioned_epoch33_screen.py"
-    },
-    "external_data_gate": null,
-    "implementation_id": "MXM_EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN_V1",
-    "next_research_state": {
-      "ai_reasoning_required": true,
-      "green_implementation_artifacts": [
-        "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
-        "research_v3/regime_context_conditioned_epoch33_screen.py",
-        "tests/test_regime_context_conditioned_epoch33_screen.py"
-      ],
-      "implementation_ai_required": false,
-      "next_action": "AI_INTERPRET_NEWLY_GREEN_NON_ECONOMIC_IMPLEMENTATION_AND_CHOOSE_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION",
-      "research_judgment_required": true,
-      "status": "AI_REASONING_REQUIRED_AFTER_IMPLEMENTATION_GREEN",
-      "user_action_required": false
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a separately frozen Epoch33 non-economic regime-context evaluator and focused tests. It processes the exact 12-symbol scope using accepted broker-native M5 captures, lagged volatility/activity ranks, UTC session-overlap state, chronological-half validation, exact binomial tests, state-selection correction, and BH correction across symbols. No external data gate is required; no economic identity, outcome, protected evidence, live order, or accounting artifact was modified.",
-    "tests_requested": [
-      "tests/test_regime_context_conditioned_epoch33_screen.py",
-      "Exact-head repository CI including Python compilation and the focused Epoch33 test"
-    ]
-  },
-  "basis_next_state_sha256": "b9ff19621129925c8434aa326d972f27e688417590b9e74584b1ca27acd9f575",
+  "basis_next_state_sha256": "4de21fb73a2a7cb0c4513d960602623f006c99eae101f49092dd603ad5c68ad1",
   "changed_paths": [
-    "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
-    "research_v3/regime_context_conditioned_epoch33_screen.py",
-    "tests/test_regime_context_conditioned_epoch33_screen.py"
+    "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
+    "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+    "research_v3/deterministic_operation_executor.py",
+    "research_v3/epoch34_composite_causal_ml_regime_screen.py",
+    "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+    "tests/test_epoch34_deterministic_operation.py"
   ],
-  "created_utc": "2026-09-26T21:29:07Z",
+  "created_utc": "2026-09-26T21:52:28Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
+      "accepted_proposal_file_sha256": "af1e3d62b83f8265e92ebbdeec5d703fb524936dc08032a69fb651aac0ccb230",
+      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_de9da14ab5a5c49ceceaded07e20c776.json",
       "data_scope": {
-        "history": "Accepted 13-week broker-native frontier history",
-        "replacement_capture_ids": [
-          7427,
-          5352,
-          2924
-        ],
-        "resolution": "M5",
-        "symbols": [
-          "VER.AT",
-          "GEM.AU",
-          "Lead",
-          "TRUMPUSD",
-          "NatGas",
-          "USDCZK",
-          "JPN225-F",
-          "EUBobl-F",
-          "SCI25",
-          "NIO.US-24",
-          "XPDUSD",
-          "WTOIL-PERP"
-        ]
+        "accepted_capture_bytes_transport_materialization_only": true,
+        "frontier": "All 41 current structural representatives",
+        "interval_utc": {
+          "end": "2026-09-13T23:59:59Z",
+          "start": "2026-06-15T00:00:00Z"
+        },
+        "new_market_data_requested": false,
+        "resolution": "M5"
       },
-      "economic_effect": {
-        "economic_outcomes_opened": 0,
-        "search_budget_change": 0,
-        "v2_attempts_consumed": 0
-      },
-      "freeze_ref": "research_v3/EPOCH33_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
-      "implementation_ref": "research_v3/regime_context_conditioned_epoch33_screen.py",
-      "implementation_scope": "IMPLEMENT_FRESH_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN",
+      "freeze_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+      "implementation_ref": "research_v3/epoch34_composite_causal_ml_regime_screen.py",
+      "operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
       "safety": {
-        "competition_start_authorized": false,
-        "economic_promotion_authorized": false,
+        "economic_outcome_opened": false,
         "live_orders_authorized": false,
-        "protected_forward_opened": false
+        "protected_forward_opened": false,
+        "v2_attempt_consumed": false
       },
-      "test_ref": "tests/test_regime_context_conditioned_epoch33_screen.py"
+      "selected_action": "Implement an Epoch34 composite causal-ML and regime-context structural screen.",
+      "test_refs": [
+        "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+        "tests/test_epoch34_deterministic_operation.py"
+      ]
     },
     "external_data_gate": null,
-    "implementation_id": "MXM_EPOCH33_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_SCREEN_V1",
+    "implementation_id": "MXM_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_SCREEN_V1",
     "next_research_state": {
-      "next_action": "Run exact-head CI for the new Epoch33 evaluator and focused tests, then execute the frozen non-economic screen without changing its parameters or scope; preserve economic promotion as a later research decision.",
+      "accepted_capture_transport_materialization_required": true,
+      "authority_ci_required": true,
+      "deterministic_next_operation": {
+        "copilot_reasoning_required": false,
+        "exact_head_green_required_before_execution": true,
+        "implementation_ai_required": false,
+        "new_semantic_judgment_required": false,
+        "operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json"
+      },
+      "external_data_gate": null,
+      "external_data_required": false,
+      "implementation_ai_required": false,
+      "later_step_after_epoch34_result": "Fresh AI reasoning interprets the accepted Epoch34 structural result and selects the next legal research step.",
+      "next_action": "RUN_FROZEN_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+      "next_deterministic_operation_ref": "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_DETERMINISTIC_OPERATION_V1.json",
+      "research_judgment_required": false,
       "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added a separately frozen Epoch33 non-economic regime-context evaluator and focused tests. It processes the exact 12-symbol scope using accepted broker-native M5 captures, lagged volatility/activity ranks, UTC session-overlap state, chronological-half validation, exact binomial tests, state-selection correction, and BH correction across symbols. No external data gate is required; no economic identity, outcome, protected evidence, live order, or accounting artifact was modified.",
+    "summary": "Added a prospectively frozen causal-ML-versus-regime-context screen across all 41 current representatives, with fail-closed frontier/history and capture-hash validation, targeted tests, and an authorized deterministic operation. The accepted 13-week captures are already hash-bound; their bytes may need transport materialization outside Git, which is not new data acquisition. Exact-head CI is still required; tests were not run because shell tools are prohibited.",
     "tests_requested": [
-      "tests/test_regime_context_conditioned_epoch33_screen.py",
-      "Exact-head repository CI including Python compilation and the focused Epoch33 test"
+      "tests/test_epoch34_composite_causal_ml_regime_screen.py",
+      "tests/test_epoch34_deterministic_operation.py",
+      "Exact-head CI for the changed files, including Python compilation and both targeted test modules"
     ]
   },
   "project_snapshot": {
@@ -146,7 +83,7 @@
     "model_selection": "AUTO_ACCOUNT_AVAILABLE",
     "provider": "github-copilot-cli"
   },
-  "request_fingerprint": "b9e518cd77749cb8e4f54b21aa46d73631b6d2d832e08ae524d648198de54398",
+  "request_fingerprint": "1febc8a25d7645b33453267f26b024102d4a4d7776c3e23daa2e88059db25552",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }

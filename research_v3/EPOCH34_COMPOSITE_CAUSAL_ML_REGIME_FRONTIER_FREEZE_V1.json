@@ -1,0 +1,115 @@
+{
+  "schema": "mxm.greenfield.epoch34-composite-causal-ml-regime-frontier-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_EPOCH34_STRUCTURAL_SCREEN",
+  "evidence_epoch": 34,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_de9da14ab5a5c49ceceaded07e20c776.json",
+    "accepted_proposal_file_sha256": "af1e3d62b83f8265e92ebbdeec5d703fb524936dc08032a69fb651aac0ccb230",
+    "current_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+    "current_frontier_sha256": "2e8cbe434a776d36ec494e7fbd642c36098400c38132cb57c734d6a60ab0f69b",
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
+    "feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+    "feature_store_sha256": "b92ad33bffad77f00b86933e1f552736485782e17fdea98fd0e84d1ab6dd117c",
+    "coverage_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json",
+    "coverage_sha256": "5cfb0662b12f1f42f8f5c503df64f42716dab98ba5729ab7e6eef75bce2c5dec",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "scope": {
+    "frontier": "ALL_41_CURRENT_STRUCTURAL_REPRESENTATIVES_EXACTLY_ONCE",
+    "representative_count": 41,
+    "representatives_are_not_economically_equivalent": true,
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "training_cutoff_utc": "2026-07-30T00:00:00Z",
+    "outer_evaluation": "ALL_ELIGIBLE_OBSERVATIONS_AT_OR_AFTER_TRAINING_CUTOFF_WITH_MODEL_WEIGHTS_FROZEN",
+    "replacement_capture_symbol_ids": [7427, 5352, 2924],
+    "selection_law": "PROCESS_ALL_41_CURRENT_REGISTRY_REPRESENTATIVES_WITHOUT_OUTCOME_BASED_SUBSETTING"
+  },
+  "preregistered_structural_law": {
+    "target": "sign(close[t+1]-close[t]); zero labels excluded",
+    "prediction_timing": "At t, compute inputs only from bars ending at t-1; emit both predictions before observing the t+1 close; fit only on labels settled strictly before the training cutoff.",
+    "regime_context": {
+      "atr_period": 14,
+      "rank_lookback": 48,
+      "volatility_rank": "ATR(t-1) ranked against the 48 prior valid ATR observations ending t-2 through t-49; <=0.20 LOW_VOL, >=0.80 HIGH_VOL, otherwise unclassified.",
+      "activity_rank": "tick_volume(t-1) ranked against the 48 prior bars ending t-2 through t-49; <=0.20 LOW_ACTIVITY, >=0.80 HIGH_ACTIVITY, otherwise unclassified.",
+      "session_overlap": "UTC hour 13 through 15 inclusive is OVERLAP; all other UTC hours are NON_OVERLAP.",
+      "context_states": [
+        "LOW_VOL_LOW_ACTIVITY_NON_OVERLAP",
+        "LOW_VOL_LOW_ACTIVITY_OVERLAP",
+        "LOW_VOL_HIGH_ACTIVITY_NON_OVERLAP",
+        "LOW_VOL_HIGH_ACTIVITY_OVERLAP",
+        "HIGH_VOL_LOW_ACTIVITY_NON_OVERLAP",
+        "HIGH_VOL_LOW_ACTIVITY_OVERLAP",
+        "HIGH_VOL_HIGH_ACTIVITY_NON_OVERLAP",
+        "HIGH_VOL_HIGH_ACTIVITY_OVERLAP"
+      ],
+      "unclassified_context": "Exclude the observation from both models."
+    },
+    "paired_models": {
+      "baseline": "Online logistic regression with intercept and one-hot encoding of the eight frozen regime-context states.",
+      "augmented": "Same logistic regression and context inputs plus lagged log returns at t-1, t-2, t-3 and mean absolute log return over the 12 bars ending t-1.",
+      "return_scaling": "Divide each of the three lagged returns by the mean absolute return over the same 12-bar window; clip each ratio to [-10,10]. The fourth input is the unscaled mean absolute return.",
+      "initial_weights": "All zero.",
+      "learning_rate": 0.05,
+      "training": "Chronological prequential updates on eligible training observations only; emit each score before its label update. Freeze both weight vectors at the cutoff and never update during outer evaluation.",
+      "prediction": "Stable logistic probability of an up label."
+    },
+    "primary_statistic": "MEAN_DAILY_CLUSTERED_BASELINE_BRIER_SCORE_MINUS_AUGMENTED_BRIER_SCORE",
+    "interpretation": "Positive values indicate lower non-economic out-of-sample probabilistic prediction error for the augmented model; this is not PnL or economic value.",
+    "inference": {
+      "partition": "Sort distinct eligible outer-evaluation UTC dates chronologically; first floor(N/2) dates form half 1 and remaining dates form half 2.",
+      "daily_cluster": "Within each UTC date, average paired per-observation Brier-score improvement.",
+      "test": "ONE_SIDED_SIGN_FLIP_PERMUTATION_OF_DAILY_CLUSTERED_PAIRED_SCORE_DIFFERENCES",
+      "permutations": 999,
+      "seed": "First 64 bits SHA256('MXM_EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_V1|' + broker_symbol + '|' + chronological_half_label)",
+      "p_value": "(1 + randomized_means >= observed)/(1 + permutations)",
+      "minimum_training_observations": 100,
+      "minimum_training_utc_dates": 10,
+      "minimum_outer_utc_dates_per_half": 10,
+      "raw_support": "Both halves eligible, both mean improvements >0, and both one-sided p-values <=0.05.",
+      "multiplicity": "HOLM_STEP_DOWN_FAMILY_WISE_ERROR_CONTROL_ACROSS_ALL_41_SYMBOL_MAX_HALF_P_VALUES",
+      "family_wise_error_rate": 0.05
+    },
+    "missing_data": "No fill, interpolation, resampling or synthetic bars; any timestamp delta other than exactly 300 seconds starts a new segment, and labels cannot cross segments.",
+    "duplicate_timestamps": "Collapse only rows identical in parsed OHLC and tick volume; conflicting duplicates fail closed.",
+    "input_validation": "Require finite positive OHLC, valid OHLC bounds, nonnegative finite tick volume, UTC timestamps within the frozen interval, exact M5 member identity and exact accepted archive hashes.",
+    "no_parameter_search": true,
+    "no_outer_refit": true,
+    "prior_epoch_results_are_not_inputs": true,
+    "internal_development_data_is_not_independent_confirmation": true
+  },
+  "interpretation_boundary": {
+    "result_scope": "FROZEN_NON_ECONOMIC_DEVELOPMENT_STRUCTURAL_INCREMENTAL_INFORMATION_SCREEN_ONLY",
+    "independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "mechanism_family_closed": false,
+    "winner_selected": false,
+    "candidate_identity_created": false,
+    "protected_forward_opened": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "protected_forward_opened": false
+  },
+  "execution": {
+    "implementation": "research_v3/epoch34_composite_causal_ml_regime_screen.py",
+    "freeze_must_be_persisted_before_screen_execution": true,
+    "accepted_data_bytes_may_be_transport_materialized_without_new_data_acquisition": true
+  }
+}
