@@ -1,12 +1,12 @@
 {
-  "basis_next_state_sha256": "cfc546ae2e199b22bb6ea444b5db1b475e343758a341111e3e31e04e8e756222",
-  "created_utc": "2026-09-26T09:08:15Z",
+  "basis_next_state_sha256": "5ecff9a4b7902dece9d9bab1f01cb1f7b5c3152ccd5cd416105a0464b9f234e4",
+  "created_utc": "2026-09-26T12:36:08Z",
   "exact_head": {
     "green": true,
-    "head": "c97a684e0f9805665c0fbc2fefb44788664dc568",
+    "head": "62fbda4204f649845cec4597898673513849ca90",
     "predecessor_conclusion": "success",
-    "predecessor_head": "c97a684e0f9805665c0fbc2fefb44788664dc568",
-    "predecessor_run_id": 36231760888
+    "predecessor_head": "62fbda4204f649845cec4597898673513849ca90",
+    "predecessor_run_id": 36242343344
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "next_state": {
@@ -41,7 +41,7 @@
     "alignment_prerequisite_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
     "all_frontier_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
     "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
-    "authorizing_evidence_epoch": 27,
+    "authorizing_evidence_epoch": 28,
     "breadth": "ADAPTIVE",
     "breadth_symbols_count": 41,
     "breakout_15m_followthrough_ref": "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_15M_DIRECTIONAL_FOLLOWTHROUGH_V1.json",
@@ -121,8 +121,8 @@
     "collector_implementation_acceptance_ref": "evidence/BREAKOUT_FADE_NETH25_COST_COLLECTOR_IMPLEMENTATION_ACCEPTANCE_V1.json",
     "collector_package_artifact_ref": "research_v3/ai_director/artifact_attestations/MXM_CROSSMARKET_FOUR_SYMBOL_DISJOINT_M5_CAPTURE_PACKAGE_V1.json",
     "collector_runtime_reliability_ref": "research_v3/COLLECTOR_RUNTIME_RELIABILITY_V1.json",
-    "completed_family": "CROSS_SECTIONAL_RANKING",
-    "completed_structural_report_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+    "completed_family": "BREAKOUT_VOLATILITY_EXPANSION",
+    "completed_structural_report_ref": "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
     "consumes_v2_attempts": 0,
     "cross_market_one_bar_directional_screen_ref": "evidence/CROSS_MARKET_ONE_BAR_DIRECTIONAL_AVAILABILITY_V1.json",
     "cross_market_one_bar_gate_ref": "evidence/CROSS_MARKET_LEAD_LAG_ONE_BAR_STRUCTURAL_GATE_V1.json",
@@ -162,7 +162,7 @@
       "valid_source_data_discarded": false
     },
     "current_outer_reuse": "Completed four-panel SESSION_GAP outer remains historical evidence only and cannot be reused as a new confirmatory dataset",
-    "current_research_evidence_epoch": 27,
+    "current_research_evidence_epoch": 28,
     "current_structural_registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
     "data_binding": "NONE_UNTIL_AUTHENTICATED_SYMBOL_FEASIBILITY_IS_VERIFIED",
     "data_capture": "ACCEPTED_HASH_VERIFIED_PRE_OUTCOME",
@@ -208,7 +208,7 @@
     "economic_promotion": "NOT_AUTHORIZED",
     "economic_promotion_authorized": false,
     "evidence_eligibility_ref": "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
-    "evidence_epoch": 27,
+    "evidence_epoch": 28,
     "evidence_epoch_advanced_by_inventory": false,
     "evidence_epoch_ref": "research_v3/RESEARCH_EVIDENCE_EPOCH_V1.json",
     "exact_head_confidence_interval_required": true,
@@ -223,9 +223,23 @@
     "external_data_gate": null,
     "external_data_required": false,
     "external_gate": null,
+    "families_blocked_on_data": [
+      "CARRY_TERM_STRUCTURE"
+    ],
+    "families_exhausted_non_economically": [
+      "TREND_MOMENTUM",
+      "MEAN_REVERSION",
+      "BREAKOUT_VOLATILITY_EXPANSION"
+    ],
+    "families_with_valid_consumed_survivors": [
+      "CROSS_SECTIONAL_RANKING",
+      "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+      "SEASONALITY_SESSION_TIME(narrow)",
+      "CROSS_MARKET_LEAD_LAG(narrow)"
+    ],
     "family_exhaustion": false,
     "family_exhaustion_claimed": false,
-    "family_result": "NO_REPRESENTATIVE_PASSED_FROZEN_CROSS_SECTIONAL_RANKING_STRUCTURAL_CRITERIA",
+    "family_result": "DESCRIPTIVE_STRUCTURAL_GATE_NOT_MET",
     "fixed15m_directional_screen_ref": "evidence/CROSS_MARKET_FIXED_15M_DIRECTIONAL_SCREEN_V1.json",
     "follow_on_step": "Once the exact intersected symbol list is materialized from the cited artifacts, submit a subsequent proposal requesting fresh PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API data for those exact symbols to verify current cost/margin and compute exact-head CI before any freeze.",
     "fresh_director_decision_ref": "research_v3/EPOCH21_CLEAN_FRONTIER_GENERAL_AI_DECISION_V1.json",
@@ -264,8 +278,19 @@
       "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
       "v2_attempts_consumed_delta": 0
     },
-    "implementation_satisfied": true,
-    "implementation_scope": "Add the missing repository machinery to freeze and evaluate the specified non-economic screen using accepted M5 data. Enforce session synchronization, predeclared horizon/statistic/multiplicity, dependence-aware evidence, and structural-only reporting; do not open economic outcomes.",
+    "implementation_satisfied": false,
+    "implementation_scope": {
+      "constraints": [
+        "Freeze document must be authored and hashed before the screen is executed against data",
+        "No parameter selection may be informed by inspecting Epoch23 exploratory outcomes",
+        "Result is non-economic and confers no economic_outcomes_opened, v2_attempts, or protected_forward effect"
+      ],
+      "deliverables": [
+        "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
+        "research_v3/regime_context_conditioned_epoch29_screen.py",
+        "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json (produced by executing the frozen script against the already-accepted 13w M5 data, then accepted)"
+      ]
+    },
     "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
     "information_gain_summary": {
       "accepted_13w_history_current_eligible": 42,
@@ -311,7 +336,7 @@
       "Separate cost and independent-validation prerequisites before any prospective economic envelope is considered."
     ],
     "later_step": "Report the complete structural result without economic promotion or an independent-confirmation claim.",
-    "latest_material_structural_result_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+    "latest_material_structural_result_ref": "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
     "latest_prospective_freeze_ref": "research_v3/EPOCH24_TREND_MOMENTUM_FRONTIER_FREEZE_V1.json",
     "liveness_policy": {
       "paid_runner_sleep": false,
@@ -328,11 +353,12 @@
       "semantic_request_unchanged": true
     },
     "market_data_capture_required": false,
+    "mechanism_family_closed": false,
     "minimum_breadth_threshold_symbols": null,
     "minimum_structural_clusters": null,
     "new_market_data_required": false,
     "next_acquisition_plan_ref": null,
-    "next_action": "ADDITIONAL_AUTHORITY_REQUIRED",
+    "next_action": "AUTHOR_REGIME_CONTEXT_CONDITIONED_PROSPECTIVE_FRONTIER_FREEZE_THEN_IMPLEMENT_AND_EXECUTE_FROZEN_NON_ECONOMIC_STRUCTURAL_SCREEN",
     "next_deterministic_operation_ref": null,
     "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
     "no_economic_outcome_opened_by_this_proposal": true,
@@ -383,7 +409,7 @@
       "source_capture_sha256": "73cc5b5a2bf2d756ef4ca75ef0b4fbd5e13a3da04d7dab2809b57616fbc41404",
       "status": "OPENED_NON_ECONOMIC_INTERPRETED_NO_PROMOTION"
     },
-    "rationale": "The current epoch authorizes fresh semantic selection and contains reusable broker-native M5 coverage, but authorized_deterministic_operations_current_epoch is empty. The existing frontier, capture, and historical evidence refs are not deterministic-operation refs and cannot be repurposed for routing. No unrouted non-empty action may be emitted.",
+    "rationale": "The generic fail-closed route is already implemented. Do not execute the breakout screen or invent its missing prospective law; preserve that screen as the explicit later step once exact authority is available.",
     "rationale_for_implementation_ai_false": "Selection, binding, and Stage-A spec formalization from already-produced deterministic artifacts (feature store, opportunity map, information-gain ranking, repaired capture) require judgment-guided evidence synthesis, not novel repository machinery; existing Stage-A/capture pipeline capability is sufficient.",
     "recorded_utc": "2026-09-24T18:59:00Z",
     "recovery_binding": {
@@ -413,7 +439,7 @@
       "prospective freeze record"
     ],
     "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-    "research_judgment_required": false,
+    "research_judgment_required": true,
     "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
     "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
     "result_sha256": "278babcec46cdb404057b9c0b8166a68ea987a1c9a8e7e19003eb9df32f7a2f8",
@@ -437,11 +463,20 @@
     "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
     "search_budget_change": -1,
     "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-    "source_ai_proposal_hash": "17f669208328281e0564be2e76c7d9e433e9c2180c8fd80ccbe47d951842dde7",
-    "source_ai_proposal_id": "AUTO_reason_epoch27_frontier_route_20260926",
+    "source_ai_proposal_hash": "1e3cbd5dd134c72eb58c889056a1d476d0f6757665ba7a348c4fa258e7a2ef22",
+    "source_ai_proposal_id": "AI_reason_0282192e6861bbbc8540e81125ce260a_regime_context_freeze_epoch29",
     "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-    "source_runtime_operation_id": "op_06fbfe16e36474ef2f98b93f9b4dd1a3",
-    "status": "ADDITIONAL_AUTHORITY_REQUIRED",
+    "source_runtime_operation_id": "op_8d375f1c395ca0035c21f3108fd5307d",
+    "stale_reasoning_guard": {
+      "authorizing_evidence_epoch": 27,
+      "current_evidence_epoch": 28,
+      "law": "Historical reasoning remains evidence but cannot authorize new mechanism/panel/universe/horizon judgment after material evidence advances.",
+      "previous_external_data_gate": null,
+      "previous_next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
+      "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
+      "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
+    },
+    "status": "REGIME_CONTEXT_CONDITIONED_FRESH_FRONTIER_FREEZE_AND_IMPLEMENTATION_PENDING",
     "stop_condition": null,
     "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
     "structural_representatives_are_not_economic_equivalence": true,
@@ -517,6 +552,6 @@
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "research_head": "c97a684e0f9805665c0fbc2fefb44788664dc568",
+  "research_head": "62fbda4204f649845cec4597898673513849ca90",
   "schema": "mxm.greenfield.general-ai-implementation-request.v1"
 }
