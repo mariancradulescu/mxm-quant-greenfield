@@ -13,7 +13,8 @@ from research_v3.frontier_information_gain import (
     build_information_gain_selection, build_next_acquisition_plan,
 )
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL, project_snapshot
-from research_v3.runtime_v2_primitives import GitCheckpointSink, atomic_write_json, load_json, iso
+from research_v3.evidence_epoch import advance_evidence_epoch
+from research_v3.runtime_v2_primitives import GitCheckpointSink, atomic_write_json, load_json, iso, sha256_file
 
 VERSION="MXM_DETERMINISTIC_OPERATION_EXECUTOR_V1"
 ROUTING_REPAIR_REL=Path("research_v3/EPOCH21_DETERMINISTIC_ROUTING_REPAIR_V1.json")
@@ -115,6 +116,75 @@ def _execute_selection_layer(root:Path,state:dict[str,Any],op:dict[str,Any])->di
     })
     return state
 
+def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    """Accept an already-materialized, explicitly bound non-economic structural result.
+
+    This is deliberately generic: the operation document supplies the result ref,
+    expected schema/family/source epoch and the fresh-reasoning transition.
+    """
+    result_ref=str(op.get("result_ref") or "").strip()
+    if not result_ref or not (root/result_ref).is_file():
+        raise DeterministicOperationRejected("structural result authority missing")
+    result=dict(load_json(root/result_ref,{}) or {})
+    expected=dict(op.get("result_validation") or {})
+    if expected.get("schema") and result.get("schema")!=expected["schema"]:
+        raise DeterministicOperationRejected("structural result schema mismatch")
+    if expected.get("status") and result.get("status")!=expected["status"]:
+        raise DeterministicOperationRejected("structural result status mismatch")
+    if expected.get("family") and result.get("family")!=expected["family"]:
+        raise DeterministicOperationRejected("structural result family mismatch")
+    source_epoch=int(result.get("source_evidence_epoch") or result.get("evidence_epoch") or 0)
+    if source_epoch!=int(op.get("evidence_epoch") or 0):
+        raise DeterministicOperationRejected("structural result evidence epoch mismatch")
+    effect=result.get("accounting_effect") or {}
+    if any(int(effect.get(k) or 0)!=0 for k in ("v2_attempts_consumed","economic_outcomes_opened","search_budget_change")):
+        raise DeterministicOperationRejected("structural result declares prohibited accounting effect")
+    safety=result.get("safety") or {}
+    if safety.get("protected_forward_opened") is not False or safety.get("live_orders_authorized") is not False:
+        raise DeterministicOperationRejected("structural result crosses protected/live safety boundary")
+    interpretation=result.get("interpretation_boundary") or {}
+    if interpretation.get("economic_promotion_authorized") is not False:
+        raise DeterministicOperationRejected("structural result attempts economic promotion")
+    expected_sha=str(op.get("result_sha256") or "").strip()
+    if expected_sha and sha256_file(root/result_ref)!=expected_sha:
+        raise DeterministicOperationRejected("structural result hash mismatch")
+
+    reason=str(op.get("acceptance_reason") or "").strip()
+    if not reason:
+        raise DeterministicOperationRejected("structural result operation missing acceptance_reason")
+    epoch_doc=advance_evidence_epoch(
+        root,
+        event_class="MATERIAL_DEVELOPMENT_STRUCTURAL_EVIDENCE_ACCEPTED",
+        refs=[result_ref],
+        reason=reason,
+        advanced_utc=iso(),
+    )
+    new_epoch=int(epoch_doc["current_epoch"])
+    new_state=dict(state)
+    new_state.update({
+        "status":str(op.get("next_status") or "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_DETERMINISTIC_STRUCTURAL_RESULT"),
+        "next_action":str(op.get("next_reasoning_action") or "AI_INTERPRET_NEW_MATERIAL_STRUCTURAL_RESULT_AND_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_FRONTIER_ACTION"),
+        "current_research_evidence_epoch":new_epoch,
+        "evidence_epoch":new_epoch,
+        "authorizing_evidence_epoch":new_epoch,
+        "completed_family":result.get("family"),
+        "completed_structural_report_ref":result_ref,
+        "latest_material_structural_result_ref":result_ref,
+        "family_result":op.get("family_result"),
+        "result_sha256":sha256_file(root/result_ref),
+        "next_deterministic_operation_ref":None,
+        "deterministic_next_operation":None,
+        "ai_reasoning_required":True,
+        "research_judgment_required":True,
+        "implementation_ai_required":False,
+        "external_data_required":False,
+        "external_data_gate":None,
+        "external_gate":None,
+        "user_action_required":False,
+    })
+    return new_state
+
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -124,7 +194,9 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     before=project_snapshot(root)
     provider_before=_provider_count(root)
     name=op["operation_name"]
-    if name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
+    if op.get("materializer")=="ACCEPT_EXISTING_NON_ECONOMIC_STRUCTURAL_RESULT":
+        new_state=_execute_existing_structural_result(root,state,op)
+    elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
         new_state=_execute_selection_layer(root,state,op)
