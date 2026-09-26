@@ -70,8 +70,9 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
             for row in operations
         ))
         for row in operations:
-            self.assertEqual(row.get("evidence_epoch"),binding["evidence_epoch"])
-            self.assertFalse(row.get("implementation_ai_required"))
+            authority=json.loads((ROOT/row["ref"]).read_text())
+            self.assertEqual(authority.get("evidence_epoch"),binding["evidence_epoch"])
+            self.assertFalse((authority.get("execution_policy") or {}).get("implementation_ai_required"))
 
     def test_current_packet_includes_frontier_and_capture_authorities(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
