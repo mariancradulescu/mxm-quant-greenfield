@@ -1,23 +1,15 @@
 {
   "accepted_output": {
     "decision": {
-      "action": "IMPLEMENT_PROSPECTIVE_CROSS_SECTIONAL_RANK_PERSISTENCE_SCREEN",
-      "data_bindings": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
-      ],
-      "data_coverage": "Accepted records bind the development and replacement captures and report complete history coverage for all 41 current representatives.",
-      "economic_outcomes_opened": 0,
-      "freeze": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "later_step": "Run exact-head CI, then evaluate the frozen law on the hash-bound accepted 41-symbol M5 data. Report structural evidence only; do not claim independent confirmation or economic promotion.",
-      "live_orders_authorized": false,
-      "manifest": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "protected_evidence_opened": false,
-      "scope": "All 41 frozen representatives, M5, 2026-06-15 through 2026-09-13 UTC; synchronized cross-sectional ranks, five-day moving-block bootstrap, and Benjamini-Yekutieli correction across the full test family.",
-      "v2_attempts_consumed": 0,
-      "validation": "INSPECTED_ONLY; exact-head CI and frozen-data evaluation remain pending."
+      "action": "Reuse the existing implementation without changes.",
+      "causal_and_reporting_boundaries": "The evaluator enforces synchronized eligible panels, exact contiguous M5 windows, frozen inference and multiplicity, and structural-only reporting. Do not interpret development evidence as independent confirmation.",
+      "data": "The manifest binds accepted development and replacement captures covering all 41 representatives; no external data dependency is identified.",
+      "evidence": [
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/cross_sectional_ranking_epoch26_screen.py",
+        "tests/test_cross_sectional_ranking_epoch26_screen.py",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json"
+      ]
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence",
@@ -26,43 +18,34 @@
       "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The frozen cross-sectional rank-persistence screen, evaluator, targeted tests, and implementation manifest already exist and match the accepted decision. The bound records establish accepted M5 history for all 41 representatives over the frozen interval, so no new collector or external data gate is needed. No files were changed; validation was by inspection only.",
+    "summary": "The accepted decision is already implemented: the frozen law, hash-bound 41-representative M5 evaluator, targeted tests, and implementation manifest are present and aligned. No edits or new data capture are needed. Exact-head CI and frozen-data evaluation remain pending.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py",
-      "Exact-head CI",
-      "Frozen-law evaluation on hash-bound accepted 41-symbol 13W M5 data"
+      "Run exact-head CI, including tests/test_cross_sectional_ranking_epoch26_screen.py.",
+      "After exact-head CI is green, evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data."
     ]
   },
-  "basis_next_state_sha256": "39ecf8abc9356745130cc03aa23f03353531fddb4a0e48bca6714eae20ff6d21",
+  "basis_next_state_sha256": "d1e9bdfef9f9798647ec57f4e6ec6ba1bdc4bc9da84432b8bcc44ed72f9ceca3",
   "changed_paths": [],
-  "created_utc": "2026-09-26T08:27:50Z",
+  "created_utc": "2026-09-26T08:30:40Z",
   "exact_head": {
     "green": true,
-    "head": "5148347f6073e615784225f40c6f7684ef74f15e",
+    "head": "86031f3ae4c2bf8ad53714bad90613dd4d3e7a8f",
     "predecessor_conclusion": "success",
-    "predecessor_head": "5148347f6073e615784225f40c6f7684ef74f15e",
-    "predecessor_run_id": 36229738572
+    "predecessor_head": "86031f3ae4c2bf8ad53714bad90613dd4d3e7a8f",
+    "predecessor_run_id": 36229874172
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "action": "IMPLEMENT_PROSPECTIVE_CROSS_SECTIONAL_RANK_PERSISTENCE_SCREEN",
-      "data_bindings": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json"
-      ],
-      "data_coverage": "Accepted records bind the development and replacement captures and report complete history coverage for all 41 current representatives.",
-      "economic_outcomes_opened": 0,
-      "freeze": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "later_step": "Run exact-head CI, then evaluate the frozen law on the hash-bound accepted 41-symbol M5 data. Report structural evidence only; do not claim independent confirmation or economic promotion.",
-      "live_orders_authorized": false,
-      "manifest": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "protected_evidence_opened": false,
-      "scope": "All 41 frozen representatives, M5, 2026-06-15 through 2026-09-13 UTC; synchronized cross-sectional ranks, five-day moving-block bootstrap, and Benjamini-Yekutieli correction across the full test family.",
-      "v2_attempts_consumed": 0,
-      "validation": "INSPECTED_ONLY; exact-head CI and frozen-data evaluation remain pending."
+      "action": "Reuse the existing implementation without changes.",
+      "causal_and_reporting_boundaries": "The evaluator enforces synchronized eligible panels, exact contiguous M5 windows, frozen inference and multiplicity, and structural-only reporting. Do not interpret development evidence as independent confirmation.",
+      "data": "The manifest binds accepted development and replacement captures covering all 41 representatives; no external data dependency is identified.",
+      "evidence": [
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/cross_sectional_ranking_epoch26_screen.py",
+        "tests/test_cross_sectional_ranking_epoch26_screen.py",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json"
+      ]
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence",
@@ -71,11 +54,10 @@
       "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The frozen cross-sectional rank-persistence screen, evaluator, targeted tests, and implementation manifest already exist and match the accepted decision. The bound records establish accepted M5 history for all 41 representatives over the frozen interval, so no new collector or external data gate is needed. No files were changed; validation was by inspection only.",
+    "summary": "The accepted decision is already implemented: the frozen law, hash-bound 41-representative M5 evaluator, targeted tests, and implementation manifest are present and aligned. No edits or new data capture are needed. Exact-head CI and frozen-data evaluation remain pending.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py",
-      "Exact-head CI",
-      "Frozen-law evaluation on hash-bound accepted 41-symbol 13W M5 data"
+      "Run exact-head CI, including tests/test_cross_sectional_ranking_epoch26_screen.py.",
+      "After exact-head CI is green, evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data."
     ]
   },
   "project_snapshot": {
