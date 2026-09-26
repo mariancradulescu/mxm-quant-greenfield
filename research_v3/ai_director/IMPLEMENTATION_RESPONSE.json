@@ -1,65 +1,44 @@
 {
-  "accepted_output": {
-    "decision": {
-      "alignment_inventory": "Reuse the persisted accepted inventory; do not recompute it.",
-      "data_binding": "Accepted hash-bound 41-representative 13-week M5 captures; no new market data requested.",
-      "economic_outcomes_opened": 0,
-      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "implementation_sufficient": true,
-      "live_orders_authorized": false,
-      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "protected_evidence_opened": false,
-      "v2_attempts_consumed": 0
-    },
-    "external_data_gate": null,
-    "implementation_id": "epoch26-cross-sectional-rank-persistence",
-    "next_research_state": {
-      "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
-      "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
-    },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The prospective freeze, 41-representative evaluator, targeted tests, and implementation manifest already implement the bounded non-economic screen. Inspection confirms hash-bound accepted M5 inputs, synchronized timestamp panels, dependence-aware block inference, and structural-only reporting. No code changes or new data acquisition are needed; exact-head CI and frozen-data evaluation remain pending.",
-    "tests_requested": [
-      "Run exact-head CI, including tests/test_cross_sectional_ranking_epoch26_screen.py.",
-      "After CI passes, evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data and report all representatives as non-economic structural evidence only."
-    ]
-  },
   "basis_next_state_sha256": "d1e9bdfef9f9798647ec57f4e6ec6ba1bdc4bc9da84432b8bcc44ed72f9ceca3",
-  "changed_paths": [],
-  "created_utc": "2026-09-26T06:56:47Z",
-  "exact_head": {
-    "green": true,
-    "head": "c28e14279fecd0136347a4edeb6095cdb44cf4ba",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "c28e14279fecd0136347a4edeb6095cdb44cf4ba",
-    "predecessor_run_id": 36225146876
-  },
+  "changed_paths": [
+    "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+    "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+    "research_v3/cross_sectional_ranking_epoch26_screen.py"
+  ],
+  "created_utc": "2026-09-26T06:59:58Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "alignment_inventory": "Reuse the persisted accepted inventory; do not recompute it.",
-      "data_binding": "Accepted hash-bound 41-representative 13-week M5 captures; no new market data requested.",
+      "changed_paths": [
+        "research_v3/cross_sectional_ranking_epoch26_screen.py",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json"
+      ],
       "economic_outcomes_opened": 0,
-      "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
-      "implementation_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
       "implementation_sufficient": true,
       "live_orders_authorized": false,
-      "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "new_market_data_required": false,
+      "preserved_later_step": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
+      "proposal_hash": "3b56de4ae2e210ecce36201a2074824b6eb4286ac13cb680df7a8238f2cf4b8e",
+      "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_e283d6915fe79926049551e4bdfecf22.json",
       "protected_evidence_opened": false,
+      "representative_count": 41,
+      "resolution": "M5",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
     "implementation_id": "epoch26-cross-sectional-rank-persistence",
     "next_research_state": {
       "next_action": "RUN_EXACT_HEAD_CI_THEN_EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
-      "status": "IMPLEMENTATION_COMPLETE_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
+      "status": "IMPLEMENTATION_CHANGED_PENDING_EXACT_HEAD_GREEN_AND_FROZEN_DATA_EVALUATION"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The prospective freeze, 41-representative evaluator, targeted tests, and implementation manifest already implement the bounded non-economic screen. Inspection confirms hash-bound accepted M5 inputs, synchronized timestamp panels, dependence-aware block inference, and structural-only reporting. No code changes or new data acquisition are needed; exact-head CI and frozen-data evaluation remain pending.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Rebound the existing prospective 41-representative cross-sectional ranking evaluator, freeze, and implementation manifest from the superseded proposal to the authoritative accepted proposal hash 3b56de4ae2e210ecce36201a2074824b6eb4286ac13cb680df7a8238f2cf4b8e. The evaluator already enforces the frozen synchronized M5 panel, exact-contiguous windows, daily aggregation, moving-block bootstrap, BY multiplicity correction, full-family reporting, and non-economic safety boundaries. Accepted hash-bound data already covers all 41 representatives; no external data gate is required.",
     "tests_requested": [
-      "Run exact-head CI, including tests/test_cross_sectional_ranking_epoch26_screen.py.",
-      "After CI passes, evaluate the frozen law on the hash-bound accepted 41-symbol 13-week M5 data and report all representatives as non-economic structural evidence only."
+      "Run exact-head CI including tests/test_cross_sectional_ranking_epoch26_screen.py.",
+      "After exact-head green, evaluate the frozen law using the accepted hash-bound 41-symbol 13-week M5 data.",
+      "Report all 41 representatives and the complete fixed test family as non-economic structural evidence only."
     ]
   },
   "project_snapshot": {
@@ -78,5 +57,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
