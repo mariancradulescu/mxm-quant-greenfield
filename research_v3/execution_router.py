@@ -61,7 +61,7 @@ def load_authorized_deterministic_operation(root_value: str | Path, state: Mappi
         # exact-head validation without embedding a path in the canonical
         # state. Resolve only a unique, explicitly authorized operation for
         # that exact action and evidence epoch; ambiguity fails closed.
-        if state.get("status") != "READY_FOR_FROZEN_SCREEN_EXECUTION" or state.get("implementation_satisfied") is not True:
+        if state.get("status") not in {"READY_FOR_FROZEN_SCREEN_EXECUTION", "SCREEN_EXECUTION_AND_RESULT_VERIFICATION_PENDING"} or state.get("implementation_satisfied") is not True:
             return None
         action = str(state.get("next_action") or "").strip()
         epoch = int(state.get("current_research_evidence_epoch") or state.get("evidence_epoch") or 0)

@@ -190,8 +190,16 @@ def evaluate(freeze: dict[str, Any], development_zip: Path, replacement_zip: Pat
     return {"schema": "mxm.greenfield.epoch31-causal-ml-predictive-state-structural-result.v1", "status": "COMPLETE_NON_ECONOMIC_STRUCTURAL_RESULT",
             "evidence_epoch": 31, "family": "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL", "freeze_ref": FREEZE_REF,
             "implementation": {"version": VERSION}, "scope": {"representatives_processed": len(results), "all_41_processed_exactly_once": len(results) == 41, "representatives_are_economic_equivalents": False},
+            "input_attestation": {"registry_sha256": sha256_file(registry_path),
+                                  "development_zip_sha256": sha256_file(development_zip),
+                                  "replacement_zip_sha256": sha256_file(replacement_zip),
+                                  "protected_forward_rows_read": 0},
             "inference": {"multiplicity": "HOLM_ACROSS_41_SYMBOL_P_VALUES", "family_wise_error_rate": 0.05, "mechanism_family_closed": False},
-            "symbols": results, "accounting_effect": {"v2_attempts_consumed": 0, "economic_outcomes_opened": 0, "search_budget_change": 0},
+            "symbols": results,
+            "interpretation_boundary": {"result": "FROZEN_NON_ECONOMIC_DEVELOPMENT_STRUCTURAL_SCREEN_ONLY",
+                                        "economic_promotion_authorized": False, "independent_confirmation": False,
+                                        "mechanism_family_closed": False, "winner_selected": False},
+            "accounting_effect": {"v2_attempts_consumed": 0, "economic_outcomes_opened": 0, "search_budget_change": 0},
             "safety": {"protected_forward_opened": False, "live_orders_authorized": False, "competition_start_authorized": False}}
 
 
