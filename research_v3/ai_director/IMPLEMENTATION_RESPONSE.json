@@ -1,79 +1,75 @@
 {
   "accepted_output": {
     "decision": {
-      "accepted_data_refs": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
-      ],
-      "accepted_data_scope": "All 41 frozen representatives, M5, 2026-06-15 through 2026-09-13; development ZIP SHA-256 64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503 and replacement ZIP SHA-256 d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75.",
-      "action": "Reuse the existing implementation; do not rewrite it or create a capture gate.",
-      "alignment_inventory": "The persisted relative-value alignment inventory remains accepted; it was not recomputed and does not constitute independent confirmation.",
-      "boundaries": {
-        "economic_outcomes_opened": 0,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false,
-        "v2_attempts_consumed": 0
-      },
+      "action": "IMPLEMENTATION_ALREADY_SUFFICIENT",
       "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
       "implementation_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "later_step": "Run the targeted tests on exact HEAD, then evaluate the frozen law on the accepted hash-bound data and report structural evidence only.",
+      "later_step": "Evaluate the frozen law on the hash-bound accepted data; do not treat development evidence as independent confirmation.",
       "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "validation": "Inspection confirms the evaluator binds the frozen law and accepted data hashes, processes the full fixed representative family, and rejects protected-forward observations. No tests were run."
+      "verification": {
+        "data_bindings": {
+          "accepted_coverage": "41 representatives; replacement capture covers symbol IDs 7427, 5352, and 2924",
+          "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+          "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+        },
+        "law": "Synchronized one-hour past/future cross-sectional percentile ranks, minimum panel breadth 10, UTC-day aggregation, five-day moving-block bootstrap, and Benjamini-Yekutieli correction across all 41",
+        "safety": "Structural-only; no economic outcomes, attempt consumption, protected-forward opening, or live-order authorization",
+        "scope": "All 41 frozen representatives in authority order; M5; 2026-06-15 through 2026-09-13",
+        "validation_boundary": "Confirmed by repository inspection; tests and raw-data evaluation were not run."
+      }
     },
     "external_data_gate": null,
-    "implementation_id": "epoch26-cross-sectional-rank-persistence",
+    "implementation_id": "epoch26-cross-sectional-rank-persistence-implementation-review",
     "next_research_state": {
       "next_action": "EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
       "status": "IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The existing frozen evaluator, implementation manifest, and targeted tests cover the accepted 41-representative M5 screen. Accepted hash-bound captures cover the frozen scope, so no code changes or new data gate are needed. Evaluation remains a later step; any result is structural only, not independent confirmation or economic promotion.",
+    "summary": "The exact 41-representative frozen screen is already implemented with its evaluator, freeze, manifest, and targeted tests. Accepted M5 coverage binds 40 development series and the accepted three-symbol replacement; no additional capture is justified. No files changed.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py (run on exact HEAD before frozen-data evaluation)"
+      "tests/test_cross_sectional_ranking_epoch26_screen.py"
     ]
   },
   "basis_next_state_sha256": "4a1b2ac21ee73df27502001430f6e11011464e0132f1e53f64cace242954fab6",
   "changed_paths": [],
-  "created_utc": "2026-09-26T07:22:31Z",
+  "created_utc": "2026-09-26T07:26:37Z",
   "exact_head": {
     "green": true,
-    "head": "7e2e4f4d22efed6600dece90ae88136024173807",
+    "head": "3a1ca1a9788fb30446aa7ff9bf9bda6a7260fdf1",
     "predecessor_conclusion": "success",
-    "predecessor_head": "7e2e4f4d22efed6600dece90ae88136024173807",
-    "predecessor_run_id": 36226443445
+    "predecessor_head": "3a1ca1a9788fb30446aa7ff9bf9bda6a7260fdf1",
+    "predecessor_run_id": 36226606826
   },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_data_refs": [
-        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
-        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json"
-      ],
-      "accepted_data_scope": "All 41 frozen representatives, M5, 2026-06-15 through 2026-09-13; development ZIP SHA-256 64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503 and replacement ZIP SHA-256 d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75.",
-      "action": "Reuse the existing implementation; do not rewrite it or create a capture gate.",
-      "alignment_inventory": "The persisted relative-value alignment inventory remains accepted; it was not recomputed and does not constitute independent confirmation.",
-      "boundaries": {
-        "economic_outcomes_opened": 0,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false,
-        "v2_attempts_consumed": 0
-      },
+      "action": "IMPLEMENTATION_ALREADY_SUFFICIENT",
       "freeze_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
       "implementation_ref": "research_v3/cross_sectional_ranking_epoch26_screen.py",
-      "later_step": "Run the targeted tests on exact HEAD, then evaluate the frozen law on the accepted hash-bound data and report structural evidence only.",
+      "later_step": "Evaluate the frozen law on the hash-bound accepted data; do not treat development evidence as independent confirmation.",
       "manifest_ref": "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
-      "validation": "Inspection confirms the evaluator binds the frozen law and accepted data hashes, processes the full fixed representative family, and rejects protected-forward observations. No tests were run."
+      "verification": {
+        "data_bindings": {
+          "accepted_coverage": "41 representatives; replacement capture covers symbol IDs 7427, 5352, and 2924",
+          "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+          "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+        },
+        "law": "Synchronized one-hour past/future cross-sectional percentile ranks, minimum panel breadth 10, UTC-day aggregation, five-day moving-block bootstrap, and Benjamini-Yekutieli correction across all 41",
+        "safety": "Structural-only; no economic outcomes, attempt consumption, protected-forward opening, or live-order authorization",
+        "scope": "All 41 frozen representatives in authority order; M5; 2026-06-15 through 2026-09-13",
+        "validation_boundary": "Confirmed by repository inspection; tests and raw-data evaluation were not run."
+      }
     },
     "external_data_gate": null,
-    "implementation_id": "epoch26-cross-sectional-rank-persistence",
+    "implementation_id": "epoch26-cross-sectional-rank-persistence-implementation-review",
     "next_research_state": {
       "next_action": "EVALUATE_FROZEN_LAW_ON_HASH_BOUND_ACCEPTED_41_SYMBOL_13W_M5_DATA",
       "status": "IMPLEMENTATION_COMPLETE_PENDING_FROZEN_DATA_EVALUATION"
     },
     "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The existing frozen evaluator, implementation manifest, and targeted tests cover the accepted 41-representative M5 screen. Accepted hash-bound captures cover the frozen scope, so no code changes or new data gate are needed. Evaluation remains a later step; any result is structural only, not independent confirmation or economic promotion.",
+    "summary": "The exact 41-representative frozen screen is already implemented with its evaluator, freeze, manifest, and targeted tests. Accepted M5 coverage binds 40 development series and the accepted three-symbol replacement; no additional capture is justified. No files changed.",
     "tests_requested": [
-      "tests/test_cross_sectional_ranking_epoch26_screen.py (run on exact HEAD before frozen-data evaluation)"
+      "tests/test_cross_sectional_ranking_epoch26_screen.py"
     ]
   },
   "project_snapshot": {
