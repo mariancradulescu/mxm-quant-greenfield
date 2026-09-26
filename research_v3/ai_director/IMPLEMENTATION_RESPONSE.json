@@ -1,4 +1,49 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "5ffb564e29467164d451e8ea78cf42556d09bf23",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "5ffb564e29467164d451e8ea78cf42556d09bf23",
+    "predecessor_run_id": 36242638463
+  },
+  "accepted_output": {
+    "decision": {
+      "accounting_effect": {
+        "economic_outcomes_opened": 0,
+        "search_budget_change": 0,
+        "v2_attempts_consumed": 0
+      },
+      "data_dependency": "NONE_NEW_DATA_REQUIRED; existing accepted development and replacement capture bindings are frozen by hash.",
+      "execution_blocker": "The user prohibited shell tools, so targeted tests and the frozen screen could not be run.",
+      "execution_performed": false,
+      "executor_ref": "research_v3/regime_context_conditioned_epoch29_screen.py",
+      "freeze_ref": "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
+      "implementation_changed": true,
+      "independent_confirmation_claimed": false,
+      "inference_frozen": "Chronological per-symbol and per-context split; exact one-sided binomial tests in both halves; 0.025 per-half threshold; within-symbol context correction; Benjamini-Hochberg FDR across all 41 representatives at q=0.05.",
+      "mechanism_family_closed": false,
+      "result_generated": false,
+      "result_ref": "evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json",
+      "safety": {
+        "competition_start_authorized": false,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false
+      },
+      "tests_ref": "tests/test_regime_context_conditioned_epoch29_screen.py"
+    },
+    "external_data_gate": null,
+    "implementation_id": "MXM_EPOCH29_REGIME_CONTEXT_CONDITIONED_SCREEN_V1",
+    "next_research_state": {
+      "next_action": "RUN_TARGETED_TESTS_AND_EXECUTE_FROZEN_NON_ECONOMIC_STRUCTURAL_SCREEN_THEN_ACCEPT_RESULT",
+      "status": "REGIME_CONTEXT_CONDITIONED_EPOCH29_IMPLEMENTATION_AUTHORED_SCREEN_EXECUTION_PENDING"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Authored the epoch29 prospective freeze, deterministic structural-screen executor, and targeted tests. The accepted hash-bound M5 captures already cover all 41 frozen representatives, including the three replacement symbols, so no new data or external data gate is required. Tests and the screen were not executed; no result artifact was generated.",
+    "tests_requested": [
+      "python -m pytest tests/test_regime_context_conditioned_epoch29_screen.py",
+      "Execute research_v3/regime_context_conditioned_epoch29_screen.py with the frozen manifest, accepted structural registry, and the already-accepted development and replacement ZIPs; write evidence/EPOCH29_REGIME_CONTEXT_CONDITIONED_STRUCTURAL_RESULT_V1.json."
+    ]
+  },
   "basis_next_state_sha256": "5ecff9a4b7902dece9d9bab1f01cb1f7b5c3152ccd5cd416105a0464b9f234e4",
   "changed_paths": [
     "research_v3/EPOCH29_REGIME_CONTEXT_CONDITIONED_FRONTIER_FREEZE_V1.json",
@@ -61,5 +106,5 @@
     "provider": "github-copilot-cli"
   },
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
