@@ -1,0 +1,27 @@
+{
+  "schema": "mxm.greenfield.epoch25-authority-packet-closure-repair.v1",
+  "status": "IMPLEMENTED_REQUIRES_EXACT_HEAD_CI",
+  "recorded_utc": "2026-09-26T03:35:00Z",
+  "observed_failure": {
+    "rejected_request_id": "reason_963b92ef2cf34a122e7109abd8cb2658",
+    "rejection_ref": "research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",
+    "reason": "provider candidate referenced authority outside supplied context: evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
+    "provider_call_created_material_state": false
+  },
+  "root_cause": "The semantic packet used a manually enumerated list of NEXT_AUTONOMOUS_STATE *_ref fields. The state exposed an existing evidence ref to the model while authority_refs omitted it, so a semantically legal citation was rejected before registry.",
+  "repair": [
+    "Recursively include every existing repository file referenced by *_ref and *_refs fields in durable NEXT_AUTONOMOUS_STATE.",
+    "Retain the proposal-side fail-closed check: candidates still cannot cite arbitrary repository paths outside the supplied packet.",
+    "Add a regression asserting that every existing state ref is present in the semantic authority packet."
+  ],
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "account_mutation": false
+  }
+}

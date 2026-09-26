@@ -20,6 +20,33 @@ class Epoch25AdditionalAuthorityRecoveryTests(unittest.TestCase):
         ):
             self.assertIn(rel,refs)
 
+    def test_all_existing_repository_refs_exposed_by_current_state_are_authorized(self):
+        state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+        _,refs=_authority_context(ROOT,state)
+        # Regression for the exact Epoch25 rejection: this ref was visible in
+        # NEXT_AUTONOMOUS_STATE but omitted from the old manual authority list.
+        self.assertIn(
+            "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
+            refs,
+        )
+
+        def walk(value,key=None):
+            found=[]
+            if isinstance(value,dict):
+                for k,v in value.items():
+                    if k.endswith("_ref") and isinstance(v,str) and v and (ROOT/v).is_file():
+                        found.append(v)
+                    elif k.endswith("_refs") and isinstance(v,list):
+                        found.extend(x for x in v if isinstance(x,str) and x and (ROOT/x).is_file())
+                    found.extend(walk(v,k))
+            elif isinstance(value,list):
+                for v in value:
+                    found.extend(walk(v,key))
+            return found
+
+        missing=sorted(set(walk(state))-set(refs))
+        self.assertEqual(missing,[])
+
     def test_epoch25_authority_request_is_already_durable_and_resolved(self):
         request=json.loads((ROOT/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").read_text())
         acceptance=json.loads((ROOT/"research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json").read_text())

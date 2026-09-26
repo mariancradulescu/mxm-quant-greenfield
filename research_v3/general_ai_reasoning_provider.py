@@ -97,6 +97,30 @@ def reasoning_required(next_state:Mapping[str,Any])->bool:
     # Wake detection only. This never maps a state to a research decision.
     return action.startswith("AI_") or "PENDING_AI_INTERPRETATION" in status or "AI_REASONING_REQUIRED" in status
 
+def _state_repository_refs(value:Any, *, key:str|None=None)->list[str]:
+    """Collect durable repository refs exposed by NEXT_AUTONOMOUS_STATE.
+
+    If a state document is shown to the semantic provider, any existing repository
+    artifact referenced by *_ref / *_refs fields must also be in the provider's
+    allowed authority packet.  Maintaining a manual allow-list caused Epoch25 to
+    reject a valid proposal merely because one historical evidence ref was visible
+    in state but absent from authority_refs.
+    """
+    found:list[str]=[]
+    if isinstance(value,Mapping):
+        for child_key,child in value.items():
+            child_name=str(child_key)
+            if child_name.endswith("_ref") and isinstance(child,str) and child:
+                found.append(child)
+            elif child_name.endswith("_refs") and isinstance(child,list):
+                found.extend(str(x) for x in child if isinstance(x,str) and x)
+            found.extend(_state_repository_refs(child,key=child_name))
+    elif isinstance(value,list):
+        for child in value:
+            found.extend(_state_repository_refs(child,key=key))
+    return found
+
+
 def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[str,Any]],list[str]]:
     refs=list(BASE_AUTHORITIES)
     for rel in ("research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
@@ -137,6 +161,14 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         value=next_state.get(key)
         if isinstance(value,str) and value and value not in refs:
             refs.append(value)
+
+    # Systemic closure: do not expose a durable state ref to AI while forbidding
+    # the same ref as proposal authority.  Include only repository files that
+    # actually exist; non-file identifiers never become authorities.
+    for rel in _state_repository_refs(next_state):
+        if rel not in refs and (root/rel).is_file():
+            refs.append(rel)
+
     rows=[]; kept=[]
     for rel in refs:
         p=root/rel
