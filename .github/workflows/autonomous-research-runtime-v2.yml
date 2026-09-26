@@ -122,6 +122,16 @@ jobs:
                 gh workflow run research-fast-path-validation.yml --ref "${TARGET_BRANCH}"
                 break
                 ;;
+              QUIESCENT_NO_ACTION)
+                python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+          if state.get("next_action"):
+              raise SystemExit("Unrouted canonical next_action: "+str(state["next_action"]))
+          PY
+                break
+                ;;
               *)
                 break
                 ;;
