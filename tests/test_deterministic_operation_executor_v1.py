@@ -137,7 +137,8 @@ class DeterministicOperationExecutorV1Tests(unittest.TestCase):
             }
             payload_rel="research_v3/runtime_v2_inputs/result.b64"
             payload=base64.b64encode(gzip.compress(json.dumps(result,separators=(",",":")).encode())).decode()
-            (root/payload_rel).write_text(payload,encoding="ascii")
+            # Base64 transport is canonicalized for insignificant surrounding whitespace.
+            (root/payload_rel).write_text(payload+"\n",encoding="ascii")
             op_rel="research_v3/op.json"
             op={
                 "schema":"mxm.greenfield.deterministic-next-operation.v1",
@@ -156,7 +157,7 @@ class DeterministicOperationExecutorV1Tests(unittest.TestCase):
                 "family_result":"NO_SUPPORT",
             }
             import research_v3.runtime_v2_primitives as primitives
-            op["payload_sha256"]=primitives.sha256_file(root/payload_rel)
+            op["payload_sha256"]=hashlib.sha256(payload.encode("ascii")).hexdigest()
             (root/op_rel).write_text(json.dumps(op),encoding="utf-8")
             state={
                 "schema":"mxm.greenfield.runtime-v2-next-autonomous-state.v3",

@@ -129,13 +129,17 @@ def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
     payload_path=root/payload_ref
     if not payload_path.is_file():
         raise DeterministicOperationRejected("embedded structural result payload missing")
+    encoded_payload=payload_path.read_text(encoding="ascii").strip()
     expected_payload_sha=str(op.get("payload_sha256") or "").strip()
-    if expected_payload_sha and sha256_file(payload_path)!=expected_payload_sha:
-        raise DeterministicOperationRejected("embedded structural result payload hash mismatch")
+    if expected_payload_sha:
+        import hashlib
+        normalized_payload_sha=hashlib.sha256(encoded_payload.encode("ascii")).hexdigest()
+        if normalized_payload_sha!=expected_payload_sha:
+            raise DeterministicOperationRejected("embedded structural result payload hash mismatch")
     if op.get("payload_encoding")!="BASE64_GZIP_JSON":
         raise DeterministicOperationRejected("unsupported embedded structural result payload encoding")
     try:
-        packed=base64.b64decode(payload_path.read_text(encoding="ascii").strip(),validate=True)
+        packed=base64.b64decode(encoded_payload,validate=True)
         result=json.loads(gzip.decompress(packed).decode("utf-8"))
     except Exception as exc:
         raise DeterministicOperationRejected(f"embedded structural result payload decode failed: {exc}") from exc
