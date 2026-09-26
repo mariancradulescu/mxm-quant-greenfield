@@ -17,7 +17,11 @@ def classify(root_value:str|Path=".")->dict[str,Any]:
     fp=liveness_fingerprint(root,state)
     dedup=load_json(root/DEDUP_REL,{}) or {}
     completed=dedup.get("last_completed_fingerprint")
-    duplicate=bool(completed and completed==fp)
+    completed_operation=str(dedup.get("last_completed_operation") or "").strip()
+    current_operation=str(state.get("next_action") or "").strip()
+    # A completed fingerprint suppresses only the same completed action.
+    # It must never suppress a new frontier action produced by that execution.
+    duplicate=bool(completed and completed==fp and completed_operation and completed_operation==current_operation)
     execution_class=route["execution_class"]
     dispatch_required=execution_class in {
         "DETERMINISTIC_OPERATION","SEMANTIC_REASONING","NOVEL_AI_IMPLEMENTATION",
