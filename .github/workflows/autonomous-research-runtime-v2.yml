@@ -204,6 +204,10 @@ jobs:
         if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'DETERMINISTIC_OPERATION' }}
         run: python -m research_v3.deterministic_operation_executor execute-chain --root . --max-operations 8 --git-checkpoint --git-push
 
+      - name: Install runtime test dependency for implementation
+        if: ${{ steps.mode.outputs.mode == 'resume' && steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION' }}
+        run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
+
       - name: General AI focused tests
         if: ${{ steps.mode.outputs.mode == 'resume' && (steps.route.outputs.execution_class == 'SEMANTIC_REASONING' || steps.route.outputs.execution_class == 'NOVEL_AI_IMPLEMENTATION') }}
         run: python -m unittest -v tests.test_execution_router_v1 tests.test_autonomous_runtime_v2 tests.test_autonomous_director_v2 tests.test_general_ai_director_bridge tests.test_general_ai_reasoning_provider tests.test_general_ai_implementation_executor tests.test_copilot_sdk_observability_v1
