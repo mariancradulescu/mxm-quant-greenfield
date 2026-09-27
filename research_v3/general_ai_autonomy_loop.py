@@ -143,6 +143,81 @@ def _park_authority(root: Path, state: dict, request: dict, *, git_checkpoint: b
     GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("scoped_authority_blocker",None)
     return True
 
+def _current_authority_request(root:Path,state:dict)->dict|None:
+    """Recover the exact local authority request from the currently accepted AI proposal.
+
+    The accepted proposal, not stale inherited state fields, owns the blocked scope.
+    """
+    proposal_id=str(state.get("source_ai_proposal_id") or "").strip()
+    proposal_hash=str(state.get("source_ai_proposal_hash") or "").strip()
+    if not proposal_id and not proposal_hash:
+        return None
+    registry=load_json(root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",{}) or {}
+    matches=[
+        row for row in list(registry.get("accepted") or [])
+        if (not proposal_id or row.get("proposal_id")==proposal_id)
+        and (not proposal_hash or row.get("proposal_hash")==proposal_hash)
+    ]
+    if len(matches)!=1:
+        return None
+    proposal_ref=str(matches[0].get("proposal_ref") or "").strip()
+    proposal=load_json(root/proposal_ref,{}) if proposal_ref else {}
+    decision=dict((proposal or {}).get("decision") or {})
+    if str(decision.get("status") or "").upper()!="ADDITIONAL_AUTHORITY_REQUIRED":
+        return None
+    scope=str(decision.get("blocked_scope_id") or "").strip()
+    requested=str(decision.get("requested_authority_or_class") or state.get("requested_authority_or_class") or "").strip()
+    if not scope or not requested:
+        return None
+    binding=dict((proposal or {}).get("evidence_binding") or {})
+    request_id=str(binding.get("reasoning_request_id") or ((proposal or {}).get("provider") or {}).get("reasoning_request_id") or "").strip()
+    if not request_id:
+        request_id="authority_"+hashlib.sha256(json.dumps({
+            "proposal_hash":matches[0].get("proposal_hash"),"scope":scope,
+            "epoch":state.get("current_research_evidence_epoch")
+        },sort_keys=True,separators=(",",":")).encode()).hexdigest()[:32]
+    return {
+        "schema":"mxm.greenfield.additional-authority-request.v1",
+        "status":"ADDITIONAL_AUTHORITY_REQUIRED",
+        "requested_authority_or_class":requested,
+        "rationale":str(decision.get("rationale") or state.get("rationale") or "")[:700],
+        "request_id":request_id,
+        "evidence_epoch":state.get("current_research_evidence_epoch"),
+        "blocked_scope_ids":[scope],
+        "no_economic_outcome":True,
+        "source_ai_proposal_id":proposal_id or None,
+        "source_ai_proposal_hash":proposal_hash or None,
+    }
+
+def _park_current_local_authority(root:Path,state:dict,*,git_checkpoint:bool,git_push:bool)->dict|None:
+    request=_current_authority_request(root,state)
+    if request is None:
+        return None
+    if not _park_authority(root,state,request,git_checkpoint=False,git_push=False):
+        return None
+    parked=dict(load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{}) or {})
+    next_state=dict(state)
+    for key in ("blocked_scope_id","requested_authority_or_class","implementation_scope","implementation_ai_scope"):
+        next_state.pop(key,None)
+    next_state.update({
+        "status":"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_LOCAL_AUTHORITY_PARK",
+        "next_action":"AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_OUTSIDE_PARKED_LOCAL_FRONTIERS",
+        "ai_reasoning_required":True,
+        "research_judgment_required":True,
+        "implementation_ai_required":False,
+        "implementation_satisfied":False,
+        "implementation_scope_complete":False,
+        "user_action_required":False,
+        "external_data_required":False,
+        "external_data_gate":None,
+        "external_gate":None,
+        "additional_authority_request_ref":"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",
+    })
+    atomic_write_json(root/NEXT_STATE_REL,next_state)
+    refresh_derived_views(root)
+    GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("local_authority_park_and_continue",None)
+    return {"request":parked,"next_state":next_state}
+
 def _material_state_signature(state: dict) -> str:
     """Hash only routing/research state that can represent material progress.
 
@@ -242,11 +317,16 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             return {"status":"MATERIAL_INTEGRITY_FAILURE","progress_class":"MATERIAL_FAILURE","cycles":cycle-1,"trace":trace,"next_state":state}
         if state.get("user_action_required") is True or state.get("external_data_required") is True or state.get("external_gate") not in (None,"",{},[]) or state.get("external_data_gate") not in (None,"",{},[]):
             return {"status":"EXTERNAL_USER_ACTION_REQUIRED" if state.get("user_action_required") is True else "EXTERNAL_DATA_REQUIRED","progress_class":"LEGITIMATE_EXTERNAL_GATE","cycles":cycle-1,"trace":trace,"next_state":state}
-        if (state.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED"
-                and state.get("requested_authority_or_class")
-                and state.get("implementation_ai_required") is True):
-            return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_RESEARCH_AUTHORITY",
-                    "cycles":cycle-1,"trace":trace,"next_state":state}
+        if state.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED" and state.get("requested_authority_or_class"):
+            parked=_park_current_local_authority(root,state,git_checkpoint=git_checkpoint,git_push=git_push)
+            if parked is None:
+                return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_RESEARCH_AUTHORITY",
+                        "cycles":cycle-1,"trace":trace,"next_state":state}
+            trace.append({"cycle":cycle,"kind":"LOCAL_AUTHORITY_PARKED",
+                          "blocked_scope_ids":parked["request"].get("blocked_scope_ids"),
+                          "provider_calls_delta":0})
+            state=dict(parked["next_state"])
+            continue
         if deterministic_operation_required(root,state):
             out=execute_deterministic_chain(root,max_operations=max_cycles-cycle+1,git_checkpoint=git_checkpoint,git_push=git_push)
             if out.get("status")=="PENDING_EXACT_HEAD_GREEN":

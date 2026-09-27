@@ -584,6 +584,23 @@ def _normalize_candidate_routing(request:Mapping[str,Any],candidate:Mapping[str,
         return doc
 
     status=str(next_state.get("status") or "").upper()
+    decision_status=str(decision.get("status") or "").upper()
+    if decision_status=="ADDITIONAL_AUTHORITY_REQUIRED":
+        blocked=str(decision.get("blocked_scope_id") or "").strip()
+        requested=str(decision.get("requested_authority_or_class") or "").strip()
+        if blocked:
+            next_state["blocked_scope_id"]=blocked
+        if requested:
+            next_state["requested_authority_or_class"]=requested
+        next_state["status"]="ADDITIONAL_AUTHORITY_REQUIRED"
+        next_state["implementation_ai_required"]=False
+        next_state["ai_reasoning_required"]=False
+        next_state["research_judgment_required"]=False
+        next_state["implementation_satisfied"]=False
+        next_state["implementation_scope_complete"]=False
+        next_state["user_action_required"]=False
+        next_state["external_data_required"]=False
+        return doc
     if (
         next_state.get("implementation_ai_required") is not True
         and (

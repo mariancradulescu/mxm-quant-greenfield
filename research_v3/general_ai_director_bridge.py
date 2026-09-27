@@ -852,6 +852,9 @@ def _clean_next_state_for_new_ai_decision(
         "collector_package_artifact_name",
         "expected_return_artifact_name",
         "source_implementation_id",
+        "blocked_scope_id",
+        "requested_authority_or_class",
+        "additional_authority_request_ref",
         *ONE_SHOT_NEXT_STATE_KEYS,
     ):
         doc.pop(key, None)

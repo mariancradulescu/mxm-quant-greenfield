@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.general_ai_autonomy_loop import run, _park_authority, _blocked_scopes, _recoverable_provider_failure, _persist_provider_recovery, MAX_RECOVERABLE_PROVIDER_FAILURES
+from research_v3.general_ai_autonomy_loop import run, _park_authority, _blocked_scopes, _recoverable_provider_failure, _persist_provider_recovery, _current_authority_request, _park_current_local_authority, MAX_RECOVERABLE_PROVIDER_FAILURES
 from research_v3.general_ai_implementation_executor import ImplementationRejected
 
 
@@ -50,6 +50,36 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
             with patch("research_v3.general_ai_autonomy_loop.current_evidence_binding",return_value={"current_open_mechanism_families":["CARRY_TERM_STRUCTURE"]}):
                 self.assertFalse(_park_authority(root,state,{**request,"blocked_scope_ids":["A","B"]},
                                                  git_checkpoint=False,git_push=False))
+
+    def test_current_accepted_proposal_scope_overrides_stale_inherited_blocked_scope(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            (root/"research_v3/ai_director/proposals").mkdir(parents=True)
+            (root/"research_v3/runtime_v2_acceptance").mkdir(parents=True)
+            proposal={
+                "proposal_id":"P","decision":{"status":"ADDITIONAL_AUTHORITY_REQUIRED",
+                    "blocked_scope_id":"SEASONALITY_SESSION_TIME",
+                    "requested_authority_or_class":"distinct session authority","rationale":"prospective only"},
+                "evidence_binding":{"reasoning_request_id":"reason_new"}
+            }
+            (root/"research_v3/ai_director/proposals/P.json").write_text(json.dumps(proposal))
+            (root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json").write_text(json.dumps({"accepted":[{
+                "proposal_id":"P","proposal_hash":"h","proposal_ref":"research_v3/ai_director/proposals/P.json"}]}))
+            state=write_state(root,status="ADDITIONAL_AUTHORITY_REQUIRED",next_action="AUTHORIZE",
+                current_research_evidence_epoch=34,evidence_epoch=34,source_ai_proposal_id="P",
+                source_ai_proposal_hash="h",blocked_scope_id="RELATIVE_VALUE_COINTEGRATION",
+                requested_authority_or_class="distinct session authority",broader_universe_remains_open=True)
+            request=_current_authority_request(root,state)
+            self.assertEqual(request["blocked_scope_ids"],["SEASONALITY_SESSION_TIME"])
+            with patch("research_v3.general_ai_autonomy_loop.current_evidence_binding",
+                       return_value={"current_open_mechanism_families":["SEASONALITY_SESSION_TIME","TREND_MOMENTUM"]}), \
+                 patch("research_v3.general_ai_autonomy_loop.GitCheckpointSink.checkpoint",return_value=None):
+                parked=_park_current_local_authority(root,state,git_checkpoint=False,git_push=False)
+            self.assertIsNotNone(parked)
+            self.assertTrue(parked["next_state"]["ai_reasoning_required"])
+            self.assertFalse(parked["next_state"]["implementation_ai_required"])
+            self.assertNotIn("blocked_scope_id",parked["next_state"])
+            self.assertIn("SEASONALITY_SESSION_TIME",_blocked_scopes(root))
 
     def test_quota_failure_is_checkpointed_as_retryable_not_fatal(self):
         with tempfile.TemporaryDirectory() as td:

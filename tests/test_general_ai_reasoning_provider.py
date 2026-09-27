@@ -112,6 +112,27 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
                     wake(root,token="test-token",transport=exhausted)
             self.assertEqual(len(calls),1)
 
+    def test_additional_authority_decision_is_not_misrouted_to_implementation(self):
+        request={"authorized_deterministic_operations_current_epoch":[]}
+        candidate={
+            "data_policy":{"new_market_data_requested":False},
+            "decision":{"status":"ADDITIONAL_AUTHORITY_REQUIRED",
+                        "blocked_scope_id":"SEASONALITY_SESSION_TIME",
+                        "requested_authority_or_class":"distinct prospective authority"},
+            "next_research_state":{
+                "status":"ADDITIONAL_AUTHORITY_REQUIRED",
+                "next_action":"AUTHORIZE_DISTINCT_HYPOTHESIS",
+                "implementation_ai_required":True,
+            },
+        }
+        normalized=_normalize_candidate_routing(request,candidate)
+        ns=normalized["next_research_state"]
+        self.assertEqual(ns["blocked_scope_id"],"SEASONALITY_SESSION_TIME")
+        self.assertEqual(ns["requested_authority_or_class"],"distinct prospective authority")
+        self.assertFalse(ns["implementation_ai_required"])
+        self.assertFalse(ns["ai_reasoning_required"])
+        self.assertFalse(ns["research_judgment_required"])
+
     def test_implementation_handoff_is_single_coherent_stage(self):
         request={"authorized_deterministic_operations_current_epoch":[]}
         candidate={
