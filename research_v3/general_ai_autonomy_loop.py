@@ -249,6 +249,10 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                     "cycles":cycle-1,"trace":trace,"next_state":state}
         if deterministic_operation_required(root,state):
             out=execute_deterministic_chain(root,max_operations=max_cycles-cycle+1,git_checkpoint=git_checkpoint,git_push=git_push)
+            if out.get("status")=="PENDING_EXACT_HEAD_GREEN":
+                trace.append({"cycle":cycle,"kind":"PENDING_EXACT_HEAD_GREEN","operation_name":out.get("operation_name"),"exact_head":out.get("exact_head"),"provider_calls_delta":0})
+                return {"status":"PENDING_EXACT_HEAD_GREEN","progress_class":"SAFE_NO_PROGRESS","cycles":cycle,
+                        "trace":trace,"result":out,"next_state":out.get("next_state") or state}
             trace.append({"cycle":cycle,"kind":"DETERMINISTIC_OPERATION","completed_operations":out.get("completed_operations"),"provider_calls_delta":out.get("provider_calls_delta",0)})
             state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
             if state.get("user_action_required") is True or state.get("external_data_required") is True:

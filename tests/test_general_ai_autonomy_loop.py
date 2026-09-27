@@ -115,6 +115,26 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                 out=run(root,max_cycles=1)
             self.assertEqual(out["status"],"PROVIDER_RETRY_REQUIRED")
 
+    def test_deterministic_exact_head_pending_is_machine_routable_without_provider(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            state=write_state(root,status="DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+                              next_action="RUN_FROZEN_EPOCH34",current_research_evidence_epoch=33,evidence_epoch=33,
+                              ai_reasoning_required=False,research_judgment_required=False,implementation_ai_required=False)
+            pending={"status":"PENDING_EXACT_HEAD_GREEN","operation_name":"RUN_FROZEN_EPOCH34",
+                     "exact_head":{"green":False,"head":"a"*40},"next_state":state,
+                     "provider_calls_delta":0,"state_persisted":False}
+            with patch("research_v3.general_ai_autonomy_loop.current_evidence_epoch",return_value=33), \
+                 patch("research_v3.general_ai_autonomy_loop.refresh_derived_views",return_value={}), \
+                 patch("research_v3.general_ai_autonomy_loop.stale_reasoning_redirect",return_value=None), \
+                 patch("research_v3.general_ai_autonomy_loop.deterministic_operation_required",return_value=True), \
+                 patch("research_v3.general_ai_autonomy_loop.execute_deterministic_chain",return_value=pending), \
+                 patch("research_v3.general_ai_autonomy_loop.reason",side_effect=AssertionError("CI recovery must not call provider")):
+                out=run(root,max_cycles=1)
+            self.assertEqual(out["status"],"PENDING_EXACT_HEAD_GREEN")
+            self.assertEqual(out["result"]["exact_head"]["head"],"a"*40)
+            self.assertEqual(out["trace"][0]["provider_calls_delta"],0)
+
     def test_fresh_non_economic_reasoning_does_not_wait_for_exact_head_ci(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)

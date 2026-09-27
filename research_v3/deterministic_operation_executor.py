@@ -1,6 +1,6 @@
 """Zero-provider executor for explicitly authorized deterministic research operations."""
 from __future__ import annotations
-import argparse, base64, gzip, json
+import argparse, base64, gzip, json, os, subprocess
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +24,39 @@ DEDUP_REL=Path("research_v3/LIVENESS_DEDUP_V1.json")
 
 class DeterministicOperationRejected(RuntimeError):
     pass
+
+def _head(root:Path)->str:
+    return subprocess.check_output(["git","rev-parse","HEAD"],cwd=root,text=True).strip()
+
+def exact_head_green(root:Path)->dict[str,Any]:
+    observed=_head(root)
+    expected=os.environ.get("MXM_PREDECESSOR_CI_HEAD","").strip()
+    conclusion=os.environ.get("MXM_PREDECESSOR_CI_CONCLUSION","").strip().lower()
+    run_id=os.environ.get("MXM_PREDECESSOR_CI_RUN_ID","").strip()
+    return {
+        "green":bool(expected and conclusion=="success" and expected==observed),
+        "head":observed,
+        "predecessor_head":expected or None,
+        "predecessor_conclusion":conclusion or None,
+        "predecessor_run_id":int(run_id) if run_id.isdigit() else None,
+    }
+
+def _pending_exact_head(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]|None:
+    policy=op.get("execution_policy") or {}
+    if policy.get("exact_head_green_required_before_execution") is not True:
+        return None
+    proof=exact_head_green(root)
+    if proof["green"]:
+        return None
+    return {
+        "status":"PENDING_EXACT_HEAD_GREEN",
+        "operation_name":op.get("operation_name"),
+        "reason":"AUTHORIZED_DETERMINISTIC_OPERATION_AWAITS_EXACT_HEAD_FAST_CI",
+        "exact_head":proof,
+        "next_state":state,
+        "provider_calls_delta":0,
+        "state_persisted":False,
+    }
 
 def _provider_count(root:Path)->int:
     doc=load_json(root/"research_v3/ai_director/PROVIDER_USAGE_V1.json",{}) or {}
@@ -267,7 +300,7 @@ def _run_epoch34_composite_screen(root:Path,state:dict[str,Any],op:dict[str,Any]
         raise DeterministicOperationRejected("Epoch34 operation is not explicitly deterministic and non-semantic")
     if policy.get("exact_head_green_required_before_execution") is not True:
         raise DeterministicOperationRejected("Epoch34 operation is missing its exact-head green prerequisite")
-    if state.get("exact_head_green") is not True:
+    if not exact_head_green(root)["green"]:
         raise DeterministicOperationRejected("Epoch34 screen execution is blocked until exact-head CI is green")
     freeze_path=root/expected["freeze_ref"]
     development_path=root/expected["development_zip_ref"]
@@ -295,6 +328,9 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     if not deterministic_operation_required(root,state):
         return {"status":"NO_DETERMINISTIC_OPERATION_REQUIRED"}
     op=load_authorized_deterministic_operation(root,state)
+    pending=_pending_exact_head(root,state,op)
+    if pending is not None:
+        return pending
     before=project_snapshot(root)
     provider_before=_provider_count(root)
     name=op["operation_name"]
@@ -359,6 +395,18 @@ def execute_chain(root_value:str|Path=".",*,max_operations:int=8,git_checkpoint:
         if not deterministic_operation_required(root,state):
             break
         out=execute_one(root,git_checkpoint=False,git_push=False)
+        if out.get("status")=="PENDING_EXACT_HEAD_GREEN":
+            if completed:
+                GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("deterministic_operation_chain",None)
+            return {
+                "status":"PENDING_EXACT_HEAD_GREEN",
+                "completed_operations":completed,
+                "operation_name":out.get("operation_name"),
+                "exact_head":out.get("exact_head"),
+                "next_state":out.get("next_state") or state,
+                "provider_calls_delta":0,
+                "state_persisted":False,
+            }
         completed.append(out["operation_name"])
     if completed:
         GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("deterministic_operation_chain",None)
