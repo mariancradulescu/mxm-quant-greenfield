@@ -27,6 +27,7 @@
   "active_proposal_id": null,
   "active_target_symbol": null,
   "additional_authority_acceptance_ref": "research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json",
+  "ai_reasoning_required": false,
   "alignment_prerequisite_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
   "all_frontier_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
@@ -254,6 +255,7 @@
   "fresh_director_decision_ref": "research_v3/EPOCH21_CLEAN_FRONTIER_GENERAL_AI_DECISION_V1.json",
   "fresh_evidence_epoch_required": false,
   "fresh_family_selection_required": true,
+  "fresh_frontier_reasoning_required_next": true,
   "fresh_semantic_boundary": true,
   "frontier_feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
   "frontier_opportunity_map_ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
@@ -282,7 +284,7 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": false,
+  "implementation_ai_required": true,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -305,8 +307,8 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": true,
-  "implementation_scope": "Create a prospectively frozen, outcome-blind Epoch35 cross-sectional ranking specification and non-economic evaluator for the current eligible frontier. Enforce causal timing, current-frontier identity controls, full representative breadth, and auditable result materialization. Do not reuse or retune an exposed diagnostic. Do not add broker acquisition or economic evaluation.",
+  "implementation_satisfied": false,
+  "implementation_scope": "Author research_v3/EPOCH35_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json (frozen law spec above) and a new evaluator research_v3/cross_sectional_ranking_epoch35_screen.py implementing the volatility-normalized decile-spread cross-sectional test over the 41 frozen representatives using existing accepted 13w M5 capture; execute it deterministically and produce evidence/EPOCH35_CROSS_SECTIONAL_RANKING_STRUCTURAL_RESULT_V1.json as a non-economic structural acceptance artifact.",
   "implementation_scope_complete": false,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
@@ -463,7 +465,7 @@
     "prospective freeze record"
   ],
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
   "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
   "result_sha256": "4ae7aec358a32f48aa699360ab28cb809ff5a2963365c2bd242af416bdc7b47a",
@@ -492,10 +494,10 @@
   "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
   "search_budget_change": -1,
   "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-  "source_ai_proposal_hash": "43ea99043a95eeb1343df2d0dd09a93e5a13aee6aea71d6c72ddad32fc316bdc",
-  "source_ai_proposal_id": "epoch35-cross-sectional-structural-selection",
+  "source_ai_proposal_hash": "d34c432c748bc2922a114b8a30db565b0695dd6fab16a2265bcf4fed1a0761ed",
+  "source_ai_proposal_id": "EPOCH35_CROSS_SECTIONAL_RANKING_FRESH_STRUCTURAL_LAW_PROPOSAL_V1",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-  "source_runtime_operation_id": "op_8016486285cb3c2158d15b439f7670ba",
+  "source_runtime_operation_id": "op_107b99bdde4060494f45eaf61c29658a",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 27,
     "current_evidence_epoch": 28,
@@ -505,7 +507,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_PROSPECTIVE_STRUCTURAL_LAW_REQUIRED",
+  "status": "STRUCTURAL_LAW_PROPOSED_EPOCH35",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
