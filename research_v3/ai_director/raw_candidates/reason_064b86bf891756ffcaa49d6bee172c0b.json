@@ -1,0 +1,100 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+      "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+      "research_v3/cross_sectional_ranking_epoch26_screen.py",
+      "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+      "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_IMPLEMENTATION_MANIFEST_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+      "research_v3/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_FRONTIER_FREEZE_V1.json",
+      "evidence/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_RESULT_V1.json",
+      "research_v3/RESEARCH_CONTRACT_V3.json",
+      "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json"
+    ],
+    "data_bindings": [
+      {
+        "ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+        "role": "PRIMARY_STRUCTURAL_FEATURE_SOURCE"
+      },
+      {
+        "ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+        "role": "REPRESENTATIVE_PANEL_DEFINITION"
+      }
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "artifacts_to_author": {
+        "evaluator_ref": "research_v3/cross_sectional_ranking_epoch35_screen.py",
+        "freeze_ref": "research_v3/EPOCH35_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "result_ref_on_completion": "evidence/EPOCH35_CROSS_SECTIONAL_RANKING_STRUCTURAL_RESULT_V1.json"
+      },
+      "economic_promotion_authorized": false,
+      "fresh_frozen_law_spec": {
+        "cross_sectional_unit": "same_timestamp_rank_across_41_representatives",
+        "distinctness_from_epoch26": "Different ranking construction (volatility-normalized N-bar return rank rather than raw pairwise rank), different formation/holding horizons, and a cross-sectional decile-spread test statistic instead of Epoch26's design; this is a new prospectively justified hypothesis, not a redesign after seeing Epoch26/34 outcomes.",
+        "fdr_q": 0.05,
+        "formation_window_bars": 24,
+        "holding_horizon_bars": 12,
+        "minimum_settled_observations_per_half": 30,
+        "multiplicity_correction": "BENJAMINI_HOCHBERG_FDR",
+        "no_retroactive_parameter_selection": true,
+        "resolution": "M5",
+        "test_statistic": "TOP_MINUS_BOTTOM_DECILE_MEAN_FORWARD_RETURN_ONE_SIDED_SIGN_TEST"
+      },
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "no_economic_or_provider_action_authorized": true,
+      "panel": {
+        "breadth_rationale": "Full frozen representative set (one per accepted structural signature with existing 13w M5 history) preserves non-economic structural heterogeneity across regions/asset classes and event independence; no ad hoc narrowing.",
+        "representative_count": 41,
+        "source": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
+      },
+      "prohibitions_observed": [
+        "NO_C032_RERUN",
+        "NO_C032_OUTCOME_CAPTURE_REUSE",
+        "NO_RETROACTIVE_TUNING",
+        "NO_OUTCOME_DRIVEN_SCOPE_SELECTION"
+      ],
+      "reused_reusable_evidence": [
+        "research_v3/EPOCH26_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json",
+        "research_v3/cross_sectional_ranking_epoch26_screen.py",
+        "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
+        "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json"
+      ],
+      "scope": "NON_ECONOMIC_STRUCTURAL_DIAGNOSTIC_ONLY"
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "fresh_frontier_reasoning_required_next": true,
+      "implementation_ai_required": true,
+      "implementation_scope": "Author research_v3/EPOCH35_CROSS_SECTIONAL_RANKING_FRONTIER_FREEZE_V1.json (frozen law spec above) and a new evaluator research_v3/cross_sectional_ranking_epoch35_screen.py implementing the volatility-normalized decile-spread cross-sectional test over the 41 frozen representatives using existing accepted 13w M5 capture; execute it deterministically and produce evidence/EPOCH35_CROSS_SECTIONAL_RANKING_STRUCTURAL_RESULT_V1.json as a non-economic structural acceptance artifact.",
+      "mechanism_family_closed": false,
+      "next_action": "AI_DECLARE_FRESH_EPOCH35_CROSS_SECTIONAL_STRUCTURAL_LAW",
+      "research_judgment_required": true,
+      "status": "STRUCTURAL_LAW_PROPOSED_EPOCH35"
+    },
+    "objective": {
+      "class": "NON_ECONOMIC_STRUCTURAL_LAW_DECLARATION",
+      "goal": "Declare and implement a genuinely fresh, predeclared, non-economic CROSS_SECTIONAL_RANKING structural law (Epoch35) over the current 41 accepted broker-native structural representatives, distinct in design from the already-observed Epoch26 cross-sectional law, to continue exhausting this open mechanism family toward eventual economic candidacy without reusing or retuning any previously observed diagnostic outcome.",
+      "information_gain_rationale": "The frontier's own pending_decision explicitly requires AI_DECLARE_FRESH_EPOCH35_CROSS_SECTIONAL_STRUCTURAL_LAW as the next legal reasoning action; the material delta since last accepted reasoning is the Epoch34 composite causal-ML/regime result, and CROSS_SECTIONAL_RANKING is a validated-breadth survivor (V2-C023) whose mechanism family is not yet closed. A fresh, differently-designed rank-based cross-sectional test (different ranking horizon, response window, and dispersion statistic than Epoch26) over the same 41-symbol frozen structural panel maximizes information gain per unit of search budget: it reuses existing accepted 13w M5 capture (zero new acquisition cost), avoids all three blocked families (CARRY_TERM_STRUCTURE, CROSS_MARKET_LEAD_LAG, SEASONALITY_SESSION_TIME), and produces a new non-economic pass/fail structural verdict that either narrows or further exhausts CROSS_SECTIONAL_RANKING before any economic envelope can be considered."
+    },
+    "proposal_id": "EPOCH35_CROSS_SECTIONAL_RANKING_FRESH_STRUCTURAL_LAW_PROPOSAL_V1"
+  },
+  "captured_utc": "2026-09-27T16:28:17Z",
+  "evidence_bundle_sha256": "3085b3943c22809652cc028136a8bf16876f51cd676556292c259bd37fc825d8",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_064b86bf891756ffcaa49d6bee172c0b"
+}
