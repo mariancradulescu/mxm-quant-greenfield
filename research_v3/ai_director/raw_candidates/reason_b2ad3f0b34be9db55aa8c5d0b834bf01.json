@@ -1,0 +1,84 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/EPOCH27_PROSPECTIVE_BREAKOUT_RESEARCH_SPEC_V1.json",
+      "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
+      "evidence/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_RESULT_V1.json",
+      "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "research_v3/mean_reversion_epoch25_screen.py",
+      "research_v3/trend_momentum_epoch24_screen.py",
+      "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json",
+      "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
+      "HYPOTHESIS_SPACE_V1.json",
+      "research_v3/RESEARCH_CONTRACT_V3.json",
+      "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_VOLATILITY_EVENT_AVAILABILITY_V1.json"
+    ],
+    "data_bindings": [
+      {
+        "acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+        "capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503"
+      },
+      {
+        "acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+        "capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+      }
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "action": "DESIGN_AND_EXECUTE_FRESH_FROZEN_BREAKOUT_VOLATILITY_EXPANSION_STRUCTURAL_LAW",
+      "no_new_market_data_required": true,
+      "proposed_frozen_law": {
+        "chronological_split": "Two chronological halves per symbol via median event timestamp, minimum both-nonzero-settled per half (>=30, matching Epoch24/25/29/33/34 convention)",
+        "event_definition": "Reuse EPOCH27 event onset primitives (research_v3/EPOCH27_PROSPECTIVE_BREAKOUT_RESEARCH_SPEC_V1.json): close breaks prior 24-bar high/low with range >=1.5x prior median range on M5, contiguous 25-bar history, min 6 bars between selected events per symbol, chronological-earliest-first selection, no outcome-based symbol pre-selection.",
+        "freeze_discipline": "Law, thresholds, horizon, and multiplicity rule must be written to a new research_v3/EPOCH35_BREAKOUT_VOLATILITY_EXPANSION_FRONTIER_FREEZE_V1.json BEFORE execution, mirroring the Epoch24/25/29/33/34 freeze-then-execute pattern; result output as evidence/EPOCH35_BREAKOUT_VOLATILITY_EXPANSION_STRUCTURAL_RESULT_V1.json with economic_promotion_authorized=false pending separate future economic-gate review",
+        "multiplicity_correction": "Benjamini-Hochberg FDR at q=0.05 (or Holm, consistent with Epoch34 composite convention) across all 41 frozen representatives, applied once, no post-hoc reselection",
+        "per_symbol_test": "ONE_SIDED_EXACT_BINOMIAL_CONTINUATION_VS_0_5 (identical primitive used in trend_momentum_epoch24_screen.py and mean_reversion_epoch25_screen.py)",
+        "response_definition": "Direction over a fixed forward horizon (3 or 12 bars, held fixed prospectively before execution) versus event direction: continuation vs reversal, flat excluded from denominator but reported, no returns/PnL computed at this stage."
+      },
+      "reused_data": [
+        "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json (capture_sha256=64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503)",
+        "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json (capture_sha256=d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75)"
+      ],
+      "target_mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "target_representatives": "ALL_41_CURRENT_BROKER_STRUCTURAL_REGISTRY_REPRESENTATIVES_WITH_ACCEPTED_13W_M5_HISTORY (per research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json)",
+      "why_not_other_actions": "TREND_MOMENTUM, MEAN_REVERSION, CROSS_SECTIONAL_RANKING, REGIME_CONTEXT_CONDITIONED, RELATIVE_VALUE_COINTEGRATION, and CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL (including the Epoch34 composite) have each already received this exact rigorous inferential treatment with zero support; re-running any of them without a genuinely distinct prospective hypothesis would be forbidden reparameterization under NO_C032_RERUN/NO_RETROACTIVE_TUNING-style prohibitions. CARRY_TERM_STRUCTURE, SEASONALITY_SESSION_TIME, and CROSS_MARKET_LEAD_LAG are in blocked_scope_set with an existing unresolved authority request (blocked_authority_request_id=reason_788a5d2fa35e82786963081b13c824f4); re-requesting the same authority is prohibited. No economic action is authorized (no_economic_action_authorized=true) and authorized_deterministic_operations_current_epoch is empty, so this must route through implementation, not a deterministic-operation reference."
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "family_status_after_this_action": "If zero symbols pass, BREAKOUT_VOLATILITY_EXPANSION joins the other six legal families with completed, rigor-matched null structural results, at which point the legal non-blocked frontier is fully covered pending resolution of the blocked_scope_set authority.",
+      "implementation_ai_required": true,
+      "implementation_scope": "Author a new frozen freeze spec (research_v3/EPOCH35_BREAKOUT_VOLATILITY_EXPANSION_FRONTIER_FREEZE_V1.json) and a new deterministic evaluator script (research_v3/breakout_volatility_epoch35_screen.py, modeled on research_v3/mean_reversion_epoch25_screen.py and research_v3/trend_momentum_epoch24_screen.py) that: (a) loads the two existing accepted 13w M5 captures, (b) detects breakout events per the frozen event definition above across all 41 representatives, (c) computes per-symbol one-sided exact binomial continuation-vs-0.5 tests split into two chronological halves with minimum both-nonzero-settled sufficiency, (d) applies BH-FDR (or Holm) multiplicity correction once across all 41 symbols, (e) writes a COMPLETE_NON_ECONOMIC_STRUCTURAL_RESULT artifact with economic_promotion_authorized=false and mechanism_family_closed=false regardless of outcome, and (f) includes a unit test mirroring tests/test_regime_context_conditioned_epoch33_screen.py for reproducibility. No authorized_deterministic_operations_current_epoch entry exists for this exact operation, so this cannot be routed as a deterministic-operation reference; it must be built as new repository machinery.",
+      "next_action": "AI_DESIGN_AND_EXECUTE_EPOCH35_BREAKOUT_VOLATILITY_EXPANSION_FROZEN_STRUCTURAL_LAW",
+      "no_symbol_selection_pre_outcome": true,
+      "research_judgment_required": true,
+      "status": "EPOCH35_BREAKOUT_VOLATILITY_EXPANSION_RIGOROUS_STRUCTURAL_LAW_PROPOSED"
+    },
+    "objective": {
+      "class": "STRUCTURAL_METHODOLOGY_GAP_CLOSURE",
+      "current_epoch_context": "material_delta_observed=evidence/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_RESULT_V1.json (verified: 0 of 41 representatives supported_incremental_information=true; economic_promotion_authorized=false; mechanism_family_closed=false)",
+      "goal": "Design and execute a frozen, non-economic, exact-binomial + multiplicity-corrected inferential structural law for BREAKOUT_VOLATILITY_EXPANSION across all 41 current broker-native structural representatives, matching the rigor already applied to TREND_MOMENTUM (Epoch24), MEAN_REVERSION (Epoch25), CROSS_SECTIONAL_RANKING (Epoch26), REGIME_CONTEXT_CONDITIONED (Epoch29/33), CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL (Epoch31), RELATIVE_VALUE_COINTEGRATION (Epoch32), and the COMPOSITE_CAUSAL_ML_REGIME screen (Epoch34).",
+      "information_gain_rationale": "Cross-checking evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json (breadth_fraction=0.0, stable_symbols=0) and research_v3/EPOCH27_PROSPECTIVE_BREAKOUT_RESEARCH_SPEC_V1.json shows BREAKOUT_VOLATILITY_EXPANSION was only ever tested with a lower-rigor 'BINARY_EVENT_CHRONOLOGICAL_STABILITY_BREADTH_V1' descriptive breadth rule (interpretation_boundary self-declares: 'No independence, inferential confidence, economic edge, promotion, or family closure'). Every other non-blocked mechanism family has since received a frozen one-sided exact-binomial-vs-0.5 test with Benjamini-Hochberg/Holm multiplicity correction across the same 41 representatives, and every one of those (including the newest EPOCH34 composite, verified directly: zero symbols with supported_incremental_information=true) produced NO_SYMBOL_PASSED / zero-support results. BREAKOUT_VOLATILITY_EXPANSION is therefore the only currently legal (non-blocked) family that has never been subjected to the project's own now-standard rigorous inferential design. Applying that identical, already-validated template to a family that never received it is a genuinely fresh prospective decision (a real methodology gap, not a redesign of an already-observed diagnostic), reuses only already-accepted 13-week M5 broker-native data, needs no new broker calls, and yields the highest legal information gain available in the current frontier: it either closes the last major structural gap with a null result (completing exhaustive non-economic coverage of all seven legal families) or surfaces the first candidate edge in the entire frontier."
+    },
+    "proposal_id": "EPOCH35_BREAKOUT_VOLATILITY_EXPANSION_RIGOROUS_INFERENTIAL_LAW_V1"
+  },
+  "captured_utc": "2026-09-27T16:35:51Z",
+  "evidence_bundle_sha256": "3085b3943c22809652cc028136a8bf16876f51cd676556292c259bd37fc825d8",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_b2ad3f0b34be9db55aa8c5d0b834bf01"
+}
