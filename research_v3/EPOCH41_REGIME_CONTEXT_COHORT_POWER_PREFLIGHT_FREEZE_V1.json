@@ -1,0 +1,63 @@
+{
+  "schema": "mxm.greenfield.epoch41-regime-context-cohort-power-preflight-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_NON_ECONOMIC_COHORT_AND_POWER_PREFLIGHT",
+  "evidence_epoch": 41,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_f90b3ceb92870099d22c1d028eefc952.json",
+    "accepted_proposal_file_sha256": "bc458f977dec26ce0840efc29f02c57d2fbe497f34a5b9d50ff3ce5304c0e7f9",
+    "feasibility_authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "feasibility_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
+    "eligible_identity_count": 1576,
+    "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "peer_cohort_index_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+    "regime_context_data_audit_ref": "evidence/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_V1.json",
+    "regime_context_data_audit_sha256": "10cb085585bc236a9a738696a9b2d58db4d79971872cf3b8554d0899b5099fdd",
+    "accepted_development_inventory_ref": "evidence/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_RESULT_V1.json",
+    "accepted_development_inventory_sha256": "133197a1b592b401a825a6bebce5a358c8a606c5829353b55271bb2fe00dc562",
+    "adaptive_discovery_architecture_ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json"
+  },
+  "scope": {
+    "mechanism_family": "REGIME_CONTEXT_CONDITIONED",
+    "resolution": "M5",
+    "eligible_sampling_frame": "ALL_CURRENT_EUR200_FEASIBLE_POST_EXCLUSION_IDENTITIES",
+    "fixed_panel_size": false,
+    "structural_representatives_are_inferential_units": false,
+    "selection_features": [
+      "regime-feature availability",
+      "data completeness",
+      "event density",
+      "effective independent sample size",
+      "trading schedule and session coverage",
+      "directional margin feasibility",
+      "capital efficiency",
+      "conservative friction proxy",
+      "redundancy"
+    ],
+    "selection_rule": "Retain the full feasible universe as the outcome-blind sampling frame. Describe existing candidate strata from the already persisted peer-cohort index, and select no inferential members unless accepted development data supports regime-feature coverage and dependence-aware power for that stratum. Missing support is a data gap, not permission to substitute structural representatives or silently enlarge the scope.",
+    "dependence_rule": "Do not infer full-frame or stratum-level effective sample size from the 41-symbol structural audit. Mark power unavailable unless accepted regime-context observations cover the relevant prospectively selected units.",
+    "accepted_data_rule": "Use persisted hash-bound non-economic inventories only. External bytes belonging to already accepted captures are transport materialization, not new data acquisition. Do not acquire new market data in this operation."
+  },
+  "interpretation_boundary": {
+    "strategy_events_or_returns_computed": false,
+    "pnl_computed": false,
+    "economic_outcome_opened": false,
+    "candidate_economic_identity_created": false,
+    "v2_attempt_consumed": false,
+    "protected_forward_opened": false,
+    "independent_confirmation_claimed": false,
+    "mechanism_family_closed": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "execution": {
+    "implementation_ref": "research_v3/regime_context_cohort_power_preflight.py",
+    "result_ref": "evidence/EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT_V1.json",
+    "exact_head_green_required_before_execution": true,
+    "new_semantic_judgment_required": false
+  }
+}

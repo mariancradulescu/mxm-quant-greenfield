@@ -675,6 +675,51 @@ def _execute_epoch38_alignment_readiness(root:Path,state:dict[str,Any],op:dict[s
     })
     return new_state
 
+def _run_epoch41_regime_context_cohort_preflight(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    expected={
+        "operation_name":"RUN_EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT",
+        "implementation_ref":"research_v3/regime_context_cohort_power_preflight.py",
+        "freeze_ref":"research_v3/EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT_FREEZE_V1.json",
+        "result_ref":"evidence/EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT_V1.json",
+    }
+    if op.get("materializer")!="RUN_EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT":
+        raise DeterministicOperationRejected("unsupported Epoch41 cohort preflight materializer")
+    for field,value in expected.items():
+        if op.get(field)!=value:
+            raise DeterministicOperationRejected(f"Epoch41 operation authority mismatch: {field}")
+    if op.get("evidence_epoch")!=41 or op.get("result_validation")!={
+        "schema":"mxm.greenfield.epoch41-regime-context-cohort-power-preflight.v1",
+        "status":"COMPLETE_NON_ECONOMIC_COHORT_POWER_PREFLIGHT",
+        "evidence_epoch":41,
+    }:
+        raise DeterministicOperationRejected("Epoch41 result authority mismatch")
+    policy=op.get("execution_policy") or {}
+    if any(policy.get(field) is not False for field in (
+        "implementation_ai_required","copilot_reasoning_required","new_semantic_judgment_required",
+    )) or policy.get("exact_head_green_required_before_execution") is not True:
+        raise DeterministicOperationRejected("Epoch41 operation is not explicitly deterministic and non-semantic")
+    from research_v3.regime_context_cohort_power_preflight import build_preflight
+    result=build_preflight(root)
+    if (
+        result.get("freeze_sha256")!=sha256_file(root/expected["freeze_ref"])
+        or result.get("sampling_frame",{}).get("structural_41_used_as_inferential_universe") is not False
+        or result.get("sampling_frame",{}).get("selected_inferential_identity_count") is not None
+        or result.get("interpretation_boundary",{}).get("relative_value_alignment_inventory_recomputed") is not False
+        or any(int((result.get("accounting_effect") or {}).get(key) or 0)!=0 for key in (
+            "economic_outcomes_opened","v2_attempts_consumed","search_budget_change",
+        ))
+        or result.get("safety",{}).get("protected_forward_opened") is not False
+        or result.get("safety",{}).get("live_orders_authorized") is not False
+    ):
+        raise DeterministicOperationRejected("Epoch41 preflight result crossed its frozen boundary")
+    result_path=root/expected["result_ref"]
+    if result_path.is_file():
+        if load_json(result_path,{})!=result:
+            raise DeterministicOperationRejected("existing Epoch41 preflight differs from recomputation")
+    else:
+        atomic_write_json(result_path,result)
+    return _execute_existing_structural_result(root,state,op)
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -769,6 +814,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         result=build_preflight(root)
         atomic_write_json(root/op["result_ref"],result)
         new_state=_execute_existing_structural_result(root,state,op)
+    elif op.get("materializer")=="RUN_EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT":
+        new_state=_run_epoch41_regime_context_cohort_preflight(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
