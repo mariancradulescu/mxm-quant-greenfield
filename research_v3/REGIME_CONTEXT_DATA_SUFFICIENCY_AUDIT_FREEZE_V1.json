@@ -1,0 +1,87 @@
+{
+  "schema": "mxm.greenfield.regime-context-data-sufficiency-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_NON_ECONOMIC_AUDIT",
+  "evidence_epoch": 39,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_88b3d8ac3e0ad746ff188958465fbd36.json",
+    "accepted_proposal_file_sha256": "20db9e7dcc5e3ff2ac4746f7fa81c82ded1598a2ab2bca078c266a037359a62e",
+    "structural_registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "structural_registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_capture_plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
+    "development_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "development_capture_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_capture_plan_ref": "data/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PLAN_EPOCH22_V1.json",
+    "replacement_capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    "replacement_capture_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+    "capture_acceptance_source": "ALREADY_ACCEPTED_AND_HASH_BOUND; TRANSPORT_MATERIALIZATION_IS_NOT_NEW_DATA_ACQUISITION"
+  },
+  "scope": {
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "representative_count": 41,
+    "symbol_ids": [
+      5268, 3693, 5120, 5275, 2791, 306, 148, 106, 5562, 146, 3137, 5314, 5237,
+      4442, 251, 5370, 5134, 56, 98, 2759, 2755, 2924, 2917, 7290, 7296, 7292,
+      3377, 7238, 5386, 150, 269, 7372, 266, 95, 5332, 5217, 7393, 7427, 5352,
+      5479, 4120
+    ],
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "structural_coverage_only": true,
+    "structural_representatives_are_economic_equivalents": false
+  },
+  "data": {
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_symbol_ids": [7427, 5352, 2924],
+    "each_representative_processed_once": true,
+    "no_new_market_data_requested": true
+  },
+  "context_law": {
+    "true_range": "MAX(HIGH-LOW,ABS(HIGH-PREVIOUS_CLOSE),ABS(LOW-PREVIOUS_CLOSE))",
+    "volatility": "ATR is the arithmetic mean of 14 true ranges; classify bar t from ATR(t-1) ranked against ATR(t-49) through ATR(t-2).",
+    "activity": "Classify bar t from tick_volume(t-1) ranked against tick_volume(t-49) through tick_volume(t-2).",
+    "rank": "COUNT(reference<=current)/48; ranks <=0.20 are LOW, >=0.80 are HIGH, and the middle is unclassified.",
+    "session_overlap_proxy": "UTC event/bar hour 13 through 15 is OVERLAP; all other hours are NON_OVERLAP. This is a proxy only, not a claim about observed broker session schedules.",
+    "continuity": "No fill, interpolation, or resampling. A timestamp delta other than exactly 300 seconds begins a new segment and context windows restart.",
+    "duplicates": "Collapse identical timestamp rows only when OHLC and tick volume match; conflicting duplicates fail closed."
+  },
+  "audit_law": {
+    "report": [
+      "Observed and context-classified rows, explicit unclassified warmup/middle-state rows, exact common timestamps, and timestamp gaps.",
+      "Eight context-state counts, UTC date clusters, contiguous context-spell clusters, and serial-dependence-adjusted date effective sample sizes.",
+      "Session-overlap proxy coverage, never presented as observed broker schedule truth.",
+      "Pooled sensitivity only within the same broker coverage bucket, session-region signature, and weekend-capability tuple; equal symbol weight within UTC date."
+    ],
+    "effective_sample_size": "For daily state-prevalence series, estimate calendar-day autocorrelation through lag 30, stop at the first non-positive lag, and calculate n/(1+2*sum(positive autocorrelations)), bounded to [1,n]. Missing calendar dates are not imputed and contribute no autocorrelation pair.",
+    "detectable_effect_sensitivity": "Report the normal-approximation one-sample standardized mean shift (z_0.975+z_0.80)/sqrt(n_eff), using 2.8016 in the numerator. Planning sensitivity only; no tests, outcomes, or inferential claims.",
+    "pooled_units_are_descriptive_only": true
+  },
+  "prohibitions": {
+    "strategy_events_computed": false,
+    "strategy_returns_or_pnl_computed": false,
+    "prior_epoch29_epoch33_epoch34_diagnostics_retested": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_data_is_independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "candidate_identity_created": false,
+    "protected_forward_opened": false,
+    "live_orders_authorized": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "execution": {
+    "implementation_ref": "research_v3/regime_context_data_sufficiency_audit.py",
+    "result_ref": "evidence/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_V1.json",
+    "freeze_persisted_before_execution": true,
+    "exact_head_green_required_before_execution": true
+  }
+}
