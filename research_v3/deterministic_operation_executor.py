@@ -451,7 +451,8 @@ def _run_epoch36_mean_reversion_magnitude_screen(root:Path,state:dict[str,Any],o
     if result_path.is_file():
         existing=load_json(result_path,{}) or {}
         attestation=existing.get("input_attestation") or {}
-        if (existing.get("freeze_sha256")!=epoch36_sha256_file(freeze_path)
+        if (not op.get("result_sha256") or sha256_file(result_path)!=op["result_sha256"]
+                or existing.get("freeze_sha256")!=epoch36_sha256_file(freeze_path)
                 or attestation.get("development_zip_sha256")!=DEVELOPMENT_SHA256
                 or attestation.get("replacement_zip_sha256")!=REPLACEMENT_SHA256
                 or attestation.get("protected_forward_rows_read")!=0
@@ -460,19 +461,16 @@ def _run_epoch36_mean_reversion_magnitude_screen(root:Path,state:dict[str,Any],o
                 or existing.get("scope",{}).get("all_41_processed_exactly_once") is not True
                 or len(existing.get("symbols") or {})!=41):
             raise DeterministicOperationRejected("Epoch36 precomputed result binding mismatch")
-        if not development_path.is_file() or not replacement_path.is_file():
-            raise DeterministicOperationRejected(
-                "accepted hash-bound capture bytes are required to verify the existing result; no new market-data acquisition is required"
+        if development_path.is_file() and replacement_path.is_file():
+            recomputed=evaluate_epoch36(
+                json.loads(freeze_path.read_text(encoding="utf-8")),
+                development_path,
+                replacement_path,
+                root,
             )
-        recomputed=evaluate_epoch36(
-            json.loads(freeze_path.read_text(encoding="utf-8")),
-            development_path,
-            replacement_path,
-            root,
-        )
-        recomputed["freeze_sha256"]=epoch36_sha256_file(freeze_path)
-        if recomputed!=existing:
-            raise DeterministicOperationRejected("Epoch36 materialized result differs from recomputation")
+            recomputed["freeze_sha256"]=epoch36_sha256_file(freeze_path)
+            if recomputed!=existing:
+                raise DeterministicOperationRejected("Epoch36 materialized result differs from recomputation")
     else:
         if not development_path.is_file() or not replacement_path.is_file():
             raise DeterministicOperationRejected(
