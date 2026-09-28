@@ -61,7 +61,7 @@ MECHANISM_LAW = {
     "effect_size": "For each settled event compute direction * log(exit_close/event_close) * 10000 basis points. Aggregate within UTC date first, then report the arithmetic mean of daily directional responses as the cell effect size.",
     "effective_independence": "UTC date is the dependence unit: all settled event responses for one cell and UTC date are averaged before effect size, uncertainty, or chronological-half diagnostics. Effective independent sample size is the number of UTC dates with a settled daily response.",
     "uncertainty": "Sample standard error across daily directional responses and a descriptive 1.96*SE interval half-width; no confirmatory p-value or economic inference is opened.",
-    "missing_data": "No fill, interpolation, resampling, or synthetic bars. Any timestamp gap greater than 300 seconds starts a new segment. Any event whose required forward horizon crosses a segment boundary is right-censored.",
+    "missing_data": "No fill, interpolation, resampling, or synthetic bars. Any timestamp gap greater than 300 seconds starts a new segment. Any event whose required forward horizon crosses a segment boundary is right-censored and not repaired.",
 }
 ROBUSTNESS_LAW = {
     "local_support": "effect_size > 0, at least 10 effective UTC days, at least 5 effective UTC days in each chronological half, and both chronological-half effect sizes > 0",
