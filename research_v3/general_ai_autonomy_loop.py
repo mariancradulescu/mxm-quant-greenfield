@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from research_v3.evidence_epoch import stale_reasoning_redirect, refresh_derived_views, current_evidence_epoch, current_evidence_binding
 from research_v3.general_ai_director_bridge import drain, project_snapshot
-from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected, ImplementationProviderAttemptError
+from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected, ImplementationProviderAttemptError, PostProviderPersistenceConcurrencyError
 from research_v3.execution_router import deterministic_operation_required
 from research_v3.deterministic_operation_executor import execute_chain as execute_deterministic_chain
 from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError, LocalPreProviderTransportFailure
@@ -70,8 +70,9 @@ def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retrya
         "provider_requests_started":sum(row.get("provider_process_started",True) for row in rows),
         "local_pre_provider_failures":sum(row.get("outcome")=="LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE" for row in rows),
         "successful_reasoning_invocations":sum(x["purpose"]=="GENERAL_AI_REASONING" and x["outcome"]=="SUCCESS" for x in rows),
-        "successful_implementation_invocations":sum(x["purpose"]=="GENERAL_AI_IMPLEMENTATION" and x["outcome"]=="SUCCESS" for x in rows),
-        "failed_or_timeout_invocations":sum(x.get("outcome")!="SUCCESS" for x in rows),
+        "successful_implementation_invocations":sum(x["purpose"]=="GENERAL_AI_IMPLEMENTATION" and (x["outcome"]=="SUCCESS" or x.get("provider_call_success") is True) for x in rows),
+        "failed_or_timeout_invocations":sum(x.get("outcome")!="SUCCESS" and x.get("provider_call_success") is not True for x in rows),
+        "post_provider_persistence_concurrency_failures":sum(x.get("provider_call_success") is True and x.get("persistence_success") is False for x in rows),
         "timeout_invocations":sum("TIMEOUT" in str(x.get("outcome") or "").upper() for x in rows),
         "material_state_advancing_invocations":sum(bool(x.get("material_state_advancement")) for x in rows),
         "quota_failures":sum(x["outcome"]=="PROVIDER_UNAVAILABLE" for x in rows),
@@ -504,6 +505,10 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             before_material=_material_state_signature(state)
             try:
                 out=implement(root,git_checkpoint=git_checkpoint,git_push=git_push)
+            except PostProviderPersistenceConcurrencyError:
+                # Provider work is valid and retained as a local commit/response.
+                # The workflow uploads that patch; provider retry accounting is untouched.
+                raise
             except Exception as exc:
                 if not _recoverable_provider_failure(exc):
                     if _provider_attempt_was_started(exc):
