@@ -1,0 +1,105 @@
+name: TREND Parameter Scan Exact Head Validation
+
+on:
+  push:
+    branches:
+      - performance-research-v3-20260922
+    paths:
+      - "research_v3/trend_momentum_parameter_region_epoch37_screen.py"
+      - "research_v3/EPOCH37_TREND_MOMENTUM_PARAMETER_REGION_FRONTIER_FREEZE_V1.json"
+      - "tests/test_trend_momentum_parameter_region_epoch37_screen.py"
+      - "evidence/EPOCH37_TREND_MOMENTUM_IMPLEMENTATION_PROVENANCE_RECOVERY_V1.json"
+      - ".github/workflows/trend-parameter-scan-exact-head-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trend-parameter-scan-exact-head-validation
+  cancel-in-progress: true
+
+env:
+  TARGET_BRANCH: performance-research-v3-20260922
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  exact-head:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Configure commit identity
+        run: |
+          git config user.name "mxm-runtime-v2[bot]"
+          git config user.email "mxm-runtime-v2@users.noreply.github.com"
+
+      - name: Record validated head
+        id: head
+        shell: bash
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Run focused TREND provenance and grid tests
+        run: |
+          python -m unittest -v tests.test_trend_momentum_parameter_region_epoch37_screen
+
+      - name: Run fast-path regression suite
+        run: |
+          python -m unittest -v \
+            tests.test_execution_router_v1 \
+            tests.test_deterministic_operation_executor_v1 \
+            tests.test_cross_sectional_peer_cohort_index \
+            tests.test_general_ai_director_bridge \
+            tests.test_general_ai_reasoning_provider \
+            tests.test_general_ai_implementation_executor \
+            tests.test_general_ai_autonomy_loop \
+            tests.test_discovery_methodology_control \
+            tests.test_research_fast_path \
+            tests.test_active_research_projection \
+            tests.test_epoch34_composite_causal_ml_regime_screen \
+            tests.test_epoch34_deterministic_operation
+
+      - name: Persist exact-head CI authority
+        env:
+          VALIDATED_HEAD: ${{ steps.head.outputs.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${TARGET_BRANCH}"
+          remote_head="$(git rev-parse "origin/${TARGET_BRANCH}")"
+          test "${remote_head}" = "${VALIDATED_HEAD}"
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          payload={
+              "schema":"mxm.greenfield.trend-parameter-scan-exact-head-ci.v1",
+              "status":"SUCCESS",
+              "validated_head":os.environ["VALIDATED_HEAD"],
+              "workflow":"TREND Parameter Scan Exact Head Validation",
+              "run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt":int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "focused_tests":{"module":"tests.test_trend_momentum_parameter_region_epoch37_screen","result":"PASS"},
+              "fast_path_regression":"PASS",
+              "economic_outcomes_opened_delta":0,
+              "v2_attempts_used_delta":0,
+              "protected_forward_opened":False,
+              "recorded_utc":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),
+          }
+          p=Path("evidence/EPOCH37_TREND_MOMENTUM_EXACT_HEAD_CI_V1.json")
+          p.write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          PY
+          git add evidence/EPOCH37_TREND_MOMENTUM_EXACT_HEAD_CI_V1.json
+          git commit -m "[skip ci] Record TREND exact-head CI authority"
+          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
