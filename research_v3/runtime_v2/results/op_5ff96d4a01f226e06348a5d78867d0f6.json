@@ -1,0 +1,60 @@
+{
+  "artifact_attestations": [],
+  "authority_bundle_sha256": "8f4f31c8f2c3bf842a19f03c880cff2f58b02bd4ef4822fc559b17eca92e3f72",
+  "competition_start_authorized": false,
+  "decision": {
+    "frozen_method": {
+      "account_effect": "Non-economic proposal and structural screen only; no economic outcome is authorized.",
+      "event_rule": "At close of bar t, high-low range >= 2 * median(high-low) over bars t-20 through t-1.",
+      "independence": "Use at most one event per symbol per UTC date, the first qualifying event with complete baseline and forward windows; exclude conflicting, missing, or non-contiguous windows.",
+      "inference": "Split eligible UTC dates chronologically into two halves; require at least 10 eligible dates in each half, test the paired daily log variance ratios for positive median separately in both halves, and apply Benjamini-Hochberg FDR at 0.05 across the fixed 41-symbol family using the larger half p-value per symbol. Fail closed on insufficient data.",
+      "input": "Already accepted 13-week M5 captures only; use strictly prior completed bars to identify events.",
+      "outcome": "Compare realized variance from the next six completed M5 returns with realized variance from the six completed returns immediately before bar t; direction is ignored.",
+      "prohibitions": [
+        "Do not use prior structural outcomes to alter thresholds, horizons, splits, or the panel.",
+        "Do not rerun or relabel prior directional breakout diagnostics.",
+        "Do not select a winning subgroup or claim economic equivalence, economic promotion, or family closure."
+      ]
+    },
+    "hypothesis": "A completed M5 bar whose high-low range is at least twice the median range of the preceding 20 completed bars is followed by higher unsigned 30-minute realized volatility than the six-bar pre-event baseline.",
+    "implementation_scope": "Implement a new deterministic non-economic evaluator and focused tests for causal event construction, UTC-date event deduplication, chronological splitting, missing/non-contiguous windows, multiplicity, and fail-closed data sufficiency. Bind inputs to the accepted 13-week M5 captures and process the full current representative panel exactly once. Make no broker/provider calls and do not open an economic experiment.",
+    "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+    "scope": {
+      "breadth_reason": "Use the full current structural-representative panel to preserve non-economic structural heterogeneity and avoid outcome-driven subgroup selection. Representatives are not economic equivalents.",
+      "representative_count": 41,
+      "representatives_ref": "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json"
+    },
+    "status": "SELECTED_FOR_PROSPECTIVE_NON_ECONOMIC_IMPLEMENTATION"
+  },
+  "economic_outcome_opened": false,
+  "live_orders_authorized": false,
+  "new_v2_identity_opened": false,
+  "next_research_state": {
+    "ai_reasoning_required": false,
+    "authorizing_evidence_epoch": 34,
+    "economic_authorization": false,
+    "external_data_required": false,
+    "implementation_ai_required": true,
+    "implementation_satisfied": false,
+    "implementation_scope": "Create the new frozen evaluator, tests, and hash-bound non-economic result described in decision.frozen_method. Existing directional breakout evaluators are not substitutes for this unsigned-volatility estimand.",
+    "implementation_scope_complete": false,
+    "next_action": "IMPLEMENT_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_PERSISTENCE_SCREEN",
+    "research_judgment_required": false,
+    "status": "IMPLEMENTATION_REQUIRED",
+    "user_action_required": false
+  },
+  "objective": {
+    "class": "NON_ECONOMIC_STRUCTURAL_HYPOTHESIS_TEST",
+    "goal": "Test whether unusually large M5 range shocks predict elevated subsequent unsigned realized volatility.",
+    "information_gain_rationale": "This addresses volatility clustering rather than signed directional follow-through or persistence. It is a distinct, prospectively specified question on the current 41 structural representatives; it does not retune the prior breakout diagnostics or use their outcomes to choose parameters."
+  },
+  "operation_id": "op_5ff96d4a01f226e06348a5d78867d0f6",
+  "proposal_hash": "01ee033fe9f0a2bb1802503fa7ff0ccbda262f221ebb8ef15d762507f4138f29",
+  "proposal_id": "epoch35-breakout-volatility-clustering",
+  "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_a723ef9a2bc53e57b7cb2acddd9e2477.json",
+  "protected_forward_opened": false,
+  "protocol_version": "MXM_GENERAL_AI_RESEARCH_DIRECTOR_PROTOCOL_V1",
+  "schema": "mxm.greenfield.general-ai-research-decision-result.v1",
+  "status": "PASS",
+  "v2_attempt_consumed": 0
+}
