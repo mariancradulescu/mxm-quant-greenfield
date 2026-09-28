@@ -173,6 +173,21 @@ class ExecutionRouterV1Tests(unittest.TestCase):
                 "v2_attempts_used":20,
                 "v2_search_budget_remaining":64,
             })
+        elif route["execution_class"]=="DETERMINISTIC_OPERATION":
+            # The canonical repository state may legitimately advance beyond the
+            # historical peer-cohort lifecycle. Any newer explicitly authorized
+            # deterministic operation must still route deterministically and must
+            # never fall through to the AI implementation provider.
+            self.assertEqual(route["operation_name"],state["next_action"])
+            self.assertEqual(route["operation_ref"],state["next_deterministic_operation_ref"])
+            self.assertFalse(state["ai_reasoning_required"])
+            self.assertFalse(state["implementation_ai_required"])
+            self.assertFalse(implementation_required(ROOT,state))
+            self.assertEqual(state["accounting"],{
+                "economic_outcomes_opened":28,
+                "v2_attempts_used":20,
+                "v2_search_budget_remaining":64,
+            })
         else:
             self.fail(f"unexpected peer-cohort lifecycle state: {state.get('status')} / {state.get('next_action')}")
 
