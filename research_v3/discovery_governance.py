@@ -10,6 +10,14 @@ PARAM_REF=Path("research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json"
 MULTI_REF=Path("research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json")
 LEDGER_REF=Path("research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json")
 LEGACY_ACCEPTED_EXEMPT=frozenset({"post_index_extended_hours_cross_sectional_alignment_v1"})
+LEGACY_LOCAL_NULL_FIELD="families_exhausted_non_economically"
+
+def active_open_families(state:Mapping[str,Any], families:Sequence[str])->list[str]:
+    """Historical local-null labels have no family or scheduler authority."""
+    closure=state.get("family_level_closure") or {}
+    if closure.get("status")=="FAMILY_LEVEL_CLOSED_WITH_EVIDENCE":
+        raise DiscoveryGovernanceError("explicit family closure requires modern closure audit")
+    return list(families)
 
 class DiscoveryGovernanceError(ValueError):
     pass
