@@ -2,10 +2,21 @@ from __future__ import annotations
 import json
 import unittest
 from pathlib import Path
-from research_v3.discovery_governance import classify_parameter_surface,evidence_class_can_close_family,validate_confirmation_freeze,validate_parameter_discovery_plan,validate_proposal_discovery_governance
+from research_v3.discovery_governance import active_open_families,classify_parameter_surface,evidence_class_can_close_family,validate_confirmation_freeze,validate_parameter_discovery_plan,validate_proposal_discovery_governance
 ROOT=Path(__file__).resolve().parents[1]
 
 class DiscoveryGovernanceV1Tests(unittest.TestCase):
+    def test_legacy_local_nulls_cannot_close_or_starve_families(self):
+        state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+        families=state["families_exhausted_non_economically"]
+        self.assertEqual(len(families),3)
+        self.assertIn("NON_AUTHORITATIVE_FOR_FAMILY_CLOSURE_FRONTIER_SELECTION_OR_ANTI_STARVATION",state["families_exhausted_non_economically_semantics"])
+        self.assertEqual(active_open_families(state,families),families)
+        for family in families:
+            self.assertIn(family,active_open_families(state,[family]))
+        with self.assertRaisesRegex(ValueError,"modern closure audit"):
+            active_open_families({**state,"family_level_closure":{"status":"FAMILY_LEVEL_CLOSED_WITH_EVIDENCE"}},families)
+
     def test_exact_candidate_null_does_not_close_family(self):
         self.assertFalse(evidence_class_can_close_family("EXACT_SPECIFICATION_NULL",explicit_closure_audit=True,adequate_power=True,parameter_region_coverage=True,meaningful_universe_breadth=True,asset_class_coverage=True,horizon_coverage=True,plausible_unexplored_frontier=False))
 
