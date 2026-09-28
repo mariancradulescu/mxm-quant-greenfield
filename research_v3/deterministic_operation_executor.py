@@ -1,6 +1,6 @@
 """Zero-provider executor for explicitly authorized deterministic research operations."""
 from __future__ import annotations
-import argparse, base64, gzip, json, os, subprocess
+import argparse, base64, gzip, hashlib, importlib.util, json, os, subprocess
 from pathlib import Path
 from typing import Any
 
@@ -486,6 +486,119 @@ def _run_epoch36_mean_reversion_magnitude_screen(root:Path,state:dict[str,Any],o
         atomic_write_json(result_path,result)
     return _execute_existing_structural_result(root,state,op)
 
+def _run_hash_bound_python_json_transform(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    contract=op.get("operation_contract") or {}
+    if contract.get("kind")!="HASH_BOUND_PYTHON_JSON_TRANSFORM_V1":
+        raise DeterministicOperationRejected("unsupported hash-bound deterministic transform contract")
+    transport=contract.get("input_transport") or {}
+    refs=transport.get("fragment_refs") or []
+    hashes=transport.get("fragment_sha256") or []
+    if len(refs)!=len(hashes) or not refs:
+        raise DeterministicOperationRejected("invalid hash-bound transport fragment contract")
+    pieces=[]
+    for rel,expected in zip(refs,hashes):
+        path=root/rel
+        if not path.is_file():
+            raise DeterministicOperationRejected(f"hash-bound input fragment missing: {rel}")
+        raw=path.read_bytes()
+        if hashlib.sha256(raw).hexdigest()!=expected:
+            raise DeterministicOperationRejected(f"hash-bound input fragment mismatch: {rel}")
+        try:
+            pieces.append(raw.decode("ascii"))
+        except UnicodeDecodeError as exc:
+            raise DeterministicOperationRejected("hash-bound input fragment is not ASCII") from exc
+    encoded="".join(pieces).encode("ascii")
+    if hashlib.sha256(encoded).hexdigest()!=transport.get("concatenated_base64_sha256"):
+        raise DeterministicOperationRejected("hash-bound concatenated transport mismatch")
+    if transport.get("encoding")!="CONCAT_BASE64_GZIP_JSON":
+        raise DeterministicOperationRejected("unsupported hash-bound input encoding")
+    try:
+        decoded=gzip.decompress(base64.b64decode(encoded,validate=True))
+    except Exception as exc:
+        raise DeterministicOperationRejected("hash-bound input transport cannot be decoded") from exc
+    if hashlib.sha256(decoded).hexdigest()!=transport.get("decoded_json_sha256"):
+        raise DeterministicOperationRejected("hash-bound decoded JSON mismatch")
+    try:
+        payload=json.loads(decoded.decode("utf-8"))
+    except Exception as exc:
+        raise DeterministicOperationRejected("hash-bound decoded input is not valid JSON") from exc
+
+    implementation_ref=str(contract.get("implementation_ref") or "")
+    implementation_path=root/implementation_ref
+    if not implementation_path.is_file():
+        raise DeterministicOperationRejected("hash-bound transform implementation missing")
+    data=implementation_path.read_bytes()
+    git_blob=hashlib.sha1(f"blob {len(data)}\0".encode("ascii")+data).hexdigest()
+    if git_blob!=contract.get("implementation_git_blob_sha1"):
+        raise DeterministicOperationRejected("hash-bound transform implementation blob mismatch")
+    callable_name=str(contract.get("callable") or "")
+    spec=importlib.util.spec_from_file_location(
+        "mxm_hash_bound_transform_"+git_blob[:12], implementation_path
+    )
+    if spec is None or spec.loader is None:
+        raise DeterministicOperationRejected("cannot load hash-bound transform implementation")
+    module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    transform=getattr(module,callable_name,None)
+    if not callable(transform):
+        raise DeterministicOperationRejected("hash-bound transform callable missing")
+    kwargs=dict(contract.get("call_kwargs") or {})
+    try:
+        result=transform(payload,**kwargs)
+    except Exception as exc:
+        raise DeterministicOperationRejected(f"hash-bound transform rejected accepted input: {exc}") from exc
+    if not isinstance(result,dict):
+        raise DeterministicOperationRejected("hash-bound transform result must be an object")
+
+    output=contract.get("output") or {}
+    if result.get("schema")!=output.get("expected_schema") or result.get("status")!=output.get("expected_status"):
+        raise DeterministicOperationRejected("hash-bound transform result schema/status mismatch")
+    expected_count=int(output.get("expected_indexed_identity_count") or 0)
+    source_universe=result.get("source_universe") or {}
+    coverage=result.get("coverage") or {}
+    if (int(source_universe.get("indexed_identity_count") or 0)!=expected_count
+            or int(coverage.get("cohort_breadth_total") or 0)!=expected_count):
+        raise DeterministicOperationRejected("hash-bound transform did not process the full authorized universe")
+    boundary=result.get("interpretation_boundary") or {}
+    if (boundary.get("strategy_or_price_outcome_evaluated") is not False
+            or boundary.get("returns_or_pnl_computed") is not False
+            or boundary.get("economic_equivalence_claimed") is not False
+            or boundary.get("protected_forward_opened") is not False
+            or int(boundary.get("economic_outcomes_opened") or 0)!=0
+            or int(boundary.get("v2_attempts_consumed") or 0)!=0):
+        raise DeterministicOperationRejected("hash-bound transform crossed non-economic interpretation boundary")
+    policy=result.get("cohort_policy") or {}
+    if policy.get("structural_representatives_used_as_substitutes") is not False:
+        raise DeterministicOperationRejected("hash-bound transform substituted structural representatives")
+
+    output_ref=str(output.get("ref") or "")
+    output_path=root/output_ref
+    if not output_ref.startswith("evidence/"):
+        raise DeterministicOperationRejected("hash-bound transform output path is not evidence-scoped")
+    if output_path.is_file():
+        existing=json.loads(output_path.read_text(encoding="utf-8"))
+        if existing!=result:
+            raise DeterministicOperationRejected("existing deterministic output differs from recomputation")
+    else:
+        atomic_write_json(output_path,result)
+
+    new_state=dict(state)
+    new_state.update(dict(op.get("post_execution_state") or {}))
+    new_state.update({
+        "next_deterministic_operation_ref":None,
+        "deterministic_next_operation":None,
+        "transport_materialization_required":False,
+        "implementation_ai_required":False,
+        "implementation_satisfied":True,
+        "implementation_scope_complete":True,
+        "peer_cohort_index_ref":output_ref,
+        "peer_cohort_index_sha256":sha256_file(output_path),
+        "peer_cohort_index_identity_count":expected_count,
+        "peer_cohort_index_transport_decoded_sha256":transport.get("decoded_json_sha256"),
+    })
+    return new_state
+
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -498,7 +611,9 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     before=project_snapshot(root)
     provider_before=_provider_count(root)
     name=op["operation_name"]
-    if op.get("materializer")=="MATERIALIZE_BASE64_GZIP_NON_ECONOMIC_STRUCTURAL_RESULT":
+    if (op.get("operation_contract") or {}).get("kind")=="HASH_BOUND_PYTHON_JSON_TRANSFORM_V1":
+        new_state=_run_hash_bound_python_json_transform(root,state,op)
+    elif op.get("materializer")=="MATERIALIZE_BASE64_GZIP_NON_ECONOMIC_STRUCTURAL_RESULT":
         _materialize_embedded_structural_result(root,op)
         new_state=_execute_existing_structural_result(root,state,op)
     elif op.get("materializer")=="ACCEPT_EXISTING_NON_ECONOMIC_STRUCTURAL_RESULT":
