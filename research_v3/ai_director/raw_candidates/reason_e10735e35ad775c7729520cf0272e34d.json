@@ -1,0 +1,158 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+      "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_V1.json",
+      "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+      "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+      "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+      "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+      "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+      "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json"
+    ],
+    "data_bindings": [
+      "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+      "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json"
+    ],
+    "data_policy": {
+      "minimal_acquisition_request": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "fields": [
+          "timestamp",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ],
+        "information_gain_justification": "This is the exact 48-symbol/32-week aligned M5 development sample already prospectively frozen in EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1 for the outcome-blind US Equities extended-hours peer cohort. Acquiring it is required before any CROSS_SECTIONAL_RANKING power estimate, dependence/cluster design, or peer-coherence validation can proceed; it opens no economic outcome, uses no protected/forward evidence, and is not a reuse of any previously outcome-exposed evidence.",
+        "resolution": "M5",
+        "source_domain": "PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API",
+        "start_utc": "2026-02-02T00:00:00Z",
+        "symbols": [
+          "F.US-24",
+          "CCL.US-24",
+          "PFE.US-24",
+          "NKE.US-24",
+          "BSX.US-24",
+          "SLB.US-24",
+          "UBER.US-24",
+          "NFLX.US-24",
+          "HAS.US-24",
+          "DAL.US-24",
+          "CL.US-24",
+          "BIDU.US-24",
+          "ZM.US-24",
+          "SCHW.US-24",
+          "LULU.US-24",
+          "EBAY.US-24",
+          "BABA.US-24",
+          "INTC.US-24",
+          "YUM.US-24",
+          "PG.US-24",
+          "MRK.US-24",
+          "ABNB.US-24",
+          "BKNG.US-24",
+          "HSY.US-24",
+          "LOW.US-24",
+          "PM.US-24",
+          "QCOM.US-24",
+          "CVX.US-24",
+          "HON.US-24",
+          "CRM.US-24",
+          "LHX.US-24",
+          "ABBV.US-24",
+          "JNJ.US-24",
+          "FDX.US-24",
+          "DPZ.US-24",
+          "AXP.US-24",
+          "AAPL.US-24",
+          "GOOG.US-24",
+          "MAR.US-24",
+          "UNH.US-24",
+          "MSI.US-24",
+          "MCO.US-24",
+          "CMI.US-24",
+          "MSCI.US-24",
+          "AMD.US-24",
+          "CAT.US-24",
+          "GS.US-24",
+          "LLY.US-24"
+        ]
+      },
+      "new_market_data_requested": true
+    },
+    "decision": {
+      "action_type": "NON_ECONOMIC_ALIGNED_HISTORY_ACQUISITION",
+      "cohort_reference": {
+        "frozen_development_sample": 48,
+        "id": "EPOCH38_CROSS_SECTIONAL_US_EQUITIES_EXTENDED_HOURS_ALIGNMENT",
+        "peer_candidate_cohort_id": "peer_f00b1cfa2c5c4549",
+        "source_peer_cohort_breadth": 113
+      },
+      "execution_binding": {
+        "deterministic_operation_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+        "gate": "Execute only after exact HEAD is green; this proposal itself opens no economic outcome and consumes zero attempts.",
+        "operation_name": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN"
+      },
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "prohibitions_respected": [
+        "NO_C032_RERUN",
+        "NO_PROTECTED_FORWARD_LEAKAGE",
+        "NO_RETROACTIVE_TUNING",
+        "NO_OUTCOME_DRIVEN_SCOPE_SELECTION",
+        "NO_OPENED_IDENTITY_RERUN"
+      ],
+      "rationale": "Bind the already-authorized deterministic operation to fetch the exact frozen 48-symbol aligned M5 history for the outcome-blind US Equities EXTENDED_HOURS_SHARE_CFD cohort, preserving the existing Epoch38 freeze and prerequisite chain rather than reopening or reparameterizing any prior structural result (Epoch24/26/36 etc. remain untouched). This is a data-sufficiency/power step, not a strategy outcome: no returns, PnL, or economic decision are computed.",
+      "universe_methodology": {
+        "aligned_history_required": true,
+        "outcome_blind_selection": true,
+        "peer_coherence_basis": "US Equities EXTENDED_HOURS_SHARE_CFD peers sharing normalized session-region set and coverage bucket per evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json, narrowed to the frozen 48-symbol development sample in research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json; membership is a candidate peer-coherence prior only, not a behavioral/economic equivalence claim.",
+        "role": "MECHANISM_SPECIFIC_DISCOVERY",
+        "selection_features": [
+          "asset_class",
+          "product_type",
+          "normalized_session_regions_set",
+          "coverage_bucket",
+          "data_availability_and_completeness",
+          "schedule_overlap",
+          "capital_efficiency",
+          "acquisition_cost"
+        ],
+        "source_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+        "structural_representatives_are_economic_equivalents": false
+      }
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "current_mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "follow_on_after_acquisition": "Compute effective independent sample size, schedule-overlap coherence, and dependence structure for the 48-symbol cohort; freeze the confirmatory cross-sectional estimand, dependence/cluster unit, missingness and multiplicity rules before any economic outcome is opened.",
+      "implementation_ai_required": false,
+      "next_action": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
+      "next_deterministic_operation_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+      "no_economic_outcome_opened": true,
+      "research_judgment_required": true,
+      "status": "AWAITING_ALIGNED_HISTORY_ACQUISITION"
+    },
+    "objective": {
+      "class": "CROSS_SECTIONAL_RANKING",
+      "goal": "Acquire the prospectively frozen aligned-timestamp M5 development history for the outcome-blind US-Equities extended-hours peer cohort (48-symbol frozen sample, source peer breadth 113) so effective independent sample size, schedule-overlap and dependence structure can be characterized before any confirmatory or economic CROSS_SECTIONAL_RANKING design is attempted.",
+      "information_gain_rationale": "Epoch38 already froze the exact cohort, symbols, resolution and interval and validated a machine-checkable readiness artifact (market_data_fetched=false, status READY_FOR_FRESH_SEMANTIC_ACQUISITION_DECISION). CROSS_SECTIONAL_RANKING is not in blocked_scope_set and its family status is PARAMETER_REGION_UNEXPLORED with requires_aligned_history=true/requires_peer_coherence=true. No other legal frontier currently has an equally exact, already-frozen, non-economic data prerequisite ready to execute; acquiring this data is the highest-information legal next step because it unlocks power/estimand design without opening any economic outcome or reusing outcome-exposed evidence."
+    },
+    "proposal_id": "AI_EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_V1"
+  },
+  "captured_utc": "2026-09-28T09:31:28Z",
+  "evidence_bundle_sha256": "1fc10c34e4182bbebb0cdfe5978e1dbd0a70be755c275d53eaf0f19ba42920c2",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_e10735e35ad775c7729520cf0272e34d"
+}
