@@ -804,6 +804,10 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         candidate=json.loads(external.read_text(encoding="utf-8"))
         binding=candidate.get("evidence_binding") or {}
         if (candidate.get("provider") or {}).get("kind")=="EXTERNAL_CHATGPT_GENERAL_REASONING" and binding.get("reasoning_request_id")==request["request_id"] and binding.get("evidence_epoch_seen")==request["evidence_epoch_seen"]:
+            try:
+                validate_proposal_universe_methodology(root,candidate)
+            except ValueError as exc:
+                raise AIProposalRejected(str(exc)) from exc
             validate_proposal(root,candidate)
             path.parent.mkdir(parents=True,exist_ok=True)
             atomic_write_json(path,candidate)
