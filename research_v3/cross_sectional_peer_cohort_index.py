@@ -27,6 +27,12 @@ ELIGIBLE_IDENTITY_SET_SHA256 = (
 COMPACT_AUTHORITY_SHA256 = (
     "2629b471abd6c35351eefae43d2fefbd423e2726cb89363c32f2287e7bedd857"
 )
+ACCEPTED_TRANSPORT_ZIP_SHA256 = (
+    "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9"
+)
+ACCEPTED_ORIGINAL_COLLECTOR_ZIP_SHA256 = (
+    "5ce4b3bc3a47292bb8b9b704d6c8c305a0bc3657d7dd0ace539d93e740a9be15"
+)
 STRUCTURAL_REGISTRY_SHA256 = (
     "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3"
 )
@@ -54,6 +60,7 @@ REQUIRED_ROW_FIELDS = frozenset(
         "product_type",
         "session_regions",
         "coverage_bucket",
+        "schedule_time_zone",
         "minimum_executable_volume",
         "buy_min_volume_margin_eur",
         "sell_min_volume_margin_eur",
@@ -96,6 +103,37 @@ def _median(values: list[float]) -> float:
     return (ordered[middle - 1] + ordered[middle]) / 2
 
 
+def _derive_session_regions(coverage_bucket: Any, schedule_time_zone: Any) -> str | None:
+    """Deterministically derive the accepted coarse session-region label.
+
+    This is a structural schedule transform only. It does not inspect prices, returns,
+    strategy outcomes, or economic performance. Unknown schedule metadata stays unknown.
+    """
+    if coverage_bucket in {
+        "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+    }:
+        return "ASIA|EUROPE|US"
+    if schedule_time_zone == "America/New_York":
+        base = "US"
+    elif isinstance(schedule_time_zone, str) and (
+        schedule_time_zone.startswith("Europe/") or schedule_time_zone == "GMT"
+    ):
+        base = "EUROPE"
+    elif isinstance(schedule_time_zone, str) and (
+        schedule_time_zone.startswith("Asia/")
+        or schedule_time_zone.startswith("Australia/")
+    ):
+        base = "ASIA"
+    else:
+        return None
+    if coverage_bucket == "REGIONAL_OR_CASH_SESSION_SCHEDULE":
+        return base
+    if coverage_bucket == "EXTENDED_MULTI_SESSION_SCHEDULE":
+        return base + "|EXTENDED_OVERLAP"
+    return None
+
+
 def _cohort_components(row: dict[str, Any]) -> tuple[str, str, str, str] | None:
     asset_class = row["asset_class"]
     product_type = row["product_type"]
@@ -136,6 +174,8 @@ def validate_input_bundle(
         "current_broker_payload_sha256": FEASIBILITY_PAYLOAD_SHA256,
         "eligible_identity_set_sha256": ELIGIBLE_IDENTITY_SET_SHA256,
         "compact_authority_sha256": COMPACT_AUTHORITY_SHA256,
+        "accepted_transport_zip_sha256": ACCEPTED_TRANSPORT_ZIP_SHA256,
+        "accepted_original_collector_zip_sha256": ACCEPTED_ORIGINAL_COLLECTOR_ZIP_SHA256,
         "structural_registry_ref": (
             "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
         ),
@@ -182,6 +222,17 @@ def validate_input_bundle(
             raise ValueError(f"{symbol} is a test or unresolved product")
         if row["shortability"] is not True:
             raise ValueError(f"{symbol} is not confirmed shortable")
+        if row["test_product"] is not False or row["asset_class"] == "TEST":
+            raise ValueError(f"{symbol} is a test product")
+        derived_regions = _derive_session_regions(
+            row["coverage_bucket"], row["schedule_time_zone"]
+        )
+        declared_regions = row["session_regions"]
+        if declared_regions:
+            if derived_regions is None or declared_regions != derived_regions:
+                raise ValueError(f"{symbol} session-region metadata is inconsistent with current schedule authority")
+        elif derived_regions is not None:
+            raise ValueError(f"{symbol} omits derivable session-region metadata")
         if not isinstance(row["accepted_history_state"], str) or row[
             "accepted_history_state"
         ] not in {
