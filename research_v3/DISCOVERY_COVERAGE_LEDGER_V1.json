@@ -352,21 +352,27 @@
       "local_blocker_only": false
     },
     "TREND_MOMENTUM": {
-      "status": "PARAMETER_REGION_UNEXPLORED",
+      "status": "LOCAL_COARSE_PARAMETER_REGION_SCANNED_NO_ROBUST_REGION",
       "family_closed": false,
       "historical_records": [
         "V2-C013",
         "V2-C017",
         "EPOCH24",
-        "EPOCH37"
+        "EPOCH37",
+        "EPOCH38_TREND_COARSE_REGION"
       ],
       "exact_specification_null_count": 3,
       "low_power_count": 0,
       "data_or_prerequisite_insufficient_count": 1,
       "mechanism_region_supported_count": 0,
-      "parameter_region_coverage": "INCOMPLETE",
+      "parameter_region_coverage": "LOCAL_SEVEN_SYMBOL_COARSE_PROXY_COMPLETE_BROADER_FRONTIER_INCOMPLETE",
       "broader_frontier_open": true,
-      "local_blocker_only": false
+      "local_blocker_only": false,
+      "local_parameter_region_null_count": 1,
+      "latest_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json",
+      "latest_surface_manifest_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SURFACE_MANIFEST_V1.json",
+      "latest_parameter_cells_evaluated": 560,
+      "latest_robust_region_count": 0
     },
     "VOLATILITY_EXPANSION_BREAKOUT": {
       "status": "PARAMETER_REGION_UNEXPLORED",
@@ -399,33 +405,37 @@
   "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
   "multi_frontier_governor_ref": "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
   "current_selected_frontier": {
-    "id": "EPOCH38_CROSS_SECTIONAL_US_EQUITIES_EXTENDED_HOURS_ALIGNMENT",
-    "mechanism_family": "CROSS_SECTIONAL_RANKING",
-    "asset_class": "US Equities",
-    "product_type": "EXTENDED_HOURS_SHARE_CFD",
-    "source_peer_cohort_breadth": 113,
-    "frozen_development_sample": 48,
-    "status": "PREREQUISITE_IMPLEMENTED_PENDING_EXACT_HEAD_GREEN_AND_FRESH_MACHINE_OWNED_CONTINUATION",
-    "reason": "Preserve already accepted Epoch38 semantics and obtain aligned-history/power prerequisites without opening predictive/economic outcome."
+    "id": "EPOCH38_TREND_MOMENTUM_FX_CRYPTO_METALS_COARSE_PARAMETER_REGION",
+    "mechanism_family": "TREND_MOMENTUM",
+    "asset_class": "FX_CRYPTO_METALS_LOCAL_COARSE_PROXY",
+    "frozen_development_sample": 7,
+    "parameter_cells": 560,
+    "status": "COMPLETE_LOCAL_COARSE_REGION_NO_ROBUST_REGION_BROADER_FRONTIER_OPEN",
+    "result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json",
+    "full_surface_manifest_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SURFACE_MANIFEST_V1.json",
+    "interpretation_boundary": "LOCAL_NULL_ONLY_NO_FAMILY_OR_ASSET_CLASS_CLOSURE"
   },
   "materially_unexplored_frontiers": [
     {
       "asset_class": "FX",
       "mechanism_family": "TREND_MOMENTUM",
-      "status": "PARAMETER_REGION_UNEXPLORED",
-      "reason": "Prior exact M5/M15 points do not characterize horizon/hold/threshold regions across FX."
+      "status": "LOCAL_COARSE_PROXY_SCANNED_BROADER_FRONTIER_OPEN",
+      "reason": "The prospectively frozen seven-symbol coarse proxy evaluated all 560 cells and found no robust region. This is a local parameter-region null only; broader mechanism-specific symbols, asset-class breadth, and the 1576 eligible frontier remain open.",
+      "latest_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json"
     },
     {
       "asset_class": "Crypto Currency (Spot)",
       "mechanism_family": "TREND_MOMENTUM",
-      "status": "PARAMETER_REGION_UNEXPLORED",
-      "reason": "Prior mixed-universe exact point is not crypto trend region coverage."
+      "status": "LOCAL_COARSE_PROXY_SCANNED_BROADER_FRONTIER_OPEN",
+      "reason": "The prospectively frozen seven-symbol coarse proxy evaluated all 560 cells and found no robust region. This is a local parameter-region null only; broader mechanism-specific symbols, asset-class breadth, and the 1576 eligible frontier remain open.",
+      "latest_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json"
     },
     {
       "asset_class": "Metals (Spot)",
       "mechanism_family": "TREND_MOMENTUM",
-      "status": "PARAMETER_REGION_UNEXPLORED",
-      "reason": "Prior mixed-universe exact scope does not characterize metals trend regions."
+      "status": "LOCAL_COARSE_PROXY_SCANNED_BROADER_FRONTIER_OPEN",
+      "reason": "The prospectively frozen seven-symbol coarse proxy evaluated all 560 cells and found no robust region. This is a local parameter-region null only; broader mechanism-specific symbols, asset-class breadth, and the 1576 eligible frontier remain open.",
+      "latest_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json"
     },
     {
       "asset_class": "Commodities",
@@ -462,5 +472,7 @@
   "anti_starvation": {
     "enabled": true,
     "fixed_quota": false
-  }
+  },
+  "latest_material_parameter_region_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json",
+  "latest_material_parameter_region_surface_manifest_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SURFACE_MANIFEST_V1.json"
 }
