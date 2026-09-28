@@ -10,6 +10,11 @@ on:
       - 'research_v3/trend_surface_transport_repair.py'
       - 'tests/test_autonomous_runtime_v2.py'
       - 'research_v3/general_ai_reasoning_provider.py'
+      - 'research_v3/general_ai_implementation_executor.py'
+      - 'research_v3/mean_reversion_stage1_triage_epoch40.py'
+      - 'research_v3/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_DETERMINISTIC_OPERATION_V1.json'
+      - 'research_v3/runtime_v2_inputs/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_GZIP_BASE64_V1.txt'
+      - 'tests/test_mean_reversion_stage1_triage_epoch40.py'
       - 'research_v3/execution_router.py'
       - 'research_v3/deterministic_operation_executor.py'
       - 'research_v3/discovery_governance.py'
@@ -82,6 +87,7 @@ jobs:
           tests.test_epoch38_cross_sectional_aligned_history_scope_freeze
           tests.test_discovery_governance_v1
           tests.test_epoch38_deterministic_readiness_operation
+          tests.test_mean_reversion_stage1_triage_epoch40
 
       - name: Diagnose persisted TREND surface transport without rerunning research
         run: python -m research_v3.trend_surface_transport_repair
