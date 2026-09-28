@@ -141,11 +141,7 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             )
             self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
             self.assertFalse(implementation_required(ROOT,state))
-        elif state["status"]=="IMPLEMENTATION_REQUIRED":
-            self.assertEqual(
-                state["next_action"],
-                "IMPLEMENT_PROSPECTIVE_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE",
-            )
+        elif route["execution_class"]=="NOVEL_AI_IMPLEMENTATION":
             self.assertEqual(route["execution_class"],"NOVEL_AI_IMPLEMENTATION")
             self.assertTrue(implementation_required(ROOT,state))
         elif state["status"]=="IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN":

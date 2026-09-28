@@ -95,7 +95,7 @@ class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
                 out=run(root,max_cycles=1)
             self.assertEqual(out["status"],"PROVIDER_UNAVAILABLE")
             self.assertEqual(out["progress_class"],"PROVIDER_UNAVAILABLE")
-            self.assertEqual(out["recovery"]["failure_class"],"MONTHLY_QUOTA_EXHAUSTED")
+            self.assertEqual(out["recovery"]["failure_class"],"PROVIDER_QUOTA_OR_RATE_LIMIT")
             self.assertEqual(len(out["recovery"]["request_fingerprint"]),64)
             with patch("research_v3.general_ai_autonomy_loop.stale_reasoning_redirect",return_value=None), \
                  patch("research_v3.general_ai_autonomy_loop.reasoning_required",return_value=False), \

@@ -304,8 +304,14 @@ def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
                and prior.get("failure_class")!="LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE"
                and prior.get("phase")==phase
                and prior.get("request_fingerprint")==_request_fingerprint(root,state,phase))
+    due=prior.get("next_retry_after_utc")
+    cooling=(prior.get("status")=="PROVIDER_RETRY_REQUIRED"
+             and prior.get("phase")==phase
+             and bool(due)
+             and prior.get("request_fingerprint")==_request_fingerprint(root,state,phase)
+             and datetime.fromisoformat(due.replace("Z","+00:00"))>datetime.now(timezone.utc))
     # Account entitlement is global across phases; bounded retry exhaustion is local to one semantic request.
-    return prior if legacy_quota or provider_blocked or exhausted else None
+    return prior if legacy_quota or provider_blocked or exhausted or cooling else None
 
 def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_checkpoint: bool, git_push: bool) -> dict:
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -314,7 +320,11 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
     same_request=prior.get("request_fingerprint")==fingerprint and prior.get("phase")==phase
     previous_attempts=int(prior.get("consecutive_recoverable_failures") or 0) if same_request else 0
     attempts=previous_attempts+1
-    quota="quota" in str(exc).lower()
+    # TimeoutExpired renders argv (formerly the entire prompt) in its message;
+    # words inside that prompt are not provider error signals.
+    quota=(not isinstance(exc,subprocess.TimeoutExpired)
+           and any(marker in str(exc).lower() for marker in
+                   ("exceeded your monthly quota","monthly quota exhausted","copilot quota exceeded")))
     status=("PROVIDER_UNAVAILABLE" if quota else
             "PROVIDER_RETRY_BUDGET_EXHAUSTED" if attempts>=MAX_RECOVERABLE_PROVIDER_FAILURES else
             "PROVIDER_RETRY_REQUIRED")
@@ -323,7 +333,7 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
         "status":status,
         "request_fingerprint":fingerprint,
         "first_failure_utc":(prior.get("first_failure_utc") or iso()) if same_request else iso(),
-        "failure_class":"MONTHLY_QUOTA_EXHAUSTED" if quota else type(exc).__name__,
+        "failure_class":"PROVIDER_QUOTA_OR_RATE_LIMIT" if quota else "PROVIDER_TIMEOUT" if isinstance(exc,subprocess.TimeoutExpired) else type(exc).__name__,
         "provider_process_started":True,
         "failure_count":attempts,
         "last_failure_utc":iso(),
@@ -335,7 +345,7 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
                              "NEXT_LIVENESS_WAKE"),
         "provider":"github-copilot-cli",
         "phase":phase,
-        "detail":str(exc)[-1600:],
+        "detail":("Copilot implementation timed out after "+str(exc.timeout)+" seconds" if isinstance(exc,subprocess.TimeoutExpired) else str(exc)[-1600:]),
         "consecutive_recoverable_failures":attempts,
         "max_recoverable_failures":MAX_RECOVERABLE_PROVIDER_FAILURES,
         "current_evidence_epoch":state.get("current_research_evidence_epoch"),

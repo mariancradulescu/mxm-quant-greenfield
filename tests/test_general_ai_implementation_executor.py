@@ -7,6 +7,21 @@ from research_v3.execution_router import deterministic_operation_required
 
 ROOT=Path(__file__).resolve().parents[1]
 class GeneralAIImplementationExecutorTests(unittest.TestCase):
+    def test_large_implementation_prompt_uses_stdin(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from research_v3.general_ai_implementation_executor import _transport
+        prompt="implementation-context-"*20000
+        def launch(argv,**kw):
+            self.assertNotIn("-p",argv)
+            self.assertEqual(kw["input"],prompt)
+            self.assertTrue(all("implementation-context" not in part for part in argv))
+            self.assertEqual(kw["timeout"],600)
+            self.assertIn("--allow-tool=write",argv)
+            return SimpleNamespace(returncode=0,stdout='{"status":"COMPLETE_NON_ECONOMIC"}',stderr="")
+        with patch("research_v3.general_ai_implementation_executor.shutil.which",return_value="/bin/copilot"), patch("research_v3.general_ai_implementation_executor.subprocess.run",side_effect=launch):
+            result,_=_transport(ROOT,prompt,"test-token","auto")
+        self.assertEqual(result["status"],"COMPLETE_NON_ECONOMIC")
     def test_current_state_routes_by_semantics_not_finite_state_names(self):
         s=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
         if s.get("user_action_required") is True or s.get("external_gate") or not s.get("next_action") or (s.get("status")=="MATERIAL_INTEGRITY_FAILURE" and s.get("integrity_gate")):

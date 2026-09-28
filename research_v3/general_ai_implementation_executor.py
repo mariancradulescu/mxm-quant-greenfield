@@ -339,12 +339,12 @@ CURRENT_NEXT_STATE:
 
 def _transport(root:Path,prompt:str,token:str,model:str)->tuple[dict[str,Any],dict[str,Any]]:
     if not shutil.which("copilot"): raise ImplementationRejected("GitHub Copilot CLI executable missing")
-    cmd=["copilot","-p",prompt,"-s","--model="+model,"--no-ask-user","--no-auto-update","--no-color","--no-custom-instructions",
+    cmd=["copilot","-s","--model="+model,"--no-ask-user","--no-auto-update","--no-color","--no-custom-instructions",
          "--available-tools=view,grep,glob,edit,create,apply_patch","--allow-tool=read","--allow-tool=write"]
     for rel in PROTECTED_PREFIXES:
         cmd.append("--deny-tool=write("+rel.rstrip("/")+")")
     env=dict(os.environ); env["GITHUB_TOKEN"]=token; env["COPILOT_GITHUB_TOKEN"]=token
-    p=subprocess.run(cmd,cwd=root,env=env,text=True,capture_output=True,timeout=300)
+    p=subprocess.run(cmd,input=prompt,cwd=root,env=env,text=True,capture_output=True,timeout=600)
     if p.returncode!=0: raise ImplementationRejected("Copilot implementation failed: "+(p.stderr+"\n"+p.stdout)[-2400:])
     return _extract_json(p.stdout),{
         "provider":"github-copilot-cli","model":model,
