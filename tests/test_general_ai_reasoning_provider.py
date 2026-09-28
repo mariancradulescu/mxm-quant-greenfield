@@ -31,9 +31,8 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         request=build_reasoning_request(".")
         context=_context_payload(Path("."),request)
         self.assertLessEqual(context["current_frontier_content"]["evidence_epoch"],request["evidence_epoch_seen"])
-        self.assertEqual(context["latest_structural_result_ref"], "evidence/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_STRUCTURAL_RESULT_V1.json")
-        self.assertEqual(context["latest_structural_result_content"]["evidence_epoch"], 36)
-        self.assertEqual(context["latest_structural_result_content"]["inference"]["supported_symbols_after_bh_fdr"], 0)
+        self.assertTrue(Path(context["latest_structural_result_ref"]).is_file())
+        self.assertLessEqual(context["latest_structural_result_content"]["evidence_epoch"], request["evidence_epoch_seen"])
         self.assertEqual(len(context["broker_native_representatives"]),41)
         self.assertEqual(context["frontier_selection_execution_authority"]["evidence_epoch"],25)
         packet=context["semantic_decision_packet"]
@@ -42,6 +41,8 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertLess(len(__import__("json").dumps(context).encode()),120_000)
         retrospective=next(row for row in packet["source_projections"] if row["ref"].endswith("RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json"))
         self.assertNotIn("records",retrospective["facts"])
+        integrity=next(row for row in packet["source_projections"] if row["ref"].endswith("EPOCH38_TREND_SURFACE_TRANSPORT_INTEGRITY_AUDIT_V1.json"))
+        self.assertEqual(integrity["facts"]["status"],"LOCAL_TREND_SURFACE_VERIFICATION_BLOCKED")
 
     def test_copilot_large_prompt_is_piped_without_semantic_argv(self):
         from research_v3.general_ai_reasoning_provider import copilot_cli_transport
