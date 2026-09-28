@@ -196,6 +196,10 @@ jobs:
                   -f required_head="$(git rev-parse HEAD)"
                 break
                 ;;
+              PENDING_ACCEPTED_CAPTURE_BYTES)
+                echo "Accepted broker capture bytes must be materialized at the recorded hashes; no provider retry."
+                break
+                ;;
               ADDITIONAL_AUTHORITY_REQUIRED)
                 echo "Research held at explicit missing authority; no provider retry."
                 break
