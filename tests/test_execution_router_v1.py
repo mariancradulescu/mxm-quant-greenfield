@@ -160,10 +160,7 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             )
             self.assertFalse(implementation_required(ROOT,state))
         elif route["execution_class"]=="SEMANTIC_REASONING" and state.get("epoch38_alignment_readiness_ref"):
-            self.assertEqual(
-                state["next_action"],
-                "AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_EPOCH38_ALIGNMENT_READINESS",
-            )
+            self.assertTrue(state["next_action"].startswith("AI_SELECT_HIGHEST_INFORMATION_"))
             self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
             self.assertTrue(state["ai_reasoning_required"])
             self.assertFalse(state["implementation_ai_required"])
@@ -171,6 +168,9 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             self.assertIsNone(state.get("next_deterministic_operation_ref"))
             self.assertIsNone(state.get("deterministic_next_operation"))
             self.assertTrue((ROOT/state["epoch38_alignment_readiness_ref"]).is_file())
+            if state.get("local_data_park_ref"):
+                park=json.loads((ROOT/state["local_data_park_ref"]).read_text())
+                self.assertFalse(park["items"][0]["mechanism_family_closed"])
             self.assertTrue(state["broader_universe_remains_open"])
             self.assertEqual(state["accounting"],{
                 "economic_outcomes_opened":28,

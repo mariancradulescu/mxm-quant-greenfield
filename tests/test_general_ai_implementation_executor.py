@@ -44,6 +44,8 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
             self.assertTrue(state.get("supersession_ref") or state.get("outer_capture_plan_ref")
                             or (state.get("eligibility_retry") and reasoning_required(state)
                                 and not implementation_required(state,ROOT))
+                            or (state.get("local_data_park_ref") and reasoning_required(state)
+                                and not implementation_required(state,ROOT))
                             or (state.get("methodology_retired_proposal") and reasoning_required(state)
                                 and not implementation_required(state,ROOT)))
         source=(ROOT/"research_v3/general_ai_implementation_executor.py").read_text()

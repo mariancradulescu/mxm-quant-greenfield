@@ -152,6 +152,7 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
     refs=list(BASE_AUTHORITIES)
     for rel in ("research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
                 "research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json",
+                "research_v3/ai_director/BLOCKED_DATA_ACQUISITION_SCOPES_V1.json",
                 "research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json",
                 "research_v3/EPOCH21_ECONOMIC_SEARCH_GOVERNANCE_V1.json",
                 "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
@@ -311,6 +312,8 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
     blocker=_load(root,"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json") if (root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json").is_file() else {}
     blocked_doc=json.loads((root/"research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json").read_text()) if (root/"research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json").is_file() else {}
     blocked_scopes=sorted({row["scope_id"] for row in blocked_doc.get("items",[]) if row.get("status")=="PARKED_LOCAL_FRONTIER"}) if blocked_doc.get("schema")=="mxm.greenfield.blocked-frontier-scopes.v1" else (sorted(set(blocker.get("blocked_scope_ids") or [])) if blocker.get("scope_status")=="PARKED_LOCAL_FRONTIER" else [])
+    parked_data=_load(root,"research_v3/ai_director/BLOCKED_DATA_ACQUISITION_SCOPES_V1.json") if (root/"research_v3/ai_director/BLOCKED_DATA_ACQUISITION_SCOPES_V1.json").is_file() else {}
+    blocked_data_scopes=list(parked_data.get("items") or [])
     evidence=current_evidence_binding(root)
     deterministic_catalog=_authorized_deterministic_operation_catalog(root,int(evidence["evidence_epoch"]))
     # A visible executable operation must be eligible for citation under the
@@ -339,6 +342,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "universe_basis":evidence["universe_basis"],
         "current_open_mechanism_families":evidence["current_open_mechanism_families"],
         "blocked_scope_set":blocked_scopes,
+        "blocked_data_acquisition_scopes":blocked_data_scopes,
     }
     # The repository HEAD and full mutable next-state document are transport context,
     # not reasons to buy another semantic judgment on unchanged evidence.
@@ -349,6 +353,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "evidence_bundle_sha256":core["evidence_bundle_sha256"],
         "authority_hashes":[row for row in core["authority_hashes"] if row["ref"] not in NON_SEMANTIC_REQUEST_FINGERPRINT_REFS],
         "blocked_scope_set":blocked_scopes,
+        "blocked_data_acquisition_scopes":blocked_data_scopes,
         "decision_class":str(next_state.get("next_action") or ""),
         "pending_status":str(next_state.get("status") or ""),
         "semantic_question":str(next_state.get("semantic_question") or ""),
@@ -389,6 +394,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "universe_basis":core["universe_basis"],
         "current_open_mechanism_families":core["current_open_mechanism_families"],
         "blocked_scope_set":blocked_scopes,
+        "blocked_data_acquisition_scopes":blocked_data_scopes,
         "blocked_authority_request_id":blocker.get("request_id") if blocked_scopes else None,
         "eligibility_retry":next_state.get("eligibility_retry"),
         "authorized_deterministic_operations_current_epoch":deterministic_catalog,
@@ -472,6 +478,7 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
                 "lifetime_economic_exposure":20,"outcomes_opened":28},
             "authorized_deterministic_operations_current_epoch":list(request.get("authorized_deterministic_operations_current_epoch") or []),
             "blocked_scope_set":list(request.get("blocked_scope_set") or []),
+            "blocked_data_acquisition_scopes":list(request.get("blocked_data_acquisition_scopes") or []),
             "blocked_authority_request_id":request.get("blocked_authority_request_id"),
             "causal_prohibitions":["NO_C032_RERUN","NO_C032_OUTCOME_CAPTURE_REUSE",
                 "NO_PROTECTED_FORWARD_LEAKAGE","NO_RETROACTIVE_TUNING",
@@ -505,7 +512,7 @@ Those values are injected and guarded outside the AI layer.
 Important boundaries:
 - Begin with the complete current eligible frontier from CURRENT_RESEARCH_FRONTIER_V1.json and every open mechanism family. No consumed candidate, historical symbol, old panel, or rejected proposal is an active default.
 - Treat blocked_scope_set as local unavailable families. Select the highest-information legal ready action outside them. Do not request the same unresolved authority again. If no legal ready action remains, return ADDITIONAL_AUTHORITY_REQUIRED with a machine-checkable blocked_scope_id and explain why all remaining actions require it.
-- Choose mechanism-specific breadth from non-economic structural heterogeneity, data availability, event independence, and expected information gain. Do not assume a fixed panel size.
+- blocked_data_acquisition_scopes contains exact cohorts whose authenticated market data are currently unavailable to this unattended runtime. Do not choose or request the same exact cohort again. This local data blocker does NOT close its mechanism family or asset class. Prefer a legally ready material operation using already accepted development data or another frontier with machine-accessible inputs. Never label a new data gate machine-owned when it sets user_action_required=true.\n- Choose mechanism-specific breadth from non-economic structural heterogeneity, data availability, event independence, and expected information gain. Do not assume a fixed panel size.
 - One prospectively frozen economic experiment envelope may contain many symbols; do not authorize an economic outcome until causality, data sufficiency, cost, EUR200 margin feasibility, breadth, freeze, and exact-head CI all pass.
 - Historical survivors and failures remain valid context. Never rerun an opened identity, use outcome-exposed evidence as new prospective input, erase lifetime trial exposure, or retroactively select a winning subgroup.
 - When an authoritative structural result explicitly requires fresh family/frontier selection and forbids reuse/rerun of its diagnostic without new predeclared authority, do not immediately reparameterize or rerun that same family on the same observed bytes. A different split, test statistic, lag rule, multiplicity correction, or threshold after seeing the prior result is not a fresh prospective family decision. The same family may return only through a genuinely distinct prospectively justified hypothesis/authority that does not reuse the observed diagnostic outcome to redesign the test.
@@ -772,6 +779,8 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
         raise AIProposalRejected("provider candidate referenced authority outside supplied context: "+json.dumps(sanitized[:8]))
     raw_policy=candidate.get("data_policy") or {}
     new_data=bool(raw_policy.get("new_market_data_requested"))
+    if new_data and next_state.get("next_deterministic_operation_ref"):
+        raise AIProposalRejected("new broker data request cannot simultaneously route an existing deterministic operation; choose one executable next boundary")
     data_policy={"no_default_multi_year_download":True,"user_selects_symbols_or_horizon":False,"new_market_data_requested":new_data}
     if new_data:
         data_policy["minimal_acquisition_request"]=raw_policy.get("minimal_acquisition_request") or {}
