@@ -228,6 +228,10 @@ def _park_current_local_authority(root:Path,state:dict,*,git_checkpoint:bool,git
     if not _park_authority(root,state,request,git_checkpoint=False,git_push=False):
         return None
     parked=dict(load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{}) or {})
+    next_state=_resume_after_local_park(root,state,git_checkpoint=git_checkpoint,git_push=git_push)
+    return {"request":parked,"next_state":next_state}
+
+def _resume_after_local_park(root:Path,state:dict,*,git_checkpoint:bool,git_push:bool)->dict:
     next_state=dict(state)
     for key in ("blocked_scope_id","requested_authority_or_class","implementation_scope","implementation_ai_scope",
                 "implementation_task_scope","source_ai_proposal_id","source_ai_proposal_hash"):
@@ -249,7 +253,7 @@ def _park_current_local_authority(root:Path,state:dict,*,git_checkpoint:bool,git
     atomic_write_json(root/NEXT_STATE_REL,next_state)
     refresh_derived_views(root)
     GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("local_authority_park_and_continue",None)
-    return {"request":parked,"next_state":next_state}
+    return next_state
 
 def _material_state_signature(state: dict) -> str:
     """Hash only routing/research state that can represent material progress.
@@ -427,6 +431,11 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)
             trace.append({"cycle":cycle,"kind":"GENERAL_AI_REASONING","reasoning":r,"drain_status":d.get("status")})
             if r.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED":
+                if _park_authority(root,state,r,git_checkpoint=git_checkpoint,git_push=git_push):
+                    state=_resume_after_local_park(root,state,git_checkpoint=git_checkpoint,git_push=git_push)
+                    trace.append({"cycle":cycle,"kind":"LOCAL_AUTHORITY_PARKED",
+                                  "blocked_scope_ids":r.get("blocked_scope_ids"),"provider_calls_delta":0})
+                    continue
                 return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_EXECUTION_AUTHORITY","cycles":cycle,"trace":trace,"next_state":state,"request":r}
             continue
         if implementation_required(state,root):
