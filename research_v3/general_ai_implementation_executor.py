@@ -380,15 +380,15 @@ def _validate_output(root:Path,out:Mapping[str,Any])->None:
     gate=out.get("external_data_gate")
     if status=="EXTERNAL_DATA_REQUIRED":
         if not isinstance(gate,Mapping): raise ImplementationRejected("external gate object required")
+        _,proposal,_=_resolve_current_proposal(root,_next(root))
+        if (proposal.get("data_policy") or {}).get("new_market_data_requested") is not True:
+            raise ImplementationRejected("external gate lacks authorized broker-native data request")
         build=str(gate.get("collector_build_ref") or "")
         if not build or not (root/build).is_file(): raise ImplementationRejected("external gate collector build ref missing")
         plan_ref=str(gate.get("collector_plan_ref") or "")
         if not plan_ref or not (root/plan_ref).is_file(): raise ImplementationRejected("external gate requires frozen collector_plan_ref")
         plan=load_json(root/plan_ref,{}) or {}
-        _,proposal,_=_resolve_current_proposal(root,_next(root))
         request=(proposal.get("data_policy") or {}).get("minimal_acquisition_request") or {}
-        if (proposal.get("data_policy") or {}).get("new_market_data_requested") is not True:
-            raise ImplementationRejected("external gate lacks authorized broker-native data request")
         symbols=[x.get("broker_symbol") if isinstance(x,Mapping) else x for x in plan.get("symbols") or []]
         interval=plan.get("interval") or plan.get("outer_interval") or {}
         if (symbols!=request.get("symbols") or plan.get("resolution")!=request.get("resolution")
@@ -551,6 +551,11 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
     try:
         provider_attempted=True
         out,provider=_transport(root,_prompt(root,next_state),token,model)
+        # Preserve the paid response before validation can reject it and restore
+        # the worktree. The failure artifact uploader reads this private path.
+        recovery_dir=Path(os.environ.get("MXM_PROVIDER_RECOVERY_DIR","/tmp/mxm-provider-recovery"))
+        recovery_dir.mkdir(parents=True,exist_ok=True)
+        (recovery_dir/"current-implementation-output.json").write_text(json.dumps(out,sort_keys=True,indent=2),encoding="utf-8")
         _validate_output(root,out)
         changed=_changed_paths(root)
         if not changed and out["status"]=="COMPLETE_NON_ECONOMIC":
@@ -596,6 +601,17 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
     except Exception as exc:
         if isinstance(exc,PostProviderPersistenceConcurrencyError):
             raise
+        if provider_attempted:
+            recovery_dir=Path(os.environ.get("MXM_PROVIDER_RECOVERY_DIR","/tmp/mxm-provider-recovery"))
+            recovery_dir.mkdir(parents=True,exist_ok=True)
+            with (recovery_dir/"current-worktree.patch").open("wb") as patch_file:
+                subprocess.run(["git","diff","--binary","HEAD"],cwd=root,stdout=patch_file,check=False)
+            for rel in _changed_paths(root):
+                if _is_protected(rel) or not (root/rel).is_file():
+                    continue
+                target=recovery_dir/"current-files"/rel
+                target.parent.mkdir(parents=True,exist_ok=True)
+                shutil.copy2(root/rel,target)
         _restore(root)
         if provider_attempted and not isinstance(exc,(subprocess.TimeoutExpired,ImplementationProviderAttemptError)):
             raise ImplementationProviderAttemptError(str(exc)) from exc
