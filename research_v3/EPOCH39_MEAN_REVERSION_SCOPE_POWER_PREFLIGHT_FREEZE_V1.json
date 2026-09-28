@@ -1,0 +1,111 @@
+{
+  "schema": "mxm.greenfield.epoch39-mean-reversion-scope-power-preflight-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT",
+  "evidence_epoch": 39,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_44ec982538d0519ed46c879423c096b6.json",
+    "accepted_proposal_file_sha256": "9feec0b687b66e18685535bf023833343fcb3812bb88cc3921f57cc65d065f39",
+    "accepted_proposal_hash": "0990efaed7c085f0926117349545570bfd7f0e141f1f5aada4ebd598a9226671",
+    "accepted_operation_id": "op_d5365058873c8c601e6fdd9dd900cc75",
+    "feasibility_authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "feasibility_acceptance_ref": "evidence/BROKER_NATIVE_COMPETITION_UNIVERSE_CAPTURE_EPOCH22_ACCEPTANCE_V1.json",
+    "adaptive_discovery_architecture_ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+    "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+    "source_eligible_identity_count": 1576,
+    "source_eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "source_canonical_broker_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452"
+  },
+  "scope": {
+    "mechanism_family": "MEAN_REVERSION",
+    "role": "OUTCOME_BLIND_DISCOVERY_SAMPLING_FRAME",
+    "candidate_sampling_frame": "ALL_1576_CURRENT_EUR200_FEASIBLE_POST_EXCLUSION_IDENTITIES",
+    "fixed_panel_size": false,
+    "structural_41_default_inferential_authority": false,
+    "prior_outcome_exposed_identities_reused": false,
+    "current_account_authority_is_not_alpha_or_historical_margin": true,
+    "symbol_subselection": "NONE_IN_THIS_PREFLIGHT; select only after a prospectively defined data-completeness and event-independence audit over the eligible frame",
+    "selection_features": [
+      "directional_margin_feasibility",
+      "minimum_executable_volume",
+      "product_type",
+      "trading_schedule",
+      "asset_class",
+      "shortability",
+      "data_availability_and_completeness",
+      "reversal_event_density",
+      "realized_volatility_opportunity_proxy",
+      "capital_efficiency",
+      "conservative_friction_proxy",
+      "acquisition_cost",
+      "redundancy"
+    ],
+    "missing_pre_outcome_features": [
+      "full-frame historical data availability and completeness",
+      "full-frame reversal event density",
+      "full-frame realized-volatility opportunity proxy"
+    ],
+    "missingness_rule": "UNKNOWN_REMAINS_UNKNOWN; do not impute absent history, event counts, costs, or margin data; do not treat the 41 structural representatives as proxies for the 1576-member frame"
+  },
+  "design": {
+    "stage": "DESIGN_ONLY_NO_MARKET_OUTCOME_OR_SURFACE_READ",
+    "coarse_parameter_regions": {
+      "resolution": "M5",
+      "lookback_bars": [12, 24, 48, 96],
+      "absolute_standardized_deviation_threshold": [1.0, 1.5, 2.0],
+      "holding_horizon_bars": [3, 6, 12],
+      "cell_count": 36,
+      "range_rationale": "Four geometrically spaced 1-to-8-hour context windows, three separated deviation strengths, and 15-to-60-minute responses form a small, mechanism-interpretable coarse surface without optimizing against observed outcomes.",
+      "all_regions_frozen_before_development_surface": true
+    },
+    "estimand": "For each frozen cell, the arithmetic mean of UTC-date-cluster means of signed forward log returns divided by event-time rolling one-bar-return standard deviation times sqrt(holding_horizon); the return sign is reversed for positive deviations and preserved for negative deviations, so positive values indicate movement toward the rolling mean.",
+    "causal_event_rule": "At each completed M5 close, use only that close and the immediately preceding frozen lookback closes to calculate the arithmetic rolling center and population standard deviation; emit a short event at z >= threshold and a long event at z <= -threshold; zero-scale windows emit no event.",
+    "dependence_unit": "UTC calendar date pooled across all included symbols and events; average event responses within each date before inference. Effective independent sample size is date-level n divided by 1 + 2 times the sum of positive date-series autocorrelations, stopping at the first non-positive lag and bounded to [1,n].",
+    "missing_data": "No forward fill, interpolation, resampling, or synthetic bars. Gaps break contiguous segments; events whose frozen forward horizon crosses a gap are right-censored, retained in trigger/censor counts, and excluded from settled-response estimates. Missing symbols/dates are not imputed.",
+    "exploratory_multiplicity": "Benjamini-Hochberg FDR q=0.05 across all 36 frozen cells; record every cell and all failed/insufficient cells. This exploratory adjustment is not confirmatory authority.",
+    "selection_rule": "Retain broad connected adjacent parameter regions only; isolated supported cells cannot be promoted. Freeze all outcomes and probes in the region table. Do not narrow symbols from observed outcomes; any later panel selection must use only the frozen pre-outcome features.",
+    "power_design": {
+      "target_power": 0.8,
+      "one_sided_directional_test": true,
+      "familywise_conservative_alpha_for_design": "0.05 / 36",
+      "standardized_effect_sensitivity_scenarios": [0.2, 0.3, 0.5],
+      "sample_size_unit": "effective independent UTC dates, not M5 bars or raw events",
+      "approximation": "ceil(((z_(1-0.05/36) + z_0.8) / standardized_effect)^2)",
+      "scenario_values_are_economic_thresholds": false,
+      "achieved_power_estimated_without_history": false
+    }
+  },
+  "data_boundary": {
+    "new_market_data_acquisition_in_this_phase": false,
+    "accepted_canonical_broker_payload_transport_materialization_is_new_acquisition": false,
+    "accepted_capture_is_available_by_hash_binding_even_when_bytes_are_external_to_git": true,
+    "market_history_for_full_eligible_frame_available": false,
+    "later_exact_minimal_history_request_requires_materialized_pre_outcome_scope": true,
+    "later_request_resolution": "M5",
+    "later_request_fields": ["time_utc", "open", "high", "low", "close", "tick_volume"],
+    "later_request_interval": "Must be frozen from the materialized scope and accepted-history coverage; no default multi-year download."
+  },
+  "interpretation_boundary": {
+    "strategy_returns_computed": false,
+    "pnl_computed": false,
+    "economic_outcome_opened": false,
+    "v2_attempt_consumed": false,
+    "candidate_economic_identity_created": false,
+    "mechanism_family_closed": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_data_is_independent_confirmation": false,
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "accounting_effect": {
+    "v2_attempts_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0
+  },
+  "execution": {
+    "implementation_ref": "research_v3/mean_reversion_scope_power_preflight.py",
+    "result_ref": "evidence/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1.json",
+    "exact_head_green_required_before_execution": true,
+    "freeze_must_be_persisted_before_execution": true
+  }
+}

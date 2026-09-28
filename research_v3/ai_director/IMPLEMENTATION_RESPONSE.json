@@ -1,84 +1,49 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "28e2bb7ac20875c82bd980a0b3bffda9a882c789",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "28e2bb7ac20875c82bd980a0b3bffda9a882c789",
-    "predecessor_run_id": 36418553941
-  },
-  "accepted_output": {
-    "decision": {
-      "accepted_proposal_file_sha256": "20db9e7dcc5e3ff2ac4746f7fa81c82ded1598a2ab2bca078c266a037359a62e",
-      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_88b3d8ac3e0ad746ff188958465fbd36.json",
-      "audit_scope": "Accepted 41-representative M5 development panel; report observed alignment, missingness, lagged regime-context coverage, schedule-overlap proxy, date and context-spell clusters, dependence-aware effective sample sizes, and descriptive detectable-effect sensitivity. No strategy outcomes or returns.",
-      "data_dependency": "Both exact-scope captures are already accepted and hash-bound; external-to-Git byte materialization only. No new data acquisition or collector gate.",
-      "deterministic_operation_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
-      "freeze_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_FREEZE_V1.json",
-      "implementation_ref": "research_v3/regime_context_data_sufficiency_audit.py",
-      "safety": {
-        "economic_outcomes_opened": 0,
-        "independent_confirmation_claimed": false,
-        "live_orders_authorized": false,
-        "protected_forward_opened": false,
-        "v2_attempts_consumed": 0
-      }
-    },
-    "external_data_gate": null,
-    "implementation_id": "regime-context-data-sufficiency-audit-v1",
-    "next_research_state": {
-      "exact_head_green_required_before_execution": true,
-      "implementation_scope_complete": true,
-      "later_step": "Interpret the audit without treating internal development data as independent confirmation.",
-      "next_action": "RUN_REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT",
-      "next_deterministic_operation_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
-      "status": "AUTHORIZED_DETERMINISTIC_OPERATION_PENDING_EXACT_HEAD_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Implemented and prospectively froze the outcome-blind audit over the accepted 41-symbol M5 development scope, with a bound deterministic operation. The accepted capture bytes are external to Git but already hash-bound: materializing them is transport, not new data acquisition. Exact-head CI and operation execution remain pending; no economic or protected evidence was opened.",
-    "tests_requested": [
-      "python -m unittest discover -s tests -p 'test_regime_context_data_sufficiency_audit.py'"
-    ]
-  },
-  "basis_next_state_sha256": "07585c3fb1aeb0344959442a3946d21751f0fd415be9e9cd8c93a5f9cd4b442a",
+  "basis_next_state_sha256": "e59572c15d93477e5bc648ec8d336463594c3c4ba30f4399e9ec47adebabd030",
   "changed_paths": [
-    "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
-    "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_FREEZE_V1.json",
-    "research_v3/regime_context_data_sufficiency_audit.py",
-    "tests/test_regime_context_data_sufficiency_audit.py"
+    "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+    "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_FREEZE_V1.json",
+    "research_v3/mean_reversion_scope_power_preflight.py",
+    "tests/test_mean_reversion_scope_power_preflight.py"
   ],
-  "created_utc": "2026-09-28T11:34:01Z",
+  "created_utc": "2026-09-28T15:57:45Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_proposal_file_sha256": "20db9e7dcc5e3ff2ac4746f7fa81c82ded1598a2ab2bca078c266a037359a62e",
-      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_88b3d8ac3e0ad746ff188958465fbd36.json",
-      "audit_scope": "Accepted 41-representative M5 development panel; report observed alignment, missingness, lagged regime-context coverage, schedule-overlap proxy, date and context-spell clusters, dependence-aware effective sample sizes, and descriptive detectable-effect sensitivity. No strategy outcomes or returns.",
-      "data_dependency": "Both exact-scope captures are already accepted and hash-bound; external-to-Git byte materialization only. No new data acquisition or collector gate.",
-      "deterministic_operation_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
-      "freeze_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_FREEZE_V1.json",
-      "implementation_ref": "research_v3/regime_context_data_sufficiency_audit.py",
+      "deterministic_operation_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+      "freeze_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_FREEZE_V1.json",
+      "implementation_ref": "research_v3/mean_reversion_scope_power_preflight.py",
+      "implementation_scope_complete": true,
+      "later_step": "After the deterministic preflight, define the smallest pre-outcome M5 history scope using data completeness, event independence, structural heterogeneity, and acquisition cost; any new data request must bind that exact scope and collector.",
+      "power_status": "Required effective-date sample sizes are frozen as standardized-effect sensitivity scenarios; achieved power is not claimed without full-frame history.",
+      "result_ref": "evidence/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1.json",
       "safety": {
+        "C031_stage_b_rerun": false,
+        "candidate_economic_identity_created": false,
         "economic_outcomes_opened": 0,
-        "independent_confirmation_claimed": false,
         "live_orders_authorized": false,
         "protected_forward_opened": false,
         "v2_attempts_consumed": 0
       }
     },
     "external_data_gate": null,
-    "implementation_id": "regime-context-data-sufficiency-audit-v1",
+    "implementation_id": "EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1",
     "next_research_state": {
-      "exact_head_green_required_before_execution": true,
+      "exact_head_green_required": true,
+      "external_data_required": false,
+      "implementation_satisfied": true,
       "implementation_scope_complete": true,
-      "later_step": "Interpret the audit without treating internal development data as independent confirmation.",
-      "next_action": "RUN_REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT",
-      "next_deterministic_operation_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
-      "status": "AUTHORIZED_DETERMINISTIC_OPERATION_PENDING_EXACT_HEAD_GREEN"
+      "later_step": "FRESH_NON_ECONOMIC_DATA_SCOPE_DECISION_AFTER_PREFLIGHT_RESULT",
+      "next_action": "RUN_EPOCH39_MEAN_REVERSION_SCOPE_AND_POWER_DESIGN_PREFLIGHT",
+      "next_deterministic_operation_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+      "research_judgment_required": false,
+      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Implemented and prospectively froze the outcome-blind audit over the accepted 41-symbol M5 development scope, with a bound deterministic operation. The accepted capture bytes are external to Git but already hash-bound: materializing them is transport, not new data acquisition. Exact-head CI and operation execution remain pending; no economic or protected evidence was opened.",
+    "summary": "Added a prospectively frozen mean-reversion scope and power design bound to the accepted proposal’s exact file-byte hash. It uses the full 1,576-identity feasible universe as the sampling frame, keeps the 41 structural representatives non-inferential, freezes a 36-cell coarse design, and expresses power in effective independent UTC dates. No strategy outcomes or P&L are computed. Full-frame event density is unavailable, so achieved power and a smaller acquisition panel are deferred; hash-bound capture transport is not new data acquisition.",
     "tests_requested": [
-      "python -m unittest discover -s tests -p 'test_regime_context_data_sufficiency_audit.py'"
+      "tests/test_mean_reversion_scope_power_preflight.py",
+      "Exact-head CI before deterministic operation execution"
     ]
   },
   "project_snapshot": {
@@ -96,7 +61,7 @@
     "model_selection": "AUTO_ACCOUNT_AVAILABLE",
     "provider": "github-copilot-cli"
   },
-  "request_fingerprint": "4e1b45e94b66b9335d752886c89b36a4dcab2d9fdaf8a616be2007c7e5c54352",
+  "request_fingerprint": "cedb443fc7e46e16894fd9202bee5678519872a8485f4c3fbd3eb6ddc1a56f5e",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
