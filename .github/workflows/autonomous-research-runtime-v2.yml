@@ -85,6 +85,18 @@ jobs:
           tests.test_relative_value_epoch32_pair_structure
           tests.test_epoch34_composite_causal_ml_regime_screen
           tests.test_epoch34_deterministic_operation
+          tests.test_regime_context_data_sufficiency_audit
+
+      - name: Bind tested exact research head for pending implementation acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${TARGET_BRANCH}"
+          tested="$(git rev-parse HEAD)"
+          test "$(git rev-parse "origin/${TARGET_BRANCH}")" = "${tested}"
+          echo "MXM_PREDECESSOR_CI_HEAD=${tested}" >> "$GITHUB_ENV"
+          echo "MXM_PREDECESSOR_CI_CONCLUSION=success" >> "$GITHUB_ENV"
+          echo "MXM_PREDECESSOR_CI_RUN_ID=${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
 
       - name: Verify current external semantic fallback route
         run: |
@@ -224,6 +236,22 @@ jobs:
             fi
           fi
           echo "final_status=${final_status}" >> "${GITHUB_OUTPUT}"
+
+      - name: Preserve paid provider work on branch persistence failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p /tmp/mxm-provider-recovery
+          git rev-parse HEAD > /tmp/mxm-provider-recovery/failed-local-head.txt
+          git format-patch -1 --stdout HEAD > /tmp/mxm-provider-recovery/generated.patch || true
+          cp research_v3/ai_director/IMPLEMENTATION_RESPONSE.json /tmp/mxm-provider-recovery/implementation-response.json || true
+          cp research_v3/ai_director/PROVIDER_USAGE_V1.json /tmp/mxm-provider-recovery/provider-usage.json || true
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: mxm-provider-persistence-recovery-${{ github.run_id }}
+          path: /tmp/mxm-provider-recovery/
+          if-no-files-found: ignore
 
       - name: Refresh derived views after durable progress
         run: |
