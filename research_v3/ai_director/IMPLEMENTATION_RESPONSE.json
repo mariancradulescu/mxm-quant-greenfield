@@ -1,4 +1,58 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "453effc65cecea7e82eca4707359fec4519a5ad8",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "453effc65cecea7e82eca4707359fec4519a5ad8",
+    "predecessor_run_id": 36447571049
+  },
+  "accepted_output": {
+    "decision": {
+      "deterministic_operation_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+      "freeze_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_FREEZE_V1.json",
+      "implementation_ref": "research_v3/mean_reversion_scope_power_preflight.py",
+      "implementation_scope_complete": true,
+      "later_step": "After the deterministic preflight, define the smallest pre-outcome M5 history scope using data completeness, event independence, structural heterogeneity, and acquisition cost; any new data request must bind that exact scope and collector.",
+      "power_status": "Required effective-date sample sizes are frozen as standardized-effect sensitivity scenarios; achieved power is not claimed without full-frame history.",
+      "result_ref": "evidence/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1.json",
+      "safety": {
+        "C031_stage_b_rerun": false,
+        "candidate_economic_identity_created": false,
+        "economic_outcomes_opened": 0,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
+      }
+    },
+    "external_data_gate": null,
+    "implementation_id": "EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1",
+    "next_research_state": {
+      "ai_reasoning_required": false,
+      "exact_head_green_required": true,
+      "external_data_required": false,
+      "green_implementation_artifacts": [
+        "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+        "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_FREEZE_V1.json",
+        "research_v3/mean_reversion_scope_power_preflight.py",
+        "tests/test_mean_reversion_scope_power_preflight.py"
+      ],
+      "implementation_ai_required": false,
+      "implementation_satisfied": true,
+      "implementation_scope_complete": true,
+      "later_step": "FRESH_NON_ECONOMIC_DATA_SCOPE_DECISION_AFTER_PREFLIGHT_RESULT",
+      "next_action": "RUN_EPOCH39_MEAN_REVERSION_SCOPE_AND_POWER_DESIGN_PREFLIGHT",
+      "next_deterministic_operation_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+      "research_judgment_required": false,
+      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added a prospectively frozen mean-reversion scope and power design bound to the accepted proposal’s exact file-byte hash. It uses the full 1,576-identity feasible universe as the sampling frame, keeps the 41 structural representatives non-inferential, freezes a 36-cell coarse design, and expresses power in effective independent UTC dates. No strategy outcomes or P&L are computed. Full-frame event density is unavailable, so achieved power and a smaller acquisition panel are deferred; hash-bound capture transport is not new data acquisition.",
+    "tests_requested": [
+      "tests/test_mean_reversion_scope_power_preflight.py",
+      "Exact-head CI before deterministic operation execution"
+    ]
+  },
   "basis_next_state_sha256": "e59572c15d93477e5bc648ec8d336463594c3c4ba30f4399e9ec47adebabd030",
   "changed_paths": [
     "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
@@ -63,5 +117,5 @@
   },
   "request_fingerprint": "cedb443fc7e46e16894fd9202bee5678519872a8485f4c3fbd3eb6ddc1a56f5e",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
