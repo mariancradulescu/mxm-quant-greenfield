@@ -198,22 +198,23 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         if rel not in refs and (root/rel).is_file():
             refs.append(rel)
 
-    # Referential closure over the authority packet itself.  Large authority
+    # Referential closure over the authority packet itself. Large authority
     # documents are summarized to the model, but their durable *_ref / *_refs
-    # values can still be visible and legitimately cited.  A manually curated
-    # top-level list repeatedly rejected such citations (Epoch25).  Expand only
-    # existing repository JSON refs, fail closed on runaway graphs, and preserve
-    # stable insertion order.
+    # values can still be visible and legitimately cited. The repository graph is
+    # already a finite bound: only existing in-repository files are admitted and
+    # each ref is visited at most once. A fixed numeric ceiling (formerly 512)
+    # becomes a false liveness failure as durable research history grows.
     cursor=0
-    max_authority_refs=512
+    seen_refs=set(refs)
+    repository_root=root.resolve()
     while cursor < len(refs):
-        if len(refs) > max_authority_refs:
-            raise AIReasoningProviderError(
-                f"authority reference closure exceeded {max_authority_refs} files"
-            )
         rel=refs[cursor]
         cursor+=1
-        path=root/rel
+        path=(root/rel).resolve()
+        try:
+            path.relative_to(repository_root)
+        except ValueError:
+            continue
         if not path.is_file() or path.suffix.lower()!=".json":
             continue
         try:
@@ -221,8 +222,16 @@ def _authority_context(root:Path,next_state:Mapping[str,Any])->tuple[list[dict[s
         except Exception:
             continue
         for nested in _state_repository_refs(doc):
-            if nested not in refs and (root/nested).is_file():
+            if nested in seen_refs:
+                continue
+            nested_path=(root/nested).resolve()
+            try:
+                nested_path.relative_to(repository_root)
+            except ValueError:
+                continue
+            if nested_path.is_file():
                 refs.append(nested)
+                seen_refs.add(nested)
 
     rows=[]; kept=[]
     for rel in refs:
