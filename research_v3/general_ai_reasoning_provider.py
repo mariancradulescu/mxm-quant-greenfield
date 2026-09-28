@@ -25,6 +25,7 @@ from research_v3.general_ai_director_bridge import (
     validate_proposal,
     _validate_proposed_next_state_routeability,
 )
+from research_v3.discovery_methodology import validate_proposal_universe_methodology
 from research_v3.runtime_v2_primitives import (
     GitCheckpointSink,
     atomic_write_json,
@@ -73,6 +74,9 @@ BASE_AUTHORITIES=(
     "evidence/SESSION_GAP_SCHEDULE_COVERAGE_DEPENDENCY_REVIEW_V1.json",
     "data/BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1.json",
     "data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json",
+    "evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json",
+    "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+    "evidence/EPOCH37_PRE_OUTCOME_METHODOLOGY_VALIDITY_GATE_V1.json",
 )
 
 class AIReasoningProviderError(RuntimeError): pass
@@ -378,14 +382,21 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
              delta_refs=delta)
     p["allowed_authority_refs"]=[x["ref"] for x in
         p["admissible_inputs"]+p["historical_context"]+p["forbidden_inputs"]]
-    structural=json.loads((root/"evidence/EPOCH24_TREND_MOMENTUM_STRUCTURAL_RESULT_V1.json").read_text())
+    next_state_full=json.loads((root/NEXT_REL).read_text(encoding="utf-8"))
+    structural_ref=next_state_full.get("latest_material_structural_result_ref") or next_state_full.get("completed_structural_report_ref") or "evidence/EPOCH24_TREND_MOMENTUM_STRUCTURAL_RESULT_V1.json"
+    structural=json.loads((root/structural_ref).read_text(encoding="utf-8"))
     registry=json.loads((root/"research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json").read_text())
     selection_authority=json.loads((root/"research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json").read_text())
+    methodology_audit=json.loads((root/"evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json").read_text(encoding="utf-8"))
+    discovery_architecture=json.loads((root/"research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json").read_text(encoding="utf-8"))
     return {"request_id":request["request_id"],"eligibility_packet":p,
             "current_frontier_content":frontier,
+            "latest_structural_result_ref":structural_ref,
             "latest_structural_result_content":structural,
             "broker_native_representatives":registry["representatives"],
             "frontier_selection_execution_authority":selection_authority,
+            "research_discovery_methodology_audit":methodology_audit,
+            "adaptive_mechanism_discovery_architecture":discovery_architecture,
             "pending_decision":{k:(request.get("next_state") or {}).get(k) for k in ("status","next_action","reason","decision_contract","supersession_ref")},
             "historical_consumed_identity_summaries":scope,
             "valid_survivors":["V2-C006","V2-C012","V2-C031"],
@@ -436,7 +447,12 @@ Important boundaries:
 - One prospectively frozen economic experiment envelope may contain many symbols; do not authorize an economic outcome until causality, data sufficiency, cost, EUR200 margin feasibility, breadth, freeze, and exact-head CI all pass.
 - Historical survivors and failures remain valid context. Never rerun an opened identity, use outcome-exposed evidence as new prospective input, erase lifetime trial exposure, or retroactively select a winning subgroup.
 - When an authoritative structural result explicitly requires fresh family/frontier selection and forbids reuse/rerun of its diagnostic without new predeclared authority, do not immediately reparameterize or rerun that same family on the same observed bytes. A different split, test statistic, lag rule, multiplicity correction, or threshold after seeing the prior result is not a fresh prospective family decision. The same family may return only through a genuinely distinct prospectively justified hypothesis/authority that does not reuse the observed diagnostic outcome to redesign the test.
-- Distinguish structural representatives from economic equivalence; narrow scope only with explicit frontier-relative reasons independent of the new outcome.
+- Distinguish structural representatives from economic equivalence. The 41 structural representatives are a BROKER-TOPOLOGY COVERAGE PANEL, not the default inferential discovery universe. Do not reuse all 41 for a predictive/economic mechanism merely because their 13-week data are convenient.
+- For every selected mechanism family, decision MUST include universe_methodology. Use role MECHANISM_SPECIFIC_DISCOVERY for inferential discovery, set structural_representatives_are_economic_equivalents=false, outcome_blind_selection=true, source_universe_ref to an allowed full-feasible-universe authority, and list non-outcome selection_features. Use role STRUCTURAL_COVERAGE_ONLY only for topology/pipeline/cheap feasibility work and set inferential_discovery=false.
+- CROSS_SECTIONAL_RANKING, RELATIVE_VALUE_COINTEGRATION and CROSS_MARKET_LEAD_LAG additionally require universe_methodology.aligned_history_required=true and a concrete peer_coherence_basis. Peer-set construction is part of the estimand.
+- Treat statistical power as a design input: use effective independent sample size rather than raw M5 bars, avoid universal both-half per-ticker significance as an early discovery veto, and retain multiplicity control at the appropriate confirmatory level. Pooled, hierarchical, clustered or portfolio-level inference is allowed only when prospectively justified by the scientific/economic estimand.
+- A broad corrected structural result must have an explicit legal promotion path. Family-level evidence may motivate a fresh prospective follow-on, but observed per-symbol winners may not be cherry-picked into the economic universe.
+- Prioritize material information gain and expected realizable economic value: edge per turnover, opportunity density, breadth, capital utilization, friction, margin efficiency, concurrency, compounding and recovery capacity. Commits/tests/epochs are not research progress by themselves.
 - Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
 - Cite only supplied authority refs. If an additional authority is needed, return status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, rationale, and a top-level blocked_scope_id equal to exactly one current_open_mechanism_families enum. Do not bury the scope inside rationale.
 - Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
@@ -756,6 +772,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
             "current_open_mechanism_families":list(request["current_open_mechanism_families"]),
         },
     }
+    validate_proposal_universe_methodology(root,proposal)
     validate_proposal(root,proposal)
     _validate_proposed_next_state_routeability(root, proposal)
     return proposal
