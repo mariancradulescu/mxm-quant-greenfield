@@ -1,6 +1,6 @@
 {
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN",
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "basis_next_state_sha256": "6894ef6abc4d19f490ab354c3b20b08e398c954cdbd1b69f428ea889ee2864da",
   "request_fingerprint": "16f2eb9cf519806877a9dc7afc6d1074f0a88d9e8f58af1e3ec308edeaf95edf",
@@ -28,8 +28,9 @@
       ]
     },
     "next_research_state": {
-      "status": "TREND_PARAMETER_SCAN_IMPLEMENTED_AWAITING_MATERIALIZATION_AFTER_EXACT_HEAD_GREEN",
-      "next_action": "DIRECTOR_MATERIALIZE_TREND_MOMENTUM_FX_CRYPTO_METALS_COARSE_PARAMETER_REGION_SCAN_V1",
+      "status": "TREND_PARAMETER_SCAN_IMPLEMENTED_AND_RESULT_MATERIALIZED_PENDING_DETERMINISTIC_ACCEPTANCE",
+      "next_action": "ACCEPT_FROZEN_EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT",
+      "next_deterministic_operation_ref": "research_v3/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_DETERMINISTIC_OPERATION_V1.json",
       "ai_reasoning_required": false,
       "research_judgment_required": false,
       "implementation_ai_required": false,
@@ -37,7 +38,6 @@
       "implementation_scope_complete": true,
       "external_data_required": false,
       "external_data_gate": null,
-      "external_gate": null,
       "user_action_required": false
     },
     "external_data_gate": null,
@@ -65,5 +65,54 @@
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "created_utc": "2026-09-28T11:10:00Z"
+  "created_utc": "2026-09-28T11:10:00Z",
+  "accepted_exact_head": {
+    "green": true,
+    "head": "bce67ce0032060cf639e491ce8685d6148dbba62",
+    "predecessor_head": "bce67ce0032060cf639e491ce8685d6148dbba62",
+    "predecessor_conclusion": "success",
+    "predecessor_run_id": 36413737053
+  },
+  "accepted_output": {
+    "implementation_id": "epoch37_trend_momentum_coarse_parameter_region_provenance_recovery",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Recovered the accepted TREND_MOMENTUM Stage-1 coarse parameter-region implementation directly from durable canonical authorities. The repair separates the canonical semantic proposal hash from file-byte hashes and separately binds the development and replacement capture authorities. The accepted seven-symbol grid is unchanged; no new market data, economics, protected evidence, candidate identity, or semantic reselection occurred.",
+    "decision": {
+      "classification": "DETERMINISTIC_IMPLEMENTATION_PROVENANCE_REPAIR_NO_RESEARCH_SEMANTIC_CHANGE",
+      "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_85a6da387ad291b1ccdb81cefe0718b6.json",
+      "proposal_hash": "71333910d8382a45e46d7d4dd71282731ae9043eb0474977344b9142c116471e",
+      "development_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+      "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+      "replacement_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+      "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+      "parameter_cells_per_symbol": 80,
+      "symbols": [
+        "JPYX",
+        "ZARJPY",
+        "USDCLP",
+        "USDBRL",
+        "USDCZK",
+        "TRUMPUSD",
+        "XPDUSD"
+      ]
+    },
+    "next_research_state": {
+      "status": "TREND_PARAMETER_SCAN_IMPLEMENTED_AND_RESULT_MATERIALIZED_PENDING_DETERMINISTIC_ACCEPTANCE",
+      "next_action": "ACCEPT_FROZEN_EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT",
+      "next_deterministic_operation_ref": "research_v3/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_DETERMINISTIC_OPERATION_V1.json",
+      "ai_reasoning_required": false,
+      "research_judgment_required": false,
+      "implementation_ai_required": false,
+      "implementation_satisfied": true,
+      "implementation_scope_complete": true,
+      "external_data_required": false,
+      "external_data_gate": null,
+      "user_action_required": false
+    },
+    "external_data_gate": null,
+    "tests_requested": [
+      "python -m unittest -v tests.test_trend_momentum_parameter_region_epoch37_screen",
+      "Research Fast Path Validation including TREND parameter scan module"
+    ]
+  }
 }
