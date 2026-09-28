@@ -1,5 +1,5 @@
 name: Autonomous Research Runtime V2 Supervisor
-# Post-methodology external semantic fallback continuation trigger: 20260928
+# Diagnose and consume current external semantic fallback route: 20260928
 
 on:
   workflow_dispatch:
@@ -84,6 +84,40 @@ jobs:
           tests.test_relative_value_epoch32_pair_structure
           tests.test_epoch34_composite_causal_ml_regime_screen
           tests.test_epoch34_deterministic_operation
+
+      - name: Verify current external semantic fallback route
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research_v3.general_ai_autonomy_loop import _provider_unavailable
+          from research_v3.general_ai_reasoning_provider import build_reasoning_request
+          root=Path(".").resolve()
+          ext_path=root/"research_v3/ai_director/EXTERNAL_GENERAL_AI_PROPOSAL_V1.json"
+          if not ext_path.is_file():
+              print(json.dumps({"external_present": False}, sort_keys=True))
+              raise SystemExit(0)
+          ext=json.loads(ext_path.read_text())
+          if (ext.get("provider") or {}).get("kind")!="EXTERNAL_CHATGPT_GENERAL_REASONING":
+              print(json.dumps({"external_present": True, "external_kind": (ext.get("provider") or {}).get("kind")}, sort_keys=True))
+              raise SystemExit(0)
+          state=json.loads((root/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+          req=build_reasoning_request(root)
+          binding=ext.get("evidence_binding") or {}
+          blocked=_provider_unavailable(root,state,"GENERAL_AI_REASONING")
+          diag={
+              "external_present": True,
+              "external_request_id": binding.get("reasoning_request_id"),
+              "current_request_id": req.get("request_id"),
+              "external_epoch": binding.get("evidence_epoch_seen"),
+              "current_epoch": req.get("evidence_epoch_seen"),
+              "blocked": blocked is not None,
+              "blocked_status": (blocked or {}).get("status"),
+          }
+          print(json.dumps(diag, sort_keys=True))
+          if binding.get("reasoning_request_id")==req.get("request_id") and binding.get("evidence_epoch_seen")==req.get("evidence_epoch_seen") and blocked is not None:
+              raise SystemExit("current external proposal is incorrectly blocked by provider recovery state")
+          PY
 
       - name: Install Copilot CLI once for genuine semantic work reached in this run
         run: npm install -g @github/copilot
