@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -100,6 +101,7 @@ BASE_AUTHORITIES=(
 
 class AIReasoningProviderError(RuntimeError): pass
 class AIReasoningExternalGate(RuntimeError): pass
+class LocalPreProviderTransportFailure(AIReasoningProviderError): pass
 
 def _load(root:Path,rel:str|Path)->dict[str,Any]:
     p=root/Path(rel)
@@ -406,24 +408,48 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
     structural=json.loads((root/structural_ref).read_text(encoding="utf-8"))
     registry=json.loads((root/"research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json").read_text())
     selection_authority=json.loads((root/"research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json").read_text())
-    methodology_audit=json.loads((root/"evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json").read_text(encoding="utf-8"))
-    discovery_architecture=json.loads((root/"research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json").read_text(encoding="utf-8"))
-    retrospective_scope_audit=json.loads((root/"evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json").read_text(encoding="utf-8"))
-    parameter_governor=json.loads((root/"research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json").read_text(encoding="utf-8"))
-    multi_frontier_governor=json.loads((root/"research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json").read_text(encoding="utf-8"))
-    discovery_coverage_ledger=json.loads((root/"research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json").read_text(encoding="utf-8"))
-    return {"request_id":request["request_id"],"eligibility_packet":p,
+    def bounded_authority(rel:str, keys:tuple[str,...])->dict[str,Any]:
+        source=root/rel
+        doc=json.loads(source.read_text(encoding="utf-8"))
+        return {"ref":rel,"sha256":sha256_file(source),
+                "source_bytes":source.stat().st_size,
+                "facts":{key:doc[key] for key in keys if key in doc}}
+    # The complete authority graph is retained in the request for deterministic
+    # validation. The model receives only these provenance-bound decision facts.
+    semantic_authorities=[
+        bounded_authority("research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+                          ("asset_class_frontier_counts","mechanism_family_summary","current_selected_frontier","materially_unexplored_frontiers","anti_starvation")),
+        bounded_authority("research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+                          ("priority_inputs","anti_starvation","selection_contract","no_family_burn_law","no_asset_class_burn_law")),
+        bounded_authority("research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+                          ("prospective_search_space_requirements","stages","robustness_metrics","no_single_parameter_family_rejection","development_confirmation_boundary")),
+        bounded_authority("evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json",
+                          ("parameter_detail_rule","preservation","counts","family_exhaustion","global_interpretation")),
+        bounded_authority("evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+                          ("cohort_policy","source_bindings","source_universe","status","interpretation_boundary","power_design_prerequisites")),
+        bounded_authority("research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_V1.json",
+                          ("status","accepted_peer_breadth","development_interval","exact_symbols","freeze_ref","frozen_sample_size","market_data_fetched","next_boundary","peer_candidate_cohort_id","resolution")),
+        bounded_authority("research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+                          ("structural_panel","adaptive_discovery_universe","funnel","mechanism_specific_policy","statistical_policy","promotion_policy")),
+        bounded_authority("evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json",
+                          ("live_universe","findings","invariants")),
+    ]
+    semantic_eligibility={key:p[key] for key in
+                          ("schema","evidence_epoch","material_delta_since_last_accepted_reasoning",
+                           "accounting","open_universe_authority","governing_research_contract",
+                           "exact_semantic_question","allowed_authority_refs") if key in p}
+    return {"request_id":request["request_id"],"eligibility_packet":semantic_eligibility,
             "current_frontier_content":frontier,
             "latest_structural_result_ref":structural_ref,
-            "latest_structural_result_content":structural,
+            "latest_structural_result_content":{key:structural[key] for key in ("schema","status","evidence_epoch","family","scope","inference","interpretation_boundary","freeze_ref") if key in structural},
+            "latest_structural_result_sha256":sha256_file(root/structural_ref),
             "broker_native_representatives":registry["representatives"],
             "frontier_selection_execution_authority":selection_authority,
-            "research_discovery_methodology_audit":methodology_audit,
-            "adaptive_mechanism_discovery_architecture":discovery_architecture,
-            "retrospective_evidence_scope_audit":retrospective_scope_audit,
-            "parameter_discovery_and_robustness_governor":parameter_governor,
-            "multi_frontier_discovery_governor":multi_frontier_governor,
-            "discovery_coverage_ledger":discovery_coverage_ledger,
+            "semantic_decision_packet":{"schema":"mxm.greenfield.semantic-decision-packet.v1",
+                                        "request_id":request["request_id"],
+                                        "evidence_epoch":request["evidence_epoch_seen"],
+                                        "evidence_bundle_sha256":request["evidence_bundle_sha256"],
+                                        "source_projections":semantic_authorities},
             "pending_decision":{k:(request.get("next_state") or {}).get(k) for k in ("status","next_action","reason","decision_contract","supersession_ref")},
             "historical_consumed_identity_summaries":scope,
             "valid_survivors":["V2-C006","V2-C012","V2-C031"],
@@ -539,10 +565,9 @@ def _looks_external_gate(text:str)->bool:
 
 def copilot_cli_transport(token:str,model:str,prompt:str,*,root:Path)->tuple[dict[str,Any],dict[str,Any]]:
     if not shutil.which("copilot"):
-        raise AIReasoningProviderError("GitHub Copilot CLI executable is not installed")
+        raise LocalPreProviderTransportFailure("GitHub Copilot CLI executable is not installed")
     cmd=[
         "copilot",
-        "-p",prompt,
         "-s",
         "--model="+model,
         "--no-ask-user",
@@ -556,7 +581,10 @@ def copilot_cli_transport(token:str,model:str,prompt:str,*,root:Path)->tuple[dic
     env=dict(os.environ)
     env["GITHUB_TOKEN"]=token
     env["COPILOT_GITHUB_TOKEN"]=token
-    proc=subprocess.run(cmd,cwd=root,env=env,text=True,capture_output=True,timeout=240)
+    try:
+        proc=subprocess.run(cmd,input=prompt,cwd=root,env=env,text=True,capture_output=True,timeout=240)
+    except OSError as exc:
+        raise LocalPreProviderTransportFailure(f"local process launch failed: {exc}") from exc
     if proc.returncode!=0:
         detail=(proc.stderr+"\n"+proc.stdout).strip()
         if _looks_external_gate(detail):
@@ -850,6 +878,24 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         return gate
 
     context=_context_payload(root,request)
+    prompt=_user_prompt(context)
+    packet_doc=context.get("semantic_decision_packet") or {}
+    observation={"schema":"mxm.greenfield.semantic-context-observability.v1",
+                 "request_id":request["request_id"],
+                 "request_fingerprint":request["request_id"],
+                 "semantic_packet_bytes":len(canonical_bytes(packet_doc)),
+                 "final_prompt_bytes":len(prompt.encode("utf-8")),
+                 "validation_authority_ref_count":len(request.get("authority_refs") or []),
+                 "semantic_context_ref_count":len(packet_doc.get("source_projections") or []),
+                 "largest_embedded_context_items":sorted(
+                     ({"ref":row["ref"],"bytes":len(canonical_bytes(row))}
+                      for row in packet_doc.get("source_projections") or []),
+                     key=lambda row:row["bytes"],reverse=True)[:8],
+                 "transport_mode":"STDIN_PIPE","provider_process_started":False,
+                 "provider_response_received":False,"provider_duration_seconds":None,
+                 "provider_exit_code_or_failure_class":None}
+    observation_path=root/"research_v3/ai_director/SEMANTIC_CONTEXT_OBSERVABILITY_V1.json"
+    atomic_write_json(observation_path,observation)
     raw_path=root/RAW_CANDIDATE_DIR/f"{request['request_id']}.json"
     saved=json.loads(raw_path.read_text(encoding="utf-8")) if raw_path.is_file() else {}
     if saved and (saved.get("request_id")!=request["request_id"] or saved.get("evidence_bundle_sha256")!=request.get("evidence_bundle_sha256")):
@@ -861,7 +907,18 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             if saved:
                 candidate,meta=saved["candidate"],saved["provider_meta"]
             else:
-                candidate,meta=transport(token,model,_user_prompt(context,correction),root=root)
+                started=time.monotonic()
+                try:
+                    candidate,meta=transport(token,model,prompt if correction is None else _user_prompt(context,correction),root=root)
+                except LocalPreProviderTransportFailure:
+                    observation["provider_exit_code_or_failure_class"]="LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE"
+                    observation["provider_duration_seconds"]=round(time.monotonic()-started,3)
+                    atomic_write_json(observation_path,observation)
+                    raise
+                observation.update(provider_process_started=True,provider_response_received=True,
+                                   provider_duration_seconds=round(time.monotonic()-started,3),
+                                   provider_exit_code_or_failure_class="SUCCESS")
+                atomic_write_json(observation_path,observation)
                 atomic_write_json(raw_path,{"request_id":request["request_id"],
                     "evidence_bundle_sha256":request.get("evidence_bundle_sha256"),
                     "candidate":candidate,"provider_meta":meta or {},"captured_utc":iso()})
@@ -911,6 +968,13 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1","status":"EXTERNAL_AUTHORIZATION_REQUIRED","provider":"github-copilot-cli","request_id":request["request_id"],"detail":str(exc),"created_utc":iso()}
             atomic_write_json(root/GATE_REL,gate); sink.checkpoint("general_ai_reasoning_external_gate",None)
             return gate
+        except LocalPreProviderTransportFailure as exc:
+            gate={"schema":"mxm.greenfield.general-ai-reasoning-external-gate.v1",
+                  "status":"LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE","request_id":request["request_id"],
+                  "provider_process_started":False,"detail":str(exc),"created_utc":iso()}
+            atomic_write_json(root/GATE_REL,gate)
+            sink.checkpoint("general_ai_local_transport_failure",None)
+            raise
         except Exception as exc:
             correction=f"{type(exc).__name__}: {exc}"
             errors.append({"model":model,"attempt":attempt+1,"error":correction})

@@ -1,6 +1,7 @@
 """Lightweight read-only dispatcher for Actions control-plane routing."""
 from __future__ import annotations
 import argparse, json, os
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,16 @@ def classify(root_value:str|Path=".")->dict[str,Any]:
         "DETERMINISTIC_OPERATION","SEMANTIC_REASONING","NOVEL_AI_IMPLEMENTATION",
         "ECONOMIC_EXECUTION","CTRADER_BUILD_OR_CERTIFICATION","AUTHORITY_CI",
     } and not duplicate
+    recovery=load_json(root/"research_v3/ai_director/PROVIDER_RECOVERY_STATE.json",{}) or {}
+    if execution_class in {"SEMANTIC_REASONING","NOVEL_AI_IMPLEMENTATION"}:
+        from research_v3.general_ai_autonomy_loop import _request_fingerprint
+        phase="GENERAL_AI_REASONING" if execution_class=="SEMANTIC_REASONING" else "GENERAL_AI_IMPLEMENTATION"
+        if recovery.get("phase")==phase and recovery.get("request_fingerprint")==_request_fingerprint(root,state,phase):
+            if recovery.get("status") in {"PROVIDER_UNAVAILABLE","AUTH_OR_ENTITLEMENT_FAILURE","PROVIDER_RETRY_BUDGET_EXHAUSTED"}:
+                dispatch_required=False
+            due=recovery.get("next_retry_after_utc")
+            if due and datetime.fromisoformat(due.replace("Z","+00:00"))>datetime.now(timezone.utc):
+                dispatch_required=False
     return {
         **route,
         "liveness_fingerprint":fp,

@@ -1,9 +1,9 @@
 {
-  "consecutive_recoverable_failures": 2,
+  "consecutive_recoverable_failures": 0,
   "current_evidence_epoch": 37,
   "detail": "all configured general reasoning attempts failed",
   "economic_outcomes_opened_delta": 0,
-  "failure_class": "AIReasoningProviderError",
+  "failure_class": "LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE",
   "first_failure_utc": "2026-09-28T08:55:09Z",
   "max_recoverable_failures": 2,
   "pending_next_action": "AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_EPOCH38_ALIGNMENT_READINESS",
@@ -11,12 +11,18 @@
   "phase": "GENERAL_AI_REASONING",
   "provider": "github-copilot-cli",
   "request_fingerprint": "0cd358bd6d39417d4740f468abd0d735505ecc6787152e65699e8661785ac1ad",
-  "retry_eligibility": "ONLY_AFTER_NEW_SEMANTIC_REQUEST_OR_PROVIDER_RECOVERY_SIGNAL",
+  "retry_eligibility": "SAME_SEMANTIC_REQUEST_AFTER_EXACT_HEAD_GREEN",
   "retry_policy": "FINITE_RETRY_BUDGET_EXHAUSTED",
   "schema": "mxm.greenfield.provider-recovery-state.v1",
   "search_budget_change": 0,
-  "status": "PROVIDER_RETRY_BUDGET_EXHAUSTED",
+  "status": "LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE_SUPERSEDED",
   "updated_utc": "2026-09-28T08:55:14Z",
   "user_action_required": false,
-  "v2_attempts_consumed_delta": 0
+  "v2_attempts_consumed_delta": 0,
+  "provider_process_started": false,
+  "prior_raw_failure_count": 2,
+  "corrected_provider_failure_count": 0,
+  "next_retry_after_utc": null,
+  "retry_generation": 1,
+  "recovery_signal": "STDIN_TRANSPORT_REPAIRED_PENDING_EXACT_HEAD_CI"
 }

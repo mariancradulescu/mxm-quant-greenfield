@@ -36,6 +36,34 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         self.assertEqual(context["latest_structural_result_content"]["inference"]["supported_symbols_after_bh_fdr"], 0)
         self.assertEqual(len(context["broker_native_representatives"]),41)
         self.assertEqual(context["frontier_selection_execution_authority"]["evidence_epoch"],25)
+        packet=context["semantic_decision_packet"]
+        self.assertEqual(packet["request_id"],request["request_id"])
+        self.assertTrue(all(row["sha256"] and row["ref"] for row in packet["source_projections"]))
+        self.assertLess(len(__import__("json").dumps(context).encode()),120_000)
+        retrospective=next(row for row in packet["source_projections"] if row["ref"].endswith("RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json"))
+        self.assertNotIn("records",retrospective["facts"])
+
+    def test_copilot_large_prompt_is_piped_without_semantic_argv(self):
+        from research_v3.general_ai_reasoning_provider import copilot_cli_transport
+        from types import SimpleNamespace
+        prompt="semantic-secret-"*25000
+        def fake_run(argv,**kwargs):
+            self.assertNotIn("-p",argv)
+            self.assertNotIn("--prompt",argv)
+            self.assertTrue(all("semantic-secret" not in x for x in argv))
+            self.assertEqual(kwargs["input"],prompt)
+            self.assertEqual(kwargs["timeout"],240)
+            self.assertIn("--deny-tool=shell",argv)
+            return SimpleNamespace(returncode=0,stdout='{"proposal_id":"ok"}',stderr="")
+        with patch("research_v3.general_ai_reasoning_provider.shutil.which",return_value="/bin/copilot"), patch("research_v3.general_ai_reasoning_provider.subprocess.run",side_effect=fake_run):
+            result,_=copilot_cli_transport("test-token","auto",prompt,root=Path("."))
+        self.assertEqual(result["proposal_id"],"ok")
+
+    def test_launch_oserror_is_local_pre_provider(self):
+        from research_v3.general_ai_reasoning_provider import copilot_cli_transport, LocalPreProviderTransportFailure
+        with patch("research_v3.general_ai_reasoning_provider.shutil.which",return_value="/bin/copilot"), patch("research_v3.general_ai_reasoning_provider.subprocess.run",side_effect=OSError(7,"Argument list too long")):
+            with self.assertRaises(LocalPreProviderTransportFailure):
+                copilot_cli_transport("test-token","auto","prompt",root=Path("."))
 
     def test_current_state_reasoning_request_matches_generic_wake_semantics(self):
         req=build_reasoning_request(".")

@@ -1,13 +1,14 @@
 """Bounded zero-human continuation loop across AI reasoning and AI implementation."""
 from __future__ import annotations
 import argparse, json, hashlib, os, subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from research_v3.evidence_epoch import stale_reasoning_redirect, refresh_derived_views, current_evidence_epoch, current_evidence_binding
 from research_v3.general_ai_director_bridge import drain, project_snapshot
 from research_v3.general_ai_implementation_executor import execute as implement, implementation_required, ImplementationRejected, ImplementationProviderAttemptError
 from research_v3.execution_router import deterministic_operation_required
 from research_v3.deterministic_operation_executor import execute_chain as execute_deterministic_chain
-from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError
+from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_required, AIReasoningProviderError, LocalPreProviderTransportFailure
 from research_v3.general_ai_reasoning_provider import build_reasoning_request
 from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso, sha256_file
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
@@ -57,12 +58,17 @@ def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retrya
         "request_fingerprint":_request_fingerprint(root,state,phase),
         "purpose":phase, "evidence_epoch":state.get("current_research_evidence_epoch"),
         "outcome":outcome, "retryable":retryable, "material_state_advancement":advanced,
+        "provider_process_started":outcome!="LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE",
     })
     atomic_write_json(root/PROVIDER_USAGE_REL,{
         "schema":"mxm.greenfield.provider-usage.v1",
         "measurement_scope":"runtime provider attempts; all handled success, timeout, transport-failure and rejected attempts are counted; internal CLI credits and auto-selected model identity remain unknown",
-        "provider_invocations":len(rows),
+        "provider_invocations":sum(row.get("provider_process_started",True) for row in rows),
         "provider_attempts":len(rows),
+        "transport_attempts":len(rows),
+        "cli_process_started":sum(row.get("provider_process_started",True) for row in rows),
+        "provider_requests_started":sum(row.get("provider_process_started",True) for row in rows),
+        "local_pre_provider_failures":sum(row.get("outcome")=="LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE" for row in rows),
         "successful_reasoning_invocations":sum(x["purpose"]=="GENERAL_AI_REASONING" and x["outcome"]=="SUCCESS" for x in rows),
         "successful_implementation_invocations":sum(x["purpose"]=="GENERAL_AI_IMPLEMENTATION" and x["outcome"]=="SUCCESS" for x in rows),
         "failed_or_timeout_invocations":sum(x.get("outcome")!="SUCCESS" for x in rows),
@@ -75,6 +81,8 @@ def _record_invocation(root: Path, state: dict, phase: str, outcome: str, retrya
 
 
 def _recoverable_provider_failure(exc: Exception) -> bool:
+    if isinstance(exc,LocalPreProviderTransportFailure):
+        return False
     if isinstance(exc,subprocess.TimeoutExpired):
         return True
     detail=f"{type(exc).__name__}: {exc}".lower()
@@ -95,13 +103,13 @@ def _recoverable_provider_failure(exc: Exception) -> bool:
         "timeout",
     )
     if isinstance(exc, AIReasoningProviderError):
-        return True
+        return any(marker in detail for marker in markers)
     if isinstance(exc, ImplementationRejected):
         return any(marker in detail for marker in markers)
     return False
 
 def _provider_attempt_was_started(exc:Exception)->bool:
-    return isinstance(exc,(subprocess.TimeoutExpired,ImplementationProviderAttemptError,AIReasoningProviderError))
+    return not isinstance(exc,LocalPreProviderTransportFailure) and isinstance(exc,(subprocess.TimeoutExpired,ImplementationProviderAttemptError,AIReasoningProviderError))
 
 def _request_fingerprint(root: Path, state: dict, phase: str) -> str:
     """Bind provider spend to material authority, never CI/head/checkpoint churn."""
@@ -293,6 +301,7 @@ def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
                   and "monthly quota" in str(prior.get("detail","")).lower())
     provider_blocked=prior.get("status") in {"PROVIDER_UNAVAILABLE","AUTH_OR_ENTITLEMENT_FAILURE","PROBE_INCONCLUSIVE"}
     exhausted=(prior.get("status")=="PROVIDER_RETRY_BUDGET_EXHAUSTED"
+               and prior.get("failure_class")!="LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE"
                and prior.get("phase")==phase
                and prior.get("request_fingerprint")==_request_fingerprint(root,state,phase))
     # Account entitlement is global across phases; bounded retry exhaustion is local to one semantic request.
@@ -315,6 +324,12 @@ def _persist_provider_recovery(root: Path, exc: Exception, *, phase: str, git_ch
         "request_fingerprint":fingerprint,
         "first_failure_utc":(prior.get("first_failure_utc") or iso()) if same_request else iso(),
         "failure_class":"MONTHLY_QUOTA_EXHAUSTED" if quota else type(exc).__name__,
+        "provider_process_started":True,
+        "failure_count":attempts,
+        "last_failure_utc":iso(),
+        "next_retry_after_utc":None if quota or status=="PROVIDER_RETRY_BUDGET_EXHAUSTED" else (datetime.now(timezone.utc)+timedelta(minutes=min(60,5*2**(attempts-1)))).isoformat().replace("+00:00","Z"),
+        "retry_generation":attempts,
+        "recovery_signal":None,
         "retry_eligibility":("ONLY_AFTER_CONFIRMED_PROVIDER_RESET_OR_EXPLICIT_OPERATOR_OVERRIDE" if quota else
                              "ONLY_AFTER_NEW_SEMANTIC_REQUEST_OR_PROVIDER_RECOVERY_SIGNAL" if status=="PROVIDER_RETRY_BUDGET_EXHAUSTED" else
                              "NEXT_LIVENESS_WAKE"),
@@ -439,6 +454,9 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             try:
                 r=reason(root,git_checkpoint=git_checkpoint,git_push=git_push)
             except Exception as exc:
+                if isinstance(exc,LocalPreProviderTransportFailure):
+                    _record_invocation(root,state,"GENERAL_AI_REASONING","LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
+                    return {"status":"LOCAL_PRE_PROVIDER_TRANSPORT_FAILURE","progress_class":"MATERIAL_INTEGRITY_FAILURE","cycles":cycle,"detail":str(exc),"next_state":state}
                 if not _recoverable_provider_failure(exc):
                     if _provider_attempt_was_started(exc):
                         _record_invocation(root,state,"GENERAL_AI_REASONING","REJECTED_OR_FATAL",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
