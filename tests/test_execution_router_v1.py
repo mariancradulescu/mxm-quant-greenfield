@@ -148,6 +148,17 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             )
             self.assertEqual(route["execution_class"],"NOVEL_AI_IMPLEMENTATION")
             self.assertTrue(implementation_required(ROOT,state))
+        elif state["status"]=="IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN":
+            self.assertEqual(
+                state["next_action"],
+                "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
+            )
+            self.assertEqual(route["execution_class"],"DETERMINISTIC_OPERATION")
+            self.assertEqual(
+                route["operation_ref"],
+                "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+            )
+            self.assertFalse(implementation_required(ROOT,state))
         else:
             self.fail(f"unexpected peer-cohort lifecycle state: {state.get('status')} / {state.get('next_action')}")
 
