@@ -215,7 +215,13 @@ def load_authorized_deterministic_operation(root_value: str | Path, state: Mappi
     if not op_name:
         raise RoutingError("deterministic operation missing operation_name")
     if action and action != op_name:
-        raise RoutingError(f"deterministic operation next_action mismatch: {action!r} != {op_name!r}")
+        exact_head_transport=f"RUN_EXACT_HEAD_CI_THEN_{op_name}"
+        if not (
+            action == exact_head_transport
+            and state.get("implementation_satisfied") is True
+            and state.get("implementation_ai_required") is False
+        ):
+            raise RoutingError(f"deterministic operation next_action mismatch: {action!r} != {op_name!r}")
     policy = doc.get("execution_policy") or {}
     if policy.get("new_semantic_judgment_required") is True or policy.get("copilot_reasoning_required") is True:
         raise RoutingError("deterministic operation incorrectly requests semantic reasoning")
