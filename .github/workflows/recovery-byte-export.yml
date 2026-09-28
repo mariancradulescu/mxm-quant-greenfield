@@ -1,0 +1,38 @@
+name: recovery-byte-export
+on:
+  push:
+    branches:
+      - recovery-byte-transfer-20260928
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export exact live recovery bytes
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-recovery-byte-bundle
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            research_v3/runtime_v2_inputs/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_COMPACT_XZ_BASE64_V1.txt
+            research_v3/trend_momentum_parameter_region_epoch37_screen.py
+            research_v3/EPOCH37_TREND_MOMENTUM_PARAMETER_REGION_FRONTIER_FREEZE_V1.json
+            evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SURFACE_MANIFEST_V1.json
+            research_v3/trend_surface_transport_repair.py
+            research_v3/regime_context_data_sufficiency_audit.py
+            research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_FREEZE_V1.json
+            research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json
+            research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json
+            research_v3/ai_director/proposals/AUTO_reason_88b3d8ac3e0ad746ff188958465fbd36.json
+            data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json
+            data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json
+            data/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_PLAN_EPOCH22_V1.json
+            evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json
+            tests/test_regime_context_data_sufficiency_audit.py
+            tests/test_trend_momentum_parameter_region_epoch37_screen.py
