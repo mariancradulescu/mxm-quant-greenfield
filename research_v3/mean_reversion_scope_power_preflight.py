@@ -206,6 +206,7 @@ def build_preflight(root: str | Path = ".") -> dict[str, Any]:
     return {
         "schema": "mxm.greenfield.epoch39-mean-reversion-scope-power-preflight.v1",
         "status": "COMPLETE_NON_ECONOMIC_SCOPE_AND_POWER_DESIGN_PREFLIGHT",
+        "family": "MEAN_REVERSION",
         "evidence_epoch": 39,
         "implementation": {"version": VERSION, "freeze_ref": FREEZE_REF},
         "source_authority": {
@@ -253,7 +254,7 @@ def build_preflight(root: str | Path = ".") -> dict[str, Any]:
             "later_data_scope_must_follow_a_pre_outcome_completeness_and_redundancy_audit": True,
             "no_default_multi_year_download": True,
         },
-        "interpretation_boundary": freeze["interpretation_boundary"],
+        "interpretation_boundary": {**freeze["interpretation_boundary"], "economic_promotion_authorized": False},
         "accounting_effect": {
             "v2_attempts_consumed": 0,
             "economic_outcomes_opened": 0,
