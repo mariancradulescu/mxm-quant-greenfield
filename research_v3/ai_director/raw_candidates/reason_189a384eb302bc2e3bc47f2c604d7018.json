@@ -1,0 +1,113 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1.json",
+      "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_FREEZE_V1.json",
+      "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+      "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+      "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+      "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json",
+      "research_v3/ai_director/BLOCKED_DATA_ACQUISITION_SCOPES_V1.json",
+      "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+      "evidence/EPOCH25_MEAN_REVERSION_STRUCTURAL_ACCEPTANCE_V1.json",
+      "evidence/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
+      "evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json",
+      "research_v3/RESEARCH_CONTRACT_V3.json"
+    ],
+    "data_bindings": [
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
+      "evidence/SESSION_GAP_FRONTIER_FOUR_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json",
+      "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+      "evidence/CROSSMARKET_FOUR_SYMBOL_DISJOINT_FIXED15M_CAPTURE_ACCEPTANCE_V1.json",
+      "data/PRIMARY_WAVE_02_CAPTURE_ACCEPTANCE_V1.json"
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "action": "IMPLEMENT_STAGE1_OUTCOME_BLIND_BROAD_CHEAP_TRIAGE",
+      "discovery_governance": {
+        "alternatives_considered": [
+          "TREND_MOMENTUM local transport repair (deferred: narrower, does not add breadth, purely a byte-integrity fix)",
+          "CROSS_SECTIONAL_RANKING fresh acquisition (illegal: exact same parked cohort scope, blocked_data_acquisition_scopes)",
+          "REGIME_CONTEXT_CONDITIONED fresh parameter-region scan (deferred: less mature evidence trail than MEAN_REVERSION's just-completed Epoch39 preflight)",
+          "Requesting brand-new broker M5 data for the full 1576-symbol MEAN_REVERSION frame (rejected: EPOCH39 explicitly defers this; cheaper to first exploit already-captured evidence per Stage-1 policy before any new acquisition)"
+        ],
+        "coverage_ledger_ref": "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+        "local_parked_scope_is_family_exhaustion": false,
+        "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+        "ranges_frozen_before_development_surface": false,
+        "record_all_probes": true,
+        "structural_41_default_inferential_authority": false
+      },
+      "implementation_scope": {
+        "objective": "Build/extend a deterministic, outcome-blind Python screen (research_v3/mean_reversion_stage1_triage_epoch40.py) that: (1) enumerates all already-accepted M5 OHLCV capture artifacts currently on disk (structural 41-symbol 13w captures, replacement 13w captures, session-gap panels, crossalign/crossmarket captures, primary wave-02 captures), (2) for each symbol in the 1576-identity feasible frame computes data completeness (% expected M5 bars present), a reversal-event-density proxy (non-parametric, e.g. sign-change/ZigZag proxy on already-captured bars, NOT any strategy return), and a realized-volatility opportunity proxy, all without touching price-outcome/PnL semantics, (3) writes a persisted, hashed evidence artifact (evidence/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_RESULT_V1.json) reporting the outcome-blind coverage/feature summary and which subset of the 1576 frame currently has usable data vs. genuine data gaps, and (4) explicitly leaves candidate/economic selection for a subsequent fresh proposal.",
+        "why_deterministic_op_insufficient": "authorized_deterministic_operations_current_epoch is empty for this epoch; no existing catalog entry performs this specific outcome-blind full-frame data-completeness/event-density computation, so genuinely new repository machinery is required rather than reuse of an existing operation."
+      },
+      "mechanism_family": "MEAN_REVERSION",
+      "rationale_for_avoiding_alternatives": {
+        "CROSS_SECTIONAL_RANKING": "Its only concrete next step (48-symbol EPOCH38 aligned-history acquisition) is the exact PARKED_LOCAL_DATA_DEPENDENCY cohort in blocked_data_acquisition_scopes; re-requesting it is prohibited. No other prospectively frozen aligned-history scope exists yet for this family.",
+        "REGIME_CONTEXT_CONDITIONED": "PARAMETER_REGION_UNEXPLORED but has no completed preflight equivalent to Epoch39; MEAN_REVERSION has fresher, more immediately actionable evidence (Epoch39 just completed) making it the higher-information next move given anti-starvation and recency-of-exploration inputs.",
+        "TREND_MOMENTUM": "Latest local coarse surface (EPOCH38) is PENDING_TRANSPORT_INTEGRITY_REPAIR (hash/xz corrupt); a byte-repair op is a narrower, lower-information action and does not advance breadth beyond the already-scanned 7-symbol FX/crypto/metals proxy.",
+        "blocked_families": "BREAKOUT_VOLATILITY_EXPANSION, CARRY_TERM_STRUCTURE, CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL, CROSS_MARKET_LEAD_LAG, RELATIVE_VALUE_COINTEGRATION, SEASONALITY_SESSION_TIME are in blocked_scope_set and excluded outright."
+      },
+      "safeguards": {
+        "no_candidate_or_economic_selection_performed_here": true,
+        "no_protected_forward_or_outcome_evidence_used": true,
+        "no_rerun_of_opened_identities": true,
+        "no_structural_41_reuse_as_inferential_panel": true
+      },
+      "universe_methodology": {
+        "aligned_history_required": false,
+        "outcome_blind_selection": true,
+        "role": "MECHANISM_SPECIFIC_DISCOVERY",
+        "sampling_frame_size": 1576,
+        "selection_features": [
+          "data_availability_and_completeness",
+          "reversal_event_density_proxy",
+          "realized_volatility_opportunity_proxy",
+          "capital_efficiency",
+          "conservative_friction_proxy",
+          "schedule_overlap",
+          "acquisition_cost_zero_since_reusing_existing_captures"
+        ],
+        "source_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+        "structural_representatives_are_economic_equivalents": false
+      }
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "expected_follow_on": "After the Stage-1 triage artifact is produced and accepted, issue a fresh proposal to freeze a prospective, outcome-blind MEAN_REVERSION candidate cohort (mechanism-specific, not the 41-symbol structural panel) for the PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1 coarse parameter scan.",
+      "family_closed": false,
+      "implementation_ai_required": true,
+      "mechanism_family": "MEAN_REVERSION",
+      "next_action": "IMPLEMENT_MEAN_REVERSION_STAGE1_OUTCOME_BLIND_TRIAGE_USING_EXISTING_ACCEPTED_M5_CAPTURES",
+      "research_judgment_required": true,
+      "status": "MEAN_REVERSION_STAGE1_OUTCOME_BLIND_TRIAGE_IMPLEMENTATION_PENDING"
+    },
+    "objective": {
+      "class": "MECHANISM_SPECIFIC_DISCOVERY",
+      "goal": "Advance the MEAN_REVERSION mechanism family from the completed Epoch39 scope/power preflight into an outcome-blind Stage-1 broad-cheap-triage that closes the three pre_outcome_feature_gaps (full-frame data completeness, reversal-event density proxy, realized-volatility opportunity proxy) using only already-accepted, already-captured M5 OHLCV evidence, with zero new broker acquisition and zero economic outcome.",
+      "information_gain_rationale": "MEAN_REVERSION is open (family_closed=false, parameter_region_coverage=INCOMPLETE, not in blocked_scope_set), its Epoch39 preflight already froze the sampling frame (ALL_1576_CURRENT_EUR200_FEASIBLE_POST_EXCLUSION_IDENTITIES) as outcome-blind and explicitly named the exact missing pre-outcome features required before any candidate-selection or economic step. Computing those features from existing accepted M5 captures (structural-representative 13w captures, replacement/session-gap/crossalign/crossmarket capture waves already accepted into the feature store) is the highest-information legal next step: it requires no new PEPPERSTONE acquisition, does not touch any blocked family, does not reuse the parked CROSS_SECTIONAL_RANKING cohort, and directly unblocks Stage-2 mechanism-specific candidate selection for MEAN_REVERSION per the Adaptive Mechanism Discovery Architecture funnel."
+    },
+    "proposal_id": "AI_reason_189a384eb302bc2e3bc47f2c604d7018_EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE"
+  },
+  "captured_utc": "2026-09-28T16:04:35Z",
+  "evidence_bundle_sha256": "5816027f0b16ea634ff6fcda19a1ac26441575123214a2c5effef3c2ccce4277",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_189a384eb302bc2e3bc47f2c604d7018"
+}
