@@ -2,7 +2,7 @@ import base64, gzip, hashlib, json, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.deterministic_operation_executor import execute_one
+from research_v3.deterministic_operation_executor import execute_one, _run_hash_bound_python_json_transform
 
 class DeterministicOperationExecutorV1Tests(unittest.TestCase):
     def test_current_deterministic_operation_advances_with_zero_provider_delta_and_preserves_stale_request(self):
@@ -52,6 +52,87 @@ class DeterministicOperationExecutorV1Tests(unittest.TestCase):
             self.assertEqual(repair["copilot_provider_calls_delta"],0)
             record=json.loads((root/"research_v3/EPOCH21_DETERMINISTIC_OPERATION_EXECUTION_V1.json").read_text())
             self.assertEqual(record["status"],"PASS_ZERO_PROVIDER_ZERO_ECONOMIC_EFFECT")
+
+    def test_hash_bound_python_transform_materializes_and_routes_to_fresh_reasoning(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            (root/"research_v3/runtime_v2_inputs").mkdir(parents=True)
+            (root/"research_v3/runtime_v2_acceptance").mkdir(parents=True)
+            (root/"evidence").mkdir(parents=True)
+            implementation=root/"research_v3/transform.py"
+            implementation.write_text(
+                "def build(payload, expected_count):\n"
+                "    assert len(payload['rows']) == expected_count\n"
+                "    return {\n"
+                "      'schema':'test.index.v1','status':'COMPLETE_NON_ECONOMIC_CANDIDATE_UNIVERSE_INDEX',\n"
+                "      'source_universe':{'indexed_identity_count':expected_count},\n"
+                "      'coverage':{'cohort_breadth_total':expected_count},\n"
+                "      'cohort_policy':{'structural_representatives_used_as_substitutes':False},\n"
+                "      'interpretation_boundary':{\n"
+                "        'strategy_or_price_outcome_evaluated':False,'returns_or_pnl_computed':False,\n"
+                "        'economic_equivalence_claimed':False,'protected_forward_opened':False,\n"
+                "        'economic_outcomes_opened':0,'v2_attempts_consumed':0}\n"
+                "    }\n",
+                encoding="utf-8",
+            )
+            impl_bytes=implementation.read_bytes()
+            impl_blob=hashlib.sha1(
+                f"blob {len(impl_bytes)}\\0".encode("ascii")+impl_bytes
+            ).hexdigest()
+            payload=json.dumps({"rows":[1,2]},sort_keys=True,separators=(",",":")).encode()
+            decoded_sha=hashlib.sha256(payload).hexdigest()
+            encoded=base64.b64encode(gzip.compress(payload))
+            first,second=encoded[:len(encoded)//2],encoded[len(encoded)//2:]
+            refs=[]
+            hashes=[]
+            for index,part in enumerate((first,second)):
+                rel=f"research_v3/runtime_v2_inputs/p{index}.b64"
+                (root/rel).write_bytes(part)
+                refs.append(rel); hashes.append(hashlib.sha256(part).hexdigest())
+            op={
+                "operation_contract":{
+                    "kind":"HASH_BOUND_PYTHON_JSON_TRANSFORM_V1",
+                    "implementation_ref":"research_v3/transform.py",
+                    "implementation_git_blob_sha1":impl_blob,
+                    "callable":"build",
+                    "call_kwargs":{"expected_count":2},
+                    "input_transport":{
+                        "encoding":"CONCAT_BASE64_GZIP_JSON",
+                        "fragment_refs":refs,
+                        "fragment_sha256":hashes,
+                        "concatenated_base64_sha256":hashlib.sha256(encoded).hexdigest(),
+                        "decoded_json_sha256":decoded_sha,
+                    },
+                    "output":{
+                        "ref":"evidence/index.json",
+                        "expected_schema":"test.index.v1",
+                        "expected_status":"COMPLETE_NON_ECONOMIC_CANDIDATE_UNIVERSE_INDEX",
+                        "expected_indexed_identity_count":2,
+                    },
+                },
+                "post_execution_state":{
+                    "status":"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_TEST_INDEX",
+                    "next_action":"AI_INTERPRET_TEST_INDEX",
+                    "ai_reasoning_required":True,
+                    "research_judgment_required":True,
+                },
+            }
+            state={
+                "status":"READY",
+                "next_action":"MATERIALIZE_TEST_INDEX",
+                "accounting":{"economic_outcomes_opened":28,"v2_attempts_used":20,"v2_search_budget_remaining":64},
+            }
+            out=_run_hash_bound_python_json_transform(root,state,op)
+            self.assertEqual(out["status"],"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_TEST_INDEX")
+            self.assertTrue(out["ai_reasoning_required"])
+            self.assertFalse(out["implementation_ai_required"])
+            self.assertEqual(out["peer_cohort_index_identity_count"],2)
+            self.assertTrue((root/"evidence/index.json").is_file())
+
+            # A byte-level transport mutation must fail closed.
+            (root/refs[0]).write_bytes(first+b"A")
+            with self.assertRaisesRegex(Exception,"fragment mismatch"):
+                _run_hash_bound_python_json_transform(root,state,op)
 
     def test_generic_structural_result_acceptance_advances_without_provider(self):
         with tempfile.TemporaryDirectory() as td:
