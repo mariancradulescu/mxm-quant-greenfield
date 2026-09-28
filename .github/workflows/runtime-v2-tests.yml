@@ -61,7 +61,11 @@ jobs:
           git config user.email "mxm-runtime-v2@users.noreply.github.com"
 
       - name: Runtime V2 focused tests
-        run: python -m unittest -v tests.test_autonomous_runtime_v2
+        run: >
+          python -m unittest -v
+          tests.test_autonomous_runtime_v2
+          tests.test_epoch38_cross_sectional_aligned_history_scope_freeze
+          tests.test_discovery_governance_v1
 
       - name: Zero-human continuation acceptance demonstration
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'acceptance' }}
