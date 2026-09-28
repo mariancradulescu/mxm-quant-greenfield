@@ -122,28 +122,34 @@ class ExecutionRouterV1Tests(unittest.TestCase):
     def test_current_peer_cohort_lifecycle_routes_consistently(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
         route=classify_execution(ROOT,state)
+        self.assertEqual(
+            state.get("peer_cohort_index_ref"),
+            "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+        )
+        self.assertTrue((ROOT/state["peer_cohort_index_ref"]).is_file())
         if state["next_action"]=="MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX":
             self.assertEqual(route["execution_class"],"DETERMINISTIC_OPERATION")
             self.assertEqual(
                 route["operation_name"],
                 "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
             )
-        else:
-            self.assertEqual(
-                state["status"],
-                "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_PEER_COHORT_INDEX",
-            )
+            self.assertFalse(implementation_required(ROOT,state))
+        elif state["status"]=="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_PEER_COHORT_INDEX":
             self.assertEqual(
                 state["next_action"],
                 "AI_SELECT_PROSPECTIVE_CROSS_SECTIONAL_ESTIMAND_AND_ALIGNED_HISTORY_SCOPE_FROM_PEER_COHORT_INDEX",
             )
             self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
+            self.assertFalse(implementation_required(ROOT,state))
+        elif state["status"]=="IMPLEMENTATION_REQUIRED":
             self.assertEqual(
-                state["peer_cohort_index_ref"],
-                "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+                state["next_action"],
+                "IMPLEMENT_PROSPECTIVE_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE",
             )
-            self.assertTrue((ROOT/state["peer_cohort_index_ref"]).is_file())
-        self.assertFalse(implementation_required(ROOT,state))
+            self.assertEqual(route["execution_class"],"NOVEL_AI_IMPLEMENTATION")
+            self.assertTrue(implementation_required(ROOT,state))
+        else:
+            self.fail(f"unexpected peer-cohort lifecycle state: {state.get('status')} / {state.get('next_action')}")
 
     def test_unknown_deterministic_schema_and_contract_kind_fail_closed(self):
         td,root,state=self._root_with_op()
