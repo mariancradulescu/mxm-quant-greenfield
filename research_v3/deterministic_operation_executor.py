@@ -764,6 +764,11 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
                 raise DeterministicOperationRejected("REGIME recovered result does not attest the exact frozen accepted inputs")
         atomic_write_json(root/op["result_ref"],result)
         new_state=_execute_existing_structural_result(root,state,op)
+    elif op.get("materializer")=="RUN_EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT":
+        from research_v3.mean_reversion_scope_power_preflight import build_preflight
+        result=build_preflight(root)
+        atomic_write_json(root/op["result_ref"],result)
+        new_state=_execute_existing_structural_result(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
