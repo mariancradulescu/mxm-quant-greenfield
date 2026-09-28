@@ -189,11 +189,13 @@ def _current_authority_request(root:Path,state:dict)->dict|None:
     decision=dict((proposal or {}).get("decision") or {})
     explicit_authority=str(decision.get("status") or "").upper()=="ADDITIONAL_AUTHORITY_REQUIRED"
     prospective_authority=(str(decision.get("action") or "").upper()=="REQUEST_PROSPECTIVE_AUTHORITY"
+                           or str(decision.get("decision_type") or "").upper()=="HOLD_FOR_DISTINCT_PROSPECTIVE_AUTHORITY")
+    prospective_authority=(prospective_authority
                            and state.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED")
     if not (explicit_authority or prospective_authority):
         return None
     scope=str(decision.get("blocked_scope_id") or
-              (decision.get("selected_mechanism_family") if prospective_authority else "") or "").strip()
+              ((decision.get("selected_mechanism_family") or decision.get("selected_scope")) if prospective_authority else "") or "").strip()
     if scope in _blocked_scopes(root):
         return None
     requested=str(decision.get("requested_authority_or_class") or state.get("requested_authority_or_class") or "").strip()
