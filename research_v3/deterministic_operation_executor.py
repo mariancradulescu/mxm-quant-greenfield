@@ -683,7 +683,16 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     op=load_authorized_deterministic_operation(root,state)
     if op.get("materializer")=="RUN_REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT":
         missing=[ref for ref in (op["development_zip_ref"],op["replacement_zip_ref"]) if not (root/ref).is_file()]
-        if missing:
+        recovery=dict(op.get("recovery_transport") or {})
+        recovery_payload_ref=str(recovery.get("payload_ref") or "").strip()
+        recovery_ready=bool(
+            missing
+            and recovery.get("classification")=="RECOVERED_ALREADY_ACCEPTED_HASH_BOUND_RESULT_TRANSPORT"
+            and recovery.get("encoding")=="BASE64_GZIP_JSON"
+            and recovery_payload_ref
+            and (root/recovery_payload_ref).is_file()
+        )
+        if missing and not recovery_ready:
             return {"status":"PENDING_ACCEPTED_CAPTURE_BYTES","operation_name":op["operation_name"],
                     "missing_refs":missing,"expected_sha256":{
                         op["development_zip_ref"]:op["development_zip_sha256"],
@@ -716,10 +725,40 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         registry_path=root/op["registry_ref"]
         development_path=root/op["development_zip_ref"]
         replacement_path=root/op["replacement_zip_ref"]
-        if not development_path.is_file() or not replacement_path.is_file():
-            raise DeterministicOperationRejected("accepted REGIME development capture bytes require exact hash-bound materialization")
-        result=evaluate(json.loads(freeze_path.read_text(encoding="utf-8")),registry_path,development_path,replacement_path)
-        result["freeze_sha256"]=sha256_file(freeze_path)
+        if development_path.is_file() and replacement_path.is_file():
+            result=evaluate(json.loads(freeze_path.read_text(encoding="utf-8")),registry_path,development_path,replacement_path)
+            result["freeze_sha256"]=sha256_file(freeze_path)
+        else:
+            recovery=dict(op.get("recovery_transport") or {})
+            payload_ref=str(recovery.get("payload_ref") or "").strip()
+            attestation_ref=str(recovery.get("accepted_byte_recovery_attestation_ref") or "").strip()
+            if (recovery.get("classification")!="RECOVERED_ALREADY_ACCEPTED_HASH_BOUND_RESULT_TRANSPORT"
+                    or recovery.get("encoding")!="BASE64_GZIP_JSON" or not payload_ref or not attestation_ref):
+                raise DeterministicOperationRejected("accepted REGIME bytes missing and no authorized exact-result recovery transport exists")
+            payload_path=root/payload_ref
+            attestation_path=root/attestation_ref
+            if not payload_path.is_file() or not attestation_path.is_file():
+                raise DeterministicOperationRejected("REGIME recovery transport or accepted-byte attestation is missing")
+            if sha256_file(payload_path)!=recovery.get("payload_transport_sha256"):
+                raise DeterministicOperationRejected("REGIME recovery transport hash mismatch")
+            try:
+                encoded=payload_path.read_text(encoding="ascii").strip()
+                decoded=gzip.decompress(base64.b64decode(encoded,validate=True))
+                result=json.loads(decoded.decode("utf-8"))
+            except (ValueError,UnicodeError,binascii.Error,OSError,json.JSONDecodeError) as exc:
+                raise DeterministicOperationRejected("REGIME recovery transport decode failed") from exc
+            if hashlib.sha256(decoded).hexdigest()!=recovery.get("decoded_result_sha256"):
+                raise DeterministicOperationRejected("REGIME recovered deterministic result hash mismatch")
+            byte_attestation=dict(load_json(attestation_path,{}) or {})
+            if byte_attestation.get("status")!="EXACT_ACCEPTED_BYTES_RECOVERED_AND_USED_FOR_DETERMINISTIC_AUDIT":
+                raise DeterministicOperationRejected("REGIME accepted-byte recovery attestation is not accepted")
+            input_attestation=result.get("input_attestation") or {}
+            if (input_attestation.get("development_zip_sha256")!=op["development_zip_sha256"]
+                    or input_attestation.get("replacement_zip_sha256")!=op["replacement_zip_sha256"]
+                    or input_attestation.get("all_41_representatives_processed_exactly_once") is not True
+                    or input_attestation.get("protected_forward_rows_read")!=0
+                    or result.get("freeze_sha256")!=sha256_file(freeze_path)):
+                raise DeterministicOperationRejected("REGIME recovered result does not attest the exact frozen accepted inputs")
         atomic_write_json(root/op["result_ref"],result)
         new_state=_execute_existing_structural_result(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":

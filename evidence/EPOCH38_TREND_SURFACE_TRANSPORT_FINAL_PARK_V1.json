@@ -1,0 +1,66 @@
+{
+  "schema": "mxm.greenfield.trend-surface-transport-final-park.v1",
+  "status": "PARKED_LOCAL_TRANSPORT_DEPENDENCY_FAIL_CLOSED",
+  "evidence_epoch": 38,
+  "scope": "TREND_MOMENTUM/EPOCH38_COARSE_PARAMETER_REGION_FULL_560_CELL_SURFACE",
+  "authoritative_base_head": "d7daf48145bb787c842a291a5c7a83808320d177",
+  "durable_recovery_attempt_ref": "evidence/EPOCH38_TREND_SURFACE_TRANSPORT_INTEGRITY_AUDIT_V1.json",
+  "expected_decoded_sha256": "af2bd7e67632448676cfabe42a87a5f3ee2d26867a191fab1eb9aed6329839b6",
+  "last_observed_salvage_decoded_sha256": "3d8a971f1598cdbd20a719674ca385c8fe0a29ba62d5b3f6eb1bac7a8a2f9da8",
+  "required_geometry": {
+    "rows": 560,
+    "symbols": 7,
+    "cells_per_symbol": 80,
+    "grid": {
+      "lookback_M5": [
+        12,
+        24,
+        48,
+        96,
+        192
+      ],
+      "zscore_threshold": [
+        0.5,
+        1,
+        1.5,
+        2
+      ],
+      "hold": [
+        "15m",
+        "1h",
+        "4h",
+        "1d"
+      ]
+    }
+  },
+  "recovery_search": {
+    "latest_github_actions_artifacts": "NO_RECOVERABLE_ARTIFACT_ON_RELEVANT_POST_EPOCH38_RUNS",
+    "persisted_transport": "CORRUPT_AND_HASH_MISMATCH",
+    "old_director_ui_claim": "UNTRUSTED_UNPERSISTED_CLAIM",
+    "exact_full_surface_recovered": false,
+    "independently_verified_cells": 0
+  },
+  "prohibited_inferences": [
+    "NO_RECREATE_FROM_SUMMARY",
+    "NO_INFER_MISSING_CELLS",
+    "NO_TREAT_LOCAL_NULL_AS_VERIFIED",
+    "NO_FAMILY_CLOSURE",
+    "NO_ASSET_CLASS_CLOSURE",
+    "NO_1576_FRONTIER_SUBSTITUTION"
+  ],
+  "research_state": {
+    "family": "TREND_MOMENTUM",
+    "family_closed": false,
+    "asset_classes_closed": false,
+    "full_1576_frontier_closed": false,
+    "local_surface_result_accepted": false,
+    "other_independent_frontiers_may_continue": true
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0,
+    "provider_calls_delta": 0
+  },
+  "resolution": "Park only this exact corrupt/missing transport scope. A future exact-hash recovery or scientifically identical prospectively bound reconstruction may reopen verification without converting this missing artifact into a negative research result."
+}
