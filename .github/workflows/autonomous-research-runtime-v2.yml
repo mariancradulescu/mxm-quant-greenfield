@@ -35,6 +35,7 @@ env:
   TARGET_BRANCH: performance-research-v3-20260922
   MXM_RUNTIME_TARGET_BRANCH: performance-research-v3-20260922
   PYTHONUNBUFFERED: "1"
+  MXM_RECONCILE_VALIDATION_COMMAND: "python -m unittest -q tests.test_autonomous_runtime_v2 tests.test_execution_router_v1 tests.test_deterministic_operation_executor_v1"
   MXM_PREDECESSOR_CI_HEAD: ${{ inputs.predecessor_ci_head }}
   MXM_PREDECESSOR_CI_CONCLUSION: ${{ inputs.predecessor_ci_conclusion }}
   MXM_PREDECESSOR_CI_RUN_ID: ${{ inputs.predecessor_ci_run_id }}
@@ -86,6 +87,7 @@ jobs:
           tests.test_epoch34_composite_causal_ml_regime_screen
           tests.test_epoch34_deterministic_operation
           tests.test_regime_context_data_sufficiency_audit
+          tests.test_epoch38_deterministic_readiness_operation
 
       - name: Bind tested exact research head for pending REGIME implementation acceptance
         shell: bash
@@ -281,6 +283,8 @@ jobs:
           tests.test_relative_value_epoch32_pair_structure
           tests.test_epoch34_composite_causal_ml_regime_screen
           tests.test_epoch34_deterministic_operation
+          tests.test_regime_context_data_sufficiency_audit
+          tests.test_epoch38_deterministic_readiness_operation
 
       - name: Report durable frontier
         shell: bash

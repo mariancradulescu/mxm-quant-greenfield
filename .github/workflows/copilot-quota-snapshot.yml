@@ -6,10 +6,10 @@ on:
     paths: [".github/workflows/copilot-quota-snapshot.yml"]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
   copilot-requests: write
 concurrency:
-  group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
+  group: mxm-read-only-copilot-quota-snapshot
   cancel-in-progress: false
 jobs:
   quota:
@@ -32,10 +32,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ github.token }}
         run: python -m research_v3.copilot_quota_snapshot --root . --run-id "$GITHUB_RUN_ID"
-      - name: Persist observed quota
-        run: |
-          git config user.name "mxm-runtime-v2[bot]"
-          git config user.email "mxm-runtime-v2@users.noreply.github.com"
-          git add research_v3/ai_director/COPILOT_ACCOUNT_QUOTA_V1.json
-          git commit -m "[skip ci] Record read-only Copilot account quota snapshot"
-          git push origin HEAD:refs/heads/performance-research-v3-20260922
+      - name: Persist observed quota as read-only Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mxm-copilot-account-quota-${{ github.run_id }}
+          path: research_v3/ai_director/COPILOT_ACCOUNT_QUOTA_V1.json
+          if-no-files-found: error
