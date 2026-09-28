@@ -1,0 +1,33 @@
+{
+  "schema": "mxm.greenfield.deterministic-operation.v1",
+  "operation_name": "VALIDATE_EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE",
+  "status": "AUTHORIZED_NON_ECONOMIC_POST_GREEN",
+  "epoch": 38,
+  "freeze_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+  "implementation_ref": "research_v3/epoch38_cross_sectional_aligned_history_scope_freeze.py",
+  "input_refs": [
+    "research_v3/ai_director/proposals/AUTO_reason_9d1e673edc306eec9e7598261c9fe5e3.json",
+    "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+    "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json"
+  ],
+  "allowed_actions": [
+    "VALIDATE_BINDINGS",
+    "RECOMPUTE_OUTCOME_BLIND_SELECTION",
+    "EMIT_ACQUISITION_READINESS_CONTRACT"
+  ],
+  "forbidden_actions": [
+    "FETCH_MARKET_DATA",
+    "COMPUTE_PRICE_DERIVED_PREDICTIVE_OUTCOME",
+    "COMPUTE_PNL",
+    "OPEN_ECONOMICS",
+    "CONSUME_V2_ATTEMPT"
+  ],
+  "output_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_V1.json",
+  "post_green_next_state": {
+    "research_judgment_required": true,
+    "ai_reasoning_required": true,
+    "implementation_ai_required": false,
+    "external_data_required": false,
+    "reason": "Epoch38 prerequisite freeze is durable and validated; a fresh semantic decision may authorize a machine-owned acquisition operation or another legal next action."
+  }
+}
