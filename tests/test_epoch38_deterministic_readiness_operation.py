@@ -16,9 +16,19 @@ class Epoch38DeterministicReadinessOperationTests(unittest.TestCase):
         self.op=json.loads((ROOT/OP_REF).read_text())
 
     def test_operation_routes_under_canonical_deterministic_schema(self):
-        routed=load_authorized_deterministic_operation(ROOT,self.state)
+        # The live state has already advanced to fresh semantic reasoning. Verify
+        # the historical, explicitly authorized deterministic transition in isolation.
+        prior_state=dict(self.state)
+        prior_state.update({
+            "status":"IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN",
+            "next_action":self.op["operation_name"],
+            "next_deterministic_operation_ref":OP_REF,
+            "ai_reasoning_required":False,
+            "research_judgment_required":False,
+        })
+        routed=load_authorized_deterministic_operation(ROOT,prior_state)
         self.assertEqual(routed["schema"],"mxm.greenfield.deterministic-next-operation.v1")
-        self.assertEqual(routed["operation_name"],self.state["next_action"])
+        self.assertEqual(routed["operation_name"],prior_state["next_action"])
         self.assertFalse(routed["execution_policy"]["implementation_ai_required"])
         self.assertTrue(routed["execution_policy"]["exact_head_green_required_before_execution"])
 
