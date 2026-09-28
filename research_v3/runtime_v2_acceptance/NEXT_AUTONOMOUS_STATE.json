@@ -24,11 +24,11 @@
   },
   "active_candidate_id": null,
   "active_candidate_scope_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
-  "active_mechanism_family": "CROSS_SECTIONAL_RANKING",
+  "active_mechanism_family": null,
   "active_proposal_id": null,
   "active_target_symbol": null,
   "additional_authority_acceptance_ref": "research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json",
-  "ai_reasoning_required": true,
+  "ai_reasoning_required": false,
   "aligned_history_current_status": "NOT_ACQUIRED_MECHANISM_SPECIFIC",
   "aligned_history_required": true,
   "alignment_prerequisite_ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
@@ -36,6 +36,17 @@
   "artifact_execution_availability_ref": "evidence/BROKER_NATIVE_FRONTIER_13W_ARTIFACT_EXECUTION_AVAILABILITY_V1.json",
   "authority_ci_required": true,
   "authorizing_evidence_epoch": 37,
+  "blocked_data_scope_untouched": [
+    "CROSS_SECTIONAL_RANKING/US_EQUITIES_EXTENDED_HOURS/PEER_peer_f00b1cfa2c5c4549"
+  ],
+  "blocked_scope_untouched": [
+    "BREAKOUT_VOLATILITY_EXPANSION",
+    "CARRY_TERM_STRUCTURE",
+    "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+    "CROSS_MARKET_LEAD_LAG",
+    "RELATIVE_VALUE_COINTEGRATION",
+    "SEASONALITY_SESSION_TIME"
+  ],
   "blocked_scopes_untouched": [
     "CARRY_TERM_STRUCTURE",
     "CROSS_MARKET_LEAD_LAG"
@@ -314,7 +325,7 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": false,
+  "implementation_ai_required": true,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -337,8 +348,9 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": true,
-  "implementation_scope_complete": true,
+  "implementation_satisfied": false,
+  "implementation_scope": "Build a coarse-grid trend-momentum parameter-region scanner (extending research_v3/trend_momentum_epoch24_screen.py) that: (1) loads the already-accepted 13w M5 series for JPYX, ZARJPY, USDCLP, USDBRL, USDCZK, TRUMPUSD, XPDUSD; (2) evaluates the predeclared cartesian coarse grid of lookback_bars x momentum_threshold_zscore x hold_horizon; (3) records every probe (no winner-only logging) with effect size, uncertainty, effective independent sample size, event density, chronological-half stability; (4) outputs a structural, non-economic response-surface report with no candidate identity opened and no economic outcome computed.",
+  "implementation_scope_complete": false,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -424,7 +436,7 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "AI_SELECT_HIGHEST_INFORMATION_MACHINE_READY_FRONTIER_OUTSIDE_PARKED_EXACT_DATA_SCOPE",
+  "next_action": "TREND_MOMENTUM_FX_CRYPTO_METALS_COARSE_PARAMETER_REGION_SCAN_V1",
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "no_economic_outcome_requested": true,
@@ -514,7 +526,7 @@
     "prospective freeze record"
   ],
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
   "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
   "result_sha256": "9bfe31be95306fa72828f5c2e068180758d3f404217c5a81f24219bd1f322b18",
@@ -544,7 +556,10 @@
   "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
   "search_budget_change": -1,
   "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
+  "source_ai_proposal_hash": "71333910d8382a45e46d7d4dd71282731ae9043eb0474977344b9142c116471e",
+  "source_ai_proposal_id": "AI_TREND_MOMENTUM_FX_CRYPTO_METALS_COARSE_PARAMETER_SCAN_V1",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_runtime_operation_id": "op_860506fa1e69f33acb985044f2b65bde",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 36,
     "current_evidence_epoch": 37,
@@ -554,7 +569,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_LOCAL_DATA_DEPENDENCY_PARK",
+  "status": "IMPLEMENTATION_AI_ROUTED_TREND_MOMENTUM_COARSE_PARAMETER_SCAN",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
