@@ -440,6 +440,8 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
                           ("prospective_search_space_requirements","stages","robustness_metrics","no_single_parameter_family_rejection","development_confirmation_boundary")),
         bounded_authority("evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json",
                           ("parameter_detail_rule","preservation","counts","family_exhaustion","global_interpretation")),
+        bounded_authority("evidence/EPOCH38_TREND_SURFACE_TRANSPORT_INTEGRITY_AUDIT_V1.json",
+                          ("status","scope","manifest_transport_sha256","observed_transport_sha256","xz_decompression","independently_verified_cells","interpretation")),
         bounded_authority("evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
                           ("cohort_policy","source_bindings","source_universe","status","interpretation_boundary","power_design_prerequisites")),
         bounded_authority("research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_V1.json",
