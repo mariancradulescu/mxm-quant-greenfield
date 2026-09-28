@@ -32,11 +32,15 @@ class Epoch38AlignedHistoryScopeFreezeTests(unittest.TestCase):
 
     def test_post_green_validation_operation_is_authorized_without_acquisition(self):
         op=load(Path("research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json"))
-        self.assertEqual(op["operation_name"],"VALIDATE_EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE")
-        self.assertEqual(op["status"],"AUTHORIZED_NON_ECONOMIC_POST_GREEN")
+        self.assertEqual(op["operation_name"],"RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN")
+        self.assertEqual(op["schema"],"mxm.greenfield.deterministic-next-operation.v1")
+        self.assertEqual(op["status"],"AUTHORIZED_DETERMINISTIC_NON_ECONOMIC_OPERATION")
         self.assertEqual(op["freeze_ref"],str(FREEZE_REF))
-        self.assertIn("FETCH_MARKET_DATA",op["forbidden_actions"])
-        self.assertIn("OPEN_ECONOMICS",op["forbidden_actions"])
+        self.assertFalse(op["boundaries"]["fetch_market_data"])
+        self.assertFalse(op["boundaries"]["compute_predictive_outcome"])
+        self.assertFalse(op["boundaries"]["compute_pnl"])
+        self.assertEqual(op["accounting_effect"]["economic_outcomes"],0)
+        self.assertEqual(op["accounting_effect"]["v2_attempts"],0)
 
     def test_proposal_file_binding_is_exact_and_not_semantic_hash_substitution(self):
         bad=copy.deepcopy(self.freeze)
