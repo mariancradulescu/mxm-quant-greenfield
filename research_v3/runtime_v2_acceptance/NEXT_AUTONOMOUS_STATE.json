@@ -325,7 +325,7 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -348,9 +348,9 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": false,
+  "implementation_satisfied": true,
   "implementation_scope": "Build a coarse-grid trend-momentum parameter-region scanner (extending research_v3/trend_momentum_epoch24_screen.py) that: (1) loads the already-accepted 13w M5 series for JPYX, ZARJPY, USDCLP, USDBRL, USDCZK, TRUMPUSD, XPDUSD; (2) evaluates the predeclared cartesian coarse grid of lookback_bars x momentum_threshold_zscore x hold_horizon; (3) records every probe (no winner-only logging) with effect size, uncertainty, effective independent sample size, event density, chronological-half stability; (4) outputs a structural, non-economic response-surface report with no candidate identity opened and no economic outcome computed.",
-  "implementation_scope_complete": false,
+  "implementation_scope_complete": true,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -436,7 +436,7 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "TREND_MOMENTUM_FX_CRYPTO_METALS_COARSE_PARAMETER_REGION_SCAN_V1",
+  "next_action": "ACCEPT_FROZEN_EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT",
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "no_economic_outcome_requested": true,
@@ -475,7 +475,7 @@
   "peer_cohort_index_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
   "peer_cohort_index_sha256": "d86231cb88a99b2b4120404566e3579a2b1a250376d546295d3bfa810884eff1",
   "peer_cohort_index_transport_decoded_sha256": "fdee7e48774d6822df0f4dcb274c24ee0ad821ac51580eb418aad7e7e0825b68",
-  "pending_structural_result_ref": "evidence/EPOCH32_RELATIVE_VALUE_PAIR_STRUCTURE_STRUCTURAL_RESULT_V1.json",
+  "pending_structural_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json",
   "post_c032_decision_acceptance_ref": "research_v3/EPOCH20_POST_C032_DECISION_ACCEPTANCE_V1.json",
   "post_implementation_follow_up": "Once EPOCH34_COMPOSITE_CAUSAL_ML_STRUCTURAL_RESULT_V1.json is produced, a fresh AI reasoning pass is required to interpret it before any economic promotion is considered; no ranking or economic panel selection is authorized by this proposal.",
   "post_triage_decision_rule": "Prefer reuse of existing valid evidence; otherwise choose a minimal authenticated broker-native extension from the verified feasibility frontier with explicit information-gain justification.",
@@ -569,7 +569,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "IMPLEMENTATION_AI_ROUTED_TREND_MOMENTUM_COARSE_PARAMETER_SCAN",
+  "status": "AUTHORIZED_TREND_COARSE_PARAMETER_REGION_RESULT_ACCEPTANCE_READY",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -638,5 +638,17 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true
+  "uses_only_existing_accepted_bytes": true,
+  "next_deterministic_operation_ref": "research_v3/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_DETERMINISTIC_OPERATION_V1.json",
+  "deterministic_next_operation": {
+    "operation_ref": "research_v3/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_DETERMINISTIC_OPERATION_V1.json",
+    "operation_name": "ACCEPT_FROZEN_EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT",
+    "implementation_ai_required": false,
+    "copilot_reasoning_required": false,
+    "v2_attempts": 0,
+    "economic_outcomes": 0
+  },
+  "latest_full_response_surface_manifest_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SURFACE_MANIFEST_V1.json",
+  "latest_exact_head_ci_ref": "evidence/EPOCH37_TREND_MOMENTUM_EXACT_HEAD_CI_V1.json",
+  "latest_exact_head_ci_run_id": 36413737053
 }
