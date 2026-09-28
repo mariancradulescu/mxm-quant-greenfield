@@ -119,6 +119,41 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             self.assertTrue(out["dispatch_required"])
             self.assertEqual(out["execution_class"],"SEMANTIC_REASONING")
 
+    def test_current_peer_cohort_operation_routes_as_deterministic(self):
+        state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
+        self.assertEqual(
+            state["next_action"],
+            "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+        )
+        route=classify_execution(ROOT,state)
+        self.assertEqual(route["execution_class"],"DETERMINISTIC_OPERATION")
+        self.assertEqual(
+            route["operation_name"],
+            "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+        )
+        self.assertFalse(implementation_required(ROOT,state))
+
+    def test_unknown_deterministic_schema_and_contract_kind_fail_closed(self):
+        td,root,state=self._root_with_op()
+        try:
+            op_path=root/"research_v3/op.json"
+            op=json.loads(op_path.read_text())
+            op["schema"]="mxm.greenfield.unknown-operation.v1"
+            op_path.write_text(json.dumps(op))
+            route=classify_execution(root,state)
+            self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+            self.assertEqual(route["reason"],"DETERMINISTIC_AUTHORITY_INVALID")
+            self.assertIn("unsupported deterministic operation schema",route["detail"])
+
+            op["schema"]="mxm.greenfield.deterministic-next-operation.v1"
+            op["operation_contract"]={"kind":"UNKNOWN_KIND"}
+            op_path.write_text(json.dumps(op))
+            route=classify_execution(root,state)
+            self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+            self.assertIn("unsupported deterministic operation contract kind",route["detail"])
+        finally:
+            td.cleanup()
+
     def test_liveness_fingerprint_is_deterministic(self):
         td,root,state=self._root_with_op()
         try:
