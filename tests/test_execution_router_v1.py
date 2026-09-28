@@ -159,6 +159,24 @@ class ExecutionRouterV1Tests(unittest.TestCase):
                 "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
             )
             self.assertFalse(implementation_required(ROOT,state))
+        elif state["status"]=="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH38_ALIGNMENT_READINESS":
+            self.assertEqual(
+                state["next_action"],
+                "AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_EPOCH38_ALIGNMENT_READINESS",
+            )
+            self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
+            self.assertTrue(state["ai_reasoning_required"])
+            self.assertFalse(state["implementation_ai_required"])
+            self.assertFalse(implementation_required(ROOT,state))
+            self.assertIsNone(state.get("next_deterministic_operation_ref"))
+            self.assertIsNone(state.get("deterministic_next_operation"))
+            self.assertTrue((ROOT/state["epoch38_alignment_readiness_ref"]).is_file())
+            self.assertTrue(state["broader_universe_remains_open"])
+            self.assertEqual(state["accounting"],{
+                "economic_outcomes_opened":28,
+                "v2_attempts_used":20,
+                "v2_search_budget_remaining":64,
+            })
         else:
             self.fail(f"unexpected peer-cohort lifecycle state: {state.get('status')} / {state.get('next_action')}")
 
