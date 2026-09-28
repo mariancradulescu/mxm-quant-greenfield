@@ -599,6 +599,37 @@ def _run_hash_bound_python_json_transform(root:Path,state:dict[str,Any],op:dict[
     return new_state
 
 
+
+def _execute_epoch38_alignment_readiness(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    """Validate the already-frozen Epoch38 scope and emit a non-economic readiness artifact."""
+    if op.get("materializer")!="EMIT_EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_READINESS":
+        raise DeterministicOperationRejected("unsupported Epoch38 readiness materializer")
+    if op.get("freeze_ref")!="research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json":
+        raise DeterministicOperationRejected("Epoch38 readiness freeze authority mismatch")
+    output_ref=str(op.get("output_ref") or "")
+    if output_ref!="research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_V1.json":
+        raise DeterministicOperationRejected("Epoch38 readiness output authority mismatch")
+    from research_v3.epoch38_cross_sectional_aligned_history_scope_freeze import emit_readiness
+    readiness=emit_readiness(root)
+    if readiness.get("status")!="READY_FOR_FRESH_SEMANTIC_ACQUISITION_DECISION":
+        raise DeterministicOperationRejected("Epoch38 readiness validator returned unexpected status")
+    new_state=dict(state)
+    new_state.update(dict(op.get("post_execution_state") or {}))
+    new_state.update({
+        "epoch38_alignment_readiness_ref":output_ref,
+        "epoch38_alignment_readiness_status":readiness["status"],
+        "next_deterministic_operation_ref":None,
+        "deterministic_next_operation":None,
+        "implementation_ai_required":False,
+        "implementation_satisfied":True,
+        "implementation_scope_complete":True,
+        "external_data_required":False,
+        "external_data_gate":None,
+        "external_gate":None,
+        "user_action_required":False,
+    })
+    return new_state
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -613,6 +644,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     name=op["operation_name"]
     if (op.get("operation_contract") or {}).get("kind")=="HASH_BOUND_PYTHON_JSON_TRANSFORM_V1":
         new_state=_run_hash_bound_python_json_transform(root,state,op)
+    elif name=="RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN":
+        new_state=_execute_epoch38_alignment_readiness(root,state,op)
     elif op.get("materializer")=="MATERIALIZE_BASE64_GZIP_NON_ECONOMIC_STRUCTURAL_RESULT":
         _materialize_embedded_structural_result(root,op)
         new_state=_execute_existing_structural_result(root,state,op)
