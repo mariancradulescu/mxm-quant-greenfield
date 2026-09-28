@@ -1,4 +1,44 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "a36a48f31e8b63735c9814096d8e77685ebfe4de",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "a36a48f31e8b63735c9814096d8e77685ebfe4de",
+    "predecessor_run_id": 36383886907
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_proposal_file_sha256": "2fb81a1d14f4cccda301f44370cceeda6ff1389fcc3ac96e6427009c64ba2657",
+      "action": "USE_EXISTING_CROSS_SECTIONAL_PEER_COHORT_IMPLEMENTATION",
+      "economic_authorized": false,
+      "expected_universe_count": 1576,
+      "implementation_ref": "research_v3/cross_sectional_peer_cohort_index.py",
+      "index_materialized": false,
+      "later_step": "After the deterministic index operation, any estimand, cohort eligibility threshold, acquisition scope, or power design requires an explicit prospective decision. Aligned history remains required before cross-symbol inference; an internal development holdout is not independent confirmation.",
+      "operation_name": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+      "operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
+      "outcome_evaluated": false,
+      "test_ref": "tests/test_cross_sectional_peer_cohort_index.py"
+    },
+    "external_data_gate": null,
+    "implementation_id": "MXM_CROSS_SECTIONAL_PEER_COHORT_INDEX_V1",
+    "next_research_state": {
+      "external_data_required": false,
+      "implementation_satisfied": true,
+      "implementation_scope_complete": true,
+      "later_step": "Run the authorized operation after exact-head green and materialization of the already accepted hash-bound input; then seek prospective judgment for any later inference or new acquisition.",
+      "next_action": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+      "next_deterministic_operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
+      "research_judgment_required": false,
+      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+      "transport_materialization_required": true
+    },
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The deterministic full-frontier peer-cohort builder, tests, implementation manifest, and authorized operation already exist and were validated by inspection; no files were changed. The index has not yet been materialized. Its accepted hash-bound identity input is external to Git, so obtaining it is transport materialization—not new data acquisition. No price or strategy outcome was evaluated.",
+    "tests_requested": [
+      "tests/test_cross_sectional_peer_cohort_index.py"
+    ]
+  },
   "basis_next_state_sha256": "3c215113d598ab81305a78d1a4402011ab4f6668c7f9175e017dee1d98ab6c9e",
   "changed_paths": [
     "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_IMPLEMENTATION_MANIFEST_V1.json",
@@ -58,5 +98,5 @@
   },
   "request_fingerprint": "1f7c3f9a4cdf251d31d9d0c7532ea1695c49a5b25c8091ff2da89d0c730fbb90",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
