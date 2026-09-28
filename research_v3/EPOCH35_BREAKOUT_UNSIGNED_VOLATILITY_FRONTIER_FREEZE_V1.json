@@ -1,0 +1,82 @@
+{
+  "schema": "mxm.greenfield.epoch35-breakout-unsigned-volatility-frontier-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_EPOCH35_UNSIGNED_VOLATILITY_SCREEN",
+  "evidence_epoch": 35,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_a723ef9a2bc53e57b7cb2acddd9e2477.json",
+    "accepted_proposal_file_sha256": "06edd1a32863782b2f116254ad094f6a0615155db28c6e4869f4e9080ec4741b",
+    "current_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+    "current_frontier_sha256": "2e8cbe434a776d36ec494e7fbd642c36098400c38132cb57c734d6a60ab0f69b",
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
+    "coverage_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json",
+    "coverage_sha256": "5cfb0662b12f1f42f8f5c503df64f42716dab98ba5729ab7e6eef75bce2c5dec",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "scope": {
+    "frontier": "ALL_41_CURRENT_STRUCTURAL_REPRESENTATIVES_EXACTLY_ONCE",
+    "representative_count": 41,
+    "representatives_are_not_economically_equivalent": true,
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "development_representative_count": 38,
+    "replacement_representative_ids": [7427, 5352, 2924],
+    "selection_law": "PROCESS_ALL_41_CURRENT_REGISTRY_REPRESENTATIVES_WITHOUT_OUTCOME_BASED_SUBSETTING"
+  },
+  "preregistered_structural_law": {
+    "event": "At close of bar t, current high-low range is at least 2 times the median high-low range of the preceding 20 completed bars.",
+    "event_lookback_bars": 20,
+    "event_range_multiple": 2.0,
+    "zero_range_policy": "Require the current bar range to be positive; when prior median range is zero, any positive current range meets the frozen multiple threshold.",
+    "outcome": "Compare the sum of squared log close-to-close returns over the next six completed M5 returns with the sum over the six completed M5 returns immediately preceding and ending at bar t.",
+    "causal_timing": "Only completed bars at or before t identify the event and baseline; forward returns use only bars t+1 through t+6.",
+    "independence": "Retain at most one event per symbol per UTC date: the first qualifying event with complete contiguous event, baseline, and forward windows and positive realized variance in both windows.",
+    "daily_statistic": "For each retained event/date, compute log(forward realized variance / baseline realized variance).",
+    "inference": {
+      "partition": "Sort eligible UTC event dates chronologically; first floor(N/2) dates are half 1 and remaining dates are half 2.",
+      "minimum_eligible_dates_per_half": 10,
+      "test": "ONE_SIDED_EXACT_BINOMIAL_SIGN_TEST_OF_POSITIVE_MEDIAN_LOG_VARIANCE_RATIO; omit exact-zero ratios from the sign-test denominator.",
+      "raw_symbol_support": "Both halves meet minimum date sufficiency, both sample medians are strictly positive, and both one-sided exact sign-test p-values are at most 0.05.",
+      "symbol_family": "Fixed family of all 41 current structural representatives; insufficient symbols remain in the family with p-value 1.",
+      "multiplicity": "BENJAMINI_HOCHBERG_FALSE_DISCOVERY_RATE_ACROSS_41_SYMBOLS_USING_LARGER_HALF_P_VALUE_PER_SYMBOL",
+      "false_discovery_rate": 0.05
+    },
+    "missing_data": "No fill, interpolation, resampling, or synthetic bars. Any timestamp delta other than exactly 300 seconds invalidates a window that crosses it. Missing, invalid, non-contiguous, or zero-variance event windows are excluded, not repaired.",
+    "input_validation": "Require exact accepted archive hashes, M5 manifests, the frozen 41-symbol registry split (38 development and 3 replacements), matching series identities and member hashes, finite positive OHLC, valid OHLC bounds, UTC timestamps within the accepted interval, and no synthetic or forward fill.",
+    "prior_epoch_results_are_not_inputs": true,
+    "no_parameter_search": true,
+    "internal_development_data_is_not_independent_confirmation": true
+  },
+  "interpretation_boundary": {
+    "result_scope": "FROZEN_NON_ECONOMIC_UNSIGNED_VOLATILITY_PERSISTENCE_SCREEN_ONLY",
+    "independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "mechanism_family_closed": false,
+    "winner_selected": false,
+    "candidate_identity_created": false,
+    "protected_forward_opened": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "protected_forward_opened": false
+  },
+  "execution": {
+    "implementation": "research_v3/breakout_unsigned_volatility_epoch35_screen.py",
+    "freeze_must_be_persisted_before_screen_execution": true,
+    "accepted_data_bytes_may_be_transport_materialized_without_new_data_acquisition": true
+  }
+}
