@@ -1,0 +1,40 @@
+{
+  "schema": "mxm.greenfield.trend-parameter-scan-provenance-recovery.v1",
+  "status": "REPAIRED_PROVENANCE_BINDING_BEFORE_ANY_COARSE_SCAN_OUTCOME",
+  "evidence_epoch": 37,
+  "failed_runtime": {
+    "run_id": 36406973882,
+    "job_id": 108877968591,
+    "exception": "TrendMomentumScanError",
+    "message": "accepted proposal or capture plan hash mismatch",
+    "tests_run": 6,
+    "passed": 5,
+    "failed_or_error": 1
+  },
+  "classification": "IMPLEMENTATION_PROVENANCE_BINDING_DEFECT_ONLY",
+  "root_cause": {
+    "failure_class": "AMBIGUOUS_OR_STALE_CAPTURE_PLAN_BINDING_ACROSS_TWO_ACCEPTED_CAPTURE_AUTHORITIES",
+    "explanation": "The accepted TREND decision cites the accepted 13W development evidence and the current-frontier replacement authority in the same implementation context. The seven prospectively frozen TREND symbols all route to the original accepted development archive, while the three replacement identities are different symbols. A generic capture-plan hash binding is therefore not canonical. The repair binds the development plan and ZIP explicitly for the seven target series and separately binds the replacement plan and ZIP as accepted provenance that is not used for these target series.",
+    "literal_failed_ephemeral_freeze_recovered": false,
+    "reason_literal_bytes_unavailable": "The failed provider working-tree diff was restored before persistence and the workflow log does not contain the ephemeral freeze bytes; the repair is derived from durable canonical repository authorities, not guessed ephemeral bytes."
+  },
+  "canonical_bindings": {
+    "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_85a6da387ad291b1ccdb81cefe0718b6.json",
+    "proposal_hash": "71333910d8382a45e46d7d4dd71282731ae9043eb0474977344b9142c116471e",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "preserved": {
+    "semantic_reasoning_repeated": false,
+    "accepted_parameter_grid_changed": false,
+    "accepted_symbol_set_changed": false,
+    "family_or_asset_class_closed": false,
+    "economic_outcomes_opened_delta": 0,
+    "v2_attempts_used_delta": 0,
+    "protected_forward_opened": false
+  }
+}
