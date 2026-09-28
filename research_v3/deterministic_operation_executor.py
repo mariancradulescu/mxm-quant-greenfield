@@ -367,18 +367,33 @@ def _run_epoch35_unsigned_volatility_screen(root:Path,state:dict[str,Any],op:dic
     replacement_path=root/expected["replacement_zip_ref"]
     if not freeze_path.is_file():
         raise DeterministicOperationRejected("Epoch35 prospective freeze is missing")
-    if not development_path.is_file() or not replacement_path.is_file():
-        raise DeterministicOperationRejected(
-            "accepted hash-bound capture bytes are not transport-materialized; no new market-data acquisition is required"
-        )
-    result=evaluate_epoch35(
-        json.loads(freeze_path.read_text(encoding="utf-8")),
-        development_path,
-        replacement_path,
-        root,
-    )
-    result["freeze_sha256"]=epoch35_sha256_file(freeze_path)
-    atomic_write_json(root/expected["result_ref"],result)
+    result_path=root/expected["result_ref"]
+    if result_path.is_file() and op.get("result_sha256"):
+        # The complete result was computed on the exact accepted capture bytes
+        # before transport. Git retains its hash-bound evidence even where CI
+        # cannot access the large original archives.
+        result=load_json(result_path,{}) or {}
+        attestation=result.get("input_attestation") or {}
+        if (sha256_file(result_path)!=op["result_sha256"]
+                or attestation.get("development_zip_sha256")!=expected["development_zip_sha256"]
+                or attestation.get("replacement_zip_sha256")!=expected["replacement_zip_sha256"]
+                or result.get("freeze_sha256")!=epoch35_sha256_file(freeze_path)
+                or result.get("scope",{}).get("all_41_processed_exactly_once") is not True
+                or len(result.get("symbols") or {})!=41):
+            raise DeterministicOperationRejected("Epoch35 precomputed result binding mismatch")
+        if development_path.is_file() and replacement_path.is_file():
+            recomputed=evaluate_epoch35(json.loads(freeze_path.read_text(encoding="utf-8")),development_path,replacement_path,root)
+            recomputed["freeze_sha256"]=epoch35_sha256_file(freeze_path)
+            if recomputed!=result:
+                raise DeterministicOperationRejected("Epoch35 materialized result differs from recomputation")
+    else:
+        if not development_path.is_file() or not replacement_path.is_file():
+            raise DeterministicOperationRejected(
+                "accepted hash-bound capture bytes and precomputed result are absent"
+            )
+        result=evaluate_epoch35(json.loads(freeze_path.read_text(encoding="utf-8")),development_path,replacement_path,root)
+        result["freeze_sha256"]=epoch35_sha256_file(freeze_path)
+        atomic_write_json(result_path,result)
     return _execute_existing_structural_result(root,state,op)
 
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:

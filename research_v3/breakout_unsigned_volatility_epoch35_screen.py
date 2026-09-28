@@ -28,6 +28,7 @@ REPLACEMENT_ACCEPTANCE_REF = "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTU
 DEVELOPMENT_SHA256 = "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503"
 REPLACEMENT_SHA256 = "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
 REPLACEMENT_IDS = frozenset({7427, 5352, 2924})
+SUPERSEDED_DEVELOPMENT_IDS = frozenset({2922, 5348})  # Crude-F, HEXAB.SE; absent from the current 41.
 M5_SECONDS = 300
 LOOKBACK_BARS = 20
 HORIZON_BARS = 6
@@ -379,6 +380,7 @@ def benjamini_hochberg(p_values: dict[str, float]) -> dict[str, float]:
 
 def _load_archive(
     archive: zipfile.ZipFile, expected: dict[int, str], interval: dict[str, str],
+    allowed_superseded_ids: set[int] | None = None,
 ) -> dict[int, list[dict[str, Any]]]:
     try:
         manifest = json.loads(archive.read("capture_manifest.json"))
@@ -393,10 +395,18 @@ def _load_archive(
     series = manifest.get("series")
     if not isinstance(series, list) or any(not isinstance(item, dict) for item in series):
         raise Epoch35ScreenError("capture manifest series must be a list of objects")
-    complete = [
+    complete_all = [
         item for item in series
         if item.get("capture_status") == "SERIES_CAPTURE_COMPLETE"
     ]
+    allowed_superseded_ids = allowed_superseded_ids or set()
+    try:
+        extra_ids = {int(item["symbol_id"]) for item in complete_all} - set(expected)
+    except (KeyError, ValueError, TypeError) as exc:
+        raise Epoch35ScreenError("capture manifest series identity is incomplete") from exc
+    if extra_ids != allowed_superseded_ids or len(complete_all) != len(expected) + len(extra_ids):
+        raise Epoch35ScreenError("capture contains unexpected or duplicate complete series")
+    complete = [item for item in complete_all if int(item["symbol_id"]) in expected]
     if len(complete) != len(expected):
         raise Epoch35ScreenError(f"expected {len(expected)} complete series, observed {len(complete)}")
     result: dict[int, list[dict[str, Any]]] = {}
@@ -429,6 +439,37 @@ def _load_archive(
         raise Epoch35ScreenError("capture does not contain the exact required representative IDs")
     return result
 
+def _load_replacement_archive(
+    archive: zipfile.ZipFile, expected: dict[int, str], interval: dict[str, str],
+) -> dict[int, list[dict[str, Any]]]:
+    """Read the accepted replacement transport format with its root checksum ledger."""
+    manifest_raw=archive.read("capture_manifest.json")
+    manifest=json.loads(manifest_raw)
+    if (manifest.get("completion_state")!="COMPLETE"
+            or manifest.get("protected_evidence_opened") is not False
+            or manifest.get("economic_outcomes_opened")!=0
+            or manifest.get("account_mutation") is not False):
+        raise Epoch35ScreenError("replacement capture safety or completion mismatch")
+    checks={}
+    for line in archive.read("CHECKSUMS.sha256").decode("utf-8").splitlines():
+        digest,member=line.split(None,1)
+        checks[member.strip()]=digest
+    if checks.get("capture_manifest.json")!=_sha256_bytes(manifest_raw):
+        raise Epoch35ScreenError("replacement manifest checksum mismatch")
+    members=[name for name in archive.namelist() if name.startswith("raw/") and name.endswith("_M5.csv")]
+    if len(members)!=len(expected) or set(checks)!={"capture_manifest.json",*members}:
+        raise Epoch35ScreenError("replacement archive has unexpected canonical members")
+    result={}
+    for symbol_id,symbol in expected.items():
+        matches=[name for name in members if name.startswith(f"raw/{symbol_id}_")]
+        if len(matches)!=1:
+            raise Epoch35ScreenError(f"replacement identity missing or duplicated: {symbol_id}")
+        raw=archive.read(matches[0])
+        if _sha256_bytes(raw)!=checks[matches[0]]:
+            raise Epoch35ScreenError(f"replacement member checksum mismatch: {symbol_id}")
+        result[symbol_id]=_canonicalize(_parse_rows(raw,matches[0],interval),symbol)[0]
+    return result
+
 
 def evaluate(
     freeze: dict[str, Any], development_zip: Path, replacement_zip: Path, root: Path,
@@ -446,8 +487,9 @@ def evaluate(
     with zipfile.ZipFile(development_zip) as development, zipfile.ZipFile(replacement_zip) as replacement:
         development_rows = _load_archive(
             development, {symbol_id: by_id[symbol_id] for symbol_id in development_ids}, interval,
+            allowed_superseded_ids=SUPERSEDED_DEVELOPMENT_IDS,
         )
-        replacement_rows = _load_archive(
+        replacement_rows = _load_replacement_archive(
             replacement, {symbol_id: by_id[symbol_id] for symbol_id in REPLACEMENT_IDS}, interval,
         )
     all_rows = {**development_rows, **replacement_rows}
