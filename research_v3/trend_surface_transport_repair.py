@@ -153,17 +153,38 @@ def diagnose(root_value: str | Path = ".") -> dict[str, Any]:
     encoded = transport_path.read_bytes()
     compact = b"".join(encoded.split())
     observed_transport_sha = sha256_bytes(encoded)
+    invalid_base64 = [
+        {"offset": i, "byte": int(value)}
+        for i, value in enumerate(compact)
+        if not (
+            65 <= value <= 90 or 97 <= value <= 122 or 48 <= value <= 57
+            or value in (43, 47, 61)
+        )
+    ]
+    strict_base64_error = None
     try:
         compressed = base64.b64decode(compact, validate=True)
+        base64_method = "STRICT"
     except Exception as exc:
-        return {
-            "schema": "mxm.greenfield.trend-surface-transport-recovery-diagnostic.v1",
-            "status": "UNRECOVERABLE_INVALID_BASE64",
-            "transport_ref": TRANSPORT_REF,
-            "observed_transport_sha256": observed_transport_sha,
-            "error": str(exc),
-            "research_rerun_performed": False,
-        }
+        strict_base64_error = str(exc)
+        # Transport-only recovery: Python's non-validating decoder discards bytes
+        # outside the Base64 alphabet. These decoded bytes still have zero authority
+        # unless the frozen decoded JSON SHA256 later matches exactly.
+        try:
+            compressed = base64.b64decode(compact, validate=False)
+            base64_method = "IGNORE_NON_ALPHABET_BYTES"
+        except Exception as fallback_exc:
+            return {
+                "schema": "mxm.greenfield.trend-surface-transport-recovery-diagnostic.v1",
+                "status": "UNRECOVERABLE_INVALID_BASE64",
+                "transport_ref": TRANSPORT_REF,
+                "observed_transport_sha256": observed_transport_sha,
+                "strict_base64_error": strict_base64_error,
+                "fallback_error": str(fallback_exc),
+                "invalid_base64_bytes": invalid_base64[:64],
+                "invalid_base64_byte_count": len(invalid_base64),
+                "research_rerun_performed": False,
+            }
 
     if not compressed.startswith(XZ_MAGIC):
         return {
@@ -185,6 +206,10 @@ def diagnose(root_value: str | Path = ".") -> dict[str, Any]:
             "manifest_transport_sha256": (manifest.get("surface") or {}).get("transport_sha256"),
             "observed_transport_sha256": observed_transport_sha,
             "compressed_bytes": len(compressed),
+            "base64_method": base64_method,
+            "strict_base64_error": strict_base64_error,
+            "invalid_base64_bytes": invalid_base64[:64],
+            "invalid_base64_byte_count": len(invalid_base64),
             "decoded_bytes": len(decoded or b""),
             "expected_decoded_sha256": EXPECTED_DECODED_SHA256,
             "observed_decoded_sha256": decoded_sha,
@@ -214,6 +239,10 @@ def diagnose(root_value: str | Path = ".") -> dict[str, Any]:
         "transport_ref": TRANSPORT_REF,
         "manifest_transport_sha256": (manifest.get("surface") or {}).get("transport_sha256"),
         "observed_transport_sha256": observed_transport_sha,
+        "base64_method": base64_method,
+        "strict_base64_error": strict_base64_error,
+        "invalid_base64_bytes": invalid_base64[:64],
+        "invalid_base64_byte_count": len(invalid_base64),
         "expected_decoded_sha256": EXPECTED_DECODED_SHA256,
         "observed_decoded_sha256": decoded_sha,
         "salvage": salvage,
