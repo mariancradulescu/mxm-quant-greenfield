@@ -14,7 +14,7 @@ from research_v3.autonomous_runtime_v2 import (
     make_synthetic_plan,
     zero_human_continuation_demo,
 )
-from research_v3.runtime_v2_primitives import GitCheckpointSink
+from research_v3.runtime_v2_primitives import GitCheckpointSink, MaterialIntegrityHalt
 
 
 class AutonomousRuntimeV2Tests(unittest.TestCase):
@@ -87,7 +87,7 @@ class AutonomousRuntimeV2Tests(unittest.TestCase):
             self.assertEqual(recovered["attempt"], 2)
             self.assertEqual(recovered["retry_metadata"]["reason"], "STALE_LEASE_TAKEOVER")
 
-    def test_checkpoint_push_conflict_rebases_and_retries(self):
+    def test_checkpoint_push_disjoint_remote_advance_revalidates_and_retries(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td) / "work"
             remote = Path(td) / "remote.git"
@@ -111,7 +111,9 @@ class AutonomousRuntimeV2Tests(unittest.TestCase):
             subprocess.run(["git", "push", "origin", "HEAD:research"], cwd=other, check=True, capture_output=True)
             (root / "checkpoint.txt").write_text("checkpoint\n", encoding="utf-8")
             previous = os.environ.get("MXM_RUNTIME_TARGET_BRANCH")
+            previous_validation = os.environ.get("MXM_RECONCILE_VALIDATION_COMMAND")
             os.environ["MXM_RUNTIME_TARGET_BRANCH"] = "research"
+            os.environ["MXM_RECONCILE_VALIDATION_COMMAND"] = "python -c pass"
             try:
                 GitCheckpointSink(root, enabled=True, push=True).checkpoint("conflict-test", None)
             finally:
@@ -119,12 +121,61 @@ class AutonomousRuntimeV2Tests(unittest.TestCase):
                     os.environ.pop("MXM_RUNTIME_TARGET_BRANCH", None)
                 else:
                     os.environ["MXM_RUNTIME_TARGET_BRANCH"] = previous
+                if previous_validation is None:
+                    os.environ.pop("MXM_RECONCILE_VALIDATION_COMMAND", None)
+                else:
+                    os.environ["MXM_RECONCILE_VALIDATION_COMMAND"] = previous_validation
             local_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
             remote_head = subprocess.check_output(
                 ["git", "--git-dir", str(remote), "rev-parse", "refs/heads/research"], text=True
             ).strip()
             self.assertEqual(local_head, remote_head)
             self.assertTrue((root / "remote.txt").exists())
+
+    def test_checkpoint_push_overlapping_remote_advance_fails_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "work"
+            remote = Path(td) / "remote.git"
+            other = Path(td) / "other"
+            subprocess.run(["git", "init", "--bare", str(remote)], check=True, capture_output=True)
+            root.mkdir()
+            subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "runtime-test"], cwd=root, check=True)
+            subprocess.run(["git", "config", "user.email", "runtime-test@example.invalid"], cwd=root, check=True)
+            (root / "shared.txt").write_text("base\n", encoding="utf-8")
+            subprocess.run(["git", "add", "."], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-m", "base"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "remote", "add", "origin", str(remote)], cwd=root, check=True)
+            subprocess.run(["git", "push", "-u", "origin", "HEAD:research"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "clone", "--branch", "research", str(remote), str(other)], check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "other-test"], cwd=other, check=True)
+            subprocess.run(["git", "config", "user.email", "other-test@example.invalid"], cwd=other, check=True)
+            (other / "shared.txt").write_text("remote\n", encoding="utf-8")
+            subprocess.run(["git", "add", "."], cwd=other, check=True)
+            subprocess.run(["git", "commit", "-m", "remote advance"], cwd=other, check=True, capture_output=True)
+            subprocess.run(["git", "push", "origin", "HEAD:research"], cwd=other, check=True, capture_output=True)
+            (root / "shared.txt").write_text("local expensive output\n", encoding="utf-8")
+            previous = os.environ.get("MXM_RUNTIME_TARGET_BRANCH")
+            previous_validation = os.environ.get("MXM_RECONCILE_VALIDATION_COMMAND")
+            os.environ["MXM_RUNTIME_TARGET_BRANCH"] = "research"
+            os.environ["MXM_RECONCILE_VALIDATION_COMMAND"] = "python -c pass"
+            try:
+                with self.assertRaises(MaterialIntegrityHalt):
+                    GitCheckpointSink(root, enabled=True, push=True).checkpoint("semantic-conflict-test", None)
+            finally:
+                if previous is None:
+                    os.environ.pop("MXM_RUNTIME_TARGET_BRANCH", None)
+                else:
+                    os.environ["MXM_RUNTIME_TARGET_BRANCH"] = previous
+                if previous_validation is None:
+                    os.environ.pop("MXM_RECONCILE_VALIDATION_COMMAND", None)
+                else:
+                    os.environ["MXM_RECONCILE_VALIDATION_COMMAND"] = previous_validation
+            remote_text = subprocess.check_output(
+                ["git", "--git-dir", str(remote), "show", "research:shared.txt"], text=True
+            )
+            self.assertEqual(remote_text, "remote\n")
+            self.assertEqual((root / "shared.txt").read_text(encoding="utf-8"), "local expensive output\n")
 
     def test_non_economic_director_operation_opens_no_economic_outcome(self):
         with tempfile.TemporaryDirectory() as td:

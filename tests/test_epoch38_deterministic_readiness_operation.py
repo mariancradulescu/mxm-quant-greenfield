@@ -21,6 +21,9 @@ class Epoch38DeterministicReadinessOperationTests(unittest.TestCase):
         prior_state=dict(self.state)
         prior_state.update({
             "status":"IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN",
+            "current_research_evidence_epoch":self.op["evidence_epoch"],
+            "evidence_epoch":self.op["evidence_epoch"],
+            "authorizing_evidence_epoch":self.op["evidence_epoch"],
             "next_action":self.op["operation_name"],
             "next_deterministic_operation_ref":OP_REF,
             "ai_reasoning_required":False,

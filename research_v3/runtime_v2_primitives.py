@@ -26,6 +26,7 @@ import importlib
 import json
 import os
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -307,40 +308,111 @@ class GitCheckpointSink:
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=self.root)
         if diff.returncode == 0:
             return
+        base_head = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=self.root, text=True
+        ).strip()
+        local_paths = {
+            row.strip()
+            for row in subprocess.check_output(
+                ["git", "diff", "--cached", "--name-only"], cwd=self.root, text=True
+            ).splitlines()
+            if row.strip()
+        }
         msg = f"[skip ci] Runtime V2 checkpoint {boundary} {operation_id or 'runtime'}"
         subprocess.run(["git", "commit", "-m", msg], cwd=self.root, check=True)
         if self.push:
             target = os.environ.get("MXM_RUNTIME_TARGET_BRANCH")
-            refspec = f"HEAD:refs/heads/{target}" if target else "HEAD"
+            if not target:
+                raise RuntimeV2Error(
+                    "checkpoint push requires MXM_RUNTIME_TARGET_BRANCH so remote-head CAS can be enforced"
+                )
+            refspec = f"HEAD:refs/heads/{target}"
+
+            def fetch_remote() -> str:
+                subprocess.run(["git", "fetch", "origin", target], cwd=self.root, check=True)
+                return subprocess.check_output(
+                    ["git", "rev-parse", f"origin/{target}"], cwd=self.root, text=True
+                ).strip()
+
+            def reconcile_once(remote_head: str) -> None:
+                ancestor = subprocess.run(
+                    ["git", "merge-base", "--is-ancestor", base_head, remote_head],
+                    cwd=self.root,
+                )
+                if ancestor.returncode != 0:
+                    raise MaterialIntegrityHalt(
+                        "research branch remote head is not a compatible fast-forward from the tested base"
+                    )
+                remote_paths = {
+                    row.strip()
+                    for row in subprocess.check_output(
+                        ["git", "diff", "--name-only", f"{base_head}..{remote_head}"],
+                        cwd=self.root, text=True,
+                    ).splitlines()
+                    if row.strip()
+                }
+                overlap = sorted(local_paths & remote_paths)
+                if overlap:
+                    raise MaterialIntegrityHalt(
+                        "research branch CAS conflict touches locally generated paths: " + ", ".join(overlap)
+                    )
+                local_commit = subprocess.check_output(
+                    ["git", "rev-parse", "HEAD"], cwd=self.root, text=True
+                ).strip()
+                rebase = subprocess.run(
+                    ["git", "rebase", "--onto", remote_head, base_head, local_commit],
+                    cwd=self.root, text=True, capture_output=True,
+                )
+                if rebase.returncode != 0:
+                    subprocess.run(["git", "rebase", "--abort"], cwd=self.root, check=False)
+                    raise MaterialIntegrityHalt(
+                        "bounded disjoint research-branch reconciliation failed; "
+                        f"stderr={rebase.stderr.strip()}"
+                    )
+                validation = os.environ.get("MXM_RECONCILE_VALIDATION_COMMAND", "").strip()
+                if not validation:
+                    raise MaterialIntegrityHalt(
+                        "compatible remote advancement requires explicit no-provider revalidation before persistence"
+                    )
+                checked = subprocess.run(
+                    shlex.split(validation), cwd=self.root, text=True, capture_output=True,
+                )
+                if checked.returncode != 0:
+                    raise MaterialIntegrityHalt(
+                        "post-reconciliation no-provider validation failed; "
+                        f"stderr={checked.stderr.strip()}"
+                    )
+                latest = fetch_remote()
+                if latest != remote_head:
+                    raise MaterialIntegrityHalt(
+                        "research branch advanced again during bounded reconciliation; fail closed"
+                    )
+
+            remote_head = fetch_remote()
+            if remote_head != base_head:
+                reconcile_once(remote_head)
+
             first = subprocess.run(
                 ["git", "push", "origin", refspec],
                 cwd=self.root, text=True, capture_output=True,
             )
             if first.returncode == 0:
                 return
-            if not target:
+
+            remote_after_failure = fetch_remote()
+            if remote_after_failure == base_head:
                 raise RuntimeV2Error(
-                    "checkpoint push failed without MXM_RUNTIME_TARGET_BRANCH; "
+                    "checkpoint push failed without a remote-head change; "
                     f"stderr={first.stderr.strip()}"
                 )
-            subprocess.run(["git", "fetch", "origin", target], cwd=self.root, check=True)
-            rebase = subprocess.run(
-                ["git", "rebase", f"origin/{target}"],
-                cwd=self.root, text=True, capture_output=True,
-            )
-            if rebase.returncode != 0:
-                subprocess.run(["git", "rebase", "--abort"], cwd=self.root, check=False)
-                raise MaterialIntegrityHalt(
-                    "checkpoint push conflict could not be reconciled cleanly; "
-                    f"stderr={rebase.stderr.strip()}"
-                )
+            reconcile_once(remote_after_failure)
             second = subprocess.run(
                 ["git", "push", "origin", refspec],
                 cwd=self.root, text=True, capture_output=True,
             )
             if second.returncode != 0:
                 raise RuntimeV2Error(
-                    "checkpoint push failed after one fetch/rebase retry; "
+                    "checkpoint push failed after one bounded CAS reconciliation; "
                     f"stderr={second.stderr.strip()}"
                 )
 
