@@ -186,7 +186,26 @@ jobs:
                 continue
                 ;;
               PROVIDER_RETRY_REQUIRED)
-                echo "Recoverable provider failure; retrying within the finite machine-owned request budget."
+                retry_sleep="$(python - <<'PY'
+          import json, math
+          from datetime import datetime, timezone
+          from pathlib import Path
+          p=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
+          doc=json.loads(p.read_text()) if p.is_file() else {}
+          due=doc.get("next_retry_after_utc")
+          if not due:
+              print(0)
+          else:
+              target=datetime.fromisoformat(due.replace("Z","+00:00"))
+              remaining=max(0.0,(target-datetime.now(timezone.utc)).total_seconds())
+              print(int(math.ceil(remaining)))
+          PY
+                )"
+                if [[ "${retry_sleep}" -gt 0 ]]; then
+                  echo "Recoverable provider failure; holding the canonical writer until the persisted retry deadline (${retry_sleep}s) without another provider call."
+                  sleep "${retry_sleep}"
+                fi
+                echo "Retry deadline reached; retrying the same semantic request within the finite machine-owned request budget."
                 continue
                 ;;
               PROVIDER_RETRY_BUDGET_EXHAUSTED|PROVIDER_UNAVAILABLE)
