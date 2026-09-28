@@ -1,0 +1,138 @@
+{
+  "schema": "mxm.greenfield.epoch37-trend-momentum-parameter-region-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SCAN",
+  "evidence_epoch": 37,
+  "family": "TREND_MOMENTUM",
+  "stage": "PARAMETER_DISCOVERY_STAGE_1_COARSE_MECHANISM_REGION_SCAN",
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_85a6da387ad291b1ccdb81cefe0718b6.json",
+    "accepted_proposal_hash": "71333910d8382a45e46d7d4dd71282731ae9043eb0474977344b9142c116471e",
+    "proposal_registry_ref": "research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_capture_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_capture_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+    "multi_frontier_governor_ref": "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+    "coverage_ledger_ref": "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json"
+  },
+  "scope": {
+    "symbols": [
+      {
+        "symbol": "JPYX",
+        "symbol_id": 146,
+        "asset_class": "Currency Index (Spot)"
+      },
+      {
+        "symbol": "ZARJPY",
+        "symbol_id": 98,
+        "asset_class": "Forex (Spot)"
+      },
+      {
+        "symbol": "USDCLP",
+        "symbol_id": 2759,
+        "asset_class": "Forex (Spot)"
+      },
+      {
+        "symbol": "USDBRL",
+        "symbol_id": 2755,
+        "asset_class": "Forex (Spot)"
+      },
+      {
+        "symbol": "USDCZK",
+        "symbol_id": 56,
+        "asset_class": "Forex (Spot)"
+      },
+      {
+        "symbol": "TRUMPUSD",
+        "symbol_id": 5562,
+        "asset_class": "Crypto Currency (Spot)"
+      },
+      {
+        "symbol": "XPDUSD",
+        "symbol_id": 95,
+        "asset_class": "Metals (Spot)"
+      }
+    ],
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "data_source": "DEVELOPMENT_ARCHIVE_ONLY_FOR_THE_SEVEN_FROZEN_SYMBOLS",
+    "structural_41_are_economic_equivalents": false,
+    "eligible_frontier_remains_open": 1576
+  },
+  "parameter_grid": {
+    "lookback_bars_M5": [
+      12,
+      24,
+      48,
+      96,
+      192
+    ],
+    "momentum_threshold_zscore": [
+      0.5,
+      1,
+      1.5,
+      2
+    ],
+    "hold_horizon": [
+      "15m",
+      "1h",
+      "4h",
+      "1d"
+    ],
+    "cells_per_symbol": 80,
+    "ranges_frozen_before_development_surface": true,
+    "record_every_probe": true,
+    "winner_only_logging": false
+  },
+  "mechanism_law": {
+    "signal": "At each completed M5 bar inside an exact-contiguous segment, compute log(close_t/close_t-lookback) divided by population standard deviation of the lookback one-bar log returns times sqrt(lookback). Admit a trend event when absolute normalized momentum is at least the frozen threshold; direction is its sign.",
+    "exit": "Starting after the event bar, exit at the first bar where normalized momentum using the same frozen lookback crosses zero to the opposite sign, or at the frozen hold horizon, whichever occurs first. A horizon crossing a segment boundary is right-censored and not repaired.",
+    "effect_size": "For each settled event compute direction * log(exit_close/event_close) * 10000 basis points. Aggregate within UTC date first, then report the arithmetic mean of daily directional responses as the cell effect size.",
+    "effective_independence": "UTC date is the dependence unit: all settled event responses for one cell and UTC date are averaged before effect size, uncertainty, or chronological-half diagnostics. Effective independent sample size is the number of UTC dates with a settled daily response.",
+    "uncertainty": "Sample standard error across daily directional responses and a descriptive 1.96*SE interval half-width; no confirmatory p-value or economic inference is opened.",
+    "missing_data": "No fill, interpolation, resampling, or synthetic bars. Any timestamp gap greater than 300 seconds starts a new segment. Any event whose required forward horizon crosses a segment boundary is right-censored and not repaired."
+  },
+  "robustness_law": {
+    "local_support": "effect_size > 0, at least 10 effective UTC days, at least 5 effective UTC days in each chronological half, and both chronological-half effect sizes > 0",
+    "direct_neighborhood": "Cells differing by exactly one adjacent frozen grid step on exactly one parameter axis are direct neighbors.",
+    "broad_local_neighborhood_support": "local_support plus at least three direct neighbors, at least 75% directly adjacent cells locally supported, and positive median adjacent effect size",
+    "cross_symbol_support": ">=4 of 7 symbols locally supported at the exact parameter cell and support spans >=2 asset classes",
+    "robust_region": "A connected direct-adjacent component of cross-symbol-supported parameter cells containing >=3 cells and varying in >=2 parameter dimensions.",
+    "single_symbol_proxy_boundary": "A single-symbol asset-class proxy cannot by itself establish asset-class robustness."
+  },
+  "null_semantics": {
+    "weak_surface_scope": "LOCAL_SEVEN_SYMBOL_COARSE_PARAMETER_REGION_ONLY",
+    "cannot_close": [
+      "TREND_MOMENTUM",
+      "Forex (Spot)",
+      "Currency Index (Spot)",
+      "Crypto Currency (Spot)",
+      "Metals (Spot)"
+    ],
+    "full_1576_frontier_substitution": false,
+    "low_power_is_family_failure": false,
+    "data_insufficient_is_family_failure": false
+  },
+  "boundaries": {
+    "protected_or_forward_evidence_used": false,
+    "economic_outcome_opened": false,
+    "v2_attempt_consumed": false,
+    "candidate_identity_opened": false,
+    "mechanism_family_closed": false,
+    "asset_class_closed": false
+  },
+  "execution": {
+    "implementation_ref": "research_v3/trend_momentum_parameter_region_epoch37_screen.py",
+    "result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json",
+    "freeze_must_be_persisted_before_screen_execution": true,
+    "exact_head_green_required_before_execution": true,
+    "accepted_data_bytes_may_be_transport_materialized_without_new_data_acquisition": true
+  }
+}
