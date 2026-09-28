@@ -160,6 +160,8 @@ def apply_pre_outcome_methodology_gate(
             "frontier using outcome-blind features; preserve false-positive control and quantify power."
         ),
         "decision_contract": {
+            "required_action": "SELECT_MECHANISM_SPECIFIC_DISCOVERY_FRONTIER_UNDER_ADAPTIVE_ARCHITECTURE",
+            "require_no_economic_opening": True,
             "methodology_policy_ref": str(ARCH_REL),
             "methodology_audit_ref": str(AUDIT_REL),
             "structural_panel_default_inferential_role_forbidden": True,
