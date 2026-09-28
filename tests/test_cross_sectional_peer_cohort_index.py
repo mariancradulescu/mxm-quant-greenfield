@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import base64
 import copy
+import gzip
+import hashlib
+import json
+from pathlib import Path
 import unittest
 
 from research_v3.cross_sectional_peer_cohort_index import (
@@ -95,7 +100,48 @@ def _bundle(rows: list[dict]) -> dict:
     }
 
 
+ROOT = Path(__file__).resolve().parents[1]
+FRAGMENT_HASHES = [
+    "5c165c4499050e05e7753e88d9aec496fa21b79ea7a2b31bb6cdbbf89f23ac9b",
+    "b072290ca21ae94eddead70a9c82d0c679d7cb54345c3850c5daf0e5503d4fc3",
+    "2b5b5c8d4f50c2b340458f284fc4d7f39ab4effb0b0061717c64f035f8d0a63b",
+    "ca678a5ceaa5120db2cca21c30d50ba9a644eff3d68a4c733fdcc1a1043bef1b",
+    "fbb1aa9edfe1c29677fed8fa3e7755c134c6d6e0f2b9ff84d0ac3c23ae0caff4",
+    "a6e78eb21fe0f52bf66f0b080413830b7d2048467ec3b468952b98e2787c7eed",
+    "bc5f38f5546d5e9431f3748bfc7bc5f54d33af45acd09e866f925be69ad2938a",
+    "a6bc8c778316093060b28890dcbce02fce8de8806e11280a34a65ec2d3300d23",
+]
+CONCAT_SHA256 = "208d2ed854a240a47300ba89c4e76d0c9861d5aab940e5adee8a11351d6c6e12"
+DECODED_SHA256 = "fdee7e48774d6822df0f4dcb274c24ee0ad821ac51580eb418aad7e7e0825b68"
+
 class CrossSectionalPeerCohortIndexTests(unittest.TestCase):
+    def test_current_hash_bound_transport_builds_all_1576_once_without_outcomes(self):
+        pieces=[]
+        for index,expected in enumerate(FRAGMENT_HASHES):
+            path=ROOT/f"research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part{index:02d}.b64"
+            raw=path.read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(),expected)
+            pieces.append(raw)
+        encoded=b"".join(pieces)
+        self.assertEqual(hashlib.sha256(encoded).hexdigest(),CONCAT_SHA256)
+        decoded=gzip.decompress(base64.b64decode(encoded,validate=True))
+        self.assertEqual(hashlib.sha256(decoded).hexdigest(),DECODED_SHA256)
+        bundle=json.loads(decoded)
+        self.assertEqual(len(bundle["eligible_identities"]),1576)
+        self.assertEqual(
+            sum(row["accepted_history_state"]=="ACCEPTED_HISTORY_AVAILABLE" for row in bundle["eligible_identities"]),
+            42,
+        )
+        result=build_index(bundle)
+        self.assertEqual(result["source_universe"]["indexed_identity_count"],1576)
+        self.assertEqual(result["coverage"]["cohort_breadth_total"],1576)
+        self.assertEqual(result["coverage"]["unassigned_missing_metadata_count"],0)
+        self.assertFalse(result["cohort_policy"]["structural_representatives_used_as_substitutes"])
+        self.assertFalse(result["interpretation_boundary"]["strategy_or_price_outcome_evaluated"])
+        self.assertFalse(result["interpretation_boundary"]["returns_or_pnl_computed"])
+        self.assertEqual(result["interpretation_boundary"]["economic_outcomes_opened"],0)
+        self.assertEqual(result["interpretation_boundary"]["v2_attempts_consumed"],0)
+
     def test_preserves_all_rows_and_groups_only_exact_peer_metadata(self):
         rows = [
             _row("A.US", 1),
