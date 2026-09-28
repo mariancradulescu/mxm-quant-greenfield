@@ -159,7 +159,7 @@ class ExecutionRouterV1Tests(unittest.TestCase):
                 "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
             )
             self.assertFalse(implementation_required(ROOT,state))
-        elif state["status"]=="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH38_ALIGNMENT_READINESS":
+        elif route["execution_class"]=="SEMANTIC_REASONING" and state.get("epoch38_alignment_readiness_ref"):
             self.assertEqual(
                 state["next_action"],
                 "AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_EPOCH38_ALIGNMENT_READINESS",
