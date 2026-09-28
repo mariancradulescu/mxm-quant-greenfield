@@ -772,7 +772,10 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
             "current_open_mechanism_families":list(request["current_open_mechanism_families"]),
         },
     }
-    validate_proposal_universe_methodology(root,proposal)
+    try:
+        validate_proposal_universe_methodology(root,proposal)
+    except ValueError as exc:
+        raise AIProposalRejected(str(exc)) from exc
     validate_proposal(root,proposal)
     _validate_proposed_next_state_routeability(root, proposal)
     return proposal
