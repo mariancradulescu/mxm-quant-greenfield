@@ -1,0 +1,139 @@
+{
+  "schema": "mxm.greenfield.research-discovery-methodology-audit.v1",
+  "status": "MATERIAL_GAP_CONFIRMED",
+  "created_utc": "2026-09-28T05:10:00Z",
+  "evidence_epoch_seen": 36,
+  "objective": "Align structural research, discovery breadth, statistical power and promotion with realizable compounded EUR200 Pepperstone/cTrader equity growth while preserving free margin, recovery capacity and anti-ruin constraints.",
+  "live_universe": {
+    "authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "current_symbols": 5324,
+    "current_new_entry_accessible": 1689,
+    "both_direction_eur200_feasible": 1607,
+    "buy_only_eur200_feasible": 40,
+    "current_eligible_post_exclusion_frontier": 1576,
+    "structural_signatures": 41,
+    "structural_representatives": 41,
+    "note": "These are the persisted LIVE-authority counts at the reconciled research HEAD; broader architecture does not depend on the small count drift from prior external snapshots."
+  },
+  "findings": {
+    "structural_panel_conflation": {
+      "severity": "MATERIAL",
+      "finding": "The 41-symbol structural coverage panel repeatedly became the inferential discovery panel without authority that structural signature implies behavioral or economic equivalence.",
+      "evidence": [
+        "Registry selection is outcome-blind and appropriate for broker-topology coverage.",
+        "Registry explicitly states structural_representative_is_economic_equivalence=false.",
+        "Epoch35 and Epoch36 each processed all 41 exactly once while also declaring representatives_are_economic_equivalents=false.",
+        "Cross-sectional inference is especially sensitive because peer-universe definition is part of the estimand."
+      ]
+    },
+    "statistical_power": {
+      "severity": "MATERIAL",
+      "method": "Exact binomial power audit using each symbol's observed chronological-half eligible-date counts. Reported power requires both halves to independently reject a one-sided p=0.5 sign null. The Bonferroni column is a conservative multiplicity reference, not a claim that BH equals Bonferroni.",
+      "epoch35": {
+        "family": "BREAKOUT_VOLATILITY_EXPANSION",
+        "eligible_symbols_reported": 33,
+        "half_eligible_dates_median_across_82_halves": 32,
+        "half_eligible_dates_mean_across_82_halves": 25.146341463414632,
+        "paired_symbols_with_nonzero_halves": 38,
+        "average_both_half_power_alpha_0_05": {
+          "p_0_55": 0.008507967764541456,
+          "p_0_60": 0.04757709300956156,
+          "p_0_65": 0.1669391083556911,
+          "p_0_70": 0.38543458327961866
+        },
+        "average_both_half_power_bonferroni_0_05_over_41": {
+          "p_0_55": 0.000018718573901967913,
+          "p_0_60": 0.0003603318600429105,
+          "p_0_65": 0.004208021129695785,
+          "p_0_70": 0.030058214890096097
+        }
+      },
+      "epoch36": {
+        "family": "MEAN_REVERSION",
+        "eligible_symbols_reported": 30,
+        "half_eligible_dates_median_across_82_halves": 13,
+        "half_eligible_dates_mean_across_82_halves": 14.731707317073171,
+        "paired_symbols_with_nonzero_halves": 36,
+        "average_both_half_power_alpha_0_05": {
+          "p_0_55": 0.005077566551506256,
+          "p_0_60": 0.023762845724383346,
+          "p_0_65": 0.07885493331251842,
+          "p_0_70": 0.18930462216803753
+        },
+        "average_both_half_power_bonferroni_0_05_over_41": {
+          "p_0_55": 0.0000064218311998435545,
+          "p_0_60": 0.0000960516419949857,
+          "p_0_65": 0.0010202370046665523,
+          "p_0_70": 0.007318004923385357
+        }
+      },
+      "interpretation": [
+        "M5 bar count is not effective independent sample size for event-based sign tests; the independent unit used by Epoch35/36 is approximately an eligible UTC date within each chronological half.",
+        "Both-half requirements can be scientifically useful for stability, but used as an early discovery gate they create very high false-negative probability for moderate effects.",
+        "Multiplicity protection must remain, but exploratory discovery and confirmatory error control should not be conflated.",
+        "Pooled, hierarchical, clustered or portfolio-level estimands are appropriate when the economic object is a diversified portfolio effect and the design supports those estimands."
+      ]
+    },
+    "promotion_logic": {
+      "severity": "MATERIAL",
+      "epoch30": {
+        "family": "SEASONALITY_SESSION_TIME",
+        "representatives_tested": 41,
+        "supported_symbols_after_holm": 28,
+        "multiplicity": "HOLM_ACROSS_41_SYMBOL_P_VALUES",
+        "half_utc_dates_median_across_82_halves": 32,
+        "interpretation": "This is broad corrected structural evidence of repeatable session-time activity structure, not direct economic alpha.",
+        "defect": "No explicit rapid legal promotion path converted the broad family-level structural result into a fresh, prospectively defined confirmatory/economic research question. Per-symbol winners also cannot simply be cherry-picked after observation."
+      },
+      "required_fix": [
+        "Promote broad structural evidence at the mechanism/family level into a fresh prospective follow-on question, without selecting observed winning tickers as the new economic universe.",
+        "Define independent/protected confirmation and cost/margin gates before opening economics.",
+        "Measure opportunity density, turnover, capital utilization, concurrency and friction early enough to prioritize economically useful research."
+      ]
+    },
+    "objective_alignment": {
+      "finding": "Per-symbol corrected significance is evidence, not the competition objective.",
+      "research_value_terms": [
+        "edge_per_turnover",
+        "opportunity_density",
+        "breadth",
+        "capital_utilization",
+        "transaction_cost",
+        "margin_efficiency",
+        "concurrency",
+        "compounding",
+        "recovery_capacity"
+      ],
+      "prohibited_shortcut": "Do not replace statistical rigor with blind brute-force economic testing."
+    }
+  },
+  "answers_to_required_questions": {
+    "why_41_became_discovery_panel": "Shared 13-week data were complete for all 41 representatives and the fast-path machinery repeatedly reused that convenient, deterministic coverage surface. Convenience and topology coverage were allowed to become implicit inferential scope.",
+    "evidence_one_rep_behaviorally_represents_signature": "NONE_FOUND_IN_CURRENT_AUTHORITIES",
+    "family_specific_universes_required": true,
+    "thirteen_week_m5_sufficient_for_every_question": false,
+    "multiplicity_too_early_in_some_discovery_paths": true,
+    "both_half_gate_can_suppress_regime_dependent_edges": true,
+    "individual_symbol_tests_always_aligned_with_portfolio_objective": false,
+    "epoch30_promotion_logic_too_restrictive": true,
+    "economic_operational_metrics_measured_early_enough": false,
+    "system_overoptimized_for_individual_ticker_certainty": true
+  },
+  "invariants": {
+    "preserve_false_positive_control": true,
+    "preserve_existing_evidence_immutably": true,
+    "no_outcome_leakage": true,
+    "no_blind_full_universe_economic_testing": true,
+    "no_economic_outcome_from_this_audit": true,
+    "v2_attempts_delta": 0
+  },
+  "source_refs": [
+    "evidence/EPOCH30_SEASONALITY_SESSION_TIME_STRUCTURAL_RESULT_V1.json",
+    "evidence/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
+    "evidence/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
+    "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
+    "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json"
+  ]
+}
