@@ -45,6 +45,20 @@ GATE_REL=Path("research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json")
 PROPOSAL_DIR=Path("research_v3/ai_director/proposals")
 RAW_CANDIDATE_DIR=Path("research_v3/ai_director/raw_candidates")
 
+# Mutable provider/control-plane transport artifacts are not semantic research evidence.
+# Their content can change on retry/recovery while the research question is unchanged;
+# including their hashes in the request fingerprint creates false-new semantic requests.
+NON_SEMANTIC_REQUEST_FINGERPRINT_REFS=frozenset({
+    "research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",
+    "research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json",
+    "research_v3/ai_director/AI_REASONING_REQUEST.json",
+    "research_v3/ai_director/AI_REASONING_RESPONSE.json",
+    "research_v3/ai_director/PROVIDER_RECOVERY_STATE.json",
+    "research_v3/ai_director/PROVIDER_USAGE_V1.json",
+    "research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",
+    "research_v3/ai_director/EXTERNAL_GENERAL_AI_PROPOSAL_V1.json",
+})
+
 BASE_AUTHORITIES=(
     "research_v3/RESEARCH_CONTRACT_V3.json",
     "data/RESEARCH_SCOPE_GOVERNANCE_V1.json",
@@ -317,7 +331,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "protocol_version":PROTOCOL_VERSION,
         "evidence_epoch":core["evidence_epoch_seen"],
         "evidence_bundle_sha256":core["evidence_bundle_sha256"],
-        "authority_hashes":[row for row in core["authority_hashes"] if row["ref"]!="research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json"],
+        "authority_hashes":[row for row in core["authority_hashes"] if row["ref"] not in NON_SEMANTIC_REQUEST_FINGERPRINT_REFS],
         "blocked_scope_set":blocked_scopes,
         "decision_class":str(next_state.get("next_action") or ""),
         "pending_status":str(next_state.get("status") or ""),
