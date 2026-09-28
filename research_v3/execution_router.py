@@ -134,7 +134,12 @@ def implementation_required(root_value: str | Path, state: Mapping[str, Any]) ->
     # In particular, an accepted semantic proposal with implementation_ai_required=false
     # is NOT implementation authority.
     if "implementation_ai_required" in state:
-        return state.get("implementation_ai_required") is True
+        if state.get("implementation_ai_required") is not True:
+            return False
+        registry=load_json(Path(root_value)/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",{}) or {}
+        return any(row.get("proposal_id")==state.get("source_ai_proposal_id") and
+                   row.get("proposal_hash")==state.get("source_ai_proposal_hash")
+                   for row in registry.get("accepted",[]) if state.get("source_ai_proposal_id") and state.get("source_ai_proposal_hash"))
     # Backward compatibility only for historical states that predate explicit routing.
     if state.get("source_ai_proposal_id") and (
         state.get("source_ai_proposal_hash") or state.get("source_runtime_operation_id")

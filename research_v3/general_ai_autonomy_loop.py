@@ -16,6 +16,30 @@ VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
 PROVIDER_RECOVERY_REL=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
 PROVIDER_USAGE_REL=Path("research_v3/ai_director/PROVIDER_USAGE_V1.json")
 BLOCKED_SCOPES_REL=Path("research_v3/ai_director/BLOCKED_FRONTIER_SCOPES_V1.json")
+MAX_ELIGIBILITY_RETRIES=2
+
+def _recover_eligibility_rejection(root:Path,state:dict,rejection:dict,*,git_checkpoint:bool,git_push:bool)->dict:
+    """Retire rejected implementation intent and bind a finite new semantic request to feedback."""
+    epoch=current_evidence_epoch(root)
+    previous=dict(state.get("eligibility_retry") or {})
+    count=(int(previous.get("count") or 0) if previous.get("evidence_epoch")==epoch else 0)+1
+    retired={"request_id":rejection.get("request_id"),"proposal_id":rejection.get("proposal_id"),
+             "reason":rejection.get("reason"),"evidence_epoch":epoch,"count":count}
+    next_state=dict(state)
+    for key in ("source_ai_proposal_id","source_ai_proposal_hash","source_runtime_operation_id",
+                "implementation_scope","implementation_ai_scope","implementation_task_scope",
+                "fresh_director_decision_ref"):
+        next_state.pop(key,None)
+    next_state.update({"status":"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_ELIGIBILITY_REJECTION" if count<=MAX_ELIGIBILITY_RETRIES else "ELIGIBILITY_RETRY_BUDGET_EXHAUSTED",
+                       "next_action":"AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH" if count<=MAX_ELIGIBILITY_RETRIES else "WAIT_FOR_NEW_MATERIAL_EVIDENCE_OR_AUTHORITY",
+                       "ai_reasoning_required":count<=MAX_ELIGIBILITY_RETRIES,
+                       "research_judgment_required":count<=MAX_ELIGIBILITY_RETRIES,
+                       "implementation_ai_required":False,"implementation_satisfied":False,
+                       "eligibility_retry":retired,"current_research_evidence_epoch":epoch})
+    atomic_write_json(root/NEXT_STATE_REL,next_state)
+    refresh_derived_views(root)
+    GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("general_ai_eligibility_recovery",None)
+    return next_state
 try:
     MAX_RECOVERABLE_PROVIDER_FAILURES=max(2,min(5,int(os.environ.get("MXM_PROVIDER_MAX_RECOVERABLE_FAILURES","2"))))
 except ValueError:
@@ -313,6 +337,20 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
             state.update(stale); atomic_write_json(root/NEXT_STATE_REL,state)
             trace.append({"cycle":cycle,"kind":"STALE_REASONING_GUARD","status":"FRESH_GENERAL_AI_REASONING_REQUIRED",
                           "current_evidence_epoch":state.get("current_research_evidence_epoch")})
+        rejection=load_json(root/"research_v3/ai_director/PROPOSAL_ELIGIBILITY_REJECTION_V1.json",{}) or {}
+        registry=load_json(root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",{}) or {}
+        accepted=any(row.get("proposal_id")==state.get("source_ai_proposal_id") and
+                     row.get("proposal_hash")==state.get("source_ai_proposal_hash")
+                     for row in registry.get("accepted",[]) if state.get("source_ai_proposal_id"))
+        if (rejection.get("status")=="REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION"
+                and state.get("status")!="MATERIAL_INTEGRITY_FAILURE"
+                and rejection.get("evidence_epoch")==current_evidence_epoch(root)
+                and not state.get("eligibility_retry")
+                and (not accepted or str(state.get("next_action") or "").startswith("AI_"))
+                ):
+            state=_recover_eligibility_rejection(root,state,rejection,git_checkpoint=git_checkpoint,git_push=git_push)
+            trace.append({"cycle":cycle,"kind":"REJECTED_PROPOSAL_AUTHORITY_RETIRED"})
+            continue
         if state.get("status")=="MATERIAL_INTEGRITY_FAILURE" and state.get("integrity_gate"):
             return {"status":"MATERIAL_INTEGRITY_FAILURE","progress_class":"MATERIAL_FAILURE","cycles":cycle-1,"trace":trace,"next_state":state}
         if state.get("user_action_required") is True or state.get("external_data_required") is True or state.get("external_gate") not in (None,"",{},[]) or state.get("external_data_gate") not in (None,"",{},[]):
@@ -369,8 +407,12 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
                 return {"status":recovery["status"],"progress_class":"PROVIDER_UNAVAILABLE" if blocked else "SAFE_NO_PROGRESS","cycles":cycle,"trace":trace,"recovery":recovery,"next_state":state}
             if r.get("status")=="REJECTED_BEFORE_REGISTRY_AND_IMPLEMENTATION":
                 _record_invocation(root,state,"GENERAL_AI_REASONING","REJECTED_BY_ELIGIBILITY",False,False,git_checkpoint=git_checkpoint,git_push=git_push)
-                return {"status":"PROPOSAL_REJECTED_PRE_REGISTRY","progress_class":"MATERIAL_FAILURE",
-                        "cycles":cycle,"trace":trace,"rejection":r}
+                state=_recover_eligibility_rejection(root,state,r,git_checkpoint=git_checkpoint,git_push=git_push)
+                trace.append({"cycle":cycle,"kind":"PROPOSAL_REJECTED_PRE_REGISTRY","rejection":r})
+                if not reasoning_required(state):
+                    return {"status":"ELIGIBILITY_RETRY_BUDGET_EXHAUSTED","progress_class":"MISSING_RESEARCH_AUTHORITY",
+                            "cycles":cycle,"trace":trace,"next_state":state}
+                continue
             d=drain(root,git_checkpoint=git_checkpoint,git_push=git_push)
             if r.get("status")!="EXTERNAL_PROPOSAL_REUSED":
                 _record_invocation(root,state,"GENERAL_AI_REASONING","SUCCESS",False,d.get("status") not in {"NO_PENDING_PROPOSAL","PROPOSAL_ALREADY_DURABLE"},git_checkpoint=git_checkpoint,git_push=git_push)

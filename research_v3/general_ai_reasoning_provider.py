@@ -324,6 +324,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "universe_basis":core["universe_basis"],
         "open_families":core["current_open_mechanism_families"],
         "authorized_deterministic_operations_current_epoch":deterministic_catalog,
+        "eligibility_retry":next_state.get("eligibility_retry"),
     }
     request_id="reason_"+sha256_bytes(canonical_bytes(decision_fingerprint))[:32]
     return {
@@ -355,6 +356,7 @@ def build_reasoning_request(root_value:str|Path)->dict[str,Any]:
         "current_open_mechanism_families":core["current_open_mechanism_families"],
         "blocked_scope_set":blocked_scopes,
         "blocked_authority_request_id":blocker.get("request_id") if blocked_scopes else None,
+        "eligibility_retry":next_state.get("eligibility_retry"),
         "authorized_deterministic_operations_current_epoch":deterministic_catalog,
         "created_utc":iso(),
     }
@@ -448,6 +450,9 @@ Important boundaries:
 def _user_prompt(context:Mapping[str,Any], correction:str|None=None)->str:
     base=_system_prompt()+"\n\nAUTHORITATIVE REPOSITORY CONTEXT:\n"+json.dumps(context,sort_keys=True,separators=(",",":"),ensure_ascii=False)
     contract=(context.get("pending_decision") or {}).get("decision_contract") or {}
+    retry=context.get("eligibility_retry") or {}
+    if retry:
+        base+="\n\nPREVIOUS PROPOSAL REJECTED BEFORE REGISTRY. Generate a distinct proposal and correct the eligibility defect. Rejection feedback: "+json.dumps(retry,sort_keys=True)
     if contract:
         if contract.get("require_implementation_ai"):
             base+="\n\nIMPLEMENTATION ROUTING REQUIRED: Set next_research_state.implementation_ai_required=true, next_research_state.research_judgment_required=false, and decision.implementation_scope to concrete non-economic repository code, accepted inputs and tests. Preserve the selected mechanism family; never authorize economic execution or use development-selected winning pairs as independent confirmation."
