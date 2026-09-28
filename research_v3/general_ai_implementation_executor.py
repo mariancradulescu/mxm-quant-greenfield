@@ -245,6 +245,14 @@ def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,A
         # continuation instead of manufacturing a fresh semantic reasoning boundary.
         deterministic_authority=bool(ns.get("next_deterministic_operation_ref") or ns.get("deterministic_next_operation"))
         if deterministic_authority:
+            # Exact-head CI is a prerequisite, not part of the deterministic
+            # operation's durable semantic name. Once green, remove that
+            # transport prefix so the strict execution router sees the exact
+            # operation_name frozen in the authorized operation document.
+            action=str(ns.get("next_action") or "")
+            prefix="RUN_EXACT_HEAD_CI_THEN_"
+            if action.startswith(prefix):
+                ns["next_action"]=action[len(prefix):]
             ns["status"]="DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN"
             ns["ai_reasoning_required"]=False
             ns["research_judgment_required"]=False
