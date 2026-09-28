@@ -809,6 +809,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
             except ValueError as exc:
                 raise AIProposalRejected(str(exc)) from exc
             validate_proposal(root,candidate)
+            _validate_proposed_next_state_routeability(root,candidate)
             path.parent.mkdir(parents=True,exist_ok=True)
             atomic_write_json(path,candidate)
             sink.checkpoint("external_general_ai_reasoning_reused",None)
