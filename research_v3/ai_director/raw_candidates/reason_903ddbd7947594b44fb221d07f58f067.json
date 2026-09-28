@@ -1,0 +1,61 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json"
+    ],
+    "data_bindings": [
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "action": "IMPLEMENT_CROSS_SECTIONAL_BREADTH_CONDITIONED_TREND_STRUCTURAL_SCREEN",
+      "hypothesis": "Broad peer participation in a target symbol's prior 60-minute return direction is associated with greater target-symbol directional continuation over the next 60 minutes than narrow or opposing participation.",
+      "implementation_scope": "Add a prospectively frozen specification and deterministic non-economic screen for the defined leave-one-out breadth contrast using the accepted current representative data. Validate symbol coverage, timestamp alignment, and event counts before computing the frozen statistic. Do not open an economic outcome or request provider data.",
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "novelty_boundary": "A prospectively distinct cross-sectional participation hypothesis, not a rerun or retuning of prior per-symbol trend, ranking, or composite diagnostics. Do not use their observed outcomes to choose thresholds, scope, split, or statistic.",
+      "scope": {
+        "economic_authorization": false,
+        "inference": "One pooled, predeclared primary contrast; account for common anchor-time dependence and report both chronological-half results. Freeze event, censoring, and missing-data rules before evaluating outcomes.",
+        "primary_contrast": "Compare target continuation rates when at least 60% of eligible peers share the target's prior-return sign versus when at most 40% do; omit the intermediate band from the primary contrast.",
+        "sampling": "Non-overlapping 60-minute anchors; calculate breadth leave-one-out across the other representatives using only prior returns.",
+        "symbols": "All 41 current structural representatives with accepted 13-week M5 history; no post-result narrowing."
+      }
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "economic_outcome_authorized": false,
+      "implementation_ai_required": true,
+      "implementation_scope": "Create and validate a pre-outcome freeze and deterministic evaluator for the pooled breadth-conditioned continuation hypothesis on all 41 current structural representatives. Keep prior structural result outcomes out of design choices; produce only non-economic structural evidence.",
+      "next_action": "IMPLEMENT_CROSS_SECTIONAL_BREADTH_CONDITIONED_TREND_STRUCTURAL_SCREEN",
+      "research_judgment_required": false,
+      "status": "IMPLEMENTATION_REQUIRED"
+    },
+    "objective": {
+      "class": "NON_ECONOMIC_STRUCTURAL_HYPOTHESIS",
+      "goal": "Test whether broad cross-sectional participation in prior price moves is associated with subsequent directional continuation across the complete current set of 41 broker-native structural representatives.",
+      "information_gain_rationale": "This tests a predeclared participation mechanism, not another per-symbol trend-persistence screen: leave-one-out breadth measures whether peers share the target's prior 60-minute return direction, and a single pooled contrast tests continuation in the following 60 minutes. The full structurally heterogeneous representative set preserves breadth; accepted 13-week M5 data are already available."
+    },
+    "proposal_id": "epoch37_breadth_conditioned_trend"
+  },
+  "captured_utc": "2026-09-28T04:39:54Z",
+  "evidence_bundle_sha256": "aa59c025839d5673c20447623086035cbb1e167334a1355c4bf5bd3aa45c411f",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_903ddbd7947594b44fb221d07f58f067"
+}
