@@ -95,6 +95,23 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertTrue(ns["implementation_scope_complete"])
         self.assertEqual(ns["next_deterministic_operation_ref"],"research_v3/OP.json")
 
+    def test_post_green_removes_exact_head_transport_prefix_before_deterministic_routing(self):
+        out={
+            "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+            "next_research_state":{
+                "status":"IMPLEMENTATION_SATISFIED_PENDING_EXACT_HEAD_GREEN",
+                "next_action":"RUN_EXACT_HEAD_CI_THEN_RUN_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT",
+                "next_deterministic_operation_ref":"research_v3/EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_DETERMINISTIC_OPERATION_V1.json",
+            },
+        }
+        accepted=_post_green_output(out,["research_v3/mean_reversion_hypothesis_power_preflight.py"])
+        ns=accepted["next_research_state"]
+        self.assertEqual(ns["status"],"DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN")
+        self.assertEqual(ns["next_action"],"RUN_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT")
+        self.assertFalse(ns["ai_reasoning_required"])
+        self.assertFalse(ns["research_judgment_required"])
+        self.assertFalse(ns["implementation_ai_required"])
+
     def test_post_green_normalizes_implementation_changed_requires_exact_head_green(self):
         out={
             "status":"IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
