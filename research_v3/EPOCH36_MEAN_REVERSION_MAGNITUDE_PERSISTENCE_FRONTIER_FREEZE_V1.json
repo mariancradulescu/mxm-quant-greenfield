@@ -1,0 +1,87 @@
+{
+  "schema": "mxm.greenfield.epoch36-mean-reversion-magnitude-persistence-frontier-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_EPOCH36_MEAN_REVERSION_MAGNITUDE_SCREEN",
+  "evidence_epoch": 35,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_60c35177b58bab7c680cec8c9ef01bae.json",
+    "accepted_proposal_file_sha256": "52276c4b1c0103bdcf7d4bc6d000eca5e97b314ce8d2be1db9af80f16b671a85",
+    "current_frontier_ref": "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+    "current_frontier_sha256": "2e8cbe434a776d36ec494e7fbd642c36098400c38132cb57c734d6a60ab0f69b",
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
+    "coverage_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json",
+    "coverage_sha256": "5cfb0662b12f1f42f8f5c503df64f42716dab98ba5729ab7e6eef75bce2c5dec",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_zip_filename": "MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75"
+  },
+  "family": "MEAN_REVERSION",
+  "scope": {
+    "frontier": "ALL_41_CURRENT_STRUCTURAL_REPRESENTATIVES_EXACTLY_ONCE",
+    "representative_count": 41,
+    "representatives_are_not_economically_equivalent": true,
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "development_representative_count": 38,
+    "replacement_representative_ids": [7427, 5352, 2924],
+    "selection_law": "PROCESS_ALL_41_CURRENT_REGISTRY_REPRESENTATIVES_WITHOUT_OUTCOME_BASED_SUBSETTING"
+  },
+  "preregistered_structural_law": {
+    "event": "At the frozen anchor lattice, a completed M5 close is extreme when its z-score against the trailing 12 completed closes (including itself) is at least +2 or at most -2.",
+    "signal_window_bars": 12,
+    "signal_window_includes_event_bar": true,
+    "signal_center": "ARITHMETIC_MEAN_OF_THE_12_CLOSES_ENDING_AT_EVENT_BAR",
+    "signal_scale": "POPULATION_STANDARD_DEVIATION_OF_THE_SAME_12_CLOSES",
+    "extreme_z_threshold": 2.0,
+    "zero_scale_policy": "No event is emitted when the 12-close population standard deviation is zero.",
+    "anchor_lattice": "Within each exact-contiguous M5 segment, evaluate index 11 and then every 12 observed bars; restart at index 11 after each missing or off-cadence interval.",
+    "outcome": "At t+12 completed M5 bars, calculate the absolute distance of the close from the event-time rolling mean. The standardized absolute-distance contraction is (abs(close_t - center_t) - abs(close_t+12 - center_t)) / scale_t. Positive values indicate movement toward the frozen event-time mean, for upper and lower extremes alike.",
+    "causal_timing": "The event, center, and scale use only the 12 completed closes ending at t; the outcome uses only close at t+12 and the event-time center and scale.",
+    "independence": "Retain at most one eligible event per symbol per UTC date: the first extreme anchor with a complete exact-contiguous 12-bar forward window and nonzero event-time scale.",
+    "daily_statistic": "For each retained event/date, report its standardized absolute-distance contraction.",
+    "inference": {
+      "partition": "Sort eligible UTC event dates chronologically; first floor(N/2) dates are half 1 and remaining dates are half 2.",
+      "minimum_eligible_dates_per_half": 10,
+      "test": "ONE_SIDED_EXACT_BINOMIAL_SIGN_TEST_OF_POSITIVE_STANDARDIZED_ABSOLUTE_DISTANCE_CONTRACTION; omit exact-zero outcomes from the sign-test denominator.",
+      "raw_symbol_support": "Both halves meet minimum date sufficiency, both sample medians are strictly positive, and both one-sided exact sign-test p-values are at most 0.05.",
+      "symbol_family": "Fixed family of all 41 current structural representatives; insufficient symbols remain in the family with p-value 1.",
+      "multiplicity": "BENJAMINI_HOCHBERG_FALSE_DISCOVERY_RATE_ACROSS_41_SYMBOLS_USING_LARGER_HALF_P_VALUE_PER_SYMBOL",
+      "false_discovery_rate": 0.05
+    },
+    "missing_data": "No fill, interpolation, resampling, or synthetic bars. Any timestamp delta other than exactly 300 seconds invalidates a window that crosses it. Missing, invalid, non-contiguous, or zero-scale event windows are excluded, not repaired.",
+    "input_validation": "Require exact accepted archive hashes, M5 manifests, the frozen 41-symbol registry split (38 development and 3 replacements), matching series identities and member hashes, finite positive OHLC, valid OHLC bounds, UTC timestamps within the accepted interval, and no synthetic or forward fill.",
+    "prior_epoch_results_are_not_inputs": true,
+    "no_parameter_search": true,
+    "internal_development_data_is_not_independent_confirmation": true
+  },
+  "interpretation_boundary": {
+    "result_scope": "FROZEN_NON_ECONOMIC_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN_ONLY",
+    "independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "mechanism_family_closed": false,
+    "winner_selected": false,
+    "candidate_identity_created": false,
+    "protected_forward_opened": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "protected_forward_opened": false
+  },
+  "execution": {
+    "implementation": "research_v3/mean_reversion_magnitude_epoch36_screen.py",
+    "freeze_must_be_persisted_before_screen_execution": true,
+    "accepted_data_bytes_may_be_transport_materialized_without_new_data_acquisition": true
+  }
+}

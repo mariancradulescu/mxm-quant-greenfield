@@ -1,148 +1,68 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "2e2450e620999508a1686d65ef8e155e06b367e6",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "2e2450e620999508a1686d65ef8e155e06b367e6",
-    "predecessor_run_id": 36376400974
-  },
-  "accepted_output": {
-    "decision": {
-      "data_assessment": {
-        "accepted_representatives": 41,
-        "development_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-        "new_data_acquisition_required": false,
-        "replacement_capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-        "transport_materialization_required": true
-      },
-      "deterministic_operation_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
-      "freeze_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_FRONTIER_FREEZE_V1.json",
-      "implementation_ref": "research_v3/breakout_unsigned_volatility_epoch35_screen.py",
-      "method": {
-        "event": "At close of bar t, range is at least twice the median range of the preceding 20 completed M5 bars.",
-        "independence": "First qualifying event per symbol per UTC date with complete contiguous windows and positive realized variance.",
-        "inference": "Chronological date halves, at least 10 eligible dates per half, one-sided exact sign tests of positive median log variance ratios, then Benjamini-Hochberg FDR at 0.05 across all 41 symbols using the larger half p-value.",
-        "outcome": "Compare six-return forward realized variance with the six-return baseline ending at t; direction is ignored."
-      },
-      "result_ref": "evidence/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
-      "safety": {
-        "candidate_identity_created": false,
-        "economic_outcomes_opened": 0,
-        "live_orders_authorized": false,
-        "mechanism_family_closed": false,
-        "protected_forward_opened": false,
-        "v2_attempts_consumed": 0
-      },
-      "status": "IMPLEMENTED_PROSPECTIVE_NON_ECONOMIC_SCREEN",
-      "tests_executed": false
-    },
-    "external_data_gate": null,
-    "implementation_id": "MXM_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_IMPLEMENTATION_V1",
-    "next_research_state": {
-      "ai_reasoning_required": false,
-      "current_research_evidence_epoch": 34,
-      "deterministic_next_operation": {
-        "copilot_reasoning_required": false,
-        "economic_outcomes": 0,
-        "exact_head_green_required_before_execution": true,
-        "implementation_ai_required": false,
-        "new_semantic_judgment_required": false,
-        "operation_name": "RUN_FROZEN_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
-        "operation_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
-        "v2_attempts": 0
-      },
-      "economic_authorization": false,
-      "external_data_required": false,
-      "external_gate": null,
-      "implementation_ai_required": false,
-      "implementation_satisfied": true,
-      "implementation_scope_complete": true,
-      "later_step": "Run the frozen screen once on the already accepted hash-bound capture bytes, persist and validate the non-economic result, then interpret that result without treating development data as independent confirmation.",
-      "next_action": "RUN_FROZEN_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
-      "next_deterministic_operation_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
-      "research_judgment_required": false,
-      "status": "READY_FOR_FROZEN_SCREEN_EXECUTION",
-      "transport_materialization_required": true
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added the prospective Epoch35 freeze, causal unsigned-volatility evaluator, focused tests, and an authorized deterministic operation. The accepted captures already cover all 41 representatives and are hash-bound; their ZIP bytes are external to Git, so only transport materialization—not new data acquisition—remains. The screen and result were not run; exact-head green is required before the deterministic operation executes.",
-    "tests_requested": [
-      "python -m unittest tests.test_breakout_unsigned_volatility_epoch35_screen tests.test_epoch35_deterministic_operation"
-    ]
-  },
-  "basis_next_state_sha256": "828322fa8a1b9ec7b6198f58a8b74027f50b14029b71db07244f00917b02317d",
+  "basis_next_state_sha256": "b8594924ad4f0db7b3d9807bc7afeffc19d3fb862845a49d986f75be7e195137",
   "changed_paths": [
-    "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
-    "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_FRONTIER_FREEZE_V1.json",
-    "research_v3/breakout_unsigned_volatility_epoch35_screen.py",
+    "research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_DETERMINISTIC_OPERATION_V1.json",
+    "research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_FRONTIER_FREEZE_V1.json",
     "research_v3/deterministic_operation_executor.py",
-    "tests/test_breakout_unsigned_volatility_epoch35_screen.py",
-    "tests/test_epoch35_deterministic_operation.py"
+    "research_v3/mean_reversion_magnitude_epoch36_screen.py",
+    "tests/test_epoch36_deterministic_operation.py",
+    "tests/test_mean_reversion_magnitude_epoch36_screen.py"
   ],
-  "created_utc": "2026-09-28T04:07:51Z",
+  "created_utc": "2026-09-28T04:30:21Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "data_assessment": {
-        "accepted_representatives": 41,
-        "development_capture_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
-        "new_data_acquisition_required": false,
-        "replacement_capture_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
-        "transport_materialization_required": true
-      },
-      "deterministic_operation_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
-      "freeze_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_FRONTIER_FREEZE_V1.json",
-      "implementation_ref": "research_v3/breakout_unsigned_volatility_epoch35_screen.py",
-      "method": {
-        "event": "At close of bar t, range is at least twice the median range of the preceding 20 completed M5 bars.",
-        "independence": "First qualifying event per symbol per UTC date with complete contiguous windows and positive realized variance.",
-        "inference": "Chronological date halves, at least 10 eligible dates per half, one-sided exact sign tests of positive median log variance ratios, then Benjamini-Hochberg FDR at 0.05 across all 41 symbols using the larger half p-value.",
-        "outcome": "Compare six-return forward realized variance with the six-return baseline ending at t; direction is ignored."
-      },
-      "result_ref": "evidence/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
-      "safety": {
-        "candidate_identity_created": false,
+      "accounting_effect": {
         "economic_outcomes_opened": 0,
-        "live_orders_authorized": false,
-        "mechanism_family_closed": false,
-        "protected_forward_opened": false,
+        "search_budget_change": 0,
         "v2_attempts_consumed": 0
       },
-      "status": "IMPLEMENTED_PROSPECTIVE_NON_ECONOMIC_SCREEN",
-      "tests_executed": false
+      "family": "MEAN_REVERSION",
+      "freeze_ref": "research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_FRONTIER_FREEZE_V1.json",
+      "hypothesis": "At frozen 12-bar extreme-z anchors, test whether standardized contraction in absolute distance from the event-time mean over the next 12 M5 bars is positive, regardless of whether the extreme was above or below the mean.",
+      "inference": "One-sided exact sign tests split chronologically; require positive medians and p-values at most 0.05 in both sufficient halves; apply BH FDR q=0.05 across all 41.",
+      "interpretation_boundary": {
+        "candidate_identity_created": false,
+        "economic_promotion_authorized": false,
+        "independent_confirmation": false,
+        "mechanism_family_closed": false,
+        "protected_forward_opened": false
+      },
+      "result_generated": false,
+      "result_ref": "evidence/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
+      "scope": "All 41 current structural representatives, using the exact accepted M5 archives and no outcome-based subsetting.",
+      "screen_ref": "research_v3/mean_reversion_magnitude_epoch36_screen.py"
     },
     "external_data_gate": null,
-    "implementation_id": "MXM_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_IMPLEMENTATION_V1",
+    "implementation_id": "MXM_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_IMPLEMENTATION_V1",
     "next_research_state": {
       "ai_reasoning_required": false,
-      "current_research_evidence_epoch": 34,
       "deterministic_next_operation": {
         "copilot_reasoning_required": false,
-        "economic_outcomes": 0,
         "exact_head_green_required_before_execution": true,
         "implementation_ai_required": false,
         "new_semantic_judgment_required": false,
-        "operation_name": "RUN_FROZEN_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
-        "operation_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
-        "v2_attempts": 0
+        "operation_name": "RUN_FROZEN_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+        "operation_ref": "research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_DETERMINISTIC_OPERATION_V1.json",
+        "result_ref": "evidence/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_STRUCTURAL_RESULT_V1.json"
       },
-      "economic_authorization": false,
+      "external_data_gate": null,
       "external_data_required": false,
-      "external_gate": null,
       "implementation_ai_required": false,
-      "implementation_satisfied": true,
+      "implementation_satisfied": false,
       "implementation_scope_complete": true,
-      "later_step": "Run the frozen screen once on the already accepted hash-bound capture bytes, persist and validate the non-economic result, then interpret that result without treating development data as independent confirmation.",
-      "next_action": "RUN_FROZEN_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
-      "next_deterministic_operation_ref": "research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json",
+      "later_step": "After exact-head green and transport materialization of the exact accepted hash-bound archives, run and validate the frozen screen; then return to fresh reasoning. No new data acquisition is authorized or required.",
+      "next_action": "RUN_FROZEN_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+      "next_deterministic_operation_ref": "research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_DETERMINISTIC_OPERATION_V1.json",
       "research_judgment_required": false,
-      "status": "READY_FOR_FROZEN_SCREEN_EXECUTION",
-      "transport_materialization_required": true
+      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
     },
     "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "Added the prospective Epoch35 freeze, causal unsigned-volatility evaluator, focused tests, and an authorized deterministic operation. The accepted captures already cover all 41 representatives and are hash-bound; their ZIP bytes are external to Git, so only transport materialization—not new data acquisition—remains. The screen and result were not run; exact-head green is required before the deterministic operation executes.",
+    "summary": "Added the Epoch36 prospective freeze, fixed-law screen, and authorized deterministic operation for all 41 representatives using the already accepted 13-week M5 scope. The accepted capture ZIPs are hash-bound but absent from this checkout, so no structural result was generated; the operation treats their later availability as transport, not new data acquisition. Tests were added but not run because shell use is prohibited.",
     "tests_requested": [
-      "python -m unittest tests.test_breakout_unsigned_volatility_epoch35_screen tests.test_epoch35_deterministic_operation"
+      "tests/test_mean_reversion_magnitude_epoch36_screen.py",
+      "tests/test_epoch36_deterministic_operation.py"
     ]
   },
   "project_snapshot": {
@@ -160,7 +80,7 @@
     "model_selection": "AUTO_ACCOUNT_AVAILABLE",
     "provider": "github-copilot-cli"
   },
-  "request_fingerprint": "c314084afe47fefd1335acf2d002b4f11127c0bbd06d6a5035641904c583b67b",
+  "request_fingerprint": "a6cb3c3237e388306db271a3eb2c7130be0dc13cddfb4da3c73cebd793115f8f",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }

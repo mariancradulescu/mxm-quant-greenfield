@@ -396,6 +396,98 @@ def _run_epoch35_unsigned_volatility_screen(root:Path,state:dict[str,Any],op:dic
         atomic_write_json(result_path,result)
     return _execute_existing_structural_result(root,state,op)
 
+def _run_epoch36_mean_reversion_magnitude_screen(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    from research_v3.mean_reversion_magnitude_epoch36_screen import (
+        evaluate as evaluate_epoch36,
+        sha256_file as epoch36_sha256_file,
+    )
+    from research_v3.breakout_unsigned_volatility_epoch35_screen import (
+        DEVELOPMENT_SHA256,
+        REPLACEMENT_SHA256,
+    )
+
+    expected={
+        "implementation_ref":"research_v3/mean_reversion_magnitude_epoch36_screen.py",
+        "freeze_ref":"research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_FRONTIER_FREEZE_V1.json",
+        "registry_ref":"research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+        "development_zip_ref":"research_v3/runtime_v2_inputs/MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+        "replacement_zip_ref":"research_v3/runtime_v2_inputs/MXM_CURRENT_FRONTIER_REPLACEMENT_13W_M5_V1.zip",
+        "result_ref":"evidence/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_STRUCTURAL_RESULT_V1.json",
+        "operation_name":"RUN_FROZEN_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN_ON_ACCEPTED_HASH_BOUND_CAPTURE_BYTES",
+        "development_zip_sha256":DEVELOPMENT_SHA256,
+        "replacement_zip_sha256":REPLACEMENT_SHA256,
+    }
+    for field,value in expected.items():
+        if op.get(field)!=value:
+            raise DeterministicOperationRejected(f"Epoch36 operation authority mismatch: {field}")
+    if op.get("materializer")!="RUN_FROZEN_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN":
+        raise DeterministicOperationRejected("unsupported Epoch36 screen materializer")
+    if op.get("evidence_epoch")!=35 or (op.get("result_validation") or {}).get("evidence_epoch")!=36:
+        raise DeterministicOperationRejected("Epoch36 operation epoch binding mismatch")
+    expected_validation={
+        "schema":"mxm.greenfield.epoch36-mean-reversion-magnitude-persistence-structural-result.v1",
+        "status":"COMPLETE_NON_ECONOMIC_STRUCTURAL_RESULT",
+        "family":"MEAN_REVERSION",
+        "evidence_epoch":36,
+    }
+    if op.get("operation_name")!=expected["operation_name"] or op.get("result_validation")!=expected_validation:
+        raise DeterministicOperationRejected("Epoch36 operation result authority mismatch")
+    policy=op.get("execution_policy") or {}
+    if any(policy.get(field) is not False for field in (
+        "implementation_ai_required","copilot_reasoning_required","new_semantic_judgment_required",
+    )):
+        raise DeterministicOperationRejected("Epoch36 operation is not explicitly deterministic and non-semantic")
+    if policy.get("exact_head_green_required_before_execution") is not True:
+        raise DeterministicOperationRejected("Epoch36 operation is missing its exact-head green prerequisite")
+    if not exact_head_green(root)["green"]:
+        raise DeterministicOperationRejected("Epoch36 screen execution is blocked until exact-head CI is green")
+
+    freeze_path=root/expected["freeze_ref"]
+    development_path=root/expected["development_zip_ref"]
+    replacement_path=root/expected["replacement_zip_ref"]
+    result_path=root/expected["result_ref"]
+    if not freeze_path.is_file():
+        raise DeterministicOperationRejected("Epoch36 prospective freeze is missing")
+    if result_path.is_file():
+        existing=load_json(result_path,{}) or {}
+        attestation=existing.get("input_attestation") or {}
+        if (existing.get("freeze_sha256")!=epoch36_sha256_file(freeze_path)
+                or attestation.get("development_zip_sha256")!=DEVELOPMENT_SHA256
+                or attestation.get("replacement_zip_sha256")!=REPLACEMENT_SHA256
+                or attestation.get("protected_forward_rows_read")!=0
+                or attestation.get("prior_epoch_screen_results_used_as_inputs") is not False
+                or attestation.get("new_market_data_acquired") is not False
+                or existing.get("scope",{}).get("all_41_processed_exactly_once") is not True
+                or len(existing.get("symbols") or {})!=41):
+            raise DeterministicOperationRejected("Epoch36 precomputed result binding mismatch")
+        if not development_path.is_file() or not replacement_path.is_file():
+            raise DeterministicOperationRejected(
+                "accepted hash-bound capture bytes are required to verify the existing result; no new market-data acquisition is required"
+            )
+        recomputed=evaluate_epoch36(
+            json.loads(freeze_path.read_text(encoding="utf-8")),
+            development_path,
+            replacement_path,
+            root,
+        )
+        recomputed["freeze_sha256"]=epoch36_sha256_file(freeze_path)
+        if recomputed!=existing:
+            raise DeterministicOperationRejected("Epoch36 materialized result differs from recomputation")
+    else:
+        if not development_path.is_file() or not replacement_path.is_file():
+            raise DeterministicOperationRejected(
+                "exact accepted hash-bound capture bytes are not transport-materialized; no new market-data acquisition is required"
+            )
+        result=evaluate_epoch36(
+            json.loads(freeze_path.read_text(encoding="utf-8")),
+            development_path,
+            replacement_path,
+            root,
+        )
+        result["freeze_sha256"]=epoch36_sha256_file(freeze_path)
+        atomic_write_json(result_path,result)
+    return _execute_existing_structural_result(root,state,op)
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -417,6 +509,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_run_epoch34_composite_screen(root,state,op)
     elif op.get("materializer")=="RUN_FROZEN_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_SCREEN":
         new_state=_run_epoch35_unsigned_volatility_screen(root,state,op)
+    elif op.get("materializer")=="RUN_FROZEN_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN":
+        new_state=_run_epoch36_mean_reversion_magnitude_screen(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
