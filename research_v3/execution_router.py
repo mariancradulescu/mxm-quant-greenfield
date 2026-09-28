@@ -4,7 +4,7 @@ A non-empty next_action is never, by itself, authority to call an AI provider.
 Routing is based on explicit durable authority and fail-closed gates.
 """
 from __future__ import annotations
-import json
+import hashlib, json
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -53,6 +53,126 @@ def deterministic_operation_ref(state: Mapping[str, Any]) -> str | None:
     ref = embedded.get("operation_ref") if isinstance(embedded, Mapping) else None
     return str(ref).strip() if isinstance(ref, str) and ref.strip() else None
 
+def _git_blob_sha1(path: Path) -> str:
+    data=path.read_bytes()
+    header=f"blob {len(data)}\0".encode("ascii")
+    return hashlib.sha1(header+data).hexdigest()
+
+
+def _validate_extended_operation_contract(root: Path, state: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
+    contract=doc.get("operation_contract")
+    if contract in (None, {}):
+        return
+    if not isinstance(contract, Mapping):
+        raise RoutingError("deterministic operation_contract must be an object")
+    kind=str(contract.get("kind") or "")
+    if kind!="HASH_BOUND_PYTHON_JSON_TRANSFORM_V1":
+        raise RoutingError(f"unsupported deterministic operation contract kind: {kind or '<missing>'}")
+
+    authorization=doc.get("authorization") or {}
+    proposal_ref=str(authorization.get("accepted_proposal_ref") or "").strip()
+    proposal_id=str(authorization.get("proposal_id") or "").strip()
+    proposal_hash=str(authorization.get("proposal_hash") or "").strip()
+    proposal_file_sha=str(authorization.get("accepted_proposal_file_sha256") or "").strip()
+    registry_ref=str(authorization.get("proposal_registry_ref") or "").strip()
+    if not all((proposal_ref,proposal_id,proposal_hash,proposal_file_sha,registry_ref)):
+        raise RoutingError("extended deterministic operation missing proposal authorization binding")
+    proposal_path=root/proposal_ref
+    registry_path=root/registry_ref
+    if not proposal_path.is_file() or not registry_path.is_file():
+        raise RoutingError("extended deterministic proposal authority missing")
+    if sha256_file(proposal_path)!=proposal_file_sha:
+        raise RoutingError("extended deterministic proposal file hash mismatch")
+    proposal=json.loads(proposal_path.read_text(encoding="utf-8"))
+    if proposal.get("proposal_id")!=proposal_id or sha256_bytes(canonical_bytes(proposal))!=proposal_hash:
+        raise RoutingError("extended deterministic proposal identity/hash mismatch")
+    if state.get("source_ai_proposal_id")!=proposal_id or state.get("source_ai_proposal_hash")!=proposal_hash:
+        raise RoutingError("extended deterministic operation does not match canonical proposal binding")
+    registry=json.loads(registry_path.read_text(encoding="utf-8"))
+    if not any(
+        row.get("proposal_id")==proposal_id
+        and row.get("proposal_hash")==proposal_hash
+        and row.get("proposal_ref")==proposal_ref
+        and row.get("economic_outcome_opened") is False
+        and int(row.get("v2_attempt_consumed") or 0)==0
+        for row in registry.get("accepted",[])
+    ):
+        raise RoutingError("extended deterministic proposal is not accepted in registry")
+    if authorization.get("semantic_judgment_required") is not False or authorization.get("economic_authorization") is not False:
+        raise RoutingError("extended deterministic authorization crosses semantic/economic boundary")
+
+    safety=doc.get("safety") or {}
+    if any(bool(safety.get(k)) for k in ("protected_forward_opened","live_orders_authorized","competition_start_authorized")):
+        raise RoutingError("deterministic operation crosses protected/live safety boundary")
+
+    bindings=doc.get("input_bindings")
+    if not isinstance(bindings,list) or not bindings:
+        raise RoutingError("extended deterministic operation requires hash-bound input_bindings")
+    seen=set()
+    for row in bindings:
+        if not isinstance(row,Mapping):
+            raise RoutingError("invalid deterministic input binding")
+        rel=str(row.get("ref") or "").strip(); expected=str(row.get("sha256") or "").strip()
+        if not rel or len(expected)!=64 or rel in seen:
+            raise RoutingError("invalid or duplicate deterministic input binding")
+        seen.add(rel); path=root/rel
+        if not path.is_file():
+            raise RoutingError(f"deterministic input authority missing: {rel}")
+        if sha256_file(path)!=expected:
+            raise RoutingError(f"deterministic input authority hash mismatch: {rel}")
+
+    source=doc.get("source_authority") or {}
+    feasibility_ref=str(source.get("current_feasibility_ref") or "").strip()
+    feasibility_path=root/feasibility_ref
+    if not feasibility_ref or not feasibility_path.is_file():
+        raise RoutingError("current feasibility authority missing")
+    feasibility=json.loads(feasibility_path.read_text(encoding="utf-8"))
+    if feasibility.get("source_canonical_payload_sha256")!=source.get("accepted_canonical_payload_sha256"):
+        raise RoutingError("accepted canonical broker payload hash mismatch")
+    if feasibility.get("exact_current_eligible_identity_set_sha256")!=source.get("eligible_identity_set_sha256"):
+        raise RoutingError("eligible identity-set authority hash mismatch")
+    if int((feasibility.get("current_counts") or {}).get("current_eligible_post_exclusion_frontier") or 0)!=int(source.get("source_identity_count") or 0):
+        raise RoutingError("eligible identity count authority mismatch")
+
+    implementation_ref=str(contract.get("implementation_ref") or "").strip()
+    implementation_path=root/implementation_ref
+    if not implementation_ref or not implementation_path.is_file():
+        raise RoutingError("deterministic transform implementation missing")
+    expected_blob=str(contract.get("implementation_git_blob_sha1") or "").strip()
+    if len(expected_blob)!=40 or _git_blob_sha1(implementation_path)!=expected_blob:
+        raise RoutingError("deterministic transform implementation blob mismatch")
+    if not str(contract.get("callable") or "").strip():
+        raise RoutingError("deterministic transform callable missing")
+
+    transport=contract.get("input_transport") or {}
+    if transport.get("encoding")!="CONCAT_BASE64_GZIP_JSON":
+        raise RoutingError("unsupported deterministic input transport encoding")
+    refs=transport.get("fragment_refs"); hashes=transport.get("fragment_sha256")
+    if not isinstance(refs,list) or not refs or not isinstance(hashes,list) or len(refs)!=len(hashes) or len(set(refs))!=len(refs):
+        raise RoutingError("invalid deterministic input fragment contract")
+    pieces=[]
+    for rel,expected in zip(refs,hashes):
+        if not isinstance(rel,str) or not isinstance(expected,str) or len(expected)!=64:
+            raise RoutingError("invalid deterministic input fragment binding")
+        path=root/rel
+        if not path.is_file():
+            raise RoutingError(f"deterministic input fragment missing: {rel}")
+        if sha256_file(path)!=expected:
+            raise RoutingError(f"deterministic input fragment hash mismatch: {rel}")
+        pieces.append(path.read_text(encoding="ascii"))
+    concat="".join(pieces).encode("ascii")
+    if hashlib.sha256(concat).hexdigest()!=transport.get("concatenated_base64_sha256"):
+        raise RoutingError("deterministic concatenated input transport hash mismatch")
+    decoded_sha=str(transport.get("decoded_json_sha256") or "")
+    if len(decoded_sha)!=64:
+        raise RoutingError("deterministic decoded JSON hash binding missing")
+
+    output=contract.get("output") or {}
+    out_ref=str(output.get("ref") or "")
+    if not out_ref.startswith("evidence/") or not output.get("expected_schema") or not output.get("expected_status"):
+        raise RoutingError("deterministic output contract is invalid")
+
+
 def load_authorized_deterministic_operation(root_value: str | Path, state: Mapping[str, Any]) -> dict[str, Any] | None:
     root = _root(root_value)
     ref = deterministic_operation_ref(state)
@@ -100,8 +220,11 @@ def load_authorized_deterministic_operation(root_value: str | Path, state: Mappi
     if policy.get("new_semantic_judgment_required") is True or policy.get("copilot_reasoning_required") is True:
         raise RoutingError("deterministic operation incorrectly requests semantic reasoning")
     effect = doc.get("accounting_effect") or {}
-    if int(effect.get("v2_attempts") or 0) != 0 or int(effect.get("economic_outcomes") or 0) != 0:
-        raise RoutingError("deterministic non-economic operation declares economic accounting effect")
+    if (int(effect.get("v2_attempts") or 0) != 0
+            or int(effect.get("economic_outcomes") or 0) != 0
+            or int(effect.get("copilot_reasoning_calls") or 0) != 0):
+        raise RoutingError("deterministic non-economic operation declares economic/provider accounting effect")
+    _validate_extended_operation_contract(root,state,doc)
     return doc
 
 def deterministic_operation_required(root_value: str | Path, state: Mapping[str, Any]) -> bool:
