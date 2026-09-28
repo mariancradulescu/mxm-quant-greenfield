@@ -1,4 +1,44 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "28e2bb7ac20875c82bd980a0b3bffda9a882c789",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "28e2bb7ac20875c82bd980a0b3bffda9a882c789",
+    "predecessor_run_id": 36418553941
+  },
+  "accepted_output": {
+    "decision": {
+      "accepted_proposal_file_sha256": "20db9e7dcc5e3ff2ac4746f7fa81c82ded1598a2ab2bca078c266a037359a62e",
+      "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_88b3d8ac3e0ad746ff188958465fbd36.json",
+      "audit_scope": "Accepted 41-representative M5 development panel; report observed alignment, missingness, lagged regime-context coverage, schedule-overlap proxy, date and context-spell clusters, dependence-aware effective sample sizes, and descriptive detectable-effect sensitivity. No strategy outcomes or returns.",
+      "data_dependency": "Both exact-scope captures are already accepted and hash-bound; external-to-Git byte materialization only. No new data acquisition or collector gate.",
+      "deterministic_operation_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
+      "freeze_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_FREEZE_V1.json",
+      "implementation_ref": "research_v3/regime_context_data_sufficiency_audit.py",
+      "safety": {
+        "economic_outcomes_opened": 0,
+        "independent_confirmation_claimed": false,
+        "live_orders_authorized": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
+      }
+    },
+    "external_data_gate": null,
+    "implementation_id": "regime-context-data-sufficiency-audit-v1",
+    "next_research_state": {
+      "exact_head_green_required_before_execution": true,
+      "implementation_scope_complete": true,
+      "later_step": "Interpret the audit without treating internal development data as independent confirmation.",
+      "next_action": "RUN_REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT",
+      "next_deterministic_operation_ref": "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
+      "status": "AUTHORIZED_DETERMINISTIC_OPERATION_PENDING_EXACT_HEAD_GREEN"
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Implemented and prospectively froze the outcome-blind audit over the accepted 41-symbol M5 development scope, with a bound deterministic operation. The accepted capture bytes are external to Git but already hash-bound: materializing them is transport, not new data acquisition. Exact-head CI and operation execution remain pending; no economic or protected evidence was opened.",
+    "tests_requested": [
+      "python -m unittest discover -s tests -p 'test_regime_context_data_sufficiency_audit.py'"
+    ]
+  },
   "basis_next_state_sha256": "07585c3fb1aeb0344959442a3946d21751f0fd415be9e9cd8c93a5f9cd4b442a",
   "changed_paths": [
     "research_v3/REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT_DETERMINISTIC_OPERATION_V1.json",
@@ -58,5 +98,5 @@
   },
   "request_fingerprint": "4e1b45e94b66b9335d752886c89b36a4dcab2d9fdaf8a616be2007c7e5c54352",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
