@@ -147,7 +147,7 @@ class CrossSectionalPeerCohortIndexTests(unittest.TestCase):
             _row("A.US", 1),
             _row("B.US", 2),
             _row("C.US", 3, product_type="ETF_CFD"),
-            _row("D.US", 4, session_regions="EUROPE"),
+            _row("D.US", 4, session_regions="EUROPE", schedule_time_zone="Europe/London"),
         ]
         result = build_index(_bundle(rows), expected_count=4)
         self.assertEqual(result["source_universe"]["indexed_identity_count"], 4)
