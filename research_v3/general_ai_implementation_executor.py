@@ -288,6 +288,7 @@ or rerun C031 Stage-B. Do not use network or shell tools. Do not ask the human t
 Authoritative prospective freezes override an older proposal when they impose a stricter causal/data prerequisite.
 Never execute on source/development bytes if a bound freeze requires unopened disjoint outer data.
 If repository files already implement the selected action or exact collector, do not rewrite them. Validate by inspection.
+For negative/fail-closed tests, isolate the invariant being tested. Do not overfit to one exact error-message ordering when another fail-closed invariant may validly trigger first; either construct the fixture so only the intended invariant is violated, or assert the exception/invariant semantically rather than an incidental message string.
 If a green implementation creates a prospectively frozen non-economic screen that requires no new semantic judgment,
 also create/bind an explicit authorized deterministic operation and return next_deterministic_operation_ref (or
 deterministic_next_operation) in next_research_state. Do not route to fresh reasoning merely because exact-head CI
