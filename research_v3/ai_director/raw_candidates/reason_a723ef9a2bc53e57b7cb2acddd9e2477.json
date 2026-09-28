@@ -1,0 +1,74 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/RESEARCH_CONTRACT_V3.json",
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json",
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_STRUCTURAL_COVERAGE_EPOCH23_V1.json",
+      "evidence/EPOCH27_BREAKOUT_STABILITY_BREADTH_RESULT_V1.json",
+      "evidence/BROKER_NATIVE_FRONTIER_40_BREAKOUT_30M_DIRECTIONAL_PERSISTENCE_V1.json",
+      "evidence/EPOCH34_COMPOSITE_CAUSAL_ML_REGIME_STRUCTURAL_RESULT_V1.json"
+    ],
+    "data_bindings": [
+      "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+      "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+      "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
+    ],
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "frozen_method": {
+        "account_effect": "Non-economic proposal and structural screen only; no economic outcome is authorized.",
+        "event_rule": "At close of bar t, high-low range >= 2 * median(high-low) over bars t-20 through t-1.",
+        "independence": "Use at most one event per symbol per UTC date, the first qualifying event with complete baseline and forward windows; exclude conflicting, missing, or non-contiguous windows.",
+        "inference": "Split eligible UTC dates chronologically into two halves; require at least 10 eligible dates in each half, test the paired daily log variance ratios for positive median separately in both halves, and apply Benjamini-Hochberg FDR at 0.05 across the fixed 41-symbol family using the larger half p-value per symbol. Fail closed on insufficient data.",
+        "input": "Already accepted 13-week M5 captures only; use strictly prior completed bars to identify events.",
+        "outcome": "Compare realized variance from the next six completed M5 returns with realized variance from the six completed returns immediately before bar t; direction is ignored.",
+        "prohibitions": [
+          "Do not use prior structural outcomes to alter thresholds, horizons, splits, or the panel.",
+          "Do not rerun or relabel prior directional breakout diagnostics.",
+          "Do not select a winning subgroup or claim economic equivalence, economic promotion, or family closure."
+        ]
+      },
+      "hypothesis": "A completed M5 bar whose high-low range is at least twice the median range of the preceding 20 completed bars is followed by higher unsigned 30-minute realized volatility than the six-bar pre-event baseline.",
+      "implementation_scope": "Implement a new deterministic non-economic evaluator and focused tests for causal event construction, UTC-date event deduplication, chronological splitting, missing/non-contiguous windows, multiplicity, and fail-closed data sufficiency. Bind inputs to the accepted 13-week M5 captures and process the full current representative panel exactly once. Make no broker/provider calls and do not open an economic experiment.",
+      "mechanism_family": "BREAKOUT_VOLATILITY_EXPANSION",
+      "scope": {
+        "breadth_reason": "Use the full current structural-representative panel to preserve non-economic structural heterogeneity and avoid outcome-driven subgroup selection. Representatives are not economic equivalents.",
+        "representative_count": 41,
+        "representatives_ref": "research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json"
+      },
+      "status": "SELECTED_FOR_PROSPECTIVE_NON_ECONOMIC_IMPLEMENTATION"
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "economic_authorization": false,
+      "implementation_ai_required": true,
+      "implementation_scope": "Create the new frozen evaluator, tests, and hash-bound non-economic result described in decision.frozen_method. Existing directional breakout evaluators are not substitutes for this unsigned-volatility estimand.",
+      "next_action": "IMPLEMENT_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_PERSISTENCE_SCREEN",
+      "research_judgment_required": false,
+      "status": "IMPLEMENTATION_REQUIRED"
+    },
+    "objective": {
+      "class": "NON_ECONOMIC_STRUCTURAL_HYPOTHESIS_TEST",
+      "goal": "Test whether unusually large M5 range shocks predict elevated subsequent unsigned realized volatility.",
+      "information_gain_rationale": "This addresses volatility clustering rather than signed directional follow-through or persistence. It is a distinct, prospectively specified question on the current 41 structural representatives; it does not retune the prior breakout diagnostics or use their outcomes to choose parameters."
+    },
+    "proposal_id": "epoch35-breakout-volatility-clustering"
+  },
+  "captured_utc": "2026-09-28T04:03:22Z",
+  "evidence_bundle_sha256": "3085b3943c22809652cc028136a8bf16876f51cd676556292c259bd37fc825d8",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_a723ef9a2bc53e57b7cb2acddd9e2477"
+}
