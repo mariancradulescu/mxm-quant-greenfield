@@ -3,6 +3,8 @@ name: Runtime V2 Liveness Watchdog
 # Recovery-only tool. Normal research continuation never depends on this workflow.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
 
 permissions:
   actions: write
