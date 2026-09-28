@@ -720,6 +720,58 @@ def _run_epoch41_regime_context_cohort_preflight(root:Path,state:dict[str,Any],o
         atomic_write_json(result_path,result)
     return _execute_existing_structural_result(root,state,op)
 
+def _run_epoch42_mean_reversion_cohort_preflight(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    expected={
+        "operation_name":"RUN_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT",
+        "implementation_ref":"research_v3/mean_reversion_hypothesis_power_preflight.py",
+        "freeze_ref":"research_v3/EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_FREEZE_V1.json",
+        "accepted_proposal_ref":"research_v3/ai_director/proposals/AUTO_reason_e32a4b75e24fa8b92aaa3effdce7d093.json",
+        "result_ref":"evidence/EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_V1.json",
+        "accepted_proposal_file_sha256":"c590959baabd63a15a93b9c675cc08c3e727e31a0ab9634dfe06a08e80d56875",
+        "accepted_proposal_hash":"7792544546520fe7db374a8654036c452f70b009aa50491c1245edd760eaf3ad",
+    }
+    if op.get("materializer")!="RUN_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT":
+        raise DeterministicOperationRejected("unsupported Epoch42 mean-reversion preflight materializer")
+    for field,value in expected.items():
+        if op.get(field)!=value:
+            raise DeterministicOperationRejected(f"Epoch42 operation authority mismatch: {field}")
+    expected_validation={
+        "schema":"mxm.greenfield.epoch42-mean-reversion-cohort-power-preflight.v1",
+        "status":"COMPLETE_NON_ECONOMIC_HYPOTHESIS_AND_POWER_PREFLIGHT",
+        "family":"MEAN_REVERSION",
+        "evidence_epoch":42,
+    }
+    if op.get("evidence_epoch")!=42 or op.get("result_validation")!=expected_validation:
+        raise DeterministicOperationRejected("Epoch42 result authority mismatch")
+    policy=op.get("execution_policy") or {}
+    if any(policy.get(field) is not False for field in (
+        "implementation_ai_required","copilot_reasoning_required","new_semantic_judgment_required",
+        "new_market_data_required",
+    )) or policy.get("exact_head_green_required_before_execution") is not True:
+        raise DeterministicOperationRejected("Epoch42 operation is not explicitly deterministic and non-economic")
+    from research_v3.mean_reversion_hypothesis_power_preflight import build_preflight
+    result=build_preflight(root)
+    if (
+        result.get("freeze_sha256")!=sha256_file(root/expected["freeze_ref"])
+        or result.get("sampling_frame",{}).get("structural_41_used_as_inferential_universe") is not False
+        or result.get("sampling_frame",{}).get("selected_inferential_cohort") is not None
+        or result.get("power_preflight",{}).get("response_statistics_computed") is not False
+        or result.get("novelty_audit",{}).get("prior_results_read") is not False
+        or any(int((result.get("accounting_effect") or {}).get(key) or 0)!=0 for key in (
+            "economic_outcomes_opened","v2_attempts_consumed","search_budget_change",
+        ))
+        or result.get("safety",{}).get("protected_forward_opened") is not False
+        or result.get("safety",{}).get("live_orders_authorized") is not False
+    ):
+        raise DeterministicOperationRejected("Epoch42 preflight result crossed its frozen boundary")
+    result_path=root/expected["result_ref"]
+    if result_path.is_file():
+        if load_json(result_path,{})!=result:
+            raise DeterministicOperationRejected("existing Epoch42 preflight differs from recomputation")
+    else:
+        atomic_write_json(result_path,result)
+    return _execute_existing_structural_result(root,state,op)
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -816,6 +868,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_execute_existing_structural_result(root,state,op)
     elif op.get("materializer")=="RUN_EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT":
         new_state=_run_epoch41_regime_context_cohort_preflight(root,state,op)
+    elif op.get("materializer")=="RUN_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT":
+        new_state=_run_epoch42_mean_reversion_cohort_preflight(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
