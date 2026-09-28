@@ -165,6 +165,11 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
         self.assertEqual(DEFAULT_MODEL,"auto")
         self.assertEqual(IMPLEMENTATION_MODEL,"auto")
 
+    def test_implementation_prompt_requires_isolated_fail_closed_negative_tests(self):
+        source=(ROOT/"research_v3/general_ai_implementation_executor.py").read_text()
+        self.assertIn("For negative/fail-closed tests, isolate the invariant being tested.",source)
+        self.assertIn("Do not overfit to one exact error-message ordering",source)
+
     def test_large_implementation_authority_is_bounded_and_retrievable(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); rel="data/large.json"; (root/"data").mkdir()
