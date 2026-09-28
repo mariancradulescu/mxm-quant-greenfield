@@ -1,6 +1,6 @@
 """Zero-provider executor for explicitly authorized deterministic research operations."""
 from __future__ import annotations
-import argparse, base64, gzip, hashlib, importlib.util, json, os, subprocess
+import argparse, base64, binascii, gzip, hashlib, importlib.util, json, lzma, os, subprocess
 from pathlib import Path
 from typing import Any
 
@@ -189,6 +189,49 @@ def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
     return result_ref
 
 
+def verify_trend_surface(root:Path)->dict[str,Any]:
+    """Reconstruct every frozen cell before accepting a TREND completion claim."""
+    manifest=load_json(root/"evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_SURFACE_MANIFEST_V1.json",{}) or {}
+    surface=manifest.get("surface") or {}
+    ref=surface.get("transport_ref")
+    if not isinstance(ref,str) or not ref.startswith("research_v3/runtime_v2_inputs/"):
+        raise DeterministicOperationRejected("TREND transport authority missing")
+    encoded=(root/ref).read_bytes()
+    if hashlib.sha256(encoded).hexdigest()!=surface.get("transport_sha256"):
+        raise DeterministicOperationRejected("TREND transport hash mismatch")
+    try:
+        compressed=base64.b64decode(encoded,validate=True)
+        if not compressed.startswith(b"\xfd7zXZ\x00"):
+            raise ValueError("XZ magic missing")
+        decoded=lzma.decompress(compressed)
+        compact=json.loads(decoded)
+    except (ValueError, binascii.Error, lzma.LZMAError, json.JSONDecodeError) as exc:
+        raise DeterministicOperationRejected("TREND full surface cannot be reconstructed") from exc
+    if hashlib.sha256(decoded).hexdigest()!=surface.get("decoded_compact_json_sha256"):
+        raise DeterministicOperationRejected("TREND decoded surface hash mismatch")
+    columns=compact.get("columns")
+    rows=compact.get("rows")
+    if columns!=surface.get("columns") or not isinstance(rows,list) or len(rows)!=560:
+        raise DeterministicOperationRejected("TREND full grid shape mismatch")
+    coordinate=set()
+    counts={symbol:0 for symbol in surface.get("symbols",[])}
+    for row in rows:
+        if not isinstance(row,list) or len(row)!=len(columns):
+            raise DeterministicOperationRejected("TREND surface row shape mismatch")
+        point=(row[0],row[2],row[3],row[4])
+        if row[0] not in counts or point in coordinate:
+            raise DeterministicOperationRejected("TREND duplicate or unfrozen symbol cell")
+        counts[row[0]]+=1
+        coordinate.add(point)
+    if len(counts)!=7 or any(count!=80 for count in counts.values()):
+        raise DeterministicOperationRejected("TREND symbol grid incomplete")
+    expected={(symbol,lookback,threshold,hold) for symbol in counts
+              for lookback in (12,24,48,96,192) for threshold in (0.5,1.0,1.5,2.0)
+              for hold in ("15m","1h","4h","1d")}
+    if coordinate!=expected:
+        raise DeterministicOperationRejected("TREND frozen parameter coordinates mismatch")
+    return {"rows":len(rows),"symbols":counts}
+
 def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
     """Accept an already-materialized, explicitly bound non-economic structural result.
 
@@ -199,6 +242,8 @@ def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[st
     if not result_ref or not (root/result_ref).is_file():
         raise DeterministicOperationRejected("structural result authority missing")
     result=dict(load_json(root/result_ref,{}) or {})
+    if result_ref=="evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json":
+        verify_trend_surface(root)
     expected=dict(op.get("result_validation") or {})
     if expected.get("schema") and result.get("schema")!=expected["schema"]:
         raise DeterministicOperationRejected("structural result schema mismatch")
