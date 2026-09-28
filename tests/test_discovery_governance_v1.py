@@ -17,6 +17,13 @@ class DiscoveryGovernanceV1Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"modern closure audit"):
             active_open_families({**state,"family_level_closure":{"status":"FAMILY_LEVEL_CLOSED_WITH_EVIDENCE"}},families)
 
+    def test_corrupt_trend_transport_cannot_complete_local_frontier(self):
+        from research_v3.deterministic_operation_executor import verify_trend_surface, DeterministicOperationRejected
+        ledger=json.loads((ROOT/"research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json").read_text())
+        self.assertEqual(ledger["current_selected_frontier"]["status"],"PENDING_TRANSPORT_INTEGRITY_REPAIR")
+        with self.assertRaisesRegex(DeterministicOperationRejected,"TREND transport hash mismatch"):
+            verify_trend_surface(ROOT)
+
     def test_exact_candidate_null_does_not_close_family(self):
         self.assertFalse(evidence_class_can_close_family("EXACT_SPECIFICATION_NULL",explicit_closure_audit=True,adequate_power=True,parameter_region_coverage=True,meaningful_universe_breadth=True,asset_class_coverage=True,horizon_coverage=True,plausible_unexplored_frontier=False))
 
