@@ -1,134 +1,69 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "02ec9670d6507514abc16c383b017d96ea69d216",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "02ec9670d6507514abc16c383b017d96ea69d216",
-    "predecessor_run_id": 36399377424
-  },
-  "accepted_output": {
-    "decision": {
-      "action": "FREEZE_COHERENT_CROSS_SECTIONAL_ALIGNMENT_SCOPE_BEFORE_PREDICTIVE_OUTCOMES",
-      "authority": {
-        "accepted_proposal_file_sha256": "5cf3d23355ade0ccc79e1e8fcd103c538cc76e36b21c5c7d354b9ba59b735cd2",
-        "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_9d1e673edc306eec9e7598261c9fe5e3.json"
-      },
-      "boundaries": {
-        "market_data_fetch_authorized": false,
-        "predictive_or_economic_outcome_opened": false,
-        "protected_forward_opened": false,
-        "v2_attempts_consumed": 0
-      },
-      "freeze_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
-      "scope": {
-        "chronology_conflicts_required": 0,
-        "design_target_effective_days": 110,
-        "development_interval_utc": {
-          "end": "2026-09-13T23:59:59Z",
-          "start": "2026-02-02T00:00:00Z",
-          "weeks": 32
-        },
-        "minimum_effective_independent_utc_days": 100,
-        "minimum_median_effective_cross_sectional_breadth": 20,
-        "minimum_schedule_adjusted_coverage": 0.95,
-        "minimum_symbols_meeting_coverage": 36,
-        "peer_candidate_cohort_id": "peer_f00b1cfa2c5c4549",
-        "resolution": "M5",
-        "symbol_count": 48
-      }
-    },
-    "external_data_gate": null,
-    "implementation_id": "epoch38_cross_sectional_aligned_history_scope_freeze",
-    "next_research_state": {
-      "deterministic_next_operation": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
-      "implementation_satisfied": false,
-      "implementation_scope_complete": true,
-      "later_step": "After deterministic readiness validation, fresh semantic reasoning may decide whether to authorize a machine-owned acquisition operation. This implementation does not authorize acquisition.",
-      "next_action": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
-      "next_deterministic_operation_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
-      "research_judgment_required": false,
-      "status": "IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The Epoch38 freeze and authorized deterministic validation operation were already present. I added the required accepted-proposal file SHA-256 binding and strengthened validation and fail-closed tests for cohort coherence, frozen selection, alignment and power gates, and safety boundaries. No market data or outcomes were accessed. Validation was by file inspection; executable tests and exact-head CI were not run.",
-    "tests_requested": [
-      "PYTHONPATH=. python -m unittest tests.test_epoch38_cross_sectional_aligned_history_scope_freeze"
-    ]
-  },
-  "basis_next_state_sha256": "8570afd371d29e8d55e8c20f445f4213903ae18da84892d8943b5c5dacb4d2ae",
-  "changed_paths": [
-    "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
-    "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_IMPLEMENTATION_MANIFEST_V1.json",
-    "research_v3/epoch38_cross_sectional_aligned_history_scope_freeze.py",
-    "tests/test_epoch38_cross_sectional_aligned_history_scope_freeze.py"
-  ],
-  "created_utc": "2026-09-28T08:46:25Z",
+  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
+  "status": "PENDING_EXACT_HEAD_GREEN",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
+  "basis_next_state_sha256": "6894ef6abc4d19f490ab354c3b20b08e398c954cdbd1b69f428ea889ee2864da",
+  "request_fingerprint": "16f2eb9cf519806877a9dc7afc6d1074f0a88d9e8f58af1e3ec308edeaf95edf",
   "implementation_output": {
+    "implementation_id": "epoch37_trend_momentum_coarse_parameter_region_provenance_recovery",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Recovered the accepted TREND_MOMENTUM Stage-1 coarse parameter-region implementation directly from durable canonical authorities. The repair separates the canonical semantic proposal hash from file-byte hashes and separately binds the development and replacement capture authorities. The accepted seven-symbol grid is unchanged; no new market data, economics, protected evidence, candidate identity, or semantic reselection occurred.",
     "decision": {
-      "action": "FREEZE_COHERENT_CROSS_SECTIONAL_ALIGNMENT_SCOPE_BEFORE_PREDICTIVE_OUTCOMES",
-      "authority": {
-        "accepted_proposal_file_sha256": "5cf3d23355ade0ccc79e1e8fcd103c538cc76e36b21c5c7d354b9ba59b735cd2",
-        "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_9d1e673edc306eec9e7598261c9fe5e3.json"
-      },
-      "boundaries": {
-        "market_data_fetch_authorized": false,
-        "predictive_or_economic_outcome_opened": false,
-        "protected_forward_opened": false,
-        "v2_attempts_consumed": 0
-      },
-      "freeze_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
-      "scope": {
-        "chronology_conflicts_required": 0,
-        "design_target_effective_days": 110,
-        "development_interval_utc": {
-          "end": "2026-09-13T23:59:59Z",
-          "start": "2026-02-02T00:00:00Z",
-          "weeks": 32
-        },
-        "minimum_effective_independent_utc_days": 100,
-        "minimum_median_effective_cross_sectional_breadth": 20,
-        "minimum_schedule_adjusted_coverage": 0.95,
-        "minimum_symbols_meeting_coverage": 36,
-        "peer_candidate_cohort_id": "peer_f00b1cfa2c5c4549",
-        "resolution": "M5",
-        "symbol_count": 48
-      }
+      "classification": "DETERMINISTIC_IMPLEMENTATION_PROVENANCE_REPAIR_NO_RESEARCH_SEMANTIC_CHANGE",
+      "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_85a6da387ad291b1ccdb81cefe0718b6.json",
+      "proposal_hash": "71333910d8382a45e46d7d4dd71282731ae9043eb0474977344b9142c116471e",
+      "development_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+      "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+      "replacement_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+      "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+      "parameter_cells_per_symbol": 80,
+      "symbols": [
+        "JPYX",
+        "ZARJPY",
+        "USDCLP",
+        "USDBRL",
+        "USDCZK",
+        "TRUMPUSD",
+        "XPDUSD"
+      ]
+    },
+    "next_research_state": {
+      "status": "TREND_PARAMETER_SCAN_IMPLEMENTED_AWAITING_MATERIALIZATION_AFTER_EXACT_HEAD_GREEN",
+      "next_action": "DIRECTOR_MATERIALIZE_TREND_MOMENTUM_FX_CRYPTO_METALS_COARSE_PARAMETER_REGION_SCAN_V1",
+      "ai_reasoning_required": false,
+      "research_judgment_required": false,
+      "implementation_ai_required": false,
+      "implementation_satisfied": true,
+      "implementation_scope_complete": true,
+      "external_data_required": false,
+      "external_data_gate": null,
+      "external_gate": null,
+      "user_action_required": false
     },
     "external_data_gate": null,
-    "implementation_id": "epoch38_cross_sectional_aligned_history_scope_freeze",
-    "next_research_state": {
-      "deterministic_next_operation": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
-      "implementation_satisfied": false,
-      "implementation_scope_complete": true,
-      "later_step": "After deterministic readiness validation, fresh semantic reasoning may decide whether to authorize a machine-owned acquisition operation. This implementation does not authorize acquisition.",
-      "next_action": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
-      "next_deterministic_operation_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
-      "research_judgment_required": false,
-      "status": "IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN"
-    },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The Epoch38 freeze and authorized deterministic validation operation were already present. I added the required accepted-proposal file SHA-256 binding and strengthened validation and fail-closed tests for cohort coherence, frozen selection, alignment and power gates, and safety boundaries. No market data or outcomes were accessed. Validation was by file inspection; executable tests and exact-head CI were not run.",
     "tests_requested": [
-      "PYTHONPATH=. python -m unittest tests.test_epoch38_cross_sectional_aligned_history_scope_freeze"
+      "python -m unittest -v tests.test_trend_momentum_parameter_region_epoch37_screen",
+      "Research Fast Path Validation including TREND parameter scan module"
     ]
   },
+  "provider": {
+    "provider": "DIRECT_REPOSITORY_RECOVERY",
+    "model": null,
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "provider_process_started": false
+  },
+  "changed_paths": [
+    "evidence/EPOCH37_TREND_MOMENTUM_IMPLEMENTATION_PROVENANCE_RECOVERY_V1.json",
+    "research_v3/EPOCH37_TREND_MOMENTUM_PARAMETER_REGION_FRONTIER_FREEZE_V1.json",
+    "research_v3/trend_momentum_parameter_region_epoch37_screen.py",
+    "tests/test_trend_momentum_parameter_region_epoch37_screen.py"
+  ],
   "project_snapshot": {
     "discovery_ledger_sha256": "3beba7a0b606a0c25e7d300c40920324040d7a146249d298b582b1cebf92f9ac",
     "economic_outcomes_opened": 28,
     "v2_attempts_used": 20,
     "v2_search_budget_remaining": 64
   },
-  "provider": {
-    "actual_model_identity": null,
-    "actual_model_identity_known": false,
-    "cli": "@github/copilot",
-    "model": "auto",
-    "model_identity_limitation": "Explicit gpt-5.3-codex and gpt-5.4 were rejected as unavailable by this Copilot connection; Auto is the proven available route, and silent mode does not expose the selected identity.",
-    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
-    "provider": "github-copilot-cli"
-  },
-  "request_fingerprint": "e2d1c4de8753c0031aeb01e5003a6862246ef04f8ec8447b45d7476508e14ccb",
-  "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "created_utc": "2026-09-28T11:10:00Z"
 }
