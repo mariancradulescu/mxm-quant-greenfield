@@ -275,6 +275,17 @@ def _material_state_signature(state: dict) -> str:
 
 
 def _provider_unavailable(root: Path, state: dict, phase: str) -> dict | None:
+    # A current externally supplied semantic proposal is a distinct provider route,
+    # so stale Copilot retry/quota state must not block it. Full proposal validation
+    # remains inside reasoning_provider.wake() before registry/publication.
+    if phase == "GENERAL_AI_REASONING":
+        external = load_json(root/"research_v3/ai_director/EXTERNAL_GENERAL_AI_PROPOSAL_V1.json", {}) or {}
+        binding = external.get("evidence_binding") or {}
+        if (external.get("provider") or {}).get("kind") == "EXTERNAL_CHATGPT_GENERAL_REASONING":
+            request = build_reasoning_request(root)
+            if (binding.get("reasoning_request_id") == request.get("request_id")
+                    and binding.get("evidence_epoch_seen") == request.get("evidence_epoch_seen")):
+                return None
     prior=dict(load_json(root/PROVIDER_RECOVERY_REL,{}) or {})
     if os.environ.get("MXM_COPILOT_QUOTA_RESET_CONFIRMED") == "1":
         return None
