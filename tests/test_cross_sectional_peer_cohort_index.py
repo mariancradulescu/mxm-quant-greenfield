@@ -20,6 +20,7 @@ def _row(
     product_type: str = "STANDARD_CASH_SHARE_CFD",
     session_regions: str = "US",
     coverage_bucket: str = "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+    schedule_time_zone: str = "America/New_York",
 ) -> dict:
     return {
         "broker_symbol": symbol,
@@ -32,6 +33,7 @@ def _row(
         "product_type": product_type,
         "session_regions": session_regions,
         "coverage_bucket": coverage_bucket,
+        "schedule_time_zone": schedule_time_zone,
         "minimum_executable_volume": "100",
         "buy_min_volume_margin_eur": 10.0 + symbol_id,
         "sell_min_volume_margin_eur": 11.0 + symbol_id,
@@ -57,6 +59,12 @@ def _bundle(rows: list[dict]) -> dict:
             "eligible_identity_set_sha256": ELIGIBLE_IDENTITY_SET_SHA256,
             "compact_authority_sha256": (
                 "2629b471abd6c35351eefae43d2fefbd423e2726cb89363c32f2287e7bedd857"
+            ),
+            "accepted_transport_zip_sha256": (
+                "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9"
+            ),
+            "accepted_original_collector_zip_sha256": (
+                "5ce4b3bc3a47292bb8b9b704d6c8c305a0bc3657d7dd0ace539d93e740a9be15"
             ),
             "structural_registry_ref": (
                 "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json"
@@ -115,7 +123,7 @@ class CrossSectionalPeerCohortIndexTests(unittest.TestCase):
 
     def test_missing_cohort_metadata_is_retained_and_flagged(self):
         result = build_index(
-            _bundle([_row("MISSING", 8, session_regions="")]),
+            _bundle([_row("MISSING", 8, session_regions="", schedule_time_zone="Unknown/Zone")]),
             expected_count=1,
         )
         self.assertEqual(result["source_universe"]["indexed_identity_count"], 1)
@@ -125,6 +133,12 @@ class CrossSectionalPeerCohortIndexTests(unittest.TestCase):
             result["identities"][0]["cohort_assignment_status"],
             "UNASSIGNED_MISSING_COHORT_METADATA",
         )
+
+    def test_session_region_must_match_current_schedule_metadata(self):
+        row = _row("A.US", 1)
+        row["session_regions"] = "EUROPE"
+        with self.assertRaisesRegex(ValueError, "session-region metadata"):
+            build_index(_bundle([row]), expected_count=1)
 
     def test_invalid_binding_or_eligibility_fails_closed(self):
         bundle = _bundle([_row("A.US", 1)])
