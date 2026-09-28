@@ -367,7 +367,6 @@ def _evaluate_cell(segments: list[list[dict[str, Any]]], lookback: int, threshol
             "settled_over_triggered": settled / triggered if triggered else 0.0,
             "active_effective_utc_days": len(vals),
         },
-        "daily_effects_bps": daily_effects,
         "local_support": bool(effect is not None and effect > 0 and len(vals) >= MIN_EFFECTIVE_DAYS
                               and len(h1) >= MIN_HALF_DAYS and len(h2) >= MIN_HALF_DAYS and same_positive),
     }
