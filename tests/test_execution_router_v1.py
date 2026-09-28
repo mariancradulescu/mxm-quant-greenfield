@@ -119,18 +119,30 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             self.assertTrue(out["dispatch_required"])
             self.assertEqual(out["execution_class"],"SEMANTIC_REASONING")
 
-    def test_current_peer_cohort_operation_routes_as_deterministic(self):
+    def test_current_peer_cohort_lifecycle_routes_consistently(self):
         state=json.loads((ROOT/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json").read_text())
-        self.assertEqual(
-            state["next_action"],
-            "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
-        )
         route=classify_execution(ROOT,state)
-        self.assertEqual(route["execution_class"],"DETERMINISTIC_OPERATION")
-        self.assertEqual(
-            route["operation_name"],
-            "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
-        )
+        if state["next_action"]=="MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX":
+            self.assertEqual(route["execution_class"],"DETERMINISTIC_OPERATION")
+            self.assertEqual(
+                route["operation_name"],
+                "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+            )
+        else:
+            self.assertEqual(
+                state["status"],
+                "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_PEER_COHORT_INDEX",
+            )
+            self.assertEqual(
+                state["next_action"],
+                "AI_SELECT_PROSPECTIVE_CROSS_SECTIONAL_ESTIMAND_AND_ALIGNED_HISTORY_SCOPE_FROM_PEER_COHORT_INDEX",
+            )
+            self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
+            self.assertEqual(
+                state["peer_cohort_index_ref"],
+                "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+            )
+            self.assertTrue((ROOT/state["peer_cohort_index_ref"]).is_file())
         self.assertFalse(implementation_required(ROOT,state))
 
     def test_unknown_deterministic_schema_and_contract_kind_fail_closed(self):
