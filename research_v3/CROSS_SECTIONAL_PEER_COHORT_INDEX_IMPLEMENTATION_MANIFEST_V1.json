@@ -1,0 +1,59 @@
+{
+  "schema": "mxm.greenfield.cross-sectional-peer-cohort-index-implementation-manifest.v1",
+  "status": "IMPLEMENTED_PENDING_EXACT_HEAD_GREEN_AND_HASH_BOUND_INPUT_MATERIALIZATION",
+  "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_c54ec9e39feb63a7b60e3645657abf92.json",
+  "accepted_proposal_file_sha256": "2fb81a1d14f4cccda301f44370cceeda6ff1389fcc3ac96e6427009c64ba2657",
+  "implementation_ref": "research_v3/cross_sectional_peer_cohort_index.py",
+  "tests": [
+    "tests/test_cross_sectional_peer_cohort_index.py"
+  ],
+  "deterministic_operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
+  "data_bindings": {
+    "feasibility_authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "current_broker_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
+    "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "compact_authority_sha256": "2629b471abd6c35351eefae43d2fefbd423e2726cb89363c32f2287e7bedd857",
+    "structural_registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "structural_registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
+    "feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+    "feature_store_sha256": "b92ad33bffad77f00b86933e1f552736485782e17fdea98fd0e84d1ab6dd117c",
+    "opportunity_map_ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
+    "opportunity_map_sha256": "a6d024f43dd6066a73a1d6dadf35657e30968259d653fd9b4e4b30c5fde42639",
+    "architecture_ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+    "architecture_sha256": "6b14648bad0aa8e0753f3771896892d0a7d70bd89911800ce9bdbafc0e96a568",
+    "eligible_identity_count": 1576
+  },
+  "implementation_scope": {
+    "mechanism_family": "CROSS_SECTIONAL_RANKING",
+    "outcome_blind": true,
+    "retains_all_eligible_identities": true,
+    "cohort_key": [
+      "asset_class",
+      "product_type",
+      "exact normalized session region set",
+      "coverage bucket"
+    ],
+    "unavailable_metadata_is_flagged_not_imputed": true,
+    "aligned_history_required_before_cross_symbol_inference": true,
+    "aligned_history_current_status": "NOT_ACQUIRED_MECHANISM_SPECIFIC",
+    "behavioral_or_economic_equivalence_claimed": false,
+    "strategy_or_price_outcome_evaluated": false
+  },
+  "validation": {
+    "unit_tests_run": false,
+    "full_frontier_index_generated": false,
+    "exact_head_green": false,
+    "reason_not_generated": "The current 1,576-row compact identity feature derivative is hash-bound but external to the Git worktree. The accepted broker payload remains an already accepted source; materialization is transport, not new data acquisition.",
+    "next_deterministic_operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json"
+  },
+  "economic_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_evidence_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
