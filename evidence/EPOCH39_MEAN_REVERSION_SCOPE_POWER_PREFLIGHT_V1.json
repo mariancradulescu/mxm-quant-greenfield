@@ -1,0 +1,127 @@
+{
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0,
+    "v2_attempts_consumed": 0
+  },
+  "data_boundary": {
+    "current_broker_capture_transport_materialization_is_new_acquisition": false,
+    "later_data_scope_must_follow_a_pre_outcome_completeness_and_redundancy_audit": true,
+    "later_minimal_m5_ohlc_history_needed_to_measure_event_density": true,
+    "new_market_data_acquisition_in_this_phase": false,
+    "no_default_multi_year_download": true
+  },
+  "design": {
+    "causal_event_rule": "At each completed M5 close, use only that close and the immediately preceding frozen lookback closes to calculate the arithmetic rolling center and population standard deviation; emit a short event at z >= threshold and a long event at z <= -threshold; zero-scale windows emit no event.",
+    "coarse_parameter_regions": {
+      "absolute_standardized_deviation_threshold": [
+        1.0,
+        1.5,
+        2.0
+      ],
+      "all_regions_frozen_before_development_surface": true,
+      "cell_count": 36,
+      "holding_horizon_bars": [
+        3,
+        6,
+        12
+      ],
+      "lookback_bars": [
+        12,
+        24,
+        48,
+        96
+      ],
+      "range_rationale": "Four geometrically spaced 1-to-8-hour context windows, three separated deviation strengths, and 15-to-60-minute responses form a small, mechanism-interpretable coarse surface without optimizing against observed outcomes.",
+      "resolution": "M5"
+    },
+    "effective_independence": "UTC calendar date pooled across all included symbols and events; average event responses within each date before inference. Effective independent sample size is date-level n divided by 1 + 2 times the sum of positive date-series autocorrelations, stopping at the first non-positive lag and bounded to [1,n].",
+    "estimand": "For each frozen cell, the arithmetic mean of UTC-date-cluster means of signed forward log returns divided by event-time rolling one-bar-return standard deviation times sqrt(holding_horizon); the return sign is reversed for positive deviations and preserved for negative deviations, so positive values indicate movement toward the rolling mean.",
+    "exploratory_multiplicity": {
+      "all_cells_and_insufficient_cells_recorded": true,
+      "family_size": 36,
+      "method": "BENJAMINI_HOCHBERG_FDR",
+      "q": 0.05
+    },
+    "missingness": "No forward fill, interpolation, resampling, or synthetic bars. Gaps break contiguous segments; events whose frozen forward horizon crosses a gap are right-censored, retained in trigger/censor counts, and excluded from settled-response estimates. Missing symbols/dates are not imputed.",
+    "power_sensitivity": {
+      "achieved_power_estimated": false,
+      "observed_event_density_available": false,
+      "reason": "No broad historical M5 panel exists for the 1576-identity sampling frame; do not substitute the 41 structural representatives or count raw bars as independent events.",
+      "scenarios": [
+        {
+          "interpretation": "DESIGN_SENSITIVITY_ONLY_NOT_AN_ECONOMIC_THRESHOLD",
+          "one_sided_bonferroni_alpha": 0.001388888888888889,
+          "required_effective_independent_utc_dates": 368,
+          "standardized_effect": 0.2,
+          "target_power": 0.8
+        },
+        {
+          "interpretation": "DESIGN_SENSITIVITY_ONLY_NOT_AN_ECONOMIC_THRESHOLD",
+          "one_sided_bonferroni_alpha": 0.001388888888888889,
+          "required_effective_independent_utc_dates": 164,
+          "standardized_effect": 0.3,
+          "target_power": 0.8
+        },
+        {
+          "interpretation": "DESIGN_SENSITIVITY_ONLY_NOT_AN_ECONOMIC_THRESHOLD",
+          "one_sided_bonferroni_alpha": 0.001388888888888889,
+          "required_effective_independent_utc_dates": 59,
+          "standardized_effect": 0.5,
+          "target_power": 0.8
+        }
+      ]
+    }
+  },
+  "evidence_epoch": 39,
+  "family": "MEAN_REVERSION",
+  "implementation": {
+    "freeze_ref": "research_v3/EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_FREEZE_V1.json",
+    "version": "MXM_EPOCH39_MEAN_REVERSION_SCOPE_POWER_PREFLIGHT_V1"
+  },
+  "interpretation_boundary": {
+    "candidate_economic_identity_created": false,
+    "competition_start_authorized": false,
+    "economic_outcome_opened": false,
+    "economic_promotion_authorized": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_data_is_independent_confirmation": false,
+    "live_orders_authorized": false,
+    "mechanism_family_closed": false,
+    "pnl_computed": false,
+    "protected_forward_opened": false,
+    "strategy_returns_computed": false,
+    "v2_attempt_consumed": false
+  },
+  "next_gate": "Materialize only the already accepted hash-bound current broker capture if an exact member listing is needed, then determine the smallest pre-outcome M5 history extension from completeness, event independence, structural heterogeneity, and acquisition cost. No new market-data request is authorized by this preflight.",
+  "safety": {
+    "competition_start_authorized": false,
+    "live_orders_authorized": false,
+    "protected_forward_opened": false
+  },
+  "schema": "mxm.greenfield.epoch39-mean-reversion-scope-power-preflight.v1",
+  "scope": {
+    "current_decision": "Preserve the full eligible universe as the outcome-blind sampling frame; do not invent a fixed subset while full-frame data completeness and event independence are unknown.",
+    "identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "mechanism_family": "MEAN_REVERSION",
+    "pre_outcome_feature_gaps": [
+      "full-frame historical data availability and completeness",
+      "full-frame reversal event density",
+      "full-frame realized-volatility opportunity proxy"
+    ],
+    "sampling_frame": "ALL_1576_CURRENT_EUR200_FEASIBLE_POST_EXCLUSION_IDENTITIES",
+    "sampling_frame_size": 1576,
+    "structural_41_used_as_inferential_panel": false,
+    "symbol_subselection_performed": false
+  },
+  "source_authority": {
+    "accepted_proposal_file_sha256": "9feec0b687b66e18685535bf023833343fcb3812bb88cc3921f57cc65d065f39",
+    "accepted_proposal_hash": "0990efaed7c085f0926117349545570bfd7f0e141f1f5aada4ebd598a9226671",
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_44ec982538d0519ed46c879423c096b6.json",
+    "canonical_broker_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
+    "eligible_identity_count": 1576,
+    "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "feasibility_authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json"
+  },
+  "status": "COMPLETE_NON_ECONOMIC_SCOPE_AND_POWER_DESIGN_PREFLIGHT"
+}
