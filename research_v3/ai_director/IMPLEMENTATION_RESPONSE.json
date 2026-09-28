@@ -1,4 +1,52 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "416e894cd3a3414e1e8724ca667cd166849e8f27",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "416e894cd3a3414e1e8724ca667cd166849e8f27",
+    "predecessor_run_id": 36476323101
+  },
+  "accepted_output": {
+    "decision": {
+      "boundaries": {
+        "accounting_effect": {
+          "economic_outcomes_opened": 0,
+          "search_budget_change": 0,
+          "v2_attempts_consumed": 0
+        },
+        "candidate_economic_identity_created": false,
+        "cohort_preflight_executed": false,
+        "economic_outcome_opened": false,
+        "market_data_acquired": false,
+        "protected_evidence_opened": false,
+        "strategy_outcomes_or_pnl_computed": false
+      },
+      "changed_files": [
+        "research_v3/mean_reversion_cohort_power_design.py",
+        "tests/test_mean_reversion_cohort_power_design.py"
+      ],
+      "cohort_and_power": "Requires explicit frozen selection filters, ranking, rationale, and power assumptions; reports missing features and exclusions, reuses the established dependence-adjusted date-level ESS rule, and never estimates achieved power.",
+      "implementation_scope_complete": true,
+      "later_step": "After exact-head green, prospectively define and audit candidate hypotheses against the Epoch25 and Epoch36 freezes, then freeze the cohort and exact hypothesis before any diagnostic or data acquisition. No deterministic operation is authorized because this semantic freeze has not occurred.",
+      "prior_scope_audit": "Compares prospective freeze specifications only; parameter-only changes are not treated as distinct hypotheses, and structural differences do not grant diagnostic authority."
+    },
+    "external_data_gate": null,
+    "implementation_id": "MXM_E42_MEANREV_COHORT_POWER_DESIGN_V1",
+    "next_research_state": {
+      "exact_head_green_required": true,
+      "external_data_required": false,
+      "implementation_satisfied": true,
+      "next_action": "PROSPECTIVELY_AUDIT_DISTINCT_MEAN_REVERSION_HYPOTHESES_AND_FREEZE_COHORT_POWER_DESIGN",
+      "research_judgment_required": true,
+      "status": "FRESH_PROSPECTIVE_MEAN_REVERSION_COHORT_AND_HYPOTHESIS_FREEZE_REQUIRED",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added reusable, freeze-driven outcome-blind cohort selection, Epoch25/Epoch36 frozen-scope comparison, date-cluster effective-sample-size, and power-planning machinery. No new hypothesis was chosen, cohort preflight executed, or market data acquired.",
+    "tests_requested": [
+      "tests.test_mean_reversion_cohort_power_design (not run; shell/test execution was prohibited)"
+    ]
+  },
   "basis_next_state_sha256": "99e05732cb60e4e035d182ee5cc8d54af600d683d7c00ef0066fabb72ca9a882",
   "changed_paths": [
     "research_v3/mean_reversion_cohort_power_design.py",
@@ -64,5 +112,5 @@
   },
   "request_fingerprint": "5621cea239ad08726ce8669927a69653c297290a3e9ae85f97025b07a5db78ce",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }
