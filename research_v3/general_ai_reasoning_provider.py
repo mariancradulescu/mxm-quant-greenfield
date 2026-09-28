@@ -26,6 +26,7 @@ from research_v3.general_ai_director_bridge import (
     _validate_proposed_next_state_routeability,
 )
 from research_v3.discovery_methodology import validate_proposal_universe_methodology
+from research_v3.discovery_governance import validate_proposal_discovery_governance
 from research_v3.runtime_v2_primitives import (
     GitCheckpointSink,
     atomic_write_json,
@@ -90,6 +91,10 @@ BASE_AUTHORITIES=(
     "data/BROKER_NATIVE_FRONTIER_M5_PROBE_PLAN_V1.json",
     "evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json",
     "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+    "evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json",
+    "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+    "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+    "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
     "evidence/EPOCH37_PRE_OUTCOME_METHODOLOGY_VALIDITY_GATE_V1.json",
 )
 
@@ -403,6 +408,10 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
     selection_authority=json.loads((root/"research_v3/EPOCH25_FRONTIER_SELECTION_EXECUTION_AUTHORITY_V1.json").read_text())
     methodology_audit=json.loads((root/"evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json").read_text(encoding="utf-8"))
     discovery_architecture=json.loads((root/"research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json").read_text(encoding="utf-8"))
+    retrospective_scope_audit=json.loads((root/"evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json").read_text(encoding="utf-8"))
+    parameter_governor=json.loads((root/"research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json").read_text(encoding="utf-8"))
+    multi_frontier_governor=json.loads((root/"research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json").read_text(encoding="utf-8"))
+    discovery_coverage_ledger=json.loads((root/"research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json").read_text(encoding="utf-8"))
     return {"request_id":request["request_id"],"eligibility_packet":p,
             "current_frontier_content":frontier,
             "latest_structural_result_ref":structural_ref,
@@ -411,6 +420,10 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
             "frontier_selection_execution_authority":selection_authority,
             "research_discovery_methodology_audit":methodology_audit,
             "adaptive_mechanism_discovery_architecture":discovery_architecture,
+            "retrospective_evidence_scope_audit":retrospective_scope_audit,
+            "parameter_discovery_and_robustness_governor":parameter_governor,
+            "multi_frontier_discovery_governor":multi_frontier_governor,
+            "discovery_coverage_ledger":discovery_coverage_ledger,
             "pending_decision":{k:(request.get("next_state") or {}).get(k) for k in ("status","next_action","reason","decision_contract","supersession_ref")},
             "historical_consumed_identity_summaries":scope,
             "valid_survivors":["V2-C006","V2-C012","V2-C031"],
@@ -465,8 +478,7 @@ Important boundaries:
 - For every selected mechanism family, decision MUST include universe_methodology. Use role MECHANISM_SPECIFIC_DISCOVERY for inferential discovery, set structural_representatives_are_economic_equivalents=false, outcome_blind_selection=true, source_universe_ref to an allowed full-feasible-universe authority, and list non-outcome selection_features. Use role STRUCTURAL_COVERAGE_ONLY only for topology/pipeline/cheap feasibility work and set inferential_discovery=false.
 - CROSS_SECTIONAL_RANKING, RELATIVE_VALUE_COINTEGRATION and CROSS_MARKET_LEAD_LAG additionally require universe_methodology.aligned_history_required=true and a concrete peer_coherence_basis. Peer-set construction is part of the estimand.
 - Treat statistical power as a design input: use effective independent sample size rather than raw M5 bars, avoid universal both-half per-ticker significance as an early discovery veto, and retain multiplicity control at the appropriate confirmatory level. Pooled, hierarchical, clustered or portfolio-level inference is allowed only when prospectively justified by the scientific/economic estimand.
-- A broad corrected structural result must have an explicit legal promotion path. Family-level evidence may motivate a fresh prospective follow-on, but observed per-symbol winners may not be cherry-picked into the economic universe.
-- Prioritize material information gain and expected realizable economic value: edge per turnover, opportunity density, breadth, capital utilization, friction, margin efficiency, concurrency, compounding and recovery capacity. Commits/tests/epochs are not research progress by themselves.
+- A broad corrected structural result must have an explicit legal promotion path. Family-level evidence may motivate a fresh prospective follow-on, but observed per-symbol winners may not be cherry-picked into the economic universe.\n- Historical nulls are scope-bounded: one exact specification, one arbitrary parameter point, one symbol/small cohort, LOW_POWER_INCONCLUSIVE, DATA_INSUFFICIENT or a cost rejection cannot exhaust a mechanism family or another asset class. Preserve the exact negative result while reopening only broader materially distinct prospective DEVELOPMENT questions.\n- For tunable mechanisms use PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1 before confirmatory freeze: predeclare defensible coarse regions, record every probe, prefer broad stable neighborhoods, reject isolated winner cells, and never use protected/forward evidence for parameter selection.\n- Use DISCOVERY_COVERAGE_LEDGER_V1 plus MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1 for fresh frontier selection. Record alternatives considered and exact information-gain rationale. Anti-starvation has no fixed quota and PARKED_LOCAL_FRONTIER is never family exhaustion.\n- Do not claim family closure unless an explicit family-level closure audit proves adequate power, meaningful parameter-region coverage, universe/asset/horizon breadth, and no material plausible unexplored frontier.\n- Prioritize material information gain and expected realizable economic value: edge per turnover, opportunity density, breadth, capital utilization, friction, margin efficiency, concurrency, compounding and recovery capacity. Commits/tests/epochs are not research progress by themselves.
 - Use authenticated Pepperstone account cTrader/Open API evidence for market, cost, margin and execution facts. Verify exact broker symbol names and EUR200 feasibility before selecting any symbols.
 - Cite only supplied authority refs. If an additional authority is needed, return status ADDITIONAL_AUTHORITY_REQUIRED, requested_authority_or_class, rationale, and a top-level blocked_scope_id equal to exactly one current_open_mechanism_families enum. Do not bury the scope inside rationale.
 - Never ask the human to choose routine research parameters. Preserve one continuous EUR200 account, margin survivability, recovery capacity and anti-ruin.
@@ -788,6 +800,7 @@ def _wrap(root:Path,request:Mapping[str,Any],candidate:Mapping[str,Any],provider
     }
     try:
         validate_proposal_universe_methodology(root,proposal)
+        validate_proposal_discovery_governance(root,proposal)
     except ValueError as exc:
         raise AIProposalRejected(str(exc)) from exc
     validate_proposal(root,proposal)
@@ -820,6 +833,7 @@ def wake(root_value:str|Path=".",*,token:str|None=None,transport:Callable[...,tu
         if (candidate.get("provider") or {}).get("kind")=="EXTERNAL_CHATGPT_GENERAL_REASONING" and binding.get("reasoning_request_id")==request["request_id"] and binding.get("evidence_epoch_seen")==request["evidence_epoch_seen"]:
             try:
                 validate_proposal_universe_methodology(root,candidate)
+                validate_proposal_discovery_governance(root,candidate)
             except ValueError as exc:
                 raise AIProposalRejected(str(exc)) from exc
             validate_proposal(root,candidate)
