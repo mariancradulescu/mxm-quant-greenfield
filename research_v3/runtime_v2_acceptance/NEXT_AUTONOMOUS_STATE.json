@@ -209,10 +209,10 @@
   "economic_promotion_authorized": false,
   "eligibility_retry": {
     "count": 1,
-    "evidence_epoch": 34,
+    "evidence_epoch": 35,
     "proposal_id": null,
-    "reason": "data binding must name a concrete evidence ref",
-    "request_id": "reason_b2ad3f0b34be9db55aa8c5d0b834bf01"
+    "reason": "proposed next state has non-empty next_action without executable routing authority",
+    "request_id": "reason_9b29cd3042420f037b1d0fcaf26ab6b8"
   },
   "evidence_eligibility_ref": "research_v3/ai_director/EVIDENCE_ELIGIBILITY_V1.json",
   "evidence_epoch": 35,
@@ -313,8 +313,7 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": true,
-  "implementation_scope": "Create the new frozen evaluator, tests, and hash-bound non-economic result described in decision.frozen_method. Existing directional breakout evaluators are not substitutes for this unsigned-volatility estimand.",
+  "implementation_satisfied": false,
   "implementation_scope_complete": true,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
@@ -386,7 +385,7 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "AI_INTERPRET_EPOCH35_UNSIGNED_VOLATILITY_STRUCTURAL_RESULT_AND_SELECT_THE_NEXT_LEGAL_RESEARCH_STEP",
+  "next_action": "AI_REASSESS_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_FROM_CURRENT_EVIDENCE_EPOCH",
   "next_deterministic_operation_ref": null,
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
@@ -500,11 +499,8 @@
   "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
   "search_budget_change": -1,
   "semantic_focus_family": "REGIME_CONTEXT_CONDITIONED",
-  "source_ai_proposal_hash": "01ee033fe9f0a2bb1802503fa7ff0ccbda262f221ebb8ef15d762507f4138f29",
-  "source_ai_proposal_id": "epoch35-breakout-volatility-clustering",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
   "source_implementation_id": "MXM_EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_IMPLEMENTATION_V1",
-  "source_runtime_operation_id": "op_5ff96d4a01f226e06348a5d78867d0f6",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 27,
     "current_evidence_epoch": 28,
@@ -514,7 +510,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH35_STRUCTURAL_RESULT",
+  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_ELIGIBILITY_REJECTION",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
