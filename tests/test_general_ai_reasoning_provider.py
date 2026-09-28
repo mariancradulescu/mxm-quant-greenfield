@@ -90,6 +90,18 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
             second=build_reasoning_request(".")
         self.assertEqual(first["request_id"],second["request_id"])
 
+    def test_reasoning_request_id_ignores_mutable_provider_transport_authority_hashes(self):
+        stable=[{"ref":"evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json","sha256":"1"*64}]
+        gate_a={"ref":"research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json","sha256":"a"*64}
+        gate_b={"ref":"research_v3/ai_director/AI_REASONING_EXTERNAL_GATE.json","sha256":"b"*64}
+        refs=[row["ref"] for row in stable+[gate_a]]
+        with patch("research_v3.general_ai_reasoning_provider._authority_context",return_value=(stable+[gate_a],refs)):
+            first=build_reasoning_request(".")
+        with patch("research_v3.general_ai_reasoning_provider._authority_context",return_value=(stable+[gate_b],refs)):
+            second=build_reasoning_request(".")
+        self.assertEqual(first["request_id"],second["request_id"])
+        self.assertNotEqual(first["authority_hashes"],second["authority_hashes"])
+
     def test_missing_token_creates_explicit_gate_without_secret(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
