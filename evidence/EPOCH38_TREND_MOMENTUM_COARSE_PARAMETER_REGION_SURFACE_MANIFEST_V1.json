@@ -1,0 +1,159 @@
+{
+  "schema": "mxm.greenfield.epoch38-trend-momentum-coarse-parameter-region-surface-manifest.v1",
+  "status": "COMPLETE_HASH_BOUND_FULL_560_CELL_RESPONSE_SURFACE",
+  "evidence_epoch": 38,
+  "source_evidence_epoch": 37,
+  "family": "TREND_MOMENTUM",
+  "stage": "PARAMETER_DISCOVERY_STAGE_1_COARSE_MECHANISM_REGION_SCAN",
+  "surface": {
+    "row_count": 560,
+    "parameter_cells_per_symbol": 80,
+    "symbols": [
+      "JPYX",
+      "ZARJPY",
+      "USDCLP",
+      "USDBRL",
+      "USDCZK",
+      "TRUMPUSD",
+      "XPDUSD"
+    ],
+    "columns": [
+      "symbol",
+      "asset_class",
+      "lookback",
+      "momentum_threshold_zscore",
+      "hold_horizon",
+      "effect_size",
+      "standard_error_bps",
+      "ci95_half_width_bps",
+      "effective_independent_sample_size",
+      "event_density",
+      "half_1_effect_size_bps",
+      "half_2_effect_size_bps",
+      "half_1_effective_days",
+      "half_2_effective_days",
+      "same_sign",
+      "both_positive",
+      "triggered_events",
+      "settled_events",
+      "right_censored_events",
+      "opposite_sign_crossing_exits",
+      "fixed_horizon_exits",
+      "eligible_signal_bars",
+      "settled_over_triggered",
+      "active_effective_utc_days",
+      "observed_rows",
+      "contiguous_segments",
+      "gap_count",
+      "implied_nontrading_or_missing_M5_slots_between_segments",
+      "fill_or_interpolation_used",
+      "direct_adjacent_cells",
+      "adjacent_supported_cells",
+      "adjacent_support_fraction",
+      "median_adjacent_effect_size_bps",
+      "broad_local_neighborhood_support",
+      "local_support"
+    ],
+    "transport_ref": "research_v3/runtime_v2_inputs/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_COMPACT_XZ_BASE64_V1.txt",
+    "transport_encoding": "BASE64_XZ_JSON",
+    "transport_sha256": "ad489357832c90994a8e3f6d8d5851ec124760fed82f87145c08e835a9da51dc",
+    "decoded_compact_json_sha256": "af2bd7e67632448676cfabe42a87a5f3ee2d26867a191fab1eb9aed6329839b6",
+    "verbose_result_sha256": "b5281b209cb5cb3fb751bf748faae7601454dce3795ac1ca3a6e9ebe4d5bef1d",
+    "reconstruction_law": "Base64-decode transport bytes, XZ-decompress to UTF-8 JSON, verify decoded_compact_json_sha256, then interpret each row positionally against columns. No row filtering or winner-only logging is permitted."
+  },
+  "asset_class_coverage": {
+    "Forex (Spot)": {
+      "symbols": [
+        "ZARJPY",
+        "USDCLP",
+        "USDBRL",
+        "USDCZK"
+      ],
+      "cells": 320
+    },
+    "Currency Index (Spot)": {
+      "symbols": [
+        "JPYX"
+      ],
+      "cells": 80
+    },
+    "Crypto Currency (Spot)": {
+      "symbols": [
+        "TRUMPUSD"
+      ],
+      "cells": 80
+    },
+    "Metals (Spot)": {
+      "symbols": [
+        "XPDUSD"
+      ],
+      "cells": 80
+    }
+  },
+  "robustness_summary": {
+    "robust_region_count": 0,
+    "cross_symbol_supported_cells": 0,
+    "maximum_locally_supported_symbol_count_at_one_cell": 2,
+    "strongest_supported_cell_by_breadth": "L12_Z0.5_H4h",
+    "strongest_supported_cell_symbols": [
+      "JPYX",
+      "TRUMPUSD"
+    ],
+    "local_support_cells_by_symbol": {
+      "JPYX": 5,
+      "TRUMPUSD": 4,
+      "ZARJPY": 0,
+      "USDCLP": 0,
+      "USDBRL": 0,
+      "USDCZK": 0,
+      "XPDUSD": 0
+    },
+    "broad_local_neighborhood_support_cells_by_symbol": {
+      "JPYX": 0,
+      "TRUMPUSD": 0,
+      "ZARJPY": 0,
+      "USDCLP": 0,
+      "USDBRL": 0,
+      "USDCZK": 0,
+      "XPDUSD": 0
+    }
+  },
+  "authority": {
+    "proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_85a6da387ad291b1ccdb81cefe0718b6.json",
+    "proposal_hash": "71333910d8382a45e46d7d4dd71282731ae9043eb0474977344b9142c116471e",
+    "freeze_ref": "research_v3/EPOCH37_TREND_MOMENTUM_PARAMETER_REGION_FRONTIER_FREEZE_V1.json",
+    "freeze_sha256": "20771e6b2aebd48fb0b7280c92f503b6dd72157d8cfcb02570babd9d4a66e03c",
+    "exact_head_ci_ref": "evidence/EPOCH37_TREND_MOMENTUM_EXACT_HEAD_CI_V1.json",
+    "exact_head_ci_run_id": 36413737053,
+    "validated_implementation_head": "bce67ce0032060cf639e491ce8685d6148dbba62",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_capture_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "replacement_acceptance_ref": "evidence/CURRENT_FRONTIER_REPLACEMENT_13W_M5_CAPTURE_EPOCH23_ACCEPTANCE_V1.json",
+    "replacement_capture_plan_sha256": "a573cbcf19897c50f9ae2ad971dc308529578604c583d57d2e836906b0c25b5f",
+    "replacement_zip_sha256": "d9be18c7aa902a83bad0417bc561b7ef8df4c3ac357ff884d98c4ee3e0cc5d75",
+    "replacement_archive_used_for_target_symbols": false
+  },
+  "interpretation_boundary": {
+    "scope_of_null": "ONLY_THE_PROSPECTIVELY_FROZEN_SEVEN_SYMBOL_COARSE_PARAMETER_REGION",
+    "mechanism_family_closed": false,
+    "forex_closed": false,
+    "crypto_closed": false,
+    "metals_closed": false,
+    "full_1576_frontier_substituted": false,
+    "independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "candidate_identity_created": false,
+    "protected_forward_opened": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  }
+}
