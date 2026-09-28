@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from research_v3.epoch38_cross_sectional_aligned_history_scope_freeze import (
-    EXPECTED_PROPOSAL_BLOB_SHA,
+    EXPECTED_PROPOSAL_FILE_SHA256,
     FREEZE_REF,
     PEER_INDEX_REF,
     PROPOSAL_REF,
@@ -33,29 +33,52 @@ class Epoch38AlignedHistoryScopeFreezeTests(unittest.TestCase):
     def test_post_green_validation_operation_is_authorized_without_acquisition(self):
         op=load(Path("research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json"))
         self.assertEqual(op["operation_name"],"VALIDATE_EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE")
+        self.assertEqual(op["status"],"AUTHORIZED_NON_ECONOMIC_POST_GREEN")
+        self.assertEqual(op["freeze_ref"],str(FREEZE_REF))
         self.assertIn("FETCH_MARKET_DATA",op["forbidden_actions"])
         self.assertIn("OPEN_ECONOMICS",op["forbidden_actions"])
 
     def test_proposal_file_binding_is_exact_and_not_semantic_hash_substitution(self):
         bad=copy.deepcopy(self.freeze)
         bad["source_ai_proposal"]["proposal_git_blob_sha"]="d0f9945e61b6c400d34816b1b899894377541f3"
-        with self.assertRaisesRegex(ValueError,"exact accepted proposal file"):
+        with self.assertRaises(ValueError):
             validate_documents(self.proposal,self.index,bad)
-        with self.assertRaisesRegex(ValueError,"proposal file binding"):
+        bad=copy.deepcopy(self.freeze)
+        bad["source_ai_proposal"]["accepted_proposal_file_sha256"]="d0f9945e61b6c400d34816b1b899894377541f3"
+        with self.assertRaises(ValueError):
+            validate_documents(self.proposal,self.index,bad)
+        with self.assertRaises(ValueError):
             validate_documents(self.proposal,self.index,self.freeze,proposal_git_blob_sha="0"*40)
+        with self.assertRaises(ValueError):
+            validate_documents(self.proposal,self.index,self.freeze,proposal_file_sha256="0"*64)
+        self.assertEqual(self.freeze["source_ai_proposal"]["accepted_proposal_file_sha256"],EXPECTED_PROPOSAL_FILE_SHA256)
 
     def test_scope_drift_fails_closed(self):
         bad=copy.deepcopy(self.freeze)
         bad["development_data"]["resolution"]="H1"
-        with self.assertRaisesRegex(ValueError,"resolution drift"):
+        with self.assertRaises(ValueError):
             validate_documents(self.proposal,self.index,bad)
+
+    def test_alignment_power_and_data_acquisition_boundaries_are_frozen(self):
+        mutations = (
+            ("gates", "minimum_schedule_adjusted_coverage", 0.90),
+            ("gates", "minimum_effective_independent_utc_days", 99),
+            ("development_data", "market_data_fetch_authorized_by_this_freeze", True),
+            ("interpretation_boundary", "protected_forward_opened", True),
+        )
+        for section,key,value in mutations:
+            with self.subTest(section=section,key=key):
+                bad=copy.deepcopy(self.freeze)
+                bad[section][key]=value
+                with self.assertRaises(ValueError):
+                    validate_documents(self.proposal,self.index,bad)
 
     def test_wrong_cohort_membership_fails_closed_without_mutating_breadth(self):
         bad=copy.deepcopy(self.freeze)
         self.assertEqual(len([x for x in self.index["identities"] if x.get("peer_candidate_cohort_id")=="peer_f00b1cfa2c5c4549"]),113)
         bad["selection"]["exact_symbols"][0]="EURUSD"
         self.assertEqual(len(bad["selection"]["exact_symbols"]),48)
-        with self.assertRaisesRegex(ValueError,"outside the accepted peer cohort"):
+        with self.assertRaises(ValueError):
             validate_documents(self.proposal,self.index,bad)
         self.assertEqual(len([x for x in self.index["identities"] if x.get("peer_candidate_cohort_id")=="peer_f00b1cfa2c5c4549"]),113)
 

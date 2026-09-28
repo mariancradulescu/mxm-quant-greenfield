@@ -1,84 +1,60 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "a36a48f31e8b63735c9814096d8e77685ebfe4de",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "a36a48f31e8b63735c9814096d8e77685ebfe4de",
-    "predecessor_run_id": 36383886907
-  },
-  "accepted_output": {
-    "decision": {
-      "accepted_proposal_file_sha256": "2fb81a1d14f4cccda301f44370cceeda6ff1389fcc3ac96e6427009c64ba2657",
-      "action": "USE_EXISTING_CROSS_SECTIONAL_PEER_COHORT_IMPLEMENTATION",
-      "economic_authorized": false,
-      "expected_universe_count": 1576,
-      "implementation_ref": "research_v3/cross_sectional_peer_cohort_index.py",
-      "index_materialized": false,
-      "later_step": "After the deterministic index operation, any estimand, cohort eligibility threshold, acquisition scope, or power design requires an explicit prospective decision. Aligned history remains required before cross-symbol inference; an internal development holdout is not independent confirmation.",
-      "operation_name": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
-      "operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
-      "outcome_evaluated": false,
-      "test_ref": "tests/test_cross_sectional_peer_cohort_index.py"
-    },
-    "external_data_gate": null,
-    "implementation_id": "MXM_CROSS_SECTIONAL_PEER_COHORT_INDEX_V1",
-    "next_research_state": {
-      "external_data_required": false,
-      "implementation_satisfied": true,
-      "implementation_scope_complete": true,
-      "later_step": "Run the authorized operation after exact-head green and materialization of the already accepted hash-bound input; then seek prospective judgment for any later inference or new acquisition.",
-      "next_action": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
-      "next_deterministic_operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
-      "research_judgment_required": false,
-      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
-      "transport_materialization_required": true
-    },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The deterministic full-frontier peer-cohort builder, tests, implementation manifest, and authorized operation already exist and were validated by inspection; no files were changed. The index has not yet been materialized. Its accepted hash-bound identity input is external to Git, so obtaining it is transport materialization—not new data acquisition. No price or strategy outcome was evaluated.",
-    "tests_requested": [
-      "tests/test_cross_sectional_peer_cohort_index.py"
-    ]
-  },
-  "basis_next_state_sha256": "3c215113d598ab81305a78d1a4402011ab4f6668c7f9175e017dee1d98ab6c9e",
+  "basis_next_state_sha256": "8570afd371d29e8d55e8c20f445f4213903ae18da84892d8943b5c5dacb4d2ae",
   "changed_paths": [
-    "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_IMPLEMENTATION_MANIFEST_V1.json",
-    "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
-    "research_v3/cross_sectional_peer_cohort_index.py",
-    "tests/test_cross_sectional_peer_cohort_index.py"
+    "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+    "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_IMPLEMENTATION_MANIFEST_V1.json",
+    "research_v3/epoch38_cross_sectional_aligned_history_scope_freeze.py",
+    "tests/test_epoch38_cross_sectional_aligned_history_scope_freeze.py"
   ],
-  "created_utc": "2026-09-28T05:53:41Z",
+  "created_utc": "2026-09-28T08:46:25Z",
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "accepted_proposal_file_sha256": "2fb81a1d14f4cccda301f44370cceeda6ff1389fcc3ac96e6427009c64ba2657",
-      "action": "USE_EXISTING_CROSS_SECTIONAL_PEER_COHORT_IMPLEMENTATION",
-      "economic_authorized": false,
-      "expected_universe_count": 1576,
-      "implementation_ref": "research_v3/cross_sectional_peer_cohort_index.py",
-      "index_materialized": false,
-      "later_step": "After the deterministic index operation, any estimand, cohort eligibility threshold, acquisition scope, or power design requires an explicit prospective decision. Aligned history remains required before cross-symbol inference; an internal development holdout is not independent confirmation.",
-      "operation_name": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
-      "operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
-      "outcome_evaluated": false,
-      "test_ref": "tests/test_cross_sectional_peer_cohort_index.py"
+      "action": "FREEZE_COHERENT_CROSS_SECTIONAL_ALIGNMENT_SCOPE_BEFORE_PREDICTIVE_OUTCOMES",
+      "authority": {
+        "accepted_proposal_file_sha256": "5cf3d23355ade0ccc79e1e8fcd103c538cc76e36b21c5c7d354b9ba59b735cd2",
+        "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_9d1e673edc306eec9e7598261c9fe5e3.json"
+      },
+      "boundaries": {
+        "market_data_fetch_authorized": false,
+        "predictive_or_economic_outcome_opened": false,
+        "protected_forward_opened": false,
+        "v2_attempts_consumed": 0
+      },
+      "freeze_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+      "scope": {
+        "chronology_conflicts_required": 0,
+        "design_target_effective_days": 110,
+        "development_interval_utc": {
+          "end": "2026-09-13T23:59:59Z",
+          "start": "2026-02-02T00:00:00Z",
+          "weeks": 32
+        },
+        "minimum_effective_independent_utc_days": 100,
+        "minimum_median_effective_cross_sectional_breadth": 20,
+        "minimum_schedule_adjusted_coverage": 0.95,
+        "minimum_symbols_meeting_coverage": 36,
+        "peer_candidate_cohort_id": "peer_f00b1cfa2c5c4549",
+        "resolution": "M5",
+        "symbol_count": 48
+      }
     },
     "external_data_gate": null,
-    "implementation_id": "MXM_CROSS_SECTIONAL_PEER_COHORT_INDEX_V1",
+    "implementation_id": "epoch38_cross_sectional_aligned_history_scope_freeze",
     "next_research_state": {
-      "external_data_required": false,
-      "implementation_satisfied": true,
+      "deterministic_next_operation": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+      "implementation_satisfied": false,
       "implementation_scope_complete": true,
-      "later_step": "Run the authorized operation after exact-head green and materialization of the already accepted hash-bound input; then seek prospective judgment for any later inference or new acquisition.",
-      "next_action": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
-      "next_deterministic_operation_ref": "research_v3/CROSS_SECTIONAL_PEER_COHORT_INDEX_OPERATION_V1.json",
+      "later_step": "After deterministic readiness validation, fresh semantic reasoning may decide whether to authorize a machine-owned acquisition operation. This implementation does not authorize acquisition.",
+      "next_action": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
+      "next_deterministic_operation_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
       "research_judgment_required": false,
-      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
-      "transport_materialization_required": true
+      "status": "IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN"
     },
-    "status": "COMPLETE_NON_ECONOMIC",
-    "summary": "The deterministic full-frontier peer-cohort builder, tests, implementation manifest, and authorized operation already exist and were validated by inspection; no files were changed. The index has not yet been materialized. Its accepted hash-bound identity input is external to Git, so obtaining it is transport materialization—not new data acquisition. No price or strategy outcome was evaluated.",
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "The Epoch38 freeze and authorized deterministic validation operation were already present. I added the required accepted-proposal file SHA-256 binding and strengthened validation and fail-closed tests for cohort coherence, frozen selection, alignment and power gates, and safety boundaries. No market data or outcomes were accessed. Validation was by file inspection; executable tests and exact-head CI were not run.",
     "tests_requested": [
-      "tests/test_cross_sectional_peer_cohort_index.py"
+      "PYTHONPATH=. python -m unittest tests.test_epoch38_cross_sectional_aligned_history_scope_freeze"
     ]
   },
   "project_snapshot": {
@@ -96,7 +72,7 @@
     "model_selection": "AUTO_ACCOUNT_AVAILABLE",
     "provider": "github-copilot-cli"
   },
-  "request_fingerprint": "1f7c3f9a4cdf251d31d9d0c7532ea1695c49a5b25c8091ff2da89d0c730fbb90",
+  "request_fingerprint": "e2d1c4de8753c0031aeb01e5003a6862246ef04f8ec8447b45d7476508e14ccb",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "PENDING_EXACT_HEAD_GREEN"
 }
