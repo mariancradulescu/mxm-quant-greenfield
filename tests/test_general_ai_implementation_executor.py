@@ -41,7 +41,9 @@ class GeneralAIImplementationExecutorTests(unittest.TestCase):
             self.assertIsNone(state.get("source_ai_proposal_id"))
             self.assertIsNone(state.get("source_ai_proposal_hash"))
         else:
-            self.assertTrue(state.get("supersession_ref") or state.get("outer_capture_plan_ref"))
+            self.assertTrue(state.get("supersession_ref") or state.get("outer_capture_plan_ref")
+                            or (state.get("eligibility_retry") and reasoning_required(state)
+                                and not implementation_required(state,ROOT)))
         source=(ROOT/"research_v3/general_ai_implementation_executor.py").read_text()
         self.assertNotIn("AUTO_reason_a8b81cef686ff74cf678e7e25193f43f.json",source)
 

@@ -69,9 +69,18 @@ class ExecutionRouterV1Tests(unittest.TestCase):
         self.assertEqual(route["reason"],"UNROUTED_NONEMPTY_ACTION_FAIL_CLOSED")
 
     def test_explicit_novel_ai_implementation_still_routes_to_ai(self):
-        state={"status":"READY","next_action":"IMPLEMENT_NEW_VALIDATED_COLLECTOR","implementation_ai_required":True}
-        self.assertTrue(implementation_required(ROOT,state))
-        self.assertEqual(classify_execution(ROOT,state)["execution_class"],"NOVEL_AI_IMPLEMENTATION")
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            registry=root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json"
+            registry.parent.mkdir(parents=True)
+            registry.write_text(json.dumps({"accepted":[{"proposal_id":"accepted-p1","proposal_hash":"a"*64}]}))
+            state={"status":"READY","next_action":"IMPLEMENT_NEW_VALIDATED_COLLECTOR",
+                   "implementation_ai_required":True,"source_ai_proposal_id":"accepted-p1",
+                   "source_ai_proposal_hash":"a"*64}
+            self.assertTrue(implementation_required(root,state))
+            self.assertEqual(classify_execution(root,state)["execution_class"],"NOVEL_AI_IMPLEMENTATION")
+            state["source_ai_proposal_id"]="rejected-p2"
+            self.assertFalse(implementation_required(root,state))
 
     def test_fresh_semantic_requirement_precedes_implementation(self):
         state={"status":"READY","next_action":"AI_REASSESS","ai_reasoning_required":True,"implementation_ai_required":True}

@@ -23,7 +23,8 @@ on:
     - cron: "17 */6 * * *"
 
 permissions:
-  contents: write
+  contents: read
+  actions: write
 
 concurrency:
   group: mxm-autonomous-runtime-v2-performance-research-v3-20260922
@@ -63,16 +64,23 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'acceptance' }}
         run: |
           mkdir -p research_v3/runtime_v2_acceptance
-          python research_v3/autonomous_runtime_v2.py acceptance \
+          python -m research_v3.autonomous_runtime_v2 acceptance \
             --report research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
 
-      - name: Resume durable autonomous research state machine
+      - name: Classify canonical research action
+        id: route
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'resume') }}
         run: |
-          python research_v3/autonomous_runtime_v2.py run \
-            --root . \
-            --owner-token "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --lease-seconds 900 \
-            --max-operations 25 \
-            --git-checkpoint \
-            --git-push
+          python -m research_v3.lightweight_dispatcher classify \
+            --root . --github-output "$GITHUB_OUTPUT"
+
+      - name: Wake authoritative main Supervisor
+        if: ${{ steps.route.outputs.dispatch_required == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run autonomous-research-runtime-v2.yml --ref main \
+            -f mode=resume \
+            -f predecessor_ci_head="$(git rev-parse HEAD)" \
+            -f predecessor_ci_conclusion=success \
+            -f predecessor_ci_run_id="$GITHUB_RUN_ID"
