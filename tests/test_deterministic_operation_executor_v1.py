@@ -77,7 +77,7 @@ class DeterministicOperationExecutorV1Tests(unittest.TestCase):
             )
             impl_bytes=implementation.read_bytes()
             impl_blob=hashlib.sha1(
-                f"blob {len(impl_bytes)}\\0".encode("ascii")+impl_bytes
+                f"blob {len(impl_bytes)}\0".encode("ascii")+impl_bytes
             ).hexdigest()
             payload=json.dumps({"rows":[1,2]},sort_keys=True,separators=(",",":")).encode()
             decoded_sha=hashlib.sha256(payload).hexdigest()
