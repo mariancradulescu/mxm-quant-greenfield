@@ -31,6 +31,9 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Regenerate non-authoritative projection for validation
+        run: python -c 'from research_v3.evidence_epoch import refresh_derived_views; refresh_derived_views(".")'
+
       - name: Validate research fast path
         run: |
           python -m research_v3.autonomous_control_plane validate
