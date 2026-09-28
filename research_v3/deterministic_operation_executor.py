@@ -636,6 +636,14 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
     if not deterministic_operation_required(root,state):
         return {"status":"NO_DETERMINISTIC_OPERATION_REQUIRED"}
     op=load_authorized_deterministic_operation(root,state)
+    if op.get("materializer")=="RUN_REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT":
+        missing=[ref for ref in (op["development_zip_ref"],op["replacement_zip_ref"]) if not (root/ref).is_file()]
+        if missing:
+            return {"status":"PENDING_ACCEPTED_CAPTURE_BYTES","operation_name":op["operation_name"],
+                    "missing_refs":missing,"expected_sha256":{
+                        op["development_zip_ref"]:op["development_zip_sha256"],
+                        op["replacement_zip_ref"]:op["replacement_zip_sha256"]},
+                    "next_state":state,"provider_calls_delta":0,"state_persisted":False}
     pending=_pending_exact_head(root,state,op)
     if pending is not None:
         return pending
@@ -657,6 +665,18 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_run_epoch35_unsigned_volatility_screen(root,state,op)
     elif op.get("materializer")=="RUN_FROZEN_EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_SCREEN":
         new_state=_run_epoch36_mean_reversion_magnitude_screen(root,state,op)
+    elif op.get("materializer")=="RUN_REGIME_CONTEXT_DATA_SUFFICIENCY_AUDIT":
+        from research_v3.regime_context_data_sufficiency_audit import evaluate, sha256_file
+        freeze_path=root/op["freeze_ref"]
+        registry_path=root/op["registry_ref"]
+        development_path=root/op["development_zip_ref"]
+        replacement_path=root/op["replacement_zip_ref"]
+        if not development_path.is_file() or not replacement_path.is_file():
+            raise DeterministicOperationRejected("accepted REGIME development capture bytes require exact hash-bound materialization")
+        result=evaluate(json.loads(freeze_path.read_text(encoding="utf-8")),registry_path,development_path,replacement_path)
+        result["freeze_sha256"]=sha256_file(freeze_path)
+        atomic_write_json(root/op["result_ref"],result)
+        new_state=_execute_existing_structural_result(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
@@ -711,14 +731,16 @@ def execute_chain(root_value:str|Path=".",*,max_operations:int=8,git_checkpoint:
         if not deterministic_operation_required(root,state):
             break
         out=execute_one(root,git_checkpoint=False,git_push=False)
-        if out.get("status")=="PENDING_EXACT_HEAD_GREEN":
+        if out.get("status") in {"PENDING_EXACT_HEAD_GREEN","PENDING_ACCEPTED_CAPTURE_BYTES"}:
             if completed:
                 GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("deterministic_operation_chain",None)
             return {
-                "status":"PENDING_EXACT_HEAD_GREEN",
+                "status":out["status"],
                 "completed_operations":completed,
                 "operation_name":out.get("operation_name"),
                 "exact_head":out.get("exact_head"),
+                "missing_refs":out.get("missing_refs"),
+                "expected_sha256":out.get("expected_sha256"),
                 "next_state":out.get("next_state") or state,
                 "provider_calls_delta":0,
                 "state_persisted":False,
