@@ -1,49 +1,123 @@
 {
-  "schema": "mxm.greenfield.cross-sectional-peer-cohort-index-operation.v1",
-  "operation_name": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+  "schema": "mxm.greenfield.deterministic-next-operation.v1",
   "status": "AUTHORIZED_DETERMINISTIC_NON_ECONOMIC_OPERATION",
+  "evidence_epoch": 37,
+  "operation_name": "MATERIALIZE_HASH_BOUND_CURRENT_FRONTIER_AND_BUILD_PEER_COHORT_INDEX",
+  "execution_policy": {
+    "implementation_ai_required": false,
+    "copilot_reasoning_required": false,
+    "new_semantic_judgment_required": false,
+    "exact_head_green_required_before_execution": true
+  },
+  "accounting_effect": {
+    "v2_attempts": 0,
+    "economic_outcomes": 0,
+    "copilot_reasoning_calls": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
   "authorization": {
     "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_c54ec9e39feb63a7b60e3645657abf92.json",
     "accepted_proposal_file_sha256": "2fb81a1d14f4cccda301f44370cceeda6ff1389fcc3ac96e6427009c64ba2657",
-    "operation_scope": "implementation_task_scope",
+    "proposal_id": "post_methodology_cross_sectional_peer_cohort_frontier_v1",
+    "proposal_hash": "68a13eb7f43a2a46706d021558fe67c0619b3961d532842673c810bf750857b5",
+    "proposal_registry_ref": "research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",
     "semantic_judgment_required": false,
     "economic_authorization": false
   },
-  "inputs": {
-    "accepted_broker_capture_ref": "evidence/BROKER_NATIVE_COMPETITION_UNIVERSE_CAPTURE_EPOCH22_ACCEPTANCE_V1.json",
+  "input_bindings": [
+    {
+      "ref": "evidence/BROKER_NATIVE_COMPETITION_UNIVERSE_CAPTURE_EPOCH22_ACCEPTANCE_V1.json",
+      "sha256": "3577001e163f3d88308cded1770889093a8a3a74b43c3256ec603c37f6ae4e62"
+    },
+    {
+      "ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+      "sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3"
+    },
+    {
+      "ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+      "sha256": "b92ad33bffad77f00b86933e1f552736485782e17fdea98fd0e84d1ab6dd117c"
+    },
+    {
+      "ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
+      "sha256": "a6d024f43dd6066a73a1d6dadf35657e30968259d653fd9b4e4b30c5fde42639"
+    },
+    {
+      "ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+      "sha256": "6b14648bad0aa8e0753f3771896892d0a7d70bd89911800ce9bdbafc0e96a568"
+    }
+  ],
+  "source_authority": {
+    "current_feasibility_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
     "accepted_canonical_payload_sha256": "7b268eae05fad325cb1f0fc962511ca41236b3b58bb83023735fd22b94301452",
-    "feasibility_authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "accepted_transport_zip_sha256": "3d1db9a65e93fe5c7ea69411a9c76d8d6381927ce1224e02532640394076e8a9",
+    "accepted_original_collector_zip_sha256": "5ce4b3bc3a47292bb8b9b704d6c8c305a0bc3657d7dd0ace539d93e740a9be15",
     "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
     "compact_authority_sha256": "2629b471abd6c35351eefae43d2fefbd423e2726cb89363c32f2287e7bedd857",
-    "structural_registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
-    "structural_registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
-    "feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
-    "feature_store_sha256": "b92ad33bffad77f00b86933e1f552736485782e17fdea98fd0e84d1ab6dd117c",
-    "opportunity_map_ref": "research_v3/BROKER_NATIVE_FRONTIER_OPPORTUNITY_MAP_EPOCH23_V1.json",
-    "opportunity_map_sha256": "a6d024f43dd6066a73a1d6dadf35657e30968259d653fd9b4e4b30c5fde42639",
-    "architecture_ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
-    "architecture_sha256": "6b14648bad0aa8e0753f3771896892d0a7d70bd89911800ce9bdbafc0e96a568",
     "source_identity_count": 1576,
     "external_bytes_policy": "TRANSPORT_MATERIALIZATION_ONLY_FOR_ALREADY_ACCEPTED_HASH_BOUND_AUTHORITY; NO_NEW_MARKET_DATA_ACQUISITION"
   },
-  "execution": {
+  "operation_contract": {
+    "kind": "HASH_BOUND_PYTHON_JSON_TRANSFORM_V1",
     "implementation_ref": "research_v3/cross_sectional_peer_cohort_index.py",
-    "input_schema": "mxm.greenfield.cross-sectional-peer-cohort-input.v1",
-    "input_order": "LEXICAL_BROKER_SYMBOL_THEN_NUMERIC_SYMBOL_ID",
-    "output_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
-    "must_process_every_eligible_identity_exactly_once": true,
-    "must_fail_closed_on_stale_or_mismatched_authority": true,
-    "must_not_read_or_compute_price_or_strategy_outcomes": true,
-    "must_not_infer_missing_metadata": true,
-    "must_not_treat_cohort_as_behavioral_or_economic_equivalence": true,
-    "aligned_history_state": "NOT_ACQUIRED_MECHANISM_SPECIFIC",
-    "post_execution_semantic_judgment_required_for_any_estimand_or_new_acquisition": true
+    "implementation_git_blob_sha1": "73cc6570c9e77a31d20663119e1bfdf7db96b23d",
+    "callable": "build_index",
+    "call_kwargs": {
+      "expected_count": 1576
+    },
+    "input_transport": {
+      "encoding": "CONCAT_BASE64_GZIP_JSON",
+      "fragment_refs": [
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part00.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part01.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part02.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part03.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part04.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part05.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part06.b64",
+        "research_v3/runtime_v2_inputs/CROSS_SECTIONAL_PEER_COHORT_INPUT_V1.part07.b64"
+      ],
+      "fragment_sha256": [
+        "5c165c4499050e05e7753e88d9aec496fa21b79ea7a2b31bb6cdbbf89f23ac9b",
+        "b072290ca21ae94eddead70a9c82d0c679d7cb54345c3850c5daf0e5503d4fc3",
+        "2b5b5c8d4f50c2b340458f284fc4d7f39ab4effb0b0061717c64f035f8d0a63b",
+        "ca678a5ceaa5120db2cca21c30d50ba9a644eff3d68a4c733fdcc1a1043bef1b",
+        "fbb1aa9edfe1c29677fed8fa3e7755c134c6d6e0f2b9ff84d0ac3c23ae0caff4",
+        "a6e78eb21fe0f52bf66f0b080413830b7d2048467ec3b468952b98e2787c7eed",
+        "bc5f38f5546d5e9431f3748bfc7bc5f54d33af45acd09e866f925be69ad2938a",
+        "a6bc8c778316093060b28890dcbce02fce8de8806e11280a34a65ec2d3300d23"
+      ],
+      "concatenated_base64_sha256": "208d2ed854a240a47300ba89c4e76d0c9861d5aab940e5adee8a11351d6c6e12",
+      "decoded_json_sha256": "fdee7e48774d6822df0f4dcb274c24ee0ad821ac51580eb418aad7e7e0825b68"
+    },
+    "output": {
+      "ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+      "expected_schema": "mxm.greenfield.cross-sectional-peer-cohort-index.v1",
+      "expected_status": "COMPLETE_NON_ECONOMIC_CANDIDATE_UNIVERSE_INDEX",
+      "expected_indexed_identity_count": 1576
+    }
   },
-  "effects": {
-    "economic_outcomes_opened": 0,
-    "v2_attempts_consumed": 0,
-    "protected_forward_opened": false,
-    "live_orders_authorized": false,
-    "provider_calls": 0
+  "post_execution_state": {
+    "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_PEER_COHORT_INDEX",
+    "next_action": "AI_SELECT_PROSPECTIVE_CROSS_SECTIONAL_ESTIMAND_AND_ALIGNED_HISTORY_SCOPE_FROM_PEER_COHORT_INDEX",
+    "ai_reasoning_required": true,
+    "research_judgment_required": true,
+    "implementation_ai_required": false,
+    "implementation_satisfied": true,
+    "implementation_scope_complete": true,
+    "external_data_required": false,
+    "user_action_required": false,
+    "external_gate": null,
+    "external_data_gate": null,
+    "peer_cohort_index_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+    "discovery_architecture_ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+    "methodology_audit_ref": "evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json",
+    "economic_authorization": false,
+    "aligned_history_required": true,
+    "aligned_history_current_status": "NOT_ACQUIRED_MECHANISM_SPECIFIC",
+    "semantic_question": "Using the full-frontier peer-cohort index and active adaptive-discovery methodology, prospectively choose the highest-information coherent cross-sectional estimand and minimal aligned-history acquisition scope. Define peer coherence, dependence/cluster unit, effective sample size and power before outcomes; do not use the 41 structural panel as an inferential substitute."
   }
 }
