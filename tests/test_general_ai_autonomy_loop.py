@@ -5,7 +5,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research_v3.general_ai_autonomy_loop import run, _park_authority, _blocked_scopes, _recoverable_provider_failure, _persist_provider_recovery, _current_authority_request, _park_current_local_authority, MAX_RECOVERABLE_PROVIDER_FAILURES
+from research_v3.general_ai_autonomy_loop import run, _park_authority, _blocked_scopes, _recoverable_provider_failure, _persist_provider_recovery, _current_authority_request, _park_current_local_authority, _provider_unavailable, MAX_RECOVERABLE_PROVIDER_FAILURES
+from research_v3.general_ai_reasoning_provider import build_reasoning_request
 from research_v3.general_ai_implementation_executor import ImplementationRejected
 
 
@@ -31,6 +32,25 @@ def write_state(root: Path, **updates):
 
 
 class GeneralAIAutonomyProviderRecoveryTests(unittest.TestCase):
+    def test_live_current_external_proposal_bypasses_same_request_copilot_exhaustion(self):
+        root=Path(__file__).resolve().parents[1]
+        external_path=root/"research_v3/ai_director/EXTERNAL_GENERAL_AI_PROPOSAL_V1.json"
+        recovery_path=root/"research_v3/ai_director/PROVIDER_RECOVERY_STATE.json"
+        state_path=root/"research_v3/runtime_v2_acceptance/NEXT_AUTONOMOUS_STATE.json"
+        if not (external_path.is_file() and recovery_path.is_file() and state_path.is_file()):
+            self.skipTest("live external-provider fixture not present")
+        external=json.loads(external_path.read_text())
+        if (external.get("provider") or {}).get("kind")!="EXTERNAL_CHATGPT_GENERAL_REASONING":
+            self.skipTest("no live external ChatGPT reasoning proposal")
+        state=json.loads(state_path.read_text())
+        request=build_reasoning_request(root)
+        binding=external.get("evidence_binding") or {}
+        self.assertEqual(binding.get("reasoning_request_id"),request.get("request_id"),
+                         f"external/current request mismatch: external={binding.get('reasoning_request_id')} current={request.get('request_id')}")
+        self.assertEqual(binding.get("evidence_epoch_seen"),request.get("evidence_epoch_seen"))
+        self.assertIsNone(_provider_unavailable(root,state,"GENERAL_AI_REASONING"),
+                          "a current external semantic route must bypass Copilot-only exhaustion")
+
     def test_legacy_authority_is_parked_only_by_unambiguous_canonical_scope(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
