@@ -11,6 +11,7 @@ from research_v3.general_ai_reasoning_provider import wake as reason, reasoning_
 from research_v3.general_ai_reasoning_provider import build_reasoning_request
 from research_v3.runtime_v2_primitives import GitCheckpointSink, load_json, atomic_write_json, iso, sha256_file
 from research_v3.general_ai_director_bridge import NEXT_STATE_REL
+from research_v3.discovery_methodology import apply_pre_outcome_methodology_gate
 
 VERSION="MXM_GENERAL_AI_AUTONOMY_LOOP_V2"
 PROVIDER_RECOVERY_REL=Path("research_v3/ai_director/PROVIDER_RECOVERY_STATE.json")
@@ -345,6 +346,15 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
         safety=dict(state.get("safety") or {})
         if bool(safety.get("live_orders_authorized") or safety.get("protected_evidence_opened") or safety.get("protected_forward_opened")):
             raise RuntimeError("canonical active state crosses protected/live safety boundary")
+        methodology_state=apply_pre_outcome_methodology_gate(root,state)
+        if methodology_state is not None:
+            state=methodology_state
+            GitCheckpointSink(root,enabled=git_checkpoint,push=git_push).checkpoint("methodology_pre_outcome_retirement",None)
+            trace.append({"cycle":cycle,"kind":"METHODOLOGY_PRE_OUTCOME_RETIREMENT",
+                          "retired_proposal":state.get("methodology_retired_proposal"),
+                          "methodology_gate_ref":state.get("methodology_gate_ref"),
+                          "provider_calls_delta":0})
+            continue
         stale=stale_reasoning_redirect(root,state)
         if stale is not None:
             state.update(stale); atomic_write_json(root/NEXT_STATE_REL,state)
