@@ -371,6 +371,16 @@ def run(root_value=".",*,git_checkpoint=False,git_push=False,max_cycles=8):
         if state.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED" and state.get("requested_authority_or_class"):
             parked=_park_current_local_authority(root,state,git_checkpoint=git_checkpoint,git_push=git_push)
             if parked is None:
+                if accepted and state.get("implementation_ai_required") is True:
+                    feedback={"request_id":state.get("source_ai_proposal_id"),
+                              "proposal_id":state.get("source_ai_proposal_id"),
+                              "evidence_epoch":current_evidence_epoch(root),
+                              "reason":"Accepted authority request lacks an explicit machine-checkable blocked_scope_id or selected_scope; implementation is not authority to invent one."}
+                    atomic_write_json(root/"research_v3/ai_director/UNSCOPED_AUTHORITY_REJECTION_V1.json",feedback)
+                    state=_recover_eligibility_rejection(root,state,feedback,git_checkpoint=git_checkpoint,git_push=git_push)
+                    trace.append({"cycle":cycle,"kind":"UNSCOPED_ACCEPTED_AUTHORITY_RETIRED","feedback":feedback})
+                    if reasoning_required(state):
+                        continue
                 return {"status":"ADDITIONAL_AUTHORITY_REQUIRED","progress_class":"MISSING_RESEARCH_AUTHORITY",
                         "cycles":cycle-1,"trace":trace,"next_state":state}
             trace.append({"cycle":cycle,"kind":"LOCAL_AUTHORITY_PARKED",
