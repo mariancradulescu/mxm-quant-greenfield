@@ -739,6 +739,9 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
             attestation_path=root/attestation_ref
             if not payload_path.is_file() or not attestation_path.is_file():
                 raise DeterministicOperationRejected("REGIME recovery transport or accepted-byte attestation is missing")
+            expected_payload_length=recovery.get("payload_text_length_bytes")
+            if expected_payload_length is not None and payload_path.stat().st_size!=int(expected_payload_length):
+                raise DeterministicOperationRejected("REGIME recovery transport length mismatch")
             if sha256_file(payload_path)!=recovery.get("payload_transport_sha256"):
                 raise DeterministicOperationRejected("REGIME recovery transport hash mismatch")
             try:
