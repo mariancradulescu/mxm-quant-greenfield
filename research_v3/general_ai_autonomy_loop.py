@@ -187,9 +187,15 @@ def _current_authority_request(root:Path,state:dict)->dict|None:
     proposal_ref=str(matches[0].get("proposal_ref") or "").strip()
     proposal=load_json(root/proposal_ref,{}) if proposal_ref else {}
     decision=dict((proposal or {}).get("decision") or {})
-    if str(decision.get("status") or "").upper()!="ADDITIONAL_AUTHORITY_REQUIRED":
+    explicit_authority=str(decision.get("status") or "").upper()=="ADDITIONAL_AUTHORITY_REQUIRED"
+    prospective_authority=(str(decision.get("action") or "").upper()=="REQUEST_PROSPECTIVE_AUTHORITY"
+                           and state.get("status")=="ADDITIONAL_AUTHORITY_REQUIRED")
+    if not (explicit_authority or prospective_authority):
         return None
-    scope=str(decision.get("blocked_scope_id") or "").strip()
+    scope=str(decision.get("blocked_scope_id") or
+              (decision.get("selected_mechanism_family") if prospective_authority else "") or "").strip()
+    if scope in _blocked_scopes(root):
+        return None
     requested=str(decision.get("requested_authority_or_class") or state.get("requested_authority_or_class") or "").strip()
     if not scope or not requested:
         return None
@@ -221,7 +227,8 @@ def _park_current_local_authority(root:Path,state:dict,*,git_checkpoint:bool,git
         return None
     parked=dict(load_json(root/"research_v3/ai_director/ADDITIONAL_AUTHORITY_REQUEST_V1.json",{}) or {})
     next_state=dict(state)
-    for key in ("blocked_scope_id","requested_authority_or_class","implementation_scope","implementation_ai_scope"):
+    for key in ("blocked_scope_id","requested_authority_or_class","implementation_scope","implementation_ai_scope",
+                "implementation_task_scope","source_ai_proposal_id","source_ai_proposal_hash"):
         next_state.pop(key,None)
     next_state.update({
         "status":"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_LOCAL_AUTHORITY_PARK",
