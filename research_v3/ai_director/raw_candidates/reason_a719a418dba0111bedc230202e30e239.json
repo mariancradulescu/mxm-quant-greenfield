@@ -1,0 +1,165 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
+      "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+      "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+      "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+      "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+      "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+      "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+      "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+      "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json"
+    ],
+    "data_bindings": [
+      {
+        "ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json",
+        "role": "FROZEN_CANDIDATE_SCOPE"
+      },
+      {
+        "ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+        "role": "SOURCE_PEER_COHORT_AUTHORITY"
+      }
+    ],
+    "data_policy": {
+      "minimal_acquisition_request": {
+        "end_utc": "2026-09-13T23:59:59Z",
+        "fields": [
+          "timestamp",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ],
+        "information_gain_justification": "This exact 48-symbol, 32-week aligned M5 panel was prospectively frozen (outcome-blind) in research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json specifically to unblock effective-independent-sample-size estimation, cross-sectional dependence/cluster design, and multiplicity planning for the CROSS_SECTIONAL_RANKING mechanism. No aligned history currently exists for this cohort; without it no legal analytic or confirmatory step can proceed, and reusing this exact pre-frozen scope avoids any post-hoc panel selection.",
+        "resolution": "M5",
+        "source_domain": "PEPPERSTONE_ACCOUNT_VIA_CTRADER_OPEN_API",
+        "start_utc": "2026-02-02T00:00:00Z",
+        "symbols": [
+          "F.US-24",
+          "CCL.US-24",
+          "PFE.US-24",
+          "NKE.US-24",
+          "BSX.US-24",
+          "SLB.US-24",
+          "UBER.US-24",
+          "NFLX.US-24",
+          "HAS.US-24",
+          "DAL.US-24",
+          "CL.US-24",
+          "BIDU.US-24",
+          "ZM.US-24",
+          "SCHW.US-24",
+          "LULU.US-24",
+          "EBAY.US-24",
+          "BABA.US-24",
+          "INTC.US-24",
+          "YUM.US-24",
+          "PG.US-24",
+          "MRK.US-24",
+          "ABNB.US-24",
+          "BKNG.US-24",
+          "HSY.US-24",
+          "LOW.US-24",
+          "PM.US-24",
+          "QCOM.US-24",
+          "CVX.US-24",
+          "HON.US-24",
+          "CRM.US-24",
+          "LHX.US-24",
+          "ABBV.US-24",
+          "JNJ.US-24",
+          "FDX.US-24",
+          "DPZ.US-24",
+          "AXP.US-24",
+          "AAPL.US-24",
+          "GOOG.US-24",
+          "MAR.US-24",
+          "UNH.US-24",
+          "MSI.US-24",
+          "MCO.US-24",
+          "CMI.US-24",
+          "MSCI.US-24",
+          "AMD.US-24",
+          "CAT.US-24",
+          "GS.US-24",
+          "LLY.US-24"
+        ]
+      },
+      "new_market_data_requested": true
+    },
+    "decision": {
+      "action_type": "NON_ECONOMIC_DATA_ACQUISITION",
+      "candidate_id": "EPOCH38_CROSS_SECTIONAL_US_EQUITIES_EXTENDED_HOURS_ALIGNMENT",
+      "execution_routing": {
+        "next_deterministic_operation_ref": "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
+        "no_new_panel_invented": true,
+        "operation_name": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
+        "reused_existing_freeze": true
+      },
+      "guardrails": [
+        "NO_ECONOMIC_OUTCOME_OPENED",
+        "NO_PROTECTED_FORWARD_LEAKAGE",
+        "NO_OPENED_IDENTITY_RERUN",
+        "NO_OUTCOME_DRIVEN_SCOPE_SELECTION"
+      ],
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "rationale": "Epoch38 froze a 48-symbol peer cohort (peer_candidate_cohort_id peer_f00b1cfa2c5c4549) from the 113-symbol US Equities EXTENDED_HOURS_SHARE_CFD outcome-blind peer index, over a 32-week development interval (2026-02-02 to 2026-09-13), at M5 resolution. This scope was frozen prospectively via research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json and validated as READY_FOR_FRESH_SEMANTIC_ACQUISITION_DECISION, but market_data_fetched is false. No aligned history exists yet to compute power, dependence structure, or peer-set estimand properties, so no analytic or economic step can legally proceed until this exact frozen scope is materialized. TREND_MOMENTUM, MEAN_REVERSION and REGIME_CONTEXT_CONDITIONED remain open but each already has richer non-economic structural evidence (Epoch24/36/29/33) with no comparably prepared, ready-to-execute acquisition step; acquiring the already-frozen CROSS_SECTIONAL scope is strictly higher information per unit of legal action right now.",
+      "universe_methodology": {
+        "aligned_history_required": true,
+        "outcome_blind_selection": true,
+        "peer_coherence_basis": "US Equities, EXTENDED_HOURS_SHARE_CFD, mutually overlapping extended-hours trading schedule, peer_candidate_cohort_id peer_f00b1cfa2c5c4549 drawn from evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json (113-member outcome-blind cohort) and frozen to 48 symbols in research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json prior to any outcome inspection",
+        "role": "MECHANISM_SPECIFIC_DISCOVERY",
+        "selection_features": [
+          "asset_class",
+          "product_type",
+          "schedule_overlap",
+          "aligned_timestamp_coverage",
+          "data_completeness",
+          "capital_efficiency",
+          "acquisition_cost"
+        ],
+        "source_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+        "structural_representatives_are_economic_equivalents": false
+      }
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "blocked_families_untouched": [
+        "BREAKOUT_VOLATILITY_EXPANSION",
+        "CARRY_TERM_STRUCTURE",
+        "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+        "CROSS_MARKET_LEAD_LAG",
+        "RELATIVE_VALUE_COINTEGRATION",
+        "SEASONALITY_SESSION_TIME"
+      ],
+      "candidate_identity_created": false,
+      "economic_promotion_authorized": false,
+      "implementation_ai_required": false,
+      "mechanism_family": "CROSS_SECTIONAL_RANKING",
+      "next_action": "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
+      "research_judgment_required": "After acquisition, compute effective independent sample size, dependence/cluster unit, missingness and multiplicity rules for the CROSS_SECTIONAL_RANKING peer cohort before any confirmatory or economic step; per-symbol observed outcomes must not be used to alter cohort membership.",
+      "status": "NON_ECONOMIC_ACQUISITION_AUTHORIZED"
+    },
+    "objective": {
+      "class": "MECHANISM_SPECIFIC_DISCOVERY_PREREQUISITE_ACQUISITION",
+      "goal": "Acquire the already frozen, outcome-blind 48-symbol aligned M5 history for the EPOCH38 CROSS_SECTIONAL_RANKING (US Equities, EXTENDED_HOURS_SHARE_CFD) peer cohort so effective-sample-size/power and cross-sectional dependence design can be computed before any economic outcome is opened.",
+      "information_gain_rationale": "CROSS_SECTIONAL_RANKING is the only unblocked family with a fully frozen, outcome-blind candidate scope (EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1, peer_candidate_cohort_id peer_f00b1cfa2c5c4549) that is READY_FOR_FRESH_SEMANTIC_ACQUISITION_DECISION but has market_data_fetched=false. Acquiring this exact, pre-declared 48-symbol/32-week aligned M5 panel is the single highest-information legal action: it directly unblocks effective-independent-sample-size estimation, dependence/cluster design, and multiplicity planning for the peer-coherent estimand without opening any economic outcome, reusing existing frozen scope rather than reparameterizing or inventing a new panel."
+    },
+    "proposal_id": "AI_DIRECTOR_EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_V1"
+  },
+  "captured_utc": "2026-09-28T09:32:56Z",
+  "evidence_bundle_sha256": "1fc10c34e4182bbebb0cdfe5978e1dbd0a70be755c275d53eaf0f19ba42920c2",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_a719a418dba0111bedc230202e30e239"
+}
