@@ -89,6 +89,7 @@ jobs:
           tests.test_regime_context_data_sufficiency_audit
           tests.test_epoch38_deterministic_readiness_operation
           tests.test_mean_reversion_cohort_power_design
+          tests.test_mean_reversion_hypothesis_power_preflight
 
       - name: Bind tested exact research head for pending REGIME implementation acceptance
         shell: bash
@@ -236,6 +237,7 @@ jobs:
                   tests.test_regime_context_data_sufficiency_audit \
                   tests.test_epoch38_deterministic_readiness_operation \
                   tests.test_mean_reversion_cohort_power_design
+                  tests.test_mean_reversion_hypothesis_power_preflight
                 export MXM_PREDECESSOR_CI_HEAD="${tested}"
                 export MXM_PREDECESSOR_CI_CONCLUSION="success"
                 export MXM_PREDECESSOR_CI_RUN_ID="${GITHUB_RUN_ID}"
@@ -330,6 +332,7 @@ jobs:
           tests.test_regime_context_data_sufficiency_audit
           tests.test_epoch38_deterministic_readiness_operation
           tests.test_mean_reversion_cohort_power_design
+          tests.test_mean_reversion_hypothesis_power_preflight
 
       - name: Report durable frontier
         shell: bash
