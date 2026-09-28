@@ -33,6 +33,8 @@ PROTECTED_PREFIXES=(
 
 class ImplementationRejected(RuntimeError): pass
 class ImplementationProviderAttemptError(ImplementationRejected): pass
+class PostProviderPersistenceConcurrencyError(ImplementationRejected):
+    """Valid provider output is committed locally; remote reconciliation is required."""
 
 def _head(root:Path)->str:
     return subprocess.check_output(["git","rev-parse","HEAD"],cwd=root,text=True).strip()
@@ -434,14 +436,36 @@ def _publish_external_gate(root:Path,out:Mapping[str,Any],before:Mapping[str,Any
     }
     return _publish_next(root,next_out,before)
 
-def _normal_commit_push(root:Path,message:str)->str:
+def _normal_commit_push(root:Path,message:str,validation_modules:list[str]|None=None)->str:
     subprocess.run(["git","add","-A"],cwd=root,check=True)
     subprocess.run(["git","commit","-m",message],cwd=root,check=True)
-    sha=_head(root); target=os.environ.get("MXM_RUNTIME_TARGET_BRANCH","").strip()
+    target=os.environ.get("MXM_RUNTIME_TARGET_BRANCH","").strip()
     refspec=f"HEAD:refs/heads/{target}" if target else "HEAD"
-    p=subprocess.run(["git","push","origin",refspec],cwd=root,text=True,capture_output=True)
-    if p.returncode!=0: raise ImplementationRejected("implementation push failed: "+p.stderr[-1600:])
-    return sha
+    basis=subprocess.check_output(["git","rev-parse","HEAD^"],cwd=root,text=True).strip()
+    for attempt in range(3):
+        if target:
+            subprocess.run(["git","fetch","origin",target],cwd=root,check=True)
+            remote=subprocess.check_output(["git","rev-parse",f"origin/{target}"],cwd=root,text=True).strip()
+            if remote!=basis:
+                ancestor=subprocess.run(["git","merge-base","--is-ancestor",basis,remote],cwd=root)
+                if ancestor.returncode:
+                    raise PostProviderPersistenceConcurrencyError("remote authority diverged; preserved local provider commit")
+                local=set(subprocess.check_output(["git","diff","--name-only",basis,"HEAD"],cwd=root,text=True).splitlines())
+                changed=set(subprocess.check_output(["git","diff","--name-only",basis,remote],cwd=root,text=True).splitlines())
+                if local & changed:
+                    raise PostProviderPersistenceConcurrencyError("remote authority overlaps generated files; preserved local provider commit")
+                rebased=subprocess.run(["git","rebase",remote],cwd=root,text=True,capture_output=True)
+                if rebased.returncode:
+                    subprocess.run(["git","rebase","--abort"],cwd=root,check=False)
+                    raise PostProviderPersistenceConcurrencyError("compatible remote rebase failed; preserved local provider commit")
+                basis=remote
+                if validation_modules:
+                    subprocess.run(["python","-m","unittest","-q",*validation_modules],cwd=root,check=True)
+        p=subprocess.run(["git","push","origin",refspec],cwd=root,text=True,capture_output=True)
+        if p.returncode==0: return _head(root)
+        if not target or "fetch first" not in p.stderr and "non-fast-forward" not in p.stderr:
+            raise PostProviderPersistenceConcurrencyError("implementation push failed after provider success: "+p.stderr[-800:])
+    raise PostProviderPersistenceConcurrencyError("remote advanced during bounded push retries; preserved local provider commit")
 
 def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve(); next_state=_next(root)
@@ -554,7 +578,7 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
                       "request_fingerprint":semantic_fingerprint,"implementation_output":out,
                       "provider":provider,"changed_paths":changed,"project_snapshot":before,"created_utc":iso()}
             atomic_write_json(root/RESPONSE_REL,response)
-            sha=_normal_commit_push(root,"AI implement non-economic research continuation")
+            sha=_normal_commit_push(root,"AI implement non-economic research continuation",test_modules)
             return {"status":"PENDING_EXACT_HEAD_GREEN","implementation_commit":sha,"changed_paths":changed,"provider":provider}
         accepted_out=_post_green_output(out,[])
         response={"schema":"mxm.greenfield.general-ai-implementation-response.v1","status":"IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE",
@@ -570,6 +594,8 @@ def execute(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=Fa
         return {"status":"EXTERNAL_DATA_REQUIRED" if accepted_out["status"]=="EXTERNAL_DATA_REQUIRED" else "IMPLEMENTATION_COMPLETE",
                 "output":accepted_out,"next_state":published,"provider":provider,"exact_head":green}
     except Exception as exc:
+        if isinstance(exc,PostProviderPersistenceConcurrencyError):
+            raise
         _restore(root)
         if provider_attempted and not isinstance(exc,(subprocess.TimeoutExpired,ImplementationProviderAttemptError)):
             raise ImplementationProviderAttemptError(str(exc)) from exc
