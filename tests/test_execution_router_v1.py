@@ -45,6 +45,21 @@ class ExecutionRouterV1Tests(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_exact_head_transport_prefix_routes_only_after_implementation_is_satisfied(self):
+        td,root,state=self._root_with_op()
+        try:
+            state["next_action"]="RUN_EXACT_HEAD_CI_THEN_DO_DETERMINISTIC_THING"
+            state["implementation_satisfied"]=True
+            state["implementation_ai_required"]=False
+            self.assertTrue(deterministic_operation_required(root,state))
+            self.assertEqual(classify_execution(root,state)["execution_class"],"DETERMINISTIC_OPERATION")
+            state["implementation_satisfied"]=False
+            route=classify_execution(root,state)
+            self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+            self.assertIn("next_action mismatch",route["detail"])
+        finally:
+            td.cleanup()
+
     def test_nonempty_action_alone_is_not_ai_authority(self):
         state={"status":"READY","next_action":"UNBOUND_ACTION","user_action_required":False}
         self.assertFalse(implementation_required(ROOT,state))
