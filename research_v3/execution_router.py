@@ -191,7 +191,7 @@ def load_authorized_deterministic_operation(root_value: str | Path, state: Mappi
             if (doc.get("schema") == DETERMINISTIC_SCHEMA
                     and doc.get("status") == AUTHORIZED_DETERMINISTIC_STATUS
                     and doc.get("operation_name") == action
-                    and int(doc.get("evidence_epoch") or 0) == epoch):
+                    and int(doc.get("authorizing_evidence_epoch") or doc.get("evidence_epoch") or 0) == epoch):
                 matches.append(candidate)
         if len(matches) > 1:
             raise RoutingError(f"ambiguous deterministic authority for {action}")
@@ -207,7 +207,7 @@ def load_authorized_deterministic_operation(root_value: str | Path, state: Mappi
     if doc.get("status") != AUTHORIZED_DETERMINISTIC_STATUS:
         raise RoutingError("deterministic operation is not authorized")
     state_epoch = int(state.get("current_research_evidence_epoch") or state.get("evidence_epoch") or 0)
-    op_epoch = int(doc.get("evidence_epoch") or 0)
+    op_epoch = int(doc.get("authorizing_evidence_epoch") or doc.get("evidence_epoch") or 0)
     if state_epoch and op_epoch != state_epoch:
         raise RoutingError(f"deterministic operation evidence epoch mismatch: operation={op_epoch} state={state_epoch}")
     action = str(state.get("next_action") or "").strip()
@@ -237,6 +237,12 @@ def deterministic_operation_required(root_value: str | Path, state: Mapping[str,
     if _external_or_integrity_gate(state):
         return False
     if reasoning_required(state):
+        return False
+    current_epoch=int(state.get("current_research_evidence_epoch") or state.get("evidence_epoch") or 0)
+    authorizing_epoch=int(state.get("authorizing_evidence_epoch") or current_epoch or 0)
+    if current_epoch and authorizing_epoch and authorizing_epoch!=current_epoch:
+        # A historical accepted proposal remains evidence but cannot regain current
+        # implementation routing authority after newer material evidence advances.
         return False
     doc = load_authorized_deterministic_operation(root_value, state)
     if doc is None:
