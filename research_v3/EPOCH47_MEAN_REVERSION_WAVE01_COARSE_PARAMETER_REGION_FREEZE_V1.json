@@ -1,0 +1,101 @@
+{
+  "schema": "mxm.greenfield.epoch47-mean-reversion-wave01-coarse-region-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_NON_ECONOMIC_STAGE1_COARSE_PARAMETER_REGION_SCAN",
+  "evidence_epoch": 47,
+  "family": "MEAN_REVERSION",
+  "stage": "PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1/STAGE_1_COARSE_MECHANISM_REGION_SCAN",
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_ba723215ff1cce105447e4c95e4443e4.json",
+    "accepted_proposal_file_sha256": "6f889d8f2a49412621a00f6194f23b830b02ce5be36c234d1010291db28d7a22",
+    "accepted_proposal_hash": "453d0ddb418b21ae72107222f5219aea323161e7f37e4bdb65d7f963184f2edc",
+    "accepted_proposal_id": "AI_reason_ba723215ff1cce105447e4c95e4443e4_EPOCH47_MEAN_REVERSION_WAVE01_COARSE_REGION_FREEZE",
+    "capture_acceptance_ref": "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+    "capture_acceptance_file_sha256": "8e51c69485332dc70ea9ab6985d8e33866c8733ddee77e3f339ecc82adfb7128",
+    "data_sufficiency_ref": "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
+    "data_sufficiency_file_sha256": "9059e19f380e5b993d21b87edf88ddb66dc667377e16164acdd33a43e8183666",
+    "capture_plan_ref": "data/EPOCH46_OUTCOME_BLIND_M5_ACQUISITION_WAVE_01_PLAN_V1.json",
+    "capture_plan_sha256": "70706ee9c04fb262cf38be8c6cbd0fd7450c91e6d870e5c5f80c9301724ae247",
+    "accepted_capture_outer_zip_sha256": "bfdfcba4e70c699fa3719e15e01ed4f7a4542d7ed0e7439fd836133ab80d1ac1",
+    "accepted_capture_canonical_payload_sha256": "0305ca9d194300d28efde5b21aced13557e986d8d5476e3202ba66c8476774e2",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636"
+  },
+  "scope": {
+    "resolution": "M5",
+    "interval_utc": {
+      "start": "2025-12-15T00:00:00Z",
+      "end": "2026-03-15T23:59:59Z"
+    },
+    "requested_identity_count": 34,
+    "identities_with_accepted_rows": 33,
+    "authentic_zero_history_identity": "AMD.US-PERP",
+    "zero_history_is_not_negative_evidence": true,
+    "cohort_role": "DEVELOPMENT_ONLY_MECHANISM_SPECIFIC_DISCOVERY",
+    "structural_41_default_inferential_authority": false,
+    "protected_forward_opened": false
+  },
+  "parameter_grid": {
+    "absolute_standardized_deviation_thresholds": [1.0, 1.5, 2.0],
+    "lookback_bars": [12, 24, 48, 96],
+    "cell_count": 12,
+    "record_every_symbol_cell": true,
+    "winner_only_logging": false,
+    "grid_source_ref": "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json"
+  },
+  "event_law": {
+    "resolution": "M5",
+    "window": "For each exact-contiguous lookback window ending at a completed bar, calculate z=(close_t - arithmetic_mean(window_closes))/population_standard_deviation(window_closes).",
+    "eligibility": "A window is eligible only when all lookback M5 bars are present, timestamps are exactly 300 seconds apart, prices are finite and positive, and population standard deviation is positive.",
+    "event": "Count the first threshold crossing from the neutral band as one reversal excursion; do not count further bars while z remains in that tail. Returning inside the threshold rearms the next excursion. A direct crossing into the opposite tail starts a new excursion.",
+    "availability_denominator": "All eligible nonzero-scale exact-contiguous windows for that symbol and cell.",
+    "date_cluster": "UTC calendar date of the first threshold-crossing bar; retain zero-event dates that contain eligible windows.",
+    "missing_data": "Never fill, interpolate, resample, forward-fill, or bridge a timestamp gap; reset the excursion state at every gap.",
+    "prohibited": [
+      "post-event directional or return response",
+      "strategy return or PnL",
+      "candidate or winner selection",
+      "protected-forward evidence"
+    ]
+  },
+  "dependence_and_power": {
+    "independence_unit": "UTC date clusters of outcome-blind reversal event counts",
+    "effective_sample_size_method": "Initial-positive-sequence calendar-date autocorrelation adjustment; truncate at the first nonpositive lag, cap lag at 30 days, and bound effective_n to [1, date_clusters] when date_clusters is nonzero.",
+    "standardized_effect_scenarios": [0.5, 0.3, 0.2],
+    "target_power": 0.8,
+    "familywise_alpha": 0.05,
+    "power_hypothesis_count": 36,
+    "power_alpha": "One-sided Bonferroni alpha=0.05/36, matching the accepted Wave01 data-sufficiency planning design.",
+    "power_formula": "Normal approximation: Phi(effect*sqrt(effective_n)-Phi_inverse(1-alpha)); planning diagnostic only, not an observed response or inferential result."
+  },
+  "execution": {
+    "implementation_ref": "research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py",
+    "result_ref": "evidence/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_V1.json",
+    "deterministic_operation_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json",
+    "exact_head_green_required_before_execution": true
+  },
+  "later_step": {
+    "stage": "PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1/STAGE_2_ROBUST_REGION_IDENTIFICATION",
+    "status": "PRESERVED_FOR_SUBSEQUENT_PROPOSAL",
+    "rule": "Use this scan's complete per-cell diagnostics to identify broad stable neighborhoods; reject isolated single-cell winners. No Stage 2 decision or Stage 3 refinement is made by this implementation."
+  },
+  "interpretation_boundary": {
+    "economic_outcome_opened": false,
+    "v2_attempt_consumed": false,
+    "candidate_economic_identity_created": false,
+    "mechanism_family_closed": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_holdout_is_independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  }
+}
