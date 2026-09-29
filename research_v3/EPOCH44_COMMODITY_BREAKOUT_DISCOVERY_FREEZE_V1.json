@@ -1,0 +1,125 @@
+{
+  "schema": "mxm.greenfield.epoch44-commodity-breakout-discovery-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_BEFORE_COMMODITY_BREAKOUT_SURFACE_EVALUATION",
+  "evidence_epoch": 44,
+  "family": "BREAKOUT_VOLATILITY_EXPANSION",
+  "stage": "NON_ECONOMIC_COMMODITY_CASH_CFD_COARSE_PARAMETER_REGION_DISCOVERY",
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_fd77b36965efba11da293f8a9c7a7782.json",
+    "accepted_proposal_file_sha256": "d1f09390627de743519d70ce53a94ae716bff7db457d477e57c47498552a8c1e",
+    "accepted_proposal_hash": "f2046bf7da29b2da28c8bfb45e237af9c06686beb4428b0b86fc236fea32876c",
+    "proposal_registry_ref": "research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",
+    "accepted_operation_id": "op_61c37b499421a4ef06da08fee22042e1",
+    "development_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "development_capture_plan_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_PLAN_V1.json",
+    "development_capture_plan_sha256": "b29e6f95dcd1adc3374f71124628388df7e235829fc019d31b1183166b9c7d6a",
+    "development_zip_filename": "MXM_BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_V1.zip",
+    "development_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503",
+    "development_library_file_id": "libfile_f31adb42d4e88191b7b372af4f3f077a",
+    "eur200_feasibility_index_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
+    "eur200_feasibility_index_sha256": "fbad721388da7f5e48dd54056aaf00fca8554d41daa9fb728e4c546ed50f7851",
+    "capital_efficiency_frontier_ref": "data/BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1.json",
+    "capital_efficiency_frontier_sha256": "8fb15e9983f9a14bdc9a1b24667f03c83d2d15fcfc7f661f5e5f50d51852e9cf",
+    "registry_ref": "research_v3/CURRENT_BROKER_STRUCTURAL_SIGNATURE_REGISTRY_EPOCH22_V1.json",
+    "registry_sha256": "bd375406a1363704b5c6d0a76552d33b9d18d03f255c5f2c328c918c99b73ed3",
+    "coverage_inventory_ref": "evidence/EPOCH21_ALL_FRONTIER_PREREQUISITE_COVERAGE_INVENTORY_V1.json",
+    "coverage_inventory_sha256": "c0898404076a27ac8063c20d490562cd85c0ee20a142617579bef949570bb092",
+    "discovery_architecture_ref": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+    "discovery_architecture_sha256": "6b14648bad0aa8e0753f3771896892d0a7d70bd89911800ce9bdbafc0e96a568",
+    "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+    "parameter_governor_sha256": "9e7f911f60034b1a2daca6e70c473b2fa6504054beae87257656b6f245f3dc39"
+  },
+  "scope": {
+    "frontier": "COMMODITIES_CASH_CFD",
+    "selection_law": "Process every symbol classified as Commodities (Cash) in the already accepted M5 development capture plan that has complete accepted M5 history; do not use price outcomes or prior screen results to select or omit symbols.",
+    "symbols": [
+      {"symbol": "Lead", "symbol_id": 2791, "asset_class": "Commodities (Cash)"},
+      {"symbol": "Corn", "symbol_id": 306, "asset_class": "Commodities (Cash)"},
+      {"symbol": "LDSugar", "symbol_id": 148, "asset_class": "Commodities (Cash)"},
+      {"symbol": "Sugar", "symbol_id": 106, "asset_class": "Commodities (Cash)"}
+    ],
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z"
+    },
+    "data_source": "EXACT_HASH_BOUND_ACCEPTED_DEVELOPMENT_ARCHIVE_ONLY",
+    "parameter_cells_per_symbol": 27,
+    "total_parameter_cells": 108,
+    "structural_representatives_are_not_economically_equivalent": true,
+    "broader_eligible_frontier_remains_open": true
+  },
+  "universe_feature_policy": {
+    "outcome_blind": true,
+    "include_every_cash_commodity_with_complete_accepted_m5_history": true,
+    "reported_features": [
+      "asset class, broker product type, and structural schedule signature",
+      "accepted M5 rows and observed interval coverage",
+      "breakout event density and volatility-expansion opportunity",
+      "effective independent UTC-date sample size",
+      "EUR200 directional feasibility and minimum-margin/capital-efficiency proxies"
+    ],
+    "conservative_friction_proxy": "UNAVAILABLE_IN_BOUND_AUTHORITIES; DO_NOT_INFER_SPREAD_FROM_SINGLE_PRICE_OHLC",
+    "price_outcomes_may_change_universe_membership": false,
+    "prior_breakout_screen_results_may_change_universe_membership": false,
+    "low_or_unavailable_power_does_not_close_the_frontier": true
+  },
+  "parameter_grid": {
+    "lookback_bars_M5": [12, 36, 48],
+    "range_expansion_multiple": [1.25, 1.5, 2.0],
+    "followthrough_horizon_bars_M5": [3, 6, 12],
+    "cells_per_symbol": 27,
+    "ranges_frozen_before_surface_evaluation": true,
+    "record_every_probe": true,
+    "winner_only_logging": false,
+    "prior_breakout_diagnostic_exact_24bar_1_5x_cell_evaluated": false
+  },
+  "mechanism_law": {
+    "event": "At close of bar t, close_t is strictly above the maximum high or below the minimum low of the immediately preceding lookback completed, contiguous M5 bars, and the current high-low range is at least the frozen multiple of the median high-low range of those same preceding bars.",
+    "direction": "UP when close_t exceeds the preceding maximum high; DOWN when close_t is below the preceding minimum low; all other bars are not events.",
+    "causal_timing": "Event, direction, and reference range use only completed bars at or before t. Follow-through uses the close at t+h and only bars t+1 through t+h.",
+    "missing_data": "No fill, interpolation, resampling, or synthetic bars. Every event and follow-through window must have exact 300-second timestamp increments; gaps invalidate any window crossing them.",
+    "zero_range_policy": "A zero prior median range permits an event only when the current range is positive; such an event has no valid normalized response scale and is reported as excluded from response inference.",
+    "independence": "Retain the first qualifying event per symbol, parameter cell, and UTC date only when the full event and follow-through windows are contiguous and the prior median range is positive.",
+    "daily_statistic": "For each retained event/date, compute direction times (close at t+h minus close at t) divided by the prior median high-low range. This is a dimensionless structural price-response statistic, not a strategy return, PnL, executable result, or cost-adjusted outcome.",
+    "uncertainty": "Average event responses within each UTC date; report the mean of daily cluster values, standard error across daily clusters, descriptive normal-approximation 95% interval, and effective sample size in UTC dates. Chronological halves are descriptive stability diagnostics.",
+    "multiplicity": "Compute a one-sided exact positive-sign test over daily cluster values for every symbol-cell; apply Benjamini-Yekutieli adjustment across all 108 predeclared symbol-cell tests. Adjusted values are exploratory and do not authorize promotion."
+  },
+  "robustness_law": {
+    "local_support": "Positive overall mean daily response, at least 10 effective UTC dates, at least 5 dates in each chronological half, and positive mean response in both halves.",
+    "direct_neighborhood": "Cells differing by exactly one adjacent frozen grid step on exactly one parameter axis are direct neighbors.",
+    "broad_local_neighborhood_support": "Local support and positive effects for at least 75% of all direct neighbors, with at least two direct neighbors.",
+    "commodity_breadth": "A parameter cell has breadth support when at least two of the four frozen cash-commodity symbols meet local support; this is descriptive and not a significance requirement.",
+    "robust_region": "A connected direct-adjacent component of breadth-supported parameter cells containing at least three cells and varying on at least two parameter dimensions.",
+    "winner_selection": "No observed per-symbol or per-cell winner may be selected for promotion."
+  },
+  "interpretation_boundary": {
+    "result_scope": "NON_ECONOMIC_COMMODITY_CASH_CFD_BREAKOUT_STRUCTURAL_DISCOVERY_ONLY",
+    "prior_breakout_screen_results_are_inputs": false,
+    "internal_development_data_is_independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "mechanism_family_closed": false,
+    "asset_class_closed": false,
+    "winner_selected": false,
+    "candidate_identity_created": false,
+    "protected_forward_opened": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "execution": {
+    "implementation_ref": "research_v3/commodity_breakout_epoch44_screen.py",
+    "result_ref": "evidence/EPOCH45_COMMODITY_BREAKOUT_COARSE_REGION_RESULT_V1.json",
+    "deterministic_operation_ref": "research_v3/EPOCH44_COMMODITY_BREAKOUT_DETERMINISTIC_OPERATION_V1.json",
+    "exact_head_green_required_before_execution": true,
+    "accepted_data_bytes_may_be_transport_materialized_without_new_data_acquisition": true,
+    "freeze_must_be_persisted_before_surface_evaluation": true
+  }
+}

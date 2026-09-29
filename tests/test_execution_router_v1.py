@@ -177,6 +177,16 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             self.assertFalse(implementation_required(ROOT,state))
             self.assertIsNone(state.get("next_deterministic_operation_ref"))
             self.assertIsNone(state.get("deterministic_next_operation"))
+            if state.get("status")=="FRESH_GENERAL_AI_REASONING_REQUIRED_FOR_DISJOINT_MEAN_REVERSION_DATA_SCOPE":
+                audit_ref=state["accepted_capture_scope_audit_ref"]
+                audit=json.loads((ROOT/audit_ref).read_text())
+                self.assertEqual(audit["scope_count"],10)
+                self.assertEqual(audit["disjoint_accepted_exact_identities"],["NETH25"])
+                self.assertEqual(state["accounting"],{
+                    "economic_outcomes_opened":28,
+                    "v2_attempts_used":20,
+                    "v2_search_budget_remaining":64,
+                })
             self.assertEqual(state.get("authorizing_evidence_epoch"),state.get("current_research_evidence_epoch"))
             if state["next_action"].startswith("AI_SELECT_HIGHEST_INFORMATION_"):
                 self.assertTrue((ROOT/state["epoch38_alignment_readiness_ref"]).is_file())
