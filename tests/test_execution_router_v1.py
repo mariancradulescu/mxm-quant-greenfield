@@ -219,13 +219,18 @@ class ExecutionRouterV1Tests(unittest.TestCase):
                 "v2_attempts_used":20,
                 "v2_search_budget_remaining":64,
             })
-        elif state.get("status")=="LOCAL_MEAN_REVERSION_DISJOINT_SCOPE_PARKED_INSUFFICIENT_AUTHORITY":
-            self.assertEqual(route["execution_class"],"NO_WORK")
-            self.assertIsNone(state.get("next_action"))
+        elif state.get("status")=="OUTCOME_BLIND_PEPPERSTONE_M5_WAVE_01_CAPTURE_REQUIRED":
+            self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+            self.assertNotEqual(route["execution_class"],"NO_WORK")
+            self.assertEqual(state.get("next_action"),"COLLECT_EPOCH46_OUTCOME_BLIND_PEPPERSTONE_M5_WAVE_01")
             self.assertFalse(implementation_required(ROOT,state))
-            decision=json.loads((ROOT/state["mean_reversion_disjoint_scope_decision_ref"]).read_text())
-            self.assertFalse(decision["decision"]["new_market_data_acquisition_authorized"])
-            self.assertFalse(decision["broader_research"]["mean_reversion_family_closed"])
+            local=json.loads((ROOT/state["mean_reversion_disjoint_scope_decision_ref"]).read_text())
+            self.assertFalse(local["broader_research"]["mean_reversion_family_closed"])
+            global_decision=json.loads((ROOT/state["global_information_gain_decision_ref"]).read_text())
+            self.assertEqual(global_decision["status"],"GLOBAL_AUTONOMOUS_DISCOVERY_RESTORED_OUTCOME_BLIND_ACQUISITION_SELECTED")
+            wave=json.loads((ROOT/state["next_acquisition_plan_ref"]).read_text())
+            self.assertEqual(len(wave["symbols"]),34)
+            self.assertFalse(wave["selection_authority"]["outcomes_used"])
             self.assertEqual(state["accounting"],{
                 "economic_outcomes_opened":28,
                 "v2_attempts_used":20,

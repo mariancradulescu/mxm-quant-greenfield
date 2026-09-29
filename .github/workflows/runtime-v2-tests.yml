@@ -29,6 +29,11 @@ on:
       - 'tests/test_discovery_governance_v1.py'
       - 'tests/test_epoch38_deterministic_readiness_operation.py'
       - 'tests/test_execution_router_v1.py'
+      - 'research_v3/epoch46_outcome_blind_m5_capture.py'
+      - 'research_v3/pydroid_epoch46_outcome_blind_m5_launcher.py'
+      - 'data/EPOCH46_OUTCOME_BLIND_M5_ACQUISITION_WAVE_01_PLAN_V1.json'
+      - 'tests/test_epoch46_outcome_blind_m5_capture.py'
+      - 'tools/build_epoch46_outcome_blind_m5_capture_package.py'
       - 'research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json'
       - 'research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_DETERMINISTIC_OPERATION_V1.json'
       - '.github/workflows/runtime-v2-tests.yml'
@@ -88,6 +93,17 @@ jobs:
           tests.test_discovery_governance_v1
           tests.test_epoch38_deterministic_readiness_operation
           tests.test_mean_reversion_stage1_triage_epoch40
+          tests.test_epoch46_outcome_blind_m5_capture
+
+      - name: Build exact Epoch46 broker capture package
+        run: python tools/build_epoch46_outcome_blind_m5_capture_package.py
+
+      - name: Upload exact Epoch46 broker capture package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_PACKAGE_V1
+          path: dist/MXM_EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_PACKAGE_V1.zip
+          if-no-files-found: error
 
       - name: Diagnose persisted TREND surface transport without rerunning research
         run: python -m research_v3.trend_surface_transport_repair

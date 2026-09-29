@@ -1,0 +1,597 @@
+{
+  "schema": "mxm.greenfield.epoch46-outcome-blind-m5-acquisition-wave.v1",
+  "status": "FROZEN_PRE_CAPTURE_NON_ECONOMIC_OUTCOME_BLIND",
+  "source_evidence_epoch": 44,
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "resolution": "M5",
+  "interval": {
+    "start_utc": "2025-12-15T00:00:00Z",
+    "end_utc": "2026-03-15T23:59:59Z",
+    "weeks": 13
+  },
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "temporal_design": {
+    "purpose": "FIRST_OUTCOME_BLIND_DEVELOPMENT_MEASUREMENT_WAVE",
+    "earlier_than_all_ACCEPTED_M5_scopes_in_epoch45_audit": true,
+    "prior_accepted_m5_scope_floor_utc": "2026-03-16T00:00:00Z",
+    "protected_forward_opened": false,
+    "not_confirmation_evidence": true,
+    "expansion_rule": "Expand only from schedule-adjusted completeness, contiguous history, causal event density, dependence-adjusted ESS, strata undercoverage and structural redundancy; never from returns, response sign, PnL or winner status."
+  },
+  "selection_authority": {
+    "eligible_frontier": 1576,
+    "peer_cohort_index_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+    "peer_cohort_index_git_blob_sha1": "0910fa14264054b4913077f5dffa74dc2569749d",
+    "current_feasibility_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "mean_reversion_local_park_ref": "evidence/MEAN_REVERSION_DISJOINT_SCOPE_FEASIBILITY_DECISION_V1.json",
+    "global_decision_ref": "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
+    "cohort_count": 41,
+    "cohorts_with_existing_singleton_coverage": 7,
+    "open_cohorts_sampled": 34,
+    "accepted_scope_identity_exclusion_count": 45,
+    "rule": "Exclude all 45 identities appearing in any accepted scope in the completed Epoch45 audit. For every peer cohort with at least one remaining identity, select exactly one previously unsampled identity closest to that remaining cohort's median capital-efficiency proxy; tie-break by lower minimum directional margin EUR, then lower symbol_id. The seven cohorts with no remaining identity are already singleton cohorts covered by accepted scope.",
+    "outcomes_used": false
+  },
+  "symbols": [
+    {
+      "broker_symbol": "EBS.AT",
+      "symbol_id": 5266,
+      "peer_candidate_cohort_id": "peer_2a08ce2729b7af69",
+      "structural_stratum": {
+        "asset_class": "AT Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 24.56,
+      "schedule_minutes_per_week": 2536,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "BGA.AU",
+      "symbol_id": 3658,
+      "peer_candidate_cohort_id": "peer_1dd2bfc1b8e699bb",
+      "structural_stratum": {
+        "asset_class": "AU Equities",
+        "product_type": "STANDARD_CASH_SHARE_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "ASIA"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 1.12,
+      "schedule_minutes_per_week": 1789.917,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "ELI.BE",
+      "symbol_id": 5117,
+      "peer_candidate_cohort_id": "peer_6231becc36514a81",
+      "structural_stratum": {
+        "asset_class": "BE Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 23.76,
+      "schedule_minutes_per_week": 2536,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "SIKA.CH",
+      "symbol_id": 5279,
+      "peer_candidate_cohort_id": "peer_5ab97502d66cab2e",
+      "structural_stratum": {
+        "asset_class": "CH Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 38.79,
+      "schedule_minutes_per_week": 2486,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "Wheat",
+      "symbol_id": 149,
+      "peer_candidate_cohort_id": "peer_71bf2acdb77e26da",
+      "structural_stratum": {
+        "asset_class": "Commodities (Cash)",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "EXTENDED_MULTI_SESSION_SCHEDULE",
+        "session_regions": "US|EXTENDED_OVERLAP"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 61.13,
+      "schedule_minutes_per_week": 5266,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "Cattle",
+      "symbol_id": 308,
+      "peer_candidate_cohort_id": "peer_1c3e15b1e3bc0a06",
+      "structural_stratum": {
+        "asset_class": "Commodities (Cash)",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "US"
+      },
+      "minimum_executable_volume": "100000",
+      "minimum_directional_margin_eur": 193.99,
+      "schedule_minutes_per_week": 1366,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "DOGEUSD",
+      "symbol_id": 324,
+      "peer_candidate_cohort_id": "peer_402d81946bdc4389",
+      "structural_stratum": {
+        "asset_class": "Crypto Currency (Spot)",
+        "product_type": "SPOT_CRYPTO_CFD",
+        "coverage_bucket": "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "10000",
+      "minimum_directional_margin_eur": 4.16,
+      "schedule_minutes_per_week": 10065.983,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "USDX",
+      "symbol_id": 110,
+      "peer_candidate_cohort_id": "peer_a6de186afe449b0e",
+      "structural_stratum": {
+        "asset_class": "Currency Index (Spot)",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "1000",
+      "minimum_directional_margin_eur": 177.72,
+      "schedule_minutes_per_week": 6411,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "BAYNd.DE",
+      "symbol_id": 3111,
+      "peer_candidate_cohort_id": "peer_e666cceafa157ba5",
+      "structural_stratum": {
+        "asset_class": "DE Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 9.91,
+      "schedule_minutes_per_week": 2516,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "COLOB.DK",
+      "symbol_id": 5313,
+      "peer_candidate_cohort_id": "peer_39bf31802e23a3c0",
+      "structural_stratum": {
+        "asset_class": "DK Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 11.15,
+      "schedule_minutes_per_week": 2365,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "NTGY.ES",
+      "symbol_id": 5234,
+      "peer_candidate_cohort_id": "peer_2dd1410204f44b83",
+      "structural_stratum": {
+        "asset_class": "ES Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 5.91,
+      "schedule_minutes_per_week": 2536,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "EEM.US",
+      "symbol_id": 4520,
+      "peer_candidate_cohort_id": "peer_b54836f0306e650e",
+      "structural_stratum": {
+        "asset_class": "ETFs",
+        "product_type": "ETF_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "US"
+      },
+      "minimum_executable_volume": "10",
+      "minimum_directional_margin_eur": 1.18,
+      "schedule_minutes_per_week": 1936,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "FORTUM.FI",
+      "symbol_id": 5372,
+      "peer_candidate_cohort_id": "peer_cbb100be4c7f6ec4",
+      "structural_stratum": {
+        "asset_class": "FI Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 4.72,
+      "schedule_minutes_per_week": 2511,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "SGO.FR",
+      "symbol_id": 5144,
+      "peer_candidate_cohort_id": "peer_df4a012231a0beb8",
+      "structural_stratum": {
+        "asset_class": "FR Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 14,
+      "schedule_minutes_per_week": 2536,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "USDNOK",
+      "symbol_id": 22,
+      "peer_candidate_cohort_id": "peer_d1d1b14057eafe5c",
+      "structural_stratum": {
+        "asset_class": "Forex (Spot)",
+        "product_type": "FX_SPOT_OR_MARGIN_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "100000",
+      "minimum_directional_margin_eur": 43.92,
+      "schedule_minutes_per_week": 7186,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "USDCOP",
+      "symbol_id": 2760,
+      "peer_candidate_cohort_id": "peer_b98accf25a71b067",
+      "structural_stratum": {
+        "asset_class": "Forex (Spot)",
+        "product_type": "FX_SPOT_OR_MARGIN_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100000",
+      "minimum_directional_margin_eur": 87.83,
+      "schedule_minutes_per_week": 1136,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "USDIDR",
+      "symbol_id": 2912,
+      "peer_candidate_cohort_id": "peer_f1d083b7f7d96cdf",
+      "structural_stratum": {
+        "asset_class": "Forex (Spot)",
+        "product_type": "FX_SPOT_OR_MARGIN_CFD",
+        "coverage_bucket": "EXTENDED_MULTI_SESSION_SCHEDULE",
+        "session_regions": "US|EXTENDED_OVERLAP"
+      },
+      "minimum_executable_volume": "100000",
+      "minimum_directional_margin_eur": 87.83,
+      "schedule_minutes_per_week": 5686,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "USDX-F",
+      "symbol_id": 2926,
+      "peer_candidate_cohort_id": "peer_30358a1b3ff40997",
+      "structural_stratum": {
+        "asset_class": "Forwards - Indices",
+        "product_type": "FORWARD_OR_FUTURES_STYLE_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 17.72,
+      "schedule_minutes_per_week": 6411,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "US_Tbond-F",
+      "symbol_id": 7293,
+      "peer_candidate_cohort_id": "peer_5539f43e15feaa0a",
+      "structural_stratum": {
+        "asset_class": "Forwards - Treasuries",
+        "product_type": "FORWARD_OR_FUTURES_STYLE_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 18.44,
+      "schedule_minutes_per_week": 6891,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "EUBund-F",
+      "symbol_id": 7291,
+      "peer_candidate_cohort_id": "peer_1cd68a2c923ae4c5",
+      "structural_stratum": {
+        "asset_class": "Forwards - Treasuries",
+        "product_type": "FORWARD_OR_FUTURES_STYLE_CFD",
+        "coverage_bucket": "EXTENDED_MULTI_SESSION_SCHEDULE",
+        "session_regions": "EUROPE|EXTENDED_OVERLAP"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 23.96,
+      "schedule_minutes_per_week": 5916,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "BOY.GB",
+      "symbol_id": 3407,
+      "peer_candidate_cohort_id": "peer_c741667caf6aced4",
+      "structural_stratum": {
+        "asset_class": "GB Equities",
+        "product_type": "STANDARD_CASH_SHARE_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 2.2,
+      "schedule_minutes_per_week": 2536,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "9633.HK",
+      "symbol_id": 7223,
+      "peer_candidate_cohort_id": "peer_05e18c3d8865f530",
+      "structural_stratum": {
+        "asset_class": "HK Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "ASIA"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 0.86,
+      "schedule_minutes_per_week": 1636,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "KSP.IE",
+      "symbol_id": 5383,
+      "peer_candidate_cohort_id": "peer_5fd44534b294bd8c",
+      "structural_stratum": {
+        "asset_class": "IE Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 19.46,
+      "schedule_minutes_per_week": 2528,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "JPN225",
+      "symbol_id": 116,
+      "peer_candidate_cohort_id": "peer_5af4deaaf5b2fa16",
+      "structural_stratum": {
+        "asset_class": "Indices (Spot)",
+        "product_type": "CASH_INDEX_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "1000",
+      "minimum_directional_margin_eur": 184.4,
+      "schedule_minutes_per_week": 6891,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "HK50",
+      "symbol_id": 112,
+      "peer_candidate_cohort_id": "peer_7aa9f06a6ab55676",
+      "structural_stratum": {
+        "asset_class": "Indices (Spot)",
+        "product_type": "CASH_INDEX_CFD",
+        "coverage_bucket": "EXTENDED_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EXTENDED_OVERLAP"
+      },
+      "minimum_executable_volume": "10",
+      "minimum_directional_margin_eur": 27.39,
+      "schedule_minutes_per_week": 4795,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "GER40",
+      "symbol_id": 122,
+      "peer_candidate_cohort_id": "peer_cd87af699a81ab54",
+      "structural_stratum": {
+        "asset_class": "Indices (Spot)",
+        "product_type": "CASH_INDEX_CFD",
+        "coverage_bucket": "EXTENDED_MULTI_SESSION_SCHEDULE",
+        "session_regions": "EUROPE|EXTENDED_OVERLAP"
+      },
+      "minimum_executable_volume": "10",
+      "minimum_directional_margin_eur": 127.27,
+      "schedule_minutes_per_week": 5916,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "XAUJPY",
+      "symbol_id": 262,
+      "peer_candidate_cohort_id": "peer_a6e845df6ca608a7",
+      "structural_stratum": {
+        "asset_class": "Metals (Spot)",
+        "product_type": "SPOT_METAL_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 187.82,
+      "schedule_minutes_per_week": 6886,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "DNB.NO",
+      "symbol_id": 5329,
+      "peer_candidate_cohort_id": "peer_76ec2729645916b2",
+      "structural_stratum": {
+        "asset_class": "NO Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 5.85,
+      "schedule_minutes_per_week": 2186,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "NOS.PT",
+      "symbol_id": 5220,
+      "peer_candidate_cohort_id": "peer_081715e3c19db95f",
+      "structural_stratum": {
+        "asset_class": "PT Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 1.09,
+      "schedule_minutes_per_week": 2536,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "BRENTOIL-PERP",
+      "symbol_id": 7394,
+      "peer_candidate_cohort_id": "peer_4f3f9dd1de080d35",
+      "structural_stratum": {
+        "asset_class": "Perpetual Commodity",
+        "product_type": "PERPETUAL_CFD",
+        "coverage_bucket": "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 43.45,
+      "schedule_minutes_per_week": 10065.983,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "AMD.US-PERP",
+      "symbol_id": 7419,
+      "peer_candidate_cohort_id": "peer_88187d731edcec0c",
+      "structural_stratum": {
+        "asset_class": "Perpetual Stock",
+        "product_type": "PERPETUAL_CFD",
+        "coverage_bucket": "NEAR_24X7_OR_WEEKEND_CAPABLE_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "10",
+      "minimum_directional_margin_eur": 28.21,
+      "schedule_minutes_per_week": 10065.983,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "VOLVB.SE",
+      "symbol_id": 5344,
+      "peer_candidate_cohort_id": "peer_6c3874be0a0cd929",
+      "structural_stratum": {
+        "asset_class": "SE Equities",
+        "product_type": "OTHER_OR_TEST_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "EUROPE"
+      },
+      "minimum_executable_volume": "100",
+      "minimum_directional_margin_eur": 5.71,
+      "schedule_minutes_per_week": 2511,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "MMM.US-24",
+      "symbol_id": 5450,
+      "peer_candidate_cohort_id": "peer_f00b1cfa2c5c4549",
+      "structural_stratum": {
+        "asset_class": "US Equities",
+        "product_type": "EXTENDED_HOURS_SHARE_CFD",
+        "coverage_bucket": "NEAR_24X5_MULTI_SESSION_SCHEDULE",
+        "session_regions": "ASIA|EUROPE|US"
+      },
+      "minimum_executable_volume": "10",
+      "minimum_directional_margin_eur": 2.96,
+      "schedule_minutes_per_week": 7007,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    },
+    {
+      "broker_symbol": "BABA.US",
+      "symbol_id": 801,
+      "peer_candidate_cohort_id": "peer_18f29fc73fbba23f",
+      "structural_stratum": {
+        "asset_class": "US Equities",
+        "product_type": "STANDARD_CASH_SHARE_CFD",
+        "coverage_bucket": "REGIONAL_OR_CASH_SESSION_SCHEDULE",
+        "session_regions": "US"
+      },
+      "minimum_executable_volume": "10",
+      "minimum_directional_margin_eur": 1.94,
+      "schedule_minutes_per_week": 1936,
+      "history_state_at_freeze": "NO_ACCEPTED_M5_SCOPE_IN_EPOCH45_AUDIT"
+    }
+  ],
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "forward_fill_permitted": false,
+    "synthetic_fill_permitted": false,
+    "protected_rows_permitted": false,
+    "max_count_per_request": 5000,
+    "historical_request_target_rps": 4.7,
+    "window_days": 14,
+    "exhaust_pagination": true,
+    "preserve_authentic_gaps": true,
+    "strict_timestamp_order": true,
+    "reject_conflicting_duplicates": true,
+    "verify_ohlc_invariants": true
+  },
+  "post_capture_non_economic_gate": {
+    "inspect": [
+      "identity_and_account_binding",
+      "timestamp_order_and_duplicates",
+      "ohlc_invariants",
+      "hashes",
+      "schedule_adjusted_completeness",
+      "contiguous_history",
+      "causal_event_density",
+      "independent_event_cluster_density",
+      "dependence_adjusted_effective_sample_size",
+      "strata_undercoverage",
+      "structural_redundancy",
+      "protected_forward_exclusion"
+    ],
+    "forbidden": [
+      "strategy_return",
+      "PnL",
+      "response_sign",
+      "winner_identity",
+      "best_parameter_cell",
+      "protected_forward_outcome"
+    ],
+    "family_closure_authorized": false,
+    "economic_promotion_authorized": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "v2_search_budget_change": 0
+  },
+  "protected_evidence_opened": false,
+  "plan_sha256": "70706ee9c04fb262cf38be8c6cbd0fd7450c91e6d870e5c5f80c9301724ae247"
+}
