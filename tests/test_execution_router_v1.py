@@ -219,6 +219,30 @@ class ExecutionRouterV1Tests(unittest.TestCase):
                 "v2_attempts_used":20,
                 "v2_search_budget_remaining":64,
             })
+        elif state.get("status")=="FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH46_OUTCOME_BLIND_WAVE_01":
+            self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
+            self.assertTrue(state["ai_reasoning_required"])
+            self.assertTrue(state["research_judgment_required"])
+            self.assertFalse(state["user_action_required"])
+            self.assertFalse(state["external_data_required"])
+            self.assertFalse(state["implementation_ai_required"])
+            self.assertIsNone(state.get("next_deterministic_operation_ref"))
+            self.assertTrue((ROOT/state["accepted_epoch46_wave01_capture_ref"]).is_file())
+            self.assertTrue((ROOT/state["epoch46_wave01_data_sufficiency_ref"]).is_file())
+            acceptance=json.loads((ROOT/state["accepted_epoch46_wave01_capture_ref"]).read_text())
+            self.assertEqual(acceptance["integrity_validation"]["nonempty_series"],33)
+            self.assertEqual(acceptance["integrity_validation"]["zero_history_series"],1)
+            self.assertEqual(acceptance["integrity_validation"]["total_m5_rows"],305938)
+            suff=json.loads((ROOT/state["epoch46_wave01_data_sufficiency_ref"]).read_text())
+            self.assertFalse(suff["acquisition_decision"]["immediate_wave02_required"])
+            self.assertFalse(suff["allowed_next_step"]["economic_response_evaluation_authorized_now"])
+            self.assertTrue(suff["allowed_next_step"]["prospective_freeze_required_before_any_response_statistic"])
+            self.assertTrue(state["broader_universe_remains_open"])
+            self.assertEqual(state["accounting"],{
+                "economic_outcomes_opened":28,
+                "v2_attempts_used":20,
+                "v2_search_budget_remaining":64,
+            })
         elif state.get("status")=="OUTCOME_BLIND_PEPPERSTONE_M5_WAVE_01_CAPTURE_REQUIRED":
             self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
             self.assertNotEqual(route["execution_class"],"NO_WORK")
