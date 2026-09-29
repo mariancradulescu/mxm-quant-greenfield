@@ -1,7 +1,7 @@
 {
   "schema": "mxm.greenfield.epoch47-mean-reversion-wave01-coarse-region-freeze.v1",
   "status": "PROSPECTIVELY_FROZEN_NON_ECONOMIC_STAGE1_COARSE_PARAMETER_REGION_SCAN",
-  "evidence_epoch": 47,
+  "evidence_epoch": 45,
   "family": "MEAN_REVERSION",
   "stage": "PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1/STAGE_1_COARSE_MECHANISM_REGION_SCAN",
   "authority": {
@@ -34,8 +34,17 @@
     "protected_forward_opened": false
   },
   "parameter_grid": {
-    "absolute_standardized_deviation_thresholds": [1.0, 1.5, 2.0],
-    "lookback_bars": [12, 24, 48, 96],
+    "absolute_standardized_deviation_thresholds": [
+      1,
+      1.5,
+      2
+    ],
+    "lookback_bars": [
+      12,
+      24,
+      48,
+      96
+    ],
     "cell_count": 12,
     "record_every_symbol_cell": true,
     "winner_only_logging": false,
@@ -59,7 +68,11 @@
   "dependence_and_power": {
     "independence_unit": "UTC date clusters of outcome-blind reversal event counts",
     "effective_sample_size_method": "Initial-positive-sequence calendar-date autocorrelation adjustment; truncate at the first nonpositive lag, cap lag at 30 days, and bound effective_n to [1, date_clusters] when date_clusters is nonzero.",
-    "standardized_effect_scenarios": [0.5, 0.3, 0.2],
+    "standardized_effect_scenarios": [
+      0.5,
+      0.3,
+      0.2
+    ],
     "target_power": 0.8,
     "familywise_alpha": 0.05,
     "power_hypothesis_count": 36,
@@ -97,5 +110,7 @@
     "economic_outcomes_opened": 0,
     "v2_attempts_consumed": 0,
     "search_budget_change": 0
-  }
+  },
+  "research_sequence_label": "EPOCH47",
+  "evidence_epoch_semantics": "SOURCE_MATERIAL_EVIDENCE_EPOCH_45; EPOCH47_IS_A_RESEARCH_SEQUENCE_LABEL_NOT_THE_EVIDENCE_COUNTER"
 }
