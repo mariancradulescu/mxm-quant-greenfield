@@ -14,6 +14,10 @@ class Epoch46OutcomeBlindM5CaptureTests(unittest.TestCase):
         import research_v3.epoch46_outcome_blind_m5_capture as mod
         src=inspect.getsource(mod)
         for forbidden in ("ProtoOANewOrderReq","ProtoOACancelOrderReq","ProtoOAClosePositionReq","ProtoOAAmendOrderReq"): self.assertNotIn(forbidden,src)
+    def test_top_level_pydroid_entrypoint_has_real_newlines(self):
+        raw=(ROOT/"EPOCH46_OUTCOME_BLIND_M5_CAPTURE_RUN.py").read_text(encoding="utf-8")
+        self.assertNotIn("\\n",raw)
+        compile(raw,"EPOCH46_OUTCOME_BLIND_M5_CAPTURE_RUN.py","exec")
     def test_ohlc_invariants_fail_closed(self):
         with tempfile.TemporaryDirectory() as td:
             p=Path(td)/"x.csv"
