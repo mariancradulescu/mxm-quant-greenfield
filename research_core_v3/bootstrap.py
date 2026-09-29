@@ -4,6 +4,7 @@ from pathlib import Path
 from .engine import discover_series,execute_spec
 from .inventory import build_inventory
 from .migration import salvage_legacy_v2
+from .legacy_input_inspection import inspect as inspect_legacy_input
 
 DEFAULT_SPEC={
  "schema":"mxm.research-core-v3.frozen-experiment-spec.v1","role":"DEVELOPMENT_ONLY",
@@ -25,6 +26,7 @@ def main(argv=None):
  root=Path(args.root).resolve(); out=root/args.out; out.mkdir(parents=True,exist_ok=True)
  inv=build_inventory(root); _write(out/'ACCEPTED_DATA_INVENTORY_V1.json',inv)
  salv=salvage_legacy_v2(root); _write(out/'LEGACY_V2_SALVAGE_V1.json',salv)
+ legacy=inspect_legacy_input(root); _write(out/'LEGACY_INPUT_INSPECTION_V1.json',legacy)
  _write(out/'FROZEN_EXPERIMENT_SPEC_V1.json',DEFAULT_SPEC)
  roots=[Path(x).resolve() for x in args.input]+[root/'raw',root/'captures',root/'data/raw',root/'evidence/raw']
  series=discover_series(roots)
