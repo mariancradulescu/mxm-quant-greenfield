@@ -150,6 +150,13 @@ def validate_freeze(freeze: dict[str, Any], root: Path) -> tuple[dict[str, Any],
     sufficiency = _require_authority_hash(root, DATA_SUFFICIENCY_REF, DATA_SUFFICIENCY_SHA256)
     plan = _read_json(root / PLAN_REF)
     decision = proposal.get("decision") or {}
+    mr_density = (
+        (sufficiency.get("outcome_blind_event_availability") or {}).get(
+            "mean_reversion_preregistered_grid_event_density"
+        )
+        or sufficiency.get("mean_reversion_preregistered_grid_event_density")
+        or {}
+    )
     proposal_scope = (proposal.get("next_research_state") or {}).get("implementation_scope") or {}
     if (
         proposal.get("proposal_id") != expected_authority["accepted_proposal_id"]
@@ -165,10 +172,8 @@ def validate_freeze(freeze: dict[str, Any], root: Path) -> tuple[dict[str, Any],
         or capture.get("source_capture_bundle", {}).get("outer_zip_sha256") != CAPTURE_ZIP_SHA256
         or capture.get("source_capture_bundle", {}).get("canonical_payload_sha256") != CAPTURE_PAYLOAD_SHA256
         or capture.get("source_capture_bundle", {}).get("plan_sha256") != PLAN_SHA256
-        or sufficiency.get("mean_reversion_preregistered_grid_event_density", {}).get("lookback_bars") != list(LOOKBACKS)
-        or sufficiency.get("mean_reversion_preregistered_grid_event_density", {}).get(
-            "absolute_standardized_deviation_thresholds"
-        ) != list(THRESHOLDS)
+        or mr_density.get("lookback_bars") != list(LOOKBACKS)
+        or mr_density.get("absolute_standardized_deviation_thresholds") != list(THRESHOLDS)
         or sufficiency.get("power_planning", {}).get("hypothesis_count") != 36
         or sufficiency.get("power_planning", {}).get("target_power") != TARGET_POWER
         or sufficiency.get("power_planning", {}).get("familywise_alpha") != 0.05
