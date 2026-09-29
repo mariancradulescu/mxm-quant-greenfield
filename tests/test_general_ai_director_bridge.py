@@ -17,6 +17,7 @@ from research_v3.general_ai_director_bridge import (
     _reject_completed_outer_as_unseen,
     _reject_duplicate_accepted_capture,
     _validate_broker_native_selection,
+    _validate_material_authority_floor,
     compile_runtime_plan,
     drain,
     materialize_proposal,
@@ -130,6 +131,37 @@ class GeneralAIDirectorBridgeTests(unittest.TestCase):
             },
         })
         return proposal
+
+    def test_post_epoch46_floor_rejects_backward_epoch45_routing(self):
+        proposal=base_proposal()
+        from research_v3.evidence_epoch import current_evidence_binding
+        current=current_evidence_binding(Path("."))
+        proposal["evidence_binding"]={
+            "reasoning_request_id":"test-post46",
+            "reasoning_response_id":"test-post46",
+            "evidence_epoch_seen":current["evidence_epoch"],
+            "evidence_bundle_sha256":current["evidence_bundle_sha256"],
+            "authoritative_evidence_refs_and_hashes":current["authoritative_evidence_refs_and_hashes"],
+            "accounting_basis":{},
+            "universe_basis":current["universe_basis"],
+            "current_open_mechanism_families":current["current_open_mechanism_families"],
+        }
+        proposal["decision"]["selected_action"]="RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45"
+        proposal["next_research_state"]["next_action"]="RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45"
+        with self.assertRaisesRegex(AIProposalRejected,"routes backward"):
+            _validate_material_authority_floor(Path("."),proposal)
+
+    def test_new_decision_drops_stale_completed_family_and_later_step_hints(self):
+        existing={"completed_family":"MEAN_REVERSION","later_step":"go backward",
+                  "expected_follow_on":"old","semantic_focus_family":"MEAN_REVERSION",
+                  "mechanism_family_targeted":"MEAN_REVERSION",
+                  "family_touch_history_considered":{"MEAN_REVERSION":"old"},
+                  "completed_structural_report_ref":"evidence/keep.json"}
+        out=_clean_next_state_for_new_ai_decision(existing,{"status":"NEW","next_action":"NEW"})
+        for key in ("completed_family","later_step","expected_follow_on","semantic_focus_family",
+                    "mechanism_family_targeted","family_touch_history_considered"):
+            self.assertNotIn(key,out)
+        self.assertEqual(out["completed_structural_report_ref"],"evidence/keep.json")
 
     def test_objective_class_is_open_not_enum(self):
         for cls in (
