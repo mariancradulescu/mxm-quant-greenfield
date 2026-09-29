@@ -1,94 +1,74 @@
 {
-  "accepted_exact_head": {
-    "green": true,
-    "head": "2355089c1982fdfe675ec0c8bcbe7bd3ca3103cb",
-    "predecessor_conclusion": "success",
-    "predecessor_head": "2355089c1982fdfe675ec0c8bcbe7bd3ca3103cb",
-    "predecessor_run_id": 36520149187
-  },
   "accepted_output": {
     "decision": {
-      "active_proposal_file_sha256_bound": "770fd3a8da562e513f75cd18233d2f5f954b8bae6f3695f89eb72f1c224af7ec",
-      "changed": [
-        "research_v3/mean_reversion_capture_scope_audit.py",
-        "tests/test_mean_reversion_capture_scope_audit.py",
-        "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_IMPLEMENTATION_MANIFEST_V1.json"
-      ],
-      "deterministic_operation_execution": "Not performed; exact-head green is required first.",
+      "acquisition_authorized": false,
+      "coverage": {
+        "eligible_identities_with_accepted_scope": 45,
+        "eligible_identities_without_reusable_scope": 1531,
+        "smallest_increment_identifiable": false
+      },
       "deterministic_operation_ref": "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json",
       "economic_outcome_opened": false,
-      "external_data_required": false,
-      "implementation_scope": "Only the bounded Epoch45 non-economic capture-scope audit; no acquisition, cohort selection, strategy statistics, economic outcomes, or protected evidence.",
-      "stricter_preexisting_freeze_preserved": true,
+      "later_step": "Fresh prospective reasoning may assess whether a minimal disjoint M5 data scope is justified; this audit authorizes no acquisition.",
+      "protected_forward_opened": false,
+      "result_ref": "evidence/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_V1.json",
+      "result_status": "COMPLETE_NON_ECONOMIC_SCOPE_RECONCILIATION_NO_COHORT_OR_ACQUISITION_AUTHORIZED",
+      "selected_action": "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "MXM_E45_MEAN_REVERSION_SCOPE_AUDIT_PROPOSAL_BINDING",
+    "implementation_id": "MXM_EPOCH45_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT",
     "next_research_state": {
-      "ai_reasoning_required": false,
-      "exact_head_green_required_before_execution": true,
-      "green_implementation_artifacts": [
-        "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_IMPLEMENTATION_MANIFEST_V1.json",
-        "research_v3/mean_reversion_capture_scope_audit.py",
-        "tests/test_mean_reversion_capture_scope_audit.py"
-      ],
       "implementation_ai_required": false,
       "implementation_satisfied": true,
-      "implementation_scope_complete": true,
-      "later_step": "After exact-head green and deterministic audit execution, fresh prospective reasoning may assess whether a minimal disjoint M5 data scope is justified.",
-      "new_market_data_authorized": false,
-      "new_semantic_judgment_required_for_scope_reconciliation": false,
-      "next_action": "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
-      "next_deterministic_operation_ref": "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json",
-      "research_judgment_required": false,
-      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+      "next_action": "Assess prospectively whether a minimal disjoint M5 data scope is justified from the completed audit; do not acquire data without that authority.",
+      "status": "FRESH_PROSPECTIVE_REASONING_REQUIRED_FOR_ANY_MEAN_REVERSION_DATA_SCOPE",
       "user_action_required": false
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The scope audit machinery and deterministic operation already existed, but implementation validation and its manifest were bound to a different proposal. Added exact-byte and non-economic-boundary validation for the currently accepted proposal, with fail-closed tests. Preserved the stricter preexisting freeze. Tests were not run because shell tools are prohibited.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The bounded Epoch45 audit is already implemented, bound to a prospective freeze and deterministic operation, and its non-economic result is present. Inspection confirms it reconciles accepted M5 scopes against the full eligible frame without selecting a cohort or authorizing acquisition. No edits or rerun are needed.",
     "tests_requested": [
-      "tests/test_mean_reversion_capture_scope_audit.py"
+      "tests/test_mean_reversion_capture_scope_audit.py (existing; validated by inspection, not run)"
     ]
   },
-  "basis_next_state_sha256": "d4921207808901c24d510fe6115a0070300e2ac60fa0149b75d992c12614ad05",
-  "changed_paths": [
-    "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_IMPLEMENTATION_MANIFEST_V1.json",
-    "research_v3/mean_reversion_capture_scope_audit.py",
-    "tests/test_mean_reversion_capture_scope_audit.py"
-  ],
-  "created_utc": "2026-09-29T04:04:36Z",
+  "basis_next_state_sha256": "e04d94c4c03d501de437a30f560545afada2efd411dce372faa255e445850f25",
+  "changed_paths": [],
+  "created_utc": "2026-09-29T05:14:49Z",
+  "exact_head": {
+    "green": false,
+    "head": "495158c117a08904f720793be81835bb5fd50d4d",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "96bf3d7a1bcb3fa8d1aab885f67323e4e38aa667",
+    "predecessor_run_id": 36525092519
+  },
   "executor_version": "MXM_GENERAL_AI_IMPLEMENTATION_EXECUTOR_V2",
   "implementation_output": {
     "decision": {
-      "active_proposal_file_sha256_bound": "770fd3a8da562e513f75cd18233d2f5f954b8bae6f3695f89eb72f1c224af7ec",
-      "changed": [
-        "research_v3/mean_reversion_capture_scope_audit.py",
-        "tests/test_mean_reversion_capture_scope_audit.py",
-        "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_IMPLEMENTATION_MANIFEST_V1.json"
-      ],
-      "deterministic_operation_execution": "Not performed; exact-head green is required first.",
+      "acquisition_authorized": false,
+      "coverage": {
+        "eligible_identities_with_accepted_scope": 45,
+        "eligible_identities_without_reusable_scope": 1531,
+        "smallest_increment_identifiable": false
+      },
       "deterministic_operation_ref": "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json",
       "economic_outcome_opened": false,
-      "external_data_required": false,
-      "implementation_scope": "Only the bounded Epoch45 non-economic capture-scope audit; no acquisition, cohort selection, strategy statistics, economic outcomes, or protected evidence.",
-      "stricter_preexisting_freeze_preserved": true,
+      "later_step": "Fresh prospective reasoning may assess whether a minimal disjoint M5 data scope is justified; this audit authorizes no acquisition.",
+      "protected_forward_opened": false,
+      "result_ref": "evidence/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_V1.json",
+      "result_status": "COMPLETE_NON_ECONOMIC_SCOPE_RECONCILIATION_NO_COHORT_OR_ACQUISITION_AUTHORIZED",
+      "selected_action": "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
       "v2_attempts_consumed": 0
     },
     "external_data_gate": null,
-    "implementation_id": "MXM_E45_MEAN_REVERSION_SCOPE_AUDIT_PROPOSAL_BINDING",
+    "implementation_id": "MXM_EPOCH45_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT",
     "next_research_state": {
-      "exact_head_green_required_before_execution": true,
-      "later_step": "After exact-head green and deterministic audit execution, fresh prospective reasoning may assess whether a minimal disjoint M5 data scope is justified.",
-      "new_market_data_authorized": false,
-      "new_semantic_judgment_required_for_scope_reconciliation": false,
-      "next_action": "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
-      "next_deterministic_operation_ref": "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json",
-      "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN"
+      "next_action": "Assess prospectively whether a minimal disjoint M5 data scope is justified from the completed audit; do not acquire data without that authority.",
+      "status": "FRESH_PROSPECTIVE_REASONING_REQUIRED_FOR_ANY_MEAN_REVERSION_DATA_SCOPE"
     },
-    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
-    "summary": "The scope audit machinery and deterministic operation already existed, but implementation validation and its manifest were bound to a different proposal. Added exact-byte and non-economic-boundary validation for the currently accepted proposal, with fail-closed tests. Preserved the stricter preexisting freeze. Tests were not run because shell tools are prohibited.",
+    "status": "COMPLETE_NON_ECONOMIC",
+    "summary": "The bounded Epoch45 audit is already implemented, bound to a prospective freeze and deterministic operation, and its non-economic result is present. Inspection confirms it reconciles accepted M5 scopes against the full eligible frame without selecting a cohort or authorizing acquisition. No edits or rerun are needed.",
     "tests_requested": [
-      "tests/test_mean_reversion_capture_scope_audit.py"
+      "tests/test_mean_reversion_capture_scope_audit.py (existing; validated by inspection, not run)"
     ]
   },
   "project_snapshot": {
@@ -106,7 +86,7 @@
     "model_selection": "AUTO_ACCOUNT_AVAILABLE",
     "provider": "github-copilot-cli"
   },
-  "request_fingerprint": "ab44767845a23cbe134a827a66188a6b6e9b38b8f15cbb1b4811a5dbcb5e512b",
+  "request_fingerprint": "4ab9849d923b5dec0683b4f56f003ebf22b141619610d6b3f84f06b51cbe374d",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
+  "status": "IMPLEMENTATION_VALIDATED_NO_CODE_CHANGE"
 }
