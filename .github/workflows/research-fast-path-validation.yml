@@ -1,46 +1,28 @@
-name: Research Fast Path Validation
+name: Research Fast Path Validation — LEGACY READ ONLY
 
+# LEGACY V2 READ-ONLY KILL SWITCH.
+# Former V2 semantic validation path and Supervisor dispatcher.
+# Historical source/evidence remains in Git history. This workflow is deliberately
+# manual-only and cannot mutate the research branch, dispatch another workflow,
+# invoke an AI/provider, or consume resources autonomously.
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: write
 
 env:
-  TARGET_BRANCH: performance-research-v3-20260922
-  PYTHONUNBUFFERED: "1"
+  LEGACY_V2_READ_ONLY: "1"
 
 jobs:
-  focused:
+  legacy-read-only:
     runs-on: ubuntu-slim
-    timeout-minutes: 10
+    timeout-minutes: 2
     steps:
-      - name: Checkout exact research branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.TARGET_BRANCH }}
-          fetch-depth: 1
-          persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: Validate semantic routing and spec execution
+      - name: Enforce LEGACY_V2_READ_ONLY
+        shell: bash
         run: |
-          python -m research_v3.autonomous_control_plane validate
-          python -m unittest -q \
-            tests.test_execution_router_v1 \
-            tests.test_deterministic_operation_executor_v1 \
-            tests.test_general_ai_director_bridge \
-            tests.test_general_ai_reasoning_provider \
-            tests.test_general_ai_implementation_executor
-          python -m py_compile research_v3/research_spec_kernel.py research_v3/epoch27_close.py
-      - name: Release validated exact-head semantic continuation
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run autonomous-research-runtime-v2.yml --ref main \
-            -f mode=resume \
-            -f predecessor_ci_head="${GITHUB_SHA}" \
-            -f predecessor_ci_conclusion=success \
-            -f predecessor_ci_run_id="${GITHUB_RUN_ID}"
+          set -euo pipefail
+          test "${LEGACY_V2_READ_ONLY:-}" = "1"
+          echo "Legacy Runtime V2 execution is retired. Read Git history/evidence for diagnostics."
+          echo "No writes, autonomous wakes, downstream dispatches, or provider calls are authorized."

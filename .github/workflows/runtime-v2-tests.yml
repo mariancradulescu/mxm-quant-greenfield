@@ -1,156 +1,28 @@
-name: Autonomous Research Runtime V2
+name: Autonomous Research Runtime V2 — LEGACY READ ONLY
 
+# LEGACY V2 READ-ONLY KILL SWITCH.
+# Former research-branch push/cron runtime and Supervisor wake source.
+# Historical source/evidence remains in Git history. This workflow is deliberately
+# manual-only and cannot mutate the research branch, dispatch another workflow,
+# invoke an AI/provider, or consume resources autonomously.
 on:
-  push:
-    branches:
-      - performance-research-v3-20260922
-    paths:
-      - 'research_v3/general_ai_autonomy_loop.py'
-      - 'research_v3/runtime_v2_primitives.py'
-      - 'research_v3/trend_surface_transport_repair.py'
-      - 'tests/test_autonomous_runtime_v2.py'
-      - 'research_v3/general_ai_reasoning_provider.py'
-      - 'research_v3/general_ai_implementation_executor.py'
-      - 'research_v3/mean_reversion_stage1_triage_epoch40.py'
-      - 'research_v3/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_DETERMINISTIC_OPERATION_V1.json'
-      - 'research_v3/runtime_v2_inputs/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_GZIP_BASE64_V1.txt'
-      - 'tests/test_mean_reversion_stage1_triage_epoch40.py'
-      - 'research_v3/execution_router.py'
-      - 'research_v3/deterministic_operation_executor.py'
-      - 'research_v3/discovery_governance.py'
-      - 'research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json'
-      - 'research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json'
-      - 'research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json'
-      - 'evidence/RETROSPECTIVE_EVIDENCE_SCOPE_AUDIT_V1.json'
-      - 'research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_SCOPE_FREEZE_V1.json'
-      - 'research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json'
-      - 'research_v3/epoch38_cross_sectional_aligned_history_scope_freeze.py'
-      - 'tests/test_epoch38_cross_sectional_aligned_history_scope_freeze.py'
-      - 'tests/test_discovery_governance_v1.py'
-      - 'tests/test_epoch38_deterministic_readiness_operation.py'
-      - 'tests/test_execution_router_v1.py'
-      - 'tests/test_deterministic_operation_executor_v1.py'
-      - 'tests/test_general_ai_autonomy_loop.py'
-      - 'research_v3/epoch46_outcome_blind_m5_capture.py'
-      - 'research_v3/pydroid_epoch46_outcome_blind_m5_launcher.py'
-      - 'data/EPOCH46_OUTCOME_BLIND_M5_ACQUISITION_WAVE_01_PLAN_V1.json'
-      - 'tests/test_epoch46_outcome_blind_m5_capture.py'
-      - 'tools/build_epoch46_outcome_blind_m5_capture_package.py'
-      - 'research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json'
-      - 'research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_DETERMINISTIC_OPERATION_V1.json'
-      - 'research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json'
-      - 'research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json'
-      - 'research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py'
-      - 'research_v3/runtime_v2_inputs/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_RESULT_*'
-      - 'tests/test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py'
-      - 'research_v3/EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD_FREEZE_V1.json'
-      - 'research_v3/EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD_DETERMINISTIC_OPERATION_V1.json'
-      - 'research_v3/mean_reversion_epoch48_stage2_robust_neighborhood.py'
-      - 'tests/test_mean_reversion_epoch48_stage2_robust_neighborhood.py'
-      - '.github/workflows/runtime-v2-tests.yml'
   workflow_dispatch:
-    inputs:
-      mode:
-        description: Runtime entry mode
-        required: true
-        default: resume
-        type: choice
-        options:
-          - resume
-          - acceptance
-  schedule:
-    - cron: "17 */6 * * *"
 
 permissions:
   contents: read
-  actions: write
-
-concurrency:
-  group: mxm-research-writer-performance-research-v3-20260922
-  cancel-in-progress: false
 
 env:
-  TARGET_BRANCH: performance-research-v3-20260922
-  MXM_RUNTIME_TARGET_BRANCH: performance-research-v3-20260922
-  PYTHONUNBUFFERED: "1"
+  LEGACY_V2_READ_ONLY: "1"
 
 jobs:
-  runtime-v2:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
+  legacy-read-only:
+    runs-on: ubuntu-slim
+    timeout-minutes: 2
     steps:
-      - name: Checkout authoritative research branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.TARGET_BRANCH }}
-          fetch-depth: 0
-          persist-credentials: true
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Configure durable checkpoint identity
+      - name: Enforce LEGACY_V2_READ_ONLY
+        shell: bash
         run: |
-          git config user.name "mxm-runtime-v2[bot]"
-          git config user.email "mxm-runtime-v2@users.noreply.github.com"
-
-      - name: Install broker capture test dependencies
-        run: python -m pip install -r tools/requirements-m6-capture.txt
-
-      - name: Runtime V2 focused tests
-        run: >
-          python -m unittest -v
-          tests.test_autonomous_runtime_v2
-          tests.test_epoch38_cross_sectional_aligned_history_scope_freeze
-          tests.test_discovery_governance_v1
-          tests.test_epoch38_deterministic_readiness_operation
-          tests.test_mean_reversion_stage1_triage_epoch40
-          tests.test_epoch46_outcome_blind_m5_capture
-          tests.test_execution_router_v1
-          tests.test_deterministic_operation_executor_v1
-          tests.test_general_ai_autonomy_loop
-          tests.test_research_evidence_epoch
-          tests.test_general_ai_reasoning_provider
-          tests.test_general_ai_director_bridge
-          tests.test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan
-          tests.test_mean_reversion_epoch48_stage2_robust_neighborhood
-
-      - name: Build exact Epoch46 broker capture package
-        run: python tools/build_epoch46_outcome_blind_m5_capture_package.py
-
-      - name: Upload exact Epoch46 broker capture package
-        uses: actions/upload-artifact@v4
-        with:
-          name: MXM_EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_PACKAGE_V1
-          path: dist/MXM_EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_PACKAGE_V1.zip
-          if-no-files-found: error
-
-      - name: Diagnose persisted TREND surface transport without rerunning research
-        run: python -m research_v3.trend_surface_transport_repair
-
-      - name: Zero-human continuation acceptance demonstration
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'acceptance' }}
-        run: |
-          mkdir -p research_v3/runtime_v2_acceptance
-          python -m research_v3.autonomous_runtime_v2 acceptance \
-            --report research_v3/runtime_v2_acceptance/LATEST_ACCEPTANCE_REPORT.json
-
-      - name: Classify canonical research action
-        id: route
-        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'resume') }}
-        run: |
-          python -m research_v3.lightweight_dispatcher classify \
-            --root . --github-output "$GITHUB_OUTPUT"
-
-      - name: Wake authoritative main Supervisor
-        if: ${{ steps.route.outputs.dispatch_required == 'true' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run autonomous-research-runtime-v2.yml --ref main \
-            -f mode=resume \
-            -f predecessor_ci_head="$(git rev-parse HEAD)" \
-            -f predecessor_ci_conclusion=success \
-            -f predecessor_ci_run_id="$GITHUB_RUN_ID"
+          set -euo pipefail
+          test "${LEGACY_V2_READ_ONLY:-}" = "1"
+          echo "Legacy Runtime V2 execution is retired. Read Git history/evidence for diagnostics."
+          echo "No writes, autonomous wakes, downstream dispatches, or provider calls are authorized."
