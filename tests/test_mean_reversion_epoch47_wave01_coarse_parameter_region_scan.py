@@ -85,6 +85,10 @@ class MeanReversionEpoch47Wave01ScanTests(unittest.TestCase):
         self.assertEqual(freeze["evidence_epoch"],45)
         self.assertEqual(freeze["research_sequence_label"],"EPOCH47")
         validate_freeze(freeze,ROOT)
+        suff=json.loads((ROOT/"evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json").read_text())
+        density=suff["outcome_blind_event_availability"]["mean_reversion_preregistered_grid_event_density"]
+        self.assertEqual(density["lookback_bars"],[12,24,48,96])
+        self.assertEqual(density["absolute_standardized_deviation_thresholds"],[1.0,1.5,2.0])
 
         op=json.loads((ROOT/"research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json").read_text())
         self.assertEqual(op["evidence_epoch"],45)
