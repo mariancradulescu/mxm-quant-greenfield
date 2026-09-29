@@ -35,7 +35,20 @@ def evaluate_cell(s:Series,mech:str,ctx:dict[str,Any],p:dict[str,Any],hs:list[in
         asum=sum(map(abs,vals)); top=sorted(map(abs,vals),reverse=True)[:max(1,math.ceil(n*.1))] if vals else []
         stats[k]={'n':n,'mean_response':mean(vals),'median_response':median(vals),'uncertainty':_ci(dm),'robust_effect_estimate':median(dm),'long_mean':mean(pos),'short_mean':mean(neg),'long_short_asymmetry':None if not pos or not neg else statistics.fmean(pos)-statistics.fmean(neg),'chronological_thirds_mean':chrono,'response_concentration_top10_abs_share':None if asum<=EPS else sum(top)/asum}
     gaps=sum(seg[i]!=seg[i+1] for i in range(max(0,len(b)-1)))
-    return {'symbol':s.symbol,'symbol_id':s.symbol_id,'source':s.source,'mechanism':mech,'context':ctx,'params':p,'event_count':len(ev),'independent_event_clusters':clusters,'independent_date_clusters':len(dates),'horizons':stats,'missingness_sensitivity':{'gap_count':gaps,'bars':len(b),'gap_fraction':gaps/max(1,len(b)-1)}}
+    # Predeclared generic boundary exclusion. Never impute a missing bar.
+    sensitivity={}
+    for h in hs:
+        k=str(h); base=[e[3][k] for e in ev if e[3][k] is not None]
+        away=[e[3][k] for e in ev if e[3][k] is not None and
+              e[0]>=12 and seg[e[0]-12]==seg[e[0]] and
+              e[0]+h+12<len(b) and seg[e[0]+h]==seg[e[0]+h+12]]
+        base_mean=mean(base); away_mean=mean(away)
+        sensitivity[k]={'variant':'EXCLUDE_EVENTS_WITHIN_12_BARS_OF_GAP_OR_SERIES_EDGE',
+                        'baseline_n':len(base),'retained_n':len(away),
+                        'baseline_mean':base_mean,'boundary_excluded_mean':away_mean,
+                        'mean_delta':None if base_mean is None or away_mean is None else away_mean-base_mean,
+                        'sign_stable':None if base_mean is None or away_mean is None else (base_mean>0)==(away_mean>0)}
+    return {'symbol':s.symbol,'symbol_id':s.symbol_id,'source':s.source,'mechanism':mech,'context':ctx,'params':p,'event_count':len(ev),'independent_event_clusters':clusters,'independent_date_clusters':len(dates),'horizons':stats,'missingness_sensitivity':{'gap_count':gaps,'bars':len(b),'gap_fraction':gaps/max(1,len(b)-1),'response_sensitivity_by_horizon':sensitivity}}
 def _grid(g):
     out=[{}]
     for k,vals in g.items():out=[{**x,k:v} for x in out for v in vals]
