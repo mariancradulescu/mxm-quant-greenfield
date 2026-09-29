@@ -86,7 +86,7 @@ def validate_freeze(freeze: dict[str, Any], root: Path) -> tuple[dict[str, Any],
     if (
         freeze.get("schema") != "mxm.greenfield.epoch47-mean-reversion-wave01-coarse-region-freeze.v1"
         or freeze.get("status") != "PROSPECTIVELY_FROZEN_NON_ECONOMIC_STAGE1_COARSE_PARAMETER_REGION_SCAN"
-        or freeze.get("evidence_epoch") != 47
+        or freeze.get("evidence_epoch") != 45
         or freeze.get("family") != "MEAN_REVERSION"
     ):
         raise ScanError("unsupported or unfrozen Epoch47 scan authority")
@@ -455,7 +455,8 @@ def build_scan(root: str | Path, capture_zip: str | Path) -> dict[str, Any]:
     return {
         "schema": "mxm.greenfield.epoch47-mean-reversion-wave01-coarse-parameter-region-scan.v1",
         "status": "COMPLETE_NON_ECONOMIC_MEAN_REVERSION_COARSE_PARAMETER_REGION_SCAN",
-        "evidence_epoch": 47,
+        "evidence_epoch": 46,
+        "research_sequence_label": "EPOCH47",
         "family": "MEAN_REVERSION",
         "implementation": {"version": VERSION, "freeze_ref": FREEZE_REF},
         "source_authority": {
