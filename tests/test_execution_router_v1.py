@@ -219,6 +219,18 @@ class ExecutionRouterV1Tests(unittest.TestCase):
                 "v2_attempts_used":20,
                 "v2_search_budget_remaining":64,
             })
+        elif state.get("status")=="LOCAL_MEAN_REVERSION_DISJOINT_SCOPE_PARKED_INSUFFICIENT_AUTHORITY":
+            self.assertEqual(route["execution_class"],"NO_WORK")
+            self.assertIsNone(state.get("next_action"))
+            self.assertFalse(implementation_required(ROOT,state))
+            decision=json.loads((ROOT/state["mean_reversion_disjoint_scope_decision_ref"]).read_text())
+            self.assertFalse(decision["decision"]["new_market_data_acquisition_authorized"])
+            self.assertFalse(decision["broader_research"]["mean_reversion_family_closed"])
+            self.assertEqual(state["accounting"],{
+                "economic_outcomes_opened":28,
+                "v2_attempts_used":20,
+                "v2_search_budget_remaining":64,
+            })
         else:
             self.fail(f"unexpected peer-cohort lifecycle state: {state.get('status')} / {state.get('next_action')}")
 
