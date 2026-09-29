@@ -35,6 +35,9 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Install broker collector dependency
+        run: python -m pip install -r tools/requirements-m6-capture.txt
+
       - name: Validate generic causal engine and broker collector
         run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_collector
 
