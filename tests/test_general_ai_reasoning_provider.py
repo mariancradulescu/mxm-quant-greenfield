@@ -44,6 +44,19 @@ class GeneralAIReasoningProviderTests(unittest.TestCase):
         integrity=next(row for row in packet["source_projections"] if row["ref"].endswith("EPOCH38_TREND_SURFACE_TRANSPORT_INTEGRITY_AUDIT_V1.json"))
         self.assertEqual(integrity["facts"]["status"],"LOCAL_TREND_SURFACE_VERIFICATION_BLOCKED")
 
+    def test_post_epoch46_semantic_packet_contains_material_authorities(self):
+        from research_v3.general_ai_reasoning_provider import _context_payload
+        req=build_reasoning_request(".")
+        self.assertGreaterEqual(req["evidence_epoch_seen"],45)
+        refs={row["ref"] for row in req["authoritative_evidence_refs_and_hashes"]}
+        self.assertIn("evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",refs)
+        self.assertIn("evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",refs)
+        context=_context_payload(Path("."),req)
+        projected={row["ref"] for row in context["semantic_decision_packet"]["source_projections"]}
+        self.assertIn("evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",projected)
+        self.assertIn("evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",projected)
+        self.assertEqual(context["material_authority_floor"]["status"],"ACTIVE_POST_EPOCH46")
+
     def test_copilot_large_prompt_is_piped_without_semantic_argv(self):
         from research_v3.general_ai_reasoning_provider import copilot_cli_transport
         from types import SimpleNamespace
