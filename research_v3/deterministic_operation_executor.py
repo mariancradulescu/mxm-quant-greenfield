@@ -812,7 +812,7 @@ def _run_epoch43_mean_reversion_power_aware_discovery(root:Path,state:dict[str,A
         or result.get("accepted_data_coverage",{}).get("absence_claim_for_other_capture_scopes") is not False
         or result.get("power_preflight",{}).get("epoch42_diagnostic_rerun") is not False
         or result.get("power_preflight",{}).get("response_statistics_computed") is not False
-        or result.get("interpretation_boundary",{}).get("pnl_computed") is not False
+        or result.get("interpretation_boundary",{}).get("returns_or_pnl_computed") is not False
         or result.get("interpretation_boundary",{}).get("economic_outcome_opened") is not False
         or result.get("interpretation_boundary",{}).get("relative_value_alignment_inventory_recomputed") is not False
         or any(int((result.get("accounting_effect") or {}).get(key) or 0)!=0 for key in (
@@ -830,6 +830,80 @@ def _run_epoch43_mean_reversion_power_aware_discovery(root:Path,state:dict[str,A
     else:
         atomic_write_json(result_path,result)
     return _execute_existing_structural_result(root,state,op)
+
+def _run_epoch45_mean_reversion_capture_scope_audit(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    expected={
+        "operation_name":"RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
+        "materializer":"RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
+        "evidence_epoch":44,
+        "freeze_ref":"research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_FREEZE_V1.json",
+        "implementation_ref":"research_v3/mean_reversion_capture_scope_audit.py",
+        "result_ref":"evidence/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_V1.json",
+        "accepted_proposal_ref":"research_v3/ai_director/proposals/AUTO_reason_538b7957124ef714729f7ac22553ee30.json",
+        "accepted_proposal_file_sha256":"b1cee8481beb44a69a1e77aaadf6db19c7045db818266b0939be12544b8c6fc5",
+        "accepted_proposal_hash":"766dcafc60825666a7ce2f394091ca5172c62b64d2f43f8d21bc47faae36c1cc",
+    }
+    for field,value in expected.items():
+        if op.get(field)!=value:
+            raise DeterministicOperationRejected(f"Epoch45 scope-audit authority mismatch: {field}")
+    expected_validation={
+        "schema":"mxm.greenfield.mean-reversion-capture-scope-audit-epoch45.v1",
+        "status":"COMPLETE_NON_ECONOMIC_SCOPE_RECONCILIATION_NO_COHORT_OR_ACQUISITION_AUTHORIZED",
+        "evidence_epoch":45,
+    }
+    if op.get("result_validation")!=expected_validation:
+        raise DeterministicOperationRejected("Epoch45 scope-audit result authority mismatch")
+    policy=op.get("execution_policy") or {}
+    if any(policy.get(field) is not False for field in (
+        "implementation_ai_required","copilot_reasoning_required",
+        "new_semantic_judgment_required","new_market_data_required",
+    )) or policy.get("exact_head_green_required_before_execution") is not True:
+        raise DeterministicOperationRejected("Epoch45 scope audit is not explicitly deterministic and non-economic")
+    from research_v3.mean_reversion_capture_scope_audit import build_scope_audit
+    result=build_scope_audit(root)
+    if (
+        result.get("schema")!=expected_validation["schema"]
+        or result.get("status")!=expected_validation["status"]
+        or result.get("eligible_frame",{}).get("eligible_identity_count")!=1576
+        or result.get("disjoint_increment",{}).get("smallest_increment_selected") is not False
+        or result.get("disjoint_increment",{}).get("exact_symbols_selected")!=[]
+        or result.get("disjoint_increment",{}).get("new_market_data_requested_or_authorized") is not False
+        or result.get("interpretation_boundary",{}).get("strategy_events_or_response_statistics_computed") is not False
+        or result.get("interpretation_boundary",{}).get("returns_or_pnl_computed") is not False
+        or result.get("interpretation_boundary",{}).get("economic_outcome_opened") is not False
+        or result.get("interpretation_boundary",{}).get("relative_value_alignment_inventory_recomputed") is not False
+        or any(int((result.get("accounting_effect") or {}).get(key) or 0)!=0 for key in (
+            "economic_outcomes_opened","v2_attempts_consumed","search_budget_change",
+        ))
+        or result.get("safety",{}).get("protected_forward_opened") is not False
+        or result.get("safety",{}).get("live_orders_authorized") is not False
+        or result.get("safety",{}).get("competition_start_authorized") is not False
+    ):
+        raise DeterministicOperationRejected("Epoch45 scope audit crossed its frozen boundary")
+    result_path=root/expected["result_ref"]
+    if result_path.is_file():
+        if load_json(result_path,{})!=result:
+            raise DeterministicOperationRejected("existing Epoch45 scope audit differs from recomputation")
+    else:
+        atomic_write_json(result_path,result)
+    new_state=dict(state)
+    new_state.update({
+        "status":"MEAN_REVERSION_SCOPE_AUDIT_COMPLETE_PROSPECTIVE_SCOPE_JUDGMENT_REQUIRED",
+        "mean_reversion_capture_scope_audit_ref":expected["result_ref"],
+        "mean_reversion_capture_scope_audit_sha256":sha256_file(result_path),
+        "next_action":"DECIDE_IF_MINIMAL_DISJOINT_MEAN_REVERSION_M5_DATA_SCOPE_IS_JUSTIFIED",
+        "next_deterministic_operation_ref":None,
+        "deterministic_next_operation":None,
+        "research_judgment_required":True,
+        "ai_reasoning_required":True,
+        "external_data_required":False,
+        "external_data_gate":None,
+        "user_action_required":False,
+        "implementation_ai_required":False,
+        "implementation_satisfied":True,
+        "implementation_scope_complete":True,
+    })
+    return new_state
 
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
@@ -931,6 +1005,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_run_epoch42_mean_reversion_cohort_preflight(root,state,op)
     elif op.get("materializer")=="RUN_EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY":
         new_state=_run_epoch43_mean_reversion_power_aware_discovery(root,state,op)
+    elif op.get("materializer")=="RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45":
+        new_state=_run_epoch45_mean_reversion_capture_scope_audit(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":

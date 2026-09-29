@@ -186,7 +186,14 @@
   "data_capture": "ACCEPTED_HASH_VERIFIED_PRE_OUTCOME",
   "data_requirement": "NONE_NEW_REQUIRED_USES_EXISTING_13W_M5_CAPTURE",
   "decision_basis": "Outcome-blind governance and frontier authority; no new mechanism, symbol or panel prospectively selected.",
-  "deterministic_next_operation": null,
+  "deterministic_next_operation": {
+    "copilot_reasoning_required": false,
+    "economic_outcomes": 0,
+    "implementation_ai_required": false,
+    "operation_name": "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
+    "operation_ref": "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json",
+    "v2_attempts": 0
+  },
   "deterministic_operation_execution_ref": "research_v3/EPOCH21_DETERMINISTIC_OPERATION_EXECUTION_V1.json",
   "development_evidence_sufficient_for_current_decision": true,
   "development_evidence_sufficient_for_mechanism_specific_outer": false,
@@ -332,7 +339,7 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -355,9 +362,9 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": false,
+  "implementation_satisfied": true,
   "implementation_scope": "Create the scope-reconciliation and outcome-blind disjoint-cohort selection machinery specified in decision. No exact deterministic operation is authorized in the current epoch catalog. Do not acquire market data, compute strategy responses, or open an economic outcome.",
-  "implementation_scope_complete": false,
+  "implementation_scope_complete": true,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -449,8 +456,8 @@
   "minimum_structural_clusters": null,
   "new_market_data_required": false,
   "next_acquisition_plan_ref": null,
-  "next_action": "IMPLEMENT_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_AND_DISJOINT_COHORT_SELECTOR",
-  "next_deterministic_operation_ref": null,
+  "next_action": "RUN_EXACT_HEAD_CI_THEN_RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
+  "next_deterministic_operation_ref": "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json",
   "next_gate": "Deterministic structural diagnostic acceptance and independent validation; authenticated Pepperstone cost/margin and any economic freeze remain later gates.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "no_economic_outcome_requested": true,
@@ -589,7 +596,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "IMPLEMENTATION_REQUIRED",
+  "status": "IMPLEMENTATION_SATISFIED_PENDING_EXACT_HEAD_GREEN",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
