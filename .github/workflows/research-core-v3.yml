@@ -22,7 +22,7 @@ jobs:
       - name: Checkout exact authoritative research HEAD
         uses: actions/checkout@v4
         with:
-          ref: 90f8ec61bd94c9c39fe8a5bf6a402a17fbd4ad8c
+          ref: 29e9fcf82fad78c59b289bd0d9f1750e36ae49ef
           fetch-depth: 0
 
       - name: Confirm current research branch HEAD
@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
           validated_head="$(git rev-parse HEAD)"
           remote_head="$(git ls-remote origin refs/heads/performance-research-v3-20260922 | cut -f1)"
-          test "${validated_head}" = "90f8ec61bd94c9c39fe8a5bf6a402a17fbd4ad8c"
+          test "${validated_head}" = "29e9fcf82fad78c59b289bd0d9f1750e36ae49ef"
           test "${remote_head}" = "${validated_head}"
           echo "Validated current research HEAD: ${validated_head}"
 
@@ -42,17 +42,17 @@ jobs:
       - name: Install deterministic broker collector dependency
         run: python -m pip install -r tools/requirements-m6-capture.txt
 
-      - name: Validate generic engine and adaptive full-frontier collector
-        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector
+      - name: Validate generic engine, adaptive collector, frozen delta and authentic CSV importer
+        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector tests.test_v3_capture_ingest tests.test_v3_delta_core
 
-      - name: Build exact adaptive full-frontier package
+      - name: Build exact frozen high-quality delta package
         run: |
-          python tools/build_research_core_v3_collector_package.py
-          sha256sum dist/MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL.zip
+          python tools/build_research_core_v3_delta_package.py
+          sha256sum dist/MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_PACKAGE.zip
 
-      - name: Upload exact adaptive full-frontier artifact
+      - name: Upload exact high-quality missing-delta artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL
-          path: dist/MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL.zip
+          name: MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_PACKAGE
+          path: dist/MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_PACKAGE.zip
           if-no-files-found: error
