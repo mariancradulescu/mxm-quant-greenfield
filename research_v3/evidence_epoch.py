@@ -126,7 +126,8 @@ def _unique_refs(values:Iterable[Any])->list[str]:
 def current_evidence_binding(root_value:str|Path=".")->dict[str,Any]:
     root=Path(root_value).resolve(); doc=_load(root); state=_load_active_state(root)
     active_epoch=current_evidence_epoch(root)
-    refs=_unique_refs(list(doc.get("authoritative_evidence_refs") or []) + [
+    state_material_refs=list(state.get("material_authority_refs") or [])
+    refs=_unique_refs(list(doc.get("authoritative_evidence_refs") or []) + state_material_refs + [
         rel for rel in (state.get("latest_material_structural_result_ref"),state.get("completed_structural_report_ref"))
         if isinstance(rel,str) and rel
     ])
