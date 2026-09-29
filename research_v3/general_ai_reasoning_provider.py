@@ -460,6 +460,17 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
         bounded_authority("evidence/RESEARCH_DISCOVERY_METHODOLOGY_AUDIT_V1.json",
                           ("live_universe","findings","invariants")),
     ]
+    for key in ("accepted_epoch46_wave01_capture_ref","epoch46_wave01_data_sufficiency_ref",
+                "global_information_gain_decision_ref","stale_post_epoch46_proposal_supersession_ref"):
+        rel=next_state_full.get(key)
+        if isinstance(rel,str) and rel and (root/rel).is_file() and all(row["ref"]!=rel for row in semantic_authorities):
+            semantic_authorities.append(bounded_authority(
+                rel,
+                ("status","frozen_scope","integrity_validation","interpretation_boundary",
+                 "data_coverage","outcome_blind_event_availability","power_planning",
+                 "acquisition_decision","allowed_next_step","accounting_effect",
+                 "restored_boundary","supersession_basis","accounting_lock")
+            ))
     semantic_eligibility={key:p[key] for key in
                           ("schema","evidence_epoch","material_delta_since_last_accepted_reasoning",
                            "accounting","open_universe_authority","governing_research_contract",
@@ -477,6 +488,8 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
                                         "evidence_bundle_sha256":request["evidence_bundle_sha256"],
                                         "source_projections":semantic_authorities},
             "pending_decision":{k:(request.get("next_state") or {}).get(k) for k in ("status","next_action","reason","decision_contract","supersession_ref")},
+            "material_authority_floor":next_state_full.get("material_authority_floor"),
+            "material_authority_refs":list(next_state_full.get("material_authority_refs") or []),
             "historical_consumed_identity_summaries":scope,
             "valid_survivors":["V2-C006","V2-C012","V2-C031"],
             "unresolved_prerequisites":["C006 historical cash-session calendar",
@@ -538,6 +551,9 @@ Important boundaries:
 - Set implementation_ai_required=true ONLY when genuinely novel repository code or machinery is required and deterministic existing capability is insufficient. Deterministic-in-principle is NOT enough.
 - next_deterministic_operation_ref may reference ONLY a ref listed in authorized_deterministic_operations_current_epoch, and its operation_name must exactly equal next_action. Evidence, context, freeze, selection, or routing-contract files are NEVER deterministic-operation refs merely because their names contain "authority" or "execution". If the catalog is empty or has no exact operation_name match, do not invent or repurpose a ref: route genuinely missing repository machinery as implementation AI with explicit implementation_scope, request exact new data through data_policy when data is the true dependency, or choose another legal routed action.
 - Never publish an unrouted non-empty action.
+- If material_authority_floor is present, it is a hard freshness boundary: bind every required ref, never choose a superseded next_action/token, and never let stale completed_family/later_step/expected_follow_on hints override newer material evidence.
+- When the pending decision requires a prospective symbol×mechanism×context×robust-parameter-region freeze, compare all open mechanisms by expected information gain using only allowed outcome-blind inputs. Do not assume the historically most recent family is next. Freeze a robust parameter region/plateau before any post-event response statistic is opened.
+- If material_authority_floor.generic_wave02_forbidden_before_mechanism_specific_freeze is true, do not request a generic breadth/data wave. A later acquisition must be justified by the exact prospectively frozen mechanism-specific design.
 - If new broker data is genuinely required, express it through data_policy.new_market_data_requested=true with the exact minimal acquisition request; do not disguise a data gate as implementation AI.
 - The proposal itself is non-economic and consumes zero attempts. Return concise decision rationale, not chain-of-thought.
 """
