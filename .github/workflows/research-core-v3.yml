@@ -22,7 +22,7 @@ jobs:
       - name: Checkout exact authoritative research HEAD
         uses: actions/checkout@v4
         with:
-          ref: 276a882045c10c67abdd0eab50437cbf76aba1e7
+          ref: c2fe24e7dd0938603ad5fadcc5cc79651d38c483
           fetch-depth: 0
 
       - name: Confirm current research branch HEAD
@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
           validated_head="$(git rev-parse HEAD)"
           remote_head="$(git ls-remote origin refs/heads/performance-research-v3-20260922 | cut -f1)"
-          test "${validated_head}" = "276a882045c10c67abdd0eab50437cbf76aba1e7"
+          test "${validated_head}" = "c2fe24e7dd0938603ad5fadcc5cc79651d38c483"
           test "${remote_head}" = "${validated_head}"
           echo "Validated current research HEAD: ${validated_head}"
 
@@ -45,4 +45,4 @@ jobs:
           python -m pip install numpy==2.3.5
 
       - name: Validate complete 145-identity frozen development surface
-        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector tests.test_v3_capture_ingest tests.test_v3_delta_core tests.test_research_core_v3_fast_engine tests.test_v3_full_surface_manifest tests.test_v3_broad_interpretation
+        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector tests.test_v3_capture_ingest tests.test_v3_delta_core tests.test_research_core_v3_fast_engine tests.test_v3_full_surface_manifest tests.test_v3_broad_interpretation tests.test_v3_corrected_semantics tests.test_v3_corrected_surface_integrity
