@@ -1,4 +1,55 @@
 {
+  "accepted_exact_head": {
+    "green": true,
+    "head": "3584c2e6147ca026196129ef4dfe00744ef11e17",
+    "predecessor_conclusion": "success",
+    "predecessor_head": "3584c2e6147ca026196129ef4dfe00744ef11e17",
+    "predecessor_run_id": 36526422907
+  },
+  "accepted_output": {
+    "decision": {
+      "boundaries": {
+        "candidate_economic_identity_created": false,
+        "economic_outcome_opened": false,
+        "post_event_response_or_pnl_computed": false,
+        "protected_forward_opened": false,
+        "v2_attempt_consumed": false,
+        "winner_or_symbol_selected": false
+      },
+      "deterministic_operation_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json",
+      "freeze_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json",
+      "implementation_ref": "research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py",
+      "result_ref": "evidence/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_V1.json",
+      "scope": "Record outcome-blind event counts, availability rates, UTC date-cluster counts, dependence-adjusted effective sample sizes, and closed-form power scenarios for all 396 symbol-cell probes.",
+      "validation": "Targeted tests are requested but were not run. Exact-head-green validation is required before scan execution."
+    },
+    "external_data_gate": null,
+    "implementation_id": "MXM_EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_V1",
+    "next_research_state": {
+      "ai_reasoning_required": false,
+      "external_data_required": false,
+      "green_implementation_artifacts": [
+        "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json",
+        "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json",
+        "research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py",
+        "tests/test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py"
+      ],
+      "implementation_ai_required": false,
+      "implementation_satisfied": true,
+      "implementation_scope_complete": true,
+      "later_step": "A subsequent proposal may use the completed diagnostics for Stage 2 robust-region identification; isolated single-cell winners are rejected, and no Stage 3 refinement is authorized here.",
+      "next_action": "IMPLEMENT_AND_RUN_MEAN_REVERSION_EPOCH47_WAVE01_COARSE_PARAMETER_REGION_SCAN",
+      "next_deterministic_operation_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json",
+      "research_judgment_required": false,
+      "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
+      "user_action_required": false
+    },
+    "status": "IMPLEMENTATION_CHANGED_REQUIRES_EXACT_HEAD_GREEN",
+    "summary": "Added the prospective, outcome-blind 12-cell scan for the accepted 33-symbol Epoch46 cohort, bound to the exact proposal and hash-accepted capture. The accepted capture is transport materialization, not a new data acquisition. Execution and tests were not run because shell tools are prohibited; exact-head-green validation is required before the authorized deterministic scan.",
+    "tests_requested": [
+      "python -m unittest discover -s tests -p test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py"
+    ]
+  },
   "basis_next_state_sha256": "787eadb5b01485f492f6273ce084ab4990e915a05067e9993dd0ab7190b1978d",
   "changed_paths": [
     "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json",
@@ -59,5 +110,5 @@
   },
   "request_fingerprint": "860349283ea48ceda94db666565e78902384d9d50566ccebfd1e4c56f2aaab99",
   "schema": "mxm.greenfield.general-ai-implementation-response.v1",
-  "status": "PENDING_EXACT_HEAD_GREEN"
+  "status": "ACCEPTED_AFTER_EXACT_HEAD_GREEN"
 }

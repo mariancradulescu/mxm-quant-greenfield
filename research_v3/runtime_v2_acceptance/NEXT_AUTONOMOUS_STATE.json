@@ -352,8 +352,14 @@
   "frozen_structural_full_result_sha256": "e113cdfb6e3b43c602395422c2c710b1bd53e1733143bd7464fe1c04125dd7c2",
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "global_information_gain_decision_ref": "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
+  "green_implementation_artifacts": [
+    "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json",
+    "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json",
+    "research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py",
+    "tests/test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py"
+  ],
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": true,
+  "implementation_ai_required": false,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -376,7 +382,7 @@
     "root_cause": "The univariate gate parsed [open, high, low, close, tick_volume] but used tick_volume in the low-price OHLC invariant. Valid accepted rows could therefore fail execution.",
     "v2_attempts_consumed_delta": 0
   },
-  "implementation_satisfied": false,
+  "implementation_satisfied": true,
   "implementation_scope": {
     "computation": "For each of the 33 accepted identities and each (threshold, lookback) cell in the frozen grid, compute outcome-blind reversal-event counts, per-cluster UTC date counts, dependence-adjusted effective independent sample size, and closed-form power at standardized effects {0.5,0.3,0.2}. Persist every probed cell (no winner-only logging).",
     "explicitly_out_of_scope": [
@@ -390,7 +396,7 @@
     "new_script_path_suggestion": "research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py",
     "reason_deterministic_op_not_bound": "authorized_deterministic_operations_current_epoch is empty; no existing catalog entry has operation_name equal to this next_action, so this is routed as implementation AI rather than invented as a deterministic operation ref."
   },
-  "implementation_scope_complete": false,
+  "implementation_scope_complete": true,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
     "accepted_13w_history_current_eligible": 42,
@@ -435,6 +441,7 @@
     "Exact-head acceptance of the diagnostic implementation and evidence.",
     "Separate cost and independent-validation prerequisites before any prospective economic envelope is considered."
   ],
+  "later_step": "A subsequent proposal may use the completed diagnostics for Stage 2 robust-region identification; isolated single-cell winners are rejected, and no Stage 3 refinement is authorized here.",
   "later_step_after_epoch34_result": "Fresh AI reasoning interprets the accepted Epoch34 structural result and selects the next legal research step.",
   "later_step_after_semantic_freeze": "Implement and bind the fresh evaluator and authorized deterministic operation, then run only after exact-head CI and permitted hash-bound capture-byte transport materialization.",
   "latest_exact_head_ci_ref": "evidence/EPOCH37_TREND_MOMENTUM_EXACT_HEAD_CI_V1.json",
@@ -512,7 +519,7 @@
   "new_semantic_judgment_required_for_scope_reconciliation": false,
   "next_acquisition_plan_ref": "data/EPOCH46_OUTCOME_BLIND_M5_ACQUISITION_WAVE_01_PLAN_V1.json",
   "next_action": "IMPLEMENT_AND_RUN_MEAN_REVERSION_EPOCH47_WAVE01_COARSE_PARAMETER_REGION_SCAN",
-  "next_deterministic_operation_ref": null,
+  "next_deterministic_operation_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json",
   "next_gate": "Fresh prospective symbol×mechanism×context×robust-parameter-region selection and freeze. Only after that may a deterministic evaluator open development response statistics or request a minimal mechanism-specific data extension.",
   "no_economic_outcome_opened_by_this_proposal": true,
   "no_economic_outcome_requested": true,
@@ -642,6 +649,7 @@
   "source_ai_proposal_hash": "453d0ddb418b21ae72107222f5219aea323161e7f37e4bdb65d7f963184f2edc",
   "source_ai_proposal_id": "AI_reason_ba723215ff1cce105447e4c95e4443e4_EPOCH47_MEAN_REVERSION_WAVE01_COARSE_REGION_FREEZE",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
+  "source_implementation_id": "MXM_EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_V1",
   "source_runtime_operation_id": "op_bd829c8364ca5dcbca0eabd71c8f6f2a",
   "stale_post_epoch46_proposal_supersession_ref": "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json",
   "stale_reasoning_guard": {
@@ -653,7 +661,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_FROZEN_PENDING_IMPLEMENTATION",
+  "status": "DETERMINISTIC_OPERATION_READY_AFTER_IMPLEMENTATION_GREEN",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
