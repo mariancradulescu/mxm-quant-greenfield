@@ -1,0 +1,59 @@
+name: Research Core V3 Bootstrap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-core-v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mxm-research-core-v3-writer
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: performance-research-v3-20260922
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  deterministic-v3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout authoritative research branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate generic causal engine
+        run: python -m unittest -v tests.test_research_core_v3
+
+      - name: Materialize canonical V3 inventory salvage spec and development surface
+        run: python -m research_core_v3.bootstrap --root .
+
+      - name: Persist canonical V3 state if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "mxm-research-core-v3[bot]"
+          git config user.email "mxm-research-core-v3@users.noreply.github.com"
+          validated_head="$(git rev-parse HEAD)"
+          git add research_core_v3/state/
+          if git diff --cached --quiet; then
+            echo "Canonical V3 state already current."
+            exit 0
+          fi
+          git fetch origin "${TARGET_BRANCH}"
+          remote_head="$(git rev-parse "origin/${TARGET_BRANCH}")"
+          test "${remote_head}" = "${validated_head}"
+          git commit -m "Materialize canonical Research Core V3 bootstrap state"
+          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
