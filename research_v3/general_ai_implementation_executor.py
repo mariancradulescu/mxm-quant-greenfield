@@ -239,7 +239,7 @@ def _post_green_output(out:Mapping[str,Any],changed_paths:list[str])->dict[str,A
         ns["implementation_satisfied"]=True
         ns["user_action_required"]=False
         payload["next_research_state"]=ns
-    if status.startswith("PENDING_EXACT_HEAD_GREEN") or status.endswith("REQUIRES_EXACT_HEAD_GREEN"):
+    if "PENDING_EXACT_HEAD_GREEN" in status or status.endswith("REQUIRES_EXACT_HEAD_GREEN"):
         # Exact-head green closes implementation authority. If implementation already
         # published an explicit deterministic operation, preserve that zero-provider
         # continuation instead of manufacturing a fresh semantic reasoning boundary.

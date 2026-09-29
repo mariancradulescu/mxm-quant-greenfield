@@ -194,7 +194,12 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             # historical peer-cohort lifecycle. Any newer explicitly authorized
             # deterministic operation must still route deterministically and must
             # never fall through to the AI implementation provider.
-            self.assertEqual(route["operation_name"],state["next_action"])
+            expected_action=route["operation_name"]
+            if (state.get("implementation_satisfied") is True
+                    and state.get("implementation_ai_required") is False
+                    and "PENDING_EXACT_HEAD_GREEN" in str(state.get("status") or "")):
+                expected_action=f"RUN_EXACT_HEAD_CI_THEN_{expected_action}"
+            self.assertEqual(expected_action,state["next_action"])
             self.assertEqual(route["operation_ref"],state["next_deterministic_operation_ref"])
             self.assertFalse(state["ai_reasoning_required"])
             self.assertFalse(state["implementation_ai_required"])
