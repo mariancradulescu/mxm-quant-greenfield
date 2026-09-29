@@ -1,0 +1,116 @@
+{
+  "schema": "mxm.greenfield.epoch48-mean-reversion-stage2-robust-neighborhood-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_NON_ECONOMIC_STAGE2_ROBUST_REGION_IDENTIFICATION",
+  "evidence_epoch": 46,
+  "family": "MEAN_REVERSION",
+  "stage": "PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1/STAGE_2_ROBUST_REGION_IDENTIFICATION",
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_bf9cd89c9571973945f9c655002fced0.json",
+    "accepted_proposal_file_sha256": "ca457153b9d77929b907eccae492322670e00b91772c627769a37ed6c78227d9",
+    "accepted_proposal_hash": "f0c018f3c8955afdbe51563210547d79563db84269474b783aae057239b0bccc",
+    "accepted_proposal_id": "AI_E48_MR_FREEZE_01",
+    "epoch47_freeze_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json",
+    "epoch47_freeze_file_sha256": "cc1276c9fd3934b40db99002cb0f25a76f001efddb0d712f2ac38d5424d85fbb",
+    "epoch47_scan_ref": "evidence/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_V1.json",
+    "epoch47_scan_file_sha256": "a3864de83ae9ce3650fe266030dc11b9c132e84a51730b65bdb98ce223e58c03",
+    "capture_acceptance_ref": "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+    "data_sufficiency_ref": "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
+    "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json"
+  },
+  "scope": {
+    "resolution": "M5",
+    "interval_utc": {
+      "start": "2025-12-15T00:00:00Z",
+      "end": "2026-03-15T23:59:59Z"
+    },
+    "identities_with_accepted_rows": 33,
+    "authentic_zero_history_identity": "AMD.US-PERP",
+    "zero_history_is_not_negative_evidence": true,
+    "zero_history_identity_excluded_from_aggregation": true,
+    "cohort_role": "DEVELOPMENT_ONLY_MECHANISM_SPECIFIC_DISCOVERY",
+    "structural_41_default_inferential_authority": false,
+    "protected_forward_opened": false,
+    "input_data_reused_verbatim_from_epoch47_scan": true,
+    "no_new_market_data_read": true
+  },
+  "parameter_grid": {
+    "absolute_standardized_deviation_thresholds": [
+      1,
+      1.5,
+      2
+    ],
+    "lookback_bars": [
+      12,
+      24,
+      48,
+      96
+    ],
+    "cell_count": 12,
+    "grid_source_ref": "research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json"
+  },
+  "stage2_neighborhood_law": {
+    "scope_unit": "SYMBOL_X_MECHANISM_X_CONTEXT_X_ROBUST_PARAMETER_REGION",
+    "input_fields_used": [
+      "event_availability_rate",
+      "eligible_contiguous_windows",
+      "reversal_event_count",
+      "dependence_adjusted_effective_date_clusters",
+      "closed_form_power_estimates"
+    ],
+    "prohibited_input_fields": [
+      "post-event directional or return response",
+      "strategy return or PnL",
+      "protected-forward evidence",
+      "future bars or prices"
+    ],
+    "adequate_event_density_rule": "For each symbol-cell and frozen standardized_effect_scenario in [0.5,0.3,0.2], response eligibility requires eligible_contiguous_windows > 0, reversal_event_count > 0, event_availability_rate > 0, and the exact frozen closed_form_power_estimates entry estimated_power >= 0.8, the target_power already frozen by Epoch47. No new numeric threshold is introduced.",
+    "adjacency_rule": "Rook/4-connectivity on the frozen 4x3 lookback x threshold grid; no diagonal adjacency.",
+    "heterogeneity_rule": "Evaluate adjacency and connected components separately for each broker symbol and preserved structural context. Do not require a common cell, common optimum, or common parameter region across the 33 heterogeneous identities.",
+    "neighborhood_rule": "For each broker symbol and standardized_effect_scenario, maximal connected components of response-eligible cells are recorded. A supported pre-response parameter neighborhood requires at least 2 adjacent cells; isolated cells are recorded but rejected under the existing robustness governor.",
+    "no_winner_selection": "Record every supported component for every symbol and effect scenario. Do not rank symbols or components, select a cohort-wide winner, or require cross-symbol agreement.",
+    "fail_closed_rule": "A symbol/effect scenario without at least 2 adjacent response-eligible cells remains disabled for the subsequent response surface under that scenario. This is a local prerequisite result, not family closure."
+  },
+  "record_law": {
+    "record_every_cell": true,
+    "record_every_effect_scenario_per_cell": true,
+    "winner_only_logging": false,
+    "total_recorded_cell_probes_per_symbol": 12
+  },
+  "execution": {
+    "implementation_ref": "research_v3/mean_reversion_epoch48_stage2_robust_neighborhood.py",
+    "result_ref": "evidence/EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD_RESULT_V1.json",
+    "deterministic_operation_ref": "research_v3/EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD_DETERMINISTIC_OPERATION_V1.json",
+    "exact_head_green_required_before_execution": true
+  },
+  "later_step": {
+    "stage": "CAUSAL_DEVELOPMENT_RESPONSE_SURFACE_FREEZE",
+    "status": "REQUIRES_SUBSEQUENT_PROSPECTIVE_RESPONSE_LAW",
+    "rule": "After this outcome-blind per-symbol/context region freeze is accepted, fresh semantic research judgment must freeze the causal DEVELOPMENT response variable, horizon, entry/exit timing and selection-aware evaluation law before any response/return/PnL statistic is read. No generic acquisition wave is implied."
+  },
+  "interpretation_boundary": {
+    "economic_outcome_opened": false,
+    "v2_attempt_consumed": false,
+    "candidate_economic_identity_created": false,
+    "mechanism_family_closed": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_holdout_is_independent_confirmation": false,
+    "economic_promotion_authorized": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false,
+    "response_return_or_pnl_statistic_opened": false,
+    "winner_cell_or_symbol_selected": false
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "research_sequence_label": "EPOCH48",
+  "evidence_epoch_semantics": "SOURCE_MATERIAL_EVIDENCE_EPOCH_46; EPOCH48_IS_A_RESEARCH_SEQUENCE_LABEL_NOT_THE_EVIDENCE_COUNTER",
+  "methodology_note": "The unaccepted provider draft's 50% cohort-majority rule is removed because it was not prospectively authorized and would force a common parameter rule across heterogeneous symbols."
+}

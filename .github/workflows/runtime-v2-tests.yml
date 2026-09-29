@@ -43,6 +43,10 @@ on:
       - 'research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py'
       - 'research_v3/runtime_v2_inputs/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_RESULT_*'
       - 'tests/test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py'
+      - 'research_v3/EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD_FREEZE_V1.json'
+      - 'research_v3/EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD_DETERMINISTIC_OPERATION_V1.json'
+      - 'research_v3/mean_reversion_epoch48_stage2_robust_neighborhood.py'
+      - 'tests/test_mean_reversion_epoch48_stage2_robust_neighborhood.py'
       - '.github/workflows/runtime-v2-tests.yml'
   workflow_dispatch:
     inputs:
@@ -111,6 +115,7 @@ jobs:
           tests.test_general_ai_reasoning_provider
           tests.test_general_ai_director_bridge
           tests.test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan
+          tests.test_mean_reversion_epoch48_stage2_robust_neighborhood
 
       - name: Build exact Epoch46 broker capture package
         run: python tools/build_epoch46_outcome_blind_m5_capture_package.py

@@ -1106,6 +1106,11 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_run_epoch43_mean_reversion_power_aware_discovery(root,state,op)
     elif op.get("materializer")=="RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45":
         new_state=_run_epoch45_mean_reversion_capture_scope_audit(root,state,op)
+    elif op.get("materializer")=="RUN_EPOCH48_MEAN_REVERSION_STAGE2_ROBUST_NEIGHBORHOOD":
+        from research_v3.mean_reversion_epoch48_stage2_robust_neighborhood import build_stage2
+        result=build_stage2(root)
+        atomic_write_json(root/op["result_ref"],result)
+        new_state=_execute_existing_structural_result(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":
