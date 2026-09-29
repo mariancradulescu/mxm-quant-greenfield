@@ -34,8 +34,13 @@ def main():
     for offset in range(0,145,10):
         symbols=[]
         for item in inputs['primary_series'][offset:offset+10]:
-            r=json.loads((out/f"{item['symbol_id']}.json").read_text());symbols.append(r);records.append({'symbol_id':item['symbol_id'],'symbol':item['symbol'],'result_sha256':r['sha256'],'source_series_sha256':item['series_sha256'],'cells':55})
+            r=json.loads((out/f"{item['symbol_id']}.json").read_text());r['full_compute_checkpoint_sha256']=r.pop('sha256')
+            for cell in r['cells']:
+                for variant,vdata in cell['variants'].items():
+                    for horizon,metrics in vdata['horizons'].items():
+                        if variant!='CORRECTED_NEXT_OPEN_PLUS_STRICT_FULL_DEPENDENCY_CONTINUITY' or horizon!='6':metrics.pop('week_cluster_means',None)
+            r['sha256']=sha(canonical(r));symbols.append(r);records.append({'symbol_id':item['symbol_id'],'symbol':item['symbol'],'result_sha256':r['sha256'],'source_series_sha256':item['series_sha256'],'cells':55})
         name=f'CORRECTED_SURFACE_V2_SHARD_{offset//10:02d}.json.gz';blob=gzip.compress(canonical({'binding':binding,'symbols':symbols}),mtime=0);(state/name).write_bytes(blob);shards.append({'path':name,'sha256':sha(blob),'cell_count':len(symbols)*55})
-    r={'schema':'mxm.research-core-v3.corrected-complete-development.v2','binding':binding,'primary_count':145,'cell_count':7975,'variants_per_cell':4,'horizons':[1,3,6,12],'protected_forward_opened':False,'final_pnl_certification':False,'outcome_informed_methodology_change':True,'original_artifacts_unchanged':True,'old_next_open_label':'H_PLUS_ONE_HOLDING_SENSITIVITY','cohort_policy':'ORIGINAL_MAX12_FORWARD_VALID_REARMED_EVENTS;STRICT_SUBSET_NO_REARM','records':records,'shards':shards}
+    r={'schema':'mxm.research-core-v3.corrected-complete-development.v2','binding':binding,'assembly_implementation_sha256':sha(Path(__file__).read_bytes()),'primary_count':145,'cell_count':7975,'variants_per_cell':4,'horizons':[1,3,6,12],'protected_forward_opened':False,'final_pnl_certification':False,'outcome_informed_methodology_change':True,'original_artifacts_unchanged':True,'old_next_open_label':'H_PLUS_ONE_HOLDING_SENSITIVITY','cohort_policy':'ORIGINAL_MAX12_FORWARD_VALID_REARMED_EVENTS;STRICT_SUBSET_NO_REARM','records':records,'shards':shards}
     r['sha256']=sha(canonical(r));(state/'CORRECTED_145_DEVELOPMENT_MANIFEST_V2.json').write_text(json.dumps(r,indent=2,sort_keys=True)+'\n');print('COMPLETE',r['sha256'],flush=True)
 if __name__=='__main__':main()

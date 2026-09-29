@@ -1,0 +1,754 @@
+{
+  "acquisition_performed": false,
+  "additional_required_authentic_evidence": [
+    "point-in-time commission and currency conversion",
+    "minimum volume and volume step; point-in-time applicability",
+    "symbol-specific margin and leverage tiers; point-in-time applicability",
+    "swap schedule where holding can incur rollover",
+    "session/holiday/trading-state restrictions",
+    "delay/slippage sensitivity; no guaranteed OHLC open fill"
+  ],
+  "confirmation_ready": false,
+  "delay_sensitivity_seconds": [
+    0,
+    1,
+    5,
+    30
+  ],
+  "existing_evidence_audit": {
+    "archives": "authenticated M5 OHLC only; no event-time bid/ask streams",
+    "coarse_summaries": "not event-time historical evidence for this corrected surface; not applied",
+    "legacy_quote_acceptance": "raw tick bytes declared retained locally, not transferred into repository"
+  },
+  "expanded_scope_plan_sha256": "cfd58bc6489875028031c0f69ab6e3cbc40be0927202e03e500cd4b7f98da892",
+  "freeze_gate": "CLOSED_UNTIL_AUTHENTIC_COSTS_AND_ALL_OTHER_GATES_PASS",
+  "gross_survivor_regions": 88,
+  "gross_survivor_symbols": 84,
+  "historical_api": "Pepperstone cTrader Open API ProtoOAGetTickDataReq; pagination hasMore; request duration at most 604800000 ms",
+  "horizon_bars": 6,
+  "implementation_sha256": "7dc16585fa1fa95a756dc88711dad093359128b365aaa4fc619c495e9f97b67e",
+  "merged_quote_windows": 4062589,
+  "missing_quote_policy": "COST_UNRESOLVED; NEVER_SUBSTITUTE_CURRENT_SPREAD",
+  "packing_implementation_sha256": "b4dba3dd13f72bb17a802e32e1a992b6fd9a99454ee2b4857abcc7badd2f7349",
+  "protected_forward_opened": false,
+  "quote_max_age_seconds": 2,
+  "quote_types": [
+    "BID",
+    "ASK"
+  ],
+  "recovery_priority": "reuse matching authentic existing local tick chunks first; acquire only missing listed windows; no M5 recollection",
+  "schema": "mxm.research-core-v3.corrected-minimal-friction-evidence.v2",
+  "scope_archives": [
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "sha256": "1858f3bb7e8d620913bea6532d2208078516b7128108e0ceaf15f9202de6ac39",
+      "size_bytes": 1441234
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "sha256": "0e0a968e858cdb10e45d6f92b26b1f39c51f1b8a7754aa2a91c5f8b997d4a6cb",
+      "size_bytes": 1509893
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "sha256": "144981233c86ec46aeee3562f64120069caa6daf0e6273426ce3661e56be13c2",
+      "size_bytes": 1559776
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "sha256": "f0e90bb0d332fdbf2a0a1246a77ff2d0b4ffac60a2dde6f2f224623ac1922943",
+      "size_bytes": 1614620
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "sha256": "40aeeac982234403601ecd525ff693e629bdab6265b98da27c662c1c72ce5daf",
+      "size_bytes": 1405742
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "sha256": "c6e9603b927aee749dcb28f905e195453150391d7c1bcaf87a55c8a6146dbc34",
+      "size_bytes": 1460792
+    }
+  ],
+  "sha256": "4952c50fffda348b9ea042c089e1cb289d8808c083eae45a3b00bfdcc73c5be5",
+  "shards": [
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 26585,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_3.json.gz",
+      "sha256": "74f39e2fb6c6b1e0aa4ee28e89d6fd0ee22b324406bbf9e987488f5551d0ecae",
+      "symbol_id": 3,
+      "windows": 38031
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37891,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_9.json.gz",
+      "sha256": "6131421866f130260e313af1ecbe810e0e7b5ea0bd9e1c78fb10c52f48cf317b",
+      "symbol_id": 9,
+      "windows": 52797
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 38342,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_17.json.gz",
+      "sha256": "f4a900eace8c3f3fbb099021cc32ac89793f7b50cdc5e3b8530256369f773276",
+      "symbol_id": 17,
+      "windows": 53165
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 23492,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_18.json.gz",
+      "sha256": "4345de0d7485c6b8e149329fe93d2806cce18c829eeefb0e3613e86da6d7ce22",
+      "symbol_id": 18,
+      "windows": 38592
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37855,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_19.json.gz",
+      "sha256": "860eb8eab676500e85bbde4818b372fda7ec1638a62b21ffb87f96f07c06fbe7",
+      "symbol_id": 19,
+      "windows": 52528
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37716,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_22.json.gz",
+      "sha256": "c7a9680f22971c182a89858f05cc7a6447ea840814260da49efe8cad3cdee484",
+      "symbol_id": 22,
+      "windows": 52451
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37360,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_24.json.gz",
+      "sha256": "311b7080ae0176f57d3a5c639d049f32b31c71ebd7f22524dcb525e25c07afb2",
+      "symbol_id": 24,
+      "windows": 52020
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 30178,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_27.json.gz",
+      "sha256": "72fe484dd20f7ed384480c157363987a0a0e11b1e77c81bf356708074e4d3e58",
+      "symbol_id": 27,
+      "windows": 45514
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 38602,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_28.json.gz",
+      "sha256": "a2eca1a0c2529f23b4a4951aae6a58be88fac75375f1c80dee1c59310e983d57",
+      "symbol_id": 28,
+      "windows": 53506
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 20687,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_29.json.gz",
+      "sha256": "dd243d98f4d522bd1c2de5ef01afcd1cc870a50b75de109d012e1c50bd7f805f",
+      "symbol_id": 29,
+      "windows": 30057
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 36400,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_31.json.gz",
+      "sha256": "5e854bf65c472db964a5d6259df170df3b4a1efe3eec6c843d69a1353d3efc4c",
+      "symbol_id": 31,
+      "windows": 50801
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 36338,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_32.json.gz",
+      "sha256": "bdb5cd34e7a7cc91b08787dc1481228a6a1fdd1d3991dffda7c8ca04046dd94a",
+      "symbol_id": 32,
+      "windows": 50745
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 35770,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_33.json.gz",
+      "sha256": "5ceee89527024ccece0ad289781c0ee3bff0182299417f9e22832a0880352113",
+      "symbol_id": 33,
+      "windows": 50023
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 32323,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_34.json.gz",
+      "sha256": "b7d297f7b9bf3531e5b4d916d44bdd7a816572c5bb29e4a68b9c6277fb3fffea",
+      "symbol_id": 34,
+      "windows": 46007
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 38397,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_35.json.gz",
+      "sha256": "35efb25d05f56be321b5c9ffb771acbb9237471cac4dc0ea5bf35198561ce8a1",
+      "symbol_id": 35,
+      "windows": 52956
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36201,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_37.json.gz",
+      "sha256": "69aa41cd499eca92006b4ed31018ead1daf1b5b81facedcd39ded3d073cf91c0",
+      "symbol_id": 37,
+      "windows": 50826
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36863,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_44.json.gz",
+      "sha256": "c19ebab42ffcfdb464ba2fde819d08d42a369472f04c092e1701b9be435005d3",
+      "symbol_id": 44,
+      "windows": 51311
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 35889,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_46.json.gz",
+      "sha256": "c17ef86106cb9a03d0d4be5d80862932cfa3913485629fff3ddc1d8d908de17c",
+      "symbol_id": 46,
+      "windows": 50368
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 37809,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_47.json.gz",
+      "sha256": "5993dcb306df37bc3c3f9de18b14c5b503c911c60dbf030f117b79ede67febe8",
+      "symbol_id": 47,
+      "windows": 52613
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36377,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_49.json.gz",
+      "sha256": "35316dbae44ad26eb4a2555c98954b8934d63ba620dc536c93fd7b5c01643790",
+      "symbol_id": 49,
+      "windows": 50947
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 38008,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_50.json.gz",
+      "sha256": "cf71574c239541e20dc5795eb2f1889801cfdb418329e1dbdefc606e90e8c7d9",
+      "symbol_id": 50,
+      "windows": 53033
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 30953,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_51.json.gz",
+      "sha256": "0ac1ceaeb988fa110deaaf4339387dc584b0e2d6e7126f57485399552c3820b8",
+      "symbol_id": 51,
+      "windows": 44212
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 35972,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_54.json.gz",
+      "sha256": "0fda0d01aed38cce2e0f70f03d43a0457713e9ddbc5f2380daf7a93cc3af6796",
+      "symbol_id": 54,
+      "windows": 50356
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 32629,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_61.json.gz",
+      "sha256": "9129e2369a4e2a0c1afb8fd145c7fbd405e6c249044aafa4604e6e12582f172d",
+      "symbol_id": 61,
+      "windows": 46628
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 31235,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_64.json.gz",
+      "sha256": "809358a91c8400e198bfc0a5b780e023231be4db93cecd212ce29d8648bd8b32",
+      "symbol_id": 64,
+      "windows": 44804
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36631,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_82.json.gz",
+      "sha256": "1c8eb665011b481b1e1c187f7d468a854f9daa57ee01a4dabb165daa3d87532b",
+      "symbol_id": 82,
+      "windows": 51190
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36185,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_84.json.gz",
+      "sha256": "e7a8d30be54a2217e66f67c6c4a10ad6e16a84b21234fb023a00ec1d697fdcdb",
+      "symbol_id": 84,
+      "windows": 50391
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 33314,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_86.json.gz",
+      "sha256": "2fd368e32e46eb4a35b6a7bdd58d18eca8497045ad9777c94fedbcb70d08e8aa",
+      "symbol_id": 86,
+      "windows": 47528
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 36250,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_87.json.gz",
+      "sha256": "473386ff78a86ed666534dc9bb5c6ccc13d799fbd4bce3b47f767fa52d54ad3f",
+      "symbol_id": 87,
+      "windows": 50633
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 28478,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_91.json.gz",
+      "sha256": "c9a7b880072add338fb5133a032fdc1bac374de4cb49667416ed9409d0b78269",
+      "symbol_id": 91,
+      "windows": 41388
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 32028,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_95.json.gz",
+      "sha256": "8755ad02b37203a707c0707510ba51c5dafcc6622db7c3e2f88ce9d7b03ef8f4",
+      "symbol_id": 95,
+      "windows": 45460
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 32789,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_97.json.gz",
+      "sha256": "c1307fec967c8307f817723aac269903950ddc44f8e80b0cc0ef635989ede349",
+      "symbol_id": 97,
+      "windows": 46176
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 37325,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_98.json.gz",
+      "sha256": "dcdd81a4f6edf0a667f1ff7cc4cc167f12bf7f5a96b15352c07d59d2e3e42c22",
+      "symbol_id": 98,
+      "windows": 52091
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 40388,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_116.json.gz",
+      "sha256": "4a4b1e22278750808ec9c2c6c0a17203464ece2399d8e2f383e503cee46b95c7",
+      "symbol_id": 116,
+      "windows": 40939
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 38125,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_118.json.gz",
+      "sha256": "72cd0a97f47849b5d08a68039313900492da167f65b2ab446a3edb58872c424c",
+      "symbol_id": 118,
+      "windows": 52904
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 53154,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_130.json.gz",
+      "sha256": "38198e96ab9295a1dfde95a1b61f23558b80e5623f9af8baf6abf5a7e4dc2efa",
+      "symbol_id": 130,
+      "windows": 74098
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 30814,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_134.json.gz",
+      "sha256": "109ff994d6e3c0a420b186f51718b7ee64dd3559b88d7ba53e62756b4083a6d5",
+      "symbol_id": 134,
+      "windows": 44418
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 1896,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_146.json.gz",
+      "sha256": "9571488fb5015ac04e5095b1e317d6596262f041ea18a20ea6ff07856a5a91ca",
+      "symbol_id": 146,
+      "windows": 3696
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 53209,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_284.json.gz",
+      "sha256": "3ba63185e7c8e7170134e6bb5eb9e8c1950c2a7d4262ad6f2287fb0c0f29ee3c",
+      "symbol_id": 284,
+      "windows": 73809
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 48852,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_286.json.gz",
+      "sha256": "e377885b911732a98cd9b847d55c1be94dbf4a29cffe9b3461cb13f1ccdd104b",
+      "symbol_id": 286,
+      "windows": 70295
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 29482,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_324.json.gz",
+      "sha256": "c892883e6835f4eac4a296661406fc5e80cdcd82752e8266ea84aeb19397392b",
+      "symbol_id": 324,
+      "windows": 48235
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 46244,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_326.json.gz",
+      "sha256": "ff6c274336f1d84f9dde5abda3fa32a5cbdd5eb5336c9737510b2346cfa7b9ae",
+      "symbol_id": 326,
+      "windows": 66369
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 66365,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_888.json.gz",
+      "sha256": "447a005810043f57e3c8ad6b786daec720116b0633ebc354af217ec373a91718",
+      "symbol_id": 888,
+      "windows": 78686
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 45962,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2737.json.gz",
+      "sha256": "73359f2d52a900d995b760d704d5b631d924e00c0fba8bb433bb9a5f05fe0d1b",
+      "symbol_id": 2737,
+      "windows": 68236
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 46207,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2738.json.gz",
+      "sha256": "02ce23e3c21d7d1362aedd1ff211b505b714d31dc0cf60c9bf3c2ab92549ecf5",
+      "symbol_id": 2738,
+      "windows": 65830
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 44922,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2740.json.gz",
+      "sha256": "ebb2feb74457a4dcacf07099f63858922f06605a75f1394d81e5454dcc0e6644",
+      "symbol_id": 2740,
+      "windows": 66985
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 13091,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2742.json.gz",
+      "sha256": "bee75a89c98fe6a17e65b1e575c641e4b6e26a4f24ea9f7373a841b346ce481c",
+      "symbol_id": 2742,
+      "windows": 23764
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 38310,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2762.json.gz",
+      "sha256": "d2d056d5f501b9f4564f80499c203fd8871db53ffa17427b1d5b6b6244377a28",
+      "symbol_id": 2762,
+      "windows": 53158
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 35544,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2763.json.gz",
+      "sha256": "3a9108a4c7734452f1a52b115c623dc4973a886fdc590be17a893ec117781dad",
+      "symbol_id": 2763,
+      "windows": 50351
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 36736,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2764.json.gz",
+      "sha256": "c0820d7bfc4fdaa2b49135094a0412e10fdd5702081524eac75a20c3a8fbe66b",
+      "symbol_id": 2764,
+      "windows": 51786
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 37575,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2765.json.gz",
+      "sha256": "39ab18141a229b281270233b14aed14893385aab0cff4cf38ff565da375dd792",
+      "symbol_id": 2765,
+      "windows": 52548
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 26871,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2766.json.gz",
+      "sha256": "97609c079ca67192d20706ad9f1e74b256b42296c64febc3736f2ad8c1ac994f",
+      "symbol_id": 2766,
+      "windows": 38276
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 34312,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2767.json.gz",
+      "sha256": "63e88cd01acfd56bdb66de3484f9f250c3b6458715e0ac465bb558e53f8ab908",
+      "symbol_id": 2767,
+      "windows": 48671
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 29781,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2768.json.gz",
+      "sha256": "66c3838b302a39b185f5e2a4c67a8ca0dfa6aa8346e44284449e483bdd29bba9",
+      "symbol_id": 2768,
+      "windows": 43304
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 33281,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2769.json.gz",
+      "sha256": "15d468fc1c2ff4a1689859e8d425f7cbdd435f7c381f3547c18b06569b43c2c8",
+      "symbol_id": 2769,
+      "windows": 47640
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 34065,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2770.json.gz",
+      "sha256": "ffa4b34fab64d4c46049de48a0531f0f5c2dc155cff38881229268e04aa746c3",
+      "symbol_id": 2770,
+      "windows": 48137
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 35061,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2771.json.gz",
+      "sha256": "3e169663aa171e2935d5876440a470c17cbbfb223a392faceef69f2ab249cf7c",
+      "symbol_id": 2771,
+      "windows": 49411
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 34193,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2772.json.gz",
+      "sha256": "fef0cef55d31ec0c3bfa551b4855fa534b4d368c00fd8004a1b2874fea552a10",
+      "symbol_id": 2772,
+      "windows": 48929
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 38388,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2773.json.gz",
+      "sha256": "40d412de220039a0fe6d2111ac67a912a22ff173e9980f07e1cfb3bbb3aaf564",
+      "symbol_id": 2773,
+      "windows": 53150
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 37082,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2775.json.gz",
+      "sha256": "3dea7fbe954509f9fc1bfccef150de5fde2cd62db84440cb56a1e055431c200e",
+      "symbol_id": 2775,
+      "windows": 51462
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 37525,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2776.json.gz",
+      "sha256": "efe05724bf9308cb7d72ea8d578b571b550a111ccb1075d1861384490c8eb903",
+      "symbol_id": 2776,
+      "windows": 52447
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 35408,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2777.json.gz",
+      "sha256": "06f8b93bd51c12f4ff8cc819f0797d35686553da22ec0dbebca9cb39db8f1e12",
+      "symbol_id": 2777,
+      "windows": 50424
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 20931,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2779.json.gz",
+      "sha256": "a5ef9a6cba724a3e903a4465782914a44bec329f3494431a39b7e33ae8cf9f5c",
+      "symbol_id": 2779,
+      "windows": 30990
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 34279,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2780.json.gz",
+      "sha256": "ea979c0b65c18ef7ed6d3b0dbce2e7a0bf05c23146d204679e1714218cca78c2",
+      "symbol_id": 2780,
+      "windows": 48889
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 38768,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2783.json.gz",
+      "sha256": "f57cf84e41ca0bce891471e6c485ff573a79d14bf654bbf84930ee24ae3cfea9",
+      "symbol_id": 2783,
+      "windows": 53635
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 30965,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2785.json.gz",
+      "sha256": "f3748c9de0440ac188943ffe3a4df7b64eb7192131dda1fd82cf66cd6e2f8227",
+      "symbol_id": 2785,
+      "windows": 45373
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 25476,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2786.json.gz",
+      "sha256": "c9b818b9c9c3bd06c2d7604151f6c5e93d6da8e5626fa0abcf64bdfb2fe815b7",
+      "symbol_id": 2786,
+      "windows": 36841
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 34363,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2788.json.gz",
+      "sha256": "6db4ba612a1f83a536577b8abd327354378a16e460de16fa41e9cf8a266914e3",
+      "symbol_id": 2788,
+      "windows": 48617
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 40426,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2917.json.gz",
+      "sha256": "b9787ee1e6b6a56202e64526c66a79fb2150434555ea358ee77a6c22027f3364",
+      "symbol_id": 2917,
+      "windows": 40952
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 17337,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2926.json.gz",
+      "sha256": "121104cc1600a5e3b0044d321694466c3dede019e3142ab305ca1f059d73379d",
+      "symbol_id": 2926,
+      "windows": 28268
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 23844,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_2999.json.gz",
+      "sha256": "d8608c12a5549665c6c76410b2b56fa3ab5872fb1601ec6fbd9ee69c3855d1e4",
+      "symbol_id": 2999,
+      "windows": 36413
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 58615,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_3025.json.gz",
+      "sha256": "788774b2547239fe17e9ff811ee3ccf168391e1816a63209415fd7dec14cd3b5",
+      "symbol_id": 3025,
+      "windows": 51242
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 14954,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_3029.json.gz",
+      "sha256": "e65d2209dd1fcc635a03d6f12ca7c6e19946ca175c375c2c5de4e0f585996a07",
+      "symbol_id": 3029,
+      "windows": 25974
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 53219,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_3034.json.gz",
+      "sha256": "ec517905dda9a292a92ed9150c4da00eda5fe481648f9fd864cbad74ec62bed6",
+      "symbol_id": 3034,
+      "windows": 48487
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 27748,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_5406.json.gz",
+      "sha256": "c4512b0a57f92e0f977cc950a04be3d5e39404bcec65785cb5952fa7c5bd84f0",
+      "symbol_id": 5406,
+      "windows": 27036
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 19655,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_5410.json.gz",
+      "sha256": "0b99dfc510b6b662a30c50e6d05481de9386c35ec32b2849d68ae696fac2a7fd",
+      "symbol_id": 5410,
+      "windows": 20806
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 41198,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_5449.json.gz",
+      "sha256": "1368acb10df9a998b5e12790692fb5ef13daa17a4da3aebec212a73f1428f236",
+      "symbol_id": 5449,
+      "windows": 45276
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 5242,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_5470.json.gz",
+      "sha256": "1dc88d1ef7e2887052300268adbc1d7b9c0671f0a0d088768e88aca1da425934",
+      "symbol_id": 5470,
+      "windows": 10056
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 28344,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_7186.json.gz",
+      "sha256": "e51d52f3b09bb403eed94d0a8afc8f42865412f9dcf9a1aa8a51638ec04cdce0",
+      "symbol_id": 7186,
+      "windows": 46204
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 43854,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_7188.json.gz",
+      "sha256": "3c080b11f0a7078aafdf96e96d91dcc8f8eb6e896e7d5d5ed75a91d8a8d80534",
+      "symbol_id": 7188,
+      "windows": 65871
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 46477,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_7189.json.gz",
+      "sha256": "36bd3c9b710c9fb8eba9665e4109611d26df9cfd6c0eb4626f8aa1c9cb1689a6",
+      "symbol_id": 7189,
+      "windows": 68663
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 54307,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_7190.json.gz",
+      "sha256": "34771fb07306efdba3ae22bc3103444e95db668df4b3c7f3e5f62cb9772ec9cb",
+      "symbol_id": 7190,
+      "windows": 75428
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 17984,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_7196.json.gz",
+      "sha256": "5eedb324c2ee089282f46c7005e8566989d9a78e2e98d05e531bca08c9795a0e",
+      "symbol_id": 7196,
+      "windows": 30446
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 42223,
+      "path": "CORRECTED_FRICTION_SCOPE_V2_7198.json.gz",
+      "sha256": "cbe2419a24c6b0d73b7dede1527aae55954183d2b1f08d35b0a0fcdfb5457426",
+      "symbol_id": 7198,
+      "windows": 60016
+    }
+  ],
+  "slippage_sensitivity": "0,0.25,0.5,1 contemporaneous spread per fill; scenario bounds, not observed fills",
+  "source_corrected_surface_sha256": "0ceb1f79080f8c9ef5cf6a13c0f56b279d02ffabc9644624f58230c705fcccbb",
+  "source_region_assessment_sha256": "7ab0000e92bd39a28d3de3aafc328927eb25fdcf42e68240e31b1a800461026a",
+  "status": "COST_UNRESOLVED",
+  "symbol_account_identity": "MUST_MATCH_ACCEPTED_PEPPERSTONE_ACCOUNT_FINGERPRINT_AND_SYMBOL_ID",
+  "unique_symbol_decision_direction_events": 2935924
+}
