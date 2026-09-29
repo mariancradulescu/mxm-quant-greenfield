@@ -36,6 +36,11 @@ on:
       - 'tools/build_epoch46_outcome_blind_m5_capture_package.py'
       - 'research_v3/EPOCH35_BREAKOUT_UNSIGNED_VOLATILITY_DETERMINISTIC_OPERATION_V1.json'
       - 'research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_DETERMINISTIC_OPERATION_V1.json'
+      - 'research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json'
+      - 'research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json'
+      - 'research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py'
+      - 'research_v3/runtime_v2_inputs/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_RESULT_*'
+      - 'tests/test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py'
       - '.github/workflows/runtime-v2-tests.yml'
   workflow_dispatch:
     inputs:
@@ -101,6 +106,7 @@ jobs:
           tests.test_research_evidence_epoch
           tests.test_general_ai_reasoning_provider
           tests.test_general_ai_director_bridge
+          tests.test_mean_reversion_epoch47_wave01_coarse_parameter_region_scan
 
       - name: Build exact Epoch46 broker capture package
         run: python tools/build_epoch46_outcome_blind_m5_capture_package.py
