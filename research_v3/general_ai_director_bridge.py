@@ -476,6 +476,46 @@ def _validate_provisional_four_panel_reauthorization(root: Path, proposal: Mappi
         if req.get("fields")!=FOUR_PANEL_OUTER_ACQUISITION_FIELDS:
             raise AIProposalRejected("four-panel acquisition request fields drift from the certified collector acquisition contract")
 
+def _validate_material_authority_floor(root: Path, proposal: Mapping[str, Any]) -> None:
+    state=load_json(root / NEXT_STATE_REL, {}) or {}
+    floor=state.get("material_authority_floor")
+    if not isinstance(floor, Mapping) or not floor:
+        return
+    binding=proposal.get("evidence_binding") or {}
+    if int(binding.get("evidence_epoch_seen",0) or 0) < int(floor.get("evidence_epoch",0) or 0):
+        raise AIProposalRejected("proposal is below the active material-authority freshness floor")
+    bound={str(row.get("ref")):row.get("sha256") for row in binding.get("authoritative_evidence_refs_and_hashes") or [] if isinstance(row,Mapping)}
+    for rel in floor.get("required_refs") or []:
+        rel=str(rel)
+        path=root/rel
+        if not path.is_file():
+            raise AIProposalRejected(f"material-authority floor ref missing: {rel}")
+        if bound.get(rel)!=sha256_file(path):
+            raise AIProposalRejected(f"proposal omits or drifts required material authority: {rel}")
+    forbidden={str(x) for x in floor.get("superseded_next_actions") or []}
+    tokens=[str(x) for x in floor.get("superseded_action_tokens") or []]
+    candidate_values=[]
+    decision=proposal.get("decision") or {}
+    next_state=proposal.get("next_research_state") or {}
+    for value in (decision.get("action"),decision.get("selected_action"),next_state.get("next_action")):
+        if isinstance(value,str):
+            candidate_values.append(value)
+    for value in candidate_values:
+        if value in forbidden or any(token and token in value for token in tokens):
+            raise AIProposalRejected("proposal routes backward across the active material-authority supersession boundary")
+    if floor.get("prospective_freeze_required_before_any_response_statistic") is True:
+        for key in ("response_statistics_authorized","economic_response_evaluation_authorized","open_response_outcomes_now"):
+            if decision.get(key) is True or next_state.get(key) is True:
+                raise AIProposalRejected("response statistic cannot open before the required prospective freeze")
+    if floor.get("generic_wave02_forbidden_before_mechanism_specific_freeze") is True:
+        policy=proposal.get("data_policy") or {}
+        req=policy.get("minimal_acquisition_request") or {}
+        if policy.get("new_market_data_requested") is True:
+            mechanism=decision.get("mechanism_family") or decision.get("selected_mechanism_family")
+            if not mechanism:
+                raise AIProposalRejected("generic Wave02/breadth acquisition forbidden before a mechanism-specific prospective freeze")
+
+
 def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]:
     validate_proposal_shape(proposal)
     try:
@@ -492,6 +532,7 @@ def validate_proposal(root: Path, proposal: Mapping[str, Any]) -> dict[str, Any]
         raise AIProposalRejected("proposal is stale for new research judgment: evidence bundle drift")
     if binding.get("authoritative_evidence_refs_and_hashes")!=current_evidence["authoritative_evidence_refs_and_hashes"]:
         raise AIProposalRejected("proposal authoritative evidence binding drift")
+    _validate_material_authority_floor(root, proposal)
     _validate_authoritative_data_contract(root, proposal)
     _validate_provisional_four_panel_reauthorization(root, proposal)
     _reject_completed_outer_as_unseen(root, proposal)
@@ -828,6 +869,12 @@ ONE_SHOT_NEXT_STATE_KEYS = (
     "supersession_ref",
     "selection_rule",
     "selection_basis",
+    "completed_family",
+    "later_step",
+    "expected_follow_on",
+    "semantic_focus_family",
+    "mechanism_family_targeted",
+    "family_touch_history_considered",
 )
 
 def _clean_next_state_for_new_ai_decision(
