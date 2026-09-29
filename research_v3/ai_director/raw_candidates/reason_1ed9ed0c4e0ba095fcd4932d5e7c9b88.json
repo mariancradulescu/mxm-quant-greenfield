@@ -1,0 +1,85 @@
+{
+  "candidate": {
+    "artifact_attestation_refs": [],
+    "authority_refs": [
+      "evidence/EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_V1.json",
+      "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+      "research_v3/MULTI_FRONTIER_DISCOVERY_GOVERNOR_V1.json",
+      "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+      "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+      "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json"
+    ],
+    "blocked_scope_id": "MEAN_REVERSION",
+    "data_policy": {
+      "new_market_data_requested": false
+    },
+    "decision": {
+      "action": "ADDITIONAL_AUTHORITY_REQUIRED",
+      "discovery_governance": {
+        "alternatives_considered": [
+          {
+            "alternative": "Resume CROSS_SECTIONAL_RANKING data acquisition",
+            "reason_not_selected": "Its exact 48-symbol cohort and interval are an explicitly blocked local data scope; do not request it again."
+          },
+          {
+            "alternative": "Select another locally blocked mechanism family",
+            "reason_not_selected": "Blocked-scope restrictions make those frontiers unavailable for this action."
+          },
+          {
+            "alternative": "Rerun a prior mean-reversion diagnostic on accepted representatives",
+            "reason_not_selected": "The prior result requires fresh scope selection; representatives are not an inferential universe, and capture overlap is unknown."
+          }
+        ],
+        "coverage_ledger_ref": "research_v3/DISCOVERY_COVERAGE_LEDGER_V1.json",
+        "local_parked_scope_is_family_exhaustion": false,
+        "parameter_governor_ref": "research_v3/PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1.json",
+        "structural_41_default_inferential_authority": false
+      },
+      "rationale": "MEAN_REVERSION remains open and is not locally blocked. However, Epoch42's required disjoint-scope audit cannot be completed from the supplied capture-acceptance references alone. The deterministic-operation catalog is empty, and no exact new mean-reversion data cohort can be justified without the accepted-capture scope inventory. Do not rerun the prior diagnostic or request the blocked cross-sectional cohort.",
+      "selected_mechanism_family": "MEAN_REVERSION",
+      "universe_methodology": {
+        "inferential_discovery": true,
+        "outcome_blind_selection": true,
+        "role": "MECHANISM_SPECIFIC_DISCOVERY",
+        "selection_features": [
+          "tradable_direction",
+          "data_availability_and_completeness",
+          "reversal_event_density",
+          "realized_volatility_opportunity_proxy",
+          "capital_efficiency",
+          "conservative_friction_proxy",
+          "effective independent sample size"
+        ],
+        "source_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+        "structural_representatives_are_economic_equivalents": false
+      }
+    },
+    "mechanism_family_closure_claims": [],
+    "next_research_state": {
+      "implementation_ai_required": false,
+      "next_action": "ADDITIONAL_AUTHORITY_REQUIRED",
+      "rationale": "The exact accepted capture scopes needed by the Epoch42 pending decision are not present in the supplied evidence. This request is distinct from the blocked cross-sectional acquisition cohort.",
+      "requested_authority_or_class": "A new machine-readable inventory of exact accepted broker-capture symbol, resolution, interval, and accessibility scopes, sufficient to identify a disjoint MEAN_REVERSION development increment without reusing the prior diagnostic's observed outcomes.",
+      "research_judgment_required": true,
+      "status": "ADDITIONAL_AUTHORITY_REQUIRED"
+    },
+    "objective": {
+      "class": "NON_ECONOMIC_FRONTIER_SELECTION",
+      "goal": "Resolve whether a genuinely disjoint, sufficiently powered mean-reversion development increment can be formed from accepted broker captures before opening any new diagnostic.",
+      "information_gain_rationale": "Epoch42 calls for auditing accepted capture scopes and defining a minimal disjoint increment. The supplied context does not identify those exact scopes or establish which accepted bytes are machine-accessible, so selecting symbols or requesting overlapping data would be speculative."
+    },
+    "proposal_id": "mean-reversion-capture-scope-authority-epoch43"
+  },
+  "captured_utc": "2026-09-29T03:25:15Z",
+  "evidence_bundle_sha256": "d98aab012f4a5a9c5ceb7e4892947cd6a1913b89bc02c2bf93d7bf9c12ae2db7",
+  "provider_meta": {
+    "actual_model_identity": null,
+    "actual_model_identity_known": false,
+    "cli": "@github/copilot",
+    "model": "auto",
+    "model_identity_limitation": "Copilot CLI silent programmatic mode does not expose the model selected behind Auto.",
+    "model_selection": "AUTO_ACCOUNT_AVAILABLE",
+    "provider": "github-copilot-cli"
+  },
+  "request_id": "reason_1ed9ed0c4e0ba095fcd4932d5e7c9b88"
+}
