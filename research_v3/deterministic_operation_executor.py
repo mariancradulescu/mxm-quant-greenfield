@@ -772,6 +772,65 @@ def _run_epoch42_mean_reversion_cohort_preflight(root:Path,state:dict[str,Any],o
         atomic_write_json(result_path,result)
     return _execute_existing_structural_result(root,state,op)
 
+def _run_epoch43_mean_reversion_power_aware_discovery(root:Path,state:dict[str,Any],op:dict[str,Any])->dict[str,Any]:
+    expected={
+        "operation_name":"RUN_EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY",
+        "implementation_ref":"research_v3/mean_reversion_power_aware_discovery.py",
+        "freeze_ref":"research_v3/EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY_FREEZE_V1.json",
+        "accepted_proposal_ref":"research_v3/ai_director/proposals/AUTO_reason_22da232dfe8db8062f3951c98cadda8e.json",
+        "result_ref":"evidence/EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY_V1.json",
+        "accepted_proposal_file_sha256":"efa2306ee44e558711eac4db63aa09b037c460045c9f81b26b8dddf69e5d6151",
+        "accepted_proposal_hash":"a089ac3cdc3763ef8311a0eaad7d5e4e09fb63e73bdc2bb46b7fd175321084e2",
+    }
+    if op.get("materializer")!="RUN_EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY":
+        raise DeterministicOperationRejected("unsupported Epoch43 mean-reversion discovery materializer")
+    for field,value in expected.items():
+        if op.get(field)!=value:
+            raise DeterministicOperationRejected(f"Epoch43 operation authority mismatch: {field}")
+    expected_validation={
+        "schema":"mxm.greenfield.epoch43-mean-reversion-power-aware-discovery.v1",
+        "status":"COMPLETE_NON_ECONOMIC_POWER_AWARE_DISCOVERY_PREFLIGHT",
+        "family":"MEAN_REVERSION",
+        "evidence_epoch":43,
+    }
+    if op.get("evidence_epoch")!=43 or op.get("result_validation")!=expected_validation:
+        raise DeterministicOperationRejected("Epoch43 result authority mismatch")
+    policy=op.get("execution_policy") or {}
+    if any(policy.get(field) is not False for field in (
+        "implementation_ai_required","copilot_reasoning_required","new_semantic_judgment_required",
+        "new_market_data_required",
+    )) or policy.get("exact_head_green_required_before_execution") is not True:
+        raise DeterministicOperationRejected("Epoch43 operation is not explicitly deterministic and non-economic")
+    from research_v3.mean_reversion_power_aware_discovery import build_preflight
+    result=build_preflight(root)
+    if (
+        result.get("freeze_sha256")!=sha256_file(root/expected["freeze_ref"])
+        or result.get("sampling_frame",{}).get("eligible_identity_count")!=1576
+        or result.get("sampling_frame",{}).get("selected_inferential_cohort") is not None
+        or result.get("sampling_frame",{}).get("structural_41_used_as_inferential_universe") is not False
+        or result.get("cohort_decision",{}).get("selected") is not False
+        or result.get("accepted_data_coverage",{}).get("absence_claim_for_other_capture_scopes") is not False
+        or result.get("power_preflight",{}).get("epoch42_diagnostic_rerun") is not False
+        or result.get("power_preflight",{}).get("response_statistics_computed") is not False
+        or result.get("interpretation_boundary",{}).get("pnl_computed") is not False
+        or result.get("interpretation_boundary",{}).get("economic_outcome_opened") is not False
+        or result.get("interpretation_boundary",{}).get("relative_value_alignment_inventory_recomputed") is not False
+        or any(int((result.get("accounting_effect") or {}).get(key) or 0)!=0 for key in (
+            "economic_outcomes_opened","v2_attempts_consumed","search_budget_change",
+        ))
+        or result.get("safety",{}).get("protected_forward_opened") is not False
+        or result.get("safety",{}).get("live_orders_authorized") is not False
+        or result.get("safety",{}).get("competition_start_authorized") is not False
+    ):
+        raise DeterministicOperationRejected("Epoch43 discovery preflight crossed its frozen boundary")
+    result_path=root/expected["result_ref"]
+    if result_path.is_file():
+        if load_json(result_path,{})!=result:
+            raise DeterministicOperationRejected("existing Epoch43 discovery preflight differs from recomputation")
+    else:
+        atomic_write_json(result_path,result)
+    return _execute_existing_structural_result(root,state,op)
+
 def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:bool=False)->dict[str,Any]:
     root=Path(root_value).resolve()
     state=dict(load_json(root/NEXT_STATE_REL,{}) or {})
@@ -870,6 +929,8 @@ def execute_one(root_value:str|Path=".",*,git_checkpoint:bool=False,git_push:boo
         new_state=_run_epoch41_regime_context_cohort_preflight(root,state,op)
     elif op.get("materializer")=="RUN_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT":
         new_state=_run_epoch42_mean_reversion_cohort_preflight(root,state,op)
+    elif op.get("materializer")=="RUN_EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY":
+        new_state=_run_epoch43_mean_reversion_power_aware_discovery(root,state,op)
     elif name=="BUILD_READ_ONLY_ALL_FRONTIER_EXECUTION_PREREQUISITE_CAPTURE_CONTRACT":
         new_state=_execute_contract(root,state,op)
     elif name=="BUILD_FRONTIER_FEATURE_STORE_OPPORTUNITY_MAP_AND_INFORMATION_GAIN_SELECTOR":

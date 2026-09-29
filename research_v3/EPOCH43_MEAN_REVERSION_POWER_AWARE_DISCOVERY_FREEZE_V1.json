@@ -1,0 +1,127 @@
+{
+  "schema": "mxm.greenfield.epoch43-mean-reversion-power-aware-discovery-freeze.v1",
+  "status": "PROSPECTIVELY_FROZEN_NON_ECONOMIC_COHORT_COVERAGE_AND_POWER_SCREEN",
+  "evidence_epoch": 43,
+  "authority": {
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_22da232dfe8db8062f3951c98cadda8e.json",
+    "accepted_proposal_file_sha256": "efa2306ee44e558711eac4db63aa09b037c460045c9f81b26b8dddf69e5d6151",
+    "accepted_proposal_hash": "a089ac3cdc3763ef8311a0eaad7d5e4e09fb63e73bdc2bb46b7fd175321084e2",
+    "proposal_id": "MR_POWER_AWARE_DISCOVERY_PIPELINE_EPOCH43",
+    "current_feasibility_snapshot_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1.json",
+    "current_feasibility_snapshot_sha256": "fbad721388da7f5e48dd54056aaf00fca8554d41daa9fb728e4c546ed50f7851",
+    "eligible_universe_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "eligible_identity_count": 1576,
+    "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "outcome_blind_candidate_index_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+    "accepted_development_inventory_ref": "evidence/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_RESULT_V1.json",
+    "accepted_development_inventory_sha256": "133197a1b592b401a825a6bebce5a358c8a606c5829353b55271bb2fe00dc562",
+    "accepted_prior_power_design_ref": "evidence/EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_V1.json",
+    "accepted_prior_power_design_sha256": "ea9dcfa7b1a803d1221a8f5d1ea9e04f2d0577eddbd6bba820911a62768c4332",
+    "accepted_capture_acceptance_ref": "data/BROKER_NATIVE_FRONTIER_M5_13W_DEVELOPMENT_ACCEPTANCE_V1.json",
+    "accepted_capture_zip_sha256": "64ea52126a31c527d2021a50923adab1b7df8f0ce5debe7f631cf4ce09b39503"
+  },
+  "scope": {
+    "mechanism_family": "MEAN_REVERSION",
+    "purpose": "Outcome-blind inventory and design sufficiency audit over the full current feasible identity frame.",
+    "sampling_frame": "ALL_1576_CURRENT_EUR200_FEASIBLE_POST_EXCLUSION_IDENTITIES",
+    "fixed_panel_size": false,
+    "structural_41_default_inferential_authority": false,
+    "candidate_strata_ref": "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
+    "candidate_strata_are_behavioral_or_economic_equivalence": false,
+    "selection_rule": "Preserve all feasible identities in the sampling frame. Select no inferential identity unless exact broker identity, current two-direction EUR200 feasibility, authenticated contiguous M5 history, schedule-adjusted completeness, reversal-cluster density, and dependence-adjusted effective sample size can all be audited. Adapt breadth only from these outcome-blind features and the frozen power design. Do not rank from response statistics, use structural representatives as substitutes, or impose a fixed symbol count.",
+    "selection_features": [
+      "data_availability_and_completeness",
+      "tradable_direction_and_executable_volume",
+      "reversal_event_density",
+      "realized_volatility_opportunity_proxy",
+      "trading_schedule_and_session_coverage",
+      "capital_efficiency_proxy",
+      "conservative_friction_proxy",
+      "effective_independent_sample_size"
+    ],
+    "event_density_and_effective_sample_size": "NOT_COMPUTED_FROM_BOUNDED_PERSISTED_SUMMARIES",
+    "volatility_opportunity_proxy": "Audit availability of the existing Epoch40 median absolute adjacent log-price-change proxy only; do not treat it as a reversal-event count, completeness measure, economic ranking, or response statistic.",
+    "cohort_selection_if_prerequisites_fail": "NO_INFERENTIAL_COHORT; report missingness and the minimal later data dependency without acquisition."
+  },
+  "design": {
+    "reuse_epoch42_hypothesis_and_power_scenarios": true,
+    "epoch42_diagnostic_rerun": false,
+    "strategy_response_statistics_computed": false,
+    "pnl_computed": false,
+    "effective_independent_unit": "EXCURSION_CLUSTER_WITH_DEPENDENCE_AWARE_UTC_DATE_OR_SESSION_CLUSTERING",
+    "universal_per_symbol_both_half_significance_gate": false,
+    "pooling_or_hierarchical_inference_requires_prospective_coherence_assessment": true,
+    "selection_aware_multiplicity_required_at_confirmatory_level": true,
+    "existing_accepted_capture_scope": {
+      "resolution": "M5",
+      "start_utc": "2026-06-15T00:00:00Z",
+      "end_utc": "2026-09-13T23:59:59Z",
+      "series_complete": 40,
+      "history_is_external_hash_bound_transport_when_not_in_git": true,
+      "may_be_relabelled_as_a_disjoint_confirmatory_interval": false
+    }
+  },
+  "data_boundary": {
+    "new_market_data_requested": false,
+    "new_market_data_acquisition_authorized": false,
+    "accepted_hash_bound_bytes_are_transport_materialization_not_new_acquisition": true,
+    "do_not_claim_unmaterialized_accepted_scopes_are_unavailable": true,
+    "response_interval_must_be_separately_authorized_and_disjoint_from_epoch25_epoch36": true,
+    "known_prior_observation_window_end_utc": "2026-09-13T23:59:59Z",
+    "no_default_multi_year_download": true,
+    "no_collector_scope_is_authorized_in_this_phase": true,
+    "minimal_later_dependency": {
+      "symbols": "Only the exact identities remaining after a later prospective outcome-blind cohort decision; not yet selected.",
+      "resolution": "M5",
+      "fields": [
+        "time_utc",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "requirements": [
+        "Authenticated exact broker identity and source hashes.",
+        "A separately accepted interval disjoint from the Epoch25/Epoch36 response window before any response evaluation.",
+        "Contiguous-bar and schedule-adjusted completeness audit, with gaps retained and never filled.",
+        "Causal reversal-cluster counts and dependence-aware effective sample size computed before response statistics."
+      ],
+      "interval": "Must be justified from exact accepted capture-scope reconciliation and separately prospectively frozen; no interval is selected here."
+    }
+  },
+  "interpretation_boundary": {
+    "strategy_events_or_response_statistics_computed": false,
+    "pnl_computed": false,
+    "economic_outcome_opened": false,
+    "candidate_economic_identity_created": false,
+    "v2_attempt_consumed": false,
+    "protected_forward_opened": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_holdout_is_independent_confirmation": false,
+    "structural_41_used_as_inferential_universe": false,
+    "epoch42_diagnostic_rerun": false,
+    "relative_value_alignment_inventory_recomputed": false,
+    "mechanism_family_closed": false,
+    "economic_promotion_authorized": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "v2_attempts_consumed": 0,
+    "search_budget_change": 0
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "live_orders_authorized": false,
+    "competition_start_authorized": false
+  },
+  "execution": {
+    "implementation_ref": "research_v3/mean_reversion_power_aware_discovery.py",
+    "result_ref": "evidence/EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY_V1.json",
+    "deterministic_operation_ref": "research_v3/EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY_DETERMINISTIC_OPERATION_V1.json",
+    "exact_head_green_required_before_execution": true,
+    "new_semantic_judgment_required_for_this_inventory_screen": false
+  }
+}
