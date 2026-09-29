@@ -16,7 +16,10 @@ class BroadInterpretationIntegrity(unittest.TestCase):
   index=json.loads((ROOT/'BROAD_145_DEVELOPMENT_INTERPRETATION_INDEX_V1.json').read_text())
   self.assertEqual(index['source_surface_sha256'],surf['sha256'])
   self.assertEqual(index['next_open_sensitivity_sha256'],lag['sha256'])
-  blob=(ROOT/index['interpretation_path']).read_bytes();self.assertEqual(hashlib.sha256(blob).hexdigest(),index['interpretation_gzip_sha256'])
+  blob=b''
+  for part in index['interpretation_parts']:
+   data=(ROOT/part['path']).read_bytes();self.assertEqual(hashlib.sha256(data).hexdigest(),part['sha256']);self.assertEqual(len(data),part['bytes']);blob+=data
+  self.assertEqual(hashlib.sha256(blob).hexdigest(),index['interpretation_gzip_sha256'])
   doc=json.loads(gzip.decompress(blob));digest=doc.pop('sha256');self.assertEqual(hashlib.sha256(canonical(doc)).hexdigest(),digest)
   self.assertEqual(digest,index['interpretation_uncompressed_sha256']);self.assertEqual(len(doc['all_cell_diagnostics']),7975)
   self.assertFalse(doc['protected_forward_opened']);self.assertFalse(doc['final_pnl_certification'])
