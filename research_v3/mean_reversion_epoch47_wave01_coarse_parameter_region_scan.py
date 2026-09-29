@@ -157,11 +157,9 @@ def validate_freeze(freeze: dict[str, Any], root: Path) -> tuple[dict[str, Any],
         or sufficiency.get("mean_reversion_preregistered_grid_event_density")
         or {}
     )
-    proposal_scope = (
-        (proposal.get("next_research_state") or {}).get("implementation_scope")
-        or decision.get("implementation_scope")
-        or {}
-    )
+    decision_scope = decision.get("implementation_scope") or {}
+    next_state_scope = (proposal.get("next_research_state") or {}).get("implementation_scope") or {}
+    proposal_scope = {**decision_scope, **next_state_scope}
     if (
         proposal.get("proposal_id") != expected_authority["accepted_proposal_id"]
         or proposal.get("proposal_hash") not in (None, expected_authority["accepted_proposal_hash"])
