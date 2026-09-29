@@ -25,7 +25,7 @@ def _rows(rows,source):
     bars=[]; sym=None; sid=None
     for r in rows:
         try:
-            ts=_dt(_first(r,['timestamp_utc','timestamp','time','datetime','date']))
+            ts=_dt(_first(r,['time_utc','timestamp_utc','timestamp','time','datetime','date']))
             o=float(_first(r,['open','o'])); h=float(_first(r,['high','h'])); l=float(_first(r,['low','l'])); c=float(_first(r,['close','c']))
             try:v=float(_first(r,['tick_volume','volume','vol']))
             except Exception:v=0.0
@@ -53,6 +53,9 @@ def load_csv(p):
 def load_zip(p):
     out=[]
     with zipfile.ZipFile(p) as z:
+        if 'CAPTURE_MANIFEST.json' in z.namelist() and 'V3_CAPTURE_PAYLOAD.json' in z.namelist():
+            from .capture_ingest import load_capture
+            return load_capture(p)[0]
         for n in sorted(z.namelist()):
             if not n.lower().endswith('.csv'):continue
             with z.open(n) as raw:

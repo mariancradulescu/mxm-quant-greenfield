@@ -379,8 +379,9 @@ class AdaptiveCollector(FrontierDataCaptureRunner):
         else:
             self.state = {'plan_sha256': self.plan_sha, 'selected_identity_manifest_sha256': None,
                 'started_utc': datetime.now(timezone.utc).isoformat(), 'completed_units': [],
-                'phase': 'FRONTIER_PROBE', 'phase_total_work_units': 1576,
-                'phase_total_symbols': 1576, 'completed_work_units': 0,
+                'phase': getattr(self, 'initial_phase', 'FRONTIER_PROBE'),
+                'phase_total_work_units': getattr(self, 'initial_work_units', 1576),
+                'phase_total_symbols': getattr(self, 'initial_symbols', 1576), 'completed_work_units': 0,
                 'completed_symbols': 0, 'current_symbol_rows': 0, 'rows_total': 0,
                 'successful_requests': 0, 'failed_requests': 0, 'retry_count': 0,
                 'reconnection_count': 0, 'timeout_count': 0, 'throttle_count': 0,
