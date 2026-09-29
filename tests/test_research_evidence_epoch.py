@@ -80,6 +80,14 @@ class ResearchEvidenceEpochTests(unittest.TestCase):
         with self.assertRaisesRegex(AIProposalRejected,"four-panel reauthorization"):
             validate_proposal(ROOT,p)
 
+    def test_post_epoch46_material_authority_is_in_current_binding(self):
+        binding=current_evidence_binding(ROOT)
+        refs={row["ref"] for row in binding["authoritative_evidence_refs_and_hashes"]}
+        self.assertGreaterEqual(binding["evidence_epoch"],45)
+        self.assertIn("evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",refs)
+        self.assertIn("evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",refs)
+        self.assertIn("evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json",refs)
+
     def test_epoch_advance_classes_cover_required_material_events(self):
         expected={
           "AUTHENTICATED_MARKET_DATA_ACCEPTED","MATERIAL_DEVELOPMENT_STRUCTURAL_EVIDENCE_ACCEPTED",
