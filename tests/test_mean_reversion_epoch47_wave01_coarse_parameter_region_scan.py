@@ -1,7 +1,12 @@
+import base64
+import gzip
+import hashlib
+import json
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from research_v3.deterministic_operation_executor import _validate_epoch47_compact_result
 from research_v3.mean_reversion_epoch47_wave01_coarse_parameter_region_scan import (
     ScanError,
     _date_effective_n,
@@ -10,6 +15,8 @@ from research_v3.mean_reversion_epoch47_wave01_coarse_parameter_region_scan impo
     validate_freeze,
 )
 
+
+ROOT = Path(__file__).resolve().parents[1]
 
 def bars(closes, *, start=None, gap_after=None):
     start = start or datetime(2026, 1, 5, tzinfo=timezone.utc)
@@ -72,6 +79,32 @@ class MeanReversionEpoch47Wave01ScanTests(unittest.TestCase):
         powers = [item["estimated_power"] for item in _power_scenarios(30)]
         self.assertGreater(powers[0], powers[1])
         self.assertGreater(powers[1], powers[2])
+
+    def test_repaired_operation_transport_is_hash_bound_pre_response_and_epoch_correct(self):
+        freeze=json.loads((ROOT/"research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_FREEZE_V1.json").read_text())
+        self.assertEqual(freeze["evidence_epoch"],45)
+        self.assertEqual(freeze["research_sequence_label"],"EPOCH47")
+        validate_freeze(freeze,ROOT)
+
+        op=json.loads((ROOT/"research_v3/EPOCH47_MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_DETERMINISTIC_OPERATION_V1.json").read_text())
+        self.assertEqual(op["evidence_epoch"],45)
+        self.assertEqual(op["result_validation"]["evidence_epoch"],46)
+        self.assertEqual(op["materializer"],"MATERIALIZE_BASE64_GZIP_NON_ECONOMIC_STRUCTURAL_RESULT")
+        self.assertEqual(len(op["payload_refs"]),16)
+        encoded="".join((ROOT/ref).read_text(encoding="ascii").strip() for ref in op["payload_refs"])
+        self.assertEqual(len(encoded),25876)
+        self.assertEqual(hashlib.sha256(encoded.encode("ascii")).hexdigest(),op["payload_sha256"])
+        decoded=gzip.decompress(base64.b64decode(encoded,validate=True))
+        self.assertEqual(hashlib.sha256(decoded).hexdigest(),op["decoded_result_sha256"])
+        result=json.loads(decoded)
+        _validate_epoch47_compact_result(result)
+        self.assertEqual(result["evidence_epoch"],46)
+        self.assertEqual(result["grid"]["symbol_cell_records"],396)
+        self.assertEqual(result["scope"]["identities_scanned"],33)
+        self.assertEqual(result["scope"]["total_m5_rows"],305938)
+        self.assertFalse(result["interpretation_boundary"]["post_event_directional_or_return_response_computed"])
+        self.assertFalse(result["interpretation_boundary"]["pnl_computed"])
+        self.assertFalse(result["grid"]["winner_selection_performed"])
 
     def test_unsupported_or_unfrozen_authority_fails_closed(self):
         with self.assertRaises(ScanError):
