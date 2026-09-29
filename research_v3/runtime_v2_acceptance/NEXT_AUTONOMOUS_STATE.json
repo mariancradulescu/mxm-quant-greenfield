@@ -30,7 +30,7 @@
   "active_proposal_id": null,
   "active_target_symbol": null,
   "additional_authority_acceptance_ref": "research_v3/ai_director/ADDITIONAL_AUTHORITY_ACCEPTANCE_V1.json",
-  "ai_reasoning_required": true,
+  "ai_reasoning_required": false,
   "ai_reasoning_required_before_operation": true,
   "aligned_history_current_status": "NOT_ACQUIRED_MECHANISM_SPECIFIC",
   "aligned_history_required": true,
@@ -353,7 +353,7 @@
   "frozen_structural_result_acceptance_ref": "evidence/EPOCH26_CROSS_SECTIONAL_RANKING_STRUCTURAL_ACCEPTANCE_V1.json",
   "global_information_gain_decision_ref": "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
   "historical_c032_ref": "research_v3/C032_EXECUTION_RESULT_V1.json",
-  "implementation_ai_required": false,
+  "implementation_ai_required": true,
   "implementation_constraints": [
     "Preserve exact broker symbol identities and account fingerprint.",
     "Use read-only authenticated Pepperstone cTrader/Open API retrieval.",
@@ -377,7 +377,19 @@
     "v2_attempts_consumed_delta": 0
   },
   "implementation_satisfied": false,
-  "implementation_scope": "Create the scope-reconciliation and outcome-blind disjoint-cohort selection machinery specified in decision. No exact deterministic operation is authorized in the current epoch catalog. Do not acquire market data, compute strategy responses, or open an economic outcome.",
+  "implementation_scope": {
+    "computation": "For each of the 33 accepted identities and each (threshold, lookback) cell in the frozen grid, compute outcome-blind reversal-event counts, per-cluster UTC date counts, dependence-adjusted effective independent sample size, and closed-form power at standardized effects {0.5,0.3,0.2}. Persist every probed cell (no winner-only logging).",
+    "explicitly_out_of_scope": [
+      "any post-event return/PnL/response statistic",
+      "any economic candidate opening",
+      "any protected-forward read"
+    ],
+    "inputs": [
+      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json bound M5 dataset (33 identities)"
+    ],
+    "new_script_path_suggestion": "research_v3/mean_reversion_epoch47_wave01_coarse_parameter_region_scan.py",
+    "reason_deterministic_op_not_bound": "authorized_deterministic_operations_current_epoch is empty; no existing catalog entry has operation_name equal to this next_action, so this is routed as implementation AI rather than invented as a deterministic operation ref."
+  },
   "implementation_scope_complete": false,
   "information_gain_selection_ref": "research_v3/BROKER_NATIVE_FRONTIER_INFORMATION_GAIN_SELECTION_EPOCH23_V1.json",
   "information_gain_summary": {
@@ -450,6 +462,31 @@
     "TREND_MOMENTUM/EPOCH38_COARSE_PARAMETER_REGION_FULL_560_CELL_SURFACE"
   ],
   "market_data_capture_required": false,
+  "material_authority_floor": {
+    "evidence_epoch": 45,
+    "generic_wave02_forbidden_before_mechanism_specific_freeze": true,
+    "prospective_freeze_required_before_any_response_statistic": true,
+    "required_refs": [
+      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
+      "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
+      "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json"
+    ],
+    "status": "ACTIVE_POST_EPOCH46",
+    "superseded_action_tokens": [
+      "MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45"
+    ],
+    "superseded_next_actions": [
+      "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
+      "Assess prospectively whether a minimal disjoint M5 data scope is justified from the completed audit; do not acquire data without that authority."
+    ]
+  },
+  "material_authority_refs": [
+    "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
+    "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
+    "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
+    "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json"
+  ],
   "mean_reversion_capture_scope_audit_ref": "evidence/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_V1.json",
   "mean_reversion_capture_scope_audit_sha256": "a5dd4a8c1e356d76f5e79d1e8632089c8bf99686214c7e11473cebc7d6f44e11",
   "mean_reversion_disjoint_scope_decision_ref": "evidence/MEAN_REVERSION_DISJOINT_SCOPE_FEASIBILITY_DECISION_V1.json",
@@ -474,7 +511,7 @@
   "new_market_data_required": false,
   "new_semantic_judgment_required_for_scope_reconciliation": false,
   "next_acquisition_plan_ref": "data/EPOCH46_OUTCOME_BLIND_M5_ACQUISITION_WAVE_01_PLAN_V1.json",
-  "next_action": "AI_SELECT_AND_FREEZE_NEXT_SYMBOL_X_MECHANISM_X_CONTEXT_X_ROBUST_PARAMETER_REGION_FROM_EPOCH46_OUTCOME_BLIND_WAVE_01",
+  "next_action": "IMPLEMENT_AND_RUN_MEAN_REVERSION_EPOCH47_WAVE01_COARSE_PARAMETER_REGION_SCAN",
   "next_deterministic_operation_ref": null,
   "next_gate": "Fresh prospective symbol×mechanism×context×robust-parameter-region selection and freeze. Only after that may a deterministic evaluator open development response statistics or request a minimal mechanism-specific data extension.",
   "no_economic_outcome_opened_by_this_proposal": true,
@@ -519,6 +556,7 @@
   "pending_structural_result_ref": "evidence/EPOCH38_TREND_MOMENTUM_COARSE_PARAMETER_REGION_RESULT_V1.json",
   "post_c032_decision_acceptance_ref": "research_v3/EPOCH20_POST_C032_DECISION_ACCEPTANCE_V1.json",
   "post_implementation_follow_up": "Once EPOCH34_COMPOSITE_CAUSAL_ML_STRUCTURAL_RESULT_V1.json is produced, a fresh AI reasoning pass is required to interpret it before any economic promotion is considered; no ranking or economic panel selection is authorized by this proposal.",
+  "post_implementation_next_step": "Feed resulting per-cell coarse diagnostics into PARAMETER_DISCOVERY_AND_ROBUSTNESS_GOVERNOR_V1 Stage 2 (ROBUST_REGION_IDENTIFICATION) in a subsequent proposal; reject isolated single-cell winners and prefer broad stable neighborhoods before any Stage 3 bounded refinement.",
   "post_triage_decision_rule": "Prefer reuse of existing valid evidence; otherwise choose a minimal authenticated broker-native extension from the verified feasibility frontier with explicit information-gain justification.",
   "pre_economic_realizability_audit_ref": "evidence/BREAKOUT_FADE_PRE_ECONOMIC_REALIZABILITY_AUDIT_V1.json",
   "pre_outcome_freeze_ref": "research_v3/C032_PRE_OUTCOME_FREEZE_V1.json",
@@ -569,7 +607,7 @@
     "prospective freeze record"
   ],
   "research_epoch": "CURRENT_EVIDENCE_EPOCH_14",
-  "research_judgment_required": true,
+  "research_judgment_required": false,
   "research_judgment_required_before_operation": true,
   "research_scope": "NEUTRAL_FRONTIER_LEVEL_EPOCH21",
   "resource_efficiency_ref": "research_v3/RESOURCE_EFFICIENCY_V1.json",
@@ -600,8 +638,12 @@
   "scope_integrity": "Selection is based only on pre-outcome feasibility/friction authority. No development follow-through ranking, no economics, no protected-forward data.",
   "scope_supersession_ref": "evidence/CROSSALIGN_PREREQUISITE_SCOPE_SUPERSESSION_V1.json",
   "search_budget_change": -1,
+  "selected_family": "MEAN_REVERSION",
+  "source_ai_proposal_hash": "453d0ddb418b21ae72107222f5219aea323161e7f37e4bdb65d7f963184f2edc",
+  "source_ai_proposal_id": "AI_reason_ba723215ff1cce105447e4c95e4443e4_EPOCH47_MEAN_REVERSION_WAVE01_COARSE_REGION_FREEZE",
   "source_artifact": "evidence/CROSSALIGN_FOUR_SYMBOL_M5_CAPTURE_ACCEPTANCE_V1.json",
-  "source_implementation_id": "MXM_EPOCH45_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT",
+  "source_runtime_operation_id": "op_bd829c8364ca5dcbca0eabd71c8f6f2a",
+  "stale_post_epoch46_proposal_supersession_ref": "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json",
   "stale_reasoning_guard": {
     "authorizing_evidence_epoch": 36,
     "current_evidence_epoch": 37,
@@ -611,7 +653,7 @@
     "previous_status": "FRESH_GENERAL_AI_REASONING_REQUIRED",
     "status": "STALE_FOR_NEW_RESEARCH_JUDGMENT"
   },
-  "status": "FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_EPOCH46_OUTCOME_BLIND_WAVE_01",
+  "status": "MEAN_REVERSION_WAVE01_COARSE_PARAMETER_REGION_SCAN_FROZEN_PENDING_IMPLEMENTATION",
   "stop_condition": null,
   "structural_feasibility_gate_ref": "evidence/EPOCH23_CARRY_REGIME_STRUCTURAL_FEASIBILITY_GATE_V1.json",
   "structural_representatives_are_not_economic_equivalence": true,
@@ -687,50 +729,5 @@
   "unrelated_candidate_formalization_status": "PRESERVED_BUT_NOT_AUTHORITY_FOR_THIS_REGIME_SCREEN_OR_ECONOMIC_SCOPE",
   "unsafe_proposal_supersession_ref": "research_v3/EPOCH21_UNSAFE_PROPOSAL_SUPERSESSION_V1.json",
   "user_action_required": false,
-  "uses_only_existing_accepted_bytes": true,
-  "stale_post_epoch46_proposal_supersession_ref": "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json",
-  "material_authority_refs": [
-    "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
-    "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
-    "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
-    "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json"
-  ],
-  "material_authority_floor": {
-    "status": "ACTIVE_POST_EPOCH46",
-    "evidence_epoch": 45,
-    "required_refs": [
-      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
-      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
-      "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
-      "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json"
-    ],
-    "superseded_next_actions": [
-      "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45",
-      "Assess prospectively whether a minimal disjoint M5 data scope is justified from the completed audit; do not acquire data without that authority."
-    ],
-    "superseded_action_tokens": [
-      "MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45"
-    ],
-    "prospective_freeze_required_before_any_response_statistic": true,
-    "generic_wave02_forbidden_before_mechanism_specific_freeze": true
-  },
-  "semantic_question": "Using only post-Epoch46 outcome-blind completeness, event-density, dependence-adjusted ESS, structural heterogeneity, capital-efficiency and acquisition-cost information, compare all open mechanism families by expected information gain and prospectively select and freeze the next SYMBOL_X_MECHANISM_X_CONTEXT_X_ROBUST_PARAMETER_REGION. Do not assume Mean Reversion; do not open any response statistic before the freeze; do not request a generic Wave02.",
-  "decision_contract": {
-    "required_action": "SELECT_AND_FREEZE_SYMBOL_X_MECHANISM_X_CONTEXT_X_ROBUST_PARAMETER_REGION",
-    "require_post_epoch46_material_authority": true,
-    "required_authority_refs": [
-      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_CAPTURE_ACCEPTANCE_V1.json",
-      "evidence/EPOCH46_OUTCOME_BLIND_M5_WAVE_01_DATA_SUFFICIENCY_V1.json",
-      "research_v3/EPOCH46_GLOBAL_INFORMATION_GAIN_CONTINUATION_DECISION_V1.json",
-      "evidence/EPOCH46_POST_CAPTURE_STALE_SEMANTIC_ROUTING_SUPERSESSION_V1.json"
-    ],
-    "compare_open_mechanisms_by_expected_information_gain": true,
-    "mean_reversion_is_not_default": true,
-    "generic_wave02_forbidden": true,
-    "prospective_freeze_required_before_response_statistics": true,
-    "robust_parameter_region_required": true,
-    "symbol_specific_specialization_allowed": true,
-    "structural_41_default_inferential_authority": false,
-    "protected_forward_forbidden": true
-  }
+  "uses_only_existing_accepted_bytes": true
 }
