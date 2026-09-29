@@ -351,7 +351,7 @@ def _execute_existing_structural_result(root:Path,state:dict[str,Any],op:dict[st
     if expected.get("family") and result.get("family")!=expected["family"]:
         raise DeterministicOperationRejected("structural result family mismatch")
     source_epoch=int(result.get("source_evidence_epoch") or result.get("evidence_epoch") or 0)
-    operation_epoch=int(op.get("evidence_epoch") or 0)
+    operation_epoch=int(op.get("authorizing_evidence_epoch") or op.get("evidence_epoch") or 0)
     expected_result_epoch=int(expected.get("evidence_epoch") or operation_epoch)
     if source_epoch!=expected_result_epoch:
         raise DeterministicOperationRejected("structural result evidence epoch mismatch")
