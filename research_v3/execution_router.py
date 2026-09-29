@@ -255,6 +255,67 @@ def deterministic_operation_required(root_value: str | Path, state: Mapping[str,
         and bool(str(state.get("next_action") or "").strip())
     )
 
+def _current_proposal_implementation_authority(
+    root_value: str | Path, state: Mapping[str, Any], registry: Mapping[str, Any]
+) -> bool:
+    """Return True only when the canonical state and accepted proposal prove current authority.
+
+    The proposal registry is historical evidence, not an independent router.  Once a
+    material evidence epoch advances, an older accepted proposal cannot regain
+    implementation authority merely because its id/hash remain in the registry.
+    """
+    proposal_id=state.get("source_ai_proposal_id")
+    proposal_hash=state.get("source_ai_proposal_hash")
+    if not proposal_id or not proposal_hash:
+        return False
+    rows=[
+        row for row in registry.get("accepted",[])
+        if row.get("proposal_id")==proposal_id and row.get("proposal_hash")==proposal_hash
+    ]
+    if len(rows)!=1:
+        return False
+
+    current_epoch=int(state.get("current_research_evidence_epoch") or state.get("evidence_epoch") or 0)
+    if current_epoch<=0:
+        # Historical fixtures/states without an evidence lifecycle retain the old
+        # id/hash proof. Current Runtime V2 states always carry a typed epoch.
+        return True
+
+    try:
+        authorizing_epoch=int(state.get("authorizing_evidence_epoch"))
+    except (TypeError,ValueError):
+        return False
+    if authorizing_epoch!=current_epoch:
+        return False
+
+    proposal_ref=str(rows[0].get("proposal_ref") or "").strip()
+    if not proposal_ref:
+        # At a typed current epoch, registry membership alone is insufficient.
+        return False
+    proposal_path=Path(root_value)/proposal_ref
+    if not proposal_path.is_file():
+        return False
+    proposal=load_json(proposal_path,{}) or {}
+    if proposal.get("proposal_id")!=proposal_id:
+        return False
+    binding=proposal.get("evidence_binding") or {}
+    try:
+        proposal_epoch=int(binding.get("evidence_epoch_seen"))
+    except (TypeError,ValueError):
+        return False
+    if proposal_epoch!=current_epoch:
+        return False
+    proposed_state=proposal.get("next_research_state") or {}
+    proposed_authorizing=proposed_state.get("authorizing_evidence_epoch")
+    if proposed_authorizing is not None:
+        try:
+            if int(proposed_authorizing)!=current_epoch:
+                return False
+        except (TypeError,ValueError):
+            return False
+    return True
+
+
 def implementation_required(root_value: str | Path, state: Mapping[str, Any]) -> bool:
     if _external_or_integrity_gate(state):
         return False
@@ -265,16 +326,12 @@ def implementation_required(root_value: str | Path, state: Mapping[str, Any]) ->
     doc = load_authorized_deterministic_operation(root_value, state)
     if doc is not None:
         return (doc.get("execution_policy") or {}).get("implementation_ai_required") is True
-    # Explicit routing intent always wins over legacy proposal-binding inference.
-    # In particular, an accepted semantic proposal with implementation_ai_required=false
-    # is NOT implementation authority.
+    # Explicit typed routing intent dominates historical proposal-registry evidence.
     if "implementation_ai_required" in state:
         if state.get("implementation_ai_required") is not True:
             return False
         registry=load_json(Path(root_value)/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json",{}) or {}
-        return any(row.get("proposal_id")==state.get("source_ai_proposal_id") and
-                   row.get("proposal_hash")==state.get("source_ai_proposal_hash")
-                   for row in registry.get("accepted",[]) if state.get("source_ai_proposal_id") and state.get("source_ai_proposal_hash"))
+        return _current_proposal_implementation_authority(root_value,state,registry)
     # Backward compatibility only for historical states that predate explicit routing.
     if state.get("source_ai_proposal_id") and (
         state.get("source_ai_proposal_hash") or state.get("source_runtime_operation_id")
