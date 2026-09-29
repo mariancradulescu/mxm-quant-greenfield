@@ -1,4 +1,4 @@
-name: Research Core V3 Adaptive Collector
+name: Research Core V3 Broad Development Validation
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout exact authoritative research HEAD
         uses: actions/checkout@v4
         with:
-          ref: 29e9fcf82fad78c59b289bd0d9f1750e36ae49ef
+          ref: 839e0e18ec70b01790e04a802da1400ee1f96035
           fetch-depth: 0
 
       - name: Confirm current research branch HEAD
@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
           validated_head="$(git rev-parse HEAD)"
           remote_head="$(git ls-remote origin refs/heads/performance-research-v3-20260922 | cut -f1)"
-          test "${validated_head}" = "29e9fcf82fad78c59b289bd0d9f1750e36ae49ef"
+          test "${validated_head}" = "839e0e18ec70b01790e04a802da1400ee1f96035"
           test "${remote_head}" = "${validated_head}"
           echo "Validated current research HEAD: ${validated_head}"
 
@@ -40,19 +40,9 @@ jobs:
           python-version: '3.13'
 
       - name: Install deterministic broker collector dependency
-        run: python -m pip install -r tools/requirements-m6-capture.txt
-
-      - name: Validate generic engine, adaptive collector, frozen delta and authentic CSV importer
-        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector tests.test_v3_capture_ingest tests.test_v3_delta_core
-
-      - name: Build exact frozen high-quality delta package
         run: |
-          python tools/build_research_core_v3_delta_package.py
-          sha256sum dist/MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_PACKAGE.zip
+          python -m pip install -r tools/requirements-m6-capture.txt
+          python -m pip install numpy==2.3.5
 
-      - name: Upload exact high-quality missing-delta artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_PACKAGE
-          path: dist/MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_PACKAGE.zip
-          if-no-files-found: error
+      - name: Validate complete 145-identity frozen development surface
+        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector tests.test_v3_capture_ingest tests.test_v3_delta_core tests.test_research_core_v3_fast_engine tests.test_v3_full_surface_manifest tests.test_v3_broad_interpretation
