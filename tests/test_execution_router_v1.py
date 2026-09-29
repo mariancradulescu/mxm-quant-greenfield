@@ -292,5 +292,76 @@ class ExecutionRouterV1Tests(unittest.TestCase):
         finally:
             td.cleanup()
 
+
+    def test_research_sequence_label_cannot_override_authorizing_evidence_epoch(self):
+        td,root,state=self._root_with_op()
+        try:
+            op_path=root/"research_v3/op.json"
+            op=json.loads(op_path.read_text())
+            op["research_sequence_label"]="EPOCH47"
+            op["evidence_epoch"]=47
+            op["authorizing_evidence_epoch"]=21
+            op_path.write_text(json.dumps(op),encoding="utf-8")
+            self.assertTrue(deterministic_operation_required(root,state))
+            self.assertEqual(classify_execution(root,state)["execution_class"],"DETERMINISTIC_OPERATION")
+            op["authorizing_evidence_epoch"]=20
+            op_path.write_text(json.dumps(op),encoding="utf-8")
+            route=classify_execution(root,state)
+            self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+            self.assertIn("evidence epoch mismatch",route["detail"])
+        finally:
+            td.cleanup()
+
+    def test_stale_accepted_proposal_cannot_regain_implementation_authority(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            registry=root/"research_v3/ai_director/PROPOSAL_REGISTRY_V1.json"
+            registry.parent.mkdir(parents=True)
+            registry.write_text(json.dumps({"accepted":[{"proposal_id":"p-old","proposal_hash":"a"*64}]}))
+            state={
+                "status":"IMPLEMENTATION_AI_REQUIRED",
+                "current_research_evidence_epoch":46,
+                "authorizing_evidence_epoch":45,
+                "next_action":"IMPLEMENT_STALE_PROPOSAL",
+                "implementation_ai_required":True,
+                "source_ai_proposal_id":"p-old",
+                "source_ai_proposal_hash":"a"*64,
+                "ai_reasoning_required":False,
+                "research_judgment_required":False,
+                "user_action_required":False,
+                "external_data_required":False,
+            }
+            self.assertFalse(implementation_required(root,state))
+            route=classify_execution(root,state)
+            self.assertNotEqual(route["execution_class"],"NOVEL_AI_IMPLEMENTATION")
+            self.assertEqual(route["execution_class"],"MATERIAL_INTEGRITY_OR_EXTERNAL_GATE")
+
+    def test_implementation_complete_deterministic_work_cannot_call_implementation_ai_again(self):
+        td,root,state=self._root_with_op()
+        try:
+            state["implementation_ai_required"]=True
+            state["implementation_satisfied"]=True
+            self.assertTrue(deterministic_operation_required(root,state))
+            self.assertFalse(implementation_required(root,state))
+            self.assertEqual(classify_execution(root,state)["execution_class"],"DETERMINISTIC_OPERATION")
+        finally:
+            td.cleanup()
+
+    def test_local_park_continuation_is_semantic_work_not_global_no_work(self):
+        state={
+            "status":"FRESH_GENERAL_AI_REASONING_REQUIRED_AFTER_LOCAL_AUTHORITY_PARK",
+            "current_research_evidence_epoch":46,
+            "authorizing_evidence_epoch":46,
+            "next_action":"AI_SELECT_HIGHEST_INFORMATION_LEGAL_NEXT_ACTION_OUTSIDE_PARKED_LOCAL_FRONTIERS",
+            "ai_reasoning_required":True,
+            "research_judgment_required":True,
+            "implementation_ai_required":False,
+            "user_action_required":False,
+            "external_data_required":False,
+        }
+        route=classify_execution(ROOT,state)
+        self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
+        self.assertNotEqual(route["execution_class"],"NO_WORK")
+
 if __name__=="__main__":
     unittest.main()
