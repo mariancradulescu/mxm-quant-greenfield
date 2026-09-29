@@ -1,5 +1,4 @@
-name: Research Core V3 Bootstrap
-# collector-validation: 1
+name: Research Core V3 Adaptive Collector
 
 on:
   push:
@@ -9,65 +8,51 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: mxm-research-core-v3-writer
+  group: mxm-research-core-v3-validation
   cancel-in-progress: false
-
-env:
-  TARGET_BRANCH: performance-research-v3-20260922
-  PYTHONUNBUFFERED: "1"
 
 jobs:
   deterministic-v3:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout authoritative research branch
+      - name: Checkout exact authoritative research HEAD
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.TARGET_BRANCH }}
+          ref: 90f8ec61bd94c9c39fe8a5bf6a402a17fbd4ad8c
           fetch-depth: 0
-          persist-credentials: true
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install broker collector dependency
-        run: python -m pip install -r tools/requirements-m6-capture.txt
-
-      - name: Validate generic causal engine and broker collector
-        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_collector
-
-      - name: Build exact V3 Pepperstone collector package
-        run: python tools/build_research_core_v3_collector_package.py
-
-      - name: Upload exact V3 Pepperstone collector package
-        uses: actions/upload-artifact@v4
-        with:
-          name: MXM_RESEARCH_CORE_V3_M5_CAPTURE_PACKAGE_V1
-          path: dist/MXM_RESEARCH_CORE_V3_M5_CAPTURE_PACKAGE_V1.zip
-          if-no-files-found: error
-
-      - name: Materialize canonical V3 inventory salvage spec and development surface
-        run: python -m research_core_v3.bootstrap --root .
-
-      - name: Persist canonical V3 state if changed
+      - name: Confirm current research branch HEAD
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "mxm-research-core-v3[bot]"
-          git config user.email "mxm-research-core-v3@users.noreply.github.com"
           validated_head="$(git rev-parse HEAD)"
-          git add research_core_v3/state/
-          if git diff --cached --quiet; then
-            echo "Canonical V3 state already current."
-            exit 0
-          fi
-          git fetch origin "${TARGET_BRANCH}"
-          remote_head="$(git rev-parse "origin/${TARGET_BRANCH}")"
+          remote_head="$(git ls-remote origin refs/heads/performance-research-v3-20260922 | cut -f1)"
+          test "${validated_head}" = "90f8ec61bd94c9c39fe8a5bf6a402a17fbd4ad8c"
           test "${remote_head}" = "${validated_head}"
-          git commit -m "Materialize canonical Research Core V3 bootstrap state"
-          git push origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          echo "Validated current research HEAD: ${validated_head}"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install deterministic broker collector dependency
+        run: python -m pip install -r tools/requirements-m6-capture.txt
+
+      - name: Validate generic engine and adaptive full-frontier collector
+        run: python -m unittest -v tests.test_research_core_v3 tests.test_research_core_v3_adaptive_collector
+
+      - name: Build exact adaptive full-frontier package
+        run: |
+          python tools/build_research_core_v3_collector_package.py
+          sha256sum dist/MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL.zip
+
+      - name: Upload exact adaptive full-frontier artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL
+          path: dist/MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL.zip
+          if-no-files-found: error
