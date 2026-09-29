@@ -5,12 +5,13 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = ROOT / "dist" / "MXM_RESEARCH_CORE_V3_FULL_FRONTIER_CAPTURE_V2.zip"
+TARGET = ROOT / "dist" / "MXM_RESEARCH_CORE_V3_FULL_FRONTIER_FINAL.zip"
 FILES = (
     "RESEARCH_CORE_V3_M5_CAPTURE_RUN.py",
     "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
     "evidence/CROSS_SECTIONAL_PEER_COHORT_INDEX_V1.json",
     "research_core_v3/__init__.py",
+    "research_core_v3/state/FROZEN_EXPERIMENT_SPEC_V1.json",
     "research_core_v3/adaptive_collector.py",
     "research_core_v3/pydroid_adaptive_launcher.py",
     "research_v3/__init__.py",
