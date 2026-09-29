@@ -22,7 +22,7 @@ jobs:
       - name: Checkout exact authoritative research HEAD
         uses: actions/checkout@v4
         with:
-          ref: 839e0e18ec70b01790e04a802da1400ee1f96035
+          ref: 276a882045c10c67abdd0eab50437cbf76aba1e7
           fetch-depth: 0
 
       - name: Confirm current research branch HEAD
@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
           validated_head="$(git rev-parse HEAD)"
           remote_head="$(git ls-remote origin refs/heads/performance-research-v3-20260922 | cut -f1)"
-          test "${validated_head}" = "839e0e18ec70b01790e04a802da1400ee1f96035"
+          test "${validated_head}" = "276a882045c10c67abdd0eab50437cbf76aba1e7"
           test "${remote_head}" = "${validated_head}"
           echo "Validated current research HEAD: ${validated_head}"
 
