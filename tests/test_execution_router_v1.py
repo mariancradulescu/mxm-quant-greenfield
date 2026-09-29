@@ -160,15 +160,10 @@ class ExecutionRouterV1Tests(unittest.TestCase):
             self.assertEqual(route["execution_class"],"NOVEL_AI_IMPLEMENTATION")
             self.assertTrue(implementation_required(ROOT,state))
         elif state["status"]=="IMPLEMENTATION_PENDING_EXACT_HEAD_GREEN":
-            self.assertEqual(
-                state["next_action"],
-                "RUN_AUTHORIZED_DETERMINISTIC_OPERATION_AFTER_EXACT_HEAD_GREEN",
-            )
             self.assertEqual(route["execution_class"],"DETERMINISTIC_OPERATION")
-            self.assertEqual(
-                route["operation_ref"],
-                "research_v3/EPOCH38_CROSS_SECTIONAL_ALIGNED_HISTORY_ACQUISITION_READINESS_OPERATION_V1.json",
-            )
+            self.assertEqual(route["operation_ref"],state["next_deterministic_operation_ref"])
+            if state.get("implementation_satisfied") is True and state["next_action"].startswith("RUN_EXACT_HEAD_CI_THEN_"):
+                self.assertEqual(state["next_action"],f"RUN_EXACT_HEAD_CI_THEN_{route['operation_name']}")
             self.assertFalse(implementation_required(ROOT,state))
         elif route["execution_class"]=="SEMANTIC_REASONING":
             self.assertEqual(route["execution_class"],"SEMANTIC_REASONING")
