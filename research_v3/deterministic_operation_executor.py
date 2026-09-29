@@ -149,23 +149,118 @@ def _execute_selection_layer(root:Path,state:dict[str,Any],op:dict[str,Any])->di
     })
     return state
 
-def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
-    """Materialize a hash-bound, transport-only JSON payload before deterministic acceptance.
+def _validate_epoch47_compact_result(result:dict[str,Any])->None:
+    if result.get("schema")!="mxm.greenfield.epoch47-mean-reversion-wave01-coarse-parameter-region-scan.v1":
+        return
+    if (result.get("status")!="COMPLETE_NON_ECONOMIC_MEAN_REVERSION_COARSE_PARAMETER_REGION_SCAN"
+            or result.get("family")!="MEAN_REVERSION"
+            or result.get("evidence_epoch")!=46
+            or result.get("research_sequence_label")!="EPOCH47"):
+        raise DeterministicOperationRejected("Epoch47 compact result identity mismatch")
+    scope=result.get("scope") or {}
+    grid=result.get("grid") or {}
+    if (scope.get("resolution")!="M5"
+            or scope.get("requested_identity_count")!=34
+            or scope.get("identities_scanned")!=33
+            or scope.get("authentic_zero_history_identities")!=["AMD.US-PERP"]
+            or scope.get("total_m5_rows")!=305938
+            or scope.get("development_only") is not True
+            or scope.get("not_independent_confirmation") is not True):
+        raise DeterministicOperationRejected("Epoch47 compact result scope mismatch")
+    if (grid.get("lookback_bars")!=[12,24,48,96]
+            or grid.get("absolute_standardized_deviation_thresholds")!=[1.0,1.5,2.0]
+            or grid.get("cells_per_symbol")!=12
+            or grid.get("symbol_cell_records")!=396
+            or grid.get("all_probes_recorded") is not True
+            or grid.get("winner_selection_performed") is not False):
+        raise DeterministicOperationRejected("Epoch47 compact result grid mismatch")
+    rows=result.get("symbols")
+    if not isinstance(rows,list) or len(rows)!=396:
+        raise DeterministicOperationRejected("Epoch47 compact result missing complete symbol-cell surface")
+    coords=set(); symbols=set()
+    for row in rows:
+        if not isinstance(row,dict):
+            raise DeterministicOperationRejected("Epoch47 compact cell is not an object")
+        symbol=str(row.get("broker_symbol") or ""); lookback=row.get("lookback_bars")
+        threshold=row.get("absolute_standardized_deviation_threshold")
+        coord=(symbol,lookback,threshold)
+        if (not symbol or coord in coords or lookback not in (12,24,48,96)
+                or threshold not in (1.0,1.5,2.0)):
+            raise DeterministicOperationRejected("Epoch47 compact result has duplicate or unfrozen cell")
+        coords.add(coord); symbols.add(symbol)
+        for key in ("eligible_contiguous_windows","reversal_event_count","date_cluster_count",
+                    "dependence_adjusted_effective_date_clusters","positive_autocorrelation_lags"):
+            value=row.get(key)
+            if isinstance(value,bool) or not isinstance(value,(int,float)) or value<0:
+                raise DeterministicOperationRejected(f"Epoch47 compact cell invalid metric: {key}")
+        rate=row.get("event_availability_rate")
+        if rate is not None and (isinstance(rate,bool) or not isinstance(rate,(int,float)) or rate<0 or rate>1):
+            raise DeterministicOperationRejected("Epoch47 compact cell invalid event availability rate")
+        powers=row.get("closed_form_power_estimates")
+        if not isinstance(powers,list) or [x.get("standardized_effect") for x in powers]!=[0.5,0.3,0.2]:
+            raise DeterministicOperationRejected("Epoch47 compact cell power planning mismatch")
+    if len(symbols)!=33:
+        raise DeterministicOperationRejected("Epoch47 compact result identity breadth mismatch")
+    expected={(symbol,lookback,threshold) for symbol in symbols for lookback in (12,24,48,96) for threshold in (1.0,1.5,2.0)}
+    if coords!=expected:
+        raise DeterministicOperationRejected("Epoch47 compact result incomplete frozen coordinates")
+    boundary=result.get("interpretation_boundary") or {}
+    if (boundary.get("event_availability_only") is not True
+            or any(boundary.get(key) is not False for key in (
+                "post_event_directional_or_return_response_computed","strategy_returns_computed",
+                "pnl_computed","economic_outcome_opened","candidate_economic_identity_created",
+                "winner_cell_or_symbol_selected","protected_forward_opened",
+                "independent_confirmation_claimed","mechanism_family_closed",
+                "economic_promotion_authorized"))):
+        raise DeterministicOperationRejected("Epoch47 compact result crosses pre-response boundary")
+    effect=result.get("accounting_effect") or {}
+    if any(int(effect.get(key) or 0)!=0 for key in ("economic_outcomes_opened","v2_attempts_consumed","search_budget_change")):
+        raise DeterministicOperationRejected("Epoch47 compact result changes accounting")
+    safety=result.get("safety") or {}
+    if any(safety.get(key) is not False for key in ("protected_forward_opened","live_orders_authorized","competition_start_authorized")):
+        raise DeterministicOperationRejected("Epoch47 compact result crosses safety boundary")
+    source=result.get("source_authority") or {}
+    if (source.get("capture_outer_zip_sha256")!="bfdfcba4e70c699fa3719e15e01ed4f7a4542d7ed0e7439fd836133ab80d1ac1"
+            or source.get("capture_canonical_payload_sha256")!="0305ca9d194300d28efde5b21aced13557e986d8d5476e3202ba66c8476774e2"
+            or source.get("accepted_proposal_hash")!="453d0ddb418b21ae72107222f5219aea323161e7f37e4bdb65d7f963184f2edc"):
+        raise DeterministicOperationRejected("Epoch47 compact result source authority mismatch")
+    compact=result.get("transport_compaction") or {}
+    if (compact.get("status")!="EXACT_METRIC_PRESERVING_COMPACTION_FROM_ACCEPTED_CAPTURE"
+            or compact.get("per_utc_date_event_counts_used_for_effective_n_computation") is not True
+            or compact.get("per_utc_date_event_count_vectors_omitted_from_durable_payload") is not True
+            or compact.get("research_semantics_changed") is not False
+            or compact.get("post_event_response_computed") is not False):
+        raise DeterministicOperationRejected("Epoch47 compact transport semantics mismatch")
 
-    The payload is not semantic authority. The operation document remains the authority
-    for schema/family/epoch validation, accounting boundaries and the follow-on state.
-    """
+
+def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
+    """Materialize a hash-bound, transport-only JSON payload before deterministic acceptance."""
     payload_ref=str(op.get("payload_ref") or "").strip()
+    payload_refs=op.get("payload_refs") or []
     result_ref=str(op.get("result_ref") or "").strip()
-    if not payload_ref or not result_ref:
-        raise DeterministicOperationRejected("embedded structural result operation missing payload_ref/result_ref")
-    payload_path=root/payload_ref
-    if not payload_path.is_file():
-        raise DeterministicOperationRejected("embedded structural result payload missing")
-    encoded_payload=payload_path.read_text(encoding="ascii").strip()
+    if payload_ref and payload_refs:
+        raise DeterministicOperationRejected("embedded structural result must use payload_ref or payload_refs, not both")
+    if payload_refs:
+        if not isinstance(payload_refs,list) or any(not isinstance(x,str) or not x for x in payload_refs):
+            raise DeterministicOperationRejected("embedded structural result payload_refs invalid")
+        pieces=[]
+        for rel in payload_refs:
+            path=root/rel
+            if not path.is_file():
+                raise DeterministicOperationRejected(f"embedded structural result payload fragment missing: {rel}")
+            pieces.append(path.read_text(encoding="ascii").strip())
+        encoded_payload="".join(pieces)
+    elif payload_ref:
+        payload_path=root/payload_ref
+        if not payload_path.is_file():
+            raise DeterministicOperationRejected("embedded structural result payload missing")
+        encoded_payload=payload_path.read_text(encoding="ascii").strip()
+    else:
+        raise DeterministicOperationRejected("embedded structural result operation missing payload_ref/payload_refs")
+    if not result_ref:
+        raise DeterministicOperationRejected("embedded structural result operation missing result_ref")
     expected_payload_sha=str(op.get("payload_sha256") or "").strip()
     if expected_payload_sha:
-        import hashlib
         normalized_payload_sha=hashlib.sha256(encoded_payload.encode("ascii")).hexdigest()
         if normalized_payload_sha!=expected_payload_sha:
             raise DeterministicOperationRejected("embedded structural result payload hash mismatch")
@@ -173,11 +268,16 @@ def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
         raise DeterministicOperationRejected("unsupported embedded structural result payload encoding")
     try:
         packed=base64.b64decode(encoded_payload,validate=True)
-        result=json.loads(gzip.decompress(packed).decode("utf-8"))
+        decoded=gzip.decompress(packed)
+        result=json.loads(decoded.decode("utf-8"))
     except Exception as exc:
         raise DeterministicOperationRejected(f"embedded structural result payload decode failed: {exc}") from exc
+    expected_decoded_sha=str(op.get("decoded_result_sha256") or "").strip()
+    if expected_decoded_sha and hashlib.sha256(decoded).hexdigest()!=expected_decoded_sha:
+        raise DeterministicOperationRejected("embedded structural result decoded JSON hash mismatch")
     if not isinstance(result,dict):
         raise DeterministicOperationRejected("embedded structural result payload must decode to a JSON object")
+    _validate_epoch47_compact_result(result)
     for field,file_ref in dict(op.get("sha256_attestations") or {}).items():
         if not isinstance(field,str) or "." in field or not field:
             raise DeterministicOperationRejected("sha256 attestation field must be a simple top-level JSON field")
@@ -187,7 +287,6 @@ def _materialize_embedded_structural_result(root:Path,op:dict[str,Any])->str:
         result[field]=sha256_file(bound)
     atomic_write_json(root/result_ref,result)
     return result_ref
-
 
 def verify_trend_surface(root:Path)->dict[str,Any]:
     """Reconstruct every frozen cell before accepting a TREND completion claim."""
