@@ -11,6 +11,10 @@ VERSION = "MXM_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_V1"
 FREEZE_REF = "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_FREEZE_V1.json"
 PROPOSAL_REF = "research_v3/ai_director/proposals/AUTO_reason_538b7957124ef714729f7ac22553ee30.json"
 PROPOSAL_FILE_SHA256 = "b1cee8481beb44a69a1e77aaadf6db19c7045db818266b0939be12544b8c6fc5"
+ACTIVE_PROPOSAL_REF = "research_v3/ai_director/proposals/AUTO_reason_e22724fc189afd1b685caf49e9b87b20.json"
+ACTIVE_PROPOSAL_FILE_SHA256 = "770fd3a8da562e513f75cd18233d2f5f954b8bae6f3695f89eb72f1c224af7ec"
+ACTIVE_PROPOSAL_ID = "AI_E45_MR_SCOPE_AUDIT"
+DETERMINISTIC_OPERATION_REF = "research_v3/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_DETERMINISTIC_OPERATION_V1.json"
 SCOPE_AUDIT_REF = "evidence/ACCEPTED_BROKER_NATIVE_M5_CAPTURE_SCOPE_AUDIT_EPOCH43_V1.json"
 SCOPE_AUDIT_SHA256 = "3353a176a551e876bf63beba538677daaa0853a6165b5167913cad46dc4b1a21"
 EPOCH43_FREEZE_REF = "research_v3/EPOCH43_MEAN_REVERSION_POWER_AWARE_DISCOVERY_FREEZE_V1.json"
@@ -56,6 +60,37 @@ def _require_hash(root: Path, ref: str, expected: str) -> None:
     path = root / ref
     if not path.is_file() or _sha256(path) != expected:
         raise ScopeAuditError(f"accepted authority file-byte hash mismatch: {ref}")
+
+
+def _validate_active_proposal(proposal: dict[str, Any]) -> None:
+    decision = proposal.get("decision") or {}
+    implementation_scope = decision.get("implementation_scope") or {}
+    economic_effect = proposal.get("economic_effect") or {}
+    safety = proposal.get("safety") or {}
+    operation_ref = decision.get("operation_ref")
+    if (
+        proposal.get("schema") != "mxm.greenfield.general-ai-research-proposal.v1"
+        or proposal.get("proposal_id") != ACTIVE_PROPOSAL_ID
+        or operation_ref != DETERMINISTIC_OPERATION_REF
+        or operation_ref not in proposal.get("authority_refs", [])
+        or decision.get("selected_action") != "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45"
+        or decision.get("mechanism_family") != "MEAN_REVERSION"
+        or decision.get("economic_outcome_opened") is not False
+        or implementation_scope.get("next_action")
+        != "RUN_MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45"
+        or implementation_scope.get("scope_type")
+        != "NON_ECONOMIC_REPOSITORY_IMPLEMENTATION_FOR_BOUND_AI_DECISION"
+        or implementation_scope.get("data_bindings") != []
+        or proposal.get("data_bindings") != []
+        or (proposal.get("data_policy") or {}).get("new_market_data_requested") is not False
+        or economic_effect.get("consume_v2_attempt") != 0
+        or economic_effect.get("create_new_v2_identity") is not False
+        or economic_effect.get("open_economic_outcome") is not False
+        or safety.get("protected_forward_opened") is not False
+        or safety.get("live_orders_authorized") is not False
+        or safety.get("competition_start_authorized") is not False
+    ):
+        raise ScopeAuditError("active accepted proposal identity or non-economic boundary mismatch")
 
 
 def _walk(value: Any) -> Iterable[dict[str, Any]]:
@@ -112,6 +147,9 @@ def _parse_utc(value: str) -> datetime:
 
 
 def _load_inputs(root: Path) -> tuple[dict[str, Any], ...]:
+    _require_hash(root, ACTIVE_PROPOSAL_REF, ACTIVE_PROPOSAL_FILE_SHA256)
+    _validate_active_proposal(_read_json(root, ACTIVE_PROPOSAL_REF))
+
     freeze = _read_json(root, FREEZE_REF)
     if (
         freeze.get("schema") != "mxm.greenfield.mean-reversion-capture-scope-audit-freeze.v1"
@@ -410,6 +448,8 @@ def build_from_authorities(
         "source_authority": {
             "accepted_proposal_ref": PROPOSAL_REF,
             "accepted_proposal_file_sha256": PROPOSAL_FILE_SHA256,
+            "active_accepted_proposal_ref": ACTIVE_PROPOSAL_REF,
+            "active_accepted_proposal_file_sha256": ACTIVE_PROPOSAL_FILE_SHA256,
             "accepted_capture_scope_audit_ref": SCOPE_AUDIT_REF,
             "accepted_capture_scope_audit_sha256": SCOPE_AUDIT_SHA256,
             "eligible_universe_ref": FEASIBILITY_REF,

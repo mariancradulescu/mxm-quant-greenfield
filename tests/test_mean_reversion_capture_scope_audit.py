@@ -8,6 +8,7 @@ from research_v3.mean_reversion_capture_scope_audit import (
     FREEZE_REF,
     ScopeAuditError,
     _load_inputs,
+    _validate_active_proposal,
     build_from_authorities,
     build_scope_audit,
 )
@@ -88,6 +89,27 @@ class MeanReversionCaptureScopeAuditTests(unittest.TestCase):
             operation["result_ref"],
             "evidence/MEAN_REVERSION_CAPTURE_SCOPE_AUDIT_EPOCH45_V1.json",
         )
+
+    def test_active_accepted_proposal_is_bound_and_fail_closed(self):
+        proposal = json.loads(
+            (
+                ROOT
+                / "research_v3/ai_director/proposals/AUTO_reason_e22724fc189afd1b685caf49e9b87b20.json"
+            ).read_text(encoding="utf-8")
+        )
+        _validate_active_proposal(proposal)
+
+        changed = copy.deepcopy(proposal)
+        changed["decision"]["implementation_scope"]["data_bindings"] = [
+            {"ref": "unapproved-market-data"}
+        ]
+        with self.assertRaises(ScopeAuditError):
+            _validate_active_proposal(changed)
+
+        changed = copy.deepcopy(proposal)
+        changed["economic_effect"]["open_economic_outcome"] = True
+        with self.assertRaises(ScopeAuditError):
+            _validate_active_proposal(changed)
 
 
 if __name__ == "__main__":
