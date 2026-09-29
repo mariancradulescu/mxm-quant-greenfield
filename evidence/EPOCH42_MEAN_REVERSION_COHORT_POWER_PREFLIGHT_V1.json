@@ -1,0 +1,188 @@
+{
+  "accepted_data_coverage": {
+    "bounded_inventory_ref": "evidence/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_RESULT_V1.json",
+    "bounded_inventory_verified_m5_identities": 45,
+    "effective_independent_cluster_count": null,
+    "eligible_sampling_frame_identities": 1576,
+    "event_cluster_count": null,
+    "full_frame_history_completeness": "NOT_ESTABLISHED",
+    "other_accepted_capture_scopes": "NOT_MATERIALIZED_OR_HASH_VERIFIED_IN_THIS_RUN; no absence claim",
+    "regime_context_inventory_ref": "evidence/EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT_V1.json",
+    "regime_inventory_summary": {
+      "identities_with_verified_m5_bars": 45,
+      "other_accepted_capture_scopes": "NOT_MATERIALIZED_OR_HASH_VERIFIED_IN_THIS_RUN; no absence claim"
+    },
+    "unmaterialized_hash_bound_capture_bytes_are_new_acquisition": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "search_budget_change": 0,
+    "v2_attempts_consumed": 0
+  },
+  "data_boundary": {
+    "accepted_external_bytes_are_transport_materialization_not_new_acquisition": true,
+    "accepted_inventory_scope": "The bounded Epoch40/Epoch41 inventories report 45 identities with verified M5 bars; they explicitly do not establish absence in other accepted capture scopes.",
+    "effective_excursion_cluster_count": "NOT_ESTIMABLE_FROM_PERSISTED_ACCEPTED_INVENTORIES",
+    "full_frame_history_completeness": "NOT_ESTABLISHED",
+    "later_data_authority": "A later prospective decision must first audit exact accepted capture scopes and, only if justified, define a minimal disjoint data increment. Do not reuse a collector frozen for another symbol/window scope.",
+    "new_market_data_or_collector_authorized": false,
+    "new_market_data_requested": false,
+    "response_statistics_computed": false
+  },
+  "evidence_epoch": 42,
+  "family": "MEAN_REVERSION",
+  "freeze_sha256": "16d69da05d17ef72091abdeec98513d223a1500bff40f3678de0ccbeb720d91f",
+  "hypothesis": {
+    "causal_timing": "Freeze event, center, scale, cohort, temporal split, missingness, power, and multiplicity rules before any response statistic; no future value may enter event admission or event-time normalization.",
+    "event_definition": {
+      "causal_inputs": "Only exact contiguous completed M5 closes at or before the event time.",
+      "center": "Arithmetic mean of the frozen trailing lookback closes ending at the event close.",
+      "cluster_unit": "For each symbol, begin one excursion cluster on the first threshold crossing from inside the neutral band. Admit no repeat event while z remains in that tail; a return inside the band rearms the next cluster, and a direct crossing into the opposite tail starts a new opposite cluster.",
+      "resolution": "M5",
+      "scale": "Population standard deviation of those same contiguous trailing closes.",
+      "trigger": "At a completed close, calculate z=(close-center)/scale; upper excursions are z >= threshold and lower excursions are z <= -threshold; zero-scale windows emit no event."
+    },
+    "prior_specification_audit": {
+      "compare_only_immutable_epoch25_and_epoch36_freezes": true,
+      "do_not_evaluate_if_not_structurally_distinct": true,
+      "must_report_estimand_and_input_comparison": true,
+      "read_prior_result_artifacts": false
+    },
+    "response_estimand": {
+      "lower_excursion": "ln(close_t_plus_h / close_t) / (sigma_t * sqrt(h))",
+      "measure": "For each predeclared horizon h, direction-adjusted forward log displacement divided by the population standard deviation of the trailing lookback's contiguous one-bar log returns ending at event time times sqrt(h); positive values indicate displacement in the reversal direction.",
+      "primary_unit": "Independent excursion cluster, with dependence-aware UTC date/session clustering and pooled cohort inference only when outcome-blind coherence supports pooling.",
+      "upper_excursion": "ln(close_t / close_t_plus_h) / (sigma_t * sqrt(h))"
+    }
+  },
+  "implementation": {
+    "freeze_ref": "research_v3/EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_FREEZE_V1.json",
+    "version": "MXM_EPOCH42_MEAN_REVERSION_COHORT_POWER_PREFLIGHT_V1"
+  },
+  "interpretation_boundary": {
+    "candidate_economic_identity_created": false,
+    "competition_start_authorized": false,
+    "economic_outcome_opened": false,
+    "economic_promotion_authorized": false,
+    "independent_confirmation_claimed": false,
+    "internal_development_holdout_is_independent_confirmation": false,
+    "live_orders_authorized": false,
+    "mechanism_family_closed": false,
+    "pnl_computed": false,
+    "protected_forward_opened": false,
+    "strategy_events_or_response_statistics_computed": false,
+    "v2_attempt_consumed": false
+  },
+  "next_gate": "Fresh prospective reasoning must audit exact accepted capture scopes and define any minimal disjoint data increment before evaluating response statistics. Existing hash-bound bytes may be transport-materialized without being called new acquisition.",
+  "novelty_audit": {
+    "accepted_proposal_authorizes_design_only": true,
+    "comparisons": {
+      "EPOCH25": {
+        "classification": "STRUCTURAL_DIFFERENCE_REQUIRES_PROSPECTIVE_JUDGMENT",
+        "distinct_hypothesis_authorized": false,
+        "parameter_field_matches": {
+          "anchor_stride_bars": false,
+          "horizon_bars": false,
+          "lookback_bars": false,
+          "threshold": false
+        },
+        "structural_field_matches": {
+          "causal_timing": false,
+          "event_definition": false,
+          "response_estimand": false
+        }
+      },
+      "EPOCH36": {
+        "classification": "STRUCTURAL_DIFFERENCE_REQUIRES_PROSPECTIVE_JUDGMENT",
+        "distinct_hypothesis_authorized": false,
+        "parameter_field_matches": {
+          "anchor_stride_bars": false,
+          "horizon_bars": false,
+          "lookback_bars": false,
+          "threshold": false
+        },
+        "structural_field_matches": {
+          "causal_timing": false,
+          "event_definition": false,
+          "response_estimand": false
+        }
+      }
+    },
+    "distinct_hypothesis_authorized": false,
+    "interpretation": "Structural differences identify candidates for prospective review; they do not by themselves establish scientific distinctness or authorize a diagnostic.",
+    "prior_results_read": false,
+    "response_statistic_evaluated": false,
+    "same_observation_window_reused": false
+  },
+  "power_preflight": {
+    "achieved_power_estimated": false,
+    "observed_effective_sample_size": null,
+    "planning_sensitivity": [
+      {
+        "familywise_alpha": 0.05,
+        "hypothesis_count": 36,
+        "interpretation": "PLANNING_SENSITIVITY_ONLY_NOT_AN_ECONOMIC_THRESHOLD",
+        "required_effective_independent_clusters": 368,
+        "standardized_effect": 0.2,
+        "target_power": 0.8
+      },
+      {
+        "familywise_alpha": 0.05,
+        "hypothesis_count": 36,
+        "interpretation": "PLANNING_SENSITIVITY_ONLY_NOT_AN_ECONOMIC_THRESHOLD",
+        "required_effective_independent_clusters": 164,
+        "standardized_effect": 0.3,
+        "target_power": 0.8
+      },
+      {
+        "familywise_alpha": 0.05,
+        "hypothesis_count": 36,
+        "interpretation": "PLANNING_SENSITIVITY_ONLY_NOT_AN_ECONOMIC_THRESHOLD",
+        "required_effective_independent_clusters": 59,
+        "standardized_effect": 0.5,
+        "target_power": 0.8
+      }
+    ],
+    "response_statistics_computed": false,
+    "status": "NOT_ESTIMABLE_WITHOUT_ACCEPTED_DISJOINT_EVENT_INVENTORY"
+  },
+  "safety": {
+    "competition_start_authorized": false,
+    "live_orders_authorized": false,
+    "protected_forward_opened": false
+  },
+  "sampling_frame": {
+    "cohort_selection_status": "NOT_ESTIMABLE_FROM_BOUNDED_ACCEPTED_INVENTORIES",
+    "eligible_identity_count": 1576,
+    "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "outcome_blind_selection": true,
+    "selected_inferential_cohort": null,
+    "selection_rule": "Keep the full feasible universe as the sampling frame. Select no inferential symbol unless exact identity, EUR200 feasibility, accepted contiguous M5 history, completeness, event-cluster information, and dependence support can be audited from accepted authorities. Adapt breadth to coherence and power; do not impose a fixed size, substitute structural representatives, or select from response results.",
+    "structural_41_used_as_inferential_universe": false
+  },
+  "schema": "mxm.greenfield.epoch42-mean-reversion-cohort-power-preflight.v1",
+  "source_authority": {
+    "accepted_coverage_preflight_ref": "evidence/EPOCH41_REGIME_CONTEXT_COHORT_POWER_PREFLIGHT_V1.json",
+    "accepted_development_inventory_ref": "evidence/EPOCH40_MEAN_REVERSION_STAGE1_TRIAGE_RESULT_V1.json",
+    "accepted_proposal_file_sha256": "c590959baabd63a15a93b9c675cc08c3e727e31a0ab9634dfe06a08e80d56875",
+    "accepted_proposal_hash": "7792544546520fe7db374a8654036c452f70b009aa50491c1245edd760eaf3ad",
+    "accepted_proposal_ref": "research_v3/ai_director/proposals/AUTO_reason_e32a4b75e24fa8b92aaa3effdce7d093.json",
+    "eligible_identity_count": 1576,
+    "eligible_identity_set_sha256": "e53dc4e58d4e0d37eca4f528e06d0866ad8ffe3f2bc64d35278ecc8ee9f52a65",
+    "feasibility_authority_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "feature_store_ref": "research_v3/BROKER_NATIVE_FRONTIER_FEATURE_STORE_EPOCH23_V1.json",
+    "prior_freeze_refs": [
+      "research_v3/EPOCH25_MEAN_REVERSION_FRONTIER_FREEZE_V1.json",
+      "research_v3/EPOCH36_MEAN_REVERSION_MAGNITUDE_PERSISTENCE_FRONTIER_FREEZE_V1.json"
+    ],
+    "prior_result_artifacts_read": false
+  },
+  "status": "COMPLETE_NON_ECONOMIC_HYPOTHESIS_AND_POWER_PREFLIGHT",
+  "temporal_boundary": {
+    "future_response_evaluation_authorized_in_this_phase": false,
+    "missingness": "No fill, interpolation, resampling, synthetic bars, or cross-gap events. Gaps break contiguous segments. Cluster horizons crossing gaps are right-censored and excluded from settled-response estimates while retained in event/censor counts. Do not impute symbols or dates.",
+    "prior_observation_window_end_utc": "2026-09-13T23:59:59Z",
+    "response_sample_must_be_disjoint_from_prior_epoch25_epoch36_observation_window": true,
+    "split_rule": "After a separately accepted disjoint development interval is authorized, split by the UTC-time midpoint of that authorized interval into earlier development and later internal temporal holdout dates before response evaluation; the holdout is not independent confirmation."
+  }
+}
