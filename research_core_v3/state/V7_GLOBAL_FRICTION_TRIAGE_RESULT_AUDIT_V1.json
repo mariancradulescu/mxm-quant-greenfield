@@ -1,0 +1,168 @@
+{
+  "schema": "mxm.research-core-v3.v7-global-friction-triage-result-audit.v1",
+  "status": "ACCEPTED_INTEGRITY_OFFICIAL_DECISION_UNRESOLVED_STRONG_NEGATIVE_DIAGNOSTIC",
+  "evidence_bundle": {
+    "file_name": "MXM_V3_GLOBAL_FRICTION_TRIAGE_EVIDENCE_V1.zip",
+    "sha256": "44c3d7a9ab68d712714175b6d6e776e4d8a8a2fa6f47c54869d133e7cb8dd13a",
+    "size_bytes": 1149596,
+    "zip_crc_pass": true,
+    "internal_checksums_verified": 19,
+    "internal_checksum_failures": 0,
+    "duplicate_nested_payload_copies": 20,
+    "duplicate_nested_payloads_byte_identical": true,
+    "duplicate_interpretation": "PACKAGING_QUIRK_NOT_EVIDENCE_DIVERGENCE"
+  },
+  "authority": {
+    "source_design_binding_sha256": "e25ff11499625e4277d03556f7947a2f97bb44b87a896f3143943561f449b8c4",
+    "source_plan_binding_sha256": "0704a9984b4121e3998802f4bf809c93df7fe55ee342b1bf281fe96e5a9c1875",
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "raw_ticks_persisted": false
+  },
+  "capture": {
+    "regions_completed": 14,
+    "sampled_hours": 728,
+    "sampled_exact_windows": 2165,
+    "stage0_probe_records": 364,
+    "stage0_api_attempts": 382,
+    "stage0_successful_pages": 382,
+    "stage0_broker_history_unavailable_events": 0,
+    "stage1_base_bid_ask_requests": 2720,
+    "stage1_api_attempts": 2722,
+    "stage1_successful_pages": 2720,
+    "stage1_broker_history_unavailable_events": 0,
+    "transient_retry_counts": {
+      "BLOCKED_PAYLOAD_TYPE": 2
+    },
+    "transport_retry_count": 0,
+    "summed_broker_call_elapsed_seconds": 975.384,
+    "summed_broker_call_elapsed_minutes": 16.2564,
+    "protobuf_response_bytes_total": 33832098
+  },
+  "official_v7_result": {
+    "dead_by_pre_frozen_rule": 0,
+    "plausible_or_unresolved": 14,
+    "automatic_additional_acquisition": false,
+    "interpretation": "NO_REGION_WAS_FORMALLY_PROVEN_DEAD;NONDEATH_IS_NOT_POSITIVE_EDGE_CERTIFICATION"
+  },
+  "estimator_audit": {
+    "defect": "WITHIN_SELECTED_HOUR_ONLY_UP_TO_3_WINDOWS_WERE_MEASURED_BUT_UNSELECTED_WINDOWS_WERE_FORCED_TO_ZERO_WITHOUT_INCLUSION_WEIGHTING",
+    "consequence": "THE_PRE_FROZEN_DEATH_TEST_WAS_STRUCTURALLY_UNABLE_TO_REACH ITS DEATH THRESHOLD FOR ANY OF THE 14 REGIONS EVEN UNDER IDEAL CAPPED OBSERVATIONS",
+    "maximum_possible_official_lcb_over_gross_across_14": 0.5816474202451559,
+    "all_regions_max_possible_official_lcb_over_gross_below_one": true,
+    "retrospective_rule_change_for_certification": "FORBIDDEN",
+    "two_stage_inclusion_weighted_posthoc_diagnostic_only": true,
+    "maximum_posthoc_two_stage_lcb_over_gross": 0.9880015957075795,
+    "posthoc_formal_certifications": 0
+  },
+  "economic_diagnostic": {
+    "all_14_every_fresh_d0_spread_exceeded_2x_gross": true,
+    "minimum_across_regions_of_minimum_fresh_spread_over_gross": 2.02826725390925,
+    "maximum_across_regions_of_minimum_fresh_spread_over_gross": 37.47870402519801,
+    "minimum_zero_imputed_sample_mean_spread_over_gross": 3.697196126996078,
+    "maximum_zero_imputed_sample_mean_spread_over_gross": 24.254555398927963,
+    "fresh_quote_fraction_range": [
+      0.18421052631578946,
+      0.8896103896103896
+    ],
+    "interpretation": "STRONG_NEGATIVE_ECONOMIC_DIAGNOSTIC_BUT_NOT_A_PRE_FROZEN_FAMILYWISE_DEATH_CERTIFICATION"
+  },
+  "decision": {
+    "priority14_status": "PARK_NO_FURTHER_BROKER_ACQUISITION_FOR_NOW",
+    "reason": "ADDITIONAL_CAPTURE_WOULD_MAINLY_REFINE_FORMAL_DEATH_CERTAINTY_FOR_REGIONS_WHOSE_OBSERVED_AUTHENTIC_SPREAD_IS_ALREADY_MATERIALLY_ABOVE_GROSS_EDGE;LOW_INFORMATION_VALUE_FOR_FINDING_A_REALIZABLE_WINNER",
+    "frozen_candidates": 0,
+    "net_certified_candidates": 0,
+    "other_74_gross_regions_remain_open": true,
+    "authoritative_frontier_1576_remains_open": true
+  },
+  "next_information_gain_wave": {
+    "selection_law": "DESCENDING_MINIMUM_GROSS_MEAN_RESPONSE_BPS_AMONG_THE_74_NON_PRIORITY_GROSS_REGIONS;TRANSPORT_PRIORITY_ONLY_NOT_PROMOTION",
+    "estimator_requirement": "PROSPECTIVELY_FROZEN_TWO_STAGE_INCLUSION_WEIGHTING_OR_FULL_SELECTED_HOUR_CAPTURE;NO_UNWEIGHTED_FORCED_ZERO_FOR_UNSELECTED_WINDOWS",
+    "selected_regions": [
+      [
+        "CRM.US-24",
+        "BREAKOUT_VOLATILITY_EXPANSION",
+        4.633215927725507,
+        "84ca5423890f24dfe980d8fbcb3995ac1c33e005b119e36659ffe601105dc0e2"
+      ],
+      [
+        "HOOD.US-24",
+        "BREAKOUT_VOLATILITY_EXPANSION",
+        3.7838219951617313,
+        "8b2e068d01a564a4f9d348b3388e42fabf97617c192e98a94a218574b6652214"
+      ],
+      [
+        "AMD.US-24",
+        "BREAKOUT_VOLATILITY_EXPANSION",
+        2.961363142752253,
+        "9253238518feeb3784c25971ca153ae3059e39f48294f1e2cf42b666233f9468"
+      ],
+      [
+        "NERUSD",
+        "MEAN_REVERSION",
+        2.6528226897319644,
+        "42bb366e1b6f86cbcc6572a384bc208aa03dde82224f4b229a27f9eaddbefd40"
+      ],
+      [
+        "ONDUSD",
+        "MEAN_REVERSION",
+        2.367339914067578,
+        "3895ae871ecf3af39750240ce066f5e25b8643d8cb011cccc8befd1aeddc98f6"
+      ],
+      [
+        "XPDUSD",
+        "MEAN_REVERSION",
+        2.3092916966167345,
+        "ac2615e1c1f4ddd01af8adbd343691f2d05a138c4108c2c3cf3549b034ea6e7b"
+      ],
+      [
+        "BNKUSD",
+        "MEAN_REVERSION",
+        2.201921528418078,
+        "d2a7a95c3bcd058664b1400ff979e7d2a17fa3c0ad9baa6960747024a911a2c9"
+      ],
+      [
+        "DOGEUSD",
+        "MEAN_REVERSION",
+        1.9236919356224265,
+        "bee27450703cb5ecc50ad366a2c9e8ebd335521d4301571df8a2b95b7b0030be"
+      ],
+      [
+        "ATMUSD",
+        "MEAN_REVERSION",
+        1.843837164538113,
+        "ee35c54e450f859513728636e0a0756c726683f9938756b15427a91b52bccfa6"
+      ],
+      [
+        "COMPUSD",
+        "MEAN_REVERSION",
+        1.758593082672564,
+        "47880cc6a6cefacda95bbea4210c2dbd4c8f4bf85a69aeb19f75796ff6b86b33"
+      ],
+      [
+        "ETCUSD",
+        "MEAN_REVERSION",
+        1.707619155123967,
+        "c71742fcc5636291c2cd54dcc1fff1fb22d058f2228c88181f0a17a54d33aade"
+      ],
+      [
+        "XTZUSD",
+        "MEAN_REVERSION",
+        1.6095208387876978,
+        "81d26d3027eb5c40a82f1178295195a89cc8949c7c837350322e6ca324cb5fca"
+      ],
+      [
+        "KSMUSD",
+        "MEAN_REVERSION",
+        1.5918063144132417,
+        "00f2a0b5878bd16e1b2a47762cf427a013e790dc66f7cb2321bd1d818e2f8a1e"
+      ],
+      [
+        "LTCUSD",
+        "MEAN_REVERSION",
+        1.3907604482387022,
+        "e00487c51c5edaf5021693cb01ff3498b9a7dd5aafa4df485c1b3223e1078624"
+      ]
+    ]
+  }
+}
