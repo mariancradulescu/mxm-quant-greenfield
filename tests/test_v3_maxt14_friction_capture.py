@@ -4,6 +4,8 @@ import unittest
 from pathlib import Path
 
 from research_core_v3.v3_friction_capture import (
+    account_identity_recovery_decision,
+    build_account_rebind_proposal_document,
     classify_ctrader_api_error,
     coalesce_exact_windows,
     decode_delta_windows,
@@ -104,6 +106,56 @@ class V3MaxT14FrictionCaptureTests(unittest.TestCase):
             history_coverage_for_window(record, 2000, 3000),
             "REQUEST_COMPLETED",
         )
+
+    def test_account_identity_recovery_requires_fresh_oauth_before_rebind(self):
+        frozen = "a" * 64
+        self.assertEqual(
+            account_identity_recovery_decision(
+                frozen, ["b" * 64], "REUSED_SAVED_ACCESS_TOKEN"
+            ),
+            "FORCE_FRESH_OAUTH",
+        )
+        self.assertEqual(
+            account_identity_recovery_decision(
+                frozen, [frozen], "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION_FORCED"
+            ),
+            "MATCH_FROZEN_ACCOUNT",
+        )
+        self.assertEqual(
+            account_identity_recovery_decision(
+                frozen, ["b" * 64], "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION_FORCED"
+            ),
+            "REBIND_REVIEW_REQUIRED",
+        )
+
+    def test_rebind_proposal_is_sanitized_and_does_not_change_authority(self):
+        plan = json.loads(PLAN.read_text(encoding="utf-8"))
+        symbols = {}
+        for target in plan["targets"]:
+            symbols[target["symbol"]] = {
+                "symbol": target["symbol"],
+                "symbol_id": target["symbol_id"],
+                "identity": "EXACT_ACCEPTED_SYMBOL_ID_NAME_CURRENT_ENABLED",
+                "current_metadata_only_not_historical_cost_truth": {
+                    "symbolId": target["symbol_id"]
+                },
+            }
+        proposal = build_account_rebind_proposal_document(
+            plan,
+            {
+                "account_fingerprint_sha256": "c" * 64,
+                "environment": "Pepperstone - Europe LIVE",
+                "broker_name": "Pepperstone",
+            },
+            symbols,
+        )
+        self.assertTrue(proposal["rebind_scientifically_eligible"])
+        self.assertFalse(proposal["authority_change_performed"])
+        self.assertFalse(proposal["historical_bid_ask_capture_started"])
+        self.assertEqual(proposal["verified_symbol_count"], 14)
+        encoded = json.dumps(proposal, sort_keys=True)
+        self.assertNotIn("ctidTraderAccountId", encoded)
+        self.assertNotIn("ctid_trader_account_id", encoded)
 
     def test_real_frozen_scope_geometry_preflight(self):
         geometry = local_geometry_preflight(ROOT)

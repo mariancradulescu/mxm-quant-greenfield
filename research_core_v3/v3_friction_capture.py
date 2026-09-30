@@ -62,6 +62,7 @@ SCOPE_ROOT_REL = "research_core_v3/state"
 WORK_REL = ".mxm_v3_maxt14_friction_work"
 OUTPUT_REL = "v3_friction_output/MXM_V3_MAXT14_FRICTION_EVIDENCE_V1"
 TRANSFER_NAME = "MXM_V3_MAXT14_FRICTION_EVIDENCE_V1.zip"
+REBIND_PROPOSAL_NAME = "MXM_V3_ACCOUNT_IDENTITY_REBIND_PROPOSAL_V1.json"
 
 
 def _plain(message: Any) -> dict[str, Any]:
@@ -136,6 +137,111 @@ def classify_ctrader_api_error(
         if has_context and unavailable:
             return "EXPLICIT_BROKER_HISTORY_UNAVAILABLE"
     return "FAIL_CLOSED"
+
+
+def account_identity_recovery_decision(
+    expected_fingerprint: str,
+    authorized_fingerprints: list[str],
+    auth_mode: str,
+) -> str:
+    """Choose the next account-identity action without inspecting any market history."""
+    matches = sum(
+        1 for value in authorized_fingerprints if str(value) == str(expected_fingerprint)
+    )
+    if matches == 1:
+        return "MATCH_FROZEN_ACCOUNT"
+    if matches > 1:
+        return "FAIL_CLOSED_DUPLICATE_FROZEN_ACCOUNT_IDENTITY"
+    if "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION" not in str(auth_mode):
+        return "FORCE_FRESH_OAUTH"
+    return "REBIND_REVIEW_REQUIRED"
+
+
+def build_account_rebind_proposal_document(
+    plan: Mapping[str, Any],
+    account_evidence: Mapping[str, Any],
+    symbol_evidence: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build a sanitized proposal; this never changes the frozen authority."""
+    old_fp = str(
+        plan["broker_identity"]["accepted_account_fingerprint_sha256"]
+    )
+    new_fp = str(account_evidence.get("account_fingerprint_sha256") or "")
+    if len(new_fp) != 64 or new_fp == old_fp:
+        raise CaptureContractError("account rebind proposal requires a distinct valid fingerprint")
+    if str(account_evidence.get("environment")) != "Pepperstone - Europe LIVE":
+        raise CaptureContractError("account rebind environment is not Pepperstone Europe LIVE")
+    if "pepperstone" not in str(account_evidence.get("broker_name") or "").lower():
+        raise CaptureContractError("account rebind broker identity is not Pepperstone")
+    expected = {
+        (str(t["symbol"]), int(t["symbol_id"])) for t in plan["targets"]
+    }
+    observed = {
+        (str(v.get("symbol")), int(v.get("symbol_id", 0)))
+        for v in symbol_evidence.values()
+        if v.get("identity") == "EXACT_ACCEPTED_SYMBOL_ID_NAME_CURRENT_ENABLED"
+    }
+    if observed != expected:
+        raise CaptureContractError(
+            "account rebind requires exact current applicability for all 14 frozen symbols"
+        )
+    prior = plan.get("recovered_prior_evidence_audit") or {}
+    if prior.get("direct_historical_tick_coverage_for_selected_14") != "NONE_FOUND":
+        raise CaptureContractError(
+            "account rebind cannot be auto-proposed after prior selected-14 account evidence"
+        )
+    symbol_binding = _sha_bytes(
+        _canonical(
+            [
+                {
+                    "symbol": symbol,
+                    "symbol_id": sid,
+                    "identity": symbol_evidence[symbol]["identity"],
+                    "current_metadata_sha256": _sha_bytes(
+                        _canonical(
+                            symbol_evidence[symbol].get(
+                                "current_metadata_only_not_historical_cost_truth"
+                            ) or {}
+                        )
+                    ),
+                }
+                for symbol, sid in sorted(expected)
+            ]
+        )
+    )
+    proposal = {
+        "schema": "mxm.research-core-v3.account-identity-rebind-proposal.v1",
+        "source_plan_binding_sha256": plan["binding_sha256"],
+        "source_accepted_account_fingerprint_sha256": old_fp,
+        "proposed_account_fingerprint_sha256": new_fp,
+        "environment": "Pepperstone - Europe LIVE",
+        "broker_verified": True,
+        "oauth_scope": "accounts",
+        "exact_symbol_id_name_enabled_verified": True,
+        "verified_symbol_count": len(expected),
+        "symbol_applicability_binding_sha256": symbol_binding,
+        "raw_account_id_embedded": False,
+        "historical_bid_ask_capture_started": False,
+        "protected_forward_opened": False,
+        "candidate_identity_changed": False,
+        "development_surface_changed": False,
+        "account_specific_friction_evidence_reused_across_accounts": False,
+        "rebind_scientifically_eligible": True,
+        "authority_change_performed": False,
+        "scientific_basis": (
+            "The gross DEVELOPMENT surface and candidate regions are account-independent "
+            "at this stage; selected-14 historical friction remains unresolved. Rebinding "
+            "is eligible only before historical quote capture, after Pepperstone LIVE "
+            "identity and exact 14-symbol applicability are reverified. The frozen account "
+            "authority must be durably rebound before any historical BID/ASK request."
+        ),
+        "next_required_step": (
+            "DURABLY_REBIND_THE_FROZEN_V3_ACQUISITION_ACCOUNT_FINGERPRINT_"
+            "AND_REBUILD_THE_ANDROID_PACKAGE_BEFORE_CAPTURE"
+        ),
+    }
+    proposal["binding_sha256"] = _sha_bytes(_canonical(proposal))
+    return proposal
 
 
 def history_coverage_for_window(
@@ -586,8 +692,8 @@ class V3MaxT14FrictionRunner:
             f"{redact_text(str(last))}"
         )
 
-    def _authenticate_and_verify_targets(self) -> int:
-        self._stage("[1/4] Verifying exact Pepperstone LIVE account and 14 symbol identities")
+    def _authorized_live_accounts(self) -> list[dict[str, Any]]:
+        """Authenticate the app/token and return LIVE account descriptors only."""
         self._restore_session()
         self._send(
             ProtoOAApplicationAuthReq(
@@ -595,28 +701,17 @@ class V3MaxT14FrictionRunner:
             )
         )
         self._app_authorized = True
-
         accounts_res = self._send(
             ProtoOAGetAccountListByAccessTokenReq(accessToken=self.access_token)
         )
         accounts = [_plain(x) for x in accounts_res.ctidTraderAccount]
-        expected_fingerprint = self.plan["broker_identity"][
-            "accepted_account_fingerprint_sha256"
-        ]
-        matching_accounts = []
-        for candidate in live_account_candidates(accounts):
-            candidate_id = int(candidate["ctidTraderAccountId"])
-            if account_fingerprint(candidate_id) == expected_fingerprint:
-                matching_accounts.append(candidate)
-        if len(matching_accounts) != 1:
-            raise CaptureContractError(
-                "the exact accepted Pepperstone LIVE research account is not uniquely authorized "
-                "under this read-only token"
-            )
-        account = matching_accounts[0]
+        return [dict(x) for x in live_account_candidates(accounts)]
+
+    def _verify_account_and_targets(
+        self, account: Mapping[str, Any]
+    ) -> int:
         account_id = int(account["ctidTraderAccountId"])
         fingerprint = account_fingerprint(account_id)
-
         self._authorized_account_id = account_id
         self._send(
             ProtoOAAccountAuthReq(
@@ -684,7 +779,110 @@ class V3MaxT14FrictionRunner:
             "account_mutation": False,
         }
         self._symbol_evidence = evidence
-        self._stage("[PREFLIGHT PASS] accepted account fingerprint and all 14 exact symbol IDs verified")
+        return account_id
+
+    def probe_account_identity(self, auth_mode: str) -> dict[str, Any]:
+        """Resolve only account/symbol identity. Never sends historical tick requests."""
+        accounts = self._authorized_live_accounts()
+        expected = self.plan["broker_identity"][
+            "accepted_account_fingerprint_sha256"
+        ]
+        fingerprints = [
+            account_fingerprint(int(account["ctidTraderAccountId"]))
+            for account in accounts
+        ]
+        decision = account_identity_recovery_decision(
+            expected, fingerprints, auth_mode
+        )
+        result: dict[str, Any] = {
+            "decision": decision,
+            "authorized_live_accounts": accounts,
+            "authorized_live_account_count": len(accounts),
+            "expected_fingerprint_sha256": expected,
+            "historical_requests": self._historical_requests,
+        }
+        if decision == "MATCH_FROZEN_ACCOUNT":
+            matches = [
+                account
+                for account in accounts
+                if account_fingerprint(int(account["ctidTraderAccountId"]))
+                == expected
+            ]
+            account_id = self._verify_account_and_targets(matches[0])
+            result["verified_account_id_local_only"] = account_id
+            result["verified_account_fingerprint_sha256"] = expected
+            result["verified_symbol_count"] = len(self._symbol_evidence)
+        if self._historical_requests != 0:
+            raise CaptureContractError(
+                "account identity probe attempted historical market data"
+            )
+        return result
+
+    def capture_has_started(self) -> bool:
+        completed = self.resume.get("completed")
+        if isinstance(completed, dict) and completed:
+            return True
+        if self.raw_root.exists() and any(
+            path.is_file() for path in self.raw_root.rglob("*")
+        ):
+            return True
+        if self.transfer_path.is_file():
+            return True
+        if self.output_dir.exists() and any(
+            path.is_file() for path in self.output_dir.rglob("*")
+        ):
+            return True
+        return False
+
+    def write_account_rebind_proposal(self, account_id: int) -> Path:
+        """Verify a different LIVE account, emit sanitized proposal, and stop before capture."""
+        if self.capture_has_started():
+            raise CaptureContractError(
+                "account identity rebind is blocked because V3 friction capture data already exists"
+            )
+        accounts = self._authorized_live_accounts()
+        selected = [
+            account
+            for account in accounts
+            if int(account["ctidTraderAccountId"]) == int(account_id)
+        ]
+        if len(selected) != 1:
+            raise CaptureContractError(
+                "selected local LIVE account is not uniquely authorized by the fresh token"
+            )
+        self._verify_account_and_targets(selected[0])
+        if self._historical_requests != 0:
+            raise CaptureContractError(
+                "account rebind review attempted historical market data"
+            )
+        proposal = build_account_rebind_proposal_document(
+            self.plan, self._account_evidence, self._symbol_evidence
+        )
+        target = self.output_dir.parent / REBIND_PROPOSAL_NAME
+        atomic_write_json(target, proposal)
+        return target
+
+    def _authenticate_and_verify_targets(self) -> int:
+        self._stage("[1/4] Verifying exact Pepperstone LIVE account and 14 symbol identities")
+        accounts = self._authorized_live_accounts()
+        expected_fingerprint = self.plan["broker_identity"][
+            "accepted_account_fingerprint_sha256"
+        ]
+        matching_accounts = [
+            account
+            for account in accounts
+            if account_fingerprint(int(account["ctidTraderAccountId"]))
+            == expected_fingerprint
+        ]
+        if len(matching_accounts) != 1:
+            raise CaptureContractError(
+                "the exact accepted Pepperstone LIVE research account is not uniquely authorized "
+                "under this read-only token"
+            )
+        account_id = self._verify_account_and_targets(matching_accounts[0])
+        self._stage(
+            "[PREFLIGHT PASS] accepted account fingerprint and all 14 exact symbol IDs verified"
+        )
         return account_id
 
     def _chunk_path(

@@ -7,7 +7,12 @@ from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
 
 from m6.ctrader_capture import CaptureContractError, READ_ONLY_SCOPE, redact_text, sha256_file
-from m6.pydroid_oauth import PRIVATE_ROOT, ensure_v2_authorization
+from m6.pydroid_oauth import (
+    PRIVATE_ROOT,
+    choose_live_account_locally,
+    ensure_v2_authorization,
+    force_fresh_v2_authorization,
+)
 from research_core_v3.v3_friction_capture import (
     OUTPUT_REL,
     WORK_REL,
@@ -72,10 +77,29 @@ def local_preflight() -> dict:
     }
 
 
+def _runner(app: dict, access_token: str) -> V3MaxT14FrictionRunner:
+    return V3MaxT14FrictionRunner(
+        client_id=app["client_id"],
+        client_secret=app["client_secret"],
+        access_token=access_token,
+        config={"account_selection": "EXACT_ACCEPTED_FINGERPRINT_AUTOMATIC"},
+        repo_root=ROOT,
+    )
+
+
+def _close_runner(runner) -> None:
+    if runner is None:
+        return
+    try:
+        runner.transport.close()
+    except Exception:
+        pass
+
+
 def main() -> None:
-    print("MXM Research Core V3 — maxT14 authentic Pepperstone event-time friction capture")
-    print("READ ONLY: accounts/view access | BID+ASK history | orders=NO | protected-forward=NO")
-    print("Raw ticks stay local. Transfer ZIP contains exact-window quote evidence only.")
+    print("MXM Research Core V3 — account identity recovery + maxT14 friction capture")
+    print("READ ONLY: accounts/view access | orders=NO | protected-forward=NO")
+    print("NO historical BID/ASK request is sent until frozen account identity is unambiguous.")
 
     try:
         report = local_preflight()
@@ -90,32 +114,75 @@ def main() -> None:
         f"base BID/ASK requests={report['base_bid_ask_requests_before_pagination']}"
     )
 
+    runner = None
+    access_token = None
     try:
         app, access_token, auth_mode = ensure_v2_authorization()
-    except Exception as exc:
-        print("[OAUTH BLOCKED SAFELY]", redact_text(str(exc)))
-        raise SystemExit(1) from None
-    print(f"[OAUTH] {auth_mode}; existing safe authorization is reused/refreshed when valid.")
+        print(f"[OAUTH] {auth_mode}")
+        runner = _runner(app, access_token)
+        probe = runner.probe_account_identity(auth_mode)
 
-    config = {"account_selection": "EXACT_ACCEPTED_FINGERPRINT_AUTOMATIC"}
-    try:
-        runner = V3MaxT14FrictionRunner(
-            client_id=app["client_id"],
-            client_secret=app["client_secret"],
-            access_token=access_token,
-            config=config,
-            repo_root=ROOT,
-        )
-        zip_path = runner.run()
+        if probe["decision"] == "FORCE_FRESH_OAUTH":
+            print(
+                "[ACCOUNT RECOVERY] Saved/refreshable token does not authorize the "
+                "frozen V3 account fingerprint."
+            )
+            print(
+                "[ACCOUNT RECOVERY] Opening ONE fresh official cTrader authorization. "
+                "Select the intended Pepperstone Europe LIVE research account. "
+                "No historical quote request has started."
+            )
+            _close_runner(runner)
+            runner = None
+            access_token = None
+            app, access_token, auth_mode = force_fresh_v2_authorization()
+            print(f"[OAUTH] {auth_mode}")
+            runner = _runner(app, access_token)
+            probe = runner.probe_account_identity(auth_mode)
+
+        if probe["decision"] == "MATCH_FROZEN_ACCOUNT":
+            print(
+                "[ACCOUNT IDENTITY PASS] Frozen Pepperstone LIVE fingerprint is uniquely "
+                "authorized and all 14 exact symbol IDs/names are currently applicable."
+            )
+            print("[CAPTURE START AUTHORIZED] Identity ambiguity resolved before tick history.")
+            zip_path = runner.run()
+        elif probe["decision"] == "REBIND_REVIEW_REQUIRED":
+            print(
+                "[ACCOUNT RECOVERY] The frozen account fingerprint is still absent after "
+                "fresh OAuth. No historical BID/ASK capture will start."
+            )
+            candidates = probe["authorized_live_accounts"]
+            selected_id = choose_live_account_locally(candidates)
+            proposal_path = runner.write_account_rebind_proposal(selected_id)
+            print(
+                "[ACCOUNT REBIND REVIEW REQUIRED] The locally selected account is verified "
+                "Pepperstone LIVE and all 14 frozen symbol IDs/names are currently applicable."
+            )
+            print(
+                "A scientifically eligible rebind proposal was created, but the frozen "
+                "GitHub authority was NOT changed on this phone."
+            )
+            print("Return ONLY this JSON to ChatGPT:")
+            print(proposal_path)
+            print("Historical BID/ASK capture started: NO")
+            raise SystemExit(3)
+        else:
+            raise CaptureContractError(
+                f"account identity recovery failed closed: {probe['decision']}"
+            )
     except KeyboardInterrupt:
-        print("\n[PAUSED] Hash-verified progress is resumable. Run this SAME file again.")
+        print("\n[PAUSED] No authority is silently changed. Existing verified progress is resumable.")
         raise SystemExit(130) from None
+    except SystemExit:
+        raise
     except Exception as exc:
-        print("\n[V3 FRICTION CAPTURE BLOCKED SAFELY]", redact_text(str(exc)))
+        print("\n[V3 ACCOUNT/CAPTURE BLOCKED SAFELY]", redact_text(str(exc)))
         print("No order/account mutation/protected-forward opening occurred.")
-        print("Rerun the SAME file to resume after the external issue is corrected.")
+        print("Do not substitute a different account or edit the frozen fingerprint manually.")
         raise SystemExit(1) from None
     finally:
+        _close_runner(runner)
         access_token = None
 
     print("\nCAPTURE COMPLETE.")

@@ -596,3 +596,9 @@ def ensure_v2_authorization():
         return remembered
     app, access_token = _fresh_browser_authorization()
     return app, access_token, "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION"
+
+
+def force_fresh_v2_authorization():
+    """Force one browser OAuth round without deleting the previous local token first."""
+    app, access_token = _fresh_browser_authorization()
+    return app, access_token, "FRESH_ANDROID_SAFE_BROWSER_AUTHORIZATION_FORCED"
