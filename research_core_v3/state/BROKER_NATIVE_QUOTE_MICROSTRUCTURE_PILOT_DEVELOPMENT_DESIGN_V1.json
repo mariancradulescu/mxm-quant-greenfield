@@ -1,0 +1,101 @@
+{
+  "schema": "mxm.research-core-v3.broker-native-quote-microstructure-pilot-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_NEW_TICK_ACQUISITION",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "FIVE_SECOND_QUOTE_IMPULSE_WITH_INTENSITY_AND_SPREAD_CONFIRMATION",
+  "preoutcome_audit_sha256": "792256a955dba4585eb42a30c2cd82f711b44e47d36038cf7168187762445458",
+  "pilot_symbols": [
+    {"symbol":"EURJPY","symbol_id":3},
+    {"symbol":"EURGBP","symbol_id":9},
+    {"symbol":"AUDCAD","symbol_id":18},
+    {"symbol":"GBPCAD","symbol_id":19},
+    {"symbol":"JPN225","symbol_id":116}
+  ],
+  "calendar_binding": {
+    "date_count": 27,
+    "windows_utc": [["00:00:00","01:00:00"],["07:00:00","08:00:00"],["13:00:00","14:00:00"]],
+    "symbol_hours": 405
+  },
+  "quote_state": {
+    "grid": "integer UTC seconds",
+    "bid": "latest BID tick at or before snapshot second",
+    "ask": "latest ASK tick at or before snapshot second",
+    "freshness": "both sides age <=2000 ms and ask >= bid > 0",
+    "mid": "(bid+ask)/2",
+    "spread_bps": "log(ask/bid)*10000",
+    "raw_tick_values_persisted": false
+  },
+  "causal_feature_law": {
+    "baseline_window_seconds": 60,
+    "minimum_valid_baseline_snapshots": 45,
+    "median_spread_baseline": "median valid spread_bps over integer-second snapshots t-60 through t-1; require >0",
+    "impulse_seconds": 5,
+    "impulse_spread_units": "log(mid_t/mid_t_minus_5s)*10000 / median_spread_baseline",
+    "consistency": "among nonzero one-second mid changes ending at t over the prior 5 seconds, fraction matching impulse sign",
+    "minimum_nonzero_one_second_changes": 3,
+    "minimum_consistency_fraction": 0.7,
+    "quote_intensity_ratio": "raw BID+ASK tick count over (t-5s,t] divided by one-twelfth of raw BID+ASK tick count over (t-60s,t]; require denominator >0",
+    "minimum_quote_intensity_ratio": 1.5,
+    "spread_filter": "spread_bps_t <= median_spread_baseline",
+    "signal": "all causal filters pass and abs(impulse_spread_units) >= frozen threshold"
+  },
+  "parameter_grid": {
+    "minimum_abs_impulse_spread_units": [1.5,2.5],
+    "direction_law": ["CONTINUATION","REVERSION"],
+    "holding_seconds": [5,15,30]
+  },
+  "cells_per_symbol": 12,
+  "test_count": 60,
+  "execution_and_response": {
+    "signal_time": "integer second t after all ticks timestamped <=t have been processed",
+    "entry": "integer-second quote state at t+1s; require fresh state",
+    "direction_continuation": "long if impulse>0, short if impulse<0",
+    "direction_reversion": "short if impulse>0, long if impulse<0",
+    "exit": "integer-second fresh quote state exactly holding_seconds after entry snapshot",
+    "long_spread_net_bps": "log(exit_bid/entry_ask)*10000",
+    "short_spread_net_bps": "log(entry_bid/exit_ask)*10000",
+    "commission": "not subtracted in primary pilot; any spread-net survivor must pass current commission truth plus EUR200 sizing/margin before expansion/promotion",
+    "overlap": "within each symbol x frozen cell, ignore new signals until scheduled exit",
+    "missing": "entry or exit snapshot not fresh => right-censor; no delay search, interpolation, synthetic quotes or stale-side repair"
+  },
+  "support_and_economic_gate": {
+    "completed_events_min": 100,
+    "distinct_sample_dates_min": 18,
+    "distinct_iso_weeks_min": 10,
+    "retention_fraction_min": 0.8,
+    "mean_spread_net_bps_min": 2.0,
+    "median_spread_net_bps_min": 0.0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "all 60 frozen symbol x threshold x direction-law x horizon cells",
+    "dependence_cluster": "sampled UTC date",
+    "procedure": "shared sampled-date wild-sign max-T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "support_rule_predeclared": "All 60 remain family members. Only cells meeting non-return support prerequisites (>=100 completed events, >=18 dates, >=10 ISO weeks, retention>=0.80) generate finite max-T statistics; others receive p=1."
+  },
+  "robust_region_gate": {
+    "within": "same symbol and same direction_law only",
+    "adjacency": "one step in impulse threshold or holding horizon",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "cross_direction_adjacency_forbidden": true,
+    "single_cell_promotion_forbidden": true
+  },
+  "pilot_semantics": {
+    "robust_survivor_can_freeze_candidate": false,
+    "robust_survivor_next_step": "freeze disjoint remaining-DEVELOPMENT-date expansion under same feature/response law, then current commission + volume lattice + margin/EUR200 gate",
+    "pilot_null_closes_full_quote_microstructure_family": false,
+    "pilot_null_closes_authoritative_1576_frontier": false,
+    "post_outcome_threshold_direction_or_horizon_rescue_forbidden": true
+  },
+  "governance": {
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false,
+    "runtime_v2_reactivated": false
+  },
+  "canonical_sha256": "7ed9121bf5c13e6067617c51ecbb650f7692757ebde7d4512a6fc9f8dc0279ca"
+}
