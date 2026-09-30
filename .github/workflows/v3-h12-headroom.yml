@@ -1,0 +1,54 @@
+name: V3 H12 headroom diagnostic
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - 'tools/scan_v3_h12_headroom.py'
+      - '.github/workflows/v3-h12-headroom.yml'
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install numpy
+        run: python -m pip install numpy
+      - name: Compile diagnostic
+        run: python -m py_compile tools/scan_v3_h12_headroom.py
+      - name: Run H12 existing-surface diagnostic
+        run: |
+          PYTHONPATH=. python tools/scan_v3_h12_headroom.py | tee h12.log
+      - name: Validate diagnostic scientific boundaries
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research_core_v3/state/H12_HEADROOM_DIAGNOSTIC_V1.json")
+          d=json.loads(p.read_text())
+          assert d["existing_surface_cells"] == 7975
+          assert d["source_primary_horizon_bars"] == 6
+          assert d["diagnostic_horizon_bars"] == 12
+          assert d["new_market_data_used"] is False
+          assert d["protected_forward_opened"] is False
+          assert d["candidate_freeze_allowed"] is False
+          assert d["net_certification_allowed"] is False
+          assert d["h12_familywise_multiplicity_recomputed"] is False
+          assert all(r["horizon_bars"] == 12 for r in d["regions"])
+          assert all(r["candidate_frozen"] is False for r in d["regions"])
+          print("H12_BOUNDARIES_PASS", json.dumps({
+            "sha256":d["sha256"],
+            "gross_cells":d["h12_gross_screen_cells"],
+            "regions":d["h12_connected_diagnostic_regions"],
+            "symbols":d["h12_connected_symbols"],
+          }, sort_keys=True))
+          PY
+      - name: Upload H12 diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: H12_HEADROOM_DIAGNOSTIC_V1
+          path: research_core_v3/state/H12_HEADROOM_DIAGNOSTIC_V1.json
+          if-no-files-found: error
+          retention-days: 30
