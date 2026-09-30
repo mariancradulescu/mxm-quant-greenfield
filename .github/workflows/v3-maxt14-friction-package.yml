@@ -1,4 +1,4 @@
-name: V3 winner-first friction screen package
+name: V3 winner-first friction screen V9R1 package
 on:
   push:
     branches: [performance-research-v3-20260922]
@@ -40,11 +40,11 @@ jobs:
       - name: Scientific regression tests
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_staged_friction tests.test_v3_global_friction_triage tests.test_v3_wave2_friction tests.test_v3_winner_first_friction tests.test_v3_maxt14_friction_evidence -v
-      - name: Build deterministic V9 Android package
+      - name: Build deterministic V9R1 Android package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_winner_first_friction_package.py
-          sha256sum dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9.zip
-      - name: Upload V9 package
+          sha256sum dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1R1.zip
+      - name: Upload V9R1 package
         uses: actions/upload-artifact@v4
         with:
           name: MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9
