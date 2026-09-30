@@ -1,0 +1,82 @@
+{
+  "schema": "mxm.research-core-v3.xpt-session-gap-authentic-friction-acquisition.v1",
+  "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
+  "created_utc": "2026-09-30T17:30:00Z",
+  "authority": {
+    "source_gross_result_ref": "research_core_v3/state/SESSION_TRANSITION_GAP_PATH_DEVELOPMENT_RESULT_V1.json",
+    "source_gross_result_commit": "0cab4da8b355daf281c514460a1e4a8b158df103",
+    "source_execution_window_map_ref": "research_core_v3/state/XPT_SESSION_GAP_FRICTION_EXECUTION_WINDOW_MAP_V1.json",
+    "source_execution_window_map_binding_sha256": "4c97236f5c20cfed9754b70dc943240639355f692661d4fe2518e7c11c694b07",
+    "existing_friction_intersection_ref": "research_core_v3/state/XPT_SESSION_GAP_EXISTING_FRICTION_INTERSECTION_V1.json",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "broker_identity": {
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "account_mutation": false,
+    "current_metadata_is_historical_cost_truth": false,
+    "environment": "Pepperstone - Europe LIVE",
+    "exact_symbol_id_and_name_match_required": true,
+    "oauth_scope": "accounts",
+    "orders": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "candidate_outcomes_opened_by_capture": false,
+    "delay_sensitivity_seconds": [0,1,5,30],
+    "fill_authority": false,
+    "historical_request_max_span_ms": 604800000,
+    "protected_forward_opened": false,
+    "quote_age_limit_seconds": 2,
+    "quote_types": ["BID","ASK"],
+    "raw_chunks_retained_locally": false,
+    "request_pacing_seconds": 0.21,
+    "scope_window_interpretation": "Each exact frozen execution window is [boundary-2s,boundary+30s]; boundary=start+2000ms.",
+    "transfer_bundle_contains_raw_ticks": false,
+    "transport_coalescing": {
+      "allowed": true,
+      "maximum_block_span_ms": 3600000,
+      "maximum_gap_ms": 300000,
+      "overfetch_interpretation": "TRANSPORT_ONLY;ANALYSIS_USES_ONLY_THE_275_FROZEN_EXECUTION_BOUNDARIES",
+      "rule": "One fixed 60-minute BID/ASK transport request pair per frozen execution hour; overfetch is transport only."
+    }
+  },
+  "selection": {
+    "selected_regions": 1,
+    "selected_symbols": 1,
+    "selected_exact_quote_windows": 275,
+    "selected_unique_events": 101,
+    "selected_unique_entry_boundaries": 101,
+    "selected_unique_exit_boundaries": 174,
+    "selected_transport_hours": 157,
+    "ordering": "COMPLETE_EXACT_EXECUTION_BOUNDARY_UNION_OF_THE_DURABLE_18_CELL_XPTUSD_GROSS_ROBUST_REGION",
+    "authoritative_frontier_remains_open": 1576,
+    "reason": "EXISTING_AUTHENTIC_XPTUSD_FRICTION_HAS_ZERO_EXACT_TIMESTAMP_OVERLAP;MINIMAL_EVENT_TIME_CAPTURE_REQUIRED_FOR_NET_GATE"
+  },
+  "scope_archives": [],
+  "freeze_gate": {
+    "candidate_freeze_allowed_by_this_capture": false,
+    "net_certification_allowed_by_this_capture_alone": false,
+    "protected_forward_must_remain_closed": true,
+    "screen_may_only_supply_AUTHENTIC_EVENT_TIME_BID_ASK_FOR_SUBSEQUENT_OFF_DEVICE_NET_REPLAY": true
+  },
+  "targets": [{
+    "symbol": "XPTUSD",
+    "symbol_id": 97,
+    "events": 101,
+    "windows": 275,
+    "screen_gross_bps": 10.436840601462228,
+    "representative_mechanism": "SESSION_TRANSITION_GAP_PATH",
+    "region_sha256": "633da9cb65b3cc8e6e9f4ad8a5c5b58f7e73f0d34ff78f5bf6af573f2a91a461",
+    "shard": "XPT_SESSION_GAP_FRICTION_EXECUTION_WINDOW_MAP_V1.json",
+    "shard_sha256": "4c97236f5c20cfed9754b70dc943240639355f692661d4fe2518e7c11c694b07",
+    "regions": [{
+      "region_sha256": "633da9cb65b3cc8e6e9f4ad8a5c5b58f7e73f0d34ff78f5bf6af573f2a91a461",
+      "mechanism": "SESSION_TRANSITION_GAP_PATH",
+      "minimum_mean_response_bps": 10.436840601462228,
+      "p_familywise_region_intersection": 0.0138,
+      "plateau_cell_count": 18
+    }]
+  }],
+  "binding_sha256": "3f29987e37c9535634fcdb869dbf48722c80cc1e2eb3cb4dcada916bfe9cdf66"
+}
