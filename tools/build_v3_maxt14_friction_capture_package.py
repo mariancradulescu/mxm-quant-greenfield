@@ -7,7 +7,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = ROOT / "dist" / "MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V3.zip"
+TARGET = ROOT / "dist" / "MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V4.zip"
 
 FILES = (
     "V3_MAXT14_FRICTION_CAPTURE_RUN.py",

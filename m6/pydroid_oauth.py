@@ -321,28 +321,39 @@ def _open_browser(url: str) -> None:
         )
 
 
-def _best_effort_return_to_pydroid() -> bool:
-    """Ask Android to foreground the already-installed Pydroid launcher activity.
+PYDROID_PACKAGE = "ru.iiec.pydroid3"
+PYDROID_MAIN_COMPONENT = "ru.iiec.pydroid3/ru.iiec.pydroid.MainActivity"
 
-    This does not use an browser deep-link browser URL and therefore cannot intentionally route
-    through Google Play. Failure is non-fatal; the user can return via Android Recents.
-    """
-    try:
-        completed = subprocess.run(
-            [
-                "am", "start",
-                "-a", "android.intent.action.MAIN",
-                "-c", "android.intent.category.LAUNCHER",
-                "-p", "ru.iiec.pydroid3",
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=3,
-            check=False,
-        )
-        return completed.returncode == 0
-    except (OSError, subprocess.SubprocessError):
-        return False
+
+def _pydroid_foreground_commands() -> tuple[tuple[str, ...], ...]:
+    """Safe local Android activity-manager paths; no browser/deep-link routing."""
+    return (
+        ("am", "start", "-n", PYDROID_MAIN_COMPONENT),
+        (
+            "am", "start",
+            "-a", "android.intent.action.MAIN",
+            "-c", "android.intent.category.LAUNCHER",
+            "-p", PYDROID_PACKAGE,
+        ),
+    )
+
+
+def _best_effort_return_to_pydroid() -> bool:
+    """Try the earlier proven explicit activity, then launcher; Recents remains fallback."""
+    for command in _pydroid_foreground_commands():
+        try:
+            completed = subprocess.run(
+                list(command),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=3,
+                check=False,
+            )
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if completed.returncode == 0:
+            return True
+    return False
 
 
 def _start_callback_server(host="127.0.0.1", port=8765):
@@ -426,11 +437,14 @@ def _fresh_browser_authorization(timeout_seconds=300):
         _save_token_state(token)
 
         if _best_effort_return_to_pydroid():
-            print("[OAUTH] Authorization received. Android foreground return requested.")
+            print(
+                "[OAUTH] Authorization received. Pydroid foreground return requested "
+                "through Android's local activity manager."
+            )
         else:
             print(
-                "[OAUTH] Authorization received. Return to the SAME Pydroid run via "
-                "Android Recents. Do NOT press RUN again."
+                "[OAUTH] Authorization received. Automatic foreground return was unavailable. "
+                "Return to the SAME Pydroid run via Android Recents. Do NOT press RUN again."
             )
 
         # Keep localhost alive briefly after successful code exchange so Chrome cannot

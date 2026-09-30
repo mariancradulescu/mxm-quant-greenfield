@@ -408,8 +408,12 @@ class V3MaxT14FrictionRunner:
         self._historical_requests = 0
         self._historical_unavailable_responses = 0
         self._resume_reused_chunks = 0
-        self._app_authorized = False
-        self._authorized_account_id: int | None = None
+        # Logical authorization intent is separate from auth on the current TLS session.
+        # New transport sessions replay required auth exactly once; live sessions do not.
+        self._logical_app_authorized = False
+        self._logical_account_id: int | None = None
+        self._session_app_authorized = False
+        self._session_account_authorized_id: int | None = None
         self._account_evidence: dict[str, Any] = {}
         self._symbol_evidence: dict[str, Any] = {}
         self._started = time.monotonic()
@@ -613,21 +617,68 @@ class V3MaxT14FrictionRunner:
         return response
 
     def _restore_session(self) -> None:
+        """Open a new transport session and replay logically required auth once."""
         self.transport.connect()
         self._persist_network_endpoint_cache()
-        if self._app_authorized:
+        self._session_app_authorized = False
+        self._session_account_authorized_id = None
+
+        if self._logical_app_authorized:
             self._transport_request(
                 ProtoOAApplicationAuthReq(
                     clientId=self.client_id, clientSecret=self.client_secret
                 )
             )
-        if self._authorized_account_id is not None:
+            self._session_app_authorized = True
+
+        if self._logical_account_id is not None:
+            if not self._session_app_authorized:
+                raise CaptureContractError(
+                    "account session restore requires application authentication"
+                )
             self._transport_request(
                 ProtoOAAccountAuthReq(
-                    ctidTraderAccountId=self._authorized_account_id,
+                    ctidTraderAccountId=self._logical_account_id,
                     accessToken=self.access_token,
                 )
             )
+            self._session_account_authorized_id = self._logical_account_id
+
+    def _ensure_application_authenticated(self) -> None:
+        """Authenticate the application at most once on the current live session."""
+        if not bool(getattr(self.transport, "connected", False)):
+            self._restore_session()
+        if self._session_app_authorized:
+            return
+        self._send(
+            ProtoOAApplicationAuthReq(
+                clientId=self.client_id, clientSecret=self.client_secret
+            )
+        )
+        self._logical_app_authorized = True
+        self._session_app_authorized = True
+
+    def _ensure_account_authenticated(self, account_id: int) -> None:
+        """Authenticate one logical account once per session; never switch silently."""
+        account_id = int(account_id)
+        self._ensure_application_authenticated()
+        if self._session_account_authorized_id == account_id:
+            return
+        if (
+            self._logical_account_id is not None
+            and int(self._logical_account_id) != account_id
+        ):
+            raise CaptureContractError(
+                "attempted to switch authenticated cTrader account within one runner"
+            )
+        self._send(
+            ProtoOAAccountAuthReq(
+                ctidTraderAccountId=account_id,
+                accessToken=self.access_token,
+            )
+        )
+        self._logical_account_id = account_id
+        self._session_account_authorized_id = account_id
 
     def _send(self, request, *, historical: bool = False, retries: int = 4):
         require_read_only_request(type(request).__name__)
@@ -693,14 +744,10 @@ class V3MaxT14FrictionRunner:
         )
 
     def _authorized_live_accounts(self) -> list[dict[str, Any]]:
-        """Authenticate the app/token and return LIVE account descriptors only."""
-        self._restore_session()
-        self._send(
-            ProtoOAApplicationAuthReq(
-                clientId=self.client_id, clientSecret=self.client_secret
-            )
-        )
-        self._app_authorized = True
+        """Return LIVE accounts after idempotent application auth."""
+        if not bool(getattr(self.transport, "connected", False)):
+            self._restore_session()
+        self._ensure_application_authenticated()
         accounts_res = self._send(
             ProtoOAGetAccountListByAccessTokenReq(accessToken=self.access_token)
         )
@@ -712,12 +759,7 @@ class V3MaxT14FrictionRunner:
     ) -> int:
         account_id = int(account["ctidTraderAccountId"])
         fingerprint = account_fingerprint(account_id)
-        self._authorized_account_id = account_id
-        self._send(
-            ProtoOAAccountAuthReq(
-                ctidTraderAccountId=account_id, accessToken=self.access_token
-            )
-        )
+        self._ensure_account_authenticated(account_id)
         trader_res = self._send(ProtoOATraderReq(ctidTraderAccountId=account_id))
         trader = _plain(trader_res.trader)
         broker_name = str(trader.get("brokerName") or "")

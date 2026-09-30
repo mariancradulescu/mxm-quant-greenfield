@@ -3,7 +3,13 @@ import json
 import unittest
 from pathlib import Path
 
+from m6.pydroid_oauth import (
+    PYDROID_MAIN_COMPONENT,
+    PYDROID_PACKAGE,
+    _pydroid_foreground_commands,
+)
 from research_core_v3.v3_friction_capture import (
+    V3MaxT14FrictionRunner,
     account_identity_recovery_decision,
     build_account_rebind_proposal_document,
     classify_ctrader_api_error,
@@ -156,6 +162,65 @@ class V3MaxT14FrictionCaptureTests(unittest.TestCase):
         encoded = json.dumps(proposal, sort_keys=True)
         self.assertNotIn("ctidTraderAccountId", encoded)
         self.assertNotIn("ctid_trader_account_id", encoded)
+
+    def test_application_auth_is_once_per_session_and_replayed_after_reconnect(self):
+        class Response:
+            pass
+
+        class FakeTransport:
+            def __init__(self):
+                self.connected = False
+                self.requests = []
+                self.cached_endpoints = ()
+
+            def connect(self):
+                self.connected = True
+
+            def close(self):
+                self.connected = False
+
+            def request(self, request, timeout=60):
+                self.requests.append(type(request).__name__)
+                return Response()
+
+        runner = object.__new__(V3MaxT14FrictionRunner)
+        runner.client_id = "client"
+        runner.client_secret = "secret"
+        runner.access_token = "token"
+        runner.transport = FakeTransport()
+        runner._logical_app_authorized = False
+        runner._logical_account_id = None
+        runner._session_app_authorized = False
+        runner._session_account_authorized_id = None
+        runner._persist_network_endpoint_cache = lambda: None
+        runner._historical_requests = 0
+        runner._historical_unavailable_responses = 0
+        runner._last_historical_send = None
+        runner._stage = lambda message: None
+
+        runner._restore_session()
+        runner._ensure_application_authenticated()
+        runner._ensure_application_authenticated()
+        self.assertEqual(
+            runner.transport.requests.count("ProtoOAApplicationAuthReq"), 1
+        )
+
+        runner.transport.close()
+        runner._restore_session()
+        runner._ensure_application_authenticated()
+        self.assertEqual(
+            runner.transport.requests.count("ProtoOAApplicationAuthReq"), 2
+        )
+
+    def test_pydroid_foreground_uses_explicit_component_before_launcher_fallback(self):
+        commands = _pydroid_foreground_commands()
+        self.assertGreaterEqual(len(commands), 2)
+        self.assertEqual(
+            commands[0],
+            ("am", "start", "-n", PYDROID_MAIN_COMPONENT),
+        )
+        self.assertEqual(PYDROID_PACKAGE, "ru.iiec.pydroid3")
+        self.assertIn(PYDROID_PACKAGE, commands[1])
 
     def test_real_frozen_scope_geometry_preflight(self):
         geometry = local_geometry_preflight(ROOT)

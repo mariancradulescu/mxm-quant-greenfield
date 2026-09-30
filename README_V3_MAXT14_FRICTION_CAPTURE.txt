@@ -30,8 +30,11 @@ Run
 3. Run that same file. The saved token is checked against the frozen V3 account fingerprint
    before any historical quote request.
 4. If the saved token does not authorize the frozen account, the same run opens ONE fresh
-   official cTrader authorization. Select the intended Pepperstone Europe LIVE account and
-   return to the same Pydroid process. Do not start a second copy.
+   official cTrader authorization. Select the intended Pepperstone Europe LIVE account.
+   After callback/token exchange, the script first tries the explicit Pydroid MainActivity
+   foreground path that worked in the earlier Android flow, then the generic launcher intent.
+   If Android still leaves the browser foregrounded, return through Android Recents to the
+   SAME running Pydroid process. Never press RUN a second time.
 5. If the frozen fingerprint becomes uniquely authorized, the script reverifies Pepperstone
    LIVE identity plus all 14 exact symbol IDs/names and only then starts BID/ASK capture.
 6. If fresh OAuth still exposes a different account, capture remains blocked. A local account
