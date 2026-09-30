@@ -1,4 +1,4 @@
-name: V3 maxT14 authentic friction package
+name: V3 staged authentic friction package
 on:
   push:
     branches: [performance-research-v3-20260922]
@@ -16,7 +16,7 @@ jobs:
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile targeted V3 capture and evidence runtime
         run: |
-          python -m py_compile V3_MAXT14_FRICTION_CAPTURE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/pydroid_v3_friction_launcher.py research_core_v3/v3_friction_evidence.py m6/pydroid_oauth.py tools/build_v3_maxt14_friction_capture_package.py tools/assess_v3_maxt14_friction_evidence.py
+          python -m py_compile V3_MAXT14_FRICTION_STAGE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/v3_friction_staged.py research_core_v3/pydroid_v3_friction_staged_launcher.py research_core_v3/v3_friction_evidence.py m6/pydroid_oauth.py tools/build_v3_maxt14_friction_capture_package.py tools/assess_v3_maxt14_friction_evidence.py
       - name: No-network exact frozen-scope geometry preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -31,15 +31,15 @@ jobs:
           PY
       - name: Focused unit tests
         run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_maxt14_friction_evidence -v
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_staged_friction tests.test_v3_maxt14_friction_evidence -v
       - name: Build deterministic Android capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_maxt14_friction_capture_package.py
-          sha256sum dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V5.zip
+          sha256sum dist/MXM_V3_STAGED_FRICTION_PACKAGE_V6.zip
       - name: Upload capture package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V5
-          path: dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V5.zip
+          name: MXM_V3_STAGED_FRICTION_PACKAGE_V6
+          path: dist/MXM_V3_STAGED_FRICTION_PACKAGE_V6.zip
           if-no-files-found: error
           retention-days: 30
