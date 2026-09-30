@@ -1,0 +1,62 @@
+{
+  "schema": "mxm.research-core-v3.broker-native-quote-microstructure-pilot-acquisition.v1",
+  "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "source_audit_sha256": "792256a955dba4585eb42a30c2cd82f711b44e47d36038cf7168187762445458",
+  "source_design_sha256": "7ed9121bf5c13e6067617c51ecbb650f7692757ebde7d4512a6fc9f8dc0279ca",
+  "broker_identity": {
+    "environment": "Pepperstone - Europe LIVE",
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "selection": {
+    "selected_symbols": 5,
+    "prior_strategy_return_outcomes_used": false,
+    "execution_plausibility_only": true
+  },
+  "targets": [
+    {"symbol":"EURJPY","symbol_id":3},
+    {"symbol":"EURGBP","symbol_id":9},
+    {"symbol":"AUDCAD","symbol_id":18},
+    {"symbol":"GBPCAD","symbol_id":19},
+    {"symbol":"JPN225","symbol_id":116}
+  ],
+  "calendar": {
+    "dates_utc": ["2025-09-17","2025-10-01","2025-10-15","2025-10-29","2025-11-12","2025-11-26","2025-12-10","2025-12-24","2026-01-07","2026-01-21","2026-02-04","2026-02-18","2026-03-04","2026-03-18","2026-04-01","2026-04-15","2026-04-29","2026-05-13","2026-05-27","2026-06-10","2026-06-24","2026-07-08","2026-07-22","2026-08-05","2026-08-19","2026-09-02","2026-09-16"],
+    "windows_utc": [["00:00:00","01:00:00"],["07:00:00","08:00:00"],["13:00:00","14:00:00"]],
+    "query_padding_before_seconds": 90,
+    "query_padding_after_seconds": 45,
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z"
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "quote_sides": ["BID","ASK"],
+    "historical_request_max_span_ms": 604800000,
+    "request_min_interval_seconds": 0.22,
+    "pagination": "follow hasMore backward with chronology repair and exact duplicate boundary removal",
+    "base_side_requests_before_pagination": 810,
+    "raw_ticks_written_to_disk": false,
+    "raw_ticks_transferred_off_device": false,
+    "on_device_feature_and_response_aggregation": true,
+    "protected_forward_opened": false,
+    "fill_authority": false,
+    "automatic_additional_acquisition": false
+  },
+  "output": {
+    "bundle_name": "MXM_V3_QUOTE_MICROSTRUCTURE_PILOT_EVIDENCE_V1.zip",
+    "event_rows": "sanitized frozen-cell event rows with causal features and side-aware spread-net response",
+    "transport_provenance": true,
+    "current_symbol_metadata": true,
+    "checksums": true
+  },
+  "governance": {
+    "candidate_freeze_from_capture": false,
+    "net_certification_from_capture": false,
+    "pilot_result_may_not_open_protected_forward": true,
+    "pilot_null_does_not_close_1576_frontier": true
+  },
+  "binding_sha256": "f8055a213226bceb4c4eeb2dd50a36d7e2bc9f6a3d6bfdd8c6fbc2ea2a5a7d2f"
+}
