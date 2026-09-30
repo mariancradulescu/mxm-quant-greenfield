@@ -452,7 +452,8 @@ class V3MaxT14FrictionRunner:
             raise CaptureContractError("protected-forward flag is not closed")
         if p["acquisition"].get("fill_authority") is not False:
             raise CaptureContractError("quote capture may not claim fill authority")
-        configured_count = self.config.get("expected_target_count")
+        config = getattr(self, "config", {}) or {}
+        configured_count = config.get("expected_target_count")
         if configured_count is None:
             selection = p.get("selection") or {}
             configured_count = selection.get(
