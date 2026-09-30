@@ -1,0 +1,40 @@
+{
+  "schema": "mxm.research-core-v3.us-regular-session-opening-range-breakout-development-result.v1",
+  "status": "COMPLETE_DEVELOPMENT_ONLY_NO_ROBUST_GROSS_REGION",
+  "design_ref": "research_core_v3/state/US_REGULAR_SESSION_OPENING_RANGE_BREAKOUT_DEVELOPMENT_DESIGN_V1.json",
+  "design_sha256": "1af34b209d47a5cdc1ae952f2893295f71d60c8890a380b5f857409ccfa3d67a",
+  "design_commit": "612835a162f833ceb43961e66145d5f845e98aa7",
+  "test_count": 228,
+  "eligible_symbol_count": 19,
+  "multiplicity_support_eligible_cell_count": 228,
+  "economic_support_pass_count": 16,
+  "multiplicity_pass_count": 0,
+  "full_pass_count": 0,
+  "robust_region_count": 0,
+  "robust_regions": [],
+  "economic_pass_by_symbol": {
+    "AAPL.US-24":{"cell_count":1,"mean_gross_bps_range":[13.981859073270787,13.981859073270787],"best_familywise_p":0.7204},
+    "BABA.US-24":{"cell_count":1,"mean_gross_bps_range":[14.410433123054785,14.410433123054785],"best_familywise_p":0.1526},
+    "NKE.US-24":{"cell_count":2,"mean_gross_bps_range":[12.544035725282841,12.723691329293334],"best_familywise_p":0.9774},
+    "ORCL.US-24":{"cell_count":2,"mean_gross_bps_range":[21.477563842165385,23.23708267376323],"best_familywise_p":0.8532},
+    "TSLA.US-24":{"cell_count":10,"mean_gross_bps_range":[12.14152161346305,24.8356546403339],"best_familywise_p":0.5672}
+  },
+  "best_familywise_observed": {
+    "cell_id":"BABA.US-24|OR30|FMIDPOINT|H24","symbol_id":3033,"broker_symbol":"BABA.US-24",
+    "opening_range_minutes":30,"failure_rule":"MIDPOINT","maximum_hold_bars":24,"attempted_events":178,"completed_events":178,
+    "retention_fraction":1.0,"distinct_dates":178,"distinct_iso_weeks":53,"mean_gross_bps":14.410433123054785,
+    "median_gross_bps":3.6334102550117975,"cluster_se_bps":4.693787142396822,"t_stat":3.0701079290306894,
+    "chronological_thirds_mean_gross_bps":[20.99601545953983,20.00353423617717,2.1201296338459055],
+    "top10pct_abs_concentration":0.2714809694553161,"p_familywise":0.1526,"multiplicity_pass":false,"full_pass":false
+  },
+  "best_mean_observed": {
+    "cell_id":"QCOM.US-24|OR30|FOPPOSITE_BOUNDARY|H24","symbol_id":5414,"broker_symbol":"QCOM.US-24",
+    "mean_gross_bps":34.09544119083512,"median_gross_bps":26.380700050322833,
+    "chronological_thirds_mean_gross_bps":[29.174843475298474,101.45176651124119,-28.340286414034345],
+    "p_familywise":0.9322,"economic_support_pass":false,"multiplicity_pass":false,"full_pass":false
+  },
+  "multiplicity_implementation":{"all_228_cells_remain_family_members":true,"support_ineligible_cells_assigned_p1":true,"resamples":4999,"seed":20260930,"dependence_cluster":"ISO week"},
+  "protected_forward_opened":false,"candidate_frozen_count":0,"net_certified_count":0,"new_android_acquisition_required":false,
+  "interpretation":{"post_outcome_grid_or_session_time_rescue_forbidden":true,"family_status":"PARKED_MULTIPLICITY_NULL_DESPITE_16_ECONOMIC_SUPPORT_CELLS","next_action":"SELECT_NEXT_DISTINCT_PREOUTCOME_RESEARCH_FRONTIER"},
+  "canonical_sha256":"5dd6946559ff27b792b18e83e0532efd9cfd8dd4de0eb1aa97e415e998d1720c"
+}
