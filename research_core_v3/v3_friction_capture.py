@@ -448,8 +448,18 @@ class V3MaxT14FrictionRunner:
             raise CaptureContractError("protected-forward flag is not closed")
         if p["acquisition"].get("fill_authority") is not False:
             raise CaptureContractError("quote capture may not claim fill authority")
-        if len(p["targets"]) != 14:
-            raise CaptureContractError("maxT14 target count changed")
+        configured_count = self.config.get("expected_target_count")
+        if configured_count is None:
+            selection = p.get("selection") or {}
+            configured_count = selection.get(
+                "selected_symbols",
+                selection.get("selected_regions", len(p["targets"])),
+            )
+        if len(p["targets"]) != int(configured_count):
+            raise CaptureContractError(
+                f"friction target count changed: expected {configured_count}, "
+                f"observed {len(p['targets'])}"
+            )
         if p.get("schema") == "mxm.research-core-v3.maxt14-authentic-friction-acquisition.v2":
             rebind = p.get("account_identity_rebind") or {}
             if rebind.get("research_scope_changed") is not False:
@@ -930,7 +940,10 @@ class V3MaxT14FrictionRunner:
         return target
 
     def _authenticate_and_verify_targets(self) -> int:
-        self._stage("[1/4] Verifying exact Pepperstone LIVE account and 14 symbol identities")
+        self._stage(
+            f"[1/4] Verifying exact Pepperstone LIVE account and "
+            f"{len(self.plan['targets'])} symbol identities"
+        )
         accounts = self._authorized_live_accounts()
         expected_fingerprint = self.plan["broker_identity"][
             "accepted_account_fingerprint_sha256"
@@ -948,7 +961,8 @@ class V3MaxT14FrictionRunner:
             )
         account_id = self._verify_account_and_targets(matching_accounts[0])
         self._stage(
-            "[PREFLIGHT PASS] accepted account fingerprint and all 14 exact symbol IDs verified"
+            f"[PREFLIGHT PASS] accepted account fingerprint and all "
+            f"{len(self.plan['targets'])} exact symbol IDs verified"
         )
         return account_id
 
