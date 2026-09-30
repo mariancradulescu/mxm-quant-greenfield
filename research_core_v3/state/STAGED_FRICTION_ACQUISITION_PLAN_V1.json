@@ -1,0 +1,109 @@
+{
+  "schema": "mxm.research-core-v3.staged-friction-acquisition.v1",
+  "status": "FROZEN_OUTCOME_BLIND_STAGED_AUTHENTIC_FRICTION_DESIGN",
+  "source_plan_path": "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json",
+  "source_plan_binding_sha256": "0704a9984b4121e3998802f4bf809c93df7fe55ee342b1bf281fe96e5a9c1875",
+  "source_corrected_surface_sha256": "0ceb1f79080f8c9ef5cf6a13c0f56b279d02ffabc9644624f58230c705fcccbb",
+  "source_corrected_region_assessment_sha256": "7ab0000e92bd39a28d3de3aafc328927eb25fdcf42e68240e31b1a800461026a",
+  "scope": {
+    "corrected_development_cells": 7975,
+    "gross_robust_regions": 88,
+    "priority_regions": 14,
+    "other_gross_regions_cost_unresolved": 74,
+    "authoritative_frontier": 1576,
+    "full_reference_exact_windows": 691919,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2": "LEGACY_READ_ONLY"
+  },
+  "principles": {
+    "historical_development_friction_only": true,
+    "post_protected_forward_for_development_selection": false,
+    "current_spread_substitution": false,
+    "raw_ticks_transferable": false,
+    "transport_may_overfetch": true,
+    "analysis_uses_only_frozen_reference_windows_or_frozen_sample_membership": true,
+    "transport_adaptation_may_use_only_tick_counts_pagination_bytes_latency_and_errors": true,
+    "transport_adaptation_may_not_use_bid_ask_prices_or_spreads": true
+  },
+  "stage0_benchmark": {
+    "anchor_selection": "PER_SYMBOL_REFERENCE_HOUR_WINDOW_COUNT_QUANTILES_25_50_90_DETERMINISTIC_TIEBREAK_BY_HOUR",
+    "anchors_per_symbol": 3,
+    "probe_spans_minutes": [5, 15, 60],
+    "quote_sides": ["BID", "ASK"],
+    "planned_base_probes": 252,
+    "metrics": [
+      "successful_api_responses",
+      "api_attempts",
+      "pagination_pages",
+      "tick_count",
+      "protobuf_response_bytes",
+      "elapsed_ms",
+      "has_more_count",
+      "page_depth",
+      "transient_retry_counts",
+      "transport_retry_count",
+      "broker_history_unavailable"
+    ],
+    "economic_values_recorded": false,
+    "raw_tick_values_persisted": false,
+    "transport_profile_rule": {
+      "candidate_spans_minutes": [60, 15, 5],
+      "choose": "LARGEST_SPAN_WITH_MAX_OBSERVED_PAGE_DEPTH_LE_2_PER_SYMBOL_SIDE;OTHERWISE_5_MINUTES",
+      "purpose": "TRANSPORT_ONLY_NOT_ECONOMIC_SELECTION"
+    }
+  },
+  "stage1_sampling": {
+    "primary_sampling_unit": "UTC_CALENDAR_HOUR_CONTAINING_ONE_OR_MORE_FROZEN_EXACT_WINDOWS",
+    "strata": "UTC_MONTH_X_6H_SESSION_BUCKET",
+    "session_buckets_utc": [[0, 6], [6, 12], [12, 18], [18, 24]],
+    "stage_hours_per_nonempty_stratum": [1, 2, 4, 8],
+    "maximum_looks_per_region": 4,
+    "ordering_seed_material": "SHA256(source_plan_binding|symbol|stratum|hour_start_ms)",
+    "selection": "HASH_ORDER_WITHOUT_REPLACEMENT_WITHIN_EACH_NONEMPTY_STRATUM",
+    "all_exact_windows_in_selected_hour_are_analyzed": true,
+    "additional_transport_ticks_outside_exact_windows_are_discarded_after_derivation": true,
+    "delay_sensitivity_seconds": [0, 1, 5, 30],
+    "fresh_quote_age_limit_seconds": 2
+  },
+  "sequential_rule": {
+    "familywise_alpha": 0.01,
+    "regions": 14,
+    "looks_per_region": 4,
+    "per_look_alpha": 0.00017857142857142857,
+    "death_test_variable": "MIN(FRESH_NONNEGATIVE_D0_SPREAD_BPS, 2*MINIMUM_GROSS_MEAN_RESPONSE_BPS);MISSING_STALE_UNAVAILABLE_OR_NEGATIVE_CONTRIBUTE_0_TO_DEATH_LOWER_BOUND",
+    "death_test_target": "EVENT_WINDOW_WEIGHTED_MEAN_OVER_FULL_FROZEN_REFERENCE_SCOPE",
+    "cluster_total_estimator": "STRATIFIED_UNIFORM_HOUR_SAMPLE;HORVITZ_STYLE_STRATUM_TOTAL_ESTIMATE_USING_KNOWN_REFERENCE_HOUR_COUNTS;DIVIDE_BY_TOTAL_REFERENCE_WINDOWS",
+    "one_sided_lower_bound": "HOEFFDING_BOUND_ON_BOUNDED_HOUR_CLUSTER_TOTALS_WITH_BONFERRONI_ALPHA_SPENDING",
+    "death_stop": "LOWER_BOUND_GT_MINIMUM_GROSS_MEAN_RESPONSE_BPS",
+    "precision_target_half_width_fraction_of_gross": 0.25,
+    "intermediate_no_death": "MARGINAL_EXPAND_SAMPLE",
+    "final_no_death": "INSUFFICIENT_KEEP_COST_UNRESOLVED",
+    "favorable_early_stop": false,
+    "interpretation": "ONLY_SPREAD_ALONE_CAN_PROVE_DEATH;NON_DEATH_DOES_NOT_CERTIFY_SURVIVAL_OR_NET_ECONOMICS"
+  },
+  "stage2": {
+    "exhaustive_capture_default": false,
+    "reserved_for": "REGIONS_WHERE_REMAINING_UNCERTAINTY_CAN_MATERIALLY_CHANGE_CANDIDATE_FREEZE_EXACT_REPLAY_OR_NET_ECONOMIC_DECISION"
+  },
+  "storage": {
+    "raw_tick_csv_long_term": false,
+    "raw_tick_values_written_to_disk": false,
+    "derived_hour_evidence_gzip": true,
+    "page_provenance_hashes": true,
+    "minimum_free_disk_bytes": 536870912,
+    "stage_work_dir_hard_cap_bytes": 268435456,
+    "hard_fail_before_silent_disk_growth": true,
+    "transfer_bundle_contains_raw_ticks": false
+  },
+  "observed_v5_baseline": {
+    "approximately_completed_base_chunks": 600,
+    "elapsed_seconds": 210,
+    "observed_base_chunk_rate_per_second": 2.857142857142857,
+    "exhaustive_base_requests_before_pagination": 461102,
+    "base_only_wall_clock_hours_at_observed_rate": 44.829361111111105,
+    "base_only_wall_clock_hours_at_official_5_per_second_ceiling": 25.616777777777777
+  },
+  "binding_sha256": "18d9f61aec64c622c56c4a4f2dbdf88ce804cfbbc3ceccdae125f6eec2e4d5c7"
+}
