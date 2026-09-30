@@ -1,0 +1,236 @@
+{
+  "schema": "mxm.research-core-v3.us-equity-opening-gap-cross-sectional-development-design.v1",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parent_research_head": "2844441a2c7237c324038a15f43c36831ba30932",
+  "family": "SEASONALITY_SESSION_TIME_X_CROSS_SECTIONAL_OPENING_GAP",
+  "rationale": {
+    "prior_epoch30_use": "FAMILY_LEVEL_NON_ECONOMIC_EVIDENCE_ONLY;NO_SUPPORTED_SYMBOL_OR_PEAK_HOUR_IS_SELECTED",
+    "c031_distinction": "C031_USED_INDIVIDUAL_MIXED_ASSET_GAP_SHOCK_THRESHOLD_AND_60M_REVERSION;THIS_DESIGN_USES_FIXED_DAILY_US_EQUITY_OPEN_GAP_CROSS_SECTIONAL_RANKING_WITH_NO_SHOCK_THRESHOLD",
+    "economic_reason": "US-24 panel has synchronized one-year DEVELOPMENT history, uniform product structure, fine volume lattice and much lower structural commission burden than exotic FX; opening session is a prospectively fixed high-activity market boundary"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "source_archives_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "timezone": "America/New_York",
+    "missing_bars": "DO_NOT_FABRICATE"
+  },
+  "universe": {
+    "selection_law": "ALL_31_US_EQUITY_EXTENDED_HOURS_CFD_IDENTITIES_ALREADY_PRESENT_IN_FROZEN_V3_ONE_YEAR_ARCHIVES",
+    "symbol_count": 31,
+    "symbols": [
+      {
+        "symbol_id": 2998,
+        "broker_symbol": "GOOG.US-24"
+      },
+      {
+        "symbol_id": 2999,
+        "broker_symbol": "AAPL.US-24"
+      },
+      {
+        "symbol_id": 3000,
+        "broker_symbol": "IBM.US-24"
+      },
+      {
+        "symbol_id": 3002,
+        "broker_symbol": "NFLX.US-24"
+      },
+      {
+        "symbol_id": 3004,
+        "broker_symbol": "PFE.US-24"
+      },
+      {
+        "symbol_id": 3005,
+        "broker_symbol": "SNAP.US-24"
+      },
+      {
+        "symbol_id": 3009,
+        "broker_symbol": "F.US-24"
+      },
+      {
+        "symbol_id": 3019,
+        "broker_symbol": "META.US-24"
+      },
+      {
+        "symbol_id": 3020,
+        "broker_symbol": "INTC.US-24"
+      },
+      {
+        "symbol_id": 3023,
+        "broker_symbol": "WMT.US-24"
+      },
+      {
+        "symbol_id": 3025,
+        "broker_symbol": "TSLA.US-24"
+      },
+      {
+        "symbol_id": 3027,
+        "broker_symbol": "ORCL.US-24"
+      },
+      {
+        "symbol_id": 3028,
+        "broker_symbol": "NKE.US-24"
+      },
+      {
+        "symbol_id": 3029,
+        "broker_symbol": "MSFT.US-24"
+      },
+      {
+        "symbol_id": 3032,
+        "broker_symbol": "AMZN.US-24"
+      },
+      {
+        "symbol_id": 3033,
+        "broker_symbol": "BABA.US-24"
+      },
+      {
+        "symbol_id": 3034,
+        "broker_symbol": "AMD.US-24"
+      },
+      {
+        "symbol_id": 5402,
+        "broker_symbol": "LLY.US-24"
+      },
+      {
+        "symbol_id": 5403,
+        "broker_symbol": "AVGO.US-24"
+      },
+      {
+        "symbol_id": 5406,
+        "broker_symbol": "ASML.US-24"
+      },
+      {
+        "symbol_id": 5410,
+        "broker_symbol": "CRM.US-24"
+      },
+      {
+        "symbol_id": 5411,
+        "broker_symbol": "ADBE.US-24"
+      },
+      {
+        "symbol_id": 5414,
+        "broker_symbol": "QCOM.US-24"
+      },
+      {
+        "symbol_id": 5424,
+        "broker_symbol": "UBER.US-24"
+      },
+      {
+        "symbol_id": 5449,
+        "broker_symbol": "PLTR.US-24"
+      },
+      {
+        "symbol_id": 5460,
+        "broker_symbol": "GIS.US-24"
+      },
+      {
+        "symbol_id": 5462,
+        "broker_symbol": "LULU.US-24"
+      },
+      {
+        "symbol_id": 5468,
+        "broker_symbol": "CCL.US-24"
+      },
+      {
+        "symbol_id": 5470,
+        "broker_symbol": "HOOD.US-24"
+      },
+      {
+        "symbol_id": 5474,
+        "broker_symbol": "AMCR.US-24"
+      },
+      {
+        "symbol_id": 5481,
+        "broker_symbol": "LYFT.US-24"
+      }
+    ],
+    "minimum_cross_section_breadth": 20,
+    "post_outcome_symbol_selection_forbidden": true
+  },
+  "signal": {
+    "session_close": "15:55 America/New_York exact M5 close of prior regular session",
+    "session_open": "09:30 America/New_York exact M5 open of current regular session",
+    "raw_gap": "open_09_30/current_prior_15_55_close_minus_1",
+    "causal_scale": "median(abs(raw_gap)) over exactly the prior 20 valid regular sessions for that symbol, excluding current gap",
+    "minimum_prior_scale_observations": 10,
+    "normalized_gap": "raw_gap / causal_scale",
+    "cross_sectional_ranking": "average-tie rank of normalized_gap across currently eligible fixed-universe symbols at current 09:30 open",
+    "no_outcome_selected_threshold": true
+  },
+  "timing": {
+    "decision": "09:30 NY open after all current gap values are observable",
+    "entry": "exact 09:35 NY M5 open",
+    "hold_minutes": [
+      30,
+      60,
+      120
+    ],
+    "exits": {
+      "30": "10:05 NY exact M5 open",
+      "60": "10:35 NY exact M5 open",
+      "120": "11:35 NY exact M5 open"
+    },
+    "exact_entry_and_exit_required": true,
+    "no_cross_gap_fill_or_interpolation": true
+  },
+  "portfolio_grid": {
+    "orientation": [
+      "CONTINUATION",
+      "REVERSAL"
+    ],
+    "selection_k_each_side": [
+      1,
+      2
+    ],
+    "hold_minutes": [
+      30,
+      60,
+      120
+    ],
+    "test_count": 12,
+    "CONTINUATION": "LONG_TOP_K_NORMALIZED_GAPS_SHORT_BOTTOM_K",
+    "REVERSAL": "LONG_BOTTOM_K_NORMALIZED_GAPS_SHORT_TOP_K",
+    "weighting": "EQUAL_ABSOLUTE_NOTIONAL_PER_LEG_TOTAL_LONG_GROSS_0_5_TOTAL_SHORT_GROSS_0_5",
+    "ties": "SYMBOL_ID_ASCENDING",
+    "one_portfolio_per_regular_session_per_cell": true
+  },
+  "gross_economic_gates": {
+    "minimum_completed_events": 180,
+    "minimum_event_retention_fraction": 0.8,
+    "minimum_mean_portfolio_gross_bps": 15,
+    "median_portfolio_gross_bps_must_be_positive": true,
+    "chronological_thirds": "ALL_THREE_MEAN_GROSS_BPS_AT_LEAST_5",
+    "maximum_top10pct_absolute_event_concentration": 0.5,
+    "minimum_connected_cells_same_orientation": 3,
+    "note": "NO_SPREAD_OR_PROXY_COST_IS_SUBTRACTED;15_BPS_IS_A_PROJECT_MATERIALITY_HEADROOM_GATE_NOT_A_FRICTION_ESTIMATE"
+  },
+  "multiplicity": {
+    "family": "ALL_12_FROZEN_PORTFOLIO_CELLS",
+    "method": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "region_evidence": "AT_LEAST_3_CONNECTED_SAME_ORIENTATION_CELLS_PASS_GROSS_GATES_AND_FAMILYWISE_P_LE_0_05"
+  },
+  "promotion_boundary": {
+    "candidate_freeze_allowed": false,
+    "net_certification_allowed": false,
+    "protected_forward_access": false,
+    "if_survivor": "INTERSECT_SELECTED_LEGS_AND_ENTRY_TIMES_WITH_EXISTING_AUTHENTIC_FRICTION_THEN_ACQUIRE_ONLY_MINIMAL_MISSING_EVENT_TIME_COST_EVIDENCE_IF_NEEDED",
+    "if_none": "MOVE_TO_NEXT_DISTINCT_FRONTIER_WITHOUT_POST_OUTCOME_PARAMETER_RESCUE"
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "new_android_acquisition": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_legacy_read_only": true
+  }
+}
