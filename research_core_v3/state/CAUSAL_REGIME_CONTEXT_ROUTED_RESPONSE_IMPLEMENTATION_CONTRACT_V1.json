@@ -1,0 +1,13 @@
+{
+  "schema": "mxm.research-core-v3.causal-regime-context-routed-response-implementation-contract.v1",
+  "status": "FROZEN_BEFORE_ROUTED_OUTCOME_COMPUTE",
+  "design_sha256": "dcfb5bb9537c4975ccb5df0f80f8b7d5a26ccb7a52e2f6becc054d9eb12936d1",
+  "event_calendar_assignment": "UTC date and ISO week of the entry next-open timestamp",
+  "gap_semantics": "A triggered event is scanned causally within its current exact-contiguous M5 segment. If target/failure triggers and its next-open execution exists before the first gap, the event completes. If no executable trigger occurs and the frozen time exit is unavailable before a gap, the event is right-censored at that gap.",
+  "censored_overlap_release": "After a right-censored event, the cell may evaluate new signals only from the first bar of the next exact-contiguous segment; no synthetic cross-gap exit is created.",
+  "daily_family_statistic": "For each architecture cell and UTC entry date, first average completed event gross bps within symbol; then equal-weight those symbol-day means across symbols.",
+  "route_statistic": "TREND and RANGE route means are arithmetic means of completed event gross bps within the route and are support gates, not separate multiplicity families.",
+  "maxT_statistic": "mean of daily-family gross bps divided by ISO-week cluster-robust standard error; shared ISO-week wild-sign flips applied to centered daily-family observations; 4999 resamples seed 20260930.",
+  "no_outcomes_observed_before_freeze": true,
+  "canonical_sha256": "dc34a4ba2da172d456afb6ec36aae890bf3c2717b8b83e4b905155bca6445829"
+}
