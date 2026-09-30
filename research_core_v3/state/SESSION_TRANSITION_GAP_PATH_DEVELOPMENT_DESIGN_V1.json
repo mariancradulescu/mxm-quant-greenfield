@@ -1,0 +1,119 @@
+{
+  "schema": "mxm.research-core-v3.session-transition-gap-path-development-design.v1",
+  "status": "FROZEN_BEFORE_PRICE_OUTCOMES",
+  "parent_audit_ref": "research_core_v3/state/SESSION_TRANSITION_GAP_PATH_PREOUTCOME_AUDIT_V1.json",
+  "parent_audit_sha256": "9c7d6af2d3bf6e61f247093852e228669893a6083e507ab239b01e80b2a15a07",
+  "parent_audit_commit": "bba9b3cd6a5420aed760342a85874dfd93b39015",
+  "family": "SESSION_TRANSITION_GAP_PATH",
+  "purpose": "TEST_A_DISTINCT_WITHIN_SYMBOL_REOPEN_GAP_REVERSION_PATH_WITH_CAUSAL_DELAYED_ENTRY_AND_ADAPTIVE_FILL_FAILURE_OR_TIME_EXIT;REQUIRE_MATERIAL_GROSS_HEADROOM_BEFORE_AUTHENTIC_FRICTION",
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {"start_utc":"2025-09-16T00:00:00Z","end_utc":"2026-09-16T23:59:59Z"},
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_archives": {
+      "selected_m5_development_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "high_quality_delta_m5_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    },
+    "missing_data": "NO_FILL_NO_INTERPOLATION_NO_RESAMPLING_NO_SYNTHETIC_BARS",
+    "exact_m5_seconds": 300
+  },
+  "universe": {
+    "selection_law": "ONLY_THE_5_TIMESTAMP_ELIGIBLE_NON_US_EQUITY_SERIES_FROZEN_BY_THE_PREOUTCOME_AUDIT",
+    "symbol_count": 5,
+    "symbols": [
+      {"symbol_id":41,"broker_symbol":"XAUUSD","underlying":"GOLD","gap_minutes":65,"utc_transition_pairs":[["20:55","22:00"],["21:55","23:00"]]},
+      {"symbol_id":95,"broker_symbol":"XPDUSD","underlying":"PALLADIUM","gap_minutes":65,"utc_transition_pairs":[["20:55","22:00"],["21:55","23:00"]]},
+      {"symbol_id":97,"broker_symbol":"XPTUSD","underlying":"PLATINUM","gap_minutes":65,"utc_transition_pairs":[["20:55","22:00"],["21:55","23:00"]]},
+      {"symbol_id":7394,"broker_symbol":"BRENTOIL-PERP","underlying":"BRENT_CRUDE","gap_minutes":185,"utc_transition_pairs":[["20:55","00:00"],["21:55","01:00"]]},
+      {"symbol_id":2926,"broker_symbol":"USDX-F","underlying":"USD_INDEX","gap_minutes":185,"utc_transition_pairs":[["20:55","00:00"],["21:55","01:00"]]}
+    ],
+    "us_equity_opening_gap_cross_sectional_scope_excluded": true,
+    "post_outcome_symbol_selection_forbidden": true
+  },
+  "event_definition": {
+    "pre_gap_mark": "CLOSE_OF_THE_LAST_M5_BAR_IMMEDIATELY_BEFORE_THE_FROZEN_RECURRING_SESSION_TRANSITION",
+    "reopen_mark": "OPEN_OF_THE_FIRST_M5_BAR_IMMEDIATELY_AFTER_THE_FROZEN_SESSION_TRANSITION",
+    "gap_bps": "LN(REOPEN_OPEN_DIV_PRE_GAP_CLOSE)*10000",
+    "pre_gap_scale": "1.4826_TIMES_MEDIAN_ABSOLUTE_OF_THE_11_EXACT_CONTIGUOUS_CLOSE_TO_CLOSE_LOG_RETURNS_FROM_THE_12_M5_BARS_ENDING_AT_PRE_GAP_BAR",
+    "normalized_gap": "ABS(LN(REOPEN_OPEN_DIV_PRE_GAP_CLOSE))_DIV_PRE_GAP_SCALE",
+    "zero_or_nonfinite_scale": "EXCLUDE_EVENT",
+    "direction": "REVERSION_ONLY;GAP_UP_SHORT_GAP_DOWN_LONG",
+    "entry_signal_availability": "GAP_IS_KNOWN_AT_REOPEN_BUT_M5_CANNOT_CERTIFY_EXECUTION_AT_THE_REOPEN_OPEN",
+    "entry": "OPEN_OF_THE_SECOND_POST_REOPEN_M5_BAR_AFTER_THE_FIRST_REOPEN_BAR_HAS_COMPLETED",
+    "entry_requires_exact_contiguity": true
+  },
+  "adaptive_exit": {
+    "fill_level": "PRE_GAP_CLOSE",
+    "fill_trigger": "FIRST_COMPLETED_POST_ENTRY_M5_BAR_WHOSE_CLOSE_REACHES_OR_CROSSES_PRE_GAP_CLOSE_IN_THE_REVERSION_DIRECTION",
+    "failure_level": "REOPEN_OPEN_PLUS_GAP_SIGN_TIMES_FAILURE_EXTENSION_MULTIPLE_TIMES_ABS(REOPEN_OPEN_MINUS_PRE_GAP_CLOSE)",
+    "failure_trigger": "FIRST_COMPLETED_POST_ENTRY_M5_BAR_WHOSE_CLOSE_REACHES_OR_CROSSES_THE_FAILURE_LEVEL_AWAY_FROM_THE_FILL_DIRECTION",
+    "trigger_execution": "OPEN_OF_THE_NEXT_EXACT_CONTIGUOUS_M5_BAR",
+    "time_exit": "OPEN_AFTER_MAX_HOLD_COMPLETED_POST_ENTRY_M5_BARS",
+    "priority_if_fill_and_failure_same_completed_bar": "FAIL_CLOSED_RIGHT_CENSOR_AMBIGUOUS_BAR",
+    "gap_or_missing_required_bar": "RIGHT_CENSOR_NO_REPAIR"
+  },
+  "parameter_grid": {
+    "minimum_normalized_gap": [1.0,2.0,3.0],
+    "failure_extension_multiple": [0.5,1.0,2.0],
+    "maximum_hold_bars": [12,24,48],
+    "cells_per_symbol": 27,
+    "total_test_count": 135,
+    "all_ranges_frozen_before_selected_price_outcomes": true
+  },
+  "gross_return": {
+    "unit": "BPS_PER_COMPLETED_EVENT",
+    "formula": "DIRECTION_TIMES_LN(EXIT_OPEN_DIV_ENTRY_OPEN)*10000",
+    "spread_commission_slippage_funding": "NOT_SUBTRACTED_HERE;AUTHENTIC_FRICTION_GATE_ONLY_AFTER_GROSS_SURVIVAL"
+  },
+  "economic_support_gate": {
+    "minimum_completed_events": 30,
+    "minimum_distinct_reopen_dates": 30,
+    "minimum_distinct_iso_weeks": 20,
+    "minimum_event_retention_fraction": 0.8,
+    "minimum_mean_gross_bps": 10.0,
+    "minimum_median_gross_bps": 0.0,
+    "chronological_thirds": "ALL_THREE_EVENT_COUNT_THIRDS_HAVE_STRICTLY_POSITIVE_MEAN_GROSS_BPS",
+    "maximum_top10pct_absolute_event_concentration": 0.5,
+    "gross_threshold_semantics": "MATERIAL_HEADROOM_SCREEN_NOT_A_PROXY_FOR_UNKNOWN_SPREAD"
+  },
+  "multiplicity": {
+    "family": "ALL_135_FROZEN_SYMBOL_X_PARAMETER_CELLS",
+    "dependence_unit": "ISO_WEEK_OF_REOPEN",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "statistic": "MEAN_EVENT_GROSS_BPS_DIV_ISO_WEEK_CLUSTER_ROBUST_STANDARD_ERROR",
+    "insufficient_or_nonpositive_cells_receive_p": 1.0
+  },
+  "robustness": {
+    "cell_pass": "ECONOMIC_SUPPORT_GATE_AND_FAMILYWISE_MULTIPLICITY_PASS",
+    "adjacency": "SAME_SYMBOL_AND_ONE_GRID_STEP_DIFFERENCE_IN_EXACTLY_ONE_OF_NORMALIZED_GAP_FAILURE_MULTIPLE_MAX_HOLD",
+    "minimum_connected_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "no_single_cell_promotion": true
+  },
+  "friction_and_execution_boundary": {
+    "no_invented_or_proxy_spread": true,
+    "no_new_android_before_gross_survivor": true,
+    "next_if_survivor": "INTERSECT_ONLY_SURVIVING_EVENT_TIMESTAMPS_WITH_EXISTING_AUTHENTIC_PEPPERSTONE_FRICTION;ACQUIRE_MINIMAL_MISSING_EVENT_TIME_FRICTION_ONLY_IF_NEEDED",
+    "eur200_volume_lattice_margin_and_sizing_replay_required_before_candidate_freeze": true,
+    "funding_and_carry_required_if_ANY_HOLD_CAN_CROSS_A_FINANCING_BOUNDARY": true
+  },
+  "promotion_boundary": {
+    "development_only": true,
+    "candidate_freeze_from_this_result": false,
+    "net_certification_from_this_result": false,
+    "protected_forward_access": false,
+    "next_if_no_robust_region": "PARK_THIS_EXACT_SESSION_TRANSITION_GAP_REVERSION_PATH;NO_POST_OUTCOME_THRESHOLD_OR_EXIT_RESCUE"
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_orders_authorized": false,
+    "runtime_v2_legacy_read_only": true,
+    "epoch_routing_reactivated": false
+  },
+  "canonical_sha256": "1a6d34e56e93ca5799f0a3218daebe0624b20ffc0463b2e1d91cf7e0fff9407f"
+}
