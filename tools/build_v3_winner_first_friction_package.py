@@ -9,7 +9,7 @@ from pathlib import Path
 from tools.freeze_v3_winner_first_sampling import generate
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = ROOT / "dist" / "MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9.zip"
+TARGET = ROOT / "dist" / "MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip"
 
 FILES = (
     "V3_WINNER_FIRST_FRICTION_SCREEN_RUN.py",
