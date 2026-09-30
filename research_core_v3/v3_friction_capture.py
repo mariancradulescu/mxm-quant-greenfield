@@ -406,7 +406,10 @@ class V3MaxT14FrictionRunner:
 
         self._last_historical_send: float | None = None
         self._historical_requests = 0
+        self._historical_attempts = 0
         self._historical_unavailable_responses = 0
+        self._transient_retry_counts: dict[str, int] = {}
+        self._transport_retry_count = 0
         self._resume_reused_chunks = 0
         # Logical authorization intent is separate from auth on the current TLS session.
         # New transport sessions replay required auth exactly once; live sessions do not.
@@ -702,6 +705,8 @@ class V3MaxT14FrictionRunner:
                         time.sleep(delay)
                 self._last_historical_send = time.monotonic()
             try:
+                if historical:
+                    self._historical_attempts += 1
                 response = self._transport_request(request)
                 if historical:
                     self._historical_requests += 1
@@ -720,6 +725,10 @@ class V3MaxT14FrictionRunner:
                         f"{exc.code}: {redact_text(exc.description)}"
                     ) from None
                 last = exc
+                if historical:
+                    self._transient_retry_counts[exc.code] = (
+                        self._transient_retry_counts.get(exc.code, 0) + 1
+                    )
                 if attempt >= retries:
                     break
                 delay = max(
@@ -733,6 +742,8 @@ class V3MaxT14FrictionRunner:
                 time.sleep(delay)
             except Exception as exc:
                 last = exc
+                if historical:
+                    self._transport_retry_count += 1
                 if attempt >= retries:
                     break
                 delay = min(8.0, float(2 ** (attempt - 1)))
