@@ -39,7 +39,7 @@ to open protected-forward. No Look2, Look3 or Look4 is requested automatically.
 Transport benchmark
 -------------------
 Stage 0 benchmarks 1m, 5m, 15m, 60m and 180m ranges at three frozen density anchors per
-symbol and both quote sides: 420 base probes total. It records latency, API attempts,
+symbol and both quote sides for 1m/5m/15m/60m, plus the 180m envelope only at the\nmedian-density anchor: 364 base probes total. It records latency, API attempts,
 pagination, protobuf bytes, tick counts, retries/rate limits and historical unavailability,
 but no prices/spreads.
 
