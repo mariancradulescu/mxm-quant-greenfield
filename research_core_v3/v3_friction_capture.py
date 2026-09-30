@@ -183,12 +183,16 @@ def build_account_rebind_proposal_document(
     }
     if observed != expected:
         raise CaptureContractError(
-            "account rebind requires exact current applicability for all 14 frozen symbols"
+            "account rebind requires exact current applicability for all frozen target symbols"
         )
     prior = plan.get("recovered_prior_evidence_audit") or {}
-    if prior.get("direct_historical_tick_coverage_for_selected_14") != "NONE_FOUND":
+    prior_coverage = prior.get(
+        "direct_historical_tick_coverage_for_selected_14",
+        prior.get("direct_historical_tick_coverage_for_selected_scope", "NONE_FOUND"),
+    )
+    if prior_coverage != "NONE_FOUND":
         raise CaptureContractError(
-            "account rebind cannot be auto-proposed after prior selected-14 account evidence"
+            "account rebind cannot be auto-proposed after prior selected-scope account evidence"
         )
     symbol_binding = _sha_bytes(
         _canonical(
@@ -230,7 +234,7 @@ def build_account_rebind_proposal_document(
         "authority_change_performed": False,
         "scientific_basis": (
             "The gross DEVELOPMENT surface and candidate regions are account-independent "
-            "at this stage; selected-14 historical friction remains unresolved. Rebinding "
+            "at this stage; selected-scope historical friction remains unresolved. Rebinding "
             "is eligible only before historical quote capture, after Pepperstone LIVE "
             "identity and exact 14-symbol applicability are reverified. The frozen account "
             "authority must be durably rebound before any historical BID/ASK request."
@@ -448,8 +452,18 @@ class V3MaxT14FrictionRunner:
             raise CaptureContractError("protected-forward flag is not closed")
         if p["acquisition"].get("fill_authority") is not False:
             raise CaptureContractError("quote capture may not claim fill authority")
-        if len(p["targets"]) != 14:
-            raise CaptureContractError("maxT14 target count changed")
+        configured_count = self.config.get("expected_target_count")
+        if configured_count is None:
+            selection = p.get("selection") or {}
+            configured_count = selection.get(
+                "selected_symbols",
+                selection.get("selected_regions", len(p["targets"])),
+            )
+        if len(p["targets"]) != int(configured_count):
+            raise CaptureContractError(
+                f"friction target count changed: expected {configured_count}, "
+                f"observed {len(p['targets'])}"
+            )
         if p.get("schema") == "mxm.research-core-v3.maxt14-authentic-friction-acquisition.v2":
             rebind = p.get("account_identity_rebind") or {}
             if rebind.get("research_scope_changed") is not False:
@@ -930,7 +944,10 @@ class V3MaxT14FrictionRunner:
         return target
 
     def _authenticate_and_verify_targets(self) -> int:
-        self._stage("[1/4] Verifying exact Pepperstone LIVE account and 14 symbol identities")
+        self._stage(
+            f"[1/4] Verifying exact Pepperstone LIVE account and "
+            f"{len(self.plan['targets'])} symbol identities"
+        )
         accounts = self._authorized_live_accounts()
         expected_fingerprint = self.plan["broker_identity"][
             "accepted_account_fingerprint_sha256"
@@ -948,7 +965,8 @@ class V3MaxT14FrictionRunner:
             )
         account_id = self._verify_account_and_targets(matching_accounts[0])
         self._stage(
-            "[PREFLIGHT PASS] accepted account fingerprint and all 14 exact symbol IDs verified"
+            f"[PREFLIGHT PASS] accepted account fingerprint and all "
+            f"{len(self.plan['targets'])} exact symbol IDs verified"
         )
         return account_id
 
