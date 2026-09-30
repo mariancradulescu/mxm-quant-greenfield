@@ -109,6 +109,19 @@ def freeze_global_triage_sampling(
     return out
 
 
+def expand_within_hour_cluster_total(
+    sampled_total: float,
+    *,
+    reference_window_count: int,
+    sampled_window_count: int,
+) -> float:
+    reference = int(reference_window_count)
+    sampled = int(sampled_window_count)
+    if sampled <= 0 or reference < sampled:
+        raise CaptureContractError("invalid within-hour inclusion geometry")
+    return float(sampled_total) * reference / sampled
+
+
 def global_death_bound(
     *,
     gross_bps: float,
@@ -590,11 +603,11 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
                 sampled_count = len(doc["rows"])
                 reference_count = int(doc["reference_window_count"])
                 if inclusion_weighted:
-                    if sampled_count <= 0 or reference_count < sampled_count:
-                        raise CaptureContractError(
-                            "invalid within-hour inclusion geometry"
-                        )
-                    value *= reference_count / sampled_count
+                    value = expand_within_hour_cluster_total(
+                        value,
+                        reference_window_count=reference_count,
+                        sampled_window_count=sampled_count,
+                    )
                 else:
                     coverage[
                         "implicit_zero_unselected_within_sampled_hours"
