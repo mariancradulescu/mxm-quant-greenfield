@@ -1,0 +1,110 @@
+{
+  "schema": "mxm.research-core-v3.crypto-cross-sectional-dislocation-reversal-development-design.v1",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parent_research_head": "9d8e0f12ff61ab5be5ce2e28a3b99a7eaff472a4",
+  "family": "CROSS_SECTIONAL_RANKING",
+  "subfamily": "CRYPTO_VOL_NORMALIZED_DISLOCATION_REVERSAL",
+  "purpose": "TEST_SELECTIVE_LOW_CONCURRENCY_CRYPTO_RELATIVE_DISLOCATION_REVERSAL_WITH_GROSS_HEADROOM_LARGE_ENOUGH_TO_JUSTIFY_AUTHENTIC_FRICTION_IF_IT_SURVIVES",
+  "pre_outcome_rationale": {
+    "crypto_native_move_scale_can_SUPPORT_MATERIAL_BPS_HEADROOM": true,
+    "relative_cross_sectional_dislocation_is_DISTINCT_FROM_SINGLE_SYMBOL_MEAN_REVERSION_AND_FAILED_BREAKOUT": true,
+    "dispersion_gate_is_FROZEN_BEFORE_OUTCOME_TO_AVOID_TRADING_ROUTINE_SMALL_RANK_DIFFERENCES": true,
+    "K_EQUALS_1_LIMITS_CONCURRENCY_TO_TWO_MIN_VOLUME_LEGS": true,
+    "market_outcomes_used_for_grid_or_universe": false
+  },
+  "universe": {
+    "authority_ref": "research_core_v3/state/INCLUSIVE_FULL_DEPTH_DISCOVERY_CORE_V1.json",
+    "selection_law": "SAME_28_PRIMARY_CORE_CRYPTO_UNDERLYINGS_FROZEN_FOR_THE_INTRABAR_TEST;ONE_CROSS_PER_UNDERLYING_QUOTE_PREFERENCE_USD_THEN_EUR_THEN_GBP_THEN_AUD",
+    "symbol_count": 28,
+    "two_leg_max_minimum_margin_estimate_eur": "LESS_THAN_30_BASED_ON_FROZEN_CORE_METADATA;FINAL_EXECUTION_REPLAY_STILL_REQUIRED",
+    "selection_outcome_blind": true
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_archive_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "exact_contiguity_seconds": 300,
+    "missing_bars": "NO_FILL_INTERPOLATION_RESAMPLING_OR_SYNTHETIC_BARS"
+  },
+  "signal": {
+    "score": "LN(CLOSE_t/CLOSE_t_minus_L)/(POP_STD_OF_L_ONE_BAR_LOG_RETURNS*SQRT(L))_ON_EXACT_CONTIGUOUS_COMPLETED_BARS",
+    "decision_grid": "UNIX_M5_BAR_INDEX_MOD_H_EQUALS_ZERO",
+    "minimum_valid_cross_section": 20,
+    "dispersion": "MAX_VALID_SCORE_MINUS_MIN_VALID_SCORE",
+    "admission": "DISPERSION_AT_LEAST_D",
+    "orientation": "REVERSAL_ONLY_LONG_LOWEST_SCORE_SHORT_HIGHEST_SCORE",
+    "tie_break": "SYMBOL_ID_ASCENDING",
+    "K": 1,
+    "entry": "NEXT_EXACT_M5_OPEN_FOR_BOTH_LEGS",
+    "exit": "OPEN_AFTER_H_COMPLETED_M5_BARS_FOR_BOTH_LEGS",
+    "portfolio_gross_bps": "MEAN_OF_LONG_AND_SHORT_DIRECTIONAL_LOG_RETURN_BPS",
+    "observation_admission": "BOTH_SELECTED_LEGS_REQUIRE_COMPLETE_EXACT_ENTRY_TO_EXIT_PATH"
+  },
+  "parameter_grid": {
+    "lookback_bars": [
+      12,
+      24,
+      48
+    ],
+    "minimum_score_dispersion": [
+      2,
+      3
+    ],
+    "hold_rebalance_bars": [
+      6,
+      12,
+      24
+    ],
+    "cell_count": 18,
+    "ranges_frozen_before_outcome": true
+  },
+  "economic_support_gate": {
+    "minimum_completed_portfolio_observations": 500,
+    "minimum_distinct_utc_dates": 180,
+    "minimum_distinct_iso_weeks": 45,
+    "minimum_observation_retention_fraction": 0.8,
+    "minimum_mean_portfolio_gross_bps": 15,
+    "minimum_median_portfolio_gross_bps": 0,
+    "chronological_thirds": "ALL_THREE_OBSERVATION_COUNT_THIRDS_STRICTLY_POSITIVE_MEAN_GROSS_BPS",
+    "gross_threshold_semantics": "HIGH_HEADROOM_SCREEN_ONLY_NOT_A_SPREAD_PROXY"
+  },
+  "multiplicity": {
+    "family": "ALL_18_FROZEN_CELLS",
+    "dependence_unit": "UTC_ISO_WEEK",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "insufficient_cells_receive_p": 1
+  },
+  "robustness": {
+    "local_cell_pass": "ECONOMIC_SUPPORT_GATE_AND_FAMILYWISE_MULTIPLICITY_PASS",
+    "adjacency": "ONE_GRID_STEP_IN_EXACTLY_ONE_OF_LOOKBACK_DISPERSION_HOLD",
+    "minimum_connected_cells": 3,
+    "minimum_varied_axes": 2,
+    "no_single_cell_promotion": true
+  },
+  "friction_execution_boundary": {
+    "no_proxy_spread": true,
+    "gross_only_at_this_stage": true,
+    "if_survivor": "INTERSECT_ONLY_SURVIVING_LONG_SHORT_EVENT_TIMESTAMPS_WITH_AUTHENTIC_PEPPERSTONE_SPREAD_AND_COMMISSION_THEN_REPLAY_EXACT_MIN_VOLUME_MARGIN_AND_TWO_LEG_ALLOCATOR_ON_EUR200",
+    "candidate_freeze_here": false,
+    "protected_forward_access": false
+  },
+  "if_null": "PARK_THIS_EXACT_CRYPTO_CROSS_SECTIONAL_DISLOCATION_REVERSAL_REGION_WITHOUT_POST_OUTCOME_K_DISPERSION_LOOKBACK_OR_HOLD_RESCUE",
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_orders_authorized": false,
+    "runtime_v2_legacy_read_only": true
+  },
+  "canonical_sha256": "e9b772885311938057eeaddf4f481e68f6b561d34f77e76422508e5872b327c8"
+}
