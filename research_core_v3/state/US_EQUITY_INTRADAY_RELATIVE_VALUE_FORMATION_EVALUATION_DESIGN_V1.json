@@ -1,0 +1,104 @@
+{
+  "schema": "mxm.research-core-v3.us-equity-intraday-relative-value-formation-evaluation-design.v1",
+  "status": "FROZEN_BEFORE_PAIR_FORMATION_AND_TRADING_OUTCOMES",
+  "parent_research_head": "a2b240dc7cd9204f948230bc25cdfa223343e400",
+  "family": "RELATIVE_VALUE_COINTEGRATION",
+  "subfamily": "US_EQUITY_INTRADAY_RETURN_RESIDUAL_MEAN_REVERSION",
+  "purpose": "USE_A_COHERENT_ALIGNED_US_EQUITY_PANEL_TO_FORM_PAIRS_ON_A_NONTRADING_FORMATION_SAMPLE_AND_TEST_HIGHER_FREQUENCY_RELATIVE_VALUE_ONLY_ON_A_DISJOINT_EVALUATION_SAMPLE",
+  "data": {
+    "resolution": "M5",
+    "classification": "DEVELOPMENT_ONLY",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "source_archives_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "timezone": "America/New_York",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "universe": {
+    "law": "SAME_FROZEN_31_US_24_EXTENDED_HOURS_EQUITY_CFD_PANEL",
+    "symbol_count": 31,
+    "post_formation_pair_substitution_forbidden": true
+  },
+  "split": {
+    "eligible_session_law": "NY_REGULAR_SESSION_DATE_WITH_AT_LEAST_30_OF_31_SYMBOLS_HAVING_EXACT_09_30_OPEN_AND_15_55_CLOSE",
+    "formation_sessions": "FIRST_84_ELIGIBLE_SESSIONS_ONLY",
+    "evaluation_sessions": "ALL_SUBSEQUENT_ELIGIBLE_SESSIONS_THROUGH_DEVELOPMENT_END",
+    "formation_trading_pnl_forbidden": true,
+    "evaluation_data_for_pair_selection_forbidden": true
+  },
+  "formation": {
+    "feature": "30_MINUTE_REGULAR_SESSION_CLOSE_TO_CLOSE_RETURN",
+    "anchors": "M5 bars with NY local bar-open minute 25 or 55, from 10:25 through 14:25 inclusive; each feature requires exact 6-bar backward continuity",
+    "pair_common_observation_minimum": 500,
+    "score": "PEARSON_CORRELATION_OF_30_MINUTE_RETURNS",
+    "minimum_pair_correlation": 0.5,
+    "beta": "OLS_RETURN_BETA_A_ON_B_WITH_INTERCEPT_ON_FORMATION_COMMON_OBSERVATIONS",
+    "beta_bounds": [
+      0.2,
+      5
+    ],
+    "residual_center_and_scale": "FORMATION_MEAN_AND_POPULATION_STD_OF_rA_MINUS_alpha_MINUS_beta_rB",
+    "pair_selection": "GREEDY_DESCENDING_CORRELATION_THEN_SYMBOL_ID_PAIR_ASCENDING;SELECT_UP_TO_5_DISJOINT_PAIRS",
+    "if_fewer_than_two_pairs": "STOP_NO_TRADING_EVALUATION",
+    "selected_pair_authority_must_be_persisted_before_evaluation": true
+  },
+  "evaluation_signal": {
+    "same_30_minute_return_feature": true,
+    "zscore": "(rA-alpha-beta*rB-formation_residual_mean)/formation_residual_std",
+    "thresholds": [
+      1.5,
+      2,
+      2.5
+    ],
+    "direction": "MEAN_REVERSION_OF_RESIDUAL",
+    "signal_positive_z": "SHORT_A_LONG_B",
+    "signal_negative_z": "LONG_A_SHORT_B",
+    "entry": "NEXT_EXACT_M5_OPEN_AFTER_COMPLETED_30_MINUTE_SIGNAL",
+    "no_overlap_per_pair": true
+  },
+  "portfolio_execution": {
+    "hold_minutes": [
+      30,
+      60
+    ],
+    "exit": "EXACT_M5_OPEN_AT_ENTRY_PLUS_HOLD_MINUTES",
+    "leg_weights": "TOTAL_GROSS_1;ABS_WEIGHT_A=1/(1+abs(beta));ABS_WEIGHT_B=abs(beta)/(1+abs(beta))",
+    "missing_entry_or_exit": "RIGHT_CENSOR_NO_REPLACEMENT",
+    "no_cross_gap": true
+  },
+  "economic_gates": {
+    "minimum_completed_events": 80,
+    "minimum_dates": 40,
+    "minimum_weeks": 12,
+    "minimum_mean_gross_bps": 10,
+    "chronological_thirds": "ALL_THREE_MEAN_GROSS_BPS_AT_LEAST_3",
+    "maximum_top10pct_absolute_event_concentration": 0.5,
+    "minimum_connected_cells_same_pair": 3,
+    "no_proxy_friction_subtraction": true
+  },
+  "multiplicity": {
+    "family": "ALL_FORMATION_SELECTED_PAIR_X_3_THRESHOLD_X_2_HOLD_TESTS",
+    "maximum_tests": 30,
+    "method": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05
+  },
+  "promotion_boundary": {
+    "candidate_freeze_allowed": false,
+    "net_certification_allowed": false,
+    "if_survivor": "AUTHENTIC_FRICTION_INTERSECTION_BEFORE_ANY_CANDIDATE_FREEZE",
+    "if_none": "MOVE_DISTINCT_FRONTIER_NO_PARAMETER_RESCUE"
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "new_android_acquisition": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_legacy_read_only": true
+  }
+}
