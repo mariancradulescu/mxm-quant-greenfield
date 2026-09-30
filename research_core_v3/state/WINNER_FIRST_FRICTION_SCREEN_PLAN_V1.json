@@ -1,0 +1,121 @@
+{
+  "schema": "mxm.research-core-v3.winner-first-friction-screen.v1",
+  "status": "FROZEN_OUTCOME_BLIND_WINNER_FIRST_AUTHENTIC_FRICTION_SCREEN",
+  "source_plan_path": "research_core_v3/state/WINNER_FIRST_FRICTION_ACQUISITION_PLAN_V1.json",
+  "source_plan_binding_sha256": "a4c7e0cb0e4ad309cee497950ebbc59bac076734edd494aa17ab11ed3d576151",
+  "scope": {
+    "corrected_development_cells": 7975,
+    "gross_robust_regions": 88,
+    "previously_measured_regions": 28,
+    "prior_symbol_reuse_regions": 3,
+    "screen_regions": 57,
+    "screen_symbols": 56,
+    "full_reference_exact_windows": 2623050,
+    "authoritative_frontier": 1576,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0
+  },
+  "objective": "MAXIMIZE_INFORMATION_GAIN_TOWARD_A_REALIZABLE_WINNER_BY_SCREENING_ALL_PREVIOUSLY_UNMEASURED_GROSS_REGIONS_FOR_AUTHENTIC_EVENT_TIME_SPREAD",
+  "sampling": {
+    "strata": "UTC_MONTH_X_6H_SESSION_BUCKET",
+    "session_buckets_utc": [
+      [
+        0,
+        6
+      ],
+      [
+        6,
+        12
+      ],
+      [
+        12,
+        18
+      ],
+      [
+        18,
+        24
+      ]
+    ],
+    "selected_nonempty_session_strata_per_month": 2,
+    "selected_hours_per_selected_stratum": 1,
+    "selected_exact_windows_per_hour": 3,
+    "selection": "SHA256_HASH_ORDER_WITHOUT_REPLACEMENT",
+    "seed_material": "SOURCE_PLAN_BINDING",
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
+    "fresh_quote_age_limit_seconds": 2,
+    "fixed_transport_span_minutes": 60,
+    "automatic_additional_acquisition": false
+  },
+  "screen_metrics": {
+    "per_symbol": [
+      "fresh_d0_count",
+      "sampled_windows",
+      "fresh_fraction",
+      "min_spread_bps",
+      "p25_spread_bps",
+      "median_spread_bps",
+      "mean_spread_bps"
+    ],
+    "per_region": [
+      "gross_bps",
+      "min_spread_over_gross",
+      "p25_spread_over_gross",
+      "median_spread_over_gross",
+      "mean_spread_over_gross"
+    ],
+    "delays_are_diagnostic_only": [
+      1,
+      5,
+      30
+    ],
+    "no_formal_death_test": true,
+    "no_promotion_from_screen": true,
+    "no_candidate_freeze_from_screen": true,
+    "ranking_after_joint_capture_only": true
+  },
+  "interpretation_rules": {
+    "friction_plausible_signal": "AT_LEAST_3_FRESH_D0_OBSERVATIONS_AND_ANY_OBSERVED_D0_SPREAD_AT_OR_BELOW_GROSS_EDGE",
+    "strong_negative_signal": "AT_LEAST_3_FRESH_D0_OBSERVATIONS_AND_MINIMUM_OBSERVED_D0_SPREAD_GREATER_THAN_2X_GROSS_EDGE",
+    "otherwise": "UNRESOLVED_SCREEN",
+    "labels_are_diagnostic_not_certification": true
+  },
+  "transport": {
+    "stage0_benchmark_skipped": true,
+    "fixed_span_minutes": 60,
+    "justification": "V7_AND_V8_SELECTED_60M_FOR_ALL_28_PREVIOUSLY_MEASURED_SYMBOLS;TRANSPORT_CHOICE_IS_OPERATIONAL_NOT_ECONOMIC;PAGINATION_REMAINS_VERIFIED",
+    "raw_tick_values_written_to_disk": false,
+    "current_symbol_metadata_in_bundle": true,
+    "current_symbol_metadata_is_not_historical_cost_truth": true
+  },
+  "storage": {
+    "raw_tick_values_written_to_disk": false,
+    "derived_hour_evidence_gzip": true,
+    "minimum_free_disk_bytes": 536870912,
+    "aggregate_local_capture_artifacts_hard_cap_bytes": 268435456,
+    "preferred_bundle_size_bytes": 26214400,
+    "hard_bundle_cap_bytes": 67108864,
+    "transfer_bundle_contains_raw_ticks": false,
+    "stage_work_dir_hard_cap_bytes": 268435456
+  },
+  "prior_runtime_baseline": {
+    "v8_stage1_api_attempts": 1456,
+    "v8_stage1_broker_call_elapsed_seconds": 540.319,
+    "v8_attempt_rate_per_second": 2.694704424608426
+  },
+  "stage1_sampling": {
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
+    "fresh_quote_age_limit_seconds": 2
+  },
+  "binding_sha256": "dd634e66b5f183f8847f6a80709872c7c7a23dfbb4e4f8b0f2150f68245f28f4"
+}
