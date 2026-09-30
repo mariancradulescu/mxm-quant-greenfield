@@ -1,0 +1,74 @@
+{
+  "schema": "mxm.research-core-v3.us-regular-session-opening-range-breakout-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_PRICE_RESPONSE_EVALUATION",
+  "family": "US_REGULAR_SESSION_OPENING_RANGE_BREAKOUT_PATH",
+  "preoutcome_audit_sha256": "0f83567f1b1523425abfbbd6bf96ea4460f74ef4980bf065b87fcff18990e275",
+  "eligible_symbol_count": 19,
+  "eligible_symbol_ids": [2999,3034,3032,5406,5403,3033,5410,2998,5470,3020,5402,3019,3029,3002,3028,3027,5449,5414,3025],
+  "development_window": {
+    "source": "accepted Pepperstone M5 DEVELOPMENT archives",
+    "development_end_utc": "2026-09-16T23:59:59Z",
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false
+  },
+  "signal": {
+    "timezone": "America/New_York",
+    "regular_session_open_local": "09:30",
+    "resolution": "M5",
+    "exact_contiguity_seconds": 300,
+    "opening_range": "for each eligible session date, OR high/low are the max high/min low of completed bars beginning 09:30 for opening_range_minutes",
+    "breakout_watch": "after OR completion, examine the next 18 completed M5 bars (90 minutes); LONG on the first close strictly above OR high, SHORT on the first close strictly below OR low; if neither occurs no event for that date/cell",
+    "entry": "next contiguous M5 open after breakout bar completion",
+    "one_event_per_session": "first breakout only per date and frozen cell",
+    "failure_midpoint": "LONG exit next open after completed close <= OR midpoint; SHORT exit next open after completed close >= OR midpoint",
+    "failure_opposite_boundary": "LONG exit next open after completed close <= OR low; SHORT exit next open after completed close >= OR high",
+    "time_exit": "if no frozen failure trigger, exit at next open after maximum_hold_bars completed post-entry bars",
+    "session_boundary": "all required timestamps through exit must remain within the timestamp-audited date window and no later than 15:35 local; otherwise right-censor",
+    "gross_return": "direction * log(exit_open/entry_open) * 10000 bps",
+    "missing_or_ambiguous": "right-censor fail-closed; no interpolation, synthetic bars, same-bar execution, or overnight carry"
+  },
+  "parameter_grid": {
+    "opening_range_minutes": [15,30],
+    "failure_rule": ["MIDPOINT","OPPOSITE_BOUNDARY"],
+    "maximum_hold_bars": [12,24,48]
+  },
+  "cells_per_symbol": 12,
+  "test_count": 228,
+  "economic_support_gate": {
+    "completed_events_min": 80,
+    "distinct_dates_min": 80,
+    "distinct_iso_weeks_min": 30,
+    "retention_fraction_min": 0.9,
+    "mean_gross_bps_min": 12.0,
+    "median_gross_bps_min": 0.0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "all 228 frozen symbol x OR x failure x hold cells",
+    "dependence_cluster": "ISO week",
+    "procedure": "shared ISO-week wild-sign max-T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "support_rule_predeclared": "All frozen cells remain family members. Only cells meeting non-return support prerequisites (>=80 completed events, >=80 dates, >=30 ISO weeks, retention>=0.90) may generate finite max-T statistics; support-ineligible cells receive p=1."
+  },
+  "robust_region_gate": {
+    "adjacency": "one-step grid adjacency within same symbol; failure_rule two-level adjacency is one step",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "friction_policy": {
+    "exact_authentic_event_time_bid_ask_required_only_after_gross_robust_survivor": true,
+    "proxy_costs_forbidden": true,
+    "new_android_before_gross_survivor": false
+  },
+  "governance": {
+    "post_outcome_direction_flip_forbidden": true,
+    "post_outcome_grid_or_session_time_rescue_forbidden": true,
+    "candidate_freeze_from_development_forbidden": true,
+    "protected_forward_access_forbidden": true
+  },
+  "canonical_sha256": "1af34b209d47a5cdc1ae952f2893295f71d60c8890a380b5f857409ccfa3d67a"
+}
