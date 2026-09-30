@@ -14,8 +14,9 @@ jobs:
       - name: Install Android-safe protobuf
         run: |
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-      - name: Compile targeted V3 capture runtime
-        run: python -m py_compile V3_MAXT14_FRICTION_CAPTURE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/pydroid_v3_friction_launcher.py tools/build_v3_maxt14_friction_capture_package.py
+      - name: Compile targeted V3 capture and evidence runtime
+        run: |
+          python -m py_compile V3_MAXT14_FRICTION_CAPTURE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/pydroid_v3_friction_launcher.py research_core_v3/v3_friction_evidence.py tools/build_v3_maxt14_friction_capture_package.py tools/assess_v3_maxt14_friction_evidence.py
       - name: No-network exact frozen-scope geometry preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -29,7 +30,8 @@ jobs:
           print("V3_MAXT14_GEOMETRY_PASS", g)
           PY
       - name: Focused unit tests
-        run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture -v
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_maxt14_friction_evidence -v
       - name: Build deterministic Android capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_maxt14_friction_capture_package.py
