@@ -39,7 +39,7 @@
     ],
     "selected_nonempty_session_strata_per_month": 2,
     "selected_hours_per_selected_stratum": 1,
-    "selected_exact_windows_per_hour": 1,
+    "selected_exact_windows_per_hour": 3,
     "selection": "SHA256_HASH_ORDER_WITHOUT_REPLACEMENT",
     "seed_material": "SOURCE_PLAN_BINDING",
     "delay_sensitivity_seconds": [
@@ -100,12 +100,22 @@
     "aggregate_local_capture_artifacts_hard_cap_bytes": 268435456,
     "preferred_bundle_size_bytes": 26214400,
     "hard_bundle_cap_bytes": 67108864,
-    "transfer_bundle_contains_raw_ticks": false
+    "transfer_bundle_contains_raw_ticks": false,
+    "stage_work_dir_hard_cap_bytes": 268435456
   },
   "prior_runtime_baseline": {
     "v8_stage1_api_attempts": 1456,
     "v8_stage1_broker_call_elapsed_seconds": 540.319,
     "v8_attempt_rate_per_second": 2.694704424608426
   },
-  "binding_sha256": "da1a3eb892c8f4819d802f64c21cba2fbf39df7289ebf84feba0e64d5d4db04c"
+  "stage1_sampling": {
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
+    "fresh_quote_age_limit_seconds": 2
+  },
+  "binding_sha256": "dd634e66b5f183f8847f6a80709872c7c7a23dfbb4e4f8b0f2150f68245f28f4"
 }
