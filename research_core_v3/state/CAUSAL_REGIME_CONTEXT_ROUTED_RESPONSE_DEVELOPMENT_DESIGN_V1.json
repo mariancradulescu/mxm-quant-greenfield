@@ -1,0 +1,103 @@
+{
+  "schema": "mxm.research-core-v3.causal-regime-context-routed-response-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_ROUTED_PRICE_RESPONSE_EVALUATION",
+  "family": "CAUSAL_REGIME_CONTEXT_ROUTED_RESPONSE_PATH",
+  "preoutcome_audit_sha256": "7bf2f6d389931107bdee2d7b518e118fd513b767ed2a5699553a7e2128090388",
+  "development_window": {
+    "source": "accepted Pepperstone M5 DEVELOPMENT archives",
+    "development_end_utc": "2026-09-16T23:59:59Z",
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false
+  },
+  "universe": {
+    "eligible_symbol_count": 156,
+    "selection": "same outcome-blind timestamp/identity panel; no outcome filtering"
+  },
+  "regime_router": {
+    "efficiency_ratio": "ER_N = abs(log(close_t/close_t-N)) / sum(abs(one-bar log returns)) over the N completed exact-contiguous M5 returns ending at t; require positive denominator",
+    "trend_state": "ER_N >= 0.35",
+    "range_state": "ER_N <= 0.15",
+    "ambiguous_state": "0.15 < ER_N < 0.35 => no new trade",
+    "causality": "state and signal use only completed bars through t; any trade enters at t+1 open"
+  },
+  "trend_route": {
+    "direction": "sign(log(close_t/close_t-N))",
+    "trigger": "in trend_state, close_t must break the previous 12-bar high in positive trend direction or previous 12-bar low in negative trend direction",
+    "entry": "next exact-contiguous M5 open",
+    "failure": "first completed post-entry close re-enters the frozen 12-bar breakout boundary; exit next open",
+    "time_exit": "exit next open after frozen maximum_hold_bars completed post-entry bars"
+  },
+  "range_route": {
+    "center": "median of log closes over previous 24 completed exact-contiguous bars excluding signal bar t",
+    "scale": "1.4826 * median absolute deviation of those 24 log closes around their frozen center; require >0",
+    "trigger": "in range_state, abs(log(close_t)-center) >= 2.0*scale",
+    "direction": "toward the frozen center",
+    "entry": "next exact-contiguous M5 open",
+    "target": "first completed post-entry close reaches/crosses frozen center in reversion direction; exit next open",
+    "failure": "if completed close reaches >=2.0 times the initial signal deviation away from frozen center in adverse direction; exit next open",
+    "time_exit": "exit next open after frozen maximum_hold_bars completed post-entry bars"
+  },
+  "overlap": "at most one open event per symbol x architecture cell across either route; later signals ignored until exit",
+  "missing_data": "all required links exactly 300 seconds; otherwise right-censor; no interpolation, resampling, gap bridging or same-bar execution",
+  "gross_return": "direction * log(exit_open/entry_open) * 10000 bps",
+  "parameter_grid": {
+    "regime_lookback_bars": [
+      72,
+      144
+    ],
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ]
+  },
+  "test_count": 6,
+  "aggregation": {
+    "event_level": "retain route, symbol, UTC date and ISO week for every completed event",
+    "symbol_day": "mean gross bps of completed events per symbol per UTC date",
+    "daily_family": "equal-weight mean across available symbol-day statistics on each UTC date",
+    "route_contribution": "separately report equal-weight family statistics for TREND and RANGE route events"
+  },
+  "economic_support_gate": {
+    "completed_events_familywide_min": 2000,
+    "symbols_with_at_least_20_completed_events_min": 80,
+    "distinct_utc_dates_min": 180,
+    "distinct_iso_weeks_min": 40,
+    "event_retention_fraction_min": 0.8,
+    "mean_daily_family_gross_bps_min": 8,
+    "median_daily_family_gross_bps_min": 0,
+    "fraction_eligible_symbols_positive_mean_gross_min": 0.6,
+    "chronological_date_thirds_each_mean_strictly_positive": true,
+    "trend_route_completed_events_min": 500,
+    "range_route_completed_events_min": 500,
+    "trend_route_mean_gross_bps_strictly_positive": true,
+    "range_route_mean_gross_bps_strictly_positive": true
+  },
+  "multiplicity": {
+    "family": "all 6 frozen universal router cells",
+    "dependence_cluster": "ISO week of daily family statistics",
+    "procedure": "shared ISO-week wild-sign max-T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "support_rule_predeclared": "all six remain family members; support-ineligible cells receive p=1 and cannot pass"
+  },
+  "robust_region_gate": {
+    "adjacency": "one step in regime lookback or hold grid",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "friction_policy": {
+    "exact_authentic_event_time_bid_ask_only_after_gross_robust_survivor": true,
+    "proxy_costs_forbidden": true,
+    "new_android_before_gross_survivor": false
+  },
+  "governance": {
+    "router_threshold_tuning_after_outcomes_forbidden": true,
+    "route_removal_or_sign_flip_after_outcomes_forbidden": true,
+    "candidate_freeze_from_development_forbidden": true,
+    "protected_forward_access_forbidden": true
+  },
+  "canonical_sha256": "dcfb5bb9537c4975ccb5df0f80f8b7d5a26ccb7a52e2f6becc054d9eb12936d1"
+}
