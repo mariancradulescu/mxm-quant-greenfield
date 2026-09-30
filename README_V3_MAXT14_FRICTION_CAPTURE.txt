@@ -2,8 +2,10 @@ MXM Research Core V3 — maxT14 authentic friction capture
 
 Purpose
 -------
-Collect broker-native historical BID/ASK evidence from the already accepted Pepperstone
-Europe LIVE account for the 14 DEVELOPMENT regions that passed the maxT screen.
+Collect broker-native historical BID/ASK evidence from the explicitly rebound and accepted
+Pepperstone Europe LIVE account for the 14 DEVELOPMENT regions that passed the maxT screen.
+Plan V1 remains immutable history; package V5 binds plan V2 plus the accepted sanitized
+account-rebind authority. No raw cTrader account ID is persisted in repository authority.
 
 Safety / research boundaries
 ----------------------------
@@ -27,8 +29,8 @@ Run
 ---
 1. Extract this ZIP to one folder on Android.
 2. Open V3_MAXT14_FRICTION_CAPTURE_RUN.py in Pydroid 3.
-3. Run that same file. The saved token is checked against the frozen V3 account fingerprint
-   before any historical quote request.
+3. Run that same file. The saved token is checked against the rebound accepted V3 account
+   fingerprint from plan V2 before any historical quote request.
 4. If the saved token does not authorize the frozen account, the same run opens ONE fresh
    official cTrader authorization. Select the intended Pepperstone Europe LIVE account.
    After callback/token exchange, the script first tries the explicit Pydroid MainActivity
