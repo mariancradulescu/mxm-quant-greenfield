@@ -106,7 +106,7 @@ def _close_runner(runner) -> None:
 
 
 def main() -> None:
-    print("MXM Research Core V3 — WINNER-FIRST authentic friction screen V9")
+    print("MXM Research Core V3 — WINNER-FIRST authentic friction screen V9R1")
     print("56 unmeasured symbols | 57 gross regions | one sparse global screen")
     print("READ ONLY | orders=NO | protected-forward=NO | raw ticks on disk=NO")
     print("SCREEN ONLY | candidate freeze=NO | net certification=NO")
