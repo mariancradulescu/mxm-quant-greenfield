@@ -1,0 +1,30 @@
+{
+  "schema":"mxm.research-core-v3.same-underlying-cash-futures-basis-reversion-development-design.v1",
+  "status":"FROZEN_PREOUTCOME_BEFORE_PRICE_RESPONSE_EVALUATION",
+  "family":"SAME_UNDERLYING_CASH_FUTURES_BASIS_REVERSION_PATH",
+  "preoutcome_audit_sha256":"5888cf686425f313dd32cf57c573ac93254ad9ab5844bc8fe2b8d60c925f34cb",
+  "eligible_pair_count":3,
+  "pair_ids":["XAUUSD_XAUUSD-F","JPN225_JPN225-F","USDX_USDX-F"],
+  "development_window":{"source":"accepted Pepperstone M5 DEVELOPMENT archives","development_end_utc":"2026-09-16T23:59:59Z","protected_forward_start_utc":"2026-09-17T12:02:58Z","protected_forward_opened":false},
+  "signal":{
+    "basis":"b_t = log(close_leg_a_t) - log(close_leg_b_t) on exact common M5 timestamps",
+    "rolling_center_scale":"using completed bars through t, center = rolling median basis over lookback_bars; scale = 1.4826 * rolling median absolute deviation from that rolling median over the same lookback; require scale>0",
+    "entry_signal":"z_t=(b_t-center_t)/scale_t; first non-overlapping completed bar with abs(z_t)>=entry_abs_z; if z>0 short leg A/long leg B, if z<0 long A/short B",
+    "entry":"next exact common M5 open",
+    "target_exit":"freeze center_t at signal; after entry, when completed close-basis crosses the frozen center, exit both legs at next exact common M5 open",
+    "failure_exit":"freeze initial absolute basis deviation d0=abs(b_t-center_t); if completed close-basis moves to >=2.0*d0 away from frozen center in the adverse direction, exit both legs at next exact common M5 open",
+    "time_exit":"if neither target nor failure triggers, exit both legs at next exact common open after maximum_hold_bars completed bars",
+    "gross_return_on_total_gross_notional":"equal 50/50 notional legs; pair bps = 0.5 * (-sign(z_signal)*log(A_exit/A_entry) + sign(z_signal)*log(B_exit/B_entry)) * 10000",
+    "overlap_policy":"one open pair position per pair x cell; later signals ignored until exit",
+    "missing_or_ambiguous":"right-censor fail-closed; exact common timestamps only; no interpolation, lead-lag shifting, stale-leg repair, or synthetic basis"
+  },
+  "parameter_grid":{"basis_lookback_bars":[72,144],"entry_abs_z":[2.0,3.0],"maximum_hold_bars":[12,24,48]},
+  "cells_per_pair":12,
+  "test_count":36,
+  "economic_support_gate":{"completed_events_min":40,"distinct_dates_min":30,"distinct_iso_weeks_min":20,"retention_fraction_min":0.9,"mean_gross_bps_min":8.0,"median_gross_bps_min":0.0,"chronological_event_count_thirds_each_mean_strictly_positive":true,"top10pct_abs_event_concentration_max":0.5},
+  "multiplicity":{"family":"all 36 frozen pair x lookback x z x hold cells","dependence_cluster":"ISO week","procedure":"shared ISO-week wild-sign max-T","resamples":4999,"seed":20260930,"familywise_alpha":0.05,"support_rule_predeclared":"All 36 cells remain family members. Only cells meeting non-return support prerequisites (>=40 completed events, >=30 dates, >=20 ISO weeks, retention>=0.90) generate finite max-T statistics; others receive p=1."},
+  "robust_region_gate":{"adjacency":"one-step grid adjacency within same deterministic pair","minimum_connected_full_pass_cells":3,"minimum_varied_parameter_dimensions":2,"single_cell_promotion_forbidden":true},
+  "friction_policy":{"two_leg_exact_authentic_event_time_bid_ask_and_commission_required_after_gross_robust_survivor":true,"proxy_costs_forbidden":true,"new_android_before_gross_survivor":false},
+  "governance":{"post_outcome_pair_selection_forbidden":true,"post_outcome_sign_flip_or_grid_rescue_forbidden":true,"candidate_freeze_from_development_forbidden":true,"protected_forward_access_forbidden":true},
+  "canonical_sha256":"cac4c3e3e4a341ae28c59856048c7246a63e557857fefce337714878efd8ca53"
+}
