@@ -426,12 +426,25 @@ class StagedFrictionRunner(V3MaxT14FrictionRunner):
         targets = {str(t["symbol"]): t for t in self.plan["targets"]}
         for symbol in sorted(benchmark_freeze["anchors_by_symbol"]):
             target = targets[symbol]
+            reference_windows = self.scope_by_symbol[symbol]["windows"]
+            development_min_ms = min(int(x[0]) for x in reference_windows)
+            development_max_ms = max(int(x[1]) for x in reference_windows)
             for anchor_hour in benchmark_freeze["anchors_by_symbol"][symbol]:
                 center = int(anchor_hour) + HOUR_MS // 2
                 for span_min in spans:
                     span_ms = span_min * 60_000
-                    start_ms = max(0, center - span_ms // 2)
-                    end_ms = min(protected_ms - 1, center + span_ms // 2)
+                    start_ms = max(
+                        development_min_ms, center - span_ms // 2
+                    )
+                    end_ms = min(
+                        development_max_ms,
+                        protected_ms - 1,
+                        center + span_ms // 2,
+                    )
+                    if end_ms <= start_ms:
+                        raise CaptureContractError(
+                            "stage0 benchmark escaped DEVELOPMENT reference range"
+                        )
                     for side in ("BID", "ASK"):
                         _, meta = self._probe_range(
                             account_id,
@@ -1010,3 +1023,77 @@ class StagedFrictionRunner(V3MaxT14FrictionRunner):
         return self._finalize(
             benchmark, profile, sampling_freeze, decisions, disk_start
         )
+
+
+def staged_geometry_preflight(repo_root: Path | str) -> dict[str, Any]:
+    """No-network exact staged sampling/transport geometry for CI and estimates."""
+    runner = object.__new__(StagedFrictionRunner)
+    runner.repo_root = Path(repo_root)
+    runner.plan_path = runner.repo_root / "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json"
+    runner.plan = json.loads(runner.plan_path.read_text(encoding="utf-8"))
+    runner._validate_plan()
+    runner.scope_by_symbol = runner._load_scopes_and_blocks()
+    runner.design_path = runner.repo_root / DESIGN_REL
+    runner.design = json.loads(runner.design_path.read_text(encoding="utf-8"))
+    runner._validate_design()
+    sampling_freeze, _ = runner._reference()
+    stage_counts = [
+        int(x)
+        for x in runner.design["stage1_sampling"][
+            "stage_hours_per_nonempty_stratum"
+        ]
+    ]
+    by_stage: list[dict[str, Any]] = []
+    for desired in stage_counts:
+        record: dict[str, Any] = {
+            "hours_per_nonempty_stratum": desired,
+            "by_transport_span_minutes": {},
+        }
+        for span_min in (60, 15, 5):
+            total_hours = total_windows = total_blocks = 0
+            span_ms = span_min * 60_000
+            buckets_per_hour = max(1, HOUR_MS // span_ms)
+            for target in runner.plan["targets"]:
+                symbol = str(target["symbol"])
+                strata = build_reference_strata(runner.scope_by_symbol[symbol])
+                meta = sampling_freeze["sampling"][symbol]
+                for stratum, smeta in meta.items():
+                    selected = [
+                        int(x)
+                        for x in smeta["ordered_hour_start_ms"][
+                            : min(desired, int(smeta["reference_hours"]))
+                        ]
+                    ]
+                    total_hours += len(selected)
+                    for hour in selected:
+                        windows = strata[stratum][hour]
+                        total_windows += len(windows)
+                        occupied = {
+                            int(
+                                max(
+                                    0,
+                                    min(
+                                        (w.boundary_ms - hour) // span_ms,
+                                        buckets_per_hour - 1,
+                                    ),
+                                )
+                            )
+                            for w in windows
+                        }
+                        total_blocks += len(occupied)
+            record["by_transport_span_minutes"][str(span_min)] = {
+                "sampled_hours": total_hours,
+                "sampled_exact_windows": total_windows,
+                "transport_blocks": total_blocks,
+                "base_bid_ask_requests_before_pagination": 2 * total_blocks,
+            }
+        by_stage.append(record)
+    return {
+        "schema": "mxm.research-core-v3.staged-friction-geometry.v1",
+        "design_binding_sha256": runner.design["binding_sha256"],
+        "reference_exact_windows": 691_919,
+        "stage0_base_probes": int(
+            runner.design["stage0_benchmark"]["planned_base_probes"]
+        ),
+        "stages": by_stage,
+    }
