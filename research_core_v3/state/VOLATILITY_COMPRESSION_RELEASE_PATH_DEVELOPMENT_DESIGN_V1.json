@@ -1,0 +1,98 @@
+{
+  "schema": "mxm.research-core-v3.volatility-compression-release-path-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_PRICE_RESPONSE_EVALUATION",
+  "family": "VOLATILITY_COMPRESSION_RELEASE_PATH",
+  "selection_rationale": {
+    "distinct_from_parked_session_gap_path": true,
+    "distinct_from_commodity_only_breakout_grid": "broad cross-asset within-symbol compression-conditioned release with path-dependent reentry exit",
+    "information_gain": "tests whether low-volatility state compression followed by causal range release creates larger gross headroom without external data",
+    "uses_existing_authentic_pepperstone_m5_only": true,
+    "new_android_acquisition_before_gross_survivor": false
+  },
+  "development_window": {
+    "source": "accepted Pepperstone M5 DEVELOPMENT archives",
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false
+  },
+  "universe_rule": {
+    "outcome_blind": "all recovered authentic M5 symbols with >=40 distinct ISO weeks and >=30000 M5 rows",
+    "eligible_symbol_count": 156,
+    "excluded_symbols": [
+      {
+        "symbol_id": 7338,
+        "broker_symbol": "CNHJPY",
+        "rows": 37970,
+        "distinct_iso_weeks": 27
+      }
+    ],
+    "eligible_symbol_id_set_source": "deterministically reconstruct from the two accepted DEVELOPMENT archives under the frozen rule; HIGH_QUALITY delta supersedes duplicate symbol IDs"
+  },
+  "signal": {
+    "bar_resolution": "M5",
+    "precondition_contiguity": "require every M5 link used by 72-bar long volatility window, 12-bar breakout box, breakout bar, entry and exit path to be exactly 300 seconds; otherwise skip event",
+    "long_volatility_window_returns": 72,
+    "short_volatility_window_returns": 12,
+    "robust_scale": "1.4826 * median(abs(close-to-close log returns))",
+    "compression_ratio": "short_scale / long_scale, computed only from completed bars ending immediately before breakout bar",
+    "breakout_box_bars": 12,
+    "breakout_rule": "on completed breakout bar t, LONG if close_t exceeds log(box_high) by at least breakout_strength * long_scale; SHORT if close_t is below log(box_low) by at least breakout_strength * long_scale",
+    "entry": "next contiguous M5 open t+1",
+    "direction": "continuation in breakout direction",
+    "overlap_policy": "within each frozen cell and symbol, after an accepted entry ignore later signals until that position exits",
+    "failure_exit": "if a completed post-entry close re-enters the pre-breakout box boundary (LONG close <= box_high; SHORT close >= box_low), exit at next contiguous M5 open",
+    "time_exit": "if no reentry failure, exit at next open after maximum_hold_bars completed post-entry bars",
+    "ambiguous_or_missing": "right-censor/fail-closed; no interpolation, repair, or gap bridging"
+  },
+  "parameter_grid": {
+    "maximum_compression_ratio": [
+      0.45,
+      0.6
+    ],
+    "minimum_breakout_strength_long_scale": [
+      0.5,
+      1
+    ],
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ]
+  },
+  "test_count": 1872,
+  "economic_support_gate": {
+    "completed_events_min": 40,
+    "distinct_dates_min": 30,
+    "distinct_iso_weeks_min": 20,
+    "retention_fraction_min": 0.8,
+    "mean_gross_bps_min": 6,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "all frozen symbol x parameter cells",
+    "dependence_cluster": "ISO week",
+    "procedure": "shared ISO-week wild-sign max-T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05
+  },
+  "robust_region_gate": {
+    "adjacency": "one-step parameter-grid adjacency within same symbol",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "friction_policy": {
+    "gross_robust_survivor_required_before_exact_event_time_authentic_friction": true,
+    "proxy_spread_application_forbidden": true,
+    "new_android_capture_before_gross_survivor": false
+  },
+  "governance": {
+    "post_outcome_sign_flip_forbidden": true,
+    "post_outcome_grid_rescue_forbidden": true,
+    "candidate_freeze_from_development_forbidden": true,
+    "protected_forward_access_forbidden": true
+  },
+  "canonical_sha256": "4cfc01a6ecb9d605ad524c84f67a72529499c9aecfaeb51793e6541a246c6531"
+}
