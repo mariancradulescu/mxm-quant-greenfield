@@ -1,4 +1,4 @@
-name: V3 global authentic friction triage package
+name: V3 Wave2 authentic friction triage package
 on:
   push:
     branches: [performance-research-v3-20260922]
@@ -14,36 +14,38 @@ jobs:
       - name: Install Android-safe protobuf
         run: |
           python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-      - name: Compile V7 global triage runtime
+      - name: Compile Wave2 runtime
         run: |
-          python -m py_compile V3_MAXT14_GLOBAL_FRICTION_TRIAGE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/v3_friction_staged.py research_core_v3/v3_friction_global_triage.py research_core_v3/pydroid_v3_friction_global_triage_launcher.py m6/pydroid_oauth.py tools/build_v3_global_friction_triage_package.py
-      - name: No-network exact frozen-scope global triage geometry
+          python -m py_compile V3_WAVE2_GLOBAL_FRICTION_TRIAGE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/v3_friction_staged.py research_core_v3/v3_friction_global_triage.py research_core_v3/pydroid_v3_friction_wave2_launcher.py m6/pydroid_oauth.py tools/build_v3_wave2_friction_package.py
+      - name: Validate frozen Wave2 bindings and geometry
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
           import json
           from pathlib import Path
-          from research_core_v3.v3_friction_capture import local_geometry_preflight
           from research_core_v3.v3_friction_global_triage import global_triage_geometry_preflight
-          base=local_geometry_preflight(Path("."))
-          assert base["symbols"] == 14, base
-          assert base["exact_windows"] == 691_919, base
-          g=global_triage_geometry_preflight(Path("."))
+          g=global_triage_geometry_preflight(
+              Path("."),
+              plan_rel="research_core_v3/state/WAVE2_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V1.json",
+              design_rel="research_core_v3/state/WAVE2_GLOBAL_FRICTION_TRIAGE_PLAN_V1.json",
+          )
+          assert g["reference_exact_windows"] == 747620, g
           assert g["campaign_looks"] == 1, g
           assert g["automatic_additional_acquisition"] is False, g
+          assert g["estimator_mode"] == "TWO_STAGE_INCLUSION_WEIGHTED_WITHIN_SELECTED_HOUR", g
           assert g["sampled_exact_windows"] <= 3*g["sampled_hours"], g
-          print("GLOBAL_TRIAGE_GEOMETRY_PASS", json.dumps(g, sort_keys=True))
+          print("WAVE2_GEOMETRY_PASS", json.dumps(g, sort_keys=True))
           PY
-      - name: Focused unit tests
+      - name: Focused scientific regression tests
         run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_staged_friction tests.test_v3_global_friction_triage tests.test_v3_maxt14_friction_evidence -v
-      - name: Build deterministic Android global triage package
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_staged_friction tests.test_v3_global_friction_triage tests.test_v3_wave2_friction tests.test_v3_maxt14_friction_evidence -v
+      - name: Build deterministic Wave2 Android package
         run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_global_friction_triage_package.py
-          sha256sum dist/MXM_V3_GLOBAL_FRICTION_TRIAGE_PACKAGE_V7.zip
-      - name: Upload global triage package
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_wave2_friction_package.py
+          sha256sum dist/MXM_V3_WAVE2_GLOBAL_FRICTION_TRIAGE_PACKAGE_V8.zip
+      - name: Upload Wave2 package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_V3_GLOBAL_FRICTION_TRIAGE_PACKAGE_V7
-          path: dist/MXM_V3_GLOBAL_FRICTION_TRIAGE_PACKAGE_V7.zip
+          name: MXM_V3_WAVE2_GLOBAL_FRICTION_TRIAGE_PACKAGE_V8
+          path: dist/MXM_V3_WAVE2_GLOBAL_FRICTION_TRIAGE_PACKAGE_V8.zip
           if-no-files-found: error
           retention-days: 30
