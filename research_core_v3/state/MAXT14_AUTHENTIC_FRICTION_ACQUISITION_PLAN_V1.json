@@ -2,12 +2,20 @@
   "acquisition": {
     "api": "cTrader Open API ProtoOAGetTickDataReq",
     "candidate_outcomes_opened_by_capture": false,
-    "delay_sensitivity_seconds": [0, 1, 5, 30],
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
     "fill_authority": false,
     "historical_request_max_span_ms": 604800000,
     "protected_forward_opened": false,
     "quote_age_limit_seconds": 2,
-    "quote_types": ["BID", "ASK"],
+    "quote_types": [
+      "BID",
+      "ASK"
+    ],
     "raw_chunks_retained_locally": true,
     "request_pacing_seconds": 0.21,
     "scope_window_interpretation": "Each exact packed window is [boundary-2s,boundary+30s]; boundary=start+2000ms.",
@@ -16,7 +24,7 @@
       "allowed": true,
       "maximum_block_span_ms": 3600000,
       "maximum_gap_ms": 300000,
-      "overfetch_interpretation": "TRANSPORT_ONLY; DERIVED EVIDENCE IS RE-EXTRACTED_AT_THE_ORIGINAL_EXACT_WINDOWS; NO_NEW_SIGNAL_OR_OUTCOME_SELECTION",
+      "overfetch_interpretation": "TRANSPORT_ONLY; DERIVED EVIDENCE IS RE-EXTRACTED AT THE ORIGINAL EXACT WINDOWS; NO NEW SIGNAL_OR_OUTCOME_SELECTION",
       "rule": "Merge only adjacent exact windows for the same symbol when the gap is <=5 minutes and total acquisition block span remains <=1 hour."
     }
   },
@@ -67,10 +75,26 @@
   },
   "schema": "mxm.research-core-v3.maxt14-authentic-friction-acquisition.v1",
   "scope_archives": [
-    {"path":"CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip","sha256":"1858f3bb7e8d620913bea6532d2208078516b7128108e0ceaf15f9202de6ac39","size_bytes":1441234},
-    {"path":"CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip","sha256":"0e0a968e858cdb10e45d6f92b26b1f39c51f1b8a7754aa2a91c5f8b997d4a6cb","size_bytes":1509893},
-    {"path":"CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip","sha256":"f0e90bb0d332fdbf2a0a1246a77ff2d0b4ffac60a2dde6f2f224623ac1922943","size_bytes":1614620},
-    {"path":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","sha256":"40aeeac982234403601ecd525ff693e629bdab6265b98da27c662c1c72ce5daf","size_bytes":1405742}
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "sha256": "1858f3bb7e8d620913bea6532d2208078516b7128108e0ceaf15f9202de6ac39",
+      "size_bytes": 1441234
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "sha256": "0e0a968e858cdb10e45d6f92b26b1f39c51f1b8a7754aa2a91c5f8b997d4a6cb",
+      "size_bytes": 1509893
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "sha256": "f0e90bb0d332fdbf2a0a1246a77ff2d0b4ffac60a2dde6f2f224623ac1922943",
+      "size_bytes": 1614620
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "sha256": "40aeeac982234403601ecd525ff693e629bdab6265b98da27c662c1c72ce5daf",
+      "size_bytes": 1405742
+    }
   ],
   "selection": {
     "does_not_close_other_gross_regions": true,
@@ -87,19 +111,173 @@
   },
   "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
   "targets": [
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","events":30965,"minimum_mean_response_bps":4.114900525775218,"p_familywise_region_intersection":0.0005,"region_sha256":"f375ab01ddfaf8983ee4f602fba1b8c44788b1ac3dec98852ccbbe47d666594e","shard":"CORRECTED_FRICTION_SCOPE_V2_2785.json.gz","shard_sha256":"f3748c9de0440ac188943ffe3a4df7b64eb7192131dda1fd82cf66cd6e2f8227","symbol":"EURILS","symbol_id":2785,"windows":45373},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip","events":35544,"minimum_mean_response_bps":1.0795951614375658,"p_familywise_region_intersection":0.0005,"region_sha256":"71d8d3625446ec391fca8e165b20ffe71ee4ff8a2a8b52a9e7b46a7a212d7d74","shard":"CORRECTED_FRICTION_SCOPE_V2_2763.json.gz","shard_sha256":"3a9108a4c7734452f1a52b115c623dc4973a886fdc590be17a893ec117781dad","symbol":"AUDHUF","symbol_id":2763,"windows":50351},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","events":34363,"minimum_mean_response_bps":1.0386051543328325,"p_familywise_region_intersection":0.0005,"region_sha256":"3cf8cc64c51993b73c62fd9a4fc4d3fa0d9caf008b37c9dca6c7f31528b5a4f4","shard":"CORRECTED_FRICTION_SCOPE_V2_2788.json.gz","shard_sha256":"6db4ba612a1f83a536577b8abd327354378a16e460de16fa41e9cf8a266914e3","symbol":"USDRON","symbol_id":2788,"windows":48617},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","events":34279,"minimum_mean_response_bps":0.9163748982490163,"p_familywise_region_intersection":0.0005,"region_sha256":"623a95eca5d71d8effe0ff42185b19b4e0d4244929c9373f89bdf0f6c783b5d8","shard":"CORRECTED_FRICTION_SCOPE_V2_2780.json.gz","shard_sha256":"ea979c0b65c18ef7ed6d3b0dbce2e7a0bf05c23146d204679e1714218cca78c2","symbol":"NZDHUF","symbol_id":2780,"windows":48889},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","events":35408,"minimum_mean_response_bps":0.8987220483606819,"p_familywise_region_intersection":0.0005,"region_sha256":"a9f27aa4c8a43b30f958568971cba54e006cad3221e8e0dc7291dbf60600f5ca","shard":"CORRECTED_FRICTION_SCOPE_V2_2777.json.gz","shard_sha256":"06f8b93bd51c12f4ff8cc819f0797d35686553da22ec0dbebca9cb39db8f1e12","symbol":"GBPHUF","symbol_id":2777,"windows":50424},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip","events":33281,"minimum_mean_response_bps":0.7168965722808278,"p_familywise_region_intersection":0.0005,"region_sha256":"52dc3d8cd98ac3b42a5334df5a33f2c139406c824e2d4bfeea5dc4201c02e2e2","shard":"CORRECTED_FRICTION_SCOPE_V2_2769.json.gz","shard_sha256":"15d468fc1c2ff4a1689859e8d425f7cbdd435f7c381f3547c18b06569b43c2c8","symbol":"CHFHUF","symbol_id":2769,"windows":47640},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","events":34193,"minimum_mean_response_bps":0.6065696490025873,"p_familywise_region_intersection":0.0005,"region_sha256":"9492d57a366d54ddd42fc557c59a372586c75b9ea1f6693884a0720c0dbc3a29","shard":"CORRECTED_FRICTION_SCOPE_V2_2772.json.gz","shard_sha256":"fef0cef55d31ec0c3bfa551b4855fa534b4d368c00fd8004a1b2874fea552a10","symbol":"CHFSEK","symbol_id":2772,"windows":48929},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip","events":36736,"minimum_mean_response_bps":0.4926017901792032,"p_familywise_region_intersection":0.0005,"region_sha256":"2150cb9caf1a52ec69ed42e3c764e62dd578d09ef839befb438378fe1f41fd08","shard":"CORRECTED_FRICTION_SCOPE_V2_2764.json.gz","shard_sha256":"c0820d7bfc4fdaa2b49135094a0412e10fdd5702081524eac75a20c3a8fbe66b","symbol":"AUDNOK","symbol_id":2764,"windows":51786},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip","events":32323,"minimum_mean_response_bps":0.4552470327502462,"p_familywise_region_intersection":0.0125,"region_sha256":"9b1306f74b97bb8a4313df6d878b76b8125f95f40f2cd638d74869301f7bb69a","shard":"CORRECTED_FRICTION_SCOPE_V2_34.json.gz","shard_sha256":"b7d297f7b9bf3531e5b4d916d44bdd7a816572c5bb29e4a68b9c6277fb3fffea","symbol":"EURHUF","symbol_id":34,"windows":46007},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip","events":37575,"minimum_mean_response_bps":0.3249157599766669,"p_familywise_region_intersection":0.0005,"region_sha256":"179a2150d6e1470eff2c49f6fade32113090dc5650c7eba351ed930395197198","shard":"CORRECTED_FRICTION_SCOPE_V2_2765.json.gz","shard_sha256":"39ab18141a229b281270233b14aed14893385aab0cff4cf38ff565da375dd792","symbol":"AUDPLN","symbol_id":2765,"windows":52548},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip","events":30953,"minimum_mean_response_bps":0.2737857148950921,"p_familywise_region_intersection":0.0005,"region_sha256":"1d478c436e4ea4bd5d40987ae9dd4c63c9fc3ea3c523d58d089232ed70f5489c","shard":"CORRECTED_FRICTION_SCOPE_V2_51.json.gz","shard_sha256":"0ac1ceaeb988fa110deaaf4339387dc584b0e2d6e7126f57485399552c3820b8","symbol":"EURPLN","symbol_id":51,"windows":44212},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip","events":37525,"minimum_mean_response_bps":0.17294235162715604,"p_familywise_region_intersection":0.0205,"region_sha256":"c8a4e51a5aed3cd1b91c323b5269386bcc6778c94aae259b221f872d137d453b","shard":"CORRECTED_FRICTION_SCOPE_V2_2776.json.gz","shard_sha256":"efe05724bf9308cb7d72ea8d578b571b550a111ccb1075d1861384490c8eb903","symbol":"GBPDKK","symbol_id":2776,"windows":52447},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip","events":38602,"minimum_mean_response_bps":0.15335832350531622,"p_familywise_region_intersection":0.037,"region_sha256":"d9fa14a2beaa315517a60ca1715c133fa007257aa87287ff377f647a77d85ef2","shard":"CORRECTED_FRICTION_SCOPE_V2_28.json.gz","shard_sha256":"a2eca1a0c2529f23b4a4951aae6a58be88fac75375f1c80dee1c59310e983d57","symbol":"USDSGD","symbol_id":28,"windows":53506},
-    {"archive":"CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip","events":36631,"minimum_mean_response_bps":0.14008338129170708,"p_familywise_region_intersection":0.008,"region_sha256":"d420ddf48592aacf7b39d93f4cf4790976b3d0f11af5f06b3e08bfc6c5d06acf","shard":"CORRECTED_FRICTION_SCOPE_V2_82.json.gz","shard_sha256":"1c8eb665011b481b1e1c187f7d468a854f9daa57ee01a4dabb165daa3d87532b","symbol":"EURSGD","symbol_id":82,"windows":51190}
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 30965,
+      "minimum_mean_response_bps": 4.114900525775218,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "f375ab01ddfaf8983ee4f602fba1b8c44788b1ac3dec98852ccbbe47d666594e",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2785.json.gz",
+      "shard_sha256": "f3748c9de0440ac188943ffe3a4df7b64eb7192131dda1fd82cf66cd6e2f8227",
+      "symbol": "EURILS",
+      "symbol_id": 2785,
+      "windows": 45373
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 35544,
+      "minimum_mean_response_bps": 1.0795951614375658,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "71d8d3625446ec391fca8e165b20ffe71ee4ff8a2a8b52a9e7b46a7a212d7d74",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2763.json.gz",
+      "shard_sha256": "3a9108a4c7734452f1a52b115c623dc4973a886fdc590be17a893ec117781dad",
+      "symbol": "AUDHUF",
+      "symbol_id": 2763,
+      "windows": 50351
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 34363,
+      "minimum_mean_response_bps": 1.0386051543328325,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "3cf8cc64c51993b73c62fd9a4fc4d3fa0d9caf008b37c9dca6c7f31528b5a4f4",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2788.json.gz",
+      "shard_sha256": "6db4ba612a1f83a536577b8abd327354378a16e460de16fa41e9cf8a266914e3",
+      "symbol": "USDRON",
+      "symbol_id": 2788,
+      "windows": 48617
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 34279,
+      "minimum_mean_response_bps": 0.9163748982490163,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "623a95eca5d71d8effe0ff42185b19b4e0d4244929c9373f89bdf0f6c783b5d8",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2780.json.gz",
+      "shard_sha256": "ea979c0b65c18ef7ed6d3b0dbce2e7a0bf05c23146d204679e1714218cca78c2",
+      "symbol": "NZDHUF",
+      "symbol_id": 2780,
+      "windows": 48889
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 35408,
+      "minimum_mean_response_bps": 0.8987220483606819,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "a9f27aa4c8a43b30f958568971cba54e006cad3221e8e0dc7291dbf60600f5ca",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2777.json.gz",
+      "shard_sha256": "06f8b93bd51c12f4ff8cc819f0797d35686553da22ec0dbebca9cb39db8f1e12",
+      "symbol": "GBPHUF",
+      "symbol_id": 2777,
+      "windows": 50424
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 33281,
+      "minimum_mean_response_bps": 0.7168965722808278,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "52dc3d8cd98ac3b42a5334df5a33f2c139406c824e2d4bfeea5dc4201c02e2e2",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2769.json.gz",
+      "shard_sha256": "15d468fc1c2ff4a1689859e8d425f7cbdd435f7c381f3547c18b06569b43c2c8",
+      "symbol": "CHFHUF",
+      "symbol_id": 2769,
+      "windows": 47640
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 34193,
+      "minimum_mean_response_bps": 0.6065696490025873,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "9492d57a366d54ddd42fc557c59a372586c75b9ea1f6693884a0720c0dbc3a29",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2772.json.gz",
+      "shard_sha256": "fef0cef55d31ec0c3bfa551b4855fa534b4d368c00fd8004a1b2874fea552a10",
+      "symbol": "CHFSEK",
+      "symbol_id": 2772,
+      "windows": 48929
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 36736,
+      "minimum_mean_response_bps": 0.4926017901792032,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "2150cb9caf1a52ec69ed42e3c764e62dd578d09ef839befb438378fe1f41fd08",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2764.json.gz",
+      "shard_sha256": "c0820d7bfc4fdaa2b49135094a0412e10fdd5702081524eac75a20c3a8fbe66b",
+      "symbol": "AUDNOK",
+      "symbol_id": 2764,
+      "windows": 51786
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 32323,
+      "minimum_mean_response_bps": 0.4552470327502462,
+      "p_familywise_region_intersection": 0.0125,
+      "region_sha256": "9b1306f74b97bb8a4313df6d878b76b8125f95f40f2cd638d74869301f7bb69a",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_34.json.gz",
+      "shard_sha256": "b7d297f7b9bf3531e5b4d916d44bdd7a816572c5bb29e4a68b9c6277fb3fffea",
+      "symbol": "EURHUF",
+      "symbol_id": 34,
+      "windows": 46007
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 37575,
+      "minimum_mean_response_bps": 0.3249157599766669,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "179a2150d6e1470eff2c49f6fade32113090dc5650c7eba351ed930395197198",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2765.json.gz",
+      "shard_sha256": "39ab18141a229b281270233b14aed14893385aab0cff4cf38ff565da375dd792",
+      "symbol": "AUDPLN",
+      "symbol_id": 2765,
+      "windows": 52548
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 30953,
+      "minimum_mean_response_bps": 0.2737857148950921,
+      "p_familywise_region_intersection": 0.0005,
+      "region_sha256": "1d478c436e4ea4bd5d40987ae9dd4c63c9fc3ea3c523d58d089232ed70f5489c",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_51.json.gz",
+      "shard_sha256": "0ac1ceaeb988fa110deaaf4339387dc584b0e2d6e7126f57485399552c3820b8",
+      "symbol": "EURPLN",
+      "symbol_id": 51,
+      "windows": 44212
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 37525,
+      "minimum_mean_response_bps": 0.17294235162715604,
+      "p_familywise_region_intersection": 0.0205,
+      "region_sha256": "c8a4e51a5aed3cd1b91c323b5269386bcc6778c94aae259b221f872d137d453b",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2776.json.gz",
+      "shard_sha256": "efe05724bf9308cb7d72ea8d578b571b550a111ccb1075d1861384490c8eb903",
+      "symbol": "GBPDKK",
+      "symbol_id": 2776,
+      "windows": 52447
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 38602,
+      "minimum_mean_response_bps": 0.15335832350531622,
+      "p_familywise_region_intersection": 0.037,
+      "region_sha256": "d9fa14a2beaa315517a60ca1715c133fa007257aa87287ff377f647a77d85ef2",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_28.json.gz",
+      "shard_sha256": "a2eca1a0c2529f23b4a4951aae6a58be88fac75375f1c80dee1c59310e983d57",
+      "symbol": "USDSGD",
+      "symbol_id": 28,
+      "windows": 53506
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36631,
+      "minimum_mean_response_bps": 0.14008338129170708,
+      "p_familywise_region_intersection": 0.008,
+      "region_sha256": "d420ddf48592aacf7b39d93f4cf4790976b3d0f11af5f06b3e08bfc6c5d06acf",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_82.json.gz",
+      "shard_sha256": "1c8eb665011b481b1e1c187f7d468a854f9daa57ee01a4dabb165daa3d87532b",
+      "symbol": "EURSGD",
+      "symbol_id": 82,
+      "windows": 51190
+    }
   ]
 }
