@@ -20,7 +20,9 @@ from research_core_v3.v3_friction_capture import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V1.json"
+PLAN = ROOT / "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json"
+PLAN_V1 = ROOT / "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V1.json"
+REBIND = ROOT / "research_core_v3/state/ACCOUNT_IDENTITY_REBIND_ACCEPTANCE_V1.json"
 
 
 class V3MaxT14FrictionCaptureTests(unittest.TestCase):
@@ -41,6 +43,32 @@ class V3MaxT14FrictionCaptureTests(unittest.TestCase):
         self.assertFalse(plan["acquisition"]["fill_authority"])
         self.assertFalse(
             plan["freeze_gate"]["candidate_freeze_allowed_by_this_capture"]
+        )
+
+    def test_account_rebind_v2_preserves_v1_scope_and_has_explicit_authority(self):
+        v1 = json.loads(PLAN_V1.read_text(encoding="utf-8"))
+        v2 = json.loads(PLAN.read_text(encoding="utf-8"))
+        auth = json.loads(REBIND.read_text(encoding="utf-8"))
+        self.assertEqual(
+            v2["schema"],
+            "mxm.research-core-v3.maxt14-authentic-friction-acquisition.v2",
+        )
+        self.assertEqual(
+            auth["status"], "ACCEPTED_BEFORE_ANY_SELECTED14_FRICTION_CAPTURE"
+        )
+        self.assertEqual(auth["verified_symbol_count"], 14)
+        self.assertFalse(auth["historical_bid_ask_capture_started_before_rebind"])
+        self.assertFalse(auth["raw_account_id_persisted"])
+        self.assertEqual(v2["targets"], v1["targets"])
+        self.assertEqual(v2["selection"], v1["selection"])
+        self.assertEqual(v2["authority"], v1["authority"])
+        self.assertNotEqual(
+            v2["broker_identity"]["accepted_account_fingerprint_sha256"],
+            v1["broker_identity"]["accepted_account_fingerprint_sha256"],
+        )
+        self.assertEqual(
+            v2["account_identity_rebind"]["authority_binding_sha256"],
+            auth["binding_sha256"],
         )
 
     def test_delta_decode_is_exact(self):
