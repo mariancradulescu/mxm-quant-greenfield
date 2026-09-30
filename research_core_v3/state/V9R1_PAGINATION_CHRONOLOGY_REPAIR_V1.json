@@ -1,0 +1,57 @@
+{
+  "schema": "mxm.research-core-v3.v9r1-pagination-chronology-repair.v1",
+  "status": "VALIDATED_RESUMABLE_EXECUTION_REPAIR",
+  "observed_failure": {
+    "package": "MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9.zip",
+    "runtime_label": "V9",
+    "error": "BID ticks are not chronological",
+    "observed_during_symbol": "EURNOK",
+    "safety_result": "FAIL_CLOSED_NO_ORDER_NO_ACCOUNT_MUTATION_NO_PROTECTED_FORWARD_OPENING",
+    "completed_hour_evidence_before_failure_preserved": true
+  },
+  "root_cause": {
+    "component": "research_core_v3/v3_friction_staged.py::_probe_range",
+    "broker_semantics": "CTRADER_HISTORICAL_TICK_PAGINATION_WALKS_BACKWARD_IN_TIME",
+    "prior_behavior": "EACH_PAGE_DECODED_OLDEST_FIRST_BUT_SUCCESSIVE_OLDER_PAGES_APPENDED_AFTER_NEWER_PAGES",
+    "consequence": "MULTI_PAGE_COMBINED_TAPE_WAS_NOT_GLOBALLY_CHRONOLOGICAL",
+    "economic_or_sampling_defect": false
+  },
+  "correction": {
+    "behavior": "REVERSE_FETCHED_PAGE_SEQUENCE_TO_OLDER_PAGE_FIRST_AND_REMOVE_ONLY_EXACT_BOUNDARY_DUPLICATE_STATES",
+    "distinct_same_millisecond_states_preserved": true,
+    "raw_price_sorting_used": false,
+    "frozen_plan_changed": false,
+    "frozen_design_changed": false,
+    "sampling_membership_changed": false,
+    "source_plan_binding_sha256": "a4c7e0cb0e4ad309cee497950ebbc59bac076734edd494aa17ab11ed3d576151",
+    "screen_design_binding_sha256": "dd634e66b5f183f8847f6a80709872c7c7a23dfbb4e4f8b0f2150f68245f28f4",
+    "sampling_freeze_binding_sha256": "81bf4be0d83e06ad0f89c9ec714409d88fb105ad91475813eabc33effc692caa",
+    "resume_contract_unchanged": true,
+    "resume_instruction": "EXTRACT_V9R1_OVER_THE_SAME_EXISTING_V9_FOLDER_AND_RUN_THE_SAME_ENTRYPOINT;DO_NOT_DELETE_HIDDEN_WORK_DIR"
+  },
+  "regression_proofs": {
+    "exact_boundary_duplicate_overlap_test": true,
+    "distinct_same_millisecond_state_test": true,
+    "full_scientific_regression_suite": true,
+    "workflow_run_id": 36711945758,
+    "validation_commit_sha": "c1e27544effd9c069befa1e5e960673a8667f60d",
+    "conclusion": "success"
+  },
+  "package": {
+    "name": "MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip",
+    "sha256": "413e8b4a274bb93f7bb60bf9ed73a2b532d6c73a2ad8366d7c0a10959b27299f",
+    "bytes": 171603,
+    "artifact_id": 11094795214,
+    "artifact_wrapper_digest_sha256": "e548e7882ffe15a26665be7411793b8786fdefc7986fe76742a0729a65590c0f",
+    "local_crc_reverification": true,
+    "local_sha256_reverification": true
+  },
+  "scientific_boundaries": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "net_certified_count": 0,
+    "automatic_additional_acquisition": false,
+    "raw_ticks_written_to_disk": false,
+    "completed_v9_hours_reusable": true
+  }
+}
