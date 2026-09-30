@@ -1,0 +1,29 @@
+{
+  "schema":"mxm.research-core-v3.broker-native-volume-confirmed-range-breakout-development-design.v1",
+  "status":"FROZEN_PREOUTCOME_BEFORE_PRICE_RESPONSE_EVALUATION",
+  "family":"BROKER_NATIVE_VOLUME_CONFIRMED_RANGE_BREAKOUT_PATH",
+  "distinctness":{"vs_commodity_breakout":"broad 156-symbol universe and broker-native tick-volume confirmation, no true-range expansion filter","vs_tick_volume_shock_reversal":"continuation after multi-bar range break, not reversal after one-bar price/volume shock"},
+  "development_window":{"source":"accepted Pepperstone M5 DEVELOPMENT archives","development_end_utc":"2026-09-16T23:59:59Z","protected_forward_start_utc":"2026-09-17T12:02:58Z","protected_forward_opened":false},
+  "universe_rule":{"outcome_blind":"reuse timestamp/identity-only 156-symbol DEVELOPMENT universe: >=40 ISO weeks and >=30000 M5 rows; HIGH_QUALITY delta supersedes duplicate symbol IDs","eligible_symbol_count":156,"market_outcomes_used_for_selection":false},
+  "signal":{
+    "reference_range":"previous range_lookback_bars exact contiguous completed M5 highs/lows excluding signal bar t",
+    "volume_reference":"median tick_volume over previous 72 exact contiguous completed M5 bars excluding t; require positive median",
+    "volume_confirmation":"tick_volume_t >= tick_volume_multiplier * prior-72 median",
+    "long_signal":"close_t strictly above frozen prior range high AND volume confirmation",
+    "short_signal":"close_t strictly below frozen prior range low AND volume confirmation",
+    "entry":"next exact contiguous M5 open after completed signal bar",
+    "failure_exit":"LONG first completed post-entry close <= frozen prior range high; SHORT first completed post-entry close >= frozen prior range low; execute next open",
+    "time_exit":"next open after maximum_hold_bars completed post-entry bars if no failure",
+    "overlap":"one open event per symbol x cell",
+    "gross_return":"direction * log(exit_open/entry_open) * 10000 bps",
+    "missing":"right-censor any required missing 300-second link; no interpolation or synthetic bars"
+  },
+  "parameter_grid":{"range_lookback_bars":[24,48],"tick_volume_multiplier":[1.5,2.5],"maximum_hold_bars":[12,24,48]},
+  "cells_per_symbol":12,"test_count":1872,
+  "economic_support_gate":{"completed_events_min":40,"distinct_dates_min":30,"distinct_iso_weeks_min":20,"retention_fraction_min":0.8,"mean_gross_bps_min":10.0,"median_gross_bps_min":0.0,"chronological_event_count_thirds_each_mean_strictly_positive":true,"top10pct_abs_event_concentration_max":0.5},
+  "multiplicity":{"family":"all 1872 frozen symbol x parameter cells","dependence_cluster":"ISO week","procedure":"shared ISO-week wild-sign max-T","resamples":4999,"seed":20260930,"familywise_alpha":0.05,"support_rule_predeclared":"All 1872 remain family members. Only cells meeting non-return support prerequisites (>=40 completed events, >=30 dates, >=20 ISO weeks, retention>=0.80) may generate finite max-T statistics; others receive p=1."},
+  "robust_region_gate":{"adjacency":"one-step parameter-grid adjacency within same symbol","minimum_connected_full_pass_cells":3,"minimum_varied_parameter_dimensions":2,"single_cell_promotion_forbidden":true},
+  "friction_policy":{"exact_authentic_event_time_bid_ask_required_only_after_gross_robust_survivor":true,"proxy_costs_forbidden":true,"new_android_before_gross_survivor":false},
+  "governance":{"post_outcome_direction_flip_or_grid_rescue_forbidden":true,"candidate_freeze_from_development_forbidden":true,"protected_forward_access_forbidden":true},
+  "canonical_sha256":"0aa120805adb70f8344d6de312612ea0c6696daec4a743f307084c6fa9a3c859"
+}
