@@ -7,15 +7,17 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = ROOT / "dist" / "MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V5.zip"
+TARGET = ROOT / "dist" / "MXM_V3_STAGED_FRICTION_PACKAGE_V6.zip"
 
 FILES = (
-    "V3_MAXT14_FRICTION_CAPTURE_RUN.py",
+    "V3_MAXT14_FRICTION_STAGE_RUN.py",
     "research_core_v3/__init__.py",
     "research_core_v3/v3_friction_capture.py",
-    "research_core_v3/pydroid_v3_friction_launcher.py",
+    "research_core_v3/v3_friction_staged.py",
+    "research_core_v3/pydroid_v3_friction_staged_launcher.py",
     "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json",
     "research_core_v3/state/ACCOUNT_IDENTITY_REBIND_ACCEPTANCE_V1.json",
+    "research_core_v3/state/STAGED_FRICTION_ACQUISITION_PLAN_V1.json",
     "research_core_v3/state/CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
     "research_core_v3/state/CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
     "research_core_v3/state/CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
