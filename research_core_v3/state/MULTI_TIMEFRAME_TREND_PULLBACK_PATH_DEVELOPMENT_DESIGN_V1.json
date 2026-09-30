@@ -1,0 +1,75 @@
+{
+  "schema": "mxm.research-core-v3.multi-timeframe-trend-pullback-path-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_PRICE_RESPONSE_EVALUATION",
+  "family": "MULTI_TIMEFRAME_TREND_PULLBACK_PATH",
+  "preoutcome_audit_sha256": "b37de2157cdb3769ec624981e8b261d0ce64086af14aae9f517c5df54bb975ae",
+  "development_window": {
+    "source": "accepted Pepperstone M5 DEVELOPMENT archives",
+    "development_end_utc": "2026-09-16T23:59:59Z",
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false
+  },
+  "universe_rule": {
+    "outcome_blind": "reuse the timestamp/identity-only 156-symbol eligible DEVELOPMENT universe already frozen for VOLATILITY_COMPRESSION_RELEASE_PATH: >=40 distinct ISO weeks and >=30000 M5 rows; HIGH_QUALITY delta supersedes duplicate symbol IDs",
+    "eligible_symbol_count": 156,
+    "market_outcomes_used_for_universe_selection": false
+  },
+  "signal": {
+    "resolution": "M5",
+    "exact_contiguity_seconds": 300,
+    "trend_state": "For candidate resumption bar t and pullback length P, trend anchor is close[t-P-1]. Compute direction from log(close[t-P-1]/close[t-P-1-H]); normalize by 1.4826*median(abs(one-bar log returns)) over the H completed returns ending at t-P-1 times sqrt(H). Require absolute normalized trend >=1.0; direction is its sign.",
+    "pullback": "Over the P completed bars immediately after the trend anchor and ending t-1, require cumulative log return opposite the frozen trend direction with absolute magnitude >= pullback_magnitude * long_scale * sqrt(P).",
+    "resumption": "Completed bar t must close in the original trend direction beyond the two immediately preceding pullback-bar extremes: LONG close_t > max(high[t-2],high[t-1]); SHORT close_t < min(low[t-2],low[t-1]).",
+    "entry": "next contiguous M5 open t+1 after resumption bar has completed",
+    "overlap_policy": "within each symbol x frozen cell, ignore later signals until the accepted position exits",
+    "failure_exit": "LONG: if completed post-entry close <= minimum low of the P pullback bars, exit next contiguous M5 open; SHORT symmetric at maximum high of pullback bars.",
+    "time_exit": "if no failure, exit at next contiguous open after maximum_hold_bars completed post-entry M5 bars",
+    "gross_return": "direction * log(exit_open/entry_open) * 10000 bps",
+    "missing_or_ambiguous": "right-censor fail-closed; no interpolation, resampling, gap bridging, synthetic fills, or same-bar execution claims"
+  },
+  "parameter_grid": {
+    "trend_horizon_bars": [72, 144],
+    "pullback_bars": [6, 12],
+    "minimum_pullback_magnitude_long_scale": [0.5, 1.0],
+    "maximum_hold_bars": [12, 24, 48]
+  },
+  "cells_per_symbol": 24,
+  "test_count": 3744,
+  "economic_support_gate": {
+    "completed_events_min": 40,
+    "distinct_dates_min": 30,
+    "distinct_iso_weeks_min": 20,
+    "retention_fraction_min": 0.8,
+    "mean_gross_bps_min": 8.0,
+    "median_gross_bps_min": 0.0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "all 3744 frozen symbol x parameter cells",
+    "dependence_cluster": "ISO week",
+    "procedure": "shared ISO-week wild-sign max-T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "support_rule_predeclared": "All 3744 cells remain family members. Only cells meeting non-return support prerequisites (>=40 completed events, >=30 dates, >=20 ISO weeks, retention>=0.80) may generate finite studentized statistics in max-T; support-ineligible cells are assigned familywise p=1 and cannot pass."
+  },
+  "robust_region_gate": {
+    "adjacency": "one-step parameter-grid adjacency within same symbol",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "friction_policy": {
+    "exact_authentic_event_time_friction_only_after_gross_robust_survivor": true,
+    "proxy_costs_forbidden": true,
+    "new_android_before_gross_survivor": false
+  },
+  "governance": {
+    "post_outcome_sign_flip_forbidden": true,
+    "post_outcome_grid_or_exit_rescue_forbidden": true,
+    "candidate_freeze_from_development_forbidden": true,
+    "protected_forward_access_forbidden": true
+  },
+  "canonical_sha256": "837e0ef72c5651abc123c1a7aad15df5f7620829a91f404fdd2ae92d399ba40c"
+}
