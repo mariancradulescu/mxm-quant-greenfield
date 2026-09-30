@@ -183,12 +183,16 @@ def build_account_rebind_proposal_document(
     }
     if observed != expected:
         raise CaptureContractError(
-            "account rebind requires exact current applicability for all 14 frozen symbols"
+            "account rebind requires exact current applicability for all frozen target symbols"
         )
     prior = plan.get("recovered_prior_evidence_audit") or {}
-    if prior.get("direct_historical_tick_coverage_for_selected_14") != "NONE_FOUND":
+    prior_coverage = prior.get(
+        "direct_historical_tick_coverage_for_selected_14",
+        prior.get("direct_historical_tick_coverage_for_selected_scope", "NONE_FOUND"),
+    )
+    if prior_coverage != "NONE_FOUND":
         raise CaptureContractError(
-            "account rebind cannot be auto-proposed after prior selected-14 account evidence"
+            "account rebind cannot be auto-proposed after prior selected-scope account evidence"
         )
     symbol_binding = _sha_bytes(
         _canonical(
@@ -230,7 +234,7 @@ def build_account_rebind_proposal_document(
         "authority_change_performed": False,
         "scientific_basis": (
             "The gross DEVELOPMENT surface and candidate regions are account-independent "
-            "at this stage; selected-14 historical friction remains unresolved. Rebinding "
+            "at this stage; selected-scope historical friction remains unresolved. Rebinding "
             "is eligible only before historical quote capture, after Pepperstone LIVE "
             "identity and exact 14-symbol applicability are reverified. The frozen account "
             "authority must be durably rebound before any historical BID/ASK request."
