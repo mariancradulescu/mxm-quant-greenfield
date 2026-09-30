@@ -155,14 +155,22 @@ def global_death_bound(
 class GlobalFrictionTriageRunner(StagedFrictionRunner):
     def __init__(self, **kwargs):
         V3MaxT14FrictionRunner.__init__(self, **kwargs)
-        self.design_path = self.repo_root / DESIGN_REL
+        design_rel = str(self.config.get("design_rel") or DESIGN_REL)
+        work_rel = str(self.config.get("stage_work_rel") or WORK_REL)
+        output_rel = str(self.config.get("stage_output_rel") or OUTPUT_REL)
+        transfer_name = str(
+            self.config.get("stage_transfer_name") or TRANSFER_NAME
+        )
+        self.design_path = self.repo_root / design_rel
         if not self.design_path.is_file():
-            raise CaptureContractError("global friction triage design missing")
+            raise CaptureContractError(
+                f"global friction triage design missing: {design_rel}"
+            )
         self.design = json.loads(self.design_path.read_text(encoding="utf-8"))
         self._validate_global_design()
-        self.stage_work_dir = self.repo_root / WORK_REL
-        self.stage_output_dir = self.repo_root / OUTPUT_REL
-        self.stage_bundle_path = self.stage_output_dir.parent / TRANSFER_NAME
+        self.stage_work_dir = self.repo_root / work_rel
+        self.stage_output_dir = self.repo_root / output_rel
+        self.stage_bundle_path = self.stage_output_dir.parent / transfer_name
         self.stage_state_path = self.stage_work_dir / "state.json"
         self.hours_dir = self.stage_work_dir / "hours"
         self.stage_work_dir.mkdir(parents=True, exist_ok=True)
@@ -181,15 +189,18 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
         if self.design.get("source_plan_binding_sha256") != self.plan.get("binding_sha256"):
             raise CaptureContractError("global triage/source plan mismatch")
         scope = self.design["scope"]
-        if int(scope["full_reference_exact_windows"]) != 691_919:
-            raise CaptureContractError("global triage reference-window count changed")
+        expected_windows = sum(int(t["windows"]) for t in self.plan["targets"])
+        if int(scope["full_reference_exact_windows"]) != expected_windows:
+            raise CaptureContractError(
+                "global triage reference-window count does not match acquisition plan"
+            )
         if scope.get("protected_forward_opened") is not False:
             raise CaptureContractError("global triage opens protected-forward")
         if int(scope.get("candidate_frozen_count", -1)) != 0:
             raise CaptureContractError("global triage assumes frozen candidate")
         triage = self.design["initial_global_triage"]
         if int(triage.get("campaign_looks", 0)) != 1:
-            raise CaptureContractError("V7 initial campaign must contain exactly one look")
+            raise CaptureContractError("initial global campaign must contain exactly one look")
         if triage.get("automatic_additional_acquisition") is not False:
             raise CaptureContractError("automatic additional acquisition is forbidden")
 
@@ -515,7 +526,13 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
             "hour_start_ms": int(hour_start),
             "reference_window_count": int(reference_window_count),
             "sampled_window_count": len(windows),
-            "unsampled_windows_contribute_zero_to_death_proxy": True,
+            "unsampled_windows_contribute_zero_to_death_proxy": (
+                self.design["death_rule"].get("estimator_mode")
+                != "TWO_STAGE_INCLUSION_WEIGHTED_WITHIN_SELECTED_HOUR"
+            ),
+            "within_hour_inclusion_weighting": self.design[
+                "initial_global_triage"
+            ].get("within_hour_inclusion_weighting"),
             "transport_span_minutes": int(span_min),
             "rows": sorted(rows, key=lambda r: r["exact_window_index"]),
             "transport_provenance": provenance,
@@ -540,7 +557,16 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
         sampling_meta: Mapping[str, Any],
     ) -> dict[str, Any]:
         gross = float(target["minimum_mean_response_bps"])
+        rule = self.design["death_rule"]
+        estimator_mode = str(
+            rule.get("estimator_mode") or "UNWEIGHTED_FORCED_ZERO"
+        )
+        inclusion_weighted = (
+            estimator_mode
+            == "TWO_STAGE_INCLUSION_WEIGHTED_WITHIN_SELECTED_HOUR"
+        )
         totals: dict[str, list[float]] = {}
+        bound_meta: dict[str, dict[str, Any]] = {}
         coverage = {
             "fresh_nonnegative": 0,
             "missing_or_stale": 0,
@@ -550,26 +576,40 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
         sampled_hours = 0
         sampled_windows = 0
         for stratum, meta in sampling_meta.items():
+            local_meta = dict(meta)
+            if inclusion_weighted:
+                local_meta["proxy_max_windows_per_hour"] = int(
+                    meta["max_windows_per_hour"]
+                )
+            bound_meta[stratum] = local_meta
             values = []
             for hour_value in meta["selected_hour_start_ms"]:
                 hour = int(hour_value)
                 doc = _load_gzip_json(self._hour_file(symbol, hour))
                 value, counts = self._cluster_total(doc, gross)
+                sampled_count = len(doc["rows"])
+                reference_count = int(doc["reference_window_count"])
+                if inclusion_weighted:
+                    if sampled_count <= 0 or reference_count < sampled_count:
+                        raise CaptureContractError(
+                            "invalid within-hour inclusion geometry"
+                        )
+                    value *= reference_count / sampled_count
+                else:
+                    coverage[
+                        "implicit_zero_unselected_within_sampled_hours"
+                    ] += max(0, reference_count - sampled_count)
                 values.append(value)
                 sampled_hours += 1
-                sampled_windows += len(doc["rows"])
-                coverage["implicit_zero_unselected_within_sampled_hours"] += max(
-                    0, int(doc["reference_window_count"]) - len(doc["rows"])
-                )
+                sampled_windows += sampled_count
                 for key in ("fresh_nonnegative", "missing_or_stale", "negative"):
                     coverage[key] += counts[key]
             if values:
                 totals[stratum] = values
-        rule = self.design["death_rule"]
         bound = global_death_bound(
             gross_bps=gross,
             total_reference_windows=int(target["windows"]),
-            strata_meta=sampling_meta,
+            strata_meta=bound_meta,
             sampled_cluster_totals=totals,
             alpha=float(rule["per_region_alpha"]),
         )
@@ -579,10 +619,14 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
             "region_sha256": str(target["region_sha256"]),
             "minimum_gross_mean_response_bps": gross,
             **bound,
+            "estimator_mode": estimator_mode,
+            "within_hour_inclusion_weighted": inclusion_weighted,
             "sampled_hours": sampled_hours,
             "sampled_exact_windows": sampled_windows,
             "coverage": coverage,
-            "decision": str(rule["death_label"] if dead else rule["nondeath_label"]),
+            "decision": str(
+                rule["death_label"] if dead else rule["nondeath_label"]
+            ),
             "candidate_frozen": False,
             "net_certification": False,
             "automatic_additional_acquisition": False,
@@ -728,8 +772,18 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
             ],
             "corrected_development_cells": 7975,
             "gross_robust_regions": 88,
-            "priority_regions": 14,
-            "other_gross_regions_cost_unresolved": 74,
+            "triage_regions": len(self.plan["targets"]),
+            "prior_priority_regions_parked": int(
+                self.design["scope"].get("prior_priority_regions_parked", 0)
+            ),
+            "other_gross_regions_cost_unresolved": int(
+                self.design["scope"].get(
+                    "other_gross_regions_after_wave2",
+                    self.design["scope"].get(
+                        "other_gross_regions_cost_unresolved", 74
+                    ),
+                )
+            ),
             "authoritative_frontier": 1576,
             "protected_forward_opened": False,
             "candidate_frozen_count": 0,
@@ -753,9 +807,9 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
             },
             "interpretation": (
                 "One frozen global DEVELOPMENT friction triage completed for all 14. "
-                "A lower proxy can prove spread-alone economic death. Non-death means "
-                "PLAUSIBLE_OR_UNRESOLVED only. No Look2/Look3/Look4, candidate freeze, "
-                "or net certification is automatic."
+                "The frozen estimator declared by the design can prove spread-alone "
+                "economic death. Non-death means PLAUSIBLE_OR_UNRESOLVED only. "
+                "No Look2/Look3/Look4, candidate freeze, or net certification is automatic."
             ),
         }
         manifest["binding_sha256"] = _sha_bytes(_canonical(manifest))
@@ -799,17 +853,23 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
         )
 
 
-def global_triage_geometry_preflight(repo_root: Path | str) -> dict[str, Any]:
+def global_triage_geometry_preflight(
+    repo_root: Path | str,
+    *,
+    plan_rel: str | None = None,
+    design_rel: str | None = None,
+) -> dict[str, Any]:
     runner = object.__new__(GlobalFrictionTriageRunner)
     runner.repo_root = Path(repo_root)
-    runner.plan_path = (
-        runner.repo_root
-        / "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json"
+    runner.config = {}
+    runner.plan_path = runner.repo_root / (
+        plan_rel
+        or "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json"
     )
     runner.plan = json.loads(runner.plan_path.read_text(encoding="utf-8"))
     runner._validate_plan()
     runner.scope_by_symbol = runner._load_scopes_and_blocks()
-    runner.design_path = runner.repo_root / DESIGN_REL
+    runner.design_path = runner.repo_root / (design_rel or DESIGN_REL)
     runner.design = json.loads(runner.design_path.read_text(encoding="utf-8"))
     runner._validate_global_design()
     sampling_freeze, _ = runner._reference()
@@ -833,10 +893,14 @@ def global_triage_geometry_preflight(repo_root: Path | str) -> dict[str, Any]:
                     hour = int(hour_value)
                     chosen_ids = {
                         int(x)
-                        for x in meta["selected_window_indices_by_hour"][str(hour)]
+                        for x in meta["selected_window_indices_by_hour"][
+                            str(hour)
+                        ]
                     }
                     chosen = [
-                        w for w in strata[stratum][hour] if int(w.index) in chosen_ids
+                        w
+                        for w in strata[stratum][hour]
+                        if int(w.index) in chosen_ids
                     ]
                     hours_count += 1
                     windows_count += len(chosen)
@@ -863,26 +927,46 @@ def global_triage_geometry_preflight(repo_root: Path | str) -> dict[str, Any]:
         total_windows = windows_count
 
     stage0 = int(runner.design["stage0_benchmark"]["planned_base_probes"])
-    eligible = [str(x) for x in runner.design["stage0_benchmark"]["stage1_eligible_spans_minutes"]]
+    eligible = [
+        str(x)
+        for x in runner.design["stage0_benchmark"][
+            "stage1_eligible_spans_minutes"
+        ]
+    ]
     base_requests = [
         stage0 + int(by_span[k]["base_bid_ask_requests_before_pagination"])
         for k in eligible
     ]
-    rate = float(runner.design["observed_v5_baseline"]["observed_base_chunk_rate_per_second"])
+    baseline = runner.design.get("observed_v7_baseline") or {}
+    if baseline:
+        rate = float(
+            baseline["api_attempts_total"]
+            / baseline["summed_broker_call_elapsed_seconds"]
+        )
+    else:
+        old = runner.design["observed_v5_baseline"]
+        rate = float(old["observed_base_chunk_rate_per_second"])
+    reference_windows = sum(int(t["windows"]) for t in runner.plan["targets"])
     return {
-        "schema": "mxm.research-core-v3.global-friction-triage-geometry.v1",
+        "schema": "mxm.research-core-v3.global-friction-triage-geometry.v2",
         "design_binding_sha256": runner.design["binding_sha256"],
-        "reference_exact_windows": 691_919,
+        "source_plan_binding_sha256": runner.plan["binding_sha256"],
+        "reference_exact_windows": reference_windows,
         "sampled_hours": total_hours,
         "sampled_exact_windows": total_windows,
         "stage0_base_probes": stage0,
         "by_transport_span_minutes": by_span,
         "eligible_stage1_spans_minutes": [int(x) for x in eligible],
-        "total_base_request_range_before_pagination": [min(base_requests), max(base_requests)],
-        "base_only_seconds_at_observed_v5_rate_range": [
+        "total_base_request_range_before_pagination": [
+            min(base_requests),
+            max(base_requests),
+        ],
+        "base_only_seconds_at_observed_rate_range": [
             min(base_requests) / rate,
             max(base_requests) / rate,
         ],
         "campaign_looks": 1,
         "automatic_additional_acquisition": False,
+        "estimator_mode": runner.design["death_rule"].get("estimator_mode"),
     }
+
