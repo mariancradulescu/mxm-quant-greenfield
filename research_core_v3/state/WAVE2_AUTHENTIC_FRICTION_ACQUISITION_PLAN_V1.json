@@ -1,0 +1,286 @@
+{
+  "schema": "mxm.research-core-v3.wave2-authentic-friction-acquisition.v1",
+  "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
+  "created_utc": "2026-09-30T10:30:00Z",
+  "authority": {
+    "corrected_friction_scope_plan_sha256": "4952c50fffda348b9ea042c089e1cb289d8808c083eae45a3b00bfdcc73c5be5",
+    "corrected_region_assessment_sha256": "7ab0000e92bd39a28d3de3aafc328927eb25fdcf42e68240e31b1a800461026a",
+    "corrected_surface_sha256": "0ceb1f79080f8c9ef5cf6a13c0f56b279d02ffabc9644624f58230c705fcccbb",
+    "project_contract_blob_sha": "3999db1ccb5428039f1bfc731e65b118fa868e7d",
+    "project_contract_path": "RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_v7_result_audit": "research_core_v3/state/V7_GLOBAL_FRICTION_TRIAGE_RESULT_AUDIT_V1.json"
+  },
+  "broker_identity": {
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "account_mutation": false,
+    "current_metadata_is_historical_cost_truth": false,
+    "environment": "Pepperstone - Europe LIVE",
+    "exact_symbol_id_and_name_match_required": true,
+    "oauth_scope": "accounts",
+    "orders": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "candidate_outcomes_opened_by_capture": false,
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
+    "fill_authority": false,
+    "historical_request_max_span_ms": 604800000,
+    "protected_forward_opened": false,
+    "quote_age_limit_seconds": 2,
+    "quote_types": [
+      "BID",
+      "ASK"
+    ],
+    "raw_chunks_retained_locally": false,
+    "request_pacing_seconds": 0.21,
+    "scope_window_interpretation": "Each exact packed window is [boundary-2s,boundary+30s]; boundary=start+2000ms.",
+    "transfer_bundle_contains_raw_ticks": false,
+    "transport_coalescing": {
+      "allowed": true,
+      "maximum_block_span_ms": 3600000,
+      "maximum_gap_ms": 300000,
+      "overfetch_interpretation": "TRANSPORT_ONLY;DERIVED_EVIDENCE_RESTRICTED_TO_FROZEN_SAMPLED_WINDOWS;NO_NEW_SIGNAL_OR_OUTCOME_SELECTION",
+      "rule": "Transport may overfetch authentic historical ticks around frozen sampled windows; analysis remains frozen."
+    }
+  },
+  "selection": {
+    "gross_robust_regions_total": 88,
+    "priority14_prior_wave_parked": 14,
+    "remaining_nonpriority_gross_regions_before_wave2": 74,
+    "selected_regions": 14,
+    "selected_exact_quote_windows": 747620,
+    "selected_unique_events": 543348,
+    "ordering": "DESCENDING_MINIMUM_GROSS_MEAN_RESPONSE_BPS_AMONG_74_NON_PRIORITY_GROSS_REGIONS_FOR_INFORMATION_GAIN_ONLY;NOT_PROMOTION",
+    "does_not_close_unselected_gross_regions": true,
+    "unselected_gross_regions_remaining_open": 60,
+    "authoritative_frontier_remains_open": 1576,
+    "reason": "NEXT_HIGHEST_INFORMATION_GAIN_AFTER_PRIORITY14_STRONG_NEGATIVE_FRICTION_DIAGNOSTIC"
+  },
+  "scope_archives": [
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "sha256": "144981233c86ec46aeee3562f64120069caa6daf0e6273426ce3661e56be13c2",
+      "size_bytes": 1559776
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "sha256": "f0e90bb0d332fdbf2a0a1246a77ff2d0b4ffac60a2dde6f2f224623ac1922943",
+      "size_bytes": 1614620
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "sha256": "c6e9603b927aee749dcb28f905e195453150391d7c1bcaf87a55c8a6146dbc34",
+      "size_bytes": 1460792
+    }
+  ],
+  "recovered_prior_evidence_audit": {
+    "direct_historical_tick_coverage_for_selected_14": "NONE_FOUND",
+    "v7_priority14_evidence_reusable_for_wave2_symbols": false,
+    "reason": "NO_SELECTED_SYMBOL_OVERLAP_WITH_V7_PRIORITY14"
+  },
+  "freeze_gate": {
+    "candidate_freeze_allowed_by_this_capture": false,
+    "net_certification_allowed_by_this_capture_alone": false,
+    "protected_forward_must_remain_closed": true,
+    "remaining_required_components": [
+      "point-in-time applicable commission/currency conversion",
+      "volume/min-step feasibility",
+      "margin/leverage applicability",
+      "swap where relevant",
+      "session/holiday/trading-state restrictions",
+      "explicit execution/delay/slippage rule"
+    ]
+  },
+  "targets": [
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 19655,
+      "mechanism": "BREAKOUT_VOLATILITY_EXPANSION",
+      "minimum_mean_response_bps": 4.633215927725507,
+      "p_familywise_region_intersection": 0.9995,
+      "region_sha256": "84ca5423890f24dfe980d8fbcb3995ac1c33e005b119e36659ffe601105dc0e2",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_5410.json.gz",
+      "shard_sha256": "0b99dfc510b6b662a30c50e6d05481de9386c35ec32b2849d68ae696fac2a7fd",
+      "symbol": "CRM.US-24",
+      "symbol_id": 5410,
+      "windows": 20806
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 5242,
+      "mechanism": "BREAKOUT_VOLATILITY_EXPANSION",
+      "minimum_mean_response_bps": 3.7838219951617313,
+      "p_familywise_region_intersection": 1,
+      "region_sha256": "8b2e068d01a564a4f9d348b3388e42fabf97617c192e98a94a218574b6652214",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_5470.json.gz",
+      "shard_sha256": "1dc88d1ef7e2887052300268adbc1d7b9c0671f0a0d088768e88aca1da425934",
+      "symbol": "HOOD.US-24",
+      "symbol_id": 5470,
+      "windows": 10056
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 53219,
+      "mechanism": "BREAKOUT_VOLATILITY_EXPANSION",
+      "minimum_mean_response_bps": 2.961363142752253,
+      "p_familywise_region_intersection": 1,
+      "region_sha256": "9253238518feeb3784c25971ca153ae3059e39f48294f1e2cf42b666233f9468",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_3034.json.gz",
+      "shard_sha256": "ec517905dda9a292a92ed9150c4da00eda5fe481648f9fd864cbad74ec62bed6",
+      "symbol": "AMD.US-24",
+      "symbol_id": 3034,
+      "windows": 48487
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 46477,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 2.6528226897319644,
+      "p_familywise_region_intersection": 0.115,
+      "region_sha256": "42bb366e1b6f86cbcc6572a384bc208aa03dde82224f4b229a27f9eaddbefd40",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_7189.json.gz",
+      "shard_sha256": "36bd3c9b710c9fb8eba9665e4109611d26df9cfd6c0eb4626f8aa1c9cb1689a6",
+      "symbol": "NERUSD",
+      "symbol_id": 7189,
+      "windows": 68663
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 54307,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 2.367339914067578,
+      "p_familywise_region_intersection": 0.083,
+      "region_sha256": "3895ae871ecf3af39750240ce066f5e25b8643d8cb011cccc8befd1aeddc98f6",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_7190.json.gz",
+      "shard_sha256": "34771fb07306efdba3ae22bc3103444e95db668df4b3c7f3e5f62cb9772ec9cb",
+      "symbol": "ONDUSD",
+      "symbol_id": 7190,
+      "windows": 75428
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 32028,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 2.3092916966167345,
+      "p_familywise_region_intersection": 0.9045,
+      "region_sha256": "ac2615e1c1f4ddd01af8adbd343691f2d05a138c4108c2c3cf3549b034ea6e7b",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_95.json.gz",
+      "shard_sha256": "8755ad02b37203a707c0707510ba51c5dafcc6622db7c3e2f88ce9d7b03ef8f4",
+      "symbol": "XPDUSD",
+      "symbol_id": 95,
+      "windows": 45460
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 17984,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 2.201921528418078,
+      "p_familywise_region_intersection": 1,
+      "region_sha256": "d2a7a95c3bcd058664b1400ff979e7d2a17fa3c0ad9baa6960747024a911a2c9",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_7196.json.gz",
+      "shard_sha256": "5eedb324c2ee089282f46c7005e8566989d9a78e2e98d05e531bca08c9795a0e",
+      "symbol": "BNKUSD",
+      "symbol_id": 7196,
+      "windows": 30446
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 29482,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.9236919356224265,
+      "p_familywise_region_intersection": 0.997,
+      "region_sha256": "bee27450703cb5ecc50ad366a2c9e8ebd335521d4301571df8a2b95b7b0030be",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_324.json.gz",
+      "shard_sha256": "c892883e6835f4eac4a296661406fc5e80cdcd82752e8266ea84aeb19397392b",
+      "symbol": "DOGEUSD",
+      "symbol_id": 324,
+      "windows": 48235
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 28344,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.843837164538113,
+      "p_familywise_region_intersection": 0.99,
+      "region_sha256": "ee35c54e450f859513728636e0a0756c726683f9938756b15427a91b52bccfa6",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_7186.json.gz",
+      "shard_sha256": "e51d52f3b09bb403eed94d0a8afc8f42865412f9dcf9a1aa8a51638ec04cdce0",
+      "symbol": "ATMUSD",
+      "symbol_id": 7186,
+      "windows": 46204
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 45962,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.758593082672564,
+      "p_familywise_region_intersection": 0.379,
+      "region_sha256": "47880cc6a6cefacda95bbea4210c2dbd4c8f4bf85a69aeb19f75796ff6b86b33",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2737.json.gz",
+      "shard_sha256": "73359f2d52a900d995b760d704d5b631d924e00c0fba8bb433bb9a5f05fe0d1b",
+      "symbol": "COMPUSD",
+      "symbol_id": 2737,
+      "windows": 68236
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 46207,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.707619155123967,
+      "p_familywise_region_intersection": 0.3365,
+      "region_sha256": "c71742fcc5636291c2cd54dcc1fff1fb22d058f2228c88181f0a17a54d33aade",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2738.json.gz",
+      "shard_sha256": "02ce23e3c21d7d1362aedd1ff211b505b714d31dc0cf60c9bf3c2ab92549ecf5",
+      "symbol": "ETCUSD",
+      "symbol_id": 2738,
+      "windows": 65830
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 66365,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.6095208387876978,
+      "p_familywise_region_intersection": 0.092,
+      "region_sha256": "81d26d3027eb5c40a82f1178295195a89cc8949c7c837350322e6ca324cb5fca",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_888.json.gz",
+      "shard_sha256": "447a005810043f57e3c8ad6b786daec720116b0633ebc354af217ec373a91718",
+      "symbol": "XTZUSD",
+      "symbol_id": 888,
+      "windows": 78686
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 44922,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.5918063144132417,
+      "p_familywise_region_intersection": 0.9915,
+      "region_sha256": "00f2a0b5878bd16e1b2a47762cf427a013e790dc66f7cb2321bd1d818e2f8a1e",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2740.json.gz",
+      "shard_sha256": "ebb2feb74457a4dcacf07099f63858922f06605a75f1394d81e5454dcc0e6644",
+      "symbol": "KSMUSD",
+      "symbol_id": 2740,
+      "windows": 66985
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 53154,
+      "mechanism": "MEAN_REVERSION",
+      "minimum_mean_response_bps": 1.3907604482387022,
+      "p_familywise_region_intersection": 0.9065,
+      "region_sha256": "e00487c51c5edaf5021693cb01ff3498b9a7dd5aafa4df485c1b3223e1078624",
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_130.json.gz",
+      "shard_sha256": "38198e96ab9295a1dfde95a1b61f23558b80e5623f9af8baf6abf5a7e4dc2efa",
+      "symbol": "LTCUSD",
+      "symbol_id": 130,
+      "windows": 74098
+    }
+  ],
+  "binding_sha256": "094a9560914a2fb0c0e4cfaeb68bd0ada6a1948c364c845bcbbe3a8f80c8478f"
+}
