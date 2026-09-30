@@ -295,18 +295,40 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
             reference_windows = self.scope_by_symbol[symbol]["windows"]
             development_min_ms = min(int(x[0]) for x in reference_windows)
             development_max_ms = max(int(x[1]) for x in reference_windows)
-            for anchor_hour in benchmark_freeze["anchors_by_symbol"][symbol]:
+            symbol_anchors = list(benchmark_freeze["anchors_by_symbol"][symbol])
+            broad_spans = {
+                int(x)
+                for x in self.design["stage0_benchmark"].get(
+                    "broad_probe_spans_minutes", []
+                )
+            }
+            broad_anchor = (
+                symbol_anchors[len(symbol_anchors) // 2]
+                if symbol_anchors
+                else None
+            )
+            for anchor_hour in symbol_anchors:
                 center = int(anchor_hour) + HOUR_MS // 2
                 for span_min in spans:
+                    if span_min in broad_spans and anchor_hour != broad_anchor:
+                        continue
                     span_ms = span_min * 60_000
                     start_ms = max(development_min_ms, center - span_ms // 2)
                     end_ms = min(development_max_ms, protected_ms - 1, center + span_ms // 2)
                     if end_ms <= start_ms:
                         raise CaptureContractError("stage0 benchmark escaped DEVELOPMENT")
-                    useful = sum(
+                    reference_windows_in_probe = sum(
                         1
                         for start, end in reference_windows
                         if int(start) <= end_ms and int(end) >= start_ms
+                    )
+                    retain_cap = int(
+                        self.design["initial_global_triage"][
+                            "max_frozen_exact_windows_per_sampled_hour"
+                        ]
+                    )
+                    retained_triage_windows = min(
+                        retain_cap, reference_windows_in_probe
                     )
                     for side in ("BID", "ASK"):
                         _, meta = self._probe_range(
@@ -318,7 +340,12 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
                                 "symbol_id": int(target["symbol_id"]),
                                 "anchor_hour_start_ms": int(anchor_hour),
                                 "probe_span_minutes": int(span_min),
-                                "reference_windows_in_probe": int(useful),
+                                "reference_windows_in_probe": int(
+                                    reference_windows_in_probe
+                                ),
+                                "retained_triage_windows_in_probe": int(
+                                    retained_triage_windows
+                                ),
                             }
                         )
                         records.append(meta)
@@ -336,21 +363,24 @@ class GlobalFrictionTriageRunner(StagedFrictionRunner):
                 ]
                 if not subset or any(r["broker_history_unavailable"] for r in subset):
                     continue
-                useful = sum(max(0, int(r["reference_windows_in_probe"])) for r in subset)
+                useful = sum(
+                    max(0, int(r["retained_triage_windows_in_probe"]))
+                    for r in subset
+                )
                 if useful <= 0:
                     continue
                 elapsed = sum(max(1, int(r["elapsed_ms"])) for r in subset)
                 response_bytes = sum(int(r["protobuf_response_bytes"]) for r in subset)
                 attempts = sum(int(r["api_attempts"]) for r in subset)
                 metrics = {
-                    "elapsed_ms_per_reference_window": elapsed / useful,
-                    "protobuf_bytes_per_reference_window": response_bytes / useful,
-                    "api_attempts_per_reference_window": attempts / useful,
+                    "elapsed_ms_per_retained_triage_window": elapsed / useful,
+                    "protobuf_bytes_per_retained_triage_window": response_bytes / useful,
+                    "api_attempts_per_retained_triage_window": attempts / useful,
                 }
                 score = (
-                    metrics["elapsed_ms_per_reference_window"],
-                    metrics["protobuf_bytes_per_reference_window"],
-                    metrics["api_attempts_per_reference_window"],
+                    metrics["elapsed_ms_per_retained_triage_window"],
+                    metrics["protobuf_bytes_per_retained_triage_window"],
+                    metrics["api_attempts_per_retained_triage_window"],
                     candidate,
                 )
                 scored.append((score, candidate, metrics))
