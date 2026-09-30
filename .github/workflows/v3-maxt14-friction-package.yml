@@ -35,11 +35,11 @@ jobs:
       - name: Build deterministic Android capture package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_maxt14_friction_capture_package.py
-          sha256sum dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V1.zip
+          sha256sum dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V2.zip
       - name: Upload capture package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V1
-          path: dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V1.zip
+          name: MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V2
+          path: dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V2.zip
           if-no-files-found: error
           retention-days: 30
