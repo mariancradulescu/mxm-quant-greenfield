@@ -1,0 +1,109 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-sectional-normalized-momentum-development-design.v1",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parent_research_head": "94c4a235cc14d36f27ca9b64b40db18942d01530",
+  "family": "CROSS_SECTIONAL_RANKING",
+  "subfamily": "FX_SPOT_NORMALIZED_RELATIVE_MOMENTUM",
+  "purpose": "TEST_A_LOWER_TURNOVER_CROSS_SECTIONAL_FX_PAIR_RANKING_ARCHITECTURE_WITH_PRE_OUTCOME_EUR200_MARGIN_HEADROOM_FILTER_AND_CAUSAL_NEXT_OPEN_EXECUTION",
+  "pre_outcome_rationale": {
+    "us_equity_cross_sectional_low_turnover_result_was_null": true,
+    "fx_cross_sectional_pair_ranking_is_distinct_asset_class_and_return_structure": true,
+    "price_only_single_symbol_trend_surface_is_not_equivalent_to_synchronous_cross_sectional_ranking": true,
+    "existing_authentic_one_year_M5_reused": true,
+    "outcome_information_used_to_select_fx_members": false
+  },
+  "universe": {
+    "source_core_ref": "research_core_v3/state/INCLUSIVE_FULL_DEPTH_DISCOVERY_CORE_V1.json",
+    "source_current_feasibility_ref": "data/PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_EPOCH22_V1.json",
+    "selection_law": "ALL_AND_ONLY_primary_core_FOREX_SPOT_IDENTITIES_WITH_CURRENT_BOTH_DIRECTION_FEASIBILITY_AND_OUTCOME_BLIND_minimum_margin_estimate_for_EUR200_LE_50_EUR",
+    "symbol_count": 56,
+    "minimum_margin_cap_eur_per_symbol": 50,
+    "two_leg_minimum_margin_sum_upper_bound_eur": 100,
+    "starting_equity_eur": 200,
+    "margin_filter_is_not_final_execution_certification": true,
+    "supplementary_existing_identities_excluded": true,
+    "market_outcomes_used_for_universe": false
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_archive_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "missing_bars": "NO_FILL_INTERPOLATION_RESAMPLING_OR_SYNTHETIC_BARS",
+    "exact_contiguity_seconds": 300
+  },
+  "signal": {
+    "score": "LN(CLOSE_t/CLOSE_t_minus_L)/(POP_STD_OF_L_ONE_BAR_LOG_RETURNS*SQRT(L))_USING_ONLY_EXACT_CONTIGUOUS_COMPLETED_BARS",
+    "decision_grid": "UNIX_M5_BAR_INDEX_MOD_H_EQUALS_ZERO",
+    "minimum_cross_section_valid_scores": 40,
+    "rank_law": "HIGHEST_SCORE_LONG_LOWEST_SCORE_SHORT_K_EQUALS_1_EACH;TIES_BY_SYMBOL_ID_ASCENDING",
+    "entry": "NEXT_EXACT_M5_OPEN_AFTER_DECISION_FOR_BOTH_SELECTED_LEGS",
+    "exit": "OPEN_AFTER_H_COMPLETED_M5_BARS_FOR_BOTH_SELECTED_LEGS",
+    "portfolio_gross_bps": "ARITHMETIC_MEAN_OF_LONG_AND_SHORT_DIRECTIONAL_LOG_RETURN_BPS",
+    "portfolio_observation_admission": "BOTH_LEGS_MUST_HAVE_COMPLETE_EXACT_CONTIGUOUS_ENTRY_TO_EXIT_PATH_OR_THE_REBALANCE_OBSERVATION_IS_EXCLUDED",
+    "overlap": "DECISION_AT_THE_FINAL_HELD_BAR_CLOSE_MAY_REBALANCE_AT_THE_SAME_NEXT_OPEN_AS_THE_PRIOR_EXIT"
+  },
+  "parameter_grid": {
+    "lookback_bars": [
+      24,
+      72,
+      288
+    ],
+    "hold_rebalance_bars": [
+      12,
+      24,
+      48
+    ],
+    "K": 1,
+    "cell_count": 9,
+    "ranges_frozen_before_outcome": true
+  },
+  "economic_support_gate": {
+    "minimum_completed_portfolio_observations": 600,
+    "minimum_distinct_utc_dates": 180,
+    "minimum_distinct_iso_weeks": 45,
+    "minimum_observation_retention_fraction": 0.8,
+    "minimum_mean_portfolio_gross_bps": 5,
+    "minimum_median_portfolio_gross_bps": 0,
+    "chronological_thirds": "ALL_THREE_OBSERVATION_COUNT_THIRDS_STRICTLY_POSITIVE_MEAN_GROSS_BPS",
+    "gross_threshold_semantics": "HEADROOM_SCREEN_ONLY_NOT_A_COST_PROXY"
+  },
+  "multiplicity": {
+    "family": "ALL_9_FROZEN_CELLS",
+    "dependence_unit": "UTC_ISO_WEEK",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "insufficient_cells_receive_p": 1
+  },
+  "robustness": {
+    "local_cell_pass": "ECONOMIC_SUPPORT_GATE_AND_FAMILYWISE_MULTIPLICITY_PASS",
+    "adjacency": "ONE_GRID_STEP_IN_EXACTLY_ONE_OF_LOOKBACK_OR_HOLD",
+    "minimum_connected_cells": 3,
+    "minimum_varied_axes": 2,
+    "no_single_cell_promotion": true
+  },
+  "friction_execution_boundary": {
+    "no_proxy_spread": true,
+    "gross_only_at_this_stage": true,
+    "if_survivor": "INTERSECT_SELECTED_LONG_AND_SHORT_EVENT_TIMESTAMPS_WITH_AUTHENTIC_PEPPERSTONE_FRICTION_THEN_REPLAY_ACTUAL_VOLUME_LATTICE_MARGIN_COMMISSION_SPREAD_AND_TWO_LEG_CONCURRENCY_ON_EUR200",
+    "candidate_freeze_here": false,
+    "protected_forward_access": false
+  },
+  "if_null": "PARK_THIS_FX_CROSS_SECTIONAL_PAIR_RANKING_REGION_WITHOUT_POST_OUTCOME_ORIENTATION_K_LOOKBACK_OR_HOLD_EXTENSION",
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_orders_authorized": false,
+    "runtime_v2_legacy_read_only": true
+  },
+  "canonical_sha256": "c69fe4bdd9a88f0c02ef2ebc1e2c0a66b6266dce54ed326a741c8c7e0506f31f"
+}
