@@ -1,0 +1,27 @@
+{
+  "schema":"mxm.research-core-v3.same-underlying-cash-futures-basis-reversion-development-result.v1",
+  "status":"COMPLETE_DEVELOPMENT_ONLY_NO_ROBUST_GROSS_REGION",
+  "design_ref":"research_core_v3/state/SAME_UNDERLYING_CASH_FUTURES_BASIS_REVERSION_DEVELOPMENT_DESIGN_V1.json",
+  "design_sha256":"cac4c3e3e4a341ae28c59856048c7246a63e557857fefce337714878efd8ca53",
+  "design_commit":"40acb0f577098cb009c2a7f65e58cdda319618ae",
+  "test_count":36,
+  "eligible_pair_count":3,
+  "multiplicity_support_eligible_cell_count":0,
+  "economic_support_pass_count":0,
+  "multiplicity_pass_count":0,
+  "full_pass_count":0,
+  "robust_region_count":0,
+  "robust_regions":[],
+  "best_mean_observed":{
+    "cell_id":"XAUUSD_XAUUSD-F|L72|Z3|H48","pair_id":"XAUUSD_XAUUSD-F","leg_a_symbol":"XAUUSD","leg_b_symbol":"XAUUSD-F",
+    "basis_lookback_bars":72,"entry_abs_z":3.0,"maximum_hold_bars":48,"attempted_events":642,"completed_events":393,"censored_events":249,
+    "retention_fraction":0.6121495327102804,"distinct_dates":221,"distinct_iso_weeks":53,"mean_gross_bps":0.40398624036040154,
+    "median_gross_bps":0.5562680334065813,"cluster_se_bps":0.2550603611244363,"t_stat":1.5838848442753861,
+    "chronological_thirds_mean_gross_bps":[0.4970968759656402,0.6035340249037038,0.11132782021186043],
+    "top10pct_abs_concentration":0.5393383632216021,"p_familywise":1.0,"multiplicity_support_eligible":false,"economic_support_pass":false,"multiplicity_pass":false,"full_pass":false
+  },
+  "support_failure_interpretation":"No cell met the frozen >=0.90 retention support prerequisite; exact common-timestamp closure gaps cause right-censoring. Even the best observed mean gross is only about 0.404 bps on total gross notional, far below the frozen 8 bps economic gate.",
+  "protected_forward_opened":false,"candidate_frozen_count":0,"net_certified_count":0,"new_android_acquisition_required":false,
+  "interpretation":{"post_outcome_pair_grid_or_retention_rescue_forbidden":true,"family_status":"PARKED_SUPPORT_AND_ECONOMIC_NULL","next_action":"SELECT_NEXT_DISTINCT_PREOUTCOME_RESEARCH_FRONTIER"},
+  "canonical_sha256":"45b60737abf42301ce6c88592abf2b1adf9e922abe1756f7aaf010fa5d39e748"
+}
