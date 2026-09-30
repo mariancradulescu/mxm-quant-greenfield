@@ -1,0 +1,67 @@
+{
+  "schema": "mxm.research-core-v3.volatility-compression-release-path-development-result.v1",
+  "status": "COMPLETE_DEVELOPMENT_ONLY_NO_ROBUST_GROSS_REGION",
+  "design_ref": "research_core_v3/state/VOLATILITY_COMPRESSION_RELEASE_PATH_DEVELOPMENT_DESIGN_V1.json",
+  "design_sha256": "4cfc01a6ecb9d605ad524c84f67a72529499c9aecfaeb51793e6541a246c6531",
+  "design_commit": "c4c64b1b74b6993c183bdab9b5fd52075ae99f1e",
+  "test_count": 1872,
+  "eligible_symbol_count": 156,
+  "multiplicity_support_eligible_cell_count": 1632,
+  "economic_support_pass_count": 1,
+  "multiplicity_pass_count": 0,
+  "full_pass_count": 0,
+  "robust_region_count": 0,
+  "robust_regions": [],
+  "economic_support_survivor": {
+    "cell_id": "SHBUSD|CR0.45|BS1|H12",
+    "symbol_id": 7192,
+    "completed_events": 56,
+    "distinct_dates": 46,
+    "distinct_iso_weeks": 30,
+    "retention_fraction": 0.9491525423728814,
+    "mean_gross_bps": 10.999637146349512,
+    "median_gross_bps": 0,
+    "cluster_se_bps": 8.73588092371072,
+    "t_stat": 1.2591331363611606,
+    "chronological_thirds_mean_gross_bps": [
+      17.270783974129994,
+      0.5681783198345027,
+      15.39107758945817
+    ],
+    "top10pct_abs_concentration": 0.3565582405792439,
+    "p_familywise": 1,
+    "multiplicity_pass": false,
+    "full_pass": false
+  },
+  "best_familywise_observed": {
+    "cell_id": "TSLA.US-24|CR0.45|BS0.5|H12",
+    "mean_gross_bps": 4.095484723620751,
+    "t_stat": 2.264523234090433,
+    "p_familywise": 0.9998,
+    "economic_support_pass": false
+  },
+  "multiplicity_implementation": {
+    "all_1872_cells_remain_family_members": true,
+    "support_ineligible_cells_assigned_p1_and_cannot_pass": true,
+    "maxT_generated_only_by_cells_meeting_frozen_nonreturn_support_prerequisites": "completed_events>=40; distinct_dates>=30; distinct_iso_weeks>=20; retention>=0.80",
+    "reason": "avoid undefined/degenerate low-n t-statistics dominating shared max-T while preserving fail-closed family membership",
+    "resamples": 4999,
+    "seed": 20260930
+  },
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0,
+  "net_certified_count": 0,
+  "new_android_acquisition_required": false,
+  "interpretation": {
+    "single_economic_support_cell": "SHBUSD|CR0.45|BS1|H12",
+    "single_economic_support_cell_mean_gross_bps": 10.999637146349512,
+    "single_economic_support_cell_familywise_p": 1,
+    "no_multiplicity_pass_cells": true,
+    "no_robust_region": true,
+    "post_outcome_grid_rescue_forbidden": true,
+    "next_action": "SELECT_NEXT_DISTINCT_PREOUTCOME_RESEARCH_FRONTIER",
+    "best_support_eligible_familywise_p": 0.9998,
+    "family_status": "PARKED_NO_POST_OUTCOME_GRID_OR_PATH_RESCUE"
+  },
+  "canonical_sha256": "ea4bb7874e6b8668ecbc5b53ef6923acc736392629c6e0b116ede4965f383732"
+}
