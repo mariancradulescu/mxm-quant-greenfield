@@ -1,0 +1,166 @@
+{
+  "schema": "mxm.research-core-v3.commodity-breakout-volatility-expansion-development-design.v1",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parent_research_head": "9cd9e7c594d752430e571784e7cbcd10766dcfe5",
+  "reconciled_post_handoff_commit_count": 19,
+  "family": "BREAKOUT_VOLATILITY_EXPANSION",
+  "purpose": "CHARACTERIZE_A_DISTINCT_EVENT_DRIVEN_COMMODITY_METALS_ENERGY_BREAKOUT_PARAMETER_REGION_WITH_GROSS_HEADROOM_BEFORE_AUTHENTIC_EVENT_TIME_FRICTION_AND_EUR200_EXECUTION_GATES",
+  "pre_outcome_selection_rationale": {
+    "why_now": [
+      "durable discovery ledger records structural breakout/volatility signal but incomplete economic parameter-region coverage",
+      "the immediately prior live work exhausted or parked cross-sectional ranking, opening-gap, intraday relative value, simple causal Ridge, cross-market lead-lag, and the H6/H24/H48 mean-reversion adaptive-exit rescue",
+      "one-year authentic Pepperstone M5 DEVELOPMENT bytes already exist for all selected underlyings",
+      "event-driven breakout can provide materially larger move-per-trade headroom than the exhausted high-turnover fixed-horizon surface without new Android acquisition"
+    ],
+    "outcome_information_used_for_this_selection": false,
+    "prior_non_economic_structural_evidence_may_inform_family_choice": true,
+    "post_outcome_symbol_or_grid_extension_forbidden": true
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_archives": {
+      "selected_m5_development_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "high_quality_delta_m5_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    },
+    "missing_bars": "DO_NOT_FILL_INTERPOLATE_RESAMPLE_OR_SYNTHESIZE",
+    "exact_contiguity_seconds": 300
+  },
+  "universe": {
+    "selection_law": "ONE_HIGH_QUALITY_ONE_YEAR_AUTHENTIC_M5_SERIES_PER_DISTINCT_PHYSICAL_COMMODITY_METAL_OR_ENERGY_UNDERLYING_AVAILABLE_IN_THE_FROZEN_V3_CORE;EXCLUDE_DUPLICATE_GOLD_CURRENCY_CROSSES_AND_NON_PHYSICAL_EQUITY_OR_CRYPTO_PRODUCTS;NO_OUTCOME_SELECTION",
+    "symbol_count": 6,
+    "symbols": [
+      {
+        "symbol_id": 41,
+        "broker_symbol": "XAUUSD",
+        "underlying": "GOLD",
+        "asset_class": "Metals (Spot)"
+      },
+      {
+        "symbol_id": 95,
+        "broker_symbol": "XPDUSD",
+        "underlying": "PALLADIUM",
+        "asset_class": "Metals (Spot)"
+      },
+      {
+        "symbol_id": 97,
+        "broker_symbol": "XPTUSD",
+        "underlying": "PLATINUM",
+        "asset_class": "Metals (Spot)"
+      },
+      {
+        "symbol_id": 251,
+        "broker_symbol": "NatGas",
+        "underlying": "NATURAL_GAS",
+        "asset_class": "Energies (Spot)"
+      },
+      {
+        "symbol_id": 7393,
+        "broker_symbol": "WTOIL-PERP",
+        "underlying": "WTI_CRUDE",
+        "asset_class": "Perpetual Commodity"
+      },
+      {
+        "symbol_id": 7394,
+        "broker_symbol": "BRENTOIL-PERP",
+        "underlying": "BRENT_CRUDE",
+        "asset_class": "Perpetual Commodity"
+      }
+    ],
+    "duplicate_underlying_crosses_forbidden": true,
+    "post_outcome_symbol_selection_forbidden": true
+  },
+  "causal_mechanism": {
+    "signal_bar": "COMPLETED_M5_BAR_t",
+    "reference_range": "MAX_HIGH_AND_MIN_LOW_OF_THE_PREVIOUS_N_EXACT_CONTIGUOUS_COMPLETED_M5_BARS_EXCLUDING_t",
+    "true_range": "MAX(HIGH_t_MINUS_LOW_t,ABS(HIGH_t_MINUS_PREVIOUS_CLOSE),ABS(LOW_t_MINUS_PREVIOUS_CLOSE))",
+    "volatility_expansion": "TRUE_RANGE_OF_SIGNAL_BAR_DIVIDED_BY_MEDIAN_TRUE_RANGE_OF_THE_PREVIOUS_N_BARS",
+    "long_signal": "CLOSE_t_STRICTLY_ABOVE_REFERENCE_HIGH_AND_EXPANSION_AT_LEAST_M",
+    "short_signal": "CLOSE_t_STRICTLY_BELOW_REFERENCE_LOW_AND_EXPANSION_AT_LEAST_M",
+    "entry": "OPEN_OF_THE_NEXT_EXACT_CONTIGUOUS_M5_BAR_AFTER_SIGNAL",
+    "failure_exit_trigger": "FOR_LONG_FIRST_COMPLETED_POST_ENTRY_BAR_WITH_CLOSE_AT_OR_BELOW_FROZEN_REFERENCE_HIGH;FOR_SHORT_FIRST_COMPLETED_POST_ENTRY_BAR_WITH_CLOSE_AT_OR_ABOVE_FROZEN_REFERENCE_LOW",
+    "failure_exit_execution": "OPEN_OF_THE_NEXT_EXACT_CONTIGUOUS_M5_BAR_AFTER_FAILURE_TRIGGER",
+    "time_exit": "OPEN_IMMEDIATELY_AFTER_H_COMPLETED_POST_ENTRY_M5_BARS",
+    "exit": "EARLIER_OF_FAILURE_EXIT_EXECUTION_OR_TIME_EXIT",
+    "gap_policy": "ANY_REQUIRED_300_SECOND_LINK_MISSING_RIGHT_CENSORS_THE_EVENT;NO_JUMP_ACROSS_GAPS",
+    "overlap_policy": "AT_MOST_ONE_OPEN_EVENT_PER_SYMBOL_PER_CELL;IGNORE_NEW_SIGNALS_UNTIL_EXIT",
+    "gross_return_bps": "DIRECTION_TIMES_LN(EXIT_OPEN_DIV_ENTRY_OPEN)_TIMES_10000"
+  },
+  "parameter_grid": {
+    "range_lookback_bars": [
+      12,
+      24,
+      48,
+      96
+    ],
+    "volatility_expansion_multiplier": [
+      1.5,
+      2
+    ],
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ],
+    "cells_per_symbol": 24,
+    "total_test_count": 144,
+    "ranges_frozen_before_outcome": true
+  },
+  "economic_support_gate": {
+    "minimum_completed_events": 50,
+    "minimum_distinct_utc_dates": 40,
+    "minimum_distinct_iso_weeks": 20,
+    "minimum_event_retention_fraction": 0.8,
+    "minimum_mean_gross_bps": 10,
+    "minimum_median_gross_bps": 0,
+    "chronological_thirds": "ALL_THREE_EVENT_COUNT_THIRDS_MUST_HAVE_STRICTLY_POSITIVE_MEAN_GROSS_BPS",
+    "maximum_top10pct_absolute_event_concentration": 0.5,
+    "gross_threshold_semantics": "HEADROOM_SCREEN_ONLY_NOT_A_SPREAD_OR_COST_PROXY"
+  },
+  "multiplicity": {
+    "family": "ALL_144_FROZEN_SYMBOL_X_PARAMETER_CELLS",
+    "dependence_unit": "UTC_ISO_WEEK",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "null_centering": "CELL_EVENT_RETURNS_CENTERED_BY_CELL_MEAN_BEFORE_SHARED_WEEK_SIGN_FLIPS",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "statistic": "MEAN_EVENT_RETURN_BPS_DIV_ISO_WEEK_CLUSTER_ROBUST_STANDARD_ERROR",
+    "insufficient_cells_receive_p": 1
+  },
+  "robustness": {
+    "local_cell_pass": "ECONOMIC_SUPPORT_GATE_AND_FAMILYWISE_MULTIPLICITY_PASS",
+    "parameter_region_adjacency": "SAME_SYMBOL;ONE_GRID_STEP_DIFFERENCE_IN_EXACTLY_ONE_OF_LOOKBACK_EXPANSION_HOLD",
+    "minimum_connected_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "no_single_cell_promotion": true,
+    "cross_symbol_breadth_is_reported_but_not_required_because_underlyings_are_economically_distinct": true
+  },
+  "friction_and_execution_boundary": {
+    "no_invented_or_proxy_spread": true,
+    "development_result_is_gross_only": true,
+    "next_if_survivor": "INTERSECT_SURVIVING_REGION_EVENT_TIMESTAMPS_WITH_EXISTING_AUTHENTIC_PEPPERSTONE_FRICTION_WHERE_EXACTLY_AVAILABLE;ACQUIRE_ONLY_MINIMAL_MISSING_EVENT_TIME_FRICTION_IF_INFORMATION_VALUE_JUSTIFIES",
+    "structural_commission_or_margin_metadata_may_be_reported_but_not_substituted_for_spread": true,
+    "eur200_volume_lattice_margin_and_sizing_replay_required_before_candidate_freeze": true,
+    "allocator_and_risk_not_certified_here": true
+  },
+  "promotion_boundary": {
+    "candidate_freeze_from_this_result": false,
+    "net_certification_from_this_result": false,
+    "protected_forward_access": false,
+    "next_if_no_robust_region": "PARK_THIS_BREAKOUT_CONTINUATION_SPECIFICATION_AND_MOVE_TO_A_DISTINCT_OPEN_FRONTIER_WITHOUT_POST_OUTCOME_GRID_RESCUE"
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_orders_authorized": false,
+    "runtime_v2_legacy_read_only": true,
+    "new_android_acquisition_required": false
+  },
+  "canonical_sha256": "a7020b8eeacc79a352386b62c7c2d70ee9893f7f251d511d8008b6c071747dd1"
+}
