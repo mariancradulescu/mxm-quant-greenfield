@@ -57,7 +57,7 @@ from m6.ctrader_proto.OpenApiMessages_pb2 import (
 from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 
 TOOL_VERSION = "MXM_RESEARCH_CORE_V3_MAXT14_FRICTION_CAPTURE_V2"
-PLAN_REL = "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V1.json"
+PLAN_REL = "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json"
 SCOPE_ROOT_REL = "research_core_v3/state"
 WORK_REL = ".mxm_v3_maxt14_friction_work"
 OUTPUT_REL = "v3_friction_output/MXM_V3_MAXT14_FRICTION_EVIDENCE_V1"
@@ -441,6 +441,14 @@ class V3MaxT14FrictionRunner:
             raise CaptureContractError("quote capture may not claim fill authority")
         if len(p["targets"]) != 14:
             raise CaptureContractError("maxT14 target count changed")
+        if p.get("schema") == "mxm.research-core-v3.maxt14-authentic-friction-acquisition.v2":
+            rebind = p.get("account_identity_rebind") or {}
+            if rebind.get("research_scope_changed") is not False:
+                raise CaptureContractError("account rebind may not change research scope")
+            if rebind.get("historical_bid_ask_capture_started_before_rebind") is not False:
+                raise CaptureContractError("account rebind occurred after historical capture")
+            if rebind.get("raw_account_id_persisted") is not False:
+                raise CaptureContractError("raw account ID may not enter rebind authority")
 
     def _load_scopes_and_blocks(self) -> dict[str, dict[str, Any]]:
         from datetime import datetime
