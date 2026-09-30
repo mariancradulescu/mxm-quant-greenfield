@@ -1,0 +1,156 @@
+{
+  "schema": "mxm.research-core-v3.global-friction-triage.v1",
+  "status": "FROZEN_OUTCOME_BLIND_GLOBAL_AUTHENTIC_FRICTION_TRIAGE",
+  "supersedes_execution_design": "research_core_v3/state/STAGED_FRICTION_ACQUISITION_PLAN_V1.json",
+  "source_plan_path": "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V2.json",
+  "source_plan_binding_sha256": "0704a9984b4121e3998802f4bf809c93df7fe55ee342b1bf281fe96e5a9c1875",
+  "source_corrected_surface_sha256": "0ceb1f79080f8c9ef5cf6a13c0f56b279d02ffabc9644624f58230c705fcccbb",
+  "source_corrected_region_assessment_sha256": "7ab0000e92bd39a28d3de3aafc328927eb25fdcf42e68240e31b1a800461026a",
+  "scope": {
+    "corrected_development_cells": 7975,
+    "gross_robust_regions": 88,
+    "priority_regions": 14,
+    "other_gross_regions_cost_unresolved": 74,
+    "authoritative_frontier": 1576,
+    "full_reference_exact_windows": 691919,
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2": "LEGACY_READ_ONLY"
+  },
+  "objective": "FASTEST_SCIENTIFICALLY_DEFENSIBLE_SPREAD_ALONE_KILL_OR_UNRESOLVED_DECISION_FOR_ALL_14_PRIORITY_REGIONS",
+  "principles": {
+    "historical_development_friction_only": true,
+    "post_protected_forward_for_development_selection": false,
+    "current_spread_substitution": false,
+    "raw_ticks_transferable": false,
+    "transport_may_overfetch": true,
+    "analysis_uses_only_frozen_sample_membership": true,
+    "all_14_complete_before_joint_evaluation": true,
+    "automatic_second_look_forbidden": true,
+    "favorable_early_stopping": false,
+    "failure_to_prove_death_means": "PLAUSIBLE_OR_UNRESOLVED"
+  },
+  "stage0_benchmark": {
+    "anchor_selection": "PER_SYMBOL_REFERENCE_HOUR_WINDOW_COUNT_QUANTILES_25_50_90_DETERMINISTIC_TIEBREAK_BY_HOUR",
+    "anchors_per_symbol": 3,
+    "probe_spans_minutes": [
+      1,
+      5,
+      15,
+      60,
+      180
+    ],
+    "stage1_eligible_spans_minutes": [
+      1,
+      5,
+      15,
+      60
+    ],
+    "broader_180m_probe_role": "MEASURED_ENVELOPE_CHECK_ONLY;HOUR_BOUNDED_TRIAGE_CANNOT_REDUCE_BELOW_ONE_BID_ASK_PAIR_PER_SAMPLED_HOUR_VS_60M",
+    "quote_sides": [
+      "BID",
+      "ASK"
+    ],
+    "planned_base_probes": 420,
+    "metrics": [
+      "successful_api_responses",
+      "api_attempts",
+      "pagination_pages",
+      "tick_count",
+      "protobuf_response_bytes",
+      "elapsed_ms",
+      "has_more_count",
+      "page_depth",
+      "transient_retry_counts",
+      "transport_retry_count",
+      "broker_history_unavailable",
+      "reference_windows_in_probe"
+    ],
+    "economic_values_recorded": false,
+    "raw_tick_values_persisted": false,
+    "transport_profile_rule": {
+      "choose": "MINIMIZE_MEASURED_ELAPSED_MS_PER_REFERENCE_WINDOW;TIEBREAK_BYTES_PER_REFERENCE_WINDOW_THEN_API_ATTEMPTS_PER_REFERENCE_WINDOW_THEN_SHORTER_SPAN",
+      "requires_no_broker_history_unavailable_on_benchmark_probes": true,
+      "purpose": "TRANSPORT_ONLY_NOT_ECONOMIC_SELECTION"
+    }
+  },
+  "initial_global_triage": {
+    "primary_sampling_unit": "UTC_CALENDAR_HOUR_CONTAINING_ONE_OR_MORE_FROZEN_EXACT_WINDOWS",
+    "strata": "UTC_MONTH_X_6H_SESSION_BUCKET",
+    "session_buckets_utc": [
+      [
+        0,
+        6
+      ],
+      [
+        6,
+        12
+      ],
+      [
+        12,
+        18
+      ],
+      [
+        18,
+        24
+      ]
+    ],
+    "sample_hours_per_nonempty_stratum": 1,
+    "max_frozen_exact_windows_per_sampled_hour": 3,
+    "hour_ordering_seed_material": "SHA256(source_plan_binding|HOUR|symbol|stratum|hour_start_ms)",
+    "within_hour_window_ordering_seed_material": "SHA256(source_plan_binding|WINDOW|symbol|stratum|hour_start_ms|exact_window_index)",
+    "selection": "HASH_ORDER_WITHOUT_REPLACEMENT",
+    "unsampled_exact_windows_within_sampled_hour_for_death_proxy": "CONTRIBUTE_ZERO",
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
+    "fresh_quote_age_limit_seconds": 2,
+    "campaign_looks": 1,
+    "automatic_additional_acquisition": false
+  },
+  "death_rule": {
+    "familywise_alpha": 0.01,
+    "regions": 14,
+    "per_region_alpha": 0.0007142857142857143,
+    "death_test_variable": "MIN(FRESH_NONNEGATIVE_D0_SPREAD_BPS,2*MINIMUM_GROSS_MEAN_RESPONSE_BPS);MISSING_STALE_UNAVAILABLE_NEGATIVE_AND_UNSAMPLED_WITHIN_HOUR_CONTRIBUTE_0",
+    "death_test_target": "LOWER_PROXY_TO_EVENT_WINDOW_WEIGHTED_MEAN_OVER_FULL_FROZEN_REFERENCE_SCOPE",
+    "cluster_total_estimator": "STRATIFIED_UNIFORM_ONE_HOUR_SAMPLE;FROZEN_UP_TO_3_WINDOW_SPARSE_CLUSTER_TOTAL;HORVITZ_STYLE_STRATUM_TOTAL_ESTIMATE_DIVIDED_BY_TOTAL_REFERENCE_WINDOWS",
+    "one_sided_lower_bound": "HOEFFDING_BOUND_ON_BOUNDED_SPARSE_HOUR_CLUSTER_TOTALS_WITH_BONFERRONI_ACROSS_14_REGIONS",
+    "death_decision": "LOWER_BOUND_GT_MINIMUM_GROSS_MEAN_RESPONSE_BPS",
+    "death_label": "CLEARLY_ECONOMICALLY_DEAD_BY_AUTHENTIC_SPREAD_ALONE",
+    "nondeath_label": "PLAUSIBLE_OR_UNRESOLVED_STOP_ANDROID",
+    "candidate_freeze_allowed": false,
+    "net_certification_allowed": false
+  },
+  "after_initial_campaign": {
+    "automatic_look2_look3_look4": false,
+    "next_action_decided_only_after_joint_14_region_evaluation": true,
+    "additional_broker_acquisition_only_if_expected_information_value_exceeds_operational_cost": true,
+    "broader_program_remains_open": {
+      "other_gross_cost_unresolved_regions": 74,
+      "authoritative_frontier": 1576
+    }
+  },
+  "storage": {
+    "raw_tick_values_written_to_disk": false,
+    "derived_hour_evidence_gzip": true,
+    "page_provenance_hashes": true,
+    "minimum_free_disk_bytes": 536870912,
+    "aggregate_local_capture_artifacts_hard_cap_bytes": 268435456,
+    "preferred_first_bundle_size_bytes": 26214400,
+    "hard_first_bundle_cap_bytes": 67108864,
+    "hard_fail_before_silent_disk_growth": true,
+    "transfer_bundle_contains_raw_ticks": false
+  },
+  "observed_v5_baseline": {
+    "approximately_completed_base_chunks": 600,
+    "elapsed_seconds": 210,
+    "observed_base_chunk_rate_per_second": 2.857142857142857,
+    "exhaustive_base_requests_before_pagination": 461102
+  },
+  "binding_sha256": "ef528c4fce40058dca7677744aca1bde1ca02c6318885d274be7a5c431f6b89f"
+}
