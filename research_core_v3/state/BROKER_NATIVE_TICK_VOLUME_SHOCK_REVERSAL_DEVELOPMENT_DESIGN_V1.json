@@ -1,0 +1,132 @@
+{
+  "schema": "mxm.research-core-v3.broker-native-tick-volume-shock-reversal-development-design.v1",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parent_research_head": "833af2bdceeedb72d9a0ff2f045f0aada788e4eb",
+  "family": "BROKER_NATIVE_TICK_VOLUME_SHOCK_REVERSAL",
+  "purpose": "TEST_A_DISTINCT_PRICE_PLUS_BROKER_TICK_VOLUME_INFORMATION_SOURCE_FOR_CAUSAL_SHORT_HORIZON_EXHAUSTION_REVERSAL_WITHOUT_REUSING_FIXED_HORIZON_PRICE_ONLY_SURFACE",
+  "pre_outcome_rationale": {
+    "price_only_surfaces_exhausted_or_parked": true,
+    "tick_volume_used_by_prior_v3_economic_surfaces": false,
+    "broker_native_tick_volume_already_in_accepted_raw_M5": true,
+    "new_android_acquisition_required": false,
+    "mechanism_hypothesis": "AN_ABNORMALLY_LARGE_ONE_BAR_PRICE_IMPULSE_CONFIRMED_BY_AN_ABNORMALLY_LARGE_WITHIN_SYMBOL_TICK_VOLUME_SHOCK_CAN_REPRESENT_SHORT_HORIZON_LIQUIDITY_EXHAUSTION;TRADE_THE_CAUSAL_REVERSAL_TOWARD_THE_PRE_SHOCK_CLOSE",
+    "outcome_information_used_to_choose_grid": false
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_archives": {
+      "selected_m5_development_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "high_quality_delta_m5_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    },
+    "required_fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "missing_bars": "NO_FILL_INTERPOLATION_RESAMPLING_OR_SYNTHETIC_BARS",
+    "exact_contiguity_seconds": 300
+  },
+  "universe": {
+    "authority_ref": "research_core_v3/state/INCLUSIVE_FULL_DEPTH_DISCOVERY_CORE_V1.json",
+    "authority_sha256": "7fb39be13192d97ea9ac5d1d57de2820a8af0edbaf2cdc495b271426acbc9955",
+    "selection_law": "ALL_AND_ONLY_asset_class_FOREX_SPOT_MEMBERS_OF_primary_core;SUPPLEMENTARY_EXISTING_IDENTITIES_EXCLUDED",
+    "symbol_count": 75,
+    "market_outcomes_used_for_universe": false,
+    "current_frontier_remains_open": 1576
+  },
+  "causal_mechanism": {
+    "shock_return": "LN(CLOSE_t/CLOSE_t_minus_1)_ON_AN_EXACT_CONTIGUOUS_M5_LINK",
+    "price_scale": "MEDIAN_ABSOLUTE_ONE_BAR_LOG_RETURN_OVER_PREVIOUS_N_EXACT_CONTIGUOUS_BARS_EXCLUDING_t",
+    "volume_scale": "MEDIAN_TICK_VOLUME_OVER_PREVIOUS_N_EXACT_CONTIGUOUS_BARS_EXCLUDING_t",
+    "qualifying_shock": "ABS(shock_return)>=R*price_scale_AND_tick_volume_t>=V*volume_scale_WITH_STRICTLY_POSITIVE_SCALES",
+    "direction": "NEGATIVE_SIGN_OF_shock_return",
+    "target": "CLOSE_t_minus_1_FROZEN_AT_SIGNAL",
+    "entry": "OPEN_OF_NEXT_EXACT_CONTIGUOUS_M5_BAR",
+    "target_exit_trigger": "FIRST_COMPLETED_POST_ENTRY_BAR_WHOSE_CLOSE_REACHES_OR_CROSSES_THE_FROZEN_PRE_SHOCK_TARGET_IN_THE_REVERSAL_DIRECTION",
+    "target_exit_execution": "OPEN_OF_NEXT_EXACT_CONTIGUOUS_M5_BAR_AFTER_TRIGGER",
+    "time_exit": "OPEN_IMMEDIATELY_AFTER_H_COMPLETED_POST_ENTRY_M5_BARS",
+    "exit": "EARLIER_OF_TARGET_EXIT_OR_TIME_EXIT",
+    "overlap": "AT_MOST_ONE_OPEN_EVENT_PER_SYMBOL_PER_CELL",
+    "gross_return_bps": "DIRECTION*LN(EXIT_OPEN/ENTRY_OPEN)*10000",
+    "gap_policy": "RIGHT_CENSOR_IF_A_REQUIRED_300_SECOND_LINK_IS_MISSING;NEVER_JUMP_ACROSS_GAPS"
+  },
+  "parameter_grid": {
+    "lookback_bars": [
+      24,
+      48,
+      96
+    ],
+    "price_shock_multiplier": [
+      2,
+      3
+    ],
+    "tick_volume_multiplier": [
+      1.5,
+      2
+    ],
+    "maximum_hold_bars": [
+      6,
+      12,
+      24
+    ],
+    "cell_count": 36,
+    "ranges_frozen_before_outcome": true
+  },
+  "aggregation": {
+    "symbol_day_statistic": "ARITHMETIC_MEAN_OF_COMPLETED_EVENT_GROSS_BPS_PER_SYMBOL_PER_UTC_DATE",
+    "daily_family_statistic": "EQUAL_WEIGHT_ARITHMETIC_MEAN_ACROSS_SYMBOL_DAY_STATISTICS_AVAILABLE_ON_THAT_UTC_DATE",
+    "reason": "PREVENT_HIGH_EVENT_COUNT_SYMBOLS_FROM_DOMINATING_THE_FAMILY_EFFECT",
+    "symbol_breadth_reported": true
+  },
+  "economic_support_gate": {
+    "minimum_completed_events_familywide": 1000,
+    "minimum_symbols_with_at_least_20_completed_events": 40,
+    "minimum_distinct_utc_dates": 180,
+    "minimum_event_retention_fraction_familywide": 0.8,
+    "minimum_mean_daily_family_gross_bps": 5,
+    "minimum_median_daily_family_gross_bps": 0,
+    "minimum_fraction_eligible_symbols_with_positive_mean_gross": 0.6,
+    "chronological_thirds": "ALL_THREE_UTC_DATE_COUNT_THIRDS_MUST_HAVE_STRICTLY_POSITIVE_MEAN_DAILY_FAMILY_GROSS_BPS",
+    "gross_threshold_semantics": "HEADROOM_SCREEN_ONLY_NOT_A_COST_PROXY"
+  },
+  "multiplicity": {
+    "family": "ALL_36_FROZEN_PARAMETER_CELLS",
+    "dependence_unit": "UTC_ISO_WEEK",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T_ON_DAILY_FAMILY_STATISTICS",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "insufficient_cells_receive_p": 1
+  },
+  "robustness": {
+    "local_cell_pass": "ECONOMIC_SUPPORT_GATE_AND_FAMILYWISE_MULTIPLICITY_PASS",
+    "adjacency": "ONE_GRID_STEP_IN_EXACTLY_ONE_PARAMETER_AXIS",
+    "minimum_connected_cells": 3,
+    "minimum_varied_axes": 2,
+    "no_single_cell_promotion": true
+  },
+  "friction_execution_boundary": {
+    "no_proxy_spread": true,
+    "gross_only_at_this_stage": true,
+    "if_survivor": "RECOVER_OR_MINIMALLY_ACQUIRE_AUTHENTIC_EVENT_TIME_PEPPERSTONE_FRICTION_ONLY_FOR_THE_ROBUST_SURVIVING_REGION_THEN_REPLAY_EUR200_MIN_VOLUME_MARGIN_VOLUME_LATTICE_AND_CONCURRENT_EVENT_ALLOCATOR",
+    "candidate_freeze_here": false,
+    "protected_forward_access": false
+  },
+  "if_null": "PARK_THIS_EXACT_TICK_VOLUME_SHOCK_REVERSAL_REGION_AND_MOVE_TO_ANOTHER_DISTINCT_INFORMATION_SOURCE_OR_ENTRY_ARCHITECTURE_WITHOUT_POST_OUTCOME_THRESHOLD_RESCUE",
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_orders_authorized": false,
+    "runtime_v2_legacy_read_only": true
+  },
+  "canonical_sha256": "a0b279d6b92113886cf389cba0327536af0a5df35fdfb4e6c2c9760b2ecc5876"
+}
