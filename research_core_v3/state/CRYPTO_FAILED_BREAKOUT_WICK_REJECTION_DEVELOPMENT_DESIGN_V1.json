@@ -1,0 +1,131 @@
+{
+  "schema": "mxm.research-core-v3.crypto-failed-breakout-wick-rejection-development-design.v1",
+  "status": "FROZEN_BEFORE_OUTCOME",
+  "parent_research_head": "1c0336a2400854b8f39d8abf72cdc3005df28c59",
+  "family": "FAILED_BREAKOUT_WICK_REJECTION",
+  "subfamily": "CRYPTO_INTRABAR_RANGE_REJECTION",
+  "purpose": "TEST_A_DISTINCT_INTRABAR_OHLC_PATH_MECHANISM_WITH_LARGER_PER_TRADE_MOVE_HEADROOM_THAN_PRIOR_CLOSE_ONLY_AND_TICK_VOLUME_SURFACES",
+  "pre_outcome_rationale": {
+    "intrabar_wick_geometry_used_by_prior_v3_economic_surfaces": false,
+    "broad_price_only_breakout_continuation_was_null": true,
+    "failed_breakout_reentry_is_not_A_SIGN_FLIP_OF_THE_OBSERVED_CONTINUATION_PATH_BECAUSE_ENTRY_CONDITION_AND_EXIT_TARGET_DIFFER": true,
+    "crypto_selected_for_HIGHER_NATIVE_INTRADAY_MOVE_SCALE_AND_LOW_MINIMUM_MARGIN_IN_FROZEN_PRIMARY_CORE": true,
+    "market_outcomes_used_for_symbol_selection": false
+  },
+  "universe": {
+    "authority_ref": "research_core_v3/state/INCLUSIVE_FULL_DEPTH_DISCOVERY_CORE_V1.json",
+    "selection_law": "ALL_PRIMARY_CORE_CRYPTO_CURRENCY_SPOT_IDENTITIES_DEDUPLICATED_BY_UNDERLYING_WITH_QUOTE_PREFERENCE_USD_THEN_EUR_THEN_GBP_THEN_AUD",
+    "symbol_count": 28,
+    "duplicate_underlying_crosses_removed": [
+      "ETHAUD",
+      "ETHGBP"
+    ],
+    "retained_eth_cross": "ETHEUR",
+    "selection_is_outcome_blind": true,
+    "margin_observation": "PRIMARY_CORE_CRYPTO_MINIMUM_MARGIN_ESTIMATES_ARE_LOW_RELATIVE_TO_EUR200_BUT_FINAL_EVENT_TIME_EXECUTION_REPLAY_REMAINS_REQUIRED"
+  },
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "source_archive_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "missing_bars": "NO_FILL_INTERPOLATION_RESAMPLING_OR_SYNTHETIC_BARS",
+    "exact_contiguity_seconds": 300
+  },
+  "causal_mechanism": {
+    "reference_range": "PRIOR_N_EXACT_CONTIGUOUS_COMPLETED_M5_BARS_EXCLUDING_SIGNAL_BAR",
+    "range_scale": "MEDIAN_TRUE_RANGE_OF_PRIOR_N_BARS",
+    "upper_failed_breakout": "HIGH_t_STRICTLY_ABOVE_PRIOR_RANGE_HIGH_AND_CLOSE_t_AT_OR_BELOW_PRIOR_RANGE_HIGH",
+    "lower_failed_breakout": "LOW_t_STRICTLY_BELOW_PRIOR_RANGE_LOW_AND_CLOSE_t_AT_OR_ABOVE_PRIOR_RANGE_LOW",
+    "upper_wick_fraction": "(HIGH_t-MAX(OPEN_t,CLOSE_t))/(HIGH_t-LOW_t)",
+    "lower_wick_fraction": "(MIN(OPEN_t,CLOSE_t)-LOW_t)/(HIGH_t-LOW_t)",
+    "range_expansion": "TRUE_RANGE_t/MEDIAN_PRIOR_TRUE_RANGE",
+    "short_signal": "UPPER_FAILED_BREAKOUT_AND_UPPER_WICK_FRACTION_AT_LEAST_W_AND_RANGE_EXPANSION_AT_LEAST_R",
+    "long_signal": "LOWER_FAILED_BREAKOUT_AND_LOWER_WICK_FRACTION_AT_LEAST_W_AND_RANGE_EXPANSION_AT_LEAST_R",
+    "entry": "OPEN_OF_NEXT_EXACT_CONTIGUOUS_M5_BAR",
+    "target": "MIDPOINT_OF_THE_FROZEN_PRIOR_N_RANGE",
+    "target_exit_trigger": "FIRST_COMPLETED_POST_ENTRY_BAR_REACHING_OR_CROSSING_TARGET_IN_REVERSAL_DIRECTION",
+    "target_exit_execution": "OPEN_OF_NEXT_EXACT_CONTIGUOUS_M5_BAR",
+    "time_exit": "OPEN_AFTER_H_COMPLETED_POST_ENTRY_M5_BARS",
+    "exit": "EARLIER_OF_TARGET_EXIT_OR_TIME_EXIT",
+    "overlap": "AT_MOST_ONE_OPEN_EVENT_PER_SYMBOL_PER_CELL",
+    "gross_return_bps": "DIRECTION*LN(EXIT_OPEN/ENTRY_OPEN)*10000",
+    "gap_policy": "RIGHT_CENSOR_IF_REQUIRED_300_SECOND_LINK_MISSING;NO_GAP_JUMP"
+  },
+  "parameter_grid": {
+    "lookback_bars": [
+      24,
+      48,
+      96
+    ],
+    "minimum_rejection_wick_fraction": [
+      0.4,
+      0.6
+    ],
+    "minimum_range_expansion_multiple": [
+      1.5,
+      2
+    ],
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ],
+    "cell_count": 36,
+    "ranges_frozen_before_outcome": true
+  },
+  "aggregation": {
+    "symbol_day_statistic": "MEAN_COMPLETED_EVENT_GROSS_BPS_PER_SYMBOL_PER_UTC_DATE",
+    "daily_family_statistic": "EQUAL_WEIGHT_MEAN_ACROSS_AVAILABLE_SYMBOL_DAY_STATISTICS",
+    "reason": "PREVENT_HIGH_EVENT_COUNT_OR_HIGH_VOLATILITY_SYMBOLS_FROM_DOMINATING_THE_FAMILY_EFFECT"
+  },
+  "economic_support_gate": {
+    "minimum_completed_events_familywide": 500,
+    "minimum_symbols_with_at_least_15_completed_events": 18,
+    "minimum_distinct_utc_dates": 180,
+    "minimum_event_retention_fraction": 0.8,
+    "minimum_mean_daily_family_gross_bps": 15,
+    "minimum_median_daily_family_gross_bps": 0,
+    "minimum_fraction_eligible_symbols_with_positive_mean_gross": 0.6,
+    "chronological_thirds": "ALL_THREE_UTC_DATE_COUNT_THIRDS_STRICTLY_POSITIVE_MEAN_DAILY_FAMILY_GROSS_BPS",
+    "gross_threshold_semantics": "HIGH_HEADROOM_SCREEN_ONLY_NOT_A_SPREAD_PROXY"
+  },
+  "multiplicity": {
+    "family": "ALL_36_FROZEN_PARAMETER_CELLS",
+    "dependence_unit": "UTC_ISO_WEEK",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T_ON_DAILY_FAMILY_STATISTICS",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "insufficient_cells_receive_p": 1
+  },
+  "robustness": {
+    "local_cell_pass": "ECONOMIC_SUPPORT_GATE_AND_FAMILYWISE_MULTIPLICITY_PASS",
+    "adjacency": "ONE_GRID_STEP_IN_EXACTLY_ONE_PARAMETER_AXIS",
+    "minimum_connected_cells": 3,
+    "minimum_varied_axes": 2,
+    "no_single_cell_promotion": true
+  },
+  "friction_execution_boundary": {
+    "no_proxy_spread": true,
+    "gross_only_at_this_stage": true,
+    "if_survivor": "USE_ONLY_SURVIVING_REGION_EVENT_TIMESTAMPS_FOR_AUTHENTIC_PEPPERSTONE_FRICTION_AND_THEN_EUR200_VOLUME_MARGIN_CONCURRENCY_ALLOCATOR_REPLAY",
+    "candidate_freeze_here": false,
+    "protected_forward_access": false
+  },
+  "if_null": "PARK_THIS_EXACT_INTRABAR_FAILED_BREAKOUT_REGION_WITHOUT_POST_OUTCOME_WICK_RANGE_OR_HOLD_RESCUE",
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_orders_authorized": false,
+    "runtime_v2_legacy_read_only": true
+  },
+  "canonical_sha256": "6cf192210fed950c0dc459a589cfdc6c6d24dad6994b8e5d7a9dd3b7198c0640"
+}
