@@ -1,49 +1,20 @@
 name: V3 maxT14 authentic friction package
-
 on:
   push:
     branches: [performance-research-v3-20260922]
-    paths:
-      - "V3_MAXT14_FRICTION_CAPTURE_RUN.py"
-      - "research_core_v3/v3_friction_capture.py"
-      - "research_core_v3/pydroid_v3_friction_launcher.py"
-      - "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V1.json"
-      - "tools/build_v3_maxt14_friction_capture_package.py"
-      - "tests/test_v3_maxt14_friction_capture.py"
-      - "README_V3_MAXT14_FRICTION_CAPTURE.txt"
-      - ".github/workflows/v3-maxt14-friction-package.yml"
   workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: v3-maxt14-friction-package-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   validate-and-package:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: tools/requirements-m6-capture.txt
-
+          python-version: '3.13'
       - name: Install Android-safe protobuf
         run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-
       - name: Compile targeted V3 capture runtime
-        run: |
-          python -m py_compile \
-            V3_MAXT14_FRICTION_CAPTURE_RUN.py \
-            research_core_v3/v3_friction_capture.py \
-            research_core_v3/pydroid_v3_friction_launcher.py \
-            tools/build_v3_maxt14_friction_capture_package.py
-
+        run: python -m py_compile V3_MAXT14_FRICTION_CAPTURE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/pydroid_v3_friction_launcher.py tools/build_v3_maxt14_friction_capture_package.py
       - name: No-network exact frozen-scope geometry preflight
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
@@ -56,18 +27,12 @@ jobs:
           assert g["base_bid_ask_requests_before_pagination"] == 2*g["transport_blocks"], g
           print("V3_MAXT14_GEOMETRY_PASS", g)
           PY
-
       - name: Focused unit tests
-        run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python \
-            python -m unittest tests.test_v3_maxt14_friction_capture -v
-
+        run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture -v
       - name: Build deterministic Android capture package
         run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python \
-            python tools/build_v3_maxt14_friction_capture_package.py
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_maxt14_friction_capture_package.py
           sha256sum dist/MXM_V3_MAXT14_FRICTION_CAPTURE_PACKAGE_V1.zip
-
       - name: Upload capture package
         uses: actions/upload-artifact@v4
         with:
