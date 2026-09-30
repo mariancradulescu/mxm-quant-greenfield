@@ -9,6 +9,7 @@ from research_core_v3.v3_friction_staged import (
     build_reference_strata,
     freeze_sampling_for_symbol,
     staged_death_bound,
+    staged_geometry_preflight,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -112,6 +113,21 @@ class V3StagedFrictionTests(unittest.TestCase):
             high["lower_bound_bps"], low["lower_bound_bps"]
         )
         self.assertTrue(math.isfinite(high["half_width_bps"]))
+
+    def test_real_staged_geometry_is_exact_and_bounded(self):
+        g = staged_geometry_preflight(ROOT)
+        self.assertEqual(g["reference_exact_windows"], 691919)
+        self.assertEqual(g["stage0_base_probes"], 252)
+        first = g["stages"][0]["by_transport_span_minutes"]
+        last = g["stages"][-1]["by_transport_span_minutes"]
+        self.assertEqual(first["60"]["sampled_exact_windows"], 5977)
+        self.assertEqual(first["60"]["base_bid_ask_requests_before_pagination"], 1456)
+        self.assertEqual(first["15"]["base_bid_ask_requests_before_pagination"], 5620)
+        self.assertEqual(first["5"]["base_bid_ask_requests_before_pagination"], 11954)
+        self.assertEqual(last["60"]["sampled_exact_windows"], 47256)
+        self.assertEqual(last["60"]["base_bid_ask_requests_before_pagination"], 11648)
+        self.assertEqual(last["15"]["base_bid_ask_requests_before_pagination"], 44848)
+        self.assertEqual(last["5"]["base_bid_ask_requests_before_pagination"], 94512)
 
     def test_staged_package_excludes_exhaustive_entrypoint_and_raw_tick_csv(self):
         builder = BUILDER.read_text(encoding="utf-8")
