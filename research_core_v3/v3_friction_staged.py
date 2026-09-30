@@ -138,6 +138,47 @@ def benchmark_anchor_hours(
     return selected
 
 
+def merge_paginated_tick_pages_chronological(
+    pages: list[list[Any]],
+) -> tuple[list[Any], int]:
+    """Merge historical tick pages fetched newest-page-first into one causal tape.
+
+    cTrader pagination walks the request window backward in time. Each decoded page
+    is already chronological oldest-first, but the pages themselves therefore arrive
+    newest-page-first. Reversing the page sequence restores global chronology.
+
+    Exact duplicate quote states at inclusive page boundaries are removed. Distinct
+    quote states sharing the same millisecond are preserved in their page-local order.
+    """
+    merged: list[Any] = []
+    seen: set[tuple[int, int]] = set()
+    duplicates = 0
+    for page in reversed(pages):
+        last_page_ts = None
+        for tick in page:
+            ts = int(tick.timestamp_ms)
+            raw = int(tick.raw_tick)
+            if last_page_ts is not None and ts < last_page_ts:
+                raise CaptureContractError(
+                    "decoded cTrader tick page lost chronological order"
+                )
+            last_page_ts = ts
+            key = (ts, raw)
+            if key in seen:
+                duplicates += 1
+                continue
+            seen.add(key)
+            merged.append(tick)
+    if any(
+        int(a.timestamp_ms) > int(b.timestamp_ms)
+        for a, b in zip(merged, merged[1:])
+    ):
+        raise CaptureContractError(
+            "paginated cTrader tick merge is not chronological"
+        )
+    return merged, duplicates
+
+
 def staged_death_bound(
     *,
     gross_bps: float,
@@ -311,7 +352,7 @@ class StagedFrictionRunner(V3MaxT14FrictionRunner):
     ) -> tuple[list[Any], dict[str, Any]]:
         page_to = int(end_ms)
         previous_oldest = None
-        ticks: list[Any] = []
+        tick_pages: list[list[Any]] = []
         tick_count = 0
         pages = 0
         has_more_count = 0
@@ -356,7 +397,7 @@ class StagedFrictionRunner(V3MaxT14FrictionRunner):
             )
             tick_count += len(decoded)
             if keep_ticks:
-                ticks.extend(decoded)
+                tick_pages.append(decoded)
             more = bool(getattr(response, "hasMore", False))
             if not more:
                 break
@@ -384,6 +425,13 @@ class StagedFrictionRunner(V3MaxT14FrictionRunner):
             diff = int(value) - int(start_transient.get(key, 0))
             if diff:
                 transient_delta[key] = diff
+        if keep_ticks:
+            ticks, pagination_boundary_duplicates_removed = (
+                merge_paginated_tick_pages_chronological(tick_pages)
+            )
+        else:
+            ticks = []
+            pagination_boundary_duplicates_removed = 0
         meta = {
             "side": side,
             "from_ms": int(start_ms),
@@ -394,6 +442,10 @@ class StagedFrictionRunner(V3MaxT14FrictionRunner):
             "protobuf_response_bytes": int(response_bytes),
             "has_more_count": int(has_more_count),
             "page_depth": int(pages),
+            "pagination_merge_order": "OLDER_PAGES_PREPENDED_CHRONOLOGICALLY",
+            "pagination_boundary_duplicates_removed": int(
+                pagination_boundary_duplicates_removed
+            ),
             "elapsed_ms": int(round((time.monotonic() - started) * 1000)),
             "transient_retry_counts": transient_delta,
             "transport_retry_count": int(
