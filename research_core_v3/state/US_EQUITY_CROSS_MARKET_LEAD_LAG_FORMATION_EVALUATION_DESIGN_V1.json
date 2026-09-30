@@ -1,0 +1,106 @@
+{
+  "schema": "mxm.research-core-v3.us-equity-cross-market-lead-lag-formation-evaluation-design.v1",
+  "status": "FROZEN_BEFORE_FORMATION_AND_EVALUATION_OUTCOMES",
+  "parent_research_head": "51e641356c6244f52d5c3bf31c239f4214e1859f",
+  "family": "CROSS_MARKET_LEAD_LAG",
+  "subfamily": "US_EQUITY_30M_LEADER_TO_NEXT_30M_FOLLOWER",
+  "purpose": "TEST_CAUSAL_SHORT_HORIZON_INFORMATION_TRANSMISSION_INSIDE_A_COHERENT_SYNCHRONIZED_US_EQUITY_CFD_PANEL_WITH_PAIR_SELECTION_ISOLATED_TO_A_NONTRADING_FORMATION_SAMPLE",
+  "data": {
+    "classification": "DEVELOPMENT_ONLY",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-09-16T00:00:00Z",
+      "end_utc": "2026-09-16T23:59:59Z"
+    },
+    "source_archives_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "timezone": "America/New_York",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "universe": {
+    "law": "FIXED_31_US_24_EXTENDED_HOURS_EQUITY_CFD_PANEL",
+    "minimum_anchor_breadth": 25,
+    "post_formation_symbol_substitution_forbidden": true
+  },
+  "anchors": {
+    "signal_bar_open_local_times": [
+      "10:25",
+      "10:55",
+      "11:25",
+      "11:55",
+      "12:25",
+      "12:55",
+      "13:25",
+      "13:55",
+      "14:25"
+    ],
+    "leader_feature": "30_MINUTE_LOG_RETURN_ENDING_AT_COMPLETION_OF_SIGNAL_BAR",
+    "follower_target": "30_MINUTE_TRADABLE_LOG_RETURN_FROM_NEXT_EXACT_M5_OPEN_TO_EXACT_OPEN_30_MINUTES_LATER",
+    "exact_backward_continuity_bars": 6,
+    "exact_forward_continuity_bars": 6
+  },
+  "split": {
+    "eligible_session_law": "NY_REGULAR_SESSION_DATE_WITH_AT_LEAST_30_OF_31_SYMBOLS_HAVING_EXACT_09_30_OPEN_AND_15_55_CLOSE",
+    "formation_sessions": "FIRST_84_ELIGIBLE_SESSIONS_ONLY",
+    "evaluation_sessions": "ALL_SUBSEQUENT_ELIGIBLE_SESSIONS_THROUGH_DEVELOPMENT_END",
+    "formation_trading_pnl_forbidden": true,
+    "evaluation_data_for_edge_selection_forbidden": true
+  },
+  "formation": {
+    "candidate_edges": "ALL_ORDERED_LEADER_FOLLOWER_PAIRS_WITH_LEADER_NOT_EQUAL_FOLLOWER",
+    "minimum_common_observations": 500,
+    "full_abs_lead_lag_correlation_minimum": 0.08,
+    "chronological_half_sign_consistency_required": true,
+    "score": "ABS_PEARSON_CORRELATION_BETWEEN_LEADER_PAST_30M_LOG_RETURN_AND_FOLLOWER_NEXT_30M_TRADABLE_LOG_RETURN",
+    "regression": "OLS_FOLLOWER_TARGET_ON_LEADER_FEATURE_WITH_INTERCEPT",
+    "edge_selection": "GREEDY_DESCENDING_ABS_CORRELATION_THEN_LEADER_ID_THEN_FOLLOWER_ID;SELECT_UP_TO_5_EDGES_WITH_NO_SYMBOL_REUSED_AS_EITHER_LEADER_OR_FOLLOWER",
+    "selected_edge_authority_must_be_persisted_before_evaluation": true,
+    "if_fewer_than_4_edges": "STOP_NO_TRADING_EVALUATION"
+  },
+  "evaluation_signal": {
+    "predicted_follower_return": "alpha_plus_beta_times_current_leader_30m_log_return",
+    "ranking": "DESCENDING_PREDICTED_FOLLOWER_RETURN_THEN_FOLLOWER_SYMBOL_ID",
+    "portfolio_k_each_side": [
+      1,
+      2
+    ],
+    "long": "TOP_K_FOLLOWERS",
+    "short": "BOTTOM_K_FOLLOWERS",
+    "weighting": "TOTAL_LONG_GROSS_0_5_TOTAL_SHORT_GROSS_0_5_EQUAL_WITHIN_SIDE",
+    "entry": "NEXT_EXACT_M5_OPEN_AFTER_SIGNAL_BAR_COMPLETES",
+    "exit": "EXACT_M5_OPEN_30_MINUTES_AFTER_ENTRY",
+    "no_future_availability_in_ranking": true,
+    "selected_leg_missing_entry_or_exit": "RIGHT_CENSOR_WHOLE_PORTFOLIO_EVENT_NO_SUBSTITUTION"
+  },
+  "economic_gates": {
+    "minimum_completed_events": 1000,
+    "minimum_event_retention_fraction": 0.9,
+    "minimum_mean_gross_bps": 10,
+    "median_gross_bps_must_be_positive": true,
+    "chronological_thirds": "ALL_THREE_MEAN_GROSS_BPS_AT_LEAST_5",
+    "maximum_top10pct_absolute_event_concentration": 0.35,
+    "robust_region": "BOTH_K1_AND_K2_PASS"
+  },
+  "multiplicity": {
+    "family": "K1_AND_K2",
+    "tests": 2,
+    "method": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05
+  },
+  "interpretation": {
+    "candidate_freeze_allowed": false,
+    "net_certification_allowed": false,
+    "if_survivor": "AUTHENTIC_EVENT_TIME_FRICTION_INTERSECTION_THEN_EUR200_EXECUTABLE_VOLUME_MARGIN_REPLAY",
+    "if_none": "PARK_THIS_LEAD_LAG_SPECIFICATION_AND_MOVE_TO_NEXT_DISTINCT_FRONTIER_NO_POST_OUTCOME_EDGE_OR_LAG_SEARCH"
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "new_android_acquisition": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_legacy_read_only": true
+  }
+}
