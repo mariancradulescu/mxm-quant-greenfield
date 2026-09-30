@@ -56,7 +56,7 @@ from m6.ctrader_proto.OpenApiMessages_pb2 import (
 )
 from m6.ctrader_transport import LIVE_HOST, LIVE_PORT, StdlibCTraderTransport
 
-TOOL_VERSION = "MXM_RESEARCH_CORE_V3_MAXT14_FRICTION_CAPTURE_V1"
+TOOL_VERSION = "MXM_RESEARCH_CORE_V3_MAXT14_FRICTION_CAPTURE_V2"
 PLAN_REL = "research_core_v3/state/MAXT14_AUTHENTIC_FRICTION_ACQUISITION_PLAN_V1.json"
 SCOPE_ROOT_REL = "research_core_v3/state"
 WORK_REL = ".mxm_v3_maxt14_friction_work"
@@ -80,6 +80,90 @@ def _canonical(value: Any) -> bytes:
 
 def _sha_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
+
+
+ERROR_RESPONSE_TYPES = {"ProtoOAErrorRes", "ProtoErrorRes"}
+TRANSIENT_API_ERROR_CODES = {
+    "BLOCKED_PAYLOAD_TYPE",
+    "CANT_ROUTE_REQUEST",
+    "TIMEOUT_ERROR",
+    "RATE_LIMIT",
+    "TOO_MANY_REQUESTS",
+}
+HISTORY_CONTEXT_TERMS = (
+    "histor", "tick", "quote", "retention", "archive", "requested period",
+    "requested range", "time range", "date range",
+)
+HISTORY_UNAVAILABLE_TERMS = (
+    "not available", "unavailable", "no data", "no ticks", "no tick",
+    "not retained", "retention limit", "retention period", "outside",
+    "older than", "too old", "available range",
+)
+
+
+class CTraderAPIResponseError(CaptureContractError):
+    def __init__(
+        self, code: str, description: str, retry_after_seconds: int = 0
+    ):
+        self.code = str(code or "UNKNOWN")
+        self.description = str(description or "")
+        self.retry_after_seconds = max(0, int(retry_after_seconds or 0))
+        detail = f"{self.code}: {redact_text(self.description)}".rstrip(": ")
+        super().__init__(f"cTrader API error: {detail}")
+
+
+class BrokerHistoryUnavailable(CaptureContractError):
+    def __init__(self, api_error: CTraderAPIResponseError):
+        self.code = api_error.code
+        self.description = api_error.description
+        super().__init__(
+            "cTrader explicitly reports requested historical quote data unavailable: "
+            f"{self.code}: {redact_text(self.description)}"
+        )
+
+
+def classify_ctrader_api_error(
+    error_code: str, description: str, *, historical: bool
+) -> str:
+    """Conservative error policy: only explicit historical unavailability degrades."""
+    code = str(error_code or "UNKNOWN").strip().upper()
+    desc = " ".join(str(description or "").lower().split())
+    if code in TRANSIENT_API_ERROR_CODES:
+        return "TRANSIENT_RETRY"
+    if historical:
+        has_context = any(term in desc for term in HISTORY_CONTEXT_TERMS)
+        unavailable = any(term in desc for term in HISTORY_UNAVAILABLE_TERMS)
+        if has_context and unavailable:
+            return "EXPLICIT_BROKER_HISTORY_UNAVAILABLE"
+    return "FAIL_CLOSED"
+
+
+def history_coverage_for_window(
+    record: Mapping[str, Any], start_ms: int, end_ms: int
+) -> str:
+    """Classify exact-window overlap with explicit broker-unavailable history."""
+    start_ms, end_ms = int(start_ms), int(end_ms)
+    if end_ms <= start_ms:
+        raise CaptureContractError("invalid exact-window range")
+    overlaps: list[tuple[int, int]] = []
+    for item in record.get("broker_history_unavailable_ranges") or []:
+        left = max(start_ms, int(item["from_ms"]))
+        right = min(end_ms, int(item["to_ms"]))
+        if right > left:
+            overlaps.append((left, right))
+    if not overlaps:
+        return "REQUEST_COMPLETED"
+    overlaps.sort()
+    merged: list[list[int]] = []
+    for left, right in overlaps:
+        if not merged or left > merged[-1][1]:
+            merged.append([left, right])
+        else:
+            merged[-1][1] = max(merged[-1][1], right)
+    unavailable_ms = sum(right - left for left, right in merged)
+    if unavailable_ms >= end_ms - start_ms:
+        return "BROKER_HISTORY_UNAVAILABLE"
+    return "PARTIAL_BROKER_HISTORY_UNAVAILABLE"
 
 
 @dataclass(frozen=True)
@@ -216,6 +300,7 @@ class V3MaxT14FrictionRunner:
 
         self._last_historical_send: float | None = None
         self._historical_requests = 0
+        self._historical_unavailable_responses = 0
         self._resume_reused_chunks = 0
         self._app_authorized = False
         self._authorized_account_id: int | None = None
@@ -413,9 +498,11 @@ class V3MaxT14FrictionRunner:
     def _transport_request(self, request):
         require_read_only_request(type(request).__name__)
         response = self.transport.request(request, timeout=60)
-        if type(response).__name__ == "ProtoOAErrorRes":
-            raise CaptureContractError(
-                f"cTrader API error: {getattr(response, 'errorCode', 'UNKNOWN')}"
+        if type(response).__name__ in ERROR_RESPONSE_TYPES:
+            raise CTraderAPIResponseError(
+                str(getattr(response, "errorCode", "UNKNOWN") or "UNKNOWN"),
+                str(getattr(response, "description", "") or ""),
+                int(getattr(response, "retryAfter", 0) or 0),
             )
         return response
 
@@ -454,20 +541,46 @@ class V3MaxT14FrictionRunner:
                 if historical:
                     self._historical_requests += 1
                 return response
+            except CTraderAPIResponseError as exc:
+                policy = classify_ctrader_api_error(
+                    exc.code, exc.description, historical=historical
+                )
+                if policy == "EXPLICIT_BROKER_HISTORY_UNAVAILABLE":
+                    self._historical_unavailable_responses += 1
+                    raise BrokerHistoryUnavailable(exc) from None
+                if policy == "FAIL_CLOSED":
+                    raise CaptureContractError(
+                        f"{type(request).__name__} broker API error is not safely "
+                        f"classifiable as transient or historical unavailability: "
+                        f"{exc.code}: {redact_text(exc.description)}"
+                    ) from None
+                last = exc
+                if attempt >= retries:
+                    break
+                delay = max(
+                    min(8.0, float(2 ** (attempt - 1))),
+                    float(exc.retry_after_seconds),
+                )
+                self._stage(
+                    f"[RETRY] {type(request).__name__} transient broker error "
+                    f"{exc.code} attempt {attempt}/{retries}; retry in {delay:.1f}s"
+                )
+                time.sleep(delay)
             except Exception as exc:
                 last = exc
                 if attempt >= retries:
                     break
+                delay = min(8.0, float(2 ** (attempt - 1)))
                 self._stage(
-                    f"[RETRY] {type(request).__name__} attempt {attempt}/{retries}: "
-                    f"{redact_text(str(exc))}"
+                    f"[RETRY] {type(request).__name__} transport attempt "
+                    f"{attempt}/{retries}: {redact_text(str(exc))}"
                 )
-                time.sleep(min(8.0, float(2 ** (attempt - 1))))
-                try:
-                    self.transport.close()
-                    self._restore_session()
-                except Exception as reconnect_exc:
-                    last = reconnect_exc
+                time.sleep(delay)
+            try:
+                self.transport.close()
+                self._restore_session()
+            except Exception as reconnect_exc:
+                last = reconnect_exc
         raise CaptureContractError(
             f"{type(request).__name__} failed after {retries} attempts: "
             f"{redact_text(str(last))}"
@@ -609,6 +722,7 @@ class V3MaxT14FrictionRunner:
         ticks: list[DecodedTick] = []
         pages = 0
         fallback_count = 0
+        unavailable_ranges: list[dict[str, Any]] = []
         while page_to >= block.start_ms:
             request = ProtoOAGetTickDataReq(
                 ctidTraderAccountId=account_id,
@@ -617,13 +731,27 @@ class V3MaxT14FrictionRunner:
                 fromTimestamp=int(block.start_ms),
                 toTimestamp=int(page_to),
             )
-            response = self._send(request, historical=True)
+            try:
+                response = self._send(request, historical=True)
+            except BrokerHistoryUnavailable as exc:
+                description = redact_text(exc.description)
+                unavailable_ranges.append({
+                    "from_ms": int(block.start_ms),
+                    "to_ms": int(page_to),
+                    "error_code": exc.code,
+                    "description": description,
+                    "description_sha256": _sha_bytes(description.encode("utf-8")),
+                    "classification": "EXPLICIT_BROKER_HISTORY_UNAVAILABLE",
+                })
+                self._stage(
+                    f"[HISTORY UNAVAILABLE] {symbol} {side} block={block.index} "
+                    f"{block.start_ms}..{page_to} | {exc.code} | continuing"
+                )
+                break
             pages += 1
             decoded = decode_ctrader_tick_page(
-                [
-                    {"timestamp": int(x.timestamp), "tick": int(x.tick)}
-                    for x in response.tickData
-                ]
+                [{"timestamp": int(x.timestamp), "tick": int(x.tick)}
+                 for x in response.tickData]
             )
             ticks.extend(decoded)
             if not bool(getattr(response, "hasMore", False)):
@@ -656,10 +784,20 @@ class V3MaxT14FrictionRunner:
         )
         payload = tick_csv_bytes(rows)
         atomic_write_bytes(path, payload)
+        if unavailable_ranges:
+            capture_status = (
+                "PARTIAL_BROKER_HISTORY_UNAVAILABLE"
+                if rows else "BROKER_HISTORY_UNAVAILABLE"
+            )
+        elif rows:
+            capture_status = "REQUEST_COMPLETED_WITH_TICKS"
+        else:
+            capture_status = "REQUEST_COMPLETED_NO_TICKS"
         record = {
             "key": key,
             "symbol": symbol,
             "symbol_id": int(target["symbol_id"]),
+            "region_sha256": str(target["region_sha256"]),
             "quote_type": side,
             "block_index": block.index,
             "from_ms": block.start_ms,
@@ -668,6 +806,8 @@ class V3MaxT14FrictionRunner:
             "row_count": len(rows),
             "page_count": pages,
             "pagination_boundary_fallback_count": fallback_count,
+            "capture_status": capture_status,
+            "broker_history_unavailable_ranges": unavailable_ranges,
             "sha256": _sha_bytes(payload),
         }
         self.resume["completed"][key] = record
@@ -724,7 +864,8 @@ class V3MaxT14FrictionRunner:
         delays = [int(x) for x in self.plan["acquisition"]["delay_sensitivity_seconds"]]
         fieldnames = [
             "symbol", "symbol_id", "exact_window_index", "window_start_ms",
-            "boundary_ms", "window_end_ms", "region_sha256"
+            "boundary_ms", "window_end_ms", "region_sha256",
+            "bid_history_coverage", "ask_history_coverage",
         ]
         for delay in delays:
             prefix = f"d{delay}s"
@@ -755,8 +896,9 @@ class V3MaxT14FrictionRunner:
                 ask_path = self._chunk_path(symbol, "ASK", block)
                 bid_key = self._chunk_key(symbol, "BID", block)
                 ask_key = self._chunk_key(symbol, "ASK", block)
-                for key, raw_path in ((bid_key, bid_path), (ask_key, ask_path)):
-                    record = self.resume["completed"].get(key)
+                bid_record = self.resume["completed"].get(bid_key)
+                ask_record = self.resume["completed"].get(ask_key)
+                for record, raw_path in ((bid_record, bid_path), (ask_record, ask_path)):
                     if not isinstance(record, dict) or not verified_resume_chunk(
                         raw_path, str(record.get("sha256") or "")
                     ):
@@ -767,6 +909,12 @@ class V3MaxT14FrictionRunner:
                 asks = _read_tick_csv(ask_path)
                 index = BoundaryQuoteIndex(bids, asks)
                 for window in block.windows:
+                    bid_history_coverage = history_coverage_for_window(
+                        bid_record, window.start_ms, window.end_ms
+                    )
+                    ask_history_coverage = history_coverage_for_window(
+                        ask_record, window.start_ms, window.end_ms
+                    )
                     row = {
                         "symbol": symbol,
                         "symbol_id": int(target["symbol_id"]),
@@ -775,6 +923,8 @@ class V3MaxT14FrictionRunner:
                         "boundary_ms": window.boundary_ms,
                         "window_end_ms": window.end_ms,
                         "region_sha256": target["region_sha256"],
+                        "bid_history_coverage": bid_history_coverage,
+                        "ask_history_coverage": ask_history_coverage,
                     }
                     for delay in delays:
                         prefix = f"d{delay}s"
@@ -908,16 +1058,55 @@ class V3MaxT14FrictionRunner:
                 "symbols": self._symbol_evidence,
             },
         )
+        unavailability_events = []
+        for rec in records:
+            for item in rec.get("broker_history_unavailable_ranges") or []:
+                unavailability_events.append({
+                    "symbol": rec["symbol"],
+                    "symbol_id": int(rec["symbol_id"]),
+                    "region_sha256": rec["region_sha256"],
+                    "quote_type": rec["quote_type"],
+                    "block_index": int(rec["block_index"]),
+                    "requested_from_ms": int(rec["from_ms"]),
+                    "requested_to_ms": int(rec["to_ms"]),
+                    **item,
+                })
+        availability_path = (
+            self.output_dir / "evidence" / "broker_history_availability.json"
+        )
+        availability_doc = {
+            "schema": "mxm.research-core-v3.broker-history-availability.v1",
+            "classification": (
+                "AUTHENTIC_BROKER_RESPONSE_PROVENANCE_NOT_ZERO_COST_NOT_SYNTHETIC_DATA"
+            ),
+            "error_policy": {
+                "transient_network_or_rate_limit": "RETRY_AND_RESUME",
+                "authentication_account_or_symbol_identity_failure": "FAIL_CLOSED",
+                "explicit_broker_history_unavailable": "RECORD_UNAVAILABILITY_AND_CONTINUE",
+                "unknown_or_ambiguous_api_error": "FAIL_CLOSED_PRESERVE_PROGRESS",
+            },
+            "event_count": len(unavailability_events),
+            "events": unavailability_events,
+        }
+        atomic_write_json(availability_path, availability_doc)
+
         ordered_raw = sorted(
-            (
-                rec["symbol"], rec["quote_type"], int(rec["block_index"]),
-                rec["sha256"], int(rec["row_count"])
-            )
-            for rec in records
+            [{
+                "symbol": rec["symbol"],
+                "quote_type": rec["quote_type"],
+                "block_index": int(rec["block_index"]),
+                "sha256": rec["sha256"],
+                "row_count": int(rec["row_count"]),
+                "capture_status": rec.get("capture_status"),
+                "broker_history_unavailable_ranges": (
+                    rec.get("broker_history_unavailable_ranges") or []
+                ),
+            } for rec in records],
+            key=lambda x: (x["symbol"], x["quote_type"], x["block_index"]),
         )
         raw_commitment = _sha_bytes(_canonical(ordered_raw))
         manifest = {
-            "schema": "mxm.research-core-v3.maxt14-friction-evidence-bundle.v1",
+            "schema": "mxm.research-core-v3.maxt14-friction-evidence-bundle.v2",
             "tool_version": TOOL_VERSION,
             "plan_binding_sha256": self.plan["binding_sha256"],
             "source_corrected_region_assessment_sha256": self.plan["authority"][
@@ -942,8 +1131,30 @@ class V3MaxT14FrictionRunner:
             "raw_tick_rows": sum(int(x["row_count"]) for x in records),
             "raw_ordered_commitment_sha256": raw_commitment,
             "historical_api_requests_completed": self._historical_requests,
+            "historical_api_explicit_unavailable_responses": (
+                self._historical_unavailable_responses
+            ),
             "resume_chunks_reused": self._resume_reused_chunks,
             "geometry": geometry,
+            "broker_history_availability_evidence": {
+                "path": availability_path.relative_to(self.output_dir).as_posix(),
+                "sha256": sha256_file(availability_path),
+                "event_count": len(unavailability_events),
+            },
+            "coverage_semantics": {
+                "REQUEST_COMPLETED": (
+                    "broker request covered the exact window; zero ticks remains an "
+                    "authentic observation, not zero spread"
+                ),
+                "PARTIAL_BROKER_HISTORY_UNAVAILABLE": (
+                    "some requested time in the exact window was explicitly unavailable"
+                ),
+                "BROKER_HISTORY_UNAVAILABLE": (
+                    "the exact requested window was covered by explicit broker "
+                    "history-unavailable provenance"
+                ),
+            },
+            "bundle_integrity_is_not_economic_sufficiency": True,
             "derived_exact_window_evidence": derived,
             "next_required_step": (
                 "VERIFY_BUNDLE_AND_APPLY_ONLY_AUTHENTIC_POINT_IN_TIME_APPLICABLE_COST_"

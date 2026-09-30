@@ -4,8 +4,10 @@ import unittest
 from pathlib import Path
 
 from research_core_v3.v3_friction_capture import (
+    classify_ctrader_api_error,
     coalesce_exact_windows,
     decode_delta_windows,
+    history_coverage_for_window,
     local_geometry_preflight,
 )
 
@@ -51,6 +53,57 @@ class V3MaxT14FrictionCaptureTests(unittest.TestCase):
         self.assertEqual(recovered, source)
         self.assertEqual(blocks[0].start_ms, 1000)
         self.assertEqual(blocks[0].end_ms, 1232)
+
+    def test_error_policy_is_conservative(self):
+        self.assertEqual(
+            classify_ctrader_api_error(
+                "INVALID_REQUEST",
+                "Historical tick data is not available outside the retention period",
+                historical=True,
+            ),
+            "EXPLICIT_BROKER_HISTORY_UNAVAILABLE",
+        )
+        self.assertEqual(
+            classify_ctrader_api_error(
+                "INVALID_REQUEST",
+                "Tick data request interval must not exceed one week",
+                historical=True,
+            ),
+            "FAIL_CLOSED",
+        )
+        self.assertEqual(
+            classify_ctrader_api_error(
+                "BLOCKED_PAYLOAD_TYPE", "Rate limit reached", historical=True
+            ),
+            "TRANSIENT_RETRY",
+        )
+        self.assertEqual(
+            classify_ctrader_api_error(
+                "INVALID_REQUEST",
+                "Historical tick data is not available",
+                historical=False,
+            ),
+            "FAIL_CLOSED",
+        )
+
+    def test_window_history_coverage_is_exact_and_deterministic(self):
+        record = {
+            "broker_history_unavailable_ranges": [
+                {"from_ms": 1200, "to_ms": 1800},
+            ]
+        }
+        self.assertEqual(
+            history_coverage_for_window(record, 1000, 2000),
+            "PARTIAL_BROKER_HISTORY_UNAVAILABLE",
+        )
+        self.assertEqual(
+            history_coverage_for_window(record, 1200, 1800),
+            "BROKER_HISTORY_UNAVAILABLE",
+        )
+        self.assertEqual(
+            history_coverage_for_window(record, 2000, 3000),
+            "REQUEST_COMPLETED",
+        )
 
     def test_real_frozen_scope_geometry_preflight(self):
         geometry = local_geometry_preflight(ROOT)
