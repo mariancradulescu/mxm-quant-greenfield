@@ -12,7 +12,8 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install Android-safe protobuf
-        run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
+        run: |
+          python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile targeted V3 capture runtime
         run: python -m py_compile V3_MAXT14_FRICTION_CAPTURE_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/pydroid_v3_friction_launcher.py tools/build_v3_maxt14_friction_capture_package.py
       - name: No-network exact frozen-scope geometry preflight
