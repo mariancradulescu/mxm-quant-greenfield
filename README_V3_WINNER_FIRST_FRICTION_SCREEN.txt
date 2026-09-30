@@ -1,4 +1,4 @@
-MXM Research Core V3 — Winner-First Authentic Friction Screen V9
+MXM Research Core V3 — Winner-First Authentic Friction Screen V9R1
 
 WHY THIS EXISTS
 ---------------
@@ -56,16 +56,28 @@ The evidence ZIP also contains safe current cTrader symbol metadata (commission 
 lot/min/step volume, leverage ID, schedule, swaps where supplied). It is explicitly
 marked CURRENT ONLY and is NOT treated as historical cost truth.
 
-RUN
----
-1. Extract MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9.zip into a NEW folder.
-2. Open only V3_WINNER_FIRST_FRICTION_SCREEN_RUN.py in Pydroid 3.
-3. Run once.
-4. If OAuth leaves the browser foregrounded, return through Android Recents to the
+V9R1 RESUME HOTFIX
+------------------
+V9R1 repairs multi-page cTrader tick chronology only. It does NOT change the frozen
+research plan, sparse sampling membership, symbol set, or economic rules.
+
+If V9 stopped with "BID ticks are not chronological" or "ASK ticks are not chronological":
+extract V9R1 OVER THE SAME EXISTING V9 FOLDER and allow file overwrite. Do NOT delete
+the hidden .mxm_v3_winner_first_friction_work directory. That directory contains the
+verified completed-hour resume state. The same frozen contract remains valid, so
+completed hours are reused without broker recollection.
+
+RUN / RESUME
+------------
+1. Extract MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip OVER THE SAME V9 folder.
+2. Allow overwrite/replace of package files; do not delete other files/folders.
+3. Open only V3_WINNER_FIRST_FRICTION_SCREEN_RUN.py in Pydroid 3.
+4. Run once. Previously completed hours will scroll past quickly and be reused.
+5. If OAuth leaves the browser foregrounded, return through Android Recents to the
    SAME Pydroid process. Do not press Run again.
-5. If interrupted, rerun the same file from the same folder; completed sparse hours
-   are resumable.
-6. When complete, return only:
+6. If interrupted, rerun the same file from the same folder; completed sparse hours
+   remain resumable.
+7. When complete, return only:
    v3_friction_winner_output/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_EVIDENCE_V1.zip
 
 Do not run V7 or V8 again.
