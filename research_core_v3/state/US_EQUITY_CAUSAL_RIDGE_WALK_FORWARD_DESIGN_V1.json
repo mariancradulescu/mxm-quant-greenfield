@@ -1,0 +1,104 @@
+{
+  "schema": "mxm.research-core-v3.us-equity-causal-ridge-walk-forward-design.v1",
+  "status": "FROZEN_BEFORE_MODEL_OUTCOMES",
+  "parent_research_head": "7e5bfc0180b6925d86113f4b11bc651fa5f520cd",
+  "family": "CAUSAL_ML_PREDICTIVE_OR_STATE_MODEL",
+  "subfamily": "POOLED_LINEAR_RIDGE_INTRADAY_CROSS_SECTIONAL",
+  "data": {
+    "resolution": "M5",
+    "classification": "DEVELOPMENT_ONLY",
+    "source_archives_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "timezone": "America/New_York",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "universe": {
+    "law": "FIXED_31_US_24_EXTENDED_HOURS_EQUITY_CFD_PANEL",
+    "minimum_anchor_breadth": 25
+  },
+  "anchors": "M5 bar-open local times 10:25,10:55,...,14:25; signal is available at completion of that bar; entry is next exact M5 open",
+  "target": "30_MINUTE_TRADABLE_RETURN_FROM_ENTRY_OPEN_i_plus_1_TO_EXIT_OPEN_i_plus_7",
+  "feature_set": {
+    "continuous": [
+      "r5=close_i/close_i_minus_1-1",
+      "r15=close_i/close_i_minus_3-1",
+      "r30=close_i/close_i_minus_6-1",
+      "r60=close_i/close_i_minus_12-1",
+      "vol30=std(last_6_exact_M5_log_returns)",
+      "range30=(max_high_last_6-min_low_last_6)/close_i",
+      "session_return=close_i/exact_09_30_open-1",
+      "cross_sectional_r5_percentile_centered",
+      "cross_sectional_r30_percentile_centered"
+    ],
+    "categorical": [
+      "SYMBOL_ID_ONE_HOT_31",
+      "ANCHOR_SLOT_ONE_HOT_9"
+    ],
+    "exact_backward_continuity_required_through_12_bars": true,
+    "current_anchor_cross_section_only": true
+  },
+  "model": {
+    "estimator": "sklearn.linear_model.Ridge",
+    "alpha": 10,
+    "fit_intercept": true,
+    "continuous_standardization": "TRAIN_BLOCK_HISTORY_MEAN_STD_ONLY",
+    "categorical_scaling": "NONE",
+    "hyperparameter_search": false,
+    "model_class_search": false
+  },
+  "walk_forward": {
+    "eligible_session_law": "NY regular-session date with at least 30/31 symbols having exact 09:30 open and 15:55 close",
+    "warmup_sessions": 60,
+    "prediction_block_sessions": 20,
+    "training": "EXPANDING_ALL_ELIGIBLE_ROWS_STRICTLY_BEFORE_CURRENT_PREDICTION_BLOCK",
+    "retrain_at_each_block_start": true,
+    "labels_from_current_or_future_prediction_block_forbidden": true
+  },
+  "portfolio": {
+    "prediction_rank": "DESCENDING_PREDICTED_NEXT_30M_RETURN_THEN_SYMBOL_ID",
+    "k_each_side": [
+      1,
+      2,
+      3
+    ],
+    "long": "TOP_K",
+    "short": "BOTTOM_K",
+    "weighting": "TOTAL_LONG_GROSS_0_5_TOTAL_SHORT_GROSS_0_5_EQUAL_WITHIN_SIDE",
+    "one_portfolio_per_anchor_per_k": true,
+    "entry": "next exact M5 open",
+    "exit": "exact M5 open 30 minutes after entry",
+    "missing_selected_leg": "RIGHT_CENSOR_PORTFOLIO_EVENT_NO_RANK_SUBSTITUTION",
+    "same_timestamp_prior_exit_then_new_entry": true
+  },
+  "economic_gates": {
+    "minimum_completed_events": 1200,
+    "minimum_event_retention_fraction": 0.9,
+    "minimum_mean_gross_bps": 10,
+    "median_gross_bps_must_be_positive": true,
+    "chronological_thirds": "ALL_THREE_MEAN_GROSS_BPS_AT_LEAST_5",
+    "maximum_top10pct_absolute_event_concentration": 0.35,
+    "robust_region": "AT_LEAST_TWO_ADJACENT_K_VALUES_PASS"
+  },
+  "multiplicity": {
+    "family": "K_1_K_2_K_3",
+    "tests": 3,
+    "method": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05
+  },
+  "promotion_boundary": {
+    "candidate_freeze_allowed": false,
+    "net_certification_allowed": false,
+    "if_survivor": "AUTHENTIC_EVENT_TIME_FRICTION_INTERSECTION_AND_EUR200_VOLUME_MARGIN_REPLAY",
+    "if_none": "PARK_SIMPLE_CAUSAL_ML;DO_NOT_ESCALATE_MODEL_COMPLEXITY_ON_SAME_OUTCOMES"
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "new_android_acquisition": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_legacy_read_only": true
+  }
+}
