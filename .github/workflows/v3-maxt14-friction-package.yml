@@ -43,11 +43,11 @@ jobs:
       - name: Build deterministic V9R1 Android package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_winner_first_friction_package.py
-          sha256sum dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1R1.zip
+          sha256sum dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip
       - name: Upload V9R1 package
         uses: actions/upload-artifact@v4
         with:
-          name: MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9
-          path: dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9.zip
+          name: MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1
+          path: dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip
           if-no-files-found: error
           retention-days: 30
