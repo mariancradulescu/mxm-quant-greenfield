@@ -43,7 +43,7 @@ def main() -> None:
         if result.returncode != 0 or not _ready():
             print("[BOOTSTRAP FAIL] protobuf unavailable; no broker request was made.")
             raise SystemExit(2)
-    from research_core_v3.pydroid_v3_friction_staged_launcher import main as launcher
+    from research_core_v3.pydroid_v3_friction_global_triage_launcher import main as launcher
     launcher()
 
 
