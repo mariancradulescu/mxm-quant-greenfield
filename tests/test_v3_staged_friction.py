@@ -4,10 +4,12 @@ import math
 import unittest
 from pathlib import Path
 
+from m6.cost_evidence import DecodedTick
 from research_core_v3.v3_friction_staged import (
     benchmark_anchor_hours,
     build_reference_strata,
     freeze_sampling_for_symbol,
+    merge_paginated_tick_pages_chronological,
     staged_death_bound,
     staged_geometry_preflight,
 )
@@ -77,6 +79,49 @@ class V3StagedFrictionTests(unittest.TestCase):
         anchors = benchmark_anchor_hours(strata)
         self.assertEqual(len(anchors), 3)
         self.assertEqual(len(set(anchors)), 3)
+
+    def test_paginated_tick_pages_are_merged_globally_chronological(self):
+        # cTrader returns each page newest-range first, while each decoded page
+        # is normalized oldest-first. The older second page must be prepended.
+        newest_page = [
+            DecodedTick(3000, 103),
+            DecodedTick(4000, 104),
+        ]
+        older_page = [
+            DecodedTick(1000, 101),
+            DecodedTick(2000, 102),
+            DecodedTick(3000, 103),  # inclusive pagination overlap
+        ]
+        merged, duplicates = merge_paginated_tick_pages_chronological(
+            [newest_page, older_page]
+        )
+        self.assertEqual(
+            [x.timestamp_ms for x in merged],
+            [1000, 2000, 3000, 4000],
+        )
+        self.assertEqual(
+            [x.raw_tick for x in merged],
+            [101, 102, 103, 104],
+        )
+        self.assertEqual(duplicates, 1)
+
+    def test_paginated_tick_merge_preserves_distinct_same_ms_states(self):
+        newest_page = [
+            DecodedTick(3000, 104),
+            DecodedTick(4000, 105),
+        ]
+        older_page = [
+            DecodedTick(2000, 102),
+            DecodedTick(3000, 103),
+        ]
+        merged, duplicates = merge_paginated_tick_pages_chronological(
+            [newest_page, older_page]
+        )
+        self.assertEqual(
+            [(x.timestamp_ms, x.raw_tick) for x in merged],
+            [(2000, 102), (3000, 103), (3000, 104), (4000, 105)],
+        )
+        self.assertEqual(duplicates, 0)
 
     def test_death_bound_is_conservative_and_monotone(self):
         meta = {
