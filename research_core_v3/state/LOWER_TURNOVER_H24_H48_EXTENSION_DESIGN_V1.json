@@ -1,0 +1,78 @@
+{
+  "schema": "mxm.research-core-v3.lower-turnover-h24-h48-extension-design.v1",
+  "status": "FROZEN_BEFORE_H24_H48_OUTCOMES",
+  "frozen_utc": "2026-09-30T12:50:00Z",
+  "rationale": {
+    "outcome_informed_redesign": true,
+    "prior_h6_result": "NO_REGION_SIMULTANEOUSLY_MULTIPLICITY_PASS_AND_AUTHENTIC_SPREAD_PLAUSIBLE",
+    "prior_h12_status": "DEVELOPMENT_DIAGNOSTIC_ONLY_HEADROOM_INSUFFICIENT_ON_68_ALREADY_MEASURED_REGIONS",
+    "purpose": "TEST_WHETHER_LOWER_TURNOVER_LONGER_HOLDING_HORIZONS_CREATE_MATERIAL_GROSS_HEADROOM_BEFORE_ANY_NEW_BROKER_FRICTION_ACQUISITION"
+  },
+  "immutable_sources": {
+    "primary_145_manifest": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+    "original_capture_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "delta_capture_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+    "frozen_experiment_spec": "research_core_v3/state/FROZEN_EXPERIMENT_SPEC_V1.json",
+    "frozen_experiment_spec_sha256": "e9808fcc6b7df72f025d68e9d3067b931f26a24761cd69c6a3750b95092d3ba3",
+    "corrected_surface_sha256": "0ceb1f79080f8c9ef5cf6a13c0f56b279d02ffabc9644624f58230c705fcccbb",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "parity_gate": {
+    "required_before_extension_interpretation": true,
+    "reproduce_existing_h6_cell_count": 7975,
+    "reproduce_h6_gross_region_count": 88,
+    "reproduce_h6_multiplicity_pass_region_count": 14,
+    "reproduce_h6_multiplicity_pass_region_identities": true,
+    "failure_action": "STOP_AND_DO_NOT_INTERPRET_H24_H48"
+  },
+  "extension": {
+    "resolution": "M5",
+    "horizons_bars": [
+      24,
+      48
+    ],
+    "approximate_holding_minutes": [
+      120,
+      240
+    ],
+    "common_forward_cohort_horizon_bars": 48,
+    "timing": "signal close[i], entry open[i+1], exit close[i+h]",
+    "backward_dependency_continuity": "EXACT_FULL_DEPENDENCY",
+    "forward_continuity": "CONTIGUOUS_THROUGH_H48",
+    "rearm_policy": "UNCHANGED_FROM_FROZEN_EXPERIMENT_SPEC",
+    "mechanisms_and_parameter_grids": "UNCHANGED_FROM_FROZEN_EXPERIMENT_SPEC",
+    "contexts": "UNCHANGED_FROM_FROZEN_EXPERIMENT_SPEC",
+    "no_new_parameter_grid": true
+  },
+  "gross_screen_policy": {
+    "material_mean_response_bps": 0.1,
+    "minimum_event_retention": 0.5,
+    "minimum_date_support": 60,
+    "minimum_week_support": 20,
+    "maximum_top10_absolute_concentration": 0.5,
+    "chronological_thirds": "ALL_THREE_POSITIVE",
+    "minimum_numeric_connected_plateau_cells": 3,
+    "require_timing_continuity_sign_stability": true,
+    "require_positive_robust_effect": true
+  },
+  "multiplicity": {
+    "family": "ALL_7975_CELLS_X_BOTH_NEW_HORIZONS_H24_H48",
+    "tests": 15950,
+    "method": "SHARED_4_UTC_WEEK_BLOCK_WILD_SIGN_MAX_T",
+    "wild_week_resamples": 1999,
+    "seed": 20260930,
+    "resampling_block_weeks": 4,
+    "familywise_alpha": 0.05,
+    "region_evidence": "WORST_CONSTITUENT_FAMILYWISE_P_WITHIN_CONNECTED_PARAMETER_REGION",
+    "development_only": true
+  },
+  "interpretation": {
+    "h24_h48_are_new_outcome_informed_development_hypotheses": true,
+    "no_candidate_freeze_from_development": true,
+    "no_net_certification_from_development": true,
+    "no_protected_forward_access": true,
+    "no_new_android_acquisition_before_extension_result": true,
+    "friction_followup_only_for_multiplicity_pass_regions_with_material_gross_headroom": true,
+    "authoritative_frontier_1576_remains_open": true
+  }
+}
