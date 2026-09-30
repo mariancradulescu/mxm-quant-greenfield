@@ -52,7 +52,7 @@
       "BID",
       "ASK"
     ],
-    "planned_base_probes": 420,
+    "planned_base_probes": 364,
     "metrics": [
       "successful_api_responses",
       "api_attempts",
@@ -65,15 +65,20 @@
       "transient_retry_counts",
       "transport_retry_count",
       "broker_history_unavailable",
-      "reference_windows_in_probe"
+      "retained_triage_windows_in_probe"
     ],
     "economic_values_recorded": false,
     "raw_tick_values_persisted": false,
     "transport_profile_rule": {
-      "choose": "MINIMIZE_MEASURED_ELAPSED_MS_PER_REFERENCE_WINDOW;TIEBREAK_BYTES_PER_REFERENCE_WINDOW_THEN_API_ATTEMPTS_PER_REFERENCE_WINDOW_THEN_SHORTER_SPAN",
+      "choose": "MINIMIZE_MEASURED_ELAPSED_MS_PER_RETAINED_TRIAGE_WINDOW;TIEBREAK_BYTES_PER_RETAINED_TRIAGE_WINDOW_THEN_API_ATTEMPTS_PER_RETAINED_TRIAGE_WINDOW_THEN_SHORTER_SPAN",
       "requires_no_broker_history_unavailable_on_benchmark_probes": true,
       "purpose": "TRANSPORT_ONLY_NOT_ECONOMIC_SELECTION"
-    }
+    },
+    "broad_probe_spans_minutes": [
+      180
+    ],
+    "broad_probe_anchors_per_symbol": 1,
+    "broad_probe_anchor_selection": "MEDIAN_DENSITY_ANCHOR_ONLY"
   },
   "initial_global_triage": {
     "primary_sampling_unit": "UTC_CALENDAR_HOUR_CONTAINING_ONE_OR_MORE_FROZEN_EXACT_WINDOWS",
@@ -152,5 +157,5 @@
     "observed_base_chunk_rate_per_second": 2.857142857142857,
     "exhaustive_base_requests_before_pagination": 461102
   },
-  "binding_sha256": "ef528c4fce40058dca7677744aca1bde1ca02c6318885d274be7a5c431f6b89f"
+  "binding_sha256": "e25ff11499625e4277d03556f7947a2f97bb44b87a896f3143943561f449b8c4"
 }
