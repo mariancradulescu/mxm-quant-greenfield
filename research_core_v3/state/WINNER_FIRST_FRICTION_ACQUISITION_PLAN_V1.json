@@ -1,0 +1,1315 @@
+{
+  "schema": "mxm.research-core-v3.winner-first-authentic-friction-acquisition.v1",
+  "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
+  "created_utc": "2026-09-30T11:20:00Z",
+  "authority": {
+    "corrected_region_assessment_sha256": "7ab0000e92bd39a28d3de3aafc328927eb25fdcf42e68240e31b1a800461026a",
+    "corrected_surface_sha256": "0ceb1f79080f8c9ef5cf6a13c0f56b279d02ffabc9644624f58230c705fcccbb",
+    "source_v8_result_audit": "research_core_v3/state/V8_WAVE2_FRICTION_RESULT_AUDIT_V1.json",
+    "project_contract_path": "RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md",
+    "protected_forward_start": "2026-09-17T12:02:58Z"
+  },
+  "broker_identity": {
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "account_mutation": false,
+    "current_metadata_is_historical_cost_truth": false,
+    "environment": "Pepperstone - Europe LIVE",
+    "exact_symbol_id_and_name_match_required": true,
+    "oauth_scope": "accounts",
+    "orders": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "candidate_outcomes_opened_by_capture": false,
+    "delay_sensitivity_seconds": [
+      0,
+      1,
+      5,
+      30
+    ],
+    "fill_authority": false,
+    "historical_request_max_span_ms": 604800000,
+    "protected_forward_opened": false,
+    "quote_age_limit_seconds": 2,
+    "quote_types": [
+      "BID",
+      "ASK"
+    ],
+    "raw_chunks_retained_locally": false,
+    "request_pacing_seconds": 0.21,
+    "scope_window_interpretation": "Each exact packed window is [boundary-2s,boundary+30s]; boundary=start+2000ms.",
+    "transfer_bundle_contains_raw_ticks": false,
+    "transport_coalescing": {
+      "allowed": true,
+      "maximum_block_span_ms": 3600000,
+      "maximum_gap_ms": 300000,
+      "overfetch_interpretation": "TRANSPORT_ONLY;SCREEN_ANALYSIS_USES_ONLY_FROZEN_SAMPLED_WINDOWS",
+      "rule": "Winner-first screen uses one fixed 60-minute broker request around each frozen sampled hour; overfetch is transport only."
+    }
+  },
+  "selection": {
+    "gross_robust_regions_total": 88,
+    "previously_measured_regions": 28,
+    "remaining_regions_before_symbol_reuse": 60,
+    "prior_measured_symbol_reuse_regions": 3,
+    "selected_regions": 57,
+    "selected_symbols": 56,
+    "selected_exact_quote_windows": 2623050,
+    "selected_unique_events": 1904198,
+    "ordering": "ALL_UNMEASURED_SYMBOL_SCOPES_SIMULTANEOUSLY;NO_ECONOMIC_RANKING_FOR_ACQUISITION",
+    "does_not_close_unselected_or_reused_regions": true,
+    "authoritative_frontier_remains_open": 1576,
+    "reason": "WINNER_FIRST_BROAD_FRICTION_SCREEN_AFTER_DEATH_CERTIFICATION_PROVED_LOW_INFORMATION_VALUE"
+  },
+  "prior_measured_symbol_reuse": {
+    "regions": [
+      {
+        "symbol": "CRM.US-24",
+        "region_sha256": "4f9f4ba6f15f22f6100435854c471d54bd516ed591a4426bd5d3e304ad69d3e7",
+        "mechanism": "TREND_MOMENTUM",
+        "gross_bps": 0.9508198216015679,
+        "v8_min_fresh_d0_spread_over_gross": 5.2854
+      },
+      {
+        "symbol": "AMD.US-24",
+        "region_sha256": "0f092db4f8c2b1fe486690728ab6d23cc9e01fc93bbfe83f068c5c5555853e14",
+        "mechanism": "TREND_MOMENTUM",
+        "gross_bps": 0.8338236926982588,
+        "v8_min_fresh_d0_spread_over_gross": 3.0046
+      },
+      {
+        "symbol": "XTZUSD",
+        "region_sha256": "54a63c988536e1e190a6fc355ded4a74beeada6aba00c18f1b9d015f87488bef",
+        "mechanism": "VOLATILITY_STATE",
+        "gross_bps": 0.6412881785113269,
+        "v8_min_fresh_d0_spread_over_gross": 127.2004
+      }
+    ],
+    "interpretation": "SYMBOL_SCOPE_QUOTE_WINDOWS_ARE_UNIONS_ACROSS_ROBUST_REGIONS;REUSE_IS_SCREENING_DIAGNOSTIC_ONLY_NOT_FORMAL_REGION_CERTIFICATION"
+  },
+  "scope_archives": [
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "sha256": "1858f3bb7e8d620913bea6532d2208078516b7128108e0ceaf15f9202de6ac39",
+      "size_bytes": 1441234
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "sha256": "0e0a968e858cdb10e45d6f92b26b1f39c51f1b8a7754aa2a91c5f8b997d4a6cb",
+      "size_bytes": 1509893
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "sha256": "144981233c86ec46aeee3562f64120069caa6daf0e6273426ce3661e56be13c2",
+      "size_bytes": 1559776
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "sha256": "f0e90bb0d332fdbf2a0a1246a77ff2d0b4ffac60a2dde6f2f224623ac1922943",
+      "size_bytes": 1614620
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "sha256": "40aeeac982234403601ecd525ff693e629bdab6265b98da27c662c1c72ce5daf",
+      "size_bytes": 1405742
+    },
+    {
+      "path": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "sha256": "c6e9603b927aee749dcb28f905e195453150391d7c1bcaf87a55c8a6146dbc34",
+      "size_bytes": 1460792
+    }
+  ],
+  "freeze_gate": {
+    "candidate_freeze_allowed_by_this_capture": false,
+    "net_certification_allowed_by_this_capture_alone": false,
+    "protected_forward_must_remain_closed": true,
+    "screen_may_only_prioritize_followup": true
+  },
+  "targets": [
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 32789,
+      "screen_gross_bps": 1.112234113531998,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "5f18efed2b7e02735b6e10491444358d8fd0037f09fa9628337c845543003bc5",
+      "regions": [
+        {
+          "region_sha256": "5f18efed2b7e02735b6e10491444358d8fd0037f09fa9628337c845543003bc5",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 1.112234113531998,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_97.json.gz",
+      "shard_sha256": "c1307fec967c8307f817723aac269903950ddc44f8e80b0cc0ef635989ede349",
+      "symbol": "XPTUSD",
+      "symbol_id": 97,
+      "windows": 46176
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 42223,
+      "screen_gross_bps": 1.0451751811239485,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "d1684e59310b3d6405f07fd60407a8e672b282edeaf16d175cff42345f8cb0fa",
+      "regions": [
+        {
+          "region_sha256": "d1684e59310b3d6405f07fd60407a8e672b282edeaf16d175cff42345f8cb0fa",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 1.0451751811239485,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_7198.json.gz",
+      "shard_sha256": "cbe2419a24c6b0d73b7dede1527aae55954183d2b1f08d35b0a0fcdfb5457426",
+      "symbol": "MANUSD",
+      "symbol_id": 7198,
+      "windows": 60016
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 14954,
+      "screen_gross_bps": 0.8389780524975863,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "e71255d33c5d6a2c6469bed4953e9f8e92c45184b3b522c8c4a85931de407e4b",
+      "regions": [
+        {
+          "region_sha256": "e71255d33c5d6a2c6469bed4953e9f8e92c45184b3b522c8c4a85931de407e4b",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.8389780524975863,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 4
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_3029.json.gz",
+      "shard_sha256": "e65d2209dd1fcc635a03d6f12ca7c6e19946ca175c375c2c5de4e0f585996a07",
+      "symbol": "MSFT.US-24",
+      "symbol_id": 3029,
+      "windows": 25974
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 41198,
+      "screen_gross_bps": 0.790055773657812,
+      "representative_mechanism": "TREND_MOMENTUM",
+      "region_sha256": "1bcd2c41e04e70d4b9b92f02a01bc91cb235336739bf87be8d110c3e4a96d38c",
+      "regions": [
+        {
+          "region_sha256": "1bcd2c41e04e70d4b9b92f02a01bc91cb235336739bf87be8d110c3e4a96d38c",
+          "mechanism": "TREND_MOMENTUM",
+          "minimum_mean_response_bps": 0.790055773657812,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_5449.json.gz",
+      "shard_sha256": "1368acb10df9a998b5e12790692fb5ef13daa17a4da3aebec212a73f1428f236",
+      "symbol": "PLTR.US-24",
+      "symbol_id": 5449,
+      "windows": 45276
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 48852,
+      "screen_gross_bps": 0.7579429499867554,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "b1c0e289f6c3a03f79775b8d7fdd22aea3098ea000b3da625d7cdaa367be3598",
+      "regions": [
+        {
+          "region_sha256": "b1c0e289f6c3a03f79775b8d7fdd22aea3098ea000b3da625d7cdaa367be3598",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.7579429499867554,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_286.json.gz",
+      "shard_sha256": "e377885b911732a98cd9b847d55c1be94dbf4a29cffe9b3461cb13f1ccdd104b",
+      "symbol": "XRPUSD",
+      "symbol_id": 286,
+      "windows": 70295
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 43854,
+      "screen_gross_bps": 0.693972885040597,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "3542e3c7f2972a159b092e1cb6d2acdd8b719bdd67f27f61ceb653c1d3071d1e",
+      "regions": [
+        {
+          "region_sha256": "3542e3c7f2972a159b092e1cb6d2acdd8b719bdd67f27f61ceb653c1d3071d1e",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.693972885040597,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 7
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_7188.json.gz",
+      "shard_sha256": "3c080b11f0a7078aafdf96e96d91dcc8f8eb6e896e7d5d5ed75a91d8a8d80534",
+      "symbol": "JUPUSD",
+      "symbol_id": 7188,
+      "windows": 65871
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 25476,
+      "screen_gross_bps": 0.6786490660691639,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "0349c15f4e7ca8769d958342f002f745d1b20da8ea96a62a0f061bb70043bcde",
+      "regions": [
+        {
+          "region_sha256": "0349c15f4e7ca8769d958342f002f745d1b20da8ea96a62a0f061bb70043bcde",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.6786490660691639,
+          "p_familywise_region_intersection": 0.1075,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2786.json.gz",
+      "shard_sha256": "c9b818b9c9c3bd06c2d7604151f6c5e93d6da8e5626fa0abcf64bdfb2fe815b7",
+      "symbol": "USDILS",
+      "symbol_id": 2786,
+      "windows": 36841
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 35889,
+      "screen_gross_bps": 0.596719855180776,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "92cfb96a27f188e24bb6a03d8a33f622630e7e056142d1cdf698aed3c0050ef6",
+      "regions": [
+        {
+          "region_sha256": "92cfb96a27f188e24bb6a03d8a33f622630e7e056142d1cdf698aed3c0050ef6",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.596719855180776,
+          "p_familywise_region_intersection": 0.648,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_46.json.gz",
+      "shard_sha256": "c17ef86106cb9a03d0d4be5d80862932cfa3913485629fff3ddc1d8d908de17c",
+      "symbol": "EURZAR",
+      "symbol_id": 46,
+      "windows": 50368
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 23844,
+      "screen_gross_bps": 0.5633129615456667,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "139e0f2674f6930ddcb48b7666714fd5ed91335dc619f07c722f2a0bfc7ac513",
+      "regions": [
+        {
+          "region_sha256": "139e0f2674f6930ddcb48b7666714fd5ed91335dc619f07c722f2a0bfc7ac513",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.5633129615456667,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 6
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2999.json.gz",
+      "shard_sha256": "d8608c12a5549665c6c76410b2b56fa3ab5872fb1601ec6fbd9ee69c3855d1e4",
+      "symbol": "AAPL.US-24",
+      "symbol_id": 2999,
+      "windows": 36413
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 53209,
+      "screen_gross_bps": 0.5520692481526711,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "226ff4d45a3ea4cff911a67688f8f6617abfa8ae09dcab06f9c28c86c92ff95d",
+      "regions": [
+        {
+          "region_sha256": "226ff4d45a3ea4cff911a67688f8f6617abfa8ae09dcab06f9c28c86c92ff95d",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.5520692481526711,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_284.json.gz",
+      "shard_sha256": "3ba63185e7c8e7170134e6bb5eb9e8c1950c2a7d4262ad6f2287fb0c0f29ee3c",
+      "symbol": "XLMUSD",
+      "symbol_id": 284,
+      "windows": 73809
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 13091,
+      "screen_gross_bps": 0.5394314153181022,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "2f9c857466bef819b2a97e81bed8dfce8aca49c7c8b0abc61dca9e5b8a275b4e",
+      "regions": [
+        {
+          "region_sha256": "2f9c857466bef819b2a97e81bed8dfce8aca49c7c8b0abc61dca9e5b8a275b4e",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.5394314153181022,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2742.json.gz",
+      "shard_sha256": "bee75a89c98fe6a17e65b1e575c641e4b6e26a4f24ea9f7373a841b346ce481c",
+      "symbol": "ETHAUD",
+      "symbol_id": 2742,
+      "windows": 23764
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 27748,
+      "screen_gross_bps": 0.5008792409330972,
+      "representative_mechanism": "TREND_MOMENTUM",
+      "region_sha256": "5d56d3472e879e984d66a59ef52d29fc430ce92e42a1590256a0f5c9e7743568",
+      "regions": [
+        {
+          "region_sha256": "5d56d3472e879e984d66a59ef52d29fc430ce92e42a1590256a0f5c9e7743568",
+          "mechanism": "TREND_MOMENTUM",
+          "minimum_mean_response_bps": 0.5008792409330972,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_5406.json.gz",
+      "shard_sha256": "c4512b0a57f92e0f977cc950a04be3d5e39404bcec65785cb5952fa7c5bd84f0",
+      "symbol": "ASML.US-24",
+      "symbol_id": 5406,
+      "windows": 27036
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36377,
+      "screen_gross_bps": 0.4918574276023294,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "08cee64a0fea11683a09a957227036c0214e0079d1dfce987188331aa1acf6b2",
+      "regions": [
+        {
+          "region_sha256": "08cee64a0fea11683a09a957227036c0214e0079d1dfce987188331aa1acf6b2",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.4918574276023294,
+          "p_familywise_region_intersection": 0.8145,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_49.json.gz",
+      "shard_sha256": "35316dbae44ad26eb4a2555c98954b8934d63ba620dc536c93fd7b5c01643790",
+      "symbol": "USDZAR",
+      "symbol_id": 49,
+      "windows": 50947
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 46244,
+      "screen_gross_bps": 0.4891506027000334,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "2ff9a2d41caa8f83a9f467802a59721d731d690f7469ccde3398c3077aecffd0",
+      "regions": [
+        {
+          "region_sha256": "2ff9a2d41caa8f83a9f467802a59721d731d690f7469ccde3398c3077aecffd0",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.4891506027000334,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 7
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_326.json.gz",
+      "shard_sha256": "ff6c274336f1d84f9dde5abda3fa32a5cbdd5eb5336c9737510b2346cfa7b9ae",
+      "symbol": "BCHUSD",
+      "symbol_id": 326,
+      "windows": 66369
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_05.zip",
+      "events": 58615,
+      "screen_gross_bps": 0.48528820022588337,
+      "representative_mechanism": "TREND_MOMENTUM",
+      "region_sha256": "34ae357a3648bcc34eb92136de85e981a1a74ee9d0687139e084c022a17c3c46",
+      "regions": [
+        {
+          "region_sha256": "34ae357a3648bcc34eb92136de85e981a1a74ee9d0687139e084c022a17c3c46",
+          "mechanism": "TREND_MOMENTUM",
+          "minimum_mean_response_bps": 0.48528820022588337,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 5
+        },
+        {
+          "region_sha256": "ff6be68d8fd0173ed1ac2733cde223cd562112ccdeb8313642142530c7d005bf",
+          "mechanism": "VOLATILITY_STATE",
+          "minimum_mean_response_bps": 0.41171622284568954,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_3025.json.gz",
+      "shard_sha256": "788774b2547239fe17e9ff811ee3ccf168391e1816a63209415fd7dec14cd3b5",
+      "symbol": "TSLA.US-24",
+      "symbol_id": 3025,
+      "windows": 51242
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 40388,
+      "screen_gross_bps": 0.44013439006965366,
+      "representative_mechanism": "TREND_MOMENTUM",
+      "region_sha256": "e40583440c14b61c6a63dc0a7b1c4b9a2f906efc37064fa73bf6938301d85233",
+      "regions": [
+        {
+          "region_sha256": "e40583440c14b61c6a63dc0a7b1c4b9a2f906efc37064fa73bf6938301d85233",
+          "mechanism": "TREND_MOMENTUM",
+          "minimum_mean_response_bps": 0.44013439006965366,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 4
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_116.json.gz",
+      "shard_sha256": "4a4b1e22278750808ec9c2c6c0a17203464ece2399d8e2f383e503cee46b95c7",
+      "symbol": "JPN225",
+      "symbol_id": 116,
+      "windows": 40939
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 40426,
+      "screen_gross_bps": 0.42471698387333695,
+      "representative_mechanism": "TREND_MOMENTUM",
+      "region_sha256": "d7c4819f87a06c4412780fd2660f1247115bc09cc54d7f4d6b6de622a5310e5c",
+      "regions": [
+        {
+          "region_sha256": "d7c4819f87a06c4412780fd2660f1247115bc09cc54d7f4d6b6de622a5310e5c",
+          "mechanism": "TREND_MOMENTUM",
+          "minimum_mean_response_bps": 0.42471698387333695,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 4
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2917.json.gz",
+      "shard_sha256": "b9787ee1e6b6a56202e64526c66a79fb2150434555ea358ee77a6c22027f3364",
+      "symbol": "JPN225-F",
+      "symbol_id": 2917,
+      "windows": 40952
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 37325,
+      "screen_gross_bps": 0.42112589021700064,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "578e92da75f6fb97daf55dc7c7da5959890c1041d976a307df2bea6e5d6d2a77",
+      "regions": [
+        {
+          "region_sha256": "578e92da75f6fb97daf55dc7c7da5959890c1041d976a307df2bea6e5d6d2a77",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.42112589021700064,
+          "p_familywise_region_intersection": 0.994,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_98.json.gz",
+      "shard_sha256": "dcdd81a4f6edf0a667f1ff7cc4cc167f12bf7f5a96b15352c07d59d2e3e42c22",
+      "symbol": "ZARJPY",
+      "symbol_id": 98,
+      "windows": 52091
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 30814,
+      "screen_gross_bps": 0.4116633918611359,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "e562ee72869fe5039079ea6b22c831f5fc2b8c30fa25199a7edf2973bdb2e3b2",
+      "regions": [
+        {
+          "region_sha256": "e562ee72869fe5039079ea6b22c831f5fc2b8c30fa25199a7edf2973bdb2e3b2",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.4116633918611359,
+          "p_familywise_region_intersection": 0.304,
+          "plateau_cell_count": 7
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_134.json.gz",
+      "shard_sha256": "109ff994d6e3c0a420b186f51718b7ee64dd3559b88d7ba53e62756b4083a6d5",
+      "symbol": "GBPMXN",
+      "symbol_id": 134,
+      "windows": 44418
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 35972,
+      "screen_gross_bps": 0.34102501402655,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "0a351f5e6c1e1c6813a976b81844facbac5d78878d978a747db65f2a3b0bd875",
+      "regions": [
+        {
+          "region_sha256": "0a351f5e6c1e1c6813a976b81844facbac5d78878d978a747db65f2a3b0bd875",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.34102501402655,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_54.json.gz",
+      "shard_sha256": "0fda0d01aed38cce2e0f70f03d43a0457713e9ddbc5f2380daf7a93cc3af6796",
+      "symbol": "USDHUF",
+      "symbol_id": 54,
+      "windows": 50356
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 1896,
+      "screen_gross_bps": 0.28579141765626426,
+      "representative_mechanism": "BREAKOUT_VOLATILITY_EXPANSION",
+      "region_sha256": "83d6b11b4c4e8057be6fe7b04ad38d6dd433a4c6486b568adeef995ff2d2a5ea",
+      "regions": [
+        {
+          "region_sha256": "83d6b11b4c4e8057be6fe7b04ad38d6dd433a4c6486b568adeef995ff2d2a5ea",
+          "mechanism": "BREAKOUT_VOLATILITY_EXPANSION",
+          "minimum_mean_response_bps": 0.28579141765626426,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_146.json.gz",
+      "shard_sha256": "9571488fb5015ac04e5095b1e317d6596262f041ea18a20ea6ff07856a5a91ca",
+      "symbol": "JPYX",
+      "symbol_id": 146,
+      "windows": 3696
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 26871,
+      "screen_gross_bps": 0.2822516728099302,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "44ea15bf70bdcd00d5eb98b1d12204aa11028863387e6b26940a160105f47b7e",
+      "regions": [
+        {
+          "region_sha256": "44ea15bf70bdcd00d5eb98b1d12204aa11028863387e6b26940a160105f47b7e",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.2822516728099302,
+          "p_familywise_region_intersection": 0.186,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2766.json.gz",
+      "shard_sha256": "97609c079ca67192d20706ad9f1e74b256b42296c64febc3736f2ad8c1ac994f",
+      "symbol": "CADMXN",
+      "symbol_id": 2766,
+      "windows": 38276
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36201,
+      "screen_gross_bps": 0.2821844913440978,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "5cc9111df2d442e8d4d9ec47a5d1c541537609532e7964b88a4537477df9a43c",
+      "regions": [
+        {
+          "region_sha256": "5cc9111df2d442e8d4d9ec47a5d1c541537609532e7964b88a4537477df9a43c",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.2821844913440978,
+          "p_familywise_region_intersection": 0.6495,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_37.json.gz",
+      "shard_sha256": "69aa41cd499eca92006b4ed31018ead1daf1b5b81facedcd39ded3d073cf91c0",
+      "symbol": "GBPNOK",
+      "symbol_id": 37,
+      "windows": 50826
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 32629,
+      "screen_gross_bps": 0.2769717938472667,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "0dfb6bb0d9df3388fabe84738877bf740b2b62656d94bf46cbde339bf5751381",
+      "regions": [
+        {
+          "region_sha256": "0dfb6bb0d9df3388fabe84738877bf740b2b62656d94bf46cbde339bf5751381",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.2769717938472667,
+          "p_familywise_region_intersection": 0.4795,
+          "plateau_cell_count": 7
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_61.json.gz",
+      "shard_sha256": "9129e2369a4e2a0c1afb8fd145c7fbd405e6c249044aafa4604e6e12582f172d",
+      "symbol": "GBPSEK",
+      "symbol_id": 61,
+      "windows": 46628
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 38008,
+      "screen_gross_bps": 0.2729739694324269,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "454d14d93bedb0ad571d742a09341730924ba4a6116a5296c42926d4c2eb2a42",
+      "regions": [
+        {
+          "region_sha256": "454d14d93bedb0ad571d742a09341730924ba4a6116a5296c42926d4c2eb2a42",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.2729739694324269,
+          "p_familywise_region_intersection": 0.3035,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_50.json.gz",
+      "shard_sha256": "cf71574c239541e20dc5795eb2f1889801cfdb418329e1dbdefc606e90e8c7d9",
+      "symbol": "EURMXN",
+      "symbol_id": 50,
+      "windows": 53033
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 28478,
+      "screen_gross_bps": 0.27106568160169303,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "6eebdb7a8659371d78ebd4ab7b2c1df764fa6a6104604784258601d9a68020da",
+      "regions": [
+        {
+          "region_sha256": "6eebdb7a8659371d78ebd4ab7b2c1df764fa6a6104604784258601d9a68020da",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.27106568160169303,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_91.json.gz",
+      "shard_sha256": "c9a7b880072add338fb5133a032fdc1bac374de4cb49667416ed9409d0b78269",
+      "symbol": "USDTHB",
+      "symbol_id": 91,
+      "windows": 41388
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 36250,
+      "screen_gross_bps": 0.26004232553622536,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "5e931d07fba6c7a19409105e597112735b653b1d0800ef4c50a505c623f0d023",
+      "regions": [
+        {
+          "region_sha256": "5e931d07fba6c7a19409105e597112735b653b1d0800ef4c50a505c623f0d023",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.26004232553622536,
+          "p_familywise_region_intersection": 0.13,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_87.json.gz",
+      "shard_sha256": "473386ff78a86ed666534dc9bb5c6ccc13d799fbd4bce3b47f767fa52d54ad3f",
+      "symbol": "NOKSEK",
+      "symbol_id": 87,
+      "windows": 50633
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 34065,
+      "screen_gross_bps": 0.2577438521833666,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "b8e25ceaeb63553bdb70d30e81dcbf16179655f88e03ec4ce8942e1259b38fa4",
+      "regions": [
+        {
+          "region_sha256": "b8e25ceaeb63553bdb70d30e81dcbf16179655f88e03ec4ce8942e1259b38fa4",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.2577438521833666,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2770.json.gz",
+      "shard_sha256": "ffa4b34fab64d4c46049de48a0531f0f5c2dc155cff38881229268e04aa746c3",
+      "symbol": "CHFNOK",
+      "symbol_id": 2770,
+      "windows": 48137
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 20687,
+      "screen_gross_bps": 0.25460210960155194,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "9ef911d79d74d129ced0b06acf6ed44a948da3f09d9633f868084c9e5424f485",
+      "regions": [
+        {
+          "region_sha256": "9ef911d79d74d129ced0b06acf6ed44a948da3f09d9633f868084c9e5424f485",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.25460210960155194,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_29.json.gz",
+      "shard_sha256": "dd243d98f4d522bd1c2de5ef01afcd1cc870a50b75de109d012e1c50bd7f805f",
+      "symbol": "USDSEK",
+      "symbol_id": 29,
+      "windows": 30057
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 35770,
+      "screen_gross_bps": 0.24338724451121546,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "6807bb6514f353a117b88115048a682c752d57bb8b2967e4f1c29a2d5fb23b66",
+      "regions": [
+        {
+          "region_sha256": "6807bb6514f353a117b88115048a682c752d57bb8b2967e4f1c29a2d5fb23b66",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.24338724451121546,
+          "p_familywise_region_intersection": 0.988,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_33.json.gz",
+      "shard_sha256": "5ceee89527024ccece0ad289781c0ee3bff0182299417f9e22832a0880352113",
+      "symbol": "EURNOK",
+      "symbol_id": 33,
+      "windows": 50023
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 33314,
+      "screen_gross_bps": 0.23401861247230632,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "5e880cd37594cfa1cbebe19879ee63eeed74ecab18286225074e2e7b5de996f5",
+      "regions": [
+        {
+          "region_sha256": "5e880cd37594cfa1cbebe19879ee63eeed74ecab18286225074e2e7b5de996f5",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.23401861247230632,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_86.json.gz",
+      "shard_sha256": "2fd368e32e46eb4a35b6a7bdd58d18eca8497045ad9777c94fedbcb70d08e8aa",
+      "symbol": "NOKJPY",
+      "symbol_id": 86,
+      "windows": 47528
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36185,
+      "screen_gross_bps": 0.23169527990591451,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "969018e803b094009f60fd814f2f4c49b259d76b0a0ba35f35fe52bdec704daa",
+      "regions": [
+        {
+          "region_sha256": "969018e803b094009f60fd814f2f4c49b259d76b0a0ba35f35fe52bdec704daa",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.23169527990591451,
+          "p_familywise_region_intersection": 0.739,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_84.json.gz",
+      "shard_sha256": "e7a8d30be54a2217e66f67c6c4a10ad6e16a84b21234fb023a00ec1d697fdcdb",
+      "symbol": "GBPTRY",
+      "symbol_id": 84,
+      "windows": 50391
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 35061,
+      "screen_gross_bps": 0.22031778931053664,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "8f0e23135a67b8838b055b47d3509264dca0269bfedb02d09c273e9f1764ee67",
+      "regions": [
+        {
+          "region_sha256": "8f0e23135a67b8838b055b47d3509264dca0269bfedb02d09c273e9f1764ee67",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.22031778931053664,
+          "p_familywise_region_intersection": 0.074,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2771.json.gz",
+      "shard_sha256": "3e169663aa171e2935d5876440a470c17cbbfb223a392faceef69f2ab249cf7c",
+      "symbol": "CHFPLN",
+      "symbol_id": 2771,
+      "windows": 49411
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 36863,
+      "screen_gross_bps": 0.19640051004104775,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "a7efef76aba079eac1e869ee9e7bf84c3afb59fed4da3e1eacce221617bcfea6",
+      "regions": [
+        {
+          "region_sha256": "a7efef76aba079eac1e869ee9e7bf84c3afb59fed4da3e1eacce221617bcfea6",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.19640051004104775,
+          "p_familywise_region_intersection": 0.956,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_44.json.gz",
+      "shard_sha256": "c19ebab42ffcfdb464ba2fde819d08d42a369472f04c092e1701b9be435005d3",
+      "symbol": "EURTRY",
+      "symbol_id": 44,
+      "windows": 51311
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37716,
+      "screen_gross_bps": 0.179809957720116,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "e867f6e683e45d146bdfa422fc910e315fba9ff8e446dda030fbfb52aff12f5d",
+      "regions": [
+        {
+          "region_sha256": "e867f6e683e45d146bdfa422fc910e315fba9ff8e446dda030fbfb52aff12f5d",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.179809957720116,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_22.json.gz",
+      "shard_sha256": "c7a9680f22971c182a89858f05cc7a6447ea840814260da49efe8cad3cdee484",
+      "symbol": "USDNOK",
+      "symbol_id": 22,
+      "windows": 52451
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37360,
+      "screen_gross_bps": 0.16668412184456455,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "327604cffa66083148399776cabee50a6fe246f4661dce90e0892bcfdf094340",
+      "regions": [
+        {
+          "region_sha256": "327604cffa66083148399776cabee50a6fe246f4661dce90e0892bcfdf094340",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.16668412184456455,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_24.json.gz",
+      "shard_sha256": "311b7080ae0176f57d3a5c639d049f32b31c71ebd7f22524dcb525e25c07afb2",
+      "symbol": "USDMXN",
+      "symbol_id": 24,
+      "windows": 52020
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 38397,
+      "screen_gross_bps": 0.16220892569979087,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "e81ea4c42e030e523ca1368867955412f4732c305c59151442adeb175c0f957f",
+      "regions": [
+        {
+          "region_sha256": "e81ea4c42e030e523ca1368867955412f4732c305c59151442adeb175c0f957f",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.16220892569979087,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_35.json.gz",
+      "shard_sha256": "35efb25d05f56be321b5c9ffb771acbb9237471cac4dc0ea5bf35198561ce8a1",
+      "symbol": "USDPLN",
+      "symbol_id": 35,
+      "windows": 52956
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 31235,
+      "screen_gross_bps": 0.15787620401861693,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "349a97bd51ac980616fcf8a74c257c8bee95c8f9cbdec3a03b68e2240f6ce112",
+      "regions": [
+        {
+          "region_sha256": "349a97bd51ac980616fcf8a74c257c8bee95c8f9cbdec3a03b68e2240f6ce112",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.15787620401861693,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 7
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_64.json.gz",
+      "shard_sha256": "809358a91c8400e198bfc0a5b780e023231be4db93cecd212ce29d8648bd8b32",
+      "symbol": "AUDSGD",
+      "symbol_id": 64,
+      "windows": 44804
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 20931,
+      "screen_gross_bps": 0.15633331803063724,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "7d4c86f40dcd7192a2bc9d69073a87d7f524b42aea9e1a05a2d6e51be529b6d6",
+      "regions": [
+        {
+          "region_sha256": "7d4c86f40dcd7192a2bc9d69073a87d7f524b42aea9e1a05a2d6e51be529b6d6",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.15633331803063724,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 4
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2779.json.gz",
+      "shard_sha256": "a5ef9a6cba724a3e903a4465782914a44bec329f3494431a39b7e33ae8cf9f5c",
+      "symbol": "NZDCNH",
+      "symbol_id": 2779,
+      "windows": 30990
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 17337,
+      "screen_gross_bps": 0.15537292064677258,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "d7fc8274dcdc4856b6bc242bd4c527405803a9ae9dfc9ba0c1d65e0e7bde76c7",
+      "regions": [
+        {
+          "region_sha256": "d7fc8274dcdc4856b6bc242bd4c527405803a9ae9dfc9ba0c1d65e0e7bde76c7",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.15537292064677258,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 5
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2926.json.gz",
+      "shard_sha256": "121104cc1600a5e3b0044d321694466c3dede019e3142ab305ca1f059d73379d",
+      "symbol": "USDX-F",
+      "symbol_id": 2926,
+      "windows": 28268
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 29781,
+      "screen_gross_bps": 0.15529244974055137,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "e5bffae82c1d1ff4f23b9f33973643090023bea08d3fd3d0d4633f5b3040da29",
+      "regions": [
+        {
+          "region_sha256": "e5bffae82c1d1ff4f23b9f33973643090023bea08d3fd3d0d4633f5b3040da29",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.15529244974055137,
+          "p_familywise_region_intersection": 0.3065,
+          "plateau_cell_count": 6
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2768.json.gz",
+      "shard_sha256": "66c3838b302a39b185f5e2a4c67a8ca0dfa6aa8346e44284449e483bdd29bba9",
+      "symbol": "CHFDKK",
+      "symbol_id": 2768,
+      "windows": 43304
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 30178,
+      "screen_gross_bps": 0.15429801341193167,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "17b550859cd6efd4bfccfc49b3dd28f8c1dbb523df806c3a8b6dad9fe985c492",
+      "regions": [
+        {
+          "region_sha256": "17b550859cd6efd4bfccfc49b3dd28f8c1dbb523df806c3a8b6dad9fe985c492",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.15429801341193167,
+          "p_familywise_region_intersection": 0.989,
+          "plateau_cell_count": 6
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_27.json.gz",
+      "shard_sha256": "72fe484dd20f7ed384480c157363987a0a0e11b1e77c81bf356708074e4d3e58",
+      "symbol": "CADCHF",
+      "symbol_id": 27,
+      "windows": 45514
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 38310,
+      "screen_gross_bps": 0.15338866188261882,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "6971df56564d006487adeeb01f846cc1cbf588458a147408faa55c8cb2fbf754",
+      "regions": [
+        {
+          "region_sha256": "6971df56564d006487adeeb01f846cc1cbf588458a147408faa55c8cb2fbf754",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.15338866188261882,
+          "p_familywise_region_intersection": 0.991,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2762.json.gz",
+      "shard_sha256": "d2d056d5f501b9f4564f80499c203fd8871db53ffa17427b1d5b6b6244377a28",
+      "symbol": "AUDDKK",
+      "symbol_id": 2762,
+      "windows": 53158
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 38388,
+      "screen_gross_bps": 0.1454388827510248,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "84b3f3e364795d254fe0931b8c81dd38a1be6c483a09336936342ba3199d34a5",
+      "regions": [
+        {
+          "region_sha256": "84b3f3e364795d254fe0931b8c81dd38a1be6c483a09336936342ba3199d34a5",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.1454388827510248,
+          "p_familywise_region_intersection": 0.8935,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2773.json.gz",
+      "shard_sha256": "40d412de220039a0fe6d2111ac67a912a22ff173e9980f07e1cfb3bbb3aaf564",
+      "symbol": "EURCNH",
+      "symbol_id": 2773,
+      "windows": 53150
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 23492,
+      "screen_gross_bps": 0.14243613649486714,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "9741c0410242f42006497ae38adf59ad5d2641601138ef71dd4f956578b08898",
+      "regions": [
+        {
+          "region_sha256": "9741c0410242f42006497ae38adf59ad5d2641601138ef71dd4f956578b08898",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.14243613649486714,
+          "p_familywise_region_intersection": 0.999,
+          "plateau_cell_count": 4
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_18.json.gz",
+      "shard_sha256": "4345de0d7485c6b8e149329fe93d2806cce18c829eeefb0e3613e86da6d7ce22",
+      "symbol": "AUDCAD",
+      "symbol_id": 18,
+      "windows": 38592
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 38768,
+      "screen_gross_bps": 0.1391150059240807,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "a23676605a5488af86ac5c7138d9afe8d6f2ad663e79478af6c1d063b69929c1",
+      "regions": [
+        {
+          "region_sha256": "a23676605a5488af86ac5c7138d9afe8d6f2ad663e79478af6c1d063b69929c1",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.1391150059240807,
+          "p_familywise_region_intersection": 0.9795,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2783.json.gz",
+      "shard_sha256": "f57cf84e41ca0bce891471e6c485ff573a79d14bf654bbf84930ee24ae3cfea9",
+      "symbol": "USDDKK",
+      "symbol_id": 2783,
+      "windows": 53635
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_04.zip",
+      "events": 37082,
+      "screen_gross_bps": 0.13391425919782995,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "66362dac13962168b9e38186c1ae3a01a910b5b5aaa51102b436bbae901d20d4",
+      "regions": [
+        {
+          "region_sha256": "66362dac13962168b9e38186c1ae3a01a910b5b5aaa51102b436bbae901d20d4",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.13391425919782995,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2775.json.gz",
+      "shard_sha256": "3dea7fbe954509f9fc1bfccef150de5fde2cd62db84440cb56a1e055431c200e",
+      "symbol": "GBPCNH",
+      "symbol_id": 2775,
+      "windows": 51462
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_02.zip",
+      "events": 38125,
+      "screen_gross_bps": 0.12610928655620177,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "8442222b3c0851ae88e7913e7821a73a3c2e3c813617be9554c4108ad8e9d70d",
+      "regions": [
+        {
+          "region_sha256": "8442222b3c0851ae88e7913e7821a73a3c2e3c813617be9554c4108ad8e9d70d",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.12610928655620177,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_118.json.gz",
+      "shard_sha256": "72cd0a97f47849b5d08a68039313900492da167f65b2ab446a3edb58872c424c",
+      "symbol": "SEKJPY",
+      "symbol_id": 118,
+      "windows": 52904
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 36338,
+      "screen_gross_bps": 0.12527666603038068,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "e92250f09a0a8d32933b8cd4217323bed6d9ba079b71f1b95c775007bdde922b",
+      "regions": [
+        {
+          "region_sha256": "e92250f09a0a8d32933b8cd4217323bed6d9ba079b71f1b95c775007bdde922b",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.12527666603038068,
+          "p_familywise_region_intersection": 0.428,
+          "plateau_cell_count": 7
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_32.json.gz",
+      "shard_sha256": "bdb5cd34e7a7cc91b08787dc1481228a6a1fdd1d3991dffda7c8ca04046dd94a",
+      "symbol": "GBPSGD",
+      "symbol_id": 32,
+      "windows": 50745
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 36400,
+      "screen_gross_bps": 0.11917177754766414,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "94f0a214becc16fb3644270a2be08b4db3c5848d09050cc404bc542c85736e81",
+      "regions": [
+        {
+          "region_sha256": "94f0a214becc16fb3644270a2be08b4db3c5848d09050cc404bc542c85736e81",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.11917177754766414,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_31.json.gz",
+      "shard_sha256": "5e854bf65c472db964a5d6259df170df3b4a1efe3eec6c843d69a1353d3efc4c",
+      "symbol": "EURSEK",
+      "symbol_id": 31,
+      "windows": 50801
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_01.zip",
+      "events": 37809,
+      "screen_gross_bps": 0.11776352011874962,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "7f1938872297da637811658da6c98239429d64702a7778ce16a54b3d9dacaf23",
+      "regions": [
+        {
+          "region_sha256": "7f1938872297da637811658da6c98239429d64702a7778ce16a54b3d9dacaf23",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.11776352011874962,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_47.json.gz",
+      "shard_sha256": "5993dcb306df37bc3c3f9de18b14c5b503c911c60dbf030f117b79ede67febe8",
+      "symbol": "SGDJPY",
+      "symbol_id": 47,
+      "windows": 52613
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37891,
+      "screen_gross_bps": 0.11161037252894529,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "0caf901a63eecb3714540f501f5935911668b44e2704a42ebf641e420de4092e",
+      "regions": [
+        {
+          "region_sha256": "0caf901a63eecb3714540f501f5935911668b44e2704a42ebf641e420de4092e",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.11161037252894529,
+          "p_familywise_region_intersection": 0.96,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_9.json.gz",
+      "shard_sha256": "6131421866f130260e313af1ecbe810e0e7b5ea0bd9e1c78fb10c52f48cf317b",
+      "symbol": "EURGBP",
+      "symbol_id": 9,
+      "windows": 52797
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 26585,
+      "screen_gross_bps": 0.11130960635043953,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "bb0849a05aba86cf07ddd7cb2ab57ab1e05976a207579a283124134170821790",
+      "regions": [
+        {
+          "region_sha256": "bb0849a05aba86cf07ddd7cb2ab57ab1e05976a207579a283124134170821790",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.11130960635043953,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 3
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_3.json.gz",
+      "shard_sha256": "74f39e2fb6c6b1e0aa4ee28e89d6fd0ee22b324406bbf9e987488f5551d0ecae",
+      "symbol": "EURJPY",
+      "symbol_id": 3,
+      "windows": 38031
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_03.zip",
+      "events": 34312,
+      "screen_gross_bps": 0.10989050951209549,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "33a1d9fe28efc836cb048ff1ecc2e0b5781c1937ca0f30400977efe8676dd7df",
+      "regions": [
+        {
+          "region_sha256": "33a1d9fe28efc836cb048ff1ecc2e0b5781c1937ca0f30400977efe8676dd7df",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.10989050951209549,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 8
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_2767.json.gz",
+      "shard_sha256": "63e88cd01acfd56bdb66de3484f9f250c3b6458715e0ac465bb558e53f8ab908",
+      "symbol": "CADSGD",
+      "symbol_id": 2767,
+      "windows": 48671
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 37855,
+      "screen_gross_bps": 0.10676882330889062,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "8813fb6feda4bc85e898b0020b0d3626cd008dbb61182a4a2c49cb87acc01050",
+      "regions": [
+        {
+          "region_sha256": "8813fb6feda4bc85e898b0020b0d3626cd008dbb61182a4a2c49cb87acc01050",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.10676882330889062,
+          "p_familywise_region_intersection": 1,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_19.json.gz",
+      "shard_sha256": "860eb8eab676500e85bbde4818b372fda7ec1638a62b21ffb87f96f07c06fbe7",
+      "symbol": "GBPCAD",
+      "symbol_id": 19,
+      "windows": 52528
+    },
+    {
+      "archive": "CORRECTED_FRICTION_SCOPE_V2_PACK_00.zip",
+      "events": 38342,
+      "screen_gross_bps": 0.10046867963259473,
+      "representative_mechanism": "MEAN_REVERSION",
+      "region_sha256": "60af9f42995aea23ba47634b0315616def01272f08df2b6f774117d14d839482",
+      "regions": [
+        {
+          "region_sha256": "60af9f42995aea23ba47634b0315616def01272f08df2b6f774117d14d839482",
+          "mechanism": "MEAN_REVERSION",
+          "minimum_mean_response_bps": 0.10046867963259473,
+          "p_familywise_region_intersection": 0.9995,
+          "plateau_cell_count": 9
+        }
+      ],
+      "shard": "CORRECTED_FRICTION_SCOPE_V2_17.json.gz",
+      "shard_sha256": "f4a900eace8c3f3fbb099021cc32ac89793f7b50cdc5e3b8530256369f773276",
+      "symbol": "EURCAD",
+      "symbol_id": 17,
+      "windows": 53165
+    }
+  ],
+  "binding_sha256": "a4c7e0cb0e4ad309cee497950ebbc59bac076734edd494aa17ab11ed3d576151"
+}
