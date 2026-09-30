@@ -1,0 +1,91 @@
+{
+  "schema": "mxm.research-core-v3.h24-h48-mean-reversion-path-diagnostic-design.v1",
+  "status": "FROZEN_BEFORE_PATH_OUTCOMES",
+  "parent_research_head": "6558cd95eb1f6101e6136ad0ed4aefacc62a8dbd",
+  "purpose": "TEST_WHETHER_THE_ALREADY_MULTIPLICITY_SUPPORTED_BUT_COST_INCOMPATIBLE_MEAN_REVERSION_ENTRIES_CONTAIN_DIRECTIONAL_PATH_ASYMMETRY_THAT_JUSTIFIES_A_SEPARATE_PROSPECTIVE_ADAPTIVE_EXIT_FAMILY",
+  "not_a_rescue": {
+    "fixed_horizon_surface_remains_closed_for_promotion": true,
+    "no_take_profit_or_stop_threshold_is_tuned": true,
+    "no_new_holding_horizon_is_added": true,
+    "diagnostic_only": true
+  },
+  "data": {
+    "source_h24_h48_result_file": "research_core_v3/state/H24_H48_EXTENSION_RESULT_V1.json",
+    "source_h24_h48_result_commit": "0ea1689865e8d9df1f49e63606a833ba68828a59",
+    "source_h24_h48_result_sha256": "04d14e6eddb2e8c0eec791c917e7062ca255f43fbf78d7b2699dc983b5083bd4",
+    "source_original_capture_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "source_delta_capture_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+    "protected_forward_start": "2026-09-17T12:02:58Z",
+    "resolution": "M5"
+  },
+  "scope": {
+    "selection_law": "DETERMINISTIC_UNION_OF_ALL_PARAMETERS_FIELD_MEMBERS_FROM_H24_AND_H48_PASSES_IN_THE_BOUND_H24_H48_RESULT;DEDUPLICATE_BY_SYMBOL_ID_MECHANISM_CANONICAL_PARAMETER_JSON",
+    "unique_symbols": 13,
+    "member_cells": 114,
+    "source_pass_regions": 18,
+    "post_path_member_selection_forbidden": true
+  },
+  "optimistic_cost_floors": [
+    {"symbol":"USDZAR","symbol_id":49,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":1.887533868363053,"source":"V9R1","fresh_d0_count":63},
+    {"symbol":"EURPLN","symbol_id":51,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":4.850904000610832,"source":"V7","fresh_d0_count":28},
+    {"symbol":"GBPSEK","symbol_id":61,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":3.5314843872275867,"source":"V9R1","fresh_d0_count":39},
+    {"symbol":"NOKSEK","symbol_id":87,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":6.8864425621493845,"source":"V9R1","fresh_d0_count":19},
+    {"symbol":"AUDHUF","symbol_id":2763,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":9.655844074766172,"source":"V7","fresh_d0_count":129},
+    {"symbol":"AUDNOK","symbol_id":2764,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":5.008005220466508,"source":"V7","fresh_d0_count":68},
+    {"symbol":"AUDPLN","symbol_id":2765,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":6.487360080731973,"source":"V7","fresh_d0_count":126},
+    {"symbol":"CADSGD","symbol_id":2767,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":1.070159667822321,"source":"V9R1","fresh_d0_count":36},
+    {"symbol":"EURDKK","symbol_id":2774,"kind":"STRUCTURAL_COMMISSION_ROUNDTRIP_LOWER_BOUND_BPS","bps":0.4959734030811219},
+    {"symbol":"GBPHUF","symbol_id":2777,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":9.626311919246303,"source":"V7","fresh_d0_count":116},
+    {"symbol":"NZDHUF","symbol_id":2780,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":10.307525843018137,"source":"V7","fresh_d0_count":120},
+    {"symbol":"EURILS","symbol_id":2785,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":9.84730977758177,"source":"V7","fresh_d0_count":108},
+    {"symbol":"USDRON","symbol_id":2788,"kind":"MIN_FRESH_D0_AUTHENTIC_SPREAD_BPS","bps":13.147567150429925,"source":"V7","fresh_d0_count":56}
+  ],
+  "event_semantics": {
+    "mechanism": "MEAN_REVERSION",
+    "rearm_bars": 3,
+    "entry": "open[i+1]",
+    "strict_dependency": "EXACT_FULL_BACKWARD_DEPENDENCY_AND_CONTIGUOUS_FORWARD_THROUGH_H48",
+    "path_window": "ENTRY_OPEN_THROUGH_BAR_i_plus_48_INCLUSIVE",
+    "long_mfe": "max(high/entry-1)",
+    "long_mae": "max(1-low/entry)",
+    "short_mfe": "max(1-low/entry)",
+    "short_mae": "max(high/entry-1)",
+    "units": "bps"
+  },
+  "primary_path_statistic": {
+    "name": "PATH_ADVANTAGE_BPS",
+    "formula": "MFE48_BPS_MINUS_MAE48_BPS",
+    "null": "MEAN_PATH_ADVANTAGE_EQUALS_ZERO",
+    "alternative": "MEAN_PATH_ADVANTAGE_GREATER_THAN_ZERO"
+  },
+  "support_gates": {
+    "minimum_events": 200,
+    "minimum_dates": 60,
+    "minimum_weeks": 20,
+    "chronological_thirds": "ALL_THREE_MEAN_PATH_ADVANTAGE_POSITIVE",
+    "median_mfe_headroom": "MEDIAN_MFE48_BPS_AT_LEAST_2X_THE_SYMBOL_OPTIMISTIC_AUTHENTIC_COST_FLOOR",
+    "minimum_connected_parameter_cells": 3
+  },
+  "multiplicity": {
+    "family": "ALL_114_FROZEN_REGION_MEMBER_CELLS",
+    "method": "SHARED_4_UTC_WEEK_BLOCK_WILD_SIGN_MAX_T",
+    "resamples": 1999,
+    "seed": 20260930,
+    "familywise_alpha": 0.05,
+    "region_evidence": "AT_LEAST_3_NUMERICALLY_CONNECTED_MEMBER_CELLS_PASS_ALL_SUPPORT_GATES_AND_FAMILYWISE_P_LE_0_05"
+  },
+  "interpretation": {
+    "if_region_passes": "PATH_ARCHITECTURE_JUSTIFIED_ONLY;FREEZE_A_NEW_ADAPTIVE_EXIT_DESIGN_BEFORE_TESTING_ANY_EXIT_THRESHOLDS",
+    "if_none_pass": "DO_NOT_REVISIT_THIS_H6_H24_H48_MEAN_REVERSION_ENTRY_FAMILY_VIA_EXIT_TUNING;MOVE_TO_DISTINCT_FRONTIER",
+    "candidate_freeze_allowed": false,
+    "net_certification_allowed": false,
+    "protected_forward_access": false,
+    "new_android_acquisition": false
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_legacy_read_only": true
+  },
+  "canonical_sha256": "47ae98ff34adca0a83511073b39d24b06d15001f085317e67454f878b7eabe0c"
+}
