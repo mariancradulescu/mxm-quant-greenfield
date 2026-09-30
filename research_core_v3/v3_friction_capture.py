@@ -378,27 +378,33 @@ class V3MaxT14FrictionRunner:
         transport: StdlibCTraderTransport | None = None,
     ):
         self.repo_root = Path(repo_root)
-        self.plan_path = self.repo_root / PLAN_REL
+        self.config = dict(config)
+        plan_rel = str(self.config.get("plan_rel") or PLAN_REL)
+        self.plan_path = self.repo_root / plan_rel
         if not self.plan_path.is_file():
-            raise CaptureContractError("V3 maxT14 friction plan missing")
+            raise CaptureContractError(f"V3 friction plan missing: {plan_rel}")
         self.plan = json.loads(self.plan_path.read_text(encoding="utf-8"))
         self._validate_plan()
 
         self.client_id = str(client_id)
         self.client_secret = str(client_secret)
         self.access_token = str(access_token)
-        self.config = dict(config)
         self.progress = progress
         self.transport = transport or StdlibCTraderTransport(
             LIVE_HOST, LIVE_PORT, response_timeout=60
         )
 
-        self.work_dir = self.repo_root / WORK_REL
+        base_work_rel = str(self.config.get("base_work_rel") or WORK_REL)
+        base_output_rel = str(self.config.get("base_output_rel") or OUTPUT_REL)
+        base_transfer_name = str(
+            self.config.get("base_transfer_name") or TRANSFER_NAME
+        )
+        self.work_dir = self.repo_root / base_work_rel
         self.raw_root = self.work_dir / "chunks"
         self.resume_path = self.work_dir / "resume.json"
         self.network_cache_path = self.work_dir / "network_endpoint_cache.json"
-        self.output_dir = self.repo_root / OUTPUT_REL
-        self.transfer_path = self.output_dir.parent / TRANSFER_NAME
+        self.output_dir = self.repo_root / base_output_rel
+        self.transfer_path = self.output_dir.parent / base_transfer_name
 
         self.scope_by_symbol = self._load_scopes_and_blocks()
         self.resume = self._load_or_initialize_resume()
