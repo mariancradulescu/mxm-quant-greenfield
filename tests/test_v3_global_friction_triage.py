@@ -39,7 +39,7 @@ class V3GlobalFrictionTriageTests(unittest.TestCase):
         self.assertEqual(
             d["stage0_benchmark"]["probe_spans_minutes"], [1, 5, 15, 60, 180]
         )
-        self.assertEqual(d["stage0_benchmark"]["planned_base_probes"], 420)
+        self.assertEqual(d["stage0_benchmark"]["planned_base_probes"], 364)
         self.assertFalse(d["storage"]["raw_tick_values_written_to_disk"])
         self.assertEqual(d["storage"]["hard_first_bundle_cap_bytes"], 67108864)
 
@@ -116,7 +116,7 @@ class V3GlobalFrictionTriageTests(unittest.TestCase):
     def test_real_geometry_is_one_global_bounded_campaign(self):
         g = global_triage_geometry_preflight(ROOT)
         self.assertEqual(g["reference_exact_windows"], 691919)
-        self.assertEqual(g["stage0_base_probes"], 420)
+        self.assertEqual(g["stage0_base_probes"], 364)
         self.assertEqual(g["campaign_looks"], 1)
         self.assertFalse(g["automatic_additional_acquisition"])
         self.assertGreater(g["sampled_hours"], 0)
@@ -139,7 +139,7 @@ class V3GlobalFrictionTriageTests(unittest.TestCase):
         )
         lo, hi = g["total_base_request_range_before_pagination"]
         self.assertLessEqual(lo, hi)
-        self.assertGreaterEqual(lo, 420)
+        self.assertGreaterEqual(lo, 364)
 
     def test_v7_package_is_distinct_from_v5_and_v6_entrypoints(self):
         builder = BUILDER.read_text(encoding="utf-8")
