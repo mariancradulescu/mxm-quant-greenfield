@@ -1,0 +1,145 @@
+{
+  "schema": "mxm.research-core-v3.mean-reversion-progress-vol-trail-development-design.v1",
+  "status": "FROZEN_BEFORE_UNTOUCHED_EXIT_OUTCOMES",
+  "parent_evidence_audit_commit": "ef6100f1361ca2c091f117013e470983189bcbce",
+  "evidence_audit_ref": "research_core_v3/state/MEAN_REVERSION_UNTOUCHED_EXIT_TEST_EVIDENCE_AUDIT_V1.json",
+  "purpose": "TEST_WHETHER_MEAN_REVERSION_ENTRY_INFORMATION_CAN_CONVERT_THE_PREVIOUSLY_JUSTIFIED_FAVORABLE_PATH_GEOMETRY_INTO_MATERIAL_CAUSAL_GROSS_HEADROOM_USING_A_PROGRESS_ARMED_VOLATILITY_TRAIL_RATHER_THAN_FIXED_COST_MULTIPLE_BRACKETS_OR_IMMEDIATE_ZSCORE_EXITS",
+  "not_retrospective_rescue": {
+    "prior_h24_h48_fixed_horizon_results_unchanged": true,
+    "prior_path_diagnostic_result_unchanged": true,
+    "prior_230_adaptive_exit_results_unchanged": true,
+    "new_test_uses_only_mean_reversion_outcome_untouched_symbol_id_x_time_intervals": true,
+    "no_parameter_selected_from_new_cohort_outcomes": true,
+    "candidate_freeze_allowed": false
+  },
+  "scope": {
+    "symbols": [
+      {"symbol":"EURUSD","symbol_id":1,"series_sha256":"b9c567c16a855a1b08bca334d14b2dc536fd4b51b6f7dc4670844429b86ff8d3","start_utc":"2026-03-30T00:00:00Z","end_utc":"2026-07-19T23:50:00Z","planning_friction_bps":0.6092951455071025},
+      {"symbol":"USDCAD","symbol_id":8,"series_sha256":"a31f6d9a3631d48f734cf4fba43ceb3eb34dd247fe9b0ceadeb43933e7e34267","start_utc":"2026-03-30T00:00:00Z","end_utc":"2026-07-19T23:50:00Z","planning_friction_bps":0.8814569944704655},
+      {"symbol":"MXNJPY","symbol_id":2778,"series_sha256":"34b96cd2cca5775e447b01c72e6643306a2f5fe36baccf2bba2aa1d9c7cc0232","start_utc":"2026-03-30T00:00:00Z","end_utc":"2026-07-19T23:50:00Z","planning_friction_bps":19.001277827474315},
+      {"symbol":"USDJPY","symbol_id":4,"series_sha256":"ecaa119b7327248754af75c0419d7ad6571f06ca2489ffbf54b620544d52ad9b","start_utc":"2026-06-15T00:00:00Z","end_utc":"2026-09-13T23:50:00Z","planning_friction_bps":0.788131},
+      {"symbol":"GBPUSD","symbol_id":2,"series_sha256":"3053153b404412600756ada4200a7db2289181d804f9ef9a9feddebe517fd519","start_utc":"2026-06-15T00:00:00Z","end_utc":"2026-09-13T23:50:00Z","planning_friction_bps":0.664199},
+      {"symbol":"USDCHF","symbol_id":6,"series_sha256":"85675d4f13ecc139e702434dc92cea3cb3e452976fc273783bc85d1fd96bcdd4","start_utc":"2026-06-15T00:00:00Z","end_utc":"2026-09-13T23:50:00Z","planning_friction_bps":0.847269},
+      {"symbol":"AUDUSD","symbol_id":5,"series_sha256":"366570a1f0e4a12c52585bdeca774085d7a2b1eee10238adc0f2779e7fa873fe","start_utc":"2026-06-15T00:00:00Z","end_utc":"2026-09-13T23:50:00Z","planning_friction_bps":1.114183}
+    ],
+    "source_bundles": [
+      {"name":"MXM_SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_M5_16W_FRICTION_V1.zip","sha256":"1ae4f6722960bec8451f9912c32cc3de2c2f24cb7363ad678de7a0272bd70537","acceptance_ref":"evidence/SESSION_GAP_SIX_PANEL_INDEPENDENT_OUTER_CAPTURE_ACCEPTANCE_V1.json"},
+      {"name":"MXM_COMPETITION_ULTRA_FAST_STAGE_A_V6.zip","sha256":"dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d","acceptance_ref":"data/COMPETITION_ULTRA_FAST_STAGE_A_V6_ACCEPTANCE_V1.json"}
+    ]
+  },
+  "entry_family": {
+    "mechanism": "MEAN_REVERSION",
+    "lookback_bars": [12,24,48],
+    "absolute_z_thresholds": [1.0,1.5,2.0],
+    "zscore": "POPULATION_STANDARD_DEVIATION_OF_CLOSES_OVER_THE_INCLUSIVE_LOOKBACK_WINDOW_ENDING_AT_SIGNAL_BAR",
+    "direction": "SHORT_IF_Z_GTE_THRESHOLD_LONG_IF_Z_LTE_MINUS_THRESHOLD",
+    "signal_time": "CLOSE_I",
+    "entry": "OPEN_I_PLUS_1",
+    "rearm_bars": 3,
+    "full_backward_dependency": true,
+    "require_exact_contiguous_M5_history_for_ENTRY_LOOKBACK_AND_VOLATILITY_UNIT": true,
+    "require_contiguous_forward_through_I_PLUS_48_BEFORE_ACCEPTING_SIGNAL": true,
+    "parameter_cells_per_symbol": 9,
+    "frozen_test_count": 63
+  },
+  "exit_architecture": {
+    "id": "HALF_REVERSION_PROGRESS_VOL_TRAIL_V1",
+    "kind": "CAUSAL_PROGRESS_ARMED_VOLATILITY_TRAIL",
+    "volatility_unit": {
+      "name": "VRU24_BPS",
+      "formula": "MEDIAN_OVER_J_I_MINUS_23_TO_I_OF_MAX(HIGH_J_MINUS_LOW_J,ABS(HIGH_J_MINUS_CLOSE_J_MINUS_1),ABS(LOW_J_MINUS_CLOSE_J_MINUS_1))/CLOSE_J_MINUS_1*10000",
+      "information_time": "ALL_COMPONENTS_KNOWN_AT_SIGNAL_CLOSE_I",
+      "minimum_contiguous_dependency_bars": 25
+    },
+    "initial_protective_stop": {
+      "distance_vru_multiple": 2.0,
+      "long_level": "ENTRY_OPEN*EXP(-2*VRU24_BPS/10000)",
+      "short_level": "ENTRY_OPEN*EXP(+2*VRU24_BPS/10000)",
+      "active_from_entry": true
+    },
+    "progress_arm": {
+      "law": "ABS(CURRENT_CAUSAL_ZSCORE_AT_COMPLETED_BAR_CLOSE)<=0.5*FROZEN_ENTRY_THRESHOLD",
+      "rationale": "MECHANISM_PROGRESS_TOWARD_EQUILIBRIUM_NOT_PNL_OPTIMIZATION",
+      "activation": "TRAIL_BECOMES_ACTIVE_ON_THE_NEXT_BAR_ONLY"
+    },
+    "trailing_stop": {
+      "distance_vru_multiple": 1.0,
+      "long_anchor": "BEST_COMPLETED_BAR_HIGH_SINCE_ARM",
+      "short_anchor": "BEST_COMPLETED_BAR_LOW_SINCE_ARM",
+      "update_time": "ONLY_AFTER_BAR_COMPLETION_FOR_NEXT_BAR_EXECUTION",
+      "long_level": "ANCHOR*EXP(-VRU24_BPS/10000)",
+      "short_level": "ANCHOR*EXP(+VRU24_BPS/10000)",
+      "monotonic_tightening": true
+    },
+    "maximum_time_exit": {
+      "bars_after_signal": 48,
+      "execution": "CLOSE_I_PLUS_48_IF_NO_PRIOR_STOP_OR_TRAIL_EXIT",
+      "longer_horizon_escalation": false
+    },
+    "intrabar_execution": {
+      "gap_rule": "IF_NEXT_BAR_OPEN_IS_BEYOND_THE_ACTIVE_STOP_IN_THE_ADVERSE_DIRECTION_EXECUTE_AT_OPEN",
+      "otherwise": "IF_BAR_EXTREME_CROSSES_ACTIVE_STOP_EXECUTE_AT_STOP_LEVEL",
+      "active_stop_when_armed": "THE_MORE_PROTECTIVE_OF_INITIAL_STOP_AND_TRAIL",
+      "same_bar_lookahead": false
+    },
+    "fixed_profit_target": false,
+    "partial_exit": false
+  },
+  "why_distinct_from_prior_230_tests": {
+    "prior_fixed_cost_multiple_brackets_reused": false,
+    "prior_immediate_zscore_exit_reused": false,
+    "new_information": "ALLOW_FAVORABLE_PATH_TO_DEVELOP_UNTIL_MECHANISM_PROGRESS_ARMS_A_CAUSAL_VOLATILITY_TRAIL",
+    "parameters_chosen_from_exposed_exit_pnl": false
+  },
+  "outcome": {
+    "gross_response_bps": "DIRECTION*LOG(EXIT_PRICE/ENTRY_OPEN)*10000",
+    "actual_exit_reason_recorded": true,
+    "actual_holding_bars_recorded": true,
+    "no_spread_proxy_subtracted": true,
+    "no_net_profit_claim_from_ohlc": true
+  },
+  "support_gate": {
+    "completed_events_min": 150,
+    "distinct_utc_dates_min": 40,
+    "distinct_iso_weeks_min": 10,
+    "retention_fraction_min": 0.8,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "economic_headroom_gate": {
+    "mean_gross_bps_min_by_symbol": "MAX(5.0,2.0*AUTHENTIC_PLANNING_FRICTION_MEDIAN_WINDOW_P75_BPS)",
+    "median_gross_bps_strictly_positive": true,
+    "authentic_planning_friction_role": "PREOUTCOME_INFORMATION_GAIN_AND_GROSS_HEADROOM_SCREEN_ONLY_NOT_EVENT_TIME_NET_CERTIFICATION",
+    "exact_event_time_friction_required_after_robust_gross_survivor": true,
+    "no_proxy_spread_used_as_realized_cost": true
+  },
+  "multiplicity": {
+    "family": "ALL_63_FROZEN_SYMBOL_X_LOOKBACK_X_Z_CELLS",
+    "cluster": "UTC_ISO_WEEK",
+    "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "alternative": "POSITIVE_MEAN_GROSS_RESPONSE",
+    "support_ineligible_cells_assigned_p1": true
+  },
+  "robust_region_gate": {
+    "within": "SAME_SYMBOL_AND_SINGLE_FROZEN_EXIT_ARCHITECTURE",
+    "adjacency": "ONE_STEP_IN_LOOKBACK_OR_Z_THRESHOLD_WITH_THE_OTHER_PARAMETER_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_entry_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "post_result_decision": {
+    "if_no_robust_gross_region": "PARK_THIS_EXACT_PROGRESS_VOL_TRAIL_ARCHITECTURE_WITHOUT_RESCUE_AND_RETURN_TO_THE_OPEN_1576_ENTRY_FRONTIER",
+    "if_robust_gross_region": "FREEZE_EXACT_EVENT_TIME_BID_ASK_COMMISSION_EXECUTION_WINDOWS_FOR_ONLY_THE_SURVIVING_REGION_THEN_APPLY_MARGIN_MIN_VOLUME_EUR200_AND_DISJOINT_CONFIRMATION_GATES",
+    "candidate_freeze_at_this_stage": false,
+    "automatic_new_broker_acquisition": false
+  },
+  "safety": {
+    "protected_forward_opened": false,
+    "runtime_v2_reactivated": false,
+    "external_market_data_used": false,
+    "new_broker_acquisition_required_for_this_test": false
+  }
+}
