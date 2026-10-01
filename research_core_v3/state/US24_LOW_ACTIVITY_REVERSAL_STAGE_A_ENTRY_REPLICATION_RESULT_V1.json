@@ -1,0 +1,84 @@
+{
+  "schema": "mxm.research-core-v3.us24-low-activity-reversal-stage-a-entry-replication-result.v1",
+  "status": "COMPLETE_ENTRY_REPLICATION_FAILED_STAGE_B_EXIT_HOLDOUT_UNOPENED",
+  "design_ref": "research_core_v3/state/US24_LOW_ACTIVITY_REVERSAL_TWO_STAGE_EXIT_DESIGN_V1.json",
+  "preoutcome_audit_ref": "research_core_v3/state/US24_LOW_ACTIVITY_REVERSAL_EXIT_PREOUTCOME_AUDIT_V1.json",
+  "exact_hypothesis": "LOW_ACTIVITY_REVERSAL|L10|K2|H1_NEXT_SESSION_0930_EXIT",
+  "interval": [
+    "2025-09-16T00:00:00Z",
+    "2026-06-14T23:59:59Z"
+  ],
+  "source_archives": {
+    "selected_m5_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "high_quality_delta_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+  },
+  "support": {
+    "attempted_events": 81,
+    "completed_events": 81,
+    "retention_fraction": 1,
+    "distinct_entry_dates": 81,
+    "distinct_iso_weeks": 35,
+    "support_gate_pass": true
+  },
+  "gross": {
+    "mean_bps": -22.42715180501845,
+    "median_bps": -7.131240323573763,
+    "chronological_thirds_mean_bps": [
+      -1.6830703725790377,
+      1.2263581176376184,
+      -66.82474316011393
+    ],
+    "top10pct_abs_event_concentration": 0.3609367639580013,
+    "economic_gate_pass": false
+  },
+  "inference": {
+    "method": "5_TRADING_SESSION_BLOCK_WILD_SIGN_ONE_SIDED_TEST",
+    "cluster_robust_se_bps": 18.957476686042675,
+    "t_stat": -1.1830241005402529,
+    "resamples": 4999,
+    "seed": 20261001,
+    "one_sided_p": 0.874,
+    "alpha": 0.05,
+    "significance_pass": false,
+    "bootstrap_t_quantiles": {
+      "q50": -0.00407811,
+      "q90": 1.29526209,
+      "q95": 1.63778467,
+      "q99": 2.25637322
+    }
+  },
+  "gate_summary": {
+    "support_pass": true,
+    "economic_pass": false,
+    "statistical_pass": false,
+    "full_pass": false
+  },
+  "interpretation": {
+    "preV3_discovery_signal_replicated": false,
+    "current_exact_entry_architecture_temporal_generalization": "FAILED",
+    "exposed_preV3_path_diagnostics_remain_design_evidence_only": true,
+    "stage_B_exit_question_invalid_to_open_after_failed_entry_replication": true,
+    "stage_B_outcomes_opened": false,
+    "stage_B_holdout_interval_preserved_unconsumed": [
+      "2026-06-15T00:00:00Z",
+      "2026-09-16T23:59:59Z"
+    ],
+    "same_evidence_exit_rescue_authorized": false,
+    "same_evidence_entry_retune_authorized": false,
+    "broader_cross_sectional_or_activity_concept_exhausted": false
+  },
+  "decision": {
+    "exact_LOW_ACTIVITY_REVERSAL_L10_K2_entry_replication": "LOCAL_HYPOTHESIS_CLOSED_ON_DISJOINT_CONFIRMATION",
+    "exit_architecture_test": "PARKED_WITHOUT_OUTCOME_ACCESS_BECAUSE_ENTRY_GATE_FAILED",
+    "authentic_friction_required": false,
+    "candidate_frozen": false,
+    "protected_forward_opened": false,
+    "return_to_frontier_rerank": true
+  },
+  "governance": {
+    "candidate_frozen_count": 0,
+    "authoritative_frontier": 1576,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "runtime_v2_read_only": true
+  }
+}
