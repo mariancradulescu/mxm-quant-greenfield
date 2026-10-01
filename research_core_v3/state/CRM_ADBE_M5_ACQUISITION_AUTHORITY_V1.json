@@ -1,0 +1,80 @@
+{
+  "schema": "mxm.research-core-v3.crm-adbe-m5-acquisition-authority.v1",
+  "status": "AUTHORIZED_VALIDATED_PACKAGE_READY_STOP_BEFORE_USER_EXECUTION",
+  "research_authority_head_before_this_record": "68863e3f5c9a9ec462518a89af7af7ed50a568cc",
+  "provenance_gate": {
+    "status": "PASS",
+    "ref": "research_core_v3/state/CRM_ADBE_M5_PREACQUISITION_PROVENANCE_AUDIT_V1.json",
+    "sha256": "f804e41aa6fd5eb4d71e701eb2ee769b3aa972455c430652599700990ff3a499",
+    "conclusion": "REQUESTED_2025_01_02_THROUGH_2025_09_14_M5_INTERVAL_NOT_PREVIOUSLY_CONSUMED_AS_CRM_ADBE_RELATIVE_VALUE_EVALUATION_OUTCOMES"
+  },
+  "frozen_hypothesis_ref": "research_core_v3/state/CRM_ADBE_INTRADAY_RV_TEMPORAL_RETEST_PACKAGE_V1.json",
+  "acquisition_plan": {
+    "ref": "data/CRM_ADBE_M5_TEMPORAL_ACQUISITION_PLAN_V1.json",
+    "plan_sha256": "3eb3155e04541c5d4dab9f7e1483f2d61732063e6213fa07d61ebc80326cf7a3"
+  },
+  "exact_scope": {
+    "symbols": [
+      {
+        "symbol_id": 5410,
+        "broker_symbol": "CRM.US-24"
+      },
+      {
+        "symbol_id": 5411,
+        "broker_symbol": "ADBE.US-24"
+      }
+    ],
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-01-02T00:00:00Z",
+      "end_utc": "2025-09-14T23:59:59Z"
+    },
+    "source": "Pepperstone cTrader Open API",
+    "trendbars_only": true,
+    "bid_ask": false,
+    "ticks": false
+  },
+  "collector_package": {
+    "name": "MXM_V3_CRM_ADBE_M5_TEMPORAL_COLLECTOR_V1.zip",
+    "sha256": "e1c7582b80d7552ad032926eb38ae2d6685a096f40d39587c89f56144d3b0836",
+    "size_bytes": 70225,
+    "run_only": "CRM_ADBE_M5_CAPTURE_RUN.py",
+    "expected_return_only": "MXM_V3_CRM_ADBE_M5_TEMPORAL_EVIDENCE_V1.zip",
+    "build_branch": "crm-adbe-m5-package-build-20261001",
+    "build_head": "e8c939165cfae142540867a52867bb9232360cd3",
+    "workflow_run_id": 36841950139,
+    "workflow_job_id": 110302886134,
+    "workflow_artifact_id": 11151349232,
+    "workflow_artifact_outer_digest_sha256": "9a1517dd1c3b0b0c8d56f7d483139eb06b08b351600d818f245a1f49c7bb5c98"
+  },
+  "validation": {
+    "python_compile": "PASS",
+    "offline_read_only_preflight": "PASS",
+    "exact_symbol_identity_scope": "PASS",
+    "exact_interval_and_resolution_scope": "PASS",
+    "device_strategy_outcomes_disabled": "PASS",
+    "device_formation_estimation_disabled": "PASS",
+    "zip_crc_build": "PASS",
+    "zip_crc_independent_post_download": "PASS",
+    "package_sha256_independently_recomputed": "PASS",
+    "broker_contacted_during_package_build": false,
+    "acquisition_launched": false
+  },
+  "authorization": {
+    "user_authorized_acquisition": true,
+    "collector_execution_started": false,
+    "automatic_execution": false,
+    "automatic_extension": false,
+    "alternate_interval": false,
+    "alternate_resolution": false,
+    "extra_symbols": false,
+    "unrelated_discovery": false
+  },
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true,
+    "authoritative_frontier": 1576,
+    "stop_before_user_execution": true
+  }
+}
