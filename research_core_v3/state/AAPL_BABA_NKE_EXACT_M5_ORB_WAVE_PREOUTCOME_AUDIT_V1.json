@@ -1,0 +1,66 @@
+{
+  "schema": "mxm.research-core-v3.aapl-baba-nke-exact-m5-orb-wave-preoutcome-audit.v1",
+  "status": "PASS_UNTOUCHED_EXACT_M5_SUPPORT_FEASIBLE",
+  "source_evidence": {
+    "archive_name": "MXM_V3_US24_XSEC_ACTIVITY_PREV3_M5_EVIDENCE_V1.zip",
+    "archive_sha256": "dde0bc3215f887df4e3a9d3ebb10d502743866534f3d64d7955669325f71ae06",
+    "source_environment": "Pepperstone - Europe LIVE",
+    "resolution": "M5"
+  },
+  "symbols": [
+    {
+      "symbol_id": 2999,
+      "broker_symbol": "AAPL.US-24",
+      "member": "raw/2999_AAPL_US_24_M5.csv",
+      "rows": 48146,
+      "complete_regular_sessions": 173,
+      "distinct_iso_weeks": 37,
+      "first_complete_session": "2025-01-02",
+      "last_complete_session": "2025-09-12"
+    },
+    {
+      "symbol_id": 3033,
+      "broker_symbol": "BABA.US-24",
+      "member": "raw/3033_BABA_US_24_M5.csv",
+      "rows": 46868,
+      "complete_regular_sessions": 172,
+      "distinct_iso_weeks": 37,
+      "first_complete_session": "2025-01-02",
+      "last_complete_session": "2025-09-12"
+    },
+    {
+      "symbol_id": 3028,
+      "broker_symbol": "NKE.US-24",
+      "member": "raw/3028_NKE_US_24_M5.csv",
+      "rows": 39926,
+      "complete_regular_sessions": 172,
+      "distinct_iso_weeks": 37,
+      "first_complete_session": "2025-01-02",
+      "last_complete_session": "2025-09-12"
+    }
+  ],
+  "contamination_audit": {
+    "original_ORB_outcome_window_starts_utc": "2025-09-16T00:00:00Z",
+    "proposed_wave_interval": [
+      "2025-01-02T00:00:00Z",
+      "2025-09-14T23:59:59Z"
+    ],
+    "exact_ORB_outcomes_previously_opened_on_proposed_interval_for_these_symbols": false,
+    "other_mechanism_use_does_not_disqualify": true,
+    "TSLA_M15_and_exact_M5_tests_do_not_contaminate_AAPL_BABA_NKE": true
+  },
+  "support_topology": {
+    "frozen_original_support_gate": {
+      "completed_events_min": 80,
+      "distinct_dates_min": 80,
+      "distinct_iso_weeks_min": 30,
+      "retention_fraction_min": 0.9
+    },
+    "timestamp_capacity_feasible_all_symbols": true,
+    "robust_region_topology_feasible": true,
+    "price_breakout_events_opened_in_preflight": false,
+    "returns_opened_in_preflight": false
+  },
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0
+}

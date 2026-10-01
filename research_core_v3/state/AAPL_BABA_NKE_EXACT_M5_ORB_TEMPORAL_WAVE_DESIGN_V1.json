@@ -1,0 +1,136 @@
+{
+  "schema": "mxm.research-core-v3.aapl-baba-nke-exact-m5-orb-temporal-wave-design.v1",
+  "status": "FROZEN_PREOUTCOME_ON_UNTOUCHED_EXACT_M5_HISTORY",
+  "rerank_ref": "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V5.json",
+  "preoutcome_audit_ref": "research_core_v3/state/AAPL_BABA_NKE_EXACT_M5_ORB_WAVE_PREOUTCOME_AUDIT_V1.json",
+  "source": "Pepperstone cTrader Open API accepted raw M5 evidence only",
+  "evaluation_interval_utc": [
+    "2025-01-02T00:00:00Z",
+    "2025-09-14T23:59:59Z"
+  ],
+  "symbols": [
+    {
+      "symbol_id": 2999,
+      "broker_symbol": "AAPL.US-24",
+      "family_id": "AAPL_US24_ORB_12_CELL"
+    },
+    {
+      "symbol_id": 3033,
+      "broker_symbol": "BABA.US-24",
+      "family_id": "BABA_US24_ORB_12_CELL"
+    },
+    {
+      "symbol_id": 3028,
+      "broker_symbol": "NKE.US-24",
+      "family_id": "NKE_US24_ORB_12_CELL"
+    }
+  ],
+  "common_signal": {
+    "timezone": "America/New_York",
+    "regular_session_open_local": "09:30",
+    "resolution": "M5",
+    "exact_contiguity_seconds": 300,
+    "opening_range_minutes": [
+      15,
+      30
+    ],
+    "opening_range": "MAX_HIGH_AND_MIN_LOW_OF_COMPLETED_M5_BARS_BEGINNING_09_30_FOR_FROZEN_OR_MINUTES",
+    "breakout_watch": "AFTER_OR_COMPLETION_EXAMINE_NEXT_18_COMPLETED_M5_BARS;LONG_FIRST_CLOSE_STRICTLY_ABOVE_OR_HIGH;SHORT_FIRST_CLOSE_STRICTLY_BELOW_OR_LOW",
+    "entry": "NEXT_CONTIGUOUS_M5_OPEN_AFTER_BREAKOUT_BAR_COMPLETION",
+    "one_event_per_session_per_cell": true,
+    "failure_rules": {
+      "MIDPOINT": "LONG_EXIT_NEXT_OPEN_AFTER_COMPLETED_CLOSE_LE_OR_MIDPOINT;SHORT_EXIT_NEXT_OPEN_AFTER_CLOSE_GE_OR_MIDPOINT",
+      "OPPOSITE_BOUNDARY": "LONG_EXIT_NEXT_OPEN_AFTER_COMPLETED_CLOSE_LE_OR_LOW;SHORT_EXIT_NEXT_OPEN_AFTER_CLOSE_GE_OR_HIGH"
+    },
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ],
+    "time_exit": "IF_NO_FAILURE_TRIGGER_EXIT_AT_NEXT_CONTIGUOUS_M5_OPEN_AFTER_MAXIMUM_HOLD_BARS_COMPLETED_POST_ENTRY_BARS",
+    "session_boundary": "ALL_REQUIRED_TIMESTAMPS_THROUGH_EXIT_NO_LATER_THAN_15_35_LOCAL_OTHERWISE_RIGHT_CENSOR",
+    "gross_return": "DIRECTION_TIMES_LOG_EXIT_OPEN_OVER_ENTRY_OPEN_TIMES_10000_BPS",
+    "missing": "RIGHT_CENSOR_FAIL_CLOSED_NO_INTERPOLATION_SYNTHETIC_BARS_SAME_BAR_EXECUTION_OR_OVERNIGHT"
+  },
+  "parameter_grid": {
+    "opening_range_minutes": [
+      15,
+      30
+    ],
+    "failure_rule": [
+      "MIDPOINT",
+      "OPPOSITE_BOUNDARY"
+    ],
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ],
+    "cells_per_symbol": 12,
+    "total_cells": 36
+  },
+  "support_gate": {
+    "completed_events_min": 80,
+    "distinct_dates_min": 80,
+    "distinct_iso_weeks_min": 30,
+    "retention_fraction_min": 0.9
+  },
+  "economic_gross_gate": {
+    "mean_gross_bps_min": 12,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "local": {
+      "family": "ALL_12_CELLS_WITHIN_EACH_SYMBOL",
+      "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+      "resamples": 4999,
+      "seed": 20261001,
+      "familywise_alpha": 0.05,
+      "support_ineligible_cells_assigned_p1": true
+    },
+    "selection_layer": {
+      "interchangeable_symbol_count": 3,
+      "rule": "BONFERRONI_ACROSS_THREE_SYMBOL_LOCAL_FAMILIES",
+      "overall_alpha": 0.05,
+      "required_local_familywise_p_for_promotion": 0.016666666666666666,
+      "no_free_winner": true
+    }
+  },
+  "robust_region_gate": {
+    "within_same_symbol_only": true,
+    "adjacency": "ONE_STEP_IN_OR_MINUTES_FAILURE_RULE_OR_HOLD_WITH_OTHER_PARAMETERS_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "each_cell_must_pass_support_economic_and_selection_adjusted_local_p": true,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "horizon_minutes": 240,
+    "role": "DIAGNOSTIC_ONLY_NO_SAME_OUTCOME_EXIT_RESCUE",
+    "metrics": [
+      "MFE_bps",
+      "MAE_bps",
+      "time_to_MFE",
+      "time_to_first_positive",
+      "realized_exit",
+      "MFE_minus_realized_exit"
+    ]
+  },
+  "evaluation_order": [
+    "AAPL.US-24",
+    "BABA.US-24",
+    "NKE.US-24"
+  ],
+  "contamination_rule": "ALL_THREE_DESIGNS_FROZEN_BEFORE_ANY_NEW_OUTCOMES;EARLY_RESULT_CANNOT_REDIGN_ANOTHER_SYMBOL",
+  "permanent_close_rule": "IF_NO_SYMBOL_HAS_A_CONNECTED_3_CELL_SELECTION_ADJUSTED_FULL_PASS_REGION_CLOSE_ONLY_THESE_THREE_SYMBOL_LOCAL_TEMPORAL_GENERALIZATIONS;DO_NOT_DECLARE_BROADER_ORB_CONCEPT_EXHAUSTED",
+  "friction_boundary": "ONLY_AFTER_CONNECTED_SELECTION_ADJUSTED_ROBUST_MATERIAL_GROSS_REGION_FREEZE_EXACT_EVENTS_THEN_AUTHENTIC_BID_ASK_COMMISSION_CONVERSION_VOLUME_MARGIN_EUR200",
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "runtime_v2_read_only": true
+  }
+}
