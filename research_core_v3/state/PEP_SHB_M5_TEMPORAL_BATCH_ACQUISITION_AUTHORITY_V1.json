@@ -1,0 +1,88 @@
+{
+  "schema": "mxm.research-core-v3.pep-shb-m5-temporal-batch-acquisition-authority.v1",
+  "status": "AUTHORIZED_VALIDATED_PACKAGE_READY_STOP_BEFORE_USER_EXECUTION",
+  "source_research_head": "1ad9b9789c7f1aa6669489fb90239ada0b1bfefc",
+  "scientific_boundary": {
+    "raw_acquisition_batched_only": true,
+    "PEP_and_SHB_statistical_families_remain_separate": true,
+    "PEP_design_ref": "research_core_v3/state/PEPUSD_M5_TREND_PULLBACK_TEMPORAL_DESIGN_V1.json",
+    "PEP_design_git_blob_sha1": "f874377b12d6d777bdc6d2eb0852af7e4fcd0d64",
+    "SHB_design_ref": "research_core_v3/state/SHBUSD_M5_VOLATILITY_COMPRESSION_TEMPORAL_DESIGN_V1.json",
+    "SHB_design_git_blob_sha1": "8b74c5aa40611f456cb8b3dbb37e08e569350dd6",
+    "PEP_evaluated_first_after_return": true,
+    "SHB_outcomes_remain_unopened_if_PEP_connected_robust_gross_passes": true
+  },
+  "acquisition_plan": {
+    "ref": "data/PEP_SHB_M5_TEMPORAL_BATCH_ACQUISITION_PLAN_V1.json",
+    "git_blob_sha1": "4980d8e0e01bf307c2f8ed7341f3039c0d926d6f",
+    "canonical_json_sha256": "a628f3147eb91e9adbec2266129a85a0e49c98b6d8de63ae1c217d82b596dc39"
+  },
+  "exact_scope": {
+    "symbols": [
+      {
+        "symbol_id": 7191,
+        "broker_symbol": "PEPUSD",
+        "role": "PEP_ONLY"
+      },
+      {
+        "symbol_id": 7192,
+        "broker_symbol": "SHBUSD",
+        "role": "SHB_ONLY"
+      }
+    ],
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-01-02T00:00:00Z",
+      "end_utc": "2025-09-14T23:59:59Z"
+    },
+    "source": "Pepperstone cTrader Open API",
+    "trendbars_only": true,
+    "bid_ask": false,
+    "ticks": false,
+    "orders": false,
+    "account_mutation": false,
+    "extra_symbols": false
+  },
+  "collector_package": {
+    "name": "MXM_V3_PEP_SHB_M5_TEMPORAL_COLLECTOR_V1.zip",
+    "sha256": "22cbdda77c893e99cc396f2f757480b20dfd4b7f593bd1336bc231c44d40330b",
+    "size_bytes": 66736,
+    "entry_count": 23,
+    "package_manifest_sha256": "5aa5f9af3647d77286a3ccbc6e304678588a84390ee816591d2467725b81d8dd",
+    "run_only": "PEP_SHB_M5_TEMPORAL_CAPTURE_RUN.py",
+    "expected_return_only": "MXM_V3_PEP_SHB_M5_TEMPORAL_EVIDENCE_V1.zip"
+  },
+  "validation": {
+    "python_compile": "PASS",
+    "offline_local_preflight": "PASS",
+    "exact_plan_git_blob_binding": "PASS",
+    "exact_plan_canonical_binding": "PASS",
+    "exact_symbol_scope": "PASS",
+    "exact_interval_and_resolution": "PASS",
+    "static_read_only_request_surface": "PASS",
+    "zip_crc": "PASS",
+    "package_sha256_recomputed": "PASS",
+    "device_PEP_outcomes": false,
+    "device_SHB_outcomes": false,
+    "device_pnl": false,
+    "broker_contacted_during_build": false,
+    "acquisition_launched": false
+  },
+  "authorization": {
+    "user_authorized_raw_batch_acquisition": true,
+    "automatic_execution": false,
+    "automatic_extension": false,
+    "alternate_interval": false,
+    "alternate_resolution": false,
+    "extra_symbols": false,
+    "new_1576_hypothesis_selected": false
+  },
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true,
+    "authoritative_frontier": 1576,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "stop_before_user_execution": true
+  }
+}
