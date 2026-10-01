@@ -1,0 +1,107 @@
+{
+  "schema": "mxm.research-core-v3.tsla-us24-exact-m5-orb-temporal-generalization-design.v1",
+  "status": "FROZEN_PREOUTCOME_ON_UNTOUCHED_EXACT_M5_HISTORY",
+  "rerank_ref": "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V4.json",
+  "preoutcome_audit_ref": "research_core_v3/state/TSLA_US24_EXACT_M5_ORB_PREOUTCOME_AUDIT_V1.json",
+  "symbol": {
+    "symbol_id": 3025,
+    "broker_symbol": "TSLA.US-24"
+  },
+  "source": "Pepperstone cTrader Open API accepted raw M5 evidence only",
+  "resolution": "M5",
+  "evaluation_interval_utc": [
+    "2025-01-02T00:00:00Z",
+    "2025-06-13T23:59:59Z"
+  ],
+  "signal": {
+    "timezone": "America/New_York",
+    "regular_session_open_local": "09:30",
+    "exact_contiguity_seconds": 300,
+    "opening_range_minutes": [
+      15,
+      30
+    ],
+    "opening_range": "MAX_HIGH_AND_MIN_LOW_OF_COMPLETED_M5_BARS_BEGINNING_09_30_FOR_THE_FROZEN_OR_MINUTES",
+    "breakout_watch": "AFTER_OR_COMPLETION_EXAMINE_NEXT_18_COMPLETED_M5_BARS;LONG_FIRST_CLOSE_STRICTLY_ABOVE_OR_HIGH;SHORT_FIRST_CLOSE_STRICTLY_BELOW_OR_LOW",
+    "entry": "NEXT_CONTIGUOUS_M5_OPEN_AFTER_BREAKOUT_BAR_COMPLETION",
+    "one_event_per_session_per_cell": true,
+    "failure_rules": {
+      "MIDPOINT": "LONG_TRIGGER_COMPLETED_CLOSE_LE_OR_MIDPOINT_SHORT_TRIGGER_GE_OR_MIDPOINT_EXIT_NEXT_CONTIGUOUS_M5_OPEN",
+      "OPPOSITE_BOUNDARY": "LONG_TRIGGER_COMPLETED_CLOSE_LE_OR_LOW_SHORT_TRIGGER_GE_OR_HIGH_EXIT_NEXT_CONTIGUOUS_M5_OPEN"
+    },
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ],
+    "time_exit": "IF_NO_FAILURE_TRIGGER_EXIT_AT_NEXT_CONTIGUOUS_M5_OPEN_AFTER_MAXIMUM_HOLD_BARS_COMPLETED_POST_ENTRY_BARS",
+    "session_boundary": "ALL_REQUIRED_ENTRY_AND_EXIT_TIMESTAMPS_MUST_BE_NO_LATER_THAN_15_35_LOCAL_OTHERWISE_RIGHT_CENSOR",
+    "gross_return": "DIRECTION_TIMES_LOG_EXIT_OPEN_OVER_ENTRY_OPEN_TIMES_10000_BPS",
+    "missing": "RIGHT_CENSOR_FAIL_CLOSED_NO_INTERPOLATION_SYNTHETIC_BARS_SAME_BAR_EXECUTION_OR_OVERNIGHT"
+  },
+  "parameter_grid": {
+    "opening_range_minutes": [
+      15,
+      30
+    ],
+    "failure_rule": [
+      "MIDPOINT",
+      "OPPOSITE_BOUNDARY"
+    ],
+    "maximum_hold_bars": [
+      12,
+      24,
+      48
+    ],
+    "test_count": 12
+  },
+  "support_gate": {
+    "completed_events_min": 60,
+    "distinct_dates_min": 60,
+    "distinct_iso_weeks_min": 15,
+    "retention_fraction_min": 0.9
+  },
+  "economic_gross_gate": {
+    "mean_gross_bps_min": 12,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "ALL_12_FROZEN_TSLA_EXACT_M5_CELLS",
+    "dependence_cluster": "ENTRY_UTC_ISO_WEEK",
+    "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_ineligible_cells_assigned_p1": true,
+    "no_postoutcome_family_narrowing": true
+  },
+  "robust_region_gate": {
+    "adjacency": "ONE_STEP_IN_OR_MINUTES_FAILURE_RULE_OR_HOLD_WITH_OTHER_PARAMETERS_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "horizon_minutes": 240,
+    "role": "DIAGNOSTIC_ONLY_NO_SAME_OUTCOME_EXIT_RESCUE",
+    "metrics": [
+      "MFE_bps",
+      "MAE_bps",
+      "time_to_MFE_minutes",
+      "time_to_first_positive_response_minutes",
+      "realized_frozen_exit_response_bps",
+      "MFE_minus_realized_exit_bps"
+    ]
+  },
+  "permanent_close_condition": "IF_NO_CONNECTED_AT_LEAST_3_CELL_FULL_PASS_REGION_CLOSE_THIS_EXACT_TSLA_M5_TEMPORAL_GENERALIZATION_WITHOUT_OR_FAILURE_HOLD_SESSION_OR_EXIT_RESCUE",
+  "friction_boundary": "ONLY_AFTER_CONNECTED_ROBUST_MATERIAL_GROSS_REGION_FREEZE_EXACT_EVENT_TIMESTAMPS_THEN_AUTHENTIC_BID_ASK_COMMISSION_CONVERSION_VOLUME_MARGIN_EUR200",
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "runtime_v2_read_only": true
+  }
+}

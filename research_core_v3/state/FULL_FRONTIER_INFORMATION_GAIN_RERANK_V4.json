@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.research-core-v3.full-frontier-information-gain-rerank.v4",
+  "status": "COMPLETE_PREOUTCOME_TSLA_EXACT_M5_ORB_TEMPORAL_GENERALIZATION_SELECTED",
+  "source_live_head": "e82cf534325210470ab6b76b46d11b0d6d4300f0",
+  "preserved_boundaries": {
+    "stage_B_US24_exit_holdout_status": "PARKED_UNTESTED_NOT_FAILED_AND_ACCESS_CONDITION_UNCHANGED",
+    "stage_B_outcomes_opened": false,
+    "stage_B_interval": [
+      "2026-06-15T00:00:00Z",
+      "2026-09-16T23:59:59Z"
+    ],
+    "PEP_SHB_data_limited_unopened": true,
+    "authoritative_frontier": 1576,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true
+  },
+  "candidate_class_comparison": [
+    {
+      "rank": 1,
+      "information_class": "TSLA_US24_EXACT_M5_OPENING_RANGE_BREAKOUT_TEMPORAL_GENERALIZATION",
+      "selected": true,
+      "evidence": [
+        "Original exact-M5 ORB family had 10 of 12 TSLA cells pass the strict economic-support gate, with means 12.14-24.84 bps; this is within-symbol breadth, not a singleton winner.",
+        "The prior time-disjoint M15 translation reproduced two economic cells, including OR15 midpoint H8 at +29.58 bps with all thirds positive, but did not pass familywise multiplicity; that closes the M15 translation only, not exact-M5 semantics.",
+        "A newly acquired authentic exact-M5 TSLA series exists from 2025-01-02 onward.",
+        "The exact-M5 interval 2025-01-02 through 2025-06-13 is temporally disjoint both from the original V3 ORB outcome interval starting 2025-09-16 and from the M15 temporal test interval starting 2025-06-16.",
+        "Outcome-blind timestamp preflight finds 112 complete 09:30-15:35 regular sessions across 24 ISO weeks, sufficient for a prospectively frozen exact-M5 local family without new acquisition."
+      ],
+      "limitations": [
+        "Original 228-cell global family had zero multiplicity survivors.",
+        "The M15 temporal test had zero multiplicity survivors and no robust region.",
+        "A new exact-M5 result must therefore pass a compact local max-T and connected-region gate; gross amplitude alone cannot promote it."
+      ],
+      "expected_information_gain": "HIGHEST_CURRENTLY_AVAILABLE_COMBINATION_OF_LOCAL_BREADTH_MECHANISM_SPECIFICITY_UNTOUCHED_EXACT_SEMANTICS_AND_ZERO_USER_ROUNDTRIP"
+    },
+    {
+      "rank": 2,
+      "information_class": "BROADER_QUOTE_MICROSTRUCTURE_DISTINCT_SUBFAMILY",
+      "selected": false,
+      "reason": "Conceptually open but three prior quote/cross-pair subfamilies had no positive support-eligible directional edge or were execution dominated."
+    },
+    {
+      "rank": 3,
+      "information_class": "NEW_CROSS_INSTRUMENT_RELATIONAL_OR_CAUSAL_LEAD_LAG",
+      "selected": false,
+      "reason": "Conceptually open, but CRM/ADBE temporal replication failed, generic US lead-lag means were negative, and same-underlying basis amplitude was sub-bp."
+    },
+    {
+      "rank": 4,
+      "information_class": "AAPL_BABA_NKE_OR_PLTR_LOCAL_BACKLOG",
+      "selected": false,
+      "reason": "Preserved and testable, but each has materially weaker within-symbol breadth than TSLA; adding them now would create selection multiplicity without comparable information gain."
+    },
+    {
+      "rank": 5,
+      "information_class": "PARKED_US24_EXIT_ARCHITECTURE_QUESTION",
+      "selected": false,
+      "reason": "Logically untested, but associated entry+H1 specification failed strongly on 81 disjoint events; frozen Stage B access remains unsatisfied and cannot be changed."
+    }
+  ],
+  "adaptive_wave_size": {
+    "hypothesis_count": 1,
+    "fixed_arbitrary_size": false,
+    "rationale": "STRONG_PREOUTCOME_LOCALIZATION_TO_TSLA_WITH_10_OF_12_ORIGINAL_ECONOMIC_SUPPORT_CELLS_JUSTIFIES_A_COMPACT_ONE_SYMBOL_FAMILY;ADDING_WEAKER_SYMBOLS_WOULD_DILUTE_SELECTION_POWER"
+  },
+  "selection_multiplicity": {
+    "family": "ALL_12_ORIGINAL_TSLA_EXACT_M5_OR_X_FAILURE_X_HOLD_CELLS",
+    "no_retrospective_cell_narrowing": true,
+    "future_disjoint_confirmation_required_if_any_survivor": true
+  }
+}

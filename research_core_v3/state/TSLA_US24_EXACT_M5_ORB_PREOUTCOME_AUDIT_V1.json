@@ -1,0 +1,55 @@
+{
+  "schema": "mxm.research-core-v3.tsla-us24-exact-m5-orb-preoutcome-audit.v1",
+  "status": "PASS_UNTOUCHED_EXACT_M5_INTERVAL_SUPPORT_FEASIBLE",
+  "symbol": {
+    "symbol_id": 3025,
+    "broker_symbol": "TSLA.US-24"
+  },
+  "source_evidence": {
+    "archive_name": "MXM_V3_US24_XSEC_ACTIVITY_PREV3_M5_EVIDENCE_V1.zip",
+    "archive_sha256": "dde0bc3215f887df4e3a9d3ebb10d502743866534f3d64d7955669325f71ae06",
+    "member": "raw/3025_TSLA_US_24_M5.csv",
+    "source_environment": "Pepperstone - Europe LIVE",
+    "resolution": "M5"
+  },
+  "contamination_audit": {
+    "original_exact_M5_ORB_outcome_interval": [
+      "2025-09-16T00:00:00Z",
+      "2026-09-16T23:59:59Z"
+    ],
+    "prior_TSLA_M15_ORB_outcome_interval": [
+      "2025-06-16T00:00:00Z",
+      "2025-09-14T23:59:59Z"
+    ],
+    "proposed_exact_M5_interval": [
+      "2025-01-02T00:00:00Z",
+      "2025-06-13T23:59:59Z"
+    ],
+    "disjoint_from_original_exact_M5": true,
+    "disjoint_from_prior_M15_test": true,
+    "prior_cross_sectional_use_on_same_raw_interval_does_not_disqualify": true,
+    "exact_TSLA_M5_ORB_outcomes_previously_opened_on_proposed_interval": false
+  },
+  "outcome_blind_timestamp_preflight": {
+    "rows_through_2025_06_13": 31401,
+    "complete_regular_session_dates_09_30_through_15_35_exact_M5": 112,
+    "distinct_iso_weeks": 24,
+    "first_complete_session": "2025-01-02",
+    "last_complete_session": "2025-06-13",
+    "proposed_support_gate": {
+      "completed_events_min": 60,
+      "distinct_dates_min": 60,
+      "distinct_iso_weeks_min": 15,
+      "retention_fraction_min": 0.9
+    },
+    "support_capacity_feasible": true,
+    "price_breakout_events_opened": false,
+    "returns_opened": false
+  },
+  "design_choice": {
+    "parameter_family": "ALL_12_ORIGINAL_EXACT_M5_TSLA_ORB_CELLS",
+    "reason": "ORIGINAL_DESIGN_EVIDENCE_SHOWED_BROAD_10_OF_12_ECONOMIC_SUPPORT_WITHIN_TSLA_SO_NO_POSTOUTCOME_PARAMETER_NARROWING_IS_NEEDED_OR_ALLOWED"
+  },
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0
+}
