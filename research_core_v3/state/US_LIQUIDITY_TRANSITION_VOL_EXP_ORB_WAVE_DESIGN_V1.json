@@ -1,0 +1,117 @@
+{
+  "schema": "mxm.research-core-v3.us-liquidity-transition-vol-exp-orb-wave-design.v1",
+  "status": "FROZEN_PREOUTCOME_READY_EXISTING_RAW",
+  "selection_audit_ref": "research_core_v3/state/ADAPTIVE_HIERARCHICAL_FRONTIER_WAVE2_SELECTION_AUDIT_V1.json",
+  "mechanism_id": "US_LIQUIDITY_TRANSITION_VOLATILITY_EXPANSION_ORB_CONTINUATION",
+  "evaluation_interval_utc": {
+    "start": "2025-09-16T00:00:00Z",
+    "end": "2026-06-14T23:59:59Z"
+  },
+  "resolution": "M5",
+  "common_family": {
+    "timezone": "America/New_York",
+    "session_anchor_local": "09:30",
+    "opening_range_minutes": [
+      15,
+      30
+    ],
+    "opening_range_semantics": {
+      "OR15": "HIGH_MAX_LOW_MIN_OF_EXACT_M5_BARS_09_30_09_35_09_40_LOCAL",
+      "OR30": "HIGH_MAX_LOW_MIN_OF_EXACT_M5_BARS_09_30_THROUGH_09_55_LOCAL"
+    },
+    "breakout_watch_bars": 12,
+    "breakout_watch_minutes": 60,
+    "signal": "FIRST_COMPLETED_M5_CLOSE_AFTER_OPENING_RANGE_STRICTLY_ABOVE_OR_HIGH_OR_BELOW_OR_LOW_WITHIN_12_BAR_WATCH_AND_EVENT_BAR_RANGE_AT_LEAST_1_5_TIMES_MEDIAN_HIGH_LOW_RANGE_OF_PRECEDING_24_CONTIGUOUS_M5_BARS",
+    "expansion_ratio": 1.5,
+    "entry": "NEXT_CONTIGUOUS_EXACT_M5_OPEN_AFTER_BREAKOUT_BAR",
+    "direction": "CONTINUATION_OF_BREAKOUT",
+    "hold_bars": [
+      6,
+      12
+    ],
+    "hold_minutes": [
+      30,
+      60
+    ],
+    "exit": "NEXT_CONTIGUOUS_M5_OPEN_AFTER_HOLD_BARS_COMPLETED_POST_ENTRY",
+    "one_event_per_local_date_per_cell": true,
+    "gap_policy": "FAIL_CLOSED_NO_GAP_BRIDGING_INTERPOLATION_OR_SYNTHETIC_FILL",
+    "parameter_topology": "OPENING_RANGE_15_30_X_HOLD_6_12_EQUALS_4_CELLS_PER_SYMBOL",
+    "support_gate": {
+      "completed_events_min": 60,
+      "distinct_dates_min": 60,
+      "distinct_iso_weeks_min": 20,
+      "retention_fraction_min": 0.9
+    },
+    "economic_gross_gate": {
+      "mean_gross_bps_min": 8,
+      "median_gross_bps_min": 0,
+      "chronological_thirds_each_mean_strictly_positive": true,
+      "top10pct_abs_event_concentration_max": 0.5
+    },
+    "multiplicity": {
+      "scope": "SEPARATE_4_CELL_MAXT_PER_SYMBOL",
+      "cluster": "ISO_WEEK",
+      "resamples": 4999,
+      "seed": 20261001,
+      "alpha": 0.05,
+      "no_cross_symbol_pooling": true
+    },
+    "robust_region": {
+      "minimum_connected_full_pass_cells": 3,
+      "minimum_varied_dimensions": 2,
+      "adjacency": "ONE_STEP_IN_OR_MINUTES_OR_HOLD",
+      "single_cell_promotion_forbidden": true
+    },
+    "path_diagnostic": {
+      "horizon_minutes": 120,
+      "metrics": [
+        "MFE",
+        "MAE",
+        "time_to_MFE",
+        "time_to_first_positive",
+        "realized_exit",
+        "MFE_minus_realized_exit"
+      ],
+      "primary_gate_effect": false
+    },
+    "friction_boundary": "ONLY_AFTER_CONNECTED_ROBUST_MATERIAL_GROSS_REGION",
+    "permanent_close": "CLOSE_ONLY_SYMBOL_LOCAL_US_LIQUIDITY_TRANSITION_VOL_EXP_ORB_REGION_IF_NO_3_CELL_CONNECTED_FULL_PASS;NO_SAME_OUTCOME_OR_HOLD_EXPANSION_RESCUE"
+  },
+  "hypotheses": [
+    {
+      "symbol_id": 98,
+      "broker_symbol": "ZARJPY",
+      "family": "ZARJPY_4_CELL"
+    },
+    {
+      "symbol_id": 146,
+      "broker_symbol": "JPYX",
+      "family": "JPYX_4_CELL"
+    },
+    {
+      "symbol_id": 2917,
+      "broker_symbol": "JPN225-F",
+      "family": "JPN225-F_4_CELL"
+    },
+    {
+      "symbol_id": 251,
+      "broker_symbol": "NatGas",
+      "family": "NatGas_4_CELL"
+    },
+    {
+      "symbol_id": 7393,
+      "broker_symbol": "WTOIL-PERP",
+      "family": "WTOIL-PERP_4_CELL"
+    },
+    {
+      "symbol_id": 95,
+      "broker_symbol": "XPDUSD",
+      "family": "XPDUSD_4_CELL"
+    }
+  ],
+  "wave_continuation_policy": "EVALUATE_ALL_SIX;GROSS_SURVIVORS_ROUTE_TO_FRICTION_AFTER_WAVE;REMAINING_HYPOTHESES_NEVER_REDIGNED_FROM_EARLY_OUTCOMES",
+  "classification_if_fail": "LOCAL_REGION_CLOSED_NOT_CONCEPTUAL_SESSION_OR_BREAKOUT_EXHAUSTION",
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0
+}
