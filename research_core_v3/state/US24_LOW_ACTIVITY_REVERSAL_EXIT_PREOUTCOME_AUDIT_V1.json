@@ -1,0 +1,59 @@
+{
+  "schema": "mxm.research-core-v3.us24-low-activity-reversal-exit-preoutcome-audit.v1",
+  "status": "PASS_UNTOUCHED_ANNUAL_EVIDENCE_AND_SUPPORT_FEASIBLE_TWO_STAGE_SPLIT",
+  "source_archives": {
+    "selected_m5_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "high_quality_delta_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+  },
+  "exact_mechanism": "US24_LOW_ACTIVITY_REVERSAL_L10_K2_WITH_BROKER_NATIVE_ACTIVITY_RANK",
+  "contamination_audit": {
+    "exposed_path_interval": [
+      "2025-01-02T00:00:00Z",
+      "2025-09-14T23:59:59Z"
+    ],
+    "annual_candidate_interval": [
+      "2025-09-16T00:00:00Z",
+      "2026-09-16T23:59:59Z"
+    ],
+    "intervals_disjoint": true,
+    "annual_price_only_cross_sectional_outcomes_exist": true,
+    "annual_single_symbol_tick_volume_outcomes_exist": true,
+    "annual_exact_combined_return_x_activity_portfolio_outcomes_previously_opened": false,
+    "annual_exit_architecture_outcomes_previously_opened": false,
+    "interpretation": "PRIOR_USE_OF_THE_RAW_SYMBOLS_FOR_UNRELATED_PRICE_ONLY_OR_SINGLE_SYMBOL_ACTIVITY_MECHANISMS_DOES_NOT_CONTAMINATE_THIS_EXACT_COMBINED_HYPOTHESIS"
+  },
+  "outcome_blind_support_preflight": {
+    "panel_dates_with_breadth_ge_20": 249,
+    "first_feature_eligible_low_activity_reversal_signal_date": "2025-10-14",
+    "stage_A": {
+      "interval": [
+        "2025-09-16T00:00:00Z",
+        "2026-06-14T23:59:59Z"
+      ],
+      "fixed_H1_nonoverlap_attempt_capacity": 81,
+      "distinct_iso_weeks_capacity": 35,
+      "frozen_support_min_completed": 60,
+      "support_feasible": true
+    },
+    "stage_B": {
+      "interval": [
+        "2026-06-15T00:00:00Z",
+        "2026-09-16T23:59:59Z"
+      ],
+      "same_day_entry_opportunity_capacity": 55,
+      "distinct_iso_weeks_capacity": 14,
+      "proposed_support_min_completed": 40,
+      "proposed_support_min_weeks": 12,
+      "support_feasible": true,
+      "all_exit_architectures_have_mandatory_15_55_local_fallback": true
+    },
+    "post_entry_returns_opened_during_preflight": false,
+    "MFE_MAE_opened_on_annual_data": false
+  },
+  "design_lesson": {
+    "old_H2_support_defect_not_repeated": true,
+    "new_exit_stage_support_gate_selected_from_outcome_blind_capacity": true,
+    "same_exposed_preV3_outcomes_not_reused": true
+  },
+  "protected_forward_opened": false
+}

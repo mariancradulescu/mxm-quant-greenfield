@@ -1,0 +1,108 @@
+{
+  "schema": "mxm.research-core-v3.us24-low-activity-reversal-two-stage-exit-design.v1",
+  "status": "FROZEN_PREOUTCOME_TWO_STAGE_ENTRY_CONFIRMATION_THEN_EXIT_HOLDOUT",
+  "rerank_ref": "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V3.json",
+  "preoutcome_audit_ref": "research_core_v3/state/US24_LOW_ACTIVITY_REVERSAL_EXIT_PREOUTCOME_AUDIT_V1.json",
+  "source": "Pepperstone cTrader Open API accepted annual raw M5 archives only",
+  "universe": "SAME_FIXED_31_US24_PANEL_FROM_THE_FROZEN_RETURN_X_ACTIVITY_DESIGN",
+  "common_entry": {
+    "activity_context": "LOW_ACTIVITY_ONLY_ACTIVITY_RANK_LT_0_5",
+    "orientation": "REVERSAL_LONG_LOWEST_RETURN_SHORT_HIGHEST_RETURN",
+    "lookback_sessions": 10,
+    "selection_k_each_side": 2,
+    "weighting": "EQUAL_ABSOLUTE_NOTIONAL_PER_LEG_TOTAL_LONG_0_5_TOTAL_SHORT_0_5",
+    "signal_mark": "AFTER_COMPLETION_OF_REGULAR_SESSION",
+    "entry": "NEXT_PANEL_SESSION_EXACT_09_30_AMERICA_NEW_YORK_M5_OPEN",
+    "tie_break": "SYMBOL_ID_ASCENDING",
+    "minimum_cross_section_breadth": 20,
+    "activity_baseline_sessions": 20,
+    "activity_ratio": "CURRENT_COMPLETE_REGULAR_SESSION_TICK_VOLUME_DIV_MEDIAN_PREVIOUS_20_COMPLETE_SESSION_TICK_VOLUMES",
+    "no_leg_replacement": true
+  },
+  "stage_A_entry_replication": {
+    "role": "DISJOINT_CONFIRMATION_OF_SELECTED_ENTRY_ARCHITECTURE_BEFORE_EXIT_HOLDOUT_IS_OPENED",
+    "interval": [
+      "2025-09-16T00:00:00Z",
+      "2026-06-14T23:59:59Z"
+    ],
+    "exit": "EXACT_NEXT_PANEL_SESSION_09_30_M5_OPEN_AFTER_ONE_HOLD_SESSION",
+    "nonoverlap": "MATCH_ORIGINAL_H1_WITHIN_CELL_NONOVERLAP",
+    "support_gate": {
+      "completed_events_min": 60,
+      "distinct_entry_dates_min": 60,
+      "distinct_iso_weeks_min": 20,
+      "retention_fraction_min": 0.8
+    },
+    "economic_gate": {
+      "mean_gross_bps_min": 10,
+      "median_gross_bps_min": 0,
+      "chronological_thirds_each_mean_strictly_positive": true,
+      "top10pct_abs_event_concentration_max": 0.5
+    },
+    "inference": {
+      "family": "ONE_PRESELECTED_DISJOINT_CONFIRMATORY_HYPOTHESIS",
+      "method": "5_TRADING_SESSION_BLOCK_WILD_SIGN_ONE_SIDED_TEST",
+      "resamples": 4999,
+      "seed": 20261001,
+      "alpha": 0.05,
+      "selection_multiplicity_interpretation": "PREVIOUS_SELECTION_IS_PAID_BY_GENUINELY_DISJOINT_CONFIRMATION_NOT_BY_REUSING_THE_DISCOVERY_PVALUE"
+    },
+    "pass_rule": "ALL_SUPPORT_ECONOMIC_AND_P_LE_0_05",
+    "fail_rule": "IF_STAGE_A_FAILS_DO_NOT_OPEN_STAGE_B_EXIT_OUTCOMES;PARK_EXIT_QUESTION_AND_RETURN_TO_FRONTIER"
+  },
+  "stage_B_exit_holdout": {
+    "access_condition": "ONLY_IF_STAGE_A_PASSES_ALL_FROZEN_GATES",
+    "interval": [
+      "2026-06-15T00:00:00Z",
+      "2026-09-16T23:59:59Z"
+    ],
+    "support_gate": {
+      "completed_events_min": 40,
+      "distinct_entry_dates_min": 40,
+      "distinct_iso_weeks_min": 12,
+      "retention_fraction_min": 0.8
+    },
+    "economic_gate": {
+      "mean_gross_bps_min": 10,
+      "median_gross_bps_min": 0,
+      "chronological_thirds_each_mean_strictly_positive": true,
+      "top10pct_abs_event_concentration_max": 0.5
+    },
+    "exit_architectures": [
+      {
+        "id": "FINAL_REGULAR_BAR_1555",
+        "semantics": "EXIT_ALL_4_LEGS_AT_EXACT_15_55_AMERICA_NEW_YORK_M5_OPEN_ON_ENTRY_DATE"
+      },
+      {
+        "id": "RELATIVE_RANK_CROSSOVER_WITH_1555_FALLBACK",
+        "semantics": "AFTER_EACH_COMPLETED_M5_BAR_FROM_09_35_THROUGH_15_50_RECOMPUTE_CAUSAL_INTRADAY_10_SESSION_RETURN_RANK_USING_CURRENT_M5_CLOSE;EXIT_NEXT_CONTIGUOUS_M5_OPEN_WHEN_MEAN_ORIGINAL_LONG_RANK_GE_MEAN_ORIGINAL_SHORT_RANK;OTHERWISE_EXIT_15_55_OPEN"
+      },
+      {
+        "id": "ACTIVITY_STATE_TRANSITION_WITH_1555_FALLBACK",
+        "semantics": "AT_COMPLETED_30_MINUTE_CHECKPOINTS_10_00_THROUGH_15_30_COMPUTE_EACH_SYMBOL_CUMULATIVE_SESSION_TICK_VOLUME_RATIO_VS_MEDIAN_PRIOR_20_COMPLETE_SESSIONS_THROUGH_SAME_CLOCK_AND_CROSS_SECTIONAL_ACTIVITY_RANK;EXIT_NEXT_M5_OPEN_WHEN_MEAN_ACTIVITY_RANK_OF_THE_4_SELECTED_LEGS_GE_0_5;OTHERWISE_EXIT_15_55_OPEN"
+      },
+      {
+        "id": "FIRST_POSITIVE_PORTFOLIO_RESPONSE_WITH_1555_FALLBACK",
+        "semantics": "AFTER_EACH_COMPLETED_M5_BAR_FROM_09_35_THROUGH_15_50_COMPUTE_EQUAL_WEIGHT_4_LEG_MARK_TO_MARKET_LOG_RETURN_FROM_ENTRY;EXIT_NEXT_CONTIGUOUS_M5_OPEN_AT_FIRST_STRICTLY_POSITIVE_PORTFOLIO_RESPONSE;OTHERWISE_EXIT_15_55_OPEN"
+      }
+    ],
+    "multiplicity": {
+      "family": "ALL_4_INTERCHANGEABLE_EXIT_ARCHITECTURES",
+      "method": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+      "resamples": 4999,
+      "seed": 20261001,
+      "familywise_alpha": 0.05,
+      "no_postoutcome_narrowing": true
+    },
+    "survivor_rule": "SUPPORT_PLUS_ECONOMIC_PLUS_FAMILYWISE_P_LE_0_05_CREATES_EXIT_DISCOVERY_SURVIVOR_ONLY;NO_FRICTION_OR_CANDIDATE_FREEZE_UNTIL_GENUINELY_DISJOINT_CONFIRMATION",
+    "no_single_winner_as_confirmation": true,
+    "path_diagnostic_role": "DIAGNOSTIC_ONLY"
+  },
+  "governance": {
+    "stage_B_outcomes_must_remain_unopened_until_stage_A_pass": true,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "runtime_v2_read_only": true
+  }
+}
