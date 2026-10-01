@@ -1,0 +1,108 @@
+{
+  "schema": "mxm.research-core-v3.mean-reversion-same-symbol-temporal-untouched-audit.v1",
+  "status": "EXISTING_M5_BYTES_INSUFFICIENT_MINIMAL_PRE_EXPOSURE_M5_ACQUISITION_REQUIRED",
+  "reconciled_live_head": "2800c6121d9afeacf42d23f58930cdf4cc82bff2",
+  "frozen_architecture": {
+    "id": "HALF_REVERSION_PROGRESS_VOL_TRAIL_V1",
+    "design_ref": "research_core_v3/state/MEAN_REVERSION_PROGRESS_VOL_TRAIL_DEVELOPMENT_DESIGN_V1.json",
+    "design_commit": "5b412dd57d66e14e361b33b0bbf90ba9b681c14a",
+    "retuning_forbidden": true
+  },
+  "prior_7_symbol_transfer_result": {
+    "ref": "research_core_v3/state/MEAN_REVERSION_PROGRESS_VOL_TRAIL_DEVELOPMENT_RESULT_V1.json",
+    "status": "COMPLETE_UNTOUCHED_DEVELOPMENT_NO_ECONOMIC_HEADROOM",
+    "preserved_unchanged": true
+  },
+  "target_symbols": [
+    {
+      "symbol": "USDZAR",
+      "symbol_id": 49,
+      "exposed_m5_start_utc": "2025-09-16T00:00:00Z",
+      "exposed_m5_end_utc": "2026-09-16T23:50:00Z",
+      "exposed_series_sha256": "15040719c3d1f618066842b7662da94874a4895f8565f9bdba1e5d23f50da513",
+      "pre_exposure_existing_m5": false
+    },
+    {
+      "symbol": "GBPSEK",
+      "symbol_id": 61,
+      "exposed_m5_start_utc": "2025-09-16T00:00:00Z",
+      "exposed_m5_end_utc": "2026-09-16T23:50:00Z",
+      "exposed_series_sha256": "81c67e6c5481e18061801902e9674a15bff7b5ef4af945c481f69b6da97df6d2",
+      "pre_exposure_existing_m5": false
+    },
+    {
+      "symbol": "NOKSEK",
+      "symbol_id": 87,
+      "exposed_m5_start_utc": "2025-09-16T00:00:00Z",
+      "exposed_m5_end_utc": "2026-09-16T23:50:00Z",
+      "exposed_series_sha256": "7ada725ddda6fcbb91d6716aed2d9f0e6e6a28e990fdd85f584b4e4aacdc9a81",
+      "pre_exposure_existing_m5": false,
+      "older_broker_h1_verified_start_utc": "2024-03-01T15:00:00Z"
+    },
+    {
+      "symbol": "AUDNOK",
+      "symbol_id": 2764,
+      "exposed_m5_start_utc": "2025-09-16T00:00:00Z",
+      "exposed_m5_end_utc": "2026-09-16T23:50:00Z",
+      "exposed_series_sha256": "da7fa8ec663eafa5003ef8f65fa91646dbddc851c8b35b57d0021ac9a1633361",
+      "pre_exposure_existing_m5": false,
+      "older_broker_h1_verified_start_utc": "2024-03-01T15:00:00Z"
+    },
+    {
+      "symbol": "CADSGD",
+      "symbol_id": 2767,
+      "exposed_m5_start_utc": "2025-09-16T00:00:00Z",
+      "exposed_m5_end_utc": "2026-09-16T23:50:00Z",
+      "exposed_series_sha256": "f0bbcae5c6d429e4fea9afa30952b33e6bafc77d87cdfb10b05b9117b1a7c7b0",
+      "pre_exposure_existing_m5": false,
+      "older_broker_h1_verified_start_utc": "2024-03-01T15:00:00Z"
+    },
+    {
+      "symbol": "EURILS",
+      "symbol_id": 2785,
+      "exposed_m5_start_utc": "2025-09-16T00:00:00Z",
+      "exposed_m5_end_utc": "2026-09-16T23:50:00Z",
+      "exposed_series_sha256": "e7adbb795bda49f764de2a81323330ba11e0ea6b53a7c8617542dd6bb71d3a82",
+      "pre_exposure_existing_m5": false
+    }
+  ],
+  "exposure_authority": {
+    "source_capture": "MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_M5.zip",
+    "source_capture_interval": [
+      "2025-09-16T00:00:00Z",
+      "2026-09-16T23:59:59Z"
+    ],
+    "path_result_ref": "research_core_v3/state/H24_H48_MEAN_REVERSION_PATH_DIAGNOSTIC_RESULT_V1.json",
+    "adaptive_exit_result_ref": "research_core_v3/state/MEAN_REVERSION_ADAPTIVE_EXIT_DEVELOPMENT_RESULT_V1.json",
+    "conservative_rule": "ENTIRE_SOURCE_M5_INTERVAL_FOR_THE_SIX_SYMBOLS_IS_TREATED_AS_MEAN_REVERSION_OUTCOME_EXPOSED"
+  },
+  "existing_archive_audit": {
+    "checked": [
+      "MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_M5.zip",
+      "MXM_RESEARCH_CORE_V3_SELECTED_M5_DEVELOPMENT.zip",
+      "MXM_A007_WAREHOUSE_MXM-A007-CCORE-20260831T084500Z-V4.zip",
+      "MXM_A011_WAREHOUSE_MXM-A011-FULL-UNIVERSE-H1-V3-30M.zip",
+      "MXM_A031_FINAL_DIVERSIFIED_M5_WAREHOUSE_MXM-A031-FINAL-DIVERSIFIED-M5-20260902-V1.zip",
+      "MXM_A047_TARGETED_CAD_M5_WAREHOUSE_MXM-A047-CAD-M5-20260902-V1.zip"
+    ],
+    "sufficient_existing_pre_exposure_M5": false,
+    "h1_cannot_substitute_for_frozen_m5_exit_semantics": true
+  },
+  "selected_untouched_interval": {
+    "start_utc": "2025-06-16T00:00:00Z",
+    "end_utc": "2025-09-14T23:59:59Z",
+    "duration_weeks": 13,
+    "rationale": "EXACT_13_COMPLETE_UTC_ISO_WEEKS_IMMEDIATELY_BEFORE_A_FULL_ONE_DAY_GAP_AND_THE_2025_09_16_EXPOSURE_FLOOR",
+    "selected_without_mean_reversion_outcomes": true
+  },
+  "acquisition_decision": {
+    "required": true,
+    "scope": "EXACT_SIX_TARGET_SYMBOLS_M5_ONLY_EXACT_13_WEEK_INTERVAL",
+    "broad_frontier_collection": false,
+    "raw_ticks": false,
+    "automatic_extra_acquisition": false,
+    "protected_forward_opened": false,
+    "external_market_data": false,
+    "broker_history_evidence": "OLDER_H1_HISTORY_TO_2024_CONFIRMS_BROKER_DEPTH_FOR_THREE_TARGETS;M5_PRE_EXPOSURE_AVAILABILITY_FOR_ALL_SIX_MUST_BE_ESTABLISHED_BY_THE_FROZEN_MINIMAL_CAPTURE_ITSELF"
+  }
+}
