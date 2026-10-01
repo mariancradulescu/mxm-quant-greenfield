@@ -43,7 +43,11 @@
   "frozen_design": {
     "test_count": 72,
     "relationships": 6,
-    "holding_seconds": [15, 60, 180],
+    "holding_seconds": [
+      15,
+      60,
+      180
+    ],
     "support_prerequisites": {
       "completed_events_min": 80,
       "distinct_sample_dates_min": 16,
@@ -51,8 +55,8 @@
       "retention_fraction_min": 0.8
     },
     "economic_gate": {
-      "mean_spread_net_bps_min": 2.0,
-      "median_spread_net_bps_min": 0.0,
+      "mean_spread_net_bps_min": 2,
+      "median_spread_net_bps_min": 0,
       "all_chronological_thirds_mean_strictly_positive": true,
       "top10pct_abs_concentration_max": 0.5
     },
@@ -91,7 +95,7 @@
   "maxT": {
     "all_support_eligible_observed_means_negative": true,
     "all_support_eligible_observed_t_stats_nonpositive": true,
-    "all_72_familywise_p_values": 1.0,
+    "all_72_familywise_p_values": 1,
     "reason": "39 support-eligible cells all have negative observed spread-net mean under the frozen one-sided positive alternative; 33 support-ineligible cells are predeclared p=1"
   },
   "best_observed_all_cells": {
@@ -104,7 +108,7 @@
     "mean_spread_net_bps": 0.7500238347430099,
     "median_spread_net_bps": 0.799530746903724,
     "support_eligible": false,
-    "p_familywise": 1.0
+    "p_familywise": 1
   },
   "other_positive_mean_cell": {
     "cell_id": "EURJPY_TO_EURGBP|L5|I2.5|H180",
@@ -115,7 +119,7 @@
     "distinct_iso_weeks": 7,
     "mean_spread_net_bps": 0.35266319663242457,
     "support_eligible": false,
-    "p_familywise": 1.0
+    "p_familywise": 1
   },
   "best_support_eligible_cell": {
     "cell_id": "AUDCAD_TO_GBPCAD|L15|I2.5|H180",
@@ -128,19 +132,59 @@
     "median_spread_net_bps": -0.24114715835424966,
     "cluster_se_bps": 0.16451555480419897,
     "t_stat": -1.5567896597161304,
-    "chronological_thirds_mean_bps": [-0.2106587010737041, -0.3235423220247363, -0.23414732064647725],
-    "p_familywise": 1.0,
+    "chronological_thirds_mean_bps": [
+      -0.2106587010737041,
+      -0.3235423220247363,
+      -0.23414732064647725
+    ],
+    "p_familywise": 1,
     "economic_pass": false,
     "multiplicity_pass": false,
     "full_pass": false
   },
   "relationship_summary": [
-    {"relationship_id":"AUDCAD_TO_GBPCAD","frozen_cells":12,"support_eligible_cells":9,"positive_mean_support_cells":0,"best_support_mean_net_bps":-0.2561161145816393},
-    {"relationship_id":"EURGBP_TO_EURJPY","frozen_cells":12,"support_eligible_cells":12,"positive_mean_support_cells":0,"best_support_mean_net_bps":-0.408482899559889},
-    {"relationship_id":"EURGBP_TO_GBPCAD","frozen_cells":12,"support_eligible_cells":12,"positive_mean_support_cells":0,"best_support_mean_net_bps":-0.5443718648621232},
-    {"relationship_id":"EURJPY_TO_EURGBP","frozen_cells":12,"support_eligible_cells":0,"positive_mean_support_cells":0,"best_observed_mean_net_bps":0.35266319663242457},
-    {"relationship_id":"GBPCAD_TO_AUDCAD","frozen_cells":12,"support_eligible_cells":6,"positive_mean_support_cells":0,"best_support_mean_net_bps":-0.41347441241552707},
-    {"relationship_id":"GBPCAD_TO_EURGBP","frozen_cells":12,"support_eligible_cells":0,"positive_mean_support_cells":0,"best_observed_mean_net_bps":-0.1156506696116811}
+    {
+      "relationship_id": "AUDCAD_TO_GBPCAD",
+      "frozen_cells": 12,
+      "support_eligible_cells": 9,
+      "positive_mean_support_cells": 0,
+      "best_support_mean_net_bps": -0.2561161145816393
+    },
+    {
+      "relationship_id": "EURGBP_TO_EURJPY",
+      "frozen_cells": 12,
+      "support_eligible_cells": 12,
+      "positive_mean_support_cells": 0,
+      "best_support_mean_net_bps": -0.408482899559889
+    },
+    {
+      "relationship_id": "EURGBP_TO_GBPCAD",
+      "frozen_cells": 12,
+      "support_eligible_cells": 12,
+      "positive_mean_support_cells": 0,
+      "best_support_mean_net_bps": -0.5443718648621232
+    },
+    {
+      "relationship_id": "EURJPY_TO_EURGBP",
+      "frozen_cells": 12,
+      "support_eligible_cells": 0,
+      "positive_mean_support_cells": 0,
+      "best_observed_mean_net_bps": 0.35266319663242457
+    },
+    {
+      "relationship_id": "GBPCAD_TO_AUDCAD",
+      "frozen_cells": 12,
+      "support_eligible_cells": 6,
+      "positive_mean_support_cells": 0,
+      "best_support_mean_net_bps": -0.41347441241552707
+    },
+    {
+      "relationship_id": "GBPCAD_TO_EURGBP",
+      "frozen_cells": 12,
+      "support_eligible_cells": 0,
+      "positive_mean_support_cells": 0,
+      "best_observed_mean_net_bps": -0.1156506696116811
+    }
   ],
   "interpretation": {
     "primary_status": "PARKED_FROZEN_72_CELL_SPREAD_NET_NULL",
@@ -150,6 +194,5 @@
     "eur200_sizing_margin_gate_required": false,
     "protected_forward_opened": false,
     "authoritative_frontier_1576_closed": false
-  },
-  "canonical_sha256": "1c655303f23d65ba7eb6eff7ef758f5fb74f3855895a8560c26501301d1ac838"
+  }
 }
