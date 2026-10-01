@@ -1,0 +1,100 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-pair-quote-lead-lag-path-diagnostic-result.v1",
+  "status": "COMPLETE_DIAGNOSTIC_ONLY_NO_EXIT_RESCUE_JUSTIFIED",
+  "primary_result_ref": "research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PRIMARY_RESULT_V1.json",
+  "evidence_bundle_sha256": "27d754f9fbc80213a2c9824bb9e8c5dda45fafc78ab6bd27baf51aa22e93867b",
+  "diagnostic_freeze_sha256": "e7e1e196263e9e06a0c33a0e411554f9523d8c37365c29cb5ea90b0574f0839d",
+  "diagnostic_horizon_seconds": 900,
+  "role": "DIAGNOSTIC_ONLY_CANNOT_ALTER_PRIMARY_72_CELL_RESULT_OR_ENTER_MAXT",
+  "coverage": {
+    "entry_available_rows": 22958,
+    "mean_diagnostic_coverage_fraction_all_entry_rows": 0.9093128512723953,
+    "minimum_diagnostic_coverage_fraction_all_entry_rows": 0.3318534961154273,
+    "support_cell_completed_rows": 19221,
+    "mean_diagnostic_coverage_fraction_support_completed": 0.9203271532748847
+  },
+  "support_eligible_primary_decomposition": {
+    "completed_events": 19221,
+    "mean_directional_mid_price_gross_bps": -0.023472335999227593,
+    "median_directional_mid_price_gross_bps": 0.0,
+    "fraction_directional_mid_positive_at_frozen_exit": 0.4950314759898028,
+    "mean_exact_execution_drag_bps": 0.5466196154106376,
+    "median_exact_execution_drag_bps": 0.5353963943831412,
+    "mean_primary_side_aware_spread_net_bps": -0.5700919514098651,
+    "median_primary_side_aware_spread_net_bps": -0.5403915678625003,
+    "fraction_primary_spread_net_positive": 0.24769783049789293
+  },
+  "support_eligible_15m_path": {
+    "mean_mid_price_MFE_bps": 3.83589156384593,
+    "median_mid_price_MFE_bps": 2.8034052212131058,
+    "mean_mid_price_MAE_bps": 4.2472750312371526,
+    "median_mid_price_MAE_bps": 2.8395684587644654,
+    "mean_executable_side_aware_MFE_bps": 3.286405483686202,
+    "median_executable_side_aware_MFE_bps": 2.286048468865815,
+    "mean_executable_side_aware_MAE_bps": 4.836532943973797,
+    "median_executable_side_aware_MAE_bps": 3.389748464699101,
+    "fraction_with_positive_executable_MFE": 0.879818948025597,
+    "median_time_to_mid_MFE_seconds": 447.0,
+    "median_time_to_first_positive_executable_response_seconds_when_observed": 34.0,
+    "fraction_with_first_positive_executable_response_observed": 0.879818948025597,
+    "mean_executable_MFE_minus_frozen_exit_net_bps": 3.8564974350960672,
+    "median_executable_MFE_minus_frozen_exit_net_bps": 2.889632127128846,
+    "fraction_executable_MFE_gt_frozen_exit_net": 0.9962540970813173,
+    "fraction_executable_MFE_ge_2bps": 0.5410748660319442,
+    "fraction_executable_MFE_ge_3bps": 0.41210134748452215,
+    "fraction_executable_MFE_ge_5bps": 0.21564954997138547,
+    "fraction_executable_MFE_gt_executable_MAE": 0.41428645752042037,
+    "fraction_mid_MFE_gt_mid_MAE": 0.5024712553977421
+  },
+  "chronological_thirds_support_event_means": {
+    "directional_mid_price_gross_bps": [-0.01462475189759545, -0.03793109400984289, -0.017861162090244433],
+    "exact_execution_drag_bps": [0.5652112385590438, 0.5538049635733614, 0.5208426440995075],
+    "primary_side_aware_spread_net_bps": [-0.5798359904566392, -0.5917360575832044, -0.538703806189752],
+    "mid_price_MFE_bps": [4.132107121535341, 3.5459179814836896, 3.8296495885187603],
+    "mid_price_MAE_bps": [4.010412352771304, 3.7585708875455097, 4.972841853394647],
+    "executable_side_aware_MFE_bps": [3.54956522368406, 2.9977680157301783, 3.311883211644367],
+    "executable_side_aware_MAE_bps": [4.679796374414187, 4.322680436797041, 5.507122020710161]
+  },
+  "support_event_summary_by_horizon": [
+    {"holding_seconds":15,"completed_events":9314,"mean_mid_gross_bps":-0.00511524748033864,"mean_execution_drag_bps":0.5471056053149678,"mean_spread_net_bps":-0.5522208527953065,"mean_executable_MFE_bps":3.3373494284565237,"mean_executable_MAE_bps":4.8886067718034205,"median_time_to_mid_MFE_seconds":444.0,"median_time_to_first_positive_executable_seconds":33.0},
+    {"holding_seconds":60,"completed_events":6040,"mean_mid_gross_bps":-0.019466031384521205,"mean_execution_drag_bps":0.5463064992510609,"mean_spread_net_bps":-0.5657725306355822,"mean_executable_MFE_bps":3.2771540578904688,"mean_executable_MAE_bps":4.89750764800824,"median_time_to_mid_MFE_seconds":446.0,"median_time_to_first_positive_executable_seconds":34.0},
+    {"holding_seconds":180,"completed_events":3867,"mean_mid_gross_bps":-0.07394453727612399,"mean_execution_drag_bps":0.5459381340646099,"mean_spread_net_bps":-0.6198826713407338,"mean_executable_MFE_bps":3.178152758114815,"mean_executable_MAE_bps":4.615870196424495,"median_time_to_mid_MFE_seconds":455.0,"median_time_to_first_positive_executable_seconds":36.0}
+  ],
+  "relationship_summary": [
+    {"relationship_id":"AUDCAD_TO_GBPCAD","support_cells":9,"completed_events_all_cells":2931,"mean_mid_gross_bps":-0.03766500342309117,"mean_execution_drag_bps":0.5679849098237485,"mean_net_bps":-0.6056499132468396,"mean_exec_MFE_bps":3.360291467904998,"mean_exec_MAE_bps":4.276770246042308},
+    {"relationship_id":"EURGBP_TO_EURJPY","support_cells":12,"completed_events_all_cells":7829,"mean_mid_gross_bps":-0.0009802476958457658,"mean_execution_drag_bps":0.5462049989798133,"mean_net_bps":-0.547185246675659,"mean_exec_MFE_bps":3.318955204381716,"mean_exec_MAE_bps":5.2675515771300985},
+    {"relationship_id":"EURGBP_TO_GBPCAD","support_cells":12,"completed_events_all_cells":7451,"mean_mid_gross_bps":-0.05881473209331339,"mean_execution_drag_bps":0.5406854951352507,"mean_net_bps":-0.599500227228564,"mean_exec_MFE_bps":3.030182329457583,"mean_exec_MAE_bps":4.555980331053239},
+    {"relationship_id":"EURJPY_TO_EURGBP","support_cells":0,"completed_events_all_cells":887,"mean_mid_gross_bps":0.02054973426868662,"mean_execution_drag_bps":0.14154777710361957,"mean_net_bps":-0.12099804283493301,"mean_exec_MFE_bps":2.7790337928459077,"mean_exec_MAE_bps":2.7439519474022864},
+    {"relationship_id":"GBPCAD_TO_AUDCAD","support_cells":6,"completed_events_all_cells":1346,"mean_mid_gross_bps":0.07950221848041746,"mean_execution_drag_bps":0.5427021568516402,"mean_net_bps":-0.46319993837122275,"mean_exec_MFE_bps":4.886558213971799,"mean_exec_MAE_bps":5.210165902897443},
+    {"relationship_id":"GBPCAD_TO_EURGBP","support_cells":0,"completed_events_all_cells":640,"mean_mid_gross_bps":-0.14517014480420692,"mean_execution_drag_bps":0.14895574205388556,"mean_net_bps":-0.2941258868580925,"mean_exec_MFE_bps":2.574583448235869,"mean_exec_MAE_bps":3.133467207083881}
+  ],
+  "classification": {
+    "dominant": "NO_DIRECTIONAL_PREDICTIVE_EDGE",
+    "secondary": "POSITIVE_EDGE_BUT_FRICTION_DOMINATED_IN_LOCALIZED_CELLS_ONLY",
+    "mixed_by_relationship_or_horizon": true,
+    "favorable_path_not_captured_by_frozen_exit": false,
+    "dominant_problem": "ENTRY_INFORMATION_QUALITY",
+    "secondary_problem": "AUTHENTIC_BID_ASK_EXECUTION_DRAG",
+    "exit_timing_as_primary_problem": false
+  },
+  "interpretation": {
+    "directional_entry_edge": "Across the 39 support-eligible cells the frozen-exit directional mid-price mean is essentially zero and slightly negative; only 49.50% of mid responses are positive.",
+    "spread_effect": "Mean exact side-aware execution drag is about 0.547 bps and converts near-zero gross drift into about -0.570 bps mean spread-net return.",
+    "path_effect": "The 15-minute extrema are large, but executable adverse excursion exceeds favorable excursion on average and in every chronological third; only 41.43% of support events have executable MFE greater than executable MAE.",
+    "timing": "Median mid-MFE occurs about 447 seconds after entry. A positive executable response is seen at least once in 87.98% of support paths, with median first-positive time 34 seconds among those paths, but this eventual crossing is not a stable directional edge.",
+    "exit_rescue_conclusion": "Large ex-post MFE alone does not justify an adaptive exit because comparable or larger MAE and near-zero directional drift are consistent with two-sided price noise rather than a capturable causal path."
+  },
+  "exit_architecture_decision": {
+    "new_prospective_exit_design_frozen": false,
+    "reason": "PATH_EXTREMA_DO_NOT_SHOW_SUFFICIENT_DIRECTIONAL_ASYMMETRY_OR_MAE_COMPATIBILITY_TO_JUSTIFY_CONSUMING_UNTOUCHED_DEVELOPMENT_ON_AN_EXIT_ONLY_RESCUE",
+    "arbitrary_longer_horizon_escalation_forbidden": true,
+    "additional_quote_recollection_required": false
+  },
+  "governance": {
+    "primary_result_changed": false,
+    "candidate_frozen_count": 0,
+    "protected_forward_opened": false,
+    "authoritative_frontier": 1576,
+    "runtime_v2_reactivated": false
+  }
+}
