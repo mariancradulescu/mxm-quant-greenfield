@@ -1,0 +1,20 @@
+{
+  "calendar_binding":{"date_count":26,"symbol_hours":390,"windows_utc":[["00:00:00","01:00:00"],["07:00:00","08:00:00"],["13:00:00","14:00:00"]]},
+  "canonical_sha256":"6376d25d5ab89a937a4fc70c3ed47a9762db31f36a82ddd12372ed881d8df1ce",
+  "causal_feature_law":{"ask_move_bps":"log(ask_t/ask_t-L)*10000","baseline_window_seconds":60,"bid_move_bps":"log(bid_t/bid_t-L)*10000","directional_side_leader":"LONG when bid_move_bps>0, mid_t>mid_t-L, and abs(bid_move_bps)/(abs(bid_move_bps)+abs(ask_move_bps))>=0.70; SHORT when ask_move_bps<0, mid_t<mid_t-L, and abs(ask_move_bps)/(abs(bid_move_bps)+abs(ask_move_bps))>=0.70; denominator must be >0","median_spread_baseline":"median valid spread_bps t-60..t-1; require >0","minimum_valid_baseline_snapshots":45,"side_move_lookback_seconds":[2,5],"signal":"directional side leader + spread state filter + spread_compression_units >= frozen threshold","spread_compression_units":"(spread_bps_t_minus_L - spread_bps_t) / median_spread_baseline","spread_state_filter":"spread_bps_t <= median_spread_baseline"},
+  "cells_per_symbol":24,
+  "execution_and_response":{"base_direction":"LONG/SHORT from directional_side_leader","catchup_continuation":"trade base_direction","entry":"fresh side-aware quote at t+1 second","exit":"fresh side-aware quote exactly holding_seconds after entry","long_spread_net_bps":"log(exit_bid/entry_ask)*10000","missing":"entry or exit not fresh => right-censor; no delay search/interpolation/stale repair","overlap":"one open event per symbol x frozen cell","short_spread_net_bps":"log(entry_bid/exit_ask)*10000","signal_time":"integer second t after all ticks timestamped <=t processed","snapback_reversion":"trade opposite base_direction"},
+  "family":"BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "governance":{"candidate_freeze_from_pilot":false,"pilot_null_does_not_close_1576_frontier":true,"post_outcome_rescue_forbidden":true,"protected_forward_opened":false,"robust_survivor_next_step":"freeze disjoint remaining-DEVELOPMENT confirmation plus commission/volume/margin/EUR200 gate"},
+  "multiplicity":{"dependence_cluster":"sampled UTC date","family":"all 120 frozen cells","familywise_alpha":0.05,"procedure":"shared sampled-date wild-sign max-T","resamples":4999,"seed":20261001,"support_rule_predeclared":"all cells family members; only support-eligible cells generate finite max-T statistics; others p=1"},
+  "parameter_grid":{"direction_law":["CATCHUP_CONTINUATION","SNAPBACK_REVERSION"],"holding_seconds":[3,10,30],"minimum_spread_compression_units":[0.5,1.0],"side_move_lookback_seconds":[2,5]},
+  "pilot_symbols":[{"symbol":"EURJPY","symbol_id":3},{"symbol":"EURGBP","symbol_id":9},{"symbol":"AUDCAD","symbol_id":18},{"symbol":"GBPCAD","symbol_id":19},{"symbol":"JPN225","symbol_id":116}],
+  "preoutcome_audit_sha256":"eccff5b0e549c5d899d8e5169fcd07249c6b9e017c3e885731809004b22c0a2f",
+  "quote_state":{"ask":"latest ASK tick at or before snapshot second","bid":"latest BID tick at or before snapshot second","freshness":"both sides age <=2000 ms and ask>=bid>0","grid":"integer UTC seconds","mid":"(bid+ask)/2","spread_bps":"log(ask/bid)*10000"},
+  "robust_region_gate":{"adjacency":"one step in lookback, compression threshold, or horizon","cross_direction_adjacency_forbidden":true,"minimum_connected_full_pass_cells":3,"minimum_varied_parameter_dimensions":2,"single_cell_promotion_forbidden":true,"within":"same symbol and same direction_law"},
+  "schema":"mxm.research-core-v3.quote-side-catchup-development-design.v1",
+  "status":"FROZEN_PREOUTCOME_BEFORE_NEW_TICK_ACQUISITION",
+  "subfamily":"QUOTE_SIDE_CATCHUP_AFTER_DIRECTIONAL_SPREAD_COMPRESSION",
+  "support_and_economic_gate":{"chronological_event_count_thirds_each_mean_strictly_positive":true,"completed_events_min":100,"distinct_iso_weeks_min":10,"distinct_sample_dates_min":17,"mean_spread_net_bps_min":2.0,"median_spread_net_bps_min":0.0,"retention_fraction_min":0.8,"top10pct_abs_event_concentration_max":0.5},
+  "test_count":120
+}
