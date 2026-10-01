@@ -1,0 +1,107 @@
+{
+  "schema": "mxm.research-core-v3.shbusd-m5-volatility-compression-temporal-generalization-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_ANY_NEW_RAW_M5_EVALUATION",
+  "preoutcome_audit_ref": "research_core_v3/state/SHBUSD_M5_VOLATILITY_COMPRESSION_TEMPORAL_PREOUTCOME_AUDIT_V1.json",
+  "symbol": {
+    "symbol_id": 7192,
+    "broker_symbol": "SHBUSD"
+  },
+  "resolution": "M5",
+  "source": "Pepperstone cTrader Open API only",
+  "classification": "DEVELOPMENT_ONLY_TEMPORAL_GENERALIZATION",
+  "evaluation_interval_requested_utc": [
+    "2025-01-02T00:00:00Z",
+    "2025-09-14T23:59:59Z"
+  ],
+  "signal": {
+    "exact_contiguity_seconds": 300,
+    "long_volatility_window_returns": 72,
+    "short_volatility_window_returns": 12,
+    "robust_scale": "1.4826*median(abs(close-to-close log returns))",
+    "compression_ratio": "SHORT_SCALE_DIVIDED_BY_LONG_SCALE_COMPUTED_ONLY_FROM_COMPLETED_BARS_ENDING_IMMEDIATELY_BEFORE_BREAKOUT_BAR",
+    "breakout_box_bars": 12,
+    "breakout_rule": "LONG if completed breakout close exceeds log(box_high) by at least breakout_strength*long_scale; SHORT if below log(box_low) by at least breakout_strength*long_scale.",
+    "entry": "NEXT_CONTIGUOUS_EXACT_M5_OPEN_AFTER_BREAKOUT_BAR",
+    "failure_exit": "Completed post-entry close re-enters pre-breakout box boundary; execute next contiguous M5 open.",
+    "time_exit": "If no reentry, next contiguous open after maximum_hold_bars completed post-entry bars.",
+    "overlap": "WITHIN_CELL_IGNORE_LATER_SIGNALS_UNTIL_ACCEPTED_POSITION_EXITS",
+    "missing": "RIGHT_CENSOR_FAIL_CLOSED_NO_INTERPOLATION_REPAIR_OR_GAP_BRIDGING"
+  },
+  "frozen_cells": [
+    {
+      "cell_id": "SHBUSD|CR0.45|BS1|H12",
+      "maximum_compression_ratio": 0.45,
+      "minimum_breakout_strength_long_scale": 1,
+      "maximum_hold_bars": 12
+    },
+    {
+      "cell_id": "SHBUSD|CR0.6|BS1|H12",
+      "maximum_compression_ratio": 0.6,
+      "minimum_breakout_strength_long_scale": 1,
+      "maximum_hold_bars": 12
+    },
+    {
+      "cell_id": "SHBUSD|CR0.45|BS0.5|H12",
+      "maximum_compression_ratio": 0.45,
+      "minimum_breakout_strength_long_scale": 0.5,
+      "maximum_hold_bars": 12
+    },
+    {
+      "cell_id": "SHBUSD|CR0.45|BS1|H24",
+      "maximum_compression_ratio": 0.45,
+      "minimum_breakout_strength_long_scale": 1,
+      "maximum_hold_bars": 24
+    }
+  ],
+  "support_gate": {
+    "completed_events_min": 40,
+    "distinct_dates_min": 30,
+    "distinct_iso_weeks_min": 20,
+    "retention_fraction_min": 0.8
+  },
+  "economic_gross_gate": {
+    "mean_gross_bps_min": 6,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "ALL_4_FROZEN_SHBUSD_LOCAL_CELLS_ONLY",
+    "dependence_cluster": "ISO_WEEK",
+    "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_ineligible_cells_assigned_p1": true,
+    "no_postoutcome_family_narrowing": true
+  },
+  "robust_region_gate": {
+    "adjacency": "ONE_STEP_IN_ORIGINAL_PARAMETER_GRID_WITH_OTHER_DIMENSIONS_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "horizon_minutes": 120,
+    "metrics": [
+      "MFE_bps",
+      "MAE_bps",
+      "time_to_MFE_minutes",
+      "time_to_first_positive_response_minutes",
+      "realized_frozen_exit_response_bps",
+      "MFE_minus_realized_exit_bps"
+    ],
+    "primary_pass_fail_unchanged": true,
+    "role": "DIAGNOSTIC_ONLY_NO_SAME_OUTCOME_RESCUE"
+  },
+  "permanent_close_condition": "IF_REACHED_AFTER_PEP_FAILURE_AND_NO_CONNECTED_AT_LEAST_3_CELL_REGION_SPANNING_AT_LEAST_2_PARAMETER_DIMENSIONS_PASSES_SUPPORT_ECONOMIC_GROSS_AND_MAX_T_THEN_CLOSE_SHBUSD_TEMPORAL_GENERALIZATION_WITHOUT_PARAMETER_HOLD_OR_EXIT_RESCUE",
+  "friction_boundary": "ONLY_AFTER_CONNECTED_ROBUST_GROSS_REGION_WITH_MATERIAL_HEADROOM_FREEZE_EXACT_EVENT_TIMESTAMPS_THEN_AUTHENTIC_BID_ASK_COMMISSION_CONVERSION_VOLUME_MARGIN_EUR200",
+  "hard21_boundary": "NOT_REQUIRED_FOR_SHB_ALONE_FINAL_PORTFOLIO_ONLY",
+  "outcome_order": "SCIENTIFICALLY_UNOPENED_UNTIL_PEP_FROZEN_RESULT_FAILS_OR_IS_UNAVAILABLE;PEP_RESULT_CANNOT_CHANGE_THIS_DESIGN",
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "new_1576_family_selected": false
+  }
+}

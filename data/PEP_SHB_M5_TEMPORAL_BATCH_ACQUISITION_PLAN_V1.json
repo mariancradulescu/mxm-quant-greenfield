@@ -1,0 +1,68 @@
+{
+  "schema": "mxm.research-core-v3.pep-shb-m5-temporal-batch-acquisition-plan.v1",
+  "status": "FROZEN_AUTHORIZED_RAW_ACQUISITION_FOR_TWO_SEPARATE_PREOUTCOME_HYPOTHESES_NOT_YET_EXECUTED",
+  "purpose": "ACQUISITION_EFFICIENCY_ONLY_DO_NOT_MERGE_STATISTICAL_FAMILIES",
+  "frozen_design_refs": [
+    "research_core_v3/state/PEPUSD_M5_TREND_PULLBACK_TEMPORAL_DESIGN_V1.json",
+    "research_core_v3/state/SHBUSD_M5_VOLATILITY_COMPRESSION_TEMPORAL_DESIGN_V1.json"
+  ],
+  "source_environment": "Pepperstone - Europe LIVE",
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "symbols": [
+    {
+      "symbol_id": 7191,
+      "broker_symbol": "PEPUSD",
+      "scientific_role": "PEP_ONLY"
+    },
+    {
+      "symbol_id": 7192,
+      "broker_symbol": "SHBUSD",
+      "scientific_role": "SHB_ONLY"
+    }
+  ],
+  "resolution": "M5",
+  "interval": {
+    "start_utc": "2025-01-02T00:00:00Z",
+    "end_utc": "2025-09-14T23:59:59Z"
+  },
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "capture_law": {
+    "read_only": true,
+    "trendbars_only": true,
+    "raw_ticks_requested": false,
+    "bid_ask_requested": false,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "fill_authority": false,
+    "extra_symbols_permitted": false,
+    "interval_extension_permitted": false,
+    "external_datasets_permitted": false,
+    "protected_rows_permitted": false,
+    "forward_fill_permitted": false,
+    "synthetic_fill_permitted": false,
+    "exhaust_pagination": true,
+    "preserve_authentic_gaps": true,
+    "strict_timestamp_order": true,
+    "reject_conflicting_duplicates": true,
+    "verify_ohlc_invariants": true,
+    "window_days": 7
+  },
+  "output_contract": {
+    "device_computes_strategy_outcomes": false,
+    "device_computes_pnl": false,
+    "device_computes_PEP_or_SHB_signals": false,
+    "raw_m5_only_plus_identity_integrity_completeness_metadata": true,
+    "evidence_zip_name": "MXM_V3_PEP_SHB_M5_TEMPORAL_EVIDENCE_V1.zip"
+  },
+  "outcome_opening_law": {
+    "PEP_first": true,
+    "SHB_must_remain_unopened_if_PEP_connected_robust_gross_passes": true,
+    "PEP_result_must_not_modify_SHB_design": true,
+    "SHB_result_must_not_modify_PEP_design": true
+  },
+  "history_unavailable_policy": "PER_SYMBOL_DATA_UNAVAILABLE_FAIL_CLOSED_NO_INTERVAL_OR_RESOLUTION_SUBSTITUTION;DO_NOT_AUTOSELECT_NEW_1576_FAMILY",
+  "acquisition_authorized_for_user_execution": true,
+  "acquisition_launched": false,
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0
+}

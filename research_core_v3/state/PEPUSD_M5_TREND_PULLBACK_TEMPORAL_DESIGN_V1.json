@@ -1,0 +1,122 @@
+{
+  "schema": "mxm.research-core-v3.pepusd-m5-trend-pullback-temporal-generalization-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_ANY_NEW_RAW_M5_EVALUATION",
+  "preoutcome_audit_ref": "research_core_v3/state/PEPUSD_M5_TREND_PULLBACK_TEMPORAL_PREOUTCOME_AUDIT_V1.json",
+  "symbol": {
+    "symbol_id": 7191,
+    "broker_symbol": "PEPUSD"
+  },
+  "resolution": "M5",
+  "source": "Pepperstone cTrader Open API only",
+  "classification": "DEVELOPMENT_ONLY_TEMPORAL_GENERALIZATION",
+  "evaluation_interval_requested_utc": [
+    "2025-01-02T00:00:00Z",
+    "2025-09-14T23:59:59Z"
+  ],
+  "signal": {
+    "exact_contiguity_seconds": 300,
+    "trend_state": "For candidate resumption bar t and pullback length P, trend anchor is close[t-P-1]. Direction from log(close[t-P-1]/close[t-P-1-H]), normalized by 1.4826*median(abs(one-bar log returns)) over the H completed returns ending at t-P-1 times sqrt(H); require abs normalized trend >=1.0.",
+    "pullback": "Over P completed bars immediately after trend anchor ending t-1, require cumulative log return opposite frozen trend direction with abs magnitude >= pullback_magnitude*long_scale*sqrt(P).",
+    "resumption": "Completed bar t must close in trend direction beyond the two immediately preceding pullback-bar extremes.",
+    "entry": "NEXT_CONTIGUOUS_EXACT_M5_OPEN_T_PLUS_1_AFTER_RESUMPTION",
+    "failure_exit": "LONG completed post-entry close <= minimum low of the P pullback bars; SHORT symmetric at maximum high; execute next contiguous M5 open.",
+    "time_exit": "If no failure, next contiguous open after maximum_hold_bars completed post-entry M5 bars.",
+    "overlap": "WITHIN_CELL_IGNORE_LATER_SIGNALS_UNTIL_ACCEPTED_POSITION_EXITS",
+    "missing": "RIGHT_CENSOR_FAIL_CLOSED_NO_INTERPOLATION_RESAMPLING_GAP_BRIDGING_SYNTHETIC_FILL_OR_SAME_BAR_EXECUTION"
+  },
+  "frozen_cells": [
+    {
+      "cell_id": "PEPUSD|TH72|PB12|M1|H24",
+      "trend_horizon_bars": 72,
+      "pullback_bars": 12,
+      "minimum_pullback_magnitude_long_scale": 1,
+      "maximum_hold_bars": 24
+    },
+    {
+      "cell_id": "PEPUSD|TH144|PB12|M1|H24",
+      "trend_horizon_bars": 144,
+      "pullback_bars": 12,
+      "minimum_pullback_magnitude_long_scale": 1,
+      "maximum_hold_bars": 24
+    },
+    {
+      "cell_id": "PEPUSD|TH72|PB6|M1|H24",
+      "trend_horizon_bars": 72,
+      "pullback_bars": 6,
+      "minimum_pullback_magnitude_long_scale": 1,
+      "maximum_hold_bars": 24
+    },
+    {
+      "cell_id": "PEPUSD|TH72|PB12|M0.5|H24",
+      "trend_horizon_bars": 72,
+      "pullback_bars": 12,
+      "minimum_pullback_magnitude_long_scale": 0.5,
+      "maximum_hold_bars": 24
+    },
+    {
+      "cell_id": "PEPUSD|TH72|PB12|M1|H12",
+      "trend_horizon_bars": 72,
+      "pullback_bars": 12,
+      "minimum_pullback_magnitude_long_scale": 1,
+      "maximum_hold_bars": 12
+    },
+    {
+      "cell_id": "PEPUSD|TH72|PB12|M1|H48",
+      "trend_horizon_bars": 72,
+      "pullback_bars": 12,
+      "minimum_pullback_magnitude_long_scale": 1,
+      "maximum_hold_bars": 48
+    }
+  ],
+  "support_gate": {
+    "completed_events_min": 40,
+    "distinct_dates_min": 30,
+    "distinct_iso_weeks_min": 20,
+    "retention_fraction_min": 0.8
+  },
+  "economic_gross_gate": {
+    "mean_gross_bps_min": 8,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "ALL_6_FROZEN_PEPUSD_LOCAL_CELLS_ONLY",
+    "dependence_cluster": "ISO_WEEK",
+    "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_ineligible_cells_assigned_p1": true,
+    "no_postoutcome_family_narrowing": true
+  },
+  "robust_region_gate": {
+    "adjacency": "ONE_STEP_IN_ORIGINAL_PARAMETER_GRID_WITH_OTHER_DIMENSIONS_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "horizon_minutes": 240,
+    "metrics": [
+      "MFE_bps",
+      "MAE_bps",
+      "time_to_MFE_minutes",
+      "time_to_first_positive_response_minutes",
+      "realized_frozen_exit_response_bps",
+      "MFE_minus_realized_exit_bps"
+    ],
+    "primary_pass_fail_unchanged": true,
+    "role": "DIAGNOSTIC_ONLY_NO_SAME_OUTCOME_RESCUE"
+  },
+  "permanent_close_condition": "IF_NO_CONNECTED_AT_LEAST_3_CELL_REGION_SPANNING_AT_LEAST_2_PARAMETER_DIMENSIONS_PASSES_SUPPORT_ECONOMIC_GROSS_AND_MAX_T_THEN_CLOSE_PEPUSD_TEMPORAL_GENERALIZATION_WITHOUT_THRESHOLD_HOLD_EXIT_OR_PARAMETER_RESCUE",
+  "friction_boundary": "ONLY_AFTER_CONNECTED_ROBUST_GROSS_REGION_WITH_MATERIAL_HEADROOM_FREEZE_EXACT_EVENT_TIMESTAMPS_THEN_AUTHENTIC_BID_ASK_COMMISSION_CONVERSION_VOLUME_MARGIN_EUR200",
+  "hard21_boundary": "NOT_REQUIRED_FOR_PEP_ALONE_FINAL_PORTFOLIO_ONLY",
+  "outcome_order": "EVALUATE_PEP_FIRST;IF_PEP_PASSES_STOP_BEFORE_OPENING_SHB_OUTCOMES",
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "SHB_design_must_remain_unchanged_after_PEP_outcomes": true
+  }
+}
