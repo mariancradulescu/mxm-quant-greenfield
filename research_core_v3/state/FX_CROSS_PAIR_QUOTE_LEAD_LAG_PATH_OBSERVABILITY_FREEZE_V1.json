@@ -1,0 +1,82 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-pair-quote-lead-lag-path-observability-freeze.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_ANY_LEAD_LAG_ACQUISITION",
+  "parent_live_head": "74b9e64e0298965f3cfd26a68464e0b2b8bb76d6",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "FX_CROSS_PAIR_QUOTE_LEAD_LAG_CATCHUP",
+  "primary_design_authority": {
+    "ref": "research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_DEVELOPMENT_DESIGN_V1.json",
+    "sha256": "d275f41ee22bd97f10fc5892e390b74c6cfa209ae80691a9de7e9cc89765a5f8",
+    "frozen_test_count": 72,
+    "primary_design_changed": false,
+    "relationships_changed": false,
+    "structural_signs_changed": false,
+    "signal_law_changed": false,
+    "thresholds_changed": false,
+    "calendar_changed": false,
+    "symbols_changed": false,
+    "primary_holding_seconds_changed": false,
+    "primary_statistical_family_changed": false,
+    "primary_pass_fail_gates_changed": false
+  },
+  "diagnostic_path": {
+    "role": "DIAGNOSTIC_ONLY_CANNOT_ENTER_PRIMARY_MAXT_CANNOT_PROMOTE_PILOT",
+    "horizon_seconds": 900,
+    "selection_rationale": "15_MINUTES_IS_LONG_ENOUGH_TO_OBSERVE_POST_ENTRY_PATH_BEYOND_180_SECOND_PRIMARY_EXIT_WHILE_LIMITING_TICK_VOLUME_AND_PAGINATION_RELATIVE_TO_30_MINUTES",
+    "clock_grid": "INTEGER_UTC_SECONDS",
+    "freshness": "BID_AND_ASK_AGE_LE_2000_MS_AND_ASK_GE_BID_GT_0",
+    "direction": "SAME_FROZEN_STRUCTURAL_EXPECTED_DIRECTION_AS_PRIMARY_EVENT",
+    "entry_anchor": "SAME_PRIMARY_ENTRY_QUOTE_AT_T_PLUS_1_SECOND",
+    "fields": [
+      "entry_bid",
+      "entry_ask",
+      "entry_mid",
+      "primary_exit_bid",
+      "primary_exit_ask",
+      "primary_exit_mid",
+      "directional_mid_price_gross_bps",
+      "primary_side_aware_spread_net_bps",
+      "exact_execution_drag_bps",
+      "mid_price_MFE_bps",
+      "mid_price_MAE_bps",
+      "executable_side_aware_MFE_bps",
+      "executable_side_aware_MAE_bps",
+      "time_to_mid_MFE_seconds",
+      "time_to_first_positive_executable_response_seconds"
+    ],
+    "formulas": {
+      "directional_mid_response_bps": "direction * log(mid_s / entry_mid) * 10000",
+      "long_executable_response_bps": "log(bid_s / entry_ask) * 10000",
+      "short_executable_response_bps": "log(entry_bid / ask_s) * 10000",
+      "exact_execution_drag_bps": "directional_mid_price_gross_bps - primary_side_aware_spread_net_bps",
+      "mid_price_MFE_bps": "max(directional_mid_response_bps over fresh s in [entry,entry+900s])",
+      "mid_price_MAE_bps": "max(0,-min(directional_mid_response_bps over fresh s in [entry,entry+900s]))",
+      "executable_side_aware_MFE_bps": "max(executable_response_bps over fresh s in [entry,entry+900s])",
+      "executable_side_aware_MAE_bps": "max(0,-min(executable_response_bps over fresh s in [entry,entry+900s]))",
+      "time_to_mid_MFE_seconds": "earliest elapsed integer second attaining mid_price_MFE_bps",
+      "time_to_first_positive_executable_response_seconds": "earliest elapsed integer second with executable_response_bps > 0"
+    },
+    "missingness": "NO_DELAY_SEARCH_NO_INTERPOLATION_NO_STALE_SIDE_REPAIR;MISSING_DIAGNOSTIC_SECONDS_ARE_SKIPPED_AND_COVERAGE_IS_REPORTED",
+    "primary_exit_metrics_remain_exact": "15_60_180_SECOND_PRIMARY_EXIT_REQUIRES_FRESH_QUOTE_EXACTLY_AT_FROZEN_EXIT_SECOND_OR_PRIMARY_EVENT_IS_RIGHT_CENSORED_AS_BEFORE"
+  },
+  "acquisition_implication": {
+    "query_padding_before_seconds": 90,
+    "query_padding_after_seconds": 960,
+    "base_side_requests_before_pagination_unchanged": 624,
+    "request_count_change_before_pagination": 0,
+    "expected_incremental_cost": "MORE_TICKS_PER_EXISTING_REQUEST_AND_POSSIBLE_ADDITIONAL_PAGINATION_ONLY",
+    "raw_ticks_transfer_off_device": false,
+    "orders": false,
+    "fill_authority": false,
+    "protected_forward_opened": false,
+    "automatic_additional_acquisition": false
+  },
+  "governance": {
+    "candidate_freeze_from_diagnostics": false,
+    "net_certification_from_diagnostics": false,
+    "post_outcome_diagnostic_horizon_change_forbidden": true,
+    "diagnostic_fields_may_not_modify_primary_support_or_maxT": true,
+    "old_package_must_be_superseded_before_user_execution": true
+  },
+  "canonical_sha256": "e7e1e196263e9e06a0c33a0e411554f9523d8c37365c29cb5ea90b0574f0839d"
+}
