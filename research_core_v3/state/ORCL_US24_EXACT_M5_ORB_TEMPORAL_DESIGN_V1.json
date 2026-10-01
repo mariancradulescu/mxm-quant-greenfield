@@ -1,0 +1,107 @@
+{
+  "schema": "mxm.research-core-v3.orcl-us24-exact-m5-orb-temporal-generalization-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_NEW_ORCL_M5_ACQUISITION",
+  "preoutcome_audit_ref": "research_core_v3/state/ORCL_US24_EXACT_M5_ORB_TEMPORAL_PREOUTCOME_AUDIT_V1.json",
+  "scientific_question": "DOES_THE_ORIGINAL_ORCL_M5_OPENING_RANGE_BREAKOUT_STRUCTURE_REPLICATE_WITH_MATERIAL_GROSS_AMPLITUDE_TEMPORAL_STABILITY_AND_CONNECTED_LOCAL_ROBUSTNESS_ON_GENUINELY_UNTOUCHED_EXACT_M5_PEPPERSTONE_EVIDENCE",
+  "symbol": {
+    "symbol_id": 3027,
+    "broker_symbol": "ORCL.US-24"
+  },
+  "source": "Pepperstone cTrader Open API only",
+  "classification": "DEVELOPMENT_ONLY_TEMPORAL_GENERALIZATION",
+  "resolution": "M5",
+  "resolution_translation_allowed": false,
+  "evaluation_interval_requested_utc": [
+    "2025-01-02T00:00:00Z",
+    "2025-09-14T23:59:59Z"
+  ],
+  "timezone": "America/New_York",
+  "session": {
+    "regular_session_open_local": "09:30",
+    "opening_range_minutes": 30,
+    "opening_range": "max high / min low of completed 09:30 through 09:55 M5 bars",
+    "breakout_watch": "after OR completion examine next 18 completed M5 bars (90 minutes); LONG first close strictly above OR high, SHORT first close strictly below OR low",
+    "entry": "NEXT_CONTIGUOUS_EXACT_M5_OPEN_AFTER_BREAKOUT_BAR_COMPLETION",
+    "one_event_per_session": "FIRST_BREAKOUT_ONLY_PER_DATE_PER_FROZEN_CELL",
+    "session_boundary": "ALL_REQUIRED_TIMESTAMPS_THROUGH_EXIT_NO_LATER_THAN_15:35_LOCAL_OTHERWISE_RIGHT_CENSOR",
+    "missing_or_ambiguous": "RIGHT_CENSOR_FAIL_CLOSED_NO_INTERPOLATION_SYNTHETIC_BARS_SAME_BAR_EXECUTION_OR_OVERNIGHT"
+  },
+  "parameter_grid": {
+    "failure_rule": [
+      "MIDPOINT",
+      "OPPOSITE_BOUNDARY"
+    ],
+    "maximum_hold_bars": [
+      24,
+      48
+    ],
+    "test_count": 4,
+    "hold_minutes": [
+      120,
+      240
+    ]
+  },
+  "exits": {
+    "MIDPOINT": "LONG exit next open after completed close <= OR midpoint; SHORT exit next open after completed close >= OR midpoint",
+    "OPPOSITE_BOUNDARY": "LONG exit next open after completed close <= OR low; SHORT exit next open after completed close >= OR high",
+    "time_exit": "if no frozen failure trigger, exit at next open after maximum_hold_bars completed post-entry bars"
+  },
+  "gross_return": "direction * log(exit_open / entry_open) * 10000 bps",
+  "support_gate": {
+    "completed_events_min": 80,
+    "distinct_dates_min": 80,
+    "distinct_iso_weeks_min": 30,
+    "retention_fraction_min": 0.9
+  },
+  "economic_gross_gate": {
+    "mean_gross_bps_min": 12,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5,
+    "note": "GROSS_HEADROOM_GATE_ONLY_NOT_PROXY_NET_COST"
+  },
+  "multiplicity": {
+    "family": "ALL_4_FROZEN_ORCL_OR30_FAILURE_X_HOLD_CELLS",
+    "dependence_cluster": "ISO_WEEK",
+    "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_ineligible_cells_assigned_p1": true,
+    "no_retrospective_narrowing": true
+  },
+  "robust_region_gate": {
+    "adjacency": "ONE_STEP_IN_FAILURE_RULE_OR_HOLD_WITH_OTHER_DIMENSION_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "primary_pass_fail_unchanged": true,
+    "horizon_minutes": 240,
+    "metrics": [
+      "MFE_bps",
+      "MAE_bps",
+      "time_to_MFE_minutes",
+      "time_to_first_positive_response_minutes",
+      "realized_frozen_exit_response_bps",
+      "MFE_minus_realized_exit_bps"
+    ],
+    "role": "DIAGNOSTIC_ONLY_NO_EXIT_RESCUE_OR_GRID_RETUNING"
+  },
+  "friction_boundary": {
+    "exact_bid_ask_acquisition_only_after_connected_robust_gross_region_with_material_headroom": true,
+    "proxy_cost_subtraction_forbidden": true
+  },
+  "permanent_close_condition": "IF_SUFFICIENT_UNTOUCHED_SUPPORT_EXISTS_BUT_NO_CONNECTED_AT_LEAST_3_CELL_REGION_SPANNING_FAILURE_AND_HOLD_PASSES_SUPPORT_ECONOMIC_GROSS_AND_MAX_T_ALPHA_0_05_THEN_CLOSE_ORCL_EXACT_M5_TEMPORAL_GENERALIZATION_WITHOUT_THRESHOLD_HOLD_OR_EXIT_RESCUE",
+  "if_history_insufficient": "DATA_UNAVAILABLE_FAIL_CLOSED_NO_INTERVAL_OR_RESOLUTION_SUBSTITUTION_AND_DO_NOT_SELECT_SECOND_STRUCTURE_IN_THIS_TURN",
+  "hard21_boundary": "HARD21_NOT_REQUIRED_FOR_ORCL_ALONE;ONLY_FINAL_CERTIFIED_PORTFOLIO_LEVEL",
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true,
+    "PEP_or_SHB_opened": false,
+    "new_1576_family_selected": false
+  }
+}
