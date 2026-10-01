@@ -1,24 +1,13 @@
-name: CRM ADBE M5 collector package build
+name: CRM ADBE M5 package
 on:
   push:
-    branches: [crm-adbe-m5-package-build-20261001]
-    paths:
-      - 'tools/build_crm_adbe_m5_temporal_package.py'
-      - '.github/workflows/crm-adbe-m5-package-build.yml'
-      - 'CRM_ADBE_M5_CAPTURE_RUN.py'
-      - 'README_CRM_ADBE_M5_CAPTURE.txt'
-      - 'data/CRM_ADBE_M5_TEMPORAL_ACQUISITION_PLAN_V1.json'
-      - 'research_core_v3/crm_adbe_m5_temporal_capture.py'
-      - 'research_core_v3/pydroid_crm_adbe_m5_temporal_launcher.py'
+    branches:
+      - crm-adbe-m5-package-build-20261001
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
-  validate-and-package-only:
+  package:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,62 +15,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Install Android-safe protobuf
+      - name: Install protobuf
         run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-      - name: Compile exact collector sources
-        run: |
-          python -m py_compile \
-            CRM_ADBE_M5_CAPTURE_RUN.py \
-            research_core_v3/crm_adbe_m5_temporal_capture.py \
-            research_core_v3/pydroid_crm_adbe_m5_temporal_launcher.py \
-            tools/build_crm_adbe_m5_temporal_package.py
-      - name: Validate frozen read-only authority offline
-        env:
-          PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
-        run: |
-          PYTHONPATH=. python - <<'PY'
-          import json
-          from pathlib import Path
-          from research_core_v3.pydroid_crm_adbe_m5_temporal_launcher import local_preflight
-          from research_core_v3.crm_adbe_m5_temporal_capture import validate_plan
-          plan=json.loads(Path("data/CRM_ADBE_M5_TEMPORAL_ACQUISITION_PLAN_V1.json").read_text())
-          validate_plan(plan)
-          p=local_preflight()
-          assert p["symbols"] == ["CRM.US-24","ADBE.US-24"]
-          assert p["resolution"] == "M5"
-          assert p["interval"] == {"start_utc":"2025-01-02T00:00:00Z","end_utc":"2025-09-14T23:59:59Z"}
-          assert p["orders_permitted"] is False
-          assert p["account_mutation_permitted"] is False
-          assert p["fill_authority"] is False
-          assert p["strategy_outcomes_computed"] is False
-          assert p["protected_forward_opened"] is False
-          print("CRM_ADBE_OFFLINE_PREFLIGHT_PASS", p)
-          PY
-      - name: Build deterministic package and validate CRC
-        env:
-          PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
-        run: |
-          PYTHONPATH=. python tools/build_crm_adbe_m5_temporal_package.py
-          python - <<'PY'
-          import hashlib, json, zipfile
-          from pathlib import Path
-          z=Path("dist/MXM_V3_CRM_ADBE_M5_TEMPORAL_COLLECTOR_V1.zip")
-          with zipfile.ZipFile(z) as f:
-              assert f.testzip() is None
-          r=json.loads(Path("dist/CRM_ADBE_M5_PACKAGE_BUILD_REPORT_V1.json").read_text())
-          assert r["status"]=="PASS"
-          assert r["zip_crc"]=="PASS"
-          assert r["broker_contacted"] is False
-          assert r["acquisition_launched"] is False
-          assert hashlib.sha256(z.read_bytes()).hexdigest()==r["package_sha256"]
-          print("CRM_ADBE_PACKAGE_SHA256", r["package_sha256"])
-          PY
-      - name: Upload build-only artifact
+      - name: Compile
+        run: python -m py_compile CRM_ADBE_M5_CAPTURE_RUN.py research_core_v3/crm_adbe_m5_temporal_capture.py research_core_v3/pydroid_crm_adbe_m5_temporal_launcher.py tools/build_crm_adbe_m5_temporal_package.py tools/validate_crm_adbe_m5_temporal_package.py
+      - name: Validate and build
+        run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/validate_crm_adbe_m5_temporal_package.py
+      - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: MXM_V3_CRM_ADBE_M5_TEMPORAL_COLLECTOR_V1
-          path: |
-            dist/MXM_V3_CRM_ADBE_M5_TEMPORAL_COLLECTOR_V1.zip
-            dist/CRM_ADBE_M5_PACKAGE_BUILD_REPORT_V1.json
+          path: dist/
           if-no-files-found: error
           retention-days: 30
