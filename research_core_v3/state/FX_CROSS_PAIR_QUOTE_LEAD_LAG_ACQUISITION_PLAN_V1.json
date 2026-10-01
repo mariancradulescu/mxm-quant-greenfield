@@ -1,0 +1,111 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-pair-quote-lead-lag-acquisition-plan.v1",
+  "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "FX_CROSS_PAIR_QUOTE_LEAD_LAG_CATCHUP",
+  "source_audit_sha256": "39f52564a701e94fd00f6783769459e0c2ec737ad2ba11f6b76595a5775e4454",
+  "source_design_sha256": "d275f41ee22bd97f10fc5892e390b74c6cfa209ae80691a9de7e9cc89765a5f8",
+  "broker_identity": {
+    "environment": "Pepperstone - Europe LIVE",
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "targets": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    }
+  ],
+  "calendar": {
+    "dates_utc": [
+      "2025-09-22",
+      "2025-10-07",
+      "2025-10-23",
+      "2025-11-07",
+      "2025-11-17",
+      "2025-12-02",
+      "2025-12-18",
+      "2026-01-02",
+      "2026-01-12",
+      "2026-01-27",
+      "2026-02-12",
+      "2026-02-27",
+      "2026-03-09",
+      "2026-03-24",
+      "2026-04-09",
+      "2026-04-24",
+      "2026-05-04",
+      "2026-05-19",
+      "2026-06-04",
+      "2026-06-19",
+      "2026-06-29",
+      "2026-07-14",
+      "2026-07-30",
+      "2026-08-14",
+      "2026-08-24",
+      "2026-09-08"
+    ],
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "query_padding_before_seconds": 90,
+    "query_padding_after_seconds": 240,
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z"
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "quote_sides": [
+      "BID",
+      "ASK"
+    ],
+    "request_min_interval_seconds": 0.22,
+    "base_side_requests_before_pagination": 624,
+    "fill_authority": false,
+    "raw_ticks_written_to_disk": false,
+    "raw_ticks_transferred_off_device": false,
+    "on_device_cross_symbol_feature_and_response_aggregation": true,
+    "protected_forward_opened": false,
+    "automatic_additional_acquisition": false
+  },
+  "output": {
+    "bundle_name": "MXM_V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_EVIDENCE_V1.zip",
+    "event_rows": "sanitized frozen relationship-cell rows with causal leader/follower features and follower side-aware spread-net response",
+    "transport_provenance": true,
+    "current_symbol_metadata": true,
+    "checksums": true,
+    "raw_tick_values": false
+  },
+  "governance": {
+    "candidate_freeze_from_capture": false,
+    "net_certification_from_capture": false,
+    "pilot_result_may_not_open_protected_forward": true,
+    "pilot_null_does_not_close_1576_frontier": true
+  },
+  "binding_sha256": "59360ef565cd8523c36e31a7f5ec550e5648e591643ab78d9fcf2fea10a6b8e1"
+}
