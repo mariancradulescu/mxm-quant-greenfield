@@ -1,0 +1,139 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-pair-quote-lead-lag-preoutcome-audit.v1",
+  "status": "DISTINCT_CROSS_SYMBOL_MICROSTRUCTURE_RELATIONSHIPS_AND_DISJOINT_CALENDAR_FROZEN_BEFORE_ACQUISITION",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "FX_CROSS_PAIR_QUOTE_LEAD_LAG_CATCHUP",
+  "prior_single_symbol_subfamilies": [
+    "FIVE_SECOND_QUOTE_IMPULSE_WITH_INTENSITY_AND_SPREAD_CONFIRMATION",
+    "QUOTE_SIDE_CATCHUP_AFTER_DIRECTIONAL_SPREAD_COMPRESSION"
+  ],
+  "distinctness": {
+    "cross_symbol_not_single_symbol": true,
+    "pair_signs_derived_from_currency_identity_only": true,
+    "no_reuse_of_prior_exposed_53_calendar_dates": true,
+    "not_a_post_outcome_horizon_or_threshold_rescue": true
+  },
+  "relationships": [
+    {
+      "relationship_id": "EURJPY_TO_EURGBP",
+      "leader": "EURJPY",
+      "leader_id": 3,
+      "follower": "EURGBP",
+      "follower_id": 9,
+      "structural_sign": 1,
+      "shared_currency": "EUR",
+      "identity_logic": "EUR is base in both; common EUR move maps to same return sign"
+    },
+    {
+      "relationship_id": "EURGBP_TO_EURJPY",
+      "leader": "EURGBP",
+      "leader_id": 9,
+      "follower": "EURJPY",
+      "follower_id": 3,
+      "structural_sign": 1,
+      "shared_currency": "EUR",
+      "identity_logic": "EUR is base in both; common EUR move maps to same return sign"
+    },
+    {
+      "relationship_id": "AUDCAD_TO_GBPCAD",
+      "leader": "AUDCAD",
+      "leader_id": 18,
+      "follower": "GBPCAD",
+      "follower_id": 19,
+      "structural_sign": 1,
+      "shared_currency": "CAD",
+      "identity_logic": "CAD is quote in both; common CAD move maps to same return sign"
+    },
+    {
+      "relationship_id": "GBPCAD_TO_AUDCAD",
+      "leader": "GBPCAD",
+      "leader_id": 19,
+      "follower": "AUDCAD",
+      "follower_id": 18,
+      "structural_sign": 1,
+      "shared_currency": "CAD",
+      "identity_logic": "CAD is quote in both; common CAD move maps to same return sign"
+    },
+    {
+      "relationship_id": "EURGBP_TO_GBPCAD",
+      "leader": "EURGBP",
+      "leader_id": 9,
+      "follower": "GBPCAD",
+      "follower_id": 19,
+      "structural_sign": -1,
+      "shared_currency": "GBP",
+      "identity_logic": "GBP is quote in EURGBP and base in GBPCAD; common GBP move maps to opposite return sign"
+    },
+    {
+      "relationship_id": "GBPCAD_TO_EURGBP",
+      "leader": "GBPCAD",
+      "leader_id": 19,
+      "follower": "EURGBP",
+      "follower_id": 9,
+      "structural_sign": -1,
+      "shared_currency": "GBP",
+      "identity_logic": "GBP is base in GBPCAD and quote in EURGBP; common GBP move maps to opposite return sign"
+    }
+  ],
+  "calendar": {
+    "rule": "every second ISO week beginning week of 2025-09-22; selected weekday cycles Monday, Tuesday, Thursday, Friday; no substitution for holidays or unavailable history",
+    "dates_utc": [
+      "2025-09-22",
+      "2025-10-07",
+      "2025-10-23",
+      "2025-11-07",
+      "2025-11-17",
+      "2025-12-02",
+      "2025-12-18",
+      "2026-01-02",
+      "2026-01-12",
+      "2026-01-27",
+      "2026-02-12",
+      "2026-02-27",
+      "2026-03-09",
+      "2026-03-24",
+      "2026-04-09",
+      "2026-04-24",
+      "2026-05-04",
+      "2026-05-19",
+      "2026-06-04",
+      "2026-06-19",
+      "2026-06-29",
+      "2026-07-14",
+      "2026-07-30",
+      "2026-08-14",
+      "2026-08-24",
+      "2026-09-08"
+    ],
+    "date_count": 26,
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "disjoint_from_prior_two_pilots": true
+  },
+  "data_policy": {
+    "authentic_pepperstone_bid_ask_ticks_only": true,
+    "same_execution_plausible_fx_symbols_frozen_before_any_microstructure_outcomes": true,
+    "JPN225_excluded_by_identity_not_performance": "no deterministic shared-currency relationship with the FX panel",
+    "raw_ticks_persisted": false,
+    "protected_forward_opened": false,
+    "runtime_v2_reactivated": false
+  },
+  "pilot_null_semantics": {
+    "candidate_freeze_from_pilot": false,
+    "does_not_close_1576_frontier": true,
+    "does_not_close_full_quote_microstructure_family": true
+  },
+  "canonical_sha256": "39f52564a701e94fd00f6783769459e0c2ec737ad2ba11f6b76595a5775e4454"
+}
