@@ -1,0 +1,113 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-pair-quote-lead-lag-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_NEW_TICK_ACQUISITION",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "FX_CROSS_PAIR_QUOTE_LEAD_LAG_CATCHUP",
+  "preoutcome_audit_sha256": "39f52564a701e94fd00f6783769459e0c2ec737ad2ba11f6b76595a5775e4454",
+  "relationships": [
+    "EURJPY_TO_EURGBP",
+    "EURGBP_TO_EURJPY",
+    "AUDCAD_TO_GBPCAD",
+    "GBPCAD_TO_AUDCAD",
+    "EURGBP_TO_GBPCAD",
+    "GBPCAD_TO_EURGBP"
+  ],
+  "calendar_binding": {
+    "date_count": 26,
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "relationship_windows": 468
+  },
+  "quote_state": {
+    "grid": "integer UTC seconds",
+    "bid": "latest BID tick at or before snapshot second",
+    "ask": "latest ASK tick at or before snapshot second",
+    "freshness": "both sides age <=2000 ms and ask>=bid>0",
+    "mid": "(bid+ask)/2",
+    "spread_bps": "log(ask/bid)*10000"
+  },
+  "causal_feature_law": {
+    "baseline_window_seconds": 60,
+    "minimum_valid_baseline_snapshots": 45,
+    "leader_impulse_units": "log(leader_mid_t/leader_mid_t_minus_L)*10000 divided by leader median spread over t-60..t-1",
+    "leader_spread_filter": "leader spread_t <= leader median spread baseline",
+    "follower_spread_filter": "follower spread_t <= follower median spread baseline",
+    "structural_expected_direction": "sign(leader impulse) multiplied by frozen relationship structural_sign",
+    "follower_lag_units": "abs(log(follower_mid_t/follower_mid_t_minus_L)*10000) divided by follower median spread baseline",
+    "maximum_follower_lag_units": 0.5,
+    "signal": "both symbols fresh; abs(leader_impulse_units)>=frozen threshold; follower_lag_units<=0.5; both spread filters pass"
+  },
+  "parameter_grid": {
+    "leader_impulse_lookback_seconds": [
+      5,
+      15
+    ],
+    "minimum_abs_leader_impulse_spread_units": [
+      1.5,
+      2.5
+    ],
+    "holding_seconds": [
+      15,
+      60,
+      180
+    ]
+  },
+  "cells_per_relationship": 12,
+  "test_count": 72,
+  "execution_and_response": {
+    "signal_time": "integer second t after all leader and follower ticks timestamped <=t are processed",
+    "entry": "follower fresh side-aware quote at t+1 second",
+    "trade_direction": "frozen structural_expected_direction",
+    "exit": "follower fresh side-aware quote exactly holding_seconds after entry",
+    "long_spread_net_bps": "log(exit_bid/entry_ask)*10000",
+    "short_spread_net_bps": "log(entry_bid/exit_ask)*10000",
+    "overlap": "one open event per relationship x frozen cell; later signals ignored until scheduled exit",
+    "missing": "any leader/follower signal state, entry or exit not fresh => skip/right-censor; no delay search/interpolation/stale repair"
+  },
+  "support_and_economic_gate": {
+    "completed_events_min": 80,
+    "distinct_sample_dates_min": 16,
+    "distinct_iso_weeks_min": 10,
+    "retention_fraction_min": 0.8,
+    "mean_spread_net_bps_min": 2,
+    "median_spread_net_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "family": "all 72 frozen relationship x lookback x threshold x horizon cells",
+    "dependence_cluster": "sampled UTC date",
+    "procedure": "shared sampled-date wild-sign max-T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_rule_predeclared": "all 72 remain family members; only cells meeting non-return support prerequisites generate finite max-T statistics; others p=1"
+  },
+  "robust_region_gate": {
+    "within": "same frozen relationship",
+    "adjacency": "one step in lookback, impulse threshold or holding horizon",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "governance": {
+    "post_outcome_pair_sign_threshold_or_horizon_rescue_forbidden": true,
+    "candidate_freeze_from_pilot": false,
+    "robust_survivor_next_step": "freeze a further disjoint DEVELOPMENT confirmation plus commission, volume lattice, margin and EUR200 gate before any candidate freeze",
+    "pilot_null_does_not_close_1576_frontier": true,
+    "protected_forward_opened": false
+  },
+  "canonical_sha256": "d275f41ee22bd97f10fc5892e390b74c6cfa209ae80691a9de7e9cc89765a5f8"
+}
