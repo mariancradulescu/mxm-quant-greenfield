@@ -2,17 +2,6 @@ name: V3 FX cross-pair lead-lag V2 diagnostic package
 on:
   push:
     branches: [performance-research-v3-20260922]
-    paths:
-      - '.github/workflows/v3-fx-cross-pair-lead-lag-v2-package.yml'
-      - 'V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_RUN.py'
-      - 'research_core_v3/fx_cross_pair_quote_lead_lag_capture.py'
-      - 'research_core_v3/pydroid_fx_cross_pair_quote_lead_lag_launcher.py'
-      - 'research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_ACQUISITION_PLAN_V2.json'
-      - 'research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PATH_OBSERVABILITY_FREEZE_V1.json'
-      - 'research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_DEVELOPMENT_DESIGN_V1.json'
-      - 'research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PREOUTCOME_AUDIT_V1.json'
-      - 'tools/build_fx_cross_pair_quote_lead_lag_v2_package.py'
-      - 'README_FX_CROSS_PAIR_QUOTE_LEAD_LAG_V2.txt'
   workflow_dispatch:
 permissions:
   contents: write
@@ -31,35 +20,20 @@ jobs:
       - name: Compile V2 collector
         run: |
           python -m py_compile V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_RUN.py research_core_v3/fx_cross_pair_quote_lead_lag_capture.py research_core_v3/pydroid_fx_cross_pair_quote_lead_lag_launcher.py tools/build_fx_cross_pair_quote_lead_lag_v2_package.py
-      - name: Verify frozen primary science and diagnostic bindings
+      - name: Verify frozen authorities
         run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
-          from pathlib import Path
-          from research_core_v3.fx_cross_pair_quote_lead_lag_capture import offline_preflight
-          g=offline_preflight(Path("."))
-          assert g["primary_tests"] == 72, g
-          assert g["relationships"] == 6, g
-          assert g["symbols"] == 4, g
-          assert g["base_side_requests_before_pagination"] == 624, g
-          assert g["diagnostic_horizon_seconds"] == 900, g
-          print("LEAD_LAG_V2_PREFLIGHT_PASS", g)
-          PY
-      - name: Build deterministic authoritative package
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -c "from pathlib import Path; from research_core_v3.fx_cross_pair_quote_lead_lag_capture import offline_preflight; g=offline_preflight(Path('.')); assert g['primary_tests']==72 and g['relationships']==6 and g['symbols']==4 and g['base_side_requests_before_pagination']==624 and g['diagnostic_horizon_seconds']==900; print('LEAD_LAG_V2_PREFLIGHT_PASS',g)"
+      - name: Build deterministic package
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_fx_cross_pair_quote_lead_lag_v2_package.py
           sha256sum dist/MXM_V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_PACKAGE_V2_DIAGNOSTIC.zip
-      - name: Persist V2 package authority
+      - name: Persist package authority
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PACKAGE_AUTHORITY_V2.json
-          if git diff --cached --quiet; then
-            echo "Authority already current"
-          else
-            git commit -m "Authorize diagnostic-observable FX lead-lag V2 package [skip ci]"
-            git push origin HEAD:performance-research-v3-20260922
-          fi
-      - name: Upload authoritative V2 package
+          if git diff --cached --quiet; then echo "Authority already current"; else git commit -m "Authorize diagnostic-observable FX lead-lag V2 package [skip ci]" && git push origin HEAD:performance-research-v3-20260922; fi
+      - name: Upload authoritative package
         uses: actions/upload-artifact@v4
         with:
           name: MXM_V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_PACKAGE_V2_DIAGNOSTIC
