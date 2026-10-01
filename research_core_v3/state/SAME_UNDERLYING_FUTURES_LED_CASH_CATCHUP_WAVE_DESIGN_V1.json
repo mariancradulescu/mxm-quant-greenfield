@@ -1,0 +1,140 @@
+{
+  "schema": "mxm.research-core-v3.same-underlying-futures-led-cash-catchup-wave-design.v1",
+  "status": "FROZEN_PREOUTCOME_EXISTING_RAW_READY",
+  "rerank_ref": "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V6.json",
+  "preoutcome_audit_ref": "research_core_v3/state/SAME_UNDERLYING_FUTURES_LED_CASH_CATCHUP_PREOUTCOME_AUDIT_V1.json",
+  "source": "Pepperstone cTrader Open API accepted M5 raw archives only",
+  "interval": [
+    "2025-09-16T00:00:00Z",
+    "2026-09-16T23:59:59Z"
+  ],
+  "pairs": [
+    {
+      "pair_id": "JPN225_F_TO_JPN225",
+      "leader_symbol_id": 2917,
+      "leader_symbol": "JPN225-F",
+      "follower_symbol_id": 116,
+      "follower_symbol": "JPN225",
+      "family_id": "JPN225_6_CELL"
+    },
+    {
+      "pair_id": "XAUUSD_F_TO_XAUUSD",
+      "leader_symbol_id": 2924,
+      "leader_symbol": "XAUUSD-F",
+      "follower_symbol_id": 41,
+      "follower_symbol": "XAUUSD",
+      "family_id": "XAUUSD_6_CELL"
+    },
+    {
+      "pair_id": "USDX_F_TO_USDX",
+      "leader_symbol_id": 2926,
+      "leader_symbol": "USDX-F",
+      "follower_symbol_id": 110,
+      "follower_symbol": "USDX",
+      "family_id": "USDX_6_CELL"
+    }
+  ],
+  "signal": {
+    "resolution": "M5",
+    "exact_contiguity_seconds": 300,
+    "impulse_window_bars": [
+      1,
+      3
+    ],
+    "trailing_normalization_windows": 72,
+    "leader_return": "LOG_LEADER_CLOSE_T_OVER_LEADER_CLOSE_T_MINUS_W_ON_EXACT_COMMON_CONTIGUOUS_M5",
+    "follower_return": "LOG_FOLLOWER_CLOSE_T_OVER_FOLLOWER_CLOSE_T_MINUS_W_ON_SAME_EXACT_COMMON_WINDOW",
+    "divergence": "LEADER_RETURN_MINUS_FOLLOWER_RETURN",
+    "divergence_center": "ROLLING_MEDIAN_OF_PRIOR_72_DIVERGENCES_EXCLUDING_CURRENT",
+    "divergence_scale": "1_4826_TIMES_ROLLING_MAD_OF_PRIOR_72_DIVERGENCES_EXCLUDING_CURRENT",
+    "divergence_z_threshold": 2,
+    "leader_price_shock_scale": "MEDIAN_ABSOLUTE_LEADER_W_BAR_RETURN_OVER_PRIOR_72_WINDOWS_EXCLUDING_CURRENT",
+    "leader_price_shock_multiplier": 2,
+    "leader_activity": "SUM_LEADER_TICK_VOLUME_OVER_CURRENT_W_BARS",
+    "leader_activity_scale": "MEDIAN_OF_PRIOR_72_MATCHING_W_BAR_ACTIVITY_SUMS_EXCLUDING_CURRENT",
+    "leader_activity_multiplier": 1.5,
+    "qualifying_signal": "ABS_DIVERGENCE_Z_GE_2_AND_ABS_LEADER_RETURN_GE_2_TIMES_PRICE_SCALE_AND_LEADER_ACTIVITY_GE_1_5_TIMES_ACTIVITY_SCALE_AND_SIGN_DIVERGENCE_EQUALS_SIGN_LEADER_RETURN",
+    "direction": "SIGN_OF_LEADER_RETURN",
+    "entry": "FOLLOWER_OPEN_OF_NEXT_EXACT_COMMON_M5_BAR",
+    "overlap": "AT_MOST_ONE_OPEN_FOLLOWER_POSITION_PER_PAIR_PER_CELL",
+    "missing": "RIGHT_CENSOR_FAIL_CLOSED_NO_GAP_BRIDGING_OR_SYNTHETIC_FILL"
+  },
+  "exit": {
+    "hold_bars": [
+      1,
+      3,
+      6
+    ],
+    "semantics": "FOLLOWER_OPEN_IMMEDIATELY_AFTER_H_COMPLETED_POST_ENTRY_EXACT_COMMON_M5_BARS",
+    "gross_return": "DIRECTION_TIMES_LOG_FOLLOWER_EXIT_OPEN_OVER_FOLLOWER_ENTRY_OPEN_TIMES_10000_BPS"
+  },
+  "parameter_topology": {
+    "impulse_window_bars": [
+      1,
+      3
+    ],
+    "hold_bars": [
+      1,
+      3,
+      6
+    ],
+    "cells_per_pair": 6,
+    "total_cells": 18,
+    "adjacency": "ONE_STEP_IN_EXACTLY_ONE_OF_IMPULSE_WINDOW_OR_HOLD"
+  },
+  "support_gate": {
+    "completed_events_min": 60,
+    "distinct_dates_min": 30,
+    "distinct_iso_weeks_min": 20,
+    "retention_fraction_min": 0.9
+  },
+  "economic_gross_gate": {
+    "mean_gross_bps_min": 8,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "local": {
+      "family": "ALL_6_CELLS_WITHIN_PAIR",
+      "method": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+      "resamples": 4999,
+      "seed": 20261001,
+      "alpha": 0.05,
+      "support_ineligible_p1": true
+    },
+    "selection_layer": {
+      "pair_count": 3,
+      "rule": "BONFERRONI_ACROSS_3_INTERCHANGEABLE_PAIRS",
+      "required_local_familywise_p_for_promotion": 0.016666666666666666,
+      "no_free_winner": true
+    }
+  },
+  "robust_region": {
+    "within_pair_only": true,
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "horizon_bars": 12,
+    "role": "DIAGNOSTIC_ONLY_NO_SAME_OUTCOME_EXIT_RESCUE",
+    "metrics": [
+      "MFE",
+      "MAE",
+      "time_to_MFE",
+      "time_to_first_positive",
+      "realized_exit",
+      "MFE_minus_realized_exit"
+    ]
+  },
+  "permanent_close_rule": "IF_NO_PAIR_HAS_CONNECTED_3_CELL_SELECTION_ADJUSTED_FULL_PASS_REGION_CLOSE_ONLY_THIS_FUTURES_LED_CASH_CATCHUP_ARCHITECTURE;DO_NOT_CLOSE_ALL_CROSS_INSTRUMENT_RELATIONAL_INFORMATION",
+  "friction_boundary": "ONLY_AFTER_CONNECTED_SELECTION_ADJUSTED_ROBUST_GROSS_REGION_FREEZE_EXACT_EVENTS_THEN_AUTHENTIC_FOLLOWER_BID_ASK_COMMISSION_CONVERSION_VOLUME_MARGIN_EUR200",
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "runtime_v2_read_only": true
+  }
+}

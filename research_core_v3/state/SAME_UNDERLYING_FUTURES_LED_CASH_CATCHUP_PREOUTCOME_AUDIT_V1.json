@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.research-core-v3.same-underlying-futures-led-cash-catchup-preoutcome-audit.v1",
+  "status": "PASS_SUPPORT_TOPOLOGY_AND_RAW_AVAILABILITY",
+  "source_archives": {
+    "selected_m5_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "high_quality_delta_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+  },
+  "evaluation_interval": [
+    "2025-09-16T00:00:00Z",
+    "2026-09-16T23:59:59Z"
+  ],
+  "pairs": [
+    {
+      "pair_id": "JPN225_F_TO_JPN225",
+      "leader": {
+        "symbol_id": 2917,
+        "symbol": "JPN225-F"
+      },
+      "follower": {
+        "symbol_id": 116,
+        "symbol": "JPN225"
+      },
+      "exact_common_m5_timestamps": 70865,
+      "distinct_iso_weeks": 53
+    },
+    {
+      "pair_id": "XAUUSD_F_TO_XAUUSD",
+      "leader": {
+        "symbol_id": 2924,
+        "symbol": "XAUUSD-F"
+      },
+      "follower": {
+        "symbol_id": 41,
+        "symbol": "XAUUSD"
+      },
+      "exact_common_m5_timestamps": 70825,
+      "distinct_iso_weeks": 53
+    },
+    {
+      "pair_id": "USDX_F_TO_USDX",
+      "leader": {
+        "symbol_id": 2926,
+        "symbol": "USDX-F"
+      },
+      "follower": {
+        "symbol_id": 110,
+        "symbol": "USDX"
+      },
+      "exact_common_m5_timestamps": 66057,
+      "distinct_iso_weeks": 53
+    }
+  ],
+  "contamination": {
+    "prior_basis_reversion_outcomes_exist": true,
+    "prior_basis_reversion_is_same_exact_hypothesis": false,
+    "prior_US_equity_lead_lag_is_same_exact_hypothesis": false,
+    "exact_futures_led_single_follower_catchup_outcomes_previously_opened": false,
+    "raw_reuse_allowed_for_new_development_hypothesis": true
+  },
+  "support_preflight": {
+    "exact_common_timestamp_density_sufficient": true,
+    "proposed_support_gate": {
+      "completed_events_min": 60,
+      "distinct_dates_min": 30,
+      "distinct_iso_weeks_min": 20,
+      "retention_fraction_min": 0.9
+    },
+    "event_outcomes_opened": false,
+    "return_divergence_signals_opened": false
+  },
+  "protected_forward_opened": false
+}
