@@ -1,0 +1,225 @@
+{
+  "schema": "mxm.research-core-v3.orcl-us24-exact-m5-orb-temporal-primary-result.v1",
+  "status": "COMPLETE_NO_ROBUST_GROSS_REGION_ORCL_TEMPORAL_GENERALIZATION_CLOSED",
+  "evidence_acceptance_ref": "research_core_v3/state/ORCL_US24_M5_ORB_TEMPORAL_EVIDENCE_ACCEPTANCE_V1.json",
+  "evidence_acceptance_sha256": "ac311de305353dbfc76119a6c7defed40c9386e3f304699e2b6c64f45663c4f3",
+  "design_ref": "research_core_v3/state/ORCL_US24_EXACT_M5_ORB_TEMPORAL_DESIGN_V1.json",
+  "source_evidence_outer_sha256": "02e051fc2bf9451caa51736a8629612b87b4af8c97c1a7e2e9e53cf6f9d623f9",
+  "evaluation": {
+    "symbol_id": 3027,
+    "broker_symbol": "ORCL.US-24",
+    "resolution": "M5",
+    "interval": {
+      "start_utc": "2025-01-02T00:00:00Z",
+      "end_utc": "2025-09-14T23:59:59Z"
+    },
+    "test_count": 4,
+    "opening_range_minutes": [
+      30
+    ],
+    "failure_rules": [
+      "MIDPOINT",
+      "OPPOSITE_BOUNDARY"
+    ],
+    "maximum_hold_bars": [
+      24,
+      48
+    ]
+  },
+  "exact_semantics": {
+    "opening_range": "MAX_HIGH_MIN_LOW_OF_EXACT_M5_BARS_09_30_THROUGH_09_55_AMERICA_NEW_YORK",
+    "breakout_watch": "NEXT_18_COMPLETED_EXACT_M5_BARS_LONG_FIRST_CLOSE_GT_OR_HIGH_SHORT_FIRST_CLOSE_LT_OR_LOW",
+    "entry": "NEXT_CONTIGUOUS_EXACT_M5_OPEN_AFTER_BREAKOUT_BAR_COMPLETION",
+    "failure_execution": "TRIGGER_ON_COMPLETED_M5_CLOSE_EXECUTE_NEXT_CONTIGUOUS_M5_OPEN",
+    "time_exit": "NEXT_CONTIGUOUS_M5_OPEN_AFTER_24_OR_48_COMPLETED_POST_ENTRY_BARS",
+    "missing_required_bar": "RIGHT_CENSOR_FAIL_CLOSED_NO_FILL",
+    "session_boundary": "NO_REQUIRED_ENTRY_OR_EXIT_AFTER_15_35_LOCAL",
+    "gross_return": "DIRECTION_TIMES_LOG_EXIT_OPEN_OVER_ENTRY_OPEN_TIMES_10000_BPS"
+  },
+  "frozen_gates": {
+    "support": {
+      "completed_events_min": 80,
+      "distinct_dates_min": 80,
+      "distinct_iso_weeks_min": 30,
+      "retention_fraction_min": 0.9
+    },
+    "economic": {
+      "mean_gross_bps_min": 12,
+      "median_gross_bps_min": 0,
+      "chronological_event_count_thirds_each_mean_strictly_positive": true,
+      "top10pct_abs_event_concentration_max": 0.5
+    },
+    "multiplicity": {
+      "family": "ALL_4_FROZEN_ORCL_OR30_FAILURE_X_HOLD_CELLS",
+      "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+      "resamples": 4999,
+      "seed": 20261001,
+      "familywise_alpha": 0.05,
+      "support_ineligible_cells_assigned_p1": true
+    },
+    "robust_region": {
+      "minimum_connected_full_pass_cells": 3,
+      "minimum_varied_parameter_dimensions": 2
+    }
+  },
+  "multiplicity_implementation": {
+    "cluster_se": "SQRT_G_OVER_G_MINUS_1_TIMES_SUM_WEEK_CENTERED_EVENT_RESIDUAL_SUM_SQUARED_DIVIDED_BY_N_SQUARED",
+    "wild_sign_null": "CELL_RETURNS_CENTERED_BY_CELL_SAMPLE_MEAN_THEN_MULTIPLIED_BY_SHARED_ISO_WEEK_RADEMACHER_SIGNS",
+    "bootstrap_studentization": "RECOMPUTE_CLUSTER_SE_PER_RESAMPLE",
+    "rng": "PYTHON_RANDOM_RANDOM_SEEDED_20261001",
+    "max_statistic": "ONE_SIDED_MAX_T_ACROSS_ALL_4_SUPPORT_ELIGIBLE_CELLS",
+    "maxT_quantiles": {
+      "q50": 0.30351375461598584,
+      "q90": 1.5575863577802498,
+      "q95": 1.9158522914173977,
+      "q99": 2.5990347194264634
+    }
+  },
+  "cells": [
+    {
+      "cell_id": "ORCL.US-24|OR30|FMIDPOINT|H24",
+      "opening_range_minutes": 30,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 24,
+      "hold_minutes": 120,
+      "attempted_events": 138,
+      "completed_events": 137,
+      "retention_fraction": 0.9927536231884058,
+      "distinct_dates": 137,
+      "distinct_iso_weeks": 37,
+      "mean_gross_bps": 5.83801745838805,
+      "median_gross_bps": -9.450307838307204,
+      "cluster_se_bps": 8.573758187628044,
+      "t_stat": 0.6809169713711223,
+      "chronological_thirds_mean_gross_bps": [
+        10.107742197977231,
+        3.64392217186915,
+        3.716262906360646
+      ],
+      "top10pct_abs_event_concentration": 0.30820477565455207,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.3556,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "ORCL.US-24|OR30|FMIDPOINT|H48",
+      "opening_range_minutes": 30,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 48,
+      "hold_minutes": 240,
+      "attempted_events": 138,
+      "completed_events": 136,
+      "retention_fraction": 0.9855072463768116,
+      "distinct_dates": 136,
+      "distinct_iso_weeks": 37,
+      "mean_gross_bps": 0.09998593517088787,
+      "median_gross_bps": -43.84568865660191,
+      "cluster_se_bps": 11.277170530081888,
+      "t_stat": 0.008866225344750714,
+      "chronological_thirds_mean_gross_bps": [
+        8.796865587222976,
+        -13.75033884480933,
+        5.060167070831185
+      ],
+      "top10pct_abs_event_concentration": 0.3135390366773824,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.6186,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "ORCL.US-24|OR30|FOPPOSITE_BOUNDARY|H24",
+      "opening_range_minutes": 30,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 24,
+      "hold_minutes": 120,
+      "attempted_events": 138,
+      "completed_events": 137,
+      "retention_fraction": 0.9927536231884058,
+      "distinct_dates": 137,
+      "distinct_iso_weeks": 37,
+      "mean_gross_bps": 7.324117533105196,
+      "median_gross_bps": -2.8968114585237434,
+      "cluster_se_bps": 8.547202184584398,
+      "t_stat": 0.8569023377398116,
+      "chronological_thirds_mean_gross_bps": [
+        15.115301403628433,
+        0.012866588402190522,
+        6.833519431155623
+      ],
+      "top10pct_abs_event_concentration": 0.32147967644076003,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.2906,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "ORCL.US-24|OR30|FOPPOSITE_BOUNDARY|H48",
+      "opening_range_minutes": 30,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 48,
+      "hold_minutes": 240,
+      "attempted_events": 138,
+      "completed_events": 136,
+      "retention_fraction": 0.9855072463768116,
+      "distinct_dates": 136,
+      "distinct_iso_weeks": 37,
+      "mean_gross_bps": 0.06279850883140166,
+      "median_gross_bps": -5.645328234211323,
+      "cluster_se_bps": 11.578892172492868,
+      "t_stat": 0.005423533434449585,
+      "chronological_thirds_mean_gross_bps": [
+        10.489150406692323,
+        -20.452794973092484,
+        9.920343384053005
+      ],
+      "top10pct_abs_event_concentration": 0.301935517747686,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.6198,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    }
+  ],
+  "aggregate": {
+    "support_pass_count": 4,
+    "economic_gross_pass_count": 0,
+    "multiplicity_pass_count": 0,
+    "full_pass_count": 0,
+    "robust_region_count": 0,
+    "best_mean_gross_bps": 7.324117533105196,
+    "best_mean_cell": "ORCL.US-24|OR30|FOPPOSITE_BOUNDARY|H24"
+  },
+  "interpretation": {
+    "historical_orcl_local_structure_replicated_on_untouched_interval": false,
+    "historical_21_23bps_h48_effect_reproduced": false,
+    "new_support_is_adequate": true,
+    "economic_gross_gate_failed_all_cells": true,
+    "familywise_confirmation": false,
+    "connected_robust_gross_region": false,
+    "positive_path_excursion_does_not_change_primary_result": true
+  },
+  "decision": {
+    "orcl_exact_m5_temporal_generalization": "PARKED_CLOSED_NO_POST_OUTCOME_RESCUE",
+    "threshold_rescue_allowed": false,
+    "hold_rescue_allowed": false,
+    "exit_rescue_inside_same_outcome_set_allowed": false,
+    "session_time_rescue_allowed": false,
+    "exact_bid_ask_friction_acquisition_required": false,
+    "candidate_frozen": false,
+    "protected_forward_opened": false,
+    "next_structure_if_information_gain_ordering_unchanged": "PEPUSD_M5_TREND_PULLBACK_TEMPORAL_GENERALIZATION",
+    "next_structure_selected_in_this_turn": false
+  },
+  "governance": {
+    "hard21_required_for_orcl_alone": false,
+    "candidate_frozen_count": 0,
+    "authoritative_frontier": 1576,
+    "runtime_v2_read_only": true
+  },
+  "canonical_sha256": "b01f437c414e05a568383ad2f65ce71ee7c68fb79986674637c4a401406e93d3"
+}
