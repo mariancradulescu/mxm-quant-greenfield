@@ -1,0 +1,97 @@
+{
+  "schema": "mxm.research-core-v3.crm-adbe-m5-temporal-acquisition-plan.v1",
+  "status": "FROZEN_AUTHORIZED_MINIMAL_READ_ONLY_ACQUISITION",
+  "role": "DEVELOPMENT_ONLY_GROSS_EVIDENCE_ACQUISITION",
+  "authorization": {
+    "user_authorized": true,
+    "scope": "CRM.US-24_AND_ADBE.US-24_EXACT_M5_ONLY",
+    "automatic_extension": false
+  },
+  "provenance_gate": {
+    "status": "PASS",
+    "authority_ref": "research_core_v3/state/CRM_ADBE_M5_PREACQUISITION_PROVENANCE_AUDIT_V1.json",
+    "authority_sha256": "f804e41aa6fd5eb4d71e701eb2ee769b3aa972455c430652599700990ff3a499"
+  },
+  "frozen_hypothesis_binding": {
+    "package_ref": "research_core_v3/state/CRM_ADBE_INTRADAY_RV_TEMPORAL_RETEST_PACKAGE_V1.json",
+    "git_blob_sha1": "fb289d6d56296a166a19b5e4b2b006e5952b6cf8",
+    "sha256": "a69bcc6a6b3c7ba4d09a1863054ab6c03af3ea4a8b494789f76eadae02a2ce01",
+    "coverage_audit_ref": "research_core_v3/state/PROJECT_WIDE_RESEARCH_DESIGN_COVERAGE_AUDIT_V1.json",
+    "coverage_audit_git_blob_sha1": "7c24437c227f99565efb0ac7575241a6fddafa69",
+    "coverage_audit_sha256": "435284c66092c583945b2a74cdeddd70aeec5b22657c2c514f6e126ac021676a",
+    "hypothesis_must_remain_unchanged": true
+  },
+  "source_environment": "Pepperstone - Europe LIVE",
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "resolution": "M5",
+  "interval": {
+    "start_utc": "2025-01-02T00:00:00Z",
+    "end_utc": "2025-09-14T23:59:59Z"
+  },
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "symbols": [
+    {
+      "symbol_id": 5410,
+      "broker_symbol": "CRM.US-24"
+    },
+    {
+      "symbol_id": 5411,
+      "broker_symbol": "ADBE.US-24"
+    }
+  ],
+  "frozen_scientific_design": {
+    "formation_sessions": "FIRST_84_ELIGIBLE_SESSIONS",
+    "evaluation_sessions": "ALL_SUBSEQUENT_ELIGIBLE_SESSIONS_THROUGH_2025_09_14",
+    "thresholds": [
+      1.5,
+      2,
+      2.5
+    ],
+    "hold_minutes": [
+      30,
+      60
+    ],
+    "frozen_test_count": 6,
+    "causal_formation": "Estimate alpha, beta, residual mean and residual standard deviation only from the new formation segment; freeze before evaluation outcomes.",
+    "entry_semantics": "NEXT_EXACT_M5_OPEN_AFTER_COMPLETED_30_MINUTE_RESIDUAL_SIGNAL",
+    "direction": {
+      "positive_z": "SHORT_CRM_LONG_ADBE",
+      "negative_z": "LONG_CRM_SHORT_ADBE"
+    },
+    "primary_pass_fail": "UNCHANGED_FROM_CRM_ADBE_INTRADAY_RV_TEMPORAL_RETEST_PACKAGE_V1",
+    "diagnostic_path": "DIAGNOSTIC_ONLY_MFE_MAE_TIME_TO_MFE_TIME_TO_FIRST_POSITIVE_REALIZED_HOLDING;NO_PRIMARY_GATE_CHANGE"
+  },
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "fill_authority": false,
+    "raw_ticks_requested": false,
+    "bid_ask_requested": false,
+    "trendbars_only": true,
+    "resolution": "M5",
+    "extra_symbols_permitted": false,
+    "interval_extension_permitted": false,
+    "external_datasets_permitted": false,
+    "protected_rows_permitted": false,
+    "forward_fill_permitted": false,
+    "synthetic_fill_permitted": false,
+    "exhaust_pagination": true,
+    "preserve_authentic_gaps": true,
+    "strict_timestamp_order": true,
+    "reject_conflicting_duplicates": true,
+    "verify_ohlc_invariants": true,
+    "window_days": 7
+  },
+  "output_contract": {
+    "device_computes_strategy_outcomes": false,
+    "device_computes_pnl": false,
+    "device_estimates_formation_parameters": false,
+    "raw_m5_only_plus_identity_integrity_completeness_metadata": true,
+    "evidence_zip_name": "MXM_V3_CRM_ADBE_M5_TEMPORAL_EVIDENCE_V1.zip"
+  },
+  "history_unavailable_policy": "DATA_UNAVAILABLE_FAIL_CLOSED_NO_INTERVAL_OR_RESOLUTION_SUBSTITUTION",
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0,
+  "plan_sha256": "3eb3155e04541c5d4dab9f7e1483f2d61732063e6213fa07d61ebc80326cf7a3"
+}

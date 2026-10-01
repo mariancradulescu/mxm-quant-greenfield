@@ -1,0 +1,69 @@
+{
+  "schema": "mxm.research-core-v3.crm-adbe-m5-preacquisition-provenance-audit.v1",
+  "status": "PASS_REQUESTED_INTERVAL_NOT_PREVIOUSLY_CONSUMED_AS_CRM_ADBE_RELATIVE_VALUE_EVALUATION_OUTCOMES",
+  "audited_live_head": "841e7624fad1f7f2dee2195d89b3771386f23a51",
+  "pair": [
+    "CRM.US-24",
+    "ADBE.US-24"
+  ],
+  "requested_interval_utc": {
+    "start": "2025-01-02T00:00:00Z",
+    "end": "2025-09-14T23:59:59Z"
+  },
+  "resolution": "M5",
+  "rule": "Prior unrelated mechanism use does not disqualify bytes; prior CRM/ADBE relative-value evaluation outcome use would fail closed.",
+  "v3_relative_value_authority": {
+    "design_ref": "research_core_v3/state/US_EQUITY_INTRADAY_RELATIVE_VALUE_FORMATION_EVALUATION_DESIGN_V1.json",
+    "design_git_blob_sha1": "c788c8f434d25af655d404a4de28329bf426d544",
+    "design_sha256": "986b66b28340b49957fdbd12ae959e277113337a7cefe405ee76aba49e253407",
+    "original_development_start_utc": "2025-09-16T00:00:00Z",
+    "original_development_end_utc": "2026-09-16T23:59:59Z",
+    "formation_ref": "research_core_v3/state/US_EQUITY_INTRADAY_RV_FORMATION_V1.json",
+    "formation_git_blob_sha1": "79b4396b5f09e82a8227f70c5035cf3f9ad77825",
+    "formation_sha256": "4fdf4de003bcc3905a30ae26c3cbfeb118f84e0d55d4f2b11ea22da3c922f2a0",
+    "formation_first_date": "2025-09-16",
+    "formation_last_date": "2026-01-20",
+    "evaluation_first_date": "2026-01-21",
+    "evaluation_last_date": "2026-09-16",
+    "selected_pair_present": true,
+    "evaluation_ref": "research_core_v3/state/US_EQUITY_INTRADAY_RV_EVALUATION_V1.json",
+    "evaluation_git_blob_sha1": "aa5fdb5cb0b237193b12c3b9b7beba9929e774d0",
+    "evaluation_sha256": "22efcbda34b0aec1eb600c5a6295978ce023695aa24265bb03fae8aa26cdd8a2",
+    "strongest_pair": "CRM.US-24|ADBE.US-24"
+  },
+  "legacy_relative_value_review": {
+    "refs": [
+      {
+        "ref": "evidence/EPOCH24_RELATIVE_VALUE_ALIGNMENT_PREREQUISITE_V1.json",
+        "git_blob_sha1": "730f88f920b8262704954052af2d9b3f405e2a96",
+        "sha256": "ae18d012f35bfa7aa4e5c32362846f94f1a7e7750bb5e905b28acb6d52f2533e"
+      },
+      {
+        "ref": "evidence/EPOCH24_RELATIVE_VALUE_STRUCTURAL_DIAGNOSTIC_ACCEPTANCE_V1.json",
+        "git_blob_sha1": "8cd37b6f377d30a8e7ea6b93b33a0585da3941c9",
+        "sha256": "d0a15017a36935d7d1145eac7b3fb2553f8ba39d5cc50cb093aaed6502c96af3"
+      },
+      {
+        "ref": "evidence/EPOCH32_RELATIVE_VALUE_PAIR_STRUCTURE_STRUCTURAL_RESULT_V1.json",
+        "git_blob_sha1": "04fc6959e7a1d24f4cb4b94e7e74e2a3b675484d",
+        "sha256": "46a3e154811b2e9e530b19239d64d6dc6b573b704d6fd499ebbd5557242336d0"
+      }
+    ],
+    "crm_or_adbe_string_hits": [],
+    "crm_adbe_relative_value_outcome_contamination_found": false
+  },
+  "temporal_separation": {
+    "requested_interval_end_utc": "2025-09-14T23:59:59Z",
+    "original_v3_relative_value_formation_start_utc": "2025-09-16T00:00:00Z",
+    "strict_precedes_original_v3_relative_value_outcomes": true,
+    "one_full_calendar_day_gap": true
+  },
+  "conclusion": {
+    "provenance_gate_passed": true,
+    "requested_interval_may_be_acquired_for_frozen_temporal_retest": true,
+    "alternate_interval_authorized": false,
+    "alternate_resolution_authorized": false,
+    "protected_forward_opened": false
+  },
+  "sha256": "f804e41aa6fd5eb4d71e701eb2ee769b3aa972455c430652599700990ff3a499"
+}
