@@ -1,0 +1,78 @@
+{
+  "schema": "mxm.research-core-v3.fx-cross-pair-quote-lead-lag-acquisition-plan.v2",
+  "status": "FROZEN_READ_ONLY_AUTHENTIC_QUOTE_ACQUISITION_PLAN",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "FX_CROSS_PAIR_QUOTE_LEAD_LAG_CATCHUP",
+  "source_audit_sha256": "39f52564a701e94fd00f6783769459e0c2ec737ad2ba11f6b76595a5775e4454",
+  "source_design_sha256": "d275f41ee22bd97f10fc5892e390b74c6cfa209ae80691a9de7e9cc89765a5f8",
+  "path_observability_freeze_ref": "research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PATH_OBSERVABILITY_FREEZE_V1.json",
+  "path_observability_freeze_sha256": "e7e1e196263e9e06a0c33a0e411554f9523d8c37365c29cb5ea90b0574f0839d",
+  "supersedes_acquisition_plan_ref": "research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_ACQUISITION_PLAN_V1.json",
+  "supersession_scope": "ACQUISITION_OBSERVABILITY_ONLY_PRIMARY_SCIENTIFIC_DESIGN_UNCHANGED",
+  "broker_identity": {
+    "environment": "Pepperstone - Europe LIVE",
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "targets": [
+    {"symbol":"EURJPY","symbol_id":3},
+    {"symbol":"EURGBP","symbol_id":9},
+    {"symbol":"AUDCAD","symbol_id":18},
+    {"symbol":"GBPCAD","symbol_id":19}
+  ],
+  "calendar": {
+    "dates_utc": ["2025-09-22","2025-10-07","2025-10-23","2025-11-07","2025-11-17","2025-12-02","2025-12-18","2026-01-02","2026-01-12","2026-01-27","2026-02-12","2026-02-27","2026-03-09","2026-03-24","2026-04-09","2026-04-24","2026-05-04","2026-05-19","2026-06-04","2026-06-19","2026-06-29","2026-07-14","2026-07-30","2026-08-14","2026-08-24","2026-09-08"],
+    "windows_utc": [["00:00:00","01:00:00"],["07:00:00","08:00:00"],["13:00:00","14:00:00"]],
+    "query_padding_before_seconds": 90,
+    "query_padding_after_seconds": 960,
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z"
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "quote_sides": ["BID","ASK"],
+    "historical_request_max_span_ms": 604800000,
+    "request_min_interval_seconds": 0.22,
+    "pagination": "follow hasMore backward with chronology repair and exact duplicate boundary removal",
+    "base_side_requests_before_pagination": 624,
+    "fill_authority": false,
+    "raw_ticks_written_to_disk": "TEMPORARY_RESUMABLE_ON_DEVICE_CACHE_ONLY",
+    "raw_ticks_transferred_off_device": false,
+    "raw_tick_cache_retention": "MAY_REMAIN_ON_DEVICE_FOR_RESUME_UNTIL_ACCEPTANCE;NEVER_INCLUDED_IN_TRANSFER_BUNDLE",
+    "on_device_cross_symbol_feature_and_response_aggregation": true,
+    "diagnostic_path_horizon_seconds": 900,
+    "protected_forward_opened": false,
+    "automatic_additional_acquisition": false
+  },
+  "primary_science_invariance": {
+    "frozen_test_count": 72,
+    "relationships_unchanged": true,
+    "structural_signs_unchanged": true,
+    "signal_law_unchanged": true,
+    "thresholds_unchanged": true,
+    "calendar_unchanged": true,
+    "symbols_unchanged": true,
+    "primary_holding_seconds": [15,60,180],
+    "primary_exit_law_unchanged": true,
+    "primary_statistical_family_unchanged": true,
+    "primary_pass_fail_gates_unchanged": true
+  },
+  "output": {
+    "bundle_name": "MXM_V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_EVIDENCE_V2.zip",
+    "event_rows": "sanitized frozen 72-cell relationship-event rows with unchanged primary metrics plus diagnostic-only entry/exit/mid/MFE/MAE/path timing fields",
+    "transport_provenance": true,
+    "current_symbol_metadata": true,
+    "checksums": true,
+    "raw_tick_values": false
+  },
+  "governance": {
+    "candidate_freeze_from_capture": false,
+    "net_certification_from_capture": false,
+    "diagnostic_fields_may_not_enter_primary_maxT": true,
+    "pilot_result_may_not_open_protected_forward": true,
+    "pilot_null_does_not_close_1576_frontier": true
+  },
+  "binding_sha256": "eaa46220c925dc461f39b33c60f3e1a90b76ee7c678a8d8acfa7a26180826d71"
+}
