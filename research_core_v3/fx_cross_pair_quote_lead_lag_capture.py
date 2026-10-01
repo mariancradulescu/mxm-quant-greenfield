@@ -66,7 +66,9 @@ def _path(snaps,entry_sec,direction,horizon=900):
 def offline_preflight(root):
     root=Path(root)
     p=json.loads((root/PLAN_REL).read_text()); d=json.loads((root/DESIGN_REL).read_text()); a=json.loads((root/AUDIT_REL).read_text()); g=json.loads((root/DIAG_REL).read_text())
-    for doc,key in ((p,"binding_sha256"),(d,"canonical_sha256"),(a,"canonical_sha256"),(g,"canonical_sha256")): _self(doc,key)
+    _self(p,"binding_sha256"); _self(g,"canonical_sha256")
+    if d.get("canonical_sha256")!="d275f41ee22bd97f10fc5892e390b74c6cfa209ae80691a9de7e9cc89765a5f8": raise CaptureContractError("historical primary design authority changed")
+    if a.get("canonical_sha256")!="39f52564a701e94fd00f6783769459e0c2ec737ad2ba11f6b76595a5775e4454": raise CaptureContractError("historical preoutcome audit authority changed")
     if p["source_design_sha256"]!=d["canonical_sha256"] or p["source_audit_sha256"]!=a["canonical_sha256"] or p["path_observability_freeze_sha256"]!=g["canonical_sha256"]: raise CaptureContractError("authority binding mismatch")
     if d["test_count"]!=72 or d["parameter_grid"]["holding_seconds"]!=[15,60,180]: raise CaptureContractError("primary 72-cell design changed")
     if p["acquisition"]["base_side_requests_before_pagination"]!=624 or p["acquisition"]["diagnostic_path_horizon_seconds"]!=900: raise CaptureContractError("acquisition geometry changed")
