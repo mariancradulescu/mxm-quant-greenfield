@@ -1,0 +1,139 @@
+{
+  "schema": "mxm.research-core-v3.mean-reversion-same-symbol-disjoint-m5-acquisition-plan.v1",
+  "status": "FROZEN_PRE_CAPTURE_OUTCOME_BLIND_SAME_SYMBOL_TEMPORAL_TEST",
+  "parent_live_head": "2800c6121d9afeacf42d23f58930cdf4cc82bff2",
+  "frozen_architecture": {
+    "id": "HALF_REVERSION_PROGRESS_VOL_TRAIL_V1",
+    "design_ref": "research_core_v3/state/MEAN_REVERSION_PROGRESS_VOL_TRAIL_DEVELOPMENT_DESIGN_V1.json",
+    "design_commit": "5b412dd57d66e14e361b33b0bbf90ba9b681c14a",
+    "parameters_must_remain_unchanged": true
+  },
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "resolution": "M5",
+  "classification": "DEVELOPMENT_ONLY_OUTCOME_BLIND_ACQUISITION",
+  "interval": {
+    "start_utc": "2025-06-16T00:00:00Z",
+    "end_utc": "2025-09-14T23:59:59Z",
+    "weeks": 13,
+    "selection_law": "EXACT_13_COMPLETE_UTC_ISO_WEEKS_IMMEDIATELY_BEFORE_A_ONE_DAY_GAP_AND_THE_2025_09_16_MEAN_REVERSION_EXPOSURE_FLOOR"
+  },
+  "mean_reversion_exposure_floor_utc": "2025-09-16T00:00:00Z",
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "symbols": [
+    {
+      "broker_symbol": "USDZAR",
+      "symbol_id": 49,
+      "schedule_minutes_per_week": 7186,
+      "minimum_executable_volume": "100000",
+      "minimum_margin_estimate_for_EUR200": 43.92,
+      "planning_friction_bps": 2.487533868363053
+    },
+    {
+      "broker_symbol": "GBPSEK",
+      "symbol_id": 61,
+      "schedule_minutes_per_week": 7186,
+      "minimum_executable_volume": "100000",
+      "minimum_margin_estimate_for_EUR200": 58.07,
+      "planning_friction_bps": 3.928494535667453
+    },
+    {
+      "broker_symbol": "NOKSEK",
+      "symbol_id": 87,
+      "schedule_minutes_per_week": 7186,
+      "minimum_executable_volume": "100000",
+      "minimum_margin_estimate_for_EUR200": 4.61,
+      "planning_friction_bps": 11.882698793027854
+    },
+    {
+      "broker_symbol": "AUDNOK",
+      "symbol_id": 2764,
+      "schedule_minutes_per_week": 7186,
+      "minimum_executable_volume": "100000",
+      "minimum_margin_estimate_for_EUR200": 30.83,
+      "planning_friction_bps": 5.801583642622846
+    },
+    {
+      "broker_symbol": "CADSGD",
+      "symbol_id": 2767,
+      "schedule_minutes_per_week": 7186,
+      "minimum_executable_volume": "100000",
+      "minimum_margin_estimate_for_EUR200": 31.04,
+      "planning_friction_bps": 1.8678715993704116
+    },
+    {
+      "broker_symbol": "EURILS",
+      "symbol_id": 2785,
+      "schedule_minutes_per_week": 7186,
+      "minimum_executable_volume": "100000",
+      "minimum_margin_estimate_for_EUR200": 50,
+      "planning_friction_bps": 10.268924783273377
+    }
+  ],
+  "scientific_boundary": {
+    "purpose": "ONE_FINAL_SAME_SYMBOL_TIME_DISJOINT_GENERALIZATION_TEST_OF_THE_ALREADY_FROZEN_EXIT_ARCHITECTURE",
+    "mean_reversion_outcomes_may_not_be_computed_on_device": true,
+    "interval_was_selected_without_mean_reversion_outcomes": true,
+    "other_mechanism_use_does_not_disqualify_interval": true,
+    "no_symbol_removal_based_on_capture_or_future_outcome": true,
+    "no_architecture_retuning_after_capture": true,
+    "no_automatic_additional_acquisition": true,
+    "no_protected_forward_access": true
+  },
+  "capture_law": {
+    "read_only": true,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "forward_fill_permitted": false,
+    "synthetic_fill_permitted": false,
+    "protected_rows_permitted": false,
+    "max_count_per_request": 5000,
+    "historical_request_target_rps": 4.7,
+    "window_days": 14,
+    "exhaust_pagination": true,
+    "preserve_authentic_gaps": true,
+    "strict_timestamp_order": true,
+    "reject_conflicting_duplicates": true,
+    "verify_ohlc_invariants": true,
+    "raw_ticks_requested": false,
+    "trendbars_only": true
+  },
+  "post_capture_acceptance": {
+    "required_symbol_identity_count": 6,
+    "minimum_active_iso_weeks_per_symbol": 13,
+    "schedule_adjusted_coverage_proxy_floor": 0.95,
+    "zero_or_insufficient_history_is_a_data_availability_result_not_a_negative_strategy_outcome": true,
+    "strategy_return_forbidden_in_collector": true,
+    "pnl_forbidden_in_collector": true,
+    "winner_selection_forbidden_in_collector": true
+  },
+  "frozen_economic_and_inference_contract": {
+    "entry_lookbacks": [
+      12,
+      24,
+      48
+    ],
+    "z_thresholds": [
+      1,
+      1.5,
+      2
+    ],
+    "exit_architecture": "HALF_REVERSION_PROGRESS_VOL_TRAIL_V1",
+    "vru24_definition_unchanged": true,
+    "initial_stop_vru_multiple": 2,
+    "half_reversion_arm_unchanged": true,
+    "trail_vru_multiple": 1,
+    "maximum_horizon_bars": 48,
+    "support_gates_unchanged": true,
+    "economic_gates_unchanged": true,
+    "multiplicity_procedure_unchanged": true,
+    "connected_robustness_unchanged": true,
+    "candidate_freeze_at_development_stage": false
+  },
+  "accounting_effect": {
+    "economic_outcomes_opened": 0,
+    "candidate_frozen_count": 0
+  },
+  "protected_forward_opened": false,
+  "plan_sha256": "86ac0d74e744dfdc63d1b8291bfe2b367ee28ca4f06fa614b36b69b6da845152"
+}
