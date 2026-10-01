@@ -1,0 +1,255 @@
+{
+  "schema": "mxm.research-core-v3.crm-adbe-m5-temporal-primary-result.v1",
+  "status": "COMPLETE_NO_ROBUST_GROSS_REGION_HYPOTHESIS_CLOSED",
+  "formation_freeze_ref": "research_core_v3/state/CRM_ADBE_M5_TEMPORAL_FORMATION_FREEZE_V1.json",
+  "formation_freeze_sha256": "8f1a12ddf8e3130d5f92cd1370050bcef99042296ab3371b166ddb95e6d28b97",
+  "source_evidence_outer_sha256": "fa865cda66a97ae33eef460e0dc13a9c98785ab5667a5c321d171835b7723244",
+  "evaluation": {
+    "session_count": 62,
+    "first_date": "2025-06-03",
+    "last_date": "2025-09-12",
+    "feature_observations": 554,
+    "pair": [
+      "CRM.US-24",
+      "ADBE.US-24"
+    ],
+    "resolution": "M5",
+    "thresholds": [
+      1.5,
+      2,
+      2.5
+    ],
+    "holds_minutes": [
+      30,
+      60
+    ],
+    "test_count": 6
+  },
+  "execution_semantics": {
+    "signal_feature": "FORMATION_FROZEN_30_MINUTE_RETURN_RESIDUAL_ZSCORE_AT_THE_9_PREDECLARED_REGULAR_SESSION_ANCHORS",
+    "entry": "M5_OPEN_AT_SIGNAL_BAR_COMPLETION_T_PLUS_5_MINUTES",
+    "direction_positive_z": "SHORT_CRM_LONG_ADBE",
+    "direction_negative_z": "LONG_CRM_SHORT_ADBE",
+    "leg_weight_crm": 0.5324735566317569,
+    "leg_weight_adbe": 0.46752644336824317,
+    "exit": "EXACT_M5_OPEN_AT_ENTRY_PLUS_HOLD",
+    "no_overlap": "WITHIN_EACH_THRESHOLD_X_HOLD_CELL",
+    "no_cross_gap": true,
+    "missing_entry_or_exit": "RIGHT_CENSOR_NO_REPLACEMENT",
+    "retention_fraction_definition": "COMPLETED_EVENTS_DIVIDED_BY_ACCEPTED_NONOVERLAPPING_SIGNAL_ATTEMPTS"
+  },
+  "frozen_gates": {
+    "support": {
+      "completed_events_min": 80,
+      "distinct_dates_min": 40,
+      "distinct_iso_weeks_min": 12,
+      "retention_fraction_min": 0.8
+    },
+    "economic": {
+      "mean_gross_bps_min": 10,
+      "chronological_thirds_each_mean_gross_bps_min": 3,
+      "top10pct_absolute_event_concentration_max": 0.5
+    },
+    "multiplicity": {
+      "procedure": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+      "resamples": 4999,
+      "seed": 20261001,
+      "familywise_alpha": 0.05,
+      "support_ineligible_cells_assigned_p1": true
+    },
+    "robust_region": {
+      "minimum_connected_full_pass_cells": 3,
+      "minimum_varied_parameter_dimensions": 2
+    }
+  },
+  "cells": [
+    {
+      "threshold": 1.5,
+      "hold_minutes": 30,
+      "qualified_signals": 51,
+      "overlap_skipped": 0,
+      "accepted_signal_attempts": 51,
+      "right_censored": 1,
+      "completed_events": 50,
+      "retention_fraction": 0.9803921568627451,
+      "distinct_dates": 29,
+      "distinct_iso_weeks": 13,
+      "mean_gross_bps": -2.427354133324129,
+      "median_gross_bps": -2.8682021763654753,
+      "chronological_thirds_mean_gross_bps": [
+        -2.902177409753737,
+        -7.423537266504603,
+        3.3855901768865833
+      ],
+      "top10pct_absolute_event_concentration": 0.286334296297419,
+      "t_stat": -0.9632971318344649,
+      "support_gate_pass": false,
+      "economic_gate_pass": false,
+      "p_familywise": 1,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "threshold": 1.5,
+      "hold_minutes": 60,
+      "qualified_signals": 51,
+      "overlap_skipped": 7,
+      "accepted_signal_attempts": 44,
+      "right_censored": 1,
+      "completed_events": 43,
+      "retention_fraction": 0.9772727272727273,
+      "distinct_dates": 29,
+      "distinct_iso_weeks": 13,
+      "mean_gross_bps": -2.936650259544301,
+      "median_gross_bps": 1.9845329968466696,
+      "chronological_thirds_mean_gross_bps": [
+        -2.028770970761646,
+        -1.967221675163935,
+        -4.878806653334656
+      ],
+      "top10pct_absolute_event_concentration": 0.3260565614956987,
+      "t_stat": -0.7276601550524527,
+      "support_gate_pass": false,
+      "economic_gate_pass": false,
+      "p_familywise": 1,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "threshold": 2,
+      "hold_minutes": 30,
+      "qualified_signals": 19,
+      "overlap_skipped": 0,
+      "accepted_signal_attempts": 19,
+      "right_censored": 1,
+      "completed_events": 18,
+      "retention_fraction": 0.9473684210526315,
+      "distinct_dates": 13,
+      "distinct_iso_weeks": 9,
+      "mean_gross_bps": -4.993609892276066,
+      "median_gross_bps": -5.144844040173174,
+      "chronological_thirds_mean_gross_bps": [
+        -9.421872721389192,
+        -4.473176460292046,
+        -1.0857804951469594
+      ],
+      "top10pct_absolute_event_concentration": 0.2799634352806994,
+      "t_stat": -1.3583523941146183,
+      "support_gate_pass": false,
+      "economic_gate_pass": false,
+      "p_familywise": 1,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "threshold": 2,
+      "hold_minutes": 60,
+      "qualified_signals": 19,
+      "overlap_skipped": 0,
+      "accepted_signal_attempts": 19,
+      "right_censored": 1,
+      "completed_events": 18,
+      "retention_fraction": 0.9473684210526315,
+      "distinct_dates": 13,
+      "distinct_iso_weeks": 9,
+      "mean_gross_bps": -7.923614397180085,
+      "median_gross_bps": -5.489675893286084,
+      "chronological_thirds_mean_gross_bps": [
+        -23.716670239824065,
+        3.391984204465009,
+        -3.4461571561812008
+      ],
+      "top10pct_absolute_event_concentration": 0.263567345572748,
+      "t_stat": -1.4292174165489369,
+      "support_gate_pass": false,
+      "economic_gate_pass": false,
+      "p_familywise": 1,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "threshold": 2.5,
+      "hold_minutes": 30,
+      "qualified_signals": 7,
+      "overlap_skipped": 0,
+      "accepted_signal_attempts": 7,
+      "right_censored": 0,
+      "completed_events": 7,
+      "retention_fraction": 1,
+      "distinct_dates": 7,
+      "distinct_iso_weeks": 6,
+      "mean_gross_bps": 3.4576145894963384,
+      "median_gross_bps": 6.525228763940526,
+      "chronological_thirds_mean_gross_bps": [
+        10.38778252389456,
+        -16.622904750878163,
+        13.142882028273508
+      ],
+      "top10pct_absolute_event_concentration": 0.3336486180333959,
+      "t_stat": 0.5203400539329522,
+      "support_gate_pass": false,
+      "economic_gate_pass": false,
+      "p_familywise": 1,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "threshold": 2.5,
+      "hold_minutes": 60,
+      "qualified_signals": 7,
+      "overlap_skipped": 0,
+      "accepted_signal_attempts": 7,
+      "right_censored": 0,
+      "completed_events": 7,
+      "retention_fraction": 1,
+      "distinct_dates": 7,
+      "distinct_iso_weeks": 6,
+      "mean_gross_bps": 3.8332746707662273,
+      "median_gross_bps": 15.352838970697931,
+      "chronological_thirds_mean_gross_bps": [
+        12.584357983990273,
+        -12.954855471179119,
+        7.4947798428755075
+      ],
+      "top10pct_absolute_event_concentration": 0.3358667641862754,
+      "t_stat": 0.4430101189263929,
+      "support_gate_pass": false,
+      "economic_gate_pass": false,
+      "p_familywise": 1,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    }
+  ],
+  "aggregate": {
+    "support_pass_count": 0,
+    "economic_pass_count": 0,
+    "multiplicity_pass_count": 0,
+    "full_pass_count": 0,
+    "robust_region_count": 0,
+    "max_completed_events": 50,
+    "all_cells_support_ineligible": true,
+    "max_t_resampling_executed": false,
+    "max_t_short_circuit_reason": "ALL_6_CELLS_SUPPORT_INELIGIBLE;FROZEN_RULE_ASSIGNS_P_FAMILYWISE_1_TO_SUPPORT_INELIGIBLE_CELLS"
+  },
+  "decision": {
+    "robust_gross_region": false,
+    "crm_adbe_temporal_generalization_closed": true,
+    "post_outcome_threshold_retune": false,
+    "post_outcome_hold_retune": false,
+    "exit_rescue": false,
+    "pair_substitution": false,
+    "formation_length_change": false,
+    "bid_ask_acquisition_authorized": false,
+    "friction_stage_opened": false,
+    "candidate_frozen": false,
+    "return_to_unresolved_queue_later": true,
+    "next_structure_if_ordering_unchanged": "ORCL_M5"
+  },
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "authoritative_frontier": 1576,
+    "runtime_v2_read_only": true
+  },
+  "canonical_sha256": "55f0532495bab50ddacb2e61807ee8b4d5bfa61d68dc538a59e53bcb6919efad"
+}
