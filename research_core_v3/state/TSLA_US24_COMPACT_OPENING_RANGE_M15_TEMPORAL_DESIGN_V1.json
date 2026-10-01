@@ -1,0 +1,159 @@
+{
+  "schema": "mxm.research-core-v3.tsla-us24-compact-opening-range-temporal-generalization-design.v1",
+  "status": "FROZEN_PREOUTCOME_ON_UNTOUCHED_M15_HISTORY",
+  "parent_audit_ref": "research_core_v3/state/PROJECT_WIDE_HIERARCHICAL_MISSED_EDGE_AUDIT_V1.json",
+  "parent_audit_commit": "9448e1fb287f0cdb241f0045c06ce56251f62111",
+  "purpose": "TEST_WHETHER_THE_SYMBOL_LOCAL_TSLA_US24_OPENING_RANGE_STRUCTURE_SEEN_INSIDE_THE_228_CELL_GLOBAL_V3_FAMILY_GENERALIZES_ON_TIME_DISJOINT_AUTHENTIC_PEPPERSTONE_HISTORY_USING_A_MECHANICALLY_RESOLUTION_TRANSLATED_COMPACT_FAMILY",
+  "old_result_boundary": {
+    "old_family_ref": "research_core_v3/state/US_REGULAR_SESSION_OPENING_RANGE_BREAKOUT_DEVELOPMENT_RESULT_V1.json",
+    "old_family_status": "PARKED_MULTIPLICITY_NULL_DESPITE_16_ECONOMIC_SUPPORT_CELLS",
+    "old_tsla_economic_support_cells": 10,
+    "old_tsla_mean_gross_range_bps": [
+      12.14152161346305,
+      24.8356546403339
+    ],
+    "old_pvalues_unchanged": true,
+    "old_family_not_reinterpreted_as_pass": true
+  },
+  "source_evidence": {
+    "archive_name": "MXM_A097_ATTACKER_WAREHOUSE_MXM-A097-ATTACKER-R3-20260903-V1.zip",
+    "archive_sha256": "2e59108b66a7bdadacfe2bcf27ef54b0698e451abf16a86ce13d23922da91e7e",
+    "archive_manifest_schema": "mxm.a097r3.manifest.v1",
+    "source_environment": "Pepperstone",
+    "member": "warehouse/TSLA.US-24/Minute15.csv.gz",
+    "member_gzip_sha256": "8498f85d9aff0a7d60bc2847b20bd86da5439d90b0f4dce57e1ecb95f6c5f8e2",
+    "member_decompressed_sha256": "92a717eaeb8e49e8de2de0a4501aa0aad80c1f389ed4c2fd5811036d992973ea",
+    "source_series_first_utc": "2025-01-02T01:00:00Z",
+    "source_series_last_utc": "2026-09-03T11:45:00Z",
+    "frozen_test_interval": {
+      "start_utc": "2025-06-16T00:00:00Z",
+      "end_utc": "2025-09-14T23:59:59Z"
+    },
+    "exact_regular_sessions_in_interval": 62,
+    "untouched_for_v3_opening_range_outcomes": true,
+    "other_mechanism_use_does_not_disqualify": true,
+    "protected_forward_opened": false
+  },
+  "selection_logic": {
+    "symbol": "TSLA.US-24",
+    "symbol_id": 3025,
+    "reason": "TEN_OF_TWELVE_ORIGINAL_TSLA_CELLS_PASSED_THE_STRICT_PREDECLARED_ECONOMIC_SUPPORT_GATE_ACROSS_THE_BROAD_GRID;SELECTION_IS_BY_WITHIN_SYMBOL_BREADTH_NOT_BY_THE_SINGLE_BEST_PNL_CELL",
+    "selection_is_not_based_on_new_untouched_outcomes": true
+  },
+  "resolution_translation": {
+    "old_resolution": "M5",
+    "new_resolution": "M15",
+    "rule": "PRESERVE_CLOCK_TIME_GEOMETRY_AND_MECHANISM;DO_NOT_REUSE_OLD_CELL_PVALUES",
+    "opening_range_minutes": [
+      15,
+      30
+    ],
+    "breakout_watch_minutes": 90,
+    "breakout_watch_m15_bars": 6,
+    "old_maximum_hold_m5_bars": [
+      12,
+      24,
+      48
+    ],
+    "new_maximum_hold_m15_bars": [
+      4,
+      8,
+      16
+    ],
+    "clock_horizons_minutes": [
+      60,
+      120,
+      240
+    ],
+    "failure_rules": [
+      "MIDPOINT",
+      "OPPOSITE_BOUNDARY"
+    ],
+    "test_count": 12
+  },
+  "signal": {
+    "timezone": "America/New_York",
+    "regular_session_open_local": "09:30",
+    "required_regular_session_bar_opens_local": [
+      "09:30",
+      "09:45",
+      "10:00",
+      "10:15",
+      "10:30",
+      "10:45",
+      "11:00",
+      "11:15",
+      "11:30",
+      "11:45",
+      "12:00",
+      "12:15",
+      "12:30",
+      "12:45",
+      "13:00",
+      "13:15",
+      "13:30",
+      "13:45",
+      "14:00",
+      "14:15",
+      "14:30",
+      "14:45",
+      "15:00",
+      "15:15",
+      "15:30",
+      "15:45"
+    ],
+    "exact_contiguity_seconds": 900,
+    "opening_range": "MAX_HIGH_AND_MIN_LOW_OF_THE_FIRST_1_OR_2_COMPLETED_M15_BARS_BEGINNING_09_30_FOR_OR15_OR_OR30",
+    "breakout_watch": "AFTER_OR_COMPLETION_EXAMINE_THE_NEXT_6_COMPLETED_M15_BARS;LONG_ON_FIRST_CLOSE_STRICTLY_ABOVE_OR_HIGH;SHORT_ON_FIRST_CLOSE_STRICTLY_BELOW_OR_LOW",
+    "entry": "NEXT_CONTIGUOUS_M15_OPEN_AFTER_BREAKOUT_BAR_COMPLETION",
+    "one_event_per_session_per_cell": true,
+    "failure_midpoint": "LONG_TRIGGER_ON_COMPLETED_CLOSE_LE_OR_MIDPOINT_SHORT_TRIGGER_ON_COMPLETED_CLOSE_GE_OR_MIDPOINT_EXECUTE_NEXT_CONTIGUOUS_M15_OPEN",
+    "failure_opposite_boundary": "LONG_TRIGGER_ON_COMPLETED_CLOSE_LE_OR_LOW_SHORT_TRIGGER_ON_COMPLETED_CLOSE_GE_OR_HIGH_EXECUTE_NEXT_CONTIGUOUS_M15_OPEN",
+    "time_exit": "IF_NO_FAILURE_TRIGGER_EXIT_AT_NEXT_CONTIGUOUS_M15_OPEN_AFTER_4_8_OR_16_COMPLETED_POST_ENTRY_BARS",
+    "session_boundary": "ENTRY_AND_EXIT_MUST_USE_EXACT_REGULAR_SESSION_M15_OPENS_NO_LATER_THAN_15_45_LOCAL;NO_OVERNIGHT_OR_EXTENDED_SESSION_CARRY",
+    "right_censor": "MISSING_REQUIRED_BAR_OR_NO_VALID_NEXT_REGULAR_SESSION_OPEN_FOR_EXIT",
+    "gross_return": "DIRECTION_TIMES_LOG_EXIT_OPEN_OVER_ENTRY_OPEN_TIMES_10000_BPS"
+  },
+  "support_gate": {
+    "completed_events_min": 40,
+    "distinct_dates_min": 40,
+    "distinct_iso_weeks_min": 10,
+    "retention_fraction_min": 0.9,
+    "rationale": "PREDECLARED_FOR_13_WEEK_62_SESSION_UNTOUCHED_INTERVAL_BEFORE_OUTCOMES;NONRETURN_SUPPORT_ONLY"
+  },
+  "economic_gate": {
+    "mean_gross_bps_min": 12,
+    "median_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5,
+    "rationale": "PRESERVE_THE_ORIGINAL_V3_ORB_MATERIAL_GROSS_HURDLE"
+  },
+  "multiplicity": {
+    "family": "ALL_12_FROZEN_TSLA_M15_OR_X_FAILURE_X_HOLD_CELLS",
+    "dependence_cluster": "ENTRY_UTC_ISO_WEEK",
+    "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_ineligible_cells_assigned_p1": true,
+    "no_postoutcome_family_narrowing": true
+  },
+  "robust_region_gate": {
+    "adjacency": "ONE_STEP_IN_OR_MINUTES_FAILURE_RULE_OR_HOLD_WITH_OTHER_PARAMETERS_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "friction_policy": {
+    "exact_authentic_event_time_bid_ask_required_only_after_robust_gross_survivor": true,
+    "proxy_costs_forbidden": true,
+    "planning_cost_not_subtracted_as_realized_net": true,
+    "no_new_broker_acquisition_before_gross_result": true
+  },
+  "decision": {
+    "if_no_robust_gross_region": "PERMANENTLY_CLOSE_THIS_TSLA_LOCAL_ORB_REOPENING_AND_RETURN_TO_THE_1576_FRONTIER",
+    "if_robust_gross_region": "FREEZE_EXACT_TSLA_EVENT_TIME_FRICTION_WINDOWS_BEFORE_ANY_BID_ASK_ACQUISITION_OR_NET_CLAIM",
+    "candidate_freeze_at_this_stage": false,
+    "protected_forward_access": false
+  }
+}
