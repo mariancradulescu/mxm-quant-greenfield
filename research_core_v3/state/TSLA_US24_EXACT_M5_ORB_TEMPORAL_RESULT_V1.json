@@ -1,0 +1,403 @@
+{
+  "schema": "mxm.research-core-v3.tsla-us24-exact-m5-orb-temporal-result.v1",
+  "status": "COMPLETE_NO_ROBUST_GROSS_REGION_EXACT_M5_TSLA_TEMPORAL_GENERALIZATION_CLOSED",
+  "design_ref": "research_core_v3/state/TSLA_US24_EXACT_M5_ORB_TEMPORAL_DESIGN_V1.json",
+  "preoutcome_audit_ref": "research_core_v3/state/TSLA_US24_EXACT_M5_ORB_PREOUTCOME_AUDIT_V1.json",
+  "source_evidence": {
+    "archive_sha256": "dde0bc3215f887df4e3a9d3ebb10d502743866534f3d64d7955669325f71ae06",
+    "member": "raw/3025_TSLA_US_24_M5.csv",
+    "interval": [
+      "2025-01-02T00:00:00Z",
+      "2025-06-13T23:59:59Z"
+    ]
+  },
+  "implementation_validation": {
+    "M15_price_response_parity_check": "PASS_EXACT",
+    "benchmarks": [
+      {
+        "cell": "TSLA M15 OR15 MIDPOINT H8",
+        "recomputed_mean": 29.583485372606496,
+        "persisted_mean": 29.583485372606496
+      },
+      {
+        "cell": "TSLA M15 OR15 OPPOSITE H8",
+        "recomputed_mean": 25.046615764361892,
+        "persisted_mean": 25.04661576436188
+      },
+      {
+        "cell": "TSLA M15 OR30 MIDPOINT H4",
+        "recomputed_mean": -2.709893270864262,
+        "persisted_mean": -2.7098932708642605
+      }
+    ],
+    "note": "SIGNAL_ENTRY_FAILURE_AND_TIME_EXIT_SEMANTICS_MATCH_PERSISTED_M15_REFERENCE_EXACTLY"
+  },
+  "multiplicity_implementation": {
+    "procedure": "SHARED_ISO_WEEK_WILD_SIGN_MAX_T",
+    "centered_cell_returns": true,
+    "shared_rademacher_sign_per_iso_week": true,
+    "bootstrap_studentization": "RECOMPUTE_CLUSTER_ROBUST_SE_PER_RESAMPLE",
+    "resamples": 4999,
+    "seed": 20261001,
+    "rng": "PYTHON_RANDOM_RANDOM",
+    "maxT_quantiles": {
+      "q50": 0.954134335331976,
+      "q90": 2.1557080928856522,
+      "q95": 2.561659818495874,
+      "q99": 3.4147818383795694
+    }
+  },
+  "cells": [
+    {
+      "cell_id": "TSLA.US-24|OR15|FMIDPOINT|H12",
+      "opening_range_minutes": 15,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 12,
+      "attempted_events": 97,
+      "completed_events": 97,
+      "retention_fraction": 1,
+      "distinct_dates": 97,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -11.278389972682675,
+      "median_gross_bps": -2.816108157162116,
+      "cluster_se_bps": 13.966155894871031,
+      "t_stat": -0.8075514878667924,
+      "chronological_thirds_mean_gross_bps": [
+        8.427172290357953,
+        -8.80781151479942,
+        -34.07032951432657
+      ],
+      "top10pct_abs_event_concentration": 0.27832443156677034,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9766,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR15|FMIDPOINT|H24",
+      "opening_range_minutes": 15,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 24,
+      "attempted_events": 97,
+      "completed_events": 97,
+      "retention_fraction": 1,
+      "distinct_dates": 97,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -10.584370941447183,
+      "median_gross_bps": -8.189094073870994,
+      "cluster_se_bps": 18.177690751338417,
+      "t_stat": -0.5822725827078921,
+      "chronological_thirds_mean_gross_bps": [
+        16.557630492593763,
+        -19.109263359272276,
+        -30.04966750247682
+      ],
+      "top10pct_abs_event_concentration": 0.2591389783110345,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9614,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR15|FMIDPOINT|H48",
+      "opening_range_minutes": 15,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 48,
+      "attempted_events": 97,
+      "completed_events": 97,
+      "retention_fraction": 1,
+      "distinct_dates": 97,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -7.011024472831683,
+      "median_gross_bps": -54.72777799306337,
+      "cluster_se_bps": 21.353100422049543,
+      "t_stat": -0.32833754041600394,
+      "chronological_thirds_mean_gross_bps": [
+        28.218711814798546,
+        -39.413450829518865,
+        -10.939263662763185
+      ],
+      "top10pct_abs_event_concentration": 0.26471914435842925,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9346,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR15|FOPPOSITE_BOUNDARY|H12",
+      "opening_range_minutes": 15,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 12,
+      "attempted_events": 97,
+      "completed_events": 97,
+      "retention_fraction": 1,
+      "distinct_dates": 97,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": 0.24157646565026683,
+      "median_gross_bps": 6.513165266611989,
+      "cluster_se_bps": 14.74381551606238,
+      "t_stat": 0.016384935459012342,
+      "chronological_thirds_mean_gross_bps": [
+        24.738636483419036,
+        -1.1228563132861762,
+        -23.65658389873733
+      ],
+      "top10pct_abs_event_concentration": 0.3361011867963663,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.8638,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR15|FOPPOSITE_BOUNDARY|H24",
+      "opening_range_minutes": 15,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 24,
+      "attempted_events": 97,
+      "completed_events": 97,
+      "retention_fraction": 1,
+      "distinct_dates": 97,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -2.53801264445214,
+      "median_gross_bps": 7.911045109993418,
+      "cluster_se_bps": 21.981541350063473,
+      "t_stat": -0.1154610863739458,
+      "chronological_thirds_mean_gross_bps": [
+        33.224681835355824,
+        -18.973805038501716,
+        -22.982498932704523
+      ],
+      "top10pct_abs_event_concentration": 0.29293813533948243,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.894,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR15|FOPPOSITE_BOUNDARY|H48",
+      "opening_range_minutes": 15,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 48,
+      "attempted_events": 97,
+      "completed_events": 97,
+      "retention_fraction": 1,
+      "distinct_dates": 97,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": 34.3710973034219,
+      "median_gross_bps": 13.998602425968356,
+      "cluster_se_bps": 24.565666956836477,
+      "t_stat": 1.399151806617513,
+      "chronological_thirds_mean_gross_bps": [
+        44.926940787326615,
+        45.76294818932676,
+        12.093532824740294
+      ],
+      "top10pct_abs_event_concentration": 0.3044064458637035,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": true,
+      "p_familywise": 0.3116,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR30|FMIDPOINT|H12",
+      "opening_range_minutes": 30,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 12,
+      "attempted_events": 86,
+      "completed_events": 86,
+      "retention_fraction": 1,
+      "distinct_dates": 86,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -25.422526236387025,
+      "median_gross_bps": -15.091460141230652,
+      "cluster_se_bps": 16.245364133565264,
+      "t_stat": -1.5649095968160185,
+      "chronological_thirds_mean_gross_bps": [
+        -30.893518160223028,
+        -32.79741163882271,
+        -12.1178675770342
+      ],
+      "top10pct_abs_event_concentration": 0.34872085793938534,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9986,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR30|FMIDPOINT|H24",
+      "opening_range_minutes": 30,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 24,
+      "attempted_events": 86,
+      "completed_events": 86,
+      "retention_fraction": 1,
+      "distinct_dates": 86,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -27.935145231608526,
+      "median_gross_bps": -39.50046075010427,
+      "cluster_se_bps": 18.149908912004324,
+      "t_stat": -1.5391341833750063,
+      "chronological_thirds_mean_gross_bps": [
+        -20.90237795554167,
+        -32.1884553324105,
+        -30.813868734561446
+      ],
+      "top10pct_abs_event_concentration": 0.29551969561104263,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9982,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR30|FMIDPOINT|H48",
+      "opening_range_minutes": 30,
+      "failure_rule": "MIDPOINT",
+      "maximum_hold_bars": 48,
+      "attempted_events": 86,
+      "completed_events": 86,
+      "retention_fraction": 1,
+      "distinct_dates": 86,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -15.88189805672597,
+      "median_gross_bps": -52.01714324546492,
+      "cluster_se_bps": 23.640297780460486,
+      "t_stat": -0.6718146363559304,
+      "chronological_thirds_mean_gross_bps": [
+        5.633286817440615,
+        -43.02769112031181,
+        -10.050196717684603
+      ],
+      "top10pct_abs_event_concentration": 0.28049678944027173,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9688,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR30|FOPPOSITE_BOUNDARY|H12",
+      "opening_range_minutes": 30,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 12,
+      "attempted_events": 86,
+      "completed_events": 86,
+      "retention_fraction": 1,
+      "distinct_dates": 86,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -18.538405890607383,
+      "median_gross_bps": -4.411566973003758,
+      "cluster_se_bps": 15.471971236450628,
+      "t_stat": -1.198192887466886,
+      "chronological_thirds_mean_gross_bps": [
+        -28.20104575287444,
+        -24.853065449413634,
+        -1.9904886330671563
+      ],
+      "top10pct_abs_event_concentration": 0.3521658408251286,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9938,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR30|FOPPOSITE_BOUNDARY|H24",
+      "opening_range_minutes": 30,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 24,
+      "attempted_events": 86,
+      "completed_events": 86,
+      "retention_fraction": 1,
+      "distinct_dates": 86,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": -18.75965711060053,
+      "median_gross_bps": -15.160704676247125,
+      "cluster_se_bps": 18.797421147843735,
+      "t_stat": -0.9979909990340596,
+      "chronological_thirds_mean_gross_bps": [
+        -8.725284301467635,
+        -25.938736704153357,
+        -21.716925083879886
+      ],
+      "top10pct_abs_event_concentration": 0.3009121321130494,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.9868,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    },
+    {
+      "cell_id": "TSLA.US-24|OR30|FOPPOSITE_BOUNDARY|H48",
+      "opening_range_minutes": 30,
+      "failure_rule": "OPPOSITE_BOUNDARY",
+      "maximum_hold_bars": 48,
+      "attempted_events": 86,
+      "completed_events": 86,
+      "retention_fraction": 1,
+      "distinct_dates": 86,
+      "distinct_iso_weeks": 24,
+      "mean_gross_bps": 5.3804512325579905,
+      "median_gross_bps": -18.552472730054877,
+      "cluster_se_bps": 23.30405487923035,
+      "t_stat": 0.23088047382489205,
+      "chronological_thirds_mean_gross_bps": [
+        -0.44874728428831157,
+        15.114166592011285,
+        1.336487359857887
+      ],
+      "top10pct_abs_event_concentration": 0.3241111165012733,
+      "support_gate_pass": true,
+      "economic_gross_gate_pass": false,
+      "p_familywise": 0.8028,
+      "multiplicity_gate_pass": false,
+      "full_pass": false
+    }
+  ],
+  "aggregate": {
+    "support_pass_count": 12,
+    "economic_gross_pass_count": 1,
+    "multiplicity_pass_count": 0,
+    "full_pass_count": 0,
+    "robust_region_count": 0,
+    "best_mean_cell": "TSLA.US-24|OR15|FOPPOSITE_BOUNDARY|H48",
+    "best_mean_gross_bps": 34.3710973034219,
+    "best_mean_median_bps": 13.998602425968356,
+    "best_mean_thirds": [
+      44.926940787326615,
+      45.76294818932676,
+      12.093532824740294
+    ],
+    "best_mean_p_familywise": 0.3116
+  },
+  "interpretation": {
+    "exact_M5_TSLA_local_structure_not_information_free": true,
+    "economic_amplitude_reappeared_in_one_cell": true,
+    "compact_familywise_confirmation": false,
+    "connected_robust_region": false,
+    "prior_M15_and_new_exact_M5_both_show_isolated_economic_cells_without_multiplicity_confirmation": true,
+    "postoutcome_OR_failure_hold_session_or_exit_rescue_forbidden": true,
+    "broader_US_ORB_concept_exhausted": false,
+    "AAPL_BABA_NKE_local_backlog_preserved": true
+  },
+  "decision": {
+    "tsla_exact_M5_ORB_temporal_generalization": "PARKED_CLOSED_NO_POST_OUTCOME_RESCUE",
+    "authentic_friction_required": false,
+    "candidate_frozen": false,
+    "protected_forward_opened": false,
+    "return_to_frontier_rerank": true
+  },
+  "governance": {
+    "candidate_frozen_count": 0,
+    "authoritative_frontier": 1576,
+    "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+    "runtime_v2_read_only": true
+  }
+}
