@@ -1,0 +1,184 @@
+{
+  "schema": "mxm.research-core-v3.us24-cross-sectional-activity-prev3-m5-acquisition-plan.v1",
+  "status": "FROZEN_MINIMAL_BATCH_ACQUISITION_NOT_YET_EXECUTED",
+  "design_ref": "research_core_v3/state/US24_CROSS_SECTIONAL_RETURN_ACTIVITY_STATE_WAVE_DESIGN_V1.json",
+  "source_environment": "Pepperstone - Europe LIVE",
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "symbols": [
+    {
+      "symbol_id": 2998,
+      "broker_symbol": "GOOG.US-24"
+    },
+    {
+      "symbol_id": 2999,
+      "broker_symbol": "AAPL.US-24"
+    },
+    {
+      "symbol_id": 3000,
+      "broker_symbol": "IBM.US-24"
+    },
+    {
+      "symbol_id": 3002,
+      "broker_symbol": "NFLX.US-24"
+    },
+    {
+      "symbol_id": 3004,
+      "broker_symbol": "PFE.US-24"
+    },
+    {
+      "symbol_id": 3005,
+      "broker_symbol": "SNAP.US-24"
+    },
+    {
+      "symbol_id": 3009,
+      "broker_symbol": "F.US-24"
+    },
+    {
+      "symbol_id": 3019,
+      "broker_symbol": "META.US-24"
+    },
+    {
+      "symbol_id": 3020,
+      "broker_symbol": "INTC.US-24"
+    },
+    {
+      "symbol_id": 3023,
+      "broker_symbol": "WMT.US-24"
+    },
+    {
+      "symbol_id": 3025,
+      "broker_symbol": "TSLA.US-24"
+    },
+    {
+      "symbol_id": 3027,
+      "broker_symbol": "ORCL.US-24"
+    },
+    {
+      "symbol_id": 3028,
+      "broker_symbol": "NKE.US-24"
+    },
+    {
+      "symbol_id": 3029,
+      "broker_symbol": "MSFT.US-24"
+    },
+    {
+      "symbol_id": 3032,
+      "broker_symbol": "AMZN.US-24"
+    },
+    {
+      "symbol_id": 3033,
+      "broker_symbol": "BABA.US-24"
+    },
+    {
+      "symbol_id": 3034,
+      "broker_symbol": "AMD.US-24"
+    },
+    {
+      "symbol_id": 5402,
+      "broker_symbol": "LLY.US-24"
+    },
+    {
+      "symbol_id": 5403,
+      "broker_symbol": "AVGO.US-24"
+    },
+    {
+      "symbol_id": 5406,
+      "broker_symbol": "ASML.US-24"
+    },
+    {
+      "symbol_id": 5410,
+      "broker_symbol": "CRM.US-24"
+    },
+    {
+      "symbol_id": 5411,
+      "broker_symbol": "ADBE.US-24"
+    },
+    {
+      "symbol_id": 5414,
+      "broker_symbol": "QCOM.US-24"
+    },
+    {
+      "symbol_id": 5424,
+      "broker_symbol": "UBER.US-24"
+    },
+    {
+      "symbol_id": 5449,
+      "broker_symbol": "PLTR.US-24"
+    },
+    {
+      "symbol_id": 5460,
+      "broker_symbol": "GIS.US-24"
+    },
+    {
+      "symbol_id": 5462,
+      "broker_symbol": "LULU.US-24"
+    },
+    {
+      "symbol_id": 5468,
+      "broker_symbol": "CCL.US-24"
+    },
+    {
+      "symbol_id": 5470,
+      "broker_symbol": "HOOD.US-24"
+    },
+    {
+      "symbol_id": 5474,
+      "broker_symbol": "AMCR.US-24"
+    },
+    {
+      "symbol_id": 5481,
+      "broker_symbol": "LYFT.US-24"
+    }
+  ],
+  "resolution": "M5",
+  "interval": {
+    "start_utc": "2025-01-02T00:00:00Z",
+    "end_utc": "2025-09-14T23:59:59Z"
+  },
+  "availability_preflight": {
+    "known_exact_m5_success_same_asset_class": [
+      "ORCL.US-24 pre-V3 exact M5 returned 37 ISO weeks"
+    ],
+    "known_partial_library_pre_v3_m5": [
+      "AMZN.US-24",
+      "TSLA.US-24"
+    ],
+    "complete_31_panel_history_not_proven": true,
+    "collector_must_report_per_symbol_first_last_rows_iso_weeks": true,
+    "no_symbol_replacement": true,
+    "fail_closed_if_frozen_panel_support_is_impossible": true
+  },
+  "capture_law": {
+    "read_only": true,
+    "trendbars_only": true,
+    "bid_ask_requested": false,
+    "raw_ticks_requested": false,
+    "orders_permitted": false,
+    "account_mutation_permitted": false,
+    "fill_authority": false,
+    "extra_symbols_permitted": false,
+    "interval_extension_permitted": false,
+    "external_datasets_permitted": false,
+    "protected_rows_permitted": false,
+    "forward_fill_permitted": false,
+    "synthetic_fill_permitted": false,
+    "exhaust_pagination": true,
+    "preserve_authentic_gaps": true,
+    "strict_timestamp_order": true,
+    "reject_conflicting_duplicates": true,
+    "verify_ohlc_invariants": true,
+    "window_days": 7
+  },
+  "output_contract": {
+    "device_computes_strategy_outcomes": false,
+    "device_computes_pnl": false,
+    "device_computes_cross_sectional_ranks": false,
+    "device_selects_parameters": false,
+    "raw_m5_only_plus_identity_integrity_completeness_metadata": true,
+    "evidence_zip_name": "MXM_V3_US24_XSEC_ACTIVITY_PREV3_M5_EVIDENCE_V1.zip"
+  },
+  "acquisition_authorized_for_user_execution": true,
+  "acquisition_launched": false,
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0
+}

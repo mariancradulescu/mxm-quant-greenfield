@@ -1,0 +1,298 @@
+{
+  "schema": "mxm.research-core-v3.us24-cross-sectional-return-activity-state-wave-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_NEW_RAW_M5_ACQUISITION",
+  "ranking_ref": "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V2.json",
+  "mechanism_id": "US24_CROSS_SECTIONAL_RETURN_ACTIVITY_STATE",
+  "scientific_question": "DOES_WITHIN_SYMBOL_NORMALIZED_BROKER_TICK_VOLUME_PARTICIPATION_STATE_SEPARATE_CROSS_SECTIONAL_US24_RELATIVE_RETURN_MOVES_INTO_PROSPECTIVELY_STABLE_CONTINUATION_OR_REVERSAL_PORTFOLIO_EDGE",
+  "data": {
+    "source": "Pepperstone cTrader Open API only",
+    "resolution": "M5",
+    "requested_interval": {
+      "start_utc": "2025-01-02T00:00:00Z",
+      "end_utc": "2025-09-14T23:59:59Z"
+    },
+    "timezone": "America/New_York",
+    "required_fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "external_datasets_forbidden": true,
+    "protected_forward_forbidden": true
+  },
+  "universe": {
+    "fixed_symbol_count": 31,
+    "symbols": [
+      {
+        "symbol_id": 2998,
+        "broker_symbol": "GOOG.US-24"
+      },
+      {
+        "symbol_id": 2999,
+        "broker_symbol": "AAPL.US-24"
+      },
+      {
+        "symbol_id": 3000,
+        "broker_symbol": "IBM.US-24"
+      },
+      {
+        "symbol_id": 3002,
+        "broker_symbol": "NFLX.US-24"
+      },
+      {
+        "symbol_id": 3004,
+        "broker_symbol": "PFE.US-24"
+      },
+      {
+        "symbol_id": 3005,
+        "broker_symbol": "SNAP.US-24"
+      },
+      {
+        "symbol_id": 3009,
+        "broker_symbol": "F.US-24"
+      },
+      {
+        "symbol_id": 3019,
+        "broker_symbol": "META.US-24"
+      },
+      {
+        "symbol_id": 3020,
+        "broker_symbol": "INTC.US-24"
+      },
+      {
+        "symbol_id": 3023,
+        "broker_symbol": "WMT.US-24"
+      },
+      {
+        "symbol_id": 3025,
+        "broker_symbol": "TSLA.US-24"
+      },
+      {
+        "symbol_id": 3027,
+        "broker_symbol": "ORCL.US-24"
+      },
+      {
+        "symbol_id": 3028,
+        "broker_symbol": "NKE.US-24"
+      },
+      {
+        "symbol_id": 3029,
+        "broker_symbol": "MSFT.US-24"
+      },
+      {
+        "symbol_id": 3032,
+        "broker_symbol": "AMZN.US-24"
+      },
+      {
+        "symbol_id": 3033,
+        "broker_symbol": "BABA.US-24"
+      },
+      {
+        "symbol_id": 3034,
+        "broker_symbol": "AMD.US-24"
+      },
+      {
+        "symbol_id": 5402,
+        "broker_symbol": "LLY.US-24"
+      },
+      {
+        "symbol_id": 5403,
+        "broker_symbol": "AVGO.US-24"
+      },
+      {
+        "symbol_id": 5406,
+        "broker_symbol": "ASML.US-24"
+      },
+      {
+        "symbol_id": 5410,
+        "broker_symbol": "CRM.US-24"
+      },
+      {
+        "symbol_id": 5411,
+        "broker_symbol": "ADBE.US-24"
+      },
+      {
+        "symbol_id": 5414,
+        "broker_symbol": "QCOM.US-24"
+      },
+      {
+        "symbol_id": 5424,
+        "broker_symbol": "UBER.US-24"
+      },
+      {
+        "symbol_id": 5449,
+        "broker_symbol": "PLTR.US-24"
+      },
+      {
+        "symbol_id": 5460,
+        "broker_symbol": "GIS.US-24"
+      },
+      {
+        "symbol_id": 5462,
+        "broker_symbol": "LULU.US-24"
+      },
+      {
+        "symbol_id": 5468,
+        "broker_symbol": "CCL.US-24"
+      },
+      {
+        "symbol_id": 5470,
+        "broker_symbol": "HOOD.US-24"
+      },
+      {
+        "symbol_id": 5474,
+        "broker_symbol": "AMCR.US-24"
+      },
+      {
+        "symbol_id": 5481,
+        "broker_symbol": "LYFT.US-24"
+      }
+    ],
+    "selection_law": "ALL_AND_ONLY_THE_31_PREEXISTING_US_EQUITY_EXTENDED_HOURS_CFD_IDENTITIES_FROM_US_EQUITY_CROSS_SECTIONAL_LOW_TURNOVER_DEVELOPMENT_DESIGN_V1",
+    "replacements_for_unavailable_symbols": false,
+    "minimum_cross_section_breadth": 20,
+    "missing_symbol_or_date": "OMIT_ONLY_THAT_SYMBOL_FROM_THAT_DATE;SKIP_SIGNAL_DATE_IF_PANEL_BREADTH_BELOW_20"
+  },
+  "daily_features": {
+    "regular_session_bars": "M5 bars with America/New_York open times 09:30 through 15:55 inclusive",
+    "regular_close": "close of completed M5 bar whose local open time is 15:55",
+    "daily_tick_volume": "sum broker tick_volume across all required regular-session M5 bars; require complete regular session otherwise daily feature unavailable",
+    "trailing_return_lookback_sessions": [
+      3,
+      5,
+      10
+    ],
+    "return_measure": "log(current_regular_close / regular_close_L_eligible_sessions_ago)",
+    "activity_baseline_sessions": 20,
+    "activity_ratio": "current_complete_regular_session_tick_volume / median(previous_20_complete_regular_session_tick_volume_values), excluding current session",
+    "cross_section_return_rank": "AVERAGE_TIE_PERCENTILE_RANK_WITHIN_CURRENT_ELIGIBLE_PANEL",
+    "cross_section_activity_rank": "AVERAGE_TIE_PERCENTILE_RANK_OF_ACTIVITY_RATIO_WITHIN_CURRENT_ELIGIBLE_PANEL",
+    "causality": "ALL_FEATURES_COMPLETE_BEFORE_NEXT_SESSION_ENTRY"
+  },
+  "sibling_architectures": [
+    {
+      "id": "HIGH_ACTIVITY_CONTINUATION",
+      "activity_context": "activity_rank >= 0.5",
+      "orientation": "LONG_HIGHEST_RETURN_SHORT_LOWEST_RETURN"
+    },
+    {
+      "id": "HIGH_ACTIVITY_REVERSAL",
+      "activity_context": "activity_rank >= 0.5",
+      "orientation": "LONG_LOWEST_RETURN_SHORT_HIGHEST_RETURN"
+    },
+    {
+      "id": "LOW_ACTIVITY_CONTINUATION",
+      "activity_context": "activity_rank < 0.5",
+      "orientation": "LONG_HIGHEST_RETURN_SHORT_LOWEST_RETURN"
+    },
+    {
+      "id": "LOW_ACTIVITY_REVERSAL",
+      "activity_context": "activity_rank < 0.5",
+      "orientation": "LONG_LOWEST_RETURN_SHORT_HIGHEST_RETURN"
+    }
+  ],
+  "portfolio_semantics": {
+    "selection_k_each_side": 2,
+    "require_two_eligible_symbols_each_side": true,
+    "tie_break": "symbol_id ascending",
+    "weighting": "EQUAL_ABSOLUTE_NOTIONAL_PER_LEG_TOTAL_LONG_GROSS_0_5_TOTAL_SHORT_GROSS_0_5",
+    "signal_mark": "AFTER_COMPLETION_OF_CURRENT_REGULAR_SESSION",
+    "entry": "EXACT_09_30_AMERICA_NEW_YORK_M5_OPEN_OF_NEXT_PANEL_SESSION",
+    "hold_sessions": [
+      1,
+      2
+    ],
+    "exit": "EXACT_09_30_AMERICA_NEW_YORK_M5_OPEN_AFTER_FROZEN_HOLD_SESSION_COUNT",
+    "missing_exit": "FIRST_SUBSEQUENT_EXACT_09_30_OPEN_UP_TO_5_PANEL_SESSIONS_OTHERWISE_RIGHT_CENSOR",
+    "nonoverlap": "WITHIN_EACH_CELL_NEW_PORTFOLIO_ONLY_AFTER_PRIOR_PORTFOLIO_EXITS",
+    "gross_return_unit": "EQUAL_WEIGHT_PORTFOLIO_ROUNDTRIP_LOG_RETURN_BPS_PER_REBALANCE_EVENT"
+  },
+  "parameter_topology": {
+    "per_sibling_cells": 6,
+    "return_lookback_sessions": [
+      3,
+      5,
+      10
+    ],
+    "hold_sessions": [
+      1,
+      2
+    ],
+    "total_cells": 24,
+    "adjacency": "WITHIN_SAME_SIBLING_ARCHITECTURE_ONE_GRID_STEP_IN_EXACTLY_ONE_OF_LOOKBACK_OR_HOLD"
+  },
+  "support_gate": {
+    "completed_events_min": 60,
+    "distinct_entry_dates_min": 60,
+    "distinct_iso_weeks_min": 20,
+    "retention_fraction_min": 0.8,
+    "minimum_panel_breadth_each_signal_date": 20
+  },
+  "economic_gross_gate": {
+    "mean_portfolio_gross_bps_min": 10,
+    "median_portfolio_gross_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5,
+    "meaning": "HEADROOM_SCREEN_ONLY_NOT_PROXY_NET_COST"
+  },
+  "multiplicity": {
+    "local": {
+      "family": "SIX_CELLS_WITHIN_ONE_FIXED_ACTIVITY_CONTEXT_X_ORIENTATION_SIBLING",
+      "method": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+      "resamples": 4999,
+      "seed": 20261001,
+      "familywise_alpha": 0.05,
+      "insufficient_cells_p1": true
+    },
+    "hierarchical_selection": {
+      "sibling_count": 4,
+      "rule": "BONFERRONI_ACROSS_THE_FOUR_PREDECLARED_INTERCHANGEABLE_SIBLING_ARCHITECTURES",
+      "overall_alpha": 0.05,
+      "required_local_familywise_p_for_PROMOTION": 0.0125,
+      "local_p_below_0_05_but_above_0_0125": "DESCRIPTIVE_LOCAL_SIGNAL_ONLY_NOT_PROMOTABLE",
+      "no_free_winner": true
+    }
+  },
+  "robust_region_gate": {
+    "minimum_connected_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "same_sibling_architecture_required": true,
+    "each_member_must_pass_support": true,
+    "each_member_must_pass_economic_gross": true,
+    "each_member_must_have_local_familywise_p_lte_0_0125_for_hierarchical_promotion": true,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path": {
+    "enabled": true,
+    "role": "DIAGNOSTIC_ONLY_NO_POST_OUTCOME_EXIT_OR_ACTIVITY_THRESHOLD_RESCUE",
+    "portfolio_marking": "EQUAL_WEIGHT_LEG_LOG_RETURN_PATH_ON_EXACT_M5_BARS_DURING_FROZEN_HOLD",
+    "metrics": [
+      "portfolio_MFE_bps",
+      "portfolio_MAE_bps",
+      "time_to_MFE",
+      "time_to_first_positive_response",
+      "realized_frozen_exit_bps",
+      "MFE_minus_realized_exit_bps"
+    ]
+  },
+  "permanent_close": {
+    "sibling": "IF_NO_CONNECTED_3_CELL_HIERARCHICALLY_PROMOTABLE_REGION_CLOSE_ONLY_THAT_FIXED_ACTIVITY_CONTEXT_X_ORIENTATION_SUBFAMILY",
+    "whole_architecture": "IF_ALL_FOUR_SIBLINGS_HAVE_NO_HIERARCHICALLY_PROMOTABLE_CONNECTED_REGION_CLOSE_THIS_EXACT_US24_RETURN_X_ACTIVITY_STATE_ARCHITECTURE_WITHOUT_THRESHOLD_LOOKBACK_HOLD_K_OR_ACTIVITY_SPLIT_RESCUE",
+    "broader_cross_sectional_concept_exhausted": false
+  },
+  "friction_boundary": {
+    "trigger": "AT_LEAST_ONE_HIERARCHICALLY_PROMOTABLE_CONNECTED_ROBUST_GROSS_REGION",
+    "next": "FREEZE_EXACT_PORTFOLIO_EVENT_LEGS_AND_TIMESTAMPS_THEN_AUTHENTIC_PEPPERSTONE_BID_ASK_COMMISSION_CONVERSION_MIN_VOLUME_VOLUME_STEP_MARGIN_AND_SAFE_EUR200_REPLAY",
+    "invented_spread_forbidden": true,
+    "hard21_required_for_this_sleeve": false
+  },
+  "outcome_order": "EVALUATE_ALL_4_FROZEN_SIBLING_ARCHITECTURES_AFTER_RAW_ACCEPTANCE;AN_EARLY_RESULT_CANNOT_REDIGN_ANY_OTHER_SIBLING",
+  "safety": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true
+  }
+}
