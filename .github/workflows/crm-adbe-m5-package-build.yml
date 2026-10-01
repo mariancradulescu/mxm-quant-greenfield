@@ -16,11 +16,14 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install protobuf
-        run: python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
+        run: |
+          python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
       - name: Compile
-        run: python -m py_compile CRM_ADBE_M5_CAPTURE_RUN.py research_core_v3/crm_adbe_m5_temporal_capture.py research_core_v3/pydroid_crm_adbe_m5_temporal_launcher.py tools/build_crm_adbe_m5_temporal_package.py tools/validate_crm_adbe_m5_temporal_package.py
+        run: |
+          python -m py_compile CRM_ADBE_M5_CAPTURE_RUN.py research_core_v3/crm_adbe_m5_temporal_capture.py research_core_v3/pydroid_crm_adbe_m5_temporal_launcher.py tools/build_crm_adbe_m5_temporal_package.py tools/validate_crm_adbe_m5_temporal_package.py
       - name: Validate and build
-        run: PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/validate_crm_adbe_m5_temporal_package.py
+        run: |
+          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/validate_crm_adbe_m5_temporal_package.py
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
