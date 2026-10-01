@@ -1,0 +1,65 @@
+{
+  "schema": "mxm.research-core-v3.us24-cross-sectional-activity-prev3-m5-collector-repair.v1r1",
+  "status": "IMPLEMENTATION_DEFECT_CORRECTED_NO_SCIENTIFIC_SCOPE_CHANGE",
+  "source_research_head": "c209227c60925f7c8869f199222d21dc4e2798dc",
+  "failed_package": {
+    "name": "MXM_V3_US24_XSEC_ACTIVITY_PREV3_M5_COLLECTOR_V1.zip",
+    "sha256": "94506adb4f30cab64a0076d1f4b21534d2a967c8cafb8bb94833eb74cb2be258",
+    "observed_failure": "KeyError('protected_forward_start')",
+    "observed_stage": "AFTER_READ_ONLY_AUTH_AND_31_SYMBOL_IDENTITY_BINDING_AT_START_OF_RAW_CAPTURE",
+    "preflight_passed": true,
+    "broker_contacted": true,
+    "historical_request_may_have_completed_in_memory": true,
+    "persistent_raw_series_completed": 0,
+    "strategy_outcomes_computed": false,
+    "cross_sectional_ranks_computed": false,
+    "pnl_computed": false,
+    "protected_forward_opened": false
+  },
+  "root_cause": {
+    "component": "competition.frontier_data_capture.FrontierDataCaptureRunner._capture_one",
+    "defect": "SHARED_RUNNER_EXPECTED_TOP_LEVEL_plan['protected_forward_start']_BUT_THE_FROZEN_US24_PLAN_CARRIED_ONLY_protected_forward_opened_AND_CAPTURE_LAW_PROTECTED_ROWS_PERMITTED",
+    "classification": "SEMANTIC_OR_IMPLEMENTATION_DEFECT_CORRECTED",
+    "scientific_design_defect": false,
+    "acquisition_scope_defect": false
+  },
+  "repair": {
+    "package_name": "MXM_V3_US24_XSEC_ACTIVITY_PREV3_M5_COLLECTOR_V1R1.zip",
+    "package_sha256": "bd1afad7fc514e312f8fdd15dad5884e35e7ededd59e40cc78819950b85813f9",
+    "size_bytes": 66758,
+    "entry_count": 23,
+    "package_manifest_sha256": "b94c8adce2b740c7cd50b2f6fa0faba4c4bc97a490a7d8f1d75440d84367a1d8",
+    "collector_source_sha256": "cab70671d7b204f2c50716c83d6d10478c8671ed3383d3d731d50e3caed1ae65",
+    "launcher_source_sha256": "8e3ed720790e3465aa85da99be5a08753b0ca319e02460eadd849b79d4016a57",
+    "run_only": "US24_XSEC_ACTIVITY_PREV3_M5_CAPTURE_RUN.py",
+    "expected_return_only": "MXM_V3_US24_XSEC_ACTIVITY_PREV3_M5_EVIDENCE_V1.zip",
+    "runtime_adapter": {
+      "protected_forward_start": "2026-09-17T12:02:58Z",
+      "protected_evidence_opened": false
+    },
+    "frozen_plan_bytes_changed": false,
+    "frozen_plan_git_blob_sha1": "6d666015ae6a7956f112b2618e5fbcbfeb15b054",
+    "frozen_plan_canonical_sha256": "a53e634d0535acca6beb16e057ab1beb0f21373d53bcec9483e88d49bc67e990",
+    "design_changed": false,
+    "symbol_scope_changed": false,
+    "interval_changed": false,
+    "resolution_changed": false
+  },
+  "validation": {
+    "python_compile": "PASS",
+    "offline_local_preflight": "PASS",
+    "runtime_adapter_preflight": "PASS",
+    "frozen_plan_git_blob_unchanged": "PASS",
+    "exact_31_symbol_scope": "PASS",
+    "static_read_only_request_surface": "PASS",
+    "zip_crc": "PASS",
+    "package_sha256_recomputed": "PASS"
+  },
+  "authority": {
+    "retry_with_R1_authorized": true,
+    "use_failed_V1_again": false,
+    "automatic_execution": false,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0
+  }
+}
