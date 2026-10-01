@@ -1,0 +1,126 @@
+{
+  "schema": "mxm.research-core-v3.crm-adbe-intraday-rv-temporal-retest-package.v1",
+  "status": "FROZEN_PROSPECTIVE_HYPOTHESIS_NEW_M5_ACQUISITION_REQUIRED_NOT_AUTHORIZED",
+  "package_kind": "MINIMAL_AUTHORITATIVE_PREOUTCOME_DESIGN_AND_ACQUISITION_SCOPE_ONLY",
+  "selected_from_coverage_audit": true,
+  "source_design_ref": "research_core_v3/state/US_EQUITY_INTRADAY_RELATIVE_VALUE_FORMATION_EVALUATION_DESIGN_V1.json",
+  "source_formation_ref": "research_core_v3/state/US_EQUITY_INTRADAY_RV_FORMATION_V1.json",
+  "source_result_ref": "research_core_v3/state/US_EQUITY_INTRADAY_RV_EVALUATION_V1.json",
+  "historical_outcomes_role": "DESIGN_EVIDENCE_ONLY_NOT_CONFIRMATION",
+  "hypothesis": "CRM.US-24 / ADBE.US-24 intraday 30-minute return residual mean reversion generalizes to a time-disjoint M5 DEVELOPMENT interval when pair parameters are estimated only on a preceding causal formation segment.",
+  "exact_scope": {
+    "pair": [
+      {
+        "symbol_id": 5410,
+        "symbol": "CRM.US-24"
+      },
+      {
+        "symbol_id": 5411,
+        "symbol": "ADBE.US-24"
+      }
+    ],
+    "resolution": "M5",
+    "resolution_translation_allowed": false,
+    "timezone": "America/New_York",
+    "regular_session_only": true,
+    "formation_feature": "30-minute regular-session close-to-close return at the same anchors used by the original design",
+    "formation_sessions": "FIRST_84_ELIGIBLE_SESSIONS_IN_THE_ACQUIRED_INTERVAL",
+    "formation_min_common_observations": 500,
+    "formation_beta_bounds": [
+      0.2,
+      5
+    ],
+    "pair_selection": "PAIR_ID_FIXED_TO_CRM_ADBE_FROM_OLD_EXPOSED_DESIGN_EVIDENCE;DO_NOT_RESELECT_AMONG_OTHER_PAIRS",
+    "evaluation_sessions": "ALL_ELIGIBLE_SESSIONS_AFTER_THE_FIRST_84_THROUGH_2025_09_14",
+    "thresholds": [
+      1.5,
+      2,
+      2.5
+    ],
+    "direction": "MEAN_REVERSION_OF_FORMATION_FROZEN_RESIDUAL",
+    "entry": "NEXT_EXACT_M5_OPEN_AFTER_COMPLETED_30_MINUTE_SIGNAL",
+    "holds_minutes": [
+      30,
+      60
+    ],
+    "test_count": 6,
+    "leg_weights": "TOTAL_GROSS_1; ABS_WEIGHT_A=1/(1+abs(beta)); ABS_WEIGHT_B=abs(beta)/(1+abs(beta))",
+    "missing_entry_or_exit": "RIGHT_CENSOR_NO_REPLACEMENT"
+  },
+  "acquisition_scope": {
+    "source": "Pepperstone cTrader Open API only",
+    "data_type": "M5_OHLC_TRENDBARS_ONLY_AT_GROSS_STAGE",
+    "symbols": [
+      "CRM.US-24",
+      "ADBE.US-24"
+    ],
+    "requested_interval_utc": [
+      "2025-01-02T00:00:00Z",
+      "2025-09-14T23:59:59Z"
+    ],
+    "rationale": "Entire interval precedes the original relative-value formation start 2025-09-16 and protected-forward start 2026-09-17. It provides room for an 84-session formation segment plus a materially sized evaluation segment.",
+    "pre_acquisition_provenance_gate": "Before outcome access, prove that CRM/ADBE M5 bars in this requested interval have not been consumed by any prior V3 CRM/ADBE relative-value outcome test. If not provable, abort.",
+    "no_bid_ask_capture_at_this_stage": true,
+    "no_other_symbols": true,
+    "no_external_data": true,
+    "history_unavailable_policy": "FAIL_CLOSED_DATA_UNAVAILABLE;DO_NOT_SUBSTITUTE_M15_OR_OTHER_RESOLUTION_AND_DO_NOT_CHANGE_THE_HYPOTHESIS"
+  },
+  "support_gate": {
+    "completed_events_min": 80,
+    "distinct_dates_min": 40,
+    "distinct_iso_weeks_min": 12,
+    "retention_fraction_min": 0.8
+  },
+  "economic_gate": {
+    "mean_gross_bps_min": 10,
+    "chronological_thirds_each_mean_gross_bps_min": 3,
+    "top10pct_absolute_event_concentration_max": 0.5,
+    "median_gross_bps_report_required": true
+  },
+  "multiplicity": {
+    "family": "ALL_6_FROZEN_CRM_ADBE_THRESHOLD_X_HOLD_CELLS",
+    "procedure": "SHARED_5_TRADING_SESSION_BLOCK_WILD_SIGN_MAX_T",
+    "resamples": 4999,
+    "seed": 20261001,
+    "familywise_alpha": 0.05,
+    "support_ineligible_cells_assigned_p1": true,
+    "no_postoutcome_narrowing": true
+  },
+  "robust_region_gate": {
+    "adjacency": "ONE_STEP_IN_THRESHOLD_OR_HOLD_WITH_OTHER_DIMENSION_FIXED",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "single_cell_promotion_forbidden": true
+  },
+  "diagnostic_path_observability": {
+    "enabled": true,
+    "primary_pass_fail_unchanged": true,
+    "horizon_minutes": 60,
+    "metrics": [
+      "portfolio_MFE_bps",
+      "portfolio_MAE_bps",
+      "MFE_minus_frozen_exit_bps",
+      "time_to_MFE_minutes",
+      "time_to_first_positive_response_minutes",
+      "realized_holding_minutes"
+    ],
+    "role": "DIAGNOSTIC_ONLY_NO_EXIT_RESCUE_OR_PARAMETER_RETUNING_FROM_THIS_TEST"
+  },
+  "permanent_close_condition": "If sufficient untouched evaluation support exists but no connected >=3-cell region spanning both threshold and hold dimensions passes support, the frozen gross economic gate and max-T familywise alpha 0.05, permanently close this CRM/ADBE temporal-retest hypothesis without threshold/hold/exit rescue. If gross robust region passes but later authentic two-leg Pepperstone friction destroys realizable headroom, close it economically.",
+  "downstream_if_gross_passes": [
+    "Freeze exact CRM and ADBE event timestamps before BID/ASK acquisition",
+    "Acquire/reuse authentic Pepperstone BID/ASK for both legs",
+    "Apply authentic commission/conversion where applicable",
+    "Evaluate minimum volume, volume step, margin, safe EUR200 risk sizing and two-leg concurrency",
+    "Only after authentic net plausibility consider disjoint confirmation"
+  ],
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_reactivated": false,
+    "acquisition_authorized": false,
+    "acquisition_launched": false,
+    "collector_created": false,
+    "user_symbol_parameter_choice_required": false
+  }
+}
