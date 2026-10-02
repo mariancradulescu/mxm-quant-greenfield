@@ -96,3 +96,20 @@ jobs:
               raise SystemExit(f"broker/acquisition/order token present in V4 implementation: {bad}")
           print("V4_NO_BROKER_ACQUISITION_ORDER_SURFACE_PASS")
           PY
+
+      - name: Record exact-head execution source
+        run: git rev-parse HEAD > V4_EXECUTION_SOURCE_HEAD.txt
+      - name: Upload exact-head V4 execution source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: V4_AUTHORITY_V3_EXECUTION_SOURCE
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            research_core_v4
+            research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json
+            tests/test_research_core_v4_method.py
+            tests/test_research_core_v4_response_evaluator.py
+            tests/test_research_core_v4_support_geometry.py
+            tests/test_research_core_v4_execution_binding.py
+            V4_EXECUTION_SOURCE_HEAD.txt

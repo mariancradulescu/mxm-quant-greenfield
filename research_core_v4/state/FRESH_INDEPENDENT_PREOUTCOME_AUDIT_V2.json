@@ -1,0 +1,63 @@
+{
+  "schema": "mxm.research-core-v4.fresh-independent-preoutcome-audit.v2",
+  "status": "PREOUTCOME_CORRECTIONS_FROZEN_EXECUTION_REQUIRES_EXACT_HEAD_GREEN_VALIDATION",
+  "as_of_date": "2026-10-02",
+  "audited_from_head": "2f18a1458d55c0285f519581d99df083505ef941",
+  "scientific_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "outcome_blind": true,
+  "real_v4_development_responses_opened": false,
+  "findings": [
+    {
+      "id": "EXECUTION_BYPASS",
+      "severity": "MATERIAL_PREOUTCOME",
+      "finding": "PUBLIC_IMPORTABLE_EVALUATOR_ENTRYPOINTS_COULD_OPEN_REAL_RESPONSES_WITHOUT_RUNNER_INPUT_AND_SKELETON_HASH_GUARDS",
+      "correction": "PUBLIC_REAL_RESPONSE_ENTRYPOINTS_DENY;INTERNAL_CORE_REQUIRES_RUNNER_ONLY_PROCESS_CAPABILITY"
+    },
+    {
+      "id": "EXACTLY_ONCE_SCOPE",
+      "severity": "MATERIAL_PREOUTCOME",
+      "finding": "ONCE_ONLY_GUARD_WAS_PROCESS_LOCAL_AND_OUTPUT_COULD_BE_REEXECUTED_FROM_A_FRESH_PROCESS_BEFORE_CANONICAL_STATE_UPDATE",
+      "correction": "CREATE_DURABLE_O_EXCL_OPENING_LOCK_BEFORE_FIRST_RESPONSE_READ_AND_REFUSE_EXISTING_RESULT_OR_LOCK"
+    },
+    {
+      "id": "RESULT_PROVENANCE_COMPLETENESS",
+      "severity": "MATERIAL_PREOUTCOME",
+      "finding": "RAW_RESULT_PROVENANCE_DID_NOT_COPY_ALL_FROZEN_CODE_CALIBRATION_CONFIRMATION_DIAGNOSTIC_AND_INPUT_METADATA_BINDINGS",
+      "correction": "PERSIST_COMPLETE_BOUND_HASH_AND_SERIES_SCOPE_PROVENANCE_IN_RAW_RESULT"
+    },
+    {
+      "id": "STALE_CURRENT_POINTERS",
+      "severity": "GOVERNANCE_PREOUTCOME",
+      "finding": "CURRENT_STATE_STILL_POINTED_TO_V1_IMPLEMENTATION_AND_OLD_FINAL_VALIDATION_ARTIFACTS_AFTER_EVALUATOR_V3_CALIBRATION_V2_AUTHORITY_V2",
+      "correction": "PRESERVE_V1_HISTORY;POINT_CURRENT_STATE_TO_V2_IMPLEMENTATION_CONTRACT_FRESH_AUDIT_AND_EXACT_HEAD_VALIDATION_POLICY"
+    }
+  ],
+  "scientific_reaudit": {
+    "information_source": "UNCHANGED_CAUSAL_CROSS_SCALE_ALIGNMENT_INCREMENTAL_RESPONSE",
+    "incremental_cross_scale_test": true,
+    "single_scale_relabeling": false,
+    "universality_across_asset_classes_required": false,
+    "symbols_are_replicates_not_free_winners": true,
+    "contexts_are_predeclared_structural_siblings": true,
+    "scale_topology_unchanged": true,
+    "low_high_unchanged": true,
+    "horizons_unchanged": true,
+    "paired_estimand_unchanged": true,
+    "maxT_holm_unchanged": true,
+    "temporal_breadth_concentration_unchanged": true,
+    "confirmation_law_unchanged": true,
+    "frontier_1576_preserved": true,
+    "economic_certification_deferred_to_authentic_postconfirmation_evidence": true
+  },
+  "control_plane": {
+    "automatic_canonical_writer_found": false,
+    "v2_runtime_read_only": true,
+    "v3_read_only_history": true,
+    "quote_revision_v2_disabled": true,
+    "broker_acquisition_disabled": true,
+    "protected_forward_closed": true,
+    "candidate_promotion_disabled": true,
+    "live_trading_disabled": true
+  },
+  "correction_classification": "IMPLEMENTATION_PROVENANCE_CONTROL_PLANE_BINDING_ONLY_NO_SCIENTIFIC_REDESIGN"
+}

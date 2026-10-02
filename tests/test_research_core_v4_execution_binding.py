@@ -15,7 +15,7 @@ from research_core_v4.frozen_v2_semantics import paired_arm_hierarchical_mean, s
 
 def base_authority():
     return {
-        "schema":"mxm.research-core-v4.first-development-response-execution-authority.v2",
+        "schema":"mxm.research-core-v4.first-development-response-execution-authority.v3",
         "status":"AUTHORIZED_READY_NOT_EXECUTED",
         "scientific_design":"research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
         "real_development_response_execution_authorized":True,
@@ -68,6 +68,17 @@ class ExecutionBindingTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             runner.verify_rebuilt_skeleton([e],"0"*64,1)
         self.assertFalse(runner.RESPONSE_OPENING_STARTED)
+
+    def test_public_real_response_paths_cannot_bypass_runner(self):
+        a=base_authority()
+        with self.assertRaises(PermissionError):
+            ev.evaluate_real_development(authority=a,events=(),bars_by_symbol={})
+        with self.assertRaises(PermissionError):
+            ev.evaluate_prevalidated_development(authority=a,design={},events=(),bars_by_symbol={},source_hashes={})
+        with self.assertRaises(PermissionError):
+            ev._evaluate_prevalidated_development_core(authority=a,design={},events=(),bars_by_symbol={},source_hashes={})
+        with self.assertRaises(PermissionError):
+            ev._runner_execution_capability()
 
     def test_wrong_seed_rejected(self):
         a=base_authority();a["development_scope"]["seed"]=1
@@ -151,7 +162,7 @@ class ExecutionBindingTests(unittest.TestCase):
             base_authority(),{"status":"SYNTHETIC_AUTHORIZED_NOT_EXECUTED"}, {}, {}, {}, tuple(), {}, {"X":"3"*64}, prov
         )
         with tempfile.TemporaryDirectory() as td, patch.object(
-            ev,"evaluate_prevalidated_development",
+            ev,"_evaluate_prevalidated_development_core",
             return_value={"schema":"synthetic-known-answer","contexts":[]}
         ):
             p=Path(td)/"result.json"
@@ -161,6 +172,7 @@ class ExecutionBindingTests(unittest.TestCase):
             self.assertIn("raw_result_sha256_without_self_field",out)
             self.assertEqual(len(digest),64)
             self.assertTrue(runner.RESPONSE_OPENING_STARTED)
+            self.assertTrue(p.with_suffix(p.suffix+".opening.lock").exists())
 
 
 if __name__=="__main__":

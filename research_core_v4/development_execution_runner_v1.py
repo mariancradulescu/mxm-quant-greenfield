@@ -16,7 +16,7 @@ except ModuleNotFoundError:
     from frozen_v2_semantics import canonical_json_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
-AUTHORITY_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V2.json"
+AUTHORITY_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json"
 STATE_REL = "research_core_v4/state/V4_STATE.json"
 DESIGN_REL = "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json"
 MANIFEST_REL = "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json"
@@ -28,6 +28,10 @@ CONFIRMATION_LAW_REL = "research_core_v4/state/CONFIRMATION_PASS_LAW_V1.json"
 CONFIRMATION_PROVENANCE_REL = "research_core_v4/state/CONFIRMATION_PROVENANCE_CERTIFICATE_V1.json"
 DIAGNOSTICS_REL = "research_core_v4/state/NONSELECTION_DIAGNOSTIC_IMPLEMENTATION_V1.json"
 ALIGNMENT_REL = "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V1.json"
+IMPLEMENTATION_CONTRACT_REL = "research_core_v4/state/RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V2.json"
+INDEPENDENT_AUDIT_REL = "research_core_v4/state/FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json"
+VALIDATION_POLICY_REL = "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"
+AUTHORITY_V2_SUPERSESSION_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V2_SUPERSESSION_V1.json"
 RESPONSE_OPENING_STARTED = False
 
 @dataclass(frozen=True)
@@ -127,6 +131,10 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("confirmation_provenance_sha256",sha256_file(ROOT/CONFIRMATION_PROVENANCE_REL),b["confirmation_provenance_content_sha256"])
     _must_equal("diagnostics_sha256",sha256_file(ROOT/DIAGNOSTICS_REL),b["nonselection_diagnostic_implementation_content_sha256"])
     _must_equal("alignment_sha256",sha256_file(ROOT/ALIGNMENT_REL),b["production_calibration_alignment_content_sha256"])
+    _must_equal("implementation_contract_sha256",sha256_file(ROOT/IMPLEMENTATION_CONTRACT_REL),b["response_evaluator_implementation_contract_content_sha256"])
+    _must_equal("independent_audit_sha256",sha256_file(ROOT/INDEPENDENT_AUDIT_REL),b["fresh_independent_preoutcome_audit_content_sha256"])
+    _must_equal("validation_policy_sha256",sha256_file(ROOT/VALIDATION_POLICY_REL),b["final_preoutcome_validation_policy_content_sha256"])
+    _must_equal("authority_v2_supersession_sha256",sha256_file(ROOT/AUTHORITY_V2_SUPERSESSION_REL),b["authority_v2_supersession_content_sha256"])
     _must_equal("support_skeleton_sha256",support["skeleton"]["canonical_sha256"],b["support_skeleton_sha256"])
     _must_equal("support_skeleton_row_count",support["skeleton"]["row_count"],b["support_skeleton_row_count"])
 
@@ -134,6 +142,9 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("state_runner_pointer",state["first_wave"]["development_execution_runner"],"research_core_v4/development_execution_runner_v1.py")
     _must_equal("state_calibration_pointer",state["first_wave"]["exact_geometry_calibration"],CALIBRATION_REL)
     _must_equal("state_diagnostics_pointer",state["first_wave"]["nonselection_diagnostic_implementation"],DIAGNOSTICS_REL)
+    _must_equal("state_implementation_contract_pointer",state["first_wave"]["response_evaluator_implementation_contract"],IMPLEMENTATION_CONTRACT_REL)
+    _must_equal("state_independent_audit_pointer",state["final_preoutcome_scientific_audit"],INDEPENDENT_AUDIT_REL)
+    _must_equal("state_validation_policy_pointer",state["final_preoutcome_validation_policy"],VALIDATION_POLICY_REL)
     scope=authority["development_scope"]
     _must_equal("contexts",[x["id"] for x in design["structural_contexts"]],scope["contexts"])
     _must_equal("volatility_states",list(ev.VOL_STATES),scope["volatility_states"])
@@ -219,16 +230,32 @@ def pre_response_guards(raw_root: str | Path) -> PrevalidatedBundle:
 
     provenance={
         "authority_sha256":sha256_file(ROOT/AUTHORITY_REL),
+        "canonical_state_file_sha256":sha256_file(ROOT/STATE_REL),
         "canonical_state_binding_sha256":state_binding_sha256(state),
         "canonical_design_sha256":sha256_file(ROOT/DESIGN_REL),
         "evaluator_sha256":sha256_file(ROOT/EVALUATOR_REL),
+        "execution_runner_sha256":sha256_file(Path(__file__).resolve()),
         "shared_semantics_sha256":sha256_file(ROOT/SEMANTICS_REL),
         "primary_manifest_sha256":sha256_file(ROOT/MANIFEST_REL),
         "support_audit_sha256":sha256_file(ROOT/SUPPORT_REL),
+        "exact_geometry_calibration_sha256":sha256_file(ROOT/CALIBRATION_REL),
+        "confirmation_pass_law_sha256":sha256_file(ROOT/CONFIRMATION_LAW_REL),
+        "confirmation_provenance_sha256":sha256_file(ROOT/CONFIRMATION_PROVENANCE_REL),
+        "nonselection_diagnostic_implementation_sha256":sha256_file(ROOT/DIAGNOSTICS_REL),
+        "production_calibration_alignment_sha256":sha256_file(ROOT/ALIGNMENT_REL),
+        "response_evaluator_implementation_contract_sha256":sha256_file(ROOT/IMPLEMENTATION_CONTRACT_REL),
+        "fresh_independent_preoutcome_audit_sha256":sha256_file(ROOT/INDEPENDENT_AUDIT_REL),
+        "final_preoutcome_validation_policy_sha256":sha256_file(ROOT/VALIDATION_POLICY_REL),
         "rebuilt_support_skeleton_sha256":skeleton_sha,
         "rebuilt_support_skeleton_row_count":len(all_events),
         "source_series_sha256":source_hashes,
+        "development_series_binding":authority["bindings"]["development_series"],
+        "source_archives":{
+            "original_archive_sha256":authority["bindings"]["original_archive_sha256"],
+            "delta_archive_sha256":authority["bindings"]["delta_archive_sha256"],
+        },
         "context_support_counts":context_counts,
+        "development_scope":authority["development_scope"],
         "seed":ev.DEFAULT_SEED,
         "permutations":ev.DEFAULT_PERMUTATIONS,
     }
@@ -237,10 +264,22 @@ def pre_response_guards(raw_root: str | Path) -> PrevalidatedBundle:
 
 def execute_once(bundle: PrevalidatedBundle, output: str | Path) -> str:
     global RESPONSE_OPENING_STARTED
+    output=Path(output)
+    output.parent.mkdir(parents=True,exist_ok=True)
+    lock=output.with_suffix(output.suffix+".opening.lock")
     if RESPONSE_OPENING_STARTED:
         raise PermissionError("response opening already started in this process")
+    if output.exists():
+        raise PermissionError("authorized development result already exists; refusing duplicate execution")
+    try:
+        fd=os.open(lock,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+    except FileExistsError as exc:
+        raise PermissionError("durable response-opening lock already exists; refusing duplicate execution") from exc
+    with os.fdopen(fd,"w",encoding="utf-8") as f:
+        f.write(sha256_file(ROOT/AUTHORITY_REL)+"\n");f.flush();os.fsync(f.fileno())
     RESPONSE_OPENING_STARTED=True
-    result=ev.evaluate_prevalidated_development(
+    capability=ev._runner_execution_capability()
+    result=ev._evaluate_prevalidated_development_core(
         authority=bundle.authority,
         design=bundle.design,
         events=bundle.events,
@@ -248,6 +287,7 @@ def execute_once(bundle: PrevalidatedBundle, output: str | Path) -> str:
         source_hashes=bundle.source_hashes,
         permutations=ev.DEFAULT_PERMUTATIONS,
         seed=ev.DEFAULT_SEED,
+        _execution_capability=capability,
     )
     result["execution_provenance"]=bundle.provenance
     result["authority_status_at_open"]=bundle.authority["status"]
@@ -261,8 +301,6 @@ def execute_once(bundle: PrevalidatedBundle, output: str | Path) -> str:
     raw=canonical_json_bytes(result)
     final_digest=sha256_bytes(raw)
 
-    output=Path(output)
-    output.parent.mkdir(parents=True,exist_ok=True)
     tmp=output.with_suffix(output.suffix+".tmp")
     with tmp.open("wb") as f:
         f.write(raw);f.flush();os.fsync(f.fileno())

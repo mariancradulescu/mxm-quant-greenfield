@@ -31,6 +31,18 @@ CONTEXTS = ("FX_SPOT", "SPOT_CRYPTO", "US_EQUITY_EXTENDED_HOURS")
 DEFAULT_PERMUTATIONS = 1023
 DEFAULT_SEED = 20261002
 
+# Process-local capability: issued only to the exact sibling authority-bound runner file.
+_EXECUTION_CAPABILITY = object()
+
+def _runner_execution_capability() -> object:
+    import inspect
+    frame = inspect.currentframe()
+    caller = frame.f_back if frame is not None else None
+    expected = Path(__file__).resolve().with_name("development_execution_runner_v1.py")
+    if caller is None or Path(caller.f_code.co_filename).resolve() != expected:
+        raise PermissionError("direct evaluator capability issuance denied; use development_execution_runner_v1.py")
+    return _EXECUTION_CAPABILITY
+
 
 @dataclass(frozen=True)
 class M5Bar:
@@ -262,7 +274,7 @@ def skeleton_sha256(events: Iterable[SignalEvent]) -> str:
 
 def require_real_response_authority(authority: dict) -> None:
     required = {
-        "schema": "mxm.research-core-v4.first-development-response-execution-authority.v2",
+        "schema": "mxm.research-core-v4.first-development-response-execution-authority.v3",
         "status": "AUTHORIZED_READY_NOT_EXECUTED",
         "scientific_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
         "real_development_response_execution_authorized": True,
@@ -443,27 +455,15 @@ def confirmation_single_leaf_test(block_ids: np.ndarray, block_values: np.ndarra
     return float((1+np.sum(pt>=obs))/(permutations+1))
 
 
-def evaluate_real_development(*, authority: dict, events: Sequence[SignalEvent], bars_by_symbol: dict[str,Sequence[M5Bar]]) -> dict:
-    require_real_response_authority(authority)
-    responses: dict[tuple[str,datetime,int],float]={}
-    for sym,bars in bars_by_symbol.items():
-        close={b.time:b.close for b in bars}
-        for e in events:
-            if e.symbol!=sym:
-                continue
-            for h in HORIZONS:
-                r=response_for_event(e,h,close)
-                if r is not None:
-                    responses[(sym,e.trigger_time,h)]=r
-    return {"response_count":len(responses),"paired_units":len(construct_paired_units(events,responses))}
-
+def evaluate_real_development(*args, **kwargs):
+    raise PermissionError("Direct real-response evaluator execution is disabled. Use the authority-bound development_execution_runner_v1.py.")
 
 def main() -> None:
     ap=argparse.ArgumentParser()
     ap.add_argument("--self-test-summary",action="store_true")
     args=ap.parse_args()
     if args.self_test_summary:
-        print(json.dumps({"module":"response_evaluator_v2","real_execution_default":"DENIED","horizons":HORIZONS,"permutations":DEFAULT_PERMUTATIONS}))
+        print(json.dumps({"module":"response_evaluator_v3","real_execution_default":"DENIED","horizons":HORIZONS,"permutations":DEFAULT_PERMUTATIONS}))
         return
     raise SystemExit("Real response execution is intentionally unavailable from CLI at the preoutcome stop boundary.")
 
@@ -606,7 +606,7 @@ def build_nonselection_diagnostics(events: Sequence[SignalEvent], norm: dict, ra
     return diagnostics
 
 
-def evaluate_prevalidated_development(
+def _evaluate_prevalidated_development_core(
     *,
     authority: dict,
     design: dict,
@@ -615,7 +615,10 @@ def evaluate_prevalidated_development(
     source_hashes: dict[str,str],
     permutations: int=DEFAULT_PERMUTATIONS,
     seed: int=DEFAULT_SEED,
+    _execution_capability: object | None=None,
 ) -> dict:
+    if _execution_capability is not _EXECUTION_CAPABILITY:
+        raise PermissionError("direct prevalidated evaluator execution denied; authority-bound runner capability required")
     require_real_response_authority(authority)
     if permutations != DEFAULT_PERMUTATIONS or seed != DEFAULT_SEED:
         raise PermissionError("caller override of frozen seed/permutations is forbidden")
@@ -682,6 +685,9 @@ def evaluate_prevalidated_development(
         "protected_forward_opened":False,
     }
 
+
+def evaluate_prevalidated_development(*args, **kwargs):
+    raise PermissionError("Direct prevalidated real-response execution is disabled. Use the authority-bound development_execution_runner_v1.py.")
 
 def evaluate_development_from_directory(*args,**kwargs):
     raise PermissionError("Direct real-response directory execution is disabled. Use the authority-bound development_execution_runner_v1.py.")
