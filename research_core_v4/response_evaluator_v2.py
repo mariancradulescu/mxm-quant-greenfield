@@ -439,5 +439,105 @@ def main() -> None:
     raise SystemExit("Real response execution is intentionally unavailable from CLI at the preoutcome stop boundary.")
 
 
+
+# ---- Frozen development/confirmation gate helpers and complete development runner ----
+
+def development_quarter_gate(values_by_week_index: dict[int,float], min_positive:int=3) -> bool:
+    groups=[[] for _ in range(4)]
+    for w,v in values_by_week_index.items():
+        if 0 <= w <= 52: groups[min(3,w*4//53)].append(v)
+    return sum(bool(g) and float(np.mean(g))>0 for g in groups) >= min_positive
+
+
+def confirmation_tertile_gate(values_by_week_index: dict[int,float], min_positive:int=2) -> bool:
+    groups=[[],[],[]]
+    for w,v in values_by_week_index.items():
+        if 0 <= w <= 7: groups[0].append(v)
+        elif 8 <= w <= 15: groups[1].append(v)
+        elif 16 <= w <= 24: groups[2].append(v)
+    return sum(bool(g) and float(np.mean(g))>0 for g in groups) >= min_positive
+
+
+def sha256_file(path: str|Path) -> str:
+    h=hashlib.sha256()
+    with Path(path).open("rb") as f:
+        for chunk in iter(lambda:f.read(1024*1024),b""):h.update(chunk)
+    return h.hexdigest()
+
+
+def _filter_interval(bars:Sequence[M5Bar], start:datetime, end:datetime)->list[M5Bar]:
+    return [b for b in bars if start <= b.time <= end]
+
+
+def _responses_for_events(events:Sequence[SignalEvent], close_by_time:dict[datetime,float]):
+    norm={};raw={}
+    for e in events:
+        for h in HORIZONS:
+            idx=HORIZONS.index(h)
+            if not e.path_available[idx]:continue
+            t=e.trigger_time+timedelta(minutes=5*(h-1));c=close_by_time.get(t)
+            if c is None:continue
+            rr=e.signal_direction*math.log(c/e.m15_close)
+            norm[(e.symbol,e.trigger_time,h)]=rr/e.h1_rms24
+            raw[(e.symbol,e.trigger_time,h)]=rr*10000.0
+    return norm,raw
+
+
+def _leaf_aggregates(units:Sequence[PairedUnit],context:str,state:str,h:int,anchor:datetime,min_symbols:int):
+    lu=[u for u in units if u.context==context and u.vol_state==state and u.horizon==h]
+    sw=aggregate_direction_to_symbol_week(lu);cw=aggregate_symbol_to_context_week(sw,min_symbols)
+    ids,blocks=two_week_blocks(cw,anchor,context,state,h)
+    sym={}
+    for (ctx,s,w,st,hh),v in sw.items():
+        if ctx==context and st==state and hh==h:sym.setdefault(s,[]).append(v)
+    symbol_means={s:float(np.mean(v)) for s,v in sym.items()}
+    week_means={week_index(w,anchor):v for (ctx,w,st,hh),v in cw.items() if ctx==context and st==state and hh==h}
+    return lu,sw,cw,ids,blocks,symbol_means,week_means
+
+
+def _development_support_leaf(events,context,state,h,units,blocks):
+    ce=[e for e in events if e.context==context];se=[e for e in ce if e.vol_state==state];idx=HORIZONS.index(h)
+    cfull=sum(e.arm=="FULL" for e in ce);cbase=sum(e.arm=="BASELINE" for e in ce)
+    sfull=sum(e.arm=="FULL" for e in se);sbase=sum(e.arm=="BASELINE" for e in se)
+    syms=sorted({e.symbol for e in ce});per={};retention=[]
+    for s in syms:
+        x=[e for e in ce if e.symbol==s];f=sum(e.arm=="FULL" for e in x);b=sum(e.arm=="BASELINE" for e in x);avail=sum(e.path_available[idx] for e in x)
+        per[s]={"full":f,"baseline":b,"retention":avail/len(x) if x else 0};retention.append(per[s]["retention"])
+    weeks=len({e.week_key for e in ce})
+    passed=(cfull>=240 and cbase>=240 and all(v["full"]>=20 and v["baseline"]>=20 for v in per.values()) and sfull>=80 and sbase>=80 and weeks>=24 and len(blocks)>=12 and all(x>=.80 for x in retention))
+    return {"pass":passed,"context_full":cfull,"context_baseline":cbase,"state_full":sfull,"state_baseline":sbase,"distinct_weeks":weeks,"paired_units":len(units),"valid_blocks":len(blocks),"per_symbol":per}
+
+
+def evaluate_development_from_directory(*,authority:dict,design:dict,raw_root:str|Path,permutations:int=DEFAULT_PERMUTATIONS,seed:int=DEFAULT_SEED)->dict:
+    require_real_response_authority(authority)
+    start=parse_utc(design["development_interval_utc"][0]);end=parse_utc(design["development_interval_utc"][1]);raw_root=Path(raw_root)
+    all_events=[];bars_by_symbol={};source_hashes={}
+    for c in design["structural_contexts"]:
+        ctx=c["id"]
+        for sym,sid in c["development_symbols"]:
+            p=raw_root/f"{int(sid)}_M5.csv"
+            if not p.exists():raise FileNotFoundError(p)
+            source_hashes[sym]=sha256_file(p);bars=_filter_interval(read_m5_csv(p),start,end);bars_by_symbol[sym]=bars;all_events.extend(build_signal_support(bars,ctx,sym,int(sid)))
+    norm={};raw={}
+    for sym,bars in bars_by_symbol.items():
+        n,r=_responses_for_events([e for e in all_events if e.symbol==sym],{b.time:b.close for b in bars});norm.update(n);raw.update(r)
+    units=construct_paired_units(all_events,norm);family=[];contexts=[];leaf_order=[(s,h) for s in VOL_STATES for h in HORIZONS]
+    for ci,c in enumerate(design["structural_contexts"]):
+        ctx=c["id"];leaves=[];metrics=[]
+        for state,h in leaf_order:
+            lu,sw,cw,ids,blocks,smeans,wmeans=_leaf_aggregates(units,ctx,state,h,DEV_BLOCK_ANCHOR,4);sup=_development_support_leaf(all_events,ctx,state,h,lu,blocks)
+            leaves.append((ids,blocks) if sup["pass"] else (np.array([],int),np.array([],float)))
+            full_norm=[norm[(e.symbol,e.trigger_time,h)] for e in all_events if e.context==ctx and e.vol_state==state and e.arm=="FULL" and (e.symbol,e.trigger_time,h) in norm]
+            full_raw=[raw[(e.symbol,e.trigger_time,h)] for e in all_events if e.context==ctx and e.vol_state==state and e.arm=="FULL" and (e.symbol,e.trigger_time,h) in raw]
+            base_raw=[raw[(e.symbol,e.trigger_time,h)] for e in all_events if e.context==ctx and e.vol_state==state and e.arm=="BASELINE" and (e.symbol,e.trigger_time,h) in raw]
+            metrics.append({"state":state,"horizon_m5":h,"support":sup,"blocks":blocks.tolist(),"block_ids":ids.tolist(),"incremental_mean":float(np.mean(blocks)) if len(blocks) else None,"symbol_means":smeans,"week_means":wmeans,"full_absolute_normalized_mean":float(np.mean(full_norm)) if full_norm else None,"full_raw_bps_mean":float(np.mean(full_raw)) if full_raw else None,"baseline_raw_bps_mean":float(np.mean(base_raw)) if base_raw else None})
+        test=local_shared_maxT(leaves,permutations,seed+ci);family.append(test["family_p"]);contexts.append({"context":ctx,"local_test":test,"leaves":metrics})
+    rejects=holm_reject(family,.05)
+    for ci,cx in enumerate(contexts):
+        j=cx["local_test"]["selected_index"];m=cx["leaves"][j];m["holm_context_reject"]=rejects[ci]
+        m["temporal_pass"]=development_quarter_gate({int(k):v for k,v in m["week_means"].items()},3);m["breadth_pass"]=breadth_gate(m["symbol_means"],3);m["concentration_pass"]=concentration_gate(m["symbol_means"],.50);m["full_arm_positive"]=m["full_absolute_normalized_mean"] is not None and m["full_absolute_normalized_mean"]>0
+        cx["development_lead_pass"]=bool(m["support"]["pass"] and rejects[ci] and m["incremental_mean"] is not None and m["incremental_mean"]>0 and m["temporal_pass"] and m["breadth_pass"] and m["concentration_pass"] and m["full_arm_positive"])
+    return {"schema":"mxm.research-core-v4.development-response-result.v1","design":"FIRST_REAL_MARKET_DESIGN_V2","source_hashes":source_hashes,"support_skeleton_sha256":skeleton_sha256(all_events),"event_count":len(all_events),"response_value_count":len(norm),"family_pvalues":family,"holm_reject":rejects,"contexts":contexts,"nonselection_diagnostics_only":["UTC_HOUR","DAY_OF_WEEK","SESSION_LABEL","DST_REGIME"],"protected_forward_opened":False}
+
 if __name__ == "__main__":
     main()
