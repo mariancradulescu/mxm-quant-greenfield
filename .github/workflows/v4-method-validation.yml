@@ -10,6 +10,7 @@ on:
       - "tests/test_research_core_v4_response_evaluator.py"
       - "tests/test_research_core_v4_support_geometry.py"
       - "tests/test_research_core_v4_execution_binding.py"
+      - "tests/test_research_core_v4_recovery_v2.py"
       - "research_core_v3/state/V3_STATE.json"
       - "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json"
       - ".github/workflows/v4-method-validation.yml"
@@ -37,16 +38,33 @@ jobs:
             research_core_v4/exact_geometry_calibration_v2.py \
             research_core_v4/exact_geometry_calibration_v3.py \
             research_core_v4/development_execution_runner_v1.py \
-            research_core_v4/crash_recovery_control_v1.py
+            research_core_v4/crash_recovery_control_v1.py \
+            research_core_v4/crash_recovery_control_v2.py \
+            research_core_v4/runtime_profile_audit_v1.py
       - name: Preoutcome architecture and evaluator invariants
         run: |
           python -m unittest \
             tests.test_research_core_v4_method \
             tests.test_research_core_v4_response_evaluator \
             tests.test_research_core_v4_support_geometry \
-            tests.test_research_core_v4_execution_binding
+            tests.test_research_core_v4_execution_binding \
+            tests.test_research_core_v4_recovery_v2
       - name: Deterministic crash-recovery control-plane invariants
         run: python research_core_v4/crash_recovery_control_v1.py
+      - name: Recovery V2 prepared-not-armed invariants
+        run: python research_core_v4/crash_recovery_control_v2.py
+      - name: Synthetic-only runtime hotspot audit
+        run: |
+          python research_core_v4/runtime_profile_audit_v1.py > /tmp/v4_runtime_profile.json
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/v4_runtime_profile.json"))
+          assert x["status"]=="PASS"
+          assert x["synthetic_only"] is True
+          assert x["real_market_response_values_used"] is False
+          assert x["hotspot_verified"] is True
+          print("V4_RECOVERY_V2_SYNTHETIC_RUNTIME_AUDIT_PASS",x)
+          PY
       - name: Exact real-support geometry synthetic calibration smoke
         run: |
           python research_core_v4/exact_geometry_calibration_v3.py \

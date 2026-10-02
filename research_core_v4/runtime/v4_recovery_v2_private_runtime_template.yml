@@ -1,0 +1,133 @@
+name: V4 Recovery V2 Private Runtime TEMPLATE
+
+# TEMPLATE ONLY. Intentionally stored outside .github/workflows in the PUBLIC
+# repository. Install only in the verified PRIVATE runtime repository after the
+# exact 18-series private staging certificate is durable and Recovery V2 is armed.
+on:
+  push:
+    branches: [v4-recovery-v2-runtime]
+    paths: [v4_runtime/ARM_V2.json]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: MXM_V4_FIRST_DEV_RECOVERY_V2_SINGLETON
+  cancel-in-progress: false
+
+jobs:
+  exact-frozen-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout private runtime/input vault
+        uses: actions/checkout@v4
+        with:
+          path: private_runtime
+
+      - name: Checkout exact frozen scientific source
+        uses: actions/checkout@v4
+        with:
+          repository: mariancradulescu/mxm-quant-greenfield
+          ref: 68bdee4b51244ae50acd56fe868468b96106450f
+          path: science
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: python -m pip install --disable-pip-version-check numpy
+
+      - name: Verify ARM, private staging certificate, exact source and exact 18 series
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv, hashlib, json
+          from pathlib import Path
+
+          arm = json.load(open("private_runtime/v4_runtime/ARM_V2.json", encoding="utf-8"))
+          cert = json.load(open("private_runtime/v4_runtime/PRIVATE_INPUT_STAGING_CERTIFICATE_V1.json", encoding="utf-8"))
+          assert arm["logical_computation_id"] == "FIRST_REAL_V4_DEVELOPMENT_RESPONSE_FROZEN_LOGICAL_COMPUTATION_V2"
+          assert arm["process_attempt_number"] == 1
+          assert arm["process_attempt_limit"] == 1
+          assert arm["automatic_retry"] is False
+          assert cert["status"] == "PASS_EXACT_PRIVATE_INPUT_STAGING"
+          assert cert["series_count"] == 18
+          assert cert["original_archive_sha256"] == "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259"
+          assert cert["delta_archive_sha256"] == "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+
+          def sha256(path):
+              h=hashlib.sha256()
+              with open(path,"rb") as f:
+                  for chunk in iter(lambda:f.read(1024*1024),b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          frozen = {
+            "science/research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json": "3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3497e1b8a72b59b1d4e590e",
+            "science/research_core_v4/response_evaluator_v3.py": "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a",
+            "science/research_core_v4/development_execution_runner_v1.py": "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d",
+            "science/research_core_v4/frozen_v2_semantics.py": "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed",
+          }
+          for path, expected in frozen.items():
+              assert sha256(path) == expected, path
+
+          raw_root=Path("private_runtime/v4_runtime/raw18")
+          for item in cert["series"]:
+              p=raw_root/f"{int(item['symbol_id'])}_M5.csv"
+              assert p.exists(), p
+              assert sha256(p) == item["series_sha256"], p
+              with p.open("r",encoding="utf-8",newline="") as f:
+                  reader=csv.DictReader(f)
+                  rows=list(reader)
+              assert len(rows) == int(item["row_count"]), p
+              assert rows[0]["time_utc"] == item["first_timestamp_utc"], p
+              assert rows[-1]["time_utc"] == item["last_timestamp_utc"], p
+          print("PRIVATE_INPUT_AND_EXACT_68B_SOURCE_PRECHECK_PASS")
+          PY
+
+      - name: Verify zero prior accepted private raw result artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          count="$(gh api "repos/${GH_REPOSITORY}/actions/artifacts?name=V4_FIRST_DEV_V2_RECOVERY_V2_RAW_RESULT" --jq '.total_count')"
+          test "$count" = "0"
+
+      - name: Create distinct V2 process lock
+        run: |
+          set -euo pipefail
+          umask 077
+          ( set -o noclobber; printf '%s\n' "FIRST_REAL_V4_DEVELOPMENT_RESPONSE_FROZEN_LOGICAL_COMPUTATION_V2" > "$RUNNER_TEMP/V4_RECOVERY_V2_PROCESS.lock" )
+
+      - name: Execute byte-identical frozen runner exactly once
+        working-directory: science
+        run: |
+          set -euo pipefail
+          python research_core_v4/development_execution_runner_v1.py \
+            --execute-authorized-development \
+            --raw-root ../private_runtime/v4_runtime/raw18 \
+            --output "$RUNNER_TEMP/V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json"
+
+      - name: Verify raw result exists before any interpretation
+        run: |
+          set -euo pipefail
+          test -s "$RUNNER_TEMP/V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json"
+          sha256sum "$RUNNER_TEMP/V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json" > "$RUNNER_TEMP/RAW_RESULT_SHA256.txt"
+          test ! -e "$RUNNER_TEMP/V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json.tmp"
+
+      - name: Durably persist exactly one private raw result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: V4_FIRST_DEV_V2_RECOVERY_V2_RAW_RESULT
+          path: |
+            ${{ runner.temp }}/V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json
+            ${{ runner.temp }}/RAW_RESULT_SHA256.txt
+            ${{ runner.temp }}/V4_RECOVERY_V2_PROCESS.lock
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: No interpretation boundary
+        run: echo "RAW_RESULT_DURABLY_PERSISTED_PRIVATE_STOP_BEFORE_INTERPRETATION"

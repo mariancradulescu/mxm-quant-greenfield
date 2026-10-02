@@ -1,0 +1,89 @@
+{
+  "schema": "mxm.research-core-v4.execution-runtime-profile-audit.v1",
+  "as_of_date": "2026-10-02",
+  "status": "PASS_TRUE_RUNTIME_BOTTLENECK_IDENTIFIED_WITHOUT_REAL_DEVELOPMENT_OUTCOMES",
+  "evidence_boundary": "ONLY_OUTCOME_BLIND_REAL_SUPPORT_GEOMETRY_AND_SYNTHETIC_DETERMINISTIC_RESPONSE_VALUES",
+  "real_development_response_values_calculated": false,
+  "real_development_response_values_exposed": false,
+  "authoritative_support": {
+    "rows": 118262,
+    "sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b",
+    "contexts": {
+      "FX_SPOT": 35014,
+      "SPOT_CRYPTO": 51366,
+      "US_EQUITY_EXTENDED_HOURS": 31882
+    }
+  },
+  "measured_profile_seconds": {
+    "FX_SPOT": {
+      "support_reconstruction": 9.704,
+      "synthetic_response_dictionary_137488_values": 0.2723,
+      "paired_units_once": 0.119,
+      "full_primary_context_including_support_gates": 0.27,
+      "nonselection_diagnostics": 7.842,
+      "diagnostic_rows": 280
+    },
+    "SPOT_CRYPTO": {
+      "support_reconstruction": 15.275,
+      "synthetic_response_fixture_build": 0.25,
+      "paired_units_once": 0.163,
+      "primary_context_core": 0.016,
+      "nonselection_diagnostics": 11.835,
+      "diagnostic_rows": 288
+    },
+    "US_EQUITY_EXTENDED_HOURS": {
+      "support_reconstruction": 8.414,
+      "synthetic_response_fixture_build": 0.155,
+      "paired_units_once": 0.092,
+      "primary_context_core": 0.013,
+      "nonselection_diagnostics": 5.765,
+      "diagnostic_rows": 280
+    },
+    "combined": {
+      "support_reconstruction": 33.393,
+      "nonselection_diagnostics": 25.442,
+      "total_diagnostic_rows": 848
+    }
+  },
+  "cprofile_hotspot": {
+    "fixture": "FX_SPOT_REAL_SUPPORT_SYNTHETIC_OUTCOMES",
+    "events": 35014,
+    "profiled_total_seconds": 13.281,
+    "function_calls": 23641410,
+    "build_nonselection_diagnostics_cumulative_seconds": 13.281,
+    "paired_leaf_metrics_calls": 280,
+    "paired_leaf_metrics_cumulative_seconds": 12.645,
+    "construct_paired_units_calls": 560,
+    "construct_paired_units_cumulative_seconds": 10.388,
+    "numpy_mean_calls": 971658,
+    "explanation": "EACH_DIAGNOSTIC_ROW_REBUILDS_PAIRED_UNITS_TWICE_NORMALIZED_AND_RAW_AND_EACH_REBUILD_SCANS_ALL_FOUR_HORIZONS_BEFORE_FILTERING_TO_ONE_HORIZON"
+  },
+  "support_hotspot": {
+    "fixture": "SOLUSD_REAL_PREENTRY_GEOMETRY_NO_FORWARD_RESPONSES",
+    "events": 8780,
+    "profiled_build_signal_support_seconds": 3.187,
+    "preentry_volatility_state_cumulative_seconds": 1.289,
+    "completed_buckets_cumulative_seconds": 0.757,
+    "static_note": "preentry_volatility_state_builds_prior_history_from_rv_ends_prefix_each_iteration;this_is_avoidable_but_not_adopted"
+  },
+  "static_complexity_findings": [
+    "build_nonselection_diagnostics_partitions_events_by_4_diagnostics_then_iterates_2_volatility_states_x_4_horizons",
+    "_paired_leaf_metrics_calls_construct_paired_units_twice_per_diagnostic_row",
+    "construct_paired_units_processes_all_4_horizons_even_when_caller_immediately_filters_to_one_horizon",
+    "full_event_filters_are_repeated_across_diagnostic_rows",
+    "normalized_and_raw_aggregation_reconstruct_the_same_fixed_grouping_structure_separately",
+    "_development_support_leaf_repeated_scans_exist_but_measured_primary_gate_runtime_is_small_relative_to_diagnostics",
+    "maxT_Holm_temporal_breadth_concentration_and_full_arm_positive_gates_are_not_RUNTIME_BOTTLENECKS"
+  ],
+  "timeout_reconciliation": {
+    "recovery_v1_recorded_configured_timeout_seconds": 900,
+    "verified_elapsed_900_seconds": false,
+    "attempt_commit_utc": "2026-10-02T12:17:45Z",
+    "recovery_opening_lock_local_mtime_utc": "2026-10-02T12:19:59Z",
+    "failure_commit_utc": "2026-10-02T12:21:18Z",
+    "attempt_commit_to_failure_commit_seconds": 213,
+    "recovery_opening_lock_to_failure_commit_seconds_approx": 79,
+    "conclusion": "NO_EVIDENCE_THE_FROZEN_COMPUTATION_REQUIRES_MORE_THAN_900_SECONDS;THE_FAILURE_RECORD_CLASSIFICATION_IS_PRESERVED_AS_HISTORY_BUT_ITS_900_SECOND_ELAPSED_RUNTIME_INTERPRETATION_IS_SUPERSEDED"
+  },
+  "decision": "DO_NOT_REFACTOR_SCIENTIFIC_EVALUATOR_FOR_RECOVERY_V2;MOVE_BYTE_IDENTICAL_SOURCE_TO_DURABLE_RUNNER"
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "mxm.research-core-v4.private-input-transport-decision.v1",
+  "as_of_date": "2026-10-02",
+  "status": "PRIVATE_RUNTIME_SELECTED_INPUT_STAGING_NOT_YET_SATISFIED",
+  "exact_archives": {
+    "original_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "delta_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+  },
+  "required_series_count": 18,
+  "destination_repository": "mariancradulescu/mxm-quant-director",
+  "destination_visibility": "private",
+  "selected_storage": "DEDICATED_PRIVATE_GIT_BRANCH_OR_PRIVATE_RUNTIME_VAULT_WITH_18_INDIVIDUAL_CSV_FILES_EACH_BELOW_GITHUB_SINGLE_FILE_LIMIT",
+  "public_repo_raw_commit_forbidden": true,
+  "public_repo_actions_artifact_for_raw_inputs_forbidden": true,
+  "reason_public_artifact_forbidden": "PUBLIC_REPOSITORY_READ_ACCESS_ALLOWS_ARTIFACT_DOWNLOAD_BY_REPOSITORY_READERS;RAW_BROKER_BYTES_MUST_REMAIN_PRIVATE",
+  "broker_recollection_authorized": false,
+  "replacement_data_authorized": false,
+  "external_market_data_authorized": false,
+  "staging_certificate_future_ref": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RECOVERY_V2_PRIVATE_INPUT_STAGING_CERTIFICATE_V1.json",
+  "staging_certificate_requirements": [
+    "PRIVATE_REPOSITORY_COMMIT_SHA_OR_PRIVATE_ARTIFACT_RUN_ID",
+    "ALL_18_EXACT_SERIES_SHA256",
+    "ALL_18_ROW_COUNTS",
+    "ALL_18_FIRST_AND_LAST_TIMESTAMPS",
+    "SOURCE_ARCHIVE_HASH_BINDINGS",
+    "ZERO_REPLACEMENT_SERIES",
+    "VISIBILITY_PRIVATE_VERIFIED"
+  ],
+  "current_private_repo_search_for_exact_archive_hashes": "NO_MATCH",
+  "current_real_execution_authorized": false,
+  "blocker": "CURRENT_CONNECTED_GITHUB_INTERFACE_CANNOT_STREAM_THE_EXISTING_LIBRARY_BINARY_INPUT_BYTES_INTO_THE_PRIVATE_REPOSITORY_WITHOUT_EXPOSING_OR_REENCODING_THEM;NO_UNSAFE_PUBLIC_WORKAROUND_IS_ALLOWED",
+  "resolution_rule": "STAGE_THE_EXISTING_EXACT_BYTES_PRIVATELY_USING_A_FILE_UPLOAD_CAPABILITY_OR_PRIVATE_RUNTIME_FILE_TRANSFER;THEN_PERSIST_AND_VALIDATE_THE_STAGING_CERTIFICATE_BEFORE_ARMING_RECOVERY_V2"
+}

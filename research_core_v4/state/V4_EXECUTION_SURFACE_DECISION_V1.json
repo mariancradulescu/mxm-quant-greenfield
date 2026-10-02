@@ -1,0 +1,49 @@
+{
+  "schema": "mxm.research-core-v4.execution-surface-decision.v1",
+  "as_of_date": "2026-10-02",
+  "status": "SELECT_STANDARD_GITHUB_HOSTED_PRIVATE_RUNTIME_NO_REAL_EXECUTION_YET",
+  "selected_surface": "STANDARD_GITHUB_HOSTED_UBUNTU_RUNNER_IN_PRIVATE_REPOSITORY",
+  "private_runtime_repository": "mariancradulescu/mxm-quant-director",
+  "private_runtime_repository_visibility_verified": "private",
+  "private_runtime_repository_push_permission_verified": true,
+  "public_scientific_repository": "mariancradulescu/mxm-quant-greenfield",
+  "exact_scientific_source_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+  "checkout_rule": "CHECKOUT_PUBLIC_SCIENTIFIC_REPOSITORY_AT_EXACT_68BDEE4B_SOURCE_HEAD_INTO_SEPARATE_SCIENCE_DIRECTORY;DO_NOT_COPY_OR_EDIT_FROZEN_SCIENTIFIC_FILES",
+  "github_actions_current_limits_verified_on_2026_10_02": {
+    "standard_github_hosted_job_execution_limit_hours": 6,
+    "workflow_timeout_minutes_default": 360,
+    "chosen_job_timeout_minutes": 60,
+    "ubuntu_slim_forbidden_for_real_recovery_v2": true,
+    "ubuntu_slim_reason": "15_MINUTE_JOB_LIMIT_AND_NO_BENEFIT_FOR_THIS_CPU_BOUND_VALIDATION"
+  },
+  "workflow_shape": {
+    "trigger": "FUTURE_MACHINE_CREATED_ARM_COMMIT_ON_DEDICATED_PRIVATE_RUNTIME_BRANCH_ONLY",
+    "concurrency_group": "MXM_V4_FIRST_DEV_RECOVERY_V2_SINGLETON",
+    "cancel_in_progress": false,
+    "process_attempt_limit": 1,
+    "automatic_retry": false,
+    "preflight": [
+      "VERIFY_PRIVATE_INPUT_STAGING_CERTIFICATE",
+      "VERIFY_ALL_18_SERIES_HASH_ROWCOUNT_TIMESTAMPS",
+      "VERIFY_EXACT_68B_SOURCE_HASHES",
+      "VERIFY_ZERO_EXISTING_ACCEPTED_RESULT_ARTIFACTS",
+      "VERIFY_PUBLIC_V2_ARM_HASH"
+    ],
+    "execution": "INVOKE_BYTE_IDENTICAL_development_execution_runner_v1.py_FROM_68B_CHECKOUT",
+    "raw_persistence": "ORIGINAL_RUNNER_ATOMIC_LOCAL_WRITE_THEN_IMMEDIATE_PRIVATE_actions_upload_artifact_V4",
+    "interpretation_inside_job": false,
+    "raw_inputs_uploaded_as_artifact": false
+  },
+  "fail_closed": [
+    "NO_INPUT_STAGING_CERTIFICATE_NO_RUN",
+    "ANY_HASH_MISMATCH_NO_RUN",
+    "ANY_PRIOR_ACCEPTED_RESULT_ARTIFACT_NO_RUN",
+    "ANY_PROCESS_FAILURE_CONSUMES_THE_SINGLE_V2_ATTEMPT_AND_REQUIRES_NEW_AUDIT",
+    "NO_AUTOMATIC_RETRY"
+  ],
+  "docs_verified": [
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes",
+    "https://docs.github.com/en/actions/reference/limits",
+    "https://docs.github.com/en/actions/reference/runners/github-hosted-runners"
+  ]
+}
