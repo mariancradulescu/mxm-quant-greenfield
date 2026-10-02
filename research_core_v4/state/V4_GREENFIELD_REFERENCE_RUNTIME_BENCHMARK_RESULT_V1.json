@@ -1,0 +1,81 @@
+{
+  "schema": "mxm.research-core-v4.greenfield-reference-runtime-benchmark-result.v1",
+  "as_of_date": "2026-10-02",
+  "status": "PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN",
+  "successful_run": {
+    "workflow": "V4 Greenfield Reference Runtime Benchmark",
+    "run_id": 37015991317,
+    "head": "b33c5ddfb1d21e20928c1b14c43feefa873f6d69",
+    "conclusion": "SUCCESS",
+    "artifact_id": 11230127343,
+    "artifact_name": "V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK",
+    "artifact_digest": "sha256:a6d45ca4452128940e9f305c1fc3cf9360aae72f05dadcbb1c1fb887afd14c30"
+  },
+  "prior_harness_failure": {
+    "run_id": 37015908477,
+    "head": "1e0255410467cb5a9fe7ff7f454ae2e5e0d3df6d",
+    "classification": "PYTHON_MODULE_INVOCATION_DEFECT_BEFORE_ANY_BENCHMARK_EXECUTION",
+    "scientific_or_performance_result": false
+  },
+  "evidence_boundary": {
+    "synthetic_only": true,
+    "real_market_response_values_used": false,
+    "reference_implementation_only": true,
+    "execution_optimization_adopted": false,
+    "diagnostics_omitted": false
+  },
+  "frozen_reference_hashes": {
+    "response_evaluator_v3_sha256": "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a",
+    "development_execution_runner_v1_sha256": "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d",
+    "frozen_v2_semantics_sha256": "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed"
+  },
+  "support_binding": {
+    "rows": 118262,
+    "sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b"
+  },
+  "bounded_stage_limit_seconds": 30,
+  "bounded_results": [
+    {
+      "event_count": 3000,
+      "paired_units_seconds": 0.02559736399999224,
+      "nonselection_diagnostics_seconds": 0.8669172400000207,
+      "combined_profiled_seconds": 0.8925146040000129
+    },
+    {
+      "event_count": 6000,
+      "paired_units_seconds": 0.043860996999995905,
+      "nonselection_diagnostics_seconds": 1.6955268439999998,
+      "combined_profiled_seconds": 1.7393878409999957
+    },
+    {
+      "event_count": 12000,
+      "paired_units_seconds": 0.0883357490000094,
+      "nonselection_diagnostics_seconds": 3.4731341189999796,
+      "combined_profiled_seconds": 3.561469867999989
+    },
+    {
+      "event_count": 24000,
+      "paired_units_seconds": 0.19578390700002046,
+      "nonselection_diagnostics_seconds": 7.311617350999995,
+      "combined_profiled_seconds": 7.507401258000016
+    }
+  ],
+  "full_synthetic_result": {
+    "event_count": 118262,
+    "paired_units": 50744,
+    "paired_units_seconds": 1.1648256729999957,
+    "nonselection_diagnostics_seconds": 48.68743989399999,
+    "combined_profiled_seconds": 49.85226556699999,
+    "diagnostic_rows": 848
+  },
+  "available_execution_limit_seconds": 21600,
+  "full_reference_guardrail_seconds": 900,
+  "measured_margin_multiple_vs_available_limit": 433.28020811752737,
+  "decision": "DO_NOT_CREATE_A_FAST_REIMPLEMENTATION;USE_THE_BYTE_IDENTICAL_FROZEN_REFERENCE_ON_A_DURABLE_GREENFIELD_GITHUB_HOSTED_RUNNER",
+  "rationale": "THE_DOMINANT_SYNTHETIC_FULL_SUPPORT_SIZED_PROFILE_COMPLETES_WITH_MORE_THAN_400X_MARGIN_TO_THE_6_HOUR_JOB_LIMIT;A_REIMPLEMENTATION_WOULD_ADD_SEMANTIC_RISK_WITHOUT_RUNTIME_NECESSITY",
+  "seed_changed": false,
+  "permutations_changed": false,
+  "rng_sequence_changed": false,
+  "scientific_semantics_changed": false,
+  "real_development_response_execution": false
+}
