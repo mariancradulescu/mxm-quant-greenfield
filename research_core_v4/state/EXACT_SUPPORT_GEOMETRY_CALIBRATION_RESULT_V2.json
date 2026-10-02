@@ -1,0 +1,77 @@
+{
+  "schema": "mxm.research-core-v4.exact-support-geometry-calibration-result.v2",
+  "status": "PASS_POST_ALIGNMENT_ACTUAL_PAIRED_ESTIMATOR_CALIBRATED_ON_UNCHANGED_REAL_OUTCOME_BLIND_SUPPORT_GEOMETRY",
+  "as_of_date": "2026-10-02",
+  "supersedes_as_authoritative": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V1.json",
+  "v1_preserved_as": "PRE_CORRECTION_IMPLEMENTATION_CALIBRATION_HISTORY",
+  "design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "support_ref": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json",
+  "support_skeleton_sha256": "e79db90359e473e51de464ccddf400136c4cbaeedabada87975ac6961f6e9aee",
+  "support_geometry_recomputed": false,
+  "support_geometry_changed": false,
+  "exact_full_baseline_arm_counts_changed": false,
+  "real_market_response_values_used": false,
+  "broker_contacted": false,
+  "workflow_run_id": 36976820633,
+  "workflow_head": "abc4c87f8381d19e566739cc6a1708504a7c6e69",
+  "workflow_conclusion": "SUCCESS",
+  "evaluator": "research_core_v4/response_evaluator_v3.py",
+  "shared_semantics": "research_core_v4/frozen_v2_semantics.py",
+  "calibration_harness": "research_core_v4/exact_geometry_calibration_v2.py",
+  "permutations": 1023,
+  "seed": 20261002,
+  "selector_exact_tiecheck": {
+    "expected_index": 2,
+    "selected_index": 2,
+    "pass": true
+  },
+  "full_arm_weighting_parity": {
+    "production": 0.2535718329576218,
+    "calibration": 0.2535718329576218,
+    "abs_diff": 0,
+    "pass": true
+  },
+  "negative_control_global_type_I": {
+    "symmetric_zero_mean": 0.05,
+    "fat_tailed_t5_zero_mean": 0.043333333333333335,
+    "skewed_zero_mean": 0.024,
+    "heteroskedastic_zero_mean": 0.043333333333333335,
+    "common_factor_zero_mean": 0.046
+  },
+  "standardized_mde_summary": {
+    "FX_SPOT": {
+      "six_of_six_p50": 0.04760869565217391,
+      "six_of_six_p80": 0.06846153846153846,
+      "four_of_six_p50": 0.07304347826086957,
+      "three_of_six_p50": 0.10186666666666667,
+      "high_only_p50": 0.0640677966101695,
+      "low_only_p50": 0.06326923076923077
+    },
+    "SPOT_CRYPTO": {
+      "six_of_six_p50": 0.04,
+      "six_of_six_p80": 0.05275862068965517,
+      "four_of_six_p50": 0.05689320388349514,
+      "three_of_six_p50": 0.07340206185567011,
+      "high_only_p50": 0.048091603053435114,
+      "low_only_p50": 0.0472
+    },
+    "US_EQUITY_EXTENDED_HOURS": {
+      "six_of_six_p50": 0.06342857142857143,
+      "six_of_six_p80": 0.09000000000000001,
+      "four_of_six_p50": 0.10191780821917809,
+      "three_of_six_p50": 0.13278688524590163,
+      "high_only_p50": 0.08103896103896104,
+      "low_only_p50": 0.08492307692307692
+    }
+  },
+  "scenario_specific_bps_mde_status": "NOT_IDENTIFIABLE_OUTCOME_BLIND_FOR_THE_ACTUAL_PAIRED_ESTIMATOR",
+  "acceptance": {
+    "global_type_I_approximately_controlled_at_predeclared_FWER": true,
+    "material_type_I_deviation_found": false,
+    "production_calibration_selected_leaf_identical_on_known_ties": true,
+    "production_calibration_full_arm_gate_identical": true,
+    "no_gate_relaxed_for_power": true,
+    "all_24_leaf_support_geometry_still_feasible": true,
+    "authoritative_post_alignment_calibration_green": true
+  }
+}
