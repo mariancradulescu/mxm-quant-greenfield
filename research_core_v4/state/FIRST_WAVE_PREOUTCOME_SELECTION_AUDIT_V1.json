@@ -1,0 +1,151 @@
+{
+  "schema": "mxm.research-core-v4.first-wave-preoutcome-selection-audit.v1",
+  "status": "COMPLETE_FIRST_INFORMATION_SOURCE_AND_PANELS_SELECTED_WITHOUT_V4_MARKET_OUTCOMES",
+  "as_of_date": "2026-10-02",
+  "selected_information_source": "CAUSAL_CROSS_SCALE_ALIGNMENT_ONSET",
+  "source_catalog_ref": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
+  "detector_calibration_ref": "research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V2.json",
+  "closure_graph_ref": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
+  "selection_inputs": {
+    "family_level": [
+      "V3_CLOSURE_DEPENDENCY_GRAPH",
+      "V4_INFORMATION_SOURCE_CATALOG",
+      "V4_MULTISCALE_COVERAGE_AUDIT",
+      "V4_DETECTOR_CALIBRATION"
+    ],
+    "identity_level": [
+      "PRIMARY_145_INPUT_MANIFEST_V1_DATA_COMPLETENESS",
+      "PEPPERSTONE_CURRENT_EUR200_SYMBOL_FEASIBILITY_INDEX_V1",
+      "BROKER_NATIVE_ADAPTIVE_INFORMATION_FRONTIER_V1_STRUCTURAL_SIGNATURES"
+    ],
+    "forbidden_identity_selection_inputs": [
+      "V3_CELL_RETURN_MAGNITUDE",
+      "V3_SYMBOL_P_VALUE",
+      "V3_BEST_CELL_RANK",
+      "V3_FRICTION_WINNER_RANK"
+    ]
+  },
+  "rationale": [
+    "CORRECTS_THE_V3_PSEUDO_MULTITIMEFRAME_DEFECT_BY_USING_DISTINCT_H4_H1_M15_COMPLETED_CLOCK_STATES",
+    "USES_EXISTING_ACCEPTED_PEPPERSTONE_M5_BYTES_FOR_DEVELOPMENT_SO_NO_NEW_MARKET_ACQUISITION_IS_REQUIRED",
+    "TESTS_INFORMATION_RESPONSE_BEFORE_EXECUTION_OR_EXIT_ENGINEERING",
+    "POOLS_ACROSS_STRUCTURALLY_DIVERSE_IDENTITIES_SO_SYMBOL_IS_NOT_THE_PRIMARY_ALPHA_UNIT",
+    "LEAVES_QUOTE_MICROSTRUCTURE_V2_HELD_AND_USES_MICROSTRUCTURE_LATER_AS_EXECUTION_OR_CONFIRMATION_UNLESS_NEW_HEADROOM_JUSTIFIES_STANDALONE_ALPHA"
+  ],
+  "development_panel": {
+    "evidence_source": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+    "interval": [
+      "2025-09-16T00:00:00Z",
+      "2026-09-16T23:50:00Z"
+    ],
+    "members": [
+      {
+        "symbol": "EURJPY",
+        "symbol_id": 3,
+        "structural_role": "FX_SPOT",
+        "accepted_m5_rows": 74718,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "XAUUSD",
+        "symbol_id": 41,
+        "structural_role": "SPOT_METAL",
+        "accepted_m5_rows": 71102,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "JPN225",
+        "symbol_id": 116,
+        "structural_role": "CASH_INDEX",
+        "accepted_m5_rows": 70997,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "NatGas",
+        "symbol_id": 251,
+        "structural_role": "SPOT_ENERGY",
+        "accepted_m5_rows": 70470,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "LTCUSD",
+        "symbol_id": 130,
+        "structural_role": "SPOT_CRYPTO",
+        "accepted_m5_rows": 105037,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "AAPL.US-24",
+        "symbol_id": 2999,
+        "structural_role": "EXTENDED_HOURS_US_EQUITY",
+        "accepted_m5_rows": 69634,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      }
+    ],
+    "identity_selection_from_v4_outcomes": false
+  },
+  "confirmation_panel": {
+    "access_status": "FROZEN_IDENTITIES_AND_INTERVAL_OUTCOMES_UNOPENED_DATA_NOT_ACQUIRED_IN_THIS_TURN",
+    "identity_rule": "STRUCTURAL_REPRESENTATIVES_OUTSIDE_THE_CORRECTED_V3_145_SURFACE_AND_CURRENTLY_BOTH_DIRECTION_EUR200_FEASIBLE",
+    "preferred_historical_interval": [
+      "2025-01-06T00:00:00Z",
+      "2025-06-27T23:59:59Z"
+    ],
+    "members": [
+      {
+        "symbol": "USDCZK",
+        "symbol_id": 56,
+        "structural_role": "FX_SPOT_EXTENDED",
+        "outside_v3_145": true,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "US400",
+        "symbol_id": 7372,
+        "structural_role": "CASH_INDEX_NEAR_24X5",
+        "outside_v3_145": true,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "Crude-F",
+        "symbol_id": 2922,
+        "structural_role": "COMMODITY_FORWARD",
+        "outside_v3_145": true,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "APTUSD",
+        "symbol_id": 7300,
+        "structural_role": "SPOT_CRYPTO",
+        "outside_v3_145": true,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "NIO.US-24",
+        "symbol_id": 5479,
+        "structural_role": "EXTENDED_HOURS_US_EQUITY",
+        "outside_v3_145": true,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      },
+      {
+        "symbol": "USTN5YR-F",
+        "symbol_id": 7296,
+        "structural_role": "TREASURY_FORWARD",
+        "outside_v3_145": true,
+        "current_eur200_feasibility": "BOTH_FEASIBLE"
+      }
+    ],
+    "broker_history_availability_unknown": true,
+    "if_any_required_confirmation_data_unavailable": "DATA_LIMITED_UNTESTED_NOT_NULL;NO_POSTOUTCOME_IDENTITY_OR_INTERVAL_SUBSTITUTION",
+    "protected_forward_may_not_be_used": true
+  },
+  "governance": {
+    "development_outcomes_opened": false,
+    "confirmation_outcomes_opened": false,
+    "acquisition_started": false,
+    "quote_revision_v2_executed": false,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_trading_started": false
+  }
+}
