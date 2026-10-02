@@ -1,6 +1,6 @@
 {
-  "schema": "mxm.research-core-v4.state.v2",
-  "status": "FIRST_REAL_MARKET_DESIGN_V2_FROZEN_OUTCOMES_UNOPENED",
+  "schema": "mxm.research-core-v4.state.v3",
+  "status": "FIRST_REAL_MARKET_DESIGN_V2_DEVELOPMENT_RESPONSE_AUTHORIZED_NOT_EXECUTED",
   "as_of_date": "2026-10-02",
   "predecessor": {
     "v3_status": "READ_ONLY_RESEARCH_HISTORY",
@@ -49,7 +49,9 @@
     "confirmation_outcomes_opened": false,
     "new_market_acquisition_started": false,
     "confirmation_availability_preflight_run": false,
-    "evaluator_execution_authorized": false
+    "evaluator_execution_authorized": true,
+    "development_response_execution_authority": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V1.json",
+    "confirmation_execution_authorized": false
   },
   "held_artifacts": {
     "v3_quote_revision_v2": {
@@ -70,9 +72,11 @@
     "broker_contacted_by_v4": false,
     "quote_revision_v2_execution_authorized": false,
     "first_wave_v1_outcomes_opened": false,
-    "first_wave_v2_outcomes_opened": false
+    "first_wave_v2_outcomes_opened": false,
+    "broker_acquisition_authorized": false
   },
-  "stop_boundary": "INDEPENDENTLY_RECONCILE_THE_FROZEN_FIRST_REAL_MARKET_DESIGN_V2_AND_GREEN_METHOD_VALIDATION_BEFORE_ANY_FIRST_WAVE_V4_RESPONSE_OPENING",
-  "next_action": "RECONCILE_V4_DESIGN_V2_ONLY;DO_NOT_OPEN_DEVELOPMENT_OR_CONFIRMATION_RESPONSES;DO_NOT_CONTACT_BROKER;DO_NOT_RUN_QUOTE_REVISION_V2",
-  "final_preoutcome_scientific_audit": "research_core_v4/state/FIRST_WAVE_FINAL_PREOUTCOME_SCIENTIFIC_AUDIT_V1.json"
+  "stop_boundary": "STOP_IMMEDIATELY_BEFORE_CALLING_THE_AUTHORIZED_FROZEN_FIRST_WAVE_V2_DEVELOPMENT_RESPONSE_EVALUATOR_ON_REAL_ACCEPTED_M5_RESPONSES",
+  "next_action": "AUTHORIZED_BUT_DO_NOT_EXECUTE_IN_THIS_TURN;NEXT_TURN_MAY_OPEN_ONLY_THE_FROZEN_V2_DEVELOPMENT_RESPONSES_USING_FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V1",
+  "final_preoutcome_scientific_audit": "research_core_v4/state/FIRST_WAVE_FINAL_PREOUTCOME_SCIENTIFIC_AUDIT_V1.json",
+  "final_preoutcome_validation_result": "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_RESULT_V1.json"
 }
