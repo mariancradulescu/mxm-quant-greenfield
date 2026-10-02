@@ -15,10 +15,13 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 
-from research_core_v4.frozen_v2_semantics import (
-    paired_arm_hierarchical_mean,
-    select_leaf_index,
-)
+try:
+    from research_core_v4.frozen_v2_semantics import (
+        paired_arm_hierarchical_mean,
+        select_leaf_index,
+    )
+except ModuleNotFoundError:
+    from frozen_v2_semantics import paired_arm_hierarchical_mean, select_leaf_index
 
 HORIZONS = (3, 6, 12, 48)
 VOL_STATES = ("LOW", "HIGH")
