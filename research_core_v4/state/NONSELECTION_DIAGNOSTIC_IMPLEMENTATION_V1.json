@@ -1,0 +1,46 @@
+{
+  "schema": "mxm.research-core-v4.nonselection-diagnostic-implementation.v1",
+  "status": "FROZEN_BEFORE_ANY_REAL_V4_DEVELOPMENT_RESPONSE",
+  "as_of_date": "2026-10-02",
+  "design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "evaluator_ref": "research_core_v4/response_evaluator_v3.py",
+  "diagnostics": [
+    "UTC_HOUR_OF_TRIGGER",
+    "DAY_OF_WEEK",
+    "DETERMINISTIC_SESSION_LABEL",
+    "US_EQUITY_DST_REGIME"
+  ],
+  "grouping": {
+    "dimensions": "ONE_DIAGNOSTIC_AT_A_TIME_X_STRUCTURAL_CONTEXT_X_VOL_STATE_X_FROZEN_HORIZON",
+    "support_counts": [
+      "FULL_PATH_AVAILABLE_EVENTS",
+      "BASELINE_PATH_AVAILABLE_EVENTS"
+    ],
+    "paired_response_requirement": "FULL_AND_BASELINE_MUST_BOTH_EXIST_WITHIN_THE_SAME_DIAGNOSTIC_GROUP_FOR_INCREMENTAL_RESPONSE",
+    "normalized_weighting": [
+      "PAIR_WITHIN_DIAGNOSTIC_GROUP",
+      "EQUAL_WEIGHT_AVAILABLE_DIRECTIONS_WITHIN_SYMBOL_WEEK",
+      "EQUAL_WEIGHT_VALID_SYMBOLS_WITHIN_CONTEXT_WEEK",
+      "MEAN_ACROSS_VALID_CONTEXT_WEEKS"
+    ],
+    "raw_bps_weighting": "SAME_PAIRED_HIERARCHICAL_WEIGHTING_FOR_REPORTED_PAIRED_FULL_BASELINE_AND_INCREMENTAL_RAW_BPS",
+    "minimum_symbols_for_diagnostic_aggregation": 1
+  },
+  "session_law": {
+    "FX_SPOT": "DETERMINISTIC_UTC_SESSION_LABEL_FROM_TRIGGER_TIME",
+    "SPOT_CRYPTO": "DETERMINISTIC_UTC_SESSION_LABEL_FROM_TRIGGER_TIME",
+    "US_EQUITY_EXTENDED_HOURS": "DETERMINISTIC_US_EASTERN_REGULAR_OR_EXTENDED_LABEL_PLUS_STANDARD_OR_DST_REGIME"
+  },
+  "selection_firewall": {
+    "classification": "NONSELECTION_ONLY",
+    "may_change_local_maxT": false,
+    "may_change_selected_leaf": false,
+    "may_change_Holm_decision": false,
+    "may_change_temporal_gate": false,
+    "may_change_breadth_gate": false,
+    "may_change_concentration_gate": false,
+    "may_change_full_arm_positive_gate": false,
+    "may_rescue_or_retune_same_outcomes": false
+  },
+  "interpretation": "DIAGNOSTICS_MAY_EXPLAIN_WHERE_A_FROZEN_RESULT_IS_CONCENTRATED_BUT_CANNOT_CREATE_REMOVE_OR_RESCUE_A_DEVELOPMENT_LEAD"
+}
