@@ -1,0 +1,287 @@
+{
+  "schema": "mxm.research-core-v3.quote-revision-sequence-method-and-acquisition-audit.v2",
+  "status": "COMPLETE_V1_STRUCTURAL_DEFECTS_FOUND_CORRECTED_V2_REQUIRED_BEFORE_CAPTURE",
+  "as_of_date": "2026-10-02",
+  "source_live_head": "b55e1eb19c4633a7f6bf2d4b776c6e1b88cc6c8e",
+  "outcomes_opened": false,
+  "protected_forward_opened": false,
+  "candidate_frozen_count": 0,
+  "runtime_v2_role": "READ_ONLY",
+  "immutable_history": [
+    "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_PREOUTCOME_AUDIT_V1.json",
+    "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V1.json",
+    "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_ACQUISITION_PLAN_V1.json",
+    "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_PACKAGE_AUTHORITY_V1.json"
+  ],
+  "supersession_required": true,
+  "supersession_reasons": [
+    "V1 development calendar is 26 of 26 Thursdays because a 14-calendar-day cadence aliases weekday.",
+    "V1 raw acquisition plan discards transferable raw BID/ASK history after derivation and therefore cannot support exact independent replay.",
+    "V1 universal 2-bps spread-net economic hurdle is not broker-symbol-specific and is not authoritative executable break-even.",
+    "V1 connected-three-cell/two-parameter-dimension robustness gate is generic surface smoothness rather than mechanism-aligned temporal/window stability.",
+    "V1 Bonferroni across five symbol families at development spends selection alpha before an independent confirmation stage despite development being explicitly discovery."
+  ],
+  "calendar_audit": {
+    "v1_date_count": 26,
+    "v1_weekday_distribution": {
+      "MONDAY": 0,
+      "TUESDAY": 0,
+      "WEDNESDAY": 0,
+      "THURSDAY": 26,
+      "FRIDAY": 0
+    },
+    "v1_aliasing_defect": true,
+    "v2_rule": "12_MONTH_CALENDAR_STRATIFICATION_FROM_2025_10_THROUGH_2026_09;30_DATES;EXACTLY_6_EACH_MON_FRI;EACH_MONTH_CONTRIBUTES_2_OR_3_DATES;DATES_SELECTED_FROM_CALENDAR_ONLY_USING_PREDECLARED_MONTH_X_WEEKDAY_BLOCKS_AND_SECOND_WEEKDAY_OCCURRENCE;NO_PRICE_QUOTE_RETURN_OR_SIGNAL_OUTCOME_USED",
+    "v2_dates_utc": [
+      "2025-10-13",
+      "2025-10-14",
+      "2025-10-08",
+      "2025-11-13",
+      "2025-11-14",
+      "2025-12-08",
+      "2025-12-11",
+      "2025-12-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-02-09",
+      "2026-02-10",
+      "2026-02-13",
+      "2026-03-11",
+      "2026-03-12",
+      "2026-04-13",
+      "2026-04-08",
+      "2026-04-09",
+      "2026-05-12",
+      "2026-05-08",
+      "2026-06-09",
+      "2026-06-10",
+      "2026-06-11",
+      "2026-07-13",
+      "2026-07-10",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-09-14",
+      "2026-09-08"
+    ],
+    "v2_date_count": 30,
+    "v2_weekday_distribution": {
+      "MONDAY": 6,
+      "TUESDAY": 6,
+      "WEDNESDAY": 6,
+      "THURSDAY": 6,
+      "FRIDAY": 6
+    },
+    "v2_month_coverage": [
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09"
+    ],
+    "fixed_holiday_pre_exclusions": [
+      "2025-12-25",
+      "2026-01-01"
+    ],
+    "broker_holiday_rule": "REQUESTED_DATE_MEMBERSHIP_NEVER_CHANGED_FROM_RETURN_OUTCOMES;CURRENT_SYMBOL_HOLIDAY_AND_SCHEDULE_METADATA_ARE_RECORDED_PRECAPTURE;EMPTY_OR_CLOSED_WINDOWS_ARE_RECORDED_WITHOUT_DATE_SUBSTITUTION",
+    "overlap_with_prior_quote_pilot_calendars": "ALLOWED_AND_NOT_USED_AS_A_SELECTION_FILTER;THIS_IS_DEVELOPMENT_FOR_A_NEW_INFORMATION_SOURCE;FINAL_CONFIRMATION_MUST_BE_GENUINELY_DISJOINT_FROM_ALL_V2_DEVELOPMENT_DATES"
+  },
+  "time_window_audit": {
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "prior_execution_only_evidence": "ALL_FIVE_SELECTED_SYMBOLS_HAVE_COMBINED_BID_ASK_ACTIVITY_APPROX_69_TO_132_TICKS_PER_MINUTE_AND_D0_FRESH_FRACTION_APPROX_0.628_TO_0.855;DURABLE_REPO_EVIDENCE_IS_NOT_WINDOW_DECOMPOSED",
+    "conclusion": "KEEP_THE_THREE_WINDOWS_AS_A_PREDECLARED_MULTI_WINDOW_HYPOTHESIS_BUT_REQUIRE_WINDOW_LEVEL_SUPPORT_AND_RESPONSE_STABILITY;NO_WINDOW_MAY_SILENTLY_DRIVE_A_GENERAL_EFFECT",
+    "preoutcome_support_rule": "AFTER_RAW_CAPTURE_AND_BEFORE_RETURN_MAGNITUDES_ARE_OPENED_COMPUTE_SIGNAL_ATTEMPT_COUNTS_BY_WINDOW;A_CELL_REQUIRES_AT_LEAST_15_COMPLETABLE_EVENTS_IN_EACH_OF_THE_THREE_WINDOWS_AND_AT_LEAST_100_TOTAL_COMPLETED_EVENTS",
+    "response_stability_rule": "FOR_A_DEVELOPMENT_LEAD_THE_ANCHOR_CELL_MEAN_SPREAD_NET_RESPONSE_MUST_BE_STRICTLY_POSITIVE_IN_EACH_OF_THE_THREE_FROZEN_WINDOWS"
+  },
+  "raw_quote_persistence_audit": {
+    "v1_transfer_raw_ticks": false,
+    "v1_defect": true,
+    "v2_policy": "PERSIST_LOSSLESS_RAW_BID_AND_ASK_EVENT_HISTORY_FOR_EVERY_FROZEN_SIGNAL_SYMBOL_DATE_WINDOW_SIDE",
+    "storage": "GZIP_COMPRESSED_CSV_OR_EQUIVALENT_LOSSLESS_INTEGER_ENCODING",
+    "raw_fields": [
+      "absolute_timestamp_ms",
+      "raw_tick_integer",
+      "chronological_tie_order"
+    ],
+    "preserve_original_broker_fields": true,
+    "per_file_sha256": true,
+    "manifest_maps_every_requested_window": true,
+    "request_split_and_hasMore_boundaries_persisted": true,
+    "chronology_validation": true,
+    "no_raw_event_discard_after_derivation": true,
+    "reproducibility_requirement": "RETURNED_EVIDENCE_MUST_RECONSTRUCT_QUOTE_STATE_FEATURE_SEQUENCE_AND_ALL_FROZEN_RESPONSES_WITHOUT_RECONTACTING_BROKER",
+    "scope_limit": "ONLY_5_SIGNAL_SYMBOLS_X_30_DATES_X_3_WINDOWS_X_BID_ASK_WITH_FROZEN_PADDING;NO_GENERAL_PURPOSE_BROKER_ARCHIVE"
+  },
+  "authentic_execution_metadata_audit": {
+    "source_ref": "research_core_v3/state/BROKER_NATIVE_QUOTE_MICROSTRUCTURE_PREOUTCOME_AUDIT_V1.json",
+    "prior_metadata": [
+      {
+        "symbol": "EURJPY",
+        "symbol_id": 3,
+        "minVolume": "100000",
+        "stepVolume": "100000",
+        "lotSize": "10000000",
+        "commission": "300",
+        "commissionType": 2,
+        "tradingMode": 0
+      },
+      {
+        "symbol": "EURGBP",
+        "symbol_id": 9,
+        "minVolume": "100000",
+        "stepVolume": "100000",
+        "lotSize": "10000000",
+        "commission": "300",
+        "commissionType": 2,
+        "tradingMode": 0
+      },
+      {
+        "symbol": "AUDCAD",
+        "symbol_id": 18,
+        "minVolume": "100000",
+        "stepVolume": "100000",
+        "lotSize": "10000000",
+        "commission": "300",
+        "commissionType": 2,
+        "tradingMode": 0
+      },
+      {
+        "symbol": "GBPCAD",
+        "symbol_id": 19,
+        "minVolume": "100000",
+        "stepVolume": "100000",
+        "lotSize": "10000000",
+        "commission": "300",
+        "commissionType": 2,
+        "tradingMode": 0
+      },
+      {
+        "symbol": "JPN225",
+        "symbol_id": 116,
+        "minVolume": "1000",
+        "stepVolume": "1000",
+        "lotSize": "10000",
+        "commission": "0",
+        "commissionType": 2,
+        "tradingMode": 0
+      }
+    ],
+    "broker_semantics_ref": "m2/broker_semantics.py",
+    "verified_margin_authority": "ProtoOAExpectedMarginReq/Res at relevant executable volume plus current price/conversion/cost truth",
+    "verified_volume_protocol_semantics": "actual_units = raw_minVolume / 100; lot conversion requires applicable current lotSize",
+    "current_metadata_refresh_required_before_first_historical_quote_request": true,
+    "required_current_fields": [
+      "minVolume",
+      "stepVolume",
+      "maxVolume",
+      "lotSize",
+      "tradingMode",
+      "enableShortSelling",
+      "commissionType",
+      "preciseTradingCommissionRate",
+      "preciseMinCommission",
+      "minCommissionType",
+      "minCommissionAsset",
+      "pnlConversionFeeRate",
+      "schedule",
+      "scheduleTimeZone",
+      "holiday",
+      "leverageId"
+    ],
+    "expected_margin_gate": {
+      "request": "ProtoOAExpectedMarginReq",
+      "requested_volume": "CURRENT_RAW_MIN_VOLUME_FOR_EACH_SIGNAL_SYMBOL",
+      "both_buy_and_sell_required": true,
+      "deposit_currency_required": "EUR",
+      "structural_infeasibility_rule": "IF_EITHER_MINIMUM_SIZE_BUY_OR_SELL_EXPECTED_MARGIN_IS_MISSING_OR_GREATER_THAN_OR_EQUAL_TO_200_EUR_STOP_BEFORE_ANY_HISTORICAL_QUOTE_REQUEST_FOR_THE_WAVE",
+      "safe_sizing_certified_here": false
+    },
+    "replacement_rule": "NO_REPLACEMENT_IS_PREAUTHORIZED_BECAUSE_DURABLE_PREOUTCOME_EXECUTION_METADATA_FOR_A_COMPARABLE_REPLACEMENT_POOL_IS_NOT_CURRENTLY_SUFFICIENT;IF_ANY_SIGNAL_SYMBOL_FAILS_THE_STRUCTURAL_MARGIN_GATE_THE_PACKAGE_FAILS_CLOSED_BEFORE_QUOTES_AND_A_NEW_PREOUTCOME_RERANK_IS_REQUIRED"
+  },
+  "economic_gate_audit": {
+    "v1_mean_spread_net_bps_min": 2,
+    "v1_universal_gate_retained": false,
+    "reason": "A_FIXED_2_BPS_HURDLE_IS_NOT_AN_AUTHENTIC_SYMBOL_SPECIFIC_BREAK_EVEN_AND_CAN_FALSELY_REJECT_REAL_INFORMATION_OR_FALSELY_PROMOTE_AN_UNEXECUTABLE_SMALL_EDGE",
+    "v2_primary_measure": "SIDE_AWARE_SPREAD_NET_BPS_AT_FIXED_CAUSAL_RESPONSE_HORIZONS",
+    "v2_signal_information_gate": {
+      "mean_spread_net_bps_strictly_positive": true,
+      "local_familywise_maxT_alpha": 0.05,
+      "chronological_thirds_each_mean_strictly_positive": true,
+      "top10pct_abs_event_concentration_max": 0.5
+    },
+    "development_survivor_label": "INFORMATION_LEAD_ONLY_NOT_ECONOMIC_CANDIDATE",
+    "final_economic_promotion_requires": [
+      "CURRENT_AUTHENTIC_SYMBOL_COMMISSION_TYPE_AND_PRECISE_RATE",
+      "CURRENT_AUTHENTIC_MIN_COMMISSION_FIELDS",
+      "CURRENT_AUTHENTIC_PNL_CONVERSION_FEE_FIELDS_WHERE_APPLICABLE",
+      "AUTHENTIC_COMMISSION_CURRENCY_CONVERSION_OR_BROKER_NATIVE_EQUIVALENT",
+      "MINIMUM_VOLUME_AND_STEP",
+      "EXPECTED_MARGIN",
+      "SAFE_EUR200_SIZING",
+      "DISJOINT_CONFIRMATION"
+    ],
+    "historical_commission_not_invented": true,
+    "proxy_costs_forbidden": true
+  },
+  "response_horizon_semantics": {
+    "horizons_seconds": [
+      10,
+      30,
+      90
+    ],
+    "interpretation": "PREDECLARED_CAUSAL_RESPONSE_HORIZONS_TO_TEST_DIRECTIONAL_INFORMATION",
+    "exit_optimization_surface": false,
+    "hindsight_path_maxima_used_as_exit": false,
+    "future_exit_engineering": "ONLY_AFTER_A_CONFIRMED_SIGNAL_AND_ONLY_ON_UNTOUCHED_EVIDENCE_UNDER_A_NEW_PROSPECTIVE_EXIT_DESIGN"
+  },
+  "robustness_audit": {
+    "v1_connected_region_gate_retained": false,
+    "reason": "NARROW_EVENT_SEQUENCE_MICROSTRUCTURE_NEED_NOT_FORM_A_SMOOTH_3_CELL_SURFACE_ACROSS_LOOKBACK_THRESHOLD_AND_RESPONSE_HORIZON;THE_GENERIC_TOPOLOGY_CAN_BE_MISALIGNED_WITH_THE_MECHANISM",
+    "v2_development_lead_requirements": [
+      "SUPPORT_GATE_PASS",
+      "LOCAL_24_CELL_MAXT_P_LE_0.05",
+      "MEAN_SPREAD_NET_BPS_GT_0",
+      "ALL_THREE_CHRONOLOGICAL_EVENT_COUNT_THIRDS_MEAN_GT_0",
+      "EACH_OF_3_TIME_WINDOWS_HAS_AT_LEAST_15_COMPLETED_EVENTS",
+      "EACH_OF_3_TIME_WINDOWS_MEAN_SPREAD_NET_BPS_GT_0",
+      "TOP10PCT_ABSOLUTE_EVENT_CONCENTRATION_LE_0.5"
+    ],
+    "neighboring_threshold_diagnostic": "RECORD_PREDECLARED_ADJACENT_IMBALANCE_THRESHOLD_RESPONSE_SIGN_AND_EFFECT_BUT_DO_NOT_MAKE_IT_A_HARD_PASS_GATE",
+    "single_lucky_cell_promotion": false,
+    "no_candidate_freeze_from_development": true,
+    "final_protection": "GENUINELY_DISJOINT_CONFIRMATION"
+  },
+  "multiplicity_and_confirmation": {
+    "within_symbol": "ALL_24_CELLS_REMAIN_ONE_LOCAL_MAXT_FAMILY_PER_SYMBOL;SUPPORT_INELIGIBLE_P1",
+    "development_cross_symbol_bonferroni": false,
+    "reason": "DEVELOPMENT_ONLY_DISCOVERY_LEADS_CANNOT_BE_PROMOTED_DIRECTLY;SPENDING_5_WAY_ALPHA_HERE_IS_UNNECESSARY_IF_SYMBOL_SELECTION_IS_PAID_ON_INDEPENDENT_CONFIRMATION",
+    "no_free_best_symbol": true,
+    "development_selection_rule": "EVERY_SYMBOL_WITH_AT_LEAST_ONE_V2_DEVELOPMENT_LEAD_PROCEEDS_TO_CONFIRMATION;NO_POSTOUTCOME_PICKING_OF_ONLY_THE_BEST_SYMBOL",
+    "representative_cell_rule": "WITHIN_EACH_SURVIVING_SYMBOL_CHOOSE_THE_ROBUST_CELL_WITH_SMALLEST_LOCAL_FAMILYWISE_P_THEN_LARGEST_T_STAT_THEN_LEXICOGRAPHIC_CELL_ID;FREEZE_BEFORE_CONFIRMATION",
+    "confirmation_data": "ALL_CONFIRMATION_DATES_MUST_BE_GENUINELY_DISJOINT_FROM_THE_30_V2_DEVELOPMENT_DATES_AND_NOT_OPENED_BEFORE_CONFIRMATION_FREEZE",
+    "confirmation_multiplicity": "HOLM_FWER_0.05_ACROSS_ALL_SYMBOL_REPRESENTATIVE_HYPOTHESES_SELECTED_BY_THE_PREDECLARED_DEVELOPMENT_RULE",
+    "confirmation_required_before_candidate_admission": true
+  },
+  "collector_rebuild_authorized_after_audit": true,
+  "collector_execution_authorized_by_this_audit": false
+}
