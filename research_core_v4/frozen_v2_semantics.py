@@ -17,7 +17,7 @@ def select_leaf_index(
     """Frozen V2 selector: p asc, t desc, horizon asc, LOW before HIGH."""
     if not (len(adjusted_p) == len(observed_t) == len(leaf_meta)):
         raise ValueError("selector inputs must have equal length")
-    if not adjusted_p:
+    if len(adjusted_p) == 0:
         raise ValueError("no leaves")
     for state, horizon in leaf_meta:
         if state not in STATE_ORDER:
