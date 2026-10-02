@@ -145,7 +145,7 @@ def _interp_mde(grid,power,target):
     return ">0.20"
 
 
-def full_report(geoms):
+def full_report(geoms,support_rows):
     neg={}
     noise_map={"symmetric_zero_mean":"normal","fat_tailed_t5_zero_mean":"fat","skewed_zero_mean":"skew","heteroskedastic_zero_mean":"hetero","common_factor_zero_mean":"common"}
     for i,(name,noise) in enumerate(noise_map.items()):
@@ -171,7 +171,7 @@ def full_report(geoms):
             state_power[ctx][scenario]={"power":vals,"mde":{"p50":_interp_mde(grid,vals,.50),"p80":_interp_mde(grid,vals,.80),"p90":_interp_mde(grid,vals,.90)}}
     return {
         "market_responses_used":False,
-        "support_rows":sum(1 for _ in load_rows(Path("research_core_v4/support"))),
+        "support_rows":support_rows,
         "permutations":1023,
         "seed":20261002,
         "selector_rule":"MIN_ADJUSTED_P_THEN_MAX_OBSERVED_T_THEN_SHORTEST_HORIZON_THEN_LOW_BEFORE_HIGH",
@@ -202,7 +202,7 @@ def main():
     a=ap.parse_args()
     rows=load_rows(a.support_root);g=all_geometries(rows)
     if a.full:
-        result=full_report(g)
+        result=full_report(g,len(rows))
     else:
         R=100 if a.smoke else 300;P=127 if a.smoke else 1023
         result={
