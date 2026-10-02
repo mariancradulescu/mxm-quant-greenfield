@@ -135,6 +135,10 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertFalse(state["governance"]["protected_forward_opened"])
         self.assertEqual(state["governance"]["candidate_frozen_count"],0)
         self.assertFalse(state["governance"]["live_trading_started"])
+        self.assertEqual(state["first_wave"]["legacy_evaluator_v2_status"],"SUPERSEDED_EXECUTION_DISABLED")
+        self.assertEqual(state["first_wave"]["development_response_execution_authority"],"research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json")
+        audit=load("research_core_v4/state/FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json")
+        self.assertEqual(audit["unresolved_findings_gate"]["classification"],"NO_MATERIAL_PREOUTCOME_FINDINGS_REMAIN")
 
 
 if __name__ == "__main__":

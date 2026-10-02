@@ -619,6 +619,14 @@ def _evaluate_prevalidated_development_core(
 ) -> dict:
     if _execution_capability is not _EXECUTION_CAPABILITY:
         raise PermissionError("direct prevalidated evaluator execution denied; authority-bound runner capability required")
+    # Private-object possession alone is not authority. The immediate caller must be
+    # the exact sibling runner frozen by Authority V3. This closes the trivial
+    # module-global capability bypass while preserving synthetic helper tests.
+    import inspect
+    frame=inspect.currentframe();caller=frame.f_back if frame is not None else None
+    expected=Path(__file__).resolve().with_name("development_execution_runner_v1.py")
+    if caller is None or Path(caller.f_code.co_filename).resolve()!=expected:
+        raise PermissionError("direct internal evaluator execution denied; exact authority-bound runner caller required")
     require_real_response_authority(authority)
     if permutations != DEFAULT_PERMUTATIONS or seed != DEFAULT_SEED:
         raise PermissionError("caller override of frozen seed/permutations is forbidden")

@@ -253,16 +253,10 @@ def skeleton_sha256(events: Iterable[SignalEvent]) -> str:
 
 
 def require_real_response_authority(authority: dict) -> None:
-    required = {
-        "status": "AUTHORIZED_READY_NOT_EXECUTED",
-        "scientific_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
-        "real_development_response_execution_authorized": True,
-    }
-    for k, v in required.items():
-        if authority.get(k) != v:
-            raise PermissionError(f"real response execution not authorized: {k}")
-    if authority.get("protected_forward_opened") is not False:
-        raise PermissionError("protected forward boundary not closed")
+    raise PermissionError(
+        "response_evaluator_v2 is superseded historical code and cannot authorize or open real V4 responses; "
+        "use development_execution_runner_v1.py bound to Authority V3"
+    )
 
 
 def response_for_event(e: SignalEvent, horizon: int, close_by_time: dict[datetime, float]) -> float | None:
@@ -414,19 +408,8 @@ def confirmation_single_leaf_test(block_ids: np.ndarray, block_values: np.ndarra
     return float((1+np.sum(pt>=obs))/(permutations+1))
 
 
-def evaluate_real_development(*, authority: dict, events: Sequence[SignalEvent], bars_by_symbol: dict[str,Sequence[M5Bar]]) -> dict:
-    require_real_response_authority(authority)
-    responses: dict[tuple[str,datetime,int],float]={}
-    for sym,bars in bars_by_symbol.items():
-        close={b.time:b.close for b in bars}
-        for e in events:
-            if e.symbol!=sym:
-                continue
-            for h in HORIZONS:
-                r=response_for_event(e,h,close)
-                if r is not None:
-                    responses[(sym,e.trigger_time,h)]=r
-    return {"response_count":len(responses),"paired_units":len(construct_paired_units(events,responses))}
+def evaluate_real_development(*args, **kwargs):
+    raise PermissionError("legacy response_evaluator_v2 real-response execution is permanently disabled")
 
 
 def main() -> None:
@@ -508,36 +491,9 @@ def _development_support_leaf(events,context,state,h,units,blocks):
     return {"pass":passed,"context_full":cfull,"context_baseline":cbase,"state_full":sfull,"state_baseline":sbase,"distinct_weeks":weeks,"paired_units":len(units),"valid_blocks":len(blocks),"per_symbol":per}
 
 
-def evaluate_development_from_directory(*,authority:dict,design:dict,raw_root:str|Path,permutations:int=DEFAULT_PERMUTATIONS,seed:int=DEFAULT_SEED)->dict:
-    require_real_response_authority(authority)
-    start=parse_utc(design["development_interval_utc"][0]);end=parse_utc(design["development_interval_utc"][1]);raw_root=Path(raw_root)
-    all_events=[];bars_by_symbol={};source_hashes={}
-    for c in design["structural_contexts"]:
-        ctx=c["id"]
-        for sym,sid in c["development_symbols"]:
-            p=raw_root/f"{int(sid)}_M5.csv"
-            if not p.exists():raise FileNotFoundError(p)
-            source_hashes[sym]=sha256_file(p);bars=_filter_interval(read_m5_csv(p),start,end);bars_by_symbol[sym]=bars;all_events.extend(build_signal_support(bars,ctx,sym,int(sid)))
-    norm={};raw={}
-    for sym,bars in bars_by_symbol.items():
-        n,r=_responses_for_events([e for e in all_events if e.symbol==sym],{b.time:b.close for b in bars});norm.update(n);raw.update(r)
-    units=construct_paired_units(all_events,norm);family=[];contexts=[];leaf_order=[(s,h) for s in VOL_STATES for h in HORIZONS]
-    for ci,c in enumerate(design["structural_contexts"]):
-        ctx=c["id"];leaves=[];metrics=[]
-        for state,h in leaf_order:
-            lu,sw,cw,ids,blocks,smeans,wmeans=_leaf_aggregates(units,ctx,state,h,DEV_BLOCK_ANCHOR,4);sup=_development_support_leaf(all_events,ctx,state,h,lu,blocks)
-            leaves.append((ids,blocks) if sup["pass"] else (np.array([],int),np.array([],float)))
-            full_norm=[norm[(e.symbol,e.trigger_time,h)] for e in all_events if e.context==ctx and e.vol_state==state and e.arm=="FULL" and (e.symbol,e.trigger_time,h) in norm]
-            full_raw=[raw[(e.symbol,e.trigger_time,h)] for e in all_events if e.context==ctx and e.vol_state==state and e.arm=="FULL" and (e.symbol,e.trigger_time,h) in raw]
-            base_raw=[raw[(e.symbol,e.trigger_time,h)] for e in all_events if e.context==ctx and e.vol_state==state and e.arm=="BASELINE" and (e.symbol,e.trigger_time,h) in raw]
-            metrics.append({"state":state,"horizon_m5":h,"support":sup,"blocks":blocks.tolist(),"block_ids":ids.tolist(),"incremental_mean":float(np.mean(blocks)) if len(blocks) else None,"symbol_means":smeans,"week_means":wmeans,"full_absolute_normalized_mean":float(np.mean(full_norm)) if full_norm else None,"full_raw_bps_mean":float(np.mean(full_raw)) if full_raw else None,"baseline_raw_bps_mean":float(np.mean(base_raw)) if base_raw else None})
-        test=local_shared_maxT(leaves,permutations,seed+ci);family.append(test["family_p"]);contexts.append({"context":ctx,"local_test":test,"leaves":metrics})
-    rejects=holm_reject(family,.05)
-    for ci,cx in enumerate(contexts):
-        j=cx["local_test"]["selected_index"];m=cx["leaves"][j];m["holm_context_reject"]=rejects[ci]
-        m["temporal_pass"]=development_quarter_gate({int(k):v for k,v in m["week_means"].items()},3);m["breadth_pass"]=breadth_gate(m["symbol_means"],3);m["concentration_pass"]=concentration_gate(m["symbol_means"],.50);m["full_arm_positive"]=m["full_absolute_normalized_mean"] is not None and m["full_absolute_normalized_mean"]>0
-        cx["development_lead_pass"]=bool(m["support"]["pass"] and rejects[ci] and m["incremental_mean"] is not None and m["incremental_mean"]>0 and m["temporal_pass"] and m["breadth_pass"] and m["concentration_pass"] and m["full_arm_positive"])
-    return {"schema":"mxm.research-core-v4.development-response-result.v1","design":"FIRST_REAL_MARKET_DESIGN_V2","source_hashes":source_hashes,"support_skeleton_sha256":skeleton_sha256(all_events),"event_count":len(all_events),"response_value_count":len(norm),"family_pvalues":family,"holm_reject":rejects,"contexts":contexts,"nonselection_diagnostics_only":["UTC_HOUR","DAY_OF_WEEK","SESSION_LABEL","DST_REGIME"],"protected_forward_opened":False}
+def evaluate_development_from_directory(*args, **kwargs):
+    raise PermissionError("legacy response_evaluator_v2 directory execution is permanently disabled")
+
 
 if __name__ == "__main__":
     main()

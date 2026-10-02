@@ -10,6 +10,7 @@ from unittest.mock import patch
 from research_core_v4 import development_execution_runner_v1 as runner
 from research_core_v4 import exact_geometry_calibration_v2 as cal
 from research_core_v4 import response_evaluator_v3 as ev
+from research_core_v4 import response_evaluator_v2 as legacy_ev
 from research_core_v4.frozen_v2_semantics import paired_arm_hierarchical_mean, select_leaf_index
 
 
@@ -80,6 +81,23 @@ class ExecutionBindingTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             ev._runner_execution_capability()
 
+    def test_internal_capability_object_cannot_bypass_runner_caller_check(self):
+        a=base_authority()
+        with self.assertRaises(PermissionError):
+            ev._evaluate_prevalidated_development_core(
+                authority=a,design={},events=(),bars_by_symbol={},source_hashes={},
+                _execution_capability=ev._EXECUTION_CAPABILITY,
+            )
+
+    def test_legacy_v2_complete_real_response_paths_are_disabled(self):
+        a=base_authority()
+        with self.assertRaises(PermissionError):
+            legacy_ev.require_real_response_authority(a)
+        with self.assertRaises(PermissionError):
+            legacy_ev.evaluate_real_development(authority=a,events=(),bars_by_symbol={})
+        with self.assertRaises(PermissionError):
+            legacy_ev.evaluate_development_from_directory(authority=a,design={},raw_root='.')
+
     def test_wrong_seed_rejected(self):
         a=base_authority();a["development_scope"]["seed"]=1
         with self.assertRaises(PermissionError):ev.require_real_response_authority(a)
@@ -130,7 +148,7 @@ class ExecutionBindingTests(unittest.TestCase):
         self.assertAlmostEqual(paired_arm_hierarchical_mean(units,"FULL",2),5.0)
 
 
-    def test_live_authority_v2_bindings_match_repository_preoutcome(self):
+    def test_live_authority_v3_bindings_match_repository_preoutcome(self):
         authority=runner.load_json(runner.ROOT/runner.AUTHORITY_REL)
         state=runner.load_json(runner.ROOT/runner.STATE_REL)
         design=runner.load_json(runner.ROOT/runner.DESIGN_REL)
@@ -141,6 +159,15 @@ class ExecutionBindingTests(unittest.TestCase):
         self.assertFalse(runner.RESPONSE_OPENING_STARTED)
         self.assertFalse(state["first_wave"]["development_outcomes_opened"])
         self.assertFalse(state["first_wave"]["confirmation_outcomes_opened"])
+
+    def test_exactly_one_current_development_authority_is_v3(self):
+        state=runner.load_json(runner.ROOT/runner.STATE_REL)
+        self.assertEqual(state["first_wave"]["development_response_execution_authority"],runner.AUTHORITY_REL)
+        self.assertTrue(runner.AUTHORITY_REL.endswith("FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json"))
+        self.assertEqual(state["first_wave"]["execution_authority_v1_status"],"SUPERSEDED_BEFORE_ANY_REAL_V4_RESPONSE")
+        self.assertEqual(state["first_wave"]["execution_authority_v2_status"],"SUPERSEDED_BEFORE_ANY_REAL_V4_RESPONSE")
+        self.assertNotEqual(state["first_wave"]["execution_authority_v1"],runner.AUTHORITY_REL)
+        self.assertNotEqual(state["first_wave"]["execution_authority_v2"],runner.AUTHORITY_REL)
 
     def test_result_provenance_hashes_present_and_atomic_write(self):
         prov={

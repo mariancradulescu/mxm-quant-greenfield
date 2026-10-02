@@ -22,6 +22,7 @@ DESIGN_REL = "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json"
 MANIFEST_REL = "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json"
 SUPPORT_REL = "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json"
 EVALUATOR_REL = "research_core_v4/response_evaluator_v3.py"
+LEGACY_EVALUATOR_V2_REL = "research_core_v4/response_evaluator_v2.py"
 SEMANTICS_REL = "research_core_v4/frozen_v2_semantics.py"
 CALIBRATION_REL = "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V2.json"
 CONFIRMATION_LAW_REL = "research_core_v4/state/CONFIRMATION_PASS_LAW_V1.json"
@@ -70,6 +71,12 @@ def state_binding_payload(state: dict) -> dict:
         "status":state["status"],
         "design":fw["design"],
         "development_response_execution_authority":fw["development_response_execution_authority"],
+        "execution_authority_v1_status":fw["execution_authority_v1_status"],
+        "execution_authority_v2_status":fw["execution_authority_v2_status"],
+        "legacy_evaluator_v2_status":fw["legacy_evaluator_v2_status"],
+        "response_evaluator_implementation_contract":fw["response_evaluator_implementation_contract"],
+        "final_preoutcome_scientific_audit":state["final_preoutcome_scientific_audit"],
+        "final_preoutcome_validation_policy":state["final_preoutcome_validation_policy"],
         "evaluator_execution_authorized":fw["evaluator_execution_authorized"],
         "confirmation_execution_authorized":fw["confirmation_execution_authorized"],
         "development_outcomes_opened":fw["development_outcomes_opened"],
@@ -122,6 +129,7 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("canonical_state_binding_sha256",state_binding_sha256(state),b["canonical_state_binding_sha256"])
     _must_equal("design_sha256",sha256_file(ROOT/DESIGN_REL),b["canonical_design_content_sha256"])
     _must_equal("evaluator_sha256",sha256_file(ROOT/EVALUATOR_REL),b["evaluator_content_sha256"])
+    _must_equal("legacy_evaluator_v2_sha256",sha256_file(ROOT/LEGACY_EVALUATOR_V2_REL),b["legacy_evaluator_v2_content_sha256"])
     _must_equal("semantics_sha256",sha256_file(ROOT/SEMANTICS_REL),b["shared_semantics_content_sha256"])
     _must_equal("runner_sha256",sha256_file(Path(__file__).resolve()),b["execution_runner_content_sha256"])
     _must_equal("manifest_sha256",sha256_file(ROOT/MANIFEST_REL),b["canonical_primary_manifest_content_sha256"])
@@ -138,6 +146,10 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("support_skeleton_sha256",support["skeleton"]["canonical_sha256"],b["support_skeleton_sha256"])
     _must_equal("support_skeleton_row_count",support["skeleton"]["row_count"],b["support_skeleton_row_count"])
 
+    _must_equal("state_current_authority_pointer",state["first_wave"]["development_response_execution_authority"],AUTHORITY_REL)
+    _must_equal("state_authority_v1_status",state["first_wave"]["execution_authority_v1_status"],"SUPERSEDED_BEFORE_ANY_REAL_V4_RESPONSE")
+    _must_equal("state_authority_v2_status",state["first_wave"]["execution_authority_v2_status"],"SUPERSEDED_BEFORE_ANY_REAL_V4_RESPONSE")
+    _must_equal("state_legacy_evaluator_v2_status",state["first_wave"]["legacy_evaluator_v2_status"],"SUPERSEDED_EXECUTION_DISABLED")
     _must_equal("state_evaluator_pointer",state["first_wave"]["development_response_evaluator"],EVALUATOR_REL)
     _must_equal("state_runner_pointer",state["first_wave"]["development_execution_runner"],"research_core_v4/development_execution_runner_v1.py")
     _must_equal("state_calibration_pointer",state["first_wave"]["exact_geometry_calibration"],CALIBRATION_REL)
@@ -234,6 +246,7 @@ def pre_response_guards(raw_root: str | Path) -> PrevalidatedBundle:
         "canonical_state_binding_sha256":state_binding_sha256(state),
         "canonical_design_sha256":sha256_file(ROOT/DESIGN_REL),
         "evaluator_sha256":sha256_file(ROOT/EVALUATOR_REL),
+        "legacy_evaluator_v2_sha256":sha256_file(ROOT/LEGACY_EVALUATOR_V2_REL),
         "execution_runner_sha256":sha256_file(Path(__file__).resolve()),
         "shared_semantics_sha256":sha256_file(ROOT/SEMANTICS_REL),
         "primary_manifest_sha256":sha256_file(ROOT/MANIFEST_REL),
