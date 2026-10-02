@@ -148,14 +148,18 @@ class ExecutionBindingTests(unittest.TestCase):
         self.assertAlmostEqual(paired_arm_hierarchical_mean(units,"FULL",2),5.0)
 
 
-    def test_live_authority_v3_is_fail_closed_during_support_reconciliation(self):
+    def test_live_authority_v3_bindings_match_production_support_v2_preoutcome(self):
         authority=runner.load_json(runner.ROOT/runner.AUTHORITY_REL)
         state=runner.load_json(runner.ROOT/runner.STATE_REL)
-        self.assertEqual(authority["status"],"HELD_PREOUTCOME_SUPPORT_PARITY_RECONCILIATION")
-        self.assertFalse(authority["real_development_response_execution_authorized"])
-        self.assertFalse(state["first_wave"]["evaluator_execution_authorized"])
-        with self.assertRaises(PermissionError):
-            ev.require_real_response_authority(authority)
+        design=runner.load_json(runner.ROOT/runner.DESIGN_REL)
+        manifest=runner.load_json(runner.ROOT/runner.MANIFEST_REL)
+        support=runner.load_json(runner.ROOT/runner.SUPPORT_REL)
+        runner.verify_static_bindings(authority,state,design,manifest,support)
+        self.assertEqual(authority["status"],"AUTHORIZED_READY_NOT_EXECUTED")
+        self.assertTrue(authority["real_development_response_execution_authorized"])
+        self.assertTrue(state["first_wave"]["evaluator_execution_authorized"])
+        self.assertEqual(authority["bindings"]["support_skeleton_row_count"],118262)
+        self.assertEqual(authority["bindings"]["support_skeleton_sha256"],"e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b")
         self.assertFalse(runner.RESPONSE_OPENING_STARTED)
         self.assertFalse(state["first_wave"]["development_outcomes_opened"])
         self.assertFalse(state["first_wave"]["confirmation_outcomes_opened"])

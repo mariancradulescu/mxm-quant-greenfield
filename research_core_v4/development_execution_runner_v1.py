@@ -20,16 +20,20 @@ AUTHORITY_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_
 STATE_REL = "research_core_v4/state/V4_STATE.json"
 DESIGN_REL = "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json"
 MANIFEST_REL = "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json"
-SUPPORT_REL = "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json"
+SUPPORT_REL = "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V2.json"
 EVALUATOR_REL = "research_core_v4/response_evaluator_v3.py"
 LEGACY_EVALUATOR_V2_REL = "research_core_v4/response_evaluator_v2.py"
 SEMANTICS_REL = "research_core_v4/frozen_v2_semantics.py"
-CALIBRATION_REL = "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V2.json"
+CALIBRATION_REL = "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json"
+CALIBRATION_FULL_REL = "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"
+CALIBRATION_HARNESS_REL = "research_core_v4/exact_geometry_calibration_v3.py"
+SUPPORT_TRANSPORT_REL = "research_core_v4/support_v2/SUPPORT_V2_CALIBRATION_GEOMETRY_MANIFEST_V1.json"
+SUPPORT_RECONCILIATION_REL = "research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json"
 CONFIRMATION_LAW_REL = "research_core_v4/state/CONFIRMATION_PASS_LAW_V1.json"
 CONFIRMATION_PROVENANCE_REL = "research_core_v4/state/CONFIRMATION_PROVENANCE_CERTIFICATE_V1.json"
 DIAGNOSTICS_REL = "research_core_v4/state/NONSELECTION_DIAGNOSTIC_IMPLEMENTATION_V1.json"
-ALIGNMENT_REL = "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V1.json"
-IMPLEMENTATION_CONTRACT_REL = "research_core_v4/state/RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V2.json"
+ALIGNMENT_REL = "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V2.json"
+IMPLEMENTATION_CONTRACT_REL = "research_core_v4/state/RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V3.json"
 INDEPENDENT_AUDIT_REL = "research_core_v4/state/FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json"
 VALIDATION_POLICY_REL = "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"
 AUTHORITY_V2_SUPERSESSION_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V2_SUPERSESSION_V1.json"
@@ -75,6 +79,10 @@ def state_binding_payload(state: dict) -> dict:
         "execution_authority_v2_status":fw["execution_authority_v2_status"],
         "legacy_evaluator_v2_status":fw["legacy_evaluator_v2_status"],
         "response_evaluator_implementation_contract":fw["response_evaluator_implementation_contract"],
+        "support_skeleton_audit":fw["support_skeleton_audit"],
+        "exact_geometry_calibration":fw["exact_geometry_calibration"],
+        "production_calibration_semantics_alignment":fw["production_calibration_semantics_alignment"],
+        "support_parity_reconciliation":fw["support_parity_reconciliation"],
         "final_preoutcome_scientific_audit":state["final_preoutcome_scientific_audit"],
         "final_preoutcome_validation_policy":state["final_preoutcome_validation_policy"],
         "evaluator_execution_authorized":fw["evaluator_execution_authorized"],
@@ -135,6 +143,10 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("manifest_sha256",sha256_file(ROOT/MANIFEST_REL),b["canonical_primary_manifest_content_sha256"])
     _must_equal("support_audit_sha256",sha256_file(ROOT/SUPPORT_REL),b["support_audit_content_sha256"])
     _must_equal("calibration_sha256",sha256_file(ROOT/CALIBRATION_REL),b["exact_geometry_calibration_content_sha256"])
+    _must_equal("calibration_full_sha256",sha256_file(ROOT/CALIBRATION_FULL_REL),b["exact_geometry_calibration_full_content_sha256"])
+    _must_equal("calibration_harness_sha256",sha256_file(ROOT/CALIBRATION_HARNESS_REL),b["exact_geometry_calibration_harness_content_sha256"])
+    _must_equal("support_transport_sha256",sha256_file(ROOT/SUPPORT_TRANSPORT_REL),b["support_v2_geometry_transport_manifest_content_sha256"])
+    _must_equal("support_reconciliation_sha256",sha256_file(ROOT/SUPPORT_RECONCILIATION_REL),b["support_parity_reconciliation_content_sha256"])
     _must_equal("confirmation_law_sha256",sha256_file(ROOT/CONFIRMATION_LAW_REL),b["confirmation_pass_law_content_sha256"])
     _must_equal("confirmation_provenance_sha256",sha256_file(ROOT/CONFIRMATION_PROVENANCE_REL),b["confirmation_provenance_content_sha256"])
     _must_equal("diagnostics_sha256",sha256_file(ROOT/DIAGNOSTICS_REL),b["nonselection_diagnostic_implementation_content_sha256"])
@@ -152,7 +164,10 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("state_legacy_evaluator_v2_status",state["first_wave"]["legacy_evaluator_v2_status"],"SUPERSEDED_EXECUTION_DISABLED")
     _must_equal("state_evaluator_pointer",state["first_wave"]["development_response_evaluator"],EVALUATOR_REL)
     _must_equal("state_runner_pointer",state["first_wave"]["development_execution_runner"],"research_core_v4/development_execution_runner_v1.py")
+    _must_equal("state_support_pointer",state["first_wave"]["support_skeleton_audit"],SUPPORT_REL)
     _must_equal("state_calibration_pointer",state["first_wave"]["exact_geometry_calibration"],CALIBRATION_REL)
+    _must_equal("state_alignment_pointer",state["first_wave"]["production_calibration_semantics_alignment"],ALIGNMENT_REL)
+    _must_equal("state_support_reconciliation_pointer",state["first_wave"]["support_parity_reconciliation"],SUPPORT_RECONCILIATION_REL)
     _must_equal("state_diagnostics_pointer",state["first_wave"]["nonselection_diagnostic_implementation"],DIAGNOSTICS_REL)
     _must_equal("state_implementation_contract_pointer",state["first_wave"]["response_evaluator_implementation_contract"],IMPLEMENTATION_CONTRACT_REL)
     _must_equal("state_independent_audit_pointer",state["final_preoutcome_scientific_audit"],INDEPENDENT_AUDIT_REL)
@@ -252,6 +267,10 @@ def pre_response_guards(raw_root: str | Path) -> PrevalidatedBundle:
         "primary_manifest_sha256":sha256_file(ROOT/MANIFEST_REL),
         "support_audit_sha256":sha256_file(ROOT/SUPPORT_REL),
         "exact_geometry_calibration_sha256":sha256_file(ROOT/CALIBRATION_REL),
+        "exact_geometry_calibration_full_sha256":sha256_file(ROOT/CALIBRATION_FULL_REL),
+        "exact_geometry_calibration_harness_sha256":sha256_file(ROOT/CALIBRATION_HARNESS_REL),
+        "support_v2_geometry_transport_manifest_sha256":sha256_file(ROOT/SUPPORT_TRANSPORT_REL),
+        "support_parity_reconciliation_sha256":sha256_file(ROOT/SUPPORT_RECONCILIATION_REL),
         "confirmation_pass_law_sha256":sha256_file(ROOT/CONFIRMATION_LAW_REL),
         "confirmation_provenance_sha256":sha256_file(ROOT/CONFIRMATION_PROVENANCE_REL),
         "nonselection_diagnostic_implementation_sha256":sha256_file(ROOT/DIAGNOSTICS_REL),

@@ -1,92 +1,69 @@
 {
-  "schema": "mxm.research-core-v4.real-support-skeleton-audit.v2",
-  "status": "COMPLETE_OUTCOME_BLIND_PRODUCTION_REBUILT_SUPPORT_GEOMETRY_PENDING_FULL_V3_CALIBRATION",
   "as_of_date": "2026-10-02",
-  "supersedes": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json",
-  "supersession_reason": "V1_SUPPORT_SKELETON_IS_NOT_REPRODUCIBLE_BY_THE_FROZEN_PRODUCTION_EVALUATOR_ON_THE_EXACT_HASH_BOUND_18_SERIES_AND_ITS_GENERATOR_SOURCE_WAS_NOT_PERSISTED",
-  "scientific_design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
-  "scientific_design_changed": false,
-  "production_evaluator": "research_core_v4/response_evaluator_v3.py",
-  "outcome_boundary": {
-    "future_response_values_read": false,
-    "future_returns_computed": false,
-    "mfe_computed": false,
-    "mae_computed": false,
-    "pnl_computed": false,
-    "response_path_availability_uses_timestamps_only": true,
-    "broker_contacted": false,
-    "protected_forward_opened": false
-  },
-  "sources": {
-    "canonical_manifest": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
-    "original_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
-    "delta_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
-    "development_series_count": 18,
-    "exact_series_hashes_verified": true
-  },
-  "skeleton": {
-    "row_count": 118262,
-    "canonical_sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b",
-    "canonicalization": "response_evaluator_v3.skeleton_canonical_line sorted UTF-8 lines with LF",
-    "rebuilt_from_exact_series": true
+  "context_event_counts": {
+    "FX_SPOT": {
+      "HIGH": {
+        "baseline": 9781,
+        "full": 3925
+      },
+      "LOW": {
+        "baseline": 15972,
+        "full": 5336
+      },
+      "baseline": 25753,
+      "events": 35014,
+      "full": 9261,
+      "iso_weeks": 53
+    },
+    "SPOT_CRYPTO": {
+      "HIGH": {
+        "baseline": 17528,
+        "full": 7049
+      },
+      "LOW": {
+        "baseline": 20199,
+        "full": 6590
+      },
+      "baseline": 37727,
+      "events": 51366,
+      "full": 13639,
+      "iso_weeks": 53
+    },
+    "US_EQUITY_EXTENDED_HOURS": {
+      "HIGH": {
+        "baseline": 10231,
+        "full": 4075
+      },
+      "LOW": {
+        "baseline": 13234,
+        "full": 4342
+      },
+      "baseline": 23465,
+      "events": 31882,
+      "full": 8417,
+      "iso_weeks": 53
+    }
   },
   "count_geometry_hashes": {
     "FX_SPOT": {
-      "data_rows": 1270,
-      "csv_sha256": "4b4763091bbeb9bfaef7e347aad16e43f0f51219d3101f002db410e501dd27c9"
+      "csv_sha256": "4b4763091bbeb9bfaef7e347aad16e43f0f51219d3101f002db410e501dd27c9",
+      "data_rows": 1270
     },
     "SPOT_CRYPTO": {
-      "data_rows": 1272,
-      "csv_sha256": "681fae245df0dd928cc76fd5f0e4b6e1c90081161e1cf959fae55469889760c3"
+      "csv_sha256": "681fae245df0dd928cc76fd5f0e4b6e1c90081161e1cf959fae55469889760c3",
+      "data_rows": 1272
     },
     "US_EQUITY_EXTENDED_HOURS": {
-      "data_rows": 1211,
-      "csv_sha256": "e9a5c9b82c55bac38c8c5db5d52e7809e1ba8f6719082770170bff3836091386"
+      "csv_sha256": "e9a5c9b82c55bac38c8c5db5d52e7809e1ba8f6719082770170bff3836091386",
+      "data_rows": 1211
     }
   },
-  "context_event_counts": {
-    "FX_SPOT": {
-      "events": 35014,
-      "full": 9261,
-      "baseline": 25753,
-      "LOW": {
-        "full": 5336,
-        "baseline": 15972
-      },
-      "HIGH": {
-        "full": 3925,
-        "baseline": 9781
-      },
-      "iso_weeks": 53
-    },
-    "SPOT_CRYPTO": {
-      "events": 51366,
-      "full": 13639,
-      "baseline": 37727,
-      "LOW": {
-        "full": 6590,
-        "baseline": 20199
-      },
-      "HIGH": {
-        "full": 7049,
-        "baseline": 17528
-      },
-      "iso_weeks": 53
-    },
-    "US_EQUITY_EXTENDED_HOURS": {
-      "events": 31882,
-      "full": 8417,
-      "baseline": 23465,
-      "LOW": {
-        "full": 4342,
-        "baseline": 13234
-      },
-      "HIGH": {
-        "full": 4075,
-        "baseline": 10231
-      },
-      "iso_weeks": 53
-    }
+  "exact_geometry_calibration": {
+    "full_ref": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json",
+    "result_ref": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json",
+    "workflow_conclusion": "SUCCESS",
+    "workflow_head": "4e5d05d9b9a291c8c4c3f7f1a150bdb8320f369d",
+    "workflow_run_id": 36997738593
   },
   "leaf_support": [
     [
@@ -365,17 +342,47 @@
     "baseline_available_events",
     "valid_two_week_blocks"
   ],
+  "outcome_boundary": {
+    "broker_contacted": false,
+    "future_response_values_read": false,
+    "future_returns_computed": false,
+    "mae_computed": false,
+    "mfe_computed": false,
+    "pnl_computed": false,
+    "protected_forward_opened": false,
+    "response_path_availability_uses_timestamps_only": true
+  },
+  "production_evaluator": "research_core_v4/response_evaluator_v3.py",
+  "schema": "mxm.research-core-v4.real-support-skeleton-audit.v2",
+  "scientific_design_changed": false,
+  "scientific_design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "skeleton": {
+    "canonical_sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b",
+    "canonicalization": "response_evaluator_v3.skeleton_canonical_line sorted UTF-8 lines with LF",
+    "rebuilt_from_exact_series": true,
+    "row_count": 118262
+  },
+  "sources": {
+    "canonical_manifest": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+    "delta_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+    "development_series_count": 18,
+    "exact_series_hashes_verified": true,
+    "original_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259"
+  },
+  "status": "COMPLETE_OUTCOME_BLIND_PRODUCTION_REBUILT_SUPPORT_GEOMETRY_CALIBRATION_V3_GREEN",
+  "supersedes": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json",
+  "supersession_reason": "V1_SUPPORT_SKELETON_IS_NOT_REPRODUCIBLE_BY_THE_FROZEN_PRODUCTION_EVALUATOR_ON_THE_EXACT_HASH_BOUND_18_SERIES_AND_ITS_GENERATOR_SOURCE_WAS_NOT_PERSISTED",
   "support_verdict": {
     "all_24_leaves_meet_v2_min_12_blocks": true,
-    "minimum_valid_two_week_blocks": 25,
     "maximum_pairing_loss_fraction": 0.15939597315436238,
+    "minimum_valid_two_week_blocks": 25,
     "scientific_design_v2_support_geometry": "FEASIBLE"
   },
   "v1_reconciliation": {
-    "v1_skeleton_sha256": "e79db90359e473e51de464ccddf400136c4cbaeedabada87975ac6961f6e9aee",
-    "v1_row_count": 95506,
     "difference_classification": "PREOUTCOME_PRODUCTION_SUPPORT_PARITY_DEFECT_NOT_MARKET_OUTCOME",
     "v1_generator_source_persisted": false,
-    "v1_preserved_as_history": true
+    "v1_preserved_as_history": true,
+    "v1_row_count": 95506,
+    "v1_skeleton_sha256": "e79db90359e473e51de464ccddf400136c4cbaeedabada87975ac6961f6e9aee"
   }
 }

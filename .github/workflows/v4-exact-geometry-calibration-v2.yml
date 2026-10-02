@@ -9,7 +9,17 @@ on:
       - "research_core_v4/support_v2/**"
       - "research_core_v4/response_evaluator_v3.py"
       - "research_core_v4/frozen_v2_semantics.py"
+      - "research_core_v4/development_execution_runner_v1.py"
       - "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V2.json"
+      - "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json"
+      - "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"
+      - "research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json"
+      - "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V2.json"
+      - "research_core_v4/state/RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V3.json"
+      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json"
+      - "research_core_v4/state/FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json"
+      - "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"
+      - "research_core_v4/state/V4_STATE.json"
       - ".github/workflows/v4-exact-geometry-calibration-v2.yml"
 
 permissions:
@@ -26,13 +36,15 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --disable-pip-version-check numpy
       - name: Compile aligned production and calibration code
-        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py
+        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py
       - name: Run full outcome-blind production-support-V2 calibration
         run: |
           python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --full --output /tmp/exact_geometry_v3.json
           python - <<'PY'
           import json
           x=json.load(open("/tmp/exact_geometry_v3.json"))
+          persisted=json.load(open("research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"))
+          assert x == persisted, "exact-head calibration differs from persisted full V3 result"
           assert x["market_responses_used"] is False
           assert x["support_rows"] == 3753
           assert x["permutations"] == 1023
@@ -41,15 +53,7 @@ jobs:
           assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
           for name,v in x["negative_controls"].items():
               assert v["global_any"] < .07, (name,v)
-          print("V4_EXACT_GEOMETRY_V3_FULL_PASS")
-          print("CALIBRATION_SUMMARY_JSON="+json.dumps({
-            "negative_controls":x["negative_controls"],
-            "selector_exact_tiecheck":x["selector_exact_tiecheck"],
-            "full_arm_weighting_parity":x["full_arm_weighting_parity"],
-            "standardized_mde":x["standardized_mde"],
-            "state_specific_power":x["state_specific_power"],
-            "effect_grid_standardized":x["effect_grid_standardized"]
-          },sort_keys=True,separators=(",",":")))
+          print("V4_EXACT_GEOMETRY_V3_FULL_PERSISTED_MATCH_PASS")
           PY
       - uses: actions/upload-artifact@v4
         with:

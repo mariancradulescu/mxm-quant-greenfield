@@ -1,0 +1,65 @@
+{
+  "as_of_date": "2026-10-02",
+  "calibration_harness": "research_core_v4/exact_geometry_calibration_v3.py",
+  "calibration_v1_status": "PRE_CORRECTION_IMPLEMENTATION_CALIBRATION_HISTORY",
+  "corrections": [
+    {
+      "exact_order": [
+        "SMALLEST_ADJUSTED_MAXT_P",
+        "LARGEST_OBSERVED_T",
+        "SHORTEST_HORIZON",
+        "LOW_BEFORE_HIGH"
+      ],
+      "id": "SELECTED_LEAF_TIEBREAK",
+      "prior_problem": "PRODUCTION_AND_CALIBRATION_USED_DIFFERENT_OR_IMPLICIT_INDEX_TIEBREAKS",
+      "shared_implementation": "research_core_v4/frozen_v2_semantics.py::select_leaf_index",
+      "threshold_or_family_changed": false
+    },
+    {
+      "exact_rule": [
+        "ONLY_SYMBOL_WEEK_DIRECTION_UNITS_WITH_VALID_FULL_AND_BASELINE_PAIR",
+        "EQUAL_WEIGHT_AVAILABLE_DIRECTIONS_WITHIN_SYMBOL_WEEK",
+        "EQUAL_WEIGHT_VALID_SYMBOLS_WITHIN_CONTEXT_WEEK",
+        "MEAN_ACROSS_FIXED_VALID_CONTEXT_WEEK_GEOMETRY",
+        "STRICTLY_GREATER_THAN_ZERO"
+      ],
+      "id": "FULL_ARM_POSITIVITY_GATE",
+      "new_magnitude_threshold": false,
+      "prior_problem": "PRODUCTION_USED_EVENT_WEIGHTED_ALL_FULL_EVENTS_WHILE_CALIBRATION_USED_PAIRED_HIERARCHICAL_SUPPORT",
+      "raw_event_weighted_full_response": "SECONDARY_DIAGNOSTIC_ONLY",
+      "shared_implementation": "research_core_v4/frozen_v2_semantics.py::paired_arm_hierarchical_mean",
+      "unpaired_full_events_in_gate": false
+    }
+  ],
+  "design_changed": false,
+  "design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "diagnostic_implementation_ref": "research_core_v4/state/NONSELECTION_DIAGNOSTIC_IMPLEMENTATION_V1.json",
+  "exact_geometry_calibration_full_ref": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json",
+  "exact_geometry_calibration_ref": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json",
+  "exact_support_geometry_recomputed": true,
+  "outcomes_opened": false,
+  "preserved_scientific_boundaries": [
+    "INFORMATION_SOURCE",
+    "DEVELOPMENT_AND_CONFIRMATION_SYMBOLS",
+    "STRUCTURAL_CONTEXTS",
+    "SCALE_TOPOLOGY",
+    "SIGN_ONLY_RULE",
+    "LOW_HIGH_DEFINITION",
+    "RESPONSE_HORIZONS",
+    "PAIRED_INCREMENTAL_ESTIMAND",
+    "SUPPORT_THRESHOLDS",
+    "MAXT_FAMILY",
+    "HOLM_CONTROL",
+    "TEMPORAL_BREADTH_CONCENTRATION_THRESHOLDS",
+    "CONFIRMATION_PASS_LAW",
+    "CONFIRMATION_INTERVAL"
+  ],
+  "production_evaluator": "research_core_v4/response_evaluator_v3.py",
+  "schema": "mxm.research-core-v4.production-calibration-semantics-alignment.v2",
+  "status": "FROZEN_PREOUTCOME_PRODUCTION_SUPPORT_V2_CALIBRATION_V3_ALIGNMENT",
+  "supersedes": "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V1.json",
+  "support_geometry_ref": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V2.json",
+  "support_parity_reconciliation_ref": "research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json",
+  "support_skeleton_row_count": 118262,
+  "support_skeleton_sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b"
+}

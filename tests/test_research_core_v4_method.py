@@ -104,20 +104,20 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertFalse(ca["outcomes_opened_now"])
         self.assertTrue(ca["protected_forward_forbidden"])
 
-    def test_v4_canonical_state_is_fail_closed_and_still_preoutcome(self):
+    def test_v4_canonical_state_is_ready_and_still_preoutcome(self):
         state=load("research_core_v4/state/V4_STATE.json")
         authority=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json")
-        self.assertEqual(state["status"], "FIRST_REAL_MARKET_DESIGN_V2_AUTHORITY_V3_HELD_PREOUTCOME_SUPPORT_PARITY_RECONCILIATION")
+        self.assertEqual(state["status"], "FIRST_REAL_MARKET_DESIGN_V2_AUTHORITY_V3_READY_NOT_EXECUTED")
         self.assertTrue(state["first_wave"]["design"].endswith("FIRST_REAL_MARKET_DESIGN_V2.json"))
         self.assertTrue(state["first_wave"]["selection_audit"].endswith("FIRST_WAVE_PREOUTCOME_SELECTION_AUDIT_V2.json"))
         self.assertEqual(state["detector_calibration_history"]["v3_status"], "AUTHORITATIVE_FINAL_PREOUTCOME_ENGINE_FOR_FIRST_WAVE_V2")
-        self.assertFalse(state["first_wave"]["evaluator_execution_authorized"])
+        self.assertTrue(state["first_wave"]["evaluator_execution_authorized"])
         self.assertFalse(state["first_wave"]["confirmation_execution_authorized"])
         self.assertFalse(state["first_wave"]["development_outcomes_opened"])
         self.assertFalse(state["first_wave"]["confirmation_outcomes_opened"])
         self.assertFalse(state["first_wave"]["new_market_acquisition_started"])
-        self.assertEqual(authority["status"], "HELD_PREOUTCOME_SUPPORT_PARITY_RECONCILIATION")
-        self.assertFalse(authority["real_development_response_execution_authorized"])
+        self.assertEqual(authority["status"], "AUTHORIZED_READY_NOT_EXECUTED")
+        self.assertTrue(authority["real_development_response_execution_authorized"])
         self.assertFalse(authority["confirmation_response_execution_authorized"])
         self.assertFalse(authority["broker_acquisition_authorized"])
         self.assertFalse(authority["quote_revision_v2_execution_authorized"])
@@ -125,7 +125,7 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertEqual(authority["schema"], "mxm.research-core-v4.first-development-response-execution-authority.v3")
         self.assertEqual(len(authority["bindings"]["development_series"]),18)
         self.assertEqual(state["first_wave"]["execution_authority_v2_status"],"SUPERSEDED_BEFORE_ANY_REAL_V4_RESPONSE")
-        self.assertTrue(state["first_wave"]["response_evaluator_implementation_contract"].endswith("RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V2.json"))
+        self.assertTrue(state["first_wave"]["response_evaluator_implementation_contract"].endswith("RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V3.json"))
         self.assertTrue(state["final_preoutcome_scientific_audit"].endswith("FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json"))
         self.assertTrue(state["final_preoutcome_validation_policy"].endswith("FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"))
         self.assertNotIn("final_preoutcome_validation_result",state)
@@ -138,7 +138,7 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertEqual(state["first_wave"]["legacy_evaluator_v2_status"],"SUPERSEDED_EXECUTION_DISABLED")
         self.assertEqual(state["first_wave"]["development_response_execution_authority"],"research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json")
         audit=load("research_core_v4/state/FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json")
-        self.assertEqual(audit["unresolved_findings_gate"]["classification"],"MATERIAL_PREOUTCOME_FINDING_REMAINS")
+        self.assertEqual(audit["unresolved_findings_gate"]["classification"],"NO_MATERIAL_PREOUTCOME_FINDINGS_REMAIN")
 
 
 if __name__ == "__main__":

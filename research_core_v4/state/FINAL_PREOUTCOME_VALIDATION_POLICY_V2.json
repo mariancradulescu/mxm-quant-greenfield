@@ -1,10 +1,8 @@
 {
-  "schema": "mxm.research-core-v4.final-preoutcome-validation-policy.v2",
-  "status": "AUTHORITATIVE_EXACT_HEAD_EXTERNAL_VALIDATION_POLICY",
   "as_of_date": "2026-10-02",
-  "supersedes_current_use_of": "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_RESULT_V1.json",
+  "execution_forbidden_if_any_required_check_missing_or_not_success": true,
   "historical_validation_result": "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_RESULT_V1.json",
-  "rule": "NO_PERSISTED_RESULT_FILE_CAN_SELF_CERTIFY_ITS_OWN_COMMIT;EXECUTION_REQUIRES_SUCCESSFUL_GITHUB_ACTIONS_ON_THE_EXACT_CURRENT_AUTHORITY_V3_HEAD_AFTER_ALL_PREOUTCOME_CORRECTIONS",
+  "market_responses_used_by_validation": false,
   "required_exact_head_checks": [
     "Research Core V4 Method Validation",
     "V4 Exact Geometry Calibration V2"
@@ -19,8 +17,13 @@
     "INTERNAL_CAPABILITY_OBJECT_ALONE_CANNOT_INVOKE_REAL_RESPONSE_CORE",
     "LEGACY_RESPONSE_EVALUATOR_V2_COMPLETE_REAL_EXECUTION_PATHS_DENY",
     "V1_AND_V2_AUTHORITIES_SUPERSEDED_AND_UNSELECTABLE_BY_CURRENT_STATE_OR_RUNNER",
-    "NO_MATERIAL_PREOUTCOME_FINDINGS_REMAIN_CLASSIFICATION_PRESENT"
+    "NO_MATERIAL_PREOUTCOME_FINDINGS_REMAIN_CLASSIFICATION_PRESENT",
+    "PRODUCTION_REBUILT_SUPPORT_V2_IS_HASH_BOUND",
+    "PERSISTED_FULL_CALIBRATION_V3_MATCHES_EXACT_HEAD_RECALCULATION",
+    "SUPPORT_PARITY_RECONCILIATION_RESOLVED_PREOUTCOME"
   ],
-  "execution_forbidden_if_any_required_check_missing_or_not_success": true,
-  "market_responses_used_by_validation": false
+  "rule": "NO_PERSISTED_RESULT_FILE_CAN_SELF_CERTIFY_ITS_OWN_COMMIT;EXECUTION_REQUIRES_SUCCESSFUL_GITHUB_ACTIONS_ON_THE_EXACT_CURRENT_AUTHORITY_V3_HEAD_AFTER_ALL_PREOUTCOME_CORRECTIONS",
+  "schema": "mxm.research-core-v4.final-preoutcome-validation-policy.v2",
+  "status": "AUTHORITATIVE_EXACT_HEAD_EXTERNAL_VALIDATION_POLICY",
+  "supersedes_current_use_of": "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_RESULT_V1.json"
 }

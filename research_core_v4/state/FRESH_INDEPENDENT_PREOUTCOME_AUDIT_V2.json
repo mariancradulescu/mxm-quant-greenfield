@@ -1,122 +1,122 @@
 {
-  "schema": "mxm.research-core-v4.fresh-independent-preoutcome-audit.v2",
-  "status": "MATERIAL_PREOUTCOME_FINDING_REMAINS_SUPPORT_PARITY_RECALIBRATION_PENDING",
   "as_of_date": "2026-10-02",
   "audited_from_head": "2f18a1458d55c0285f519581d99df083505ef941",
-  "scientific_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
-  "outcome_blind": true,
-  "real_v4_development_responses_opened": false,
+  "control_plane": {
+    "automatic_canonical_writer_found": false,
+    "broker_acquisition_disabled": true,
+    "candidate_promotion_disabled": true,
+    "live_trading_disabled": true,
+    "protected_forward_closed": true,
+    "quote_revision_v2_disabled": true,
+    "v2_runtime_read_only": true,
+    "v3_read_only_history": true
+  },
+  "correction_classification": "IMPLEMENTATION_PROVENANCE_CONTROL_PLANE_BINDING_ONLY_NO_SCIENTIFIC_REDESIGN",
   "findings": [
     {
+      "correction": "PUBLIC_REAL_RESPONSE_ENTRYPOINTS_DENY;INTERNAL_CORE_REQUIRES_RUNNER_ONLY_PROCESS_CAPABILITY",
+      "finding": "PUBLIC_IMPORTABLE_EVALUATOR_ENTRYPOINTS_COULD_OPEN_REAL_RESPONSES_WITHOUT_RUNNER_INPUT_AND_SKELETON_HASH_GUARDS",
       "id": "EXECUTION_BYPASS",
       "severity": "MATERIAL_PREOUTCOME",
-      "finding": "PUBLIC_IMPORTABLE_EVALUATOR_ENTRYPOINTS_COULD_OPEN_REAL_RESPONSES_WITHOUT_RUNNER_INPUT_AND_SKELETON_HASH_GUARDS",
-      "correction": "PUBLIC_REAL_RESPONSE_ENTRYPOINTS_DENY;INTERNAL_CORE_REQUIRES_RUNNER_ONLY_PROCESS_CAPABILITY",
       "validation": [
         "tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_public_real_response_paths_cannot_bypass_runner",
         "AUTHORITY_V3_STATIC_BINDING_OF_EVALUATOR_AND_RUNNER"
       ]
     },
     {
+      "correction": "CREATE_DURABLE_O_EXCL_OPENING_LOCK_BEFORE_FIRST_RESPONSE_READ_AND_REFUSE_EXISTING_RESULT_OR_LOCK",
+      "finding": "ONCE_ONLY_GUARD_WAS_PROCESS_LOCAL_AND_OUTPUT_COULD_BE_REEXECUTED_FROM_A_FRESH_PROCESS_BEFORE_CANONICAL_STATE_UPDATE",
       "id": "EXACTLY_ONCE_SCOPE",
       "severity": "MATERIAL_PREOUTCOME",
-      "finding": "ONCE_ONLY_GUARD_WAS_PROCESS_LOCAL_AND_OUTPUT_COULD_BE_REEXECUTED_FROM_A_FRESH_PROCESS_BEFORE_CANONICAL_STATE_UPDATE",
-      "correction": "CREATE_DURABLE_O_EXCL_OPENING_LOCK_BEFORE_FIRST_RESPONSE_READ_AND_REFUSE_EXISTING_RESULT_OR_LOCK",
       "validation": [
         "tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_result_provenance_hashes_present_and_atomic_write",
         "O_EXCL_OPENING_LOCK_CREATED_BEFORE_RESPONSE_OPENING"
       ]
     },
     {
+      "correction": "PERSIST_COMPLETE_BOUND_HASH_AND_SERIES_SCOPE_PROVENANCE_IN_RAW_RESULT",
+      "finding": "RAW_RESULT_PROVENANCE_DID_NOT_COPY_ALL_FROZEN_CODE_CALIBRATION_CONFIRMATION_DIAGNOSTIC_AND_INPUT_METADATA_BINDINGS",
       "id": "RESULT_PROVENANCE_COMPLETENESS",
       "severity": "MATERIAL_PREOUTCOME",
-      "finding": "RAW_RESULT_PROVENANCE_DID_NOT_COPY_ALL_FROZEN_CODE_CALIBRATION_CONFIRMATION_DIAGNOSTIC_AND_INPUT_METADATA_BINDINGS",
-      "correction": "PERSIST_COMPLETE_BOUND_HASH_AND_SERIES_SCOPE_PROVENANCE_IN_RAW_RESULT",
       "validation": [
         "AUTHORITY_V3_BINDS_COMPLETE_EXECUTION_ARTIFACT_SET",
         "RUNNER_RAW_RESULT_EXECUTION_PROVENANCE_INCLUDES_ALL_BOUND_HASHES_AND_FROZEN_SERIES_SCOPE"
       ]
     },
     {
+      "correction": "PRESERVE_V1_HISTORY;POINT_CURRENT_STATE_TO_V2_IMPLEMENTATION_CONTRACT_FRESH_AUDIT_AND_EXACT_HEAD_VALIDATION_POLICY",
+      "finding": "CURRENT_STATE_STILL_POINTED_TO_V1_IMPLEMENTATION_AND_OLD_FINAL_VALIDATION_ARTIFACTS_AFTER_EVALUATOR_V3_CALIBRATION_V2_AUTHORITY_V2",
       "id": "STALE_CURRENT_POINTERS",
       "severity": "GOVERNANCE_PREOUTCOME",
-      "finding": "CURRENT_STATE_STILL_POINTED_TO_V1_IMPLEMENTATION_AND_OLD_FINAL_VALIDATION_ARTIFACTS_AFTER_EVALUATOR_V3_CALIBRATION_V2_AUTHORITY_V2",
-      "correction": "PRESERVE_V1_HISTORY;POINT_CURRENT_STATE_TO_V2_IMPLEMENTATION_CONTRACT_FRESH_AUDIT_AND_EXACT_HEAD_VALIDATION_POLICY",
       "validation": [
         "tests.test_research_core_v4_method.ResearchCoreV4MethodTests.test_v4_canonical_state_is_authorized_but_still_preoutcome",
         "RUNNER_VERIFY_STATIC_BINDINGS_CHECKS_CURRENT_STATE_POINTERS"
       ]
     },
     {
+      "correction": "INTERNAL_V3_CORE_NOW_REQUIRES_BOTH_THE_FROZEN_CAPABILITY_AND_THE_EXACT_SIBLING_AUTHORITY_BOUND_RUNNER_AS_IMMEDIATE_CALLER",
+      "finding": "MODULE_GLOBAL_EXECUTION_CAPABILITY_COULD_BE_PASSED_DIRECTLY_TO_THE_INTERNAL_V3_CORE_BY_A_NONRUNNER_CALLER",
       "id": "AUTHORITY_V3_CAPABILITY_OBJECT_BYPASS",
       "severity": "MATERIAL_PREOUTCOME",
-      "finding": "MODULE_GLOBAL_EXECUTION_CAPABILITY_COULD_BE_PASSED_DIRECTLY_TO_THE_INTERNAL_V3_CORE_BY_A_NONRUNNER_CALLER",
-      "correction": "INTERNAL_V3_CORE_NOW_REQUIRES_BOTH_THE_FROZEN_CAPABILITY_AND_THE_EXACT_SIBLING_AUTHORITY_BOUND_RUNNER_AS_IMMEDIATE_CALLER",
       "validation": [
         "tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_internal_capability_object_cannot_bypass_runner_caller_check",
         "INTERNAL_CORE_REQUIRES_EXACT_RUNNER_CALLER_AND_FROZEN_CAPABILITY"
       ]
     },
     {
+      "correction": "LEGACY_V2_REAL_RESPONSE_AUTHORIZATION_AND_COMPLETE_EXECUTION_ENTRYPOINTS_PERMANENTLY_DENY_AND_ARE_HASH_BOUND_AS_SUPERSEDED_EXECUTION_DISABLED",
+      "finding": "SUPERSEDED_RESPONSE_EVALUATOR_V2_RETAINED_IMPORTABLE_FULL_REAL_RESPONSE_ENTRYPOINTS_WITH_A_WEAKER_AUTHORITY_CHECK",
       "id": "LEGACY_V2_EVALUATOR_REAL_RESPONSE_PATH",
       "severity": "MATERIAL_PREOUTCOME",
-      "finding": "SUPERSEDED_RESPONSE_EVALUATOR_V2_RETAINED_IMPORTABLE_FULL_REAL_RESPONSE_ENTRYPOINTS_WITH_A_WEAKER_AUTHORITY_CHECK",
-      "correction": "LEGACY_V2_REAL_RESPONSE_AUTHORIZATION_AND_COMPLETE_EXECUTION_ENTRYPOINTS_PERMANENTLY_DENY_AND_ARE_HASH_BOUND_AS_SUPERSEDED_EXECUTION_DISABLED",
       "validation": [
         "tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_legacy_v2_complete_real_response_paths_are_disabled",
         "AUTHORITY_V3_BINDS_LEGACY_EVALUATOR_V2_HASH_AND_STATE_MARKS_SUPERSEDED_EXECUTION_DISABLED"
       ]
     },
     {
+      "correction": "SUPERSEDE_UNREPRODUCIBLE_SUPPORT_V1_WITH_PRODUCTION_REBUILT_SUPPORT_V2;PERSIST_FULL_OUTCOME_BLIND_CALIBRATION_V3;REBIND_AUTHORITY_V3_WITHOUT_SCIENTIFIC_DESIGN_CHANGE",
+      "finding": "THE_AUTHORITY_BOUND_RUNNER_REBUILT_118262_OUTCOME_BLIND_SIGNAL_SUPPORT_EVENTS_WITH_SHA256_E3F8DE0012E2BCDD2005D72AFEF73F738DE11FCA404675689A8F00422BA0918B_FROM_THE_EXACT_18_HASH_BOUND_SERIES_WHILE_FROZEN_SUPPORT_V1_EXPECTED_95506_EVENTS_WITH_SHA256_E79DB90359E473E51DE464CCddf400136c4cbaeedabada87975ac6961f6e9aee",
       "id": "SUPPORT_SKELETON_PRODUCTION_PARITY_MISMATCH",
       "severity": "MATERIAL_PREOUTCOME",
-      "finding": "THE_AUTHORITY_BOUND_RUNNER_REBUILT_118262_OUTCOME_BLIND_SIGNAL_SUPPORT_EVENTS_WITH_SHA256_E3F8DE0012E2BCDD2005D72AFEF73F738DE11FCA404675689A8F00422BA0918B_FROM_THE_EXACT_18_HASH_BOUND_SERIES_WHILE_FROZEN_SUPPORT_V1_EXPECTED_95506_EVENTS_WITH_SHA256_E79DB90359E473E51DE464CCddf400136c4cbaeedabada87975ac6961f6e9aee",
-      "correction": "SUPERSEDE_UNREPRODUCIBLE_SUPPORT_V1_WITH_OUTCOME_BLIND_SUPPORT_V2_REBUILT_DIRECTLY_FROM_THE_FROZEN_PRODUCTION_SUPPORT_SEMANTICS;RERUN_EXACT_GEOMETRY_CALIBRATION_BEFORE_REAUTHORIZATION",
       "validation": [
-        "PRE_RESPONSE_GUARD_FAIL_OBSERVED_BEFORE_RESPONSE_OPENING",
-        "SUPPORT_V2_REBUILD_118262_ROWS_MINIMUM_25_VALID_TWO_WEEK_BLOCKS",
-        "FULL_V3_EXACT_GEOMETRY_RECALIBRATION_PENDING"
+        "V4_REAL_SUPPORT_SKELETON_AUDIT_V2_REBUILDS_118262_ROWS_SHA256_E3F8DE0012E2BCDD2005D72AFEF73F738DE11FCA404675689A8F00422BA0918B",
+        "SUPPORT_V2_LOSSLESS_CALIBRATION_GEOMETRY_RECONSTRUCTS_ALL_THREE_EXACT_CSV_HASHES",
+        "FULL_OUTCOME_BLIND_EXACT_GEOMETRY_CALIBRATION_V3_WORKFLOW_RUN_36997738593_SUCCESS_ON_4E5D05D9",
+        "FINAL_AUTHORITY_V3_STATIC_BINDINGS_AND_BOTH_REQUIRED_EXACT_HEAD_CHECKS_MUST_PASS_BEFORE_EXECUTION"
       ]
     }
   ],
+  "outcome_blind": true,
+  "real_v4_development_responses_opened": false,
+  "schema": "mxm.research-core-v4.fresh-independent-preoutcome-audit.v2",
+  "scientific_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
   "scientific_reaudit": {
-    "information_source": "UNCHANGED_CAUSAL_CROSS_SCALE_ALIGNMENT_INCREMENTAL_RESPONSE",
-    "incremental_cross_scale_test": true,
-    "single_scale_relabeling": false,
-    "universality_across_asset_classes_required": false,
-    "symbols_are_replicates_not_free_winners": true,
-    "contexts_are_predeclared_structural_siblings": true,
-    "scale_topology_unchanged": true,
-    "low_high_unchanged": true,
-    "horizons_unchanged": true,
-    "paired_estimand_unchanged": true,
-    "maxT_holm_unchanged": true,
-    "temporal_breadth_concentration_unchanged": true,
     "confirmation_law_unchanged": true,
+    "contexts_are_predeclared_structural_siblings": true,
+    "economic_certification_deferred_to_authentic_postconfirmation_evidence": true,
     "frontier_1576_preserved": true,
-    "economic_certification_deferred_to_authentic_postconfirmation_evidence": true
+    "horizons_unchanged": true,
+    "incremental_cross_scale_test": true,
+    "information_source": "UNCHANGED_CAUSAL_CROSS_SCALE_ALIGNMENT_INCREMENTAL_RESPONSE",
+    "low_high_unchanged": true,
+    "maxT_holm_unchanged": true,
+    "paired_estimand_unchanged": true,
+    "scale_topology_unchanged": true,
+    "single_scale_relabeling": false,
+    "symbols_are_replicates_not_free_winners": true,
+    "temporal_breadth_concentration_unchanged": true,
+    "universality_across_asset_classes_required": false
   },
-  "control_plane": {
-    "automatic_canonical_writer_found": false,
-    "v2_runtime_read_only": true,
-    "v3_read_only_history": true,
-    "quote_revision_v2_disabled": true,
-    "broker_acquisition_disabled": true,
-    "protected_forward_closed": true,
-    "candidate_promotion_disabled": true,
-    "live_trading_disabled": true
-  },
-  "correction_classification": "IMPLEMENTATION_PROVENANCE_CONTROL_PLANE_BINDING_ONLY_NO_SCIENTIFIC_REDESIGN",
+  "status": "PREOUTCOME_CORRECTIONS_FROZEN_EXECUTION_REQUIRES_EXACT_HEAD_GREEN_VALIDATION",
   "unresolved_findings_gate": {
-    "classification": "MATERIAL_PREOUTCOME_FINDING_REMAINS",
-    "blocker": "SUPPORT_SKELETON_PRODUCTION_PARITY_MISMATCH",
+    "basis": "ALL_SEVEN_PERSISTED_FINDINGS_HAVE_PROSPECTIVE_CORRECTIONS_AND_DETERMINISTIC_INVARIANTS;EXECUTION_REMAINS_CONDITIONAL_ON_BOTH_REQUIRED_EXACT_HEAD_GITHUB_ACTIONS_SUCCEEDING_ON_THE_FINAL_REBOUND_HEAD",
+    "classification": "NO_MATERIAL_PREOUTCOME_FINDINGS_REMAIN",
+    "exact_geometry_calibration": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json",
     "market_responses_opened": false,
-    "required_to_clear": [
-      "PERSIST_PRODUCTION_REBUILT_SUPPORT_V2_AND_ITS_EXACT_PROVENANCE",
-      "PERSIST_FULL_OUTCOME_BLIND_EXACT_GEOMETRY_CALIBRATION_V3",
-      "REBIND_AUTHORITY_V3_TO_SUPPORT_V2_AND_CALIBRATION_V3",
-      "BOTH_REQUIRED_EXACT_HEAD_GITHUB_ACTIONS_SUCCESS",
-      "AUTHORITY_BOUND_PRE_RESPONSE_GUARDS_PASS_ON_EXACT_18_INPUT_SERIES"
-    ]
+    "required_external_checks": [
+      "Research Core V4 Method Validation",
+      "V4 Exact Geometry Calibration V2"
+    ],
+    "support_parity_reconciliation": "research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json"
   }
 }
