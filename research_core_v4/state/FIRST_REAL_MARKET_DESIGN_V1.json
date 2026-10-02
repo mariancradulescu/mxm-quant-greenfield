@@ -1,0 +1,238 @@
+{
+  "schema": "mxm.research-core-v4.first-real-market-design.v1",
+  "status": "FROZEN_PREOUTCOME_STOP_BEFORE_ANY_V4_MARKET_RESPONSE_OPENING",
+  "as_of_date": "2026-10-02",
+  "project_contract_ref": "research_core_v4/V4_PROJECT_CONTRACT_V1.json",
+  "preoutcome_selection_ref": "research_core_v4/state/FIRST_WAVE_PREOUTCOME_SELECTION_AUDIT_V1.json",
+  "preoutcome_selection_commit": "12ca2b7da3e33436f4488591fad4b2aed02d0c24",
+  "information_source": "CAUSAL_CROSS_SCALE_ALIGNMENT_ONSET",
+  "primary_research_unit": "ONE_INFORMATION_SOURCE_X_ONE_FIXED_SCALE_TOPOLOGY_X_ONE_CONTINUATION_TRIGGER_X_FOUR_RESPONSE_HORIZONS_X_PREENTRY_VOLATILITY_STATE",
+  "development_panel": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3,
+      "structural_role": "FX_SPOT"
+    },
+    {
+      "symbol": "XAUUSD",
+      "symbol_id": 41,
+      "structural_role": "SPOT_METAL"
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116,
+      "structural_role": "CASH_INDEX"
+    },
+    {
+      "symbol": "NatGas",
+      "symbol_id": 251,
+      "structural_role": "SPOT_ENERGY"
+    },
+    {
+      "symbol": "LTCUSD",
+      "symbol_id": 130,
+      "structural_role": "SPOT_CRYPTO"
+    },
+    {
+      "symbol": "AAPL.US-24",
+      "symbol_id": 2999,
+      "structural_role": "EXTENDED_HOURS_US_EQUITY"
+    }
+  ],
+  "scale_topology": {
+    "H4_context": {
+      "source": "UTC_ALIGNED_COMPLETE_H4_AGGREGATED_FROM_48_CONSECUTIVE_AUTHENTIC_M5_BARS",
+      "directional_state": "SIGN(LOG(H4_CLOSE_T/H4_CLOSE_T_MINUS_3))",
+      "lookback_interpretation": "12_HOURS_OF_COMPLETED_H4_STATE",
+      "continuity": "ALL_REQUIRED_H4_BUCKETS_COMPLETE_AND_EXACTLY_4H_CONTIGUOUS"
+    },
+    "H1_setup": {
+      "source": "UTC_ALIGNED_COMPLETE_H1_AGGREGATED_FROM_12_CONSECUTIVE_AUTHENTIC_M5_BARS",
+      "directional_state": "SIGN(LOG(H1_CLOSE_T/H1_CLOSE_T_MINUS_4))",
+      "lookback_interpretation": "4_HOURS_OF_COMPLETED_H1_STATE",
+      "continuity": "ALL_REQUIRED_H1_BUCKETS_COMPLETE_AND_EXACTLY_1H_CONTIGUOUS"
+    },
+    "M15_transition": {
+      "source": "UTC_ALIGNED_COMPLETE_M15_AGGREGATED_FROM_3_CONSECUTIVE_AUTHENTIC_M5_BARS",
+      "directional_state": "SIGN(LOG(M15_CLOSE_T/M15_CLOSE_T_MINUS_4))",
+      "lookback_interpretation": "1_HOUR_OF_COMPLETED_M15_STATE",
+      "continuity": "ALL_REQUIRED_M15_BUCKETS_COMPLETE_AND_EXACTLY_15M_CONTIGUOUS"
+    },
+    "M5_event_clock": {
+      "source": "AUTHENTIC_ACCEPTED_M5",
+      "role": "EVALUATE_ALIGNMENT_ONSET_ONLY",
+      "previous_evaluation_must_be_exactly_5_minutes_earlier": true
+    },
+    "scale_grid": false,
+    "centered_or_two_sided_filters": false,
+    "partial_bucket_use": false,
+    "forward_fill": false,
+    "synthetic_fill": false
+  },
+  "preentry_volatility_state": {
+    "h1_return": "LOG(H1_CLOSE_T/H1_CLOSE_T_MINUS_1)",
+    "current_rv4": "SUM_OF_SQUARED_LAST_4_COMPLETED_CONTIGUOUS_H1_RETURNS",
+    "causal_baseline": "MEDIAN_OF_PREVIOUS_40_AVAILABLE_RV4_VALUES_STRICTLY_BEFORE_CURRENT_RV4",
+    "state": "HIGH_IF_CURRENT_RV4_GT_CAUSAL_BASELINE_MEDIAN_ELSE_LOW",
+    "role": "ROBUSTNESS_STRATUM_NOT_A_POSTOUTCOME_SELECTION_AXIS"
+  },
+  "trigger": {
+    "alignment": "H4_DIRECTION_EQUALS_H1_DIRECTION_EQUALS_M15_DIRECTION_AND_COMMON_SIGN_NONZERO",
+    "onset": "ALIGNMENT_TRUE_AT_CURRENT_M5_EVALUATION_AND_PREVIOUS_VALID_CONTIGUOUS_M5_EVALUATION_NOT_ALIGNED_WITH_THE_SAME_COMMON_SIGN",
+    "signal_direction": "COMMON_ALIGNMENT_SIGN",
+    "law": "CONTINUATION_ONLY",
+    "reversion_rescue_on_same_evidence": false
+  },
+  "response_function": {
+    "type": "DIRECTIONAL_INFORMATION_RESPONSE_NOT_EXECUTABLE_EXIT",
+    "horizons_completed_contiguous_m5_bars": [
+      3,
+      6,
+      12,
+      48
+    ],
+    "approximate_active_minutes": [
+      15,
+      30,
+      60,
+      240
+    ],
+    "raw_response_bps": "SIGNAL_DIRECTION*LOG(FUTURE_M5_CLOSE/CURRENT_M5_CLOSE)*10000",
+    "volatility_normalizer": "RMS_OF_PREVIOUS_24_COMPLETED_CONTIGUOUS_H1_LOG_RETURNS",
+    "primary_normalized_response": "SIGNAL_DIRECTION*LOG(FUTURE_M5_CLOSE/CURRENT_M5_CLOSE)/PREENTRY_H1_RMS24",
+    "future_path_continuity": "EVERY_M5_TIMESTAMP_FROM_SIGNAL_TO_RESPONSE_MUST_ADVANCE_EXACTLY_300_SECONDS_OR_RESPONSE_IS_RIGHT_CENSORED",
+    "no_delay_search": true,
+    "no_hindsight_mfe_as_exit": true
+  },
+  "discovery_aggregation": {
+    "event_to_symbol_week": "MEAN_PRIMARY_NORMALIZED_RESPONSE_WITHIN_SYMBOL_X_UTC_ISO_WEEK_X_HORIZON",
+    "symbol_week_to_information_source_week": "EQUAL_WEIGHT_MEAN_ACROSS_SYMBOLS_WITH_VALID_SYMBOL_WEEK",
+    "minimum_symbols_per_pooled_week": 5,
+    "inference_cluster": "UTC_ISO_WEEK",
+    "symbol_is_primary_alpha_unit": false
+  },
+  "support_gate": {
+    "total_signal_events_across_panel_min": 480,
+    "signal_events_per_symbol_min": 60,
+    "distinct_sample_dates_per_symbol_min": 30,
+    "distinct_iso_weeks_per_symbol_min": 20,
+    "pooled_inference_weeks_min": 28,
+    "response_retention_per_symbol_horizon_min": 0.8,
+    "events_per_chronological_quarter_min": 80,
+    "high_volatility_state_events_panel_min": 80,
+    "low_volatility_state_events_panel_min": 80,
+    "support_ineligible_horizon_p_familywise": 1
+  },
+  "multiplicity": {
+    "local_family": "FOUR_RESPONSE_HORIZONS_FOR_ONE_POOLED_INFORMATION_SOURCE",
+    "test_statistic": "STUDENTIZED_MEAN_OF_WEEKLY_POOLED_NORMALIZED_RESPONSE",
+    "resampling": "9999_SHARED_ISO_WEEK_RADEMACHER_SIGN_FLIPS_APPLIED_JOINTLY_TO_ALL_4_HORIZONS",
+    "seed": 20261002,
+    "one_sided_alpha": 0.05,
+    "maxT_across_response_horizons": true,
+    "cross_symbol_maxT": false,
+    "free_best_symbol": false,
+    "generic_connected_region_gate": false
+  },
+  "development_information_lead_gate": {
+    "support_gate_pass": true,
+    "at_least_one_horizon_local_maxT_p_le": 0.05,
+    "selected_horizon_rule": "SMALLEST_LOCAL_MAXT_P_THEN_LARGEST_POOLED_T_THEN_SHORTEST_HORIZON",
+    "selected_horizon_pooled_mean_normalized_response_gt": 0,
+    "temporal_stability": "SELECTED_HORIZON_POOLED_MEAN_POSITIVE_IN_AT_LEAST_3_OF_4_CHRONOLOGICAL_QUARTERS",
+    "symbol_breadth": "SELECTED_HORIZON_SYMBOL_LEVEL_MEAN_POSITIVE_IN_AT_LEAST_4_OF_6_DEVELOPMENT_SYMBOLS",
+    "volatility_state_stability": "SELECTED_HORIZON_POOLED_MEAN_POSITIVE_IN_BOTH_PREDECLARED_HIGH_AND_LOW_VOLATILITY_STATES",
+    "top10pct_absolute_event_contribution_max": 0.5,
+    "direct_candidate_promotion": false,
+    "economic_bps_hurdle": null
+  },
+  "confirmation_architecture": {
+    "access_condition": "DEVELOPMENT_INFORMATION_LEAD_GATE_PASS",
+    "panel": [
+      {
+        "symbol": "USDCZK",
+        "symbol_id": 56,
+        "structural_role": "FX_SPOT_EXTENDED"
+      },
+      {
+        "symbol": "US400",
+        "symbol_id": 7372,
+        "structural_role": "CASH_INDEX_NEAR_24X5"
+      },
+      {
+        "symbol": "Crude-F",
+        "symbol_id": 2922,
+        "structural_role": "COMMODITY_FORWARD"
+      },
+      {
+        "symbol": "APTUSD",
+        "symbol_id": 7300,
+        "structural_role": "SPOT_CRYPTO"
+      },
+      {
+        "symbol": "NIO.US-24",
+        "symbol_id": 5479,
+        "structural_role": "EXTENDED_HOURS_US_EQUITY"
+      },
+      {
+        "symbol": "USTN5YR-F",
+        "symbol_id": 7296,
+        "structural_role": "TREASURY_FORWARD"
+      }
+    ],
+    "preferred_interval_utc": [
+      "2025-01-06T00:00:00Z",
+      "2025-06-27T23:59:59Z"
+    ],
+    "data_acquired_now": false,
+    "outcomes_opened_now": false,
+    "identity_disjoint_from_development": true,
+    "corrected_v3_145_surface_disjoint": true,
+    "selected_horizon_frozen_before_confirmation": true,
+    "no_scale_or_horizon_retuning": true,
+    "primary_test": "SAME_POOLED_INFORMATION_SOURCE_AT_FROZEN_HORIZON_ONE_SIDED_ALPHA_0.05",
+    "temporal_and_symbol_breadth_gates_repeat": true,
+    "higher_selection_control": "IF_MULTIPLE_V4_INFORMATION_SOURCES_ENTER_THE_SAME_CONFIRMATION_BATCH_USE_HOLM_FWER_0.05_ACROSS_ALL_FROZEN_SOURCE_HYPOTHESES;IF_THIS_IS_THE_ONLY_SOURCE_ALPHA_0.05",
+    "unavailable_data_rule": "DATA_LIMITED_UNTESTED_NOT_NULL_NO_POSTOUTCOME_SUBSTITUTION",
+    "protected_forward_forbidden": true
+  },
+  "economic_evaluation_law": {
+    "discovery_economic_promotion": false,
+    "fixed_universal_bps_gate": false,
+    "development_secondary_raw_bps_report": true,
+    "authentic_execution_certification_only_after_confirmation": true,
+    "required_after_confirmation": [
+      "EVENT_TIME_SIDE_AWARE_BID_ASK_AT_PROSPECTIVE_ENTRY_AND_RESPONSE_OR_EXIT_GEOMETRY",
+      "AUTHENTIC_CURRENT_AND_APPLICABLE_COMMISSION",
+      "AUTHENTIC_DEPOSIT_CURRENCY_CONVERSION",
+      "MINIMUM_VOLUME",
+      "VOLUME_STEP",
+      "EXPECTED_MARGIN",
+      "SAFE_EUR200_SIZING",
+      "REALIZED_EVENT_FREQUENCY",
+      "CAPITAL_TURNOVER",
+      "CONCURRENT_EVENT_DEPENDENCE",
+      "DOWNSIDE_TAIL",
+      "EXPECTED_LOG_GROWTH_CONTRIBUTION"
+    ],
+    "execution_or_exit_design_access": "ONLY_ON_UNTOUCHED_EVIDENCE_AFTER_INFORMATION_CONFIRMATION",
+    "quote_revision_v2_package_not_authorized_for_this_wave": true
+  },
+  "closure_law": {
+    "if_no_development_lead": "CLOSE_EXACT_CAUSAL_CROSS_SCALE_ALIGNMENT_CONTINUATION_SPECIFICATION_ON_THIS_DEVELOPMENT_PANEL_NOT_THE_CONCEPT_OF_MULTISCALE_INFORMATION",
+    "if_development_lead_but_confirmation_unavailable": "DATA_LIMITED_UNTESTED_NOT_NULL",
+    "if_confirmation_fails": "CLOSE_EXACT_INFORMATION_SOURCE_GEOMETRY_NO_EXECUTION_OR_EXIT_RESCUE",
+    "if_confirmation_passes": "PROCEED_TO_SEPARATE_PROSPECTIVE_EXECUTION_AND_ECONOMIC_CERTIFICATION_DESIGN",
+    "postoutcome_scale_direction_horizon_threshold_rescue": false
+  },
+  "governance": {
+    "v3_read_only": true,
+    "v4_real_market_outcomes_opened": false,
+    "development_outcomes_opened": false,
+    "confirmation_outcomes_opened": false,
+    "new_market_acquisition_started": false,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_trading_started": false
+  }
+}
