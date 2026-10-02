@@ -178,12 +178,123 @@ def run_calibration(null_reps: int = 20000, positive_reps: int = 4000, negative_
     }
 
 
+
+
+def pooled_t_statistics(y: np.ndarray) -> np.ndarray:
+    """Equal-weight symbol aggregation first, then weekly-cluster inference."""
+    weekly = y.mean(axis=1)
+    mean = weekly.mean(axis=1)
+    sd = weekly.std(axis=1, ddof=1)
+    return mean / (sd / np.sqrt(WEEKS))
+
+
+def pooled_temporal_stability(y: np.ndarray, selected_horizon: np.ndarray) -> np.ndarray:
+    weekly = y.mean(axis=1)
+    n = y.shape[0]
+    positive = []
+    for block in range(4):
+        block_mean = weekly[:, block * 7 : (block + 1) * 7, :].mean(axis=1)
+        positive.append(block_mean[np.arange(n), selected_horizon] > 0)
+    return np.stack(positive, axis=1).sum(axis=1) >= 3
+
+
+def pooled_symbol_breadth(y: np.ndarray, selected_horizon: np.ndarray) -> np.ndarray:
+    symbol_mean = y.mean(axis=2)
+    n = y.shape[0]
+    selected = symbol_mean[
+        np.arange(n)[:, None],
+        np.arange(SYMBOLS)[None, :],
+        selected_horizon[:, None],
+    ]
+    return (selected > 0).sum(axis=1) >= 4
+
+
+def pooled_connected_region_surrogate(t: np.ndarray) -> np.ndarray:
+    z = 1.645
+    return (
+        ((t[:, 0] > z) & (t[:, 1] > z) & (t[:, 2] > z))
+        | ((t[:, 1] > z) & (t[:, 2] > z) & (t[:, 3] > z))
+    )
+
+
+def evaluate_pooled(y: np.ndarray, local_threshold: float) -> dict[str, float]:
+    t = pooled_t_statistics(y)
+    local_max = t.max(axis=1)
+    rejected = local_max > local_threshold
+    selected = np.argmax(t, axis=1)
+    temporal = pooled_temporal_stability(y, selected)
+    breadth = pooled_symbol_breadth(y, selected)
+    old = pooled_connected_region_surrogate(t)
+    return {
+        "pooled_local_maxT": float(rejected.mean()),
+        "pooled_local_maxT_plus_temporal_stability": float((rejected & temporal).mean()),
+        "pooled_local_maxT_plus_temporal_and_breadth": float((rejected & temporal & breadth).mean()),
+        "old_connected_region_surrogate": float(old.mean()),
+    }
+
+
+def simulate_pooled_effect(n: int, target_cluster_mean_se_bps: float, effect_bps: float, rng: np.random.Generator) -> np.ndarray:
+    y = simulate(n, target_cluster_mean_se_bps, 0.0, rng)
+    if effect_bps:
+        y += float(effect_bps) * EFFECT_SHAPE[None, None, None, :]
+    return y
+
+
+def run_pooled_calibration(null_reps: int = 20000, positive_reps: int = 4000, negative_reps: int = 12000) -> dict:
+    null = simulate_pooled_effect(null_reps, 1.0, 0.0, np.random.default_rng(SEED + 20000))
+    null_max = pooled_t_statistics(null).max(axis=1)
+    threshold = float(np.quantile(null_max, 0.95, method="higher"))
+
+    negative = simulate_pooled_effect(negative_reps, 1.0, 0.0, np.random.default_rng(SEED + 20999))
+    negative_result = evaluate_pooled(negative, threshold)
+
+    regimes = {}
+    for se in TARGET_SE_REGIMES:
+        rows = []
+        for j, effect in enumerate(EFFECT_GRID):
+            y = simulate_pooled_effect(
+                positive_reps,
+                se,
+                effect,
+                np.random.default_rng(SEED + 30000 + int(se) * 100 + j),
+            )
+            row = {"effect_bps": effect, **evaluate_pooled(y, threshold)}
+            rows.append(row)
+        mde = {}
+        for key in (
+            "pooled_local_maxT",
+            "pooled_local_maxT_plus_temporal_stability",
+            "pooled_local_maxT_plus_temporal_and_breadth",
+            "old_connected_region_surrogate",
+        ):
+            mde[key] = {
+                "power_50pct_bps": interpolate_mde(rows, key, 0.50),
+                "power_80pct_bps": interpolate_mde(rows, key, 0.80),
+                "power_90pct_bps": interpolate_mde(rows, key, 0.90),
+            }
+        regimes[str(int(se))] = {
+            "detection_probability_by_effect": rows,
+            "mde": mde,
+        }
+    return {
+        "seed": SEED,
+        "null_reps": null_reps,
+        "positive_reps_per_effect_per_regime": positive_reps,
+        "negative_control_reps": negative_reps,
+        "pooled_local_maxT_95pct_threshold": threshold,
+        "negative_control": negative_result,
+        "noise_regimes": regimes,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path)
     parser.add_argument("--quick", action="store_true")
+    parser.add_argument("--mode", choices=("symbol_families", "pooled_information_source"), default="pooled_information_source")
     args = parser.parse_args()
-    result = run_calibration(
+    runner = run_pooled_calibration if args.mode == "pooled_information_source" else run_calibration
+    result = runner(
         null_reps=2000 if args.quick else 20000,
         positive_reps=400 if args.quick else 4000,
         negative_reps=1200 if args.quick else 12000,
