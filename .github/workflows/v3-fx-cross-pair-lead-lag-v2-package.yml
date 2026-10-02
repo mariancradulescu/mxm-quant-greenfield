@@ -1,10 +1,11 @@
-name: V3 FX cross-pair lead-lag V2 diagnostic package
+name: V3 FX cross-pair lead-lag V2 historical diagnostic package
+
 on:
-  push:
-    branches: [performance-research-v3-20260922]
   workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+
 jobs:
   validate-and-package:
     runs-on: ubuntu-latest
@@ -24,17 +25,14 @@ jobs:
       - name: Verify frozen authorities
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -c "from pathlib import Path; from research_core_v3.fx_cross_pair_quote_lead_lag_capture import offline_preflight; g=offline_preflight(Path('.')); assert g['primary_tests']==72 and g['relationships']==6 and g['symbols']==4 and g['base_side_requests_before_pagination']==624 and g['diagnostic_horizon_seconds']==900; print('LEAD_LAG_V2_PREFLIGHT_PASS',g)"
-      - name: Build deterministic package
+      - name: Build deterministic package without mutating canonical state
         run: |
           PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_fx_cross_pair_quote_lead_lag_v2_package.py
           sha256sum dist/MXM_V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_PACKAGE_V2_DIAGNOSTIC.zip
-      - name: Persist package authority
+      - name: Assert historical canonical authority was not rewritten
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PACKAGE_AUTHORITY_V2.json
-          if git diff --cached --quiet; then echo "Authority already current"; else git commit -m "Authorize diagnostic-observable FX lead-lag V2 package [skip ci]" && git push origin HEAD:performance-research-v3-20260922; fi
-      - name: Upload authoritative package
+          git diff --exit-code -- research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PACKAGE_AUTHORITY_V2.json
+      - name: Upload historical validation package
         uses: actions/upload-artifact@v4
         with:
           name: MXM_V3_FX_CROSS_PAIR_QUOTE_LEAD_LAG_PILOT_PACKAGE_V2_DIAGNOSTIC
