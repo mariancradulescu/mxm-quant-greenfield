@@ -1,0 +1,435 @@
+{
+  "schema": "mxm.research-core-v4.real-support-skeleton-audit.v1",
+  "status": "COMPLETE_OUTCOME_BLIND_SUPPORT_GEOMETRY_ALL_24_DEVELOPMENT_LEAVES_FEASIBLE",
+  "as_of_date": "2026-10-02",
+  "scientific_design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "scientific_design_changed": false,
+  "outcome_boundary": {
+    "future_response_values_read": false,
+    "future_returns_computed": false,
+    "mfe_computed": false,
+    "mae_computed": false,
+    "pnl_computed": false,
+    "response_path_availability_uses_timestamps_only": true,
+    "broker_contacted": false,
+    "protected_forward_opened": false
+  },
+  "sources": {
+    "canonical_manifest": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+    "original_archive": {
+      "name": "MXM_RESEARCH_CORE_V3_SELECTED_M5_DEVELOPMENT.zip",
+      "sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259"
+    },
+    "delta_archive": {
+      "name": "MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_M5.zip",
+      "sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    },
+    "archive_hashes_match_canonical_manifest": true
+  },
+  "skeleton": {
+    "row_count": 95506,
+    "canonical_sha256": "e79db90359e473e51de464ccddf400136c4cbaeedabada87975ac6961f6e9aee",
+    "columns": [
+      "context",
+      "symbol",
+      "symbol_id",
+      "trigger_time_utc",
+      "signal_direction",
+      "vol_state",
+      "arm",
+      "iso_week",
+      "avail_h3",
+      "avail_h6",
+      "avail_h12",
+      "avail_h48",
+      "utc_hour",
+      "day_of_week",
+      "session_label",
+      "dst_regime"
+    ],
+    "generator_local_sha256": "f87ce154dac4ffcee509d7a3764c2f75be1ed7df81ad25133bba3a96200c197e"
+  },
+  "exact_counts": [
+    {
+      "context": "FX_SPOT",
+      "ref": "research_core_v4/support/V4_SUPPORT_COUNTS_FX_SPOT_V1.csv",
+      "data_rows": 1272,
+      "sha256": "d9191ac459cedfb4896ba3a5103cf8e3357f33ccd67ec29464d6c0c64efeed5e",
+      "size_bytes": 75299
+    },
+    {
+      "context": "SPOT_CRYPTO",
+      "ref": "research_core_v4/support/V4_SUPPORT_COUNTS_SPOT_CRYPTO_V1.csv",
+      "data_rows": 1272,
+      "sha256": "20234c7511c71c470ea3ac473b34858bebd1e9b25250b9453ae7130db3f4e457",
+      "size_bytes": 85120
+    },
+    {
+      "context": "US_EQUITY_EXTENDED_HOURS",
+      "ref": "research_core_v4/support/V4_SUPPORT_COUNTS_US_EQUITY_EXTENDED_HOURS_V1.csv",
+      "data_rows": 1247,
+      "sha256": "fb3b0bb7fff984066e106a89482c89f4ab86cebaab285e191f2ed1c05d7fe9e5",
+      "size_bytes": 100565
+    }
+  ],
+  "state_engine": {
+    "M5_timestamp_semantics": "BAR_OPEN_UTC",
+    "completed_M15": "3_EXACT_CONSECUTIVE_M5_BARS_UTC_ALIGNED_NO_FILL",
+    "completed_H1": "12_EXACT_CONSECUTIVE_M5_BARS_UTC_ALIGNED_NO_FILL",
+    "completed_H4": "48_EXACT_CONSECUTIVE_M5_BARS_UTC_ALIGNED_NO_FILL",
+    "M15_direction": "SIGN_LOG_CLOSE_OVER_CLOSE_4_COMPLETED_M15_BUCKETS_BACK_WITH_CONTIGUITY",
+    "M15_transition": "CURRENT_DIRECTION_NONZERO_AND_DIFFERS_FROM_PREVIOUS_VALID_CONTIGUOUS_M15_DIRECTION",
+    "H1_direction": "SIGN_LOG_CLOSE_OVER_CLOSE_4_COMPLETED_H1_BUCKETS_BACK",
+    "H4_direction": "SIGN_LOG_CLOSE_OVER_CLOSE_3_COMPLETED_H4_BUCKETS_BACK",
+    "higher_scale_availability": "LATEST_FULLY_COMPLETED_STATE_WITH_BUCKET_END_LE_TRIGGER_TIME",
+    "full_arm": "H1_DIRECTION_EQUALS_M15_SIGNAL_DIRECTION_AND_H4_DIRECTION_EQUALS_M15_SIGNAL_DIRECTION",
+    "baseline_arm": "BOTH_H1_H4_STATES_AVAILABLE_AND_NOT_FULL_ARM",
+    "volatility_state": "RV4_OF_LAST_4_CONTIGUOUS_H1_RETURNS_VERSUS_MEDIAN_OF_PRIOR_40_AVAILABLE_RV4_VALUES_STRICTLY_PREENTRY",
+    "path_mask": "H_FUTURE_M5_BAR_OPEN_TIMESTAMPS_EXIST_CONTIGUOUSLY_FROM_TRIGGER;NO_FUTURE_CLOSE_READ"
+  },
+  "aggregation_geometry": {
+    "paired_unit": "SYMBOL_X_ISO_WEEK_X_DIRECTION_X_VOL_STATE_X_HORIZON_REQUIRES_FULL_AND_BASELINE_PATH_AVAILABLE_EVENTS",
+    "direction_weighting": "EQUAL_WEIGHT_AVAILABLE_LONG_AND_SHORT_PAIRED_CONTRASTS",
+    "symbol_weighting": "EQUAL_WEIGHT_VALID_SYMBOL_REPLICATES_WITHIN_CONTEXT_WEEK",
+    "development_min_symbols_per_context_week": 4,
+    "two_week_anchor_utc": "2025-09-15T00:00:00Z",
+    "valid_two_week_block": "BOTH_CONSTITUENT_WEEKS_VALID_WITH_AT_LEAST_4_SYMBOLS"
+  },
+  "context_event_counts": {
+    "FX_SPOT": {
+      "events": 28842,
+      "full": 7619,
+      "baseline": 21223,
+      "LOW": {
+        "full": 3910,
+        "baseline": 11845
+      },
+      "HIGH": {
+        "full": 3709,
+        "baseline": 9378
+      },
+      "iso_weeks": 53
+    },
+    "SPOT_CRYPTO": {
+      "events": 45269,
+      "full": 11830,
+      "baseline": 33439,
+      "LOW": {
+        "full": 5892,
+        "baseline": 18226
+      },
+      "HIGH": {
+        "full": 5938,
+        "baseline": 15213
+      },
+      "iso_weeks": 53
+    },
+    "US_EQUITY_EXTENDED_HOURS": {
+      "events": 21395,
+      "full": 5637,
+      "baseline": 15758,
+      "LOW": {
+        "full": 2589,
+        "baseline": 8471
+      },
+      "HIGH": {
+        "full": 3048,
+        "baseline": 7287
+      },
+      "iso_weeks": 53
+    }
+  },
+  "leaf_support": [
+    [
+      "FX_SPOT",
+      "LOW",
+      3,
+      636,
+      612,
+      0.0377358491,
+      3884,
+      11769,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "LOW",
+      6,
+      636,
+      611,
+      0.0393081761,
+      3862,
+      11715,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "LOW",
+      12,
+      636,
+      610,
+      0.0408805031,
+      3815,
+      11580,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "LOW",
+      48,
+      636,
+      604,
+      0.0503144654,
+      3669,
+      11083,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "HIGH",
+      3,
+      636,
+      614,
+      0.034591195,
+      3702,
+      9352,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "HIGH",
+      6,
+      636,
+      614,
+      0.034591195,
+      3697,
+      9334,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "HIGH",
+      12,
+      636,
+      614,
+      0.034591195,
+      3687,
+      9306,
+      26
+    ],
+    [
+      "FX_SPOT",
+      "HIGH",
+      48,
+      636,
+      608,
+      0.0440251572,
+      3501,
+      8846,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "LOW",
+      3,
+      636,
+      633,
+      0.0047169811,
+      5884,
+      18185,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "LOW",
+      6,
+      636,
+      632,
+      0.0062893082,
+      5867,
+      18140,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "LOW",
+      12,
+      636,
+      632,
+      0.0062893082,
+      5846,
+      18049,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "LOW",
+      48,
+      636,
+      632,
+      0.0062893082,
+      5745,
+      17764,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "HIGH",
+      3,
+      636,
+      632,
+      0.0062893082,
+      5931,
+      15174,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "HIGH",
+      6,
+      636,
+      632,
+      0.0062893082,
+      5919,
+      15145,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "HIGH",
+      12,
+      636,
+      632,
+      0.0062893082,
+      5900,
+      15095,
+      26
+    ],
+    [
+      "SPOT_CRYPTO",
+      "HIGH",
+      48,
+      636,
+      630,
+      0.0094339623,
+      5705,
+      14646,
+      26
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "LOW",
+      3,
+      625,
+      557,
+      0.1088,
+      2570,
+      8417,
+      25
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "LOW",
+      6,
+      625,
+      555,
+      0.112,
+      2549,
+      8356,
+      25
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "LOW",
+      12,
+      625,
+      548,
+      0.1232,
+      2516,
+      8225,
+      25
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "LOW",
+      48,
+      625,
+      526,
+      0.1584,
+      2374,
+      7737,
+      24
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "HIGH",
+      3,
+      622,
+      566,
+      0.0900321543,
+      3037,
+      7240,
+      26
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "HIGH",
+      6,
+      622,
+      564,
+      0.0932475884,
+      3016,
+      7210,
+      25
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "HIGH",
+      12,
+      622,
+      563,
+      0.0948553055,
+      2973,
+      7116,
+      25
+    ],
+    [
+      "US_EQUITY_EXTENDED_HOURS",
+      "HIGH",
+      48,
+      622,
+      544,
+      0.1254019293,
+      2690,
+      6435,
+      25
+    ]
+  ],
+  "leaf_support_columns": [
+    "context",
+    "vol_state",
+    "horizon_m5",
+    "eligible_units_before_pairing",
+    "paired_units",
+    "pairing_loss_fraction",
+    "full_available_events",
+    "baseline_available_events",
+    "valid_two_week_blocks"
+  ],
+  "support_verdict": {
+    "all_24_leaves_meet_v2_min_12_blocks": true,
+    "all_contexts_have_large_full_and_baseline_support": true,
+    "worst_pairing_loss_leaf": "US_EQUITY_EXTENDED_HOURS_LOW_H48",
+    "worst_pairing_loss_fraction": 0.1584,
+    "minimum_valid_two_week_blocks": 24,
+    "scientific_design_v2_support_geometry": "FEASIBLE_WITH_WIDE_MARGIN"
+  },
+  "nonselection_diagnostics_frozen": [
+    "UTC_HOUR_OF_TRIGGER",
+    "DAY_OF_WEEK",
+    "DETERMINISTIC_SESSION_LABEL",
+    "US_EQUITY_DST_REGIME",
+    "FULL_BASELINE_EVENT_COUNTS_BY_SESSION"
+  ],
+  "diagnostics_use_rule": "EXPLANATION_ONLY_NOT_SELECTION_RESCUE_OR_RETUNING_ON_FIRST_WAVE_V2"
+}
