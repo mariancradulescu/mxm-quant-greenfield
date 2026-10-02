@@ -5,7 +5,10 @@ import math
 import time
 from datetime import datetime, timedelta, timezone
 
-from research_core_v4 import response_evaluator_v3 as ev
+try:
+    from research_core_v4 import response_evaluator_v3 as ev
+except ModuleNotFoundError:
+    import response_evaluator_v3 as ev
 
 
 def synthetic_fixture(n: int = 6000):

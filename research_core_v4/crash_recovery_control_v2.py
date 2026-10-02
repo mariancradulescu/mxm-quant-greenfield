@@ -4,7 +4,10 @@ import hashlib
 import json
 from pathlib import Path
 
-from research_core_v4.crash_recovery_control_v1 import validate_current_control_plane as validate_v1
+try:
+    from research_core_v4.crash_recovery_control_v1 import validate_current_control_plane as validate_v1
+except ModuleNotFoundError:
+    from crash_recovery_control_v1 import validate_current_control_plane as validate_v1
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / "research_core_v4/state/V4_STATE.json"
