@@ -1,0 +1,355 @@
+{
+  "schema": "mxm.research-core-v4.detector-calibration-result.v2",
+  "status": "COMPLETE_POOLED_INFORMATION_SOURCE_CALIBRATION_NO_MARKET_OUTCOMES",
+  "spec_ref": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V2.json",
+  "spec_commit": "2bc59b19f49a4ab4779e7ec5240b954676b7e028",
+  "engine_ref": "research_core_v4/detector_calibration.py",
+  "engine_commit": "1576f475f01e5f86794b7584bd1c6c37bbfa3397",
+  "real_market_outcomes_opened": false,
+  "broker_contacted": false,
+  "protected_forward_opened": false,
+  "seed": 20261002,
+  "pooled_local_maxT_95pct_threshold": 2.930473831016276,
+  "negative_control": {
+    "pooled_local_maxT_false_positive_rate": 0.0505,
+    "pooled_plus_temporal_false_positive_rate": 0.0505,
+    "pooled_plus_temporal_and_breadth_false_positive_rate": 0.050333333333333334,
+    "old_connected_region_surrogate_false_positive_rate": 0.0345,
+    "prior_v1_any_of_6_local_without_selection_control_fwer": 0.258,
+    "prior_v1_holm6_global_fwer": 0.049916666666666665
+  },
+  "effect_grid_bps": [
+    0.25,
+    0.5,
+    1,
+    2,
+    3,
+    5,
+    8,
+    10,
+    15,
+    20
+  ],
+  "noise_regimes": {
+    "5": {
+      "detection_probability_by_effect": [
+        [
+          0.25,
+          0.0545,
+          0.0545,
+          0.0545,
+          0.03975
+        ],
+        [
+          0.5,
+          0.05425,
+          0.054,
+          0.054,
+          0.042
+        ],
+        [
+          1,
+          0.082,
+          0.082,
+          0.082,
+          0.06
+        ],
+        [
+          2,
+          0.1175,
+          0.1175,
+          0.1175,
+          0.09225
+        ],
+        [
+          3,
+          0.18625,
+          0.186,
+          0.18575,
+          0.15475
+        ],
+        [
+          5,
+          0.382,
+          0.3815,
+          0.38075,
+          0.30525
+        ],
+        [
+          8,
+          0.69975,
+          0.6995,
+          0.69925,
+          0.571
+        ],
+        [
+          10,
+          0.85175,
+          0.8515,
+          0.85125,
+          0.71875
+        ],
+        [
+          15,
+          0.992,
+          0.992,
+          0.992,
+          0.93575
+        ],
+        [
+          20,
+          0.9995,
+          0.9995,
+          0.9995,
+          0.9875
+        ]
+      ],
+      "columns": [
+        "effect_bps",
+        "pooled_local_maxT",
+        "plus_temporal",
+        "plus_temporal_and_breadth",
+        "old_connected_surrogate"
+      ],
+      "mde": {
+        "pooled_local_maxT": {
+          "p50": 6.114083398898505,
+          "p80": 9.319078947368421,
+          "p90": 11.720142602495544
+        },
+        "plus_temporal": {
+          "p50": 6.117924528301887,
+          "p80": 9.322368421052632,
+          "p90": 11.725978647686834
+        },
+        "plus_temporal_and_breadth": {
+          "p50": 6.123233908948195,
+          "p80": 9.325657894736842,
+          "p90": 11.731793960923625
+        },
+        "old_connected_surrogate": {
+          "p50": 7.198494825964252,
+          "p80": 11.872119815668205,
+          "p90": 14.176267281105993
+        }
+      }
+    },
+    "10": {
+      "detection_probability_by_effect": [
+        [
+          0.25,
+          0.05525,
+          0.05525,
+          0.05525,
+          0.0365
+        ],
+        [
+          0.5,
+          0.054,
+          0.05375,
+          0.05375,
+          0.03625
+        ],
+        [
+          1,
+          0.061,
+          0.061,
+          0.061,
+          0.0445
+        ],
+        [
+          2,
+          0.08125,
+          0.08125,
+          0.081,
+          0.06125
+        ],
+        [
+          3,
+          0.09875,
+          0.09875,
+          0.098,
+          0.0765
+        ],
+        [
+          5,
+          0.1545,
+          0.154,
+          0.15375,
+          0.12675
+        ],
+        [
+          8,
+          0.27025,
+          0.26975,
+          0.26925,
+          0.21675
+        ],
+        [
+          10,
+          0.371,
+          0.3705,
+          0.36975,
+          0.3055
+        ],
+        [
+          15,
+          0.66125,
+          0.66125,
+          0.661,
+          0.52325
+        ],
+        [
+          20,
+          0.85525,
+          0.855,
+          0.85475,
+          0.732
+        ]
+      ],
+      "columns": [
+        "effect_bps",
+        "pooled_local_maxT",
+        "plus_temporal",
+        "plus_temporal_and_breadth",
+        "old_connected_surrogate"
+      ],
+      "mde": {
+        "pooled_local_maxT": {
+          "p50": 12.222222222222221,
+          "p80": 18.576030927835053,
+          "p90": ">20"
+        },
+        "plus_temporal": {
+          "p50": 12.226999140154772,
+          "p80": 18.580645161290324,
+          "p90": ">20"
+        },
+        "plus_temporal_and_breadth": {
+          "p50": 12.236051502145923,
+          "p80": 18.587096774193547,
+          "p90": ">20"
+        },
+        "old_connected_surrogate": {
+          "p50": 14.466130884041332,
+          "p80": ">20",
+          "p90": ">20"
+        }
+      }
+    },
+    "20": {
+      "detection_probability_by_effect": [
+        [
+          0.25,
+          0.051,
+          0.051,
+          0.05025,
+          0.03775
+        ],
+        [
+          0.5,
+          0.06,
+          0.06,
+          0.0595,
+          0.039
+        ],
+        [
+          1,
+          0.05525,
+          0.05525,
+          0.05525,
+          0.038
+        ],
+        [
+          2,
+          0.062,
+          0.062,
+          0.0615,
+          0.0425
+        ],
+        [
+          3,
+          0.06925,
+          0.06925,
+          0.069,
+          0.04925
+        ],
+        [
+          5,
+          0.0905,
+          0.09,
+          0.09,
+          0.0655
+        ],
+        [
+          8,
+          0.12075,
+          0.12025,
+          0.12,
+          0.09625
+        ],
+        [
+          10,
+          0.15425,
+          0.15375,
+          0.15275,
+          0.124
+        ],
+        [
+          15,
+          0.25225,
+          0.25175,
+          0.251,
+          0.2125
+        ],
+        [
+          20,
+          0.38375,
+          0.38275,
+          0.3825,
+          0.3105
+        ]
+      ],
+      "columns": [
+        "effect_bps",
+        "pooled_local_maxT",
+        "plus_temporal",
+        "plus_temporal_and_breadth",
+        "old_connected_surrogate"
+      ],
+      "mde": {
+        "pooled_local_maxT": {
+          "p50": ">20",
+          "p80": ">20",
+          "p90": ">20"
+        },
+        "plus_temporal": {
+          "p50": ">20",
+          "p80": ">20",
+          "p90": ">20"
+        },
+        "plus_temporal_and_breadth": {
+          "p50": ">20",
+          "p80": ">20",
+          "p90": ">20"
+        },
+        "old_connected_surrogate": {
+          "p50": ">20",
+          "p80": ">20",
+          "p90": ">20"
+        }
+      }
+    }
+  },
+  "conclusions": [
+    "POOLED_LOCAL_MAXT_CONTROLS_NEGATIVE_CONTROL_AT_APPROX_5_PERCENT",
+    "V1_SYMBOL_AS_FAMILY_ARCHITECTURE_WITHOUT_HIGHER_CONTROL_INFLATED_SIX_FAMILY_FWER_TO_APPROX_25_8_PERCENT",
+    "HOLM_REPAIRED_FWER_BUT_SPENT_SUBSTANTIAL_DEVELOPMENT_POWER",
+    "POOLED_INFORMATION_SOURCE_UNIT_REMOVES_THE_FREE_BEST_SYMBOL_PROBLEM_AT_DISCOVERY_BY_CONSTRUCTION",
+    "TEMPORAL_AND_BREADTH_GATES_ADD_NEGLIGIBLE_POWER_LOSS_IN_THE_PERSISTENT_POSITIVE_CONTROL",
+    "OLD_CONNECTED_REGION_SURROGATE_COSTS_MORE_POWER_AND_IS_NOT_REQUIRED_IN_V4",
+    "AT_REPRESENTATIVE_10_BPS_CLUSTER_SE_THE_POOLED_ENGINE_REQUIRES_APPROX_12_22_BPS_FOR_50_PERCENT_AND_18_58_BPS_FOR_80_PERCENT_POWER_UNDER_THIS_SYNTHETIC_MODEL"
+  ],
+  "architectural_decision": "USE_ONE_POOLED_INFORMATION_SOURCE_FAMILY_ACROSS_A_STRUCTURAL_PANEL;MAXT_ONLY_ACROSS_RESPONSE_HORIZONS;SYMBOLS_ARE_BREADTH_CHECKS;HIGHER_SELECTION_IS_PAID_ONLY_WHEN_MULTIPLE_INFORMATION_SOURCES_OR_CONFIRMATION_HYPOTHESES_EXIST",
+  "caution": "METHOD_CALIBRATION_ONLY_NOT_EVIDENCE_OF_MARKET_EDGE"
+}
