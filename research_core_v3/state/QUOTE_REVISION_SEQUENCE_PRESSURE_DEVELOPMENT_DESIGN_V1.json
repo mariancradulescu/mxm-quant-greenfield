@@ -1,0 +1,194 @@
+{
+  "schema": "mxm.research-core-v3.quote-revision-sequence-pressure-development-design.v1",
+  "status": "FROZEN_PREOUTCOME_BEFORE_NEW_TICK_ACQUISITION",
+  "preoutcome_audit_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_PREOUTCOME_AUDIT_V1.json",
+  "preoutcome_audit_commit": "579a4e524a8c437831723cdb12403331bf52080e",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "pilot_symbols": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116
+    }
+  ],
+  "calendar_binding": {
+    "dates_utc": [
+      "2025-09-18",
+      "2025-10-02",
+      "2025-10-16",
+      "2025-10-30",
+      "2025-11-13",
+      "2025-11-27",
+      "2025-12-11",
+      "2025-12-25",
+      "2026-01-08",
+      "2026-01-22",
+      "2026-02-05",
+      "2026-02-19",
+      "2026-03-05",
+      "2026-03-19",
+      "2026-04-02",
+      "2026-04-16",
+      "2026-04-30",
+      "2026-05-14",
+      "2026-05-28",
+      "2026-06-11",
+      "2026-06-25",
+      "2026-07-09",
+      "2026-07-23",
+      "2026-08-06",
+      "2026-08-20",
+      "2026-09-03"
+    ],
+    "date_count": 26,
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "symbol_hours": 390
+  },
+  "quote_state": {
+    "evaluation_grid": "INTEGER_UTC_SECONDS",
+    "bid": "LATEST_BID_TICK_AT_OR_BEFORE_T",
+    "ask": "LATEST_ASK_TICK_AT_OR_BEFORE_T",
+    "freshness": "BOTH_SIDE_AGES_LE_2000MS_AND_ASK_GE_BID_GT_0",
+    "mid": "(BID+ASK)/2",
+    "spread_bps": "LOG(ASK/BID)*10000",
+    "baseline_window_seconds": 60,
+    "minimum_valid_baseline_snapshots": 45,
+    "median_spread_baseline": "MEDIAN_VALID_SPREAD_BPS_OVER_T_MINUS_60_THROUGH_T_MINUS_1;REQUIRE_GT_0"
+  },
+  "causal_feature_law": {
+    "price_changing_revision": "FOR_EACH_SIDE_SEPARATELY_COMPARE_EACH_TICK_PRICE_TO_THE_IMMEDIATELY_PRECEDING_TICK_ON_THAT_SIDE;UNCHANGED_PRICE_TICKS_DO_NOT_ENTER_DIRECTIONAL_COUNTS",
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "directional_revision_counts": "UP_COUNT_AND_DOWN_COUNT_ACROSS_BID_AND_ASK_PRICE_CHANGING_REVISIONS_IN_OPEN_CLOSED_INTERVAL_(T-L,T]",
+    "minimum_directional_revision_count": 6,
+    "signed_revision_imbalance": "(UP_COUNT-DOWN_COUNT)/(UP_COUNT+DOWN_COUNT)",
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "net_mid_displacement_units": "ABS(LOG(MID_T/MID_T_MINUS_L)*10000)/MEDIAN_SPREAD_BASELINE",
+    "maximum_abs_net_mid_displacement_units": 0.75,
+    "novelty_guard": "THE_MAXIMUM_NET_MID_DISPLACEMENT_CONSTRAINT_PREVENTS_THE_SIGNAL_FROM_BECOMING_A_HIDDEN_RETEST_OF_THE_CLOSED_LARGE_QUOTE_IMPULSE_FAMILY",
+    "spread_filter": "SPREAD_BPS_T_LE_MEDIAN_SPREAD_BASELINE",
+    "signal": "FRESH_VALID_STATE_AT_T_AND_T_MINUS_L;DIRECTIONAL_REVISION_COUNT_GE_6;ABS_SIGNED_REVISION_IMBALANCE_GE_THRESHOLD;NET_MID_DISPLACEMENT_UNITS_LE_0.75;SPREAD_FILTER_PASS",
+    "base_direction": "LONG_IF_SIGNED_REVISION_IMBALANCE_POSITIVE_SHORT_IF_NEGATIVE"
+  },
+  "parameter_grid": {
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "direction_law": [
+      "CONTINUATION",
+      "REVERSION"
+    ],
+    "holding_seconds": [
+      10,
+      30,
+      90
+    ]
+  },
+  "cells_per_symbol": 24,
+  "total_test_count": 120,
+  "execution_and_response": {
+    "signal_time": "INTEGER_SECOND_T_AFTER_ALL_TICKS_TIMESTAMPED_LE_T_PROCESSED",
+    "entry": "FRESH_SIDE_AWARE_QUOTE_EXACTLY_AT_T_PLUS_1_SECOND",
+    "continuation": "TRADE_BASE_DIRECTION",
+    "reversion": "TRADE_OPPOSITE_BASE_DIRECTION",
+    "exit": "FRESH_SIDE_AWARE_QUOTE_EXACTLY_HOLDING_SECONDS_AFTER_ENTRY",
+    "long_spread_net_bps": "LOG(EXIT_BID/ENTRY_ASK)*10000",
+    "short_spread_net_bps": "LOG(ENTRY_BID/EXIT_ASK)*10000",
+    "overlap": "WITHIN_EACH_SYMBOL_X_FROZEN_CELL_IGNORE_NEW_SIGNALS_UNTIL_SCHEDULED_EXIT",
+    "missing": "ENTRY_OR_EXIT_OR_REQUIRED_SIGNAL_STATE_NOT_FRESH_EQUALS_RIGHT_CENSOR;NO_DELAY_SEARCH_INTERPOLATION_OR_STALE_REPAIR",
+    "commission": "NOT_SUBTRACTED_IN_PRIMARY_SPREAD_NET_TEST;ANY_ROBUST_SURVIVOR_MUST_PASS_AUTHENTIC_CURRENT_COMMISSION_VOLUME_MARGIN_AND_EUR200_GATES"
+  },
+  "support_and_economic_gate": {
+    "completed_events_min": 100,
+    "distinct_sample_dates_min": 18,
+    "distinct_iso_weeks_min": 10,
+    "retention_fraction_min": 0.8,
+    "mean_spread_net_bps_min": 2,
+    "median_spread_net_bps_min": 0,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5
+  },
+  "multiplicity": {
+    "local_family": "SEPARATE_24_CELL_FAMILY_PER_SYMBOL",
+    "dependence_cluster": "SAMPLED_UTC_DATE",
+    "procedure": "SHARED_SAMPLED_DATE_WILD_SIGN_MAX_T_WITHIN_EACH_SYMBOL",
+    "resamples": 4999,
+    "seed_rule": "20261002_PLUS_SYMBOL_ID",
+    "local_familywise_alpha": 0.05,
+    "higher_selection_layer": "BONFERRONI_ACROSS_5_INTERCHANGEABLE_SYMBOL_FAMILIES",
+    "required_local_familywise_p_for_wave_promotion": 0.01,
+    "no_free_best_symbol": true,
+    "support_ineligible_cells_assigned_p1": true
+  },
+  "robust_region_gate": {
+    "within": "SAME_SYMBOL_AND_SAME_DIRECTION_LAW",
+    "adjacency": "ONE_STEP_IN_LOOKBACK_OR_IMBALANCE_THRESHOLD_OR_HOLDING_HORIZON",
+    "minimum_connected_full_pass_cells": 3,
+    "minimum_varied_parameter_dimensions": 2,
+    "cross_direction_adjacency_forbidden": true,
+    "single_cell_promotion_forbidden": true
+  },
+  "permanent_close_rule": {
+    "exact_symbol_subfamily": "IF_NO_CONNECTED_FULL_PASS_REGION_MEETS_LOCAL_MAXT_AND_HIGHER_SELECTION_LAYER_THAT_SYMBOL_EXACT_SPECIFICATION_CLOSES",
+    "whole_wave": "IF_NO_SYMBOL_HAS_A_PROMOTABLE_ROBUST_REGION_CLOSE_THIS_EXACT_REVISION_SEQUENCE_SUBFAMILY_ON_THIS_PANEL_AND_CALENDAR",
+    "post_outcome_threshold_lookback_direction_hold_or_exit_rescue": false,
+    "broader_quote_microstructure_global_exhaustion": false
+  },
+  "survivor_boundary": {
+    "freeze_exact_events_and_timestamps": true,
+    "authentic_bid_ask_already_in_primary_spread_net": true,
+    "next_gates": [
+      "AUTHENTIC_COMMISSION",
+      "MINIMUM_VOLUME",
+      "VOLUME_STEP",
+      "MARGIN",
+      "SAFE_EUR200_SIZING",
+      "LEGITIMATE_DISJOINT_CONFIRMATION"
+    ],
+    "hard21_required_for_individual_sleeve": false
+  },
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_freeze_from_development": false,
+    "runtime_v2_reactivated": false
+  }
+}
