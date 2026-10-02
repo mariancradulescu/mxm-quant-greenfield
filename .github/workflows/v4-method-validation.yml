@@ -31,19 +31,20 @@ jobs:
       - name: Static compile
         run: |
           python -m py_compile \
-            research_core_v4/detector_calibration.py \
-            research_core_v4/detector_calibration_v3.py \
-            research_core_v4/response_evaluator_v2.py \
-            research_core_v4/exact_geometry_calibration_v1.py
+            research_core_v4/frozen_v2_semantics.py \
+            research_core_v4/response_evaluator_v3.py \
+            research_core_v4/exact_geometry_calibration_v2.py \
+            research_core_v4/development_execution_runner_v1.py
       - name: Preoutcome architecture and evaluator invariants
         run: |
           python -m unittest \
             tests.test_research_core_v4_method \
             tests.test_research_core_v4_response_evaluator \
-            tests.test_research_core_v4_support_geometry
+            tests.test_research_core_v4_support_geometry \
+            tests.test_research_core_v4_execution_binding
       - name: Exact real-support geometry synthetic calibration smoke
         run: |
-          python research_core_v4/exact_geometry_calibration_v1.py \
+          python research_core_v4/exact_geometry_calibration_v2.py \
             --support-root research_core_v4/support \
             --smoke \
             --output /tmp/exact_geometry_smoke.json
@@ -59,7 +60,7 @@ jobs:
           PY
       - name: Evaluator default is fail closed
         run: |
-          python research_core_v4/response_evaluator_v2.py --self-test-summary > /tmp/evaluator.json
+          python research_core_v4/response_evaluator_v3.py --self-test-summary > /tmp/evaluator.json
           python - <<'PY'
           import json
           x=json.load(open("/tmp/evaluator.json"))
