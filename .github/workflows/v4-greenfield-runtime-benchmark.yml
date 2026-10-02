@@ -1,0 +1,46 @@
+name: V4 Greenfield Reference Runtime Benchmark
+
+on:
+  push:
+    branches:
+      - performance-research-v3-20260922
+    paths:
+      - "research_core_v4/greenfield_runtime_benchmark_v1.py"
+      - ".github/workflows/v4-greenfield-runtime-benchmark.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Bounded then full synthetic reference benchmark
+        run: |
+          python research_core_v4/greenfield_runtime_benchmark_v1.py | tee /tmp/v4_greenfield_runtime_benchmark.json
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/v4_greenfield_runtime_benchmark.json"))
+          assert x["status"] == "PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN"
+          assert x["synthetic_only"] is True
+          assert x["real_market_response_values_used"] is False
+          assert x["reference_implementation_only"] is True
+          assert x["execution_optimization_adopted"] is False
+          assert x["support_binding"]["rows"] == 118262
+          assert x["support_binding"]["sha256"] == "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b"
+          assert x["measured_margin_multiple_vs_available_limit"] > 10
+          print("V4_GREENFIELD_REFERENCE_RUNTIME_MARGIN_PASS")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK
+          path: /tmp/v4_greenfield_runtime_benchmark.json
+          if-no-files-found: error
+          retention-days: 30
