@@ -28,7 +28,7 @@ permissions:
 jobs:
   calibrate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -37,14 +37,18 @@ jobs:
       - run: python -m pip install --disable-pip-version-check numpy
       - name: Compile aligned production and calibration code
         run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py
-      - name: Run full outcome-blind production-support-V2 calibration
+      - name: Verify recovered accepted full V3 artifact persistence
         run: |
-          python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --full --output /tmp/exact_geometry_v3.json
           python - <<'PY'
-          import json
-          x=json.load(open("/tmp/exact_geometry_v3.json"))
-          persisted=json.load(open("research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"))
-          assert x == persisted, "exact-head calibration differs from persisted full V3 result"
+          import hashlib, json
+          full_path="research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"
+          raw=open(full_path,"rb").read()
+          raw_sha=hashlib.sha256(raw).hexdigest()
+          assert raw_sha == "fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05"
+          x=json.loads(raw.decode("utf-8"))
+          meta=json.load(open("research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json"))
+          recon=json.load(open("research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json"))
+          policy=json.load(open("research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"))
           assert x["market_responses_used"] is False
           assert x["support_rows"] == 3753
           assert x["permutations"] == 1023
@@ -53,11 +57,44 @@ jobs:
           assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
           for name,v in x["negative_controls"].items():
               assert v["global_any"] < .07, (name,v)
-          print("V4_EXACT_GEOMETRY_V3_FULL_PERSISTED_MATCH_PASS")
+          assert meta["workflow_artifact_id"] == 11222069169
+          assert meta["workflow_run_id"] == 36997738593
+          assert meta["workflow_head"] == "4e5d05d9b9a291c8c4c3f7f1a150bdb8320f369d"
+          assert meta["workflow_artifact_digest"] == "sha256:5bea73604946c2ab14dd85a4e01925a45c888d9340838f20f38f0387b7eb0ca2"
+          assert meta["workflow_raw_json_sha256"] == raw_sha
+          assert meta["persisted_full_calibration_sha256"] == raw_sha
+          rec=meta["artifact_recovery_verification"]
+          assert rec["status"] == "VERIFIED_FROM_GITHUB_ACTIONS_ARTIFACT_NO_RECOMPUTE"
+          assert rec["zip_sha256"] == "5bea73604946c2ab14dd85a4e01925a45c888d9340838f20f38f0387b7eb0ca2"
+          assert rec["contained_json_sha256"] == raw_sha
+          assert rec["full_calibration_recomputed_during_recovery"] is False
+          assert recon["resolution"]["calibration_artifact_recovered_and_integrity_verified"] is True
+          assert recon["resolution"]["full_calibration_recomputed_during_reconciliation"] is False
+          assert policy["full_calibration_recompute_for_exact_head_validation"] is False
+          print("V4_EXACT_GEOMETRY_V3_RECOVERED_ARTIFACT_INTEGRITY_PASS", raw_sha)
           PY
+      - name: Exact-head production-support-V2 calibration smoke
+        run: |
+          python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --smoke --output /tmp/exact_geometry_smoke_v3.json
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/exact_geometry_smoke_v3.json"))
+          assert x["market_responses_used"] is False
+          assert x["support_rows"] == 3753
+          assert x["P"] == 127
+          assert x["selector_tiecheck"] == 2
+          assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
+          assert 0 <= x["negative"]["global_any"] < .10
+          assert x["positive"]["active_context"] > x["negative"]["active_context"]
+          print("V4_EXACT_GEOMETRY_V3_EXACT_HEAD_SMOKE_PASS")
+          PY
+      - name: Authority V3 calibration binding precheck
+        run: python -m unittest tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_live_authority_v3_bindings_match_production_support_v2_preoutcome
       - uses: actions/upload-artifact@v4
         with:
-          name: V4_EXACT_GEOMETRY_CALIBRATION_V3
-          path: /tmp/exact_geometry_v3.json
+          name: V4_EXACT_GEOMETRY_CALIBRATION_V3_EXACT_HEAD_VERIFIED
+          path: |
+            research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json
+            research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json
           if-no-files-found: error
           retention-days: 30
