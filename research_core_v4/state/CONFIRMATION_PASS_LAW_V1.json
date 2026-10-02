@@ -1,0 +1,85 @@
+{
+  "schema": "mxm.research-core-v4.confirmation-pass-law.v1",
+  "status": "FROZEN_BEFORE_ANY_DEVELOPMENT_RESPONSE",
+  "as_of_date": "2026-10-02",
+  "design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "panels": {
+    "FX_SPOT": [
+      "USDCZK",
+      "USDBRL",
+      "USDCLP",
+      "USDCOP"
+    ],
+    "SPOT_CRYPTO": [
+      "APTUSD",
+      "FETUSD",
+      "INJUSD",
+      "SUIUSD"
+    ],
+    "US_EQUITY_EXTENDED_HOURS": [
+      "BA.US-24",
+      "BAC.US-24",
+      "F.US-24",
+      "DIS.US-24"
+    ]
+  },
+  "interval_utc": [
+    "2025-01-06T00:00:00Z",
+    "2025-06-27T23:59:59Z"
+  ],
+  "frozen_leaf_only": true,
+  "no_retuning": true,
+  "outcome_blind_proxy_calibration": {
+    "method": "FIRST_4_FROZEN_DEVELOPMENT_REPLICATES_PER_CONTEXT_RESTRICTED_TO_FIRST_25_WEEKS_AS_SUPPORT_GEOMETRY_PROXY_ONLY_NO_MARKET_RESPONSES",
+    "engine_local_sha256": "6b339e57b6485ce2029683aef871ed3339214d8a5f4c9d99faf273113f278c0e",
+    "breadth_2_of_4_null_pass_rates": {
+      "FX_SPOT": 0.031,
+      "SPOT_CRYPTO": 0.0375,
+      "US_EQUITY_EXTENDED_HOURS": 0.0335
+    },
+    "breadth_3_of_4_null_pass_rates": {
+      "FX_SPOT": 0.0285,
+      "SPOT_CRYPTO": 0.0275,
+      "US_EQUITY_EXTENDED_HOURS": 0.0215
+    },
+    "selected_breadth": "2_OF_4",
+    "rationale": "PRESERVES_THE_DEVELOPMENT_50_PERCENT_BREADTH_PROPORTION_3_OF_6_TO_2_OF_4;REMAINS_CONSERVATIVE_UNDER_NULL;AVOIDS_INTRODUCING_A_NEW_75_PERCENT_UNIVERSALITY_REQUIREMENT_AND_HAS_BETTER_POWER_FOR_2_OF_4_OR_ONE_OPPOSITE_PATTERNS"
+  },
+  "exact_support": {
+    "per_symbol_full_path_available_events_min": 10,
+    "per_symbol_baseline_path_available_events_min": 10,
+    "context_full_path_available_events_min": 80,
+    "context_baseline_path_available_events_min": 80,
+    "distinct_iso_weeks_min": 20,
+    "paired_units_min": 120,
+    "valid_two_week_blocks_min": 10,
+    "response_retention_per_symbol_frozen_horizon_min": 0.8,
+    "min_symbols_per_context_week": 3,
+    "two_week_anchor_utc": "2025-01-06T00:00:00Z",
+    "block_rule": "BOTH_CONSTITUENT_WEEKS_VALID_AND_EACH_HAS_AT_LEAST_3_OF_4_SYMBOLS_WITH_AT_LEAST_ONE_PAIRED_DIRECTION",
+    "support_failure": "DATA_LIMITED_UNTESTED_NOT_NULL"
+  },
+  "exact_test": {
+    "estimand": "SAME_PAIRED_FULL_MINUS_BASELINE_INCREMENTAL_NORMALIZED_RESPONSE_AT_FROZEN_CONTEXT_VOL_STATE_HORIZON",
+    "statistic": "ONE_SIDED_STUDENTIZED_MEAN_OF_VALID_TWO_WEEK_BLOCK_CONTRASTS",
+    "resampling": "1023_DETERMINISTIC_RADEMACHER_SIGN_FLIPS_SHARED_BY_BLOCK",
+    "seed": 20261002,
+    "alpha": 0.05,
+    "higher_selection": "HOLM_FWER_0_05_ACROSS_ALL_DEVELOPMENT_LEADS_ENTERING_THE_SAME_CONFIRMATION_BATCH"
+  },
+  "pass_gates": {
+    "one_sided_adjusted_test_pass": true,
+    "context_incremental_mean_gt": 0,
+    "full_arm_absolute_normalized_mean_gt": 0,
+    "temporal_stability": "POSITIVE_INCREMENTAL_CONTEXT_MEAN_IN_AT_LEAST_2_OF_3_CHRONOLOGICAL_TERTILES",
+    "breadth": "AT_LEAST_2_OF_4_CONFIRMATION_SYMBOL_INCREMENTAL_MEANS_GT_0",
+    "concentration": "MAX_ABS_SYMBOL_INCREMENTAL_MEAN_DIV_SUM_ABS_SYMBOL_INCREMENTAL_MEANS_LE_0_50"
+  },
+  "prohibited": [
+    "CHANGE_2_OF_4_AFTER_DEVELOPMENT",
+    "CHANGE_SUPPORT_AFTER_DEVELOPMENT",
+    "CHANGE_PANEL_AFTER_DEVELOPMENT",
+    "CHANGE_INTERVAL_AFTER_DEVELOPMENT",
+    "CHANGE_CONTEXT_STATE_HORIZON_AFTER_DEVELOPMENT"
+  ]
+}
