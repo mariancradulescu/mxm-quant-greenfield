@@ -5,8 +5,11 @@ ROOT=Path(__file__).resolve().parents[1]
 S="research_core_v4/state/"
 STATE=ROOT/(S+"V4_STATE.json"); AUTH=ROOT/(S+"FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V3.json")
 BENCH=ROOT/(S+"V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK_RESULT_V1.json"); EQUIV=ROOT/(S+"V4_GREENFIELD_EXECUTION_SEMANTIC_EQUIVALENCE_V1.json")
-ARCH=ROOT/(S+"V4_GREENFIELD_EXECUTION_ARCHITECTURE_V1.json"); TRANSPORT=ROOT/(S+"V4_GREENFIELD_ENCRYPTED_INPUT_TRANSPORT_V1.json")
-SUPER=ROOT/(S+"V4_PRIVATE_RUNTIME_PROPOSAL_SUPERSESSION_V1.json"); TEMPLATE=ROOT/"research_core_v4/runtime/v4_greenfield_recovery_v3_runtime_template.yml"
+ARCH=ROOT/(S+"V4_GREENFIELD_EXECUTION_ARCHITECTURE_V1.json"); TRANSPORT=ROOT/(S+"V4_GREENFIELD_ENCRYPTED_INPUT_TRANSPORT_V2.json")
+SCOPE=ROOT/(S+"V4_RUNTIME_EVIDENCE_SCOPE_CORRECTION_V1.json"); BLOCKER=ROOT/(S+"V4_PRE_ARM_SECRET_PROVISIONING_BLOCKER_V1.json")
+INPUT_RECOVERY=ROOT/(S+"V4_EXACT_18_INPUT_RECOVERY_AUDIT_V1.json"); SUPER=ROOT/(S+"V4_PRIVATE_RUNTIME_PROPOSAL_SUPERSESSION_V1.json")
+TEMPLATE=ROOT/"research_core_v4/runtime/v4_greenfield_recovery_v3_runtime_template.yml"; WORKFLOW=ROOT/".github/workflows/v4-greenfield-recovery-v3.yml"
+WORKFLOW_SHA256="62ad05a3fc8b4794e524e2899f04f3abe7e1d068c707ae31516830375a401fbb"
 HIST={
 S+"FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_LOCK_V1.txt":"1e75c3a2e9aeaf6099e57545ad9fb62ca3311445",
 S+"FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_INTERRUPTION_V1.json":"f0d94c13d14a61be297d401b63d62cd4d9f2ac4d",
@@ -27,6 +30,7 @@ S+"FIRST_REAL_MARKET_DESIGN_V2.json":"3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3
 "research_core_v4/frozen_v2_semantics.py":"0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed"}
 RESULTS=(S+"FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json",S+"FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json.tmp","V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json","V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json.tmp")
 ARM=ROOT/(S+"FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ARM_V1.json")
+LOCK=ROOT/(S+"FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ATTEMPT_LOCK_V1.txt")
 STAGING=ROOT/(S+"FIRST_V4_DEVELOPMENT_RESPONSE_RECOVERY_V3_GREENFIELD_INPUT_STAGING_CERTIFICATE_V1.json")
 def load(p): return json.loads(p.read_text(encoding="utf-8"))
 def sha256(p): return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -42,30 +46,43 @@ def verify_staged_directory(root,auth):
   bars,d=r.verify_series_file(p,x); out[str(sid)]={"sha256":d,"rows":len(bars)}
  req(len(out)==18,"staged series count"); return out
 def validate_current_control_plane():
- st=load(STATE); a=load(AUTH); b=load(BENCH); e=load(EQUIV); ar=load(ARCH); tr=load(TRANSPORT); su=load(SUPER)
+ st=load(STATE); a=load(AUTH); b=load(BENCH); e=load(EQUIV); ar=load(ARCH); tr=load(TRANSPORT); sc=load(SCOPE); bl=load(BLOCKER); ir=load(INPUT_RECOVERY); su=load(SUPER)
  for p,h in HIST.items(): req(blob(ROOT/p)==h,"historical bytes changed: "+p)
  for p,h in PRIVATE.items(): req(blob(ROOT/p)==h,"private proposal bytes changed: "+p)
  for p,h in SCI.items(): req(sha256(ROOT/p)==h,"frozen science changed: "+p)
  req(su["status"].startswith("SUPERSEDED_BEFORE_ARM_OR_REAL_EXECUTION"),"private proposal not superseded")
- req(b["status"]=="PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN" and b["evidence_boundary"]["synthetic_only"] and not b["evidence_boundary"]["real_market_response_values_used"],"runtime evidence boundary")
- req(b["full_synthetic_result"]["event_count"]==118262 and b["measured_margin_multiple_vs_available_limit"]>10,"runtime margin")
+ req(b["status"]=="PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN" and b["evidence_boundary"]["synthetic_only"] and not b["evidence_boundary"]["real_market_response_values_used"],"historical runtime evidence boundary")
+ req(b["full_synthetic_result"]["event_count"]==118262 and abs(b["full_synthetic_result"]["combined_profiled_seconds"]-49.85226556699999)<1e-9,"historical hotspot measurement changed")
+ req(sc["status"]=="PASS_SCOPE_CORRECTED_CONSERVATIVE_TOTAL_RUNTIME_BOUND","runtime scope correction")
+ req(sc["correction"]["end_to_end_measured_claim_authorized"] is False,"runtime scope overclaim")
+ req(sc["conservative_total_runtime_upper_bound_seconds"]==983.2452655669999,"runtime upper bound")
+ req(sc["conservative_margin_vs_installed_workflow_timeout"]>3 and sc["conservative_margin_vs_available_job_limit"]>20,"runtime conservative margin")
  req(e["status"]=="PASS_EXACT_REFERENCE_BYTE_IDENTITY_NO_REIMPLEMENTATION" and e["execution_implementation"]["identity_with_reference"] and not e["execution_implementation"]["fast_reimplementation_created"],"semantic identity")
  req(ar["canonical_repository"]=="mariancradulescu/mxm-quant-greenfield" and not ar["current_authorization"]["real_development_response_execution"],"architecture authorization")
- req(not tr["staging_certificate_present_now"] and not tr["real_execution_authorized"],"transport authorization")
+ req(tr["status"]=="EXACT_BYTES_RECOVERED_SECRET_BLOCKED_NOT_STAGED_NOT_ARMED" and tr["exact_bytes_recovered"] and tr["required_secret_status"]=="ABSENT","transport blocked state")
+ req(not tr["encrypted_parts_present_now"] and not tr["staging_certificate_present_now"] and not tr["arm_present_now"] and not tr["real_execution_authorized"],"transport authorization")
+ req(bl["status"]=="FAIL_CLOSED_PRE_ARM_BLOCKED_REQUIRED_SECRET_ABSENT" and bl["secret_value_exposed"] is False and bl["final_nonrevealing_probe"]["run_id"]==37033895856,"secret blocker")
+ req(bl["authenticated_control_surface"]["secure_machine_side_provisioning_possible_in_this_turn"] is False,"secret provisioning capability")
+ req(ir["status"]=="PASS_EXACT_18_SOURCE_BYTES_RECOVERED_NO_RECOLLECTION" and ir["verification"]["verified_series_count"]==18 and ir["verification"]["all_series_sha256_match"],"exact input recovery")
  req(a["status"]=="PREPARED_NOT_ARMED_NOT_EXECUTED" and not a["real_development_response_execution_authorized"] and not a["arm_authorized"],"authority status")
  req(a["accepted_canonical_result_count_at_prepare"]==0 and a["accepted_canonical_result_limit"]==1 and not a["automatic_retry"] and a["future_process_attempt_limit_after_explicit_arm"]==1,"authority result/retry")
  req(len(a["frozen_reference"]["exact_18_series"])==18 and a["frozen_reference"]["execution_is_byte_identical_to_reference"],"reference binding")
+ req(sha256(WORKFLOW)==WORKFLOW_SHA256,"installed workflow hash changed")
+ wt=WORKFLOW.read_text(encoding="utf-8"); req("mxm-quant-director" not in wt and "FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ARM_V1.json" in wt and "workflow_dispatch" not in wt,"installed workflow inert binding")
+ tt=TEMPLATE.read_text(encoding="utf-8"); req("mxm-quant-director" not in tt and "68bdee4b51244ae50acd56fe868468b96106450f" in tt,"runtime template history binding")
  fw=st["first_wave"]; p=st["recovery_v3_preparation"]; g=st["governance"]
- req(st["status"]=="FIRST_REAL_MARKET_DESIGN_V2_GREENFIELD_RECOVERY_V3_PREPARED_NOT_ARMED_NOT_EXECUTED","state status")
+ req(st["status"]=="FIRST_REAL_MARKET_DESIGN_V2_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED","state status")
  req(fw["development_outcomes_opened"] and not fw["development_execution_completed"] and not fw["development_raw_result_persisted"] and not fw["development_result_interpreted"],"development state")
  req(not fw["deterministic_crash_recovery_authorized"] and not fw["further_recovery_attempt_authorized"] and not fw["current_recovery_execution_authorized"],"current recovery authorization")
- req(p["status"]=="PREPARED_NOT_ARMED_NOT_EXECUTED" and p["canonical_repository"]=="mariancradulescu/mxm-quant-greenfield" and not p["second_repository_allowed"],"V3 prep")
- req(not p["input_staging_certificate_present"] and not p["arm_present"] and not p["real_execution_authorized"] and p["accepted_canonical_result_count"]==0 and p["accepted_canonical_result_limit"]==1 and p["process_attempts_started"]==0 and not p["automatic_retry"],"V3 boundary")
+ req(p["status"]=="FAIL_CLOSED_PRE_ARM_BLOCKED" and p["canonical_repository"]=="mariancradulescu/mxm-quant-greenfield" and not p["second_repository_allowed"],"V3 blocked state")
+ req(p["exact_source_bytes_recovered"] is True and p["required_secret_status"]=="ABSENT","V3 recovered input/secret truth")
+ req(not p["encrypted_input_parts_present"] and not p["input_staging_certificate_present"] and not p["arm_present"] and not p["real_execution_authorized"],"V3 staging/arm boundary")
+ req(p["accepted_canonical_result_count"]==0 and p["accepted_canonical_result_limit"]==1 and p["process_attempts_started"]==0 and not p["automatic_retry"],"V3 result/attempt boundary")
+ req(p["installed_runtime_workflow_sha256"]==WORKFLOW_SHA256,"state installed workflow hash")
  req(not fw["confirmation_execution_authorized"] and not fw["confirmation_outcomes_opened"] and not g["broker_acquisition_authorized"] and not g["protected_forward_opened"] and not g["candidate_promotion_authorized"] and not g["live_trading_started"],"downstream opened")
- req(not ARM.exists() and not STAGING.exists(),"ARM or staging certificate exists")
+ req(not ARM.exists() and not LOCK.exists() and not STAGING.exists(),"ARM lock or staging certificate exists")
  req(not [x for x in RESULTS if (ROOT/x).exists()],"canonical result exists")
- t=TEMPLATE.read_text(); req("mxm-quant-director" not in t and "68bdee4b51244ae50acd56fe868468b96106450f" in t,"runtime template binding")
- return {"schema":"mxm.research-core-v4.greenfield-recovery-v3-control-validation.v1","status":"PASS_GREENFIELD_RECOVERY_V3_PREPARED_NOT_ARMED_NO_REAL_RESPONSE_EXECUTION","accepted_canonical_result_count":0,"accepted_canonical_result_limit":1,"real_execution_authorized":False,"arm_present":False,"input_staging_present":False,"process_attempts_started":0,"scientific_source_unchanged":True,"historical_locks_unchanged":True,"private_runtime_proposal_preserved_and_superseded":True,"execution_is_byte_identical_reference":True,"runtime_margin_multiple":b["measured_margin_multiple_vs_available_limit"]}
+ return {"schema":"mxm.research-core-v4.greenfield-recovery-v3-control-validation.v2","status":"PASS_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED_NO_REAL_RESPONSE_EXECUTION","accepted_canonical_result_count":0,"accepted_canonical_result_limit":1,"real_execution_authorized":False,"arm_present":False,"attempt_lock_present":False,"input_staging_present":False,"process_attempts_started":0,"scientific_source_unchanged":True,"historical_locks_unchanged":True,"private_runtime_proposal_preserved_and_superseded":True,"execution_is_byte_identical_reference":True,"exact_source_bytes_recovered":True,"required_secret_status":"ABSENT","installed_workflow_sha256":WORKFLOW_SHA256,"measured_hotspot_seconds":49.85226556699999,"conservative_total_runtime_upper_bound_seconds":983.2452655669999,"conservative_margin_vs_installed_timeout":sc["conservative_margin_vs_installed_workflow_timeout"],"conservative_margin_vs_available_job_limit":sc["conservative_margin_vs_available_job_limit"]}
 def main():
  ap=argparse.ArgumentParser(); ap.add_argument("--verify-staged-directory",type=Path); x=ap.parse_args(); a=load(AUTH)
  print(json.dumps({"status":"PASS_STAGED_EXACT_18_SERIES","series":verify_staged_directory(x.verify_staged_directory,a)},sort_keys=True) if x.verify_staged_directory else json.dumps(validate_current_control_plane(),sort_keys=True))

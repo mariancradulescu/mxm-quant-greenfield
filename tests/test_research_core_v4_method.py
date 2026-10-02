@@ -111,7 +111,7 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         authority=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json")
         recovery=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V3.json")
         report=validate_current_control_plane()
-        self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_PREPARED_NOT_ARMED_NO_REAL_RESPONSE_EXECUTION")
+        self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED_NO_REAL_RESPONSE_EXECUTION")
         self.assertEqual(report["accepted_canonical_result_count"],0)
         self.assertFalse(report["real_execution_authorized"])
         self.assertEqual(authority["status"],"AUTHORIZED_READY_NOT_EXECUTED")

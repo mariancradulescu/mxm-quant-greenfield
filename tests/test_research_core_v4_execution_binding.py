@@ -170,7 +170,7 @@ class ExecutionBindingTests(unittest.TestCase):
         # the frozen runner accept it as a fresh READY state.
         from research_core_v4.crash_recovery_control_v3 import validate_current_control_plane
         report=validate_current_control_plane()
-        self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_PREPARED_NOT_ARMED_NO_REAL_RESPONSE_EXECUTION")
+        self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED_NO_REAL_RESPONSE_EXECUTION")
         self.assertEqual(report["accepted_canonical_result_count"],0)
         self.assertFalse(report["real_execution_authorized"])
         self.assertTrue(report["scientific_source_unchanged"])

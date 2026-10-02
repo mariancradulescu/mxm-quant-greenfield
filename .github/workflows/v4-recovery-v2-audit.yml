@@ -25,4 +25,18 @@ jobs:
           assert b["status"]=="PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN" and b["evidence_boundary"]["synthetic_only"] and not b["evidence_boundary"]["real_market_response_values_used"] and b["full_synthetic_result"]["event_count"]==118262 and b["measured_margin_multiple_vs_available_limit"]>10
           assert e["status"]=="PASS_EXACT_REFERENCE_BYTE_IDENTITY_NO_REIMPLEMENTATION" and e["execution_implementation"]["identity_with_reference"]
           assert s["recovery_v3_preparation"]["accepted_canonical_result_count"]==0 and not s["recovery_v3_preparation"]["real_execution_authorized"]
+          scope=json.load(open("research_core_v4/state/V4_RUNTIME_EVIDENCE_SCOPE_CORRECTION_V1.json"))
+          blocker=json.load(open("research_core_v4/state/V4_PRE_ARM_SECRET_PROVISIONING_BLOCKER_V1.json"))
+          assert scope["correction"]["end_to_end_measured_claim_authorized"] is False
+          assert scope["conservative_total_runtime_upper_bound_seconds"]==983.2452655669999
+          assert blocker["status"]=="FAIL_CLOSED_PRE_ARM_BLOCKED_REQUIRED_SECRET_ABSENT"
+          assert s["recovery_v3_preparation"]["status"]=="FAIL_CLOSED_PRE_ARM_BLOCKED"
           PY
+
+      - name: Verify installed workflow hash and fail-closed absent artifacts
+        run: |
+          echo "62ad05a3fc8b4794e524e2899f04f3abe7e1d068c707ae31516830375a401fbb  .github/workflows/v4-greenfield-recovery-v3.yml" | sha256sum -c -
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RECOVERY_V3_GREENFIELD_INPUT_STAGING_CERTIFICATE_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
