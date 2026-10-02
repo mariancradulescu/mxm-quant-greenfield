@@ -23,6 +23,11 @@ MANIFEST_REL = "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json"
 SUPPORT_REL = "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json"
 EVALUATOR_REL = "research_core_v4/response_evaluator_v3.py"
 SEMANTICS_REL = "research_core_v4/frozen_v2_semantics.py"
+CALIBRATION_REL = "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V2.json"
+CONFIRMATION_LAW_REL = "research_core_v4/state/CONFIRMATION_PASS_LAW_V1.json"
+CONFIRMATION_PROVENANCE_REL = "research_core_v4/state/CONFIRMATION_PROVENANCE_CERTIFICATE_V1.json"
+DIAGNOSTICS_REL = "research_core_v4/state/NONSELECTION_DIAGNOSTIC_IMPLEMENTATION_V1.json"
+ALIGNMENT_REL = "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V1.json"
 RESPONSE_OPENING_STARTED = False
 
 @dataclass(frozen=True)
@@ -114,11 +119,21 @@ def verify_static_bindings(authority: dict, state: dict, design: dict, manifest:
     _must_equal("design_sha256",sha256_file(ROOT/DESIGN_REL),b["canonical_design_content_sha256"])
     _must_equal("evaluator_sha256",sha256_file(ROOT/EVALUATOR_REL),b["evaluator_content_sha256"])
     _must_equal("semantics_sha256",sha256_file(ROOT/SEMANTICS_REL),b["shared_semantics_content_sha256"])
+    _must_equal("runner_sha256",sha256_file(Path(__file__).resolve()),b["execution_runner_content_sha256"])
     _must_equal("manifest_sha256",sha256_file(ROOT/MANIFEST_REL),b["canonical_primary_manifest_content_sha256"])
     _must_equal("support_audit_sha256",sha256_file(ROOT/SUPPORT_REL),b["support_audit_content_sha256"])
+    _must_equal("calibration_sha256",sha256_file(ROOT/CALIBRATION_REL),b["exact_geometry_calibration_content_sha256"])
+    _must_equal("confirmation_law_sha256",sha256_file(ROOT/CONFIRMATION_LAW_REL),b["confirmation_pass_law_content_sha256"])
+    _must_equal("confirmation_provenance_sha256",sha256_file(ROOT/CONFIRMATION_PROVENANCE_REL),b["confirmation_provenance_content_sha256"])
+    _must_equal("diagnostics_sha256",sha256_file(ROOT/DIAGNOSTICS_REL),b["nonselection_diagnostic_implementation_content_sha256"])
+    _must_equal("alignment_sha256",sha256_file(ROOT/ALIGNMENT_REL),b["production_calibration_alignment_content_sha256"])
     _must_equal("support_skeleton_sha256",support["skeleton"]["canonical_sha256"],b["support_skeleton_sha256"])
     _must_equal("support_skeleton_row_count",support["skeleton"]["row_count"],b["support_skeleton_row_count"])
 
+    _must_equal("state_evaluator_pointer",state["first_wave"]["development_response_evaluator"],EVALUATOR_REL)
+    _must_equal("state_runner_pointer",state["first_wave"]["development_execution_runner"],"research_core_v4/development_execution_runner_v1.py")
+    _must_equal("state_calibration_pointer",state["first_wave"]["exact_geometry_calibration"],CALIBRATION_REL)
+    _must_equal("state_diagnostics_pointer",state["first_wave"]["nonselection_diagnostic_implementation"],DIAGNOSTICS_REL)
     scope=authority["development_scope"]
     _must_equal("contexts",[x["id"] for x in design["structural_contexts"]],scope["contexts"])
     _must_equal("volatility_states",list(ev.VOL_STATES),scope["volatility_states"])
