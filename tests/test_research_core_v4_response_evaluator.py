@@ -3,7 +3,7 @@ import math
 import unittest
 from datetime import datetime,timedelta,timezone
 import numpy as np
-from research_core_v4 import response_evaluator_v2 as ev
+from research_core_v4 import response_evaluator_v3 as ev
 
 UTC=timezone.utc
 
