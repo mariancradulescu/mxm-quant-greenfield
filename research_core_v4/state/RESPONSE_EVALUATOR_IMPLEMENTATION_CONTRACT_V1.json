@@ -1,0 +1,94 @@
+{
+  "schema": "mxm.research-core-v4.response-evaluator-implementation-contract.v1",
+  "status": "FROZEN_IMPLEMENTATION_BEFORE_FIRST_REAL_RESPONSE",
+  "as_of_date": "2026-10-02",
+  "scientific_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "support_geometry": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json",
+  "exact_geometry_calibration": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V1.json",
+  "confirmation_pass_law": "research_core_v4/state/CONFIRMATION_PASS_LAW_V1.json",
+  "confirmation_provenance": "research_core_v4/state/CONFIRMATION_PROVENANCE_CERTIFICATE_V1.json",
+  "evaluator": "research_core_v4/response_evaluator_v2.py",
+  "calibration_harness": "research_core_v4/exact_geometry_calibration_v1.py",
+  "semantic_claim": "INCREMENTAL_PREDICTIVE_INFORMATION_CONDITIONAL_ON_PREDECLARED_CROSS_SCALE_ALIGNMENT;CAUSAL_REFERS_ONLY_TO_NO_LOOKAHEAD_INFORMATION_AVAILABILITY",
+  "exact_state_construction": {
+    "M5": "AUTHENTIC_BAR_OPEN_UTC",
+    "M15": "UTC_ALIGNED_3_EXACT_M5_BARS",
+    "H1": "UTC_ALIGNED_12_EXACT_M5_BARS",
+    "H4": "UTC_ALIGNED_48_EXACT_M5_BARS",
+    "incomplete_bucket": "DROP",
+    "missing_bar_fill": "FORBIDDEN",
+    "higher_scale_use": "BUCKET_END_MUST_BE_LE_TRIGGER",
+    "M15_trigger": "NEW_COMPLETED_M15_DIRECTIONAL_TRANSITION_ONLY",
+    "arm_assignment": "FULL_IFF_H1_AND_H4_BOTH_EQUAL_M15_DIRECTION_ELSE_BASELINE_IF_BOTH_STATES_EXIST",
+    "volatility_state": "CAUSAL_RV4_VS_PRIOR_40_AVAILABLE_RV4_MEDIAN",
+    "response_normalizer": "PREENTRY_H1_RMS24"
+  },
+  "exact_response": {
+    "horizons_m5": [
+      3,
+      6,
+      12,
+      48
+    ],
+    "normalized": "SIGNAL_DIRECTION_X_LOG_FUTURE_M5_CLOSE_OVER_CURRENT_M15_CLOSE_DIV_PREENTRY_H1_RMS24",
+    "raw_bps_secondary": "SIGNAL_DIRECTION_X_LOG_FUTURE_M5_CLOSE_OVER_CURRENT_M15_CLOSE_X_10000",
+    "right_censor": "ANY_MISSING_REQUIRED_5_MINUTE_TIMESTAMP",
+    "exit_interpretation": false
+  },
+  "exact_aggregation": {
+    "paired_unit": "SYMBOL_X_ISO_WEEK_X_DIRECTION_X_VOL_STATE_X_HORIZON",
+    "paired_unit_requires": "AT_LEAST_ONE_FULL_AND_ONE_BASELINE_PATH_AVAILABLE_RESPONSE",
+    "within_arm": "MEAN_EVENTS",
+    "direction": "EQUAL_WEIGHT_AVAILABLE_DIRECTIONS",
+    "symbol": "EQUAL_WEIGHT_VALID_SYMBOLS",
+    "development_context_week_min_symbols": 4,
+    "development_two_week_anchor": "2025-09-15T00:00:00Z",
+    "development_block": "BOTH_CONSTITUENT_WEEKS_VALID",
+    "confirmation_context_week_min_symbols": 3,
+    "confirmation_two_week_anchor": "2025-01-06T00:00:00Z"
+  },
+  "exact_statistics": {
+    "local_development_family": "8_LEAVES_2_VOL_STATES_X_4_HORIZONS",
+    "statistic": "ONE_SIDED_STUDENTIZED_MEAN_OF_TWO_WEEK_BLOCK_INCREMENTAL_CONTRAST",
+    "shared_maxT_permutations": 1023,
+    "resampling": "DETERMINISTIC_RADEMACHER_SIGNS_SHARED_BY_GLOBAL_BLOCK_ID_ACROSS_8_LEAVES",
+    "seed": 20261002,
+    "higher_control": "HOLM_FWER_0_05_ACROSS_3_CONTEXTS",
+    "development_temporal": "FIXED_53_WEEK_CALENDAR_QUARTERS_W0_13_W14_26_W27_39_W40_52_REQUIRE_3_OF_4_POSITIVE",
+    "development_breadth": "3_OF_6",
+    "concentration_max_abs_share": 0.5,
+    "confirmation_test": "FROZEN_SINGLE_LEAF_ONE_SIDED_STUDENTIZED_BLOCK_SIGN_FLIP",
+    "confirmation_temporal": "FIXED_25_WEEK_TERTILES_W0_7_W8_15_W16_24_REQUIRE_2_OF_3_POSITIVE",
+    "confirmation_breadth": "2_OF_4",
+    "confirmation_batch_control": "HOLM_FWER_0_05_ACROSS_ALL_FROZEN_DEVELOPMENT_LEADS"
+  },
+  "diagnostic_freeze": {
+    "nonselection_only": [
+      "UTC_HOUR_OF_TRIGGER",
+      "DAY_OF_WEEK",
+      "DETERMINISTIC_SESSION_LABEL",
+      "US_EQUITY_DST_REGIME",
+      "FULL_BASELINE_EVENT_COUNTS_BY_SESSION"
+    ],
+    "may_rescue_or_retune_same_outcomes": false
+  },
+  "execution_guard": {
+    "real_response_function_requires_authority_status": "AUTHORIZED_READY_NOT_EXECUTED",
+    "requires_scientific_design_pointer": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+    "requires_real_development_response_execution_authorized": true,
+    "protected_forward_must_be_false": true,
+    "broker_access_in_evaluator": false,
+    "cTrader_imports": false,
+    "default_cli_real_execution": "DENIED"
+  },
+  "frozen_boundaries": {
+    "no_deadband_grid": true,
+    "no_reversion_rescue": true,
+    "no_scale_grid": true,
+    "no_postoutcome_context_change": true,
+    "no_postoutcome_symbol_change": true,
+    "no_postoutcome_horizon_change": true,
+    "no_exit_optimization": true,
+    "no_fixed_universal_bps_gate": true
+  }
+}
