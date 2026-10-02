@@ -1,0 +1,114 @@
+{
+  "schema": "mxm.research-core-v4.detector-calibration-spec.v3",
+  "status": "FROZEN_FINAL_PREOUTCOME_CALIBRATION_SPEC_FOR_FIRST_WAVE_V2",
+  "supersedes_primary": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V2.json",
+  "preserves_v1_v2_as_method_history": true,
+  "real_market_outcomes_used": false,
+  "new_market_data_used": false,
+  "contexts": [
+    "FX_SPOT",
+    "SPOT_CRYPTO",
+    "US_EQUITY_EXTENDED_HOURS"
+  ],
+  "symbols_per_development_context": 6,
+  "preentry_volatility_states": [
+    "LOW",
+    "HIGH"
+  ],
+  "response_horizons_m5": [
+    3,
+    6,
+    12,
+    48
+  ],
+  "primary_estimand": "INCREMENTAL_NORMALIZED_DIRECTIONAL_RESPONSE_OF_FULL_H4_H1_M15_ALIGNMENT_VERSUS_SAME_M15_DIRECTIONAL_TRANSITION_WITHOUT_H4_H1_ALIGNMENT",
+  "detector": {
+    "local_family": "8_LEAVES_PER_STRUCTURAL_CONTEXT_EQUALS_2_VOL_STATES_X_4_RESPONSE_HORIZONS",
+    "local_control": "MAXT_ONE_SIDED_ALPHA_0_05",
+    "higher_control": "HOLM_FWER_0_05_ACROSS_3_PREDECLARED_STRUCTURAL_CONTEXTS",
+    "selected_leaf": "MINIMUM_LOCAL_MAXT_P_THEN_LARGEST_T_THEN_SHORTEST_HORIZON_THEN_LOW_BEFORE_HIGH_ONLY_AS_FINAL_DETERMINISTIC_TIEBREAK",
+    "temporal_gate": "SELECTED_LEAF_INCREMENTAL_POOLED_CONTRAST_POSITIVE_IN_AT_LEAST_3_OF_4_CHRONOLOGICAL_QUARTERS",
+    "breadth_gate": "SELECTED_LEAF_SYMBOL_LEVEL_INCREMENTAL_CONTRAST_POSITIVE_IN_AT_LEAST_3_OF_6_CONTEXT_REPLICATES",
+    "inference_block": "NONOVERLAPPING_2_WEEK_BLOCK_MEANS_WITH_AT_LEAST_12_OF_14_VALID_BLOCKS",
+    "symbol_pooling": "EQUAL_WEIGHT_SYMBOL_REPLICATES_WITHIN_CONTEXT",
+    "no_free_symbol_selection": true,
+    "no_free_context_selection": true,
+    "no_free_volatility_state_selection": true,
+    "no_free_horizon_selection": true
+  },
+  "effect_prevalence_scenarios": [
+    "6_OF_6_POSITIVE",
+    "5_OF_6_POSITIVE",
+    "4_OF_6_POSITIVE",
+    "STRUCTURAL_SUBSET_3_OF_6",
+    "HETEROGENEOUS_POSITIVE_MAGNITUDES",
+    "ONE_ZERO_ONE_WEAK",
+    "ONE_OPPOSITE_SIGN",
+    "TWO_OPPOSITE_SIGN"
+  ],
+  "context_scenarios": [
+    "EFFECT_PRESENT_BOTH_VOL_STATES",
+    "EFFECT_PRESENT_HIGH_VOL_ONLY",
+    "EFFECT_PRESENT_LOW_VOL_ONLY",
+    "EFFECT_STRONGER_HIGH_THAN_LOW",
+    "EFFECT_STRONGER_LOW_THAN_HIGH",
+    "EFFECT_PRESENT_ALL_3_STRUCTURAL_CONTEXTS"
+  ],
+  "noise_stress": [
+    "FAT_TAILED_INNOVATIONS_T5",
+    "VOLATILITY_CLUSTERING_AR1_LOGVOL",
+    "WEEKLY_REGIME_SHIFTS",
+    "STRONGER_CROSS_SYMBOL_COMMON_FACTOR",
+    "UNEQUAL_SYMBOL_NOISE",
+    "MISSING_SYMBOL_WEEKS",
+    "UNEQUAL_EVENT_COUNTS",
+    "MICRO_SIGN_FLIP_DILUTION_30PCT"
+  ],
+  "empirical_noise_anchors_from_exposed_v3_only": {
+    "representative_symbol_cluster_se_bps": 10,
+    "support": [
+      "ORCL_US24_TEMPORAL_CLUSTER_SE_APPROX_8_55_TO_11_58_BPS",
+      "US24_CROSS_SECTIONAL_CLUSTER_SE_APPROX_11_24_TO_33_08_BPS"
+    ],
+    "rule": "BPS_MDE_VALUES_ARE_SCENARIO_SPECIFIC_AT_THIS_NOISE_ANCHOR_AND_MUST_NOT_BE_DESCRIBED_AS_GENERAL_V4_MDE"
+  },
+  "synthetic_generator": {
+    "weeks": 28,
+    "contexts": 3,
+    "symbols_per_context": 6,
+    "states": 2,
+    "horizons": 4,
+    "weekly_ar1": 0.25,
+    "horizon_ar1_correlation": 0.65,
+    "low_high_state_correlation": 0.5,
+    "baseline_cross_symbol_common_weight": 0.3,
+    "stressed_common_weight": 0.65,
+    "logvol_ar1": 0.85,
+    "logvol_loading": 0.22,
+    "effect_horizon_shape": [
+      0.5,
+      1,
+      0.75,
+      0.4
+    ],
+    "baseline_symbol_cluster_mean_se_bps": 10
+  },
+  "monte_carlo": {
+    "calibration_null_reps": 6000,
+    "negative_control_reps": 3000,
+    "positive_reps_per_grid_cell": 1200,
+    "extended_mde_reps_per_grid_cell": 1400,
+    "effect_grid_bps": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      40,
+      50
+    ],
+    "seed": 20261002
+  },
+  "interpretation": "SYNTHETIC_METHOD_CALIBRATION_ONLY;NO_MARKET_ALPHA_INFERENCE"
+}
