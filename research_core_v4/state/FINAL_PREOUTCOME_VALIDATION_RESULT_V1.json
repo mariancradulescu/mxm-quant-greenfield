@@ -1,0 +1,50 @@
+{
+  "schema": "mxm.research-core-v4.final-preoutcome-validation-result.v1",
+  "status": "PASS_POST_IMPORT_FIX_FULL_V4_METHOD_VALIDATION",
+  "as_of_date": "2026-10-02",
+  "validated_head": "5fa04a01ff2cf41ff00e6e0a8e5db584494e3086",
+  "workflow": "Research Core V4 Method Validation",
+  "run_id": 36974430185,
+  "conclusion": "SUCCESS",
+  "recovery_from": {
+    "failed_run_id": 36972441630,
+    "failed_head": "0e0ebb4a1a227f208f1385d14905c7a8f2a42371",
+    "sole_failed_step": "Exact real-support geometry synthetic calibration smoke",
+    "failure_class": "SCRIPT_IMPORT_PATH_ONLY",
+    "observed_error": "ModuleNotFoundError: No module named 'research_core_v4'",
+    "repair_commit": "5d5fc01fe27339fb6982dc2c39211bcc6a1fd593",
+    "scientific_design_changed": false,
+    "support_geometry_recomputed": false,
+    "persisted_exact_geometry_calibration_recomputed": false
+  },
+  "passed_checks": [
+    "STATIC_COMPILE",
+    "PREOUTCOME_ARCHITECTURE_AND_EVALUATOR_INVARIANTS",
+    "EXACT_REAL_SUPPORT_GEOMETRY_SYNTHETIC_CALIBRATION_SMOKE",
+    "EVALUATOR_DEFAULT_FAIL_CLOSED",
+    "NO_BROKER_ACQUISITION_OR_ORDER_SURFACE"
+  ],
+  "frozen_scientific_authorities": {
+    "design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+    "support_geometry": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json",
+    "support_skeleton_sha256": "e79db90359e473e51de464ccddf400136c4cbaeedabada87975ac6961f6e9aee",
+    "exact_geometry_calibration": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V1.json",
+    "confirmation_pass_law": "research_core_v4/state/CONFIRMATION_PASS_LAW_V1.json",
+    "confirmation_provenance": "research_core_v4/state/CONFIRMATION_PROVENANCE_CERTIFICATE_V1.json",
+    "evaluator": "research_core_v4/response_evaluator_v2.py",
+    "evaluator_implementation_commit": "4ac38ea8f01dd53cff98c6f57b78fc4d3bbbc3c5",
+    "exact_geometry_harness": "research_core_v4/exact_geometry_calibration_v1.py",
+    "import_fix_commit": "5d5fc01fe27339fb6982dc2c39211bcc6a1fd593"
+  },
+  "boundaries_at_validation": {
+    "development_outcomes_opened": false,
+    "confirmation_outcomes_opened": false,
+    "broker_contacted_by_v4": false,
+    "new_market_acquisition_started": false,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "live_trading_started": false,
+    "quote_revision_v2_executed": false
+  },
+  "verdict": "GREEN_TO_PERSIST_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_ONLY;NO_RESPONSE_EXECUTION_PERFORMED_BY_THIS_VALIDATION"
+}
