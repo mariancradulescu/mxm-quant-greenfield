@@ -23,6 +23,7 @@ MANIFEST_REL = "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json"
 SUPPORT_REL = "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json"
 EVALUATOR_REL = "research_core_v4/response_evaluator_v3.py"
 SEMANTICS_REL = "research_core_v4/frozen_v2_semantics.py"
+RESPONSE_OPENING_STARTED = False
 
 @dataclass(frozen=True)
 class PrevalidatedBundle:
@@ -81,6 +82,28 @@ def state_binding_sha256(state: dict) -> str:
 def _must_equal(name: str, actual: Any, expected: Any) -> None:
     if actual != expected:
         raise PermissionError(f"PRE_RESPONSE_GUARD_FAIL {name}: {actual!r} != {expected!r}")
+
+
+def verify_bound_file(name: str, path: str | Path, expected_sha256: str) -> str:
+    actual=sha256_file(path)
+    _must_equal(name,actual,expected_sha256)
+    return actual
+
+
+def verify_series_file(path: str | Path, item: dict) -> tuple[list[ev.M5Bar],str]:
+    digest=verify_bound_file(f"series_sha256:{item['symbol']}",path,item["series_sha256"])
+    bars=ev.read_m5_csv(path)
+    _must_equal(f"row_count:{item['symbol']}",len(bars),int(item["row_count"]))
+    _must_equal(f"first_timestamp:{item['symbol']}",bars[0].time.isoformat().replace("+00:00","Z"),item["first_timestamp_utc"])
+    _must_equal(f"last_timestamp:{item['symbol']}",bars[-1].time.isoformat().replace("+00:00","Z"),item["last_timestamp_utc"])
+    return bars,digest
+
+
+def verify_rebuilt_skeleton(events, expected_sha256: str, expected_rows: int) -> str:
+    digest=ev.skeleton_sha256(events)
+    _must_equal("rebuilt_skeleton_sha256",digest,expected_sha256)
+    _must_equal("rebuilt_skeleton_row_count",len(events),int(expected_rows))
+    return digest
 
 
 def verify_static_bindings(authority: dict, state: dict, design: dict, manifest: dict, support: dict) -> None:
@@ -147,27 +170,25 @@ def pre_response_guards(raw_root: str | Path) -> PrevalidatedBundle:
         sid=int(item["symbol_id"]);sym=item["symbol"];p=raw_root/f"{sid}_M5.csv"
         if not p.exists():
             raise FileNotFoundError(f"PRE_RESPONSE_GUARD_FAIL missing frozen input {p}")
-        _must_equal(f"series_sha256:{sym}",sha256_file(p),item["series_sha256"])
         m=manifest_by_id.get(sid)
         if m is None:
             raise PermissionError(f"PRE_RESPONSE_GUARD_FAIL manifest missing {sid}")
         for key in ("symbol","row_count","series_sha256","first_timestamp_utc","last_timestamp_utc","source_archive_sha256"):
             _must_equal(f"manifest:{sym}:{key}",m[key],item[key])
-        bars=ev.read_m5_csv(p)
-        _must_equal(f"row_count:{sym}",len(bars),int(item["row_count"]))
-        _must_equal(f"first_timestamp:{sym}",bars[0].time.isoformat().replace("+00:00","Z"),item["first_timestamp_utc"])
-        _must_equal(f"last_timestamp:{sym}",bars[-1].time.isoformat().replace("+00:00","Z"),item["last_timestamp_utc"])
+        bars,digest=verify_series_file(p,item)
         bars_by_symbol[sym]=bars
-        source_hashes[sym]=item["series_sha256"]
+        source_hashes[sym]=digest
 
     start=ev.parse_utc(design["development_interval_utc"][0]);end=ev.parse_utc(design["development_interval_utc"][1])
     for ctx,sym,sid in design_pairs:
         bars=[b for b in bars_by_symbol[sym] if start <= b.time <= end]
         all_events.extend(ev.build_signal_support(bars,ctx,sym,sid))
 
-    skeleton_sha=ev.skeleton_sha256(all_events)
-    _must_equal("rebuilt_skeleton_sha256",skeleton_sha,authority["bindings"]["support_skeleton_sha256"])
-    _must_equal("rebuilt_skeleton_row_count",len(all_events),authority["bindings"]["support_skeleton_row_count"])
+    skeleton_sha=verify_rebuilt_skeleton(
+        all_events,
+        authority["bindings"]["support_skeleton_sha256"],
+        authority["bindings"]["support_skeleton_row_count"],
+    )
 
     context_counts={}
     for ctx in authority["development_scope"]["contexts"]:
@@ -200,6 +221,10 @@ def pre_response_guards(raw_root: str | Path) -> PrevalidatedBundle:
 
 
 def execute_once(bundle: PrevalidatedBundle, output: str | Path) -> str:
+    global RESPONSE_OPENING_STARTED
+    if RESPONSE_OPENING_STARTED:
+        raise PermissionError("response opening already started in this process")
+    RESPONSE_OPENING_STARTED=True
     result=ev.evaluate_prevalidated_development(
         authority=bundle.authority,
         design=bundle.design,
