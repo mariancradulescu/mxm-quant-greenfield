@@ -152,6 +152,14 @@ def full_report(geoms):
         "seed":20261002,
         "selector_rule":"MIN_ADJUSTED_P_THEN_MAX_OBSERVED_T_THEN_SHORTEST_HORIZON_THEN_LOW_BEFORE_HIGH",
         "full_arm_gate":"PAIRED_SUPPORT_EQUAL_DIRECTION_EQUAL_SYMBOL_MEAN_VALID_CONTEXT_WEEKS_GT_ZERO",
+        "selector_exact_tiecheck":{
+            "leaf_meta":[["LOW",48],["HIGH",3],["LOW",3]],
+            "adjusted_p":[.01,.01,.01],
+            "observed_t":[2.,2.,2.],
+            "selected_index":select_leaf_index([.01,.01,.01],[2.,2.,2.],[("LOW",48),("HIGH",3),("LOW",3)]),
+            "expected_index":2,
+            "pass":select_leaf_index([.01,.01,.01],[2.,2.,2.],[("LOW",48),("HIGH",3),("LOW",3)])==2
+        },
         "full_arm_weighting_parity":_full_arm_weighting_parity_check(geoms),
         "negative_controls":neg,
         "effect_grid_standardized":grid,
