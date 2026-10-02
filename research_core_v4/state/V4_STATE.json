@@ -1,6 +1,6 @@
 {
-  "schema": "mxm.research-core-v4.state.v3",
-  "status": "FIRST_REAL_MARKET_DESIGN_V2_DEVELOPMENT_RESPONSE_AUTHORIZED_NOT_EXECUTED",
+  "schema": "mxm.research-core-v4.state.v4",
+  "status": "FIRST_REAL_MARKET_DESIGN_V2_AUTHORITY_V2_READY_NOT_EXECUTED",
   "as_of_date": "2026-10-02",
   "predecessor": {
     "v3_status": "READ_ONLY_RESEARCH_HISTORY",
@@ -50,8 +50,15 @@
     "new_market_acquisition_started": false,
     "confirmation_availability_preflight_run": false,
     "evaluator_execution_authorized": true,
-    "development_response_execution_authority": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V1.json",
-    "confirmation_execution_authorized": false
+    "development_response_execution_authority": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V2.json",
+    "confirmation_execution_authorized": false,
+    "execution_authority_v1": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V1.json",
+    "execution_authority_v1_status": "SUPERSEDED_BEFORE_ANY_REAL_V4_RESPONSE",
+    "development_response_evaluator": "research_core_v4/response_evaluator_v3.py",
+    "development_execution_runner": "research_core_v4/development_execution_runner_v1.py",
+    "exact_geometry_calibration": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V2.json",
+    "nonselection_diagnostic_implementation": "research_core_v4/state/NONSELECTION_DIAGNOSTIC_IMPLEMENTATION_V1.json",
+    "production_calibration_semantics_alignment": "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V1.json"
   },
   "held_artifacts": {
     "v3_quote_revision_v2": {
@@ -73,10 +80,11 @@
     "quote_revision_v2_execution_authorized": false,
     "first_wave_v1_outcomes_opened": false,
     "first_wave_v2_outcomes_opened": false,
-    "broker_acquisition_authorized": false
+    "broker_acquisition_authorized": false,
+    "candidate_promotion_authorized": false
   },
-  "stop_boundary": "STOP_IMMEDIATELY_BEFORE_CALLING_THE_AUTHORIZED_FROZEN_FIRST_WAVE_V2_DEVELOPMENT_RESPONSE_EVALUATOR_ON_REAL_ACCEPTED_M5_RESPONSES",
-  "next_action": "AUTHORIZED_BUT_DO_NOT_EXECUTE_IN_THIS_TURN;NEXT_TURN_MAY_OPEN_ONLY_THE_FROZEN_V2_DEVELOPMENT_RESPONSES_USING_FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V1",
+  "stop_boundary": "STOP_IMMEDIATELY_BEFORE_THE_AUTHORITY_V2_BOUND_RUNNER_READS_THE_FIRST_REAL_V4_DEVELOPMENT_RESPONSE_VALUE",
+  "next_action": "AUTHORIZED_READY_NOT_EXECUTED_AFTER_FINAL_GREEN_VALIDATION;DO_NOT_EXECUTE_IN_THIS_TURN;NEXT_TURN_USE_ONLY_DEVELOPMENT_EXECUTION_RUNNER_V1_WITH_AUTHORITY_V2",
   "final_preoutcome_scientific_audit": "research_core_v4/state/FIRST_WAVE_FINAL_PREOUTCOME_SCIENTIFIC_AUDIT_V1.json",
   "final_preoutcome_validation_result": "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_RESULT_V1.json"
 }
