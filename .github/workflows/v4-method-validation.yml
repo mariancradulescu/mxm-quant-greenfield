@@ -30,23 +30,22 @@ jobs:
         run: python -m pip install --disable-pip-version-check numpy
       - name: Static compile
         run: |
-          python -m py_compile research_core_v4/detector_calibration.py
+          python -m py_compile research_core_v4/detector_calibration.py research_core_v4/detector_calibration_v3.py
       - name: Preoutcome architecture invariants
         run: |
           python -m unittest tests.test_research_core_v4_method
-      - name: Synthetic pooled detector smoke calibration
+      - name: Synthetic heterogeneous hierarchical detector smoke calibration
         run: |
-          python research_core_v4/detector_calibration.py --quick --mode pooled_information_source --output /tmp/v4_quick_calibration.json
+          python research_core_v4/detector_calibration_v3.py --quick --output /tmp/v4_v3_quick_calibration.json
           python - <<'PY'
           import json
-          p=json.load(open("/tmp/v4_quick_calibration.json"))
-          assert p["null_reps"] == 2000
-          assert p["positive_reps_per_effect_per_regime"] == 400
-          assert 2.0 < p["pooled_local_maxT_95pct_threshold"] < 4.0
-          assert set(p["noise_regimes"]) == {"5","10","20"}
-          print("V4_SYNTHETIC_SMOKE_PASS")
+          p=json.load(open("/tmp/v4_v3_quick_calibration.json"))
+          assert p["market_data_used"] is False
+          assert 0.0 <= p["negative_control"]["global_any"] < 0.10
+          assert p["heterogeneous_high_only_20bps"]["active_context"] > p["negative_control"]["active_context"]
+          print("V4_HETEROGENEOUS_HIERARCHICAL_SYNTHETIC_SMOKE_PASS",p)
           PY
-      - name: Assert no market execution surface in V4 method layer
+      - name: Assert no market execution or acquisition surface in V4 method layer
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -62,5 +61,5 @@ jobs:
           bad=[x for x in forbidden if x in text]
           if bad:
               raise SystemExit(f"market execution/acquisition token present in V4 method layer: {bad}")
-          print("V4_NO_MARKET_EXECUTION_SURFACE_PASS")
+          print("V4_NO_MARKET_EXECUTION_OR_ACQUISITION_SURFACE_PASS")
           PY
