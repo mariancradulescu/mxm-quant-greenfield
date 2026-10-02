@@ -1,0 +1,210 @@
+{
+  "schema": "mxm.research-core-v4.detector-calibration-result.v3",
+  "status": "COMPLETE_HETEROGENEOUS_HIERARCHICAL_SYNTHETIC_CALIBRATION_NO_MARKET_OUTCOMES",
+  "as_of_date": "2026-10-02",
+  "spec_ref": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V3.json",
+  "spec_commit": "59b06e39b668cf8477de9cbf07ef2140052de88c",
+  "engine_ref": "research_core_v4/detector_calibration_v3.py",
+  "engine_commit": "a50393aaa9bc77a86c19c98a85de0e10f2822d9e",
+  "real_market_outcomes_opened": false,
+  "broker_contacted": false,
+  "new_market_data_used": false,
+  "protected_forward_opened": false,
+  "primary_architecture": {
+    "structural_contexts": 3,
+    "symbols_per_context": 6,
+    "sibling_volatility_states": 2,
+    "response_horizons": 4,
+    "local_family_leaves_per_context": 8,
+    "local_control": "MAXT",
+    "higher_control": "HOLM_ACROSS_3_CONTEXTS",
+    "temporal_gate": "3_OF_4_QUARTERS_POSITIVE",
+    "breadth_gate": "3_OF_6_SYMBOL_REPLICATES_POSITIVE",
+    "inference_blocks": "14_NONOVERLAPPING_2_WEEK_BLOCKS_MIN_12_VALID"
+  },
+  "empirical_anchor": {
+    "symbol_cluster_mean_se_bps": 10,
+    "interpretation": "BPS_MDE_VALUES_BELOW_APPLY_ONLY_TO_THE_10_BPS_SYMBOL_CLUSTER_SE_SYNTHETIC_ANCHOR",
+    "exposed_v3_refs": [
+      "ORCL_TEMPORAL_CLUSTER_SE_APPROX_8_55_TO_11_58_BPS",
+      "US24_CROSS_SECTIONAL_H1_H2_CLUSTER_SE_APPROX_11_24_TO_33_08_BPS"
+    ]
+  },
+  "negative_control": {
+    "baseline_global_false_positive_rate": 0.051333333333333335,
+    "acceptance": "PASS_WITHIN_MONTE_CARLO_TOLERANCE_AROUND_0_05",
+    "stressed_false_positive_rates": {
+      "FAT_TAILED_INNOVATIONS_T5": 0.05,
+      "WEEKLY_REGIME_SHIFTS": 0.044333333333333336,
+      "STRONGER_CROSS_SYMBOL_COMMON_FACTOR": 0.04033333333333333,
+      "UNEQUAL_SYMBOL_NOISE": 0.048,
+      "MISSING_SYMBOL_WEEKS": 0.041,
+      "UNEQUAL_EVENT_COUNTS": 0.03866666666666667
+    },
+    "conclusion": "HIERARCHICAL_CONTEXT_SELECTION_PLUS_VOLATILITY_STATE_AND_HORIZON_SELECTION_REMAINS_CONTROLLED_NEAR_OR_BELOW_5_PERCENT_IN_ALL_SIMULATED_NULL_STRESSES"
+  },
+  "power_by_effect_prevalence": {
+    "units": "PEAK_INJECTED_SYMBOL_EFFECT_BPS_AT_THE_HIGHEST_EFFECT_RESPONSE_HORIZON_UNDER_10_BPS_SYMBOL_CLUSTER_SE_ANCHOR",
+    "6_OF_6_POSITIVE": {
+      "mde50_bps": 16.081460674157302,
+      "mde80_bps": 22.842741935483872,
+      "mde90_bps": 26.299212598425196,
+      "standardized_mde50": 1.6081460674157302,
+      "standardized_mde80": 2.284274193548387
+    },
+    "5_OF_6_POSITIVE": {
+      "mde50_bps": 19.11864406779661,
+      "mde80_bps": 26.71957671957672,
+      "mde90_bps": 31.159420289855074,
+      "standardized_mde50": 1.911864406779661,
+      "standardized_mde80": 2.671957671957672
+    },
+    "4_OF_6_POSITIVE": {
+      "mde50_bps": 23.916256157635466,
+      "mde80_bps": 34.21232876712329,
+      "mde90_bps": 39.00684931506849,
+      "standardized_mde50": 2.3916256157635467,
+      "standardized_mde80": 3.421232876712329
+    },
+    "STRUCTURAL_SUBSET_3_OF_6": {
+      "mde50_bps": 32.15584415584416,
+      "mde80_bps": 44.682539682539684,
+      "mde90_bps": ">50",
+      "standardized_mde50": 3.215584415584416,
+      "standardized_mde80": 4.468253968253968
+    },
+    "HETEROGENEOUS_POSITIVE_MAGNITUDES": {
+      "mde50_bps": 17.83098591549296,
+      "mde80_bps": 25.909090909090914,
+      "mde90_bps": 29.444444444444446,
+      "standardized_mde50": 1.783098591549296,
+      "standardized_mde80": 2.5909090909090913
+    },
+    "ONE_ZERO_ONE_WEAK": {
+      "mde50_bps": 22.5,
+      "mde80_bps": 31.68674698795181,
+      "mde90_bps": 37.30923694779116,
+      "standardized_mde50": 2.25,
+      "standardized_mde80": 3.168674698795181
+    },
+    "ONE_OPPOSITE_SIGN": {
+      "mde50_bps": 21.49671052631579,
+      "mde80_bps": 29.058823529411764,
+      "mde90_bps": 34.81675392670157,
+      "standardized_mde50": 2.149671052631579,
+      "standardized_mde80": 2.9058823529411764
+    },
+    "TWO_OPPOSITE_SIGN": {
+      "mde50_bps": 32.00557103064067,
+      "mde80_bps": 45.54166666666667,
+      "mde90_bps": ">50",
+      "standardized_mde50": 3.200557103064067,
+      "standardized_mde80": 4.554166666666667
+    }
+  },
+  "power_by_context_concentration": {
+    "EFFECT_PRESENT_BOTH_VOL_STATES": {
+      "mde50_bps": 15.722070844686648,
+      "mde80_bps": 22.535885167464116,
+      "mde90_bps": 26.554621848739497
+    },
+    "EFFECT_PRESENT_HIGH_VOL_ONLY": {
+      "mde50_bps": 19.201277955271564,
+      "mde80_bps": 26.7741935483871,
+      "mde90_bps": 31.37931034482759
+    },
+    "EFFECT_PRESENT_LOW_VOL_ONLY": {
+      "mde50_bps": 18.97798742138365,
+      "mde80_bps": 26.835106382978726,
+      "mde90_bps": 31.46853146853147
+    },
+    "EFFECT_STRONGER_HIGH_THAN_LOW": {
+      "mde50_bps": 18.976897689768975,
+      "mde80_bps": 26.272727272727273,
+      "mde90_bps": 31.180555555555554
+    },
+    "EFFECT_STRONGER_LOW_THAN_HIGH": {
+      "mde50_bps": 18.567251461988306,
+      "mde80_bps": 26.598984771573605,
+      "mde90_bps": 30.465116279069772
+    },
+    "EFFECT_PRESENT_ALL_3_STRUCTURAL_CONTEXTS": {
+      "mde50_bps": 14.342984409799554,
+      "mde80_bps": 19.75,
+      "mde90_bps": 23.151041666666668
+    }
+  },
+  "power_by_noise_regime": {
+    "BASELINE": {
+      "fpr": 0.051333333333333335,
+      "mde50_bps": 16.40988372093023,
+      "mde80_bps": 22.75609756097561,
+      "mde90_bps": 26.473684210526315
+    },
+    "FAT_TAILED_INNOVATIONS_T5": {
+      "fpr": 0.05,
+      "mde50_bps": 15.311475409836065,
+      "mde80_bps": 22.16374269005848,
+      "mde90_bps": 26.161616161616163
+    },
+    "WEEKLY_REGIME_SHIFTS": {
+      "fpr": 0.044333333333333336,
+      "mde50_bps": 16.573705179282868,
+      "mde80_bps": 25.405405405405407,
+      "mde90_bps": 31.53846153846154
+    },
+    "STRONGER_CROSS_SYMBOL_COMMON_FACTOR": {
+      "fpr": 0.04033333333333333,
+      "mde50_bps": 23.48936170212766,
+      "mde80_bps": 33.714285714285715,
+      "mde90_bps": 38.61224489795919
+    },
+    "UNEQUAL_SYMBOL_NOISE": {
+      "fpr": 0.048,
+      "mde50_bps": 17.5381679389313,
+      "mde80_bps": 24.62,
+      "mde90_bps": 29.549549549549553
+    },
+    "MISSING_SYMBOL_WEEKS": {
+      "fpr": 0.041,
+      "mde50_bps": 17.088607594936708,
+      "mde80_bps": 23.826086956521742,
+      "mde90_bps": 28.26732673267327
+    },
+    "UNEQUAL_EVENT_COUNTS": {
+      "fpr": 0.03866666666666667,
+      "mde50_bps": 17.846441947565545,
+      "mde80_bps": 25.071942446043167,
+      "mde90_bps": 29.388489208633093
+    }
+  },
+  "sign_only_strength_stress": {
+    "scenario": "MICRO_SIGN_FLIP_DILUTION_30PCT_UNINFORMATIVE_TRIGGERS",
+    "mde50_bps": 22.836363636363636,
+    "mde80_bps": 32.301587301587304,
+    "mde90_bps": 37.857142857142854,
+    "interpretation": "SIGN_ONLY_RETAINS_TYPE_I_CONTROL_BUT_LOSES_POWER_WHEN_MICRO_SIGN_FLIPS_DILUTE_TRUE_TRANSITIONS;THIS_IS_ACCEPTED_FOR_THE_LOW_BIAS_FIRST_TEST_INSTEAD_OF_ADDING_AN_UNCALIBRATED_DEADBAND_PARAMETER"
+  },
+  "comparison_to_v2": {
+    "v2_homogeneous_10bps_mde50_bps": 12.222222222222221,
+    "v2_homogeneous_10bps_mde80_bps": 18.576030927835053,
+    "correction": "DO_NOT_USE_THE_V2_12_22_OR_18_58_BPS_VALUES_AS_GENERAL_V4_MDE",
+    "reason": "V3_HIERARCHICAL_CALIBRATION_PAYS_CONTEXT_SELECTION_AND_HETEROGENEITY_AND_CALIBRATES_VOLATILITY_CONTEXT_SELECTION"
+  },
+  "acceptance": {
+    "type_I_error_control_verified": true,
+    "heterogeneous_effect_power_reported": true,
+    "context_specific_effect_power_reported": true,
+    "high_low_context_selection_calibrated": true,
+    "structural_hierarchy_calibrated": true,
+    "micro_sign_flip_strength_issue_calibrated": true,
+    "calibration_accepted_for_first_real_market_design_v2": true
+  },
+  "interpretation": [
+    "THE_DETECTOR_CAN_DISCOVER_A_HIGH_ONLY_OR_LOW_ONLY_EDGE_WITHOUT_REQUIRING_UNIVERSALITY_ACROSS_VOLATILITY_STATES",
+    "POWER_DEGRADES_GRADUALLY_AS_EFFECT_PREVALENCE_FALLS_OR_SYMBOLS_HAVE_OPPOSITE_SIGN;THIS_IS_NOW_MEASURED_RATHER_THAN_ASSUMED",
+    "STRONG_CROSS_SYMBOL_COMMON_NOISE_IS_THE_MOST_EXPENSIVE_STRESS_AMONG_THE_TESTED_NOISE_ARCHETYPES",
+    "THE_3_OF_6_BREADTH_GATE_PERMITS_CONTEXT_SPECIALIZATION_BUT_MAKES_A_TRUE_3_OF_6_SUBSET_SUBSTANTIALLY_HARDER_TO_DETECT",
+    "ALL_BPS_MDE_VALUES_ARE_SCENARIO_SPECIFIC_SYNTHETIC_VALUES_AT_THE_STATED_10_BPS_CLUSTER_SE_ANCHOR_NOT_GENERAL_MARKET_THRESHOLDS"
+  ]
+}
