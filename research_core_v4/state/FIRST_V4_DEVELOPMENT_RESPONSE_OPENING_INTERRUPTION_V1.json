@@ -1,0 +1,60 @@
+{
+  "schema": "mxm.research-core-v4.first-development-response-opening-interruption.v1",
+  "as_of_utc": "2026-10-02T11:30:35Z",
+  "execution_source_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+  "authority_ref": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json",
+  "authority_sha256_at_open": "2bf73c2492833463fa942c78c62126db0edc85e0763e468039eaa905390f48bc",
+  "exact_head_validations": {
+    "research_core_v4_method_validation": {
+      "run_id": 37000698204,
+      "head_sha": "68bdee4b51244ae50acd56fe868468b96106450f",
+      "conclusion": "SUCCESS"
+    },
+    "v4_exact_geometry_calibration_v2": {
+      "run_id": 37000698258,
+      "head_sha": "68bdee4b51244ae50acd56fe868468b96106450f",
+      "conclusion": "SUCCESS"
+    }
+  },
+  "pre_response_guard": {
+    "status": "PASS",
+    "development_series_count": 18,
+    "support_skeleton_row_count": 118262,
+    "support_skeleton_sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b",
+    "seed": 20261002,
+    "permutations": 1023
+  },
+  "opening": {
+    "started": true,
+    "durable_o_excl_lock_created_before_response_read": true,
+    "lock_ref": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_LOCK_V1.txt",
+    "lock_content_authority_sha256": "2bf73c2492833463fa942c78c62126db0edc85e0763e468039eaa905390f48bc",
+    "runner": "research_core_v4/development_execution_runner_v1.py",
+    "process_completed": false,
+    "canonical_raw_result_written": false,
+    "canonical_raw_result_sha256": null,
+    "interruption_class": "EXECUTION_ENVIRONMENT_TIMEOUT_AFTER_EXACTLY_ONCE_LOCK_CREATION",
+    "evaluator_rerun_performed": false,
+    "lock_deleted_or_bypassed": false
+  },
+  "outcome_governance": {
+    "conservatively_treat_development_responses_as_opened": true,
+    "human_interpretation_performed": false,
+    "frozen_gate_interpretation_performed": false,
+    "confirmation_availability_preflight_run": false,
+    "confirmation_response_opened": false,
+    "broker_acquisition_run": false,
+    "quote_revision_v2_run": false,
+    "protected_forward_opened": false,
+    "candidate_promotion_performed": false,
+    "live_trading_started": false
+  },
+  "fail_closed": {
+    "second_development_response_opening_authorized": false,
+    "delete_or_bypass_opening_lock_authorized": false,
+    "direct_evaluator_execution_authorized": false,
+    "confirmation_authorized": false,
+    "rule": "DO_NOT_RERUN_OR_REOPEN_THE_FROZEN_DEVELOPMENT_RESPONSES;NO_CANONICAL_RESULT_EXISTS_TO_INTERPRET"
+  },
+  "scientific_design_changed": false
+}

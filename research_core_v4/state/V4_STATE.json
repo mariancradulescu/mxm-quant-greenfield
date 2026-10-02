@@ -26,11 +26,11 @@
     "design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
     "development_context_count": 3,
     "development_execution_runner": "research_core_v4/development_execution_runner_v1.py",
-    "development_outcomes_opened": false,
+    "development_outcomes_opened": true,
     "development_response_evaluator": "research_core_v4/response_evaluator_v3.py",
     "development_response_execution_authority": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json",
     "development_symbol_count": 18,
-    "evaluator_execution_authorized": true,
+    "evaluator_execution_authorized": false,
     "exact_geometry_calibration": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json",
     "exact_geometry_calibration_full": "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json",
     "exact_geometry_calibration_status": "PASS_PRODUCTION_REBUILT_SUPPORT_V2_FULL_OUTCOME_BLIND_CALIBRATION_V3",
@@ -61,7 +61,13 @@
     "support_skeleton_audit_v1_status": "SUPERSEDED_PREOUTCOME_PRODUCTION_PARITY_MISMATCH",
     "v1_design": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1.json",
     "v1_status": "SUPERSEDED_BEFORE_ANY_V4_MARKET_OUTCOME",
-    "volatility_sibling_contexts_per_structural_context": 2
+    "volatility_sibling_contexts_per_structural_context": 2,
+    "development_response_opening_started": true,
+    "development_execution_completed": false,
+    "development_raw_result_persisted": false,
+    "development_result_interpreted": false,
+    "development_response_opening_lock": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_LOCK_V1.txt",
+    "development_opening_interruption": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_INTERRUPTION_V1.json"
   },
   "governance": {
     "autonomous_writer_workflows_enabled": false,
@@ -71,7 +77,7 @@
     "candidate_promotion_authorized": false,
     "external_market_data_used": false,
     "first_wave_v1_outcomes_opened": false,
-    "first_wave_v2_outcomes_opened": false,
+    "first_wave_v2_outcomes_opened": true,
     "live_trading_started": false,
     "protected_forward_opened": false,
     "quote_revision_v2_execution_authorized": false,
@@ -88,7 +94,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "EXECUTE_ONLY_IF_BOTH_REQUIRED_EXACT_HEAD_GITHUB_ACTIONS_ARE_GREEN_ON_THIS_EXACT_READY_HEAD;THEN_USE_ONLY_DEVELOPMENT_EXECUTION_RUNNER_V1_WITH_AUTHORITY_V3_AND_EXACT_ACCEPTED_INPUTS",
+  "next_action": "STOP_FAIL_CLOSED;DO_NOT_RERUN_DEVELOPMENT_RESPONSES;DO_NOT_OPEN_CONFIRMATION_OR_ANY_NEXT_RESEARCH_ACTION",
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
     "v3_freeze_ref": "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json",
@@ -99,6 +105,6 @@
   "project_contract": "research_core_v4/V4_PROJECT_CONTRACT_V1.json",
   "project_selection_bias_audit": "research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json",
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "FIRST_REAL_MARKET_DESIGN_V2_AUTHORITY_V3_READY_NOT_EXECUTED",
-  "stop_boundary": "STOP_IMMEDIATELY_BEFORE_THE_AUTHORITY_V3_BOUND_RUNNER_READS_THE_FIRST_REAL_V4_DEVELOPMENT_RESPONSE_VALUE"
+  "status": "FIRST_REAL_MARKET_DESIGN_V2_AUTHORITY_V3_OPENING_INTERRUPTED_FAIL_CLOSED_NO_CANONICAL_RESULT",
+  "stop_boundary": "STOP_AFTER_DURABLY_PERSISTING_THE_INTERRUPTED_EXACTLY_ONCE_DEVELOPMENT_OPENING_WITHOUT_A_CANONICAL_RAW_RESULT"
 }
