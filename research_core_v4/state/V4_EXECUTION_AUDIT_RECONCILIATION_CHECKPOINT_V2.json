@@ -1,0 +1,61 @@
+{
+  "schema": "mxm.research-core-v4.execution-audit-reconciliation-checkpoint.v2",
+  "as_of_date": "2026-10-02",
+  "status": "RECONCILED_STATIC_AUDIT_PERSISTED_BEFORE_NEW_BENCHMARKS",
+  "authoritative_branch": "performance-research-v3-20260922",
+  "reconciled_entry_head": "1901b3d06d99d582c2ef6996b9c9ef27ea9ffd79",
+  "reconciled_entry_parent": "4d6cec11c83a6dcbf9297140fbe291a71f03d005",
+  "newer_live_progress_found": true,
+  "newer_commit_disposition": "PRESERVE_AS_PROVISIONAL_AUDIT_PROGRESS_BUT_NOT_ACCEPT_AS_FINAL_BECAUSE_EXACT_HEAD_VALIDATIONS_FAILED",
+  "scientific_boundary": {
+    "real_development_response_execution_started_in_this_reconciliation": false,
+    "real_development_response_values_used": false,
+    "canonical_raw_development_result_count": 0,
+    "development_verdict": "UNKNOWN",
+    "prior_infrastructure_failures_are_market_evidence": false
+  },
+  "failed_exact_head_validations": [
+    {
+      "workflow": "V4 Recovery V2 Governance and Runtime Audit",
+      "run_id": 37010667920,
+      "head": "1901b3d06d99d582c2ef6996b9c9ef27ea9ffd79",
+      "conclusion": "failure"
+    },
+    {
+      "workflow": "Research Core V4 Method Validation",
+      "run_id": 37010667935,
+      "head": "1901b3d06d99d582c2ef6996b9c9ef27ea9ffd79",
+      "conclusion": "failure"
+    },
+    {
+      "workflow": "V4 Exact Geometry Calibration V2",
+      "run_id": 37010667809,
+      "head": "1901b3d06d99d582c2ef6996b9c9ef27ea9ffd79",
+      "conclusion": "failure"
+    }
+  ],
+  "immediate_ci_failure_root_cause": {
+    "classification": "AUDIT_CONTROL_INVOCATION_DEFECT_NOT_SCIENTIFIC_FAILURE",
+    "detail": "crash_recovery_control_v2.py was invoked as a file while importing research_core_v4 as a package, causing ModuleNotFoundError before Recovery V2 validation; runtime_profile_audit_v1.py has the same package-import exposure if invoked as a file.",
+    "frozen_science_changed": false
+  },
+  "static_complexity_findings": [
+    "build_nonselection_diagnostics enumerates four diagnostic families and materializes context/group rows for every volatility-state x horizon leaf",
+    "_paired_leaf_metrics reconstructs paired units twice per diagnostic row: normalized then raw",
+    "construct_paired_units scans every supplied event and all four horizons on each invocation even when the caller immediately retains one horizon",
+    "build_nonselection_diagnostics repeatedly filters the complete event sequence by context/group/state",
+    "normalized and raw diagnostics rebuild the same immutable grouping topology independently",
+    "_development_support_leaf repeatedly filters context/state/symbol event subsets, but this is a smaller bounded primary-path pattern than diagnostic reconstruction",
+    "local_shared_maxT complexity depends primarily on permutations x block span x leaf count, which is frozen and small relative to repeated event rescans at large N"
+  ],
+  "current_hypothesis_not_conclusion": "NONSELECTION_DIAGNOSTIC_RECONSTRUCTION_IS_THE_DOMINANT_PURE_PYTHON_SCALING_HOTSPOT;REPRODUCE_WITH_REQUIRED_3000_6000_12000_24000_BOUNDED_SYNTHETIC_PROFILE_BEFORE_CLASSIFYING",
+  "next_allowed_action": "ADD_BOUNDED_SYNTHETIC_PROFILER_AND_RUN_PROGRESSIVE_3000_6000_12000_24000_BENCHMARKS_WITH_30_SECOND_STAGE_BUDGETS",
+  "hard_stop": {
+    "real_development_response_execution": false,
+    "confirmation": false,
+    "broker_acquisition": false,
+    "protected_forward": false,
+    "candidate_promotion": false,
+    "live_trading": false
+  }
+}
