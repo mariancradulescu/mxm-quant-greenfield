@@ -8,8 +8,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from research_core_v4 import response_evaluator_v3 as ev
-from research_core_v4.frozen_v2_semantics import canonical_json_bytes
+try:
+    from research_core_v4 import response_evaluator_v3 as ev
+    from research_core_v4.frozen_v2_semantics import canonical_json_bytes
+except ModuleNotFoundError:
+    import response_evaluator_v3 as ev
+    from frozen_v2_semantics import canonical_json_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 AUTHORITY_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V2.json"
