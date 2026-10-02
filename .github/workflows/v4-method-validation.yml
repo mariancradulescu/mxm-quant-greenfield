@@ -36,7 +36,8 @@ jobs:
             research_core_v4/response_evaluator_v3.py \
             research_core_v4/exact_geometry_calibration_v2.py \
             research_core_v4/exact_geometry_calibration_v3.py \
-            research_core_v4/development_execution_runner_v1.py
+            research_core_v4/development_execution_runner_v1.py \
+            research_core_v4/crash_recovery_control_v1.py
       - name: Preoutcome architecture and evaluator invariants
         run: |
           python -m unittest \
@@ -44,6 +45,8 @@ jobs:
             tests.test_research_core_v4_response_evaluator \
             tests.test_research_core_v4_support_geometry \
             tests.test_research_core_v4_execution_binding
+      - name: Deterministic crash-recovery control-plane invariants
+        run: python research_core_v4/crash_recovery_control_v1.py
       - name: Exact real-support geometry synthetic calibration smoke
         run: |
           python research_core_v4/exact_geometry_calibration_v3.py \

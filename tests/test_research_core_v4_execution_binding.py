@@ -149,20 +149,33 @@ class ExecutionBindingTests(unittest.TestCase):
 
 
     def test_live_authority_v3_bindings_match_production_support_v2_preoutcome(self):
+        # Recovery must not relax the original READY gate. Validate Authority V3
+        # against the immutable pre-interruption state snapshot using the unchanged runner.
         authority=runner.load_json(runner.ROOT/runner.AUTHORITY_REL)
-        state=runner.load_json(runner.ROOT/runner.STATE_REL)
+        historical=runner.load_json(runner.ROOT/"research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_PREINTERRUPTION_STATE_V1.json")
         design=runner.load_json(runner.ROOT/runner.DESIGN_REL)
         manifest=runner.load_json(runner.ROOT/runner.MANIFEST_REL)
         support=runner.load_json(runner.ROOT/runner.SUPPORT_REL)
-        runner.verify_static_bindings(authority,state,design,manifest,support)
+        runner.verify_static_bindings(authority,historical,design,manifest,support)
         self.assertEqual(authority["status"],"AUTHORIZED_READY_NOT_EXECUTED")
         self.assertTrue(authority["real_development_response_execution_authorized"])
-        self.assertTrue(state["first_wave"]["evaluator_execution_authorized"])
+        self.assertTrue(historical["first_wave"]["evaluator_execution_authorized"])
         self.assertEqual(authority["bindings"]["support_skeleton_row_count"],118262)
         self.assertEqual(authority["bindings"]["support_skeleton_sha256"],"e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b")
         self.assertFalse(runner.RESPONSE_OPENING_STARTED)
-        self.assertFalse(state["first_wave"]["development_outcomes_opened"])
-        self.assertFalse(state["first_wave"]["confirmation_outcomes_opened"])
+        self.assertFalse(historical["first_wave"]["development_outcomes_opened"])
+        self.assertFalse(historical["first_wave"]["confirmation_outcomes_opened"])
+
+        # Separately validate the current interrupted/recovery state without making
+        # the frozen runner accept it as a fresh READY state.
+        from research_core_v4.crash_recovery_control_v1 import validate_current_control_plane
+        report=validate_current_control_plane()
+        self.assertEqual(report["status"],"PASS")
+        self.assertEqual(report["allowed_attempts"],1)
+        self.assertFalse(report["scientific_design_changed"])
+        self.assertFalse(report["evaluator_changed"])
+        self.assertFalse(report["runner_changed"])
+
 
     def test_exactly_one_current_development_authority_is_v3(self):
         state=runner.load_json(runner.ROOT/runner.STATE_REL)

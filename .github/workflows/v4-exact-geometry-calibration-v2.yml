@@ -10,6 +10,13 @@ on:
       - "research_core_v4/response_evaluator_v3.py"
       - "research_core_v4/frozen_v2_semantics.py"
       - "research_core_v4/development_execution_runner_v1.py"
+      - "research_core_v4/crash_recovery_control_v1.py"
+      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V1.json"
+      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_LOCK_V1.txt"
+      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_PREINTERRUPTION_STATE_V1.json"
+      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_INTERRUPTION_V1.json"
+      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_LOCK_V1.txt"
+      - "tests/test_research_core_v4_execution_binding.py"
       - "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V2.json"
       - "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json"
       - "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"
@@ -36,7 +43,7 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --disable-pip-version-check numpy
       - name: Compile aligned production and calibration code
-        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py
+        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py research_core_v4/crash_recovery_control_v1.py
       - name: Verify recovered accepted full V3 artifact persistence
         run: |
           python - <<'PY'
@@ -90,6 +97,8 @@ jobs:
           PY
       - name: Authority V3 calibration binding precheck
         run: python -m unittest tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_live_authority_v3_bindings_match_production_support_v2_preoutcome
+      - name: Deterministic crash-recovery control-plane invariants
+        run: python research_core_v4/crash_recovery_control_v1.py
       - uses: actions/upload-artifact@v4
         with:
           name: V4_EXACT_GEOMETRY_CALIBRATION_V3_EXACT_HEAD_VERIFIED
