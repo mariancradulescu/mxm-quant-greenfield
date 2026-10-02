@@ -1,0 +1,72 @@
+{
+  "schema": "mxm.research-core-v4.detector-calibration-spec.v1",
+  "status": "FROZEN_BEFORE_CALIBRATION_EXECUTION",
+  "as_of_date": "2026-10-02",
+  "purpose": "MEASURE_TYPE_I_ERROR_POWER_AND_METHOD_ALIGNMENT_NOT_MARKET_ALPHA",
+  "new_market_data_used": false,
+  "market_outcomes_opened": false,
+  "seed": 20261002,
+  "positive_effect_grid_bps": [
+    0.25,
+    0.5,
+    1,
+    2,
+    3,
+    5,
+    8,
+    10,
+    15,
+    20
+  ],
+  "template": {
+    "weekly_clusters": 28,
+    "symbol_families": 6,
+    "response_horizons": 4,
+    "local_family": "4_RESPONSE_HORIZONS_PER_SYMBOL",
+    "local_test": "EMPIRICAL_MAXT_ONE_SIDED_ALPHA_0.05",
+    "higher_selection_diagnostic": "HOLM_FWER_0.05_ACROSS_6_SYMBOL_FAMILY_PVALUES",
+    "temporal_stability_gate": "SELECTED_HORIZON_POSITIVE_IN_AT_LEAST_3_OF_4_CHRONOLOGICAL_7_WEEK_BLOCKS",
+    "old_connected_region_diagnostic_surrogate": "AT_LEAST_ONE_OF_THE_TWO_ADJACENT_3_HORIZON_RUNS_HAS_ALL_THREE_UNADJUSTED_Z_GT_1.645_AND_POSITIVE;DIAGNOSTIC_ONLY_NOT_EXACT_RECONSTRUCTION_OF_EVERY_V3_TOPOLOGY"
+  },
+  "dependence_generator": {
+    "weekly_ar1": 0.25,
+    "cross_horizon_ar1_correlation": 0.65,
+    "cross_symbol_common_factor_weight": 0.3,
+    "log_volatility_ar1": 0.85,
+    "log_volatility_loading": 0.22,
+    "injected_horizon_shape": [
+      0.5,
+      1,
+      0.75,
+      0.4
+    ]
+  },
+  "noise_regimes": [
+    {
+      "id": "LOW_NOISE",
+      "target_cluster_mean_se_bps": 5,
+      "interpretation": "OPTIMISTIC_STRESS_CASE"
+    },
+    {
+      "id": "REPRESENTATIVE_TEMPORAL_BAR",
+      "target_cluster_mean_se_bps": 10,
+      "anchor": "ORCL_TEMPORAL_CLUSTER_SE_APPROX_8.55_TO_11.58_BPS"
+    },
+    {
+      "id": "HIGH_NOISE",
+      "target_cluster_mean_se_bps": 20,
+      "anchor": "US24_CROSS_SECTIONAL_H1_H2_CLUSTER_SE_APPROX_11.24_TO_33.08_BPS"
+    }
+  ],
+  "monte_carlo": {
+    "null_calibration_replicates": 20000,
+    "positive_replicates_per_effect_per_regime": 4000,
+    "separate_negative_control_check_replicates": 12000,
+    "interpolation_for_mde": "LINEAR_BETWEEN_REQUESTED_EFFECT_GRID_POINTS;REPORT_GT20_IF_TARGET_POWER_NOT_REACHED"
+  },
+  "forbidden_interpretation": [
+    "DO_NOT_TREAT_SYNTHETIC_POWER_AS_EVIDENCE_OF_MARKET_EDGE",
+    "DO_NOT_USE_CALIBRATION_TO_SELECT_A_WINNING_SYMBOL",
+    "DO_NOT_LOWER_MULTIPLICITY_CONTROL_POSTOUTCOME"
+  ]
+}
