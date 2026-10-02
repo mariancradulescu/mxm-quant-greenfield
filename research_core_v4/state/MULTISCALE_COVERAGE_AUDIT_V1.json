@@ -1,0 +1,69 @@
+{
+  "schema": "mxm.research-core-v4.multiscale-coverage-audit.v1",
+  "status": "COMPLETE_PREOUTCOME_SCALE_COVERAGE_AUDIT",
+  "accepted_v3_source": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+  "accepted_series": 145,
+  "accepted_interval": [
+    "2025-09-16T00:00:00Z",
+    "2026-09-16T23:50:00Z"
+  ],
+  "protected_forward_start": "2026-09-17T12:02:58Z",
+  "scale_availability": {
+    "H4": {
+      "status": "DERIVABLE_CAUSALLY_FROM_ACCEPTED_M5",
+      "rule": "48_CONSECUTIVE_M5_BARS_PER_UTC_ALIGNED_H4_BUCKET_REQUIRE_COMPLETE_BUCKET_NO_FORWARD_FILL"
+    },
+    "H1": {
+      "status": "DERIVABLE_CAUSALLY_FROM_ACCEPTED_M5",
+      "rule": "12_CONSECUTIVE_M5_BARS_PER_UTC_ALIGNED_H1_BUCKET_REQUIRE_COMPLETE_BUCKET_NO_FORWARD_FILL"
+    },
+    "M30": {
+      "status": "DERIVABLE_CAUSALLY_FROM_ACCEPTED_M5",
+      "rule": "6_CONSECUTIVE_M5_BARS_COMPLETE_BUCKET"
+    },
+    "M15": {
+      "status": "DERIVABLE_CAUSALLY_FROM_ACCEPTED_M5",
+      "rule": "3_CONSECUTIVE_M5_BARS_COMPLETE_BUCKET"
+    },
+    "M5": {
+      "status": "NATIVE_ACCEPTED_EVIDENCE"
+    },
+    "M1": {
+      "status": "NOT_AVAILABLE_IN_CURRENT_ACCEPTED_GENERAL_V3_EVIDENCE"
+    },
+    "QUOTE_EVENT_TIME": {
+      "status": "NO_GENERAL_REUSABLE_RAW_STREAM;QUOTE_V2_ARTIFACT_UNUSED_AND_HELD"
+    },
+    "TICK_OR_ACTIVITY_TIME": {
+      "status": "M5_TICK_VOLUME_PROXY_AVAILABLE_TRUE_EVENT_TIME_NOT_GENERAL"
+    },
+    "REALIZED_VARIANCE_TIME": {
+      "status": "COARSE_M5_BASED_CAUSAL_RV_AVAILABLE_TRUE_HIGH_FREQUENCY_RV_LIMITED"
+    },
+    "SPREAD_STATE_TIME": {
+      "status": "FRICTION_SNAPSHOTS_AND_DERIVED_QUOTE_PILOTS_ONLY_NOT_GENERAL_CONTINUOUS_STATE"
+    }
+  },
+  "aggregation_integrity": {
+    "timestamp_anchor": "UTC",
+    "completed_information_only": true,
+    "partial_bucket_forbidden": true,
+    "synthetic_fill": false,
+    "forward_fill": false,
+    "gap_crossing_feature_forbidden": true,
+    "same_timestamp_higher_scale_close_available_at_or_after_its_close_only": true
+  },
+  "first_wave_compact_topology": [
+    "H4_CONTEXT",
+    "H1_SETUP",
+    "M15_STATE_TRANSITION",
+    "M5_EVENT_CLOCK"
+  ],
+  "first_wave_excludes": [
+    "M1",
+    "QUOTE_EVENT_TIME",
+    "TRUE_ACTIVITY_TIME",
+    "SPREAD_STATE_TIME"
+  ],
+  "reason": "MAXIMIZES_METHOD_CORRECTION_WITH_EXISTING_ACCEPTED_EVIDENCE_AND_ZERO_NEW_MARKET_ACQUISITION"
+}
