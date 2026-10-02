@@ -1,0 +1,218 @@
+{
+  "schema": "mxm.research-core-v3.quote-revision-sequence-pressure-development-design.v2",
+  "status": "FROZEN_PREOUTCOME_CORRECTED_DESIGN_SUPERSEDES_V1_BEFORE_ANY_NEW_QUOTE_OUTCOMES",
+  "supersedes": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V1.json",
+  "supersession_audit_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_METHOD_AND_ACQUISITION_AUDIT_V2.json",
+  "supersession_audit_commit": "aba50bd27f87b8363d43b45fb6efdf903c64a803",
+  "v1_outcomes_opened_before_supersession": false,
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "subfamily": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "signal_symbols": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116
+    }
+  ],
+  "calendar": {
+    "dates_utc": [
+      "2025-10-13",
+      "2025-10-14",
+      "2025-10-08",
+      "2025-11-13",
+      "2025-11-14",
+      "2025-12-08",
+      "2025-12-11",
+      "2025-12-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-02-09",
+      "2026-02-10",
+      "2026-02-13",
+      "2026-03-11",
+      "2026-03-12",
+      "2026-04-13",
+      "2026-04-08",
+      "2026-04-09",
+      "2026-05-12",
+      "2026-05-08",
+      "2026-06-09",
+      "2026-06-10",
+      "2026-06-11",
+      "2026-07-13",
+      "2026-07-10",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-09-14",
+      "2026-09-08"
+    ],
+    "date_count": 30,
+    "weekday_counts": {
+      "MONDAY": 6,
+      "TUESDAY": 6,
+      "WEDNESDAY": 6,
+      "THURSDAY": 6,
+      "FRIDAY": 6
+    },
+    "months": 12,
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "hypothesis_scope": "GENERAL_ACROSS_THE_THREE_FROZEN_WINDOWS_NOT_WINDOW_SPECIFIC"
+  },
+  "quote_state": {
+    "evaluation_grid": "INTEGER_UTC_SECONDS",
+    "bid": "LATEST_BID_EVENT_AT_OR_BEFORE_T_USING_PRESERVED_BROKER_EVENT_ORDER_FOR_EQUAL_TIMESTAMPS",
+    "ask": "LATEST_ASK_EVENT_AT_OR_BEFORE_T_USING_PRESERVED_BROKER_EVENT_ORDER_FOR_EQUAL_TIMESTAMPS",
+    "freshness": "BOTH_SIDE_AGES_LE_2000MS_AND_ASK_GE_BID_GT_0",
+    "mid": "(BID+ASK)/2",
+    "spread_bps": "LOG(ASK/BID)*10000",
+    "baseline_window_seconds": 60,
+    "minimum_valid_baseline_snapshots": 45,
+    "median_spread_baseline": "MEDIAN_VALID_SPREAD_BPS_OVER_T_MINUS_60_THROUGH_T_MINUS_1;REQUIRE_GT_0"
+  },
+  "causal_feature_law": {
+    "price_changing_revision": "PER_SIDE_CONSECUTIVE_BROKER_EVENTS;UNCHANGED_PRICE_EVENTS_EXCLUDED_FROM_DIRECTION_COUNTS_BUT_RETAINED_IN_RAW_EVIDENCE",
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "directional_revision_counts": "UP_AND_DOWN_COUNTS_ACROSS_BID_AND_ASK_PRICE_CHANGING_EVENTS_IN_(T-L,T]",
+    "minimum_directional_revision_count": 6,
+    "signed_revision_imbalance": "(UP_COUNT-DOWN_COUNT)/(UP_COUNT+DOWN_COUNT)",
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "net_mid_displacement_units": "ABS(LOG(MID_T/MID_T_MINUS_L)*10000)/MEDIAN_SPREAD_BASELINE",
+    "maximum_abs_net_mid_displacement_units": 0.75,
+    "spread_filter": "SPREAD_BPS_T_LE_MEDIAN_SPREAD_BASELINE",
+    "signal": "FRESH_T_AND_T_MINUS_L;REVISION_COUNT_GE_6;ABS_IMBALANCE_GE_THRESHOLD;NET_MID_DISPLACEMENT_UNITS_LE_0.75;SPREAD_FILTER_PASS",
+    "base_direction": "LONG_IF_IMBALANCE_POSITIVE_SHORT_IF_NEGATIVE"
+  },
+  "parameter_grid": {
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "direction_law": [
+      "CONTINUATION",
+      "REVERSION"
+    ],
+    "response_horizon_seconds": [
+      10,
+      30,
+      90
+    ]
+  },
+  "cells_per_symbol": 24,
+  "total_cells": 120,
+  "response_semantics": {
+    "role": "CAUSAL_INFORMATION_RESPONSE_NOT_EXIT_OPTIMIZATION",
+    "signal_time": "INTEGER_SECOND_T_AFTER_ALL_EVENTS_TIMESTAMPED_LE_T_HAVE_BEEN_PROCESSED",
+    "entry": "FRESH_SIDE_AWARE_QUOTE_STATE_AT_T_PLUS_1_SECOND",
+    "continuation": "TRADE_BASE_DIRECTION",
+    "reversion": "TRADE_OPPOSITE_BASE_DIRECTION",
+    "response_state": "FRESH_SIDE_AWARE_QUOTE_EXACTLY_H_SECONDS_AFTER_ENTRY",
+    "long_spread_net_bps": "LOG(RESPONSE_BID/ENTRY_ASK)*10000",
+    "short_spread_net_bps": "LOG(ENTRY_BID/RESPONSE_ASK)*10000",
+    "missing": "RIGHT_CENSOR_NO_DELAY_SEARCH_NO_INTERPOLATION_NO_STALE_REPAIR",
+    "overlap": "WITHIN_EACH_SYMBOL_X_CELL_IGNORE_SIGNALS_UNTIL_THE_PREDECLARED_RESPONSE_HORIZON_COMPLETES"
+  },
+  "support_gate": {
+    "completed_events_min": 100,
+    "distinct_sample_dates_min": 18,
+    "distinct_iso_weeks_min": 10,
+    "retention_fraction_min": 0.8,
+    "completed_events_per_window_min": 15,
+    "support_ineligible_cells_assigned_p1": true
+  },
+  "signal_information_gate": {
+    "mean_spread_net_bps_strictly_positive": true,
+    "chronological_event_count_thirds_each_mean_strictly_positive": true,
+    "each_frozen_window_mean_spread_net_bps_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5,
+    "universal_fixed_bps_hurdle": null
+  },
+  "multiplicity": {
+    "local_family": "24_CELLS_PER_SYMBOL",
+    "procedure": "SHARED_SAMPLED_DATE_WILD_SIGN_MAX_T_WITHIN_SYMBOL",
+    "dependence_cluster": "SAMPLED_UTC_DATE",
+    "local_familywise_alpha": 0.05,
+    "resamples": 4999,
+    "seed_rule": "20261002_PLUS_SYMBOL_ID",
+    "cross_symbol_development_correction": "NONE_BECAUSE_DEVELOPMENT_LEADS_CANNOT_PROMOTE_AND_ALL_LEADS_MUST_ENTER_INDEPENDENT_CONFIRMATION",
+    "no_free_best_symbol": true
+  },
+  "development_lead_gate": {
+    "connected_region_required": false,
+    "minimum_full_pass_cells": 1,
+    "mechanistic_robustness": [
+      "ALL_THREE_CHRONOLOGICAL_THIRDS_POSITIVE",
+      "ALL_THREE_TIME_WINDOWS_POSITIVE_WITH_SUPPORT",
+      "CONCENTRATION_LE_0.5"
+    ],
+    "neighboring_threshold_recorded_not_required": true,
+    "label": "DEVELOPMENT_INFORMATION_LEAD_ONLY"
+  },
+  "confirmation_architecture": {
+    "all_surviving_symbols_confirmed": true,
+    "representative_cell_selection": "SMALLEST_LOCAL_P_THEN_LARGEST_T_THEN_LEXICOGRAPHIC_CELL_ID",
+    "freeze_before_confirmation": true,
+    "independent_calendar_required": true,
+    "cross_symbol_confirmation_control": "HOLM_FWER_0.05",
+    "candidate_freeze_from_development": false
+  },
+  "economic_boundary": {
+    "primary_response_includes_authentic_bid_ask_spread": true,
+    "universal_2bps_gate_removed": true,
+    "current_commission_metadata_required_pre_capture": true,
+    "min_volume_step_and_expected_margin_required_pre_capture": true,
+    "current_commission_adjusted_promotion": "DEFERRED_UNTIL_A_STATISTICAL_DEVELOPMENT_LEAD_EXISTS_AND_AUTHENTIC_SYMBOL_SPECIFIC_COMMISSION_CONVERSION_IS_AVAILABLE",
+    "safe_eur200_sizing_required_before_candidate": true,
+    "proxy_costs_forbidden": true
+  },
+  "permanent_close_rule": {
+    "symbol_exact_v2": "IF_NO_CELL_IN_A_SYMBOL_PASSES_SUPPORT_LOCAL_MAXT_AND_MECHANISTIC_STABILITY_THAT_SYMBOL_LOCAL_V2_SPECIFICATION_CLOSES",
+    "wave_exact_v2": "IF_NO_SYMBOL_PRODUCES_A_DEVELOPMENT_INFORMATION_LEAD_CLOSE_THIS_EXACT_V2_SUBFAMILY_ON_THIS_PANEL_AND_CALENDAR",
+    "broader_quote_microstructure_exhausted": false,
+    "same_outcome_threshold_lookback_direction_horizon_or_exit_rescue": false
+  },
+  "governance": {
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true,
+    "live_trading_started": false
+  }
+}
