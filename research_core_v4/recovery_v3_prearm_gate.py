@@ -4,6 +4,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,7 @@ SCIENTIFIC_SOURCE_HEAD = "68bdee4b51244ae50acd56fe868468b96106450f"
 SEED = 20261002
 PERMUTATIONS = 1023
 ENCRYPTION_FORMAT = "OPENPGP_SYMMETRIC_AES256_WITH_INTEGRITY_PROTECTION"
+KEY_BINDING_DOMAIN = b"MXM_V4_INPUT_BUNDLE_KEY_BINDING_V1"
 
 ARM_REL = "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ARM_V1.json"
 STATE_REL = "research_core_v4/state/V4_STATE.json"
@@ -43,11 +45,20 @@ def sha256_bytes(data: bytes) -> str:
 def sha256_file(path: Path) -> str:
     h=hashlib.sha256()
     with path.open("rb") as f:
-        for chunk in iter(lambda:f.read(1024*1024),b""): h.update(chunk)
+        for chunk in iter(lambda:f.read(1024*1024),b""):
+            h.update(chunk)
     return h.hexdigest()
 
 def canonical_sha256(value: Any) -> str:
     return sha256_bytes(json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode("utf-8"))
+
+def secret_binding_sha256(secret: str) -> str:
+    require(isinstance(secret,str) and len(secret)>0,"required input-bundle secret absent")
+    return sha256_bytes(KEY_BINDING_DOMAIN + secret.encode("utf-8"))
+
+def require_decryption_success(returncode: int) -> dict:
+    require(int(returncode)==0,"encrypted input-bundle decryption failed")
+    return {"status":"PASS_DECRYPTION_COMPLETED_BEFORE_ATTEMPT_LOCK"}
 
 def load_json(path: Path) -> dict:
     value=json.loads(path.read_text(encoding="utf-8"))
@@ -56,35 +67,53 @@ def load_json(path: Path) -> dict:
 
 def parse_json_object_bytes(data: bytes,label: str) -> dict:
     require(bool(data.strip()),f"{label} empty")
-    try: value=json.loads(data.decode("utf-8"))
-    except Exception as exc: raise PermissionError(f"RECOVERY_V3_PREARM_GATE_FAIL {label} malformed") from exc
+    try:
+        value=json.loads(data.decode("utf-8"))
+    except Exception as exc:
+        raise PermissionError(f"RECOVERY_V3_PREARM_GATE_FAIL {label} malformed") from exc
     require(isinstance(value,dict),f"{label} must be an object")
     return value
 
 def _exact_series(root: Path) -> list[dict]:
-    recovery=load_json(root/RECOVERY_AUTH_REL); execution=load_json(root/EXEC_AUTH_REL)
-    a=recovery["frozen_reference"]["exact_18_series"]; b=execution["bindings"]["development_series"]
+    recovery=load_json(root/RECOVERY_AUTH_REL)
+    execution=load_json(root/EXEC_AUTH_REL)
+    a=recovery["frozen_reference"]["exact_18_series"]
+    b=execution["bindings"]["development_series"]
     require(a==b,"Recovery V3 exact-series binding differs from Execution Authority V3")
     require(len(a)==18,"exact series count is not 18")
     return a
 
 def expected_runtime_bindings(root: Path) -> dict:
-    state=load_json(root/STATE_REL); recovery=load_json(root/RECOVERY_AUTH_REL); series=_exact_series(root)
+    state=load_json(root/STATE_REL)
+    recovery=load_json(root/RECOVERY_AUTH_REL)
+    series=_exact_series(root)
     frozen={}
     for key,(rel,expected) in FROZEN_HASHES.items():
-        actual=sha256_file(root/rel); require(actual==expected,f"frozen science changed: {rel}"); frozen[key]=actual
+        actual=sha256_file(root/rel)
+        require(actual==expected,f"frozen science changed: {rel}")
+        frozen[key]=actual
     prep=state.get("recovery_v3_preparation",{})
     require(prep.get("accepted_canonical_result_count")==0,"canonical accepted result count is not zero")
     require(prep.get("real_execution_authorized") is False,"real execution already authorized in V4_STATE")
     require(prep.get("arm_present") is False,"V4_STATE already claims ARM present")
     return {
-        "canonical_repository":REPOSITORY,"research_branch":BRANCH,"scientific_source_head":SCIENTIFIC_SOURCE_HEAD,
-        "frozen_hashes":frozen,"recovery_v3_authority_sha256":sha256_file(root/RECOVERY_AUTH_REL),
-        "canonical_v4_state_sha256":sha256_file(root/STATE_REL),"installed_runtime_workflow_sha256":sha256_file(root/WORKFLOW_REL),
+        "canonical_repository":REPOSITORY,
+        "research_branch":BRANCH,
+        "scientific_source_head":SCIENTIFIC_SOURCE_HEAD,
+        "frozen_hashes":frozen,
+        "recovery_v3_authority_sha256":sha256_file(root/RECOVERY_AUTH_REL),
+        "canonical_v4_state_sha256":sha256_file(root/STATE_REL),
+        "installed_runtime_workflow_sha256":sha256_file(root/WORKFLOW_REL),
         "staging_certificate_sha256":sha256_file(root/STAGING_REL) if (root/STAGING_REL).exists() else None,
-        "exact_18_series_manifest_sha256":canonical_sha256(series),"exact_18_series":series,"seed":SEED,"permutations":PERMUTATIONS,
+        "exact_18_series_manifest_sha256":canonical_sha256(series),
+        "exact_18_series":series,
+        "seed":SEED,
+        "permutations":PERMUTATIONS,
         "accepted_canonical_result_count":0,
-        "source_archives":{"original_sha256":recovery["frozen_reference"]["original_archive_sha256"],"delta_sha256":recovery["frozen_reference"]["delta_archive_sha256"]},
+        "source_archives":{
+            "original_sha256":recovery["frozen_reference"]["original_archive_sha256"],
+            "delta_sha256":recovery["frozen_reference"]["delta_archive_sha256"],
+        },
     }
 
 def validate_arm_document(arm:dict,expected:dict,*,actual_head:str,actual_parent:str,changed_paths:list[str],result_present:bool,lock_present:bool)->dict:
@@ -103,13 +132,21 @@ def validate_arm_document(arm:dict,expected:dict,*,actual_head:str,actual_parent
     require(expected.get("staging_certificate_sha256") is not None,"staging certificate absent")
     require(arm.get("staging_certificate_sha256")==expected["staging_certificate_sha256"],"ARM staging certificate hash")
     require(arm.get("exact_18_series_manifest_sha256")==expected["exact_18_series_manifest_sha256"],"ARM exact 18-series manifest identity")
-    require(arm.get("seed")==SEED,"ARM seed"); require(arm.get("permutations")==PERMUTATIONS,"ARM permutations")
+    require(arm.get("seed")==SEED,"ARM seed")
+    require(arm.get("permutations")==PERMUTATIONS,"ARM permutations")
     require(arm.get("accepted_canonical_result_count")==0,"ARM accepted result count")
     require(arm.get("no_prior_recovery_v3_attempt_lock") is True,"ARM prior-lock declaration")
     require(arm.get("no_canonical_result_present") is True,"ARM result-absence declaration")
     require(not result_present,"canonical development result already exists")
     require(not lock_present,"Recovery V3 attempt lock already exists")
     return {"status":"PASS_ARM_PAYLOAD_VALIDATED_BEFORE_LOCK","pre_arm_parent_head":actual_parent}
+
+def validate_secret_binding(cert:dict,secret:str)->dict:
+    actual=secret_binding_sha256(secret)
+    declared=cert.get("secret_binding_sha256")
+    require(isinstance(declared,str) and len(declared)==64,"staging secret binding digest missing or malformed")
+    require(actual==declared,"input-bundle secret binding mismatch")
+    return {"status":"PASS_SECRET_BINDING_BEFORE_DECRYPTION","secret_exposed":False}
 
 def validate_staging_certificate_document(cert:dict,expected:dict,*,part_records:list[dict],reconstructed_bundle_sha256:str)->dict:
     require(cert.get("schema")=="mxm.research-core-v4.recovery-v3-greenfield-input-staging-certificate.v1","staging certificate schema")
@@ -122,36 +159,47 @@ def validate_staging_certificate_document(cert:dict,expected:dict,*,part_records
     require(cert.get("installed_runtime_workflow_sha256")==expected["installed_runtime_workflow_sha256"],"staging workflow hash")
     require(cert.get("accepted_canonical_result_count")==0,"staging accepted result count")
     require(cert.get("arm_present_at_staging") is False,"staging ARM-absence assertion")
+    require(cert.get("attempt_lock_present_at_staging") is False,"staging attempt-lock-absence assertion")
     require(cert.get("real_execution_authorized_at_staging") is False,"staging execution authorization assertion")
     require(cert.get("encryption_format")==ENCRYPTION_FORMAT,"staging encryption format")
+    binding=cert.get("secret_binding_sha256")
+    require(isinstance(binding,str) and len(binding)==64 and all(c in "0123456789abcdef" for c in binding),"staging secret binding digest")
     require(cert.get("source_archives")==expected["source_archives"],"staging source archive provenance")
     require(cert.get("exact_18_series")==expected["exact_18_series"],"staging exact 18-series bindings")
     require(cert.get("exact_18_series_manifest_sha256")==expected["exact_18_series_manifest_sha256"],"staging exact-series manifest identity")
-    declared=cert.get("encrypted_parts"); require(isinstance(declared,list) and declared,"staging encrypted-parts manifest")
+    declared=cert.get("encrypted_parts")
+    require(isinstance(declared,list) and declared,"staging encrypted-parts manifest")
     require(declared==part_records,"staging encrypted-part filenames/digests/sizes")
-    names=[x["filename"] for x in part_records]; require(names==sorted(names),"encrypted parts are not in deterministic ordered concatenation")
+    names=[x["filename"] for x in part_records]
+    require(names==sorted(names),"encrypted parts are not in deterministic ordered concatenation")
     require(cert.get("encrypted_part_order")==names,"staging encrypted part order")
     require(cert.get("encrypted_bundle_sha256")==reconstructed_bundle_sha256,"staging reconstructed encrypted bundle hash")
     return {"status":"PASS_STAGING_CERTIFICATE_AND_ENCRYPTED_PARTS","encrypted_part_count":len(part_records)}
 
 def inspect_encrypted_parts(root:Path,cert:dict)->tuple[list[dict],str]:
-    declared=cert.get("encrypted_parts"); require(isinstance(declared,list) and declared,"certificate has no encrypted parts")
+    declared=cert.get("encrypted_parts")
+    require(isinstance(declared,list) and declared,"certificate has no encrypted parts")
     names=[x.get("filename") for x in declared]
     require(all(isinstance(x,str) and x.startswith(INPUT_PREFIX) and ".." not in x for x in names),"invalid encrypted-part filename")
     require(names==sorted(names),"encrypted parts not declared in deterministic order")
-    records=[]; h=hashlib.sha256()
+    records=[]
+    h=hashlib.sha256()
     for item in declared:
-        path=root/item["filename"]; require(path.is_file(),f"encrypted part missing: {item['filename']}")
-        digest=sha256_file(path); size=path.stat().st_size
+        path=root/item["filename"]
+        require(path.is_file(),f"encrypted part missing: {item['filename']}")
+        digest=sha256_file(path)
+        size=path.stat().st_size
         require(digest==item.get("sha256"),f"encrypted part digest mismatch: {item['filename']}")
         require(size==item.get("size_bytes"),f"encrypted part size mismatch: {item['filename']}")
         records.append({"filename":item["filename"],"sha256":digest,"size_bytes":size})
         with path.open("rb") as f:
-            for chunk in iter(lambda:f.read(1024*1024),b""): h.update(chunk)
+            for chunk in iter(lambda:f.read(1024*1024),b""):
+                h.update(chunk)
     return records,h.hexdigest()
 
 def validate_staging_certificate(root:Path)->dict:
-    expected=expected_runtime_bindings(root); cert_path=root/STAGING_REL
+    expected=expected_runtime_bindings(root)
+    cert_path=root/STAGING_REL
     require(cert_path.is_file(),"staging certificate absent")
     cert=parse_json_object_bytes(cert_path.read_bytes(),"staging certificate")
     records,bundle_sha=inspect_encrypted_parts(root,cert)
@@ -159,47 +207,106 @@ def validate_staging_certificate(root:Path)->dict:
 
 def _git(root:Path,*args:str,check:bool=True)->str:
     p=subprocess.run(["git","-C",str(root),*args],text=True,capture_output=True)
-    if check and p.returncode!=0: raise PermissionError("RECOVERY_V3_PREARM_GATE_FAIL git "+" ".join(args)+": "+p.stderr.strip())
+    if check and p.returncode!=0:
+        raise PermissionError("RECOVERY_V3_PREARM_GATE_FAIL git "+" ".join(args)+": "+p.stderr.strip())
     return p.stdout.strip()
 
-def validate_runtime_gate(root:Path=ROOT)->dict:
-    arm_path=root/ARM_REL; require(arm_path.is_file(),"ARM file absent at ARM-triggered runtime")
+def validate_runtime_gate(root:Path=ROOT,secret:str|None=None)->dict:
+    arm_path=root/ARM_REL
+    require(arm_path.is_file(),"ARM file absent at ARM-triggered runtime")
     arm=parse_json_object_bytes(arm_path.read_bytes(),"ARM")
-    head=_git(root,"rev-parse","HEAD"); parents=_git(root,"rev-list","--parents","-n","1","HEAD").split()
-    require(len(parents)==2,"ARM commit must have exactly one parent"); parent=parents[1]
+    head=_git(root,"rev-parse","HEAD")
+    parents=_git(root,"rev-list","--parents","-n","1","HEAD").split()
+    require(len(parents)==2,"ARM commit must have exactly one parent")
+    parent=parents[1]
     changed=[x for x in _git(root,"diff-tree","--no-commit-id","--name-only","-r","HEAD").splitlines() if x]
     expected=expected_runtime_bindings(root)
-    validate_arm_document(arm,expected,actual_head=head,actual_parent=parent,changed_paths=changed,result_present=(root/RESULT_REL).exists(),lock_present=(root/LOCK_REL).exists())
-    staging=validate_staging_certificate(root); cert=load_json(root/STAGING_REL)
+    validate_arm_document(
+        arm,expected,actual_head=head,actual_parent=parent,changed_paths=changed,
+        result_present=(root/RESULT_REL).exists(),lock_present=(root/LOCK_REL).exists()
+    )
+    staging=validate_staging_certificate(root)
+    cert=load_json(root/STAGING_REL)
     ancestry=subprocess.run(["git","-C",str(root),"merge-base","--is-ancestor",cert["staging_commit"],parent])
     require(ancestry.returncode==0,"staging commit is not an ancestor of the validated pre-arm parent")
     for item in cert["encrypted_parts"]:
         unchanged=subprocess.run(["git","-C",str(root),"diff","--quiet",cert["staging_commit"],parent,"--",item["filename"]])
         require(unchanged.returncode==0,f"encrypted part changed after staging commit: {item['filename']}")
-    return {"schema":"mxm.research-core-v4.recovery-v3-runtime-prearm-validation.v1","status":"PASS_ALL_PRELOCK_PREOPEN_GATES","arm_commit":head,"pre_arm_parent_head":parent,"staging_status":staging["status"],"response_opened":False,"attempt_lock_persisted_by_gate":False}
+    if secret is None:
+        secret=os.environ.get("MXM_V4_INPUT_BUNDLE_PASSPHRASE","")
+    secret_status=validate_secret_binding(cert,secret)
+    return {
+        "schema":"mxm.research-core-v4.recovery-v3-runtime-prearm-validation.v2",
+        "status":"PASS_ARM_CERT_PARTS_AND_SECRET_BINDING_BEFORE_DECRYPTION",
+        "arm_commit":head,
+        "pre_arm_parent_head":parent,
+        "staging_status":staging["status"],
+        "secret_binding_status":secret_status["status"],
+        "response_opened":False,
+        "attempt_lock_persisted_by_gate":False,
+    }
 
-def verify_plaintext_directory(raw_root:Path,root:Path=ROOT)->dict:
-    expected=_exact_series(root); wanted={f"{int(x['symbol_id'])}_M5.csv":x for x in expected}
-    actual={p.name for p in raw_root.glob("*_M5.csv") if p.is_file()}; require(actual==set(wanted),"plaintext staged directory file-set differs from exact 18-series set")
+def verify_plaintext_directory_against(raw_root:Path,expected:list[dict])->dict:
+    wanted={f"{int(x['symbol_id'])}_M5.csv":x for x in expected}
+    actual={p.name for p in raw_root.iterdir() if p.is_file()}
+    require(actual==set(wanted),"plaintext staged directory file-set differs from exact frozen series set")
     rows_out=[]
     for name in sorted(wanted,key=lambda n:int(n.split("_")[0])):
-        item=wanted[name]; path=raw_root/name; require(sha256_file(path)==item["series_sha256"],f"plaintext SHA256 mismatch: {name}")
+        item=wanted[name]
+        path=raw_root/name
+        require(sha256_file(path)==item["series_sha256"],f"plaintext SHA256 mismatch: {name}")
         with path.open("r",encoding="utf-8",newline="") as f:
-            reader=csv.DictReader(f); require("time_utc" in (reader.fieldnames or []),f"time_utc absent: {name}")
-            count=0; first=None; last=None
+            reader=csv.DictReader(f)
+            require("time_utc" in (reader.fieldnames or []),f"time_utc absent: {name}")
+            count=0
+            first=None
+            last=None
             for row in reader:
-                t=row["time_utc"]; first=t if first is None else first; last=t; count+=1
+                t=row["time_utc"]
+                first=t if first is None else first
+                last=t
+                count+=1
         require(count==item["row_count"],f"plaintext row count mismatch: {name}")
         require(first==item["first_timestamp_utc"],f"plaintext first timestamp mismatch: {name}")
         require(last==item["last_timestamp_utc"],f"plaintext last timestamp mismatch: {name}")
-        rows_out.append({"symbol":item["symbol"],"symbol_id":item["symbol_id"],"sha256":item["series_sha256"],"row_count":count,"first_timestamp_utc":first,"last_timestamp_utc":last,"source_archive_sha256":item["source_archive_sha256"]})
-    return {"status":"PASS_EXACT_18_PLAINTEXT_SERIES","series":rows_out,"response_opened":False}
+        rows_out.append({
+            "symbol":item["symbol"],"symbol_id":item["symbol_id"],"sha256":item["series_sha256"],
+            "row_count":count,"first_timestamp_utc":first,"last_timestamp_utc":last,
+            "source_archive_sha256":item["source_archive_sha256"],
+        })
+    return {"status":"PASS_EXACT_PLAINTEXT_SERIES","series":rows_out,"response_opened":False,"attempt_lock_persisted":False}
+
+def verify_plaintext_directory(raw_root:Path,root:Path=ROOT)->dict:
+    expected=_exact_series(root)
+    result=verify_plaintext_directory_against(raw_root,expected)
+    require(len(result["series"])==18,"validated plaintext series count is not 18")
+    result["status"]="PASS_EXACT_18_PLAINTEXT_SERIES_BEFORE_ATTEMPT_LOCK"
+    return result
 
 def main()->None:
-    ap=argparse.ArgumentParser(); ap.add_argument("--validate-runtime",action="store_true"); ap.add_argument("--validate-staging-only",action="store_true"); ap.add_argument("--verify-plaintext-dir",type=Path)
-    args=ap.parse_args(); selected=int(args.validate_runtime)+int(args.validate_staging_only)+int(args.verify_plaintext_dir is not None)
-    if selected!=1: raise SystemExit("choose exactly one validation mode")
-    out=validate_runtime_gate(ROOT) if args.validate_runtime else validate_staging_certificate(ROOT) if args.validate_staging_only else verify_plaintext_directory(args.verify_plaintext_dir,ROOT)
+    ap=argparse.ArgumentParser()
+    ap.add_argument("--validate-runtime",action="store_true")
+    ap.add_argument("--validate-staging-only",action="store_true")
+    ap.add_argument("--verify-plaintext-dir",type=Path)
+    ap.add_argument("--require-decryption-success",type=int)
+    args=ap.parse_args()
+    selected=sum([
+        int(args.validate_runtime),
+        int(args.validate_staging_only),
+        int(args.verify_plaintext_dir is not None),
+        int(args.require_decryption_success is not None),
+    ])
+    if selected!=1:
+        raise SystemExit("choose exactly one validation mode")
+    if args.validate_runtime:
+        out=validate_runtime_gate(ROOT)
+    elif args.validate_staging_only:
+        out=validate_staging_certificate(ROOT)
+    elif args.verify_plaintext_dir is not None:
+        out=verify_plaintext_directory(args.verify_plaintext_dir,ROOT)
+    else:
+        out=require_decryption_success(args.require_decryption_success)
     print(json.dumps(out,sort_keys=True))
 
-if __name__=="__main__": main()
+if __name__=="__main__":
+    main()

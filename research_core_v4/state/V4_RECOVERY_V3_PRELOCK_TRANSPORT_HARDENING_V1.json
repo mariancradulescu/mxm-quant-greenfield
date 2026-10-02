@@ -1,0 +1,53 @@
+{
+  "schema": "mxm.research-core-v4.recovery-v3-prelock-transport-hardening.v1",
+  "as_of_date": "2026-10-02",
+  "status": "PASS_PRELOCK_TRANSPORT_ORDER_HARDENED_SECRET_BLOCKED",
+  "finding_corrected": "ATTEMPT_LOCK_WAS_PREVIOUSLY_BEFORE_DECRYPTION_PLAINTEXT_VALIDATION_AND_FROZEN_SOURCE_VALIDATION",
+  "installed_workflow_ref": ".github/workflows/v4-greenfield-recovery-v3.yml",
+  "installed_workflow_sha256": "ca4f1e36fb9e7507afc0a4d52ddff1726078d630c7f72ca2f8032d16008c80ff",
+  "corrected_order": [
+    "CHECKOUT_TRIGGERING_ARM_COMMIT",
+    "VALIDATE_ARM_PAYLOAD_AND_EXACT_PARENT",
+    "VALIDATE_STAGING_CERTIFICATE",
+    "VALIDATE_ENCRYPTED_PARTS_AND_ORDERED_BUNDLE_DIGEST",
+    "VALIDATE_SECRET_BINDING",
+    "DECRYPT_IN_RUNNER_TEMP",
+    "VALIDATE_EXACT_18_PLAINTEXT_FILE_SET_HASHES_ROWS_FIRST_LAST_TIMESTAMPS",
+    "CHECKOUT_AND_VALIDATE_BYTE_IDENTICAL_FROZEN_SCIENCE",
+    "PERSIST_EXACTLY_ONCE_ATTEMPT_LOCK",
+    "EXECUTE_FROZEN_REAL_DEVELOPMENT_RESPONSE_ONCE",
+    "PERSIST_RAW_CANONICAL_RESULT",
+    "STOP_BEFORE_INTERPRETATION"
+  ],
+  "precommit_negative_test_result": {
+    "conclusion": "PASS",
+    "unittest_test_methods": 13,
+    "required_failure_classes_covered": [
+      "ABSENT_SECRET",
+      "WRONG_SECRET_BINDING",
+      "DECRYPTION_FAILURE",
+      "CORRUPTED_ENCRYPTED_PART",
+      "WRONG_ENCRYPTED_BUNDLE_DIGEST",
+      "MISSING_PLAINTEXT_FILE",
+      "EXTRA_PLAINTEXT_FILE",
+      "WRONG_PLAINTEXT_SHA256",
+      "WRONG_PLAINTEXT_ROW_COUNT",
+      "WRONG_FIRST_TIMESTAMP",
+      "WRONG_LAST_TIMESTAMP",
+      "CHANGED_FROZEN_SCIENCE",
+      "STALE_ARM",
+      "WRONG_ARM_PARENT",
+      "EXISTING_ATTEMPT_LOCK",
+      "EXISTING_CANONICAL_RESULT"
+    ],
+    "invariant": "ALL_FAILURES_OCCURRED_WITHOUT_RECOVERY_V3_ATTEMPT_LOCK_CREATION"
+  },
+  "current_execution_boundary": {
+    "arm_present": false,
+    "attempt_lock_present": false,
+    "staging_certificate_present": false,
+    "canonical_result_present": false,
+    "accepted_canonical_result_count": 0,
+    "real_execution_authorized": false
+  }
+}

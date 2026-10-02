@@ -1,0 +1,50 @@
+{
+  "schema": "mxm.research-core-v4.greenfield-encrypted-input-transport.v3",
+  "as_of_date": "2026-10-02",
+  "status": "EXACT_BYTES_RECOVERED_SECRET_BLOCKED_NOT_STAGED_NOT_ARMED_PRELOCK_HARDENED",
+  "supersedes": "research_core_v4/state/V4_GREENFIELD_ENCRYPTED_INPUT_TRANSPORT_V2.json",
+  "canonical_repository": "mariancradulescu/mxm-quant-greenfield",
+  "research_branch": "performance-research-v3-20260922",
+  "second_repository_required": false,
+  "plaintext_raw_input_in_git_forbidden": true,
+  "plaintext_raw_input_as_github_actions_artifact_forbidden": true,
+  "encryption_format": "OPENPGP_SYMMETRIC_AES256_WITH_INTEGRITY_PROTECTION",
+  "secret_binding_domain": "MXM_V4_INPUT_BUNDLE_KEY_BINDING_V1",
+  "required_secret_name": "MXM_V4_INPUT_BUNDLE_PASSPHRASE",
+  "required_secret_status": "ABSENT",
+  "secret_provisioning_blocker": "research_core_v4/state/V4_PRE_ARM_SECRET_PROVISIONING_BLOCKER_V2.json",
+  "exact_bytes_recovered": true,
+  "recovery_audit": "research_core_v4/state/V4_EXACT_18_INPUT_RECOVERY_AUDIT_V2.json",
+  "recovered_archives": [
+    {
+      "filename": "MXM_RESEARCH_CORE_V3_SELECTED_M5_DEVELOPMENT.zip",
+      "sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259"
+    },
+    {
+      "filename": "MXM_RESEARCH_CORE_V3_HIGH_QUALITY_DELTA_M5.zip",
+      "sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    }
+  ],
+  "exact_series_count": 18,
+  "all_exact_series_reverified": true,
+  "installed_runtime_workflow_ref": ".github/workflows/v4-greenfield-recovery-v3.yml",
+  "installed_runtime_workflow_sha256": "ca4f1e36fb9e7507afc0a4d52ddff1726078d630c7f72ca2f8032d16008c80ff",
+  "future_runtime_order": [
+    "VALIDATE_ARM_CERTIFICATE_ENCRYPTED_PARTS_AND_SECRET_BINDING",
+    "DECRYPT_TO_RUNNER_TEMP",
+    "VALIDATE_EXACT_18_PLAINTEXT",
+    "VALIDATE_FROZEN_SOURCE",
+    "PERSIST_ATTEMPT_LOCK",
+    "EXECUTE_FROZEN_RESPONSE_ONCE",
+    "PERSIST_RAW_RESULT",
+    "STOP_BEFORE_INTERPRETATION"
+  ],
+  "encrypted_parts_present_now": false,
+  "staging_certificate_present_now": false,
+  "arm_present_now": false,
+  "attempt_lock_present_now": false,
+  "real_execution_authorized": false,
+  "broker_recollection_authorized": false,
+  "replacement_data_authorized": false,
+  "external_market_data_authorized": false
+}

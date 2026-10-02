@@ -20,44 +20,26 @@ jobs:
       RESULT_PATH: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
       ATTEMPT_LOCK: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ATTEMPT_LOCK_V1.txt
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout triggering ARM commit
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - run: python -m pip install --disable-pip-version-check numpy
-      - name: Validate ARM staging encrypted parts and all pre-lock gates
+
+      - name: Validate ARM certificate encrypted parts and secret binding
         env:
           MXM_V4_INPUT_BUNDLE_PASSPHRASE: ${{ secrets.MXM_V4_INPUT_BUNDLE_PASSPHRASE }}
         run: |
           set -euo pipefail
-          test -n "$MXM_V4_INPUT_BUNDLE_PASSPHRASE"
           python -m research_core_v4.recovery_v3_prearm_gate --validate-runtime
-      - name: Persist exactly-once attempt lock
-        run: |
-          set -euo pipefail
-          printf '%s\n' "${{ github.sha }}" > "$ATTEMPT_LOCK"
-          git config user.name mxm-v4-recovery-machine
-          git config user.email mxm-v4-recovery-machine@users.noreply.github.com
-          git add "$ATTEMPT_LOCK"
-          git commit -m "v4: persist single Recovery V3 attempt lock"
-          git push origin HEAD:performance-research-v3-20260922
-      - name: Checkout byte-identical frozen science from canonical Greenfield
-        uses: actions/checkout@v4
-        with:
-          repository: mariancradulescu/mxm-quant-greenfield
-          ref: 68bdee4b51244ae50acd56fe868468b96106450f
-          path: science
-          persist-credentials: false
-      - name: Verify exact frozen science hashes
-        run: |
-          echo "3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3497e1b8a72b59b1d4e590e  science/research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json" | sha256sum -c -
-          echo "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a  science/research_core_v4/response_evaluator_v3.py" | sha256sum -c -
-          echo "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d  science/research_core_v4/development_execution_runner_v1.py" | sha256sum -c -
-          echo "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed  science/research_core_v4/frozen_v2_semantics.py" | sha256sum -c -
-      - name: Decrypt exact staged input bundle
+
+      - name: Decrypt exact staged input bundle into RUNNER_TEMP
         env:
           MXM_V4_INPUT_BUNDLE_PASSPHRASE: ${{ secrets.MXM_V4_INPUT_BUNDLE_PASSPHRASE }}
         run: |
@@ -71,13 +53,54 @@ jobs:
               for item in cert["encrypted_parts"]:
                   w.write(pathlib.Path(item["filename"]).read_bytes())
           PY
-          gpg --batch --yes --pinentry-mode loopback --passphrase "$MXM_V4_INPUT_BUNDLE_PASSPHRASE" --decrypt "$RUNNER_TEMP/v4-input/bundle.gpg" > "$RUNNER_TEMP/v4-input/bundle.tar"
+          set +e
+          printf '%s\n' "$MXM_V4_INPUT_BUNDLE_PASSPHRASE" | \
+            gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+              --output "$RUNNER_TEMP/v4-input/bundle.tar" \
+              --decrypt "$RUNNER_TEMP/v4-input/bundle.gpg"
+          rc=$?
+          set -e
+          python -m research_core_v4.recovery_v3_prearm_gate --require-decryption-success "$rc"
           tar -xf "$RUNNER_TEMP/v4-input/bundle.tar" -C "$RUNNER_TEMP/v4-raw"
-      - name: Validate exact 18 plaintext files before response opening
+
+      - name: Validate exact 18 plaintext files before attempt lock
         run: python -m research_core_v4.recovery_v3_prearm_gate --verify-plaintext-dir "$RUNNER_TEMP/v4-raw"
+
+      - name: Checkout byte-identical frozen science from canonical Greenfield
+        uses: actions/checkout@v4
+        with:
+          repository: mariancradulescu/mxm-quant-greenfield
+          ref: 68bdee4b51244ae50acd56fe868468b96106450f
+          path: science
+          persist-credentials: false
+
+      - name: Validate byte-identical frozen science before attempt lock
+        run: |
+          set -euo pipefail
+          echo "3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3497e1b8a72b59b1d4e590e  science/research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json" | sha256sum -c -
+          echo "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a  science/research_core_v4/response_evaluator_v3.py" | sha256sum -c -
+          echo "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d  science/research_core_v4/development_execution_runner_v1.py" | sha256sum -c -
+          echo "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed  science/research_core_v4/frozen_v2_semantics.py" | sha256sum -c -
+
+      - name: Persist exactly-once Recovery V3 attempt lock
+        run: |
+          set -euo pipefail
+          test ! -e "$ATTEMPT_LOCK"
+          test ! -e "$RESULT_PATH"
+          printf '%s\n' "${{ github.sha }}" > "$ATTEMPT_LOCK"
+          git config user.name mxm-v4-recovery-machine
+          git config user.email mxm-v4-recovery-machine@users.noreply.github.com
+          git add "$ATTEMPT_LOCK"
+          git commit -m "v4: persist single Recovery V3 attempt lock"
+          git push origin HEAD:performance-research-v3-20260922
+
       - name: Execute exact frozen development response once
         run: |
-          python science/research_core_v4/development_execution_runner_v1.py --raw-root "$RUNNER_TEMP/v4-raw" --output "$RUNNER_TEMP/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json" --execute-authorized-development
+          python science/research_core_v4/development_execution_runner_v1.py \
+            --raw-root "$RUNNER_TEMP/v4-raw" \
+            --output "$RUNNER_TEMP/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json" \
+            --execute-authorized-development
+
       - name: Persist raw canonical result before interpretation
         run: |
           set -euo pipefail

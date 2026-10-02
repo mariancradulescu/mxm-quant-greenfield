@@ -115,7 +115,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "BLOCKED_UNTIL_REQUIRED_SECRET_MXM_V4_INPUT_BUNDLE_PASSPHRASE_CAN_BE_SECURELY_PROVISIONED_MACHINE_SIDE;THEN_ENCRYPT_AND_STAGE_ONLY_THE_ALREADY_RECOVERED_EXACT_18_SERIES;REVALIDATE;DO_NOT_ARM_OR_EXECUTE_NOW",
+  "next_action": "BLOCKED_BECAUSE_NO_SECURE_MACHINE_SIDE_SECRET_PROVISIONING_SURFACE_IS_AVAILABLE_IN_THIS_SESSION;PRESERVE_EXACT_RECOVERED_18_SERIES_AND_PRELOCK_HARDENING;DO_NOT_STAGE_PLAINTEXT;DO_NOT_ARM_OR_EXECUTE",
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
     "v3_freeze_ref": "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json",
@@ -127,7 +127,7 @@
   "project_selection_bias_audit": "research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json",
   "schema": "mxm.research-core-v4.state.v4",
   "status": "FIRST_REAL_MARKET_DESIGN_V2_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED",
-  "stop_boundary": "STOP_FAIL_CLOSED_PRE_ARM_BLOCKED_WITH_ZERO_ACCEPTED_CANONICAL_DEVELOPMENT_RESULTS",
+  "stop_boundary": "STOP_FAIL_CLOSED_PRE_ARM_BLOCKED_AFTER_PRELOCK_TRANSPORT_HARDENING_WITH_ZERO_ACCEPTED_CANONICAL_DEVELOPMENT_RESULTS",
   "recovery_v2_preparation": {
     "status": "HISTORICAL_PRIVATE_RUNTIME_PROPOSAL_SUPERSEDED_BEFORE_USE",
     "authority_v2": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V2.json",
@@ -140,7 +140,7 @@
     "status": "FAIL_CLOSED_PRE_ARM_BLOCKED",
     "independent_governance": "research_core_v4/state/V4_GREENFIELD_RECOVERY_V3_INDEPENDENT_GOVERNANCE_V1.json",
     "architecture": "research_core_v4/state/V4_GREENFIELD_EXECUTION_ARCHITECTURE_V1.json",
-    "input_transport": "research_core_v4/state/V4_GREENFIELD_ENCRYPTED_INPUT_TRANSPORT_V2.json",
+    "input_transport": "research_core_v4/state/V4_GREENFIELD_ENCRYPTED_INPUT_TRANSPORT_V3.json",
     "runtime_template": "research_core_v4/runtime/v4_greenfield_recovery_v3_runtime_template.yml",
     "runtime_benchmark": "research_core_v4/state/V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK_RESULT_V1.json",
     "semantic_equivalence": "research_core_v4/state/V4_GREENFIELD_EXECUTION_SEMANTIC_EQUIVALENCE_V1.json",
@@ -155,13 +155,16 @@
     "process_attempts_started": 0,
     "automatic_retry": false,
     "runtime_evidence_scope_correction": "research_core_v4/state/V4_RUNTIME_EVIDENCE_SCOPE_CORRECTION_V1.json",
-    "exact_input_recovery_audit": "research_core_v4/state/V4_EXACT_18_INPUT_RECOVERY_AUDIT_V1.json",
-    "pre_arm_blocker": "research_core_v4/state/V4_PRE_ARM_SECRET_PROVISIONING_BLOCKER_V1.json",
+    "exact_input_recovery_audit": "research_core_v4/state/V4_EXACT_18_INPUT_RECOVERY_AUDIT_V2.json",
+    "pre_arm_blocker": "research_core_v4/state/V4_PRE_ARM_SECRET_PROVISIONING_BLOCKER_V2.json",
     "installed_runtime_workflow": ".github/workflows/v4-greenfield-recovery-v3.yml",
-    "installed_runtime_workflow_sha256": "62ad05a3fc8b4794e524e2899f04f3abe7e1d068c707ae31516830375a401fbb",
+    "installed_runtime_workflow_sha256": "ca4f1e36fb9e7507afc0a4d52ddff1726078d630c7f72ca2f8032d16008c80ff",
     "exact_source_bytes_recovered": true,
     "required_secret_status": "ABSENT",
     "secret_probe_run_id": 37033895856,
-    "encrypted_input_parts_present": false
+    "encrypted_input_parts_present": false,
+    "prelock_transport_hardening": "research_core_v4/state/V4_RECOVERY_V3_PRELOCK_TRANSPORT_HARDENING_V1.json",
+    "secret_machine_side_provisioning_available": false,
+    "attempt_lock_present": false
   }
 }
