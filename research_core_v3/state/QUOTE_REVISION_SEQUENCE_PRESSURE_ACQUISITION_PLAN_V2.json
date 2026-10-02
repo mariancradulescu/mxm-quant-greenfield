@@ -1,0 +1,158 @@
+{
+  "schema": "mxm.research-core-v3.quote-revision-sequence-pressure-acquisition-plan.v2",
+  "status": "FROZEN_PREOUTCOME_READ_ONLY_RAW_REPLAYABLE_ACQUISITION_SUPERSEDES_V1",
+  "supersedes": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_ACQUISITION_PLAN_V1.json",
+  "supersession_audit_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_METHOD_AND_ACQUISITION_AUDIT_V2.json",
+  "supersession_audit_commit": "aba50bd27f87b8363d43b45fb6efdf903c64a803",
+  "design_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V2.json",
+  "design_commit": "10f7942cf73028c7dfdf592bd495ad9eaaba2d65",
+  "execution_authorized": false,
+  "source_environment": "Pepperstone - Europe LIVE",
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "signal_symbols": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116
+    }
+  ],
+  "precapture_execution_feasibility": {
+    "exact_account_environment_validation": true,
+    "exact_symbol_identity_validation": true,
+    "current_full_symbol_metadata_required": true,
+    "deposit_asset_required": "EUR",
+    "expected_margin_request": "ProtoOAExpectedMarginReq_FOR_CURRENT_MIN_VOLUME_EACH_SYMBOL",
+    "both_buy_sell_margin_required": true,
+    "structural_gate": "MAX_BUY_OR_SELL_MIN_VOLUME_MARGIN_MUST_BE_STRICTLY_LESS_THAN_200_EUR_FOR_EVERY_SIGNAL_SYMBOL",
+    "current_commission_fields_persisted": true,
+    "current_volume_fields_persisted": true,
+    "schedule_and_holidays_persisted": true,
+    "on_failure": "STOP_BEFORE_ANY_HISTORICAL_TICK_REQUEST;WRITE_SANITIZED_PRECAPTURE_BLOCK_REPORT_ONLY",
+    "replacement_allowed_in_collector": false
+  },
+  "calendar": {
+    "dates_utc": [
+      "2025-10-13",
+      "2025-10-14",
+      "2025-10-08",
+      "2025-11-13",
+      "2025-11-14",
+      "2025-12-08",
+      "2025-12-11",
+      "2025-12-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-02-09",
+      "2026-02-10",
+      "2026-02-13",
+      "2026-03-11",
+      "2026-03-12",
+      "2026-04-13",
+      "2026-04-08",
+      "2026-04-09",
+      "2026-05-12",
+      "2026-05-08",
+      "2026-06-09",
+      "2026-06-10",
+      "2026-06-11",
+      "2026-07-13",
+      "2026-07-10",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-09-14",
+      "2026-09-08"
+    ],
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "query_padding_before_seconds": 120,
+    "query_padding_after_seconds": 105,
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z"
+  },
+  "acquisition": {
+    "api": "ProtoOAGetTickDataReq",
+    "quote_sides": [
+      "BID",
+      "ASK"
+    ],
+    "historical_request_rate_limit_documented_rps": 5,
+    "request_min_interval_seconds": 0.22,
+    "base_side_window_requests_before_hasMore_splitting": 900,
+    "hasMore_policy": "LOSSLESS_RECURSIVE_DISJOINT_TIME_SPLIT;IF_RESPONSE_HASMORE_SPLIT_REQUEST_INTERVAL_AT_INTEGER_MILLISECOND_MIDPOINT_AND_RETRY_BOTH_HALVES;FAIL_CLOSED_IF_A_SINGLE_MILLISECOND_REQUEST_STILL_HASMORE",
+    "raw_event_decode": "FIRST_TICK_TIMESTAMP_ABSOLUTE;SUBSEQUENT_TICK_TIMESTAMP_FIELDS_ARE_BACKWARD_MILLISECOND_DELTAS_FROM_PREVIOUS_NEWER_EVENT",
+    "raw_event_persistence": "ONE_GZIP_CSV_PER_SIGNAL_SYMBOL_DATE_WINDOW_SIDE_WITH_ABSOLUTE_TIMESTAMP_MS_RAW_TICK_INTEGER_AND_TIE_ORDER",
+    "raw_ticks_transferred_off_device": true,
+    "raw_ticks_discarded_after_derivation": false,
+    "device_computes_strategy_features": false,
+    "device_computes_strategy_outcomes": false,
+    "device_computes_pnl": false,
+    "automatic_parameter_search": false,
+    "automatic_additional_acquisition": false,
+    "fill_authority": false,
+    "orders": false,
+    "account_mutation": false,
+    "protected_forward_opened": false
+  },
+  "evidence_contract": {
+    "bundle_name": "MXM_V3_QUOTE_REVISION_SEQUENCE_RAW_EVIDENCE_V2.zip",
+    "raw_root": "raw_quotes/",
+    "per_raw_file_sha256": true,
+    "checksums_file": "CHECKSUMS.sha256",
+    "window_manifest": "RAW_WINDOW_MANIFEST.json",
+    "precapture_metadata": "PRECAPTURE_EXECUTION_METADATA.json",
+    "capture_manifest": "CAPTURE_MANIFEST.json",
+    "request_trace": "REQUEST_SPLIT_MANIFEST.json",
+    "preserve_empty_requested_windows": true,
+    "exact_requested_to_returned_mapping": true,
+    "raw_tick_values_required": true,
+    "replay_without_broker_required": true,
+    "secrets_forbidden": true
+  },
+  "estimates": {
+    "selected_dates": 30,
+    "signal_symbols": 5,
+    "windows_per_date": 3,
+    "quote_sides": 2,
+    "symbol_hours": 450,
+    "base_requests": 900,
+    "estimated_total_combined_ticks_from_prior_execution_rates": 2899619,
+    "expected_transfer_compressed_bytes_planning_range": [
+      20000000,
+      80000000
+    ],
+    "estimate_only": true
+  },
+  "governance": {
+    "outcomes_opened": false,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_read_only": true
+  }
+}
