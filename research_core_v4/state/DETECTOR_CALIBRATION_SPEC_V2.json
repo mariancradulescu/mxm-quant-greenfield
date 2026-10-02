@@ -1,0 +1,62 @@
+{
+  "schema": "mxm.research-core-v4.detector-calibration-spec.v2",
+  "status": "FROZEN_AND_EXECUTED_PREOUTCOME_SUPERSEDES_SYMBOL_FAMILY_V1",
+  "supersedes": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V1.json",
+  "supersession_reason": "V4_PRIMARY_RESEARCH_UNIT_IS_INFORMATION_SOURCE_NOT_SYMBOL;V1_REVEALED_THE_POWER_COST_OF_RETAINING_SYMBOL_AS_THE_DISCOVERY_FAMILY",
+  "new_market_data_used": false,
+  "real_market_outcomes_opened": false,
+  "seed": 20261002,
+  "primary_detector": {
+    "unit": "ONE_INFORMATION_SOURCE_ACROSS_A_PREDECLARED_STRUCTURALLY_DIVERSE_6_SYMBOL_PANEL",
+    "response_horizons": 4,
+    "aggregation": "WITHIN_SYMBOL_WEEK_MEAN_THEN_EQUAL_WEIGHT_ACROSS_SYMBOLS_THEN_WEEK_CLUSTER_INFERENCE",
+    "multiplicity": "ONE_SIDED_LOCAL_MAXT_ACROSS_4_RESPONSE_HORIZONS_ALPHA_0.05",
+    "symbol_role": "BREADTH_AND_HETEROGENEITY_CHECK_NOT_SIX_INDEPENDENT_ALPHA_FAMILIES",
+    "temporal_stability": "SELECTED_HORIZON_POOLED_RESPONSE_POSITIVE_IN_AT_LEAST_3_OF_4_CHRONOLOGICAL_BLOCKS",
+    "breadth": "SELECTED_HORIZON_SYMBOL_MEAN_POSITIVE_IN_AT_LEAST_4_OF_6_PANEL_SYMBOLS"
+  },
+  "comparative_diagnostics": {
+    "v1_symbol_family_architecture_preserved_as_method_history": true,
+    "old_connected_region_surrogate": "TWO_ADJACENT_3_HORIZON_RUNS;ALL_THREE_UNADJUSTED_Z_GT_1.645;DIAGNOSTIC_ONLY",
+    "higher_level_selection": "PAID_AT_DISJOINT_INFORMATION_SOURCE_CONFIRMATION_NOT_AT_DEVELOPMENT_SYMBOL_PICKING"
+  },
+  "generator": {
+    "weeks": 28,
+    "panel_symbols": 6,
+    "response_horizons": 4,
+    "weekly_ar1": 0.25,
+    "cross_horizon_ar1_correlation": 0.65,
+    "cross_symbol_common_factor_weight": 0.3,
+    "log_volatility_ar1": 0.85,
+    "log_volatility_loading": 0.22,
+    "injected_effect_shape": [
+      0.5,
+      1,
+      0.75,
+      0.4
+    ]
+  },
+  "effect_grid_bps": [
+    0.25,
+    0.5,
+    1,
+    2,
+    3,
+    5,
+    8,
+    10,
+    15,
+    20
+  ],
+  "noise_regimes_target_cluster_mean_se_bps": [
+    5,
+    10,
+    20
+  ],
+  "monte_carlo": {
+    "null_reps": 20000,
+    "positive_reps_per_effect_per_regime": 4000,
+    "negative_control_reps": 12000
+  },
+  "interpretation_boundary": "SYNTHETIC_METHOD_CALIBRATION_ONLY_NOT_MARKET_ALPHA"
+}
