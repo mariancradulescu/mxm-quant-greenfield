@@ -5,10 +5,11 @@ on:
     branches:
       - performance-research-v3-20260922
     paths:
-      - "research_core_v4/exact_geometry_calibration_v2.py"
+      - "research_core_v4/exact_geometry_calibration_v3.py"
+      - "research_core_v4/support_v2/**"
       - "research_core_v4/response_evaluator_v3.py"
       - "research_core_v4/frozen_v2_semantics.py"
-      - "research_core_v4/state/EXACT_GEOMETRY_CALIBRATION_V2_REQUEST.json"
+      - "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V2.json"
       - ".github/workflows/v4-exact-geometry-calibration-v2.yml"
 
 permissions:
@@ -25,22 +26,22 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --disable-pip-version-check numpy
       - name: Compile aligned production and calibration code
-        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v2.py
-      - name: Run full outcome-blind exact-support calibration
+        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py
+      - name: Run full outcome-blind production-support-V2 calibration
         run: |
-          python research_core_v4/exact_geometry_calibration_v2.py --full --output /tmp/exact_geometry_v2.json
+          python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --full --output /tmp/exact_geometry_v3.json
           python - <<'PY'
           import json
-          x=json.load(open("/tmp/exact_geometry_v2.json"))
+          x=json.load(open("/tmp/exact_geometry_v3.json"))
           assert x["market_responses_used"] is False
-          assert x["support_rows"] == 3791
+          assert x["support_rows"] == 3753
           assert x["permutations"] == 1023
           assert x["seed"] == 20261002
           assert x["selector_exact_tiecheck"]["pass"] is True
           assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
           for name,v in x["negative_controls"].items():
               assert v["global_any"] < .07, (name,v)
-          print("V4_EXACT_GEOMETRY_V2_FULL_PASS")
+          print("V4_EXACT_GEOMETRY_V3_FULL_PASS")
           print("CALIBRATION_SUMMARY_JSON="+json.dumps({
             "negative_controls":x["negative_controls"],
             "selector_exact_tiecheck":x["selector_exact_tiecheck"],
@@ -52,7 +53,7 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: V4_EXACT_GEOMETRY_CALIBRATION_V2
-          path: /tmp/exact_geometry_v2.json
+          name: V4_EXACT_GEOMETRY_CALIBRATION_V3
+          path: /tmp/exact_geometry_v3.json
           if-no-files-found: error
           retention-days: 30

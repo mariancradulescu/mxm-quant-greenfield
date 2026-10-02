@@ -35,6 +35,7 @@ jobs:
             research_core_v4/frozen_v2_semantics.py \
             research_core_v4/response_evaluator_v3.py \
             research_core_v4/exact_geometry_calibration_v2.py \
+            research_core_v4/exact_geometry_calibration_v3.py \
             research_core_v4/development_execution_runner_v1.py
       - name: Preoutcome architecture and evaluator invariants
         run: |
@@ -45,15 +46,15 @@ jobs:
             tests.test_research_core_v4_execution_binding
       - name: Exact real-support geometry synthetic calibration smoke
         run: |
-          python research_core_v4/exact_geometry_calibration_v2.py \
-            --support-root research_core_v4/support \
+          python research_core_v4/exact_geometry_calibration_v3.py \
+            --support-root research_core_v4/support_v2 \
             --smoke \
-            --output /tmp/exact_geometry_smoke.json
+            --output /tmp/exact_geometry_smoke_v3.json
           python - <<'PY'
           import json
-          x=json.load(open("/tmp/exact_geometry_smoke.json"))
+          x=json.load(open("/tmp/exact_geometry_smoke_v3.json"))
           assert x["market_responses_used"] is False
-          assert x["support_rows"] == 3791
+          assert x["support_rows"] == 3753
           assert x["P"] == 127
           assert x["selector_tiecheck"] == 2
           assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
