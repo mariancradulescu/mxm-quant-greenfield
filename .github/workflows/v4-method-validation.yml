@@ -7,10 +7,10 @@ on:
     paths:
       - "research_core_v4/**"
       - "tests/test_research_core_v4_method.py"
+      - "tests/test_research_core_v4_response_evaluator.py"
+      - "tests/test_research_core_v4_support_geometry.py"
       - "research_core_v3/state/V3_STATE.json"
-      - "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json"
       - "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json"
-      - "research_core_v3/state/V3_POST_FREEZE_WORKFLOW_HARDENING_V1.json"
       - ".github/workflows/v4-method-validation.yml"
   workflow_dispatch:
 
@@ -20,7 +20,7 @@ permissions:
 jobs:
   method-validation:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,22 +30,45 @@ jobs:
         run: python -m pip install --disable-pip-version-check numpy
       - name: Static compile
         run: |
-          python -m py_compile research_core_v4/detector_calibration.py research_core_v4/detector_calibration_v3.py
-      - name: Preoutcome architecture invariants
+          python -m py_compile \
+            research_core_v4/detector_calibration.py \
+            research_core_v4/detector_calibration_v3.py \
+            research_core_v4/response_evaluator_v2.py \
+            research_core_v4/exact_geometry_calibration_v1.py
+      - name: Preoutcome architecture and evaluator invariants
         run: |
-          python -m unittest tests.test_research_core_v4_method
-      - name: Synthetic heterogeneous hierarchical detector smoke calibration
+          python -m unittest \
+            tests.test_research_core_v4_method \
+            tests.test_research_core_v4_response_evaluator \
+            tests.test_research_core_v4_support_geometry
+      - name: Exact real-support geometry synthetic calibration smoke
         run: |
-          python research_core_v4/detector_calibration_v3.py --quick --output /tmp/v4_v3_quick_calibration.json
+          python research_core_v4/exact_geometry_calibration_v1.py \
+            --support-root research_core_v4/support \
+            --smoke \
+            --output /tmp/exact_geometry_smoke.json
           python - <<'PY'
           import json
-          p=json.load(open("/tmp/v4_v3_quick_calibration.json"))
-          assert p["market_data_used"] is False
-          assert 0.0 <= p["negative_control"]["global_any"] < 0.10
-          assert p["heterogeneous_high_only_20bps"]["active_context"] > p["negative_control"]["active_context"]
-          print("V4_HETEROGENEOUS_HIERARCHICAL_SYNTHETIC_SMOKE_PASS",p)
+          x=json.load(open("/tmp/exact_geometry_smoke.json"))
+          assert x["market_responses_used"] is False
+          assert x["support_rows"] == 3791
+          assert x["P"] == 127
+          assert 0 <= x["negative"]["global_any"] < .10
+          assert x["positive"]["active_context"] > x["negative"]["active_context"]
+          print("V4_EXACT_GEOMETRY_CALIBRATION_SMOKE_PASS",x)
           PY
-      - name: Assert no market execution or acquisition surface in V4 method layer
+      - name: Evaluator default is fail closed
+        run: |
+          python research_core_v4/response_evaluator_v2.py --self-test-summary > /tmp/evaluator.json
+          python - <<'PY'
+          import json
+          x=json.load(open("/tmp/evaluator.json"))
+          assert x["real_execution_default"] == "DENIED"
+          assert x["horizons"] == [3,6,12,48]
+          assert x["permutations"] == 1023
+          print("V4_EVALUATOR_FAIL_CLOSED_PASS")
+          PY
+      - name: Assert no broker or order surface in V4 implementation
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -57,9 +80,10 @@ jobs:
             "ProtoOANewOrderReq",
             "live.ctraderapi.com",
             "place_order",
+            "accessToken",
           ]
           bad=[x for x in forbidden if x in text]
           if bad:
-              raise SystemExit(f"market execution/acquisition token present in V4 method layer: {bad}")
-          print("V4_NO_MARKET_EXECUTION_OR_ACQUISITION_SURFACE_PASS")
+              raise SystemExit(f"broker/acquisition/order token present in V4 implementation: {bad}")
+          print("V4_NO_BROKER_ACQUISITION_ORDER_SURFACE_PASS")
           PY
