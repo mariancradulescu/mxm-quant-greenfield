@@ -1,0 +1,135 @@
+{
+  "schema": "mxm.research-core-v3.quote-revision-sequence-pressure-acquisition-plan.v1",
+  "status": "FROZEN_READ_ONLY_BATCH_PLAN_IMPLEMENTATION_NOT_YET_AUTHORIZED",
+  "preoutcome_audit_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_PREOUTCOME_AUDIT_V1.json",
+  "preoutcome_audit_commit": "579a4e524a8c437831723cdb12403331bf52080e",
+  "development_design_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V1.json",
+  "development_design_commit": "aea9ace18fc46634ed5e7f32429518f9876712b2",
+  "broker_identity": {
+    "environment": "Pepperstone - Europe LIVE",
+    "accepted_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "oauth_scope": "accounts",
+    "orders": false,
+    "account_mutation": false,
+    "raw_account_id_may_leave_device": false
+  },
+  "targets": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116
+    }
+  ],
+  "calendar": {
+    "dates_utc": [
+      "2025-09-18",
+      "2025-10-02",
+      "2025-10-16",
+      "2025-10-30",
+      "2025-11-13",
+      "2025-11-27",
+      "2025-12-11",
+      "2025-12-25",
+      "2026-01-08",
+      "2026-01-22",
+      "2026-02-05",
+      "2026-02-19",
+      "2026-03-05",
+      "2026-03-19",
+      "2026-04-02",
+      "2026-04-16",
+      "2026-04-30",
+      "2026-05-14",
+      "2026-05-28",
+      "2026-06-11",
+      "2026-06-25",
+      "2026-07-09",
+      "2026-07-23",
+      "2026-08-06",
+      "2026-08-20",
+      "2026-09-03"
+    ],
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "query_padding_before_seconds": 120,
+    "query_padding_after_seconds": 105,
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "calendar_disjoint_from_all_three_prior_quote_pilot_date_sets": true
+  },
+  "acquisition": {
+    "api": "cTrader Open API ProtoOAGetTickDataReq",
+    "quote_sides": [
+      "BID",
+      "ASK"
+    ],
+    "historical_request_max_span_ms": 604800000,
+    "request_min_interval_seconds": 0.22,
+    "pagination": "FOLLOW_HASMORE_BACKWARD_WITH_CHRONOLOGY_REPAIR_AND_EXACT_DUPLICATE_BOUNDARY_REMOVAL",
+    "base_side_requests_before_pagination": 780,
+    "raw_ticks_written_to_disk": "TEMPORARY_RESUMABLE_ON_DEVICE_CACHE_ONLY_IF_REQUIRED_BY_IMPLEMENTATION",
+    "raw_ticks_transferred_off_device": false,
+    "raw_tick_cache_retention": "DELETE_AFTER_ACCEPTED_DERIVED_EVIDENCE_OR_KEEP_ONLY_FOR_FAILED_RESUME_ON_DEVICE",
+    "support_only_prepass": "COMPUTE_FEATURE_SUPPORT_COUNTS_AND_RETENTION_BEFORE_ANY_SPREAD_NET_RESPONSE",
+    "response_compute_authorized_only_if_support_topology_feasible": true,
+    "automatic_additional_acquisition": false,
+    "fill_authority": false,
+    "protected_forward_opened": false
+  },
+  "estimates": {
+    "estimated_total_combined_ticks": 2513003,
+    "expected_network_bytes_planning_range": [
+      30000000,
+      120000000
+    ],
+    "expected_capture_duration_minutes_planning_range": [
+      6,
+      18
+    ],
+    "minimum_pacing_time_seconds_before_pagination": 171.6,
+    "evidence_transfer": "DERIVED_SUPPORT_DIAGNOSTICS_EVENT_ROWS_PROVENANCE_METADATA_AND_CHECKSUMS_ONLY;NO_RAW_TICK_VALUES"
+  },
+  "output": {
+    "intended_bundle_name": "MXM_V3_QUOTE_REVISION_SEQUENCE_PRESSURE_EVIDENCE_V1.zip",
+    "support_prepass_artifact": "OUTCOME_BLIND_FEATURE_SUPPORT_AND_RETENTION_COUNTS",
+    "event_rows": "ONLY_AFTER_SUPPORT_PREFLIGHT_PASSES;SANITIZED_FROZEN_CELL_EVENT_ROWS_WITH_SIDE_AWARE_SPREAD_NET_RESPONSE",
+    "current_symbol_metadata": true,
+    "transport_provenance": true,
+    "checksums": true,
+    "raw_tick_values": false
+  },
+  "governance": {
+    "execution_authorized": false,
+    "reason": "COLLECTOR_PACKAGE_NOT_YET_REBUILT_AND_OFFLINE_VALIDATED_FROM_DURABLE_LIVE_GITHUB_SOURCE",
+    "candidate_freeze_from_capture": false,
+    "net_certification_from_capture": false,
+    "protected_forward_opened": false,
+    "runtime_v2_reactivated": false
+  }
+}
