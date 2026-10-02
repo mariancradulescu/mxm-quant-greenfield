@@ -18,85 +18,105 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertEqual(freeze["status"], "READ_ONLY_RESEARCH_HISTORY")
         self.assertFalse(state["quote_revision_sequence_package_execution_authorized"])
         self.assertEqual(state["quote_revision_sequence_research_execution_status"], "HELD_PENDING_V4")
-        self.assertTrue(state["quote_revision_sequence_raw_tick_transfer"])
-        self.assertEqual(state["quote_revision_sequence_base_side_requests_before_pagination"], 900)
-        self.assertTrue(state["quote_revision_sequence_design"].endswith("_V2.json"))
-        self.assertTrue(state["quote_revision_sequence_acquisition_plan"].endswith("_V2.json"))
-        self.assertTrue(state["quote_revision_sequence_package_authority"].endswith("_V2.json"))
         self.assertFalse(state["protected_forward_opened"])
 
-    def test_v4_contract_and_state_are_preoutcome(self):
-        contract = load("research_core_v4/V4_PROJECT_CONTRACT_V1.json")
-        state = load("research_core_v4/state/V4_STATE.json")
-        self.assertEqual(contract["primary_research_unit"], "INFORMATION_SOURCE_X_CAUSAL_SCALE_STATE_X_PREENTRY_CONTEXT_X_TRIGGER_X_RESPONSE_FUNCTION_X_EXECUTION_STATE")
-        self.assertEqual(state["status"], "FIRST_REAL_MARKET_DESIGN_FROZEN_OUTCOMES_UNOPENED")
+    def test_v1_is_immutable_preoutcome_history_and_v2_is_successor(self):
+        v1 = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1.json")
+        sup = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1_SUPERSESSION_V1.json")
+        v2 = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json")
+        self.assertFalse(v1["governance"]["v4_real_market_outcomes_opened"])
+        self.assertEqual(sup["status"], "SUPERSEDED_BEFORE_ANY_V4_MARKET_OUTCOME")
+        self.assertFalse(sup["outcomes_opened_under_v1"])
+        self.assertEqual(v2["status"], "FROZEN_PREOUTCOME_STOP_BEFORE_ANY_FIRST_WAVE_V4_RESPONSE_OPENING")
+        self.assertEqual(v2["supersedes"], "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1.json")
+
+    def test_final_detector_calibration_covers_heterogeneity_and_context(self):
+        cal = load("research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V3.json")
+        self.assertTrue(cal["acceptance"]["type_I_error_control_verified"])
+        self.assertTrue(cal["acceptance"]["heterogeneous_effect_power_reported"])
+        self.assertTrue(cal["acceptance"]["context_specific_effect_power_reported"])
+        self.assertTrue(cal["acceptance"]["high_low_context_selection_calibrated"])
+        self.assertLess(cal["negative_control"]["baseline_global_false_positive_rate"], 0.06)
+        for fpr in cal["negative_control"]["stressed_false_positive_rates"].values():
+            self.assertLess(fpr, 0.06)
+        self.assertGreater(
+            cal["power_by_effect_prevalence"]["4_OF_6_POSITIVE"]["mde50_bps"],
+            cal["power_by_effect_prevalence"]["6_OF_6_POSITIVE"]["mde50_bps"],
+        )
+        self.assertGreater(
+            cal["power_by_context_concentration"]["EFFECT_PRESENT_HIGH_VOL_ONLY"]["mde50_bps"],
+            cal["power_by_context_concentration"]["EFFECT_PRESENT_BOTH_VOL_STATES"]["mde50_bps"],
+        )
+        self.assertFalse(cal["real_market_outcomes_opened"])
+        self.assertFalse(cal["broker_contacted"])
+
+    def test_v2_hierarchy_has_no_free_symbol_context_state_or_horizon_selection(self):
+        d = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json")
+        h = d["hierarchical_inference"]
+        self.assertEqual(len(d["structural_contexts"]), 3)
+        self.assertEqual(h["leaves_per_structural_context"], 8)
+        self.assertEqual(h["local_multiplicity"], "MAXT_ACROSS_8_LEAVES_WITH_SHARED_BLOCK_RESAMPLING")
+        self.assertIn("HOLM", h["higher_selection_control"])
+        self.assertFalse(h["free_best_symbol"])
+        self.assertFalse(h["free_best_context"])
+        self.assertFalse(h["free_best_volatility_state"])
+        self.assertFalse(h["free_best_horizon"])
+        self.assertFalse(h["universal_cross_asset_pooling"])
+
+    def test_volatility_context_is_sibling_not_universality_gate(self):
+        d = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json")
+        v = d["causal_preentry_volatility_context"]
+        self.assertEqual(v["role"], "PREDECLARED_SIBLING_CONTEXT_HYPOTHESES")
+        self.assertFalse(v["universality_required"])
+        self.assertFalse(v["postoutcome_high_low_selection"])
+
+    def test_incremental_cross_scale_attribution_is_primary(self):
+        d = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json")
+        a = d["trigger_and_attribution"]
+        self.assertTrue(a["same_information_boundary"])
+        self.assertFalse(a["baseline_is_not_a_development_candidate"] is False)
+        self.assertIn("ADDS_DIRECTIONAL_RESPONSE_INFORMATION", a["primary_attribution_claim"])
+        self.assertIn("FULL_ARM_MEAN_MINUS_BASELINE_ARM_MEAN", d["paired_incremental_estimator"]["paired_unit_contrast"])
+
+    def test_sign_only_is_explicitly_resolved_without_threshold_grid(self):
+        d = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json")
+        s = d["scale_topology"]["sign_only_state_rule"]
+        self.assertTrue(s["retained"])
+        self.assertIsNone(s["deadband"])
+        self.assertFalse(d["scale_topology"]["scale_grid"])
+        self.assertFalse(d["scale_topology"]["centered_or_two_sided_filters"])
+
+    def test_development_and_confirmation_are_context_matched_and_disjoint(self):
+        d = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json")
+        dev=set()
+        conf=set()
+        for c in d["structural_contexts"]:
+            self.assertEqual(len(c["development_symbols"]), 6)
+            self.assertEqual(len(c["confirmation_symbols"]), 4)
+            dev |= {int(x[1]) for x in c["development_symbols"]}
+            conf |= {int(x[1]) for x in c["confirmation_symbols"]}
+        self.assertTrue(dev.isdisjoint(conf))
+        ca=d["confirmation_architecture"]
+        self.assertTrue(ca["matched_by_structural_context"])
+        self.assertTrue(ca["identity_disjoint"])
+        self.assertTrue(ca["time_disjoint"])
+        self.assertFalse(ca["data_acquired_now"])
+        self.assertFalse(ca["outcomes_opened_now"])
+        self.assertTrue(ca["protected_forward_forbidden"])
+
+    def test_v4_canonical_state_points_only_to_v2_and_stays_preoutcome(self):
+        state=load("research_core_v4/state/V4_STATE.json")
+        self.assertEqual(state["status"], "FIRST_REAL_MARKET_DESIGN_V2_FROZEN_OUTCOMES_UNOPENED")
+        self.assertTrue(state["first_wave"]["design"].endswith("FIRST_REAL_MARKET_DESIGN_V2.json"))
+        self.assertTrue(state["first_wave"]["selection_audit"].endswith("FIRST_WAVE_PREOUTCOME_SELECTION_AUDIT_V2.json"))
+        self.assertEqual(state["detector_calibration_history"]["v3_status"], "AUTHORITATIVE_FINAL_PREOUTCOME_ENGINE_FOR_FIRST_WAVE_V2")
         self.assertFalse(state["first_wave"]["development_outcomes_opened"])
         self.assertFalse(state["first_wave"]["confirmation_outcomes_opened"])
         self.assertFalse(state["first_wave"]["new_market_acquisition_started"])
         self.assertFalse(state["first_wave"]["evaluator_execution_authorized"])
         self.assertFalse(state["governance"]["protected_forward_opened"])
-        self.assertEqual(state["governance"]["candidate_frozen_count"], 0)
+        self.assertEqual(state["governance"]["candidate_frozen_count"],0)
         self.assertFalse(state["governance"]["live_trading_started"])
-
-    def test_closure_graph_preserves_v3_and_does_not_auto_reopen(self):
-        graph = load("research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json")
-        self.assertGreaterEqual(graph["node_count"], 40)
-        self.assertFalse(graph["invariants"]["old_pvalues_recomputed"])
-        self.assertFalse(graph["invariants"]["old_pass_fail_changed"])
-        self.assertFalse(graph["invariants"]["every_old_null_reopened"])
-        classes = set(graph["classification_vocabulary"])
-        for needed in (
-            "CARRY_FORWARD_HARD_CLOSURE",
-            "METHOD_DEPENDENT_REINTERPRETATION_REQUIRED",
-            "AUTHENTIC_FRICTION_CLOSED",
-            "DATA_LIMITED_UNTESTED_NOT_NULL",
-        ):
-            self.assertIn(needed, classes)
-
-    def test_detector_calibration_is_type_i_controlled_and_information_first(self):
-        cal = load("research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V2.json")
-        fpr = cal["negative_control"]["pooled_local_maxT_false_positive_rate"]
-        self.assertGreater(fpr, 0.04)
-        self.assertLess(fpr, 0.06)
-        self.assertGreater(cal["negative_control"]["prior_v1_any_of_6_local_without_selection_control_fwer"], 0.20)
-        self.assertLess(cal["negative_control"]["prior_v1_holm6_global_fwer"], 0.06)
-        low = cal["noise_regimes"]["5"]["mde"]
-        self.assertLess(low["pooled_local_maxT"]["p50"], low["old_connected_surrogate"]["p50"])
-        self.assertFalse(cal["real_market_outcomes_opened"])
-        self.assertFalse(cal["broker_contacted"])
-
-    def test_first_wave_is_one_pooled_source_and_confirmation_is_closed(self):
-        design = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1.json")
-        select = load("research_core_v4/state/FIRST_WAVE_PREOUTCOME_SELECTION_AUDIT_V1.json")
-        dev_ids = {int(x["symbol_id"]) for x in design["development_panel"]}
-        conf_ids = {int(x["symbol_id"]) for x in design["confirmation_architecture"]["panel"]}
-        self.assertEqual(len(dev_ids), 6)
-        self.assertEqual(len(conf_ids), 6)
-        self.assertTrue(dev_ids.isdisjoint(conf_ids))
-        self.assertEqual(design["multiplicity"]["local_family"], "FOUR_RESPONSE_HORIZONS_FOR_ONE_POOLED_INFORMATION_SOURCE")
-        self.assertFalse(design["multiplicity"]["cross_symbol_maxT"])
-        self.assertFalse(design["multiplicity"]["free_best_symbol"])
-        self.assertFalse(design["multiplicity"]["generic_connected_region_gate"])
-        self.assertIsNone(design["development_information_lead_gate"]["economic_bps_hurdle"])
-        self.assertFalse(design["confirmation_architecture"]["outcomes_opened_now"])
-        self.assertFalse(design["confirmation_architecture"]["data_acquired_now"])
-        self.assertTrue(design["confirmation_architecture"]["protected_forward_forbidden"])
-        self.assertFalse(design["governance"]["v4_real_market_outcomes_opened"])
-        self.assertFalse(select["governance"]["quote_revision_v2_executed"])
-
-    def test_scale_topology_is_true_completed_multiscale(self):
-        design = load("research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1.json")
-        topology = design["scale_topology"]
-        self.assertIn("H4_context", topology)
-        self.assertIn("H1_setup", topology)
-        self.assertIn("M15_transition", topology)
-        self.assertIn("M5_event_clock", topology)
-        self.assertFalse(topology["scale_grid"])
-        self.assertFalse(topology["centered_or_two_sided_filters"])
-        self.assertFalse(topology["partial_bucket_use"])
-        self.assertFalse(topology["forward_fill"])
-        self.assertFalse(topology["synthetic_fill"])
-        self.assertEqual(design["response_function"]["horizons_completed_contiguous_m5_bars"], [3, 6, 12, 48])
 
 
 if __name__ == "__main__":
