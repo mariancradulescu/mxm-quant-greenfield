@@ -1,0 +1,56 @@
+{
+  "schema": "mxm.research-core-v4.greenfield-recovery-v3-final-validation-state.v1",
+  "as_of_date": "2026-10-02",
+  "status": "FINAL_VALIDATION_STATE_PERSISTED_FAIL_CLOSED",
+  "authoritative_repository": "mariancradulescu/mxm-quant-greenfield",
+  "authoritative_branch": "performance-research-v3-20260922",
+  "predecessor_validated_head": "acbcb9fdfdd84df5bd2cbad7d38a98d3d47c9f9d",
+  "predecessor_exact_head_green_evidence": [
+    {
+      "workflow": "Research Core V4 Method Validation",
+      "run_id": 37018505960,
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "V4 Exact Geometry Calibration V2",
+      "run_id": 37018506521,
+      "conclusion": "SUCCESS"
+    },
+    {
+      "workflow": "V4 Recovery Governance and Runtime Audit",
+      "run_id": 37018506194,
+      "conclusion": "SUCCESS"
+    }
+  ],
+  "validation_target": "THE_COMMIT_CONTAINING_THIS_RECORD",
+  "success_condition": "ALL_THREE_REQUIRED_WORKFLOWS_MUST_CONCLUDE_SUCCESS_ON_THE_SAME_RECORD_CONTAINING_HEAD",
+  "required_workflows": [
+    "Research Core V4 Method Validation",
+    "V4 Exact Geometry Calibration V2",
+    "V4 Recovery Governance and Runtime Audit"
+  ],
+  "path_filter_policy": "ALL_THREE_INCLUDE research_core_v4/** AND tests/test_research_core_v4_*.py PLUS THEIR_OWN_WORKFLOW_FILE",
+  "scientific_boundary": {
+    "development_verdict": "UNKNOWN",
+    "accepted_canonical_development_result_count": 0,
+    "development_execution_completed": false,
+    "development_raw_result_persisted": false,
+    "development_result_interpreted": false,
+    "real_development_response_execution_authorized": false,
+    "recovery_arm_present": false,
+    "recovery_input_staging_present": false,
+    "confirmation_outcomes_opened": false,
+    "protected_forward_opened": false,
+    "candidate_promotion_authorized": false,
+    "live_trading_started": false
+  },
+  "execution_architecture": {
+    "mode": "GREENFIELD_ONLY_BYTE_IDENTICAL_FROZEN_REFERENCE",
+    "scientific_source_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+    "runtime_benchmark_seconds_full_support_sized_synthetic": 49.85226556699999,
+    "runtime_margin_multiple_vs_available_execution_limit": 433.28020811752737,
+    "fast_scientific_reimplementation_created": false,
+    "deterministic_context_sharding_adopted": false
+  },
+  "hard_stop": "NO_REAL_DEVELOPMENT_RESPONSE_EXECUTION_IN_OR_AFTER_THIS_VALIDATION_TURN"
+}
