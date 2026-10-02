@@ -148,7 +148,7 @@ class ExecutionBindingTests(unittest.TestCase):
             "permutations":1023,
         }
         b=runner.PrevalidatedBundle(
-            base_authority(),{}, {}, {}, {}, tuple(), {}, {"X":"3"*64}, prov
+            base_authority(),{"status":"SYNTHETIC_AUTHORIZED_NOT_EXECUTED"}, {}, {}, {}, tuple(), {}, {"X":"3"*64}, prov
         )
         with tempfile.TemporaryDirectory() as td, patch.object(
             ev,"evaluate_prevalidated_development",
