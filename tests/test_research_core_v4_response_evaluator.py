@@ -75,6 +75,9 @@ class Tests(unittest.TestCase):
     self.assertFalse(ev.support_fail_closed(full_events=79,baseline_events=100,paired_units=120,blocks=12,min_full=80,min_baseline=80,min_paired=120,min_blocks=10))
  def test_real_execution_denied_without_authority(self):
     with self.assertRaises(PermissionError): ev.require_real_response_authority({})
+ def test_fixed_calendar_gates(self):
+    self.assertTrue(ev.development_quarter_gate({0:1,14:1,27:1,40:-1},3))
+    self.assertTrue(ev.confirmation_tertile_gate({0:1,8:1,16:-1},2))
  def test_confirmation_single_leaf_known_answer(self):
     ids=np.arange(12);x=np.ones(12)
     self.assertLessEqual(ev.confirmation_single_leaf_test(ids,x,1023,99),.05)
