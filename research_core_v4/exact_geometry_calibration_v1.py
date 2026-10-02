@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from datetime import datetime,timezone
 from pathlib import Path
 import numpy as np
-from research_core_v4 import response_evaluator_v2 as ev
+try:
+    from research_core_v4 import response_evaluator_v2 as ev
+except ModuleNotFoundError:
+    import response_evaluator_v2 as ev
 
 CONTEXTS=("FX_SPOT","SPOT_CRYPTO","US_EQUITY_EXTENDED_HOURS");STATES=("LOW","HIGH");HORIZONS=(3,6,12,48)
 HSHAPE=np.array([.5,1.,.75,.4]);DEV_ANCHOR=datetime(2025,9,15,tzinfo=timezone.utc)
