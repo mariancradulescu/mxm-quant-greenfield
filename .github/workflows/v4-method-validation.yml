@@ -9,6 +9,7 @@ on:
       - "tests/test_research_core_v4_method.py"
       - "tests/test_research_core_v4_response_evaluator.py"
       - "tests/test_research_core_v4_support_geometry.py"
+      - "tests/test_research_core_v4_execution_binding.py"
       - "research_core_v3/state/V3_STATE.json"
       - "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json"
       - ".github/workflows/v4-method-validation.yml"
@@ -54,6 +55,8 @@ jobs:
           assert x["market_responses_used"] is False
           assert x["support_rows"] == 3791
           assert x["P"] == 127
+          assert x["selector_tiecheck"] == 2
+          assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
           assert 0 <= x["negative"]["global_any"] < .10
           assert x["positive"]["active_context"] > x["negative"]["active_context"]
           print("V4_EXACT_GEOMETRY_CALIBRATION_SMOKE_PASS",x)
@@ -61,13 +64,18 @@ jobs:
       - name: Evaluator default is fail closed
         run: |
           python research_core_v4/response_evaluator_v3.py --self-test-summary > /tmp/evaluator.json
+          python research_core_v4/development_execution_runner_v1.py --self-test-summary > /tmp/runner.json
           python - <<'PY'
           import json
           x=json.load(open("/tmp/evaluator.json"))
+          r=json.load(open("/tmp/runner.json"))
           assert x["real_execution_default"] == "DENIED"
           assert x["horizons"] == [3,6,12,48]
           assert x["permutations"] == 1023
-          print("V4_EVALUATOR_FAIL_CLOSED_PASS")
+          assert r["default"] == "DENIED"
+          assert r["seed"] == 20261002
+          assert r["permutations"] == 1023
+          print("V4_EVALUATOR_AND_RUNNER_FAIL_CLOSED_PASS")
           PY
       - name: Assert no broker or order surface in V4 implementation
         run: |
