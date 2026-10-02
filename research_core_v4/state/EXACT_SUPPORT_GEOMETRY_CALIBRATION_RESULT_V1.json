@@ -1,0 +1,347 @@
+{
+  "schema": "mxm.research-core-v4.exact-support-geometry-calibration-result.v1",
+  "status": "PASS_ACTUAL_PAIRED_ESTIMATOR_CALIBRATED_ON_REAL_OUTCOME_BLIND_SUPPORT_GEOMETRY",
+  "as_of_date": "2026-10-02",
+  "design_ref": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+  "support_ref": "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V1.json",
+  "real_market_response_values_used": false,
+  "skeleton_sha256": "e79db90359e473e51de464ccddf400136c4cbaeedabada87975ac6961f6e9aee",
+  "calibration_engine_local_sha256": "8524e839458a8e56149edd06d9095db0d6baa331322e7c980e64bf08d8ef58c5",
+  "exact_estimator": {
+    "synthetic_responses_generated_separately_for_full_and_baseline_events": true,
+    "actual_arm_counts_used": true,
+    "actual_missing_pair_geometry_used": true,
+    "actual_symbol_week_direction_state_horizon_units_used": true,
+    "equal_direction_weighting": true,
+    "equal_symbol_weighting": true,
+    "actual_two_week_block_ids_used": true,
+    "local_family": "8_LEAVES_PER_CONTEXT_2_VOL_STATES_X_4_HORIZONS",
+    "shared_block_maxT_permutations": 1023,
+    "shared_block_resampling": "RADEMACHER_SIGNS_SHARED_BY_GLOBAL_TWO_WEEK_BLOCK_ID_ACROSS_ALL_8_LEAVES_IN_CONTEXT",
+    "base_seed": 20261002,
+    "higher_selection": "HOLM_FWER_0_05_ACROSS_3_STRUCTURAL_CONTEXT_FAMILY_PVALUES",
+    "exact_gates": [
+      "TEMPORAL_3_OF_4",
+      "BREADTH_3_OF_6",
+      "CONCENTRATION_LE_0_50",
+      "FULL_ARM_ABSOLUTE_NORMALIZED_MEAN_GT_0",
+      "SUPPORT_FAIL_CLOSED"
+    ]
+  },
+  "negative_controls": {
+    "symmetric_zero_mean": {
+      "global_type_I": 0.042,
+      "per_context": [
+        0.014,
+        0.0133333333,
+        0.0163333333
+      ],
+      "holm_any": 0.044
+    },
+    "fat_tailed_t5_zero_mean": {
+      "global_type_I": 0.0496666667,
+      "per_context": [
+        0.0156666667,
+        0.021,
+        0.0156666667
+      ],
+      "holm_any": 0.05
+    },
+    "skewed_zero_mean": {
+      "global_type_I": 0.033,
+      "per_context": [
+        0.0116666667,
+        0.0126666667,
+        0.009
+      ],
+      "holm_any": 0.0336666667
+    },
+    "heteroskedastic_zero_mean": {
+      "global_type_I": 0.0446666667,
+      "per_context": [
+        0.0143333333,
+        0.0166666667,
+        0.015
+      ],
+      "holm_any": 0.05
+    },
+    "common_factor_zero_mean": {
+      "global_type_I": 0.0456666667,
+      "per_context": [
+        0.0173333333,
+        0.014,
+        0.0153333333
+      ],
+      "holm_any": 0.0456666667
+    }
+  },
+  "standardized_effect_mde": {
+    "unit": "SYNTHETIC_INCREMENTAL_EFFECT_IN_UNITS_OF_THE_PER_EVENT_NOISE_SCALE_BEFORE_COUNT_AVERAGING",
+    "homogeneous_6_of_6_both_vol_states": {
+      "FX_SPOT": {
+        "p50": 0.0489,
+        "p80": 0.0669
+      },
+      "SPOT_CRYPTO": {
+        "p50": 0.0376,
+        "p80": 0.0505
+      },
+      "US_EQUITY_EXTENDED_HOURS": {
+        "p50": 0.0661,
+        "p80": 0.0903
+      }
+    },
+    "low_only": {
+      "FX_SPOT": {
+        "p50": 0.0622,
+        "p80": 0.08079,
+        "p90": 0.09349
+      },
+      "SPOT_CRYPTO": {
+        "p50": 0.04646,
+        "p80": 0.06147,
+        "p90": 0.07213
+      },
+      "US_EQUITY_EXTENDED_HOURS": {
+        "p50": 0.08393,
+        "p80": 0.11382,
+        "p90": 0.13021
+      }
+    },
+    "high_only": {
+      "FX_SPOT": {
+        "p50": 0.06372,
+        "p80": 0.08459,
+        "p90": 0.09541
+      },
+      "SPOT_CRYPTO": {
+        "p50": 0.04833,
+        "p80": 0.06312,
+        "p90": 0.07351
+      },
+      "US_EQUITY_EXTENDED_HOURS": {
+        "p50": 0.08143,
+        "p80": 0.10564,
+        "p90": 0.11932
+      }
+    }
+  },
+  "power_patterns_summary": {
+    "effect_grid_standardized": [
+      0.04,
+      0.06,
+      0.08,
+      0.1,
+      0.12,
+      0.15,
+      0.2
+    ],
+    "FX_SPOT": {
+      "six_of_six": [
+        0.3233,
+        0.7317,
+        0.94,
+        0.9967,
+        1,
+        0.9983,
+        1
+      ],
+      "five_of_six": [
+        0.2033,
+        0.4933,
+        0.785,
+        0.965,
+        0.9967,
+        1,
+        1
+      ],
+      "four_of_six": [
+        0.1367,
+        0.3283,
+        0.5417,
+        0.775,
+        0.9483,
+        0.9967,
+        1
+      ],
+      "three_of_six": [
+        0.0817,
+        0.2,
+        0.3267,
+        0.4633,
+        0.735,
+        0.9033,
+        0.9967
+      ],
+      "heterogeneous": [
+        0.2217,
+        0.5383,
+        0.8617,
+        0.9767,
+        0.9967,
+        1,
+        0.9967
+      ],
+      "one_opposite": [
+        0.1567,
+        0.4033,
+        0.72,
+        0.9,
+        0.9933,
+        1,
+        1
+      ],
+      "two_opposite": [
+        0.0817,
+        0.195,
+        0.3133,
+        0.5233,
+        0.725,
+        0.9133,
+        0.9917
+      ]
+    },
+    "SPOT_CRYPTO": {
+      "six_of_six": [
+        0.5683,
+        0.9367,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "five_of_six": [
+        0.4083,
+        0.7833,
+        0.9817,
+        1,
+        1,
+        1,
+        1
+      ],
+      "four_of_six": [
+        0.265,
+        0.5467,
+        0.88,
+        0.975,
+        0.9983,
+        0.9983,
+        1
+      ],
+      "three_of_six": [
+        0.1233,
+        0.3333,
+        0.5617,
+        0.8083,
+        0.94,
+        0.9967,
+        0.9983
+      ],
+      "heterogeneous": [
+        0.4367,
+        0.82,
+        0.9933,
+        0.9967,
+        1,
+        1,
+        0.9967
+      ],
+      "one_opposite": [
+        0.295,
+        0.6617,
+        0.9533,
+        1,
+        1,
+        1,
+        1
+      ],
+      "two_opposite": [
+        0.1067,
+        0.2967,
+        0.545,
+        0.7917,
+        0.9117,
+        1,
+        1
+      ]
+    },
+    "US_EQUITY_EXTENDED_HOURS": {
+      "six_of_six": [
+        0.1683,
+        0.4167,
+        0.6983,
+        0.89,
+        0.9917,
+        0.9983,
+        1
+      ],
+      "five_of_six": [
+        0.145,
+        0.2783,
+        0.485,
+        0.735,
+        0.9017,
+        0.9867,
+        1
+      ],
+      "four_of_six": [
+        0.0633,
+        0.1517,
+        0.2967,
+        0.4883,
+        0.6783,
+        0.8767,
+        0.9917
+      ],
+      "three_of_six": [
+        0.0567,
+        0.0983,
+        0.185,
+        0.2467,
+        0.4,
+        0.63,
+        0.905
+      ],
+      "heterogeneous": [
+        0.135,
+        0.3533,
+        0.5533,
+        0.7883,
+        0.935,
+        0.9917,
+        1
+      ],
+      "one_opposite": [
+        0.0867,
+        0.2167,
+        0.3883,
+        0.615,
+        0.8017,
+        0.95,
+        1
+      ],
+      "two_opposite": [
+        0.0433,
+        0.0867,
+        0.145,
+        0.2233,
+        0.3617,
+        0.5917,
+        0.8583
+      ]
+    }
+  },
+  "scenario_specific_bps_mde": {
+    "status": "NOT_IDENTIFIABLE_OUTCOME_BLIND_FOR_THE_ACTUAL_PAIRED_ESTIMATOR",
+    "reason": "A_BPS_MAPPING_REQUIRES_THE_SCALE_OF_FUTURE_FULL_AND_BASELINE_RESPONSE_NOISE_WHICH_IS_ITSELF_AN_UNOPENED_MARKET_RESPONSE",
+    "rule": "DO_NOT_REUSE_OLD_10_BPS_SYNTHETIC_NOISE_ANCHORS_AS_ACTUAL_GEOMETRY_BPS_MDE"
+  },
+  "acceptance": {
+    "global_type_I_approximately_controlled_at_predeclared_fwer": true,
+    "material_type_I_deviation_found": false,
+    "all_24_leaf_support_geometry_feasible": true,
+    "no_gate_relaxed_for_power": true,
+    "exact_geometry_calibration_green": true
+  }
+}
