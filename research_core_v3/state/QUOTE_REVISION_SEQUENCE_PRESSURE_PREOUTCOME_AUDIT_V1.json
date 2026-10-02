@@ -1,0 +1,189 @@
+{
+  "schema": "mxm.research-core-v3.quote-revision-sequence-pressure-preoutcome-audit.v1",
+  "status": "COMPLETE_NEW_INFORMATION_SOURCE_DEFINED_SUPPORT_AND_ACQUISITION_PREFLIGHT_PASS_STOP_BEFORE_IMPLEMENTATION_AUTHORIZATION",
+  "as_of_date": "2026-10-02",
+  "coverage_authority_ref": "research_core_v3/state/PROJECT_WIDE_RESEARCH_DESIGN_COVERAGE_AUDIT_V2.json",
+  "coverage_authority_commit": "819db94581d05c330a0c31592b9a292130414d74",
+  "rerank_ref": "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V7.json",
+  "rerank_commit": "ef9bb85556c37538656797760317d9bd5f4b17e8",
+  "selected_family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE",
+  "selected_subfamily": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "novelty_boundary": {
+    "five_second_quote_impulse": "NOT_SAME;NEW_SIGNAL_DOES_NOT_REQUIRE_LARGE_CUMULATIVE_MID_IMPULSE_AND_EXPLICITLY_CAPS_NET_MID_DISPLACEMENT",
+    "quote_side_catchup": "NOT_SAME;NEW_SIGNAL_USES_COUNTS_OF_SIGNED_PRICE_CHANGING_REVISIONS_ACROSS_BOTH_SIDES_NOT_DIRECTIONAL_SIDE_MOVE_SHARE_OR_SPREAD_COMPRESSION",
+    "fx_cross_pair_quote_lead_lag": "NOT_SAME;NEW_SIGNAL_IS_WITHIN_SYMBOL_AND_USES_NO_LEADER_FOLLOWER_RELATIONSHIP",
+    "threshold_retune_of_closed_family": false
+  },
+  "panel_selection": {
+    "source_ref": "research_core_v3/state/BROKER_NATIVE_QUOTE_MICROSTRUCTURE_PREOUTCOME_AUDIT_V1.json",
+    "rule": "REUSE_PREVIOUSLY_FROZEN_EXECUTION_PLAUSIBILITY_ONLY_PANEL_WITHOUT_PRIOR_RETURN_BASED_SYMBOL_SELECTION",
+    "symbols": [
+      {
+        "symbol": "EURJPY",
+        "symbol_id": 3,
+        "combined_bid_ask_ticks_per_minute": 131.94266121972575,
+        "d0_median_spread_bps": 0.49288196298536147,
+        "d0_fresh_fraction": 0.8552631578947368
+      },
+      {
+        "symbol": "EURGBP",
+        "symbol_id": 9,
+        "combined_bid_ask_ticks_per_minute": 69.23146232396718,
+        "d0_median_spread_bps": 0.11582720898467125,
+        "d0_fresh_fraction": 0.6410256410256411
+      },
+      {
+        "symbol": "AUDCAD",
+        "symbol_id": 18,
+        "combined_bid_ask_ticks_per_minute": 119.03988984394562,
+        "d0_median_spread_bps": 0.5449917978733819,
+        "d0_fresh_fraction": 0.7051282051282052
+      },
+      {
+        "symbol": "GBPCAD",
+        "symbol_id": 19,
+        "combined_bid_ask_ticks_per_minute": 116.23585759541412,
+        "d0_median_spread_bps": 0.5362765460340806,
+        "d0_fresh_fraction": 0.6410256410256411
+      },
+      {
+        "symbol": "JPN225",
+        "symbol_id": 116,
+        "combined_bid_ask_ticks_per_minute": 100.51649057681328,
+        "d0_median_spread_bps": 1.206648980640179,
+        "d0_fresh_fraction": 0.6282051282051282
+      }
+    ]
+  },
+  "outcome_blind_support_preflight": {
+    "sampled_dates": 26,
+    "windows_per_date": 3,
+    "symbol_hours_each": 78,
+    "total_symbol_hours": 390,
+    "distinct_calendar_dates": 26,
+    "minimum_required_completed_events_per_cell": 100,
+    "minimum_required_dates": 18,
+    "minimum_required_iso_weeks": 10,
+    "raw_decision_seconds_per_symbol": 280800,
+    "prior_observed_combined_quote_rate_range_ticks_per_minute": [
+      69.23146232396718,
+      131.94266121972575
+    ],
+    "estimated_total_bid_ask_ticks_from_prior_execution_only_rates": 2513003,
+    "structural_capacity_conclusion": "PASS_RAW_EVENT_CAPACITY_PLAUSIBLE",
+    "exact_signal_incidence_rule": "AFTER_CAPTURE_COMPUTE_FEATURE_SUPPORT_COUNTS_BEFORE_ANY_RESPONSE_OR_PNL;IF_SUPPORT_TOPOLOGY_IS_IMPOSSIBLE_FAIL_CLOSED_WITHOUT_OPENING_RESPONSES",
+    "support_gate_relaxation_allowed": false
+  },
+  "acquisition_preflight": {
+    "exact_symbols": [
+      {
+        "symbol": "EURJPY",
+        "symbol_id": 3
+      },
+      {
+        "symbol": "EURGBP",
+        "symbol_id": 9
+      },
+      {
+        "symbol": "AUDCAD",
+        "symbol_id": 18
+      },
+      {
+        "symbol": "GBPCAD",
+        "symbol_id": 19
+      },
+      {
+        "symbol": "JPN225",
+        "symbol_id": 116
+      }
+    ],
+    "required_fields": [
+      "BID_TIMESTAMP_PRICE_EVENTS",
+      "ASK_TIMESTAMP_PRICE_EVENTS",
+      "CURRENT_SYMBOL_METADATA",
+      "SANITIZED_ACCOUNT_PROVENANCE"
+    ],
+    "clock_semantics": "HISTORICAL_EVENT_TIMESTAMPS_MERGED_CAUSALLY;PRIMARY_SIGNAL_EVALUATED_ON_INTEGER_UTC_SECONDS_AFTER_ALL_SIDE_TICKS_TIMESTAMPED_AT_OR_BEFORE_T",
+    "history_availability": "PRIOR_EXECUTION_ONLY_AUDIT_OBSERVED_AVAILABLE_HISTORY_ACROSS_2025_09_TO_2026_09_FOR_ALL_FIVE_WITH_BROKER_HISTORY_UNAVAILABLE_COUNT_0",
+    "calendar_dates_utc": [
+      "2025-09-18",
+      "2025-10-02",
+      "2025-10-16",
+      "2025-10-30",
+      "2025-11-13",
+      "2025-11-27",
+      "2025-12-11",
+      "2025-12-25",
+      "2026-01-08",
+      "2026-01-22",
+      "2026-02-05",
+      "2026-02-19",
+      "2026-03-05",
+      "2026-03-19",
+      "2026-04-02",
+      "2026-04-16",
+      "2026-04-30",
+      "2026-05-14",
+      "2026-05-28",
+      "2026-06-11",
+      "2026-06-25",
+      "2026-07-09",
+      "2026-07-23",
+      "2026-08-06",
+      "2026-08-20",
+      "2026-09-03"
+    ],
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ],
+    "disjoint_from_prior_three_quote_pilot_date_sets": true,
+    "base_side_requests_before_pagination": 780,
+    "request_min_interval_seconds": 0.22,
+    "documented_rate_limit_requests_per_second": 5,
+    "planned_rate_requests_per_second": 4.545454545454546,
+    "request_rate_feasible": true,
+    "historical_request_max_span": "ONE_WEEK_DOCUMENTED;PLANNED_REQUESTS_ARE_ABOUT_ONE_HOUR_PLUS_PADDING",
+    "estimated_total_combined_ticks": 2513003,
+    "expected_network_bytes_planning_range": [
+      30000000,
+      120000000
+    ],
+    "expected_capture_duration_minutes_planning_range": [
+      6,
+      18
+    ],
+    "minimum_pacing_time_seconds_before_pagination": 171.6,
+    "estimate_note": "PLANNING_RANGE_ONLY;ACTUAL_PAGINATION_AND_BROKER_LATENCY_MAY_INCREASE_DURATION",
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "latest_planned_sample_date": "2026-09-03",
+    "protected_forward_opened": false,
+    "read_only_surface": "ProtoOAGetTickDataReq BID_AND_ASK_ONLY;NO_ORDER_OR_ACCOUNT_MUTATION"
+  },
+  "adaptive_wave_size": {
+    "symbol_local_families": 5,
+    "cells_per_symbol": 24,
+    "total_frozen_cells": 120,
+    "shared_capture": true,
+    "shared_global_maxT": false,
+    "higher_selection_layer": "BONFERRONI_ACROSS_5_SYMBOL_LOCAL_FAMILIES",
+    "rationale": "FIVE_SYMBOL_PANEL_IS_THE_COMPLETE_PREEXISTING_EXECUTION_ONLY_LOCALIZATION;BROADER_CAPTURE_WOULD_ADD_COST_WITHOUT_PREOUTCOME_EXECUTION_EVIDENCE"
+  },
+  "governance": {
+    "wave_membership_frozen": true,
+    "protected_forward_opened": false,
+    "candidate_frozen_count": 0,
+    "runtime_v2_reactivated": false,
+    "no_user_execution_authorized_yet": true
+  }
+}
