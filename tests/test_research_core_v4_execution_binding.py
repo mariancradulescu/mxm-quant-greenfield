@@ -168,7 +168,7 @@ class ExecutionBindingTests(unittest.TestCase):
 
         # Separately validate the current interrupted/recovery state without making
         # the frozen runner accept it as a fresh READY state.
-        from research_core_v4.crash_recovery_control_v1 import validate_current_control_plane
+        from research_core_v4.crash_recovery_control_v3 import validate_current_control_plane
         report=validate_current_control_plane()
         self.assertEqual(report["status"],"PASS")
         self.assertEqual(report["allowed_attempts"],1)

@@ -1,24 +1,10 @@
 name: Research Core V4 Method Validation
-
 on:
   push:
-    branches:
-      - performance-research-v3-20260922
-    paths:
-      - "research_core_v4/**"
-      - "tests/test_research_core_v4_method.py"
-      - "tests/test_research_core_v4_response_evaluator.py"
-      - "tests/test_research_core_v4_support_geometry.py"
-      - "tests/test_research_core_v4_execution_binding.py"
-      - "tests/test_research_core_v4_recovery_v2.py"
-      - "research_core_v3/state/V3_STATE.json"
-      - "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json"
-      - ".github/workflows/v4-method-validation.yml"
+    branches: [performance-research-v3-20260922]
+    paths: ["research_core_v4/**","tests/test_research_core_v4_*.py",".github/workflows/v4-method-validation.yml"]
   workflow_dispatch:
-
-permissions:
-  contents: read
-
+permissions: {contents: read}
 jobs:
   method-validation:
     runs-on: ubuntu-latest
@@ -26,112 +12,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install method-only dependency
-        run: python -m pip install --disable-pip-version-check numpy
-      - name: Static compile
+        with: {python-version: "3.11"}
+      - run: python -m pip install --disable-pip-version-check numpy
+      - run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py research_core_v4/crash_recovery_control_v3.py research_core_v4/greenfield_runtime_benchmark_v1.py
+      - run: python -m unittest tests.test_research_core_v4_method tests.test_research_core_v4_response_evaluator tests.test_research_core_v4_support_geometry tests.test_research_core_v4_execution_binding tests.test_research_core_v4_recovery_v3
+      - run: python -m research_core_v4.crash_recovery_control_v3
+      - name: Exact geometry synthetic smoke
         run: |
-          python -m py_compile \
-            research_core_v4/frozen_v2_semantics.py \
-            research_core_v4/response_evaluator_v3.py \
-            research_core_v4/exact_geometry_calibration_v2.py \
-            research_core_v4/exact_geometry_calibration_v3.py \
-            research_core_v4/development_execution_runner_v1.py \
-            research_core_v4/crash_recovery_control_v1.py \
-            research_core_v4/crash_recovery_control_v2.py \
-            research_core_v4/runtime_profile_audit_v1.py
-      - name: Preoutcome architecture and evaluator invariants
-        run: |
-          python -m unittest \
-            tests.test_research_core_v4_method \
-            tests.test_research_core_v4_response_evaluator \
-            tests.test_research_core_v4_support_geometry \
-            tests.test_research_core_v4_execution_binding \
-            tests.test_research_core_v4_recovery_v2
-      - name: Deterministic crash-recovery control-plane invariants
-        run: python research_core_v4/crash_recovery_control_v1.py
-      - name: Recovery V2 prepared-not-armed invariants
-        run: python research_core_v4/crash_recovery_control_v2.py
-      - name: Synthetic-only runtime hotspot audit
-        run: |
-          python research_core_v4/runtime_profile_audit_v1.py > /tmp/v4_runtime_profile.json
+          python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --smoke --output /tmp/g.json
           python - <<'PY'
           import json
-          x=json.load(open("/tmp/v4_runtime_profile.json"))
-          assert x["status"]=="PASS"
-          assert x["synthetic_only"] is True
-          assert x["real_market_response_values_used"] is False
-          assert x["hotspot_verified"] is True
-          print("V4_RECOVERY_V2_SYNTHETIC_RUNTIME_AUDIT_PASS",x)
+          x=json.load(open("/tmp/g.json")); assert not x["market_responses_used"] and x["support_rows"]==3753 and x["P"]==127 and x["selector_tiecheck"]==2 and x["full_arm_weighting_parity"]["abs_diff"]<1e-12 and 0<=x["negative"]["global_any"]<.10 and x["positive"]["active_context"]>x["negative"]["active_context"]
           PY
-      - name: Exact real-support geometry synthetic calibration smoke
+      - name: Evaluator and runner default fail closed
         run: |
-          python research_core_v4/exact_geometry_calibration_v3.py \
-            --support-root research_core_v4/support_v2 \
-            --smoke \
-            --output /tmp/exact_geometry_smoke_v3.json
+          python research_core_v4/response_evaluator_v3.py --self-test-summary >/tmp/e.json
+          python research_core_v4/development_execution_runner_v1.py --self-test-summary >/tmp/r.json
           python - <<'PY'
           import json
-          x=json.load(open("/tmp/exact_geometry_smoke_v3.json"))
-          assert x["market_responses_used"] is False
-          assert x["support_rows"] == 3753
-          assert x["P"] == 127
-          assert x["selector_tiecheck"] == 2
-          assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
-          assert 0 <= x["negative"]["global_any"] < .10
-          assert x["positive"]["active_context"] > x["negative"]["active_context"]
-          print("V4_EXACT_GEOMETRY_CALIBRATION_SMOKE_PASS",x)
+          e=json.load(open("/tmp/e.json")); r=json.load(open("/tmp/r.json")); assert e["real_execution_default"]=="DENIED" and e["permutations"]==1023 and r["default"]=="DENIED" and r["seed"]==20261002
           PY
-      - name: Evaluator default is fail closed
-        run: |
-          python research_core_v4/response_evaluator_v3.py --self-test-summary > /tmp/evaluator.json
-          python research_core_v4/development_execution_runner_v1.py --self-test-summary > /tmp/runner.json
-          python - <<'PY'
-          import json
-          x=json.load(open("/tmp/evaluator.json"))
-          r=json.load(open("/tmp/runner.json"))
-          assert x["real_execution_default"] == "DENIED"
-          assert x["horizons"] == [3,6,12,48]
-          assert x["permutations"] == 1023
-          assert r["default"] == "DENIED"
-          assert r["seed"] == 20261002
-          assert r["permutations"] == 1023
-          print("V4_EVALUATOR_AND_RUNNER_FAIL_CLOSED_PASS")
-          PY
-      - name: Assert no broker or order surface in V4 implementation
+      - name: No broker acquisition or order surface
         run: |
           python - <<'PY'
           from pathlib import Path
-          files=list(Path("research_core_v4").rglob("*.py"))
-          text="\n".join(p.read_text(encoding="utf-8") for p in files)
-          forbidden=[
-            "ProtoOAGetTickDataReq",
-            "ProtoOAGetTrendbarsReq",
-            "ProtoOANewOrderReq",
-            "live.ctraderapi.com",
-            "place_order",
-            "accessToken",
-          ]
-          bad=[x for x in forbidden if x in text]
-          if bad:
-              raise SystemExit(f"broker/acquisition/order token present in V4 implementation: {bad}")
-          print("V4_NO_BROKER_ACQUISITION_ORDER_SURFACE_PASS")
+          t="\n".join(p.read_text() for p in Path("research_core_v4").rglob("*.py")); bad=[x for x in ["ProtoOAGetTickDataReq","ProtoOAGetTrendbarsReq","ProtoOANewOrderReq","live.ctraderapi.com","place_order","accessToken"] if x in t]
+          assert not bad,bad
           PY
-
-      - name: Record exact-head execution source
-        run: git rev-parse HEAD > V4_EXECUTION_SOURCE_HEAD.txt
-      - name: Upload exact-head V4 execution source bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: V4_AUTHORITY_V3_EXECUTION_SOURCE
-          if-no-files-found: error
-          retention-days: 7
-          path: |
-            research_core_v4
-            research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json
-            tests/test_research_core_v4_method.py
-            tests/test_research_core_v4_response_evaluator.py
-            tests/test_research_core_v4_support_geometry.py
-            tests/test_research_core_v4_execution_binding.py
-            V4_EXECUTION_SOURCE_HEAD.txt

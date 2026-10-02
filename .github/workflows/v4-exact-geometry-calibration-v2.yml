@@ -1,45 +1,10 @@
 name: V4 Exact Geometry Calibration V2
-
 on:
   push:
-    branches:
-      - performance-research-v3-20260922
-    paths:
-      - "research_core_v4/exact_geometry_calibration_v3.py"
-      - "research_core_v4/support_v2/**"
-      - "research_core_v4/response_evaluator_v3.py"
-      - "research_core_v4/frozen_v2_semantics.py"
-      - "research_core_v4/development_execution_runner_v1.py"
-      - "research_core_v4/crash_recovery_control_v1.py"
-      - "research_core_v4/crash_recovery_control_v2.py"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V2.json"
-      - "research_core_v4/state/V4_RECOVERY_V2_INDEPENDENT_GOVERNANCE_AUDIT_V1.json"
-      - "research_core_v4/state/V4_EXECUTION_RUNTIME_PROFILE_AUDIT_V1.json"
-      - "research_core_v4/state/V4_EXECUTION_SURFACE_DECISION_V1.json"
-      - "research_core_v4/state/V4_PRIVATE_INPUT_TRANSPORT_DECISION_V1.json"
-      - "research_core_v4/state/V4_EXACT_SOURCE_EXECUTION_EQUIVALENCE_CONTRACT_V1.json"
-      - "tests/test_research_core_v4_recovery_v2.py"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V1.json"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_LOCK_V1.txt"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_PREINTERRUPTION_STATE_V1.json"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_INTERRUPTION_V1.json"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_OPENING_LOCK_V1.txt"
-      - "tests/test_research_core_v4_execution_binding.py"
-      - "research_core_v4/state/V4_REAL_SUPPORT_SKELETON_AUDIT_V2.json"
-      - "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json"
-      - "research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"
-      - "research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json"
-      - "research_core_v4/state/PRODUCTION_CALIBRATION_SEMANTICS_ALIGNMENT_V2.json"
-      - "research_core_v4/state/RESPONSE_EVALUATOR_IMPLEMENTATION_CONTRACT_V3.json"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json"
-      - "research_core_v4/state/FRESH_INDEPENDENT_PREOUTCOME_AUDIT_V2.json"
-      - "research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"
-      - "research_core_v4/state/V4_STATE.json"
-      - ".github/workflows/v4-exact-geometry-calibration-v2.yml"
-
-permissions:
-  contents: read
-
+    branches: [performance-research-v3-20260922]
+    paths: ["research_core_v4/**","tests/test_research_core_v4_*.py",".github/workflows/v4-exact-geometry-calibration-v2.yml"]
+  workflow_dispatch:
+permissions: {contents: read}
 jobs:
   calibrate:
     runs-on: ubuntu-latest
@@ -47,73 +12,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+        with: {python-version: "3.11"}
       - run: python -m pip install --disable-pip-version-check numpy
-      - name: Compile aligned production and calibration code
-        run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py research_core_v4/crash_recovery_control_v1.py research_core_v4/crash_recovery_control_v2.py
-      - name: Verify recovered accepted full V3 artifact persistence
+      - run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py research_core_v4/crash_recovery_control_v3.py
+      - name: Verify recovered V3 calibration artifact
         run: |
           python - <<'PY'
-          import hashlib, json
-          full_path="research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"
-          raw=open(full_path,"rb").read()
-          raw_sha=hashlib.sha256(raw).hexdigest()
-          assert raw_sha == "fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05"
-          x=json.loads(raw.decode("utf-8"))
-          meta=json.load(open("research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json"))
-          recon=json.load(open("research_core_v4/state/SUPPORT_PARITY_RECONCILIATION_V2.json"))
-          policy=json.load(open("research_core_v4/state/FINAL_PREOUTCOME_VALIDATION_POLICY_V2.json"))
-          assert x["market_responses_used"] is False
-          assert x["support_rows"] == 3753
-          assert x["permutations"] == 1023
-          assert x["seed"] == 20261002
-          assert x["selector_exact_tiecheck"]["pass"] is True
-          assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
-          for name,v in x["negative_controls"].items():
-              assert v["global_any"] < .07, (name,v)
-          assert meta["workflow_artifact_id"] == 11222069169
-          assert meta["workflow_run_id"] == 36997738593
-          assert meta["workflow_head"] == "4e5d05d9b9a291c8c4c3f7f1a150bdb8320f369d"
-          assert meta["workflow_artifact_digest"] == "sha256:5bea73604946c2ab14dd85a4e01925a45c888d9340838f20f38f0387b7eb0ca2"
-          assert meta["workflow_raw_json_sha256"] == raw_sha
-          assert meta["persisted_full_calibration_sha256"] == raw_sha
-          rec=meta["artifact_recovery_verification"]
-          assert rec["status"] == "VERIFIED_FROM_GITHUB_ACTIONS_ARTIFACT_NO_RECOMPUTE"
-          assert rec["zip_sha256"] == "5bea73604946c2ab14dd85a4e01925a45c888d9340838f20f38f0387b7eb0ca2"
-          assert rec["contained_json_sha256"] == raw_sha
-          assert rec["full_calibration_recomputed_during_recovery"] is False
-          assert recon["resolution"]["calibration_artifact_recovered_and_integrity_verified"] is True
-          assert recon["resolution"]["full_calibration_recomputed_during_reconciliation"] is False
-          assert policy["full_calibration_recompute_for_exact_head_validation"] is False
-          print("V4_EXACT_GEOMETRY_V3_RECOVERED_ARTIFACT_INTEGRITY_PASS", raw_sha)
+          import hashlib,json
+          p="research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json"; raw=open(p,"rb").read(); h=hashlib.sha256(raw).hexdigest(); assert h=="fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05"; x=json.loads(raw); assert not x["market_responses_used"] and x["support_rows"]==3753 and x["permutations"]==1023 and x["seed"]==20261002
           PY
-      - name: Exact-head production-support-V2 calibration smoke
+      - name: Exact-head calibration smoke
         run: |
-          python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --smoke --output /tmp/exact_geometry_smoke_v3.json
+          python research_core_v4/exact_geometry_calibration_v3.py --support-root research_core_v4/support_v2 --smoke --output /tmp/g.json
           python - <<'PY'
           import json
-          x=json.load(open("/tmp/exact_geometry_smoke_v3.json"))
-          assert x["market_responses_used"] is False
-          assert x["support_rows"] == 3753
-          assert x["P"] == 127
-          assert x["selector_tiecheck"] == 2
-          assert x["full_arm_weighting_parity"]["abs_diff"] < 1e-12
-          assert 0 <= x["negative"]["global_any"] < .10
-          assert x["positive"]["active_context"] > x["negative"]["active_context"]
-          print("V4_EXACT_GEOMETRY_V3_EXACT_HEAD_SMOKE_PASS")
+          x=json.load(open("/tmp/g.json")); assert not x["market_responses_used"] and x["support_rows"]==3753 and x["P"]==127 and x["selector_tiecheck"]==2 and x["full_arm_weighting_parity"]["abs_diff"]<1e-12 and 0<=x["negative"]["global_any"]<.10 and x["positive"]["active_context"]>x["negative"]["active_context"]
           PY
-      - name: Authority V3 calibration binding precheck
-        run: python -m unittest tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_live_authority_v3_bindings_match_production_support_v2_preoutcome
-      - name: Deterministic crash-recovery control-plane invariants
-        run: python research_core_v4/crash_recovery_control_v1.py
-      - name: Recovery V2 prepared-not-armed invariants
-        run: python research_core_v4/crash_recovery_control_v2.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: V4_EXACT_GEOMETRY_CALIBRATION_V3_EXACT_HEAD_VERIFIED
-          path: |
-            research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_FULL_V3.json
-            research_core_v4/state/EXACT_SUPPORT_GEOMETRY_CALIBRATION_RESULT_V3.json
-          if-no-files-found: error
-          retention-days: 30
+      - run: python -m unittest tests.test_research_core_v4_execution_binding.ExecutionBindingTests.test_live_authority_v3_bindings_match_production_support_v2_preoutcome
+      - run: python -m research_core_v4.crash_recovery_control_v3

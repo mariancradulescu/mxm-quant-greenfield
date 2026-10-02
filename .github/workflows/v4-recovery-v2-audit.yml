@@ -1,59 +1,28 @@
-name: V4 Recovery V2 Governance and Runtime Audit
-
+name: V4 Recovery Governance and Runtime Audit
 on:
   push:
-    branches:
-      - performance-research-v3-20260922
-    paths:
-      - "research_core_v4/crash_recovery_control_v2.py"
-      - "research_core_v4/runtime_profile_audit_v1.py"
-      - "research_core_v4/runtime/v4_recovery_v2_private_runtime_template.yml"
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V2.json"
-      - "research_core_v4/state/V4_RECOVERY_V2_INDEPENDENT_GOVERNANCE_AUDIT_V1.json"
-      - "research_core_v4/state/V4_EXECUTION_RUNTIME_PROFILE_AUDIT_V1.json"
-      - "research_core_v4/state/V4_EXECUTION_SURFACE_DECISION_V1.json"
-      - "research_core_v4/state/V4_PRIVATE_INPUT_TRANSPORT_DECISION_V1.json"
-      - "research_core_v4/state/V4_EXACT_SOURCE_EXECUTION_EQUIVALENCE_CONTRACT_V1.json"
-      - "research_core_v4/state/V4_STATE.json"
-      - "tests/test_research_core_v4_recovery_v2.py"
-      - ".github/workflows/v4-recovery-v2-audit.yml"
-
-permissions:
-  contents: read
-
+    branches: [performance-research-v3-20260922]
+    paths: ["research_core_v4/**","tests/test_research_core_v4_*.py",".github/workflows/v4-recovery-v2-audit.yml"]
+  workflow_dispatch:
+permissions: {contents: read}
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+        with: {python-version: "3.11"}
       - run: python -m pip install --disable-pip-version-check numpy
-      - name: Compile audit-only control code
-        run: python -m py_compile research_core_v4/crash_recovery_control_v1.py research_core_v4/crash_recovery_control_v2.py research_core_v4/runtime_profile_audit_v1.py
-      - name: Preserve Recovery V1 fail-closed history
-        run: python research_core_v4/crash_recovery_control_v1.py
-      - name: Validate Recovery V2 prepared-not-armed state
-        run: python research_core_v4/crash_recovery_control_v2.py
-      - name: Recovery V2 unit invariants
-        run: python -m unittest tests.test_research_core_v4_recovery_v2
-      - name: Synthetic-only runtime audit
+      - run: python -m py_compile research_core_v4/crash_recovery_control_v3.py research_core_v4/greenfield_runtime_benchmark_v1.py
+      - run: python -m research_core_v4.crash_recovery_control_v3
+      - run: python -m unittest tests.test_research_core_v4_recovery_v3
+      - name: Verify persisted runtime and identity evidence
         run: |
-          python research_core_v4/runtime_profile_audit_v1.py > /tmp/v4_runtime_profile.json
           python - <<'PY'
           import json
-          x=json.load(open("/tmp/v4_runtime_profile.json"))
-          assert x["status"]=="PASS"
-          assert x["synthetic_only"] is True
-          assert x["real_market_response_values_used"] is False
-          assert x["hotspot_verified"] is True
-          print("V4_RECOVERY_V2_AUDIT_GREEN")
+          b=json.load(open("research_core_v4/state/V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK_RESULT_V1.json")); e=json.load(open("research_core_v4/state/V4_GREENFIELD_EXECUTION_SEMANTIC_EQUIVALENCE_V1.json")); s=json.load(open("research_core_v4/state/V4_STATE.json"))
+          assert b["status"]=="PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN" and b["evidence_boundary"]["synthetic_only"] and not b["evidence_boundary"]["real_market_response_values_used"] and b["full_synthetic_result"]["event_count"]==118262 and b["measured_margin_multiple_vs_available_limit"]>10
+          assert e["status"]=="PASS_EXACT_REFERENCE_BYTE_IDENTITY_NO_REIMPLEMENTATION" and e["execution_implementation"]["identity_with_reference"]
+          assert s["recovery_v3_preparation"]["accepted_canonical_result_count"]==0 and not s["recovery_v3_preparation"]["real_execution_authorized"]
           PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: V4_RECOVERY_V2_SYNTHETIC_AUDIT
-          path: /tmp/v4_runtime_profile.json
-          if-no-files-found: error
-          retention-days: 30

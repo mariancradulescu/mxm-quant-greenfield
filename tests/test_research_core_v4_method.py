@@ -105,16 +105,16 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertTrue(ca["protected_forward_forbidden"])
 
     def test_v4_canonical_state_is_valid_under_recovery_control_plane(self):
-        from research_core_v4.crash_recovery_control_v1 import validate_current_control_plane
+        from research_core_v4.crash_recovery_control_v3 import validate_current_control_plane
 
         state=load("research_core_v4/state/V4_STATE.json")
         authority=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json")
-        recovery=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V1.json")
+        recovery=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V3.json")
         report=validate_current_control_plane()
         self.assertEqual(report["status"],"PASS")
-        self.assertEqual(report["phase"],state["status"])
-        self.assertEqual(report["allowed_attempts"],1)
-        self.assertEqual(report["original_authority_sha256"],"2bf73c2492833463fa942c78c62126db0edc85e0763e468039eaa905390f48bc")
+        self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_PREPARED_NOT_ARMED_NO_REAL_RESPONSE_EXECUTION")
+        self.assertEqual(report["accepted_canonical_result_count"],0)
+        self.assertFalse(report["real_execution_authorized"])
         self.assertEqual(authority["status"],"AUTHORIZED_READY_NOT_EXECUTED")
         self.assertTrue(authority["real_development_response_execution_authorized"])
         self.assertFalse(authority["confirmation_response_execution_authorized"])
@@ -126,7 +126,7 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertEqual(len(authority["bindings"]["development_series"]),18)
         self.assertTrue(state["first_wave"]["development_outcomes_opened"])
         self.assertFalse(state["first_wave"]["evaluator_execution_authorized"])
-        self.assertTrue(state["first_wave"]["deterministic_crash_recovery_authorized"])
+        self.assertFalse(state["first_wave"]["deterministic_crash_recovery_authorized"])
         self.assertEqual(state["first_wave"]["deterministic_crash_recovery_attempt_limit"],1)
         self.assertFalse(state["first_wave"]["confirmation_execution_authorized"])
         self.assertFalse(state["first_wave"]["confirmation_outcomes_opened"])
