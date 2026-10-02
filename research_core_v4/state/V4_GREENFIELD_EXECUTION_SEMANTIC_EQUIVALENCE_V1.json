@@ -1,0 +1,92 @@
+{
+  "schema": "mxm.research-core-v4.greenfield-execution-semantic-equivalence.v1",
+  "as_of_date": "2026-10-02",
+  "status": "PASS_EXACT_REFERENCE_BYTE_IDENTITY_NO_REIMPLEMENTATION",
+  "decision": "ADOPT_GREENFIELD_EXECUTION_SURFACE_OPTIMIZATION_ONLY;DO_NOT_CREATE_A_FAST_SCIENTIFIC_REIMPLEMENTATION",
+  "reason": "THE_BYTE_IDENTICAL_FROZEN_REFERENCE_HAS_433X_MEASURED_MARGIN_TO_THE_AVAILABLE_6_HOUR_EXECUTION_LIMIT_ON_A_FULL_SUPPORT_SIZED_SYNTHETIC_PROFILE;REIMPLEMENTATION_ADDS_SEMANTIC_RISK_WITHOUT_RUNTIME_NEED",
+  "reference_implementation": {
+    "exact_scientific_source_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+    "evaluator": {
+      "ref": "research_core_v4/response_evaluator_v3.py",
+      "sha256": "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a"
+    },
+    "runner": {
+      "ref": "research_core_v4/development_execution_runner_v1.py",
+      "sha256": "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d"
+    },
+    "frozen_semantics": {
+      "ref": "research_core_v4/frozen_v2_semantics.py",
+      "sha256": "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed"
+    }
+  },
+  "execution_implementation": {
+    "kind": "BYTE_IDENTICAL_REFERENCE_REUSE",
+    "evaluator_ref": "research_core_v4/response_evaluator_v3.py",
+    "evaluator_sha256": "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a",
+    "runner_ref": "research_core_v4/development_execution_runner_v1.py",
+    "runner_sha256": "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d",
+    "fast_reimplementation_created": false,
+    "identity_with_reference": true
+  },
+  "proof_mode": "BYTE_IDENTITY_STRONGER_THAN_REFERENCE_VS_REIMPLEMENTATION_NUMERICAL_EQUIVALENCE",
+  "exact_identity_consequence": {
+    "signal_event_identities": true,
+    "support_sha256": true,
+    "pairing_memberships": true,
+    "paired_unit_counts": true,
+    "block_ids": true,
+    "symbol_week_aggregates": true,
+    "context_week_aggregates": true,
+    "selected_leaf": true,
+    "observed_t_statistics": true,
+    "adjusted_maxT_p_values": true,
+    "family_p_values": true,
+    "holm_decisions": true,
+    "temporal_gate": true,
+    "breadth_gate": true,
+    "concentration_gate": true,
+    "paired_full_arm_values": true,
+    "development_lead_decisions": true,
+    "every_nonselection_only_diagnostic_group_and_reported_value": true,
+    "canonical_json_serialization": true
+  },
+  "frozen_inputs": {
+    "support_v2_rows": 118262,
+    "support_v2_sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b",
+    "calibration_v3_full_sha256": "fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05",
+    "seed": 20261002,
+    "permutations": 1023
+  },
+  "runtime_evidence_ref": "research_core_v4/state/V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK_RESULT_V1.json",
+  "runtime_evidence_run_id": 37015991317,
+  "outcome_boundary": {
+    "synthetic_only_runtime_values": true,
+    "real_market_response_values_used": false,
+    "development_result_opened": false,
+    "confirmation_opened": false,
+    "protected_forward_opened": false
+  },
+  "forbidden_changes_all_false": {
+    "event_membership": false,
+    "event_order": false,
+    "response_formulas": false,
+    "normalization": false,
+    "pairing_membership": false,
+    "aggregation_weights": false,
+    "floating_point_operation_order": false,
+    "rng_sequence": false,
+    "seed": false,
+    "permutations": false,
+    "maxT": false,
+    "holm": false,
+    "development_gates": false,
+    "diagnostic_grouping": false,
+    "diagnostic_omission": false,
+    "canonical_reported_values": false
+  },
+  "deterministic_context_sharding": {
+    "evaluated_as_fallback_only": true,
+    "adopted": false,
+    "reason": "SINGLE_PROCESS_BYTE_IDENTICAL_REFERENCE_HAS_SUFFICIENT_RUNTIME_MARGIN"
+  }
+}
