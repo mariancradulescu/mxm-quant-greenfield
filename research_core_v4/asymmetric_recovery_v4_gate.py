@@ -265,14 +265,22 @@ def main()->None:
     ap.add_argument("--preflight-output",type=Path)
     ap.add_argument("--runtime-arm",type=Path)
     ap.add_argument("--raw-output",type=Path)
-    ap.add_argument("--audit",action="store_true")\n    ap.add_argument("--keypair-only",action="store_true")
+    ap.add_argument("--audit",action="store_true")
+    ap.add_argument("--keypair-only",action="store_true")
     x=ap.parse_args()
     modes=sum([x.preflight_output is not None,x.runtime_arm is not None,x.audit,x.keypair_only])
     req(modes==1,"choose one mode")
-    if x.preflight_output is not None:
+    if x.keypair_only:
+        static=verify_public_and_probe()
+        with tempfile.TemporaryDirectory(prefix="mxm-v4-keypair-") as td:
+            _,fp=_private_key_from_secret(Path(td))
+        print(json.dumps({"status":"PASS_PRIVATE_KEY_PARSE_AND_PUBLIC_FINGERPRINT_MATCH","private_key_parse_status":"VALID","private_derived_public_spki_sha256":fp,"fingerprint_status":"MATCH",**static},sort_keys=True))
+    elif x.preflight_output is not None:
         run_preflight(x.preflight_output)
     elif x.runtime_arm is not None:
-        req(x.raw_output is not None,"runtime raw output required"); x.raw_output.mkdir(parents=True,exist_ok=True); print(json.dumps(validate_arm_and_runtime(x.runtime_arm,x.raw_output),sort_keys=True))
+        req(x.raw_output is not None,"runtime raw output required")
+        x.raw_output.mkdir(parents=True,exist_ok=True)
+        print(json.dumps(validate_arm_and_runtime(x.runtime_arm,x.raw_output),sort_keys=True))
     else:
         print(json.dumps(audit(),sort_keys=True))
 
