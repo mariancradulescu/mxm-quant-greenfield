@@ -2,7 +2,7 @@ name: V4 Recovery Governance and Runtime Audit
 on:
   push:
     branches: [performance-research-v3-20260922]
-    paths: ["research_core_v4/**","tests/test_research_core_v4_*.py",".github/workflows/v4-recovery-v2-audit.yml",".github/workflows/v4-greenfield-recovery-v3.yml"]
+    paths: ["research_core_v4/**","tests/test_research_core_v4_*.py",".github/workflows/v4-recovery-v2-audit.yml",".github/workflows/v4-greenfield-recovery-v4.yml"]
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -13,30 +13,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
-      - run: python -m pip install --disable-pip-version-check numpy
-      - run: python -m py_compile research_core_v4/crash_recovery_control_v3.py research_core_v4/greenfield_runtime_benchmark_v1.py research_core_v4/recovery_v3_prearm_gate.py
-      - run: python -m research_core_v4.crash_recovery_control_v3
-      - run: python -m unittest tests.test_research_core_v4_recovery_v3 tests.test_research_core_v4_prearm_gate
-      - name: Verify persisted runtime and identity evidence
+      - run: python -m py_compile research_core_v4/asymmetric_recovery_v4_gate.py research_core_v4/development_execution_runner_v1.py research_core_v4/frozen_v2_semantics.py
+      - run: python -m unittest tests.test_research_core_v4_prearm_gate
+      - name: Audit asymmetric Recovery V4 control plane
+        run: python research_core_v4/asymmetric_recovery_v4_gate.py --audit
+      - name: Verify future runtime remains inert before explicit ARM
+        run: |
+          set -euo pipefail
+          grep -q 'FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json' .github/workflows/v4-greenfield-recovery-v4.yml
+          ! grep -q 'workflow_dispatch' .github/workflows/v4-greenfield-recovery-v4.yml
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+      - name: Verify shared-passphrase supersession is permanent
         run: |
           python - <<'PY'
           import json
-          b=json.load(open("research_core_v4/state/V4_GREENFIELD_REFERENCE_RUNTIME_BENCHMARK_RESULT_V1.json")); e=json.load(open("research_core_v4/state/V4_GREENFIELD_EXECUTION_SEMANTIC_EQUIVALENCE_V1.json")); s=json.load(open("research_core_v4/state/V4_STATE.json"))
-          assert b["status"]=="PASS_REFERENCE_SOURCE_RUNTIME_WITH_SAFE_MARGIN" and b["evidence_boundary"]["synthetic_only"] and not b["evidence_boundary"]["real_market_response_values_used"] and b["full_synthetic_result"]["event_count"]==118262 and b["measured_margin_multiple_vs_available_limit"]>10
-          assert e["status"]=="PASS_EXACT_REFERENCE_BYTE_IDENTITY_NO_REIMPLEMENTATION" and e["execution_implementation"]["identity_with_reference"]
-          assert s["recovery_v3_preparation"]["accepted_canonical_result_count"]==0 and not s["recovery_v3_preparation"]["real_execution_authorized"]
-          scope=json.load(open("research_core_v4/state/V4_RUNTIME_EVIDENCE_SCOPE_CORRECTION_V1.json"))
-          blocker=json.load(open("research_core_v4/state/V4_PRE_ARM_SECRET_PROVISIONING_BLOCKER_V1.json"))
-          assert scope["correction"]["end_to_end_measured_claim_authorized"] is False
-          assert scope["conservative_total_runtime_upper_bound_seconds"]==983.2452655669999
-          assert blocker["status"]=="FAIL_CLOSED_PRE_ARM_BLOCKED_REQUIRED_SECRET_ABSENT"
-          assert s["recovery_v3_preparation"]["status"]=="FAIL_CLOSED_PRE_ARM_BLOCKED"
+          x=json.load(open("research_core_v4/state/V4_INPUT_TRANSPORT_ASYMMETRIC_SUPERSESSION_V1.json"))
+          assert x["status"]=="SHARED_PASSPHRASE_TRANSPORT_PERMANENTLY_SUPERSEDED_FOR_FUTURE_STAGING"
+          assert x["superseded"]["may_be_used_for_future_staging"] is False
+          assert x["successor"]["shared_secret_available_to_director"] is False
+          assert x["successor"]["work_dependency_required"] is False
           PY
-
-      - name: Verify installed workflow hash and fail-closed absent artifacts
-        run: |
-          echo "7817bcf31185297343b25e9c36fd9d4c07e3b7d7a2083100fe979def88b465ea  .github/workflows/v4-greenfield-recovery-v3.yml" | sha256sum -c -
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ARM_V1.json
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ATTEMPT_LOCK_V1.txt
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RECOVERY_V3_GREENFIELD_INPUT_STAGING_CERTIFICATE_V1.json
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
