@@ -100,12 +100,12 @@ jobs:
           set -euo pipefail
           git config user.name mxm-v4-asymmetric-staging-machine
           git config user.email mxm-v4-asymmetric-staging-machine@users.noreply.github.com
-          git rm "$PAYLOAD"
+          test -f "$PAYLOAD"
+          test "$(sha256sum "$PAYLOAD" | awk '{print $1}')" = "$EXPECTED_PAYLOAD_SHA256"
           git add research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_MANIFEST_V2.json
           git add research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.bundle_key.rsa_oaep_sha256.bin
           git add research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-*
           git commit -m "v4: stage exact asymmetric encrypted 18-input bundle"
-          git push origin HEAD:"$BRANCH"
           echo "STAGING_DATA_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Create mechanically bound pending staging certificate
@@ -121,6 +121,8 @@ jobs:
             "status":"STAGED_NOT_ARMED_NOT_EXECUTED_PENDING_REAL_PREARM_PREFLIGHT",
             "canonical_repository":g.REPO,
             "research_branch":g.BRANCH,
+            "transport_payload_file":os.environ["PAYLOAD"],
+            "transport_payload_sha256":os.environ["EXPECTED_PAYLOAD_SHA256"],
             "staging_data_commit":os.environ["STAGING_DATA_COMMIT"],
             "scientific_source_head":g.SCI_HEAD,
             "active_recovery_authority_at_staging":g.V3_AUTH_REL,
@@ -159,7 +161,6 @@ jobs:
           PY
           git add "$CERT"
           git commit -m "v4: bind asymmetric encrypted staging certificate"
-          git push origin HEAD:"$BRANCH"
           echo "CERTIFICATE_PREFLIGHT_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Real pre-ARM decrypt and exact 18-input integrity preflight
@@ -171,7 +172,6 @@ jobs:
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
           git add "$PREFLIGHT"
           git commit -m "v4: persist real asymmetric pre-ARM decrypt integrity preflight"
-          git push origin HEAD:"$BRANCH"
           echo "PREFLIGHT_RESULT_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Finalize staging certificate after real preflight PASS
@@ -196,7 +196,6 @@ jobs:
           PY
           git add "$CERT"
           git commit -m "v4: finalize staged validated asymmetric certificate"
-          git push origin HEAD:"$BRANCH"
           echo "FINAL_CERTIFICATE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Activate transport-only Recovery Authority V4 without ARM
@@ -325,8 +324,30 @@ jobs:
           PY
           git add "$ACTIVE_AUTH" "$ACTIVATION" research_core_v4/state/V4_STATE.json research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_RESOLUTION_V1.json
           git commit -m "v4: activate asymmetric transport-only recovery authority without ARM"
-          git push origin HEAD:"$BRANCH"
           echo "FINAL_ACTIVATION_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Publish completed staging transaction with one branch ref update
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$FINAL_ACTIVATION_HEAD"
+          test "$(git rev-parse HEAD)" = "$PUBLISHED_FINAL_HEAD"
+          test "$(git rev-parse "origin/$BRANCH")" = "$PUBLISHED_FINAL_HEAD"
+          test -f "$PAYLOAD"
+          test "$(sha256sum "$PAYLOAD" | awk '{print $1}')" = "$EXPECTED_PAYLOAD_SHA256"
+          git diff --quiet "$GITHUB_SHA" HEAD -- "$PAYLOAD"
+          python research_core_v4/asymmetric_recovery_v4_gate.py --audit
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+          test -z "$(git status --porcelain)"
+          git fetch --no-tags origin "$BRANCH"
+          remote_head="$(git rev-parse "origin/$BRANCH")"
+          test "$remote_head" = "$GITHUB_SHA"
+          final_head="$(git rev-parse HEAD)"
+          git push origin HEAD:"$BRANCH"
+          git fetch --no-tags origin "$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$final_head"
+          echo "PUBLISHED_FINAL_HEAD=$final_head" >> "$GITHUB_ENV"
 
       - name: Final local exact-head fail-closed audit
         run: |

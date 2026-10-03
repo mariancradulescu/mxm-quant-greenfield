@@ -25,6 +25,21 @@ jobs:
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+      - name: Verify staging bootstrap is single-publish and resumable
+        run: |
+          set -euo pipefail
+          test -f research_core_v4/runtime_inputs/README.md
+          python - <<'PY'
+          from pathlib import Path
+          p=Path(".github/workflows/v4-asymmetric-staging-bootstrap.yml").read_text(encoding="utf-8")
+          assert p.count('git push origin HEAD:"$BRANCH"')==1
+          assert 'git rm "$PAYLOAD"' not in p
+          assert 'git diff --quiet "$GITHUB_SHA" HEAD -- "$PAYLOAD"' in p
+          assert 'remote_head="$(git rev-parse "origin/$BRANCH")"' in p
+          assert 'test "$remote_head" = "$GITHUB_SHA"' in p
+          assert 'PUBLISHED_FINAL_HEAD' in p
+          assert 'transport_payload_sha256' in p
+          PY
       - name: Verify shared-passphrase supersession is permanent
         run: |
           python - <<'PY'

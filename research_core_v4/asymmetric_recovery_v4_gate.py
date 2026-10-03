@@ -21,6 +21,8 @@ EXPECTED_MANIFEST_SHA="d338dcaac31af05819aebd2876946f6af001c31ecca526e0424c4ddee
 EXPECTED_PLAINTEXT_BUNDLE_SHA="efaf64d663f11d25cde5e09290e41f21bd61ceb6cede2a3893ba4514599d0ea0"
 EXPECTED_ENCRYPTED_BUNDLE_SHA="e601aa8dbbd5a8dd7f76b0ca578b07e9ca3621b5518929dd95a4f0dc48dac78f"
 EXPECTED_WRAPPED_SHA="8eecaca7b0e93971dc3ac50613118be7f8daaee0e620955e9c0052c011f4516f"
+EXPECTED_PAYLOAD_SHA="6ae52d1123d747fdf976031cd5684fbe9255f35ff865840df86277a3ae7eee10"
+PAYLOAD_REL="research_core_v4/runtime_inputs/MXM_V4_ASYMMETRIC_STAGING_PAYLOAD_V1.zip"
 MANIFEST_REL="research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_MANIFEST_V2.json"
 WRAPPED_REL="research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.bundle_key.rsa_oaep_sha256.bin"
 PUBLIC_REL="research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem"
@@ -210,6 +212,8 @@ def validate_certificate(final_required:bool=False)->dict:
     req(cert.get("status") in allowed,"certificate status")
     if final_required: req(cert.get("status")=="STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED","final certificate required")
     req(cert.get("canonical_repository")==REPO and cert.get("research_branch")==BRANCH and cert.get("scientific_source_head")==SCI_HEAD,"certificate identity")
+    req(cert.get("transport_payload_file")==PAYLOAD_REL and cert.get("transport_payload_sha256")==EXPECTED_PAYLOAD_SHA,"certificate restart-payload binding")
+    req((ROOT/PAYLOAD_REL).is_file() and sha256_file(ROOT/PAYLOAD_REL)==EXPECTED_PAYLOAD_SHA,"durable encrypted restart payload")
     req(cert.get("rsa_public_key_spki_sha256")==EXPECTED_SPKI,"certificate public fingerprint")
     req(cert.get("rsa_oaep_parameters")=={"algorithm":"RSA_OAEP","hash":"SHA256","mgf1_hash":"SHA256"},"certificate OAEP")
     req(cert.get("wrapped_bundle_key",{}).get("sha256")==EXPECTED_WRAPPED_SHA,"certificate wrapped key")

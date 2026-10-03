@@ -1,0 +1,39 @@
+{
+  "schema": "mxm.research-core-v4.asymmetric-staging-resumability-hardening.v1",
+  "as_of_date": "2026-10-03",
+  "status": "PASS_PREUPLOAD_SINGLE_PUBLISH_RESUMABLE_NOT_ARMED_NOT_EXECUTED",
+  "reconciled_entry_head": "ee59b6d3a117ce229d8bec4b279b93025e83fc74",
+  "findings": {
+    "runtime_inputs_upload_path": {
+      "finding": "RUNTIME_INPUTS_DIRECTORY_ABSENT_IN_LIVE_TREE",
+      "resolution": "DIRECTORY_MADE_DURABLE_WITH_ENCRYPTED_ONLY_README_BEFORE_USER_UPLOAD",
+      "user_directory_preparation_required": false
+    },
+    "interrupted_bootstrap": {
+      "finding": "MULTIPLE_INTERMEDIATE_BRANCH_PUSHES_COULD_REQUIRE_SECOND_UPLOAD_AFTER_INTERRUPTION",
+      "resolution": "ALL_STAGING_CERTIFICATE_PREFLIGHT_AND_AUTHORITY_COMMITS_ARE_LOCAL_UNTIL_ONE_FINAL_BRANCH_REF_UPDATE",
+      "payload_retained_unchanged_as_restart_source": true,
+      "remote_head_must_equal_trigger_upload_commit_before_publish": true,
+      "interruption_before_final_push": "BRANCH_REMAINS_AT_ORIGINAL_UPLOAD_COMMIT_AND_IS_RERUNNABLE_WITHOUT_REUPLOAD",
+      "interruption_after_final_push": "BRANCH_ALREADY_CONTAINS_COMPLETE_STAGED_VALIDATED_NOT_ARMED_STATE",
+      "partial_authority_publication_possible": false
+    }
+  },
+  "frozen_science": {
+    "scientific_source_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+    "design_sha256": "3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3497e1b8a72b59b1d4e590e",
+    "evaluator_sha256": "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a",
+    "runner_sha256": "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d",
+    "semantics_sha256": "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed"
+  },
+  "hard_stop": {
+    "recovery_v4_arm_present": false,
+    "recovery_v4_attempt_lock_present": false,
+    "canonical_development_result_present": false,
+    "accepted_canonical_result_count": 0,
+    "real_execution_authorized": false,
+    "market_outcome_inspected": false,
+    "confirmation_opened": false,
+    "protected_forward_opened": false
+  }
+}
