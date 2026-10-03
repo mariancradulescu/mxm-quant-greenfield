@@ -17,27 +17,12 @@ jobs:
         run: |
           python -m pip install --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
       - name: Execute actual V4 control mechanics on isolated synthetic Git and cryptographic evidence
-        run: python -m unittest -v tests.test_research_core_v4_actual_path
+        run: python -m unittest -v tests.test_research_core_v4_actual_path tests.test_research_core_v4_numeric_namespace
       - name: Fetch immutable numerical environment
         run: |
           python -m research_core_v4.numeric_environment_v1 --fetch-wheel "$RUNNER_TEMP/wheels"
           image=$(python -c 'from research_core_v4.numeric_environment_v1 import load; print(load()["container_image"])')
           docker pull --platform linux/amd64 "$image"
-      - name: Probe pinned numerical environment twice with synthetic frozen computation
-        run: |
-          python - <<'PY'
-          import subprocess,pathlib,os,json
-          from research_core_v4 import numeric_environment_v1 as n
-          root=pathlib.Path.cwd();temp=pathlib.Path(os.environ['RUNNER_TEMP'])
-          out=temp/'probe';out.mkdir();raw=temp/'synthetic-empty';raw.mkdir()
-          c=n.container_command(root,root,raw,out,temp/'wheels','--probe')
-          results=[subprocess.check_output(c,text=True).strip().splitlines()[-1] for _ in range(2)]
-          assert results[0]==results[1]
-          m=n.load()
-          if m['probe_sha256'] is not None: assert m['probe_sha256']==results[0]
-          print('NUMERIC_PROBE_SHA256='+results[0])
-          print('IMMUTABLE_IMAGE='+m['container_image'])
-          PY
       - name: Checkout frozen science for input-and-support-only validation
         uses: actions/checkout@v4
         with:
@@ -45,6 +30,21 @@ jobs:
           ref: 68bdee4b51244ae50acd56fe868468b96106450f
           path: science
           persist-credentials: false
+      - name: Probe pinned numerical environment twice with synthetic frozen computation
+        run: |
+          python - <<'PY'
+          import subprocess,pathlib,os,json
+          from research_core_v4 import numeric_environment_v1 as n
+          root=pathlib.Path.cwd();temp=pathlib.Path(os.environ['RUNNER_TEMP'])
+          out=temp/'probe';out.mkdir();raw=temp/'synthetic-empty';raw.mkdir()
+          c=n.container_command(root,root/'science',raw,out,temp/'wheels','--probe')
+          results=[subprocess.check_output(c,text=True).strip().splitlines()[-1] for _ in range(2)]
+          assert results[0]==results[1]
+          m=n.load()
+          if m['probe_sha256'] is not None: assert m['probe_sha256']==results[0]
+          print('NUMERIC_PROBE_SHA256='+results[0])
+          print('IMMUTABLE_IMAGE='+m['container_image'])
+          PY
       - name: Recover exact inputs for pre-response-only support validation
         env:
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
@@ -65,6 +65,7 @@ jobs:
           subprocess.check_call(n.container_command(root,root/'science',temp/'authentic-raw',out,temp/'wheels','--prepare'))
           p=json.loads((out/'prepared.json').read_text());v=p['provenance']
           assert p['response_opened'] is False
+          assert p['pre_response_guard']=={'forbidden_response_calls':0,'scientific_imports_from_frozen_mount':True}
           assert v['rebuilt_support_skeleton_row_count']==118262
           assert v['rebuilt_support_skeleton_sha256']=='e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b'
           assert v['exact_geometry_calibration_full_sha256']=='fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05'
@@ -75,8 +76,16 @@ jobs:
           print('FROZEN_REAL_INPUT_SUPPORT_PREVALIDATION=PASS_NO_RESPONSE_OPENED')
           print('PREPARED_PROVENANCE='+json.dumps(p,sort_keys=True))
           PY
+      - name: Preserve support-only proof without plaintext or market responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: v4-outcome-blind-prepared-${{ github.sha }}
+          path: ${{ runner.temp }}/prevalidation/prepared.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Clean plaintext inputs after outcome-blind support validation
         if: always()
         run: rm -rf "$RUNNER_TEMP/authentic-raw"
       - name: Reconfirm current real repository remains before ARM
+        if: always()
         run: python -m research_core_v4.asymmetric_recovery_v4_gate --audit

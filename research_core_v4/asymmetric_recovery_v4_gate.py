@@ -243,6 +243,7 @@ def arm_binding_files()->list[str]:
             'research_core_v4/recovery_v4_transaction_v1.py',
             'research_core_v4/numeric_environment_v1.py',
             'research_core_v4/numeric_worker_v1.py',
+            'research_core_v4/runtime_profile_audit_v1.py',
             'research_core_v4/runtime/NUMERIC_ENVIRONMENT_V1.json',
             'research_core_v4/runtime/numeric-requirements-v1.txt',
             'research_core_v4/state/V4_EXECUTION_PATH_DEEP_AUDIT_V1.json',

@@ -1,6 +1,6 @@
 """Immutable OS/interpreter + hash-locked NumPy wheel, offline numerical worker."""
 from pathlib import Path
-import argparse,hashlib,json,os,platform,subprocess,sys,urllib.request
+import argparse,hashlib,importlib.util,json,os,platform,subprocess,sys,urllib.request
 ROOT=Path(__file__).resolve().parents[1]
 REL='research_core_v4/runtime/NUMERIC_ENVIRONMENT_V1.json'
 def h(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -8,7 +8,12 @@ def load():return json.loads((ROOT/REL).read_text())
 def probe():
  import math,numpy as np
  from research_core_v4 import response_evaluator_v3 as ev
- from research_core_v4.runtime_profile_audit_v1 import synthetic_fixture
+ # This fixture belongs to the control plane, not the frozen science package.
+ # Load it under a separate name; its evaluator import resolves only to science.
+ spec=importlib.util.spec_from_file_location('numeric_probe_fixture_control',ROOT/'research_core_v4/runtime_profile_audit_v1.py')
+ fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)
+ assert fixture.ev is ev,'probe evaluator namespace drift'
+ synthetic_fixture=fixture.synthetic_fixture
  events,norm,raw=synthetic_fixture(3000)
  units=ev.construct_paired_units(events,norm)
  diagnostics=ev.build_nonselection_diagnostics(events,norm,raw)
@@ -36,6 +41,8 @@ def fetch_wheel(directory):
  assert h(p)==w['sha256'],'wheel hash mismatch'
  return p
 def container_command(root,science,raw,temporary,wheel_dir,mode):
+ assert mode in ('--probe','--prepare','--execute'),'invalid worker mode'
+ assert root.resolve()!=science.resolve(),'control and frozen science mounts must be distinct'
  m=load();w=wheel_dir/m['numpy_wheel']['filename'];assert h(w)==m['numpy_wheel']['sha256']
  cmd=['docker','run','--rm','--platform','linux/amd64','--user',str(os.getuid())+':'+str(os.getgid()),'--network=none','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--tmpfs','/tmp:rw,exec,nosuid,nodev,size=512m']
  for k,v in m['environment'].items():cmd+=['-e',k+'='+v]
