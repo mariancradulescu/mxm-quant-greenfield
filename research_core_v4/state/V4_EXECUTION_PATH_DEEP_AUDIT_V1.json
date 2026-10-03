@@ -1,7 +1,350 @@
 {
   "schema": "mxm.v4.execution-path-deep-audit.v1",
-  "status": "BLOCKED_PENDING_ACTUAL_PATH_AND_NUMERIC_PROOFS",
+  "status": "READY_FOR_SEPARATE_ARM_GOVERNANCE_DECISION",
   "entry_head": "d81a9643d18c3a02c41bbc41f00ecb3db8b6cba5",
+  "reconciled_entry_head": "8e627dbb9cd1edb1f99bfcbc672fb3e4570c3400",
+  "proven_control_head": "db8a08bd3222f14f8b5fd56a80492c6f0d4f41f1",
+  "successful_control_head_validations": [
+    {
+      "id": 37107006705,
+      "name": "V4 Exact Geometry Calibration V2",
+      "conclusion": "success",
+      "head_sha": "db8a08bd3222f14f8b5fd56a80492c6f0d4f41f1"
+    },
+    {
+      "id": 37107006680,
+      "name": "Research Core V4 Method Validation",
+      "conclusion": "success",
+      "head_sha": "db8a08bd3222f14f8b5fd56a80492c6f0d4f41f1"
+    },
+    {
+      "id": 37107006671,
+      "name": "V4 Recovery Governance and Runtime Audit",
+      "conclusion": "success",
+      "head_sha": "db8a08bd3222f14f8b5fd56a80492c6f0d4f41f1"
+    },
+    {
+      "id": 37107006713,
+      "name": "V4 Outcome Blind Execution Path Proof",
+      "conclusion": "success",
+      "head_sha": "db8a08bd3222f14f8b5fd56a80492c6f0d4f41f1"
+    }
+  ],
+  "successful_outcome_blind_proof_artifact": {
+    "id": 11267978558,
+    "digest": "sha256:e5c6a9b03ece35d88917e3ec35d9eadd23948fd1f6ddf0c4603bd6d9cc37802f"
+  },
+  "support_only_prepared": {
+    "environment": {
+      "image": "python@sha256:4b4c524dc3dce996864e030c7bd9c6b0e517597189fee48f48e05b499442444b",
+      "manifest_sha256": "a5140cea0d764864a7665e57f153dec85cb86765276e2138c9d8d7e1ba32766b",
+      "numpy": "2.4.6",
+      "probe_sha256": "8d6dbc59b94e0c94236a427bd07409fa914b5bdcbaf942fd48394eb6e93bb1b3",
+      "python": "3.11.16",
+      "status": "PASS"
+    },
+    "pre_response_guard": {
+      "forbidden_response_calls": 0,
+      "scientific_imports_from_frozen_mount": true
+    },
+    "provenance": {
+      "authority_sha256": "2bf73c2492833463fa942c78c62126db0edc85e0763e468039eaa905390f48bc",
+      "canonical_design_sha256": "3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3497e1b8a72b59b1d4e590e",
+      "canonical_state_binding_sha256": "27f04731c32a8fe7f834c5da4437394f14b2e74d1bb10b33a2a1df789717726c",
+      "canonical_state_file_sha256": "d1647e8e16aa9733927e1afa2015d9e7957cda5f63c338bbc09b17cd5984159d",
+      "confirmation_pass_law_sha256": "24d7160ceb209613cba220777eeea6ba2e7f244dc22eaaa6cf7a2baf30b4941d",
+      "confirmation_provenance_sha256": "ec4e5734a1cf7292f4e463f25f060d691cfc6710a03efdda626b8605b6936cad",
+      "context_support_counts": {
+        "FX_SPOT": {
+          "baseline": 25753,
+          "events": 35014,
+          "full": 9261
+        },
+        "SPOT_CRYPTO": {
+          "baseline": 37727,
+          "events": 51366,
+          "full": 13639
+        },
+        "US_EQUITY_EXTENDED_HOURS": {
+          "baseline": 23465,
+          "events": 31882,
+          "full": 8417
+        }
+      },
+      "development_scope": {
+        "accepted_m5_sources_only": true,
+        "contexts": [
+          "FX_SPOT",
+          "SPOT_CRYPTO",
+          "US_EQUITY_EXTENDED_HOURS"
+        ],
+        "development_interval_utc": [
+          "2025-09-16T00:00:00Z",
+          "2026-09-16T23:50:00Z"
+        ],
+        "estimand": "PAIRED_FULL_H4_H1_M15_ALIGNMENT_MINUS_SAME_M15_TRANSITION_WITHOUT_FULL_H1_H4_ALIGNMENT",
+        "no_design_retuning": true,
+        "permutations": 1023,
+        "response_horizons_m5": [
+          3,
+          6,
+          12,
+          48
+        ],
+        "seed": 20261002,
+        "volatility_states": [
+          "LOW",
+          "HIGH"
+        ]
+      },
+      "development_series_binding": [
+        {
+          "context": "FX_SPOT",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 74768,
+          "series_sha256": "edc9b2f93cb764eb190fa70979fc75a102a4f2008e7ec0ea9350378414319e3a",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "EURGBP",
+          "symbol_id": 9
+        },
+        {
+          "context": "FX_SPOT",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 74753,
+          "series_sha256": "519b4dc313e4eb501bfbb023d695f0aceba21b7be63217cefa0521ee91032853",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "USDPLN",
+          "symbol_id": 35
+        },
+        {
+          "context": "FX_SPOT",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 74752,
+          "series_sha256": "4ba88ed747ea0b155a5c87ae403ccb591b907572c80fbaa7d82632075ea40210",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "EURCAD",
+          "symbol_id": 17
+        },
+        {
+          "context": "FX_SPOT",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 74742,
+          "series_sha256": "bdaf7cafcc660b457dc659ce010e54393b2b199c6c1580e1831d93b367b2626e",
+          "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+          "symbol": "NOKJPY",
+          "symbol_id": 86
+        },
+        {
+          "context": "FX_SPOT",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 74738,
+          "series_sha256": "9492a3459d462126973a8b4cfcb40984487c89cd7ead461020f4efa35e4e64cc",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "USDSGD",
+          "symbol_id": 28
+        },
+        {
+          "context": "FX_SPOT",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 74734,
+          "series_sha256": "388bd0c66ce843978324970645126a4450f239db570a2b5a0e1fdaff3fc768af",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "USDCNH",
+          "symbol_id": 60
+        },
+        {
+          "context": "SPOT_CRYPTO",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 105060,
+          "series_sha256": "d01dc39533e70eac2b93a83fb74f20fd46c5397ca7f798d6deedff6c3b905ad7",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "SOLUSD",
+          "symbol_id": 2083
+        },
+        {
+          "context": "SPOT_CRYPTO",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 105037,
+          "series_sha256": "96bab0a8787d808a0adf938a939b73ed4fbb8007f633d2c94b9dac446f8d0365",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "LTCUSD",
+          "symbol_id": 130
+        },
+        {
+          "context": "SPOT_CRYPTO",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 105029,
+          "series_sha256": "e235252ce8c8a646e5f079e32cce61d0d3085b6bfc3100a76d7fd057d7d9ab1a",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "DOGEUSD",
+          "symbol_id": 324
+        },
+        {
+          "context": "SPOT_CRYPTO",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 105029,
+          "series_sha256": "891559f15a49912ea65f188ac4bdca4348a5cd99c89870fdf80b88319c8ad44f",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "BCHUSD",
+          "symbol_id": 326
+        },
+        {
+          "context": "SPOT_CRYPTO",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 105021,
+          "series_sha256": "68bb87c3c9679b7e607879260a302991c4ac4941eb2824c6f5c5c6a09a4eab52",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "AVAXUSD",
+          "symbol_id": 2086
+        },
+        {
+          "context": "SPOT_CRYPTO",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 105010,
+          "series_sha256": "62c96baefe1310e11e2df9d95df467ce54d56371d2de8cbbca0ba510f53d453f",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "UNIUSD",
+          "symbol_id": 323
+        },
+        {
+          "context": "US_EQUITY_EXTENDED_HOURS",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 70534,
+          "series_sha256": "5764fe3d196194342302d610302da51fcd63995c31d5d66f668bb8b0f8b62f91",
+          "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+          "symbol": "TSLA.US-24",
+          "symbol_id": 3025
+        },
+        {
+          "context": "US_EQUITY_EXTENDED_HOURS",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 70460,
+          "series_sha256": "372bfdead0ca3143c6c54be083cdb7df21756584e625bb2d8e9a0bc82c74bf1a",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "PLTR.US-24",
+          "symbol_id": 5449
+        },
+        {
+          "context": "US_EQUITY_EXTENDED_HOURS",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 70392,
+          "series_sha256": "d56c7c9711c3f4f01a3df4623a00bd588fdece2dec78c6446e22bb15e0df9412",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "AMD.US-24",
+          "symbol_id": 3034
+        },
+        {
+          "context": "US_EQUITY_EXTENDED_HOURS",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 70317,
+          "series_sha256": "b5cf54ca90f30cf998a9ce4c88fcf5d7fc338c522744a904456d64adcf535244",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "AMZN.US-24",
+          "symbol_id": 3032
+        },
+        {
+          "context": "US_EQUITY_EXTENDED_HOURS",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 70287,
+          "series_sha256": "c30fc68ea476f627c830eb54ef4bebe5a426571d2e53f0056be205ea04a8cfcf",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "AVGO.US-24",
+          "symbol_id": 5403
+        },
+        {
+          "context": "US_EQUITY_EXTENDED_HOURS",
+          "first_timestamp_utc": "2025-09-16T00:00:00Z",
+          "last_timestamp_utc": "2026-09-16T23:50:00Z",
+          "row_count": 70197,
+          "series_sha256": "29ba6a4dd0824b27f8021c6ea504d8232432e9b729f57630f8859f2a6c11fe74",
+          "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+          "symbol": "META.US-24",
+          "symbol_id": 3019
+        }
+      ],
+      "evaluator_sha256": "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a",
+      "exact_geometry_calibration_full_sha256": "fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05",
+      "exact_geometry_calibration_harness_sha256": "56d3d434747b71a5c2d27047c93e7ecf0293fba368da625410d0597fa0308db4",
+      "exact_geometry_calibration_sha256": "71fdc33fba3079d2af3bfe1081554ba0300933480075b83f2f0253ed770fc2c2",
+      "execution_runner_sha256": "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d",
+      "final_preoutcome_validation_policy_sha256": "a382c8884da74fcc579e75b2222ec1666e13ab873e64f1a6a454292d0a92047f",
+      "fresh_independent_preoutcome_audit_sha256": "ba193c285c5015cf4d83f50e279c18628b451db9cc0156d736ba4ed81753ae68",
+      "legacy_evaluator_v2_sha256": "cc24eec339d726bca3102c8df40d579d71ed37399f7280cf10d6ede1f748e7f2",
+      "nonselection_diagnostic_implementation_sha256": "c7a2ef0dcb8df47392c8b0e6e9476ca73a6c1b608ac2a8671ebeeaa771b43830",
+      "permutations": 1023,
+      "primary_manifest_sha256": "3f42fcad0e82b80d4f51bfab3a7faae11bf0b83dedd511826d68c308e34a7e02",
+      "production_calibration_alignment_sha256": "f6a3cc2f29532aa702f4615bc8b664095617d546586b98463841de89690552a2",
+      "rebuilt_support_skeleton_row_count": 118262,
+      "rebuilt_support_skeleton_sha256": "e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b",
+      "response_evaluator_implementation_contract_sha256": "b9fbf0a9ba2f63dd6cb7cf716ffcb2fe45e285dbb793f9020a69aa22f8f7ecbf",
+      "seed": 20261002,
+      "shared_semantics_sha256": "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed",
+      "source_archives": {
+        "delta_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "original_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259"
+      },
+      "source_series_sha256": {
+        "AMD.US-24": "d56c7c9711c3f4f01a3df4623a00bd588fdece2dec78c6446e22bb15e0df9412",
+        "AMZN.US-24": "b5cf54ca90f30cf998a9ce4c88fcf5d7fc338c522744a904456d64adcf535244",
+        "AVAXUSD": "68bb87c3c9679b7e607879260a302991c4ac4941eb2824c6f5c5c6a09a4eab52",
+        "AVGO.US-24": "c30fc68ea476f627c830eb54ef4bebe5a426571d2e53f0056be205ea04a8cfcf",
+        "BCHUSD": "891559f15a49912ea65f188ac4bdca4348a5cd99c89870fdf80b88319c8ad44f",
+        "DOGEUSD": "e235252ce8c8a646e5f079e32cce61d0d3085b6bfc3100a76d7fd057d7d9ab1a",
+        "EURCAD": "4ba88ed747ea0b155a5c87ae403ccb591b907572c80fbaa7d82632075ea40210",
+        "EURGBP": "edc9b2f93cb764eb190fa70979fc75a102a4f2008e7ec0ea9350378414319e3a",
+        "LTCUSD": "96bab0a8787d808a0adf938a939b73ed4fbb8007f633d2c94b9dac446f8d0365",
+        "META.US-24": "29ba6a4dd0824b27f8021c6ea504d8232432e9b729f57630f8859f2a6c11fe74",
+        "NOKJPY": "bdaf7cafcc660b457dc659ce010e54393b2b199c6c1580e1831d93b367b2626e",
+        "PLTR.US-24": "372bfdead0ca3143c6c54be083cdb7df21756584e625bb2d8e9a0bc82c74bf1a",
+        "SOLUSD": "d01dc39533e70eac2b93a83fb74f20fd46c5397ca7f798d6deedff6c3b905ad7",
+        "TSLA.US-24": "5764fe3d196194342302d610302da51fcd63995c31d5d66f668bb8b0f8b62f91",
+        "UNIUSD": "62c96baefe1310e11e2df9d95df467ce54d56371d2de8cbbca0ba510f53d453f",
+        "USDCNH": "388bd0c66ce843978324970645126a4450f239db570a2b5a0e1fdaff3fc768af",
+        "USDPLN": "519b4dc313e4eb501bfbb023d695f0aceba21b7be63217cefa0521ee91032853",
+        "USDSGD": "9492a3459d462126973a8b4cfcb40984487c89cd7ead461020f4efa35e4e64cc"
+      },
+      "support_audit_sha256": "b9f17ba1cf48b2fd8a8afd6cb4ac60afa14589786f8de28dc034284c7c70f990",
+      "support_parity_reconciliation_sha256": "2abb3eaa11f4ccd79eabdc601fb2ce6bbcb0e1ca04ca38da42d8deb592785ad0",
+      "support_v2_geometry_transport_manifest_sha256": "138b44aad18bf81862546500974262f19cb9bce4306b00ca028cf600c4ae0822"
+    },
+    "response_opened": false,
+    "schema": "mxm.v4.prevalidated-frozen-runner.v1"
+  },
+  "material_findings_remaining": 0,
+  "resolved_findings": [
+    "Split frozen-science/control fixture namespace failure",
+    "Previous probe used current checkout as science, hiding split-mount failure",
+    "Synthetic control fixture absent from ARM bindings",
+    "Stale control certificate/authority/activation/state hashes",
+    "Real-input pre-response proof now dynamically rejects response entry calls"
+  ],
+  "frozen_science_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+  "scientific_code_changed": false,
+  "numeric_probe_reference_changed": false,
+  "accepted_canonical_result_limit": 1,
+  "accepted_canonical_result_count": 0,
   "real_execution_authorized": false,
-  "response_computed": false
+  "response_computed": false,
+  "arm_present": false,
+  "attempt_lock_present": false,
+  "canonical_result_present": false,
+  "closure_semantics": "Preserve V4_CRASH_RECOVERY_LAW_V1.json and all frozen local-scope/non-null/open-family/HARD21/1576-frontier constraints.",
+  "final_ready_commit_validation": "Same installed controls/science; rerun full proof and all exact-head validations after persisting this readiness record. No ARM is authorized by readiness."
 }

@@ -76,6 +76,22 @@ jobs:
           print('FROZEN_REAL_INPUT_SUPPORT_PREVALIDATION=PASS_NO_RESPONSE_OPENED')
           print('PREPARED_PROVENANCE='+json.dumps(p,sort_keys=True))
           PY
+      - name: Construct actual future ARM in memory only with synthetic governance decision
+        run: |
+          python - <<'PY'
+          import os,subprocess
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          assert head==os.environ['GITHUB_SHA']
+          g.audit()
+          decision={'explicit_separate_arm_authorization':True,'decision_id':'SYNTHETIC_CONSTRUCTOR_PROOF_ONLY_NO_PUBLICATION','certified_parent_head':head}
+          arm=g.build_arm_document(head,decision)
+          assert arm['pre_arm_parent_head']==head and 'arm_commit' not in arm
+          assert arm['accepted_canonical_result_limit']==1 and arm['accepted_canonical_result_count']==0
+          assert arm['bound_files_sha256']=={rel:g.sha256_file(g.ROOT/rel) for rel in g.arm_binding_files()}
+          g.verify_boundary()
+          print('ACTUAL_FUTURE_ARM_CONSTRUCTIBLE_IN_MEMORY_ONLY_NO_ARM_FILE_CREATED')
+          PY
       - name: Preserve support-only proof without plaintext or market responses
         uses: actions/upload-artifact@v4
         with:
