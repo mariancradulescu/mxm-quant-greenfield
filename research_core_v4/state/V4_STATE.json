@@ -115,7 +115,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "BLOCKED_BECAUSE_NO_SECURE_MACHINE_SIDE_SECRET_PROVISIONING_SURFACE_IS_AVAILABLE_IN_THIS_SESSION;PRESERVE_EXACT_RECOVERED_18_SERIES_AND_PRELOCK_HARDENING;DO_NOT_STAGE_PLAINTEXT;DO_NOT_ARM_OR_EXECUTE",
+  "next_action": "REPLACE_MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM_WITH_THE_CORRECT_MATCHING_PRIVATE_KEY_IN_GITHUB_ACTIONS_SECRETS;DO_NOT_PASTE_PRIVATE_KEY_IN_CHAT;THEN_REPROBE_AND_CONTINUE_ASYMMETRIC_STAGING;DO_NOT_ARM_OR_EXECUTE",
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
     "v3_freeze_ref": "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json",
@@ -165,6 +165,20 @@
     "encrypted_input_parts_present": false,
     "prelock_transport_hardening": "research_core_v4/state/V4_RECOVERY_V3_PRELOCK_TRANSPORT_HARDENING_V1.json",
     "secret_machine_side_provisioning_available": false,
-    "attempt_lock_present": false
+    "attempt_lock_present": false,
+    "asymmetric_transport_migration": {
+      "status": "BLOCKED_PRIVATE_KEY_SECRET_PRESENT_INVALID_NOT_ACTIVATED",
+      "transport_spec": "research_core_v4/state/V4_GREENFIELD_ASYMMETRIC_INPUT_TRANSPORT_V1.json",
+      "transport_supersession": "research_core_v4/state/V4_INPUT_TRANSPORT_ASYMMETRIC_SUPERSESSION_V1.json",
+      "authority_binding_audit": "research_core_v4/state/V4_RECOVERY_AUTHORITY_TRANSPORT_BINDING_AUDIT_V1.json",
+      "prospective_authority_v4": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V4_PROSPECTIVE.json",
+      "blocker": "research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_V1.json",
+      "active_authority_remains_v3": true,
+      "old_shared_passphrase_allowed_for_future_staging": false,
+      "public_key_spki_sha256": "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11",
+      "private_key_secret_presence": "PRESENT",
+      "private_key_pair_match_proven": false,
+      "encrypted_staging_performed": false
+    }
   }
 }

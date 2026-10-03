@@ -1,0 +1,43 @@
+{
+  "schema": "mxm.research-core-v4.greenfield-asymmetric-input-transport.v1",
+  "as_of_date": "2026-10-03",
+  "status": "SELECTED_FOR_ALL_FUTURE_STAGING_BLOCKED_BEFORE_ACTIVATION_PRIVATE_KEY_SECRET_INVALID",
+  "canonical_repository": "mariancradulescu/mxm-quant-greenfield",
+  "research_branch": "performance-research-v3-20260922",
+  "repository_visibility": "PUBLIC",
+  "work_dependency_required": false,
+  "shared_passphrase_dependency": false,
+  "public_key": {
+    "path": "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem",
+    "algorithm": "RSA",
+    "modulus_bits": 4096,
+    "public_exponent": 65537,
+    "canonical_spki_der_sha256": "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11"
+  },
+  "hybrid_scheme": {
+    "bulk_cipher": "OPENPGP_SYMMETRIC_AES256_WITH_INTEGRITY_PROTECTION",
+    "bundle_key_entropy_bits_minimum": 256,
+    "key_wrap": "RSA_OAEP_SHA256_MGF1_SHA256",
+    "encrypted_parts_prefix": "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-",
+    "wrapped_key_path": "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.bundle_key.rsa_oaep_sha256.bin"
+  },
+  "runtime_private_key": {
+    "github_actions_secret_name": "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM",
+    "director_may_read": false,
+    "repository_may_store": false,
+    "logs_may_expose": false,
+    "required_derived_public_spki_sha256": "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11"
+  },
+  "source_archives": {
+    "original_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+    "delta_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+  },
+  "exact_series_count": 18,
+  "scientific_source_head": "68bdee4b51244ae50acd56fe868468b96106450f",
+  "seed": 20261002,
+  "permutations": 1023,
+  "current_blocker": "research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_V1.json",
+  "current_staging_authorized": false,
+  "recovery_arm_authorized": false,
+  "real_response_execution_authorized": false
+}
