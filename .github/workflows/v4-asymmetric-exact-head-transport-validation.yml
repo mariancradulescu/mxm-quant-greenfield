@@ -1,0 +1,26 @@
+name: V4 Asymmetric Exact Head Transport Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - "research_core_v4/state/V4_EXACT_HEAD_VALIDATION_TRIGGER_V1.txt"
+permissions: {contents: read}
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Cryptographic key-pair match
+        run: python research_core_v4/asymmetric_recovery_v4_gate.py --keypair-only
+      - name: Real pre-ARM decrypt and exact-input integrity
+        run: python research_core_v4/asymmetric_recovery_v4_gate.py --preflight-output "$RUNNER_TEMP/v4-exact-head-preflight.json"
+      - name: Hard-stop boundary
+        run: |
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
