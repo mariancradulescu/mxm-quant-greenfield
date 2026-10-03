@@ -1,105 +1,15 @@
-# probe-schema: v4-durable-corrected-secret-reprobe
-name: V4 Asymmetric Private Key Presence and Pair Probe
-
+name: V4 Private Key Probe Read Only
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths:
-      - ".github/workflows/v4-asymmetric-private-key-probe.yml"
-      - "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem"
-
-permissions:
-  contents: write
-
+  workflow_dispatch:
+permissions: {contents: read}
 jobs:
-  probe:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    env:
-      EXPECTED_SPKI_SHA256: "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11"
-      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+  validate:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: performance-research-v3-20260922
-
-      - name: Probe corrected private key without revealing secret material
-        run: |
-          set -euo pipefail
-          mkdir -p research_core_v4/state
-          python - <<'PY'
-          import base64, hashlib, json, os, pathlib, subprocess
-          expected=os.environ["EXPECTED_SPKI_SHA256"]
-          raw=os.environ.get("MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM","")
-          result={
-              "schema":"mxm.research-core-v4.asymmetric-private-key-pair-probe-result.v1",
-              "run_id":int(os.environ["GITHUB_RUN_ID"]),
-              "run_attempt":int(os.environ.get("GITHUB_RUN_ATTEMPT","1")),
-              "trigger_head":os.environ["GITHUB_SHA"],
-              "secret_name":"MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM",
-              "secret_status":"ABSENT" if not raw else "PRESENT",
-              "private_key_parse_status":"NOT_TESTED",
-              "private_derived_public_spki_sha256":None,
-              "expected_public_spki_sha256":expected,
-              "fingerprint_status":"NOT_TESTED",
-              "conclusion":"FAIL"
-          }
-          if raw:
-              candidates=[]
-              def add(label,s):
-                  if s and all(s != x[1] for x in candidates): candidates.append((label,s))
-              add("RAW",raw)
-              add("NORMALIZED_CRLF",raw.replace("\r\n","\n").replace("\r","\n"))
-              if "\\n" in raw: add("LITERAL_BACKSLASH_N_NORMALIZED",raw.replace("\\r\\n","\n").replace("\\n","\n"))
-              stripped=raw.strip()
-              if len(stripped)>=2 and stripped[0]==stripped[-1] and stripped[0] in "'\"":
-                  add("SURROUNDING_QUOTES_REMOVED",stripped[1:-1].replace("\\n","\n"))
-              if "-----BEGIN" not in raw:
-                  try:
-                      decoded=base64.b64decode(raw,validate=True).decode("utf-8")
-                      if "-----BEGIN" in decoded: add("BASE64_DECODED_PEM",decoded)
-                  except Exception: pass
-              tmp=pathlib.Path(os.environ["RUNNER_TEMP"])
-              for label,value in candidates:
-                  key=tmp/"mxm_v4_private_key_candidate"
-                  der=tmp/"mxm_v4_derived_public.der"
-                  key.write_text(value,encoding="utf-8"); key.chmod(0o600)
-                  p=subprocess.run(["openssl","pkey","-in",str(key),"-pubout","-outform","DER","-out",str(der)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-                  if p.returncode==0:
-                      actual=hashlib.sha256(der.read_bytes()).hexdigest()
-                      result["private_key_parse_status"]="VALID"
-                      result["normalization_used"]=label
-                      result["private_derived_public_spki_sha256"]=actual
-                      result["fingerprint_status"]="MATCH" if actual==expected else "MISMATCH"
-                      result["conclusion"]="PASS" if actual==expected else "FAIL"
-                      key.unlink(missing_ok=True); der.unlink(missing_ok=True)
-                      break
-                  key.unlink(missing_ok=True); der.unlink(missing_ok=True)
-              if result["private_key_parse_status"]!="VALID":
-                  result["private_key_parse_status"]="INVALID_AFTER_SAFE_NORMALIZATION"
-                  result["fingerprint_status"]="NOT_VERIFIABLE"
-          pathlib.Path("research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_PAIR_PROBE_LATEST.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-          print("PRIVATE_KEY_SECRET_STATUS="+result["secret_status"])
-          print("PRIVATE_KEY_PARSE_STATUS="+result["private_key_parse_status"])
-          print("PRIVATE_KEY_DERIVED_PUBLIC_SPKI_SHA256="+str(result["private_derived_public_spki_sha256"]))
-          print("PRIVATE_KEY_PAIR_STATUS="+result["fingerprint_status"])
-          PY
-
-      - name: Persist non-secret probe result
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_PAIR_PROBE_LATEST.json
-          git commit -m "v4: persist asymmetric private key pair probe result" || true
-          git push origin HEAD:performance-research-v3-20260922
-
-      - name: Enforce pair match
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json,sys
-          r=json.load(open("research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_PAIR_PROBE_LATEST.json"))
-          if r.get("conclusion") != "PASS" or r.get("fingerprint_status") != "MATCH":
-              sys.exit(1)
-          PY
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11.16"}
+      - name: Validate pair without writing research state
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: python -m research_core_v4.asymmetric_recovery_v4_gate --keypair-only

@@ -7,7 +7,7 @@ permissions: {contents: read}
 jobs:
   prove:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
@@ -38,5 +38,45 @@ jobs:
           print('NUMERIC_PROBE_SHA256='+results[0])
           print('IMMUTABLE_IMAGE='+m['container_image'])
           PY
+      - name: Checkout frozen science for input-and-support-only validation
+        uses: actions/checkout@v4
+        with:
+          repository: mariancradulescu/mxm-quant-greenfield
+          ref: 68bdee4b51244ae50acd56fe868468b96106450f
+          path: science
+          persist-credentials: false
+      - name: Recover exact inputs for pre-response-only support validation
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          python - <<'PY'
+          import pathlib,os
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          g.verify_boundary();g.validate_certificate(True)
+          g.decrypt_verify(pathlib.Path(os.environ['RUNNER_TEMP'])/'authentic-raw')
+          PY
+      - name: Exercise frozen pre-response guards only in exact offline numerical environment
+        run: |
+          python - <<'PY'
+          import pathlib,os,subprocess,json
+          from research_core_v4 import numeric_environment_v1 as n
+          root=pathlib.Path.cwd();temp=pathlib.Path(os.environ['RUNNER_TEMP']);out=temp/'prevalidation';out.mkdir()
+          subprocess.check_call(n.container_command(root,root/'science',temp/'authentic-raw',out,temp/'wheels','--prepare'))
+          p=json.loads((out/'prepared.json').read_text());v=p['provenance']
+          assert p['response_opened'] is False
+          assert v['rebuilt_support_skeleton_row_count']==118262
+          assert v['rebuilt_support_skeleton_sha256']=='e3f8de0012e2bcdd2005d72afef73f738de11fca404675689a8f00422ba0918b'
+          assert v['exact_geometry_calibration_full_sha256']=='fae10bd4817efb1a20426e2ae35171aa62bd924456c104c4d0aa1d07aec0eb05'
+          assert v['seed']==20261002 and v['permutations']==1023
+          assert len(v['source_series_sha256'])==18
+          assert not (out/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json').exists()
+          assert not (out/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json.opening.lock').exists()
+          print('FROZEN_REAL_INPUT_SUPPORT_PREVALIDATION=PASS_NO_RESPONSE_OPENED')
+          print('PREPARED_PROVENANCE='+json.dumps(p,sort_keys=True))
+          PY
+      - name: Clean plaintext inputs after outcome-blind support validation
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/authentic-raw"
       - name: Reconfirm current real repository remains before ARM
         run: python -m research_core_v4.asymmetric_recovery_v4_gate --audit

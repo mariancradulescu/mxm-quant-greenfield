@@ -12,8 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
-      - run: python -m pip install --disable-pip-version-check numpy
+        with: {python-version: "3.11.16"}
+      - run: |
+          python -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
       - run: python -m py_compile research_core_v4/frozen_v2_semantics.py research_core_v4/response_evaluator_v3.py research_core_v4/exact_geometry_calibration_v3.py research_core_v4/development_execution_runner_v1.py research_core_v4/crash_recovery_control_v3.py research_core_v4/greenfield_runtime_benchmark_v1.py research_core_v4/recovery_v3_prearm_gate.py research_core_v4/asymmetric_recovery_v4_gate.py
       - run: python -m unittest tests.test_research_core_v4_method tests.test_research_core_v4_response_evaluator tests.test_research_core_v4_support_geometry tests.test_research_core_v4_execution_binding tests.test_research_core_v4_prearm_gate
       - run: python research_core_v4/asymmetric_recovery_v4_gate.py --audit

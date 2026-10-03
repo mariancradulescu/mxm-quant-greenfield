@@ -305,8 +305,14 @@ def audit()->dict:
     if not (ROOT/CERT_REL).exists():
         req(not (ROOT/MANIFEST_REL).exists(),"manifest present without certificate in pre-staging state")
         return {"status":"PASS_ASYMMETRIC_TRANSPORT_PRE_STAGING_NOT_ARMED","accepted_canonical_result_count":0,"arm_present":False,"attempt_lock_present":False,**static,"frozen_hashes":frozen}
-    verify_staged_ciphertext(); cert=validate_certificate(True); pre=load(PREFLIGHT_REL); req(pre.get("conclusion")=="PASS" and pre.get("fingerprint_status")=="MATCH" and pre.get("exact_plaintext_series_count")==18,"preflight result")
-    active=load(V4_ACTIVE_REL); req(active.get("status")=="ACTIVE_TRANSPORT_ONLY_SUCCESSOR_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED","active V4 authority")
+    verify_staged_ciphertext(); cert=validate_certificate(True); pre=load(PREFLIGHT_REL)
+    req(cert.get("preflight_result_sha256")==sha256_file(ROOT/PREFLIGHT_REL),"certificate preflight attestation bytes")
+    req(pre.get("conclusion")=="PASS" and pre.get("fingerprint_status")=="MATCH" and pre.get("exact_plaintext_series_count")==18,"preflight result")
+    active=load(V4_ACTIVE_REL)
+    req(active.get("real_pre_arm_preflight_sha256")==sha256_file(ROOT/PREFLIGHT_REL),"active authority preflight bytes")
+    req(active.get("execution_path_bindings",{})==cert.get("execution_path_bindings",{}),"active controls/certificate bindings")
+    req(active.get("installed_recovery_workflow_sha256")==sha256_file(ROOT/WORKFLOW_REL),"active workflow binding")
+    req(active.get("status")=="ACTIVE_TRANSPORT_ONLY_SUCCESSOR_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED","active V4 authority")
     req(active.get("staging_certificate_sha256")==sha256_file(ROOT/CERT_REL),"active authority certificate binding")
     act=load(ACTIVATION_REL); req(act.get("status")=="ACTIVATED_TRANSPORT_ONLY_AFTER_REAL_PREARM_PREFLIGHT_PASS" and act.get("active_recovery_authority_sha256")==sha256_file(ROOT/V4_ACTIVE_REL),"activation record")
     st=load(STATE_REL); p=st.get("recovery_v4_preparation",{})

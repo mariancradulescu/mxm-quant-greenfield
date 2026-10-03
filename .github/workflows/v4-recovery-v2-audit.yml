@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
+        with: {python-version: "3.11.16"}
       - run: python -m py_compile research_core_v4/asymmetric_recovery_v4_gate.py research_core_v4/development_execution_runner_v1.py research_core_v4/frozen_v2_semantics.py
       - run: python -m unittest tests.test_research_core_v4_prearm_gate
       - name: Audit asymmetric Recovery V4 control plane
