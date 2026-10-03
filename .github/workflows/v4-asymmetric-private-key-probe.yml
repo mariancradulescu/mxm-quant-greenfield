@@ -83,10 +83,15 @@ jobs:
                   print("PRIVATE_KEY_PAIR_STATUS=MATCH")
                   sys.exit(0)
               key.unlink(missing_ok=True); der.unlink(missing_ok=True)
-          if saw_encrypted:
+          headers=[v.lstrip().splitlines()[0] for _,v in candidates if v.lstrip().splitlines()]
+          if any("BEGIN PUBLIC KEY" in h or "BEGIN RSA PUBLIC KEY" in h for h in headers):
+              print("PRIVATE_KEY_PARSE_STATUS=PUBLIC_KEY_MATERIAL_NOT_PRIVATE_KEY")
+          elif saw_encrypted:
               print("PRIVATE_KEY_PARSE_STATUS=ENCRYPTED_PRIVATE_KEY_REQUIRES_SEPARATE_PASSPHRASE")
           elif saw_openssh:
               print("PRIVATE_KEY_PARSE_STATUS=OPENSSH_FORMAT_NOT_ACCEPTED_BY_OPENSSL_PKEY")
+          elif any("BEGIN CERTIFICATE" in h for h in headers):
+              print("PRIVATE_KEY_PARSE_STATUS=CERTIFICATE_MATERIAL_NOT_PRIVATE_KEY")
           else:
               print("PRIVATE_KEY_PARSE_STATUS=INVALID_AFTER_SAFE_NORMALIZATION")
           print("PRIVATE_KEY_PAIR_STATUS=NOT_VERIFIABLE")
