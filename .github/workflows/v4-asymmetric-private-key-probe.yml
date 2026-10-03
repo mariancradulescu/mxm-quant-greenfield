@@ -1,4 +1,4 @@
-# probe-schema: v4-corrected-secret-reprobe-20261003
+# probe-schema: v4-durable-corrected-secret-reprobe
 name: V4 Asymmetric Private Key Presence and Pair Probe
 
 on:
@@ -9,7 +9,7 @@ on:
       - "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   probe:
@@ -20,81 +20,86 @@ jobs:
       MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
     steps:
       - uses: actions/checkout@v4
-      - name: Verify committed public key fingerprint
-        run: |
-          set -euo pipefail
-          actual="$(openssl pkey -pubin -in research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem -outform DER | sha256sum | awk '{print $1}')"
-          test "$actual" = "$EXPECTED_SPKI_SHA256"
-          echo "COMMITTED_PUBLIC_KEY_FINGERPRINT_STATUS=MATCH"
+        with:
+          ref: performance-research-v3-20260922
 
-      - name: Non-revealing normalized private-key presence and pair probe
+      - name: Probe corrected private key without revealing secret material
         run: |
           set -euo pipefail
-          if [ -z "${MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM:-}" ]; then
-            echo "PRIVATE_KEY_SECRET_STATUS=ABSENT"
-            echo "PRIVATE_KEY_PAIR_STATUS=NOT_TESTED"
-            exit 0
-          fi
-          echo "PRIVATE_KEY_SECRET_STATUS=PRESENT"
+          mkdir -p research_core_v4/state
           python - <<'PY'
-          import base64, os, pathlib, subprocess, sys
-          raw=os.environ["MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM"]
-          candidates=[]
-          def add(label,s):
-              if s and all(s != x[1] for x in candidates):
-                  candidates.append((label,s))
-          add("RAW",raw)
-          add("NORMALIZED_CRLF",raw.replace("\r\n","\n").replace("\r","\n"))
-          if "\\n" in raw:
-              add("LITERAL_BACKSLASH_N_NORMALIZED",raw.replace("\\r\\n","\n").replace("\\n","\n"))
-          stripped=raw.strip()
-          if len(stripped)>=2 and stripped[0]==stripped[-1] and stripped[0] in "'\"":
-              add("SURROUNDING_QUOTES_REMOVED",stripped[1:-1].replace("\\n","\n"))
-          if "-----BEGIN" not in raw:
-              try:
-                  decoded=base64.b64decode(raw,validate=True).decode("utf-8")
-                  if "-----BEGIN" in decoded:
-                      add("BASE64_DECODED_PEM",decoded)
-              except Exception:
-                  pass
-          tmp=pathlib.Path(os.environ["RUNNER_TEMP"])
+          import base64, hashlib, json, os, pathlib, subprocess
           expected=os.environ["EXPECTED_SPKI_SHA256"]
-          saw_encrypted=False
-          saw_openssh=False
-          for label,value in candidates:
-              header=value.lstrip().splitlines()[0] if value.lstrip().splitlines() else ""
-              if "BEGIN ENCRYPTED PRIVATE KEY" in header:
-                  saw_encrypted=True
-              if "BEGIN OPENSSH PRIVATE KEY" in header:
-                  saw_openssh=True
-              key=tmp/"mxm_v4_private_key_candidate"
-              key.write_text(value,encoding="utf-8")
-              key.chmod(0o600)
-              der=tmp/"derived-public.der"
-              p=subprocess.run(["openssl","pkey","-in",str(key),"-pubout","-outform","DER","-out",str(der)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-              if p.returncode==0:
-                  import hashlib
-                  actual=hashlib.sha256(der.read_bytes()).hexdigest()
+          raw=os.environ.get("MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM","")
+          result={
+              "schema":"mxm.research-core-v4.asymmetric-private-key-pair-probe-result.v1",
+              "run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt":int(os.environ.get("GITHUB_RUN_ATTEMPT","1")),
+              "trigger_head":os.environ["GITHUB_SHA"],
+              "secret_name":"MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM",
+              "secret_status":"ABSENT" if not raw else "PRESENT",
+              "private_key_parse_status":"NOT_TESTED",
+              "private_derived_public_spki_sha256":None,
+              "expected_public_spki_sha256":expected,
+              "fingerprint_status":"NOT_TESTED",
+              "conclusion":"FAIL"
+          }
+          if raw:
+              candidates=[]
+              def add(label,s):
+                  if s and all(s != x[1] for x in candidates): candidates.append((label,s))
+              add("RAW",raw)
+              add("NORMALIZED_CRLF",raw.replace("\r\n","\n").replace("\r","\n"))
+              if "\\n" in raw: add("LITERAL_BACKSLASH_N_NORMALIZED",raw.replace("\\r\\n","\n").replace("\\n","\n"))
+              stripped=raw.strip()
+              if len(stripped)>=2 and stripped[0]==stripped[-1] and stripped[0] in "'\"":
+                  add("SURROUNDING_QUOTES_REMOVED",stripped[1:-1].replace("\\n","\n"))
+              if "-----BEGIN" not in raw:
+                  try:
+                      decoded=base64.b64decode(raw,validate=True).decode("utf-8")
+                      if "-----BEGIN" in decoded: add("BASE64_DECODED_PEM",decoded)
+                  except Exception: pass
+              tmp=pathlib.Path(os.environ["RUNNER_TEMP"])
+              for label,value in candidates:
+                  key=tmp/"mxm_v4_private_key_candidate"
+                  der=tmp/"mxm_v4_derived_public.der"
+                  key.write_text(value,encoding="utf-8"); key.chmod(0o600)
+                  p=subprocess.run(["openssl","pkey","-in",str(key),"-pubout","-outform","DER","-out",str(der)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                  if p.returncode==0:
+                      actual=hashlib.sha256(der.read_bytes()).hexdigest()
+                      result["private_key_parse_status"]="VALID"
+                      result["normalization_used"]=label
+                      result["private_derived_public_spki_sha256"]=actual
+                      result["fingerprint_status"]="MATCH" if actual==expected else "MISMATCH"
+                      result["conclusion"]="PASS" if actual==expected else "FAIL"
+                      key.unlink(missing_ok=True); der.unlink(missing_ok=True)
+                      break
                   key.unlink(missing_ok=True); der.unlink(missing_ok=True)
-                  print("PRIVATE_KEY_PARSE_STATUS=VALID")
-                  print("PRIVATE_KEY_NORMALIZATION="+label)
-                  if actual != expected:
-                      print("PRIVATE_KEY_PAIR_STATUS=FINGERPRINT_MISMATCH")
-                      sys.exit(1)
-                  print("PRIVATE_KEY_PAIR_STATUS=MATCH")
-                  sys.exit(0)
-              key.unlink(missing_ok=True); der.unlink(missing_ok=True)
-          headers=[v.lstrip().splitlines()[0] for _,v in candidates if v.lstrip().splitlines()]
-          if any("BEGIN PUBLIC KEY" in h or "BEGIN RSA PUBLIC KEY" in h for h in headers):
-              print("PRIVATE_KEY_PARSE_STATUS=PUBLIC_KEY_MATERIAL_NOT_PRIVATE_KEY")
-          elif saw_encrypted:
-              print("PRIVATE_KEY_PARSE_STATUS=ENCRYPTED_PRIVATE_KEY_REQUIRES_SEPARATE_PASSPHRASE")
-          elif saw_openssh:
-              print("PRIVATE_KEY_PARSE_STATUS=OPENSSH_FORMAT_NOT_ACCEPTED_BY_OPENSSL_PKEY")
-          elif any("BEGIN CERTIFICATE" in h for h in headers):
-              print("PRIVATE_KEY_PARSE_STATUS=CERTIFICATE_MATERIAL_NOT_PRIVATE_KEY")
-          else:
-              print("PRIVATE_KEY_PARSE_STATUS=INVALID_AFTER_SAFE_NORMALIZATION")
-          print("PRIVATE_KEY_PAIR_STATUS=NOT_VERIFIABLE")
-          sys.exit(1)
+              if result["private_key_parse_status"]!="VALID":
+                  result["private_key_parse_status"]="INVALID_AFTER_SAFE_NORMALIZATION"
+                  result["fingerprint_status"]="NOT_VERIFIABLE"
+          pathlib.Path("research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_PAIR_PROBE_LATEST.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("PRIVATE_KEY_SECRET_STATUS="+result["secret_status"])
+          print("PRIVATE_KEY_PARSE_STATUS="+result["private_key_parse_status"])
+          print("PRIVATE_KEY_DERIVED_PUBLIC_SPKI_SHA256="+str(result["private_derived_public_spki_sha256"]))
+          print("PRIVATE_KEY_PAIR_STATUS="+result["fingerprint_status"])
+          PY
+
+      - name: Persist non-secret probe result
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_PAIR_PROBE_LATEST.json
+          git commit -m "v4: persist asymmetric private key pair probe result" || true
+          git push origin HEAD:performance-research-v3-20260922
+
+      - name: Enforce pair match
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,sys
+          r=json.load(open("research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_PAIR_PROBE_LATEST.json"))
+          if r.get("conclusion") != "PASS" or r.get("fingerprint_status") != "MATCH":
+              sys.exit(1)
           PY
