@@ -1,0 +1,37 @@
+name: V4 Real Pre-ARM Decrypt Input Integrity Validation
+on:
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  real-prearm-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Real decrypt and exact 18-input integrity preflight
+        run: |
+          set -euo pipefail
+          python research_core_v4/asymmetric_recovery_v4_gate.py --preflight-output "$RUNNER_TEMP/v4-final-preflight.json"
+          python - <<'PY'
+          import json,os
+          p=os.path.join(os.environ["RUNNER_TEMP"],"v4-final-preflight.json")
+          x=json.load(open(p))
+          assert x["conclusion"]=="PASS"
+          assert x["private_key_parse_status"]=="VALID"
+          assert x["fingerprint_status"]=="MATCH"
+          assert x["wrapped_bundle_passphrase_decrypt"]=="SUCCESS"
+          assert x["encrypted_bulk_decrypt"]=="SUCCESS"
+          assert x["openpgp_integrity_check"]=="SUCCESS"
+          assert x["exact_plaintext_series_count"]==18
+          assert x["all_18_sha256_match"] and x["all_18_row_counts_match"]
+          assert x["all_18_first_timestamps_match"] and x["all_18_last_timestamps_match"]
+          assert x["response_computed"] is False and x["market_outcome_exposed"] is False
+          assert x["plaintext_artifact_persisted"] is False
+          PY
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
