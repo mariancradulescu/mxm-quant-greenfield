@@ -1,0 +1,355 @@
+{
+  "as_of_date": "2026-10-03",
+  "calendar": {
+    "cross_boundary_padding_guard": true,
+    "dates_per_identity_per_week": 1,
+    "historical_schedule_caveat": "Current schedules are planning proxies, not verified historical schedules; historical availability remains unknown and cannot justify replacement after quotes.",
+    "iso_week_count": 52,
+    "iso_week_mondays_utc": [
+      "2025-09-15",
+      "2025-09-22",
+      "2025-09-29",
+      "2025-10-06",
+      "2025-10-13",
+      "2025-10-20",
+      "2025-10-27",
+      "2025-11-03",
+      "2025-11-10",
+      "2025-11-17",
+      "2025-11-24",
+      "2025-12-01",
+      "2025-12-08",
+      "2025-12-15",
+      "2025-12-22",
+      "2025-12-29",
+      "2026-01-05",
+      "2026-01-12",
+      "2026-01-19",
+      "2026-01-26",
+      "2026-02-02",
+      "2026-02-09",
+      "2026-02-16",
+      "2026-02-23",
+      "2026-03-02",
+      "2026-03-09",
+      "2026-03-16",
+      "2026-03-23",
+      "2026-03-30",
+      "2026-04-06",
+      "2026-04-13",
+      "2026-04-20",
+      "2026-04-27",
+      "2026-05-04",
+      "2026-05-11",
+      "2026-05-18",
+      "2026-05-25",
+      "2026-06-01",
+      "2026-06-08",
+      "2026-06-15",
+      "2026-06-22",
+      "2026-06-29",
+      "2026-07-06",
+      "2026-07-13",
+      "2026-07-20",
+      "2026-07-27",
+      "2026-08-03",
+      "2026-08-10",
+      "2026-08-17",
+      "2026-08-24",
+      "2026-08-31",
+      "2026-09-07"
+    ],
+    "no_window_after": "2026-09-12T00:00:00Z",
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "schedule_rule": "Convert broker Sunday-origin weekly intervals using scheduleTimeZone and date DST; apply holidays; longest >=60-minute interval, tie earliest UTC; center one 60-minute window. Keep every uncovered week as explicit empty scheduled slot. Freeze exact identity/date/timestamps and metadata SHA256 before historical requests. Unknown timezone/holiday/schedule blocks scope lock.",
+    "subwindows_minutes": [
+      [
+        0,
+        20
+      ],
+      [
+        20,
+        40
+      ],
+      [
+        40,
+        60
+      ]
+    ],
+    "weekday_rule": "CYCLE_MONDAY_TO_FRIDAY_BY_WEEK_INDEX;IF_TARGET_HAS_NO_60_MIN_OPEN_INTERVAL_CHOOSE_NEXT_WEEKDAY_CYCLICALLY_WITHIN_SAME_WEEK_FROM_METADATA_ONLY;NO_HISTORY_BASED_REPLACEMENT",
+    "window_minutes": 60,
+    "windows_per_date": 1
+  },
+  "causal_feature_law": {
+    "base_direction": "LONG_IF_IMBALANCE_POSITIVE_SHORT_IF_NEGATIVE",
+    "directional_revision_counts": "UP_AND_DOWN_COUNTS_ACROSS_BID_AND_ASK_PRICE_CHANGING_EVENTS_IN_(T-L,T]",
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "maximum_abs_net_mid_displacement_units": 0.75,
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "minimum_directional_revision_count": 6,
+    "net_mid_displacement_units": "ABS(LOG(MID_T/MID_T_MINUS_L)*10000)/MEDIAN_SPREAD_BASELINE",
+    "price_changing_revision": "PER_SIDE_CONSECUTIVE_BROKER_EVENTS;UNCHANGED_PRICE_EVENTS_EXCLUDED_FROM_DIRECTION_COUNTS_BUT_RETAINED_IN_RAW_EVIDENCE",
+    "signal": "FRESH_T_AND_T_MINUS_L;REVISION_COUNT_GE_6;ABS_IMBALANCE_GE_THRESHOLD;NET_MID_DISPLACEMENT_UNITS_LE_0.75;SPREAD_FILTER_PASS",
+    "signed_revision_imbalance": "(UP_COUNT-DOWN_COUNT)/(UP_COUNT+DOWN_COUNT)",
+    "spread_filter": "SPREAD_BPS_T_LE_MEDIAN_SPREAD_BASELINE"
+  },
+  "cells_per_symbol": 24,
+  "closure_law": {
+    "DATA_LIMITED_UNTESTED_NOT_NULL_preserved": true,
+    "LOW_POWER_INCONCLUSIVE_not_null": true,
+    "broader_1576_frontier_not_closed": true,
+    "cost_unresolved": true,
+    "no_nearby_rescue": true,
+    "only_scope": "This mechanism, selected eligible census, frozen schedule/calendar,24 common cells and29context inference; advancement closure only for supported exact specification",
+    "sparse_or_other_quote_mechanisms_remain_open": true
+  },
+  "confirmation_architecture": {
+    "broader_population_transportability_not_established": true,
+    "current_confirmation_calendar_frozen": false,
+    "development_selected_common_cell_frozen_before_confirmation": true,
+    "genuinely_disjoint_confirmation_required": true,
+    "no_confirmation_authority_in_this_task": true,
+    "same_census_and_reporting_no_free_best_symbol": true,
+    "surviving_contexts_Holm_batch": true
+  },
+  "development_lead_gate": {
+    "all_eligible_identities_and_contexts_reported": true,
+    "confirmation_required_for_any_context_survivor": true,
+    "context_maxT_and_29_context_Holm_reject": true,
+    "context_mean_spread_units_positive": true,
+    "each_three_20min_subwindow_context_mean_positive": true,
+    "each_three_predeclared_calendar_week_thirds_context_mean_positive": true,
+    "event_concentration_gate_per_identity": 0.5,
+    "individual_identity_candidate_promotion_authorized": false,
+    "maximum_single_identity_fraction_of_total_absolute_identity_mean_contribution": 0.5,
+    "same_cell_positive_identity_fraction_min": 0.6,
+    "single_identity_context_cannot_establish_replication": true,
+    "support_pass": true
+  },
+  "distinct_from_failed_first_v4": "Top-of-book revision sequence with bounded displacement; no H4/H1/M15 directional alignment, no first-wave LOW/HIGH/horizon/symbol tuning.",
+  "economic_boundary": {
+    "current_commission_adjusted_promotion": "DEFERRED_UNTIL_A_STATISTICAL_DEVELOPMENT_LEAD_EXISTS_AND_AUTHENTIC_SYMBOL_SPECIFIC_COMMISSION_CONVERSION_IS_AVAILABLE",
+    "current_commission_metadata_required_pre_capture": true,
+    "min_volume_step_and_expected_margin_required_pre_capture": true,
+    "primary_response_includes_authentic_bid_ask_spread": true,
+    "proxy_costs_forbidden": true,
+    "safe_eur200_sizing_required_before_candidate": true,
+    "universal_2bps_gate_removed": true
+  },
+  "economic_status": "COST_UNRESOLVED_AUTHENTIC_SPREAD_ONLY_COMMISSION_MARGIN_CONVERSION_AND_FILL_CERTIFICATION_DEFERRED",
+  "event_frequency": "Count observed eligible signals prospectively after authorized raw acquisition; no assumed 21/week or stand-alone sleeve gate.",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "governance": {
+    "ARM_created": false,
+    "broker_acquisition_authorized": false,
+    "candidate_frozen_count": 0,
+    "candidate_promotion_authorized": false,
+    "live_trading_started": false,
+    "no_first_wave_statistic_used": true,
+    "protected_forward_opened": false,
+    "response_execution_authorized": false,
+    "runtime_v2_read_only": true
+  },
+  "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+  "information_source": "TOP_OF_BOOK_QUOTE_STATE",
+  "mechanism_id": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "multiplicity": {
+    "alternative_if_invalid": "FAIL_CLOSED_INVALID_NO_METHOD_SWITCH_AFTER_OUTCOMES",
+    "context_count_frozen": 29,
+    "context_method": "Shared sampled ISO-week Rademacher sign matrix across all contexts, identities and cells; max studentized equal-identity context-week mean over all24 cells; p=(1+exceedances)/(1+B); unsupported cells p1",
+    "contexts": [
+      "AT Equities",
+      "AU Equities",
+      "BE Equities",
+      "CH Equities",
+      "Commodities (Cash)",
+      "Crypto Currency (Spot)",
+      "Currency Index (Spot)",
+      "DE Equities",
+      "DK Equities",
+      "ES Equities",
+      "ETFs",
+      "Energies (Spot)",
+      "FI Equities",
+      "FR Equities",
+      "Forex (Spot)",
+      "Forwards - Commodities",
+      "Forwards - Indices",
+      "Forwards - Treasuries",
+      "GB Equities",
+      "HK Equities",
+      "IE Equities",
+      "Indices (Spot)",
+      "Metals (Spot)",
+      "NO Equities",
+      "PT Equities",
+      "Perpetual Commodity",
+      "Perpetual Stock",
+      "SE Equities",
+      "US Equities"
+    ],
+    "higher_level": "HOLM_FWER_0_05_ACROSS_ALL_29_BROKER_ASSET_CLASS_CONTEXT_MAXT_FAMILY_PVALUES;ABSENT_OR_UNSUPPORTED_CONTEXTS_P1",
+    "identity_diagnostics": "24-cell per-identity shared-week maxT reported diagnostically; no standalone discovery authority",
+    "local_family": "24_FIXED_CELLS_PER_CONTEXT;SAME_CELL_ACROSS_IDENTITIES;NO_PER_IDENTITY_BEST_CELL_POOLING",
+    "no_flat_Holm_across_1576_symbols": true,
+    "no_global_information_source_pooling": true,
+    "resamples": 4999,
+    "seed": 20261004,
+    "selection_rule": "Context representative min maxT-adjusted cell p, then largest context T, then lexicographic cell ID; same frozen cell for breadth/stability; do not optimize cell separately per identity",
+    "validity_assumption": "ISO-week clusters sufficient for joint sign symmetry under context null; stationarity/symmetry/cross-week dependence must pass prospective null stress/real geometry audit before response; not asserted from metadata"
+  },
+  "parameter_grid": {
+    "direction_law": [
+      "CONTINUATION",
+      "REVERSION"
+    ],
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "response_horizon_seconds": [
+      10,
+      30,
+      90
+    ]
+  },
+  "permanent_close_rule": {
+    "DATA_LIMITED_UNTESTED_NOT_NULL_preserved": true,
+    "LOW_POWER_INCONCLUSIVE_not_null": true,
+    "broader_1576_frontier_not_closed": true,
+    "cost_unresolved": true,
+    "no_nearby_rescue": true,
+    "only_scope": "This mechanism, selected eligible census, frozen schedule/calendar,24 common cells and29context inference; advancement closure only for supported exact specification",
+    "sparse_or_other_quote_mechanisms_remain_open": true
+  },
+  "power_calibration_plan": {
+    "40_common_week_or_complete_identity_support_gate_failure": "DATA_LIMITED_NOT_NULL;NO_RESPONSE_AUTHORITY;NO_REPLACEMENTS",
+    "comparison_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_PANEL_POWER_COMPARISON_V1.json",
+    "gate": "Freeze real support masks and prospective variance/noise scenarios before responses; full proposed maxT/Holm/support/breadth/temporal/concentration null and power calibration must pass independent review. Current Gaussian planning is not sufficient.",
+    "mandatory_pre_response_real_geometry_calibration": true,
+    "new_geometry_unknown": true,
+    "no_use_of_first_wave_results": true,
+    "nonGaussian_cluster_null_stress_required": true,
+    "sensitivity_grid": {
+      "active_prevalence": [
+        0.1,
+        0.3,
+        1.0
+      ],
+      "rho": [
+        0,
+        0.2,
+        0.8
+      ],
+      "support_loss": [
+        0,
+        0.2,
+        0.5
+      ]
+    },
+    "sparse_effect_law": "Context mean has weak power for rare identity effects by design; failure is not closure of sparse mechanisms. No best-identity selection to repair it.",
+    "weeks_increased_from_17_to_52_before_acquisition": true
+  },
+  "predecessor_design_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V2.json",
+  "predecessor_design_sha256": "992b4e8c00efdcdb2076e573ae2f4d63f8179ba622b01064a2a2bd49f98627c1",
+  "preoutcome_migration_corrections": [
+    "Independent pre-acquisition breadth audit rejects pilot as final universe; no quotes acquired",
+    "Conditional complete eligible census replaces execution-localized winner provenance",
+    "52 ISO weeks replaces17; schedule-local 1h replaces3 fixed UTC hours; complete-identity support failure blocks a context-cell without removing identities",
+    "Common-cell structural-context aggregation replaces best-symbol selection; all29 classes retained",
+    "New full-gate real-geometry certification required; current design has no execution authority"
+  ],
+  "primary_estimand": {
+    "context_week_cell": "Equal fixed weights across ALL currently eligible identities in the predeclared context; no identity removal for signal frequency/support, no best-cell-per-identity pooling, no dynamic weekly reweighting. If any member cannot support the common context-cell geometry, that context-cell is DATA_LIMITED and p1.",
+    "heterogeneity": "Publish all eligible identities, including unsupported and negative ones, distributions, sign breadth and contribution shares. No symbol-level advancement inferred from context mean.",
+    "identity_week_cell": "Equal event mean spread-net executable-side log response DIVIDED BY causal median spread bps; equal three scheduled 20-minute subwindows where support gate passes; existing price response direction/horizons unchanged",
+    "missing_week": "Require complete paired identity/week geometry; freeze common weeks per context-cell before responses; if insufficient coverage assign p1 and DATA_LIMITED. Never impute scientific returns as zero.",
+    "target": "Mean spread-unit response across the complete metadata-eligible context census; unsupported identities remain in the denominator/population and block that cell rather than being silently removed. No global cross-class mean."
+  },
+  "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+  "quote_state": {
+    "ask": "LATEST_ASK_EVENT_AT_OR_BEFORE_T_USING_PRESERVED_BROKER_EVENT_ORDER_FOR_EQUAL_TIMESTAMPS",
+    "baseline_window_seconds": 60,
+    "bid": "LATEST_BID_EVENT_AT_OR_BEFORE_T_USING_PRESERVED_BROKER_EVENT_ORDER_FOR_EQUAL_TIMESTAMPS",
+    "equal_ms_different_price_policy": "Preserve lossless per-side rows, but censor any feature with different prices sharing a side millisecond in its baseline/feature information window. No invented within-ms arrival ordering or last-price rescue.",
+    "evaluation_grid": "INTEGER_UTC_SECONDS",
+    "freshness": "BOTH_SIDE_AGES_LE_2000MS_AND_ASK_GE_BID_GT_0",
+    "median_spread_baseline": "MEDIAN_VALID_SPREAD_BPS_OVER_T_MINUS_60_THROUGH_T_MINUS_1;REQUIRE_GT_0",
+    "mid": "(BID+ASK)/2",
+    "minimum_valid_baseline_snapshots": 45,
+    "spread_bps": "LOG(ASK/BID)*10000"
+  },
+  "response_semantics": {
+    "continuation": "TRADE_BASE_DIRECTION",
+    "entry": "FRESH_SIDE_AWARE_QUOTE_STATE_AT_T_PLUS_1_SECOND",
+    "long_spread_net_bps": "LOG(RESPONSE_BID/ENTRY_ASK)*10000",
+    "missing": "RIGHT_CENSOR_NO_DELAY_SEARCH_NO_INTERPOLATION_NO_STALE_REPAIR",
+    "overlap": "WITHIN_EACH_SYMBOL_X_CELL_IGNORE_SIGNALS_UNTIL_THE_PREDECLARED_RESPONSE_HORIZON_COMPLETES",
+    "response_state": "FRESH_SIDE_AWARE_QUOTE_EXACTLY_H_SECONDS_AFTER_ENTRY",
+    "reversion": "TRADE_OPPOSITE_BASE_DIRECTION",
+    "role": "CAUSAL_INFORMATION_RESPONSE_NOT_EXIT_OPTIMIZATION",
+    "short_spread_net_bps": "LOG(ENTRY_BID/RESPONSE_ASK)*10000",
+    "signal_time": "INTEGER_SECOND_T_AFTER_ALL_EVENTS_TIMESTAMPED_LE_T_HAVE_BEEN_PROCESSED"
+  },
+  "schema": "mxm.research-core-v4.next-quote-sequence-preoutcome-design.v2",
+  "scope_adaptive_basis": {
+    "OTHER_OR_TEST_CFD": "DO_NOT_EXCLUDE_OR_INFER_TEST_STATUS_FROM_RESIDUAL_LABEL",
+    "all_current_metadata_must_be_resolved_before_scope_lock": true,
+    "candidate_population_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_FULL_FRONTIER_ELIGIBILITY_V1.json",
+    "candidate_population_sha256": "3b2b157ed810e13a1211de2e423ac727282764a409d3ec74621249909e525fef",
+    "class_membership": "BROKER_ASSET_CLASS_PRESERVED_WITH_PRODUCT_AND_SCHEDULE_SUBSTRUCTURE;NO_FUSION_OF_DISTINCT_CLASSES",
+    "eligible_population_rule": "CENSUS_OF_ALL_1576_IDENTITIES_PASSING_COMPLETE_CURRENT_METADATA_GATES;NO_SIGNAL_OR_RESPONSE_BASED_INCLUSION",
+    "final_current_eligible_symbol_count": null,
+    "fixed_symbol_count": false,
+    "maximum_candidate_count": 1576,
+    "missing_current_metadata_blocks_final_scope_not_silent_exclusion": true,
+    "pilot_only_five_symbol_scope_not_accepted": true,
+    "starting_population": 1576,
+    "subsampling_authorized": false
+  },
+  "scope_lock_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SCOPE_AUDIT_V1.json",
+  "selection_history_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_ADAPTIVE_SCOPE_PROVENANCE_V1.json",
+  "selection_ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
+  "signal_information_gate": {
+    "authority": "development_lead_gate_in_V2;V1_date_thirds_and_UTC_window_rules_superseded_prospectively",
+    "no_best_identity_signal_frequency_selection": true,
+    "same_cell_for_all_context_members": true,
+    "three_schedule_relative_subwindows_instead_of_fixed_UTC_windows": true,
+    "week_thirds_instead_of_date_thirds": true
+  },
+  "signal_symbols": [],
+  "source_live_head": "ecd17a188fc82418854937e939f6034d5f5e28bb",
+  "status": "SUPERSEDING_CONDITIONAL_CENSUS_DESIGN_FROZEN_CURRENT_METADATA_BOUNDARY_UNRESOLVED_NOT_ACQUISITION_READY",
+  "subfamily": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "supersedes": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V1.json",
+  "supersedes_sha256": "4a4772934976f3737d498ab1b8bc397a8b09e0fb08dfd9c55f7d0c7863ef0bdb",
+  "support_gate": {
+    "identity_scope_fixed_from_metadata_only_no_feature_frequency_selection": true,
+    "minimum_common_iso_weeks": 40,
+    "minimum_distinct_qualified_identities_per_context": 2,
+    "no_context_shrink_after_response": true,
+    "per_identity_cell": {
+      "completed_events_min": 100,
+      "completed_events_per_window_min": 15,
+      "distinct_iso_weeks_min": 10,
+      "distinct_sample_dates_min": 18,
+      "retention_fraction_min": 0.8,
+      "support_ineligible_cells_assigned_p1": true
+    },
+    "required_qualified_identity_fraction_of_current_eligible_context": 1.0,
+    "timestamp_endpoint_availability_only_pre_response": true,
+    "unknown_support_not_eligibility_exclusion": true,
+    "unsupported_context_family_p": 1
+  },
+  "total_cells": null
+}
