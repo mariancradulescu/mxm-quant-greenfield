@@ -26,7 +26,6 @@ jobs:
       PREFLIGHT: research_core_v4/state/V4_ASYMMETRIC_PRE_ARM_DECRYPTION_PREFLIGHT_RESULT_V1.json
       ACTIVE_AUTH: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V4.json
       ACTIVATION: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V4_ACTIVATION_V1.json
-      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
     steps:
       - name: Checkout exact upload commit
         uses: actions/checkout@v4
@@ -164,6 +163,8 @@ jobs:
           echo "CERTIFICATE_PREFLIGHT_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Real pre-ARM decrypt and exact 18-input integrity preflight
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
         run: |
           set -euo pipefail
           python research_core_v4/asymmetric_recovery_v4_gate.py --preflight-output "$PREFLIGHT"
@@ -330,8 +331,6 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$FINAL_ACTIVATION_HEAD"
-          test "$(git rev-parse HEAD)" = "$PUBLISHED_FINAL_HEAD"
-          test "$(git rev-parse "origin/$BRANCH")" = "$PUBLISHED_FINAL_HEAD"
           test -f "$PAYLOAD"
           test "$(sha256sum "$PAYLOAD" | awk '{print $1}')" = "$EXPECTED_PAYLOAD_SHA256"
           git diff --quiet "$GITHUB_SHA" HEAD -- "$PAYLOAD"
@@ -340,18 +339,23 @@ jobs:
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
           test -z "$(git status --porcelain)"
-          git fetch --no-tags origin "$BRANCH"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
           remote_head="$(git rev-parse "origin/$BRANCH")"
           test "$remote_head" = "$GITHUB_SHA"
           final_head="$(git rev-parse HEAD)"
-          git push origin HEAD:"$BRANCH"
-          git fetch --no-tags origin "$BRANCH"
+          git merge-base --is-ancestor "$GITHUB_SHA" "$final_head"
+          test "$final_head" != "$GITHUB_SHA"
+          git push --force-with-lease="refs/heads/$BRANCH:$GITHUB_SHA" origin "$final_head:refs/heads/$BRANCH"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
           test "$(git rev-parse "origin/$BRANCH")" = "$final_head"
           echo "PUBLISHED_FINAL_HEAD=$final_head" >> "$GITHUB_ENV"
 
       - name: Final local exact-head fail-closed audit
         run: |
           set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PUBLISHED_FINAL_HEAD"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$PUBLISHED_FINAL_HEAD"
           test "$(git rev-parse HEAD)" = "$FINAL_ACTIVATION_HEAD"
           python research_core_v4/asymmetric_recovery_v4_gate.py --audit
           test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
