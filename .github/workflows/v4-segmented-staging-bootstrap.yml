@@ -1,0 +1,387 @@
+name: V4 Segmented Encrypted Staging Bootstrap
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - "research_core_v4/runtime_inputs/V4_ENCRYPTED_TRANSPORT_SEGMENTS_V1.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: MXM_V4_ASYMMETRIC_STAGING_SINGLETON
+  cancel-in-progress: false
+
+jobs:
+  stage-and-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BRANCH: performance-research-v3-20260922
+      PAYLOAD: research_core_v4/runtime_inputs/MXM_V4_ASYMMETRIC_STAGING_PAYLOAD_V1.zip
+      EXPECTED_PAYLOAD_SHA256: "6ae52d1123d747fdf976031cd5684fbe9255f35ff865840df86277a3ae7eee10"
+      EXPECTED_MANIFEST_SHA256: "d338dcaac31af05819aebd2876946f6af001c31ecca526e0424c4ddee1f3d207"
+      CERT: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RECOVERY_V4_GREENFIELD_INPUT_STAGING_CERTIFICATE_V1.json
+      PREFLIGHT: research_core_v4/state/V4_ASYMMETRIC_PRE_ARM_DECRYPTION_PREFLIGHT_RESULT_V1.json
+      ACTIVE_AUTH: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V4.json
+      ACTIVATION: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V4_ACTIVATION_V1.json
+    steps:
+      - name: Checkout exact upload commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Reassemble exact encrypted ZIP and publish isolated payload commit
+        run: |
+          set -euo pipefail
+          test ! -e "$PAYLOAD"
+          python - <<'CHECK'
+          import subprocess
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          g.verify_boundary();g.verify_frozen();g.verify_public_and_probe()
+          changed=subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines()
+          assert changed==['research_core_v4/runtime_inputs/V4_ENCRYPTED_TRANSPORT_SEGMENTS_V1.json'], changed
+          CHECK
+          python research_core_v4/encrypted_transport_segments_v1.py
+          git config user.name mxm-v4-asymmetric-staging-machine
+          git config user.email mxm-v4-asymmetric-staging-machine@users.noreply.github.com
+          git add "$PAYLOAD"
+          git commit -m "v4: publish exact encrypted payload from verified bounded segments"
+          upload_head="$(git rev-parse HEAD)"
+          git push --force-with-lease="refs/heads/$BRANCH:${{ github.sha }}" origin "$upload_head:refs/heads/$BRANCH"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$upload_head"
+          echo "UPLOAD_HEAD=$upload_head" >> "$GITHUB_ENV"
+
+      - name: Require isolated encrypted-only payload commit and hard-stop boundary
+        run: |
+          set -euo pipefail
+          test -f "$PAYLOAD"
+          test "$(sha256sum "$PAYLOAD" | awk '{print $1}')" = "$EXPECTED_PAYLOAD_SHA256"
+          python - <<'PY'
+          import os,subprocess
+          payload=os.environ["PAYLOAD"]
+          parents=subprocess.check_output(["git","rev-list","--parents","-n","1","HEAD"],text=True).split()
+          assert len(parents)==2
+          changed=[x for x in subprocess.check_output(["git","diff-tree","--no-commit-id","--name-only","-r","HEAD"],text=True).splitlines() if x]
+          assert changed==[payload], changed
+          PY
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+
+      - name: Verify payload allowlist and install encrypted staging bytes
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/v4-payload"
+          mkdir -p "$RUNNER_TEMP/v4-payload"
+          python - <<'PY'
+          import hashlib,os,pathlib,shutil,zipfile
+          payload=pathlib.Path(os.environ["PAYLOAD"])
+          expected=[
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_MANIFEST_V2.json",
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.bundle_key.rsa_oaep_sha256.bin",
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-000",
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-001",
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-002",
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-003",
+            "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-004",
+          ]
+          out=pathlib.Path(os.environ["RUNNER_TEMP"])/"v4-payload"
+          with zipfile.ZipFile(payload) as z:
+              names=z.namelist()
+              assert names==expected, names
+              for n in names:
+                  assert not n.startswith("/") and ".." not in pathlib.PurePosixPath(n).parts
+                  target=out/n
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  with z.open(n) as src,target.open("wb") as dst: shutil.copyfileobj(src,dst)
+          assert hashlib.sha256((out/expected[0]).read_bytes()).hexdigest()==os.environ["EXPECTED_MANIFEST_SHA256"]
+          for n in expected:
+              target=pathlib.Path(n); target.parent.mkdir(parents=True,exist_ok=True)
+              shutil.copy2(out/n,target)
+          PY
+          python - <<'PY'
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          g.verify_public_and_probe()
+          g.verify_frozen()
+          g.verify_staged_ciphertext()
+          g.verify_boundary()
+          print("ENCRYPTED_STAGING_BYTES_VERIFIED=PASS")
+          PY
+
+      - name: Persist encrypted staging-data commit
+        run: |
+          set -euo pipefail
+          git config user.name mxm-v4-asymmetric-staging-machine
+          git config user.email mxm-v4-asymmetric-staging-machine@users.noreply.github.com
+          test -f "$PAYLOAD"
+          test "$(sha256sum "$PAYLOAD" | awk '{print $1}')" = "$EXPECTED_PAYLOAD_SHA256"
+          git add research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_MANIFEST_V2.json
+          git add research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.bundle_key.rsa_oaep_sha256.bin
+          git add research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_BUNDLE_V2.gpg.part-*
+          git commit -m "v4: stage exact asymmetric encrypted 18-input bundle"
+          echo "STAGING_DATA_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Create mechanically bound pending staging certificate
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          def h(rel): return g.sha256_file(g.ROOT/rel)
+          m=g.load(g.MANIFEST_REL); probe=g.load(g.PROBE_REL)
+          cert={
+            "schema":"mxm.research-core-v4.recovery-v4-greenfield-input-staging-certificate.v1",
+            "status":"STAGED_NOT_ARMED_NOT_EXECUTED_PENDING_REAL_PREARM_PREFLIGHT",
+            "canonical_repository":g.REPO,
+            "research_branch":g.BRANCH,
+            "transport_payload_file":os.environ["PAYLOAD"],
+            "transport_payload_sha256":os.environ["EXPECTED_PAYLOAD_SHA256"],
+            "staging_data_commit":os.environ["STAGING_DATA_COMMIT"],
+            "scientific_source_head":g.SCI_HEAD,
+            "active_recovery_authority_at_staging":g.V3_AUTH_REL,
+            "active_recovery_authority_sha256":h(g.V3_AUTH_REL),
+            "prospective_recovery_v4_authority":g.V4_PROSPECTIVE_REL,
+            "prospective_recovery_v4_authority_sha256":h(g.V4_PROSPECTIVE_REL),
+            "installed_recovery_workflow":g.WORKFLOW_REL,
+            "installed_recovery_workflow_sha256":h(g.WORKFLOW_REL),
+            "asymmetric_transport_supersession":g.SUPERSESSION_REL,
+            "asymmetric_transport_supersession_sha256":h(g.SUPERSESSION_REL),
+            "rsa_public_key_path":g.PUBLIC_REL,
+            "rsa_public_key_spki_sha256":g.EXPECTED_SPKI,
+            "rsa_oaep_parameters":{"algorithm":"RSA_OAEP","hash":"SHA256","mgf1_hash":"SHA256"},
+            "wrapped_bundle_key":m["wrapped_bundle_key"],
+            "exact_18_series_manifest_file":g.MANIFEST_REL,
+            "exact_18_series_manifest_file_sha256":h(g.MANIFEST_REL),
+            "exact_18_series_manifest_sha256":g.canonical_sha(m["exact_18_series"]),
+            "exact_18_series":m["exact_18_series"],
+            "source_archives":m["source_archives"],
+            "plaintext_bundle_sha256":m["plaintext_bundle_sha256"],
+            "encrypted_bundle_sha256":m["encrypted_bundle_sha256"],
+            "encrypted_parts":m["encrypted_parts"],
+            "encrypted_part_order":[x["filename"] for x in m["encrypted_parts"]],
+            "key_pair_probe":{"run_id":probe["run_id"],"private_key_parse_status":probe["private_key_parse_status"],"private_derived_public_spki_sha256":probe["private_derived_public_spki_sha256"],"fingerprint_status":probe["fingerprint_status"]},
+            "accepted_canonical_result_count":0,
+            "arm_present_at_staging":False,
+            "attempt_lock_present_at_staging":False,
+            "canonical_result_present_at_staging":False,
+            "real_execution_authorized_at_staging":False,
+            "market_outcome_inspected":False,
+            "plaintext_market_data_persisted":False,
+            "private_key_persisted":False,
+            "raw_bundle_passphrase_persisted":False
+          }
+          pathlib.Path(os.environ["CERT"]).write_text(json.dumps(cert,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          PY
+          git add "$CERT"
+          git commit -m "v4: bind asymmetric encrypted staging certificate"
+          echo "CERTIFICATE_PREFLIGHT_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Real pre-ARM decrypt and exact 18-input integrity preflight
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          set -euo pipefail
+          python research_core_v4/asymmetric_recovery_v4_gate.py --preflight-output "$PREFLIGHT"
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+          git add "$PREFLIGHT"
+          git commit -m "v4: persist real asymmetric pre-ARM decrypt integrity preflight"
+          echo "PREFLIGHT_RESULT_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Finalize staging certificate after real preflight PASS
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,pathlib,hashlib
+          certp=pathlib.Path(os.environ["CERT"]); prep=pathlib.Path(os.environ["PREFLIGHT"])
+          cert=json.loads(certp.read_text()); pre=json.loads(prep.read_text())
+          assert pre["conclusion"]=="PASS"
+          cert["status"]="STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED"
+          cert["real_pre_arm_preflight_run_id"]=pre["run_id"]
+          cert["real_pre_arm_preflight_conclusion"]="PASS"
+          cert["preflight_result_path"]=os.environ["PREFLIGHT"]
+          cert["preflight_result_sha256"]=hashlib.sha256(prep.read_bytes()).hexdigest()
+          cert["preflight_result_commit"]=os.environ["PREFLIGHT_RESULT_COMMIT"]
+          cert["arm_present_after_preflight"]=False
+          cert["attempt_lock_present_after_preflight"]=False
+          cert["canonical_result_present_after_preflight"]=False
+          cert["real_execution_authorized_after_preflight"]=False
+          certp.write_text(json.dumps(cert,indent=2,sort_keys=True)+"\n")
+          PY
+          git add "$CERT"
+          git commit -m "v4: finalize staged validated asymmetric certificate"
+          echo "FINAL_CERTIFICATE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Activate transport-only Recovery Authority V4 without ARM
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import copy,hashlib,json,os,pathlib
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          def h(rel): return g.sha256_file(g.ROOT/rel)
+          cert=g.load(g.CERT_REL); pre=g.load(g.PREFLIGHT_REL); prospective=g.load(g.V4_PROSPECTIVE_REL)
+          assert cert["status"]=="STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED"
+          assert pre["conclusion"]=="PASS"
+          active=copy.deepcopy(prospective)
+          active["schema"]="mxm.research-core-v4.first-development-response-crash-recovery-authority.v4"
+          active["status"]="ACTIVE_TRANSPORT_ONLY_SUCCESSOR_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED"
+          active["real_development_response_execution_authorized"]=False
+          active["arm_authorized"]=False
+          active["supersedes"]=g.V3_AUTH_REL
+          active["superseded_v3_authority_sha256"]=h(g.V3_AUTH_REL)
+          active["prospective_authority_sha256"]=h(g.V4_PROSPECTIVE_REL)
+          active["staging_data_commit"]=cert["staging_data_commit"]
+          active["staging_certificate_ref"]=g.CERT_REL
+          active["staging_certificate_sha256"]=h(g.CERT_REL)
+          active["real_pre_arm_preflight_ref"]=g.PREFLIGHT_REL
+          active["real_pre_arm_preflight_sha256"]=h(g.PREFLIGHT_REL)
+          active["real_pre_arm_preflight_run_id"]=pre["run_id"]
+          active["installed_recovery_workflow"]=g.WORKFLOW_REL
+          active["installed_recovery_workflow_sha256"]=h(g.WORKFLOW_REL)
+          active["future_staging"]["certificate_ref"]=g.CERT_REL
+          active["future_staging"]["certificate_present_at_prepare"]=True
+          active["future_staging"]["encrypted_parts_present_at_prepare"]=True
+          active["future_arm"]["arm_ref"]=g.ARM_REL
+          active["future_arm"]["arm_present_at_prepare"]=False
+          pathlib.Path(g.V4_ACTIVE_REL).write_text(json.dumps(active,indent=2,sort_keys=True)+"\n")
+          active_sha=h(g.V4_ACTIVE_REL)
+          activation={
+            "schema":"mxm.research-core-v4.recovery-authority-v4-activation.v1",
+            "status":"ACTIVATED_TRANSPORT_ONLY_AFTER_REAL_PREARM_PREFLIGHT_PASS",
+            "canonical_repository":g.REPO,
+            "research_branch":g.BRANCH,
+            "superseded_authority":g.V3_AUTH_REL,
+            "superseded_authority_sha256":h(g.V3_AUTH_REL),
+            "active_recovery_authority":g.V4_ACTIVE_REL,
+            "active_recovery_authority_sha256":active_sha,
+            "transport_only_change":True,
+            "scientific_source_head":g.SCI_HEAD,
+            "staging_data_commit":cert["staging_data_commit"],
+            "staging_certificate":g.CERT_REL,
+            "staging_certificate_sha256":h(g.CERT_REL),
+            "preflight_result":g.PREFLIGHT_REL,
+            "preflight_result_sha256":h(g.PREFLIGHT_REL),
+            "preflight_run_id":pre["run_id"],
+            "installed_recovery_workflow":g.WORKFLOW_REL,
+            "installed_recovery_workflow_sha256":h(g.WORKFLOW_REL),
+            "accepted_canonical_result_count":0,
+            "arm_present":False,
+            "attempt_lock_present":False,
+            "canonical_result_present":False,
+            "real_execution_authorized":False
+          }
+          pathlib.Path(g.ACTIVATION_REL).write_text(json.dumps(activation,indent=2,sort_keys=True)+"\n")
+          st=g.load(g.STATE_REL)
+          st["status"]="FIRST_REAL_MARKET_DESIGN_V2_ASYMMETRIC_RECOVERY_V4_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED"
+          st["stop_boundary"]="STOP_BEFORE_RECOVERY_V4_ARM_AFTER_ASYMMETRIC_STAGING_AND_REAL_PREARM_VALIDATION"
+          st["next_action"]="STOP_BEFORE_ARM;SEPARATE_FUTURE_GOVERNANCE_DECISION_REQUIRED;DO_NOT_EXECUTE_REAL_V4_RESPONSE"
+          fw=st["first_wave"]
+          fw["current_recovery_authority"]=g.V4_ACTIVE_REL
+          fw["current_recovery_execution_authorized"]=False
+          fw["current_recovery_arm_present"]=False
+          mig=st.get("recovery_v3_preparation",{}).get("asymmetric_transport_migration",{})
+          mig["status"]="ACTIVATED_SUCCESSOR_V4_STAGED_VALIDATED_NOT_ARMED"
+          mig["active_authority_remains_v3"]=False
+          mig["private_key_pair_match_proven"]=True
+          mig["encrypted_staging_performed"]=True
+          mig["staging_certificate"]=g.CERT_REL
+          mig["preflight_result"]=g.PREFLIGHT_REL
+          mig["preflight_run_id"]=pre["run_id"]
+          st["recovery_v4_preparation"]={
+            "status":"STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED",
+            "canonical_repository":g.REPO,
+            "research_branch":g.BRANCH,
+            "authority":g.V4_ACTIVE_REL,
+            "authority_sha256":active_sha,
+            "staging_data_commit":cert["staging_data_commit"],
+            "staging_certificate":g.CERT_REL,
+            "staging_certificate_sha256":h(g.CERT_REL),
+            "real_pre_arm_preflight":g.PREFLIGHT_REL,
+            "real_pre_arm_preflight_sha256":h(g.PREFLIGHT_REL),
+            "real_pre_arm_preflight_run_id":pre["run_id"],
+            "installed_runtime_workflow":g.WORKFLOW_REL,
+            "installed_runtime_workflow_sha256":h(g.WORKFLOW_REL),
+            "private_key_secret_status":"PRESENT_VALID_MATCH",
+            "public_key_spki_sha256":g.EXPECTED_SPKI,
+            "shared_passphrase_dependency":False,
+            "work_dependency_required":False,
+            "exact_series_count":18,
+            "plaintext_bundle_sha256":g.EXPECTED_PLAINTEXT_BUNDLE_SHA,
+            "encrypted_bundle_sha256":g.EXPECTED_ENCRYPTED_BUNDLE_SHA,
+            "accepted_canonical_result_count":0,
+            "accepted_canonical_result_limit":1,
+            "process_attempts_started":0,
+            "automatic_retry":False,
+            "arm_present":False,
+            "attempt_lock_present":False,
+            "canonical_result_present":False,
+            "real_execution_authorized":False
+          }
+          pathlib.Path(g.STATE_REL).write_text(json.dumps(st,indent=2,sort_keys=True)+"\n")
+          resolution={
+            "schema":"mxm.research-core-v4.asymmetric-private-key-secret-blocker-resolution.v1",
+            "status":"RESOLVED_BY_PRIVATE_KEY_PARSE_AND_PUBLIC_FINGERPRINT_MATCH_THEN_REAL_PREARM_PASS",
+            "historical_blocker_preserved":"research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_V1.json",
+            "key_pair_probe_run_id":g.load(g.PROBE_REL)["run_id"],
+            "private_key_parse_status":"VALID",
+            "private_derived_public_spki_sha256":g.EXPECTED_SPKI,
+            "fingerprint_status":"MATCH",
+            "preflight_run_id":pre["run_id"],
+            "preflight_conclusion":"PASS",
+            "secret_value_exposed":False,
+            "private_key_persisted":False,
+            "arm_created":False,
+            "attempt_lock_created":False,
+            "real_response_computed":False
+          }
+          pathlib.Path("research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_RESOLUTION_V1.json").write_text(json.dumps(resolution,indent=2,sort_keys=True)+"\n")
+          PY
+          git add "$ACTIVE_AUTH" "$ACTIVATION" research_core_v4/state/V4_STATE.json research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_RESOLUTION_V1.json
+          git commit -m "v4: activate asymmetric transport-only recovery authority without ARM"
+          echo "FINAL_ACTIVATION_HEAD=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Publish completed staging transaction with one branch ref update
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$FINAL_ACTIVATION_HEAD"
+          test -f "$PAYLOAD"
+          test "$(sha256sum "$PAYLOAD" | awk '{print $1}')" = "$EXPECTED_PAYLOAD_SHA256"
+          git diff --quiet "$UPLOAD_HEAD" HEAD -- "$PAYLOAD"
+          python research_core_v4/asymmetric_recovery_v4_gate.py --audit
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+          test -z "$(git status --porcelain)"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+          remote_head="$(git rev-parse "origin/$BRANCH")"
+          test "$remote_head" = "$UPLOAD_HEAD"
+          final_head="$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "$UPLOAD_HEAD" "$final_head"
+          test "$final_head" != "$UPLOAD_HEAD"
+          git push --force-with-lease="refs/heads/$BRANCH:$UPLOAD_HEAD" origin "$final_head:refs/heads/$BRANCH"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$final_head"
+          echo "PUBLISHED_FINAL_HEAD=$final_head" >> "$GITHUB_ENV"
+
+      - name: Final local exact-head fail-closed audit
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PUBLISHED_FINAL_HEAD"
+          git fetch --no-tags origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+          test "$(git rev-parse "origin/$BRANCH")" = "$PUBLISHED_FINAL_HEAD"
+          test "$(git rev-parse HEAD)" = "$FINAL_ACTIVATION_HEAD"
+          python research_core_v4/asymmetric_recovery_v4_gate.py --audit
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
+          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+          test -z "$(git status --porcelain)"
+          echo "STOP=STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED"
