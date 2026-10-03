@@ -1,6 +1,9 @@
 {
+  "adaptive_selection_history": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V1.json",
   "as_of_date": "2026-10-02",
   "closure_dependency_graph": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
+  "current_project_closure_ledger": "research_core_v4/state/POST_FIRST_V4_CLOSURE_LEDGER_V1.json",
+  "current_project_coverage": "research_core_v4/state/POST_FIRST_V4_PROJECT_COVERAGE_REFRESH_V1.json",
   "detector_calibration_history": {
     "v1_result": "research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V1.json",
     "v1_spec": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V1.json",
@@ -129,7 +132,29 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "STOP;INDEPENDENT_REVIEW_REQUIRED;NO_SUBSEQUENT_RESEARCH_ACTION_SELECTED",
+  "next_action": "STOP;SEPARATE_READ_ONLY_ACQUISITION_DECISION_REQUIRED;NO_MARKET_RESPONSE_AUTHORITY",
+  "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
+  "next_prospective_wave": {
+    "ARM_present": false,
+    "acquisition_requirement": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_ACQUISITION_REQUIREMENT_V1.json",
+    "attempt_lock_present": false,
+    "broker_acquisition_authorized": false,
+    "candidate_promotion_authorized": false,
+    "canonical_result_present": false,
+    "confirmation_opened": false,
+    "design": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V1.json",
+    "design_sha256": "4a4772934976f3737d498ab1b8bc397a8b09e0fb08dfd9c55f7d0c7863ef0bdb",
+    "information_source": "TOP_OF_BOOK_QUOTE_STATE",
+    "mechanism_id": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+    "preparation_audit": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_PREPARATION_AUDIT_V1.json",
+    "preparation_audit_sha256": "0181eefd44a937e6555ea03f3bcff45d540585b7088395cdf90fa78d3861aff1",
+    "protected_forward_opened": false,
+    "real_inputs_loaded": 0,
+    "request_manifest": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_REQUEST_MANIFEST_V1.json",
+    "response_execution_authorized": false,
+    "selected_mechanism_count": 1,
+    "status": "DESIGN_FROZEN_ACQUISITION_REQUIRED_NOT_AUTHORIZED"
+  },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
     "v3_freeze_ref": "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json",
@@ -254,6 +279,6 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "FIRST_REAL_V4_CANONICAL_DEVELOPMENT_RESULT_INTERPRETED_STOP_FOR_INDEPENDENT_REVIEW",
-  "stop_boundary": "STOP_FOR_INDEPENDENT_REVIEW_BEFORE_ANY_SUBSEQUENT_RESEARCH_OR_CONFIRMATION_DECISION"
+  "status": "FIRST_V4_EXACT_WAVE_CLOSED_NEXT_QUOTE_SEQUENCE_PROSPECTIVE_DESIGN_FROZEN",
+  "stop_boundary": "STOP_FOR_INDEPENDENT_REVIEW_BEFORE_NEW_QUOTE_ACQUISITION_OR_RESPONSE"
 }

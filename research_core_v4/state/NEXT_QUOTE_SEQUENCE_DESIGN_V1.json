@@ -1,0 +1,294 @@
+{
+  "as_of_date": "2026-10-03",
+  "calendar": {
+    "date_count": 30,
+    "dates_utc": [
+      "2025-10-13",
+      "2025-10-14",
+      "2025-10-08",
+      "2025-11-13",
+      "2025-11-14",
+      "2025-12-08",
+      "2025-12-11",
+      "2025-12-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-02-09",
+      "2026-02-10",
+      "2026-02-13",
+      "2026-03-11",
+      "2026-03-12",
+      "2026-04-13",
+      "2026-04-08",
+      "2026-04-09",
+      "2026-05-12",
+      "2026-05-08",
+      "2026-06-09",
+      "2026-06-10",
+      "2026-06-11",
+      "2026-07-13",
+      "2026-07-10",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-09-14",
+      "2026-09-08"
+    ],
+    "hypothesis_scope": "GENERAL_ACROSS_THE_THREE_FROZEN_WINDOWS_NOT_WINDOW_SPECIFIC",
+    "months": 12,
+    "weekday_counts": {
+      "FRIDAY": 6,
+      "MONDAY": 6,
+      "THURSDAY": 6,
+      "TUESDAY": 6,
+      "WEDNESDAY": 6
+    },
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ]
+  },
+  "causal_feature_law": {
+    "base_direction": "LONG_IF_IMBALANCE_POSITIVE_SHORT_IF_NEGATIVE",
+    "directional_revision_counts": "UP_AND_DOWN_COUNTS_ACROSS_BID_AND_ASK_PRICE_CHANGING_EVENTS_IN_(T-L,T]",
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "maximum_abs_net_mid_displacement_units": 0.75,
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "minimum_directional_revision_count": 6,
+    "net_mid_displacement_units": "ABS(LOG(MID_T/MID_T_MINUS_L)*10000)/MEDIAN_SPREAD_BASELINE",
+    "price_changing_revision": "PER_SIDE_CONSECUTIVE_BROKER_EVENTS;UNCHANGED_PRICE_EVENTS_EXCLUDED_FROM_DIRECTION_COUNTS_BUT_RETAINED_IN_RAW_EVIDENCE",
+    "signal": "FRESH_T_AND_T_MINUS_L;REVISION_COUNT_GE_6;ABS_IMBALANCE_GE_THRESHOLD;NET_MID_DISPLACEMENT_UNITS_LE_0.75;SPREAD_FILTER_PASS",
+    "signed_revision_imbalance": "(UP_COUNT-DOWN_COUNT)/(UP_COUNT+DOWN_COUNT)",
+    "spread_filter": "SPREAD_BPS_T_LE_MEDIAN_SPREAD_BASELINE"
+  },
+  "cells_per_symbol": 24,
+  "closure_law": {
+    "broader_quote_information_closed": false,
+    "economic_costs_missing": "COST_UNRESOLVED",
+    "infrastructure_failure_is_null": false,
+    "invalid_capture_or_statistical_validity": "INVALID_NOT_A_SCIENTIFIC_NULL",
+    "no_Holm_full_gate_lead": "Close only this exact V4 quote-sequence specification on these symbols/calendar/windows/24 cells for advancement; no threshold/lookback/direction/horizon/window/exit rescue.",
+    "small_or_sparse_effect_without_adequate_exclusion": "LOW_POWER_INCONCLUSIVE_NOT_FAMILY_CLOSURE",
+    "unsupported_leaf": "DATA_LIMITED_UNTESTED_NOT_NULL"
+  },
+  "confirmation_architecture": {
+    "all_surviving_symbols_confirmed": true,
+    "all_survivors_in_one_Holm_batch": true,
+    "candidate_freeze_from_development": false,
+    "confirmation_calendar_not_chosen_now": true,
+    "cross_symbol_confirmation_control": "HOLM_FWER_0.05",
+    "freeze_before_confirmation": true,
+    "genuinely_disjoint_from": "All development dates, all first-wave development/confirmation exposures and every other previously opened outcome set applicable to this source. Exact raw-date/identity exposure ledger required before confirmation.",
+    "identity_or_time_overlap_not_hidden": true,
+    "if_no_genuinely_disjoint_evidence_available": "DATA_LIMITED_UNTESTED_NOT_NULL;NO_SUBSTITUTION_AFTER_OUTCOMES",
+    "independent_calendar_required": true,
+    "protected_forward_forbidden": true,
+    "representative_cell_selection": "SMALLEST_LOCAL_P_THEN_LARGEST_T_THEN_LEXICOGRAPHIC_CELL_ID"
+  },
+  "development_lead_gate": {
+    "candidate_promotion": false,
+    "each_fixed_date_third_mean_gt": 0,
+    "each_of_3_frozen_windows_mean_gt": 0,
+    "every_surviving_symbol_reported_and_requires_confirmation": true,
+    "local_maxT_and_symbol_Holm_reject": true,
+    "primary_week_weighted_mean_spread_net_gt": 0,
+    "support_pass": true,
+    "top10pct_abs_event_concentration_le": 0.5
+  },
+  "distinct_from_failed_first_v4": "Top-of-book revision sequence with bounded displacement; no H4/H1/M15 directional alignment, no first-wave LOW/HIGH/horizon/symbol tuning.",
+  "economic_boundary": {
+    "current_commission_adjusted_promotion": "DEFERRED_UNTIL_A_STATISTICAL_DEVELOPMENT_LEAD_EXISTS_AND_AUTHENTIC_SYMBOL_SPECIFIC_COMMISSION_CONVERSION_IS_AVAILABLE",
+    "current_commission_metadata_required_pre_capture": true,
+    "min_volume_step_and_expected_margin_required_pre_capture": true,
+    "primary_response_includes_authentic_bid_ask_spread": true,
+    "proxy_costs_forbidden": true,
+    "safe_eur200_sizing_required_before_candidate": true,
+    "universal_2bps_gate_removed": true
+  },
+  "economic_status": "COST_UNRESOLVED_AUTHENTIC_SPREAD_ONLY_COMMISSION_MARGIN_CONVERSION_AND_FILL_CERTIFICATION_DEFERRED",
+  "event_frequency": "Count observed eligible signals prospectively after authorized raw acquisition; no assumed 21/week or stand-alone sleeve gate.",
+  "family": "BROKER_NATIVE_QUOTE_MICROSTRUCTURE_DYNAMICS",
+  "governance": {
+    "ARM_created": false,
+    "broker_acquisition_authorized": false,
+    "candidate_frozen_count": 0,
+    "candidate_promotion_authorized": false,
+    "live_trading_started": false,
+    "no_first_wave_statistic_used": true,
+    "protected_forward_opened": false,
+    "response_execution_authorized": false,
+    "runtime_v2_read_only": true
+  },
+  "hard21_scope": "FINAL_COMPLETE_PRODUCTION_PORTFOLIO_ONLY",
+  "information_source": "TOP_OF_BOOK_QUOTE_STATE",
+  "mechanism_id": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "multiplicity": {
+    "dependence_cluster": "ISO_YEAR_X_ISO_WEEK_OF_THE_30_FROZEN_DATES",
+    "family_p": "MIN_LOCAL_MAXT_ADJUSTED_P_WITH_DETERMINISTIC_SELECTOR",
+    "higher_level": "HOLM_FWER_0_05_ACROSS_ALL_5_PREDECLARED_SYMBOL_LOCAL_FAMILY_PVALUES",
+    "local_alpha": 0.05,
+    "local_family": "ALL_24_FROZEN_CELLS_PER_SYMBOL_INCLUDING_UNSUPPORTED_P1",
+    "local_method": "SHARED_SAMPLED_ISO_WEEK_WILD_SIGN_MAX_STUDENTIZED_MEAN_ONE_SIDED_POSITIVE_SPREAD_NET",
+    "resamples": 4999,
+    "same_shared_sign_matrix_across_five_symbols": true,
+    "seed": 20261003,
+    "selected_leaf_rule": "MIN_LOCAL_MAXT_P_THEN_LARGEST_T_THEN_LEXICOGRAPHIC_CELL_ID",
+    "support_missing_family_p": 1,
+    "symbol_winner_selection_forbidden": true
+  },
+  "parameter_grid": {
+    "direction_law": [
+      "CONTINUATION",
+      "REVERSION"
+    ],
+    "lookback_seconds": [
+      10,
+      30
+    ],
+    "minimum_abs_signed_revision_imbalance": [
+      0.6,
+      0.8
+    ],
+    "response_horizon_seconds": [
+      10,
+      30,
+      90
+    ]
+  },
+  "permanent_close_rule": {
+    "broader_quote_information_closed": false,
+    "economic_costs_missing": "COST_UNRESOLVED",
+    "infrastructure_failure_is_null": false,
+    "invalid_capture_or_statistical_validity": "INVALID_NOT_A_SCIENTIFIC_NULL",
+    "no_Holm_full_gate_lead": "Close only this exact V4 quote-sequence specification on these symbols/calendar/windows/24 cells for advancement; no threshold/lookback/direction/horizon/window/exit rescue.",
+    "small_or_sparse_effect_without_adequate_exclusion": "LOW_POWER_INCONCLUSIVE_NOT_FAMILY_CLOSURE",
+    "unsupported_leaf": "DATA_LIMITED_UNTESTED_NOT_NULL"
+  },
+  "power_calibration_plan": {
+    "before_response": "Synthetic controls now; exact real endpoint/support geometry only after separately authorized lossless acquisition, before new responses. No borrowed first-wave calibration.",
+    "bound_resamples": 4999,
+    "effect_grid": "[0,0.25,0.5,0.75,1,1.5] measured in synthetic ISO-week response noise SD, not market bps or break-even",
+    "exclusion_law": "No null/exclusion claim without a prospectively justified effect range, real support/noise mapping and adequate exclusion power. Synthetic MDE is not an equivalence interval.",
+    "planned_replicates_per_scenario": 300,
+    "power_patterns": [
+      "ONE_ACTIVE_SYMBOL_ONE_CONTINUATION_LEAF",
+      "THREE_ACTIVE_SYMBOLS",
+      "ALL_FIVE_ACTIVE_SYMBOLS"
+    ],
+    "scaffolding_status": "NETWORK_FREE_SYNTHETIC_FEATURE_AND_INFERENCE_PROOF;REAL_GEOMETRY_NOT_AVAILABLE",
+    "synthetic_null_stresses": [
+      "GAUSSIAN",
+      "FAT_TAIL_T5",
+      "COMMON_FACTOR",
+      "DATE_REGIME_WITHIN_WEEK",
+      "UNEQUAL_SYMBOL_NOISE",
+      "NEGATIVE_SPREAD_DRIFT"
+    ],
+    "validity_gate": "No real execution before outcome-blind exact geometry calibration, stress checks, Monte Carlo binomial uncertainty and method review. An empirical any-false-reject rate exceeding 0.07 flags rejection of readiness; no relaxed gates or effect-dependent model choice."
+  },
+  "predecessor_design_ref": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V2.json",
+  "predecessor_design_sha256": "992b4e8c00efdcdb2076e573ae2f4d63f8179ba622b01064a2a2bd49f98627c1",
+  "preoutcome_migration_corrections": [
+    "Conservative Holm control across every one of five symbol-local family p-values at development as well as independent-confirmation Holm across all survivors; no global development claim from an uncorrected winner.",
+    "Cluster shared wild signs by sampled ISO week, preserving same-week sampled-date dependence rather than assuming adjacent sampled dates independent.",
+    "Fix calendar-date thirds and equal-window/date/week estimand before outcomes, avoiding event-frequency weighting or post-hoc date partition choice."
+  ],
+  "primary_estimand": {
+    "aggregation": [
+      "EVENT_MEAN_WITHIN_SYMBOL_CELL_WINDOW_SAMPLED_DATE",
+      "EQUAL_WEIGHT_AVAILABLE_WINDOWS_WITHIN_SAMPLED_DATE_REQUIRE_ALL_3_FOR_A_LEAD",
+      "EQUAL_WEIGHT_SAMPLED_DATES_WITHIN_ISO_WEEK",
+      "EQUAL_WEIGHT_VALID_SAMPLED_ISO_WEEK_MEANS"
+    ],
+    "event": "Authentic side-aware spread-net log response at t+1s through t+1s+h; information response, not executable PnL",
+    "missing": "Right censor each event; all attempts remain retention denominator. Missing windows/dates are recorded, never replaced or filled.",
+    "symbol_pooling": false
+  },
+  "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+  "quote_state": {
+    "ask": "LATEST_ASK_EVENT_AT_OR_BEFORE_T_USING_PRESERVED_BROKER_EVENT_ORDER_FOR_EQUAL_TIMESTAMPS",
+    "baseline_window_seconds": 60,
+    "bid": "LATEST_BID_EVENT_AT_OR_BEFORE_T_USING_PRESERVED_BROKER_EVENT_ORDER_FOR_EQUAL_TIMESTAMPS",
+    "equal_ms_different_price_policy": "Preserve lossless per-side rows, but censor any feature with different prices sharing a side millisecond in its baseline/feature information window. No invented within-ms arrival ordering or last-price rescue.",
+    "evaluation_grid": "INTEGER_UTC_SECONDS",
+    "freshness": "BOTH_SIDE_AGES_LE_2000MS_AND_ASK_GE_BID_GT_0",
+    "median_spread_baseline": "MEDIAN_VALID_SPREAD_BPS_OVER_T_MINUS_60_THROUGH_T_MINUS_1;REQUIRE_GT_0",
+    "mid": "(BID+ASK)/2",
+    "minimum_valid_baseline_snapshots": 45,
+    "spread_bps": "LOG(ASK/BID)*10000"
+  },
+  "response_semantics": {
+    "continuation": "TRADE_BASE_DIRECTION",
+    "entry": "FRESH_SIDE_AWARE_QUOTE_STATE_AT_T_PLUS_1_SECOND",
+    "long_spread_net_bps": "LOG(RESPONSE_BID/ENTRY_ASK)*10000",
+    "missing": "RIGHT_CENSOR_NO_DELAY_SEARCH_NO_INTERPOLATION_NO_STALE_REPAIR",
+    "overlap": "WITHIN_EACH_SYMBOL_X_CELL_IGNORE_SIGNALS_UNTIL_THE_PREDECLARED_RESPONSE_HORIZON_COMPLETES",
+    "response_state": "FRESH_SIDE_AWARE_QUOTE_EXACTLY_H_SECONDS_AFTER_ENTRY",
+    "reversion": "TRADE_OPPOSITE_BASE_DIRECTION",
+    "role": "CAUSAL_INFORMATION_RESPONSE_NOT_EXIT_OPTIMIZATION",
+    "short_spread_net_bps": "LOG(ENTRY_BID/RESPONSE_ASK)*10000",
+    "signal_time": "INTEGER_SECOND_T_AFTER_ALL_EVENTS_TIMESTAMPED_LE_T_HAVE_BEEN_PROCESSED"
+  },
+  "schema": "mxm.research-core-v4.quote-sequence-next-wave-design.v1",
+  "scope_adaptive_basis": "Inherited independent execution-only panel, complete coherent documented pool, not winners of any response wave.",
+  "selection_history_ref": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V1.json",
+  "selection_ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
+  "signal_information_gate": {
+    "chronological_event_count_thirds_each_mean_strictly_positive": false,
+    "chronological_fixed_calendar_date_thirds_each_mean_strictly_positive": true,
+    "each_frozen_window_mean_spread_net_bps_strictly_positive": true,
+    "mean_spread_net_bps_strictly_positive": true,
+    "top10pct_abs_event_concentration_max": 0.5,
+    "universal_fixed_bps_hurdle": null
+  },
+  "signal_symbols": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116
+    }
+  ],
+  "source_live_head": "825ac2903f5c133178e50717cc17e862bd49a0fc",
+  "status": "FROZEN_PROSPECTIVE_SCIENCE_NOT_EXECUTION_AUTHORITY",
+  "subfamily": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+  "support_gate": {
+    "completed_events_min": 100,
+    "completed_events_per_window_min": 15,
+    "distinct_iso_weeks_min": 10,
+    "distinct_sample_dates_min": 18,
+    "retention_fraction_min": 0.8,
+    "support_ineligible_cells_assigned_p1": true
+  },
+  "total_cells": 120
+}

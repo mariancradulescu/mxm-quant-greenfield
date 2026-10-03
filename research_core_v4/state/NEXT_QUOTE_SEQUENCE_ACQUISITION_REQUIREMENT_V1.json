@@ -1,0 +1,202 @@
+{
+  "V4_read_only_collector_wrapper_not_installed": true,
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "acquisition": {
+    "account_mutation": false,
+    "api": "ProtoOAGetTickDataReq",
+    "automatic_additional_acquisition": false,
+    "automatic_parameter_search": false,
+    "base_side_window_requests_before_hasMore_splitting": 900,
+    "device_computes_pnl": false,
+    "device_computes_strategy_features": false,
+    "device_computes_strategy_outcomes": false,
+    "fill_authority": false,
+    "hasMore_policy": "LOSSLESS_RECURSIVE_DISJOINT_TIME_SPLIT;IF_RESPONSE_HASMORE_SPLIT_REQUEST_INTERVAL_AT_INTEGER_MILLISECOND_MIDPOINT_AND_RETRY_BOTH_HALVES;FAIL_CLOSED_IF_A_SINGLE_MILLISECOND_REQUEST_STILL_HASMORE",
+    "historical_request_rate_limit_documented_rps": 5,
+    "orders": false,
+    "protected_forward_opened": false,
+    "quote_sides": [
+      "BID",
+      "ASK"
+    ],
+    "raw_event_decode": "FIRST_TICK_TIMESTAMP_ABSOLUTE;SUBSEQUENT_TICK_TIMESTAMP_FIELDS_ARE_BACKWARD_MILLISECOND_DELTAS_FROM_PREVIOUS_NEWER_EVENT",
+    "raw_event_persistence": "ONE_GZIP_CSV_PER_SIGNAL_SYMBOL_DATE_WINDOW_SIDE_WITH_ABSOLUTE_TIMESTAMP_MS_RAW_TICK_INTEGER_AND_TIE_ORDER",
+    "raw_ticks_discarded_after_derivation": false,
+    "raw_ticks_transferred_off_device": true,
+    "request_min_interval_seconds": 0.22
+  },
+  "as_of_date": "2026-10-03",
+  "bounded_acquisition": {
+    "base_requests": 900,
+    "dates": 30,
+    "max_request_budget": 20000,
+    "no_scope_expansion_on_missing_data": true,
+    "padding_after_seconds": 105,
+    "padding_before_seconds": 120,
+    "per_request_pause_seconds": 0.22,
+    "quote_sides": 2,
+    "signal_symbols": 5,
+    "windows": 3
+  },
+  "calendar": {
+    "dates_utc": [
+      "2025-10-13",
+      "2025-10-14",
+      "2025-10-08",
+      "2025-11-13",
+      "2025-11-14",
+      "2025-12-08",
+      "2025-12-11",
+      "2025-12-12",
+      "2026-01-13",
+      "2026-01-14",
+      "2026-02-09",
+      "2026-02-10",
+      "2026-02-13",
+      "2026-03-11",
+      "2026-03-12",
+      "2026-04-13",
+      "2026-04-08",
+      "2026-04-09",
+      "2026-05-12",
+      "2026-05-08",
+      "2026-06-09",
+      "2026-06-10",
+      "2026-06-11",
+      "2026-07-13",
+      "2026-07-10",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-14",
+      "2026-09-14",
+      "2026-09-08"
+    ],
+    "protected_forward_start_utc": "2026-09-17T12:02:58Z",
+    "query_padding_after_seconds": 105,
+    "query_padding_before_seconds": 120,
+    "windows_utc": [
+      [
+        "00:00:00",
+        "01:00:00"
+      ],
+      [
+        "07:00:00",
+        "08:00:00"
+      ],
+      [
+        "13:00:00",
+        "14:00:00"
+      ]
+    ]
+  },
+  "current_data": {
+    "M5_supports_this_quote_sequence": false,
+    "accepted_145_M5_manifest": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+    "execution_only_quote_summary": "research_core_v3/state/BROKER_NATIVE_QUOTE_MICROSTRUCTURE_PREOUTCOME_AUDIT_V1.json",
+    "lossless_exact_frozen_quote_capture_present": false,
+    "unused_V2_artifact_is_collector_package_not_raw_evidence": true
+  },
+  "design_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V1.json",
+  "design_sha256": "4a4772934976f3737d498ab1b8bc397a8b09e0fb08dfd9c55f7d0c7863ef0bdb",
+  "estimates": {
+    "base_requests": 900,
+    "estimate_only": true,
+    "estimated_total_combined_ticks_from_prior_execution_rates": 2899619,
+    "expected_transfer_compressed_bytes_planning_range": [
+      20000000,
+      80000000
+    ],
+    "quote_sides": 2,
+    "selected_dates": 30,
+    "signal_symbols": 5,
+    "symbol_hours": 450,
+    "windows_per_date": 3
+  },
+  "evidence_contract": {
+    "bundle_name": "MXM_V3_QUOTE_REVISION_SEQUENCE_RAW_EVIDENCE_V2.zip",
+    "capture_manifest": "CAPTURE_MANIFEST.json",
+    "checksums_file": "CHECKSUMS.sha256",
+    "exact_requested_to_returned_mapping": true,
+    "per_raw_file_sha256": true,
+    "precapture_metadata": "PRECAPTURE_EXECUTION_METADATA.json",
+    "preserve_empty_requested_windows": true,
+    "raw_root": "raw_quotes/",
+    "raw_tick_values_required": true,
+    "replay_without_broker_required": true,
+    "request_trace": "REQUEST_SPLIT_MANIFEST.json",
+    "secrets_forbidden": true,
+    "window_manifest": "RAW_WINDOW_MANIFEST.json"
+  },
+  "execution_authorized": false,
+  "governance": {
+    "candidate_frozen_count": 0,
+    "outcomes_opened": false,
+    "protected_forward_opened": false,
+    "runtime_v2_read_only": true
+  },
+  "legacy_V3_execution_remains_held": true,
+  "legacy_collector_ref": "research_core_v3/quote_revision_sequence_raw_capture_v2.py",
+  "legacy_collector_sha256": "4770427fb6084e9ca1a72c767fb69c90fbd365e5f71d8cb3faf3c2f121d80e5b",
+  "new_authority_required_before_any_broker_contact": true,
+  "no_orders_no_account_mutation_no_outcomes": true,
+  "official_api_sources_checked_2026_10_03": [
+    "https://help.ctrader.com/open-api/",
+    "https://help.ctrader.com/open-api/symbol-data/"
+  ],
+  "precapture_execution_feasibility": {
+    "both_buy_sell_margin_required": true,
+    "current_commission_fields_persisted": true,
+    "current_full_symbol_metadata_required": true,
+    "current_volume_fields_persisted": true,
+    "deposit_asset_required": "EUR",
+    "exact_account_environment_validation": true,
+    "exact_symbol_identity_validation": true,
+    "expected_margin_request": "ProtoOAExpectedMarginReq_FOR_CURRENT_MIN_VOLUME_EACH_SYMBOL",
+    "on_failure": "STOP_BEFORE_ANY_HISTORICAL_TICK_REQUEST;WRITE_SANITIZED_PRECAPTURE_BLOCK_REPORT_ONLY",
+    "replacement_allowed_in_collector": false,
+    "schedule_and_holidays_persisted": true,
+    "structural_gate": "MAX_BUY_OR_SELL_MIN_VOLUME_MARGIN_MUST_BE_STRICTLY_LESS_THAN_200_EUR_FOR_EVERY_SIGNAL_SYMBOL"
+  },
+  "required_after_capture_before_response": [
+    "Verify full ZIP and every gzip raw SHA256, exact request coverage, identities and metadata provenance",
+    "Verify pagination traces: complete leaf intervals partition each requested interval with no overlap/gap",
+    "Compute only causal features and endpoint timestamps/freshness availability for support; do not subtract future prices",
+    "Freeze support skeleton and exact sampled-week geometry; run pre-response synthetic calibration against that geometry",
+    "Install independently audited next-wave at-most-once gate and immutable numeric environment; current first-wave ARM/fence cannot authorize next wave"
+  ],
+  "required_before_capture": [
+    "Separate read-only acquisition governance decision, no response ARM",
+    "Fresh broker-native account/product identity, metadata and both-side minimum-size expected margin checks",
+    "V4 wrapper binds this design and request manifest; never runs held V3 entry point",
+    "Install/hash-lock collector Python/protobuf dependencies and repeat complete offline tests",
+    "Fail-closed lossless hasMore split and equal-ms order audit; no dedup or invented side interleaving"
+  ],
+  "reusable_transport_only_not_legacy_research_authority": true,
+  "schema": "mxm.research-core-v4.next-quote-sequence-acquisition-requirement.v1",
+  "selection_ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
+  "signal_symbols": [
+    {
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    },
+    {
+      "symbol": "GBPCAD",
+      "symbol_id": 19
+    },
+    {
+      "symbol": "JPN225",
+      "symbol_id": 116
+    }
+  ],
+  "source_environment": "Pepperstone - Europe LIVE",
+  "source_live_head": "825ac2903f5c133178e50717cc17e862bd49a0fc",
+  "status": "EXACT_FROZEN_REQUIREMENT_NOT_COLLECTION_OR_EXECUTION_AUTHORITY"
+}
