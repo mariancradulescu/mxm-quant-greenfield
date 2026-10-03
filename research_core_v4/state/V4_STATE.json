@@ -110,7 +110,7 @@
   "governance": {
     "autonomous_writer_workflows_enabled": false,
     "broker_acquisition_authorized": false,
-    "broker_contacted_by_v4": false,
+    "broker_contacted_by_v4": true,
     "candidate_frozen_count": 0,
     "candidate_promotion_authorized": false,
     "external_market_data_used": false,
@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "STOP_FOR_SECURE_CURRENT_METADATA_ONLY_CAPABILITY_NO_HISTORICAL_CAPTURE",
+  "next_action": "STOP_BEFORE_HISTORICAL_CAPTURE_PENDING_OUTCOME_BLIND_SCHEDULE_AND_ACQUISITION_PLAN_REVIEW",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
   "next_prospective_wave": {
     "ARM_authorized": false,
@@ -148,29 +148,29 @@
       "broker_contacted_by_Work": false,
       "contract_ref": "research_core_v4/state/QUOTE_CURRENT_METADATA_ANDROID_CONTRACT_V1.json",
       "contract_sha256": "1f87345dc3a63e7a69de3605fb39fbb27d4e8e6044e9c07ee8c2c5f7ab6739fa",
-      "current_metadata_run_performed": false,
+      "current_metadata_run_performed": true,
       "expected_return_package": "MXM_V4_CURRENT_METADATA_1576_RETURN_V1.zip",
       "historical_capture_authorized": false,
       "launcher": "V4_CURRENT_METADATA_RUN.py",
       "route": "EXISTING_DEVICE_LOCAL_OAUTH_CACHE_OR_FRESH_OFFICIAL_SCOPE_VIEW;NO_WORK_CREDENTIAL_CHANNEL_OR_GITHUB_SECRETS_REQUIRED",
       "scientific_execution_authorized": false,
       "source_package": "MXM_V4_CURRENT_METADATA_ANDROID_V1.zip",
-      "status": "READY_FOR_SINGLE_DEVICE_CURRENT_METADATA_RUN_NOT_EXECUTED"
+      "status": "DEVICE_CURRENT_METADATA_COMPLETED_INTAKE_VERIFIED"
     },
     "attempt_lock_present": false,
     "broker_acquisition_authorized": false,
     "candidate_promotion_authorized": false,
     "canonical_result_present": false,
     "confirmation_opened": false,
-    "current_metadata_credential_capability_missing": true,
+    "current_metadata_credential_capability_missing": false,
     "current_metadata_localization_authorized_by_task": true,
-    "current_metadata_localization_performed": false,
-    "current_metadata_localization_required": true,
+    "current_metadata_localization_performed": true,
+    "current_metadata_localization_required": false,
     "design": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V2.json",
     "design_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V2.json",
     "design_sha256": "f1c986e8588d721babf07eaa34fbf838077508cb96b8a6f35ef04812c379d5c8",
     "exact_discovery_scope_certified": false,
-    "final_symbol_count": null,
+    "final_symbol_count": 1576,
     "full_frontier_eligibility_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_FULL_FRONTIER_ELIGIBILITY_V1.json",
     "full_frontier_eligibility_sha256": "3b2b157ed810e13a1211de2e423ac727282764a409d3ec74621249909e525fef",
     "historical_V1_state": {
@@ -413,7 +413,16 @@
     "secure_channel_blocker_sha256": "33113c59ce6d8b6db342053fe4f64b2778f11b89dca24f90dd36ed9b275ac341",
     "secure_machine_side_broker_channel_available": false,
     "selected_mechanism_count": 1,
-    "status": "V1_PILOT_SUPERSEDED_V2_CONDITIONAL_CENSUS_CURRENT_METADATA_BLOCKED"
+    "status": "V1_PILOT_SUPERSEDED_V2_CONDITIONAL_CENSUS_CURRENT_METADATA_BLOCKED",
+    "current_metadata_localization_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_INTAKE_V1.json",
+    "current_metadata_eligibility_counts": {
+      "ECONOMICALLY_UNEXECUTABLE_FOR_EUR200": 0,
+      "METADATA_INSUFFICIENT": 0,
+      "STRUCTURALLY_ELIGIBLE": 1576,
+      "STRUCTURALLY_INELIGIBLE": 0
+    },
+    "current_metadata_eligible_census_count": 1576,
+    "current_metadata_eligible_census_identity_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1"
   },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
