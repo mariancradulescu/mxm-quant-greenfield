@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "STOP_BEFORE_HISTORICAL_CAPTURE_PENDING_OUTCOME_BLIND_SCHEDULE_AND_ACQUISITION_PLAN_REVIEW",
+  "next_action": "STOP_FOR_INDEPENDENT_BOUNDED_PROBE_PREPARATION_REVIEW",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
   "next_prospective_wave": {
     "ARM_authorized": false,
@@ -158,13 +158,38 @@
       "status": "DEVICE_CURRENT_METADATA_COMPLETED_INTAKE_VERIFIED"
     },
     "attempt_lock_present": false,
+    "bounded_support_transport_probe": {
+      "base_request_count": 1120,
+      "context_count": 29,
+      "contract_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V1.json",
+      "device_execution_after_review_only": true,
+      "executed": false,
+      "full_capture_authorized": false,
+      "historical_requests_sent": 0,
+      "identity_count": 56,
+      "method_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_METHOD_SUPPORT_AUDIT_V1.json",
+      "plan_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json",
+      "preparation_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_PREPARATION_AUDIT_V1.json",
+      "preparation_audit_sha256": "873ea9bd3177159b181753e0111d775aed0a700f73083a6f8cdea153b66a0b17",
+      "response_authorized": false,
+      "work_execution_authorized": false
+    },
     "broker_acquisition_authorized": false,
     "candidate_promotion_authorized": false,
     "canonical_result_present": false,
     "confirmation_opened": false,
     "current_metadata_credential_capability_missing": false,
+    "current_metadata_eligibility_counts": {
+      "ECONOMICALLY_UNEXECUTABLE_FOR_EUR200": 0,
+      "METADATA_INSUFFICIENT": 0,
+      "STRUCTURALLY_ELIGIBLE": 1576,
+      "STRUCTURALLY_INELIGIBLE": 0
+    },
+    "current_metadata_eligible_census_count": 1576,
+    "current_metadata_eligible_census_identity_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
     "current_metadata_localization_authorized_by_task": true,
     "current_metadata_localization_performed": true,
+    "current_metadata_localization_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_INTAKE_V1.json",
     "current_metadata_localization_required": false,
     "design": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V2.json",
     "design_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V2.json",
@@ -413,16 +438,7 @@
     "secure_channel_blocker_sha256": "33113c59ce6d8b6db342053fe4f64b2778f11b89dca24f90dd36ed9b275ac341",
     "secure_machine_side_broker_channel_available": false,
     "selected_mechanism_count": 1,
-    "status": "V1_PILOT_SUPERSEDED_V2_CONDITIONAL_CENSUS_CURRENT_METADATA_BLOCKED",
-    "current_metadata_localization_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_INTAKE_V1.json",
-    "current_metadata_eligibility_counts": {
-      "ECONOMICALLY_UNEXECUTABLE_FOR_EUR200": 0,
-      "METADATA_INSUFFICIENT": 0,
-      "STRUCTURALLY_ELIGIBLE": 1576,
-      "STRUCTURALLY_INELIGIBLE": 0
-    },
-    "current_metadata_eligible_census_count": 1576,
-    "current_metadata_eligible_census_identity_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1"
+    "status": "V2_CENSUS1576_CURRENT_METADATA_VERIFIED_BOUNDED_SUPPORT_PROBE_PREPARED_NOT_EXECUTED"
   },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
@@ -548,6 +564,6 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "QUOTE_SEQUENCE_SCOPE_AUDIT_PROSPECTIVE_CENSUS_FROZEN_CURRENT_METADATA_CREDENTIAL_BOUNDARY",
-  "stop_boundary": "NO_HISTORICAL_BID_ASK_CAPTURE_NO_RESPONSE_NO_ARM;FINAL_PANEL_CERTIFICATION_BLOCKED_ON_CURRENT_METADATA"
+  "status": "QUOTE_SEQUENCE_CURRENT_METADATA_COMPLETE_V2_RETAINED_BOUNDED_SUPPORT_PROBE_PREPARED_NOT_EXECUTED",
+  "stop_boundary": "NO_FULL_HISTORICAL_CAPTURE_NO_RESPONSE_NO_ARM;BOUNDED_PROBE_PREPARED_AWAITING_INDEPENDENT_REVIEW"
 }
