@@ -151,3 +151,56 @@ class ActualPathTests(unittest.TestCase):
   self.assertIn('STARTED',t.classify(True,False,True))
   self.assertIn('PUBLICATION_ONLY',t.classify(True,False,True,True))
   self.assertIn('DURABLE',t.classify(True,True))
+
+ def test_complete_result_recovery_without_second_worker(self):
+  self.decrypt();real=t.publish;calls=[]
+  def pub(expected,head):
+   calls.append(head)
+   if len(calls)==2:raise RuntimeError('synthetic lost result publication')
+   return real(expected,head)
+  with patch.object(t,'publish',side_effect=pub):
+   with self.assertRaises(RuntimeError):self.transaction()
+  cmd(self.root,'git','reset','--hard',calls[0])
+  candidate=self.out/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json'
+  decision=dict(publication_only_authorized=True,fence_commit=calls[0],result_sha256=h(candidate),decision_id='synthetic-publication-only')
+  with patch.object(t,'invoke_worker',side_effect=AssertionError('recovery must never invoke worker')):
+   report=t.recover_completed_result(candidate,self.out/'prepared.json',calls[0],decision)
+   self.assertEqual(t.remote_head(),report['commit'])
+   again=t.recover_completed_result(candidate,self.out/'prepared.json',calls[0],decision)
+   self.assertEqual(again['status'],'IDENTICAL_CANONICAL_RESULT_ALREADY_DURABLE')
+ def test_corrupted_recovered_prepared_attestation_denied(self):
+  self.decrypt();self.transaction()
+  candidate=self.out/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json';fence=json.loads((self.root/t.PUBLICATION).read_text())['fence_commit']
+  (self.out/'prepared.json').write_text('{}')
+  with self.assertRaises(AssertionError):t.recover_completed_result(candidate,self.out/'prepared.json',fence,dict(publication_only_authorized=True,fence_commit=fence,result_sha256=h(candidate),decision_id='synthetic'))
+ def test_worker_partial_opening_failure_never_reexecutes(self):
+  self.decrypt()
+  def worker(*args):
+   if args[-1]=='--prepare':return self.worker(*args)
+   (self.out/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json.opening.lock').write_text('synthetic opened')
+   (self.out/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json.tmp').write_text('partial')
+   raise RuntimeError('synthetic interrupted core')
+  with patch.object(t,'invoke_worker',side_effect=worker):
+   with self.assertRaises(RuntimeError):t.run_transaction(self.science,self.raw,self.out,self.wheels,self.pre)
+  self.assertIn('STARTED_OUTCOME_UNKNOWN',json.loads((self.out/t.FAILURE).read_text())['classification'])
+  with self.assertRaises(PermissionError):self.transaction()
+ def test_push_acknowledgement_loss_is_idempotent(self):
+  (self.root/'synthetic-marker').write_text('no market');head=commit(self.root,'synthetic publication only')
+  real=subprocess.run;pushes=[]
+  def wrapped(args,*a,**kw):
+   r=real(args,*a,**kw)
+   if isinstance(args,list) and 'push' in args:
+    pushes.append(args);r.returncode=1
+   return r
+  with patch.object(subprocess,'run',side_effect=wrapped):self.assertEqual(t.publish(self.armhead,head),head)
+  self.assertEqual(len(pushes),1);self.assertEqual(t.publish(self.armhead,head),head)
+ def test_ref_race_after_fetch_before_push_rejects_ancestor_reset(self):
+  (self.root/'synthetic-marker').write_text('no market');head=commit(self.root,'synthetic publication only')
+  real=subprocess.run
+  def wrapped(args,*a,**kw):
+   if isinstance(args,list) and 'push' in args:
+    real(['git','--git-dir='+str(self.remote),'update-ref','refs/heads/'+g.BRANCH,self.parent],check=True)
+   return real(args,*a,**kw)
+  with patch.object(subprocess,'run',side_effect=wrapped):
+   with self.assertRaises(PermissionError):t.publish(self.armhead,head)
+  self.assertEqual(t.remote_head(),self.parent)

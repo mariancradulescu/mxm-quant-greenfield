@@ -37,7 +37,7 @@ def fetch_wheel(directory):
  return p
 def container_command(root,science,raw,temporary,wheel_dir,mode):
  m=load();w=wheel_dir/m['numpy_wheel']['filename'];assert h(w)==m['numpy_wheel']['sha256']
- cmd=['docker','run','--rm','--platform','linux/amd64','--user',str(os.getuid())+':'+str(os.getgid()),'--network=none','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,size=512m']
+ cmd=['docker','run','--rm','--platform','linux/amd64','--user',str(os.getuid())+':'+str(os.getgid()),'--network=none','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--tmpfs','/tmp:rw,exec,nosuid,nodev,size=512m']
  for k,v in m['environment'].items():cmd+=['-e',k+'='+v]
  for src,dst,access in [(root,'/controls','ro'),(science,'/science','ro'),(raw,'/raw','ro'),(temporary,'/output','rw'),(wheel_dir,'/wheel','ro')]:cmd+=['-v',str(src.resolve())+':'+dst+':'+access]
  cmd += [m['container_image'],'sh','-ec','python -m pip install --disable-pip-version-check --no-index --no-deps --require-hashes --target /tmp/numeric --find-links /wheel -r /controls/research_core_v4/runtime/numeric-requirements-v1.txt >/dev/null; PYTHONPATH=/tmp/numeric:/science python /controls/research_core_v4/numeric_worker_v1.py '+mode]

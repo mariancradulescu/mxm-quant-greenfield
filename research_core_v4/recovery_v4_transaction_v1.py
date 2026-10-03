@@ -48,6 +48,25 @@ def verify_candidate(candidate,prepared):
  for flag in ['confirmation_execution_authorized','broker_acquisition_authorized','candidate_promotion_authorized']:assert x.get(flag) is False
  return x
 
+def persist_candidate(candidate,prepared,arm_head,fence,lock):
+ verify_candidate(candidate,prepared)
+ assert remote_head()==fence and git('rev-parse','HEAD')==fence
+ result=ROOT/g.RESULT_REL;assert not result.exists()
+ result.write_bytes(candidate.read_bytes())
+ with result.open('rb') as f:os.fsync(f.fileno())
+ publication={'schema':'mxm.v4.raw-canonical-publication.v1','arm_commit':arm_head,'fence_commit':fence,
+    'result_sha256':digest(result),'owner_run_id':lock['owner_run_id'],
+    'prepared':prepared,'attempt_fence':lock,'interpretation_performed':False,'accepted_canonical_result_count':1}
+ write(ROOT/PUBLICATION,publication)
+ st=g.load(g.STATE_REL);st['status']='FIRST_REAL_V4_RAW_CANONICAL_RESULT_PERSISTED_NOT_INTERPRETED'
+ fw=st['first_wave'];fw['development_execution_completed']=True;fw['development_raw_result_persisted']=True;fw['development_result_interpreted']=False;fw['current_recovery_execution_authorized']=False
+ p=st['recovery_v4_preparation'];p.update(status='RAW_CANONICAL_RESULT_PERSISTED_NOT_INTERPRETED',accepted_canonical_result_count=1,process_attempts_started=1,arm_present=True,attempt_lock_present=True,canonical_result_present=True,real_execution_authorized=False)
+ (ROOT/g.STATE_REL).write_text(json.dumps(st,indent=2,sort_keys=True)+'\n')
+ git('add',g.RESULT_REL,PUBLICATION,g.STATE_REL);git('commit','-m','v4: persist single raw result with exact transaction and numeric provenance')
+ final=git('rev-parse','HEAD');publish(fence,final)
+ assert subprocess.check_output(['git','-C',str(ROOT),'show',final+':'+g.RESULT_REL])==candidate.read_bytes()
+ return {'status':'RAW_CANONICAL_RESULT_DURABLE_NOT_INTERPRETED','commit':final,'result_sha256':digest(result)}
+
 def run_transaction(science,raw,temp,wheels,prelock):
  arm_head=git('rev-parse','HEAD');fence=None;fence_published=False;candidate=temp/'FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json'
  try:
@@ -77,21 +96,7 @@ def run_transaction(science,raw,temp,wheels,prelock):
   assert not (ROOT/g.RESULT_REL).exists()
   invoke_worker(science,raw,temp,wheels,'--execute')
   verify_candidate(candidate,prepared)
-  result=ROOT/g.RESULT_REL;assert not result.exists()
-  result.write_bytes(candidate.read_bytes())
-  with result.open('rb') as f:os.fsync(f.fileno())
-  publication={'schema':'mxm.v4.raw-canonical-publication.v1','arm_commit':arm_head,'fence_commit':fence,
-     'result_sha256':digest(result),'owner_run_id':os.environ['GITHUB_RUN_ID'],
-     'prepared':prepared,'attempt_fence':lock,'interpretation_performed':False,'accepted_canonical_result_count':1}
-  write(ROOT/PUBLICATION,publication)
-  st=g.load(g.STATE_REL);st['status']='FIRST_REAL_V4_RAW_CANONICAL_RESULT_PERSISTED_NOT_INTERPRETED'
-  fw=st['first_wave'];fw['development_execution_completed']=True;fw['development_raw_result_persisted']=True;fw['development_result_interpreted']=False;fw['current_recovery_execution_authorized']=False
-  p=st['recovery_v4_preparation'];p.update(status='RAW_CANONICAL_RESULT_PERSISTED_NOT_INTERPRETED',accepted_canonical_result_count=1,process_attempts_started=1,arm_present=True,attempt_lock_present=True,canonical_result_present=True,real_execution_authorized=False)
-  (ROOT/g.STATE_REL).write_text(json.dumps(st,indent=2,sort_keys=True)+'\n')
-  git('add',g.RESULT_REL,PUBLICATION,g.STATE_REL);git('commit','-m','v4: persist single raw result with exact transaction and numeric provenance')
-  final=git('rev-parse','HEAD');publish(fence,final)
-  assert subprocess.check_output(['git','-C',str(ROOT),'show',final+':'+g.RESULT_REL])==candidate.read_bytes()
-  return {'status':'RAW_CANONICAL_RESULT_DURABLE_NOT_INTERPRETED','commit':final,'result_sha256':digest(result)}
+  return persist_candidate(candidate,prepared,arm_head,fence,lock)
  except BaseException as exc:
   # This diagnostic never authorizes a second observation; absence of evidence is unknown.
   opening=candidate.with_suffix(candidate.suffix+'.opening.lock').exists()
@@ -106,6 +111,24 @@ def run_transaction(science,raw,temp,wheels,prelock):
      'exception_type':type(exc).__name__,'automatic_retry':False,'market_outcome_interpreted':False}
   (temp/FAILURE).write_text(json.dumps(failure,sort_keys=True)+'\n')
   raise
+
+def recover_completed_result(candidate:Path,prepared_file:Path,fence_head:str,decision:dict):
+    # This path has no worker/decrypt call and cannot generate a second observation.
+    assert decision.get('publication_only_authorized') is True
+    assert decision.get('fence_commit')==fence_head and decision.get('result_sha256')==digest(candidate)
+    assert isinstance(decision.get('decision_id'),str) and bool(decision['decision_id'])
+    lock=json.loads(subprocess.check_output(['git','-C',str(ROOT),'show',fence_head+':'+g.LOCK_REL]))
+    assert digest(prepared_file)==lock['prepared_sha256'],'recovered attestation differs from durable fence'
+    prepared=json.loads(prepared_file.read_text());verify_candidate(candidate,prepared)
+    remote=remote_head()
+    # Completion whose acknowledgement was lost is already accepted, never rewritten.
+    existing=subprocess.run(['git','-C',str(ROOT),'show',remote+':'+g.RESULT_REL],capture_output=True)
+    if existing.returncode==0:
+        assert existing.stdout==candidate.read_bytes(),'a different canonical result already exists'
+        return {'status':'IDENTICAL_CANONICAL_RESULT_ALREADY_DURABLE','commit':remote}
+    assert remote==fence_head and git('rev-parse','HEAD')==fence_head,'publication-only recovery requires exact surviving fence head; no rebase'
+    assert g.load(g.STATE_REL)['recovery_v4_preparation']['accepted_canonical_result_count']==0
+    return persist_candidate(candidate,prepared,lock['arm_commit'],fence_head,lock)
 
 def main():
  a=argparse.ArgumentParser();a.add_argument('--science',type=Path,required=True);a.add_argument('--raw',type=Path,required=True);a.add_argument('--temporary',type=Path,required=True);a.add_argument('--wheels',type=Path,required=True);a.add_argument('--prelock',type=Path,required=True);x=a.parse_args()
