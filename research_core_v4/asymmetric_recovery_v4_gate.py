@@ -203,6 +203,7 @@ def verify_boundary(*,arm_allowed:bool=False)->None:
     if not arm_allowed: req(not (ROOT/ARM_REL).exists(),"ARM already present")
     req(not (ROOT/LOCK_REL).exists(),"Recovery V4 attempt lock already present")
     req(not (ROOT/RESULT_REL).exists(),"canonical result already present")
+    for rel in [RESULT_REL+".tmp","V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json","V4_FIRST_DEVELOPMENT_RESPONSE_RESULT_V1.json.tmp"]: req(not (ROOT/rel).exists(),"alternate/partial canonical result present")
     st=load(STATE_REL)
     prep=st.get("recovery_v4_preparation",{})
     if prep: req(prep.get("accepted_canonical_result_count",0)==0 and prep.get("real_execution_authorized") is False,"V4 state execution/result boundary")
@@ -244,7 +245,8 @@ def arm_binding_files()->list[str]:
             'research_core_v4/numeric_worker_v1.py',
             'research_core_v4/runtime/NUMERIC_ENVIRONMENT_V1.json',
             'research_core_v4/runtime/numeric-requirements-v1.txt',
-            'research_core_v4/state/V4_EXECUTION_PATH_DEEP_AUDIT_V1.json']
+            'research_core_v4/state/V4_EXECUTION_PATH_DEEP_AUDIT_V1.json',
+            'research_core_v4/runtime/V4_CRASH_RECOVERY_LAW_V1.json']
 
 def build_arm_document(parent_head:str,decision:dict)->dict:
     # Pure constructor: caller must separately publish a single-file ARM commit.
@@ -267,6 +269,7 @@ def validate_arm_binding(arm_path:Path)->dict:
     req(arm_path.resolve()==(ROOT/ARM_REL).resolve(),'canonical ARM path required')
     verify_boundary(arm_allowed=True); validate_certificate(True)
     active=load(V4_ACTIVE_REL)
+    req(active.get('execution_path_bindings',{})==load(CERT_REL).get('execution_path_bindings',{}),'authority/certificate controls disagree')
     req(active.get('status')=='ACTIVE_TRANSPORT_ONLY_SUCCESSOR_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED','active V4 authority status')
     arm=json.loads(arm_path.read_text())
     req(load(STATE_REL).get('execution_path_audit',{}).get('status')=='READY_FOR_SEPARATE_ARM_GOVERNANCE_DECISION','execution path not certified ready')

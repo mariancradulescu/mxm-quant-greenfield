@@ -14,7 +14,8 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11.16"}
       - name: Hash-locked synthetic test dependency
-        run: python -m pip install --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
+        run: |
+          python -m pip install --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
       - name: Execute actual V4 control mechanics on isolated synthetic Git and cryptographic evidence
         run: python -m unittest -v tests.test_research_core_v4_actual_path
       - name: Fetch immutable numerical environment
