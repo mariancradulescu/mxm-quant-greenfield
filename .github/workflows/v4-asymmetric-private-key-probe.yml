@@ -1,0 +1,52 @@
+name: V4 Asymmetric Private Key Presence and Pair Probe
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - ".github/workflows/v4-asymmetric-private-key-probe.yml"
+      - "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      EXPECTED_SPKI_SHA256: "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11"
+      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify committed public key fingerprint
+        run: |
+          set -euo pipefail
+          actual="$(openssl pkey -pubin -in research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem -outform DER | sha256sum | awk '{print $1}')"
+          test "$actual" = "$EXPECTED_SPKI_SHA256"
+          echo "COMMITTED_PUBLIC_KEY_FINGERPRINT_STATUS=MATCH"
+      - name: Non-revealing private-key secret presence and pair probe
+        run: |
+          set -euo pipefail
+          if [ -z "${MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM:-}" ]; then
+            echo "PRIVATE_KEY_SECRET_STATUS=ABSENT"
+            echo "PRIVATE_KEY_PAIR_STATUS=NOT_TESTED"
+            exit 0
+          fi
+          echo "PRIVATE_KEY_SECRET_STATUS=PRESENT"
+          keyfile="$RUNNER_TEMP/mxm_v4_private_key.pem"
+          umask 077
+          printf '%s' "$MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM" > "$keyfile"
+          chmod 600 "$keyfile"
+          if ! openssl pkey -in "$keyfile" -pubout -outform DER > "$RUNNER_TEMP/derived-public.der" 2>/dev/null; then
+            rm -f "$keyfile" "$RUNNER_TEMP/derived-public.der"
+            echo "PRIVATE_KEY_PAIR_STATUS=INVALID_PRIVATE_KEY"
+            exit 1
+          fi
+          actual="$(sha256sum "$RUNNER_TEMP/derived-public.der" | awk '{print $1}')"
+          rm -f "$keyfile" "$RUNNER_TEMP/derived-public.der"
+          if [ "$actual" != "$EXPECTED_SPKI_SHA256" ]; then
+            echo "PRIVATE_KEY_PAIR_STATUS=FINGERPRINT_MISMATCH"
+            exit 1
+          fi
+          echo "PRIVATE_KEY_PAIR_STATUS=MATCH"
