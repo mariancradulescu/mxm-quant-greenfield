@@ -1,0 +1,16 @@
+name: V4 Asymmetric Private Key Pair Final Validation
+on:
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  validate-key-pair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - name: Non-revealing private/public key-pair validation
+        run: python research_core_v4/asymmetric_recovery_v4_gate.py --keypair-only
