@@ -265,9 +265,9 @@ def main()->None:
     ap.add_argument("--preflight-output",type=Path)
     ap.add_argument("--runtime-arm",type=Path)
     ap.add_argument("--raw-output",type=Path)
-    ap.add_argument("--audit",action="store_true")
+    ap.add_argument("--audit",action="store_true")\n    ap.add_argument("--keypair-only",action="store_true")
     x=ap.parse_args()
-    modes=sum([x.preflight_output is not None,x.runtime_arm is not None,x.audit])
+    modes=sum([x.preflight_output is not None,x.runtime_arm is not None,x.audit,x.keypair_only])
     req(modes==1,"choose one mode")
     if x.preflight_output is not None:
         run_preflight(x.preflight_output)
