@@ -1,90 +1,66 @@
 name: V4 Greenfield Recovery V4 Asymmetric
-
 on:
   push:
     branches: [performance-research-v3-20260922]
-    paths:
-      - "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json"
-
-permissions:
-  contents: write
-
+    paths: ["research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json"]
+permissions: {contents: write}
 concurrency:
   group: MXM_V4_FIRST_DEV_GREENFIELD_RECOVERY_V4_SINGLETON
   cancel-in-progress: false
-
 jobs:
   recovery-v4:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
-    env:
-      RESULT_PATH: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
-      ATTEMPT_LOCK: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
-      ARM_PATH: research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
-      MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
     steps:
       - name: Checkout triggering ARM commit
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-
+        with: {ref: "${{ github.sha }}", fetch-depth: 0}
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - run: python -m pip install --disable-pip-version-check numpy
-
-      - name: Real asymmetric prelock validation and exact input recovery
+        with: {python-version: "3.11.16"}
+      - name: Reject workflow replay and stale ARM before any input recovery
         run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/v4-raw"
-          python research_core_v4/asymmetric_recovery_v4_gate.py \
-            --runtime-arm "$ARM_PATH" \
-            --raw-output "$RUNNER_TEMP/v4-raw"
-
-      - name: Checkout byte-identical frozen science from canonical Greenfield
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          python - <<'PY'
+          from research_core_v4 import asymmetric_recovery_v4_gate as g
+          g.validate_arm_binding(g.ROOT/g.ARM_REL)
+          PY
+      - name: Recover exact inputs with private key scoped to this step only
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          python -m research_core_v4.asymmetric_recovery_v4_gate --runtime-arm research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json --raw-output "$RUNNER_TEMP/v4-raw" --prelock-report "$RUNNER_TEMP/v4-prelock.json"
+      - name: Checkout byte-identical frozen science
         uses: actions/checkout@v4
         with:
           repository: mariancradulescu/mxm-quant-greenfield
           ref: 68bdee4b51244ae50acd56fe868468b96106450f
           path: science
           persist-credentials: false
-
-      - name: Reverify frozen science before attempt lock
+      - name: Fetch immutable numerical image and exact hash-locked wheel
         run: |
-          set -euo pipefail
-          echo "3f9a6b1da92b9904da91e86d005f26e8e99d93e5e3497e1b8a72b59b1d4e590e  science/research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json" | sha256sum -c -
-          echo "bb846fb3bbbe567c53587a6c22b344ffe39af7129db5e9a4a39c77026f3ade2a  science/research_core_v4/response_evaluator_v3.py" | sha256sum -c -
-          echo "cebcf2ad4f88e40d575cb46ffc14e0862107b47a84260a15b3310f075af4f79d  science/research_core_v4/development_execution_runner_v1.py" | sha256sum -c -
-          echo "0a7bda1afe5cbe79373ee833e9d09febc08721d1826d94435f74d900f74f26ed  science/research_core_v4/frozen_v2_semantics.py" | sha256sum -c -
-          test ! -e "$ATTEMPT_LOCK"
-          test ! -e "$RESULT_PATH"
-
-      - name: Persist exactly-once Recovery V4 attempt lock
+          python -m research_core_v4.numeric_environment_v1 --fetch-wheel "$RUNNER_TEMP/v4-wheels"
+          image=$(python -c 'from research_core_v4.numeric_environment_v1 import load; print(load()["container_image"])')
+          docker pull --platform linux/amd64 "$image"
+      - name: Prevalidate frozen runner, fence once, execute offline, publish raw result
         run: |
-          set -euo pipefail
-          printf '%s\n' "${{ github.sha }}" > "$ATTEMPT_LOCK"
+          umask 077
           git config user.name mxm-v4-recovery-machine
           git config user.email mxm-v4-recovery-machine@users.noreply.github.com
-          git add "$ATTEMPT_LOCK"
-          git commit -m "v4: persist single asymmetric Recovery V4 attempt lock"
-          git push origin HEAD:performance-research-v3-20260922
-
-      - name: Execute exact frozen development response once
-        run: |
-          python science/research_core_v4/development_execution_runner_v1.py \
-            --raw-root "$RUNNER_TEMP/v4-raw" \
-            --output "$RUNNER_TEMP/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json" \
-            --execute-authorized-development
-
-      - name: Persist raw canonical result before interpretation
-        run: |
-          set -euo pipefail
-          test -f "$RUNNER_TEMP/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json"
-          test ! -e "$RESULT_PATH"
-          install -m 0600 "$RUNNER_TEMP/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json" "$RESULT_PATH"
-          git add "$RESULT_PATH"
-          git commit -m "v4: persist single raw asymmetric Recovery V4 result"
-          git push origin HEAD:performance-research-v3-20260922
-          echo "STOP: raw result persisted; interpretation is a separate future action"
+          mkdir -p "$RUNNER_TEMP/v4-transaction"
+          python -m research_core_v4.recovery_v4_transaction_v1 --science "$PWD/science" --raw "$RUNNER_TEMP/v4-raw" --temporary "$RUNNER_TEMP/v4-transaction" --wheels "$RUNNER_TEMP/v4-wheels" --prelock "$RUNNER_TEMP/v4-prelock.json"
+      - name: Preserve completed raw result or failure diagnostics without recomputation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v4-raw-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/v4-transaction/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
+            ${{ runner.temp }}/v4-transaction/prepared.json
+            ${{ runner.temp }}/v4-transaction/failure-classification.json
+            ${{ runner.temp }}/v4-transaction/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json.opening.lock
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Remove plaintext exact inputs
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/v4-raw"

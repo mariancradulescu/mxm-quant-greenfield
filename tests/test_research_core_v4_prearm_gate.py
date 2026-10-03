@@ -96,7 +96,10 @@ class RecoveryV3PreArmGateTests(unittest.TestCase):
                 with self.subTest(expected=expected[0]): self._assert_failure_without_lock(lambda e=expected:verify_plaintext_directory_against(root,e))
 
     def test_installed_workflow_order_is_prelock_safe(self):
-        t=(Path(__file__).resolve().parents[1]/".github/workflows/v4-greenfield-recovery-v3.yml").read_text()
+        root=Path(__file__).resolve().parents[1]
+        current=(root/".github/workflows/v4-greenfield-recovery-v3.yml").read_text()
+        self.assertNotIn("--execute-authorized-development",current); self.assertNotIn("secrets.",current)
+        t=(root/"research_core_v4/runtime/SUPERSEDED_RECOVERY_V3_WORKFLOW_READ_ONLY.yml").read_text()
         self.assertIn('paths: ["research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V3_ARM_V1.json"]',t); self.assertNotIn("workflow_dispatch",t)
         arm=t.index("--validate-runtime"); decrypt=t.index("Decrypt exact staged input bundle into RUNNER_TEMP"); plain=t.index("--verify-plaintext-dir"); science=t.index("Validate byte-identical frozen science before attempt lock"); lock=t.index("Persist exactly-once Recovery V3 attempt lock"); execute=t.index("--execute-authorized-development")
         self.assertLess(arm,decrypt); self.assertLess(decrypt,plain); self.assertLess(plain,science); self.assertLess(science,lock); self.assertLess(lock,execute)

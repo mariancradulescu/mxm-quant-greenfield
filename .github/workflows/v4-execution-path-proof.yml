@@ -1,0 +1,41 @@
+name: V4 Outcome Blind Execution Path Proof
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: ["research_core_v4/state/V4_EXECUTION_PATH_PROOF_TRIGGER_V1.txt"]
+permissions: {contents: read}
+jobs:
+  prove:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11.16"}
+      - name: Hash-locked synthetic test dependency
+        run: python -m pip install --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
+      - name: Execute actual V4 control mechanics on isolated synthetic Git and cryptographic evidence
+        run: python -m unittest -v tests.test_research_core_v4_actual_path
+      - name: Fetch immutable numerical environment
+        run: |
+          python -m research_core_v4.numeric_environment_v1 --fetch-wheel "$RUNNER_TEMP/wheels"
+          image=$(python -c 'from research_core_v4.numeric_environment_v1 import load; print(load()["container_image"])')
+          docker pull --platform linux/amd64 "$image"
+      - name: Probe pinned numerical environment twice with synthetic frozen computation
+        run: |
+          python - <<'PY'
+          import subprocess,pathlib,os,json
+          from research_core_v4 import numeric_environment_v1 as n
+          root=pathlib.Path.cwd();temp=pathlib.Path(os.environ['RUNNER_TEMP'])
+          out=temp/'probe';out.mkdir();raw=temp/'synthetic-empty';raw.mkdir()
+          c=n.container_command(root,root,raw,out,temp/'wheels','--probe')
+          results=[subprocess.check_output(c,text=True).strip().splitlines()[-1] for _ in range(2)]
+          assert results[0]==results[1]
+          m=n.load()
+          if m['probe_sha256'] is not None: assert m['probe_sha256']==results[0]
+          print('NUMERIC_PROBE_SHA256='+results[0])
+          print('IMMUTABLE_IMAGE='+m['container_image'])
+          PY
+      - name: Reconfirm current real repository remains before ARM
+        run: python -m research_core_v4.asymmetric_recovery_v4_gate --audit

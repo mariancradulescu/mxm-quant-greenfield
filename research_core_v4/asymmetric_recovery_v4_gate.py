@@ -161,6 +161,7 @@ def verify_plaintext_dir(raw:Path,series:list[dict])->list[dict]:
 def decrypt_verify(raw_output:Path|None=None)->dict:
     verify_public_and_probe(); m,_=verify_staged_ciphertext(); frozen=verify_frozen()
     td_obj=tempfile.TemporaryDirectory(prefix="mxm-v4-asym-"); td=Path(td_obj.name)
+    gpghome=td/"gnupg"; gpghome.mkdir(mode=0o700)
     try:
         key,fp=_private_key_from_secret(td)
         passfile=td/"bundle-passphrase"; 
@@ -174,7 +175,7 @@ def decrypt_verify(raw_output:Path|None=None)->dict:
                     for b in iter(lambda:f.read(1024*1024),b""): w.write(b)
         req(sha256_file(cipher)==EXPECTED_ENCRYPTED_BUNDLE_SHA,"reconstructed ciphertext")
         tar=td/"bundle.tar"
-        r=subprocess.run(["gpg","--batch","--yes","--pinentry-mode","loopback","--passphrase-file",str(passfile),"--output",str(tar),"--decrypt",str(cipher)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        r=subprocess.run(["gpg","--homedir",str(gpghome),"--no-symkey-cache","--batch","--yes","--pinentry-mode","loopback","--passphrase-file",str(passfile),"--output",str(tar),"--decrypt",str(cipher)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         req(r.returncode==0 and tar.is_file(),"OpenPGP decrypt/integrity")
         req(sha256_file(tar)==EXPECTED_PLAINTEXT_BUNDLE_SHA,"plaintext deterministic bundle hash")
         raw=raw_output if raw_output is not None else td/"raw"
@@ -189,6 +190,7 @@ def decrypt_verify(raw_output:Path|None=None)->dict:
         rows=verify_plaintext_dir(raw,series)
         return {"private_key_parse_status":"VALID","private_derived_public_spki_sha256":fp,"fingerprint_status":"MATCH","wrapped_bundle_passphrase_decrypt":"SUCCESS","encrypted_bulk_decrypt":"SUCCESS","openpgp_integrity_check":"SUCCESS","plaintext_bundle_sha256":EXPECTED_PLAINTEXT_BUNDLE_SHA,"exact_plaintext_series_count":18,"all_18_sha256_match":True,"all_18_row_counts_match":True,"all_18_first_timestamps_match":True,"all_18_last_timestamps_match":True,"frozen_hashes":frozen,"series":rows}
     finally:
+        subprocess.run(["gpgconf","--homedir",str(gpghome),"--kill","gpg-agent"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         if raw_output is None: td_obj.cleanup()
         else:
             for p in td.iterdir():
@@ -221,6 +223,7 @@ def validate_certificate(final_required:bool=False)->dict:
     req(cert.get("exact_18_series")==expected_series(),"certificate exact 18")
     req(cert.get("accepted_canonical_result_count")==0 and cert.get("arm_present_at_staging") is False and cert.get("attempt_lock_present_at_staging") is False and cert.get("real_execution_authorized_at_staging") is False,"certificate hard stop")
     req(cert.get("installed_recovery_workflow_sha256")==sha256_file(ROOT/WORKFLOW_REL),"certificate runtime workflow binding")
+    for rel,want in cert.get("execution_path_bindings",{}).items(): req(sha256_file(ROOT/rel)==want,"execution control binding "+rel)
     req(cert.get("asymmetric_transport_supersession_sha256")==sha256_file(ROOT/SUPERSESSION_REL),"certificate transport supersession binding")
     return cert
 
@@ -233,21 +236,65 @@ def run_preflight(output:Path)->dict:
     print(json.dumps({k:result[k] for k in ["conclusion","run_id","private_key_parse_status","private_derived_public_spki_sha256","fingerprint_status","exact_plaintext_series_count","plaintext_bundle_sha256"]},sort_keys=True))
     return result
 
+def arm_binding_files()->list[str]:
+    return [V4_ACTIVE_REL,CERT_REL,WORKFLOW_REL,MANIFEST_REL,
+            'research_core_v4/asymmetric_recovery_v4_gate.py',
+            'research_core_v4/recovery_v4_transaction_v1.py',
+            'research_core_v4/numeric_environment_v1.py',
+            'research_core_v4/numeric_worker_v1.py',
+            'research_core_v4/runtime/NUMERIC_ENVIRONMENT_V1.json',
+            'research_core_v4/runtime/numeric-requirements-v1.txt',
+            'research_core_v4/state/V4_EXECUTION_PATH_DEEP_AUDIT_V1.json']
+
+def build_arm_document(parent_head:str,decision:dict)->dict:
+    # Pure constructor: caller must separately publish a single-file ARM commit.
+    audit()
+    head=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+    req(head==parent_head,'constructor parent must be checked-out certified head')
+    req(decision.get('explicit_separate_arm_authorization') is True and
+        isinstance(decision.get('decision_id'),str) and bool(decision['decision_id']) and
+        decision.get('certified_parent_head')==parent_head,'separate exact-parent governance decision')
+    req(load(STATE_REL).get('execution_path_audit',{}).get('status')=='READY_FOR_SEPARATE_ARM_GOVERNANCE_DECISION','execution path not ready')
+    tree=subprocess.check_output(['git','-C',str(ROOT),'rev-parse',parent_head+'^{tree}'],text=True).strip()
+    return {'schema':'mxm.research-core-v4.recovery-v4-arm.v2','status':'ARMED_NOT_EXECUTED',
+      'canonical_repository':REPO,'research_branch':BRANCH,'pre_arm_parent_head':parent_head,
+      'pre_arm_parent_tree':tree,'bound_files_sha256':{rel:sha256_file(ROOT/rel) for rel in arm_binding_files()},
+      'governance_decision':decision,'accepted_canonical_result_count':0,
+      'accepted_canonical_result_limit':1,'no_prior_recovery_v4_attempt_lock':True,
+      'no_canonical_result_present':True,'automatic_retry':False}
+
+def validate_arm_binding(arm_path:Path)->dict:
+    req(arm_path.resolve()==(ROOT/ARM_REL).resolve(),'canonical ARM path required')
+    verify_boundary(arm_allowed=True); validate_certificate(True)
+    active=load(V4_ACTIVE_REL)
+    req(active.get('status')=='ACTIVE_TRANSPORT_ONLY_SUCCESSOR_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED','active V4 authority status')
+    arm=json.loads(arm_path.read_text())
+    req(load(STATE_REL).get('execution_path_audit',{}).get('status')=='READY_FOR_SEPARATE_ARM_GOVERNANCE_DECISION','execution path not certified ready')
+    req(arm.get('schema')=='mxm.research-core-v4.recovery-v4-arm.v2' and arm.get('status')=='ARMED_NOT_EXECUTED' and 'arm_commit' not in arm,'nonrecursive ARM schema')
+    req(arm.get('canonical_repository')==REPO and arm.get('research_branch')==BRANCH,'ARM repository/branch')
+    head=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+    req(subprocess.check_output(['git','-C',str(ROOT),'show',head+':'+ARM_REL])==arm_path.read_bytes(),'ARM worktree bytes differ from committed event')
+    req(os.environ.get('GITHUB_SHA')==head and os.environ.get('GITHUB_RUN_ATTEMPT')=='1','exact event head / first workflow attempt only')
+    parents=subprocess.check_output(['git','-C',str(ROOT),'rev-list','--parents','-n','1','HEAD'],text=True).split()
+    req(len(parents)==2 and parents[1]==arm.get('pre_arm_parent_head'),'ARM parent binding')
+    tree=subprocess.check_output(['git','-C',str(ROOT),'rev-parse',parents[1]+'^{tree}'],text=True).strip()
+    req(tree==arm.get('pre_arm_parent_tree'),'parent tree binding')
+    changed=subprocess.check_output(['git','-C',str(ROOT),'diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines()
+    req(changed==[ARM_REL],'isolated ARM commit')
+    req(arm.get('bound_files_sha256')=={rel:sha256_file(ROOT/rel) for rel in arm_binding_files()},'complete control/input/environment bindings')
+    d=arm.get('governance_decision',{})
+    req(d.get('explicit_separate_arm_authorization') is True and d.get('certified_parent_head')==parents[1] and isinstance(d.get('decision_id'),str) and bool(d['decision_id']),'explicit separate governance decision')
+    req(arm.get('accepted_canonical_result_count')==0 and arm.get('accepted_canonical_result_limit')==1 and arm.get('automatic_retry') is False and arm.get('no_prior_recovery_v4_attempt_lock') is True and arm.get('no_canonical_result_present') is True,'ARM exactly-once boundary')
+    subprocess.check_call(['git','-C',str(ROOT),'fetch','--no-tags','origin','+refs/heads/'+BRANCH+':refs/remotes/origin/'+BRANCH],stdout=subprocess.DEVNULL)
+    remote=subprocess.check_output(['git','-C',str(ROOT),'rev-parse','origin/'+BRANCH],text=True).strip()
+    req(remote==head,'remote drift/replay before decryption')
+    return {'arm_commit':head,'pre_arm_parent_head':parents[1],'arm_document_sha256':sha256_file(arm_path)}
+
 def validate_arm_and_runtime(arm_path:Path,raw_output:Path)->dict:
-    verify_boundary(arm_allowed=True); cert=validate_certificate(True); active=load(V4_ACTIVE_REL)
-    req(active.get("status")=="ACTIVE_TRANSPORT_ONLY_SUCCESSOR_STAGED_VALIDATED_NOT_ARMED_NOT_EXECUTED","active V4 authority status")
-    arm=json.loads(arm_path.read_text()); req(arm.get("schema")=="mxm.research-core-v4.recovery-v4-arm.v1" and arm.get("status")=="ARMED_NOT_EXECUTED","ARM schema/status")
-    head=subprocess.check_output(["git","-C",str(ROOT),"rev-parse","HEAD"],text=True).strip()
-    parents=subprocess.check_output(["git","-C",str(ROOT),"rev-list","--parents","-n","1","HEAD"],text=True).split(); req(len(parents)==2,"ARM commit parent count")
-    changed=subprocess.check_output(["git","-C",str(ROOT),"diff-tree","--no-commit-id","--name-only","-r","HEAD"],text=True).splitlines()
-    req(head==arm.get("arm_commit") and parents[1]==arm.get("pre_arm_parent_head") and changed==[ARM_REL],"ARM exact commit binding")
-    req(arm.get("active_recovery_authority_sha256")==sha256_file(ROOT/V4_ACTIVE_REL),"ARM authority binding")
-    req(arm.get("staging_certificate_sha256")==sha256_file(ROOT/CERT_REL),"ARM staging certificate binding")
-    req(arm.get("installed_recovery_workflow_sha256")==sha256_file(ROOT/WORKFLOW_REL),"ARM workflow binding")
-    req(arm.get("accepted_canonical_result_count")==0 and arm.get("no_prior_recovery_v4_attempt_lock") is True and arm.get("no_canonical_result_present") is True,"ARM result/lock boundary")
+    binding=validate_arm_binding(arm_path)
     out=decrypt_verify(raw_output)
-    req(not (ROOT/LOCK_REL).exists() and not (ROOT/RESULT_REL).exists(),"prelock invariant")
-    return {"status":"PASS_RECOVERY_V4_PRELOCK_RUNTIME_VALIDATION","arm_commit":head,"pre_arm_parent_head":parents[1],**out}
+    req(not (ROOT/LOCK_REL).exists() and not (ROOT/RESULT_REL).exists(),'prelock invariant')
+    return {'status':'PASS_RECOVERY_V4_PRELOCK_RUNTIME_VALIDATION',**binding,**out}
 
 def audit()->dict:
     verify_boundary(); static=verify_public_and_probe(); frozen=verify_frozen(); sup=load(SUPERSESSION_REL)
@@ -267,6 +314,7 @@ def audit()->dict:
 def main()->None:
     ap=argparse.ArgumentParser()
     ap.add_argument("--preflight-output",type=Path)
+    ap.add_argument("--prelock-report",type=Path)
     ap.add_argument("--runtime-arm",type=Path)
     ap.add_argument("--raw-output",type=Path)
     ap.add_argument("--audit",action="store_true")
@@ -284,7 +332,9 @@ def main()->None:
     elif x.runtime_arm is not None:
         req(x.raw_output is not None,"runtime raw output required")
         x.raw_output.mkdir(parents=True,exist_ok=True)
-        print(json.dumps(validate_arm_and_runtime(x.runtime_arm,x.raw_output),sort_keys=True))
+        report=validate_arm_and_runtime(x.runtime_arm,x.raw_output)
+        if x.prelock_report is not None: x.prelock_report.write_text(json.dumps(report,sort_keys=True)+"\n")
+        print(json.dumps(report,sort_keys=True))
     else:
         print(json.dumps(audit(),sort_keys=True))
 
