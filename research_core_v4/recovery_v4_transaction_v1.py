@@ -41,11 +41,10 @@ def verify_science(science):
 def invoke_worker(science,raw,temp,wheels,mode):
  subprocess.check_call(n.container_command(ROOT,science,raw,temp,wheels,mode))
 def verify_candidate(candidate,prepared):
- x=json.loads(candidate.read_text());assert x.get('schema')=='mxm.research-core-v4.development-response-result.v2';declared=x.pop('raw_result_sha256_without_self_field',None)
- canonical=(json.dumps(x,sort_keys=True,separators=(',',':'),ensure_ascii=False)+'\n').encode()
- assert declared==hashlib.sha256(canonical).hexdigest(),'raw result self-digest'
- assert x.get('execution_provenance')==prepared['provenance'],'exact prepared provenance'
- for flag in ['confirmation_execution_authorized','broker_acquisition_authorized','candidate_promotion_authorized']:assert x.get(flag) is False
+ # Verify the producer's original byte ordering; decoded integer keys are strings.
+ from research_core_v4.publication_only_v1 import verify_candidate_metadata, SELF_FIELD
+ x,_=verify_candidate_metadata(candidate.read_bytes(),prepared)
+ x.pop(SELF_FIELD)
  return x
 
 def persist_candidate(candidate,prepared,arm_head,fence,lock):
