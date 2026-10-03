@@ -166,10 +166,10 @@ class ExecutionBindingTests(unittest.TestCase):
         self.assertFalse(historical["first_wave"]["development_outcomes_opened"])
         self.assertFalse(historical["first_wave"]["confirmation_outcomes_opened"])
 
-        # Separately validate the current interrupted/recovery state without making
-        # the frozen runner accept it as a fresh READY state.
-        from research_core_v4.crash_recovery_control_v3 import validate_current_control_plane
-        report=validate_current_control_plane()
+        # Validate the immutable V3 history and current V4 transport independently;
+        # the frozen runner still rejects the recovery state as fresh READY.
+        from tests.test_research_core_v4_control_state_history import validate_historical_v3_and_current_transport
+        report=validate_historical_v3_and_current_transport()
         self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED_NO_REAL_RESPONSE_EXECUTION")
         self.assertEqual(report["accepted_canonical_result_count"],0)
         self.assertFalse(report["real_execution_authorized"])

@@ -105,12 +105,12 @@ class ResearchCoreV4MethodTests(unittest.TestCase):
         self.assertTrue(ca["protected_forward_forbidden"])
 
     def test_v4_canonical_state_is_valid_under_recovery_control_plane(self):
-        from research_core_v4.crash_recovery_control_v3 import validate_current_control_plane
+        from tests.test_research_core_v4_control_state_history import validate_historical_v3_and_current_transport
 
         state=load("research_core_v4/state/V4_STATE.json")
         authority=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_EXECUTION_AUTHORITY_V3.json")
         recovery=load("research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_AUTHORITY_V3.json")
-        report=validate_current_control_plane()
+        report=validate_historical_v3_and_current_transport()
         self.assertEqual(report["status"],"PASS_GREENFIELD_RECOVERY_V3_FAIL_CLOSED_PRE_ARM_BLOCKED_NO_REAL_RESPONSE_EXECUTION")
         self.assertEqual(report["accepted_canonical_result_count"],0)
         self.assertFalse(report["real_execution_authorized"])
