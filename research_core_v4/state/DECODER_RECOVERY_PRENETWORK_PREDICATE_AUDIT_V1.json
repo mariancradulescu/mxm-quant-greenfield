@@ -1,0 +1,240 @@
+{
+  "all_predicates": [
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "original STOP hash",
+      "runtime_rule": "Exact authority hash; actual device bytes must match and unseal; byte identical original archive on resumes",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "plan SHA256",
+      "runtime_rule": "Exact frozen committed plan bytes must hash to authority PLAN_SHA",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "attempt_index",
+      "runtime_rule": "Original0, replacement1; all journal indexes typed int and contiguous",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "retry_index",
+      "runtime_rule": "Original and replacement0; all indexes typed int,0..2",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "wire attempt count",
+      "runtime_rule": "Exactly1 before replacement; no extra first-request attempt later",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "outcome count",
+      "runtime_rule": "Exactly1 before replacement; unique typed indexes and corresponding request scope",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "returned_ticks",
+      "runtime_rule": "Exactly66 from immutable explicitly authorized replacement_shape, confirmed by actual sealed original outcome",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "hasMore",
+      "runtime_rule": "False from immutable explicitly authorized replacement_shape, confirmed by actual sealed original outcome",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "schedule status",
+      "runtime_rule": "Exact EXACT_FROZEN_WINDOWS_MATCH and empty mismatches in actual sealed report",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "terminal_recovery_stop",
+      "runtime_rule": "Any presence blocks before OAuth; generic bypass prohibited",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "storage cap",
+      "runtime_rule": "Count actual local file bytes including evidence archive/fences; cap2GB unchanged",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "wire cap",
+      "runtime_rule": "Check actual entire sealed journal before OAuth; max11200 unchanged",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "EXACT_REPOSITORY_BOUND_CONSTANT",
+      "predicate": "logical execution count",
+      "runtime_rule": "Exactly1 in existing private plan registry; no second registry created",
+      "source": "DECODER_RECOVERY_AUTHORITY_V1.json; accepted transport writer; user explicit recovery authorization"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "request_id",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "symbol_id",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "side",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "from_ms",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "to_ms",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "symbol",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "asset_class",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "week_index",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "iso_week_monday",
+      "runtime_rule": "Exact first slot matches authority; original/replacement journals require request ID/window/depth0/retry0. Symbol/side derive from frozen slot because original writer did not journal those separately. Actual wire account bound to unchanged account fingerprint.",
+      "source": "SHA-bound frozen first PLANNED slot plus immutable exact request authority"
+    },
+    {
+      "classification": "DERIVED_FROM_FROZEN_PLAN",
+      "predicate": "schedule counts",
+      "runtime_rule": "Compute56/1120/560 from plan; typed exact integers, never report literals.",
+      "source": "Frozen plan identities/slots/distinct symbol-week pairs"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "private folder registry binding",
+      "runtime_rule": "Existing unsealed PLAN_SHA/resolved folder hash/logical count must match; initial exact registry bytes hash-bound and checked on every resume",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "active_seconds",
+      "runtime_rule": "Actual sealed finite non-bool numeric >0 and <=7200. Archive exact bytes, bind their SHA and exact original numeric. Current must remain >= archived original. Cumulative arithmetic previous+(now-start), preserving precision.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "completed directory",
+      "runtime_rule": "Before replacement no persisted file at all. Later normal probe replay retains all existing chunks.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "raw directory",
+      "runtime_rule": "Before replacement no persisted file at all. Real quotes never inspected in Work.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "nodes directory",
+      "runtime_rule": "Before replacement no persisted file at all. Once consumed require expected first node and its recorded byte SHA before OAuth, no quote decode in gate.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "decoder_recovery_binding existence/state",
+      "runtime_rule": "Absent: adopt only fully verified device originals atomically. Present: verify seal/schema/authority/folder/private registry,exact five archive hashes, prefixes, charged numeric and typed consumed flag. Never readopt different evidence.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "schedule evidence bytes",
+      "runtime_rule": "Archive original exact bytes. Current exact hash remains original or gate-owned current preflight update hash. Any unbound schedule change fails.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "EXACT_DEVICE_CHECKPOINT_DERIVED",
+      "predicate": "attempt/outcome original bytes",
+      "runtime_rule": "Archive exact original bytes; every resume requires exact immutable prefixes and validates all journals before OAuth.",
+      "source": "Actual local sealed device files; exact byte hashes captured only at first successful gate"
+    },
+    {
+      "classification": "HUMAN_READABLE_OBSERVATION_ONLY",
+      "predicate": "displayed active seconds5.56",
+      "runtime_rule": "Corroboration only. Removed from initial equality, original charged binding value, cumulative floor and active execution authority field. Never used as authorization predicate.",
+      "source": "Human-readable user offline report"
+    }
+  ],
+  "base_head": "73355f57e782bbecce0d3380a06159cd07a8a56a",
+  "corrections": "All four now use actual integrity-verified local original checkpoint bytes and exact numeric value. Display retained only as non-authoritative corroboration.",
+  "device_state_unknowns": "Exact original duration and byte hashes are deliberately discovered only on device. No invented exact duration or claim of physical Android validation.",
+  "full_science_unchanged": true,
+  "offline_test_evidence": {
+    "actual_device_duration": "NOT_OPENED_IN_WORK;derived_on_device_only",
+    "device_execution_performed": false,
+    "entry_point_fault_cases": 31,
+    "new_precision_and_prenetwork_tests": 19,
+    "oauth_and_transport_calls_for_each_failing_case": 0,
+    "total": 171,
+    "valid_precise_values_tested": [
+      5.563847219,
+      7.123456789123,
+      5.559999999
+    ]
+  },
+  "other_audit_findings_fixed": [
+    "Left associative previous+now-start could fall below original by floating cancellation; use previous+(now-start).",
+    "Stage all five control files and atomically rename archive; interrupted archive cannot adopt different bytes.",
+    "Bind exact private registry bytes, current authorized schedule hash and persisted replacement node hash before resumed network.",
+    "Validate all journal indexes, scope, outcome uniqueness and wire cap before OAuth; require complete received scope fields.",
+    "Validate active reserve before OAuth; gate failures leave active checkpoint and journal unchanged."
+  ],
+  "preserved_exact_conditions": [
+    "Original STOP hash passed on real device; unchanged",
+    "Original one-attempt/one-outcome state",
+    "Exact first frozen request",
+    "RECEIVED66/hasMoreFalse",
+    "Calendar exact match and frozen counts",
+    "All science, caps, one replacement and later STOP law"
+  ],
+  "real_device_observation_scope": "User evidence reached old line91 after listed predicates. Failed local gate preceded OAuth/start clock/transport; no historical attempt or broker time added.",
+  "report_derived_predicates_found": [
+    "initial active checkpoint equality to5.56",
+    "binding original_active_seconds_charged hardcoded5.56",
+    "resume active checkpoint lower bound5.56",
+    "recovery authority charged-active field5.56"
+  ],
+  "root_cause": "Rounded human display5.56 was incorrectly used as exact serialized active_seconds equality. Actual measured device floating point was different.",
+  "schema": "mxm.v4.recovery-prenetwork-predicate-provenance-audit.v1",
+  "signed_decoder_function_unchanged": true,
+  "work_broker_contacts": 0,
+  "work_historical_requests": 0
+}

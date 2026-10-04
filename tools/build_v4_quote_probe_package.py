@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse,json,subprocess,zipfile
 from tools.build_v4_current_metadata_android_package import build as dependencies,digest
-PROBE_FILES=['research_core_v4/state/DECODER_RECOVERY_AUTHORITY_V1.json','research_core_v4/state/NEXT_QUOTE_SEQUENCE_V2_ORDERED_EVENT_IMPLEMENTATION_AMENDMENT_V1.json','research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json','research_core_v4/quote_probe_schedule_preflight_v1.py','research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V2.json','research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V2.json','V4_QUOTE_SUPPORT_PROBE_RUN.py','research_core_v4/quote_probe_plan_v1.py',
+PROBE_FILES=['research_core_v4/state/DECODER_RECOVERY_PRENETWORK_PREDICATE_AUDIT_V1.json','research_core_v4/state/DECODER_RECOVERY_AUTHORITY_V1.json','research_core_v4/state/NEXT_QUOTE_SEQUENCE_V2_ORDERED_EVENT_IMPLEMENTATION_AMENDMENT_V1.json','research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json','research_core_v4/quote_probe_schedule_preflight_v1.py','research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V2.json','research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V2.json','V4_QUOTE_SUPPORT_PROBE_RUN.py','research_core_v4/quote_probe_plan_v1.py',
  'research_core_v4/quote_probe_transport_v1.py','research_core_v4/quote_probe_support_v1.py',
  'research_core_v4/pydroid_quote_probe_v1.py','research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json',
  'research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V1.json',
@@ -17,7 +17,7 @@ def build(root,output,wheel_dir=None,source_head=None):
     bootstrap.unlink()
     for p in PROBE_FILES:files[p]=(root/p).read_bytes()
     # No evaluator, old collector, outcome files, or full historical manifest.
-    head=source_head or 'GIT_COMMIT_AUTHORIZING_EXACT_SIGNED_DECODER_RECOVERY_V1'
+    head=source_head or 'GIT_COMMIT_REPAIRING_PRENETWORK_EXACT_DEVICE_EVIDENCE_GATE_V1'
     p={'schema':'mxm.v4.quote-support-probe-source-package.v1','source_head':head,'device_authority_scope_sha256':digest(files['research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json']),'file_sha256':{n:digest(b) for n,b in sorted(files.items())},'full_capture_authorized':False,'scientific_response_authorized':False,'broker_called_by_builder':False}
     files['PACKAGE_MANIFEST.json']=json.dumps(p,sort_keys=True,indent=2).encode()+b'\n'
     files['README.txt']='Pachet RECOVERY pentru revizuire independentă înainte de rulare. Actualizează numai fișierele din folderul deja legat MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1; extrage în părintele acelui folder, cu suprascrierea fișierelor existente. Nu crea un folder nou sau imbricat. Păstrează DEVICE_LOCAL_PROBE_RAW, checkpoint, jurnale și configurația privată OAuth/registru. Launcher: V4_QUOTE_SUPPORT_PROBE_RUN.py. Nu rula încă. STOP original se păstrează; o singură pagină înlocuitoare condiționată este autorizată, în aceeași probă logică.\n'.encode()

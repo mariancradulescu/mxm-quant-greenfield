@@ -1,5 +1,5 @@
 """Dedicated resumable device probe, compact return only. No full capture path."""
-import base64,collections,errno,fcntl,gzip,json,os,threading,time,zipfile
+import base64,collections,errno,fcntl,gzip,json,math,os,threading,time,zipfile
 from pathlib import Path
 import importlib
 from research_core_v4.quote_probe_plan_v1 import canonical,sha,STATE
@@ -244,7 +244,8 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
     elapsed_path=workdir/'active_seconds.json'
     try:
         previous=unseal(json.loads(elapsed_path.read_bytes()))['active_seconds'] if elapsed_path.exists() else 0
-        if type(previous) not in (int,float) or not 0<=previous<=7200:raise PermissionError('active budget checkpoint')
+        if type(previous) not in (int,float) or not math.isfinite(previous) or not 0<=previous<=7200:raise PermissionError('active budget checkpoint')
+        if recovery is not None and previous+120>7200:raise PermissionError('active reserve exhausted before OAuth')
     except Exception:
         oauth._token_request=token_request;release_device_lock(lock);raise
     heart=Heartbeat(plan['base_request_count'],0,progress);heart.__enter__()
@@ -265,12 +266,16 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
                     if app.get('scope','').lower()!='accounts':raise PermissionError('SCOPE_VIEW OAuth required')
                 else:raise
         schedule_report=preflight(meta,aid,plan)
-        atomic(workdir/'current_schedule_preflight.json',canonical(seal(schedule_report)))
+        schedule_bytes=canonical(seal(schedule_report))
+        if recovery is not None:
+            recovery['authorized_current_schedule_sha256']=sha(schedule_bytes)
+            atomic(workdir/'decoder_recovery_binding.json',canonical(seal(recovery)))
+        atomic(workdir/'current_schedule_preflight.json',schedule_bytes)
         if schedule_report['status']!='EXACT_FROZEN_WINDOWS_MATCH':
             return schedule_mismatch_return(root,schedule_report,secrets)
         tr=ProbeTransport(meta,plan['slots'],aid,workdir,recovery=recovery)
         def cumulative_budget():
-            current=previous+time.monotonic()-start
+            current=previous+(time.monotonic()-start)
             if current+120>7200:raise PermissionError('cumulative active time reserve exhausted')
             # Prepay up to120sec request plus bounded reconnect; abrupt interruption cannot
             # reset the durable active budget. Normal exit records actual time.
@@ -289,16 +294,16 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
         for slot in plan['slots']:
             if slot['status']!='PLANNED':continue
             was_done=(workdir/'completed'/f"{slot['request_id']}.json").exists()
-            if previous+time.monotonic()-start>plan['maximum_run_wall_seconds']:raise PermissionError('cumulative active time budget')
+            if previous+(time.monotonic()-start)>plan['maximum_run_wall_seconds']:raise PermissionError('cumulative active time budget')
             record=verified_cache.get(slot['request_id']) or logical_capture(tr,slot,workdir);records.append(record)
             if not was_done:heart.done+=1
             if tr.local_bytes>plan['maximum_local_compressed_bytes']:raise PermissionError('local storage budget')
         meta.close();meta=None
-        return compact_return(root,workdir,plan,package,records,secrets,previous+time.monotonic()-start,tr.attempts,progress,schedule_report,cumulative_budget)
+        return compact_return(root,workdir,plan,package,records,secrets,previous+(time.monotonic()-start),tr.attempts,progress,schedule_report,cumulative_budget)
     finally:
         try:
             heart.__exit__()
-            atomic(elapsed_path,canonical(seal({'active_seconds':previous+time.monotonic()-start})))
+            atomic(elapsed_path,canonical(seal({'active_seconds':previous+(time.monotonic()-start)})))
         finally:
             try:
                 if meta is not None:meta.close()
