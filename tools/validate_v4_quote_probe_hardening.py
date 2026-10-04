@@ -2,7 +2,7 @@
 import argparse,hashlib,json,socket,subprocess,tempfile,unittest,urllib.request,urllib.parse,zipfile
 from pathlib import Path
 from unittest.mock import patch
-MODULES=['tests.test_v4_android_private_lock_fix','tests.test_v4_quote_support_probe','tests.test_v4_android_current_metadata','tests.test_v4_quote_scope_metadata_protocol','tests.test_m6_browser_oauth','tests.test_v4_quote_probe_decision_law','tests.test_v4_quote_probe_hardening']
+MODULES=['tests.test_v4_signed_tick_decoder_fix','tests.test_v4_android_private_lock_fix','tests.test_v4_quote_support_probe','tests.test_v4_android_current_metadata','tests.test_v4_quote_scope_metadata_protocol','tests.test_m6_browser_oauth','tests.test_v4_quote_probe_decision_law','tests.test_v4_quote_probe_hardening']
 STATE='research_core_v4/state/'
 def digest(raw):return hashlib.sha256(raw).hexdigest()
 def suite():return unittest.TestLoader().loadTestsFromNames(MODULES)

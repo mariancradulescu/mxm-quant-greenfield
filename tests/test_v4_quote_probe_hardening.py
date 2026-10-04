@@ -81,7 +81,7 @@ def stream(scale=1):
 class HardenedProof(unittest.TestCase):
  def tr(self,broker,slot=None,work=None):return prior.ProbeProof.tr(self,broker,slot,work)
  def test_multiple_ties_and_unchanged_revisions_latest(self):
-  ticks=[SimpleNamespace(timestamp=1000,tick=12),SimpleNamespace(timestamp=0,tick=10),SimpleNamespace(timestamp=0,tick=10),SimpleNamespace(timestamp=0,tick=11),SimpleNamespace(timestamp=5,tick=9)]
+  ticks=[SimpleNamespace(timestamp=1000,tick=12),SimpleNamespace(timestamp=0,tick=-2),SimpleNamespace(timestamp=0,tick=0),SimpleNamespace(timestamp=0,tick=1),SimpleNamespace(timestamp=-5,tick=-2)]
   rows=decode_ticks(ticks,995,1000);self.assertEqual(rows,[[995,9],[1000,11],[1000,10],[1000,10],[1000,12]])
   ts,up,down,_=_side(rows);self.assertEqual(up,[1000,1000]);self.assertEqual(down,[1000]);self.assertEqual(rows[-1][1],12)
  def test_all24_counts_masks_exact_independent_reference_with_ties(self):
@@ -103,7 +103,7 @@ class HardenedProof(unittest.TestCase):
   broker=TickBroker();calls=[]
   def request(msg):
    lo,hi=int(msg.fromTimestamp),int(msg.toTimestamp);calls.append((lo,hi));res=oa.ProtoOAGetTickDataRes(ctidTraderAccountId=FAKE_AID,hasMore=lo<hi)
-   for stamp,price in [(hi,3),(0,3),(0,2),(0,1)]:res.tickData.add(timestamp=stamp,tick=price)
+   for stamp,price in [(hi,3),(0,0),(0,-1),(0,-1)]:res.tickData.add(timestamp=stamp,tick=price)
    return res
   broker.request=request;tr,slot,c=self.tr(broker,slot)
   expected=[[1000,1],[1000,2],[1000,3],[1000,3],[1001,1],[1001,2],[1001,3],[1001,3]]

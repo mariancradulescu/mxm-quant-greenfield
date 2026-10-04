@@ -314,5 +314,8 @@ def main(root):
     except KeyboardInterrupt:
         print('[OPRIT] Checkpoint păstrat. Ulterior rulează același fișier din același folder pentru resume.');return 130
     except Exception as exc:
-        print('[DIAGNOSTIC SIGUR] tip='+type(exc).__name__+'; errno='+str(getattr(exc,'errno',None)))
+        tb=exc.__traceback__
+        while tb is not None and tb.tb_next is not None:tb=tb.tb_next
+        location=(Path(tb.tb_frame.f_code.co_filename).name+':'+str(tb.tb_lineno)) if tb is not None else 'UNKNOWN'
+        print('[DIAGNOSTIC SIGUR] tip='+type(exc).__name__+'; errno='+str(getattr(exc,'errno',None))+'; sursa='+location)
         print('[BLOCAT ÎN SIGURANȚĂ] Checkpoint păstrat; nu trimite un ZIP vechi. Nu trimite credențiale.');return 1

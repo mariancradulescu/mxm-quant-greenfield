@@ -32,12 +32,19 @@ def validate_rows(rows,lo,hi):
         previous=row[0]
 
 def decode_ticks(ticks,lo,hi):
-    rows=[];t=None
+    # First event is absolute; subsequent timestamp AND price fields are signed
+    # differences from the immediately preceding encoded event. Add both.
+    rows=[];t=None;price=None
     for index,x in enumerate(ticks):
-        t=int(x.timestamp) if index==0 else t-int(x.timestamp)
-        if (index and int(x.timestamp)<0) or not lo<=t<=hi or int(x.tick)<=0:raise PermissionError('malformed historical ticks')
-        rows.append([t,int(x.tick)])
-    # Reverse the repeated sequence, never sort/deduplicate ties.
+        dt=int(x.timestamp);dp=int(x.tick)
+        if index==0:t,price=dt,dp
+        else:
+            if dt>0:raise PermissionError('TICK_TIME_DELTA_POSITIVE')
+            t+=dt;price+=dp
+        if not lo<=t<=hi:raise PermissionError('TICK_TIMESTAMP_OUTSIDE_FROZEN_WINDOW')
+        if price<=0:raise PermissionError('TICK_RECONSTRUCTED_PRICE_NONPOSITIVE')
+        rows.append([t,price])
+    # Reverse the repeated sequence, never sort/deduplicate same-ms events.
     out=list(reversed(rows));validate_rows(out,lo,hi);return out
 
 class ProbeTransport:

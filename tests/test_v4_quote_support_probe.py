@@ -103,9 +103,9 @@ class ProbeProof(unittest.TestCase):
    meta=SmallMetadata(TickBroker());meta.scope_view_verified=False
    with self.assertRaises(PermissionError):ProbeTransport(meta,PLAN['slots'],FAKE_AID,d)
  def test_lossless_delta_and_same_millisecond_order(self):
-  a=SimpleNamespace(timestamp=1000,tick=3);b=SimpleNamespace(timestamp=0,tick=2);c=SimpleNamespace(timestamp=5,tick=1)
+  a=SimpleNamespace(timestamp=1000,tick=3);b=SimpleNamespace(timestamp=0,tick=-1);c=SimpleNamespace(timestamp=-5,tick=-1)
   self.assertEqual(decode_ticks([a,b,c],995,1000),[[995,1],[1000,2],[1000,3]])
-  with self.assertRaises(PermissionError):decode_ticks([a,SimpleNamespace(timestamp=-1,tick=2)],0,1000)
+  with self.assertRaises(PermissionError):decode_ticks([a,SimpleNamespace(timestamp=1,tick=2)],0,1000)
  def test_has_more_disjoint_checkpoint_resume_no_redownload(self):
   s=copy.deepcopy(PLAN['slots'][0]);s['from_ms']=1000;s['to_ms']=1003
   broker=TickBroker('SPLIT');tr,s,c=self.tr(broker,s)
