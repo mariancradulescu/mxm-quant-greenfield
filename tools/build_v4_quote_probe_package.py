@@ -17,10 +17,10 @@ def build(root,output,wheel_dir=None,source_head=None):
     bootstrap.unlink()
     for p in PROBE_FILES:files[p]=(root/p).read_bytes()
     # No evaluator, old collector, outcome files, or full historical manifest.
-    head=source_head or 'GIT_COMMIT_INTRODUCING_USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1'
+    head=source_head or 'GIT_COMMIT_APPLYING_ANDROID_PRIVATE_POSIX_LOCK_FIX_V1'
     p={'schema':'mxm.v4.quote-support-probe-source-package.v1','source_head':head,'device_authority_scope_sha256':digest(files['research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json']),'file_sha256':{n:digest(b) for n,b in sorted(files.items())},'full_capture_authorized':False,'scientific_response_authorized':False,'broker_called_by_builder':False}
     files['PACKAGE_MANIFEST.json']=json.dumps(p,sort_keys=True,indent=2).encode()+b'\n'
-    files['README.txt']='Autoritate strictă pentru un singur probe logic, reluabil; verificarea calendarului curent precede orice cerere istorică: extrage separat, deschide V4_QUOTE_SUPPORT_PROBE_RUN.py în Pydroid, RUN o singură dată. OAuth privat se reutilizează. La întrerupere păstrează folderul și rulează același fișier pentru resume. Nu se continuă automat la captura integrală. Trimite numai MXM_V4_QUOTE_SUPPORT_TRANSPORT_PROBE_RETURN_V1.zip indicat la final; nu trimite DEVICE_LOCAL_PROBE_RAW sau cache-ul OAuth.\n'.encode()
+    files['README.txt']='Autoritate strictă pentru un singur probe logic, reluabil; verificarea calendarului curent precede orice cerere istorică: actualizează fișierele din același folder existent fără a șterge checkpoint-ul sau datele locale, deschide V4_QUOTE_SUPPORT_PROBE_RUN.py în Pydroid, RUN o singură dată. OAuth privat se reutilizează. La întrerupere păstrează folderul și rulează același fișier pentru resume. Nu se continuă automat la captura integrală. Trimite numai MXM_V4_QUOTE_SUPPORT_TRANSPORT_PROBE_RETURN_V1.zip indicat la final; nu trimite DEVICE_LOCAL_PROBE_RAW sau cache-ul OAuth.\n'.encode()
     with zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
         for n,b in sorted(files.items()):
             info=zipfile.ZipInfo('MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1/'+n,(1980,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o644<<16;z.writestr(info,b)

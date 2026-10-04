@@ -1,14 +1,41 @@
 {
   "all_real_historical_requests_in_Work": 0,
   "android_package": {
-    "filename": "MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1.zip",
+    "filename": "MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1_FIXED.zip",
     "members": 718,
-    "sha256": "9651f0c8375b6ac59e0487f5600145bbc21dc9cf7f338c976fa26bbba1b8c6cd",
-    "size_bytes": 762448,
-    "source_head_binding": "GIT_COMMIT_INTRODUCING_USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1"
+    "sha256": "e3b2b1b5555bd703ad8f0b104a77a53c7aae284c98cdb9802ed069f73416f4d1",
+    "size_bytes": 763071,
+    "source_head_binding": "GIT_COMMIT_APPLYING_ANDROID_PRIVATE_POSIX_LOCK_FIX_V1"
+  },
+  "android_private_lock_fix_v1": {
+    "authorized_by": "USER_2026_10_04_12_33_EUROPE_BUCHAREST_OK_CONTINUA_AUTONOM",
+    "broker_contacts_during_repair": 0,
+    "correction": "App-private POSIX record lock held for full execution, plus same-process exclusion; no flock syscall. Unsupported locking fails closed before OAuth. Existing registry and folder binding remain authoritative.",
+    "device_evidence": {
+      "checkpoint_active_seconds_present": false,
+      "completed_count": 0,
+      "original_package_and_runtime_pass": true,
+      "private_plan_registry_present": false,
+      "raw_count": 0
+    },
+    "historical_requests_during_repair": 0,
+    "new_logical_execution_authorized": false,
+    "observed_android_errno": 38,
+    "observed_device_python": "3.13.13",
+    "observed_failure_stage": "shared_storage_checkpoint_flock_before_private_registry_and_OAuth",
+    "physical_android_validation": "USER_RUN_REQUIRED_NOT_CLAIMED",
+    "same_single_logical_probe_only": true,
+    "science_changed": false,
+    "supersedes_package_for_device_execution": {
+      "filename": "MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1.zip",
+      "members": 718,
+      "sha256": "9651f0c8375b6ac59e0487f5600145bbc21dc9cf7f338c976fa26bbba1b8c6cd",
+      "size_bytes": 762448,
+      "source_head_binding": "GIT_COMMIT_INTRODUCING_USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1"
+    }
   },
   "authority_scope_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json",
-  "authority_scope_sha256": "94b77af72abaa274708a8bbe497742424cc2dab7000a2efea5023f02cfb99f3c",
+  "authority_scope_sha256": "3eac26d3fe310602891d65d487c6f6a53b0491c1d054cfdcc53677dcf50480ee",
   "authorized_by": "FINAL_COMPREHENSIVE_PRE_DEVICE_SUPPORT_PROBE_HARDENING_AND_EXECUTION_AUTHORITY_PREPARATION",
   "candidate_promotion_authorized": false,
   "certified_parent_head": "782857da039f92f8aa8f726bd29b1b5e425f6d36",
@@ -28,16 +55,17 @@
   },
   "exact_final_HEAD_binding": {
     "branch": "performance-research-v3-20260922",
-    "law": "EXACT_UNIQUE_GIT_COMMIT_INTRODUCING_THIS_RECORD",
+    "law": "EXACT_UNIQUE_GIT_COMMIT_APPLYING_ANDROID_PRIVATE_POSIX_LOCK_FIX_V1",
     "reason_for_containing_commit_binding": "A commit cannot literally contain its own SHA; its exact containing commit cryptographically binds this record and the independently fixed outer package hash. Final SHA is resolved and reported after durable commit.",
     "repository": "mariancradulescu/mxm-quant-greenfield",
-    "verification": "git log --diff-filter=A --format=%H -- research_core_v4/state/USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1.json must equal git rev-parse HEAD; source/package SHA parity then verified at that exact HEAD"
+    "verification": "git log -1 --format=%H -- research_core_v4/state/USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1.json must equal git rev-parse HEAD; unchanged frozen plan plus repaired package SHA parity verified on that head"
   },
   "full1576_capture_authorized": false,
   "live_trading_authorized": false,
   "offline_tests": {
     "all_original74_applicable_tests_rerun": true,
-    "count": 117,
+    "android_lock_regression_tests": 8,
+    "count": 125,
     "decision_tests": 17,
     "external_connections_denied": true,
     "new_adversarial_tests": 26,
@@ -65,21 +93,22 @@
     "weeks": 10
   },
   "source_file_sha256": {
-    "research_core_v4/pydroid_quote_probe_v1.py": "2ef1d76cdf3eb92a53ddb961f9413dba6f3a447c70cda6f84d1f5493689eea46",
+    "research_core_v4/pydroid_quote_probe_v1.py": "1ca7516ce7b34bbd57c41f201e0a81fef7c3296afba29933ee2549295f88efd9",
     "research_core_v4/quote_metadata_android_v1.py": "4265eddd066cf94551a1405606a4a4983b33c52556f0f5176e296d0d0208f5ba",
     "research_core_v4/quote_probe_decision_law_v1.py": "ddf654d84874633d3938cc2a5d39438269af3b321fe6fec9a501c4c58a387d4c",
     "research_core_v4/quote_probe_schedule_preflight_v1.py": "497188aea8793e967028784d676c6c72f0a048ee05535fa9bfca8fedfbe15005",
     "research_core_v4/quote_probe_support_v1.py": "3b75fdb71322086e97f6e32e3a2dc77ccc0c8b275b3b9e770a1662486ada2c3d",
     "research_core_v4/quote_probe_transport_v1.py": "a2d5bdc515d471439f3244c90c65a44a6c8214b22168b2b92588a3e49191c34a",
-    "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json": "94b77af72abaa274708a8bbe497742424cc2dab7000a2efea5023f02cfb99f3c",
+    "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DEVICE_AUTHORITY_SCOPE_V1.json": "3eac26d3fe310602891d65d487c6f6a53b0491c1d054cfdcc53677dcf50480ee",
     "research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V2.json": "2ed452f25e73030ff716726675bd513be5f3be7b32260fe642dfe79277d307b5",
     "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V2.json": "13d876e5542b7ffaa6e61047081d2448fc126ecdb113fba23d1d8e95af348eb3",
     "research_core_v4/state/NEXT_QUOTE_SEQUENCE_V2_ORDERED_EVENT_IMPLEMENTATION_AMENDMENT_V1.json": "26e34322a3e180ff82dd93f5f7ad4e60d0e8f5c2f41f0da0b324415e86325206",
+    "tests/test_v4_android_private_lock_fix.py": "fc108e28f26a4806dad082b013be39dd716659b9b8d2f924ae5bd46c1f3b48fa",
     "tests/test_v4_quote_probe_decision_law.py": "82afa34e48f1297321be7e0ef9a4d22b4950ffa6c8a58ddb4565e94e67fddb73",
     "tests/test_v4_quote_probe_hardening.py": "4a477dd77c63dad31c3acc592be3387dec6718299d829b7b9d7933fe9f47ffdb",
     "tests/test_v4_quote_support_probe.py": "fb040e4e98d9d9953f76c8a17e5dbacfffe718ad59df910caf79205ed635a35b",
-    "tools/build_v4_quote_probe_package.py": "71da60a9265e152371501753223a56ac9848c1dff82d8f19a55650b10a7d03e9",
-    "tools/validate_v4_quote_probe_hardening.py": "4c5ce85aca6f2b76828b2a1f0e92c12218e525bbb6eb7325f50c35c120b23f43"
+    "tools/build_v4_quote_probe_package.py": "b5e02be690b2995bd4367037e261e48e6b525cd66e3b168044ccbb7c658b7097",
+    "tools/validate_v4_quote_probe_hardening.py": "cac72f25276e9ad580d6d82186ad77b3bf7a46cc2ab42d06ab90adbdb454a321"
   },
   "status": "AUTHORIZED_SINGLE_LOGICAL_RESUMABLE_USER_DEVICE_PROBE_ONLY"
 }

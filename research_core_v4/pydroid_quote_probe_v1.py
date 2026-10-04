@@ -1,5 +1,5 @@
 """Dedicated resumable device probe, compact return only. No full capture path."""
-import base64,collections,fcntl,gzip,json,os,threading,time,zipfile
+import base64,collections,errno,fcntl,gzip,json,os,threading,time,zipfile
 from pathlib import Path
 import importlib
 from research_core_v4.quote_probe_plan_v1 import canonical,sha,STATE
@@ -10,6 +10,8 @@ from research_core_v4.quote_metadata_android_v1 import Secrets,MetadataTransport
 PLAN_REL=STATE+'NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json'
 PLAN_SHA='e60b2dcb6cac33fd0f419daf0263d0003beaf1a0d77e7842a5ae690ff855bb16'
 RETURN_NAME='MXM_V4_QUOTE_SUPPORT_TRANSPORT_PROBE_RETURN_V1.zip'
+_DEVICE_LOCK_GUARD=threading.Lock()
+_DEVICE_LOCK_PATHS=set()
 
 def verify(root):
     root=Path(root);p=json.loads((root/'PACKAGE_MANIFEST.json').read_bytes())
@@ -42,16 +44,47 @@ def reject_quote_export(value):
     elif isinstance(value,list):
         for v in value:reject_quote_export(v)
 
-def claim_device_execution(private_root,root,plan):
-    private_root=Path(private_root);private_root.mkdir(parents=True,exist_ok=True)
-    path=private_root/('v4_probe_'+PLAN_SHA+'.json');lock=open(path.with_suffix('.lock'),'a')
-    fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+def acquire_device_lock(private_root):
+    # Android shared storage may return ENOSYS for flock. POSIX record locks
+    # live only in the app-private registry, and are held for the entire run.
+    private_root=Path(private_root)
+    if not private_root.is_absolute():raise PermissionError('absolute private device registry required')
+    private_root.mkdir(parents=True,exist_ok=True)
+    path=private_root/('v4_probe_'+PLAN_SHA+'.lock')
+    if path.is_symlink():raise PermissionError('private lock symlink rejected')
+    key=str(path.resolve())
+    with _DEVICE_LOCK_GUARD:
+        if key in _DEVICE_LOCK_PATHS:raise BlockingIOError(errno.EAGAIN,'device probe already running in this process')
+        _DEVICE_LOCK_PATHS.add(key)
+    lock=None
     try:
+        lock=open(path,'a+b')
+        fcntl.lockf(lock,fcntl.LOCK_EX|fcntl.LOCK_NB,0,0,os.SEEK_SET)
+    except BaseException:
+        if lock is not None:lock.close()
+        with _DEVICE_LOCK_GUARD:_DEVICE_LOCK_PATHS.discard(key)
+        raise
+    return lock
+
+def release_device_lock(lock):
+    key=str(Path(lock.name).resolve())
+    try:fcntl.lockf(lock,fcntl.LOCK_UN,0,0,os.SEEK_SET)
+    finally:
+        lock.close()
+        with _DEVICE_LOCK_GUARD:_DEVICE_LOCK_PATHS.discard(key)
+
+def claim_device_execution(private_root,root,plan,*,held_lock=None):
+    private_root=Path(private_root)
+    lock=held_lock if held_lock is not None else acquire_device_lock(private_root)
+    try:
+        path=private_root/('v4_probe_'+PLAN_SHA+'.json')
+        if path.is_symlink():raise PermissionError('private registry symlink rejected')
         binding={'plan_sha256':PLAN_SHA,'folder_sha256':sha(str(Path(root).resolve()).encode()),'logical_execution_count':1}
         if path.exists():
             if unseal(json.loads(path.read_bytes()))!=binding:raise PermissionError('one logical probe already bound to another folder')
         else:atomic(path,canonical(seal(binding)))
-    finally:fcntl.flock(lock,fcntl.LOCK_UN);lock.close()
+    finally:
+        if held_lock is None:release_device_lock(lock)
 
 def schedule_mismatch_return(root,report,secrets):
     files={'SCHEDULE_PREFLIGHT.json':canonical(report)+b'\n','PROBE_EXECUTION_MANIFEST.json':canonical({'status':'STOP_BEFORE_HISTORICAL_SCHEDULE_MISMATCH','historical_requests_sent':0,'orders_sent':0,'response_values_computed':False})+b'\n'}
@@ -193,14 +226,14 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
     if transport_factory is None:
         from m6.ctrader_transport import StdlibCTraderTransport
         transport_factory=StdlibCTraderTransport
-    workdir=root/'DEVICE_LOCAL_PROBE_RAW'/PLAN_SHA;workdir.mkdir(parents=True,exist_ok=True)
-    lock=open(workdir/'.run.lock','a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     private_root=Path(private_registry_root) if private_registry_root is not None else Path(oauth.APP_CONFIG_PATH).parent
+    progress('[LOCAL] Verificare lock POSIX privat; proba nu a contactat brokerul.')
+    lock=acquire_device_lock(private_root)
     try:
-        if not private_root.is_absolute():raise PermissionError('absolute private device registry required')
-        claim_device_execution(private_root,root,plan)
-    except Exception:fcntl.flock(lock,fcntl.LOCK_UN);lock.close();raise
-    secrets=Secrets();secrets.capture(oauth);token_request=oauth._token_request
+        workdir=root/'DEVICE_LOCAL_PROBE_RAW'/PLAN_SHA;workdir.mkdir(parents=True,exist_ok=True)
+        claim_device_execution(private_root,root,plan,held_lock=lock)
+        secrets=Secrets();secrets.capture(oauth);token_request=oauth._token_request
+    except BaseException:release_device_lock(lock);raise
     def token(params):
         for k in ['client_id','client_secret','refresh_token','code']:secrets.add(params.get(k))
         value=token_request(params)
@@ -212,7 +245,7 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
         previous=unseal(json.loads(elapsed_path.read_bytes()))['active_seconds'] if elapsed_path.exists() else 0
         if type(previous) not in (int,float) or not 0<=previous<=7200:raise PermissionError('active budget checkpoint')
     except Exception:
-        oauth._token_request=token_request;fcntl.flock(lock,fcntl.LOCK_UN);lock.close();raise
+        oauth._token_request=token_request;release_device_lock(lock);raise
     heart=Heartbeat(plan['base_request_count'],0,progress);heart.__enter__()
     try:
         app,access,mode=oauth.ensure_v2_authorization();secrets.capture(oauth)
@@ -262,10 +295,14 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
         meta.close();meta=None
         return compact_return(root,workdir,plan,package,records,secrets,previous+time.monotonic()-start,tr.attempts,progress,schedule_report,cumulative_budget)
     finally:
-        heart.__exit__()
-        atomic(elapsed_path,canonical(seal({'active_seconds':previous+time.monotonic()-start})))
-        if meta is not None:meta.close()
-        oauth._token_request=token_request;fcntl.flock(lock,fcntl.LOCK_UN);lock.close()
+        try:
+            heart.__exit__()
+            atomic(elapsed_path,canonical(seal({'active_seconds':previous+time.monotonic()-start})))
+        finally:
+            try:
+                if meta is not None:meta.close()
+            finally:
+                oauth._token_request=token_request;release_device_lock(lock)
 
 def main(root):
     try:
@@ -276,5 +313,6 @@ def main(root):
         print('TRIMITE DOAR ACEST ZIP:');print(p.resolve());return 0 if status=='PROBE_COMPLETED_SUPPORT_TRANSPORT_ONLY' else 2
     except KeyboardInterrupt:
         print('[OPRIT] Checkpoint păstrat. Ulterior rulează același fișier din același folder pentru resume.');return 130
-    except Exception:
+    except Exception as exc:
+        print('[DIAGNOSTIC SIGUR] tip='+type(exc).__name__+'; errno='+str(getattr(exc,'errno',None)))
         print('[BLOCAT ÎN SIGURANȚĂ] Checkpoint păstrat; nu trimite un ZIP vechi. Nu trimite credențiale.');return 1

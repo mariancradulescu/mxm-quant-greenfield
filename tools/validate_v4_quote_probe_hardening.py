@@ -2,7 +2,7 @@
 import argparse,hashlib,json,socket,subprocess,tempfile,unittest,urllib.request,urllib.parse,zipfile
 from pathlib import Path
 from unittest.mock import patch
-MODULES=['tests.test_v4_quote_support_probe','tests.test_v4_android_current_metadata','tests.test_v4_quote_scope_metadata_protocol','tests.test_m6_browser_oauth','tests.test_v4_quote_probe_decision_law','tests.test_v4_quote_probe_hardening']
+MODULES=['tests.test_v4_android_private_lock_fix','tests.test_v4_quote_support_probe','tests.test_v4_android_current_metadata','tests.test_v4_quote_scope_metadata_protocol','tests.test_m6_browser_oauth','tests.test_v4_quote_probe_decision_law','tests.test_v4_quote_probe_hardening']
 STATE='research_core_v4/state/'
 def digest(raw):return hashlib.sha256(raw).hexdigest()
 def suite():return unittest.TestLoader().loadTestsFromNames(MODULES)
@@ -63,8 +63,8 @@ def verify_package(root,archive,require_durable=False):
     head=subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD']).decode().strip()
     if require_durable:
         rel=STATE+'USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1.json'
-        intro=subprocess.check_output(['git','-C',str(root),'log','--diff-filter=A','--format=%H','--',rel]).decode().splitlines()
-        if intro!=[head]:raise AssertionError('HEAD must be exact authority-introducing commit')
+        intro=subprocess.check_output(['git','-C',str(root),'log','-1','--format=%H','--',rel]).decode().splitlines()
+        if intro!=[head]:raise AssertionError('HEAD must be exact latest authority-updating commit')
         if subprocess.check_output(['git','-C',str(root),'status','--porcelain']).strip():raise AssertionError('dirty final checkout')
         if subprocess.check_output(['git','-C',str(root),'show',head+':'+rel])!=(root/rel).read_bytes():raise AssertionError('durable authority bytes')
     return dict(exact_final_head=head,authority_sha256=digest((root/(STATE+'USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1.json')).read_bytes()),package_sha256=digest(archive.read_bytes()),source_package_parity=True,deterministic_zip=True,plan_unchanged=True,science_decision_semantic_identity=True,preserved_first_result_and_interpretation=True,real_historical_requests=0,real_scientific_responses=0)
