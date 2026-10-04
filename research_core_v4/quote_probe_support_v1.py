@@ -17,13 +17,15 @@ def completion_mask(bid_timestamps,ask_timestamps,signal_ms,horizon_seconds):
 
 def _side(rows):
     ts=[x[0] for x in rows];up=[];down=[];conflicts=[]
+    if any(len(x)!=2 or type(x[0]) is not int or type(x[1]) is not int or x[1]<=0 for x in rows):raise ValueError('raw ordered event shape')
     for i,(t,p) in enumerate(rows):
         if i:
             if t<rows[i-1][0] or p<=0:raise ValueError('raw chronology/price')
             old=rows[i-1][1]
             if p>old:up.append(t)
             elif p<old:down.append(t)
-            if t==rows[i-1][0] and p!=old:conflicts.append(t)
+            # List order is the immutable chronological broker tie order.
+            # Unchanged prices remain evidence; changed ties count normally.
     return ts,up,down,conflicts
 
 def count_support(bid,ask,start_ms,end_ms):
@@ -47,8 +49,6 @@ def count_support(bid,ask,start_ms,end_ms):
         current=snaps[t]
         if current is None:continue
         fresh+=1
-        if any(bisect.bisect_right(s[3],t)>bisect.bisect_left(s[3],t-60000) for s in sides):
-            ambiguous+=1;continue
         spreads=[snaps[q][1] for q in range(t-60000,t,1000) if snaps[q] is not None]
         if len(spreads)<45:continue
         baseline=statistics.median(spreads)

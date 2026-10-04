@@ -1,0 +1,115 @@
+{
+  "bindings": {
+    "V2_design": {
+      "path": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_DESIGN_V2.json",
+      "sha256": "f1c986e8588d721babf07eaa34fbf838077508cb96b8a6f35ef04812c379d5c8"
+    },
+    "current_metadata_census": {
+      "decoded_sha256": "4ceb988206c6caf5c0077d12201e9043c5bd640c63fd645c20273fafa9fcb63f",
+      "eligible_identity_count": 1576,
+      "frontier_identity_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+      "path": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_LOCALIZATION_V1.json.zlib.b64",
+      "sha256": "cdbfe0478771277fd6f258c269e324d5cc65308c9831ebcae26a4a8bdb503335"
+    },
+    "probe_contract": {
+      "path": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V2.json",
+      "sha256": "13d876e5542b7ffaa6e61047081d2448fc126ecdb113fba23d1d8e95af348eb3"
+    },
+    "probe_plan": {
+      "path": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json",
+      "sha256": "e60b2dcb6cac33fd0f419daf0263d0003beaf1a0d77e7842a5ae690ff855bb16"
+    }
+  },
+  "current_boundary": {
+    "ARM_created": false,
+    "full_capture_authorized": false,
+    "historical_requests_sent": 0,
+    "probe_executed": false,
+    "scientific_response_values_opened": false
+  },
+  "definitions": {
+    "probe_context_support_plausible": "At least one original cell has>=8 common weeks of10. Feasibility analogue of40/52 only; NOT scientific support certification.",
+    "sampled_pair_common_support_weeks": "Each27 non-singleton context and each24 frozen cells: count original10 weeks where BOTH predetermined identities qualify for SAME cell. Missing/no-window/unavailable support is unqualified, never replaced.",
+    "weekly_identity_cell_support": "Non-singleton identity; complete60-minute scheduled window; timestamp-completable nonoverlapping attempts>=15 AND retention>=4/5. Never15 per20-minute slice. Availability masks only, not response values."
+  },
+  "frozen_before_any_historical_quote": true,
+  "full_capture_boundary": {
+    "DIRECT_PROBE_TO_CANDIDATE": "FORBIDDEN",
+    "DIRECT_PROBE_TO_FULL1576_CAPTURE": "FORBIDDEN",
+    "DIRECT_PROBE_TO_SCIENTIFIC_RESPONSE": "FORBIDDEN",
+    "separate_prospective_authorization_after_independent_probe_review_required": true
+  },
+  "historical_predecessor": {
+    "path": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V1.json",
+    "sha256": "9c03409cab9c5d5623aa2bd5a694afcc3bb8a6915572a6ae27876aa0bc62a6d2"
+  },
+  "implementation": "research_core_v4/quote_probe_decision_law_v1.py",
+  "implementation_sha256": "ddf654d84874633d3938cc2a5d39438269af3b321fe6fec9a501c4c58a387d4c",
+  "limits": [
+    "Two identities cannot certify all-member support in large contexts",
+    "Probe support is necessary information for continuation,never sufficient for full capture",
+    "No development lead,candidate promotion,economic interpretation or null from this probe",
+    "Good transport alone cannot authorize full capture",
+    "Latency,pagination,ticks/hour,bytes/hour constrain later architecture only;never retune feature thresholds or select favorable identities"
+  ],
+  "schema": "mxm.v4.post-probe-decision-law.v2",
+  "semantic_identity_proof": {
+    "all_stop_continue_actions_and_scientific_semantics_identical": true,
+    "only_changes": [
+      "contract_binding",
+      "implementation_binding",
+      "version_and_predecessor_provenance"
+    ],
+    "thresholds_equal": true
+  },
+  "singleton_contexts": {
+    "names": [
+      "Energies (Spot)",
+      "Forwards - Commodities"
+    ],
+    "role": "Transport diagnostics only;excluded from27-context continuation;cannot satisfy replicated discovery;retained in full1576 census."
+  },
+  "source_parent_head": "782857da039f92f8aa8f726bd29b1b5e425f6d36",
+  "support_continue": {
+    "action": "Eligible ONLY for separately reviewed prospective SECOND_STAGE_OUTCOME_BLIND_BREADTH_SUPPORT_CENSUS_DESIGN. That later support census must cover ALL current eligible identities in each support-plausible context under frozen support-only geometry. No winner-only identity selection.",
+    "classification": "SUPPORT_PLAUSIBLE_SECOND_STAGE_REVIEW_ONLY",
+    "condition": "AT_LEAST_ONE_OF27_PLAUSIBLE_AND_TRANSPORT_VALID_COMPLETE",
+    "full52_week1576_capture_authorized": false,
+    "scientific_response_authorized": false,
+    "second_stage_acquisition_authorized_by_this_law": false
+  },
+  "support_stop": {
+    "action": "STOP further acquisition for exactV2 mechanism;no full1576 capture;no thresholds/horizons/direction tuning;return to project-wide information-source selection through separate governance. Do not choose next source in this task.",
+    "classification": "DATA_LIMITED_ACQUISITION_NOT_JUSTIFIED",
+    "condition": "ZERO_OF27_NON_SINGLETON_CONTEXTS_PLAUSIBLE",
+    "economic_null": false,
+    "mechanism_closure": false
+  },
+  "thresholds": {
+    "decision_context_count": 27,
+    "sampled_pair_common_weeks_min": 8,
+    "sampled_week_count": 10,
+    "weekly_retention_denominator": 5,
+    "weekly_retention_numerator": 4,
+    "weekly_timestamp_completable_attempts_min": 15
+  },
+  "transport_fail_closed": {
+    "action": "STOP;no dropping identities,weeks,sides or raw events;no lossy truncation",
+    "budget_boundaries_inclusive": true,
+    "classification": "TRANSPORT_ARCHITECTURE_NOT_FEASIBLE_AS_CURRENTLY_CONFIGURED",
+    "conditions": [
+      "Exact manifest not completed within2GB local,7200active seconds or11200wire attempts",
+      "Any saturated1ms hasMore",
+      "Checkpoint integrity,scope/account binding,lossless reconstruction or package integrity fails or cannot be verified"
+    ]
+  },
+  "validation": {
+    "current_contract_rebound_only_science_threshold_actions_identical": true,
+    "historical_V1_evidence_unchanged": true,
+    "no_network_in_decision_tests": true,
+    "offline_decision_tests": 17,
+    "test_path": "tests/test_v4_quote_probe_decision_law.py",
+    "test_sha256": "82afa34e48f1297321be7e0ef9a4d22b4950ffa6c8a58ddb4565e94e67fddb73"
+  },
+  "verification_required": "Independent intake proves exact manifest,checkpoint,scope/account,lossless reconstruction and package checksums. Missing proof fail-closes. Engine reads ONLY compact counts and transport facts; no raw quote/response-price access."
+}

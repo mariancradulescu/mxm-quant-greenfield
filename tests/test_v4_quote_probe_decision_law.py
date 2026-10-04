@@ -59,13 +59,11 @@ class DecisionLawProof(unittest.TestCase):
   self.plausible(self.contexts[0]);r=next(x for x in self.matrix if x['asset_class']==self.contexts[0]);r['status']='ENDPOINT_UNAVAILABLE';self.assertFalse(self.run_law()['second_stage_design_review_eligible'])
  def test_binding_mismatch_fail_closed(self):
   self.execution['plan_sha256']='0'*64;self.assertEqual(self.run_law()['action'],'STOP_FAIL_CLOSED')
- def test_probe_implementation_and_contract_unchanged(self):
-  # Accepted preparation SHA forest binds launcher, plan, transport, support,
-  # builder, old safety tests and contract. No rebuild or probe execution.
-  a=json.loads((ROOT/'research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_PREPARATION_AUDIT_V1.json').read_bytes())
-  for p,h in a['source_file_sha256'].items():self.assertEqual(hashlib.sha256((ROOT/p).read_bytes()).hexdigest(),h,p)
+ def test_science_plan_and_historical_law_unchanged_current_rebinding(self):
+  old=ROOT/'research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V1.json'
+  self.assertEqual(hashlib.sha256(old.read_bytes()).hexdigest(),'9c03409cab9c5d5623aa2bd5a694afcc3bb8a6915572a6ae27876aa0bc62a6d2')
+  self.assertEqual(self.law['thresholds'],json.loads(old.read_bytes())['thresholds'])
   self.assertEqual(hashlib.sha256((ROOT/self.law['implementation']).read_bytes()).hexdigest(),self.law['implementation_sha256'])
-  state=json.loads((ROOT/'research_core_v4/state/V4_STATE.json').read_bytes());self.assertEqual(state['next_prospective_wave']['bounded_support_transport_probe']['post_probe_decision_law_sha256'],hashlib.sha256((ROOT/LAW_PATH).read_bytes()).hexdigest())
  def test_singletons_cannot_enable_continuation(self):
   for r in self.matrix:
    if r['status']=='SINGLETON_TRANSPORT_ONLY_NO_FEATURE_COUNTS':

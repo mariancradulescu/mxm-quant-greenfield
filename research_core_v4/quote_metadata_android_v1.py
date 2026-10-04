@@ -258,7 +258,7 @@ def sanitize(result,frontier):
         # the materialization semantics, without unrelated server fields.
         full=new['current_full_metadata']
         if full:
-            for key,allowed in [('schedule',{'startSecond','endSecond'}),('holiday',{'holidayId','name','description','holidayDate','isRecurring','startSecond','endSecond'})]:
+            for key,allowed in [('schedule',{'startSecond','endSecond'}),('holiday',{'holidayId','name','description','holidayDate','isRecurring','startSecond','endSecond','scheduleTimeZone'})]:
                 if key in full:
                     if not isinstance(full[key],list):raise ValueError('schedule shape invalid')
                     full[key]=[{k:v for k,v in x.items() if k in allowed} for x in full[key]]

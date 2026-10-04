@@ -119,9 +119,10 @@ class ProbeProof(unittest.TestCase):
   tr,s,c=self.tr(TickBroker('TIMEOUT_ONCE'));rows,trace=tr.capture(s)
   self.assertEqual(len(tr.attempts),2);self.assertEqual(tr.attempts[0]['status'],'TRANSPORT_FAILURE_OR_ACK_LOSS');self.assertEqual(tr.attempts[1]['retry_index'],1)
   self.assertGreaterEqual(sum(c.delays),1)
- def test_unavailable_status_preserved(self):
-  tr,s,c=self.tr(TickBroker('UNAVAILABLE'));rows,trace=tr.capture(s)
-  self.assertIsNone(rows);self.assertEqual(trace[0]['status'],'ENDPOINT_UNAVAILABLE');self.assertNotIn(PRIVATE_SECRET,str(trace))
+ def test_symbol_error_is_transport_failure_not_support_absence(self):
+  tr,s,c=self.tr(TickBroker('UNAVAILABLE'))
+  with self.assertRaises(PermissionError):tr.capture(s)
+  self.assertEqual(tr.attempts[0]['status'],'BROKER_ERROR_FAIL_CLOSED');self.assertNotIn(PRIVATE_SECRET,str(tr.attempts))
  def test_hard_wire_budget(self):
   tr,s,c=self.tr(TickBroker());tr.attempts=[{}]*11200
   with self.assertRaises(PermissionError):tr.capture(s)
@@ -146,9 +147,9 @@ class ProbeProof(unittest.TestCase):
   bid=[[t,100000+(t//1000)%3] for t in range(0,end+106000,1000)];ask=[[t,100010+(t//1000)%3] for t in range(0,end+106000,1000)]
   changed=[[t,p if t<end else 200000] for t,p in ask]
   self.assertEqual(count_support(bid,ask,start,end),count_support(bid,changed,start,end))
- def test_ambiguous_ms_censors_not_reorders(self):
+ def test_same_ms_does_not_censor_later_baseline(self):
   bid=[[t,100000] for t in range(0,3720000,1000)];bid.insert(120, [119000,100001]);ask=[[t,100010] for t in range(0,3720000,1000)]
-  d=count_support(bid,ask,120000,3720000);self.assertGreater(d['ambiguous_causal_seconds'],0)
+  d=count_support(bid,ask,120000,3720000);self.assertEqual(d['ambiguous_causal_seconds'],0);self.assertGreater(d['baseline_qualified_seconds'],0)
  def test_method_retained_population_target_not_support_selection(self):
   a=audit(ROOT);self.assertFalse(a['prospective_supersession']);self.assertTrue(a['exhaustive_synthetic_sign_symmetry_with_fixed_support_mask']['pass'])
   self.assertEqual(set(a['singleton_contexts']),{'Energies (Spot)','Forwards - Commodities'})
@@ -165,14 +166,21 @@ class ProbeProof(unittest.TestCase):
     res=oa.ProtoOASymbolsListRes(ctidTraderAccountId=FAKE_AID)
     for i in PLAN['identities']:res.symbol.add(symbolId=i['symbol_id'],symbolName=i['symbol'],enabled=True)
     return res
+   if type(msg) is oa.ProtoOASymbolByIdReq:
+    import zlib
+    from google.protobuf.json_format import ParseDict
+    d=json.loads(zlib.decompress(base64.b64decode((ROOT/(STATE+'NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_LOCALIZATION_V1.json.zlib.b64')).read_bytes())))
+    full=next(x['current_full_metadata'] for x in d['rows'] if x['symbol_id']==msg.symbolId[0]);full=copy.deepcopy(full)
+    for h in full.get('holiday',[]):h['scheduleTimeZone']=full['scheduleTimeZone'] # explicitly fictional broker fixture
+    out=oa.ProtoOASymbolByIdRes(ctidTraderAccountId=FAKE_AID);ParseDict(full,out.symbol.add());return out
    return original(msg)
   broker.request=request
   mt=lambda inner,o,secrets,progress:MetadataTransport(inner,o,secrets,progress=progress,clock=clock,sleep=clock.sleep)
   pt=lambda meta,slots,aid,d:ProbeTransport(meta,slots,aid,d,clock=clock,sleep=clock.sleep)
   with patch('m6.ctrader_capture.account_fingerprint',return_value=module.__dict__.get('FINGERPRINT','b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636')),patch('os.fsync',return_value=None),patch.object(module,'MetadataTransport',side_effect=mt),patch.object(module,'ProbeTransport',side_effect=pt):
-   output=run_device(self.deploy,oauth=oauth,transport_factory=lambda:broker,progress=lambda _:None)
+   output=run_device(self.deploy,oauth=oauth,transport_factory=lambda:broker,progress=lambda _:None,private_registry_root=self.deploy.parent/'private-registry')
    self.assertEqual(len(broker.tick_calls),1120)
-   output2=run_device(self.deploy,oauth=oauth,transport_factory=lambda:broker,progress=lambda _:None);self.assertEqual(len(broker.tick_calls),1120)
+   output2=run_device(self.deploy,oauth=oauth,transport_factory=lambda:broker,progress=lambda _:None,private_registry_root=self.deploy.parent/'private-registry');self.assertEqual(len(broker.tick_calls),1120)
   with zipfile.ZipFile(output2) as z:
    m=json.loads(z.read('PROBE_EXECUTION_MANIFEST.json'));self.assertEqual(m['base_requests_completed'],1120);self.assertFalse(m['response_values_computed']);self.assertFalse(m['full_capture_started'])
    matrix=json.loads(z.read('SUPPORT_ONLY_MATRIX.json'));self.assertEqual(len(matrix),560);self.assertTrue(all(len(x['support']['cells'])==24 for x in matrix))
@@ -180,7 +188,7 @@ class ProbeProof(unittest.TestCase):
    for name in z.namelist():
     raw=z.read(name);raw=gzip.decompress(raw) if name.endswith('.gz') else raw
     self.assertNotIn(PRIVATE_SECRET.encode(),raw);self.assertNotIn(str(FAKE_AID).encode(),raw);self.assertNotIn(PRIVATE_CODE.encode(),raw)
-   auditraw=json.loads(z.read('RAW_AUDIT_MANIFEST.json'));self.assertLessEqual(auditraw['uncompressed_bytes'],50000000);self.assertEqual(len(auditraw['included']),58)
+   self.assertFalse(any(n.startswith('RAW_AUDIT') or n.endswith('.gz') for n in z.namelist()));self.assertFalse(m['raw_quote_prices_exported'])
  def test_interrupted_split_resumes_cached_root_and_left(self):
   s=copy.deepcopy(PLAN['slots'][0]);s['from_ms']=1000;s['to_ms']=1003
   broker=TickBroker('SPLIT');old=broker.request;failing=[True]

@@ -6,7 +6,8 @@ A CONTINUE classification grants no acquisition/execution authority.
 """
 import base64,hashlib,json,math,zlib
 from pathlib import Path
-LAW_PATH='research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V1.json'
+HISTORICAL_LAW_PATH='research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V1.json'
+LAW_PATH='research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V2.json'
 THRESHOLDS={'weekly_timestamp_completable_attempts_min':15,'weekly_retention_numerator':4,'weekly_retention_denominator':5,'sampled_pair_common_weeks_min':8,'sampled_week_count':10,'decision_context_count':27}
 CELLS=[f'L{l}_I{i}_H{h}_{d}' for l in [10,30] for i in [0.6,0.8] for h in [10,30,90] for d in ['CONTINUATION','REVERSION']]
 def digest(raw):return hashlib.sha256(raw).hexdigest()

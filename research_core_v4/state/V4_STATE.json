@@ -159,21 +159,32 @@
     },
     "attempt_lock_present": false,
     "bounded_support_transport_probe": {
+      "active_contract_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V2.json",
+      "active_post_probe_decision_law_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V2.json",
+      "active_post_probe_decision_law_sha256": "2ed452f25e73030ff716726675bd513be5f3be7b32260fe642dfe79277d307b5",
+      "android_package_sha256": "9651f0c8375b6ac59e0487f5600145bbc21dc9cf7f338c976fa26bbba1b8c6cd",
       "base_request_count": 1120,
       "context_count": 29,
       "contract_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_CONTRACT_V1.json",
-      "device_execution_after_review_only": true,
+      "device_execution_after_review_only": false,
+      "device_execution_authority_ref": "research_core_v4/state/USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1.json",
+      "device_execution_authority_sha256": "c336c01c6189af56d57b1f6f8cb3bbf13a456f81f651ac7fc6a2fd134fa54baa",
+      "device_execution_authorized": true,
       "executed": false,
       "full_capture_authorized": false,
+      "hardening_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_HARDENING_AUDIT_V1.json",
+      "hardening_audit_sha256": "db2e15f77df6ba800c8cf70797b770733887c823a7f9cb4db0e4bb028f9fffa6",
       "historical_requests_sent": 0,
       "identity_count": 56,
       "method_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_METHOD_SUPPORT_AUDIT_V1.json",
+      "ordered_event_amendment_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_V2_ORDERED_EVENT_IMPLEMENTATION_AMENDMENT_V1.json",
       "plan_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json",
       "post_probe_decision_law_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V1.json",
       "post_probe_decision_law_sha256": "9c03409cab9c5d5623aa2bd5a694afcc3bb8a6915572a6ae27876aa0bc62a6d2",
       "post_probe_decision_law_status": "FROZEN_BEFORE_ANY_HISTORICAL_QUOTE_AWAITING_IMMEDIATE_DEVICE_EXECUTION_REVIEW",
       "preparation_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_PREPARATION_AUDIT_V1.json",
       "preparation_audit_sha256": "873ea9bd3177159b181753e0111d775aed0a700f73083a6f8cdea153b66a0b17",
+      "real_raw_quote_export_authorized": false,
       "response_authorized": false,
       "work_execution_authorized": false
     },
@@ -441,7 +452,7 @@
     "secure_channel_blocker_sha256": "33113c59ce6d8b6db342053fe4f64b2778f11b89dca24f90dd36ed9b275ac341",
     "secure_machine_side_broker_channel_available": false,
     "selected_mechanism_count": 1,
-    "status": "V2_CENSUS1576_CURRENT_METADATA_VERIFIED_BOUNDED_SUPPORT_PROBE_PREPARED_NOT_EXECUTED"
+    "status": "BOUNDED_SUPPORT_TRANSPORT_PROBE_USER_DEVICE_AUTHORIZED_NO_FULL_CAPTURE_OR_RESPONSE"
   },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
@@ -567,6 +578,6 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "QUOTE_SEQUENCE_CURRENT_METADATA_COMPLETE_V2_RETAINED_BOUNDED_SUPPORT_PROBE_PREPARED_NOT_EXECUTED",
-  "stop_boundary": "NO_FULL_HISTORICAL_CAPTURE_NO_RESPONSE_NO_ARM;BOUNDED_PROBE_PREPARED_AWAITING_INDEPENDENT_REVIEW"
+  "status": "QUOTE_SEQUENCE_BOUNDED_SUPPORT_PROBE_USER_DEVICE_READY",
+  "stop_boundary": "WORK_STOPS_BEFORE_HISTORICAL_REQUEST;ONLY_EXACT_SINGLE_RESUMABLE_DEVICE_PROBE_AUTHORIZED_AFTER_CURRENT_SCHEDULE_MATCH;NO_FULL_CAPTURE_OR_RESPONSE"
 }
