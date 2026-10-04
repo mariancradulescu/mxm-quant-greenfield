@@ -3,7 +3,7 @@ import base64,collections,errno,fcntl,gzip,json,os,threading,time,zipfile
 from pathlib import Path
 import importlib
 from research_core_v4.quote_probe_plan_v1 import canonical,sha,STATE
-from research_core_v4.quote_probe_transport_v1 import ProbeTransport,atomic,seal,unseal,EVENT_ORDER,validate_rows
+from research_core_v4.quote_probe_transport_v1 import ProbeTransport,atomic,seal,unseal,EVENT_ORDER,validate_rows,recovery_gate
 from research_core_v4.quote_probe_support_v1 import count_support
 from research_core_v4.quote_probe_schedule_preflight_v1 import preflight
 from research_core_v4.quote_metadata_android_v1 import Secrets,MetadataTransport,reject_sensitive_keys,verify_runtime,load_frontier
@@ -231,6 +231,7 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
     lock=acquire_device_lock(private_root)
     try:
         workdir=root/'DEVICE_LOCAL_PROBE_RAW'/PLAN_SHA;workdir.mkdir(parents=True,exist_ok=True)
+        recovery=recovery_gate(root,workdir,private_root,plan) if (root/'research_core_v4/state/DECODER_RECOVERY_AUTHORITY_V1.json').exists() else None
         claim_device_execution(private_root,root,plan,held_lock=lock)
         secrets=Secrets();secrets.capture(oauth);token_request=oauth._token_request
     except BaseException:release_device_lock(lock);raise
@@ -267,7 +268,7 @@ def run_device(root,*,oauth=None,transport_factory=None,progress=print,private_r
         atomic(workdir/'current_schedule_preflight.json',canonical(seal(schedule_report)))
         if schedule_report['status']!='EXACT_FROZEN_WINDOWS_MATCH':
             return schedule_mismatch_return(root,schedule_report,secrets)
-        tr=ProbeTransport(meta,plan['slots'],aid,workdir)
+        tr=ProbeTransport(meta,plan['slots'],aid,workdir,recovery=recovery)
         def cumulative_budget():
             current=previous+time.monotonic()-start
             if current+120>7200:raise PermissionError('cumulative active time reserve exhausted')

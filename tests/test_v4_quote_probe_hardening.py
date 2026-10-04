@@ -247,6 +247,8 @@ class HardenedProof(unittest.TestCase):
    base=Path(d);archive=base/'package.zip';package(ROOT,archive,ROOT.parent/'probe-wheels')
    with zipfile.ZipFile(archive) as z:z.extractall(base)
    deploy=base/'MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1'
+   from tests.test_v4_exact_decoder_recovery import seed_recovery_fixture
+   seed_recovery_fixture(deploy,base/'private')
    mt=lambda inner,o,secrets,progress:MetadataTransport(inner,o,secrets,progress=progress,clock=clock,sleep=clock.sleep)
    from research_core_v4.quote_scope_metadata_v1 import FINGERPRINT
    with patch('m6.ctrader_capture.account_fingerprint',return_value=FINGERPRINT),patch('research_core_v4.pydroid_quote_probe_v1.MetadataTransport',side_effect=mt):

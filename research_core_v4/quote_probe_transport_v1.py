@@ -47,13 +47,92 @@ def decode_ticks(ticks,lo,hi):
     # Reverse the repeated sequence, never sort/deduplicate same-ms events.
     out=list(reversed(rows));validate_rows(out,lo,hi);return out
 
+
+RECOVERY_REL='research_core_v4/state/DECODER_RECOVERY_AUTHORITY_V1.json'
+RECOVERY_ID='6eed644c4506f73218ccf7df8e978b157447aeced6340935b7b9d67b696a477e'
+
+def recovery_gate(root,workdir,private_root,plan):
+    """Local control evidence only; called before OAuth/network. Never read quotes."""
+    root=Path(root);w=Path(workdir)
+    if w.is_symlink() or any(p.is_symlink() for p in w.rglob('*')):raise PermissionError('recovery checkpoint symlink')
+    authority_raw=(root/RECOVERY_REL).read_bytes();a=json.loads(authority_raw)
+    first=next(x for x in plan['slots'] if x['status']=='PLANNED')
+    if any(first.get(k)!=v for k,v in a['request'].items()):raise PermissionError('recovery first slot mismatch')
+    registry=Path(private_root)/('v4_probe_'+a['plan_sha256']+'.json')
+    expected={'plan_sha256':a['plan_sha256'],'folder_sha256':sha(str(root.resolve()).encode()),'logical_execution_count':1}
+    if registry.is_symlink() or unseal(json.loads(registry.read_bytes()))!=expected:raise PermissionError('recovery requires existing same folder registry')
+    if sha((root/'research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json').read_bytes())!=a['plan_sha256']:raise PermissionError('recovery plan mismatch')
+    def persist(path,data):
+        used=sum(p.stat().st_size for p in w.rglob('*') if p.is_file())
+        old=path.stat().st_size if path.exists() else 0
+        if used+len(data)-old>2000000000:raise PermissionError('recovery evidence storage cap')
+        atomic(path,data)
+    def read(name):
+        path=w/name
+        if path.is_symlink():raise PermissionError('recovery evidence symlink')
+        return path.read_bytes()
+    stop=read('terminal_transport_stop.json')
+    if sha(stop)!=a['original_stop_sha256']:raise PermissionError('original STOP mismatch')
+    unseal(json.loads(stop))
+    if (w/'terminal_recovery_stop.json').exists():raise PermissionError('later STOP no recovery authority')
+    statepath=w/'decoder_recovery_binding.json'
+    attempts=read('wire_attempts.jsonl');outcomes=read('wire_outcomes.jsonl')
+    aa=[unseal(json.loads(x)) for x in attempts.splitlines()];oo=[unseal(json.loads(x)) for x in outcomes.splitlines()]
+    def original_check(initial=False):
+        if len(aa)!=1 or len(oo)!=1:raise PermissionError('one original attempt/outcome required')
+        q=aa[0];o=oo[0]
+        for k,v in {'attempt_index':0,'request_id':RECOVERY_ID,'from_ms':first['from_ms'],'to_ms':first['to_ms'],'depth':0,'retry_index':0}.items():
+            if q.get(k)!=v or (k in o and o[k]!=v):raise PermissionError('original request scope mismatch')
+        if o.get('attempt_index')!=0 or o.get('status')!='RECEIVED' or o.get('returned_ticks')!=66 or o.get('has_more') is not False:raise PermissionError('original outcome mismatch')
+        if q.get('status')!='SENT_OR_ACK_UNKNOWN':raise PermissionError('original attempt status')
+        schedule=unseal(json.loads(read('current_schedule_preflight.json')))
+        if schedule.get('status')!='EXACT_FROZEN_WINDOWS_MATCH' or schedule.get('mismatches')!=[] or schedule.get('identities_checked')!=56 or schedule.get('base_slot_count')!=1120 or schedule.get('identity_week_windows_checked')!=560:raise PermissionError('original schedule mismatch')
+        elapsed=unseal(json.loads(read('active_seconds.json')))
+        if initial and elapsed!={'active_seconds':5.56}:raise PermissionError('original active seconds mismatch')
+        for directory in ['completed','raw','nodes']:
+            if any(x.is_file() for x in (w/directory).rglob('*')):raise PermissionError('unpersisted original page required')
+    if not statepath.exists():
+        original_check(initial=True)
+        evidence={n:read(n) for n in ['terminal_transport_stop.json','wire_attempts.jsonl','wire_outcomes.jsonl','current_schedule_preflight.json','active_seconds.json']}
+        archive=w/'ORIGINAL_DECODER_STOP_EVIDENCE'
+        for n,b in evidence.items():
+            target=archive/n
+            if target.exists() and target.read_bytes()!=b:raise PermissionError('immutable original evidence mismatch')
+            if not target.exists():persist(target,b)
+        state={'authority_sha256':sha(authority_raw),'folder_binding':expected,'original_file_sha256':{n:sha(b) for n,b in evidence.items()},'replacement_consumed':False,'original_attempts_charged':1,'original_active_seconds_charged':5.56,'payload_equality_proven':False}
+        persist(statepath,canonical(seal(state)))
+    state=unseal(json.loads(statepath.read_bytes()))
+    if state.get('authority_sha256')!=sha(authority_raw) or state.get('folder_binding')!=expected:raise PermissionError('recovery authority binding')
+    for n,h in state['original_file_sha256'].items():
+        if sha((w/'ORIGINAL_DECODER_STOP_EVIDENCE'/n).read_bytes())!=h:raise PermissionError('original evidence changed')
+    for n,current in [('wire_attempts.jsonl',attempts),('wire_outcomes.jsonl',outcomes)]:
+        original=(w/'ORIGINAL_DECODER_STOP_EVIDENCE'/n).read_bytes()
+        if not current.startswith(original):raise PermissionError('journal original prefix changed')
+    elapsed=unseal(json.loads(read('active_seconds.json')))['active_seconds']
+    if not 5.56<=elapsed<=7200:raise PermissionError('cumulative active time')
+    if not state['replacement_consumed']:
+        original_check()
+    else:
+        # A consumed grant without a persisted page may never send again, even
+        # after an acknowledgement loss or crash between fence and node write.
+        node=w/'nodes'/RECOVERY_ID/f"{first['from_ms']}_{first['to_ms']}.json.gz"
+        if not node.is_file() or node.is_symlink() or len(aa)<2:raise PermissionError('consumed recovery page unavailable; review required')
+        replacement=aa[1];received=[x for x in oo if x.get('attempt_index')==1]
+        if len(received)!=1 or received[0].get('status')!='RECEIVED' or received[0].get('returned_ticks')!=66 or received[0].get('has_more') is not False:raise PermissionError('replacement shape evidence')
+        for k,v in {'request_id':RECOVERY_ID,'from_ms':first['from_ms'],'to_ms':first['to_ms'],'depth':0,'attempt_index':1}.items():
+            if replacement.get(k)!=v:raise PermissionError('replacement request scope')
+    if sum(p.stat().st_size for p in w.rglob('*') if p.is_file())>2000000000:raise PermissionError('recovery storage cap')
+    return state
+
 class ProbeTransport:
-    def __init__(self,metadata,slots,account,workdir,clock=time.monotonic,sleep=time.sleep):
+    def __init__(self,metadata,slots,account,workdir,clock=time.monotonic,sleep=time.sleep,recovery=None):
         from m6.ctrader_proto import OpenApiMessages_pb2 as oa
         if not metadata.scope_view_verified or not metadata.account_auth_verified:raise PermissionError('read-only account gate before ticks')
         self.oa=oa;self.meta=metadata;self._account=account;self.slots={x['request_id']:x for x in slots if x['status']=='PLANNED'}
         self.workdir=Path(workdir)
-        if (self.workdir/'terminal_transport_stop.json').exists():
+        self.recovery=recovery
+        if (self.workdir/'terminal_recovery_stop.json').exists():raise PermissionError('later terminal STOP')
+        if recovery is None and (self.workdir/'terminal_transport_stop.json').exists():
             unseal(json.loads((self.workdir/'terminal_transport_stop.json').read_bytes()))
             raise PermissionError('durable terminal transport STOP; no retry authority')
         self.clock=clock;self.sleep=sleep;self.last=None
@@ -79,6 +158,7 @@ class ProbeTransport:
     def __repr__(self):return '<bounded probe; private account withheld>'
     def _trace(self,item):
         raw=canonical(seal(item))+b'\n'
+        if self.local_bytes+len(raw)>2000000000:raise PermissionError('wire journal storage cap')
         atomic(self.journal,(self.journal.read_bytes() if self.journal.exists() else b'')+raw)
         self.attempts.append(item);self.local_bytes+=len(raw)
     def _validate(self,msg):
@@ -90,12 +170,22 @@ class ProbeTransport:
         if (lo,hi) not in self._authorized_ranges or not s['from_ms']<=lo<=hi<=s['to_ms']:raise PermissionError('window outside exact probe split tree')
     def _outcome(self,item):
         path=self.workdir/'wire_outcomes.jsonl'
+        if self.local_bytes+len(canonical(seal(item)))+1>2000000000:raise PermissionError('outcome journal storage cap')
         atomic(path,(path.read_bytes() if path.exists() else b'')+canonical(seal(item))+b'\n')
         self.attempts[item['attempt_index']].update(item);self.local_bytes+=len(canonical(seal(item)))+1
     def request(self,msg,depth):
         self._validate(msg)
         from m6.ctrader_transport import TransportError
-        for retry in range(3):
+        if self.recovery is not None and self.active==RECOVERY_ID and len(self.attempts)!=1:raise PermissionError('no additional replacement authorized')
+        replacement=self.recovery is not None and self.active==RECOVERY_ID and len(self.attempts)==1
+        if replacement:
+            if self.recovery['replacement_consumed']:raise PermissionError('replacement already consumed')
+            self.recovery['replacement_consumed']=True
+            self.recovery['replacement_request_sha256']=sha(msg.SerializeToString(deterministic=True))
+            binding_path=self.workdir/'decoder_recovery_binding.json';encoded=canonical(seal(self.recovery));delta=len(encoded)-binding_path.stat().st_size
+            if self.local_bytes+delta>2000000000:raise PermissionError('recovery fence storage cap')
+            atomic(binding_path,encoded);self.local_bytes+=delta
+        for retry in range(1 if replacement else 3):
             self.budget_check()
             if len(self.attempts)>=11200 or self.clock()-self.started>=7200:raise PermissionError('hard probe wire/time budget')
             delay=0.22-(self.clock()-self.last) if self.last is not None else 0
@@ -110,6 +200,7 @@ class ProbeTransport:
             except PermissionError:raise
             except (TransportError,OSError,TimeoutError):
                 self._outcome({'attempt_index':trace['attempt_index'],'status':'TRANSPORT_FAILURE_OR_ACK_LOSS','latency_seconds':self.clock()-start})
+                if replacement:raise PermissionError('replacement transport failure; no second replacement') from None
                 if retry==2:raise RuntimeError('probe transport interrupted safely') from None
                 self.sleep(retry+1);self.meta._restore();continue
             self.budget_check()
@@ -124,14 +215,16 @@ class ProbeTransport:
                 raise PermissionError('historical broker error; transport failed closed') from None
             if type(res) is not self.oa.ProtoOAGetTickDataRes or not res.IsInitialized() or int(res.ctidTraderAccountId)!=self._account:raise PermissionError('wrong historical response binding')
             if 'symbolId' in res.DESCRIPTOR.fields_by_name and res.HasField('symbolId') and int(res.symbolId)!=int(msg.symbolId):raise PermissionError('historical symbol mismatch')
-            trace.update(status='RECEIVED',returned_ticks=len(res.tickData),has_more=bool(res.hasMore));self._outcome(trace);return res,trace
+            trace.update(status='RECEIVED',returned_ticks=len(res.tickData),has_more=bool(res.hasMore));self._outcome(trace)
+            if replacement and (len(res.tickData)!=66 or bool(res.hasMore)):raise PermissionError('replacement shape differs; independent review required')
+            return res,trace
         raise RuntimeError('unreachable')
     def capture(self,slot):
         if slot['request_id'] not in self.slots or slot!=self.slots[slot['request_id']]:raise PermissionError('unbound slot')
         self.active=slot['request_id'];self._authorized_ranges={(slot['from_ms'],slot['to_ms'])}
         try:return self._node(slot['from_ms'],slot['to_ms'],0)
         except PermissionError:
-            atomic(self.workdir/'terminal_transport_stop.json',canonical(seal({'status':'TRANSPORT_ARCHITECTURE_NOT_FEASIBLE_AS_CURRENTLY_CONFIGURED','request_id':self.active,'automatic_retry_authorized':False})))
+            atomic(self.workdir/('terminal_recovery_stop.json' if self.recovery is not None else 'terminal_transport_stop.json'),canonical(seal({'status':'TRANSPORT_ARCHITECTURE_NOT_FEASIBLE_AS_CURRENTLY_CONFIGURED','request_id':self.active,'automatic_retry_authorized':False})))
             raise
     def capture_cached(self,slot):
         self.replay_only=True

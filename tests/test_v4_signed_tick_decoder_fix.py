@@ -29,6 +29,9 @@ class SignedWireDecoderTests(unittest.TestCase):
    for _ in range(100):
     t+=rng.randrange(3);p+=rng.randrange(-5,6);rows.append([t,p])
    self.assertEqual(decode_ticks(encode(rows),1000,t),rows)
+   from m6.cost_evidence import decode_ctrader_tick_page
+   prior=decode_ctrader_tick_page([{'timestamp':x.timestamp,'tick':x.tick} for x in encode(rows)])
+   self.assertEqual(rows,[[x.timestamp_ms,x.raw_tick] for x in prior])
  def test_positive_subsequent_time_delta_rejected(self):
   with self.assertRaises(PermissionError):decode_ticks([SimpleNamespace(timestamp=1000,tick=20),SimpleNamespace(timestamp=1,tick=0)],999,1001)
  def test_reconstructed_nonpositive_price_rejected(self):

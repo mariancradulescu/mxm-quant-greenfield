@@ -173,16 +173,24 @@ class ProbeProof(unittest.TestCase):
     full=next(x['current_full_metadata'] for x in d['rows'] if x['symbol_id']==msg.symbolId[0]);full=copy.deepcopy(full)
     for h in full.get('holiday',[]):h['scheduleTimeZone']=full['scheduleTimeZone'] # explicitly fictional broker fixture
     out=oa.ProtoOASymbolByIdRes(ctidTraderAccountId=FAKE_AID);ParseDict(full,out.symbol.add());return out
+   if type(msg) is oa.ProtoOAGetTickDataReq and int(msg.fromTimestamp)==PLAN['slots'][0]['from_ms'] and int(msg.toTimestamp)==PLAN['slots'][0]['to_ms'] and int(msg.symbolId)==PLAN['slots'][0]['symbol_id'] and int(msg.type)==1:
+    broker.tick_calls.append((int(msg.fromTimestamp),int(msg.toTimestamp)))
+    out=oa.ProtoOAGetTickDataRes(ctidTraderAccountId=FAKE_AID,hasMore=False)
+    from tests.test_v4_signed_tick_decoder_fix import encode
+    for x in encode([[int(msg.fromTimestamp)+i,100000+i%3] for i in range(66)]):out.tickData.add(timestamp=x.timestamp,tick=x.tick)
+    return out
    return original(msg)
   broker.request=request
+  from tests.test_v4_exact_decoder_recovery import seed_recovery_fixture
+  seed_recovery_fixture(self.deploy,self.deploy.parent/'private-registry')
   mt=lambda inner,o,secrets,progress:MetadataTransport(inner,o,secrets,progress=progress,clock=clock,sleep=clock.sleep)
-  pt=lambda meta,slots,aid,d:ProbeTransport(meta,slots,aid,d,clock=clock,sleep=clock.sleep)
+  pt=lambda meta,slots,aid,d,**kw:ProbeTransport(meta,slots,aid,d,clock=clock,sleep=clock.sleep,**kw)
   with patch('m6.ctrader_capture.account_fingerprint',return_value=module.__dict__.get('FINGERPRINT','b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636')),patch('os.fsync',return_value=None),patch.object(module,'MetadataTransport',side_effect=mt),patch.object(module,'ProbeTransport',side_effect=pt):
    output=run_device(self.deploy,oauth=oauth,transport_factory=lambda:broker,progress=lambda _:None,private_registry_root=self.deploy.parent/'private-registry')
    self.assertEqual(len(broker.tick_calls),1120)
    output2=run_device(self.deploy,oauth=oauth,transport_factory=lambda:broker,progress=lambda _:None,private_registry_root=self.deploy.parent/'private-registry');self.assertEqual(len(broker.tick_calls),1120)
   with zipfile.ZipFile(output2) as z:
-   m=json.loads(z.read('PROBE_EXECUTION_MANIFEST.json'));self.assertEqual(m['base_requests_completed'],1120);self.assertFalse(m['response_values_computed']);self.assertFalse(m['full_capture_started'])
+   m=json.loads(z.read('PROBE_EXECUTION_MANIFEST.json'));self.assertEqual(m['historical_wire_attempts_including_retry'],1121);self.assertGreaterEqual(m['elapsed_active_seconds_all_resumes'],5.56);self.assertEqual(m['base_requests_completed'],1120);self.assertFalse(m['response_values_computed']);self.assertFalse(m['full_capture_started'])
    matrix=json.loads(z.read('SUPPORT_ONLY_MATRIX.json'));self.assertEqual(len(matrix),560);self.assertTrue(all(len(x['support']['cells'])==24 for x in matrix))
    for line in z.read('CHECKSUMS.sha256').decode().splitlines():h,n=line.split('  ');self.assertEqual(sha(z.read(n)),h)
    for name in z.namelist():
