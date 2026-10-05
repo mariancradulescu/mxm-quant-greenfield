@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
+      OPENBLAS_CORETYPE: Nehalem
+      NPY_DISABLE_CPU_FEATURES: AVX512F,AVX2,FMA3,AVX
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
       PYTHONHASHSEED: '0'
