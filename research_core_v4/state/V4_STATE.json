@@ -1,6 +1,6 @@
 {
   "adaptive_selection_history": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V1.json",
-  "as_of_date": "2026-10-04",
+  "as_of_date": "2026-10-05",
   "closure_dependency_graph": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
   "current_project_closure_ledger": "research_core_v4/state/POST_FIRST_V4_CLOSURE_LEDGER_V1.json",
   "current_project_coverage": "research_core_v4/state/POST_FIRST_V4_PROJECT_COVERAGE_REFRESH_V1.json",
@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "RUN_ZERO_NETWORK_PRIVATE_EVIDENCE_VERIFIER_ONLY",
+  "next_action": "STOP_ACQUISITION_RETURN_TO_PROJECT_WIDE_SELECTION",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V1.json",
   "next_prospective_wave": {
     "ARM_authorized": false,
@@ -164,6 +164,7 @@
       "active_post_probe_decision_law_sha256": "2ed452f25e73030ff716726675bd513be5f3be7b32260fe642dfe79277d307b5",
       "android_package_sha256": "b16896e88235687c21a289a69c4a3b4650b7019cd128d4c91912a728275fe681",
       "base_request_count": 1120,
+      "checkpoint_integrity_proved_by_audited_device_verifier": true,
       "completed_base_requests_observed": 1120,
       "completed_return_intake_ref": "research_core_v4/state/QUOTE_SUPPORT_PROBE_RETURN_INTAKE_V1.json",
       "completed_return_sha256": "3aad420b6e3b5c7ff862c3475512c8e0a781c44b80fef38ffee9d8e17c42e71a",
@@ -173,22 +174,28 @@
       "device_execution_authority_ref": "research_core_v4/state/USER_DEVICE_PROBE_EXECUTION_AUTHORITY_V1.json",
       "device_execution_authority_sha256": "a1378212d0a9b76091ec9e8ec05d48aef9d2eaeac163b0c01870f4f954f419ab",
       "device_execution_authorized": false,
+      "economic_null_claimed": false,
       "executed": true,
       "full_capture_authorized": false,
       "hardening_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_HARDENING_AUDIT_V1.json",
       "hardening_audit_sha256": "db2e15f77df6ba800c8cf70797b770733887c823a7f9cb4db0e4bb028f9fffa6",
       "historical_requests_sent": 1155,
       "identity_count": 56,
+      "lossless_reconstruction_proved_by_audited_device_verifier": true,
+      "mechanism_closure_declared": false,
       "method_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_METHOD_SUPPORT_AUDIT_V1.json",
       "ordered_event_amendment_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_V2_ORDERED_EVENT_IMPLEMENTATION_AMENDMENT_V1.json",
+      "paired_context_count": 27,
+      "paired_contexts_meeting8_of10": 0,
       "plan_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_TRANSPORT_PROBE_PLAN_V1.json",
       "post_probe_decision_law_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_POST_PROBE_DECISION_LAW_V1.json",
       "post_probe_decision_law_sha256": "9c03409cab9c5d5623aa2bd5a694afcc3bb8a6915572a6ae27876aa0bc62a6d2",
-      "post_probe_decision_law_status": "FROZEN_LAW_PRIVATE_PROOF_GAP_PENDING;CONDITIONAL_SUPPORT_RESULT_NOT_YET_CERTIFIED",
+      "post_probe_decision_law_status": "APPLIED_WITH_ACCEPTED_DEVICE_PRIVATE_PROOF_DATA_LIMITED_ACQUISITION_NOT_JUSTIFIED",
       "preparation_audit_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_SUPPORT_PROBE_PREPARATION_AUDIT_V1.json",
       "preparation_audit_sha256": "873ea9bd3177159b181753e0111d775aed0a700f73083a6f8cdea153b66a0b17",
-      "private_offline_proof_received": false,
-      "private_offline_verifier_execution_authorized": true,
+      "private_offline_proof_received": true,
+      "private_offline_verifier_execution_authorized": false,
+      "private_proof_intake_ref": "research_core_v4/state/QUOTE_SUPPORT_PRIVATE_PROOF_RETURN_INTAKE_V1.json",
       "private_proof_verifier_ref": "research_core_v4/state/QUOTE_SUPPORT_PRIVATE_PROOF_VERIFIER_PREPARATION_V1.json",
       "real_raw_quote_export_authorized": false,
       "response_authorized": false,
@@ -458,7 +465,7 @@
     "secure_channel_blocker_sha256": "33113c59ce6d8b6db342053fe4f64b2778f11b89dca24f90dd36ed9b275ac341",
     "secure_machine_side_broker_channel_available": false,
     "selected_mechanism_count": 1,
-    "status": "QUOTE_SEQUENCE_BOUNDED_PROBE_COMPLETED_AWAITING_PRIVATE_OFFLINE_PROOF"
+    "status": "QUOTE_SEQUENCE_BOUNDED_PROBE_PRIVATE_PROOF_ACCEPTED_DATA_LIMITED_ACQUISITION_NOT_JUSTIFIED"
   },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
@@ -584,6 +591,6 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "QUOTE_SEQUENCE_BOUNDED_PROBE_COMPLETED_AWAITING_PRIVATE_OFFLINE_PROOF",
-  "stop_boundary": "NO_MORE_BROKER_ACQUISITION;AWAIT_LOCAL_PRIVATE_INTEGRITY_AND_LOSSLESS_RECONSTRUCTION_PROOF;NO_SCIENTIFIC_RESPONSE"
+  "status": "QUOTE_SEQUENCE_BOUNDED_PROBE_PRIVATE_PROOF_ACCEPTED_DATA_LIMITED_ACQUISITION_NOT_JUSTIFIED",
+  "stop_boundary": "NO_MORE_ACQUISITION_FOR_CURRENT_V2_QUOTE_SEQUENCE_CONFIGURATION;NO_SCIENTIFIC_RESPONSE;NO_GLOBAL_TOP_OF_BOOK_FAMILY_CLOSURE;NEXT_SELECTION_REQUIRES_SEPARATE_TASK"
 }
