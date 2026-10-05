@@ -1,0 +1,41 @@
+name: V4 Factor Residual Preoutcome Support Only
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/state/FACTOR_RESIDUAL_PREOUTCOME_REQUEST_V1.json]
+permissions: {contents: read}
+concurrency:
+  group: v4-factor-residual-preoutcome-singleton
+  cancel-in-progress: false
+jobs:
+  support-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ github.sha }}", persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12.14"}
+      - name: Synthetic and adversarial tests, no market input
+        run: python -m unittest tests.test_v4_factor_residual
+      - name: Production-resolution synthetic calibration, no market input
+        run: |
+          python - <<'PYMC' > "$RUNNER_TEMP/FACTOR_RESIDUAL_CALIBRATION_PRODUCTION_V1.json"
+          import json
+          from research_core_v4.factor_residual_calibration_v1 import run
+          print(json.dumps(run(trials=256,resamples=1023),sort_keys=True))
+          PYMC
+      - name: Reuse accepted encrypted data for causal features and timestamps only
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          python -m tools.factor_residual_preoutcome --output "$RUNNER_TEMP/FACTOR_RESIDUAL_SUPPORT_PREFLIGHT_V1.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: factor-residual-support-only-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/FACTOR_RESIDUAL_SUPPORT_PREFLIGHT_V1.json
+            ${{ runner.temp }}/FACTOR_RESIDUAL_CALIBRATION_PRODUCTION_V1.json
+          if-no-files-found: error
+          retention-days: 90
