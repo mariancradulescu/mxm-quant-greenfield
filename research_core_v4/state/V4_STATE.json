@@ -1,9 +1,9 @@
 {
-  "adaptive_selection_history": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V2.json",
+  "adaptive_selection_history": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json",
   "as_of_date": "2026-10-05",
   "closure_dependency_graph": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
   "current_project_closure_ledger": "research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json",
-  "current_project_coverage": "research_core_v4/state/POST_QUOTE_V4_PROJECT_COVERAGE_REFRESH_V2.json",
+  "current_project_coverage": "research_core_v4/state/POST_QUOTE_V4_PROJECT_COVERAGE_REFRESH_V3.json",
   "detector_calibration_history": {
     "v1_result": "research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V1.json",
     "v1_spec": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V1.json",
@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "VERIFY_EXISTING_DATA_CAUSAL_SUPPORT_AND_INDEPENDENT_PREOUTCOME_AUDIT_ONLY",
+  "next_action": "STOP_BEFORE_REAL_RESPONSE_PRESERVE_FROZEN_SUPPORT_AND_CALIBRATION_BLOCKERS",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V2.json",
   "next_prospective_wave": {
     "ARM_present": false,
@@ -474,10 +474,17 @@
     },
     "information_source": "FACTOR_OR_BASKET_RESIDUAL_STATE",
     "mechanism": "CAUSAL_LEAVE_ONE_OUT_FACTOR_RESIDUAL_INFORMATION",
+    "new_acquisition_authorized": false,
+    "next_real_response_blocked": true,
+    "preoutcome_audit_ref": "research_core_v4/state/FACTOR_RESIDUAL_FINAL_PREOUTCOME_AUDIT_V1.json",
+    "production_calibration_gate_pass": false,
     "protected_forward_opened": false,
     "real_response_authorized": false,
+    "real_response_opened": false,
     "response_execution_authorized": false,
-    "status": "FROZEN_PREOUTCOME_AWAITING_EXISTING_DATA_SUPPORT_PREFLIGHT"
+    "status": "FROZEN_DESIGN_DATA_LIMITED_BEFORE_REAL_RESPONSE",
+    "support_preflight_ref": "research_core_v4/state/FACTOR_RESIDUAL_SUPPORT_PREFLIGHT_V1.json",
+    "support_status": "DATA_LIMITED_UNTESTED_NOT_NULL"
   },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
@@ -603,6 +610,6 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "FACTOR_RESIDUAL_PREOUTCOME_PREPARATION_STOP_BEFORE_REAL_RESPONSE",
+  "status": "FACTOR_RESIDUAL_PREOUTCOME_DATA_LIMITED_STOP_NO_REAL_RESPONSE",
   "stop_boundary": "NO_REAL_RESPONSE;NO_ARM;NO_NEW_ACQUISITION;NO_QUOTE_V2_RESCUE"
 }

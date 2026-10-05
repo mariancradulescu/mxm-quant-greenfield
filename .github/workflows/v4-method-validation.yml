@@ -18,7 +18,8 @@ jobs:
         run: |
           if test -f research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json; then
             python -m unittest -q tests.test_research_core_v4_publication_only
-            python -m research_core_v4.publication_only_v1 --verify-canonical "$PWD"
+            python -m research_core_v4.post_publication_integrity_v1 "$PWD"
+            python -m unittest -q tests.test_v4_factor_residual tests.test_v4_post_quote_preoutcome
             echo "pre_arm=false" >> "$GITHUB_OUTPUT"
           elif test -f research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json; then
             echo "pre_arm=false" >> "$GITHUB_OUTPUT"
