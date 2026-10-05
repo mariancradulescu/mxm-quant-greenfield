@@ -1,0 +1,29 @@
+{
+  "cohorts": 3,
+  "design_ref": "research_core_v4/triad_v2/TRIAD_V2_ESTIMAND_NUISANCE_DESIGN_V1.json",
+  "design_sha256": "39ccec246ed346f86cfd0cfeb74b83d48ec86425b32fd6ba9529b43b67f4b771",
+  "g_label_maturity": "Decision+horizon+5min conservativeavailabilitybuffer, plus240minpurge, strictlybeforeUTC00dailyupdate.",
+  "gate": "EVERYdeclaredleaf>=12blocks(each>=7validdays),>=42daysineach70daythird,>=240maturedpooledtargettrainingrowsperrolling90daydailyupdate. Anyfailureblocks exactV2 withoutremoving acohort/horizon.",
+  "horizons": [
+    15,
+    30,
+    60,
+    240
+  ],
+  "if_fail": "Persist rawresult thenDATA_LIMITED exactblocker; no stochasticFWER/powerplanexecution and no redesign inthistask.",
+  "if_pass": "Onlythen freeze fulljointstochasticcertificationplan andcode/derivedtrials/seeds beforeanysimulation.",
+  "implementation_ref": "research_core_v4/triad_v2/exact_support_v2.py",
+  "implementation_sha256": "ca33553d71ac08f71b01b87bc1a12269d8d0d42d1abe2c1bc865449cf042958d",
+  "leaves": 12,
+  "membership": "Causalpasttimestamprelationmembership at fixedclock, targetsetthenfrozen. Wholeclockdiscard ifanyoneofthesefutureownlegpaths unavailable. Cannotresidualizerefittedsubset selectedaftertime.",
+  "no_outcome_based_exclusion": true,
+  "no_params_changed_since_design_freeze": true,
+  "precision_law": "Exact timestampcounting,notMonteCarlo; trials0,seedsnone,noFWERorpowerclaim.",
+  "real_price_or_response_forbidden": true,
+  "relations": 107,
+  "schema": "mxm.v4.triad-v2.exact-support-certification-plan.v1",
+  "semantic_PASS_commit": "73f67ce6be8478ed1d4429551797c9212aaae4a4",
+  "semantic_ref": "research_core_v4/triad_v2/SEMANTIC_INTERPRETATION_V1.json",
+  "semantic_sha256": "92b9082f1ce95579dcbccbb5e83c9c7d31c26fd33e6a009a151d8c08e12d1622",
+  "status": "FROZEN_AFTER_SEMANTIC_PASS_BEFORE_TIMESTAMP_SUPPORT_EXECUTION"
+}
