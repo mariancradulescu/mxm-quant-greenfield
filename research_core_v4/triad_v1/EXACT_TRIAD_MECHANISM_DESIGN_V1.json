@@ -1,0 +1,236 @@
+{
+  "aggregation": {
+    "clock_breadth": "At leastceil(0.5*declaredrelations) andceil(0.5*declaredtargets),minimum3targets; no data-drivenweight optimization.",
+    "daily_breadth": "At least4of8fixedclocks satisfy complete causal three-leg feature and ownleg fullpathavailability for thathorizon. Causal availability check uses onlytimestamps.",
+    "law": "Equalweight available relations within each fixedtarget; equalweight targets within cohortclock; equalweight complete clocks withinday. A repeated target may not obtain extra weight from extra bridges.",
+    "max_target_weight": "At most1/3 pereligibleclock; no isolatedtriadwinner.",
+    "response_concentration_later": "At least50percent of fixed declaredtargetweight has signconsistent targetmean; also removalofeachsingletarget leaves selectedcohort orientationunchanged. These selection gates require future exactsynthetic validation; never applied to realprices now."
+  },
+  "broker_acquisition_authorized": false,
+  "candidate_promotion_authorized": false,
+  "causal_clock": {
+    "bar_timestamp_interpretation": "UTC M5 bar-open label; conservatively available only after complete bar plusone additional5minute latency buffer. At decisiont use labelt-10min as last observableclose.",
+    "decision_UTC_hours": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "endpoint_semantics": "Future response endpoints start from decisiont executable-information clock: entryreference labelt-5min (bar endingt), endpoint labelt+h-5min. Entryreference is not read before response authorization; clocks/masks only in support.",
+    "feature_history_offsets_from_last_bar_minutes": [
+      0,
+      5,
+      60
+    ],
+    "future_endpoint_bar_offsets_from_last_bar_minutes": [
+      15,
+      30,
+      60,
+      240
+    ],
+    "path_availability": "All actualM5 timestamp labels from entryreference through eachendpointh required, preserve3/6/12/48andintermediate5minute samples. No subM5 path; no priceforwardfill.",
+    "synchrony": "Exact matching bar labels are a sample-alignment convention, not simultaneous executable quotes or asynchronous-close freshness proof.",
+    "weekdays_only": true
+  },
+  "closure_scope": "Only this exact frozen relation/cohortfeature/prefix/clock/horizon/support/inference/stability law mayblock. Broader CROSS_INSTRUMENT_RELATIONAL_STATE family remainsopen. No old classification reinterpretation.",
+  "cohort_relation_counts": {
+    "G10_MONETARY_TRIADS": 56,
+    "MANAGED_EXTENSION_TRIADS": 32,
+    "OTHER_EXTENSION_TRIADS": 19
+  },
+  "cohort_target_ids": {
+    "G10_MONETARY_TRIADS": [
+      7,
+      11,
+      13,
+      15,
+      16,
+      18,
+      19,
+      20,
+      21,
+      23,
+      25,
+      27,
+      30,
+      37,
+      39,
+      40,
+      61,
+      86,
+      87,
+      118,
+      2764,
+      2770,
+      2772
+    ],
+    "MANAGED_EXTENSION_TRIADS": [
+      32,
+      47,
+      64,
+      75,
+      2762,
+      2767,
+      2768,
+      2775,
+      2776,
+      2779,
+      2781
+    ],
+    "OTHER_EXTENSION_TRIADS": [
+      84,
+      98,
+      134,
+      2763,
+      2765,
+      2766,
+      2769,
+      2771,
+      2777,
+      2780
+    ]
+  },
+  "cohorts": [
+    "G10_MONETARY_TRIADS",
+    "MANAGED_EXTENSION_TRIADS",
+    "OTHER_EXTENSION_TRIADS"
+  ],
+  "confirmation_authorized": false,
+  "directions": "Two-sided sharedmaxT; every adjusted surviving leaf retained, no universal crosscohort direction.",
+  "economics": {
+    "claim": null,
+    "information_before_exit": true,
+    "no_universal_bps_gate": true,
+    "planning_only": "Alreadydurableauthenticminvolume,step,margin,conversion,spread/commissionandschedule mayguidefeasibilityonly. Current executablecost,slippage,marginEUR200andloggrowth remainunresolved.",
+    "unknown_friction_is_zero": false
+  },
+  "feature": {
+    "controls": [
+      "intercept",
+      "canonical ownleg logchange qminusq-5min",
+      "canonical ownleg logchange qminusq-60min",
+      "seven UTCclock dummies for8..15"
+    ],
+    "distinctness": "Three-instrument currency-algebra closure-change innovation, fixed monetary-anchor target and broad structural cohorts. No event-time quote revision, pairdelaysearch, factor-eigenmodel, cross-sectionaldispersionranking or rescue of prior exact scopes.",
+    "law": "At causal lastobservablebarq, let C(q)=log P_uv(q)-log P_uA(q)+log P_vA(q), with inventoryfixed targetu<v and anchora. Raw relationalstate F(q)=C(q)-C(q-60min). This is an observed cycle-change discrepancy, not locked arbitrage.",
+    "normalized_state": "Residual / prefixRMS, clippedto[-3,3] prospectively. Fixed feature orientation inventorytarget-minusbridge. Both continuation and reversal paid in two-sidedfamily.",
+    "ownleg_outcome_later": "Canonical target logprice change between entryreference and eachendpoint, divided by frozen prefix ownleg60min logchange RMS. No response or priceendpoint computed in this task.",
+    "prefix_fit": "Perrelation OLSprojection F on controls using only complete causal prefixdecisionrows, no future labels. Pseudoinverse rcond1e-12 fixed. Prefixcenter/residual RMS fixed. No development refit.",
+    "prefix_validity_gates": {
+      "all_relations_required": true,
+      "minimum_complete_prefix_clocks_per_relation": 240,
+      "minimum_ownleg60min_RMS": 1e-10,
+      "minimum_residual_RMS": 1e-10,
+      "no_postsupport_pruning": true,
+      "prefix_design_rank": 10
+    }
+  },
+  "horizons_M5": [
+    3,
+    6,
+    12,
+    48
+  ],
+  "horizons_minutes": [
+    15,
+    30,
+    60,
+    240
+  ],
+  "individual_triad_hypotheses": false,
+  "inference": {
+    "FWER_ceiling": 0.05,
+    "bootstrap_draws": 1023,
+    "generic_implementation_sha256": "e948a3e36e546168f185d52c8a31a5caf0da7fe0f0c160eb3da3a492c56979d0",
+    "generic_plan_sha256": "a334f95e5d8c3e11317a1cad72e03d0953ab2c19e97d146d95592a5d2921be52",
+    "method": "JOINT_CALENDAR_BLOCK_WILD_BOOTSTRAP_T_MAXT_V1",
+    "no_HAC_fallback": true,
+    "no_postresult_adjustment": true,
+    "no_tournament": true,
+    "nominal_family_alpha": 0.025,
+    "studentization": "Exactgeneric centered blockbootstrap-t with one common calendarmultiplier across12leaves; no independentrelationbootstrap. Exact score extraction covariance/prefix/masks require certification beforeanyresponse."
+  },
+  "inventory_ref": "research_core_v4/triad_v1/CANONICAL_FX_RELATION_COHORT_INVENTORY_V1.json",
+  "inventory_sha256": "bd1b3064aa02e1ec2743350416a831f2a752431d2a573504ceaa83472dfbcc47",
+  "leaf_count": 12,
+  "leaves": [
+    "G10_MONETARY_TRIADS|H3",
+    "G10_MONETARY_TRIADS|H6",
+    "G10_MONETARY_TRIADS|H12",
+    "G10_MONETARY_TRIADS|H48",
+    "MANAGED_EXTENSION_TRIADS|H3",
+    "MANAGED_EXTENSION_TRIADS|H6",
+    "MANAGED_EXTENSION_TRIADS|H12",
+    "MANAGED_EXTENSION_TRIADS|H48",
+    "OTHER_EXTENSION_TRIADS|H3",
+    "OTHER_EXTENSION_TRIADS|H6",
+    "OTHER_EXTENSION_TRIADS|H12",
+    "OTHER_EXTENSION_TRIADS|H48"
+  ],
+  "maximum_response_openings": 0,
+  "mechanism": "CAUSAL_CURRENCY_TRIAD_RELATIONAL_STATE_INCREMENTAL_OWN_LEG_INFORMATION",
+  "no_free_selection": true,
+  "preoutcome_order": [
+    "Frozen design and timestamp-only support implementation",
+    "Actualtimestamp mask/support and prefixavailability checks",
+    "If anyfrozen gatefails persist blocker and stop; no fullcertificationorresponse",
+    "Only ifsupportpasses: freeze complete exactsyntheticDGP,implementation,trials,seeds,error/powergates before simulation",
+    "Rawsynthetic results beforeinterpretation",
+    "If everyexactgatepasses READY_NOT_EXECUTED forindependentgovernance"
+  ],
+  "primary_features": 1,
+  "protocol_ref": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+  "protocol_sha256": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5",
+  "real_response_authorized": false,
+  "recovery_ledger_ref": "research_core_v4/triad_v1/ACCEPTED_FX_ARCHIVE_RECOVERY_LEDGER_V1.json",
+  "recovery_ledger_sha256": "49295cb9add563c6ae85e4f05b3f3e7316607ffe92df3d4d49b7ddd03d2467a1",
+  "schema": "mxm.v4.triad.exact-mechanism-design.v1",
+  "stability": {
+    "complete_procedure_calibration_required": true,
+    "law": "Two fixed105day halves: each must have supported mean in the globallyselected orientation. This reflects persistence across two longer currency-state windows; unrelatedcohorts remainindependentleads.",
+    "no_best_half_or_regime": true,
+    "not_universal_default": true
+  },
+  "status": "FROZEN_PREOUTCOME_LAW_NO_RESPONSE_AUTHORITY",
+  "support": {
+    "block_days": 14,
+    "calendar_days": 210,
+    "complete_family_required": true,
+    "minimum_observed_days_per_fixed70day_third": 42,
+    "minimum_supported_blocks_per_leaf": 12,
+    "minimum_valid_days_per_block": 7,
+    "potential_blocks": 15,
+    "support_failure": "DATA_LIMITED_SUPPORT_UNTESTED_NOT_NULL; stop exactdesign, no cohort/horizon removal or rescue. Missingness neverzero and calendarnevercompressed."
+  },
+  "synthetic_requirement_not_yet_executable": {
+    "MC_precision": "Mustfreeze simultaneousuncertainty-derivedcount andseedswithimplementation beforeanysimulation; generic abstractresults cannotcertifythisdesign.",
+    "must_cover": [
+      "actual overlapping horizon endpoints",
+      "actual107relationtargetcurrencytopology",
+      "prefix estimation usingonlydisjointsynthetictraining",
+      "actualcausal mask/gaps",
+      "heavy tails",
+      "heteroscedasticity",
+      "serial AR025/AR050orstronger justifiedscoredependence",
+      "commonfactors",
+      "global andmultiplepartialnulls",
+      "localizedplusminus andheterogeneousdirections",
+      "completebreadthconcentrationstabilityselection"
+    ],
+    "status": "REQUIRES_COMPLETE_SUPPORT_FIRST_NOT_A_CERTIFICATION_PLAN"
+  },
+  "window": {
+    "development_calendar_days": 210,
+    "development_end_exclusive_utc": "2026-07-13T00:00:00Z",
+    "development_start_utc": "2025-12-15T00:00:00Z",
+    "prefix_calendar_days": 90,
+    "prefix_embargo": "Prefix uses past-only feature/control regression, no forward training label. Last prefix state never enters development response; development starts separately at08UTC.",
+    "prefix_end_exclusive_utc": "2025-12-15T00:00:00Z",
+    "prefix_start_utc": "2025-09-16T00:00:00Z",
+    "remaining_accepted_interval": "Exposed development already; never declared disjointconfirmation."
+  }
+}
