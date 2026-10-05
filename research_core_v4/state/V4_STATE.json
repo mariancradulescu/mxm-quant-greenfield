@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "INTERPRET_PERSISTED_RAW_ONLY_NO_RESPONSE_RECOMPUTATION",
+  "next_action": "STOP_BEFORE_CONFIRMATION_OR_ANY_CANDIDATE_PROMOTION_OR_NEW_INFORMATION_WAVE",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V2.json",
   "next_prospective_wave": {
     "ARM_present": false,
@@ -610,18 +610,24 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "VARIANCE_COMPOSITION_RAW_COMPLETE_AWAITING_FROZEN_INTERPRETATION",
-  "stop_boundary": "NO_REAL_RESPONSE;NO_ARM;NO_NEW_ACQUISITION;NO_QUOTE_V2_RESCUE",
+  "status": "VARIANCE_COMPOSITION_V1_COMPLETE_NO_REPLICATED_LEAD",
+  "stop_boundary": "NO_CONFIRMATION;NO_CANDIDATE_PROMOTION;NO_PROTECTED_FORWARD;NO_NEW_ACQUISITION;NO_QUOTES_OR_FACTOR_RESCUE;NO_ORDERS",
   "variance_composition_wave": {
     "all_preoutcome_gates_pass": true,
+    "audit_ref": "research_core_v4/state/VARIANCE_COMPOSITION_FINAL_AUDIT_V1.json",
     "broader_family_closed": false,
     "calibration_ref": "research_core_v4/state/VARIANCE_COMPOSITION_CALIBRATION_V1.json",
     "candidate_frozen_count": 0,
     "candidate_promotion_authorized": false,
+    "classification": "NO_REPLICATED_INFORMATION_LEAD_SMALL_EFFECTS_LOW_POWER_INCONCLUSIVE",
     "confirmation_opened": false,
     "design_ref": "research_core_v4/state/VARIANCE_COMPOSITION_DESIGN_V1.json",
+    "development_result_interpreted": true,
+    "economic_null_claimed": false,
+    "economic_status": "COST_UNRESOLVED",
     "freeze_ref": "research_core_v4/state/VARIANCE_COMPOSITION_PREOUTCOME_FREEZE_V1.json",
     "further_response_openings_authorized": false,
+    "interpretation_ref": "research_core_v4/state/VARIANCE_COMPOSITION_INTERPRETATION_V1.json",
     "mechanism": "CAUSAL_VARIANCE_COMPOSITION_PREDICTIVE_STATE",
     "new_acquisition_authorized": false,
     "preoutcome_freeze_head": "c648c05b1e94c0856dcd2375c7e6056a9667f0bd",
@@ -635,7 +641,7 @@
     "response_openings": 1,
     "response_run_id": 37267592504,
     "response_trigger_head": "7d573ff2c12aec4da1006443b76d6e947ef723d3",
-    "status": "RAW_CANONICAL_PERSISTED_NOT_INTERPRETED",
+    "status": "COMPLETED_NO_REPLICATED_INFORMATION_LEAD_SMALL_EFFECTS_LOW_POWER_INCONCLUSIVE",
     "support_ref": "research_core_v4/state/VARIANCE_COMPOSITION_SUPPORT_V1.json"
   }
 }
