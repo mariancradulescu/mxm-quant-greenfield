@@ -3,7 +3,7 @@
   "as_of_date": "2026-10-05",
   "closure_dependency_graph": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
   "current_project_closure_ledger": "research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json",
-  "current_project_coverage": "research_core_v4/state/POST_QUOTE_V4_PROJECT_COVERAGE_REFRESH_V3.json",
+  "current_project_coverage": "research_core_v4/state/POST_VARIANCE_V1_PROJECT_COVERAGE_REFRESH_V1.json",
   "detector_calibration_history": {
     "v1_result": "research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V1.json",
     "v1_spec": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V1.json",
@@ -132,8 +132,8 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "STOP_BEFORE_CONFIRMATION_OR_ANY_CANDIDATE_PROMOTION_OR_NEW_INFORMATION_WAVE",
-  "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V2.json",
+  "next_action": "FREEZE_DISTINCT_ONLINE_CHANGE_PREOUTCOME_DESIGN",
+  "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V3.json",
   "next_prospective_wave": {
     "ARM_present": false,
     "candidate_promotion_authorized": false,
@@ -486,6 +486,18 @@
     "support_preflight_ref": "research_core_v4/state/FACTOR_RESIDUAL_SUPPORT_PREFLIGHT_V1.json",
     "support_status": "DATA_LIMITED_UNTESTED_NOT_NULL"
   },
+  "online_change_wave": {
+    "broader_family_closed": false,
+    "candidate_frozen_count": 0,
+    "confirmation_opened": false,
+    "mechanism": "ONLINE_CHANGE_STATE_INCREMENTAL_INFORMATION",
+    "new_acquisition_authorized": false,
+    "protected_forward_opened": false,
+    "real_response_opened": false,
+    "response_openings": 0,
+    "selection_ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V3.json",
+    "status": "PROSPECTIVELY_SELECTED_NOT_OPENED"
+  },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
     "v3_freeze_ref": "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json",
@@ -610,7 +622,7 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "VARIANCE_COMPOSITION_V1_COMPLETE_NO_REPLICATED_LEAD",
+  "status": "ONLINE_CHANGE_PROSPECTIVELY_SELECTED_DESIGN_PENDING",
   "stop_boundary": "NO_CONFIRMATION;NO_CANDIDATE_PROMOTION;NO_PROTECTED_FORWARD;NO_NEW_ACQUISITION;NO_QUOTES_OR_FACTOR_RESCUE;NO_ORDERS",
   "variance_composition_wave": {
     "all_preoutcome_gates_pass": true,
