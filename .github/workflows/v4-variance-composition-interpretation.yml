@@ -2,7 +2,7 @@ name: V4 Variance Composition Persisted Result Interpretation Only
 on:
   push:
     branches: [performance-research-v3-20260922]
-    paths: [research_core_v4/state/VARIANCE_COMPOSITION_RAW_RESULT_V1.json]
+    paths: [research_core_v4/state/VARIANCE_COMPOSITION_RAW_RESULT_V1.json, .github/workflows/v4-variance-composition-interpretation.yml]
 permissions: {contents: read}
 jobs:
   interpret-persisted-only:
@@ -39,12 +39,16 @@ jobs:
           v.require(subprocess.check_output(['git','merge-base',raw['preoutcome_freeze_head'],'HEAD']).decode().strip()==raw['preoutcome_freeze_head'],'immutable freeze ancestor')
           d=json.loads((S/'VARIANCE_COMPOSITION_DESIGN_V1.json').read_bytes())
           v.require(v.sha(v.canonical(d))==raw['design_sha256'],'design exact')
+          raw_publication_head=subprocess.check_output(['git','log','-1','--format=%H','--','research_core_v4/state/VARIANCE_COMPOSITION_RAW_RESULT_V1.json']).decode().strip()
           network_fence()
           def denied(*a,**k):raise PermissionError('NO_MARKET_RESPONSE_ACCESS_IN_INTERPRETATION')
           v.raw_result=denied;v.response=denied;v.read_series=denied
           result=v.interpret(raw,d)
-          result.update(raw_result_sha256=v.sha(raw_bytes),raw_canonical_publication_head=os.environ['GITHUB_SHA'],preoutcome_freeze_head=raw['preoutcome_freeze_head'],interpretation_run_id=int(os.environ['GITHUB_RUN_ID']),environment=environment(),scientific_law_changed=False,new_real_openings=0,broker_contacts=0,historical_requests=0)
-          print(json.dumps(result,sort_keys=True,indent=2))
+          result.update(raw_result_sha256=v.sha(raw_bytes),raw_canonical_publication_head=raw_publication_head,interpretation_source_head=os.environ['GITHUB_SHA'],preoutcome_freeze_head=raw['preoutcome_freeze_head'],interpretation_run_id=int(os.environ['GITHUB_RUN_ID']),environment=environment(),scientific_law_changed=False,new_real_openings=0,broker_contacts=0,historical_requests=0)
+          def scalar(o):
+              v.require(isinstance(o,v.np.integer),'unsupported output scalar type')
+              return int(o)
+          print(json.dumps(result,sort_keys=True,indent=2,default=scalar))
           PY
       - uses: actions/upload-artifact@v4
         with:
