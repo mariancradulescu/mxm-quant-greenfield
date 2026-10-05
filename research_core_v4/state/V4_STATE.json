@@ -2,7 +2,7 @@
   "adaptive_selection_history": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json",
   "as_of_date": "2026-10-05",
   "closure_dependency_graph": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
-  "current_next_action_type": null,
+  "current_next_action_type": "CORRECTED_EXISTING_DATA_DISCOVERY_ON_BROADER_ACCEPTED_EVIDENCE",
   "current_project_closure_ledger": "research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json",
   "current_project_coverage": "research_core_v4/state/POST_RESIDUALIZED_DISPERSION_V1_PROJECT_COVERAGE_REFRESH_V1.json",
   "depth_information_requirement": {
@@ -33,10 +33,11 @@
   "discovery_authority_hardening_ref": "research_core_v4/state/DISCOVERY_AUTHORITY_STATE_HARDENING_V1.json",
   "discovery_authority_hardening_sha256": "6d5b0726f5a4f8c23825ca2c5c4f04b86aaf4b04162baed9ca9a09106499da8f",
   "discovery_protocol_correction_gate": {
-    "current_V5_selection_is_historical_pending_validated_rerank": true,
+    "current_V5_selection_is_historical_pending_validated_rerank": false,
+    "current_V5_selection_is_historical_reranked_by_V6": true,
     "new_acquisition_authorized": false,
     "new_real_response_authorized": false,
-    "next_action_type": null,
+    "next_action_type": "CORRECTED_EXISTING_DATA_DISCOVERY_ON_BROADER_ACCEPTED_EVIDENCE",
     "protocol_ref": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
     "protocol_sha256": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5",
     "ref": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2_SUPERSESSION_AUTHORITY_V1.json",
@@ -173,11 +174,13 @@
       "technical_status": "VALIDATED_AND_AUTHORIZED"
     }
   },
+  "historical_next_information_source_selection_V5": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V5.json",
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "POST_PROTOCOL_TWO_ACTION_RERANK_ONLY_NO_EXECUTION",
-  "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V5.json",
-  "next_information_source_selection_status": "HISTORICAL_V5_PENDING_VALIDATED_POST_PROTOCOL_RERANK_NOT_ACTION_AUTHORITY",
+  "next_action": "PLAN_ONLY_CORRECTED_BROADER_EXISTING_DATA_DISCOVERY_NO_EXECUTION",
+  "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V6.json",
+  "next_information_source_selection_sha256": "f1a2ce55407351686588b7ef9f1af45f08c83d4340dd03df0ed24eddbceff449",
+  "next_information_source_selection_status": "V6_POST_PROTOCOL_RERANK_FROZEN_PLAN_ONLY_NOT_EXECUTED",
   "next_prospective_wave": {
     "ARM_present": false,
     "candidate_promotion_authorized": false,
@@ -717,8 +720,8 @@
     "support_ref": "research_core_v4/state/RESIDUALIZED_DISPERSION_SUPPORT_V1.json"
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "DISCOVERY_PROTOCOL_V2_FROZEN_PROSPECTIVE_ONLY_NOT_EXECUTED",
-  "stop_boundary": "STOP_BEFORE_ANY_MARKET_RESPONSE_ACQUISITION_CONFIRMATION_OR_TRADING;NEXT_ACTION_SELECTION_IS_PLAN_ONLY",
+  "status": "DISCOVERY_PROTOCOL_V2_FROZEN_NEXT_ACTION_PLAN_ONLY_STOP_NO_EXECUTION",
+  "stop_boundary": "STOP_AFTER_PROTOCOL_SUPERSESSION_AND_ONE_NEXT_ACTION_PLAN;NO_REAL_RESPONSE_BROKER_ACQUISITION_CONFIRMATION_OR_TRADING",
   "variance_composition_wave": {
     "all_preoutcome_gates_pass": true,
     "audit_ref": "research_core_v4/state/VARIANCE_COMPOSITION_FINAL_AUDIT_V1.json",
