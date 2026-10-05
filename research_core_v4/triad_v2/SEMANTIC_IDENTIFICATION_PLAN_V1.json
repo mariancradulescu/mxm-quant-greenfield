@@ -1,0 +1,46 @@
+{
+  "FWL_equivalence": "Residualproductcoefficient matches QYprojection and directOLS[X,D].",
+  "both_baseline_signs_all_cases": true,
+  "cohorts": 3,
+  "design_ref": "research_core_v4/triad_v2/TRIAD_V2_ESTIMAND_NUISANCE_DESIGN_V1.json",
+  "design_sha256": "39ccec246ed346f86cfd0cfeb74b83d48ec86425b32fd6ba9529b43b67f4b771",
+  "gate": "Every analyticnull moment/coefficient and FWLerrors<=tolerance; positivecontrols retain theirtheta anddirection; everyleaveonetargetoutdirection survives; no futurelabelleakage. ANYfailureblocksV2 beforeFWER/power.",
+  "gradual_steps": 20,
+  "heterogeneous_theta": [
+    0.2,
+    -0.2,
+    0.2
+  ],
+  "horizons": [
+    15,
+    30,
+    60,
+    240
+  ],
+  "implementation_ref": "research_core_v4/triad_v2/semantic_certification_v2.py",
+  "implementation_sha256": "a002ace5854bfa9814c5e187ea2046abcc033c0e92814a08bf51a7e840b24321",
+  "kernel_sha256": "7cc458c4d489e1b77a50acfcf3fe3f1f96fcd133fcbd581d817a84a329d44f35",
+  "maturity_tests": "Futureforbiddenlabelperturbations must change NO earlier gcoefficients. Maturityplus240strictlybeforedailyupdate; boundary equality excluded. Tomorrowmayadmitlatermaturedlabels.",
+  "no_extension_reseed_threshold_or_method_change": true,
+  "nuisance_uncertainty": "gfit actualfinite/noisy synthetictraininglabels, not an oracle; arbitrary gerror cancels pathwise. Currentm recomputed on each changeddistribution sample.",
+  "null_cases": [
+    "stable_covariance",
+    "abrupt_covariance_change",
+    "gradual_covariance_drift",
+    "baseline_coefficient_change",
+    "simultaneous_baseline_covariance_change",
+    "heterogeneous_cohort_changes",
+    "horizon_dependent_baseline",
+    "common_factor_covariance_change"
+  ],
+  "positive_theta": [
+    0.2,
+    -0.2
+  ],
+  "real_market_or_response_inputs_forbidden": true,
+  "schema": "mxm.v4.triad-v2.semantic-plan.v1",
+  "seed": 2026100521,
+  "statistical_semantics": "Analyticpopulationconditionalmean identification checks, not TypeI MonteCarlo or detectionpower. Finiteestimationscoreerrors understochasticnoise need later completecalibration.",
+  "status": "FROZEN_BEFORE_SYNTHETIC_EXECUTION",
+  "tolerance": 1e-10
+}
