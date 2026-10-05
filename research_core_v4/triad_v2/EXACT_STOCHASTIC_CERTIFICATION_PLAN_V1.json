@@ -1,0 +1,275 @@
+{
+  "DGP": {
+    "alternative_law": "At eachdecision, add delta_c*(currentRD/currentRMS)*sourceownscale to eachactivetarget firstfutureM5innovation atq+10min, propagateAR response throughremainingday. Allclockfeatures formed BEFORE theirinjection; saveprojectionbeforefuturelabels; latercausalimpulses mayaffectearlieroverlapping4h labels. True-nullcohort receives noownimpulse; itsconditionalmean remains common AR ownlastchange span evenwhen relationalbridgescontainnonnullprices. Future response horizon covariance comes fromonecommon assetpath, notindependentlysimulatedhorizonleaves.",
+    "cases": [
+      {
+        "id": 0,
+        "name": "NORMAL_WEAK",
+        "rho": 0.1
+      },
+      {
+        "id": 1,
+        "name": "AR025",
+        "rho": 0.25
+      },
+      {
+        "id": 2,
+        "name": "AR050",
+        "rho": 0.5
+      },
+      {
+        "id": 3,
+        "name": "PERSISTENT_INTRADAY",
+        "rho": "0.5^(1/288);daily reset; not crossdayAR050"
+      },
+      {
+        "id": 4,
+        "name": "HEAVY_T5",
+        "rho": 0.1
+      },
+      {
+        "id": 5,
+        "name": "CENTERED_SKEW_CHI3",
+        "rho": 0.1
+      },
+      {
+        "daily_scale": "exp(.45Z-.2025)",
+        "id": 6,
+        "name": "HETEROSCEDASTIC",
+        "rho": 0.1
+      },
+      {
+        "id": 7,
+        "loading_change": "column0x4; allothercolumnsx.4 beforefixedvariance normalization; genuinelyalteredjointcorrelation",
+        "name": "STRONG_COMMON_FACTOR",
+        "rho": 0.1
+      },
+      {
+        "id": 8,
+        "loading_change": "bookfactors .25+1.5day/209;currencycolumn0x1.5",
+        "name": "FEATURE_COVARIANCE_DRIFT",
+        "rho": 0.1
+      },
+      {
+        "id": 9,
+        "name": "BASELINE_REGIME_DRIFT",
+        "rho": "0.1 first105days, .5 next105"
+      },
+      {
+        "book_scale": ".35 then1.75",
+        "daily_variance_scale": ".6 then1.3",
+        "id": 10,
+        "name": "COMBINED_COVARIANCE_BASELINE_VARIANCE_CHANGE",
+        "rho": ".25 first105days, .5next105"
+      }
+    ],
+    "fixed_factor_loadings": "Canonicalcurrency contrast sin(index*(j+1)*sqrt2) differences for j0..4; .25sin(assetindex*(j+1)*sqrt3) forquote-bookj0..7; builder reproducible. Sourceprefixown60RMS setsasset scale, medianrelatedrelations for44targets, mediantargetscale forother31. SourcepositiveprefixrelationRMS normalizes causalclosure feature BEFORE clipping[-3,3].",
+    "innovations": "Baselineunit normal. t5unitvariance via normal*sqrt(3/chi2_5). Centeredchi2_3/sqrt6 skew. Shared draws across75assets.",
+    "joint_quoted_assets": "75 canonicallyoriented assetlog-return paths with5 fixedcurrencycontrast factors and8 deterministicquote-book factors. Algebra exact as3signedleg sum, not synchronous exchange/parity/arbitrage. Alltargetreturns share same rho percohortclock undernull; beta maydrift withcalendarstate.",
+    "null_assumptions": "Fixed actualtimestamp masks conditionallymean-ignorable; common withincohort/clock linear ownbaseline. No claim of robustness to identity-specificbeta, arbitrary nonlinearbaseline, informativefuture missingness, arbitrary crossdaylongmemory. Finite syntheticenvelope, notgeneral theorem ofwildbootstrapstrongFWER.",
+    "partial_nulls": [
+      {
+        "delta": [
+          0,
+          0,
+          0
+        ],
+        "id": 0,
+        "name": "GLOBAL_NULL"
+      },
+      {
+        "delta": [
+          0.5,
+          0,
+          0
+        ],
+        "id": 1,
+        "name": "G10_ONLY",
+        "true_null_cohorts": [
+          1,
+          2
+        ]
+      },
+      {
+        "delta": [
+          0,
+          -0.5,
+          0
+        ],
+        "id": 2,
+        "name": "NEGATIVE_MANAGED_ONLY",
+        "true_null_cohorts": [
+          0,
+          2
+        ]
+      },
+      {
+        "delta": [
+          0.5,
+          -0.5,
+          0
+        ],
+        "id": 3,
+        "name": "HETEROGENEOUS_TWO_CONTEXTS",
+        "true_null_cohorts": [
+          2
+        ]
+      }
+    ],
+    "serial": "Withinobserved M5day ARrho withstationaryfirstbar; full146barpath generatesjointoverlappingfuturehorizons. Independent dailyinitial innovations; crossdayAR is NOT claimed bythisenvelope. Missingarchive clocks masked inoriginalcalendar."
+  },
+  "authority": {
+    "broker_contacts": 0,
+    "candidate_promotion": false,
+    "confirmation": false,
+    "future_real_signed_response_computations": 0,
+    "historical_requests": 0,
+    "new_data": 0,
+    "real_response_openings": 0
+  },
+  "bindings": {
+    "EXACT_SYNTHETIC_GEOMETRY_BINDINGS_V1.json": "0256ff99f8785a811d45db7e176ec2df196f7038085386efa8fad66a0cdfa2da",
+    "EXACT_SYNTHETIC_GEOMETRY_V1.txt": "7294027129be10058510d2215ba9883d7d0cab913a76a83904ca6694155a9486",
+    "TRIAD_V2_ESTIMAND_NUISANCE_DESIGN_V1.json": "39ccec246ed346f86cfd0cfeb74b83d48ec86425b32fd6ba9529b43b67f4b771",
+    "build_exact_geometry_v1.py": "1c573934d4900310f2cc2823504d963836a7242a4f0dea75e48243cc054e943e",
+    "exact_geometry_worker_v1.cpp": "b191ba890233bb3dd95c2bda927450685393dff0e690850abf6ff00b6a10d188",
+    "orthogonal_score_v2.py": "7cc458c4d489e1b77a50acfcf3fe3f1f96fcd133fcbd581d817a84a329d44f35",
+    "stochastic_certification_driver_v1.py": "41e134dcbd8694914697f939bc6f17e0633a6b02033a50dac7dfacad9c829ee3",
+    "stochastic_invariants_v1.py": "d9f28949e38a880abbf54b8c508c8112098532087821ee62b45b45bf2b8ae4e7"
+  },
+  "closure": "Failure closesonlythisexactV2 estimand/inference law atpreoutcome scope; broaderrelationalfamilyOPEN; V1untouched; no V3 inthistask.",
+  "compiler": {
+    "binary_sha256": "9e6d9ffdda7ef77d670ab8265f156ec37a32e7740cc525cb9abbc21e476ee9d2",
+    "command": "g++ -O3 -std=c++17 -Wall -Wextra exact_geometry_worker_v1.cpp -o triad_v2_worker",
+    "fast_math": false,
+    "version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0"
+  },
+  "execution_order": "Frozenplan/code/geometry commit first; deterministic invariants; alltrials ofcase0 global+partialnulls;rawcase checkpoint BEFORE interpretation. Ifanynull/support/numericimplementationgate failsSTOP, do notrunlatercasesorpower. Otherwisecase1...10. AfterallnullPASS runcompletefrozenpowercases similarlycheckpoint. No partialtrialcount inference orresult-basedcase selection.",
+  "geometry": {
+    "M5_path_bars_per_day": 146,
+    "bar_labels": "06:50 through18:55; q=t-10min, entry=t-5min; future increments entry+5 throughentry+h",
+    "calendar_blocks": 15,
+    "calendar_blocks_days": 14,
+    "clock_hours_UTC": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cohorts": [
+      {
+        "distinct_targets": 23,
+        "name": "G10_MONETARY_TRIADS",
+        "relations": 56
+      },
+      {
+        "distinct_targets": 11,
+        "name": "MANAGED_EXTENSION_TRIADS",
+        "relations": 32
+      },
+      {
+        "distinct_targets": 10,
+        "name": "OTHER_EXTENSION_TRIADS",
+        "relations": 19
+      }
+    ],
+    "evaluation_days": 210,
+    "horizons_minutes": [
+      15,
+      30,
+      60,
+      240
+    ],
+    "masks": "Exact original75 archive causal relation and fullclock futureavailability; no synthetic outcome-selected membership, zeroimputation or clockcompression. Original gap pattern is present in EVERY stress case.",
+    "prefix_days": 90,
+    "relations": 107,
+    "two_sided_leaves": 12
+  },
+  "inference": {
+    "FWER_ceiling": 0.05,
+    "bootstrap_draws": 1023,
+    "common_sign_bank_seed": 2026100524,
+    "complete_procedure": "Paid significance, bothfixed105dayhalf signs, everydeclared singletargetleaveout aggregatedscore sameorientation, rank3/df2 eachsubset, wholefamily support. Both paid significance-only and finallead false-null rejection count are reported and gated. No universalcohort direction.",
+    "law": "One identical Rademacher sign peroriginal14day calendarblock acrossall12 centered blockscore leaves; studentize observed and resampled scores, single-stepmaximumabsoluteT; p=(1+#maxT>=absT)/1024. Common signs preservecontemporaneouscrossleaf dependence. Resampling conditional onfull estimatedscore vector; random nuisancepredictorprojection generated ineachjointMonteCarlo trial.",
+    "method": "JOINT_CALENDAR_BLOCK_WILD_BOOTSTRAP_T_MAXT_V1",
+    "nominal_family_alpha": 0.025
+  },
+  "nuisance_uncertainty": {
+    "current_m": "Recompute random full causal D/X projection for eachclock, trial and alternative. Includes predictor-nuisance estimation uncertainty and feature-control covariance drift. Fixed prefixnormalizers conditioned as already accepted predictor-only observations, not oracle unknown modelparameters. V1 residualization betas unused.",
+    "forward_g": "Exactly elided only after pathwise proof: for ANY finite estimated daily10column beta, at fixedUTCclock g=Xb and RD^Tg=0, including eachleave-one-target-out refit. Arbitrary noisy, drifting g estimates produce IDENTICAL psi and rejection. Chronological actual learner/maturity/purge verified separately by12 semantic tests and exactactual trainingcount ledger. No fixed oracle residual assumption; bootstrap gfit uncertainty has exactlyzero sensitivity.",
+    "rank_adapter": "3column Gram inverse aftercolumnRMS scaling; determinant>1e-12, columnRMS>1e-12, RD_RMS>=1e-10; failsclosed. This numerical adapter is frozen and tested against reference SVD on fixedfixtures. Positive Gram rank3 defines same projection span. Numerical rank/variance failures reduce support, never count as null evidence."
+  },
+  "power": {
+    "alternatives": [
+      "G10_POSITIVE",
+      "G10_NEGATIVE",
+      "MANAGED_POSITIVE",
+      "MANAGED_NEGATIVE",
+      "OTHER_POSITIVE",
+      "OTHER_NEGATIVE",
+      "HETEROGENEOUS_POS_NEG_POS"
+    ],
+    "cases": [
+      0,
+      2,
+      7,
+      10
+    ],
+    "confidence": "Wilson z1.96 at everygrid cell; perleaf, anypaidlead andallnonnullleaves reported.",
+    "economic_sensitivity": "Unknown realcost/event/effect scale means noeconomic powerclaim; futureEUR200 certification remainsseparate.",
+    "effect_grid": [
+      0,
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "effect_units": "IncrementalfirstfutureM5own-leg innovation per1currentclock relationalRDrms, infixed sourceprefixown60RMS units; standardizedsyntheticcoefficient, NOT bps/profit or SDofdailyteststatistic.",
+    "minimum_reliably_detectable": "Smallestgrid effect forANY paid localcohortlead withWilsonlower>=.80, separatelyeachlocalizedsign/cohort/stress. Notbesthorizonfreepass becausecommon12leafmaxT applies.",
+    "pass": "Completecurvesand lower>=.80 at SOME fixedgrid effect<=1 forALLsixlocalized alternatives inALLfourpowercases; else LOW_POWER_INCONCLUSIVE stop. Heterogeneouscurve required characterization, no universal-signgate. Diagnostic allleafpower doesnotgate."
+  },
+  "precision": {
+    "derivation": "ceil(z^2*.05*.95/.01^2)=5819;roundUP tomultiple1024=6144",
+    "desired_simultaneous_halfwidth_at_p05": 0.01,
+    "no_extension_reseed_or_gate_adjustment": true,
+    "null_seed": "2026100522 +1009*case_id",
+    "null_trials_per_case": 6144,
+    "power_derivation": "ceil(1.96^2*.8*.2/.02^2)=1537;roundUP tomultiple1024=2048",
+    "power_seed": "2026100523 +1009*case_id",
+    "power_trials_per_case": 2048,
+    "required_null_cells": 44,
+    "uncertainty_rule": "MAX of Wilson upper(z3.5) and exact ClopperPearson upper(alpha=.05/88) per44global/partialnullcells. Support gate MIN of Wilsonlower(z3.5) and exact ClopperPearsonlower(alpha=.05/88). Bonferroni88 one-sided events (44FWERupper+44supportlower) simultaneouscoverage>=.95 under IID simulation trials. Finalleadfalse-event subset ofpaid-significancefalse-event; reportboth, no independenceassumption betweenconfigurations. No point-estimate-only pass."
+  },
+  "preconditions": {
+    "semantic_interpretation_sha256": "92b9082f1ce95579dcbccbb5e83c9c7d31c26fd33e6a009a151d8c08e12d1622",
+    "timestamp_support_interpretation_sha256": "5451d8391d8f93ecd0cae04bcddc228438c7ed2cb8b60bc5140a9a990128073d"
+  },
+  "raw_result_columns": [
+    "any_true_null_paid_significance",
+    "any_true_null_complete_lead",
+    "fullfamily_supported_trials",
+    "numerical_clock_failures"
+  ],
+  "schema": "TRIAD_V2_EXACT_STOCHASTIC_CERTIFICATION_PLAN_V1",
+  "stability_breadth_included": true,
+  "status": "FROZEN_BEFORE_EXECUTION_NO_METHOD_TOURNAMENT",
+  "support": {
+    "all_numeric_failures_reported": true,
+    "complete12leaf_family_required": true,
+    "minimum_clocks_per_day": 4,
+    "minimum_days_per70daythird": 42,
+    "minimum_days_per_block": 7,
+    "minimum_supported_blocks": 12,
+    "montecarlo_full_family_support_lower_bound": 0.95,
+    "no_unsupported_trial_pruning": true,
+    "support_uncertainty_z": 3.5
+  }
+}
