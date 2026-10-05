@@ -1,0 +1,17 @@
+{
+  "RMS_error": "abs(RMS_candidate-RMS_oracle)<=1e-9*max(RMS_oracle,1e-10)",
+  "Weyl_derivation": "A normwise decomposition perturbation bounded by delta implies |sigma_i(candidate)-sigma_i(mathematical)|<=delta. Relative-cutoff function perturbation <=(1+1e-12)*delta. Combined normalization/decomposition budget is conservative; inverse conditioning is not hidden.",
+  "ambiguity": "Union of candidate/oracle absolute-rank and relative-cutoff threshold neighborhoods: any |sigma_i-1e-12|<=2*delta OR |sigma_i-1e-12*sigma_max|<=2*(1+1e-12)*delta => NUMERICAL_SUPPORT_AMBIGUOUS_UNTESTED_NOT_NULL; both oracle and production prospective eligibility false. Factor 2 covers candidate-to-oracle interval-center discrepancy in addition to one-radius boundary. Scale boundary similarly fail closed within 2*gamma_(2n+5)*scale of1e-12.",
+  "backward_error": "For candidate accepted, reconstruct raw RD from candidate normalized*RMS; eta=norm(Z.T*RD,inf)/(norm(Z,F)*max(1,norm(D))). Require max(abs(Z.T*RD)) <1e-9*max(1,norm(D)) (same numerical ceiling prospectively retained, reliability only). Also require candidate singular-value discrepancies <=delta.",
+  "fail_nonambiguous_disagreement": "PREOUTCOME_BLOCKED_IMPLEMENTATION_INDEPENDENT_PROJECTION_CONTRACT_UNCERTIFIED_UNTESTED_NOT_NULL",
+  "forward_error": "Every accepted nonambiguous audited projection must satisfy max absolute normalized_RD error <=1e-7 versus stable oracle; directly checked, never inferred solely from orthogonality. High-precision validation is predictor-only and covers all eligible geometry before any worker authority.",
+  "gamma": "gamma_K=K*u/(1-K*u)",
+  "geometry_bound": "5<=n<=23; finite inputs; no overflow/underflow accepted; fixed 100 maximum sweeps x3 pairs =300 rotations",
+  "no_changes_after_results": true,
+  "oracle_eligibility": "Mathematical contract eligible AND precision stable AND no frozen ambiguity. Historical Python acceptance not used.",
+  "production_wrapper": "Eligibility=unchanged V4 kernel accepts AND no frozen ambiguity AND finite/converged/rank3/RMS>=1e-10 AND reliability gates. Wrapper adds prospective support policy; no source edits to V4.",
+  "rounding_budget_K": "K(n)=3*n+6 + 300*(6*n+32) + 12*n+30. Covers n-term RMS reductions and normalization, per-pair three n-term moments and row/vector rotation scalar arithmetic, then n-term sigma/pseudoinverse/residual reductions. Sum budgets via gamma composition; worst-case maximum sweeps, not observed sweep count.",
+  "schema": "TRIAD_V5_BINARY64_RELIABILITY_DERIVATION_V1",
+  "spectral_error_radius": "delta=gamma_K*norm(Z,F). Treat as prospective conservative diagnostic bound; must be independently verified against high precision for every audited geometry, not presumed proven for arbitrary inputs. Singular-value discrepancy above delta blocks.",
+  "unit_roundoff": "u=2^-53"
+}

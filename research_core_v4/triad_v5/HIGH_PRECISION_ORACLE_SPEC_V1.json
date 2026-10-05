@@ -1,0 +1,32 @@
+{
+  "100_vs160_stability": "Identical mathematical eligibility, rank, retained-direction count, convergence; every singular value stable to absolute <=1e-60*max(1,abs(sigma160)); RMS similarly; normalized RD stable to max abs<=1e-60 whenever both mathematically eligible. Any disagreement => NUMERICAL_ORACLE_AMBIGUOUS and V5 blocker.",
+  "algorithm": "Independent symmetric 3-by-3 Gram eigendecomposition in arbitrary precision only: G=Z.T*Z; deterministic cyclic Jacobi diagonalization of symmetric G; V accumulates rotations. This is not a binary64 normal-equation shortcut, Gram inversion or candidate kernel rewrite. At 100/160 digits squaring conditioning is resolved independently and precision convergence is mandatory.",
+  "convergence": "max(abs(offdiagonal G)) <= 10^(-digits+20)*max(1,original Frobenius norm G); eigenvectors independently reconstruct G within 10^(-digits+15)*max(1,original Frobenius norm G)",
+  "independent_check_digits": 160,
+  "input_conversion": "Decimal.from_float(float(v)) exactly, then arbitrary-precision arithmetic; rational binary64 value preserved",
+  "library": "CPython decimal 1.70; libmpdec 4.0.0, built-in _decimal",
+  "max_sweeps": 128,
+  "no_Y": true,
+  "no_fixture_removal": true,
+  "no_precision_extension_or_algorithm_change_after_results": true,
+  "pair_order": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      1,
+      2
+    ]
+  ],
+  "primary_digits": 100,
+  "projection": "beta=sum V_col*(dot(ZV_col,D)/(sigma^2)) for retained directions; high precision RD=D-Z*beta, exact frozen rank/cutoff/RMS gates",
+  "rotation": "tau=(Gqq-Gpp)/(2*Gpq); t=sign(tau)/(abs(tau)+sqrt(1+tau^2)); c=1/sqrt(1+t^2),s=c*t; Q=[[c,s],[-s,c]] in selected plane; G=Q.T*G*Q; V=V*Q; ascending row/column sums",
+  "rounding": "ROUND_HALF_EVEN",
+  "schema": "TRIAD_V5_HIGH_PRECISION_ORACLE_SPEC_V1",
+  "sigma": "sigma=norm(Z*V_col); stable descending sigma sort, original index tie break; sign chosen largest absolute ZV element positive, first row tie"
+}
