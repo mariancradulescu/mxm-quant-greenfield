@@ -1,0 +1,22 @@
+2026-10-05T18:50:27.0669350Z Version: 20260901.588
+2026-10-05T18:50:27.0672940Z Ubuntu
+2026-10-05T18:50:27.0674767Z Image: ubuntu-24.04
+2026-10-05T18:50:27.0675118Z Version: 20260927.320.1
+2026-10-05T18:50:27.0676249Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-05T18:50:32.9029596Z Successfully set up CPython (3.12.14)
+2026-10-05T18:50:38.8626640Z Successfully installed numpy-2.3.5 scipy-1.17.0
+2026-10-05T18:50:57.8834274Z Traceback (most recent call last):
+2026-10-05T18:50:57.8844258Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/distributed/reference_route_v1.py", line 165, in <module>
+2026-10-05T18:50:57.8846365Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/distributed/reference_route_v1.py", line 126, in engineering_case
+2026-10-05T18:50:57.8847556Z     serial=[engineering_one(t) for t in tasks];parallel=pool_map(engineering_one,tasks,env['processes'])
+2026-10-05T18:50:57.8848537Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/distributed/reference_route_v1.py", line 107, in engineering_one
+2026-10-05T18:50:57.8849389Z     rows=w.trial(m,w.load_geometry(),w.Projection(w.P/'projection_bridge_v1.so'),phase,case,index)
+2026-10-05T18:50:57.8850611Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/stochastic_worker_v1.py", line 160, in trial
+2026-10-05T18:50:57.8852722Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/distributed/reference_route_v1.py", line 92, in scores
+2026-10-05T18:50:57.8854491Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/stochastic_worker_v1.py", line 100, in scores
+2026-10-05T18:50:57.8856371Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/distributed/reference_route_v1.py", line 78, in fits
+2026-10-05T18:50:57.8858435Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/stochastic_worker_v1.py", line 93, in clock_fits
+2026-10-05T18:50:57.8859614Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/triad_v7/stochastic_worker_v1.py", line 36, in __call__
+2026-10-05T18:50:57.8860010Z     if not support['accepted']:raise NumericalUnavailable(support['reason'])
+2026-10-05T18:50:57.8860473Z stochastic_worker_v1.NumericalUnavailable: CANDIDATE_FAIL_CLOSED
+2026-10-05T18:50:57.9805711Z ##[error]Process completed with exit code 1.
