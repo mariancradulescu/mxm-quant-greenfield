@@ -1,0 +1,22 @@
+{
+  "schema": "TRIAD_V6_ACTUAL_PREDICTOR_SUPPORT_PLAN_V1",
+  "period": "All210 development calendar days;8 fixed UTC clocks;3 frozen cohorts",
+  "inputs": "All75 accepted byte-verified FX series;107 canonical relations; immutable V2 timestamp geometry and inherited disjoint-prefix positive scales",
+  "price_access": "Only read CLOSE for explicitly required past predictor labels q=t-10,q-5,q-60 of scheduled development clocks. All other price cells ignored. Existing timestamp masks are reused; no future price or Y is read or computed.",
+  "features": "C(q)-C(q-60) using inventory closure coefficients on raw log broker prices; divide relation prefix residual RMS, clip raw relation state to[-3,3]; equal mean causal available relations per target. X=[1,canonical own5/targetscale,canonical own60/targetscale]; fixed targetscale median inherited prefix own60 RMS for that target.",
+  "geometry": "Audit every causal-cohort eligible clock regardless eventual horizon availability. Full original active target set plus each declared single-target leaveout; absent target leaves original geometry unchanged and is recorded. No future-selected refit.",
+  "oracle": "Frozen V6 oracle at100/160 digits for every distinct exact binary64 geometry, with deterministic cache only for bit-identical input matrices. All requested geometries counted including duplicates.",
+  "production": "Unchanged V4 candidate and frozen V6 one-sided numerical wrapper. Any unsafe acceptance or uncertified oracle blocks, no repair.",
+  "support": "Entire clock numerically usable only if full-cohort AND every required declared-target leaveout safely accepted. Combine numeric availability with unchanged V2 full-clock horizon timestamp masks; original calendar preserved, no zero imputation.",
+  "daily_minimum_complete_clocks": 4,
+  "minimum_days_per14day_block": 7,
+  "minimum_supported_blocks_per_leaf": 12,
+  "minimum_valid_days_each70day_third": 42,
+  "leaves": 12,
+  "nuisance": "Keep inherited chronological matured-label/240minute purge timestamp support counts; no Y fit. Projection support loss affects evaluation, never alters g scientific training law.",
+  "durable_raw": "Exact full-clock X/D snapshots and input hashes; for each full/leaveout record certified oracle classifications,100/160 output hashes, spectra/RMS/internal residual diagnostics, production output hash, safety/forward/backward measurement diagnostics. Compact numeric diagnostics are rounded for storage only after frozen full-precision checks; decisions never use rounded diagnostics. Raw before support interpretation.",
+  "scientific_threshold_changes": false,
+  "future_real_signed_response_computations": 0,
+  "real_response_openings": 0,
+  "broker_contacts": 0
+}
