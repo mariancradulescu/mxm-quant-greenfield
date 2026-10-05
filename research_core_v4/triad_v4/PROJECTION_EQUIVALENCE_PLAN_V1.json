@@ -1,0 +1,57 @@
+{
+  "base": "i=1..n; a=sin(i*sqrt(2)); X=[1,a,a+epsilon*cos(i*sqrt(3))]; D=sin(i*sqrt(5))",
+  "canonical": "research_core_v4/triad_v2/orthogonal_score_v2.py:current_projection",
+  "epsilon_grid": [
+    1.0,
+    0.01,
+    0.0001,
+    1e-06,
+    1e-07,
+    1e-08,
+    1e-10,
+    1e-12,
+    1e-13
+  ],
+  "fail_any": "PREOUTCOME_BLOCKED_CANONICAL_PROJECTION_KERNEL_NOT_EQUIVALENT_UNCERTIFIED_UNTESTED_NOT_NULL",
+  "frozen_before_execution": true,
+  "historical": "All 24 frozen V3 constructions and canonical expected results unchanged, in original order",
+  "no_Y": true,
+  "no_same_task_repair": true,
+  "numerical_spec_sha256": "005fb827df4ce469fc3955c7172c056ec3b2dbb5eeeab6bd48568845eb4729c1",
+  "prescribed_spectra": {
+    "construction": "Q=QR([1,sin(i*sqrt(2)),cos(i*sqrt(3))]); R fixed orthogonal right rotation from QR([[1,2,3],[2,-1,1],[1,1,-1]]); X=Q*diag([sqrt(n),sqrt(n)/2,s])*R.T, followed by canonical column RMS normalization; report actual scaled spectrum",
+    "smallest_raw_singular_values": [
+      2e-12,
+      1.01e-12,
+      9.9e-13,
+      5e-13,
+      1e-13,
+      0.0
+    ],
+    "variants": [
+      "base",
+      "reverse_rows",
+      "raw_scales_1e-6_1e6_3",
+      "D_sign_flip"
+    ]
+  },
+  "raw_before_interpretation": true,
+  "schema": "TRIAD_V4_PROJECTION_EQUIVALENCE_PLAN_V1",
+  "target_counts": [
+    5,
+    6,
+    10,
+    11,
+    22,
+    23
+  ],
+  "variants": [
+    "base",
+    "reverse_rows",
+    "control_signs_1_minus1_minus1",
+    "raw_scales_1e-6_1e6_3",
+    "D_sign_flip",
+    "D_plus_X_times_0.3_minus0.7_0.2",
+    "leave_last_target_out_if_n_gt5"
+  ]
+}

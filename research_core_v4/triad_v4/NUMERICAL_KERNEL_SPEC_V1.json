@@ -1,0 +1,52 @@
+{
+  "absolute_rank": "count(sigma>1e-12)==3",
+  "algorithm": "one-sided Jacobi SVD of RMS-normalized n-by-3 Z; B=Z,V=I; rotate columns of B and V directly, never form/invert Gram matrix",
+  "arithmetic": "IEEE-754 binary64 round-to-nearest; no fast-math; all matrix sums in ascending row order; standalone C++17",
+  "convergence": "All three |dot(Bp,Bq)| <= 8*epsilon*norm(Bp)*norm(Bq); recompute after each complete sweep. Zero column is orthogonal. Eight eps accounts for binary64 rotations and dot-product rounding, target many orders below canonical 1e-9 orthogonality gate. No data-dependent tolerance changes.",
+  "epsilon": 2.220446049250313e-16,
+  "equivalence": {
+    "eligibility": "exact for every fixture including canonical rejections",
+    "independent_orthogonality": "canonical gate must pass",
+    "normalized_max_abs": 1e-07,
+    "residual_RMS": "abs difference <= 1e-9*max(canonical_RMS,1e-10); stricter than normalized-output tolerance"
+  },
+  "forbidden": [
+    "normal equation solve or inverse",
+    "determinant rank",
+    "tolerance relaxation",
+    "kernel modification after observed failure",
+    "method tournament"
+  ],
+  "gates": {
+    "column_RMS_strict_min": 1e-12,
+    "columns": 3,
+    "finite_X_D": true,
+    "n_min": 5,
+    "orthogonality": "max(abs(Z.T*RD)) < 1e-9*max(1,norm(D))",
+    "rank": 3,
+    "residual_RMS_min_inclusive": 1e-10
+  },
+  "maximum_sweeps": 100,
+  "nonconvergence": "NUMERICAL_SUPPORT_FAILURE; never null evidence",
+  "pair_order": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      1,
+      2
+    ]
+  ],
+  "pseudoinverse": "include iff sigma>1e-12*sigma_max; beta=sum(V_col*(dot(U_col,D)/sigma))",
+  "residual": "RD=D-Z*beta using ascending columns; RMS=sqrt(sum(RD^2)/n); normalized=RD/RMS; never clip or reproject",
+  "rotation": "tau=(b-a)/(2*g); t=copysign(1,tau)/(abs(tau)+hypot(1,tau)); c=1/hypot(1,t), s=c*t; Bp=c*Bp-s*Bq; Bq=s*Bp+c*Bq; same for V. If |tau| overflows use t=g/(b-a).",
+  "schema": "TRIAD_V4_JACOBI_SVD_NUMERICAL_SPEC_V1",
+  "sign": "largest absolute B column component, first row on tie, positive; flip B and corresponding V together",
+  "singular_values": "Euclidean norms of B columns; U=B/sigma",
+  "sorting": "descending singular value; stable original index for ties"
+}
