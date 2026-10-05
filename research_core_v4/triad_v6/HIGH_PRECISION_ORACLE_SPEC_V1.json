@@ -1,0 +1,38 @@
+{
+  "algorithm": "Independent symmetric 3-by-3 Gram eigendecomposition in arbitrary precision only: G=Z.T*Z; deterministic cyclic Jacobi diagonalization of symmetric G; V accumulates rotations. This is not a binary64 normal-equation shortcut, Gram inversion or candidate kernel rewrite. At 100/160 digits squaring conditioning is resolved independently and precision convergence is mandatory.",
+  "convergence": "In the SAME sweep require max(abs(offdiag G)) <= min(1e-50,10^(-digits+20))*max(1,normG) AND full eigen reconstruction max abs error <=1e-50*max(1,normG); otherwise continue until512; no convergence claim from offdiagonal alone.",
+  "cross_precision_decisions": "identical mathematical rank, retained directions, eligibility; EVERY geometry certified, no subset-only pass",
+  "cross_precision_normalized_RD_max_abs": "1e-40",
+  "cross_precision_singular_RMS_relative": "abs difference <=1e-45*max(abs(reference160),1e-100)",
+  "dimension": "Oracle supports1<=n<=23; mathematical eligibility still requires n>=5,3controls,rank3. This permits certifying legitimate failclosed too-small leaveouts, not widening support.",
+  "independent_check_digits": 160,
+  "input_conversion": "Decimal.from_float(float(v)) exactly, then arbitrary-precision arithmetic; rational binary64 value preserved",
+  "internal_relative_certificate": "1e-50",
+  "library": "CPython decimal 1.70; libmpdec 4.0.0, built-in _decimal",
+  "max_sweeps": 512,
+  "no_Y": true,
+  "no_fixture_removal": true,
+  "no_precision_extension_or_algorithm_change_after_results": true,
+  "pair_order": [
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      1,
+      2
+    ]
+  ],
+  "precision_stability": "Both internal certificates must pass; rank/retained/eligibility identical; singular/RMS errors <=1e-45*max(1,abs160); normalized error<=1e-40 for eligible projections. Any failure blocks oracle gate.",
+  "primary_digits": 100,
+  "projection": "beta=sum V_col*(dot(ZV_col,D)/(sigma^2)) for retained directions; high precision RD=D-Z*beta, exact frozen rank/cutoff/RMS gates",
+  "rationale": "Fixed prospective1e-50 certificate and1e-45/1e-40 precision stability, vastly stricter than1e-7 production error; offdiag stopping conservatively stronger at100/160 and certificate checked in sameiteration.",
+  "rotation": "tau=(Gqq-Gpp)/(2*Gpq); t=sign(tau)/(abs(tau)+sqrt(1+tau^2)); c=1/sqrt(1+t^2),s=c*t; Q=[[c,s],[-s,c]] in selected plane; G=Q.T*G*Q; V=V*Q; ascending row/column sums",
+  "rounding": "ROUND_HALF_EVEN",
+  "schema": "TRIAD_V6_HIGH_PRECISION_ORACLE_SPEC_V1",
+  "sigma": "sigma=norm(Z*V_col); stable descending sigma sort, original index tie break; sign chosen largest absolute ZV element positive, first row tie"
+}

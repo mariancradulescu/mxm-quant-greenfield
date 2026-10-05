@@ -1,0 +1,23 @@
+{
+  "RMS_error": "abs(RMS_candidate-RMS_oracle)<=1e-9*max(RMS_oracle,1e-10)",
+  "Weyl_derivation": "A normwise decomposition perturbation bounded by delta implies |sigma_i(candidate)-sigma_i(mathematical)|<=delta. Relative-cutoff function perturbation <=(1+1e-12)*delta. Combined normalization/decomposition budget is conservative; inverse conditioning is not hidden.",
+  "allowed_conservative_rejection": "Certified mathematically eligible oracle + production wrapper rejects => CONSERVATIVE_NUMERICAL_SUPPORT_REJECTION; support loss, never null evidence.",
+  "ambiguity": "Candidate-based margin, no response: any candidate |sigma-1e-12|<=2delta or |sigma-1e-12*sigma_max|<=2(1+1e-12)delta fails closed. Column scale threshold margin2gamma_(2n+5)*scale also fails closed. Oracle validates each accepted geometry independently.",
+  "ambiguity_diagnostics": "Threshold ambiguity is numerical support rejection; oracle mathematical rank/eligibility still reported.",
+  "analytic_limit": "gamma rounding budget supplies conservative margin conditional on normwise backward error. Oracle validates bound on every accepted fixture/actual geometry; no unsupported universal numerical safety theorem is claimed.",
+  "backward_error": "For candidate accepted, reconstruct raw RD from candidate normalized*RMS; eta=norm(Z.T*RD,inf)/(norm(Z,F)*max(1,norm(D))). Require max(abs(Z.T*RD)) <1e-9*max(1,norm(D)) (same numerical ceiling prospectively retained, reliability only). Also require candidate singular-value discrepancies <=delta.",
+  "fail_nonambiguous_disagreement": "Only unsafe acceptance blocks, conservative rejection counted toward support.",
+  "forward_error": "Every accepted nonambiguous audited projection must satisfy max absolute normalized_RD error <=1e-7 versus stable oracle; directly checked, never inferred solely from orthogonality. High-precision validation is predictor-only and covers all eligible geometry before any worker authority.",
+  "gamma": "gamma_K=K*u/(1-K*u)",
+  "geometry_bound": "5<=n<=23; finite inputs; no overflow/underflow accepted; fixed 100 maximum sweeps x3 pairs =300 rotations",
+  "hard_safety": "Every wrapper accepted geometry must have both certified oracle precisions, mathematical eligibility, singular discrepancy<=delta, oracle normalized error<=1e-7 and RMS error<=1e-9*max(oracleRMS,1e-10). Any violation blocks V6; oracle output discrepancies must not silently turn an unsafe acceptance into conservative rejection.",
+  "no_Y": true,
+  "no_changes_after_results": true,
+  "oracle_eligibility": "Mathematical eligibility after full oracle certification, regardless production acceptance.",
+  "principle": "Production acceptance must be certified safe; mathematical eligibility does not compel production acceptance.",
+  "production_wrapper": "UNCHANGED V4 candidate accepts AND finite scales/singulars/output AND threshold-separated AND independently reconstructed binary64 orthogonality<1e-9*max(1,normD); all other cases numerical support unavailable.",
+  "rounding_budget_K": "K(n)=3*n+6 + 300*(6*n+32) + 12*n+30. Covers n-term RMS reductions and normalization, per-pair three n-term moments and row/vector rotation scalar arithmetic, then n-term sigma/pseudoinverse/residual reductions. Sum budgets via gamma composition; worst-case maximum sweeps, not observed sweep count.",
+  "schema": "TRIAD_V6_ONE_SIDED_PRODUCTION_SUPPORT_CONTRACT_V1",
+  "spectral_error_radius": "delta=gamma_K*norm(Z,F). Treat as prospective conservative diagnostic bound; must be independently verified against high precision for every audited geometry, not presumed proven for arbitrary inputs. Singular-value discrepancy above delta blocks.",
+  "unit_roundoff": "u=2^-53"
+}
