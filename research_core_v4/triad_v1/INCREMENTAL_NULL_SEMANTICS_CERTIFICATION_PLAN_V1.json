@@ -1,0 +1,34 @@
+{
+  "design_ref": "research_core_v4/triad_v1/EXACT_TRIAD_MECHANISM_DESIGN_V1.json",
+  "design_sha256": "21ecfa78c7d3250eddd505a3797554a5beea02f2733c491b3665833f9cb27dcf",
+  "development_feature_cases": {
+    "covariance_change": "1.5*X+Z",
+    "stable": ".5*X+Z"
+  },
+  "exact_prefix_fit": "Same ten columns, pseudoinverse rcond1e-12, residualRMS and clipping[-3,3] as frozenlaw; no responsefit.",
+  "if_fail": "Persist raw result before interpretation. PREOUTCOME_BLOCKED_INCREMENTAL_ESTIMAND_NOT_IDENTIFIED_UNTESTED_NOT_NULL. Do not freeze READY_NOT_EXECUTED, do not run FWER/power on a misidentified null, do not redesign exactlaw or choose another source.",
+  "if_pass": "Only then freeze full exact stochastic simulation implementation/precision/seeds before execution. No inherited generic12leaf certification.",
+  "implementation_ref": "research_core_v4/triad_v1/incremental_null_semantics_v1.py",
+  "implementation_sha256": "ed3c8b88343e996df61df926f3517ade6f8dc574562ffaa9147db7632a42bf7c",
+  "justification": "The selected mechanism claims incremental information beyond ownleg controls, not merely association with a prefix-residualized feature. Before spending on FWER/power, test whether an ownleg-controls-only conditional mean can produce a nonzero frozen score under a lawful prefix-to-development feature/control covariance change. This checks estimand identification, not calibrated pvalue validity.",
+  "method": "DETERMINISTIC_INCREMENTAL_NULL_ESTIMAND_PREFLIGHT_NOT_FWER_SIMULATION",
+  "no_extension_reseed_retuning": true,
+  "null_law": "E[Y_h | own60min X,own5min,clock,relational Z]=(direction*h/60)*X/prefixOwnRMS. It depends only on ownleg control X; no incremental Z information. Zero innovations are permissible for this analytic conditional-mean identification proof; not a complete stochastic market DGP.",
+  "numerical_zero_tolerance": 1e-10,
+  "operational_authority": {
+    "acquisition": false,
+    "broker": false,
+    "real_response": false
+  },
+  "prefix_control_rank": 10,
+  "prefix_feature": "F_prefix=.5*X+Z",
+  "prefix_rows": 512,
+  "required_gate": "EVERY semantic conditional-null case must have abs(mean frozen feature*Y score)<=numerical_zero_tolerance. Otherwise incremental estimand not identified; block exactdesign before stochastic certification.",
+  "schema": "mxm.v4.triad.incremental-null-semantics-certification-plan.v1",
+  "scope_limits": "This is an analyticsemanticgate, not actual107relation overlapping-response FWERcalibration. Passing would be necessary but insufficient; failing identifies a prior scientific blocker.",
+  "seeds": null,
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "synthetic_geometry": "Balanced512 clocks with8UTCdummies and mutuallyorthogonal own5min,own60min,bridge innovation signvectors. Exact currencyclosure F=targetuv-bridgeuA+bridgevA. Repeat semanticcheck for all3declaredcohorts andall4horizons,bothdirections; not independenttriad hypotheses.",
+  "trials": "Deterministic exhaustive16cases repeatedacross3cohorts=48checks; MonteCarlo trials0. No confidencebound or powerclaim applicable.",
+  "why_admissible": "Feature/control covariance can change without new conditional information; temporal/regime stability of an association alone does not certify incrementality. No historical outcome used to choose this case."
+}
