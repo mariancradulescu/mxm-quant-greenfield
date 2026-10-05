@@ -1,0 +1,38 @@
+name: V4 Online Change Single Development Opening
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/state/ONLINE_CHANGE_OPENING_REQUEST_V1.json]
+permissions: {contents: read}
+concurrency:
+  group: v4-online-change-real-singleton
+  cancel-in-progress: false
+jobs:
+  raw-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      OPENBLAS_CORETYPE: Nehalem
+      NPY_DISABLE_CPU_FEATURES: AVX512F,AVX2,FMA3,AVX
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.16'}
+      - run: |
+          python -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
+      - name: Reproduce frozen support and open only one raw response
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          python -m tools.online_change_development --output "$RUNNER_TEMP/ONLINE_CHANGE_RAW_RESULT_V1.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: online-change-raw-${{ github.run_id }}
+          path: ${{ runner.temp }}/ONLINE_CHANGE_RAW_RESULT_V1.json
+          if-no-files-found: error
+          retention-days: 90
