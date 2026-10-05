@@ -1,0 +1,53 @@
+{
+  "Monte_Carlo_trials": 0,
+  "after_failure": "Persist exact raw discrepancy and V3 blocker; no envelope/worker/manifest readiness claim, no successor V4, no reranking, no Monte Carlo.",
+  "bindings": {
+    "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V6.json": "f1a2ce55407351686588b7ef9f1af45f08c83d4340dd03df0ed24eddbceff449",
+    "research_core_v4/state/TRIAD_RELATIONAL_STATE_V1_PREOUTCOME_BLOCKER_V1.json": "4095666954df6f34aaf8b4d1057a7e66a5b7126f093a18cef02abf108a8b9f9c",
+    "research_core_v4/state/TRIAD_RELATIONAL_STATE_V2_PREOUTCOME_BLOCKER_V1.json": "085d8e010b4e02611e3e87797678cf093037b152ae06694cb70e6893b518647e",
+    "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5",
+    "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2_SUPERSESSION_AUTHORITY_V1.json": "b9f9bf43224e50f47a6f799a704b81934dbfabf0accf480c322e8d0b07145227",
+    "research_core_v4/triad_v1/ACCEPTED_FX_ARCHIVE_RECOVERY_LEDGER_V1.json": "49295cb9add563c6ae85e4f05b3f3e7316607ffe92df3d4d49b7ddd03d2467a1",
+    "research_core_v4/triad_v1/CANONICAL_FX_RELATION_COHORT_INVENTORY_V1.json": "bd1b3064aa02e1ec2743350416a831f2a752431d2a573504ceaa83472dfbcc47",
+    "research_core_v4/triad_v1/EXACT_SUPPORT_PREFIX_RAW_RESULT_V1.json": "d9b2ff6f27ea4631dee52cf9a3264874783576856f90f738db19b7e8429ae7b4",
+    "research_core_v4/triad_v2/EXACT_SUPPORT_CERTIFICATION_PLAN_V1.json": "0ade88041596d71671be71e547bbae6d50df6ccec915f8775c7c78f2558468b0",
+    "research_core_v4/triad_v2/EXACT_SUPPORT_INTERPRETATION_V1.json": "5451d8391d8f93ecd0cae04bcddc228438c7ed2cb8b60bc5140a9a990128073d",
+    "research_core_v4/triad_v2/EXACT_SUPPORT_RAW_RESULT_V1.json": "06db5b6bfddacd4ffb9bbacb7579610ab3fe223c3feeb965f73f33eb99108fff",
+    "research_core_v4/triad_v2/EXACT_SYNTHETIC_GEOMETRY_BINDINGS_V1.json": "0256ff99f8785a811d45db7e176ec2df196f7038085386efa8fad66a0cdfa2da",
+    "research_core_v4/triad_v2/EXACT_SYNTHETIC_GEOMETRY_V1.txt": "7294027129be10058510d2215ba9883d7d0cab913a76a83904ca6694155a9486",
+    "research_core_v4/triad_v2/SEMANTIC_IDENTIFICATION_PLAN_V1.json": "330113a0c3ad6249520a5228b3839ee11af9adeea0dfec3f8ca41648d8f1d341",
+    "research_core_v4/triad_v2/SEMANTIC_INTERPRETATION_V1.json": "92b9082f1ce95579dcbccbb5e83c9c7d31c26fd33e6a009a151d8c08e12d1622",
+    "research_core_v4/triad_v2/SEMANTIC_RAW_RESULT_V1.json": "27474b0a330df0407a334c55c4e3affee78f5de7d1feb1e18cbea987eee712ab",
+    "research_core_v4/triad_v2/TRIAD_V2_ESTIMAND_NUISANCE_DESIGN_V1.json": "39ccec246ed346f86cfd0cfeb74b83d48ec86425b32fd6ba9529b43b67f4b771",
+    "research_core_v4/triad_v2/exact_geometry_worker_v1.cpp": "b191ba890233bb3dd95c2bda927450685393dff0e690850abf6ff00b6a10d188",
+    "research_core_v4/triad_v2/orthogonal_score_v2.py": "7cc458c4d489e1b77a50acfcf3fe3f1f96fcd133fcbd581d817a84a329d44f35"
+  },
+  "candidate_adapter": "research_core_v4/triad_v2/exact_geometry_worker_v1.cpp:clockfit/inv3",
+  "canonical_implementation": "research_core_v4/triad_v2/orthogonal_score_v2.py:current_projection",
+  "failure_classification": "PREOUTCOME_BLOCKED_INHERITED_CURRENT_PROJECTION_ADAPTER_NOT_EQUIVALENT_UNCERTIFIED_UNTESTED_NOT_NULL",
+  "fixtures": {
+    "construction": "i=1..n; X=[1,sin(i*sqrt(2)),sin(i*sqrt(2))+epsilon*cos(i*sqrt(3))]; D=sin(i*sqrt(5)); positive fixed target scales=1. Deterministic feature/control fixtures, no Y.",
+    "near_collinearity_epsilon": [
+      1.0,
+      0.01,
+      0.0001,
+      1e-06,
+      1e-07,
+      1e-08
+    ],
+    "target_counts": [
+      5,
+      10,
+      11,
+      23
+    ],
+    "use": "Projection/support invariants only; not synthetic FWER, power, market data or parameter selection"
+  },
+  "gate": "CURRENT_CLOCK_PROJECTION_AND_NUMERICAL_SUPPORT_MATCH_INHERITED_CANONICAL_LAW",
+  "mechanism_id": "TRIAD_RELATIONAL_STATE_V3_DAILY_DEPENDENCE_CERTIFICATION_SUCCESSOR",
+  "pass_rule": "Every fixture accepted by canonical current_projection must be accepted by adapter; accepted normalized residuals agree within 1e-7 absolute. Any failure blocks V3 without repair in this task.",
+  "reason": "Hash identity of the source files alone cannot prove the numerical adapter represents the inherited current-clock law. Eligibility must match, not merely agree on well-conditioned examples.",
+  "schema": "TRIAD_V3_INHERITED_SCIENCE_STATIC_GATE_PLAN_V1",
+  "starting_head": "342009ecc2f1944b289a7cd482935458323f5567",
+  "status": "FROZEN_BEFORE_DETERMINISTIC_EXECUTION"
+}
