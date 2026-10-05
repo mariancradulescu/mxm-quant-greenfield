@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "PUBLISH_SINGLE_EXACT_FREEZE_HEAD_BOUND_OPENING_REQUEST",
+  "next_action": "INTERPRET_PERSISTED_RAW_ONLY_NO_RESPONSE_RECOMPUTATION",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V2.json",
   "next_prospective_wave": {
     "ARM_present": false,
@@ -610,7 +610,7 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "VARIANCE_COMPOSITION_PREOUTCOME_PASSED_NOT_OPENED",
+  "status": "VARIANCE_COMPOSITION_RAW_COMPLETE_AWAITING_FROZEN_INTERPRETATION",
   "stop_boundary": "NO_REAL_RESPONSE;NO_ARM;NO_NEW_ACQUISITION;NO_QUOTE_V2_RESCUE",
   "variance_composition_wave": {
     "all_preoutcome_gates_pass": true,
@@ -621,13 +621,21 @@
     "confirmation_opened": false,
     "design_ref": "research_core_v4/state/VARIANCE_COMPOSITION_DESIGN_V1.json",
     "freeze_ref": "research_core_v4/state/VARIANCE_COMPOSITION_PREOUTCOME_FREEZE_V1.json",
+    "further_response_openings_authorized": false,
     "mechanism": "CAUSAL_VARIANCE_COMPOSITION_PREDICTIVE_STATE",
     "new_acquisition_authorized": false,
+    "preoutcome_freeze_head": "c648c05b1e94c0856dcd2375c7e6056a9667f0bd",
     "protected_forward_opened": false,
-    "real_response_opened": false,
+    "raw_intake_ref": "research_core_v4/state/VARIANCE_COMPOSITION_RAW_INTAKE_V1.json",
+    "raw_result_ref": "research_core_v4/state/VARIANCE_COMPOSITION_RAW_RESULT_V1.json",
+    "raw_result_sha256": "c4d6f3132b0bf477730d47b244c356b64629111479a83186c124cbd076320e41",
+    "real_execution_authorized": false,
+    "real_response_opened": true,
     "request_ref": "research_core_v4/state/VARIANCE_COMPOSITION_PREOUTCOME_REQUEST_V1.json",
-    "response_openings": 0,
-    "status": "ALL_PREOUTCOME_GATES_PASSED_READY_FOR_ONE_AUTHORIZED_DEVELOPMENT",
+    "response_openings": 1,
+    "response_run_id": 37267592504,
+    "response_trigger_head": "7d573ff2c12aec4da1006443b76d6e947ef723d3",
+    "status": "RAW_CANONICAL_PERSISTED_NOT_INTERPRETED",
     "support_ref": "research_core_v4/state/VARIANCE_COMPOSITION_SUPPORT_V1.json"
   }
 }
