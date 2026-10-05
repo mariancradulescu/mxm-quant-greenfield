@@ -1,0 +1,121 @@
+{
+  "DGP": "Unit marginal innovation variance: common-all factor variance.25, context-common-across-horizons.35, leaf-idiosyncratic.40 in baseline. normal_weak AR.10, AR025 rho.25, AR050 rho.50, remainingcases rho.10. Burn128days. common_factors uses baseline; strong_common_factors uses.80common-all,.15context,.05leaf andrho.25, truly distinct. Heavy:independentt5components scaled sqrt(3/5); skew:(chi2_3-3)/sqrt6. Heteroscedastic shared dailyexp(.7N)/exp(.49). Variance_change deterministic scale.5before day105 andsqrt1.75after, averagevariance1. Missing isolated10percent common and5percent leaf-specific, gaps commondays84..111 inclusive plusisolated2percent leaf-specific; masks exogenous and fixedunderallnull/alternative shifts. Alltrue-null populationmeans0; no arbitrary persistentmeanbreak claimed null.",
+  "authority_hardening_head": "52b67c71892508da29e6c4b1f52f21147dbdaa05",
+  "block_days": 14,
+  "bootstrap_draws": 1023,
+  "complete_procedure": "Adjusted leaf p=(1+count(maxabs bootstrap t >= observedabs leaf t))/(1024), reject <=.025 if support. Local leads additionally selected orientation in>=2of3fixed chronological70day means. All surviving adjusted leaves retained; context lead=any within context; no free best horizon/context or universal replication. Significance and complete lead strongFWER BOTH must satisfy gate.",
+  "computational_policy": "Chunk128trials only transport/compute. Alltrials and44configurations retained. Translation-invariant null-centered bootstrap draws may be reused across constantmeanshifts with exact analytic mean update and unchanged centeredmaskgeometry; compare directrecompute invariants after freeze before fullsimulation. Not differentmethod or resultrescue.",
+  "contexts": 3,
+  "days": 210,
+  "declared_FWER_ceiling": 0.05,
+  "error_gate": "For all44case/configurations BOTH any-false-significance AND any-false-complete-lead simultaneousWilson upper z3.5 <=.05. Completelead is a subset ofsignificance; hence simultaneouscoverage need44bounding events, not88independentclaims. Point<.05 alone insufficient. Exactly9216trials eachcase, no extension, no reseed, no threshold/block/bank change.",
+  "failed_candidate_code_unchanged": true,
+  "fallback": null,
+  "false_rejection": "ANY true-null leaf rejected. Nonnull components may have heterogeneous signs. Report any true-null significance, completelead and false-context selection; no averaging oferrors acrosscases or discard of failingcase.",
+  "freeze_implementation_before_simulation": true,
+  "historical_results_unchanged": true,
+  "horizons": 4,
+  "implementation_ref": "research_core_v4/inference_v2/joint_block_wild_maxt_v1.py",
+  "implementation_sha256": "e948a3e36e546168f185d52c8a31a5caf0da7fe0f0c160eb3da3a492c56979d0",
+  "invariant_seed": 2026100515,
+  "invariants_required": [
+    "constantmean shifts leave centeredbootstrapreference invariant",
+    "same commonmultiplier acrosscorrelatedleaves",
+    "studentization recomputed eachdraw",
+    "futureperturbation cannot change prior fixedcalendar block means",
+    "missingblocks remain originalcalendar locations",
+    "allreported true-nullerrors exclude designatednonnull leaves",
+    "completelead subsetsignificance",
+    "bothdirections paid by maxabs"
+  ],
+  "leaves": 12,
+  "method": "JOINT_CALENDAR_BLOCK_WILD_BOOTSTRAP_T_MAXT_V1",
+  "method_tournament": false,
+  "missingness": "Original210day calendar and per-leaf masks retained. Blocks require>=7 observed days. Leaf >=12 valid blocks, every fixed70day third>=42observed daily scores. No zero observation or reindexed gaps; algebraic0 only on unavailable influence terms whose mask/count is separately retained.",
+  "multiplier_bank": "One prospectively fixed1023x15Rademacher matrix used as deterministic resampling bank for all trials/cases. Every draw is shared across all12leaves; every original calendar block keeps its index. Monte Carlo certification conditions on this bank; no bank reselection. A future exact-geometry bank must be frozen independently before responses.",
+  "network_forbidden": true,
+  "no_extension_reseed_retuning": true,
+  "no_market_inputs": true,
+  "nominal_family_alpha": 0.025,
+  "null_cases": [
+    "normal_weak",
+    "AR025",
+    "AR050",
+    "heavy_t5",
+    "centered_skew",
+    "heteroscedastic",
+    "common_factors",
+    "strong_common_factors",
+    "isolated_missing",
+    "contiguous_gaps",
+    "variance_change"
+  ],
+  "null_configurations": {
+    "global_null": {},
+    "multiple_contexts_remaining_true_nulls": {
+      "0:0": 1.0,
+      "0:1": 0.75,
+      "1:2": -1.0,
+      "1:3": -0.75,
+      "2:0": 1.0
+    },
+    "one_context_multiple_horizons_nonnull": {
+      "0:0": 1.0,
+      "0:1": 0.75,
+      "0:2": -1.0
+    },
+    "one_context_one_horizon_nonnull": {
+      "0:0": 1.0
+    }
+  },
+  "null_trials_per_case": 9216,
+  "old_diagnostic_source_ref": "research_core_v4/audit_v2/synthetic_comparison_v1.py",
+  "old_diagnostic_source_sha256": "0273d61e243f93dec16f9d2804bd61c0dfce1cd00bddd1154447c234aca049f2",
+  "old_universal_diagnostic": "Same generated daily paths, first and all210days. Sharedtwo-week10day means21blocks, HAC2 cutoff5 all3contexts same sign, all3thirds sign,4of6coherent syntheticassets. Identical frozen audit_v2/synthetic_comparison_v1.py old() implementation imported read-only and nevermodified. Sourcehash bound. Onlycallold() on syntheticarrays, no failedcandidate function called. Old outcome/history neverloaded.",
+  "power_alternatives": {
+    "all_contexts_same_horizon_secondary": {
+      "0:0": 1,
+      "1:0": 1,
+      "2:0": 1
+    },
+    "heterogeneous_context_directions": {
+      "0:0": 1,
+      "1:1": -1,
+      "2:2": 1
+    },
+    "localized_negative": {
+      "0:0": -1
+    },
+    "localized_positive": {
+      "0:0": 1
+    }
+  },
+  "power_effects_daily_score_SD": [
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "power_gate": "Complete all11case x4alternatives x8effects curves and95Wilson uncertainty; smallestgrid effect with LOWER>=.8 pertargetleaf. For heterogeneous/all-context also report ANY and ALL prespecified targetleads. This is characterization, not economic proof or mandatory2SDveto. Outsidegrid explicitly reported; no interpolation or posthoc effect-grid expansion.",
+  "power_precision_derivation": "At p=.8,1.96^2*.8*.2/.02^2=1536.64; round up next1024batch=2048. Wilson95limits retained; no extension.",
+  "power_target": 0.8,
+  "power_trials_per_case": 2048,
+  "precision_derivation": {
+    "desired_halfwidth_at_5percent": 0.008,
+    "family_cells": 44,
+    "normal_planning_formula": "ceil(z^2*.05*.95/.008^2)=9092 then round up to next1024 batch=9216. Formula plans precision only; exact observed Wilson upper is mandatory gate.",
+    "simultaneous_Wilson_z": 3.5,
+    "two_sided_Bonferroni_tail_union_bound_44": 0.0205
+  },
+  "schema": "mxm.v4.joint-block-wild-maxt-certification-plan.v1",
+  "seed_common_multiplier_bank": 2026100514,
+  "seed_null": 2026100512,
+  "seed_power": 2026100513,
+  "starting_head": "da3180ee67b2c93c6b9d57785e9bb85e19e89088",
+  "status": "FROZEN_PRE_SIMULATION_NO_MARKET",
+  "studentization": "Sample SD of supported14day cluster means, n-1 denominator, recomputed within every wild draw. Observed and draw t=mean/(SD/sqrt(n)). Null-centered supported cluster vectors, common signs per chronological block. No Student-t distribution/CDF, no HAC covariance or nominal leaf pvalues."
+}
