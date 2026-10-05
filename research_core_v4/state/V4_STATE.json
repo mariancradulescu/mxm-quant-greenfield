@@ -3,7 +3,7 @@
   "as_of_date": "2026-10-05",
   "closure_dependency_graph": "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json",
   "current_project_closure_ledger": "research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json",
-  "current_project_coverage": "research_core_v4/state/POST_VARIANCE_V1_PROJECT_COVERAGE_REFRESH_V1.json",
+  "current_project_coverage": "research_core_v4/state/POST_ONLINE_CHANGE_V1_PROJECT_COVERAGE_REFRESH_V1.json",
   "detector_calibration_history": {
     "v1_result": "research_core_v4/state/DETECTOR_CALIBRATION_RESULT_V1.json",
     "v1_spec": "research_core_v4/state/DETECTOR_CALIBRATION_SPEC_V1.json",
@@ -132,7 +132,7 @@
   },
   "information_source_catalog": "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json",
   "multiscale_coverage_audit": "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json",
-  "next_action": "EXECUTE_ONLINE_CHANGE_OUTCOME_BLIND_PREFLIGHT_ONLY",
+  "next_action": "STOP_BEFORE_REAL_RESPONSE_NO_RESCUE_OR_FURTHER_WAVE",
   "next_information_source_selection": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V3.json",
   "next_prospective_wave": {
     "ARM_present": false,
@@ -487,19 +487,37 @@
     "support_status": "DATA_LIMITED_UNTESTED_NOT_NULL"
   },
   "online_change_wave": {
+    "all_preoutcome_gates_pass": false,
+    "audit_ref": "research_core_v4/state/ONLINE_CHANGE_FINAL_PREOUTCOME_AUDIT_V1.json",
+    "blockers": [
+      "INFERENCE_ERROR_CONTROL_PRECISION_GATE_FAILED",
+      "DAILY_GAP_DETECTION_POWER_GATE_FAILED"
+    ],
     "broader_family_closed": false,
+    "calibration_ref": "research_core_v4/state/ONLINE_CHANGE_CALIBRATION_V1.json",
     "candidate_frozen_count": 0,
+    "classification": "PREOUTCOME_BLOCKED_CALIBRATION_UNCERTIFIED_AND_LOW_POWER_UNTESTED_NOT_NULL",
     "confirmation_opened": false,
     "design_ref": "research_core_v4/state/ONLINE_CHANGE_DESIGN_V1.json",
+    "economic_null_claimed": false,
+    "economic_status": "COST_UNRESOLVED_UNTESTED_NO_REAL_RESPONSE",
+    "exact_frozen_design_head": "8ec0087ab21a3aa0eefa1c5b9a2aeca6c04902ea",
+    "freeze_ref": "research_core_v4/state/ONLINE_CHANGE_PREOUTCOME_FREEZE_V1.json",
+    "gap_power_ref": "research_core_v4/state/ONLINE_CHANGE_GAP_POWER_V1.json",
     "mechanism": "ONLINE_CHANGE_STATE_INCREMENTAL_INFORMATION",
     "new_acquisition_authorized": false,
     "protected_forward_opened": false,
+    "raw_canonical_result_present": false,
+    "raw_publication_head": null,
+    "real_execution_authorized": false,
+    "real_response_authorized": false,
     "real_response_opened": false,
     "request_ref": "research_core_v4/state/ONLINE_CHANGE_PREOUTCOME_REQUEST_V1.json",
     "response_openings": 0,
     "selection_head": "23b23f9a2f96451eb1e3b6175c0e50cfb3c6106a",
     "selection_ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V3.json",
-    "status": "FROZEN_PREOUTCOME_PENDING_SUPPORT_AND_SYNTHETIC_GATES"
+    "status": "PREOUTCOME_BLOCKED_CALIBRATION_UNCERTIFIED_AND_LOW_POWER_UNTESTED_NOT_NULL",
+    "support_ref": "research_core_v4/state/ONLINE_CHANGE_SUPPORT_V1.json"
   },
   "predecessor": {
     "v3_control_plane_repair_ref": "research_core_v3/state/V3_CONTROL_PLANE_REPAIR_V1.json",
@@ -625,8 +643,8 @@
     "work_dependency_required": false
   },
   "schema": "mxm.research-core-v4.state.v4",
-  "status": "ONLINE_CHANGE_FROZEN_PREOUTCOME_NOT_OPENED",
-  "stop_boundary": "NO_CONFIRMATION;NO_CANDIDATE_PROMOTION;NO_PROTECTED_FORWARD;NO_NEW_ACQUISITION;NO_QUOTES_OR_FACTOR_RESCUE;NO_ORDERS",
+  "status": "ONLINE_CHANGE_V1_PREOUTCOME_BLOCKED_CALIBRATION_AND_LOW_POWER",
+  "stop_boundary": "NO_REAL_ONLINE_RESPONSE;NO_NEW_WAVE;NO_CONFIRMATION;NO_PROMOTION;NO_FORWARD;NO_BROKER_ACQUISITION;NO_ORDERS",
   "variance_composition_wave": {
     "all_preoutcome_gates_pass": true,
     "audit_ref": "research_core_v4/state/VARIANCE_COMPOSITION_FINAL_AUDIT_V1.json",
