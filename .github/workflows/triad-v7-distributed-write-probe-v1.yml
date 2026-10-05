@@ -1,0 +1,42 @@
+name: TRIAD V7 outcome-blind checkpoint write probe
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/triad-v7-distributed-write-probe-v1.yml
+      - research_core_v4/triad_v7/distributed/WRITE_PROBE_PLAN_V1.json
+permissions:
+  contents: write
+jobs:
+  checkpoint-write-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Write only outcome-blind checkpoint and prove Git bytes
+        env:
+          PROBE_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/triad_v7/EXECUTION_ARM_V1.json
+          git fetch origin performance-research-v3-20260922
+          test "$(git rev-parse origin/performance-research-v3-20260922)" = "$GITHUB_SHA"
+          git checkout -B performance-research-v3-20260922 "$GITHUB_SHA"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          p=Path('research_core_v4/triad_v7/distributed/WRITE_PROBE_PLAN_V1.json')
+          o={'schema':'TRIAD_V7_ACTIONS_OUTCOME_BLIND_WRITE_PROBE_V1','status':'CHECKPOINT_WRITE_PAYLOAD_ONLY','plan_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'source_head':os.environ['GITHUB_SHA'],'workflow_run_id':os.environ['PROBE_RUN_ID'],'outcomes_used':0,'null_Monte_Carlo_trials':0,'power_Monte_Carlo_trials':0,'real_response_openings':0,'future_Y_reads':0,'broker_contacts':0,'new_acquisition':0,'candidate_frozen_count':0,'orders':0}
+          Path('research_core_v4/triad_v7/distributed/ACTIONS_WRITE_PROBE_CHECKPOINT_V1.json').write_text(json.dumps(o,indent=2,sort_keys=True)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research_core_v4/triad_v7/distributed/ACTIONS_WRITE_PROBE_CHECKPOINT_V1.json
+          git commit -m 'Persist outcome-blind V7 Actions checkpoint write proof'
+          git push origin HEAD:performance-research-v3-20260922
+          git fetch origin performance-research-v3-20260922
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/performance-research-v3-20260922)"
+          git show HEAD:research_core_v4/triad_v7/distributed/ACTIONS_WRITE_PROBE_CHECKPOINT_V1.json
+          echo 'ACTIONS_CHECKPOINT_WRITE_AND_REMOTE_BYTES_PASS'
