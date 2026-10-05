@@ -1,0 +1,209 @@
+{
+  "CSharp_Cloud_path": "API exposes MarketDepth BidEntries/AskEntries/Updated and VolumeInUnits. Prospective scalar3level state can run in self-containedCSharp. BrokerCloud feedavailability, sameunits/eventtiming and actuallatency require later parityproof; publicAPI documentation is not PepperstoneCloud certification.",
+  "acquisition_authorized": false,
+  "acquisition_burden": {
+    "baseline_breakdown": {
+      "account_auth": 1,
+      "application_auth": 1,
+      "assets_list": 1,
+      "batch_spots_subscribe": 1,
+      "batch_spots_unsubscribe": 1,
+      "depth_subscribe_per_symbol": 3,
+      "depth_unsubscribe_per_symbol": 3,
+      "expected_margin_minimum_volume": 3,
+      "symbols_by_id": 1,
+      "symbols_list": 1,
+      "trader_metadata": 1
+    },
+    "budget_exhaustion": "Stop unconditionally; DATA_LIMITED_TRANSPORT_BUDGET_NOT_ECONOMIC_NULL. No automaticlimitincrease.",
+    "capability_sessions": 6,
+    "fullcampaign_expected_request_count": "Not executable or funded now; beforego require concretehost/calendar/request/payload budget. No blanket14weekcollection authorization.",
+    "heartbeat_10second_budget_total": 720,
+    "historical_requests": 0,
+    "minutes_per_session": 20,
+    "money_cost": "API/licence/runner cost not certified; do not assumefree compute. Useexisting acceptedhost/auth onlyifread-only and approved. No newpaidhost authorized.",
+    "optional_dynamic_leverage_requests_per_session_max": 3,
+    "per_session_nonheartbeat_requests_baseline": 17,
+    "raw_compressed_payload_bytes_cap": 536870912,
+    "raw_event_count_cap": 2000000,
+    "reconnections_or_tokenrefresh_allowed": 0,
+    "signal_symbols": 3,
+    "size_rate_unknown": "No observeddepthrate; do not substitute historicalBBOtickrate as depthrate.",
+    "symbol_minutes": 360,
+    "total_nonheartbeat_requests_baseline": 102,
+    "total_nonheartbeat_requests_hard_cap": 120
+  },
+  "broker_contacts": 0,
+  "candidate_frozen_count": 0,
+  "capability_support_go_no_go": {
+    "bothside_levels_min": 3,
+    "clock_UTC_error_seconds_max": 0.1,
+    "data_loss_tolerance": 0,
+    "depth_BBO_bestprice_agreement_within_one_tick_fraction_min": 0.95,
+    "imbalance_IQR_min": 0.05,
+    "level_size_distinct_values_per_side_per_window_min": 10,
+    "max_state_age_seconds": 2,
+    "metadata_identity_required": true,
+    "processing_latency_p95_seconds_max": 0.1,
+    "quote_size_is_not_predictive_power": "These support/dynamism thresholds only reject absent/constant/unusable size. No signed future response, pvalue or alpha fromsixwindows.",
+    "rule": "ALL3symbols and ALL6windows must pass. No bestwindow, bestsymbol,thresholdrelaxation or replacement. Failure blocks this exactcapabilityrequirement; no automatic newwave.",
+    "unknown_deleted_ID_tolerance": 0,
+    "valid_1sec_state_retention_min": 0.8,
+    "warmup_seconds": 120
+  },
+  "chronology": "ProtoOADepthEvent has no declared server timestamp in reviewedschema. Use monotonic localreceipt as actual informationavailability; retainUTC only forcalendar. Never invent server depth time or align to earlier spot server timestamp. Separate feeds joined only by receiveorder <=decision. State expires after2seconds without relevant depth/BBO update; no stalepeer inference.",
+  "classification": "NEW_INFORMATION_CLASS_REQUIREMENT_FROZEN_PENDING_GOVERNANCE_NO_ACQUISITION",
+  "closure_scope": "No new informationfamily or exactmarketmechanism closed. Planonly; all prior exactclosures preserved. No proof ofdepthavailability/predictivevalue/economicnull.",
+  "confirmation_opened": false,
+  "economic_hypothesis": "Dense nearest3level bid-vs-ask quotedsize imbalance may add directional information about OWN future executableBBO response after current return/spread controls. It could also expose no available depth, constant/indicative sizes or costs too large; all are useful early no-go information. Hypothesis only, no predictedbps/profit.",
+  "economic_status": "COST_UNRESOLVED_INFORMATION_CLASS_UNAVAILABLE_NOT_TESTED",
+  "fields_required": [
+    "symbolId and exactbroker name/environment",
+    "all raw newQuotes entries:quoteID,sizeinteger,bidinteger or askinteger",
+    "all deletedQuotes IDs",
+    "ordered raw messagepayloads before anysampling",
+    "sessionID,localreceiveUTCns,localmonotonicns,receive sequence,processing start/end timestamps",
+    "spot bid/ask optionalupdates preserving own side ages,requestedserver timestamps",
+    "symbol digits/ticksize,minVolume,stepVolume,lotSize,commissionType/value,mincommission/conversionfee,currencyIDs",
+    "account depositcurrency/moneydigits and read-only expectedmargin forminimumvolume BOTHsides",
+    "all subscriptions/acknowledgments/errors/disconnects/clockchecks/queueoverflow markers"
+  ],
+  "fixed_extraction_anchor": "I=(sum3nearestbid sizes - sum3nearestask sizes)/(sum3bid+sum3ask), positive finite sizes only. No quote-revisionpressure, net-mid-displacement filter, raretrigger or leader/follower law. A later scientificdesign must compare both orientations within one controlled family; do not choose direction fromcapability quotes.",
+  "go_no_go_decision": {
+    "after_probe": "Even ifallcapabilitygatespass, stopforseparate fullcampaigngovernance. Ifanygatefails stopwithoutrescue. No signedresponse/promotion fromprobe.",
+    "current_authority": "NO_GO_NO_BROKER_CONTACT_NO_ACQUISITION",
+    "full_campaign": "NO_GO_PENDING_CAPABILITY_COST_POWER_AND_HOST_EVIDENCE",
+    "precontact_conditions": [
+      "Separateexplicitacquisitionauthorization",
+      "Explicitnon-protecteddevelopmenttime ruling; no currentprotecteddata exposure",
+      "Machineownedread-only host/auth ready",
+      "Exactrequest/calendar/payloadcaps anddecoder unit/integrity tests frozen",
+      "Noorders/tradingpermissions used"
+    ],
+    "recommendation": "CONDITIONAL_GO_FOR_SEPARATELY_AUTHORIZED_BOUNDED_CAPABILITY_PROBE_ONLY"
+  },
+  "historical_requests": 0,
+  "history_requirement": {
+    "capability_probe": "First two eligible Monday-Friday dates AFTER a future separateauthorization, within explicitly governance-approved NEWdevelopment data scope. Three fixed UTCwindows eachdate:07:00-07:20,13:00-13:20,20:00-20:20; no holiday or missingdate substitution. All3symbols simultaneously. Total120wallminutes,360symbolminutes across2days.",
+    "currently_available_history": "No accepted depthhistory; reviewedOpenAPI documents LIVE depth, no historicaldepth retrieval. History cannot be fabricated fromtick/M5 files.",
+    "full_campaign": "NOT_AUTHORIZED. Planningfloor10training weekdays +60evaluation weekdays, >=12calendarweeks evaluation, all fixed UTCsessionwindows retained. This takes at least14calendarweeks includingprefix if onlylive data exists; holidays/gaps can increase it. No claim of instant historicaldepth/backfill. Campaignrequires secondexplicit decision aftercapability/host/cost/synthetic feasibility, not automaticcontinuation.",
+    "protected_time_gate": "No permission to reinterpret existing protected-forward boundary or relabel protecteddata as development. Any proposed live dates require explicit separate governance ruling on data partition. Untilthat ruling all acquisition remains NO_GO. Existing protectedforwarddata stays unopened."
+  },
+  "initialization": "Fresh connectioneachwindow; first120secondswarmup excluded. Need initial positive bothside3level state coherent with BBO; initialbook completeness/quoteID semantics must be established before usable state. Unknown deletion, clock reversal, overflow, disconnect or incoherent book invalidates window. No silent repairs or automatic replays.",
+  "live_trading_started": false,
+  "machine_owned": {
+    "Android_required": false,
+    "collector_built_this_task": false,
+    "current_host_auth_ready": false,
+    "if_unavailable": "NO_GO_HOST_OR_CREDENTIALS_UNAVAILABLE. Do not shift workto user or silently build infrastructure.",
+    "read_only_host_access_must_be_verified_without_ordercalls": true,
+    "route": "Read-only cTraderOpenAPI machineprocess usingalready available app/account authorization, sixbounded scheduledsessions and durable raw+hashes. Existing GitHub workflow mechanism may startone shortsession pertime; do not build persistentframework or phonecollector here.",
+    "user_runs_or_device_package_required": false
+  },
+  "official_sources": [
+    {
+      "checked": "2026-10-05",
+      "claim": "Live depth subscription andincremental state; historicaltickprice/time only.",
+      "url": "https://help.ctrader.com/open-api/symbol-data/"
+    },
+    {
+      "checked": "2026-10-05",
+      "claim": "Deptheventnew/deletedquotes, no depthservertimestamp field;spot timestampoptional.",
+      "url": "https://help.ctrader.com/open-api/messages/"
+    },
+    {
+      "checked": "2026-10-05",
+      "claim": "Depthquoteid,size,bid/ask andsizecents.",
+      "url": "https://help.ctrader.com/open-api/model-messages/"
+    },
+    {
+      "checked": "2026-10-05",
+      "claim": "CSharpinterface withsideentries andUpdated event; not account-specificCloudproof.",
+      "url": "https://help.ctrader.com/ctrader-algo/references/MarketData/MarketDepth/MarketDepth/"
+    },
+    {
+      "checked": "2026-10-05",
+      "claim": "Price andVolumeInUnits API.",
+      "url": "https://help.ctrader.com/ctrader-algo/references/MarketData/MarketDepth/MarketDepthEntry/"
+    }
+  ],
+  "orders": 0,
+  "power_feasibility": {
+    "calibration_executed_in_this_task": false,
+    "capability_probe": "NOT_A_POWERED_ECONOMIC_TEST. Sixwindowdays=only2 independentdaily vectors, not thousands of independent1second snapshots. No future signedresponse permitted.",
+    "current_full_campaign_go": false,
+    "economic_sensitivity_gate": "Required detectable all-in netownresponse must be expressed relative to authenticspread+commission+conservativeslippage+EURconversion atminsize; if minimumdetectableeconomicbenefit does not exceed unresolvedfriction uncertainty, NO_GO fullcampaign. No arbitrary universalbpsfloor or assumedzero costs.",
+    "error_control_requirement": "Prospectivelyfixed8192trials per full-family stress case, simultaneous95%upper<=.05; dailyserialdependence AR0,.25,.5,commonfactor,heavytailed,heteroscedastic,size-BBOstaleness/dropout,10dayprefixestimation mandatory. No trialextension/reseed/retuning to pass.",
+    "full_campaign_floor": "60eligiblecalendar-day joint3symbol score vectors after10dayprefix; weeklyclustering/HAC and regimebreadth mandatory. No claim these60days provide guaranteedpower.",
+    "multiplicity_family": "All3symbols,one60second ownBBOhorizon,bothdirections; no freesymbol or orientation. Later exact inference law frozen BEFORE campaign responses.",
+    "power_requirement": "Everydeclaredmandatorycase bothdirections complete replication power Wilson95lower>=.8 at1daily-scoreSD. Units statistical, no bps/profit equivalence. Lowerpower remainsLOW_POWER_INCONCLUSIVE. Must simulate before FULL acquisition authorization, not aftermarketresponse.",
+    "prospective_target_effect_daily_score_SD": 1.0,
+    "reference_horizon_seconds": 60,
+    "support_measured_in_this_task": false
+  },
+  "prospective_mechanism": "NEAR_TOUCH_QUOTED_SIZE_IMBALANCE_CAPABILITY_REQUIREMENT",
+  "protected_forward_opened": false,
+  "raw_publication_head": null,
+  "raw_result_present": false,
+  "raw_result_sha256": null,
+  "real_response_authorized": false,
+  "resolution": "Lossless eventstream plus deterministic1second receive-clock snapshots forsupport only. No eventthinning, M5 reconstruction of size, forwardfill across disconnects or retrospectiveclock reordering.",
+  "response_openings": 0,
+  "runtime_v2": "READ_ONLY",
+  "schema": "mxm.v4.depth-size-information-requirement.v1",
+  "scope": [
+    {
+      "current_identity_and_cost_reverification_required": true,
+      "economic_identity": "FX_SPOT_OR_MARGIN_CFD",
+      "minimum_margin_EUR200_historical_proxy": 33.33,
+      "minimum_volume_cents_historical": "100000",
+      "selection_basis": "Fixed first3 eligible FX in preexisting preoutcome execution-plausibility ordering, determined by spread/activity/currentmetadata not strategyresponse. No new bestsymbol or leaf outcomes.",
+      "step_volume_cents_historical": "100000",
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "current_identity_and_cost_reverification_required": true,
+      "economic_identity": "FX_SPOT_OR_MARGIN_CFD",
+      "minimum_margin_EUR200_historical_proxy": 33.33,
+      "minimum_volume_cents_historical": "100000",
+      "selection_basis": "Fixed first3 eligible FX in preexisting preoutcome execution-plausibility ordering, determined by spread/activity/currentmetadata not strategyresponse. No new bestsymbol or leaf outcomes.",
+      "step_volume_cents_historical": "100000",
+      "symbol": "EURGBP",
+      "symbol_id": 9
+    },
+    {
+      "current_identity_and_cost_reverification_required": true,
+      "economic_identity": "FX_SPOT_OR_MARGIN_CFD",
+      "minimum_margin_EUR200_historical_proxy": 30.83,
+      "minimum_volume_cents_historical": "100000",
+      "selection_basis": "Fixed first3 eligible FX in preexisting preoutcome execution-plausibility ordering, determined by spread/activity/currentmetadata not strategyresponse. No new bestsymbol or leaf outcomes.",
+      "step_volume_cents_historical": "100000",
+      "symbol": "AUDCAD",
+      "symbol_id": 18
+    }
+  ],
+  "selected_action": "Freeze one bounded broker-native quoted-depth capability/acquisition requirement; stop for governance. Neither another M5 outcome nor actual data collection selected for execution.",
+  "selection_ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V5.json",
+  "source": "BROKER_NATIVE_QUOTED_DEPTH_SIZE_STATE",
+  "source_binding": {
+    "research_core_v3/state/ACCEPTED_DATA_INVENTORY_V1.json": "5d28f9f4142592c35941913cdc426f4fe1e48367cd59a60ff374c13dc0e12dd8",
+    "research_core_v3/state/ACCEPTED_DATA_QUALITY_TABLE_V1.json.gz": "6608e62b54eaf9813e2e392609218097fd7424ce2c7d737868aec768f26f3de6",
+    "research_core_v3/state/BROKER_NATIVE_QUOTE_MICROSTRUCTURE_PREOUTCOME_AUDIT_V1.json": "0ba2740d32f0b8e07b9e618668c555e4a160d205d994f70826d2a21af4193bac",
+    "research_core_v3/state/FX_CROSS_PAIR_QUOTE_LEAD_LAG_PREOUTCOME_AUDIT_V1.json": "eba06f038ac3260255561c7b597b1a5a83022c83d3fb2ea805ed51e4a599cf97",
+    "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json": "3f42fcad0e82b80d4f51bfab3a7faae11bf0b83dedd511826d68c308e34a7e02",
+    "research_core_v3/state/PROJECT_WIDE_RESEARCH_DESIGN_COVERAGE_AUDIT_V2.json": "c78c32952bc09b0149deb1a0fc9c9a731350a39d2abbeef3ada7dd3b5dc41f74",
+    "research_core_v3/state/SAME_UNDERLYING_CASH_FUTURES_BASIS_REVERSION_PREOUTCOME_AUDIT_V1.json": "617daacd90b5a0a0de40afce909ef0a6c4706d24f405c6b2db39a210a2e90927",
+    "research_core_v3/state/SAME_UNDERLYING_FUTURES_LED_CASH_CATCHUP_WAVE_DESIGN_V1.json": "ca07ca4b7be912d5be0a3224b05bc1402d68ec2311941cae47bb69a39c409916",
+    "research_core_v4/V4_PROJECT_CONTRACT_V1.json": "def292b0efba0bcf696f876bd0c2704e9358b924b26fd4d9749278848c6715c4",
+    "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_MANIFEST_V2.json": "d338dcaac31af05819aebd2876946f6af001c31ecca526e0424c4ddee1f3d207",
+    "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json": "1fe100d81ad0d3623132536ddaff118308ee9ac6b25c4aa5bbaff6c5e088654f",
+    "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V4.json": "dc9dfedac981d579d8d7249dc6c14173cf48ee7aa63e928c6b65b22c3b1225c1",
+    "research_core_v4/state/POST_RESIDUALIZED_DISPERSION_V1_PROJECT_COVERAGE_REFRESH_V1.json": "f7342b3d0d47f07a8884e7bbba388d14ec97914f9a4d2822bb1db7a14dd79769"
+  },
+  "source_live_head": "7c9fb9c25c3a059f0d54107ee2e05dc7ea64433a",
+  "status": "FROZEN_REQUIREMENT_PENDING_GOVERNANCE_NOT_AUTHORIZED_NOT_EXECUTED",
+  "unit_law": "Persist rawprice integers; price reference/100000 with digits preserved. Depthsize cents/100 -> units per officialschema. Never infer executedvolume or executable fill guarantee from displayedsize.",
+  "what_is_new": "Broker-displayed liquidity sizes across nearest price levels, not exchange fullorderbook, executed flow, cancellations or guaranteed fills. A size-state can vary with identical BBO/M5prices/activity: irreducible new observable.",
+  "why_existing_insufficient": "145 primary M5 histories record OHLC/tick_volume, not quote IDs/sizes/sided per-price depth or receive order. Historical bid/ask ticks preserve price+time, not size. Accepted friction/quote-derived events cannot reconstruct full book size; quoteV2 privateproof is no new generalized depth archive. The quality-table depth_anchor_count is HISTORICAL BAR coverage, not LevelII market-depth evidence."
+}
