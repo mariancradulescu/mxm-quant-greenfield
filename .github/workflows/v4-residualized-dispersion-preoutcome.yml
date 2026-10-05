@@ -1,0 +1,46 @@
+name: V4 Residualized Dispersion Outcome Blind Preflight
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/state/RESIDUALIZED_DISPERSION_PREOUTCOME_REQUEST_V1.json]
+permissions: {contents: read}
+concurrency:
+  group: v4-residualized-dispersion-preoutcome-singleton
+  cancel-in-progress: false
+jobs:
+  preoutcome:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      OPENBLAS_CORETYPE: Nehalem
+      NPY_DISABLE_CPU_FEATURES: AVX512F,AVX2,FMA3,AVX
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.16'}
+      - run: |
+          python -m pip install --disable-pip-version-check --only-binary=:all: --require-hashes -r research_core_v4/runtime/numeric-requirements-v1.txt
+      - name: Frozen adversarial tests and historical integrity
+        run: |
+          python -m unittest -q tests.test_v4_residualized_dispersion tests.test_v4_post_quote_preoutcome
+          python -m research_core_v4.post_publication_integrity_v1 "$PWD"
+      - name: Prospective full-family synthetic calibration and power
+        run: python -m research_core_v4.residualized_dispersion_calibration_v1 --output "$RUNNER_TEMP/RESIDUALIZED_DISPERSION_CALIBRATION_V1.json"
+      - name: Existing accepted M5 causal features and timestamp support only
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          python -m tools.residualized_dispersion_preoutcome --output "$RUNNER_TEMP/RESIDUALIZED_DISPERSION_SUPPORT_V1.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: residualized-dispersion-preoutcome-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/RESIDUALIZED_DISPERSION_CALIBRATION_V1.json
+            ${{ runner.temp }}/RESIDUALIZED_DISPERSION_SUPPORT_V1.json
+          if-no-files-found: error
+          retention-days: 90
