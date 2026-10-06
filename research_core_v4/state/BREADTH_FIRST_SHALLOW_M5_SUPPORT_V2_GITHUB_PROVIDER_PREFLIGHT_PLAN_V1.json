@@ -1,0 +1,62 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.github-provider-preflight-plan.v1",
+  "status": "READY_PUSH_BOUND_SYNTHETIC_ONLY_NOT_TRIGGERED",
+  "architecture_v2_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V2.json",
+  "architecture_v2_sha256": "ca19f43ebd3e8e5d1de4b87226a4820ccc58616e2e18fe0e46721800c8db0230",
+  "provider_script_ref": "research_core_v4/shallow_m5_support_v2_provider_preflight.py",
+  "provider_script_sha256": "311218b25b7eed8035cc9b1e5df1cfeaad74022086de2b385e738fecae538067",
+  "provider_workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-provider-preflight.yml",
+  "provider_workflow_sha256": "e04a8a66795d9aef50e2173fd860159cf0f796f625c2dc2a9bc183f8ec020465",
+  "successor_runner_ref": "research_core_v4/shallow_m5_support_v2_production_v2.py",
+  "successor_runner_sha256": "a1aa8ba8bd104639c2758bf4bc14096565e41c897bceda2d343e0ba68c840de7",
+  "successor_workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml",
+  "successor_workflow_sha256": "208b26c10b0b3f5750512d126b4fa5a33ffbaa4c085985a64c7ca23a0706e7af",
+  "trigger": {
+    "workflow_dispatch": false,
+    "manual_user_action": false,
+    "push_bound_trigger_path": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PROVIDER_PREFLIGHT_TRIGGER_V2.json"
+  },
+  "credentials": {
+    "GITHUB_TOKEN": true,
+    "CTRADER_CLIENT_ID": false,
+    "CTRADER_CLIENT_SECRET": false,
+    "CTRADER_ACCESS_TOKEN": false,
+    "CTRADER_REFRESH_TOKEN": false,
+    "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": false
+  },
+  "payload": {
+    "synthetic_non_market_bytes_only": true,
+    "real_market_rows": false,
+    "real_account_id": false,
+    "token_material": false,
+    "encryption_public_key_ref": "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem"
+  },
+  "disposable_resources": {
+    "temporary_release_and_tag": true,
+    "temporary_scratch_branch": true,
+    "canonical_research_branch_synthetic_manifest_write": false,
+    "cleanup_required_even_on_failure": true
+  },
+  "success_required": [
+    "CREATE_DISPOSABLE_RELEASE",
+    "CREATE_SYNTHETIC_PLAINTEXT_SHARD",
+    "ENCRYPT_WITH_EXACT_PRODUCTION_PUBLIC_KEY",
+    "UPLOAD_ENCRYPTED_RELEASE_ASSET",
+    "REDOWNLOAD_AND_VERIFY_SHA256",
+    "WRITE_MANIFEST_TO_SCRATCH_BRANCH",
+    "READ_BACK_AND_STRICTLY_VALIDATE",
+    "RECOVERY_LOOKUP_SKIP_WITHOUT_REQUERY",
+    "HASH_CONFLICT_FAIL_CLOSED",
+    "BRANCH_DRIFT_GUARD_ALLOWED_PATH_ONLY",
+    "DELETE_RELEASE_AND_TAG",
+    "DELETE_SCRATCH_BRANCH",
+    "ZERO_RESIDUAL_PROVIDER_RESOURCES"
+  ],
+  "governance": {
+    "arm_present": false,
+    "broker_contact": false,
+    "historical_requests_sent": 0,
+    "ctrader_credentials_used": false,
+    "market_data_used": false
+  }
+}
