@@ -108,7 +108,7 @@ def load_accepted_localization(root: Path | str) -> dict:
         raise ValueError("intake localization hash mismatch")
     encoded = (root / LOCALIZATION_REL).read_bytes()
     try:
-        compressed = base64.b64decode(encoded, validate=True)
+        compact = b\"\".join(encoded.split())\n        compressed = base64.b64decode(compact, validate=True)
         raw = zlib.decompress(compressed)
     except Exception as exc:
         raise ValueError("accepted localization decode failure") from exc
