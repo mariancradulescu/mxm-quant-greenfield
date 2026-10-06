@@ -1,0 +1,63 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.v3-failed-production-execution-authority.v1",
+  "status": "HISTORICAL_FAILED_CLOSED_DO_NOT_RERUN",
+  "failed_arm": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json",
+    "sha256": "756544d1778262228017739f5c1dd914ca969c9c15cd4b02d077bd3171f6621f",
+    "commit": "639df8f3a252c63fbec52765f142e5d5cfe3a589",
+    "parent": "b70b8d7e527850654fac501228ec4b82f6ee2681",
+    "immutable_historical": true,
+    "rerun_authorized": false,
+    "rewrite_authorized": false,
+    "delete_authorized": false
+  },
+  "failed_execution": {
+    "workflow_run_id": 37526112788,
+    "segment_1_job_id": 112483421503,
+    "presecret_v3_arm_gate": "PASS",
+    "capture_step": "FAILED",
+    "exception_class": "RAW_ENVELOPE_PROTOCOL_BINDING_FAILURE",
+    "underlying_exception": "ValueError: bar open timestamp outside exact frozen segment",
+    "exact_historical_request_count_observed": 1,
+    "automatic_retry_after_systemic_failure": 0,
+    "segments": {
+      "segment_1": "FAILED",
+      "segment_2": "SKIPPED",
+      "segment_3": "SKIPPED",
+      "segment_4": "SKIPPED"
+    }
+  },
+  "failed_campaign_durable_state": {
+    "release_identity": "mxm-shallow-m5-v2-5a15b55ce82e12889139e74a1b213d146fcf36a97ceb763fa0a321a83721d115",
+    "release_id": 405114938,
+    "release_target_commit": "639df8f3a252c63fbec52765f142e5d5cfe3a589",
+    "encrypted_asset_count": 0,
+    "segment_manifest_count": 0,
+    "completed_shard_count": 0,
+    "recovery_progress_available": false,
+    "reuse_for_successor_authorized": false
+  },
+  "first_failed_request": {
+    "master_ordinal": 1,
+    "symbol": "EURJPY",
+    "symbol_id": 3,
+    "period": "M5",
+    "period_enum": 5,
+    "from_utc": "2026-08-20T00:00:00Z",
+    "to_utc": "2026-08-26T23:55:00Z",
+    "requested_count": 5000,
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636"
+  },
+  "forensic_authorization": {
+    "classification": "TRANSPORT_AND_BACKEND_BOUNDARY_SEMANTICS_ONLY",
+    "exact_history_request_count": 1,
+    "history_retries": 0,
+    "economic_response": false,
+    "candidate_selection": false,
+    "profitability_test": false,
+    "search_budget_consumption": 0,
+    "persist_prices": false,
+    "persist_volume": false,
+    "persist_raw_payload": false
+  }
+}

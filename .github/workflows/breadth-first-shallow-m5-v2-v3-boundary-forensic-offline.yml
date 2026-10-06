@@ -1,0 +1,45 @@
+name: Shallow M5 V3 Boundary Forensic Offline Validation
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/shallow_m5_support_v2_v3_boundary_forensic_probe.py
+      - tests/test_shallow_m5_v3_boundary_forensic_probe.py
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_FAILED_EXECUTION_AUTHORITY_V1.json
+      - .github/workflows/breadth-first-shallow-m5-v2-v3-boundary-forensic-probe.yml
+      - .github/workflows/breadth-first-shallow-m5-v2-v3-boundary-forensic-offline.yml
+
+permissions:
+  contents: read
+
+jobs:
+  offline-prearm:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install protobuf==5.29.5
+      - name: Prove no forensic ARM yet
+        run: test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_ARM_V1.json
+      - name: Compile forensic probe
+        run: python -m py_compile research_core_v4/shallow_m5_support_v2_v3_boundary_forensic_probe.py tests/test_shallow_m5_v3_boundary_forensic_probe.py
+      - name: Run forensic unit tests
+        run: python -m unittest -v tests.test_shallow_m5_v3_boundary_forensic_probe
+      - name: Prove failed V3 ARM remains byte exact
+        run: |
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json | cut -d' ' -f1)" = "756544d1778262228017739f5c1dd914ca969c9c15cd4b02d077bd3171f6621f"
+      - name: Prove no refresh token injection and no manual trigger
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path(".github/workflows/breadth-first-shallow-m5-v2-v3-boundary-forensic-probe.yml").read_text()
+          assert "workflow_dispatch" not in p
+          assert "CTRADER_REFRESH_TOKEN:" not in p
+          PY
