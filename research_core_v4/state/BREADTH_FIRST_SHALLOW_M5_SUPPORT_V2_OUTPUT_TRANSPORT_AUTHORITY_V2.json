@@ -1,0 +1,52 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.output-transport-authority.v2",
+  "status": "FROZEN_SUCCESSOR_OUTPUT_TRANSPORT_NOT_ARMED_NO_REAL_ASSETS_CREATED",
+  "preserved_v1": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_OUTPUT_TRANSPORT_AUTHORITY_V1.json",
+    "sha256": "1a5d83aea45c8e6e925542d0f14c0a5f9bed340bb141173014d501e9be86f7cd",
+    "immutable": true
+  },
+  "capture_job_private_key_required": false,
+  "capture_job_uses_public_key_only": true,
+  "public_key": {
+    "ref": "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem",
+    "expected_public_spki_sha256": "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11"
+  },
+  "encryption": {
+    "bulk_cipher": "OPENPGP_AES256_WITH_INTEGRITY_PROTECTION",
+    "fresh_random_bundle_key_per_raw_shard": true,
+    "bundle_key_min_entropy_bits": 256,
+    "key_wrap": "RSA_OAEP_SHA256_MGF1_SHA256",
+    "plaintext_raw_in_public_repository": false,
+    "plaintext_raw_release_asset": false
+  },
+  "durability_v2": {
+    "strict_segment_manifest_binding_required": true,
+    "exact_release_identity_derived_from_source_head_and_architecture_freeze_hash": true,
+    "arbitrary_release_identity_forbidden": true,
+    "release_target_must_equal_exact_original_arm_commit": true,
+    "release_body_campaign_binding_must_match_exactly": true,
+    "previous_segment_all_25_assets_redownload_and_sha256_verified_before_auth": true,
+    "campaign_branch_drift_guard_required": true,
+    "canonical_manifest_write_requires_pre_and_post_branch_guard": true
+  },
+  "bindings": {
+    "accepted_protocol_decoder_freeze_sha256": "aae769ffb41f8e29e978305ba2e6b85395f70d3c5c4c9b9780a56e601489d98c",
+    "master1576_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "digits_map_file_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "successor_runner_ref": "research_core_v4/shallow_m5_support_v2_production_v2.py",
+    "successor_runner_sha256": "a1aa8ba8bd104639c2758bf4bc14096565e41c897bceda2d343e0ba68c840de7",
+    "successor_workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml",
+    "successor_workflow_sha256": "208b26c10b0b3f5750512d126b4fa5a33ffbaa4c085985a64c7ca23a0706e7af",
+    "successor_test_ref": "tests/test_shallow_m5_support_v2_production_v2.py",
+    "successor_test_sha256": "ff5cbf40a7f8eb07614713c25b619a3aa28d79f859c32df41417b33f8e0fec1c"
+  },
+  "governance": {
+    "arm_present": false,
+    "broker_contact_this_task": false,
+    "historical_requests_sent_this_task": 0,
+    "ctrader_credentials_used_this_task": false,
+    "real_market_release_assets_created_this_task": 0
+  }
+}
