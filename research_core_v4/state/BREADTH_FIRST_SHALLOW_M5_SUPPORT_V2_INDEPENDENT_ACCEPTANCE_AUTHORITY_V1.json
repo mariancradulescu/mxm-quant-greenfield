@@ -1,0 +1,82 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.independent-acceptance-authority.v1",
+  "status": "INDEPENDENTLY_ACCEPTED_PROTOCOL_DECODER_PREARM_SEMANTICALLY_CLOSED_NOT_ARMED",
+  "accepted_at_source_head": "b593b98cc2c6cac0e86e5c4d513b7c9c420b1a22",
+  "preserved_v1": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_FREEZE.json",
+    "file_sha256": "837ee83306a587088a64852956a97da1f3099d7680d6fc01f8da015f6904f208",
+    "immutable": true
+  },
+  "accepted_v2": {
+    "freeze_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PREARM_PROTOCOL_DECODER_FREEZE.json",
+    "freeze_sha256": "aae769ffb41f8e29e978305ba2e6b85395f70d3c5c4c9b9780a56e601489d98c",
+    "freeze_git_blob_sha": "abc2fdfa48c564560d9bd241f5abc4978f8ef18c",
+    "implementation_ref": "research_core_v4/shallow_m5_support_v2.py",
+    "implementation_sha256": "7ee289e2c2abaa48cdde334689308165aa6a81fc31d271104da9b2f47f6f9d1e",
+    "digits_map_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json",
+    "digits_map_file_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "canonical_digits_map_sha256": "4657c1cea348479afa198b005ae1da3b3f788fb2b33bd2c35f07034bfba2ce7a",
+    "master_count": 1576,
+    "master_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1"
+  },
+  "accepted_semantics": {
+    "request_type": "ProtoOAGetTrendbarsReq",
+    "response_type": "ProtoOAGetTrendbarsRes",
+    "response_payload_type": 2138,
+    "period": "M5",
+    "period_enum": 5,
+    "client_msg_id_binding_required": true,
+    "response_account_binding_required": true,
+    "response_period_binding_required": true,
+    "response_symbol_if_present_binding_required": true,
+    "hasMore_presence_via_HasField": true,
+    "canonical_decoder": "RELATIVE_INTEGER_TO_EXACT_DECIMAL",
+    "relative_price_divisor": 100000,
+    "bar_membership": "OPEN_TIMESTAMP",
+    "segment_end_23_55_included": true,
+    "next_segment_00_00_exclusive_to_next_segment": true
+  },
+  "page_cap": {
+    "maximum_pages_per_identity_segment": 3,
+    "interpretation": "OUTCOME_BLIND_OPERATIONAL_RESOURCE_CAP",
+    "protocol_guarantee_claimed": false,
+    "page3_more_required_classification": "SHALLOW_SUPPORT_PARTIAL_DATA_LIMITED",
+    "page3_more_required_is_no_historical_support": false,
+    "adaptive_page_cap_increase_allowed": false
+  },
+  "official_protocol_authority": {
+    "repository": "spotware/openapi-proto-messages",
+    "exact_commit": "3fd8bddfbe0cfc2ecfda079623dc4e498af11e66",
+    "blob_sha": {
+      "OpenApiMessages.proto": "e862a857e741e95208791e75a805d9b0cbdfa124",
+      "OpenApiModelMessages.proto": "1a11cf767b4fc0e8093eabf72154c7ac4fff2807",
+      "OpenApiCommonMessages.proto": "a21699b17c0101f4fc230710743449aab92e9685",
+      "OpenApiCommonModelMessages.proto": "a420d2bea7a92c9e31a97c3a67d3553f97b1e21d"
+    }
+  },
+  "validation": {
+    "run_id": 37476793962,
+    "job_id": 112314178888,
+    "validated_head": "b593b98cc2c6cac0e86e5c4d513b7c9c420b1a22",
+    "conclusion": "success",
+    "tests_passed": 31,
+    "tests_failed": 0
+  },
+  "authentication_authority_preserved": {
+    "result_ref": "adaptive_competition/state/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_RESULT_V3.json",
+    "authority_ref": "adaptive_competition/state/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_V3_AUTHORITY.json",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "status": "PROVEN_MACHINE_SIDE_READ_ONLY_AUTH_ONLY"
+  },
+  "governance": {
+    "arm_present": false,
+    "broker_contact_this_acceptance": false,
+    "historical_requests_sent_this_acceptance": 0,
+    "ctrader_credentials_used_this_acceptance": false,
+    "economic_outcomes_opened_this_acceptance": 0,
+    "search_budget_consumed_this_acceptance": 0,
+    "protected_forward_opened": false,
+    "confirmation_opened": false
+  },
+  "next_state": "PENDING_INDEPENDENT_AUDIT_OF_SHALLOW_M5_V2_MACHINE_SIDE_PRODUCTION_EXECUTION_ARCHITECTURE_BEFORE_ARM"
+}
