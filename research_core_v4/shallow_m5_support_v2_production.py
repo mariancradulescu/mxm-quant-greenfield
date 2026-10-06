@@ -914,8 +914,7 @@ def run_segment(segment: int, *, workdir: Path) -> dict:
     if segment not in (1, 2, 3, 4):
         raise CaptureError("segment must be 1..4")
     arm = validate_arm()
-    if segment == 1:
-        validate_arm_git_event(arm)
+    validate_arm_git_event(arm)
     static = validate_static_bindings()
     master = static["master"]
     digits = static["digits"]
@@ -929,6 +928,13 @@ def run_segment(segment: int, *, workdir: Path) -> dict:
 
     store = GitHubReleaseStore(tag=arm["durable_release_identity"], arm=arm)
     store.ensure_release(create_allowed=(segment == 1))
+    if segment > 1:
+        previous = store.load_segment_manifest(segment - 1)
+        if (
+            previous.get("status") != "COMPLETE"
+            or len(previous.get("entries", [])) != SHARD_COUNT_PER_SEGMENT
+        ):
+            raise SystemicFailure("DURABLE_STORAGE_INTEGRITY_FAILURE")
 
     workdir.mkdir(parents=True, exist_ok=True)
     checkpoint = workdir / "local-checkpoint.json"
