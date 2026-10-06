@@ -7,6 +7,7 @@ on:
       - research_core_v4/triad_v7/distributed/validate_final_runtime_blocker_v1.py
       - research_core_v4/triad_v7/distributed/FINAL_V7_RUNTIME_BLOCKER_AUTHORITY_V1.json
       - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/validate_parked_v7.py
 permissions:
   contents: write
 jobs:
@@ -21,8 +22,13 @@ jobs:
       - name: Validate exact preservation and parked V7 state
         run: |
           set -euo pipefail
-          python research_core_v4/triad_v7/distributed/validate_final_runtime_blocker_v1.py /tmp/FINAL_V7_RUNTIME_BLOCKER_VALIDATION_V1.json
+          if test -f adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json; then
+            python adaptive_competition/validate_parked_v7.py /tmp/ADAPTIVE_V7_PRESERVATION_RESULT_V1.json
+          else
+            python research_core_v4/triad_v7/distributed/validate_final_runtime_blocker_v1.py /tmp/FINAL_V7_RUNTIME_BLOCKER_VALIDATION_V1.json
+          fi
       - name: Persist exact integrity validation
+        if: ${{ hashFiles('adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json') == '' }}
         run: |
           set -euo pipefail
           git fetch origin performance-research-v3-20260922
@@ -34,3 +40,10 @@ jobs:
           git add research_core_v4/triad_v7/distributed/FINAL_V7_RUNTIME_BLOCKER_VALIDATION_V1.json
           git commit -m 'Persist exact V7 parked runtime blocker integrity validation'
           git push origin HEAD:performance-research-v3-20260922
+      - name: Archive read-only V7 preservation proof after adaptive supersession
+        if: ${{ hashFiles('adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: adaptive-v1-parked-v7-preservation-${{ github.sha }}
+          path: /tmp/ADAPTIVE_V7_PRESERVATION_RESULT_V1.json
+          retention-days: 30
