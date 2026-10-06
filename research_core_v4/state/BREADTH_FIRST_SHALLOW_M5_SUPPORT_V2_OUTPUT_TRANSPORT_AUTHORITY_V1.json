@@ -1,0 +1,106 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.output-transport-authority.v1",
+  "status": "FROZEN_OUTPUT_TRANSPORT_NOT_ARMED_NO_REAL_ASSETS_CREATED",
+  "canonical_repository": "mariancradulescu/mxm-quant-greenfield",
+  "research_branch": "performance-research-v3-20260922",
+  "scope": "FUTURE_SHALLOW_M5_V2_RAW_CAPTURE_OUTPUT_TRANSPORT_ONLY",
+  "capture_job_private_key_required": false,
+  "capture_job_uses_public_key_only": true,
+  "public_key": {
+    "ref": "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem",
+    "expected_public_spki_sha256": "464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11",
+    "algorithm": "RSA",
+    "modulus_bits": 4096
+  },
+  "existing_key_resolution_authority": {
+    "ref": "research_core_v4/state/V4_ASYMMETRIC_PRIVATE_KEY_SECRET_BLOCKER_RESOLUTION_V1.json",
+    "status": "RESOLVED_BY_PRIVATE_KEY_PARSE_AND_PUBLIC_FINGERPRINT_MATCH_THEN_REAL_PREARM_PASS",
+    "historical_authority_mutated": false
+  },
+  "encryption": {
+    "bulk_cipher": "OPENPGP_AES256_WITH_INTEGRITY_PROTECTION",
+    "fresh_random_bundle_key_per_raw_shard": true,
+    "bundle_key_min_entropy_bits": 256,
+    "key_wrap": "RSA_OAEP_SHA256_MGF1_SHA256",
+    "package_format": "MXM_SHALLOW_M5_V2_ENC1",
+    "plaintext_raw_in_public_repository": false,
+    "plaintext_raw_release_asset": false,
+    "plaintext_may_be_persisted_after_job": false
+  },
+  "future_machine_side_decryption_secret": {
+    "name": "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM",
+    "director_may_read": false,
+    "logs_may_expose": false,
+    "plaintext_may_be_persisted": false,
+    "capture_job_receives_secret": false
+  },
+  "durable_storage": {
+    "architecture": "MACHINE_SIDE_ENCRYPTED_GITHUB_RELEASE_ASSET_STAGING_PLUS_COMPACT_CANONICAL_MANIFEST_IN_REPOSITORY",
+    "actions_artifact_as_only_durable_copy": false,
+    "user_download_reupload_dependency": false,
+    "dedicated_capture_release_identity_hash_bound": true,
+    "release_creation_only_after_exact_ARM": true,
+    "release_created_in_this_freeze": false,
+    "encrypted_assets_only": true,
+    "deterministic_asset_names": true,
+    "per_asset_sha256_required": true,
+    "plaintext_canonical_sha256_required": true,
+    "exact_source_head_binding_required": true,
+    "exact_plan_hash_binding_required": true,
+    "publication_transaction": "UPLOAD_ENCRYPTED_ASSET_THEN_REDOWNLOAD_AND_VERIFY_SHA256_THEN_COMMIT_COMPACT_MANIFEST"
+  },
+  "compact_plaintext_manifest": {
+    "allowed": true,
+    "account_id": false,
+    "credentials": false,
+    "token_material": false,
+    "raw_auth_payload": false,
+    "raw_market_rows": false,
+    "required_fields": [
+      "MASTER_SHA256",
+      "ACCOUNT_FINGERPRINT_SHA256",
+      "PROTOCOL_FREEZE_SHA256",
+      "DIGITS_MAP_SHA256",
+      "SEGMENT_INDEX",
+      "SHARD_INDEX",
+      "IDENTITY_RANGE",
+      "ENCRYPTED_ASSET_SHA256",
+      "PLAINTEXT_CANONICAL_SHA256",
+      "ROW_COUNT",
+      "FIRST_TIMESTAMP",
+      "LAST_TIMESTAMP",
+      "REQUEST_COUNT",
+      "RETRY_COUNT",
+      "PAGE_CAP_HITS",
+      "FAILURE_LEDGER",
+      "PROTECTED_FORWARD_ROW_COUNT"
+    ]
+  },
+  "checkpoint_recovery_law": {
+    "completed_raw_shard_requires_durable_encrypted_copy_and_sha256_manifest": true,
+    "exact_existing_durable_shard_hash_match": "SKIP_WITHOUT_BROKER_REQUERY",
+    "conflicting_existing_shard": "FAIL_CLOSED",
+    "incomplete_unpublished_shard": "MAY_BE_RECAPTURED_ONLY_AS_DOCUMENTED_INFRASTRUCTURE_RECOVERY",
+    "recapture_is_new_economic_identity": false,
+    "recapture_consumes_search_budget": false
+  },
+  "bindings": {
+    "v2_protocol_decoder_freeze_sha256": "aae769ffb41f8e29e978305ba2e6b85395f70d3c5c4c9b9780a56e601489d98c",
+    "v2_implementation_sha256": "7ee289e2c2abaa48cdde334689308165aa6a81fc31d271104da9b2f47f6f9d1e",
+    "digits_map_file_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "master1576_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "production_runner_ref": "research_core_v4/shallow_m5_support_v2_production.py",
+    "production_runner_sha256": "c80ae5fc9f72069261edc56955baeb512553cbeadb006ccc6118a7aabcad3114",
+    "production_workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-production.yml",
+    "production_workflow_sha256": "7746d1cecc7eb36691da1eb88190c0c10be2d865d00e14586f1cfa5d88d68293"
+  },
+  "hard_stop": {
+    "arm_present": false,
+    "broker_contact_this_task": false,
+    "historical_requests_sent_this_task": 0,
+    "ctrader_credentials_used_this_task": false,
+    "real_release_assets_created_this_task": 0,
+    "raw_market_assets_published_this_task": 0
+  }
+}
