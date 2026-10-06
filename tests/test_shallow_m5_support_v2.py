@@ -6,8 +6,6 @@ import unittest
 from pathlib import Path
 
 from m6.ctrader_proto.OpenApiCommonMessages_pb2 import ProtoMessage
-from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAGetTrendbarsReq, ProtoOAGetTrendbarsRes
-from m6.ctrader_proto.OpenApiModelMessages_pb2 import ProtoOATrendbar
 from research_core_v4 import shallow_m5_support_v2 as m
 
 
@@ -30,7 +28,7 @@ class ShallowM5V2ProtocolDecoderTests(unittest.TestCase):
         )
 
     def _response(self, *, account=None, period=m.M5_ENUM, symbol_marker="absent", has_more_marker="absent", bars=()):
-        res = ProtoOAGetTrendbarsRes(
+        res = m.ProtoOAGetTrendbarsResV2(
             ctidTraderAccountId=self.ctx.authenticated_account_id if account is None else account,
             period=period,
         )
@@ -49,7 +47,7 @@ class ShallowM5V2ProtocolDecoderTests(unittest.TestCase):
         )
 
     def _bar(self, timestamp, *, low=123456, dopen=0, dhigh=10, dclose=5, volume=7, set_period=False):
-        b = ProtoOATrendbar(
+        b = m.ProtoOATrendbarV2(
             volume=volume,
             low=low,
             utcTimestampInMinutes=minutes(timestamp),
@@ -64,6 +62,26 @@ class ShallowM5V2ProtocolDecoderTests(unittest.TestCase):
             b.period = m.M5_ENUM
         return b
 
+    def test_00_vendored_official_protocol_sources_exact(self):
+        result = m.verify_vendored_protocol_sources(self.root)
+        self.assertEqual(set(result), set(m.OFFICIAL_PROTO_GIT_BLOB_SHA1))
+        self.assertEqual(m.PROTO_OA_GET_TRENDBARS_REQ_PAYLOAD_TYPE, 2137)
+        self.assertEqual(m.PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE, 2138)
+        req_fields = m.ProtoOAGetTrendbarsReqV2.DESCRIPTOR.fields_by_name
+        res_fields = m.ProtoOAGetTrendbarsResV2.DESCRIPTOR.fields_by_name
+        bar_fields = m.ProtoOATrendbarV2.DESCRIPTOR.fields_by_name
+        self.assertEqual(req_fields["ctidTraderAccountId"].label, 2)
+        self.assertEqual(req_fields["period"].label, 2)
+        self.assertEqual(req_fields["symbolId"].label, 2)
+        self.assertEqual(res_fields["ctidTraderAccountId"].label, 2)
+        self.assertEqual(res_fields["period"].label, 2)
+        self.assertEqual(res_fields["symbolId"].label, 1)
+        self.assertEqual(res_fields["hasMore"].label, 1)
+        self.assertEqual(bar_fields["volume"].label, 2)
+        self.assertEqual(bar_fields["period"].label, 1)
+        self.assertEqual(bar_fields["low"].label, 1)
+        self.assertEqual(bar_fields["utcTimestampInMinutes"].label, 1)
+
     def test_01_symbol_digits_map_exact1576(self):
         self.assertEqual(len(self.digits_map["entries"]), 1576)
         self.assertEqual(len(self.lookup), 1576)
@@ -75,7 +93,7 @@ class ShallowM5V2ProtocolDecoderTests(unittest.TestCase):
         )
 
     def test_02_exact_request_contract(self):
-        req = ProtoOAGetTrendbarsReq(
+        req = m.ProtoOAGetTrendbarsReqV2(
             ctidTraderAccountId=self.ctx.authenticated_account_id,
             symbolId=self.ctx.symbol_id,
             period=m.M5_ENUM,
@@ -89,7 +107,7 @@ class ShallowM5V2ProtocolDecoderTests(unittest.TestCase):
     def test_03_exact_valid_response_binding(self):
         res = self._response(symbol_marker=self.ctx.symbol_id, has_more_marker=False)
         bound = m.bind_response_envelope(self._envelope(res), self.ctx)
-        self.assertIs(type(bound), ProtoOAGetTrendbarsRes)
+        self.assertIs(type(bound), m.ProtoOAGetTrendbarsResV2)
 
     def test_04_wrong_account_response_fails(self):
         res = self._response(account=self.ctx.authenticated_account_id + 1)
