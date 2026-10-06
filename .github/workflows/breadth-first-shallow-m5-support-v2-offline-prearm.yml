@@ -1,0 +1,68 @@
+name: breadth-first-shallow-m5-support-v2-offline-prearm
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - 'research_core_v4/shallow_m5_support_v2.py'
+      - 'tests/test_shallow_m5_support_v2.py'
+      - '.github/workflows/breadth-first-shallow-m5-support-v2-offline-prearm.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-protocol-decoder-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install protobuf==5.29.5
+      - name: Prove V1 and V2 acquisition ARM absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_ARM.json
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_ARM.json
+      - name: Prove workflow has no cTrader secret injection
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -E 'CTRADER_(CLIENT_ID|CLIENT_SECRET|ACCESS_TOKEN|REFRESH_TOKEN)|secrets\.' .github/workflows/breadth-first-shallow-m5-support-v2-offline-prearm.yml; then
+            echo "Forbidden secret injection in offline workflow" >&2
+            exit 1
+          fi
+      - name: Run exact offline protocol and decoder tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest -v tests.test_shallow_m5_support_v2
+      - name: Recover accepted metadata and materialize canonical exact1576 digits map offline
+        run: |
+          mkdir -p /tmp/shallow_v2
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from research_core_v4.shallow_m5_support_v2 import write_digits_map, v2_summary
+          root=Path('.')
+          out=Path('/tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json')
+          result=write_digits_map(root,out)
+          print(json.dumps({
+              'digits_count':len(result['entries']),
+              'digits_map_sha256':result['digits_map_sha256'],
+              'source_localization_sha256':result['source_localization_sha256'],
+              'summary':v2_summary(),
+          },sort_keys=True))
+          PY
+          sha256sum             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_FREEZE.json             research_core_v4/shallow_m5_support_v2.py             tests/test_shallow_m5_support_v2.py             /tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: shallow-m5-v2-offline-digits-map
+          path: /tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json
+          retention-days: 14
+          if-no-files-found: error
