@@ -1,0 +1,28 @@
+name: Adaptive read-only research auth presence V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: ['adaptive_competition/read_only_auth_presence_v1.py', '.github/workflows/adaptive-read-only-auth-presence-v1.yml', 'adaptive_competition/state/READ_ONLY_AUTH_PRESENCE_ARM_V1.json']
+permissions: {contents: read}
+concurrency:
+  group: adaptive-read-only-auth-presence-v1
+  cancel-in-progress: false
+jobs:
+  presence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Named-secret presence only; no broker contact or refresh
+        env:
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
+          CTRADER_EXPECTED_ACCOUNT_ID: ${{ secrets.CTRADER_EXPECTED_ACCOUNT_ID }}
+        run: python adaptive_competition/read_only_auth_presence_v1.py --out /tmp/MACHINE_SIDE_READ_ONLY_AUTH_PRESENCE_RESULT_V1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: machine-side-read-only-auth-presence-v1
+          path: /tmp/MACHINE_SIDE_READ_ONLY_AUTH_PRESENCE_RESULT_V1.json
+          retention-days: 14
