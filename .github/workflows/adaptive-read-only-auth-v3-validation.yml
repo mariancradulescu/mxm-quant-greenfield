@@ -1,0 +1,17 @@
+name: Machine-side auth V3 bounded validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: ['adaptive_competition/read_only_auth_preflight_v3.py', 'adaptive_competition/test_read_only_auth_v3.py', 'adaptive_competition/validate_auth_arm_v3.py', '.github/workflows/adaptive-read-only-auth-preflight-v3.yml', '.github/workflows/adaptive-read-only-auth-v3-validation.yml']
+permissions: {contents: read}
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install protobuf==5.29.5
+      - run: python -m adaptive_competition.test_read_only_auth_v3

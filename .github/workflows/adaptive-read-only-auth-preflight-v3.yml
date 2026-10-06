@@ -1,0 +1,43 @@
+name: Machine-side read-only cTrader auth V3 autodiscovery
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: ['adaptive_competition/state/READ_ONLY_AUTH_PREFLIGHT_ARM_V3.json']
+permissions: {contents: read}
+concurrency:
+  group: machine-side-read-only-auth-v3
+  cancel-in-progress: false
+jobs:
+  auth-only:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 2}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install protobuf==5.29.5
+      - name: Hash-bound source, workflow and five-message arm validation
+        run: python -m adaptive_competition.validate_auth_arm_v3
+      - name: Unit and negative controls before broker contact
+        run: python -m adaptive_competition.test_read_only_auth_v3
+      - name: Presence-only isolated process; no broker contact
+        env:
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
+        run: python -m adaptive_competition.read_only_auth_preflight_v3 presence --out /tmp/AUTH_V3_PRESENCE.json
+      - name: One access-token-only authentication attempt; refresh secret excluded
+        env:
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+        run: python -m adaptive_competition.read_only_auth_preflight_v3 auth --presence-file /tmp/AUTH_V3_PRESENCE.json --out /tmp/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_RESULT_V3.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: machine-side-read-only-auth-result-v3
+          path: /tmp/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_RESULT_V3.json
+          retention-days: 14
+          if-no-files-found: error
