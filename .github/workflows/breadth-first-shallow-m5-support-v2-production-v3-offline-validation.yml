@@ -1,0 +1,62 @@
+name: Shallow M5 V2 Production V3 Gate Offline Validation
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/shallow_m5_support_v2_production_v3.py
+      - tests/test_shallow_m5_support_v2_production_v3.py
+      - .github/workflows/breadth-first-shallow-m5-support-v2-production-v3.yml
+      - .github/workflows/breadth-first-shallow-m5-support-v2-production-v3-offline-validation.yml
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V3.json
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_GITHUB_PROVIDER_PREFLIGHT_RESULT_V1.json
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PROVIDER_PREFLIGHT_ACCEPTANCE_AUTHORITY_V1.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: MXM_SHALLOW_M5_V2_PRODUCTION_V3_GATE_OFFLINE_VALIDATION
+  cancel-in-progress: false
+
+jobs:
+  offline-v3-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact validation head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact protobuf runtime only
+        run: python -m pip install protobuf==5.29.5
+      - name: Prove zero production ARM files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V1.json
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V2.json
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json
+      - name: Compile V3 gate and tests
+        run: |
+          python -m py_compile             research_core_v4/shallow_m5_support_v2_production_v3.py             tests/test_shallow_m5_support_v2_production_v3.py
+      - name: Prove byte-exact V2 execution path equivalence
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m research_core_v4.shallow_m5_support_v2_production_v3 prove-equivalence
+      - name: Run accepted V2 plus V3 gate offline suite
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -m unittest -v             tests.test_shallow_m5_support_v2             tests.test_shallow_m5_support_v2_final_freeze             tests.test_shallow_m5_support_v2_production             tests.test_shallow_m5_support_v2_production_v2             tests.test_shallow_m5_support_v2_production_v3
+      - name: Print exact V3 and provider authority hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum             research_core_v4/shallow_m5_support_v2_production_v3.py             tests/test_shallow_m5_support_v2_production_v3.py             .github/workflows/breadth-first-shallow-m5-support-v2-production-v3.yml             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V3.json             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_GITHUB_PROVIDER_PREFLIGHT_RESULT_V1.json             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PROVIDER_PREFLIGHT_ACCEPTANCE_AUTHORITY_V1.json
