@@ -1,0 +1,54 @@
+name: shallow-m5-v2-map-materialize-machine-side
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - '.github/workflows/breadth-first-shallow-m5-support-v2-map-materialize.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-canonical-digits-map:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install protobuf==5.29.5
+      - name: Prove no acquisition ARM and no cTrader credential environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_ARM.json
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_ARM.json
+          env | grep -E '^CTRADER_' && exit 1 || true
+      - name: Generate exact accepted-metadata digits map offline
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from research_core_v4.shallow_m5_support_v2 import write_digits_map
+          target=Path('research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json')
+          result=write_digits_map(Path('.'),target)
+          assert len(result['entries']) == 1576
+          assert result['digits_map_sha256'] == '4657c1cea348479afa198b005ae1da3b3f788fb2b33bd2c35f07034bfba2ce7a'
+          PY
+          echo "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a  research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json" | sha256sum -c -
+      - name: Commit canonical map machine-side
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "mxm-greenfield-machine"
+          git config user.email "mxm-greenfield-machine@users.noreply.github.com"
+          git commit -m "Freeze exact1576 shallow M5 V2 symbol digits map"
+          git push origin HEAD:performance-research-v3-20260922
