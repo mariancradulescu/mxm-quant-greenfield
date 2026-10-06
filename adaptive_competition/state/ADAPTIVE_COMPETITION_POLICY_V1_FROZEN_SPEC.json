@@ -93,6 +93,7 @@
     "adaptive_competition/run.py": "c27ea6b476d57933bec9a0218bd276d750f137802bbe3beca03a8ead5587d4f3",
     "adaptive_competition/test_core.py": "934801972db94c549b55b4ac34013cf73571a8bafacf22ab21776536efecdad8"
   },
+  "inner_selection_ledger_sha256": "485daa9d2a56fa80a4a361eb9c538a42bb342973cc8bb12509324d1a8d83ca39",
   "inner_temporal_law": {
     "objective": "LOG_TERMINAL_EQUITY_OVER200_MINUS_MAXDRAWDOWN_FRACTION;UNRESOLVED_FINANCING_DISQUALIFIES",
     "purge": "MAX240MIN_LABEL_PLUS_COMPLETED_BAR_BEFORE_TRAINING_REFIT",
@@ -124,7 +125,7 @@
     91,
     366
   ],
-  "outer_policy_frozen": false,
+  "outer_policy_frozen": true,
   "policy_id": "ADAPTIVE_COMPETITION_POLICY_V1",
   "production_future": "SELF_CONTAINED_CSHARP;DOUBLE_KERNEL;PRECISE_ACCOUNTING;FINITE_BROKER_HISTORY_RECONSTRUCTION;LOCALSTORAGE_CACHE_ONLY;NO_GITHUB_HTTP_AI_PHONE_RUNTIME_DEPENDENCY",
   "protected_forward": {
@@ -135,6 +136,16 @@
     "context": 2,
     "global": 0.5,
     "intercept": 0.05
+  },
+  "selected_inner_configuration": {
+    "configuration": 0,
+    "dd_base": 0.31220522945191764,
+    "entries": 0,
+    "max_drawdown_pct": 0.0,
+    "nonlinear": false,
+    "terminal_equity_eur": 200.0,
+    "trace_sha256": "3d183c3824d7416b36d2b241929d2f65345473df829cfcb76a305ea985bf0251",
+    "utility": 0.0
   },
   "target": "CONTINUOUS_LOG_FUTURE_MARKET_RETURN_NORMALIZED_BY_DECISION_SIGMA_SQRT_HORIZON;NOT_FILL_RETURN",
   "tie_break": "MARGINAL_DENSITY_DESCENDING_THEN_CANONICAL_SYMBOL_ID_THEN_TRANCHE_ORDINAL",
