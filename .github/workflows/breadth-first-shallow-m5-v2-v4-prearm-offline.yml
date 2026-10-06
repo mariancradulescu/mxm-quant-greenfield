@@ -1,0 +1,105 @@
+name: Shallow M5 V4 Lower Boundary Corrected Prearm Offline Validation
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/shallow_m5_support_v2_boundary_v4.py
+      - research_core_v4/shallow_m5_support_v2_production_v4.py
+      - .github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V4.json
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_shallow_m5_support_v2_boundary_v4.py
+      - .github/workflows/breadth-first-shallow-m5-v2-v4-prearm-offline.yml
+
+permissions:
+  contents: read
+
+jobs:
+  exact-head-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact validation head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact protobuf runtime only
+        run: python -m pip install protobuf==5.29.5
+      - name: Prove no V4 ARM and failed V3 evidence immutable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V4.json
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json | cut -d' ' -f1)" = "756544d1778262228017739f5c1dd914ca969c9c15cd4b02d077bd3171f6621f"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_FAILED_EXECUTION_AUTHORITY_V1.json | cut -d' ' -f1)" = "e4bae388149e78391561115e0fb64b8b5417622103cfb4fed472ccbfa89a9b8e"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_RESULT_V1.json | cut -d' ' -f1)" = "5ff5ee46fe9b5483cfe11077abcabdcd77f50b4f3a4df5329a73e19b80bb013b"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_RESULT_AUTHORITY_V1.json | cut -d' ' -f1)" = "00e1a23b958ca6da0d0f58e71ad4a7be8245a221d4586ae78d9360438bbf336e"
+      - name: Prove V1 V2 V3 production history byte exact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum research_core_v4/shallow_m5_support_v2_production_v2.py | cut -d' ' -f1)" = "a1aa8ba8bd104639c2758bf4bc14096565e41c897bceda2d343e0ba68c840de7"
+          test "$(sha256sum .github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml | cut -d' ' -f1)" = "208b26c10b0b3f5750512d126b4fa5a33ffbaa4c085985a64c7ca23a0706e7af"
+          test "$(sha256sum research_core_v4/shallow_m5_support_v2_production_v3.py | cut -d' ' -f1)" = "c6897e3847cd88b1641f32e011d3b8b9f0397b8ef40c974db4f227b59978a0af"
+          test "$(sha256sum .github/workflows/breadth-first-shallow-m5-support-v2-production-v3.yml | cut -d' ' -f1)" = "2774bb2e43335589b89846bf745afef6bfd77ddd19be1bbf7b7d566c8c5d6ae1"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V3.json | cut -d' ' -f1)" = "769fd7d09c49ef0ac23675801239d5ee8e018e219e9c73d8ce4a8a584b381d84"
+      - name: Compile V4 successor
+        run: |
+          python -m py_compile             research_core_v4/shallow_m5_support_v2_boundary_v4.py             research_core_v4/shallow_m5_support_v2_production_v4.py             tests/test_shallow_m5_support_v2_boundary_v4.py
+      - name: Run V4 boundary and equivalence suite
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest -v tests.test_shallow_m5_support_v2_boundary_v4
+      - name: Prove active versus historical ARM state consistency
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          next_state="PENDING_INDEPENDENT_AUDIT_OF_LOWER_BOUNDARY_OVERFETCH_CORRECTED_V4_PREARM_ARCHITECTURE_BEFORE_ANY_SUCCESSOR_ARM"
+          v4=json.loads(Path("research_core_v4/state/V4_STATE.json").read_text())
+          cur=json.loads(Path("adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json").read_text())
+          auth=json.loads(Path("adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json").read_text())
+          assert v4["current_next_action_type"]==v4["next_action"]==cur["next_action"]==auth["next_action"]==auth["current_operation"]==next_state
+          blocks=[v4["shallow_m5_v2_current_operation"],cur["shallow_m5_v2_operational_rebind"],auth["shallow_m5_v2_operational_rebind"]]
+          for b in blocks:
+              assert b["historical_failed_V3_ARM_present"] is True
+              assert b["active_capture_ARM_present"] is False
+              assert b["historical_failed_V3_release_present"] is True
+              assert b["active_capture_release_present"] is False
+              assert b["arm_present"] is False
+              assert b["arm_present_semantics"]=="ACTIVE_CAPTURE_ARM_PRESENT"
+              assert b["v4_arm_present"] is False
+          PY
+      - name: Prove production V4 trigger is ARM-only and has no refresh path
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path(".github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml").read_text()
+          assert "workflow_dispatch" not in p
+          assert "CTRADER_REFRESH_TOKEN:" not in p
+          assert "BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V4.json" in p
+          src=Path("research_core_v4/shallow_m5_support_v2_production_v4.py").read_text()
+          for token in ("ProtoOAGetTickDataReq","ProtoOASubscribeSpotsReq","ProtoOASubscribeDepthQuotesReq","ProtoOANewOrderReq","ProtoOAClosePositionReq","ProtoOACancelOrderReq","ProtoOAAmendOrderReq"):
+              assert token not in src
+          assert "v2.validate_arm =" not in src
+          assert "v3.validate_arm =" not in src
+          PY
+      - name: Prove this validation injects no cTrader secrets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path(".github/workflows/breadth-first-shallow-m5-v2-v4-prearm-offline.yml").read_text()
+          assert ("secrets."+"CTRADER_") not in p
+          PY
+      - name: Print exact V4 hashes
+        run: |
+          sha256sum             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json             research_core_v4/shallow_m5_support_v2_boundary_v4.py             research_core_v4/shallow_m5_support_v2_production_v4.py             .github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V4.json
