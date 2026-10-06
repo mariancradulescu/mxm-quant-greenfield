@@ -1,0 +1,160 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.machine-side-production-architecture-freeze.v2",
+  "status": "FROZEN_SUCCESSOR_NOT_ARMED_PROVIDER_PREFLIGHT_REQUIRED",
+  "preserved_v1": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V1.json",
+    "sha256": "04ebe11ac4bc3f766b558c2931342f4135b7de037de22f05c72b480b57336e8f",
+    "immutable": true
+  },
+  "accepted_prearm_authority": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json",
+    "sha256": "1085a76a1d5d730753546ab43f973f0d5db96d555667ad352f8e2f5a3773560c"
+  },
+  "science_and_capture_identity_preserved": {
+    "master_count": 1576,
+    "master_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "protocol_decoder_freeze_sha256": "aae769ffb41f8e29e978305ba2e6b85395f70d3c5c4c9b9780a56e601489d98c",
+    "digits_map_file_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "segments": [
+      ["2026-08-20T00:00:00Z", "2026-08-26T23:55:00Z"],
+      ["2026-08-27T00:00:00Z", "2026-09-02T23:55:00Z"],
+      ["2026-09-03T00:00:00Z", "2026-09-09T23:55:00Z"],
+      ["2026-09-10T00:00:00Z", "2026-09-16T23:55:00Z"]
+    ],
+    "resolution": "M5",
+    "page_cap": 3,
+    "retries_after_initial": 2,
+    "historical_rate_limit_rps": 4,
+    "identities_per_shard": 64,
+    "shards_per_segment": 25
+  },
+  "successor_bindings": {
+    "runner_ref": "research_core_v4/shallow_m5_support_v2_production_v2.py",
+    "runner_sha256": "a1aa8ba8bd104639c2758bf4bc14096565e41c897bceda2d343e0ba68c840de7",
+    "workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml",
+    "workflow_sha256": "208b26c10b0b3f5750512d126b4fa5a33ffbaa4c085985a64c7ca23a0706e7af",
+    "test_ref": "tests/test_shallow_m5_support_v2_production_v2.py",
+    "test_sha256": "ff5cbf40a7f8eb07614713c25b619a3aa28d79f859c32df41417b33f8e0fec1c",
+    "output_transport_authority_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_OUTPUT_TRANSPORT_AUTHORITY_V2.json",
+    "output_transport_authority_sha256": "90cad3fad2fa92951c2257f74011dd980b4f95b3801614a2ff2f89881b8c0ea2"
+  },
+  "strict_segment_manifest_contract": {
+    "schema": "mxm.v4.shallow-m5-v2.segment-durable-manifest.v1",
+    "unknown_fields_that_change_semantics": "FAIL_CLOSED_BY_EXACT_KEYSET",
+    "fixed_bindings": {
+      "MASTER_SHA256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+      "ACCOUNT_FINGERPRINT_SHA256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+      "PROTOCOL_FREEZE_SHA256": "aae769ffb41f8e29e978305ba2e6b85395f70d3c5c4c9b9780a56e601489d98c",
+      "DIGITS_MAP_SHA256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a"
+    },
+    "dynamic_exact_bindings": [
+      "SEGMENT_INDEX",
+      "SEGMENT_FROM_UTC",
+      "SEGMENT_TO_UTC_INCLUSIVE",
+      "SOURCE_HEAD",
+      "ARM_COMMIT",
+      "DURABLE_RELEASE_IDENTITY"
+    ],
+    "complete_manifest_rules": {
+      "exact_entry_count": 25,
+      "exact_shard_index_set": "0_THROUGH_24",
+      "deterministic_identity_ranges": true,
+      "deterministic_asset_names": true,
+      "each_entry_repeats_all_campaign_bindings": true,
+      "duplicate_shard_indices": "FORBIDDEN",
+      "duplicate_asset_names": "FORBIDDEN",
+      "PROTECTED_FORWARD_ROW_COUNT": 0
+    }
+  },
+  "strict_previous_segment_gate": {
+    "location": "BEFORE_CTRADER_SECRET_READ_BEFORE_CTRADER_AUTH_BEFORE_ANY_HISTORICAL_REQUEST",
+    "required": [
+      "STRICT_MANIFEST_HEADER_VALIDATION",
+      "STATUS_COMPLETE",
+      "EXACT_25_SHARD_ENTRIES",
+      "EXACT_SHARD_INDEX_SET_0_THROUGH_24",
+      "EXACT_DETERMINISTIC_IDENTITY_RANGES",
+      "EXACT_DETERMINISTIC_ASSET_NAMES",
+      "ALL_25_ASSETS_PRESENT_IN_EXACT_CAMPAIGN_RELEASE",
+      "REDOWNLOAD_AND_SHA256_VERIFY_ALL_25_ENCRYPTED_ASSETS",
+      "ZERO_HASH_CONFLICTS",
+      "ZERO_PROTECTED_FORWARD_ROWS"
+    ],
+    "failure": "DURABLE_STORAGE_INTEGRITY_FAILURE_FAIL_CLOSED_BEFORE_BROKER_AUTH"
+  },
+  "deterministic_release_identity_law": {
+    "formula": "mxm-shallow-m5-v2- + SHA256(canonical_json({domain,exact_ARM_parent_SOURCE_HEAD,exact_ARCHITECTURE_FREEZE_V2_SHA256}))",
+    "arbitrary_user_supplied_release_tag": false,
+    "prefix_only_validation": false,
+    "exact_runtime_equality_required": true,
+    "existing_release_target_must_equal_exact_original_ARM_commit": true,
+    "existing_release_body_must_equal_exact_campaign_binding": true
+  },
+  "campaign_branch_drift_guard": {
+    "required_before_first_broker_auth": true,
+    "canonical_branch_must_descend_from_exact_ARM_commit": true,
+    "every_post_ARM_commit_is_inspected": true,
+    "every_changed_path_after_ARM_must_be_in_allowed_set": true,
+    "before_and_after_each_manifest_write_recheck": true,
+    "force_push_or_branch_reset_that_breaks_ARM_ancestry": "FAIL_CLOSED",
+    "allowed_post_ARM_paths": [
+      "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SEGMENT_1_DURABLE_MANIFEST.json",
+      "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SEGMENT_2_DURABLE_MANIFEST.json",
+      "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SEGMENT_3_DURABLE_MANIFEST.json",
+      "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SEGMENT_4_DURABLE_MANIFEST.json",
+      "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_FINAL_DURABLE_MANIFEST_V1.json"
+    ]
+  },
+  "recovery_governance": {
+    "automatic_unbounded_retry": false,
+    "workflow_dispatch": false,
+    "new_ARM_for_infrastructure_recovery": false,
+    "permitted_machine_side_recovery": "RERUN_FAILED_OR_CANCELLED_EXACT_JOB_OR_FAILED_JOBS_OF_SAME_ORIGINAL_ARM_WORKFLOW_RUN",
+    "exact_same_ARM_GITHUB_SHA_required": true,
+    "exact_same_release_identity_required": true,
+    "durable_verified_shards": "SKIP_WITHOUT_BROKER_REQUERY",
+    "incomplete_unpublished_shard": "MAY_BE_RECAPTURED_AS_INFRASTRUCTURE_RECOVERY",
+    "systemic_failure": "STOP_FOR_INDEPENDENT_GOVERNANCE",
+    "soft_stop_or_runner_failure": "PRESERVE_DURABLE_PROGRESS_AND_STOP_FOR_MACHINE_SIDE_GOVERNED_RERUN_DECISION"
+  },
+  "exact_head_offline_validation_correction": {
+    "evidence_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_EXACT_HEAD_OFFLINE_VALIDATION_EVIDENCE_V2.json",
+    "evidence_sha256": "18bcdf54af8441ea70c10748f80458a5858fd5f934365cb83b3a30d7c58c90a0",
+    "run_id": 37490663337,
+    "job_id": 112362330448,
+    "validated_head": "e20f60cbb7daec5dd6a4489a7c58bad646a9d848",
+    "tests_passed": 56,
+    "tests_failed": 0,
+    "conclusion": "success"
+  },
+  "provider_preflight": {
+    "required": true,
+    "status": "PENDING_REAL_GITHUB_PROVIDER_SYNTHETIC_PREFLIGHT",
+    "broker_contact": false,
+    "ctrader_secrets_allowed": false,
+    "market_data_allowed": false,
+    "canonical_research_branch_synthetic_manifest_writes_allowed": false,
+    "cleanup_required_even_on_failure": true
+  },
+  "preservation": {
+    "adaptive_v1_policy_sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+    "adaptive_v1_raw_result_sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+    "search_budget_total": 84,
+    "search_budget_used": 21,
+    "search_budget_remaining": 63,
+    "economic_outcomes_opened": 29,
+    "search_budget_consumed_this_task": 0,
+    "auth_v3_status": "PROVEN_MACHINE_SIDE_READ_ONLY_AUTH_ONLY",
+    "triad_v7_parked": true,
+    "protected_forward_opened": false,
+    "confirmation_opened": false
+  },
+  "required_stop_before_provider_result": {
+    "arm_present": false,
+    "broker_contact": false,
+    "historical_requests_sent": 0,
+    "ctrader_credentials_used": false,
+    "real_market_release_assets_created": 0
+  }
+}
