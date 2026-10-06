@@ -1,0 +1,41 @@
+name: Adaptive read-only research auth preflight V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: ['adaptive_competition/state/READ_ONLY_AUTH_PREFLIGHT_ARM_V1.json']
+permissions: {contents: read}
+concurrency:
+  group: adaptive-read-only-auth-preflight-v1
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install protobuf==5.29.5
+      - name: Verify hash-bound noninteractive arm before credentials
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          a=json.loads(Path('adaptive_competition/state/READ_ONLY_AUTH_PREFLIGHT_ARM_V1.json').read_text())
+          assert a['accounts_only'] and not a['orders'] and not a['market_history'] and not a['refresh']
+          for p,h in a['implementation_hashes'].items():assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
+          PY
+      - name: Auth only; no refresh, history, orders, or token output
+        env:
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
+          CTRADER_EXPECTED_ACCOUNT_ID: ${{ secrets.CTRADER_EXPECTED_ACCOUNT_ID }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+        run: python -m adaptive_competition.read_only_auth_preflight_v1 --out /tmp/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_RESULT_V1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: machine-side-read-only-auth-preflight-v1
+          path: /tmp/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_RESULT_V1.json
+          retention-days: 14

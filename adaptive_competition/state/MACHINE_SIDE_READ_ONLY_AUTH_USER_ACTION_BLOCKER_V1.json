@@ -1,0 +1,60 @@
+{
+  "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+  "additional_tiny_proof_credential": "CTRADER_ACCESS_TOKEN;NOT_PROBED_THIS_TASK;ALLOWS_AUTH_WITHOUT_REFRESH_ROTATION",
+  "after_security_action": "MACHINE_PUSH_OF_HASH_BOUND_AUTH_ONLY_ARM;ApplicationAuth;GetAccountList;SCOPE_VIEW_CHECK;FINGERPRINT_AND_LIVE_MATCH;AccountAuth;Trader_AND_EUR_ASSET_VERIFICATION;NO_HISTORY_ORDERS_OR_REFRESH",
+  "auth_proven": false,
+  "broker_contact": false,
+  "exact_missing_secret_names": [
+    "CTRADER_CLIENT_ID",
+    "CTRADER_CLIENT_SECRET",
+    "CTRADER_REFRESH_TOKEN",
+    "CTRADER_EXPECTED_ACCOUNT_ID"
+  ],
+  "market_history_acquired": false,
+  "minimal_user_steps": [
+    {
+      "action": "Use existing approved cTrader app credentials. If no valid accounts-only token exists, open that app Playground, choose accounts scope and authorize intended Pepperstone Europe LIVE account. No trading scope.",
+      "step": 1
+    },
+    {
+      "action": "Enter client ID, client secret, accounts-only refresh token and exact ctidTraderAccountId (not trader login) directly as the four named repository Actions secrets. Never share values in chat.",
+      "step": 2
+    },
+    {
+      "action": "For a safe tiny auth proof without consuming the refresh token, also enter the access token from the SAME accounts-only Playground response as CTRADER_ACCESS_TOKEN. This is an additional temporary credential, not one of the four already-probed missing names.",
+      "step": 3
+    },
+    {
+      "action": "Report only that the secrets were saved. Agent pushes a hash-bound auth-only arm; user does not run/edit/debug workflows.",
+      "step": 4
+    }
+  ],
+  "no_user_github_operator_requirement": true,
+  "oauth_location": "https://openapi.ctrader.com/apps",
+  "oauth_reauthorization_required": "IF_NO_EXISTING_VALID_ACCOUNTS_ONLY_REFRESH_TOKEN;CANNOT_DETERMINE_FROM_EMPTY_REPOSITORY_SECRET",
+  "orders_placed": false,
+  "prepared_auth_allowlist": [
+    "ProtoOAApplicationAuthReq",
+    "ProtoOAGetAccountListByAccessTokenReq",
+    "ProtoOAAccountAuthReq",
+    "ProtoOATraderReq",
+    "ProtoOAAssetListReq"
+  ],
+  "presence_artifact_id": 11409377773,
+  "presence_job_id": 112243506452,
+  "presence_run_id": 37455958290,
+  "presence_source_head": "5aab072e13aa2198b70070fc3ca87a0eda57e67d",
+  "presence_verified_in_machine_side_actions": true,
+  "probe_result": "ALL_FOUR_EMPTY_ENVIRONMENT_VALUES;BOOLEAN_ONLY_NO_SECRET_VALUE_INSPECTION",
+  "refresh_rotation": {
+    "distributed_atomicity": "NOT_CLAIMED;REMOTE_ROTATION_TO_LOCAL_DURABILITY_CRASH_WINDOW_REQUIRES_RECOVERY_DESIGN;NO_UNATTENDED_REFRESH_AUTHORIZED",
+    "hosted_actions_refresh": "FORBIDDEN_UNTIL_DURABLE_PRIVATE_CHECKPOINT_IS_PROVISIONED_AND_AUDITED",
+    "local_atomicity": "0700_PARENT_0600_STATE_EXCLUSIVE_LOCK_FSYNC_ATOMIC_REPLACE",
+    "path": "adaptive_competition/private_token_checkpoint_v1.py",
+    "status": "PRIVATE_ATOMIC_LOCAL_CHECKPOINT_ADAPTER_PREPARED_NOT_DEPLOYED_OR_PROVEN"
+  },
+  "scope": "accounts ONLY;SCOPE_TRADE HARD_REJECTED BEFORE_ACCOUNT_AUTH",
+  "secrets_location": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/secrets/actions",
+  "status": "PENDING_USER_SECURITY_ACTION",
+  "token_refresh_attempted": false
+}
