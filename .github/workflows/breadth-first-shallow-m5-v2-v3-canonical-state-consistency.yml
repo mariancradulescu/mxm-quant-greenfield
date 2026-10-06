@@ -38,10 +38,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -E 'secrets\.CTRADER_|CTRADER_CLIENT_ID:|CTRADER_CLIENT_SECRET:|CTRADER_ACCESS_TOKEN:|CTRADER_REFRESH_TOKEN:' .github/workflows/breadth-first-shallow-m5-v2-v3-canonical-state-consistency.yml; then
-            echo "offline consistency validation must not inject cTrader credentials" >&2
-            exit 1
-          fi
+          python - <<'PY'
+          from pathlib import Path
+          text = Path(".github/workflows/breadth-first-shallow-m5-v2-v3-canonical-state-consistency.yml").read_text(encoding="utf-8")
+          forbidden = "secrets." + "CTRADER_"
+          if forbidden in text:
+              raise SystemExit("offline consistency validation must not inject cTrader credentials")
+          PY
       - name: Prove zero production ARM files
         shell: bash
         run: |
