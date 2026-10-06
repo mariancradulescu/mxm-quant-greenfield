@@ -1,0 +1,64 @@
+name: Shallow M5 V2 Real GitHub Provider Synthetic Preflight
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PROVIDER_PREFLIGHT_TRIGGER_V2.json
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: MXM_SHALLOW_M5_V2_PROVIDER_PREFLIGHT_SINGLETON
+  cancel-in-progress: false
+
+jobs:
+  provider-synthetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact preflight trigger head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact protobuf runtime
+        run: python -m pip install protobuf==5.29.5
+      - name: Prove provider preflight has zero cTrader or private-key secret injection
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -E 'secrets\.(CTRADER_|MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM)' .github/workflows/breadth-first-shallow-m5-support-v2-provider-preflight.yml; then
+            echo "forbidden secret injection" >&2
+            exit 1
+          fi
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V2.json
+      - name: Compile successor and provider path
+        run: |
+          python -m py_compile             research_core_v4/shallow_m5_support_v2_production_v2.py             research_core_v4/shallow_m5_support_v2_provider_preflight.py             tests/test_shallow_m5_support_v2_production_v2.py
+      - name: Run full accepted and successor offline test suite
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -m unittest -v             tests.test_shallow_m5_support_v2             tests.test_shallow_m5_support_v2_final_freeze             tests.test_shallow_m5_support_v2_production             tests.test_shallow_m5_support_v2_production_v2
+      - name: Execute disposable real GitHub provider preflight
+        env:
+          GH_TOKEN: "${{ github.token }}"
+        run: |
+          set -euo pipefail
+          umask 077
+          python -m research_core_v4.shallow_m5_support_v2_provider_preflight             --output "$RUNNER_TEMP/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_GITHUB_PROVIDER_PREFLIGHT_RESULT_V1.json"
+      - name: Upload provider preflight result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: shallow-m5-v2-github-provider-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_GITHUB_PROVIDER_PREFLIGHT_RESULT_V1.json
+          if-no-files-found: error
+          retention-days: 14
