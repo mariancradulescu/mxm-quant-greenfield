@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
