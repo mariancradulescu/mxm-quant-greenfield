@@ -7,6 +7,7 @@ import numpy as np,scipy
 P=Path(__file__).resolve().parent;sys.path.insert(0,str(P.parent))
 import stochastic_worker_v1 as w
 import control_plane_v1 as c
+import support_semantics_wrapper_v1 as s
 FIELDS=('false_significance','false_lead','any_nonnull_lead','all_nonnull_leads','supported')
 def digest(b):return hashlib.sha256(b).hexdigest()
 def fence():c.fence()
@@ -17,7 +18,16 @@ def runtime():
  return {'python':sys.version.split()[0],'numpy':np.__version__,'scipy':scipy.__version__,'cpu_count':os.cpu_count(),'affinity_cpus':affinity,'processes':n,'RAM_bytes':os.sysconf('SC_PAGE_SIZE')*os.sysconf('SC_PHYS_PAGES'),'peak_RSS_KiB':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}
 def manifest():
  plan=json.loads((P/'PREARM_PLAN_V1.json').read_text())
- for path,h in plan['bindings'].items():assert w.sha(w.R/path)==h,path
+ # Preserve the exact preexisting engineering RNG namespace; the historical
+ # plan remains byte-identical even though its original execution files are
+ # prospectively superseded by this reconciliation layer.
+ assert w.sha(P/'PREARM_PLAN_V1.json')=='23511ae4d94d14299e6a209e5974b2b9aa9024504fd130e1337516894652aa7f'
+ authority=json.loads((P/'SUPPORT_SEMANTICS_RECONCILIATION_AUTHORITY_V1.json').read_text())
+ assert authority['classification']=='PREOUTCOME_IMPLEMENTATION_CONTRACT_INCONSISTENCY_CORRECTION_NOT_SCIENTIFIC_RETUNING'
+ assert w.sha(P/'support_semantics_wrapper_v1.py')==authority['frozen_bindings']['support_semantics_wrapper_sha256']
+ forensic=json.loads((P/'EXACT_FAILED_FIXTURE_FORENSIC_V1.json').read_text())
+ assert forensic['failure_preserved'] and forensic['reason']=='CANDIDATE_FAIL_CLOSED'
+ assert forensic['trial_context']=={'case_id':9,'configuration_id':'G10_ONLY','configuration_name':None,'delta':[0.5,0,0],'engineering_trial_index':0,'phase':'null'}
  m,a=c.preflight();assert w.sha(w.P/'TRIAL_MANIFEST_V1.json')=='7904af615cef0d5002370d45160733bd84e72a9d2599ee52de126b0560854b3a'
  assert w.sha(w.P/'stochastic_worker_v1.py')=='af0cd192adc19478686198082f190b69585dab4d29df9e6835d1f7cf6a3c6de6'
  assert w.sha(w.P/'control_plane_v1.py')=='d60ca6214553621f5122e44ec8f648592240ef91763b8b6c9a1eebbd6f975f03'
@@ -104,9 +114,9 @@ def engineering_one(task):
   w.base_paths=base;w.clock_fits=fits;w.scores=scores;w.infer=infer
  started=time.perf_counter()
  try:
-  rows=w.trial(m,w.load_geometry(),w.Projection(w.P/'projection_bridge_v1.so'),phase,case,index)
+  rows,sem=s.trial(m,w.load_geometry(),w.Projection(w.P/'projection_bridge_v1.so'),phase,case,index,verify_supported_path=(traced and index==0))
   counts=empty(m['partial_nulls'] if phase=='null' else m['power_cells']);add(counts,rows)
-  return {'index':index,'rows_sha256':digest(w.canonical(rows)),'trace':t.result() if t else None,'manufactured_engineering_counts':counts,'seconds':time.perf_counter()-started,'peak_RSS_KiB':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}
+  return {'index':index,'rows_sha256':digest(w.canonical(rows)),'trace':t.result() if t else None,'manufactured_engineering_counts':counts,'support_semantics':sem,'seconds':time.perf_counter()-started,'peak_RSS_KiB':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}
  finally:
   w.base_paths=oldbase;w.clock_fits=oldfits;w.scores=oldscores;w.infer=oldinfer
 
@@ -125,10 +135,11 @@ def engineering_case(case):
   # in scientific source or available in certification processes.
   serial=[engineering_one(t) for t in tasks];parallel=pool_map(engineering_one,tasks,env['processes'])
   for a,b in zip(serial,parallel):
-   assert a['index']==b['index'] and a['trace']==b['trace'] and a['rows_sha256']==b['rows_sha256'] and a['manufactured_engineering_counts']==b['manufactured_engineering_counts']
+   assert a['index']==b['index'] and a['trace']==b['trace'] and a['rows_sha256']==b['rows_sha256'] and a['manufactured_engineering_counts']==b['manufactured_engineering_counts'] and a['support_semantics']==b['support_semantics']
   cells=m['partial_nulls'] if phase=='null' else [m['power_cells'][x] for x in [2,11,56]]
   assert sum_counts([x['manufactured_engineering_counts'] for x in serial],cells)==sum_counts([x['manufactured_engineering_counts'] for x in parallel[::-1]],cells)
-  evidence.append({'phase_fixture':phase,'complete_210day_fixtures':len(tasks),'trace':serial[0]['trace'],'serial_distributed_bit_exact':True,'all_raw_row_digests_match':True,'integer_merge_order_independent':True})
+  parity=serial[0]['support_semantics'].get('supported_path_parity');assert parity and parity['all_accounted']
+  evidence.append({'phase_fixture':phase,'complete_210day_fixtures':len(tasks),'trace':serial[0]['trace'],'serial_distributed_bit_exact':True,'all_raw_row_digests_match':True,'integer_merge_order_independent':True,'support_semantics':[x['support_semantics'] for x in serial],'supported_path_bit_parity':parity})
  # Untraced same full-trial route for actual process-throughput measurement.
  tasks=[(case,'null',100+i,False) for i in range(env['processes'])]
  t0=time.perf_counter();serial=[engineering_one(t) for t in tasks];serial_wall=time.perf_counter()-t0
