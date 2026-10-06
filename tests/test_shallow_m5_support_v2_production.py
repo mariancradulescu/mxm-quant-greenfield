@@ -144,6 +144,18 @@ class ProductionArchitectureTests(unittest.TestCase):
         self.assertEqual(plan["concurrent_historical_connections"], 0)
         self.assertEqual(plan["exact_segment_jobs"], 4)
 
+    def test_previous_segment_durable_gate_precedes_broker_auth(self):
+        source = inspect.getsource(prod.run_segment)
+        gate = source.index("previous = store.load_segment_manifest(segment - 1)")
+        auth = source.index("transport, account_id = _connect_and_auth(credentials)")
+        self.assertLess(gate, auth)
+        self.assertIn('"DURABLE_STORAGE_INTEGRITY_FAILURE"', source)
+
+    def test_all_segment_jobs_validate_same_exact_arm_event(self):
+        source = inspect.getsource(prod.run_segment)
+        self.assertIn("validate_arm_git_event(arm)", source)
+        self.assertNotIn("if segment == 1:\\n        validate_arm_git_event(arm)", source)
+
     def test_four_rps_rate_limit(self):
         fc = FakeClock()
         limiter = prod.RateLimiter(clock=fc.clock, sleeper=fc.sleep)
