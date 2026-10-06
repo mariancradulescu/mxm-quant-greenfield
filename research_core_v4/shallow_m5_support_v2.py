@@ -18,9 +18,8 @@ from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
+from google.protobuf import descriptor_pb2, descriptor_pool, message_factory
 from m6.ctrader_proto.OpenApiCommonMessages_pb2 import ProtoMessage
-from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAGetTrendbarsReq, ProtoOAGetTrendbarsRes
-from m6.ctrader_proto.OpenApiModelMessages_pb2 import ProtoOATrendbar, ProtoOATrendbarPeriod
 
 MASTER_REL = "research_core_v4/state/QUOTE_CURRENT_METADATA_ANDROID_FRONTIER_V1.json"
 LOCALIZATION_REL = "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_LOCALIZATION_V1.json.zlib.b64"
@@ -30,6 +29,17 @@ MASTER_COUNT = 1576
 MASTER_SHA256 = "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1"
 ACCOUNT_FINGERPRINT_SHA256 = "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636"
 LOCALIZATION_SHA256 = "4ceb988206c6caf5c0077d12201e9043c5bd640c63fd645c20273fafa9fcb63f"
+
+OFFICIAL_PROTO_COMMIT = "3fd8bddfbe0cfc2ecfda079623dc4e498af11e66"
+OFFICIAL_PROTO_DIR = "research_core_v4/protocol_v2/spotware_openapi_proto_3fd8bddfbe0c"
+OFFICIAL_PROTO_GIT_BLOB_SHA1 = {
+    "OpenApiMessages.proto": "e862a857e741e95208791e75a805d9b0cbdfa124",
+    "OpenApiModelMessages.proto": "1a11cf767b4fc0e8093eabf72154c7ac4fff2807",
+    "OpenApiCommonMessages.proto": "a21699b17c0101f4fc230710743449aab92e9685",
+    "OpenApiCommonModelMessages.proto": "a420d2bea7a92c9e31a97c3a67d3553f97b1e21d",
+}
+PROTO_OA_GET_TRENDBARS_REQ_PAYLOAD_TYPE = 2137
+PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE = 2138
 
 M5_ENUM = 5
 M5_MILLISECONDS = 300_000
@@ -57,6 +67,108 @@ SEGMENTS = (
     ("2026-09-10T00:00:00Z", "2026-09-16T23:55:00Z"),
 )
 RAW_HEADER = ("time_utc", "open", "high", "low", "close", "tick_volume")
+
+
+def _add_field(msg, name, number, label, field_type, type_name=None, default_value=None):
+    field = msg.field.add()
+    field.name = name
+    field.number = number
+    field.label = label
+    field.type = field_type
+    if type_name is not None:
+        field.type_name = type_name
+    if default_value is not None:
+        field.default_value = str(default_value)
+    return field
+
+
+def _build_current_trendbar_protocol_types():
+    fd = descriptor_pb2.FileDescriptorProto()
+    fd.name = "mxm_spotware_openapi_trendbars_v2.proto"
+    fd.package = "mxm.spotware.v2"
+    fd.syntax = "proto2"
+
+    payload_enum = fd.enum_type.add()
+    payload_enum.name = "ProtoOAPayloadType"
+    for name, value in (
+        ("PROTO_OA_GET_TRENDBARS_REQ", PROTO_OA_GET_TRENDBARS_REQ_PAYLOAD_TYPE),
+        ("PROTO_OA_GET_TRENDBARS_RES", PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE),
+    ):
+        item = payload_enum.value.add()
+        item.name = name
+        item.number = value
+
+    period_enum = fd.enum_type.add()
+    period_enum.name = "ProtoOATrendbarPeriod"
+    for name, value in (
+        ("M1", 1), ("M2", 2), ("M3", 3), ("M4", 4), ("M5", 5),
+        ("M10", 6), ("M15", 7), ("M30", 8), ("H1", 9), ("H4", 10),
+        ("H12", 11), ("D1", 12), ("W1", 13), ("MN1", 14),
+    ):
+        item = period_enum.value.add()
+        item.name = name
+        item.number = value
+
+    trend = fd.message_type.add()
+    trend.name = "ProtoOATrendbar"
+    _add_field(trend, "volume", 3, 2, 3)
+    _add_field(trend, "period", 4, 1, 14, ".mxm.spotware.v2.ProtoOATrendbarPeriod", "M1")
+    _add_field(trend, "low", 5, 1, 3)
+    _add_field(trend, "deltaOpen", 6, 1, 4)
+    _add_field(trend, "deltaClose", 7, 1, 4)
+    _add_field(trend, "deltaHigh", 8, 1, 4)
+    _add_field(trend, "utcTimestampInMinutes", 9, 1, 13)
+
+    req = fd.message_type.add()
+    req.name = "ProtoOAGetTrendbarsReq"
+    _add_field(req, "payloadType", 1, 1, 14, ".mxm.spotware.v2.ProtoOAPayloadType", "PROTO_OA_GET_TRENDBARS_REQ")
+    _add_field(req, "ctidTraderAccountId", 2, 2, 3)
+    _add_field(req, "fromTimestamp", 3, 1, 3)
+    _add_field(req, "toTimestamp", 4, 1, 3)
+    _add_field(req, "period", 5, 2, 14, ".mxm.spotware.v2.ProtoOATrendbarPeriod")
+    _add_field(req, "symbolId", 6, 2, 3)
+    _add_field(req, "count", 7, 1, 13)
+
+    res = fd.message_type.add()
+    res.name = "ProtoOAGetTrendbarsRes"
+    _add_field(res, "payloadType", 1, 1, 14, ".mxm.spotware.v2.ProtoOAPayloadType", "PROTO_OA_GET_TRENDBARS_RES")
+    _add_field(res, "ctidTraderAccountId", 2, 2, 3)
+    _add_field(res, "period", 3, 2, 14, ".mxm.spotware.v2.ProtoOATrendbarPeriod")
+    _add_field(res, "timestamp", 4, 1, 3)
+    _add_field(res, "trendbar", 5, 3, 11, ".mxm.spotware.v2.ProtoOATrendbar")
+    _add_field(res, "symbolId", 6, 1, 3)
+    _add_field(res, "hasMore", 7, 1, 8)
+
+    pool = descriptor_pool.DescriptorPool()
+    pool.Add(fd)
+    req_cls = message_factory.GetMessageClass(pool.FindMessageTypeByName("mxm.spotware.v2.ProtoOAGetTrendbarsReq"))
+    res_cls = message_factory.GetMessageClass(pool.FindMessageTypeByName("mxm.spotware.v2.ProtoOAGetTrendbarsRes"))
+    bar_cls = message_factory.GetMessageClass(pool.FindMessageTypeByName("mxm.spotware.v2.ProtoOATrendbar"))
+    return req_cls, res_cls, bar_cls
+
+
+ProtoOAGetTrendbarsReqV2, ProtoOAGetTrendbarsResV2, ProtoOATrendbarV2 = _build_current_trendbar_protocol_types()
+
+
+def git_blob_sha1_bytes(data: bytes) -> str:
+    header = f"blob {len(data)}\0".encode("ascii")
+    return hashlib.sha1(header + data).hexdigest()
+
+
+def verify_vendored_protocol_sources(root: Path | str) -> dict:
+    root = Path(root)
+    result = {}
+    for name, expected_blob in OFFICIAL_PROTO_GIT_BLOB_SHA1.items():
+        raw = (root / OFFICIAL_PROTO_DIR / name).read_bytes()
+        actual_blob = git_blob_sha1_bytes(raw)
+        if actual_blob != expected_blob:
+            raise ValueError(f"vendored official protocol source mismatch: {name}")
+        result[name] = {
+            "git_blob_sha1": actual_blob,
+            "sha256": sha256_bytes(raw),
+            "bytes": len(raw),
+        }
+    return result
 
 
 def canonical(value) -> bytes:
@@ -212,8 +324,8 @@ class RequestContext:
             raise ValueError("invalid request interval")
 
 
-def validate_request(req: ProtoOAGetTrendbarsReq, ctx: RequestContext) -> None:
-    if type(req) is not ProtoOAGetTrendbarsReq or not req.IsInitialized():
+def validate_request(req, ctx: RequestContext) -> None:
+    if type(req) is not ProtoOAGetTrendbarsReqV2 or not req.IsInitialized():
         raise ValueError("exact initialized ProtoOAGetTrendbarsReq required")
     for field in ("fromTimestamp", "toTimestamp", "count"):
         if not req.HasField(field):
@@ -230,22 +342,22 @@ def validate_request(req: ProtoOAGetTrendbarsReq, ctx: RequestContext) -> None:
         raise ValueError("request count mismatch")
 
 
-def response_has_more_presence(response: ProtoOAGetTrendbarsRes) -> tuple[bool, bool | None]:
-    if type(response) is not ProtoOAGetTrendbarsRes:
+def response_has_more_presence(response) -> tuple[bool, bool | None]:
+    if type(response) is not ProtoOAGetTrendbarsResV2:
         raise ValueError("wrong response type")
     present = response.HasField("hasMore")
     return present, (bool(response.hasMore) if present else None)
 
 
-def bind_response_envelope(envelope: ProtoMessage, ctx: RequestContext) -> ProtoOAGetTrendbarsRes:
+def bind_response_envelope(envelope: ProtoMessage, ctx: RequestContext):
     if type(envelope) is not ProtoMessage:
         raise ValueError("exact ProtoMessage envelope required")
     if not envelope.HasField("clientMsgId") or str(envelope.clientMsgId) != ctx.client_msg_id:
         raise ValueError("wrong or absent response clientMsgId")
-    expected_payload_type = int(ProtoOAGetTrendbarsRes().payloadType)
+    expected_payload_type = PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE
     if int(envelope.payloadType) != expected_payload_type:
         raise ValueError("wrong response payload type")
-    response = ProtoOAGetTrendbarsRes()
+    response = ProtoOAGetTrendbarsResV2()
     response.ParseFromString(envelope.payload)
     if not response.IsInitialized():
         raise ValueError("uninitialized trendbars response")
@@ -261,8 +373,8 @@ def bind_response_envelope(envelope: ProtoMessage, ctx: RequestContext) -> Proto
     return response
 
 
-def decode_trendbar(bar: ProtoOATrendbar, *, digits: int, segment_from_ms: int, segment_to_ms: int) -> dict:
-    if type(bar) is not ProtoOATrendbar or not bar.IsInitialized():
+def decode_trendbar(bar, *, digits: int, segment_from_ms: int, segment_to_ms: int) -> dict:
+    if type(bar) is not ProtoOATrendbarV2 or not bar.IsInitialized():
         raise ValueError("initialized ProtoOATrendbar required")
     if not bar.HasField("utcTimestampInMinutes"):
         raise ValueError("trendbar open timestamp absent")
@@ -302,7 +414,7 @@ def decode_trendbar(bar: ProtoOATrendbar, *, digits: int, segment_from_ms: int, 
     return row
 
 
-def decode_bound_response(response: ProtoOAGetTrendbarsRes, *, ctx: RequestContext, digits: int) -> list[dict]:
+def decode_bound_response(response, *, ctx: RequestContext, digits: int) -> list[dict]:
     rows = [
         decode_trendbar(
             bar,
