@@ -1,0 +1,60 @@
+name: Shallow M5 V2 Production Architecture Offline Validation
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/shallow_m5_support_v2_production.py
+      - tests/test_shallow_m5_support_v2_production.py
+      - .github/workflows/breadth-first-shallow-m5-support-v2-production.yml
+      - .github/workflows/breadth-first-shallow-m5-support-v2-production-offline-validation.yml
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_OUTPUT_TRANSPORT_AUTHORITY_V1.json
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V1.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: MXM_SHALLOW_M5_V2_PRODUCTION_OFFLINE_VALIDATION
+  cancel-in-progress: false
+
+jobs:
+  offline-synthetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact validation head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact protobuf runtime only
+        run: python -m pip install protobuf==5.29.5
+      - name: Prove no ARM and no cTrader secret injection
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V1.json
+          if grep -E 'secrets\.(CTRADER_|MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM)' .github/workflows/breadth-first-shallow-m5-support-v2-production-offline-validation.yml; then
+            echo "offline validation must not inject cTrader/private-key secrets" >&2
+            exit 1
+          fi
+      - name: Compile production runner and tests
+        run: python -m py_compile research_core_v4/shallow_m5_support_v2_production.py tests/test_shallow_m5_support_v2_production.py
+      - name: Run accepted V2 plus production synthetic suite
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest -v tests.test_shallow_m5_support_v2 tests.test_shallow_m5_support_v2_final_freeze tests.test_shallow_m5_support_v2_production
+      - name: Print exact architecture file hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum             research_core_v4/shallow_m5_support_v2_production.py             tests/test_shallow_m5_support_v2_production.py             .github/workflows/breadth-first-shallow-m5-support-v2-production.yml             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
