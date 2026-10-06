@@ -1,0 +1,139 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.machine-side-production-architecture-freeze.v4",
+  "status": "FROZEN_LOWER_BOUNDARY_OVERFETCH_CORRECTED_PREARM_NOT_ARMED_PENDING_INDEPENDENT_AUDIT",
+  "authoritative_start_head": "6b7ae05cad2d06e030b4f1c0a3577fa2d65bcd49",
+  "accepted_forensic_independent_acceptance": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json",
+    "sha256": "536d29a23f13caf176fa594be59b98fe4861f0edcd1a8bf09682f7d99d74adff",
+    "status": "INDEPENDENTLY_ACCEPTED_LOWER_BOUNDARY_OVERFETCH_CONFIRMED"
+  },
+  "historical_v3_failure": {
+    "arm_sha256": "756544d1778262228017739f5c1dd914ca969c9c15cd4b02d077bd3171f6621f",
+    "execution_authority_sha256": "e4bae388149e78391561115e0fb64b8b5417622103cfb4fed472ccbfa89a9b8e",
+    "failed_release_identity": "mxm-shallow-m5-v2-5a15b55ce82e12889139e74a1b213d146fcf36a97ceb763fa0a321a83721d115",
+    "immutable_historical": true,
+    "rerun_authorized": false,
+    "release_reuse_authorized": false
+  },
+  "forensic_evidence": {
+    "result_sha256": "5ff5ee46fe9b5483cfe11077abcabdcd77f50b4f3a4df5329a73e19b80bb013b",
+    "result_authority_sha256": "00e1a23b958ca6da0d0f58e71ad4a7be8245a221d4586ae78d9360438bbf336e",
+    "classification": "LOWER_BOUNDARY_OVERFETCH_CONFIRMED",
+    "raw_response_count": 5000,
+    "lower_overfetch_count": 3561,
+    "canonical_inside_count": 1439,
+    "upper_overfetch_count": 0,
+    "protected_forward_count": 0,
+    "hasMore_present": true,
+    "hasMore_value": true
+  },
+  "v4_artifacts": {
+    "boundary_decoder_ref": "research_core_v4/shallow_m5_support_v2_boundary_v4.py",
+    "boundary_decoder_sha256": "7f148effd792052e367ce892781123fedc8d9083bfbad27ec9cf8065c48eef52",
+    "production_runner_ref": "research_core_v4/shallow_m5_support_v2_production_v4.py",
+    "production_runner_sha256": "8b7b94d3856160936af61c1a533188b972479e069a6c368fe7f5eeb9af2fcd75",
+    "production_workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml",
+    "production_workflow_sha256": "c332c53d375deaf6d409791a330dbbc47c367406df2ed39cc11c72046fd37f60",
+    "regression_tests_ref": "tests/test_shallow_m5_support_v2_boundary_v4.py",
+    "regression_tests_sha256": "afcb81b54cdba02f1fbb812eb9d540a621caa51de62ddc6aad9a8a5ab67fbc97",
+    "future_arm_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V4.json",
+    "future_arm_present": false
+  },
+  "lower_boundary_normalization_law": {
+    "bind_response_identity_first": true,
+    "scan_raw_temporal_geometry_before_economic_decode": true,
+    "lower_open_ms_lt_ctx_from_ms": "DISCARD_BEFORE_PRICE_OR_VOLUME_DECODING",
+    "inside_interval": "DECODE_WITH_EXISTING_EXACT_V2_PRICE_AND_VOLUME_LAW",
+    "upper_open_ms_gt_ctx_to_ms": "FAIL_CLOSED",
+    "protected_forward": "FAIL_CLOSED",
+    "duplicate_raw_timestamp": "FAIL_CLOSED",
+    "non_m5_aligned_raw_timestamp": "FAIL_CLOSED"
+  },
+  "raw_geometry_pagination_law": {
+    "page_count_basis": "RAW_RESPONSE_COUNT",
+    "lower_boundary_reached": "RAW_RESPONSE_COUNT_GT_0_AND_RAW_MIN_OPEN_MS_LE_CTX_FROM_MS",
+    "priority_1": "IF_RAW_LOWER_BOUNDARY_REACHED_COMPLETE_REGARDLESS_OF_HASMORE_TRUE",
+    "priority_2": "ELSE_IF_HASMORE_PRESENT_FALSE_COMPLETE",
+    "priority_3": "ELSE_IF_HASMORE_ABSENT_AND_RAW_RESPONSE_COUNT_LT_REQUESTED_COUNT_COMPLETE",
+    "priority_4": "ELSE_CONTINUE_FROM_RAW_MIN_OPEN_MS_MINUS_1",
+    "page_cap": 3,
+    "retries_after_initial": 2,
+    "rate_limit_rps": 4,
+    "requested_count": 5000
+  },
+  "forensic_regression_fixture": {
+    "input_geometry": {
+      "raw_response_count": 5000,
+      "lower_overfetch_count": 3561,
+      "canonical_inside_count": 1439,
+      "upper_overfetch_count": 0,
+      "protected_forward_count": 0,
+      "hasMore_present": true,
+      "hasMore_value": true
+    },
+    "expected_canonical_output_row_count": 1439,
+    "expected_page_complete_after_first_response": true,
+    "expected_second_history_page_authorized": false,
+    "expected_classification": "SHALLOW_SUPPORT_COMPLETE"
+  },
+  "execution_equivalence": {
+    "only_behavioral_changes": [
+      "LOWER_BOUNDARY_OVERFETCH_NORMALIZATION",
+      "RAW_GEOMETRY_AWARE_PAGINATION_COMPLETION"
+    ],
+    "unchanged": [
+      "MASTER1576_IDENTITY_AND_ORDER",
+      "FOUR_FIXED_SEGMENTS",
+      "M5_REQUEST_FIELDS",
+      "AUTH_V3_ACCOUNT_SELECTION",
+      "VIEW_SCOPE",
+      "NO_TOKEN_REFRESH",
+      "RAW_ENVELOPE_CLIENT_MSG_ID_BINDING",
+      "RESPONSE_ACCOUNT_PERIOD_SYMBOL_BINDING",
+      "PRICE_DECIMAL_SERIALIZATION_FOR_CANONICAL_ROWS",
+      "DIGITS_MAP",
+      "SHARD_GEOMETRY",
+      "CHECKPOINTING",
+      "ENCRYPTION",
+      "GITHUB_RELEASE_PROVIDER",
+      "STRICT_MANIFEST_VALIDATION",
+      "ALL25_PREVIOUS_SEGMENT_GATE",
+      "CAMPAIGN_BRANCH_DRIFT_GUARD",
+      "RECOVERY_GOVERNANCE",
+      "SOFT_RUNTIME_STOP",
+      "ZERO_TICKS",
+      "ZERO_SUBSCRIPTIONS",
+      "ZERO_DEPTH",
+      "ZERO_ORDERS",
+      "ZERO_ACCOUNT_MUTATION"
+    ]
+  },
+  "future_v4_release_identity": {
+    "domain": "mxm.v4.shallow-m5-v2.production-v4.release-identity.v1",
+    "derived_from_future_arm_parent_source_head": true,
+    "derived_from_v4_architecture_freeze_sha256": true,
+    "must_not_equal_failed_v3_release": true
+  },
+  "provider_and_auth_preservation": {
+    "provider_preflight_rerun": false,
+    "auth_v3_rerun": false,
+    "provider_result_sha256": "58aba6b981e427e60e7e20550206c1de183a0f5e49ef59809735cb6baddc3153",
+    "provider_acceptance_sha256": "c20a86896d839ad54b3c66597d797291d8244fd358555e692f20bbcf6170a00e",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636"
+  },
+  "preservation": {
+    "master1576_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "digits_map_file_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "v2_protocol_decoder_freeze_sha256": "aae769ffb41f8e29e978305ba2e6b85395f70d3c5c4c9b9780a56e601489d98c",
+    "v2_original_implementation_sha256": "7ee289e2c2abaa48cdde334689308165aa6a81fc31d271104da9b2f47f6f9d1e",
+    "search_budget_total": 84,
+    "search_budget_used": 21,
+    "search_budget_remaining": 63,
+    "search_budget_refunds": 0,
+    "economic_outcomes_opened": 29,
+    "consume_this_task": 0,
+    "protected_forward_opened": false,
+    "confirmation_opened": false
+  },
+  "next_state": "PENDING_INDEPENDENT_AUDIT_OF_LOWER_BOUNDARY_OVERFETCH_CORRECTED_V4_PREARM_ARCHITECTURE_BEFORE_ANY_SUCCESSOR_ARM"
+}
