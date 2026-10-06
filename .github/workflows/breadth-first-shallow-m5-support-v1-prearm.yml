@@ -1,0 +1,44 @@
+name: breadth-first-shallow-m5-support-v1-prearm
+
+on:
+  push:
+    branches:
+      - performance-research-v3-20260922
+    paths:
+      - 'research_core_v4/shallow_m5_support_v1.py'
+      - 'research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_FREEZE.json'
+      - 'tests/test_shallow_m5_support_v1.py'
+      - '.github/workflows/breadth-first-shallow-m5-support-v1-prearm.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-prearm-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install protobuf==5.29.5
+      - name: Prove no acquisition arm exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_ARM.json
+      - name: Run offline synthetic prearm tests only
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest -v tests.test_shallow_m5_support_v1
+      - name: Print frozen prearm summary without broker contact
+        run: |
+          python - <<'PY'
+          from research_core_v4.shallow_m5_support_v1 import freeze_summary
+          import json
+          print(json.dumps(freeze_summary(), sort_keys=True))
+          PY
