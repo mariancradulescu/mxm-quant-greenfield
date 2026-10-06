@@ -1,0 +1,67 @@
+name: Shallow M5 V4 Canonical ARM Readiness Consistency
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V4_PREARM_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_shallow_m5_v4_canonical_state_consistency.py
+      - .github/workflows/breadth-first-shallow-m5-v2-v4-canonical-state-consistency.yml
+
+permissions:
+  contents: read
+
+jobs:
+  exact-head-consistency:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact consistency head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact protobuf runtime only
+        run: python -m pip install protobuf==5.29.5
+      - name: Prove no V4 ARM before tests
+        run: test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V4.json
+      - name: Compile V4 consistency suite
+        run: |
+          python -m py_compile             research_core_v4/shallow_m5_support_v2_boundary_v4.py             research_core_v4/shallow_m5_support_v2_production_v4.py             tests/test_shallow_m5_support_v2_boundary_v4.py             tests/test_shallow_m5_v4_canonical_state_consistency.py
+      - name: Run accepted V4 regression plus canonical consistency tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -m unittest -v             tests.test_shallow_m5_support_v2_boundary_v4             tests.test_shallow_m5_v4_canonical_state_consistency
+      - name: Prove exact V4 production bytes unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum research_core_v4/shallow_m5_support_v2_boundary_v4.py | cut -d' ' -f1)" = "7f148effd792052e367ce892781123fedc8d9083bfbad27ec9cf8065c48eef52"
+          test "$(sha256sum research_core_v4/shallow_m5_support_v2_production_v4.py | cut -d' ' -f1)" = "8b7b94d3856160936af61c1a533188b972479e069a6c368fe7f5eeb9af2fcd75"
+          test "$(sha256sum .github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml | cut -d' ' -f1)" = "c332c53d375deaf6d409791a330dbbc47c367406df2ed39cc11c72046fd37f60"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V4.json | cut -d' ' -f1)" = "2df4e2ac5010e81e12cda0cfae462b1a788427c2f2cb1364021a983913addd17"
+      - name: Prove acceptance and forensic hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V4_PREARM_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json | cut -d' ' -f1)" = "3eaf659a9f57eba539fc564a78c1c2edd71cb5a8656b84d62df33c6d008c2508"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_RESULT_V1.json | cut -d' ' -f1)" = "5ff5ee46fe9b5483cfe11077abcabdcd77f50b4f3a4df5329a73e19b80bb013b"
+          test "$(sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_RESULT_AUTHORITY_V1.json | cut -d' ' -f1)" = "00e1a23b958ca6da0d0f58e71ad4a7be8245a221d4586ae78d9360438bbf336e"
+      - name: Prove validation injects no cTrader secrets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path(".github/workflows/breadth-first-shallow-m5-v2-v4-canonical-state-consistency.yml").read_text()
+          assert ("secrets."+"CTRADER_") not in p
+          PY
+      - name: Print exact accepted hashes
+        run: |
+          sha256sum             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V4_PREARM_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json             research_core_v4/shallow_m5_support_v2_boundary_v4.py             research_core_v4/shallow_m5_support_v2_production_v4.py             .github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V4.json
