@@ -97,6 +97,29 @@ class Tests(unittest.TestCase):
  def test_trader_response_mismatch(self):
   r=run_fixture('fixture',SECRET,TOKEN,Fake(changes={'ctidTraderAccountId':ID+1}),EXPECTED)
   self.assertFalse(r['auth_proven']);self.assertFalse(r['trader_response_same_account_pass']);self.assertEqual(r['safe_reason'],'TRADER_REQUEST_FAILED')
+ def test_binding_uses_v3_not_historical_v2_workflow(self):
+  from .validate_auth_arm_v3 import verify_binding,IMPLEMENTATION,WORKFLOW
+  import hashlib
+  from pathlib import Path
+  current=hashlib.sha256(Path(WORKFLOW).read_bytes()).hexdigest();old=hashlib.sha256(Path('.github/workflows/adaptive-read-only-auth-preflight-v2.yml').read_bytes()).hexdigest();code=hashlib.sha256(Path(IMPLEMENTATION).read_bytes()).hexdigest()
+  fixture={'implementation_sha256':code,'workflow_sha256':current,'implementation_hashes':{IMPLEMENTATION:code,WORKFLOW:current,'.github/workflows/adaptive-read-only-auth-preflight-v2.yml':old}}
+  verify_binding(fixture)
+  fixture['workflow_sha256']=old
+  with self.assertRaises(AssertionError):verify_binding(fixture)
+ def test_complete_arm_guard_without_credentials_or_network(self):
+  import tempfile,subprocess,hashlib
+  from pathlib import Path
+  from .validate_auth_arm_v3 import verify_arm,IMPLEMENTATION,WORKFLOW,ARM
+  origin=Path.cwd();identity='research_core_v3/state/ACCOUNT_IDENTITY_REBIND_ACCEPTANCE_V1.json';paths=[IMPLEMENTATION,WORKFLOW,identity];content={p:(origin/p).read_bytes() for p in paths}
+  with tempfile.TemporaryDirectory() as d:
+   target=Path(d)
+   for p,b in content.items():q=target/p;q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b)
+   def git(*args):return subprocess.check_output(['git','-c','user.name=MXM fixture','-c','user.email=fixture@example.invalid',*args],cwd=target,stderr=subprocess.DEVNULL).decode().strip()
+   git('init');git('add','.');git('commit','-m','frozen synthetic source');parent=git('rev-parse','HEAD');hs={p:hashlib.sha256(b).hexdigest() for p,b in content.items()}
+   arm={'exact_source_head':parent,'implementation_sha256':hs[IMPLEMENTATION],'workflow_sha256':hs[WORKFLOW],'implementation_hashes':hs,'expected_account_fingerprint_sha256':a.EXPECTED_FINGERPRINT,'accounts_only':True,'orders':False,'market_history':False,'refresh':False,'subscriptions':False,'account_mutation':False,'broker_text_used_as_identity_or_region_gate':False,'allowed_broker_messages':sorted(a.ALLOWED)}
+   q=target/ARM;q.parent.mkdir(parents=True,exist_ok=True);q.write_text(json.dumps(arm));git('add','.');git('commit','-m','single synthetic arm')
+   try:os.chdir(target);self.assertEqual(verify_arm()['exact_source_head'],parent)
+   finally:os.chdir(origin)
  def test_presence_only_booleans_no_values(self):
   from unittest.mock import patch
   with patch.dict(os.environ,{n:SECRET for n in a.REQUIRED}|{'CTRADER_REFRESH_TOKEN':TOKEN},clear=True):r=a.presence()
