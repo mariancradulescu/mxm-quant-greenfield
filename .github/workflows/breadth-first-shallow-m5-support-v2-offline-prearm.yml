@@ -38,23 +38,24 @@ jobs:
         run: |
           set -euo pipefail
           if grep -E 'CTRADER_(CLIENT_ID|CLIENT_SECRET|ACCESS_TOKEN|REFRESH_TOKEN)|secrets\.' .github/workflows/breadth-first-shallow-m5-support-v2-offline-prearm.yml; then
-            echo "Forbidden secret injection in offline workflow" >&2
+            echo "Forbidden cTrader secret injection in offline workflow" >&2
             exit 1
           fi
-      - name: Run exact offline protocol and decoder tests
+      - name: Run exact offline protocol decoder and final freeze tests
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python -m unittest -v tests.test_shallow_m5_support_v2 tests.test_shallow_m5_support_v2_final_freeze
-      - name: Recover accepted metadata and materialize canonical exact1576 digits map offline
+      - name: Reconstruct exact1576 digits map and prove persisted byte identity
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p /tmp/shallow_v2
           python - <<'PY'
           from pathlib import Path
           import json
           from research_core_v4.shallow_m5_support_v2 import write_digits_map, v2_summary
-          root=Path('.')
           out=Path('/tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json')
-          result=write_digits_map(root,out)
+          result=write_digits_map(Path('.'),out)
           print(json.dumps({
               'digits_count':len(result['entries']),
               'digits_map_sha256':result['digits_map_sha256'],
@@ -62,7 +63,23 @@ jobs:
               'summary':v2_summary(),
           },sort_keys=True))
           PY
-          sha256sum             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_FREEZE.json             research_core_v4/shallow_m5_support_v2.py             tests/test_shallow_m5_support_v2.py             /tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json
+          cmp /tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json
+      - name: Print final frozen file hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum \
+            research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_FREEZE.json \
+            research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PREARM_PROTOCOL_DECODER_FREEZE.json \
+            research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json \
+            research_core_v4/shallow_m5_support_v2.py \
+            tests/test_shallow_m5_support_v2.py \
+            tests/test_shallow_m5_support_v2_final_freeze.py \
+            research_core_v4/protocol_v2/spotware_openapi_proto_3fd8bddfbe0c/OpenApiMessages.proto \
+            research_core_v4/protocol_v2/spotware_openapi_proto_3fd8bddfbe0c/OpenApiModelMessages.proto \
+            research_core_v4/protocol_v2/spotware_openapi_proto_3fd8bddfbe0c/OpenApiCommonMessages.proto \
+            research_core_v4/protocol_v2/spotware_openapi_proto_3fd8bddfbe0c/OpenApiCommonModelMessages.proto \
+            /tmp/shallow_v2/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: shallow-m5-v2-offline-digits-map
