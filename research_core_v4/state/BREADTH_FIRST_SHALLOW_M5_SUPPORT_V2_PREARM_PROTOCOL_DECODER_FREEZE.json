@@ -1,0 +1,183 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.prearm-protocol-decoder-freeze.v1",
+  "status": "PENDING_INDEPENDENT_AUDIT_OF_CORRECTED_BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_PROTOCOL_AND_DECODER_BEFORE_ANY_ARM",
+  "versioning": {
+    "role": "SEPARATELY_VERSIONED_CORRECTED_PREARM_SUCCESSOR",
+    "preserved_v1_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_FREEZE.json",
+    "preserved_v1_file_sha256": "837ee83306a587088a64852956a97da1f3099d7680d6fc01f8da015f6904f208",
+    "preserved_v1_mutated": false,
+    "v1_structural_foundation_accepted_but_armable": false
+  },
+  "outer_capture_identity": {
+    "master_count": 1576,
+    "master_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "resolution": "M5",
+    "period_numeric_enum": 5,
+    "from_utc": "2026-08-20T00:00:00Z",
+    "to_open_timestamp_utc_inclusive": "2026-09-16T23:55:00Z",
+    "protected_forward_boundary_utc": "2026-09-17T12:02:58Z",
+    "segment_count": 4,
+    "segment_days": 7,
+    "breadth_order": "SEGMENT_MAJOR_THEN_FROZEN_MASTER1576_ORDER",
+    "requested_count": 5000,
+    "single_connection": true,
+    "maximum_historical_requests_per_second": 4,
+    "minimum_inter_request_seconds": 0.25,
+    "multiple_connections_for_rate_multiplication": false,
+    "heartbeat_idle_seconds": 10
+  },
+  "protocol_authority": {
+    "upstream_repository": "spotware/openapi-proto-messages",
+    "upstream_commit": "3fd8bddfbe0cfc2ecfda079623dc4e498af11e66",
+    "vendored_root": "research_core_v4/protocol_v2/spotware_openapi_proto_3fd8bddfbe0c",
+    "vendored_git_blob_sha1": {
+      "OpenApiMessages.proto": "e862a857e741e95208791e75a805d9b0cbdfa124",
+      "OpenApiModelMessages.proto": "1a11cf767b4fc0e8093eabf72154c7ac4fff2807",
+      "OpenApiCommonMessages.proto": "a21699b17c0101f4fc230710743449aab92e9685",
+      "OpenApiCommonModelMessages.proto": "a420d2bea7a92c9e31a97c3a67d3553f97b1e21d"
+    },
+    "implementation_ref": "research_core_v4/shallow_m5_support_v2.py",
+    "implementation_file_sha256": "7ee289e2c2abaa48cdde334689308165aa6a81fc31d271104da9b2f47f6f9d1e",
+    "request_payload_type": 2137,
+    "response_payload_type": 2138
+  },
+  "request_contract": {
+    "type": "ProtoOAGetTrendbarsReq",
+    "mandatory_for_frozen_request": [
+      "ctidTraderAccountId",
+      "symbolId",
+      "period",
+      "fromTimestamp",
+      "toTimestamp",
+      "count"
+    ],
+    "ctidTraderAccountId": "IN_MEMORY_AUTH_V3_UNIQUE_FINGERPRINT_MATCH_ONLY_NEVER_PERSIST",
+    "symbolId": "EXACT_FROZEN_MASTER1576_REQUEST_IDENTITY",
+    "period": "M5_ENUM_5",
+    "fromTimestamp_and_toTimestamp": "UNIX_MILLISECONDS",
+    "count": 5000,
+    "segment_membership": "BAR_BELONGS_BY_OPEN_TIMESTAMP;THE_INCLUSIVE_SEGMENT_TO_IS_THE_LATEST_ALLOWED_OPEN;23_55_IS_NOT_DROPPED_BECAUSE_ITS_CLOSE_IS_NEXT_CALENDAR_BOUNDARY"
+  },
+  "response_binding_contract": {
+    "response_type": "ProtoOAGetTrendbarsRes",
+    "binding_order": "BIND_ENVELOPE_AND_RESPONSE_IDENTITY_BEFORE_DECODING_OR_ACCEPTING_ANY_TRENDBAR_ROW",
+    "clientMsgId": "ENVELOPE_FIELD_REQUIRED_AND_MUST_EQUAL_EXACT_IMMUTABLE_REQUEST_CONTEXT",
+    "payload_type": "MUST_EQUAL_2138",
+    "ctidTraderAccountId": "PROTOBUF_REQUIRED_AND_MUST_EQUAL_IN_MEMORY_AUTHENTICATED_ACCOUNT;RAW_ACCOUNT_ID_NEVER_PERSISTED",
+    "period": "PROTOBUF_REQUIRED_AND_MUST_EQUAL_M5_ENUM_5",
+    "symbolId": "PROTOBUF_OPTIONAL;IF_PRESENT_MUST_EQUAL_EXACT_REQUEST_SYMBOL_ID;IF_ABSENT_ALLOWED_ONLY_BECAUSE_CLIENT_MSG_ID_ACCOUNT_AND_PERIOD_BIND_THE_RESPONSE_TO_THE_EXACT_SINGLE_REQUEST_CONTEXT;NO_SUBSTITUTION_OR_INFERENCE",
+    "trendbar_period": "PROTOBUF_OPTIONAL;IF_PRESENT_MUST_EQUAL_M5_ENUM_5"
+  },
+  "hasMore_presence_and_pagination": {
+    "field": "ProtoOAGetTrendbarsRes.hasMore",
+    "protobuf_label": "OPTIONAL",
+    "presence_detection": "response.HasField('hasMore')",
+    "schema_descriptor_existence_is_not_presence": true,
+    "present_true": "CONTINUE_DETERMINISTICALLY_BACKWARD_WITHIN_THE_SAME_IDENTITY_AND_SEGMENT_FROM_OLDEST_RETURNED_OPEN_TIMESTAMP_MINUS_1_MILLISECOND;SHORT_PAGE_DOES_NOT_OVERRIDE_EXPLICIT_TRUE",
+    "present_false": "FILTER_EXHAUSTED_FOR_CURRENT_REQUEST_INTERVAL_AFTER_ALL_BINDING_DECODER_AND_INTEGRITY_GATES_PASS",
+    "absent_short_page": "COMPLETE_ONLY_AFTER_ALL_OTHER_GATES_PASS",
+    "absent_full_page": "CONTINUE_BACKWARD_DETERMINISTICALLY",
+    "empty_explicit_true": "FAIL_CLOSED",
+    "non_progressing_pagination": "FAIL_CLOSED",
+    "page_cap_exceeded": "FAIL_CLOSED_AS_DATA_OR_TRANSPORT_LIMITED_NOT_NO_HISTORICAL_SUPPORT"
+  },
+  "trendbar_decoder_contract": {
+    "type": "ProtoOATrendbar",
+    "timestamp": "utcTimestampInMinutes_IS_BAR_OPEN_UNIX_MINUTES;MULTIPLY_BY_60_FOR_UTC_SECONDS",
+    "tick_volume": "volume_REQUIRED_INTEGER_TICK_VOLUME;NEGATIVE_FAIL_CLOSED",
+    "relative_price_divisor": 100000,
+    "relative_prices": {
+      "low": "low",
+      "open": "low_plus_deltaOpen",
+      "high": "low_plus_deltaHigh",
+      "close": "low_plus_deltaClose"
+    },
+    "optional_delta_absence": "ZERO",
+    "canonical_arithmetic": "EXACT_DECIMAL_ONLY_NO_BINARY_FLOAT",
+    "canonical_rounding": "ROUND_HALF_EVEN_TO_FROZEN_SYMBOL_DIGITS",
+    "canonical_price_serialization": "FIXED_DECIMAL_STRING_WITH_EXACTLY_SYMBOL_DIGITS_DECIMAL_PLACES",
+    "raw_header": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "row_gates": [
+      "OPEN_TIMESTAMP_M5_ALIGNED",
+      "OPEN_TIMESTAMP_INSIDE_EXACT_REQUEST_SEGMENT_INCLUSIVE",
+      "OPEN_TIMESTAMP_STRICTLY_BEFORE_PROTECTED_FORWARD",
+      "DUPLICATE_TIMESTAMP_FAILS",
+      "CONFLICTING_DUPLICATE_FAILS",
+      "CANONICAL_TIMESTAMP_ORDER_STRICT_ASCENDING",
+      "RELATIVE_AND_CANONICAL_OHLC_INVARIANTS"
+    ]
+  },
+  "symbol_digits_map": {
+    "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json",
+    "count": 1576,
+    "master_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "source_localization_ref": "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_LOCALIZATION_V1.json.zlib.b64",
+    "source_localization_sha256": "4ceb988206c6caf5c0077d12201e9043c5bd640c63fd645c20273fafa9fcb63f",
+    "digits_map_sha256": "4657c1cea348479afa198b005ae1da3b3f788fb2b33bd2c35f07034bfba2ce7a",
+    "map_file_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "missing_digits_count": 0
+  },
+  "segment_boundary_law": {
+    "segment_end_23_55_open": "INCLUDED_IN_CURRENT_SEGMENT",
+    "following_00_00_open": "BELONGS_ONLY_TO_NEXT_SEGMENT",
+    "protected_forward": "ANY_BAR_OPEN_AT_OR_AFTER_2026_09_17T12_02_58Z_REJECTED"
+  },
+  "finite_pagination_and_wire_bound": {
+    "logical_identity_segment_count": 6304,
+    "theoretical_m5_open_slots_per_seven_day_segment": 2016,
+    "maximum_pages_per_identity_segment": 3,
+    "maximum_page_request_count": 18912,
+    "maximum_retries_after_initial_attempt_per_page": 2,
+    "maximum_wire_attempts_per_page": 3,
+    "true_absolute_maximum_wire_attempts": 56736,
+    "wire_send_floor_at_4_requests_per_second_seconds": 14184,
+    "wire_send_floor_at_4_requests_per_second_hms": "03:56:24",
+    "law": "THE_THREE_PAGE_CAP_IS_OUTCOME_BLIND_AND_RUNTIME_BOUNDED;EXPLICIT_hasMore_OR_AMBIGUOUS_FULL_PAGE_ON_PAGE3_FAILS_CLOSED;NO_SCOPE_RESOLUTION_IDENTITY_ACCOUNT_OR_TIME_EXTENSION_IS_ALLOWED"
+  },
+  "reuse_accounting_preserved": {
+    "manifest_union_current_master_overlap_count": 178,
+    "current_master_without_known_manifest_overlap_count": 1398,
+    "raw_reuse_credited_now": 0,
+    "prearm_capture_required_now": 1576
+  },
+  "preservation": {
+    "auth_v3_status": "PROVEN_MACHINE_SIDE_READ_ONLY_AUTH_ONLY",
+    "adaptive_v1_policy_sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+    "adaptive_v1_raw_result_sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+    "search_budget_total": 84,
+    "search_budget_used": 21,
+    "search_budget_remaining": 63,
+    "economic_outcomes_opened_project": 29,
+    "search_budget_consumed_this_task": 0,
+    "triad_v7_parked": true,
+    "protected_forward_opened": false,
+    "confirmation_opened": false
+  },
+  "pre_freeze_synthetic_validation": {
+    "run_id": 37475482193,
+    "job_id": 112309651346,
+    "validated_head": "e433ce85b880da82c8438c96d4d2700a76b18120",
+    "tests_passed": 27,
+    "tests_failed": 0,
+    "result": "PASS",
+    "arm_absence_check": "PASS",
+    "ctrader_secret_injection_check": "PASS",
+    "exact1576_digits_materialization": "PASS"
+  },
+  "required_stop": {
+    "state": "PENDING_INDEPENDENT_AUDIT_OF_CORRECTED_BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_PROTOCOL_AND_DECODER_BEFORE_ANY_ARM",
+    "arm_present": false,
+    "broker_contact": false,
+    "historical_requests_sent": 0,
+    "credentials_used": false,
+    "economic_outcomes_opened_this_task": 0
+  }
+}
