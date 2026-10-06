@@ -1,0 +1,63 @@
+name: Shallow M5 V3 Canonical State Consistency Validation
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_ARM_GATE_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
+      - tests/test_shallow_m5_v3_canonical_state_consistency.py
+      - .github/workflows/breadth-first-shallow-m5-v2-v3-canonical-state-consistency.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: MXM_SHALLOW_M5_V3_CANONICAL_STATE_CONSISTENCY
+  cancel-in-progress: true
+
+jobs:
+  exact-head-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact validation head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: "${{ github.sha }}"
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact protobuf runtime only
+        run: python -m pip install protobuf==5.29.5
+      - name: Prove offline workflow has no cTrader secret injection
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -E 'secrets\.CTRADER_|CTRADER_CLIENT_ID:|CTRADER_CLIENT_SECRET:|CTRADER_ACCESS_TOKEN:|CTRADER_REFRESH_TOKEN:' .github/workflows/breadth-first-shallow-m5-v2-v3-canonical-state-consistency.yml; then
+            echo "offline consistency validation must not inject cTrader credentials" >&2
+            exit 1
+          fi
+      - name: Prove zero production ARM files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V1.json
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V2.json
+          test ! -e research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json
+      - name: Compile canonical consistency test
+        run: python -m py_compile tests/test_shallow_m5_v3_canonical_state_consistency.py
+      - name: Run accepted V2 and V3 suites plus canonical consistency gate
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -m unittest -v             tests.test_shallow_m5_support_v2             tests.test_shallow_m5_support_v2_final_freeze             tests.test_shallow_m5_support_v2_production             tests.test_shallow_m5_support_v2_production_v2             tests.test_shallow_m5_support_v2_production_v3             tests.test_shallow_m5_v3_canonical_state_consistency
+      - name: Print exact preserved production and acceptance hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum             research_core_v4/shallow_m5_support_v2_production_v2.py             .github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml             research_core_v4/shallow_m5_support_v2_production_v3.py             .github/workflows/breadth-first-shallow-m5-support-v2-production-v3.yml             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V3.json             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_GITHUB_PROVIDER_PREFLIGHT_RESULT_V1.json             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PROVIDER_PREFLIGHT_ACCEPTANCE_AUTHORITY_V1.json             research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_ARM_GATE_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
