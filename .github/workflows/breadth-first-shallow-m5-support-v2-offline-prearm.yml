@@ -6,6 +6,9 @@ on:
     paths:
       - 'research_core_v4/shallow_m5_support_v2.py'
       - 'tests/test_shallow_m5_support_v2.py'
+      - 'tests/test_shallow_m5_support_v2_final_freeze.py'
+      - 'research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json'
+      - 'research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PREARM_PROTOCOL_DECODER_FREEZE.json'
       - '.github/workflows/breadth-first-shallow-m5-support-v2-offline-prearm.yml'
 
 permissions:
@@ -41,7 +44,7 @@ jobs:
       - name: Run exact offline protocol and decoder tests
         env:
           PYTHONDONTWRITEBYTECODE: '1'
-        run: python -m unittest -v tests.test_shallow_m5_support_v2
+        run: python -m unittest -v tests.test_shallow_m5_support_v2 tests.test_shallow_m5_support_v2_final_freeze
       - name: Recover accepted metadata and materialize canonical exact1576 digits map offline
         run: |
           mkdir -p /tmp/shallow_v2
