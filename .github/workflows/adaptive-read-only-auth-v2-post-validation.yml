@@ -1,0 +1,25 @@
+name: Machine-side auth V2 authentic result and boundary validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: ['adaptive_competition/state/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_RESULT_V2.json', 'adaptive_competition/state/MACHINE_SIDE_READ_ONLY_AUTH_PREFLIGHT_V2_VALIDATION.json', 'adaptive_competition/validate_read_only_auth_v2_result.py', '.github/workflows/adaptive-read-only-auth-v2-post-validation.yml']
+permissions: {contents: read}
+jobs:
+  validate-result:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install protobuf==5.29.5
+      - run: python -m adaptive_competition.test_read_only_auth_v2
+      - name: No-network result, frozen source and historical integrity validation
+        run: python -m adaptive_competition.validate_read_only_auth_v2_result --out /tmp/MACHINE_SIDE_READ_ONLY_AUTH_V2_PUBLICATION_PROOF.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: auth-v2-publication-boundary-proof
+          path: /tmp/MACHINE_SIDE_READ_ONLY_AUTH_V2_PUBLICATION_PROOF.json
+          if-no-files-found: error
+          retention-days: 14

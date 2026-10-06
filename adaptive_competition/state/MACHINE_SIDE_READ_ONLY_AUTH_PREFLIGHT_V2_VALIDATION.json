@@ -1,6 +1,15 @@
 {
   "V1_scientific_change": false,
-  "auth_attempt_executed": false,
+  "auth_artifact_id": 11413383320,
+  "auth_attempt_executed": true,
+  "auth_job_id": 112272424620,
+  "auth_run_id": 37464618123,
+  "auth_status": "PREFLIGHT_FAILED_CLOSED",
+  "auth_workflow_conclusion": "success;BROKER_PREFLIGHT_FAILED_CLOSED_IS_RESULT_NOT_WORKFLOW_CRASH",
+  "authentic_result_sha256": "e1e057e355b585e486db7e6c8ee34c0286a12579c25bf7c2c3de3c6f1ace89ac",
+  "authenticated_retry_count": 0,
+  "authentication_attempt_count": 1,
+  "budget_consumed": 0,
   "budget_current": {
     "economic_outcomes_opened": 29,
     "refunds": 0,
@@ -9,6 +18,17 @@
     "used": 21
   },
   "confirmation_closed": true,
+  "downloaded_actions_artifact_sha256": "c2f7f4f2a4bc5e41427d02385338749043775cb3fadc8531bda83ace3e721cb8",
+  "downloaded_artifact_json_byte_identical": true,
+  "execution_head": "205ea6667bc604de4181631cb7f264e80cf6888c",
+  "failed_gate": "broker_region_pass",
+  "failure_interpretation": "Strict brokerName requires both Pepperstone and Europe. Gate was not verified; safe artifact intentionally contains no raw broker payload, account ID, login or credentials. Do not infer that other account semantics failed; they were not evaluated after this gate. No retry, alternate account, gate relaxation or further contact authorized.",
+  "gates_not_evaluated_after_failure": [
+    "hedged_account_pass",
+    "max_margin_mode_pass",
+    "non_swap_free_pass",
+    "eur_deposit_asset_pass"
+  ],
   "historical_preservation_hashes": {
     ".github/workflows/adaptive-read-only-auth-preflight-v1.yml": "73a9db1f37cf1a1410255de6dfaa123f03c4fd01fa6270eaaa69fa3fff6971a6",
     "adaptive_competition/read_only_auth_preflight_v1.py": "12766b875da17143207dfa76b7c0cb798588eeee98df2d47f2fe12833f7c6e5b",
@@ -33,8 +53,33 @@
     "exception_secret_redaction",
     "safe_artifact_schema"
   ],
+  "next_action": "PENDING_INDEPENDENT_AUDIT_OF_MACHINE_SIDE_READ_ONLY_AUTH_V2_FAILURE",
+  "no_history_order_refresh_subscription_contact": true,
+  "no_new_economic_identity": true,
+  "post_run_gate_results": {
+    "account_auth_pass": true,
+    "account_list_retrieved": true,
+    "application_auth_pass": true,
+    "broker_region_pass": false,
+    "eur_deposit_asset_pass": false,
+    "explicit_view_only_scope_pass": true,
+    "hedged_account_pass": false,
+    "matched_account_live": true,
+    "max_margin_mode_pass": false,
+    "non_swap_free_pass": false,
+    "unique_historical_account_fingerprint_match": true
+  },
+  "post_validation_script_sha256": "047ce114d30b5b1e00158f15b2d30007b465864398b5716ef201c4086b2c295c",
+  "preauth_bounded_ci_run_id": 37464475265,
+  "preauth_source_head": "297a291d91762864ae5669123020d1f7eefa8db7",
   "protected_forward_closed": true,
-  "status": "PASS_PREAUTH_BOUNDED_MECHANICAL_VALIDATION",
+  "refresh_token_presence_confirmed_without_auth_process_inheritance": true,
+  "result_persisted_before_interpretation_head": "7b1fac9319f30ba002d9d4ee7953752dde53a834",
+  "safe_reason": "BROKER_REGION_NOT_VERIFIED",
+  "safe_schema_verified": true,
+  "status": "PASS_POSTAUTH_SAFE_ARTIFACT_AND_HISTORICAL_INTEGRITY_VALIDATION",
+  "three_runtime_secrets_present": true,
+  "transport_closed": true,
   "triad_v7_parked": true,
   "unit_tests_passed": true
 }
