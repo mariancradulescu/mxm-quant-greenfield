@@ -1,0 +1,128 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v2.v4-prearm-independent-acceptance-authority.v1",
+  "status": "INDEPENDENTLY_ACCEPTED_LOWER_BOUNDARY_CORRECTED_V4_PREARM_READY_FOR_SEPARATE_REAL_ARM_GOVERNANCE",
+  "accepted_head": "079848fe50841ade2913ef10ac985dae2b9344b0",
+  "exact_head_validation": {
+    "run_id": 37534443385,
+    "job_id": 112511710360,
+    "validated_head": "079848fe50841ade2913ef10ac985dae2b9344b0",
+    "tests_passed": 19,
+    "tests_failed": 0,
+    "conclusion": "success"
+  },
+  "evidence_bindings": {
+    "forensic_independent_acceptance_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json",
+    "forensic_independent_acceptance_sha256": "536d29a23f13caf176fa594be59b98fe4861f0edcd1a8bf09682f7d99d74adff",
+    "forensic_result_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_RESULT_V1.json",
+    "forensic_result_sha256": "5ff5ee46fe9b5483cfe11077abcabdcd77f50b4f3a4df5329a73e19b80bb013b",
+    "forensic_result_authority_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_BOUNDARY_FORENSIC_RESULT_AUTHORITY_V1.json",
+    "forensic_result_authority_sha256": "00e1a23b958ca6da0d0f58e71ad4a7be8245a221d4586ae78d9360438bbf336e",
+    "failed_v3_execution_authority_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_V3_FAILED_EXECUTION_AUTHORITY_V1.json",
+    "failed_v3_execution_authority_sha256": "e4bae388149e78391561115e0fb64b8b5417622103cfb4fed472ccbfa89a9b8e",
+    "failed_v3_arm_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json",
+    "failed_v3_arm_sha256": "756544d1778262228017739f5c1dd914ca969c9c15cd4b02d077bd3171f6621f"
+  },
+  "v4_prearm_bindings": {
+    "boundary_decoder_ref": "research_core_v4/shallow_m5_support_v2_boundary_v4.py",
+    "boundary_decoder_sha256": "7f148effd792052e367ce892781123fedc8d9083bfbad27ec9cf8065c48eef52",
+    "production_runner_ref": "research_core_v4/shallow_m5_support_v2_production_v4.py",
+    "production_runner_sha256": "8b7b94d3856160936af61c1a533188b972479e069a6c368fe7f5eeb9af2fcd75",
+    "production_workflow_ref": ".github/workflows/breadth-first-shallow-m5-support-v2-production-v4.yml",
+    "production_workflow_sha256": "c332c53d375deaf6d409791a330dbbc47c367406df2ed39cc11c72046fd37f60",
+    "architecture_freeze_ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_MACHINE_SIDE_PRODUCTION_ARCHITECTURE_FREEZE_V4.json",
+    "architecture_freeze_sha256": "2df4e2ac5010e81e12cda0cfae462b1a788427c2f2cb1364021a983913addd17"
+  },
+  "frozen_identity_bindings": {
+    "master1576_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "digits_map_sha256": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+    "auth_account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "provider_result_sha256": "58aba6b981e427e60e7e20550206c1de183a0f5e49ef59809735cb6baddc3153",
+    "provider_acceptance_sha256": "c20a86896d839ad54b3c66597d797291d8244fd358555e692f20bbcf6170a00e"
+  },
+  "accepted_lower_boundary_normalization_law": {
+    "processing_order": [
+      "BIND_RESPONSE_ENVELOPE_AND_IDENTITY",
+      "SCAN_RAW_TEMPORAL_GEOMETRY",
+      "FAIL_CLOSED_ON_UPPER_PROTECTED_DUPLICATE_OR_ALIGNMENT_VIOLATION",
+      "PARTITION_RAW_BARS_BY_OPEN_TIMESTAMP",
+      "DISCARD_LOWER_BOUNDARY_OVERFETCH_BEFORE_PRICE_OR_VOLUME_DECODE",
+      "DECODE_ONLY_IN_INTERVAL_BARS_WITH_EXISTING_EXACT_V2_DECODER"
+    ],
+    "lower_open_lt_from": "DISCARD_BEFORE_PRICE_OR_VOLUME_DECODE",
+    "inside_from_to_inclusive": "DECODE_USING_EXISTING_EXACT_V2_DECODER",
+    "open_gt_current_to": "FAIL_CLOSED",
+    "open_at_or_after_protected_forward": "FAIL_CLOSED",
+    "duplicate_raw_timestamp": "FAIL_CLOSED",
+    "non_m5_aligned_raw_timestamp": "FAIL_CLOSED"
+  },
+  "accepted_raw_geometry_pagination_law": {
+    "count_basis": "RAW_RESPONSE_COUNT",
+    "cursor_basis": "RAW_MIN_OPEN_TIMESTAMP",
+    "lower_boundary_reached": "RAW_RESPONSE_COUNT_GT_0_AND_RAW_MIN_OPEN_MS_LE_CTX_FROM_MS",
+    "completion_priority": [
+      "RAW_LOWER_BOUNDARY_REACHED_COMPLETE_REGARDLESS_OF_HASMORE_TRUE",
+      "HASMORE_PRESENT_FALSE_COMPLETE",
+      "HASMORE_ABSENT_AND_RAW_PAGE_SHORT_COMPLETE",
+      "OTHERWISE_CONTINUE_RAW_MIN_MINUS_1_SUBJECT_TO_PAGE_CAP"
+    ],
+    "page_cap": 3,
+    "retries_after_initial": 2,
+    "rate_limit_rps": 4,
+    "requested_count": 5000
+  },
+  "accepted_forensic_regression": {
+    "raw_response_count": 5000,
+    "lower_overfetch_count": 3561,
+    "canonical_inside_count": 1439,
+    "upper_overfetch_count": 0,
+    "protected_forward_count": 0,
+    "hasMore_present": true,
+    "hasMore_value": true,
+    "canonical_output_rows": 1439,
+    "page_complete_after_first_response": true,
+    "second_history_page_authorized": false,
+    "classification": "SHALLOW_SUPPORT_COMPLETE",
+    "result": "PASS"
+  },
+  "production_path_acceptance": {
+    "v4_identity_loop_uses_v4_normalized_page": true,
+    "v4_pagination_decision_used_in_real_identity_loop": true,
+    "checkpoint_contains_only_canonical_rows_plus_transport_geometry": true,
+    "historical_v2_v3_modules_modified": false,
+    "global_monkey_patch": false,
+    "workflow_arm_v4_path_trigger_only": true,
+    "workflow_dispatch": false,
+    "four_jobs_strictly_sequential": true,
+    "refresh_token_injected": false,
+    "order_or_trading_surface_present": false
+  },
+  "arm_readiness_boundary": {
+    "active_v4_arm_present": false,
+    "active_v4_release_present": false,
+    "v4_production_run_count": 0,
+    "protected_forward_opened": false,
+    "confirmation_opened": false,
+    "real_arm_not_created_by_this_authority": true,
+    "next_state": "PENDING_SEPARATE_REAL_SHALLOW_M5_V4_ARM_AUTHORIZATION"
+  },
+  "historical_v3_preservation": {
+    "failed_arm_commit": "639df8f3a252c63fbec52765f142e5d5cfe3a589",
+    "failed_arm_status": "HISTORICAL_FAILED_CLOSED_DO_NOT_RERUN",
+    "failed_run_id": 37526112788,
+    "failed_run_attempt": 1,
+    "failed_release_identity": "mxm-shallow-m5-v2-5a15b55ce82e12889139e74a1b213d146fcf36a97ceb763fa0a321a83721d115",
+    "failed_release_preserved": true,
+    "failed_release_reuse_for_v4": false
+  },
+  "preservation": {
+    "adaptive_v1_policy_sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+    "adaptive_v1_raw_result_sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+    "search_budget_total": 84,
+    "search_budget_used": 21,
+    "search_budget_remaining": 63,
+    "search_budget_refunds": 0,
+    "economic_outcomes_opened": 29,
+    "consume_this_task": 0,
+    "triad_v7_parked": true
+  }
+}
