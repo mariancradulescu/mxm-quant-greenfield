@@ -1,0 +1,102 @@
+{
+  "schema": "TRIAD_V7_SUPPORT_SEMANTICS_RECONCILIATION_AUTHORITY_V1",
+  "classification": "PREOUTCOME_IMPLEMENTATION_CONTRACT_INCONSISTENCY_CORRECTION_NOT_SCIENTIFIC_RETUNING",
+  "parent_authoritative_head": "885facfdbb3dc93c923b9241f1a4d5afe3b0c992",
+  "forensic_checkpoint_head": "0fb63f3b90c1ac8695288cf81889ea5bcc832ccb",
+  "forensic": {
+    "fixture_id": 9,
+    "case_id": 9,
+    "case_name": "BASELINE_REGIME_DRIFT",
+    "phase": "null",
+    "engineering_trial_index": 0,
+    "configuration_id": "G10_ONLY",
+    "delta": [
+      0.5,
+      0,
+      0
+    ],
+    "day": 50,
+    "clock_k": 6,
+    "clock_q": 84,
+    "cohort": 2,
+    "full_or_leaveout": "leaveout",
+    "excluded_target": 42,
+    "reason": "CANDIDATE_FAIL_CLOSED",
+    "failure_preserved": true,
+    "certification_seed_usage": false
+  },
+  "frozen_bindings": {
+    "V7_manifest_sha256": "7904af615cef0d5002370d45160733bd84e72a9d2599ee52de126b0560854b3a",
+    "V7_reference_worker_sha256": "af0cd192adc19478686198082f190b69585dab4d29df9e6835d1f7cf6a3c6de6",
+    "V7_control_plane_sha256": "d60ca6214553621f5122e44ec8f648592240ef91763b8b6c9a1eebbd6f975f03",
+    "V6_numerical_authority_sha256": "52775bdde358280ca56b37527454ad8cc11e8bc7d1316aca987a8a8585d30701",
+    "support_semantics_wrapper_sha256": "fe57921a8e20414f9d5d453be1cb315e7d10204b7aefe884a51e0585f9df3a1f"
+  },
+  "inherited_authority": {
+    "V2": "Numerical rank/variance failures reduce support and never count as null evidence; unsupported trials are not pruned.",
+    "V6": "Production-support accepted=false is numerical support unavailable unless unsafe acceptance or runtime corruption exists.",
+    "V7": "FWER/lead events use the fixed prospective trial denominator; support is a separate simultaneous CP gate."
+  },
+  "expected_support_unavailable_reasons": [
+    "CANDIDATE_FAIL_CLOSED",
+    "DIMENSION_OR_FINITE_REJECTION",
+    "SCALE_REJECTION",
+    "NONFINITE_SINGULAR_VALUES",
+    "NUMERICAL_SUPPORT_AMBIGUOUS_UNTESTED_NOT_NULL",
+    "INDEPENDENT_ORTHOGONALITY_REJECTION",
+    "RESIDUAL_RELIABILITY_REJECTION",
+    "FIXED_TIMESTAMP_OR_SYNTHETIC_FULL_FAMILY_SUPPORT_FAILURE",
+    "DEGENERATE_STUDENTIZATION",
+    "NEGATIVE_BOOTSTRAP_VARIANCE"
+  ],
+  "unsupported_configuration_semantics": {
+    "atomic": true,
+    "pruning_forbidden": true,
+    "partial_score_salvage": false,
+    "false_significance_event": false,
+    "false_lead_event": false,
+    "supported_event": false,
+    "continue_remaining_prospectively_declared_trials": true
+  },
+  "hard_failure_semantics": {
+    "action": "ABORT_CASE_FAIL_CLOSED_NO_RETRY_NO_RESEED_NO_PARTIAL_INTERPRETATION",
+    "includes": [
+      "unsafe production acceptance",
+      "hash or binding mismatch",
+      "runtime corruption",
+      "seed mismatch or nondeterminism",
+      "malformed data structure",
+      "unexpected exception",
+      "duplicate or missing trial identity",
+      "checkpoint integrity failure",
+      "implementation divergence"
+    ]
+  },
+  "accounting": {
+    "null_trials_per_case": 8192,
+    "denominator": "FIXED_FROZEN_OUTER_TRIAL_COUNT",
+    "support_CP_lower_min": 0.95,
+    "FWER_CP_upper_max": 0.05,
+    "lead_FWER_CP_upper_max": 0.05,
+    "every_null_configuration_required": true,
+    "conditional_on_supported_FWER": false
+  },
+  "strict_freeze": {
+    "worker_changed": false,
+    "manifest_changed": false,
+    "control_plane_changed": false,
+    "DGP_changed": false,
+    "RNG_changed": false,
+    "seeds_changed": false,
+    "trial_counts_changed": false,
+    "projection_kernel_changed": false,
+    "numerical_tolerances_changed": false
+  },
+  "prearm_only": true,
+  "ARM_present": false,
+  "null_certification_trials": 0,
+  "power_trials": 0,
+  "real_response_openings": 0,
+  "broker_contacts": 0,
+  "orders": 0
+}
