@@ -1,0 +1,130 @@
+{
+  "schema": "mxm.v4.breadth-first-shallow-m5-support-v1.prearm-freeze.v1",
+  "status": "PENDING_INDEPENDENT_AUDIT_OF_BREADTH_FIRST_SHALLOW_M5_SUPPORT_V1_PREARM_ARCHITECTURE_BEFORE_ANY_NEW_HISTORICAL_REQUEST",
+  "authoritative_start_head": "e9f086c9051eb7d3e4fc31e466257352dc04542d",
+  "accepted_auth_v3": {
+    "status": "PROVEN_MACHINE_SIDE_READ_ONLY_AUTH_ONLY",
+    "account_fingerprint_sha256": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636",
+    "explicit_scope": "VIEW",
+    "refresh_token_used": false,
+    "future_acquisition_authorized": false
+  },
+  "master_universe": {
+    "identity_count": 1576,
+    "frontier_identity_sha256": "2287445f9b8dbd61ef40a1d81756e1848c2b623a846bc968c4e214d9b2a874e1",
+    "roster_ref": "research_core_v4/state/QUOTE_CURRENT_METADATA_ANDROID_FRONTIER_V1.json",
+    "ordering": "FROZEN_ASCENDING_SYMBOL_ID"
+  },
+  "fixed_capture_geometry": {
+    "resolution": "M5",
+    "from_utc": "2026-08-20T00:00:00Z",
+    "to_utc_inclusive": "2026-09-16T23:55:00Z",
+    "protected_forward_boundary_utc": "2026-09-17T12:02:58Z",
+    "segments": [
+      {"segment_index": 0, "from_utc": "2026-08-20T00:00:00Z", "to_utc_inclusive": "2026-08-26T23:55:00Z"},
+      {"segment_index": 1, "from_utc": "2026-08-27T00:00:00Z", "to_utc_inclusive": "2026-09-02T23:55:00Z"},
+      {"segment_index": 2, "from_utc": "2026-09-03T00:00:00Z", "to_utc_inclusive": "2026-09-09T23:55:00Z"},
+      {"segment_index": 3, "from_utc": "2026-09-10T00:00:00Z", "to_utc_inclusive": "2026-09-16T23:55:00Z"}
+    ],
+    "theoretical_m5_slots_per_segment": 2016,
+    "theoretical_m5_slots_full_window": 8064,
+    "breadth_first_request_order": "SEGMENT_MAJOR_THEN_FROZEN_MASTER1576_ORDER"
+  },
+  "existing_data_reuse_accounting": {
+    "policy": "CREDIT_RAW_REUSE_ONLY_WHEN_EXACT_BYTES_ARE_MACHINE_ACCESSIBLE_AND_IDENTITY_TIMESTAMP_FINGERPRINT_COMPATIBLE",
+    "primary145_manifest_identity_count": 145,
+    "late_join_archive_member_count": 40,
+    "late_join_distinct_new_identities_reported": 33,
+    "older_13w_archive_identity_count": 40,
+    "late_join_and_older_13w_identity_sets_identical": true,
+    "primary145_overlap_with_late_join_or_older13w": 6,
+    "union_existing_manifest_identity_count": 179,
+    "union_existing_manifest_current_master_overlap_count": 178,
+    "historical_identity_no_longer_in_master_symbol_ids": [2922],
+    "accepted_raw_bytes_durably_available_in_repository_or_current_machine_workspace_count": 0,
+    "exact_full_window_raw_reuse_identity_count": 0,
+    "capture_required_identity_count": 1576,
+    "known_manifest_overlap_but_raw_inaccessible_count": 178,
+    "current_master_without_known_existing_manifest_overlap_count": 1398,
+    "note": "Manifests and hashes prove prior captures but are not raw bytes. No duplicate-data request is credited away unless exact raw bytes are available at future pre-execution reconciliation. If exact bytes become machine-accessible before a separately audited arm, only the frozen missing intervals may be requested; this does not change the prearm plan or reorder the universe."
+  },
+  "transport_and_pagination": {
+    "source": "CTRADER_OPEN_API_ONLY",
+    "historical_message": "ProtoOAGetTrendbarsReq",
+    "historical_response": "ProtoOAGetTrendbarsRes",
+    "page_size": 5000,
+    "single_connection": true,
+    "maximum_historical_request_rate_per_connection": 4,
+    "minimum_request_interval_seconds": 0.25,
+    "heartbeat_idle_seconds": 10,
+    "automatic_token_refresh": false,
+    "alternate_account": false,
+    "max_wire_attempts_per_logical_request": 3,
+    "retryable_transport_classes": ["TIMEOUT", "CONNECTION_RESET", "SERVER_UNAVAILABLE"],
+    "auth_or_token_failure_policy": "FAIL_CLOSED_NO_REFRESH",
+    "rate_limit_error_policy": "FAIL_CLOSED_FOR_SEPARATE_GOVERNANCE",
+    "pagination_law": "REQUEST_EXACT_FROZEN_SEGMENT_WITH_COUNT5000. VALIDATE_IDENTITY_RANGE_M5_ALIGNMENT_ORDER_DUPLICATES_AND_PROTECTED_BOUNDARY. IF_FROM_BOUNDARY_REACHED_COMPLETE. IF_hasMore_EXPOSED_FALSE_COMPLETE. IF_hasMore_TRUE_ON_SHORT_PAGE_FAIL_CLOSED. IF_hasMore_NOT_EXPOSED_AND_SHORT_PAGE_COMPLETE. GENERIC_FULL_PAGE_CONTINUATION_MOVES_toTimestamp_TO_OLDEST_BAR_MINUS_1_WITHIN_SAME_IDENTITY_AND_SEGMENT_ONLY. PRODUCTION_SEVEN_DAY_M5_SEGMENT_HAS_AT_MOST2016_UNIQUE_ALIGNED_SLOTS_SO_A_VALID5000_BAR_FULL_PAGE_CANNOT_OCCUR; ANY_CONTRADICTION_FAILS_CLOSED.",
+    "logical_historical_request_bound": 6304,
+    "wire_attempt_bound_including_retries": 18912
+  },
+  "checkpoint_and_artifact_architecture": {
+    "checkpoint": "ATOMIC_SEALED_JSON_TMP_FSYNC_REPLACE_WITH_PLAN_HASH_COMPLETED_REQUEST_IDS_INFLIGHT_STATE_PER_SEGMENT_PAGINATION_AND_WIRE_ATTEMPTS",
+    "resume": "COMPLETED_REQUEST_NEVER_REPEATED;INCOMPLETE_REQUEST_MAY_ONLY_RETRY_SAME_IMMUTABLE_REQUEST_WITHIN_FROZEN_BOUND;NO_SCOPE_WINDOW_RESOLUTION_ACCOUNT_OR_TOKEN_ADAPTATION",
+    "deterministic_raw_shard_size_identities": 64,
+    "deterministic_raw_shard_count": 25,
+    "raw_and_compact_summary_separated": true,
+    "per_chunk_sha256": true,
+    "per_series_sha256": true,
+    "canonical_manifest": true,
+    "missing_or_failed_identity_ledger_complete1576": true,
+    "integrity_gates": [
+      "EXACT_ROW_COUNT",
+      "FIRST_LAST_TIMESTAMP",
+      "DUPLICATE_TIMESTAMP_COUNT_ZERO",
+      "STRICT_TIMESTAMP_ORDER",
+      "OHLC_INVARIANT",
+      "PROTECTED_FORWARD_ROW_COUNT_ZERO",
+      "OUT_OF_INTERVAL_ROW_COUNT_ZERO",
+      "PAGINATION_COMPLETION_EXPLICIT"
+    ],
+    "security": "NO_RAW_ACCOUNT_ID_LOGIN_CREDENTIAL_TOKEN_OR_AUTH_PAYLOAD_PERSISTENCE;KNOWN_PRIVATE_VALUE_AND_PRIVATE_FIELD_SCAN_REQUIRED"
+  },
+  "post_capture_support_law": {
+    "allowed_classifications": [
+      "SHALLOW_SUPPORT_COMPLETE",
+      "SHALLOW_SUPPORT_PARTIAL_DATA_LIMITED",
+      "NO_HISTORICAL_SUPPORT",
+      "IDENTITY_OR_MAPPING_FAILURE"
+    ],
+    "complete": "ALL_FOUR_FROZEN_SEGMENTS_EXPLICITLY_COMPLETE_AND_INTEGRITY_PASS_WITH_AT_LEAST_ONE_AUTHENTIC_M5_ROW",
+    "partial": "AT_LEAST_ONE_SEGMENT_INCOMPLETE_OR_FAILED_AFTER_BOUNDED_FAIL_CLOSED_PROCESS;AUTHENTIC_ROWS_MAY_EXIST_BUT_NO_SILENT_OMISSION",
+    "no_support": "ALL_FOUR_SEGMENTS_EXPLICITLY_COMPLETE_AND_INTEGRITY_PASS_WITH_ZERO_TOTAL_AUTHENTIC_M5_ROWS",
+    "mapping_failure": "EXACT_IDENTITY_OR_MAPPING_CANNOT_BE_PROVEN",
+    "metrics_descriptive_only": [
+      "row_count", "coverage_fraction", "active_day_count", "nonflat_bar_fraction",
+      "tick_volume_presence", "gap_fraction", "median_interbar_gap",
+      "session_region_coverage", "realized_volatility_support_only",
+      "coarse_multiscale_aggregation_availability"
+    ],
+    "deterministic_aggregation_allowed": ["M15", "M30", "H1", "H4"],
+    "forbidden_inference": ["HISTORICAL_BID_ASK_SPREAD", "TICK_MICROSTRUCTURE", "MARKET_DEPTH", "EXACT_EXECUTION_COST", "POSITIVE_NET_EXECUTION_EDGE"]
+  },
+  "forbidden_operations": [
+    "PNL_BACKTEST", "ECONOMIC_UTILITY_RANKING", "WINNER_SELECTION", "SYMBOL_TOP_K_SELECTION",
+    "PARAMETER_TUNING", "THRESHOLD_RELAXATION", "COST_RESCUE_OF_ADAPTIVE_V1",
+    "CANDIDATE_PROMOTION", "CONFIRMATION", "PROTECTED_FORWARD", "TICKS", "SPOT_SUBSCRIPTIONS",
+    "DEPTH", "ORDERS", "ACCOUNT_MUTATION", "TOKEN_REFRESH"
+  ],
+  "accounting": {
+    "search_budget_consumed": 0,
+    "economic_outcomes_opened": 0,
+    "new_economic_identity": false
+  },
+  "stop": {
+    "arm_present": false,
+    "broker_contact_this_task": false,
+    "historical_requests_sent_this_task": 0,
+    "market_outcomes_opened_this_task": 0,
+    "do_not_execute_acquisition": true
+  }
+}
