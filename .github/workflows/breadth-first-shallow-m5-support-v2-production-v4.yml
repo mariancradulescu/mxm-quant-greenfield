@@ -1,0 +1,120 @@
+name: Breadth First Shallow M5 Support V2 Production Capture V4 Boundary Corrected
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V4.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: MXM_BREADTH_FIRST_SHALLOW_M5_V2_CAPTURE_V4_SINGLETON
+  cancel-in-progress: false
+
+jobs:
+  segment-1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - name: Checkout exact ARM V4 commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: "${{ github.sha }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install protobuf==5.29.5
+      - name: Validate exact ARM V4 before secrets
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: python -m research_core_v4.shallow_m5_support_v2_production_v4 validate-arm
+      - name: Capture segment 1 through V4 corrected boundary path
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          CTRADER_CLIENT_ID: "${{ secrets.CTRADER_CLIENT_ID }}"
+          CTRADER_CLIENT_SECRET: "${{ secrets.CTRADER_CLIENT_SECRET }}"
+          CTRADER_ACCESS_TOKEN: "${{ secrets.CTRADER_ACCESS_TOKEN }}"
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/mxm-shallow-m5-v4-seg1"
+          python -m research_core_v4.shallow_m5_support_v2_production_v4 run-segment --segment 1 --workdir "$RUNNER_TEMP/mxm-shallow-m5-v4-seg1"
+      - if: always()
+        run: rm -rf "$RUNNER_TEMP/mxm-shallow-m5-v4-seg1"
+  segment-2:
+    needs: segment-1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: "${{ github.sha }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install protobuf==5.29.5
+      - name: Validate exact ARM V4 before secrets
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: python -m research_core_v4.shallow_m5_support_v2_production_v4 validate-arm
+      - name: Capture segment 2 after strict previous durable gate
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          CTRADER_CLIENT_ID: "${{ secrets.CTRADER_CLIENT_ID }}"
+          CTRADER_CLIENT_SECRET: "${{ secrets.CTRADER_CLIENT_SECRET }}"
+          CTRADER_ACCESS_TOKEN: "${{ secrets.CTRADER_ACCESS_TOKEN }}"
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/mxm-shallow-m5-v4-seg2"
+          python -m research_core_v4.shallow_m5_support_v2_production_v4 run-segment --segment 2 --workdir "$RUNNER_TEMP/mxm-shallow-m5-v4-seg2"
+      - if: always()
+        run: rm -rf "$RUNNER_TEMP/mxm-shallow-m5-v4-seg2"
+  segment-3:
+    needs: segment-2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: "${{ github.sha }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install protobuf==5.29.5
+      - name: Validate exact ARM V4 before secrets
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: python -m research_core_v4.shallow_m5_support_v2_production_v4 validate-arm
+      - name: Capture segment 3 after strict previous durable gate
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          CTRADER_CLIENT_ID: "${{ secrets.CTRADER_CLIENT_ID }}"
+          CTRADER_CLIENT_SECRET: "${{ secrets.CTRADER_CLIENT_SECRET }}"
+          CTRADER_ACCESS_TOKEN: "${{ secrets.CTRADER_ACCESS_TOKEN }}"
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/mxm-shallow-m5-v4-seg3"
+          python -m research_core_v4.shallow_m5_support_v2_production_v4 run-segment --segment 3 --workdir "$RUNNER_TEMP/mxm-shallow-m5-v4-seg3"
+      - if: always()
+        run: rm -rf "$RUNNER_TEMP/mxm-shallow-m5-v4-seg3"
+  segment-4:
+    needs: segment-3
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: "${{ github.sha }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install protobuf==5.29.5
+      - name: Validate exact ARM V4 before secrets
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: python -m research_core_v4.shallow_m5_support_v2_production_v4 validate-arm
+      - name: Capture segment 4 and final manifest
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          CTRADER_CLIENT_ID: "${{ secrets.CTRADER_CLIENT_ID }}"
+          CTRADER_CLIENT_SECRET: "${{ secrets.CTRADER_CLIENT_SECRET }}"
+          CTRADER_ACCESS_TOKEN: "${{ secrets.CTRADER_ACCESS_TOKEN }}"
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/mxm-shallow-m5-v4-seg4"
+          python -m research_core_v4.shallow_m5_support_v2_production_v4 run-segment --segment 4 --workdir "$RUNNER_TEMP/mxm-shallow-m5-v4-seg4"
+      - if: always()
+        run: rm -rf "$RUNNER_TEMP/mxm-shallow-m5-v4-seg4"
