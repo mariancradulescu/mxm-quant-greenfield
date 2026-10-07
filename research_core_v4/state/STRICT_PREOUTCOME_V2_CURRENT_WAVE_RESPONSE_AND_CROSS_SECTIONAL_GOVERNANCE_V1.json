@@ -1,0 +1,114 @@
+{
+  "authority": "Explicit user prospective response and cross-sectional semantics instruction 2026-10-07",
+  "baseline_reopen": false,
+  "baseline_sha256": "d57589c12af2a514903f3945c11bf87bd04ac70b880498806a75625f4095d2d1",
+  "common_domain_missingness": {
+    "delayed": "unavailable for feature/B if original availability>t",
+    "duplicates": "unavailable if required identity-timestamp duplicated",
+    "imputation": false,
+    "missing": "unavailable; no older-hour fallback or forward-fill",
+    "no_original_availability_evidence": "causal availability UNKNOWN, never PASS by inventing available_at=close_time",
+    "required_OHLC": "finite numeric values with LOW<=min(OPEN,CLOSE)<=max(OPEN,CLOSE)<=HIGH",
+    "tick_volume": "reported nonnegative integer where B/feature requires it"
+  },
+  "comparative_inputs": [],
+  "cross_sectional_exact_semantics": {
+    "L_j": "Exact hourly price location coordinate of immutable B_j(t)",
+    "MU_minus_i": "SUM(j in P_i)L_j/|P_i|",
+    "Phi": "SQRT(SUM(j in P_i)(L_j-MU_minus_i)^2/|P_i|)",
+    "R_i_h": "LN(C_i(t+300*h)/C_i(t))",
+    "Rbar_minus_i_h": "SUM(j in P_i,h^R)LN(C_j(t+300*h)/C_j(t))/|P_i,h^R|",
+    "Y_i_h": "R_i_h-Rbar_minus_i_h",
+    "availability": "Every peer required at feature entry has completed immutable B and certified availability<=t; no forward fill",
+    "cohort_authority": "Frozen accepted 1575 eligible study identities grouped by BROKER_NATIVE_CONTEXT; immutable study cohort, no claim of dynamic historical economic linkage",
+    "fresh_peer_set": "P_i(t)={j in same frozen context,j!=i, immutable B_j(t) available causally}. Freeze this set at feature timestamp t; never add response-selected identities.",
+    "horizons_M5": [
+      1,
+      12
+    ],
+    "information_source": "CROSS_SECTIONAL_RELATIVE_STATE",
+    "mechanism": "Contemporaneous within-cohort price-location dispersion conditions next-hour peer adjustment",
+    "minimum_fresh_peers": 2,
+    "minimum_valid_peer_responses": 2,
+    "missingness": "Own B/feature and own future response valid, |P_i(t)|>=2 and |P_i,h^R|>=2. No filling/imputation, no substitutions outside frozen P_i(t). Retain peer set sizes and missingness reasons.",
+    "nonredundancy_domain_law": "Hold own B fixed; vary legal fresh peer hourly locations in same study context to vary Phi. Only structural nonredundancy, no predictive claim",
+    "own_identity_excluded": true,
+    "response_role": "Own relative-to-contemporaneous-peer adjustment, as explicit new user authority",
+    "units": "DIMENSIONLESS",
+    "valid_response_peer_set": "P_i,h^R subset of frozen P_i(t): complete h-bar future window with valid finite OHLC and positive close endpoints. Invalid responses are missing, never zero."
+  },
+  "duration_selected": false,
+  "feature_authority_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_PROSPECTIVE_EXACT_SEMANTIC_AUTHORITIES_V3.json",
+  "feature_authority_sha256": "0de0dff0a36834a3d6bf78e62dae0e811c0cc6df5a40f34cf8bc2313e81f3558",
+  "four_feature_maps_retuned": false,
+  "historical_outcome_inputs": [],
+  "market_row_inputs": [],
+  "new_prospective_design_choices": true,
+  "power_trials": 0,
+  "response_authorities": {
+    "BROKER_NATIVE_ACTIVITY_STATE": {
+      "Y_h": "LN(C_i(t+300*h)/C_i(t))",
+      "horizons_M5": [
+        1,
+        12
+      ],
+      "missingness": "Own baseline/feature and all declared future window bars required; no fill/imputation",
+      "positive_prices": "Both close endpoints >0",
+      "response_preserved": true
+    },
+    "MULTISCALE_PRICE_STATE": {
+      "Y_h": "LN(C_i(t+300*h)/C_i(t))",
+      "horizons_M5": [
+        1,
+        12
+      ],
+      "missingness": "Own baseline/feature and all declared future window bars required; no fill/imputation",
+      "positive_prices": "Both close endpoints >0",
+      "response_preserved": true
+    },
+    "REGIME_AND_STRUCTURAL_BREAK_STATE": {
+      "D0": "12 per-bar price locations from H0=[t-3600,t), as inherited",
+      "Dplus1": "12 per-bar price locations from immediately next completed UTC hour [t,t+3600)",
+      "Y_12": "1-SUM(j=1..12)ABS(SORT(Dplus1)_j-SORT(D0)_j)/12",
+      "codomain": "[0,1]",
+      "decision_schedule": "t%3600=0 only for this candidate",
+      "feature_change": false,
+      "horizon_contraction": "1 M5 cannot define a full nonoverlapping future hour distribution; prospective mechanism-specific contraction, not performance-based horizon selection",
+      "horizons_M5": [
+        12
+      ],
+      "interpretation": "HIGHER_VALUE_MEANS_GREATER_STATE_PERSISTENCE",
+      "location": "(CLOSE-LOW)/(HIGH-LOW) if HIGH>LOW else 0.5",
+      "missingness": "Any required future bar missing, duplicate or invalid/nonfinite OHLC => RESPONSE_UNAVAILABLE; no imputation",
+      "role": "State persistence information only; separate downstream economic incremental certification",
+      "schedule_reason": "Only at UTC hour boundary does next nonoverlapping UTC hour [h,h+3600) equal a wholly future twelve-M5 response window starting at entry t. Other M5 decision times are not in this candidate response schedule; feature map unchanged."
+    },
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE": {
+      "Y_h": "SUM(k=1..h)[LN(CLOSE_{t+k}/OPEN_{t+k})]^2",
+      "feature_change": false,
+      "future_window": "[t,t+300*h)",
+      "horizons_M5": [
+        1,
+        12
+      ],
+      "missingness": "Any required future bar missing, duplicate, invalid/nonfinite or nonpositive OPEN/CLOSE => RESPONSE_UNAVAILABLE; no imputation",
+      "positive_prices": "Every future OPEN and CLOSE must be >0",
+      "role": "Variation information only; separate downstream economic incremental certification before trading promotion",
+      "units": "DIMENSIONLESS_SQUARED_LOG_VARIATION"
+    }
+  },
+  "response_values_opened": false,
+  "schema": "mxm.v4.current-testability-prospective-governance.v1",
+  "start_head": "f261771cadef7d1f9b5225fd02e7eeb68c767a18",
+  "supports_measured": false,
+  "time_index_law": {
+    "C_i(t)": "close of bar [t-300,t), latest fully completed M5",
+    "bar_key": "M5 interval open s represents [s,s+300)",
+    "entry_grid": "t%300=0",
+    "features": "Inherited exact feature maps are evaluated at the same t; no changing their anchors",
+    "future_k": "bar [t+(k-1)*300,t+k*300), k=1..horizon",
+    "h0_anchor": "h=floor(t/3600)*3600; H0=[h-3600,h)",
+    "original_availability": "Required feature/B records completed and authentic original availability<=t. Acquisition/receipt time is not substituted for historical availability.",
+    "unit": "integer UTC epoch seconds"
+  }
+}
