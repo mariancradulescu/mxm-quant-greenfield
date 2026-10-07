@@ -1,0 +1,27 @@
+name: MASTER1576 V2 Private Key Readiness Only
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/MASTER1576_QUALIFICATION_V2_PRIVATE_KEY_READINESS_TRIGGER_V1.txt
+permissions:
+  contents: read
+jobs:
+  private-key-readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify existing private key only without market data
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          python research_core_v4/asymmetric_recovery_v4_gate.py --keypair-only
