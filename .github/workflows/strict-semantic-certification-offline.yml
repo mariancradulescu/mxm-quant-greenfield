@@ -1,0 +1,30 @@
+name: Strict Preoutcome V2 Semantic Certification and Frozen Functional Offline Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_SEMANTIC_*.json
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_OWN_INFORMATION_BASELINE_CERTIFICATE_V1.json
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_NEXT_MINIMUM_STRUCTURAL_DISCRIMINATOR_PLAN_V1.json
+      - research_core_v4/strict_semantic_certification_v1.py
+      - research_core_v4/strict_semantic_certification_preflight_v1.py
+      - research_core_v4/master1576_current_state_guard_v5.py
+      - tests/test_strict_semantic_certification_v1.py
+      - .github/workflows/strict-semantic-certification-offline.yml
+permissions:
+  contents: read
+jobs:
+  semantic-certification-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact head semantic isolation freeze order and unchanged functional checks
+        run: python -m research_core_v4.strict_semantic_certification_preflight_v1

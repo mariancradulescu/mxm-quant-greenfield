@@ -1,0 +1,96 @@
+{
+  "availability_timestamp_map": {
+    "additional_modality_already_certified": null,
+    "completed_M5_constraint": "No forming bars or post-entry inputs",
+    "exact_map": null
+  },
+  "candidate_definition_sha256": "6c9def9ed833c728a4bbb3886bacea1feb11572e896b84a981cc59a2522aa6b4",
+  "cohort_or_linkage_domain": {
+    "authoritative_extra_contract_certified": null,
+    "exact_linkage_contract": null,
+    "frozen_definition": {
+      "available_contexts": [
+        "AT Equities",
+        "AU Equities",
+        "BE Equities",
+        "CH Equities",
+        "Commodities (Cash)",
+        "Crypto Currency (Spot)",
+        "Currency Index (Spot)",
+        "DE Equities",
+        "DK Equities",
+        "ES Equities",
+        "ETFs",
+        "Energies (Spot)",
+        "FI Equities",
+        "FR Equities",
+        "Forex (Spot)",
+        "Forwards - Commodities",
+        "Forwards - Indices",
+        "Forwards - Treasuries",
+        "GB Equities",
+        "HK Equities",
+        "IE Equities",
+        "Indices (Spot)",
+        "Metals (Spot)",
+        "NO Equities",
+        "PT Equities",
+        "Perpetual Commodity",
+        "Perpetual Stock",
+        "SE Equities",
+        "US Equities"
+      ],
+      "context_policy": "Every broker native context evaluated as its own structural cohort; no support or activity ranking",
+      "membership_rule": "All eligible identities in a context; authoritative linkage required for basket, peer or contract relations; no name-only linkage"
+    }
+  },
+  "constructive_nonredundancy_witness_or_redundancy_proof": {
+    "proof": null,
+    "reason": "Two legal states with identical B_t and different Phi_i cannot be certified without choosing the unresolved maps and domain. No formula is invented.",
+    "status": "NOT_CERTIFIABLE",
+    "witness": null
+  },
+  "exact_baseline_map_B_t": {
+    "map": null,
+    "ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_OWN_INFORMATION_BASELINE_CERTIFICATE_V1.json",
+    "sha256": "3a605e7ae34658c2c2010de8e6ed3ccee0b2478f8f68116fd819ae5d1736fe31",
+    "status": "FORMALIZATION_UNRESOLVED"
+  },
+  "exact_feature_map_Phi_i": null,
+  "formalization_status": "FORMALIZATION_UNRESOLVED",
+  "information_source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE",
+  "input_domain": {
+    "exact_domain": null,
+    "frozen_observable_inputs": "Completed canonical M5 OHLC"
+  },
+  "preentry_information_readset": {
+    "exact_readset": null,
+    "frozen_preentry_law": "Use only observations with authentic availability <= entry timestamp; completed intervals only; effective metadata known by entry"
+  },
+  "semantic_equivalence_to_frozen_proposal_proof": {
+    "feature_formalization_gaps": [
+      "Variation measure and concentration operator across the twelve M5 bars are unspecified.",
+      "No exact unit/normalization or flat-hour rule is fixed."
+    ],
+    "frozen_mechanism": "Completed-hour variation concentration across its twelve M5 bars conditions next-hour variation",
+    "reason": "Certificate records the exact missing choices; it does not complete or improve the mechanism.",
+    "shared_baseline_gaps": [
+      "aggregation_clock_domain",
+      "broker_activity_projection",
+      "causal_clock_controls",
+      "hourly_price_location",
+      "last_completed_M5_projection",
+      "range_projection"
+    ],
+    "status": "NO_NEW_FORMULA_OR_MECHANISM_ADDED"
+  },
+  "sigma_containment_verdict": "UNRESOLVED_BASELINE_AND_FEATURE_MAPS_NOT_UNIQUELY_DETERMINED",
+  "synchronization_requirement": {
+    "exact_identity_time_mask": null,
+    "frozen_law": "Exact authentic common timestamps for related identities; no forward-filled prices; own interval requires all twelve M5 observations"
+  },
+  "units": {
+    "exact_feature_units": null,
+    "reason": "The missing feature map and normalization prevent a unique unit specification."
+  }
+}

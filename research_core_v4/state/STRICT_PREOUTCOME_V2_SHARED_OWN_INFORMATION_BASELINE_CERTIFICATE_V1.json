@@ -1,0 +1,89 @@
+{
+  "CAUSAL_AVAILABILITY_TIMESTAMPS": {
+    "exact_map": null,
+    "required": "Each authentic availability timestamp must precede or equal entry, with closed bars only"
+  },
+  "CLOCK_CONTROLS": null,
+  "COMPLETED_BAR_LAW": "Use completed M5 and completed hourly observations only; no forming-bar or future response input. Exact hour anchoring remains unresolved.",
+  "DOMAIN": {
+    "canonical_resolution_minutes": 5,
+    "exact_state_and_aggregation_domain": null
+  },
+  "EXACT_MATHEMATICAL_MAP": null,
+  "INPUT_VARIABLES": {
+    "available_schema_fields": [
+      "identity",
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "baseline_inclusion_projection": null,
+    "note": "Available raw fields are not automatically included in B_t."
+  },
+  "MISSINGNESS_LAW": {
+    "exact_mask": null,
+    "required": "No imputation; missing inputs make the feature window unavailable"
+  },
+  "OUTPUT_SIGMA_ALGEBRA_INTERPRETATION": "sigma(B_t) cannot be instantiated uniquely while the projection and clock maps are unspecified. No raw-path baseline or invented smaller projection is assumed.",
+  "READ_SET": {
+    "exact_variables_and_timestamps": null,
+    "required_semantic_components": [
+      "last_completed_M5_projection",
+      "hourly_price_location",
+      "range_projection",
+      "broker_activity_projection",
+      "causal_clock_controls",
+      "aggregation_clock_domain"
+    ]
+  },
+  "UNITS": {
+    "broker_activity": "Reported count; inclusion and aggregation map not fixed",
+    "broker_price_fields": "Broker-native units; normalization and per-identity quote units not fixed here",
+    "clock": "Exact clock coordinate/encoding not fixed"
+  },
+  "component_formalization": {
+    "aggregation_clock_domain": {
+      "map": null,
+      "reason": "Completed-hour alignment and interval boundary convention are not uniquely specified; neutral resolution alone is insufficient.",
+      "status": "FORMALIZATION_UNRESOLVED"
+    },
+    "broker_activity_projection": {
+      "map": null,
+      "reason": "A last-bar count, completed-hour aggregate or full within-hour vector would define different baseline sigma-algebras; the prose does not choose.",
+      "status": "FORMALIZATION_UNRESOLVED"
+    },
+    "causal_clock_controls": {
+      "map": null,
+      "reason": "The exact clock variables, timezone/session semantics and encoding are not specified.",
+      "status": "FORMALIZATION_UNRESOLVED"
+    },
+    "hourly_price_location": {
+      "map": null,
+      "reason": "No unique location transformation, completed-hour anchor or treatment of flat high-low intervals is specified.",
+      "status": "FORMALIZATION_UNRESOLVED"
+    },
+    "last_completed_M5_projection": {
+      "map": null,
+      "reason": "The prose does not say whether the raw last bar, selected price fields or a derived M5 state enter B_t.",
+      "status": "FORMALIZATION_UNRESOLVED"
+    },
+    "range_projection": {
+      "map": null,
+      "reason": "Which M5/hour interval, price-unit versus normalized/log range representation and degeneracy law are not fixed.",
+      "status": "FORMALIZATION_UNRESOLVED"
+    }
+  },
+  "formalization_status": "FORMALIZATION_UNRESOLVED",
+  "frozen_baseline_text": "Own last completed M5 and hourly price location, range and broker activity, with causal clock controls; incremental predictor excluded from baseline",
+  "market_rows_used": 0,
+  "new_design_choice_added": false,
+  "schema": "mxm.v4.strict-preoutcome-v2.shared-baseline-certificate.v1",
+  "unique_semantic_constraints": [
+    "Shared own-information baseline as frozen",
+    "Completed observations causally available before entry",
+    "Incremental predictor excluded from baseline"
+  ]
+}
