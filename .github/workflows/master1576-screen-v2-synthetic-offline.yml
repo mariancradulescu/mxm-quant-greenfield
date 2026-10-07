@@ -33,8 +33,8 @@ jobs:
           from pathlib import Path
           p=Path('.github/workflows/master1576-screen-v2-synthetic-offline.yml').read_text()
           assert ('secrets'+'.') not in p
-          assert 'workflow_dispatch' not in p
-          assert '--arm' not in p
+          assert ('workflow'+'_dispatch') not in p
+          assert ('--'+'arm') not in p
           PY
       - name: Execute deterministic structural and cryptographic synthetic preflight
         env:
