@@ -1,0 +1,58 @@
+name: Support V1 hash bound machine publication and real support only
+on:
+  push:
+    branches: [support-only-v1-real-campaign]
+permissions:
+  contents: write
+concurrency:
+  group: current-wave-support-only-v1
+  cancel-in-progress: false
+jobs:
+  real-support-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.3.5 ijson==3.4.0.post0
+      - name: Verify frozen launcher then publish exact preflight and ARM by REST
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,subprocess,urllib.request
+          armhead=subprocess.check_output(['git','rev-parse','HEAD^']).decode().strip()
+          path='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_EXECUTION_ARM_V1.json'
+          arm=json.loads(subprocess.check_output(['git','show',armhead+':'+path]))
+          launcher='.github/workflows/current-wave-support-v1-machine-real-publication.yml'
+          assert hashlib.sha256(open(launcher,'rb').read()).hexdigest()==arm['machine_execution_workflow_sha256']
+          assert arm['scope']=='SUPPORT_ONLY'
+          url='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/git/'
+          headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],'Accept':'application/vnd.github+json'}
+          def req(path,data=None):
+              r=urllib.request.Request(url+path,headers=headers,data=json.dumps(data).encode() if data else None,method='PATCH' if data else 'GET')
+              with urllib.request.urlopen(r) as f:return json.load(f)
+          branch='heads/performance-research-v3-20260922'
+          head=req('ref/'+branch)['object']['sha']
+          assert head in [arm['canonical_expected_implementation_head'],arm['preflight_freeze_commit'],armhead]
+          if head==arm['canonical_expected_implementation_head']:
+              req('refs/'+branch,{'sha':arm['preflight_freeze_commit'],'force':False})
+          if req('ref/'+branch)['object']['sha']!=armhead:
+              req('refs/'+branch,{'sha':armhead,'force':False})
+          assert req('ref/'+branch)['object']['sha']==armhead
+          print('EXACT_SUPPORT_ARM_PUBLICATION_PASS '+armhead)
+          PY
+          git checkout --detach "$(git rev-parse HEAD^)"
+      - name: Exactly one support-only campaign with verified durable checkpoints
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          GITHUB_SHA="$(git rev-parse HEAD)" python -m research_core_v4.current_wave_support_machine_v1 --execute
