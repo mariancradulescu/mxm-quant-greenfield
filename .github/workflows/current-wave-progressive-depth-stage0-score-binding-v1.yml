@@ -1,0 +1,47 @@
+name: Progressive depth stage0 exact synthetic score binding audit V1
+on:
+  push:
+    branches: [audit-progressive-depth-stage0-v1]
+permissions:
+  contents: read
+jobs:
+  exact-stage0-no-market:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch exact canonical parent allowlist without checkout or secrets
+        env:
+          EXACT_TARGET: ${{ github.event.before }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib,urllib.request
+          repo='mariancradulescu/mxm-quant-greenfield'
+          head=os.environ['EXACT_TARGET']
+          start='54d0c9583178c51496f9403ac79ae6d7cd833fcc'
+          authority='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_PROGRESSIVE_DEPTH_STAGE0_AUTHORITY_V1.json'
+          ah='e38388697529fbd17708aeb0480021abdc3ed366dd7dbf0eaf81f4e838eb1a36'
+          approved=set();trace=[]
+          def fetch(ref,path,target=None,expected=None):
+              assert path==authority or path in approved
+              assert not path.endswith(('.mxmenc','.npz','.bin','.zip'))
+              assert '/shards/' not in path and 'support_only_v1/' not in path
+              url='https://raw.githubusercontent.com/'+repo+'/'+ref+'/'+path
+              with urllib.request.urlopen(url,timeout=60) as f:b=f.read()
+              if expected:assert hashlib.sha256(b).hexdigest()==expected,path
+              p=pathlib.Path(target or path);p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+              trace.append({'ref':ref,'path':path,'sha256':hashlib.sha256(b).hexdigest()})
+              return b
+          a=json.loads(fetch(head,authority,expected=ah))
+          approved=set(a['immutable_inputs_sha256'])|set(a['new_artifacts_sha256'])|set(a['canonical_states'])
+          for path,h in a['immutable_inputs_sha256'].items():fetch(head,path,expected=h)
+          for path,h in a['new_artifacts_sha256'].items():fetch(head,path,expected=h)
+          for path in a['canonical_states']:
+              fetch(head,path);fetch(start,path,'baseline/'+path)
+          pathlib.Path('stage0_read_trace.json').write_text(json.dumps(trace,sort_keys=True))
+          print('EXACT_TESTED_TARGET='+head)
+          print('ALLOWLIST_FETCHES='+str(len(trace)))
+          print('CTRADER_REQUESTS=0 REAL_M5_ROWS=0 REAL_VALUES=0 POWER_TRIALS=0 NO_CHECKOUT NO_SECRETS')
+          PY
+      - name: Exact finite-population proof and frozen historical boundary tests
+        run: python research_core_v4/current_wave_power_stage0_score_binding_v1.py -v
