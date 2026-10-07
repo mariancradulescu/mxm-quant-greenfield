@@ -1,0 +1,29 @@
+name: Strict Preoutcome Reselection V2 Firewall Offline Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/STRICT_PREOUTCOME_RESELECTION_V2_*.json
+      - research_core_v4/state/PROJECT_WIDE_RESELECTION_V1_SEMANTIC_CORRECTION_AUTHORITY_V1.json
+      - research_core_v4/strict_reselection_v2.py
+      - research_core_v4/strict_reselection_v2_preflight_v1.py
+      - research_core_v4/master1576_current_state_guard_v3.py
+      - tests/test_strict_reselection_v2.py
+      - .github/workflows/strict-reselection-v2-offline.yml
+permissions:
+  contents: read
+jobs:
+  strict-firewall-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact head field flow file flow semantic collision and state tests
+        run: python -m research_core_v4.strict_reselection_v2_preflight_v1
