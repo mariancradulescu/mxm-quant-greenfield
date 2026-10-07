@@ -1,0 +1,54 @@
+name: Current wave mask-only duration boundary validation V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - 'research_core_v4/current_wave_duration_boundary_v1.py'
+      - 'research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_*DURATION*V1.json'
+      - '.github/workflows/current-wave-power-duration-boundary-v1.yml'
+permissions:
+  contents: read
+jobs:
+  exact-mask-only-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install pinned Boolean mask dependency
+        run: python -m pip install numpy==2.3.5
+      - name: Fetch only exact authorities and durable nonoutcome masks without checkout
+        env:
+          EXACT_HEAD: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib,urllib.request
+          repo='mariancradulescu/mxm-quant-greenfield'
+          head=os.environ['EXACT_HEAD']
+          start='aee51de1bcd3b8d2849a3ce0b40b6a9fa416a2f3'
+          durable='b80f8dba610153c91b051ffd5073ee3433e300c4'
+          authority='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_POWER_DURATION_BOUNDARY_AUTHORITY_V1.json'
+          authority_hash='cf94be439d32bab6ff50838650d3b967e06eeebb58aa0e861e92c90b68f2126c'
+          trace=[]
+          def fetch(ref,path,target=None,expected=None):
+              assert path==authority or path in approved
+              assert not path.endswith(('.mxmenc','.zip'))
+              url='https://raw.githubusercontent.com/'+repo+'/'+ref+'/'+path
+              with urllib.request.urlopen(url,timeout=60) as f: raw=f.read()
+              if expected: assert hashlib.sha256(raw).hexdigest()==expected,path
+              p=pathlib.Path(target or path);p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+              trace.append({'ref':ref,'path':path,'sha256':hashlib.sha256(raw).hexdigest()})
+              return raw
+          approved=set()
+          a=json.loads(fetch(head,authority,expected=authority_hash))
+          approved=set(a['immutable_input_sha256'])|set(a['new_artifact_sha256'])|set(a['canonical_states'])|set(a['durable_output_sha256'])
+          for path,h in a['immutable_input_sha256'].items(): fetch(head,path,expected=h)
+          for path,h in a['new_artifact_sha256'].items(): fetch(head,path,expected=h)
+          for path in a['canonical_states']:
+              fetch(head,path);fetch(start,path,'baseline/'+path)
+          for path,h in a['durable_output_sha256'].items():fetch(durable,path,expected=h)
+          pathlib.Path('nonoutcome_read_trace.json').write_text(json.dumps(trace,sort_keys=True))
+          print('EXACT_HEAD='+head)
+          print('ALLOWLIST_FETCHES='+str(len(trace)))
+          print('RAW_M5_READS=0 ENCRYPTED_ASSET_BODY_READS=0 NO_CHECKOUT NO_SECRETS NO_BROKER')
+          PY
+      - name: Validate full mask parity, unchanged UNKNOWN, causal ordering and historical states
+        run: python research_core_v4/current_wave_duration_boundary_v1.py -v
