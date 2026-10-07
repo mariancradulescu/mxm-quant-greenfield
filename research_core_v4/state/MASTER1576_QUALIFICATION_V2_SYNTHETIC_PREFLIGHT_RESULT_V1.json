@@ -1,0 +1,83 @@
+{
+  "bindings": {
+    "campaign_acceptance": {
+      "ref": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_FINAL_CAMPAIGN_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json",
+      "sha256": "73a7714757488bcffbc2ac48a34653e9deed50491d72e72cffc7a402f83ae38e"
+    },
+    "protocol": {
+      "ref": "research_core_v4/state/MASTER1576_POST_SHALLOW_OUTCOME_BLIND_DEEP_HISTORICAL_M5_QUALIFICATION_PROTOCOL_V2.json",
+      "sha256": "25d8b45d97fe6302af96c603202cf0f68764e844312987e54d06621c09938a30"
+    },
+    "runner": {
+      "ref": "research_core_v4/master1576_screen_v2_preflight.py",
+      "sha256": "d08aa01e547bfbe2b344a6026079a63abe8285c11c933e10c9ca66d84d170774"
+    },
+    "tests": {
+      "ref": "tests/test_master1576_screen_v2.py",
+      "sha256": "835645a9825b810770a7d27235ef0015f90cbf089931d6b703b3e94868915218"
+    },
+    "worker": {
+      "ref": "research_core_v4/master1576_screen_v2.py",
+      "sha256": "2f2ba2ce22515a1a0ba7cd121cb90171ec9726cf743515ec5bad5944386ce965"
+    }
+  },
+  "execution": {
+    "broker_contacts": 0,
+    "confirmation_opened": false,
+    "ctrader_secrets_used": false,
+    "fixture": "Synthetic constant OHLC and volumes across all100 synthetic shards and all1576 accepted identities; separate generated synthetic RSA2048/AES256 cryptographic fixtures. No real encrypted asset downloaded.",
+    "new_history_requests": 0,
+    "protected_forward_opened": false,
+    "real_screen_executed": false,
+    "real_shards_decrypted": 0,
+    "search_budget_use": 0
+  },
+  "job_name": "exact-head-synthetic",
+  "passed_tests": [
+    "tests.test_master1576_screen_v2.GovernanceBindingTests.test_29_preserved_v1_acceptance_and_manifests",
+    "tests.test_master1576_screen_v2.GovernanceBindingTests.test_30_no_new_cutoffs_or_duration",
+    "tests.test_master1576_screen_v2.GovernanceBindingTests.test_31_real_context_metadata_only_preflight",
+    "tests.test_master1576_screen_v2.GovernanceBindingTests.test_32_primary_governance_budget_preserved",
+    "tests.test_master1576_screen_v2.GovernanceBindingTests.test_35_final_rebind_when_preflight_materialized",
+    "tests.test_master1576_screen_v2.GovernanceBindingTests.test_36_exact_diff_preserves_historical_bytes",
+    "tests.test_master1576_screen_v2.SyntheticCryptoTests.test_26_existing_encryption_format_roundtrip_and_cleanup",
+    "tests.test_master1576_screen_v2.SyntheticCryptoTests.test_27_crypto_failure_cleanup",
+    "tests.test_master1576_screen_v2.SyntheticCryptoTests.test_28_key_fingerprint_rejects_before_plaintext",
+    "tests.test_master1576_screen_v2.SyntheticCryptoTests.test_33_crypto_to_structural_reducer_integration",
+    "tests.test_master1576_screen_v2.SyntheticCryptoTests.test_34_malformed_encrypted_header",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_01_qualified_all1576_zero_activity_zero_price_change",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_02_zero_row_support_limited",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_03_authoritative_cold_start_zero_rows",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_04_metadata_limited",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_05_margin_exact200_infeasible",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_06_encrypted_hash_failure_before_decrypt",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_07_plaintext_hash_failure",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_08_duplicate_timestamp",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_09_out_of_interval",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_10_protected_forward",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_11_wrong_identity",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_12_wrong_segment",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_13_malformed_price_fails_without_price_exception",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_14_outputs_exclude_ohlc_returns_pnl",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_15_repeatability_and_all_passers_order",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_16_single_segment_support_still_qualifies",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_17_incomplete_campaign_no_partial_result",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_18_exact_minimum_volume_alignment",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_19_min_margin_below200_passes_existing_gate",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_20_first_observed_timestamp_never_implies_late_start",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_21_real_route_requires_absent_separate_arm",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_22_manifest_row_count_failure",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_23_timestamp_order_and_m5_alignment",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_24_unknown_cost_is_deferred_not_zero",
+    "tests.test_master1576_screen_v2.SyntheticScreenTests.test_25_signed_canonical_prices_follow_decoder_contract"
+  ],
+  "run_id": "37575783164",
+  "schema": "mxm.v4.master1576.qualification-v2.synthetic-preflight.v1",
+  "source_head": "cae9fcf3e14135e78626e0f6c021234b46c498e9",
+  "status": "PASS_SYNTHETIC_ONLY_NO_REAL_DECRYPTION",
+  "tests_failed": 0,
+  "tests_passed": 36,
+  "tests_skipped": 0,
+  "tests_total": 36,
+  "validation_job_id": 112644252514
+}
