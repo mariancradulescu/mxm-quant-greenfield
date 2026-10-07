@@ -1,0 +1,45 @@
+{
+  "aggregation": "UTC [h,h+3600), exactly 12 authentic consecutive M5 bars",
+  "authority": "Explicit user prospective instruction 2026-10-07 before candidate rebuild",
+  "availability": "All required bars completed and authentic availability <= t; t is UTC M5 grid",
+  "builder_candidate_visibility": false,
+  "builder_historical_outcome_visibility": false,
+  "candidate_invariant": true,
+  "clock": [
+    "UTC weekday 0..6",
+    "floor((hour*60+minute)/5) 0..287"
+  ],
+  "completed_hour": [
+    "(close-low)/(high-low); flat=1/2",
+    "high-low",
+    "sum(tick_volume over 12 bars)"
+  ],
+  "decision": "COMPACT_REFERENCE_STATE_BASELINE_LAW",
+  "excluded_clock": [
+    "calendar date",
+    "trend index",
+    "DST transform"
+  ],
+  "forbidden": [
+    "full 12 M5 activity vector in baseline",
+    "full 12 M5 price path in baseline",
+    "candidate-specific baseline",
+    "post-certificate retuning",
+    "performance based choice"
+  ],
+  "implementation_input_law": "One identity per call, immutable point-in-time bars; no revisions backdated",
+  "last_M5": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "tick_volume"
+  ],
+  "latest_hour": "Immediate latest fully elapsed UTC calendar hour; missing or delayed constituent makes state unavailable, no fallback to an older hour",
+  "missingness": "None on any missing required bar/field; no fill/imputation",
+  "normalization": "None; one-to-one reencoding only preserves sigma algebra",
+  "role": "Shared causal reference state, not maximal own-history sigma algebra",
+  "schema": "mxm.v4.compact-reference-governance.v2",
+  "source_head": "e7d3ef8b64fbf0133e751f10757a187e8ea9813f",
+  "units": "Broker-native prices and reported nonnegative integer counts"
+}
