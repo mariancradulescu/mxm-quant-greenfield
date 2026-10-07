@@ -1,0 +1,998 @@
+{
+  "accepted_start_head": "6f776c535b8df9cf87aaeddbafc0f47c643e77f5",
+  "auxiliary_workflow_files_sha256_and_ancestry": [
+    {
+      "commit": "0e90a4eb7ae933ef4bfd8341305ed173c0189ac3",
+      "parent": "e6e0a397ab82a7e73807c6912b53a121c781f1c5",
+      "path": ".github/workflows/current-wave-support-v1-machine-preflight-publication.yml",
+      "sha256": "9565f6a2e3e99737e49106c51f382f06f0970fa1b4c5bf314d8747a3661296f5"
+    },
+    {
+      "commit": "1691e294a43f3b7a7a602ddd6845c0921f008ee8",
+      "parent": "28efbc017d5b1dfd61c6516b1464bf8c41b9a84b",
+      "path": ".github/workflows/current-wave-support-v1-machine-final-preflight-publication.yml",
+      "sha256": "3d99c7a45c15f3031171ef7d98a1071d49891b78cffec29313362ba6f30f0247"
+    },
+    {
+      "commit": "9c9707954806ad7bdb57aa0a1418a7faa0748668",
+      "parent": "4a9ab528e07c435935249c0a15a402ece4c65daa",
+      "path": ".github/workflows/current-wave-support-v1-machine-real-publication.yml",
+      "sha256": "6e65713e61d8774813f90ba3c87dbab74343f4ad85672824b50f1818e511192f"
+    },
+    {
+      "commit": "SUPPLIED_EXTERNALLY_AFTER_FINAL_PARENT_FREEZE",
+      "parent": "EXACT_FINAL_HEAD_SUPPLIED_EXTERNALLY",
+      "path": ".github/workflows/current-wave-support-v1-machine-final-delivery.yml",
+      "sha256": "9291a91d321c6916d821d91bbbb6b40083054cb51eccad3294756e9df00dd312"
+    }
+  ],
+  "changed_files_sha256": {
+    ".github/workflows/current-wave-support-v1-preflight.yml": "9192c9e9c8bc915bcd0af4bef3914ea3adad47fe5646d60262df920cd44b851d",
+    ".github/workflows/current-wave-support-v1-real.yml": "d03e365069fd0647417758ecc151ccf0ec222fd0d55c4506a3f425585336820e",
+    "adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json": "1e94c65d61e5da6da4d7ad230eecf9cf00cce535f30dca48d7c7351adc0ff3b6",
+    "adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json": "f0edb9ad784adfc6291b17246922368f209d1f3faafa89374a2a4aab0b23535c",
+    "research_core_v4/current_wave_support_final_validation_v1.py": "954fdf191b57b0f73c9e8a0022932d3960cb4c6616032d17e07098a9eb23ceb1",
+    "research_core_v4/current_wave_support_machine_v1.py": "1be6cc40d58f93f4d3e90683f7aa1129554caf198c79beac8776f0b90c364f9d",
+    "research_core_v4/current_wave_support_output_audit_v1.py": "7356a45e558a892bbc17ce01b1dbc6ccb9f3dd8b42418782d34c3b95f5cc8e87",
+    "research_core_v4/current_wave_support_worker_v1.py": "9778d32ef58c0d6cc47cd76d77d8555bf10d4a1a0901fb86cf2a230f28b4c6e2",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_DEPENDENCE_GEOMETRY_RESULT_V1.json": "09fff25dbac560a2564ca772f0e848a915e40a400ca65a4a642def794a859208",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_EXECUTION_ARM_V1.json": "a770434a0c0108bdaf18e2436dd85710b0f3e188e686f94158bb14f7490530ab",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_EXECUTION_AUTHORITY_V1.json": "5bbad382604e48a2ced7108affe74ba0ab77519f1988df0971f596b2476e4c3e",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_IMPLEMENTATION_FREEZE_V1.json": "30403e44269c51357488083a4af9d4eeefa9159915dd8b325439b86684c4f144",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_MACHINE_PREFLIGHT_RESULT_V1.json": "141eeb56b17f7e49e6520f3824ab6219cab8c56efd7984dea1971c311eed7840",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_RESULT_V1.json": "db6dde68ee31498d18b0815164df094a5858b2da186199d61037dbf1d74ed7b3",
+    "research_core_v4/state/V4_STATE.json": "d4559880acf0ba113cd9c04e5b1c094fac78b8b8ff3fb68b29d698b4503ecad5",
+    "research_core_v4/tests/test_current_wave_support_v1.py": "478a8c7ab50302428ffd2dab76e7f7b3b1629b339cc17d6a0f5639601c26c6f3"
+  },
+  "checkpoint_commit_ancestry": [
+    {
+      "message": "Claim exactly one support-only campaign",
+      "parents": [
+        "4a9ab528e07c435935249c0a15a402ece4c65daa"
+      ],
+      "sha": "ae2da5c13b3ec64d9108813a999042b56783af01"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 1/100",
+      "parents": [
+        "ae2da5c13b3ec64d9108813a999042b56783af01"
+      ],
+      "sha": "bfab0101f4f68ec8bbcbb35473241b59375bcda8"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 2/100",
+      "parents": [
+        "bfab0101f4f68ec8bbcbb35473241b59375bcda8"
+      ],
+      "sha": "781233a67e634873669dce609a5976116f03913f"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 3/100",
+      "parents": [
+        "781233a67e634873669dce609a5976116f03913f"
+      ],
+      "sha": "69f73f44936d51fe6cc342aa07da5a74be0e7a37"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 4/100",
+      "parents": [
+        "69f73f44936d51fe6cc342aa07da5a74be0e7a37"
+      ],
+      "sha": "630d22f75f34b29a11bbb1eee5a596dc027a13f3"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 5/100",
+      "parents": [
+        "630d22f75f34b29a11bbb1eee5a596dc027a13f3"
+      ],
+      "sha": "155bb0e0b233cc34fbb7cf42b2d6fa62fea3312c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 6/100",
+      "parents": [
+        "155bb0e0b233cc34fbb7cf42b2d6fa62fea3312c"
+      ],
+      "sha": "c3b38ed3f9404aa19320e29154a16f32016dad37"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 7/100",
+      "parents": [
+        "c3b38ed3f9404aa19320e29154a16f32016dad37"
+      ],
+      "sha": "9a2337a681537ddd71e47c51af981f8003460a6d"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 8/100",
+      "parents": [
+        "9a2337a681537ddd71e47c51af981f8003460a6d"
+      ],
+      "sha": "2eb4026ec82fdbba6a14598242dc6e327c81bb5c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 9/100",
+      "parents": [
+        "2eb4026ec82fdbba6a14598242dc6e327c81bb5c"
+      ],
+      "sha": "15a178d16453a6f7b5160db81abbbd4fc0fbde41"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 10/100",
+      "parents": [
+        "15a178d16453a6f7b5160db81abbbd4fc0fbde41"
+      ],
+      "sha": "ab77c8436426fb9ac80a1e6da5535e02de158d98"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 11/100",
+      "parents": [
+        "ab77c8436426fb9ac80a1e6da5535e02de158d98"
+      ],
+      "sha": "a32eafde6f4e99a0363d98766ddd9f967ab216ff"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 12/100",
+      "parents": [
+        "a32eafde6f4e99a0363d98766ddd9f967ab216ff"
+      ],
+      "sha": "c16f2cb2cbf48a70fff51b4d084e3f77363f1f79"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 13/100",
+      "parents": [
+        "c16f2cb2cbf48a70fff51b4d084e3f77363f1f79"
+      ],
+      "sha": "fe124b416451917bd0a8465e1e848807b4304bc8"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 14/100",
+      "parents": [
+        "fe124b416451917bd0a8465e1e848807b4304bc8"
+      ],
+      "sha": "34efc1f8eff50d989e96f4e23e63f3d1687dec53"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 15/100",
+      "parents": [
+        "34efc1f8eff50d989e96f4e23e63f3d1687dec53"
+      ],
+      "sha": "8e53de616dd8fb5ff147822a8a4e5918a556572f"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 16/100",
+      "parents": [
+        "8e53de616dd8fb5ff147822a8a4e5918a556572f"
+      ],
+      "sha": "d180884c5ae4407f90b079a0defd998f54385759"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 17/100",
+      "parents": [
+        "d180884c5ae4407f90b079a0defd998f54385759"
+      ],
+      "sha": "5ccd264e96349766e975c24bac868d9a5f51093e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 18/100",
+      "parents": [
+        "5ccd264e96349766e975c24bac868d9a5f51093e"
+      ],
+      "sha": "8ac7e58e236c0bf5d9cd874cb6c690d0da4881cd"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 19/100",
+      "parents": [
+        "8ac7e58e236c0bf5d9cd874cb6c690d0da4881cd"
+      ],
+      "sha": "d9d4753368a51ef60b252a6fab6d9932051719b4"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 20/100",
+      "parents": [
+        "d9d4753368a51ef60b252a6fab6d9932051719b4"
+      ],
+      "sha": "d56db05d9b995a10179b7393eb84916c423a9107"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 21/100",
+      "parents": [
+        "d56db05d9b995a10179b7393eb84916c423a9107"
+      ],
+      "sha": "36d47ce1b1b043c51003a6a91e1391a84da18f3c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 22/100",
+      "parents": [
+        "36d47ce1b1b043c51003a6a91e1391a84da18f3c"
+      ],
+      "sha": "084940fc89321f908d46cb573c668c8d3a5bd342"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 23/100",
+      "parents": [
+        "084940fc89321f908d46cb573c668c8d3a5bd342"
+      ],
+      "sha": "a867ec627e45534c055b7e981c7ee82fedf69a06"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 24/100",
+      "parents": [
+        "a867ec627e45534c055b7e981c7ee82fedf69a06"
+      ],
+      "sha": "521bd6c720873ebcda3c7781c0ec5d01d558f553"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 25/100",
+      "parents": [
+        "521bd6c720873ebcda3c7781c0ec5d01d558f553"
+      ],
+      "sha": "147cc6ede129f2fc124ac73f81555346152eaeae"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 26/100",
+      "parents": [
+        "147cc6ede129f2fc124ac73f81555346152eaeae"
+      ],
+      "sha": "816717ecbda04308a9a4e92eddfe2066f085c821"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 27/100",
+      "parents": [
+        "816717ecbda04308a9a4e92eddfe2066f085c821"
+      ],
+      "sha": "ea2b2d9c8b1e94b439b237ebbdd66b27431c7b65"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 28/100",
+      "parents": [
+        "ea2b2d9c8b1e94b439b237ebbdd66b27431c7b65"
+      ],
+      "sha": "4079c7a58e26894c1ec78652db65e7949935cadb"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 29/100",
+      "parents": [
+        "4079c7a58e26894c1ec78652db65e7949935cadb"
+      ],
+      "sha": "bea5791dcfebe6c9433f762d41fcbc63a8a950be"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 30/100",
+      "parents": [
+        "bea5791dcfebe6c9433f762d41fcbc63a8a950be"
+      ],
+      "sha": "32bef519a155b06571087048beb9813ddf55ac83"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 31/100",
+      "parents": [
+        "32bef519a155b06571087048beb9813ddf55ac83"
+      ],
+      "sha": "b6cf6b5f1c6b4d665cf93a7eb5a8c97102b860f2"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 32/100",
+      "parents": [
+        "b6cf6b5f1c6b4d665cf93a7eb5a8c97102b860f2"
+      ],
+      "sha": "848cdf2cf9d6d6c6f1d7b4578d5eea4bc4ddb019"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 33/100",
+      "parents": [
+        "848cdf2cf9d6d6c6f1d7b4578d5eea4bc4ddb019"
+      ],
+      "sha": "e2be194f9258200d5142691108abaa941519e036"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 34/100",
+      "parents": [
+        "e2be194f9258200d5142691108abaa941519e036"
+      ],
+      "sha": "154bd04e310beb8330a61b1f389fefeb9df86a83"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 35/100",
+      "parents": [
+        "154bd04e310beb8330a61b1f389fefeb9df86a83"
+      ],
+      "sha": "50ff017b16fc400d4bb596676fca3b65408d373b"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 36/100",
+      "parents": [
+        "50ff017b16fc400d4bb596676fca3b65408d373b"
+      ],
+      "sha": "6d76e5cfe137da3169f36d49c8cc8783a94d5937"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 37/100",
+      "parents": [
+        "6d76e5cfe137da3169f36d49c8cc8783a94d5937"
+      ],
+      "sha": "2e2ec0f66b3324d34a62636067ddca6447040233"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 38/100",
+      "parents": [
+        "2e2ec0f66b3324d34a62636067ddca6447040233"
+      ],
+      "sha": "53ee12cb03f0ee8d79725b234d86e1bc7fbad11c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 39/100",
+      "parents": [
+        "53ee12cb03f0ee8d79725b234d86e1bc7fbad11c"
+      ],
+      "sha": "5a12e5f50734398711d201b52fd8182cb522201c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 40/100",
+      "parents": [
+        "5a12e5f50734398711d201b52fd8182cb522201c"
+      ],
+      "sha": "fa60cbfb28d7db76999f7b1ca22bf8c2f3ed9532"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 41/100",
+      "parents": [
+        "fa60cbfb28d7db76999f7b1ca22bf8c2f3ed9532"
+      ],
+      "sha": "6918926876b92fa3cc42e4e75d170908d29edaa0"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 42/100",
+      "parents": [
+        "6918926876b92fa3cc42e4e75d170908d29edaa0"
+      ],
+      "sha": "456d8dffaf6ba7ee9a450d50798c66b6f38fc7f6"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 43/100",
+      "parents": [
+        "456d8dffaf6ba7ee9a450d50798c66b6f38fc7f6"
+      ],
+      "sha": "c319912d1364a63b4ab425a0554b6592a63e1b07"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 44/100",
+      "parents": [
+        "c319912d1364a63b4ab425a0554b6592a63e1b07"
+      ],
+      "sha": "45222a0b13c565233323c0dbe30356d8095710ee"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 45/100",
+      "parents": [
+        "45222a0b13c565233323c0dbe30356d8095710ee"
+      ],
+      "sha": "83efa74083a20601fdc93f0212959f264235af16"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 46/100",
+      "parents": [
+        "83efa74083a20601fdc93f0212959f264235af16"
+      ],
+      "sha": "e5bac2a41c87c2629762996b0d5ccf1bfcfd65de"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 47/100",
+      "parents": [
+        "e5bac2a41c87c2629762996b0d5ccf1bfcfd65de"
+      ],
+      "sha": "dc730b6f63f2b20045167ca536b8917ac1fb7ce8"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 48/100",
+      "parents": [
+        "dc730b6f63f2b20045167ca536b8917ac1fb7ce8"
+      ],
+      "sha": "c7dc067b0e31b1e232d3d8f3bd47d60040520e95"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 49/100",
+      "parents": [
+        "c7dc067b0e31b1e232d3d8f3bd47d60040520e95"
+      ],
+      "sha": "113dc899b3e7bfbbc5369bf800ff1f524af7b72e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 50/100",
+      "parents": [
+        "113dc899b3e7bfbbc5369bf800ff1f524af7b72e"
+      ],
+      "sha": "305cf5ae7752e130272fe6a713189d6e79c5498d"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 51/100",
+      "parents": [
+        "305cf5ae7752e130272fe6a713189d6e79c5498d"
+      ],
+      "sha": "c3ecf1f6c5813f01651abcd8ba4df712e68a67b7"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 52/100",
+      "parents": [
+        "c3ecf1f6c5813f01651abcd8ba4df712e68a67b7"
+      ],
+      "sha": "e3e294e11352526c7538437bd4c88133a661fbde"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 53/100",
+      "parents": [
+        "e3e294e11352526c7538437bd4c88133a661fbde"
+      ],
+      "sha": "b04abf72da22f4fc187b28e873cba49e5e8944d3"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 54/100",
+      "parents": [
+        "b04abf72da22f4fc187b28e873cba49e5e8944d3"
+      ],
+      "sha": "fe3110c13b8a18d2bd24ee90b580b6e9d96f374d"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 55/100",
+      "parents": [
+        "fe3110c13b8a18d2bd24ee90b580b6e9d96f374d"
+      ],
+      "sha": "efa2a6bc1adfe55bdbc1c83ee2e35751b20adfc8"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 56/100",
+      "parents": [
+        "efa2a6bc1adfe55bdbc1c83ee2e35751b20adfc8"
+      ],
+      "sha": "d5299e84104e080605f57ca5a134464030e8da15"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 57/100",
+      "parents": [
+        "d5299e84104e080605f57ca5a134464030e8da15"
+      ],
+      "sha": "f088a3d470967507eff06c9dd5e4de24e84d5e20"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 58/100",
+      "parents": [
+        "f088a3d470967507eff06c9dd5e4de24e84d5e20"
+      ],
+      "sha": "285307e9997818530a1f343ddfc8f34a9effd5a5"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 59/100",
+      "parents": [
+        "285307e9997818530a1f343ddfc8f34a9effd5a5"
+      ],
+      "sha": "d6245fccbb239dcb3cde1e9301a813432926418e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 60/100",
+      "parents": [
+        "d6245fccbb239dcb3cde1e9301a813432926418e"
+      ],
+      "sha": "a08928186a94e6182811de3234c63f96c61081cd"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 61/100",
+      "parents": [
+        "a08928186a94e6182811de3234c63f96c61081cd"
+      ],
+      "sha": "f28323d9d71fdafa7a8a3ba711a441cb02db5acf"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 62/100",
+      "parents": [
+        "f28323d9d71fdafa7a8a3ba711a441cb02db5acf"
+      ],
+      "sha": "3b12cfec418db83862e386bc195e1a9f59d21c1a"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 63/100",
+      "parents": [
+        "3b12cfec418db83862e386bc195e1a9f59d21c1a"
+      ],
+      "sha": "3ec232e54ed51688e5dc295986b90787b3f50417"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 64/100",
+      "parents": [
+        "3ec232e54ed51688e5dc295986b90787b3f50417"
+      ],
+      "sha": "0f0b382999490862839579a26d3fa6ff6c7b743d"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 65/100",
+      "parents": [
+        "0f0b382999490862839579a26d3fa6ff6c7b743d"
+      ],
+      "sha": "be35269e4289844a5f4460c1d13fb61b70b7b40c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 66/100",
+      "parents": [
+        "be35269e4289844a5f4460c1d13fb61b70b7b40c"
+      ],
+      "sha": "1ec9e8001721f2843ac96e9445f3376005345b82"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 67/100",
+      "parents": [
+        "1ec9e8001721f2843ac96e9445f3376005345b82"
+      ],
+      "sha": "245dbb47cff6aedafe86502ca7ff74aaefd48471"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 68/100",
+      "parents": [
+        "245dbb47cff6aedafe86502ca7ff74aaefd48471"
+      ],
+      "sha": "ea736f053b27da6f61191dae7b74e7163fbfb98b"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 69/100",
+      "parents": [
+        "ea736f053b27da6f61191dae7b74e7163fbfb98b"
+      ],
+      "sha": "6a3d5d6b6b50746aa0bb2374927a960940cae04e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 70/100",
+      "parents": [
+        "6a3d5d6b6b50746aa0bb2374927a960940cae04e"
+      ],
+      "sha": "479fceba0b196eea84875fb5ded49ec8e11cd80e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 71/100",
+      "parents": [
+        "479fceba0b196eea84875fb5ded49ec8e11cd80e"
+      ],
+      "sha": "b323119d7d47618ef1577f4102fe49a589b82081"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 72/100",
+      "parents": [
+        "b323119d7d47618ef1577f4102fe49a589b82081"
+      ],
+      "sha": "8fdea4ae9074bea83c0b78ded0fe40657863f169"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 73/100",
+      "parents": [
+        "8fdea4ae9074bea83c0b78ded0fe40657863f169"
+      ],
+      "sha": "0eb137f7249ecf6058c13fbff0080dbb1b011983"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 74/100",
+      "parents": [
+        "0eb137f7249ecf6058c13fbff0080dbb1b011983"
+      ],
+      "sha": "e608143c53a401d0f13a88d3f8b42ced243e0b07"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 75/100",
+      "parents": [
+        "e608143c53a401d0f13a88d3f8b42ced243e0b07"
+      ],
+      "sha": "f0f5dbed1c6498e814a0f20c911b3b84e4898be4"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 76/100",
+      "parents": [
+        "f0f5dbed1c6498e814a0f20c911b3b84e4898be4"
+      ],
+      "sha": "b355c12ca163d61c09bc29135711075e978c67fc"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 77/100",
+      "parents": [
+        "b355c12ca163d61c09bc29135711075e978c67fc"
+      ],
+      "sha": "d40426c13a5139780efda6de794a269ea1bad171"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 78/100",
+      "parents": [
+        "d40426c13a5139780efda6de794a269ea1bad171"
+      ],
+      "sha": "a9cec77a030734f38773f2961819438a5ba19847"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 79/100",
+      "parents": [
+        "a9cec77a030734f38773f2961819438a5ba19847"
+      ],
+      "sha": "9e3ed8e27b83810350026e95992e76699005830e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 80/100",
+      "parents": [
+        "9e3ed8e27b83810350026e95992e76699005830e"
+      ],
+      "sha": "ccca70753f2b1c9dbb96edda895587f96ea3eab3"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 81/100",
+      "parents": [
+        "ccca70753f2b1c9dbb96edda895587f96ea3eab3"
+      ],
+      "sha": "e9140cc1652e0779131d2547cd8104b479240c98"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 82/100",
+      "parents": [
+        "e9140cc1652e0779131d2547cd8104b479240c98"
+      ],
+      "sha": "481a90bed9f3af24eeacc068c98fd2bf27929262"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 83/100",
+      "parents": [
+        "481a90bed9f3af24eeacc068c98fd2bf27929262"
+      ],
+      "sha": "99f08291986d49de55534e8a3ccb199330e04eb9"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 84/100",
+      "parents": [
+        "99f08291986d49de55534e8a3ccb199330e04eb9"
+      ],
+      "sha": "22b4a610bedf08df944a0ab2a3ad4605d25f7c8f"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 85/100",
+      "parents": [
+        "22b4a610bedf08df944a0ab2a3ad4605d25f7c8f"
+      ],
+      "sha": "7a9009659a605e60e4e16c71a0e88b6ec6afa976"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 86/100",
+      "parents": [
+        "7a9009659a605e60e4e16c71a0e88b6ec6afa976"
+      ],
+      "sha": "34be0594e28159a6112bdb6eed241319ad07c331"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 87/100",
+      "parents": [
+        "34be0594e28159a6112bdb6eed241319ad07c331"
+      ],
+      "sha": "b00cc6e556c5af285e382d90e405989e00a3a9bf"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 88/100",
+      "parents": [
+        "b00cc6e556c5af285e382d90e405989e00a3a9bf"
+      ],
+      "sha": "b26a5bebf21af856f0f008f87f57298b7d6dd673"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 89/100",
+      "parents": [
+        "b26a5bebf21af856f0f008f87f57298b7d6dd673"
+      ],
+      "sha": "95cb9a5650f12edfa1da190d0119eccb351ef71c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 90/100",
+      "parents": [
+        "95cb9a5650f12edfa1da190d0119eccb351ef71c"
+      ],
+      "sha": "b6a16d55be446e8af8aad2ad3e3b547b178eccaa"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 91/100",
+      "parents": [
+        "b6a16d55be446e8af8aad2ad3e3b547b178eccaa"
+      ],
+      "sha": "01cad13a4397ae5aa2ce246c720e15331d2508c9"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 92/100",
+      "parents": [
+        "01cad13a4397ae5aa2ce246c720e15331d2508c9"
+      ],
+      "sha": "aee6e027029b506a0967b95f1d6ffb350b11911e"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 93/100",
+      "parents": [
+        "aee6e027029b506a0967b95f1d6ffb350b11911e"
+      ],
+      "sha": "7b932276286adbe132188f9f78c0cd5ab36e2786"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 94/100",
+      "parents": [
+        "7b932276286adbe132188f9f78c0cd5ab36e2786"
+      ],
+      "sha": "a32451c836e2be1f9a2510512d7224204b84a914"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 95/100",
+      "parents": [
+        "a32451c836e2be1f9a2510512d7224204b84a914"
+      ],
+      "sha": "8f0211fe9919d8294e849f8d549fcdec7b6963f0"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 96/100",
+      "parents": [
+        "8f0211fe9919d8294e849f8d549fcdec7b6963f0"
+      ],
+      "sha": "f4ae0acee6595f8777f64d882e12ce3626e2189c"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 97/100",
+      "parents": [
+        "f4ae0acee6595f8777f64d882e12ce3626e2189c"
+      ],
+      "sha": "58768db25a12cdfc9a9c7afd6d086d63dbb069f1"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 98/100",
+      "parents": [
+        "58768db25a12cdfc9a9c7afd6d086d63dbb069f1"
+      ],
+      "sha": "fdfb8ef83baf83ee3547e242fd4173be7cd729d4"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 99/100",
+      "parents": [
+        "fdfb8ef83baf83ee3547e242fd4173be7cd729d4"
+      ],
+      "sha": "7da439f8fc23d0c924f30e52015e45c21dd61956"
+    },
+    {
+      "message": "Atomic verified support mask checkpoint 100/100",
+      "parents": [
+        "7da439f8fc23d0c924f30e52015e45c21dd61956"
+      ],
+      "sha": "2c7114248a3f140b51126f6a03b4f23f91437c16"
+    },
+    {
+      "message": "Freeze complete real support-only masks counts and factorized geometry",
+      "parents": [
+        "2c7114248a3f140b51126f6a03b4f23f91437c16"
+      ],
+      "sha": "b80f8dba610153c91b051ffd5073ee3433e300c4"
+    }
+  ],
+  "checkpoint_commit_count": 102,
+  "commit_ancestry_before_delivery": [
+    "6f776c535b8df9cf87aaeddbafc0f47c643e77f5",
+    "b65694d7504a6ca63bbb7724a01e4702e9154da4",
+    "e6e0a397ab82a7e73807c6912b53a121c781f1c5",
+    "28efbc017d5b1dfd61c6516b1464bf8c41b9a84b",
+    "d88be26e6240fa4163d7806647789638cde1802b",
+    "4a9ab528e07c435935249c0a15a402ece4c65daa"
+  ],
+  "durable_nonoutcome_changed_files_sha256": {
+    "support_only_v1/checkpoint.json": "d6506897ba3571f02ea71ec7754aa2a9ddc99e44890a120003a070794f6bad74",
+    "support_only_v1/results/dependence_geometry.json.gz": "3ec7a8a5045f2920c5043b720c070705a1ea15b659475cde2b809b61bad0daf3",
+    "support_only_v1/results/event_masks.npz": "26acadf914fbcd904badd2200186424bf54f485af09cf69e797bf837f0f3aba7",
+    "support_only_v1/results/result.json": "78b83d2f20cf13868fb0a490faec5de21e1967311da70969a348108bfcfdaa7d",
+    "support_only_v1/results/support_counts.json.gz": "c9e272ffdea09790516ef2998a8635cbbe3da566d01f5c3d94ec76619ca4106b",
+    "support_only_v1/shards/000.bin": "e78def9473643644198525e220242268ebabe42daf70252533d53e3f941951de",
+    "support_only_v1/shards/001.bin": "a3d58d8663304c3e0e8072026db61304f3a38b1ce0044684e87e178e56bd57d9",
+    "support_only_v1/shards/002.bin": "56f82a3473adf09e63e546a2d4e61748ed8a7a06f58db0cff4e222a2806053c9",
+    "support_only_v1/shards/003.bin": "070fd72ec9d7178718e9bbd551881205d24eadde735382fb61db165237512852",
+    "support_only_v1/shards/004.bin": "4b212611a4a6b4af0ed05e55649eb332fe89320845e628e4fcb5f10d0c70adf1",
+    "support_only_v1/shards/005.bin": "6e82a4c260c54b0db61f9bb5efd952a4d7a971b36445db77b381fccc3a54d3c5",
+    "support_only_v1/shards/006.bin": "27822580ef416857a4b39e8674cf6c5a5a6058fb17f1e29424c8a529657301fb",
+    "support_only_v1/shards/007.bin": "beeb717a34b4209913e8422f60db5c1ab213fb97598974961f515ca2aadfbc03",
+    "support_only_v1/shards/008.bin": "8c8b0cc326b02f97b9f9e3940e9360d29a1bb5bd5f48d002d89c7b2c8035f1ed",
+    "support_only_v1/shards/009.bin": "86b07a95cefc09eedcc809e86b1dcc48f3f63a6c8b429182af7bbbf1300d5fbf",
+    "support_only_v1/shards/010.bin": "418cf042f7f5b0b93c7bfa9b86c5a01506e59c52190d24e1062293d6a4205ad9",
+    "support_only_v1/shards/011.bin": "1a827aeea6a34729acba3414f1c08b8738e203a8acef21a196b4b53bb1bd6036",
+    "support_only_v1/shards/012.bin": "0d5fab9951ec450c7116cc4ba347b86f64ae5355846a382a2a10d4178d94a78e",
+    "support_only_v1/shards/013.bin": "668cbb766b999db60ef631d42e06539bb2b57970b8c00e47dd6b6a4a9023c579",
+    "support_only_v1/shards/014.bin": "6f0d7d88a149cda2554541334de17cf970709618bbd74988b420ed8fb1d31172",
+    "support_only_v1/shards/015.bin": "14c16ecee3f10760ac96b5a6dc941fac26b936309d5883540d909b1495a8e96e",
+    "support_only_v1/shards/016.bin": "e76775e70cd97d4017ec6d824bd21320edeb9c2ab3977817cb84ea9bd4010c2f",
+    "support_only_v1/shards/017.bin": "780cbdefb6faeca1653c9b58e050b10a1040ceec3e008eb9508b7b520794da66",
+    "support_only_v1/shards/018.bin": "0bd49e74a131407e7f93dae3e8e2ae32a52a220945c06acc47d5b53d88ed1109",
+    "support_only_v1/shards/019.bin": "300f0164766dbce729c2dc8c5b1c48b9d3ccad8283d9453b88395886b8cdcec7",
+    "support_only_v1/shards/020.bin": "0d5c80011cc7e7ea841ea28d294266b3b39bba45461738d9174d692e17fd088c",
+    "support_only_v1/shards/021.bin": "7084d3f56bc1b03f2ba5d060c0ebceb39da190bc1b2a2cf4c1e950df0fa91ace",
+    "support_only_v1/shards/022.bin": "d80dde08d31071c3247c91023984ab1e998618b036b47667435cc9fa592ff79f",
+    "support_only_v1/shards/023.bin": "0f5c446b624bc2bb7b77af5b4c96e137f27494bae6df1e3f0380254842d82d29",
+    "support_only_v1/shards/024.bin": "4637a50e3115fcf226d53057c83bbf6bd9eacb262dd592410faa63033b97a1c8",
+    "support_only_v1/shards/025.bin": "e96efa544edc575d5e1c7be3be7766f9f8b6c1187e09f7320e3391fe1f89a3cc",
+    "support_only_v1/shards/026.bin": "4db49c80789cb642d3923fc98caf68482bb324050a4c61971ea0c77df4be05e1",
+    "support_only_v1/shards/027.bin": "fc86b6afb54ecc4b703d9a066c2abd5a102ccac0ccec19fe71a9286fb9695cd7",
+    "support_only_v1/shards/028.bin": "dedb1a205f71736684ae9f2185c45a0f80c835a84eaf1443608b4655271f4b75",
+    "support_only_v1/shards/029.bin": "81320f5f13de9b1b058816680b081212cd2a0340f50224b48969b4340b9d1552",
+    "support_only_v1/shards/030.bin": "0040d16a742cef9540fb76f68726648823d77aab955b6c4488dc6c5efeff4796",
+    "support_only_v1/shards/031.bin": "a35b920feaa532819ad2ab760a31e61153dd4dc43682b138f33db172629ae814",
+    "support_only_v1/shards/032.bin": "cae730af29bfa94d029f19955a6cb236e2427e4caf6c1d2033943853fd320ea5",
+    "support_only_v1/shards/033.bin": "dd5cb0f8e43db48a298c17d81774193266e285ad38b78d2b1f4b2b9d237994a5",
+    "support_only_v1/shards/034.bin": "e0b0796aaffc8a943a09f213de4517ce67cdb5c7b9ac93a3280aa5b1ad7fd71a",
+    "support_only_v1/shards/035.bin": "338e95bcf73845493befa76201625592ccdef1885f43df8e536e2f90b2ca46e2",
+    "support_only_v1/shards/036.bin": "e012d2ad9fe1b39a30314d569617c648679fb029c335350e5cf38e21e294b252",
+    "support_only_v1/shards/037.bin": "84a8a7639544e466fdee04f0b6925a970e19f66a9d6d99003343349402fc3c9c",
+    "support_only_v1/shards/038.bin": "84ab132f6c7070da6ccf859616bea17c7aa7773a8bce0d65ea697511986d32f1",
+    "support_only_v1/shards/039.bin": "381fa40cce6088b6e2f4be8c8293b5d617d00db5a5d4205d0a9d9b0fbe162f46",
+    "support_only_v1/shards/040.bin": "27f4cb4b6b49b03c00a8b9d54a58a8f31d6f6faf69a6a551de20143c8b8cfe41",
+    "support_only_v1/shards/041.bin": "4d4db2604944e4877bb2d2f5655a61bc6a14fccba6ced3348cb15cba2baca840",
+    "support_only_v1/shards/042.bin": "fc0644be065ed1e34add63962f9e3233ac11f866db3c0f565726fc315b7114d5",
+    "support_only_v1/shards/043.bin": "7ef613621995ad0cc9ffdf04aa0ebdea33683f458e7bfc8f40e8d5d3d98e98ac",
+    "support_only_v1/shards/044.bin": "da58211c42d1dd86380d8518ce3ed29c7f5cf2c32ad5a006bd8f1317a87e5479",
+    "support_only_v1/shards/045.bin": "70537700b41f8c3dfea5b7d2c048ff9a4cb777dd400497b61d36ae87bcd7bd77",
+    "support_only_v1/shards/046.bin": "c1c05ffa5b2e6508c7bdded52ee5ca409bb7ac95dcd0533d5f9e15cd40ce7c4d",
+    "support_only_v1/shards/047.bin": "c2a2e8276c5a400d53c516d1379f43d020b78fa44e70cee786535161040aa61b",
+    "support_only_v1/shards/048.bin": "9bb432bb0fa962863125177da08355b3b93df08e9801ada0c96f1a53f45852f9",
+    "support_only_v1/shards/049.bin": "42d05186910b1fd324000fc92f10f810a4d4ab7136bff197f24e822f0c367d98",
+    "support_only_v1/shards/050.bin": "8afdbc33c784e023af968c527042d62f22c5ef85fb645f0f3b5914009d47bd24",
+    "support_only_v1/shards/051.bin": "10afe367340a21f5ca84c1634fe9994e784128254d7ad050f21c5a7ee9d865b1",
+    "support_only_v1/shards/052.bin": "a35e3ace4fddf6b8dbf22d4d2cde0e85f9b78facad2293e17e33e88116c10fbe",
+    "support_only_v1/shards/053.bin": "ef7285a76177e8e8ccacefdb3fe4ffdc9ed5e9cf7fd776c8d88ec9b8332e56ee",
+    "support_only_v1/shards/054.bin": "242abb23c18adf9e31eec049759dc89ff6eb1881c7b9eb886f9a26f1614a33a1",
+    "support_only_v1/shards/055.bin": "4d0c5825a59a21bb05c3b9c218e59ee601c9317f70f65e7945e3a295c76e7376",
+    "support_only_v1/shards/056.bin": "6b918469eeb80298d5a418aff5528a10204ceeb69e50702cdfb3b602dcde3c08",
+    "support_only_v1/shards/057.bin": "cf859ca77fb00638bdaf89bfbde9109d68900962618f6e172acf80a2942e4382",
+    "support_only_v1/shards/058.bin": "8d6d627d0ce0a8a98bef9fcd3eb212f6afcec1454dc2f8c5addddbe40393014d",
+    "support_only_v1/shards/059.bin": "2cbaf91bf1f28e4d4fcad14cf4fba1073b321baee3ee7a995c33d1c033702fe8",
+    "support_only_v1/shards/060.bin": "543cc7d8f73a0a5d25259abdf6143fec7327ed229cb66d0f1318ff6d6d9376a4",
+    "support_only_v1/shards/061.bin": "8e6624229a9e8160c34a3207c5d4a471ca5387c6561dbfad412dd9dced5cb841",
+    "support_only_v1/shards/062.bin": "2799c8283237e763c2c7d21d83c8b5a072fd5cdaace6f88ab2235c9c0c4e8db6",
+    "support_only_v1/shards/063.bin": "c513d38ad7961231b9ff999156616ade8b30a1c3159e2d53b52af11bd7682dc8",
+    "support_only_v1/shards/064.bin": "d6a2beda1af3316ee308099866dc8d19bf541d0e8ba1c7e5d442fd120ca7b54a",
+    "support_only_v1/shards/065.bin": "c611158bb86a471c53c245e8e099b6810604bd027ce9f418f02305d602a0104a",
+    "support_only_v1/shards/066.bin": "1ca492e7dccc69076cbb7aa28b0af72cfef961b653ddb6f15b51728e4ef93d40",
+    "support_only_v1/shards/067.bin": "f4a541340472ac6f5b03534cf7ca88c591f4f1b725c34b899aa251b95b8fb94b",
+    "support_only_v1/shards/068.bin": "e04231718bf1eedd49c63ec7e880718fb23f9b0e2b8d4412a83324bc0e081c9c",
+    "support_only_v1/shards/069.bin": "625aaa1fe36b3235fae534ed0531035689d8a362919555057d1e243beac14592",
+    "support_only_v1/shards/070.bin": "2817c7452dc88ee8110b131cbe435989ba3714a18f8b1fa89caece0aa013e6a9",
+    "support_only_v1/shards/071.bin": "5a9f19be808318adf23e064ec7a7d46aa9f28d7a35ad0d082f4f62d748c5f93c",
+    "support_only_v1/shards/072.bin": "f91bbfebbbf89767dc09224350cf8f7c3e7b106b79977763e3e607d41f58d849",
+    "support_only_v1/shards/073.bin": "f38f45adbc2998951e25dd14f9b9c2baf4177c4c8a5f90eb4842b5be160348a9",
+    "support_only_v1/shards/074.bin": "5129804014afad0b8d05ebd6e46094b35473af56b6b78649ec6242087c08e556",
+    "support_only_v1/shards/075.bin": "7dd701c295a46c25b15595d4db2c7dbdf526c797fe929ba46a09abdc36ed6b7a",
+    "support_only_v1/shards/076.bin": "913fcca94cc0010151d4347a5880fcf15610416230caab1f9e54be3d768a69ad",
+    "support_only_v1/shards/077.bin": "99bb25c947781cfe67057a5c8b69adbf7dd9dc2bbffb33e13a95be269e515138",
+    "support_only_v1/shards/078.bin": "7506624d929e7a8764f9609ef68dac9eff82fc0a7d2bba66f9dbd8c38aaef5a5",
+    "support_only_v1/shards/079.bin": "c2bcdd064144cc9c80cbe955d85418fbd234b385022be62538b6f4014bb1b695",
+    "support_only_v1/shards/080.bin": "db4208ca426042c90ad837c4ea29908189f058053b5e558e96dc12d87c645923",
+    "support_only_v1/shards/081.bin": "44591ea59d2fef0ec45eaa3fd112d5e805cfc864dc8745e4eb179cb073e7df73",
+    "support_only_v1/shards/082.bin": "3032e9d879628774922276287cca5f98dff4e041aeba78fe9299fccd5c03af87",
+    "support_only_v1/shards/083.bin": "5d2e7299a6396b03b2b407161a6c73cef2347c1c94287186c612be82b0f0903d",
+    "support_only_v1/shards/084.bin": "87b65c60550d6d9ffe847e067ee1064773d88194976dc1a09618bfb310db04d2",
+    "support_only_v1/shards/085.bin": "eaec6024dbcd6df3a6cda4a33b3ee0df87d349e8ca54c613efc7a8b766e363d0",
+    "support_only_v1/shards/086.bin": "14b8b59c275c38457fb486dcfd9bb57df4a70bdaa874daaf34c8a1d0360a542b",
+    "support_only_v1/shards/087.bin": "43f382e1dd76f08f1e43d94729f6df1a165a2c0b9ace88374c133a0ccca5e445",
+    "support_only_v1/shards/088.bin": "021c977a986e33956ec6cc87a2f636986c0f979a74ca6ac09710fbf3c2ffbe56",
+    "support_only_v1/shards/089.bin": "87bb27a041ab642208bd13d3f077cd75cf0f0923d0d0377d7986743b28c009b1",
+    "support_only_v1/shards/090.bin": "8ec1842486f91199a70fb6c204c7325ae56ce36707861f82bb86e16d842b0851",
+    "support_only_v1/shards/091.bin": "208457a37b54ac738f8fa118991367a7c177de976bd2941284359b0c9313d02f",
+    "support_only_v1/shards/092.bin": "627a871734e00039f9275f5adb40a8b46a28d6db307f4797a9ba498441cddad3",
+    "support_only_v1/shards/093.bin": "8f8da5f40e270760a55f7c9d92ef401f9af5fc1859f1fd53a6b150f5395ef1a7",
+    "support_only_v1/shards/094.bin": "60a1552c528c1527bf7e58ebabd7f04971936ec1e3f7938ad7f700f11749e565",
+    "support_only_v1/shards/095.bin": "397a072ce740b0ad220453aab7610eba422dfccb29acdd57f016bc3dd9cf0cde",
+    "support_only_v1/shards/096.bin": "88518662e92537f5965385f36fc344f51b135aa5cbf20e227ecd5500693cb944",
+    "support_only_v1/shards/097.bin": "c47c9d2a0e8a98f25b4ed8684c1d7e1a3a0a57c64839da2e4d38eaa35eae12e0",
+    "support_only_v1/shards/098.bin": "791de293a9eb6bb35e543f05d8d5dee491663cd4b37b158d814b7b437830d993",
+    "support_only_v1/shards/099.bin": "5de69e337f484f486f997c17036e93ca392e3a7142283da544dd8d51dca45757"
+  },
+  "independently_accepted_predecessor_commits": [
+    "c99a8f602fc6d33f00e9514e0c37686bd788b2b0",
+    "c0034aeb25b6fed578f85ad05781458a1ccbc187",
+    "6f776c535b8df9cf87aaeddbafc0f47c643e77f5"
+  ],
+  "next_action": "Independent audit only; no power/duration/economic stage authorized.",
+  "physical_retry_accounting": {
+    "accepted_evidence_double_counted": false,
+    "exact_physical_encrypted_download_total_certified": false,
+    "exact_physical_row_stream_total_certified": false,
+    "physical_encrypted_byte_total_lower_bound": 49708418,
+    "physical_encrypted_byte_total_upper_bound": 50135249,
+    "physical_row_total_lower_bound": 3355389,
+    "physical_row_total_upper_bound": 3382901,
+    "possible_uncommitted_shard": "shallow-m5-v2-seg1-shard20.mxmenc",
+    "reason": "First attempt sanitized HTTPError does not identify whether interruption preceded asset21 body download or occurred during atomic checkpoint publication. Uncommitted work is not accepted evidence. Do not claim exact physical totals.",
+    "requires_no_new_rows_for_current_frozen_unique_support_result": true
+  },
+  "preflight": {
+    "actual_workflow_path": ".github/workflows/current-wave-support-v1-machine-final-preflight-publication.yml",
+    "bindings": {
+      ".github/workflows/current-wave-support-v1-preflight.yml": "9192c9e9c8bc915bcd0af4bef3914ea3adad47fe5646d60262df920cd44b851d",
+      ".github/workflows/current-wave-support-v1-real.yml": "d03e365069fd0647417758ecc151ccf0ec222fd0d55c4506a3f425585336820e",
+      "research_core_v4/current_wave_presupport_geometry_v1.py": "0f50d079418f120c6d1e04ef762fbbbabdd1d1b76f43ea03dd0e685890e19206",
+      "research_core_v4/current_wave_support_machine_v1.py": "1be6cc40d58f93f4d3e90683f7aa1129554caf198c79beac8776f0b90c364f9d",
+      "research_core_v4/current_wave_support_worker_v1.py": "9778d32ef58c0d6cc47cd76d77d8555bf10d4a1a0901fb86cf2a230f28b4c6e2",
+      "research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem": "5000edc335b16c66c145d1d3c7cdaa60d40c1f68bd9607cf18f8aca33158132a",
+      "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_SYMBOL_DIGITS_MAP.json": "2a8f29795ba49f3a79e96fb2bf9cf6d7f2e5f880d736cd7ba4726ff729feab4a",
+      "research_core_v4/state/MASTER1576_V2_DEEP_HISTORICAL_M5_ELIGIBLE_ROSTER_V1.json": "85ef55be0fdcbff6a541424f2ded72ad1c80bbf0089d22eeb497090cdcfc0ee0",
+      "research_core_v4/state/QUOTE_CURRENT_METADATA_ANDROID_FRONTIER_V1.json": "5e85a9f21229c6ccd65875ef25815468ea500e315851bc18692d99d1ae102860",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_AUTHORITY_V1.json": "8f53e53534ec354cb9ca5698b3258b39d236f165e6a1463343ce94252cb24199",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_PROTOCOL_V1.json": "742d43783fdb8d0e323cc39fc938bdd8332b296581aa12296bcc56ff5035683d",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_V1.json": "abaf362a949e5c4f7d34aa4bf279ac368f34ac079096d174e238d808853df78f",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_ACCEPTED_M5_ASSET_ROUTE_V1.json": "3f9c2d5708a784bf76ceee10fe855e3e3c243624c0bef308adf1113e9612226d",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_FREEZE_DELIVERY_REPORT_V1.json": "32be73d69e08de9e157cff9dfeffe7235978c5b98c0861ab5dbd55790b06c8d9",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_RESPONSE_AND_CROSS_SECTIONAL_GOVERNANCE_V1.json": "2af573c84b88c3d6bd560da5a576556aeeac9e31d7ffe5108d022d3928669ff3",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_DEPENDENCE_PREFLIGHT_V1.json": "e565cf648b651831f3f123ab2293c57cf58a8eee1479d895e81b867d0b30a0ef",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_DEPENDENCE_PROTOCOL_V1.json": "f72b5e6c7ed578b9a30890b25ff0f0e7ce4d07e6847228d840e72c87f08d56fc",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_PROSPECTIVE_EXACT_SEMANTIC_AUTHORITIES_V3.json": "0de0dff0a36834a3d6bf78e62dae0e811c0cc6df5a40f34cf8bc2313e81f3558",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_PROSPECTIVE_SELECTION_FUNCTIONAL_V1.json": "561e054658a4878008db10dbd6610408246756f5cabf7336a0c0b5088f4e1d2d",
+      "research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_OWN_INFORMATION_BASELINE_EXACT_SPECIFICATION_V2.json": "d57589c12af2a514903f3945c11bf87bd04ac70b880498806a75625f4095d2d1",
+      "research_core_v4/tests/test_current_wave_support_v1.py": "478a8c7ab50302428ffd2dab76e7f7b3b1629b339cc17d6a0f5639601c26c6f3"
+    },
+    "broker_requests": 0,
+    "checked_out_implementation_head": "28efbc017d5b1dfd61c6516b1464bf8c41b9a84b",
+    "ctrader_requests": 0,
+    "evidence_route": "GitHub Actions decoded job log SUPPORT_MACHINE_PREFLIGHT_RESULT; exact checkout and REST head reconciliation",
+    "implementation_freeze_sha256": "30403e44269c51357488083a4af9d4eeefa9159915dd8b325439b86684c4f144",
+    "implementation_head": "28efbc017d5b1dfd61c6516b1464bf8c41b9a84b",
+    "job_id": 112866617105,
+    "market_rows_read": 0,
+    "no_plaintext_file_in_real_adapter": true,
+    "private_key_pair": "PASS",
+    "real_asset_bodies_read": 0,
+    "run_attempt": 1,
+    "run_id": 37643071675,
+    "scope": "SUPPORT_ONLY",
+    "status": "PASS_MACHINE_SYNTHETIC_AND_PRIVATE_ROUTE_NO_REAL_ASSET_READ",
+    "stream_shard_cap_bytes": 268435456,
+    "synthetic_envelope_roundtrip": "PASS",
+    "synthetic_full_domain": {
+      "elapsed_seconds_ceiling": 76,
+      "entry_slots": 8064,
+      "identities": 1575,
+      "output_disk_bytes": 442909,
+      "peak_RSS_bytes": 593137664,
+      "source_horizon_records": 14175
+    },
+    "tests_failed": 0,
+    "tests_passed": 15,
+    "tests_skipped": 0,
+    "workflow_head": "1691e294a43f3b7a7a602ddd6845c0921f008ee8"
+  },
+  "proofs": {
+    "baseline_features_governance_frontier_protocol_functional_byte_exact": "Implementation freeze bindings checked at preflight, real execution and final validator; scientific files absent from changed-file manifest",
+    "causal_law": "All potential events UNKNOWN; PASS/FALSE zero; no authentic original_available_at present or fabricated",
+    "closed_boundaries": "Zero new economic outcomes/search budget/power trials; duration absent; protected-forward and confirmation remain closed",
+    "global_scientific_status": "No global ledger/functional rewrite/reapplication; no selection/ranking/nulls from support",
+    "historical_preservation": "Exact final-head per-field byte-canonical comparison to accepted start; only operational pointers advance",
+    "no_broker_ctrader_new_data": "GitHub-only accepted release route; no broker imports/URL/auth routes",
+    "no_feature_response_numerics": "Worker AST synthetic guard plus strict48-field packed uint8 schema and no raw/numeric response fields in durable output audit",
+    "no_raw_persistence": "gpg stdout -> incremental ijson -> transient validity bits; plaintext SHA/provenance checked before atomic mask checkpoint; no plaintext file or raw row artifact",
+    "same_1575_roster": "ARM embeds exact accepted roster and immutable roster SHA; worker projects all100shards, no identities dropped"
+  },
+  "real_execution": {
+    "accepted_prefix_double_counted": false,
+    "all_100_encrypted_and_plaintext_hashes_verified": true,
+    "attempts": [
+      {
+        "attempt": 1,
+        "checkpoint_head": "d56db05d9b995a10179b7393eb84916c423a9107",
+        "conclusion": "HTTP_INTERRUPTION_AFTER_20_DURABLE_CHECKPOINTS",
+        "job_id": 112868503022,
+        "unique_verified_rows": 676142,
+        "unique_verified_shards": 20
+      },
+      {
+        "accepted_prefix_identical": true,
+        "already_accepted_assets_redecrypted": 0,
+        "already_accepted_assets_redownloaded": 0,
+        "attempt": 2,
+        "conclusion": "SUCCESS_VERIFIED_CHECKPOINT_RESUME",
+        "job_id": 112871527288
+      }
+    ],
+    "checked_out_arm_head": "4a9ab528e07c435935249c0a15a402ece4c65daa",
+    "final_checkpoint_head": "b80f8dba610153c91b051ffd5073ee3433e300c4",
+    "run_id": 37643598489,
+    "unique_assets": 100,
+    "unique_verified_encrypted_bytes": 49708418,
+    "unique_verified_rows": 3355389,
+    "workflow_head": "9c9707954806ad7bdb57aa0a1418a7faa0748668"
+  },
+  "schema": "mxm.v4.current-wave.support-execution-delivery-report.v1",
+  "self_sha256_and_final_head": "Supplied externally from exact frozen final head; no circular self-hash claim.",
+  "status": "SUPPORT_RESULT_COMPLETE_PENDING_INDEPENDENT_AUDIT",
+  "stop_rule": "STOP_FOR_INDEPENDENT_AUDIT_NO_POWER_NO_DURATION_NO_DEEP_HISTORY_NO_ECONOMIC_RESPONSE",
+  "validation_expected_tests": 24,
+  "validation_final_run_and_job_ids": "Supplied externally after candidate freeze; exact final head checked out and live reconciled by machine publication workflow."
+}
