@@ -1,0 +1,31 @@
+name: Exact candidate semantics V3 exact head offline
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/exact_candidate*.py
+      - research_core_v4/master1576_current_state_guard_v8.py
+      - research_core_v4/state/STRICT_PREOUTCOME*_V3.json
+      - research_core_v4/state/V4_STATE.json
+      - research_core_v4/nonmarket_contract_v3/**
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_exact_candidate_certification_v3.py
+      - .github/workflows/exact-candidate-semantic-closure-v3-offline.yml
+permissions:
+  contents: read
+jobs:
+  exact-candidate-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify prospective freeze ancestry and isolated zero-row closure
+        run: python -m research_core_v4.exact_candidate_preflight_v3
