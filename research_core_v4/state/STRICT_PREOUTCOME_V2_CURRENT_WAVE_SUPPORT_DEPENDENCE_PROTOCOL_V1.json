@@ -1,0 +1,256 @@
+{
+  "asset_route_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_ACCEPTED_M5_ASSET_ROUTE_V1.json",
+  "asset_route_sha256": "3f9c2d5708a784bf76ceee10fe855e3e3c243624c0bef308adf1113e9612226d",
+  "authorization_for_future_execution": null,
+  "broker_requests": 0,
+  "candidate_count": 5,
+  "compute_operation_bound": {
+    "accepted_master_rows_metadata": 3355389,
+    "bound_value": 50893693380,
+    "context_count": 29,
+    "crypto_io_count_bound": "100 asset downloads and 100 decryptions only if separately authorized; no new broker requests",
+    "derivation": "Per identity-entry at most 2*28+2*25+2*25+2*25+36=242 window-key checks across source/horizon templates; at most 12 fixed Boolean/index operations per key plus fewer than 1000 shared counters/reductions. 4000 bounds 242*12+1000=3904. Cross-sectional context reductions are cached per identity-entry, not identity-pair enumerations. JSON/crypto/I/O and generic graph traversal are separately bounded, not disguised as scalar predicates.",
+    "eligible_identities": 1575,
+    "entry_grid_slots": 8064,
+    "graph_complexity": "O(V+I) connected components via incidence hypergraph traversal; no O(V^2) adjacency expansion",
+    "incidence_upper_bound": "At most 100*N*G incidence references with shared context/date hyperedges; use compact bitmaps and interval-compressed incidences, not dense edges",
+    "no_feature_arithmetic_in_support": true,
+    "plaintext_byte_bound": null,
+    "plaintext_byte_bound_reason": "Not derivable from encrypted inventory metadata; future adapter must use streaming projection and bounded shard lifecycle, and report concrete resource feasibility before execution",
+    "scalar_mask_predicate_bound": "20*N_input + 4000*N*G + 100*K*G"
+  },
+  "confirmation_opened": false,
+  "current_wave": [
+    "MULTISCALE_PRICE_STATE",
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE",
+    "BROKER_NATIVE_ACTIVITY_STATE",
+    "CROSS_SECTIONAL_RELATIVE_STATE",
+    "REGIME_AND_STRUCTURAL_BREAK_STATE"
+  ],
+  "duration_selected": false,
+  "execution_in_this_task": false,
+  "frontier_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_V1.json",
+  "frontier_sha256": "abaf362a949e5c4f7d34aa4bf279ac368f34ac079096d174e238d808853df78f",
+  "future_adapter_architecture": {
+    "compute": "After plaintext discarded, masks alone derive windows, peer counts, coverage and factorized overlap graph. All potential peers are read; no per-identity pair scan required.",
+    "decrypt": "One accepted envelope at a time on already established private machine route. Verify public SPKI, plaintext canonical hash, exact identities/segments/schema; discard plaintext immediately after validity projection. Do not reuse old screen ARM or launch old acquisition workflow.",
+    "download": "Separately authorized GitHub release adapter only; verify IDs/size/encrypted SHA and accepted manifest before each shard; no broker imports/routes",
+    "fail_closed": "Stop on hash/schema/duplicate identity provenance/drift, protected-forward or extra-data ingress. Missing market rows yield mask reasons, not data repair requests.",
+    "not_implemented_or_executed_in_this_task": true,
+    "storage": "Persist only masks/provenance and aggregates, never raw/decrypted rows or feature/response numeric values",
+    "three_valued_causal_masks": "Absent original availability authority yields UNKNOWN for causal certification while geometric support can be reported separately; no synthetic timestamp substitution",
+    "validity_projection": "One pass through canonical rows creates source identity-time bitmaps for presence/uniqueness, OHLC consistency, nonnegative counts, positive OPEN/CLOSE and optional authenticated availability provenance; no logarithm, aggregate price location, normalization or future return calculation"
+  },
+  "governance_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_RESPONSE_AND_CROSS_SECTIONAL_GOVERNANCE_V1.json",
+  "governance_sha256": "2af573c84b88c3d6bd560da5a576556aeeac9e31d7ffe5108d022d3928669ff3",
+  "market_rows_read": 0,
+  "minimum_next_permission": "Independent audit of frozen protocol; separate explicit support-only execution authorization required before downloads/decryption/rows",
+  "new_economic_outcomes": 0,
+  "no_support_stage_ranking": true,
+  "not_duration_selection": true,
+  "not_economic_certification": true,
+  "not_power_calibration": true,
+  "overlap_graph": {
+    "bar_incidence_edge": "Two nodes adjacent iff query readsets share an identity-time key, or declared shared-calendar/context incidence hyperedge connects them. Same timestamp alone does not make a missing economic-link authority.",
+    "connected_components": "Report component count/size and date coverage by layer; connected components are not certified independent samples",
+    "context_hyperedge": "(context,t,role) links same-context potential peer-B mask queries and frozen peer-response queries. Factorize by context snapshots; do not materialize dense identity-pair edges.",
+    "exact_overlap_geometry": "Store factorized sorted key/date/context incidence sufficient to reproduce all edges, components and no-overlap classes without prices",
+    "nodes": "(source,identity,t,horizon) potential and complete-mask event nodes; separate geometric, causal-certified and causal-unknown layers",
+    "required_query_readset": "All feature/B required identity-M5 keys, including absent-key queries that determine missingness. Response mask queries cover own future keys plus every frozen fresh peer future key, including invalid responses.",
+    "shared_calendar_hyperedge": "For every UTC date touched by any required feature/B/response query, attach node to that global date hyperedge, across all identities and contexts. Cross-midnight nodes attach to all touched dates; never cut edges at segment boundary.",
+    "structural_graph_not_empirical_correlation": true
+  },
+  "per_candidate": {
+    "BROKER_NATIVE_ACTIVITY_STATE": {
+      "baseline_readset": "Own keys {[h-3600,h) every300s} union {t-300}; h=floor(t/3600)*3600. Exact immutable 10-coordinate B required, never compute/store additional baseline coordinates.",
+      "baseline_window_length_M5_max": 13,
+      "decision_grid_seconds": 300,
+      "execution_friction_later": "Separately accepted historical side-specific bid/ask, spread, fill/slippage, commission, account conversion/margin and capital-survival authority required before economic/trading promotion. Current EUR200 eligibility is not historical friction certification.",
+      "feature_readset": "H0 twelve chronological M5 counts, valid nonnegative integers; total zero valid; normalization not calculated in support stage",
+      "feature_window_length_M5": 12,
+      "identity_context_mask": "Own identity in immutable accepted 1575 roster; context exactly bound roster label; never infer dynamic linkage from names or prices",
+      "maximum_unique_local_keys_per_event": 25,
+      "missingness_mask": "Conjunction of required row existence, canonical field validity, original availability state and schedule; use three-valued True/False/UNKNOWN, missing never means zero/null edge",
+      "price_field_validity": "Canonical OHLC/count validity only, no activity-based eligibility threshold",
+      "response_availability_mask_only": "All h future bars exist with canonical OHLC; close endpoints >0; no future returns or sign/magnitude",
+      "response_horizons_M5": [
+        1,
+        12
+      ],
+      "response_window_lengths_M5": [
+        1,
+        12
+      ],
+      "timestamp_masks": {
+        "authentic_causal": "PASS only when every required feature/B original available_at is authentically evidenced and <=t; FALSE if late, UNKNOWN if evidence absent.",
+        "geometric_completion": "Each required feature/B bar has open+300<=t. This is separate from original availability authentication.",
+        "grid": "integer UTC seconds; source timestamps on 300s grid; duplicate required key unavailable",
+        "no_available_at_fabrication": true,
+        "response_schedule": "Future bar k has key t+300*(k-1), k=1..h. Never include future rows in feature or peer-set construction."
+      }
+    },
+    "CROSS_SECTIONAL_RELATIVE_STATE": {
+      "baseline_readset": "Own keys {[h-3600,h) every300s} union {t-300}; h=floor(t/3600)*3600. Exact immutable 10-coordinate B required, never compute/store additional baseline coordinates.",
+      "baseline_window_length_M5_max": 13,
+      "context_size_below_3": "Structurally no leave-one-out2-peer event; retain zero support for these contexts without ranking or scientific null",
+      "decision_grid_seconds": 300,
+      "execution_friction_later": "Separately accepted historical side-specific bid/ask, spread, fill/slippage, commission, account conversion/margin and capital-survival authority required before economic/trading promotion. Current EUR200 eligibility is not historical friction certification.",
+      "feature_readset": "Own immutable B plus B of every potential peer in own roster context excluding i; required-presence/causal queries for all peers. Fresh set P_i(t) frozen from these masks, minimum2. No L_j, mean, variance or sqrt calculated.",
+      "feature_window_length_M5": 12,
+      "identity_context_mask": "Own identity in immutable accepted 1575 roster; context exactly bound roster label; never infer dynamic linkage from names or prices",
+      "maximum_local_keys_per_identity_query": 25,
+      "missingness_mask": "Conjunction of required row existence, canonical field validity, original availability state and schedule; use three-valued True/False/UNKNOWN, missing never means zero/null edge",
+      "price_field_validity": "Immutable B OHLC/count validity and authentic causal availability for fresh set; future canonical OHLC and positive endpoint closes",
+      "response_availability_mask_only": "Own future h-window and close endpoints positive; inspect h-window validity for every member of frozen P_i(t), without adding identities. Minimum2 valid peer responses. P_i,h^R is a subset selected only by validity mask, not returns. Compute no R_i, Rbar or Y.",
+      "response_horizons_M5": [
+        1,
+        12
+      ],
+      "response_window_lengths_M5": [
+        1,
+        12
+      ],
+      "timestamp_masks": {
+        "authentic_causal": "PASS only when every required feature/B original available_at is authentically evidenced and <=t; FALSE if late, UNKNOWN if evidence absent.",
+        "geometric_completion": "Each required feature/B bar has open+300<=t. This is separate from original availability authentication.",
+        "grid": "integer UTC seconds; source timestamps on 300s grid; duplicate required key unavailable",
+        "no_available_at_fabrication": true,
+        "response_schedule": "Future bar k has key t+300*(k-1), k=1..h. Never include future rows in feature or peer-set construction."
+      }
+    },
+    "MULTISCALE_PRICE_STATE": {
+      "baseline_readset": "Own keys {[h-3600,h) every300s} union {t-300}; h=floor(t/3600)*3600. Exact immutable 10-coordinate B required, never compute/store additional baseline coordinates.",
+      "baseline_window_length_M5_max": 13,
+      "decision_grid_seconds": 300,
+      "execution_friction_later": "Separately accepted historical side-specific bid/ask, spread, fill/slippage, commission, account conversion/margin and capital-survival authority required before economic/trading promotion. Current EUR200 eligibility is not historical friction certification.",
+      "feature_readset": "Qminus1 keys [h-4500,h-3600) three M5; H0 keys [h-3600,h) twelve M5",
+      "feature_window_length_M5": 15,
+      "identity_context_mask": "Own identity in immutable accepted 1575 roster; context exactly bound roster label; never infer dynamic linkage from names or prices",
+      "maximum_unique_local_keys_per_event": 28,
+      "missingness_mask": "Conjunction of required row existence, canonical field validity, original availability state and schedule; use three-valued True/False/UNKNOWN, missing never means zero/null edge",
+      "price_field_validity": "Feature/B require finite canonical OHLC consistency and integer nonnegative counts as immutable B; flat ranges allowed.",
+      "response_availability_mask_only": "All future keys [t,t+300*h) exist and valid OHLC; close endpoints C(t),C(t+300*h)>0. No log, displacement, sign or magnitude calculation.",
+      "response_horizons_M5": [
+        1,
+        12
+      ],
+      "response_window_lengths_M5": [
+        1,
+        12
+      ],
+      "timestamp_masks": {
+        "authentic_causal": "PASS only when every required feature/B original available_at is authentically evidenced and <=t; FALSE if late, UNKNOWN if evidence absent.",
+        "geometric_completion": "Each required feature/B bar has open+300<=t. This is separate from original availability authentication.",
+        "grid": "integer UTC seconds; source timestamps on 300s grid; duplicate required key unavailable",
+        "no_available_at_fabrication": true,
+        "response_schedule": "Future bar k has key t+300*(k-1), k=1..h. Never include future rows in feature or peer-set construction."
+      }
+    },
+    "REGIME_AND_STRUCTURAL_BREAK_STATE": {
+      "baseline_readset": "Own keys {[h-3600,h) every300s} union {t-300}; h=floor(t/3600)*3600. Exact immutable 10-coordinate B required, never compute/store additional baseline coordinates.",
+      "baseline_window_length_M5_max": 13,
+      "decision_grid_seconds": 3600,
+      "execution_friction_later": "Separately accepted historical side-specific bid/ask, spread, fill/slippage, commission, account conversion/margin and capital-survival authority required before economic/trading promotion. Current EUR200 eligibility is not historical friction certification.",
+      "feature_readset": "Hminus1=[t-7200,t-3600), H0=[t-3600,t), twelve M5 each; inherited feature unchanged",
+      "feature_window_length_M5": 24,
+      "identity_context_mask": "Own identity in immutable accepted 1575 roster; context exactly bound roster label; never infer dynamic linkage from names or prices",
+      "maximum_unique_local_keys_per_event": 36,
+      "missingness_mask": "Conjunction of required row existence, canonical field validity, original availability state and schedule; use three-valued True/False/UNKNOWN, missing never means zero/null edge",
+      "price_field_validity": "Canonical OHLC/count validity, no level positivity restriction for locations; no regime threshold",
+      "response_availability_mask_only": "Exactly twelve future UTC-hour bars [t,t+3600); finite canonical OHLC validity; flat locations allowed. No price-location values, Wasserstein distance or persistence response computed.",
+      "response_horizons_M5": [
+        12
+      ],
+      "response_window_lengths_M5": [
+        12
+      ],
+      "timestamp_masks": {
+        "authentic_causal": "PASS only when every required feature/B original available_at is authentically evidenced and <=t; FALSE if late, UNKNOWN if evidence absent.",
+        "geometric_completion": "Each required feature/B bar has open+300<=t. This is separate from original availability authentication.",
+        "grid": "integer UTC seconds; source timestamps on 300s grid; duplicate required key unavailable",
+        "no_available_at_fabrication": true,
+        "response_schedule": "Future bar k has key t+300*(k-1), k=1..h. Never include future rows in feature or peer-set construction."
+      }
+    },
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE": {
+      "baseline_readset": "Own keys {[h-3600,h) every300s} union {t-300}; h=floor(t/3600)*3600. Exact immutable 10-coordinate B required, never compute/store additional baseline coordinates.",
+      "baseline_window_length_M5_max": 13,
+      "decision_grid_seconds": 300,
+      "execution_friction_later": "Separately accepted historical side-specific bid/ask, spread, fill/slippage, commission, account conversion/margin and capital-survival authority required before economic/trading promotion. Current EUR200 eligibility is not historical friction certification.",
+      "feature_readset": "H0 twelve M5; inherited positive OPEN/CLOSE for all feature bars; zero Q valid and retained",
+      "feature_window_length_M5": 12,
+      "identity_context_mask": "Own identity in immutable accepted 1575 roster; context exactly bound roster label; never infer dynamic linkage from names or prices",
+      "maximum_unique_local_keys_per_event": 25,
+      "missingness_mask": "Conjunction of required row existence, canonical field validity, original availability state and schedule; use three-valued True/False/UNKNOWN, missing never means zero/null edge",
+      "price_field_validity": "Finite positive feature OPEN/CLOSE; canonical OHLC; baseline counts; no minimum volatility/activity gate",
+      "response_availability_mask_only": "All h future bars exist with canonical OHLC consistency and positive OPEN/CLOSE. Do not compute any logarithm, square or realized variation.",
+      "response_horizons_M5": [
+        1,
+        12
+      ],
+      "response_window_lengths_M5": [
+        1,
+        12
+      ],
+      "timestamp_masks": {
+        "authentic_causal": "PASS only when every required feature/B original available_at is authentically evidenced and <=t; FALSE if late, UNKNOWN if evidence absent.",
+        "geometric_completion": "Each required feature/B bar has open+300<=t. This is separate from original availability authentication.",
+        "grid": "integer UTC seconds; source timestamps on 300s grid; duplicate required key unavailable",
+        "no_available_at_fabrication": true,
+        "response_schedule": "Future bar k has key t+300*(k-1), k=1..h. Never include future rows in feature or peer-set construction."
+      }
+    }
+  },
+  "power_trials": 0,
+  "protected_forward_opened": false,
+  "reason_codes": [
+    "OUTSIDE_ARCHIVE_DOMAIN",
+    "ROW_ABSENT",
+    "DUPLICATE_IDENTITY_TIME",
+    "BAD_TIME_GRID",
+    "INVALID_OHLC",
+    "INVALID_COUNT",
+    "NONPOSITIVE_REQUIRED_PRICE",
+    "FEATURE_BAR_NOT_COMPLETED",
+    "ORIGINAL_AVAILABILITY_UNKNOWN",
+    "ORIGINAL_AVAILABILITY_LATE",
+    "OFF_HOUR_REGIME_SCHEDULE",
+    "MIN_FRESH_PEERS_NOT_MET",
+    "MIN_VALID_RESPONSE_PEERS_NOT_MET",
+    "CONTEXT_SIZE_BELOW_3",
+    "RESPONSE_WINDOW_INCOMPLETE",
+    "LEFT_CENSORED",
+    "RIGHT_CENSORED"
+  ],
+  "redecryptions": 0,
+  "required_outputs": {
+    "dependence_cluster_geometry": "Factorized incidence/overlap graph and connected-component geometry derived from masks only, not score dependence/correlation",
+    "effective_calendar_support": "For each candidate/horizon/layer: number and set of distinct UTC entry dates with >=1 complete joint event, unique entry slots and touched dates; descriptive effective calendar coverage only, never ESS, independent N or power",
+    "mask_artifact": "No prices, counts-as-feature, logs, realized feature/response values, return sign/magnitude or economic metrics; output fixed bool/tri-state bitmaps, identity/context/time keys, cardinalities and reason codes only",
+    "peer_masks": "Per cross-sectional identity-entry: fresh peer cardinality and frozen peer-set provenance; per horizon valid response subset cardinality; UNKNOWN causal peers remain separately recorded",
+    "per_context_support_counts": "Aggregate identical identity-event counters plus distinct entry timestamp union; distinguish sums of identity-events from unique calendar support; retain all29 contexts including zero structural support",
+    "per_identity_support_counts": "For every candidate/horizon/eligible identity: scheduled potential events, geometrically complete, causal PASS/FALSE/UNKNOWN, complete response-mask events and complete joint events per causal layer; report each failure reason and combinations",
+    "temporal_coverage_summary": "Full inherited archive domain: per-day and per-segment counters, first/last complete entry timestamp, longest run of consecutive scheduled complete entry slots, gap histogram in scheduled slots, left/right censor counts; no best period/subset selection"
+  },
+  "schema": "mxm.v4.current-wave.support-dependence-protocol.v1",
+  "search_budget_use": 0,
+  "shared_calendar_block_unit": {
+    "cross_day_dependence": "Preserve readset/date hyperedges across dates; no day-independence claim",
+    "no_calibrated_inference_blocks": true,
+    "partition": "[00:00:00Z,next00:00:00Z) across all identities and contexts",
+    "reason": "Calendar reporting/dependence bookkeeping only; does not select inferential block length or estimate correlations",
+    "unit": "UTC_CALENDAR_DAY"
+  },
+  "source_domain": {
+    "M5_entry_grid_slots": 8064,
+    "all_archive_segments_required": true,
+    "calendar_is_inherited_existing_asset_domain_not_power_or_depth_choice": true,
+    "chosen_new_duration": null,
+    "end_exclusive": "2026-09-17T00:00:00Z",
+    "entry_grid": "t in [start,end) on M5 UTC grid for four sources; hour grid for regime. Warmup/right censoring are masks, not arbitrary trimming. Include incomplete events in reason denominators.",
+    "inherited_segments": 4,
+    "start_inclusive": "2026-08-20T00:00:00Z"
+  },
+  "status": "FROZEN_NOT_EXECUTED_PRE_SUPPORT_ONLY",
+  "support_measurements": 0
+}

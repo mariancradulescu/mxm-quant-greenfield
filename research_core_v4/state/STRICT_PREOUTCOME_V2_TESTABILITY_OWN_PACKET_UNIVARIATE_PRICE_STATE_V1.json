@@ -1,0 +1,38 @@
+{
+  "freeze_bindings": {
+    "baseline_sha256": "d57589c12af2a514903f3945c11bf87bd04ac70b880498806a75625f4095d2d1",
+    "frontier_protocol_sha256": "742d43783fdb8d0e323cc39fc938bdd8332b296581aa12296bcc56ff5035683d",
+    "governance_commit": "c99a8f602fc6d33f00e9514e0c37686bd788b2b0",
+    "governance_sha256": "2af573c84b88c3d6bd560da5a576556aeeac9e31d7ffe5108d022d3928669ff3"
+  },
+  "information_source": "UNIVARIATE_PRICE_STATE",
+  "own_candidate": null,
+  "own_capability_facts": null,
+  "own_feature_authority": null,
+  "own_nonredundancy_certificate": null,
+  "own_response_authority": null,
+  "shared_laws": {
+    "accepted_support_route_exists": true,
+    "canonical_M5_accepted": true,
+    "causal_timestamp_law": {
+      "C_i(t)": "close of bar [t-300,t), latest fully completed M5",
+      "bar_key": "M5 interval open s represents [s,s+300)",
+      "entry_grid": "t%300=0",
+      "features": "Inherited exact feature maps are evaluated at the same t; no changing their anchors",
+      "future_k": "bar [t+(k-1)*300,t+k*300), k=1..horizon",
+      "h0_anchor": "h=floor(t/3600)*3600; H0=[h-3600,h)",
+      "original_availability": "Required feature/B records completed and authentic original availability<=t. Acquisition/receipt time is not substituted for historical availability.",
+      "unit": "integer UTC epoch seconds"
+    },
+    "cohort": "Accepted immutable 1575 study roster in broker-native contexts; no dynamic economic-linkage claim",
+    "missingness_law": {
+      "delayed": "unavailable for feature/B if original availability>t",
+      "duplicates": "unavailable if required identity-timestamp duplicated",
+      "imputation": false,
+      "missing": "unavailable; no older-hour fallback or forward-fill",
+      "no_original_availability_evidence": "causal availability UNKNOWN, never PASS by inventing available_at=close_time",
+      "required_OHLC": "finite numeric values with LOW<=min(OPEN,CLOSE)<=max(OPEN,CLOSE)<=HIGH",
+      "tick_volume": "reported nonnegative integer where B/feature requires it"
+    }
+  }
+}
