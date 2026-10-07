@@ -147,7 +147,10 @@ def verify_checkpoint(ledger,assets):
 def execute():
  f,route,roster=bound();arm=load(ARM);armsha=sha(Path(ARM).read_bytes());need(arm['scope']=='SUPPORT_ONLY' and arm['implementation_freeze_sha256']==sha(Path(FREEZE).read_bytes()),'ARM_BINDING')
  need(arm['assets']==route['assets'] and arm['roster']==roster and arm['protected_forward_boundary']=='2026-09-17T12:02:58Z','ARM_INPUT_BINDING')
- need(load(arm['preflight_ref'])['status']=='PASS_MACHINE_SYNTHETIC_AND_PRIVATE_ROUTE_NO_REAL_ASSET_READ','PREFLIGHT_FAIL_CLOSED')
+ need(sha(Path(arm['preflight_ref']).read_bytes())==arm['preflight_sha256'],'PREFLIGHT_HASH_BINDING')
+ need(load(arm['preflight_ref'])['status']=='PASS_MACHINE_SYNTHETIC_AND_PRIVATE_ROUTE_NO_REAL_ASSET_READ' and load(arm['preflight_ref'])['implementation_freeze_sha256']==arm['implementation_freeze_sha256'],'PREFLIGHT_FAIL_CLOSED')
+ for field,path in [('worker_sha256','research_core_v4/current_wave_support_worker_v1.py'),('machine_sha256','research_core_v4/current_wave_support_machine_v1.py'),('support_protocol_sha256',S+'STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_DEPENDENCE_PROTOCOL_V1.json'),('frontier_sha256',S+'STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_V1.json'),('asset_route_sha256',S+'STRICT_PREOUTCOME_V2_CURRENT_WAVE_ACCEPTED_M5_ASSET_ROUTE_V1.json')]:need(arm[field]==f['bindings'][path],'ARM_EXACT_HASH_BINDING')
+ need(arm['allowed_output_schema']==f['output_schema'] and arm['forbidden_output_schema']==f['forbidden_output_schema'],'ARM_OUTPUT_SCHEMA_BINDING')
  run=int(os.environ['GITHUB_RUN_ID']);head=os.environ['GITHUB_SHA'];need(api('/repos/'+REPO+'/git/ref/heads/'+BRANCH)['object']['sha']==head,'LIVE_ARM_HEAD')
  ref='support-only-v1-'+armsha[:16];cp='support_only_v1/checkpoint.json';parent=head;ledger=[]
  try:

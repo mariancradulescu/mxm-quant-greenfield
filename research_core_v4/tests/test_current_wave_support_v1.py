@@ -68,7 +68,16 @@ class Checkpoints(unittest.TestCase):
   from research_core_v4.current_wave_support_machine_v1 import verify_checkpoint
   verify_checkpoint([],[])
   with self.assertRaisesRegex(SupportError,'CHECKPOINT_INVENTORY'):verify_checkpoint([{}]*101,[])
-TEST_COUNT=13
+ def test_arm_rejects_wrong_preflight_hash_before_network(self):
+  from unittest.mock import patch
+  import research_core_v4.current_wave_support_machine_v1 as m
+  f,route,roster=m.bound()
+  with tempfile.TemporaryDirectory() as td:
+   pf=Path(td)/'preflight.json';pf.write_text('{}')
+   arm=Path(td)/'arm.json';arm.write_bytes(canonical({'scope':'SUPPORT_ONLY','implementation_freeze_sha256':sha(Path(m.FREEZE).read_bytes()),'assets':route['assets'],'roster':roster,'protected_forward_boundary':'2026-09-17T12:02:58Z','preflight_ref':str(pf),'preflight_sha256':'0'*64}))
+   with patch.object(m,'ARM',str(arm)),patch.object(m,'api',side_effect=AssertionError('NETWORK_FORBIDDEN')):
+    with self.assertRaisesRegex(SupportError,'PREFLIGHT_HASH_BINDING'):m.execute()
+TEST_COUNT=14
 def run_tests():
  result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(__import__(__name__,fromlist=["*"])))
  need(result.wasSuccessful() and result.testsRun==TEST_COUNT,'SYNTHETIC_PROTOCOL_PARITY')
