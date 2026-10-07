@@ -1,0 +1,39 @@
+{
+  "ambiguity_test": "Construct two legal symbolic causal inputs and two prose-compatible activity projections differing in retained information. This is a countermodel of uniqueness, not a choice of baseline.",
+  "baseline_text": "Own last completed M5 and hourly price location, range and broker activity, with causal clock controls; incremental predictor excluded from baseline",
+  "builder_read_allowlist": [
+    "research_core_v4/state/STRICT_PREOUTCOME_RESELECTION_V2_INPUTS_V1.json",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_OWN_INFORMATION_BASELINE_CERTIFICATE_V1.json"
+  ],
+  "candidate_visibility": false,
+  "countermodel_domain": "An abstract fully observed completed hour containing 12 M5 count observations; common nonactivity coordinates Z held fixed; all availability timestamps strictly before entry.",
+  "empirical_measurement_authorized": false,
+  "forbidden_resolution": [
+    "use candidates",
+    "use outcomes",
+    "choose minimum dimensionality without authorization",
+    "assume maximal raw-path retention"
+  ],
+  "invariants": [
+    "fidelity",
+    "causal preentry completed observations",
+    "deterministic map",
+    "explicit domain and units",
+    "no imputation",
+    "no response",
+    "candidate invariance"
+  ],
+  "market_rows_required": 0,
+  "resolution_test": "An exact map requires a unique information sigma-algebra; invertible coordinate encodings may be equivalent. Information-losing projections are not equivalent.",
+  "schema": "mxm.v4.strict-preoutcome-v2.shared-baseline-specification-protocol.v1",
+  "source_head": "0b76201cc959494487f6f824d4848d1179273aa6",
+  "stage_order": [
+    "freeze this protocol",
+    "derive candidate-blind nonuniqueness result",
+    "freeze specification result",
+    "bind authority",
+    "stop if unresolved"
+  ],
+  "status": "FROZEN_BEFORE_STAGE_1_OUTPUT",
+  "stop_rule": "If competing information-content projections satisfy all fixed constraints and no permitted premise orders them, stop at the stage 1 nondefensible free design choice. Do not rebuild certificates or reapply the functional."
+}

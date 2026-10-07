@@ -1,0 +1,32 @@
+name: Strict Preoutcome V2 Shared Baseline Zero Outcome Campaign Offline Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_BASELINE_SPECIFICATION_*.json
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_OWN_INFORMATION_BASELINE_EXACT_SPECIFICATION_V1.json
+      - research_core_v4/shared_baseline_campaign_v1.py
+      - research_core_v4/shared_baseline_campaign_preflight_v1.py
+      - research_core_v4/master1576_current_state_guard_v6.py
+      - tests/test_shared_baseline_campaign_v1.py
+      - .github/workflows/shared-baseline-campaign-offline.yml
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+permissions:
+  contents: read
+jobs:
+  shared-baseline-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact head baseline compartment nonuniqueness and fail closed boundary
+        run: python -m research_core_v4.shared_baseline_campaign_preflight_v1

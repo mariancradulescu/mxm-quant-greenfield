@@ -1,0 +1,95 @@
+{
+  "additional_information_scope": "A shared prospective governance specification only; no candidate comparisons, market rows, broker or external data.",
+  "boundary_kind": "NONDEFENSIBLE_FREE_DESIGN_CHOICE_STAGE_1_STOP",
+  "candidate_definitions_read": false,
+  "complete_design_selected": false,
+  "components": {
+    "AGGREGATION_CLOCK_DOMAIN": {
+      "exact_map": null,
+      "status": "UNRESOLVED_NOT_ASSIGNED"
+    },
+    "BROKER_ACTIVITY_PROJECTION": {
+      "exact_map": null,
+      "status": "UNRESOLVED_NOT_ASSIGNED"
+    },
+    "CAUSAL_CLOCK_CONTROLS": {
+      "exact_map": null,
+      "status": "UNRESOLVED_NOT_ASSIGNED"
+    },
+    "HOURLY_PRICE_LOCATION": {
+      "exact_map": null,
+      "status": "UNRESOLVED_NOT_ASSIGNED"
+    },
+    "LAST_COMPLETED_M5_PROJECTION": {
+      "exact_map": null,
+      "status": "UNRESOLVED_NOT_ASSIGNED"
+    },
+    "RANGE_PROJECTION": {
+      "exact_map": null,
+      "status": "UNRESOLVED_NOT_ASSIGNED"
+    }
+  },
+  "duration_selected": false,
+  "empirical_or_external_blocker_reached": false,
+  "exact_baseline_map_B_t": null,
+  "exact_governance_choice_required": "Prospectively specify which temporal activity information belongs in the shared own-information baseline, with a candidate-independent sufficiency justification; total versus vector is a material information-set decision.",
+  "first_blocking_component": "BROKER_ACTIVITY_PROJECTION",
+  "frozen_baseline_text": "Own last completed M5 and hourly price location, range and broker activity, with causal clock controls; incremental predictor excluded from baseline",
+  "market_rows_used": 0,
+  "minimum_unstated_freedom_analysis": "The rule minimizes unsupported choices, but supplies neither a minimum-dimension sufficiency criterion nor a maximal-retention criterion. It cannot order distinct information contents. Unit rescaling cannot remove strict sigma containment.",
+  "next_action": "STRICT_PREOUTCOME_V2_SHARED_BASELINE_INFORMATION_GRANULARITY_UNRESOLVED_PENDING_INDEPENDENT_GOVERNANCE_BEFORE_CANDIDATE_REBUILD",
+  "power_trials": 0,
+  "proof": {
+    "availability_map": "Every abstract component available at or before completed-hour close, strictly before entry; no forming bars or future response.",
+    "coarse_map": "B_total=(Z,v_12,sum(v_j,j=1..12))",
+    "containment_proof": "Sum and last count are deterministic functions of the vector.",
+    "degenerate_cases": "Zero counts allowed. Missing counts invalidate the window; neither map imputes. This witness is fully observed.",
+    "different_fine_projection": true,
+    "domain": "v in nonnegative integer counts^12, completed and authentic availability before entry; common nonactivity coordinates Z fixed. Abstract legal states, not market observations.",
+    "fidelity": "Both are own completed M5/hour broker activity summaries in reported count units. Frozen certificate explicitly leaves last count, hourly aggregate and within-hour vector unchosen.",
+    "fine_map": "B_vector=(Z,v_12,(v_1,...,v_12))",
+    "left_counts": [
+      1,
+      3,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "not_a_baseline_assignment": true,
+    "right_counts": [
+      3,
+      1,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "same_total_projection": [
+      2,
+      24
+    ],
+    "sigma_relation": "sigma(B_total) is a strict subset of sigma(B_vector) on this domain",
+    "strictness_proof": "The two states have identical total and last count but distinct first coordinate; {v_1=1} is observable under B_vector and not under B_total."
+  },
+  "remaining_possible_contenders": 11,
+  "response_opened": false,
+  "schema": "mxm.v4.strict-preoutcome-v2.shared-baseline-exact-specification.v1",
+  "source_head": "0b76201cc959494487f6f824d4848d1179273aa6",
+  "stage_2_executed": false,
+  "stage_3_executed": false,
+  "status": "BLOCKED_INFORMATION_CONTENT_GOVERNANCE_CHOICE_PROVED",
+  "why_data_cannot_resolve_semantics": "More rows can estimate properties of either map but cannot establish which information set the frozen prose intended. Choosing by empirical fit would violate the firewall."
+}
