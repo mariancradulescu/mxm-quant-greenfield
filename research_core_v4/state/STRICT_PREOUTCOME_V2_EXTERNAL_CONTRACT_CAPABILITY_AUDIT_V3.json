@@ -1,0 +1,265 @@
+{
+  "allowed_authority_classes": [
+    "OFFICIAL_CTRADER_OPEN_API_MODEL_OR_PROTOBUF_SCHEMA",
+    "ALREADY_ACCEPTED_NONOUTCOME_BROKER_METADATA_IN_CANONICAL_REPOSITORY",
+    "ALREADY_ACCEPTED_ROSTER_AND_CONTEXT_METADATA"
+  ],
+  "audit_records": [
+    {
+      "accepted_repository_metadata_sufficient": false,
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "CURRENT_METADATA_CAPABILITY_EXISTS_BUT_HISTORICAL_POINT_IN_TIME_AUTHORITY_MISSING",
+      "current_metadata_fields_exist": {
+        "holiday": 1575,
+        "schedule": 1576,
+        "scheduleTimeZone": 1576
+      },
+      "exact_required_contract": "Per-identity session boundary with timezone/holiday rules, known-at and effective-from/to revision history",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "SESSION_AND_LIQUIDITY_STATE",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Prospective exact distance semantics plus authentic historically versioned broker calendar; current snapshot cannot backfill knowledge",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": true,
+      "official_route": "ProtoOASymbolByIdReq -> ProtoOASymbolByIdRes: symbol.schedule,scheduleTimeZone,holiday; no historical as-of argument",
+      "semantic_fields_still_unspecified": [
+        "opening versus closing boundary and closed-session law",
+        "definition of distance units and exact Phi",
+        "historical DST rule version and revisions known at entry"
+      ]
+    },
+    {
+      "accepted_repository_metadata_sufficient": false,
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "OFFICIAL_PROTOCOL_ROUTE_EXISTS_BUT_AUTHENTIC_HISTORICAL_SUPPORT_UNVERIFIED",
+      "current_metadata_fields_exist": {
+        "historical_tick_stream_in_current_metadata": false
+      },
+      "exact_required_contract": "Per-symbol BID and ASK ordered revision streams with authenticated original availability, decoding, pagination completeness, tie ordering and finite causal read window",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "TOP_OF_BOOK_QUOTE_STATE",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Freeze sequencing/read-window contract before separately authorized bounded BID/ASK support request; no support claim from route existence",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": true,
+      "official_route": "ProtoOAGetTickDataReq/Res: side-specific timestamps/prices and hasMore; response lacks symbol/side echo, require request correlation",
+      "semantic_fields_still_unspecified": [
+        "signed revision operator and bounded lookback",
+        "simultaneous side ties and carry/stale law",
+        "contemporaneous midpoint conditioning relative to immutable B"
+      ]
+    },
+    {
+      "accepted_repository_metadata_sufficient": "Roster certifies all 1575 eligible identities and 29 context labels only; this closes roster membership, not a peer economic/exclusion law",
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "SEMANTIC_GOVERNANCE_REQUIRED_BEFORE_AUTHENTICATION",
+      "current_metadata_fields_exist": {
+        "accepted_roster_context_membership": true
+      },
+      "exact_required_contract": "Coherent eligible within-context peer domain, causal common M5 readset and exact dispersion/reduction and own-leg treatment",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "CROSS_SECTIONAL_RELATIVE_STATE",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Prospective exact dispersion/peer contract; then authentic joint feature/response support mask. No new broker contact needed to restate accepted roster membership",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": true,
+      "official_route": "ProtoOAGetTrendbarsReq/Res plus accepted roster/context identities; no extra peer-link schema for this candidate",
+      "semantic_fields_still_unspecified": [
+        "exact dispersion operator and units",
+        "own-leg inclusion and peer response aggregation",
+        "causal missing peers and cohort law"
+      ]
+    },
+    {
+      "accepted_repository_metadata_sufficient": false,
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "SEMANTIC_GOVERNANCE_REQUIRED_BEFORE_AUTHENTICATION",
+      "current_metadata_fields_exist": {
+        "baseAssetId": 1576,
+        "quoteAssetId": 1576,
+        "symbolCategoryId": 1576
+      },
+      "exact_required_contract": "Independently fixed basket identities, weights, rebalancing and point-in-time known-at membership; own-leg exclusion and synchronization",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "FACTOR_OR_BASKET_RESIDUAL_STATE",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Prospective authoritative basket semantics and membership/weight authority before any additional prices; current shared asset IDs are not a basket",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": true,
+      "official_route": "ProtoOALightSymbol baseAssetId/quoteAssetId and trendbars identify assets and prices; no basket constituent/weight history route",
+      "semantic_fields_still_unspecified": [
+        "basket definition and independent weights",
+        "normalization and residual operator",
+        "membership effectiveness and own-leg exclusion"
+      ]
+    },
+    {
+      "accepted_repository_metadata_sufficient": false,
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "SEMANTIC_GOVERNANCE_REQUIRED_BEFORE_AUTHENTICATION",
+      "current_metadata_fields_exist": {
+        "baseAssetId": 1576,
+        "quoteAssetId": 1576,
+        "symbolCategoryId": 1576
+      },
+      "exact_required_contract": "Authoritative exact non-triad economic relation, direction, identities, units and known-at/effective interval; causal peer-to-own map",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "CROSS_INSTRUMENT_RELATIONAL_STATE",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Prospective exact non-triad relationship and independently certified point-in-time mapping. Asset IDs may authenticate asset identity only; names and previous triad outcomes excluded",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": true,
+      "official_route": "ProtoOALightSymbol asset IDs provide current base/quote identities; trendbars provide prices; no general economic linkage history message",
+      "semantic_fields_still_unspecified": [
+        "specific non-triad linkage and transmission map",
+        "direction and lag/read window",
+        "historical relationship validity"
+      ]
+    },
+    {
+      "accepted_repository_metadata_sufficient": false,
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "NO_AUTHENTIC_ROUTE_IDENTIFIED",
+      "current_metadata_fields_exist": {
+        "current_asset_ids": {
+          "baseAssetId": 1576,
+          "quoteAssetId": 1576,
+          "symbolCategoryId": 1576
+        },
+        "measurementUnits": 0
+      },
+      "exact_required_contract": "Same-underlying contract links, settlement type, maturity/delivery, multiplier, roll/conversion and effective revision law; exact term spread response",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "CURVE_CASH_FORWARD_PERPETUAL_RELATIONSHIPS",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Authentic broker-issued contract specification/version history plus prospective exact linkage/spread/response. No inspected symbol schema identifies complete underlying/maturity/settlement linkage; order expirationTimestamp is not contract maturity",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": false,
+      "official_route": null,
+      "semantic_fields_still_unspecified": [
+        "term linkage and exact spread units",
+        "settlement cashflow and response",
+        "roll and maturity laws"
+      ]
+    },
+    {
+      "accepted_repository_metadata_sufficient": false,
+      "actual_broker_support_requires_contact_if_new_data_attempted": true,
+      "authentic_support_certified": false,
+      "authority_refs": [
+        "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+        "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json"
+      ],
+      "broker_contacts": 0,
+      "classification": "CURRENT_METADATA_CAPABILITY_EXISTS_BUT_HISTORICAL_POINT_IN_TIME_AUTHORITY_MISSING",
+      "current_metadata_fields_exist": {
+        "chargeSwapAtWeekends": 0,
+        "rolloverCommission": 0,
+        "skipSWAPPeriods": 0,
+        "swapCalculationType": 0,
+        "swapLong": 0,
+        "swapPeriod": 0,
+        "swapRollover3Days": 0,
+        "swapShort": 0,
+        "swapTime": 0
+      },
+      "exact_required_contract": "Published side-specific rates, units, charging schedule, account applicability and currency conversion with original publication and effective revision timestamps",
+      "historical_point_in_time_authority_already_present": false,
+      "historical_point_in_time_authority_required": true,
+      "information_source": "BROKER_NATIVE_CARRY_FINANCING_SWAP",
+      "market_rows_used": 0,
+      "minimum_next_information_needed": "Prospective cashflow semantics and historical published financing schedule authority; optional omitted fields are not zero; realized charged swaps are outcomes, not preentry publication authority",
+      "no_name_only_linkage": true,
+      "official_protocol_capability_exists": true,
+      "official_route": "ProtoOASymbolByIdReq/Res current swap and rollover fields; no historical as-of metadata argument",
+      "semantic_fields_still_unspecified": [
+        "exact cashflow predictor and term/cash response",
+        "side and account applicability",
+        "conversion/reference price and calendar interpretation"
+      ]
+    }
+  ],
+  "broker_contacts": 0,
+  "duration_selected": false,
+  "market_rows": 0,
+  "power_trials": 0,
+  "protocol_capability_is_not_authentic_support": true,
+  "read_allowlist": [
+    "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_LOCALIZATION_V1.json.zlib.b64",
+    "research_core_v4/state/NEXT_QUOTE_SEQUENCE_CURRENT_METADATA_INTAKE_V1.json",
+    "research_core_v4/state/STRICT_PREOUTCOME_RESELECTION_V2_INPUTS_V1.json",
+    "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+    "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto"
+  ],
+  "schema": "mxm.v4.nonmarket-external-contract-capability-audit.v3",
+  "scope": "Only inspected pinned official schema and accepted current metadata/roster. No global nonexistence claim for unknown archives. Stored quote support/result history not read or used.",
+  "semantic_freeze_commit": "68f1227704cc607520dc25250c08bd6c6620d96a",
+  "sources": [
+    {
+      "authority_class": "OFFICIAL_CTRADER_OPEN_API_MODEL_OR_PROTOBUF_SCHEMA",
+      "ref": "research_core_v4/nonmarket_contract_v3/OpenApiModelMessages.proto",
+      "sha256": "56338dcac45a149227678b7c23637d64f4e2b607f6649af82394ce5c0957fedf",
+      "url": "https://github.com/spotware/openapi-proto-messages/blob/3fd8bddfbe0cfc2ecfda079623dc4e498af11e66/OpenApiModelMessages.proto"
+    },
+    {
+      "authority_class": "OFFICIAL_CTRADER_OPEN_API_MODEL_OR_PROTOBUF_SCHEMA",
+      "ref": "research_core_v4/nonmarket_contract_v3/OpenApiMessages.proto",
+      "sha256": "a84df9b528e69a494e197d48e21d6291b3d76db31396663a8188721eef9fcf35",
+      "url": "https://github.com/spotware/openapi-proto-messages/blob/3fd8bddfbe0cfc2ecfda079623dc4e498af11e66/OpenApiMessages.proto"
+    },
+    {
+      "authority_class": "ALREADY_ACCEPTED_NONOUTCOME_BROKER_METADATA_IN_CANONICAL_REPOSITORY",
+      "ref": "research_core_v4/nonmarket_contract_v3/METADATA_CAPABILITY_PROJECTION_V3.json",
+      "sha256": "44cc68652820c9be20678336a22a88f419831a1b7821bd3f52a77f458c51379e"
+    }
+  ]
+}
