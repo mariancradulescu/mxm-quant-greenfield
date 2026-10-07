@@ -1,0 +1,57 @@
+name: Support V1 exact final head audit and machine publication
+on:
+  push:
+    branches: [support-only-v1-final-delivery]
+permissions:
+  contents: write
+jobs:
+  exact-final-head:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check frozen validation launcher and select exact final candidate
+        run: |
+          python - <<'PY'
+          import hashlib,json,subprocess
+          head=subprocess.check_output(['git','rev-parse','HEAD^']).decode().strip()
+          a=json.loads(subprocess.check_output(['git','show',head+':research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_EXECUTION_AUTHORITY_V1.json']))
+          p='.github/workflows/current-wave-support-v1-machine-final-delivery.yml'
+          assert hashlib.sha256(open(p,'rb').read()).hexdigest()==a['validation_workflow_sha256']
+          print('EXACT_FINAL_CANDIDATE '+head)
+          PY
+          git checkout --detach "$(git rev-parse HEAD^)"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.3.5 ijson==3.4.0.post0
+      - name: Validate exact final head with zero M5 input reads
+        run: python -m research_core_v4.current_wave_support_final_validation_v1
+      - name: Verify durable nonoutcome output hashes and strict packed mask schema
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m research_core_v4.current_wave_support_output_audit_v1
+      - name: Publish validated exact final head by fail-closed REST fast forward
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json,os,subprocess,urllib.request
+          head=subprocess.check_output(['git','rev-parse','HEAD']).decode().strip()
+          a=json.load(open('research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_EXECUTION_AUTHORITY_V1.json'))
+          url='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/git/'
+          headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],'Accept':'application/vnd.github+json'}
+          def req(path,data=None):
+              r=urllib.request.Request(url+path,headers=headers,data=json.dumps(data).encode() if data else None,method='PATCH' if data else 'GET')
+              with urllib.request.urlopen(r) as f:return json.load(f)
+          branch='heads/performance-research-v3-20260922'
+          live=req('ref/'+branch)['object']['sha']
+          assert live in [a['delivery_parent_commit'],head]
+          if live!=head:req('refs/'+branch,{'sha':head,'force':False})
+          assert req('ref/'+branch)['object']['sha']==head
+          print('EXACT_FINAL_LIVE_HEAD '+head)
+          PY
