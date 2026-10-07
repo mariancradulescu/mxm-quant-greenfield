@@ -1,0 +1,46 @@
+name: Support V1 machine publication and final private preflight
+on:
+  push:
+    branches: [support-only-v1-machine-final-preflight]
+permissions:
+  contents: write
+jobs:
+  publish-and-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 28efbc017d5b1dfd61c6516b1464bf8c41b9a84b
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.3.5 ijson==3.4.0.post0
+      - name: Publish exact implementation by fail-closed REST fast forward
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json,os,urllib.request
+          url='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/git/'
+          headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],'Accept':'application/vnd.github+json'}
+          def req(path,data=None):
+              r=urllib.request.Request(url+path,headers=headers,data=json.dumps(data).encode() if data else None,method='PATCH' if data else 'GET')
+              with urllib.request.urlopen(r) as f:return json.load(f)
+          branch='heads/performance-research-v3-20260922'
+          head=req('ref/'+branch)['object']['sha']
+          assert head in ['b65694d7504a6ca63bbb7724a01e4702e9154da4','e6e0a397ab82a7e73807c6912b53a121c781f1c5','28efbc017d5b1dfd61c6516b1464bf8c41b9a84b']
+          if head!='28efbc017d5b1dfd61c6516b1464bf8c41b9a84b':
+              req('refs/'+branch,{'sha':'28efbc017d5b1dfd61c6516b1464bf8c41b9a84b','force':False})
+          assert req('ref/'+branch)['object']['sha']=='28efbc017d5b1dfd61c6516b1464bf8c41b9a84b'
+          print('EXACT_MACHINE_PUBLICATION_PASS 28efbc017d5b1dfd61c6516b1464bf8c41b9a84b')
+          PY
+      - name: Final exact implementation synthetic and private crypto preflight
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          test "$(git rev-parse HEAD)" = "28efbc017d5b1dfd61c6516b1464bf8c41b9a84b"
+          GITHUB_SHA=28efbc017d5b1dfd61c6516b1464bf8c41b9a84b python -m research_core_v4.current_wave_support_machine_v1 --preflight
