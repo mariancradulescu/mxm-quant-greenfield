@@ -1,0 +1,91 @@
+{
+  "authoritative_start": "2e5bc9854d727b3b48a0ff449ceb70d9c090009a",
+  "authorities": {
+    "BROKER_NATIVE_ACTIVITY_STATE": {
+      "H0": "[h-60m,h), latest fully completed UTC hour",
+      "Phi": "(v_1/T,...,v_11/T) if T>0 else eleven zeros",
+      "T": "SUM_j(v_j)",
+      "bars": 12,
+      "interpretation": "ORDERED_INTRAHOUR_ACTIVITY_DISTRIBUTION_SHAPE",
+      "mechanism": "Distribution of broker activity across a completed hour provides information beyond its price path.",
+      "resolution": "M5",
+      "smoothing": false,
+      "thresholding": false,
+      "twelfth_weight": "1-SUM(first 11) when T>0",
+      "unordered_histogram": false,
+      "v_j": "broker tick volume of chronological M5 bar j=1..12; nonnegative integer"
+    },
+    "MULTISCALE_PRICE_STATE": {
+      "H0": "[h-60m,h), latest fully completed UTC hour",
+      "Phi": "STATE_Qminus1 * STATE_H0",
+      "Qminus1": "[h-75m,h-60m), immediately preceding adjacent interval, disjoint from H0",
+      "aggregate": "O first open, H maximum high, L minimum low, C last close",
+      "bars": [
+        3,
+        12
+      ],
+      "codomain": [
+        -1,
+        0,
+        1
+      ],
+      "interpretation": {
+        "-1": "DIRECTIONAL_DISAGREEMENT",
+        "0": "NEUTRAL_OR_FLAT_STATE",
+        "1": "DIRECTIONAL_AGREEMENT"
+      },
+      "location": "(C_I-L_I)/(H_I-L_I) if H_I>L_I else 0.5",
+      "mechanism": "Agreement between disjoint completed 15 minute and hourly aggregation states conditions subsequent adjustment.",
+      "resolution": "M5",
+      "state": "SIGN(location-0.5)"
+    },
+    "REGIME_AND_STRUCTURAL_BREAK_STATE": {
+      "D0": "12 locations from H0",
+      "Dminus1": "12 locations from Hminus1",
+      "H0": "[h-60m,h), latest fully completed UTC hour",
+      "Hminus1": "[h-120m,h-60m), immediately preceding completed UTC hour",
+      "Phi": "SUM_j(ABS(SORT(D0)_j-SORT(Dminus1)_j))/12",
+      "bars": [
+        12,
+        12
+      ],
+      "interpretation": "EXACT_EQUAL_WEIGHT_ONE_DIMENSIONAL_WASSERSTEIN_1_DISTANCE",
+      "location_codomain": "[0,1]",
+      "location_j": "(CLOSE_j-LOW_j)/(HIGH_j-LOW_j) if HIGH_j>LOW_j else 0.5",
+      "mechanism": "Change in completed-hour price-location distribution conditions subsequent state persistence.",
+      "resolution": "M5",
+      "response_integrity_audit_required": true
+    },
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE": {
+      "H0": "[h-60m,h), latest fully completed UTC hour",
+      "Phi": "SUM_j((q_j/Q)^2) if Q>0 else 0",
+      "Q": "SUM_j(q_j)",
+      "bars": 12,
+      "interpretation": "HERFINDAHL_CONCENTRATION_OF_REALIZED_WITHIN_BAR_SQUARED_VARIATION",
+      "mechanism": "Completed-hour variation concentration across its twelve M5 bars conditions next-hour variation.",
+      "positive_prices_required": true,
+      "q_j": "r_j*r_j",
+      "r_j": "LN(CLOSE_j/OPEN_j)",
+      "resolution": "M5",
+      "response_integrity_audit_required": true
+    }
+  },
+  "authority": "User prospective governance instruction 2026-10-07; new choices, not uniquely entailed by previous prose",
+  "baseline_reopen": false,
+  "baseline_sha256": "d57589c12af2a514903f3945c11bf87bd04ac70b880498806a75625f4095d2d1",
+  "candidate_comparative_input": false,
+  "common_missingness": {
+    "any_required_bar_missing": "FEATURE_UNAVAILABLE",
+    "invalid_nonfinite_or_invalid_OHLC": "FEATURE_UNAVAILABLE",
+    "no_imputation": true,
+    "no_older_interval_fallback": true,
+    "require_completed_utc_grid_and_available_by_t": true
+  },
+  "freeze_all_simultaneously": true,
+  "historical_outcome_input": false,
+  "market_rows": 0,
+  "response_change_authorized": false,
+  "response_conflict_law": "Materialize prospective response governance blocker; do not change response",
+  "schema": "mxm.v4.prospective-exact-candidate-semantics.v3",
+  "zero_parameter_search": true
+}
