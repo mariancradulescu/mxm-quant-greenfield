@@ -1,0 +1,27 @@
+name: Current wave support V1 synthetic and private preflight
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_IMPLEMENTATION_FREEZE_V1.json]
+permissions:
+  contents: read
+jobs:
+  synthetic-private-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.3.5 ijson==3.4.0.post0
+      - name: Full synthetic parity resource and existing private crypto fixture
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          test "$GITHUB_RUN_ATTEMPT" = "1"
+          python -m research_core_v4.current_wave_support_machine_v1 --preflight

@@ -1,0 +1,30 @@
+name: Current wave support V1 real support only
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_EXECUTION_ARM_V1.json]
+permissions:
+  contents: write
+concurrency:
+  group: current-wave-support-only-v1
+  cancel-in-progress: false
+jobs:
+  support-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.3.5 ijson==3.4.0.post0
+      - name: Hash bound streaming support only with atomic durable masks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          python -m research_core_v4.current_wave_support_machine_v1 --execute
