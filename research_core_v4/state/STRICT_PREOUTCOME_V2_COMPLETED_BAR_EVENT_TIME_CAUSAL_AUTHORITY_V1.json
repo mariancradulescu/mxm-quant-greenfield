@@ -1,0 +1,60 @@
+{
+  "acquisition_authorized": false,
+  "authoritative_start_head": "aee51de1bcd3b8d2849a3ce0b40b6a9fa416a2f3",
+  "authority": "Explicit prospective user instruction 2026-10-07; separate layer, not supersession of support archive",
+  "confirmation_opened": false,
+  "current_wave": [
+    "MULTISCALE_PRICE_STATE",
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE",
+    "BROKER_NATIVE_ACTIVITY_STATE",
+    "CROSS_SECTIONAL_RELATIVE_STATE",
+    "REGIME_AND_STRUCTURAL_BREAK_STATE"
+  ],
+  "does_not_authorize_real_values": true,
+  "event_time_law": {
+    "bar_interval": "[s,s+300)",
+    "feature_and_baseline": "Every required feature and baseline bar has s+300<=t; h=floor(t/3600)*3600; keep existing completed-hour anchors",
+    "no_forming_bar": true,
+    "no_forward_fill": true,
+    "no_future_feature_rows": true,
+    "peers": "Frozen context and freshness/validity sets from entry masks only; no response values choose peers",
+    "response": "Future bar k is [t+300*(k-1),t+300*k), k>=1; the response excludes the decision bar [t-300,t). The shared boundary at t is an event-time reference, not an executable fill.",
+    "runtime": "Actual receipt must precede actual decision; missing or stale input cancels decision; execution strictly after actual decision. No zero latency claim."
+  },
+  "frozen_execution_authority": {
+    "law": "DECIDE_ONLY_AFTER_COMPLETED_BAR_AT_T;PENDING_FIRST_GRID_OPEN_T_PLUS5MIN_STRICTLY_AFTER;CANCEL_IF_MISSING_OR_STALE;SIMULTANEOUS_ACTIONS_GATHERED;ALL_REDUCTIONS_SETTLE_BEFORE_GREEDY_ENTRIES;OPPOSITE_DIRECTION_MUST_FIRST_CLOSE",
+    "ref": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+    "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f"
+  },
+  "layer_interpretation": "Existing geometric masks can describe completed-bar ordered event geometry. This authority certifies the prospective ordering law, not historical receipt/revision provenance or any statistical power.",
+  "new_economic_outcomes": 0,
+  "new_row_masks_created": false,
+  "official_authorities": [
+    {
+      "law": "Live ProtoOASpotEvent trendbar supplies the last closed bar",
+      "url": "https://help.ctrader.com/open-api/symbol-data/",
+      "verified_utc_date": "2026-10-07"
+    },
+    {
+      "law": "ProtoOATrendbar utcTimestampInMinutes is the Unix time in minutes of the bar open tick",
+      "url": "https://help.ctrader.com/open-api/model-messages/",
+      "verified_utc_date": "2026-10-07"
+    }
+  ],
+  "old_masks_rewritten": false,
+  "parked_sources": [
+    "SESSION_AND_LIQUIDITY_STATE",
+    "TOP_OF_BOOK_QUOTE_STATE",
+    "FACTOR_OR_BASKET_RESIDUAL_STATE",
+    "CROSS_INSTRUMENT_RELATIONAL_STATE",
+    "CURVE_CASH_FORWARD_PERPETUAL_RELATIONSHIPS",
+    "BROKER_NATIVE_CARRY_FINANCING_SWAP"
+  ],
+  "prospective_only": true,
+  "protected_forward_opened": false,
+  "ranking": null,
+  "schema": "mxm.v4.current-wave.power-duration-boundary.v1",
+  "search_budget_use": 0,
+  "selected_source": null,
+  "status": "CERTIFIABLE_FOR_PREDICTIVE_POWER_PLANNING_ONLY"
+}

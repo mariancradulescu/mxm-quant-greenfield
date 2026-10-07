@@ -1,0 +1,65 @@
+{
+  "acquisition_authorized": false,
+  "allowed_inputs": [
+    "support_only_v1/results/event_masks.npz",
+    "support_only_v1/results/support_counts.json.gz",
+    "support_only_v1/results/dependence_geometry.json.gz",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_SUPPORT_RESULT_V1.json",
+    "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_DEPENDENCE_GEOMETRY_RESULT_V1.json",
+    "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+    "research_core_v4/state/MASTER1576_V2_DEEP_M5_SUPPORT_AND_POWER_CALIBRATION_V1.json"
+  ],
+  "assumed_repetition_forbidden": true,
+  "audit_order": [
+    "Verify existing accepted hashes and exact UNKNOWN bitmap bytes",
+    "Derive observed per-context/horizon daily and weekly support summaries without selecting leaves",
+    "Check whether observed masks plus frozen authorities impose a positive support lower envelope outside their observed calendar domain",
+    "Distinguish finite assumed-model sensitivity calibration from an identified duration",
+    "Stop before power if necessary transport quantity is unidentified"
+  ],
+  "authoritative_start_head": "aee51de1bcd3b8d2849a3ce0b40b6a9fa416a2f3",
+  "confirmation_opened": false,
+  "counterexample": "Fix every observed identity/time/source mask and all overlap/peer/context incidence byte-exact. Outside the observed 28 days compare a calendar-compatible continuation to no available rows. Both agree on every permitted observation and neither is excluded by the frozen masks; no positive out-of-domain support lower bound follows.",
+  "counterexample_nonclaim": "Not a claim that broker actually lacks earlier history; not a probability estimate, empirical null or proof of absent predictive information.",
+  "current_wave": [
+    "MULTISCALE_PRICE_STATE",
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE",
+    "BROKER_NATIVE_ACTIVITY_STATE",
+    "CROSS_SECTIONAL_RELATIVE_STATE",
+    "REGIME_AND_STRUCTURAL_BREAK_STATE"
+  ],
+  "duration": null,
+  "effect_grid_authority": {
+    "pointer": "/power",
+    "ref": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+    "sha256": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5"
+  },
+  "finite_stress_model_nonclaim": "Normal/AR025/AR050 are required finite prospective sensitivity cases, not empirical bounds on arbitrary longer-range score dependence or coverage. Simulation under explicitly declared transport assumptions is possible; its duration is conditional on those assumptions.",
+  "minimum_power_lower_95_bound": 0.8,
+  "multiplicity_and_stability_status": "NOT_FROZEN_FOR_SIMULATION; no complete-procedure trial may run",
+  "new_economic_outcomes": 0,
+  "new_effect_size": null,
+  "parked_sources": [
+    "SESSION_AND_LIQUIDITY_STATE",
+    "TOP_OF_BOOK_QUOTE_STATE",
+    "FACTOR_OR_BASKET_RESIDUAL_STATE",
+    "CROSS_INSTRUMENT_RELATIONAL_STATE",
+    "CURVE_CASH_FORWARD_PERPETUAL_RELATIONSHIPS",
+    "BROKER_NATIVE_CARRY_FINANCING_SWAP"
+  ],
+  "power_effect_grid": {
+    "AR025_local_MDE_SD": 0.5,
+    "AR050_local_MDE_SD": 0.75,
+    "normal_local_MDE_SD": 0.4
+  },
+  "prospective_only": true,
+  "protected_forward_opened": false,
+  "ranking": null,
+  "schema": "mxm.v4.current-wave.power-duration-boundary.v1",
+  "search_budget_use": 0,
+  "selected_source": null,
+  "simulation_trials": 0,
+  "status": "FROZEN_BEFORE_DETERMINISTIC_MASK_AUDIT_NO_POWER_TRIALS",
+  "trial_count": null,
+  "trial_count_status": "NOT_SELECTED_BECAUSE_STOP_PRECEDES_COMPLETE_POWER_PROTOCOL"
+}
