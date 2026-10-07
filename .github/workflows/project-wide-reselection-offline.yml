@@ -1,0 +1,27 @@
+name: Project Wide Outcome Blind Information Source Reselection Offline Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_*.json
+      - research_core_v4/master1576_current_state_guard_v2.py
+      - research_core_v4/project_wide_reselection_preflight_v1.py
+      - tests/test_project_wide_reselection_v1.py
+      - .github/workflows/project-wide-reselection-offline.yml
+permissions:
+  contents: read
+jobs:
+  reselection-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Exact head categorical comparison and successor current state regression
+        run: python -m research_core_v4.project_wide_reselection_preflight_v1
