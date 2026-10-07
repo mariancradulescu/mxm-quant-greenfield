@@ -45,6 +45,9 @@ class Parity(unittest.TestCase):
  def test_graph_vector_parity(self):
   g=CalendarGraph();g.add(np.array([True,True,False]),np.array([0,280,600]),np.array([2,300,900]),np.array([3,21,301]))
   d=g.result();self.assertEqual(d['node_count'],2);self.assertEqual(d['connected_component_count'],1);self.assertEqual(d['cross_midnight_incidence_count'],1)
+ def test_coverage_includes_censored_and_absent_runs(self):
+  c=coverage(np.zeros(10,bool),np.arange(10));self.assertEqual(c['maximum_geometric_gap_scheduled_slots'],10)
+  c=coverage(np.array([False,False,True,True,False]),np.arange(5));self.assertEqual(c['maximum_geometric_gap_scheduled_slots'],2);self.assertEqual(c['longest_complete_run_scheduled_slots'],2)
  def test_no_forbidden_calculation(self):
   tree=ast.parse(Path('research_core_v4/current_wave_support_worker_v1.py').read_text())
   names={n.func.attr if isinstance(n.func,ast.Attribute) else n.func.id for n in ast.walk(tree) if isinstance(n,ast.Call) and isinstance(n.func,(ast.Name,ast.Attribute))}
@@ -77,7 +80,7 @@ class Checkpoints(unittest.TestCase):
    arm=Path(td)/'arm.json';arm.write_bytes(canonical({'scope':'SUPPORT_ONLY','implementation_freeze_sha256':sha(Path(m.FREEZE).read_bytes()),'assets':route['assets'],'roster':roster,'protected_forward_boundary':'2026-09-17T12:02:58Z','preflight_ref':str(pf),'preflight_sha256':'0'*64}))
    with patch.object(m,'ARM',str(arm)),patch.object(m,'api',side_effect=AssertionError('NETWORK_FORBIDDEN')):
     with self.assertRaisesRegex(SupportError,'PREFLIGHT_HASH_BINDING'):m.execute()
-TEST_COUNT=14
+TEST_COUNT=15
 def run_tests():
  result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(__import__(__name__,fromlist=["*"])))
  need(result.wasSuccessful() and result.testsRun==TEST_COUNT,'SYNTHETIC_PROTOCOL_PARITY')

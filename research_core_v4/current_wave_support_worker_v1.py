@@ -59,7 +59,8 @@ def own_masks(bits):
 def coverage(mask,t):
  idx=t[mask]; scheduled=np.flatnonzero(mask); gaps=np.diff(scheduled)-1
  edges=np.diff(np.r_[False,mask,False].astype(np.int8));runs=np.flatnonzero(edges==-1)-np.flatnonzero(edges==1)
- return {'first_query_timestamp':int(START+t[0]*300),'last_query_timestamp':int(START+t[-1]*300),'first_complete_timestamp':int(START+idx[0]*300) if len(idx) else None,'last_complete_timestamp':int(START+idx[-1]*300) if len(idx) else None,'distinct_utc_date_count':int(len(np.unique(idx//288))),'observed_calendar_span_seconds':int((idx[-1]-idx[0])*300) if len(idx) else 0,'maximum_geometric_gap_scheduled_slots':int(max(gaps,default=0)),'longest_complete_run_scheduled_slots':int(max(runs,default=0)),'gap_histogram_scheduled_slots':dict(sorted(Counter(map(int,gaps[gaps>0])).items())),'per_day_complete_counts':np.bincount(idx//288,minlength=28).tolist(),'per_segment_complete_counts':np.bincount(idx//2016,minlength=4).tolist()}
+ gap_edges=np.diff(np.r_[False,~mask,False].astype(np.int8));all_gaps=np.flatnonzero(gap_edges==-1)-np.flatnonzero(gap_edges==1)
+ return {'first_query_timestamp':int(START+t[0]*300),'last_query_timestamp':int(START+t[-1]*300),'first_complete_timestamp':int(START+idx[0]*300) if len(idx) else None,'last_complete_timestamp':int(START+idx[-1]*300) if len(idx) else None,'distinct_utc_date_count':int(len(np.unique(idx//288))),'observed_calendar_span_seconds':int((idx[-1]-idx[0])*300) if len(idx) else 0,'maximum_geometric_gap_scheduled_slots':int(max(all_gaps,default=0)),'longest_complete_run_scheduled_slots':int(max(runs,default=0)),'gap_histogram_scheduled_slots':dict(sorted(Counter(map(int,all_gaps)).items())),'per_day_complete_counts':np.bincount(idx//288,minlength=28).tolist(),'per_segment_complete_counts':np.bincount(idx//2016,minlength=4).tolist()}
 class CalendarGraph:
  """Date hyperedges subsume bar/context edges; exact components without pairs.
 Every node touches all dates of its query set. Other declared incidences share
@@ -123,7 +124,7 @@ def derive(validity,roster,outdir):
      peer_hist.update(map(int,peers));valid_peer_hist.update(map(int,rp))
     B=base[i][ti];F=feature[ti];R=response[ti];joint=B&F&R
     reason={}
-    tests={'BASELINE_WINDOW_INCOMPLETE':~B,'FEATURE_WINDOW_INCOMPLETE':~F,'RESPONSE_WINDOW_INCOMPLETE':~R,'LEFT_CENSORED':lo[ti]<0,'RIGHT_CENSORED':ti+h>G,'ROW_ABSENT':~(window(m['p'],lo,hr)&indexed(m['p'],t-1))[ti],'INVALID_OHLC':~(window(m['o'],lo,hr)&indexed(m['o'],t-1))[ti],'INVALID_COUNT':~(window(m['c'],lo,hr)&indexed(m['c'],t-1))[ti]}
+    tests={'BASELINE_WINDOW_INCOMPLETE':~B,'FEATURE_WINDOW_INCOMPLETE':~F,'RESPONSE_WINDOW_INCOMPLETE':~R,'LEFT_CENSORED':lo[ti]<0,'RIGHT_CENSORED':ti+h>G,'ROW_ABSENT':~(window(m['p'],lo,hr)&indexed(m['p'],t-1))[ti],'INVALID_OHLC':((window(m['p'],lo,hr)&indexed(m['p'],t-1))&~(window(m['o'],lo,hr)&indexed(m['o'],t-1)))[ti],'INVALID_COUNT':((window(m['p'],lo,hr)&indexed(m['p'],t-1))&~(window(m['c'],lo,hr)&indexed(m['c'],t-1)))[ti]}
     if source==SOURCES[1]:tests['NONPOSITIVE_REQUIRED_PRICE']=~window(m['pos'],lo,hr)[ti]
     if source==SOURCES[3]:tests.update(MIN_FRESH_PEERS_NOT_MET=peers[ti]<2,MIN_VALID_RESPONSE_PEERS_NOT_MET=rp[ti]<2,CONTEXT_SIZE_BELOW_3=np.full(len(ti),len(contexts[ctx])<3))
     for code,mask in tests.items():reason[code]=int(mask.sum())
@@ -135,6 +136,8 @@ def derive(validity,roster,outdir):
     for val,num in zip(*np.unique(codebits,return_counts=True)):
      combos['|'.join([code for j,code in enumerate(codes) if int(val)&(1<<j)]) or 'NONE']=int(num)
     rec={'source':source,'identity':e['SYMBOL_ID'],'context':ctx,'horizon_M5':h,'potential_event_count':len(ti),'geometrically_complete_event_count':int((B&F).sum()),'geometrically_incomplete_event_count':int((~(B&F)).sum()),'geometric_joint_count':int(joint.sum()),'causal_pass_count':0,'causal_false_count':0,'causal_unknown_count':len(ti),'response_window_available_count':int(R.sum()),'missingness_reason_counts':reason,'missingness_combination_counts':dict(combos),'segment_boundary_counts':int(np.count_nonzero(lo[ti]//2016!=(ti+h-1)//2016)),**coverage(joint,ti)}
+    rec['per_day_mask_counts']={name:np.bincount(ti[value]//288,minlength=28).tolist() for name,value in [('baseline',B),('feature',F),('response',R),('geometric_feature',B&F),('geometric_joint',joint),('causal_unknown',np.ones(len(ti),bool))]}
+    rec['per_segment_mask_counts']={name:np.bincount(ti[value]//2016,minlength=4).tolist() for name,value in [('baseline',B),('feature',F),('response',R),('geometric_feature',B&F),('geometric_joint',joint),('causal_unknown',np.ones(len(ti),bool))]}
     if source==SOURCES[3]:rec.update(events_with_at_least_two_geometric_peers=int((peers>=2).sum()),events_with_at_least_two_valid_response_peers=int((rp>=2).sum()),causally_certified_peer_events=0,context_size=len(contexts[ctx]))
     records.append(rec);context_counts[(source,ctx,h)]+=int(joint.sum());dateunion[ctx]|=joint
     masks={'baseline':B,'feature':F,'response':R,'joint':joint,'causal_unknown':np.ones(len(ti),bool)}
