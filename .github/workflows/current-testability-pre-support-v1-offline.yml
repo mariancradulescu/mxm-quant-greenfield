@@ -1,0 +1,32 @@
+name: Current testability V1 pre-support exact head offline
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/current_testability_frontier_v1.py
+      - research_core_v4/current_wave_presupport*.py
+      - research_core_v4/master1576_current_state_guard_v9.py
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT*.json
+      - research_core_v4/state/STRICT_PREOUTCOME_V2_TESTABILITY_OWN*.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_current_testability_frontier_v1.py
+      - .github/workflows/current-testability-pre-support-v1-offline.yml
+permissions:
+  contents: read
+jobs:
+  current-wave-pre-support-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen gate, isolated frontier and unexecuted support protocol
+        run: python -m research_core_v4.current_wave_presupport_preflight_v1
