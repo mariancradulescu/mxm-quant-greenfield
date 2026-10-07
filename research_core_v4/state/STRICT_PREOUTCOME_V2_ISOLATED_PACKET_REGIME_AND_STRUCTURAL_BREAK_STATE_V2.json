@@ -1,0 +1,89 @@
+{
+  "candidate": {
+    "causal_timestamp_law": "Use only observations with authentic availability <= entry timestamp; completed intervals only; effective metadata known by entry",
+    "coherent_context_and_cohort": {
+      "available_contexts": [
+        "AT Equities",
+        "AU Equities",
+        "BE Equities",
+        "CH Equities",
+        "Commodities (Cash)",
+        "Crypto Currency (Spot)",
+        "Currency Index (Spot)",
+        "DE Equities",
+        "DK Equities",
+        "ES Equities",
+        "ETFs",
+        "Energies (Spot)",
+        "FI Equities",
+        "FR Equities",
+        "Forex (Spot)",
+        "Forwards - Commodities",
+        "Forwards - Indices",
+        "Forwards - Treasuries",
+        "GB Equities",
+        "HK Equities",
+        "IE Equities",
+        "Indices (Spot)",
+        "Metals (Spot)",
+        "NO Equities",
+        "PT Equities",
+        "Perpetual Commodity",
+        "Perpetual Stock",
+        "SE Equities",
+        "US Equities"
+      ],
+      "context_policy": "Every broker native context evaluated as its own structural cohort; no support or activity ranking",
+      "membership_rule": "All eligible identities in a context; authoritative linkage required for basket, peer or contract relations; no name-only linkage"
+    },
+    "compact_horizon_family": {
+      "m5_bars": [
+        1,
+        12
+      ],
+      "prospective_rationale": "One authentic M5 update and one full hour for immediate versus hourly propagation; paired planned family, no best-horizon choice",
+      "selected_for_real_test": false
+    },
+    "compute_geometry": "One causal streaming feature pass per identity plus cohort reductions; finite feature families, no parameter search or automatic mechanism optimization",
+    "confirmation_path": "Development and selection payment followed by genuinely disjoint confirmation; existing development data cannot certify confirmation",
+    "dependence_unit": "Shared calendar-time blocks with within-context and cross-context simultaneous dependence; identities are not independent trials",
+    "execution_information_path": "Current EUR200 structural eligibility only; side-aware historical spread and slippage remain unknown and require later authentic certification",
+    "incremental_information_claim": "Additional conditional information beyond the declared own-information baseline; no historical effect asserted",
+    "information_source": "REGIME_AND_STRUCTURAL_BREAK_STATE",
+    "materially_distinct_causal_mechanism": "Change in completed-hour price-location distribution conditions subsequent state persistence",
+    "missingness_law": "Exclude incompletely observed feature or response windows; retain masks and reasons; no imputation, no missingness-as-null",
+    "observable_inputs": "Completed canonical M5 OHLC",
+    "own_information_baseline": "Own last completed M5 and hourly price location, range and broker activity, with causal clock controls; incremental predictor excluded from baseline",
+    "response_function": "Future closed-bar log price displacement at each declared horizon, conditionally incremental to own baseline; financing or term candidates additionally require authenticated cashflow or term response. Definition only: no values calculated",
+    "synchronization_requirement": "Exact authentic common timestamps for related identities; no forward-filled prices; own interval requires all twelve M5 observations",
+    "why_information_exists_before_entry": "Completed observations and effective metadata precede entry; no response data used to construct features"
+  },
+  "modalities": {
+    "canonical_m5": {
+      "availability": "Completed bar only; close time before entry",
+      "fields": [
+        "identity",
+        "timestamp",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume"
+      ],
+      "provenance": "Accepted broker native historical M5; structural summary only in this task",
+      "resolution_minutes": 5
+    },
+    "financing": {
+      "point_in_time_historical_schedule_certified": false
+    },
+    "quotes": {
+      "point_in_time_sequence_support_certified": false
+    },
+    "relationships": {
+      "authoritative_membership_and_linkage_certified": false
+    },
+    "sessions": {
+      "historical_session_labels_certified": false
+    }
+  }
+}

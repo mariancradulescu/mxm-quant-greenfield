@@ -1,0 +1,103 @@
+{
+  "baseline": {
+    "freeze_commit": "9254cd828b96bc1f31441010201bd7916d32560b",
+    "ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_SHARED_OWN_INFORMATION_BASELINE_EXACT_SPECIFICATION_V2.json",
+    "sha256": "d57589c12af2a514903f3945c11bf87bd04ac70b880498806a75625f4095d2d1"
+  },
+  "candidate_definition_sha256": "a93bfcdf51ff4b8709e186f18abb2a90f2e8791ebdda5a533419a334de3a5120",
+  "causal_timestamp_law": "Use only observations with authentic availability <= entry timestamp; completed intervals only; effective metadata known by entry",
+  "constructive_nonredundancy_witness_or_redundancy_proof": null,
+  "constructor_inputs": [
+    "own unchanged candidate",
+    "shared frozen baseline",
+    "neutral modality flags"
+  ],
+  "exact_feature_map_Phi_i": null,
+  "feature_specific_readset": null,
+  "formalization_status": "FORMALIZATION_UNRESOLVED",
+  "frozen_mechanism": "Agreement between disjoint completed 15 minute and hourly aggregation states conditions subsequent adjustment",
+  "information_source": "MULTISCALE_PRICE_STATE",
+  "market_rows_used": 0,
+  "missingness_law": "Exclude incompletely observed feature or response windows; retain masks and reasons; no imputation, no missingness-as-null",
+  "no_definition_change": true,
+  "peer_certificate_visibility": false,
+  "resolved_shared_components": [
+    "LAST_M5_OPEN",
+    "LAST_M5_HIGH",
+    "LAST_M5_LOW",
+    "LAST_M5_CLOSE",
+    "LAST_M5_TICK_VOLUME",
+    "HOURLY_PRICE_LOCATION",
+    "HOURLY_RANGE",
+    "HOURLY_TOTAL_TICK_VOLUME",
+    "UTC_WEEKDAY",
+    "UTC_5_MINUTE_SLOT_OF_DAY"
+  ],
+  "schema": "mxm.v4.isolated-semantic-certificate.v2",
+  "sigma_containment_verdict": "UNRESOLVED_FEATURE_MAP_NOT_UNIQUELY_DEFINED",
+  "synchronization_requirement": "Exact authentic common timestamps for related identities; no forward-filled prices; own interval requires all twelve M5 observations",
+  "unchanged_definition": {
+    "causal_timestamp_law": "Use only observations with authentic availability <= entry timestamp; completed intervals only; effective metadata known by entry",
+    "coherent_context_and_cohort": {
+      "available_contexts": [
+        "AT Equities",
+        "AU Equities",
+        "BE Equities",
+        "CH Equities",
+        "Commodities (Cash)",
+        "Crypto Currency (Spot)",
+        "Currency Index (Spot)",
+        "DE Equities",
+        "DK Equities",
+        "ES Equities",
+        "ETFs",
+        "Energies (Spot)",
+        "FI Equities",
+        "FR Equities",
+        "Forex (Spot)",
+        "Forwards - Commodities",
+        "Forwards - Indices",
+        "Forwards - Treasuries",
+        "GB Equities",
+        "HK Equities",
+        "IE Equities",
+        "Indices (Spot)",
+        "Metals (Spot)",
+        "NO Equities",
+        "PT Equities",
+        "Perpetual Commodity",
+        "Perpetual Stock",
+        "SE Equities",
+        "US Equities"
+      ],
+      "context_policy": "Every broker native context evaluated as its own structural cohort; no support or activity ranking",
+      "membership_rule": "All eligible identities in a context; authoritative linkage required for basket, peer or contract relations; no name-only linkage"
+    },
+    "compact_horizon_family": {
+      "m5_bars": [
+        1,
+        12
+      ],
+      "prospective_rationale": "One authentic M5 update and one full hour for immediate versus hourly propagation; paired planned family, no best-horizon choice",
+      "selected_for_real_test": false
+    },
+    "compute_geometry": "One causal streaming feature pass per identity plus cohort reductions; finite feature families, no parameter search or automatic mechanism optimization",
+    "confirmation_path": "Development and selection payment followed by genuinely disjoint confirmation; existing development data cannot certify confirmation",
+    "dependence_unit": "Shared calendar-time blocks with within-context and cross-context simultaneous dependence; identities are not independent trials",
+    "execution_information_path": "Current EUR200 structural eligibility only; side-aware historical spread and slippage remain unknown and require later authentic certification",
+    "incremental_information_claim": "Additional conditional information beyond the declared own-information baseline; no historical effect asserted",
+    "information_source": "MULTISCALE_PRICE_STATE",
+    "materially_distinct_causal_mechanism": "Agreement between disjoint completed 15 minute and hourly aggregation states conditions subsequent adjustment",
+    "missingness_law": "Exclude incompletely observed feature or response windows; retain masks and reasons; no imputation, no missingness-as-null",
+    "observable_inputs": "Completed canonical M5 OHLC",
+    "own_information_baseline": "Own last completed M5 and hourly price location, range and broker activity, with causal clock controls; incremental predictor excluded from baseline",
+    "response_function": "Future closed-bar log price displacement at each declared horizon, conditionally incremental to own baseline; financing or term candidates additionally require authenticated cashflow or term response. Definition only: no values calculated",
+    "synchronization_requirement": "Exact authentic common timestamps for related identities; no forward-filled prices; own interval requires all twelve M5 observations",
+    "why_information_exists_before_entry": "Completed observations and effective metadata precede entry; no response data used to construct features"
+  },
+  "unresolved_candidate_quantities": [
+    "The aggregation-state map at 15 minutes and one hour is undefined.",
+    "Agreement operator and disjoint-window anchor are unspecified."
+  ],
+  "why_no_exact_witness": "A witness for one invented feature would not certify the frozen unresolved candidate. Compact B resolves only the shared baseline."
+}

@@ -1,0 +1,30 @@
+name: Compact baseline V2 exact head offline semantic closure
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/compact_*.py
+      - research_core_v4/master1576_current_state_guard_v7.py
+      - research_core_v4/state/STRICT_PREOUTCOME*_V2.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_compact_*_v2.py
+      - .github/workflows/compact-baseline-closure-v2-offline.yml
+permissions:
+  contents: read
+jobs:
+  compact-closure-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify freeze ancestry, isolation, exact map and canonical boundary
+        run: python -m research_core_v4.compact_closure_preflight_v2
