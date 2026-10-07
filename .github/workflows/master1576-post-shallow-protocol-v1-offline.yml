@@ -1,0 +1,35 @@
+name: MASTER1576 Post Shallow Protocol V1 Exact Head Offline Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_FINAL_CAMPAIGN_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
+      - research_core_v4/state/MASTER1576_POST_SHALLOW_OUTCOME_BLIND_DEEP_HISTORICAL_M5_QUALIFICATION_PROTOCOL_V1.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_master1576_post_shallow_protocol_v1.py
+      - .github/workflows/master1576-post-shallow-protocol-v1-offline.yml
+permissions:
+  contents: read
+jobs:
+  exact-head-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen authorities and exact preservation offline
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest -v tests.test_master1576_post_shallow_protocol_v1
+      - name: Print exact authority hashes
+        run: |
+          git rev-parse HEAD
+          sha256sum research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_FINAL_CAMPAIGN_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json research_core_v4/state/MASTER1576_POST_SHALLOW_OUTCOME_BLIND_DEEP_HISTORICAL_M5_QUALIFICATION_PROTOCOL_V1.json
