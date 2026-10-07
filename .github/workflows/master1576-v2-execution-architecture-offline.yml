@@ -1,0 +1,32 @@
+name: MASTER1576 V2 Execution Architecture Exact Head Offline Preflight
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/master1576_screen_v2_real_launcher_v1.py
+      - research_core_v4/master1576_real_execution_architecture_preflight_v1.py
+      - research_core_v4/state/MASTER1576_QUALIFICATION_V2_REAL_EXECUTION_ARCHITECTURE_V1.json
+      - research_core_v4/state/MASTER1576_QUALIFICATION_V2_EXECUTION_ARCHITECTURE_SYNTHETIC_PREFLIGHT_V1.json
+      - tests/test_master1576_real_execution_architecture_v1.py
+      - .github/workflows/master1576-qualification-v2-real-screen.yml
+      - .github/workflows/master1576-v2-execution-architecture-offline.yml
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+permissions:
+  contents: read
+jobs:
+  offline-architecture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run synthetic architecture control path without secrets or real assets
+        run: python -m research_core_v4.master1576_real_execution_architecture_preflight_v1 --output /tmp/master1576-architecture-preflight.json
