@@ -1,0 +1,33 @@
+name: MASTER1576 V2 Post Screen Acceptance and Duration Boundary Offline Validation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/master1576_post_screen_v1.py
+      - research_core_v4/master1576_post_screen_preflight_v1.py
+      - research_core_v4/state/MASTER1576_QUALIFICATION_V2_REAL_STRUCTURAL_SCREEN_INDEPENDENT_ACCEPTANCE_AUTHORITY_V1.json
+      - research_core_v4/state/MASTER1576_QUALIFICATION_V2_POST_SCREEN_STRUCTURAL_SUMMARY_V1.json
+      - research_core_v4/state/MASTER1576_V2_DEEP_HISTORICAL_M5_ELIGIBLE_ROSTER_V1.json
+      - research_core_v4/state/MASTER1576_V2_POST_SCREEN_BREADTH_TO_DEPTH_INFORMATION_DESIGN_V1.json
+      - research_core_v4/state/MASTER1576_V2_DEEP_M5_SUPPORT_AND_POWER_CALIBRATION_V1.json
+      - research_core_v4/state/V4_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_CURRENT_STATE.json
+      - adaptive_competition/state/ADAPTIVE_COMPETITION_AUTHORITY_V1.json
+      - tests/test_master1576_post_screen_v1.py
+      - .github/workflows/master1576-post-screen-offline.yml
+permissions:
+  contents: read
+jobs:
+  post-screen-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate complete accounting and explicit unresolved information and power boundary
+        run: python -m research_core_v4.master1576_post_screen_preflight_v1
