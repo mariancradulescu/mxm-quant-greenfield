@@ -1,0 +1,51 @@
+name: Fixed k15 28-week synthetic certification V2 after Stage7 recovery
+on:
+  push:
+    branches: [audit-operational-v2-extended-certification28-v2]
+permissions:
+  contents: write
+concurrency:
+  group: operational-v2-extended-certification28-v2
+  cancel-in-progress: false
+jobs:
+  fixed-cutoff-null:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        case: ["NORMAL", "AR025", "AR050", "HEAVY_T5", "CENTERED_SKEW", "HETEROSCEDASTIC", "VARIANCE_CHANGE", "STRONG_COMMON_FACTORS", "ISOLATED_MISSINGNESS", "CONTIGUOUS_GAPS"]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      EXACT_TARGET: ${{ github.event.before }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - run: python -m pip install numpy==2.3.5 protobuf==5.29.5
+      - name: Fetch exact hash-bound nonmarket implementation only
+        run: |
+          python - <<'CODE'
+          import os,json,pathlib,hashlib,urllib.request
+          root='https://raw.githubusercontent.com/mariancradulescu/mxm-quant-greenfield/'+os.environ['EXACT_TARGET']+'/'
+          def get(p,h=None):
+           assert p.endswith(('.py','.json')) and not p.startswith('support_only_v1/')
+           b=urllib.request.urlopen(root+p,timeout=90).read();d=hashlib.sha256(b).hexdigest()
+           if h:assert d==h,p
+           q=pathlib.Path(p);q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b);return json.loads(b) if p.endswith('.json') else None
+          f=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_DOMAIN_IMPLEMENTATION_FREEZE_V1.json','59be4fa5542b056d39a4438c3a12c7034ae99ccd6b0a14488d6b3d253f591d90')
+          for p,h in f['files_sha256'].items():get(p,h)
+          a=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_DOMAIN_NEXT_PROFILE_AUTHORITY_V2.json','34d8b79d74e055d083dd7137b90d7c284f35e13badcfe4a6d58a6a140a13720b');assert a['profile']==28 and a['selected_k']==15 and a['stage7_shared_ready'] is False and a['extended_certification_implementation_sha256']=='59be4fa5542b056d39a4438c3a12c7034ae99ccd6b0a14488d6b3d253f591d90' and a['broker_requests_authorized'] is False and a['cutoff_retuned'] is False and a['new_calibration_bank'] is False
+          s=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_STAGE7_RECOVERY224_FINAL_CANONICAL_STATE_V1.json','3d6407e7b4bdb31ee64941966cd9c262fb7646e10fca8fba8d63f81f52ccf720');assert s['shared_ready'] is False and s['accepted_identities']==1575 and s['score_calendar_days']==168 and s['next_allowed']=='FIXED_K15_28_WEEK_EXTENDED_CERTIFICATION_ONLY'
+          p=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_DOMAIN_CERTIFICATION_PROTOCOL_V1.json','38492f9504755e77cb4671ac49802b16b8c4589f9087d8844c4f6cae9cd35be1');assert p['profiles']==[24,28] and p['selected_k']==15 and p['trials_per_cell']==16384
+          get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_DOMAIN_SEED_MANIFEST_V1.json','f9871acae68cf8720c321d9dd26d06958232da14877411860cce88fae3be6852')
+          with open(os.environ['GITHUB_ENV'],'a') as o:print('CERT_PROFILE='+str(a['profile']),file=o)
+          CODE
+      - name: Exact immutable-engine and disjoint-seed fixtures
+        run: python research_core_v4/operational_v2_extended/certify.py --verify
+      - name: Durable attempt intent before first synthetic trial
+        run: python research_core_v4/operational_v2_extended/checkpoint.py --mode intent --profile "$CERT_PROFILE" --case '${{ matrix.case }}'
+      - name: Complete all16384 trials at fixed k15; no calibration
+        run: python research_core_v4/operational_v2_extended/certify.py --profile "$CERT_PROFILE" --case '${{ matrix.case }}' --output cell.json
+      - name: Durable result; no automatic replay
+        run: python research_core_v4/operational_v2_extended/checkpoint.py --mode result --profile "$CERT_PROFILE" --case '${{ matrix.case }}'
