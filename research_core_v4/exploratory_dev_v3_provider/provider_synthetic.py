@@ -132,6 +132,7 @@ def main():
         if release.returncode:
             raise RuntimeError("GITHUB_RELEASE_CREATE_BLOCKED:" + release.stderr[:250])
         digests = fabricated_zips(destination, head)
+        (destination / "redownload").mkdir(exist_ok=True)
         for name, digest in digests.items():
             gh("release", "upload", tag, str(destination / name), "--repo", REPO)
             gh("release", "download", tag, "--repo", REPO, "--pattern", name,
