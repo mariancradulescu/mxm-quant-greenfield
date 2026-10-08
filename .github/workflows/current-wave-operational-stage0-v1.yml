@@ -1,0 +1,54 @@
+name: Current wave separate operational Stage0 synthetic certification V1
+on:
+  push:
+    branches: [audit-current-wave-operational-stage0-v1]
+permissions:
+  contents: read
+jobs:
+  frozen-synthetic-stage0:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - name: Install fixed synthetic numerical dependency
+        run: python -m pip install numpy==2.3.5
+      - name: Fetch exact frozen allowlist without checkout or broker secrets
+        env:
+          EXACT_TARGET: ${{ github.event.before }}
+        run: |
+          python - <<'PYCODE'
+          import hashlib,json,os,pathlib,urllib.request
+          repo='mariancradulescu/mxm-quant-greenfield';target=os.environ['EXACT_TARGET']
+          freeze='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_IMPLEMENTATION_FREEZE_V1.json';expected='334f81d4e119fff4e7ddb825cb3d40e459a193a7ce64c13f49e712be5743ed23';trace=[]
+          def get(ref,path,expect):
+              assert path.endswith(('.json','.py'));assert not path.startswith('support_only_v1/')
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/'+repo+'/'+ref+'/'+path,timeout=60).read()
+              assert hashlib.sha256(b).hexdigest()==expect,path
+              p=pathlib.Path(path);p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+              trace.append({'ref':ref,'path':path,'sha256':expect});return b
+          d=json.loads(get(target,freeze,expected))
+          for p,h in d['files'].items():get(target,p,h)
+          p=json.loads(pathlib.Path('research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_POWER_PROTOCOL_V1.json').read_text())
+          for path,h in [(p['inventory_ref'],p['inventory_sha256']),(p['calendar_ref'],p['calendar_sha256']),(p['power']['effect_authority'],p['power']['effect_authority_sha256'])]:get(target,path,h)
+          for path,h in [('adaptive_competition/models.py','9fcc3a00954750597ff25ce3d86bc657008f88a90d950374666a9b18f6484257'),('adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json','dcf0e06070379eaa35c56193b6381f2d9d970104c30b161b1bb124e96aa92c98')]:get('89084af0a21452a17a723fabe19ddd9d636f22af',path,h)
+          pathlib.Path('synthetic_read_trace.json').write_text(json.dumps(trace,sort_keys=True,indent=2))
+          print('EXACT_TESTED_TARGET='+target)
+          print('MARKET_INPUTS=0 BROKER_REQUESTS=0 RAW_M5_READS=0 NO_CHECKOUT NO_SECRETS')
+          PYCODE
+      - name: Full fixed-trial synthetic pipeline null and power-engine certification
+        run: |
+          python research_core_v4/operational_v1/certify.py --output synthetic_machine_result.json
+          python - <<'PYCODE'
+          import json
+          d=json.load(open('synthetic_machine_result.json'));print('SCIENTIFIC_STAGE0_STATUS='+d['status']);print('PIPELINE_TESTS_PASSED='+str(d['pipeline']['tests_passed']));print('POWER_ENGINE_TESTS_PASSED='+str(d['power_engine']['tests_passed']));print('TESTS_FAILED=0')
+          print(json.dumps(d.get('first_blocker',{}),sort_keys=True))
+          PYCODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-operational-stage0-synthetic-result
+          path: |
+            synthetic_machine_result.json
+            synthetic_read_trace.json
