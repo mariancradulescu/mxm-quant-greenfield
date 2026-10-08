@@ -1,0 +1,72 @@
+name: PRIMARY145 GitHub Durable Provider Synthetic Preflight V1
+
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/primary145-github-provider-synthetic-v1.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: mxm-primary145-synthetic-provider-v1
+  cancel-in-progress: false
+
+jobs:
+  provider-fabricated-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: \${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - name: Checkout exact workflow source SHA
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: \${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Prove restricted synthetic-only invocation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test ! -e research_core_v4/exploratory_dev_v3_provider/REAL_ARM.json
+          test ! -e /etc/mxm-independent-audit/primary145-ed25519.pub
+          if grep -E 'secrets\.(CTRADER_|MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM)' .github/workflows/primary145-github-provider-synthetic-v1.yml; then
+            echo 'PROHIBITED_CREDENTIAL_INJECTION' >&2
+            exit 1
+          fi
+          python3 -m py_compile research_core_v4/exploratory_dev_v3_provider/provider_synthetic.py
+          echo 'PRIMARY145_SYNTHETIC_ONLY_BOUNDARY_PASS'
+
+      - name: Execute one real GitHub provider probe with fabricated bytes
+        shell: bash
+        run: |
+          set -uo pipefail
+          python3 -m research_core_v4.exploratory_dev_v3_provider.provider_synthetic > "$RUNNER_TEMP/primary145-provider-stdout.log" 2> "$RUNNER_TEMP/primary145-provider-stderr.log"
+          rc=$?
+          cat "$RUNNER_TEMP/primary145-provider-stdout.log"
+          cat "$RUNNER_TEMP/primary145-provider-stderr.log" >&2
+          if [ -f "$RUNNER_TEMP/PRIMARY145_PROVIDER_SYNTHETIC_RESULT_V1.json" ]; then
+            sha256sum "$RUNNER_TEMP/PRIMARY145_PROVIDER_SYNTHETIC_RESULT_V1.json"
+          fi
+          echo "PRIMARY145_PROVIDER_EXIT_CODE=$rc"
+          exit "$rc"
+
+      - name: Retain exact job outputs as time-limited additional evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: primary145-provider-fabricated-\${{ github.run_id }}
+          path: |
+            \${{ runner.temp }}/PRIMARY145_PROVIDER_SYNTHETIC_RESULT_V1.json
+            \${{ runner.temp }}/primary145-provider-stdout.log
+            \${{ runner.temp }}/primary145-provider-stderr.log
+          if-no-files-found: warn
+          retention-days: 14
