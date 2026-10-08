@@ -1,0 +1,16 @@
+name: Stop Stage7 at discovered mask-domain guard blocker
+on:
+  push:
+    branches: [audit-operational-v2-stop-stage7-37738256226]
+permissions:
+  actions: write
+  contents: read
+jobs:
+  cancel-stage7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Cancel only the known active Stage7 run; no broker IO
+        run: gh api --method POST repos/mariancradulescu/mxm-quant-greenfield/actions/runs/37738256226/cancel
