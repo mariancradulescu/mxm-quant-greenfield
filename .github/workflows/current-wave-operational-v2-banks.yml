@@ -1,0 +1,61 @@
+name: Operational inference V2 exact disjoint synthetic banks
+on:
+  push:
+    branches: [audit-operational-v2-calibration-v1, audit-operational-v2-certification-v1]
+permissions:
+  contents: read
+jobs:
+  frozen-bank:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    name: bank-${{ matrix.case }}-${{ matrix.blocks }}
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+      matrix:
+        case: [NORMAL, AR025, AR050, HEAVY_T5, CENTERED_SKEW, HETEROSCEDASTIC, VARIANCE_CHANGE, STRONG_COMMON_FACTORS, ISOLATED_MISSINGNESS, CONTIGUOUS_GAPS]
+        blocks: [12, 16, 20]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - run: python -m pip install numpy==2.3.5
+      - name: Exact immutable file allowlist; no checkout or secrets
+        env:
+          EXACT_TARGET: ${{ github.event.before }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          python - <<'PYCODE'
+          import os,json,pathlib,hashlib,urllib.request
+          repo='mariancradulescu/mxm-quant-greenfield';ref=os.environ['EXACT_TARGET'];s='research_core_v4/state/'
+          branch=os.environ['BRANCH'];domain={'audit-operational-v2-calibration-v1':'CALIBRATION','audit-operational-v2-certification-v1':'CERTIFICATION'}[branch]
+          freeze=s+'STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_INFERENCE_V2_IMPLEMENTATION_FREEZE_V1.json';approved={freeze};trace=[]
+          def fetch(path,h=None):
+           assert path in approved and path.endswith(('.py','.json')) and not path.startswith('support_only_v1/')
+           b=urllib.request.urlopen('https://raw.githubusercontent.com/'+repo+'/'+ref+'/'+path,timeout=60).read();digest=hashlib.sha256(b).hexdigest()
+           if h:assert digest==h,path
+           p=pathlib.Path(path);p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b);trace.append({'ref':ref,'path':path,'sha256':digest});return b
+          f=json.loads(fetch(freeze,'2e96665b4055e20e10136f213bc8fe2cbfec35f4302777c42b3f5a8e012a9bef'))
+          approved|=set(f['files_sha256'])|set(f['immutable_v1_files_sha256'])
+          for p,h in {**f['files_sha256'],**f['immutable_v1_files_sha256']}.items():fetch(p,h)
+          if domain=='CERTIFICATION':
+           for name in ['CALIBRATION_RESULT','CUTOFF_FREEZE']:
+            path=s+'STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_INFERENCE_V2_'+name+'_V1.json';approved.add(path);fetch(path)
+          pathlib.Path('bank_read_trace.json').write_text(json.dumps(trace,sort_keys=True,indent=2))
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('BANK_DOMAIN='+domain+'\n')
+          print('EXACT_TESTED_TARGET='+ref+' DOMAIN='+domain+' BROKER_REQUESTS=0 REAL_ROWS=0 NO_CHECKOUT_NO_SECRETS')
+          PYCODE
+      - name: Hash invariance and fixed software checks
+        run: python research_core_v4/operational_v2/bank.py --verify
+      - name: Full fixed16384 trial cell; scientific failures never skip other cells
+        env:
+          CASE: ${{ matrix.case }}
+          BLOCKS: ${{ matrix.blocks }}
+        run: python research_core_v4/operational_v2/bank.py --domain "$BANK_DOMAIN" --case "$CASE" --blocks "$BLOCKS" --output cell.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v2-${{ env.BANK_DOMAIN }}-${{ matrix.case }}-${{ matrix.blocks }}
+          path: |
+            cell.json
+            bank_read_trace.json
