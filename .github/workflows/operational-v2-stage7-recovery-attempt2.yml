@@ -1,0 +1,41 @@
+name: Stage7 attempt2 hash-bound partial recovery
+on:
+  push:
+    branches: [audit-operational-v2-stage7-recovery-attempt2-v1]
+permissions:
+  contents: write
+concurrency:
+  group: operational-v2-support-depth-single-writer
+  cancel-in-progress: false
+jobs:
+  readonly-stage7-recovery-attempt2:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      EXACT_TARGET: ${{ github.event.before }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+    steps:
+      - run: python -m pip install numpy==2.3.5 protobuf==5.29.5
+      - name: Exact recovery allowlist; full224 preflight result is hash-bound before broker
+        run: |
+          python - <<'CODE'
+          import os,json,pathlib,hashlib,urllib.request
+          root='https://raw.githubusercontent.com/mariancradulescu/mxm-quant-greenfield/'+os.environ['EXACT_TARGET']+'/'
+          def get(p,h):
+           assert p.endswith(('.py','.json')) and not p.startswith('support_only_v1/')
+           b=urllib.request.urlopen(root+p,timeout=90).read();assert hashlib.sha256(b).hexdigest()==h,p
+           q=pathlib.Path(p);q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b);return json.loads(b) if p.endswith('.json') else None
+          f=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_STAGE7_RECOVERY224_IMPLEMENTATION_FREEZE_V1.json','4e423acdb9a14ecf805f07f93247380fd52e5d362026ab3c863a902856100e23')
+          for p,h in f['files_sha256'].items():get(p,h)
+          get('research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_INFERENCE_V2_DEPTH_IMPLEMENTATION_FREEZE_V1.json','8ea44387cc73df510576d03892cd6de977edf6bf209d1518d8b20f47458af1b4');get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_STAGE7_RECOVERY224_AUTHORITY_V1.json','58a3826edf9459a331e932bebc722be3c7614055f9a2aa6929cb93c68d2de3b3')
+          CODE
+      - name: Offline immutable software and corrected full224-preflight gate; broker requests zero
+        run: PYTHONPATH=. python research_core_v4/operational_v2_extended/gate_recovery224_v1.py
+      - name: Resume exactly from identity65; preserve first64; freeze real Boolean masks before synthetic power
+        run: PYTHONPATH=. python research_core_v4/operational_v2_extended/resume_stage7_attempt2_v1.py --stage 7
