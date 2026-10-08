@@ -1,0 +1,1436 @@
+{
+  "broker_requests_before_all_gates_pass": 0,
+  "calendar_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_PROGRESSIVE_SUPPORT_DEPTH_CALENDAR_V1.json",
+  "calendar_sha256": "5138d40190f6f2c88be83f076fef7d2f9dd5576effb993b2998414230744d63f",
+  "gate_order": [
+    "immutable hashes",
+    "pipeline causality/fairness fixtures",
+    "fullN null FWER certification",
+    "power engine algebra certification",
+    "machine read-only preflight",
+    "one progressive block at a time"
+  ],
+  "inference": {
+    "FWER_ceiling": 0.05,
+    "alpha": 0.025,
+    "block_days": 7,
+    "common_sign_across_all_leaves": true,
+    "direction": "ONE_SIDED_POSITIVE",
+    "draws": 1023,
+    "implementation_ref": "research_core_v4/operational_v1/inference.py",
+    "implementation_sha256": "125f197dcd06289497635d2e22aceecceef2f190420246f72fb571af7b88555f",
+    "method": "JOINT_CALENDAR_BLOCK_WILD_BOOTSTRAP_T_MAXT",
+    "minimum_valid_blocks": 12,
+    "thirds": "chronological whole scoring-calendar weekly blocks divided into3 nearly equal consecutive sets; each requires4 valid blocks; at least2 positive means",
+    "unsupported": "retained paid; tstar excluded and cannot lead; no null claim",
+    "valid_block": "at least one nonmissing scored UTC date; equal mean over supported daily scores; no missing imputation"
+  },
+  "innovations": {
+    "AR025": 0.25,
+    "AR050": 0.5,
+    "burnin_days": 128,
+    "contiguous_gaps": "one centered complete7day gap, plus isolated2%",
+    "factorized_context": "29 immutable context labels, shared common process across all five sources/horizons; own leaf innovations retain all261; within-day event overlap collapsed by defined daily score unit; actual daily masks bind later power",
+    "heavy": "t5 / sqrt(5/3)",
+    "heteroscedastic": "shared daily exp(.7Z)/exp(.49)",
+    "isolated_missingness": "common daily10% plus independent leaf5%",
+    "normal": "independent Gaussian common(.25 variance), context(.35), ownleaf(.40); unit marginal variance",
+    "skew": "(chi2_3-3)/sqrt6",
+    "strong_common": "variance weights .80,.15,.05, rho.25",
+    "variance_change": "firsthalf*.5, secondhalf*sqrt1.75"
+  },
+  "inventory_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_PROGRESSIVE_DEPTH_PAID_LEAF_INVENTORY_V1.json",
+  "inventory_sha256": "0c88d5dc36f79d2e7d935fbcc9eb3f2a118e33439b8b1b8ce27cd06e3a7df3e1",
+  "null_cases": [
+    "NORMAL",
+    "AR025",
+    "AR050",
+    "HEAVY_T5",
+    "CENTERED_SKEW",
+    "HETEROSCEDASTIC",
+    "VARIANCE_CHANGE",
+    "STRONG_COMMON_FACTORS",
+    "ISOLATED_MISSINGNESS",
+    "CONTIGUOUS_GAPS"
+  ],
+  "null_certificate": "simultaneous upper Wilson <=.05 for false complete lead under every declared case/profile; also record stricter false-significance diagnostic; stop immediately after first full-N case/profile failing complete-lead certificate; never retune",
+  "null_geometry_profiles_week_blocks": [
+    12,
+    16,
+    20
+  ],
+  "null_geometry_scope": "hypothetical fully-supported calendar plus declared missingness stresses; method certification, NOT extrapolated actual coverage or a duration result",
+  "paid_leaves": [
+    {
+      "context": "AT Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 1,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 12,
+      "source": "MULTISCALE_PRICE_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 1,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 12,
+      "source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 1,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 12,
+      "source": "BROKER_NATIVE_ACTIVITY_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 1,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 12,
+      "source": "CROSS_SECTIONAL_RELATIVE_STATE"
+    },
+    {
+      "context": "AT Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "AU Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "BE Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "CH Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Commodities (Cash)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Crypto Currency (Spot)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Currency Index (Spot)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "DE Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "DK Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "ES Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "ETFs",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Energies (Spot)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "FI Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "FR Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Forex (Spot)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Forwards - Commodities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Forwards - Indices",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Forwards - Treasuries",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "GB Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "HK Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "IE Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Indices (Spot)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Metals (Spot)",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "NO Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "PT Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Perpetual Commodity",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "Perpetual Stock",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "SE Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    },
+    {
+      "context": "US Equities",
+      "horizon_M5": 12,
+      "source": "REGIME_AND_STRUCTURAL_BREAK_STATE"
+    }
+  ],
+  "parked_sources": [
+    "SESSION_AND_LIQUIDITY_STATE",
+    "TOP_OF_BOOK_QUOTE_STATE",
+    "FACTOR_OR_BASKET_RESIDUAL_STATE",
+    "CROSS_INSTRUMENT_RELATIONAL_STATE",
+    "CURVE_CASH_FORWARD_PERPETUAL_RELATIONSHIPS",
+    "BROKER_NATIVE_CARRY_FINANCING_SWAP"
+  ],
+  "pipeline_fixture_plan": [
+    "EXACT_NO_INCREMENTAL_SIGNAL_LINEAR_BASELINE",
+    "NONLINEAR_B_CORRELATED_PHI_OPERATIONAL_NULL_CONSTRUCTED",
+    "HEAVY_TAIL_RESPONSE",
+    "HETEROSCEDASTIC_RESPONSE",
+    "CONTIGUOUS_MISSINGNESS",
+    "ISOLATED_MISSINGNESS",
+    "AR025_DAILY_SCORE_DEPENDENCE",
+    "AR050_DAILY_SCORE_DEPENDENCE",
+    "STRONG_COMMON_CONTEXT_FACTOR",
+    "OLD_SIGMAB_COUNTEREXAMPLE_SCOPE_WITNESS"
+  ],
+  "power": {
+    "effect_authority": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+    "effect_authority_sha256": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5",
+    "effects": {
+      "AR025": 0.5,
+      "AR050": 0.75,
+      "NORMAL": 0.4
+    },
+    "local_alternative": "one target leaf shifted, all other leaves null; reference centered translation invariant; each leaf pays full261family",
+    "mask_law": "actual acquired cumulative factorized geometry only, warm-up/refit/maturelabel masks first; no support transport or mean-week repetition",
+    "shared_ready": "all5 sources ready",
+    "source_ready": "one or more fixed paid leaves independently meet all3 lowerbounds; feasibility only, no source ranking",
+    "target_simultaneous_lower95": 0.8,
+    "units": "SYNTHETIC_DAILY_INCREMENTAL_SCORE_MARGINAL_SD"
+  },
+  "precision": {
+    "bounds_family_size": 16503,
+    "confidence_familywise": 0.95,
+    "counts": "21 possible weekly scoring-depth looks *261 leaves*3 stress +10 nullcases*3 geometry profiles*2(false significance,false complete lead)",
+    "maximum_actual_wilson_halfwidth": 0.018225350966156018,
+    "maximum_half_width": 0.02,
+    "minimum_n": 13602,
+    "n_formula": "ceil(z^2*(1/(4*halfwidth^2)-1)), maximum Wilson halfwidth at p=.5",
+    "rounding": "next power of two",
+    "trials_per_case": 16384,
+    "wilson_z": 4.668792482396629
+  },
+  "real_market_inputs": 0,
+  "retuning": false,
+  "schema": "mxm.current-wave.operational-power-protocol.v1",
+  "score_protocol_ref": "research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_SCORE_PROTOCOL_V1.json",
+  "score_protocol_sha256": "d2dbcd71aa68725251f3f391b3217b1bebdc445bdf9da2d61875d6d9600c71bf",
+  "seeds": {
+    "bank": 2026100801,
+    "null": 2026100802,
+    "pipeline_fixtures": 2026100804,
+    "power": 2026100803
+  },
+  "sources": [
+    "MULTISCALE_PRICE_STATE",
+    "VOLATILITY_AND_REALIZED_VARIANCE_STATE",
+    "BROKER_NATIVE_ACTIVITY_STATE",
+    "CROSS_SECTIONAL_RELATIVE_STATE",
+    "REGIME_AND_STRUCTURAL_BREAK_STATE"
+  ],
+  "status": "FROZEN_BEFORE_ANY_SYNTHETIC_TRIAL_OR_BROKER_REQUEST"
+}
