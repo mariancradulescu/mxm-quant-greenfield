@@ -1,0 +1,44 @@
+name: Extended fixed V2 Stage7 support-only depth
+on:
+  push:
+    branches: [audit-operational-v2-extended-stage7-v1]
+permissions:
+  contents: write
+concurrency:
+  group: operational-v2-support-depth-single-writer
+  cancel-in-progress: false
+jobs:
+  readonly-depth-stage7:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      EXACT_TARGET: ${{ github.event.before }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+    steps:
+      - run: python -m pip install numpy==2.3.5 protobuf==5.29.5
+      - name: Hash-bound separately versioned certified-domain allowlist; no checkout
+        run: |
+          python - <<'CODE'
+          import os,json,pathlib,hashlib,urllib.request
+          root='https://raw.githubusercontent.com/mariancradulescu/mxm-quant-greenfield/'+os.environ['EXACT_TARGET']+'/'
+          def get(p,h=None):
+           assert p.endswith(('.py','.json')) and not p.startswith('support_only_v1/')
+           b=urllib.request.urlopen(root+p,timeout=90).read()
+           if h:assert hashlib.sha256(b).hexdigest()==h,p
+           q=pathlib.Path(p);q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b);return json.loads(b) if p.endswith('.json') else None
+          f=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_STAGE7_IMPLEMENTATION_FREEZE_V1.json','1363f656a94d10aac8c07fa7bcf77c741314f052fead02cfdfcee34d8e3ef019')
+          for p,h in f['files_sha256'].items():get(p,h)
+          get('research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_INFERENCE_V2_DEPTH_IMPLEMENTATION_FREEZE_V1.json','8ea44387cc73df510576d03892cd6de977edf6bf209d1518d8b20f47458af1b4');get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_STAGE7_AUTHORITY_V1.json','4dc592404f7d7045b7d66979f657bc98eb12a741778994cf75c925aca398653f')
+          CODE
+      - name: Offline immutable V2 software tests
+        run: PYTHONPATH=. python research_core_v4/operational_v2/preflight.py --software
+      - name: Stage7 machine preflight; zero broker IO
+        run: PYTHONPATH=. python research_core_v4/operational_v2_extended/gate_stage7.py
+      - name: Exactly one authorized Stage7 support-only block; freeze masks before power
+        run: PYTHONPATH=. python research_core_v4/operational_v2_extended/depth_stage7.py --stage 7
