@@ -1,0 +1,40 @@
+{
+  "commands": [
+    {
+      "command": "python -m research_core_v4.skill_preflight_v1.offline_oracles > research_core_v4/skill_preflight_v1/OFFLINE_STDOUT_ATTEMPT1.txt 2> research_core_v4/skill_preflight_v1/OFFLINE_STDERR_ATTEMPT1.txt",
+      "cwd": "repository root",
+      "exit_code": 0,
+      "passed": 16,
+      "stage": "initial16",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "59ed049daf3f01756494a5c390294ee2da323157e939cfe306064d5c81228408",
+      "tests_run": 16
+    },
+    {
+      "command": "python -m research_core_v4.skill_preflight_v1.offline_oracles > research_core_v4/skill_preflight_v1/OFFLINE_STDOUT_ATTEMPT2.txt 2> research_core_v4/skill_preflight_v1/OFFLINE_STDERR_ATTEMPT2.txt",
+      "cwd": "repository root",
+      "exit_code": 0,
+      "passed": 18,
+      "stage": "final18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "507434a67058e996b007f59b3ef92a8338ec1ec0557c962ffdd52f0e41d407b8",
+      "tests_run": 18
+    }
+  ],
+  "final_oracle_script_sha256": "537ebe9df43266fc87740eb07f563c51dccd34198f3ce0da93599e09d05689ae",
+  "intentional_rejections": [
+    "bad/nonfinite forecast ValueError",
+    "fewer than two causal peers unavailable",
+    "224 excluded by old196 guard",
+    "missing original receipt UNKNOWN"
+  ],
+  "no_campaign_execution": true,
+  "no_failed_tests_deleted": true,
+  "non_scientific_routing_failures": [
+    {
+      "command": "git ls-tree -r --name-only 4cefedb84841639781381c2afc4f3ac4d12d98a5 support_depth_v2/stage7",
+      "resolution": "read-only fetch of exact historic commit, then immutable blob read",
+      "stderr": "fatal: not a tree object"
+    }
+  ]
+}
