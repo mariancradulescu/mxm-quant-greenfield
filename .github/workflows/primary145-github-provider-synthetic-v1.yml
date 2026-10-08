@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      GH_TOKEN: \${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
       PYTHONDONTWRITEBYTECODE: "1"
       OPENBLAS_NUM_THREADS: "1"
       OMP_NUM_THREADS: "1"
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout exact workflow source SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: \${{ github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -63,10 +63,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: primary145-provider-fabricated-\${{ github.run_id }}
+          name: primary145-provider-fabricated-${{ github.run_id }}
           path: |
-            \${{ runner.temp }}/PRIMARY145_PROVIDER_SYNTHETIC_RESULT_V1.json
-            \${{ runner.temp }}/primary145-provider-stdout.log
-            \${{ runner.temp }}/primary145-provider-stderr.log
+            ${{ runner.temp }}/PRIMARY145_PROVIDER_SYNTHETIC_RESULT_V1.json
+            ${{ runner.temp }}/primary145-provider-stdout.log
+            ${{ runner.temp }}/primary145-provider-stderr.log
           if-no-files-found: warn
           retention-days: 14
