@@ -1,0 +1,41 @@
+name: Current wave operational exact blocked delivery validation V1
+on:
+  push:
+    branches: [audit-current-wave-operational-delivery-v1]
+permissions:
+  contents: read
+jobs:
+  exact-delivery-boundary:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: python -m pip install numpy==2.3.5
+      - name: Fetch hash-bound synthetic delivery and metadata only
+        env:
+          EXACT_TARGET: ${{ github.event.before }}
+        run: |
+          python - <<'PYCODE'
+          import hashlib,json,os,pathlib,urllib.request
+          repo='mariancradulescu/mxm-quant-greenfield';head=os.environ['EXACT_TARGET'];start='8759b50eb25673a0c8b67c29cd4853efcac33608'
+          authority='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_AUTHORITY_V1.json';approved={authority};trace=[]
+          def get(ref,path,h=None,target=None):
+              assert path in approved;assert path.endswith(('.json','.py','.yml'))
+              assert not path.startswith('support_only_v1/') and '/shards/' not in path
+              b=urllib.request.urlopen('https://raw.githubusercontent.com/'+repo+'/'+ref+'/'+path,timeout=60).read()
+              digest=hashlib.sha256(b).hexdigest()
+              if h:assert digest==h,path
+              p=pathlib.Path(target or path);p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b);trace.append({'ref':ref,'path':path,'sha256':digest});return b
+          a=json.loads(get(head,authority,'782fa54877c7daa36ad7ade3e1dc50bf5a850721f4885f4738d5fc9749161fb1'));approved |= set(a['immutable_inputs_sha256'])|set(a['new_artifacts_sha256'])|set(a['canonical_states'])
+          for p,h in a['immutable_inputs_sha256'].items():get(head,p,h)
+          for p,h in a['new_artifacts_sha256'].items():get(head,p,h)
+          for p in a['canonical_states']:get(head,p);get(start,p,target='baseline/'+p)
+          pathlib.Path('delivery_read_trace.json').write_text(json.dumps(trace,sort_keys=True,indent=2))
+          print('EXACT_TESTED_TARGET='+head);print('READS_ALLOWLISTED='+str(len(trace)));print('BROKER_REQUESTS=0 REAL_ROWS=0 NO_RAW_NO_ASSETS_NO_CHECKOUT_NO_SECRETS')
+          PYCODE
+      - name: Immutable boundaries and exact scientific stop validation
+        run: python research_core_v4/operational_v1/verify_delivery.py -v
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-operational-delivery-read-trace
+          path: delivery_read_trace.json
