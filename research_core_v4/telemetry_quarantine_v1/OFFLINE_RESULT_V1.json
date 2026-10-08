@@ -1,0 +1,116 @@
+{
+  "schema": "mxm.telemetry-quarantine.offline-prearm-result.v1",
+  "source_head": "a0521249f26872d8c8544c66b769e3db98bfbb52",
+  "final_status": "STOP_FOR_INDEPENDENT_PREARM_AUDIT",
+  "live_capture": "UNARMED_DO_NOT_START",
+  "partition_design": "FROZEN_PROSPECTIVE_ONLY_WITH_RESERVED_IDENTITIES_EXCLUDED;NOT_AN_EXISTING_POLICY_CHANGE",
+  "phase2_status": "PARTIAL_OFFLINE_COMPONENTS_ONLY_ESSENTIAL_ENCRYPTION_PREFLIGHT_FAILED",
+  "blocker": {
+    "code": "REUSED_ENCRYPTION_GPG_AGENT_START_FAILED",
+    "exact_requirement": "Authenticated ciphertext must be produced successfully by the existing frozen encryption function before a real live adapter or ARM is implemented.",
+    "probe": {
+      "command_template": "gpg --homedir TEMP/gnupg --batch --yes --no-symkey-cache --pinentry-mode loopback --passphrase-file TEMP/pass --symmetric --cipher-algo AES256 --force-mdc --output TEMP/cipher TEMP/plain",
+      "returncode": 2,
+      "stdout": "",
+      "stderr": "gpg: keybox 'TEMP/gnupg/pubring.kbx' created\ngpg: error running '/usr/bin/gpg-agent': exit status 2\ngpg: failed to start gpg-agent '/usr/bin/gpg-agent': General error\ngpg: can't connect to the gpg-agent: General error\ngpg: problem with the agent: No agent running\n",
+      "cipher_created": true,
+      "cipher_bytes": 99,
+      "synthetic_only": true
+    },
+    "safety": "Nonzero GPG exit raises CalledProcessError; any partially written ciphertext is not accepted. Existing encryption worker was not modified.",
+    "not_claimed": "Does not establish that encryption is broken on the historical runner. It fails in this task environment. No completed historic capability duplicated.",
+    "required_resolution": "Independent auditor must authorize an offline execution-environment preflight that supplies a working GPG agent and verifies unchanged encryption/decryption; no broker needed."
+  },
+  "actual_tests": {
+    "command": "PYTHONPATH=telemetry_repo python -m unittest discover -s telemetry_repo/tests -p test_telemetry_quarantine_v1.py -v > telemetry_test_final_output.txt 2>&1",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "executions": 2,
+    "why_second_execution": "Removed unpublished live-wire path after the first encryption failure; retested the changed final fixture-only adapter.",
+    "test_count": 18,
+    "passing": 17,
+    "errors": 1,
+    "failures": 0,
+    "conclusion": "FAILED_ERRORS_1",
+    "shell_wrapper_exit": 0,
+    "shell_wrapper_detail": "The shell printed the redirected log after unittest; wrapper zero is not a successful unittest outcome.",
+    "first_output": "test_adapter_receipt_sampling_before_decode_offline (test_telemetry_quarantine_v1.Fixtures.test_adapter_receipt_sampling_before_decode_offline) ... ok\ntest_atomic_recovery_repeated_arm_and_corruption (test_telemetry_quarantine_v1.Fixtures.test_atomic_recovery_repeated_arm_and_corruption) ... ok\ntest_clock_uncertainty_staleness_and_wall_step_fail_closed (test_telemetry_quarantine_v1.Fixtures.test_clock_uncertainty_staleness_and_wall_step_fail_closed) ... ok\ntest_exact_request_budget_and_no_orders (test_telemetry_quarantine_v1.Fixtures.test_exact_request_budget_and_no_orders) ... ok\ntest_exact_terminal_stop_binding (test_telemetry_quarantine_v1.Fixtures.test_exact_terminal_stop_binding) ... ok\ntest_historical_available_at_not_fabricated (test_telemetry_quarantine_v1.Fixtures.test_historical_available_at_not_fabricated) ... ok\ntest_initial_snapshot_side_age_and_spread (test_telemetry_quarantine_v1.Fixtures.test_initial_snapshot_side_age_and_spread) ... ok\ntest_late_duplicate_out_of_order (test_telemetry_quarantine_v1.Fixtures.test_late_duplicate_out_of_order) ... ok\ntest_local_utc_monotonic_pair_and_event_ordering (test_telemetry_quarantine_v1.Fixtures.test_local_utc_monotonic_pair_and_event_ordering) ... ok\ntest_message_raw_frame_and_runtime_budgets (test_telemetry_quarantine_v1.Fixtures.test_message_raw_frame_and_runtime_budgets) ... ok\ntest_missing_revision_incomplete_bars (test_telemetry_quarantine_v1.Fixtures.test_missing_revision_incomplete_bars) ... ok\ntest_no_broker_without_separate_arm (test_telemetry_quarantine_v1.Fixtures.test_no_broker_without_separate_arm) ... ok\ntest_no_economic_readers_or_payload_diagnostics (test_telemetry_quarantine_v1.Fixtures.test_no_economic_readers_or_payload_diagnostics) ... ok\ntest_partition_overlap_identity_and_ambiguity (test_telemetry_quarantine_v1.Fixtures.test_partition_overlap_identity_and_ambiguity) ... ok\ntest_protected_and_historical_decoder_exact_bytes_unchanged (test_telemetry_quarantine_v1.Fixtures.test_protected_and_historical_decoder_exact_bytes_unchanged) ... ok\ntest_real_reused_encryption_synthetic_key_and_old_reader_rejection (test_telemetry_quarantine_v1.Fixtures.test_real_reused_encryption_synthetic_key_and_old_reader_rejection) ... ERROR\ntest_storage_namespace_and_repo_isolation (test_telemetry_quarantine_v1.Fixtures.test_storage_namespace_and_repo_isolation) ... ok\ntest_unpaired_clock_rejected (test_telemetry_quarantine_v1.Fixtures.test_unpaired_clock_rejected) ... ok\n\n======================================================================\nERROR: test_real_reused_encryption_synthetic_key_and_old_reader_rejection (test_telemetry_quarantine_v1.Fixtures.test_real_reused_encryption_synthetic_key_and_old_reader_rejection)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/workspace/scratch/6cb3a79fbfe2/telemetry_repo/tests/test_telemetry_quarantine_v1.py\", line 137, in test_real_reused_encryption_synthetic_key_and_old_reader_rejection\n    dest=pathlib.Path(td)/'test.sealed';seal(b'SYNTHETIC_NO_MARKET_DATA',dest);raw=dest.read_bytes()\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/6cb3a79fbfe2/telemetry_repo/research_core_v4/telemetry_quarantine_v1/core.py\", line 122, in __call__\n    self.crypto['encrypt_shard'](raw,public_key=self.public_key,output=tmp)\n  File \"/workspace/scratch/6cb3a79fbfe2/telemetry_repo/research_core_v4/shallow_m5_support_v2_production.py\", line 615, in encrypt_shard\n    subprocess.run(\n  File \"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['gpg', '--homedir', '/tmp/mxm-m5v2-enc-0tg1x1k3/gnupg', '--batch', '--yes', '--no-symkey-cache', '--pinentry-mode', 'loopback', '--passphrase-file', '/tmp/mxm-m5v2-enc-0tg1x1k3/bundle.pass', '--symmetric', '--cipher-algo', 'AES256', '--force-mdc', '--output', '/tmp/mxm-m5v2-enc-0tg1x1k3/cipher.gpg', '/tmp/mxm-m5v2-enc-0tg1x1k3/plain']' returned non-zero exit status 2.\n\n----------------------------------------------------------------------\nRan 18 tests in 0.178s\n\nFAILED (errors=1)\n",
+    "final_output": "test_adapter_receipt_sampling_before_decode_offline (test_telemetry_quarantine_v1.Fixtures.test_adapter_receipt_sampling_before_decode_offline) ... ok\ntest_atomic_recovery_repeated_arm_and_corruption (test_telemetry_quarantine_v1.Fixtures.test_atomic_recovery_repeated_arm_and_corruption) ... ok\ntest_clock_uncertainty_staleness_and_wall_step_fail_closed (test_telemetry_quarantine_v1.Fixtures.test_clock_uncertainty_staleness_and_wall_step_fail_closed) ... ok\ntest_exact_request_budget_and_no_orders (test_telemetry_quarantine_v1.Fixtures.test_exact_request_budget_and_no_orders) ... ok\ntest_exact_terminal_stop_binding (test_telemetry_quarantine_v1.Fixtures.test_exact_terminal_stop_binding) ... ok\ntest_historical_available_at_not_fabricated (test_telemetry_quarantine_v1.Fixtures.test_historical_available_at_not_fabricated) ... ok\ntest_initial_snapshot_side_age_and_spread (test_telemetry_quarantine_v1.Fixtures.test_initial_snapshot_side_age_and_spread) ... ok\ntest_late_duplicate_out_of_order (test_telemetry_quarantine_v1.Fixtures.test_late_duplicate_out_of_order) ... ok\ntest_local_utc_monotonic_pair_and_event_ordering (test_telemetry_quarantine_v1.Fixtures.test_local_utc_monotonic_pair_and_event_ordering) ... ok\ntest_message_raw_frame_and_runtime_budgets (test_telemetry_quarantine_v1.Fixtures.test_message_raw_frame_and_runtime_budgets) ... ok\ntest_missing_revision_incomplete_bars (test_telemetry_quarantine_v1.Fixtures.test_missing_revision_incomplete_bars) ... ok\ntest_no_broker_without_separate_arm (test_telemetry_quarantine_v1.Fixtures.test_no_broker_without_separate_arm) ... ok\ntest_no_economic_readers_or_payload_diagnostics (test_telemetry_quarantine_v1.Fixtures.test_no_economic_readers_or_payload_diagnostics) ... ok\ntest_partition_overlap_identity_and_ambiguity (test_telemetry_quarantine_v1.Fixtures.test_partition_overlap_identity_and_ambiguity) ... ok\ntest_protected_and_historical_decoder_exact_bytes_unchanged (test_telemetry_quarantine_v1.Fixtures.test_protected_and_historical_decoder_exact_bytes_unchanged) ... ok\ntest_real_reused_encryption_synthetic_key_and_old_reader_rejection (test_telemetry_quarantine_v1.Fixtures.test_real_reused_encryption_synthetic_key_and_old_reader_rejection) ... ERROR\ntest_storage_namespace_and_repo_isolation (test_telemetry_quarantine_v1.Fixtures.test_storage_namespace_and_repo_isolation) ... ok\ntest_unpaired_clock_rejected (test_telemetry_quarantine_v1.Fixtures.test_unpaired_clock_rejected) ... ok\n\n======================================================================\nERROR: test_real_reused_encryption_synthetic_key_and_old_reader_rejection (test_telemetry_quarantine_v1.Fixtures.test_real_reused_encryption_synthetic_key_and_old_reader_rejection)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/workspace/scratch/6cb3a79fbfe2/telemetry_repo/tests/test_telemetry_quarantine_v1.py\", line 137, in test_real_reused_encryption_synthetic_key_and_old_reader_rejection\n    dest=pathlib.Path(td)/'test.sealed';seal(b'SYNTHETIC_NO_MARKET_DATA',dest);raw=dest.read_bytes()\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/6cb3a79fbfe2/telemetry_repo/research_core_v4/telemetry_quarantine_v1/core.py\", line 122, in __call__\n    self.crypto['encrypt_shard'](raw,public_key=self.public_key,output=tmp)\n  File \"/workspace/scratch/6cb3a79fbfe2/telemetry_repo/research_core_v4/shallow_m5_support_v2_production.py\", line 615, in encrypt_shard\n    subprocess.run(\n  File \"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '['gpg', '--homedir', '/tmp/mxm-m5v2-enc-cvx4amla/gnupg', '--batch', '--yes', '--no-symkey-cache', '--pinentry-mode', 'loopback', '--passphrase-file', '/tmp/mxm-m5v2-enc-cvx4amla/bundle.pass', '--symmetric', '--cipher-algo', 'AES256', '--force-mdc', '--output', '/tmp/mxm-m5v2-enc-cvx4amla/cipher.gpg', '/tmp/mxm-m5v2-enc-cvx4amla/plain']' returned non-zero exit status 2.\n\n----------------------------------------------------------------------\nRan 18 tests in 0.260s\n\nFAILED (errors=1)\n",
+    "output_sha256": "4b149359993a8382a812d28c1ee169ed3d2f46ce0a4c8cc3ec6e74ed2967fcfa",
+    "network_guard": "socket.socket.connect patched to raise NETWORK_FORBIDDEN in every fixture; no broker connection or secret read invoked. RSA keys and messages generated solely as ephemeral synthetic fixtures."
+  },
+  "proof_limits": {
+    "ordering_clock_revision_spread_budgets": "Executed decoded synthetic message fixtures only; does not prove server timestamps, real UTC quality, or live event completeness.",
+    "terminal_and_historical_preservation": "Exact-byte SHA256 checks executed; no real archived or protected OHLC decoded.",
+    "routing": "Prospective contract, reserved-ID/time overlap rejection, external-root checks and readers/export rejection tested; separate OS custody enforcement remains unproven.",
+    "encrypted_legacy_reader_rejection": "NOT_REACHED_IN_FINAL_ENCRYPTION_TEST; distinct magic is specified but no successful end-to-end encryption/decryption or legacy-reader rejection claimed.",
+    "atomic_recovery": "Executed crash fixture after journal before checkpoint with explicitly fake fixture ciphertext; not evidence of real encryption.",
+    "real_wire_and_execution_arm": "NOT_IMPLEMENTED_OR_TESTED; no live adapter, no execution entrypoint, no ARM or independent execution authorization published."
+  },
+  "reused_capabilities": [
+    "Exact frozen encryption functions loaded from verified AST without importing workers",
+    "Existing transport framing contract used by offline fake transport only; transport unchanged",
+    "Existing accepted structural metadata and confirmation authorities",
+    "Existing historical boundaries and terminal STOP"
+  ],
+  "implemented_offline": [
+    "Paired local monotonic/UTC uncertainty and freshness rejection",
+    "Arrival ordinal, original synthetic provider fields/envelope hash",
+    "Late/out-of-order/duplicate/revised/missing-grid detection",
+    "Initial snapshot and bid/ask side-age spread validity",
+    "Finite message/request/frame/raw/cipher/runtime bounds",
+    "Atomic encrypted-batch journal/checkpoint contract and one-attempt intent; fake-cipher crash recovery"
+  ],
+  "unresolved_dependencies": [
+    "REUSED_ENCRYPTION_GPG_AGENT_START_FAILED",
+    "Successful offline protobuf wire/permission/account-envelope binding and finite TLS endpoint budget not tested or implemented in this delivery",
+    "Authentic spot timestamp unit certification; official field description only says Unix time",
+    "Independent authenticated clock-witness supplier and OS custody/key attestation",
+    "Independent partition review of immutable inventory and exact future ARM interval"
+  ],
+  "official_sources": [
+    "https://help.ctrader.com/open-api/messages/",
+    "https://help.ctrader.com/open-api/model-messages/",
+    "https://help.ctrader.com/open-api/symbol-data/"
+  ],
+  "future_ARM_requirements": [
+    "Resolve the encryption blocker and complete outstanding offline prerequisites under separate authorization",
+    "Independent audit of exact immutable source head, partition, code, hashes, clock witness, permission scope and route custody",
+    "No changes to existing scientific/protection authorities; exact future UTC start/end and pilot ID",
+    "Authorization commit then separate ARM-only child commit with source-head/STOP/scope/key/account bindings",
+    "Exactly three frozen identities, thirty minutes, request/message/byte limits and zero reconnects; one durable logical attempt"
+  ],
+  "no_external_actions": {
+    "broker_contact": false,
+    "broker_secrets_accessed": false,
+    "market_data_collected": false,
+    "orders": false,
+    "trading": false,
+    "economic_response": false,
+    "protected_payloads_opened": false,
+    "new_workflow": false,
+    "stage8": false
+  },
+  "scientific_boundary": {
+    "V2": "CLOSED_FAIL_AR050_UNCHANGED",
+    "paid_leaves": 261,
+    "PRIMARY145": "DEVELOPMENT_ONLY_DISJOINT_CONFIRMATION_REQUIRED",
+    "new_mechanism_selected": false,
+    "historical_original_available_at": "UNKNOWN_UNCHANGED",
+    "cost_inventory": "No new authentic costs acquired. Previously accepted current metadata/support/conversion and cost gaps remain as bound in a052 blocker; unknown commission/spread/swap/volume/margin/conversion never becomes zero.",
+    "shortest_subsequent_route": "After independent infrastructure audit and separately authorized quarantined pilot, publish metadata-only feasibility findings. Any new predictive experiment requires a separate untouched input allocation, prospectively frozen estimand/multiplicity/support law and genuinely disjoint confirmation. Quarantined payload values remain forbidden to research."
+  },
+  "file_sha256": {
+    "research_core_v4/telemetry_quarantine_v1/core.py": "3a13ca8b9627e72d55c236cca206a5d64f64d26f2417bd61041aaed0a1ec581f",
+    "research_core_v4/telemetry_quarantine_v1/adapter.py": "24cffcc37f2dd7ed91cb819a82ea88c9508d93dc83e6606f4958ec85acc6ea9c",
+    "research_core_v4/telemetry_quarantine_v1/PARTITION_V1.json": "177d7738b9df182088c3a75888713c9a23723121ee31a2652429f903e9d97650",
+    "research_core_v4/telemetry_quarantine_v1/AUTHORITY_INVENTORY_V1.json": "09e6ea558eebe128aaed73272cf8dc52828c6e6edcadaed66de58a55ee5a9630",
+    "tests/test_telemetry_quarantine_v1.py": "82c94d6f2c14ddee228a21a890393a4be294ad709fdf4e125315830dd0c4a626"
+  },
+  "preserved_authority_sha256": {
+    "V2_PROTECTED_FORWARD_START.json": "605829d363c92ff74b0d5027442dd581f2944fb56336d8b6c9b8a3c74a875c1e",
+    "research_core_v4/shallow_m5_support_v2_boundary_v4.py": "7f148effd792052e367ce892781123fedc8d9083bfbad27ec9cf8065c48eef52",
+    "research_core_v4/shallow_m5_support_v2_production.py": "b020790cfbd3aa4efb6bd1898e4b3b66395977334a37c68c8a5effe1fd23128d",
+    "m6/ctrader_transport.py": "abedb7b8177642859d780be5da7966c348dd391bdfed84e9c59bfb2899c94baf",
+    "research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_28_WEEK_FAILURE_PROJECT_GOVERNANCE_STOP_V1.json": "de227c5625d2e44e2a49e3dca0971cb0d86929f79c58a16a9c5b6c9dfc2a6330"
+  }
+}

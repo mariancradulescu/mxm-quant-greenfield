@@ -1,0 +1,235 @@
+{
+  "schema": "mxm.telemetry-quarantine.partition.v1",
+  "namespace": "PILOT_TELEMETRY_QUARANTINE_V1",
+  "base_head": "a0521249f26872d8c8544c66b769e3db98bfbb52",
+  "purpose": "OBSERVABILITY_ONLY_NO_SCIENTIFIC_READERS",
+  "allocation_authority": "USER_PROSPECTIVE_OBSERVABILITY_ONLY_TELEMETRY_QUARANTINE_DESIGN_AUTHORIZATION_2026_10_08",
+  "real_execution_authorized": false,
+  "not_before_ns": 1791504000000000000,
+  "roster": [
+    {
+      "asset_class": "Forex (Spot)",
+      "symbol": "EURJPY",
+      "symbol_id": 3
+    },
+    {
+      "asset_class": "Indices (Spot)",
+      "symbol": "CN50",
+      "symbol_id": 108
+    },
+    {
+      "asset_class": "Crypto Currency (Spot)",
+      "symbol": "LTCUSD",
+      "symbol_id": 130
+    }
+  ],
+  "reserved_identity_ids": [
+    56,
+    284,
+    2755,
+    2759,
+    2760,
+    2922,
+    3006,
+    3008,
+    3009,
+    3024,
+    3026,
+    5408,
+    5414,
+    5428,
+    5432,
+    5438,
+    5479,
+    7190,
+    7193,
+    7194,
+    7195,
+    7296,
+    7298,
+    7299,
+    7300,
+    7302,
+    7304,
+    7372
+  ],
+  "assignments": [
+    {
+      "source": "research_core_v4/state/FACTOR_RESIDUAL_DESIGN_V1.json",
+      "key": "replication_law.reserved_confirmation_members",
+      "classification": "CONFIRMATION",
+      "identity_ids": [
+        284,
+        7299,
+        7190,
+        7195,
+        7193,
+        7194,
+        5432,
+        5428,
+        5438,
+        5408,
+        3026,
+        5414
+      ],
+      "start_ns": 1789603200000000000,
+      "end_ns": null,
+      "conservative_rule": "EXCLUDE_IDENTITIES_FOR_ALL_PILOT_TIMES"
+    },
+    {
+      "source": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V1.json",
+      "key": "confirmation_architecture",
+      "classification": "CONFIRMATION",
+      "identity_ids": [
+        56,
+        7372,
+        2922,
+        7300,
+        5479,
+        7296
+      ],
+      "start_ns": 1736121600000000000,
+      "end_ns": 1751068800000000000,
+      "conservative_rule": "EXCLUDE_IDENTITIES_FOR_ALL_PILOT_TIMES"
+    },
+    {
+      "source": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+      "key": "structural_contexts.0.confirmation_symbols",
+      "classification": "CONFIRMATION",
+      "identity_ids": [
+        56,
+        2755,
+        2759,
+        2760
+      ],
+      "start_ns": 1736121600000000000,
+      "end_ns": 1751068800000000000,
+      "conservative_rule": "EXCLUDE_IDENTITIES_FOR_ALL_PILOT_TIMES"
+    },
+    {
+      "source": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+      "key": "structural_contexts.1.confirmation_symbols",
+      "classification": "CONFIRMATION",
+      "identity_ids": [
+        7300,
+        7304,
+        7302,
+        7298
+      ],
+      "start_ns": 1736121600000000000,
+      "end_ns": 1751068800000000000,
+      "conservative_rule": "EXCLUDE_IDENTITIES_FOR_ALL_PILOT_TIMES"
+    },
+    {
+      "source": "research_core_v4/state/FIRST_REAL_MARKET_DESIGN_V2.json",
+      "key": "structural_contexts.2.confirmation_symbols",
+      "classification": "CONFIRMATION",
+      "identity_ids": [
+        3006,
+        3008,
+        3009,
+        3024
+      ],
+      "start_ns": 1736121600000000000,
+      "end_ns": 1751068800000000000,
+      "conservative_rule": "EXCLUDE_IDENTITIES_FOR_ALL_PILOT_TIMES"
+    },
+    {
+      "source": "research_core_v3/state/US24_LOW_ACTIVITY_REVERSAL_TWO_STAGE_EXIT_DESIGN_V1.json",
+      "key": "stage_A_entry_replication_and_stage_B_exit_holdout",
+      "classification": "CONFIRMATION",
+      "identity_ids": [],
+      "start_ns": 1757980800000000000,
+      "end_ns": 1789603200000000000,
+      "conservative_rule": "ALL_IDENTITIES_EXCLUDED_IN_HISTORICAL_HOLDOUT_INTERVAL"
+    }
+  ],
+  "neutral_rule": {
+    "accepted_metadata": "research_core_v4/state/QUOTE_CURRENT_METADATA_ANDROID_FRONTIER_V1.json",
+    "classes": [
+      "Forex (Spot)",
+      "Indices (Spot)",
+      "Crypto Currency (Spot)"
+    ],
+    "selection": "MINIMUM_STRUCTURAL_SYMBOL_ID_IN_EACH_FIXED_CLASS_AFTER_EXCLUDING_ALL_RESERVED_CONFIRMATION_IDENTITIES",
+    "outcome_inputs": false,
+    "sampling_claim": "THREE_STRUCTURAL_EXAMPLES_NOT_POPULATION_REPRESENTATIVENESS",
+    "prior_development_identity_reuse": "NOT_UNTOUCHED_CONFIRMATION;PAYLOAD_PERMANENTLY_QUARANTINED"
+  },
+  "protected_scope": {
+    "authority": "V2_PROTECTED_FORWARD_START.json",
+    "boundary_utc": "2026-09-17T12:02:58Z",
+    "interpretation": "PRESERVE_EVERY_EXISTING_DESIGNATED_PROTECTED_SCOPE;NEW_FUTURE_TELEMETRY_IS_AN_EXPLICIT_SEPARATE_ALLOCATION_NOT_HISTORICAL_DEVELOPMENT_OR_CONFIRMATION",
+    "historical_global_decoder_guard": "UNCHANGED_REJECTS_EVERY_POST_BOUNDARY_BAR",
+    "new_assignment_or_ambiguity": "FAIL_CLOSED_REAUDIT_REQUIRED"
+  },
+  "future_schedule": "START=CEIL_UTC_HOUR(INDEPENDENT_AUTHORIZATION_FROZEN_AT_PLUS_1_HOUR);EXACT_START_END_PILOT_ID_IN_SEPARATE_ARM;START_MUST_BE_FUTURE_AND_NOT_BEFORE_2026_10_09",
+  "limits": {
+    "duration_ns": 1800000000000,
+    "max_messages": 10000,
+    "max_raw_bytes": 16777216,
+    "max_cipher_bytes": 33554432,
+    "max_frame_bytes": 1048576,
+    "max_requests": 256,
+    "batch_messages": 64,
+    "max_idle_ns": 30000000000,
+    "max_side_age_ns": 2000000000,
+    "retries": 0,
+    "reconnects": 0,
+    "logical_attempts": 1,
+    "max_clock_uncertainty_ns": 50000000
+  },
+  "payload_readers": [
+    "ISOLATED_CAPTURE_PROCESS",
+    "INDEPENDENT_QUARANTINE_CUSTODIAN"
+  ],
+  "public_payload_export": false,
+  "scientific_ingestion": false,
+  "route": {
+    "root": "EXTERNAL_REPO_ROOT/PILOT_TELEMETRY_QUARANTINE_V1/PILOT_ID",
+    "ownership": "SEPARATE_OS_CUSTODIAN_UID;DIRECTOR_AND_RESEARCH_UIDS_MUST_NOT_HAVE_ACCESS;MODE0700_ROOT_0600_FILES",
+    "encryption": "REUSED_OPENPGP_AES256_MDC_RSA_OAEP_SHA256_WITH_NEW_DISTINCT_CUSTODIAN_KEY_AND_DISTINCT_OUTER_MAGIC",
+    "raw_publication": "FORBIDDEN",
+    "public_outputs": "COUNTS_HASHES_FAILURE_CODES_ONLY",
+    "legacy_ingestion": "EXTERNAL_ROOT_NOT_ARCHIVE_ASSETS;DISTINCT_OUTER_MAGIC_REJECTED_BY_OLD_PACKAGE_DECODER;PRIVATE_KEY_NOT_AVAILABLE_TO_RESEARCH;NO_ARCHIVE_MANIFEST_ENTRIES",
+    "no_readers": [
+      "HYPOTHESIS_GENERATION",
+      "RANKING",
+      "CALIBRATION",
+      "RETURN_ANALYSIS",
+      "PORTFOLIO_SELECTION",
+      "HISTORICAL_DECODERS",
+      "OLD_CONFIRMATION_ROUTES"
+    ],
+    "route_changes_require_new_independent_audit": true
+  },
+  "claims": {
+    "receipt": "PAIRED_MONOTONIC_AND_UTC_UNCERTAINTY_BOUND_AT_LOCAL_POST_READ_SAMPLE_NOT_NETWORK_HARDWARE_ARRIVAL",
+    "provider_event_time": "ORIGINAL_OPTIONAL_TIMESTAMP_RETAINED_UNIT_MUST_BE_AUTHENTICALLY_CERTIFIED_BEFORE_ARM",
+    "bar": "OPEN_MINUTE_AND_M5_INTERVAL_NOT_PROVIDER_REVISION_TIME;OBSERVED_REVISION_TIME_IS_RECEIPT_ONLY",
+    "duplicate": "IDENTICAL_ENVELOPE_HASH_NOT_PROOF_OF_IDENTICAL_PROVIDER_MESSAGE_ID",
+    "missing": "EXPECTED_GRID_NOT_OBSERVED_NOT_PROOF_PROVIDER_LOSS_WHEN_MARKET_CLOSED",
+    "quote": "SIDE_AGE_VALID_QUOTED_SPREAD_NOT_REALIZED_FILL_OR_SLIPPAGE",
+    "historical_original_available_at": "UNKNOWN_UNCHANGED",
+    "predictive_information": "NOT_TESTED_NOT_AUTHORIZED"
+  },
+  "prior_conclusions": {
+    "V2": "CLOSED",
+    "certification28": "FAIL_AR050_TERMINAL_STOP_UNCHANGED",
+    "paid_leaves": 261,
+    "stage8_authorized": false,
+    "protected_forward_opened": false,
+    "PRIMARY145": "DEVELOPMENT_ONLY_DISJOINT_CONFIRMATION_REQUIRED"
+  },
+  "future_prerequisites": [
+    "INDEPENDENT_PARTITION_AND_IMPLEMENTATION_AUDIT",
+    "EXACT_ARM_ONLY_COMMIT_AFTER_AUTHORIZATION_COMMIT",
+    "AUTHENTIC_PROVIDER_TIMESTAMP_UNIT_AND_ACCOUNT_VIEW_SCOPE",
+    "INDEPENDENT_SYNC_CLOCK_WITNESS_WITH_BOUNDED_ERROR",
+    "DISTINCT_CUSTODIAN_PUBLIC_KEY_FINGERPRINT_AND_OS_ROUTE_ATTESTATION",
+    "AUDITED_AUTH_BOOTSTRAP_AND_CONTROL_ENVELOPE_HANDLING",
+    "PINNED_PROTOBUF_DEPENDENCY_AND_REAL_WIRE_FIXTURES_OFFLINE_ONLY_BEFORE_ARM"
+  ],
+  "prearm_status": "BLOCKED_REUSED_ENCRYPTION_MACHINE_PREFLIGHT_FAILED",
+  "live_adapter_implemented": false
+}
