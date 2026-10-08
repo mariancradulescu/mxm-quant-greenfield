@@ -1,0 +1,48 @@
+name: Fixed k15 extended-domain synthetic certification
+on:
+  push:
+    branches: [audit-operational-v2-extended-certification-v1]
+permissions:
+  contents: write
+concurrency:
+  group: operational-v2-extended-certification
+  cancel-in-progress: false
+jobs:
+  fixed-cutoff-null:
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        case: ["NORMAL", "AR025", "AR050", "HEAVY_T5", "CENTERED_SKEW", "HETEROSCEDASTIC", "VARIANCE_CHANGE", "STRONG_COMMON_FACTORS", "ISOLATED_MISSINGNESS", "CONTIGUOUS_GAPS"]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      EXACT_TARGET: ${{ github.event.before }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - run: python -m pip install numpy==2.3.5 protobuf==5.29.5
+      - name: Fetch exact hash-bound nonmarket implementation only
+        run: |
+          python - <<'CODE'
+          import os,json,pathlib,hashlib,urllib.request
+          root='https://raw.githubusercontent.com/mariancradulescu/mxm-quant-greenfield/'+os.environ['EXACT_TARGET']+'/'
+          def get(p,h=None):
+           assert p.endswith(('.py','.json')) and not p.startswith('support_only_v1/')
+           b=urllib.request.urlopen(root+p,timeout=90).read();d=hashlib.sha256(b).hexdigest()
+           if h:assert d==h,p
+           q=pathlib.Path(p);q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b);return json.loads(b) if p.endswith('.json') else None
+          f=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_DOMAIN_IMPLEMENTATION_FREEZE_V1.json','59be4fa5542b056d39a4438c3a12c7034ae99ccd6b0a14488d6b3d253f591d90')
+          for p,h in f['files_sha256'].items():get(p,h)
+          a=get('research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_DOMAIN_NEXT_PROFILE_AUTHORITY_V1.json');assert a['profile'] in [24,28] and a['extension_freeze_sha256']=='59be4fa5542b056d39a4438c3a12c7034ae99ccd6b0a14488d6b3d253f591d90' and a['previous_shared_ready'] is False
+          with open(os.environ['GITHUB_ENV'],'a') as o:print('CERT_PROFILE='+str(a['profile']),file=o)
+          CODE
+      - name: Exact immutable-engine and disjoint-seed fixtures
+        run: python research_core_v4/operational_v2_extended/certify.py --verify
+      - name: Durable attempt intent before first synthetic trial
+        run: python research_core_v4/operational_v2_extended/checkpoint.py --mode intent --profile "$CERT_PROFILE" --case '${{ matrix.case }}'
+      - name: Complete all16384 trials at fixed k15; no calibration
+        run: python research_core_v4/operational_v2_extended/certify.py --profile "$CERT_PROFILE" --case '${{ matrix.case }}' --output cell.json
+      - name: Durable result; no automatic replay
+        run: python research_core_v4/operational_v2_extended/checkpoint.py --mode result --profile "$CERT_PROFILE" --case '${{ matrix.case }}'
