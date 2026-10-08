@@ -32,10 +32,10 @@ jobs:
            b=urllib.request.urlopen('https://raw.githubusercontent.com/'+repo+'/'+ref+'/'+p,timeout=90).read();digest=hashlib.sha256(b).hexdigest()
            if h:assert digest==h,p
            q=pathlib.Path(p);q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b);trace.append({'ref':ref,'path':p,'sha256':digest});return b
-          f=json.loads(fetch(freeze,'d68d744cb538614d2df8604945773f56b89eef289d01d42c58586ffba69ca214'))
+          f=json.loads(fetch(freeze,'8ea44387cc73df510576d03892cd6de977edf6bf209d1518d8b20f47458af1b4'))
           for p,h in f['files_sha256'].items():fetch(p,h)
           if os.environ['GITHUB_REF_NAME']=='audit-operational-v2-depth-stage-v1':
-           p='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_INFERENCE_V2_NEXT_STAGE_AUTHORITY_V1.json';a=json.loads(fetch(p));assert a['exact_implementation_freeze_sha256']=='d68d744cb538614d2df8604945773f56b89eef289d01d42c58586ffba69ca214' and a['stage'] in range(1,7)
+           p='research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_WAVE_OPERATIONAL_INFERENCE_V2_NEXT_STAGE_AUTHORITY_V1.json';a=json.loads(fetch(p));assert a['exact_implementation_freeze_sha256']=='8ea44387cc73df510576d03892cd6de977edf6bf209d1518d8b20f47458af1b4' and a['stage'] in range(1,7)
            with open(os.environ['GITHUB_ENV'],'a') as out:out.write('DEPTH_STAGE='+str(a['stage'])+'\n')
           pathlib.Path('depth_read_trace.json').write_text(json.dumps(trace,sort_keys=True,indent=2))
           print('EXACT_TARGET='+ref+' INITIAL_BROKER_REQUESTS=0')
