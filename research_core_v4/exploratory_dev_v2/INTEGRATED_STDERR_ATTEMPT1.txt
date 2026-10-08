@@ -1,0 +1,91 @@
+test_01_signed_payload_tampering (__main__.Integrated.test_01_signed_payload_tampering) ... ok
+test_02_wrong_live_head (__main__.Integrated.test_02_wrong_live_head) ... ok
+test_03_wrong_signed_hashes (__main__.Integrated.test_03_wrong_signed_hashes) ... ok
+test_04_wrong_absolute_paths (__main__.Integrated.test_04_wrong_absolute_paths) ... ok
+test_05_runtime_drift (__main__.Integrated.test_05_runtime_drift) ... ok
+test_06_missing_frozen_dependency (__main__.Integrated.test_06_missing_frozen_dependency) ... ok
+test_07_inherited_binding_override (__main__.Integrated.test_07_inherited_binding_override) ... ok
+test_08_host_drift (__main__.Integrated.test_08_host_drift) ... ok
+test_09_volatile_filesystem_denied (__main__.Integrated.test_09_volatile_filesystem_denied) ... ok
+test_10_incomplete145_corpus (__main__.Integrated.test_10_incomplete145_corpus) ... ok
+test_11_corrupted_records_fail_in_actual_parser (__main__.Integrated.test_11_corrupted_records_fail_in_actual_parser) ... FAIL
+test_12_corrupted_zip_digest (__main__.Integrated.test_12_corrupted_zip_digest) ... FAIL
+test_13_interrupted_invocation_and_no_replay (__main__.Integrated.test_13_interrupted_invocation_and_no_replay) ... ERROR
+test_14_complete_signed_reader_checkpoint_report145 (__main__.Integrated.test_14_complete_signed_reader_checkpoint_report145) ... ERROR
+
+======================================================================
+ERROR: test_13_interrupted_invocation_and_no_replay (__main__.Integrated.test_13_interrupted_invocation_and_no_replay)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 211, in test_13_interrupted_invocation_and_no_replay
+    with self.assertRaises(KeyboardInterrupt):env.execute(interrupt=True)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 143, in execute
+    with patch.object(science,'derive',side_effect=stop):return entrypoint.execute(self.envelope)
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/entrypoint.py", line 14, in execute
+    caches,ids=read_production(permit);permit.check();report=evaluate(caches,ids);permit.check()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/reader.py", line 20, in read_production
+    gate.require(len(expected)==2 and {x['source_archive_sha256'] for x in records}==set(expected),'ARCHIVE_SCOPE')
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v1/entrypoint.py", line 35, in require
+    if not ok:raise ValueError(why)
+              ^^^^^^^^^^^^^^^^^^^^^
+ValueError: ARCHIVE_SCOPE
+
+======================================================================
+ERROR: test_14_complete_signed_reader_checkpoint_report145 (__main__.Integrated.test_14_complete_signed_reader_checkpoint_report145)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 222, in test_14_complete_signed_reader_checkpoint_report145
+    env=Environment(td,full=True);started=time.process_time();report=env.execute()
+                                                                     ^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 144, in execute
+    return entrypoint.execute(self.envelope)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/entrypoint.py", line 14, in execute
+    caches,ids=read_production(permit);permit.check();report=evaluate(caches,ids);permit.check()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/reader.py", line 20, in read_production
+    gate.require(len(expected)==2 and {x['source_archive_sha256'] for x in records}==set(expected),'ARCHIVE_SCOPE')
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v1/entrypoint.py", line 35, in require
+    if not ok:raise ValueError(why)
+              ^^^^^^^^^^^^^^^^^^^^^
+ValueError: ARCHIVE_SCOPE
+
+======================================================================
+FAIL: test_11_corrupted_records_fail_in_actual_parser (__main__.Integrated.test_11_corrupted_records_fail_in_actual_parser)
+----------------------------------------------------------------------
+ValueError: ARCHIVE_SCOPE
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 201, in test_11_corrupted_records_fail_in_actual_parser
+    self.assertTrue(self.negative('corrupt_records',pattern='SOURCE_CHRONOLOGY'))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 158, in negative
+    with self.assertRaisesRegex(expected,pattern):env.execute(**options)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "SOURCE_CHRONOLOGY" does not match "ARCHIVE_SCOPE"
+
+======================================================================
+FAIL: test_12_corrupted_zip_digest (__main__.Integrated.test_12_corrupted_zip_digest)
+----------------------------------------------------------------------
+ValueError: ARCHIVE_SCOPE
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 206, in test_12_corrupted_zip_digest
+    self.assertTrue(self.negative('normal',mutate,pattern='ARCHIVE_DIGEST'))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/437eff501b9b/mxm-work/research_core_v4/exploratory_dev_v2/integrated_offline.py", line 158, in negative
+    with self.assertRaisesRegex(expected,pattern):env.execute(**options)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "ARCHIVE_DIGEST" does not match "ARCHIVE_SCOPE"
+
+----------------------------------------------------------------------
+Ran 14 tests in 60.384s
+
+FAILED (failures=2, errors=2)

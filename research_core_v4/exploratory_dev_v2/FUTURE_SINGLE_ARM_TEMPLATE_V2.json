@@ -1,0 +1,44 @@
+{
+  "branch": "performance-research-v3-20260922",
+  "campaign": "PRIMARY145_EXPLORATORY_V1_OPERATIONAL_V2_SINGLE_PASS",
+  "execution_authorized": false,
+  "execution_head": null,
+  "files_sha256": "must exactly equal gate.signed_scope() on audited clean deployment;75 SHA256 values",
+  "future_entrypoint": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 -m research_core_v4.exploratory_dev_v2.entrypoint --independent-signed-arm <separately-approved-signed-envelope>",
+  "host_binding": {
+    "devices": null,
+    "durability_evidence_sha256": null,
+    "filesystems": null,
+    "hostname": null,
+    "independent_durability_approved": false
+  },
+  "independent_preexecution_audit": "PENDING",
+  "inference_class": "EXPLORATORY_ONLY_NO_FORMAL_REJECTION",
+  "key_installation_authorized": false,
+  "limits": {
+    "CPU_seconds": 7200,
+    "RAM_bytes": 8589934592,
+    "accepted_corpus_passes": 1,
+    "broker_requests": 0,
+    "orders": 0,
+    "protected_forward_rows": 0,
+    "trading": 0
+  },
+  "paths": {
+    "archive_directory": "/srv/mxm-primary145/accepted-archives",
+    "checkpoint_directory": "/srv/mxm-primary145/exploratory-v1/checkpoint",
+    "output_file": "/srv/mxm-primary145/exploratory-v1/report.json"
+  },
+  "repository": "mariancradulescu/mxm-quant-greenfield",
+  "required_before_any_real_ARM": [
+    "independent integrated re-audit of final HEAD and exact hashes",
+    "verified persistent host and independently approved lifecycle/storage evidence",
+    "whole-byte rematerialization of the exact two accepted archives at frozen paths;145 headers/member/series digests verified without numeric conversion",
+    "verified runtime and live GitHub metadata access on that host",
+    "separate authorization for independent key installation and one exact signed payload",
+    "no V1 alternative execution, no second corpus pass, no replay after crash"
+  ],
+  "schema": "mxm.primary145.single-exploratory-arm.v2",
+  "signature_creation_authorized": false,
+  "status": "TEMPLATE_ONLY_NOT_AUTHORIZED_NOT_SIGNED"
+}
