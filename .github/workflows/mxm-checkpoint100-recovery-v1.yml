@@ -1,0 +1,38 @@
+name: MXM MASTER1576 checkpoint100 forensic recovery V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [.github/workflows/mxm-checkpoint100-recovery-v1.yml]
+permissions:
+  contents: write
+concurrency:
+  group: mxm-checkpoint100-forensic-once-v1
+  cancel-in-progress: false
+jobs:
+  checkpoint100-recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install existing vetted crypto dependency before secret exposure
+        run: python3 -m pip install protobuf==5.29.5
+      - name: Strict fabricated fault and geometry preflight without secret
+        run: python3 -m research_core_v4.checkpoint100_recovery_v1.checkpoint100_recovery_worker_v1 --preflight
+      - name: One-time encrypted checkpoint100 and existing mask recovery only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: python3 -m research_core_v4.checkpoint100_recovery_v1.checkpoint100_recovery_worker_v1
+      - name: Preserve runtime receipt or fail-closed evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-checkpoint100-recovery-${{ github.run_id }}
+          path: |
+            research_core_v4/checkpoint100_recovery_v1/RECOVERY_RUNTIME_RESULT_V1.json
+            research_core_v4/checkpoint100_recovery_v1/RECOVERY_RUNTIME_FAILURE_V1.json
+          if-no-files-found: warn
+          retention-days: 30
