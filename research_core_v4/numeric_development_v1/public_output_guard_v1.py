@@ -66,7 +66,7 @@ def validate_public_blob(path, document):
             if type(value) is not str or value not in ENUM[key]:
                 raise PublicDisclosureDenied("PUBLIC_ENUM_DENIED")
         elif key in HASHES:
-            if type(value) is not str or not re.fullmatch(r"[0-9a-f]{64 if key != 'source_head' else 40}", value):
+            if type(value) is not str or not re.fullmatch(r"[0-9a-f]{" + str(40 if key == "source_head" else 64) + r"}", value):
                 # source_head is a Git SHA-1, other digests are SHA-256
                 raise PublicDisclosureDenied("PUBLIC_DIGEST_DENIED")
         elif key == "encrypted_artifact_name":
