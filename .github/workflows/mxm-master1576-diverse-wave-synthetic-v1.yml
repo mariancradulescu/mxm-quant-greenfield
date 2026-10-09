@@ -34,7 +34,7 @@ jobs:
           a.need(launch=={'schema':'mxm.diverse.wave.synthetic.launch.v1','mode':'FABRICATED_ONLY','source_head':source,'design_sha256':a.DESIGN_SHA,'binding_manifest_sha256':a.digest(a.BINDINGS),'fixture_packages':2,'family_comparisons':6,'attempts':1,'real_authorized':False},'SYNTHETIC_LAUNCH_DRIFT')
           name='tags/mxm-diverse-wave-synthetic-launch-'+source
           a.need(not a.old.api('git/matching-refs/'+name),'SYNTHETIC_CAMPAIGN_ALREADY_CLAIMED')
-          a.old.api('git/refs','POST',{'ref':'refs/'+name,'sha':head})
+          a.old.api('git/refs',{'ref':'refs/'+name,'sha':head})
           print('PASS_EXACT_FABRICATED_SOURCE_ONLY_NO_REAL_PRIVATE_KEY')
           PY
       - name: New scientific and adapter boundaries only
