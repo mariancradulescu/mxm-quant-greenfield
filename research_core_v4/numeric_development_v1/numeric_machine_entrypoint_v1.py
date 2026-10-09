@@ -190,11 +190,13 @@ def fabricated_shard(seg,k,master,digits):
     lo=k*64+1;hi=min(num.MASTER,lo+63);items=[]
     first=None;last=None;count=0
     for ordinal in range(lo,hi+1):
-        rows=_fabricated_rows(seg,ordinal,digits[master[ordinal-1]["symbol_id"]])
-        count+=len(rows);first=min(first or rows[0]["time_utc"],rows[0]["time_utc"])
-        last=max(last or rows[-1]["time_utc"],rows[-1]["time_utc"])
+        rows=[] if ordinal==515 else _fabricated_rows(seg,ordinal,digits[master[ordinal-1]["symbol_id"]])
+        count+=len(rows)
+        if rows:
+            first=min(first or rows[0]["time_utc"],rows[0]["time_utc"])
+            last=max(last or rows[-1]["time_utc"],rows[-1]["time_utc"])
         items.append({"ordinal":ordinal,"symbol_id":master[ordinal-1]["symbol_id"],
-         "classification":"SHALLOW_SUPPORT_COMPLETE","request_count":1,
+         "classification":"SHALLOW_SUPPORT_COMPLETE" if rows else "NO_HISTORICAL_SUPPORT","request_count":1,
          "retry_count":0,"page_cap_hits":0,"failure":None,
          "transport_geometry_pages":[],"rows":rows})
     raw=crypto.canonical({"schema":"mxm.v4.shallow-m5-v2.raw-shard.v1",
