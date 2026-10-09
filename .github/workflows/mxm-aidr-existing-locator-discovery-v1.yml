@@ -1,0 +1,44 @@
+name: MXM existing AIDR locator discovery outputs only
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [.github/workflows/mxm-aidr-existing-locator-discovery-v1.yml]
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  inspect-existing-outputs:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Exact source and completed-output authority before key access
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import pathlib,hashlib
+          p=pathlib.Path('research_core_v4/aidr_locator_v1/discover_existing_v1.py')
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='2996097101bad86d5f123c478697082f49d05b369c8b39731b36ba39c984b37f'
+          PY
+          python3 -m research_core_v4.aidr_locator_v1.discover_existing_v1 --preflight
+      - name: Authenticate existing encrypted output contents only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 1048576
+          ulimit -t 500
+          python3 - <<'PY'
+          import pathlib,hashlib
+          p=pathlib.Path('research_core_v4/aidr_locator_v1/discover_existing_v1.py')
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='2996097101bad86d5f123c478697082f49d05b369c8b39731b36ba39c984b37f'
+          PY
+          timeout --signal=TERM 500 python3 -m research_core_v4.aidr_locator_v1.discover_existing_v1
