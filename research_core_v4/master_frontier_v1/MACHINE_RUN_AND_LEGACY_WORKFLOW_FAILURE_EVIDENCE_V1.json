@@ -1,0 +1,60 @@
+{
+  "automatic_legacy_runs": [
+    {
+      "job_id": 113689898022,
+      "name": "V4 Exact Geometry Calibration V2",
+      "result": "FAIL_PUBLICATION_STATE;calibration_SKIPPED",
+      "run_id": 37890430228
+    },
+    {
+      "job_id": 113689898386,
+      "name": "V4 Recovery Governance and Runtime Audit",
+      "result": "FAIL_PUBLICATION_STATE;audit_SKIPPED",
+      "run_id": 37890430286
+    },
+    {
+      "job_id": 113689898234,
+      "name": "Research Core V4 Method Validation",
+      "result": "FAIL_PUBLICATION_STATE;method_validation_SKIPPED",
+      "run_id": 37890430280
+    }
+  ],
+  "broker_requests": 0,
+  "failure_evidence": "29publication-onlytestsPASSin each; post_publication_integrity_v1 fails PermissionError PUBLICATION_ONLY_FAIL_CLOSED prospective boundary response_execution_authorized; no realresponse, no calibration, no broker",
+  "independent_diagnosis": "check_state reads absent next_prospective_wave via {} and requires missing response_execution_authorized isFalse; actual valueNone. V4_STATE and verifier preexistunchanged at checkpoint. This is stale schema compatibility, not newly granted realexecution or modified scientificresult.",
+  "material_blocker": "Legacy automaticCI cannot issue project-widePASS. Leave unchanged, no reruns or infrastructurecampaign. Futureexecution must independentlyaudit anylawful schema-aware successor, notsilentlyset historicalfields.",
+  "metadata_run": {
+    "billing": "Actual billable runner minutes/cost not supplied; CPU/RSS aboveprocessonly, excludescheckout/artifactoverhead",
+    "cpu_seconds": 0.382231728,
+    "elapsed_seconds": 7.3714209890000575,
+    "id": 37890430296,
+    "job_id": 113689898668,
+    "output_sha256": {
+      "MACHINE_METADATA_RECONCILIATION_RESULT_V1.json": "11c5c5d06c050d2dd0f6bac97ee780442fc51f42b210663f6880f76dfee94a27",
+      "SOURCE_INVENTORY_V1.json.gz": "5ad355c686f4a968a594f2c926456d08222b03e42ce1207803baf050f113e83b"
+    },
+    "peak_rss_kib": 56252,
+    "publication_commit": "b08c32eed78c32468bfd708543978e7c21db4a3b",
+    "run_receipt_artifact_id": 11598157646,
+    "run_receipt_artifact_sha256": "c00008bf0840fb433d50fb14f78f3376ea8f64b617bb47a5c009e015ab79fd32",
+    "source_commit": "58390a25c247086ef7bbcf1cd74ee3f2f8c8e102",
+    "status": "SUCCESS_EXACT_REMOTE_READBACK"
+  },
+  "new_numeric_market_rows": 0,
+  "new_publications": "Subsequent documentonlycommits use[skipci] to avoid repeatedautomaticCI; this is publication, notpassing or bypassing an empiricalgate.",
+  "schema": "mxm.frontier.machine.evidence.v1",
+  "source_refs": [
+    {
+      "last_modified_commit": "a74eb5eff6d733cf1a00e06feac9eaa94c8eee72",
+      "path": "research_core_v4/state/V4_STATE.json",
+      "sha256": "7da472e44af03b9ce75a265cc7e6e144dcbd94986ce67f5f1160fe6bd8da05c1",
+      "source_commit": "42df764fa4d71b2507027b4031a23ac052cbef07"
+    },
+    {
+      "last_modified_commit": "594017e8fc32b8e818620de386530ed88f3a20d0",
+      "path": "research_core_v4/post_publication_integrity_v1.py",
+      "sha256": "56ea0a16448deeefdfc6a5ff44e70f04baf58cbeac91221743b622462340e19e",
+      "source_commit": "42df764fa4d71b2507027b4031a23ac052cbef07"
+    }
+  ]
+}
