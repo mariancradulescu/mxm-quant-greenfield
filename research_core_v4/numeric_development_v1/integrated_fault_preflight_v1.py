@@ -104,7 +104,9 @@ class IntegratedFaults(unittest.TestCase):
         engine=n.new(self.master)
         s=engine["states"][0];n._advance(engine,s,n.END+n.LAGS[-1]+3600)
         self.assertEqual(s["next_clock"],672)
-        self.assertGreater(s["lag"]["900"]["reasons"]["DOMAIN_CENSOR"],0)
+        self.assertEqual(s["lag"]["900"]["reasons"]["FEATURE_GAP"],672)
+        # The immutable kernel right-censors before accessing unavailable labels.
+        self.assertEqual(n.frozen.response({},n.END-3600,900,n.END+900,n.END),(None,"DOMAIN_CENSOR"))
 
 if __name__=="__main__":
     unittest.main(verbosity=2)

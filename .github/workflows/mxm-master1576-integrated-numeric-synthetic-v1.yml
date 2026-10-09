@@ -24,6 +24,7 @@ jobs:
         run: |
           python3 -m py_compile research_core_v4/numeric_development_v1/numeric_streaming_executor_v1.py research_core_v4/numeric_development_v1/numeric_machine_entrypoint_v1.py
           python3 -m unittest -v research_core_v4.numeric_development_v1.integrated_fault_preflight_v1
+      # Bounded mechanical correction: Decimal import and fault fixture precedence.
       - name: EXACTLY ONE fabricated 1576 identity, 100 shard, 4 segment streaming campaign
         env:
           GH_TOKEN: ${{ github.token }}

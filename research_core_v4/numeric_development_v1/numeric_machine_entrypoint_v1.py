@@ -20,6 +20,7 @@ import tempfile
 import time
 import urllib.request
 from datetime import datetime, timezone
+from decimal import Decimal
 
 from research_core_v4.numeric_development_v1 import numeric_streaming_executor_v1 as num
 from research_core_v4.numeric_development_v1.public_output_guard_v1 import safe_public_git_blob, SCHEMA, ROOT as PUBLIC_ROOT
@@ -289,6 +290,7 @@ def run(mode):
                 need(engine["next_shard"]==seg*25,"CHECKPOINT_RESUME_DRIFT")
                 print(json.dumps({"checkpoint_segment":seg,"encrypted_remote_readback":"PASS",
                      "processed_shards":engine["next_shard"],"resources":usage()},sort_keys=True),flush=True)
+        if mode=="real":need(expected_rows==num.EXPECTED_ROWS,"HISTORICAL_ROW_COUNT_DRIFT")
         report=num.finish(engine,expected_rows)
         # Only encrypted storage receives numeric results, including all unsupported evidence.
         final=store.encrypted(report,"full-frontier-numeric-response.mxmenc")
