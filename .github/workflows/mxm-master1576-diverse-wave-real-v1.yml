@@ -1,0 +1,55 @@
+name: MXM MASTER1576 diverse wave real default deny
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/diverse_mechanism_wave_v1/INDEPENDENT_ACCEPTANCE_V1.json]
+  workflow_dispatch:
+    inputs:
+      accepted_source_head:
+        description: Exact independently accepted source commit
+        required: true
+        type: string
+      accepted_arm_sha256:
+        description: Exact independently accepted ARM digest
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  one-approved-wave:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Presecret independent acceptance and all deterministic source gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SOURCE_HEAD: ${{ inputs.accepted_source_head }}
+          EXPECTED_ARM_SHA256: ${{ inputs.accepted_arm_sha256 }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from research_core_v4.diverse_mechanism_wave_v1 import authority_v1 as a
+          from research_core_v4.numeric_development_v2 import machine_v2 as v2
+          head=os.environ['GITHUB_SHA'];v2.runtime(head);arm=a.real_gate(head);a.real_event_gate()
+          if os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch':
+              a.need(arm['source_head']==os.environ['EXPECTED_SOURCE_HEAD'] and a.digest(a.ARM)==os.environ['EXPECTED_ARM_SHA256'],'DISPATCH_APPROVAL_DRIFT')
+          master,entries,digits,manifest=a.old.verify_science();a.olda.preflight_inventory(manifest,entries)
+          a.need(not v2.existing_ref(v2.claim_name(arm)),'CONSUMED_WAVE_ARM')
+          print('PASS_PRESECRET_WAVE_SOURCE_AND_INDEPENDENT_AUTHORITY')
+          PY
+      - name: Exactly one approved original scientific invocation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          timeout --signal=TERM 3400 python3 -m research_core_v4.diverse_mechanism_wave_v1.worker_v1 --mode real
