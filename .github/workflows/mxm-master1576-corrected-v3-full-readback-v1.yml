@@ -1,0 +1,104 @@
+name: MXM corrected V3 independent full-byte readback only V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/mxm-master1576-corrected-v3-full-readback-v1.yml
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  independent-existing-fixture-readback-only:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Presecret immutable code and successful exact original proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from research_core_v4.numeric_development_v3 import authority_v3 as a
+          from research_core_v4.numeric_development_v2 import machine_v2 as m
+          from research_core_v4.numeric_development_v1 import numeric_machine_entrypoint_v1 as old
+          head=os.environ['GITHUB_SHA'];m.runtime(head)
+          path='.github/workflows/mxm-master1576-corrected-v3-full-readback-v1.yml'
+          a.need(os.environ['GITHUB_EVENT_NAME']=='push' and os.environ['GITHUB_WORKFLOW_REF']==old.REPO+'/'+path+'@refs/heads/'+old.BRANCH and os.environ['GITHUB_WORKFLOW_SHA']==head,'INDEPENDENT_READER_WORKFLOW_IDENTITY')
+          a.need(a.sha(a.git('show',head+':'+path))==a.digest(path),'READER_WORKFLOW_BYTES')
+          proof=old.api('actions/runs/37921565944')
+          a.need(proof['head_sha']=='27ed9bb3bb1d9e96d0a5a833cba78fcf385c8f12' and proof['run_attempt']==1 and proof['status']=='completed' and proof['conclusion']=='success' and proof['path']=='.github/workflows/mxm-master1576-corrected-v3-finalization-launch-v1.yml','EXACT_PROOF_MUST_HAVE_SUCCEEDED')
+          a.need(a.digest(a.ARM)=='f982857d38a385ca77c7d3944587bf20a1669ceb062c0d807ed5e53238021749','EXISTING_REAL_CANDIDATE_BYTES')
+          arm=a.read(a.ARM);a.verify_bindings(arm['source_head'],head,arm['bindings'])
+          a.need(len(arm['bindings'])==72 and not (a.ROOT/a.APPROVAL).exists() and not (a.ROOT/a.RECOVERY).exists(),'READ_ONLY_NO_REAL_ACCEPTANCE')
+          baseline='5d341416dc036b50d61508493429ea7056661f65'
+          oldtree={line.split('\t',1)[1]:line.split('\t',1)[0] for line in a.git('ls-tree','-r',baseline).decode().splitlines()}
+          newtree={line.split('\t',1)[1]:line.split('\t',1)[0] for line in a.git('ls-tree','-r',head).decode().splitlines()}
+          a.need(all(newtree.get(p)==v for p,v in oldtree.items()),'ORIGINAL_HISTORY_DRIFT')
+          print('PASS_PRESECRET_72_UNCHANGED_BINDINGS_ORIGINAL_HISTORY_AND_EXACT_SUCCEEDED_PROOF')
+          PY
+      - name: Separate reader authenticates existing assets, state, Git, Release and immutable refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          set +e
+          timeout --signal=TERM 1100 /usr/bin/time -v python3 - <<'PY'
+          import json,os,pathlib,tempfile
+          from research_core_v4.numeric_development_v3 import authority_v3 as a, finalization_v3 as f
+          from research_core_v4.numeric_development_v3.fault_proof_v3 import STOPS,ERRORS
+          from research_core_v4.numeric_development_v2 import machine_v2 as m
+          from research_core_v4.numeric_development_v1 import numeric_machine_entrypoint_v1 as old
+          from research_core_v4.numeric_development_v1.public_output_guard_v1 import ROOT as PUB
+          os.umask(0o077)
+          audit_head=os.environ['GITHUB_SHA'];audit_run=int(os.environ['GITHUB_RUN_ID'])
+          proof_head='27ed9bb3bb1d9e96d0a5a833cba78fcf385c8f12';proof_run=37921565944
+          arm=a.candidate(proof_head,a.read(a.BINDINGS)['bindings']);arm['mode']='synthetic'
+          approval={'schema':'mxm.numeric.independent.acceptance.v3','status':'INDEPENDENT_ACCEPTANCE_PASS','mode':'synthetic','role':'FABRICATED_TEST_AUTHORITY','arm_sha256':a.sha(a.enc(arm)),'source_head':proof_head,'arm_commit':proof_head,'audit_receipt_sha256':'a'*64,'explicit_acceptance':True}
+          a.validate(arm,approval,audit_head,'synthetic',a.enc(arm),artifacts=False)
+          cases=(*STOPS,*ERRORS,'normal','after_completion_ref');records=[];assets=[]
+          claim='mxm-corrected-v3-independent-readback-'+str(proof_run)
+          a.need(not m.existing_ref(claim),'INDEPENDENT_READBACK_ALREADY_CONSUMED')
+          old.api('git/refs',{'ref':'refs/tags/'+claim,'sha':audit_head})
+          with tempfile.TemporaryDirectory(prefix='mxm-independent-v3-reader-') as td:
+              tmp=pathlib.Path(td);tmp.chmod(0o700)
+              key,fp=old._private_key_from_secret(tmp);a.need(fp==old.FP,'EXISTING_KEY_FINGERPRINT')
+              for case in cases:
+                  old.budget(maxwall=1000)
+                  store=f.Store(proof_head,key,a.ROOT/old.PUBLIC_KEY,tmp,arm,a.sha(a.enc(approval)),fp)
+                  store.original_run=proof_run;store.name='mxm-atomicity-v3-'+str(proof_run)+'-'+case.replace('_','')
+                  store.release=old.api('releases/tags/'+store.name)
+                  complete=f.verify_complete(store);a.need(complete is not None,'INDEPENDENT_COMPLETE_REF_ABSENT')
+                  a.need(store.load_named(f.REPORT)[0]=={'fixture':'FABRICATED_FINALIZATION_ONLY','private_vector':[1.25,-2.5,3.75],'case':case},'INDEPENDENT_REPORT_FIXTURE_PARITY')
+                  a.need(store.load_named(f.STATE)[0]=={'next_shard':100,'fixture':'NO_SCIENTIFIC_EXECUTION','case':case},'INDEPENDENT_STATE_FIXTURE_PARITY')
+                  for asset in store.release['assets']:
+                      a.need(asset['name'].endswith('.mxmenc'),'UNENCRYPTED_RESULT_ASSET')
+                      value,meta=store.load_named(asset['name'],asset['digest'].removeprefix('sha256:'))
+                      assets.append({'case':case,'release_id':store.release['id'],**meta,'authenticated_plaintext_readback':True})
+                      if asset['name']=='finalization-fault-proof.mxmenc':original_proof=value
+                  records.append({'case':case,'release_id':store.release['id'],**complete})
+                  print(json.dumps({'independent_case_readback':'PASS','case':case,'completion_commit':complete['completion_commit'],'completion_ref':complete['completion_ref']}),flush=True)
+              a.need(len(assets)==66 and len(records)==13,'EXACT_EXISTING_ASSET_AND_CASE_COUNT')
+              a.need(original_proof['run_id']==proof_run and original_proof['source_head']==proof_head and original_proof['scientific_reducer_calls']==0 and original_proof['historical_input_downloads']==0 and len(original_proof['cases'])==13,'ORIGINAL_PROOF_IDENTITY')
+              for row in original_proof['cases']:
+                  case=row['case'];first=-9 if case in (*STOPS,'after_completion_ref') else (1 if case in ERRORS else 0)
+                  a.need(row['first_exit']==first and row['cold_exit']==0 and row['shards_replayed']==0 and row['global_pass_after_readback'] and row['global_pass_before_recovery']==(case in ('normal','after_completion_ref')),'ORIGINAL_BOUNDARY_VERDICT')
+                  if case=='normal':a.need(row['repeat_exit']==0,'ORIGINAL_IDEMPOTENCE_VERDICT')
+              evidence={'schema':'mxm.corrected.v3.independent.full.readback.v1','status':'PASS_ALL_13_AND_66_AUTHENTICATED_ASSETS','reader_head':audit_head,'reader_run_id':audit_run,'reader_pid':os.getpid(),'proof_head':proof_head,'proof_run_id':proof_run,'cases':records,'assets':assets,'resources':old.usage(),'scientific_reducer_calls':0,'new_fixture_executions':0,'historical_market_input_downloads':0,'real_acceptance_artifact_absent':True}
+              meta=store.put(evidence,'corrected-independent-full-readback.mxmenc')
+              a.need(store.restore(meta)==evidence,'INDEPENDENT_EVIDENCE_REMOTE_READBACK')
+              public=store.publish_exact(m.safe_status(audit_head,'PUBLICATION','PASS',run_id=audit_run,encrypted_artifact_name=meta['name'],encrypted_artifact_sha256=meta['ciphertext_sha256'],failure_code='NONE'),PUB+'CORRECTED_V3_INDEPENDENT_FULL_READBACK_V1.json')
+              print(json.dumps({'independent_readback':'PASS_ALL_13_AND_66_AUTHENTICATED_ASSETS','reader_head':audit_head,'reader_run_id':audit_run,'reader_pid':os.getpid(),'proof_head':proof_head,'proof_run_id':proof_run,'cases':records,'assets':assets,'evidence_asset':meta,'public_git':public,'resources':old.usage(),'new_scientific_executions':0,'new_fixture_executions':0,'real_numeric_execution':False}),flush=True)
+          PY
+          mxm_reader_exit=$?
+          set -e
+          echo "EXACT_INDEPENDENT_V3_READBACK_EXIT=$mxm_reader_exit"
+          exit "$mxm_reader_exit"
