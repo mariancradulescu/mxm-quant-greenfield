@@ -1,0 +1,2619 @@
+{
+  "causal_timing": {
+    "authentic_receipt": "UNKNOWN; original archive hash does not recover actual available_at/revisions. Scenarios are not evidence a300/900lag cures all unknown latency.",
+    "bar_time": "M5UTC open; hypothetical available_at=open+300; bar-close+lag sensitivity only",
+    "decision_clocks": "00:00,06:00,12:00,18:00 UTC; t multiple300",
+    "feature_cutoff": "t-lag, lag0/300/900; latest fully elapsed calendarhour at cutoff plus lastM5 bar, exactsourceB and diagnostic maps; no stale fallback",
+    "label_maturity": "t+300*h+lag; must<=end; forecast bound before labelaccess; only labels with maturity<refit in training",
+    "training": "Rolling56days, refit weekly; exclude entire refitUTCday; train_decision+245min<refit AND maturity<refit; complete commonintersection"
+  },
+  "chronological_stability_and_dependence": {
+    "existing_report": "All18calendar_gain vectors,145fixedcalendaridentity contributions andsupportcounters, fitprefix audit, forecast digest, full18x18commoncalendar descriptivecovariance",
+    "limits": "No temporal/cross-symbol independence assumed; covariance is descriptive, neither validCI nor effectiveN. No selecting strongestperiod, symbol, map, horizon or lag. Formal temporalstability/generalization remainsunknown.",
+    "stability_readout": "For independent audit, fixed nonoverlapping periods [2025-11-11,2026-01-01),[2026-01-01,2026-04-01),[2026-04-01,2026-07-01),[2026-07-01,2026-09-17). For eachj report sum(G_j)/numberof fixedscoreclocks inperiod, includingabstentions. Use already-produced complete report only; no secondcorpus pass. This descriptive partition changes no scientific score or promotion law."
+  },
+  "complete_original_scientific_freeze": {
+    "aggregation": {
+      "calendar": "fixed1240 units; per unit sum identity gains/145; unavailable gain0 means abstention, never missing response imputation",
+      "dependence": "common calendar gain vectors and full18x18 descriptive covariance; identities never independent N; no p-value,CI or formal rejection",
+      "early_stop": "only hard integrity/resource violations; never favorable score",
+      "identity": "fixed145 denominator and fixed calendar denominator; every identity reported",
+      "missingness": "feature, label, fit counters; identity supported counts; all unsupported and negative comparisons emitted"
+    },
+    "calendar": {
+      "clock_UTC_hours": [
+        0,
+        6,
+        12,
+        18
+      ],
+      "compress_missing_calendar": false,
+      "end_exclusive": "2026-09-17T00:00:00Z",
+      "first_score": "2025-11-11T00:00:00Z",
+      "fixed_opportunities_per_comparison": 179800,
+      "score_calendar_units": 1240,
+      "start_inclusive": "2025-09-16T00:00:00Z",
+      "warmup_days": 56,
+      "weekends_included": true
+    },
+    "corpus_manifest": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+    "corpus_manifest_sha256": "3f42fcad0e82b80d4f51bfab3a7faae11bf0b83dedd511826d68c308e34a7e02",
+    "crash_recovery": "atomic per-series digest-bound caches and counters preserve completed work; invocation reserves entire7200sec budget; same signed ARM cannot re-enter after crash; no source replay; recovery is forensic inspection only until separately audited budget/evidence resolution, no second ARM implied",
+    "fail_closed": [
+      "digest",
+      "duplicate timestamp/member",
+      "offgrid timestamp",
+      "wrong dimensions",
+      "unexpected out-of-domain row",
+      "nonfinite or invalid OHLCV",
+      "wrong row count or endpoints",
+      "decrypt error; these accepted ZIPs are not encrypted"
+    ],
+    "family": [
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 0,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 0,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 0,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 0,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 0,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 0,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 300,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 300,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 300,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 300,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 300,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 300,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 900,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 900,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 900,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 900,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 900,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 900,
+        "map": "COMBINED"
+      }
+    ],
+    "features": {
+      "B": "exact compact_baseline_v2.baseline evaluated at t-lag; ten coordinates unchanged",
+      "chronology": "sum(sign(c_i-o_i)*sign(c_(i+1)-o_(i+1)), i=0..10)/11 on latest fully elapsed calendar hour at cutoff",
+      "combination": "append both scalars to B",
+      "coupling": "sum(v_i*sign(c_i-o_i))/sum(v_i) on same12 bars",
+      "late_bar": "baseline requires actual synthetic available_at<=cutoff; no stale fallback",
+      "receipt": "UNKNOWN; bar-close+lag is conditional assumed sensitivity only",
+      "zero_activity": "common abstention for all three maps"
+    },
+    "fit": {
+      "common_B": "same beta_B and response normalization for all3 map comparisons within horizon/lag; B coordinate law shared across all18",
+      "no_fit": "common abstention; no alternate fitting",
+      "prediction": "linear ridge; clip[-8,8]; forecast bound before current label release",
+      "refit": "start+56d then every7d",
+      "route": "reuse immutable fit_prefix,predict,solve_ridge; common combined input standardization",
+      "scaling": "weighted population mean/sd on training prefix only; sd<=1e-12 zero coordinate; ridge slopes0.5 intercept0.05",
+      "support": "intersection B,chronology,coupling and complete horizon; same training/scoring support for all3 variants within horizon/lag",
+      "training": "rolling56 days; same6h clocks; entire refit UTC day excluded; decision+245min<refit AND label_maturity<refit",
+      "weights": "equal total weight among training identities present, then equal events per identity; absent training identities explicitly reported; no substitution"
+    },
+    "identity_order": [
+      3,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      37,
+      39,
+      40,
+      41,
+      43,
+      44,
+      46,
+      47,
+      49,
+      50,
+      51,
+      54,
+      60,
+      61,
+      64,
+      75,
+      82,
+      84,
+      86,
+      87,
+      91,
+      93,
+      95,
+      97,
+      98,
+      104,
+      110,
+      116,
+      117,
+      118,
+      130,
+      134,
+      146,
+      251,
+      255,
+      256,
+      262,
+      284,
+      286,
+      323,
+      324,
+      326,
+      888,
+      2083,
+      2086,
+      2737,
+      2738,
+      2739,
+      2740,
+      2742,
+      2744,
+      2746,
+      2753,
+      2762,
+      2763,
+      2764,
+      2765,
+      2766,
+      2767,
+      2768,
+      2769,
+      2770,
+      2771,
+      2772,
+      2773,
+      2774,
+      2775,
+      2776,
+      2777,
+      2779,
+      2780,
+      2781,
+      2783,
+      2785,
+      2786,
+      2788,
+      2917,
+      2924,
+      2926,
+      2998,
+      2999,
+      3000,
+      3002,
+      3019,
+      3020,
+      3025,
+      3027,
+      3029,
+      3032,
+      3033,
+      3034,
+      5402,
+      5403,
+      5406,
+      5410,
+      5411,
+      5414,
+      5424,
+      5449,
+      5470,
+      7186,
+      7187,
+      7188,
+      7189,
+      7190,
+      7191,
+      7192,
+      7193,
+      7194,
+      7195,
+      7196,
+      7198,
+      7285,
+      7286,
+      7393,
+      7394
+    ],
+    "inference_class": "EXPLORATORY_ONLY_NO_FORMAL_REJECTION",
+    "previous_adaptive_selection_paid": false,
+    "primary_claim": "paired fixed algorithm forecasting score improvement; no general conditional information, economic edge or profitability",
+    "project_alpha_allocated": false,
+    "protected_forward": "CLOSED",
+    "resource_limits": {
+      "CPU_seconds": 7200,
+      "RAM_bytes": 8589934592,
+      "accepted_corpus_passes": 1,
+      "broker_requests": 0,
+      "orders": 0,
+      "protected_forward_rows": 0,
+      "trading": 0
+    },
+    "response": {
+      "complete_required_bars": "all h future bars plus preceding bar",
+      "domain_end": "maturity<=end; no label crosses accepted development boundary",
+      "law": "log(close of last bar in [t,t+300h) / close of [t-300,t))",
+      "maturity": "t+300h+lag",
+      "normalization": "one common fit ymean/ysd per horizon/lag/refit; ysd floor1e-12; clip[-8,8]",
+      "score": "((z-pB)^2-(z-pA)^2)/256 in[-1,1]"
+    },
+    "runtime": {
+      "OMP_NUM_THREADS": 1,
+      "OPENBLAS_NUM_THREADS": 1,
+      "cryptography": "50.0.1",
+      "floating_point": "IEEE754 binary64; deterministic within pinned runtime; no cross-platform bitwise guarantee claimed",
+      "numpy": "2.3.5",
+      "python": "3.12.14"
+    },
+    "schema": "mxm.primary145.exploratory.design.v1",
+    "semantic_corrections_prospective": [
+      "shared intersection support across three maps ensures one actual B comparator and one response normalization",
+      "response availability includes scenario lag; maturity no later than domain end",
+      "reuse fit_prefix only; do not reuse old prequential aggregator which compresses missing calendar and has unbounded score"
+    ],
+    "source_schema": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "stage8": "NOT_AUTHORIZED"
+  },
+  "data": {
+    "accepted_rows_as_manifest": 11406418,
+    "availability": "As stored canonical M5 OHLCV/tick_volume and UTC open stamps only. No interpolation, sorting repair, invented missing bars, revision history, bid/ask, market orders/LOB or historical financing inferred.",
+    "frozen_cohort_manifest": {
+      "last_modified_commit": "3f6a9de6e5dcab389ffeb49f72d3303e02dce29e",
+      "path": "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json",
+      "sha256": "3f42fcad0e82b80d4f51bfab3a7faae11bf0b83dedd511826d68c308e34a7e02",
+      "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+      "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json"
+    },
+    "identity_order": [
+      3,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      37,
+      39,
+      40,
+      41,
+      43,
+      44,
+      46,
+      47,
+      49,
+      50,
+      51,
+      54,
+      60,
+      61,
+      64,
+      75,
+      82,
+      84,
+      86,
+      87,
+      91,
+      93,
+      95,
+      97,
+      98,
+      104,
+      110,
+      116,
+      117,
+      118,
+      130,
+      134,
+      146,
+      251,
+      255,
+      256,
+      262,
+      284,
+      286,
+      323,
+      324,
+      326,
+      888,
+      2083,
+      2086,
+      2737,
+      2738,
+      2739,
+      2740,
+      2742,
+      2744,
+      2746,
+      2753,
+      2762,
+      2763,
+      2764,
+      2765,
+      2766,
+      2767,
+      2768,
+      2769,
+      2770,
+      2771,
+      2772,
+      2773,
+      2774,
+      2775,
+      2776,
+      2777,
+      2779,
+      2780,
+      2781,
+      2783,
+      2785,
+      2786,
+      2788,
+      2917,
+      2924,
+      2926,
+      2998,
+      2999,
+      3000,
+      3002,
+      3019,
+      3020,
+      3025,
+      3027,
+      3029,
+      3032,
+      3033,
+      3034,
+      5402,
+      5403,
+      5406,
+      5410,
+      5411,
+      5414,
+      5424,
+      5449,
+      5470,
+      7186,
+      7187,
+      7188,
+      7189,
+      7190,
+      7191,
+      7192,
+      7193,
+      7194,
+      7195,
+      7196,
+      7198,
+      7285,
+      7286,
+      7393,
+      7394
+    ],
+    "machine_copy": "NOT_PROVEN; never substitute local Work path as research runtime",
+    "series": [
+      {
+        "file": "raw/3_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 72,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74718,
+        "series_sha256": "3e91652c80b89e9f7bd5dbc29e64afd1c60b5a91a97f11a553effa0d3d6a21d3",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURJPY",
+        "symbol_id": 3
+      },
+      {
+        "file": "raw/7_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 136,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74652,
+        "series_sha256": "a47f8fc83b17742a388cedcf64093331d0f4cc619d5bbdd970c8c28eb5a19a35",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPJPY",
+        "symbol_id": 7
+      },
+      {
+        "file": "raw/9_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 61,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74768,
+        "series_sha256": "edc9b2f93cb764eb190fa70979fc75a102a4f2008e7ec0ea9350378414319e3a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURGBP",
+        "symbol_id": 9
+      },
+      {
+        "file": "raw/10_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 183,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74591,
+        "series_sha256": "8c3baddb070d3fb61599f2d4a5ffa05aa7bab8234d89f51e32f6ff4ac2a05a09",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURCHF",
+        "symbol_id": 10
+      },
+      {
+        "file": "raw/11_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 111,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74666,
+        "series_sha256": "cbba222194b49ff1ec18d7679b1c4553cb202ef612b894eb1f146cc8b9f6d806",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDJPY",
+        "symbol_id": 11
+      },
+      {
+        "file": "raw/12_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 183,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74628,
+        "series_sha256": "5683aabf590971adf3a3803bbf1b93787bc8174287eeea57fd96dbe2ea458db4",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDUSD",
+        "symbol_id": 12
+      },
+      {
+        "file": "raw/13_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 252,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73772,
+        "series_sha256": "1eafef65dccabe968076f2a5cfa9d70abcac6a0844d2148a7a50ece75fdf1db9",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFJPY",
+        "symbol_id": 13
+      },
+      {
+        "file": "raw/14_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 91,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74725,
+        "series_sha256": "85b70c01c70b67acb04ea3a2f9445d26646ea116de628450b46b69fe39b6080e",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURAUD",
+        "symbol_id": 14
+      },
+      {
+        "file": "raw/15_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 81,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74702,
+        "series_sha256": "800a353fe016487556de9603246d9b227e100cafe26137bfa9d53f40bb3fdb9c",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CADJPY",
+        "symbol_id": 15
+      },
+      {
+        "file": "raw/16_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 114,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74618,
+        "series_sha256": "c843a4e4c72c33f74234a0fbed9eaef36a66652b39f69814450e07959dfdf849",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPAUD",
+        "symbol_id": 16
+      },
+      {
+        "file": "raw/17_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 71,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74752,
+        "series_sha256": "4ba88ed747ea0b155a5c87ae403ccb591b907572c80fbaa7d82632075ea40210",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURCAD",
+        "symbol_id": 17
+      },
+      {
+        "file": "raw/18_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 94,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74686,
+        "series_sha256": "132eef5130073c72ad4e89d635dafa12423d5de860bce07cf74052ede9eef065",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDCAD",
+        "symbol_id": 18
+      },
+      {
+        "file": "raw/19_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 107,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74667,
+        "series_sha256": "b970b64cd0f2b20712ef8c313285389f6a5183f5cd3930a34ac375b295c5ffdc",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPCAD",
+        "symbol_id": 19
+      },
+      {
+        "file": "raw/20_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 239,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74297,
+        "series_sha256": "e652f5740b17daf0ef3377df08da8dd34f3f3cccaa54eb106954bfaca65fc9f7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDNZD",
+        "symbol_id": 20
+      },
+      {
+        "file": "raw/21_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 216,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74493,
+        "series_sha256": "1d3916f95157983185e140570fe4071e1129595dbb8d382c8ea693210a16c399",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDJPY",
+        "symbol_id": 21
+      },
+      {
+        "file": "raw/22_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 81,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74663,
+        "series_sha256": "739b5cd48b03835e72fe7762e380fdf6a3de15635de29b9af4b798ff1154f6c4",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDNOK",
+        "symbol_id": 22
+      },
+      {
+        "file": "raw/23_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 175,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74607,
+        "series_sha256": "93caaa6a26b8986bff531bec017ca618e950165bb7914c7bd652178b825f5e12",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDCHF",
+        "symbol_id": 23
+      },
+      {
+        "file": "raw/24_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 66,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74730,
+        "series_sha256": "f748cb829e43bff8d7a1cc0aceb27ec4ff34d25f3ca455211654aa93cfea343d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDMXN",
+        "symbol_id": 24
+      },
+      {
+        "file": "raw/25_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 233,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73333,
+        "series_sha256": "9649d6fb30a6d7ddcb618d9671f4415f96aa49d773746fe5d5048ca557fcb23d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPNZD",
+        "symbol_id": 25
+      },
+      {
+        "file": "raw/26_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 277,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73696,
+        "series_sha256": "7abd9505a9dee03bd6060341f40d73d5fcbe99c35c6a6b645166d45a0d03681b",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURNZD",
+        "symbol_id": 26
+      },
+      {
+        "file": "raw/27_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 179,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74601,
+        "series_sha256": "ab60650d56476d6d91136259addb124b0f0d6767c44dd85a72fe01e07316b574",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CADCHF",
+        "symbol_id": 27
+      },
+      {
+        "file": "raw/28_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 72,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74738,
+        "series_sha256": "9492a3459d462126973a8b4cfcb40984487c89cd7ead461020f4efa35e4e64cc",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDSGD",
+        "symbol_id": 28
+      },
+      {
+        "file": "raw/29_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 80,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74555,
+        "series_sha256": "bb8c6941932c36bc0506aa0682766b2efcf89c016a5b8a63c53dbcc336e45f98",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDSEK",
+        "symbol_id": 29
+      },
+      {
+        "file": "raw/30_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 214,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74508,
+        "series_sha256": "a8459c593b1c75f25217233004c89c63f6d4e6d152c0a17b58d36a1b37dd8545",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDCAD",
+        "symbol_id": 30
+      },
+      {
+        "file": "raw/31_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 166,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74453,
+        "series_sha256": "68e7e9d99fcb71faed3ab0213456771534f0f812cc99bc3649839fb2571f55b9",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURSEK",
+        "symbol_id": 31
+      },
+      {
+        "file": "raw/32_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 154,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74453,
+        "series_sha256": "ef2d07e40314e247f0be8b35d69ed4719ddba21cd9ae53ee24270f746f41c92d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPSGD",
+        "symbol_id": 32
+      },
+      {
+        "file": "raw/33_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 169,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74438,
+        "series_sha256": "fb30165ca7a1cec9df96ff1fad3f2a83c0a45fe2a77a77fdd0b52c929ef456d6",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURNOK",
+        "symbol_id": 33
+      },
+      {
+        "file": "raw/34_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 361,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74291,
+        "series_sha256": "314e5f168c9cfe55e0f1fcf7e9f737c7a718c49af84b8e5761b59b577945057a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURHUF",
+        "symbol_id": 34
+      },
+      {
+        "file": "raw/35_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 89,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74753,
+        "series_sha256": "519b4dc313e4eb501bfbb023d695f0aceba21b7be63217cefa0521ee91032853",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDPLN",
+        "symbol_id": 35
+      },
+      {
+        "file": "raw/37_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 118,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74357,
+        "series_sha256": "f09a33124f07899043109ee31c115e04f86e395356c9fc18d6c18dcd10eecc57",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPNOK",
+        "symbol_id": 37
+      },
+      {
+        "file": "raw/39_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 197,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74577,
+        "series_sha256": "f5ea0e62d5ee9bad1561a312332ec81a3c1df88e47ec62e3bbe8f96724a846db",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDCHF",
+        "symbol_id": 39
+      },
+      {
+        "file": "raw/40_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 179,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74583,
+        "series_sha256": "dbfa1146c07773130078711d5f17fd1dca06334323d27aa7d87f350c5fb39e45",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPCHF",
+        "symbol_id": 40
+      },
+      {
+        "file": "raw/41_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 259,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71102,
+        "series_sha256": "78994d6fe58993f53f59d56ad416ad3a693e57d17a96e84143d312d2eb6a7a89",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUUSD",
+        "symbol_id": 41
+      },
+      {
+        "file": "raw/43_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 2274,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71446,
+        "series_sha256": "549f29a6ec0c3139a5f0f27c045644d0369feef34d5795965df8b67eccbfa3bf",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDTRY",
+        "symbol_id": 43
+      },
+      {
+        "file": "raw/44_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 179,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74213,
+        "series_sha256": "f2c2321566cfb1a54c9bba00873589cf2d37454d27d9bc677b49e14d2976bd5d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURTRY",
+        "symbol_id": 44
+      },
+      {
+        "file": "raw/46_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 160,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74399,
+        "series_sha256": "e2cbb3411eda3481aaadac245094fde17df58da31aefa7e264c629d0f8986bd7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURZAR",
+        "symbol_id": 46
+      },
+      {
+        "file": "raw/47_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 89,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74625,
+        "series_sha256": "610981c79f9990daf8609b1efccb7a7424ec7990a60accc728917138b52c6553",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "SGDJPY",
+        "symbol_id": 47
+      },
+      {
+        "file": "raw/49_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 155,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74624,
+        "series_sha256": "15040719c3d1f618066842b7662da94874a4895f8565f9bdba1e5d23f50da513",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDZAR",
+        "symbol_id": 49
+      },
+      {
+        "file": "raw/50_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 62,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74703,
+        "series_sha256": "437fded17fa506791e02e1a2a0fb8bce0be14ea4fe05d602f0a1eb1d9090733f",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "EURMXN",
+        "symbol_id": 50
+      },
+      {
+        "file": "raw/51_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 478,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74316,
+        "series_sha256": "98808572cc795523b9234bb6eb1392578e341bb043c96c52bc15445ef9f82f17",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURPLN",
+        "symbol_id": 51
+      },
+      {
+        "file": "raw/54_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 178,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73996,
+        "series_sha256": "7d67f353823ca34fc2f959b2619a4f45b4f52bbd33e13f9b76e2f82d171fa8eb",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDHUF",
+        "symbol_id": 54
+      },
+      {
+        "file": "raw/60_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 91,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74734,
+        "series_sha256": "388bd0c66ce843978324970645126a4450f239db570a2b5a0e1fdaff3fc768af",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDCNH",
+        "symbol_id": 60
+      },
+      {
+        "file": "raw/61_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 91,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74572,
+        "series_sha256": "81c67e6c5481e18061801902e9674a15bff7b5ef4af945c481f69b6da97df6d2",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPSEK",
+        "symbol_id": 61
+      },
+      {
+        "file": "raw/64_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 96,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74675,
+        "series_sha256": "6c7592bc8bb2ffbaa915191b25507b25ee76daa1ffc04dd2f33a298eb6bc062b",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDSGD",
+        "symbol_id": 64
+      },
+      {
+        "file": "raw/75_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 247,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73923,
+        "series_sha256": "6b71050c96b6fe4fd85a04c3af48417bd00859d61fd68adda2e9581d25533b98",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFSGD",
+        "symbol_id": 75
+      },
+      {
+        "file": "raw/82_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 184,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74126,
+        "series_sha256": "35b2bbbdbe49e3201c81f4e947f1a19e5596bb75940c24081bc608308fdb3888",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURSGD",
+        "symbol_id": 82
+      },
+      {
+        "file": "raw/84_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 307,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73696,
+        "series_sha256": "9a39949663f4562d662c3d4003a1f24c9941689477b38f383ae3758e63a33449",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPTRY",
+        "symbol_id": 84
+      },
+      {
+        "file": "raw/86_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 73,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74742,
+        "series_sha256": "bdaf7cafcc660b457dc659ce010e54393b2b199c6c1580e1831d93b367b2626e",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "NOKJPY",
+        "symbol_id": 86
+      },
+      {
+        "file": "raw/87_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 132,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74441,
+        "series_sha256": "7ada725ddda6fcbb91d6716aed2d9f0e6e6a28e990fdd85f584b4e4aacdc9a81",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NOKSEK",
+        "symbol_id": 87
+      },
+      {
+        "file": "raw/91_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 732,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73253,
+        "series_sha256": "2d4d12b8b13592d2c1622e9ba34c317ad070493b2c3ec14055a2f7a014d78e33",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDTHB",
+        "symbol_id": 91
+      },
+      {
+        "file": "raw/93_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 260,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71105,
+        "series_sha256": "fb94a3e97e5df6ed53bad1ce13f2e5a14d1831dce52370ef46c362f988e02e16",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUEUR",
+        "symbol_id": 93
+      },
+      {
+        "file": "raw/95_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 275,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70975,
+        "series_sha256": "ddbee10c7aab147f5d4a5fbb290077c3514dd588fd499cc8a240eec5c222d4c4",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XPDUSD",
+        "symbol_id": 95
+      },
+      {
+        "file": "raw/97_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 296,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70827,
+        "series_sha256": "e76c017028ccfef2d59c11af0ee6277712e55701a1bdfb1232ab58e31e9d617c",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XPTUSD",
+        "symbol_id": 97
+      },
+      {
+        "file": "raw/98_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 116,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74697,
+        "series_sha256": "a1bff3ac7318495a40688261f106fcdc6849743e95317c08327478a8255e7b15",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "ZARJPY",
+        "symbol_id": 98
+      },
+      {
+        "file": "raw/104_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 259,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71105,
+        "series_sha256": "61dc5c48b6109cebfecd7faadc17f0fd85b685741a72155f73806953fae601a7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUAUD",
+        "symbol_id": 104
+      },
+      {
+        "file": "raw/110_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 276,
+        "last_timestamp_utc": "2026-09-16T20:55:00Z",
+        "row_count": 66244,
+        "series_sha256": "d4acd7cc123e0d2a0d11b8927119a99a5a0559a5ac2e73e77440795e708e9002",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDX",
+        "symbol_id": 110
+      },
+      {
+        "file": "raw/116_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 292,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70997,
+        "series_sha256": "da5bba2e83887c2c93b4fd964e3f7bb69c05bfd0de675e1d1042cfeb85ebe2f5",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "JPN225",
+        "symbol_id": 116
+      },
+      {
+        "file": "raw/117_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 598,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 62779,
+        "series_sha256": "aa445f38df1876300b5ad565760500416105df668acc4a92e518dd7ba2832810",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUS200",
+        "symbol_id": 117
+      },
+      {
+        "file": "raw/118_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 68,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74728,
+        "series_sha256": "a6e42e717c4360e58d452935c3556075fa66284d9e14a0576d056d06e99b76a5",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "SEKJPY",
+        "symbol_id": 118
+      },
+      {
+        "file": "raw/130_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 98,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105037,
+        "series_sha256": "96bab0a8787d808a0adf938a939b73ed4fbb8007f633d2c94b9dac446f8d0365",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "LTCUSD",
+        "symbol_id": 130
+      },
+      {
+        "file": "raw/134_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 110,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74511,
+        "series_sha256": "47b473462d46350b57f1dd4b885b5c88598c279f2daf7dc1d4d5088542f8f388",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPMXN",
+        "symbol_id": 134
+      },
+      {
+        "file": "raw/146_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 4295,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 65639,
+        "series_sha256": "3081d5610ba6001b0444b57e8f57aaff138baf6f908d7e67810fc2b46383bebc",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "JPYX",
+        "symbol_id": 146
+      },
+      {
+        "file": "raw/251_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 708,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70470,
+        "series_sha256": "46d63602b1bc46ea1067bff67bf5f288fe14866221054c0f74d72bd375a2cf02",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NatGas",
+        "symbol_id": 251
+      },
+      {
+        "file": "raw/255_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 259,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71109,
+        "series_sha256": "303ead0d6dd24889a5911fa5cc230e07e3b635edf407f3cb36cc74b0b034a2ef",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUCHF",
+        "symbol_id": 255
+      },
+      {
+        "file": "raw/256_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 260,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71112,
+        "series_sha256": "bf1fd8349cd967d1f7c356ae626c086d97b928001f823ef1693399a2ee6aa406",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUGBP",
+        "symbol_id": 256
+      },
+      {
+        "file": "raw/262_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 289,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71040,
+        "series_sha256": "003d5a2d74d462a844fe78634effb7a876dc08eb7c2834a103ad98793496b59a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUJPY",
+        "symbol_id": 262
+      },
+      {
+        "file": "raw/284_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 169,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104843,
+        "series_sha256": "92fd1b375c53937f57a489e797ceb07209785b36cd43e2da5df758c87a2f7351",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "XLMUSD",
+        "symbol_id": 284
+      },
+      {
+        "file": "raw/286_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 69,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104973,
+        "series_sha256": "f161bb4a8f358a58d732088a8644c3390e355dd2e08e16d2f8004e4369a7a706",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XRPUSD",
+        "symbol_id": 286
+      },
+      {
+        "file": "raw/323_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 81,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105010,
+        "series_sha256": "62c96baefe1310e11e2df9d95df467ce54d56371d2de8cbbca0ba510f53d453f",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "UNIUSD",
+        "symbol_id": 323
+      },
+      {
+        "file": "raw/324_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 74,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105029,
+        "series_sha256": "e235252ce8c8a646e5f079e32cce61d0d3085b6bfc3100a76d7fd057d7d9ab1a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "DOGEUSD",
+        "symbol_id": 324
+      },
+      {
+        "file": "raw/326_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 73,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105029,
+        "series_sha256": "891559f15a49912ea65f188ac4bdca4348a5cd99c89870fdf80b88319c8ad44f",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "BCHUSD",
+        "symbol_id": 326
+      },
+      {
+        "file": "raw/888_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 252,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104833,
+        "series_sha256": "adbab7cceaa8cb0313e3464a40ff603073d825fa5880b3b304b644c1f938c990",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XTZUSD",
+        "symbol_id": 888
+      },
+      {
+        "file": "raw/2083_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 73,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105060,
+        "series_sha256": "d01dc39533e70eac2b93a83fb74f20fd46c5397ca7f798d6deedff6c3b905ad7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "SOLUSD",
+        "symbol_id": 2083
+      },
+      {
+        "file": "raw/2086_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 81,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105021,
+        "series_sha256": "68bb87c3c9679b7e607879260a302991c4ac4941eb2824c6f5c5c6a09a4eab52",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AVAXUSD",
+        "symbol_id": 2086
+      },
+      {
+        "file": "raw/2737_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 88,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 105004,
+        "series_sha256": "672e4181943d41a06f13072f7843c45b76ef90feaaafee58a92c190040019846",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "COMPUSD",
+        "symbol_id": 2737
+      },
+      {
+        "file": "raw/2738_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 488,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104559,
+        "series_sha256": "d12166b3ff4c6a0821bad88fbeb1ae75a70fb38e020587dcc3a233570631d834",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ETCUSD",
+        "symbol_id": 2738
+      },
+      {
+        "file": "raw/2739_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 9611,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 83214,
+        "series_sha256": "a4f0673dda123d81bd6efa39cba4fc650b56709ca3d534b1182d152dd45d333e",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "GLMRUSD",
+        "symbol_id": 2739
+      },
+      {
+        "file": "raw/2740_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 112,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104934,
+        "series_sha256": "650cfafb27beb1770bbda9127f21aef9946474aa88e5000023a18f697c75abab",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "KSMUSD",
+        "symbol_id": 2740
+      },
+      {
+        "file": "raw/2742_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 137,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 103470,
+        "series_sha256": "e1cd02cbf87707820235bd5993494309bb2f0cd793289379bb9ff38295c79862",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ETHAUD",
+        "symbol_id": 2742
+      },
+      {
+        "file": "raw/2744_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 139,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 103763,
+        "series_sha256": "fd349bed4d65692adef10e871d3dba42b4d86115de385990a94dd90af31d3686",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ETHGBP",
+        "symbol_id": 2744
+      },
+      {
+        "file": "raw/2746_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 137,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 103765,
+        "series_sha256": "cd42ce4f7a0cd1d3c35ee7a5588ef5a9f83971f0f718c619074a50ac7a667f9e",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ETHEUR",
+        "symbol_id": 2746
+      },
+      {
+        "file": "raw/2753_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 259,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70836,
+        "series_sha256": "4592ce4a5c19d8e32c4056d78eb5dbaa3860f2448bbdd3f676d790fcb463f7e7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUSGD",
+        "symbol_id": 2753
+      },
+      {
+        "file": "raw/2762_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 55,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74788,
+        "series_sha256": "d01f1aef115da80503a847905ae0426023262d49be15ed56e6cc508927a0ab52",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "AUDDKK",
+        "symbol_id": 2762
+      },
+      {
+        "file": "raw/2763_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 112,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74344,
+        "series_sha256": "266a02ed1b3542c0e0c67b6cd0f1855173dffa2a3608a36b16a5ee34dc85cb7d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDHUF",
+        "symbol_id": 2763
+      },
+      {
+        "file": "raw/2764_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 79,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74702,
+        "series_sha256": "da7fa8ec663eafa5003ef8f65fa91646dbddc851c8b35b57d0021ac9a1633361",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDNOK",
+        "symbol_id": 2764
+      },
+      {
+        "file": "raw/2765_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 55,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74794,
+        "series_sha256": "0b71d7f751fdfbe0caa1b826fa584f720fd23fba1e7e895cebce7b30c5350ee7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AUDPLN",
+        "symbol_id": 2765
+      },
+      {
+        "file": "raw/2766_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 62,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74753,
+        "series_sha256": "de289d4969179f6f3f499c0b9185e092521a01d02a9f3a6a6d2106e993dc0497",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CADMXN",
+        "symbol_id": 2766
+      },
+      {
+        "file": "raw/2767_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 62,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74768,
+        "series_sha256": "f0bbcae5c6d429e4fea9afa30952b33e6bafc77d87cdfb10b05b9117b1a7c7b0",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CADSGD",
+        "symbol_id": 2767
+      },
+      {
+        "file": "raw/2768_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 177,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74613,
+        "series_sha256": "e7add63d525955d4f24e155e4232d039a5dd20d9da17f52672b8c4148045356a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFDKK",
+        "symbol_id": 2768
+      },
+      {
+        "file": "raw/2769_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 257,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73828,
+        "series_sha256": "97383897c7cd22653da9e9ce8d58d5edb9f0d134d3c2959ea01222b93b082c2d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFHUF",
+        "symbol_id": 2769
+      },
+      {
+        "file": "raw/2770_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 264,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73931,
+        "series_sha256": "212982faf177c5fb961ac76c66584979f1a59a0399d1587b2630c8d8b9366bd6",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFNOK",
+        "symbol_id": 2770
+      },
+      {
+        "file": "raw/2771_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 195,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74595,
+        "series_sha256": "8048b086efd3a698d9554a96e67eed041f4cf0897161d13336ca88b011b7135d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFPLN",
+        "symbol_id": 2771
+      },
+      {
+        "file": "raw/2772_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 209,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74253,
+        "series_sha256": "7869dbb3e91c1108f54e0f6c47efb1085dbe5994eee63c099bbfac3350579436",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CHFSEK",
+        "symbol_id": 2772
+      },
+      {
+        "file": "raw/2773_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 82,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74712,
+        "series_sha256": "0582713cd9bb6b73dd6a81b64dd02b669157942e4825477324372b920a40d596",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURCNH",
+        "symbol_id": 2773
+      },
+      {
+        "file": "raw/2774_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 3972,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70082,
+        "series_sha256": "f7a79f8d7a040835e9b2a7cf508e2835b8880c2c254894c84901de91fa721850",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURDKK",
+        "symbol_id": 2774
+      },
+      {
+        "file": "raw/2775_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 231,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74070,
+        "series_sha256": "c098f5bdaa52abd886386c26ce15870f7923f487e9860747965d026c6c5459a6",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPCNH",
+        "symbol_id": 2775
+      },
+      {
+        "file": "raw/2776_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 56,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74778,
+        "series_sha256": "a9a6b81f2728b56fe72eda5acd47df835cbc768d1aa75a5e0a0f316cae029b87",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPDKK",
+        "symbol_id": 2776
+      },
+      {
+        "file": "raw/2777_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 83,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74559,
+        "series_sha256": "bb7bc1e881b077de575f7b26b3b24955c85c81be3410512090b18157927f162c",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GBPHUF",
+        "symbol_id": 2777
+      },
+      {
+        "file": "raw/2779_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 182,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74625,
+        "series_sha256": "278868433cdc2d3eda977838b8d7f7ab8fb68f52c90ac92aa4a75354f73a93f9",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDCNH",
+        "symbol_id": 2779
+      },
+      {
+        "file": "raw/2780_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 217,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74343,
+        "series_sha256": "355e0b6ff685abe205578578c653b486b0e49b5faa7191ef63880a0dc9bb0d4b",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDHUF",
+        "symbol_id": 2780
+      },
+      {
+        "file": "raw/2781_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 198,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74603,
+        "series_sha256": "651e58d3407d956b9a9bca5f0481ea50150d56c6bdaa2842ed170bf02057c2ad",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NZDSGD",
+        "symbol_id": 2781
+      },
+      {
+        "file": "raw/2783_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 56,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74785,
+        "series_sha256": "29a989c039b95cac5437ded7909fb0c59d7e6eeeb99664e7faf989ccf4a87ddc",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDDKK",
+        "symbol_id": 2783
+      },
+      {
+        "file": "raw/2785_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 144,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 73707,
+        "series_sha256": "e7adbb795bda49f764de2a81323330ba11e0ea6b53a7c8617542dd6bb71d3a82",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "EURILS",
+        "symbol_id": 2785
+      },
+      {
+        "file": "raw/2786_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1800,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71751,
+        "series_sha256": "4b452250d2cf6e5ce3af5853a6b9cb6a135db2c75a2843c109b5a04738e40d07",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDILS",
+        "symbol_id": 2786
+      },
+      {
+        "file": "raw/2788_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 99,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 74070,
+        "series_sha256": "b7a9750d074ecaac85198186daa7ecec105b672a5836d59e7034e7d5f1bc18aa",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDRON",
+        "symbol_id": 2788
+      },
+      {
+        "file": "raw/2917_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 296,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 71060,
+        "series_sha256": "221183805b920db439dc34911e1cf0637bd15aa5eb9ac30a7616ddcddde25a3d",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "JPN225-F",
+        "symbol_id": 2917
+      },
+      {
+        "file": "raw/2924_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 266,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70829,
+        "series_sha256": "ae7f75b9dc9482ede2a1d524c869cd3c6423fc1ab847a8b99876fecec9c0bbc5",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "XAUUSD-F",
+        "symbol_id": 2924
+      },
+      {
+        "file": "raw/2926_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 279,
+        "last_timestamp_utc": "2026-09-16T20:55:00Z",
+        "row_count": 66062,
+        "series_sha256": "d4c85d19f14f9974252afb459df34e89eac08e68dc85802f6bb8ea926f7fb3dd",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "USDX-F",
+        "symbol_id": 2926
+      },
+      {
+        "file": "raw/2998_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1111,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 69105,
+        "series_sha256": "de3bfcc35c3fca9a363090370863f19367988584deee931241869219b529c0e8",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "GOOG.US-24",
+        "symbol_id": 2998
+      },
+      {
+        "file": "raw/2999_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 763,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 69634,
+        "series_sha256": "c0b63fa108235d6e8757980dba7f57918621c8ae0765d99d909a07f01cefd37c",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AAPL.US-24",
+        "symbol_id": 2999
+      },
+      {
+        "file": "raw/3000_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 5708,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 57336,
+        "series_sha256": "dd0e97f266eb046f303794d308fe40bbfc383a330672d40d037c6cdc71f1b15a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "IBM.US-24",
+        "symbol_id": 3000
+      },
+      {
+        "file": "raw/3002_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1639,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 68293,
+        "series_sha256": "37973234e9ca45db1fa48dd8ff115f61fcb79a465691646c061bab846d17f269",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "NFLX.US-24",
+        "symbol_id": 3002
+      },
+      {
+        "file": "raw/3019_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 360,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70197,
+        "series_sha256": "29ba6a4dd0824b27f8021c6ea504d8232432e9b729f57630f8859f2a6c11fe74",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "META.US-24",
+        "symbol_id": 3019
+      },
+      {
+        "file": "raw/3020_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 388,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70135,
+        "series_sha256": "88de9a620c263173fbd2709e3217fde45dce1e0bf278a63e4a3f22c742c0ccaa",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "INTC.US-24",
+        "symbol_id": 3020
+      },
+      {
+        "file": "raw/3025_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 56,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70534,
+        "series_sha256": "5764fe3d196194342302d610302da51fcd63995c31d5d66f668bb8b0f8b62f91",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "TSLA.US-24",
+        "symbol_id": 3025
+      },
+      {
+        "file": "raw/3027_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 355,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70184,
+        "series_sha256": "c35c10ebf10a9f250728becad3cb7b12abd2f378898f800bede13927dffcab14",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "ORCL.US-24",
+        "symbol_id": 3027
+      },
+      {
+        "file": "raw/3029_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 361,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70169,
+        "series_sha256": "d2eb0afa52a336660edb1178fce02c5dae09a0ac949afb5a885b5fbc06fea191",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "MSFT.US-24",
+        "symbol_id": 3029
+      },
+      {
+        "file": "raw/3032_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 251,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70317,
+        "series_sha256": "b5cf54ca90f30cf998a9ce4c88fcf5d7fc338c522744a904456d64adcf535244",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AMZN.US-24",
+        "symbol_id": 3032
+      },
+      {
+        "file": "raw/3033_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1702,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 67862,
+        "series_sha256": "89eedffb32b2196799daa998e95fdac60e45dcc7f020c3464ccdbe9f3f7e7eaa",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "BABA.US-24",
+        "symbol_id": 3033
+      },
+      {
+        "file": "raw/3034_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 158,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70392,
+        "series_sha256": "d56c7c9711c3f4f01a3df4623a00bd588fdece2dec78c6446e22bb15e0df9412",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AMD.US-24",
+        "symbol_id": 3034
+      },
+      {
+        "file": "raw/5402_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 5263,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 61796,
+        "series_sha256": "08a138a70c295668f7f69144cafa59aa383c5a675aefb1b8f57c5435976c7f55",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "LLY.US-24",
+        "symbol_id": 5402
+      },
+      {
+        "file": "raw/5403_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 275,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70287,
+        "series_sha256": "c30fc68ea476f627c830eb54ef4bebe5a426571d2e53f0056be205ea04a8cfcf",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "AVGO.US-24",
+        "symbol_id": 5403
+      },
+      {
+        "file": "raw/5406_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 2589,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 65742,
+        "series_sha256": "ecc2012a6e55d131ef195cee98587de3cd8f76892345923d006a3bb9c5b22fb3",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ASML.US-24",
+        "symbol_id": 5406
+      },
+      {
+        "file": "raw/5410_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 5273,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 62063,
+        "series_sha256": "28a6b4ce2583349cffd5212ea417dacaa522108a1b09dcca4eda726d0062b9e4",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "CRM.US-24",
+        "symbol_id": 5410
+      },
+      {
+        "file": "raw/5411_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 5456,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 61806,
+        "series_sha256": "43bae6bdc0e22ba4ef5c2d7e8a959afc11643df2d9a47ee12aecbdb55aebd3c0",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ADBE.US-24",
+        "symbol_id": 5411
+      },
+      {
+        "file": "raw/5414_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 3511,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 64963,
+        "series_sha256": "682d581959ca964f6b167d63d53f53fe95192c52af73b79001348055b6295ea9",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "QCOM.US-24",
+        "symbol_id": 5414
+      },
+      {
+        "file": "raw/5424_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 6812,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 58845,
+        "series_sha256": "d30605f905b032753907dc7b60c86ec9e262559ed9a9c09b106f59a4393856ed",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "UBER.US-24",
+        "symbol_id": 5424
+      },
+      {
+        "file": "raw/5449_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 126,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 70460,
+        "series_sha256": "372bfdead0ca3143c6c54be083cdb7df21756584e625bb2d8e9a0bc82c74bf1a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "PLTR.US-24",
+        "symbol_id": 5449
+      },
+      {
+        "file": "raw/5470_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 543,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 69548,
+        "series_sha256": "dc3587b49e3140306b2a1712ccd26330bbbe18a3b303dcd1847ddafef1f7128b",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "HOOD.US-24",
+        "symbol_id": 5470
+      },
+      {
+        "file": "raw/7186_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 554,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104390,
+        "series_sha256": "c92057ddcc9d6ceae487c7d9e15eb250349019f6788cb10daf0128c75405ca35",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "ATMUSD",
+        "symbol_id": 7186
+      },
+      {
+        "file": "raw/7187_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 135,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104902,
+        "series_sha256": "1daf15a596681db836cffc259568b3911b406f13fc76da9f8225ebb72a00baee",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "FLOUSD",
+        "symbol_id": 7187
+      },
+      {
+        "file": "raw/7188_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 188,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104888,
+        "series_sha256": "a398b8858bed4c2f38b5941ef370d0de6afdaee9dea3cd5f01250035f04e162a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "JUPUSD",
+        "symbol_id": 7188
+      },
+      {
+        "file": "raw/7189_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 123,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104964,
+        "series_sha256": "00b9558f9bccd95efd69ffcd7a1574d6f268753716fcbb9afabbdf8c109b1d85",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "NERUSD",
+        "symbol_id": 7189
+      },
+      {
+        "file": "raw/7190_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 79,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104996,
+        "series_sha256": "aecc63a3ab43888284f7e760b2381522ef4e2fb77faabfb48d17cbf86477def9",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ONDUSD",
+        "symbol_id": 7190
+      },
+      {
+        "file": "raw/7191_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 2544,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 102374,
+        "series_sha256": "bad918b9cff430a3ad313e79d2ffdd9547d426eadc4605224ddd2eacf55ea28a",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "PEPUSD",
+        "symbol_id": 7191
+      },
+      {
+        "file": "raw/7192_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1903,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 102929,
+        "series_sha256": "9c77002ff9a5ff6ffb7a20739e3af901f38c15322afe403a3dbb4992869f60a7",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "SHBUSD",
+        "symbol_id": 7192
+      },
+      {
+        "file": "raw/7193_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 4090,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 100593,
+        "series_sha256": "78388af0108b2fa69aeb30c7c67b93ea6b73a044804003e67692bf9c39518e14",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "TRXUSD",
+        "symbol_id": 7193
+      },
+      {
+        "file": "raw/7194_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 133,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104862,
+        "series_sha256": "510383974f9bdb4e8074ffd431c81657617a84baed3d150d81cd589ba155470e",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "WIFUSD",
+        "symbol_id": 7194
+      },
+      {
+        "file": "raw/7195_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 623,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 104324,
+        "series_sha256": "b60889cf99dcbe6a7da355166f4782aa2fe3fe5b257123012ab2a737ae2e04f4",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "ARBUSD",
+        "symbol_id": 7195
+      },
+      {
+        "file": "raw/7196_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 2468,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 102128,
+        "series_sha256": "be03a594a431056ac6a29892bf277ae1734199b48204f614dce03fc304a5ffee",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "BNKUSD",
+        "symbol_id": 7196
+      },
+      {
+        "file": "raw/7198_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1354,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 103475,
+        "series_sha256": "099c778871eb5dce5c19daad5f47f84d7d805a277b78c8c8393ce19904202ba2",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "MANUSD",
+        "symbol_id": 7198
+      },
+      {
+        "file": "raw/7285_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 1787,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 102691,
+        "series_sha256": "73d04d68575809767cdf5a8c89771cffec90ee39acc0f348043e3ba25a4363c3",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "POLUSD",
+        "symbol_id": 7285
+      },
+      {
+        "file": "raw/7286_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:15:00Z",
+        "gap_count_24x7_reference": 9062,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 84836,
+        "series_sha256": "591fb38a06bf9f41eb6d183544c8af00ecf0753f7e7eae6323b1d7f45080d7ea",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "SONUSD",
+        "symbol_id": 7286
+      },
+      {
+        "file": "raw/7393_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 258,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 78591,
+        "series_sha256": "78ae738ebebe72d571b51b3be243c12a8b66f374e9dd63e68f5c95e044e32bf6",
+        "source_archive_sha256": "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+        "symbol": "WTOIL-PERP",
+        "symbol_id": 7393
+      },
+      {
+        "file": "raw/7394_M5.csv",
+        "first_timestamp_utc": "2025-09-16T00:00:00Z",
+        "gap_count_24x7_reference": 235,
+        "last_timestamp_utc": "2026-09-16T23:50:00Z",
+        "row_count": 75027,
+        "series_sha256": "225c68f00d4f6916427ef5f99bb255307115d0e54234796a20970dcc3aa6c3e6",
+        "source_archive_sha256": "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e",
+        "symbol": "BRENTOIL-PERP",
+        "symbol_id": 7394
+      }
+    ],
+    "whole_and_member_identity": "PASS_IN_DIRECTOR_ENVIRONMENT; evidence ACCEPTED_ARCHIVE_IDENTITY_BINDING_V1.json"
+  },
+  "economic_relevance_and_friction": {
+    "EUR200_later_feasibility_gate": "At futureeconomiccandidate freeze, actual broker minvolumelattice and causalconversion/margin must admit positive net expected opportunity at safelyvalidated risk withfree marginreserve. If required safevolume<broker minimum, reject. Do not infer minimum-volume feasibility from score or orderintent. Validatecontinuousstates80/200/350/1000/5000 and externalcashflow accounting atfinal appropriate stage.",
+    "EUR200_status": "1576 historicalstructural gatesPASS as acquisitioneligibility only. Not proof any signal safelyexecutes atminimumvolume. Primary145M5archives containno exacthistorical executiontruth.",
+    "HARD21": "FINAL_PORTFOLIO_ONLY_NOT_CURRENT_PROMOTION_OR_FREQ_TARGET",
+    "claim": "Scoregain may suggest reusable forecast refinement; no direction/trade/exit/size derived or optimized in selectedexperiment",
+    "coarse_screen": "A future separatelyfrozen DEVELOPMENT StageA may report net under valid broker-specific conservativecost assumptions, never arbitraryuniversalbps or omittedcost0. Signchanginguncertainty ->COST_UNRESOLVED. No such screenexecuted/designed as secondexperimenthere.",
+    "final_runtime": "Only later validated finite causalrules ported to autonomousC#/.NETcBot withdeterministic economicparity; Pythonresearch doesnotcertifyproduction",
+    "historical_guardrails": "AdaptiveV1zeroexecutions and all exact authenticfriction/meanreversion/leadlag closures retained; no rescues",
+    "necessary_later_inputs": [
+      "authentic side-aware relevant-time bid/ask spread",
+      "typed broker commission and applicable minimum",
+      "causal currency conversion",
+      "slippage/delay/gap assumptions or certified bounds",
+      "financing/session/holiday truth whereapplicable",
+      "minimumvolume/step and unit scaling",
+      "expectedmargin/free-margin and concurrenttailrisk"
+    ],
+    "no_net_edge_before_evidence": true,
+    "source_bindings": [
+      {
+        "last_modified_commit": "01cb44b530d8a7b436dac472f5dfdaa1004e049c",
+        "path": "research_core_v4/state/MASTER1576_QUALIFICATION_V2_REAL_STRUCTURAL_SCREEN_RESULT_V1.json",
+        "sha256": "d6914d2d6b0ddb588f3479ca0628f6543c7fc5492481e50fb4166663d9074954",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/state/MASTER1576_QUALIFICATION_V2_REAL_STRUCTURAL_SCREEN_RESULT_V1.json"
+      },
+      {
+        "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+        "path": "adaptive_competition/core.py",
+        "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/adaptive_competition/core.py"
+      }
+    ]
+  },
+  "exact_hypothesis_and_estimand": {
+    "common_calendar_gain": "G[j,k]=(1/145)*sum_i d[j,i,k]; k is fixed UTC6hour clock after56daywarmup",
+    "finite_development_estimand": "D[j]=(1/1240)*sum_k G[j,k], j=all18. Targets fixed algorithms, paired support, fixed identity/calendar mass, clipped loss and assumed receipt.",
+    "hypothesis": "Positive versus nonpositive bounded paired score improvement for each of18; complete descriptive estimates only, no pvalues/CI/formal rejection.",
+    "not_estimands": [
+      "general Y independent ofPhi conditional onsigma(B)",
+      "authentic historical causal receipt or revision path",
+      "expected executable net trade PnL",
+      "final weekly/monthly equity or HARD21"
+    ],
+    "per_identity_score": "d[j,i,k]=((z[i,k]-pB[i,k])^2-(z[i,k]-pA[j,i,k])^2)/256 for common paired eligible opportunity; otherwise d=0 for opportunity-level abstention, never response0",
+    "question": "Do completed-hour sign chronology and sign/activity coupling add out-of-sample fixed-ridge forecasting score over the common compact10coordinateB on the accepted DEVELOPMENT archive under each frozen receipt sensitivity?"
+  },
+  "execution_authority": {
+    "broker": false,
+    "funding": false,
+    "new_confirmatory_alpha": false,
+    "numeric_market_experiment": false,
+    "orders": false,
+    "protected_forward": false,
+    "real_ARM_signature_or_key_install": false,
+    "stage8": false
+  },
+  "experiment_id": "PRIMARY145_EXPLORATORY_V1_FROZEN18_FIXED_ALGORITHM_SKILL",
+  "failure_classifications": [
+    "ARCHIVE_HASH_MISMATCH",
+    "DATA_INTEGRITY_FAIL",
+    "UNSUPPORTED_EXPLORATORY",
+    "NEGATIVE_OR_ZERO_EXPLORATORY_GAIN_NOT_GLOBAL_NULL",
+    "POSITIVE_EXPLORATORY_GAIN_NOT_CONFIRMED",
+    "TIMING_SENSITIVE_CONDITIONAL_GAIN",
+    "RESOURCE_FAIL",
+    "SECURE_DEPLOYMENT_BLOCKED",
+    "HOST_DURABILITY_UNBOUND",
+    "NO_REPLAY_VIOLATION",
+    "NOT_PERSISTED",
+    "COST_OR_ECONOMIC_FEASIBILITY_UNRESOLVED"
+  ],
+  "family_selection_and_missingness": {
+    "PROJECT_effective_trials": "UNIDENTIFIED; no invented independent7975or145sample count",
+    "all_comparisons": [
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 0,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 0,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 0,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 0,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 0,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 0,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 300,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 300,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 300,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 300,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 300,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 300,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 900,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 900,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 1,
+        "lag_seconds": 900,
+        "map": "COMBINED"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 900,
+        "map": "CHRONOLOGY"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 900,
+        "map": "COUPLING"
+      },
+      {
+        "horizon_M5": 12,
+        "lag_seconds": 900,
+        "map": "COMBINED"
+      }
+    ],
+    "calendar_denominators": "145identities x1240fixedscoreUTCunits=179800opportunities percomparison. Weekends/session gaps retained; no calendarcompression, no cohortpruning",
+    "history_sources": [
+      {
+        "last_modified_commit": "594017e8fc32b8e818620de386530ed88f3a20d0",
+        "path": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json",
+        "sha256": "95b3fd3a2efebc10bc2745bc7657bd57ae5a67a67051364c70a99368c5bc3664",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json"
+      },
+      {
+        "last_modified_commit": "bff7fd2ed251860bf8f8a0a51f165d0fdf62b601",
+        "path": "research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json",
+        "sha256": "5789bce3f82ed6be5878bd15bc4cca5ad6e3b88321d40b12c568d6980de1e45f",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json"
+      }
+    ],
+    "inherited_selection": {
+      "as_of_date": "2026-10-05",
+      "cscv_pbo": "NOT_APPLICABLE_TO_HETEROGENEOUS_INFORMATION_SOURCES;REQUIRE_ONLY_IF_COMPLETE_COMPARABLE_CANDIDATE_MATRIX_EXISTS",
+      "deflated_sharpe": "NOT_APPLICABLE_TO_THIS_INFORMATION_RESPONSE;REQUIRE_ONLY_IF_COMPARABLE_RETURN_STREAM_SELECTION_EXISTS",
+      "event_history": [
+        {
+          "ref": "research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json",
+          "scope": "Historical families/cells and adaptive reranks; read-only durable closure graph and coverage references",
+          "stage": "V3"
+        },
+        {
+          "ref": "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_INTERPRETATION_V1.json",
+          "source": "CAUSAL_CROSS_SCALE_ALIGNMENT_INCREMENTAL_RESPONSE",
+          "stage": "V4_FIRST_WAVE",
+          "use": "EXACT_CLOSURE_ONLY"
+        },
+        {
+          "mechanism": "QUOTE_REVISION_SEQUENCE_PRESSURE_WITH_SMALL_NET_MID_DISPLACEMENT",
+          "selection_precedes_any_new_raw_quote_acquisition_or_response": true,
+          "source": "TOP_OF_BOOK_QUOTE_STATE",
+          "stage": "V4_NEXT_SOURCE"
+        },
+        {
+          "classification": "DATA_LIMITED_ACQUISITION_NOT_JUSTIFIED",
+          "ref": "research_core_v4/state/QUOTE_SUPPORT_PRIVATE_PROOF_RETURN_INTAKE_V1.json",
+          "stage": "V4_QUOTE_SUPPORT_STOP",
+          "use": "EXACT_SUPPORT_CLASSIFICATION_ONLY_NOT_IDENTITY_NEAR_MISSES"
+        },
+        {
+          "mechanism": "CAUSAL_LEAVE_ONE_OUT_FACTOR_RESIDUAL_INFORMATION",
+          "no_real_response_opened": true,
+          "ref": "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V2.json",
+          "stage": "V4_PROSPECTIVE_NEXT_MECHANISM"
+        },
+        {
+          "classification": "DATA_LIMITED_UNTESTED_NOT_NULL",
+          "no_real_response_opened": true,
+          "no_support_rescue": true,
+          "production_calibration_gate_pass": false,
+          "ref": "research_core_v4/state/FACTOR_RESIDUAL_PREFLIGHT_INTAKE_V1.json",
+          "selection_unchanged": true,
+          "stage": "V4_FACTOR_RESIDUAL_SUPPORT_ONLY_STOP"
+        }
+      ],
+      "excluded_first_wave_information": [
+        "leaf_effects",
+        "leaf_pvalues",
+        "effect_signs",
+        "symbols_ranked_by_results",
+        "horizon_or_volatility_near_misses",
+        "nonselection_diagnostics"
+      ],
+      "first_wave_information_available_to_selection": {
+        "exact_closure_scope": {
+          "claim": "This exact sign-only transition/alignment specification has no development lead under its frozen positive incremental-response selection law. Closure is against advancement/rescue of this exact tested wave, not statistical exclusion of all effects.",
+          "contexts": [
+            "FX_SPOT",
+            "SPOT_CRYPTO",
+            "US_EQUITY_EXTENDED_HOURS"
+          ],
+          "design": "FIRST_REAL_MARKET_DESIGN_V2",
+          "development_interval_utc": [
+            "2025-09-16T00:00:00Z",
+            "2026-09-16T23:50:00Z"
+          ],
+          "development_symbols": {
+            "FX_SPOT": [
+              [
+                "EURGBP",
+                9
+              ],
+              [
+                "USDPLN",
+                35
+              ],
+              [
+                "EURCAD",
+                17
+              ],
+              [
+                "NOKJPY",
+                86
+              ],
+              [
+                "USDSGD",
+                28
+              ],
+              [
+                "USDCNH",
+                60
+              ]
+            ],
+            "SPOT_CRYPTO": [
+              [
+                "SOLUSD",
+                2083
+              ],
+              [
+                "LTCUSD",
+                130
+              ],
+              [
+                "DOGEUSD",
+                324
+              ],
+              [
+                "BCHUSD",
+                326
+              ],
+              [
+                "AVAXUSD",
+                2086
+              ],
+              [
+                "UNIUSD",
+                323
+              ]
+            ],
+            "US_EQUITY_EXTENDED_HOURS": [
+              [
+                "TSLA.US-24",
+                3025
+              ],
+              [
+                "PLTR.US-24",
+                5449
+              ],
+              [
+                "AMD.US-24",
+                3034
+              ],
+              [
+                "AMZN.US-24",
+                3032
+              ],
+              [
+                "AVGO.US-24",
+                5403
+              ],
+              [
+                "META.US-24",
+                3019
+              ]
+            ]
+          },
+          "horizons_m5": [
+            3,
+            6,
+            12,
+            48
+          ],
+          "information_source": "CAUSAL_CROSS_SCALE_ALIGNMENT_INCREMENTAL_RESPONSE",
+          "response_scale": "M5",
+          "scales": [
+            "H4",
+            "H1",
+            "M15"
+          ],
+          "volatility_states": [
+            "LOW",
+            "HIGH"
+          ]
+        },
+        "exact_wave_failed_to_advance": true
+      },
+      "global_effective_trials": "NOT_IDENTIFIED_NOT_INVENTED",
+      "new_selection_consumes_v2_economic_budget": false,
+      "panel_selection_history_caveat": "The earlier execution-only panel metadata originated in a winner-first friction evidence capture. Reusing its execution-localized panel is not a random or unbiased full-frontier sample. Its earlier project-level selection pressure remains material and is paid through this prospective log and genuinely disjoint confirmation; no new first-V4 leaf information is used.",
+      "predecessor": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V2.json",
+      "predecessor_sha256": "e8a3280c322b45fea835e505fbe500dc53e8282da495419a3432004ee245954a",
+      "project_selection_payment": "Prospective mechanism-selection log and genuinely disjoint confirmation of every eligible development survivor; no naive historical-cell Bonferroni or invented effective trial count.",
+      "schema": "mxm.v4.adaptive-selection-history.v2",
+      "selection_occurs_after_failed_first_v4_wave": true,
+      "source_live_head": "b51696f590a894fa339b93d4c5162576b458c6aa",
+      "source_sha256": {
+        "research_core_v3/state/ACCEPTED_DATA_QUALITY_TABLE_V1.json.gz": "6608e62b54eaf9813e2e392609218097fd7424ce2c7d737868aec768f26f3de6",
+        "research_core_v3/state/BROKER_NATIVE_QUOTE_MICROSTRUCTURE_PREOUTCOME_AUDIT_V1.json": "0ba2740d32f0b8e07b9e618668c555e4a160d205d994f70826d2a21af4193bac",
+        "research_core_v3/state/FULL_FRONTIER_INFORMATION_GAIN_RERANK_V7.json": "331dc5b85ef04c0431c8372a56a1a375e61e99a77f6bb838a5fbdfb2454d296d",
+        "research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json": "3f42fcad0e82b80d4f51bfab3a7faae11bf0b83dedd511826d68c308e34a7e02",
+        "research_core_v3/state/PROJECT_WIDE_RESEARCH_DESIGN_COVERAGE_AUDIT_V2.json": "c78c32952bc09b0149deb1a0fc9c9a731350a39d2abbeef3ada7dd3b5dc41f74",
+        "research_core_v3/state/QUOTE_REVISION_SEQUENCE_METHOD_AND_ACQUISITION_AUDIT_V2.json": "6cdf94f16aeb2dbb24e611d5cdaf8840867e6853bd111987751fa903dd39eb7e",
+        "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_ACQUISITION_PLAN_V2.json": "34b49fdf3d7ff950e452f6ba96a4267efcc8b1d6736c3d8293f17fa6332ec135",
+        "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V2.json": "992b4e8c00efdcdb2076e573ae2f4d63f8179ba622b01064a2a2bd49f98627c1",
+        "research_core_v3/state/V3_FREEZE_AUTHORITY_V1.json": "1fffb6317f9d07e0ab8f706e8e240d369a6d350141a82093e2c4169acb01507a",
+        "research_core_v4/V4_PROJECT_CONTRACT_V1.json": "def292b0efba0bcf696f876bd0c2704e9358b924b26fd4d9749278848c6715c4",
+        "research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_INTERPRETATION_V1.json": "715e0d100fddda9b525fedc6f1dbf852973419d14634fa0c347fdb445d31cad2",
+        "research_core_v4/state/INFORMATION_SOURCE_CATALOG_V1.json": "1fe100d81ad0d3623132536ddaff118308ee9ac6b25c4aa5bbaff6c5e088654f",
+        "research_core_v4/state/MULTISCALE_COVERAGE_AUDIT_V1.json": "1e40aa9476b9200ac7c20dad283a320c305d88c753fd87ff94d68f4b2055212e",
+        "research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json": "5789bce3f82ed6be5878bd15bc4cca5ad6e3b88321d40b12c568d6980de1e45f",
+        "research_core_v4/state/V3_CLOSURE_DEPENDENCY_GRAPH_V1.json": "fcc55e881178e0b5c9526b00a3eb6230f81c94297ed758917d892c8ae5777e2b"
+      },
+      "status": "POST_QUOTE_STOP_PROSPECTIVE_SELECTION_NO_RESPONSE"
+    },
+    "model_fit": "Equal total weight per observed trainingidentity thenequal events; absentidentities reported; no substitution",
+    "no_previous_adaptive_selection_payment": true,
+    "paired_support": "SameB+chronology+coupling+complete label intersection for all3maps withinh/lag, commonBfit andnormalization; invalidfeature/no fit/unavailablelabel => opportunitygain0; report separate reason/count"
+  },
+  "final_status": "STOP_FOR_INDEPENDENT_MASTER_OBJECTIVE_CONTRACT_COMPATIBILITY_ARCHIVE_BINDING_AND_SINGLE_RESEARCH_ROUTE_AUDIT",
+  "inferential_limits_and_confirmation": {
+    "confirmation_route": "If a new economic/information design is justified later, first independently verify a genuinely disjoint prospective domain not selected using its outcomes, scope entire selection history and full testedfamily, freeze causal receipt/support/maturity/forecast and error law, then independently allocate error and authorize opening. Originalprotectedforward remainsCLOSED; no confirmationdataset designated now.",
+    "current": "EXPLORATORY_ONLY_NO_FORMAL_REJECTION; no marketpvalue/CI, no syntheticpowertransfer, no alphaallocation",
+    "possible_legitimate_rule_source": {
+      "last_modified_commit": "79a81ded1a7acc1fb0bf6adee2fa70a35b26c113",
+      "path": "research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json",
+      "sha256": "7640dc982f8b6583721e7d3aa134ff03d18da81253e9283a41786369f449b7d3",
+      "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+      "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json"
+    },
+    "possible_rule_not_current_authority": "Bounded conditional-score CS with completeweightedunion spending only under true predictable forecasts, common chronologicalfiltration and frozenfullfamilyweights sum<=1. Exposedarchive cannot automatically satisfy it. No theorem of disjointness or power certified here."
+  },
+  "machine_resources_and_execution_gate": {
+    "compute": "ExistingGitHubActions infrastructureonly for empiricalrun, never Work/chat lifetime",
+    "current_status": "NOT_EXECUTABLE_NOW",
+    "exact75sourcebindings": "SELECTED_EXPERIMENT_SOURCE_CODE_BINDINGS_V1.json",
+    "gates": [
+      "Independent audit accepts masterobjective compatibility and selectedquestion",
+      "Original2ZIPwholehash and145memberidentityverified onactualapprovedexecutionhost aftersecure approvedtransfer",
+      "Approved host/durability compatible with frozen gate or separatelyauditeddeployment-only successor, preservingnumeric science/budget/no-replay",
+      "Fail-open provider not used; actualpublicationfailure causesnonzero/failstatus and NOT_PERSISTED; nofixauthorizedhere",
+      "Exactruntime clean tree and dependencies; separate independent exactLIVEHEAD-bound authorization/signature gate before anymarketnumeric opening",
+      "Durable single invocation/budgetreservation andduplicate denial before firstnumericmember; report/checkpoints/readbackdurable; noautomaticrerun ornewARM afterfailure"
+    ],
+    "limits": {
+      "CPU_seconds": 7200,
+      "RAM_bytes": 8589934592,
+      "accepted_corpus_passes": 1,
+      "broker_requests": 0,
+      "orders": 0,
+      "protected_forward_rows": 0,
+      "trading": 0
+    },
+    "runtime": {
+      "OMP_NUM_THREADS": 1,
+      "OPENBLAS_NUM_THREADS": 1,
+      "cryptography": "50.0.1",
+      "floating_point": "IEEE754 binary64; deterministic within pinned runtime; no cross-platform bitwise guarantee claimed",
+      "numpy": "2.3.5",
+      "python": "3.12.14"
+    },
+    "storage": "Existingapprovedencryptedstorage+durableGitHubreceipts/checkpoints; private numeric reports/caches cannot be public plaintext by default; safe aggregate scientificreport after security review",
+    "unproven": "Actualrealhostandarchivebinding, wholeworker2h/8GiBperformance, realremotecheckpointpublication and encryptednumericcache/reportsecurity not proven byfabricatedprovider."
+  },
+  "mathematical_formulas": {
+    "activity_coupling": "sum_(i=0..11)v_i*s_i / sum_(i=0..11)v_i; zero denominator -> common abstention",
+    "baseline_hour_location": "(last_hour_close-hour_low)/(hour_high-hour_low), zero width ->1/2; exact source baseline() governs required bars and availability",
+    "baseline_order": [
+      "LAST_M5_OPEN",
+      "LAST_M5_HIGH",
+      "LAST_M5_LOW",
+      "LAST_M5_CLOSE",
+      "LAST_M5_TICK_VOLUME",
+      "HOURLY_PRICE_LOCATION",
+      "HOURLY_RANGE",
+      "HOURLY_TOTAL_TICK_VOLUME",
+      "UTC_WEEKDAY",
+      "UTC_5_MINUTE_SLOT_OF_DAY"
+    ],
+    "chronology": "(1/11)*sum_(i=0..10)s_i*s_(i+1)",
+    "normalization": "z=clip((Y-ymean_train)/max(ysd_train,1e-12),-8,8); one common B/label normalization perhorizon,lag,refit",
+    "predictions": "clip(Z beta,-8,8) before accessing currentlabel",
+    "response": "Y[t,h]=log(close[t+300*(h-1)]/close[t-300]); h in1,12",
+    "ridge": "beta=(Z^T W Z+diag(0.05,0.5,...,0.5))^(-1) Z^T W y; Z has intercept; same prefix-only scaler/equal-identity weights. Actual solve_ridge uses solve, not explicit inverse.",
+    "score_range": "d,G,D in[-1,1]; clipped squared error difference/256",
+    "sign": "s_i=sign(c_i-o_i), zero-body sign0",
+    "source_specification": [
+      {
+        "last_modified_commit": "9254cd828b96bc1f31441010201bd7916d32560b",
+        "path": "research_core_v4/compact_baseline_v2.py",
+        "sha256": "a8a7f5d883f9f6966176c657ea0bcf8dc1294f4e11e48ff0aa35a9036f163758",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/compact_baseline_v2.py"
+      },
+      {
+        "last_modified_commit": "e9194f809f71a76356adf67ab5dfaa24288ed72e",
+        "path": "research_core_v4/operational_v1/prequential_score.py",
+        "sha256": "116ec6fe528ed1a0155a1ece019a51534060ffc3fc10676d9cfe78249493094a",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/operational_v1/prequential_score.py"
+      },
+      {
+        "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+        "path": "research_core_v4/exploratory_dev_v1/worker.py",
+        "sha256": "3e6ca9c78417f593e4b270c3d9ed8d676cf474184b62c219d559e7e10ffc87d1",
+        "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/exploratory_dev_v1/worker.py"
+      }
+    ]
+  },
+  "schema": "mxm.one-complete-selected-prospective-experiment.v1",
+  "scientific_freeze": {
+    "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+    "path": "research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json",
+    "sha256": "4589df78d32a21a6d84387821a7ed0cfacef514b4b0a299c211e7dd21ace71c6",
+    "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+    "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/5c7cafdee2ab5f9673c61c9da4166db73d589365/research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json"
+  },
+  "scientific_identity_rule": "Reuse exact original scientificV1; no new learner, threshold, horizon, map, cohort, fit or inference law. This index copies complete freeze and exposes economic/operational audit limits.",
+  "source_head": "5c7cafdee2ab5f9673c61c9da4166db73d589365",
+  "status": "SELECTED_FOR_INDEPENDENT_PROSPECTIVE_AUDIT_ONLY_NOT_ARMED",
+  "stopping_rule": {
+    "completion": "Exactlyone acceptedcorpus pass andfull18complete report inside reserved7200CPUseconds/8GiB; neverstop becausegainfavorable orunfavorable",
+    "crash": "Sameauthorization cannotrestart/reread sources. Forensiccheckpoint inspectiononlyuntilseparatelyaudited evidence/budgetresolution; noautomaticnewbudget/ARM",
+    "integrity_or_resource_failure": "Stop immediately; preserve safe failuremetadataandpartialcheckpoints; markDATA_INTEGRITY_FAIL/RESOURCE_FAIL/NOT_PERSISTED asappropriate; neverPASS or marketnull",
+    "no_rescue": "Noalternativelearner/cohort/lag/horizon/feature/exit/size selectedfromreport; anymaterialnew identityrequiresseparateprospectivefreeze andselectionaccounting",
+    "publication": "Mandatorycanonicalreadbackfailure ->NOT_PERSISTED; noaffectedbatchcompleteclaim",
+    "score_interpretation": "Unsupported, negative/zero descriptivegain, positivegain or timingsensitivegain are reported forwholefamily, not stoppingtriggers orformalmarketverdicts"
+  },
+  "user_operations": "NONE",
+  "what_proven": [
+    "Original2ZIPand145memberbytes",
+    "Exactscientific18freeze and75unchangeddependencies",
+    "Syntheticstructural/worker/integratedtests as historical evidence only",
+    "Historicalsyntheticproviderprimitives, notrealhost"
+  ],
+  "what_unknown": [
+    "Realscoregain/effectsize/support/stability",
+    "Authentichistoricalreceipt/revisions",
+    "Genuine independentconfirmation/errorlaw",
+    "RealEUR200netexecutability/frequency",
+    "FinalCloudproductionparity/growth/survival/HARD21"
+  ]
+}
