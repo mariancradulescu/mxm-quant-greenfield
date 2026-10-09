@@ -1,0 +1,134 @@
+{
+  "schema": "mxm.diverse.mechanism.wave.design.v1",
+  "status": "PROSPECTIVE_SCIENTIFIC_FREEZE_NOT_REAL_AUTHORITY",
+  "name": "MASTER1576_TWO_HOUR_RANGE_TRANSLATION_AND_ACTIVITY_IMPACT_DECELERATION_WAVE_V1",
+  "selection_head": "e0007b40f8c94634b7ab9e43ca1ad213f632fc4b",
+  "selection_basis": "Prospective causal extraction and complete available inputs; no confidential leaves, best lags, weeks, symbols or observed A/B signs used to choose directions or parameters",
+  "mechanisms": [
+    {
+      "id": "RANGE_TRANSLATION_CONTINUATION",
+      "source_class": "TRUE_COMPLETED_HOURLY_PRICE_RANGE_TOPOLOGY",
+      "definition": "For two adjacent fully elapsed UTC hours H1=H-3600 and H2=H, aggregate each from exactly twelve M5 bars: O=first open, C=last close, L=min low, U=max high. Long iff L2>L1 AND U2>U1 AND C2>O2. Short iff L2<L1 AND U2<U1 AND C2<O2. Otherwise abstain. Strict comparisons; no fitted thresholds.",
+      "causal_hypothesis": "Both traded range endpoints relocate together and the completed hourly body agrees: continuation of sustained directional price discovery.",
+      "distinctness": "Uses consecutive actual H1 high/low range geometry, not sign-only H4/H1/M15 alignment, M5 z-score, return lookback crossover, opening-range breakout, thresholded wick rejection, or weighted M5 signs. May trigger with close inside prior range; does not require breakout or reverse old A."
+    },
+    {
+      "id": "ACTIVITY_IMPACT_DECELERATION_REVERSAL",
+      "source_class": "INTERHOUR_PRICE_MAGNITUDE_PER_NATIVE_ACTIVITY",
+      "definition": "For the same H1/H2 define rj=ln(Cj/Oj), Vj=sum native tick_volume, Ij=abs(rj)/Vj. Require V1,V2>0, r1*r2>0, abs(r2)>abs(r1), V2>V1 and I2<I1. Then direction=-sign(r2); otherwise abstain. Compare ratios by cross multiplication abs(r2)*V1<abs(r1)*V2; no fitted multipliers.",
+      "causal_hypothesis": "A same-direction accelerating move needs disproportionately more broker-native activity; declining displacement per activity is a prospective exhaustion/absorption hypothesis.",
+      "distinctness": "New two-hour joint elasticity state. Not one-M5 volume-shock/median-multiplier reversal or its target/adaptive exit; not a reversal of the closed hourly activity-weighted direction. No large-volume rank or threshold selected from returns."
+    }
+  ],
+  "source": {
+    "manifest": "research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_FINAL_DURABLE_MANIFEST_V1.json",
+    "manifest_sha256": "cc28c61a7788fc9d18bd54a343bc0e2c7467b27f1dbb111bf54185f9f0f16cb4",
+    "shards": 100,
+    "rows": 3355389,
+    "identities": 1576,
+    "start_UTC": "2026-08-20T00:00:00Z",
+    "end_exclusive_UTC": "2026-09-17T00:00:00Z",
+    "required_fields": [
+      "time_utc",
+      "open",
+      "high",
+      "low",
+      "close",
+      "tick_volume"
+    ],
+    "new_acquisition": 0
+  },
+  "family": {
+    "mechanism_count": 2,
+    "lags_seconds": [
+      0,
+      300,
+      900
+    ],
+    "response_horizon_seconds": 3600,
+    "total_comparisons": 6,
+    "selection_rule": "Report all six, without best-cell selection or pooling away negative cells",
+    "fit": "NONE",
+    "parameters_tuned": 0
+  },
+  "calendar": {
+    "clocks": "t=START+3600*j, j=0..671, all UTC hours including weekends and closed sessions",
+    "q": "t-lag",
+    "H": "3600*floor(q/3600)-3600",
+    "feature_hours": "H-3600 and H, each twelve exact M5 bars; require close availability <=q, no preperiod data",
+    "denominator_per_cell": 1059072,
+    "weekly_denominator_per_cell": 264768,
+    "weeks": "Four fixed adjacent 7-day UTC partitions of the 28-day domain",
+    "cross_market_synchrony": "Not required; no cross-instrument relations or independence assumption"
+  },
+  "response": {
+    "law": "y=ln(close_(t+3300)/close_(t-300)); all thirteen exact M5 bars required; release at t+3600+lag; maturity beyond END is DOMAIN_CENSOR",
+    "gross": "direction*y*10000",
+    "baseline": "FLAT_NO_POSITION: gross response 0, no trading or friction; this does not assign zero cost to a hypothetical executed signal",
+    "paired_increment": "Mechanism gross minus flat gross on exactly the same supported opportunity",
+    "measurement": "Reference close prices only, not fictional fills/equity/positions"
+  },
+  "abstention": {
+    "reasons": [
+      "SUPPORTED",
+      "NO_EVENT",
+      "FEATURE_GAP",
+      "FEATURE_RECEIPT",
+      "ZERO_ACTIVITY",
+      "LABEL_GAP",
+      "LABEL_RECEIPT",
+      "DOMAIN_CENSOR"
+    ],
+    "features": "Require exact 24 feature bars, independent of label/outcome. Missing bars => abstain; no forward fill, stale substitute or compressed market clock.",
+    "labels": "Require mature contiguous label only for emitted events; count feature-valid/event opportunities separately from mature responses.",
+    "market_closure": "Any missing feature/label interval abstains; no reopening-gap trade and no jumping closure. UTC hour is a measurement clock, not a claimed venue-session identity.",
+    "numeric_invalidity": "Invalid OHLC/digits/volume/nonfinite calculations fail closed; not silently dropped.",
+    "QUB_AU": "All1576 frontier identities retained; QUB.AU id3741 ordinal515 preserved as support-limited"
+  },
+  "reporting": {
+    "every_cell": [
+      "calendar mean gross",
+      "event-supported mean gross",
+      "flat paired incremental",
+      "gross sum and squared sum",
+      "calendar opportunities",
+      "feature-valid clocks",
+      "emitted signals before label maturity",
+      "mature supported responses",
+      "all reason counts",
+      "agreement with sign of completed hourly move only as private diagnostic",
+      "four fixed weekly summaries",
+      "signal density per calendar week and identity; not executed-trade count"
+    ],
+    "aggregation": "Full frontier primary; per-identity/context/time vectors encrypted only. No symbol/market independence, p-values or fresh confirmation alpha.",
+    "gross_positive_requirement": "Each cell assessed separately: mean standalone gross >0 necessary, supported >0; no rescue using positive A-minus-negative-B. No automatic empirical promotion.",
+    "cost_headroom": "If supported gross mean g>0, admissible mean nonnegative additive roundtrip log-equivalent friction must be <g for proxy net positivity. No cost assumed, stress threshold, fills or net profit claimed.",
+    "temporal_instability": "All four weeks and signs reported even with positive full-period mean; one favorable week insufficient.",
+    "stopping": "Nonpositive gross closes that exact new cell for promotion within tested DEVELOPMENT domain; zero support => DATA_LIMITED_NOT_TESTED; insufficient support/unstable => INCONCLUSIVE/NO_PROMOTION; positive gross still needs independent economic and confirmatory decision"
+  },
+  "economics": {
+    "historical_costs": "COST_UNRESOLVED for the new full-frontier 2026-08-20/09-17 hourly opportunities",
+    "prior_evidence": "Dated genuine MR spread failures and US500/NAS100 transaction-local captures retained only within original product/time/candidate applicability; index commission discovery policy cannot be exported to all Razor instruments.",
+    "EUR200": "Current minimum-volume/step/margin feasibility snapshots are structural only; historical FX conversion, affordability, simultaneous portfolio margin and actual fills unresolved.",
+    "minimum_future_cost_source": "Same instrument and event-boundary bilateral bid/ask plus account-applicable Razor commission/currency conversion, dated symbol min/step/margin and execution/rejection/slippage receipts; financing if boundary crosses applicable rollover. No acquisition authorized now.",
+    "frequency": "At most168 hourly opportunities per identity per week per cell; actual feature/event-supported density unknown until authorized evaluation, not inferred from rows. HARD21 remains final portfolio executed-entry law."
+  },
+  "data_limited_not_tested": [
+    "113-day seasonal learner prefix",
+    "quote-revision sequence",
+    "authoritative cross-market/curve linkage",
+    "carry with point-in-time financing",
+    "factor/residual methods requiring missing synchronized relational authority"
+  ],
+  "selection_history": "All51 ledger nodes, paid V4 leaves and PRIMARY145 exposure retained; accepted original 3-lag result is a closed DEVELOPMENT selection event. This 6-cell wave remains adaptively exposed DEVELOPMENT, not independent confirmation.",
+  "budget": {
+    "wall_seconds": 3600,
+    "cpu_seconds": 7200,
+    "ram_kib": 8388608,
+    "workers": 1,
+    "attempts": 1,
+    "automatic_retries": 0
+  },
+  "real_execution_authorized": false,
+  "no_live_trading": true
+}
