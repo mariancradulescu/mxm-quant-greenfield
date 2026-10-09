@@ -1,0 +1,60 @@
+name: MXM MASTER1576 exact real DEVELOPMENT V2 default deny
+on:
+  workflow_dispatch:
+    inputs:
+      accepted_source_head:
+        description: Exact audited immutable source commit
+        required: true
+        type: string
+      accepted_arm_sha256:
+        description: Independently accepted exact candidate ARM SHA256
+        required: true
+        type: string
+      previous_run_id:
+        description: Empty for original; exact independently approved interrupted run for recovery
+        required: false
+        default: ''
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  exact-approved-development-only:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Presecret exact independent ARM acceptance and deterministic source checks
+        env:
+          EXPECTED_SOURCE_HEAD: ${{ inputs.accepted_source_head }}
+          EXPECTED_ARM_SHA256: ${{ inputs.accepted_arm_sha256 }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from research_core_v4.numeric_development_v2 import authority_v2 as a, machine_v2 as m
+          from research_core_v4.numeric_development_v1 import numeric_machine_entrypoint_v1 as old
+          head=os.environ['GITHUB_SHA']; m.runtime(head); arm=a.real_gate(head)
+          a.need(arm['source_head']==os.environ['EXPECTED_SOURCE_HEAD'] and a.digest(a.ARM)==os.environ['EXPECTED_ARM_SHA256'],'DISPATCH_APPROVAL_DRIFT')
+          master,entries,digits,manifest=old.verify_science(); a.preflight_inventory(manifest,entries)
+          print('PASS_PRESECRET_SOURCE_AND_AUTHORITY_ONLY')
+          PY
+      - name: Exactly one independently authorized original or narrow recovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          PREVIOUS_RUN_ID: ${{ inputs.previous_run_id }}
+        run: |
+          ulimit -v 8388608
+          if [ -z "$PREVIOUS_RUN_ID" ]; then
+            timeout --signal=TERM 3400 python3 -m research_core_v4.numeric_development_v2.machine_v2 --mode real
+          else
+            timeout --signal=TERM 3400 python3 -m research_core_v4.numeric_development_v2.machine_v2 --mode real --previous-run "$PREVIOUS_RUN_ID"
+          fi

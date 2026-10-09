@@ -1,0 +1,31 @@
+name: MXM MASTER1576 V2 one bounded fabricated cold process proof
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/mxm-master1576-cold-process-synthetic-v2.yml
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-cold-process-synthetic-v2
+  cancel-in-progress: false
+jobs:
+  one-fabricated-cold-process-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Successor authority, publication failures and unchanged scientific regressions
+        run: |
+          python3 -m unittest -v research_core_v4.numeric_development_v2.test_successor_v2 research_core_v4.numeric_development_v1.integrated_fault_preflight_v1 research_core_v4.numeric_development_v1.test_public_output_guard_v1 research_core_v4.numeric_development_v1.test_frozen_coupling_parity_v1
+      - name: One terminated worker, cold concurrent claim, deterministic reference and encrypted readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          timeout --signal=TERM 3500 python3 -m research_core_v4.numeric_development_v2.synthetic_proof_v2
