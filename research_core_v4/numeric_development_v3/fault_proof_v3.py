@@ -126,7 +126,8 @@ def proof():
             repeated=call_child(case,kd) if case=="normal" else None
             if case=="normal":
                 a.need(repeated==0,"REPEATED_FINALIZATION_FAILED")
-                a.need(old.api("releases/"+str(store.release["id"])+"/assets?per_page=100")==assets_complete and
+                identity=lambda assets:[{k:x[k] for k in ("id","name","size","digest")} for x in assets]
+                a.need(identity(old.api("releases/"+str(store.release["id"])+"/assets?per_page=100"))==identity(assets_complete) and
                   f.verify_complete(store)["completion_commit"]==complete["completion_commit"],"SECOND_SCIENTIFIC_EXECUTION")
             got,_=store.load_named(f.REPORT);state,_=store.load_named(f.STATE)
             a.need(got==report and state==engine,"FINALIZATION_PARITY")
@@ -148,7 +149,7 @@ def proof():
         path=PUB+"FINALIZATION_CRASH_BOUNDARY_PROOF_V1.json"
         store.publish_exact(v2.safe_status(os.environ["GITHUB_SHA"],"PUBLICATION","PASS",
           run_id=int(os.environ["GITHUB_RUN_ID"]),encrypted_artifact_name=meta["name"],encrypted_artifact_sha256=meta["ciphertext_sha256"],
-          cpu_seconds=proof["resources"]["cpu_seconds"],wall_seconds=proof["resources"]["wall_seconds"],peak_kib=proof["resources"]["peak_kib"],failure_code="NONE"),path)
+          resource_cpu_seconds=proof["resources"]["cpu_seconds"],resource_wall_seconds=proof["resources"]["wall_seconds"],resource_peak_ram_kib=proof["resources"]["peak_kib"],failure_code="NONE"),path)
         print(json.dumps({"proof":"PASS_ALL_13_REMOTE_CASES","cases":records,"inventories":inventories,
           "proof_asset":meta,"resources":old.usage(),"real_numeric_run_started":False}),flush=True)
 

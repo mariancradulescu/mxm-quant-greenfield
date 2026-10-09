@@ -1,4 +1,6 @@
 import ast
+import base64
+import hashlib
 import os
 import pathlib
 import unittest
@@ -37,6 +39,33 @@ class Finalization(unittest.TestCase):
         from research_core_v4.numeric_development_v2 import authority_v2
         self.assertEqual(a.candidate("a"*40,{})['invocation_id'],authority_v2.candidate("b"*40,{})['invocation_id'])
         self.assertEqual(v2.claim_name(a.candidate("a"*40,{})),v2.claim_name(authority_v2.candidate("b"*40,{})))
+    def test_tree_mutation_uses_guarded_target_and_original_expected_bytes(self):
+        s=self.store()
+        source='research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json'
+        data=(old.ROOT/source).read_bytes()
+        s.arm['bindings']={source:a.sha(data)}
+        target=PUB+'REAL_DEVELOPMENT_DELIVERY_V1.json'
+        doc=v2.safe_status('a'*40,'FINAL','NOT_PERSISTED')
+        from research_core_v4.numeric_development_v1.public_output_guard_v1 import validate_public_blob
+        expected=validate_public_blob(target,doc)
+        mutations=[]
+        def api(endpoint,body=None,method=None):
+            if endpoint=='git/blobs':return {'sha':'b'*40}
+            if endpoint=='git/ref/heads/'+old.BRANCH:return {'object':{'sha':'a'*40}}
+            if endpoint=='git/trees/'+'a'*40+'?recursive=1':return {'truncated':False,'tree':[{'path':source,'type':'blob','sha':hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()}]}
+            if endpoint.startswith('compare/'):return {'status':'identical'}
+            if endpoint=='git/commits/'+'a'*40:return {'tree':{'sha':'c'*40}}
+            if endpoint=='git/trees':
+                mutations.append(body);return {'sha':'d'*40}
+            if endpoint=='git/commits':return {'sha':'e'*40}
+            if endpoint=='git/refs/heads/'+old.BRANCH:return {}
+            if endpoint=='contents/'+target+'?ref='+'e'*40:return {'content':base64.b64encode(expected).decode()}
+            self.fail('Unexpected API path '+endpoint)
+        with patch.object(old,'api',side_effect=api):
+            got=s.publish_exact(doc,target)
+        self.assertEqual(mutations[0]['tree'][0]['path'],target)
+        self.assertNotEqual(mutations[0]['tree'][0]['path'],source)
+        self.assertEqual(got['sha256'],a.sha(expected))
     def test_real_paths_are_successors_and_approval_absent(self):
         self.assertTrue(a.APPROVAL.endswith('numeric_development_v3/INDEPENDENT_ACCEPTANCE_V3.json'))
         self.assertFalse((a.ROOT/a.APPROVAL).exists())

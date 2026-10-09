@@ -62,14 +62,17 @@ class Store(v2.Store):
         remote=old.api("git/trees/"+current+"?recursive=1")
         a.need(remote.get("truncated") is False,"FINAL_SOURCE_TREE_TRUNCATED")
         blobs={x["path"]:x["sha"] for x in remote["tree"] if x["type"]=="blob"}
-        for path,expected in self.arm["bindings"].items():
-            data=(old.ROOT/path).read_bytes()
-            a.need(a.sha(data)==expected and blobs.get(path)==hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),"FINAL_BOUND_SOURCE_DRIFT")
+        for bound_path,bound_sha256 in self.arm["bindings"].items():
+            data=(old.ROOT/bound_path).read_bytes()
+            a.need(a.sha(data)==bound_sha256 and blobs.get(bound_path)==hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),"FINAL_BOUND_SOURCE_DRIFT")
         comparison=old.api("compare/"+self.arm["source_head"]+"..."+current)
         a.need(comparison["status"] in ("ahead","identical"),"FINAL_SOURCE_ANCESTRY")
         # A recovery checkout may precede already durable delivery commits.
         # Every immutable bound source is checked by the presecret ARM gate;
         # this publication appends only the guarded single status path.
+        # Validate the exact target again at the tree mutation boundary. A
+        # bound-source pathname can never be substituted for the guarded path.
+        a.need(validate_public_blob(path,document)==expected,"FINAL_PUBLIC_TARGET_DRIFT")
         tree=old.api("git/trees",{"base_tree":old.api("git/commits/"+current)["tree"]["sha"],
           "tree":[{"path":path,"mode":"100644","type":"blob","sha":blob["sha"]}]})
         commit=old.api("git/commits",{"message":"Persist guarded V3 finalization "+kind+" [skip ci]",

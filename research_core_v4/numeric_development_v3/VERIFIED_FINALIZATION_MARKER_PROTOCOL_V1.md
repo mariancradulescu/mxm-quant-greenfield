@@ -1,5 +1,13 @@
 # V3 authoritative finalization protocol
 
+**BLOCKED — not yet accepted.** Run37917881441/job113778412491 stopped
+fail-closed on the first cold finalization: a publication pathname was shadowed
+by a bound-source loop variable. The frozen policy bytes are restored in a new
+commit, and the pathname defect is corrected with a regression test. No complete
+remote crash-boundary proof exists for the corrected source. No further campaign
+is started in this task, following the material-drift stop rule. The protocol
+below specifies intended ordering; it is not a successful machine-side verdict.
+
 This operational successor closes the V2 Release-before-Git false-PASS window.
 V1/V2, their candidate, numerical worker, design, cohort, data, lags, calendar,
 estimands and historical evidence remain immutable. This is delivery engineering.
