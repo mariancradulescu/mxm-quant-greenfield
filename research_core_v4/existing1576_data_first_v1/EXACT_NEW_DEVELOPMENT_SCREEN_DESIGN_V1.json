@@ -1,0 +1,129 @@
+{
+  "broker_requests": 0,
+  "calendar": {
+    "actual_masks": "NOT_PROVEN currentrunner; historicalidentity/day/hour summaries insufficient for exact13barjoins. Freezeoutcome-blindmasks before any numericalresponse.",
+    "feature_prefix": "Onlylastfullyelapsedhour plusq-300. Firstunsupportedclocksabstain; no preperiodacquisition",
+    "input_end_exclusive": "2026-09-17T00:00:00Z",
+    "input_start": "2026-08-20T00:00:00Z",
+    "opportunity_density": "168calendarclocks/week/identity isuppergeometry only; actualsupportand executedentrydensity UNKNOWN; notselectionbyfrequency orHARD21certificate",
+    "response_boundary": "If maturity>end, rightcensor; if missinganyrequiredbar, unavailable; no gapjump/zeroimputation",
+    "score": "672UTC clocks t=start+3600j,j=0..671; includeallweekends/sessionclosedperiods; no calendardropping",
+    "training": "NONE; fixedrules nofittedparameters"
+  },
+  "causal_availability": {
+    "actual_receipts": "UNKNOWN inacceptedhistoricalM5; do notclaimoriginalfirstreceipt/no-revisionproved",
+    "conditional_sensitivity": "as-ifavailable_at=barclose+lag; evaluatefeatures atq withunshiftedcloseavailability equivalenttoshiftedreceipt<=t. Alllabels releasedonlyaftert+3600+lag",
+    "execution_price": "Closemarks are measurementreferences, not executablefills. No brokerageorders, fills, position, capital orPNL simulated."
+  },
+  "cohort_law": "Prospective exact feature/receipt/labelmask only. No outcomesforparticipation. Do not selectbestcontext/symbol/comparison. Nativecontextdescriptions notassumed economiclinks or independentreplications.",
+  "comparisons": 3,
+  "cost_and_capital": "Use HISTORICAL_SELECTION_AND_COST_SCOPE_V1.json; no inventedcostbound orEUR200equitymodel; positivegrossrequiresnewauthenticcost/executabilitydecision beforepromotion",
+  "estimand": {
+    "fixed_denominator": "1576identities*672hourlyUTCclocks=1059072opportunities perlag; unsupportedcommonabstention contributes0operationalgain, neverunobservedreturn0",
+    "for_each_lag": "For each3lags report allfrontierfixedcalendarmeanG_A,meanG_B,mean(G_A-G_B), plus supported-onlyversions and counts. DescriptiveexposedDEVELOPMENT only.",
+    "hypothesis": "NewfixedA haspositiveexpecteddirectionalpriceproxy and positivepairedincrement overfixedB; no formaltest/rejection in28days."
+  },
+  "failure_classes": [
+    "SECURE_MACHINE_SIDE_ACCESS_BLOCKED",
+    "CAUSAL_RECEIPT_OR_COST_UNRESOLVED",
+    "EXISTING_DATA_SUPPORT_INSUFFICIENT",
+    "SCIENTIFIC_DESIGN_REJECTED_AS_NOT_DISTINCT",
+    "RESOURCE_OR_DURABILITY_BLOCKED",
+    "NEGATIVE_OR_ZERO_DESCRIPTIVE_RESPONSE",
+    "POSITIVE_GROSS_NOT_ECONOMICALLY_CERTIFIED",
+    "LOW_POWER_OR_UNSTABLE",
+    "NOT_PERSISTED"
+  ],
+  "family": [
+    {
+      "horizon_M5": 12,
+      "lag_seconds": 0
+    },
+    {
+      "horizon_M5": 12,
+      "lag_seconds": 300
+    },
+    {
+      "horizon_M5": 12,
+      "lag_seconds": 900
+    }
+  ],
+  "formulas": {
+    "G_A_B": "d_A*y*10000 andd_B*y*10000; grosslogbps priceproxies only",
+    "H": "3600floor(q/3600)-3600",
+    "baseline_d_B": "sign(close_(q-300)-open_(q-300)), exactown-pricebodyprimitive fromcompactBcoordinates; nofittedmodel",
+    "coupling": "C=sum(v_k*s_k)/sum(v_k); zero totalactivity unavailable",
+    "d_A": "sign(sum(v_k*s_k))",
+    "no_full_conditional_claim": "Comparingfixedlastbodybaseline doesnot test conditionalinformation beyondsigma(compactB) or fullpredictiveefficiency.",
+    "paired": "Samecompletefeatures, bothnonzero directions andcompletematurelabels; differenceG_A-G_B",
+    "q": "t-lag",
+    "response": "y=log(close_(t+3300)/close_(t-300)); all13barst-300throught+3300 required; maturity=t+3600+lag",
+    "s_k": "sign(close_k-open_k) for12M5bars H+300k"
+  },
+  "gates_before_real": [
+    "independentclosed-spec/design/selectionaudit",
+    "separateexactmetadata-only100sharddecryption/accessauthority, key-onlyreadinesscheck scope and privatehandling",
+    "verifiedcurrentciphertextbytes/acceptedcanonicalplaintextSHA, exacttimestamps/commonmasks checkpoint withoutresponses",
+    "adequatesupport/causalreceiptandcostscope audit",
+    "newrealstreamingadapter/sourceSHA/syntheticdurability+failureproof andlawfulhostauthority",
+    "separateexactone-use numericdirectionalresponseARM; no netPnL/equity/backtest/promotion/alpha implied"
+  ],
+  "machine_plan": {
+    "compute": "ExistingGitHubActions, oneprivateordered100shardpassonlyafterseparateaccessandresponseauthority; no Workbulkcomputation",
+    "concurrency": "Atomicexperiment+dataset+source claim, exactsourcehead, singleactivejob, duplicateclaimdenial; consumedfailedclaim preserved; publication CAS+fullbytesreadback; ephemeralrunner neveracceptedsolecheckpoint",
+    "current": "Onefabricated-onlykernel/fault/resourcepreflight; norealentrypoint/decrypt/key",
+    "host_law": "PRIMARY145 HOST_LAYOUT_V2 remainsunchanged, notautomatically applicabletoallnewresearch, nor satisfiedbyephemeralActions. Distinctnewroute requiresprospectiveversionedauthority+independentremotecheckpointproof beforeempiricalARM.",
+    "needed_new_worker": "Short-historydirectionalresponsekernel supplied; realstreamadapter and all-source/output/hostgates UNIMPLEMENTED/NOT_AUTHORIZED",
+    "real_budget_proposal": {
+      "attempts": 1,
+      "automatic_retries": 0,
+      "cpu_seconds": 7200,
+      "data_assets": 100,
+      "historical_rows_expected": 3355389,
+      "memory_gib": 4,
+      "realfeasibility": "NOT_PROVEN byfabricateddimension benchmark",
+      "wall_minutes": 120,
+      "workers": 1
+    },
+    "reuse": "Acceptedmaster1576_screen_v2.py decrypt/package/rowverificationsemantics mayinform separatelyauditednewread adapter; oldcompletequalificationmustnotrerun",
+    "streaming": "Processacceptedshards segmentorder/shardorder; maintainlimitedperidentityhourandpendinglabelbuffers acrosssegmentboundaries; persistencryptedsegmentcheckpoints andreadbacks beforedeletingprivateplaintext; labelcompute only afterseparatelyauthorizedmaskfreeze. No source replay/retry withoutindependentaudit."
+  },
+  "mechanism": "MASTER1576_HOURLY_PRICE_ACTIVITY_COUPLING_DIRECTIONAL_RESPONSE_V1",
+  "new_alpha": false,
+  "new_economic_backtest": false,
+  "no_direction_threshold_horizon_grid": true,
+  "protected_forward": false,
+  "question": "Does fixedvolume-weightedcompletedhourbody direction yield positive descriptiveone-hourpriceheadroom and incrementalpairedgrossresponse versusfixedlastcompletedM5bodydirection onexactcommon support?",
+  "real_ARM": false,
+  "real_response_authorized": false,
+  "reports": {
+    "inference": "No p-values,CI, bootstrap,Holm/maxT, CS orconfirmation/alpha inthis28day screen; notiidtickers/weeks, no globalnull; fourweeksdo notestablishgeneralization",
+    "privacy": "Per-bar/price-bearing marketderived outputs and sensitive eventvectors onlyexistingapprovedencryptedstorage, notpublicGitHub. Publicsafe aggregateledger andciphertextreferences/hashmetadata only; no sensitiveaccountfingerprints",
+    "required": [
+      "all1576identities/all3lags/supportcounters",
+      "fixedcalendarand supportedmeans separately",
+      "672calendar3vectors withfull3x3descriptivecovariance",
+      "fourfixed7dayperiodsummaries, allnativecontexts descriptive",
+      "ruleAandB bothpositive/negative results; nodroppedlosers",
+      "completecostunknown/headroomlabels",
+      "exactinput/codesource/masksSHA256 andresources",
+      "negative/failureevidence andverifiedremoteoutputs"
+    ],
+    "stopping": "No favorable-outcomeearlystop/expansion; fixed3family andexact28daydomain; onlyintegrity/security/budgetfailurestops; preservepartialfailure evidence"
+  },
+  "schema": "mxm.existing1576.coupling.direction.response.design.v1",
+  "source_mechanism": "Intrahourprice/activity coupling from main_reentry_v1/offline_falsification.py diagnostic_maps; newdirectionalresponse question, nothistoricalalpha",
+  "status": "PROSPECTIVE_FROZEN_FOR_INDEPENDENT_AUDIT_NOT_REAL_ARM",
+  "support_and_integrity": {
+    "abstentions": "missingfeature, latefeature, zerototalactivity, zeroAorBdirection, missinglabel, domaincensor; peridentity/lag/clockcounts with exactreason; zero-directionpaired restriction disclosed as estimanddomain",
+    "exposure": "AlreadyexposedDEVELOPMENT shallow/support; PRIMARY145olderexposure retained; no protectedforward or independentconfirmation",
+    "failure": "Corrupt/hash/schema/duplicate/out-of-domain/invalidOHLCV failclosed, never silentlyrepair",
+    "requirements": "PositivefinitevalidOHLC, nonnegativeintegerbroker tickvolume, exacttimestamps/series/digests, no duplicates/revisions/offgrid; labelcomplete13bars; samecommonmaskforAandB"
+  },
+  "universe": {
+    "count": 1576,
+    "law": "ExacteligibleMASTERorder, everyidentityreported; no topK or replacement;1575qualified+QUB.AUlimitedretained",
+    "path": "research_core_v4/state/QUOTE_CURRENT_METADATA_ANDROID_FRONTIER_V1.json",
+    "sha256": "5e85a9f21229c6ccd65875ef25815468ea500e315851bc18692d99d1ae102860"
+  }
+}
