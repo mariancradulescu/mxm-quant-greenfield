@@ -1,0 +1,32 @@
+name: MXM MASTER1576 integrated streaming numeric fabricated full-frontier V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/mxm-master1576-integrated-numeric-synthetic-v1.yml
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-integrated-numeric-synthetic-v1
+  cancel-in-progress: false
+jobs:
+  exact-one-fabricated-full-frontier:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install prior accepted numeric/crypto decoder dependency
+        run: python3 -m pip install protobuf==5.29.5
+      - name: Verify source syntax and actual adapter fault barriers before invocation
+        run: |
+          python3 -m py_compile research_core_v4/numeric_development_v1/numeric_streaming_executor_v1.py research_core_v4/numeric_development_v1/numeric_machine_entrypoint_v1.py
+          python3 -m unittest -v research_core_v4.numeric_development_v1.integrated_fault_preflight_v1
+      - name: EXACTLY ONE fabricated 1576 identity, 100 shard, 4 segment streaming campaign
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ulimit -v 8388608
+          timeout --signal=TERM 3500 python3 -m research_core_v4.numeric_development_v1.numeric_machine_entrypoint_v1 --synthetic
