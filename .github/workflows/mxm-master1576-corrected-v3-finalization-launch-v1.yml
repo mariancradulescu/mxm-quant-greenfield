@@ -1,0 +1,71 @@
+name: MXM exact corrected V3 one-use remote finalization proof launch V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/mxm-master1576-corrected-v3-finalization-launch-v1.yml
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  corrected-v3-fabricated-finalization-only:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Presecret exact corrected source, existing candidate and launch identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from research_core_v4.numeric_development_v3 import authority_v3 as a
+          from research_core_v4.numeric_development_v2 import machine_v2 as m
+          from research_core_v4.numeric_development_v1 import numeric_machine_entrypoint_v1 as old
+          head=os.environ['GITHUB_SHA'];m.runtime(head)
+          path='.github/workflows/mxm-master1576-corrected-v3-finalization-launch-v1.yml'
+          a.need(os.environ['GITHUB_EVENT_NAME']=='push' and os.environ['GITHUB_WORKFLOW_REF']==old.REPO+'/'+path+'@refs/heads/'+old.BRANCH and os.environ['GITHUB_WORKFLOW_SHA']==head,'EXACT_PROOF_WORKFLOW_IDENTITY')
+          a.need(a.sha(a.git('show',head+':'+path))==a.digest(path),'LAUNCH_WORKFLOW_BYTES')
+          baseline='5d341416dc036b50d61508493429ea7056661f65'
+          a.ancestor(baseline,head)
+          a.need(a.git('diff','--name-status',baseline,head).decode().splitlines()==['A\t'+path],'LAUNCH_ONLY_NO_SOURCE_REWRITE')
+          a.need(a.digest(a.ARM)=='f982857d38a385ca77c7d3944587bf20a1669ceb062c0d807ed5e53238021749','EXISTING_ARM_CANDIDATE_SHA256')
+          arm=a.read(a.ARM)
+          a.need(arm['source_head']=='3b4d099f1bd77419056b590d47580f56149c651d' and len(arm['bindings'])==72,'CORRECTED_SOURCE_IDENTITY')
+          a.verify_bindings(arm['source_head'],head,arm['bindings'])
+          a.need(a.digest('research_core_v4/numeric_development_v3/finalization_v3.py')=='d92186d298346730a02fff6442b9a2b9775d8acaac600aec2d66ba59c24b034e','CORRECTED_FINALIZER_SHA256')
+          approval={'schema':'mxm.numeric.independent.acceptance.v3','status':'INDEPENDENT_ACCEPTANCE_PASS','mode':'real','role':'INDEPENDENT_AUDITOR','arm_sha256':a.digest(a.ARM),'source_head':arm['source_head'],'arm_commit':baseline,'audit_receipt_sha256':'a'*64,'explicit_acceptance':True}
+          # Fabricated in-memory gate fixture only. No acceptance artifact is written.
+          a.validate(arm,approval,head,'real',a.enc(arm),artifacts=False)
+          a.need(not any((a.ROOT/p).exists() for p in (a.APPROVAL,a.RECOVERY,'research_core_v4/numeric_development_v2/INDEPENDENT_ACCEPTANCE_V2.json','research_core_v4/numeric_development_v2/INDEPENDENT_RECOVERY_ACCEPTANCE_V2.json')),'REAL_ACCEPTANCE_MUST_REMAIN_ABSENT')
+          a.need(not m.existing_ref('mxm-finalization-v3-proof-'+head),'NEW_PROOF_HEAD_ALREADY_CONSUMED')
+          a.need(not m.existing_ref(m.claim_name(arm)),'REAL_EXPERIMENT_ALREADY_CLAIMED')
+          master,entries,digits,manifest=old.verify_science()
+          a.preflight_inventory(manifest,entries)
+          print('PASS_PRESECRET_72_BINDINGS_EXISTING_CANDIDATE_EXACT_LAUNCH_NO_REAL_APPROVAL')
+          PY
+      - name: Exact existing eighty tests on machine
+        run: |
+          python3 -m unittest -v research_core_v4.numeric_development_v3.test_authority_v3 research_core_v4.numeric_development_v3.test_finalization_v3 research_core_v4.numeric_development_v2.test_successor_v2 research_core_v4.numeric_development_v1.integrated_fault_preflight_v1 research_core_v4.numeric_development_v1.test_public_output_guard_v1 research_core_v4.numeric_development_v1.test_frozen_coupling_parity_v1
+      - name: One corrected fabricated remote campaign with resource and failure evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          set +e
+          timeout --signal=TERM 3500 /usr/bin/time -v -o "$RUNNER_TEMP/mxm-corrected-v3-proof-resource.txt" python3 -m research_core_v4.numeric_development_v3.fault_proof_v3
+          mxm_proof_exit=$?
+          set -e
+          if [ -f "$RUNNER_TEMP/mxm-corrected-v3-proof-resource.txt" ]; then
+            cat "$RUNNER_TEMP/mxm-corrected-v3-proof-resource.txt"
+          fi
+          echo "EXACT_CORRECTED_V3_CAMPAIGN_EXIT=$mxm_proof_exit"
+          exit "$mxm_proof_exit"
