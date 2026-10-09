@@ -1,0 +1,51 @@
+name: MXM standing historical access timestamp-only100 operational V2
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [.github/workflows/mxm-standing-timestamp-access-v2.yml]
+permissions:
+  contents: write
+concurrency:
+  group: mxm-standing-historical-timestamp-access-v1
+  cancel-in-progress: false
+jobs:
+  timestamp-access-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install existing acquisition crypto import dependency before any secret step
+        run: python3 -m pip install protobuf==5.29.5
+      - name: Verify immutable operational successor bindings
+        run: |
+          python3 - <<'PYVERIFY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('.')
+          a=json.loads((root/'research_core_v4/historical_access_v1/TIMESTAMP_ONLY_ACCESS_OPERATIONAL_ENVIRONMENT_SUCCESSOR_V2.json').read_text())
+          for p,h in a['bindings_sha256'].items():
+              assert hashlib.sha256((root/p).read_bytes()).hexdigest()==h, 'OPERATIONAL_SOURCE_HASH_DRIFT'
+          assert a['scientific_worker_changed'] is False
+          print('PASS_OPERATIONAL_BINDINGS_NO_SECRET')
+          PYVERIFY
+      - name: Verify standing authority, source and timestamp-only scope before key access
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.historical_access_v1.timestamp_access_worker_v1 --presecret-only
+      - name: Reuse existing key; timestamp-only100 with encrypted remote checkpoints
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: python3 -m research_core_v4.historical_access_v1.timestamp_access_worker_v1
+      - name: Preserve safe exact readback receipt or failure forensic evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: standing-timestamp-forensics-${{ github.run_id }}
+          path: |
+            research_core_v4/historical_access_v1/RUN_READBACK_RECEIPT_V1.json
+            research_core_v4/historical_access_v1/RUN_FAILURE_V1.json
+          if-no-files-found: error
+          retention-days: 30
