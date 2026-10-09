@@ -1,0 +1,29 @@
+name: MXM owner full authentic historical cost intersection
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/owner_frontier_v1/OWNER_FULL_COST_CAPTURE_V1.json]
+permissions:
+  contents: write
+jobs:
+  all-events-four-weeks-read-only-cost-capture:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: All original events historical quote references with encrypted checkpoints
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+        run: |
+          ulimit -v 2097152
+          ulimit -t 1800
+          timeout --signal=TERM 6600 python3 -m research_core_v4.owner_frontier_v1.execute_full_cost_capture_v1
