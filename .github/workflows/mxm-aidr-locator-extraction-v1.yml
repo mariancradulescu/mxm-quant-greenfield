@@ -1,0 +1,34 @@
+name: MXM AIDR locator extraction default deny
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/aidr_locator_v1/INDEPENDENT_EXTRACTION_ACCEPTANCE_V1.json]
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  one-independent-accepted-extraction:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Exact independent authority before key access
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m research_core_v4.aidr_locator_v1.extract_locators_v1 --preflight
+      - name: One authorized existing-source locator extraction only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 2097152
+          ulimit -t 900
+          timeout --signal=TERM 1800 python3 -m research_core_v4.aidr_locator_v1.extract_locators_v1
