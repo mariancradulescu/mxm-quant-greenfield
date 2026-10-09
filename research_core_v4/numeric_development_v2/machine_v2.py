@@ -185,11 +185,13 @@ def run(args):
     mode=args.mode
     master,entries,digits,manifest=old.verify_science()
     if mode=="real":
+        a.real_event_gate()
         a.need(args.fabricated_authority is None and args.key_dir is None and args.stop_after is None,
                "REAL_TEST_SWITCH_DENIED")
         arm=a.real_gate(head);approval_sha=a.digest(a.APPROVAL)
         # Avoidable inventory checks happen BEFORE key opening and invocation claim.
         assets=a.preflight_inventory(manifest,entries)
+        if args.previous_run is not None:a.stopped_original_preflight(arm,args.previous_run)
     else:
         a.need(args.fabricated_authority is not None,"FABRICATED_AUTHORITY_REQUIRED")
         f=json.loads(pathlib.Path(args.fabricated_authority).read_text())

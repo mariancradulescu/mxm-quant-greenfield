@@ -3,7 +3,7 @@
 Path: .github/workflows/mxm-master1576-real-numeric-v2.yml
 Entrypoint: research_core_v4.numeric_development_v2.machine_v2 --mode real
 
-Explicit workflow_dispatch only; fixed research branch, attempt1, one concurrency
+Push of a separate independent acceptance/recovery artifact or workflow_dispatch; fixed research branch, attempt1, one concurrency
 group, no cancellation of active work, no automatic retry. Before secret wiring:
 validate source commit ancestry, exact ARM/approval, all bound source hashes,
 manifest and full100 release inventory. The worker repeats those checks before
@@ -30,3 +30,8 @@ four weeks and native contexts; include per-clock vectors, descriptive3x3
 calendar covariance, denominators, reasons, source hashes and timestamp-mask
 provenance. No lag/symbol selection, netPnL, confirmatory alpha or broker receipts
 are inferred. Original receipt availability and broker costs remain unresolved.
+
+Real-mode event binding checks the exact workflow/ref and permitted event.
+Real recovery also verifies the original Actions run is completed with failure,
+cancellation or timeout, attempt1, exact original source and exact real workflow.
+It cannot race a still-running original job.

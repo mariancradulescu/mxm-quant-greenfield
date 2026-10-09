@@ -136,5 +136,26 @@ class Successor(unittest.TestCase):
              self.assertRaisesRegex(n.NumericalStop,"MISSING_INDEPENDENT_APPROVAL"):
             a.real_gate("a"*40)
         download.assert_not_called()
+    def test_exact_real_workflow_event(self):
+        with patch.dict(os.environ,{"GITHUB_EVENT_NAME":"push","GITHUB_WORKFLOW_REF":old.REPO+"/"+a.REAL_WORKFLOW+"@refs/heads/"+old.BRANCH}):
+            a.real_event_gate()
+        with patch.dict(os.environ,{"GITHUB_EVENT_NAME":"push","GITHUB_WORKFLOW_REF":"wrong"}),\
+             self.assertRaisesRegex(n.NumericalStop,"REAL_WORKFLOW_EVENT_BINDING"):
+            a.real_event_gate()
+    def test_recovery_original_actions_run_must_be_stopped(self):
+        arm={**self.arm,"mode":"real"}
+        name="mxm-numeric-v2-claim-real-"+arm["invocation_id"]
+        refs=[{"ref":"refs/tags/"+name,"object":{"sha":"a"*40}}]
+        run={"id":123,"head_sha":"a"*40,"run_attempt":1,"path":a.REAL_WORKFLOW,"status":"completed","conclusion":"failure"}
+        with patch.object(old,"api",side_effect=[refs,run]):a.stopped_original_preflight(arm,123)
+        with patch.object(old,"api",side_effect=[refs,{**run,"status":"in_progress","conclusion":None}]),\
+             self.assertRaisesRegex(n.NumericalStop,"ORIGINAL_RUN_MUST_BE_STOPPED_AND_FAILED"):
+            a.stopped_original_preflight(arm,123)
+    def test_recovery_original_wrong_workflow_or_source_rejected(self):
+        arm={**self.arm,"mode":"real"};name="mxm-numeric-v2-claim-real-"+arm["invocation_id"]
+        refs=[{"ref":"refs/tags/"+name,"object":{"sha":"a"*40}}]
+        run={"id":123,"head_sha":"b"*40,"run_attempt":1,"path":"wrong","status":"completed","conclusion":"failure"}
+        with patch.object(old,"api",side_effect=[refs,run]),self.assertRaises(n.NumericalStop):
+            a.stopped_original_preflight(arm,123)
 
 if __name__=="__main__":unittest.main(verbosity=2)

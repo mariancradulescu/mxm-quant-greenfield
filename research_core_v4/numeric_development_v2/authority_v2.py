@@ -28,6 +28,7 @@ SCOPE={"experiment":EXPERIMENT,"purpose":"DESCRIPTIVE_GROSS_DEVELOPMENT_ONLY",
        "attempts":1,"automatic_retries":0,"broker_requests":0,
        "protected_forward":False,"new_alpha":False,"live_orders":False}
 BUDGET={"wall_seconds":3600,"cpu_seconds":7200,"ram_kib":8388608,"workers":1}
+REAL_WORKFLOW=".github/workflows/mxm-master1576-real-numeric-v2.yml"
 
 def need(ok,code):old.need(ok,code)
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -127,3 +128,23 @@ def preflight_inventory(manifest,entries):
         need(a["digest"]=="sha256:"+e["ENCRYPTED_ASSET_SHA256"] and 0<a["size"]<128*1024*1024,
              "INPUT_CIPHER_SHA_OR_SIZE")
     return names
+
+def real_event_gate():
+    """Real authority is usable only through the exact bound machine workflow."""
+    import os
+    need(os.environ.get("GITHUB_EVENT_NAME") in ("push","workflow_dispatch") and
+         os.environ.get("GITHUB_WORKFLOW_REF")==old.REPO+"/"+REAL_WORKFLOW+"@refs/heads/"+old.BRANCH,
+         "REAL_WORKFLOW_EVENT_BINDING")
+
+def stopped_original_preflight(arm,previous):
+    """A real recovery must never race a still-running original Actions job."""
+    need(type(previous) is int and previous>0,"PREVIOUS_RUN_FORMAT")
+    name="mxm-numeric-v2-claim-real-"+arm["invocation_id"]
+    refs=old.api("git/matching-refs/tags/"+name)
+    matches=[r for r in refs if r["ref"]=="refs/tags/"+name]
+    need(len(matches)==1,"ORIGINAL_INVOCATION_NOT_CLAIMED")
+    run=old.api("actions/runs/"+str(previous))
+    need(run["id"]==previous and run["head_sha"]==matches[0]["object"]["sha"] and
+         run["run_attempt"]==1 and run["path"]==REAL_WORKFLOW and
+         run["status"]=="completed" and run["conclusion"] in ("failure","cancelled","timed_out"),
+         "ORIGINAL_RUN_MUST_BE_STOPPED_AND_FAILED")

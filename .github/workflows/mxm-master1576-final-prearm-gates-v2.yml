@@ -1,0 +1,29 @@
+name: MXM MASTER1576 final real gate verification only NO numeric invocation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [.github/workflows/mxm-master1576-final-prearm-gates-v2.yml]
+permissions:
+  contents: read
+jobs:
+  exact-final-source-gates-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: All final authority/source/failure tests no scientific invocation
+        run: |
+          python3 -m unittest -v research_core_v4.numeric_development_v2.test_successor_v2 research_core_v4.numeric_development_v1.integrated_fault_preflight_v1 research_core_v4.numeric_development_v1.test_public_output_guard_v1 research_core_v4.numeric_development_v1.test_frozen_coupling_parity_v1
+          python3 - <<'PY'
+          import os
+          from research_core_v4.numeric_development_v2 import authority_v2 as a
+          from research_core_v4.numeric_development_v1 import numeric_machine_entrypoint_v1 as old
+          a.verify_bindings(os.environ['GITHUB_SHA'],os.environ['GITHUB_SHA'],a.read(a.BINDINGS)['bindings'])
+          old.verify_science()
+          a.need(not (a.ROOT/a.APPROVAL).exists(),'REAL_ACCEPTANCE_MUST_REMAIN_ABSENT')
+          print('PASS_FINAL_EXACT_SOURCE_HASHES_AND_DEFAULT_DENY_NO_INVOCATION')
+          PY
