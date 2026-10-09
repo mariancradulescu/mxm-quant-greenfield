@@ -1,135 +1,53 @@
-name: MXM diverse wave V2 authenticated completed real result readback only
+name: MXM exact readback log confidentiality containment only
 on:
   push:
     branches: [performance-research-v3-20260922]
     paths: [.github/workflows/mxm-master1576-diverse-wave-authentic-readback-v2.yml]
 permissions:
-  contents: write
-concurrency:
-  group: mxm-master1576-exact-real-numeric-development-v2
-  cancel-in-progress: false
+  contents: read
+  actions: write
 jobs:
-  authenticate-completed-result-and-requested-global-aggregates:
-    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+  remove-exact-disclosing-reader-log:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    env:
-      PYTHONPATH: ${{ github.workspace }}
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      - run: python3 -m pip install protobuf==5.29.5
-      - name: Presecret completed original authority and exact read-only script
+      - name: Preserve completed encrypted evidence and remove only exact reader logs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          umask 077
-          cat > "$RUNNER_TEMP/diverse_reader_v2.py" <<'PY'
-          import json,math,os,pathlib,tempfile,sys
-          from research_core_v4.diverse_mechanism_wave_v2 import authority_v2 as a,worker_v2 as w
-          from research_core_v4.numeric_development_v1.public_output_guard_v1 import validate_public_blob,ROOT as PUB
-          RUN=37950879700
-          ORIGINAL_HEAD='793f198a24262d4b9ceb5b2820bb30e99619b34f'
-          ARM_SHA='9c91c7263bce5e7afd73616c56f10c437bb6d81e71a701b926489595863a238a'
-          APPROVAL_SHA='64bfb9c96f81250e251d2c944317429cae4882c38534abd5908fa9cfb34f2af5'
-          WORKFLOW='.github/workflows/mxm-master1576-diverse-wave-authentic-readback-v2.yml'
-          FIELDS={'calendar','supported','feature_valid','emitted_before_maturity','gross_calendar_bps','gross_supported_bps','flat_baseline_gross_bps','increment_calendar_bps','increment_supported_bps','gross_sum','gross_sum_square','reasons','emitted_per_identity_calendar_week'}
-          
-          
-          def approved_cell(summary,denominator,mechanism):
-              a.need(type(summary) is dict and set(summary)==FIELDS|{'h2_diagnostic'},'READBACK_PRIVATE_SUMMARY_FIELDS')
-              # Verify the private diagnostic before excluding it from public output.
-              w.validate_metric({'n':summary['supported'],'sum':summary['gross_sum'],'sum_square':summary['gross_sum_square'],'feature_valid':summary['feature_valid'],'emitted':summary['emitted_before_maturity'],'reasons':summary['reasons'],'h2_diagnostic':summary['h2_diagnostic']},mechanism)
-              cell={key:summary[key] for key in FIELDS}
-              a.need(cell['calendar']==denominator and sum(cell['reasons'].values())==denominator,'READBACK_CALENDAR')
-              a.need(all(type(cell[x]) is int and 0<=cell[x]<=denominator for x in ('calendar','supported','feature_valid','emitted_before_maturity')),'READBACK_COUNT_FIELDS')
-              a.need(cell['flat_baseline_gross_bps']==0. and cell['increment_calendar_bps']==cell['gross_calendar_bps'] and cell['increment_supported_bps']==cell['gross_supported_bps'],'READBACK_FLAT_PAIRING')
-              a.need(cell['gross_calendar_bps']==cell['gross_sum']/denominator and cell['gross_supported_bps']==(cell['gross_sum']/cell['supported'] if cell['supported'] else None),'READBACK_GROSS_ESTIMAND')
-              for x in ('gross_calendar_bps','gross_supported_bps','flat_baseline_gross_bps','increment_calendar_bps','increment_supported_bps','gross_sum','gross_sum_square','emitted_per_identity_calendar_week'):
-                  a.need((x in ('gross_supported_bps','increment_supported_bps') and cell['supported']==0 and cell[x] is None) or (type(cell[x]) in (int,float) and math.isfinite(cell[x])),'READBACK_FINITE_AGGREGATE')
-              return cell
-          
-          
-          def preflight():
-              head=os.environ['GITHUB_SHA'];w.v2.runtime(head);arm=a.real_gate(head)
-              a.need(a.digest(a.ARM)==ARM_SHA and a.digest(a.APPROVAL)==APPROVAL_SHA,'READBACK_EXACT_ORIGINAL_AUTHORITY')
-              a.need(os.environ['GITHUB_EVENT_NAME']=='push' and os.environ['GITHUB_WORKFLOW_REF']==a.old.REPO+'/'+WORKFLOW+'@refs/heads/'+a.old.BRANCH and os.environ['GITHUB_WORKFLOW_SHA']==head,'READBACK_EXACT_WORKFLOW')
-              a.need(a.sha(a.git('show',head+':'+WORKFLOW))==a.digest(WORKFLOW),'READBACK_WORKFLOW_BYTES')
-              run=a.old.api('actions/runs/'+str(RUN))
-              a.need(run['status']=='completed' and run['conclusion']=='success' and run['run_attempt']==1 and run['head_sha']==ORIGINAL_HEAD and run['path']==a.WORKFLOW,'READBACK_ORIGINAL_SUCCESS_REQUIRED')
-              refs=w.v2.existing_ref(w.v2.claim_name(arm));a.need(len(refs)==1 and refs[0]['object']['sha']==ORIGINAL_HEAD,'READBACK_CONSUMED_ORIGINAL_ONLY')
-              refs=w.v2.existing_ref('mxm-numeric-v3-complete-real-'+arm['invocation_id']);a.need(len(refs)==1,'READBACK_AUTHORITATIVE_COMPLETION')
-              a.ancestor(ORIGINAL_HEAD,refs[0]['object']['sha']);a.ancestor(refs[0]['object']['sha'],head)
-              return head,arm
-          
-          
-          def main():
-              os.umask(0o077);head,arm=preflight();w.install_identity_adapter()
-              with tempfile.TemporaryDirectory(prefix='mxm-diverse-completed-reader-',dir=os.environ['RUNNER_TEMP']) as td:
-                  tmp=pathlib.Path(td);tmp.chmod(0o700);key,fp=w.old._private_key_from_secret(tmp);a.need(fp==w.old.FP,'READBACK_KEY_FINGERPRINT')
-                  store=w.Store(head,key,a.ROOT/w.old.PUBLIC_KEY,tmp,arm,APPROVAL_SHA,fp)
-                  store.original_run=RUN;store.name=w.v2.release_name(arm,RUN);store.release=w.old.api('releases/tags/'+store.name)
-                  a.need(store.release['target_commitish']==ORIGINAL_HEAD,'READBACK_RELEASE_BINDING')
-                  completion=w.f.verify_complete(store);a.need(completion is not None,'READBACK_COMPLETE_ENCRYPTED_DELIVERY')
-                  journal,jmeta=store.load_named(w.f.JOURNAL);w.validate_journal(store,journal);r=journal['report'];e=journal['engine']
-                  att,attmeta=store.load_named(w.f.ATTEST,completion['attestation']['ciphertext_sha256']);receipt=store.restore(att['receipt'])
-                  a.need(receipt['journal']==att['journal'] and receipt['report']['canonical_sha256']==a.sha(a.enc(r)) and receipt['state']['canonical_sha256']==a.sha(a.enc(e)),'READBACK_EXACT_REPORT_STATE_SHA256')
-                  lineage={'journal':jmeta,'report':receipt['report'],'state':receipt['state'],'receipt':att['receipt'],'attestation':attmeta,'prefix_assets':journal['prefix_assets']}
-                  a.need(r['rows']==e['rows']==3355389 and r['input_shards']==e['next_shard']==100 and all(s['next_clock']==672 for s in e['states']),'READBACK_FULL100_REQUIRED')
-                  a.need(r['costs']=='COST_UNRESOLVED' and r['claim']=='STANDALONE_GROSS_EXPLORATORY_DEVELOPMENT_ONLY' and r['protected_forward'] is False and r['net_PnL_claimed'] is False,'READBACK_ECONOMIC_SCOPE')
-                  lags={};private_h2={}
-                  for lag in map(str,w.k.LAGS):
-                      full={};weeks=[{} for _ in range(4)];private_h2[lag]={}
-                      for mech in w.k.MECHANISMS:
-                          summary=r['full_frontier'][lag][mech];full[mech]=approved_cell(summary,1576*672,mech)
-                          private_h2[lag][mech]={'full_frontier':summary['h2_diagnostic'],'four_weeks':[]}
-                          for week in range(4):
-                              ss=r['four_weeks'][lag][week][mech];weeks[week][mech]=approved_cell(ss,1576*168,mech);private_h2[lag][mech]['four_weeks'].append(ss['h2_diagnostic'])
-                          a.need(all(sum(week[mech][x] for week in weeks)==full[mech][x] for x in ('supported','feature_valid','emitted_before_maturity')),'READBACK_WEEK_COUNTS')
-                          a.need(all(sum(week[mech]['reasons'][reason] for week in weeks)==full[mech]['reasons'][reason] for reason in w.REASONS),'READBACK_WEEK_REASONS')
-                      lags[lag]={'full_frontier':full,'four_weeks':weeks}
-                  document={'schema':'mxm.diverse.wave.task.approved.global.aggregates.v2','original_run_id':RUN,'original_approval_head':ORIGINAL_HEAD,'arm_sha256':ARM_SHA,'source_head':arm['source_head'],'scientific_design_sha256':a.DESIGN_SHA,'completion_commit':completion['completion_commit'],'identities':1576,'shards':100,'rows':3355389,'units':'gross_log_bps','mechanisms':list(w.k.MECHANISMS),'lags':lags,'costs':r['costs'],'claim':r['claim'],'receipt_provenance':r['receipt_provenance'],'net_PnL_claimed':False,'protected_forward':False,'all1576_identity_weekly_reconciliation':'PASS','private_h2_diagnostic_reconciliation':'PASS_ALL_IDENTITIES_SIX_CELLS_FOUR_WEEKS','private_h2_diagnostic_counts_publicly_disclosed':False,'scientific_kernel_calls':0,'historical_input_downloads':0}
-                  # Task-specific full-frontier projection: no identity/time/context vectors.
-                  a.need(set(document)=={'schema','original_run_id','original_approval_head','arm_sha256','source_head','scientific_design_sha256','completion_commit','identities','shards','rows','units','mechanisms','lags','costs','claim','receipt_provenance','net_PnL_claimed','protected_forward','all1576_identity_weekly_reconciliation','private_h2_diagnostic_reconciliation','private_h2_diagnostic_counts_publicly_disclosed','scientific_kernel_calls','historical_input_downloads'},'READBACK_PUBLIC_FIELDS')
-                  a.need(set(document['lags'])=={'0','300','900'} and document['mechanisms']==list(w.k.MECHANISMS),'READBACK_PUBLIC_SIX_CELLS')
-                  a.need(all(set(item)=={'full_frontier','four_weeks'} and set(item['full_frontier'])==set(w.k.MECHANISMS) and len(item['four_weeks'])==4 and all(set(week)==set(w.k.MECHANISMS) for week in item['four_weeks']) for item in document['lags'].values()),'READBACK_PUBLIC_WEEK_SHAPE')
-                  safe=a.enc(document);a.need(len(safe)<65536,'READBACK_PUBLIC_SIZE')
-                  evidence=store.encrypted({'schema':'mxm.diverse.wave.authentic.encrypted.readback.v2','reader_head':head,'reader_run':int(os.environ['GITHUB_RUN_ID']),'completion':completion,'journal':jmeta,'encrypted_artifact_lineage':lineage,'approved_global_aggregates':document,'private_full_frontier_h2_diagnostics':private_h2,'all_identity_weekly_private_diagnostics':'AUTHENTICATED_AND_VALIDATED_IN_ORIGINAL_ENCRYPTED_JOURNAL','scientific_response_replayed':False,'historical_input_downloads':0,'resources':w.old.usage()},'authentic-diverse-wave-readback.mxmenc')
-                  # Preserve the original completion's Release body; publish only guarded status.
-                  usage=w.old.usage();status=w.safe_status(head,'PUBLICATION','PASS',run_id=int(os.environ['GITHUB_RUN_ID']),encrypted_artifact_name=evidence['name'],encrypted_artifact_sha256=evidence['ciphertext_sha256'],resource_cpu_seconds=usage['cpu_seconds'],resource_wall_seconds=usage['wall_seconds'],resource_peak_ram_kib=usage['peak_kib'],failure_code='NONE')
-                  w.old.budget(maxwall=800)
-                  public=store.publish_exact(status,PUB+'DIVERSE_WAVE_V2_AUTHENTIC_READBACK_V1.json')
-                  a.need(w.f.verify_complete(store) is not None,'READBACK_ORIGINAL_COMPLETION_PRESERVED')
-                  print('APPROVED_DIVERSE_GLOBAL_AGGREGATES_V2='+safe.decode().strip(),flush=True)
-                  print('AUTHENTIC_DIVERSE_ENCRYPTED_READBACK='+json.dumps({'status':'PASS_COMPLETE_AUTHENTIC_ENCRYPTED_READBACK','reader_head':head,'reader_run':int(os.environ['GITHUB_RUN_ID']),'original_run':RUN,'completion':completion,'journal':jmeta,'encrypted_artifact_lineage':lineage,'evidence':evidence,'public_git':public,'resources':w.old.usage(),'scientific_kernel_calls':0,'historical_input_downloads':0,'private_h2_diagnostic_reconciliation':'PASS_ENCRYPTED_ONLY'}),flush=True)
-          
-          
-          if __name__=='__main__':
+          python3 - <<'PY'
+          import json,os,sys,urllib.request,urllib.error
+          base='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs): return None
+          opener=urllib.request.build_opener(NoRedirect)
+          def request(path,method='GET'):
+              req=urllib.request.Request(base+path,headers=headers,method=method)
               try:
-                  if sys.argv[1:]==['--preflight']:preflight();print('PASS_EXACT_COMPLETED_ORIGINAL_READBACK_PREFLIGHT',flush=True)
-                  elif not sys.argv[1:]:main()
-                  else:raise w.n.NumericalStop('READBACK_ARGUMENTS_DENIED')
-              except Exception as exc:
-                  print(json.dumps({'status':'FAIL_CLOSED','code':str(exc.args[0]) if isinstance(exc,w.n.NumericalStop) and exc.args else 'READBACK_FAILURE','scientific_kernel_calls':0,'historical_input_downloads':0}),flush=True);raise SystemExit(2) from None
+                  with opener.open(req,timeout=30) as response: return response.status,response.read()
+              except urllib.error.HTTPError as exc: return exc.code,b''
+          def get(path):
+              code,body=request(path);assert code==200,'METADATA_READBACK_FAILURE';return json.loads(body)
+          try:
+              reader=get('actions/runs/37951902101')
+              assert reader['head_sha']=='e8700131a12eba2c08ddd2c0aceb3219fb51eee4' and reader['path']=='.github/workflows/mxm-master1576-diverse-wave-authentic-readback-v2.yml' and reader['run_attempt']==1 and reader['conclusion']=='success','EXACT_READER_MISMATCH'
+              original=get('actions/runs/37950879700')
+              assert original['head_sha']=='793f198a24262d4b9ceb5b2820bb30e99619b34f' and original['run_attempt']==1 and original['conclusion']=='success','ORIGINAL_EXECUTION_MISMATCH'
+              invocation='30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584'
+              assert get('git/ref/tags/mxm-numeric-v2-claim-real-'+invocation)['object']['sha']=='793f198a24262d4b9ceb5b2820bb30e99619b34f','CLAIM_CHANGED'
+              assert get('git/ref/tags/mxm-numeric-v3-complete-real-'+invocation)['object']['sha']=='ffee8b68bedc0a0556b818aa11e47b644dc5ec2c','COMPLETION_CHANGED'
+              release=get('releases/408041914');assets={x['name']:x for x in release['assets']}
+              assert release['tag_name']=='mxm-numeric-v2-real-30b4191766bc-37950879700' and len(assets)==14,'RELEASE_CHANGED'
+              for name,digest in {'complete-development-result.mxmenc':'7487d0efd880d56b48ee59299d06edc16d337493f46ca580dbbf5502e9d18e7d','authentic-diverse-wave-readback.mxmenc':'d9e6a17e700804b34d91a46563fbd7dd5dbab43fdd8fd9a7e4223aff4170bc94'}.items():
+                  assert assets[name]['digest']=='sha256:'+digest,'ENCRYPTED_EVIDENCE_CHANGED'
+              code,_=request('actions/runs/37951902101/logs','DELETE');assert code==204,'EXACT_LOG_DELETION_REJECTED'
+              rcode,_=request('actions/runs/37951902101/logs');jcode,_=request('actions/jobs/113892536825/logs')
+              assert rcode in (404,410) and jcode in (404,410),'LOG_REMOVAL_READBACK_FAILED'
+              assert get('actions/runs/37951902101')['conclusion']=='success','READER_METADATA_CHANGED'
+              print(json.dumps({'status':'PASS_EXACT_READER_LOG_REMOVAL','removed_run':37951902101,'removed_job':113892536825,'delete_http_status':code,'run_logs_http_status':rcode,'job_logs_http_status':jcode,'encrypted_assets_preserved':14,'original_execution_preserved':True,'completion_ref_preserved':True,'scientific_invocations':0,'historical_input_downloads':0,'private_key_access':False}))
+          except Exception as exc:
+              code=str(exc.args[0]) if isinstance(exc,AssertionError) and exc.args else 'CONTAINMENT_FAILURE'
+              print(json.dumps({'status':'FAIL_CLOSED','code':code,'scientific_invocations':0,'private_key_access':False}));sys.exit(2)
           PY
-          python3 - <<'PY'
-          import os,pathlib,hashlib
-          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'diverse_reader_v2.py'
-          assert hashlib.sha256(p.read_bytes()).hexdigest()=='6a5bda0a1ee728114a460154d233f2728f23ba4cba03cd10bcf27c2e9f38b930'
-          PY
-          python3 "$RUNNER_TEMP/diverse_reader_v2.py" --preflight
-      - name: Read completed encrypted outputs only and project authorized full-frontier results
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-        run: |
-          ulimit -v 8388608
-          ulimit -t 7200
-          python3 - <<'PY'
-          import os,pathlib,hashlib
-          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'diverse_reader_v2.py'
-          assert hashlib.sha256(p.read_bytes()).hexdigest()=='6a5bda0a1ee728114a460154d233f2728f23ba4cba03cd10bcf27c2e9f38b930'
-          PY
-          timeout --signal=TERM 800 python3 "$RUNNER_TEMP/diverse_reader_v2.py"
