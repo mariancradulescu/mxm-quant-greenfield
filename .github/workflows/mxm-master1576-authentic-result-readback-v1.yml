@@ -1,0 +1,41 @@
+name: MXM authentic completed V3 encrypted result readback only V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - .github/workflows/mxm-master1576-authentic-result-readback-v1.yml
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-authentic-result-readback-37927463493
+  cancel-in-progress: false
+jobs:
+  completed-result-readback-only:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Presecret immutable source, exact reader and completed original authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, pathlib
+          p=pathlib.Path('research_core_v4/numeric_development_v3/authentic_result_readback_v1/reader_v1.py')
+          assert hashlib.sha256(p.read_bytes()).hexdigest()=='ea1b585a0b09aa35fbfef70057102daa0a090e803e60e6cd3a0d0add6c90ed08'
+          from research_core_v4.numeric_development_v3.authentic_result_readback_v1.reader_v1 import preflight
+          preflight()
+          print('PASS_PRESECRET_COMPLETED_ORIGINAL_AND_UNCHANGED_72_SOURCES')
+          PY
+      - name: Authenticate already completed encrypted bytes and task-approved global aggregates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          timeout --signal=TERM 800 python3 -m research_core_v4.numeric_development_v3.authentic_result_readback_v1.reader_v1
