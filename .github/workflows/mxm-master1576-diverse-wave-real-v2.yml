@@ -1,0 +1,67 @@
+name: MXM MASTER1576 diverse wave operational V2 real default deny
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/diverse_mechanism_wave_v2/INDEPENDENT_ACCEPTANCE_V2.json, research_core_v4/diverse_mechanism_wave_v2/INDEPENDENT_RECOVERY_ACCEPTANCE_V2.json]
+  workflow_dispatch:
+    inputs:
+      accepted_source_head:
+        description: Exact independently accepted source commit
+        required: true
+        type: string
+      previous_run:
+        description: Original failed invocation requiring separate recovery acceptance
+        required: false
+        type: string
+      accepted_arm_sha256:
+        description: Exact independently accepted ARM digest
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-exact-real-numeric-development-v2
+  cancel-in-progress: false
+jobs:
+  one-approved-wave:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Presecret independent acceptance and all deterministic source gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SOURCE_HEAD: ${{ inputs.accepted_source_head }}
+          PREVIOUS_RUN: ${{ inputs.previous_run }}
+          EXPECTED_ARM_SHA256: ${{ inputs.accepted_arm_sha256 }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from research_core_v4.diverse_mechanism_wave_v2 import authority_v2 as a
+          from research_core_v4.numeric_development_v2 import machine_v2 as v2
+          head=os.environ['GITHUB_SHA'];v2.runtime(head);arm=a.real_gate(head);a.real_event_gate()
+          if os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch':
+              a.need(arm['source_head']==os.environ['EXPECTED_SOURCE_HEAD'] and a.digest(a.ARM)==os.environ['EXPECTED_ARM_SHA256'],'DISPATCH_APPROVAL_DRIFT')
+          master,entries,digits,manifest=a.old.verify_science();a.olda.preflight_inventory(manifest,entries)
+          previous=os.environ.get('PREVIOUS_RUN') or (str(a.read(a.RECOVERY)['previous_run_id']) if (a.ROOT/a.RECOVERY).is_file() else '')
+          if previous:
+              auth=a.recovery_document(head);a.stopped_original_preflight(arm,int(previous));a.need(auth['previous_run_id']==int(previous),'RECOVERY_RUN_DRIFT')
+          else:a.need(not v2.existing_ref(v2.claim_name(arm)),'CONSUMED_WAVE_ARM')
+          with open(os.environ['GITHUB_ENV'],'a') as ef:ef.write('WAVE_PREVIOUS_RUN='+previous+'\n')
+          print('PASS_PRESECRET_WAVE_SOURCE_AND_INDEPENDENT_AUTHORITY')
+          PY
+      - name: Exactly one approved original scientific invocation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          ulimit -t 7200
+          args=()
+          if [ -n "$WAVE_PREVIOUS_RUN" ]; then args+=(--previous-run "$WAVE_PREVIOUS_RUN"); fi
+          timeout --signal=TERM 3400 python3 -m research_core_v4.diverse_mechanism_wave_v2.worker_v2 --mode real "${args[@]}"

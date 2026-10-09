@@ -1,0 +1,46 @@
+name: MXM diverse wave V2 one targeted fabricated operational proof
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/diverse_mechanism_wave_v2/SYNTHETIC_LAUNCH_V2.json]
+permissions:
+  contents: write
+concurrency:
+  group: mxm-master1576-diverse-wave-operational-v2-fabricated
+  cancel-in-progress: false
+jobs:
+  exact-diagnostics-and-actual-cold-process:
+    if: github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Exact fabricated source and default deny before key opening
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from research_core_v4.diverse_mechanism_wave_v2 import authority_v2 as a
+          from research_core_v4.numeric_development_v2 import machine_v2 as v2
+          head=os.environ['GITHUB_SHA'];v2.runtime(head);a.unavailable_acceptance_preflight()
+          source=a.git('log','-1','--format=%H',head,'--',a.BINDINGS).decode().strip()
+          arm=a.candidate(source,a.read(a.BINDINGS)['bindings'],'synthetic');a.validate_candidate(head,arm,'synthetic')
+          try:a.real_gate(head)
+          except Exception as e:
+              a.need(e.args and e.args[0]=='MISSING_INDEPENDENT_WAVE_ACCEPTANCE','EXACT_DEFAULT_DENY_FAILURE')
+          else:raise SystemExit('REAL_DEFAULT_DENY_FAILED')
+          print('PASS_EXACT_SOURCE_REAL_DENIED_FABRICATED_ONLY')
+          PY
+      - name: One bounded fabricated diagnostic and scientific recovery campaign
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          ulimit -v 8388608
+          ulimit -t 7200
+          timeout --signal=TERM 3400 python3 -m research_core_v4.diverse_mechanism_wave_v2.integration_proof_v2
