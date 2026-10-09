@@ -1,0 +1,472 @@
+{
+  "blockers": [
+    {
+      "blocks": "Full original mathematical recovery and unconditional project-wide priority claim",
+      "classification": "ORIGINAL_SOURCE_NOT_RECOVERABLE",
+      "evidence": "Conversation-search returned error; prior handoff is secondary; deleted/other branch sources not fully inventoried",
+      "id": "ORIGINAL_SOURCE_ACCESS_AND_COVERAGE",
+      "smallest_discriminator": "Read-only restore original conversation retrieval and exact matching source record; no user manual export required."
+    },
+    {
+      "blocks": "Complete lineage/formula inventory claim",
+      "classification": "OPEN_UNTESTED",
+      "evidence": "3403source blobs indexed; bounded24 thematic entries plus51closure nodes, not every historical source reviewed",
+      "id": "SCIENTIFIC_COVERAGE_PARTIAL",
+      "smallest_discriminator": "Resume verified unreviewed sources using immutable source inventory after access boundary resolves; no scientific reruns."
+    },
+    {
+      "blocks": "Actual exploratory execution",
+      "classification": "OPEN_UNTESTED",
+      "evidence": "Two accepted ZIP metadata located, bytes not currently verified on GitHub runner; V2 HOST_LAYOUT rejects ephemeral overlay; full host/archive binding unproven",
+      "id": "PRIMARY145_REAL_ARCHIVE_BYTE_HOST_BINDING",
+      "smallest_discriminator": "Outcome-blind archive SHA256 plus all145 member identities/count/header hashes on approved existing execution/storage route, without CSV numeric model opening; stop on security/deployment blocker."
+    },
+    {
+      "classification": "OPEN_NOT_ACCEPTED_FOR_REAL_EXECUTION",
+      "consequence": "Never use this provider for real execution; any publication failure classified NOT_PERSISTED; no false PASS.",
+      "exact_source_main": "def main():\n    head = os.environ[\"GITHUB_SHA\"]\n    run_id = os.environ[\"GITHUB_RUN_ID\"]\n    destination = Path(os.environ[\"RUNNER_TEMP\"])\n    result = {\"schema\": \"mxm.primary145.github-provider.synthetic-preflight.v1\",\n              \"source_head\": head, \"workflow_run_id\": run_id,\n              \"real_arm\": False, \"real_signature\": False, \"real_key\": False,\n              \"real_numeric_openings\": 0, \"broker_requests\": 0, \"protected_forward_rows\": 0,\n              \"science_modified\": False, \"status\": \"BLOCKED\", \"steps\": []}\n    branch = f\"mxm-primary145-synthetic-{head[:20]}\"\n    tag = f\"mxm-primary145-synthetic-{head[:20]}\"\n    result[\"durable_scratch_branch\"] = branch\n    result[\"durable_release_tag\"] = tag\n    try:\n        if any(os.getenv(x) for x in ENV_DENY):\n            raise RuntimeError(\"FORBIDDEN_REAL_CREDENTIAL_ENVIRONMENT\")\n        if len(head) != 40 or any(c not in \"0123456789abcdef\" for c in head):\n            raise RuntimeError(\"INVALID_SOURCE_HEAD\")\n        guard_live(head)\n        from research_core_v4.exploratory_dev_v2.gate import signed_scope\n        scope = signed_scope()\n        if len(scope) != 75:\n            raise RuntimeError(f\"WRONG_SIGNED_SCOPE_{len(scope)}\")\n        result[\"signed_dependency_sha256_count\"] = 75\n        result[\"steps\"].append(\"LIVE_HEAD_AND_75_FROZEN_SHA256_PASS\")\n\n        # Existence of a deterministic campaign branch refuses repeated invocations.\n        create = gh(\"api\", \"-X\", \"POST\", f\"repos/{REPO}/git/refs\",\n                    \"-f\", f\"ref=refs/heads/{branch}\", \"-f\", f\"sha={head}\", check=False)\n        if create.returncode:\n            raise RuntimeError(\"CAMPAIGN_ALREADY_RESERVED_NO_REPLAY_OR_PROVIDER_FAILURE\")\n        reservation = canonical({\"schema\": \"mxm.primary145.synthetic-reservation.v1\",\n                                 \"source_head\": head, \"run_id\": run_id,\n                                 \"consumed\": True, \"budget_CPU_seconds\": 7200,\n                                 \"accepted_corpus_passes\": 1})\n        content_put(branch, \"RESERVATION_SYNTHETIC_V1.json\", reservation)\n        if content_get(branch, \"RESERVATION_SYNTHETIC_V1.json\")[0] != reservation:\n            raise RuntimeError(\"DURABLE_RESERVATION_ROUNDTRIP\")\n        conflict = gh(\"api\", \"-X\", \"PUT\",\n                      f\"repos/{REPO}/contents/{PREFIX}/RESERVATION_SYNTHETIC_V1.json\",\n                      \"-f\", f\"branch={branch}\", \"-f\", \"message=illegal synthetic replay\",\n                      \"-f\", \"content=\" + base64.b64encode(reservation).decode(), check=False)\n        if conflict.returncode == 0:\n            raise RuntimeError(\"NO_REPLAY_CREATE_WITHOUT_SHA_ACCEPTED\")\n        result[\"steps\"].append(\"GITHUB_REMOTE_RESERVATION_AND_NO_REPLAY_PASS\")\n\n        # Durable byte store: fresh release with exactly two fabricated ZIPs.\n        release = gh(\"release\", \"create\", tag, \"--repo\", REPO, \"--target\", head,\n                     \"--title\", f\"PRIMARY145 synthetic provider {head[:12]}\",\n                     \"--notes\", \"Fabricated metadata only. NOT a real ARM or real market corpus.\",\n                     check=False)\n        if release.returncode:\n            raise RuntimeError(\"GITHUB_RELEASE_CREATE_BLOCKED:\" + release.stderr[:250])\n        digests = fabricated_zips(destination, head)\n        (destination / \"redownload\").mkdir(exist_ok=True)\n        for name, digest in digests.items():\n            gh(\"release\", \"upload\", tag, str(destination / name), \"--repo\", REPO)\n            gh(\"release\", \"download\", tag, \"--repo\", REPO, \"--pattern\", name,\n               \"--dir\", str(destination / \"redownload\"))\n            if sha((destination / \"redownload\" / name).read_bytes()) != digest:\n                raise RuntimeError(\"GITHUB_RELEASE_BYTE_ROUNDTRIP_MISMATCH\")\n        result[\"fabricated_archives_sha256\"] = digests\n        result[\"steps\"].append(\"TWO_GITHUB_RELEASE_ASSETS_SHA256_ROUNDTRIP_PASS\")\n\n        # Synthetic one-pass consumer. Commit a forensic midpoint; disallow\n        # reentry, then finish in the SAME invocation. No source replay on crash.\n        ids = []\n        cp_sha = None\n        for name in sorted(digests):\n            with zipfile.ZipFile(destination / \"redownload\" / name) as z:\n                for member in z.namelist():\n                    raw = z.read(member)\n                    if b\"NOT_MARKET_DATA\" not in raw:\n                        raise RuntimeError(\"NONFABRICATED_INPUT\")\n                    ids.append(int(member.split(\"/\")[-1].split(\".\")[0]))\n            cp = canonical({\"source_head\": head, \"run_id\": run_id,\n                            \"parsed_fabricated_identities\": len(ids),\n                            \"complete\": False, \"no_replay\": True})\n            content_put(branch, \"CHECKPOINT_SYNTHETIC_V1.json\", cp, cp_sha)\n            observed, cp_sha = content_get(branch, \"CHECKPOINT_SYNTHETIC_V1.json\")\n            if cp != observed:\n                raise RuntimeError(\"DURABLE_CHECKPOINT_ROUNDTRIP\")\n            if content_get(branch, \"RESERVATION_SYNTHETIC_V1.json\")[0] != reservation:\n                raise RuntimeError(\"RESERVATION_DISAPPEARED\")\n        if sorted(ids) != list(range(145)):\n            raise RuntimeError(\"FABRICATED_145_IDENTITY_FAILURE\")\n        final_cp = canonical({\"source_head\": head, \"run_id\": run_id,\n                              \"parsed_fabricated_identities\": 145, \"complete\": True,\n                              \"no_replay\": True})\n        content_put(branch, \"CHECKPOINT_SYNTHETIC_V1.json\", final_cp, cp_sha)\n        if content_get(branch, \"CHECKPOINT_SYNTHETIC_V1.json\")[0] != final_cp:\n            raise RuntimeError(\"FINAL_CHECKPOINT_NOT_DURABLE\")\n        guard_live(head)\n        result[\"fabricated_identities\"] = 145\n        result[\"remote_checkpoint_sha256\"] = sha(final_cp)\n        result[\"steps\"].append(\"DURABLE_CHECKPOINT_RECOVERY_AND_145_FABRICATED_IDENTITIES_PASS\")\n        result[\"status\"] = \"MACHINE_SIDE_SYNTHETIC_PROVIDER_PASS_NOT_REAL_ARM\"\n        report = canonical(result)\n        content_put(branch, \"PROVIDER_REPORT_SYNTHETIC_V1.json\", report)\n        if content_get(branch, \"PROVIDER_REPORT_SYNTHETIC_V1.json\")[0] != report:\n            raise RuntimeError(\"DURABLE_REPORT_ROUNDTRIP\")\n    except BaseException as exc:\n        result[\"error\"] = f\"{type(exc).__name__}: {exc}\"\n    finally:\n        report_path = destination / \"PRIMARY145_PROVIDER_SYNTHETIC_RESULT_V1.json\"\n        report_path.write_bytes(canonical(result))\n        print(json.dumps(result, sort_keys=True), flush=True)\n    return 0 if result[\"status\"] == \"MACHINE_SIDE_SYNTHETIC_PROVIDER_PASS_NOT_REAL_ARM\" else 1",
+      "fixed_in_this_task": false,
+      "id": "FINAL_REPORT_FAIL_OPEN_PATH",
+      "source": {
+        "last_modified_commit": "00ef0c8604a9410ea2cf62d3891ae2587c789c79",
+        "path": "research_core_v4/exploratory_dev_v3_provider/provider_synthetic.py",
+        "sha256": "858c47be76036dbb52737ee3e3727d2f51130bb25c0f01e78596cdd6fe0a837d",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v3_provider/provider_synthetic.py"
+      },
+      "static_evidence": [
+        "result[status] is set to MACHINE_SIDE_SYNTHETIC_PROVIDER_PASS_NOT_REAL_ARM before final content_put and content_get",
+        "Either publication/readback exception is caught by BaseException and only result[error] is added; status is not demoted",
+        "finally writes local result; return code tests only status==PASS, therefore may return0 with error and without durable final report"
+      ],
+      "verification": "Static source-path proof; no new workflow or fault-injection test run; successful observed run is not evidence the failure branch is safe."
+    },
+    {
+      "blocks": "Formal project-wide inference on PRIMARY145",
+      "classification": "OPEN_UNTESTED",
+      "evidence": {
+        "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+        "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+        "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+      },
+      "id": "OUTCOME_INDEPENDENT_INFERENCE_DOMAIN_UNIDENTIFIED",
+      "smallest_discriminator": "Genuinely disjoint future domain with independently verified provenance, receipt, frozen selection/error law; or valid complete-history selective law. No alpha allocated."
+    },
+    {
+      "blocks": "Authentic live-causal receipt claim",
+      "classification": "OPEN_UNTESTED",
+      "evidence": "Archive open time/OHLC not original available_at or versions",
+      "id": "HISTORICAL_RECEIPT_REVISION_UNKNOWN",
+      "smallest_discriminator": "Independent preoutcome authentic source receipts; lag0/300/900 sensitivity is conditional only."
+    },
+    {
+      "blocks": "Profit/finalEUR200 promotion",
+      "classification": "OPEN_UNTESTED",
+      "evidence": "No certified predictor or exact historical costs/execution/margin/survival parity; current structural affordability not edge",
+      "id": "ECONOMIC_HEADROOM_UNCERTIFIED",
+      "smallest_discriminator": "Only after valid information/confirmation, prospectively freeze applicable authentic side-aware friction and economics; no current backtest."
+    },
+    {
+      "blocks": "OriginalStage8 and exactV2 continuation",
+      "classification": "HISTORICAL_FAILED_OR_CLOSED",
+      "evidence": {
+        "last_modified_commit": "37ec0e737653f05335362b810a607c55e8c9c79f",
+        "path": "research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_28_WEEK_CERTIFICATION_AGGREGATED_RESULT_V1.json",
+        "sha256": "294b8b30c6b4500f04ff5c17616a0375e1bb7aca9a200b08a4a8c1d18221c430",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_28_WEEK_CERTIFICATION_AGGREGATED_RESULT_V1.json"
+      },
+      "id": "EXACT_V2_28_WEEK_FAIL_AR050",
+      "smallest_discriminator": "None within recovery; immutable fail, no rerun/retune."
+    },
+    {
+      "blocks": "Claim every final mathematical law implemented",
+      "classification": "OPEN_UNTESTED",
+      "evidence": "Contract intent recovered; exact original estimator/recurrence/production law not recovered",
+      "id": "ENTROPY_NAV_FINAL_RUIN_AND_OPTIMIZER_SPEC_MISSING",
+      "smallest_discriminator": "Recover original exact source/version, or later explicitly distinguish a newly proposed method from recovered historical mathematics."
+    }
+  ],
+  "critical_rules": [
+    "PRIMARY145 not automatic next priority and not abandoned solely for operational difficulty",
+    "Stage7 shared_ready is exactV2 gate, not universalV4 discovery gate",
+    "No retrospective winner, fixedbps rescue, frequency-only strategy selection or negative-edge sizing/exit rescue",
+    "Open sources remain open; no complete source order inferred from catalog or metadata",
+    "No repair-allPRIMARY145 prerequisite to scientific direction decision; no infrastructure churn"
+  ],
+  "current_successors": [
+    {
+      "last_modified_commit": "79a81ded1a7acc1fb0bf6adee2fa70a35b26c113",
+      "path": "research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json",
+      "sha256": "7640dc982f8b6583721e7d3aa134ff03d18da81253e9283a41786369f449b7d3",
+      "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+      "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json"
+    },
+    {
+      "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+      "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+      "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+      "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+      "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+    },
+    {
+      "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+      "path": "research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json",
+      "sha256": "4589df78d32a21a6d84387821a7ed0cfacef514b4b0a299c211e7dd21ace71c6",
+      "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+      "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json"
+    },
+    {
+      "last_modified_commit": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+      "path": "research_core_v4/state/MAIN_V4_PRIMARY145_MACHINE_PROVIDER_AUDIT_STOP_V1.json",
+      "sha256": "26723184d978dfae4667ceb75173f95e900106c1b547a78affa992b7ab59ac17",
+      "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+      "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_PRIMARY145_MACHINE_PROVIDER_AUDIT_STOP_V1.json"
+    }
+  ],
+  "global_priority_order": null,
+  "numeric_VOI_ranking": null,
+  "schema": "mxm.project-wide-open-question-and-blocker-matrix.v1",
+  "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+  "sources": [
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Exact mean-reversion and authentic-friction closures cannot be reopened. Own-price state is a baseline; no distinct incremental causal role is specified by the current proposal set.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "UNIVARIATE_PRICE_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "The sign-only cross-scale alignment specification is closed. A different true-scale representation remains possible, but no defined new extraction law establishes distinctness from alignment or variance composition.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "MULTISCALE_PRICE_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Variance-composition exact rescue is forbidden and its low-power interpretation is preserved. A different variance mechanism needs an explicit estimand and incremental baseline; generic volatility context is insufficient.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "VOLATILITY_AND_REALIZED_VARIANCE_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Standalone volume-shock reversal is context-only. Positive tick volume demonstrates descriptive activity, not predictive novelty; a new event-clock mechanism and response law remain unspecified.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "BROKER_NATIVE_ACTIVITY_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Exact opening-range and session-gap laws retain closures. Authoritative session labels can support context, but the published summary has no session-specific causal availability or new handoff mechanism.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "SESSION_AND_LIQUIDITY_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "Accepted historical quote provenance under held quote V2; M5 is not quote reconstruction",
+      "blocking_design_uncertainty": "Quote revision is data-limited with further acquisition not justified. Canonical M5 cannot reconstruct bid/ask sequence or historical friction; the existing quote route does not remove this blocker.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "M5_DEPTH_ALONE_DOES_NOT_RESOLVE_INFORMATION_GAP",
+        "causal_availability": "ADDITIONAL_AUTHORITATIVE_POINT_IN_TIME_SEMANTICS_REQUIRED",
+        "compute_feasibility": "UNRESOLVED_ROUTE_OR_SEMANTICS",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "TOP_OF_BOOK_QUOTE_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Residualized dispersion exact advancement is blocked. The broader family remains open; alternative cross-sectional information needs a new causal representation and synchronized cohort contract, not an old rank or threshold rescue.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "CROSS_SECTIONAL_RELATIVE_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Leave-one-out factor residual exact rescue is forbidden. A distinct basket mechanism needs authoritative membership and a different identification argument; generic peer residual renaming is insufficient.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "FACTOR_OR_BASKET_RESIDUAL_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Exact TRIAD V7 is parked for runtime infeasibility, not scientific null. No V8 or triad engineering is permitted. A non-triad relation needs independently justified linkage and causal synchronization; no such complete new candidate is specified.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "CROSS_INSTRUMENT_RELATIONAL_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "Accepted M5 for separately identified contracts only; authoritative linkage/expiry/roll route not established",
+      "blocking_design_uncertainty": "Exact cash/futures basis and catch-up cannot be rescued. Name similarity and broker context do not prove same-underlying contract, expiry, roll or timestamp binding; authoritative curve identity and historical semantics remain unavailable in these inputs.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "M5_DEPTH_ALONE_DOES_NOT_RESOLVE_INFORMATION_GAP",
+        "causal_availability": "ADDITIONAL_AUTHORITATIVE_POINT_IN_TIME_SEMANTICS_REQUIRED",
+        "compute_feasibility": "UNRESOLVED_ROUTE_OR_SEMANTICS",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "CURVE_CASH_FORWARD_PERPETUAL_RELATIONSHIPS",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "Existing current broker metadata only; accepted historical financing route not established",
+      "blocking_design_uncertainty": "Current execution metadata does not supply point-in-time financing schedules, revision timestamps, historical conversion and cashflow semantics. A carry predictor cannot be identified from OHLC or current swap values alone.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "M5_DEPTH_ALONE_DOES_NOT_RESOLVE_INFORMATION_GAP",
+        "causal_availability": "ADDITIONAL_AUTHORITATIVE_POINT_IN_TIME_SEMANTICS_REQUIRED",
+        "compute_feasibility": "UNRESOLVED_ROUTE_OR_SEMANTICS",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "BROKER_NATIVE_CARRY_FINANCING_SWAP",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    },
+    {
+      "accepted_data_route": "PRIMARY145 accepted canonical M5; MASTER1576 shallow structural summaries only",
+      "blocking_design_uncertainty": "Online-change exact advancement is preoutcome blocked; old simple router requires method correction. A new change-state mechanism must distinguish online detection from the blocked law and specify incremental response; no automatic continuation is justified.",
+      "broader_family_global_null": false,
+      "comparison_dimensions": {
+        "acquisition_burden": "REUSE_FIRST_NO_DEPTH_JUSTIFICATION_YET",
+        "causal_availability": "CLOSED_M5_BARS_AVAILABLE_IN_ACCEPTED_DATA",
+        "compute_feasibility": "FINITE_M5_ROUTE_POSSIBLE_NO_PROTOTYPE_CERTIFIED",
+        "confirmation_path": "PRIMARY145_NOT_DISJOINT_PROTECTED_FORWARD_AND_CONFIRMATION_CLOSED",
+        "dependence_geometry_feasibility": "REQUIRES_MECHANISM_SPECIFIC_CLUSTER_LAW",
+        "execution_and_friction_observability": "CURRENT_EUR200_STRUCTURAL_GATES_PASS_FOR_ELIGIBLE_ROSTER_HISTORICAL_COST_UNKNOWN_NOT_ZERO",
+        "generalization_path": "PROSPECTIVE_COHORT_AND_TEMPORAL_LAW_REQUIRED",
+        "information_distinctness": "NEW_EXTRACTION_OR_CAUSAL_ROLE_UNRESOLVED",
+        "scientific_identifiability": "UNRESOLVED_COMPLETE_ESTIMAND_AND_BASELINE",
+        "support_and_synchronization_feasibility": "DESCRIPTIVE_SUPPORT_AVAILABLE_EXACT_COMMON_MASKS_NOT_CERTIFIED",
+        "time_to_genuine_economic_information": "UNRESOLVED_IDENTIFICATION_AND_SUBSEQUENT_FRICTION_CERTIFICATION"
+      },
+      "historical_decision": "NOT_SELECTED_NOT_GLOBAL_NULL",
+      "information_source": "REGIME_AND_STRUCTURAL_BREAK_STATE",
+      "source": {
+        "last_modified_commit": "d11869bee56bc046c53be8fe71307b4d06ff7362",
+        "path": "research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json",
+        "sha256": "5c86b71ba9a205ad68c34096921a14a1991eada88ba288c1e6c433ea12bf6b1f",
+        "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+        "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_WIDE_INFORMATION_SOURCE_RESELECTION_MATRIX_V1.json"
+      },
+      "temporal_caveat": "Historical matrix precedes later main reentry, frozen PRIMARY145 design, and provider primitives; not a permanent prohibition or latest total ranking."
+    }
+  ],
+  "user_operations": "NONE"
+}

@@ -1,0 +1,1955 @@
+{
+  "classification_semantics": "Each row classifies its primary stated object; facets/limitations preserve differences between implemented adaptive features, synthetic witnesses, and unexecuted production requirements. Exact code segments are recovered source, not newly run computations.",
+  "material_entries": [
+    {
+      "actual_empirical_result": "No standalone alpha result established by this contract.",
+      "assumptions_and_domain_of_validity": "Completed distinct clock/event states only; original available_at/revisions must be known for authentic causal certification.",
+      "exact_formula_or_source_specification": {
+        "all_higher_scale_features_must_be_fully_completed_before_trigger": true,
+        "centered_or_two_sided_future_looking_filters_forbidden": true,
+        "clock_candidates": [
+          "H4",
+          "H1",
+          "M30",
+          "M15",
+          "M5",
+          "M1"
+        ],
+        "merely_longer_lookback_on_one_M5_series_is_not_true_multiscale": true,
+        "nonclock_candidates": [
+          "QUOTE_EVENT_TIME",
+          "TICK_OR_ACTIVITY_TIME",
+          "REALIZED_VARIANCE_TIME",
+          "SPREAD_STATE_TIME"
+        ],
+        "scale_topology_must_be_compact_and_frozen_preoutcome": true,
+        "true_multi_scale_requires_distinct_completed_clock_or_event_state_representations": true
+      },
+      "formula_family": "Causal multi-resolution market representations",
+      "id": "M01",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "Longer M5 lookback is not native H1/H4; centered wavelets and ex-post best scale prohibited.",
+      "predictive_or_economic_estimand": "Prospective multi-resolution information; no exact selected estimator prescribed by this contract.",
+      "relation_to_final_cbot_objective": "Portable causal finite states for final cBot; confirmation/economics still required.",
+      "scientific_status": "FROZEN_AUTHORITY",
+      "sources": [
+        {
+          "last_modified_commit": "11fd5c5e47f16b93de57a681afa9024469d3025d",
+          "path": "research_core_v4/V4_PROJECT_CONTRACT_V1.json",
+          "sha256": "def292b0efba0bcf696f876bd0c2704e9358b924b26fd4d9749278848c6715c4",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/V4_PROJECT_CONTRACT_V1.json"
+        },
+        {
+          "last_modified_commit": "393a3ced369c55e746f7299379861090a060a28b",
+          "path": "RESEARCH_CONTRACT_V2.md",
+          "sha256": "f7d7fdca2c4a77bc36f3a3153641f9fff295dc14fcb9f7f5fa507b025c561b96",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CONTRACT_V2.md"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Completed contiguous M5 grid; missing rows break windows; clipped feature domain[-4,4]; 48bar warmup and discontinuity quarantine.",
+      "exact_formula_or_source_specification": {
+        "exact_features_function_is_authoritative": true,
+        "r_t": "log(c_t)-log(c_(t-1))",
+        "return_component": "(log(c_t)-log(c_(t-w)))/(sigma_t*sqrt(w)); w=3,6,12,48",
+        "sigma": "max(sqrt(trailing_mean_48(r^2)),1e-7)"
+      },
+      "formula_family": "Adaptive normalized returns and volatility",
+      "id": "M02",
+      "implementation_paths": [
+        "adaptive_competition/data.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 48,
+              "exact_source": "def features(o,h,l,c,v):\n # Grid NaNs interrupt windows. No forward fill or future fitted scaler.\n r=np.r_[np.nan,np.diff(np.log(c))]\n sig=np.sqrt(rolling(r*r,48)); sig=np.maximum(sig,1e-7)\n x=[np.ones(len(c))]\n for w in (3,6,12,48): x.append((np.log(c)-np.log(np.roll(c,w)))/(sig*np.sqrt(w)))\n x.append(rolling(r,12)*12/(rolling(abs(r),12)*12+1e-12))\n x.append((c-rolling(c,12))/(c*sig*np.sqrt(12)))\n x.append((c-(pd.Series(h).rolling(12).max().to_numpy()+pd.Series(l).rolling(12).min().to_numpy())/2)/(c*sig*np.sqrt(12)))\n rv=np.sqrt(rolling(r*r,12))\n x.append(np.log(np.maximum(rv,1e-9)/sig))\n x.append(rolling(np.minimum(r,0)**2,12)/(rolling(r*r,12)+1e-12)-.5)\n x.append((r/sig))\n x.append(np.log((v+1)/(rolling(v,48)+1)))\n x.append(np.sqrt(rolling(np.log(h/l)**2,12)/(4*np.log(2)))/sig)\n x.append(rolling((r*r-rolling(r*r,12))**2,12)/(sig**4+1e-20))\n # session primitive (UTC; honestly rolling 60m/240m, not native H1/H4)\n hour=(np.arange(len(c))%288)/288*2*np.pi\n x.extend([np.sin(hour),np.cos(hour)])\n a=np.column_stack(x)\n a[:48]=np.nan\n return np.clip(a,-4,4),sig",
+              "function": "features",
+              "start_line": 27
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/data.py",
+            "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Conditional discovery proxies; no exact historical bid/ask or genuine native-scale claim.",
+      "predictive_or_economic_estimand": "Normalized future market log return, not executable fill return.",
+      "relation_to_final_cbot_objective": "Candidate information representation only; cannot promote failed policy.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/data.py",
+          "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Chronology synthetic witnesses differ 5/11 vs9/11 with equal B and five V2 maps; PRIMARY145 real score not executed.",
+      "assumptions_and_domain_of_validity": "Past contiguous completed bars; chronology on latest fully elapsed calendar hour; score design uses common B/chronology/coupling support.",
+      "exact_formula_or_source_specification": {
+        "adaptive_efficiency": "sum_12(r)/(sum_12(abs(r))+1e-12)",
+        "chronology": "sum(sign(c_i-o_i)*sign(c_(i+1)-o_(i+1)), i=0..10)/11 on latest fully elapsed calendar hour at cutoff"
+      },
+      "formula_family": "Persistence and anti-persistence",
+      "id": "M03",
+      "implementation_paths": [
+        "adaptive_competition/data.py",
+        "research_core_v4/exploratory_dev_v1/worker.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 90,
+              "exact_source": "def features(bars, t, lag):\n    cutoff = t-lag\n    hour = cutoff//3600*3600-3600\n    need = set(range(hour,hour+3600,300))|{cutoff-300}\n    if not need.issubset(bars): return None, 'FEATURE_INCOMPLETE'\n    # As-if receipt shift: available_at is hypothetical bar-close+lag.\n    # Evaluate the immutable B at cutoff with unshifted close availability;\n    # equivalent to shifted receipt<=t. Late synthetic records still fail.\n    selected = [bars[k] for k in sorted(need)]\n    b = baseline(cutoff,selected)\n    if b is None: return None, 'FEATURE_LATE_OR_INVALID'\n    elapsed = [bars[k] for k in range(hour,hour+3600,300)]\n    # Translate only timestamps into the fixed witness grid; values unchanged.\n    phi = diagnostic_maps([dict(x,timestamp=7200+300*i) for i,x in enumerate(elapsed)])\n    if phi[1] is None: return None, 'ZERO_ACTIVITY_COMMON_ABSTENTION'\n    return (np.asarray(b,float),np.asarray(phi,float)), 'SUPPORTED'",
+              "function": "features",
+              "start_line": 75
+            }
+          ],
+          "source": {
+            "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+            "path": "research_core_v4/exploratory_dev_v1/worker.py",
+            "sha256": "3e6ca9c78417f593e4b270c3d9ed8d676cf474184b62c219d559e7e10ffc87d1",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/worker.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Adaptive efficiency executed within failed V1 policy; chronology real skill unknown; neither implies trade profitability.",
+      "predictive_or_economic_estimand": "M5 price-path state and fixed algorithm score gain; not Hurst proof.",
+      "relation_to_final_cbot_objective": "A new structural refinement could support forecast research only after separate audit.",
+      "scientific_status": "IMPLEMENTED_SYNTHETIC_ONLY",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/data.py",
+          "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+        },
+        {
+          "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+          "path": "research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json",
+          "sha256": "4589df78d32a21a6d84387821a7ed0cfacef514b4b0a299c211e7dd21ace71c6",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json"
+        },
+        {
+          "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+          "path": "research_core_v4/exploratory_dev_v1/worker.py",
+          "sha256": "3e6ca9c78417f593e4b270c3d9ed8d676cf474184b62c219d559e7e10ffc87d1",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/worker.py"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Completed M5 data; no invented missing bars; exact code defines window and clipping.",
+      "exact_formula_or_source_specification": {
+        "adaptive_rv": "sqrt(trailing_mean_12(r^2))",
+        "range_estimator": "sqrt(trailing_mean_12(log(h/l)^2)/(4*log(2)))/sigma",
+        "semivariance": "trailing_mean_12(min(r,0)^2)/(trailing_mean_12(r^2)+1e-12)-0.5",
+        "vol_of_vol": "trailing_mean_12((r^2-trailing_mean_12(r^2))^2)/(sigma^4+1e-20)"
+      },
+      "formula_family": "Realized variance, semivariance and vol-of-vol",
+      "id": "M04",
+      "implementation_paths": [
+        "adaptive_competition/data.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 48,
+              "exact_source": "def features(o,h,l,c,v):\n # Grid NaNs interrupt windows. No forward fill or future fitted scaler.\n r=np.r_[np.nan,np.diff(np.log(c))]\n sig=np.sqrt(rolling(r*r,48)); sig=np.maximum(sig,1e-7)\n x=[np.ones(len(c))]\n for w in (3,6,12,48): x.append((np.log(c)-np.log(np.roll(c,w)))/(sig*np.sqrt(w)))\n x.append(rolling(r,12)*12/(rolling(abs(r),12)*12+1e-12))\n x.append((c-rolling(c,12))/(c*sig*np.sqrt(12)))\n x.append((c-(pd.Series(h).rolling(12).max().to_numpy()+pd.Series(l).rolling(12).min().to_numpy())/2)/(c*sig*np.sqrt(12)))\n rv=np.sqrt(rolling(r*r,12))\n x.append(np.log(np.maximum(rv,1e-9)/sig))\n x.append(rolling(np.minimum(r,0)**2,12)/(rolling(r*r,12)+1e-12)-.5)\n x.append((r/sig))\n x.append(np.log((v+1)/(rolling(v,48)+1)))\n x.append(np.sqrt(rolling(np.log(h/l)**2,12)/(4*np.log(2)))/sig)\n x.append(rolling((r*r-rolling(r*r,12))**2,12)/(sig**4+1e-20))\n # session primitive (UTC; honestly rolling 60m/240m, not native H1/H4)\n hour=(np.arange(len(c))%288)/288*2*np.pi\n x.extend([np.sin(hour),np.cos(hour)])\n a=np.column_stack(x)\n a[:48]=np.nan\n return np.clip(a,-4,4),sig",
+              "function": "features",
+              "start_line": 27
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/data.py",
+            "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "These are distinct from high-frequency integrated-variance truth; no individual component contribution certified.",
+      "predictive_or_economic_estimand": "Variance/volatility feature state within adaptive forecast model.",
+      "relation_to_final_cbot_objective": "May represent risk/context; must earn incremental predictive/economic value.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/data.py",
+          "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Finite A/B maps equal; no predictive experiment from the witness.",
+      "assumptions_and_domain_of_validity": "Legal contiguous completed-hour domain, current B definitions and source-specific degeneracy/missingness.",
+      "exact_formula_or_source_specification": {
+        "specification": "Exact feature(source,t,bars) implementation and frozen authority; no reconstructed substitute."
+      },
+      "formula_family": "Frozen V2 variance composition and structural maps",
+      "id": "M05",
+      "implementation_paths": [
+        "research_core_v4/prospective_exact_semantics_v3.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 53,
+              "exact_source": "def feature(source,t,bars):\n    if type(t) is not int or t%300:raise ValueError('M5_DECISION_GRID')\n    h=(t//3600)*3600;a=interval(t,bars,h-3600,h)\n    if a is None:return None\n    if source=='MULTISCALE_PRICE_STATE':\n        q=interval(t,bars,h-4500,h-3600)\n        return None if q is None else sign(aggloc(q)-F(1,2))*sign(aggloc(a)-F(1,2))\n    if source=='BROKER_NATIVE_ACTIVITY_STATE':\n        total=sum(b['tick_volume'] for b in a)\n        return tuple(F(b['tick_volume'],total) if total else F(0) for b in a[:11])\n    if source=='REGIME_AND_STRUCTURAL_BREAK_STATE':\n        prev=interval(t,bars,h-7200,h-3600)\n        return None if prev is None else sum(abs(x-y) for x,y in zip(sorted(map(loc,a)),sorted(map(loc,prev))))/12\n    if source=='VOLATILITY_AND_REALIZED_VARIANCE_STATE':\n        if any(b['open']<=0 or b['close']<=0 for b in a):return None\n        # Semantic authority is the real logarithm. Decimal is synthetic QA only,\n        # not a production numeric environment or an exact real-arithmetic claim.\n        with localcontext() as ctx:\n            ctx.prec=80\n            def dec(x):\n                q=F(x);return Decimal(q.numerator)/Decimal(q.denominator)\n            r=[(dec(b['close'])/dec(b['open'])).ln() for b in a];q=[x*x for x in r];total=sum(q)\n            return sum((x/total)**2 for x in q) if total else Decimal(0)\n    raise ValueError('NO_AUTHORIZED_EXACT_MAP')",
+              "function": "feature",
+              "start_line": 30
+            }
+          ],
+          "source": {
+            "last_modified_commit": "8de0976936de47e3816c426107e9579eb7dbf51e",
+            "path": "research_core_v4/prospective_exact_semantics_v3.py",
+            "sha256": "4e1a0a5a32a32d0e73b1039ea41568419e0fcd85885204190166e9faa8735f28",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/prospective_exact_semantics_v3.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Four maps directly invoked in prior oracle; fifth cross-sectional Phi law compared algebraically, not through a nonexistent V2 numeric runner.",
+      "predictive_or_economic_estimand": "Structural measurability/distinctness relative to ten-coordinate B.",
+      "relation_to_final_cbot_objective": "Identifies prospective information refinements without alpha or profit claims.",
+      "scientific_status": "MATHEMATICAL_WITNESS_ONLY",
+      "sources": [
+        {
+          "last_modified_commit": "8de0976936de47e3816c426107e9579eb7dbf51e",
+          "path": "research_core_v4/prospective_exact_semantics_v3.py",
+          "sha256": "4e1a0a5a32a32d0e73b1039ea41568419e0fcd85885204190166e9faa8735f28",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/prospective_exact_semantics_v3.py"
+        },
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+          "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "No exact project entropy estimator or market test recovered.",
+      "assumptions_and_domain_of_validity": "Contract permits causal complexity/entropy only; no specific entropy alphabet, partition, lag, estimator or calibration recovered in bounded review.",
+      "exact_formula_or_source_specification": {
+        "recovered_exact_formula": null,
+        "source_specification": {
+          "allowed": [
+            "CAUSAL_MULTIRESOLUTION_RETURN_COMPONENTS",
+            "CAUSAL_MULTIRESOLUTION_VOLATILITY_COMPONENTS",
+            "SCALE_SPECIFIC_VARIANCE_RATIOS",
+            "ONLINE_PERSISTENCE_ANTIPERSISTENCE",
+            "CROSS_SCALE_STATE_TRANSITIONS",
+            "ONE_SIDED_FILTER_BANKS",
+            "CAUSAL_COMPLEXITY_OR_ENTROPY",
+            "ONLINE_CHANGE_POINT_DETECTION"
+          ],
+          "forbidden": [
+            "HURST_AS_TRADE_SIGNAL_WITHOUT_PROSPECTIVE_EVIDENCE",
+            "CENTERED_WAVELET_LOOKAHEAD",
+            "EX_POST_BEST_SCALE_SELECTION"
+          ],
+          "hypotheses_not_proof_of_alpha": true
+        }
+      },
+      "formula_family": "Entropy and complexity",
+      "id": "M06",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "Do not insert Shannon, permutation entropy or another new formula as recovered original mathematics; original conversations inaccessible.",
+      "predictive_or_economic_estimand": "Unspecified prospective complexity/regime information.",
+      "relation_to_final_cbot_objective": "Open research family; cannot rank or implement until identified.",
+      "scientific_status": "PROPOSED_NOT_FROZEN",
+      "sources": [
+        {
+          "last_modified_commit": "11fd5c5e47f16b93de57a681afa9024469d3025d",
+          "path": "research_core_v4/V4_PROJECT_CONTRACT_V1.json",
+          "sha256": "def292b0efba0bcf696f876bd0c2704e9358b924b26fd4d9749278848c6715c4",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/V4_PROJECT_CONTRACT_V1.json"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": {
+        "all_preoutcome_gates_pass": false,
+        "blockers": [
+          "INFERENCE_ERROR_CONTROL_PRECISION_GATE_FAILED",
+          "DAILY_GAP_DETECTION_POWER_GATE_FAILED"
+        ],
+        "broader_online_change_family_closed": false,
+        "broker_contacts": 0,
+        "calibration_reruns_to_improve_pass": 0,
+        "candidate_frozen_count": 0,
+        "classification": "PREOUTCOME_BLOCKED_CALIBRATION_UNCERTIFIED_AND_LOW_POWER_UNTESTED_NOT_NULL",
+        "confirmation_opened": false,
+        "continuous_detection_delay_range_of_medians": [
+          326.0,
+          373.0
+        ],
+        "continuous_detection_power_pass": true,
+        "core_law_byte_unchanged_from_initial_freeze": true,
+        "economic_null_claimed": false,
+        "economic_status": "COST_UNRESOLVED_UNTESTED_NO_REAL_RESPONSE",
+        "exact_closure_scope": "Exact V1 is blocked for advancement in this task by error-control uncertainty and gap-stress low power; no actual market response measured, no economic null, broader sequential/regime source open. No rescue or another wave in this task.",
+        "exact_final_scientific_freeze_head": "8ec0087ab21a3aa0eefa1c5b9a2aeca6c04902ea",
+        "final_design_byte_sha256": "eac9e0331a52f4b470a232e13953a11ba3dbad944d326932b45000b9b6fb0005",
+        "gap_05_power_by_case_and_direction": {
+          "AR1_050": {
+            "-1": {
+              "censored": 3450,
+              "delay_quantiles_detected_only": [
+                308.0,
+                609.0,
+                921.5
+              ],
+              "detections": 646,
+              "power": 0.15771484375,
+              "power_wilson95": [
+                0.14687419225579917,
+                0.16919694571206767
+              ],
+              "trials": 4096,
+              "wrong_direction_wilson95": [
+                0.0,
+                0.0009370118104075045
+              ]
+            },
+            "1": {
+              "censored": 3406,
+              "delay_quantiles_detected_only": [
+                320.0,
+                588.0,
+                907.1
+              ],
+              "detections": 690,
+              "power": 0.16845703125,
+              "power_wilson95": [
+                0.15730678213580299,
+                0.18022859971894964
+              ],
+              "trials": 4096,
+              "wrong_direction_wilson95": [
+                0.0,
+                0.0009370118104075045
+              ]
+            }
+          },
+          "heavy_t5": {
+            "-1": {
+              "censored": 2489,
+              "delay_quantiles_detected_only": [
+                299.6,
+                553.0,
+                902.4000000000001
+              ],
+              "detections": 1607,
+              "power": 0.392333984375,
+              "power_wilson95": [
+                0.37748825314681117,
+                0.4073814842596292
+              ],
+              "trials": 4096,
+              "wrong_direction_wilson95": [
+                0.0,
+                0.0009370118104075045
+              ]
+            },
+            "1": {
+              "censored": 2481,
+              "delay_quantiles_detected_only": [
+                314.0,
+                560.0,
+                898.2000000000003
+              ],
+              "detections": 1615,
+              "power": 0.394287109375,
+              "power_wilson95": [
+                0.37942650265419836,
+                0.40934582454985763
+              ],
+              "trials": 4096,
+              "wrong_direction_wilson95": [
+                0.0,
+                0.0009370118104075045
+              ]
+            }
+          },
+          "normal": {
+            "-1": {
+              "censored": 3497,
+              "delay_quantiles_detected_only": [
+                317.8,
+                609.0,
+                938.0
+              ],
+              "detections": 599,
+              "power": 0.146240234375,
+              "power_wilson95": [
+                0.1357504557001872,
+                0.15739296720668802
+              ],
+              "trials": 4096,
+              "wrong_direction_wilson95": [
+                0.0,
+                0.0009370118104075045
+              ]
+            },
+            "1": {
+              "censored": 3480,
+              "delay_quantiles_detected_only": [
+                323.0,
+                617.0,
+                924.5
+              ],
+              "detections": 616,
+              "power": 0.150390625,
+              "power_wilson95": [
+                0.1397714149061998,
+                0.1616650113206086
+              ],
+              "trials": 4096,
+              "wrong_direction_wilson95": [
+                0.0,
+                0.0009370118104075045
+              ]
+            }
+          }
+        },
+        "gap_artifact_id": 11328382941,
+        "gap_artifact_sha256": "b475148d1407a5fd5a34429008c1a5cb087f2a2143efc43c12e72dbb9ded9e17",
+        "gap_detection_power_pass": false,
+        "gap_power_run_id": 37271054410,
+        "gap_source_binding": {
+          ".github/workflows/v4-online-change-gap-power.yml": "c6b755d64b75d91a387174d4ab109dd4e376400babc23e7db83f4c2679f10368",
+          "research_core_v4/online_change_calibration_v1.py": "3badc5bd06f235d878d35f7dc4b302a15473dde29f11e352ae6c0585a0a487a6",
+          "research_core_v4/online_change_gap_power_v1.py": "5b951d750ee7fcc2e68f33087913e1d38884a46588d84684f1de546d2e219c40",
+          "research_core_v4/online_change_v1.py": "07c836878ff2afc6b57baea2979c56674c99a5bd9131754d542f8f7bef1e139e",
+          "research_core_v4/runtime/numeric-requirements-v1.txt": "4644ecce139a02ab2cc2932ab0a81c15b7fe7e23c537243095dd35cc11344bed",
+          "research_core_v4/state/ONLINE_CHANGE_DESIGN_V1.json": "eac9e0331a52f4b470a232e13953a11ba3dbad944d326932b45000b9b6fb0005"
+        },
+        "historical_requests": 0,
+        "inference_calibration_pass": false,
+        "initial_scientific_freeze_head": "fe915d866b11a6ac316ae5c45e5b625989c06393",
+        "joint_blocks": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "live_trading_started": false,
+        "main_preoutcome_source_binding": {
+          ".github/workflows/v4-online-change-development.yml": "0718243338ff7e2324566a398778bc067885cb53bb3c6eac48c80577f4bc23fc",
+          ".github/workflows/v4-online-change-interpretation.yml": "ef95f78a2906bafe1a60fee989e66d12b841312d2688c68f1eb3554e9412d0d1",
+          ".github/workflows/v4-online-change-preoutcome.yml": "0274b10280ffb922a28cb2badfa0148d55fe0e046d9dc76db0be1512c200f085",
+          "research_core_v4/asymmetric_recovery_v4_gate.py": "77b1d76d9531e5e0a0e9ce16d212e504a1a44ec7e87ab3d9d628a02e51fd3e19",
+          "research_core_v4/online_change_calibration_v1.py": "3badc5bd06f235d878d35f7dc4b302a15473dde29f11e352ae6c0585a0a487a6",
+          "research_core_v4/online_change_v1.py": "07c836878ff2afc6b57baea2979c56674c99a5bd9131754d542f8f7bef1e139e",
+          "research_core_v4/runtime/numeric-requirements-v1.txt": "4644ecce139a02ab2cc2932ab0a81c15b7fe7e23c537243095dd35cc11344bed",
+          "research_core_v4/runtime_inputs/V4_EXACT_M5_INPUT_MANIFEST_V2.json": "d338dcaac31af05819aebd2876946f6af001c31ecca526e0424c4ddee1f3d207",
+          "research_core_v4/state/NEXT_INFORMATION_SOURCE_SELECTION_V3.json": "13b42f30b194d4ed85763fa527586df9464d794cb3228cc39228a5a9e9da1299",
+          "research_core_v4/state/ONLINE_CHANGE_DESIGN_V1.json": "cdced0646fa17520c3f57dca3400f2b621471237d671ff9437cbaf710632e2a0",
+          "research_core_v4/state/POST_VARIANCE_V1_PROJECT_COVERAGE_REFRESH_V1.json": "9478c8d782d68f93b91f53ab7071826291ae46a9c37518f37d956119a406b8d3",
+          "tests/test_v4_online_change.py": "b2940c7bef69befd56231a029f72d82bbc933fe75c1178568aba036e4cdd9a3e",
+          "tools/online_change_development.py": "ad28788bbf705d8208c81c780a3597f761758ca522b75f685a065c8a5b87a404",
+          "tools/online_change_preoutcome.py": "0aa4e328c01685801e425cc7c28e7e8a331c856820797eb2dad1f1056bc639d8"
+        },
+        "monte_carlo_trial_extension": false,
+        "orders": 0,
+        "prior_verdicts": {
+          "factor_residual_v1": "DATA_LIMITED_UNTESTED_NOT_NULL",
+          "quote_v2": "DATA_LIMITED_ACQUISITION_NOT_JUSTIFIED",
+          "variance_v1": "NO_REPLICATED_INFORMATION_LEAD_SMALL_EFFECTS_LOW_POWER_INCONCLUSIVE"
+        },
+        "protected_forward_opened": false,
+        "raw_canonical_result_present": false,
+        "raw_publication_head": null,
+        "raw_result_sha256": null,
+        "real_response_authority_created": false,
+        "report_sha256": {
+          "ONLINE_CHANGE_CALIBRATION_V1.json": "d95f3fa2d57fa35380cfdf2286a866cada848c06704570414476e6ceb2e9bd99",
+          "ONLINE_CHANGE_GAP_POWER_V1.json": "ac5c8b5f3ce2aec5460ab0d3521df8bc035319e3f16f0791e0339e52c134c59f",
+          "ONLINE_CHANGE_SUPPORT_V1.json": "e1652be5af28f1bdb69efd5db9eb7d67e8bec00ac3cbe0ffcccaa3555803336a"
+        },
+        "response_openings": 0,
+        "response_run_id": null,
+        "schema": "mxm.v4.online-change-preoutcome-audit.v1",
+        "seeds_reselected": false,
+        "selection_head": "23b23f9a2f96451eb1e3b6175c0e50cfb3c6106a",
+        "selection_prohibited_leaf_outcomes_used": false,
+        "sequential_false_alarm_pass": true,
+        "sequential_max18stream_alarm_union_upper": 0.03057609785848767,
+        "starting_head": "7ffcaa4a9ea47c9cf8644cabac0f5e2267a14b6a",
+        "stop": "NO_CONFIRMATION_NO_PROMOTION_NO_NEW_WAVE_NO_ACQUISITION",
+        "support_and_main_calibration_run_id": 37270549878,
+        "support_artifact_id": 11327598355,
+        "support_artifact_sha256": "80cff24e457ea171338f67b59fa5f6af2754427b9f564cd75e7c3986e0865214",
+        "support_law_equivalence_after_gap_gate_addition": "Final design minus sole gap_power_calibration field equals initial design exactly; detector,normalization,training,response,horizon,support,inference parameters unchanged. Only mandatory additional power gate was prospectively added before gap simulations or real response.",
+        "support_pass": true,
+        "technical_and_preoutcome_corrections": [
+          {
+            "correction": "Additional mandatory daily missing-link power gate frozen before its simulation. Scientific certification rule strengthened; original detector/response/inference and alternatives not modified.",
+            "head": "8ec0087ab21a3aa0eefa1c5b9a2aeca6c04902ea",
+            "market_response_seen": false
+          },
+          {
+            "correction": "Guard read-only interpretation route when raw file absent; initial route run37270550159 failed on missing file, no scientific evaluation or real opening. Subsequent routing succeeds/skips interpretation.",
+            "head": "8ec0087ab21a3aa0eefa1c5b9a2aeca6c04902ea",
+            "scientific_law_changed": false
+          }
+        ],
+        "threshold_or_effect_or_deadline_retuning": false,
+        "total_retained_clocks": 1165519,
+        "worst_inference_null": [
+          "18:AR050",
+          {
+            "family_rejections": 170,
+            "rate": 0.04150390625,
+            "simultaneous_wilson": [
+              0.03271258019000648,
+              0.05252954828751787
+            ],
+            "trials": 4096
+          }
+        ]
+      },
+      "assumptions_and_domain_of_validity": "First4week prefix AR1 OLS and fixed innovation RMS; gap resets; bounded increments. Conditional-zero-mean law is a reference assumption, not authenticated on archival market paths.",
+      "exact_formula_or_source_specification": {
+        "bet": 0.25,
+        "clip_bound": 1.0,
+        "evaluation_initialization": "Reset both evidence counters exactly at first evaluation clock, preserve causal previous return; no carry of prefix evidence into development. Gap resets remain mandatory.",
+        "maximum_campaign_clocks": 84672,
+        "normalization": "First4-week prefix only: fixed AR1 OLS intercept,phi clipped[-.95,.95], innovation RMS; hourly return RMS on exact contiguous prefix hours. All parameters fixed before any detector state used for second prefix/evaluation.",
+        "reference_family_alarm_budget": 0.01,
+        "representation": "Causal sequential reflected evidence with adaptive start/reset, available on every eligible completed M5 clock, not binary alarm trigger, not retrospective breakpoint or ER router.",
+        "threshold": 19.535229371918827,
+        "threshold_justification": "h=log(2directions*18symbols*maximum84672candidate change starts/.01), fixed union-bound reference for bounded zero-conditional-mean increments via Hoeffding supermartingale. Prefix parameter estimation/dependence make assumptions non-exact; synthetic calibration is mandatory, no universal finite-sample guarantee.",
+        "update": "u=clip((r_t-prefix_intercept-prefix_phi*r_t-1)/prefix_sigma,-1,1); Cplus=max(0,Cplus+bet*u-bet^2/2), Cminus=max(0,Cminus-bet*u-bet^2/2); dense state=(Cplus-Cminus)/h. Alarm if either accumulator>=h; emit state then reset both for next completed bar. Reset on any missing300sec link."
+      },
+      "formula_family": "Online change-point detection",
+      "id": "M07",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "Exact preoutcome inference precision and daily-gap power gates failed; broad family open. Adams-MacKay is a contract method reference, not this detector or a recovered implemented BOCPD formula.",
+      "predictive_or_economic_estimand": "x_residual*(own next1h cumulative log return/prefix hour RMS - frozen prefix baseline_y). Direct signed own-instrument information; incremental relative to current innovation/fixed-hour carrier/UTC baseline, not all possible models. Both theta signs are one frozen family.",
+      "relation_to_final_cbot_objective": "Potential causal regime information; exact failed law cannot be rescued.",
+      "scientific_status": "HISTORICAL_FAILED_OR_CLOSED",
+      "sources": [
+        {
+          "last_modified_commit": "8ec0087ab21a3aa0eefa1c5b9a2aeca6c04902ea",
+          "path": "research_core_v4/state/ONLINE_CHANGE_DESIGN_V1.json",
+          "sha256": "eac9e0331a52f4b470a232e13953a11ba3dbad944d326932b45000b9b6fb0005",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/ONLINE_CHANGE_DESIGN_V1.json"
+        },
+        {
+          "last_modified_commit": "a8e225cbb29511701714a2b33807ce6067463193",
+          "path": "research_core_v4/state/ONLINE_CHANGE_FINAL_PREOUTCOME_AUDIT_V1.json",
+          "sha256": "a58d7a3389b2ae883cada17a14214f624a3f332d8ae5533dba6d6e87844d87b0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/ONLINE_CHANGE_FINAL_PREOUTCOME_AUDIT_V1.json"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Authoritative context/cohort, synchronized bars, causal freshness; structural broker context alone does not establish economic coherence.",
+      "exact_formula_or_source_specification": {
+        "peer": "Fresh same-timestamp context mean excluding own with >=2 peers; unavailable peer neutral with explicit flag",
+        "residual": "own normalized return minus peer, clipped[-4,4]",
+        "structural_Phi": "sqrt(Var(peer hourly price locations)); witness compares squared Phi=1/9 in both worlds"
+      },
+      "formula_family": "Cross-sectional and relational information",
+      "id": "M08",
+      "implementation_paths": [
+        "adaptive_competition/data.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 139,
+              "exact_source": "def build(data_dir,cache):\n cache.mkdir(parents=True,exist_ok=True)\n manifest=json.loads((ROOT/'research_core_v3/state/PRIMARY_145_INPUT_MANIFEST_V1.json').read_text())\n records=sorted(manifest['primary_series'],key=lambda s:s['symbol_id']); n=len(records)\n loc,md=metadata(); contexts=sorted({md[s['symbol_id']]['asset_class'] for s in records})\n # Half-open development grid. At each timestamp raw bar is not yet complete.\n times=pd.date_range(START,END,freq='5min',inclusive='left'); T=len(times)\n arrays={}\n for name,shape in [('ohlcv',(T,n,5)),('X',(T,n,19)),('sigma',(T,n)),('Y',(T,n,4))]:\n  a=np.lib.format.open_memmap(cache/(name+'.npy'),mode='w+',dtype='float64',shape=shape);a[:]=np.nan;arrays[name]=a\n archives={HASHES[name]:verify_zip(data_dir/name) for name in list(HASHES)[:2]}\n rows=[]; total=0\n for sidx,s in enumerate(records):\n  raw=archives[s['source_archive_sha256']].read(s['file']);assert sha(raw)==s['series_sha256'],s['symbol']\n  df=pd.read_csv(io.BytesIO(raw));ts=pd.to_datetime(df.time_utc,utc=True)\n  assert len(df)==s['row_count'] and ts.is_monotonic_increasing and not ts.duplicated().any()\n  ns=ts.astype('int64').to_numpy();assert np.all(ns%300_000_000_000==0)\n  assert ts.min()>=START and ts.max()<END\n  ix=((ns-START.value)//300_000_000_000).astype(int)\n  values=df[['open','high','low','close','tick_volume']].to_numpy(float)\n  assert np.isfinite(values).all() and (values[:,:4]>0).all() and (values[:,4]>=0).all()\n  assert (values[:,1]>=values[:,[0,2,3]].max(axis=1)-1e-10).all()\n  assert (values[:,2]<=values[:,[0,1,3]].min(axis=1)+1e-10).all()\n  arrays['ohlcv'][ix,sidx]=values\n  o,h,l,c,v=arrays['ohlcv'][:,sidx].T\n  x,sig=features(o,h,l,c,v)\n  # discontinuity detection available at completion, quarantine next 48 bars;\n  # no potentially discontinuous label may teach the model or count as alpha.\n  jump=abs(np.r_[np.nan,np.diff(np.log(c))])\n  threshold=np.maximum(.05,12*np.roll(sig,1))\n  bad=(jump>threshold)\n  quarantine=pd.Series(bad.astype(int)).rolling(49,min_periods=1).max().to_numpy().astype(bool)\n  x[quarantine]=np.nan\n  arrays['X'][:,sidx,:16]=x;arrays['sigma'][:,sidx]=sig\n  for hi,w in enumerate(HORIZONS):\n   future=np.roll(c,-w);label=np.log(future/c)/(sig*np.sqrt(w))\n   count=pd.Series(np.isfinite(c).astype(int)).rolling(w+1,min_periods=w+1).sum().shift(-w).to_numpy()\n   badfuture=pd.Series(bad.astype(int)).rolling(w+1,min_periods=w+1).max().shift(-w).to_numpy()\n   label[(count!=w+1)|(badfuture>0)|~np.isfinite(x).all(axis=1)]=np.nan;label[-w:]=np.nan\n   arrays['Y'][:,sidx,hi]=label\n  total+=len(df);rows.append({**s,'verified_rows':len(df),'discontinuity_events':int(bad.sum()),'quarantine_bars':int(quarantine.sum()),'context':md[s['symbol_id']]['asset_class']})\n  if sidx%20==0: print('verified series',sidx+1,'/',n,flush=True)\n assert n==145 and total==11406418\n # contemporaneous freshness mask only. Context factors exclude own leg;\n # no arbitrarily stale relational series; sufficient breadth means >=2 peers.\n r1=arrays['X'][:,:,10].copy()\n for ci,ctx in enumerate(contexts):\n  si=[i for i,s in enumerate(records) if md[s['symbol_id']]['asset_class']==ctx]\n  f=r1[:,si];valid=np.isfinite(f);count=valid.sum(axis=1);totalr=np.nansum(f,axis=1)\n  for i in si:\n   own=r1[:,i];num=count-np.isfinite(own)\n   peer=(totalr-np.nan_to_num(own))/np.maximum(num,1);peer[num<2]=np.nan\n   # singleton contexts have explicit neutral unavailable state, never invented relation.\n   arrays['X'][:,i,16]=np.nan_to_num(peer)\n   arrays['X'][:,i,17]=np.where(np.isfinite(peer),np.clip(own-peer,-4,4),0)\n   arrays['X'][:,i,18]=(num>=2).astype(float)\n # Canonical symbol state and cost summaries use only prefix friction timestamps.\n costs={}\n for name in list(HASHES)[2:]:\n  z=verify_zip(data_dir/name)\n  for fn in z.namelist():\n   if not fn.startswith('derived/') or not fn.endswith('.jsonl.gz'):continue\n   for line in gzip.decompress(z.read(fn)).splitlines():\n    j=json.loads(line);symbol=j['symbol'];d=costs.setdefault(symbol,{'fresh_prefix_spreads_bps':[],'files':[]})\n    if name not in d['files']:d['files'].append(name)\n    for row in j['rows']:\n     if row['boundary_ms']>=INNER_END.value//1_000_000:continue\n     for key in ('d0s','d1s','d5s','d30s'):\n      q=row[key]\n      if q.get('fresh') and q.get('spread_bps') is not None and q['spread_bps']>=0:d['fresh_prefix_spreads_bps'].append(q['spread_bps'])\n cost_inventory=[]\n for s in records:\n  vals=costs.get(s['symbol'],{}).get('fresh_prefix_spreads_bps',[])\n  cost_inventory.append({'symbol':s['symbol'],'prefix_fresh_sample_count':len(vals),'spread_bound_bps':2*max(vals) if len(vals)>=10 else None,'state':'PREFIX_SAMPLE_MAX_X2_DISCOVERY_BOUND_NOT_HISTORICAL_TRUTH' if len(vals)>=10 else 'COST_UNRESOLVED'})\n info={'records':records,'metadata':[md[s['symbol_id']] for s in records],'assets':{a['assetId']:a['name'] for a in loc['asset_metadata']},'contexts':contexts,'costs':cost_inventory,'T':T,'inner_end_index':91*288,'outer_end_index':T,'source_archive_hashes':{k:v for k,v in HASHES.items()}}\n (cache/'info.json').write_text(json.dumps(info))\n save('PRIMARY145_DATA_INTEGRITY_RESULT.json',{'status':'PASS_RAW_BYTES_VERIFIED','series_count':n,'total_m5_rows':total,'archive_hashes':{k:v for k,v in HASHES.items() if 'M5_' in k},'series':rows,'protected_forward_opened':False,'supplementary_primary_inference':False})\n save('REUSABLE_DATA_AND_FRICTION_INVENTORY_V1.json',{'costs':cost_inventory,'cost_admissible_symbols':sum(c['spread_bound_bps'] is not None for c in cost_inventory),'source_hashes':HASHES,'prefix_only':True,'supplementary_count':len(manifest['supplementary_original_series']),'late_join':'materialized; transfer diagnostic separate from primary chronological replay; not fresh temporal evidence','present_metadata':'DISCOVERY_SCENARIO_ONLY_NOT_EXACT_HISTORICAL_AUTHORITY'})\n for a in arrays.values():a.flush()\n print('integrity complete rows',total,flush=True)\n return info",
+              "function": "build",
+              "start_line": 59
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/data.py",
+            "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "No independent identity count; own excluded; frozen cross-sectional mathematical witness is not numeric market evidence.",
+      "predictive_or_economic_estimand": "Peer/context feature contribution; not independently certified source alpha.",
+      "relation_to_final_cbot_objective": "Common-factor risk and comparative forecast context; final portfolio must pay dependence.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/data.py",
+          "sha256": "7a111801ce08b42cdfeafa44a76d72c66a0099189617c375177fa7980849217b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/data.py"
+        },
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+          "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        },
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "US_CROSS_MARKET_LEAD_LAG exact2cell specification closed, means -0.5516731661407288 and -0.66450596004339bps; no robust region. Broad non-triad family open.",
+      "assumptions_and_domain_of_validity": "Only historically available leads before own response; cash/futures underlying identity, session and timing must be authenticated.",
+      "exact_formula_or_source_specification": {
+        "authority": "Family-specific causal lag, economic linkage, aligned history and nonoverlapping information timing; not a universal formula.",
+        "recovered_specification": {
+          "candidate_basis": [
+            "causal_market_linkage",
+            "aligned_history",
+            "nonoverlapping_information_timing",
+            "schedule_overlap"
+          ],
+          "confirmation": "causal lag design and protected confirmation",
+          "requires_aligned_history": true,
+          "requires_peer_coherence": true
+        }
+      },
+      "formula_family": "Lead-lag and cross-market dependencies",
+      "id": "M09",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "No recovered new authoritative non-triad linkage; TRIAD V7 is runtime-blocked, not a scientific global null.",
+      "predictive_or_economic_estimand": "Exact source-specific directional response.",
+      "relation_to_final_cbot_objective": "Could expand opportunity diversity only with material new information and net executability.",
+      "scientific_status": "HISTORICAL_FAILED_OR_CLOSED",
+      "sources": [
+        {
+          "last_modified_commit": "457483ee527085d36bade43feb0d859c133d45dd",
+          "path": "research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json",
+          "sha256": "6b14648bad0aa8e0753f3771896892d0a7d70bd89911800ce9bdbafc0e96a568",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_v3/ADAPTIVE_MECHANISM_DISCOVERY_ARCHITECTURE_V1.json"
+        },
+        {
+          "last_modified_commit": "73e991a98db5c51e882118006d7359edf3348ec1",
+          "path": "research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json",
+          "sha256": "d5fbfd6bf8d08621b3158cdcc843f39dd911c4af74ea6a3b81f948863ef3e25e",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen18 family not executed on real PRIMARY145 numeric inputs.",
+      "assumptions_and_domain_of_validity": "One common causal baseline and response normalization per horizon/lag/refit; identical paired support; unavailable opportunity gain0 as abstention, never Y=0.",
+      "exact_formula_or_source_specification": {
+        "aggregation": {
+          "calendar": "fixed1240 units; per unit sum identity gains/145; unavailable gain0 means abstention, never missing response imputation",
+          "dependence": "common calendar gain vectors and full18x18 descriptive covariance; identities never independent N; no p-value,CI or formal rejection",
+          "early_stop": "only hard integrity/resource violations; never favorable score",
+          "identity": "fixed145 denominator and fixed calendar denominator; every identity reported",
+          "missingness": "feature, label, fit counters; identity supported counts; all unsupported and negative comparisons emitted"
+        },
+        "baseline": "Exact ORDER and baseline(t,bars) function: last M5 OHLCV, previous-hour location/range/total activity, UTC weekday and 5min slot",
+        "score": "((z-pB)^2-(z-pA)^2)/256 in[-1,1]"
+      },
+      "formula_family": "Baseline information and incremental predictive skill",
+      "id": "M10",
+      "implementation_paths": [
+        "research_core_v4/compact_baseline_v2.py",
+        "research_core_v4/exploratory_dev_v1/worker.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 39,
+              "exact_source": "def baseline(t, bars):\n    \"\"\"Times are integer UTC epoch seconds; bar timestamp is its open.\n    No backward search past an incomplete latest calendar hour is allowed.\n    Availability includes original effective record availability, not revisions.\n    Return None when any required record is unavailable or invalid.\n    \"\"\"\n    if type(t) is not int or t % 300: raise ValueError('M5_DECISION_GRID')\n    last=t-300; hour=(t//3600)*3600-3600\n    required=set(range(hour,hour+3600,300))|{last}\n    selected={}\n    for b in bars:\n        if b.get('timestamp') not in required: continue\n        ts=b['timestamp']\n        if ts in selected: return None\n        selected[ts]=b\n    if set(selected)!=required: return None\n    for ts,b in selected.items():\n        if type(ts) is not int or ts%300: return None\n        a=b.get('available_at')\n        if type(a) is not int or a<ts+300 or a>t: return None\n        vals=[b.get(k) for k in ('open','high','low','close')]\n        if any(type(v) not in (int,float,Fraction) or not math.isfinite(v) for v in vals): return None\n        o,h,l,c=vals\n        if not l<=min(o,c)<=max(o,c)<=h: return None\n        v=b.get('tick_volume')\n        if type(v) is not int or v<0: return None\n    hbars=[selected[s] for s in range(hour,hour+3600,300)]\n    high=max(b['high'] for b in hbars); low=min(b['low'] for b in hbars)\n    width=Fraction(high)-Fraction(low)\n    location=(Fraction(hbars[-1]['close'])-Fraction(low))/width if width else Fraction(1,2)\n    b=selected[last]; dt=datetime.fromtimestamp(t,timezone.utc)\n    return tuple(b[k] for k in ('open','high','low','close','tick_volume'))+(location,width,sum(x['tick_volume'] for x in hbars),dt.weekday(),(dt.hour*60+dt.minute)//5)",
+              "function": "baseline",
+              "start_line": 8
+            }
+          ],
+          "source": {
+            "last_modified_commit": "9254cd828b96bc1f31441010201bd7916d32560b",
+            "path": "research_core_v4/compact_baseline_v2.py",
+            "sha256": "a8a7f5d883f9f6966176c657ea0bcf8dc1294f4e11e48ff0aa35a9036f163758",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/compact_baseline_v2.py"
+          }
+        },
+        {
+          "segments": [
+            {
+              "end_line": 130,
+              "exact_source": "def fit_family(t,maturity,ids,b,phi,sealed_y,valid,refit,start):\n    fail(np.all(maturity>t),'LABEL_MATURITY_ORDER')\n    fail(b.shape==(len(t),10) and phi.shape==(len(t),2),'MODEL_DIMENSIONS')\n    # Future labels are replaced with zero BEFORE the inherited fitter sees Y.\n    past = valid & (maturity<refit)\n    y = np.zeros_like(sealed_y);y[past]=sealed_y[past]\n    f = fit_prefix(t,maturity,ids,b,phi,y,past,refit,start)\n    if f is None: return None\n    ix=f.train_indices\n    fail(np.all(maturity[ix]<refit) and np.all(t[ix]+245*60<refit), 'FIT_LOOKAHEAD')\n    xx=(np.column_stack([b[ix],phi[ix]])-f.means)/f.sds;xx[:,f.zero]=0\n    yy=np.clip((y[ix]-f.ymean)/f.ysd,-8,8)\n    coefficients = [solve_ridge(np.column_stack([xx[:,:10],xx[:,10+j]]),yy,f.weights) for j in (0,1)]\n    coefficients.append(f.beta_aug)\n    return f,coefficients",
+              "function": "fit_family",
+              "start_line": 116
+            },
+            {
+              "end_line": 137,
+              "exact_source": "def forecasts(fit,b,phi):\n    f,coef=fit\n    pb,_=predict(f,b,phi)\n    xx=(np.r_[b,phi]-f.means)/f.sds;xx[f.zero]=0\n    xs=[np.r_[1.,xx[:10],xx[10]],np.r_[1.,xx[:10],xx[11]],np.r_[1.,xx]]\n    return pb,np.clip([x@beta for x,beta in zip(xs,coef)],-8,8)",
+              "function": "forecasts",
+              "start_line": 132
+            },
+            {
+              "end_line": 202,
+              "exact_source": "def evaluate(caches,ids,clocks=CLOCK,start=START,end=END):\n    \"\"\"All18 comparisons, common family support, fixed identity/calendar mass.\"\"\"\n    n=len(ids);K=len(clocks);fail(n>0 and len(set(ids))==n,'IDENTITIES')\n    score_ix=np.flatnonzero(clocks>=start+56*DAY);N=len(score_ix)\n    fail(N>0,'SCORE_CALENDAR')\n    outputs=[];calendar=[];fit_audits=[]\n    times=np.repeat(clocks,n);identity=np.tile(ids,K)\n    for li,lag in enumerate(LAGS):\n        for hi,h in enumerate(HORIZONS):\n            b=np.stack([c['b'][li] for c in caches],axis=1).reshape(K*n,10)\n            phi=np.stack([c['phi'][li] for c in caches],axis=1).reshape(K*n,2)\n            sealed=np.stack([c['y'][li,hi] for c in caches],axis=1).reshape(-1)\n            fok=np.stack([c['feature_ok'][li] for c in caches],axis=1).reshape(-1)\n            lok=np.stack([c['label_ok'][li,hi] for c in caches],axis=1).reshape(-1)\n            maturity=times+300*h+lag;valid=fok&lok&(maturity<=end)\n            gains=np.zeros((K,n,3));supported=np.zeros((K,n),bool)\n            absent={'feature':0,'label':0,'fit':0};forecast_hash=hashlib.sha256()\n            feature_reasons={}\n            fit=None;current=None\n            for k in score_ix:\n                t=int(clocks[k]);refit=start+56*DAY+((t-start-56*DAY)//(7*DAY))*7*DAY\n                if current!=refit:\n                    fit=fit_family(times,maturity,identity,b,phi,sealed,valid,refit,start);current=refit\n                    if fit is not None:\n                        f=fit[0];ix=f.train_indices\n                        fit_audits.append({'lag_seconds':lag,'horizon_M5':h,'refit':refit,'training_rows':len(ix),\n                          'latest_training_maturity':int(maturity[ix].max()),'latest_training_clock':int(times[ix].max()),\n                          'train_indices_sha256':digest(ix.tobytes()),'ymean':f.ymean,'ysd':f.ysd,\n                          'identity_weight_totals':{str(i):float(f.weights[identity[ix]==i].sum()) for i in np.unique(identity[ix])}})\n                for s in range(n):\n                    j=k*n+s\n                    if not fok[j]:\n                        absent['feature']+=1;why=str(caches[s]['reason'][li,k])\n                        feature_reasons[why]=feature_reasons.get(why,0)+1;continue\n                    if fit is None: absent['fit']+=1;continue\n                    # Forecasts computed and bound before accessing this label.\n                    pb,pa=forecasts(fit,b[j],phi[j])\n                    forecast_hash.update(np.r_[t,ids[s],pb,pa].astype('<f8').tobytes())\n                    if not lok[j] or maturity[j]>end: absent['label']+=1;continue\n                    released_at=int(maturity[j]);fail(released_at>t,'FORECAST_LABEL_ORDER')\n                    yy=float(np.clip((sealed[j]-fit[0].ymean)/fit[0].ysd,-8,8))\n                    gain=((yy-pb)**2-(yy-pa)**2)/256\n                    fail(np.isfinite(gain).all() and (np.abs(gain)<=1+1e-14).all(),'SCORE_BOUND')\n                    gains[k,s]=gain;supported[k,s]=True\n            for mi,name in enumerate(MAPS):\n                x=gains[score_ix,:,mi].mean(1);calendar.append(x)\n                outputs.append({'comparison':name,'horizon_M5':h,'lag_seconds':lag,\n                  'status':'EXPLORATORY_ONLY_NO_FORMAL_REJECTION' if supported[score_ix].any() else 'UNSUPPORTED',\n                  'calendar_units':N,'identities':n,'fixed_opportunities':N*n,\n                  'paired_supported':int(supported[score_ix].sum()),'abstention':absent,\n                  'feature_abstention_reasons':feature_reasons,\n                  'mean_bounded_score_gain':float(x.mean()),'calendar_gain':x.tolist(),\n                  'identity_gain_fixed_calendar':gains[score_ix,:,mi].mean(0).tolist(),\n                  'identity_supported_counts':supported[score_ix].sum(0).tolist(),\n                  'forecast_sha256':forecast_hash.hexdigest(),\n                  'score_denominator':256,'formal_p_value':None,'formal_rejection':None})\n    panel=np.asarray(calendar).T\n    fail(len(outputs)==18,'FULL_FAMILY')\n    return {'schema':'mxm.exploratory.primary145.report.v1','inference_class':'EXPLORATORY_ONLY_NO_FORMAL_REJECTION',\n      'receipt':'UNKNOWN; conditional sensitivity scenarios only','identity_order':list(map(int,ids)),\n      'score_clock_utc_epoch':clocks[score_ix].tolist(),'comparisons':outputs,'fit_audits':fit_audits,\n      'descriptive_common_calendar_covariance':np.atleast_2d(np.cov(panel,rowvar=False,ddof=0)).tolist(),\n      'independent_sample_size_claim':None,'confidence_interval':None,'alpha_allocated':False,\n      'economic_or_profit_claim':False,'winner_pruning':False}",
+              "function": "evaluate",
+              "start_line": 139
+            }
+          ],
+          "source": {
+            "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+            "path": "research_core_v4/exploratory_dev_v1/worker.py",
+            "sha256": "3e6ca9c78417f593e4b270c3d9ed8d676cf474184b62c219d559e7e10ffc87d1",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/worker.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Historic PRIMARY145 selection makes report exploratory; no pvalue/CI/formal rejection; predictive score improvement may occur without new sigma(B) information.",
+      "predictive_or_economic_estimand": "paired fixed algorithm forecasting score improvement; no general conditional information, economic edge or profitability",
+      "relation_to_final_cbot_objective": "Forecast evidence first, then disjoint confirmation and authentic economics.",
+      "scientific_status": "IMPLEMENTED_SYNTHETIC_ONLY",
+      "sources": [
+        {
+          "last_modified_commit": "9254cd828b96bc1f31441010201bd7916d32560b",
+          "path": "research_core_v4/compact_baseline_v2.py",
+          "sha256": "a8a7f5d883f9f6966176c657ea0bcf8dc1294f4e11e48ff0aa35a9036f163758",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/compact_baseline_v2.py"
+        },
+        {
+          "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+          "path": "research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json",
+          "sha256": "4589df78d32a21a6d84387821a7ed0cfacef514b4b0a299c211e7dd21ace71c6",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json"
+        },
+        {
+          "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+          "path": "research_core_v4/exploratory_dev_v1/worker.py",
+          "sha256": "3e6ca9c78417f593e4b270c3d9ed8d676cf474184b62c219d559e7e10ffc87d1",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/worker.py"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        },
+        {
+          "last_modified_commit": "bc4069eda3128e72c186414a40cd63833ce0f1c7",
+          "path": "research_core_v4/exploratory_dev_v2/INTEGRATED_RESULT_V2.json",
+          "sha256": "cc146f64c2baa6616f515520b6fa7ce0158bee211c6f324814a770911b86eb4f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v2/INTEGRATED_RESULT_V2.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Brier gain4/315 mathematical counterexample under conditional independence.",
+      "assumptions_and_domain_of_validity": "Conditional-null score/nuisance error law must be identified; arbitrary restricted model improvement is insufficient.",
+      "exact_formula_or_source_specification": {
+        "counterexample": "No justified conditional-null score/nuisance-error law identified; positive proper-score relative model gain is insufficient, exact counterexample gain4/315 under conditional independence.",
+        "null": "Y independent of Phi conditional on sigma(B)"
+      },
+      "formula_family": "Conditional information and sigma(B)",
+      "id": "M11",
+      "implementation_paths": [
+        "research_core_v4/main_reentry_v1/offline_falsification.py"
+      ],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "No general conditional-information experiment frozen or certified; no alpha allocation.",
+      "predictive_or_economic_estimand": "New information beyond full sigma(B), distinct from score gain versus a fixed model.",
+      "relation_to_final_cbot_objective": "Avoids false predictive promotion before committing EUR200.",
+      "scientific_status": "OPEN_UNTESTED",
+      "sources": [
+        {
+          "last_modified_commit": "79a81ded1a7acc1fb0bf6adee2fa70a35b26c113",
+          "path": "research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json",
+          "sha256": "7640dc982f8b6583721e7d3aa134ff03d18da81253e9283a41786369f449b7d3",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json"
+        },
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+          "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+        },
+        {
+          "last_modified_commit": "79a81ded1a7acc1fb0bf6adee2fa70a35b26c113",
+          "path": "research_core_v4/main_reentry_v1/offline_falsification.py",
+          "sha256": "8315380dd9da720581ce789c90bd0c9ae51bbcbbf91cf94b2e72e96666389324",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/main_reentry_v1/offline_falsification.py"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "18 synthetic/oracle comparisons only; no new empirical report.",
+      "assumptions_and_domain_of_validity": "56day rolling prefix, 7day refit, exclude refit UTC day; t+245min<refit and label maturity<refit; training-only weighted scaler and equal identity totals.",
+      "exact_formula_or_source_specification": {
+        "fit": {
+          "common_B": "same beta_B and response normalization for all3 map comparisons within horizon/lag; B coordinate law shared across all18",
+          "no_fit": "common abstention; no alternate fitting",
+          "prediction": "linear ridge; clip[-8,8]; forecast bound before current label release",
+          "refit": "start+56d then every7d",
+          "route": "reuse immutable fit_prefix,predict,solve_ridge; common combined input standardization",
+          "scaling": "weighted population mean/sd on training prefix only; sd<=1e-12 zero coordinate; ridge slopes0.5 intercept0.05",
+          "support": "intersection B,chronology,coupling and complete horizon; same training/scoring support for all3 variants within horizon/lag",
+          "training": "rolling56 days; same6h clocks; entire refit UTC day excluded; decision+245min<refit AND label_maturity<refit",
+          "weights": "equal total weight among training identities present, then equal events per identity; absent training identities explicitly reported; no substitution"
+        },
+        "response": {
+          "complete_required_bars": "all h future bars plus preceding bar",
+          "domain_end": "maturity<=end; no label crosses accepted development boundary",
+          "law": "log(close of last bar in [t,t+300h) / close of [t-300,t))",
+          "maturity": "t+300h+lag",
+          "normalization": "one common fit ymean/ysd per horizon/lag/refit; ysd floor1e-12; clip[-8,8]",
+          "score": "((z-pB)^2-(z-pA)^2)/256 in[-1,1]"
+        }
+      },
+      "formula_family": "Prequential forecasting, regularization and maturity",
+      "id": "M12",
+      "implementation_paths": [
+        "research_core_v4/operational_v1/prequential_score.py",
+        "research_core_v4/exploratory_dev_v1/worker.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 23,
+              "exact_source": "def weights_equal_identity(ids):\n    _, inv, counts=np.unique(ids,return_inverse=True,return_counts=True)\n    # Total weight one, equally allocated to identities, then their events.\n    return 1.0/(len(counts)*counts[inv])",
+              "function": "weights_equal_identity",
+              "start_line": 20
+            },
+            {
+              "end_line": 28,
+              "exact_source": "def solve_ridge(x,y,w):\n    z=np.column_stack([np.ones(len(x)),x])\n    penalty=np.full(z.shape[1],0.5);penalty[0]=0.05\n    return np.linalg.solve((z*w[:,None]).T@z+np.diag(penalty),z.T@(w*y))",
+              "function": "solve_ridge",
+              "start_line": 25
+            },
+            {
+              "end_line": 44,
+              "exact_source": "def fit_prefix(t,maturity,ids,b,phi,y,valid,refit,domain_start):\n    assert b.shape[1]==10 and np.all(maturity>t)\n    if refit-domain_start<56*DAY:return None\n    # Entire current UTC day is excluded. Maximum-label plus closed-bar purge\n    # is strict: a training decision must precede refit by >240min+5min.\n    day_start=(refit//DAY)*DAY\n    mask=valid&(t>=refit-56*DAY)&(t<day_start)&(t+245*60<refit)&(maturity<refit)&(t%1800==0)\n    idx=np.flatnonzero(mask)\n    if not len(idx):return None\n    w=weights_equal_identity(ids[idx]);x=np.column_stack([b[idx],phi[idx]])\n    mean=(x*w[:,None]).sum(0);sd=np.sqrt(((x-mean)**2*w[:,None]).sum(0));zero=sd<=1e-12\n    scale=np.maximum(sd,1e-12);xx=(x-mean)/scale;xx[:,zero]=0\n    ym=float(w@y[idx]);ys=float(np.sqrt(w@((y[idx]-ym)**2)));ys=max(ys,1e-12)\n    yy=np.clip((y[idx]-ym)/ys,-8,8)\n    return PrefixFit(mean,scale,zero,ym,ys,solve_ridge(xx[:,:10],yy,w),solve_ridge(xx,yy,w),idx,w,refit)",
+              "function": "fit_prefix",
+              "start_line": 30
+            },
+            {
+              "end_line": 50,
+              "exact_source": "def predict(f,b,phi):\n    xx=(np.concatenate([b,phi])-f.means)/f.sds;xx[f.zero]=0\n    pb=float(np.clip(np.r_[1.,xx[:10]]@f.beta_b,-8,8))\n    pa=float(np.clip(np.r_[1.,xx]@f.beta_aug,-8,8))\n    return pb,pa",
+              "function": "predict",
+              "start_line": 46
+            }
+          ],
+          "source": {
+            "last_modified_commit": "e9194f809f71a76356adf67ab5dfaa24288ed72e",
+            "path": "research_core_v4/operational_v1/prequential_score.py",
+            "sha256": "116ec6fe528ed1a0155a1ece019a51534060ffc3fc10676d9cfe78249493094a",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/operational_v1/prequential_score.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Old prequential aggregator compresses missing days and has unbounded loss; freeze expressly reuses fit functions, not that aggregation.",
+      "predictive_or_economic_estimand": "Paired bounded loss reduction for fixed ridge learners.",
+      "relation_to_final_cbot_objective": "Finite arithmetic can be ported to C# only after scientific/economic qualification.",
+      "scientific_status": "IMPLEMENTED_SYNTHETIC_ONLY",
+      "sources": [
+        {
+          "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+          "path": "research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json",
+          "sha256": "4589df78d32a21a6d84387821a7ed0cfacef514b4b0a299c211e7dd21ace71c6",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/DESIGN_FREEZE_V1.json"
+        },
+        {
+          "last_modified_commit": "e9194f809f71a76356adf67ab5dfaa24288ed72e",
+          "path": "research_core_v4/operational_v1/prequential_score.py",
+          "sha256": "116ec6fe528ed1a0155a1ece019a51534060ffc3fc10676d9cfe78249493094a",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/operational_v1/prequential_score.py"
+        },
+        {
+          "last_modified_commit": "84af51091046d663575433dcedaba87b5af295c9",
+          "path": "research_core_v4/exploratory_dev_v1/worker.py",
+          "sha256": "3e6ca9c78417f593e4b270c3d9ed8d676cf474184b62c219d559e7e10ffc87d1",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v1/worker.py"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        },
+        {
+          "last_modified_commit": "bc4069eda3128e72c186414a40cd63833ce0f1c7",
+          "path": "research_core_v4/exploratory_dev_v2/INTEGRATED_RESULT_V2.json",
+          "sha256": "cc146f64c2baa6616f515520b6fa7ce0158bee211c6f324814a770911b86eb4f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/exploratory_dev_v2/INTEGRATED_RESULT_V2.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Global/context/local regularization; matured daily buckets; 56/7day model windows; empirical residual bands, not exact coverage.",
+      "exact_formula_or_source_specification": {
+        "adaptation": {
+          "memory_maximum_days": 63,
+          "overlay_update": "UTC_MIDNIGHT_MATURE_DAILY_BUCKETS",
+          "overlay_weight": 0.25,
+          "overlay_window_days": 7,
+          "randomness": false,
+          "structural_reanchor_every_days": 7,
+          "structural_window_days": 56
+        },
+        "hierarchy": "GLOBAL_RIDGE_PLUS_CONTEXT_RESIDUAL_RIDGE_PLUS_LOCAL_RESIDUAL_INTERCEPT_SHRUNK_N_OVER_N_PLUS_500_CAPPED_0.25;NO_SYMBOL_ONE_HOT",
+        "uncertainty": "RESIDUAL_VARIANCE_MIN0.04;MEAN_SE_SQRT_VAR_OVER_MIN_WINDOW_DAYS_N_OVER48;MEAN_RELIABILITY_1_OVER_1_PLUS_VAR;TAIL3_RESIDUAL_SD;NOT_EXACT_PROBABILITY_COVERAGE"
+      },
+      "formula_family": "Adaptive hierarchical ridge and uncertainty",
+      "id": "M13",
+      "implementation_paths": [
+        "adaptive_competition/models.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 65,
+              "exact_source": "def fit_window(self,day,days):\n  stats=[self.daystats(i) for i in range(max(0,day-days),day)]\n  xx,xy,yy,cnt=[sum(v[k] for v in stats) for k in range(4)]\n  n,h,d=xy.shape;betas=np.zeros_like(xy);variance=np.ones((n,h));se=np.zeros((n,h));tails=np.ones((n,h))*3\n  for hi in range(h):\n   count=cnt[:,hi];w=self.sw/np.maximum(count,1);w[count==0]=0\n   A=np.einsum('s,sij->ij',w,xx[:,hi]);b=np.einsum('s,si->i',w,xy[:,hi])\n   penalty=np.eye(d)*.5;penalty[0,0]=.05\n   globalb=np.linalg.solve(A+penalty,b)\n   for ci in range(len(self.nc)):\n    ids=np.flatnonzero(self.ci==ci);wc=w[ids];xc=xx[ids,hi]\n    Ac=np.einsum('s,sij->ij',wc,xc);bc=np.einsum('s,si->i',wc,xy[ids,hi])-Ac@globalb\n    # context component shrinks toward the global law, not symbol one-hot.\n    cb=globalb+np.linalg.solve(Ac+np.eye(d)*2,bc)\n    for si in ids:\n     if count[si]<24:betas[si,hi]=globalb;continue\n     local=(xy[si,hi,0]-xx[si,hi,0]@cb)/count[si]\n     cb2=cb.copy();cb2[0]+=np.clip(local,-.25,.25)*count[si]/(count[si]+500)\n     betas[si,hi]=cb2\n     variance[si,hi]=max(.04,(yy[si,hi]-2*cb2@xy[si,hi]+cb2@xx[si,hi]@cb2)/count[si])\n     # Overlap is not independent evidence: daily cluster ceiling, not row count.\n     independent=min(days,count[si]/48)\n     se[si,hi]=np.sqrt(variance[si,hi]/max(independent,1))\n     tails[si,hi]=3*np.sqrt(variance[si,hi])\n  return betas,variance,se,tails",
+              "function": "fit_window",
+              "start_line": 41
+            },
+            {
+              "end_line": 75,
+              "exact_source": "def update(self,day):\n  if day==self.fitted_day:return\n  # causal periodic reanchor, finite trailing history; bounded overlay.\n  if self.anchor is None or day-self.anchor_day>=7:\n   self.anchor=self.fit_window(day,56);self.anchor_day=day\n  recent=self.fit_window(day,7)\n  self.state=tuple(.75*a+.25*b for a,b in zip(self.anchor,recent))\n  self.fitted_day=day\n  # retain at most 63 UTC maturity-day buckets; no hidden infinite state.\n  self.daily={k:v for k,v in self.daily.items() if k>=day-63}",
+              "function": "update",
+              "start_line": 66
+            },
+            {
+              "end_line": 87,
+              "exact_source": "def predict(self,x,sig):\n  x=basis(np.asarray(x),self.nonlinear);valid=np.isfinite(x).all(axis=1)&np.isfinite(sig)\n  xb=np.nan_to_num(x);b,var,se,tail=self.state\n  normalized=np.einsum('sd,shd->sh',xb,b)\n  reliability=1/(1+var)\n  mu=normalized*reliability\n  scale=sig[:,None]*np.sqrt(np.array(HORIZONS))[None,:]\n  # OOD from dimensionless primitives, unavailable relation has separate flag.\n  ood=(abs(xb[:,1:16])>=3.99).any(axis=1)\n  mu[ood]*=.25\n  mu[~valid]=np.nan\n  return mu*scale,se*scale,tail*scale,reliability,ood",
+              "function": "predict",
+              "start_line": 76
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/models.py",
+            "sha256": "9fcc3a00954750597ff25ce3d86bc657008f88a90d950374666a9b18f6484257",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/models.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Code clips local residual before n/(n+500), code is exact implementation authority. Count<24 leaves SE0; post-outcome diagnostic explicitly says not zero true uncertainty. No retuning frozen policy.",
+      "predictive_or_economic_estimand": "Normalized market-return prediction with empirical risk/uncertainty.",
+      "relation_to_final_cbot_objective": "Historical model knowledge reusable as methodology; failed trading identity stays closed.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/models.py",
+          "sha256": "9fcc3a00954750597ff25ce3d86bc657008f88a90d950374666a9b18f6484257",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/models.py"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Persisted finite44cell prototype envelope passed; contiguous gaps support/power limited.",
+      "assumptions_and_domain_of_validity": "Support masks and calendar retained; common block multipliers; weak between-block dependence is approximate. Global/partial null stress is finite, not arbitrary-distribution theorem.",
+      "exact_formula_or_source_specification": {
+        "adjusted_p": "(1 + number of joint maxabs bootstrap statistics >= observed absT)/1024",
+        "before_real_response": [
+          "Recover accepted data/provenance without opening outcomes",
+          "Freeze mechanism, complete cohort/horizon/feature family, availability and dependency geometry",
+          "Freeze seeds/trials/gates before exact-geometry synthetic certification",
+          "Validate joint overlapping horizons, prefix-estimated nuisance scores, censoring/masks, actual support and complete stability/breadth selection",
+          "Any calibration failure blocks without retuning exact failed design",
+          "Separate durable governance authorization before any response"
+        ],
+        "declared_FWER_ceiling": 0.05,
+        "draws": 1023,
+        "fallback": null,
+        "finite_certification": "All44 global/partial-null complete-procedure cells pass fixed z3.5 simultaneous Wilson upper<=.05. Not distribution-free strong FWER for arbitrary data or geometries.",
+        "gap_limit": "No contiguous-gap trial supports all12 leaves; some individual leaves support. Local power plateaus near43%. FWER certification applies only to support-screened procedure. Full-family gap geometry and informative censoring NOT certified; do not relax support or label absence null.",
+        "joint_resampling": "One common Rademacher sign per calendar block across every leaf. Null-center per-leaf supported block means. Preserve contemporaneous cross-leaf covariance; within-block dependence retained by aggregation. Between-block weak dependence is an approximation assessed by stress, not exact independence.",
+        "local_selection": "Two-sided significance pays all12 leaves, including all horizons/contexts. Complete prototype lead also requires orientation consistency in at least2of3 fixed calendar segments. Retain every surviving leaf and orientation; unrelated contexts may have opposite directions.",
+        "method": "JOINT_CALENDAR_BLOCK_WILD_BOOTSTRAP_T_MAXT_V1",
+        "nominal_family_alpha": 0.025,
+        "primary_only": true,
+        "prototype_geometry": "210 daily calendar scores; 3 contexts x 4 horizons; 12 leaves; 15 chronological 14-day blocks.",
+        "stability_breadth": "Prototype2of3 is an abstract synthetic example, not a universal mechanism law. Before any real mechanism, freeze temporal/regime stability and coherent cohort breadth/concentration appropriate to its causal semantics and include them in exact-geometry calibration. No default every-third-sign or4of6 breadth.",
+        "studentization": "Mean of equal supported block means / sample SD of those means divided by sqrt(n); recompute centered bootstrap variance in every draw.",
+        "support": "At least 7 valid days/block, 12 supported blocks/leaf, and 42 observed days in each fixed70-day third; unsupported/degenerate leaf fails closed. Keep original calendar/masks. No imputation to zero observations and no clock compression.",
+        "unknown_geometry_status": "CALIBRATION_REQUIRED_NOT_AUTHORIZED"
+      },
+      "formula_family": "Temporal dependence, maxT and partial nulls",
+      "id": "M14",
+      "implementation_paths": [
+        "research_core_v4/inference_v2/joint_block_wild_maxt_v1.py"
+      ],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "Do not transfer this prototype certificate to operational261leaf/28week geometry. DAILY_HAC10_HOLM and WEEKLY_HAC2_HOLM failed and remain closed.",
+      "predictive_or_economic_estimand": "Prototype12leaf complete development lead family-error control.",
+      "relation_to_final_cbot_objective": "Protects against paying capital for a statistical selection artifact.",
+      "scientific_status": "IMPLEMENTED_SYNTHETIC_ONLY",
+      "sources": [
+        {
+          "last_modified_commit": "65a929a3383ce8b0efda233c843061fc44ffe91e",
+          "path": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+          "sha256": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json"
+        },
+        {
+          "last_modified_commit": "d888440fe17fa669f4d881f36b5b416b2edfb4d6",
+          "path": "research_core_v4/inference_v2/joint_block_wild_maxt_v1.py",
+          "sha256": "e948a3e36e546168f185d52c8a31a5caf0da7fe0f0c160eb3da3a492c56979d0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/inference_v2/joint_block_wild_maxt_v1.py"
+        },
+        {
+          "last_modified_commit": "2e60a5ba7fa223cb700841909938348248553b59",
+          "path": "research_core_v4/inference_v2/JBW_MAXT_CERTIFICATION_INTERPRETATION_V1.json",
+          "sha256": "a039c5d2bfe8f375f1274f73ed8bbd7bec84d7cc3287a7cb890375078bb9a6f4",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/inference_v2/JBW_MAXT_CERTIFICATION_INTERPRETATION_V1.json"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Historical session activity 28/41 Holm-supported structural result as recorded in architecture; family phenomenon, no selected economic winner.",
+      "assumptions_and_domain_of_validity": "Each constituent pvalue must be null-valid for actual dependent observation law; Holm cannot repair invalid nominal pvalues.",
+      "exact_formula_or_source_specification": {
+        "source_formula": "Sort pvalues ascending; threshold alpha/(m-i); stop at first nonrejection; no independent-leaf assumption if input pvalues valid. Exact code is source specification."
+      },
+      "formula_family": "Holm multiplicity",
+      "id": "M15",
+      "implementation_paths": [
+        "research_v3/seasonality_session_time_epoch30_screen.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 490,
+              "exact_source": "def holm_adjust(p_values: dict[str, float]) -> dict[str, float]:\n    ordered = sorted(p_values.items(), key=lambda item: (item[1], item[0]))\n    adjusted: dict[str, float] = {}\n    running = 0.0\n    count = len(ordered)\n    for index, (key, p_value) in enumerate(ordered):\n        running = max(running, min(1.0, p_value * (count - index)))\n        adjusted[key] = running\n    return adjusted",
+              "function": "holm_adjust",
+              "start_line": 482
+            }
+          ],
+          "source": {
+            "last_modified_commit": "2041d59436c276fd066f475a840c798bfdaafdfa",
+            "path": "research_v3/seasonality_session_time_epoch30_screen.py",
+            "sha256": "5bc24a8640d920a12b5e300b4517be3809f3d22245858a97728f48922f2fed6e",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_v3/seasonality_session_time_epoch30_screen.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Not a profit claim; no broad transfer of pvalue validity from synthetic models.",
+      "predictive_or_economic_estimand": "Declared family FWER.",
+      "relation_to_final_cbot_objective": "Pays source/identity family selection before confirmation.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "2041d59436c276fd066f475a840c798bfdaafdfa",
+          "path": "research_v3/seasonality_session_time_epoch30_screen.py",
+          "sha256": "5bc24a8640d920a12b5e300b4517be3809f3d22245858a97728f48922f2fed6e",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_v3/seasonality_session_time_epoch30_screen.py"
+        },
+        {
+          "last_modified_commit": "65a929a3383ce8b0efda233c843061fc44ffe91e",
+          "path": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+          "sha256": "ce80c4a71fe2f49c3f9b6eba7797f47de6e2f49827bd97384e54b81e63f28be5",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "24week all10 PASS; 28week AR050714/16384, upper0.05165277915188849>0.05 -> FAIL; Stage7 not shared_ready.",
+      "assumptions_and_domain_of_validity": "261 paid leaves; finite frozen null/effect banks; confidence family and geometry-specific z fixed; no trial reuse.",
+      "exact_formula_or_source_specification": {
+        "alpha": "k/1024 with immutable k15, alpha=15/1024",
+        "rank": "(1 + #joint bootstrap maxima >= observed T)/1024",
+        "source_power": "all NORMAL/AR025/AR050 Wilson lower>=0.8; shared_ready all5 sources only within exact V2 contract",
+        "support": "At least12 weekly blocks and >=4 in each fixed third"
+      },
+      "formula_family": "Operational V2 maxT cutoff, Wilson and power",
+      "id": "M16",
+      "implementation_paths": [
+        "research_core_v4/operational_v1/inference.py",
+        "research_core_v4/operational_v2/bank.py",
+        "research_core_v4/operational_v2/power.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 19,
+              "exact_source": "def cluster(x,mask,block_days=7):\n    ntrial,days,leaves=x.shape;assert days%block_days==0\n    B=days//block_days\n    v=x.reshape(ntrial,B,block_days,leaves);m=mask.reshape(v.shape)\n    counts=m.sum(2);valid=counts>0\n    means=(np.where(m,v,0)).sum(2)/np.maximum(counts,1)\n    n=valid.sum(1);mu=(means*valid).sum(1)/np.maximum(n,1)\n    u=(means-mu[:,None,:])*valid;s2=(u*u).sum(1)\n    se=np.sqrt(s2/np.maximum(n-1,1)/np.maximum(n,1))\n    support=(n>=12)&(se>1e-12);third=[]\n    # Partition the scoring calendar (after structural warm-up), not raw acquisition calendar.\n    # Whole weekly blocks stay in one third; unsupported calendar positions never reindexed.\n    for idx in np.array_split(np.arange(B),3):\n        vv=valid[:,idx];nn=vv.sum(1);support &= nn>=4\n        third.append((means[:,idx]*vv).sum(1)/np.maximum(nn,1))\n    return {'mu':mu,'u':u,'n':n,'s2':s2,'se':se,'valid':valid,'support':support,'third':np.stack(third,1)}",
+              "function": "cluster",
+              "start_line": 4
+            },
+            {
+              "end_line": 27,
+              "exact_source": "def bootstrap_max(g,bank):\n    # Common bank R x B signs multiply the entire 261-leaf block vector.\n    nt,B,L=g['u'].shape\n    totals=(bank@g['u'].transpose(1,0,2).reshape(B,nt*L)).reshape(len(bank),nt,L).transpose(1,0,2)\n    var=(g['n'][:,None,:]*g['s2'][:,None,:]-totals**2)/np.maximum(g['n'][:,None,:]-1,1)\n    ts=totals/np.sqrt(np.maximum(var,1e-24));ts=np.where(g['support'][:,None,:],ts,-np.inf)\n    return np.sort(ts.max(-1),axis=1)",
+              "function": "bootstrap_max",
+              "start_line": 21
+            },
+            {
+              "end_line": 36,
+              "exact_source": "def decisions(g,sorted_max,shift):\n    t=(g['mu']+shift)/np.maximum(g['se'],1e-12)\n    p=np.empty(t.shape)\n    for i in range(len(t)):\n        p[i]=(1+len(sorted_max[i])-np.searchsorted(sorted_max[i],t[i],side='left'))/(len(sorted_max[i])+1)\n    significant=(p<=.025)&g['support']\n    stable=((g['third']+shift[:,None,:])>0).sum(1)>=2\n    return significant&stable,significant,p,t",
+              "function": "decisions",
+              "start_line": 29
+            },
+            {
+              "end_line": 41,
+              "exact_source": "def wilson(k,n,z):\n    p=np.asarray(k)/n;den=1+z*z/n;mid=(p+z*z/(2*n))/den\n    half=z*np.sqrt(p*(1-p)/n+z*z/(4*n*n))/den\n    return mid-half,mid+half",
+              "function": "wilson",
+              "start_line": 38
+            }
+          ],
+          "source": {
+            "last_modified_commit": "e9194f809f71a76356adf67ab5dfaa24288ed72e",
+            "path": "research_core_v4/operational_v1/inference.py",
+            "sha256": "125f197dcd06289497635d2e22aceecceef2f190420246f72fb571af7b88555f",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/operational_v1/inference.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Wilson is normal-score interval not exact binomial theorem; algebra oracle is not validation for arbitrary market laws. AR050 adjacent-week correlation witness16129/139520.",
+      "predictive_or_economic_estimand": "Synthetic false-complete lead probability and procedure power on real support masks.",
+      "relation_to_final_cbot_objective": "Stops invalid real market opening; does not close all V4 discovery.",
+      "scientific_status": "HISTORICAL_FAILED_OR_CLOSED",
+      "sources": [
+        {
+          "last_modified_commit": "e9194f809f71a76356adf67ab5dfaa24288ed72e",
+          "path": "research_core_v4/operational_v1/inference.py",
+          "sha256": "125f197dcd06289497635d2e22aceecceef2f190420246f72fb571af7b88555f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/operational_v1/inference.py"
+        },
+        {
+          "last_modified_commit": "931f984f1ccad978a20476ffc9c9b0c4c7a6ce2c",
+          "path": "research_core_v4/operational_v2/bank.py",
+          "sha256": "3b0349972ee04633c1239f4367db33eed327125184dec6f2e215642d07882459",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/operational_v2/bank.py"
+        },
+        {
+          "last_modified_commit": "e3ccbd3cf38dd23d249e75aa4c1612391a405a8b",
+          "path": "research_core_v4/operational_v2/power.py",
+          "sha256": "31fc5038e26368220415fee43088413426af076d16cf231f9f7d6c1ecf6a673b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/operational_v2/power.py"
+        },
+        {
+          "last_modified_commit": "c644e4fce5b1173aae12ad50bb55e77a6cbfa586",
+          "path": "research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_STAGE7_RECOVERY224_FINAL_CANONICAL_STATE_V1.json",
+          "sha256": "3d6407e7b4bdb31ee64941966cd9c262fb7646e10fca8fba8d63f81f52ccf720",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_STAGE7_RECOVERY224_FINAL_CANONICAL_STATE_V1.json"
+        },
+        {
+          "last_modified_commit": "37ec0e737653f05335362b810a607c55e8c9c79f",
+          "path": "research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_28_WEEK_CERTIFICATION_AGGREGATED_RESULT_V1.json",
+          "sha256": "294b8b30c6b4500f04ff5c17616a0375e1bb7aca9a200b08a4a8c1d18221c430",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/STRICT_PREOUTCOME_OPERATIONAL_V2_EXTENDED_28_WEEK_CERTIFICATION_AGGREGATED_RESULT_V1.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Conditional Hoeffding proof and analytic geometry only; no market inference. Example alpha0.025 is not allocated.",
+      "assumptions_and_domain_of_validity": "X[-1,1], truly predictable forecasts/design, common truthful chronological filtration; fixed complete family weights sum<=1; censoring belongs to target.",
+      "exact_formula_or_source_specification": {
+        "V2_alpha_k15_pass_rule": "BYTE_IDENTICAL_UNCHANGED",
+        "alpha_new": "UNALLOCATED_NO_EXPERIMENT_FROZEN",
+        "alternative_at_look": "Delta_jn > 0",
+        "claim": "ONLY_FROZEN_FORECASTER_SKILL_NOT_SIGMA_B_INFORMATION",
+        "estimand": "Delta_jn = average E[X_jk | common calendar filtration F_(k-1)]",
+        "fixed_look_lower_bound": "mean(X_j1:n) - sqrt(2*log(1/(alpha_new*w_j))/n)",
+        "lower_bound": "mean(X_j1:n) - sqrt(2*log(n*(n+1)/(alpha_new*w_j))/n)",
+        "method": "CONDITIONAL_HOEFFDING_SCORE_DIFFERENCE_CS_WITH_COMPLETE_WEIGHTED_UNION_SPENDING",
+        "null_at_look": "Delta_jn <= 0",
+        "partial_null_and_dependence": "Union bound over any true-null subset; no cross-leaf or iid-week assumption; chronological units not duplicated instrument counts.",
+        "power": "NOT_CERTIFIED_NO_NEW_CAMPAIGN",
+        "requirements": [
+          "predictable forecasts and bets/design",
+          "bounded scores",
+          "complete fixed family weights with sum<=1",
+          "truthful common filtration and maturity law",
+          "target includes exact censoring/weight law",
+          "no adaptive historical reuse labelled preoutcome"
+        ],
+        "score_range": [
+          -1,
+          1
+        ],
+        "support_and_stability": "MECHANISM_SPECIFIC_NOT_YET_IDENTIFIED"
+      },
+      "formula_family": "Sequential bounds and legitimate confidence sequences",
+      "id": "M17",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "One fixed-look radius sqrt(2log(1/(alpha*w_j))/n); repeated-look spending alpha*w_j/[n(n+1)]. Exposed adaptive archive breaks automatic application; outcome-selected family can reject always.",
+      "predictive_or_economic_estimand": "Delta_jn=(1/n)sum E[X_jk|F_(k-1)] for the frozen forecaster pair.",
+      "relation_to_final_cbot_objective": "Provides legitimate potential confirmation rule when domain/selection valid; no current execution authority.",
+      "scientific_status": "MATHEMATICAL_WITNESS_ONLY",
+      "sources": [
+        {
+          "last_modified_commit": "79a81ded1a7acc1fb0bf6adee2fa70a35b26c113",
+          "path": "research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json",
+          "sha256": "7640dc982f8b6583721e7d3aa134ff03d18da81253e9283a41786369f449b7d3",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_RESEARCH_REENTRY_METHOD_DECISION_AUTHORITY_V1.json"
+        },
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+          "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json",
+          "sha256": "61922763faeb88d510b34706b39f0fb2c67d3af96ff9b5f0ef79a3840c4a31da",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/skill_preflight_v1/OFFLINE_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Global effective trials unidentified; winner-first exposure documented; protected forward CLOSED.",
+      "assumptions_and_domain_of_validity": "Heterogeneous source trials cannot be treated as7975 independent cells; protected data remain hidden until authorized.",
+      "exact_formula_or_source_specification": {
+        "adaptive_selection_history": {
+          "interpretation": "FRONTIER_RERANKS_AND_FAMILY_TRANSITIONS_CREATE_PROJECT_LEVEL_SELECTION_PRESSURE_EVEN_WHEN_PARAMETER_CELLS_ARE_DEPENDENT",
+          "material": true,
+          "v4_control": "CATALOG_LEVEL_PREOUTCOME_SELECTION_LOG_PLUS_DISJOINT_CONFIRMATION_FOR_ALL_DISCOVERY_SURVIVORS"
+        },
+        "conclusion": "V4_MUST_PAY_SELECTION_AT_INFORMATION_SOURCE_FAMILY_AND_CONFIRMATION_LEVEL_NOT_BY_NAIVELY_BONFERRONI_CORRECTING_EVERY_HISTORICAL_PARAMETER_CELL",
+        "cscv_pbo": {
+          "applicable_when": "SAME_RESPONSE_TARGET_COMMON_FOLDS_COMPLETE_COMPARABLE_CANDIDATE_MATRIX",
+          "project_global_status": "NOT_APPLICABLE_TO_HETEROGENEOUS_V3_FAMILIES_AS_ONE_MATRIX",
+          "required_when_applicable": true
+        },
+        "deflated_sharpe": {
+          "project_global_status": "NOT_APPLICABLE_TO_INFORMATION_RESPONSES_WITHOUT_COMPARABLE_RETURN_STREAMS",
+          "required_for_candidate_or_portfolio_return_selection_when_semantics_valid": true
+        },
+        "effective_number_of_correlated_trials": {
+          "action": "ESTIMATE_FROM_JOINT_RESPONSE_OR_TEST_STATISTIC_MATRIX_WITHIN_EACH_COMPARABLE_V4_FAMILY;DO_NOT_INVENT_GLOBAL_NEFF",
+          "status": "NOT_IDENTIFIABLE_FROM_AGGREGATE_PERSISTED_SUMMARIES_ALONE"
+        },
+        "materially_relevant_family_or_context_audit_units": 32,
+        "rule": "DO_NOT_TREAT_7975_CELLS_AS_7975_INDEPENDENT_INFORMATION_SOURCES",
+        "schema": "mxm.research-core-v4.project-selection-bias-audit.v1",
+        "sources": [
+          "research_core_v3/state/PROJECT_WIDE_HIERARCHICAL_MISSED_EDGE_AUDIT_V1.json",
+          "research_core_v3/state/PROJECT_WIDE_RESEARCH_DESIGN_COVERAGE_AUDIT_V2.json",
+          "research_core_v3/state/CORRECTED_REGION_ASSESSMENT_V2.json"
+        ],
+        "status": "COMPLETE_DIAGNOSTIC_NO_FALSE_PRECISION",
+        "v3_cell_count_reference": 7975
+      },
+      "formula_family": "Selection bias and protected confirmation",
+      "id": "M18",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "CSCV/PBO requires comparable complete strategy matrix; deflated Sharpe requires comparable returns and defensible trial semantics. Neither automatically defined here.",
+      "predictive_or_economic_estimand": "Generalization after material source/context/horizon/model selection.",
+      "relation_to_final_cbot_objective": "Prevents false confidence and preserves one continuous account objective.",
+      "scientific_status": "FROZEN_AUTHORITY",
+      "sources": [
+        {
+          "last_modified_commit": "bff7fd2ed251860bf8f8a0a51f165d0fdf62b601",
+          "path": "research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json",
+          "sha256": "5789bce3f82ed6be5878bd15bc4cca5ad6e3b88321d40b12c568d6980de1e45f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json"
+        },
+        {
+          "last_modified_commit": "594017e8fc32b8e818620de386530ed88f3a20d0",
+          "path": "research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json",
+          "sha256": "95b3fd3a2efebc10bc2745bc7657bd57ae5a67a67051364c70a99368c5bc3664",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json"
+        },
+        {
+          "last_modified_commit": "3a7bd64c2f4168d93f1b64e7d690552d4ee19bea",
+          "path": "research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json",
+          "sha256": "6daf2e3508e3221196aa7d26b920d61bc5641c824fd26a2138f89dd21cb24d02",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/state/MAIN_V4_SKILL_INDEPENDENT_FORENSICS_PREFLIGHT_AUTHORITY_V1.json"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Authentic applicable typed broker inputs, causal fresh conversion; sampled past spread bound not guaranteed unseen maximum; no current-spread historical substitution.",
+      "exact_formula_or_source_specification": {
+        "frozen_cost_law": "ONLY_AUTHENTIC_FRICTION_PREFIX_BEFORE_DAY91;AT_LEAST10_FRESH_SAMPLES;SPREAD_BOUND2X_PREFIX_MAX;HALF_EACH_SIDE;DELAY_EACH_SIDE0.25_LAST_COMPLETED_BAR_RANGE;CURRENT_TYPED_COMMISSION2X;NO_EXACT_HISTORICAL_BIDASK_CLAIM;UNMEASURED_SYMBOLS_FORECAST_ONLY",
+        "margin_law": "EXPLICIT_DISCOVERY_SCENARIO2X_AUTHENTIC_CURRENT_EXPECTED_MINIMUM_MARGIN;LINEAR_TRANCHE_SCALE;NOT_EXACT_HISTORICAL_LEVERAGE_OR_MARGIN_SCHEDULE",
+        "pnl": "direction*units*(exit-entry)*conversion",
+        "typed_commission": "Exact commission_side function; preserves per-type conversions/min commission; x2 discovery scenario"
+      },
+      "formula_family": "Authentic economic response and transaction costs",
+      "id": "M19",
+      "implementation_paths": [
+        "adaptive_competition/core.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 18,
+              "exact_source": "def pnl(direction,units,entry,exit,conversion):return direction*units*(exit-entry)*conversion",
+              "function": "pnl",
+              "start_line": 18
+            },
+            {
+              "end_line": 59,
+              "exact_source": "def commission_side(m,assets,price,units,rate):\n f=m['current_full_metadata'];lm=m['current_light_metadata'];quote=assets[str(lm['quoteAssetId'])];base=assets[str(lm['baseAssetId'])]\n qr=rate(quote);ur=rate('USD');raw=int(f.get('preciseTradingCommissionRate',0));typ=int(f.get('commissionType',0));lot=int(f.get('lotSize',0))/100\n if qr is None:return None\n fee=0.\n if raw:\n  if typ==2 and ur is not None and lot>0:fee=raw/1e8*units/lot*ur\n  elif typ==4 and lot>0:fee=raw/1e8*units/lot*qr\n  elif typ==3:fee=raw/1e5/100*price*units*qr\n  elif typ==1 and ur is not None:\n   br=rate(base,'USD')\n   if br is None:return None\n   fee=raw/1e8*units*br/1e6*ur\n  else:return None\n minimum=int(f.get('preciseMinCommission',0))/1e8\n if minimum:\n  mt=int(f.get('minCommissionType',0));mc=quote if mt==2 else str(f.get('minCommissionAsset',''))\n  mr=rate(mc)\n  if mr is None:return None\n  fee=max(fee,minimum*mr)\n return 2*fee",
+              "function": "commission_side",
+              "start_line": 39
+            },
+            {
+              "end_line": 78,
+              "exact_source": "def quote(self,si,price,rate,range_fraction=0,units_override=None):\n  m=self.info['metadata'][si];quote=self.info['assets'][str(m['current_light_metadata']['quoteAssetId'])];conv=rate(quote)\n  if conv is None:return None\n  bound=self.info['costs'][si]['spread_bound_bps']\n  if bound is None:return None\n  unit=m['min_volume']/100 if units_override is None else units_override;commission=commission_side(m,self.info['assets'],price,unit,rate)\n  if commission is None:return None\n  spread=unit*price*conv*bound/20000\n  delay=unit*price*conv*max(range_fraction,0)*.25\n  margin=2*max(float(m['buy_min_margin_eur']),float(m['sell_min_margin_eur']))*unit/(m['min_volume']/100)\n  return {'unit':unit,'conv':conv,'notional':unit*price*conv,'spread':spread,'commission':commission,'delay':delay,'cost':spread+commission+delay,'margin':margin}",
+              "function": "quote",
+              "start_line": 68
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/core.py",
+            "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "Historical adaptive replay conditional bound not exact economic certification; costs/slippage/financing unresolved cannot be zero.",
+      "predictive_or_economic_estimand": "Realizable net EUR response after side-aware friction and minimum-volume execution.",
+      "relation_to_final_cbot_objective": "Prerequisite to legitimate weekly/monthly final equity.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/core.py",
+          "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        },
+        {
+          "last_modified_commit": "393a3ced369c55e746f7299379861090a060a28b",
+          "path": "RESEARCH_CONTRACT_V2.md",
+          "sha256": "f7d7fdca2c4a77bc36f3a3153641f9fff295dc14fcb9f7f5fa507b025c561b96",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CONTRACT_V2.md"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Only valid positive-net executable opportunities; account continuous, tail/risk common factors included; no arbitrary growth cap.",
+      "exact_formula_or_source_specification": {
+        "allocation_source": "utility=net/equity - risk_factor*(stress_next^2-stress^2)/equity^2; density=utility/(margin*horizon/60); exact code in Portfolio.execute",
+        "historical_inner_utility": "LOG_TERMINAL_EQUITY_OVER200_MINUS_MAXDRAWDOWN_FRACTION;UNRESOLVED_FINANCING_DISQUALIFIES",
+        "project_objective": "MAXIMIZE_GENUINELY_REALIZABLE_LONG_RUN_LOG_EQUITY_GROWTH_AND_AGGRESSIVE_COMPOUNDING_SUBJECT_TO_AUTHENTIC_SPREAD_COMMISSION_CONVERSION_MINIMUM_VOLUME_VOLUME_STEP_MARGIN_EXECUTION_RISK_DRAWDOWN_SURVIVAL_AND_PORTFOLIO_DEPENDENCE"
+      },
+      "formula_family": "Expected log-equity growth and capital efficiency",
+      "id": "M20",
+      "implementation_paths": [
+        "adaptive_competition/core.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 173,
+              "exact_source": "def execute(self,g,opens,fresh,rate):\n  if not self.clock.accept(g):return\n  jobs=self.pending;self.pending={}\n  # All reductions settle before any entry. No atomic reversal.\n  for si,j in sorted(jobs.items()):\n   if j['due']!=g or not fresh[si] or not np.isfinite(opens[si]):\n    self.counts['stale_signal_expiry']+=1;continue\n   lots=self.positions[si];target=j['target'];remove=max(0,len(lots)-target)\n   for _ in range(remove):\n    lot=lots[-1];q=self.quote(si,opens[si],rate,j['range'],lot['units'])\n    if q is None:self.counts['rejected_conversion_count']+=1;break\n    lots.pop();gross=pnl(lot['direction'],lot['units'],lot['entry'],opens[si],q['conv']);self.cash+=gross-q['cost'];self.gross+=gross;self.cost+=q['cost'];self.turnover+=q['notional']\n    net=gross-lot['entry_cost']-q['cost'];self.by_symbol[si]+=net;self.by_context[self.info['metadata'][si]['asset_class']]+=net\n    action='EXIT' if not lots else 'REDUCE';self.action_counts[action]+=1\n    self.trades.append({'event':g,'symbol':self.info['records'][si]['symbol'],'action':action,'direction':lot['direction'],'units':lot['units'],'open_event':lot['open_event'],'gross_pnl_eur':gross,'net_pnl_eur':net,'spread_eur':lot['spread']+q['spread'],'commission_eur':lot['commission']+q['commission'],'delay_eur':lot['delay']+q['delay'],'margin_scenario':'CURRENT_EXPECTED_MIN_MARGIN_X2','financing_state':'INTRADAY_AVOIDED' if lot['open_event']//288==g//288 else 'FINANCING_UNRESOLVED','conversion_state':'CAUSAL_FRESH_M5_PROXY_NOT_EXACT_BID_ASK'})\n    if lot['open_event']//288!=g//288:self.counts['financing_unresolved_positions']+=1\n  value,margin,stress=self.mark(g,opens,rate)\n  # Gather every same-time eligible entry; sort marginal utility, canonical tie.\n  additions=[]\n  for si,j in sorted(jobs.items()):\n   if j['due']!=g or not fresh[si] or not np.isfinite(opens[si]):continue\n   if self.positions[si] and self.positions[si][0]['direction']!=j['direction']:\n    self.counts['rejected_conflict_count']+=1;continue\n   q=self.quote(si,opens[si],rate,j['range'])\n   if q is None:self.counts['rejected_conversion_count']+=1;continue\n   for ordinal in range(len(self.positions[si]),j['target']):\n    m=self.info['metadata'][si]\n    q=self.quote(si,opens[si],rate,j['range'],(m['min_volume'] if ordinal==0 else m['step_volume'])/100)\n    if q is None:continue\n    adjusted=j['lower_return']-j['direction']*np.log(opens[si]/j['signal_price'])\n    net=q['notional']*adjusted-2*q['cost']\n    additions.append((si,ordinal,j,q,net))\n  remaining=additions\n  while remaining:\n   scored=[]\n   for si,ordinal,j,q,net in remaining:\n    # Worst common shock: sum tails, plus shared context/currency cluster stress.\n    tail=q['notional']*j['tail'];cluster=sum(l['stress'] for sj,ls in self.positions.items() for l in ls if self.info['metadata'][sj]['asset_class']==self.info['metadata'][si]['asset_class'])\n    stress_next=stress+tail+.5*cluster\n    factor=(1,1.5,2,4,1e9)[self.financial_state]\n    utility=net/max(value,1e-9)-factor*(stress_next**2-stress**2)/max(value,1e-9)**2\n    # compare capital-time opportunity density; no fixed position/trade cap.\n    density=utility/max(q['margin']*j['horizon']/60,1e-9)\n    scored.append((density,utility,self.info['records'][si]['symbol_id'],ordinal,si,j,q,net,tail))\n   row=sorted(scored,key=lambda a:(-a[0],a[2],a[3]))[0];density,utility,sid,ordinal,si,j,q,net,tail=row\n   remaining=[v for v in remaining if not(v[0]==si and v[1]==ordinal)]\n   if net<=0:self.counts['rejected_uncertainty_count']+=1;continue\n   if utility<=0 or self.financial_state==4 or self.model_health==2:self.counts['rejected_risk_count']+=1;continue\n   # free-margin reserve derives from the complete portfolio tail; no percentage rule.\n   if value-margin-q['margin'] < stress+tail+2*q['cost']:\n    self.counts['rejected_margin_count']+=1;continue\n   if ordinal!=len(self.positions[si]):continue\n   m=self.info['metadata'][si];volume=m['min_volume']+ordinal*m['step_volume']\n   if not lattice(volume,m['min_volume'],m['step_volume'],int(m['current_full_metadata']['maxVolume'])):continue\n   # first tranche min units; later tranches step units, broker lattice preserved.\n   action='ENTRY' if not self.positions[si] else 'ADD';self.action_counts[action]+=1\n   lot={'direction':j['direction'],'units':q['unit'],'entry':opens[si],'entry_cost':q['cost'],'exit_cost_reserve':q['cost'],'margin':q['margin'],'stress':tail,'open_event':g,'spread':q['spread'],'commission':q['commission'],'delay':q['delay']}\n   self.positions[si].append(lot);self.cash-=q['cost'];self.cost+=q['cost'];self.turnover+=q['notional'];margin+=q['margin'];stress+=tail;value-=2*q['cost']\n   self.counts['executed_entry_count']+=1\n   date=(START+dt.timedelta(minutes=g*5)).to_pydatetime();self.by_week[f'{date.isocalendar().year}-W{date.isocalendar().week:02d}']+=1\n   self.trades.append({'event':g,'symbol':self.info['records'][si]['symbol'],'action':action,'direction':j['direction'],'units':q['unit'],'cost_eur':q['cost'],'margin_eur':q['margin'],'tail_stress_eur':tail})\n  self.minfree=min(self.minfree,value-margin)",
+              "function": "execute",
+              "start_line": 112
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/core.py",
+            "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "No production-optimal expected-log-equity distribution/optimizer certified; do not present second-order proxy as exact Kelly or future winner.",
+      "predictive_or_economic_estimand": "Realizable compounded equity; historical utility is log-terminal-equity minus max drawdown, allocation proxy is not proved expected log-growth optimizer.",
+      "relation_to_final_cbot_objective": "Directly relates scarce-capital decisions to growth, after edge exists.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "11fd5c5e47f16b93de57a681afa9024469d3025d",
+          "path": "research_core_v4/V4_PROJECT_CONTRACT_V1.json",
+          "sha256": "def292b0efba0bcf696f876bd0c2704e9358b924b26fd4d9749278848c6715c4",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/research_core_v4/V4_PROJECT_CONTRACT_V1.json"
+        },
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/core.py",
+          "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Frozen adaptive V1 real development replay: EUR200 -> EUR200; zero executed entries, no certified economic edge. Feature/model existence does not validate each feature family independently.",
+      "assumptions_and_domain_of_validity": "Continuous concurrent account; reductions first, canonical ties, broker volume lattice; correlation does not confer independence.",
+      "exact_formula_or_source_specification": {
+        "capital_law": "GREEDY_POSITIVE_LOWER_MEAN_MINUS2_SIDE_COST_MARGINAL_UTILITY_OVER_MARGIN_TIME;INCREMENTAL_SQUARED_PORTFOLIO_TAIL_STRESS_PLUS0.5_SHARED_CONTEXT_STRESS;FREE_MARGIN_GE_TOTAL_TAIL_PLUS_COST;ONE_BOUNDED_LOCAL_ROTATION_IF_GAIN_BEATS_SWITCH_COST_HYSTERESIS;NO_FIXED_PERCENT_NO_FULLKELLY_NO_MARTINGALE",
+        "common_shock_law": "FULL_SUM_OF_RESIDUAL_TAILS_IS_WORST_DIRECTION_COMMON_SHOCK;SHARED_CONTEXT_EXTRA_STRESS;CORRELATION_NOT_INDEPENDENCE",
+        "free_margin_admission": "equity-margin-new_margin >= current_tail+new_tail+2*side_cost",
+        "neff": "(sum(abs(contributions)))^2/sum(abs(contributions)^2); descriptive concentration only"
+      },
+      "formula_family": "Portfolio dependence and scarce-capital allocation",
+      "id": "M21",
+      "implementation_paths": [
+        "adaptive_competition/core.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 62,
+              "exact_source": "def neff(values):\n a=np.abs(np.array(list(values),float));return float(a.sum()**2/(a@a)) if len(a) and a@a>0 else 0.",
+              "function": "neff",
+              "start_line": 61
+            },
+            {
+              "end_line": 173,
+              "exact_source": "def execute(self,g,opens,fresh,rate):\n  if not self.clock.accept(g):return\n  jobs=self.pending;self.pending={}\n  # All reductions settle before any entry. No atomic reversal.\n  for si,j in sorted(jobs.items()):\n   if j['due']!=g or not fresh[si] or not np.isfinite(opens[si]):\n    self.counts['stale_signal_expiry']+=1;continue\n   lots=self.positions[si];target=j['target'];remove=max(0,len(lots)-target)\n   for _ in range(remove):\n    lot=lots[-1];q=self.quote(si,opens[si],rate,j['range'],lot['units'])\n    if q is None:self.counts['rejected_conversion_count']+=1;break\n    lots.pop();gross=pnl(lot['direction'],lot['units'],lot['entry'],opens[si],q['conv']);self.cash+=gross-q['cost'];self.gross+=gross;self.cost+=q['cost'];self.turnover+=q['notional']\n    net=gross-lot['entry_cost']-q['cost'];self.by_symbol[si]+=net;self.by_context[self.info['metadata'][si]['asset_class']]+=net\n    action='EXIT' if not lots else 'REDUCE';self.action_counts[action]+=1\n    self.trades.append({'event':g,'symbol':self.info['records'][si]['symbol'],'action':action,'direction':lot['direction'],'units':lot['units'],'open_event':lot['open_event'],'gross_pnl_eur':gross,'net_pnl_eur':net,'spread_eur':lot['spread']+q['spread'],'commission_eur':lot['commission']+q['commission'],'delay_eur':lot['delay']+q['delay'],'margin_scenario':'CURRENT_EXPECTED_MIN_MARGIN_X2','financing_state':'INTRADAY_AVOIDED' if lot['open_event']//288==g//288 else 'FINANCING_UNRESOLVED','conversion_state':'CAUSAL_FRESH_M5_PROXY_NOT_EXACT_BID_ASK'})\n    if lot['open_event']//288!=g//288:self.counts['financing_unresolved_positions']+=1\n  value,margin,stress=self.mark(g,opens,rate)\n  # Gather every same-time eligible entry; sort marginal utility, canonical tie.\n  additions=[]\n  for si,j in sorted(jobs.items()):\n   if j['due']!=g or not fresh[si] or not np.isfinite(opens[si]):continue\n   if self.positions[si] and self.positions[si][0]['direction']!=j['direction']:\n    self.counts['rejected_conflict_count']+=1;continue\n   q=self.quote(si,opens[si],rate,j['range'])\n   if q is None:self.counts['rejected_conversion_count']+=1;continue\n   for ordinal in range(len(self.positions[si]),j['target']):\n    m=self.info['metadata'][si]\n    q=self.quote(si,opens[si],rate,j['range'],(m['min_volume'] if ordinal==0 else m['step_volume'])/100)\n    if q is None:continue\n    adjusted=j['lower_return']-j['direction']*np.log(opens[si]/j['signal_price'])\n    net=q['notional']*adjusted-2*q['cost']\n    additions.append((si,ordinal,j,q,net))\n  remaining=additions\n  while remaining:\n   scored=[]\n   for si,ordinal,j,q,net in remaining:\n    # Worst common shock: sum tails, plus shared context/currency cluster stress.\n    tail=q['notional']*j['tail'];cluster=sum(l['stress'] for sj,ls in self.positions.items() for l in ls if self.info['metadata'][sj]['asset_class']==self.info['metadata'][si]['asset_class'])\n    stress_next=stress+tail+.5*cluster\n    factor=(1,1.5,2,4,1e9)[self.financial_state]\n    utility=net/max(value,1e-9)-factor*(stress_next**2-stress**2)/max(value,1e-9)**2\n    # compare capital-time opportunity density; no fixed position/trade cap.\n    density=utility/max(q['margin']*j['horizon']/60,1e-9)\n    scored.append((density,utility,self.info['records'][si]['symbol_id'],ordinal,si,j,q,net,tail))\n   row=sorted(scored,key=lambda a:(-a[0],a[2],a[3]))[0];density,utility,sid,ordinal,si,j,q,net,tail=row\n   remaining=[v for v in remaining if not(v[0]==si and v[1]==ordinal)]\n   if net<=0:self.counts['rejected_uncertainty_count']+=1;continue\n   if utility<=0 or self.financial_state==4 or self.model_health==2:self.counts['rejected_risk_count']+=1;continue\n   # free-margin reserve derives from the complete portfolio tail; no percentage rule.\n   if value-margin-q['margin'] < stress+tail+2*q['cost']:\n    self.counts['rejected_margin_count']+=1;continue\n   if ordinal!=len(self.positions[si]):continue\n   m=self.info['metadata'][si];volume=m['min_volume']+ordinal*m['step_volume']\n   if not lattice(volume,m['min_volume'],m['step_volume'],int(m['current_full_metadata']['maxVolume'])):continue\n   # first tranche min units; later tranches step units, broker lattice preserved.\n   action='ENTRY' if not self.positions[si] else 'ADD';self.action_counts[action]+=1\n   lot={'direction':j['direction'],'units':q['unit'],'entry':opens[si],'entry_cost':q['cost'],'exit_cost_reserve':q['cost'],'margin':q['margin'],'stress':tail,'open_event':g,'spread':q['spread'],'commission':q['commission'],'delay':q['delay']}\n   self.positions[si].append(lot);self.cash-=q['cost'];self.cost+=q['cost'];self.turnover+=q['notional'];margin+=q['margin'];stress+=tail;value-=2*q['cost']\n   self.counts['executed_entry_count']+=1\n   date=(START+dt.timedelta(minutes=g*5)).to_pydatetime();self.by_week[f'{date.isocalendar().year}-W{date.isocalendar().week:02d}']+=1\n   self.trades.append({'event':g,'symbol':self.info['records'][si]['symbol'],'action':action,'direction':j['direction'],'units':q['unit'],'cost_eur':q['cost'],'margin_eur':q['margin'],'tail_stress_eur':tail})\n  self.minfree=min(self.minfree,value-margin)",
+              "function": "execute",
+              "start_line": 112
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/core.py",
+            "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "No isolated-backtest sum as portfolio performance; allocator cannot rescue negative-edge primitive; descriptive neff is not inferential sample size.",
+      "predictive_or_economic_estimand": "Admission/size and marginal whole-account growth/risk.",
+      "relation_to_final_cbot_objective": "Required final-system allocation capability once multiple opportunities are confirmed.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/core.py",
+          "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+        },
+        {
+          "last_modified_commit": "f15f7b350361c0e528fc69b66f28be9bc6024ec7",
+          "path": "RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md",
+          "sha256": "d00024ef4a257cb62a9a82be9d9d73cc781bded9df593716f2cc468a7cc2c8bf",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "V1 zero trading/zero drawdown cannot validate active loss/recovery behavior; final validation still open.",
+      "assumptions_and_domain_of_validity": "Actual causal equity, margin and shared-tail state; scale-up/down only prospectively validated; below safe minimum volume -> reject.",
+      "exact_formula_or_source_specification": {
+        "drawdown": "max(0,1-equity/high_water_mark)",
+        "frozen_drawdown_law": "TRAINING_PREFIX_LAST7D_Q99_MINIMUM_EXECUTABLE_UNIT_TAIL_PLUS2_SIDE_COST_OVER200_BASE;NORMAL_CAUTION_RECOVERY_PRESERVATION_HALT_LEVELS1_2_4_8_XBASE;RESUMPTION_HYSTERESIS0.75;RISK_PENALTY1_1.5_2_4_LOCK;NO_UNIT_AVAILABLE_STATES_DORMANT",
+        "functional_ruin": "CURRENT_EQUITY_MINUS_MARGIN_MINUS_TOTAL_TAIL_BELOW_ALL_MINIMUM_COST_ADMISSIBLE_MARGINS;DERIVED_UNIT_THRESHOLD_NOT_ARBITRARY",
+        "volume_law": "FIRST_MINIMUM_VOLUME;SUBSEQUENT_STEP_VOLUME;BROKER_CURRENT_MIN_STEP_MAX_DISCOVERY_LATTICE;NO_FIXED_SYMBOL_OR_POSITION_CAP"
+      },
+      "formula_family": "Drawdown, survival and dynamic risk",
+      "id": "M22",
+      "implementation_paths": [
+        "adaptive_competition/core.py"
+      ],
+      "implementation_source_segments": [
+        {
+          "segments": [
+            {
+              "end_line": 111,
+              "exact_source": "def mark(self,g,prices,rate):\n  value=self.cash;margin=0.;stress=0.\n  for si,lots in self.positions.items():\n   if not lots:continue\n   m=self.info['metadata'][si];q=self.info['assets'][str(m['current_light_metadata']['quoteAssetId'])];conv=rate(q)\n   if conv is None or not np.isfinite(prices[si]):\n    # visible unresolved mark, never silently carry a conversion across a closure.\n    self.counts['unresolved_position_marks']+=1\n    # Explicit conservative mark bound, not a silent stale conversion fill.\n    value+=self.last_valuations.get(si,0.)-sum(l['stress'] for l in lots)\n    margin+=sum(l['margin'] for l in lots);stress+=sum(l['stress'] for l in lots)\n    continue\n   symbol_value=0.\n   for lot in lots:\n    symbol_value+=pnl(lot['direction'],lot['units'],lot['entry'],prices[si],conv)-lot['exit_cost_reserve']\n    margin+=lot['margin'];stress+=lot['stress'];self.capital_time[si]+=lot['margin']*5/60;self.risk_time[si]+=lot['stress']*5/60\n   self.last_valuations[si]=symbol_value;value+=symbol_value\n  minimum=min((2*max(float(m['buy_min_margin_eur']),float(m['sell_min_margin_eur'])) for m,c in zip(self.info['metadata'],self.info['costs']) if c['spread_bound_bps'] is not None),default=float('inf'))\n  if value-margin-stress<minimum:self.functional_ruin_events+=1\n  self.hwm=max(self.hwm,value);dd=max(0.,1-value/max(self.hwm,1e-12));self.maxdd=max(self.maxdd,dd)\n  if dd>1e-10:\n   if self.dd_start is None:self.dd_start=g\n   self.dd_duration=max(self.dd_duration,(g-self.dd_start)*5)\n  else:self.dd_start=None\n  self.minfree=min(self.minfree,value-margin);self.util+=margin/max(value,1e-9);self.nmarks+=1\n  # thresholds derived from inner stress/loss scale, deterministic hysteresis.\n  levels=np.array([1,2,4,8])*self.dd_base\n  state=int(np.sum(dd>=levels))\n  if state>self.financial_state:self.financial_state=state\n  elif self.financial_state and dd<.75*levels[self.financial_state-1]:self.financial_state=state\n  date=(START+dt.timedelta(minutes=g*5)).to_pydatetime();self.weekly[f'{date.isocalendar().year}-W{date.isocalendar().week:02d}']=value;self.monthly[date.strftime('%Y-%m')]=value\n  if g%288==0 or not self.equity:self.equity.append({'timestamp_utc':date.isoformat(),'equity_eur':value,'free_margin_eur':value-margin,'financial_state':self.financial_state})\n  return value,margin,stress",
+              "function": "mark",
+              "start_line": 79
+            }
+          ],
+          "source": {
+            "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+            "path": "adaptive_competition/core.py",
+            "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+            "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+            "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+          }
+        }
+      ],
+      "limitations_and_known_counterexamples": "NORMAL/CAUTION/RECOVERY/PRESERVATION/HALT is historical policy; no martingale, uncontrolled Kelly or loss-chasing; thresholds cannot be relaxed to rescue.",
+      "predictive_or_economic_estimand": "Survival-adjusted account growth and recovery; no exact general ruin probability estimator frozen here.",
+      "relation_to_final_cbot_objective": "Preserves real profits/losses, de-scaling, catastrophic-drawdown protection and compounding.",
+      "scientific_status": "IMPLEMENTED_REAL_DATA_TESTED",
+      "sources": [
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/core.py",
+          "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+        },
+        {
+          "last_modified_commit": "f15f7b350361c0e528fc69b66f28be9bc6024ec7",
+          "path": "RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md",
+          "sha256": "d00024ef4a257cb62a9a82be9d9d73cc781bded9df593716f2cc468a7cc2c8bf",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md"
+        },
+        {
+          "last_modified_commit": "df543320739c4c72117601132f807f4c384a0b05",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json",
+          "sha256": "be255fcfadbcf412a9d7b01238772dde4dc94fe5972cca4eb68006c4987de4e0",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_RAW_ECONOMIC_RESULT.json"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Contract recovered. No exact final deposit/withdrawal NAV implementation/parity test recovered in bounded review.",
+      "assumptions_and_domain_of_validity": "Broker-confirmed causal event order; balance/equity/margin/free-margin reconciled; cashflow-neutral NAV separate from account equity.",
+      "exact_formula_or_source_specification": {
+        "exact_NAV_recurrence": null,
+        "exact_recovered_law": "Deposits and withdrawals are external cashflows, not profit/loss; after broker confirmation affect future equity/free margin/sizing. Track broker balance/equity separately from cashflow-neutral strategy NAV. InitialEUR200 once; no reset."
+      },
+      "formula_family": "Cashflow-neutral capital accounting",
+      "id": "M23",
+      "implementation_paths": [],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "Do not invent unitization or time-weighted-return recurrence as recovered original formula; zero-flow historical V1 does not certify cashflow events.",
+      "predictive_or_economic_estimand": "Strategy compound growth separated from funding flows.",
+      "relation_to_final_cbot_objective": "Allows genuine future deposits/withdrawals without relabeling them profit.",
+      "scientific_status": "FROZEN_AUTHORITY",
+      "sources": [
+        {
+          "last_modified_commit": "393a3ced369c55e746f7299379861090a060a28b",
+          "path": "RESEARCH_CONTRACT_V2.md",
+          "sha256": "f7d7fdca2c4a77bc36f3a3153641f9fff295dc14fcb9f7f5fa507b025c561b96",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CONTRACT_V2.md"
+        },
+        {
+          "last_modified_commit": "f15f7b350361c0e528fc69b66f28be9bc6024ec7",
+          "path": "RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md",
+          "sha256": "d00024ef4a257cb62a9a82be9d9d73cc781bded9df593716f2cc468a7cc2c8bf",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md"
+        }
+      ],
+      "test_evidence": [],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    },
+    {
+      "actual_empirical_result": "Adaptive V1 weekly entries0; final production parity/HARD21 not certified.",
+      "assumptions_and_domain_of_validity": "Confirmed net-edge primitives and whole-account replay; autonomous C#/.NET cTrader Cloud; no external decision dependency.",
+      "exact_formula_or_source_specification": {
+        "hard21": "Executed entries>=21 for each certified UTC ISO week in final production portfolio; no upper cap; rejected/unfilled intents count0",
+        "parity": "Identical causal events/fixtures must agree on economic decisions, size, capital/PnL/margin/portfolio/HARD21 state; mechanical adapter differences only"
+      },
+      "formula_family": "HARD21 feasibility and final cBot parity",
+      "id": "M24",
+      "implementation_paths": [
+        "adaptive_competition/core.py"
+      ],
+      "implementation_source_segments": [],
+      "limitations_and_known_counterexamples": "No negative-EV fillers; Python core alone not C# Cloud parity; no funding, orders or competition authorization.",
+      "predictive_or_economic_estimand": "Final-system realizability and deterministic economic equality.",
+      "relation_to_final_cbot_objective": "Direct final production constraint, imposed at appropriate final portfolio stage.",
+      "scientific_status": "FROZEN_AUTHORITY",
+      "sources": [
+        {
+          "last_modified_commit": "393a3ced369c55e746f7299379861090a060a28b",
+          "path": "RESEARCH_CONTRACT_V2.md",
+          "sha256": "f7d7fdca2c4a77bc36f3a3153641f9fff295dc14fcb9f7f5fa507b025c561b96",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CONTRACT_V2.md"
+        },
+        {
+          "last_modified_commit": "f15f7b350361c0e528fc69b66f28be9bc6024ec7",
+          "path": "RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md",
+          "sha256": "d00024ef4a257cb62a9a82be9d9d73cc781bded9df593716f2cc468a7cc2c8bf",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/RESEARCH_CORE_V3_PROJECT_CONTRACT_V1.md"
+        },
+        {
+          "last_modified_commit": "32884731ef2c110d6718325483a11b27af2a3171",
+          "path": "adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json",
+          "sha256": "08274d6911bc7bbfc75500b63091236ea978e6d2e39cc9d7d1af98dbc187b89f",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/ADAPTIVE_COMPETITION_POLICY_V1_FROZEN_SPEC.json"
+        },
+        {
+          "last_modified_commit": "3b2ee505099a1f6bdb7e11f35456716c430fe169",
+          "path": "adaptive_competition/core.py",
+          "sha256": "8f8b82e01e0ff18c1d11679a94de8cbe00a948edc56408ddd9218bf6f2e06e9c",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/core.py"
+        }
+      ],
+      "test_evidence": [
+        {
+          "last_modified_commit": "89084af0a21452a17a723fabe19ddd9d636f22af",
+          "path": "adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json",
+          "sha256": "603d6a2aee27d7af080a3b703c2bd00dbfd2b70e5c97703eb42d69f0bef1839b",
+          "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+          "url": "https://github.com/mariancradulescu/mxm-quant-greenfield/blob/65887459e4c7c8b9551fb02c6c2c59c13fca8b33/adaptive_competition/state/MECHANICAL_FALSIFICATION_RESULT_V1.json"
+        }
+      ],
+      "test_verification_this_task": "Historical persisted evidence inspected/referenced; no tests or scientific calculations rerun. A test file alone is not proof of test execution."
+    }
+  ],
+  "no_silent_math_replacement": true,
+  "schema": "mxm.formula-to-implementation.traceability.v1",
+  "source_head": "65887459e4c7c8b9551fb02c6c2c59c13fca8b33",
+  "status": "BOUNDED_THEMATIC_RECOVERY_NOT_EXHAUSTIVE_ORIGINAL_MATHEMATICS",
+  "unrecovered": [
+    "Original conversation mathematics not accessible",
+    "Exact project entropy/complexity estimator",
+    "Implemented Adams-MacKay/BOCPD recursion not recovered; actual frozen online detector preserved",
+    "Exact final cashflow-neutral NAV recurrence and causal cashflow event code",
+    "Final certified expected-log-growth optimizer/risk-of-ruin law",
+    "Complete historical lead-lag/triad/formula inventory and all deleted/other-branch sources remain unreviewed"
+  ]
+}
