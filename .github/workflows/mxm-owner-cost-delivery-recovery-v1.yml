@@ -1,0 +1,23 @@
+name: MXM owner encrypted cost delivery recovery
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/aidr_cost_coverage_v1/OWNER_DELIVERY_RECOVERY_V1.json]
+permissions:
+  contents: write
+jobs:
+  recover-existing-encrypted-result:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5
+      - name: Recover one existing encrypted result without intersection replay
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: timeout --signal=TERM 600 python3 -m research_core_v4.aidr_cost_coverage_v1.recover_owner_delivery_v1
