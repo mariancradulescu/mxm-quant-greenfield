@@ -1,0 +1,34 @@
+name: MXM existing1576 data-first one synthetic preflight V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [.github/workflows/mxm-existing-data-synthetic-v1.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: mxm-existing1576-synthetic-v1
+  cancel-in-progress: false
+jobs:
+  fabricated-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: One fabricated kernel and resource pass; no archive or secret access
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.existing1576_data_first_v1.synthetic_preflight_v1
+      - name: Preserve safe readback receipt or failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: existing1576-synthetic-forensics-${{ github.run_id }}
+          path: |
+            research_core_v4/existing1576_data_first_v1/RUN_RECEIPT_V1.json
+            research_core_v4/existing1576_data_first_v1/RUN_FAILURE_V1.json
+          if-no-files-found: error
+          retention-days: 30
