@@ -136,6 +136,10 @@ def main():
     os.umask(0o077);h,a,pol=gate()
     with tempfile.TemporaryDirectory(prefix='mxm-native-qualification-',dir=os.environ['RUNNER_TEMP']) as td:
         tmp=pathlib.Path(td);key,fp=e.w.old._private_key_from_secret(tmp);need(fp==e.w.old.FP,'OWNER_KEY')
+        if a.get('failure_checkpoint_readback_only'):
+            PHASE='EXISTING_INTERRUPTED_CHECKPOINT_READBACK';saved,sp=load_asset(key,fp,tmp,a['checkpoint_source'])
+            out={'schema':'mxm.private.native.failure.checkpoint.readback.v1','source_head':h,'checkpoint_source_head':saved['source_head'],'checkpoint_provenance':sp,'authentication':saved['authentication'],'request_counts':saved['requests'],'saved_m5_receipts':len(saved['m5_receipts']),'saved_quotes':len(saved['quotes']),'m5_canonical_rows':{s:len(v) for s,v in saved['bars'].items()},'new_broker_requests':0,'closed_results_replayed':False,'orders':0,'protected_forward':False,'cloud_deployment':False}
+            rt.output(h,a,tmp,key,'nativefailure',{'summary':out},out);relay(h,a,tmp,out);return
         PHASE='EXISTING_BYTE_IDENTICAL_ARCHIVES';bars,provenance,recovered,manifest=staged(key,fp,tmp);cost,cp=load_asset(key,fp,tmp,a['cost_source']);native=cost['current_native_evidence']['private_native_evidence'];digits={s:int(native['full'][str(s)]['digits']) for s in SIDS}
         PHASE='MISSING_NATIVE_TAIL_AND_FIXED_BID_ASK';quotes,receipts,requests,auth,checkpoint=capture(h,a,pol,tmp,key,bars,digits)
         PHASE='FROZEN_DATA_AND_CURRENT_ECONOMIC_QUALIFICATION';episodes,identities=qualify(pol,bars,quotes,cost);qualified=[{'sid':r['sid'],'horizon_seconds':int(k)} for r in identities for k,v in r['horizons'].items() if v['qualified']]
