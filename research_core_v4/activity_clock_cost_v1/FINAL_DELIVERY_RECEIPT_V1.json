@@ -107,5 +107,18 @@
     "sha256": "137259adc7d021272d2415f1887d3a5edb2310c0da8e611e3458690fe0d321a3",
     "modified_recompiled_replaced_deployed": false
   },
-  "review_limit": "DIRECTOR_EXECUTION_AND_DELIVERY_CHECKS;NOT_AN_INDEPENDENT_AUDIT"
+  "review_limit": "DIRECTOR_EXECUTION_AND_DELIVERY_CHECKS;NOT_AN_INDEPENDENT_AUDIT",
+  "authority_metadata_discrepancy": {
+    "field": "EXECUTION_V1.json.implementation_commit",
+    "recorded": "bb4d0f81375a9abacc754bb770de92a13cfa57c5",
+    "actual_corrected_implementation_commit": "5735b3a4e574284d133af8c79abbb1586a91cd78",
+    "actual_execution_head": "98e0421317a16726d54f31ff9a0a9f98563fa85f",
+    "cause": "DESCRIPTIVE_IMPLEMENTATION_COMMIT_FIELD_WAS_NOT_UPDATED_WITH_PREOUTCOME_ADAPTER_CORRECTION",
+    "all_18_enforced_source_sha256_bindings_match": true,
+    "corrected_source_binding_bytes_match_actual_corrected_implementation_commit": true,
+    "runtime_enforcement": "GITHUB_SHA_AND_EACH_BINDING_SHA256;IMPLEMENTATION_COMMIT_FIELD_NOT_USED_AS_SOURCE_ENFORCEMENT",
+    "consumed_execution_authority_modified": false,
+    "scientific_parameters_or_results_changed": false,
+    "review_limit": "DISCLOSED_PROVENANCE_METADATA_DEFECT;NO_CLAIM_OF_DEFECT_FREE_AUTHORITY_METADATA"
+  }
 }
