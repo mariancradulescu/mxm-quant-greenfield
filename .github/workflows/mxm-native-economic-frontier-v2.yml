@@ -1,0 +1,29 @@
+name: MXM causal economic frontier V2 saved inputs only
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/native_economic_frontier_v2/EXECUTION_V2.json]
+permissions:
+  contents: write
+jobs:
+  causal-economic-capacity:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Verify economic accounting identities
+        run: python3 -m unittest -q research_core_v4.native_economic_frontier_v2.test_kernel_v2
+      - name: Calculate existing causal cost capacity and archive extension
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          ulimit -v 2097152
+          timeout --signal=TERM 750 python3 -m research_core_v4.native_economic_frontier_v2.runner_v2
