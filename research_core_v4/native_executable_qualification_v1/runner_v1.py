@@ -8,7 +8,7 @@ from research_core_v4.owner_recovery_v1.runtime_v1 import load_asset
 from research_core_v4.aidr_cost_coverage_v1 import frontier_runtime_v1 as rt
 from research_core_v4.cloud_native_covariance_v1.runner_v1 import fee
 from research_core_v4 import shallow_m5_support_v2 as v2
-from research_core_v4.shallow_m5_support_v2_production import authenticate_segment,send_history_page,RateLimiter
+from research_core_v4.shallow_m5_support_v2_production import authenticate_segment,send_history_page,RateLimiter,SystemicFailure
 from research_core_v4.owner_frontier_v1.execute_historical_quotes_v1 import StdlibCTraderTransport,m,enums,decode_ctrader_tick_page
 from m6.ctrader_capture import require_read_only_request
 e=rt.e;P='research_core_v4/native_executable_qualification_v1/';BASE='223117350f65048865815922f23d14102148aa7d';START=1787184000;END=START+28*86400;SIDS=(1,2,250);PHASE='GATE'
@@ -33,6 +33,13 @@ def rowcheck(r):
     need(t%300==0 and t<END and all(math.isfinite(x) and x>0 for x in v),'BAR_GRID_DOMAIN_OR_PRICE')
     need(v[2]<=min(v[0],v[3])<=max(v[0],v[3])<=v[1] and math.isfinite(vol) and vol>=0 and vol.is_integer(),'BAR_OHLC_VOLUME')
     return t
+class HistoryReceiptTransport(StdlibCTraderTransport):
+    """Retain historical response bytes; inherited authentication/wire logic unchanged."""
+    last_history_envelope=None
+    def receive_envelope(self,*,deadline):
+        envelope=super().receive_envelope(deadline=deadline)
+        if int(envelope.payloadType)==v2.PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE:self.last_history_envelope=envelope
+        return envelope
 def staged(key,fp,tmp):
     manifest=json.loads((e.a.ROOT/(P+'ARCHIVE_INPUT_MANIFEST_V1.json')).read_text());b=base64.b64decode(''.join((e.a.ROOT/p).read_text().strip() for p in manifest['parts']),validate=True)
     need(sha(b)==manifest['ciphertext_sha256'],'ARCHIVE_CIPHER_SHA');raw=gzip.decompress(e.w.old.crypto.decrypt_package(b,private_key=key,expected_public_spki_sha256=fp,temp_parent=tmp));need(sha(raw)==manifest['canonical_sha256'],'ARCHIVE_CANONICAL_SHA')
@@ -57,19 +64,33 @@ def capture(h,a,pol,tmp,key,bars,digits):
     def persist(label):store.encrypted({'schema':'mxm.private.native.history.checkpoint.v1','source_head':h,'authentication':auth,'requests':dict(counts),'m5_receipts':receipts,'quotes':list(quotes.values()),'bars':{str(s):list(bars[s].values()) for s in SIDS}},'native-history-'+label+'.mxmenc')
     try:
         credentials=[os.environ.get(k) for k in ('CTRADER_CLIENT_ID','CTRADER_CLIENT_SECRET','CTRADER_ACCESS_TOKEN')];need(all(credentials),'EXISTING_RUNNER_CREDENTIAL_ABSENT')
-        tr=StdlibCTraderTransport(response_timeout=30);tr.connect();account=authenticate_segment(tr,*credentials);auth='PASS_UNCHANGED_EXPLICIT_VIEW_SAME_LIVE_ACCOUNT_FINGERPRINT';rate=RateLimiter(min_interval=.25)
+        tr=HistoryReceiptTransport(response_timeout=30);tr.connect();account=authenticate_segment(tr,*credentials);auth='PASS_UNCHANGED_EXPLICIT_VIEW_SAME_LIVE_ACCOUNT_FINGERPRINT';rate=RateLimiter(min_interval=.25)
         # All three accepted CSVs exhaust through Sep13. Only the missing tail is fetched.
         for sid in SIDS:
             frm=ts('2026-09-14T00:00:00Z')*1000;to=END*1000-1
             for page in range(1,4):
                 need(counts['m5']<pol['capture']['maximum_m5_requests'],'M5_REQUEST_CAP');ctx=v2.RequestContext(f'native-{sid}-{page}',account,sid,frm,to);beg=time.monotonic();counts['m5']+=1
-                rows,present,more=send_history_page(tr,ctx=ctx,digits=digits[sid],limiter=rate);latency=(time.monotonic()-beg)*1000
+                overfetch=0;decoder_diagnostic=None
+                try:rows,present,more=send_history_page(tr,ctx=ctx,digits=digits[sid],limiter=rate)
+                except SystemicFailure as exc:
+                    cause=str(exc.__cause__) if exc.__cause__ is not None else None
+                    if cause!='bar open timestamp outside exact frozen segment':
+                        receipts.append({'sid':sid,'failed':True,'systemic_code':exc.code,'decoder_diagnostic':cause,'from_ms':frm,'to_ms':to,'raw_response_envelope_b64':base64.b64encode(tr.last_history_envelope.SerializeToString()).decode() if tr.last_history_envelope else None});raise
+                    # Some native endpoints prioritize count backwards from toTimestamp.
+                    # Bind and decode with the SAME accepted V2 functions, preserving raw bytes.
+                    response=v2.bind_response_envelope(tr.last_history_envelope,ctx);present,more=v2.response_has_more_presence(response)
+                    allrows=[v2.decode_trendbar(b,digits=digits[sid],segment_from_ms=0,segment_to_ms=ctx.to_ms) for b in response.trendbar]
+                    times=[ts(r['time_utc'])*1000 for r in allrows];need(len(times)==len(set(times)) and len(allrows)<=v2.PAGE_REQUESTED_COUNT,'RAW_OVERFETCH_INTEGRITY')
+                    need(all(t<=ctx.to_ms for t in times),'UPPER_BOUND_OVERFETCH_FORBIDDEN')
+                    rows=sorted([r for r,t in zip(allrows,times) if ctx.from_ms<=t<=ctx.to_ms],key=lambda r:r['time_utc']);overfetch=sum(t<ctx.from_ms for t in times);decoder_diagnostic=cause
+                    need(overfetch>0 and rows,'LOWER_OVERFETCH_BOUNDARY_NOT_PROVEN')
+                latency=(time.monotonic()-beg)*1000
                 decision=v2.pagination_decision(ctx=ctx,decoded_rows=rows,has_more_present=present,has_more_value=more,page_index=page)
-                rec={'sid':sid,'from_ms':frm,'to_ms':to,'requested_count':v2.PAGE_REQUESTED_COUNT,'rows':rows,'has_more_present':present,'has_more':more,'pagination_reason':decision.reason,'roundtrip_latency_ms':latency,'retrieved_utc':datetime.now(timezone.utc).isoformat(),'canonical_rows_sha256':sha(e.a.enc(rows)),'decoder':'UNCHANGED_ACCEPTED_V2_RAW_ENVELOPE_ACCOUNT_PERIOD_BINDING'};receipts.append(rec)
+                rec={'sid':sid,'from_ms':frm,'to_ms':to,'requested_count':v2.PAGE_REQUESTED_COUNT,'rows':rows,'has_more_present':present,'has_more':more,'pagination_reason':'LOWER_OVERFETCH_PROVES_FROM_BOUNDARY_EXHAUSTED' if overfetch else decision.reason,'lower_boundary_overfetch_discarded':overfetch,'decoder_diagnostic':decoder_diagnostic,'raw_response_envelope_b64':base64.b64encode(tr.last_history_envelope.SerializeToString()).decode(),'roundtrip_latency_ms':latency,'retrieved_utc':datetime.now(timezone.utc).isoformat(),'canonical_rows_sha256':sha(e.a.enc(rows)),'decoder':'UNCHANGED_ACCEPTED_V2_RAW_ENVELOPE_ACCOUNT_PERIOD_BINDING'};receipts.append(rec)
                 for r in rows:
                     t=rowcheck(r);need(t not in bars[sid] or bars[sid][t]==r,'CONFLICTING_REUSED_NEW_BAR');bars[sid][t]=r
-                need(not decision.fail_closed,'M5_PAGINATION_INCOMPLETE')
-                if decision.complete:break
+                need(overfetch or not decision.fail_closed,'M5_PAGINATION_INCOMPLETE')
+                if overfetch or decision.complete:break
                 to=decision.next_to_ms
             persist('m5-'+str(sid))
         boundaries=sorted({(s,t) for s in SIDS for entry in grid() for t in (entry,entry+3600,entry+14400)},key=lambda k:(k[1],k[0]));need(len(boundaries)==300,'FIXED_BOUNDARY_COUNT')
