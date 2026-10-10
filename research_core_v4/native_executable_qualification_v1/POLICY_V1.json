@@ -1,0 +1,107 @@
+{
+  "schema": "mxm.native.executable.data.qualification.policy.v1",
+  "role": "EXECUTOR_DIRECTOR_MXM_QUANT_GREENFIELD",
+  "base_head": "223117350f65048865815922f23d14102148aa7d",
+  "created_utc": "2026-10-10T18:46:39Z",
+  "scope": "DATA_RECOVERY_AND_OUTCOME_BLIND_QUALIFICATION_ONLY",
+  "symbols": [
+    {
+      "symbol": "EURUSD",
+      "sid": 1
+    },
+    {
+      "symbol": "GBPUSD",
+      "sid": 2
+    },
+    {
+      "symbol": "SpotCrude",
+      "sid": 250
+    }
+  ],
+  "development": {
+    "start_utc": "2026-08-20T00:00:00Z",
+    "end_exclusive_utc": "2026-09-17T00:00:00Z",
+    "original_blocks": 4,
+    "block_days": 7,
+    "complete_iso_weeks": [
+      "2026-W35",
+      "2026-W36",
+      "2026-W37"
+    ]
+  },
+  "grid": {
+    "weekdays_utc": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "entry_clocks_utc": [
+      "09:15",
+      "13:15"
+    ],
+    "horizons_seconds": [
+      3600,
+      14400
+    ],
+    "boundary_window_ms": 60000,
+    "max_quote_age_ms": 5000,
+    "max_bid_ask_skew_ms": 2000,
+    "features": "EXACT12_CONTIGUOUS_COMPLETED_M5_BARS_BEFORE_EACH_ENTRY;LATEST_BAR_CLOSE_AT_ENTRY_MINUS5_SECONDS",
+    "bar_availability": "BAR_TIMESTAMP_PLUS300_SECONDS_PLUS5_SECOND_DECISION_BUFFER_IS_AN_ASSUMPTION;ACTUAL_HISTORICAL_DELIVERY_LATENCY_NOT_OBSERVED"
+  },
+  "reuse": "BYTE_IDENTICAL_ACCEPTED_SAME_PEPPERSTONE_EUROPE_LIVE_ACCOUNT_FINGERPRINT_M5_AND_QUOTES;OTHER_ACCOUNT_DEMO_ARCHIVES_CATALOGUED_BUT_NOT_EXECUTABLE_LIVE_SUBSTITUTES;NO_INTERPOLATION",
+  "capture": {
+    "only_missing_m5_intervals": true,
+    "maximum_m5_requests": 24,
+    "maximum_tick_requests": 600,
+    "maximum_total_historical_requests": 624,
+    "maximum_pages_per_m5_interval": 3,
+    "maximum_pages_per_tick_side": 1,
+    "has_more_tick": "EXCLUDE_TRUNCATED_SIDE_FAIL_CLOSED_NO_UNBOUNDED_PAGINATION",
+    "rate_min_interval_seconds": 0.25,
+    "request_timeout_seconds": 30,
+    "maximum_wall_seconds": 1800
+  },
+  "acceptance": {
+    "valid_ohlc_and_volume": true,
+    "duplicate_conflicts_allowed": 0,
+    "off_grid_allowed": 0,
+    "quote_pair_fraction_each_original_block_and_complete_week": 0.95,
+    "minimum_joint_m5_quote_episodes_each_original_block_and_complete_week": 8,
+    "current_economic_fraction_each_partition": 0.8,
+    "current_minimum_margin_eur_max": 50,
+    "current_free_capital_eur_min": 150,
+    "current_risk_proxy_plus_cost_eur_max": 2,
+    "capital_eur": 200,
+    "designed_stop_risk_budget_eur": 1,
+    "definition": "EACH_SYMBOL_AND_HORIZON_MUST_PASS_ALL4_ORIGINAL_BLOCKS_AND_ALL3_COMPLETE_ISO_WEEKS;NO_RETURN_BASED_SELECTION;CLOCKS_NOT_RETUNED_AFTER_RESULTS"
+  },
+  "costs": {
+    "spread": "AUTHENTIC_FRESH_BID_ASK_HALF_SPREAD_AT_BOTH_BOUNDARIES",
+    "commission": "EXPLICIT_CURRENT_NATIVE_TERMS_SCENARIO_ONLY_NOT_CERTIFIED_HISTORICAL",
+    "conversion": "CAUSAL_SAME_GRID_EURUSD_BID_ASK_CONSERVATIVE_USD_LIABILITY_TO_EUR",
+    "slippage_stress_bps": [
+      0,
+      1,
+      2
+    ],
+    "risk_proxy": "PRE_ENTRY_H1_HIGH_LOW_AT_MINIMUM_VOLUME_PLUS_SPREAD_CURRENT_COMMISSION_AND2BPS;NOT_STOP_OR_SURVIVAL_CERTIFICATE",
+    "funding": "INTRADAY_FIXED_CLOCKS;NO_CERTIFIED_HISTORICAL_ROLLOVER_EXEMPTION;UNKNOWN_NOT_ZERO_IF_APPLICABLE",
+    "fills": "NOT_OBSERVED;QUOTES_AND_M5_REFERENCE_ARE_NOT_REAL_FILLS"
+  },
+  "session": "CURRENT_NATIVE_WEEKLY_SCHEDULE_TIMEZONE_PROXY_PLUS_OBSERVED_GRID;HISTORICAL_HOLIDAYS_AND_ACTUAL_BAR_DELIVERY_NOT_CERTIFIED",
+  "directional_experiment": false,
+  "closed_experiment_replay": false,
+  "orders": false,
+  "protected_forward": false,
+  "cloud_deployment": false,
+  "authentication_changed": false,
+  "unknown_costs_are_zero": false,
+  "final_decisions": [
+    "DATA_QUALIFIED_FOR_NEW_PROSPECTIVE_RESEARCH",
+    "DATA_LIMITED"
+  ],
+  "qualification_is_not": "NET_PROFITABILITY_HARD21_HISTORICAL_FEE_OR_EXECUTION_CERTIFICATION"
+}
