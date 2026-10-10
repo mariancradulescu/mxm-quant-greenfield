@@ -36,7 +36,7 @@ def rowcheck(r):
 def staged(key,fp,tmp):
     manifest=json.loads((e.a.ROOT/(P+'ARCHIVE_INPUT_MANIFEST_V1.json')).read_text());b=base64.b64decode(''.join((e.a.ROOT/p).read_text().strip() for p in manifest['parts']),validate=True)
     need(sha(b)==manifest['ciphertext_sha256'],'ARCHIVE_CIPHER_SHA');raw=gzip.decompress(e.w.old.crypto.decrypt_package(b,private_key=key,expected_public_spki_sha256=fp,temp_parent=tmp));need(sha(raw)==manifest['canonical_sha256'],'ARCHIVE_CANONICAL_SHA')
-    value=e.w.old.crypto.strict_json(raw);need(e.a.enc(value)==raw,'ARCHIVE_CANONICAL');bars={};provenance=[]
+    value=e.w.old.crypto.strict_json(raw);need(json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()==raw,'ARCHIVE_CANONICAL');bars={};provenance=[]
     for source in value['sources']:
         b=base64.b64decode(source['member_bytes_b64'],validate=True);need(sha(b)==source['member_sha256'],'CSV_BYTE_IDENTITY');need(e.w.old.filehash(source['acceptance_path'])==source['acceptance_sha256'],'ACCEPTANCE_SHA')
         rows=list(csv.DictReader(io.StringIO(b.decode())));times=[rowcheck(r) for r in rows];need(times==sorted(times) and len(set(times))==len(times),'SOURCE_MONOTONIC_DUPLICATES')
