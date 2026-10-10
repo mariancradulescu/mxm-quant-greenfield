@@ -1,0 +1,14 @@
+{
+  "schema": "mxm.append.only.pre_numeric_read.cash.integrity.v1",
+  "recorded_UTC": "2026-10-10T10:56:26.042175+00:00",
+  "source_head": "de23ca27628b78efdec8156ab633323a41e0693f",
+  "source_run": 38046117908,
+  "numeric_outcomes_seen": false,
+  "immutable_source_unchanged": true,
+  "finding": "Frozen indicative cash diagnostic uses EURUSD bid for both signs. USD gain converted to EUR needs EURUSD ask; USD loss needs EURUSD bid. Initial stop-risk screen correctly uses bid for loss. Quote-side model/baseline and all acceptance gates are unaffected.",
+  "correction_scope": "Separate new-result authentication supplement only: preserve original summary; reconstruct quote-cash scenario from same authenticated endpoints and current fee-equivalent records using sign-appropriate EURUSD bid/ask. No new broker data, no direction/selection/holding/support/gate change, no refit. Portable CSharp cash formula parity on same authentic samples.",
+  "cash_formula": "q*(exit_bid-entry_ask) for LONG; q*(entry_bid-exit_ask) for SHORT; subtract q*entry_mid*current_roundtrip_fee_bps/10000; divide netUSD by EURUSDask if net>=0 else EURUSDbid; directEUR unchanged. Fees remain current price-equivalent scenarios,not exact historical cash charges.",
+  "runtime_finding": "Original RoundProbe lacks explicit rejection of crossed/nonfinite baseline snapshots. Do not deploy it. Pure RoundKernel parity remains distinct from full stream/allocator/risk parity. A faithful safe adapter repair is an engineering action,not an altered research law.",
+  "deployment_authorized": false,
+  "orders": false
+}
