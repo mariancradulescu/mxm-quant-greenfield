@@ -24,6 +24,16 @@ def correlation(xs,ys):
     if len(xs)<2:return None
     ax=sum(xs)/len(xs);ay=sum(ys)/len(ys);vx=sum((x-ax)**2 for x in xs);vy=sum((y-ay)**2 for y in ys)
     return sum((x-ax)*(y-ay) for x,y in zip(xs,ys))/math.sqrt(vx*vy) if vx*vy>0 else None
+def capital_bounds(metadata):
+    out=defaultdict(Counter)
+    for r in metadata.values():
+        c=r['asset_class'];out[c]['metadata_symbols']+=1
+        if r.get('buy_eligible_current') is not True or r.get('sell_eligible_current') is not True:continue
+        try:
+            mar=max(float(r['buy_margin_eur']),float(r['sell_margin_eur']));out[c]['both_direction_margin_known']+=1
+            for limit in (50,150,200):out[c]['both_direction_margin_le'+str(limit)]+=int(mar<=limit)
+        except (ValueError,KeyError,TypeError):out[c]['both_direction_margin_unknown']+=1
+    return {c:dict(v) for c,v in sorted(out.items())}
 def pair_audit(results,ids,metadata):
     pairs={};maps=[]
     for name in NAMES:
@@ -114,7 +124,7 @@ def main():
             for r in rr:r['trials']=[dict(zip(fields,tr)) for tr in r['trials']]
         PHASE='PORTFOLIO_ECONOMIC_AUDIT';pair=pair_audit(results,ids,metadata);clocks=pair.pop('private_clock_capital_diagnostics');wanted,diag=promising(results,ids,metadata)
         PHASE='CONDITIONAL_NEW_QUOTE_PILOT';quotes,pilotprivate=pilot(wanted,key,fp,tmp,head,a)
-        summary={'schema':'mxm.private.multiscale.regime.economic.readback.v1','source_provenance':{'cost':cp,'science':sp},'scientific_models_replayed':False,'native_identity_matches':1576-len(mismatches),'native_identity_mismatches':len(mismatches),'normalized_known_legitimate_class_mapping_changes':len(changed),'mapping_is_return_selected':False,'prospective_identity_matched_margin_eligible':len(ids),'full_current_universe_economic_classes':aggregate(list(metadata.values()),master),'paired_mechanism_portfolio':pair,'identity_matched_economic_cohort_diagnostics':diag,'new_bounded_quote_pilot':quotes,'historical_point_in_time_terms':False,'certified_positive_net':False,'HARD21_certified':False,'executed_fills':0,'protected_forward':False,'orders':0,'science_initial_output_preserved':True,'readback_is_independent_empirical_replication':False}
+        summary={'schema':'mxm.private.multiscale.regime.economic.readback.v1','source_provenance':{'cost':cp,'science':sp},'scientific_models_replayed':False,'native_identity_matches':1576-len(mismatches),'native_identity_mismatches':len(mismatches),'normalized_known_legitimate_class_mapping_changes':len(changed),'mapping_is_return_selected':False,'prospective_identity_matched_margin_eligible':len(ids),'full_current_universe_economic_classes':aggregate(list(metadata.values()),master),'capital_bounds_by_asset_class':capital_bounds(metadata),'paired_mechanism_portfolio':pair,'identity_matched_economic_cohort_diagnostics':diag,'new_bounded_quote_pilot':quotes,'historical_point_in_time_terms':False,'certified_positive_net':False,'HARD21_certified':False,'executed_fills':0,'protected_forward':False,'orders':0,'science_initial_output_preserved':True,'readback_is_independent_empirical_replication':False}
         PHASE='ENCRYPTED_AGGREGATE_DELIVERY';rt.output(head,a,tmp,key,'economicreadback',{'summary':summary,'private_identity_mismatches':mismatches,'private_class_mapping_changes':changed,'private_capital_clocks':clocks,'private_conditional_quote_pilot':pilotprivate},summary)
 if __name__=='__main__':
     try:main()
