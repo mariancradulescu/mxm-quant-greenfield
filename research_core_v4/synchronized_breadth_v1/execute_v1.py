@@ -116,6 +116,9 @@ def main():
           'design':json.loads((e.a.ROOT/(P+'DESIGN_V1.json')).read_text()),'cost_source_provenance':costprov,'broker_requests':0,'original_experiments_replayed':False,
           'orders':0,'protected_forward':False,'scientific_significance_claimed':False,'independent_confirmation':False,'net_expectancy_established':False,'causal_availability':'FROZEN_SYNTHETIC_BAR_AVAILABILITY_PLUS_15MIN_DELAY;NOT_LIVE_RECEIPT_OR_FILL_PROOF'}
         del panel,breadth,full
+        # Lossless aggregate counts retain every clock; vector transport needs emitted predictions only.
+        for result in results:result['trials']=[trial for trial in result['trials'] if trial['model'] is not None]
+        summary['transport_nonprediction_vectors']='OMITTED;ALL_CLOCK_DENOMINATORS_AND_REASONS_PRESERVED_BY_IDENTITY_BLOCK_ISOWEEK'
         PHASE='ENCRYPTED_DELIVERY';rt.output(head,auth,tmp,key,'breadth',{'summary':summary,'all_trials':results,'input_provenance':provenance},summary)
 
 if __name__=='__main__':
