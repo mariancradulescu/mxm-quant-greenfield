@@ -1,0 +1,37 @@
+{
+  "schema": "mxm.frozen.native.spread.midpoint.concordance.directional.v1",
+  "base_head": "c87a1cf10e8c93a9e2b3ea9be78543f413ff1854",
+  "status": "PREOUTCOME_FROZEN_DEVELOPMENT_ONLY",
+  "scientific_information_source": "BROKER_NATIVE_TOP_OF_BOOK_JOINT_SPREAD_PRICE_INNOVATIONS",
+  "mechanism": "Liquidity withdrawal associated with signed midpoint innovation may reveal demand direction; test whether centered contemporaneous spread/mid-return concordance predicts subsequent one-hour quote-side direction. Observational predictive hypothesis, not identified causal effect.",
+  "novelty": "Joint centered covariance between LOG_MIDPOINT_CHANGES and LOG_SPREAD_CHANGES on a uniform time grid. Not direction/count of quote revisions, side update-count imbalance, quote catchup, impulse, spread forecast target, cross-asset liquidity, momentum/reversal/breakout, triad, factor, session or previous M5 variance-composition exact. No renamed direction, inversion, grid tuning or rescue.",
+  "exact_native_CSharp_feature_mapping": "NativeProbe.cs:MarketData.GetTicks(symbol).Tick->Tick.Time/Bid/Ask->bounded per-side CHANGED_PRICE queues->13 causal five-second samples->NativeKernel.Feature; no Open API fields required at runtime",
+  "source_timestamps_and_availability": "Historical side ticks timestamp<=sample time. Causal samples t-60,t-55,...,t seconds, each side last changed-price age<=10s. Capture70s history; initial per-side row is seed and cannot manufacture a change. Same-side same-ms different-price ambiguity censors window. hasMore/error/invalid/crossed/insufficient data abstain. Historical first receipt and Cloud delivery unproven; RESEARCH_ONLY until verified.",
+  "universe_and_selection": "Reuse authenticated full Oct10 native cost snapshot. Scan EVERY asset class; structural both sides/minimum lattice/max minimum ticket EUR50. Two deterministic hash-ranked nominees per eligible asset class (fixed SHA256 MXM_NATIVE_COV_V1|symbol_id), zero return selection and zero margin-ranked nomination. Limited representative class-balanced probe, not exhaustive optimum. Eight qualification windows Aug18/19 at04:10,08:10,13:10,17:10 UTC before outcomes. Require>=2 fresh uncensored bilateral pairs spanning both dates. One per class ranked resolvable current fee scenario first, then observed spread+current fee scenario (or spread if unknown), margin then ID. All exclusions retained. No replacement nominees.",
+  "original_chronology": "Aug20T00:00Z..Sep17T00:00Z exclusive;four ORIGINAL adjacent seven-day blocks;offset days1,4,5,6 at04:10,08:10,13:10,17:10 UTC;64 scheduled actions per selected instrument;complete ISO UTC W35,W36,W37;partial W34/W38 retained;protected forward after Sep17T12:02:58Z unopened",
+  "direction_and_horizon": "sign(Pearson centered correlation of12 logmid changes with12 logspread changes), only abs(corr)>=0.2;fixed same orientation all classes/blocks;degenerate variance<=1e-24 abstain;horizon+3600s;NO_FIT",
+  "paired_baseline": "sign(mid_t-mid_t_minus60sec), no fitting. Both directions nonzero and same feature/entry/exit support. Also report standalone quote-side returns; increment cannot rescue negative standalone.",
+  "entry_exit_and_cost_conventions": "LONG=10000ln(exit_bid/entry_ask);SHORT=10000ln(entry_bid/exit_ask). Genuine historical quotes with exit side age<=10s;NOT fills. Current Oct10 fee contracts applied to historical prices as explicitly INDICATIVE scenario only;require fee field presence;unknown historical fees/conversion/swap/slippage remain unknown, never zero. Price-equivalent current fee bps is scenario not exact realized cashflow. Subtract2/5/10bps sensitivities;no actual historical NET certification.",
+  "missingness_and_abstention": "Count all64scheduled actions for selected instruments including provider errors/page truncation/feature gaps/ambiguous_ms/weakcorrelation/degeneracy/baselineflat/exitgaps;no compressed clocks, substitutions or zero return imputation. Unselected class nominees and full current structural census retained.",
+  "minimum_support_and_power": "Descriptive global paired>=64 and>=12per original block and>=12per complete ISO week. This minimum does not establish power;only4 dependent blocks/3complete ISO weeks, adaptive prior history => no confirmatory p-values or familywise alpha certification. All classes reported, no return-selected winning class.",
+  "dependence_and_multiplicity": "One fixed directional exact, class-balanced shared DEVELOPMENT with full prior selection exposure. Correlated instruments and same-clock overlapping signals NOT independent trades. No iid pooling/p-value/independent confirmation. Class views descriptive only.",
+  "robustness_gates": "Standalone quote-side and paired increment positive in EACH original block and each complete ISO UTC week;adequate support;fresh<=5sec sensitivity reported. Positive gate only development observation, not promotion. Missing runtime parity or historical all-cost evidence => no deployable NET claim.",
+  "economic_gates": "Current min margin50EUR <=25% of200;freebuffer50EUR;aggregate margin cap150EUR eventual single position unless independently verified multi-position allocator. Stop-loss risk, overlap, concentration, EUR conversion and rollover not simulated/certified. This fixed test grid has16 single-position opportunity clocks per complete ISO week, cannot itself certify HARD21. Signal rows are not executed entries.",
+  "CSharp_python_math_parity": "All authentic causally resampled13bid13ask inputs piped privately to compiled reusable NativeKernel;same direction/reason and correlation absolute error<=1e-10. Fabricated edge cases solely software tests, never alpha evidence.",
+  "cloud_compatibility": "Native cBot compile only against actual SpotwareSDK1.0.21 net6 onLinux;no cloud deployment. Pure parityconsole net8 research only. No externalruntime input/file/server/GitHub/Python/network dependency for CSharp feature. Delivery/order semantics require future separately authorized Cloud proof.",
+  "selection_history": "All previous exact negatives immutable. New exact appended before any new historical observation or response;no after-outcome direction/threshold/horizon/symbol rescue.",
+  "budget": {
+    "request_cap": 10000,
+    "min_request_spacing_sec": 0.25,
+    "wall_sec": 4200,
+    "selected_class_cap": 32,
+    "retries": 0
+  },
+  "governance": {
+    "orders": false,
+    "demo_orders": false,
+    "cloud_deployment": false,
+    "protected_forward": false,
+    "confidential_market_data": "ENCRYPTED_PRIMARY_ATTESTATION_AND_PRIVATE_AGGREGATES_ONLY"
+  }
+}

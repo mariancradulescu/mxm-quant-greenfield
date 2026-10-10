@@ -1,0 +1,34 @@
+name: MXM native CSharp Cloud contract and authentic spread price concordance DEVELOPMENT
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/cloud_native_covariance_v1/EXECUTION_V1.json]
+permissions:
+  contents: write
+jobs:
+  native-compile-authentic-research-private-parity:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 76
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Compile pure CSharp kernel and native Algo adapter on Linux without deployment
+        run: |
+          dotnet build research_core_v4/cloud_native_covariance_v1/csharp/Parity.csproj -c Release --nologo
+          dotnet build research_core_v4/cloud_native_covariance_v1/csharp/NativeProbe.csproj -c Release --nologo
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.3.5 cryptography==46.0.4
+      - name: Verify causal feature edge cases without market inference
+        run: python3 -m unittest research_core_v4.cloud_native_covariance_v1.test_kernel_v1
+      - name: New frozen authentic broker-native directional research and private CSharp parity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 4350 python3 -m research_core_v4.cloud_native_covariance_v1.runner_v1

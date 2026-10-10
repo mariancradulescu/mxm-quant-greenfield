@@ -1,0 +1,122 @@
+{
+  "schema": "mxm.native.cloud.production.information.contract.v1",
+  "as_of_utc": "2026-10-10",
+  "architecture": "ONE_CSHARP_DOTNET_CBOT_PEPPERSTONE_EUROPE_RAZOR_EUR200",
+  "sources": [
+    {
+      "source": "BID_ASK",
+      "native_API_mapping": "Symbol.Bid/Ask; Tick.Bid/Ask",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "EXISTING_AUTHENTIC_PAGES_AND_CURRENT_CONTRACT",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "AUTHENTIC_OPEN_API_BID_ASK_PAGES_AVAILABLE",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "TICK_TIMESTAMPS",
+      "native_API_mapping": "Tick.Time; Ticks.Tick; Ticks.Reloaded",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "HISTORICAL_ONLY_DELIVERY_PROOF",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "AUTHENTIC_SIDE_HISTORY;FIRST_RECEIPT_TIMES_NOT_AVAILABLE",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "BARS",
+      "native_API_mapping": "MarketData.GetBars(TimeFrame.Minute5,symbol);Bars.TickVolumes",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "EXISTING_1576_IDENTITY_CORPUS",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "EXISTING_AUTHENTIC_ENCRYPTED_M5_100SHARDS",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "OTHER_SYMBOLS",
+      "native_API_mapping": "Symbols.GetSymbol;MarketData.GetTicks/GetBars(symbol)",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "CURRENT_ACCOUNT_SYMBOLS_NOT_CLOUD_SUBSCRIPTIONS",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "CURRENT_NATIVE_UNIVERSE_AND_HISTORICAL_SIDE_PAGES",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "DEPTH",
+      "native_API_mapping": "MarketData.GetMarketDepth;MarketDepth.Updated",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "NOT_VERIFIED_OR_UNAVAILABLE",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "NO_AUTHENTIC_HISTORICAL_DEPTH",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "COMMISSION_VOLUME",
+      "native_API_mapping": "Symbol.Commission/CommissionType/MinCommission/MinCommissionType/MinCommissionAsset/VolumeInUnitsMin/Step/LotSize",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "CURRENT_AUTHENTIC_NATIVE_SNAPSHOT_ONLY",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "CURRENT_ONLY_NOT_HISTORICAL_CHARGES",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "MARGIN_LEVERAGE",
+      "native_API_mapping": "Symbol.GetEstimatedMargin;Account.PreciseLeverage/FreeMargin",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "CURRENT_AUTHENTIC_EUR_ACCOUNT_EVIDENCE_ONLY",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "CURRENT_SNAPSHOT_ONLY",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "SESSIONS_STATUS",
+      "native_API_mapping": "Symbol.MarketHours/IsTradingEnabled/TradingMode",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "CURRENT_NATIVE_CONTRACT_ONLY",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "CURRENT_SCHEDULE_NOT_HISTORICAL_REVISIONS",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "POSITIONS_EQUITY",
+      "native_API_mapping": "Positions;Account.Equity/FreeMargin",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "NOT_CLOUD_VERIFIED",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "NO_NEW_FILL_RECEIPTS_OR_STRATEGY_EQUITY",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    },
+    {
+      "source": "SWAP_FINANCING",
+      "native_API_mapping": "Symbol.SwapLong/Short/CalculationType/Swap3DaysRollover;PnLConversionFeeRate",
+      "DOCUMENTED_IN_ALGO_API": true,
+      "VERIFIED_IN_CTRADER_CLOUD": false,
+      "VERIFIED_FOR_PEPPERSTONE_SYMBOLS": "CURRENT_NATIVE_SNAPSHOT_ONLY",
+      "HISTORICAL_RESEARCH_ACCESSIBLE": "CURRENT_ONLY_HISTORICAL_REVISION_UNAVAILABLE",
+      "runtime_proof": "NOT_VERIFIED_OR_UNAVAILABLE_UNTIL_SEPARATE_AUTHORIZED_CLOUD_PROBE"
+    }
+  ],
+  "official_sources": {
+    "cloud": "https://help.ctrader.com/ctrader-algo/documentation/cbots/cloud-requirements/",
+    "data": "https://help.ctrader.com/ctrader-algo/references/MarketData/MarketData/",
+    "tick": "https://help.ctrader.com/ctrader-algo/references/MarketData/Ticks/Tick/",
+    "ticks": "https://help.ctrader.com/ctrader-algo/references/MarketData/Ticks/Ticks/",
+    "symbol": "https://help.ctrader.com/ctrader-algo/references/MarketData/Symbols/Symbol/",
+    "depth": "https://help.ctrader.com/ctrader-algo/references/MarketData/MarketDepth/MarketDepth/",
+    "compiler": "https://help.ctrader.com/ctrader-algo/documentation/all-algos/compiling/"
+  },
+  "cloud_platform": "LINUX;ONLY_COMPILE_TIME_CROSS_PLATFORM_DEPENDENCIES",
+  "HTTP": "NO_REQUESTS_SENT_DOCUMENTED;NOT_USED",
+  "external_services": "FORBIDDEN_IN_DECISIONS_FILTERS_AND_SIGNALS",
+  "storage": "INSTANCE_FILES_DELETED_ON_RESTART;NO_DURABLE_FILE_STATE_ASSUMED",
+  "restart": "REBUILD_NATIVE_ACCOUNT_AND_POSITION_EXPOSURE;UNKNOWN_STATE_ABSTAINS;CLEAR_TICK_STATE_ON_RELOAD;75SEC_FRESH_WARMUP;NO_ORDERS_IN_PROBE",
+  "multi_symbol": "DOCUMENTED_NATIVE_SYMBOL_LOOKUPS_AND_EVENT_SUBSCRIPTIONS;MAX32_PROBE;ACTUAL_CLOUD_STREAM_DELIVERY_NOT_VERIFIED",
+  "numeric_probe": "COMPILE_ONLY_LINUX_NET6_NATIVE_SDK_PIN1.0.21;NET8_PURE_KERNEL_PARITY;BUILD_IS_NOT_CLOUD_RUNTIME_PROOF",
+  "market_depth": "NO_HISTORICAL_DEPTH_AND_NO_CLOUD_PEPPERSTONE_PROOF;NOT_SELECTED",
+  "nondeployable_sources": [
+    "EXTERNAL_MACRO_NEWS_ALFRED_FRED_ORDERFLOW",
+    "OPEN_API_ONLY_FIELDS_WITHOUT_NATIVE_EQUIVALENT",
+    "FABRICATED_DEPTH",
+    "EXTERNAL_HTTP_OR_WEBSOCKET_INFERENCE"
+  ],
+  "deployment_authorized": false,
+  "orders_authorized": false
+}
