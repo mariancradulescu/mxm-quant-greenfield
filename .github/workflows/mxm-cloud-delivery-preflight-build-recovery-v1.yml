@@ -1,0 +1,42 @@
+name: MXM prepared Cloud no-order package recovery ONLY
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/cloud_delivery_preflight_v1/BUILD_RECOVERY_V1.json]
+permissions:
+  contents: read
+jobs:
+  build-inspect-no-deployment:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Build exact native package without broker or deployment credentials
+        run: |
+          dotnet build research_core_v4/cloud_delivery_preflight_v1/csharp/DeliveryProbe.csproj -c Release --nologo
+          mkdir -p delivery
+          find research_core_v4/cloud_delivery_preflight_v1/csharp/bin/Release/net6.0 -maxdepth 1 -type f -exec cp {} delivery/ \;
+          cp research_core_v4/cloud_delivery_preflight_v1/csharp/DeliveryProbe.cs delivery/REVIEW_SOURCE.cs
+          cp research_core_v4/cloud_delivery_preflight_v1/PACKAGE_SCOPE_V1.json delivery/
+          find delivery -maxdepth 1 -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > delivery/SHA256SUMS.txt
+          python3 - <<'PY'
+          import pathlib,zipfile
+          for p in pathlib.Path('delivery').glob('*.algo'):
+              print('ALGO_SIGNATURE',p.name,p.read_bytes()[:32].hex(),p.stat().st_size)
+              if zipfile.is_zipfile(p):
+                  z=zipfile.ZipFile(p);print('ALGO_ENTRIES',z.namelist());z.extractall('delivery/unpacked')
+          PY
+      - name: Decompile exact assembly and inspect SDK package format
+        run: |
+          dotnet tool install ilspycmd --tool-path /tmp/mxm-ilspy --version 9.1.0.7988
+          /tmp/mxm-ilspy/ilspycmd delivery/MXM_DeliveryProbe_20261012.dll > delivery/COMPILED_DECOMPILED.cs
+          /tmp/mxm-ilspy/ilspycmd /home/runner/.nuget/packages/ctrader.automate/1.0.21/tools/net6.0/Core.AlgoFormat.dll > delivery/SDK_FORMAT_REVIEW.cs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-prepared-no-order-probe
+          path: delivery/
+          retention-days: 30
+          if-no-files-found: error
