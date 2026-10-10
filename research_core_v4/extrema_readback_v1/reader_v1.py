@@ -3,7 +3,7 @@ and its attestation, verify stored summary arithmetic, relay aggregate via
 ephemeral RSA/AES-GCM recipient. Never read 100 source shards or replay model.
 Public release body and runner logs contain ciphertext/metadata ONLY.
 """
-import base64,gzip,hashlib,json,math,os,pathlib,re,tempfile
+import base64,gzip,hashlib,json,math,os,pathlib,re,tempfile,subprocess
 from collections import Counter
 from cryptography.hazmat.primitives import hashes,serialization
 from cryptography.hazmat.primitives.asymmetric import padding,rsa
@@ -59,8 +59,9 @@ def main():
     need(os.environ.get("GITHUB_EVENT_NAME")=="push" and
          os.environ.get("GITHUB_WORKFLOW_REF")==e.w.old.REPO+"/"+W+"@refs/heads/"+e.w.old.BRANCH,"WORKFLOW_SCOPE")
     e.a.ancestor(auth["base_head"],head)
-    for p,expected in auth["sha256_bindings"].items():
-        need(e.w.old.filehash(p)==expected,"IMMUTABLE_READBACK_SOURCE_DRIFT")
+    for p,expected in auth["git_blob_sha1_bindings"].items():
+        got=subprocess.check_output(["git","hash-object",p],cwd=e.a.ROOT,text=True).strip()
+        need(got==expected,"IMMUTABLE_READBACK_SOURCE_DRIFT")
     need(e.w.old.api("git/ref/heads/"+e.w.old.BRANCH)["object"]["sha"]==head,"LIVE_HEAD_DRIFT")
     tag="mxm-extrema-readback-oneuse-"+auth["invocation_id"]
     need(not e.w.v2.existing_ref(tag),"READBACK_ALREADY_CONSUMED")
