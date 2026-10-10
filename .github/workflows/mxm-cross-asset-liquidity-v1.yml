@@ -1,0 +1,27 @@
+name: MXM frozen cross-asset native liquidity context DEVELOPMENT
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/cross_asset_liquidity_v1/EXECUTION_V1.json]
+permissions:
+  contents: write
+jobs:
+  secure-existing-broker-quotes-cross-class-exact:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.3.5
+      - name: Encrypted original broker quotes cross asset incremental model
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          ulimit -v 2097152
+          timeout --signal=TERM 600 python3 -m research_core_v4.cross_asset_liquidity_v1.runner_v1
