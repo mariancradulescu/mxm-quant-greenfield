@@ -1,0 +1,25 @@
+{
+  "schema": "mxm.prepared.no.order.cloud.probe.scope.v1",
+  "status": "PREPARED_ONLY_SEPARATE_EXPLICIT_OWNER_AUTHORIZATION_REQUIRED",
+  "entry_point": "Mxm.Native.DeliveryProbe",
+  "source": "csharp/DeliveryProbe.cs",
+  "symbols": [
+    "EURUSD",
+    "US500",
+    "SpotCrude"
+  ],
+  "instances": 1,
+  "duration_minutes_max": 120,
+  "hosting": "cTraderCloudPepperstoneEuropeRazor",
+  "account_reads": "nativeprices/timestamps,bars,metadata,margin,PositionsCount;noaccountvalueslogged",
+  "permissions": "AccessRights.None;noorderAPI,noHTTP,noWebSocket,noexternalservice,nofiles",
+  "actions": "subscribeTick/Reloaded;boundedcounters;60secaggregatelogs;autoStopafter120minutes;noautomaticrestart",
+  "logs": "platformownerprivate;onlycounts/symbolnames/status;norawprices,noaccountvalues,nopredictivedecisions",
+  "output_evidence": "ownerCloudinstanceidentity,compiledSHA,startstop,andprivateplatformlog;eventdelivery/reload/timestampgapscounts only",
+  "limits": "DoesnotprovehistoricalsidevsCloudfirstreceiptparity;doesnotrecoverunobservedpastsentiment/depth;doesnotcertifystop/fees/fills;restartobservedonlyifoccursnaturally",
+  "deployment_method": "NO_AUTHENTICATED_CLOUD_DEPLOYMENT_PROVIDER_VERIFIED_IN_THIS_SESSION",
+  "authorization": false,
+  "orders": false,
+  "demo_orders": false,
+  "protected_forward": false
+}

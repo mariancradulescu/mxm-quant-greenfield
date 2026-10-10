@@ -1,0 +1,39 @@
+{
+  "schema": "mxm.prospectively.frozen.native.nominal.round.barrier.reflection.v1",
+  "status": "FROZEN_BEFORE_NEW_QUALIFICATION_OR_OUTCOMES",
+  "base_head": "4209dcfbea958605b6bf3f0288ea89dc3ab1a161",
+  "scientific_information_source": "ABSOLUTE_NOMINAL_PRICE_LOCATION_RELATIVE_TO_DIGITS_DEFINED_ROUND_LEVELS;NO_ORDERFLOW_INPUT",
+  "method_source": "https://www.newyorkfed.org/research/staff_reports/sr125.html",
+  "method_limitation": "Published FX order clustering motivates a barrier hypothesis; it does not prove broker clusters, universal cross-class effect, reflection at arbitrary price distances, or positive net expectancy. Away-from-level direction is a new explicitly prospective inference. No external runtime signal.",
+  "novelty": "First absolute nominal-level anchored, non-translation-invariant estimand in project; previous price-return/count/covariance/lead-lag/session/gap/basis laws do not encode nominal digit lattice location. No crossing trigger, no return reversal threshold, no old winner panel or parameter rescue. Broad reflection/reversal taxonomy is not claimed novel; exact information and conditioning are distinct.",
+  "direction": "q=10^(3-Symbol.Digits);R=q*floor(mid/q+0.5);distance=abs(mid-R);if distance<=q*1e-10 or distance>q/4 abstain;else sign(mid-R), fixed reflection away from nearest nominal level;no fit",
+  "native_CSharp_mapping": "GetTicks(symbol).Tick->Tick.Time/Bid/Ask->bounded changed-price queues; Symbol.Digits; RoundKernel.Feature(bid,ask,digits). Historical 70sec side pages latest causal changed price age<=5sec; first row seed never manufactures a change; same-side same-ms differing price or hasMore/error censors boundary. C# requires>=2 changes inside70sec, warmup3700sec; out-of-order/reload resets; first event seeds.",
+  "runtime_mapping_limits": "Native event/first-receipt/coalescing and symbol Cloud streams not proven. Compile and pure math parity are not actual Cloud delivery. No Cloud deployment or orders authorized. Native adapter is a feature compatibility probe, not final fee/risk engine.",
+  "baseline": "Same-cohort direction sign(mid_at_t-mid_at_t_minus3600);prior boundary has same price-age/ambiguity/gap rules;zero baseline abstains. All model/baseline outcomes and current fee scenarios use identical rows.",
+  "universe_selection": "Authentic Oct10 fullcost snapshot; all current broker classes screened; both new-entry directions, min/step and worst current min margin<=50EUR. Only quoted USD with native EURUSD bid conversion or direct EUR; others preserved as conversion unsupported. Native digits and explicit fee fields required. Two fixed SHA256(MXM_ROUND_BARRIER_V1|sid) nominees per eligible class;no price returns used. Qualification16clocks Aug18/19 04:10..18:10 UTC every2h;>=8 fresh bilateral cost-supported quotes on bothdates and>=4 min-ticket initial risk<=2EUR. One perclass ranked median spread+currentfee, median initial risk,ID;topfour distinctclasses samecost ranking;no replacements. Bounded representative probe,not exhaustive optimality.",
+  "economic_entry_gates": "Potential displacement to neighboring grid midpoint=q/2-distance;require headroom_bps>actual_entry_spread_bps+currentfee_bps+5. This is a geometric distance budget,not expected profit or limit fill. Initial indicative stop distance=distance+2*(ask-bid);cash min-volume stop exposure plus currentfee plus2bps<=2EUR. USD conversion uses same-time fresh native EURUSD bid. Unknowns abstain,never zero.",
+  "entry_exit_horizon": "Historical LONG10000ln(exit_bid/entry_ask),SHORT10000ln(entry_bid/exit_ask);1hour fixed time exit,not target-fill;native endpoints fresh5sec. Four15min path endpoints report sampled adverse exposure only,not intrapath extrema/stop fills. No real receipts.",
+  "clocks_frequency": "160 clocks acrossoriginal28days;weekdays04:10,06:10,08:10,10:10,12:10,14:10,16:10,18:10 UTC=40percompleteISOweek;one1hour candidate per2hour clock,no overlap. Event density measured,not forced.",
+  "original_blocks_ISO": "Aug20T00..Sep17T00 exclusive;all4 originaladjacent7dayblocks;ISO UTCW35/W36/W37complete,W34/W38partialretained;allpreviousselection exposure retained;protectedforwardclosed",
+  "portfolio_allocation": "One causally eligible candidate perclock;rank entryspread+fee then initialrisk thenID BEFORE future quote availability;missing selected exits never replaced by another symbol. EUR200 currentmargin<=50,freebuffer50;historical margin/capital survival andactualstop executionunknown. Indicative cash markouts/drawdown notrealized equity.",
+  "minimum_support_power": "Global>=80 paired;>=16peroriginalblock andcompleteISOweek. Fourdependentblocks/3completeweeks inadequate familywise confirmation. Correlatedsameclockclasses notindependent. Allsymbolviews reported,no winningclass rescue.",
+  "acceptance_gates": "Model after currentfee>2bps AND pairedincrement>0 in each originalblock andcompleteISOweek plus minimumsupport. Unknownhistoricalallcosts or nativeCloudparity forbids robustNETcertification evenifgate passes. 2/5/10bps additional sensitivities, allrows preserved.",
+  "historical_costs": "Current fees applied tohistoricalprices are scenario only;actualpast commission/minima/currencycharges/swap/financing/rollover/slippage/fills unknown,never zero. Stop risk excludes discontinuous gaps andunobservedpath;no full riskcertification.",
+  "CSharp_Python_parity": "Every authentic valid entry quote/digits sample direction/reason exact;numericdifference<=1e-9*max(1,absPython);private stdin/out. Four fabricated softwaretests notalpha.",
+  "governance": {
+    "orders": false,
+    "demo_orders": false,
+    "cloud_deployment": false,
+    "protected_forward": false,
+    "retrospective_tuning": false,
+    "private_data": "OWNER_ENCRYPTED_PRIMARY_ATTESTATION_AND_RELAY_ONLY"
+  },
+  "budget": {
+    "request_cap": 12000,
+    "spacing_sec": 0.25,
+    "wall_sec": 4200,
+    "max_panel": 4,
+    "retry": 0,
+    "attempt": 1
+  }
+}
