@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from research_core_v4.aidr_cost_coverage_v1 import frontier_runtime_v1 as rt
 from research_core_v4.owner_recovery_v1.runtime_v1 import load_asset
 from research_core_v4.multiscale_regime_v1.cost_universe_v1 import eligibility
+from research_core_v4.multiscale_regime_v1.execute_v1 import conversion
 from research_core_v4.cloud_native_covariance_v1.runner_v1 import fee
 from research_core_v4.owner_recovery_v1.readback_v1 import iso,describe
 from research_core_v4.activity_clock_cost_v1.kernel_v1 import observations,evaluate,stats,paired_return,n
@@ -61,22 +62,21 @@ def universe(cost,master):
         r['quote_currency']=q
         r['captured_pnl_conversion_fraction']=int(f['pnlConversionFeeRate'])/10000 if q!='EUR' else 0.
         selected[sid]=r;census[c]['structurally_selected']+=1
-    # Name and currency identities both verified from existing native metadata.
-    fx=[int(r['symbol_id']) for r in cost['metadata_rows'] if r['broker_symbol']=='EURUSD' and r.get('base_asset')=='EUR' and r.get('quote_asset')=='USD']
-    need(len(fx)==1 and fx[0] in {m['symbol_id'] for m in master},'EXISTING_NATIVE_EURUSD_IDENTITY')
-    return selected,native,dict(census),fx[0]
+    # Reuse existing authenticated native currency identities, not symbol-name inference.
+    fx={m['symbol_id']:metadata[m['symbol_id']] for m in master if m['asset_class']=='Forex (Spot)' and
+         m['symbol_id'] in metadata and metadata[m['symbol_id']].get('base_asset') and metadata[m['symbol_id']].get('quote_asset')}
+    return selected,native,dict(census),fx
 
-def economic_gate(row,native,fxbars,spread_times,spread_values):
+def economic_gate(row,native,fxedges,spread_times,spread_values):
     def gate(r):
         out={'research_pass':False,'reason':'ECONOMIC_REFERENCE_OR_RANGE_UNAVAILABLE','full_cost_certified':False}
         p=r['causal_reference_price'];width=r['causal_h1_range'];t=r['action'];units=int(row['min_volume_cents'])/100
         if p is None or width is None or p<=0 or width<=0:return out
         if row['quote_currency']=='USD':
-            fx=fxbars.get(t-300)
-            if fx is None or not n.frozen.valid_bar(t-300,fx,t) or fx['tick_volume']<=0:
-                out['reason']='CAUSAL_EURUSD_REFERENCE_MISSING';return out
-            route=fx['close']
-        else:route=1.
+            qeur=conversion(fxedges.get(t,[]),'USD','EUR')
+            if qeur is None:
+                out['reason']='CAUSAL_NATIVE_FX_REFERENCE_MISSING';return out
+        else:qeur=1.
         f=fee(row,native,p)
         if f['bps'] is None:out['reason']='EXPLICIT_CURRENT_FEE_UNRESOLVED';return out
         k=bisect.bisect_right(spread_times,t)-1
@@ -84,12 +84,12 @@ def economic_gate(row,native,fxbars,spread_times,spread_values):
         age=t-spread_times[k]
         if age>86400:out['reason']='LAST_SPREAD_CONTEXT_OLDER_THAN24H';return out
         # Prior same-symbol spread context only, never a quote at a new entry.
-        spread=spread_values[k];notional=units*p/route;fee_eur=notional*f['bps']/10000
+        spread=spread_values[k];notional=units*p*qeur;fee_eur=notional*f['bps']/10000
         drag=f['bps']+spread+2;rangebps=10000*width/p
-        risk=(units*width/route+notional*drag/10000)*(1+row['captured_pnl_conversion_fraction'])
+        risk=(units*width*qeur+notional*drag/10000)*(1+row['captured_pnl_conversion_fraction'])
         out.update(fee_bps=f['bps'],fee_eur=fee_eur,prior_spread_bps=spread,spread_context_age_s=age,
           prior_spread_count=k+1,causal_H1_range_bps=rangebps,range_plus_cost_exposure_eur=risk,
-          causal_reference_notional_eur=notional,reference_quote_to_eur=1/route,
+          causal_reference_notional_eur=notional,reference_quote_to_eur=qeur,
           cost_fraction_of_H1_range=drag/rangebps,minimum_units=units,
           captured_worst_min_margin_eur=max(float(row['buy_margin_eur']),float(row['sell_margin_eur'])),
           current_pnl_conversion_fraction=row['captured_pnl_conversion_fraction'])
@@ -98,7 +98,7 @@ def economic_gate(row,native,fxbars,spread_times,spread_values):
         return out
     return gate
 
-def corpus(key,fp,tmp,source,selected,native,fullcost,fxid):
+def corpus(key,fp,tmp,source,selected,native,fullcost,fxmetadata):
     master,entries,digits,manifest=source
     rel=e.w.old.api('releases/tags/'+manifest['DURABLE_RELEASE_IDENTITY'])
     assets={a['name']:a for a in e.w.old.api('releases/'+str(rel['id'])+'/assets?per_page=100')}
@@ -110,9 +110,7 @@ def corpus(key,fp,tmp,source,selected,native,fullcost,fxid):
             need((sid,t) not in quote_map,'DUPLICATE_COST_BOUNDARY')
             quote_map[sid,t]=p;spreads[sid].append((t,p['spread_bps']))
     for sid in spreads:spreads[sid].sort()
-    fxordinal=next(k+1 for k,m in enumerate(master) if m['symbol_id']==fxid);fxgroup=(fxordinal-1)//64
-    order=[fxgroup]+[k for k in range(25) if k!=fxgroup]
-    fxbars=None;provenance=[];rows_total=0;results=[];screens=[]
+    order=range(25);fxedges=defaultdict(list);work={};provenance=[];rows_total=0;results=[];screens=[]
     for group in order:
         buffers={o:{} for o in range(group*64+1,min(1576,group*64+64)+1)}
         for segment in range(1,5):
@@ -132,30 +130,36 @@ def corpus(key,fp,tmp,source,selected,native,fullcost,fxid):
                     prev=t;buffers[ordinal][t]=b;count+=1
             need(count==entry['ROW_COUNT'] and entry['PROTECTED_FORWARD_ROW_COUNT']==0,'ARCHIVE_COUNT');rows_total+=count
             provenance.append({'segment':segment,'shard':group,'rows':count,'ciphertext_sha256':sha(blob),'canonical_sha256':sha(raw)})
-        if group==fxgroup:fxbars=buffers[fxordinal]
         for ordinal,bars in buffers.items():
             sid=master[ordinal-1]['symbol_id']
+            if sid in fxmetadata:
+                fr=fxmetadata[sid]
+                for j in range(672):
+                    action=n.START+j*3600+900;b=bars.get(action-300)
+                    if b is not None and n.frozen.valid_bar(action-300,b,action) and b['tick_volume']>0:
+                        fxedges[action].append((sid,fr['base_asset'],fr['quote_asset'],b['close']))
             if sid not in selected:continue
-            r=selected[sid];ss=spreads.get(sid,[]);times=[v[0] for v in ss];vals=[v[1] for v in ss]
-            gate=economic_gate(r,native,fxbars,times,vals);obs=observations(bars)
-            es=[gate(v) for v in obs]
-            screens.append({'sid':sid,'symbol':r['broker_symbol'],'class':r['asset_class'],'source_rows':len(bars),
-              'hourly_screen_reasons':dict(Counter(v['reason'] for v in es)),
-              'economic_pass_hourly':sum(v['research_pass'] for v in es),'historical_spread_observations':len(ss),
-              'explicit_current_fee_eur':describe([v['fee_eur'] for v in es if 'fee_eur' in v]),
-              'range_plus_cost_exposure_eur':describe([v['range_plus_cost_exposure_eur'] for v in es if v['research_pass']])})
-            trials=evaluate(obs,gate)
-            for tr in trials:
-                tr.update(sid=sid,symbol=r['broker_symbol'],asset_class=r['asset_class'],block=tr['clock']//168,iso=iso(tr['action']))
-                q0=quote_map.get((sid,tr['action']));q1=quote_map.get((sid,tr['exit']))
-                tr['exact_quote_coverage']='BOTH' if q0 and q1 else 'PARTIAL' if q0 or q1 else 'NONE'
-                tr['quote_model_bps']=tr['quote_baseline_bps']=None
-                if tr['model'] is not None and tr['y'] is not None and q0 and q1:
-                    tr['quote_model_bps']=paired_return((tr['model']>0)-(tr['model']<0),q0,q1)
-                    tr['quote_baseline_bps']=paired_return((tr['baseline']>0)-(tr['baseline']<0),q0,q1)
-            results.extend(trials)
+            work[sid]=(len(bars),observations(bars))
         del buffers,raw,obj,blob
         e.w.old.budget(maxwall=1800,maxcpu=1400,maxkib=2097152)
+    for sid,(source_rows,obs) in work.items():
+        r=selected[sid];ss=spreads.get(sid,[]);times=[v[0] for v in ss];vals=[v[1] for v in ss]
+        gate=economic_gate(r,native,fxedges,times,vals);es=[gate(v) for v in obs]
+        screens.append({'sid':sid,'symbol':r['broker_symbol'],'class':r['asset_class'],'source_rows':source_rows,
+          'hourly_screen_reasons':dict(Counter(v['reason'] for v in es)),
+          'economic_pass_hourly':sum(v['research_pass'] for v in es),'historical_spread_observations':len(ss),
+          'explicit_current_fee_eur':describe([v['fee_eur'] for v in es if 'fee_eur' in v]),
+          'range_plus_cost_exposure_eur':describe([v['range_plus_cost_exposure_eur'] for v in es if v['research_pass']])})
+        trials=evaluate(obs,gate)
+        for tr in trials:
+            tr.update(sid=sid,symbol=r['broker_symbol'],asset_class=r['asset_class'],block=tr['clock']//168,iso=iso(tr['action']))
+            q0=quote_map.get((sid,tr['action']));q1=quote_map.get((sid,tr['exit']))
+            tr['exact_quote_coverage']='BOTH' if q0 and q1 else 'PARTIAL' if q0 or q1 else 'NONE'
+            tr['quote_model_bps']=tr['quote_baseline_bps']=None
+            if tr['model'] is not None and tr['y'] is not None and q0 and q1:
+                tr['quote_model_bps']=paired_return((tr['model']>0)-(tr['model']<0),q0,q1)
+                tr['quote_baseline_bps']=paired_return((tr['baseline']>0)-(tr['baseline']<0),q0,q1)
+        results.extend(trials)
     need(rows_total==3355389 and len(provenance)==100 and len(screens)==len(selected),'COMPLETE_CORPUS')
     return results,screens,provenance,quality
 
@@ -204,9 +208,9 @@ def main():
         tmp=pathlib.Path(td);key,fp=e.w.old._private_key_from_secret(tmp);need(fp==e.w.old.FP,'OWNER_KEY_BINDING')
         PHASE='EXISTING_NATIVE_COST_SOURCES'
         cost,cp=load_asset(key,fp,tmp,auth['cost_source']);full,qp=load_asset(key,fp,tmp,auth['fullcost_source'])
-        selected,native,census,fxid=universe(cost,source[0])
+        selected,native,census,fxmetadata=universe(cost,source[0])
         PHASE='NEW_AUTHENTIC_ECONOMIC_AND_ACTIVITY_CLOCK_COMPARISON'
-        trials,screens,provenance,quality=corpus(key,fp,tmp,source,selected,native,full,fxid)
+        trials,screens,provenance,quality=corpus(key,fp,tmp,source,selected,native,full,fxmetadata)
         numeric,chosen=aggregate(trials)
         summary={'schema':'mxm.private.activity.clock.cost.first.development.v1','source_head':head,
           'design_sha256':auth['bindings'][P+'DESIGN_V1.json'],'mechanism':'H1_ACTIVITY_MEDIAN_CLOCK_PRICE_DISPLACEMENT_INCREMENT_V1',
@@ -220,7 +224,7 @@ def main():
           'historical_NET':'UNKNOWN_NOT_ZERO','fee_scenario':'EXPLICIT_CURRENT_CONTRACT_ON_CAUSAL_HISTORICAL_M5_REFERENCE',
           'spread_gate':'LATEST_VALID_PRIOR_SAME_SYMBOL_BOUNDARY_WITHIN24H_AFTER8PRIOR_OBSERVATIONS;CONTEXT_ONLY_NOT_NEW_ENTRY_SPREAD',
           'risk_gate':'H1_RANGE_MIN_TICKET_PLUS_CONTEXT_SPREAD_CURRENT_COMMISSION_AND2BPS<=2EUR;NOT_STOP_OR_GAP_RISK_CERTIFICATION',
-          'conversion':'CAUSAL_M5_EURUSD_CLOSE_OR_DIRECT_EUR_REFERENCE_ONLY_NOT_EXECUTABLE_BID_CONVERSION',
+          'conversion':'EXISTING_DETERMINISTIC_NATIVE_FX_GRAPH_MAX4_EDGES_OF_SAME_TIME_COMPLETED_M5_CLOSES_OR_DIRECT_EUR;NOT_EXECUTABLE_BID_CONVERSION',
           'pnl_conversion_scenario':'EXPLICIT_CAPTURED_FRACTION_TIMES_ABSOLUTE_PNL_WHEN_QUOTE_NOT_EUR;CONSERVATIVE_SCENARIO_NOT_HISTORICAL_CHARGE_PROOF',
           'missing_costs':'DATED_FEES_SWAP_FINANCING_ROLLOVER_SLIPPAGE_ACTUAL_FILLS_AND_LIVE_FIRST_RECEIPT_UNKNOWN',
           'native_mapping':'Bars.OpenTimes/OHLC/TickVolumes;bounded arrays and sufficient-statistic ridge CSharp;Symbol fees/minima/volume/margin;no external runtime input',

@@ -45,4 +45,20 @@ class ScientificChecks(unittest.TestCase):
         self.assertEqual(len(rr),168)
         self.assertTrue(all(sum(r['clock']//168==b for r in rr)==42 for b in range(4)))
         self.assertTrue(all(r['model'] is None for r in rr))
+    def test_existing_native_cross_conversion_and_direct_eur(self):
+        from research_core_v4.activity_clock_cost_v1.runner_v1 import economic_gate
+        t=n.START+10000
+        native={'assets':[{'assetId':1,'name':'EUR'},{'assetId':2,'name':'USD'},{'assetId':3,'name':'CFD'}],
+          'light':[{'symbolId':99,'baseAssetId':3,'quoteAssetId':2}],
+          'full':{'99':{'preciseTradingCommissionRate':0,'preciseMinCommission':0,'commissionType':1,'minCommissionType':2,'lotSize':100}}}
+        row={'symbol_id':99,'quote_currency':'USD','min_volume_cents':100,'buy_margin_eur':10,'sell_margin_eur':10,'captured_pnl_conversion_fraction':.003}
+        r={'action':t,'causal_reference_price':10.,'causal_h1_range':.1}
+        tt=[t-800+i*100 for i in range(8)];vv=[1.]*8
+        edges={t:[(10,'EUR','CHF',1.2),(11,'USD','CHF',.9)]}
+        out=economic_gate(row,native,edges,tt,vv)(r)
+        self.assertTrue(out['research_pass']);self.assertAlmostEqual(out['reference_quote_to_eur'],.75)
+        direct={**row,'quote_currency':'EUR'}
+        native['light'][0]['quoteAssetId']=1
+        out=economic_gate(direct,native,{},tt,vv)(r)
+        self.assertTrue(out['research_pass']);self.assertEqual(out['reference_quote_to_eur'],1.)
 if __name__=='__main__':unittest.main()
