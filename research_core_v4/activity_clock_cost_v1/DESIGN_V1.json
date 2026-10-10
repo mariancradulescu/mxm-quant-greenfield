@@ -1,0 +1,47 @@
+{
+  "schema": "mxm.frozen.cost.first.activity.median.clock.increment.v1",
+  "status": "FROZEN_BEFORE_NEW_NUMERIC_EXPOSURE",
+  "base_head": "ceecc508b75b9eb1edcc1821f1c2c6aa55e0dd62",
+  "mechanism": "H1_ACTIVITY_MEDIAN_CLOCK_PRICE_DISPLACEMENT_INCREMENT_V1",
+  "motivation": "Concentration of native quote-update activity moves the within-hour activity midpoint away from calendar midpoint. The price displacement between these two completed-M5 locations may add directional response information after own price/location/range/activity controls. This is a new hypothesis, not evidence of order flow, efficient price or NET advantage.",
+  "feature": "12 exact completed M5 bars of last UTC H1, every tick_volume>0. k is FIRST index with 2*cumulative_tick_count>=H1total. phi=10000*ln(close[k]/close[5]); no intra-M5 price or activity interpolation.",
+  "baseline": "10 frozen compact_baseline_v2 coordinates PLUS H1 log close/open bps PLUS sqrt(sum M5 body bps squared). Same paired causal/economically screened matured rows in baseline 12 and model 13 dimensions.",
+  "model": "One added continuous phi. Reuse centered online standardization from matured rows; ridge lambda10; intercept unpenalized; min32 matured pairs; no sign inversion, model clipping, parameter or winning-symbol search.",
+  "novelty": "Activity MEDIAN TIME location coupled to price-path location; neither sum(volume*sign(body)) nor two-H1 aggregate price-per-tick impact, weekly matched activity, spread covariance, extrema temporal order, ordinal close-location autocorrelation or price-path occupancy. Constructive software counterexample preserves compact baseline, total H1 activity, final M5 activity and weighted-sign vote while changing phi. Broad price/activity family is not claimed new.",
+  "closed_specs": "All prior closures preserved byte-identical, including H1 extrema, nominal barrier, coupling, diverse impact, breadth, covariance and directional side-count exacts. No previous experiment, readback or audit executed.",
+  "input_sources": "100 accepted original encrypted DEVELOPMENT M5 shards; 3,355,389 rows;1576 identities. Existing current native Pepperstone Oct10 fullcost contract/margin snapshot and existing8307 historical boundary receipts. Zero broker requests; no capture rebuild or auth change.",
+  "structural_screen": "All1576 current-mapped both-entry-direction eligible min/step/lot positive, current worst minimum margin<=50EUR, resolved native product (cash commodity classification reconciled), native quote EUR/USD and explicit commission/minimum/lot/PnLconversion fields. Preserve all class exclusion reasons; no price-profit selection.",
+  "causal_economic_screen": "At every hourly feature clock h+900: latest completed reference M5 close at action-300 and completed H1 range; USD->EUR same-time completed native EURUSD M5 close, direct EUR no FX requirement. Existing fee helper explicit current-contract commission and minima only. At least8 same-symbol valid historical spread boundaries <=action and latest within24h; quote side ages<=60s and no hasMore. Current round-trip commission at min volume<=0.50EUR; whole causal H1 range cash plus prior context spread plus commission plus2bps plus conservative PnLconversion fraction<=2EUR; H1 range >=2*(context spread+current fee+2bps). This screening context is NOT a fresh entry quote, fill, true stop exposure or historical NET.",
+  "commission_and_conversion": "Explicit native current terms at causal M5 reference applied as scenario only. Captured pnlConversionFeeRate/10000 applied to absolute PnL when quote currency differs from EUR; conservative scenario includes losing PnL, not claim exact dated broker charge. No absent fee field silently defaulted to zero. Different quote/minimum currencies unresolved by existing helper abstain.",
+  "calendar": "Original 2026-08-20T00:00:00Z <= source <2026-09-17T00:00:00Z. 672 hourly training candidate clocks, action+15min,4h response. Evaluate hourly index%4==0:42 fixed clocks/identity/original7dayblock,168 total. All4 original blocks and ISO UTC W35,W36,W37 complete; W34,W38 partial retained; no relabeling/blocked week omission.",
+  "labels": "Exact48 contiguous valid M5 from action to action+4h; y=10000ln(final close/first open); maturity strictly < next decision for training. Domain censor and gaps retained; gross reference price is not midpoint, receipt or fill.",
+  "spread_and_quote_semantics": "Prior same-symbol actual spread is context only and never replaced by invented spread. Compute new model/baseline side-aware quote markouts ONLY on exact shared action/exit boundaries already present and valid, age<=60s,no hasMore. ALL partial/none predictions counted. No reacquisition or test clock substitution.",
+  "portfolio": "At most1 candidate per4h clock. Before exit/label availability require abs(model forecast)>currentfee+priorcontextspread+2bps; choose lowest cost/H1range fraction, then initial range+cost cash risk, then symbol_id. Never replace a chosen missing-exit symbol. Current margin<=50 and50EUR free buffer are screens not historical capital survival. No orders, actual fills, certified cash/equity/drawdown.",
+  "acceptance": "Global paired>=100 AND >=16 in each4 original blocks and each3 complete ISOweeks. Model reference gross less current commission and conservative PnLconversion>2bps AND paired gross increment>0 AND paired MSE improvement>0 in EVERY block/completeweek. Failure closes this exact without class/symbol/horizon/direction rescue. Reference pass only justifies further cost confirmation, never promotion. Exact quote support>=100 and>=16 perblock/week reported independently. Dated actual fees, financing/slippage/fills/native parity/independent confirmation still block robustNET even if all descriptive gates pass.",
+  "dependence": "Hourly4h training labels overlap; eval4h labels do not overlap within symbol; common clocks, same assets and classes remain dependent. Four blocks and3 complete weeks are descriptive only. One further hypothesis after all adaptive prior selection exposures; no iid p-value or familywise confidence claim. Classes are ALL reported without winner selection.",
+  "native_runtime": "MarketData.GetBars(TimeFrame.Minute5,name),Bars.OpenTimes/OpenPrices/HighPrices/LowPrices/ClosePrices/TickVolumes; exact completed timestamp checks; bounded per-symbol sufficient statistics for CSharp ridge. Symbol.Commission/CommissionType/MinCommission/MinCommissionType/MinCommissionAsset/VolumeInUnitsMin/Step/NormalizeVolumeInUnits/GetEstimatedMargin/PnLConversionFeeRate; native EURUSD price conversion. History OpenAPI availability is not Cloud receipt parity. Reload/reset must discard immature state and warm up; not claiming a final deployed bot.",
+  "official_docs": [
+    "https://help.ctrader.com/ctrader-algo/references/MarketData/Bars/Bars/",
+    "https://help.ctrader.com/ctrader-algo/references/MarketData/Symbols/Symbol/",
+    "https://help.ctrader.com/ctrader-algo/documentation/cloud-features/"
+  ],
+  "cloud_package": "Existing MXM_DeliveryProbe_20261012.algo SHA256137259adc7d021272d2415f1887d3a5edb2310c0da8e611e3458690fe0d321a3 and correct cloud_delivery_preflight_v1/csharp/DeliveryProbe.cs preserved. No new Cloud probe, compilation, deployment or start.",
+  "governance": {
+    "orders": false,
+    "demo_orders": false,
+    "protected_forward": false,
+    "cloud_deployment": false,
+    "broker_requests": 0,
+    "auth_changed": false,
+    "owner_manual_github_actions": false,
+    "private_outputs": "OWNER_ENCRYPTED_PRIMARY_ATTESTATION_AND_SESSION_RECIPIENT_AGGREGATE_ONLY"
+  },
+  "budget": {
+    "attempts": 1,
+    "automatic_retries": 0,
+    "wall_seconds": 1900,
+    "cpu_seconds": 1600,
+    "memory_KiB": 2097152,
+    "primary_plaintext_max_MiB": 128
+  }
+}
