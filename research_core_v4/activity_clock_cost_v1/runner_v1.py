@@ -22,8 +22,13 @@ def gate():
     need(os.environ['GITHUB_EVENT_NAME']=='push' and os.environ['GITHUB_WORKFLOW_REF']==e.w.old.REPO+'/.github/workflows/mxm-activity-clock-cost-v1.yml@refs/heads/'+e.w.old.BRANCH,'WORKFLOW_SCOPE')
     need(datetime.now(timezone.utc).isoformat()<a['expires_utc'],'EXPIRED');e.a.ancestor(a['base_head'],h)
     for p,s in a['bindings'].items():need(e.w.old.filehash(p)==s,'FROZEN_SOURCE_DRIFT')
-    for p,s in a['preserved_blob_sha1'].items():
-        need(subprocess.check_output(['git','hash-object',p],cwd=e.a.ROOT,text=True).strip()==s,'PRESERVED_REPOSITORY_DRIFT')
+    tree=subprocess.check_output(['git','rev-parse',a['base_head']+'^{tree}'],cwd=e.a.ROOT,text=True).strip()
+    need(tree==a['preserved_base_tree_sha1'],'BASE_TREE_DRIFT')
+    def inventory(ref):
+        rows=subprocess.check_output(['git','ls-tree','-r',ref],cwd=e.a.ROOT,text=True).splitlines()
+        return {line.split('\t',1)[1]:line.split('\t',1)[0] for line in rows}
+    old=inventory(a['base_head']);current=inventory(h)
+    need(len(old)==a['preserved_original_files'] and all(current.get(p)==s for p,s in old.items()),'PRESERVED_REPOSITORY_DRIFT')
     need(not e.w.v2.existing_ref(a['one_use_ref']),'CONSUMED_INVOCATION')
     e.w.old.api('git/refs',{'ref':'refs/tags/'+a['one_use_ref'],'sha':h})
     return h,a,e.w.old.verify_science()
