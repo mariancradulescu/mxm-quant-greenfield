@@ -1,0 +1,114 @@
+{
+  "schema": "mxm.quote.path.order.local.execution.receipt.v1",
+  "role": "EXECUTOR_DIRECTOR_MXM_QUANT_GREENFIELD",
+  "base_head": "2fda6cd6564743ae9fd8fe80b9ea75b56e250665",
+  "status": "IMPLEMENTED_AND_SYNTHETICALLY_VERIFIED_EMPIRICAL_PILOT_NOT_INVOKED",
+  "authentication_correction": {
+    "machine_side_route_verified": true,
+    "scope_view_guard": true,
+    "account_fingerprint_guard": true,
+    "isLive_guard": true,
+    "secret_bindings_present": true,
+    "verified_prior_run": 38197915724,
+    "verified_prior_job": 114644641381,
+    "prior_run_conclusion": "SUCCESS",
+    "verified_logged_requests": {
+      "M5": 3066,
+      "BID_ASK": 23996
+    },
+    "local_environment_absence_is_not_machine_access_absence": true,
+    "credentials_requested": false,
+    "new_authentication_attempts": 0
+  },
+  "code_sha256": "0f8a384542329645a7e2129d0b48fd5f6af735b9eabb1e5d036b80707e0321cb",
+  "tests_sha256": "69d62b576db76a5ba1bbf0b44ee062e9bc112f18304bff04b79b1afc7bd31c37",
+  "design_sha256": "5f9da2487c84f9176291ecfc7518d3a0c62396eb9b26e6265f00d29fdd706837",
+  "source_sha256": {
+    "research_core_v4/shallow_m5_support_v2_production.py": "b020790cfbd3aa4efb6bd1898e4b3b66395977334a37c68c8a5effe1fd23128d",
+    ".github/workflows/mxm-cost-frequency-discovery-v1.yml": "9b490d44dc9aad31d56b6d88302fa0a86cd93018d8f1892cfe0b5f2056b46c94",
+    "research_core_v4/cost_frequency_discovery_v1/runner_v1.py": "32388f639f1046a38347a40b06831ca6d80373d7f1f048e46ec1681139da2da1",
+    "research_core_v4/cost_frequency_discovery_v1/accounts_v1.py": "1fc36a6b60bebbfc2f3a76a7d6ba007e1b244bc3d002af4b7076b89bf266add4",
+    "research_core_v3/state/QUOTE_SIDE_CATCHUP_DEVELOPMENT_DESIGN_V1.json": "d72225821894dbcc92d98b798d95d38fe0cda09f76deadb5ac2a15c168a16adb",
+    "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V2.json": "992b4e8c00efdcdb2076e573ae2f4d63f8179ba622b01064a2a2bd49f98627c1",
+    "research_core_v4/broker_liquidity_forecast_v1/DESIGN_V1.json": "86af71e1a5bd5c787da4b30ed552af802d357d41ed4fe293a48947f06f54e3ca"
+  },
+  "source_git_blob_checks": [
+    {
+      "path": "research_core_v4/shallow_m5_support_v2_production.py",
+      "blob_sha": "d18506d6754ccda76a594eda7590d252e9ec7ceb",
+      "exact": true
+    },
+    {
+      "path": ".github/workflows/mxm-cost-frequency-discovery-v1.yml",
+      "blob_sha": "3600b7051c3c10c5e3883c8ded1193ed70cf9c9a",
+      "exact": true
+    },
+    {
+      "path": "research_core_v4/cost_frequency_discovery_v1/runner_v1.py",
+      "blob_sha": "0bcf6b1b7893c3d94ab8e56a052573596fbba03f",
+      "exact": true
+    },
+    {
+      "path": "research_core_v4/cost_frequency_discovery_v1/accounts_v1.py",
+      "blob_sha": "9888d912dcfa0e4fe683c1ab6d4888aa2f03ef7b",
+      "exact": true
+    },
+    {
+      "path": "research_core_v3/state/QUOTE_SIDE_CATCHUP_DEVELOPMENT_DESIGN_V1.json",
+      "blob_sha": "6c99def44aa65b2577242599c3eb771861d5cc75",
+      "exact": true
+    },
+    {
+      "path": "research_core_v3/state/QUOTE_REVISION_SEQUENCE_PRESSURE_DEVELOPMENT_DESIGN_V2.json",
+      "blob_sha": "750a6a55c8a778bad289a12b0b3cc643ce19d5d7",
+      "exact": true
+    },
+    {
+      "path": "research_core_v4/broker_liquidity_forecast_v1/DESIGN_V1.json",
+      "blob_sha": "30af3352d54b0bce7acf934535d93d1b5d886fd8",
+      "exact": true
+    }
+  ],
+  "local_execution": {
+    "command": "python -m unittest -v quote_path_order.test_v1",
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "synthetic_numeric_witness": {
+    "price_first_area_bps2": 4.000000000002451,
+    "spread_first_area_bps2": -4.000000000001204,
+    "price_first_side": -1,
+    "spread_first_side": 1,
+    "shared_terminal_midpoint_return_bps": 2.1999999999992914,
+    "shared_terminal_spread_change_bps": 2.1999999999993696,
+    "shared_update_count_baseline_side": 0,
+    "shared_last_5sec_quotes": true,
+    "synthetic_not_market_evidence": true
+  },
+  "empirical": {
+    "market_rows_processed": 0,
+    "pilot_runs": 0,
+    "broker_requests": 0,
+    "net_eur": null,
+    "feature_support": "UNMEASURED",
+    "actual_trades": 0,
+    "HARD21_demonstrated": false
+  },
+  "security": {
+    "orders": 0,
+    "cloud_changes": 0,
+    "protected_forward_opened": false,
+    "external_data_sources": 0,
+    "old_exact_reexecutions": 0,
+    "old_files_modified": 0,
+    "new_workflows": 0,
+    "secret_values_read_or_exported": false,
+    "previous_encrypted_results_preserved": true
+  },
+  "unavailable_operation": "CURRENT_GITHUB_CONNECTOR_HAS_NO_NEW_WORKFLOW_DISPATCH_CALL;EXISTING_SCIENTIFIC_RUNNER_USES_IMMUTABLE_PUSH_PATH_AND_CONSUMED_ONE_USE_GATE;NO_RERUN_OR_CLOSED_EXECUTION_FILE_MUTATION_ATTEMPTED",
+  "pilot_ready_claim": false,
+  "alpha_claim": false,
+  "broader_pepperstone_exhausted": false
+}

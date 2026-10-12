@@ -1,0 +1,90 @@
+{
+  "schema": "mxm.quote.price.spread.path.order.preoutcome.v1",
+  "status": "FROZEN_DESIGN_AND_IMPLEMENTATION_NOT_EMPIRICAL_QUALIFICATION_NOT_ARM",
+  "base_head": "2fda6cd6564743ae9fd8fe80b9ea75b56e250665",
+  "hypothesis_id": "PRICE_SPREAD_TEMPORAL_ORDER_RESPONSE_V1",
+  "classification": "EXPLORATORY_DEVELOPMENT_WITH_ALL_PRIOR_ADAPTIVE_EXPOSURE",
+  "economic_hypothesis": "Reactive spread widening following a signed midpoint move may precede inventory-related reversal; widening preceding the move may reflect adverse-selection risk and continuation. These are proposed channels, not identified causality.",
+  "observed_information": "ONLY_HISTORICAL_BID_ASK_PRICE_TIME_AND_PREENTRY_NATIVE_COST_MARGIN_M5_QUANTITIES",
+  "feature": {
+    "clock": "45_INTEGER_UTC_SECONDS_t_minus45_THROUGH_t_minus1",
+    "quote_pages": "EXISTING_60_SECOND_CAUSAL_PAGES;FULL_FALSE_HASMORE;NO_NEW_ACQUISITION",
+    "freshness_ms": 5000,
+    "side_skew_ms": 2000,
+    "same_side_equal_ms_conflicting_price": "CENSOR_NO_EVENT_ORDER_INVENTION",
+    "x": "10000_ln(mid_i/mid_first)",
+    "y": "spread_bps_i_minus_spread_bps_first",
+    "area": "SUM_i(x_previous*delta_y - y_previous*delta_x)",
+    "normalization": "AREA_OVER_SQRT(SUM_DX2*SUM_DY2)",
+    "model_side": "MINUS_SIGN_AREA;NO_DIRECTION_INVERSION_SEARCH",
+    "degenerate": "ABSTAIN_ZERO_COORDINATE_VARIATION_OR_NUMERIC_CANCELLATION_64ULP;NOT_AN_ECONOMIC_THRESHOLD",
+    "interpolations": false,
+    "client_availability": "SERVER_ASOF_REFERENCE_ONLY;HISTORICAL_CLIENT_DELIVERY_UNPROVEN"
+  },
+  "novelty": {
+    "not_endpoint_catchup": "Paths can share terminal bid/ask, last5sec moves, counts, ages, midpoint direction and spread change but have opposite area.",
+    "not_revision_pressure": "No up-minus-down revision counts or small net displacement filter.",
+    "not_native_count_asymmetry": "Not bid-minus-ask update count.",
+    "not_spread_forecast": "Target is cost-accounted directional15min hypothetical liquidation, not future spread."
+  },
+  "source_cohort": {
+    "run": 38197915724,
+    "job": 114644641381,
+    "selection": "ALL_AUTHENTIC_EXISTING_COSTFREQUENCY_15MIN_BOUNDARIES_DEDUPLICATED_BY_NATIVE_SID_AND_T;NO_SYMBOL_PRICE_OR_PROFIT_RANK",
+    "native_universe": "EXISTING_OUTCOME_BLIND_CLASS_X_QUOTE_STRATIFIED_CORPUS;NOT_ALL_PEPPERSTONE_AND_NOT_NEW_PRIMARY145_CAP",
+    "denominators": "ALL_SAVED_CANDIDATE_BOUNDARIES;ALL_FEATURE_MISSINGNESS_AND_ECONOMIC_REJECTIONS;DO_NOT_REMOVE_UNSUPPORTED_IDENTITIES",
+    "protected_forward": "ALL_SOURCE_TIMESTAMPS_STRICTLY_BEFORE2026SEP17;NO_CURRENT_DATA",
+    "new_broker_requests": 0,
+    "source_authentication_required": "UNCHANGED_OWNER_DECRYPTION_AND_EXISTING_SOURCE_HASH_BINDINGS_BEFORE_ANALYZE_SAVED;KERNEL_DOES_NOT_DECRYPT",
+    "prior_results": "DO_NOT_CALL_PREVIOUS_PREDICTORS_OR_REPLAY_CLOSED_EXACTS"
+  },
+  "strategy": {
+    "entry": "MODELED_CURRENT_FRESH_NATIVE_REFERENCE_AT_T;FEATURE_CUTOFF_T_MINUS1SECOND;NOT_AN_ACTUAL_FILL_OR_MEASURED_LATENCY",
+    "size": "EXISTING_AUTHENTIC_NATIVE_MINIMUM_TICKET_AND_STEP",
+    "entry_risk": "REUSE_CACHED15MIN_PREENTRY_M5_TAIL_PLUS_COST_PROXY;NO_RESPONSE_INPUT;NOT_GUARANTEED_LOSS_BOUND",
+    "exit": "FIXED_T_PLUS900SECONDS;NO_EXIT_OPTIMIZATION",
+    "concurrency": 1,
+    "allocation": "LOWEST_CURRENT_ENTRY_COST_THEN_NATIVE_SID;NO_FUTURE_AVAILABILITY",
+    "cash_ledger": "EUR200_CONTINUOUS_NO_RESET;FIRST_SELECTED_UNKNOWN_EXIT_HALT_NO_REPLACEMENT",
+    "capital_eur": 200,
+    "max_risk_eur": 2,
+    "max_margin_eur": 80,
+    "min_reserve_eur": 120,
+    "drawdown_policy": "ALSO_RISK_LE1PCT_CASH_MARGIN_LE40PCT_CASH_RESERVE_GE60PCT_CASH;ABSOLUTE_CAPS_RETAINED"
+  },
+  "comparators": [
+    "SAME_ENTRY_COHORT_SIGN_PREENTRY_MIDPOINT_RETURN",
+    "SAME_ENTRY_COHORT_SIGN_BID_MINUS_ASK_UPDATE_COUNT",
+    "CASH_ZERO"
+  ],
+  "comparator_semantics": "SHADOW_MATCHED_ENTRY_MARKOUTS_NOT_SEPARATELY_EXECUTABLE_CAPITAL_PORTFOLIOS;TIES_CASH;UNKNOWN_COMPARATOR_IS_NOT_ZERO",
+  "economics": {
+    "reuse": "UNCHANGED_COSTFREQUENCY_ACCOUNTS_V1_ONLY_NOT_OLD_PREDICTION_KERNEL",
+    "side_aware": "ASK_BUY_BID_SELL_BOTH_ENDS;SIGNED_NATIVE_FX_GRAPH",
+    "commissions": "BOTH_SIDES_ALL_NATIVE_TYPES_PRECISE_MINIMUM_AND_CONVERSION_FEE",
+    "slippage_bps_per_side": 2,
+    "funding_eur_per_24h": 0.1,
+    "holding_hours": 0.25,
+    "reference_terms": "DATED_CURRENT_CONTRACT_SCENARIO;HISTORICAL_ACTUAL_CHARGES_AND_FILLS_UNKNOWN;NO_CERTIFIED_REAL_NET"
+  },
+  "falsification": "NO_EMPIRICAL_ADVANCEMENT_IF_PRIMARY_MODEL_NET_OR_MATCHED_INCREMENT_NONPOSITIVE;MISSING_SUPPORT_NOT_ECONOMIC_NULL;POSITIVE_PILOT_ONLY_EXPLORATORY_NO_PROMOTION",
+  "inference": "ONE_FIXED_PILOT_DESCRIPTIVE;ALL_COMPLETE_ISO_UTC_WEEKS_AND_HALVES_WITH_SUPPORT_DISCLOSED;NO_SIGNIFICANCE_OR_CAUSAL_IDENTIFICATION_CLAIM;INDEPENDENT_UNEXPOSED_CONFIRMATION_REQUIRED",
+  "HARD21": "ACTUAL_TRADES_NOT_QUOTE_BOUNDARIES_OR_SYNTHETIC_TESTS;UNDEMONSTRATED",
+  "security": {
+    "new_workflows": 0,
+    "orders": 0,
+    "cloud_deployment": false,
+    "protected_forward": false,
+    "credential_export": false,
+    "previous_files_unchanged": true
+  },
+  "readiness": {
+    "observable_schema": "PASS",
+    "algebraic_non_equivalence": "PASS_SYNTHETIC_WITNESS_ONLY",
+    "implementation_tests": 11,
+    "authenticated_market_payload_processed_here": false,
+    "empirical_feature_support": "UNMEASURED",
+    "net": "UNMEASURED",
+    "pilot_execution": "NOT_INVOKED;NO_CALLABLE_NEW_ACTIONS_DISPATCH_OPERATION"
+  }
+}
