@@ -1,0 +1,27 @@
+name: MXM predictive feasibility stop go saved evidence V1
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/predictive_feasibility_stopgo_v1/EXECUTION_V1.json]
+permissions:
+  contents: write
+jobs:
+  saved-economic-information-gate:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Saved evidence reduction and temporal support checks
+        run: python3 -m unittest -q research_core_v4.predictive_feasibility_stopgo_v1.test_reduce_v1
+      - name: Saved economic source novelty stop go with encrypted evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: python3 -m research_core_v4.predictive_feasibility_stopgo_v1.runner_v1
