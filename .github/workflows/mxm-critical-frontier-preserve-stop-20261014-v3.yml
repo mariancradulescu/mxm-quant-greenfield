@@ -1,0 +1,27 @@
+name: MXM critical verified checkpoint and force cancel fallback
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/critical_frontier_repair_20261014_v2/preserve_stop_v3.py]
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: mxm-critical-frontier-preservation-20261014
+  cancel-in-progress: false
+jobs:
+  preserve_stop:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Verify OWNER checkpoint, cancel old run, preserve terminal proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: python3 -m research_core_v4.critical_frontier_repair_20261014_v2.preserve_stop_v3
