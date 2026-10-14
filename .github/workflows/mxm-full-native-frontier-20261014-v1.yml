@@ -1,0 +1,1235 @@
+name: MXM full native frontier durable autonomous continuation
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [research_core_v4/full_native_frontier_20261014_v1/EXECUTION_V1.json]
+permissions:
+  contents: write
+concurrency:
+  group: mxm-full-native-frontier-20261014-v1
+  cancel-in-progress: false
+jobs:
+  bootstrap:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_01:
+    needs: [bootstrap]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.bootstrap.result != 'skipped' && needs.bootstrap.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_02:
+    needs: [bootstrap, worker_01]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_01.result != 'skipped' && needs.worker_01.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_03:
+    needs: [bootstrap, worker_02]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_02.result != 'skipped' && needs.worker_02.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_04:
+    needs: [bootstrap, worker_03]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_03.result != 'skipped' && needs.worker_03.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_05:
+    needs: [bootstrap, worker_04]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_04.result != 'skipped' && needs.worker_04.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_06:
+    needs: [bootstrap, worker_05]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_05.result != 'skipped' && needs.worker_05.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_07:
+    needs: [bootstrap, worker_06]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_06.result != 'skipped' && needs.worker_06.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_08:
+    needs: [bootstrap, worker_07]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_07.result != 'skipped' && needs.worker_07.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_09:
+    needs: [bootstrap, worker_08]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_08.result != 'skipped' && needs.worker_08.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_10:
+    needs: [bootstrap, worker_09]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_09.result != 'skipped' && needs.worker_09.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_11:
+    needs: [bootstrap, worker_10]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_10.result != 'skipped' && needs.worker_10.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_12:
+    needs: [bootstrap, worker_11]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_11.result != 'skipped' && needs.worker_11.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_13:
+    needs: [bootstrap, worker_12]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_12.result != 'skipped' && needs.worker_12.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_14:
+    needs: [bootstrap, worker_13]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_13.result != 'skipped' && needs.worker_13.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_15:
+    needs: [bootstrap, worker_14]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_14.result != 'skipped' && needs.worker_14.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_16:
+    needs: [bootstrap, worker_15]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_15.result != 'skipped' && needs.worker_15.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_17:
+    needs: [bootstrap, worker_16]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_16.result != 'skipped' && needs.worker_16.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_18:
+    needs: [bootstrap, worker_17]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_17.result != 'skipped' && needs.worker_17.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_19:
+    needs: [bootstrap, worker_18]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_18.result != 'skipped' && needs.worker_18.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_20:
+    needs: [bootstrap, worker_19]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_19.result != 'skipped' && needs.worker_19.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_21:
+    needs: [bootstrap, worker_20]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_20.result != 'skipped' && needs.worker_20.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_22:
+    needs: [bootstrap, worker_21]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_21.result != 'skipped' && needs.worker_21.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_23:
+    needs: [bootstrap, worker_22]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_22.result != 'skipped' && needs.worker_22.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_24:
+    needs: [bootstrap, worker_23]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_23.result != 'skipped' && needs.worker_23.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_25:
+    needs: [bootstrap, worker_24]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_24.result != 'skipped' && needs.worker_24.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_26:
+    needs: [bootstrap, worker_25]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_25.result != 'skipped' && needs.worker_25.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_27:
+    needs: [bootstrap, worker_26]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_26.result != 'skipped' && needs.worker_26.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_28:
+    needs: [bootstrap, worker_27]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_27.result != 'skipped' && needs.worker_27.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_29:
+    needs: [bootstrap, worker_28]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_28.result != 'skipped' && needs.worker_28.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_30:
+    needs: [bootstrap, worker_29]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_29.result != 'skipped' && needs.worker_29.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_31:
+    needs: [bootstrap, worker_30]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_30.result != 'skipped' && needs.worker_30.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_32:
+    needs: [bootstrap, worker_31]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_31.result != 'skipped' && needs.worker_31.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_33:
+    needs: [bootstrap, worker_32]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_32.result != 'skipped' && needs.worker_32.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_34:
+    needs: [bootstrap, worker_33]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_33.result != 'skipped' && needs.worker_33.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_35:
+    needs: [bootstrap, worker_34]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_34.result != 'skipped' && needs.worker_34.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_36:
+    needs: [bootstrap, worker_35]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_35.result != 'skipped' && needs.worker_35.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_37:
+    needs: [bootstrap, worker_36]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_36.result != 'skipped' && needs.worker_36.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_38:
+    needs: [bootstrap, worker_37]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_37.result != 'skipped' && needs.worker_37.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_39:
+    needs: [bootstrap, worker_38]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_38.result != 'skipped' && needs.worker_38.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_40:
+    needs: [bootstrap, worker_39]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_39.result != 'skipped' && needs.worker_39.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_41:
+    needs: [bootstrap, worker_40]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_40.result != 'skipped' && needs.worker_40.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_42:
+    needs: [bootstrap, worker_41]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_41.result != 'skipped' && needs.worker_41.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_43:
+    needs: [bootstrap, worker_42]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_42.result != 'skipped' && needs.worker_42.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_44:
+    needs: [bootstrap, worker_43]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_43.result != 'skipped' && needs.worker_43.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_45:
+    needs: [bootstrap, worker_44]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_44.result != 'skipped' && needs.worker_44.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_46:
+    needs: [bootstrap, worker_45]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_45.result != 'skipped' && needs.worker_45.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_47:
+    needs: [bootstrap, worker_46]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_46.result != 'skipped' && needs.worker_46.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
+  worker_48:
+    needs: [bootstrap, worker_47]
+    if: ${{ always() && github.run_attempt == 1 && needs.bootstrap.result == 'success' && needs.worker_47.result != 'skipped' && needs.worker_47.outputs.done != 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    outputs:
+      done: ${{ steps.engine.outputs.done }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/Replay.csproj -c Release --nologo
+      - run: dotnet build research_core_v4/full_native_frontier_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+      - run: python3 -m unittest -v research_core_v4.full_native_frontier_20261014_v1.test_v1
+      - name: Durable authenticated native frontier engine
+        id: engine
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 3900 python3 -m research_core_v4.full_native_frontier_20261014_v1.runner_v1
