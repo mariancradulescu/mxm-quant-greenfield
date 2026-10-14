@@ -1,0 +1,42 @@
+name: MXM read-only exact native repair failure classification
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/mxm-native-repair-failure-classification-20261014.yml]
+permissions:
+  contents: write
+jobs:
+  exact_cause:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0, ref: '549be6a947df0da0d0172b473121bc2457214a95'}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Inspect accepted encrypted failure receipts; no broker retry
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+        run: |
+          python3 - <<'PY'
+          import os,json,tempfile,pathlib,re
+          from collections import Counter
+          from research_core_v4.full_native_frontier_20261014_v1 import runner_v1 as v1
+          from research_core_v4.critical_frontier_repair_20261014_v2.preserve_stop_v2 import api
+          E=v1.E
+          with tempfile.TemporaryDirectory(dir=os.environ["RUNNER_TEMP"]) as td:
+           tmp=pathlib.Path(td);key,fp=E.w.old._private_key_from_secret(tmp)
+           store=v1.FrontierStore("549be6a947df0da0d0172b473121bc2457214a95",key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp,"real")
+           body=json.loads(api("releases/tags/mxm-native-frontier-repaired-20261014-v2")["body"]);st=store.restore(body["current_journal"])
+           failures=[]
+           for meta in st.get("increments_v2",[]):
+            data=store.restore(meta)
+            for rec in data.get("raw",[]):
+             if "exception_class" in rec or rec.get("state")=="PROVIDER_ERROR":
+              failures.append({"source_asset":meta["id"],"state":rec.get("state"),"exception_class":rec.get("exception_class"),"provider_code":rec.get("provider_code"),"kind":rec.get("request",{}).get("k")})
+           result={"state":"OWNER_READBACK_OPERATIONAL_FAILURE_CLASSIFICATION","generation":st["generation"],"failures":failures,"recorded_errors":st["errors"],"broker_requests":0,"orders":0}
+           rel=api("releases","POST",{"tag_name":"mxm-native-repair-error-classification-"+os.environ["GITHUB_RUN_ID"],"target_commitish":"549be6a947df0da0d0172b473121bc2457214a95","name":"MXM exact operational failure classification","prerelease":True,"body":json.dumps(result,sort_keys=True)})
+           print(json.dumps({**result,"release":rel["id"]},sort_keys=True))
+          
+          PY
