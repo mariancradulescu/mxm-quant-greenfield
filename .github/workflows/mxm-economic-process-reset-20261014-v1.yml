@@ -21,9 +21,7 @@ jobs:
       - run: dotnet build research_core_v4/economic_process_reset_20261014_v1/csharp/Contract.csproj -c Release --nologo
       - name: Native scheduler multi-symbol and aggregate hedged risk contract
         run: |
-          native_sdk_file="$(rg --files "$HOME/.nuget/packages/ctrader.automate/1.0.21" | rg '/cAlgo[.]API[.]dll$' | head -1)"
-          test -n "$native_sdk_file"
-          dotnet research_core_v4/economic_process_reset_20261014_v1/csharp/bin/Release/net8.0/Contract.dll "$native_sdk_file" research_core_v4/economic_process_reset_20261014_v1/csharp/native-contract-result.json
+          dotnet research_core_v4/economic_process_reset_20261014_v1/csharp/bin/Release/net8.0/Contract.dll research_core_v4/economic_process_reset_20261014_v1/csharp/native-contract-result.json
       - name: Quantify minimum ticket cost risk frequency before conditional pilot enrollment
         env:
           GH_TOKEN: ${{ github.token }}
