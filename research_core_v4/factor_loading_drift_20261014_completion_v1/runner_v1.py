@@ -15,6 +15,11 @@ def need(v,c):e.w.old.need(bool(v),c)
 def project_native(rows,sid,digits):
  out={}
  for key,row in rows.items():
+  # Accepted integrated-history producer stores [open,high,low,close,tick_volume].
+  if isinstance(row,list):
+   need(len(row)==5,'ACCEPTED_NATIVE_VECTOR_SCHEMA')
+   row={'time_utc':datetime.fromtimestamp(int(key),timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),**dict(zip(('open','high','low','close','tick_volume'),row))}
+  need(isinstance(row,dict),'ACCEPTED_NATIVE_ROW_SCHEMA')
   t=rowcheck(row);need(t==int(key),'ACCEPTED_NATIVE_TIMESTAMP_BINDING')
   if not k.START<=t<k.END:continue
   projected={'time_utc':row['time_utc'],'tick_volume':str(int(float(row['tick_volume'])))}
@@ -54,6 +59,11 @@ def main():
    if sid in panel:continue
    dd=int(cat['full'][str(sid)]['digits']);vv=project_native(bars,sid,dd);panel[sid]=k.reduce(vv);extra.append({'sid':sid,'source_rows_in_domain':len(vv),'role':'FX_VALUATION_CONTEXT_ONLY_NO_PREDICTOR_TARGET_OR_COHORT_CHANGE'})
   oldcost,costproof=load_asset(key,fp,tmp,a['fullcost_source']);quotes={(int(q['symbol_id']),int(q['boundary_ms'])//1000):q for q in oldcost['private_boundary_receipts']};del oldcost
+  accepted_quotes,accepted_quote_proof=load_asset(key,fp,tmp,a['accepted_native_quote_source']);native_quote_added=0
+  for q in accepted_quotes['private_quote_receipts']:
+   key_quote=(int(q['symbol_id']),int(q['boundary_ms'])//1000)
+   if key_quote not in quotes:quotes[key_quote]=q;native_quote_added+=1
+  del accepted_quotes
   PHASE='FINISH_UNCHANGED_ECONOMIC_POLICY';completed=[]
   for r in records:
    ev={n:r[n] for n in forecast_fields};row=eligible[ev['sid']];f=cat['full'][str(row['sid'])];en=econ.planned(ev,row,f,panel,graph);scenarios={}
@@ -61,7 +71,7 @@ def main():
     one=econ.account(ev,k.sign(ev['model']),row,f,panel,graph,name);base=econ.account(ev,k.sign(ev['baseline']),row,f,panel,graph,name);scenarios[name]={'model':one,'baseline':base} if one is not None and base is not None else None
    one=econ.exact(ev,k.sign(ev['model']),row,f,quotes,graph,panel);base=econ.exact(ev,k.sign(ev['baseline']),row,f,quotes,graph,panel);completed.append({**ev,'entry':en,'scenarios':scenarios,'exact':{'model':one,'baseline':base} if one is not None and base is not None else None})
   need(e.a.sha(e.a.enc([{n:r[n] for n in forecast_fields} for r in completed]))==forecast_sha,'FORECAST_DIRECTION_LABEL_ATR_CHANGE')
-  summary={'schema':'mxm.saved.factor.forecast.completed.economics.v1','original_pilot_head':a['original_head'],'original_pilot_run':38513586733,'original_primary':proof,'saved_forecast_count':len(completed),'saved_forecast_projection_sha256':forecast_sha,'forecasts_and_directions_byte_unchanged':True,'new_predictor_fits':0,'new_model_forecasts':0,'new_broker_requests':0,'original_gross':s['gross'],'original_gross_blocks':s['gross_blocks'],'universe':{n:s[n] for n in ('broker_catalog','current_minimum_margin_le80_eligible','eligible_with_accepted_M5','authenticated_rows','authenticated_shards')},'extra_accepted_native_context':extra,'native_history_proof':nativeproof,'economic_all_single_leg_opportunities':econ.totals(completed),'economic_admitted_single_leg_opportunities':econ.totals(completed,'eligible'),'economic_blocks':[econ.totals([r for r in completed if r['block']==b],'eligible') for b in range(4)],'economic_iso_utc':{w:econ.totals([r for r in completed if r['iso']==w],'eligible') for w in sorted({r['iso'] for r in completed})},'entry_reasons':dict(Counter(r['entry']['reason'] for r in completed)),'one_position_portfolio_proxy':econ.portfolio(completed),'cost_provenance':[catproof,costproof,nativeproof],'record_provenance':recordproof,'policy_sha256':e.w.old.filehash('research_core_v4/factor_loading_drift_20261014_v1/DESIGN_V1.json'),'original_economics_code_sha256':e.w.old.filehash('research_core_v4/factor_loading_drift_20261014_v1/economics_v1.py'),'all_previous_files_unchanged':True,'alpha_claimed':False,'NET_positive_certified':False,'HARD21':'NOT_DEMONSTRATED','orders':0,'protected_forward':False,'cloud_deployment':False,'limits':'CURRENT_CAPTURED_TERMS_NOT_HISTORICAL_CHARGES;M5_FIXED_FRICTION_FX_STOP_TIMING_PROXY;NATIVE_QUOTE_COMPLETE_MATCH_ONLY;NO_PVALUE_OR_INDEPENDENT_CONFIRMATION'}
+  summary={'schema':'mxm.saved.factor.forecast.completed.economics.v1','original_pilot_head':a['original_head'],'original_pilot_run':38513586733,'original_primary':proof,'saved_forecast_count':len(completed),'saved_forecast_projection_sha256':forecast_sha,'forecasts_and_directions_byte_unchanged':True,'new_predictor_fits':0,'new_model_forecasts':0,'new_broker_requests':0,'original_gross':s['gross'],'original_gross_blocks':s['gross_blocks'],'universe':{n:s[n] for n in ('broker_catalog','current_minimum_margin_le80_eligible','eligible_with_accepted_M5','authenticated_rows','authenticated_shards')},'extra_accepted_native_context':extra,'native_history_proof':nativeproof,'economic_all_single_leg_opportunities':econ.totals(completed),'economic_admitted_single_leg_opportunities':econ.totals(completed,'eligible'),'economic_blocks':[econ.totals([r for r in completed if r['block']==b],'eligible') for b in range(4)],'economic_iso_utc':{w:econ.totals([r for r in completed if r['iso']==w],'eligible') for w in sorted({r['iso'] for r in completed})},'entry_reasons':dict(Counter(r['entry']['reason'] for r in completed)),'one_position_portfolio_proxy':econ.portfolio(completed),'cost_provenance':[catproof,costproof,nativeproof,accepted_quote_proof],'added_existing_native_quote_boundaries':native_quote_added,'record_provenance':recordproof,'policy_sha256':e.w.old.filehash('research_core_v4/factor_loading_drift_20261014_v1/DESIGN_V1.json'),'original_economics_code_sha256':e.w.old.filehash('research_core_v4/factor_loading_drift_20261014_v1/economics_v1.py'),'all_previous_files_unchanged':True,'alpha_claimed':False,'NET_positive_certified':False,'HARD21':'NOT_DEMONSTRATED','orders':0,'protected_forward':False,'cloud_deployment':False,'limits':'CURRENT_CAPTURED_TERMS_NOT_HISTORICAL_CHARGES;M5_FIXED_FRICTION_FX_STOP_TIMING_PROXY;NATIVE_QUOTE_COMPLETE_MATCH_ONLY;NO_PVALUE_OR_INDEPENDENT_CONFIRMATION'}
   summary['verdict']='UNCHANGED_PILOT_ECONOMIC_COMPLETION_NO_PROMOTION'
   PHASE='VERIFIED_OWNER_AND_RECIPIENT_DELIVERY';publish(head,a,tmp,key,{'summary':summary,'input_provenance':provenance},completed)
 if __name__=='__main__':
