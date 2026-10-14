@@ -3,6 +3,7 @@ import os,json,pathlib,tempfile,time,base64,re,subprocess,gzip
 from datetime import datetime,timezone
 from collections import Counter
 from . import storage_v2 as storage,archive_v2 as ar
+from .storage_diagnostics_v3 import DiagnosticRotatingStore
 from .preserve_stop_v2 import api,complete_assets
 from research_core_v4.full_native_frontier_20261014_v1 import runner_v1 as v1
 from research_core_v4.cost_frequency_discovery_v1.collector_v1 import Collector
@@ -211,7 +212,7 @@ def main():
  head,a=gate();configure()
  with tempfile.TemporaryDirectory(prefix="mxm-repaired-frontier-",dir=os.environ["RUNNER_TEMP"]) as td:
   tmp=pathlib.Path(td);key,fp=E.w.old._private_key_from_secret(tmp);need(fp==E.w.old.FP,"OWNER_KEY")
-  store=storage.RotatingStore(head,key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp);db=ar.dbopen(tmp/"native.sqlite");storage.track(db)
+  store=DiagnosticRotatingStore(head,key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp);db=ar.dbopen(tmp/"native.sqlite");storage.track(db)
   body=json.loads(store.anchor["body"])
   if os.environ["GITHUB_JOB"]=="repair":
    if "current_journal" not in body:st=migrate(db,store,a)
