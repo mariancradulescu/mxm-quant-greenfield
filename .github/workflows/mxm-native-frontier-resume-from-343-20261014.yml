@@ -1,0 +1,55 @@
+name: MXM one-use resume from owner checkpoint 343
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths: [.github/workflows/mxm-native-frontier-resume-from-343-20261014.yml]
+permissions:
+  contents: write
+  actions: write
+jobs:
+  bounded_resume:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Prove checkpoint 343 unchanged, fence duplicate dispatch, resume finite campaign
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error,datetime
+          repo="mariancradulescu/mxm-quant-greenfield"
+          branch="performance-research-v3-20260922"
+          expected_sha="823152235a9ca91b7cfdbb7d55877b4e8557cf09d2f042a4cc0247f0c1851fb8"
+          claim="mxm-native-frontier-next-from-343"
+          def api(path,method="GET",body=None):
+           req=urllib.request.Request("https://api.github.com/repos/"+repo+"/"+path,
+            data=None if body is None else json.dumps(body).encode(),
+            method=method,headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+            "Accept":"application/vnd.github+json","Content-Type":"application/json",
+            "X-GitHub-Api-Version":"2022-11-28"})
+           with urllib.request.urlopen(req,timeout=45) as response:
+            payload=response.read()
+           return json.loads(payload) if payload else None
+          assert api("git/ref/heads/"+branch)["object"]["sha"]==os.environ["GITHUB_SHA"],"BRANCH_HEAD_DRIFT"
+          previous=api("actions/runs/38564933821")
+          assert previous["status"]=="completed" and previous["conclusion"]=="failure","PREVIOUS_NOT_TERMINAL"
+          proof=api("actions/runs/38573124875")
+          assert proof["status"]=="completed" and proof["conclusion"]=="success","INDEPENDENT_READBACK_REQUIRED"
+          assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat("2026-10-18T00:00:00+00:00"),"EXPIRED"
+          a=json.loads(api("releases/tags/mxm-native-frontier-repaired-20261014-v2")["body"])
+          assert a["state"]=="STOP_EXPLICIT_OPERATIONAL_LIMIT","UNEXPECTED_RESEARCH_STATE"
+          assert (a["generation"],a["identities_evaluated"],a["remaining"])==(343,36,1526),"CHECKPOINT_DRIFT"
+          assert a["current_journal"]["ciphertext_sha256"]==expected_sha,"CHECKPOINT_HASH_DRIFT"
+          assert a["pending_request_count"]==0 and a["actual_orders"]==0 and not a["HARD21"],"FENCE"
+          assert a["new_requests"]["BID_ASK"]<450000 and a["new_requests"]["M5"]<12000,"REQUEST_CAP"
+          try:
+           api("git/ref/tags/"+claim)
+          except urllib.error.HTTPError as err:
+           assert err.code==404,"CLAIM_READ_ERROR"
+          else:
+           raise RuntimeError("ALREADY_DISPATCHED_NO_RETRY")
+          api("git/refs","POST",{"ref":"refs/tags/"+claim,"sha":os.environ["GITHUB_SHA"]})
+          api("actions/workflows/mxm-native-frontier-repaired-20261014-v2.yml/dispatches","POST",{"ref":branch,"inputs":{"previous_generation":"343"}})
+          print(json.dumps({"state":"BOUNDED_NEW_CAMPAIGN_DISPATCH_ACCEPTED","from_generation":343,"identities_completed":36,"remaining":1526,"forensic_readback_run":38573124875,"quarantine_unknown_transport":True,"no_duplicate_wire_retry":True,"claim":claim,"head":os.environ["GITHUB_SHA"],"broker_requests_by_coordinator":0,"orders":0,"HARD21":False},sort_keys=True),flush=True)
+          PY
