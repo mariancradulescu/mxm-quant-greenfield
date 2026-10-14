@@ -34,12 +34,13 @@ def main():
     with tempfile.TemporaryDirectory(prefix='mxm-economic-process-',dir=os.environ['RUNNER_TEMP']) as td:
         tmp=pathlib.Path(td);key,fp=E.w.old._private_key_from_secret(tmp);need(fp==E.w.old.FP,'OWNER_KEY')
         source=old.FrontierStore(head,key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp,'real')
-        source.anchor={'body':json.dumps(a['snapshot'])};db=ar.dbopen(tmp/'accepted.sqlite');st=snapshots.restore(db,source)
+        source.anchor={'body':json.dumps(a['snapshot'])};db=ar.dbopen(tmp/'accepted.sqlite');snapshots.track(db);st=snapshots.restore(db,source)
         need(st['generation']==1293 and len(st['rows'])==5326 and len(st['eligible'])==1562,'ACCEPTED_SNAPSHOT_IDENTITY')
         # Read the accepted negative result as immutable evidence. No predictor replay,
         # new outcomes, sign inversion, threshold or horizon rescue of its exact.
         previous=source.restore(a['accepted_previous_primary']);need(previous['summary']['run_id']==38601324998,'ACCEPTED_PREVIOUS_RESULT')
         output=io.Store(head,key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp,TAG)
+        print(json.dumps({'phase':'ACCEPTED_OWNER_SNAPSHOT_RESTORED','generation':st['generation'],'catalog':len(st['rows']),'broker_requests':0}),flush=True)
         numeric=frontier.evaluate(db,st);review=hypotheses(numeric)
         qualified=[c for c in review if c['qualified']]
         need(not qualified,'UNEXPECTED_QUALIFIED_CANDIDATE_REQUIRES_SEPARATELY_FROZEN_PILOT_ARM')
@@ -80,4 +81,7 @@ def render(s):
 
 if __name__=='__main__':
     try:main()
-    except Exception as ex:io.evidence(ex,'ECONOMIC_RESET_STOP');print('FAIL_CLOSED_ECONOMIC_RESET_'+(str(ex) if re.fullmatch('[A-Z0-9_]{1,120}',str(ex)) else type(ex).__name__),flush=True);raise SystemExit(1) from None
+    except Exception as ex:
+        import traceback
+        print(json.dumps({'safe_code_trace':[{'file':pathlib.Path(x.filename).name,'line':x.lineno,'function':x.name} for x in traceback.extract_tb(ex.__traceback__)]}),flush=True)
+        io.evidence(ex,'ECONOMIC_RESET_STOP');print('FAIL_CLOSED_ECONOMIC_RESET_'+(str(ex) if re.fullmatch('[A-Z0-9_]{1,120}',str(ex)) else type(ex).__name__),flush=True);raise SystemExit(1) from None
