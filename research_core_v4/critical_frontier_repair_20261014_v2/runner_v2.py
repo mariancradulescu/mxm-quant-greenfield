@@ -184,8 +184,16 @@ def acquire_m5(db,sid,f,col,st,store,deadline):
    ar.span(db,sid,"M5",lo,hi,"UNKNOWN_TRANSPORT");wire_record(db,req,"UNKNOWN_TRANSPORT",None);raw=[{"request":req,"state":"UNKNOWN_TRANSPORT","exception_class":type(exc).__name__}];error="M5_TRANSPORT_OR_PROTOCOL_STOP"
   st["_raw"]=raw;st["pending_requests"]=[];storage.persist(db,store,st,"after-m5-"+str(st["op_counter"]))
   if error:raise RuntimeError(error)
+ORIGINAL_QPOINT=v1.qpoint
+def covered_qpoint(db,sid,t,strict=False):
+ z=ORIGINAL_QPOINT(db,sid,t,strict)
+ if z.get("valid"):
+  for side in ("bid","ask"):
+   if ar.missing(db,sid,side,z[side+"_time_ms"],t*1000):
+    z={**z,"valid":False,"state":"INCOMPLETE_AUTHENTIC_QUOTE_COVERAGE","cause":"PARTIAL_UNKNOWN_OR_UNCERTAIN_WIRE_BETWEEN_SEED_AND_BOUNDARY"};break
+ return z
 def configure():
- v1.ar=ar;v1.persist=storage.persist;v1.acquire_m5=acquire_m5;v1.acquire_quotes=acquire_quotes
+ v1.ar=ar;v1.persist=storage.persist;v1.acquire_m5=acquire_m5;v1.acquire_quotes=acquire_quotes;v1.qpoint=covered_qpoint
 def verify_cold(db,st,store):
  summary={"state":"INDEPENDENT_COLD_RESUME_VERIFIED","generation":st["generation"],"bars":db.execute("SELECT count(*) FROM bar").fetchone()[0],"ticks":db.execute("SELECT count(*) FROM tick").fetchone()[0],"wire":db.execute("SELECT count(*) FROM wire").fetchone()[0],"coverage_states":ar.proof_table(db),"storage_rotation_proof":st["storage_rotation_proof"],"uncertain_wire":len(st["uncertain_wire"]),"requests":st["requests"],"orders":0,"HARD21":False,"alpha_certified":False}
  st["cold_verify_summary"]=summary;st["phase"]="VERIFIED_COLD_RESUME_READY_FOR_NATIVE_WORK";storage.persist(db,store,st,"cold-verify");print(json.dumps(summary),flush=True)
