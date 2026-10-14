@@ -1,0 +1,61 @@
+name: MXM signed read-only intervention and continuation report
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/mxm-critical-intervention-final-report-20261014.yml]
+permissions:
+  contents: write
+jobs:
+  readonly_signed_report:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0, ref: '549be6a947df0da0d0172b473121bc2457214a95'}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Read immutable checkpoint, verify OWNER readback, sign report; no broker requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: |
+          python3 - <<'PY'
+          import os,json,tempfile,pathlib,base64
+          from collections import Counter
+          from cryptography.hazmat.primitives import serialization,hashes
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from research_core_v4.full_native_frontier_20261014_v1 import runner_v1 as v1
+          from research_core_v4.critical_frontier_repair_20261014_v2 import storage_v2 as storage,archive_v2 as ar
+          from research_core_v4.critical_frontier_repair_20261014_v2.preserve_stop_v2 import api
+          E=v1.E;need=v1.need;head="549be6a947df0da0d0172b473121bc2457214a95"
+          need(api("git/ref/heads/"+E.w.old.BRANCH)["object"]["sha"]==head,"CANONICAL_HEAD_DRIFT")
+          auth=json.loads((E.a.ROOT/"research_core_v4/critical_frontier_repair_20261014_v2/REPAIR_AUTHORITY_V2.json").read_text())
+          for p,sha in auth["bindings"].items():need(E.w.old.filehash(p)==sha,"READONLY_SOURCE_BINDING")
+          with tempfile.TemporaryDirectory(dir=os.environ["RUNNER_TEMP"]) as td:
+           tmp=pathlib.Path(td);key,fp=E.w.old._private_key_from_secret(tmp);need(fp==E.w.old.FP,"OWNER_KEY")
+           store=storage.RotatingStore(head,key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp)
+           body=json.loads(store.anchor["body"]);st=store.restore(body["current_journal"]);st["identity_records"]={}
+           db=ar.dbopen(tmp/"observed.sqlite");storage.track(db)
+           for meta in st.get("shards",{}).values():storage.apply(db,store.restore(meta),st)
+           for meta in st.get("record_shards",{}).values():st["identity_records"].update(store.restore(meta)["records"])
+           for meta in st.get("snapshots_v2",[])+st.get("increments_v2",[]):storage.apply(db,store.restore(meta),st)
+           accepted=st["eligible"][:st["identity_cursor"]]
+           records=[ev for sid in accepted for ev in st["identity_records"].get(str(sid),{}).get("events",[])]
+           oldrel=api("releases/tags/mxm-critical-preserve-20261014-38561983112");oldbody=json.loads(oldrel["body"])
+           old=v1.FrontierStore(head,key,store.public,tmp,"real");old.release=oldrel;preserved=old.restore(oldbody["encrypted_proof"])
+           need(preserved["old_status"]=="completed" and preserved["old_conclusion"]=="cancelled","OLD_RUN_NOT_TERMINAL")
+           summary={"schema":"mxm.critical.intervention.signed.point_in_time.v2","canonical_head":head,"observer_run":int(os.environ["GITHUB_RUN_ID"]),"writer_run":body["run_id"],"checkpoint_generation":body["generation"],"current_checkpoint":body["current_journal"],"old_run":38555928258,"old_status":preserved["old_status"],"old_conclusion":preserved["old_conclusion"],"old_checkpoint_generation":preserved["generation"],"old_checkpoint":preserved["last_safe_checkpoint"],"old_assets_preserved":preserved["accepted_assets_count"],"old_processed":preserved["identities_processed"],"identities_reconciled_v2":st["identity_cursor"],"identities_total":len(st["eligible"]),"remaining":len(st["eligible"])-st["identity_cursor"],"durable_request_counters":st["requests"],"uncertain_wire_count":len(st["uncertain_wire"]),"pending_at_snapshot_count":len(st.get("pending_requests",[])),"pending_is_in_flight_not_terminal_uncertainty":True,"coverage_states":ar.proof_table(db),"data_counts":{"M5":db.execute("SELECT count(*) FROM bar").fetchone()[0],"ticks":db.execute("SELECT count(*) FROM tick").fetchone()[0],"request_ledger":db.execute("SELECT count(*) FROM wire").fetchone()[0]},"rotation_proof":st["storage_rotation_proof"],"cold_resume_count":len(st["resume_proofs"]),"economic_event_states":dict(Counter(e["entry"]["state"] for e in records)),"exante_cost_qualified_events":sum(e["entry"].get("eligible",False) for e in records),"consecutive_ISO_weeks":{w:{"events":sum(e["iso"]==w for e in records),"exante_cost_qualified":sum(e["iso"]==w and e["entry"].get("eligible",False) for e in records)} for w in ("2026-W35","2026-W36","2026-W37")},"candidate_qualification":v1.qualifying(records),"pilot_executed":st["pilot"] is not None,"pilot_decision":None if st["pilot"] is None else st["pilot"]["decision"],"executable_NET":"NOT_DEMONSTRATED","HARD21":False,"alpha_certified":False,"actual_orders":0,"actual_fills":0,"observer_broker_requests":0,"observer_writer_checkpoint_changes":0,"all_required_work_completed":st["identity_cursor"]==len(st["eligible"]),"claim_scope":"TECHNICAL_INTERVENTION_AND_REAL_PROGRESS_SNAPSHOT;NOT_FINAL_ECONOMIC_CAMPAIGN_OR_ROBUSTNESS_CERTIFICATION"}
+           raw=v1.encode(summary);signer=serialization.load_pem_private_key(key.read_bytes(),password=None)
+           sig=signer.sign(raw,padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
+           signer.public_key().verify(sig,raw,padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
+           out=v1.FrontierStore(head,key,store.public,tmp,"real")
+           out.release=api("releases","POST",{"tag_name":"mxm-critical-intervention-final-report-"+os.environ["GITHUB_RUN_ID"],"target_commitish":head,"name":"MXM signed intervention and authentic continuation snapshot","prerelease":True,"body":json.dumps({"state":"READ_ONLY_REPORT_PUBLICATION_PENDING"})})
+           signed={"summary":summary,"summary_canonical_sha256":E.a.sha(raw),"owner_signature_b64":base64.b64encode(sig).decode(),"owner_spki_sha256":fp}
+           meta=out.encrypted(signed,"signed-intervention-progress-owner.mxmenc")
+           signed.update(primary=meta,report_release=out.release["id"],OWNER_READBACK_SUCCESS=True,DELIVERY_SUCCESS=False)
+           api("releases/"+str(out.release["id"]),"PATCH",{"body":json.dumps(signed,sort_keys=True)})
+           print(json.dumps(signed,sort_keys=True),flush=True)
+          
+          PY
