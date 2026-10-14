@@ -28,8 +28,8 @@ public static class TimingKernel {
   Dictionary<string,object> r;
   if(up.Count<2||down.Count<2)r=new Dictionary<string,object>{{"state","INSUFFICIENT_TWO_SIDED_DURATIONS"},{"up_n",up.Count},{"down_n",down.Count}};
   else{
-   double u=up.Average(),d=down.Average(),scale=Math.Max(1.,Math.Max(u,d));double ulp=Math.BitIncrement(scale)-scale;
-   double score=Math.Abs(d-u)<=64*ulp?0.:Math.Log(d/u);
+   double u=up.Average(),d=down.Average(),scale=Math.Max(1.0,Math.Max(u,d));double ulp=Math.BitIncrement(scale)-scale;
+   double score=Math.Abs(d-u)<=64*ulp?0.0:Math.Log(d/u);
    r=new Dictionary<string,object>{{"state","SUPPORTED"},{"score",score},{"model_side",Math.Sign(score)},{"count_side",Math.Sign(up.Count-down.Count)},{"momentum_side",Math.Sign(previous-first)},{"up_n",up.Count},{"down_n",down.Count},{"up_mean_ms",u},{"down_mean_ms",d}};
   }
   r["last_feature_ms"]=hi;return r;
