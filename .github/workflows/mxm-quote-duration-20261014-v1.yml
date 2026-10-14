@@ -1,0 +1,36 @@
+name: MXM native quote duration qualification and one DEVELOPMENT pilot
+on:
+  push:
+    branches: [performance-research-v3-20260922]
+    paths:
+      - research_core_v4/quote_duration_20261014_v1/PRECHECK_EXECUTION_V1.json
+      - research_core_v4/quote_duration_20261014_v1/PILOT_EXECUTION_V1.json
+permissions:
+  contents: write
+concurrency:
+  group: mxm-native-duration-20261014-v1
+  cancel-in-progress: false
+jobs:
+  native-cost-qualification-or-frozen-pilot:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Native CSharp replay and actual cTrader API compilation no deployment
+        run: |
+          dotnet build research_core_v4/quote_duration_20261014_v1/csharp/Replay.csproj -c Release --nologo
+          dotnet build research_core_v4/quote_duration_20261014_v1/csharp/NativeCompatible.csproj -c Release --nologo
+          python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Causal marked duration and risk controls
+        run: python3 -m unittest -v research_core_v4.quote_duration_20261014_v1.test_v1
+      - name: Authorized phase existing encrypted input no broker requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+        run: timeout --signal=TERM 1200 python3 -m research_core_v4.quote_duration_20261014_v1.runner_v1
