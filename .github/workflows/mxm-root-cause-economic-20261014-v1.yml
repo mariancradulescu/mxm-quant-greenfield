@@ -1,0 +1,28 @@
+name: MXM existing OWNER cause and economic cost populations
+on:
+  push:
+    branches: [mxm-root-cause-economic-20261014-v1]
+    paths: [research_core_v4/root_cause_economic_20261014_v1/AUTHORITY_V1.json]
+permissions: {contents: write}
+concurrency: {group: mxm-owner-cause-cost-evidence, cancel-in-progress: false}
+jobs:
+  recover_evidence:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: python3 -m research_core_v4.root_cause_economic_20261014_v1.evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure()
+        with:
+          name: mxm-cause-owner-outbox-${{ github.run_id }}
+          path: ${{ runner.temp }}/mxm-encrypted-outbox/*.mxmenc
+          if-no-files-found: ignore
