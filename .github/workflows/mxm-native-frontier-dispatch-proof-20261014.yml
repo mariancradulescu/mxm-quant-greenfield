@@ -1,0 +1,38 @@
+name: MXM autonomous dispatch acceptance proof
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/mxm-native-frontier-dispatch-proof-20261014.yml]
+permissions:
+  contents: write
+  actions: write
+jobs:
+  dispatch_proof:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify default registration and serialized canonical campaign dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error
+          repo="mariancradulescu/mxm-quant-greenfield"
+          branch="performance-research-v3-20260922"
+          def api(path,method="GET",body=None):
+              req=urllib.request.Request("https://api.github.com/repos/"+repo+"/"+path,data=None if body is None else json.dumps(body).encode(),method=method,headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],"Accept":"application/vnd.github+json","Content-Type":"application/json","X-GitHub-Api-Version":"2022-11-28"})
+              with urllib.request.urlopen(req,timeout=45) as resp:raw=resp.read()
+              return json.loads(raw) if raw else None
+          body=json.loads(api("releases/tags/mxm-native-frontier-repaired-20261014-v2")["body"])
+          assert body["state"]=="RUNNING_REPAIRED_NATIVE_WORK"
+          assert api("actions/runs/38555928258")["status"]=="completed"
+          head=api("git/ref/heads/"+branch)["object"]["sha"]
+          claim="mxm-native-frontier-next-from-"+str(body["generation"])
+          api("git/refs","POST",{"ref":"refs/tags/"+claim,"sha":head})
+          api("actions/workflows/mxm-native-frontier-repaired-20261014-v2.yml/dispatches","POST",{"ref":branch,"inputs":{"previous_generation":str(body["generation"])}})
+          proof={"state":"REAL_WORKFLOW_DISPATCH_ACCEPTED_SINGLE_WRITER_CONCURRENCY","coordinator_head":os.environ["GITHUB_SHA"],"canonical_head":head,"source_checkpoint_generation":body["generation"],"broker_requests_by_probe":0,"orders":0,"alpha_certified":False,"HARD21":False}
+          rel=api("releases","POST",{"tag_name":"mxm-autonomous-dispatch-proof-"+os.environ["GITHUB_RUN_ID"],"target_commitish":os.environ["GITHUB_SHA"],"name":"MXM actual finite campaign dispatch proof","prerelease":True,"body":json.dumps(proof,sort_keys=True)})
+          proof["proof_release"]=rel["id"]
+          print(json.dumps(proof,sort_keys=True))
+          PY
