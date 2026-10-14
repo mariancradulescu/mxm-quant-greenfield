@@ -153,7 +153,7 @@ def acquire_m5(db,sid,f,col,st,store,deadline):
   lo,hi=gaps[0];hi=min(hi,lo+7*86400000-1)
   req={"s":sid,"k":"M5","a":lo,"b":hi}
   if not check_new_request(db,req):continue
-  need(st["requests"]["M5"]<12000,"FINITE_CAMPAIGN_M5_CAP")
+  need(st["requests"]["M5"]<st["campaign_m5_cap"],"FINITE_CAMPAIGN_M5_CAP")
   st["op_counter"]+=1;st["pending_requests"]=[req];storage.persist(db,store,st,"before-m5-"+str(st["op_counter"]))
   raw=[];error=None
   try:
@@ -220,7 +220,12 @@ def main():
   st=storage.restore(db,store)
   if os.environ["GITHUB_JOB"]=="cold_verify":verify_cold(db,st,store);return
   if st["phase"]=="FINAL_CLASSIFIED_WITH_EXPLICIT_LIMITS":pathlib.Path(os.environ["GITHUB_OUTPUT"]).open("a").write("done=true\n");return
-  st["campaign_tick_cap"]=a["campaign_max_tick_requests"];st["rows"]={str(s):r for s,r in st["rows"].items()}
+  uncertain={tuple(req[n] for n in ("s","k","a","b")) for req in st.get("uncertain_wire",[])}
+  reserved=Counter("M5" if req[1]=="M5" else "BID_ASK" for req in uncertain)
+  st["wire_uncertainty_budget_reserve"]=dict(reserved)
+  st["campaign_tick_cap"]=a["campaign_max_tick_requests"]-reserved["BID_ASK"]
+  st["campaign_m5_cap"]=a["campaign_max_m5_requests"]-reserved["M5"]
+  st["rows"]={str(s):r for s,r in st["rows"].items()}
   deadline=time.monotonic()+(240 if os.environ["GITHUB_JOB"]=="worker_01" else 1800);col=Collector({"BID_ASK":a["campaign_max_tick_requests"],"M5":a["campaign_max_m5_requests"]})
   st["phase"]="RUNNING_REPAIRED_NATIVE_WORK";failed=None
   try:
