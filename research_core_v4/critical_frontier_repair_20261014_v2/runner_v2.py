@@ -25,7 +25,9 @@ def gate():
  need(api("git/ref/heads/"+E.w.old.BRANCH)["object"]["sha"]==head,"CANONICAL_HEAD_DRIFT")
  return head,{**original,**auth}
 def wire_record(db,req,state,sha):
- db.execute("INSERT INTO wire VALUES(?,?,?,?,?,?) ON CONFLICT(s,k,a,b) DO UPDATE SET z=excluded.z,h=excluded.h",(req["s"],req["k"],req["a"],req["b"],state,sha))
+ old=db.execute("SELECT z,h FROM wire WHERE s=? AND k=? AND a=? AND b=?",(req["s"],req["k"],req["a"],req["b"])).fetchone()
+ need(old is None or old==(state,sha),"WIRE_CONFLICT_IMMUTABLE")
+ if old is None:db.execute("INSERT INTO wire VALUES(?,?,?,?,?,?)",(req["s"],req["k"],req["a"],req["b"],state,sha))
 def classify_raw(db,req,encoded,more,provenance):
  dec=decode_ctrader_tick_page(encoded)
  need(all(req["a"]<=r.timestamp_ms<=req["b"] for r in dec),"TICK_WINDOW_BINDING")
@@ -94,7 +96,6 @@ def migrate(db,store,a):
 def check_new_request(db,req):
  row=db.execute("SELECT z FROM wire WHERE s=? AND k=? AND a=? AND b=?",(req["s"],req["k"],req["a"],req["b"])).fetchone()
  if row:
-  ar.span(db,req["s"],req["k"],req["a"],req["b"],"UNSAMPLED_OR_UNAVAILABLE")
   return False
  return True
 def quote_ops(db,keys):
@@ -134,6 +135,7 @@ def acquire_quotes(db,keys,col,st,store,deadline):
      if code in ("CH_ACCESS_TOKEN_INVALID","OA_AUTH_TOKEN_EXPIRED","ACCOUNT_NOT_AUTHORIZED","TOO_MANY_REQUESTS"):error="BROKER_"+code;break
      continue
     need(isinstance(res,v1.m.ProtoOAGetTickDataRes) and res.IsInitialized() and res.ctidTraderAccountId==col.aid,"QUOTE_RESPONSE_BINDING")
+    need(res.HasField("hasMore"),"QUOTE_HASMORE_FIELD_ABSENT")
     enc=[{"timestamp":int(x.timestamp),"tick":int(x.tick)} for x in res.tickData]
     rr=res.SerializeToString();classify_raw(db,request,enc,bool(res.hasMore),E.a.sha(rr))
     raw.append({"request":request,"response_b64":base64.b64encode(rr).decode(),"encoded":enc,"hasMore":bool(res.hasMore)})
@@ -163,6 +165,7 @@ def acquire_m5(db,sid,f,col,st,store,deadline):
    if isinstance(res,v1.m.ProtoOAErrorRes):
     ar.span(db,sid,"M5",lo,hi,"PROVIDER_ERROR_"+res.errorCode);wire_record(db,req,"PROVIDER_ERROR_"+res.errorCode,None)
     raw=[{"request":req,"state":"PROVIDER_ERROR","provider_code":res.errorCode}]
+    if res.errorCode in ("CH_ACCESS_TOKEN_INVALID","OA_AUTH_TOKEN_EXPIRED","ACCOUNT_NOT_AUTHORIZED","TOO_MANY_REQUESTS"):error="BROKER_"+res.errorCode
    else:
     envelope=col.tr.last_history_envelope
     need(envelope is not None and int(envelope.payloadType)==protocol.PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE,"M5_RAW_ENVELOPE")

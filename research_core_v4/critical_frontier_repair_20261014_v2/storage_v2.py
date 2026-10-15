@@ -45,10 +45,18 @@ def track(db):
 def delta(db,st):
  return {"schema":"mxm.native.compact.delta.v2","bars":db.execute("SELECT x.* FROM bar x JOIN delta_bar d USING(s,t) ORDER BY s,t").fetchall(),"ticks":db.execute("SELECT x.* FROM tick x JOIN delta_tick d USING(s,k,t,p) ORDER BY s,k,t,p").fetchall(),"spans":db.execute("SELECT x.* FROM span x JOIN delta_span d USING(s,k,a,b) ORDER BY s,k,a,b").fetchall(),"wire":db.execute("SELECT x.* FROM wire x JOIN delta_wire d USING(s,k,a,b) ORDER BY s,k,a,b").fetchall(),"records":{str(s):st["identity_records"][str(s)] for s in sorted(st.pop("_record_dirty_ids",set())) if str(s) in st["identity_records"]},"raw":st.pop("_raw",[]),"parent_ledger":st.get("ledger_head")}
 def apply(db,data,st):
- for sid,t,o,h,l,c,vol in data.get("bars",[]):ar.putbar(db,sid,t,[o,h,l,c,vol])
- db.executemany("INSERT OR IGNORE INTO tick VALUES(?,?,?,?)",data.get("ticks",[]))
- db.executemany("INSERT OR REPLACE INTO span VALUES(?,?,?,?,?)",data.get("spans",[]))
- db.executemany("INSERT OR IGNORE INTO wire VALUES(?,?,?,?,?,?)",data.get("wire",[]))
+ db.execute('SAVEPOINT delta_apply')
+ try:
+  for sid,t,o,h,l,c,vol in data.get("bars",[]):ar.putbar(db,sid,t,[o,h,l,c,vol])
+  db.executemany("INSERT OR IGNORE INTO tick VALUES(?,?,?,?)",data.get("ticks",[]))
+  for row in data.get("spans",[]):ar.span(db,*row)
+  for row in data.get("wire",[]):
+   old=db.execute('SELECT * FROM wire WHERE s=? AND k=? AND a=? AND b=?',row[:4]).fetchone()
+   need(old is None or tuple(old)==tuple(row),'WIRE_REPLAY_CONFLICT')
+   if old is None:db.execute('INSERT INTO wire VALUES(?,?,?,?,?,?)',row)
+  db.execute('RELEASE delta_apply')
+ except BaseException:
+  db.execute('ROLLBACK TO delta_apply');db.execute('RELEASE delta_apply');raise
  st.setdefault("identity_records",{}).update(data.get("records",{}))
 def clear(db):
  for table in ("delta_bar","delta_tick","delta_span","delta_wire"):db.execute("DELETE FROM "+table)
