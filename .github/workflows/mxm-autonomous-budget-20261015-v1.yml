@@ -1,0 +1,21 @@
+name: MXM current GitHub budget evidence
+on:
+  push:
+    branches: [mxm-autonomous-evidence-20261015-v1]
+    paths: [.github/workflows/mxm-autonomous-budget-20261015-v1.yml]
+permissions: {contents: read, actions: read}
+jobs:
+  budget:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Read authenticated API quota without broker access
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request
+          req=urllib.request.Request('https://api.github.com/rate_limit',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          with urllib.request.urlopen(req,timeout=30) as res: data=json.load(res)
+          print(json.dumps({'schema':'mxm.github.budget.readonly.v1','core':data['resources']['core'],'orders':0,'broker_requests':0,'billing_remaining_minutes':'NOT_EXPOSED_BY_REPOSITORY_TOKEN','authorized_campaign_max_segments':26,'authorized_capture_seconds_per_segment':240,'authority_expiry':'2026-10-18T00:00:00Z'},sort_keys=True))
+          PY
