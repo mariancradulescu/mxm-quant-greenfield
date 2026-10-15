@@ -24,7 +24,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {persist-credentials: false, fetch-depth: 0}
       - name: Locked dependencies before any private key access
-        run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Ordered synthetic acceptance P0 P1 P2 P3 P4 with negative controls
         run: python3 -m research_core_v4.remediation_p0_p4_20261015.verify
         env:

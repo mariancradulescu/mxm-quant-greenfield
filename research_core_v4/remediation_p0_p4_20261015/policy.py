@@ -11,6 +11,20 @@ def workflow_guard(root):
     actual={p.relative_to(root).as_posix() for p in (root/'.github/workflows').glob('*') if p.suffix in ('.yml','.yaml')}
     expected={r['path'] for r in catalog['workflows']}
     require(actual==expected|{'.github/workflows/mxm-remediation-p0-p4-20261015-v1.yml'},'WORKFLOW_CATALOG_INCOMPLETE')
+    import yaml
+    class UniqueLoader(yaml.BaseLoader):pass
+    def unique(loader,node):
+        result={}
+        for key,value in node.value:
+            k=loader.construct_object(key)
+            require(k not in result,'DUPLICATE_YAML_KEY')
+            result[k]=loader.construct_object(value)
+        return result
+    UniqueLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,unique)
+    for path in actual:
+        obj=yaml.load((root/path).read_text(),Loader=UniqueLoader)
+        require(isinstance(obj,dict) and 'jobs' in obj and 'on' in obj,'WORKFLOW_SCHEMA')
+        for job in obj['jobs'].values():require('timeout-minutes' in job and ('runs-on' in job or 'uses' in job),'JOB_TIMEOUT_OR_RUNNER')
     for p in expected:
         text=(root/p).read_text()
         require('if: ${{ false }}' in text and 'permissions: {}' in text and 'timeout-minutes: 1' in text,'LEGACY_ACTIVATION_DENIED')
