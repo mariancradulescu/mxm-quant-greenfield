@@ -7,6 +7,7 @@ import struct
 import subprocess
 import tempfile
 import urllib.request
+import urllib.parse
 from .safety import require, sha, unpack, strict_json, JOURNAL, CANONICAL, BRANCH, clean_tree
 from research_core_v4 import master1576_screen_v2 as crypto
 from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
@@ -48,7 +49,14 @@ def read_asset(meta,key,tmp):
     asset=get('releases/assets/'+str(meta['id']))
     require(asset['size']==meta['size'] and asset['name']==meta['name'] and asset['digest']=='sha256:'+meta['ciphertext_sha256'],'ASSET_METADATA_DRIFT')
     # Verify membership by full pagination. A filename is never sufficient.
-    rid=meta['release_id']
+    rid=meta.get('release_id')
+    if rid is None:
+        # URL is only a locator inside the authenticated preserved manifest;
+        # exact asset membership/digests remain mandatory, never account proof.
+        prefix='https://github.com/'+REPO+'/releases/download/'
+        require(isinstance(meta.get('url'),str) and meta['url'].startswith(prefix),'RELEASE_LOCATOR_MISSING')
+        tag=meta['url'][len(prefix):].split('/')[0]
+        rid=get('releases/tags/'+urllib.parse.quote(urllib.parse.unquote(tag),safe=''))['id']
     if rid not in INVENTORY_CACHE:
         inventory=[];page=1
         while True:
@@ -63,7 +71,7 @@ def read_asset(meta,key,tmp):
     require(len(blob)==meta['size'] and sha(blob)==meta['ciphertext_sha256'],'CIPHER_DIGEST')
     packed=bounded_decrypt(blob,key,tmp);require(sha(packed)==meta['gzip_sha256'],'PACKED_DIGEST_MISMATCH')
     raw=unpack(packed);require(sha(raw)==meta['canonical_sha256'],'CANONICAL_DIGEST')
-    return strict_json(raw)
+    return strict_json(raw,max_elements=8000000)
 
 def main():
     root=pathlib.Path(__file__).resolve().parents[2];clean_tree(root)

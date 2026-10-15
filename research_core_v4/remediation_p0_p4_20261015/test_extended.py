@@ -228,3 +228,67 @@ def _test_real_yaml_failure_lineage(self):
     self.assertNotEqual(s.sha(old.encode()),s.sha((ROOT/path).read_bytes()))
 P4Final.test_real_yaml_failure_lineage=contracts('MXM-REM-N13.3')(_test_real_yaml_failure_lineage)
 MAPPING['MXM-REM-N13.3']='test_real_yaml_failure_lineage'
+
+def _test_crypto_upload_ack_and_original_manifest(self):
+    import os,json,io,copy,gzip,urllib.parse
+    from cryptography.hazmat.primitives.asymmetric import rsa
+    from cryptography.hazmat.primitives.serialization import Encoding,PrivateFormat,PublicFormat,NoEncryption
+    from research_core_v4.final_recovery_20261014_v1 import storage as storemod
+    key=rsa.generate_private_key(public_exponent=65537,key_size=2048);private=self.path/'private.pem';public=self.path/'public.pem';private.write_bytes(key.private_bytes(Encoding.PEM,PrivateFormat.PKCS8,NoEncryption()));public.write_bytes(key.public_key().public_bytes(Encoding.PEM,PublicFormat.SubjectPublicKeyInfo));fingerprint=s.sha(key.public_key().public_bytes(Encoding.DER,PublicFormat.SubjectPublicKeyInfo))
+    assets=[];blobs={};anchor={'id':1,'body':'{}'};posts=[];patches=[];mode={'upload':'after','anchor':'normal'}
+    def api(path,method='GET',data=None):
+        if path.startswith('releases/2/assets'):return copy.deepcopy(assets)
+        if path.startswith('releases/assets/'):
+            return copy.deepcopy(next(a for a in assets if a['id']==int(path.split('/')[-1])))
+        if path=='releases/1':
+            if method=='PATCH':
+                patches.append(copy.deepcopy(data))
+                if mode['anchor']=='before':raise TimeoutError()
+                anchor.update(data)
+                if mode['anchor']=='after':raise TimeoutError()
+            return copy.deepcopy(anchor)
+        raise ValueError('UNEXPECTED_FAKE_ENDPOINT')
+    def upload(request,timeout):
+        posts.append(request.full_url)
+        if mode['upload']=='before':raise TimeoutError()
+        name=urllib.parse.parse_qs(urllib.parse.urlparse(request.full_url).query)['name'][0];blob=request.data
+        asset={'id':len(assets)+10,'name':name,'size':len(blob),'digest':'sha256:'+s.sha(blob),'browser_download_url':'https://github.com/mariancradulescu/mxm-quant-greenfield/releases/download/synthetic/'+name,'state':'uploaded'}
+        assets.append(asset);blobs[asset['browser_download_url']]=blob
+        return io.BytesIO(json.dumps(asset).encode())
+    st=storemod.Store.__new__(storemod.Store)
+    st.head='H';st.key=private;st.public=public;st.tmp=self.path;st.tag='synthetic-isolated';st.limit=750;st.index=0;st.inventory=[];st.release={'id':2};st.anchor=copy.deepcopy(anchor);st.uploaded=[];st.upload_posts=0;st.fault_after_upload=True
+    with patch.dict(os.environ,{'RUNNER_TEMP':str(self.path),'GH_TOKEN':'SYNTHETIC'}),patch.object(storemod,'api',side_effect=api),patch.object(storemod,'assets',side_effect=lambda rid:copy.deepcopy(assets)),patch.object(storemod,'download',side_effect=lambda url,maxbytes:blobs[url]),patch.object(storemod.urllib.request,'urlopen',side_effect=upload),patch.object(storemod.E.w.old,'FP',fingerprint),patch.object(storemod.time,'sleep'):
+        value={'schema':'SYNTHETIC_ONLY','state':'UNKNOWN_TRANSPORT','generation':1807};meta=st.encrypted(value,'synthetic-checkpoint.mxmenc');self.assertEqual(st.upload_posts,1);self.assertEqual(st.restore(meta),value)
+        self.assertEqual(st.encrypted(value,'synthetic-checkpoint.mxmenc'),meta);self.assertEqual(st.upload_posts,1)
+        # Cold reuse without the original packed manifest must stop, never recompress.
+        saved=st.uploaded;st.uploaded=[];self.reject('EXISTING_PACKED_MANIFEST_REQUIRED',st.encrypted,value,'synthetic-checkpoint.mxmenc');st.uploaded=saved
+        self.reject('PACKED_DIGEST_MISMATCH',st.restore,{**meta,'gzip_sha256':'0'*64})
+        self.reject('REMOTE_ASSET_METADATA',st.restore,{**meta,'ciphertext_sha256':'0'*64})
+        wrong=rsa.generate_private_key(public_exponent=65537,key_size=2048);badkey=self.path/'wrong.pem';badkey.write_bytes(wrong.private_bytes(Encoding.PEM,PrivateFormat.PKCS8,NoEncryption()));st.key=badkey
+        with self.assertRaises(Exception):st.restore(meta)
+        st.key=private
+        duplicate={**assets[0],'id':99};st.inventory=copy.deepcopy(assets)+[duplicate];self.reject('AMBIGUOUS_OR_INCOMPLETE',st.encrypted,value,'synthetic-checkpoint.mxmenc');st.inventory=copy.deepcopy(assets)
+        # Lost ACK after anchor mutation is reconciled by GET, no second PATCH.
+        mode['anchor']='after';st.commit({'generation':1808,'journal':meta});self.assertEqual(len(patches),1)
+        mode['anchor']='before';self.reject('ANCHOR_MUTATION_UNRESOLVED_NO_RETRY',st.commit,{'generation':1809,'journal':meta});self.assertEqual(len(patches),2)
+        for _ in range(2):self.assertEqual(st.restore(meta),value)
+        mode['upload']='before';self.reject('UPLOAD_UNCOMMITTED_OUTBOX_PRESERVED_NO_BLIND_RETRY',st.encrypted,{'generation':1809},'synthetic-before.mxmenc');self.assertEqual(st.upload_posts,2)
+        self.assertEqual(len(posts),2);self.assertEqual(json.loads(anchor['body'])['generation'],1808)
+P0Final.test_crypto_upload_ack_and_original_manifest=contracts('MXM-SEM-G03.3','MXM-EXISTING-N34.2','MXM-EXISTING-N17.4')(_test_crypto_upload_ack_and_original_manifest)
+MAPPING.update({i:'test_crypto_upload_ack_and_original_manifest' for i in ('MXM-SEM-G03.3','MXM-EXISTING-N34.2','MXM-EXISTING-N17.4')})
+
+def _test_full_executable_inventory_flags_unknown(self):
+    result=c.executable_inventory(ROOT);self.assertIn('research_core_v4/remediation_p0_p4_20261015/owner.py',result['source_sha256']);self.assertTrue(result['static_import_edges']);self.assertTrue(any(x['state'].startswith('DYNAMIC_EDGE') for x in result['unresolved']))
+    self.assertTrue(any(p.endswith('.proto') for p in result['source_sha256']))
+    self.assertTrue(any(p.endswith('.csproj') for p in result['source_sha256']))
+    tampered=dict(result['source_sha256']);tampered.pop('research_core_v4/remediation_p0_p4_20261015/owner.py');self.assertNotEqual(tampered,result['source_sha256'])
+P0Final.test_full_executable_inventory_flags_unknown=contracts('MXM-ACT-N02.1')(_test_full_executable_inventory_flags_unknown)
+MAPPING['MXM-ACT-N02.1']='test_full_executable_inventory_flags_unknown'
+
+def _test_systemic_public_enum_safe(self):
+    from research_core_v4.root_cause_economic_20261014_v1.continuation_1307 import exception_category
+    for raw,expected in [('BROKER_OA_AUTH_TOKEN_EXPIRED','AUTH_EXPIRED'),('BROKER_ACCOUNT_NOT_AUTHORIZED','ACCOUNT_UNAUTHORIZED'),('BROKER_TOO_MANY_REQUESTS','RATE_LIMIT'),('BROKER_PROTOCOL_UNSUPPORTED','PROTOCOL_UNSUPPORTED')]:
+        category=exception_category(RuntimeError(raw));self.assertEqual(category,expected);z=s.terminal({'category':category},{'M5':1,'BID_ASK':1});self.assertFalse(z['ready']);self.assertEqual(z['state'],'STOP_FAIL_CLOSED')
+    self.assertEqual(exception_category(RuntimeError('BROKER_OA_AUTH_TOKEN_EXPIRED SYNTHETIC_SECRET')),'UNCLASSIFIED_EXCEPTION')
+P1Final.test_systemic_public_enum_safe=contracts('MXM-EXISTING-N23.3')(_test_systemic_public_enum_safe)
+MAPPING['MXM-EXISTING-N23.3']='test_systemic_public_enum_safe'

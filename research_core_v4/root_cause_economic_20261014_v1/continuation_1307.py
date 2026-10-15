@@ -9,6 +9,9 @@ TAG='mxm-native-1307-continuation-20261015-v1'
 def exception_category(exc):
     # Never publish exception strings. Categories correspond to specific transport raise sites.
     text=str(exc)
+    categories={"AUTH_EXPIRED":"AUTH_EXPIRED","OA_AUTH_TOKEN_EXPIRED":"AUTH_EXPIRED","CH_ACCESS_TOKEN_INVALID":"AUTH_EXPIRED","ACCOUNT_UNAUTHORIZED":"ACCOUNT_UNAUTHORIZED","ACCOUNT_NOT_AUTHORIZED":"ACCOUNT_UNAUTHORIZED","RATE_LIMIT":"RATE_LIMIT","TOO_MANY_REQUESTS":"RATE_LIMIT","PROTOCOL_UNSUPPORTED":"PROTOCOL_UNSUPPORTED"}
+    exact=text.removeprefix("BROKER_")
+    if exact in categories:return categories[exact]
     for needle,label in [('timed out','RESPONSE_DEADLINE'),('response timeout','RESPONSE_DEADLINE'),('send failed','TLS_SEND_FAILURE'),('receive failed','TLS_RECEIVE_FAILURE'),('closed by peer','TLS_PEER_CLOSED'),('not connected','SOCKET_NOT_CONNECTED'),('frame length','PROTOCOL_FRAME_LENGTH'),('unsupported cTrader payload','PROTOCOL_PAYLOAD_REGISTRY')]:
         if needle in text:return label
     return 'UNCLASSIFIED_EXCEPTION'

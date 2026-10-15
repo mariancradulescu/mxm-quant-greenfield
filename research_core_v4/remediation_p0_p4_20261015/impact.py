@@ -2,6 +2,7 @@
 import gzip
 import json
 import math
+import re
 import pathlib
 from collections import Counter,defaultdict
 from .safety import canonical,sha,require
@@ -41,7 +42,8 @@ def inspect(journal,read,key,tmp,root):
             source_binds['objects_without_complete_row_account_server_receipt']+=int('source_receipt' not in value)
             record.update(state='OWNER_VERIFIED',counts=dict(local));totals.update(local)
         except Exception as ex:
-            record.update(state='UNKNOWN_ASSET_NOT_VERIFIED',exception_class=type(ex).__name__);totals['unverified_assets']+=1
+            code=str(ex) if re.fullmatch('[A-Z0-9_]{1,100}',str(ex)) else 'OWNER_SOURCE_'+type(ex).__name__
+            record.update(state='UNKNOWN_ASSET_NOT_VERIFIED',exception_class=type(ex).__name__,safe_code=code);totals['unverified_assets']+=1
         receipts.append(record)
         if index%20==0:print(json.dumps({'phase':'PRESERVED_CHECKPOINT_INTEGRITY_READBACK','objects_inspected':index+1,'objects_total':len(unique)}),flush=True)
     # Compare overlap categories, without rewriting original interval ledger.
@@ -59,6 +61,6 @@ def inspect(journal,read,key,tmp,root):
     from research_core_v4.shallow_m5_support_v2_production import encrypt_shard
     out=root/'verification';out.mkdir(exist_ok=True)
     private=out/'owner-impact.mxmenc';encrypt_shard(gzip.compress(canonical(result),mtime=0),public_key=root/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem',output=private)
-    public={'scope':result['scope'],'expected_assets':len(unique),'verified_assets':sum(r['state']=='OWNER_VERIFIED' for r in receipts),'unverified_assets':sum(r['state']!='OWNER_VERIFIED' for r in receipts),'private_inventory_ciphertext_sha256':sha(private.read_bytes()),'historical_impact_closed':False,'no_global_clean_claim':True,'broker_requests':0,'new_outcomes':0}
+    public={'scope':result['scope'],'expected_assets':len(unique),'verified_assets':sum(r['state']=='OWNER_VERIFIED' for r in receipts),'unverified_assets':sum(r['state']!='OWNER_VERIFIED' for r in receipts),'private_inventory_ciphertext_sha256':sha(private.read_bytes()),'failure_categories':dict(Counter(r.get('safe_code','UNCLASSIFIED') for r in receipts if r['state']!='OWNER_VERIFIED')),'historical_impact_closed':False,'no_global_clean_claim':True,'broker_requests':0,'new_outcomes':0}
     (out/'owner-impact-summary.json').write_text(json.dumps(public,sort_keys=True)+'\n')
     return public

@@ -134,3 +134,31 @@ def calendar_range(start,end,regime,first_seen):
     a,b=timestamp(start),timestamp(end);require(a<b and first_seen<=a,'CALENDAR_CHRONOLOGY')
     require(regime in ('ALTERNATE_40_WEEKS','THU_TO_THU_4_BLOCKS','ISO_W35_W37_DEVELOPMENT'),'CALENDAR_REGIME_UNKNOWN')
     return {'from_utc':a,'to_exclusive_utc':b,'regime':regime,'use':'DEVELOPMENT','confirmation_eligible':False}
+
+def executable_inventory(root):
+    import ast,subprocess,sys
+    tracked=subprocess.check_output(['git','ls-files','-z'],cwd=root).decode().split('\0')
+    sources={};imports=[];missing=[]
+    for rel in tracked:
+        if not rel:continue
+        path=root/rel
+        if not path.is_file():missing.append({'path':rel,'state':'TRACKED_SOURCE_ABSENT'});continue
+        if path.suffix in ('.py','.proto','.cs','.csproj','.json','.yml','.yaml','.dll','.algo','.lock'):
+            sources[rel]=sha(path.read_bytes())
+        if path.suffix=='.py':
+            try:tree=ast.parse(path.read_bytes())
+            except SyntaxError:missing.append({'path':rel,'state':'LEGACY_SYNTAX_ERROR_INERT'});continue
+            for node in ast.walk(tree):
+                if isinstance(node,ast.Import):imports.extend({'from':rel,'import':a.name,'state':'STATIC_REFERENCE'} for a in node.names)
+                elif isinstance(node,ast.ImportFrom):imports.append({'from':rel,'import':'.'*node.level+(node.module or ''),'state':'STATIC_REFERENCE'})
+                elif isinstance(node,ast.Call) and isinstance(node.func,(ast.Name,ast.Attribute)) and getattr(node.func,'id',getattr(node.func,'attr','')) in ('exec','eval','__import__','import_module'):
+                    missing.append({'path':rel,'line':node.lineno,'state':'DYNAMIC_EDGE_REQUIRES_REVIEW_NO_EXHAUSTIVE_GRAPH_CLAIM'})
+    loaded={}
+    for name,module in list(sys.modules.items()):
+        p=getattr(module,'__file__',None)
+        if p:
+            try:rel=pathlib.Path(p).resolve().relative_to(root.resolve()).as_posix()
+            except ValueError:continue
+            path=root/rel
+            if path.is_file():loaded[rel]=sha(path.read_bytes())
+    return {'source_sha256':sources,'static_import_edges':imports,'loaded_runtime_sha256':loaded,'unresolved':missing,'external_build_dependencies':'requirements.lock;CSharp_Contract_no_NuGet_dependencies','scope':'ALL_TRACKED_EXECUTABLE_AND_STRUCTURED_SOURCES;DYNAMIC_EDGES_FLAGGED_NOT_ASSUMED_CLOSED'}
