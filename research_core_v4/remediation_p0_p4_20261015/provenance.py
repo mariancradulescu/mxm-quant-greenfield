@@ -76,3 +76,12 @@ def atomic_ingest(db,envelope,expected,raw,rows,has_more,start,end):
         return state
     except BaseException:
         db.execute('ROLLBACK TO native_ingest');db.execute('RELEASE native_ingest');raise
+
+def time_evidence(value,unit='seconds'):
+    """Preserve declared source zone/unit alongside one canonical instant."""
+    instant=timestamp(value,unit)
+    if isinstance(value,str):
+        original=dt.datetime.fromisoformat(value.replace('Z','+00:00'))
+        offset=int(original.utcoffset().total_seconds());source_zone='Z' if value.endswith('Z') else original.isoformat()[-6:]
+    else:offset=0;source_zone='UTC_EPOCH_DECLARED'
+    return {'utc_ms':instant*1000 if unit=='seconds' else instant,'source_unit':unit,'source_precision':'INTEGER','source_zone':source_zone,'source_offset_seconds':offset}

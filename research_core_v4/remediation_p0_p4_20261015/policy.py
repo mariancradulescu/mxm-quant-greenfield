@@ -60,3 +60,23 @@ def packaging(directory,expected):
     for name,h in expected.items():
         p=directory/name;require(p.stat().st_size>0 and hashlib.sha256(p.read_bytes()).hexdigest()==h,'PACKAGE_DIGEST_OR_EMPTY')
     return {'state':'PACKAGE_READY_ONLY','cloud_executed':False,'NET':None}
+
+
+def archive_bytes(directory,expected):
+    import io
+    packaging(directory,expected)
+    output=io.BytesIO()
+    with zipfile.ZipFile(output,'w',compression=zipfile.ZIP_DEFLATED) as z:
+        for name in sorted(expected):
+            entry=zipfile.ZipInfo(name,(1980,1,1,0,0,0));entry.compress_type=zipfile.ZIP_DEFLATED
+            z.writestr(entry,(directory/name).read_bytes())
+    return output.getvalue()
+
+def verify_archive(blob,expected):
+    import io
+    with zipfile.ZipFile(io.BytesIO(blob)) as z:
+        names=z.namelist()
+        require(len(names)==len(set(names)) and set(names)==set(expected),'ARCHIVE_EXACT_PATHS')
+        for name,h in expected.items():
+            raw=z.read(name);require(raw and hashlib.sha256(raw).hexdigest()==h,'ARCHIVE_DIGEST_OR_EMPTY')
+    return 'PACKAGE_READY_ONLY'

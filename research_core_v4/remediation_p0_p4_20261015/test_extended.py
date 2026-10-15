@@ -76,10 +76,10 @@ class P1More(Base):
     @contracts('MXM-EXISTING-N31.1','MXM-EXISTING-N31.2','MXM-EXISTING-N31.3')
     def test_empty_is_not_observed_quote(self):
         t=ar.START*1000;db=ar.dbopen(':memory:')
-        for side in ('bid','ask'):ar.span(db,9,side,t-600000,t+10,'EMPTY_AUTHENTIC_RESPONSE')
+        for side in ('bid','ask'):ar.span(db,9,side,t-600000,t+600000,'EMPTY_AUTHENTIC_RESPONSE')
         self.assertEqual(c.quote_observed(db,9,t),{'state':'EMPTY','observed':False})
         db.executemany('INSERT INTO tick VALUES(?,?,?,?)',[(9,'bid',t,100),(9,'ask',t,101)]);self.assertTrue(c.quote_observed(db,9,t)['observed'])
-        self.assertFalse(c.quote_observed(db,9,t+300001)['observed'])
+        self.assertEqual(c.quote_observed(db,9,t+300001),{'state':'STALE','observed':False})
         db.execute('INSERT INTO tick VALUES(?,?,?,?)',(9,'bid',t,102));self.assertEqual(c.quote_observed(db,9,t)['state'],'CONFLICTED')
         db.execute('DELETE FROM tick WHERE k="bid"');db.execute('INSERT INTO tick VALUES(?,?,?,?)',(9,'bid',t,102));self.assertEqual(c.quote_observed(db,9,t)['state'],'INVALID_CROSSED')
         ar.span(db,9,'bid',t,t+1,'UNKNOWN_TRANSPORT');self.assertEqual(c.quote_observed(db,9,t)['state'],'UNKNOWN_COVERAGE')
@@ -339,3 +339,47 @@ def _test_every_successor_entrypoint_denies_old_grants(self):
     self.reject('EXPECTED_POLICY_STOP_NO_INDEPENDENT_TRUST_ROOT',real_gate,'H')
 P4Final.test_every_successor_entrypoint_denies_old_grants=contracts('MXM-ACT-O05.3','MXM-SEM-G06.1')(_test_every_successor_entrypoint_denies_old_grants)
 MAPPING.update({i:'test_every_successor_entrypoint_denies_old_grants' for i in ('MXM-ACT-O05.3','MXM-SEM-G06.1')})
+
+def _test_request_phases_no_replay_after_cold(self):
+    from research_core_v4.critical_frontier_repair_20261014_v2 import runner_v2 as runner,storage_v2 as storage
+    identity={'account':'A','server':'LIVE','s':9,'k':'bid','a':ar.START*1000,'b':ar.START*1000+10,'sequence':1}
+    for phase in ('pre_request','just_after_send','before_delta','post_manifest','provider_error_ACK'):
+        ledger=c.RequestLedger(self.path/phase);h=ledger.prepare(identity)
+        if phase!='pre_request':ledger.send_boundary(h)
+        if phase in ('post_manifest','provider_error_ACK'):ledger.accept(h,s.sha(('SYNTHETIC_'+phase).encode()))
+        cold=c.RequestLedger(self.path/phase);state=cold.db.execute('SELECT state FROM request').fetchone()[0]
+        self.assertEqual(state,'NOT_SENT' if phase=='pre_request' else 'RESPONSE_ACCEPTED' if phase in ('post_manifest','provider_error_ACK') else 'SENT_UNKNOWN')
+        if phase!='pre_request':self.reject('REQUEST_REPLAY',cold.send_boundary,h)
+        db=ar.dbopen(':memory:');storage.track(db)
+        runner.wire_record(db,identity,'CONFIRMED_COMPLETE' if state=='RESPONSE_ACCEPTED' else 'UNCERTAIN_WIRE','a'*64)
+        before=list(db.iterdump());self.assertFalse(runner.check_new_request(db,identity));self.assertEqual(before,list(db.iterdump()))
+P1Final.test_request_phases_no_replay_after_cold=contracts('MXM-EXISTING-N23.2')(_test_request_phases_no_replay_after_cold)
+MAPPING['MXM-EXISTING-N23.2']='test_request_phases_no_replay_after_cold'
+
+def _test_fault_restore_conflict_mask_twice(self):
+    from research_core_v4.critical_frontier_repair_20261014_v2 import storage_v2 as storage
+    from research_core_v4.final_recovery_20261014_v1 import storage as io
+    import os
+    t=ar.START*1000
+    original={'generation':1807,'identity_records':{},'shards':{},'record_shards':{},'snapshots_v2':[{'id':'D'}],'increments_v2':[],'resume_proofs':[],'pending_requests':[],'uncertain_wire':[],'_raw':[{'request':{'s':9},'state':'SYNTHETIC_PRESERVED'}]}
+    data={'spans':[(9,'bid',t,t+10,'CONFIRMED_COMPLETE'),(9,'bid',t+5,t+15,'UNKNOWN_TRANSPORT')]}
+    class Store:
+        anchor={'body':json.dumps({'current_journal':{'id':'J','canonical_sha256':'a'*64}})}
+        def restore(self,meta):return copy.deepcopy(original if meta['id']=='J' else data)
+    for phase in ('before_SQL_commit','after_SQL_commit','before_manifest','after_manifest'):
+        state=copy.deepcopy(original);before=copy.deepcopy(state);db=ar.dbopen(':memory:');storage.track(db)
+        def fail(db,store,st,label,groups):
+            st['generation']+=1;st['_raw']=[]
+            if phase!='before_SQL_commit':db.commit()
+            raise RuntimeError('SYNTHETIC_CHECKPOINT_FAULT')
+        with patch.object(io,'ORIGINAL_PERSIST',side_effect=fail):self.reject('SYNTHETIC_CHECKPOINT_FAULT',io.persist,db,Store(),state,'fixture')
+        self.assertEqual(state,before)
+        masks=[]
+        with patch.dict(os.environ,{'GITHUB_RUN_ID':'1','GITHUB_JOB':'offline'}):
+            for _ in range(2):
+                fresh=ar.dbopen(':memory:');storage.track(fresh);loaded=storage.restore(fresh,Store());self.assertEqual(loaded['generation'],1807);masks.append(ar.missing(fresh,9,'bid',t,t+15))
+        self.assertEqual(masks,[[(t+5,t+15)],[(t+5,t+15)]])
+        # Negative: a forged full confirmed mask is incompatible with the source.
+        self.assertNotEqual(masks[0],[])
+P1Final.test_fault_restore_conflict_mask_twice=contracts('MXM-EXISTING-N26.4')(_test_fault_restore_conflict_mask_twice)
+MAPPING['MXM-EXISTING-N26.4']='test_fault_restore_conflict_mask_twice'

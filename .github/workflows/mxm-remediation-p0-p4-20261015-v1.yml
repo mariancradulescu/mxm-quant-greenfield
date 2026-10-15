@@ -38,7 +38,9 @@ jobs:
         if: always()
         with:
           name: mxm-remediation-offline-${{ github.sha }}
-          path: verification/*.json
+          path: |
+            verification/*.json
+            verification/Contract.dll
           if-no-files-found: error
   owner_cold_readback:
     needs: offline_acceptance

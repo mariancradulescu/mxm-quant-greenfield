@@ -1,9 +1,11 @@
 """Outcome-blind enrollment and immutable successor chronology."""
 import datetime as dt
 import sqlite3
+import re
 from .safety import canonical, require, sha
 
 def consecutive(weeks):
+    require(all(re.fullmatch(r'[0-9]{4}-W[0-9]{2}',w) for w in weeks),'ISO_WEEK_FORMAT')
     starts=sorted({dt.date.fromisocalendar(int(w[:4]),int(w[-2:]),1) for w in weeks})
     run=best=0;previous=None
     for d in starts:
@@ -19,19 +21,21 @@ def qualifying(records):
 def lineage(record):
     required=('id','first_seen','design_sha256','baseline_sha256','split','feature_max_time','decision_time','outcome_time','dependence')
     require(all(k in record for k in required),'LINEAGE_MISSING')
+    require(all(re.fullmatch(r'[a-f0-9]{64}',record[k]) for k in ('design_sha256','baseline_sha256')),'DESIGN_DIGEST_REQUIRED')
     require(record['feature_max_time']<=record['decision_time']<record['outcome_time'],'FUTURE_LEAKAGE')
     require(record['first_seen']<=record['decision_time'],'FIRST_SEEN_AFTER_OUTCOME')
     dev,hold=record['split']['development'],record['split']['confirmation']
     require(all(a<b for a,b in dev+hold),'SPLIT_RANGE')
-    require(not any(max(a,c)<min(b,d) for a,b in dev for c,d in hold),'CONTAMINATED_HOLDOUT')
+    matrix=[{'development_index':i,'confirmation_index':j,'overlap':max(0,min(b,d)-max(a,c)),'restricted_use':'DEVELOPMENT_IF_REUSED'} for i,(a,b) in enumerate(dev) for j,(c,d) in enumerate(hold)]
+    require(not any(r['overlap'] for r in matrix),'CONTAMINATED_HOLDOUT')
     require(bool(record['dependence']),'DEPENDENCE_UNKNOWN')
-    return record
+    return {**record,'overlap_matrix':matrix}
 
 class CandidateLedger:
     def __init__(self,path):
         self.db=sqlite3.connect(path);self.db.execute('CREATE TABLE IF NOT EXISTS proposal(id TEXT PRIMARY KEY,h TEXT,payload BLOB)');self.db.commit()
     def append(self,record):
-        lineage(record);raw=canonical(record);h=sha(raw)
+        record=lineage(record);raw=canonical(record);h=sha(raw)
         old=self.db.execute('SELECT h FROM proposal WHERE id=?',(record['id'],)).fetchone()
         require(old is None or old[0]==h,'IMMUTABLE_FIRST_SEEN')
         with self.db:self.db.execute('INSERT OR IGNORE INTO proposal VALUES(?,?,?)',(record['id'],h,raw))

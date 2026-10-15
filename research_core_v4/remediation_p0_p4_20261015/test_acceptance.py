@@ -153,6 +153,7 @@ class P1(Base):
     def test_utc_units(self):
         self.assertEqual(p.timestamp('2026-09-01T00:00:00Z'),1788220800)
         self.assertEqual(p.timestamp('2026-10-15T01:00:00+00:00'),p.timestamp('2026-10-15T04:00:00+03:00'))
+        utc=p.time_evidence('2026-10-15T01:00:00+00:00');local=p.time_evidence('2026-10-15T04:00:00+03:00');self.assertEqual(utc['utc_ms'],local['utc_ms']);self.assertEqual(local['source_zone'],'+03:00');self.assertEqual(local['source_offset_seconds'],10800)
         self.assertEqual(p.timestamp(1788220800000,'milliseconds'),p.timestamp(1788220800)*1000)
         for v in [1788220800000,1788220800.7,float('nan'),float('inf'),-1,'2026-09-01T00:00:00']:
             with self.assertRaises(Exception):p.timestamp(v)
@@ -222,6 +223,9 @@ class P2(Base):
         def events(weeks):
             return [{'kind':'REOPEN','entry':{'eligible':True},'feature':{'model_side':1},'date':str(i%12),'iso':weeks[i%3],'class':['FX','INDEX'][i%2],'_native_accounting_context':{'paired_reference':False}} for i in range(48)]
         a=events(['2026-W01','2026-W02','2026-W03']);z=sci.qualifying(a);self.assertTrue(z['gate_pass']);self.assertEqual((z['model_entry_support'],z['paired_endpoints'],z['censored']),(48,0,48))
+        for i,e in enumerate(a):e.update(sid=i%2,t=ar.START+i*300)
+        db=ar.dbopen(':memory:');snapshot=r.support(db,{'identity_records':{'fixture':{'events':a}},'identity_cursor':2})
+        self.assertEqual([snapshot[k]['events'] for k in ('all_events','entry_feasible','paired_endpoints','continuous_paths')],[48,48,0,0])
         b=copy.deepcopy(a)
         for e in b:e['_native_accounting_context']['paired_reference']=True
         self.assertEqual(sci.qualifying(b)['model_entry_support'],48)
@@ -236,6 +240,8 @@ class P2(Base):
     def test_immutable_chronology_and_holdout(self):
         rec={'id':'A','first_seen':1,'design_sha256':'a'*64,'baseline_sha256':'b'*64,'split':{'development':[(1,10)],'confirmation':[(10,20)]},'feature_max_time':4,'decision_time':5,'outcome_time':6,'dependence':{'cluster':'common-FX','trials':'UNKNOWN'}}
         ledger=sci.CandidateLedger(self.path/'ledger');h=ledger.append(rec);self.assertEqual(ledger.append(rec),h)
+        self.assertEqual(sci.lineage(rec)['overlap_matrix'][0]['overlap'],0)
+        self.reject('DESIGN_DIGEST_REQUIRED',sci.lineage,{**rec,'design_sha256':'not-a-hash'})
         self.reject('IMMUTABLE_FIRST_SEEN',ledger.append,{**rec,'first_seen':2})
         self.reject('FUTURE_LEAKAGE',sci.lineage,{**rec,'feature_max_time':6})
         self.reject('CONTAMINATED_HOLDOUT',sci.lineage,{**rec,'split':{'development':[(1,11)],'confirmation':[(10,20)]}})
@@ -291,6 +297,10 @@ class P3(Base):
         for t in tickets:
             if sum(x['risk'] for x in greedy)+t['risk']<=2 and sum(x['margin'] for x in greedy)+t['margin']<=80:greedy.append(t)
         self.assertEqual(len(greedy),1)
+        from research_core_v4.economic_process_reset_20261014_v1.frontier import capacity_plan
+        def native(arr):return [{'sid':i,'t':1,'h':900,'mode':'STRICT5S','iso':'2026-W35','margin_eur_current':t['margin'],'endpoint_cost_support':True,'scenarios':{'2':{'feasible':True,'cost_eur':t['cost'],'risk_eur':t['risk']}}} for i,t in enumerate(arr)]
+        actual=capacity_plan(native(tickets),900,2,'STRICT5S');self.assertEqual(actual['admitted_ticket_opportunities'],1);self.assertEqual(actual['schedule_classification'],'GREEDY_FEASIBLE_REFERENCE_SCHEDULE');self.assertIsNone(actual['optimal_upper_bound'])
+        capacity21=capacity_plan(native([{'cost':0,'risk':0,'margin':0}]*21),900,2,'STRICT5S');self.assertEqual(capacity21['admitted_ticket_opportunities'],21);self.assertEqual(capacity21['actual_entries'],0);self.assertFalse(capacity21['HARD21']);self.assertFalse(ec.classify({'actual_fills':20})['HARD21'])
         for n in range(3,8):
             arr=(tickets*3)[:n];exact=max(sum(bits) for bits in itertools.product((0,1),repeat=n) if sum(t['risk']*b for t,b in zip(arr,bits))<=2 and sum(t['margin']*b for t,b in zip(arr,bits))<=80)
             self.assertGreaterEqual(ec.optimal_count_bound(arr),exact)
@@ -304,6 +314,8 @@ class P4(Base):
         import shutil
         root=self.path/'repo';shutil.copytree(ROOT/'.github',root/'.github');(root/'research_core_v4/remediation_p0_p4_20261015').mkdir(parents=True)
         shutil.copy(pathlib.Path(__file__).parent/'workflow_catalog.json',root/'research_core_v4/remediation_p0_p4_20261015/workflow_catalog.json')
+        active=root/'.github/workflows/mxm-remediation-p0-p4-20261015-v1.yml';saved=active.read_text();active.write_text(saved.replace('actions/checkout@11d5960a326750d5838078e36cf38b85af677262','actions/checkout@v5'))
+        self.reject('MUTABLE_ACTION_DENIED',policy.workflow_guard,root);active.write_text(saved)
         target=next((root/'.github/workflows').glob('*'));target.write_text(target.read_text().replace('if: ${{ false }}','if: ${{ true }}'))
         with self.assertRaises(ValueError):policy.workflow_guard(root)
     @contracts('MXM-SEM-O06.2')
@@ -328,5 +340,11 @@ class P4(Base):
     def test_exact_package_no_glob_or_cloud(self):
         directory=self.path/'publish';directory.mkdir();(directory/'X_v9R1.dll').write_bytes(b'SYNTHETIC_DLL');(directory/'X_v9R1.algo').write_bytes(b'SYNTHETIC_ALGO')
         expected={p.name:s.sha(p.read_bytes()) for p in directory.iterdir()};z=policy.packaging(directory,expected);self.assertEqual(z['state'],'PACKAGE_READY_ONLY');self.assertFalse(z['cloud_executed']);self.assertIsNone(z['NET'])
+        blob=policy.archive_bytes(directory,expected);self.assertEqual(policy.verify_archive(blob,expected),'PACKAGE_READY_ONLY');self.assertEqual(blob,policy.archive_bytes(directory,expected))
+        import io,zipfile
+        wrong=io.BytesIO()
+        with zipfile.ZipFile(wrong,'w') as z:
+            z.writestr('X_v9.algo',b'WRONG_VERSION')
+        self.reject('ARCHIVE_EXACT_PATHS',policy.verify_archive,wrong.getvalue(),expected)
         (directory/'X_v9.algo').write_bytes(b'WRONG_VERSION');self.reject('PACKAGE_EXACT_PATHS',policy.packaging,directory,expected)
         (directory/'X_v9.algo').unlink();(directory/'X_v9R1.algo').write_bytes(b'');self.reject('PACKAGE_DIGEST_OR_EMPTY',policy.packaging,directory,expected)
