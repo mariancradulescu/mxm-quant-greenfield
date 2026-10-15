@@ -76,6 +76,22 @@ class P0(Base):
         self.reject('FENCE_CAS',g.commit,1807,'H',token-1,'writer1','NEW')
         f.commit(1807,'H',token,'writer1','NEW');self.reject('FENCE_CAS',f.commit,1807,'H',token,'writer1','OTHER')
         self.assertEqual(f.db.execute('SELECT generation,hash FROM fence').fetchone(),(1808,'NEW'))
+        import threading
+        path=self.path/'race';seed=s.Fence(path);seed.initialize(1807,'H');seed.db.close();barrier=threading.Barrier(2);results=[];traces={}
+        def writer(name):
+            fence=s.Fence(path);traces[name]=[];fence.db.set_trace_callback(traces[name].append);barrier.wait()
+            try:
+                epoch=fence.claim(1807,'H',name);fence.commit(1807,'H',epoch,name,'NEW');results.append('COMMITTED')
+            except ValueError:results.append('FENCED_OUT')
+            finally:fence.db.close()
+        threads=[threading.Thread(target=writer,args=(name,)) for name in ('W1','W2')]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(timeout=10);self.assertFalse(thread.is_alive())
+        self.assertCountEqual(results,['COMMITTED','FENCED_OUT'])
+        for statements in traces.values():
+            self.assertTrue(statements[0].startswith('BEGIN IMMEDIATE'))
+            self.assertLess(next(i for i,q in enumerate(statements) if q.startswith('BEGIN IMMEDIATE')),next(i for i,q in enumerate(statements) if q.startswith('SELECT')))
+
     @contracts('MXM-EXISTING-N25.2')
     def test_reader_method_namespace(self):
         calls=[];reader=s.ReadOnlyAPI(lambda *a:calls.append(a) or {},[412686323,642889915])
@@ -289,6 +305,21 @@ class P3(Base):
         for changes in [{'state':'PREPARED'},{'state':'FAILED'},{'owner_readback':False},{'writer_active':True}]:self.reject('CHECKPOINT_NOT_OWNER_COMMITTED',reader.evaluate,cp,{**receipt,**changes})
         for changes in [{'generation':1},{'journal_sha256':'OTHER'}]:self.reject('STALE_CHECKPOINT',reader.evaluate,cp,{**receipt,**changes})
         second=ec.EconomicReader(self.path/'read');self.assertEqual(second.evaluate(cp,receipt),reader.evaluate(cp,receipt))
+        import threading,time
+        path=self.path/'concurrent_read';ec.EconomicReader(path).db.close();barrier=threading.Barrier(2);answers=[];count=[];original=ec.classify;lock=threading.Lock()
+        def counted(accepted):
+            with lock:count.append(1)
+            time.sleep(.02);return original(accepted)
+        def consume():
+            local=ec.EconomicReader(path);barrier.wait()
+            try:answers.append(local.evaluate(cp,receipt))
+            finally:local.db.close()
+        with patch.object(ec,'classify',side_effect=counted):
+            threads=[threading.Thread(target=consume) for _ in range(2)]
+            for thread in threads:thread.start()
+            for thread in threads:thread.join(timeout=10);self.assertFalse(thread.is_alive())
+        self.assertEqual(len(answers),2);self.assertEqual(answers[0],answers[1]);self.assertEqual(len(count),1)
+
     @contracts('MXM-EXISTING-N19.1','MXM-EXISTING-N19.2','MXM-EXISTING-N19.4')
     def test_greedy_is_not_optimal_bound(self):
         # Two-resource counterexample: cost-ranked A blocks feasible B+C.
