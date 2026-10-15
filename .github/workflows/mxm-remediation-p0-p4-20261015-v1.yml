@@ -43,20 +43,32 @@ jobs:
   owner_cold_readback:
     needs: offline_acceptance
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 25
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Locked integrity-readback dependencies before key access
+        run: |
+          python3.12 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Independent cold-process OWNER journal readback; no campaign restart
-        run: python3 -m research_core_v4.remediation_p0_p4_20261015.owner
+        run: python3.12 -m research_core_v4.remediation_p0_p4_20261015.owner
         env:
+          MXM_COLD_PYTHON: python3.13
           GH_TOKEN: ${{ github.token }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: mxm-remediation-owner-${{ github.sha }}
-          path: verification/owner.json
+          path: |
+            verification/owner.json
+            verification/owner-impact-summary.json
+            verification/owner-impact.mxmenc
+            verification/economic-state.json
+            verification/historical-economic-lineage.json
           if-no-files-found: warn

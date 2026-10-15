@@ -132,7 +132,7 @@ def acquire_quotes(db,keys,col,st,store,deadline):
     if isinstance(res,v1.m.ProtoOAErrorRes):
      code=res.errorCode;ar.span(db,request["s"],request["k"],request["a"],request["b"],"PROVIDER_ERROR_"+code);wire_record(db,request,"PROVIDER_ERROR_"+code,None)
      raw.append({"request":request,"state":"PROVIDER_ERROR","provider_code":code})
-     if code in ("CH_ACCESS_TOKEN_INVALID","OA_AUTH_TOKEN_EXPIRED","ACCOUNT_NOT_AUTHORIZED","TOO_MANY_REQUESTS"):error="BROKER_"+code;break
+     if code in ("CH_ACCESS_TOKEN_INVALID","OA_AUTH_TOKEN_EXPIRED","ACCOUNT_NOT_AUTHORIZED","TOO_MANY_REQUESTS","PROTOCOL_UNSUPPORTED"):error="BROKER_"+code;break
      continue
     need(isinstance(res,v1.m.ProtoOAGetTickDataRes) and res.IsInitialized() and res.ctidTraderAccountId==col.aid,"QUOTE_RESPONSE_BINDING")
     need(res.HasField("hasMore"),"QUOTE_HASMORE_FIELD_ABSENT")
@@ -165,7 +165,7 @@ def acquire_m5(db,sid,f,col,st,store,deadline):
    if isinstance(res,v1.m.ProtoOAErrorRes):
     ar.span(db,sid,"M5",lo,hi,"PROVIDER_ERROR_"+res.errorCode);wire_record(db,req,"PROVIDER_ERROR_"+res.errorCode,None)
     raw=[{"request":req,"state":"PROVIDER_ERROR","provider_code":res.errorCode}]
-    if res.errorCode in ("CH_ACCESS_TOKEN_INVALID","OA_AUTH_TOKEN_EXPIRED","ACCOUNT_NOT_AUTHORIZED","TOO_MANY_REQUESTS"):error="BROKER_"+res.errorCode
+    if res.errorCode in ("CH_ACCESS_TOKEN_INVALID","OA_AUTH_TOKEN_EXPIRED","ACCOUNT_NOT_AUTHORIZED","TOO_MANY_REQUESTS","PROTOCOL_UNSUPPORTED"):error="BROKER_"+res.errorCode
    else:
     envelope=col.tr.last_history_envelope
     need(envelope is not None and int(envelope.payloadType)==protocol.PROTO_OA_GET_TRENDBARS_RES_PAYLOAD_TYPE,"M5_RAW_ENVELOPE")

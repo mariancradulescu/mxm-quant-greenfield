@@ -314,10 +314,16 @@ class P4(Base):
         self.assertNotEqual(policy.classify_job({'log_sha256':'H','exact_policy_code':'EXPECTED_POLICY_STOP'}),'EXPECTED_POLICY_STOP')
     @contracts('MXM-ACT-N11.1','MXM-ACT-N11.2','MXM-ACT-N11.3')
     def test_independent_principal_scope(self):
-        good={'signature_verified':True,'principal':'AUDITOR','scope':'P0-P4@H','expires':20}
-        self.assertTrue(policy.independent_acceptance(good,'DIRECTOR','P0-P4@H',10))
-        for bad in [{**good,'signature_verified':False},{**good,'principal':'DIRECTOR'},{**good,'scope':'OTHER'},{**good,'expires':9},{'role':'INDEPENDENT_AUDITOR'}]:
-            with self.assertRaises(ValueError):policy.independent_acceptance(bad,'DIRECTOR','P0-P4@H',10)
+        import base64
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+        from cryptography.hazmat.primitives.serialization import Encoding,PublicFormat
+        key=Ed25519PrivateKey.generate();keys={'AUDITOR':key.public_key().public_bytes(Encoding.Raw,PublicFormat.Raw)}
+        payload={'principal':'AUDITOR','scope':'P0-P4@H','expires':20,'nonce':'ONE_USE_FIXTURE'}
+        good={**payload,'signature':base64.b64encode(key.sign(s.canonical(payload))).decode()}
+        self.assertTrue(policy.independent_acceptance(good,'DIRECTOR','P0-P4@H',10,keys))
+        for bad in [{**good,'signature':'bad'},{**good,'principal':'DIRECTOR'},{**good,'scope':'OTHER'},{**good,'expires':9},{'role':'INDEPENDENT_AUDITOR'},{**good,'nonce':'TAMPERED'}]:
+            with self.assertRaises(ValueError):policy.independent_acceptance(bad,'DIRECTOR','P0-P4@H',10,keys)
+        self.reject('TRUST_ROOT',policy.independent_acceptance,good,'DIRECTOR','P0-P4@H',10)
     @contracts('MXM-EXISTING-N20.1','MXM-EXISTING-N20.2','MXM-EXISTING-N20.4')
     def test_exact_package_no_glob_or_cloud(self):
         directory=self.path/'publish';directory.mkdir();(directory/'X_v9R1.dll').write_bytes(b'SYNTHETIC_DLL');(directory/'X_v9R1.algo').write_bytes(b'SYNTHETIC_ALGO')

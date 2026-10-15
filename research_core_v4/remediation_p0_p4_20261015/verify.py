@@ -9,6 +9,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 from . import test_acceptance as tests
+from . import test_extended as extended
 from .safety import canonical,sha,BASE
 ROOT=pathlib.Path(__file__).resolve().parents[2];P=pathlib.Path(__file__).parent
 
@@ -24,7 +25,8 @@ def main():
     with patch.object(socket,'create_connection',side_effect=RuntimeError('NETWORK_FORBIDDEN_OFFLINE_TEST')):
         for phase in ('P0','P1','P2','P3','P4'):
             if stopped:results.append({'phase':phase,'state':'NOT_RUN_DEPENDENCY_FAILED','passed':[],'failed':[]});continue
-            result=unittest.TextTestRunner(verbosity=2,resultclass=Result).run(unittest.defaultTestLoader.loadTestsFromTestCase(getattr(tests,phase)))
+            suite=unittest.TestSuite([unittest.defaultTestLoader.loadTestsFromTestCase(getattr(tests,phase)),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(extended,phase+'More')),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(extended,phase+'Final'))])
+            result=unittest.TextTestRunner(verbosity=2,resultclass=Result).run(suite)
             results.append({'phase':phase,'state':'PASS' if result.wasSuccessful() else 'FAIL','passed':result.passed,'failed':result.failed});stopped=not result.wasSuccessful()
     passed={name for x in results for name in x['passed']};failed={name for x in results for name in x['failed']}
     contracts=[]
@@ -32,8 +34,8 @@ def main():
         name=tests.MAPPING.get(c['test_id']);status='PASS' if name in passed else 'FAIL' if name in failed else 'NOT_RUN'
         reason=None
         if not name:
-            text=json.dumps(c,ensure_ascii=False).lower()
-            if any(x in text for x in ('owner','private','historical','original','acl','signed','independent','44 ','74 ','79 ')):
+            text=(c['oracle']['positive_input_recipe']+' '+c['oracle']['positive_expected_assertions']).lower()
+            if any(x in text for x in ('owner','private','historical','acl','signed','independent','44 ','74 ','79 ')):
                 status='BLOCKED';reason='Exact native/OWNER historical inventory, independent principal or ACL evidence in this contract has not been recovered; manifest1807 proof alone cannot close it.'
             else:reason='No complete executable witness for this exact contract in this run; related unit tests do not close it.'
         contracts.append({'test_id':c['test_id'],'issue_id':c['issue_id'],'phase':c['phase'],'status':status,'witness':name,'negative_control_executed':name in passed or name in failed,'reason':reason,'independent_acceptance':False})

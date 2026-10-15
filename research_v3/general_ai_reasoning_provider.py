@@ -474,7 +474,8 @@ def _context_payload(root:Path,request:Mapping[str,Any])->dict[str,Any]:
     semantic_eligibility={key:p[key] for key in
                           ("schema","evidence_epoch","material_delta_since_last_accepted_reasoning",
                            "accounting","open_universe_authority","governing_research_contract",
-                           "exact_semantic_question","allowed_authority_refs") if key in p}
+                           "exact_semantic_question","allowed_authority_refs",
+                           "admissible_inputs","historical_context","forbidden_inputs") if key in p}
     return {"request_id":request["request_id"],"eligibility_packet":semantic_eligibility,
             "current_frontier_content":frontier,
             "latest_structural_result_ref":structural_ref,

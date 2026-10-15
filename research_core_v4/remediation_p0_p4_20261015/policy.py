@@ -34,11 +34,18 @@ def workflow_guard(root):
     require('--require-hashes' in active and 'CTRADER_' not in active and 'contents: read' in active,'ACTIVE_SCOPE_DENIED')
     return {'legacy_inert':len(expected),'active_remediation_only':1,'scope':'SUCCESSOR_ONLY'}
 
-def independent_acceptance(receipt,producer,expected_scope,now):
-    require(receipt.get('signature_verified') is True,'INDEPENDENT_SIGNATURE_REQUIRED')
-    require(receipt.get('principal') and receipt['principal']!=producer,'SAME_PRINCIPAL_DENIED')
-    require(receipt.get('scope')==expected_scope and receipt.get('expires',0)>now,'AUDIT_SCOPE_OR_EXPIRY')
-    # An adapter must verify a real signature before this predicate is used.
+def independent_acceptance(receipt,producer,expected_scope,now,trusted_keys=None):
+    from .safety import canonical
+    import base64
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+    require(trusted_keys is not None,'INDEPENDENT_TRUST_ROOT_REQUIRED')
+    principal=receipt.get('principal')
+    require(principal and principal!=producer,'SAME_PRINCIPAL_DENIED')
+    require(principal in trusted_keys,'UNTRUSTED_AUDITOR_KEY')
+    payload={k:receipt.get(k) for k in ('principal','scope','expires','nonce')}
+    require(payload['scope']==expected_scope and payload['expires']>now and bool(payload['nonce']),'AUDIT_SCOPE_OR_EXPIRY')
+    try:Ed25519PublicKey.from_public_bytes(trusted_keys[principal]).verify(base64.b64decode(receipt['signature'],validate=True),canonical(payload))
+    except Exception:raise ValueError('INDEPENDENT_SIGNATURE_REQUIRED') from None
     return True
 
 def classify_job(job):

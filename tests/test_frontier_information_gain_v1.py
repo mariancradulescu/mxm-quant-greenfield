@@ -72,10 +72,14 @@ class FrontierInformationGainV1Tests(unittest.TestCase):
         u=load("research_v3/ai_director/PROVIDER_USAGE_V1.json")
         r=load("research_v3/RESOURCE_EFFICIENCY_V1.json")
         self.assertGreaterEqual(u["provider_invocations"],4)
-        self.assertEqual(u["provider_invocations"],len(u["invocations"]))
+        self.assertEqual(u["provider_attempts"],len(u["invocations"]))
+        started=sum(row.get("provider_process_started",True) is True for row in u["invocations"])
+        self.assertEqual(u["provider_invocations"],started)
+        self.assertEqual(u["provider_attempts"]-u["provider_invocations"],
+                         sum(row.get("provider_process_started") is False for row in u["invocations"]))
         successful_implementation=sum(
             1 for row in u["invocations"]
-            if row.get("purpose")=="GENERAL_AI_IMPLEMENTATION" and row.get("outcome")=="SUCCESS"
+            if row.get("purpose")=="GENERAL_AI_IMPLEMENTATION" and row.get("provider_call_success", row.get("outcome")=="SUCCESS") is True
         )
         self.assertEqual(u["successful_implementation_invocations"],successful_implementation)
         self.assertGreaterEqual(successful_implementation,1)

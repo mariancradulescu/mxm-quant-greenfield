@@ -47,7 +47,7 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
 
     def test_budget_authority_separates_historical_snapshot(self):
         b=json.loads((ROOT/"research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json").read_text())
-        self.assertEqual((b["current"]["used"],b["current"]["remaining"]),(20,64))
+        self.assertEqual((b["current"]["used"],b["current"]["remaining"]),(21,63))
         self.assertEqual((b["historical_snapshot"]["counters"]["used"],b["historical_snapshot"]["counters"]["remaining"]),(19,65))
 
     def test_all_20_outcome_blind_and_unchanged_lifetime_exposure(self):
@@ -92,6 +92,7 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
 
     def test_frontier_packet_not_anchored_to_prior_selected_action(self):
         request={"request_id":"test-frontier","evidence_epoch_seen":21,
+                 "evidence_bundle_sha256":__import__("hashlib").sha256(b"synthetic frontier packet fixture").hexdigest(),
                  "next_state":{"next_action":"AI_FRONTIER_RESEARCH"},
                  "authority_refs":["research_v3/CURRENT_RESEARCH_FRONTIER_V1.json",
                     "research_v3/EPOCH21_OUTCOME_BLIND_CAPACITY_AUDIT_V1.json",
@@ -103,6 +104,8 @@ class Epoch21FrontierGovernanceTests(unittest.TestCase):
         self.assertEqual(packet["capacity"]["methodology_replacement_total"],15)
         self.assertTrue(any(x["ref"]=="discovery/results/V2-C032_STAGE_A_V1.json"
                             for x in packet["eligibility_packet"]["forbidden_inputs"]))
+        self.assertFalse(any(x["ref"]=="discovery/results/V2-C032_STAGE_A_V1.json"
+                             for x in packet["eligibility_packet"]["admissible_inputs"]))
 
     def test_prompt_does_not_privilege_prior_symbol_or_panel(self):
         prompt=_system_prompt()

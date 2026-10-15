@@ -18,7 +18,7 @@ REPO='mariancradulescu/mxm-quant-greenfield'
 
 def get(path):
     # Endpoint allowlist; no redirects to authenticated mutation paths.
-    require(path.startswith(('releases/','git/ref/heads/','actions/runs?')),'GET_NAMESPACE')
+    require(path.startswith(('releases/','git/ref/heads/','actions/runs')),'GET_NAMESPACE')
     req=urllib.request.Request('https://api.github.com/repos/'+REPO+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
     with urllib.request.urlopen(req,timeout=45) as r:return strict_json(r.read(16*1024*1024))
 
@@ -42,15 +42,21 @@ def bounded_decrypt(blob,key,tmp):
         finally:
             subprocess.run(['gpgconf','--homedir',str(home),'--kill','gpg-agent'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=10,check=False)
 
+INVENTORY_CACHE={}
+
 def read_asset(meta,key,tmp):
     asset=get('releases/assets/'+str(meta['id']))
     require(asset['size']==meta['size'] and asset['name']==meta['name'] and asset['digest']=='sha256:'+meta['ciphertext_sha256'],'ASSET_METADATA_DRIFT')
     # Verify membership by full pagination. A filename is never sufficient.
-    inventory=[];page=1
-    while True:
-        rows=get('releases/'+str(meta['release_id'])+'/assets?per_page=100&page='+str(page));inventory+=rows
-        if len(rows)<100:break
-        page+=1;require(page<=100,'INVENTORY_LIMIT_UNKNOWN')
+    rid=meta['release_id']
+    if rid not in INVENTORY_CACHE:
+        inventory=[];page=1
+        while True:
+            rows=get('releases/'+str(rid)+'/assets?per_page=100&page='+str(page));inventory+=rows
+            if len(rows)<100:break
+            page+=1;require(page<=100,'INVENTORY_LIMIT_UNKNOWN')
+        INVENTORY_CACHE[rid]=inventory
+    inventory=INVENTORY_CACHE[rid]
     require(len([a for a in inventory if a['id']==meta['id'] and a['digest']==asset['digest']])==1,'ASSET_RELEASE_BINDING')
     url=asset['browser_download_url'];require(url.startswith('https://github.com/'+REPO+'/releases/download/'),'ASSET_URL_SCOPE')
     with urllib.request.urlopen(url,timeout=90) as r:blob=r.read(meta['size']+1)
@@ -74,10 +80,31 @@ def main():
         # Second cold interpreter independently decrypts same immutable object.
         # Only digest-only proof crosses process boundary; plaintext stays private.
         env=dict(os.environ,MXM_READBACK_KEY_PATH=str(key),MXM_READBACK_TMP=str(tmp))
-        result=subprocess.run(['python3','-m',__package__+'.owner','--cold-child'],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=180,check=False)
+        result=subprocess.run([os.environ.get('MXM_COLD_PYTHON','python3'),'-m',__package__+'.owner','--cold-child'],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=180,check=False)
         require(result.returncode==0 and strict_json(result.stdout)['canonical_sha256']==JOURNAL,'COLD_PROCESS_READBACK')
+        from .impact import inspect
+        impact=inspect(journal,read_asset,key,tmp,root)
+        from .economics import EconomicReader
+        checkpoint={'generation':1807,'journal_sha256':JOURNAL}
+        receipt={**checkpoint,'state':'COMMITTED','owner_readback':True,'writer_active':False,'sequence':journal['autonomy']['sequence']}
+        state=EconomicReader(tmp/'economic-reader.sqlite').evaluate(checkpoint,receipt)
+        state.update(source_run_id=body['run_id'],source_head=body['execution_source_head'],current_authority='REMEDIATION_READ_ONLY;NO_RESEARCH')
+        pathlib.Path('verification/economic-state.json').write_text(json.dumps(state,sort_keys=True)+'\n')
+        lineage=[]
+        historical_run=get('actions/runs/38679002289')
+        for rid in (413405151,413406302):
+            rel=get('releases/'+str(rid));b=strict_json(rel['body']);value=read_asset(b['primary'],key,tmp)
+            cp=value.get('checkpoint')
+            if cp is None:
+                old=read_asset(value['snapshots']['after'],key,tmp)
+                generation=old['generation'];jhash=value['snapshots']['after']['canonical_sha256']
+            else:
+                generation=cp['generation'];jhash=cp['current_journal']['canonical_sha256']
+            lineage.append({'release_id':rid,'asset_id':b['primary']['id'],'run_id':historical_run['id'],'head':historical_run['head_sha'],'generation':generation,'journal_sha256':jhash,'canonical_sha256':b['primary']['canonical_sha256'],'OWNER_readback':True,'outcome_recomputed':False,'NET':None})
+        pathlib.Path('verification/historical-economic-lineage.json').write_text(json.dumps({'scope':'TWO_PINNED_RELEASES_ONLY','rows':lineage,'independent_signoff':False},sort_keys=True)+'\n')
+
     after=get('releases/412686323');require(after['body']==before['body'],'ORIGINAL_ANCHOR_CHANGED')
-    proof={'state':'OWNER_VERIFIED_JOURNAL_ONLY','generation':1807,'journal_asset_id':m['id'],'canonical_sha256':JOURNAL,'ciphertext_sha256':CIPHER,'gzip_sha256':PACKED,'cold_process_readback':True,'original_anchor_unchanged':True,'broker_requests':0,'orders':0,'collection_writes':0,'scope':'MANIFEST_1807_ONLY_NOT_ALL_SHARDS_OR_HISTORICAL_IMPACT','alpha_certified':False,'HARD21':False,'source_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID']}
+    proof={'state':'OWNER_VERIFIED_JOURNAL_ONLY','generation':1807,'journal_asset_id':m['id'],'canonical_sha256':JOURNAL,'ciphertext_sha256':CIPHER,'gzip_sha256':PACKED,'cold_process_readback':True,'parent_python':__import__('sys').version.split()[0],'child_python':strict_json(result.stdout).get('python_version'),'original_anchor_unchanged':True,'broker_requests':0,'orders':0,'collection_writes':0,'scope':'MANIFEST_1807_PLUS_DIRECT_REFERENCES_NOT_ALL_HISTORICAL_IMPORT_INPUTS','impact':impact,'alpha_certified':False,'HARD21':False,'source_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID']}
     pathlib.Path('verification').mkdir(exist_ok=True);pathlib.Path('verification/owner.json').write_text(json.dumps(proof,sort_keys=True)+'\n')
     print(json.dumps(proof,sort_keys=True))
 
@@ -86,7 +113,7 @@ def child():
     require(m['id']==642889915 and m['canonical_sha256']==JOURNAL,'CHILD_PIN')
     obj=read_asset(m,pathlib.Path(os.environ['MXM_READBACK_KEY_PATH']),pathlib.Path(os.environ['MXM_READBACK_TMP']))
     require(obj['generation']==1807,'CHILD_GENERATION')
-    print(json.dumps({'canonical_sha256':m['canonical_sha256']}))
+    print(json.dumps({'canonical_sha256':m['canonical_sha256'],'python_version':__import__('sys').version.split()[0]}))
 
 if __name__=='__main__':
     import sys

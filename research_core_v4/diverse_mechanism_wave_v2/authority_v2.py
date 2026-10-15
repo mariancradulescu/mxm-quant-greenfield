@@ -43,6 +43,8 @@ def validate_candidate(head,arm,mode):
     return arm
 
 def real_gate(head):
+    # P0-P4 successor has no independent signed trust root and grants no research.
+    need(False,'EXPECTED_POLICY_STOP_NO_INDEPENDENT_TRUST_ROOT')
     need((ROOT/ARM).is_file() and (ROOT/APPROVAL).is_file(),'MISSING_INDEPENDENT_WAVE_ACCEPTANCE')
     arm=read(ARM);need((ROOT/ARM).read_bytes()==enc(arm),'WAVE_ARM_CANONICAL_BYTES')
     validate_candidate(head,arm,'real');approval=read(APPROVAL)
