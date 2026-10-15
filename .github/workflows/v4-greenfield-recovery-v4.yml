@@ -1,66 +1,11 @@
-name: V4 Greenfield Recovery V4 Asymmetric
+name: "Archived by P0-P4 remediation: v4-greenfield-recovery-v4"
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths: ["research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json"]
-permissions: {contents: write}
-concurrency:
-  group: MXM_V4_FIRST_DEV_GREENFIELD_RECOVERY_V4_SINGLETON
-  cancel-in-progress: false
+  workflow_dispatch:
+permissions: {}
 jobs:
-  recovery-v4:
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 1
     steps:
-      - name: Checkout triggering ARM commit
-        uses: actions/checkout@v4
-        with: {ref: "${{ github.sha }}", fetch-depth: 0}
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11.16"}
-      - name: Reject workflow replay and stale ARM before any input recovery
-        run: |
-          test "$GITHUB_RUN_ATTEMPT" = 1
-          python - <<'PY'
-          from research_core_v4 import asymmetric_recovery_v4_gate as g
-          g.validate_arm_binding(g.ROOT/g.ARM_REL)
-          PY
-      - name: Recover exact inputs with private key scoped to this step only
-        env:
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-        run: |
-          umask 077
-          python -m research_core_v4.asymmetric_recovery_v4_gate --runtime-arm research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json --raw-output "$RUNNER_TEMP/v4-raw" --prelock-report "$RUNNER_TEMP/v4-prelock.json"
-      - name: Checkout byte-identical frozen science
-        uses: actions/checkout@v4
-        with:
-          repository: mariancradulescu/mxm-quant-greenfield
-          ref: 68bdee4b51244ae50acd56fe868468b96106450f
-          path: science
-          persist-credentials: false
-      - name: Fetch immutable numerical image and exact hash-locked wheel
-        run: |
-          python -m research_core_v4.numeric_environment_v1 --fetch-wheel "$RUNNER_TEMP/v4-wheels"
-          image=$(python -c 'from research_core_v4.numeric_environment_v1 import load; print(load()["container_image"])')
-          docker pull --platform linux/amd64 "$image"
-      - name: Prevalidate frozen runner, fence once, execute offline, publish raw result
-        run: |
-          umask 077
-          git config user.name mxm-v4-recovery-machine
-          git config user.email mxm-v4-recovery-machine@users.noreply.github.com
-          mkdir -p "$RUNNER_TEMP/v4-transaction"
-          python -m research_core_v4.recovery_v4_transaction_v1 --science "$PWD/science" --raw "$RUNNER_TEMP/v4-raw" --temporary "$RUNNER_TEMP/v4-transaction" --wheels "$RUNNER_TEMP/v4-wheels" --prelock "$RUNNER_TEMP/v4-prelock.json"
-      - name: Preserve completed raw result or failure diagnostics without recomputation
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: v4-raw-recovery-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            ${{ runner.temp }}/v4-transaction/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
-            ${{ runner.temp }}/v4-transaction/prepared.json
-            ${{ runner.temp }}/v4-transaction/failure-classification.json
-            ${{ runner.temp }}/v4-transaction/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json.opening.lock
-          if-no-files-found: ignore
-          retention-days: 90
-      - name: Remove plaintext exact inputs
-        if: always()
-        run: rm -rf "$RUNNER_TEMP/v4-raw"
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

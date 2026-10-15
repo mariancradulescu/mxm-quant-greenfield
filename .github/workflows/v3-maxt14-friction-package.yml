@@ -1,51 +1,11 @@
-name: V3 winner-first friction screen V9R1 package
+name: "Archived by P0-P4 remediation: v3-maxt14-friction-package"
 on:
   workflow_dispatch:
+permissions: {}
 jobs:
-  validate-and-package:
-    runs-on: ubuntu-latest
+  expected_policy_stop:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - name: Install Android-safe protobuf
-        run: |
-          python -m pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt
-      - name: Compile winner-first runtime
-        run: |
-          python -m py_compile V3_WINNER_FIRST_FRICTION_SCREEN_RUN.py research_core_v3/v3_friction_capture.py research_core_v3/v3_friction_staged.py research_core_v3/v3_friction_winner_screen.py research_core_v3/pydroid_v3_friction_winner_launcher.py tools/freeze_v3_winner_first_sampling.py tools/build_v3_winner_first_friction_package.py
-      - name: Generate deterministic sparse sampling freeze
-        run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/freeze_v3_winner_first_sampling.py
-      - name: Validate frozen winner-screen geometry
-        run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python - <<'PY'
-          import json
-          from pathlib import Path
-          from research_core_v3.v3_friction_winner_screen import winner_screen_geometry_preflight
-          g=winner_screen_geometry_preflight(Path("."))
-          assert g["screen_symbols"] == 56, g
-          assert g["screen_regions"] == 57, g
-          assert g["reference_exact_windows"] == 2623050, g
-          assert g["sampled_hours"] <= 56*26, g
-          assert g["sampled_exact_windows"] <= 3*g["sampled_hours"], g
-          assert g["base_bid_ask_requests_before_pagination"] == 2*g["sampled_hours"], g
-          assert g["stage0_benchmark_skipped"] is True, g
-          assert g["automatic_additional_acquisition"] is False, g
-          print("WINNER_SCREEN_GEOMETRY_PASS", json.dumps(g, sort_keys=True))
-          PY
-      - name: Scientific regression tests
-        run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m unittest tests.test_v3_maxt14_friction_capture tests.test_v3_staged_friction tests.test_v3_global_friction_triage tests.test_v3_wave2_friction tests.test_v3_winner_first_friction tests.test_v3_maxt14_friction_evidence -v
-      - name: Build deterministic V9R1 Android package
-        run: |
-          PYTHONPATH=. PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python tools/build_v3_winner_first_friction_package.py
-          sha256sum dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip
-      - name: Upload V9R1 package
-        uses: actions/upload-artifact@v4
-        with:
-          name: MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1
-          path: dist/MXM_V3_WINNER_FIRST_FRICTION_SCREEN_PACKAGE_V9R1.zip
-          if-no-files-found: error
-          retention-days: 30
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

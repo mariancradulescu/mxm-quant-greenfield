@@ -1,22 +1,11 @@
-name: MXM read only signed bottleneck public-safe counts
+name: "Archived by P0-P4 remediation: mxm-bottleneck-safe-readback-20261014"
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths:
-      - owner_readback/mxm_bottleneck_20261014/READBACK_V1.json
-permissions:
-  contents: write
+  workflow_dispatch:
+permissions: {}
 jobs:
-  verified-public-safe-counts:
-    if: github.run_attempt == 1
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 0}
-      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
-      - name: Recover signed summary with pinned OWNER key; publish counts only
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-        run: timeout --signal=TERM 650 python3 -m owner_readback.mxm_bottleneck_20261014.reader_v1
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

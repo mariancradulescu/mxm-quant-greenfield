@@ -1,15 +1,11 @@
-name: V4 Private Key Probe Read Only
+name: "Archived by P0-P4 remediation: v4-asymmetric-private-key-probe"
 on:
   workflow_dispatch:
-permissions: {contents: read}
+permissions: {}
 jobs:
-  validate:
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11.16"}
-      - name: Validate pair without writing research state
-        env:
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-        run: python -m research_core_v4.asymmetric_recovery_v4_gate --keypair-only
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

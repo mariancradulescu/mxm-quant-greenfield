@@ -1,23 +1,11 @@
-name: MXM MASTER1576 public disclosure guard fabricated unit proof V1
+name: "Archived by P0-P4 remediation: mxm-master1576-public-output-guard-v1"
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths:
-      - .github/workflows/mxm-master1576-public-output-guard-v1.yml
-      - research_core_v4/numeric_development_v1/public_output_guard_v1.py
-      - research_core_v4/numeric_development_v1/test_public_output_guard_v1.py
-permissions:
-  contents: read
-concurrency:
-  group: mxm-master1576-public-output-guard-v1
-  cancel-in-progress: false
+  workflow_dispatch:
+permissions: {}
 jobs:
-  fabricated-disclosure-preflight:
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          persist-credentials: false
-      - name: Fabricated disclosure fixtures; no market data, keys, or responses
-        run: python3 -m unittest -v research_core_v4.numeric_development_v1.test_public_output_guard_v1
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

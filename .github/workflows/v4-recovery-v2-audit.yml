@@ -1,64 +1,11 @@
-name: V4 Recovery Governance and Runtime Audit
+name: "Archived by P0-P4 remediation: v4-recovery-v2-audit"
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths: ["research_core_v4/**","tests/test_research_core_v4_*.py",".github/workflows/v4-recovery-v2-audit.yml",".github/workflows/v4-greenfield-recovery-v4.yml"]
   workflow_dispatch:
-permissions: {contents: read}
+permissions: {}
 jobs:
-  publication-state:
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    outputs:
-      pre_arm: ${{ steps.phase.outputs.pre_arm }}
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v4
-        with: {fetch-depth: 0, persist-credentials: false}
-      - name: Route only validations compatible with durable V4 phase
-        id: phase
-        run: |
-          if test -f research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json; then
-            python -m unittest -q tests.test_research_core_v4_publication_only
-            python -m research_core_v4.post_publication_integrity_v1 "$PWD"
-            python -m unittest -q tests.test_v4_factor_residual tests.test_v4_post_quote_preoutcome
-            echo "pre_arm=false" >> "$GITHUB_OUTPUT"
-          elif test -f research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json; then
-            echo "pre_arm=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "pre_arm=true" >> "$GITHUB_OUTPUT"
-          fi
-  audit:
-    needs: publication-state
-    if: needs.publication-state.outputs.pre_arm == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11.16"}
-      - run: python -m py_compile research_core_v4/asymmetric_recovery_v4_gate.py research_core_v4/development_execution_runner_v1.py research_core_v4/frozen_v2_semantics.py
-      - run: python -m unittest tests.test_research_core_v4_prearm_gate
-      - name: Audit asymmetric Recovery V4 control plane
-        run: python research_core_v4/asymmetric_recovery_v4_gate.py --audit
-      - name: Verify future runtime remains inert before explicit ARM
-        run: |
-          set -euo pipefail
-          grep -q 'FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json' .github/workflows/v4-greenfield-recovery-v4.yml
-          ! grep -q 'workflow_dispatch' .github/workflows/v4-greenfield-recovery-v4.yml
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ARM_V1.json
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_CRASH_RECOVERY_V4_ATTEMPT_LOCK_V1.txt
-          test ! -e research_core_v4/state/FIRST_V4_DEVELOPMENT_RESPONSE_RESULT_V1.json
-      - name: Verify staging bootstrap is single-publish and resumable
-        run: |
-          set -euo pipefail
-          test -f research_core_v4/runtime_inputs/README.md
-          python -m unittest -v tests.test_research_core_v4_staging_publish
-      - name: Verify shared-passphrase supersession is permanent
-        run: |
-          python - <<'PY'
-          import json
-          x=json.load(open("research_core_v4/state/V4_INPUT_TRANSPORT_ASYMMETRIC_SUPERSESSION_V1.json"))
-          assert x["status"]=="SHARED_PASSPHRASE_TRANSPORT_PERMANENTLY_SUPERSEDED_FOR_FUTURE_STAGING"
-          assert x["superseded"]["may_be_used_for_future_staging"] is False
-          assert x["successor"]["shared_secret_available_to_director"] is False
-          assert x["successor"]["work_dependency_required"] is False
-          PY
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

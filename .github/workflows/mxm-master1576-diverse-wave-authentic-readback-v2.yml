@@ -1,53 +1,11 @@
-name: MXM exact readback log confidentiality containment only
+name: "Archived by P0-P4 remediation: mxm-master1576-diverse-wave-authentic-readback-v2"
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths: [.github/workflows/mxm-master1576-diverse-wave-authentic-readback-v2.yml]
-permissions:
-  contents: read
-  actions: write
+  workflow_dispatch:
+permissions: {}
 jobs:
-  remove-exact-disclosing-reader-log:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/performance-research-v3-20260922' && github.run_attempt == 1
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: 1
     steps:
-      - name: Preserve completed encrypted evidence and remove only exact reader logs
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python3 - <<'PY'
-          import json,os,sys,urllib.request,urllib.error
-          base='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/'
-          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
-          class NoRedirect(urllib.request.HTTPRedirectHandler):
-              def redirect_request(self,*args,**kwargs): return None
-          opener=urllib.request.build_opener(NoRedirect)
-          def request(path,method='GET'):
-              req=urllib.request.Request(base+path,headers=headers,method=method)
-              try:
-                  with opener.open(req,timeout=30) as response: return response.status,response.read()
-              except urllib.error.HTTPError as exc: return exc.code,b''
-          def get(path):
-              code,body=request(path);assert code==200,'METADATA_READBACK_FAILURE';return json.loads(body)
-          try:
-              reader=get('actions/runs/37951902101')
-              assert reader['head_sha']=='e8700131a12eba2c08ddd2c0aceb3219fb51eee4' and reader['path']=='.github/workflows/mxm-master1576-diverse-wave-authentic-readback-v2.yml' and reader['run_attempt']==1 and reader['conclusion']=='success','EXACT_READER_MISMATCH'
-              original=get('actions/runs/37950879700')
-              assert original['head_sha']=='793f198a24262d4b9ceb5b2820bb30e99619b34f' and original['run_attempt']==1 and original['conclusion']=='success','ORIGINAL_EXECUTION_MISMATCH'
-              invocation='30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584'
-              assert get('git/ref/tags/mxm-numeric-v2-claim-real-'+invocation)['object']['sha']=='793f198a24262d4b9ceb5b2820bb30e99619b34f','CLAIM_CHANGED'
-              assert get('git/ref/tags/mxm-numeric-v3-complete-real-'+invocation)['object']['sha']=='ffee8b68bedc0a0556b818aa11e47b644dc5ec2c','COMPLETION_CHANGED'
-              release=get('releases/408041914');assets={x['name']:x for x in release['assets']}
-              assert release['tag_name']=='mxm-numeric-v2-real-30b4191766bc-37950879700' and len(assets)==14,'RELEASE_CHANGED'
-              for name,digest in {'complete-development-result.mxmenc':'7487d0efd880d56b48ee59299d06edc16d337493f46ca580dbbf5502e9d18e7d','authentic-diverse-wave-readback.mxmenc':'d9e6a17e700804b34d91a46563fbd7dd5dbab43fdd8fd9a7e4223aff4170bc94'}.items():
-                  assert assets[name]['digest']=='sha256:'+digest,'ENCRYPTED_EVIDENCE_CHANGED'
-              code,_=request('actions/runs/37951902101/logs','DELETE');assert code==204,'EXACT_LOG_DELETION_REJECTED'
-              rcode,_=request('actions/runs/37951902101/logs');jcode,_=request('actions/jobs/113892536825/logs')
-              assert rcode in (404,410) and jcode in (404,410),'LOG_REMOVAL_READBACK_FAILED'
-              assert get('actions/runs/37951902101')['conclusion']=='success','READER_METADATA_CHANGED'
-              print(json.dumps({'status':'PASS_EXACT_READER_LOG_REMOVAL','removed_run':37951902101,'removed_job':113892536825,'delete_http_status':code,'run_logs_http_status':rcode,'job_logs_http_status':jcode,'encrypted_assets_preserved':14,'original_execution_preserved':True,'completion_ref_preserved':True,'scientific_invocations':0,'historical_input_downloads':0,'private_key_access':False}))
-          except Exception as exc:
-              code=str(exc.args[0]) if isinstance(exc,AssertionError) and exc.args else 'CONTAINMENT_FAILURE'
-              print(json.dumps({'status':'FAIL_CLOSED','code':code,'scientific_invocations':0,'private_key_access':False}));sys.exit(2)
-          PY
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

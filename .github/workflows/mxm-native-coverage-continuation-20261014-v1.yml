@@ -1,48 +1,11 @@
-name: MXM finite autonomous broad native coverage continuation
+name: "Archived by P0-P4 remediation: mxm-native-coverage-continuation-20261014-v1"
 on:
   workflow_dispatch:
-    inputs:
-      previous_generation: {required: true, type: string}
-permissions: {contents: write, actions: write}
-concurrency:
-  group: mxm-repaired-native-frontier-single-writer-20261014-v2
-  cancel-in-progress: false
+permissions: {}
 jobs:
-  worker_02:
-    if: github.run_attempt == 1
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 0}
-      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
-      - name: Continue broad native coverage at first safely reconciled identity
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          OPENBLAS_NUM_THREADS: '1'
-          OMP_NUM_THREADS: '1'
-          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
-          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
-          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-        run: python3 -m research_core_v4.final_recovery_20261014_v1.runtime coverage
-      - name: Preserve encrypted publication outbox on storage failure
-        if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: mxm-owner-encrypted-outbox-${{ github.run_id }}-${{ github.job }}
-          path: ${{ runner.temp }}/mxm-encrypted-outbox/*.mxmenc
-          if-no-files-found: ignore
-          retention-days: 30
-  handoff:
-    needs: worker_02
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 0}
-      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
-      - name: One progress-fenced continuation under finite original authority
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -m research_core_v4.final_recovery_20261014_v1.continue
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

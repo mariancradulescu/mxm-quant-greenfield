@@ -1,31 +1,11 @@
-name: MXM one-use checkpoint 1307 bounded native continuation
+name: "Archived by P0-P4 remediation: mxm-native-resume-1307-20261015-v1"
 on:
-  push:
-    branches: [mxm-native-1307-continuation-20261015-v1]
-    paths: [research_core_v4/root_cause_economic_20261014_v1/RESUME_1307_AUTHORITY_V1.json]
-permissions: {contents: write}
-concurrency: {group: mxm-repaired-native-frontier-single-writer-20261014-v2, cancel-in-progress: false}
+  workflow_dispatch:
+permissions: {}
 jobs:
-  bounded_resume_1307:
-    if: github.run_attempt == 1
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 0}
-      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
-      - run: python3 -m research_core_v4.root_cause_economic_20261014_v1.continuation_1307
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
-          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
-          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-          OPENBLAS_NUM_THREADS: '1'
-          OMP_NUM_THREADS: '1'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: failure()
-        with:
-          name: mxm-1307-owner-outbox-${{ github.run_id }}
-          path: ${{ runner.temp }}/mxm-encrypted-outbox/*.mxmenc
-          if-no-files-found: ignore
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

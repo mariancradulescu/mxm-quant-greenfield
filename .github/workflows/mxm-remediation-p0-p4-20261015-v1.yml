@@ -1,0 +1,61 @@
+name: MXM approved P0-P4 remediation verification only
+run-name: MXM P0-P4 acceptance ${{ github.sha }}
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - 'research_core_v4/remediation_p0_p4_20261015/**'
+      - 'research_core_v4/autonomous_native_20261015_v1/runtime.py'
+      - 'research_core_v4/critical_frontier_repair_20261014_v2/**'
+      - 'research_core_v4/final_recovery_20261014_v1/storage.py'
+      - '.github/workflows/mxm-remediation-p0-p4-20261015-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mxm-remediation-p0-p4-20261015-v1
+  cancel-in-progress: false
+jobs:
+  offline_acceptance:
+    if: github.run_attempt == 1 && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - name: Locked dependencies before any private key access
+        run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Ordered synthetic acceptance P0 P1 P2 P3 P4 with negative controls
+        run: python3 -m research_core_v4.remediation_p0_p4_20261015.verify
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+      - name: Offline C# EUR200 contract, no cTrader dependency
+        run: |
+          dotnet run --project research_core_v4/economic_process_reset_20261014_v1/csharp/Contract.csproj --configuration Release -- verification/csharp.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-remediation-offline-${{ github.sha }}
+          path: verification/*.json
+          if-no-files-found: error
+  owner_cold_readback:
+    needs: offline_acceptance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - name: Independent cold-process OWNER journal readback; no campaign restart
+        run: python3 -m research_core_v4.remediation_p0_p4_20261015.owner
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-remediation-owner-${{ github.sha }}
+          path: verification/owner.json
+          if-no-files-found: warn

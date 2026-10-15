@@ -1,28 +1,11 @@
-name: TREND exact-head validation — LEGACY READ ONLY
-
-# LEGACY V2 READ-ONLY KILL SWITCH.
-# Former V2 exact-head writer lane.
-# Historical source/evidence remains in Git history. This workflow is deliberately
-# manual-only and cannot mutate the research branch, dispatch another workflow,
-# invoke an AI/provider, or consume resources autonomously.
+name: "Archived by P0-P4 remediation: trend-parameter-scan-exact-head-validation"
 on:
   workflow_dispatch:
-
-permissions:
-  contents: read
-
-env:
-  LEGACY_V2_READ_ONLY: "1"
-
+permissions: {}
 jobs:
-  legacy-read-only:
-    runs-on: ubuntu-slim
-    timeout-minutes: 2
+  expected_policy_stop:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
     steps:
-      - name: Enforce LEGACY_V2_READ_ONLY
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "${LEGACY_V2_READ_ONLY:-}" = "1"
-          echo "Legacy Runtime V2 execution is retired. Read Git history/evidence for diagnostics."
-          echo "No writes, autonomous wakes, downstream dispatches, or provider calls are authorized."
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED

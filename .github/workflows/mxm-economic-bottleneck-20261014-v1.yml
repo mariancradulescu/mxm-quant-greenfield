@@ -1,27 +1,11 @@
-name: MXM one-use encrypted economic bottleneck reconciliation
+name: "Archived by P0-P4 remediation: mxm-economic-bottleneck-20261014-v1"
 on:
-  push:
-    branches: [performance-research-v3-20260922]
-    paths:
-      - research_core_v4/economic_bottleneck_20261014_v1/EXECUTION_V1.json
-permissions:
-  contents: write
-concurrency:
-  group: mxm-economic-bottleneck-20261014
-  cancel-in-progress: false
+  workflow_dispatch:
+permissions: {}
 jobs:
-  authenticated-archived-result-accounting:
-    if: github.run_attempt == 1
+  expected_policy_stop:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 1
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 0}
-      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
-      - name: Private accounting and encrypted signed GitHub readback
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          OPENBLAS_NUM_THREADS: "1"
-          OMP_NUM_THREADS: "1"
-        run: timeout --signal=TERM 900 python3 -m research_core_v4.economic_bottleneck_20261014_v1.runner_v1
+      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED
