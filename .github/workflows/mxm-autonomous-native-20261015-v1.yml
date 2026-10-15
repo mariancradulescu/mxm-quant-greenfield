@@ -1,0 +1,68 @@
+name: MXM autonomous finite native continuation
+run-name: MXM autonomous g${{ inputs.generation || 'bootstrap' }} s${{ inputs.sequence || '0' }}
+on:
+  push:
+    branches: [mxm-autonomous-native-20261015-v1]
+    paths: [research_core_v4/autonomous_native_20261015_v1/AUTHORITY.json]
+  workflow_dispatch:
+    inputs:
+      generation: {required: true, type: string}
+      sequence: {required: true, type: string}
+      claim: {required: true, type: string}
+permissions: {contents: write, actions: write}
+concurrency: {group: mxm-repaired-native-frontier-single-writer-20261014-v2, cancel-in-progress: false}
+jobs:
+  campaign:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - run: python3 -m unittest -v research_core_v4.autonomous_native_20261015_v1.test_runtime
+      - name: Verify dispatch or cold resume one finite worker
+        id: engine
+        run: python3 -m research_core_v4.autonomous_native_20261015_v1.runtime
+        env:
+          MODE: ${{ github.event_name == 'push' && 'bootstrap' || 'worker' }}
+          EXPECTED_GENERATION: ${{ inputs.generation }}
+          SEGMENT_SEQUENCE: ${{ inputs.sequence }}
+          DISPATCH_CLAIM: ${{ inputs.claim }}
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+      - name: OWNER readback and atomic generation handoff
+        if: steps.engine.outputs.ready == 'true'
+        run: python3 -m research_core_v4.autonomous_native_20261015_v1.runtime
+        env:
+          MODE: handoff
+          EXPECTED_GENERATION: ${{ steps.engine.outputs.generation }}
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure()
+        with:
+          name: mxm-autonomous-owner-outbox-${{ github.run_id }}
+          path: ${{ runner.temp }}/mxm-encrypted-outbox/*.mxmenc
+          if-no-files-found: ignore
+  economic_snapshot:
+    if: github.run_attempt == 1 && github.event_name == 'workflow_dispatch' && inputs.sequence == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - run: python3 -m pip install protobuf==5.29.5 numpy==2.2.6 cryptography==46.0.3
+      - name: Independent accepted snapshot support and existing corrected cost populations
+        run: python3 -m research_core_v4.autonomous_native_20261015_v1.runtime
+        env:
+          MODE: economic
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
