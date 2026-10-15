@@ -7,10 +7,13 @@ from research_core_v4.critical_frontier_repair_20261014_v2 import runner_v2 as r
 from research_core_v4.cost_frequency_discovery_v1.collector_v1 import Collector
 P='research_core_v4/autonomous_native_20261015_v1/'
 WF='mxm-autonomous-native-20261015-v1.yml'
+from research_core_v4.remediation_p0_p4_20261015.safety import terminal, bind_failure, request_identity
+from research_core_v4.remediation_p0_p4_20261015.science import qualifying
 need=old.need
 class BatchComplete(Exception):pass
 
 def gate():
+    raise RuntimeError('EXPECTED_POLICY_STOP_REMEDIATION_NO_CAMPAIGN')
     io.install();os.umask(0o077)
     a=json.loads((E.a.ROOT/(P+'AUTHORITY.json')).read_text())
     need(os.environ['GITHUB_REF_NAME']==a['branch'] and os.environ['GITHUB_RUN_ATTEMPT']=='1','EXECUTION_SCOPE')
@@ -33,36 +36,48 @@ def exclusive():
             page+=1
 
 def claim(name):
-    # Git ref creation is an atomic create-if-absent. Never retry this mutation.
-    io.api('git/refs','POST',{'ref':'refs/tags/'+name,'sha':os.environ['GITHUB_SHA']})
+    # A consumed intent is never rearmed. Resolve lost create ACK by GET only.
+    try:io.api('git/refs','POST',{'ref':'refs/tags/'+name,'sha':os.environ['GITHUB_SHA']})
+    except Exception:
+        try:observed=io.api('git/ref/tags/'+name)
+        except Exception:raise RuntimeError('CLAIM_UNKNOWN_NO_RETRY') from None
+        need(observed['object']['sha']==os.environ['GITHUB_SHA'],'CLAIM_CONFLICT')
+        raise RuntimeError('STALLED_INTENT_STOP') from None
     need(io.api('git/ref/tags/'+name)['object']['sha']==os.environ['GITHUB_SHA'],'CLAIM_READBACK')
 
 def dispatch(a,generation,sequence):
     token='mxm-auto-20261015-g'+str(generation)+'-s'+str(sequence)
     claim(token)
-    io.api('actions/workflows/'+WF+'/dispatches','POST',{'ref':a['branch'],'inputs':{'generation':str(generation),'sequence':str(sequence),'claim':token}})
-    # A 204 alone is insufficient. Locate one actual run, without repeating POST.
+    ack='ACK_RECEIVED'
+    try:io.api('actions/workflows/'+WF+'/dispatches','POST',{'ref':a['branch'],'inputs':{'generation':str(generation),'sequence':str(sequence),'claim':token}})
+    except Exception:ack='DISPATCH_UNKNOWN'
     title='MXM autonomous g'+str(generation)+' s'+str(sequence)
-    for attempt in range(10):
-        runs=io.api('actions/runs?branch='+a['branch']+'&event=workflow_dispatch&per_page=100')['workflow_runs']
-        matches=[r for r in runs if r['head_sha']==os.environ['GITHUB_SHA'] and r['display_title']==title]
+    for attempt in range(12):
+        matches=[];page=1
+        while True:
+            runs=io.api('actions/runs?branch='+a['branch']+'&event=workflow_dispatch&per_page=100&page='+str(page))['workflow_runs']
+            matches.extend(r for r in runs if r['head_sha']==os.environ['GITHUB_SHA'] and r['display_title']==title)
+            if len(runs)<100:break
+            page+=1
+            need(page<=100,'RUN_PAGINATION_LIMIT_UNKNOWN')
+        matches=list({r['id']:r for r in matches}.values())
         if matches:
             need(len(matches)==1,'DISPATCH_DUPLICATE_RUNS')
-            proof={'state':'SUCCESSOR_RUN_OBSERVED','from_run':int(os.environ['GITHUB_RUN_ID']),'successor_run':matches[0]['id'],'generation':generation,'sequence':sequence,'claim':token,'source_head':os.environ['GITHUB_SHA']}
-            print(json.dumps(proof),flush=True);return proof
+            return {'state':'SUCCESSOR_RUN_OBSERVED','successor_run':matches[0]['id'],'generation':generation,'sequence':sequence,'claim':token,'ack':ack,'source_head':os.environ['GITHUB_SHA']}
         time.sleep(3)
-    raise RuntimeError('DISPATCH_UNCERTAIN_NO_RETRY')
+    raise RuntimeError('STALLED_INTENT_STOP_DISPATCH_UNKNOWN')
 
 class EvidenceCollector(Collector):
     def __init__(self,caps,guard):super().__init__(caps);self.guard=guard;self.last_evidence=None
     def send(self,req,historical=False):
+        self.last_evidence=None
         self.guard()
         self.last_evidence={'request_type':type(req).__name__}
         try:
             result=super().send(req,historical)
             self.last_evidence.update(response_type=type(result).__name__,response_b64=base64.b64encode(result.SerializeToString()).decode())
             env=getattr(self.tr,'last_history_envelope',None)
-            if env is not None:self.last_evidence['response_envelope_b64']=base64.b64encode(env.SerializeToString()).decode()
+            if type(req).__name__=='ProtoOAGetTrendbarsReq' and env is not None:self.last_evidence['response_envelope_b64']=base64.b64encode(env.SerializeToString()).decode()
             return result
         except Exception as ex:
             self.last_evidence.update(exception_class=type(ex).__name__,exception_category=exception_category(ex));raise
@@ -77,7 +92,7 @@ def support(db,st):
     paired=[e for e in feasible if e.get('_native_accounting_context',{}).get('paired_reference')]
     continuous=[e for e in paired if all(not ar.missing(db,s,k,e['t']*1000,(e['t']+900)*1000) for s in e['_native_accounting_context']['quote_ids'] for k in ('bid','ask'))]
     def pop(es):return {'events':len(es),'identities':len({e['sid'] for e in es}),'dates':len({e['date'] for e in es}),'weeks':dict(Counter(e['iso'] for e in es))}
-    return {'processed_identities':st['identity_cursor'],'M5_rows':db.execute('SELECT count(*) FROM bar').fetchone()[0],'M5_identities':db.execute('SELECT count(DISTINCT s) FROM bar').fetchone()[0],'quote_rows':db.execute('SELECT count(*) FROM tick').fetchone()[0],'quote_identities':db.execute('SELECT count(DISTINCT s) FROM tick').fetchone()[0],'all_events':pop(events),'entry_feasible':pop(feasible),'paired_endpoints':pop(paired),'continuous_paths':pop(continuous),'existing_frozen_candidate':old.qualifying(events),'outcomes_read':False}
+    return {'processed_identities':st['identity_cursor'],'M5_rows':db.execute('SELECT count(*) FROM bar').fetchone()[0],'M5_identities':db.execute('SELECT count(DISTINCT s) FROM bar').fetchone()[0],'quote_rows':db.execute('SELECT count(*) FROM tick').fetchone()[0],'quote_identities':db.execute('SELECT count(DISTINCT s) FROM tick').fetchone()[0],'all_events':pop(events),'entry_feasible':pop(feasible),'paired_endpoints':pop(paired),'continuous_paths':pop(continuous),'existing_frozen_candidate':qualifying(events),'outcomes_read':False}
 
 def orphans(store,generation):
     # Scan every rotated shard, including a successor shard after a lost anchor ACK.
@@ -130,7 +145,7 @@ def worker(a):
         base_persist=io.persist
         def persist(db,store,st,label,groups=()):
             for item in st.get('_raw',[]):
-                if item.get('exception_class') and col.last_evidence:item['preserved_failure_evidence']=copy.deepcopy(col.last_evidence)
+                if item.get('exception_class'):item['preserved_failure_evidence']=bind_failure(item,col.last_evidence or {})
             return base_persist(db,store,st,label,groups)
         runner.storage.persist=persist;old.persist=persist
         cfg={**json.loads((E.a.ROOT/(old.P+'EXECUTION_V1.json')).read_text()),**json.loads((E.a.ROOT/(runner.P+'REPAIR_AUTHORITY_V2.json')).read_text())}
@@ -150,7 +165,7 @@ def worker(a):
         need(unchanged,'PRIOR_ACCEPTED_WIRE_CHANGED');need(sum(col.counts.values())<=a['worker_requests'],'WORKER_CAP')
         progress=st['identity_cursor']>before['processed_identities'] or sum(st['requests'].values())>sum(before_req.values())
         st['phase']='STOP_FAIL_CLOSED' if failed else 'COLLECTION_COMPLETE' if st['identity_cursor']==len(st['eligible']) else 'STOP_NO_PROGRESS' if not progress else 'STOP_FINITE_CAMPAIGN_LIMIT' if seq>=a['max_segments'] or len(st['resume_proofs'])>=a['max_total_cold_resumes'] else 'BATCH_COMPLETE_READY_FOR_HANDOFF'
-        if min(remaining(st,a).values())<=0:st['phase']='STOP_GLOBAL_BUDGET'
+        stop=terminal(failed,remaining(st,a),st['phase']);st['phase']=stop['state'];st['terminal_causes']=stop['causes']
         st['autonomy_proof']={'prior_wire_unchanged':unchanged,'before_requests':before_req,'after_requests':copy.deepcopy(st['requests']),'new_requests':dict(col.counts),'failure':failed,'cold_restore_before_requests':True,'single_writer_claim':token+'-consumed','support_before':before,'support_after':support(db,st),'remaining_broker_budget':remaining(st,a)}
         persist(db,store,st,'autonomous-worker-end')
         current=json.loads(store.anchor['body']);need(store.restore(current['current_journal'])['requests']==st['requests'],'FINAL_OWNER_READBACK')
@@ -173,22 +188,9 @@ def handoff(a):
         dispatch(a,body['generation'],st['autonomy']['sequence']+1)
 
 def economic(a):
-    # Read-only accepted snapshot references. Collection anchor is never mutated.
-    with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as td:
-        tmp=pathlib.Path(td);key,fp=E.w.old._private_key_from_secret(tmp);need(fp==E.w.old.FP,'OWNER_KEY')
-        source=BoundStore(os.environ['GITHUB_SHA'],key,tmp,a['base']);latest=json.loads(source.anchor['body'])
-        summaries={}
-        for name,body in [('accepted_1321',a['snapshot']),('latest_accepted',latest)]:
-            db=ar.dbopen(tmp/(name+'.sqlite'));snap.track(db)
-            source.anchor={**source.anchor,'body':json.dumps(body)}
-            st=snap.restore(db,source);summaries[name]=support(db,st);db.close()
-        corrected=json.loads(io.api('releases/tags/mxm-root-cause-economic-20261014-v1')['body'])
-        accepted_cost=source.restore(corrected['primary'])
-        need('corrected_cost_populations' in accepted_cost,'CORRECTED_POPULATIONS_REQUIRED')
-        qualifies=summaries['latest_accepted']['existing_frozen_candidate']['gate_pass']
-        result={'schema':'mxm.autonomous.economic.support.delta.v1','snapshots':{'before':a['snapshot']['current_journal'],'after':latest['current_journal']},'support':summaries,'four_cost_populations_reused':accepted_cost['corrected_cost_populations'],'cost_population_reference':corrected['primary'],'broker_requests':0,'collection_write':False,'outcomes_read':False,'new_NET':None,'pilot_status':'SUPPORT_GATE_MET_REQUIRES_SEMANTIC_CLOSED_EXACT_RECONCILIATION' if qualifies else 'NOT_QUALIFIED_FROZEN_SUPPORT_GATE','decision':'CONTINUE_OUTCOME_BLIND_NATIVE_SUPPORT_COMPLETION','scientific_limit':'THREE_ADAPTIVELY_EXPOSED_DEVELOPMENT_WEEKS_NOT_CONFIRMATION','orders':0}
-        output=io.Store(os.environ['GITHUB_SHA'],key,E.a.ROOT/E.w.old.PUBLIC_KEY,tmp,'mxm-autonomous-economic-'+os.environ['GITHUB_RUN_ID']);ref=output.encrypted(result,'economic-support-delta.mxmenc')
-        output.commit({'state':result['pilot_status'],'primary':ref,'support':summaries,'cost_populations_reused':True,'broker_requests':0,'collection_write':False,'NET':None,'orders':0})
+    # Source is initialized with no publishing constructor and all paths are GET.
+    from research_core_v4.remediation_p0_p4_20261015.owner import main as owner_readback
+    return owner_readback()
 
 def main():
     a=gate();mode=os.environ['MODE']

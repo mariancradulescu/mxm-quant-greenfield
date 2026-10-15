@@ -4,6 +4,7 @@ from research_core_v4.full_native_frontier_20261014_v1 import runner_v1 as v1
 from research_core_v4.critical_frontier_repair_20261014_v2 import storage_v2 as old,archive_v2 as ar
 E=v1.E;need=v1.need;encode=v1.encode
 from research_core_v4.shallow_m5_support_v2_production import encrypt_shard
+from research_core_v4.remediation_p0_p4_20261015.safety import unpack, strict_json
 ERRORS=[]
 ORIGINAL_PERSIST=old.persist
 
@@ -69,14 +70,27 @@ def release(tag,head):
 
 class Store(v1.FrontierStore):
     def __init__(self,head,key,public,tmp,tag,limit=750):
+        need(tag!=old.ROOT_TAG,'EXPECTED_POLICY_STOP_ORIGINAL_ANCHOR_READ_ONLY')
         super().__init__(head,key,public,tmp,'real');self.tag=tag;self.limit=limit
         self.anchor=release(tag,head);body=json.loads(self.anchor['body']);self.index=int(body.get('storage_index',0))
         self.release=release(tag+'-shard-'+str(self.index),head);self.inventory=assets(self.release['id'])
         self.fault_after_upload=False;self.upload_posts=0
 
+    def decoded(self,meta,require_packed=True):
+        asset=api('releases/assets/'+str(meta['id']))
+        need(asset['name']==meta['name'] and asset['size']==meta['size'] and asset['digest']=='sha256:'+meta['ciphertext_sha256'],'REMOTE_ASSET_METADATA')
+        if 'release_id' in meta:
+            matched=[a for a in assets(meta['release_id']) if a['id']==meta['id']]
+            need(len(matched)==1 and matched[0]['digest']==asset['digest'],'ASSET_RELEASE_BINDING')
+        blob=download(asset['browser_download_url'],meta['size']);need(E.a.sha(blob)==meta['ciphertext_sha256'],'REMOTE_CIPHER_SHA')
+        packed=E.w.old.crypto.decrypt_package(blob,private_key=self.key,expected_public_spki_sha256=E.w.old.FP,temp_parent=self.tmp)
+        if require_packed:need('gzip_sha256' in meta and E.a.sha(packed)==meta['gzip_sha256'],'PACKED_DIGEST_MISMATCH')
+        raw=unpack(packed);need(E.a.sha(raw)==meta['canonical_sha256'],'REMOTE_CANONICAL_SHA')
+        obj=strict_json(raw);need(encode(obj)==raw,'REMOTE_CANONICAL')
+        return obj,E.a.sha(packed)
+
     def restore(self,meta):
-        # Every component is cryptographically checked by the accepted decoder.
-        return super().restore(meta)
+        return self.decoded(meta)[0]
 
     def encrypted(self,value,label):
         value=json.loads(encode(value));raw=encode(value);need(len(raw)<128*1024*1024,'CHECKPOINT_PLAIN_BUDGET')
@@ -90,8 +104,12 @@ class Store(v1.FrontierStore):
             need(len(self.inventory)<self.limit,'ROTATED_RELEASE_FULL');existing=[a for a in self.inventory if a['name']==name]
         if existing:
             need(len(existing)==1 and existing[0]['state']=='uploaded','ASSET_NAME_AMBIGUOUS_OR_INCOMPLETE');a=existing[0]
-            meta={'id':a['id'],'name':name,'size':a['size'],'url':a['browser_download_url'],'ciphertext_sha256':a['digest'].removeprefix('sha256:'),'canonical_sha256':digest,'gzip_sha256':E.a.sha(packed),'release_id':self.release['id']}
-            need(self.restore(meta)==value,'EXISTING_CONTENT_ADDRESS_DRIFT');return meta
+            meta={'id':a['id'],'name':name,'size':a['size'],'url':a['browser_download_url'],'ciphertext_sha256':a['digest'].removeprefix('sha256:'),'canonical_sha256':digest,'release_id':self.release['id']}
+            originals=[m for m in self.uploaded if m['id']==a['id'] and m.get('gzip_sha256')]
+            need(len(originals)==1,'EXISTING_PACKED_MANIFEST_REQUIRED')
+            meta['gzip_sha256']=originals[0]['gzip_sha256']
+            need(self.restore(meta)==value,'EXISTING_CONTENT_ADDRESS_DRIFT')
+            return meta
         spool=pathlib.Path(os.environ['RUNNER_TEMP'])/'mxm-encrypted-outbox';spool.mkdir(mode=0o700,exist_ok=True)
         dest=spool/name
         if not dest.exists():encrypt_shard(packed,public_key=self.public,output=dest)
@@ -120,6 +138,7 @@ class Store(v1.FrontierStore):
         return meta
 
     def commit(self,body):
+        need(self.tag!=old.ROOT_TAG,'EXPECTED_POLICY_STOP_ORIGINAL_ANCHOR_READ_ONLY')
         if self.tag==old.ROOT_TAG:need(api('git/ref/heads/'+E.w.old.BRANCH)['object']['sha']==self.head,'ACTIVE_COLLECTION_HEAD_DRIFT')
         body=json.loads(encode(body));body.update(storage_index=self.index,storage_release=self.release['id'],max_assets_per_release=self.limit)
         try:api('releases/'+str(self.anchor['id']),'PATCH',{'body':json.dumps(body,sort_keys=True)})
