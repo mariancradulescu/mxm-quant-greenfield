@@ -123,7 +123,7 @@ def main():
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as t:
         sign_key,fp=_private_key_from_secret(pathlib.Path(t))
         signer=serialization.load_pem_private_key(sign_key.read_bytes(),password=None)
-        statement={'schema':'mxm.remediation.OWNER.attestation.v1','source_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'journal_sha256':JOURNAL,'evidence_digests':{p.name:sha(p.read_bytes()) for p in pathlib.Path('verification').glob('*') if p.is_file()},'principal':'ACTIONS_MACHINE_WITH_OWNER_KEY','independent_auditor':False,'alpha_certified':False}
+        statement={'schema':'mxm.remediation.OWNER.attestation.v1','source_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'journal_sha256':JOURNAL,'workflow_catalog_sha256':sha((root/'research_core_v4/remediation_p0_p4_20261015/workflow_catalog.json').read_bytes()),'requirements_lock_sha256':sha((root/'research_core_v4/remediation_p0_p4_20261015/requirements.lock').read_bytes()),'upstream_artifacts':[{k:a[k] for k in ('id','name','digest','size_in_bytes')} for a in get('actions/runs/'+os.environ['GITHUB_RUN_ID']+'/artifacts?per_page=100')['artifacts']],'evidence_digests':{p.name:sha(p.read_bytes()) for p in pathlib.Path('verification').glob('*') if p.is_file()},'principal':'ACTIONS_MACHINE_WITH_OWNER_KEY','independent_auditor':False,'alpha_certified':False}
         from .safety import canonical
         sig=signer.sign(canonical(statement),padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
         signer.public_key().verify(sig,canonical(statement),padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())

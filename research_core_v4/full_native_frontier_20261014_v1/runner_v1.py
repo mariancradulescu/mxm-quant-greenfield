@@ -143,8 +143,8 @@ def economic_event(db,row,f,ev,g,bars):
  return out
 
 def qualifying(records):
- model=[r for r in records if r['kind']=='REOPEN' and r['entry'].get('eligible') and r['feature'].get('model_side') and r.get('_native_accounting_context',{}).get('paired_reference')];dates={r['date'] for r in model};weeks={r['iso'] for r in model};classes={r['class'] for r in model}
- return {'model_entry_support':len(model),'dates':len(dates),'weeks':len(weeks),'classes':len(classes),'gate_pass':len(model)>=48 and len(dates)>=12 and len(weeks)>=3 and len(classes)>=2,'gate':'MIN48_EXANTE_MODEL_ENTRIES_12_NATIVE_DATES_3_CONSECUTIVE_ISO_WEEKS_2_CLASSES;SUPPORT_NOT_POWER'}
+ from research_core_v4.remediation_p0_p4_20261015.science import qualifying as successor_qualifying
+ return successor_qualifying(records)
 
 def pilot(db,st,store,a):
  rr=[r for s in st['identity_records'].values() for r in s.get('events',[])];q=qualifying(rr)
@@ -221,12 +221,15 @@ def parity(db,st,tmp):
     if ev['feature'].get('supported') and ev['kind']=='REOPEN' and 'prior_session_high' in ev['feature']:
      inputs[-1].update(rangeClose=[bb[ev['open_proxy']+i*300][3] for i in range(3)],priorHigh=ev['feature']['prior_session_high'],priorLow=ev['feature']['prior_session_low']);outputs[-1]['range_side']=ev['feature']['model_side']
  inf=tmp/'parity-input.jsonl';out=tmp/'parity-output.jsonl';inf.write_text(''.join(json.dumps(v)+'\n' for v in inputs));subprocess.run(['dotnet',str(E.a.ROOT/(P+'csharp/bin/Release/net8.0/Replay.dll')),str(inf),str(out)],check=True,stdout=subprocess.DEVNULL)
+ native_lines=out.read_text().splitlines()
+ need(len(outputs)==len(native_lines),'CSHARP_COUNT')
+ if not outputs:return {'state':'UNSUPPORTED_NO_VALID_VECTORS','causal_quote_states':0,'parity_certified':False,'actual_cloud_feed_parity':'NOT_CERTIFIED_NO_DEPLOYMENT_AUTHORIZED'}
  n=0
- for py,line in zip(outputs,out.read_text().splitlines()):
+ for py,line in zip(outputs,native_lines):
   cs=json.loads(line);need(py.keys()==cs.keys(),'CSHARP_FIELDS')
   for key,v in py.items():need(math.isclose(v,cs[key],rel_tol=1e-12,abs_tol=1e-12) if type(v)==float else v==cs[key],'CSHARP_QUOTE_STATE_PARITY')
   n+=1
- need(n==len(outputs),'CSHARP_COUNT');return {'state':'PASS_AUTHENTIC_KERNEL_REPLAY','causal_quote_states':n,'actual_cloud_feed_parity':'NOT_CERTIFIED_NO_DEPLOYMENT_AUTHORIZED','native_adapter_compilation':'REUSE_EXISTING_ACCEPTED_CTRADER_AUTOMATE_ADAPTER','prediction_observables':'CLOSED_M5_OHLC_NATIVE_SESSION_GAP_PRIOR_RANGE;API_GetBars_AND_GetTicks;NO_EXTERNAL_RUNTIME','side_timestamp_equivalence_limit':'OPEN_API_SIDE_PUBLICATION_VS_NATIVE_JOINT_TICK_CALLBACK_NOT_PROVEN','restart_state':'PURE_KERNEL_RESEEDED_FROM_NATIVE_HISTORY;MISSING_SEED_ABSTAINS;LIVE_POSITIONS_RECONCILIATION_NOT_CERTIFIED_NO_ORDERS'}
+ need(n==len(outputs),'CSHARP_COUNT');return {'state':'PASS_KERNEL_VALUES_ONLY_EVENT_ID_CERTIFICATION_REQUIRED','parity_certified':False,'causal_quote_states':n,'actual_cloud_feed_parity':'NOT_CERTIFIED_NO_DEPLOYMENT_AUTHORIZED','native_adapter_compilation':'REUSE_EXISTING_ACCEPTED_CTRADER_AUTOMATE_ADAPTER','prediction_observables':'CLOSED_M5_OHLC_NATIVE_SESSION_GAP_PRIOR_RANGE;API_GetBars_AND_GetTicks;NO_EXTERNAL_RUNTIME','side_timestamp_equivalence_limit':'OPEN_API_SIDE_PUBLICATION_VS_NATIVE_JOINT_TICK_CALLBACK_NOT_PROVEN','restart_state':'PURE_KERNEL_RESEEDED_FROM_NATIVE_HISTORY;MISSING_SEED_ABSTAINS;LIVE_POSITIONS_RECONCILIATION_NOT_CERTIFIED_NO_ORDERS'}
 
 def final_report(db,st,store,a,tmp,key):
  rr=[r for v in st['identity_records'].values() for r in v.get('events',[])];valid=sum(r['quote_state'].get('valid',False) for r in rr);strict=sum(r['strict_entry'].get('valid',False) for r in rr);paired=[r for r in rr if r.get('_native_accounting_context',{}).get('paired_reference') and r['entry']['state']=='COMPLETE_NATIVE_SUPPORT'];known=[r for r in rr if 'break_even_eur' in r['entry']]

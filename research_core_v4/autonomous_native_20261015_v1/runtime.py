@@ -9,6 +9,7 @@ P='research_core_v4/autonomous_native_20261015_v1/'
 WF='mxm-autonomous-native-20261015-v1.yml'
 from research_core_v4.remediation_p0_p4_20261015.safety import terminal, bind_failure, request_identity
 from research_core_v4.remediation_p0_p4_20261015.science import qualifying
+from research_core_v4.remediation_p0_p4_20261015.control import observed_interval
 need=old.need
 class BatchComplete(Exception):pass
 
@@ -102,7 +103,7 @@ def support(db,st):
     events=[e for r in st['identity_records'].values() for e in r.get('events',[])]
     feasible=[e for e in events if e['entry'].get('eligible')]
     paired=[e for e in feasible if e.get('_native_accounting_context',{}).get('paired_reference')]
-    continuous=[e for e in paired if all(not ar.missing(db,s,k,e['t']*1000,(e['t']+900)*1000) for s in e['_native_accounting_context']['quote_ids'] for k in ('bid','ask'))]
+    continuous=[e for e in paired if all(observed_interval(db,s,e['t']*1000,(e['t']+900)*1000) for s in e['_native_accounting_context']['quote_ids'])]
     def pop(es):return {'events':len(es),'identities':len({e['sid'] for e in es}),'dates':len({e['date'] for e in es}),'weeks':dict(Counter(e['iso'] for e in es))}
     return {'processed_identities':st['identity_cursor'],'M5_rows':db.execute('SELECT count(*) FROM bar').fetchone()[0],'M5_identities':db.execute('SELECT count(DISTINCT s) FROM bar').fetchone()[0],'quote_rows':db.execute('SELECT count(*) FROM tick').fetchone()[0],'quote_identities':db.execute('SELECT count(DISTINCT s) FROM tick').fetchone()[0],'all_events':pop(events),'entry_feasible':pop(feasible),'paired_endpoints':pop(paired),'continuous_paths':pop(continuous),'existing_frozen_candidate':qualifying(events),'outcomes_read':False}
 

@@ -127,17 +127,17 @@ class GitHubStore:
         return meta
     def restore(self,meta):
         need(self.release is not None,"RELEASE_UNINITIALIZED")
-        assets=api("releases/"+str(self.release["id"])+"/assets?per_page=100")
-        match=[a for a in assets if a["id"]==meta["id"] and a["name"]==meta["name"]]
-        need(len(match)==1 and match[0]["size"]==meta["size"] and
-             match[0]["digest"]=="sha256:"+meta["ciphertext_sha256"],"CIPHERTEXT_REMOTE_METADATA_DRIFT")
-        got=download(match[0]["browser_download_url"],meta["size"])
+        from research_core_v4.remediation_p0_p4_20261015.control import lookup
+        from research_core_v4.remediation_p0_p4_20261015.safety import unpack,strict_json
+        match=lookup(lambda path:api(path),self.release['id'],meta['id'],meta['ciphertext_sha256'])
+        need(match['name']==meta['name'] and match['size']==meta['size'],'CIPHERTEXT_REMOTE_METADATA_DRIFT')
+        got=download(match["browser_download_url"],meta["size"])
         need(len(got)==meta["size"] and sha(got)==meta["ciphertext_sha256"],"CIPHERTEXT_REMOTE_READBACK")
         packed=crypto.decrypt_package(got,private_key=self.key,expected_public_spki_sha256=FP if self.mode=="real" else self.synthetic_fp,temp_parent=self.tmp)
         need(sha(packed)==meta["gzip_sha256"],"DECRYPTED_GZIP_SHA256_DRIFT")
-        decompressed=gzip.decompress(packed)
+        decompressed=unpack(packed)
         need(sha(decompressed)==meta["canonical_sha256"],"CANONICAL_CHECKPOINT_DRIFT")
-        obj=crypto.strict_json(decompressed);need(canonical(obj)==decompressed,"NONCANONICAL_CHECKPOINT")
+        obj=strict_json(decompressed);need(canonical(obj)==decompressed,"NONCANONICAL_CHECKPOINT")
         return obj
     def publish(self,document,path):
         # Important: the actual Git blob creation closure is NEVER invoked if disallowed.

@@ -179,3 +179,14 @@ def segment_chain(entries,max_segments=26):
         require(all(e.get(k) for k in ('run_id','journal_sha256','postsegment_sha256')),'SEGMENT_EVIDENCE_MISSING')
         result.append({**e,'state':'OBSERVED_RECEIPT_NOT_ALPHA'})
     return result
+
+def observed_interval(db,sid,a,b,ttl=300000):
+    from research_core_v4.critical_frontier_repair_20261014_v2 import archive_v2 as ar
+    if a>b or b>=ar.END*1000:return False
+    if any(ar.missing(db,sid,k,a,b) for k in ('bid','ask')):return False
+    points={a,b}
+    for side in ('bid','ask'):
+        for t, in db.execute('SELECT DISTINCT t FROM tick WHERE s=? AND k=? AND t BETWEEN ? AND ?',(sid,side,a-ttl,b)):
+            if a<=t<=b:points.add(t)
+            if a<=t+ttl+1<=b:points.add(t+ttl+1)
+    return all(quote_observed(db,sid,t,ttl)['observed'] for t in sorted(points))

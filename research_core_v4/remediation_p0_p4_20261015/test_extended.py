@@ -383,3 +383,48 @@ def _test_fault_restore_conflict_mask_twice(self):
         self.assertNotEqual(masks[0],[])
 P1Final.test_fault_restore_conflict_mask_twice=contracts('MXM-EXISTING-N26.4')(_test_fault_restore_conflict_mask_twice)
 MAPPING['MXM-EXISTING-N26.4']='test_fault_restore_conflict_mask_twice'
+
+def _test_real_legacy_readers_paginate(self):
+    import gzip
+    from research_core_v4.owner_recovery_v1 import runtime_v1 as recovery
+    from research_core_v4.autonomous_native_20261015_v1 import runtime
+    module=runtime.E.w.old;value={'synthetic':'PAGINATION_ONLY'};raw=module.canonical(value);packed=gzip.compress(raw,mtime=0);cipher=b'SYNTHETIC_CIPHER'
+    inventory=[{'id':i,'name':str(i),'size':len(cipher),'digest':'sha256:'+s.sha(cipher),'browser_download_url':'synthetic://'+str(i)} for i in range(750)];calls=[]
+    def api(path,*args,**kw):
+        calls.append(path);self.assertFalse(args or kw)
+        page=int(path.split('page=')[-1]);return inventory[(page-1)*100:page*100]
+    binding={'release_id':1,'asset_id':749,'ciphertext_sha256':s.sha(cipher),'canonical_sha256':s.sha(raw)}
+    meta={**binding,'id':749,'name':'749','size':len(cipher),'gzip_sha256':s.sha(packed)}
+    st=module.GitHubStore.__new__(module.GitHubStore);st.release={'id':1};st.key=self.path/'dummy';st.tmp=self.path;st.mode='real'
+    with patch.object(module,'api',side_effect=api),patch.object(module,'download',return_value=cipher),patch.object(module.crypto,'decrypt_package',return_value=packed):
+        self.assertEqual(st.restore(meta),value);self.assertEqual(recovery.load_asset(st.key,module.FP,self.path,binding)[0],value)
+    self.assertTrue(any('page=8' in x for x in calls))
+    # Current entrypoint map includes both former first-page-only routes.
+    import inspect
+    self.assertIn('lookup(',inspect.getsource(module.GitHubStore.restore));self.assertIn('lookup(',inspect.getsource(recovery.load_asset))
+P1Final.test_real_legacy_readers_paginate=_test_real_legacy_readers_paginate
+
+def _test_observability_controls_actual_support(self):
+    from research_core_v4.autonomous_native_20261015_v1 import runtime
+    from research_core_v4.full_native_frontier_20261014_v1 import runner_v1 as legacy
+    t=ar.START*1000;db=ar.dbopen(':memory:')
+    for side in ('bid','ask'):ar.span(db,9,side,t,t+900000,'EMPTY_AUTHENTIC_RESPONSE')
+    self.assertFalse(c.observed_interval(db,9,t,t+900000))
+    for offset in (0,300000,600000,900000):
+        for side,price in [('bid',100),('ask',101)]:db.execute('INSERT INTO tick VALUES(?,?,?,?)',(9,side,t+offset,price))
+    self.assertTrue(c.observed_interval(db,9,t,t+900000))
+    event={'sid':9,'t':ar.START,'kind':'REOPEN','entry':{'eligible':True},'feature':{'model_side':1},'date':'2026-08-24','iso':'2026-W35','class':'FX','_native_accounting_context':{'quote_ids':[9],'paired_reference':True}}
+    st={'identity_cursor':1,'identity_records':{'9':{'events':[event]}}};self.assertEqual(runtime.support(db,st)['continuous_paths']['events'],1)
+    db.execute('DELETE FROM tick WHERE t=?',(t+300000,));self.assertFalse(c.observed_interval(db,9,t,t+900000));self.assertEqual(runtime.support(db,st)['continuous_paths']['events'],0);self.assertEqual(runtime.support(db,st)['entry_feasible']['events'],1)
+    event['_native_accounting_context']['paired_reference']=False;self.assertEqual(legacy.qualifying([event])['model_entry_support'],1)
+P1Final.test_observability_controls_actual_support=_test_observability_controls_actual_support
+
+def _test_legacy_parity_no_empty_or_extra_success(self):
+    from research_core_v4.full_native_frontier_20261014_v1 import runner_v1 as legacy
+    db=ar.dbopen(':memory:')
+    def empty(*args,**kw):(self.path/'parity-output.jsonl').write_text('')
+    with patch.object(legacy.subprocess,'run',side_effect=empty):
+        result=legacy.parity(db,{'identity_records':{}},self.path);self.assertEqual(result['state'],'UNSUPPORTED_NO_VALID_VECTORS');self.assertFalse(result['parity_certified'])
+    def extra(*args,**kw):(self.path/'parity-output.jsonl').write_text('{}\n')
+    with patch.object(legacy.subprocess,'run',side_effect=extra):self.reject('CSHARP_COUNT',legacy.parity,db,{'identity_records':{}},self.path)
+P2Final.test_legacy_parity_no_empty_or_extra_success=_test_legacy_parity_no_empty_or_extra_success

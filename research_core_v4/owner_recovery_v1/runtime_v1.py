@@ -23,13 +23,14 @@ def gate(kind):
 
 def load_asset(key,fp,tmp,binding):
     import gzip
-    assets=e.w.old.api('releases/'+str(binding['release_id'])+'/assets?per_page=100')
-    asset=next(x for x in assets if x['id']==binding['asset_id'])
+    from research_core_v4.remediation_p0_p4_20261015.control import lookup
+    from research_core_v4.remediation_p0_p4_20261015.safety import unpack,strict_json
+    asset=lookup(lambda path:e.w.old.api(path),binding['release_id'],binding['asset_id'],binding['ciphertext_sha256'])
     e.w.old.need(asset['digest']=='sha256:'+binding['ciphertext_sha256'],'RECOVERY_ASSET_METADATA')
     blob=e.w.old.download(asset['browser_download_url'],asset['size'])
     e.w.old.need(e.a.sha(blob)==binding['ciphertext_sha256'],'RECOVERY_CIPHER_BYTES')
     packed=e.w.old.crypto.decrypt_package(blob,private_key=key,expected_public_spki_sha256=fp,temp_parent=tmp)
-    raw=gzip.decompress(packed);value=e.w.old.crypto.strict_json(raw)
+    raw=unpack(packed);value=strict_json(raw)
     e.w.old.need(e.a.enc(value)==raw,'RECOVERY_CANONICAL_BYTES')
     if binding.get('canonical_sha256'):e.w.old.need(e.a.sha(raw)==binding['canonical_sha256'],'RECOVERY_PRIMARY_BINDING')
     return value,{'release_id':binding['release_id'],'asset_id':asset['id'],'ciphertext_sha256':e.a.sha(blob),'canonical_sha256':e.a.sha(raw),'gzip_sha256':e.a.sha(packed)}
