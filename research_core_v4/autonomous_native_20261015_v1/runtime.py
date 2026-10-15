@@ -68,19 +68,31 @@ def dispatch(a,generation,sequence):
     raise RuntimeError('STALLED_INTENT_STOP_DISPATCH_UNKNOWN')
 
 class EvidenceCollector(Collector):
-    def __init__(self,caps,guard):super().__init__(caps);self.guard=guard;self.last_evidence=None
+    def __init__(self,caps,guard):
+        super().__init__(caps);self.guard=guard;self.last_evidence=None;self.operation_request=None;self.request_sequence=0
     def send(self,req,historical=False):
-        self.last_evidence=None
-        self.guard()
-        self.last_evidence={'request_type':type(req).__name__}
+        # Bind the current operation before a guard can fail. Never copy a global
+        # prior envelope into a new request. Missing domain stays explicitly unbound.
+        self.last_evidence=None;self.request_sequence+=1
+        identity=self.operation_request
+        if isinstance(identity,dict):
+            identity.update(account=getattr(req,'ctidTraderAccountId',None),server=getattr(self.tr,'host',None),sequence=self.request_sequence)
+            try:h=request_identity(identity)
+            except Exception:h=None
+        else:h=None
+        evidence={'request_type':type(req).__name__,'phase':'PRE_SEND_GUARD'}
+        if h:evidence.update(request=copy.deepcopy(identity),request_hash=h)
+        self.last_evidence=evidence
         try:
-            result=super().send(req,historical)
-            self.last_evidence.update(response_type=type(result).__name__,response_b64=base64.b64encode(result.SerializeToString()).decode())
+            self.guard();evidence['phase']='TRANSPORT_SEND_OR_RECEIVE'
+            result=super().send(req,historical);evidence['phase']='RESPONSE_DECODE'
+            evidence.update(response_type=type(result).__name__,response_b64=base64.b64encode(result.SerializeToString()).decode())
             env=getattr(self.tr,'last_history_envelope',None)
-            if type(req).__name__=='ProtoOAGetTrendbarsReq' and env is not None:self.last_evidence['response_envelope_b64']=base64.b64encode(env.SerializeToString()).decode()
-            return result
+            if type(req).__name__=='ProtoOAGetTrendbarsReq' and env is not None:evidence['response_envelope_b64']=base64.b64encode(env.SerializeToString()).decode()
+            evidence['phase']='RESPONSE_ACCEPTED';return result
         except Exception as ex:
-            self.last_evidence.update(exception_class=type(ex).__name__,exception_category=exception_category(ex));raise
+            evidence.update(exception_class=type(ex).__name__,exception_category=exception_category(ex));raise
+        finally:self.operation_request=None
 
 def remaining(st,a):
     reserve=Counter('M5' if q['k']=='M5' else 'BID_ASK' for q in st.get('uncertain_wire',[]))

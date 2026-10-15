@@ -162,3 +162,20 @@ def executable_inventory(root):
             path=root/rel
             if path.is_file():loaded[rel]=sha(path.read_bytes())
     return {'source_sha256':sources,'static_import_edges':imports,'loaded_runtime_sha256':loaded,'unresolved':missing,'external_build_dependencies':'requirements.lock;CSharp_Contract_no_NuGet_dependencies','scope':'ALL_TRACKED_EXECUTABLE_AND_STRUCTURED_SOURCES;DYNAMIC_EDGES_FLAGGED_NOT_ASSUMED_CLOSED'}
+
+def artifact_chain(producer,consumer,ancestor):
+    required=('head','run_id','job_id','artifact_sha256','artifact_size','artifact_name')
+    require(all(k in producer and k in consumer for k in required),'ARTIFACT_CHAIN_MISSING')
+    require(all(producer[k]==consumer[k] for k in ('artifact_sha256','artifact_size','artifact_name')) and producer['artifact_size']>0,'ARTIFACT_CHAIN_DIGEST')
+    require(ancestor(producer['head'],consumer['head']),'ARTIFACT_CHAIN_ANCESTRY')
+    return {'producer_job_id':producer['job_id'],'consumer_job_id':consumer['job_id'],'state':'PACKAGE_READY_ONLY','cloud_executed':False}
+
+def segment_chain(entries,max_segments=26):
+    by={e['sequence']:e for e in entries};require(len(by)==len(entries),'DUPLICATE_SEGMENT_RECEIPT')
+    result=[]
+    for i in range(1,max_segments+1):
+        e=by.get(i)
+        if e is None:result.append({'sequence':i,'state':'ABSENT'});continue
+        require(all(e.get(k) for k in ('run_id','journal_sha256','postsegment_sha256')),'SEGMENT_EVIDENCE_MISSING')
+        result.append({**e,'state':'OBSERVED_RECEIPT_NOT_ALPHA'})
+    return result

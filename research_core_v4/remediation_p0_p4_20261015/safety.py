@@ -61,7 +61,7 @@ def terminal(failed,budgets,normal='BATCH_COMPLETE_READY_FOR_HANDOFF',other=()):
 
 def request_identity(req):
     fields=('account','server','s','k','a','b','sequence')
-    require(all(k in req for k in fields),'REQUEST_IDENTITY_MISSING')
+    require(all(k in req for k in fields) and bool(req['account']) and bool(req['server']),'REQUEST_IDENTITY_MISSING')
     return sha(canonical({k:req[k] for k in fields}))
 
 def bind_failure(item,evidence):

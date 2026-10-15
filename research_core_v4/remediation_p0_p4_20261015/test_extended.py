@@ -292,3 +292,50 @@ def _test_systemic_public_enum_safe(self):
     self.assertEqual(exception_category(RuntimeError('BROKER_OA_AUTH_TOKEN_EXPIRED SYNTHETIC_SECRET')),'UNCLASSIFIED_EXCEPTION')
 P1Final.test_systemic_public_enum_safe=contracts('MXM-EXISTING-N23.3')(_test_systemic_public_enum_safe)
 MAPPING['MXM-EXISTING-N23.3']='test_systemic_public_enum_safe'
+
+def _test_collector_fault_evidence_request_scope(self):
+    from types import SimpleNamespace
+    from research_core_v4.autonomous_native_20261015_v1 import runtime as runtime
+    for phase in ('guard','TLS_send','decode','after_response','cold_restart'):
+        guard=(lambda:(_ for _ in ()).throw(RuntimeError('SYNTHETIC_GUARD'))) if phase=='guard' else lambda:None
+        col=runtime.EvidenceCollector({'M5':1,'BID_ASK':1},guard);col.tr=SimpleNamespace(host='AUTHENTICATED_SYNTHETIC_LIVE_HOST',last_history_envelope=None)
+        col.last_evidence={'response_b64':'SYNTHETIC_PRIOR_A'};request={'s':9,'k':'bid','a':10,'b':20};col.operation_request=request
+        if phase=='TLS_send':effect=ConnectionError('send failed')
+        else:
+            class Response:
+                def SerializeToString(self):
+                    if phase=='decode':raise ValueError('SYNTHETIC_DECODE')
+                    return b'SYNTHETIC_CURRENT_B'
+            effect=None
+        with patch.object(runtime.Collector,'send',side_effect=effect,return_value=Response() if phase!='TLS_send' else None):
+            if phase in ('guard','TLS_send','decode'):
+                with self.assertRaises(Exception):col.send(SimpleNamespace(ctidTraderAccountId=1),True)
+            else:col.send(SimpleNamespace(ctidTraderAccountId=1),True)
+        proof=s.bind_failure({'request':request},col.last_evidence);self.assertEqual(proof['state'],'REQUEST_BOUND');self.assertNotIn('SYNTHETIC_PRIOR_A',json.dumps(proof));self.assertIsNone(col.operation_request)
+        self.assertEqual(col.last_evidence['request_hash'],s.request_identity(request))
+P0Final.test_collector_fault_evidence_request_scope=contracts('MXM-EXISTING-N35.3')(_test_collector_fault_evidence_request_scope)
+MAPPING['MXM-EXISTING-N35.3']='test_collector_fault_evidence_request_scope'
+
+def _test_artifact_chain_and_absent_segment(self):
+    a={'head':'A','run_id':1,'job_id':10,'artifact_sha256':'a'*64,'artifact_size':100,'artifact_name':'X_v9R1.algo'};b={**a,'head':'B','job_id':11}
+    self.assertEqual(c.artifact_chain(a,b,lambda x,y:(x,y)==('A','B'))['state'],'PACKAGE_READY_ONLY')
+    self.reject('ARTIFACT_CHAIN_DIGEST',c.artifact_chain,a,{**b,'artifact_name':'X_v9.algo'},lambda *a:True)
+    self.reject('ARTIFACT_CHAIN_ANCESTRY',c.artifact_chain,a,b,lambda *a:False)
+    entries=[{'sequence':i,'run_id':i,'journal_sha256':str(i),'postsegment_sha256':'r'+str(i)} for i in range(1,27) if i!=19]
+    chain=c.segment_chain(entries);self.assertEqual(chain[18],{'sequence':19,'state':'ABSENT'});self.assertEqual(sum(r['state']=='OBSERVED_RECEIPT_NOT_ALPHA' for r in chain),25)
+    self.reject('SEGMENT_EVIDENCE_MISSING',c.segment_chain,entries+[{'sequence':19,'run_id':19}])
+P4Final.test_artifact_chain_and_absent_segment=contracts('MXM-EXISTING-N20.3','MXM-EXISTING-N30.4')(_test_artifact_chain_and_absent_segment)
+MAPPING.update({i:'test_artifact_chain_and_absent_segment' for i in ('MXM-EXISTING-N20.3','MXM-EXISTING-N30.4')})
+
+def _test_every_successor_entrypoint_denies_old_grants(self):
+    from research_core_v4.autonomous_native_20261015_v1 import runtime
+    from research_core_v4.diverse_mechanism_wave_v2.authority_v2 import real_gate
+    from .policy import workflow_guard
+    self.assertEqual(workflow_guard(ROOT)['legacy_inert'],193)
+    for mode in ('bootstrap','worker','handoff','economic','Stage8','Cloud'):
+        with patch.dict(__import__('os').environ,{'MODE':mode}),patch.object(runtime.io,'api') as api,patch.object(runtime.EvidenceCollector,'connect') as connect:
+            self.reject('EXPECTED_POLICY_STOP_REMEDIATION_NO_CAMPAIGN',runtime.main)
+            api.assert_not_called();connect.assert_not_called()
+    self.reject('EXPECTED_POLICY_STOP_NO_INDEPENDENT_TRUST_ROOT',real_gate,'H')
+P4Final.test_every_successor_entrypoint_denies_old_grants=contracts('MXM-ACT-O05.3','MXM-SEM-G06.1')(_test_every_successor_entrypoint_denies_old_grants)
+MAPPING.update({i:'test_every_successor_entrypoint_denies_old_grants' for i in ('MXM-ACT-O05.3','MXM-SEM-G06.1')})

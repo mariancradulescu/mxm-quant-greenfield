@@ -114,6 +114,20 @@ def main():
     after=get('releases/412686323');require(after['body']==before['body'],'ORIGINAL_ANCHOR_CHANGED')
     proof={'state':'OWNER_VERIFIED_JOURNAL_ONLY','generation':1807,'journal_asset_id':m['id'],'canonical_sha256':JOURNAL,'ciphertext_sha256':CIPHER,'gzip_sha256':PACKED,'cold_process_readback':True,'parent_python':__import__('sys').version.split()[0],'child_python':strict_json(result.stdout).get('python_version'),'original_anchor_unchanged':True,'broker_requests':0,'orders':0,'collection_writes':0,'scope':'MANIFEST_1807_PLUS_DIRECT_REFERENCES_NOT_ALL_HISTORICAL_IMPORT_INPUTS','impact':impact,'alpha_certified':False,'HARD21':False,'source_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID']}
     pathlib.Path('verification').mkdir(exist_ok=True);pathlib.Path('verification/owner.json').write_text(json.dumps(proof,sort_keys=True)+'\n')
+    # Signature attests machine OWNER-key possession and the exact evidence
+    # digests. It is explicitly not an independent auditor signature.
+    from cryptography.hazmat.primitives import serialization,hashes
+    from cryptography.hazmat.primitives.asymmetric import padding
+    # The ephemeral key file was cleaned with the private temp directory. Load
+    # the legitimate secret again only inside a new private temporary directory.
+    with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as t:
+        sign_key,fp=_private_key_from_secret(pathlib.Path(t))
+        signer=serialization.load_pem_private_key(sign_key.read_bytes(),password=None)
+        statement={'schema':'mxm.remediation.OWNER.attestation.v1','source_head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'journal_sha256':JOURNAL,'evidence_digests':{p.name:sha(p.read_bytes()) for p in pathlib.Path('verification').glob('*') if p.is_file()},'principal':'ACTIONS_MACHINE_WITH_OWNER_KEY','independent_auditor':False,'alpha_certified':False}
+        from .safety import canonical
+        sig=signer.sign(canonical(statement),padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
+        signer.public_key().verify(sig,canonical(statement),padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
+        pathlib.Path('verification/owner-attestation.json').write_text(json.dumps({'statement':statement,'signature_b64':base64.b64encode(sig).decode(),'algorithm':'RSA-PSS-SHA256','owner_spki_sha256':fp},sort_keys=True)+'\n')
     print(json.dumps(proof,sort_keys=True))
 
 def child():

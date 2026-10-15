@@ -128,6 +128,7 @@ def acquire_quotes(db,keys,col,st,store,deadline):
    if time.monotonic()>deadline:break
    try:
     q=v1.m.ProtoOAGetTickDataReq(ctidTraderAccountId=col.aid,symbolId=request["s"],type=v1.enums.BID if request["k"]=="bid" else v1.enums.ASK,fromTimestamp=request["a"],toTimestamp=request["b"])
+    col.operation_request=request
     st["requests"]["BID_ASK"]+=1;sent+=1;res=col.send(q,True)
     if isinstance(res,v1.m.ProtoOAErrorRes):
      code=res.errorCode;ar.span(db,request["s"],request["k"],request["a"],request["b"],"PROVIDER_ERROR_"+code);wire_record(db,request,"PROVIDER_ERROR_"+code,None)
@@ -161,6 +162,7 @@ def acquire_m5(db,sid,f,col,st,store,deadline):
   raw=[];error=None
   try:
    q=v1.m.ProtoOAGetTrendbarsReq(ctidTraderAccountId=col.aid,symbolId=sid,period=v1.enums.M5,count=5000,fromTimestamp=lo,toTimestamp=hi)
+   col.operation_request=req
    st["requests"]["M5"]+=1;res=col.send(q,True)
    if isinstance(res,v1.m.ProtoOAErrorRes):
     ar.span(db,sid,"M5",lo,hi,"PROVIDER_ERROR_"+res.errorCode);wire_record(db,req,"PROVIDER_ERROR_"+res.errorCode,None)
