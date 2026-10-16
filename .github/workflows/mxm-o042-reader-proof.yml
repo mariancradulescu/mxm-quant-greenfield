@@ -1,0 +1,21 @@
+name: MXM O04.2 fixed authority reader dry run and spoof denial
+on:
+  push:
+    branches: [mxm-o04-stage-reader-proof-v1]
+permissions: {contents: read}
+jobs:
+  reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 1}
+      - run: python3 -m o042.reader_gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-o042-reader-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification/o042-reader.json
+          if-no-files-found: error
