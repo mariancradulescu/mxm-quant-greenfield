@@ -87,6 +87,23 @@ class RemainingTests(unittest.TestCase):
         receipt['native_minutes']=[2]
         self.assertTrue(r.pagination_assessment(c,[receipt],[[1,'M5',0,90000,'PARTIAL_HASMORE','h']])['state'].startswith('UNKNOWN'))
 
+    def test_partial_boundary_exact_content_join_without_identity_promotion(self):
+        c={'key':[1,'bid'],'a':50,'b':50,'sources':[{'a':50,'b':50,'state':'PARTIAL_HASMORE_BOUNDARY_UNRESOLVED'},{'a':11,'b':50,'state':'CONFIRMED_COMPLETE'}]}
+        old={'request':{'s':1,'k':'bid','a':0,'b':100},'has_more_present':True,'has_more':True,'native_tick_rows':[[50,100],[99,101]],'response_account':1,'response_sha256':'old','raw_sha256':'o'}
+        new={'request':{'s':1,'k':'bid','a':0,'b':50},'has_more_present':True,'has_more':True,'native_tick_rows':[[10,99],[50,100],[50,101]],'response_account':1,'response_sha256':'new','raw_sha256':'n'}
+        wires=[[1,'bid',0,100,'PARTIAL_HASMORE','old'],[1,'bid',0,50,'PARTIAL_HASMORE','new']]
+        out=r.pagination_assessment(c,[old,new],wires)
+        self.assertEqual(out['state'],'NATIVE_PAGINATION_BOUNDARY_RECONCILED_SOURCE_IDENTITY_STILL_UNKNOWN');self.assertEqual(out['boundary_partial_rows'],1);self.assertEqual(out['boundary_covering_rows'],2);self.assertTrue(out['quarantine_retained']);self.assertFalse(out['complete_source_identity'])
+
+    def test_boundary_join_rejects_missing_tick_and_foreign_account(self):
+        c={'key':[1,'bid'],'a':50,'b':50,'sources':[{'a':50,'b':50,'state':'PARTIAL_HASMORE_BOUNDARY_UNRESOLVED'},{'a':11,'b':50,'state':'CONFIRMED_COMPLETE'}]}
+        old={'request':{'s':1,'k':'bid','a':0,'b':100},'has_more_present':True,'has_more':True,'native_tick_rows':[[50,100],[99,101]],'response_account':1,'response_sha256':'old','raw_sha256':'o'}
+        new={'request':{'s':1,'k':'bid','a':0,'b':50},'has_more_present':True,'has_more':True,'native_tick_rows':[[10,99],[50,102]],'response_account':1,'response_sha256':'new','raw_sha256':'n'}
+        wires=[[1,'bid',0,100,'PARTIAL_HASMORE','old'],[1,'bid',0,50,'PARTIAL_HASMORE','new']]
+        self.assertTrue(r.pagination_assessment(c,[old,new],wires)['state'].startswith('UNKNOWN'))
+        new['native_tick_rows'][1]=[50,100];new['response_account']=2
+        self.assertTrue(r.pagination_assessment(c,[old,new],wires)['state'].startswith('UNKNOWN'))
+
     def test_complete_parent_chain_has_exact_three_digests(self):
         def item(i,parent=None):return {'state':'OWNER_DECODED','meta':{'id':i,'ciphertext_sha256':str(i)*64,'gzip_sha256':'g'*64,'canonical_sha256':'p'*64},'parent_ledger':parent}
         a=item(1);b=item(2,a['meta']);out=r.verify_chain(b['meta'],{1:a,2:b});self.assertTrue(out['complete']);self.assertEqual(out['nodes'],[2,1])

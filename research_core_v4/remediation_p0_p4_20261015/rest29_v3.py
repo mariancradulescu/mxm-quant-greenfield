@@ -93,6 +93,7 @@ def raw_receipt(raw,asset_id):
             from m6.cost_evidence import decode_ctrader_tick_page
             decoded=decode_ctrader_tick_page([{'timestamp':x.timestamp,'tick':x.tick} for x in res.tickData])
             d['native_tick_times_ms']=[x.timestamp_ms for x in decoded]
+            d['native_tick_rows']=[[x.timestamp_ms,x.raw_tick] for x in decoded]
         else:d['response_state']='NO_PRESERVED_NATIVE_RESPONSE'
     except Exception as ex:d['response_state']='UNKNOWN_NATIVE_DECODE_'+type(ex).__name__
     q=d.get('request') or {}
@@ -131,9 +132,28 @@ def pagination_assessment(conflict,receipts,wires):
     unresolved={'state':'UNKNOWN_CONFLICT_NO_EXACT_NATIVE_NESTING_PROOF','coverage_promoted':False,'quarantine_retained':True,'historical_values_changed':False}
     if len(conflict.get('sources',[]))!=2:return unresolved
     good=[s for s in conflict['sources'] if s['state']=='CONFIRMED_COMPLETE']
-    partial=[s for s in conflict['sources'] if s['state']=='PARTIAL_HASMORE']
+    partial=[s for s in conflict['sources'] if s['state'] in ('PARTIAL_HASMORE','PARTIAL_HASMORE_BOUNDARY_UNRESOLVED')]
     if len(good)!=1 or len(partial)!=1:return unresolved
     g,p=good[0],partial[0]
+    if p['state']=='PARTIAL_HASMORE_BOUNDARY_UNRESOLVED':
+        boundary=p['a']
+        if p['b']!=boundary:return {**unresolved,'reason':'BOUNDARY_SHAPE_NOT_POINT'}
+        for old in receipts:
+            oq=old.get('request') or {};ot=old.get('native_tick_rows',[])
+            if [oq.get('s'),oq.get('k')]!=list(conflict['key']) or not ot or min(t for t,price in ot)!=boundary or old.get('has_more') is not True:continue
+            if not any(tuple(w[:4])==(oq['s'],oq['k'],oq['a'],oq['b']) and w[4]=='PARTIAL_HASMORE' and w[5]==old.get('response_sha256') for w in wires):continue
+            for newer in receipts:
+                nq=newer.get('request') or {};nt=newer.get('native_tick_rows',[])
+                if [nq.get('s'),nq.get('k')]!=list(conflict['key']) or nq.get('b')!=boundary or not nt or not newer.get('has_more_present') or newer.get('response_account')!=old.get('response_account'):continue
+                if any(t<nq['a'] or t>nq['b'] for t,price in nt):continue
+                suffix=min(t for t,price in nt)+1 if newer['has_more'] else nq['a']
+                if (g['a'],g['b'])!=(suffix,nq['b']) or suffix>boundary:continue
+                state='PARTIAL_HASMORE' if newer['has_more'] else 'CONFIRMED_COMPLETE'
+                if not any(tuple(w[:4])==(nq['s'],nq['k'],nq['a'],nq['b']) and w[4]==state and w[5]==newer.get('response_sha256') for w in wires):continue
+                old_rows=Counter(tuple(x) for x in ot if x[0]==boundary);new_rows=Counter(tuple(x) for x in nt if x[0]==boundary)
+                if not old_rows or any(new_rows[k]<v for k,v in old_rows.items()):continue
+                return {**unresolved,'state':'NATIVE_PAGINATION_BOUNDARY_RECONCILED_SOURCE_IDENTITY_STILL_UNKNOWN','original_raw_sha256':old['raw_sha256'],'covering_raw_sha256':newer['raw_sha256'],'boundary_partial_rows':sum(old_rows.values()),'boundary_covering_rows':sum(new_rows.values()),'complete_source_identity':False}
+        return {**unresolved,'reason':'NO_HASH_BOUND_OLDER_PAGE_WITH_EXACT_BOUNDARY_CONTENT_JOIN'}
     for r in receipts:
         q=r.get('request') or {}
         if any(q.get(k)!=v for k,v in zip(('s','k','a','b'),(*conflict['key'],p['a'],p['b']))):continue
@@ -217,6 +237,25 @@ def recover_completed_scan(transport,key,tmp,owner):
         raw=unpack(packed);require(sha(raw)==proof['canonical_sha256'],'REST29_SCAN_CANONICAL');value=strict_json(raw,max_elements=8000000)
     require(value['source_head']==SCAN_HEAD and value['journal_sha256']==JOURNAL and value['parent_chain']['complete'],'REST29_SCAN_SCOPE')
     return value,{'artifact_id':SCAN_ARTIFACT,'artifact_sha256':SCAN_ARTIFACT_SHA,'source_head':SCAN_HEAD,'run_id':'38854115491','private_evidence':proof,'OWNER_signature_verified':True,'native_sources_read_again':0,'independent_acceptance':False}
+
+def enrich_conflict_raws(private,key,tmp,owner):
+    """Only exact conflict raw source assets, not the completed865-asset scan."""
+    metas={r['meta']['id']:r['meta'] for r in private['delta_inventory'] if r['on_current_parent_chain']}
+    metas.update({r['meta']['id']:r['meta'] for r in private['current_sources']})
+    wanted=defaultdict(set)
+    for c in private['conflict_investigations']:
+        for r in c['native_receipts']:wanted[r['asset_id']].add(r['raw_sha256'])
+    recovered={};proof=[]
+    for aid,digests in wanted.items():
+        if aid not in metas:proof.append({'asset_id':aid,'state':'SOURCE_NOT_AUTHENTICATED_IN_SCOPE'});continue
+        v=owner.read_asset(metas[aid],key,tmp);before=sha(canonical(v));found=[]
+        for raw in v.get('raw',[]):
+            digest=sha(canonical(raw))
+            if digest in digests:recovered[aid,digest]=raw_receipt(raw,aid);found.append(digest)
+        require(before==sha(canonical(v)),'REST29_ENRICH_SOURCE_CHANGED')
+        proof.append({'meta':metas[aid],'state':'OWNER_VERIFIED_UNCHANGED','raw_requested':len(digests),'raw_matched':len(set(found)),'raw_missing':len(digests-set(found)),'before_sha256':before,'after_sha256':before})
+    for c in private['conflict_investigations']:c['native_receipts']=[recovered.get((r['asset_id'],r['raw_sha256']),r) for r in c['native_receipts']]
+    private['targeted_raw_readback']=proof
 
 def validate_cold_receipt(expected,observed):
     require(all(observed.get(k)==expected[k] for k in ('ciphertext_sha256','gzip_sha256','canonical_sha256')),'REST29_COLD_RECEIPT_MISMATCH')
@@ -362,13 +401,15 @@ def main():
             from .resolution import unique_metadata
             require(set(unique_metadata(journal))=={r['meta']['id'] for r in private['current_sources']},'REST29_REUSED_SOURCE_UNIVERSE')
             private['parent_chain']=verify_chain(journal['ledger_head'],{r['meta']['id']:r for r in private['delta_inventory']})
+            enrich_conflict_raws(private,key,tmp,owner)
             wires=[w for row in private['delta_inventory'] if row['on_current_parent_chain'] for w in row['wire']]
             for c in private['conflict_investigations']:c['pagination_assessment']=pagination_assessment(c['original'],c['native_receipts'],wires)
             private.update(native_source_scan_head=SCAN_HEAD,native_source_scan_receipt=prior_receipt,source_head=os.environ['GITHUB_SHA'],family_partition=recover_family_partition(transport))
             proof=seal(private,key,tmp,owner,'rest29-owner-investigation.mxmenc')
             count=lambda rows:dict(Counter(x['state'] for x in rows))
             summary={'schema':private['schema'],'run_id':os.environ['GITHUB_RUN_ID'],'source_head':os.environ['GITHUB_SHA'],'generation':1807,'journal_sha256':JOURNAL,'prior_receipt':prior_receipt,'private_evidence':proof,'current_sources':len(private['current_sources']),'current_wire_keys':private['current_wire_keys'],'current_wire_conflicts':len(private['current_wire_conflicts']),'campaign_events':len(private['campaign_event_contacts']),'campaign_contacts':count(private['campaign_event_contacts']),'historical_order_contacts':count(private['historical_contacts']),'cost_reference_contacts':count(private['cost_reference_contacts']),'cost_reference_sources':len(private['cost_reference_sources']),'delta_assets_examined':len(private['delta_inventory']),'delta_assets_verified':sum(r['state']=='OWNER_DECODED' for r in private['delta_inventory']),'parent_chain_complete':private['parent_chain']['complete'],'parent_chain_nodes':len(private['parent_chain']['nodes']),'conflicts':[{'id':c['conflict_id'],'native_receipt_count':c['native_receipt_count'],'disposition':c['disposition']} for c in private['conflict_investigations']],'unbound_failures':len({r['raw_sha256'] for r in private['unbound_failure_investigations']}),'historical_full_impact_closed':False,'original_checkpoint_changed':False,'outcomes_recomputed':False,'new_broker_requests':0,'orders':0,'alpha_certified':False,'HARD21':False,'independent_acceptance':False,'P0_limits':limits,'HTTP_methods':dict(transport.methods)}
-            summary.update(native_pagination_assessments=[{'id':c['conflict_id'],**c['pagination_assessment']} for c in private['conflict_investigations']],delta_unavailable_reasons=dict(Counter(r.get('reason','UNKNOWN') for r in private['delta_inventory'] if r['state']!='OWNER_DECODED')),parent_chain_missing_asset_id=private['parent_chain'].get('missing_asset_id'),historical_order_records=len(private['historical_contacts']),cost_reference_events=len(private['cost_reference_contacts']),raw_response_states=dict(Counter(r.get('response_state','NATIVE_RESPONSE_DECODED') for r in private['raw_receipts'])),raw_complete_source_identity=sum(r['complete_source_identity'] for r in private['raw_receipts']),physical_failure_cause='UNKNOWN;NO_EXACT_DISPATCH_SERVER_IDENTITY_RECOVERED')
+            summary.update(native_pagination_assessments=[{'id':c['conflict_id'],**{k:v for k,v in c['pagination_assessment'].items() if k in ('state','reason','coverage_promoted','quarantine_retained','historical_values_changed','complete_source_identity')}} for c in private['conflict_investigations']],delta_unavailable_reasons=dict(Counter(r.get('reason','UNKNOWN') for r in private['delta_inventory'] if r['state']!='OWNER_DECODED')),parent_chain_missing_asset_id=private['parent_chain'].get('missing_asset_id'),historical_order_records=len(private['historical_contacts']),cost_reference_events=len(private['cost_reference_contacts']),raw_response_states=dict(Counter(r.get('response_state','NATIVE_RESPONSE_DECODED') for r in private['raw_receipts'])),raw_complete_source_identity=sum(r['complete_source_identity'] for r in private['raw_receipts']),physical_failure_cause='UNKNOWN;NO_EXACT_DISPATCH_SERVER_IDENTITY_RECOVERED')
+            summary['targeted_raw_readback']=[{k:v for k,v in r.items() if k in ('state','raw_requested','raw_matched','raw_missing')} for r in private['targeted_raw_readback']]
             summary.update(family_partition=private['family_partition'],campaign_unique_symbol_time_pairs=len({(r.get('sid'),r.get('t')) for r in private['campaign_event_contacts']}),campaign_old_entry_states=dict(Counter(str(r.get('old_entry_state')) for r in private['campaign_event_contacts'])),native_source_scan_head=SCAN_HEAD,native_sources_read_again=0)
             from cryptography.hazmat.primitives import serialization,hashes
             from cryptography.hazmat.primitives.asymmetric import padding
