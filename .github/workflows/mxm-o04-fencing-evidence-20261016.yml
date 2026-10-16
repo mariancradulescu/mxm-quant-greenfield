@@ -31,3 +31,51 @@ jobs:
           name: mxm-o04-fencing-${{ github.sha }}
           path: verification/o04-*.json
           if-no-files-found: error
+  live_synthetic_git_cas:
+    needs: isolated_fence_and_authority_evidence
+    if: github.run_attempt == 1 && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      proof_ref: ${{ steps.live.outputs.proof_ref }}
+      candidate: ${{ steps.live.outputs.candidate }}
+      expected: ${{ steps.live.outputs.expected }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - name: Real GitHub CAS on a new run-scoped synthetic ref only
+        id: live
+        run: python3 -m research_core_v4.writer_fencing_o04_20261016.live_proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-o04-live-cas-${{ github.sha }}
+          path: verification/o04-live-proof.json
+          if-no-files-found: error
+  live_ungranted_token_denied:
+    needs: live_synthetic_git_cas
+    if: github.run_attempt == 1 && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 1}
+      - name: Read-only token cannot move even the synthetic proof ref
+        run: python3 -m research_core_v4.writer_fencing_o04_20261016.live_proof --unauthorized
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROOF_REF: ${{ needs.live_synthetic_git_cas.outputs.proof_ref }}
+          CANDIDATE: ${{ needs.live_synthetic_git_cas.outputs.candidate }}
+          EXPECTED: ${{ needs.live_synthetic_git_cas.outputs.expected }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-o04-ungranted-${{ github.sha }}
+          path: verification/o04-unauthorized.json
+          if-no-files-found: error
