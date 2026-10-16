@@ -92,10 +92,26 @@ def main():
         require(result.returncode==0 and strict_json(result.stdout)['canonical_sha256']==JOURNAL,'COLD_PROCESS_READBACK')
         from .impact import inspect
         impact=inspect(journal,read_asset,key,tmp,root)
+        from .resolution import economic_errata,write_private,consumer_state
+        resolution_pins=strict_json((root/'research_core_v4/remediation_p0_p4_20261015/resolution_sources.json').read_bytes())
+        # Only immutable, previously accepted reports. No economic module main(),
+        # feature replay, quote reconstruction or new scenario evaluation.
+        corrected_meta=resolution_pins['corrected']['body']['primary']
+        historical_meta=resolution_pins['historical_order']['body']['primary']
+        accepted_meta=strict_json((root/'research_core_v4/root_cause_economic_20261014_v1/AUTHORITY_V1.json').read_bytes())['accepted_primary']
+        saved_corrected=read_asset(corrected_meta,key,tmp)
+        saved_accepted=read_asset(accepted_meta,key,tmp)
+        saved_historical=read_asset(historical_meta,key,tmp)
+        economic_labels=economic_errata(saved_corrected,saved_accepted,saved_historical,{'corrected':corrected_meta,'accepted':accepted_meta,'historical':historical_meta})
+        economic_proof=write_private(economic_labels,root,key,tmp,bounded_decrypt,'economic-label-errata.mxmenc')
+        # OWNER signature below binds this receipt and the encrypted per-case
+        # populations. Public logs contain no private market rows or PnL values.
+        economic_receipt={'schema':economic_labels['schema'],'verified':True,'case_count':len(economic_labels['cases']),'sources':{name:{k:meta[k] for k in ('id','canonical_sha256','ciphertext_sha256','gzip_sha256')} for name,meta in economic_labels['sources'].items()},'input_before_sha256':economic_labels['input_before_sha256'],'input_after_sha256':economic_labels['input_after_sha256'],'private_evidence':economic_proof,'original_numbers_changed':False,'new_outcomes':0,'new_NET':None,'HARD21':False,'independent_acceptance':False}
+        pathlib.Path('verification/economic-label-receipt.json').write_text(json.dumps(economic_receipt,sort_keys=True)+'\n')
         from .economics import EconomicReader
         checkpoint={'generation':1807,'journal_sha256':JOURNAL}
         receipt={**checkpoint,'state':'COMMITTED','owner_readback':True,'writer_active':False,'sequence':journal['autonomy']['sequence']}
-        state=EconomicReader(tmp/'economic-reader.sqlite').evaluate(checkpoint,receipt)
+        state=EconomicReader(tmp/'economic-reader.sqlite').evaluate(checkpoint,receipt,consumer_state(impact['resolution']))
         state.update(source_run_id=body['run_id'],source_head=body['execution_source_head'],current_authority='REMEDIATION_READ_ONLY;NO_RESEARCH')
         pathlib.Path('verification/economic-state.json').write_text(json.dumps(state,sort_keys=True)+'\n')
         lineage=[]

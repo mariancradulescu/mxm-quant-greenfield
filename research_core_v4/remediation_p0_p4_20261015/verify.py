@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 from . import test_acceptance as tests
 from . import test_extended as extended
+from . import test_resolution as resolution_tests
 from .safety import canonical,sha,BASE
 ROOT=pathlib.Path(__file__).resolve().parents[2];P=pathlib.Path(__file__).parent
 
@@ -25,7 +26,7 @@ def main():
     with patch.object(socket,'create_connection',side_effect=RuntimeError('NETWORK_FORBIDDEN_OFFLINE_TEST')):
         for phase in ('P0','P1','P2','P3','P4'):
             if stopped:results.append({'phase':phase,'state':'NOT_RUN_DEPENDENCY_FAILED','passed':[],'failed':[]});continue
-            suite=unittest.TestSuite([unittest.defaultTestLoader.loadTestsFromTestCase(getattr(tests,phase)),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(extended,phase+'More')),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(extended,phase+'Final'))])
+            suite=unittest.TestSuite([unittest.defaultTestLoader.loadTestsFromTestCase(getattr(tests,phase)),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(extended,phase+'More')),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(extended,phase+'Final')),unittest.defaultTestLoader.loadTestsFromTestCase(getattr(resolution_tests,phase))])
             result=unittest.TextTestRunner(verbosity=2,resultclass=Result).run(suite)
             results.append({'phase':phase,'state':'PASS' if result.wasSuccessful() else 'FAIL','passed':result.passed,'failed':result.failed});stopped=not result.wasSuccessful()
     passed={name for x in results for name in x['passed']};failed={name for x in results for name in x['failed']}

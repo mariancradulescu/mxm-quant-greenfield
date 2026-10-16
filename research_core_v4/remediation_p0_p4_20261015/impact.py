@@ -8,12 +8,14 @@ from collections import Counter,defaultdict
 from .safety import canonical,sha,require
 
 def inspect(journal,read,key,tmp,root):
+    from .resolution import EvidenceIndex, unique_metadata
+    indexer=EvidenceIndex(journal)
     # This is the exact current-checkpoint reachable set, not every historical
     # import attempt or deleted log. Missing source manifests remain explicit.
     metas=[]
     for field in ('shards','record_shards','snapshots_v2','increments_v2'):
         value=journal.get(field,[]);metas.extend(value.values() if isinstance(value,dict) else value)
-    unique={m['id']:m for m in metas};receipts=[];wire={};collisions=[];spans=defaultdict(list);totals=Counter();source_binds=Counter()
+    unique=unique_metadata(journal);receipts=[];wire={};collisions=[];spans=defaultdict(list);totals=Counter();source_binds=Counter()
     for index,meta in enumerate(unique.values()):
         record={'asset_id':meta['id'],'release_id':meta.get('release_id'),'ciphertext_sha256':meta.get('ciphertext_sha256'),'gzip_sha256':meta.get('gzip_sha256'),'canonical_sha256':meta.get('canonical_sha256')}
         try:
@@ -40,10 +42,12 @@ def inspect(journal,read,key,tmp,root):
                     from .safety import bind_failure
                     state=bind_failure(raw,evidence).get('state');local['failure_'+state]+=1
             source_binds['objects_without_complete_row_account_server_receipt']+=int('source_receipt' not in value)
+            indexer.consume(meta,value)
             record.update(state='OWNER_VERIFIED',counts=dict(local));totals.update(local)
         except Exception as ex:
             code=str(ex) if re.fullmatch('[A-Z0-9_]{1,100}',str(ex)) else 'OWNER_SOURCE_'+type(ex).__name__
             record.update(state='UNKNOWN_ASSET_NOT_VERIFIED',exception_class=type(ex).__name__,safe_code=code);totals['unverified_assets']+=1
+            indexer.unavailable(meta,code)
         receipts.append(record)
         if index%20==0:print(json.dumps({'phase':'PRESERVED_CHECKPOINT_INTEGRITY_READBACK','objects_inspected':index+1,'objects_total':len(unique)}),flush=True)
     # Compare overlap categories, without rewriting original interval ledger.
@@ -63,4 +67,11 @@ def inspect(journal,read,key,tmp,root):
     private=out/'owner-impact.mxmenc';encrypt_shard(gzip.compress(canonical(result),mtime=0),public_key=root/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem',output=private)
     public={'scope':result['scope'],'expected_assets':len(unique),'verified_assets':sum(r['state']=='OWNER_VERIFIED' for r in receipts),'unverified_assets':sum(r['state']!='OWNER_VERIFIED' for r in receipts),'private_inventory_ciphertext_sha256':sha(private.read_bytes()),'observed_integrity_counts':{'wire_conflicts':len(collisions),'overlapping_span_conflict_candidates':len(conflict_ranges),'invalid_finite_or_volume':totals.get('invalid_finite_or_volume',0),'invalid_bar_clock':totals.get('invalid_bar_clock',0),'out_of_domain_tick':totals.get('out_of_domain_tick',0),'failure_evidence_unbound':totals.get('failure_EVIDENCE_UNBOUND',0)},'failure_categories':dict(Counter(r.get('safe_code','UNCLASSIFIED') for r in receipts if r['state']!='OWNER_VERIFIED')),'historical_impact_closed':False,'no_global_clean_claim':True,'broker_requests':0,'new_outcomes':0}
     (out/'owner-impact-summary.json').write_text(json.dumps(public,sort_keys=True)+'\n')
+    from .resolution import write_private,public_summary
+    from .owner import bounded_decrypt
+    detailed=indexer.finish()
+    private_proof=write_private(detailed,root,key,tmp,bounded_decrypt)
+    resolution=public_summary(detailed,private_proof)
+    (out/'resolution-summary.json').write_text(json.dumps(resolution,sort_keys=True)+'\n')
+    public['resolution']=resolution
     return public
