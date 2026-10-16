@@ -1,11 +1,11 @@
-name: MXM O04.2 isolated issuer custody and staging proof
+name: MXM O04.2 preflight only no installation tokens
 on:
   push:
-    branches: [mxm-o04-issuer-code-v3]
+    branches: [mxm-o04-preflight-code-v1]
 permissions: {}
 jobs:
   issue:
-    if: github.event_name == 'push' && github.actor_id == '322088485' && github.ref == 'refs/heads/mxm-o04-issuer-code-v3'
+    if: github.actor_id == '322088485' && github.event_name == 'push'
     uses: ./.github/workflows/mxm-o042-issuer.yml
     secrets:
       O04_CUSTODY_CANARY: ${{ secrets.O04_CUSTODY_CANARY }}
@@ -14,45 +14,3 @@ jobs:
       contents: read
       actions: read
       id-token: write
-  generic_write_boundary:
-    outputs:
-      candidate: ${{ steps.boundary.outputs.candidate }}
-    needs: issue
-    if: github.run_attempt > 1
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions: {contents: write}
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 1}
-      - id: boundary
-        run: python3 -m o042.native_probe
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PROBE_ROLE: CONTENTS_WRITE
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: mxm-o042-generic-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification/o042-*.json
-          if-no-files-found: error
-  readonly_boundary:
-    needs: [issue, generic_write_boundary]
-    if: github.run_attempt > 1
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions: {contents: read}
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 1}
-      - run: python3 -m o042.native_probe
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PROBE_ROLE: CONTENTS_READ
-          READONLY_CANDIDATE: ${{ needs.generic_write_boundary.outputs.candidate }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: mxm-o042-readonly-${{ github.run_id }}-${{ github.run_attempt }}
-          path: verification/o042-*.json
-          if-no-files-found: error
