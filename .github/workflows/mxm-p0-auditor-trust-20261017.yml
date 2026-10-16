@@ -1,0 +1,30 @@
+name: MXM P0 independent auditor trust preparation NO GO
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/p0_auditor_trust_20261017/**
+      - .github/workflows/mxm-p0-auditor-trust-20261017.yml
+permissions:
+  contents: read
+jobs:
+  public-lifecycle-only:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.actor_id == '322088485' && github.run_attempt == 1 && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.sha == github.event.after
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false, fetch-depth: 1}
+      - name: Only12 new synthetic enrollment and lifecycle tests
+        run: python3 -m research_core_v4.p0_auditor_trust_20261017.test_lifecycle
+      - name: Five GET preservation observations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.p0_auditor_trust_20261017.preserve
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-p0-auditor-trust-${{ github.sha }}
+          path: verification/p0-auditor-trust/
+          if-no-files-found: error
+          retention-days: 90
