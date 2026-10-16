@@ -1,0 +1,32 @@
+name: MXM O04.2 single-job protected issuer
+on:
+  workflow_call:
+permissions: {}
+jobs:
+  acceptor:
+    if: github.actor_id == '322088485' && github.ref == 'refs/heads/mxm-o04-issuer-code-v1' && github.event_name == 'push'
+    environment: mxm-o04-staging-issuer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 1}
+      - name: Authenticate workload before App token issuance; no credential output
+        run: python3 -m o042.issuer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CODE_FREEZE_RULE_ID: ${{ vars.O04_CODE_FREEZE_RULE_ID }}
+          CUSTODY_CANARY: ${{ secrets.O04_CUSTODY_CANARY }}
+          APP_PRIVATE_KEY: ${{ secrets.O04_ACCEPTOR_APP_PRIVATE_KEY }}
+          CUSTODY_ACCEPTANCE_RUN: ${{ vars.O04_CUSTODY_ACCEPTANCE_RUN }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-o042-${{ github.run_id }}-${{ github.run_attempt }}
+          path: verification/o042-*.json
+          if-no-files-found: error
+          retention-days: 90
