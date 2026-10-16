@@ -2,7 +2,23 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
-## Etapa curentă — supersesiune izolată a consumatorilor, fără restart
+## Etapa curentă — arhitectura încrederii auditorului, frontieră de înrolare reală
+
+OWNER a confirmat în conversația curentă recepția independentă SYNTHETIC_SUPERSESSION_PREPARATION_NO_GO la `e1d021a72ab3ada68b86851b74ebc4efc2cee8b3`, exclusiv în domeniul sintetic. Nu este GO. Confirmarea este consemnată ca proveniență conversațională, fără semnătură criptografică independentă nouă.
+
+Rezultat curent propus recepției: **PUBLIC_TRUST_VERIFIER_READY_AWAITING_INDEPENDENT_ENROLLMENT_NO_GO**. Sursa testată `8326f992141f519316e06a583a482a284be17905`, [run38967638370](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/38967638370), job117197963654, attempt1 **SUCCESS**: **12 teste noi PASS**,32 controale negative,5GET de păstrare și zero scrieri de autoritate. Cele37 teste de supersesiune, O04.2 și auditurile anterioare nu au fost reluate.
+
+[Raport pentru auditor](docs/p0-auditor-trust/20261017/REPORT.md), [soluția principală recomandată](docs/p0-auditor-trust/20261017/RECOMMENDED_ARCHITECTURE.md), [unica decizie OWNER pregătită](docs/p0-auditor-trust/20261017/OWNER_SINGLE_DECISION_REQUIRED.json), [rezultate](docs/p0-auditor-trust/20261017/summary.json), [index/hashuri](docs/p0-auditor-trust/20261017/EVIDENCE_INDEX.json), [GitHub readback](docs/p0-auditor-trust/20261017/GITHUB_READBACK_RECEIPT.json).
+
+Soluție: un auditor/custode independent deține exclusiv cheia Ed25519 locală criptată; OWNER acceptă o singură dată identitatea/custodia și pinul public genesis/SPKI pe canal independent. GitHub distribuie numai documente publice semnate. Rotația normală este cross-signed vechi+nou; revocarea produce STOP. Codul nou verifică efectiv pin/posesie, lifecycle, expirare, identitate/context/provocare și un TrustedHead extern proaspăt. Nu există încă persoană/custodie reală verificată ori mecanism independent de head instalat. Un repository mutabil sau o conversație ChatGPT nu le substituie.
+
+**Frontieră obligatorie:** actul MXM-OWNER-AUDITOR-ENROLLMENT-001 este neaprobat, cu câmpurile identitate/fingerprint/genesis null până când custodele independent furnizează pachetul public și OWNER verifică și acceptă înrolarea completă. Nicio cheie privată reală de auditor nu a fost generată/importată/folosită. Backendul real este refuzat necondiționat. Nicio înrolare ori semnătură în numele auditorului nu a fost fabricată.
+
+**Registrul rămâne163 PASS/28 BLOCKED**, inclusiv MXM-SEM-G03.2. Cele10 rulesets nu au fost modificate;25268790 activă fără bypass, active-v1 absentă, OWNER1807/staging neschimbate. Nu există migrare operațională, issuer/writer real, bootstrap, cercetare, broker I/O sau restart. Artefact12076100839, SHA256 `bae146fc7ed725a9cb2005e89752f758f79cd27de30b27f51230e6b725cc5318`, este păstrat integral în Git și citirea ulterioară se dovedește prin receipt separat.
+
+Secțiunile următoare păstrează snapshoturile etapelor recepționate anterior; starea lor de la publicare nu se rescrie. Etapa de față așteaptă recepția independentă și decizia de înrolare, fără activare implicită.
+
+## Snapshotul etapei precedente — supersesiune izolată a consumatorilor, fără restart
 
 OWNER a confirmat în conversația curentă recepția independentă FUTURE_AUTHORITY_DENY_INSTALLED_NO_GO la `9678e920627f3f8684be3a4ba98d61b847d28c81`, exclusiv în limitele verificate, apoi a autorizat implementarea izolată a selectorului/adaptoarelor pentru viitori consumatori. Confirmarea se consemnează cu proveniență conversațională, fără semnătură nouă atribuită auditorului.
 
