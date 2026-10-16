@@ -19,7 +19,7 @@ def custody():
  i.need(i.sha(os.environ.get('CUSTODY_CANARY','').encode())==CANARY_HASH,'CUSTODY_CANARY_NOT_AVAILABLE')
  # The fixed, single-job reusable file is part of the frozen code tree.
  i.need(os.environ['GITHUB_JOB']=='acceptor','WORKLOAD_JOB')
- output('o042-custody',{'schema':'mxm.o042.custody.v1','workload':workload,'canary_matched':True,'key_generated':False,
+ output('o042-custody',{'schema':'mxm.o042.custody.v1','workload':workload,'canary_matched':True,'key_generated_by_this_job':False,'App_key_present_in_approved_job':bool(os.environ.get('APP_PRIVATE_KEY')),
   'new_APP_token_issued':False,'OWNER_ACCEPTS_NEW_CHECKPOINTS':False,'PRODUCTION_GO':False})
  return workload
 
@@ -61,9 +61,10 @@ def main():
  if not private:return
  # Key is available only after the canary and immutable-source boundary were
  # proven. This process is the issuer, not an untrusted writer holding a key.
- i.need(os.environ.get('CUSTODY_ACCEPTANCE_RUN','').isdigit(),'CUSTODY_RECEIPT_REQUIRED')
- status,prior=i.api('actions/runs/'+os.environ['CUSTODY_ACCEPTANCE_RUN'],os.environ['GH_TOKEN'])
- i.need(status==200 and prior['head_sha']==workload['sha'] and prior['conclusion']=='success','CUSTODY_RECEPTION')
+ prior_binding=os.environ.get('CUSTODY_ACCEPTANCE_RUN','').split(':')
+ i.need(len(prior_binding)==2 and all(x.isdigit() for x in prior_binding) and prior_binding[0]==workload['run_id'] and int(prior_binding[1])<int(workload['run_attempt']),'CUSTODY_RECEIPT_REQUIRED')
+ status,prior=i.api('actions/runs/'+prior_binding[0]+'/attempts/'+prior_binding[1],os.environ['GH_TOKEN'])
+ i.need(status==200 and prior['head_sha']==workload['sha'] and prior['head_branch']==i.CODE_BRANCH and prior['conclusion']=='success','CUSTODY_RECEPTION')
  lab.REF=i.AUTH_REF;results={};app_token=None
  with tempfile.TemporaryDirectory() as tmp:
   d=pathlib.Path(tmp);signer=Signer(private,d);del private
@@ -71,7 +72,10 @@ def main():
   status,_=i.http('https://api.github.com/app/installations/'+str(i.INSTALLATION_ID)+'/access_tokens',signer.jwt(True),'POST',{'repository_ids':[i.REPO_ID],'permissions':{'contents':'write'}})
   i.need(status==401,'EXPIRED_APP_JWT_NOT_REJECTED');results['expired_app_jwt']={'server_HTTP':status,'tokens_issued':0}
   status,grant=i.http('https://api.github.com/app/installations/'+str(i.INSTALLATION_ID)+'/access_tokens',signer.jwt(),'POST',{'repository_ids':[i.REPO_ID],'permissions':{'contents':'write'}})
-  i.need(status==201 and grant['permissions'].get('contents')=='write','APP_TOKEN_ISSUANCE');app_token=grant['token'];expires=grant['expires_at'];del grant
+  i.need(status==201 and grant['permissions'].get('contents')=='write' and set(grant['permissions'])<={'contents','metadata'},'APP_TOKEN_ISSUANCE');app_token=grant['token'];expires=grant['expires_at'];del grant
+  status,scope=i.http('https://api.github.com/installation/repositories',app_token)
+  i.need(status==200 and [r['id'] for r in scope['repositories']]==[i.REPO_ID],'APP_REPOSITORY_SCOPE')
+  results['token_scope']={'repository_ids':[i.REPO_ID],'permissions':{'contents':'write','metadata':'read'},'token_exported':False}
   try:
    native=os.environ['GH_TOKEN'];status,owner=i.api('releases/412686323',native);before=owner['body']
    i.need(i.sha(before.encode())==ROOT['owner_release_body_sha256'],'OWNER_ANCHOR')
@@ -81,7 +85,7 @@ def main():
    if status==404:genesis=p.genesis();results['app_create_CAS']={'server_oid':genesis,'principal_app_id':i.APP_ID}
    else:i.need(status==200,'AUTH_REF_READ')
    oid,s=p.read();claimed=p.claim(oid,'approved-'+workload['run_id']+'-'+workload['run_attempt']);proposal=p.proposal(claimed,'SYNTHETIC_ONLY-'+workload['run_id']+'-'+workload['run_attempt'])
-   mutations={'manifest':lambda q:q.update(manifest=base64.b64encode(b'SYNTHETIC_ONLY altered').decode()),'signature':lambda q:q.update(signature=base64.b64encode(b'bad').decode()),'source_SHA':lambda q:q['record'].update(source_SHA='0'*40),'version':lambda q:q['record'].update(version=99),'epoch':lambda q:q['record'].update(epoch=0),'expired_lease':lambda q:q['record'].update(lease_until=1)}
+   mutations={'manifest':lambda q:q.update(manifest=base64.b64encode(b'SYNTHETIC_ONLY altered').decode()),'ciphertext':lambda q:q.update(ciphertext=base64.b64encode(b'SYNTHETIC_ONLY altered').decode()),'signature':lambda q:q.update(signature=base64.b64encode(b'bad').decode()),'source_SHA':lambda q:q['record'].update(source_SHA='0'*40),'version':lambda q:q['record'].update(version=99),'epoch':lambda q:q['record'].update(epoch=0),'expired_lease':lambda q:q['record'].update(lease_until=1)}
    for name,mutation in mutations.items():
     q=copy.deepcopy(proposal);mutation(q);old=p.read()[0]
     try:p.pending(claimed,q)
@@ -99,6 +103,22 @@ def main():
     try:fn()
     except lab.Denied as ex:i.need(p.read()[0]==old,'REPLAY_MUTATED');results[name]={'before':old,'after':old,'frontier_refused':str(ex)}
     else:raise i.Refused('REPLAY_ACCEPTED')
+   accepted_epoch=state['epoch'];current=p.claim(accepted,'expiry-session');valid_expiring=p.proposal(current,'SYNTHETIC_ONLY-expiry-'+workload['run_id']+'-'+workload['run_attempt'])
+   duplicate=p.proposal(current,proposal['record']['operation_id']);old=p.read()[0]
+   try:p.pending(current,duplicate)
+   except lab.Denied as ex:i.need(str(ex)=='OPERATION_REPLAY' and p.read()[0]==old,'DUPLICATE_CONTROL');results['duplicate_operation']={'reason':str(ex),'before':old,'after':old}
+   else:raise i.Refused('DUPLICATE_ACCEPTED')
+   deadline=p.read()[1]['lease_until'];time.sleep(max(0,deadline-int(time.time())+1))
+   try:p.pending(current,valid_expiring)
+   except lab.Denied as ex:i.need(str(ex)=='LEASE_EXPIRED' and p.read()[0]==old,'EXPIRY_CONTROL');results['valid_signed_lease_expired']={'reason':str(ex),'deadline':deadline,'checked_at':int(time.time()),'before':old,'after':old}
+   else:raise i.Refused('EXPIRED_LEASE_ACCEPTED')
+   fresh=p.claim(old,'new-epoch-session');old_epoch=p.read()[1]['epoch'];i.need(old_epoch==accepted_epoch+2,'EPOCH_RECOVERY')
+   try:p.pending(current,valid_expiring)
+   except lab.Denied as ex:i.need(p.read()[0]==fresh,'STALE_SESSION_CHANGED');results['previous_epoch']={'reason':str(ex),'before':fresh,'after':fresh,'epoch':old_epoch}
+   else:raise i.Refused('STALE_SESSION_ACCEPTED')
+   # Finish in a durable no-lease STOP-only staging state. No new OWNER accepts.
+   _,final_state=p.read();final_state.update(status='ACCEPTED',owner=None,session=None,lease_until=0,pending=None,mode='STAGED_READY_STOP_ONLY',OWNER_ACCEPTS_NEW_CHECKPOINTS=False,CAMPAIGN_RESTART_ALLOWED=False,PRODUCTION_GO=False)
+   accepted=t._publish(fresh,final_state);results['stop_only_finalization']={'oid':accepted,'reader':verify_state(p.read()[1]),'mode':'STAGED_READY_STOP_ONLY'}
    # Existing independent no-bypass atomic rule must still apply to App token.
    genesis_oid=t.git('rev-list','--max-parents=0',accepted).decode().strip()
    for name,args in [('force_rollback',['push','--force',REMOTE,genesis_oid+':'+i.AUTH_REF]),('delete',['push',REMOTE,':'+i.AUTH_REF])]:

@@ -21,9 +21,17 @@ def main():
  status,ref=i.api('git/ref/'+i.AUTH_REF.removeprefix('refs/'),native)
  if status==404:results.append(negative(i.AUTH_REF,'b3831d31f05a60413a2ae086c4e6dc2f9a125cd6',True))
  else:
-  i.need(status==200,'AUTH_READ');old=ref['object']['sha'];status,c=i.api('git/commits/'+old,native);i.need(status==200,'COMMIT_READ')
-  status,candidate=i.api('git/commits',native,'POST',{'message':'SYNTHETIC_ONLY unauthorized native token forward candidate','tree':c['tree']['sha'],'parents':[old]})
-  if status==201:results.append(negative(i.AUTH_REF,candidate['sha']))
+  i.need(status==200,'AUTH_READ');old=ref['object']['sha']
+  if os.environ.get('READONLY_CANDIDATE'):
+   results.append(negative(i.AUTH_REF,os.environ['READONLY_CANDIDATE']));status,c=0,None
+  else:status,c=i.api('git/commits/'+old,native);i.need(status==200,'COMMIT_READ')
+  if c is not None:status,candidate=i.api('git/commits',native,'POST',{'message':'SYNTHETIC_ONLY unauthorized native token forward candidate','tree':c['tree']['sha'],'parents':[old]})
+  else:status,candidate=403,None
+  if c is None:pass
+  elif status==201:
+   results.append(negative(i.AUTH_REF,candidate['sha']))
+   if os.environ.get('GITHUB_OUTPUT'):
+    with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('candidate='+candidate['sha']+'\n')
   else:
    i.need(os.environ.get('PROBE_ROLE')=='CONTENTS_READ' and status==403,'READONLY_OBJECT_CREATE')
    # A valid forward child is not necessary to prove read-only cannot create Git objects.
