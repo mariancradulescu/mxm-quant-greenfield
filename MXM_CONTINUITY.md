@@ -2,13 +2,23 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
-## Etapa curentă — verificare administrativă P0 read-only
+## Etapa curentă — protecție fail-closed P0, fără bootstrap
+
+OWNER a confirmat recepția administrativă la `6c743b918bccc66809cf81e2a0d2d8c874fd348a` și a autorizat punctual protecția viitoarei autorități. Ruleset **25268790** este activ pentru exact `refs/heads/mxm-o04-active-v1`, creation/update/deletion/non_fast_forward, **bypass_actors=[]**. Active ref rămâne inexistentă. Cele opt reguli existente sunt identice; OWNER1807 și staging sunt neschimbate.
+
+[Raport nou pentru recepție independentă](docs/p0-failclosed/20261016/REPORT.md), [rezumat verificare](docs/p0-failclosed/20261016/VERIFICATION_SUMMARY.json), [index și hashuri](docs/p0-failclosed/20261016/EVIDENCE_INDEX.json), [inventar consumatori](docs/p0-failclosed/20261016/HISTORICAL_CONSUMERS.json), [cerințe trust root auditor](docs/p0-failclosed/20261016/AUDITOR_TRUST_ROOT_REQUIREMENTS.md).
+
+Sursă testată `7af72e8ec1bb761b322e18c44ee9a24c01d256ab`; run38954973739 attempt1, job117155431186: **failure**, opt teste noi issuer inactiv PASS,32GET și unPOST pe ținta sintetică separată sub regula25268949. POST a fost respins422 cu mesaj generic „Reference update failed”; înainte/după ambele refs sunt404. A eșuat cerința strictă ca mesajul să atribuie refuzul explicit unei reguli; nu se declară run SUCCESS. Atribuirea rule-suite și update-ul nativ rămân neprobate. Scrierea nu se repetă; workflow-ul nou este ulterior dezactivat prin condiție literal false. Backendul issuer refuză token/bootstrap/checkpoint necondiționat, fără cheie/App/environment conectat.
+
+**Toate28 BLOCKED păstrate. Fără GO, bootstrap ori campanie.** Dosarul acestei etape așteaptă recepția auditorului; Directorul nu semnează în numele lui. Documentația și dezactivarea probei sunt ulterioare sursei executate. Recuperați finalul de publicare și dovada de readback înainte de a trata arhivarea ca verificată.
+
+## Etapă administrativă anterioară — recepționată conform OWNER
 
 OWNER a confirmat recepția independentă PREPARATION_ONLY_NO_GO la `3bd053a3b23bc94ab90d5ee66e1f466483fb42cb` și a autorizat exclusiv citiri administrative și publicarea raportului. [Raport nou pentru auditor](docs/p0-admin/20261016/REPORT.md), [observații UI](docs/p0-admin/20261016/UI_OBSERVATIONS_PUBLIC.json), [reguli native](docs/p0-admin/20261016/NATIVE_RULESETS.json), [domeniul referințelor](docs/p0-admin/20261016/REFERENCE_SCOPE.json), [delta P0](docs/p0-admin/20261016/P0_EVIDENCE_DELTA.json).
 
-Accesul administrativ a fost confirmat după reconfirmare GitHub Mobile. Politica 7689 este activă,145 ținte cu actori/evenimente permise goale și excepții native declarate. Zero colaboratori/deploy keys; două aplicații instalate. Nu există protecții clasice. Cele opt rulesets protejează O04/sursele sale, fără acoperire globală canonical/autonomous/remediation. Viitorul active-v1 nu există și nu are încă regula exclusivă creation/update. Environment-ul staging rămâne exact issuer-v3, fără tags/bypass administrativ.
+Accesul administrativ a fost confirmat după reconfirmare GitHub Mobile. Politica 7689 este activă,145 ținte cu actori/evenimente permise goale și excepții native declarate. Zero colaboratori/deploy keys; două aplicații instalate. Nu există protecții clasice. Cele opt rulesets protejează O04/sursele sale, fără acoperire globală canonical/autonomous/remediation. La snapshotul administrativ, viitorul active-v1 nu exista și nu avea încă regula exclusivă creation/update; noua etapă de mai sus adaugă această protecție. Environment-ul staging rămâne exact issuer-v3, fără tags/bypass administrativ.
 
-Componenta de vizibilitate administrativă are acum dovezi; vechiul403 nu mai este o limită generală a acestor pagini. Nu există încă autoritate reală, trust root auditor real ori supersesiune recepționată pentru rutele istorice. Martorii istorici de release/data/cache nerecuperați nu sunt fabricați. **Toate 28 BLOCKED păstrate.** Nu s-au schimbat setări/cod/workflow-uri și nu s-au repetat teste. Dosarul administrativ așteaptă recepția auditorului; orice configurație reală/GO cere autorizare separată.
+Componenta de vizibilitate administrativă are acum dovezi; vechiul403 nu mai este o limită generală a acestor pagini. Nu există încă autoritate reală, trust root auditor real ori supersesiune recepționată pentru rutele istorice. Martorii istorici de release/data/cache nerecuperați nu sunt fabricați. **Toate 28 BLOCKED păstrate.** Nu s-au schimbat setări/cod/workflow-uri și nu s-au repetat teste. OWNER a confirmat recepția administrativă la6c743b918bccc66809cf81e2a0d2d8c874fd348a; orice configurație reală/GO cere autorizare separată.
 
 ## Pregătire P0 recepționată — fără GO
 

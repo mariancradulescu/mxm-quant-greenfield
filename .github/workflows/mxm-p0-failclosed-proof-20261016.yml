@@ -12,7 +12,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   isolated-denial:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
+    # One native attempt is archived at source 7af72e8; no repeat or automatic retry.
+    if: ${{ false }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     permissions:
