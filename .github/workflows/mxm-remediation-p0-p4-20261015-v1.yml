@@ -80,3 +80,25 @@ jobs:
             verification/economic-label-receipt.json
             verification/economic-label-errata.mxmenc
           if-no-files-found: warn
+  historical_receipt_readback:
+    needs: offline_acceptance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - name: Recover exact historical receipts without rerunning workflows
+        run: python3 -m research_core_v4.remediation_p0_p4_20261015.historical_logs
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-remediation-historical-${{ github.sha }}
+          path: |
+            verification/historical-log-receipts.json
+            verification/historical-log-summary.json
+          if-no-files-found: error

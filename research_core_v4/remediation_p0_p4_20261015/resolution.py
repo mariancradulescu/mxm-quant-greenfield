@@ -125,10 +125,10 @@ class EvidenceIndex:
                     if (old['state'] in good) != (row['state'] in good):
                         conflicts.append({'key': key, 'a': max(old['a'], row['a']), 'b': min(old['b'], row['b']), 'sources': [old, row], 'disposition': 'UNKNOWN_CONFLICT_QUARANTINE', 'original_changed': False})
                 active.append(row)
-        self.errata.extend({'kind': 'SPAN_CONFLICT', **x} for x in conflicts)
-        self.errata.extend({'kind': 'WIRE_CONFLICT', **x, 'disposition': 'UNKNOWN_CONFLICT_QUARANTINE', 'original_changed': False} for x in self.wire_conflicts)
+        errata = self.errata + [{'kind': 'SPAN_CONFLICT', **x} for x in conflicts]
+        errata += [{'kind': 'WIRE_CONFLICT', **x, 'disposition': 'UNKNOWN_CONFLICT_QUARANTINE', 'original_changed': False} for x in self.wire_conflicts]
         unavailable = sum(x['state'] != 'OWNER_VERIFIED_UNCHANGED' for x in self.sources)
-        return {'schema': 'mxm.remediation.bounded.evidence.and.errata.v2', 'scope': SCOPE, 'generation': 1807, 'journal_sha256': JOURNAL, 'expected_assets': len(self.expected), 'sources': self.sources, 'unavailable_assets': unavailable, 'wire_keys_inspected': len(self.wire), 'wire_conflicts': self.wire_conflicts, 'span_conflicts': conflicts, 'raw_receipts': self.raw, 'additive_errata': self.errata, 'terminal_failure': self.terminal, 'journal_errors': self.errors, 'historical_import_locator_catalog': self.historical_catalog, 'historical_catalog_complete': False, 'physical_transport_cause': 'UNKNOWN_UNLESS_EXACT_REQUEST_BOUND_RECEIPT_EXISTS', 'global_historical_impact_closed': False, 'original_changed': False, 'new_broker_requests': 0, 'new_outcomes': 0}
+        return {'schema': 'mxm.remediation.bounded.evidence.and.errata.v2', 'scope': SCOPE, 'generation': 1807, 'journal_sha256': JOURNAL, 'expected_assets': len(self.expected), 'sources': self.sources, 'unavailable_assets': unavailable, 'wire_keys_inspected': len(self.wire), 'wire_conflicts': self.wire_conflicts, 'span_conflicts': conflicts, 'raw_receipts': self.raw, 'additive_errata': errata, 'terminal_failure': self.terminal, 'journal_errors': self.errors, 'historical_import_locator_catalog': self.historical_catalog, 'historical_catalog_complete': False, 'physical_transport_cause': 'UNKNOWN_UNLESS_EXACT_REQUEST_BOUND_RECEIPT_EXISTS', 'global_historical_impact_closed': False, 'original_changed': False, 'new_broker_requests': 0, 'new_outcomes': 0}
 
 
 def write_private(result, root, key, tmp, decrypt, filename='resolution-evidence.mxmenc'):

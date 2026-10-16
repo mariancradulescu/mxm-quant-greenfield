@@ -61,7 +61,17 @@ class EconomicReader:
         with self.db:
             self.db.execute('BEGIN IMMEDIATE')
             prior=self.db.execute('SELECT result FROM evaluation WHERE g=? AND h=?',(g,h)).fetchone()
-            if prior:return json.loads(prior[0])
+            if prior:
+                cached=json.loads(prior[0])
+                # A later authenticated erratum must dominate an earlier cached
+                # support/reference state for the same immutable checkpoint.
+                # The quarantine is monotone; missing later evidence cannot
+                # clear it or silently restore an earlier NET reference.
+                if accepted and accepted.get('data_blocked') and cached.get('status')!='DATA_BLOCKED':
+                    cached=classify(accepted)
+                    cached.update(generation=g,journal_sha256=h,sequence=receipt['sequence'],broker_requests=0,collection_write=False)
+                    self.db.execute('UPDATE evaluation SET result=? WHERE g=? AND h=?',(canonical(cached),g,h))
+                return cached
             result=classify(accepted or {})
             result.update(generation=g,journal_sha256=h,sequence=receipt['sequence'],broker_requests=0,collection_write=False)
             self.db.execute('INSERT INTO evaluation VALUES(?,?,?)',(g,h,canonical(result)))

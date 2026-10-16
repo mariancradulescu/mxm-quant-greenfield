@@ -108,6 +108,8 @@ def main():
         # populations. Public logs contain no private market rows or PnL values.
         economic_receipt={'schema':economic_labels['schema'],'verified':True,'case_count':len(economic_labels['cases']),'sources':{name:{k:meta[k] for k in ('id','canonical_sha256','ciphertext_sha256','gzip_sha256')} for name,meta in economic_labels['sources'].items()},'input_before_sha256':economic_labels['input_before_sha256'],'input_after_sha256':economic_labels['input_after_sha256'],'private_evidence':economic_proof,'original_numbers_changed':False,'new_outcomes':0,'new_NET':None,'HARD21':False,'independent_acceptance':False}
         pathlib.Path('verification/economic-label-receipt.json').write_text(json.dumps(economic_receipt,sort_keys=True)+'\n')
+        impact['resolution']['economic_label_receipt']={'verified':True,'case_count':len(economic_labels['cases'])}
+        pathlib.Path('verification/resolution-summary.json').write_text(json.dumps(impact['resolution'],sort_keys=True)+'\n')
         from .economics import EconomicReader
         checkpoint={'generation':1807,'journal_sha256':JOURNAL}
         receipt={**checkpoint,'state':'COMMITTED','owner_readback':True,'writer_active':False,'sequence':journal['autonomy']['sequence']}

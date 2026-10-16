@@ -60,6 +60,18 @@ def economic_fixture():
     return c,a,h,{'accepted':{'canonical_sha256':'a'*64}}
 
 class P3(unittest.TestCase):
+    def test_late_quarantine_dominates_cache_and_cannot_be_cleared(self):
+        import tempfile,pathlib
+        from .economics import EconomicReader
+        with tempfile.TemporaryDirectory() as tmp:
+            reader=EconomicReader(pathlib.Path(tmp)/'reader.sqlite')
+            cp={'generation':1807,'journal_sha256':'h'*64};rc={**cp,'state':'COMMITTED','owner_readback':True,'writer_active':False,'sequence':19}
+            self.assertEqual(reader.evaluate(cp,rc)['status'],'SUPPORT_ONLY')
+            blocked=reader.evaluate(cp,rc,{'data_blocked':True,'source_sha256':'h'*64})
+            self.assertEqual(blocked['status'],'DATA_BLOCKED');self.assertIsNone(blocked['NET_reference'])
+            self.assertEqual(reader.evaluate(cp,rc)['status'],'DATA_BLOCKED')
+            self.assertEqual(reader.db.execute('SELECT count(*) FROM evaluation').fetchone()[0],1)
+
     def test_saved_populations_and_equity_labels_no_recompute(self):
         args=economic_fixture();before=canonical(args);r=economic_errata(*args)
         self.assertEqual(before,canonical(args));self.assertEqual(r['input_before_sha256'],r['input_after_sha256']);self.assertIsNone(r['new_NET']);self.assertEqual(r['new_outcomes'],0);self.assertEqual(r['historical_reference']['decision'],'CLOSED_NEGATIVE');self.assertFalse(r['successor_continuous_ledger']['real_account_certified'])
@@ -82,3 +94,36 @@ class P4(unittest.TestCase):
     def test_public_summary_does_not_leak_private_locator_or_promote(self):
         i=EvidenceIndex(journal(1));i.consume(meta(1),{'raw':[{'request':{'account':'PRIVATE_ACCOUNT_CANARY','s':1},'state':'UNKNOWN_TRANSPORT'}]});r=i.finish();s=public_summary(r,{'ciphertext_sha256':'x'*64})
         self.assertNotIn('PRIVATE_ACCOUNT_CANARY',canonical(s).decode());self.assertNotIn('raw_receipts',s);self.assertFalse(s['independent_acceptance']);self.assertFalse(s['alpha_certified']);self.assertFalse(s['history_complete'])
+
+    def test_historical_digest_and_attempt_are_mandatory(self):
+        import base64
+        from .historical_logs import verify_job
+        raw=b'SYNTHETIC_WORKFLOW';log=b'SYNTHETIC_LOG'
+        item={'job_id':1,'run_id':2,'attempt':1,'head':'H','workflow':'w.yml','workflow_sha256':sha(raw),'log_sha256':sha(log),'guard_paths':[],'historical_class':'Generic wrapper'}
+        def api(path,kind='json'):
+            if path.endswith('/logs'):return log
+            if path.startswith('actions/jobs/'):return {'run_id':2,'run_attempt':1,'head_sha':'H','conclusion':'failure'}
+            if path.startswith('actions/runs/'):return {'head_sha':'H'}
+            return {'content':base64.b64encode(raw).decode()}
+        self.assertEqual(verify_job(item,api)['state'],'HISTORICAL_RECEIPT_VERIFIED')
+        self.assertEqual(verify_job({**item,'log_sha256':'x'*64},api)['safe_code'],'HISTORICAL_LOG_DIGEST_MISMATCH')
+        self.assertEqual(verify_job({**item,'attempt':2},api)['safe_code'],'HISTORICAL_JOB_HEAD_OR_ATTEMPT_MISMATCH')
+
+    def test_missing_logs_never_become_success(self):
+        import urllib.error
+        from .historical_logs import verify_missing,verify_zero_job
+        item={'job_id':1,'run_id':2,'attempt':1,'head':'H'};calls=[]
+        def missing(path,kind='json'):
+            calls.append(path)
+            if path.endswith('/logs'):raise urllib.error.HTTPError('https://example.invalid',404,'not found',{},None)
+            return {'run_id':2,'head_sha':'H','run_attempt':1}
+        r=verify_missing(item,missing);self.assertEqual(r['state'],'UNAVAILABLE_404');self.assertEqual(len(calls),2);self.assertIn('UNKNOWN',r['cause'])
+        def zero(path,kind='json'):
+            return {'total_count':0,'jobs':[]} if '/jobs?' in path else {'head_sha':'H','conclusion':'cancelled'}
+        self.assertEqual(verify_zero_job(item,zero)['state'],'CANCELLED_ZERO_JOB_VERIFIED')
+
+    def test_exact_target_counts_and_no_aggregate_extrapolation(self):
+        from .historical_logs import validate_catalog
+        cat={'records':[{'job_id':i} for i in range(44)],'unavailable_logs':[{'job_id':i+100} for i in range(74)],'zero_job_cancelled_runs':[{'run_id':i} for i in range(79)]}
+        validate_catalog(cat);cat['records'][1]=cat['records'][0]
+        with self.assertRaisesRegex(ValueError,'HISTORICAL_TARGET_SET_NOT_EXACT'):validate_catalog(cat)
