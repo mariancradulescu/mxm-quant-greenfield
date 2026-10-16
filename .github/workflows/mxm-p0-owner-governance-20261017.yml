@@ -1,0 +1,31 @@
+name: MXM G03.2-R2 OWNER governance isolated delta NO GO
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/p0_owner_governance_20261017/**
+      - .github/workflows/mxm-p0-owner-governance-20261017.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  minimal-authorization-delta:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.actor_id == '322088485' && github.run_attempt == 1 && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.sha == github.event.after
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false, fetch-depth: 1}
+      - name: Only six OWNER-boundary and delegation delta tests
+        run: python3 -m research_core_v4.p0_owner_governance_20261017.test_delta
+      - name: Native GET observation, run actor is not OWNER approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.p0_owner_governance_20261017.native_observation
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-p0-owner-governance-${{ github.sha }}
+          path: verification/p0-owner-governance/
+          if-no-files-found: error
+          retention-days: 90
