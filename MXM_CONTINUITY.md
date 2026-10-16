@@ -46,3 +46,5 @@ Documentele nesensibile și ZIP-ul criptat sunt versionate în Git, separat de e
 Cheia privată OWNER nu a fost citită aici. Roundtrip-ul AEAD local este verificat; decriptarea cu cheia privată OWNER nu a fost executată în acest transfer. Readback-ul GitHub al documentelor și fișierului criptat este raportat separat după publicare.
 
 Lipsuri explicite: conversațiile integrale și aprobările istorice nesemnate nu pot fi reconstruite din acest dosar; toate dovezile private P0–P4 mai vechi nu au fost rearhivate. Acest pachet acoperă integral ZIP-ul O04.2 primit, procesul-verbal recuperat și continuitatea registrului public, nu întregul istoric al proiectului. Administratorul GitHub poate modifica/șterge repository-ul; Git nu este un mecanism WORM.
+
+Dovada livrării documentare: [raport de arhivare](docs/continuity/20261016/ARCHIVING_REPORT.md) și [receipt GitHub readback](docs/continuity/20261016/GITHUB_READBACK_RECEIPT.json). Recepția acestei livrări rămâne independentă.
