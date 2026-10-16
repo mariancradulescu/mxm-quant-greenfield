@@ -1,6 +1,14 @@
 # MXM Quant Greenfield — continuitate operativă
 
-Actualizare: 16 octombrie 2026. Rol: Director executant în mandatul P0–P4 existent. Acest document nu este mandat nou și nu acordă autorizații de cercetare.
+Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
+
+## Etapa curentă P0 — pregătire limitată, fără GO
+
+Autorizație OWNER: mesajul „AUTORIZARE LIMITATĂ P0 PENTRU PREGĂTIREA CONTINUĂRII SIGURE”, 16.10.2026. Implementare izolată la `979278ed6903bee6530426b6fe089c4667a6ad8f`; [run38908575611](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/38908575611), job116998317141, attempt1 SUCCESS. **29 teste noi PASS**, 25 GET native, zero scrieri GitHub din probă. O04.2 nu a fost rerulat.
+
+[Raport pentru auditor](docs/p0-preparation/20261016/REPORT.md), [probe și SHA256](docs/p0-preparation/20261016/EVIDENCE_INDEX.json), [dispoziție P0](docs/p0-preparation/20261016/P0_DISPOSITION.json), [spec/design](research_core_v4/p0_transition_20261016/DESIGN.md). Modelul de bootstrap este exclusiv Git local sintetic; backendul real refuză necondiționat. Nu există autoritate activă nouă. Toate cele **28 BLOCKED**, inclusiv nouă P0, rămân BLOCKED; registrul original nu este rescris.
+
+Limite observate: branch-protection 403 în Actions; bypass_actors omis în runner, coroborat separat prin definițiile publice citite de connector. Politica7689 reutilizată din recepția anterioară, fără export administrativ nou. Acestea nu certifică toate ACL istorice. Recepția noii etape este încă a auditorului; numai după ea OWNER decide separat despre operațiuni reale.
 
 ## Intrare pentru următorul chat
 
@@ -29,7 +37,7 @@ Ramură documentară existentă: `mxm-remediation-p0-p4-20261015-v1`. Recuperaț
 - [Receipt criptare și limite](docs/continuity/20261016/ARCHIVE_RECEIPT.json)
 - [ZIP integral criptat OWNER](docs/continuity/20261016/O04_2_EVIDENCE.encrypted.json)
 - [Recuperare criptată offline](docs/continuity/20261016/restore_archive.py)
-- [SHA256SUMS](docs/continuity/20261016/SHA256SUMS.txt)
+- [SHA256SUMS arhivare la HEAD-ul recepționat](https://github.com/mariancradulescu/mxm-quant-greenfield/blob/8a71881c6ef8154be4d24aab7dad3b1dd212392f/docs/continuity/20261016/SHA256SUMS.txt) — pentru acel snapshot, anterior actualizărilor acestui document
 
 Registrul original rămâne la [commitul fixat](https://github.com/mariancradulescu/mxm-quant-greenfield/blob/6cdf76f5e7bf9c672c24a05c3054f2aa4e137a10/MXM_REMEDIATION_P0_P4_FINAL_VERIFICATION_BUNDLE_20261015.json): **163 PASS / 28 BLOCKED**, rezultate declarate de executant; PASS nu este certificare independentă. Recepția staging O04.2 este adăugată separat, fără majorarea unilaterală a acestor numere. Cele 28 dependențe rămân individualizate; nu se fabrică martori istorici, nu se refac controalele acceptate, nu se substituie aprobarea auditorului/OWNER.
 
@@ -47,4 +55,4 @@ Cheia privată OWNER nu a fost citită aici. Roundtrip-ul AEAD local este verifi
 
 Lipsuri explicite: conversațiile integrale și aprobările istorice nesemnate nu pot fi reconstruite din acest dosar; toate dovezile private P0–P4 mai vechi nu au fost rearhivate. Acest pachet acoperă integral ZIP-ul O04.2 primit, procesul-verbal recuperat și continuitatea registrului public, nu întregul istoric al proiectului. Administratorul GitHub poate modifica/șterge repository-ul; Git nu este un mecanism WORM.
 
-Dovada livrării documentare: [raport de arhivare](docs/continuity/20261016/ARCHIVING_REPORT.md) și [receipt GitHub readback](docs/continuity/20261016/GITHUB_READBACK_RECEIPT.json). Recepția acestei livrări rămâne independentă.
+Dovada livrării documentare: [raport de arhivare](docs/continuity/20261016/ARCHIVING_REPORT.md) și [receipt GitHub readback](docs/continuity/20261016/GITHUB_READBACK_RECEIPT.json). OWNER a confirmat recepția arhivării la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`. Noua livrare P0 de mai sus așteaptă recepția independentă.
