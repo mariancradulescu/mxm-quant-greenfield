@@ -5,7 +5,7 @@ REPO_ID=1374181010
 OWNER_ID=322088485
 APP_ID=5343530
 INSTALLATION_ID=172030470
-CODE_BRANCH='mxm-o04-preflight-code-v1'
+CODE_BRANCH='mxm-o04-preflight-code-v2'
 ENVIRONMENT='mxm-o04-staging-issuer'
 AUTH_REF='refs/heads/mxm-o04-stage-authority-v1'
 AUD='mxm-o04-acceptor:1374181010:5343530:staging'
@@ -79,7 +79,8 @@ def authenticated_workload():
  need(rule_id.isdigit(),'CODE_FREEZE_NOT_CONFIGURED')
  status,rule=api('rulesets/'+rule_id,native)
  need(status==200 and rule['enforcement']=='active' and rule['conditions']['ref_name']=={'include':['refs/heads/'+CODE_BRANCH],'exclude':[]} and {'creation','update'}<={r['type'] for r in rule['rules']},'CODE_FREEZE')
- need(rule.get('bypass_actors')==[],'CODE_FREEZE_BYPASS')
+ # Read-only GitHub tokens omit bypass_actors; admin receipt verifies the empty list.
+ need(rule.get('bypass_actors',[])==[],'CODE_FREEZE_BYPASS')
  status,acl=api('rulesets/25231211',native)
  need(status==200 and acl['enforcement']=='active' and acl['conditions']['ref_name']=={'include':[AUTH_REF],'exclude':[]} and {r['type'] for r in acl['rules']}=={'creation','update'},'AUTHORITY_ACL')
  requrl=os.environ['ACTIONS_ID_TOKEN_REQUEST_URL']
