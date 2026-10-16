@@ -2,7 +2,25 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
-## Etapa curentă — arhitectura încrederii auditorului, frontieră de înrolare reală
+## Etapa curentă — G03.2-R2: OWNER critic, delegare automată limitată
+
+OWNER a decis în conversația curentă „SIMPLIFICARE P0 ȘI ELIMINAREA DEPENDENȚELOR CRIPTOGRAFICE NENECESARE”: **nu introduce custode auditor extern, cheie privată suplimentară de auditor sau infrastructură de semnare nouă**. Acesta este mandatul de adaptare izolată, nu bootstrap/research GO. Înrolarea MXM-OWNER-AUDITOR-ENROLLMENT-001 din etapa precedentă este **SUPERSEDATĂ și nu mai este solicitată**. Documentele ei rămân istoric, nu dependență curentă.
+
+Roluri curente: OWNER autorizează tranzițiile critice; Directorul execută și verifică automat; auditorul din conversația separată realizează recepții read-only ale etapelor critice. Checkpointurile obișnuite nu cer aprobări umane repetate cât timp politica finită armată rămâne valabilă. Autoatestările Directorului, actorul unui run ori autorul unui commit nu sunt aprobări OWNER.
+
+[Modificarea formală G03.2-R2](docs/p0-owner-governance/20261017/G03_2_REQUIREMENT_CHANGE.json), [raportul](docs/p0-owner-governance/20261017/REPORT.md), [calea minimă unică](docs/p0-owner-governance/20261017/MINIMAL_ACTIVATION_PATH.md), [separarea exactă a28BLOCKED](docs/p0-owner-governance/20261017/BLOCKER_DISPOSITION.json), [dovezi/hashuri](docs/p0-owner-governance/20261017/EVIDENCE_INDEX.json), [GitHub readback](docs/p0-owner-governance/20261017/GITHUB_READBACK_RECEIPT.json).
+
+Implementare izolată `research_core_v4/p0_owner_governance_20261017/`, sursă testată `8ea7253533abeaac4f38609191459d904b330c23`. [Run38971751030](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/38971751030), job117211522185, attempt1 **SUCCESS**: **6 teste noi de diferență PASS**,23controale negative,zero chei generate,zero suite vechi reluate. Cititorul nativ GET-only verifică review-ul OWNER exact pentru hashul manifestului critic. Două generații sintetice folosesc aceeași aprobare inițială și politică finită, fără cheie auditor ori review pe checkpoint. Jurnalul/integritatea existente sunt reutilizate nemodificate; fencingul Git atomic nu este înlocuit de SQLite.
+
+Observația nativă a runului a returnat review_history=[]; actorul OWNER nu este tratat drept aprobare. Nu există încă gate critic instalat, issuer/publisher atomic real, grant armat sau pipeline succesor operațional. **OWNER_BOUNDARY_DELTA_IMPLEMENTED_NO_GO**, în așteptarea recepției read-only a adaptării. Rămân două frontiere de aprobare viitoare: A pachet tehnic exact fără cercetare; B activare explicită după recepția instalării, cu bootstrap/delegare și research GO numai dacă scope-ul este aprobat explicit. Fără custode/cheie nouă, aprobare pe checkpoint sau26migrări istorice separate.
+
+**163 PASS/28 BLOCKED rămân neschimbate**, inclusiv statusul istoric G03.2; cerința a fost revizuită, nu închisă unilateral. Dovezile administrative N10.1 deja recepționate se reutilizează, nu se reaudită. Cele19 lipsuri istorice și limita metodologică nu pot fi fabricate prin aprobare nouă; datele afectate rămân UNKNOWN/carantină și nu primesc derogare implicită.
+
+OWNER1807 și staging neschimbate,25268790 activă fără bypass, active-v1 absentă. Nicio regulă/cheie/environment/ramură înghețată ori consumator istoric modificat. Fără bootstrap, writer real, migrare operațională, cercetare/colectare/backtesting economic, broker I/O, cBot, Cloud, tranzacționare ori restart. Artefact12077496915, SHA256 `cbd1c004775f8253da74ee4c72eebf40009c0c26f759fe8f4972389123a4dced`, păstrat integral în Git; citirea ulterioară are receipt separat.
+
+Secțiunile următoare sunt snapshoturi istorice. Orice cerere veche de custode/key enrollment de acolo este retrasă de decizia OWNER curentă; nu o reintroduceți la următorul chat.
+
+## Snapshot istoric — arhitectura auditorului cu înrolare, supersedată de G03.2-R2
 
 OWNER a confirmat în conversația curentă recepția independentă SYNTHETIC_SUPERSESSION_PREPARATION_NO_GO la `e1d021a72ab3ada68b86851b74ebc4efc2cee8b3`, exclusiv în domeniul sintetic. Nu este GO. Confirmarea este consemnată ca proveniență conversațională, fără semnătură criptografică independentă nouă.
 
