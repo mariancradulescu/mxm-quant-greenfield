@@ -1,13 +1,11 @@
 name: MXM approved P0-P4 remediation verification only
-run-name: MXM P0-P4 acceptance ${{ github.sha }}
+run-name: MXM REST29 targeted receipts ${{ github.sha }}
 on:
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
-      - 'research_core_v4/remediation_p0_p4_20261015/**'
-      - 'research_core_v4/autonomous_native_20261015_v1/runtime.py'
-      - 'research_core_v4/critical_frontier_repair_20261014_v2/**'
-      - 'research_core_v4/final_recovery_20261014_v1/storage.py'
+      - 'research_core_v4/remediation_p0_p4_20261015/rest29_v3.py'
+      - 'research_core_v4/remediation_p0_p4_20261015/test_rest29_v3.py'
       - '.github/workflows/mxm-remediation-p0-p4-20261015-v1.yml'
   workflow_dispatch:
 permissions:
@@ -16,89 +14,51 @@ concurrency:
   group: mxm-remediation-p0-p4-20261015-v1
   cancel-in-progress: false
 jobs:
-  offline_acceptance:
+  targeted_residual_controls:
     if: github.run_attempt == 1 && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1'
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {persist-credentials: false, fetch-depth: 0}
-      - name: Locked dependencies before any private key access
+      - name: Existing hash-locked dependencies, no private key
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Ordered synthetic acceptance P0 P1 P2 P3 P4 with negative controls
-        run: python3 -m research_core_v4.remediation_p0_p4_20261015.verify
-        env:
-          OPENBLAS_NUM_THREADS: '1'
-          OMP_NUM_THREADS: '1'
-      - name: Offline C# EUR200 contract, no cTrader dependency
-        run: |
-          dotnet run --project research_core_v4/economic_process_reset_20261014_v1/csharp/Contract.csproj --configuration Release -- verification/csharp.json
+      - name: Only residual and affected workflow-policy controls
+        run: python3 -m research_core_v4.remediation_p0_p4_20261015.test_rest29_v3
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: mxm-remediation-offline-${{ github.sha }}
-          path: |
-            verification/*.json
-            verification/Contract.dll
+          name: mxm-rest29-targeted-${{ github.sha }}
+          path: verification/rest29-tests.json
           if-no-files-found: error
-  owner_cold_readback:
-    needs: offline_acceptance
+  owner_remaining_receipts:
+    needs: targeted_residual_controls
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 40
     permissions:
       contents: read
       actions: read
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {persist-credentials: false, fetch-depth: 0}
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with:
-          python-version: '3.13'
-      - name: Locked integrity-readback dependencies before key access
+      - name: Existing hash-locked readback dependencies before key access
         run: |
-          python3.12 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Independent cold-process OWNER journal readback; no campaign restart
-        run: python3.12 -m research_core_v4.remediation_p0_p4_20261015.owner
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Existing OWNER conflict, parent-ledger and historical impact readback only
+        run: python3 -m research_core_v4.remediation_p0_p4_20261015.rest29_v3
         env:
-          MXM_COLD_PYTHON: python3.13
           GH_TOKEN: ${{ github.token }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: mxm-remediation-owner-${{ github.sha }}
+          name: mxm-rest29-owner-${{ github.sha }}
           path: |
-            verification/owner.json
-            verification/owner-attestation.json
-            verification/owner-impact-summary.json
-            verification/owner-impact.mxmenc
-            verification/economic-state.json
-            verification/historical-economic-lineage.json
-            verification/resolution-summary.json
-            verification/resolution-evidence.mxmenc
-            verification/economic-label-receipt.json
-            verification/economic-label-errata.mxmenc
-          if-no-files-found: warn
-  historical_receipt_readback:
-    needs: offline_acceptance
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      actions: read
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, fetch-depth: 0}
-      - name: Recover exact historical receipts without rerunning workflows
-        run: python3 -m research_core_v4.remediation_p0_p4_20261015.historical_logs
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: mxm-remediation-historical-${{ github.sha }}
-          path: |
-            verification/historical-log-receipts.json
-            verification/historical-log-summary.json
+            verification/rest29-summary.json
+            verification/rest29-attestation.json
+            verification/rest29-reader-routes.csv
+            verification/rest29-owner-investigation.mxmenc
           if-no-files-found: error
