@@ -2,7 +2,21 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
-## Etapa curentă — protecție fail-closed P0, fără bootstrap
+## Etapa curentă — supersesiune izolată a consumatorilor, fără restart
+
+OWNER a confirmat în conversația curentă recepția independentă FUTURE_AUTHORITY_DENY_INSTALLED_NO_GO la `9678e920627f3f8684be3a4ba98d61b847d28c81`, exclusiv în limitele verificate, apoi a autorizat implementarea izolată a selectorului/adaptoarelor pentru viitori consumatori. Confirmarea se consemnează cu proveniență conversațională, fără semnătură nouă atribuită auditorului.
+
+Implementare efectivă nouă: `research_core_v4/p0_supersession_20261016/`. Sursă executată `e2f9409d222c55a21f7306dfefcabc02e97ff08e`; [run38961978161](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/38961978161), job117179030059, attempt1 **SUCCESS**: **37 teste noi PASS**,94 observații negative și4 consumatori pozitivi exclusiv sintetici.10 surse/29 funcții-versiuni fixate, citite și analizate AST, fără import sau execuție istorică;25GET machine-side totale, zero scrieri de autoritate.
+
+[Raport pentru auditor](docs/p0-supersession/20261016/REPORT.md), [design și limite](docs/p0-supersession/20261016/DESIGN_AND_LIMITS.md), [rezumat verificare](docs/p0-supersession/20261016/VERIFICATION_SUMMARY.json), [matrice10/29 și plan punctual de migrare](docs/p0-supersession/20261016/CONSUMER_MIGRATION_MATRIX.json), [index/hashuri](docs/p0-supersession/20261016/EVIDENCE_INDEX.json), [receipt GitHub readback](docs/p0-supersession/20261016/GITHUB_READBACK_RECEIPT.json).
+
+Stare propusă recepției: **SYNTHETIC_SUPERSESSION_PREPARATION_NO_GO**. Patru adaptoare comune pentru restore/worker/handoff/economic întorc numai input sintetic fără execuție; arhivele au cale separată read-only. Receipturi Ed25519 și jurnal SQLite locale sunt sintetice; nu reprezintă trust root real, transport GitHub atomic sau rezistență certificată la rollback malițios al discului. Backendul real refuză necondiționat. **Zero migrări operaționale**:26 frontiere de integrare viitoare necesită aprobare OWNER punctuală;3 frontiere OWNER rămân arhivă1807. Cele144 workflow-uri istorice rămân nemodificate/nereactivate.
+
+Cele10 rulesets sunt identice,25268790 rămâne activă fără bypass, active-v1 este404; OWNER1807 și staging neschimbate. **Toate28 BLOCKED păstrate.** Niciun issuer/token de scriere, bootstrap, checkpoint real, broker I/O, cercetare sau restart. Etapa curentă așteaptă recepția auditorului; nu se deduce GO. Artefact12072469188, SHA256 `a51580de93a5fac07ffc33eba35a90c5f1fb65cc7d2f27d3efb4730135c12568`, păstrat integral și recitit separat din GitHub.
+
+Rezultatul vechi HTTP422 rămâne neatribuit concludent, iar run38954973739 rămâne FAILURE; nu a fost repetat. Secțiunea următoare păstrează snapshotul de publicare al etapei precedente, inclusiv starea recepției de atunci; confirmarea OWNER ulterioară este consemnată mai sus.
+
+## Snapshotul etapei precedente — protecție fail-closed P0, fără bootstrap
 
 OWNER a confirmat recepția administrativă la `6c743b918bccc66809cf81e2a0d2d8c874fd348a` și a autorizat punctual protecția viitoarei autorități. Ruleset **25268790** este activ pentru exact `refs/heads/mxm-o04-active-v1`, creation/update/deletion/non_fast_forward, **bypass_actors=[]**. Active ref rămâne inexistentă. Cele opt reguli existente sunt identice; OWNER1807 și staging sunt neschimbate.
 

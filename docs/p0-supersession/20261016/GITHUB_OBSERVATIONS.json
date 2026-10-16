@@ -1,0 +1,982 @@
+{
+  "schema": "mxm.p0.supersession.github-observations.v1",
+  "base_head": "9678e920627f3f8684be3a4ba98d61b847d28c81",
+  "source_head": "e2f9409d222c55a21f7306dfefcabc02e97ff08e",
+  "run": {
+    "id": 38961978161,
+    "run_attempt": 1,
+    "event": "push",
+    "head_branch": "mxm-remediation-p0-p4-20261015-v1",
+    "head_sha": "e2f9409d222c55a21f7306dfefcabc02e97ff08e",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-10-16T20:24:11Z",
+    "updated_at": "2026-10-16T20:24:36Z",
+    "html_url": "https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/38961978161"
+  },
+  "job": {
+    "id": 117179030059,
+    "name": "synthetic-consumer-boundaries",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-10-16T20:24:16Z",
+        "completed_at": "2026-10-16T20:24:17Z"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-10-16T20:24:17Z",
+        "completed_at": "2026-10-16T20:24:21Z"
+      },
+      {
+        "name": "Read pinned historical source text and AST only",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-10-16T20:24:21Z",
+        "completed_at": "2026-10-16T20:24:25Z"
+      },
+      {
+        "name": "New synthetic selector and adapter tests, network denied",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-10-16T20:24:25Z",
+        "completed_at": "2026-10-16T20:24:27Z"
+      },
+      {
+        "name": "GET-only preservation observations",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-10-16T20:24:27Z",
+        "completed_at": "2026-10-16T20:24:32Z"
+      },
+      {
+        "name": "Preserve sanitized evidence",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-10-16T20:24:32Z",
+        "completed_at": "2026-10-16T20:24:33Z"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12,
+        "started_at": "2026-10-16T20:24:33Z",
+        "completed_at": "2026-10-16T20:24:34Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13,
+        "started_at": "2026-10-16T20:24:34Z",
+        "completed_at": "2026-10-16T20:24:34Z"
+      }
+    ]
+  },
+  "artifact": {
+    "id": 12072469188,
+    "node_id": "MDg6QXJ0aWZhY3QxMjA3MjQ2OTE4OA==",
+    "name": "mxm-p0-supersession-e2f9409d222c55a21f7306dfefcabc02e97ff08e",
+    "size_in_bytes": 14199,
+    "url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12072469188",
+    "archive_download_url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12072469188/zip",
+    "expired": false,
+    "digest": "sha256:a51580de93a5fac07ffc33eba35a90c5f1fb65cc7d2f27d3efb4730135c12568",
+    "created_at": "2026-10-16T20:24:33Z",
+    "updated_at": "2026-10-16T20:24:33Z",
+    "expires_at": "2027-01-14T20:24:12Z",
+    "workflow_run": {
+      "id": 38961978161,
+      "repository_id": 1374181010,
+      "head_repository_id": 1374181010,
+      "head_branch": "mxm-remediation-p0-p4-20261015-v1",
+      "head_sha": "e2f9409d222c55a21f7306dfefcabc02e97ff08e"
+    }
+  },
+  "rulesets_before": [
+    {
+      "id": 25222248,
+      "name": "MXM O04 atomic refs append-only",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-*"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_linear_history"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGA3Gg",
+      "created_at": "2026-10-16T08:41:41.316+02:00",
+      "updated_at": "2026-10-16T08:41:41.359+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25222248"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25222248"
+        }
+      }
+    },
+    {
+      "id": 25222426,
+      "name": "MXM O04 accepted authority freeze no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-accepted-*"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "update"
+        },
+        {
+          "type": "required_linear_history"
+        },
+        {
+          "type": "creation"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGA3Ro",
+      "created_at": "2026-10-16T08:46:23.599+02:00",
+      "updated_at": "2026-10-16T08:57:46.209+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25222426"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25222426"
+        }
+      }
+    },
+    {
+      "id": 25231211,
+      "name": "MXM O04.2 staging authority acceptor App only",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-stage-authority-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGA_2s",
+      "created_at": "2026-10-16T11:51:54.158+02:00",
+      "updated_at": "2026-10-16T11:51:54.287+02:00",
+      "bypass_actors": [
+        {
+          "actor_id": 5343530,
+          "actor_type": "Integration",
+          "bypass_mode": "always"
+        }
+      ],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25231211"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25231211"
+        }
+      }
+    },
+    {
+      "id": 25231653,
+      "name": "MXM O04.2 immutable issuer code no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-issuer-code-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBASU",
+      "created_at": "2026-10-16T12:01:13.863+02:00",
+      "updated_at": "2026-10-16T12:01:13.898+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25231653"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25231653"
+        }
+      }
+    },
+    {
+      "id": 25231978,
+      "name": "MXM O04.2 immutable issuer code v2 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-issuer-code-v2"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBAmo",
+      "created_at": "2026-10-16T12:07:18.278+02:00",
+      "updated_at": "2026-10-16T12:07:18.320+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25231978"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25231978"
+        }
+      }
+    },
+    {
+      "id": 25232285,
+      "name": "MXM O04.2 immutable issuer code v3 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-issuer-code-v3"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBA50",
+      "created_at": "2026-10-16T12:13:41.533+02:00",
+      "updated_at": "2026-10-16T12:13:41.571+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25232285"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25232285"
+        }
+      }
+    },
+    {
+      "id": 25236611,
+      "name": "MXM O04.2 immutable preflight code v1 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-preflight-code-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBFIM",
+      "created_at": "2026-10-16T13:50:13.608+02:00",
+      "updated_at": "2026-10-16T13:50:13.638+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25236611"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25236611"
+        }
+      }
+    },
+    {
+      "id": 25236786,
+      "name": "MXM O04.2 immutable preflight code v2 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-preflight-code-v2"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBFTI",
+      "created_at": "2026-10-16T13:54:47.270+02:00",
+      "updated_at": "2026-10-16T13:54:47.313+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25236786"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25236786"
+        }
+      }
+    },
+    {
+      "id": 25268790,
+      "name": "MXM P0 future active fail-closed no bypass 20261016",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-active-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBkjY",
+      "created_at": "2026-10-16T21:23:48.601+02:00",
+      "updated_at": "2026-10-16T21:23:48.638+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25268790"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25268790"
+        }
+      }
+    },
+    {
+      "id": 25268949,
+      "name": "MXM P0 synthetic fail-closed denial probe 20261016",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-synthetic-deny-20261016-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBktU",
+      "created_at": "2026-10-16T21:24:57.147+02:00",
+      "updated_at": "2026-10-16T21:24:57.190+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25268949"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25268949"
+        }
+      }
+    }
+  ],
+  "rulesets_after": [
+    {
+      "id": 25222248,
+      "name": "MXM O04 atomic refs append-only",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-*"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_linear_history"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGA3Gg",
+      "created_at": "2026-10-16T08:41:41.316+02:00",
+      "updated_at": "2026-10-16T08:41:41.359+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25222248"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25222248"
+        }
+      }
+    },
+    {
+      "id": 25222426,
+      "name": "MXM O04 accepted authority freeze no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-accepted-*"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "update"
+        },
+        {
+          "type": "required_linear_history"
+        },
+        {
+          "type": "creation"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGA3Ro",
+      "created_at": "2026-10-16T08:46:23.599+02:00",
+      "updated_at": "2026-10-16T08:57:46.209+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25222426"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25222426"
+        }
+      }
+    },
+    {
+      "id": 25231211,
+      "name": "MXM O04.2 staging authority acceptor App only",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-stage-authority-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGA_2s",
+      "created_at": "2026-10-16T11:51:54.158+02:00",
+      "updated_at": "2026-10-16T11:51:54.287+02:00",
+      "bypass_actors": [
+        {
+          "actor_id": 5343530,
+          "actor_type": "Integration",
+          "bypass_mode": "always"
+        }
+      ],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25231211"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25231211"
+        }
+      }
+    },
+    {
+      "id": 25231653,
+      "name": "MXM O04.2 immutable issuer code no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-issuer-code-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBASU",
+      "created_at": "2026-10-16T12:01:13.863+02:00",
+      "updated_at": "2026-10-16T12:01:13.898+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25231653"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25231653"
+        }
+      }
+    },
+    {
+      "id": 25231978,
+      "name": "MXM O04.2 immutable issuer code v2 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-issuer-code-v2"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBAmo",
+      "created_at": "2026-10-16T12:07:18.278+02:00",
+      "updated_at": "2026-10-16T12:07:18.320+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25231978"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25231978"
+        }
+      }
+    },
+    {
+      "id": 25232285,
+      "name": "MXM O04.2 immutable issuer code v3 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-issuer-code-v3"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBA50",
+      "created_at": "2026-10-16T12:13:41.533+02:00",
+      "updated_at": "2026-10-16T12:13:41.571+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25232285"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25232285"
+        }
+      }
+    },
+    {
+      "id": 25236611,
+      "name": "MXM O04.2 immutable preflight code v1 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-preflight-code-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBFIM",
+      "created_at": "2026-10-16T13:50:13.608+02:00",
+      "updated_at": "2026-10-16T13:50:13.638+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25236611"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25236611"
+        }
+      }
+    },
+    {
+      "id": 25236786,
+      "name": "MXM O04.2 immutable preflight code v2 no bypass",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-preflight-code-v2"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBFTI",
+      "created_at": "2026-10-16T13:54:47.270+02:00",
+      "updated_at": "2026-10-16T13:54:47.313+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25236786"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25236786"
+        }
+      }
+    },
+    {
+      "id": 25268790,
+      "name": "MXM P0 future active fail-closed no bypass 20261016",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-active-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBkjY",
+      "created_at": "2026-10-16T21:23:48.601+02:00",
+      "updated_at": "2026-10-16T21:23:48.638+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25268790"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25268790"
+        }
+      }
+    },
+    {
+      "id": 25268949,
+      "name": "MXM P0 synthetic fail-closed denial probe 20261016",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-synthetic-deny-20261016-v1"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGBktU",
+      "created_at": "2026-10-16T21:24:57.147+02:00",
+      "updated_at": "2026-10-16T21:24:57.190+02:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25268949"
+        },
+        "html": {
+          "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25268949"
+        }
+      }
+    }
+  ],
+  "rulesets_identical": true,
+  "reference_readback": [
+    {
+      "ref": "refs/heads/mxm-o04-active-v1",
+      "status": 404,
+      "oid": null
+    },
+    {
+      "ref": "refs/heads/mxm-autonomous-native-20261015-v1",
+      "status": 200,
+      "oid": "3cb073e54fe3189063c2737c6337d3404b713710"
+    },
+    {
+      "ref": "refs/heads/mxm-o04-accepted-owner-1807-v1",
+      "status": 200,
+      "oid": "a830c132521bd4348454653f713e04f6107484fe"
+    },
+    {
+      "ref": "refs/heads/mxm-o04-stage-authority-v1",
+      "status": 200,
+      "oid": "c6644174244cd92b8e41b17f241b8f5e545fddd9"
+    },
+    {
+      "ref": "refs/heads/performance-research-v3-20260922",
+      "status": 200,
+      "oid": "9c5f9f1b7f2d73f98bb188a2651fd9a3c00df6b9"
+    }
+  ],
+  "scope": "Connector GET only; source/test/artifact provenance and preservation, not a repeat exhaustive administrative audit.",
+  "native_source_compare": {
+    "base": "9678e920627f3f8684be3a4ba98d61b847d28c81",
+    "head": "e2f9409d222c55a21f7306dfefcabc02e97ff08e",
+    "files": [
+      {
+        "filename": ".github/workflows/mxm-p0-supersession-20261016.yml",
+        "status": "added",
+        "sha": "14848ba791fa8fec5cfaf27cc602c211dd7be85a"
+      },
+      {
+        "filename": "research_core_v4/p0_supersession_20261016/__init__.py",
+        "status": "added",
+        "sha": "fed81773bee748c65eafd0a1b2da3758ab72dd08"
+      },
+      {
+        "filename": "research_core_v4/p0_supersession_20261016/adapters.py",
+        "status": "added",
+        "sha": "c523f7b3df0c235123c6eb454adca789c3a4714d"
+      },
+      {
+        "filename": "research_core_v4/p0_supersession_20261016/authority.py",
+        "status": "added",
+        "sha": "5b5db8bdaa6e44a9e9c39bcd3b15a07b6c6b3966"
+      },
+      {
+        "filename": "research_core_v4/p0_supersession_20261016/compatibility.py",
+        "status": "added",
+        "sha": "bfa554e93a987e69f15951af93687beb5564a63f"
+      },
+      {
+        "filename": "research_core_v4/p0_supersession_20261016/live_readonly.py",
+        "status": "added",
+        "sha": "f80c43dd2785ecf9fd4310aea6c91aacb7746532"
+      },
+      {
+        "filename": "research_core_v4/p0_supersession_20261016/test_authority.py",
+        "status": "added",
+        "sha": "9271a9c59c6318fe9c388e0f96a519acb98e1c34"
+      }
+    ]
+  }
+}
