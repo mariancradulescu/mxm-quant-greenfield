@@ -1,0 +1,38 @@
+name: MXM P0 isolated consumer supersession NO GO
+run-name: P0 SUPERSESSION SYNTHETIC ONLY ${{ github.sha }}
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/p0_supersession_20261016/**
+      - .github/workflows/mxm-p0-supersession-20261016.yml
+permissions:
+  contents: read
+jobs:
+  synthetic-consumer-boundaries:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.actor_id == '322088485' && github.run_attempt == 1 && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.sha == github.event.after
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Read pinned historical source text and AST only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.p0_supersession_20261016.compatibility
+      - name: New synthetic selector and adapter tests, network denied
+        run: python3 -m research_core_v4.p0_supersession_20261016.test_authority
+      - name: GET-only preservation observations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.p0_supersession_20261016.live_readonly
+      - name: Preserve sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-p0-supersession-${{ github.sha }}
+          path: verification/p0-supersession/
+          if-no-files-found: error
+          retention-days: 90
