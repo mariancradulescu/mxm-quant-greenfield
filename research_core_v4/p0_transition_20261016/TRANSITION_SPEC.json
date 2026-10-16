@@ -1,0 +1,206 @@
+{
+  "schema": "mxm.p0.writer-transition.preparation.v1",
+  "mode": "PREPARATION_ONLY_NO_GO",
+  "base_head": "8a71881c6ef8154be4d24aab7dad3b1dd212392f",
+  "repository": "mariancradulescu/mxm-quant-greenfield",
+  "repository_id": 1374181010,
+  "root_stop_oid": "a830c132521bd4348454653f713e04f6107484fe",
+  "owner_generation": 1807,
+  "staging_oid": "c6644174244cd92b8e41b17f241b8f5e545fddd9",
+  "staging_source_sha": "639ebc99ab2237f1b68cc152537fe919900f338a",
+  "reader_source_sha": "0cf53e3992ab688d502dc0f146a6143075ee8b55",
+  "future_authority_ref": "refs/heads/mxm-o04-active-v1",
+  "root_release_id": 412686323,
+  "root_release_body_sha256": "01a6d82498c033131302b272ee4ba2f83c4e445f40585f76dfee1a91466679b9",
+  "journal_asset_id": 642889915,
+  "journal_canonical_sha256": "ea93f6c38768824521d4ad3e316c0cd507c837e5c089c5e3b6f63d20d79e7470",
+  "registry_path": "docs/continuity/20261016/P0_P4_REGISTRY.json",
+  "registry_sha256": "17eebd55b50bd8f4b935e2eb2532ee34ee4fd7dd6f2f2de2c9f1ef54b89b84ad",
+  "reported_counts": {
+    "PASS": 163,
+    "FAIL": 0,
+    "BLOCKED": 28,
+    "NOT_RUN": 0
+  },
+  "historical_policy": {
+    "id": 7689,
+    "expected_paths_file": "research_core_v4/writer_staging_o04_20261016/MXM_O04_144_WRITERI_ISTORICI_EXPECTED_20261016.txt",
+    "expected_paths_sha256": "b751e2b87cf04cbedb9d82c4f4724b60b823a6d7ed2bf94278b7b48b68416606",
+    "count": 144,
+    "accepted_evidence": "O04.2 independent receipt; not reexecuted here",
+    "current_administrative_policy_visibility": "NOT_INFERRED_FROM_PUBLIC_RULESETS_OR_STATIC_INVENTORY",
+    "other_candidate_inventory": "research_core_v4/writer_staging_o04_20261016/bypass-candidate-review.json",
+    "other_candidate_count": 75,
+    "other_candidates_granted_authority": false
+  },
+  "permissions": {
+    "github_job": {
+      "contents": "read",
+      "actions": "read"
+    },
+    "App_key": false,
+    "OWNER_key": false,
+    "environment": false,
+    "oidc_token": false
+  },
+  "invariants": {
+    "OWNER_ACCEPTS_NEW_CHECKPOINTS": false,
+    "CAMPAIGN_RESTART_ALLOWED": false,
+    "PRODUCTION_GO": false,
+    "RESEARCH_GO": false
+  },
+  "synthetic_protocol": {
+    "schema": "mxm.p0.synthetic-transition-approval.v1",
+    "roles": [
+      "OWNER_SYNTHETIC",
+      "AUDITOR_SYNTHETIC"
+    ],
+    "distinct_trust_roots": true,
+    "scope": "SYNTHETIC_BOOTSTRAP_ONLY",
+    "max_approval_lifetime_seconds": 300,
+    "states": [
+      "SYNTHETIC_STOP",
+      "PREPARED_SYNTHETIC",
+      "SIMULATED_BOOTSTRAP_NO_GO"
+    ],
+    "backend": "EXISTING_FILESYSTEM_ONLY_GIT_FENCE_LAB",
+    "real_backend": "UNCONDITIONALLY_DISABLED",
+    "recovery": "READBACK_EXACT_OPERATION_AND_PLAN_DIGEST_NO_BLIND_REPLAY"
+  },
+  "p0_contracts": [
+    {
+      "test_id": "MXM-ACT-O04.1",
+      "phase": "P0",
+      "blocker_classification": "AUTHORIZATION_NEEDED",
+      "current_blocker": "NO-GO global. Testul pe metoda reală RotatingStore.commit arată că doi writeri stale pot suprascrie aceeași autoritate într-un transport izolat. Releases PATCH nu oferă CAS atomic generation+journal.193 workflow-uri sunt inerte numai pe succesor. Writerii de pe ramurile istorice nu pot fi migrați/dezactivați în acest mandat; protecțiile efective nu sunt accesibile administrativ.",
+      "required_dependency": "Separate explicit authorization to migrate/disable every historical writer and legitimate effective administrative authority; global atomic fencing design. No weakening of protections.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-SEM-G03.2",
+      "phase": "P0",
+      "blocker_classification": "AUTHORIZATION_NEEDED",
+      "current_blocker": "Semnătura RSA-PSS și readback-ul OWNER sunt verificate, inclusiv proces rece separat. Nu există un principal auditor distinct cu cheie/ACL administrate independent. OWNER nu substituie auditorul.",
+      "required_dependency": "Independent auditor trust root, principal/ACL and scoped receipt; independent reception remains external.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-REM-N10.1",
+      "phase": "P0",
+      "blocker_classification": "AUTHORIZATION_NEEDED",
+      "current_blocker": "Endpointul branch-protection răspunde403 atât integrației, cât și cititorului Actions.403nu dovedește că toate ACL/protecțiile sunt sigure și nu furnizează configurația efectivă.",
+      "required_dependency": "Legitimate administrative read of effective principal ACL, branch/ref protections and required checks.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-REM-N10.2",
+      "phase": "P0",
+      "blocker_classification": "AUTHORIZATION_NEEDED",
+      "current_blocker": "Nu există drepturile efective necesare pentru o probă concludentă a refuzului publisherului neautorizat la limita globală. Nu s-a încercat push pe autorități istorice și nu s-a slăbit nicio protecție.",
+      "required_dependency": "Authorized safe test of effective publisher fencing under known administrative policies.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-REM-N10.3",
+      "phase": "P0",
+      "blocker_classification": "AUTHORIZATION_NEEDED",
+      "current_blocker": "Toate operațiile aprobate au fost machine-side, fără operații GitHub cerute proprietarului. Aceasta nu demonstrează privilegiul minim și toate politicile efective pentru namespace-urile istorice.",
+      "required_dependency": "Effective administrative policy evidence and separately versioned writer authority for every affected namespace.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-EXISTING-N25.3",
+      "phase": "P0",
+      "blocker_classification": "AUTHORIZATION_NEEDED",
+      "current_blocker": "Transportul cititorului activ refuză POST/PATCH/PUT/DELETE înainte de IO; testul negativ a exercitat helperul legacy real get_or_create după404. Protecția aceasta nu este instalată pe toate ramurile istorice, a căror migrare/autoritate este în afara mandatului.",
+      "required_dependency": "Explicit historical-route migration/disable authority and complete path-level reader/writer capability separation across those branches.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-EXISTING-N25.4",
+      "phase": "P0",
+      "blocker_classification": "MISSING_EVIDENCE",
+      "current_blocker": "Au fost recuperate metadatele GitHub actor/time/tag/target_commit pentru cele4releases native. Ele nu identifică autorul unei modificări istorice a body-ului și nu sunt audit log privat. Atribuirea incidentului rămâne UNDETERMINED.",
+      "required_dependency": "Authentic administrative audit log or authority-signed mutation receipt; no malicious-actor inference from missing logs.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-EXISTING-N32.4",
+      "phase": "P0",
+      "blocker_classification": "MISSING_EVIDENCE",
+      "current_blocker": "77 surse curente au readback și comparație wire;864 noduri de lanț nativ au toate cele3 hash-uri verificate. Lipsește certificatul exhaustiv branch/generation/source per-key pentru toate ledger-ele istorice cerute. Integritatea unui subset nu este un certificat global.",
+      "required_dependency": "Complete historical wire/span manifests with explicit branch/generation and per-key authenticated mismatch inventory.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    },
+    {
+      "test_id": "MXM-EXISTING-N34.4",
+      "phase": "P0",
+      "blocker_classification": "MISSING_EVIDENCE",
+      "current_blocker": "Hash-urile cipher/gzip/canonical sunt verificate pe sursele recuperate. Nu există pentru fiecare asset cached istoric logul readerului original și receipt-ul recompresiei, deci nu se poate atribui un incident autentic de false drift/corupție fiecărui cache.",
+      "required_dependency": "Original cached named-asset manifests and historical reader/recompression logs with exact three-hash relation; absent witnesses stay UNKNOWN.",
+      "disposition": "DEFINITIVE_BLOCKED_WITHIN_CURRENT_MANDATE"
+    }
+  ],
+  "blocked_contract_ids": [
+    "MXM-SEM-S06.2",
+    "MXM-SEM-D06.2",
+    "MXM-ACT-O04.1",
+    "MXM-ACT-O05.2",
+    "MXM-SEM-O06.1",
+    "MXM-SEM-O06.3",
+    "MXM-SEM-G03.2",
+    "MXM-REM-N03.4",
+    "MXM-SEM-N05.3",
+    "MXM-REM-N10.1",
+    "MXM-REM-N10.2",
+    "MXM-REM-N10.3",
+    "MXM-REM-N14.3",
+    "MXM-REM-N14.4",
+    "MXM-EXISTING-N16.3",
+    "MXM-EXISTING-N17.3",
+    "MXM-EXISTING-N18.3",
+    "MXM-EXISTING-N21.3",
+    "MXM-EXISTING-N22.2",
+    "MXM-EXISTING-N23.4",
+    "MXM-EXISTING-N24.4",
+    "MXM-EXISTING-N25.3",
+    "MXM-EXISTING-N25.4",
+    "MXM-EXISTING-N26.3",
+    "MXM-EXISTING-N27.3",
+    "MXM-EXISTING-N32.4",
+    "MXM-EXISTING-N34.4",
+    "MXM-ACT-N36.4"
+  ],
+  "future_dependencies": [
+    {
+      "id": "D1",
+      "kind": "EXPLICIT_OWNER_AUTHORIZATION",
+      "action": "Authorize exact real-bootstrap scope, source SHA, single future ref, generation/epoch, expiry and rollback-to-STOP procedure after independent reception. This preparation is not that grant."
+    },
+    {
+      "id": "D2",
+      "kind": "NATIVE_CONTROL_AND_CONFIG_APPROVAL",
+      "action": "Approve and enforce new exact creation/update rule for future active ref with dedicated App-only bypass, preserve append-only/frozen rules; approve immutable future issuer source and environment allowlist without widening App permissions. No active ref or rule change in this stage."
+    },
+    {
+      "id": "D3",
+      "kind": "INDEPENDENT_TRUST_ROOT_AND_RECEIPT",
+      "action": "Independent auditor supplies/administers distinct trust root/principal and scoped reception; OWNER supplies independently attributable scoped approval. Director may not create either identity on their behalf."
+    },
+    {
+      "id": "D4",
+      "kind": "EFFECTIVE_POLICY_EVIDENCE",
+      "action": "Legitimate native administrative read of effective actions policy, principal grants and affected historical namespaces. Existing authenticated admin UI or separately approved scoped read access; do not grant Administration to staging App. A 403 remains UNKNOWN."
+    },
+    {
+      "id": "D5",
+      "kind": "HISTORICAL_ROUTE_SUPERSESSION_APPROVAL",
+      "action": "Approve exact reader/writer migration or disabling for any additional affected historical route not already effectively denied; retain 144 historical workflow denies. Versioned signed supersession and verified fixed-authority consumers required; never reactivate old writers."
+    },
+    {
+      "id": "D6",
+      "kind": "HISTORICAL_EVIDENCE_NOT_AN_APPROVAL",
+      "action": "P0 N25.4/N32.4/N34.4 require authentic original audit/mutation, branch/generation/per-key and cache/recompression witnesses. New permission or synthetic success cannot manufacture them."
+    }
+  ]
+}
