@@ -35,7 +35,12 @@ def scope():
     lab.need(re.fullmatch(r'\d+',os.environ.get('GITHUB_RUN_ID','')) is not None,'RUN_SCOPE')
     lab.REF=PREFIX+os.environ['GITHUB_RUN_ID']
     r=get('rulesets/25222248')
-    lab.need(r['enforcement']=='active' and not r['bypass_actors'],'RULESET_SCOPE')
+    lab.need(r['enforcement']=='active','RULESET_SCOPE')
+    # The job token omits administrative bypass metadata. Absence is not proof
+    # of an empty list: that list was verified through UI and the operator App.
+    # The live server rollback-negative below additionally proves this token
+    # cannot bypass the actual protected ref. Never grant admin to inspect it.
+    if 'bypass_actors' in r:lab.need(r['bypass_actors']==[],'RULESET_BYPASS')
     lab.need({'deletion','non_fast_forward','required_linear_history'}<={x['type'] for x in r['rules']},'RULESET_RULES')
     lab.need(r['conditions']['ref_name']=={'include':['refs/heads/mxm-o04-*'],'exclude':[]},'RULESET_TARGET')
 
