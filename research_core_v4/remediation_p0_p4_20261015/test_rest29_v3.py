@@ -12,6 +12,24 @@ from . import rest29_v3 as r
 from .safety import sha,canonical
 
 class RemainingTests(unittest.TestCase):
+    def test_native_observation_sweep_matches_existing_control_and_empty_differs(self):
+        import sqlite3
+        from research_core_v4.remediation_p0_p4_20261015.control import observed_interval
+        db=sqlite3.connect(':memory:');db.executescript('CREATE TABLE tick(s,k,t,p);CREATE TABLE span(s,k,a,b,z);')
+        a=1788000000000;b=a+900000
+        db.executemany('INSERT INTO span VALUES(?,?,?,?,?)',[(1,s,a,b,'EMPTY_AUTHENTIC_RESPONSE') for s in ('bid','ask')])
+        self.assertTrue(all(r.legacy_known_coverage(db,1,s,a,b) for s in ('bid','ask')))
+        self.assertFalse(r.native_observation_mask(db,1,a,b)['observed'])
+        for side,price in (('bid',100),('ask',101)):
+            db.executemany('INSERT INTO tick VALUES(?,?,?,?)',[(1,side,a+t,price) for t in (0,300000,600000,900000)])
+        self.assertTrue(r.native_observation_mask(db,1,a,b)['observed'])
+        self.assertEqual(r.native_observation_mask(db,1,a,b)['observed'],observed_interval(db,1,a,b))
+        db.execute('DELETE FROM tick WHERE k="ask" AND t=?',(a+300000,))
+        self.assertFalse(r.native_observation_mask(db,1,a,b)['observed']);self.assertEqual(r.native_observation_mask(db,1,a,b)['observed'],observed_interval(db,1,a,b))
+        db.execute('INSERT INTO tick VALUES(?,?,?,?)',(1,'ask',a+300000,99))
+        self.assertEqual(r.native_observation_mask(db,1,a,b)['reason'],'INVALID_CROSSED_NATIVE_QUOTE')
+        db.close()
+
     def test_cold_receipt_all_three_hashes_or_reject(self):
         p={'ciphertext_sha256':'a','gzip_sha256':'b','canonical_sha256':'c'}
         self.assertTrue(r.validate_cold_receipt(p,p))

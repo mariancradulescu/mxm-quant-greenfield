@@ -5,6 +5,7 @@ remain immutable. All detailed locators, events and request evidence are encrypt
 """
 import ast
 import base64
+import bisect
 import concurrent.futures
 import contextlib
 import csv
@@ -257,6 +258,71 @@ def enrich_conflict_raws(private,key,tmp,owner):
     for c in private['conflict_investigations']:c['native_receipts']=[recovered.get((r['asset_id'],r['raw_sha256']),r) for r in c['native_receipts']]
     private['targeted_raw_readback']=proof
 
+def legacy_known_coverage(db,sid,side,a,b):
+    # Exact frozen predecessor category set, not a claim of native provenance.
+    from research_core_v4.critical_frontier_repair_20261014_v2 import archive_v2 as ar
+    good={'CONFIRMED_COMPLETE','ARCHIVED_COMPLETE_RESPONSE','COMPLETE_NATIVE_QUOTE_RESPONSE','ACCEPTED_EXACT_M5_INTERVAL','COMPLETE_EXACT_WINDOW','REUSED_AUTHENTIC_NATIVE_M5_INTERVAL','EMPTY_AUTHENTIC_RESPONSE','EMPTY_WINDOW_NO_QUOTE_UPDATE','SESSION_CLOSED_SUPPORTED'}
+    ranges=[(x,y) for x,y,z in db.execute('SELECT a,b,z FROM span WHERE s=? AND k=? AND b>=? AND a<=?',(sid,side,a,b)) if z in good]
+    return not ar.subtract(ranges,a,b)
+
+def native_observation_mask(db,sid,a,b,ttl=300000):
+    """Finite quote/expiry boundary sweep, no price change, predictor or outcome."""
+    from research_core_v4.critical_frontier_repair_20261014_v2 import archive_v2 as ar
+    if a>b or b>=ar.END*1000:return {'observed':False,'reason':'DOMAIN_CENSORED'}
+    if any(ar.missing(db,sid,k,a,b) for k in ('bid','ask')):return {'observed':False,'reason':'COVERAGE_UNKNOWN'}
+    sides={};points={a,b}
+    for side in ('bid','ask'):
+        groups=defaultdict(set)
+        for t,p in db.execute('SELECT t,p FROM tick WHERE s=? AND k=? AND t BETWEEN ? AND ? ORDER BY t,p',(sid,side,a-ttl,b)):groups[t].add(p)
+        times=sorted(groups);sides[side]=(times,groups)
+        for t in times:
+            if a<=t<=b:points.add(t)
+            if a<=t+ttl+1<=b:points.add(t+ttl+1)
+    for point in sorted(points):
+        prices={}
+        for side,(times,groups) in sides.items():
+            i=bisect.bisect_right(times,point)-1
+            if i<0:return {'observed':False,'reason':'EMPTY_OR_STALE_NATIVE_SIDE'}
+            t=times[i]
+            if point-t>ttl:return {'observed':False,'reason':'STALE_NATIVE_SIDE'}
+            if len(groups[t])!=1:return {'observed':False,'reason':'CONFLICTED_NATIVE_SIDE'}
+            prices[side]=next(iter(groups[t]))
+        if prices['bid']<=0 or prices['bid']>prices['ask']:return {'observed':False,'reason':'INVALID_CROSSED_NATIVE_QUOTE'}
+    return {'observed':True,'reason':'NATIVE_OBSERVATIONS_WITHIN_FIXED_TTL_NOT_FILL_OR_PROVENANCE_CERTIFICATE'}
+
+def semantic_event_impact(journal,key,tmp,owner):
+    """Reclassify stored support semantics only. Do not read/recompute PnL."""
+    from .resolution import unique_metadata
+    from research_core_v4.critical_frontier_repair_20261014_v2 import archive_v2 as ar,storage_v2 as storage
+    db=ar.dbopen(tmp/'rest29-semantic-support.sqlite');storage.track(db);st={'identity_records':{}};sources=[];record_source={}
+    for ix,meta in enumerate(unique_metadata(journal).values()):
+        v=owner.read_asset(meta,key,tmp);before=sha(canonical(v));storage.apply(db,v,st)
+        for sid in v.get('records',{}):record_source[sid]=meta
+        require(before==sha(canonical(v)),'REST29_SEMANTIC_SOURCE_CHANGED')
+        sources.append({'meta':meta,'before_sha256':before,'after_sha256':before})
+        if ix%20==0:print(json.dumps({'phase':'REST29_EVENT_SEMANTIC_READBACK','sources':ix+1}),flush=True)
+    db.commit();rows=[];counts=Counter();masks={}
+    for sid,record in st['identity_records'].items():
+        for index,e in enumerate(record.get('events',[])):
+            base={'record_source':record_source[sid],'record_sid':sid,'event_index':index,'event_sha256':sha(canonical(e)),'original_changed':False,'new_outcome':False}
+            eligible=bool(e.get('entry',{}).get('eligible'));paired=eligible and bool(e.get('_native_accounting_context',{}).get('paired_reference'))
+            ids=e.get('_native_accounting_context',{}).get('quote_ids');counts['events']+=1;counts['entry_feasible']+=eligible;counts['paired_endpoints']+=paired
+            if not paired:rows.append({**base,'classification':'NOT_IN_ORIGINAL_PAIRED_COHORT','old_continuous':False,'native_observations':False});continue
+            if not isinstance(ids,list) or not ids or any(type(s) is not int for s in ids) or type(e.get('t')) is not int:
+                counts['unknown_event_or_quote_identity']+=1;rows.append({**base,'classification':'UNKNOWN_EVENT_OR_QUOTE_IDENTITY','old_continuous':None,'native_observations':None});continue
+            a=e['t']*1000;b=(e['t']+900)*1000
+            old=all(legacy_known_coverage(db,s,k,a,b) for s in ids for k in ('bid','ask'))
+            reports=[]
+            for s in ids:
+                if (s,a,b) not in masks:masks[s,a,b]=native_observation_mask(db,s,a,b)
+                reports.append({'quote_id':s,**masks[s,a,b]})
+            observed=all(r['observed'] for r in reports);counts['old_declared_continuous_paths']+=old;counts['native_observations_fixed_ttl']+=observed
+            label='DECLARED_COVERAGE_WITHOUT_CONTINUOUS_OBSERVATIONS' if old and not observed else 'NATIVE_OBSERVATIONS_NOT_FILL' if observed else 'COVERAGE_OR_OBSERVATIONS_UNKNOWN'
+            counts[label]+=1;rows.append({**base,'classification':label,'old_continuous':old,'native_observations':observed,'window':[a,b],'quote_masks':reports,'original_quote_provenance':'UNKNOWN_LEGACY_NO_COMPLETE_ACCOUNT_SERVER_ROW_RECEIPTS'})
+    require(counts['events']==4525,'REST29_EXACT_RESTORED_EVENT_UNIVERSE')
+    db.close()
+    return {'scope':'ALL4525_CURRENT_CHECKPOINT_EVENTS;ORIGINAL_PAIRED_COHORT_ONLY;FIXED900S_WINDOW_AND300000MS_TTL','counts':dict(counts),'events':rows,'sources':sources,'outcomes_recomputed':False,'historical_original_changed':False,'historical_624_cohort_binding':'ONLY_IF_EXACT_ORIGINAL_COHORT_RECEIPT_MATCHES;NOT_ASSUMED','complete_broker_provenance':False,'economic_promotion_allowed':False}
+
 def validate_cold_receipt(expected,observed):
     require(all(observed.get(k)==expected[k] for k in ('ciphertext_sha256','gzip_sha256','canonical_sha256')),'REST29_COLD_RECEIPT_MISMATCH')
     return True
@@ -405,11 +471,14 @@ def main():
             wires=[w for row in private['delta_inventory'] if row['on_current_parent_chain'] for w in row['wire']]
             for c in private['conflict_investigations']:c['pagination_assessment']=pagination_assessment(c['original'],c['native_receipts'],wires)
             private.update(native_source_scan_head=SCAN_HEAD,native_source_scan_receipt=prior_receipt,source_head=os.environ['GITHUB_SHA'],family_partition=recover_family_partition(transport))
+            private['semantic_event_impact']=semantic_event_impact(journal,key,tmp,owner)
             proof=seal(private,key,tmp,owner,'rest29-owner-investigation.mxmenc')
             count=lambda rows:dict(Counter(x['state'] for x in rows))
             summary={'schema':private['schema'],'run_id':os.environ['GITHUB_RUN_ID'],'source_head':os.environ['GITHUB_SHA'],'generation':1807,'journal_sha256':JOURNAL,'prior_receipt':prior_receipt,'private_evidence':proof,'current_sources':len(private['current_sources']),'current_wire_keys':private['current_wire_keys'],'current_wire_conflicts':len(private['current_wire_conflicts']),'campaign_events':len(private['campaign_event_contacts']),'campaign_contacts':count(private['campaign_event_contacts']),'historical_order_contacts':count(private['historical_contacts']),'cost_reference_contacts':count(private['cost_reference_contacts']),'cost_reference_sources':len(private['cost_reference_sources']),'delta_assets_examined':len(private['delta_inventory']),'delta_assets_verified':sum(r['state']=='OWNER_DECODED' for r in private['delta_inventory']),'parent_chain_complete':private['parent_chain']['complete'],'parent_chain_nodes':len(private['parent_chain']['nodes']),'conflicts':[{'id':c['conflict_id'],'native_receipt_count':c['native_receipt_count'],'disposition':c['disposition']} for c in private['conflict_investigations']],'unbound_failures':len({r['raw_sha256'] for r in private['unbound_failure_investigations']}),'historical_full_impact_closed':False,'original_checkpoint_changed':False,'outcomes_recomputed':False,'new_broker_requests':0,'orders':0,'alpha_certified':False,'HARD21':False,'independent_acceptance':False,'P0_limits':limits,'HTTP_methods':dict(transport.methods)}
             summary.update(native_pagination_assessments=[{'id':c['conflict_id'],**{k:v for k,v in c['pagination_assessment'].items() if k in ('state','reason','coverage_promoted','quarantine_retained','historical_values_changed','complete_source_identity')}} for c in private['conflict_investigations']],delta_unavailable_reasons=dict(Counter(r.get('reason','UNKNOWN') for r in private['delta_inventory'] if r['state']!='OWNER_DECODED')),parent_chain_missing_asset_id=private['parent_chain'].get('missing_asset_id'),historical_order_records=len(private['historical_contacts']),cost_reference_events=len(private['cost_reference_contacts']),raw_response_states=dict(Counter(r.get('response_state','NATIVE_RESPONSE_DECODED') for r in private['raw_receipts'])),raw_complete_source_identity=sum(r['complete_source_identity'] for r in private['raw_receipts']),physical_failure_cause='UNKNOWN;NO_EXACT_DISPATCH_SERVER_IDENTITY_RECOVERED')
             summary['targeted_raw_readback']=[{k:v for k,v in r.items() if k in ('state','raw_requested','raw_matched','raw_missing')} for r in private['targeted_raw_readback']]
+            summary['semantic_event_impact']={k:v for k,v in private['semantic_event_impact'].items() if k not in ('events','sources')}
+            summary['conflict_source_states']=[{'id':c['conflict_id'],'states':[s['state'] for s in c['original']['sources']]} for c in private['conflict_investigations']]
             summary.update(family_partition=private['family_partition'],campaign_unique_symbol_time_pairs=len({(r.get('sid'),r.get('t')) for r in private['campaign_event_contacts']}),campaign_old_entry_states=dict(Counter(str(r.get('old_entry_state')) for r in private['campaign_event_contacts'])),native_source_scan_head=SCAN_HEAD,native_sources_read_again=0)
             from cryptography.hazmat.primitives import serialization,hashes
             from cryptography.hazmat.primitives.asymmetric import padding
