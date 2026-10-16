@@ -2,13 +2,21 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
-## Etapa curentă P0 — pregătire limitată, fără GO
+## Etapa curentă — verificare administrativă P0 read-only
+
+OWNER a confirmat recepția independentă PREPARATION_ONLY_NO_GO la `3bd053a3b23bc94ab90d5ee66e1f466483fb42cb` și a autorizat exclusiv citiri administrative și publicarea raportului. [Raport nou pentru auditor](docs/p0-admin/20261016/REPORT.md), [observații UI](docs/p0-admin/20261016/UI_OBSERVATIONS_PUBLIC.json), [reguli native](docs/p0-admin/20261016/NATIVE_RULESETS.json), [domeniul referințelor](docs/p0-admin/20261016/REFERENCE_SCOPE.json), [delta P0](docs/p0-admin/20261016/P0_EVIDENCE_DELTA.json).
+
+Accesul administrativ a fost confirmat după reconfirmare GitHub Mobile. Politica 7689 este activă,145 ținte cu actori/evenimente permise goale și excepții native declarate. Zero colaboratori/deploy keys; două aplicații instalate. Nu există protecții clasice. Cele opt rulesets protejează O04/sursele sale, fără acoperire globală canonical/autonomous/remediation. Viitorul active-v1 nu există și nu are încă regula exclusivă creation/update. Environment-ul staging rămâne exact issuer-v3, fără tags/bypass administrativ.
+
+Componenta de vizibilitate administrativă are acum dovezi; vechiul403 nu mai este o limită generală a acestor pagini. Nu există încă autoritate reală, trust root auditor real ori supersesiune recepționată pentru rutele istorice. Martorii istorici de release/data/cache nerecuperați nu sunt fabricați. **Toate 28 BLOCKED păstrate.** Nu s-au schimbat setări/cod/workflow-uri și nu s-au repetat teste. Dosarul administrativ așteaptă recepția auditorului; orice configurație reală/GO cere autorizare separată.
+
+## Pregătire P0 recepționată — fără GO
 
 Autorizație OWNER: mesajul „AUTORIZARE LIMITATĂ P0 PENTRU PREGĂTIREA CONTINUĂRII SIGURE”, 16.10.2026. Implementare izolată la `979278ed6903bee6530426b6fe089c4667a6ad8f`; [run38908575611](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/38908575611), job116998317141, attempt1 SUCCESS. **29 teste noi PASS**, 25 GET native, zero scrieri GitHub din probă. O04.2 nu a fost rerulat.
 
 [Raport pentru auditor](docs/p0-preparation/20261016/REPORT.md), [probe și SHA256](docs/p0-preparation/20261016/EVIDENCE_INDEX.json), [dispoziție P0](docs/p0-preparation/20261016/P0_DISPOSITION.json), [spec/design](research_core_v4/p0_transition_20261016/DESIGN.md). Modelul de bootstrap este exclusiv Git local sintetic; backendul real refuză necondiționat. Nu există autoritate activă nouă. Toate cele **28 BLOCKED**, inclusiv nouă P0, rămân BLOCKED; registrul original nu este rescris.
 
-Limite observate: branch-protection 403 în Actions; bypass_actors omis în runner, coroborat separat prin definițiile publice citite de connector. Politica7689 reutilizată din recepția anterioară, fără export administrativ nou. Acestea nu certifică toate ACL istorice. Recepția noii etape este încă a auditorului; numai după ea OWNER decide separat despre operațiuni reale.
+Limite observate: branch-protection 403 în Actions; bypass_actors omis în runner, coroborat separat prin definițiile publice citite de connector. Politica 7689 reutilizată din recepția anterioară, fără export administrativ nou. Acestea nu certifică toate ACL istorice. OWNER a confirmat recepția independentă a acestei pregătiri la `3bd053a3b23bc94ab90d5ee66e1f466483fb42cb`; nu reprezintă GO operațional.
 
 ## Intrare pentru următorul chat
 
@@ -55,4 +63,4 @@ Cheia privată OWNER nu a fost citită aici. Roundtrip-ul AEAD local este verifi
 
 Lipsuri explicite: conversațiile integrale și aprobările istorice nesemnate nu pot fi reconstruite din acest dosar; toate dovezile private P0–P4 mai vechi nu au fost rearhivate. Acest pachet acoperă integral ZIP-ul O04.2 primit, procesul-verbal recuperat și continuitatea registrului public, nu întregul istoric al proiectului. Administratorul GitHub poate modifica/șterge repository-ul; Git nu este un mecanism WORM.
 
-Dovada livrării documentare: [raport de arhivare](docs/continuity/20261016/ARCHIVING_REPORT.md) și [receipt GitHub readback](docs/continuity/20261016/GITHUB_READBACK_RECEIPT.json). OWNER a confirmat recepția arhivării la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`. Noua livrare P0 de mai sus așteaptă recepția independentă.
+Dovada livrării documentare: [raport de arhivare](docs/continuity/20261016/ARCHIVING_REPORT.md) și [receipt GitHub readback](docs/continuity/20261016/GITHUB_READBACK_RECEIPT.json). OWNER a confirmat recepția arhivării la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`. Pregătirea P0 a fost confirmată recepționată de OWNER la `3bd053a3b23bc94ab90d5ee66e1f466483fb42cb`.

@@ -1,0 +1,233 @@
+{
+  "schema": "mxm.p0.admin.ui-observations.public.v1",
+  "base_head": "3bd053a3b23bc94ab90d5ee66e1f466483fb42cb",
+  "method": "Executor transcriptions/normalized DOM observations from signed-in GitHub UI; these are not native JSON exports or independent auditor attestations.",
+  "authentication": "Existing account re-confirmed through GitHub Mobile sudo flow. No credential value, challenge, token or private key retained.",
+  "redaction": "No screenshots, IP/location/email data, secret values or unrelated account access details included.",
+  "observations": [
+    {
+      "kind": "actions_settings",
+      "observed_at": "2026-10-16T15:38:18.583Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/actions",
+      "allow_all_actions": true,
+      "require_SHA_pinning": false,
+      "default_GITHUB_TOKEN": "read contents/packages",
+      "allow_Actions_create_approve_PR": false,
+      "fork_approval": "first-time contributors",
+      "retention_days": 90
+    },
+    {
+      "kind": "actions_policy_7689",
+      "observed_at": "2026-10-16T15:38:57.628Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/actions/rules/7689",
+      "enforcement": "Active",
+      "path_count": 145,
+      "ordered_paths_LF_sha256": "fa3edaf81aefaaafcc108119cfb7729918020e17bc55010a95c6aabc95c90d35",
+      "restrict_actors": true,
+      "allowed_actors": [],
+      "restrict_events": true,
+      "allowed_events": [],
+      "native_service_exemptions": [
+        "Dependabot",
+        "code scanning",
+        "Codespaces prebuilds",
+        "Pages"
+      ],
+      "source": "Rendered UI/DOM, not a native JSON export"
+    },
+    {
+      "kind": "classic_branch_protection",
+      "observed_at": "2026-10-16T15:39:18.530Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/branches",
+      "visible_statement": "Classic branch protections have not been configured"
+    },
+    {
+      "kind": "repository_collaborators",
+      "observed_at": "2026-10-16T15:50:02.662Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/access",
+      "collaborators": 0,
+      "sudo_reconfirmation_completed": true,
+      "visible_statement": "Only you can contribute to this repository."
+    },
+    {
+      "kind": "deploy_keys",
+      "observed_at": "2026-10-16T15:50:11.884Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/keys",
+      "count": 0
+    },
+    {
+      "kind": "installed_apps",
+      "observed_at": "2026-10-16T15:50:25.655Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/installations",
+      "apps": [
+        {
+          "name": "ChatGPT Codex Connector",
+          "installation_id": 158943705
+        },
+        {
+          "name": "MXM O04 Staging Acceptor 20261016",
+          "installation_id": 172030470
+        }
+      ]
+    },
+    {
+      "kind": "staging_app_installation",
+      "observed_at": "2026-10-16T15:50:36.118Z",
+      "page": "https://github.com/settings/installations/172030470",
+      "permissions": [
+        "Metadata:read",
+        "Contents:write"
+      ],
+      "repository_access": "selected",
+      "repository_ids": [
+        1374181010
+      ],
+      "suspend_button_visible": true,
+      "save_disabled": true
+    },
+    {
+      "kind": "codex_installation",
+      "observed_at": "2026-10-16T15:50:51.963Z",
+      "page": "https://github.com/settings/installations/158943705",
+      "read": [
+        "checks",
+        "commit_statuses",
+        "metadata"
+      ],
+      "read_write": [
+        "actions",
+        "contents",
+        "issues",
+        "pull_requests",
+        "workflows"
+      ],
+      "includes_project_repository": true,
+      "suspend_button_visible": true,
+      "save_disabled": true,
+      "account_wide_scope_details_omitted": true
+    },
+    {
+      "kind": "ruleset_inventory",
+      "observed_at": "2026-10-16T15:51:08.908Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/rules",
+      "active_ids": [
+        25222426,
+        25222248,
+        25231653,
+        25231978,
+        25232285,
+        25236611,
+        25236786,
+        25231211
+      ]
+    },
+    {
+      "kind": "staging_authority_rule_UI",
+      "observed_at": "2026-10-16T15:51:44.626Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/rules/25231211",
+      "rule_id": 25231211,
+      "enforcement": "Active",
+      "target": "refs/heads/mxm-o04-stage-authority-v1",
+      "bypass": [
+        {
+          "app": "MXM O04 Staging Acceptor 20261016",
+          "mode": "Always allow"
+        }
+      ],
+      "checked_rules": [
+        "Restrict creations",
+        "Restrict updates"
+      ],
+      "required_status_checks": false
+    },
+    {
+      "kind": "owner_freeze_rule_UI",
+      "observed_at": "2026-10-16T15:51:47.211Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/rules/25222426",
+      "rule_id": 25222426,
+      "bypass_empty": true,
+      "target": "refs/heads/mxm-o04-accepted-*",
+      "checked_rules": [
+        "Restrict creations",
+        "Restrict updates",
+        "Restrict deletions",
+        "Require linear history",
+        "Block force pushes"
+      ],
+      "required_status_checks": false
+    },
+    {
+      "kind": "append_only_rule_UI",
+      "observed_at": "2026-10-16T15:51:57.416Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/rules/25222248",
+      "rule_id": 25222248,
+      "source": "AX diff from owner freeze page and corroborating native public GET",
+      "target": "refs/heads/mxm-o04-*",
+      "restrict_creations": false,
+      "restrict_updates": false
+    },
+    {
+      "kind": "environment_inventory",
+      "observed_at": "2026-10-16T15:52:11.320Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/environments",
+      "environments": [
+        {
+          "name": "mxm-o04-staging-issuer",
+          "id": 24479108558,
+          "protection_rules": 1,
+          "secrets_count": 2,
+          "variables_count": 2
+        }
+      ]
+    },
+    {
+      "kind": "staging_environment",
+      "observed_at": "2026-10-16T15:52:38.215Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/environments/24479108558/edit",
+      "required_reviewers": false,
+      "wait_timer": false,
+      "admin_bypass": false,
+      "deployment_policy": "selected branches and tags",
+      "branch_names": [
+        "mxm-o04-issuer-code-v3"
+      ],
+      "tags_count": 0,
+      "secret_names": [
+        "O04_ACCEPTOR_APP_PRIVATE_KEY",
+        "O04_CUSTODY_CANARY"
+      ],
+      "non_sensitive_variables": {
+        "O04_CODE_FREEZE_RULE_ID": "25232285",
+        "O04_CUSTODY_ACCEPTANCE_RUN": "38885755596:2"
+      },
+      "secret_values_read": false
+    },
+    {
+      "kind": "repository_security_log",
+      "observed_at": "2026-10-16T15:53:51.848Z",
+      "page": "https://github.com/settings/security-log",
+      "query": "repo:mariancradulescu/mxm-quant-greenfield",
+      "native_events_visible": [
+        "environment.update_actions_variable",
+        "environment.update_protection_rule",
+        "repository_ruleset.create",
+        "environment.create_actions_secret"
+      ],
+      "private_network_metadata_saved": false
+    },
+    {
+      "kind": "historical_release_attribution_limit",
+      "observed_at": "2026-10-16T15:55:07.161Z",
+      "page": "https://github.com/settings/security-log",
+      "query": "repo:mariancradulescu/mxm-quant-greenfield action:release",
+      "observation": "Rendered list still included environment/ruleset events; no exact historical release-body mutation receipt recovered in this bounded inspection. No exhaustive absence or actor attribution inferred.",
+      "private_network_metadata_saved": false
+    },
+    {
+      "kind": "self_hosted_runners",
+      "observed_at": "2026-10-16T15:55:24.377Z",
+      "page": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/actions/runners",
+      "visible_statement": "There are no runners configured"
+    }
+  ]
+}
