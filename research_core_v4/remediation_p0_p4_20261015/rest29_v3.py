@@ -15,6 +15,7 @@ import os
 import pathlib
 import re
 import struct
+import subprocess
 import sys
 import tempfile
 import threading
@@ -33,10 +34,15 @@ ARTIFACT=12024388850
 ARTIFACT_SHA='56fde470633fa08e8831c59b442a3a3f6a478fc0b926965cd349bf2586354ba4'
 FP='464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11'
 MAX_ASSETS=2048
+SCAN_ARTIFACT=12026716541
+SCAN_ARTIFACT_SHA='f53a6bc8a67f2d8d0fd80971b5bd116dfe0912dcf80f2023cf24938b8a88983f'
+SCAN_HEAD='a0f041ad43b9992f473bb34b103dd82de237060d'
 
 class Redirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,req,fp,code,msg,headers,newurl):
         require(urllib.parse.urlsplit(newurl).scheme=='https','REST29_REDIRECT_SCHEME')
+        host=urllib.parse.urlsplit(newurl).hostname or ''
+        require(host in ('api.github.com','github.com','release-assets.githubusercontent.com','objects.githubusercontent.com') or bool(re.fullmatch(r'[a-z0-9]+\.blob\.core\.windows\.net',host)),'REST29_REDIRECT_HOST')
         new=super().redirect_request(req,fp,code,msg,headers,newurl)
         if urllib.parse.urlsplit(newurl).hostname!='api.github.com':new.remove_header('Authorization')
         return new
@@ -116,6 +122,30 @@ def contact(event,conflicts,kind='campaign'):
         if hit:hits.append(i)
     return {'state':'POTENTIAL_INPUT_CONTACT_NOT_RECOMPUTED' if hits else 'UNKNOWN_FX_DEPENDENCY_MASK' if unknown else 'NO_CONFLICT_DOMAIN_CONTACT_WITHIN_DECLARED_DEPENDENCIES','event_sha256':sha(canonical(event)),'sid':sid,'t':ev['t'],'conflicts':hits,'unknown_dependency_conflicts':unknown,'dependency_mask':'CONSERVATIVE_HISTORICAL_INPUT_ENVELOPE;NOT_PROOF_OF_ACTUAL_VALUE_CHANGE','kind':kind,'old_entry_state':ev.get('entry',{}).get('state'),'old_net_unchanged':True}
 
+def pagination_assessment(conflict,receipts,wires):
+    """Explain nested spans only when the exact raw page and wire hash agree.
+
+    This does not establish the absent dispatch/server identity, or promote data.
+    In particular a later unrelated COMPLETE page never erases an older failure.
+    """
+    unresolved={'state':'UNKNOWN_CONFLICT_NO_EXACT_NATIVE_NESTING_PROOF','coverage_promoted':False,'quarantine_retained':True,'historical_values_changed':False}
+    if len(conflict.get('sources',[]))!=2:return unresolved
+    good=[s for s in conflict['sources'] if s['state']=='CONFIRMED_COMPLETE']
+    partial=[s for s in conflict['sources'] if s['state']=='PARTIAL_HASMORE']
+    if len(good)!=1 or len(partial)!=1:return unresolved
+    g,p=good[0],partial[0]
+    for r in receipts:
+        q=r.get('request') or {}
+        if any(q.get(k)!=v for k,v in zip(('s','k','a','b'),(*conflict['key'],p['a'],p['b']))):continue
+        if not r.get('has_more_present') or r.get('has_more') is not True:continue
+        times=[x*60000 for x in r.get('native_minutes',[])] if q['k']=='M5' else r.get('native_tick_times_ms',[])
+        if not times or any(t>q['b'] or (q['k']!='M5' and t<q['a']) for t in times):continue
+        start=max(q['a'],min(times)) if q['k']=='M5' else min(times)+1
+        if (g['a'],g['b'])!=(start,q['b']):continue
+        if not any(tuple(w[:4])==(q['s'],q['k'],q['a'],q['b']) and w[4]=='PARTIAL_HASMORE' and w[5]==r.get('response_sha256') for w in wires):continue
+        return {**unresolved,'state':'NATIVE_HASMORE_NESTING_RECONCILED_SOURCE_IDENTITY_STILL_UNKNOWN','raw_asset_id':r['asset_id'],'raw_sha256':r['raw_sha256'],'response_sha256':r['response_sha256'],'derived_suffix':[start,q['b']],'partial_boundary_unknown':True,'complete_source_identity':r['complete_source_identity']}
+    return unresolved
+
 def verify_chain(head,byid):
     seen=set();rows=[];meta=head
     while meta:
@@ -170,13 +200,57 @@ def loose_read(asset,rid,key,tmp,owner,transport):
     except Exception as ex:
         return {'state':'EVIDENCE_UNAVAILABLE','meta':meta,'reason':str(ex) if isinstance(ex,ValueError) and re.fullmatch('REST29_[A-Z0-9_]+',str(ex)) else type(ex).__name__}
 
+def recover_completed_scan(transport,key,tmp,owner):
+    """Reuse exact authenticated native scan; no repeated865-asset readback."""
+    from cryptography.hazmat.primitives import serialization,hashes
+    from cryptography.hazmat.primitives.asymmetric import padding
+    blob=transport.data(f'actions/artifacts/{SCAN_ARTIFACT}/zip',limit=16*1024*1024)
+    require(sha(blob)==SCAN_ARTIFACT_SHA,'REST29_SCAN_ARCHIVE_DIGEST')
+    with zipfile.ZipFile(io.BytesIO(blob)) as z:
+        summary=strict_json(z.read('rest29-summary.json'));att=strict_json(z.read('rest29-attestation.json'));statement=att['statement']
+        pub=serialization.load_pem_public_key((ROOT/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem').read_bytes())
+        pub.verify(base64.b64decode(att['signature_b64']),canonical(statement),padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
+        require(statement['summary_sha256']==sha(canonical(summary)) and statement['source_head']==summary['source_head']==SCAN_HEAD and statement['run_id']==summary['run_id']=='38854115491','REST29_SCAN_STATEMENT_BINDING')
+        proof=summary['private_evidence'];require(proof==statement['private_evidence'],'REST29_SCAN_PRIVATE_BINDING')
+        cipher=z.read(proof['file']);require(sha(cipher)==proof['ciphertext_sha256'],'REST29_SCAN_CIPHER')
+        packed=owner.bounded_decrypt(cipher,key,tmp);require(sha(packed)==proof['gzip_sha256'],'REST29_SCAN_PACKED')
+        raw=unpack(packed);require(sha(raw)==proof['canonical_sha256'],'REST29_SCAN_CANONICAL');value=strict_json(raw,max_elements=8000000)
+    require(value['source_head']==SCAN_HEAD and value['journal_sha256']==JOURNAL and value['parent_chain']['complete'],'REST29_SCAN_SCOPE')
+    return value,{'artifact_id':SCAN_ARTIFACT,'artifact_sha256':SCAN_ARTIFACT_SHA,'source_head':SCAN_HEAD,'run_id':'38854115491','private_evidence':proof,'OWNER_signature_verified':True,'native_sources_read_again':0,'independent_acceptance':False}
+
+def validate_cold_receipt(expected,observed):
+    require(all(observed.get(k)==expected[k] for k in ('ciphertext_sha256','gzip_sha256','canonical_sha256')),'REST29_COLD_RECEIPT_MISMATCH')
+    return True
+
+def family_partition(frontier):
+    selected=frontier['current_wave'];parked=frontier['parked_sources'];baseline=[r['information_source'] for r in frontier['global_candidate_ledger_preserved'] if r['global_status']=='EXACT_BASELINE_REDUNDANT_PROPOSAL_FAMILY_NOT_NULL']
+    require(len(selected)==5 and len(parked)==6 and len(baseline)==1,'REST29_FAMILY_CARDINALITY')
+    require(len(set(selected+parked+baseline))==12,'REST29_FAMILY_ROLE_COLLISION')
+    require(frontier['selected_source'] is None and frontier['market_rows_read']==0 and frontier['current_wave_is_global_selection'] is False,'REST29_FAMILY_SCOPE')
+    return {'selected':selected,'parked':parked,'baseline':baseline,'roles_are_execution_outcomes':False,'originals_modified':False}
+
+def recover_family_partition(transport):
+    authority_path=ROOT/'research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_AUTHORITY_V1.json'
+    frontier_path=ROOT/'research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_V1.json'
+    require(sha(authority_path.read_bytes())=='8f53e53534ec354cb9ca5698b3258b39d236f165e6a1463343ce94252cb24199','REST29_FAMILY_AUTHORITY_DIGEST')
+    authority=strict_json(authority_path.read_bytes());frontier=strict_json(frontier_path.read_bytes());partition=family_partition(frontier)
+    pin=next(x['sha256'] for x in authority['artifact_bindings'] if x['ref']==str(frontier_path.relative_to(ROOT)))
+    require(sha(frontier_path.read_bytes())==pin,'REST29_FAMILY_FRONTIER_DIGEST')
+    freeze=transport.json('commits/'+authority['frontier_and_support_protocol_freeze_commit'])
+    return {**partition,'authority_sha256':sha(authority_path.read_bytes()),'frontier_sha256':pin,'freeze_commit':freeze['sha'],'original_commit_verification':freeze['commit']['verification'],'original_signed_partition_receipt':'NOT_RECOVERED;ORIGINAL_FREEZE_COMMIT_UNSIGNED','status':'BLOCKED_MISSING_ORIGINAL_SIGNATURE;CARDINALITIES_AND_ROLES_RECOVERED','producer_attestation_is_original_signature':False}
+
 def seal(value,key,tmp,owner,name):
     from research_core_v4.shallow_m5_support_v2_production import encrypt_shard
     out=ROOT/'verification';out.mkdir(exist_ok=True)
     raw=canonical(value);packed=gzip.compress(raw,mtime=0);p=out/name
     encrypt_shard(packed,public_key=ROOT/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem',output=p)
     require(owner.bounded_decrypt(p.read_bytes(),key,tmp)==packed,'REST29_OUTPUT_OWNER_READBACK')
-    return {'file':name,'ciphertext_sha256':sha(p.read_bytes()),'gzip_sha256':sha(packed),'canonical_sha256':sha(raw),'OWNER_readback':True}
+    proof={'file':name,'ciphertext_sha256':sha(p.read_bytes()),'gzip_sha256':sha(packed),'canonical_sha256':sha(raw),'OWNER_readback':True}
+    env={k:os.environ[k] for k in ('PATH','LANG') if k in os.environ};env.update(REST29_COLD_FILE=str(p),REST29_COLD_KEY=str(key),REST29_COLD_TMP=str(tmp))
+    child=subprocess.run([sys.executable,'-m',__package__+'.rest29_v3','--cold-child'],cwd=ROOT,env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=180,check=False)
+    require(child.returncode==0,'REST29_COLD_CHILD_FAILED');validate_cold_receipt(proof,strict_json(child.stdout))
+    proof['cold_process_readback']=True
+    return proof
 
 def source_routes():
     rows=[]
@@ -245,11 +319,12 @@ def scan_main(transport,key,tmp,owner,journal,previous):
     for item in byid.values():
         item['on_current_parent_chain']=item['meta']['id'] in linked
         if item['on_current_parent_chain']:matching+=item['raw']
+    bound_wires=[list(k)+list(v['value']) for k,v in wire.items()]+[w for item in byid.values() if item['on_current_parent_chain'] for w in item['wire']]
     investigation=[]
     for ix,c in enumerate(conflicts):
         receipts=[r for r in matching+raws if (q:=r.get('request')) and q.get('s')==c['key'][0] and q.get('k')==c['key'][1] and overlaps(q['a'],q['b'],c['a'],c['b'])]
         unique={r['raw_sha256']:r for r in receipts}
-        investigation.append({'conflict_id':ix,'original':c,'native_receipts':list(unique.values()),'native_receipt_count':len(unique),'disposition':'KEEP_UNKNOWN_QUARANTINE_NO_HISTORICAL_REWRITE','reason':'A later complete-looking receipt cannot erase an older uncertainty without complete causal identity and native pagination binding. Explicitly preserve all original source IDs/ranges.','chain_complete':chain['complete']})
+        investigation.append({'conflict_id':ix,'original':c,'native_receipts':list(unique.values()),'native_receipt_count':len(unique),'pagination_assessment':pagination_assessment(c,list(unique.values()),bound_wires),'disposition':'KEEP_UNKNOWN_QUARANTINE_NO_HISTORICAL_REWRITE','reason':'A later complete-looking receipt cannot erase an older uncertainty without complete causal identity and native pagination binding. Explicitly preserve all original source IDs/ranges.','chain_complete':chain['complete']})
     failures=[r for r in matching+raws if r.get('failure_binding')=='EVIDENCE_UNBOUND']
     # Correlate preserved historical result rows, not their numerical outcomes.
     pins=strict_json((pathlib.Path(__file__).parent/'resolution_sources.json').read_bytes())
@@ -258,8 +333,11 @@ def scan_main(transport,key,tmp,owner,journal,previous):
     accepted_meta=strict_json((ROOT/'research_core_v4/root_cause_economic_20261014_v1/AUTHORITY_V1.json').read_bytes())['accepted_primary'];accepted=owner.read_asset(accepted_meta,key,tmp)
     reference_contacts=[];reference_sources=[]
     for ref in accepted.get('economic_reference_shards',[]):
-        m=ref['asset'];v=owner.read_asset(m,key,tmp);reference_sources.append({'meta':m,'rows':len(v.get('economic_references',[]))})
+        m=ref['asset'];v=owner.read_asset(m,key,tmp)
+        require(v['start']==len(reference_contacts) and len(v['economic_references'])==ref['count'],'REST29_REFERENCE_ORDER_OR_COUNT')
+        reference_sources.append({'meta':m,'rows':len(v['economic_references'])})
         reference_contacts.extend(contact(e,conflicts,'SAVED_COST_REFERENCE_NO_OUTCOME_REPLAY') for e in v.get('economic_references',[]))
+    require(len(reference_contacts)==accepted['economic_reference_count'],'REST29_REFERENCE_TOTAL')
     report={'schema':'mxm.rest29.OWNER.investigation.v3','source_head':os.environ['GITHUB_SHA'],'journal_sha256':JOURNAL,'current_sources':current,'current_wire_keys':len(wire),'current_wire_conflicts':wire_conflicts,'campaign_event_contacts':campaign,'raw_receipts':raws,'conflict_investigations':investigation,'unbound_failure_investigations':failures,'native_storage_releases':release_metadata,'delta_inventory':list(byid.values()),'parent_chain':chain,'historical_contacts':historical_contacts,'cost_reference_contacts':reference_contacts,'cost_reference_sources':reference_sources,'historical_outcomes_recomputed':False,'historical_results_modified':False,'historical_full_impact_closed':False,'all_world_sources_claim':False,'new_broker_requests':0,'orders':0}
     return report
 
@@ -278,13 +356,20 @@ def main():
     try:
         with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as t:
             tmp=pathlib.Path(t);key,fp=_private_key_from_secret(tmp);require(fp==FP,'REST29_OWNER_KEY')
-            previous,prior_receipt=decrypt_artifact(transport,key,tmp,owner)
+            private,prior_receipt=recover_completed_scan(transport,key,tmp,owner)
             journal=owner.read_asset(body['current_journal'],key,tmp)
             limits=p0_limits(transport)
-            private=scan_main(transport,key,tmp,owner,journal,previous)
+            from .resolution import unique_metadata
+            require(set(unique_metadata(journal))=={r['meta']['id'] for r in private['current_sources']},'REST29_REUSED_SOURCE_UNIVERSE')
+            private['parent_chain']=verify_chain(journal['ledger_head'],{r['meta']['id']:r for r in private['delta_inventory']})
+            wires=[w for row in private['delta_inventory'] if row['on_current_parent_chain'] for w in row['wire']]
+            for c in private['conflict_investigations']:c['pagination_assessment']=pagination_assessment(c['original'],c['native_receipts'],wires)
+            private.update(native_source_scan_head=SCAN_HEAD,native_source_scan_receipt=prior_receipt,source_head=os.environ['GITHUB_SHA'],family_partition=recover_family_partition(transport))
             proof=seal(private,key,tmp,owner,'rest29-owner-investigation.mxmenc')
             count=lambda rows:dict(Counter(x['state'] for x in rows))
             summary={'schema':private['schema'],'run_id':os.environ['GITHUB_RUN_ID'],'source_head':os.environ['GITHUB_SHA'],'generation':1807,'journal_sha256':JOURNAL,'prior_receipt':prior_receipt,'private_evidence':proof,'current_sources':len(private['current_sources']),'current_wire_keys':private['current_wire_keys'],'current_wire_conflicts':len(private['current_wire_conflicts']),'campaign_events':len(private['campaign_event_contacts']),'campaign_contacts':count(private['campaign_event_contacts']),'historical_order_contacts':count(private['historical_contacts']),'cost_reference_contacts':count(private['cost_reference_contacts']),'cost_reference_sources':len(private['cost_reference_sources']),'delta_assets_examined':len(private['delta_inventory']),'delta_assets_verified':sum(r['state']=='OWNER_DECODED' for r in private['delta_inventory']),'parent_chain_complete':private['parent_chain']['complete'],'parent_chain_nodes':len(private['parent_chain']['nodes']),'conflicts':[{'id':c['conflict_id'],'native_receipt_count':c['native_receipt_count'],'disposition':c['disposition']} for c in private['conflict_investigations']],'unbound_failures':len({r['raw_sha256'] for r in private['unbound_failure_investigations']}),'historical_full_impact_closed':False,'original_checkpoint_changed':False,'outcomes_recomputed':False,'new_broker_requests':0,'orders':0,'alpha_certified':False,'HARD21':False,'independent_acceptance':False,'P0_limits':limits,'HTTP_methods':dict(transport.methods)}
+            summary.update(native_pagination_assessments=[{'id':c['conflict_id'],**c['pagination_assessment']} for c in private['conflict_investigations']],delta_unavailable_reasons=dict(Counter(r.get('reason','UNKNOWN') for r in private['delta_inventory'] if r['state']!='OWNER_DECODED')),parent_chain_missing_asset_id=private['parent_chain'].get('missing_asset_id'),historical_order_records=len(private['historical_contacts']),cost_reference_events=len(private['cost_reference_contacts']),raw_response_states=dict(Counter(r.get('response_state','NATIVE_RESPONSE_DECODED') for r in private['raw_receipts'])),raw_complete_source_identity=sum(r['complete_source_identity'] for r in private['raw_receipts']),physical_failure_cause='UNKNOWN;NO_EXACT_DISPATCH_SERVER_IDENTITY_RECOVERED')
+            summary.update(family_partition=private['family_partition'],campaign_unique_symbol_time_pairs=len({(r.get('sid'),r.get('t')) for r in private['campaign_event_contacts']}),campaign_old_entry_states=dict(Counter(str(r.get('old_entry_state')) for r in private['campaign_event_contacts'])),native_source_scan_head=SCAN_HEAD,native_sources_read_again=0)
             from cryptography.hazmat.primitives import serialization,hashes
             from cryptography.hazmat.primitives.asymmetric import padding
             signer=serialization.load_pem_private_key(key.read_bytes(),password=None)
@@ -300,8 +385,16 @@ def main():
         writer=csv.DictWriter(f,fieldnames=['entrypoint','resolved_helper','REST','scope']);writer.writeheader();writer.writerows(rows)
     print(json.dumps(summary,sort_keys=True))
 
+def cold_child():
+    from . import owner
+    p=pathlib.Path(os.environ['REST29_COLD_FILE']);require(p.stat().st_size<=128*1024*1024,'REST29_COLD_CIPHER_LIMIT')
+    cipher=p.read_bytes();packed=owner.bounded_decrypt(cipher,pathlib.Path(os.environ['REST29_COLD_KEY']),pathlib.Path(os.environ['REST29_COLD_TMP']));raw=unpack(packed)
+    print(json.dumps({'ciphertext_sha256':sha(cipher),'gzip_sha256':sha(packed),'canonical_sha256':sha(raw)}))
+
 if __name__=='__main__':
-    try:main()
+    try:
+        if '--cold-child' in sys.argv:cold_child()
+        else:main()
     except Exception as ex:
         # Known require() codes only. Never emit broker bodies, key or trace locals.
         code=str(ex) if isinstance(ex,ValueError) and re.fullmatch('REST29_[A-Z0-9_]+',str(ex)) else type(ex).__name__

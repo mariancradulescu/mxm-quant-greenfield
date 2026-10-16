@@ -12,6 +12,19 @@ from . import rest29_v3 as r
 from .safety import sha,canonical
 
 class RemainingTests(unittest.TestCase):
+    def test_cold_receipt_all_three_hashes_or_reject(self):
+        p={'ciphertext_sha256':'a','gzip_sha256':'b','canonical_sha256':'c'}
+        self.assertTrue(r.validate_cold_receipt(p,p))
+        for k in p:
+            bad=dict(p);bad[k]='WRONG'
+            with self.assertRaisesRegex(ValueError,'COLD_RECEIPT_MISMATCH'):r.validate_cold_receipt(p,bad)
+
+    def test_family_roles_exact_original_partition_no_execution_promotion(self):
+        f=json.loads((r.ROOT/'research_core_v4/state/STRICT_PREOUTCOME_V2_CURRENT_TESTABILITY_FRONTIER_V1.json').read_text())
+        before=canonical(f);p=r.family_partition(f);self.assertEqual([len(p[k]) for k in ('selected','parked','baseline')],[5,6,1]);self.assertFalse(p['roles_are_execution_outcomes']);self.assertEqual(before,canonical(f))
+        f['parked_sources'][0]=f['current_wave'][0]
+        with self.assertRaisesRegex(ValueError,'FAMILY_ROLE_COLLISION'):r.family_partition(f)
+
     def test_get_only_rejects_all_mutations_before_io(self):
         t=r.GetOnly()
         with patch.object(t.opener,'open') as opened:
@@ -46,8 +59,33 @@ class RemainingTests(unittest.TestCase):
 
     def test_redirect_strips_token_for_asset_host(self):
         h=r.Redirect();req=urllib.request.Request('https://api.github.com/repos/'+r.REPO+'/actions/artifacts/1/zip',headers={'Authorization':'Bearer SYNTHETIC_TOKEN'})
-        new=h.redirect_request(req,None,302,'',{},'https://example.invalid/signed-asset')
+        new=h.redirect_request(req,None,302,'',{},'https://release-assets.githubusercontent.com/signed-asset')
         self.assertIsNone(new.get_header('Authorization'))
+
+    def test_redirect_to_broker_or_http_is_rejected(self):
+        h=r.Redirect();req=urllib.request.Request('https://api.github.com/repos/'+r.REPO+'/releases/1')
+        for url in ('https://broker.invalid/','http://release-assets.githubusercontent.com/asset'):
+            with self.assertRaises(ValueError):h.redirect_request(req,None,302,'',{},url)
+
+    def test_exact_native_partial_suffix_explained_without_promotion(self):
+        c={'key':[1,'bid'],'a':51,'b':100,'sources':[{'a':0,'b':100,'state':'PARTIAL_HASMORE'},{'a':51,'b':100,'state':'CONFIRMED_COMPLETE'}]}
+        receipt={'request':{'s':1,'k':'bid','a':0,'b':100},'has_more_present':True,'has_more':True,'native_tick_times_ms':[50,99],'response_sha256':'h','raw_sha256':'r','asset_id':1,'complete_source_identity':False}
+        wire=[[1,'bid',0,100,'PARTIAL_HASMORE','h']];before=canonical([c,receipt,wire]);out=r.pagination_assessment(c,[receipt],wire)
+        self.assertEqual(out['state'],'NATIVE_HASMORE_NESTING_RECONCILED_SOURCE_IDENTITY_STILL_UNKNOWN');self.assertFalse(out['coverage_promoted']);self.assertTrue(out['quarantine_retained']);self.assertFalse(out['complete_source_identity']);self.assertEqual(before,canonical([c,receipt,wire]))
+
+    def test_unrelated_complete_page_or_wire_hash_does_not_erase_partial(self):
+        c={'key':[1,'bid'],'a':51,'b':100,'sources':[{'a':0,'b':100,'state':'PARTIAL_HASMORE'},{'a':51,'b':100,'state':'CONFIRMED_COMPLETE'}]}
+        receipt={'request':{'s':1,'k':'bid','a':0,'b':100},'has_more_present':True,'has_more':True,'native_tick_times_ms':[50,99],'response_sha256':'h','raw_sha256':'r','asset_id':1,'complete_source_identity':False}
+        self.assertTrue(r.pagination_assessment(c,[receipt],[[1,'bid',0,100,'PARTIAL_HASMORE','WRONG']])['state'].startswith('UNKNOWN'))
+        receipt['has_more']=False
+        self.assertTrue(r.pagination_assessment(c,[receipt],[[1,'bid',0,100,'PARTIAL_HASMORE','h']])['state'].startswith('UNKNOWN'))
+
+    def test_m5_nested_suffix_requires_exact_native_bar_time(self):
+        c={'key':[1,'M5'],'a':60000,'b':90000,'sources':[{'a':0,'b':90000,'state':'PARTIAL_HASMORE'},{'a':60000,'b':90000,'state':'CONFIRMED_COMPLETE'}]}
+        receipt={'request':{'s':1,'k':'M5','a':0,'b':90000},'has_more_present':True,'has_more':True,'native_minutes':[1],'response_sha256':'h','raw_sha256':'r','asset_id':1,'complete_source_identity':False}
+        self.assertEqual(r.pagination_assessment(c,[receipt],[[1,'M5',0,90000,'PARTIAL_HASMORE','h']])['state'],'NATIVE_HASMORE_NESTING_RECONCILED_SOURCE_IDENTITY_STILL_UNKNOWN')
+        receipt['native_minutes']=[2]
+        self.assertTrue(r.pagination_assessment(c,[receipt],[[1,'M5',0,90000,'PARTIAL_HASMORE','h']])['state'].startswith('UNKNOWN'))
 
     def test_complete_parent_chain_has_exact_three_digests(self):
         def item(i,parent=None):return {'state':'OWNER_DECODED','meta':{'id':i,'ciphertext_sha256':str(i)*64,'gzip_sha256':'g'*64,'canonical_sha256':'p'*64},'parent_ledger':parent}
