@@ -84,6 +84,9 @@ def raw_receipt(raw,asset_id):
         elif raw.get('response_b64'):
             blob=base64.b64decode(raw['response_b64'],validate=True);res=ProtoOAGetTickDataRes.FromString(blob)
             d.update(response_sha256=sha(blob),response_account=int(res.ctidTraderAccountId),has_more_present=res.HasField('hasMore'),has_more=bool(res.hasMore) if res.HasField('hasMore') else None,native_rows=len(res.tickData))
+            from m6.cost_evidence import decode_ctrader_tick_page
+            decoded=decode_ctrader_tick_page([{'timestamp':x.timestamp,'tick':x.tick} for x in res.tickData])
+            d['native_tick_times_ms']=[x.timestamp_ms for x in decoded]
         else:d['response_state']='NO_PRESERVED_NATIVE_RESPONSE'
     except Exception as ex:d['response_state']='UNKNOWN_NATIVE_DECODE_'+type(ex).__name__
     q=d.get('request') or {}

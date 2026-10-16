@@ -75,7 +75,7 @@ class RemainingTests(unittest.TestCase):
         from m6.ctrader_proto.OpenApiMessages_pb2 import ProtoOAGetTickDataRes
         import base64
         res=ProtoOAGetTickDataRes(ctidTraderAccountId=3)
-        got=r.raw_receipt({'response_b64':base64.b64encode(res.SerializeToString()).decode()},1)
+        got=r.raw_receipt({'response_b64':base64.b64encode(res.SerializePartialToString()).decode()},1)
         self.assertFalse(got['has_more_present']);self.assertIsNone(got['has_more'])
 
     def test_historical_impact_does_not_use_short_m5_lookback(self):
