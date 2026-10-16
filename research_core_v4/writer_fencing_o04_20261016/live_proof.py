@@ -21,6 +21,8 @@ REPO='mariancradulescu/mxm-quant-greenfield'
 REMOTE='https://github.com/'+REPO+'.git'
 PREFIX='refs/heads/mxm-o04-proof-'
 OWNER_JOURNAL='ea93f6c38768824521d4ad3e316c0cd507c837e5c089c5e3b6f63d20d79e7470'
+ACCEPTED_REF='heads/mxm-o04-accepted-owner-1807-v1'
+ACCEPTED_OID='a830c132521bd4348454653f713e04f6107484fe'
 
 def get(path):
     req=urllib.request.Request('https://api.github.com/repos/'+REPO+'/'+path,
@@ -63,10 +65,24 @@ def denied(fn):
     except lab.Denied:return
     raise ValueError('EXPECTED_DENIAL_MISSING')
 
+def verify_stop_registry(owner_body):
+    lab.need(get('git/ref/'+ACCEPTED_REF)['object']['sha']==ACCEPTED_OID,'ACCEPTED_AUTHORITY_DRIFT')
+    raw=get('contents/state.json?ref='+ACCEPTED_OID)
+    state=json.loads(base64.b64decode(raw['content']))
+    lab.need(state['schema']=='mxm.o04.accepted.stop-registry.v1' and state['mode']=='STOP_ONLY_FROZEN','ACCEPTED_AUTHORITY_MODE')
+    lab.need(state['accepted']['0']['digest']==OWNER_JOURNAL and state['checkpoint_generation']==1807,'ACCEPTED_OWNER_BINDING')
+    lab.need(state['checkpoint_writes_allowed'] is False and state['campaign_restart_allowed'] is False,'ACCEPTED_AUTHORITY_NOT_STOP')
+    lab.need(state['source_release_body_sha256']==hashlib.sha256(owner_body.encode()).hexdigest(),'ACCEPTED_RELEASE_DRIFT')
+    rule=get('rulesets/25222426')
+    lab.need(rule['enforcement']=='active' and {'update','deletion','non_fast_forward'}<={r['type'] for r in rule['rules']},'ACCEPTED_AUTHORITY_NOT_LOCKED')
+    lab.need(rule['conditions']['ref_name']=={'include':['refs/heads/mxm-o04-accepted-*'],'exclude':[]},'ACCEPTED_FREEZE_TARGET')
+    if 'bypass_actors' in rule:lab.need(rule['bypass_actors']==[],'ACCEPTED_FREEZE_BYPASS')
+    return ACCEPTED_OID
+
 def main():
     scope();before=get('releases/412686323')['body'];owner=json.loads(before)
     lab.need(owner['generation']==1807 and owner['state']=='STOP_FAIL_CLOSED' and owner['current_journal']['canonical_sha256']==OWNER_JOURNAL,'OWNER_ANCHOR')
-    results={}
+    stop_registry_oid=verify_stop_registry(before);results={}
     with tempfile.TemporaryDirectory() as tmp:
         root=pathlib.Path(tmp);a=RemoteProof(root/'a');b=RemoteProof(root/'b')
         genesis=a.initialize_synthetic();barrier=threading.Barrier(2)
@@ -113,8 +129,10 @@ def main():
         receipt={'schema':'mxm.o04.live-synthetic-proof.v1','head':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
             'synthetic_ref':lab.REF,'final_oid':oid,'unauthorized_candidate':candidate,'carrier_ref':carrier,
             'results':results,'OWNER_release_body_sha256':hashlib.sha256(before.encode()).hexdigest(),
+            'accepted_STOP_registry_oid':stop_registry_oid,'accepted_STOP_registry_verified':True,
             'OWNER_checkpoint_writes':0,'new_broker_requests':0,'orders':0,'research_executed':False}
     lab.need(get('releases/412686323')['body']==before,'OWNER_ANCHOR_CHANGED')
+    lab.need(verify_stop_registry(before)==stop_registry_oid,'STOP_AUTHORITY_CHANGED')
     out=pathlib.Path('verification');out.mkdir(exist_ok=True)
     (out/'o04-live-proof.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
     if os.environ.get('GITHUB_OUTPUT'):

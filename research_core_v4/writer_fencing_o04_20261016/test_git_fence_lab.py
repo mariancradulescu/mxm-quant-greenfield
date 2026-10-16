@@ -109,5 +109,5 @@ if __name__=='__main__':
     (out/'o04-tests.json').write_text(json.dumps({'schema':'mxm.o04.tests.v1','tests':result.testsRun,
         'failures':len(result.failures),'errors':len(result.errors),'skipped':len(result.skipped),
         'scope':'SYNTHETIC_LOCAL_GIT_RECEIVE_PACK;NOT_LIVE_GITHUB_AUTHORIZATION',
-        'production_enabled':False,'O04.1':'NO_GO_GLOBAL_AUTHORITY_UNVERIFIED'},sort_keys=True)+'\n')
+        'production_enabled':False,'O04.1':'ISOLATED_PROTOCOL_ONLY_SEE_LIVE_AND_ADMIN_EVIDENCE'},sort_keys=True)+'\n')
     raise SystemExit(not result.wasSuccessful())

@@ -53,7 +53,9 @@ def probe():
         result.append(row)
     out=pathlib.Path('verification');out.mkdir(exist_ok=True)
     summary={'schema':'mxm.o04.readonly-rights.v1','head':os.environ.get('GITHUB_SHA'),'run_id':os.environ.get('GITHUB_RUN_ID'),
-        'HTTP_methods':['GET'],'results':result,'production_mutations':0,'O04.1':'NO_GO_GLOBAL_AUTHORITY_UNVERIFIED'}
+        'HTTP_methods':['GET'],'results':result,'production_mutations':0,
+        'scope':'JOB_TOKEN_VISIBILITY_ONLY;GLOBAL_UI_CONTROLS_VERIFIED_SEPARATELY',
+        'global_O04_verdict':'NOT_DECIDED_BY_THIS_JOB_TOKEN'}
     (out/'o04-rights.json').write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
     print(json.dumps(summary,sort_keys=True))
 
