@@ -1,0 +1,33 @@
+name: MXM O04 isolated fencing evidence only
+run-name: MXM O04 fencing tests and GET-only rights ${{ github.sha }}
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - 'research_core_v4/writer_fencing_o04_20261016/**'
+      - '.github/workflows/mxm-o04-fencing-evidence-20261016.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  isolated_fence_and_authority_evidence:
+    if: github.run_attempt == 1 && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, fetch-depth: 0}
+      - name: Only synthetic local Git concurrency and fencing controls
+        run: python3 -m research_core_v4.writer_fencing_o04_20261016.test_git_fence_lab
+      - name: All fetched heads tags and historical source versions without executing legacy code
+        run: python3 -m research_core_v4.writer_fencing_o04_20261016.inventory verification/o04-writer-inventory.json
+      - name: GET-only GitHub authority and stopped checkpoint evidence
+        run: python3 -m research_core_v4.writer_fencing_o04_20261016.probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-o04-fencing-${{ github.sha }}
+          path: verification/o04-*.json
+          if-no-files-found: error
