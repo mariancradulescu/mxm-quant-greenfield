@@ -2,6 +2,22 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
+## Etapa A — implementare nativă verificată, instalare incompletă, fără GO
+
+OWNER a confirmat recepția G03.2-R2 la `f1bc26280fab95b8fd083b032cb272c543aaa93b` și a autorizat etapa A. Proveniență: mesajul OWNER din conversația curentă. Nicio recepție independentă nouă nu este inventată.
+
+**A_NATIVE_INTEGRATION_VERIFIED_INSTALLATION_INCOMPLETE_NO_GO.** Sursa finală `5f8c9432cfa5f0c29711bd721c33a6536942b13a`: publisher/issuer comun, CAS Git, jurnal/replay/generație, recuperare ACK rece, pipeline restore/worker/handoff/economic și gate critic nativ. [Run39004026709](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39004026709), job117312689341, attempt1 SUCCESS:42cazuri,33refuzuri, numai integrarea nouă în domeniu sintetic izolat. Artefact12089794794 SHA256 `73b1cf6fe06930ebde7e3b3785ed3c3d24b71ce046439db68c5761472bf2cfb0` păstrat integral în Git.
+
+Environment critic24553414129 `mxm-p0-owner-critical-v1` are reviewer exclusiv OWNER322088485, fără bypass administrativ/secrete; issuer24553648726 `mxm-p0-successor-issuer-v1` este gol, fără bypass. Ambele admit numai `mxm-o04-successor-code-a-v1`, zero tags. Gate39004110399 a fost WAITING fără runner/reviews, apoi CANCELLED după păstrarea dovezii; Directorul nu l-a aprobat. Gate-ul nu certifică operatorul uman al unei sesiuni OWNER comune.
+
+**Sigiliul nou creation/update/deletion/non-fast-forward fără bypass NU este instalat.** La salvare, reconfirmarea GitHub Mobile a expirat; operațiunea a fost oprită fără retry/escaladare. Noua ramură de cod are numai protecția append-only moștenită și nu primește credentiale. Cele10 reguli existente rămân identice;25268790 activă fără bypass și active-v1 absentă. Următorul pas exact este finalizarea sigiliului A deja autorizat prin reconfirmare nativă administrativă, readback și recepție. **B nu este încă eligibilă**.
+
+[Raport pentru auditor](docs/p0-successor-a/20261017/REPORT.md), [stare/frontiere](docs/p0-successor-a/20261017/STATUS_AND_REMAINING_BOUNDARIES.json), [pachetul unic B condiționat](docs/p0-successor-a/20261017/B_PACKAGE.json), [configurația sigiliului nesalvat](docs/p0-successor-a/20261017/SOURCE_AND_SYNTHETIC_SEAL_PENDING.json), [configurații UI](docs/p0-successor-a/20261017/UI_OBSERVATIONS_PUBLIC.json), [dovezi și SHA256](docs/p0-successor-a/20261017/EVIDENCE_INDEX.json), [readback GitHub](docs/p0-successor-a/20261017/GITHUB_READBACK_RECEIPT.json).
+
+Reutilizarea App5343530 pentru active necesită înainte de orice bypass închiderea rutei vechi de emitere/custodie, exclusivitate nouă pe cod înghețat și scurgerea TTL3600s. A nu modifică cheia/environment-ul staging. B propune un singur traseu, cu aprobarea nativă OWNER exactă, bootstrap de control1807 și delegare finită fără research; câmpurile necunoscute rămân null, nu dovezi fabricate. Formatul de input demonstrat rămâne sintetic; nu este migrare operațională sau parser economic real. Nicio modificare a celor144 workflow-uri istorice.
+
+OWNER1807/staging neschimbate. **163PASS/28BLOCKED neschimbate**, istoricul nerecuperat UNKNOWN/carantină. Fără cheie auditor, App token real nou, credential legat de active, bypass, bootstrap real, checkpoint real nou, restart, research/colectare/backtesting economic, broker I/O, cBot, Cloud sau tranzacționare. Snapshoturile următoare se păstrează integral.
+
 ## Etapa curentă — G03.2-R2: OWNER critic, delegare automată limitată
 
 OWNER a decis în conversația curentă „SIMPLIFICARE P0 ȘI ELIMINAREA DEPENDENȚELOR CRIPTOGRAFICE NENECESARE”: **nu introduce custode auditor extern, cheie privată suplimentară de auditor sau infrastructură de semnare nouă**. Acesta este mandatul de adaptare izolată, nu bootstrap/research GO. Înrolarea MXM-OWNER-AUDITOR-ENROLLMENT-001 din etapa precedentă este **SUPERSEDATĂ și nu mai este solicitată**. Documentele ei rămân istoric, nu dependență curentă.
