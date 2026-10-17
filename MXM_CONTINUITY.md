@@ -1,5 +1,18 @@
 # MXM Quant Greenfield — continuitate operativă
 
+## Actualizare operativă 17 octombrie 2026 — mandat OWNER B–E (stare parțială, fără GO)
+
+OWNER a autorizat explicit și persistent etapele B–E, inclusiv implementarea, testarea și remedierea autonomă în limitele mandatului. Această decizie supersedează exclusiv interdicția anterioară de a începe B/research offline/cBot; nu supersedează oprirea sigură, conservarea OWNER1807, limitarea furnizorilor sau interdicția tranzacțiilor reale. Nu solicităm auditorului aprobare executivă; autentificarea nativă obligatorie nu este eludată. Proveniența autorizării: mesaj OWNER în conversația din 2026-10-17, nu o semnătură GitHub.
+
+**B1 INSTALLATION COMPLETE, B NOT OPERATIONAL:** workflow-ul critic `.github/workflows/mxm-p0-successor-critical-a.yml` a fost creat pe `main` la commit `2c5d7d29769eb4d8ace243b4c77dbde1bc4a5dc7`, cu fișier byte-identical sursei înghețate `5f8c9432cfa5f0c29711bd721c33a6536942b13a` (blob `2c4f6fe3e9f219cdc25ee51eb86ce8d818ea70ac`). Readback GitHub verificat. Regula 25295948 activă fără bypass; OWNER1807 încă la `a830c132521bd4348454653f713e04f6107484fe`. Nu s-a cerut sau executat workflow_dispatch, grant, bootstrap, migrare secret, token, research ori ordin.
+
+**Urmează B2 — separarea demonstrabilă a custodiei existente App 5343530 / installation 172030470.** Doar după închiderea accesului vechi la `mxm-o04-staging-issuer` / `O04_ACCEPTOR_APP_PRIVATE_KEY` și dovada că nu există alt executor cu aceeași cheie, configurați noul `mxm-p0-successor-issuer-v1` / `SUCCESSOR_APP_PRIVATE_KEY`, respectați drenarea TTL3600s și abia apoi considerați bypass-ul îngust pe regula 25268790. Conectorul GitHub al sesiunii curente nu oferă citirea/modificarea secretelor de environment sau a ruleset-urilor; nu se inventează recitirea ori izolarea. Este o limită de instrument, nu o expirare a mandatului OWNER.
+
+**B incomplet:** backendul A admite numai payload sintetic și scope `CHECKPOINT_ONLY_NO_RESEARCH`; integrarea reală, parserul/checkpointul permis, circuitul automat inter-run și validarea machine-side reală încă lipsesc. Regula GIT numită `mxm-o04-active-v1` rămâne necreată. Nu raportați B/C/D/E ca închise înaintea doveyilor; registrul 163 PASS / 28 BLOCKED nu se rescrie. După B operațional verificat, C poate începe numai offline, cu corpusuri legitime existente sau Pepperstone în scope. Fără furnizori noi, fără ordine LIVE/fonduri/tranzacții. Continuarea Directorului și auto-testarea tehnică nu depind de o recepție repetată a auditorului.
+
+---
+
+
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
 ## Etapa A finalizată — sursă înghețată, fără activare
