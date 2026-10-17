@@ -39,7 +39,7 @@ def parse_verified(journal, expected_digest):
 
 def recover():
     root=pathlib.Path(__file__).resolve().parents[2];clean_tree(root)
-    need(os.environ.get('GITHUB_REF_NAME')=='mxm-remediation-p0-p4-20261015-v1' and
+    need(os.environ.get('GITHUB_REF_NAME') in ('mxm-remediation-p0-p4-20261015-v1','mxm-o04-successor-code-b-v1') and
          os.environ.get('GITHUB_RUN_ATTEMPT')=='1','B_RECOVERY_WORKLOAD')
     before=owner.get('releases/412686323');body=strict_json(before['body'])
     need(body['generation']==1807 and body['state']=='STOP_FAIL_CLOSED' and
@@ -68,6 +68,7 @@ def recover():
     out=root/'verification/successor-b';out.mkdir(parents=True,exist_ok=True)
     (out/'real-restore.json').write_bytes(canonical(receipt))
     print(canonical(receipt).decode())
+    return receipt
 
 if __name__=='__main__':
     # Reuse the existing process-wide GET-only route, including the legacy

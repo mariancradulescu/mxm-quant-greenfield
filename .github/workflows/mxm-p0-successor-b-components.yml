@@ -6,6 +6,7 @@ on:
     paths:
       - research_core_v4/p0_successor_b_20261017/**
       - .github/workflows/mxm-p0-successor-b-components.yml
+      - .github/workflows/mxm-p0-successor-runtime-b.yml
 permissions: {}
 concurrency:
   group: mxm-b-components-only
@@ -74,3 +75,15 @@ jobs:
           path: verification/successor-b/real-restore.json
           if-no-files-found: error
           retention-days: 90
+  native-admission-controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Existing hash-locked modules, no App or OWNER key
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: New B admission and actual local receive-pack CAS controls
+        run: python3 -m research_core_v4.p0_successor_b_20261017.test_native
