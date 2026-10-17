@@ -2,6 +2,18 @@
 
 Actualizare: 16 octombrie 2026. Rol: Director executant. OWNER a confirmat recepția O04.2 staging și arhivarea la `8a71881c6ef8154be4d24aab7dad3b1dd212392f`, apoi a autorizat separat numai pregătirea tehnică/securitate P0. Nicio autorizație de cercetare ori GO operațional.
 
+## Etapa A finalizată — sursă înghețată, fără activare
+
+**A_INSTALLED_FAIL_CLOSED_NO_GO.** Regula nouă **25295948** este instalată și verificată nativ: active, bypass[], creation/update/deletion/non_fast_forward, pentru exact sursa `mxm-o04-successor-code-a-v1` și prefixul sintetic A. Sursa rămâne `5f8c9432cfa5f0c29711bd721c33a6536942b13a`. Reconfirmarea GitHub Mobile a permis salvarea regulii în cadrul autorizării A existente; mandatul nu a expirat și nu s-a cerut unul nou. Cele10 reguli vechi sunt neschimbate;25268790 fără bypass, active-v1 absentă, OWNER1807/staging neschimbate.
+
+[Raportul de închidere A](docs/p0-successor-a/20261017/closure/REPORT.md), [dovezi native](docs/p0-successor-a/20261017/closure/NATIVE_INSTALLATION_EVIDENCE.json), [verificare](docs/p0-successor-a/20261017/closure/VERIFICATION.json), [index/SHA256](docs/p0-successor-a/20261017/closure/EVIDENCE_INDEX.json), [receipt de recitire](docs/p0-successor-a/20261017/closure/GITHUB_READBACK_RECEIPT.json), [pachetul unic B curent](docs/p0-successor-a/20261017/closure/B_PACKAGE.json).
+
+**Zero teste/workflow-uri/probe de scriere reluate.** Se reutilizează run39004026709 SUCCESS,42cazuri/33refuzuri și arhiva deja verificată. Zero schimbări de cod, chei, environment-uri ori workflow-uri istorice. Registrul163PASS/28BLOCKED rămâne neschimbat; UNKNOWN nu admite automat date în research.
+
+Instrucțiunea OWNER de continuitate este permanent valabilă în scope până la finalizare, inclusiv după timeout sau schimbare de chat. Directorul continuă autonom operațiunile autorizate. **Auditorul este verificator independent read-only, nu gate de aprobare executivă.** Nu se impun chei/custozi/straturi administrative noi sau aprobări umane pe fiecare checkpoint/workflow. Politica B viitoare trebuie să reutilizeze grantul OWNER inițial pentru runurile ordinare, în limite finite și fail-closed. Aprobarea B însă nu este dedusă din A; bootstrap/research/restart rămân neautorizate.
+
+Închiderea instalării A nu certifică funcționarea reală App, parser/restaurare economică, handoff operațional inter-run ori cercetare autonomă. Scope-ul demonstrat rămâne cel tehnic/sintetic. Directorul nu fabrică o recepție independentă; dosarul este disponibil auditorului pentru verificare. Pachetul B curent supersedează cerințele executive de recepție/auditor și teardown suplimentar din draftul vechi, conform instrucțiunii OWNER actuale. Snapshoturile și recepțiile istorice de mai jos se păstrează integral; stările lor pending/incomplete nu mai descriu instalarea A curentă.
+
 ## Etapa A — implementare nativă verificată, instalare incompletă, fără GO
 
 OWNER a confirmat recepția G03.2-R2 la `f1bc26280fab95b8fd083b032cb272c543aaa93b` și a autorizat etapa A. Proveniență: mesajul OWNER din conversația curentă. Nicio recepție independentă nouă nu este inventată.
