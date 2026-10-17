@@ -116,7 +116,7 @@ def plan():
         a=json.loads(os.environ['B_ACCESS']);now=int(time.time())
         p={'schema':'mxm.renewable-continuation-root.v1','owner_root':list(OWNER_ROOT),
            'authority_ref':ACTIVE_REF,'source_sha':os.environ['GITHUB_SHA'],
-           'principal':'APP:5343530:172030470','not_before':now,'lease_seconds':86400,
+           'principal':'APP:5343530:172030470','not_before':now,'lease_seconds':60,
            'max_items_per_lease':100,'providers':PROVIDERS,'orders_allowed':False,
            'historical_restart_allowed':False}
         m={'schema':'mxm.owner-critical-manifest.v2','critical_operation':'BOOTSTRAP_AND_DELEGATE',
@@ -150,6 +150,7 @@ def execute():
         else:need(h is not None,'B_AUTHORITY_MISSING_NO_REBOOTSTRAP')
         control=s['control'];need(control['phase']=='B','B_NEXT_PHASE_REQUIRES_INSTALLED_C_WORKER')
         need(control['generation']<1809,'B_PROOF_COMPLETE_C_INSTALLATION_PENDING')
+        prior_lease_index=None if control['lease'] is None else control['lease']['index']
         if control['lease']!=lease(p,int(time.time())):
             v=propose(p,control,h,int(time.time()),'renew');h=t.cas(h,t.wrap(v['state']));h,s=t.read();control=s['control']
         # Any persisted pending work causes STOP here, never a callback retry.
@@ -169,10 +170,12 @@ def execute():
         final=reconcile(p,s['control'],intent,result)
         final.update(native_oid=h,root_sha256=s['control']['root_sha256'],
                      original_owner_generation=1807,research_executed=False,
-                     B_worker='REAL_READ_ONLY_RESTORATION',C_worker_installed=False)
+                     B_worker='REAL_READ_ONLY_RESTORATION',C_worker_installed=False,
+                     prior_lease_index=prior_lease_index,lease=s['control']['lease'])
         out=pathlib.Path('verification/successor-b/native-receipt.json');out.write_bytes(canonical(final))
         with open(os.environ['GITHUB_OUTPUT'],'a') as f:
             f.write('next='+('continue' if s['control']['generation']==1808 else 'STOP_B_PROOF_COMPLETE_C_INSTALLATION_PENDING')+'\n')
+            f.write('next_after='+str(s['control']['lease']['expires_at']+1)+'\n')
         print(canonical(final).decode())
 
 if __name__=='__main__':

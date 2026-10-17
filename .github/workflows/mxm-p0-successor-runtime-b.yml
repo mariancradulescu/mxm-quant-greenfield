@@ -60,6 +60,7 @@ jobs:
     permissions: {contents: read, actions: read}
     outputs:
       next: ${{ steps.execute.outputs.next }}
+      next_after: ${{ steps.execute.outputs.next_after }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
@@ -94,9 +95,15 @@ jobs:
       - name: Dispatch second finite segment on the same frozen source, no human gate
         env:
           GH_TOKEN: ${{ github.token }}
+          NEXT_AFTER: ${{ needs.successor-issuer.outputs.next_after }}
         run: |
           python3 - <<'PY'
-          import json,os,urllib.request
+          import json,os,time,urllib.request
+          # A short finite B proof waits for the previous lease to expire;
+          # the next run must renew through native Git CAS without a new gate.
+          delay=max(0,int(os.environ['NEXT_AFTER'])-int(time.time()))
+          if delay>61:raise SystemExit('B_HANDOFF_DEADLINE_INVALID')
+          if delay:time.sleep(delay)
           url='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-p0-successor-runtime-b.yml/dispatches'
           body={'ref':'mxm-o04-successor-code-b-v1','inputs':{'command':'continue'}}
           req=urllib.request.Request(url,data=json.dumps(body).encode(),method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
