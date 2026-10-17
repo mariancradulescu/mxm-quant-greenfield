@@ -7,6 +7,8 @@ import dataclasses
 import pathlib
 import tempfile
 import os
+import re
+import json
 from research_core_v4.p0_supersession_20261016.authority import OWNER_ROOT, need, digest, canonical
 from research_core_v4.remediation_p0_p4_20261015 import owner
 from research_core_v4.remediation_p0_p4_20261015.resolution import unique_metadata
@@ -73,8 +75,11 @@ if __name__=='__main__':
     route=GetOnly();old_get=owner.get;old_open=urllib.request.urlopen
     owner.get=route.json;urllib.request.urlopen=route.open
     try:recover()
-    except Exception:
-        print('{"state":"B_REAL_RESTORE_BLOCKED","private_details_omitted":true}')
+    except Exception as error:
+        # Validation identifiers contain no private data. Other exception text
+        # and trace locals remain suppressed.
+        code=str(error) if re.fullmatch(r'(B_|REST29_)[A-Z0-9_]+',str(error)) else type(error).__name__
+        print(json.dumps({'state':'B_REAL_RESTORE_BLOCKED','safe_code':code}))
         raise SystemExit(1) from None
     finally:
         owner.get=old_get;urllib.request.urlopen=old_open
