@@ -6,7 +6,7 @@ access requires a separately received OWNER grant AND credential admission.
 """
 import base64, copy, json, os, pathlib, re, subprocess, time
 from research_core_v4.p0_supersession_20261016.authority import (
-    ACTIVE_REF, OWNER_ROOT, FLAGS, Denied, need, canonical, digest, strict_json)
+    ACTIVE_REF, OWNER_ROOT, FLAGS, Denied, need, canonical, digest, strict_json, closed_flags)
 from research_core_v4.p0_owner_governance_20261017.governance import (
     GitHubReadOnly, GateBinding, verify_owner_review)
 REPO='mariancradulescu/mxm-quant-greenfield'
@@ -38,7 +38,7 @@ class Grant:
         need(re.fullmatch('[0-9a-f]{40}',policy['source_sha']) is not None,'SOURCE_SHA')
         need(all(type(policy[k]) is int for k in ('epoch','first_generation','last_generation',
                   'not_before','expires_at','max_payload_bytes')),'POLICY_TYPES')
-        need(policy['epoch']>=1 and 1808<=policy['first_generation']<=policy['last_generation']<=policy['first_generation']+99
+        need(policy['epoch']>=1 and 1808==policy['first_generation']<=policy['last_generation']<=policy['first_generation']+99
              and 0<policy['expires_at']-policy['not_before']<=86400 and
              policy['not_before']<=now<policy['expires_at'] and 0<policy['max_payload_bytes']<=1048576,'FINITE_POLICY')
         if synthetic:
@@ -125,9 +125,32 @@ class Publisher:
             'root':list(OWNER_ROOT),'policy_sha256':self.g.hash,'source_sha':self.source,
             'principal':self.principal,'generation':p['first_generation']-1,'epoch':p['epoch'],
             'revoked':False,'last_parent':None,'records':[], 'payload':None})
+    def validate_head(self,head,s):
+        p=self.g.policy
+        need(type(s) is dict and s.get('schema')=='mxm.successor-state.v1' and
+             s['revoked'] is False and s['epoch']==p['epoch'] and s['source_sha']==self.source
+             and s['principal']==self.principal,'FENCED_OR_REVOKED')
+        rows=s['records']
+        need(type(rows) is list and len(rows)==s['generation']-1807 and
+             1807<=s['generation']<=p['last_generation'],'GENERATION_LOG')
+        seen=set()
+        for n,r in enumerate(rows):
+            need(r['generation']==1808+n and r['epoch']==p['epoch'] and
+                 r['policy_sha256']==self.g.hash and r['intent'] not in seen,'LOG_REPLAY_OR_ROLLBACK')
+            seen.add(r['intent'])
+        parents=self.t.git('rev-list','--parents','-n','1',head).stdout.decode().split()[1:]
+        if rows:
+            need(rows[-1]['parent']==s['last_parent'] and parents==[s['last_parent']] and
+                 digest(canonical(s['payload']))==rows[-1]['payload_sha256'] and
+                 s['payload']['generation']==s['generation'] and closed_flags(s['payload']['permissions']),
+                 'CURRENT_STATE_INTEGRITY')
+        else:
+            need(s['generation']==1807 and s['last_parent'] is None and s['payload'] is None and not parents,
+                 'GENESIS_INTEGRITY')
     def issue(self,expected,intent,payload):
         self.guard();head,s=self.t.read();need(head==expected and s is not None,'STALE_CAS')
         p=self.g.policy
+        self.validate_head(head,s)
         need(s['revoked'] is False and s['epoch']==p['epoch'] and s['source_sha']==self.source
              and s['principal']==self.principal,'FENCED_OR_REVOKED')
         need(isinstance(intent,str) and re.fullmatch(r'[A-Za-z0-9_-]{8,80}',intent),'INTENT')
@@ -139,7 +162,7 @@ class Publisher:
         need(set(obj)=={'schema','marker','generation','checkpoint','permissions'} and
              obj['schema']=='mxm.synthetic.checkpoint-input.v1' and obj['marker']=='SYNTHETIC_ONLY'
              and obj['generation']==generation and type(obj['checkpoint']) is dict and
-             obj['permissions']==FLAGS,'PAYLOAD_SCOPE')
+             closed_flags(obj['permissions']),'PAYLOAD_SCOPE')
         # A deliberately cannot admit real checkpoint formats. Activating a real
         # data format needs its own received parser/policy revision under B.
         record={'intent':intent,'generation':generation,'epoch':p['epoch'],'parent':head,
@@ -155,6 +178,7 @@ class Publisher:
         return self.t.cas(proposal['expected'],proposal['state'],lose_ack=lose_ack)
     def reconcile(self,intent,payload_sha256):
         self.guard();head,s=self.t.read();need(s is not None,'NO_AUTHORITY')
+        self.validate_head(head,s)
         found=[r for r in s['records'] if r['intent']==intent]
         need(len(found)==1 and found[0]['payload_sha256']==payload_sha256,'ACK_UNKNOWN_STOP_NO_RETRY')
         return {'status':'ACCEPTED_READBACK_NO_REEXECUTION','head':head,'record':found[0],

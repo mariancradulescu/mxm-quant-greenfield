@@ -16,6 +16,7 @@ class Successor:
         need(source_kind=='EXACT_AUTHORITY','HISTORICAL_SOURCE_NOT_AUTHORITY')
         self.p.guard();head,s=self.p.t.read();need(s is not None and s['revoked'] is False,'NO_AUTHORITY_OR_REVOKED')
         if expected_oid is not None:need(head==expected_oid,'OID_CONFLICT')
+        self.p.validate_head(head,s)
         p=self.p.g.policy
         need(s['source_sha']==p['source_sha'] and s['principal']==p['principal'] and s['epoch']==p['epoch'],
              'SOURCE_PRINCIPAL_EPOCH')

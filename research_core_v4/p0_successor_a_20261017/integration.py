@@ -42,7 +42,7 @@ def main():
            'principal':'GITHUB_TOKEN_SYNTHETIC','epoch':1,'first_generation':1808,'last_generation':1810,
            'not_before':now-5,'expires_at':now+1200,'max_payload_bytes':4096,'owner_root':list(OWNER_ROOT),'research_go':False,'access_sha256':digest(b'SYNTHETIC_NO_CREDENTIAL')}
         g=Grant(p,{'fixture':'SYNTHETIC_ONLY'},None,None,now,synthetic=True)
-        for label,changes in [('active_ref_in_synthetic',{'ref':ACTIVE_REF}),('stage_ref_in_synthetic',{'ref':'refs/heads/mxm-o04-stage-authority-v1'}),('unbounded_generation',{'last_generation':9999}),('research_go',{'research_go':True})]:
+        for label,changes in [('active_ref_in_synthetic',{'ref':ACTIVE_REF}),('stage_ref_in_synthetic',{'ref':'refs/heads/mxm-o04-stage-authority-v1'}),('unbounded_generation',{'last_generation':9999}),('research_go',{'research_go':True}),('skip_OWNER_generation',{'first_generation':1809})]:
             denied(label,lambda changes=changes:Grant(dict(p,**changes),{'fixture':'SYNTHETIC_ONLY'},None,None,now,synthetic=True))
         denied('native_grant_from_director_json',lambda:Grant(p,{},None,None,now))
         from .issuer import admit
@@ -58,6 +58,8 @@ def main():
             denied('wrong_source',lambda:Publisher(t,g,'0'*40,p['principal']).issue(genesis,'A-other-1808',payload(1808)),t)
             denied('expired_policy',lambda:Publisher(t,g,source,p['principal'],lambda:now+2000).issue(genesis,'A-other-1808',payload(1808)),t)
             denied('wrong_generation',lambda:pub.issue(genesis,'A-other-1808',payload(1809)),t)
+            wrong_flags=json.loads(payload(1808));wrong_flags['permissions']['research']=0
+            denied('non_boolean_permission',lambda:pub.issue(genesis,'A-badflags-1808',canonical(wrong_flags)),t)
             # Two different proposals prepared against SAME remote OID; the stale
             # candidate is sent to receive-pack (not only refused by a Python if).
             competing=pub.issue(genesis,'A-racer-1808',payload(1808))
@@ -98,6 +100,7 @@ def main():
                 bad=copy.deepcopy(snapshot);mutate(bad)
                 bad_oid=cold.cas(cold.head(),bad)
                 denied(label,lambda:Successor(recovered).restore(expected_oid=bad_oid),cold)
+                denied(label+'_publisher',lambda:recovered.issue(bad_oid,'A-corrupt-1811',payload(1811)),cold)
                 # Deliberately invalid fixture remains synthetic; never consumed
                 # as active authority. Each next mutation starts from valid snapshot.
             final=cold.head()
