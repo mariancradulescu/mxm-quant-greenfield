@@ -153,6 +153,14 @@ def execute():
         prior_lease_index=None if control['lease'] is None else control['lease']['index']
         if control['lease']!=lease(p,int(time.time())):
             v=propose(p,control,h,int(time.time()),'renew');h=t.cas(h,t.wrap(v['state']));h,s=t.read();control=s['control']
+        # Never start a restoration at the very end of a short proof lease.
+        # Wait before claiming; a timeout here leaves no pending side effect.
+        remaining=control['lease']['expires_at']-int(time.time())
+        if remaining<30:
+            need(control['pending'] is None,'B_PENDING_ACK_STOP')
+            time.sleep(max(0,remaining)+1)
+            h,s=t.read();control=s['control']
+            v=propose(p,control,h,int(time.time()),'renew');h=t.cas(h,t.wrap(v['state']));h,s=t.read();control=s['control']
         # Any persisted pending work causes STOP here, never a callback retry.
         v=propose(p,control,h,int(time.time()),'claim',input_sha256=OWNER_ROOT[3],exclusivity_verified=True)
         h=t.cas(h,t.wrap(v['state']));h,s=t.read();control=s['control']
