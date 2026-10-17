@@ -48,7 +48,11 @@ def main():
         from .issuer import admit
         denied('synthetic_grant_cannot_mint_App_token',lambda:admit(g,{'enabled':True}))
         with tempfile.TemporaryDirectory() as d:
+            os.environ['SUCCESSOR_APP_PRIVATE_KEY']='SYNTHETIC_ENV_ISOLATION_CANARY_NOT_A_KEY'
             t=GitCAS(pathlib.Path(d)/'client',os.environ['GH_TOKEN'],g);pub=Publisher(t,g,source,p['principal'])
+            need('SUCCESSOR_APP_PRIVATE_KEY' not in t.env,'SUBPROCESS_KEY_LEAK')
+            RESULTS.append({'name':'private_key_env_excluded_from_Git_subprocess','result':'PASS','evidence':'synthetic canary removed'})
+            del os.environ['SUCCESSOR_APP_PRIVATE_KEY']
             genesis=observe('native_isolated_genesis_CAS',pub.bootstrap)
             denied('bootstrap_twice',pub.bootstrap,t)
             proposal=pub.issue(genesis,'A-checkpoint-1808',payload(1808))

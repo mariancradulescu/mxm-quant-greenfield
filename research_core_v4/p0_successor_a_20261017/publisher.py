@@ -64,7 +64,7 @@ class GitCAS:
         need(type(grant) is Grant,'GRANT_REQUIRED')
         self.grant=grant;self.ref=grant.policy['ref'];self.directory=pathlib.Path(directory)
         self.directory.mkdir(); self.env={k:v for k,v in os.environ.items()
-            if not k.startswith(('GIT_','GH_','GITHUB_','SSH_','APP_','ACTIONS_'))}
+            if not k.startswith(('GIT_','GH_','GITHUB_','SSH_','APP_','SUCCESSOR_','CUSTODY_','ACTIONS_'))}
         self.env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL=os.devnull,GIT_TERMINAL_PROMPT='0',
             GIT_AUTHOR_NAME='MXM successor A synthetic',GIT_AUTHOR_EMAIL='mxm@example.invalid',
             GIT_COMMITTER_NAME='MXM successor A synthetic',GIT_COMMITTER_EMAIL='mxm@example.invalid',
