@@ -24,7 +24,9 @@ class RestoredCheckpoint:
     research_allowed: bool = False
 
 def parse_verified(journal, expected_digest):
-    need(expected_digest==OWNER_ROOT[3] and digest(canonical(journal))==expected_digest,
+    # The preserved journal format includes a terminal newline. Use its
+    # original encoder, not the newer control-plane encoding from stage A.
+    need(expected_digest==OWNER_ROOT[3] and digest(owner.crypto.canonical(journal))==expected_digest,
          'B_REAL_JOURNAL_HASH')
     need(type(journal) is dict and journal.get('generation')==1807 and
          not journal.get('pending_requests'), 'B_REAL_JOURNAL_NOT_CLEAN')
