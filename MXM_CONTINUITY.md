@@ -1,3 +1,21 @@
+# Actualizare prioritară 17 octombrie 2026 — CONTINUARE B–E, FĂRĂ MANDAT NOU
+
+Mandatul OWNER B–E rămâne persistent. B1 este acceptată independent conform OWNER; nu o repetați. Directorul execută; auditorul read-only nu aprobă execuția. Prioritatea este autonomia reală și progresul economic net, fără furnizori noi/ordine LIVE/restart1807.
+
+**B_COMPONENTS_VERIFIED_NATIVE_SEAL_AWAITING_IDENTITY_NO_GO.** Sursa B `95fc312a84f803276a408ca4f821a09b007e56b0` pe `mxm-o04-successor-code-b-v1`; run39057507405 SUCCESS, 19 teste noi,4 joburi, cold handoff între2 joburi fixture și restaurare **reală** a jurnalului1807 (77 referințe directe, runtime sequence19). [Raport](docs/p0-successor-b/20261017/REPORT.md), [dovezi native](docs/p0-successor-b/20261017/NATIVE_PREPARATION.json).
+
+Codul nou include lease-uri finite reînnoibile sub același root, publicare nativă CAS cu App existent, verificarea review-ului inițial/ACL-urilor, restaurare reală read-only și handoff automat pentru2 segmente B. Testele noii admiteri și receive-pack local trec. Workflow B înregistrat pe main la bcdf70015d54c8b860207593147d7572383cb883, byte-identical cu sursa. **Nu a fost executat writerul nativ** și nu s-a emis token App.
+
+Interfața administrativă GitHub funcționează. Formularul sigiliului B (Active, bypass[],4 refuzuri, numai sursa B) este pregătit; la salvare GitHub a cerut **Confirm access** prin GitHub Mobile sau email. Următorul pas este reconfirmarea personală a identității, nu un nou mandat. **Sigiliul B nesalvat**, nu presupuneți protecție instalată. După reconfirmare, verificați salvarea LIVE înainte de credentiale.
+
+Rămân: custodie exclusivă App5343530/installation172030470, închiderea vechii rute staging, TTL3600, environment-uri restrânse la sursa B sigilată, apoi bypass îngust25268790 și review nativ inițial exact. Secretul vechi nu este lizibil din UI; nu cereți PEM în chat și nu creați chei noi fără necesitate demonstrată. Niciun secret/environment/ruleset vechi nu a fost modificat în această continuare. Sursa A și B1 sunt păstrate.
+
+Proba B nativă pregătită se oprește după2 restaurări/generații noi de **control**, cu C_INSTALLATION_PENDING. C workerul de cercetare **nu** este instalat de aceste teste. După B efectiv operațional, continuați C–E autonom sub mandatul existent; nu confundați infrastructura cu alpha economic.
+
+OWNER1807 intact; active-v1 absentă;25268790 și25295948 active/bypass[];163PASS/28BLOCKED neschimbate. Nicio cercetare/colectare/ordine/cBot nouă. Snapshoturile de mai jos sunt istorice când contrazic această secțiune.
+
+---
+
 # MXM Quant Greenfield — continuitate operativă
 
 ## Actualizare operativă 17 octombrie 2026 — mandat OWNER B–E (stare parțială, fără GO)

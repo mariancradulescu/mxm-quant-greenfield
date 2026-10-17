@@ -1,0 +1,120 @@
+{
+  "schema": "mxm.B.components.native-preparation.v1",
+  "status": "COMPONENTS_VERIFIED_NATIVE_SEAL_AWAITING_IDENTITY_NO_GO",
+  "source_sha": "95fc312a84f803276a408ca4f821a09b007e56b0",
+  "source_branch": "mxm-o04-successor-code-b-v1",
+  "run_id": 39057507405,
+  "jobs": [
+    {
+      "id": 117468398067,
+      "name": "native-admission-controls",
+      "conclusion": "success",
+      "html_url": "https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39057507405/job/117468398067"
+    },
+    {
+      "id": 117468398307,
+      "name": "new-b-controls",
+      "conclusion": "success",
+      "html_url": "https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39057507405/job/117468398307"
+    },
+    {
+      "id": 117468453119,
+      "name": "real-owner-restore",
+      "conclusion": "success",
+      "html_url": "https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39057507405/job/117468453119"
+    },
+    {
+      "id": 117468453174,
+      "name": "cold-handoff",
+      "conclusion": "success",
+      "html_url": "https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39057507405/job/117468453174"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12110306680,
+      "name": "mxm-b-real-restore-95fc312a84f803276a408ca4f821a09b007e56b0",
+      "size_in_bytes": 530,
+      "url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12110306680",
+      "archive_download_url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12110306680/zip",
+      "expired": false,
+      "created_at": "2026-10-17T18:18:55Z",
+      "expires_at": "2027-01-15T18:18:21Z",
+      "updated_at": "2026-10-17T18:18:55Z",
+      "digest": "sha256:22fe13c007a550ab8f3f72a6fe6065284095584d7b7d2ed31a66eb5fc101fe79",
+      "workflow_run": {
+        "id": 39057507405,
+        "repository_id": 1374181010,
+        "head_repository_id": 1374181010,
+        "head_branch": "mxm-remediation-p0-p4-20261015-v1",
+        "head_sha": "95fc312a84f803276a408ca4f821a09b007e56b0"
+      }
+    },
+    {
+      "id": 12110306639,
+      "name": "mxm-b-transfer-95fc312a84f803276a408ca4f821a09b007e56b0",
+      "size_in_bytes": 22435,
+      "url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12110306639",
+      "archive_download_url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12110306639/zip",
+      "expired": false,
+      "created_at": "2026-10-17T18:18:35Z",
+      "expires_at": "2027-01-15T18:18:21Z",
+      "updated_at": "2026-10-17T18:18:35Z",
+      "digest": "sha256:c52df8f7dd601088a7a56c1393654c6ae09e33faeb3147c60ce5decfcbff34be",
+      "workflow_run": {
+        "id": 39057507405,
+        "repository_id": 1374181010,
+        "head_repository_id": 1374181010,
+        "head_branch": "mxm-remediation-p0-p4-20261015-v1",
+        "head_sha": "95fc312a84f803276a408ca4f821a09b007e56b0"
+      }
+    },
+    {
+      "id": 12109319220,
+      "name": "mxm-b-cold-95fc312a84f803276a408ca4f821a09b007e56b0",
+      "size_in_bytes": 377,
+      "url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12109319220",
+      "archive_download_url": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/artifacts/12109319220/zip",
+      "expired": false,
+      "created_at": "2026-10-17T18:18:48Z",
+      "expires_at": "2027-01-15T18:18:21Z",
+      "updated_at": "2026-10-17T18:18:48Z",
+      "digest": "sha256:2da3a36ca698c9c65ce65662da2bdeef62e16032407a167372cb626082307543",
+      "workflow_run": {
+        "id": 39057507405,
+        "repository_id": 1374181010,
+        "head_repository_id": 1374181010,
+        "head_branch": "mxm-remediation-p0-p4-20261015-v1",
+        "head_sha": "95fc312a84f803276a408ca4f821a09b007e56b0"
+      }
+    }
+  ],
+  "workflow_registration": {
+    "branch": "main",
+    "commit": "bcdf70015d54c8b860207593147d7572383cb883",
+    "blob": "162f329f952c99a48c5a4da314b6c6e5bddc4603",
+    "source_identical": true
+  },
+  "controls": {
+    "pure_tests": 11,
+    "native_admission_tests": 8,
+    "real_restore": true,
+    "two_job_fixture_handoff": true,
+    "native_app_writer_tested": false,
+    "source_B_seal_installed": false,
+    "App_credentials_moved": false,
+    "active_ref": [],
+    "owner_ref": "a830c132521bd4348454653f713e04f6107484fe"
+  },
+  "remaining": [
+    "Native identity reconfirmation to save B source seal; form prepared, no bypass",
+    "Exclusive existing App key custody cutover; no plaintext or rotation performed",
+    "Restrict issuer environment to B frozen source; OWNER critical gate permits B source",
+    "After proven B2 and TTL3600, narrow App bypass on25268790",
+    "Initial exact native OWNER gate; live two-run CAS/renewal and real restoration",
+    "C offline scientific worker, D economic validation and E cBot remain not started"
+  ],
+  "economic_status": "NO_NEW_RESEARCH_OR_ALPHA_OR_HARD21_CLAIM",
+  "registration_B1_repeated": false,
+  "registry_163_PASS_28_BLOCKED_unchanged": true
+}
