@@ -1,3 +1,13 @@
+## Rezultat18octombrie — două workflow-uri reale fără interacțiune între ele
+
+Traseu read-only reușit: fetch39126841231 → workflow_run automat39126863721/job117673709581, SUCCESS, sursă88d7fccd668963c9300bb4ccece8301f9b015f2e și workflow default45ecf66a868fed1d95e2e9944139e28a2d1c2e8e. Runnerul rece a descărcat checkpointul criptat din primul run, a decriptat cu cheia OWNER existentă, a verificat summary SHA256 acceptat și a interpretat totalurile economice existente fără kernel/recalculare. Tokenuri GitHub noi per run, actions:read/contents:read; fără App/CTRADER secrets, writer, broker I/O ori ordine. Datele/cifrele rămân criptate; PASS nu înseamnă profitabilitate. Artefactul a fost descărcat și verificat byte-for-byte și este păstrat în Git, nu doar în Actions90zile. [Receipt și limite](research_core_v4/successor_c_20261018/EVIDENCE.json).
+
+O eroare YAML a noului workflow rece la39126641473 a fost reparată prin bloc literal pentru comanda pip; nicio intervenție OWNER. S-a repetat numai preluarea read-only necesară verificării handoffului reparat, nu experimentul economic sau suitele acceptate.6teste NOI pentru interpretarea rezumatului PASS. Dovada este de recuperare/continuare read-only între workflow-uri; NU demonstrează încă exclusivitatea writerului, reînnoirea App B sau autonomie B–E permanentă.
+
+Custodie: UI successor24553648726 încă fără secrete, exact1branch B/0tags. Administrarea instalăriiApp172030470 a afișat nativ Confirm access/sudo; nu a fost pornită o nouă provocare. Cele3acțiuni personale cunoscute se grupează: reconfirmare GitHub dacă cerută, introducerea credentialului direct în GitHub, review-ul critic OWNER inițial după dovada custodiei. Directorul nu poate introduce credentialul în locul titularului ori semna review-ul OWNER. Nu este nevoie de un mandat nou. Nicio regulă/protecție/checkpoint OWNER modificată în această etapă; writer inactiv.
+
+---
+
 ## 18 octombrie2026 — OWNER și Work nu sunt motorul execuției
 
 Cerința OWNER curentă: GitHub Actions machine-side, fără chat/sesiune Work deschisă; autonomie trebuie demonstrată între workflow-uri. Codul B sigilat conține dispatch automat dar se oprește la1809/C_INSTALLATION_PENDING și oprește pending ambiguu; nu este autonomie B–E completă. Nu rescriem sursa sigilată și nu declarăm exclusivitate înainte de dovadă.
