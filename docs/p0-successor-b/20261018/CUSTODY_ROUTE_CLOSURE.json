@@ -1,0 +1,138 @@
+{
+  "schema": "mxm.B2.custody-route-closure.v1",
+  "status": "OLD_EXECUTOR_ROUTE_CLOSED_TARGET_CREDENTIAL_NOT_INSTALLED_NO_GO",
+  "observed_date_utc": "2026-10-18",
+  "source_sha": "95fc312a84f803276a408ca4f821a09b007e56b0",
+  "source_branch": "mxm-o04-successor-code-b-v1",
+  "source_seal": {
+    "id": 25313453,
+    "name": "MXM P0 successor B source seal no bypass 20261017",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "mariancradulescu/mxm-quant-greenfield",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/mxm-o04-successor-code-b-v1"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "creation"
+      },
+      {
+        "type": "update"
+      }
+    ],
+    "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGCQK0",
+    "created_at": "2026-10-17T20:35:32.882+02:00",
+    "updated_at": "2026-10-17T20:35:32.920+02:00",
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25313453"
+      },
+      "html": {
+        "href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25313453"
+      }
+    }
+  },
+  "changes": [
+    {
+      "environment": "mxm-p0-successor-issuer-v1",
+      "environment_id": 24553648726,
+      "allowed_branch_before": "mxm-o04-successor-code-a-v1",
+      "allowed_branch_after": "mxm-o04-successor-code-b-v1",
+      "allowed_tags": 0,
+      "admin_bypass": false,
+      "App_secret_present": false
+    },
+    {
+      "environment": "mxm-p0-owner-critical-v1",
+      "environment_id": 24553414129,
+      "allowed_branch_before": "mxm-o04-successor-code-a-v1",
+      "allowed_branch_after": "mxm-o04-successor-code-b-v1",
+      "allowed_tags": 0,
+      "admin_bypass": false,
+      "required_reviewer": "mariancradulescu",
+      "reviewer_unchanged": true
+    },
+    {
+      "environment": "mxm-o04-staging-issuer",
+      "environment_id": 24479108558,
+      "allowed_branch_before": "mxm-o04-issuer-code-v3",
+      "exact_pattern_after": "mxm-o04-staging-closed..",
+      "mode": "Selected branches and tags",
+      "UI_branches_allowed": 0,
+      "UI_tags_allowed": 0,
+      "admin_bypass": false,
+      "old_encrypted_secret_preserved": true,
+      "valid_Git_ref_can_match": false
+    }
+  ],
+  "old_custody_closed_at_upper_bound": 1792303873,
+  "old_custody_closed_at_utc_upper_bound": "2026-10-18T06:11:13Z",
+  "TTL3600_not_before_utc": "2026-10-18T07:11:13Z",
+  "timestamp_semantics": "Conservative upper bound observed after native UI success; not fabricated exact server mutation time",
+  "no_active_or_queued_or_waiting_runs_after_closure": true,
+  "repo_secret_inventory": {
+    "names_only": true,
+    "total": 5,
+    "App_secret_named_copies": 0,
+    "environment_App_secret_named_copies": [
+      {
+        "environment": "mxm-o04-staging-issuer",
+        "name": "O04_ACCEPTOR_APP_PRIVATE_KEY",
+        "execution_access": "CLOSED_BY_NATIVE_DEPLOYMENT_POLICY"
+      }
+    ],
+    "cannot_prove_secret_content_from_name_only": true
+  },
+  "source_route_scan": {
+    "source_sha": "95fc312a84f803276a408ca4f821a09b007e56b0",
+    "workflows": 206,
+    "old_issuer_environment_references": 0,
+    "old_App_secret_name_references": 0,
+    "execution_of_historical_workflows": false
+  },
+  "auto_review": {
+    "rejected_action": "Redirect old staging environment allow rule to successor B source",
+    "reason": "Would grant B access to old private-key secret",
+    "rejected_action_applied": false,
+    "safer_alternative": "Exact impossible Git ref pattern with no wildcard; UI0branches/0tags; no branch granted access"
+  },
+  "pending_personal_action": {
+    "type": "ENTER_EXISTING_APP_KEY_IN_NATIVE_GITHUB_SECRET_FORM",
+    "environment": "mxm-p0-successor-issuer-v1",
+    "secret_name": "SUCCESSOR_APP_PRIVATE_KEY",
+    "app_id": 5343530,
+    "installation_id": 172030470,
+    "expected_public_key_fingerprint": "SHA256:if9s0/vBUMyiKrKc5p6RJoXtcI2sL6HGIWRjNhpRKpk=",
+    "private_value_read_or_entered_by_Director": false,
+    "no_new_key_generated": true,
+    "no_secret_in_chat": true
+  },
+  "runtime_not_armed": true,
+  "active_ruleset_25268790_bypass": [],
+  "active_ref_created": false,
+  "old_tests_repeated": 0,
+  "source_seal_reinstalled": false,
+  "limits": [
+    "Closure of native executor route is proved; complete exclusive custody is NOT yet certified",
+    "Encrypted old secret remains stored but no valid ref is admitted",
+    "No claim about undetectable external private-key copies",
+    "Target key still missing; no App token minted or active write attempted",
+    "C-E await operational B; no economic/alpha/cBot progress claim"
+  ]
+}
+

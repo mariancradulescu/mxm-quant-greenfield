@@ -1,3 +1,21 @@
+# Actualizare prioritară 18 octombrie 2026 — sigiliu B instalat, rută veche de emitere închisă
+
+Mandatul OWNER B–E rămâne valabil. **Regula B25313453 este instalată, active, bypass[]**, pentru exact sursa B95fc312a84f803276a408ca4f821a09b007e56b0. Confirmată independent de auditor conform OWNER și recitită LIVE. **Nu reinstalați sigiliul și nu mai cereți reconfirmare pentru el.** Secțiunea veche AWAITING_IDENTITY de mai jos este supersedată.
+
+**B2_OLD_EXECUTOR_ROUTE_CLOSED_TARGET_CREDENTIAL_PENDING_NO_GO.** Administratorul GitHub a actualizat efectiv issuerul succesor și gate-ul critic pentru numai sursa B sigilată. Reviewerul OWNER și lipsa bypassului administrativ sunt păstrate. Nu s-a solicitat nou mandat, nu s-au reluat cele19teste ori B1.
+
+Ruta veche `mxm-o04-staging-issuer` admite acum **0 ramuri și0taguri**. Regula exactă, fără wildcard, `mxm-o04-staging-closed..` nu poate fi un ref Git valid (verificat cu git check-ref-format); nu poate apărea ulterior o ramură care să o satisfacă. GitHub a confirmat nativ Update succeeded și0ramuri/0taguri. Secretul vechi a rămas criptat, fără ștergere ori citire, dar fără executor admis. Mutarea inițială a regulii vechi către B a fost respinsă automat ca acordare a accesului la cheia veche; **nu a fost aplicată**. S-a folosit închiderea completă, fără acordarea accesului vreunei ramuri.
+
+Închiderea este observată cel târziu la **2026-10-18T06:11:13Z**, epoch1792303873. Este limită superioară conservatoare, nu oră exactă inventată a serverului. TTL3600 nu admite activare înainte de **07:11:13Z /10:11:13 Europe/Bucharest**, și nici atunci fără finalizarea custodiei. După închidere: zero runs in_progress/queued/waiting. Cele206workflow-uri din sursa B au fost doar citite/parse-uite, nu executate; zero referințe la environment-ul/secretul issuerului vechi. Inventarul nativ arată App key doar în mediul vechi închis și nicio copie cu nume App în cele5secrete de repository. Numele nu sunt dovadă criptografică a conținutului și nu certifică absența copiilor externe.
+
+**Pas personal indispensabil:** GitHub nu oferă citirea secretului vechi pentru copiere. Formularul Add secret în `mxm-p0-successor-issuer-v1` este pregătit cu numele `SUCCESSOR_APP_PRIVATE_KEY` și valoare goală. Titularul trebuie să introducă personal cheia GitHub App existentă5343530/installation172030470, amprentă publică așteptată `SHA256:if9s0/vBUMyiKrKc5p6RJoXtcI2sL6HGIWRjNhpRKpk=`, prin GitHub, fără PEM în chat. Nu generați altă cheie din oficiu. Dacă fișierul curent nu mai este disponibil, consemnați imposibilitatea și tratați rotația echivalentă ca necesitate demonstrată, cu pin/sursă versionate legitim; nu slăbiți sigiliul B.
+
+[Cusutodia și dovezile native](docs/p0-successor-b/20261018/CUSTODY_ROUTE_CLOSURE.json), [inventarul rutelor pe sursa înghețată](docs/p0-successor-b/20261018/FROZEN_ENVIRONMENT_ROUTES.json).
+
+B este încă neoperațională: target credential lipsă, exclusivitate completă necertificată, bypass25268790 gol, active-v1 absentă. Nu dispatch-uiți bootstrap înainte de probe/TTL și nu aprobați în numele OWNER gate-ul nativ inițial. Checkpoint1807 și sursele protejate rămân intacte. C–E continuă după B operațional în mandatul existent; nu declarați alpha sau cBot din aceste măsuri administrative.
+
+---
+
 # Actualizare prioritară 17 octombrie 2026 — CONTINUARE B–E, FĂRĂ MANDAT NOU
 
 Mandatul OWNER B–E rămâne persistent. B1 este acceptată independent conform OWNER; nu o repetați. Directorul execută; auditorul read-only nu aprobă execuția. Prioritatea este autonomia reală și progresul economic net, fără furnizori noi/ordine LIVE/restart1807.
