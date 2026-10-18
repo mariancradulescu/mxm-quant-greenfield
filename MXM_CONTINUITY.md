@@ -1,36 +1,8 @@
-# Actualizare prioritară 18 octombrie 2026 — sigiliu B instalat, rută veche de emitere închisă
+## 18 octombrie2026 — simplificare B2 și pregătire economică C
 
-Mandatul OWNER B–E rămâne valabil. **Regula B25313453 este instalată, active, bypass[]**, pentru exact sursa B95fc312a84f803276a408ca4f821a09b007e56b0. Confirmată independent de auditor conform OWNER și recitită LIVE. **Nu reinstalați sigiliul și nu mai cereți reconfirmare pentru el.** Secțiunea veche AWAITING_IDENTITY de mai jos este supersedată.
+Mandatul OWNER B–E continuă. Reutilizarea prin environment-ul vechi ar repeta accesul la cheia veche respins automat; nu este reîncercată și nu se schimbă sursa B sigilată. Rămâne unica încărcare personală a PEM-ului existent în secretul SUCCESSOR_APP_PRIVATE_KEY. Dacă PEM nu mai există: o singură înlocuire în aceeași App, actualizare versionată a pinului public și revocare veche, fără servicii/App suplimentare; rotația nu a fost pornită.
 
-**B2_OLD_EXECUTOR_ROUTE_CLOSED_TARGET_CREDENTIAL_PENDING_NO_GO.** Administratorul GitHub a actualizat efectiv issuerul succesor și gate-ul critic pentru numai sursa B sigilată. Reviewerul OWNER și lipsa bypassului administrativ sunt păstrate. Nu s-a solicitat nou mandat, nu s-au reluat cele19teste ori B1.
-
-Ruta veche `mxm-o04-staging-issuer` admite acum **0 ramuri și0taguri**. Regula exactă, fără wildcard, `mxm-o04-staging-closed..` nu poate fi un ref Git valid (verificat cu git check-ref-format); nu poate apărea ulterior o ramură care să o satisfacă. GitHub a confirmat nativ Update succeeded și0ramuri/0taguri. Secretul vechi a rămas criptat, fără ștergere ori citire, dar fără executor admis. Mutarea inițială a regulii vechi către B a fost respinsă automat ca acordare a accesului la cheia veche; **nu a fost aplicată**. S-a folosit închiderea completă, fără acordarea accesului vreunei ramuri.
-
-Închiderea este observată cel târziu la **2026-10-18T06:11:13Z**, epoch1792303873. Este limită superioară conservatoare, nu oră exactă inventată a serverului. TTL3600 nu admite activare înainte de **07:11:13Z /10:11:13 Europe/Bucharest**, și nici atunci fără finalizarea custodiei. După închidere: zero runs in_progress/queued/waiting. Cele206workflow-uri din sursa B au fost doar citite/parse-uite, nu executate; zero referințe la environment-ul/secretul issuerului vechi. Inventarul nativ arată App key doar în mediul vechi închis și nicio copie cu nume App în cele5secrete de repository. Numele nu sunt dovadă criptografică a conținutului și nu certifică absența copiilor externe.
-
-**Pas personal indispensabil:** GitHub nu oferă citirea secretului vechi pentru copiere. Formularul Add secret în `mxm-p0-successor-issuer-v1` este pregătit cu numele `SUCCESSOR_APP_PRIVATE_KEY` și valoare goală. Titularul trebuie să introducă personal cheia GitHub App existentă5343530/installation172030470, amprentă publică așteptată `SHA256:if9s0/vBUMyiKrKc5p6RJoXtcI2sL6HGIWRjNhpRKpk=`, prin GitHub, fără PEM în chat. Nu generați altă cheie din oficiu. Dacă fișierul curent nu mai este disponibil, consemnați imposibilitatea și tratați rotația echivalentă ca necesitate demonstrată, cu pin/sursă versionate legitim; nu slăbiți sigiliul B.
-
-[Cusutodia și dovezile native](docs/p0-successor-b/20261018/CUSTODY_ROUTE_CLOSURE.json), [inventarul rutelor pe sursa înghețată](docs/p0-successor-b/20261018/FROZEN_ENVIRONMENT_ROUTES.json).
-
-B este încă neoperațională: target credential lipsă, exclusivitate completă necertificată, bypass25268790 gol, active-v1 absentă. Nu dispatch-uiți bootstrap înainte de probe/TTL și nu aprobați în numele OWNER gate-ul nativ inițial. Checkpoint1807 și sursele protejate rămân intacte. C–E continuă după B operațional în mandatul existent; nu declarați alpha sau cBot din aceste măsuri administrative.
-
----
-
-# Actualizare prioritară 17 octombrie 2026 — CONTINUARE B–E, FĂRĂ MANDAT NOU
-
-Mandatul OWNER B–E rămâne persistent. B1 este acceptată independent conform OWNER; nu o repetați. Directorul execută; auditorul read-only nu aprobă execuția. Prioritatea este autonomia reală și progresul economic net, fără furnizori noi/ordine LIVE/restart1807.
-
-**B_COMPONENTS_VERIFIED_NATIVE_SEAL_AWAITING_IDENTITY_NO_GO.** Sursa B `95fc312a84f803276a408ca4f821a09b007e56b0` pe `mxm-o04-successor-code-b-v1`; run39057507405 SUCCESS, 19 teste noi,4 joburi, cold handoff între2 joburi fixture și restaurare **reală** a jurnalului1807 (77 referințe directe, runtime sequence19). [Raport](docs/p0-successor-b/20261017/REPORT.md), [dovezi native](docs/p0-successor-b/20261017/NATIVE_PREPARATION.json).
-
-Codul nou include lease-uri finite reînnoibile sub același root, publicare nativă CAS cu App existent, verificarea review-ului inițial/ACL-urilor, restaurare reală read-only și handoff automat pentru2 segmente B. Testele noii admiteri și receive-pack local trec. Workflow B înregistrat pe main la bcdf70015d54c8b860207593147d7572383cb883, byte-identical cu sursa. **Nu a fost executat writerul nativ** și nu s-a emis token App.
-
-Interfața administrativă GitHub funcționează. Formularul sigiliului B (Active, bypass[],4 refuzuri, numai sursa B) este pregătit; la salvare GitHub a cerut **Confirm access** prin GitHub Mobile sau email. Următorul pas este reconfirmarea personală a identității, nu un nou mandat. **Sigiliul B nesalvat**, nu presupuneți protecție instalată. După reconfirmare, verificați salvarea LIVE înainte de credentiale.
-
-Rămân: custodie exclusivă App5343530/installation172030470, închiderea vechii rute staging, TTL3600, environment-uri restrânse la sursa B sigilată, apoi bypass îngust25268790 și review nativ inițial exact. Secretul vechi nu este lizibil din UI; nu cereți PEM în chat și nu creați chei noi fără necesitate demonstrată. Niciun secret/environment/ruleset vechi nu a fost modificat în această continuare. Sursa A și B1 sunt păstrate.
-
-Proba B nativă pregătită se oprește după2 restaurări/generații noi de **control**, cu C_INSTALLATION_PENDING. C workerul de cercetare **nu** este instalat de aceste teste. După B efectiv operațional, continuați C–E autonom sub mandatul existent; nu confundați infrastructura cu alpha economic.
-
-OWNER1807 intact; active-v1 absentă;25268790 și25295948 active/bypass[];163PASS/28BLOCKED neschimbate. Nicio cercetare/colectare/ordine/cBot nouă. Snapshoturile de mai jos sunt istorice când contrazic această secțiune.
+Cod nou economic inactiv: [successor_c_20261018](research_core_v4/successor_c_20261018/README.md). Reutilizează ipoteza/kernelul/contabilitatea existente, validează duplicatele/cohorta, păstrează numitorii și pregătește comparații/halves fără reset de capital sau promovarea UNKNOWN.5teste NOI sintetice PASS;0suite acceptate repetate. S-a confirmat metadata asset632722856 existent,5330022bytes, digest identic pinului, fără descărcare/decriptare sau evaluare economică. METHOD.json fixează metoda; nu este ARM. B incomplet, C pregătit dar neactivat; writer/campanie/ordine neactivate. OWNER1807 și protecțiile nu sunt modificate în această etapă. Niciun rezultat NET/HARD21 nou.
 
 ---
 
