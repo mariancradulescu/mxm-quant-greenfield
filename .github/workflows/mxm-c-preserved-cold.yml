@@ -9,17 +9,18 @@ concurrency:
   cancel-in-progress: false
 jobs:
   cold-economic-readback:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1 && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.run_attempt == 1 && github.event.workflow_run.head_repository.full_name == 'mariancradulescu/mxm-quant-greenfield' && github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1' && github.event.workflow_run.head_sha == 'f3fd26511cf76a009b25c9c584d9481276aaef30'
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1 && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.run_attempt == 1 && github.event.workflow_run.head_repository.full_name == 'mariancradulescu/mxm-quant-greenfield' && github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1' && github.event.workflow_run.head_sha == '88d7fccd668963c9300bb4ccece8301f9b015f2e'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions: {contents: read, actions: read}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: f3fd26511cf76a009b25c9c584d9481276aaef30
+          ref: 88d7fccd668963c9300bb4ccece8301f9b015f2e
           persist-credentials: false
       - name: Existing hash-locked decoder, no App or broker secret
-        run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mxm-c-preserved-${{ github.event.workflow_run.id }}
@@ -31,7 +32,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           C_SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
-          C_EXPECTED_SOURCE_SHA: f3fd26511cf76a009b25c9c584d9481276aaef30
+          C_EXPECTED_SOURCE_SHA: 88d7fccd668963c9300bb4ccece8301f9b015f2e
           C_FETCH_RUN_ID: ${{ github.event.workflow_run.id }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
           OPENBLAS_NUM_THREADS: '1'
