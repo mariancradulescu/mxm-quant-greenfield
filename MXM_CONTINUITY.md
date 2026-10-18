@@ -1,3 +1,15 @@
+## 18octombrie2026 — secret instalat, review B inițial pregătit, fără writer
+
+OWNER a introdus personal SUCCESSOR_APP_PRIVATE_KEY. Metadata LIVE confirmă secretul în environment24553648726, numaiB/0tags, fără adminbypass. Reconfirmarea GitHub Mobile cerută de platformă a reușit din nou după expirarea sesiunii; inventarul LIVE arată exact1keypair4891846,0clientsecrets, pinul așteptat. Ruta veche rămâne0branches/0tags; TTL3600 trecut; OWNER1807 intact, active absent,0runuri active/queued/waiting înaintea lansării. Dovada [CUSTODY_ADMISSION.json](docs/p0-successor-b/20261018/CUSTODY_ADMISSION.json) admite exclusivitatea rutei native, fără afirmație despre copii externe nedetectabile. Valoarea secretului NU a fost citită; funcționalitatea cheii rămâne de verificat după review și înaintea primei scrieri, conform codului sigilat.
+
+Run inițial39147483523, sursaB95fc312, exact-manifest117734179847 SUCCESS; owner-critical117734238655 WAITING. [Manifestul nativ](docs/p0-successor-b/20261018/NATIVE_BUNDLE_39147483523.json) a fost descărcat și verificat prin digestul ZIP/bundle/manifest. [Review exact și ordine](docs/p0-successor-b/20261018/INITIAL_REVIEW_READY.json). Nu relansați workflow-ul, nu refaceți testele acceptate și nu fabricați review-ul OWNER. Comentariu exact: MXM_OWNER_CRITICAL_APPROVAL_V2 sha256=e9bcc6dcdfdff505bd4759319be896aeb03a44d4c24597e66f8344cbfdcb8a06. Initial review valabil până19octombrie19:59:31 ora României; continuările obișnuite reutilizează review-ul inițial.
+
+B3 NU este salvat: regula25268790 are încă bypass[]; UI conține numai draft App5343530/Integration/always, exactactive-v1, aceleași4restricții. Instrumentul browser impune confirmare la acordarea noului acces sensibil. Titularul are pregătite2confirmări în aceeași sesiune, în ordine: Save changes pe draftul accesului App; apoi Approve and deploy pe gate-ul nativ cu comentariul exact. Directorul a completat configurația, checkboxul și comentariul; NU a apăsat niciuna dintre confirmările finale.25222248 a fost citită LIVE active/bypass[], deletion/nonfastforward/linearhistory pe mxm-o04-*, se păstrează.
+
+B incompletă și writer inactiv. După acțiunile titularului, Directorul verifică efectele reale, urmărește prima verificare funcțională+bootstrap și handoff/renewal automat spre1809; nu deduce succes din existența secretului sau din WAITING. C rămâne blocată pentru execuția campaniei până la dovadaB; verdictul economic existent rămâne NO_ADVANCEMENT_INCOMPLETE_SUPPORT. Mandatul B–E nu se solicită din nou.
+
+---
+
 ## Sesiune administrativă18octombrie — reconfirmare reușită, credential pending
 
 Reconfirmarea personală GitHub Mobile a reușit; succesul a fost verificat prin pagină administrativă nouă, nu dedus din alegerea metodei. Instalarea172030470 este activă, exactrepo1374181010, contents:write/metadata:read. App5343530 are exact1keypair,0clientsecrets; unica amprentă SHA256:if9s0/vBUMyiKrKc5p6RJoXtcI2sL6HGIWRjNhpRKpk= coincide cu pinul B. Vechiul environment rămâne LIVE0branches/0tags; politica nu a fost redeschisă. Nu s-a creat/rotit/revocat nicio cheie.
