@@ -35,7 +35,7 @@ def method_plan(root=None):
     root = Path(root) if root is not None else Path(__file__).resolve().parents[2]
     for path, expected in BINDINGS.items():
         require(hashlib.sha256((root/path).read_bytes()).hexdigest() == expected, 'C_METHOD_DRIFT')
-    return {'schema': 'mxm.successor-c-preparation.v1', 'status': 'PREPARED_NOT_ARMED',
+    return {'schema': 'mxm.successor-c-preparation.v1', 'status': 'EXISTING_EXPERIMENT_EXECUTED_READBACK_REQUIRED_NO_REPLAY',
             'hypothesis': 'PRICE_SPREAD_TEMPORAL_ORDER_RESPONSE_V1',
             'bindings': dict(BINDINGS), 'saved_source': dict(SOURCE),
             'selection': 'ALL_SAVED_15MIN_BOUNDARIES_NO_OUTCOME_RANKING',
@@ -45,7 +45,8 @@ def method_plan(root=None):
             'temporal_halves': 'MIDPOINT_OF_SAVED_ENTRY_TIME_RANGE_NOT_TRADE_COUNT',
             'confirmation': 'EXPLORATORY_PRIOR_ADAPTIVE_EXPOSURE_NO_SIGNIFICANCE_CLAIM',
             'unknown_exit': 'HALT_NO_REPLACEMENT_COMPLETE_NET_NULL',
-            'empirical_support': 'UNMEASURED', 'net_eur': None,
+            'empirical_support': 'EXISTING_ENCRYPTED_RESULT_RUN_38288144447', 'net_eur': None,
+            'net_eur_semantics': 'NOT_READ_HERE_NOT_UNMEASURED_HISTORICALLY',
             'campaign_armed': False, 'orders_allowed': False}
 
 def unique(values, key, code):

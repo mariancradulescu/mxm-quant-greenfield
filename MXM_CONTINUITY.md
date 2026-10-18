@@ -1,3 +1,13 @@
+## 18 octombrie2026 — OWNER și Work nu sunt motorul execuției
+
+Cerința OWNER curentă: GitHub Actions machine-side, fără chat/sesiune Work deschisă; autonomie trebuie demonstrată între workflow-uri. Codul B sigilat conține dispatch automat dar se oprește la1809/C_INSTALLATION_PENDING și oprește pending ambiguu; nu este autonomie B–E completă. Nu rescriem sursa sigilată și nu declarăm exclusivitate înainte de dovadă.
+
+Corecție economică: ipoteza PRICE_SPREAD_TEMPORAL_ORDER_RESPONSE_V1 a fost deja calculată în run38288144447, primary634550785/release410874094, cu delivery ACK ulterior. A o numi „nemăsurată” în pregătireaC precedentă a fost incorect istoric; în sesiunea curentă nu fusese citit rezultatul. Nu se repetă experimentul ori suitele sale. Traseul nou read-only face GET al rezultatului criptat și handoff către un workflow rece care verifică hashul summary acceptat și interpretează totalurile salvate. Fără surse noi, recalculare predictori, App credential, writer, autoritate de checkpoint ori ordine.
+
+Intervențiile personale B cunoscute se grupează într-o singură sesiune administrativă, în ordinea tehnică: (1) introducerea directă în GitHub a PEM existent; dacă lipsește, o singură înlocuire în aceeași App și revocare veche cu pin public versionat; (2) review-ul nativ OWNER inițial cerut de gate-ul existent, cu digest/comment exact după verificarea custodiei. Directorul pregătește/verifică și execută configurațiile administrative permise, inclusiv grantul App îngust numai după exclusivitate; reconfirmarea identității se cere titularului numai dacă GitHub o impune efectiv. Nicio aprobare pe checkpoint/segment. Cheia nu se transmite în chat. Configurațiile privilegiate nu sunt expuse ca mutații artificiale prin Actions. B încă neînchis, writer inactiv.
+
+---
+
 ## 18 octombrie2026 — simplificare B2 și pregătire economică C
 
 Mandatul OWNER B–E continuă. Reutilizarea prin environment-ul vechi ar repeta accesul la cheia veche respins automat; nu este reîncercată și nu se schimbă sursa B sigilată. Rămâne unica încărcare personală a PEM-ului existent în secretul SUCCESSOR_APP_PRIVATE_KEY. Dacă PEM nu mai există: o singură înlocuire în aceeași App, actualizare versionată a pinului public și revocare veche, fără servicii/App suplimentare; rotația nu a fost pornită.

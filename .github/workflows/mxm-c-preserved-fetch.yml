@@ -1,0 +1,29 @@
+name: MXM C preserved result checkpoint
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [research_core_v4/successor_c_20261018/READBACK_REQUEST.json]
+permissions: {}
+concurrency:
+  group: mxm-c-preserved-fetch
+  cancel-in-progress: false
+jobs:
+  fetch-existing-result:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {contents: read, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: python3 -m research_core_v4.successor_c_20261018.readback fetch
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-c-preserved-${{ github.run_id }}
+          path: |
+            verification/c-readonly/checkpoint.json
+            verification/c-readonly/preserved-result.mxmenc
+          if-no-files-found: error
+          retention-days: 90

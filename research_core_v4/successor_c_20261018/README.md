@@ -1,3 +1,5 @@
+> Corecție18octombrie: experimentul a fost deja executat în run38288144447, receipt `quote_path_execution_20261012_v1/EXECUTION_RECEIPT_V1.json`; summary SHA256 c68b65d15ae6187287736745dc55f85fee5b94f91be6baee4b04f4345f914e68. Pregătirea din secțiunile de mai jos NU constituie un experiment neexecutat. Nu relansați kernelul; `readback.py` recuperează exclusiv rezultatul existent și îl interpretează machine-side. Cifrele economice rămân criptate, conform protecției existente.
+
 # C — pregătire economică, fără activare
 
 Se reutilizează ipoteza PRICE_SPREAD_TEMPORAL_ORDER_RESPONSE_V1 și kernelul înghețat din 12 octombrie: direcție −sign(area), intrare pe cotații bid/ask cauzale, orizont15minute, capital200EUR, un singur portofoliu continuu, costuri native și scenariul existent de slippage/funding. Nu există optimizare nouă, replay al predictorilor închiși sau revendicare de confirmare independentă.
