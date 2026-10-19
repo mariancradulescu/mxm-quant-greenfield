@@ -5,7 +5,7 @@ from .common import *
 from .runtime import ROOT,OUT,EVIDENCE_BRANCH,anchors,read_state,validate_state,admission
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 MAGIC=b'MXM_SHALLOW_M5_V2_ENC1\x00'
-ALLOWED={'schema','authority','source_sha','parent_oid','sequence','run_id','trigger_sha','admission_ref','admission_path','admission_sha256','ciphertext_sha256','safe_stop','pending','completed_steps','cold_restored','modified_cipher_rejected','mode','orders','new_economic_outcomes','app_key_used','active_authority_write','cbot_qualified','native_acquisition_state','authentic_cache_validated','durable_intent_consumed','authentic_data_controller_validated','reception_assertions_checked'}
+ALLOWED={'schema','authority','source_sha','parent_oid','sequence','run_id','trigger_sha','admission_ref','admission_path','admission_sha256','ciphertext_sha256','safe_stop','pending','completed_steps','cold_restored','modified_cipher_rejected','mode','orders','new_economic_outcomes','app_key_used','active_authority_write','cbot_qualified','native_acquisition_state','authentic_cache_validated','durable_intent_consumed','authentic_data_controller_validated','reception_assertions_checked','research_progress','V2_budget_used','V2_budget_remaining','numerical_economics_encrypted'}
 
 def main():
     need(os.environ['GITHUB_JOB']=='durable-archive' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'ARCHIVE_NO_KEYS')
@@ -13,6 +13,21 @@ def main():
     need(set(receipt)==ALLOWED and receipt['schema']=='mxm.general-laboratory-receipt.v1','PUBLIC_RECEIPT')
     parent=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha'];need(parent==receipt['parent_oid'],'PARENT_MOVED');s=read_state(route,parent);validate_state(s,int(os.environ['GITHUB_RUN_ID']))
     a=admission(route,receipt['admission_ref'],receipt['admission_path'])
+    need(receipt['numerical_economics_encrypted'] is True and type(receipt['V2_budget_used']) is int and type(receipt['V2_budget_remaining']) is int and 21<=receipt['V2_budget_used']<=84 and receipt['V2_budget_used']+receipt['V2_budget_remaining']==84,'TYPED_BUDGET_REPORT')
+    definitions={m['id']:m for m in a['programmes']}
+    need(isinstance(receipt['research_progress'],list) and len(receipt['research_progress'])<=len(definitions),'PROGRESS_SCOPE')
+    allowed_classes={'DATA_VALID','DATA_INSUFFICIENT','PROSPECTIVELY_ADMITTED','CAUSAL_INTENTS_DEFINED','RESEARCH_BUDGET_EXHAUSTED','NO_ELIGIBLE_EVENTS','IMPLEMENTATION_INVALID','STRUCTURALLY_INFEASIBLE','GROSS_EDGE_FAIL','COARSE_NET_FAIL','COST_UNRESOLVED','DISCOVERY_SURVIVOR','PROGRAMME_REPORT_SAVED'}
+    seen=set()
+    for item in receipt['research_progress']:
+        need(set(item)=={'programme','classifications','data','safe_stop'} and item['programme'] in definitions and item['programme'] not in seen and type(item['safe_stop']) is bool,'PUBLIC_PROGRESS_FIELDS')
+        seen.add(item['programme']);definition=definitions[item['programme']]
+        need(set(item['classifications'])<=set(definition['tasks']) and all(v in allowed_classes for v in item['classifications'].values()),'PUBLIC_PROGRESS_CLASSES')
+        for asset in item['data']:
+            need(set(asset)=={'task','instrument','rows','invalid','conflicts','classification'} and asset['task'] in definition['tasks'] and definition['tasks'][asset['task']]['operator']=='acquire','PUBLIC_DATA_FIELDS')
+            need(asset['classification'] in {'DATA_VALID','DATA_INSUFFICIENT'} and all(type(asset[k]) is int and 0<=asset[k]<=1000000 for k in ('rows','invalid','conflicts')),'PUBLIC_DATA_COUNTS')
+            plan=definition['tasks'][asset['task']]['input']
+            plan=plan.get('native_acquisition_plan',plan)
+            need(asset['instrument']==plan['instrument'],'PUBLIC_INSTRUMENT')
     need(receipt['admission_sha256']==digest(a) and receipt['mode']==a['mode'],'ADMISSION_BINDING')
     need(receipt['sequence']==s['sequence']+1 and receipt['source_sha']==os.environ['LAB_SOURCE_SHA'] and receipt['trigger_sha']==os.environ['GITHUB_SHA'] and receipt['run_id']==int(os.environ['GITHUB_RUN_ID']),'NATIVE_RECEIPT')
     need(receipt['durable_intent_consumed'] is True and receipt['authentic_cache_validated'] is True and receipt['native_acquisition_state'] in ('COMPLETE_EXACT_WINDOW','TRANSPORT_UNRESOLVED','PROVIDER_ERROR','HASMORE_UNRESOLVED','PAGE_CAP_INCOMPLETE','ACQUISITION_UNRESOLVED'),'DATA_ATTESTATION')
