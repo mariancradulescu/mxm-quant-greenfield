@@ -20,7 +20,9 @@ def main():
     route=GetOnly();b.SOURCE_BRANCH='mxm-o04-successor-code-typed-admission-r1';b.anchors(route)
     need(route.json('git/ref/heads/mxm-o04-integrated-laboratory-evidence')['object']['sha']==PARENT,'ADMISSION_EVIDENCE_MOVED')
     runs=route.json('actions/runs?per_page=100')['workflow_runs'];own=[r for r in runs if r['path']==WF]
-    need(len(own)==1 and own[0]['id']==int(os.environ['GITHUB_RUN_ID']),'ADMISSION_ONE_FINITE_INVOCATION')
+    need(1<=len(own)<=2 and own[0]['id']==int(os.environ['GITHUB_RUN_ID']),'ADMISSION_ONE_FINITE_INVOCATION')
+    for prior in own[1:]:
+        need(prior['id']==39302317662 and prior['conclusion']=='failure' and route.json('actions/runs/'+str(prior['id'])+'/attempts/1/jobs?per_page=100')['jobs']==[],'ADMISSION_PREVIOUS_LAUNCH_HAD_NO_JOBS')
     need(not any(r['id']!=int(os.environ['GITHUB_RUN_ID']) and r['status'] in ('queued','in_progress','waiting','pending') and r['path'] in (WF,'.github/workflows/mxm-integrated-laboratory.yml','.github/workflows/mxm-native-quote-reuse.yml') for r in runs),'ADMISSION_CONCURRENT_RESEARCH')
     original=file_at(route,'program-state.json',PARENT);state=strict_json(original)
     need(state['sequence']==16 and state['pending'] is None and state['safe_stop'] is True and state['ciphertext_sha256']=='eb031d18ee5b517ea1d4c3e6378cb276c4f3f46e2da810b86b8aabcc01a3ba8f','ADMISSION_CHECKPOINT_BINDING')
