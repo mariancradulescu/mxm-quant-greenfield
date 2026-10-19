@@ -1,3 +1,13 @@
+## 19 octombrie2026 — grant App5343530 SALVAT LIVE; delegare OWNER persistentă
+
+[Instalare și readback](docs/b-infrastructure/20261019/GRANT_INSTALLED.json), [raport curent](docs/b-infrastructure/20261019/GRANT_REPORT.md), [delegarea explicită OWNER](docs/b-infrastructure/20261019/OWNER_DELEGATION.json). Directorul a salvat personal grantul restrâns după confirmarea punctuală; GitHub Mobile a fost finalizat de titular; UI Ruleset updated și API confirmă exact Integration5343530/always pe exactactive-v1.25222248 și OWNER1807 neschimbate. Cheile nu au fost citite și nu s-a relansat bootstrapul.
+
+Mandatul OWNER include toate responsabilitățile legitim delegabile executive/tehnice/administrative/științifice B–E, persistent între chat-uri; OWNER păstrează identitatea contului, proprietatea, supravegherea și revocarea. Fără impersonare ori review-uri fabricate; nicio aprobare repetitivă pentru operațiuni deja autorizate. Se poate evalua succesiune sigură cu delegare verificabilă; nu se pretinde echivalență prin eliminarea simplă a controalelor.
+
+Run39147483523 încă WAITING, approvals=[]; gate-ul surseiB sigilate cere exact review OWNER322088485/digest e9bcc6dcdfdff505bd4759319be896aeb03a44d4c24597e66f8344cbfdcb8a06. Dialogul pregătit, mediul bifat și comentariul exact completat; Directorul NU a apăsat Approve and deploy. Manifestul expiră19octombrie19:59:31 România. B–C rămâne neînchis, workerC/succesiune neimplementate; nu se declară autonomie din salvarea ACL. Zero suite/experimente acceptate repetate și zero ordine.
+
+---
+
 ## 19 octombrie2026 — gardian expirare instalat, B–C încă neînchis
 
 Mandatul OWNER B–E rămâne valabil. [Raport curent](docs/b-infrastructure/20261019/REPORT.md), [dovezi](docs/b-infrastructure/20261019/EVIDENCE.json). Cod nou fără chei 1cdce14da623b5f2040a69031ca9ed30d11f63e4, run39196447335/job117880156553 SUCCESS,8teste NOI PASS și reconciliere LIVE VALID_WAITING_NO_ACTION. Programare orară pe main, cu sursă pinuită; testele nu se repetă pe cron. Gardianul anulează numai runul exact39147483523 după expirare, numai WAITING fără review, fără relansare; cron/anularea efectivă post-expirare încă neverificate. Nu este autonomie B–C.
