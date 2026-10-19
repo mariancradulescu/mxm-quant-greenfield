@@ -25,7 +25,7 @@ jobs:
       admission_path: ${{ steps.claim.outputs.admission_path }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: a54757ce89f613be91ea05bac9f46434dd9021c0, persist-credentials: false}
+        with: {ref: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - id: claim
@@ -33,7 +33,7 @@ jobs:
         run: python3 -m research_core_v4.laboratory.claim
         env:
           GH_TOKEN: ${{ github.token }}
-          LAB_SOURCE_SHA: a54757ce89f613be91ea05bac9f46434dd9021c0
+          LAB_SOURCE_SHA: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522
           LAB_PARENT_OID: ${{ inputs.parent_oid }}
           LAB_ADMISSION_REF: ${{ inputs.admission_ref }}
           LAB_ADMISSION_PATH: ${{ inputs.admission_path }}
@@ -44,7 +44,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: a54757ce89f613be91ea05bac9f46434dd9021c0, persist-credentials: false}
+        with: {ref: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Verify newly integrated functions and negative controls
@@ -54,7 +54,7 @@ jobs:
         run: python3 -m research_core_v4.laboratory.runtime
         env:
           GH_TOKEN: ${{ github.token }}
-          LAB_SOURCE_SHA: a54757ce89f613be91ea05bac9f46434dd9021c0
+          LAB_SOURCE_SHA: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522
           LAB_PARENT_OID: ${{ needs.segment-intent.outputs.claim_oid }}
           LAB_DISPATCH_PARENT: ${{ inputs.parent_oid }}
           LAB_ADMISSION_REF: ${{ needs.segment-intent.outputs.admission_ref }}
@@ -80,7 +80,7 @@ jobs:
       evidence_oid: ${{ steps.archive.outputs.evidence_oid }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: a54757ce89f613be91ea05bac9f46434dd9021c0, persist-credentials: false}
+        with: {ref: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -92,7 +92,7 @@ jobs:
         run: python3 -m research_core_v4.laboratory.publish
         env:
           GH_TOKEN: ${{ github.token }}
-          LAB_SOURCE_SHA: a54757ce89f613be91ea05bac9f46434dd9021c0
+          LAB_SOURCE_SHA: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522
   scientific-handoff:
     needs: durable-archive
     if: needs.durable-archive.outputs.next != 'STOP'
@@ -101,12 +101,12 @@ jobs:
     permissions: {contents: read, actions: write}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: a54757ce89f613be91ea05bac9f46434dd9021c0, persist-credentials: false}
+        with: {ref: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Continue an admissible programme from the exact encrypted checkpoint
         run: python3 -m research_core_v4.laboratory.handoff
         env:
           GH_TOKEN: ${{ github.token }}
-          LAB_SOURCE_SHA: a54757ce89f613be91ea05bac9f46434dd9021c0
+          LAB_SOURCE_SHA: f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522
           LAB_PARENT_OID: ${{ needs.durable-archive.outputs.evidence_oid }}
