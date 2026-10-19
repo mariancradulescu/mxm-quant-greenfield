@@ -15,7 +15,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   segment-intent:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    # OWNER correction: no new reservations/outcomes until reconciliation and prospective accounting policy.
+    if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions: {contents: write, actions: read}
