@@ -1,0 +1,36 @@
+name: MXM paired support V4 saved-ledger audit
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [research_core_v4/paired_support_20261019_v1/EXECUTE_ONCE.json]
+permissions: {contents: read}
+concurrency:
+  group: mxm-paired-support-v4-once
+  cancel-in-progress: false
+jobs:
+  paired-support:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 683dcfc8824580af97b605a0b1286d84b5ec3d79
+          persist-credentials: false
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Synthetic controls for new analysis only
+        run: python3 -m unittest research_core_v4.paired_support_20261019_v1.test_analysis -v
+      - name: One encrypted row-level analysis of preserved result
+        run: python3 -m research_core_v4.paired_support_20261019_v1.runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          PS_SOURCE_SHA: 683dcfc8824580af97b605a0b1286d84b5ec3d79
+          PS_SEAL_ID: '25374624'
+          PS_SEAL_REVISION: '2026-10-19T07:57:26.357+02:00'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-paired-support-v4-${{ github.run_id }}
+          path: verification/paired-support/
+          if-no-files-found: error
