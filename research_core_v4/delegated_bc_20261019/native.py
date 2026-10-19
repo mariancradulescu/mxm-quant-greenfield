@@ -14,6 +14,7 @@ import tempfile
 import time
 import urllib.request
 import zipfile
+from datetime import datetime
 from .control import *
 from . import science
 from research_core_v4.p0_successor_a_20261017.publisher import GitCAS, AckUnknown
@@ -36,25 +37,57 @@ def workload():
          os.environ.get('GITHUB_EVENT_NAME')=='workflow_dispatch' and
          os.environ.get('GITHUB_RUN_ATTEMPT')=='1','BC_FROZEN_WORKLOAD')
 
-def check_rule(rule,*,source=False,exact=False):
+def public_rule_view(rule):
+    # Native ruleset revisions fence even fields redacted from least-privilege tokens.
+    stamp=rule.get('updated_at')
+    need(type(stamp) is str,'BC_NATIVE_REVISION_MISSING')
+    stamp=datetime.fromisoformat(stamp.replace('Z','+00:00')).timestamp()
+    return {'id':rule['id'],'updated_at_epoch':stamp,'target':rule['target'],
+        'source_type':rule['source_type'],'source':rule['source'],'enforcement':rule['enforcement'],
+        'conditions':rule['conditions'],'rules':sorted(rule['rules'],key=lambda r:r['type'])}
+
+def check_rule(rule,*,source=False,exact=False,fence=None):
     target='refs/heads/'+SOURCE if source else ACTIVE_REF
     expected=[] if source else ACL
     need(rule['enforcement']=='active' and
          rule['conditions']['ref_name']=={'include':[target],'exclude':[]} and
          {r['type'] for r in rule['rules']}=={'creation','update','deletion','non_fast_forward'},
          'BC_NATIVE_RULE_SCOPE')
-    need(rule.get('bypass_actors',None if exact else expected)==expected,'BC_NATIVE_RULE_ACTORS')
+    if fence is not None:
+        need(fence.get('bypass_actors')==expected and public_rule_view(rule)==public_rule_view(fence),
+             'BC_NATIVE_ADMIN_REVISION_CHANGED')
+        # Absence is documented API redaction, never interpreted as an empty ACL.
+        # The native admin descriptor pins the full observed ACL and its revision.
+        if 'bypass_actors' in rule:need(rule['bypass_actors']==expected,'BC_NATIVE_RULE_ACTORS')
+    else:need(rule.get('bypass_actors',None if exact else expected)==expected,'BC_NATIVE_RULE_ACTORS')
+
+def delegation_descriptor(rule_id):
+    raw=os.environ.get('BC_NATIVE_DELEGATION','')
+    need(0<len(raw)<=32768,'BC_NATIVE_ADMIN_DESCRIPTOR_MISSING')
+    descriptor=strict_json(raw.encode())
+    need(set(descriptor)=={'schema','source_sha','policy_sha256','source_seal','active_acl','append_only'} and
+         descriptor['schema']=='mxm.native-admin-delegation.v1' and
+         descriptor['source_sha']==os.environ['GITHUB_SHA'] and descriptor['policy_sha256']==POLICY_SHA and
+         descriptor['source_seal']['id']==rule_id and descriptor['active_acl']['id']==25268790 and
+         descriptor['append_only']['id']==25222248,'BC_NATIVE_ADMIN_DESCRIPTOR_BINDING')
+    return descriptor
 
 def verify_server(rule_id,token,*,exact=False):
+    descriptor=delegation_descriptor(rule_id)
     _,r=http(PREFIX+'git/ref/heads/'+SOURCE,token)
     need(r['object']['sha']==os.environ['GITHUB_SHA'],'BC_SOURCE_MOVED')
-    _,rule=http(PREFIX+'rulesets/'+str(rule_id),token);check_rule(rule,source=True,exact=exact)
-    _,acl=http(PREFIX+'rulesets/25268790',token);check_rule(acl,exact=exact)
+    _,rule=http(PREFIX+'rulesets/'+str(rule_id),token)
+    check_rule(rule,source=True,exact=exact,fence=descriptor['source_seal'])
+    _,acl=http(PREFIX+'rulesets/25268790',token)
+    check_rule(acl,exact=exact,fence=descriptor['active_acl'])
     _,append=http(PREFIX+'rulesets/25222248',token)
     need(append['enforcement']=='active' and
          append['conditions']['ref_name']=={'include':['refs/heads/mxm-o04-*'],'exclude':[]} and
-         {r['type'] for r in append['rules']}=={'deletion','non_fast_forward','required_linear_history'} and
-         append.get('bypass_actors',None if exact else [])==[],'BC_APPEND_ONLY_REQUIRED')
+         {r['type'] for r in append['rules']}=={'deletion','non_fast_forward','required_linear_history'},
+         'BC_APPEND_ONLY_REQUIRED')
+    need(descriptor['append_only']['bypass_actors']==[] and
+         public_rule_view(append)==public_rule_view(descriptor['append_only']) and
+         ('bypass_actors' not in append or append['bypass_actors']==[]),'BC_APPEND_NATIVE_REVISION')
     _,owner=http(PREFIX+'git/ref/heads/mxm-o04-accepted-owner-1807-v1',token)
     need(owner['object']['sha']==OWNER_ROOT[1],'BC_OWNER_ROOT_CHANGED')
     _,old=http(PREFIX+'actions/runs/'+str(OLD_RUN),os.environ['GH_TOKEN'])
@@ -171,9 +204,12 @@ def execute():
         public=strict_json(base64.b64decode(entry['content']));validate(public,source)
         rule_id=public['source_rule_id']
     verify_server(rule_id,os.environ['GH_TOKEN'])  # public native controls before App key use
+    print(json.dumps({'phase':'BC_PUBLIC_NATIVE_ADMISSION_VERIFIED'}))
     OUT.mkdir(parents=True,exist_ok=True)
     with _app_token(os.environ['SUCCESSOR_APP_PRIVATE_KEY']) as token, tempfile.TemporaryDirectory() as folder:
+        print(json.dumps({'phase':'BC_APP_IDENTITY_INSTALLATION_AND_TOKEN_SCOPE_VERIFIED'}))
         verify_server(rule_id,token,exact=True)
+        print(json.dumps({'phase':'BC_APP_NATIVE_REVISION_FENCES_VERIFIED'}))
         store=Store(Path(folder)/'git',token,source);h,state=store.read();bootstrap_oid=None
         if mode=='bootstrap':
             need(h is None,'BC_BOOTSTRAP_EXISTS_NO_RETRY')
@@ -243,6 +279,7 @@ def execute():
             'cold_encrypted_checkpoint_verified':state['checkpoint_sha256'] is not None,
             'checkpoint_sha256':state['checkpoint_sha256'],'owner_root_unchanged':True,
             'native_owner_review_claimed':False,'orders':0,'broker_requests':0,
+            'acl_evidence':'NATIVE_ADMIN_DESCRIPTOR_AND_CURRENT_REVISION_FENCE',
             'new_app_token_per_run':True,'token_revocation':'CHECK_AFTER_CONTEXT_EXIT'}
     # Emitted only AFTER the App context confirms successful token revocation.
     receipt['token_revocation']='CONFIRMED_204'
@@ -256,5 +293,6 @@ if __name__=='__main__':
     except Exception as error:
         import re
         code=str(error) if re.fullmatch(r'(BC|B|APP|TOKEN|NATIVE|STALE|SERVER)_[A-Z0-9_]+',str(error)) else type(error).__name__
-        print(json.dumps({'state':'BC_STOP_NO_REEXECUTION','safe_code':code}))
+        print(json.dumps({'state':'BC_STOP_NO_REEXECUTION','safe_code':code,
+            'http_status':getattr(error,'code',None)}))
         raise SystemExit(1) from None

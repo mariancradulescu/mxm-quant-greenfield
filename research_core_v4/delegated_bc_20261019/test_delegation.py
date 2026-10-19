@@ -101,6 +101,32 @@ class Delegation(unittest.TestCase):
         self.assertEqual(state['sequence'],4)
         self.assertEqual(c.scheduling(state,SOURCE,9999),'REGISTERED_QUEUE_COMPLETE_NO_CBOT_QUALIFICATION')
 
+    def test_redacted_actor_list_requires_native_admin_revision_fence(self):
+        from .native import check_rule,ACL
+        full={'id':25268790,'updated_at':'2026-10-19T03:57:32.013Z','target':'branch',
+            'source_type':'Repository','source':'mariancradulescu/mxm-quant-greenfield',
+            'enforcement':'active','conditions':{'ref_name':{'include':[c.ACTIVE_REF],'exclude':[]}},
+            'rules':[{'type':k} for k in ('creation','update','deletion','non_fast_forward')],
+            'bypass_actors':ACL}
+        redacted={k:v for k,v in full.items() if k!='bypass_actors'}
+        check_rule(redacted,exact=True,fence=full)
+        with self.assertRaises(Exception):check_rule(redacted,exact=True)
+        changed={**redacted,'updated_at':'2026-10-19T03:57:33.013Z'}
+        with self.assertRaises(Exception):check_rule(changed,exact=True,fence=full)
+        with self.assertRaises(Exception):check_rule({**full,'bypass_actors':[]},exact=True,fence=full)
+
+    def test_native_admin_descriptor_binds_exact_source_and_policy(self):
+        from .native import delegation_descriptor
+        descriptor={'schema':'mxm.native-admin-delegation.v1','source_sha':SOURCE,
+            'policy_sha256':c.POLICY_SHA,'source_seal':{'id':7},
+            'active_acl':{'id':25268790},'append_only':{'id':25222248}}
+        with patch.dict(os.environ,{'GITHUB_SHA':SOURCE,'BC_NATIVE_DELEGATION':json.dumps(descriptor)}):
+            self.assertEqual(delegation_descriptor(7),descriptor)
+            with self.assertRaises(Exception):delegation_descriptor(8)
+        descriptor['source_sha']='e'*40
+        with patch.dict(os.environ,{'GITHUB_SHA':SOURCE,'BC_NATIVE_DELEGATION':json.dumps(descriptor)}),self.assertRaises(Exception):
+            delegation_descriptor(7)
+
 class ScientificSupport(unittest.TestCase):
     def test_missing_outcome_has_no_invented_finite_bound(self):
         q=summary();q['accounting']['model']=accounting(missing=1)

@@ -7,7 +7,7 @@ import copy
 from research_core_v4.p0_supersession_20261016.authority import (
     OWNER_ROOT, ACTIVE_REF, canonical, digest, need, oid, sha256)
 
-SOURCE = 'mxm-o04-successor-code-bc-v1'
+SOURCE = 'mxm-o04-successor-code-bc-v2'
 WORKFLOW = '.github/workflows/mxm-delegated-bc.yml'
 TASKS = ('B_COLD_RESTORE_1','B_COLD_RESTORE_2','C_PARTIAL_IDENTIFICATION','D_ECONOMIC_ADMISSION')
 POLICY = {'schema':'mxm.native-configured-delegation.v1',
