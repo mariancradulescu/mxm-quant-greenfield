@@ -82,6 +82,16 @@ class ScientificSensitivity(unittest.TestCase):
         a=s.missingness(q);b=s.cost_sensitivity(q)
         self.assertEqual(q,before);self.assertFalse(s.admission([a,b])['cbot_qualified'])
 
+class ReadOnlyIsolation(unittest.TestCase):
+    def test_app_key_presence_stops_before_any_private_processing(self):
+        from . import readonly
+        env={'GITHUB_REPOSITORY':'mariancradulescu/mxm-quant-greenfield',
+            'GITHUB_REF_NAME':'mxm-remediation-p0-p4-20261015-v1','GITHUB_EVENT_NAME':'push',
+            'GITHUB_RUN_ATTEMPT':'1','GITHUB_JOB':'independent-evidence','SUCCESSOR_APP_PRIVATE_KEY':'FIXTURE'}
+        with patch.dict(os.environ,env,clear=True),patch.object(readonly,'private_key') as key:
+            with self.assertRaisesRegex(Exception,'BC_READONLY_NO_APP_KEY'):readonly.main()
+            key.assert_not_called()
+
 class Durability(unittest.TestCase):
     def test_fresh_runs_and_expired_lease_across_long_session_gap(self):
         state=c.genesis(SOURCE,1000);state['checkpoint_sha256']='d'*64
