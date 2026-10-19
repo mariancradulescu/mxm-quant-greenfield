@@ -17,7 +17,7 @@ PARENT='d22b6ff51888ba910524a7ad755eb34135860ee6'
 PREFIX='diagnostics/frontier-support-pregate-B'
 OUT=ROOT/'verification/frontier-pregate-B'
 PLAN='research_programs/reconciliation/FRONTIER_SUPPORT_PREGATE_B_EXECUTION.json'
-SOURCE_BRANCH='mxm-o04-successor-code-B-publisher-proof-r1'
+SOURCE_BRANCH='mxm-o04-successor-code-native-quote-reuse-r1'
 WF='.github/workflows/mxm-frontier-pregate-b.yml'
 
 def anchors(route):
