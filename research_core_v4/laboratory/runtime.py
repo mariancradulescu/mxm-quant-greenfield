@@ -14,17 +14,18 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-laboratory-research-r4'
+SOURCE_BRANCH='mxm-o04-successor-code-integrated-p0-r1'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
 
 def module_digest():
-    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py')})
+    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py')})
 
 def anchors(route):
     old.owner_unchanged(route)
     need(route.json('git/ref/heads/mxm-o04-active-v1')['object']['sha']==AUTHORITY,'AUTHORITY_DRIFT')
+    active=strict_json(file_at(route,'state.json',AUTHORITY));need(active['revoked'] is False and active['pending'] is None,'AUTHORITY_REVOKED_OR_PENDING')
     source_admission(subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),os.environ['LAB_SOURCE_SHA'],
       route.json('git/ref/heads/'+SOURCE_BRANCH)['object']['sha'],route.json('rulesets/25222248'))
 
@@ -83,6 +84,9 @@ def authentic_integration(key,tmp):
     return {'catalogue':cat.export(),'authentic_quote_rows_validated':count,'source_ciphertext_sha256':preserved_registry()['cached_input']['ciphertext_sha256'],'native_probe':probe,'economic_outcomes_opened':0}
 
 def main():
+    if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
+        from .integrated import execute
+        return execute()
     need(os.environ['GITHUB_REPOSITORY']==old.REPO and os.environ['GITHUB_REF_NAME']==old.BRANCH and os.environ['GITHUB_RUN_ATTEMPT']=='1'
       and os.environ['GITHUB_JOB']=='investigation' and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WORKLOAD')
     route=GetOnly();anchors(route);parent=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha'];s=read_state(route,parent);validate_state(s,int(os.environ['GITHUB_RUN_ID']))
@@ -118,6 +122,7 @@ def main():
             private={'schema':'mxm.general-laboratory-private-state.v1','source_sha':os.environ['LAB_SOURCE_SHA'],'sequence':0,'pending':None,'programmes':{},'trial_book':book.export(),
               'history':history,'data_inventory':inventory(ROOT),'authentic_integration':authentic_integration(key,tmp)}
         if private['source_sha']!=os.environ['LAB_SOURCE_SHA']:
+            need(private['source_sha']!='b430a303dc76bd1ea07fbd7dd9e91dcc7c7e9ee5','EXACT_TYPED_TRANSITION_PROTOCOL_REQUIRED')
             need(private['source_sha'] in ('8f2197f047b12544e1736e31f4f93e642173ccd5','a54757ce89f613be91ea05bac9f46434dd9021c0','f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522') and private['safe_stop'] is True and all(v['progress']['safe_stop'] for v in private['programmes'].values()),'SOURCE_MIGRATION_REQUIRES_CLOSED_PREDECESSOR')
             private.setdefault('source_migrations',[]).append({'previous':private['source_sha'],'successor':os.environ['LAB_SOURCE_SHA'],'parent_oid':parent,'closed_programmes_replayed':False})
             private['source_sha']=os.environ['LAB_SOURCE_SHA']
@@ -189,8 +194,10 @@ def main():
                 asset=saved['catalogue']['assets'][result['value']['asset_id']]
                 data.append({'task':name,'instrument':asset['instrument'],'rows':asset['row_count'],'invalid':asset['invalid'],'conflicts':asset['conflicts'],'classification':result['classification']})
         receipt['research_progress'].append({'programme':m['id'],'classifications':{k:v['classification'] for k,v in results.items()},'data':data,'safe_stop':saved['progress']['safe_stop']})
-    receipt['V2_budget_used']=private['trial_book']['used']['V2']
-    receipt['V2_budget_remaining']=private['trial_book']['limits']['V2']-private['trial_book']['used']['V2']
+    from .protocol import accounting
+    v2=accounting(private['trial_book'])['lanes']['V2']
+    receipt['V2_budget_used']=v2['encumbered']
+    receipt['V2_budget_remaining']=v2['limit']-v2['encumbered']
     receipt['numerical_economics_encrypted']=True
     (OUT/'receipt.json').write_bytes(encoded(receipt));print(json.dumps(receipt,sort_keys=True))
 

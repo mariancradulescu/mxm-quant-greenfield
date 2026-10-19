@@ -37,17 +37,19 @@ class TypedTrialBook:
 
     def _apply(self,kind,p):
         if kind=='FAMILY_REGISTERED':
-            need(p['id'] not in self.families and type(p['identity_cap']) is int and p['identity_cap']>0 and type(p['observation_cap']) is int and p['observation_cap']>0,'ADMISSION_FAMILY_CAP')
+            technical=p.get('mode')=='TECHNICAL_NONOUTCOME'
+            need(p['id'] not in self.families and type(p['identity_cap']) is int and type(p['observation_cap']) is int and ((p['identity_cap']==p['observation_cap']==0) if technical else (p['identity_cap']>0 and p['observation_cap']>0)),'ADMISSION_FAMILY_CAP')
             need(len(p['decision_sha256'])==64 and len(p['novelty_justification'])>=40 and p['selection_history_ref'] and p['adaptive_exposure'],'ADMISSION_NOVELTY_AND_EXPOSURE')
             lane=p['lane'];need(lane=='V2' or lane.startswith('DISTINCT_'),'ADMISSION_LANE')
             limit=self.limits.get(lane,p['lane_cap'])
-            need(type(limit) is int and 0<p['identity_cap']<=limit and p['lane_cap']==limit,'ADMISSION_NO_LANE_RESET')
+            need(type(limit) is int and limit>0 and 0<=p['identity_cap']<=limit and p['lane_cap']==limit,'ADMISSION_NO_LANE_RESET')
             self.limits[lane]=limit
             self.families[p['id']]=deepcopy(p)
         elif kind=='PROGRAMME_REGISTERED':
             need(p['id'] not in self.programmes and p['family'] in self.families,'ADMISSION_PROGRAMME')
-            f=self.families[p['family']];need(p['lane']==f['lane'] and type(p['identity_cap']) is int and 0<p['identity_cap']<=f['identity_cap'],'ADMISSION_PROGRAMME_CAP')
-            need(type(p['observation_cap']) is int and 0<p['observation_cap']<=f['observation_cap'] and len(p['manifest_sha256'])==64,'ADMISSION_PROGRAMME_OBSERVATIONS')
+            f=self.families[p['family']];technical=f.get('mode')=='TECHNICAL_NONOUTCOME'
+            need(p['lane']==f['lane'] and type(p['identity_cap']) is int and (p['identity_cap']==0 if technical else 0<p['identity_cap']<=f['identity_cap']),'ADMISSION_PROGRAMME_CAP')
+            need(type(p['observation_cap']) is int and (p['observation_cap']==0 if technical else 0<p['observation_cap']<=f['observation_cap']) and len(p['manifest_sha256'])==64,'ADMISSION_PROGRAMME_OBSERVATIONS')
             self.programmes[p['id']]=deepcopy(p)
         elif kind=='IDENTITY_RESERVED':
             key=p['lane']+':'+p['id'];need(not any(x['id']==p['id'] for x in self.items.values()) and p['programme'] in self.programmes,'ADMISSION_IDENTITY_DUPLICATE')

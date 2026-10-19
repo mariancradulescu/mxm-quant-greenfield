@@ -5,6 +5,9 @@ from .runtime import anchors,read_state,validate_state,EVIDENCE_BRANCH
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 
 def main():
+    if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
+        from .integrated import handoff
+        return handoff()
     need(os.environ['GITHUB_JOB']=='scientific-handoff' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'HANDOFF_NO_KEYS')
     route=GetOnly();anchors(route);oid=os.environ['LAB_PARENT_OID'];need(route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']==oid,'HANDOFF_STALE')
     s=read_state(route,oid);validate_state(s);need(s['safe_stop'] is False and s['last_run_id']==int(os.environ['GITHUB_RUN_ID']),'HANDOFF_NOT_ADMITTED')

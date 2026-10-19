@@ -5,6 +5,7 @@ claim it again, even from a new push. Previous encrypted checkpoints are intact.
 """
 import json,os,re
 from .common import *
+from .protocol import identity_budget
 
 def claim_state(state,run_id,admission_sha,parent,source):
     need(state['pending'] is None,'PENDING_SEGMENT_REQUIRES_RECOVERY')
@@ -13,6 +14,9 @@ def claim_state(state,run_id,admission_sha,parent,source):
       'outcome_state':'NOT_KNOWN_UNTIL_AUTHENTIC_COMPLETION','automatic_retry':False}}
 
 def main():
+    if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
+        from .integrated import claim
+        return claim()
     from .runtime import ROOT,anchors,read_state,validate_state,admission,EVIDENCE_BRANCH,file_at
     from .custody import atomic_publish
     from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
@@ -25,7 +29,7 @@ def main():
     need(parent==expected and re.fullmatch(r'[a-f0-9]{40}',ref),'INTENT_STALE_PARENT')
     a=admission(route,ref,path);run=int(os.environ['GITHUB_RUN_ID']);new=claim_state(s,run,digest(a),parent,os.environ['LAB_SOURCE_SHA'])
     intent={'schema':'mxm.laboratory-durable-intent.v1','run_id':run,'admission_ref':ref,'admission_path':path,'admission_sha256':digest(a),'source_sha':os.environ['LAB_SOURCE_SHA'],
-      'parent_checkpoint_oid':parent,'programme_definitions_prospective':True,'maximum_new_identity_reservation':sum(m['budget']['new_V2_identities'] for m in a['programmes']),
+      'parent_checkpoint_oid':parent,'programme_definitions_prospective':True,'maximum_new_identity_reservation':sum(identity_budget(m) for m in a['programmes']),
       'pending':new['pending'],'orders':0}
     oid=atomic_publish(route,parent,{'program-state.json':encoded(new),'intents/'+str(run)+'.json':encoded(intent)},'Reserve one-shot general laboratory segment before any OWNER-key worker or broker request')
     need(read_state(route,oid)==new,'INTENT_REMOTE_READBACK');anchors(route)

@@ -8,6 +8,9 @@ MAGIC=b'MXM_SHALLOW_M5_V2_ENC1\x00'
 ALLOWED={'schema','authority','source_sha','parent_oid','sequence','run_id','trigger_sha','admission_ref','admission_path','admission_sha256','ciphertext_sha256','safe_stop','pending','completed_steps','cold_restored','modified_cipher_rejected','mode','orders','new_economic_outcomes','app_key_used','active_authority_write','cbot_qualified','native_acquisition_state','authentic_cache_validated','durable_intent_consumed','authentic_data_controller_validated','reception_assertions_checked','research_progress','V2_budget_used','V2_budget_remaining','numerical_economics_encrypted'}
 
 def main():
+    if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
+        from .integrated import publish
+        return publish()
     need(os.environ['GITHUB_JOB']=='durable-archive' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'ARCHIVE_NO_KEYS')
     route=GetOnly();anchors(route);receipt=json.loads((ROOT/'verification/laboratory-input/receipt.json').read_bytes());blob=(ROOT/'verification/laboratory-input/result.mxmenc').read_bytes()
     need(set(receipt)==ALLOWED and receipt['schema']=='mxm.general-laboratory-receipt.v1','PUBLIC_RECEIPT')

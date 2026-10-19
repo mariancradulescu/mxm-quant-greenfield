@@ -20,11 +20,11 @@ def validate_manifest(m,history,global_book):
     typed=m['schema']=='mxm.laboratory-program.v2'
     need(m['schema'] in ('mxm.laboratory-program.v1','mxm.laboratory-program.v2') and ID.fullmatch(m['id']) and type(m['version']) is int and m['version']>0,'PROGRAM_ID')
     need(m['authority']==AUTHORITY and m['partition']=='DEVELOPMENT' and m['orders']==0,'PROGRAM_SCOPE')
-    need(m['mode'] in ('SYNTHETIC_RECEPTION','DEVELOPMENT_RESEARCH'),'PROGRAM_MODE')
+    need(m['mode'] in ('SYNTHETIC_RECEPTION','DEVELOPMENT_RESEARCH','TECHNICAL_NONOUTCOME'),'PROGRAM_MODE')
     need(m['budget']['steps']>0 and m['budget']['steps']>=len(m['tasks']) and m['budget']['broker_requests']>=0,'PROGRAM_BUDGET')
     need(history['reconciled'],'HISTORICAL_BUDGET')
     if typed:
-        need(m['mode']=='DEVELOPMENT_RESEARCH' and isinstance(global_book,TypedTrialBook),'TYPED_RESEARCH_BOOK_REQUIRED');global_book.validate_programme(m)
+        need(m['mode'] in ('DEVELOPMENT_RESEARCH','TECHNICAL_NONOUTCOME') and isinstance(global_book,TypedTrialBook),'TYPED_RESEARCH_BOOK_REQUIRED');global_book.validate_programme(m)
     else:
         need(m['mode']=='SYNTHETIC_RECEPTION','LEGACY_NEW_ECONOMIC_ADMISSION_CLOSED')
         need(m['budget']['new_V2_identities']<=history['V2']['remaining'],'HISTORICAL_BUDGET')
@@ -33,6 +33,7 @@ def validate_manifest(m,history,global_book):
     charged=[]
     for ident,t in tasks.items():
         need(ID.fullmatch(ident) and t['operator'] in OPS,'OPERATOR')
+        if m['mode']=='TECHNICAL_NONOUTCOME':need(t['operator'] in ('classify','report') and m['budget']['new_identities']==m['budget']['broker_requests']==t['trial_units']==0,'TECHNICAL_NONOUTCOME_SCOPE')
         if typed:need(t['operator'] not in ('screen','replay','robustness','catalogue'),'TYPED_OPERATOR_REQUIRES_EXACT_OUTCOME_HOOK')
         need(type(t['priority']) is int and type(t['trial_units']) is int and t['trial_units']>=0,'TASK_BUDGET')
         need(set(t['dependencies'])<=set(tasks) and ident not in t['dependencies'],'DEPENDENCY')
