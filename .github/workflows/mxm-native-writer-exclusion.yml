@@ -1,0 +1,64 @@
+name: MXM native non-App writer exclusion
+on:
+  workflow_dispatch:
+    inputs:
+      expected_head:
+        description: Exact terminal active authority head; no retry on movement
+        type: string
+        required: true
+permissions: {}
+jobs:
+  native-exclusion:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'main' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {contents: write}
+    steps:
+      - name: Attempt identical-tree linear append with ordinary workflow token; expect GH013
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ inputs.expected_head }}
+        run: |
+          python3 - <<'PY'
+          import base64,json,os,re,subprocess,tempfile,urllib.request
+          REPO='mariancradulescu/mxm-quant-greenfield';REF='refs/heads/mxm-o04-active-v1'
+          def need(ok,code):
+              if not ok:raise SystemExit(code)
+          need(not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'EXCLUSION_APP_KEY_PRESENT')
+          expected=os.environ['EXPECTED_HEAD'];need(re.fullmatch('[0-9a-f]{40}',expected),'EXCLUSION_HEAD_FORMAT')
+          token=os.environ['GH_TOKEN']
+          def get(path):
+              req=urllib.request.Request('https://api.github.com/repos/'+REPO+'/'+path,headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as response:return json.load(response)
+          def head():return get('git/ref/heads/mxm-o04-active-v1')['object']['sha']
+          need(head()==expected,'EXCLUSION_HEAD_MOVED_NO_RETRY')
+          entry=get('contents/state.json?ref='+expected);state=json.loads(base64.b64decode(entry['content']))
+          need(state['source_sha']=='ca99a5ad609a301fef8bd3efe0e902fe3fbe905b' and
+               state['sequence']==3 and state['pending'] is None and
+               state['halt']=='REGISTERED_RESEARCH_COMPLETE_INSUFFICIENT_EVIDENCE','EXCLUSION_TERMINAL_REQUIRED')
+          owner_before=get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']
+          need(owner_before=='a830c132521bd4348454653f713e04f6107484fe','EXCLUSION_OWNER_CHANGED')
+          with tempfile.TemporaryDirectory() as folder:
+              env={k:v for k,v in os.environ.items() if k in ('PATH','LANG','TMPDIR')}
+              env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL=os.devnull,GIT_TERMINAL_PROMPT='0',
+                  GIT_AUTHOR_NAME='MXM native writer exclusion probe',GIT_COMMITTER_NAME='MXM native writer exclusion probe',
+                  GIT_AUTHOR_EMAIL='mxm@example.invalid',GIT_COMMITTER_EMAIL='mxm@example.invalid',
+                  GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',
+                  GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+token).encode()).decode())
+              def git(*args,data=None,check=True):
+                  r=subprocess.run(['git',*args],cwd=folder,env=env,input=data,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=60)
+                  need(not check or r.returncode==0,'EXCLUSION_GIT_TRANSPORT_STOP');return r
+              git('init','-q');remote='https://github.com/'+REPO+'.git'
+              git('fetch','--quiet','--no-tags','--depth=1',remote,expected)
+              tree=git('rev-parse',expected+'^{tree}').stdout.decode().strip()
+              candidate=git('commit-tree',tree,'-p',expected,data=b'MXM native non-App writer denial probe; identical tree\n').stdout.decode().strip()
+              r=git('push','--porcelain','--force-with-lease='+REF+':'+expected,remote,candidate+':'+REF,check=False)
+              native_error=(r.stdout+r.stderr).decode(errors='replace')
+              need(r.returncode!=0 and 'GH013' in native_error,'EXCLUSION_NOT_A_CONFIRMED_RULESET_DENIAL')
+          need(head()==expected,'EXCLUSION_AUTHORITY_CHANGED_STOP')
+          need(get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']==owner_before,'EXCLUSION_OWNER_CHANGED')
+          print(json.dumps({'schema':'mxm.native-writer-exclusion.v1','state':'NON_APP_WRITER_REJECTED_BY_NATIVE_RULESET',
+              'run_id':int(os.environ['GITHUB_RUN_ID']),'native_error_code':'GH013','authority_head_unchanged':expected,
+              'candidate_identical_tree':True,'candidate_oid':candidate,'app_key_used':False,
+              'ordinary_workflow_contents_permission':'write','owner_root_unchanged':True,'checkpoint_changed':False,'orders':0}))
+          PY
