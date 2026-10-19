@@ -1,0 +1,58 @@
+name: MXM current frontier accessibility
+run-name: MXM CURRENT FRONTIER ACCESSIBILITY 18453ac349b527040354c15520ebfde1e8e9cb61
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [research_programs/reconciliation/EXECUTE_FRONTIER_ACCESSIBILITY_20261019.json]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  census:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 18453ac349b527040354c15520ebfde1e8e9cb61, persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Verify new metadata projection fixtures only
+        run: python3 -m unittest research_core_v4.laboratory.test_frontier_accessibility -v
+      - name: Collect one list and at most one fixed29 detail batch without prices or history
+        run: python3 -m research_core_v4.laboratory.frontier_accessibility worker
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREGATE_SOURCE_SHA: 18453ac349b527040354c15520ebfde1e8e9cb61
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-frontier-accessibility-${{ github.run_id }}
+          path: verification/frontier-accessibility/
+          if-no-files-found: error
+  durable-census:
+    needs: census
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {contents: write, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 18453ac349b527040354c15520ebfde1e8e9cb61, persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: mxm-frontier-accessibility-${{ github.run_id }}
+          path: verification/accessibility-input/
+      - name: Append encrypted metadata and verify remote custody without changing checkpoint16
+        run: python3 -m research_core_v4.laboratory.frontier_accessibility publish
+        env:
+          NATIVE_CENSUS_RESULT: ${{ needs.census.result }}
+          GH_TOKEN: ${{ github.token }}
+          PREGATE_SOURCE_SHA: 18453ac349b527040354c15520ebfde1e8e9cb61
