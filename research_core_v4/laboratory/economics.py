@@ -47,6 +47,27 @@ def screen(spec,evidence):
         if complete:
             metrics.update(gross_per_event=sum(gross)/len(records),weekly_events=dict(weeks),active_weeks=len(weeks))
             if known:metrics.update(net_per_event=sum(net)/len(records),cost_burden=sum(gross)-sum(net))
+        if complete:
+            clocks=sorted(r['entry_ms'] for r in records);holds=[(r['exit_ms']-r['entry_ms'])/1000 for r in records]
+            metrics['longest_inactive_gap']={'within_observed_entry_bounds_ms':max((b-a for a,b in zip(clocks,clocks[1:])),default=0)}
+            metrics['hold_duration']={'minimum_seconds':min(holds),'mean_seconds':sum(holds)/len(holds),'maximum_seconds':max(holds)}
+            metrics['exposure']={'state':'AVAILABLE','value':sum(holds),'unit':'POSITION_SECONDS_NOT_NOTIONAL_EXPOSURE'}
+            weekdays=Counter();sessions=Counter();months=defaultdict(float)
+            for i,r in enumerate(records):
+                dt=datetime.fromtimestamp(r['entry_ms']/1000,timezone.utc);weekdays[str(dt.weekday())]+=1;sessions['UTC_H'+str(dt.hour).zfill(2)]+=1
+                months[f'{dt.year:04d}-{dt.month:02d}']+=net[i] if known else r['gross_eur']
+            metrics['weekday_distribution']=dict(weekdays);metrics['session_distribution']=dict(sessions)
+            metrics['subperiod_contribution']={'net_eur' if known else 'gross_eur':dict(months)}
+            for field,key in (('symbol_id','symbol_contribution'),('direction','direction_contribution'),('regime','regime_contribution')):
+                if all(field in r for r in records):
+                    values=defaultdict(float)
+                    for i,r in enumerate(records):values[str(r[field])]+=net[i] if known else r['gross_eur']
+                    metrics[key]={'net_eur' if known else 'gross_eur':dict(values)}
+            if all(number(r.get('turnover_eur')) for r in records):metrics['turnover']=sum(r['turnover_eur'] for r in records)
+            denominator=e.get('reference_notional_eur')
+            if number(denominator) and denominator>0:
+                metrics['gross_return']=sum(gross)/denominator
+                if known:metrics['coarse_net_return']=sum(net)/denominator
         status='IMPLEMENTATION_INVALID' if not valid else 'DATA_INSUFFICIENT' if not complete else 'COST_UNRESOLVED' if not known else 'GROSS_EDGE_FAIL' if sum(gross)<=0 else 'COARSE_NET_FAIL' if sum(net)<=0 else 'DISCOVERY_SURVIVOR'
         result={'candidate_id':s['id'],'spec_hash':s['spec_hash'],'stage':'A','status':status,
           'implementation_validity':{'state':'VALID' if valid else 'INVALID'},'data_completeness':{'state':'SUFFICIENT' if complete else 'INSUFFICIENT'},

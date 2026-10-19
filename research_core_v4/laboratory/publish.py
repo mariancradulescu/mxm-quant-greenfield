@@ -17,17 +17,20 @@ def main():
     need(receipt['sequence']==s['sequence']+1 and receipt['source_sha']==os.environ['LAB_SOURCE_SHA'] and receipt['trigger_sha']==os.environ['GITHUB_SHA'] and receipt['run_id']==int(os.environ['GITHUB_RUN_ID']),'NATIVE_RECEIPT')
     need(receipt['durable_intent_consumed'] is True and receipt['authentic_cache_validated'] is True and receipt['native_acquisition_state'] in ('COMPLETE_EXACT_WINDOW','TRANSPORT_UNRESOLVED','PROVIDER_ERROR','HASMORE_UNRESOLVED','PAGE_CAP_INCOMPLETE','ACQUISITION_UNRESOLVED'),'DATA_ATTESTATION')
     need(receipt['orders']==0 and all(receipt[k] is False for k in ('app_key_used','active_authority_write','cbot_qualified')) and receipt['pending'] is None and receipt['modified_cipher_rejected'] is True,'RECEIPT_SCOPE')
-    need(blob.startswith(MAGIC) and bytes_digest(blob)==receipt['ciphertext_sha256'] and len(blob)<700000,'CIPHERTEXT_BOUNDED')
+    need(blob.startswith(MAGIC) and bytes_digest(blob)==receipt['ciphertext_sha256'] and len(blob)<=16*1024*1024,'CIPHERTEXT_BOUNDED')
     need(type(receipt['completed_steps']) is int and 0<=receipt['completed_steps']<=a['steps_per_segment'] and type(receipt['safe_stop']) is bool,'SEGMENT_BUDGET')
     jobs=route.json('actions/runs/'+os.environ['GITHUB_RUN_ID']+'/jobs?per_page=100')['jobs'];need(any(j['name']=='investigation' and j['conclusion']=='success' for j in jobs),'NATIVE_WORKER_COMPLETION')
-    path='segments/'+str(receipt['sequence'])+'/result.mxmenc.b64'
-    new={**s,'sequence':receipt['sequence'],'ciphertext_path':path,'ciphertext_sha256':receipt['ciphertext_sha256'],'last_run_id':receipt['run_id'],'last_trigger_sha':receipt['trigger_sha'],
+    from .custody import chunk_ciphertext,restore_ciphertext
+    prefix='segments/'+str(receipt['sequence']);files,part_manifest=chunk_ciphertext(blob,prefix);path=prefix+'/checkpoint.parts.json'
+    files[path]=encoded(part_manifest);files[prefix+'/receipt.json']=encoded(receipt)
+    new={**s,'ciphertext_format':'CHUNKED_ENCRYPTED_ENVELOPE_V1','sequence':receipt['sequence'],'ciphertext_path':path,'ciphertext_sha256':receipt['ciphertext_sha256'],'last_run_id':receipt['run_id'],'last_trigger_sha':receipt['trigger_sha'],
       'source_sha':receipt['source_sha'],'admission_ref':receipt['admission_ref'],'admission_path':receipt['admission_path'],'admission_sha256':receipt['admission_sha256'],'safe_stop':receipt['safe_stop'],'pending':None}
     from .custody import atomic_publish
-    commit=atomic_publish(route,parent,{path:base64.b64encode(blob)+b'\n',path.rsplit('/',1)[0]+'/receipt.json':encoded(receipt),'program-state.json':encoded(new)},'Preserve encrypted general laboratory segment '+str(receipt['sequence'])+' and close durable intent atomically')
+    files['program-state.json']=encoded(new)
+    commit=atomic_publish(route,parent,files,'Preserve encrypted general laboratory segment '+str(receipt['sequence'])+' and close durable intent atomically')
     need(route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']==commit,'ARCHIVE_ACK_AMBIGUOUS');need(read_state(route,commit)==new,'REMOTE_STATE')
     from .runtime import file_at
-    need(base64.b64decode(file_at(route,path,commit))==blob,'REMOTE_CIPHER')
+    remote=restore_ciphertext(json.loads(file_at(route,path,commit)),lambda p:file_at(route,p,commit));need(remote==blob,'REMOTE_CIPHER')
     anchors(route)
     with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('next='+('STOP' if receipt['safe_stop'] else 'CONTINUE')+'\nevidence_oid='+commit+'\nadmission_ref='+receipt['admission_ref']+'\nadmission_path='+receipt['admission_path']+'\n')
     print(json.dumps({'state':'GENERAL_LABORATORY_DURABLE_CHECKPOINT','sequence':receipt['sequence'],'evidence_oid':commit,'safe_stop':receipt['safe_stop'],'ciphertext_sha256':receipt['ciphertext_sha256'],'active_authority_write':False}))

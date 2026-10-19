@@ -51,3 +51,22 @@ def programme(ident='RECEPTION_BRANCHING',suffix=1):
     return {'schema':'mxm.laboratory-program.v1','id':ident,'version':1,'authority':AUTHORITY,'partition':'DEVELOPMENT','orders':0,'mode':'SYNTHETIC_RECEPTION',
       'budget':{'steps':len(tasks),'broker_requests':0,'new_V2_identities':0},'prospective_at_ms':T,'provenance':'OWNER_FUNCTIONAL_RECEPTION_SYNTHETIC_ONLY',
       'source_sha256':digest('integration-reception-fixture-v1'),'tasks':tasks}
+
+def native_path_fixture():
+    """Manually known: long101 -> bid102, EUR1 gross, .20fees, .05funding."""
+    intent={'decision_ms':T,'feature_available_ms':T,'entry_ms':T+1000,'exit_ms':T+61000,'direction':1,'symbol_id':9999}
+    def quote(t,bid,ask):return {'symbol_id':9999,'boundary_ms':t,'sides':{side:{'state':'AUTHENTIC_CAUSAL_QUOTE','timestamp_ms':t,'price':price,'age_ms':0,'source_has_more':False} for side,price in [('bid',bid),('ask',ask)]},'fixture':'SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE'}
+    corpus={'all_identity_status':[{'sid':9999,'symbol':'SYNTHETIC','class':'SYNTHETIC_FOREX','base':'EUR','quote':'EUR','min_units':1,'reasons':[]}],
+      'catalog':{'full':{'9999':{'commissionType':4,'preciseTradingCommissionRate':0,'lotSize':100,'preciseMinCommission':0,'minCommissionType':2,'pnlConversionFeeRate':0}}},
+      'raw_quote_receipts':[quote(T+1000,100,101),quote(T+31000,100.5,101.5),quote(T+61000,102,103)]}
+    costs={'spread':0.,'commission':.1,'slippage':0.,'funding':0.,'fx_conversion':0.}
+    terms={'volume_cents':100,'min_volume_cents':100,'step_volume_cents':100,'max_volume_cents':10000,'margin_eur':20.,
+      'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64}],
+      'source_sha256':'a'*64,'effective_start_ms':T,'effective_end_ms':T+100000}
+    authority={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','prospectively_frozen':True,'source_sha256':'b'*64,
+      'current_snapshot_is_historical':False,'by_intent':{digest(intent):terms},'mark_interval_ms':30000}
+    coarse={'state':'CONSERVATIVE_BOUND','prospectively_frozen':True,'source_sha256':'b'*64,'current_snapshot_is_historical':False,
+      'per_intent_costs_eur':{digest(intent):{'spread':0.,'commission':.2,'slippage':0.,'funding':.05,'fx_conversion':0.}}}
+    spec,_=economic_fixture();spec['price_cost_convention']='BID_ASK_PLUS_NONSPREAD_COSTS'
+    generated={'intents':[intent],'missing':[],'feature_asset_sha256':digest('synthetic-fixed-source')}
+    return generated,corpus,authority,coarse,spec

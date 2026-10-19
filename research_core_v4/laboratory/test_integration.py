@@ -62,7 +62,7 @@ class IntegratedReception(unittest.TestCase):
         future=deepcopy(x['manifest']);future['partition']='PROTECTED';i=c.ingest(future,x['rows'])
         with self.assertRaisesRegex(LabError,'PROTECTED_READ_GATE'):c.view(i,T)
     def test_acquisition_cache_first_and_bounded_whitelist(self):
-        x=programme()['tasks']['validate_data']['input'];c=DataCatalogue();c.ingest(x['manifest'],x['rows'])
+        x=programme()['tasks']['validate_data']['input'];c=DataCatalogue();c.ingest(x['manifest'],x['rows'],trust='AUTHENTICATED_NATIVE_CUSTODY')
         p={'provider':'PEPPERSTONE_OPEN_API','partition':'DEVELOPMENT','read_only':True,'automatic_retries':0,'instrument':'SYNTHETIC','kind':'M5','start_ms':T-300000,'end_ms':T,'max_pages':3}
         a=Acquisition(c,None,{'M5':0});self.assertEqual(a.request(p)['state'],'CACHE_REUSED')
         p['start_ms']-=300000
@@ -134,4 +134,43 @@ class IntegratedReception(unittest.TestCase):
     def test_partial_day_interval_includes_next_iso_week(self):
         s,e=economic_fixture();s['evaluation_start']='2025-01-05T23:30:00Z';s['evaluation_end']='2025-01-06T12:02:00Z'
         r=replay(s,e);self.assertEqual(set(r['entries_per_week']),{'2025-W01','2025-W02'});self.assertEqual(r['entries_per_week']['2025-W01'],0)
+    def test_native_quote_path_into_shared_account_and_unresolved_gates(self):
+        from .science import native_replay
+        from discovery.engine import DiscoveryEngine
+        m=programme();c=DiscoveryEngine().freeze_candidate(m['tasks']['admit_candidate']['input']['candidate'])
+        def q(t,bid,ask):return {'symbol_id':9999,'boundary_ms':t,'sides':{side:{'state':'AUTHENTIC_CAUSAL_QUOTE','timestamp_ms':t,'price':price,'age_ms':0,'source_has_more':False} for side,price in [('bid',bid),('ask',ask)]}}
+        intent={'decision_ms':T,'feature_available_ms':T,'entry_ms':T+1000,'exit_ms':T+61000,'direction':1,'symbol_id':9999}
+        g={'intents':[intent],'missing':[]};corpus={'all_identity_status':[{'sid':9999,'symbol':'SYNTHETIC','class':'SYNTHETIC_FOREX','base':'EUR','quote':'EUR','reasons':[]}],
+          'raw_quote_receipts':[q(T+1000,100,101),q(T+31000,100.5,101.5),q(T+61000,102,103)]}
+        costs={'spread':0.,'commission':.1,'slippage':0.,'funding':0.,'fx_conversion':0.}
+        terms={'volume_cents':100,'min_volume_cents':100,'step_volume_cents':100,'max_volume_cents':10000,'margin_eur':20.,
+          'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64}],
+          'source_sha256':'a'*64,'effective_start_ms':T,'effective_end_ms':T+100000}
+        authority={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','prospectively_frozen':True,'source_sha256':'b'*64,
+          'current_snapshot_is_historical':False,'by_intent':{digest(intent):terms},'mark_interval_ms':30000}
+        spec,_=economic_fixture();spec['price_cost_convention']='BID_ASK_PLUS_NONSPREAD_COSTS'
+        out=native_replay(c,g,corpus,authority,spec);self.assertEqual(out['result']['replay']['terminal_broker_equity_eur'],'200.75')
+        corpus['raw_quote_receipts'].pop();self.assertEqual(native_replay(c,g,corpus,authority,spec)['classification'],'DATA_INSUFFICIENT')
+        authority['cost_state']='UNRESOLVED';self.assertEqual(native_replay(c,g,corpus,authority,spec)['classification'],'COST_UNRESOLVED')
+    def test_screen_reporting_and_broker_metadata_are_bound(self):
+        l=self.lab();l.execute(l.next());l.execute(l.next());r=l.execute(l.next())['value']
+        self.assertEqual(r['metrics']['hold_duration']['mean_seconds'],60.)
+        self.assertEqual(r['metrics']['exposure']['value'],60.)
+        l.authentic_corpus={'catalog':{'full':{'9':{'digits':5}}}}
+        self.assertEqual(l.resolve({'native_acquisition_plan':{'symbol_id':9,'digits':3}})['digits'],5)
+    def test_rejected_position_has_no_simulated_financing_charge(self):
+        s,e=economic_fixture();e['events'][0]['margin_eur']=300
+        e['events'].append({'timestamp_utc':'2025-01-06T12:00:30Z','kind':'FINANCING','position_id':'p1','candidate_id':'V2-C990001','symbol':'SYNTHETIC',
+          'causal_state':True,'financing_eur':-99,'metadata':{'source_sha256':'a'*64,'available_at_ms':T}})
+        r=replay(s,e);self.assertEqual(r['replay']['terminal_broker_equity_eur'],'200');self.assertEqual(r['replay']['financing_eur'],'0')
+    def test_chunked_atomic_ciphertext_and_corrupt_part(self):
+        from .custody import chunk_ciphertext,restore_ciphertext
+        blob=b'SYNTHETIC_ENCRYPTED_ENVELOPE_TEST'*30000;files,m=chunk_ciphertext(blob,'segments/test')
+        self.assertGreater(len(m['parts']),1);self.assertEqual(restore_ciphertext(m,files.__getitem__),blob)
+        files[m['parts'][0]['path']]=b'Y29ycnVwdA=='
+        with self.assertRaisesRegex(LabError,'CIPHER_PART_CHANGED'):restore_ciphertext(m,files.__getitem__)
+    def test_synthetic_catalogue_never_satisfies_native_cache(self):
+        x=programme()['tasks']['validate_data']['input'];c=DataCatalogue();c.ingest(x['manifest'],x['rows'])
+        self.assertTrue(c.query('SYNTHETIC','M5',T-300000,T))
+        self.assertEqual(c.query('SYNTHETIC','M5',T-300000,T,authentic_only=True),[])
 if __name__=='__main__':unittest.main()

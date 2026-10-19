@@ -89,3 +89,68 @@ def native_quote_screen(spec,generated,corpus,terms_authority):
     result=screen(spec,{'identity':generated['feature_asset_sha256'],'implementation_valid':True,'complete':not missing and bool(records),
       'cost_state':terms_authority['state'],'trades':records})
     return {'classification':result['status'],'result':result,'cashflows':records,'missing':missing,'native_current_terms_reference_is_verified_history':False,'authentic_quotes_are_fills':False}
+
+def native_replay(candidate,generated,corpus,authority,spec):
+    """Native bilateral quote path -> existing continuous account, no fake fills.
+
+    All original entries/exits/marks must exist. Dated margin, volume and every
+    fee/financing item must be supplied by a prospectively bound authority. A
+    current snapshot never supplies missing historical terms. Missing support
+    blocks the entire population rather than selecting favorable complete trades.
+    """
+    from .economics import replay
+    from datetime import datetime,timezone
+    need(authority['screen_status']=='DISCOVERY_SURVIVOR','DEEP_WITHOUT_SCREEN_SURVIVOR')
+    if authority['cost_state'] not in ('VERIFIED','CONSERVATIVE_BOUND'):
+        return {'classification':'COST_UNRESOLVED','result':None,'reason':'DATED_ALL_FRICTION_AUTHORITY_MISSING'}
+    need(authority['prospectively_frozen'] is True and len(authority['source_sha256'])==64 and authority['current_snapshot_is_historical'] is False,'REPLAY_AUTHORITY')
+    if generated['missing']:return {'classification':'DATA_INSUFFICIENT','result':None,'reason':'ORIGINAL_FEATURE_SUPPORT_MISSING'}
+    quotes={};conflicts=set()
+    for q in corpus['raw_quote_receipts']:
+        key=(int(q['symbol_id']),int(q['boundary_ms'])//1000)
+        if key in quotes and quotes[key]!=q:conflicts.add(key)
+        else:quotes[key]=q
+    for key in conflicts:quotes.pop(key,None)
+    graph=native.graph(corpus['all_identity_status']);identities={int(r['sid']):r for r in corpus['all_identity_status']};events=[];missing=[]
+    iso=lambda t:datetime.fromtimestamp(t/1000,timezone.utc).isoformat().replace('+00:00','Z')
+    for intent in generated['intents']:
+        token=digest(intent);terms=authority['by_intent'].get(token);sid=int(intent['symbol_id']);identity=identities.get(sid)
+        if terms is None or identity is None:missing.append('DATED_BROKER_TERMS');continue
+        required=('volume_cents','min_volume_cents','step_volume_cents','max_volume_cents','margin_eur','entry_cost_components_eur','exit_cost_components_eur','financing_cashflows','source_sha256','effective_start_ms','effective_end_ms')
+        need(all(k in terms for k in required) and len(terms['source_sha256'])==64,'NATIVE_REPLAY_TERMS')
+        need(terms['effective_start_ms']<=intent['entry_ms']<intent['exit_ms']<=terms['effective_end_ms'],'DATED_BROKER_TERMS')
+        need(type(terms['volume_cents']) is int and terms['volume_cents']>0,'NATIVE_REPLAY_VOLUME')
+        step=authority['mark_interval_ms'];need(type(step) is int and step>0,'MARK_CADENCE')
+        clocks=list(range(intent['entry_ms'],intent['exit_ms'],step))+[intent['exit_ms']]
+        need(all(t%1000==0 for t in clocks),'NATIVE_REPLAY_CLOCK')
+        points={t:native.point(quotes.get((sid,t//1000))) for t in clocks}
+        if any(p is None for p in points.values()):missing.append('ORIGINAL_ENTRY_EXIT_OR_MARK_QUOTE');continue
+        direction=intent['direction'];need(direction in (-1,1),'NATIVE_REPLAY_DIRECTION');units=terms['volume_cents']/100
+        entry=points[intent['entry_ms']]['ask' if direction>0 else 'bid'];position=candidate['id']+':'+token
+        for t in clocks:
+            kind='ENTRY' if t==intent['entry_ms'] else 'EXIT' if t==intent['exit_ms'] else 'MARK'
+            price=entry if kind=='ENTRY' else points[t]['bid' if direction>0 else 'ask']
+            pnl=direction*units*(price-entry);amount=pnl if pnl else -1.
+            eur=native.convert(amount,identity['quote'],'EUR',t//1000,quotes,graph)
+            if eur is None:missing.append('CAUSAL_SIGNED_FX');break
+            rate=eur/amount
+            components=terms['entry_cost_components_eur'] if kind=='ENTRY' else terms['exit_cost_components_eur'] if kind=='EXIT' else None
+            if components is not None:
+                from .economics import COSTS
+                need(set(components)==set(COSTS) and all(number(x) for x in components.values()),'NATIVE_REPLAY_ALL_COSTS')
+                need(components['spread']==components['funding']==0,'NATIVE_REPLAY_SPREAD_OR_FUNDING_DOUBLE_COUNT')
+            row={'timestamp_utc':iso(t),'kind':kind,'candidate_id':candidate['id'],'symbol':identity.get('symbol',str(sid)),'position_id':position,'causal_state':True,
+              'price':price,'quote_to_eur_rate':rate,'transaction_cost_eur':sum(components.values()) if components else 0,
+              'metadata':{'source_sha256':digest(quotes[(sid,t//1000)]),'available_at_ms':t,'cost_components_eur':components or {}}}
+            if kind=='ENTRY':row.update(direction='LONG' if direction>0 else 'SHORT',direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE',base_units=units,
+              **{k:terms[k] for k in ('volume_cents','min_volume_cents','step_volume_cents','max_volume_cents','margin_eur')})
+            events.append(row)
+        for cashflow in terms['financing_cashflows']:
+            need(intent['entry_ms']<=cashflow['timestamp_ms']<=intent['exit_ms'] and number(cashflow['amount_eur']) and len(cashflow['source_sha256'])==64,'DATED_FINANCING')
+            events.append({'timestamp_utc':iso(cashflow['timestamp_ms']),'kind':'FINANCING','candidate_id':candidate['id'],'symbol':identity.get('symbol',str(sid)),'position_id':position,'causal_state':True,
+              'financing_eur':cashflow['amount_eur'],'metadata':{'source_sha256':cashflow['source_sha256'],'available_at_ms':cashflow['timestamp_ms']}})
+    if missing or not events:return {'classification':'DATA_INSUFFICIENT','result':None,'missing_dependencies':dict(__import__('collections').Counter(missing)),'missing_is_loss':False}
+    evidence={'screen_status':'DISCOVERY_SURVIVOR','cost_state':authority['cost_state'],'full_mark_path':True,'dated_broker_terms':True,'events':events}
+    need(spec['price_cost_convention']=='BID_ASK_PLUS_NONSPREAD_COSTS','NATIVE_REPLAY_PRICE_CONVENTION')
+    result=replay(spec,evidence)
+    return {'classification':result['classification'],'result':result,'input_population_sha256':digest(generated),'authentic_quotes_are_fills':False,'economic_certification':False}

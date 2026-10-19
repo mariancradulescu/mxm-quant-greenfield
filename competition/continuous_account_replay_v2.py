@@ -90,7 +90,7 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
         if e.kind not in order or not e.causal_state: raise ReplayContractError("invalid/non-causal event")
         _t(e.timestamp_utc)
     seq.sort(key=lambda e:(_t(e.timestamp_utc),order[e.kind],e.priority,e.symbol,e.position_id))
-    pos={}; inactive=set(); decisions=[]; external=D(0); financing=D(0); costs=D(0); turnover=D(0); accepted=rejected=0
+    pos={}; inactive=set(); executed_units={}; decisions=[]; external=D(0); financing=D(0); costs=D(0); turnover=D(0); accepted=rejected=0
     weekly={}; monthly={}; entries_week={}; peak=cash; maxdd=D(0); minfree=cash; minratio=None
     prev_ts=None; prev_snap=_snap(seq[0].timestamp_utc if seq else "1970-01-01T00:00:00Z",cash,pos,margin_type,external)
     used_time=eq_time=seconds_total=D(0); status="COMPLETE"; halt=None
@@ -132,7 +132,14 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                 gross=(D(1) if p.direction=="LONG" else D(-1))*(price-p.entry)*p.units*rate
                 cash+=gross-cost; costs+=cost; turnover+=abs(price*p.units*rate); del pos[e.position_id]; record(e,True,"EXIT_APPLIED")
             elif e.kind=="FINANCING":
-                amt=_d(e.financing_eur); cash+=amt; financing+=amt; record(e,True,"FINANCING_APPLIED")
+                if e.position_id in inactive: record(e,False,"SKIP_FINANCING_REJECTED_ENTRY"); continue
+                amt=_d(e.financing_eur)
+                if entry_transform is not None and e.position_id:
+                    from dataclasses import replace
+                    volume_key=str(int(executed_units[e.position_id]*100))
+                    if volume_key not in e.metadata.get('financing_by_volume_cents',{}): raise ReplayContractError("sized financing unresolved")
+                    amt=_d(e.metadata['financing_by_volume_cents'][volume_key])
+                cash+=amt; financing+=amt; record(e,True,"FINANCING_APPLIED")
             else:
                 amt=_d(e.cashflow_eur)
                 if amt<=0: raise ReplayContractError("external cashflow must be positive")
@@ -173,7 +180,7 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
             elif floor is not None and trial_s.margin_level_ratio is not None and trial_s.margin_level_ratio<=floor: reason="REJECT_CAPITAL_PRESERVATION_MARGIN_LEVEL"
             if reason!="ACCEPTED":
                 rejected+=1; inactive.add(e.position_id); record(e,False,reason); continue
-            pos=trial; cash=trial_cash; costs+=cost; turnover+=abs(price*units*rate); accepted+=1
+            pos=trial; executed_units[e.position_id]=units; cash=trial_cash; costs+=cost; turnover+=abs(price*units*rate); accepted+=1
             wk,_=_keys(ts); entries_week[wk]=entries_week.get(wk,0)+1; s=record(e,True,reason)
             st,why=guard_snapshot(s)
             if st: status,halt=st,why; break

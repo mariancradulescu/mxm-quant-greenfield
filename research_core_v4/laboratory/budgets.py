@@ -31,7 +31,7 @@ def historical_accounting(root):
     adaptive=json.loads((root/'research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json').read_text())
     need(adaptive['new_selection_consumes_v2_economic_budget'] is False,'LATER_LANE_UNIT')
     return {'schema':'mxm.reconciled-typed-research-history.v1','legacy':{'used':v2['legacy_prior_attempts'],'unit':'ACCEPTED_LEGACY_ATTEMPTS'},
-      'V2':{'limit':v2['v2_search_budget'],'used':used,'remaining':v2['v2_search_budget']-used,'charged':v2['budget_charged_candidate_ids']+extras,'result_observations':v2['economic_outcomes_opened']+len(extras)},
+      'V2':{'limit':v2['v2_search_budget'],'used':used,'remaining':v2['v2_search_budget']-used,'existing_candidate_ids':sorted(p.stem for p in (root/'discovery/candidates').glob('V2-C*.json')),'charged':v2['budget_charged_candidate_ids']+extras,'result_observations':v2['economic_outcomes_opened']+len(extras)},
       'V3':{'unit':'ACCEPTED_DEPENDENT_CELLS_FAMILIES_AND_ADAPTIVE_SELECTION','accepted_selection_bias_audit':selection_audit,'independent_count_invented':False},
       'V4':{'selection_history':adaptive,'unit':'SEPARATELY_AUTHORIZED_PROGRAMS_AND_ADAPTIVE_SELECTION','closure_nodes':closures['nodes'],'source_index':later,'effective_independent_trial_count':None,'consumes_V2_identity_budget':False},
       'source_digests':{p:bytes_digest((root/p).read_bytes()) for p in sources},'reconciled':True,'unknown_effective_N_is_budget_exhaustion':False}

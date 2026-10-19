@@ -22,3 +22,21 @@ def atomic_publish(route,parent,files,message):
         git(d,'push','--force-with-lease=refs/heads/'+EVIDENCE_BRANCH+':'+parent,'origin','HEAD:refs/heads/'+EVIDENCE_BRANCH)
     need(route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']==commit,'ATOMIC_ACK_AMBIGUOUS')
     return commit
+
+def chunk_ciphertext(blob,prefix,part_size=256000):
+    need(0<len(blob)<=16*1024*1024,'CHECKPOINT_TECHNICAL_SIZE')
+    files={};parts=[]
+    for i,offset in enumerate(range(0,len(blob),part_size)):
+        part=blob[offset:offset+part_size];path=prefix+'/ciphertext.parts/part'+str(i).zfill(4)+'.b64'
+        files[path]=base64.b64encode(part)+b'\n';parts.append({'index':i,'offset':offset,'length':len(part),'sha256':bytes_digest(part),'path':path})
+    manifest={'schema':'mxm.encrypted-checkpoint-parts.v1','sha256':bytes_digest(blob),'size':len(blob),'parts':parts}
+    return files,manifest
+
+def restore_ciphertext(manifest,fetch):
+    need(manifest['schema']=='mxm.encrypted-checkpoint-parts.v1' and 0<manifest['size']<=16*1024*1024,'CIPHER_PART_MANIFEST')
+    value=bytearray()
+    for i,p in enumerate(manifest['parts']):
+        need(p['index']==i and p['offset']==len(value) and 0<p['length']<=256000,'CIPHER_PART_ORDER')
+        b=base64.b64decode(fetch(p['path']),validate=False);need(len(b)==p['length'] and bytes_digest(b)==p['sha256'],'CIPHER_PART_CHANGED');value.extend(b)
+    need(len(value)==manifest['size'] and bytes_digest(value)==manifest['sha256'],'CIPHER_PARTS_AGGREGATE')
+    return bytes(value)

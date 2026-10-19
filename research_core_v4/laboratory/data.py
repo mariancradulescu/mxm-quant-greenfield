@@ -9,9 +9,10 @@ class DataCatalogue:
     assets:dict=field(default_factory=dict)
     rows:dict=field(default_factory=dict)
     quarantine:list=field(default_factory=list)
-    def ingest(self,manifest,rows):
+    def ingest(self,manifest,rows,*,trust='UNVERIFIED'):
         required={'instrument','resolution','partition','start_ms','end_ms','source','source_sha256','available_at_ms','session_semantics','completeness','account_scope'}
         need(required<=set(manifest),'MANIFEST_FIELDS');m=dict(manifest)
+        need(not set(m)&{'id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust'},'MANIFEST_RESERVED_FIELDS')
         need(m['partition'] in ('DEVELOPMENT','CONFIRMATION','PROTECTED'),'PARTITION')
         need(len(m['source_sha256'])==64 and m['source'] and m['account_scope'],'PROVENANCE')
         need(type(m['start_ms']) is int and type(m['end_ms']) is int and m['start_ms']<m['end_ms'],'INTERVAL')
@@ -38,11 +39,11 @@ class DataCatalogue:
         # The raw source identity is preserved separately from the normalized digest.
         ident=digest({'manifest':m,'normalized':normalized})
         self.assets[ident]={**m,'id':ident,'normalized_sha256':digest(normalized),'row_count':len(normalized),
-            'conflicts':len(conflicts),'invalid':len(invalid),'interpolated':False}
+            'conflicts':len(conflicts),'invalid':len(invalid),'interpolated':False,'trust':trust}
         self.rows[ident]=normalized
         return ident
-    def query(self,instrument,resolution,start_ms,end_ms,partition='DEVELOPMENT'):
-        ids=[k for k,m in self.assets.items() if m['instrument']==instrument and m['resolution']==resolution and m['partition']==partition and m['start_ms']<=start_ms and m['end_ms']>=end_ms and m['completeness']=='CONFIRMED_COMPLETE' and not m['conflicts'] and not m['invalid']]
+    def query(self,instrument,resolution,start_ms,end_ms,partition='DEVELOPMENT',authentic_only=False):
+        ids=[k for k,m in self.assets.items() if m['instrument']==instrument and m['resolution']==resolution and m['partition']==partition and m['start_ms']<=start_ms and m['end_ms']>=end_ms and m['completeness']=='CONFIRMED_COMPLETE' and not m['conflicts'] and not m['invalid'] and (not authentic_only or m.get('trust') in ('AUTHENTICATED_NATIVE_CUSTODY','AUTHENTICATED_NATIVE_COLLECTION'))]
         return sorted(ids)
     def view(self,asset_id,decision_ms):
         m=self.assets[asset_id];need(m['partition']=='DEVELOPMENT','PROTECTED_READ_GATE')
@@ -56,7 +57,7 @@ class DataCatalogue:
         cat=cls()
         for ident,m in value['assets'].items():
             rows=value['rows'][ident];need(digest(rows)==m['normalized_sha256'],'CACHE_CHANGED')
-            need(digest({'manifest':{k:v for k,v in m.items() if k not in ('id','normalized_sha256','row_count','conflicts','invalid','interpolated')},'normalized':rows})==ident,'CACHE_MANIFEST_CHANGED')
+            need(digest({'manifest':{k:v for k,v in m.items() if k not in ('id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust')},'normalized':rows})==ident,'CACHE_MANIFEST_CHANGED')
         cat.assets=value['assets'];cat.rows=value['rows'];cat.quarantine=value['quarantine'];return cat
 
 class Acquisition:
@@ -66,7 +67,7 @@ class Acquisition:
         need(plan['provider']=='PEPPERSTONE_OPEN_API' and plan['partition']=='DEVELOPMENT','DATA_DOMAIN')
         need(plan['kind'] in KINDS and 0<=plan['start_ms']<plan['end_ms']<=DEVELOPMENT_END_MS,'ACQUISITION_SCOPE')
         need(plan.get('read_only') is True and plan.get('automatic_retries',0)==0,'ACQUISITION_MODE')
-        hit=self.cache.query(plan['instrument'],plan['kind'],plan['start_ms'],plan['end_ms'])
+        hit=self.cache.query(plan['instrument'],plan['kind'],plan['start_ms'],plan['end_ms'],authentic_only=True)
         if hit:return {'state':'CACHE_REUSED','asset_id':hit[0],'requests':0}
         # Reserve the whole bounded call before any possible network send.
         cap=plan['max_pages'];need(type(cap) is int and cap==(2 if plan['kind']=='BID_ASK' else 3),'PAGE_CAP')
@@ -83,7 +84,7 @@ class Acquisition:
             rows=[{'t':z.timestamp_ms,'available_at':z.timestamp_ms,'side':page['side'],'price':z.raw_tick/100000} for page in raw for z in decode_ctrader_tick_page(page['encoded']) if plan['start_ms']<=z.timestamp_ms<plan['end_ms']]
         complete='CONFIRMED_COMPLETE' if state=='COMPLETE_EXACT_WINDOW' else 'UNRESOLVED'
         manifest={'instrument':plan['instrument'],'resolution':plan['kind'],'partition':'DEVELOPMENT','start_ms':plan['start_ms'],'end_ms':plan['end_ms'],'source':'PEPPERSTONE_OPEN_API_NATIVE_RESPONSE','source_sha256':digest(raw),'available_at_ms':plan['end_ms'],'session_semantics':'AUTHENTIC_GAPS_RETAINED;NO_SESSION_INFERENCE','completeness':complete,'account_scope':plan['account_scope']}
-        ident=self.cache.ingest(manifest,rows);receipt={'state':state,'asset_id':ident,'native_receipts':raw,'plan_sha256':digest(plan),'budget_reserved':cap}
+        ident=self.cache.ingest(manifest,rows,trust='AUTHENTICATED_NATIVE_COLLECTION');receipt={'state':state,'asset_id':ident,'native_receipts':raw,'plan_sha256':digest(plan),'budget_reserved':cap}
         if plan['kind']=='BID_ASK':receipt['quote_point']=q
         self.receipts.append(receipt);return receipt
 

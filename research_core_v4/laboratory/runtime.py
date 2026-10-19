@@ -13,7 +13,7 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-laboratory-r2'
+SOURCE_BRANCH='mxm-o04-successor-code-laboratory-r3'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
@@ -58,7 +58,7 @@ def authentic_integration(key,tmp):
             if s.get('state')=='AUTHENTIC_CAUSAL_QUOTE':rows.append({'t':s['timestamp_ms'],'available_at':s['timestamp_ms'],'side':side,'price':s['price']})
         m={'instrument':str(q['symbol_id']),'resolution':'BID_ASK','partition':'DEVELOPMENT','start_ms':t-60000,'end_ms':t+1,
            'source':'PRESERVED_AUTHENTIC_PEPPERSTONE_QUOTE','source_sha256':digest(q),'available_at_ms':t,'session_semantics':'POINT_REFERENCE_NOT_CONTINUOUS','completeness':'UNRESOLVED','account_scope':'EXISTING_AUTHENTICATED_ACCOUNT_FINGERPRINT'}
-        i=cat.ingest(m,rows);need(cat.assets[i]['invalid']==0 and cat.assets[i]['conflicts']==0,'AUTHENTIC_QUOTE_QUALITY');count+=cat.assets[i]['row_count']
+        i=cat.ingest(m,rows,trust='AUTHENTICATED_NATIVE_CUSTODY');need(cat.assets[i]['invalid']==0 and cat.assets[i]['conflicts']==0,'AUTHENTIC_QUOTE_QUALITY');count+=cat.assets[i]['row_count']
     need(count>0,'AUTHENTIC_CACHE_EMPTY');DataCatalogue.restore(json.loads(encoded(cat.export())))
     # One minimum read-only request window through the generalized adapter.
     # This is acquisition integration, not an alpha study or historical outcome replacement.
@@ -102,7 +102,11 @@ def main():
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as td:
         tmp=Path(td);key,fp=_private_key_from_secret(tmp);need(fp==old.FP,'OWNER_KEY')
         if s['sequence']:
-            blob=base64.b64decode(file_at(route,s['ciphertext_path'],parent));need(bytes_digest(blob)==s['ciphertext_sha256'],'CHECKPOINT_CIPHER_CHANGED')
+            if s.get('ciphertext_format')=='CHUNKED_ENCRYPTED_ENVELOPE_V1':
+                from .custody import restore_ciphertext
+                manifest=strict_json(file_at(route,s['ciphertext_path'],parent));blob=restore_ciphertext(manifest,lambda p:file_at(route,p,parent))
+            else:blob=base64.b64decode(file_at(route,s['ciphertext_path'],parent))
+            need(bytes_digest(blob)==s['ciphertext_sha256'],'CHECKPOINT_CIPHER_CHANGED')
             private=strict_json(unpack(owner.bounded_decrypt(blob,key,tmp)),max_elements=8000000)
             need(private['sequence']==s['sequence'] and private['pending'] is None and private['source_sha']==s.get('source_sha'),'COLD_SOURCE_BINDING')
             jobs=route.json('actions/runs/'+str(s['last_run_id'])+'/jobs?per_page=100')['jobs']
@@ -113,10 +117,20 @@ def main():
             private={'schema':'mxm.general-laboratory-private-state.v1','source_sha':os.environ['LAB_SOURCE_SHA'],'sequence':0,'pending':None,'programmes':{},'trial_book':book.export(),
               'history':history,'data_inventory':inventory(ROOT),'authentic_integration':authentic_integration(key,tmp)}
         if private['source_sha']!=os.environ['LAB_SOURCE_SHA']:
-            need(private['source_sha']=='8f2197f047b12544e1736e31f4f93e642173ccd5' and private['safe_stop'] is True and all(v['progress']['safe_stop'] for v in private['programmes'].values()),'SOURCE_MIGRATION_REQUIRES_CLOSED_PREDECESSOR')
+            need(private['source_sha'] in ('8f2197f047b12544e1736e31f4f93e642173ccd5','a54757ce89f613be91ea05bac9f46434dd9021c0') and private['safe_stop'] is True and all(v['progress']['safe_stop'] for v in private['programmes'].values()),'SOURCE_MIGRATION_REQUIRES_CLOSED_PREDECESSOR')
             private.setdefault('source_migrations',[]).append({'previous':private['source_sha'],'successor':os.environ['LAB_SOURCE_SHA'],'parent_oid':parent,'closed_programmes_replayed':False})
             private['source_sha']=os.environ['LAB_SOURCE_SHA']
         private['history']=history
+        if 'shared_catalogue' not in private:
+            from copy import deepcopy
+            private['shared_catalogue']=deepcopy(private['authentic_integration']['catalogue'])
+            for saved in private['programmes'].values():
+                for ident,asset in saved['catalogue']['assets'].items():
+                    previous=private['shared_catalogue']['assets'].get(ident)
+                    need(previous is None or previous['normalized_sha256']==asset['normalized_sha256'],'MIGRATION_CACHE_CONFLICT')
+                    private['shared_catalogue']['assets'][ident]=deepcopy(asset);private['shared_catalogue']['rows'][ident]=deepcopy(saved['catalogue']['rows'][ident])
+        for asset in private['shared_catalogue']['assets'].values():
+            if 'trust' not in asset and asset['source'].startswith(('PEPPERSTONE_','PRESERVED_AUTHENTIC_')):asset['trust']='AUTHENTICATED_NATIVE_CUSTODY'
         book=TrialBook.restore(private['trial_book']);executed=[];cache=None
         for _ in range(a['steps_per_segment']):
             m=select_programme(a,private)
@@ -126,7 +140,7 @@ def main():
                 lab=Laboratory.restore(saved,history);lab.book=book
             else:
                 # Runtime preflight binds all definitions before first outcome.
-                validate_manifest(m,history,book);lab=Laboratory(m,history,book,cache=DataCatalogue.restore(private['authentic_integration']['catalogue']))
+                validate_manifest(m,history,book);lab=Laboratory(m,history,book,cache=DataCatalogue.restore(private['shared_catalogue']))
             if a['mode']=='DEVELOPMENT_RESEARCH':
                 from copy import deepcopy
                 lab.authentic_corpus=deepcopy(corpus(key,tmp,preserved_registry()))
@@ -136,7 +150,7 @@ def main():
             if task is None:private['programmes'][m['id']]=lab.checkpoint();continue
             result=lab.execute(task);lab.next()
             if a['mode']=='DEVELOPMENT_RESEARCH':lazy.close()
-            private['programmes'][m['id']]=lab.checkpoint();book=lab.book
+            private['programmes'][m['id']]=lab.checkpoint();private['shared_catalogue']=lab.cache.export();book=lab.book
             executed.append({'programme':m['id'],'task':task,'classification':result['classification']})
         private['trial_book']=book.export();private['sequence']+=1;private['admission_sha256']=digest(a)
         private['admission_ref']=admission_ref;private['admission_path']=path;private['last_run_id']=int(os.environ['GITHUB_RUN_ID']);private['parent_oid']=parent

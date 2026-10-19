@@ -1,0 +1,865 @@
+{
+  "schema": "mxm.laboratory-admission.v1",
+  "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+  "mode": "SYNTHETIC_RECEPTION",
+  "module_sha256": "5f78219589d6a5e7fdfe2b872fd20c811586672a55fa9ebff23b9c499a7b7f79",
+  "steps_per_segment": 5,
+  "programme_generation": "COMPLETE_NATIVE_TO_SHARED_ECONOMIC_ADAPTER_ONLY_SYNTHETIC_KNOWN_ANSWER_RECEPTION",
+  "programmes": [
+    {
+      "schema": "mxm.laboratory-program.v1",
+      "id": "FUNCTIONAL_NATIVE_ECONOMIC_INTEGRATION",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "SYNTHETIC_RECEPTION",
+      "budget": {
+        "steps": 10,
+        "broker_requests": 0,
+        "new_V2_identities": 0
+      },
+      "prospective_at_ms": 1736164800000,
+      "provenance": "OWNER_FUNCTIONAL_RECEPTION_SYNTHETIC_ONLY",
+      "source_sha256": "5f78219589d6a5e7fdfe2b872fd20c811586672a55fa9ebff23b9c499a7b7f79",
+      "tasks": {
+        "validate_data": {
+          "operator": "catalogue",
+          "input": {
+            "manifest": {
+              "instrument": "SYNTHETIC",
+              "resolution": "M5",
+              "partition": "DEVELOPMENT",
+              "start_ms": 1736164500000,
+              "end_ms": 1736164800000,
+              "source": "SYNTHETIC_RECEPTION",
+              "source_sha256": "b086de7b32510701e873f3d4ae742917ca1cc1141ffe4a8387d604ef474ef9e4",
+              "available_at_ms": 1736164800000,
+              "session_semantics": "FIXTURE_ONLY",
+              "completeness": "CONFIRMED_COMPLETE",
+              "account_scope": "SYNTHETIC"
+            },
+            "rows": [
+              {
+                "t": 1736164500000,
+                "available_at": 1736164800000,
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 10.0
+              }
+            ]
+          },
+          "dependencies": [],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        },
+        "admit_candidate": {
+          "operator": "freeze",
+          "input": {
+            "candidate": {
+              "id": "V2-C990007",
+              "mechanism": {
+                "family": "SYNTHETIC_RECEPTION"
+              },
+              "rationale": "Exercise integration; no economic hypothesis or alpha claim",
+              "universe": [
+                "SYNTHETIC"
+              ],
+              "features": [],
+              "lookbacks": [],
+              "filters": [],
+              "parameters": {},
+              "data": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "causal_availability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "normalization_training": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "timing": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "entry": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "exit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "maximum_hold": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "execution_assumptions": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "capital_semantics": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "cloud_portability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "position_admission_policy": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "stage_a_economic_unit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "direction": {
+                "rule": "FIXTURE_LONG"
+              },
+              "cost_state": {
+                "state": "CONSERVATIVE_BOUND"
+              },
+              "no_rescue_rule": {
+                "material_change_requires_new_identity": true
+              },
+              "provenance": {
+                "programme": "FUNCTIONAL_NATIVE_ECONOMIC_INTEGRATION",
+                "prospective_at_ms": 1736164800000,
+                "synthetic_reception": true
+              }
+            }
+          },
+          "dependencies": [
+            "validate_data"
+          ],
+          "when": {
+            "validate_data": [
+              "DATA_VALID"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "cheap_screen": {
+          "operator": "native_screen",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "generated": {
+              "intents": [
+                {
+                  "decision_ms": 1736164800000,
+                  "feature_available_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "direction": 1,
+                  "symbol_id": 9999
+                }
+              ],
+              "missing": [],
+              "feature_asset_sha256": "b6ebbb4b1efc296487c3a124e6f9aca913d6bac404f1e328ed291fa16a6d7a31"
+            },
+            "corpus": {
+              "all_identity_status": [
+                {
+                  "sid": 9999,
+                  "symbol": "SYNTHETIC",
+                  "class": "SYNTHETIC_FOREX",
+                  "base": "EUR",
+                  "quote": "EUR",
+                  "min_units": 1,
+                  "reasons": []
+                }
+              ],
+              "catalog": {
+                "full": {
+                  "9999": {
+                    "commissionType": 4,
+                    "preciseTradingCommissionRate": 0,
+                    "lotSize": 100,
+                    "preciseMinCommission": 0,
+                    "minCommissionType": 2,
+                    "pnlConversionFeeRate": 0
+                  }
+                }
+              },
+              "raw_quote_receipts": [
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164801000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 100,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 101,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164831000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 100.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 101.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164861000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164861000,
+                      "price": 102,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164861000,
+                      "price": 103,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                }
+              ]
+            },
+            "terms_authority": {
+              "state": "CONSERVATIVE_BOUND",
+              "prospectively_frozen": true,
+              "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "current_snapshot_is_historical": false,
+              "per_intent_costs_eur": {
+                "cefe7fda817db4605131b7c307b009c4059b700cdcffefc573536b668c8ae435": {
+                  "spread": 0.0,
+                  "commission": 0.2,
+                  "slippage": 0.0,
+                  "funding": 0.05,
+                  "fx_conversion": 0.0
+                }
+              }
+            }
+          },
+          "dependencies": [
+            "admit_candidate"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "deep_account": {
+          "operator": "native_replay",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "generated": {
+              "intents": [
+                {
+                  "decision_ms": 1736164800000,
+                  "feature_available_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "direction": 1,
+                  "symbol_id": 9999
+                }
+              ],
+              "missing": [],
+              "feature_asset_sha256": "b6ebbb4b1efc296487c3a124e6f9aca913d6bac404f1e328ed291fa16a6d7a31"
+            },
+            "corpus": {
+              "all_identity_status": [
+                {
+                  "sid": 9999,
+                  "symbol": "SYNTHETIC",
+                  "class": "SYNTHETIC_FOREX",
+                  "base": "EUR",
+                  "quote": "EUR",
+                  "min_units": 1,
+                  "reasons": []
+                }
+              ],
+              "catalog": {
+                "full": {
+                  "9999": {
+                    "commissionType": 4,
+                    "preciseTradingCommissionRate": 0,
+                    "lotSize": 100,
+                    "preciseMinCommission": 0,
+                    "minCommissionType": 2,
+                    "pnlConversionFeeRate": 0
+                  }
+                }
+              },
+              "raw_quote_receipts": [
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164801000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 100,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 101,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164831000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 100.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 101.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164861000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164861000,
+                      "price": 102,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164861000,
+                      "price": 103,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                }
+              ]
+            },
+            "authority": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "CONSERVATIVE_BOUND",
+              "prospectively_frozen": true,
+              "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "current_snapshot_is_historical": false,
+              "by_intent": {
+                "cefe7fda817db4605131b7c307b009c4059b700cdcffefc573536b668c8ae435": {
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "margin_eur": 20.0,
+                  "entry_cost_components_eur": {
+                    "spread": 0.0,
+                    "commission": 0.1,
+                    "slippage": 0.0,
+                    "funding": 0.0,
+                    "fx_conversion": 0.0
+                  },
+                  "exit_cost_components_eur": {
+                    "spread": 0.0,
+                    "commission": 0.1,
+                    "slippage": 0.0,
+                    "funding": 0.0,
+                    "fx_conversion": 0.0
+                  },
+                  "financing_cashflows": [
+                    {
+                      "timestamp_ms": 1736164831000,
+                      "amount_eur": -0.05,
+                      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    }
+                  ],
+                  "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  "effective_start_ms": 1736164800000,
+                  "effective_end_ms": 1736164900000
+                }
+              },
+              "mark_interval_ms": 30000
+            },
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "BID_ASK_PLUS_NONSPREAD_COSTS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            }
+          },
+          "dependencies": [
+            "admit_candidate",
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "DISCOVERY_SURVIVOR"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "robustness": {
+          "operator": "robustness",
+          "input": {
+            "cashflows": {
+              "field_of": "cheap_screen",
+              "field": "cashflows"
+            },
+            "cost_multipliers": {
+              "original": 1.0,
+              "stress": 2.0
+            },
+            "chronological_folds": [
+              {
+                "id": "frozen_fold",
+                "start_ms": 1736164800000,
+                "end_ms": 1736164900000
+              }
+            ]
+          },
+          "dependencies": [
+            "deep_account"
+          ],
+          "when": {
+            "deep_account": [
+              "SUPPORTED_FOR_ROBUSTNESS"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "classify": {
+          "operator": "classify",
+          "input": {
+            "result": {
+              "field_of": "cheap_screen",
+              "field": "result"
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "rejected_followup": {
+          "operator": "report",
+          "input": {
+            "purpose": "Investigate rejected case only"
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "COARSE_NET_FAIL",
+              "GROSS_EDGE_FAIL"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "programme_report": {
+          "operator": "report",
+          "input": {
+            "screen": {
+              "result_of": "cheap_screen"
+            },
+            "replay": {
+              "result_of": "deep_account"
+            },
+            "robustness": {
+              "result_of": "robustness"
+            },
+            "missing": {
+              "result_of": "missing_original_exit"
+            },
+            "unknown": {
+              "result_of": "unknown_terms"
+            }
+          },
+          "dependencies": [
+            "classify",
+            "deep_account",
+            "robustness",
+            "missing_original_exit",
+            "unknown_terms"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "missing_original_exit": {
+          "operator": "native_replay",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "generated": {
+              "intents": [
+                {
+                  "decision_ms": 1736164800000,
+                  "feature_available_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "direction": 1,
+                  "symbol_id": 9999
+                }
+              ],
+              "missing": [],
+              "feature_asset_sha256": "b6ebbb4b1efc296487c3a124e6f9aca913d6bac404f1e328ed291fa16a6d7a31"
+            },
+            "corpus": {
+              "all_identity_status": [
+                {
+                  "sid": 9999,
+                  "symbol": "SYNTHETIC",
+                  "class": "SYNTHETIC_FOREX",
+                  "base": "EUR",
+                  "quote": "EUR",
+                  "min_units": 1,
+                  "reasons": []
+                }
+              ],
+              "catalog": {
+                "full": {
+                  "9999": {
+                    "commissionType": 4,
+                    "preciseTradingCommissionRate": 0,
+                    "lotSize": 100,
+                    "preciseMinCommission": 0,
+                    "minCommissionType": 2,
+                    "pnlConversionFeeRate": 0
+                  }
+                }
+              },
+              "raw_quote_receipts": [
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164801000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 100,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 101,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164831000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 100.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 101.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                }
+              ]
+            },
+            "authority": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "CONSERVATIVE_BOUND",
+              "prospectively_frozen": true,
+              "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "current_snapshot_is_historical": false,
+              "by_intent": {
+                "cefe7fda817db4605131b7c307b009c4059b700cdcffefc573536b668c8ae435": {
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "margin_eur": 20.0,
+                  "entry_cost_components_eur": {
+                    "spread": 0.0,
+                    "commission": 0.1,
+                    "slippage": 0.0,
+                    "funding": 0.0,
+                    "fx_conversion": 0.0
+                  },
+                  "exit_cost_components_eur": {
+                    "spread": 0.0,
+                    "commission": 0.1,
+                    "slippage": 0.0,
+                    "funding": 0.0,
+                    "fx_conversion": 0.0
+                  },
+                  "financing_cashflows": [
+                    {
+                      "timestamp_ms": 1736164831000,
+                      "amount_eur": -0.05,
+                      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    }
+                  ],
+                  "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  "effective_start_ms": 1736164800000,
+                  "effective_end_ms": 1736164900000
+                }
+              },
+              "mark_interval_ms": 30000
+            },
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "BID_ASK_PLUS_NONSPREAD_COSTS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            }
+          },
+          "dependencies": [
+            "admit_candidate",
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "unknown_terms": {
+          "operator": "native_replay",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "generated": {
+              "intents": [
+                {
+                  "decision_ms": 1736164800000,
+                  "feature_available_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "direction": 1,
+                  "symbol_id": 9999
+                }
+              ],
+              "missing": [],
+              "feature_asset_sha256": "b6ebbb4b1efc296487c3a124e6f9aca913d6bac404f1e328ed291fa16a6d7a31"
+            },
+            "corpus": {
+              "all_identity_status": [
+                {
+                  "sid": 9999,
+                  "symbol": "SYNTHETIC",
+                  "class": "SYNTHETIC_FOREX",
+                  "base": "EUR",
+                  "quote": "EUR",
+                  "min_units": 1,
+                  "reasons": []
+                }
+              ],
+              "catalog": {
+                "full": {
+                  "9999": {
+                    "commissionType": 4,
+                    "preciseTradingCommissionRate": 0,
+                    "lotSize": 100,
+                    "preciseMinCommission": 0,
+                    "minCommissionType": 2,
+                    "pnlConversionFeeRate": 0
+                  }
+                }
+              },
+              "raw_quote_receipts": [
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164801000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 100,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164801000,
+                      "price": 101,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164831000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 100.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164831000,
+                      "price": 101.5,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                },
+                {
+                  "symbol_id": 9999,
+                  "boundary_ms": 1736164861000,
+                  "sides": {
+                    "bid": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164861000,
+                      "price": 102,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    },
+                    "ask": {
+                      "state": "AUTHENTIC_CAUSAL_QUOTE",
+                      "timestamp_ms": 1736164861000,
+                      "price": 103,
+                      "age_ms": 0,
+                      "source_has_more": false
+                    }
+                  },
+                  "fixture": "SYNTHETIC_RECEPTION_NOT_MARKET_EVIDENCE"
+                }
+              ]
+            },
+            "authority": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "UNRESOLVED",
+              "prospectively_frozen": true,
+              "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "current_snapshot_is_historical": false,
+              "by_intent": {
+                "cefe7fda817db4605131b7c307b009c4059b700cdcffefc573536b668c8ae435": {
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "margin_eur": 20.0,
+                  "entry_cost_components_eur": {
+                    "spread": 0.0,
+                    "commission": 0.1,
+                    "slippage": 0.0,
+                    "funding": 0.0,
+                    "fx_conversion": 0.0
+                  },
+                  "exit_cost_components_eur": {
+                    "spread": 0.0,
+                    "commission": 0.1,
+                    "slippage": 0.0,
+                    "funding": 0.0,
+                    "fx_conversion": 0.0
+                  },
+                  "financing_cashflows": [
+                    {
+                      "timestamp_ms": 1736164831000,
+                      "amount_eur": -0.05,
+                      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    }
+                  ],
+                  "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  "effective_start_ms": 1736164800000,
+                  "effective_end_ms": 1736164900000
+                }
+              },
+              "mark_interval_ms": 30000
+            },
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "BID_ASK_PLUS_NONSPREAD_COSTS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            }
+          },
+          "dependencies": [
+            "admit_candidate",
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        }
+      }
+    }
+  ]
+}

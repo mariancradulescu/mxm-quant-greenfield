@@ -11,7 +11,7 @@ from .budgets import TrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
-OPS={'causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
+OPS={'native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
 AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
 
@@ -38,12 +38,15 @@ def validate_manifest(m,history,global_book):
             if m['mode']=='SYNTHETIC_RECEPTION':
                 need(t['trial_units']==0 and candidate['provenance'].get('synthetic_reception') is True,'SYNTHETIC_LANE')
             else:
-                need(t['trial_units']==1 and candidate['id'] not in history['V2']['charged'],'IDENTITY_ALREADY_OPENED')
+                need(candidate['provenance'].get('synthetic_reception') is not True,'SYNTHETIC_RESEARCH_MIX')
+                need(t['trial_units']==1 and candidate['id'] not in history['V2']['charged'] and candidate['id'] not in history['V2'].get('existing_candidate_ids',[]),'IDENTITY_ALREADY_OPENED')
                 need('V2:'+candidate['id'] not in global_book.identities,'IDENTITY_ALREADY_RESERVED')
             charged.append(candidate['id'])
         if m['mode']=='DEVELOPMENT_RESEARCH':
-            need(t['operator'] not in ('screen','catalogue'),'REAL_DATA_REQUIRES_NATIVE_ADAPTER')
-            if t['operator']=='native_screen':need(t['input'].get('corpus')=={'bound_authentic_corpus':True},'AUTHENTIC_CORPUS_BINDING')
+            need(t['operator'] not in ('screen','catalogue','replay'),'REAL_DATA_REQUIRES_NATIVE_ADAPTER')
+            if t['operator'] in ('native_screen','native_replay'):
+                need(t['input'].get('corpus')=={'bound_authentic_corpus':True},'AUTHENTIC_CORPUS_BINDING')
+                ref=t['input'].get('candidate',{}).get('result_of');need(ref in tasks and tasks[ref]['operator']=='freeze','ECONOMICS_REQUIRES_PROSPECTIVE_REGISTRY')
         if t['operator']=='acquire':need(m['mode']=='DEVELOPMENT_RESEARCH','SYNTHETIC_NETWORK_FORBIDDEN')
     need(len(charged)==len(set(charged)) and sum(t['trial_units'] for t in tasks.values())<=m['budget']['new_V2_identities'],'PROGRAM_TRIAL_TOTAL')
     visiting=set();done=set()
@@ -91,6 +94,11 @@ class Laboratory:
         return None
     def resolve(self,value):
         if isinstance(value,dict):
+            if set(value)=={'native_acquisition_plan'}:
+                need(hasattr(self,'authentic_corpus'),'AUTHENTIC_CORPUS_UNAVAILABLE')
+                plan=deepcopy(value['native_acquisition_plan']);sid=str(plan['symbol_id']);terms=self.authentic_corpus['catalog']['full'].get(sid)
+                need(terms is not None and 'digits' in terms,'NATIVE_SYMBOL_METADATA_UNAVAILABLE')
+                plan['digits']=int(terms['digits']);return plan
             if set(value)=={'bound_authentic_corpus'}:
                 need(value['bound_authentic_corpus'] is True and hasattr(self,'authentic_corpus'),'AUTHENTIC_CORPUS_UNAVAILABLE');return self.authentic_corpus
             if set(value)=={'result_of'}:
@@ -122,6 +130,9 @@ class Laboratory:
                 from .science import native_quote_screen
                 value=native_quote_screen(x['candidate'],x['generated'],x['corpus'],x['terms_authority']);verdict=value['classification']
                 lane='RECEPTION' if self.m['mode']=='SYNTHETIC_RECEPTION' else 'V2';self.book.finish(lane,x['candidate']['id'],x['candidate']['spec_hash'])
+            elif op=='native_replay':
+                from .science import native_replay
+                value=native_replay(x['candidate'],x['generated'],x['corpus'],x['authority'],x['spec']);verdict=value['classification']
             elif op=='freeze':
                 value=DiscoveryEngine().freeze_candidate(x['candidate'],persist=False)
                 lane='RECEPTION' if self.m['mode']=='SYNTHETIC_RECEPTION' else 'V2'
