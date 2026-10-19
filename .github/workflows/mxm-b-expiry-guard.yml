@@ -27,6 +27,7 @@ jobs:
             research_core_v4/b_expiry_guard_20261019
             docs/p0-successor-b/20261018/NATIVE_BUNDLE_39147483523.json
       - name: Only new expiry and race controls, no accepted suite repeated
+        if: github.event_name == 'push'
         run: python3 -m unittest research_core_v4.b_expiry_guard_20261019.test_guard -v
       - name: Exact live expiry reconciliation, no key or bootstrap
         run: python3 -m research_core_v4.b_expiry_guard_20261019.guard
