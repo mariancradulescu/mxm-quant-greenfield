@@ -1,3 +1,5 @@
+> Completare de suport, 19 octombrie 2026: zero cotații în perioada B rămâne constatarea pentru cache-ul examinat aici. O altă tranșă raw nativă păstrată conține 17 momente bilaterale stricte în aceeași perioadă pentru șase dintre cei 29 de identificatori, fără a schimba rezultatul sau bugetul B. Vezi PRESERVED_NATIVE_QUOTE_REUSE_RESULT.md. Nu este calificare economică.
+
 > Actualizare verificată, 19 octombrie 2026: arhiva originală a fost recuperată durabil la 1f5cd4e6df827d61d3231edd48440c66aa14c0a5, fără repetarea analizei. Raportul de recuperare este CUSTODY_RECOVERY_AND_DATA_CONTINUITY.md. Mențiunile de publicare neconfirmată de mai jos descriu starea observată anterior; workflow-ul original nu este declarat SUCCESS.
 
 # MXM — B: suportul cotațiilor și autoritatea temporală a costurilor
