@@ -173,4 +173,10 @@ class IntegratedReception(unittest.TestCase):
         x=programme()['tasks']['validate_data']['input'];c=DataCatalogue();c.ingest(x['manifest'],x['rows'])
         self.assertTrue(c.query('SYNTHETIC','M5',T-300000,T))
         self.assertEqual(c.query('SYNTHETIC','M5',T-300000,T,authentic_only=True),[])
+    def test_reception_assertions_block_false_success(self):
+        m=programme();m['acceptance']={'deep_account':{'classification':'SUPPORTED_FOR_ROBUSTNESS','value_equal':{'replay.terminal_broker_equity_eur':'202.0','HARD21':False}}}
+        l=self.finish(self.lab(m));l.checkpoint()
+        m['acceptance']['deep_account']['value_equal']['replay.terminal_broker_equity_eur']='999.0'
+        l=self.finish(self.lab(m))
+        with self.assertRaisesRegex(LabError,'RECEPTION_KNOWN_ANSWER'):l.checkpoint()
 if __name__=='__main__':unittest.main()

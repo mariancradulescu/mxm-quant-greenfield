@@ -5,7 +5,7 @@ from .common import *
 from .runtime import ROOT,OUT,EVIDENCE_BRANCH,anchors,read_state,validate_state,admission
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 MAGIC=b'MXM_SHALLOW_M5_V2_ENC1\x00'
-ALLOWED={'schema','authority','source_sha','parent_oid','sequence','run_id','trigger_sha','admission_ref','admission_path','admission_sha256','ciphertext_sha256','safe_stop','pending','completed_steps','cold_restored','modified_cipher_rejected','mode','orders','new_economic_outcomes','app_key_used','active_authority_write','cbot_qualified','native_acquisition_state','authentic_cache_validated','durable_intent_consumed'}
+ALLOWED={'schema','authority','source_sha','parent_oid','sequence','run_id','trigger_sha','admission_ref','admission_path','admission_sha256','ciphertext_sha256','safe_stop','pending','completed_steps','cold_restored','modified_cipher_rejected','mode','orders','new_economic_outcomes','app_key_used','active_authority_write','cbot_qualified','native_acquisition_state','authentic_cache_validated','durable_intent_consumed','authentic_data_controller_validated','reception_assertions_checked'}
 
 def main():
     need(os.environ['GITHUB_JOB']=='durable-archive' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'ARCHIVE_NO_KEYS')

@@ -78,6 +78,13 @@ class Laboratory:
             need(e['sequence']==i+1 and e['previous']==prev and e['sha256']==digest({k:v for k,v in e.items() if k!='sha256'}),'CHECKPOINT_JOURNAL_CHANGED');prev=e['sha256']
         need(len(s['journal'])==s['sequence']==len(s['results']),'CHECKPOINT_SEQUENCE')
         for e in s['journal']:need(digest(s['results'][e['task']])==e['result_sha256'],'CHECKPOINT_RESULT_CHANGED')
+        if s['safe_stop'] and s['stop_reason']=='AUTHORIZED_PROGRAMME_COMPLETE':
+            for task,expect in self.m.get('acceptance',{}).items():
+                need(task in s['results'] and s['results'][task]['classification']==expect['classification'],'RECEPTION_CLASSIFICATION')
+                for path,expected in expect.get('value_equal',{}).items():
+                    actual=s['results'][task]['value']
+                    for key in path.split('.'):actual=actual[key]
+                    need(actual==expected,'RECEPTION_KNOWN_ANSWER')
     def next(self):
         self.check();s=self.state
         if s['safe_stop']:return None

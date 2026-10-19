@@ -131,6 +131,9 @@ def main():
                     private['shared_catalogue']['assets'][ident]=deepcopy(asset);private['shared_catalogue']['rows'][ident]=deepcopy(saved['catalogue']['rows'][ident])
         for asset in private['shared_catalogue']['assets'].values():
             if 'trust' not in asset and asset['source'].startswith(('PEPPERSTONE_','PRESERVED_AUTHENTIC_')):asset['trust']='AUTHENTICATED_NATIVE_CUSTODY'
+        authentic_proof=private['programmes'].get('FUNCTIONAL_AUTHENTIC_DATA_CONTROL')
+        if authentic_proof:
+            actual=authentic_proof['progress']['results'];need(actual['native_data']['classification']=='DATA_VALID' and actual['causal_no_op']['classification']=='CAUSAL_INTENTS_DEFINED' and actual['causal_no_op']['value']['intents']==[],'AUTHENTIC_CONTROLLER_PROOF')
         book=TrialBook.restore(private['trial_book']);executed=[];cache=None
         for _ in range(a['steps_per_segment']):
             m=select_programme(a,private)
@@ -168,6 +171,7 @@ def main():
       'sequence':private['sequence'],'run_id':int(os.environ['GITHUB_RUN_ID']),'trigger_sha':os.environ['GITHUB_SHA'],
       'admission_ref':admission_ref,'admission_path':path,'admission_sha256':digest(a),'ciphertext_sha256':bytes_digest(target.read_bytes()),
       'safe_stop':not more,'pending':None,'durable_intent_consumed':True,'completed_steps':len(executed),'cold_restored':s['sequence']>0,'modified_cipher_rejected':True,
+      'authentic_data_controller_validated':bool(authentic_proof),'reception_assertions_checked':not more and a['mode']=='SYNTHETIC_RECEPTION' and all(m.get('acceptance') for m in a['programmes']),
       'native_acquisition_state':private['authentic_integration']['native_probe']['state'],'authentic_cache_validated':True,
       'mode':a['mode'],'orders':0,'new_economic_outcomes':0 if a['mode']=='SYNTHETIC_RECEPTION' else None,
       'app_key_used':False,'active_authority_write':False,'cbot_qualified':False}
