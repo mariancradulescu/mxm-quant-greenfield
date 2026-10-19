@@ -1,0 +1,42 @@
+name: MXM typed admission proof
+run-name: MXM TYPED ADMISSION PROOF 6997e20b44ac6f7426f95156db573439ae08c07c
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [research_programs/reconciliation/EXECUTE_TYPED_ADMISSION_PROOF.json]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  unit:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 6997e20b44ac6f7426f95156db573439ae08c07c, persist-credentials: false}
+      - name: New accounting fixtures only; no strategy or accepted reception rerun
+        run: python3 -m unittest research_core_v4.laboratory.test_admission -v
+  readback:
+    needs: unit
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 6997e20b44ac6f7426f95156db573439ae08c07c, persist-credentials: false}
+      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Compare typed baseline with exact preserved checkpoint16 without migrating or economic execution
+        run: python3 -m research_core_v4.laboratory.admission_readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREGATE_SOURCE_SHA: 6997e20b44ac6f7426f95156db573439ae08c07c
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-typed-admission-proof-${{ github.run_id }}
+          path: verification/typed-admission/receipt.json
+          if-no-files-found: error
