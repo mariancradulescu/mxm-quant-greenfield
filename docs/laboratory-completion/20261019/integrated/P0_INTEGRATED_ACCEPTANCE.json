@@ -1,0 +1,495 @@
+{
+  "schema": "mxm.integrated-p0.consolidated-acceptance.v1",
+  "date": "2026-10-19",
+  "repository": "mariancradulescu/mxm-quant-greenfield",
+  "status": "BLOCKED",
+  "end_to_end_operational_accepted": false,
+  "economic_release": false,
+  "owner_action_requested": false,
+  "scope": "Repair the existing laboratory and demonstrate only new technical integration paths; accepted reception, V4-V6, C033 and historical economic outcomes are not replayed.",
+  "sources": {
+    "audited_typed_source": "1be8c56f1c132e16a5be292bf69c5747933d77e7",
+    "original_checkpoint_source": "b430a303dc76bd1ea07fbd7dd9e91dcc7c7e9ee5",
+    "R1": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+    "R1_module": "970c4e873149fb477999538bc2968550322a24f3f149a005b91d51ab4b6822a7",
+    "R2": "eab050084982916ad0c67798b38b947bac66b2b2",
+    "R2_module": "c85a62a4f13f6787f11de7a2f35ad4d812569beaee8fbb7e34c8e5efe6e76f05",
+    "sealed_observer_v3": "49ee16f38183b885699d2f3d7977ea8cbdb4ee0e",
+    "R2_admission": "6815d715d783f66a8b7968438f15e379775f5c50"
+  },
+  "preservation": {
+    "owner1807": "a830c132521bd4348454653f713e04f6107484fe",
+    "active_authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+    "revoked": false,
+    "original_sequence": 16,
+    "original_public_sha256": "1f8d3ed42a276ad6c28a29d9c19d406fe45971dcdf8a239c589b090feff70e83",
+    "original_ciphertext_sha256": "eb031d18ee5b517ea1d4c3e6378cb276c4f3f46e2da810b86b8aabcc01a3ba8f",
+    "original_state_mutated": false,
+    "archives_replaced": false,
+    "historical_results_reexecuted": false
+  },
+  "accounting": {
+    "V2_lane_limit": 84,
+    "outcome_charged_identities": 21,
+    "C033_reservation_holds": 1,
+    "legacy_used_preserved": 22,
+    "economic_observations": 29,
+    "refunds": 0,
+    "unencumbered": 62,
+    "universal_project_cap": null,
+    "new_canonical_reservations": 0,
+    "new_economic_outcomes": 0,
+    "broker_requests_during_P0": 0,
+    "orders": 0,
+    "unit_fixtures_are_market_observations": false
+  },
+  "records": [
+    {
+      "id": "P0-01",
+      "defect": "Checkpoint16 source excluded from migration",
+      "cause": "Allowlist described accepted reception source rather than actual closed checkpoint lineage",
+      "paths": [
+        "runtime.py",
+        "protocol.py",
+        "integrated.py"
+      ],
+      "change": "Exact b430/source/cipher/public/private provenance; immutable original, forward typed successor",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "Actual legacy decrypt, accepted baseline hash and encrypted successor17-19",
+      "negative_test": "Wrong source/cipher/changed original or open predecessor refused",
+      "native_proof": "R1 terminal cold readback",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-02",
+      "defect": "TypedTrialBook read as used/limits",
+      "cause": "Legacy projection survived schema upgrade",
+      "paths": [
+        "runtime.py",
+        "protocol.py"
+      ],
+      "change": "Schema-aware accounting from baseline/events/view; legacy counter retained as snapshot",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "21 charged + C033 hold1;29 observations,22 legacy used",
+      "negative_test": "C033 hold removal, refunds or technical observation changes refused",
+      "native_proof": "R1 cold19 and R2 actual preflight",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-03",
+      "defect": "Typed programme claim reads new_V2_identities",
+      "cause": "Version-specific budget field not reconciled",
+      "paths": [
+        "claim.py",
+        "protocol.py"
+      ],
+      "change": "identity_budget validates v1/v2 field names, integral finite caps, rejects ambiguity",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "v2 new_identities=0 actual prevalidated claim",
+      "negative_test": "Both keys, bool, negative or wrong version refused",
+      "native_proof": "R1/R2 native claim",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-04",
+      "defect": "Publisher public contract remains legacy V2",
+      "cause": "Reporting conflated reservations and economic outcomes",
+      "paths": [
+        "publish.py",
+        "integrated.py",
+        "protocol.py"
+      ],
+      "change": "Public typed accounting and separate reservation/outcome/observation/wire units; original report preserved",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "Encrypted publication and exact public/cipher readback",
+      "negative_test": "Modified cipher, changed accounting, forbidden wire type or exceeded finite budget rejected",
+      "native_proof": "R1 segments17-19; R2 encrypted20 + cold118301402224",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-05",
+      "defect": "Executed source disagrees with protected SOURCE_BRANCH",
+      "cause": "Old branch pointer after typed upgrade",
+      "paths": [
+        "runtime.py",
+        "recovery_v2.py"
+      ],
+      "change": "New versioned protected refs, exact checked-outSHA=declaredSHA=protectedHEAD, admission module and workflow hashes",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Actual native preflight executed eab050... and sealed observer49ee...",
+      "negative_test": "Drift in source, workflow bytes or module digest rejected",
+      "native_proof": "R2 preflight118299244155; observer118299047143",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-06",
+      "defect": "Invalid manifest could publish durable intent before complete validation",
+      "cause": "Structural/policy/cache validation deferred until worker",
+      "paths": [
+        "integrated.py",
+        "protocol.py"
+      ],
+      "change": "Full restore, DAG/operator/policy/candidate validation before encrypted preflight certificate and keyless claim; fence before worker",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "Actual preflight then deliberately failed claim recovered while workers skipped",
+      "negative_test": "Invalid DAG/native operator in technical manifest rejected; active/ambiguous/post-fence never retried",
+      "native_proof": "R1 crash/recovery from16 and R2 from closed19; workers skipped in negative paths; actual positive20",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-07",
+      "defect": "No durable encrypted legacy-to-typed migration",
+      "cause": "Unit/read-only proof never activated typed persistent custody",
+      "paths": [
+        "integrated.py",
+        "custody.py"
+      ],
+      "change": "Forward-only successor path, typed book persisted inside encrypted checkpoints, independent cold process",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "Actual checkpoint19 remote decryption verifies original legacy snapshot",
+      "negative_test": "Tampered envelope, missing/reordered ciphertext parts refused",
+      "native_proof": "R1 cold job118291490736",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-08",
+      "defect": "Lost push ACK and writer concurrency",
+      "cause": "Retry could duplicate or race publication",
+      "paths": [
+        "custody.py"
+      ],
+      "change": "Single leased atomic push; ACK reconciliation checks exact remote commit and every byte, never second push",
+      "commit": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+      "positive_test": "Actual deliberately lost ACK in native publisher; two concurrent real Git writers yield one winner",
+      "negative_test": "Loser CAS rejected; truncated real checkpoint and invalid configured-token fixture GET401 rejected",
+      "native_proof": "R1 durable archive +fault-probes118291670602",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-09",
+      "defect": "SUCCESS could hide skipped required jobs or nondurable worker output",
+      "cause": "Workflow-level conclusion and eventually consistent REST used as proof",
+      "paths": [
+        "integrated.py",
+        "recovery_v2.py"
+      ],
+      "change": "Native toJSON(needs) for same-run edges; exact terminal jobs and remote receipt/cipher for observer",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Native handoff follows successful archive or proven pre-fence recovery",
+      "negative_test": "Skipped worker/publisher and wrong/active predecessor cannot authorize work",
+      "native_proof": "R1 handoff + observer8 guard tests",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-10",
+      "defect": "Recovery displaced a pending native continuation",
+      "cause": "Default concurrency queue has one pending slot",
+      "paths": [
+        ".github/workflows/mxm-integrated-p0-recovery.yml",
+        "recovery_v2.py"
+      ],
+      "change": "Shared group retains max queue, cancel-in-progress false; finite idempotent issuance",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Three native continuations demonstrated; v3 guard deployment selfcheck success",
+      "negative_test": "Cancelled39318702258 retained as cancelled, never treated as acceptance",
+      "native_proof": "R1 automatic successor runs; v3 selfcheck",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-11",
+      "defect": "Native data/corpus and shared catalogue missing in general typed driver",
+      "cause": "Technical controller path alone did not prove reusable scientific adapter",
+      "paths": [
+        "execution.py",
+        "integrated.py"
+      ],
+      "change": "Bind preserved corpus and prior quote receipts, lazy authenticated GET collector under programme budget; preserve shared cache and remaining resource count",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Exact production Laboratory freeze→native callback→checkpoint fixture; R2 actual encrypted private restore",
+      "negative_test": "Artificial fixtures explicitly isolated; no real scientific identity opened, no broker call; economic gate refuses unprotected plane",
+      "native_proof": "37 affected tests in118299244155; cold readback20; no claim of a new market-data/economic run",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-12",
+      "defect": "Cosmetic rationale allowed another causal identity",
+      "cause": "Typed semantic index retained narrative excluded by canonical discovery hash",
+      "paths": [
+        "admission.py",
+        "protocol.py"
+      ],
+      "change": "Prospective version2 index excluding rationale from complete33 verified frozen specs; preserve original baseline/hash/history",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Actual preflight index upgrade; legacy21/hold1/observations29 unchanged",
+      "negative_test": "Rationale-only rename cannot reserve additional identity; incomplete/modified preserved specs rejected",
+      "native_proof": "R2 preflight118299244155",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-13",
+      "defect": "New programme after closed typed checkpoint could lose recovery routing or finite origin",
+      "cause": "Hard-coded16 origin and restored old safe_stop/admission prevented correct handoff",
+      "paths": [
+        "integrated.py",
+        "protocol.py"
+      ],
+      "change": "Per-admission origin and nonexposure recovery_continuation marker; preserve predecessor cipher, clear marker on publication",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Actual crash after closed19, successful recovery and native successor, encrypted20 independently cold-decrypted",
+      "negative_test": "Unit marker test preserves old state; postfence hold remains",
+      "native_proof": "Run39322312307 recovery118299804590/handoff118299973512, run39322587530 cold118301402224",
+      "status": "CLOSED"
+    },
+    {
+      "id": "P0-14",
+      "defect": "Default and execution branch/workflow control plane unprotected",
+      "cause": "Existing source namespace rules do not include main or execution branch",
+      "paths": [
+        "GitHub main protection",
+        "GitHub execution branch protection"
+      ],
+      "change": "Read-only verified; exact proposed ruleset prepared, not applied; added economic gate requiring real protection and accepted source",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Source namespace enforced; actual main/execution both protected:false",
+      "negative_test": "Economic gate rejects either unprotected branch; no broad App token mint or security bypass",
+      "native_proof": "Live branch API and exposed tool/issuer permission inventory",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "P0-15",
+      "defect": "Cron interval interpreted as autonomous liveness guarantee",
+      "cause": "Only two schedule events observed despite declared15m cadence",
+      "paths": [
+        ".github/workflows/mxm-delegated-bc-recovery.yml",
+        ".github/workflows/mxm-integrated-p0-recovery.yml"
+      ],
+      "change": "Native durable handoff plus workflow_run and schedule observer; explicitly best-effort no15m SLA",
+      "commit": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "positive_test": "Three actual native workflow_dispatch successors without conversational trigger",
+      "negative_test": "Missing scheduler deliveries not labelled successful; unknown cause retained",
+      "native_proof": "20261019 schedule inventory",
+      "status": "SCIENTIFIC_UNKNOWN"
+    }
+  ],
+  "native_proofs": {
+    "R1_initial_negative": {
+      "run": 39318418345,
+      "overall": "failure",
+      "expected": true,
+      "claim_job": 118286132802,
+      "recovery_job": 118286352421,
+      "recovery_commit": "5f38e60f7a95c518eb57e96d3bf5ae0e2439db1b",
+      "fence_worker_publisher": "skipped: evidence of pre-exposure fault only; not operational success"
+    },
+    "R1_automatic_successors": [
+      39318690151,
+      39319204335,
+      39319648613
+    ],
+    "R1_terminal": {
+      "sequence": 19,
+      "run": 39319648613,
+      "cold_job": 118291490736,
+      "publication_commit": "3c7cfff423dbbf8f1367c80aa261efdacff91486",
+      "ciphertext_sha256": "cb14705c8456668c273f3c19a55bde40839e5be13c92cb43ad36b5cd61dc71b5",
+      "private_sha256": "47c34e6307d247e03c95f2727112bcbbaee7e40d6a07f104f20b16e622be8102"
+    },
+    "R1_faults": {
+      "run": 39319648613,
+      "job": 118291670602,
+      "evidence_commit": "32f4ef9dbfd7dd694628319623f6c1105ca1e837",
+      "receipt": "typed-successor/fault-probes/39319648613/result.json",
+      "unauthorized_GET_401": true,
+      "incomplete_real_ciphertext_rejected": true,
+      "concurrent_writers_accepted": 1,
+      "concurrent_writers_attempted": 2,
+      "winner_commit": "ffec66e22c27a45fc3d5d60d4feb9c0a4424c322"
+    },
+    "R2_preflight": {
+      "run": 39322312307,
+      "job": 118299244155,
+      "result": "success",
+      "new_affected_regressions": 37,
+      "actual_closed_sequence19_decrypted": true,
+      "all_33_preserved_specs_verified": true,
+      "causal_fingerprint_version": 2,
+      "administrative_events": 4,
+      "identity_and_economic_events": 0
+    },
+    "observer_v3_selfcheck": {
+      "run": 39322270965,
+      "job": 118299047143,
+      "result": "success",
+      "new_guard_tests": 8,
+      "state": "ADMITTED_PROGRAMME_COMPLETE_NO_DISPATCH"
+    },
+    "R2_initial_negative": {
+      "run": 39322312307,
+      "overall": "failure",
+      "expected": true,
+      "claim_job": 118299562543,
+      "claim_commit": "01ddbf0d75b78c1769cc3e2ab3f7cd8b1c2301e0",
+      "fence_worker_publisher": "skipped; no exposure",
+      "recovery_job": 118299804590,
+      "recovery_commit": "d72f7a37445c20e19bf0b8fece53b2a085db93ad",
+      "native_handoff_job": 118299973512,
+      "issuance_commit": "f420697b50f2134a9ee3760106c3f7a5fc7c27a1",
+      "automatic_successor_run": 39322587530
+    },
+    "R2_terminal": {
+      "accounting": {
+        "causal_identity_fingerprint_version": 2,
+        "economic_observations": 29,
+        "lanes": {
+          "V2": {
+            "encumbered": 22,
+            "limit": 84,
+            "outcome_charged": 21,
+            "reservation_holds": 1
+          }
+        },
+        "legacy_snapshot_sha256": "f61b7b69aa969c7063714e3686919f2add3e36d9cd417c32880ae6420a835881",
+        "new_events": 4,
+        "refunds": 0,
+        "universal_project_cap": null
+      },
+      "all_admitted_programmes_complete": true,
+      "ciphertext_sha256": "0c94708365f296a91404d5bc770981fe0aab7432980e74cb867a64626bf66eca",
+      "economic_workflow_released": false,
+      "evidence_oid": "9ae2d912638923297fec36504ef93bd0db383dfe",
+      "new_outcomes": 0,
+      "orders": 0,
+      "original_unchanged": true,
+      "private_sha256": "01227d7a7715a89bc1bfcf6fac183fbaec3b941f8c61281fb3c0e4f01f232fa6",
+      "run_id": 39322587530,
+      "schema": "mxm.integrated-cold-readback.v2",
+      "sequence": 20,
+      "source_sha": "eab050084982916ad0c67798b38b947bac66b2b2",
+      "cold_job": 118301402224,
+      "worker_job": 118300826599,
+      "publisher_job": 118301019568,
+      "preflight_job": 118300155127,
+      "claim_job": 118300457248,
+      "fence_job": 118300643855,
+      "recovery_job": 118301402263,
+      "terminal_handoff_job": 118301564056,
+      "terminal_handoff_result": "skipped: programme complete",
+      "ack_loss_reconciled_without_second_push": true
+    }
+  },
+  "scheduler": {
+    "observed_scheduled_runs_20261019": [
+      {
+        "id": 39290742457,
+        "path": ".github/workflows/mxm-delegated-bc-recovery.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-19T17:02:44Z"
+      },
+      {
+        "id": 39236262889,
+        "path": ".github/workflows/mxm-delegated-bc-recovery.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-19T10:16:25Z"
+      }
+    ],
+    "old_cron": "7,22,37,52 * * * *",
+    "new_cron": "11,26,41,56 * * * *",
+    "period_is_not_delivery_guarantee": true,
+    "exact_platform_cause_of_missing_scheduled_runs": "UNKNOWN",
+    "cancelled_observer_run": 39318702258,
+    "pending_displacement_remediated_with": "queue:max; cancel-in-progress:false; shared concurrency group",
+    "native_continuation_without_ChatGPT": "Demonstrated through three workflow_dispatch successors issued by native handoff; not dependent on scheduler delivery"
+  },
+  "capability_block": {
+    "status": "BLOCKED",
+    "main_protected": false,
+    "execution_branch_protected": false,
+    "connector_role_observed": "admin:true",
+    "administrative_write_tool_exposed": false,
+    "actions_permissions_endpoint_tool_result": "400 URL not allowed; not a repository 403",
+    "app_issuer_configured_permissions": [
+      "contents:write",
+      "metadata:read"
+    ],
+    "app_credential_scope_widened": false,
+    "security_bypass_attempted": false,
+    "missing": "Legitimate callable administration-write capability to apply branch/ruleset protection; an owner mandate already exists. No additional conversational approval requested.",
+    "proposed_ruleset": "docs/laboratory-completion/20261019/integrated/P0_CONTROL_PLANE_PROTECTION_PROPOSAL.json"
+  },
+  "scientific_limits": {
+    "status": "SCIENTIFIC_UNKNOWN",
+    "qualified_strategy": false,
+    "EUR200_historical_cost_margin_certified": false,
+    "HARD21_certified": false,
+    "cbot_qualified": false,
+    "global_effective_independent_N": null,
+    "metadata_does_not_prove_profitability": true,
+    "quote_is_not_fill": true,
+    "original_C033_frozen": true
+  },
+  "next": "Apply already prepared control-plane protection through a legitimate administrative write capability, verify LIVE, then close integrated acceptance. Until then economic gate stays closed; no owner GitHub task requested.",
+  "local_targeted_negative_provenance": {
+    "tests": 6,
+    "result": "PASS",
+    "native": false,
+    "code": "verification/P0_TRANSITION_NEGATIVES.py",
+    "execution_scope": "Local current R2 files, no economic data/outcomes, positive proof from native encrypted checkpoint readback"
+  },
+  "acceptance_interpretation": "Technical path proofs do not establish global integrated acceptance while control-plane protection remains blocked. SUCCESS alone is never acceptance.",
+  "proof_limits": [
+    "R2 production native adapter is connected and covered with isolated fixtures; no new real economic screen was run to prove infrastructure.",
+    "Post-fence ambiguous crash is held, not replayed; live economic exposures are deliberately not injected.",
+    "Scheduler missing-delivery cause and future delivery guarantee remain unknown.",
+    "The existing App's actual administrative grant was not inferred from connector admin:true; configured issuer token remains contents-only."
+  ],
+  "latest_operational_checkpoint": {
+    "accounting": {
+      "causal_identity_fingerprint_version": 2,
+      "economic_observations": 29,
+      "lanes": {
+        "V2": {
+          "encumbered": 22,
+          "limit": 84,
+          "outcome_charged": 21,
+          "reservation_holds": 1
+        }
+      },
+      "legacy_snapshot_sha256": "f61b7b69aa969c7063714e3686919f2add3e36d9cd417c32880ae6420a835881",
+      "new_events": 4,
+      "refunds": 0,
+      "universal_project_cap": null
+    },
+    "all_admitted_programmes_complete": true,
+    "ciphertext_sha256": "0c94708365f296a91404d5bc770981fe0aab7432980e74cb867a64626bf66eca",
+    "economic_workflow_released": false,
+    "evidence_oid": "9ae2d912638923297fec36504ef93bd0db383dfe",
+    "new_outcomes": 0,
+    "orders": 0,
+    "original_unchanged": true,
+    "private_sha256": "01227d7a7715a89bc1bfcf6fac183fbaec3b941f8c61281fb3c0e4f01f232fa6",
+    "run_id": 39322587530,
+    "schema": "mxm.integrated-cold-readback.v2",
+    "sequence": 20,
+    "source_sha": "eab050084982916ad0c67798b38b947bac66b2b2"
+  },
+  "registry_counts": {
+    "CLOSED": 13,
+    "BLOCKED": 1,
+    "SCIENTIFIC_UNKNOWN": 1
+  },
+  "durable_verification": {
+    "commit": "09703adad6433f395a0506fa640f59bf3dba80b5",
+    "paths": [
+      "typed-successor/verification/P0_R1_COLD_READBACK.json",
+      "typed-successor/verification/P0_R2_COLD_READBACK.json",
+      "typed-successor/verification/P0_NATIVE_JOB_RESULTS.json"
+    ],
+    "connector_readback_exact": true
+  },
+  "periodic_continuation": {
+    "enabled": false,
+    "reason": "Fully blocked on a missing legitimate administration-write capability after material P0 work and encrypted native proof have completed. Existing GitHub-native observer retained; no new automation created."
+  }
+}

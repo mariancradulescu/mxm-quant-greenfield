@@ -1,0 +1,59 @@
+{
+  "schema": "mxm.proposed-control-plane-protection.v1",
+  "status": "PREPARED_NOT_APPLIED",
+  "required_capability": "GitHub repository Administration:write through an authorized exposed tool",
+  "existing_owner_authorization": true,
+  "no_new_approval_requested": true,
+  "request": {
+    "method": "POST",
+    "path": "/repos/mariancradulescu/mxm-quant-greenfield/rulesets",
+    "body": {
+      "name": "MXM control-plane orchestration protection",
+      "target": "branch",
+      "enforcement": "active",
+      "bypass_actors": [],
+      "conditions": {
+        "ref_name": {
+          "include": [
+            "refs/heads/main",
+            "refs/heads/mxm-remediation-p0-p4-20261015-v1"
+          ],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_linear_history"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": true,
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "allowed_merge_methods": [
+              "squash",
+              "rebase"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "post_apply_verification": [
+    "GET both branches must report protected=true",
+    "GET resulting ruleset active, no bypass, includes exact main/execution refs",
+    "Do not alter OWNER1807, active authority, original state16, existing protected-source rules or encrypted archives",
+    "Continue future delegated source/workflow changes through the protected PR route, not direct pushes",
+    "Keep old economic if:false and typed economic gate closed until consolidated acceptance is demonstrably complete"
+  ],
+  "warning": "This is an unapplied proposal, not proof of effective branch protection. No administrative HTTP write was performed by a nonadministrative token."
+}
