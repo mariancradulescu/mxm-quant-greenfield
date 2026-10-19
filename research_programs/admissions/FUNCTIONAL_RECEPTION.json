@@ -1,0 +1,1520 @@
+{
+  "schema": "mxm.laboratory-admission.v1",
+  "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+  "mode": "SYNTHETIC_RECEPTION",
+  "module_sha256": "cd84ffd13e4b5dd8c745af56f6c90d9f451a60f2cff195e5e6f2bdb485713a34",
+  "steps_per_segment": 5,
+  "programme_generation": "DIRECTOR_PROSPECTIVE_DETERMINISTIC_RECEPTION_ONLY",
+  "programmes": [
+    {
+      "schema": "mxm.laboratory-program.v1",
+      "id": "FUNCTIONAL_RECEPTION_NORMAL",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "SYNTHETIC_RECEPTION",
+      "budget": {
+        "steps": 8,
+        "broker_requests": 0,
+        "new_V2_identities": 0
+      },
+      "prospective_at_ms": 1736164800000,
+      "provenance": "OWNER_FUNCTIONAL_RECEPTION_SYNTHETIC_ONLY",
+      "source_sha256": "cd84ffd13e4b5dd8c745af56f6c90d9f451a60f2cff195e5e6f2bdb485713a34",
+      "tasks": {
+        "validate_data": {
+          "operator": "catalogue",
+          "input": {
+            "manifest": {
+              "instrument": "SYNTHETIC",
+              "resolution": "M5",
+              "partition": "DEVELOPMENT",
+              "start_ms": 1736164500000,
+              "end_ms": 1736164800000,
+              "source": "SYNTHETIC_RECEPTION",
+              "source_sha256": "b086de7b32510701e873f3d4ae742917ca1cc1141ffe4a8387d604ef474ef9e4",
+              "available_at_ms": 1736164800000,
+              "session_semantics": "FIXTURE_ONLY",
+              "completeness": "CONFIRMED_COMPLETE",
+              "account_scope": "SYNTHETIC"
+            },
+            "rows": [
+              {
+                "t": 1736164500000,
+                "available_at": 1736164800000,
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 10.0
+              }
+            ]
+          },
+          "dependencies": [],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        },
+        "admit_candidate": {
+          "operator": "freeze",
+          "input": {
+            "candidate": {
+              "id": "V2-C990001",
+              "mechanism": {
+                "family": "SYNTHETIC_RECEPTION"
+              },
+              "rationale": "Exercise integration; no economic hypothesis or alpha claim",
+              "universe": [
+                "SYNTHETIC"
+              ],
+              "features": [],
+              "lookbacks": [],
+              "filters": [],
+              "parameters": {},
+              "data": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "causal_availability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "normalization_training": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "timing": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "entry": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "exit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "maximum_hold": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "execution_assumptions": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "capital_semantics": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "cloud_portability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "position_admission_policy": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "stage_a_economic_unit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "direction": {
+                "rule": "FIXTURE_LONG"
+              },
+              "cost_state": {
+                "state": "CONSERVATIVE_BOUND"
+              },
+              "no_rescue_rule": {
+                "material_change_requires_new_identity": true
+              },
+              "provenance": {
+                "programme": "FUNCTIONAL_RECEPTION_NORMAL",
+                "prospective_at_ms": 1736164800000,
+                "synthetic_reception": true
+              }
+            }
+          },
+          "dependencies": [
+            "validate_data"
+          ],
+          "when": {
+            "validate_data": [
+              "DATA_VALID"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "cheap_screen": {
+          "operator": "screen",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "evidence": {
+              "identity": "SYNTHETIC_RECEPTION",
+              "implementation_valid": true,
+              "complete": true,
+              "cost_state": "CONSERVATIVE_BOUND",
+              "trades": [
+                {
+                  "decision_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "feature_available_ms": 1736164800000,
+                  "partition": "DEVELOPMENT",
+                  "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                  "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                  "execution_basis": "SYNTHETIC_RECEPTION",
+                  "gross_eur": 2,
+                  "costs": {
+                    "spread": 0.1,
+                    "commission": 0.1,
+                    "slippage": 0.1,
+                    "funding": 0.1,
+                    "fx_conversion": 0.1
+                  }
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "admit_candidate"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "deep_account": {
+          "operator": "replay",
+          "input": {
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "MID_PLUS_ALL_FRICTIONS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            },
+            "evidence": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "CONSERVATIVE_BOUND",
+              "full_mark_path": true,
+              "dated_broker_terms": true,
+              "events": [
+                {
+                  "timestamp_utc": "2025-01-06T12:00:01Z",
+                  "kind": "ENTRY",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 100,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0,
+                  "direction": "LONG",
+                  "direction_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "base_units": 1,
+                  "margin_eur": 20
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:00:30Z",
+                  "kind": "MARK",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 99.9,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:01:01Z",
+                  "kind": "EXIT",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 102,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "DISCOVERY_SURVIVOR"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "robustness": {
+          "operator": "robustness",
+          "input": {
+            "cashflows": [
+              {
+                "decision_ms": 1736164800000,
+                "entry_ms": 1736164801000,
+                "exit_ms": 1736164861000,
+                "feature_available_ms": 1736164800000,
+                "partition": "DEVELOPMENT",
+                "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                "execution_basis": "SYNTHETIC_RECEPTION",
+                "gross_eur": 2,
+                "costs": {
+                  "spread": 0.1,
+                  "commission": 0.1,
+                  "slippage": 0.1,
+                  "funding": 0.1,
+                  "fx_conversion": 0.1
+                }
+              }
+            ],
+            "cost_multipliers": {
+              "original": 1.0,
+              "stress": 2.0
+            },
+            "chronological_folds": [
+              {
+                "id": "frozen_fold",
+                "start_ms": 1736164800000,
+                "end_ms": 1736164900000
+              }
+            ]
+          },
+          "dependencies": [
+            "deep_account"
+          ],
+          "when": {
+            "deep_account": [
+              "SUPPORTED_FOR_ROBUSTNESS"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "classify": {
+          "operator": "classify",
+          "input": {
+            "result": {
+              "result_of": "cheap_screen"
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "rejected_followup": {
+          "operator": "report",
+          "input": {
+            "purpose": "Investigate rejected case only"
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "COARSE_NET_FAIL",
+              "GROSS_EDGE_FAIL"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "programme_report": {
+          "operator": "report",
+          "input": {
+            "screen": {
+              "result_of": "cheap_screen"
+            },
+            "replay": {
+              "result_of": "deep_account"
+            },
+            "robustness": {
+              "result_of": "robustness"
+            }
+          },
+          "dependencies": [
+            "classify",
+            "deep_account",
+            "robustness"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        }
+      },
+      "information_priority": 1
+    },
+    {
+      "schema": "mxm.laboratory-program.v1",
+      "id": "FUNCTIONAL_RECEPTION_REJECTED",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "SYNTHETIC_RECEPTION",
+      "budget": {
+        "steps": 8,
+        "broker_requests": 0,
+        "new_V2_identities": 0
+      },
+      "prospective_at_ms": 1736164800000,
+      "provenance": "OWNER_FUNCTIONAL_RECEPTION_SYNTHETIC_ONLY",
+      "source_sha256": "cd84ffd13e4b5dd8c745af56f6c90d9f451a60f2cff195e5e6f2bdb485713a34",
+      "tasks": {
+        "validate_data": {
+          "operator": "catalogue",
+          "input": {
+            "manifest": {
+              "instrument": "SYNTHETIC",
+              "resolution": "M5",
+              "partition": "DEVELOPMENT",
+              "start_ms": 1736164500000,
+              "end_ms": 1736164800000,
+              "source": "SYNTHETIC_RECEPTION",
+              "source_sha256": "b086de7b32510701e873f3d4ae742917ca1cc1141ffe4a8387d604ef474ef9e4",
+              "available_at_ms": 1736164800000,
+              "session_semantics": "FIXTURE_ONLY",
+              "completeness": "CONFIRMED_COMPLETE",
+              "account_scope": "SYNTHETIC"
+            },
+            "rows": [
+              {
+                "t": 1736164500000,
+                "available_at": 1736164800000,
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 10.0
+              }
+            ]
+          },
+          "dependencies": [],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        },
+        "admit_candidate": {
+          "operator": "freeze",
+          "input": {
+            "candidate": {
+              "id": "V2-C990002",
+              "mechanism": {
+                "family": "SYNTHETIC_RECEPTION"
+              },
+              "rationale": "Exercise integration; no economic hypothesis or alpha claim",
+              "universe": [
+                "SYNTHETIC"
+              ],
+              "features": [],
+              "lookbacks": [],
+              "filters": [],
+              "parameters": {},
+              "data": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "causal_availability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "normalization_training": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "timing": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "entry": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "exit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "maximum_hold": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "execution_assumptions": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "capital_semantics": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "cloud_portability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "position_admission_policy": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "stage_a_economic_unit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "direction": {
+                "rule": "FIXTURE_LONG"
+              },
+              "cost_state": {
+                "state": "CONSERVATIVE_BOUND"
+              },
+              "no_rescue_rule": {
+                "material_change_requires_new_identity": true
+              },
+              "provenance": {
+                "programme": "FUNCTIONAL_RECEPTION_REJECTED",
+                "prospective_at_ms": 1736164800000,
+                "synthetic_reception": true
+              }
+            }
+          },
+          "dependencies": [
+            "validate_data"
+          ],
+          "when": {
+            "validate_data": [
+              "DATA_VALID"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "cheap_screen": {
+          "operator": "screen",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "evidence": {
+              "identity": "SYNTHETIC_RECEPTION",
+              "implementation_valid": true,
+              "complete": true,
+              "cost_state": "CONSERVATIVE_BOUND",
+              "trades": [
+                {
+                  "decision_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "feature_available_ms": 1736164800000,
+                  "partition": "DEVELOPMENT",
+                  "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                  "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                  "execution_basis": "SYNTHETIC_RECEPTION",
+                  "gross_eur": -2,
+                  "costs": {
+                    "spread": 0.1,
+                    "commission": 0.1,
+                    "slippage": 0.1,
+                    "funding": 0.1,
+                    "fx_conversion": 0.1
+                  }
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "admit_candidate"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "deep_account": {
+          "operator": "replay",
+          "input": {
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "MID_PLUS_ALL_FRICTIONS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            },
+            "evidence": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "CONSERVATIVE_BOUND",
+              "full_mark_path": true,
+              "dated_broker_terms": true,
+              "events": [
+                {
+                  "timestamp_utc": "2025-01-06T12:00:01Z",
+                  "kind": "ENTRY",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 100,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0,
+                  "direction": "LONG",
+                  "direction_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "base_units": 1,
+                  "margin_eur": 20
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:00:30Z",
+                  "kind": "MARK",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 99.9,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:01:01Z",
+                  "kind": "EXIT",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 102,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "DISCOVERY_SURVIVOR"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "robustness": {
+          "operator": "robustness",
+          "input": {
+            "cashflows": [
+              {
+                "decision_ms": 1736164800000,
+                "entry_ms": 1736164801000,
+                "exit_ms": 1736164861000,
+                "feature_available_ms": 1736164800000,
+                "partition": "DEVELOPMENT",
+                "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                "execution_basis": "SYNTHETIC_RECEPTION",
+                "gross_eur": 2,
+                "costs": {
+                  "spread": 0.1,
+                  "commission": 0.1,
+                  "slippage": 0.1,
+                  "funding": 0.1,
+                  "fx_conversion": 0.1
+                }
+              }
+            ],
+            "cost_multipliers": {
+              "original": 1.0,
+              "stress": 2.0
+            },
+            "chronological_folds": [
+              {
+                "id": "frozen_fold",
+                "start_ms": 1736164800000,
+                "end_ms": 1736164900000
+              }
+            ]
+          },
+          "dependencies": [
+            "deep_account"
+          ],
+          "when": {
+            "deep_account": [
+              "SUPPORTED_FOR_ROBUSTNESS"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "classify": {
+          "operator": "classify",
+          "input": {
+            "result": {
+              "result_of": "cheap_screen"
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "rejected_followup": {
+          "operator": "report",
+          "input": {
+            "purpose": "Investigate rejected case only"
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "COARSE_NET_FAIL",
+              "GROSS_EDGE_FAIL"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "programme_report": {
+          "operator": "report",
+          "input": {
+            "screen": {
+              "result_of": "cheap_screen"
+            },
+            "replay": {
+              "result_of": "deep_account"
+            },
+            "robustness": {
+              "result_of": "robustness"
+            }
+          },
+          "dependencies": [
+            "classify",
+            "deep_account",
+            "robustness"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        }
+      },
+      "information_priority": 2
+    },
+    {
+      "schema": "mxm.laboratory-program.v1",
+      "id": "FUNCTIONAL_RECEPTION_UNKNOWN_COST",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "SYNTHETIC_RECEPTION",
+      "budget": {
+        "steps": 8,
+        "broker_requests": 0,
+        "new_V2_identities": 0
+      },
+      "prospective_at_ms": 1736164800000,
+      "provenance": "OWNER_FUNCTIONAL_RECEPTION_SYNTHETIC_ONLY",
+      "source_sha256": "cd84ffd13e4b5dd8c745af56f6c90d9f451a60f2cff195e5e6f2bdb485713a34",
+      "tasks": {
+        "validate_data": {
+          "operator": "catalogue",
+          "input": {
+            "manifest": {
+              "instrument": "SYNTHETIC",
+              "resolution": "M5",
+              "partition": "DEVELOPMENT",
+              "start_ms": 1736164500000,
+              "end_ms": 1736164800000,
+              "source": "SYNTHETIC_RECEPTION",
+              "source_sha256": "b086de7b32510701e873f3d4ae742917ca1cc1141ffe4a8387d604ef474ef9e4",
+              "available_at_ms": 1736164800000,
+              "session_semantics": "FIXTURE_ONLY",
+              "completeness": "CONFIRMED_COMPLETE",
+              "account_scope": "SYNTHETIC"
+            },
+            "rows": [
+              {
+                "t": 1736164500000,
+                "available_at": 1736164800000,
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 10.0
+              }
+            ]
+          },
+          "dependencies": [],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        },
+        "admit_candidate": {
+          "operator": "freeze",
+          "input": {
+            "candidate": {
+              "id": "V2-C990003",
+              "mechanism": {
+                "family": "SYNTHETIC_RECEPTION"
+              },
+              "rationale": "Exercise integration; no economic hypothesis or alpha claim",
+              "universe": [
+                "SYNTHETIC"
+              ],
+              "features": [],
+              "lookbacks": [],
+              "filters": [],
+              "parameters": {},
+              "data": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "causal_availability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "normalization_training": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "timing": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "entry": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "exit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "maximum_hold": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "execution_assumptions": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "capital_semantics": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "cloud_portability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "position_admission_policy": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "stage_a_economic_unit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "direction": {
+                "rule": "FIXTURE_LONG"
+              },
+              "cost_state": {
+                "state": "CONSERVATIVE_BOUND"
+              },
+              "no_rescue_rule": {
+                "material_change_requires_new_identity": true
+              },
+              "provenance": {
+                "programme": "FUNCTIONAL_RECEPTION_UNKNOWN_COST",
+                "prospective_at_ms": 1736164800000,
+                "synthetic_reception": true
+              }
+            }
+          },
+          "dependencies": [
+            "validate_data"
+          ],
+          "when": {
+            "validate_data": [
+              "DATA_VALID"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "cheap_screen": {
+          "operator": "screen",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "evidence": {
+              "identity": "SYNTHETIC_RECEPTION",
+              "implementation_valid": true,
+              "complete": true,
+              "cost_state": "CONSERVATIVE_BOUND",
+              "trades": [
+                {
+                  "decision_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "feature_available_ms": 1736164800000,
+                  "partition": "DEVELOPMENT",
+                  "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                  "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                  "execution_basis": "SYNTHETIC_RECEPTION",
+                  "gross_eur": 2,
+                  "costs": {
+                    "spread": 0.1,
+                    "commission": 0.1,
+                    "slippage": 0.1,
+                    "funding": null,
+                    "fx_conversion": 0.1
+                  }
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "admit_candidate"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "deep_account": {
+          "operator": "replay",
+          "input": {
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "MID_PLUS_ALL_FRICTIONS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            },
+            "evidence": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "CONSERVATIVE_BOUND",
+              "full_mark_path": true,
+              "dated_broker_terms": true,
+              "events": [
+                {
+                  "timestamp_utc": "2025-01-06T12:00:01Z",
+                  "kind": "ENTRY",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 100,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0,
+                  "direction": "LONG",
+                  "direction_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "base_units": 1,
+                  "margin_eur": 20
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:00:30Z",
+                  "kind": "MARK",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 99.9,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:01:01Z",
+                  "kind": "EXIT",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 102,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "DISCOVERY_SURVIVOR"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "robustness": {
+          "operator": "robustness",
+          "input": {
+            "cashflows": [
+              {
+                "decision_ms": 1736164800000,
+                "entry_ms": 1736164801000,
+                "exit_ms": 1736164861000,
+                "feature_available_ms": 1736164800000,
+                "partition": "DEVELOPMENT",
+                "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                "execution_basis": "SYNTHETIC_RECEPTION",
+                "gross_eur": 2,
+                "costs": {
+                  "spread": 0.1,
+                  "commission": 0.1,
+                  "slippage": 0.1,
+                  "funding": 0.1,
+                  "fx_conversion": 0.1
+                }
+              }
+            ],
+            "cost_multipliers": {
+              "original": 1.0,
+              "stress": 2.0
+            },
+            "chronological_folds": [
+              {
+                "id": "frozen_fold",
+                "start_ms": 1736164800000,
+                "end_ms": 1736164900000
+              }
+            ]
+          },
+          "dependencies": [
+            "deep_account"
+          ],
+          "when": {
+            "deep_account": [
+              "SUPPORTED_FOR_ROBUSTNESS"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "classify": {
+          "operator": "classify",
+          "input": {
+            "result": {
+              "result_of": "cheap_screen"
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "rejected_followup": {
+          "operator": "report",
+          "input": {
+            "purpose": "Investigate rejected case only"
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "COARSE_NET_FAIL",
+              "GROSS_EDGE_FAIL"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "programme_report": {
+          "operator": "report",
+          "input": {
+            "screen": {
+              "result_of": "cheap_screen"
+            },
+            "replay": {
+              "result_of": "deep_account"
+            },
+            "robustness": {
+              "result_of": "robustness"
+            }
+          },
+          "dependencies": [
+            "classify",
+            "deep_account",
+            "robustness"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        }
+      },
+      "information_priority": 3
+    },
+    {
+      "schema": "mxm.laboratory-program.v1",
+      "id": "FUNCTIONAL_RECEPTION_MISSING_DATA",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "SYNTHETIC_RECEPTION",
+      "budget": {
+        "steps": 8,
+        "broker_requests": 0,
+        "new_V2_identities": 0
+      },
+      "prospective_at_ms": 1736164800000,
+      "provenance": "OWNER_FUNCTIONAL_RECEPTION_SYNTHETIC_ONLY",
+      "source_sha256": "cd84ffd13e4b5dd8c745af56f6c90d9f451a60f2cff195e5e6f2bdb485713a34",
+      "tasks": {
+        "validate_data": {
+          "operator": "catalogue",
+          "input": {
+            "manifest": {
+              "instrument": "SYNTHETIC",
+              "resolution": "M5",
+              "partition": "DEVELOPMENT",
+              "start_ms": 1736164500000,
+              "end_ms": 1736164800000,
+              "source": "SYNTHETIC_RECEPTION",
+              "source_sha256": "b086de7b32510701e873f3d4ae742917ca1cc1141ffe4a8387d604ef474ef9e4",
+              "available_at_ms": 1736164800000,
+              "session_semantics": "FIXTURE_ONLY",
+              "completeness": "CONFIRMED_COMPLETE",
+              "account_scope": "SYNTHETIC"
+            },
+            "rows": []
+          },
+          "dependencies": [],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        },
+        "admit_candidate": {
+          "operator": "freeze",
+          "input": {
+            "candidate": {
+              "id": "V2-C990004",
+              "mechanism": {
+                "family": "SYNTHETIC_RECEPTION"
+              },
+              "rationale": "Exercise integration; no economic hypothesis or alpha claim",
+              "universe": [
+                "SYNTHETIC"
+              ],
+              "features": [],
+              "lookbacks": [],
+              "filters": [],
+              "parameters": {},
+              "data": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "causal_availability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "normalization_training": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "timing": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "entry": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "exit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "maximum_hold": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "execution_assumptions": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "capital_semantics": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "cloud_portability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "position_admission_policy": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "stage_a_economic_unit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "direction": {
+                "rule": "FIXTURE_LONG"
+              },
+              "cost_state": {
+                "state": "CONSERVATIVE_BOUND"
+              },
+              "no_rescue_rule": {
+                "material_change_requires_new_identity": true
+              },
+              "provenance": {
+                "programme": "FUNCTIONAL_RECEPTION_MISSING_DATA",
+                "prospective_at_ms": 1736164800000,
+                "synthetic_reception": true
+              }
+            }
+          },
+          "dependencies": [
+            "validate_data"
+          ],
+          "when": {
+            "validate_data": [
+              "DATA_VALID"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "cheap_screen": {
+          "operator": "screen",
+          "input": {
+            "candidate": {
+              "result_of": "admit_candidate"
+            },
+            "evidence": {
+              "identity": "SYNTHETIC_RECEPTION",
+              "implementation_valid": true,
+              "complete": true,
+              "cost_state": "CONSERVATIVE_BOUND",
+              "trades": [
+                {
+                  "decision_ms": 1736164800000,
+                  "entry_ms": 1736164801000,
+                  "exit_ms": 1736164861000,
+                  "feature_available_ms": 1736164800000,
+                  "partition": "DEVELOPMENT",
+                  "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                  "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                  "execution_basis": "SYNTHETIC_RECEPTION",
+                  "gross_eur": 2,
+                  "costs": {
+                    "spread": 0.1,
+                    "commission": 0.1,
+                    "slippage": 0.1,
+                    "funding": 0.1,
+                    "fx_conversion": 0.1
+                  }
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "admit_candidate"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "deep_account": {
+          "operator": "replay",
+          "input": {
+            "spec": {
+              "starting_equity_eur": 200,
+              "deposit_count": 1,
+              "sizing_rule_frozen": true,
+              "allocator_frozen": true,
+              "price_cost_convention": "MID_PLUS_ALL_FRICTIONS",
+              "account_type": "HEDGED",
+              "margin_type": "SUM",
+              "same_symbol_overlap_allowed": true,
+              "evaluation_start": "2025-01-06T00:00:00Z",
+              "evaluation_end": "2025-01-20T00:00:00Z"
+            },
+            "evidence": {
+              "screen_status": "DISCOVERY_SURVIVOR",
+              "cost_state": "CONSERVATIVE_BOUND",
+              "full_mark_path": true,
+              "dated_broker_terms": true,
+              "events": [
+                {
+                  "timestamp_utc": "2025-01-06T12:00:01Z",
+                  "kind": "ENTRY",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 100,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0,
+                  "direction": "LONG",
+                  "direction_feasibility": "EUR200_MIN_VOLUME_FEASIBLE",
+                  "volume_cents": 100,
+                  "min_volume_cents": 100,
+                  "step_volume_cents": 100,
+                  "max_volume_cents": 10000,
+                  "base_units": 1,
+                  "margin_eur": 20
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:00:30Z",
+                  "kind": "MARK",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 99.9,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                },
+                {
+                  "timestamp_utc": "2025-01-06T12:01:01Z",
+                  "kind": "EXIT",
+                  "candidate_id": "V2-C990001",
+                  "symbol": "SYNTHETIC",
+                  "position_id": "p1",
+                  "causal_state": true,
+                  "price": 102,
+                  "quote_to_eur_rate": 1,
+                  "metadata": {
+                    "source_sha256": "b0f47580b0a2a188784599700df1b22ffb09480ee5066bbb72becb33d3b5851c",
+                    "available_at_ms": 1736164800000,
+                    "cost_components_eur": {
+                      "spread": 0.0,
+                      "commission": 0.0,
+                      "slippage": 0.0,
+                      "funding": 0.0,
+                      "fx_conversion": 0.0
+                    }
+                  },
+                  "transaction_cost_eur": 0.0
+                }
+              ]
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "DISCOVERY_SURVIVOR"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "robustness": {
+          "operator": "robustness",
+          "input": {
+            "cashflows": [
+              {
+                "decision_ms": 1736164800000,
+                "entry_ms": 1736164801000,
+                "exit_ms": 1736164861000,
+                "feature_available_ms": 1736164800000,
+                "partition": "DEVELOPMENT",
+                "source_sha256": "cbfd8ff5ab4e069bb42228df1259b3046894d5a6dfafcd99ed341f239f25a9fd",
+                "execution_evidence_sha256": "c023fb40f5b4ca5ee82c227b0b2604756793595ed3e419b1391f9084519aada8",
+                "execution_basis": "SYNTHETIC_RECEPTION",
+                "gross_eur": 2,
+                "costs": {
+                  "spread": 0.1,
+                  "commission": 0.1,
+                  "slippage": 0.1,
+                  "funding": 0.1,
+                  "fx_conversion": 0.1
+                }
+              }
+            ],
+            "cost_multipliers": {
+              "original": 1.0,
+              "stress": 2.0
+            },
+            "chronological_folds": [
+              {
+                "id": "frozen_fold",
+                "start_ms": 1736164800000,
+                "end_ms": 1736164900000
+              }
+            ]
+          },
+          "dependencies": [
+            "deep_account"
+          ],
+          "when": {
+            "deep_account": [
+              "SUPPORTED_FOR_ROBUSTNESS"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "classify": {
+          "operator": "classify",
+          "input": {
+            "result": {
+              "result_of": "cheap_screen"
+            }
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        },
+        "rejected_followup": {
+          "operator": "report",
+          "input": {
+            "purpose": "Investigate rejected case only"
+          },
+          "dependencies": [
+            "cheap_screen"
+          ],
+          "when": {
+            "cheap_screen": [
+              "COARSE_NET_FAIL",
+              "GROSS_EDGE_FAIL"
+            ]
+          },
+          "priority": 100,
+          "trial_units": 0
+        },
+        "programme_report": {
+          "operator": "report",
+          "input": {
+            "screen": {
+              "result_of": "cheap_screen"
+            },
+            "replay": {
+              "result_of": "deep_account"
+            },
+            "robustness": {
+              "result_of": "robustness"
+            }
+          },
+          "dependencies": [
+            "classify",
+            "deep_account",
+            "robustness"
+          ],
+          "when": {},
+          "priority": 100,
+          "trial_units": 0
+        }
+      },
+      "information_priority": 4
+    }
+  ]
+}

@@ -33,7 +33,7 @@ class CapitalEvent:
 
 @dataclass
 class _Position:
-    candidate_id:str; symbol:str; direction:str; margin:Decimal; entry:Decimal; units:Decimal; mark:Decimal; rate:Decimal
+    candidate_id:str; symbol:str; direction:str; margin:Decimal; entry:Decimal; units:Decimal; mark:Decimal; rate:Decimal; risk_exposures:Mapping[str,object]=field(default_factory=dict)
 
 @dataclass(frozen=True)
 class Snapshot:
@@ -78,7 +78,7 @@ def _keys(ts):
 
 def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eur:object,account_type:str,total_margin_calculation_type:str,
                               same_symbol_overlap_allowed:bool=True,entry_margin_level_floor_ratio:object|None=None,
-                              unresolved_stop_out_guard_ratio:object|None=None)->ReplayResult:
+                              unresolved_stop_out_guard_ratio:object|None=None, entry_transform=None)->ReplayResult:
     cash=_d(starting_equity_eur); account_type=account_type.upper(); margin_type=total_margin_calculation_type.upper()
     if cash<=0 or account_type not in ACCOUNT_TYPES or margin_type not in MARGIN_TYPES: raise ReplayContractError("invalid account contract")
     floor=None if entry_margin_level_floor_ratio is None else _d(entry_margin_level_floor_ratio)
@@ -121,6 +121,13 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                 if e.position_id in inactive: record(e,False,"SKIP_EXIT_REJECTED_ENTRY"); continue
                 p=pos.get(e.position_id)
                 if p is None or p.symbol!=e.symbol or p.candidate_id!=e.candidate_id: raise ReplayContractError("exit identity mismatch")
+                if entry_transform is not None:
+                    from dataclasses import replace
+                    prices=e.metadata.get('exit_cost_by_volume_cents',{})
+                    key=str(int(p.units*100))
+                    if key not in prices: raise ReplayContractError("sized exit friction unresolved")
+                    e=replace(e,transaction_cost_eur=prices[key]);cost=_d(e.transaction_cost_eur)
+                    if cost<0: raise ReplayContractError("negative sized exit cost")
                 price=_d(e.price); rate=_d(e.quote_to_eur_rate)
                 gross=(D(1) if p.direction=="LONG" else D(-1))*(price-p.entry)*p.units*rate
                 cash+=gross-cost; costs+=cost; turnover+=abs(price*p.units*rate); del pos[e.position_id]; record(e,True,"EXIT_APPLIED")
@@ -142,6 +149,12 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
         snap=_snap(ts,cash,pos,margin_type,external); st,why=guard_snapshot(snap)
         if st: status,halt=st,why; break
         for e in entries:
+            if entry_transform is not None:
+                transformed,reason=entry_transform(e,_snap(ts,cash,pos,margin_type,external),tuple(pos.values()))
+                if transformed is None:
+                    rejected+=1;inactive.add(e.position_id);record(e,False,reason);continue
+                if any(getattr(transformed,k)!=getattr(e,k) for k in ('timestamp_utc','kind','candidate_id','symbol','position_id','direction','price','quote_to_eur_rate')): raise ReplayContractError("sizing changed opportunity semantics")
+                e=transformed
             _volume(e); cost=_d(e.transaction_cost_eur)
             if cost<0 or e.direction not in {"LONG","SHORT"} or e.direction_feasibility not in {FEASIBLE,INFEASIBLE,UNRESOLVED}: raise ReplayContractError("invalid entry")
             if e.position_id in pos or e.position_id in inactive: raise ReplayContractError("duplicate position id")
@@ -154,7 +167,7 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                 rejected+=1; inactive.add(e.position_id); record(e,False,reason); continue
             price=_d(e.price); units=_d(e.base_units); rate=_d(e.quote_to_eur_rate); margin=_d(e.margin_eur)
             if min(price,units,rate,margin)<=0: raise ReplayContractError("invalid entry primitives")
-            trial=dict(pos); trial[e.position_id]=_Position(e.candidate_id,e.symbol,e.direction,margin,price,units,price,rate)
+            trial=dict(pos); trial[e.position_id]=_Position(e.candidate_id,e.symbol,e.direction,margin,price,units,price,rate,e.metadata.get("risk_exposures_eur",{}))
             trial_cash=cash-cost; trial_s=_snap(ts,trial_cash,trial,margin_type,external); reason="ACCEPTED"
             if trial_s.free_margin_eur<0: reason="REJECT_INSUFFICIENT_FREE_MARGIN"
             elif floor is not None and trial_s.margin_level_ratio is not None and trial_s.margin_level_ratio<=floor: reason="REJECT_CAPITAL_PRESERVATION_MARGIN_LEVEL"
