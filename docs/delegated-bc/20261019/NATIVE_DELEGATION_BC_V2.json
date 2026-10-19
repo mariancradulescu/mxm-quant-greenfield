@@ -1,0 +1,101 @@
+{
+  "schema": "mxm.native-admin-delegation.v1",
+  "source_sha": "fe4f0047a6a55866d4f7dcfdcce0f973c21c2f00",
+  "policy_sha256": "1c0e7baa2f009237211ef12f8fe321abd1b62b1da443d4e7e7af224822d09d3d",
+  "source_seal": {
+    "id": 25372645,
+    "updated_at": "2026-10-19T06:38:50.543+02:00",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "mariancradulescu/mxm-quant-greenfield",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/mxm-o04-successor-code-bc-v2"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "creation"
+      },
+      {
+        "type": "update"
+      },
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      }
+    ],
+    "bypass_actors": []
+  },
+  "append_only": {
+    "id": 25222248,
+    "updated_at": "2026-10-16T08:41:41.359+02:00",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "mariancradulescu/mxm-quant-greenfield",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/mxm-o04-*"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "required_linear_history"
+      }
+    ],
+    "bypass_actors": []
+  },
+  "active_acl": {
+    "id": 25268790,
+    "updated_at": "2026-10-19T05:57:32.013+02:00",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "mariancradulescu/mxm-quant-greenfield",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/mxm-o04-active-v1"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "creation"
+      },
+      {
+        "type": "update"
+      }
+    ],
+    "bypass_actors": [
+      {
+        "actor_id": 5343530,
+        "actor_type": "Integration",
+        "bypass_mode": "always"
+      }
+    ]
+  }
+}

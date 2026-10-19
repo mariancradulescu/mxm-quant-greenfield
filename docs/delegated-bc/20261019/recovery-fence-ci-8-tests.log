@@ -1,0 +1,139 @@
+﻿2026-10-19T05:06:56.8483392Z Current runner version: '2.337.0'
+2026-10-19T05:06:56.8524803Z ##[group]Runner Image Provisioner
+2026-10-19T05:06:56.8525833Z Hosted Compute Agent
+2026-10-19T05:06:56.8526487Z Version: 20261012.601
+2026-10-19T05:06:56.8527414Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-19T05:06:56.8528515Z Build Date: 2026-10-12T17:48:21Z
+2026-10-19T05:06:56.8529240Z Worker ID: {ab74e877-956a-44ff-9340-52f48fa04548}
+2026-10-19T05:06:56.8530062Z Region: eastus
+2026-10-19T05:06:56.8530639Z Cloud: Azure
+2026-10-19T05:06:56.8531832Z ##[endgroup]
+2026-10-19T05:06:56.8533673Z ##[group]Operating System
+2026-10-19T05:06:56.8534378Z Ubuntu
+2026-10-19T05:06:56.8535012Z 24.04.5
+2026-10-19T05:06:56.8535638Z LTS
+2026-10-19T05:06:56.8536235Z ##[endgroup]
+2026-10-19T05:06:56.8536966Z ##[group]Runner Image
+2026-10-19T05:06:56.8537604Z Image: ubuntu-24.04
+2026-10-19T05:06:56.8538263Z Version: 20261012.334.1
+2026-10-19T05:06:56.8539611Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-19T05:06:56.8541663Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-19T05:06:56.8542766Z ##[endgroup]
+2026-10-19T05:06:56.8543970Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T05:06:56.8546442Z Contents: read
+2026-10-19T05:06:56.8547143Z Metadata: read
+2026-10-19T05:06:56.8547774Z ##[endgroup]
+2026-10-19T05:06:56.8550165Z Secret source: Actions
+2026-10-19T05:06:56.8552330Z Cache mode: write
+2026-10-19T05:06:56.8553616Z Prepare workflow directory
+2026-10-19T05:06:56.8934931Z Prepare all required actions
+2026-10-19T05:06:56.9038177Z Getting action download info
+2026-10-19T05:06:57.1150542Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+2026-10-19T05:06:57.3189252Z Complete job name: native-issuer-admission-controls
+2026-10-19T05:06:57.4111326Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-19T05:06:57.4112525Z with:
+2026-10-19T05:06:57.4112985Z   persist-credentials: false
+2026-10-19T05:06:57.4113599Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-19T05:06:57.4117851Z   token: ***
+2026-10-19T05:06:57.4118295Z   ssh-strict: true
+2026-10-19T05:06:57.4118737Z   ssh-user: git
+2026-10-19T05:06:57.4119160Z   clean: true
+2026-10-19T05:06:57.4119609Z   sparse-checkout-cone-mode: true
+2026-10-19T05:06:57.4120138Z   fetch-depth: 1
+2026-10-19T05:06:57.4120579Z   fetch-tags: false
+2026-10-19T05:06:57.4121293Z   show-progress: true
+2026-10-19T05:06:57.4121756Z   lfs: false
+2026-10-19T05:06:57.4122176Z   submodules: false
+2026-10-19T05:06:57.4122630Z   set-safe-directory: true
+2026-10-19T05:06:57.4123387Z ##[endgroup]
+2026-10-19T05:06:57.5178988Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-19T05:06:57.5181790Z ##[group]Getting Git version info
+2026-10-19T05:06:57.5183375Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-19T05:06:57.5185712Z [command]/usr/bin/git version
+2026-10-19T05:06:57.5279280Z git version 2.55.0
+2026-10-19T05:06:57.5335441Z ##[endgroup]
+2026-10-19T05:06:57.5352444Z Temporarily overriding HOME='/home/runner/work/_temp/16689e75-5503-44e5-bed5-9b4853287267' before making global git config changes
+2026-10-19T05:06:57.5356154Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T05:06:57.5362201Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-19T05:06:57.5417561Z Deleting the contents of '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-19T05:06:57.5421294Z ##[group]Initializing the repository
+2026-10-19T05:06:57.5427086Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-19T05:06:57.5570072Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-19T05:06:57.5572284Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-19T05:06:57.5574286Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-19T05:06:57.5575755Z hint: call:
+2026-10-19T05:06:57.5576519Z hint:
+2026-10-19T05:06:57.5577807Z hint: 	git config --global init.defaultBranch <name>
+2026-10-19T05:06:57.5578950Z hint:
+2026-10-19T05:06:57.5580029Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-19T05:06:57.5581900Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-19T05:06:57.5583152Z hint:
+2026-10-19T05:06:57.5583799Z hint: 	git branch -m <name>
+2026-10-19T05:06:57.5584541Z hint:
+2026-10-19T05:06:57.5585567Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-19T05:06:57.5587859Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.git/
+2026-10-19T05:06:57.5591222Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-19T05:06:57.5648126Z ##[endgroup]
+2026-10-19T05:06:57.5649805Z ##[group]Disabling automatic garbage collection
+2026-10-19T05:06:57.5652905Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-19T05:06:57.5688581Z ##[endgroup]
+2026-10-19T05:06:57.5690327Z ##[group]Setting up auth
+2026-10-19T05:06:57.5697575Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T05:06:57.5740208Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T05:06:57.6133203Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T05:06:57.6170635Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T05:06:57.6398690Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-19T05:06:57.6442809Z ##[endgroup]
+2026-10-19T05:06:57.6444081Z ##[group]Fetching the repository
+2026-10-19T05:06:57.6454103Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0b762206f0e3792b717e0a3303182d2d8248c33e:refs/remotes/origin/mxm-remediation-p0-p4-20261015-v1
+2026-10-19T05:07:00.1646038Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-19T05:07:00.1649208Z  * [new ref]         0b762206f0e3792b717e0a3303182d2d8248c33e -> origin/mxm-remediation-p0-p4-20261015-v1
+2026-10-19T05:07:00.1654652Z ##[endgroup]
+2026-10-19T05:07:00.1656004Z ##[group]Determining the checkout info
+2026-10-19T05:07:00.1657460Z ##[endgroup]
+2026-10-19T05:07:00.1661568Z [command]/usr/bin/git sparse-checkout disable
+2026-10-19T05:07:00.1722476Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-19T05:07:00.1758163Z ##[group]Checking out the ref
+2026-10-19T05:07:00.1762987Z [command]/usr/bin/git checkout --progress --force -B mxm-remediation-p0-p4-20261015-v1 refs/remotes/origin/mxm-remediation-p0-p4-20261015-v1
+2026-10-19T05:07:00.8012568Z Switched to a new branch 'mxm-remediation-p0-p4-20261015-v1'
+2026-10-19T05:07:00.8017707Z branch 'mxm-remediation-p0-p4-20261015-v1' set up to track 'origin/mxm-remediation-p0-p4-20261015-v1'.
+2026-10-19T05:07:00.8054429Z ##[endgroup]
+2026-10-19T05:07:00.8108332Z [command]/usr/bin/git log -1 --format=%H
+2026-10-19T05:07:00.8147437Z 0b762206f0e3792b717e0a3303182d2d8248c33e
+2026-10-19T05:07:00.8157142Z ##[group]Removing auth
+2026-10-19T05:07:00.8161190Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T05:07:00.8196925Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T05:07:00.8432461Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T05:07:00.8467134Z http.https://github.com/.extraheader
+2026-10-19T05:07:00.8475313Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-19T05:07:00.8513799Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T05:07:00.8747507Z ##[endgroup]
+2026-10-19T05:07:00.8975618Z ##[group]Run python3 -m unittest research_core_v4.delegated_recovery_fence_20261019.test_guard -v
+2026-10-19T05:07:00.8976493Z [36;1mpython3 -m unittest research_core_v4.delegated_recovery_fence_20261019.test_guard -v[0m
+2026-10-19T05:07:00.9813947Z shell: /usr/bin/bash -e {0}
+2026-10-19T05:07:00.9814439Z ##[endgroup]
+2026-10-19T05:07:01.0733305Z test_cancelled_handoff_after_successful_issuer_is_not_a_fabricated_failure (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_cancelled_handoff_after_successful_issuer_is_not_a_fabricated_failure) ... ok
+2026-10-19T05:07:01.0738421Z test_crash_immediately_after_migration_no_first_task_stops (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_crash_immediately_after_migration_no_first_task_stops) ... ok
+2026-10-19T05:07:01.0741747Z test_embedded_guard_is_byte_identical_and_no_secrets_bound (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_embedded_guard_is_byte_identical_and_no_secrets_bound) ... ok
+2026-10-19T05:07:01.0743750Z test_foreign_source_or_retried_workload_stops (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_foreign_source_or_retried_workload_stops) ... ok
+2026-10-19T05:07:01.0745563Z test_in_progress_after_git_completion_waits (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_in_progress_after_git_completion_waits) ... ok
+2026-10-19T05:07:01.0747353Z test_missing_duplicate_or_foreign_issuer_stops (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_missing_duplicate_or_foreign_issuer_stops) ... ok
+2026-10-19T05:07:01.0749107Z test_native_issuer_success_is_required (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_native_issuer_success_is_required) ... ok
+2026-10-19T05:07:01.0751145Z test_task_commit_before_revocation_failure_cannot_continue (research_core_v4.delegated_recovery_fence_20261019.test_guard.NativeIssuerFence.test_task_commit_before_revocation_failure_cannot_continue) ... ok
+2026-10-19T05:07:01.0752232Z 
+2026-10-19T05:07:01.0752425Z ----------------------------------------------------------------------
+2026-10-19T05:07:01.0752884Z Ran 8 tests in 0.001s
+2026-10-19T05:07:01.0753060Z 
+2026-10-19T05:07:01.0753173Z OK
+2026-10-19T05:07:01.0949210Z Post job cleanup.
+2026-10-19T05:07:01.1828542Z [command]/usr/bin/git version
+2026-10-19T05:07:01.1870437Z git version 2.55.0
+2026-10-19T05:07:01.1913787Z Temporarily overriding HOME='/home/runner/work/_temp/422e087d-35f0-4659-86ac-03ddbdaee380' before making global git config changes
+2026-10-19T05:07:01.1915462Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-19T05:07:01.1922263Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-19T05:07:01.1964901Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-19T05:07:01.2003945Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-19T05:07:01.2262919Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-19T05:07:01.2297407Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-19T05:07:01.2738196Z Cleaning up orphan processes
+2026-10-19T05:07:01.3147891Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

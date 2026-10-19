@@ -1,0 +1,81 @@
+﻿2026-10-19T05:07:33.5219173Z Current runner version: '2.337.0'
+2026-10-19T05:07:33.5247319Z ##[group]Runner Image Provisioner
+2026-10-19T05:07:33.5248227Z Hosted Compute Agent
+2026-10-19T05:07:33.5248830Z Version: 20261012.601
+2026-10-19T05:07:33.5249555Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-19T05:07:33.5250528Z Build Date: 2026-10-12T17:48:21Z
+2026-10-19T05:07:33.5251301Z Worker ID: {ef906a6a-cd81-4ea5-b213-376d41a71acb}
+2026-10-19T05:07:33.5252011Z Region: eastus
+2026-10-19T05:07:33.5252538Z Cloud: Azure
+2026-10-19T05:07:33.5253132Z ##[endgroup]
+2026-10-19T05:07:33.5254808Z ##[group]Operating System
+2026-10-19T05:07:33.5255561Z Ubuntu
+2026-10-19T05:07:33.5256087Z 24.04.5
+2026-10-19T05:07:33.5256600Z LTS
+2026-10-19T05:07:33.5257176Z ##[endgroup]
+2026-10-19T05:07:33.5257755Z ##[group]Runner Image
+2026-10-19T05:07:33.5258629Z Image: ubuntu-24.04
+2026-10-19T05:07:33.5259218Z Version: 20261012.334.1
+2026-10-19T05:07:33.5261081Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-19T05:07:33.5262787Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-19T05:07:33.5263816Z ##[endgroup]
+2026-10-19T05:07:33.5264940Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T05:07:33.5267153Z Contents: write
+2026-10-19T05:07:33.5267829Z Metadata: read
+2026-10-19T05:07:33.5268384Z ##[endgroup]
+2026-10-19T05:07:33.5270856Z Secret source: Actions
+2026-10-19T05:07:33.5272159Z Cache mode: write
+2026-10-19T05:07:33.5272973Z Prepare workflow directory
+2026-10-19T05:07:33.5602661Z Prepare all required actions
+2026-10-19T05:07:33.5705530Z Complete job name: native-exclusion
+2026-10-19T05:07:33.6508542Z ##[group]Run python3 - <<'PY'
+2026-10-19T05:07:33.6509529Z [36;1mpython3 - <<'PY'[0m
+2026-10-19T05:07:33.6510592Z [36;1mimport base64,json,os,re,subprocess,tempfile,urllib.request[0m
+2026-10-19T05:07:33.6511950Z [36;1mREPO='mariancradulescu/mxm-quant-greenfield';REF='refs/heads/mxm-o04-active-v1'[0m
+2026-10-19T05:07:33.6512965Z [36;1mdef need(ok,code):[0m
+2026-10-19T05:07:33.6513687Z [36;1m    if not ok:raise SystemExit(code)[0m
+2026-10-19T05:07:33.6514671Z [36;1mneed(not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'EXCLUSION_APP_KEY_PRESENT')[0m
+2026-10-19T05:07:33.6515987Z [36;1mexpected=os.environ['EXPECTED_HEAD'];need(re.fullmatch('[0-9a-f]{40}',expected),'EXCLUSION_HEAD_FORMAT')[0m
+2026-10-19T05:07:33.6517108Z [36;1mtoken=os.environ['GH_TOKEN'][0m
+2026-10-19T05:07:33.6517798Z [36;1mdef get(path):[0m
+2026-10-19T05:07:33.6519243Z [36;1m    req=urllib.request.Request('https://api.github.com/repos/'+REPO+'/'+path,headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})[0m
+2026-10-19T05:07:33.6521047Z [36;1m    with urllib.request.urlopen(req,timeout=30) as response:return json.load(response)[0m
+2026-10-19T05:07:33.6522299Z [36;1mdef head():return get('git/ref/heads/mxm-o04-active-v1')['object']['sha'][0m
+2026-10-19T05:07:33.6523331Z [36;1mneed(head()==expected,'EXCLUSION_HEAD_MOVED_NO_RETRY')[0m
+2026-10-19T05:07:33.6524451Z [36;1mentry=get('contents/state.json?ref='+expected);state=json.loads(base64.b64decode(entry['content']))[0m
+2026-10-19T05:07:33.6525752Z [36;1mneed(state['source_sha']=='ca99a5ad609a301fef8bd3efe0e902fe3fbe905b' and[0m
+2026-10-19T05:07:33.6526757Z [36;1m     state['sequence']==3 and state['pending'] is None and[0m
+2026-10-19T05:07:33.6527929Z [36;1m     state['halt']=='REGISTERED_RESEARCH_COMPLETE_INSUFFICIENT_EVIDENCE','EXCLUSION_TERMINAL_REQUIRED')[0m
+2026-10-19T05:07:33.6529303Z [36;1mowner_before=get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha'][0m
+2026-10-19T05:07:33.6530697Z [36;1mneed(owner_before=='a830c132521bd4348454653f713e04f6107484fe','EXCLUSION_OWNER_CHANGED')[0m
+2026-10-19T05:07:33.6531782Z [36;1mwith tempfile.TemporaryDirectory() as folder:[0m
+2026-10-19T05:07:33.6532696Z [36;1m    env={k:v for k,v in os.environ.items() if k in ('PATH','LANG','TMPDIR')}[0m
+2026-10-19T05:07:33.6533926Z [36;1m    env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL=os.devnull,GIT_TERMINAL_PROMPT='0',[0m
+2026-10-19T05:07:33.6535588Z [36;1m        GIT_AUTHOR_NAME='MXM native writer exclusion probe',GIT_COMMITTER_NAME='MXM native writer exclusion probe',[0m
+2026-10-19T05:07:33.6537015Z [36;1m        GIT_AUTHOR_EMAIL='mxm@example.invalid',GIT_COMMITTER_EMAIL='mxm@example.invalid',[0m
+2026-10-19T05:07:33.6538208Z [36;1m        GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',[0m
+2026-10-19T05:07:33.6539554Z [36;1m        GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+token).encode()).decode())[0m
+2026-10-19T05:07:33.6541319Z [36;1m    def git(*args,data=None,check=True):[0m
+2026-10-19T05:07:33.6542548Z [36;1m        r=subprocess.run(['git',*args],cwd=folder,env=env,input=data,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=60)[0m
+2026-10-19T05:07:33.6543985Z [36;1m        need(not check or r.returncode==0,'EXCLUSION_GIT_TRANSPORT_STOP');return r[0m
+2026-10-19T05:07:33.6545075Z [36;1m    git('init','-q');remote='https://github.com/'+REPO+'.git'[0m
+2026-10-19T05:07:33.6545977Z [36;1m    git('fetch','--quiet','--no-tags','--depth=1',remote,expected)[0m
+2026-10-19T05:07:33.6547045Z [36;1m    tree=git('rev-parse',expected+'^{tree}').stdout.decode().strip()[0m
+2026-10-19T05:07:33.6548439Z [36;1m    candidate=git('commit-tree',tree,'-p',expected,data=b'MXM native non-App writer denial probe; identical tree\n').stdout.decode().strip()[0m
+2026-10-19T05:07:33.6550083Z [36;1m    r=git('push','--porcelain','--force-with-lease='+REF+':'+expected,remote,candidate+':'+REF,check=False)[0m
+2026-10-19T05:07:33.6551852Z [36;1m    native_error=(r.stdout+r.stderr).decode(errors='replace')[0m
+2026-10-19T05:07:33.6553040Z [36;1m    need(r.returncode!=0 and 'GH013' in native_error,'EXCLUSION_NOT_A_CONFIRMED_RULESET_DENIAL')[0m
+2026-10-19T05:07:33.6554219Z [36;1mneed(head()==expected,'EXCLUSION_AUTHORITY_CHANGED_STOP')[0m
+2026-10-19T05:07:33.6555463Z [36;1mneed(get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']==owner_before,'EXCLUSION_OWNER_CHANGED')[0m
+2026-10-19T05:07:33.6557089Z [36;1mprint(json.dumps({'schema':'mxm.native-writer-exclusion.v1','state':'NON_APP_WRITER_REJECTED_BY_NATIVE_RULESET',[0m
+2026-10-19T05:07:33.6558535Z [36;1m    'run_id':int(os.environ['GITHUB_RUN_ID']),'native_error_code':'GH013','authority_head_unchanged':expected,[0m
+2026-10-19T05:07:33.6559901Z [36;1m    'candidate_identical_tree':True,'candidate_oid':candidate,'app_key_used':False,[0m
+2026-10-19T05:07:33.6561456Z [36;1m    'ordinary_workflow_contents_permission':'write','owner_root_unchanged':True,'checkpoint_changed':False,'orders':0}))[0m
+2026-10-19T05:07:33.6562549Z [36;1mPY[0m
+2026-10-19T05:07:33.7816848Z shell: /usr/bin/bash -e {0}
+2026-10-19T05:07:33.7818185Z env:
+2026-10-19T05:07:33.7822792Z   GH_TOKEN: ***
+2026-10-19T05:07:33.7823608Z   EXPECTED_HEAD: 07d1ddbe0b83753bbf189770af1911623fef8d6f
+2026-10-19T05:07:33.7824356Z ##[endgroup]
+2026-10-19T05:07:35.7128631Z {"schema": "mxm.native-writer-exclusion.v1", "state": "NON_APP_WRITER_REJECTED_BY_NATIVE_RULESET", "run_id": 39202905071, "native_error_code": "GH013", "authority_head_unchanged": "07d1ddbe0b83753bbf189770af1911623fef8d6f", "candidate_identical_tree": true, "candidate_oid": "46ff3fb672025a549d1f74c6f0bb932a2a3d755a", "app_key_used": false, "ordinary_workflow_contents_permission": "write", "owner_root_unchanged": true, "checkpoint_changed": false, "orders": 0}
+2026-10-19T05:07:35.7377289Z Cleaning up orphan processes

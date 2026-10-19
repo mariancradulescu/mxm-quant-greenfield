@@ -1,0 +1,49 @@
+﻿2026-10-19T04:45:58.6548027Z Current runner version: '2.337.0'
+2026-10-19T04:45:58.6574792Z ##[group]Runner Image Provisioner
+2026-10-19T04:45:58.6575656Z Hosted Compute Agent
+2026-10-19T04:45:58.6576317Z Version: 20261012.601
+2026-10-19T04:45:58.6576995Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-19T04:45:58.6577712Z Build Date: 2026-10-12T17:48:21Z
+2026-10-19T04:45:58.6578453Z Worker ID: {5ae74e99-09af-4701-ab41-17d62c76d802}
+2026-10-19T04:45:58.6579190Z Region: westcentralus
+2026-10-19T04:45:58.6579860Z Cloud: Azure
+2026-10-19T04:45:58.6580505Z ##[endgroup]
+2026-10-19T04:45:58.6582702Z ##[group]Operating System
+2026-10-19T04:45:58.6583489Z Ubuntu
+2026-10-19T04:45:58.6584009Z 24.04.5
+2026-10-19T04:45:58.6584553Z LTS
+2026-10-19T04:45:58.6585120Z ##[endgroup]
+2026-10-19T04:45:58.6585668Z ##[group]Runner Image
+2026-10-19T04:45:58.6586315Z Image: ubuntu-24.04
+2026-10-19T04:45:58.6586888Z Version: 20261012.334.1
+2026-10-19T04:45:58.6588220Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-19T04:45:58.6589762Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-19T04:45:58.6590784Z ##[endgroup]
+2026-10-19T04:45:58.6592206Z ##[group]GITHUB_TOKEN Permissions
+2026-10-19T04:45:58.6594458Z Actions: write
+2026-10-19T04:45:58.6595102Z Metadata: read
+2026-10-19T04:45:58.6595677Z ##[endgroup]
+2026-10-19T04:45:58.6597865Z Secret source: Actions
+2026-10-19T04:45:58.6598759Z Cache mode: write
+2026-10-19T04:45:58.6599809Z Prepare workflow directory
+2026-10-19T04:45:58.6944974Z Prepare all required actions
+2026-10-19T04:45:58.7047362Z Complete job name: automatic-handoff
+2026-10-19T04:45:58.7850625Z ##[group]Run python3 - <<'PY'
+2026-10-19T04:45:58.7851478Z [36;1mpython3 - <<'PY'[0m
+2026-10-19T04:45:58.7852572Z [36;1mimport json,os,time,urllib.request[0m
+2026-10-19T04:45:58.7853736Z [36;1mdelay=max(0,int(os.environ['NEXT_AFTER'])-int(time.time()))[0m
+2026-10-19T04:45:58.7854723Z [36;1mif delay>61:raise SystemExit('BC_HANDOFF_DEADLINE')[0m
+2026-10-19T04:45:58.7855572Z [36;1mif delay:time.sleep(delay)[0m
+2026-10-19T04:45:58.7856792Z [36;1murl='https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-delegated-bc.yml/dispatches'[0m
+2026-10-19T04:45:58.7858202Z [36;1mbody={'ref':'mxm-o04-successor-code-bc-v2','inputs':{'command':'continue'}}[0m
+2026-10-19T04:45:58.7860145Z [36;1mreq=urllib.request.Request(url,data=json.dumps(body).encode(),method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})[0m
+2026-10-19T04:45:58.7862195Z [36;1mwith urllib.request.urlopen(req,timeout=30) as r:[0m
+2026-10-19T04:45:58.7863179Z [36;1m    if r.status!=204:raise SystemExit('BC_HANDOFF_NOT_ACKNOWLEDGED')[0m
+2026-10-19T04:45:58.7864036Z [36;1mPY[0m
+2026-10-19T04:45:58.8545753Z shell: /usr/bin/bash -e {0}
+2026-10-19T04:45:58.8547464Z env:
+2026-10-19T04:45:58.8552574Z   GH_TOKEN: ***
+2026-10-19T04:45:58.8553362Z   NEXT_AFTER: 1792385201
+2026-10-19T04:45:58.8554056Z ##[endgroup]
+2026-10-19T04:46:43.2524127Z ##[error]The operation was canceled.
+2026-10-19T04:46:43.2633165Z Cleaning up orphan processes
