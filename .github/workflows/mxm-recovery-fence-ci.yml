@@ -1,0 +1,14 @@
+name: MXM native issuer failure fence controls
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: ['research_core_v4/delegated_recovery_fence_20261019/**', '.github/workflows/mxm-delegated-bc-recovery.yml', '.github/workflows/mxm-recovery-fence-ci.yml']
+permissions: {contents: read}
+jobs:
+  native-issuer-admission-controls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: python3 -m unittest research_core_v4.delegated_recovery_fence_20261019.test_guard -v

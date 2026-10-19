@@ -1,0 +1,75 @@
+name: MXM delegated campaign ordinary recovery
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_run:
+    workflows: [MXM delegated campaign sealed runtime]
+    types: [completed]
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: mxm-delegated-bc-recovery-dispatcher
+  cancel-in-progress: false
+jobs:
+  ordinary-recovery:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {contents: read, actions: write}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ca99a5ad609a301fef8bd3efe0e902fe3fbe905b
+          persist-credentials: false
+      - name: Recover missed ordinary handoff from protected Git; never bootstrap
+        run: |
+          python3 - <<'PY'
+          import base64,json,os,time
+          from research_core_v4.delegated_campaign_20261019 import watch
+          # BEGIN_NATIVE_ISSUER_GUARD
+          def admit(state,run,jobs,source,branch,workflow):
+              if not state['done']:return 'NO_FIRST_ISSUER_RECEIPT_STOP'
+              prior=state['done'][-1]['run_id']
+              if (run.get('id')!=prior or run.get('head_sha')!=source or run.get('head_branch')!=branch or
+                  run.get('path')!=workflow or run.get('run_attempt')!=1):return 'PREVIOUS_WORKLOAD_IDENTITY_STOP'
+              issuers=[j for j in jobs if j.get('name')=='delegated-issuer']
+              if len(issuers)!=1 or issuers[0].get('run_id')!=prior:return 'PREVIOUS_ISSUER_IDENTITY_STOP'
+              job=issuers[0]
+              if job.get('status')!='completed':return 'PREVIOUS_ISSUER_NOT_TERMINAL_WAIT'
+              if job.get('conclusion')!='success':return 'PREVIOUS_ISSUER_FAILED_STOP'
+              return 'ADMITTED'
+          # END_NATIVE_ISSUER_GUARD
+          source=os.environ['BC_EXPECTED_SOURCE_SHA'];token=os.environ['GH_TOKEN']
+          request=watch.http
+          _,entry=request(watch.PREFIX+'contents/state.json?ref=mxm-o04-active-v1',token)
+          from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
+          watch.need(entry['encoding']=='base64' and entry['size']<=1048576,'BC_RECOVERY_STATE_SIZE')
+          state=strict_json(base64.b64decode(entry['content']))
+          action=watch.scheduling(state,source,int(time.time()))
+          if action in ('REVOKED','PENDING_STOP_NO_REEXECUTION'):
+              print(json.dumps({'state':action,'bootstrap_dispatches':0}));raise SystemExit(0)
+          if not state['done']:
+              print(json.dumps({'state':'NO_FIRST_ISSUER_RECEIPT_STOP','bootstrap_dispatches':0}));raise SystemExit(0)
+          prior=state['done'][-1]['run_id']
+          _,run=request(watch.PREFIX+'actions/runs/'+str(prior),token)
+          _,jobs=request(watch.PREFIX+'actions/runs/'+str(prior)+'/jobs?per_page=100',token)
+          verdict=admit(state,run,jobs['jobs'],source,watch.SOURCE,watch.WORKFLOW)
+          if verdict!='ADMITTED':
+              print(json.dumps({'state':verdict,'bootstrap_dispatches':0}));raise SystemExit(0)
+          def fenced_request(path,auth,method='GET',body=None):
+              if method=='POST':
+                  _,again=request(watch.PREFIX+'contents/state.json?ref=mxm-o04-active-v1',token)
+                  if again['sha']!=entry['sha']:raise SystemExit('RECOVERY_STATE_CHANGED_NO_DISPATCH')
+              result=request(path,auth,method,body)
+              if 'contents/state.json?' in path and result[1]['sha']!=entry['sha']:
+                  raise SystemExit('RECOVERY_STATE_CHANGED_NO_DISPATCH')
+              return result
+          watch.http=fenced_request
+          print(json.dumps({'state':'PREVIOUS_ISSUER_NATIVE_SUCCESS_VERIFIED','run_id':prior}))
+          if action!='CONTINUE':
+              print(json.dumps({'state':action,'bootstrap_dispatches':0}));raise SystemExit(0)
+          watch.main()
+          PY
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BC_EXPECTED_SOURCE_SHA: ca99a5ad609a301fef8bd3efe0e902fe3fbe905b
