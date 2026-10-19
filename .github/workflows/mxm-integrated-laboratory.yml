@@ -1,0 +1,84 @@
+name: MXM integrated reusable laboratory
+run-name: MXM LAB ${{ inputs.parent_oid || github.sha }}
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [research_programs/admissions/EXECUTE_LABORATORY.json]
+  workflow_dispatch:
+    inputs:
+      parent_oid: {description: Exact durable evidence parent, type: string, required: true}
+      admission_ref: {description: Immutable prospective programme admission commit, type: string, required: true}
+      admission_path: {description: Approved admission manifest path, type: string, required: true}
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  investigation:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 8f2197f047b12544e1736e31f4f93e642173ccd5, persist-credentials: false}
+      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Verify newly integrated functions and negative controls
+        if: github.event_name == 'push'
+        run: python3 -m unittest research_core_v4.laboratory.test_integration -v
+      - name: Execute a bounded segment selected from admitted programme state
+        run: python3 -m research_core_v4.laboratory.runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAB_SOURCE_SHA: 8f2197f047b12544e1736e31f4f93e642173ccd5
+          LAB_PARENT_OID: ${{ inputs.parent_oid }}
+          LAB_ADMISSION_REF: ${{ inputs.admission_ref }}
+          LAB_ADMISSION_PATH: ${{ inputs.admission_path }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-integrated-laboratory-${{ github.run_id }}
+          path: verification/integrated-laboratory/
+          if-no-files-found: error
+  durable-archive:
+    needs: investigation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions: {contents: write, actions: read}
+    outputs:
+      next: ${{ steps.archive.outputs.next }}
+      evidence_oid: ${{ steps.archive.outputs.evidence_oid }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 8f2197f047b12544e1736e31f4f93e642173ccd5, persist-credentials: false}
+      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: mxm-integrated-laboratory-${{ github.run_id }}
+          path: verification/laboratory-input/
+      - id: archive
+        name: Atomic encrypted evidence publication without OWNER or App key
+        run: python3 -m research_core_v4.laboratory.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAB_SOURCE_SHA: 8f2197f047b12544e1736e31f4f93e642173ccd5
+  scientific-handoff:
+    needs: durable-archive
+    if: needs.durable-archive.outputs.next != 'STOP'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {contents: read, actions: write}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: 8f2197f047b12544e1736e31f4f93e642173ccd5, persist-credentials: false}
+      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Continue an admissible programme from the exact encrypted checkpoint
+        run: python3 -m research_core_v4.laboratory.handoff
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAB_SOURCE_SHA: 8f2197f047b12544e1736e31f4f93e642173ccd5
+          LAB_PARENT_OID: ${{ needs.durable-archive.outputs.evidence_oid }}
