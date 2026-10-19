@@ -8,6 +8,7 @@ from copy import deepcopy
 import re
 from .common import *
 from .budgets import TrialBook
+from .admission import TypedTrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
@@ -16,16 +17,23 @@ AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
 
 def validate_manifest(m,history,global_book):
-    need(m['schema']=='mxm.laboratory-program.v1' and ID.fullmatch(m['id']) and type(m['version']) is int and m['version']>0,'PROGRAM_ID')
+    typed=m['schema']=='mxm.laboratory-program.v2'
+    need(m['schema'] in ('mxm.laboratory-program.v1','mxm.laboratory-program.v2') and ID.fullmatch(m['id']) and type(m['version']) is int and m['version']>0,'PROGRAM_ID')
     need(m['authority']==AUTHORITY and m['partition']=='DEVELOPMENT' and m['orders']==0,'PROGRAM_SCOPE')
     need(m['mode'] in ('SYNTHETIC_RECEPTION','DEVELOPMENT_RESEARCH'),'PROGRAM_MODE')
     need(m['budget']['steps']>0 and m['budget']['steps']>=len(m['tasks']) and m['budget']['broker_requests']>=0,'PROGRAM_BUDGET')
-    need(history['reconciled'] and m['budget']['new_V2_identities']<=history['V2']['remaining'],'HISTORICAL_BUDGET')
+    need(history['reconciled'],'HISTORICAL_BUDGET')
+    if typed:
+        need(m['mode']=='DEVELOPMENT_RESEARCH' and isinstance(global_book,TypedTrialBook),'TYPED_RESEARCH_BOOK_REQUIRED');global_book.validate_programme(m)
+    else:
+        need(m['mode']=='SYNTHETIC_RECEPTION','LEGACY_NEW_ECONOMIC_ADMISSION_CLOSED')
+        need(m['budget']['new_V2_identities']<=history['V2']['remaining'],'HISTORICAL_BUDGET')
     need(type(m['prospective_at_ms']) is int and m['provenance'] and len(m['source_sha256'])==64,'PROGRAM_PROVENANCE')
     tasks=m['tasks'];need(bool(tasks) and len(tasks)==len(set(tasks)),'TASKS')
     charged=[]
     for ident,t in tasks.items():
         need(ID.fullmatch(ident) and t['operator'] in OPS,'OPERATOR')
+        if typed:need(t['operator'] not in ('screen','replay','robustness','catalogue'),'TYPED_OPERATOR_REQUIRES_EXACT_OUTCOME_HOOK')
         need(type(t['priority']) is int and type(t['trial_units']) is int and t['trial_units']>=0,'TASK_BUDGET')
         need(set(t['dependencies'])<=set(tasks) and ident not in t['dependencies'],'DEPENDENCY')
         need(set(t.get('when',{}))<=set(t['dependencies']),'CONDITIONAL_DEPENDENCY')
@@ -39,8 +47,8 @@ def validate_manifest(m,history,global_book):
                 need(t['trial_units']==0 and candidate['provenance'].get('synthetic_reception') is True,'SYNTHETIC_LANE')
             else:
                 need(candidate['provenance'].get('synthetic_reception') is not True,'SYNTHETIC_RESEARCH_MIX')
-                need(t['trial_units']==1 and candidate['id'] not in history['V2']['charged'] and candidate['id'] not in history['V2'].get('existing_candidate_ids',[]),'IDENTITY_ALREADY_OPENED')
-                need('V2:'+candidate['id'] not in global_book.identities,'IDENTITY_ALREADY_RESERVED')
+                need(t['trial_units']==1 and candidate['id'] not in history['V2']['charged'],'IDENTITY_ALREADY_OPENED')
+                need(not any(k.endswith(':'+candidate['id']) for k in global_book.identities),'IDENTITY_ALREADY_RESERVED')
             charged.append(candidate['id'])
         if m['mode']=='DEVELOPMENT_RESEARCH':
             need(t['operator'] not in ('screen','catalogue','replay'),'REAL_DATA_REQUIRES_NATIVE_ADAPTER')
@@ -48,7 +56,8 @@ def validate_manifest(m,history,global_book):
                 need(t['input'].get('corpus')=={'bound_authentic_corpus':True},'AUTHENTIC_CORPUS_BINDING')
                 ref=t['input'].get('candidate',{}).get('result_of');need(ref in tasks and tasks[ref]['operator']=='freeze','ECONOMICS_REQUIRES_PROSPECTIVE_REGISTRY')
         if t['operator']=='acquire':need(m['mode']=='DEVELOPMENT_RESEARCH','SYNTHETIC_NETWORK_FORBIDDEN')
-    need(len(charged)==len(set(charged)) and sum(t['trial_units'] for t in tasks.values())<=m['budget']['new_V2_identities'],'PROGRAM_TRIAL_TOTAL')
+    cap=m['budget']['new_identities'] if typed else m['budget']['new_V2_identities']
+    need(len(charged)==len(set(charged)) and sum(t['trial_units'] for t in tasks.values())<=cap,'PROGRAM_TRIAL_TOTAL')
     visiting=set();done=set()
     def visit(k):
         need(k not in visiting,'CYCLIC_PROGRAMME')
@@ -123,7 +132,10 @@ class Laboratory:
         # A process lost after this intent is unsafe to resume blindly. Worker
         # invocation identity and evidence-parent CAS provide durable exclusion.
         try:
-            x=self.resolve(t['input']);op=t['operator']
+            x=self.resolve(t['input']);op=t['operator'];typed=isinstance(self.book,TypedTrialBook);exposed=[False]
+            lane=self.m.get('economic_lane','RECEPTION' if self.m['mode']=='SYNTHETIC_RECEPTION' else 'V2')
+            def open_economic():
+                self.book.open_outcome(lane,x['candidate']['id'],x['candidate']['spec_hash']);exposed[0]=True
             if op=='catalogue':
                 asset=self.cache.ingest(x['manifest'],x['rows']);a=self.cache.assets[asset]
                 value={'asset_id':asset,'quality':a};verdict='DATA_VALID' if not a['invalid'] and not a['conflicts'] and a['row_count'] and a['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
@@ -139,15 +151,16 @@ class Laboratory:
                 value=causal_intents(x['candidate'],self.cache,x['assets']);verdict='CAUSAL_INTENTS_DEFINED' if not value['missing'] else 'DATA_INSUFFICIENT'
             elif op=='native_screen':
                 from .science import native_quote_screen
-                value=native_quote_screen(x['candidate'],x['generated'],x['corpus'],x['terms_authority']);verdict=value['classification']
-                lane='RECEPTION' if self.m['mode']=='SYNTHETIC_RECEPTION' else 'V2';self.book.finish(lane,x['candidate']['id'],x['candidate']['spec_hash'])
+                value=native_quote_screen(x['candidate'],x['generated'],x['corpus'],x['terms_authority'],on_economic_open=open_economic if typed else None);verdict=value['classification']
+                if not typed:self.book.finish(lane,x['candidate']['id'],x['candidate']['spec_hash'])
             elif op=='native_replay':
                 from .science import native_replay
-                value=native_replay(x['candidate'],x['generated'],x['corpus'],x['authority'],x['spec']);verdict=value['classification']
+                value=native_replay(x['candidate'],x['generated'],x['corpus'],x['authority'],x['spec'],on_economic_open=open_economic if typed else None);verdict=value['classification']
             elif op=='freeze':
                 value=DiscoveryEngine().freeze_candidate(x['candidate'],persist=False)
-                lane='RECEPTION' if self.m['mode']=='SYNTHETIC_RECEPTION' else 'V2'
-                self.book.reserve(lane,value['id'],value['spec_hash'],t['trial_units']);verdict='PROSPECTIVELY_ADMITTED'
+                if typed:self.book.reserve(lane,value['id'],value['spec_hash'],t['trial_units'],candidate=value,programme=self.m['id'])
+                else:self.book.reserve(lane,value['id'],value['spec_hash'],t['trial_units'])
+                verdict='PROSPECTIVELY_ADMITTED'
             elif op=='screen':
                 need(self.m['mode']=='SYNTHETIC_RECEPTION' or all(r['execution_basis']!='SYNTHETIC_RECEPTION' for r in x['evidence'].get('trades',[])),'SYNTHETIC_RESEARCH_MIX')
                 value=screen(x['candidate'],x['evidence']);verdict=value['status']
@@ -159,6 +172,7 @@ class Laboratory:
                 value=x['result'];verdict=value.get('status',value.get('classification'))
                 need(isinstance(verdict,str) and bool(verdict),'RESULT_CLASSIFICATION')
             else:value={'inputs':x,'economic_qualification':False};verdict='PROGRAMME_REPORT_SAVED'
+            if typed and exposed[0]:self.book.observe(lane,x['candidate']['id'],x['candidate']['spec_hash'],self.m['id']+':'+ident,digest(value))
             result={'operator':op,'classification':verdict,'input_sha256':digest(x),'value':value}
             s['results'][ident]=result;s['steps_used']+=1;s['sequence']+=1
             entry={'sequence':s['sequence'],'previous':s['journal'][-1]['sha256'] if s['journal'] else None,'task':ident,'definition_sha256':digest(t),'result_sha256':digest(result)}
@@ -172,5 +186,6 @@ class Laboratory:
     @classmethod
     def restore(cls,value,history,collector=None):
         need(value['schema']=='mxm.integrated-laboratory-checkpoint.v1','CHECKPOINT_SCHEMA')
-        obj=cls(value['programme'],history,TrialBook.restore(value['trial_book']),DataCatalogue.restore(value['catalogue']),collector,state=value['progress'])
+        book=TypedTrialBook.restore(value['trial_book']) if value['trial_book'].get('schema')==TypedTrialBook.SCHEMA else TrialBook.restore(value['trial_book'])
+        obj=cls(value['programme'],history,book,DataCatalogue.restore(value['catalogue']),collector,state=value['progress'])
         obj.acquisition.budget=value['acquisition_budget'];obj.acquisition.remaining=value['acquisition_remaining'];obj.acquisition.receipts=value['native_receipts'];return obj

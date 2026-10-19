@@ -4,6 +4,7 @@ from pathlib import Path
 from .common import *
 from .programs import Laboratory,validate_manifest,AUTHORITY
 from .budgets import historical_accounting,TrialBook
+from .admission import TypedTrialBook
 from .data import DataCatalogue,Acquisition,native_collector,LazyNativeCollector
 from research_core_v4.autonomous_laboratory_20261019_v6.runtime import file_at,corpus,registry as preserved_registry
 from research_core_v4.successor_c_20261018 import readback as old
@@ -19,7 +20,7 @@ WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
 
 def module_digest():
-    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py')})
+    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py')})
 
 def anchors(route):
     old.owner_unchanged(route)
@@ -136,7 +137,7 @@ def main():
             actual=authentic_proof['progress']['results'];asset=authentic_proof['catalogue']['assets'][actual['native_data']['value']['asset_id']]
             need(asset['row_count']>0 and asset['invalid']==asset['conflicts']==0,'AUTHENTIC_CONTROLLER_NONEMPTY_QUALITY')
             need(actual['native_data']['classification']=='DATA_VALID' and actual['causal_no_op']['classification']=='CAUSAL_INTENTS_DEFINED' and actual['causal_no_op']['value']['intents']==[],'AUTHENTIC_CONTROLLER_PROOF')
-        book=TrialBook.restore(private['trial_book']);executed=[];cache=None
+        book=(TypedTrialBook.restore(private['trial_book']) if private['trial_book'].get('schema')==TypedTrialBook.SCHEMA else TrialBook.restore(private['trial_book']));executed=[];cache=None
         for _ in range(a['steps_per_segment']):
             m=select_programme(a,private)
             if m is None:break

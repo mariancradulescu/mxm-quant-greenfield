@@ -54,7 +54,7 @@ def causal_intents(spec,cache,assets):
         if direction:intents.append({'decision_ms':decision,'feature_available_ms':latest,'entry_ms':decision+rules['entry_delay_ms'],'exit_ms':decision+rules['entry_delay_ms']+rules['hold_ms'],'direction':direction,'symbol_id':rules['trade_symbol_id']})
     return {'intents':intents,'missing':missing,'feature_asset_sha256':digest({k:cache.assets[v] for k,v in assets.items()}),'expression_sha256':digest(rules)}
 
-def native_quote_screen(spec,generated,corpus,terms_authority):
+def native_quote_screen(spec,generated,corpus,terms_authority,on_economic_open=None):
     """Direct reuse of native accounts FX/commission/quote semantics.
 
     Without prospectively certified historical costs or conservative bounds,
@@ -80,6 +80,7 @@ def native_quote_screen(spec,generated,corpus,terms_authority):
             missing.append({'intent_sha256':digest(intent),'reason':'ORIGINAL_ENTRY_OR_EXIT_QUOTE_MISSING'});continue
         a=native.account(intent['direction'],r,f,entry,exit,(exit-entry)/3600,quotes,graph,0,0)
         if a is None:missing.append({'intent_sha256':digest(intent),'reason':'CAUSAL_FX_OR_NATIVE_COMMISSION_UNRESOLVED'});continue
+        if on_economic_open is not None:on_economic_open()
         # Native gross already includes the executable bid/ask spread.
         costs={'spread':0.,'commission':None,'slippage':None,'funding':None,'fx_conversion':None}
         if known:
@@ -93,7 +94,7 @@ def native_quote_screen(spec,generated,corpus,terms_authority):
       'cost_state':terms_authority['state'],'trades':records})
     return {'classification':result['status'],'result':result,'cashflows':records,'missing':missing,'native_current_terms_reference_is_verified_history':False,'authentic_quotes_are_fills':False}
 
-def native_replay(candidate,generated,corpus,authority,spec):
+def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=None):
     """Native bilateral quote path -> existing continuous account, no fake fills.
 
     All original entries/exits/marks must exist. Dated margin, volume and every
@@ -133,6 +134,7 @@ def native_replay(candidate,generated,corpus,authority,spec):
         for t in clocks:
             kind='ENTRY' if t==intent['entry_ms'] else 'EXIT' if t==intent['exit_ms'] else 'MARK'
             price=entry if kind=='ENTRY' else points[t]['bid' if direction>0 else 'ask']
+            if on_economic_open is not None:on_economic_open()
             pnl=direction*units*(price-entry);amount=pnl if pnl else -1.
             eur=native.convert(amount,identity['quote'],'EUR',t//1000,quotes,graph)
             if eur is None:missing.append('CAUSAL_SIGNED_FX');break
