@@ -133,7 +133,9 @@ def main():
             if 'trust' not in asset and asset['source'].startswith(('PEPPERSTONE_','PRESERVED_AUTHENTIC_')):asset['trust']='AUTHENTICATED_NATIVE_CUSTODY'
         authentic_proof=private['programmes'].get('FUNCTIONAL_AUTHENTIC_DATA_CONTROL')
         if authentic_proof:
-            actual=authentic_proof['progress']['results'];need(actual['native_data']['classification']=='DATA_VALID' and actual['causal_no_op']['classification']=='CAUSAL_INTENTS_DEFINED' and actual['causal_no_op']['value']['intents']==[],'AUTHENTIC_CONTROLLER_PROOF')
+            actual=authentic_proof['progress']['results'];asset=authentic_proof['catalogue']['assets'][actual['native_data']['value']['asset_id']]
+            need(asset['row_count']>0 and asset['invalid']==asset['conflicts']==0,'AUTHENTIC_CONTROLLER_NONEMPTY_QUALITY')
+            need(actual['native_data']['classification']=='DATA_VALID' and actual['causal_no_op']['classification']=='CAUSAL_INTENTS_DEFINED' and actual['causal_no_op']['value']['intents']==[],'AUTHENTIC_CONTROLLER_PROOF')
         book=TrialBook.restore(private['trial_book']);executed=[];cache=None
         for _ in range(a['steps_per_segment']):
             m=select_programme(a,private)
