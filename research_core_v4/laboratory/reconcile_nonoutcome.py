@@ -17,7 +17,7 @@ from research_core_v4.successor_c_20261018 import readback as old
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/nonoutcome-reconciliation'
 EVIDENCE='a54420b203cf0d662db472efa6660b9db7e7bbb1'
-SOURCE_BRANCH='mxm-o04-successor-code-nonoutcome-reconciliation-r2'
+SOURCE_BRANCH='mxm-o04-successor-code-nonoutcome-reconciliation-r3'
 ACTIVE='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 PROGRAMME='VOLUME_SURPRISE_CLOSE_LOCATION_PRESSURE_20261019_A'
 PREFIX='diagnostics/reconciliation-20261019-r1'
@@ -247,7 +247,7 @@ def worker():
     anchors(route);need(route.json('git/ref/heads/mxm-o04-integrated-laboratory-evidence')['object']['sha']==EVIDENCE,'PARENT_MOVED')
     receipt={'schema':'mxm.nonoutcome-reconciliation-public.v1','source_sha':os.environ['RECON_SOURCE_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),
       'trigger_sha':os.environ['GITHUB_SHA'],'input_evidence_oid':EVIDENCE,'input_sequence':16,'input_ciphertext_sha256':state['ciphertext_sha256'],
-      'diagnostic_ciphertext_sha256':bytes_digest(target.read_bytes()),'budget_reconciliation':budget,'C033_diagnostic':c033,'data_frontier':frontier,
+      'diagnostic_ciphertext_sha256':bytes_digest(target.read_bytes()),'budget_reconciliation':budget,'historical_lifecycle':lifecycle,'C033_diagnostic':c033,'data_frontier':frontier,
       'new_outcomes':0,'new_identity_reservations':0,'broker_requests':0,'orders':0,'original_state_mutated':False,
       'original_program_state_sha256':bytes_digest(file_at(route,'program-state.json',EVIDENCE)),
       'app_key_used':False,'active_authority_write':False,'safe_stop':True,'cbot_qualified':False}
