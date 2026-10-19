@@ -1,3 +1,7 @@
+# B–E V6 — continuare științifică LIVE — 2026-10-19
+
+Mandatul OWNER integral: docs/mandates/MXM_MANDAT_UNIC_FINALIZARE_LABORATOR_B_E_20261019.md (sha256 bdffc1ad3fbf93038d56b5a34a47b21ce7e73e429045cb9a834d0b799668fc6a). Starea canonică: docs/laboratory-completion/B_E_CURRENT_STATE.json; raport și matrice: docs/laboratory-completion/20261019/v6/. Două workflow-uri distincte SUCCESS:39224856616 carry DATA_INSUFFICIENT -> handoff automat ->39225006070 capital COST_UNRESOLVED; checkpoint rece și rezultate criptate arhivate automat în Git la mxm-o04-scientific-evidence-v6, HEAD4f50eb5fb002c6a26fc85ec9d8caa5015d3053ef. Programul finit este terminal, pendingnull, next_tasknull, safe_stoptrue. Zero noi încercări direcționale, broker requests, ordine, replay V4/V5 sau restart. OWNER1807 și active07d1ddbe… rămân neschimbate. Mandatul B–E rămâne deschis; recepție PARTIAL_REGISTERED_SCIENTIFIC_CONTINUATION_VERIFIED, cBot NO_QUALIFIED_CANDIDATE. Nu se reia regula V5 respinsă. Operațiuni OWNER necesare: NONE.
+
 # 19 octombrie 2026 — program funcțional finit V5 executat; B–E integral rămâne deschis
 
 Mandatul OWNER de finalizare a laboratorului existent este persistent. Universul larg Pepperstone este deschis în domeniile autorizate;1576/145 sunt repere istorice, nu plafon. Nu se reconstruiește laboratorul, nu se reia campania1807 sau coadaC V3, nu se cer alegeri/reviewuri tehnice OWNER.200EUR o singură dată, cont continuu, HARD21 final; fără tranzacții reale, furnizori ori cheltuieli noi.
