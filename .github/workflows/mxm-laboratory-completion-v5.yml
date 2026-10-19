@@ -2,7 +2,7 @@ name: MXM laboratory completion V5 finite program
 on:
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
-    paths: [research_core_v4/laboratory_completion_20261019_v1/EXECUTE_ONCE.json]
+    paths: [research_core_v4/laboratory_completion_20261019_v2/EXECUTE_ONCE.json]
 permissions: {contents: read}
 concurrency:
   group: mxm-laboratory-completion-v5-once
@@ -17,22 +17,20 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: 0d53b956c80b8cce509adc788e6af1125bb94407
+          ref: 9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9
           persist-credentials: false
       - name: Existing locked dependencies
         run: >-
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: New scientific and checkpoint controls only
-        run: python3 -m unittest research_core_v4.laboratory_completion_20261019_v1.test_analysis -v
+        run: python3 -m unittest research_core_v4.laboratory_completion_20261019_v2.test_runtime_v2 -v
       - id: execute
         name: recovery from exact authenticated checkpoint
-        run: python3 -m research_core_v4.laboratory_completion_20261019_v1.runtime recovery
+        run: python3 -m research_core_v4.laboratory_completion_20261019_v2.runtime recovery
         env:
           GH_TOKEN: ${{ github.token }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          LAB_SOURCE_SHA: 0d53b956c80b8cce509adc788e6af1125bb94407
-          LAB_SEAL_ID: NATIVE_SEAL_NOT_YET_APPROVED
-          LAB_SEAL_REVISION: NATIVE_SEAL_NOT_YET_APPROVED
+          LAB_SOURCE_SHA: 9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -51,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: 0d53b956c80b8cce509adc788e6af1125bb94407
+          ref: 9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9
           persist-credentials: false
       - name: Existing locked dependencies
         run: >-
@@ -62,13 +60,11 @@ jobs:
           path: verification/laboratory-input/
       - id: execute
         name: frontier from exact authenticated checkpoint
-        run: python3 -m research_core_v4.laboratory_completion_20261019_v1.runtime frontier
+        run: python3 -m research_core_v4.laboratory_completion_20261019_v2.runtime frontier
         env:
           GH_TOKEN: ${{ github.token }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          LAB_SOURCE_SHA: 0d53b956c80b8cce509adc788e6af1125bb94407
-          LAB_SEAL_ID: NATIVE_SEAL_NOT_YET_APPROVED
-          LAB_SEAL_REVISION: NATIVE_SEAL_NOT_YET_APPROVED
+          LAB_SOURCE_SHA: 9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
           LAB_PARENT_SHA256: ${{ needs.recovery.outputs.ciphertext_sha256 }}
@@ -88,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: 0d53b956c80b8cce509adc788e6af1125bb94407
+          ref: 9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9
           persist-credentials: false
       - name: Existing locked dependencies
         run: >-
@@ -99,13 +95,11 @@ jobs:
           path: verification/laboratory-input/
       - id: execute
         name: admission from exact authenticated checkpoint
-        run: python3 -m research_core_v4.laboratory_completion_20261019_v1.runtime admission
+        run: python3 -m research_core_v4.laboratory_completion_20261019_v2.runtime admission
         env:
           GH_TOKEN: ${{ github.token }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          LAB_SOURCE_SHA: 0d53b956c80b8cce509adc788e6af1125bb94407
-          LAB_SEAL_ID: NATIVE_SEAL_NOT_YET_APPROVED
-          LAB_SEAL_REVISION: NATIVE_SEAL_NOT_YET_APPROVED
+          LAB_SOURCE_SHA: 9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
           LAB_PARENT_SHA256: ${{ needs.frontier.outputs.ciphertext_sha256 }}
