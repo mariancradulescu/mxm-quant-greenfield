@@ -1,5 +1,5 @@
 name: MXM typed admission proof
-run-name: MXM TYPED ADMISSION PROOF 6997e20b44ac6f7426f95156db573439ae08c07c
+run-name: MXM TYPED ADMISSION PROOF 1be8c56f1c132e16a5be292bf69c5747933d77e7
 on:
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 6997e20b44ac6f7426f95156db573439ae08c07c, persist-credentials: false}
+        with: {ref: 1be8c56f1c132e16a5be292bf69c5747933d77e7, persist-credentials: false}
       - name: New accounting fixtures only; no strategy or accepted reception rerun
         run: python3 -m unittest research_core_v4.laboratory.test_admission -v
   readback:
@@ -25,13 +25,14 @@ jobs:
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 6997e20b44ac6f7426f95156db573439ae08c07c, persist-credentials: false}
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+        with: {ref: 1be8c56f1c132e16a5be292bf69c5747933d77e7, persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Compare typed baseline with exact preserved checkpoint16 without migrating or economic execution
         run: python3 -m research_core_v4.laboratory.admission_readback
         env:
           GH_TOKEN: ${{ github.token }}
-          PREGATE_SOURCE_SHA: 6997e20b44ac6f7426f95156db573439ae08c07c
+          PREGATE_SOURCE_SHA: 1be8c56f1c132e16a5be292bf69c5747933d77e7
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
