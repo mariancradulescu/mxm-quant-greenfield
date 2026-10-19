@@ -169,9 +169,9 @@ def publish():
     output(evidence_oid=oid,next='STOP' if r['safe_stop'] else 'CONTINUE');print(json.dumps({'state':'INTEGRATED_TYPED_CHECKPOINT_DURABLE','evidence_oid':oid,'sequence':r['sequence'],'safe_stop':r['safe_stop'],'accounting':r['accounting_after']}))
 
 def recover():
-    route=workload('recover-before-exposure',True);oid=current(route);s,_=state_at(route,oid)
+    route=workload('recover-before-exposure',True);definition(route);oid=current(route);s,_=state_at(route,oid)
     if not s['pending']:output(next='NONE');return
-    jobs=route.json('actions/runs/'+str(s['pending']['run_id'])+'/attempts/1/jobs?per_page=100')['jobs']
+    jobs=native_dependency_jobs() if s['pending']['run_id']==int(os.environ['GITHUB_RUN_ID']) else route.json('actions/runs/'+str(s['pending']['run_id'])+'/attempts/1/jobs?per_page=100')['jobs']
     if not can_recover_before_exposure(s,jobs):output(next='HELD');print(json.dumps({'state':'AMBIGUOUS_EXPOSURE_HELD_NO_RETRY'}));return
     intent=strict_json(file_at(route,'typed-successor/intents/'+str(s['pending']['run_id'])+'.json',oid));base=intent['base_state']
     need(base['pending'] is None and base['ciphertext_sha256']==s['ciphertext_sha256'] and base['sequence']==s['sequence'],'RECOVERY_PREDECESSOR_UNCHANGED')
@@ -183,7 +183,7 @@ def handoff():
     route=workload('scientific-handoff',True);oid=os.environ['LAB_PARENT_OID'];need(current(route)==oid,'HANDOFF_STALE_SUCCESSOR');s,_=state_at(route,oid);need(s['pending'] is None,'HANDOFF_PENDING')
     if s['safe_stop'] and s['sequence']>16:print(json.dumps({'state':'INTEGRATED_PROGRAMME_COMPLETE_NO_DISPATCH'}));return
     a,ref,path=definition(route);need(s['sequence']<=16+sum(m['budget']['steps'] for m in a['programmes']),'HANDOFF_FINITE_TOTAL')
-    jobs=route.json('actions/runs/'+os.environ['GITHUB_RUN_ID']+'/attempts/1/jobs?per_page=100')['jobs'];names={j['name']:j for j in jobs}
+    jobs=native_dependency_jobs();names={j['name']:j for j in jobs}
     if names.get('durable-archive',{}).get('conclusion')=='success':require_jobs(jobs,['preflight','segment-intent','execution-fence','investigation','durable-archive'])
     else:
         require_jobs(jobs,['preflight','recover-before-exposure']);need(names.get('investigation',{}).get('conclusion')=='skipped','HANDOFF_RECOVERY_NO_WORKER')
@@ -191,6 +191,12 @@ def handoff():
     # workflow_dispatch is a permitted GITHUB_TOKEN event; duplicate ACKs cannot
     # duplicate work because preflight and claim require the exact evidence parent.
     return dispatch_once(route,oid,s,ref,path)
+
+def native_dependency_jobs():
+    graph=strict_json(os.environ['NATIVE_CHAIN_RESULTS'].encode());required={'preflight','segment-intent','execution-fence','investigation','durable-archive'}
+    need(required<=set(graph),'NATIVE_DEPENDENCY_GRAPH_INCOMPLETE')
+    need(all(v['result'] in ('success','failure','cancelled','skipped') for v in graph.values()),'NATIVE_DEPENDENCY_RESULT')
+    return [{'name':k,'status':'completed','conclusion':v['result']} for k,v in graph.items()]
 
 def dispatch_once(route,oid,s,ref,path):
     record_path='typed-successor/dispatches/'+str(s['sequence'])+'-'+s['ciphertext_sha256']+'.json'
