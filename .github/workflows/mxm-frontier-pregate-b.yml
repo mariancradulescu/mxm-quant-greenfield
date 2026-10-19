@@ -1,5 +1,5 @@
 name: MXM frontier support pre-gate B
-run-name: MXM FRONTIER PREGATE B 7e3474365ea4d846ab17d4e4209d236d2134a1b4
+run-name: MXM FRONTIER PREGATE B FINAL CACHED 1340ab28cc645f3a05acd75838de1618b0d18067
 on:
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
@@ -15,23 +15,23 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 7e3474365ea4d846ab17d4e4209d236d2134a1b4, persist-credentials: false}
+        with: {ref: 1340ab28cc645f3a05acd75838de1618b0d18067, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Check only new nonoutcome feature support contracts
-        run: python3 -m unittest research_core_v4.laboratory.test_frontier_pregate -v
-      - name: Measure preserved M5 support without broker requests or economic outcomes
-        run: python3 -m research_core_v4.laboratory.frontier_pregate worker
+      - name: Check causal quote support and cache-window separation
+        run: python3 -m unittest research_core_v4.laboratory.test_frontier_cached_support -v
+      - name: Read existing cached quotes and terms without new downloads or outcomes
+        run: python3 -m research_core_v4.laboratory.frontier_cached_support worker
         env:
           GH_TOKEN: ${{ github.token }}
-          PREGATE_SOURCE_SHA: 7e3474365ea4d846ab17d4e4209d236d2134a1b4
+          PREGATE_SOURCE_SHA: 1340ab28cc645f3a05acd75838de1618b0d18067
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: mxm-frontier-pregate-B-${{ github.run_id }}
-          path: verification/frontier-pregate-B/
+          path: verification/frontier-cached-support/
           if-no-files-found: error
   durable-pregate:
     needs: pregate
@@ -40,7 +40,7 @@ jobs:
     permissions: {contents: write, actions: read}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 7e3474365ea4d846ab17d4e4209d236d2134a1b4, persist-credentials: false}
+        with: {ref: 1340ab28cc645f3a05acd75838de1618b0d18067, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -48,7 +48,7 @@ jobs:
           name: mxm-frontier-pregate-B-${{ github.run_id }}
           path: verification/pregate-input/
       - name: Append encrypted frontier support evidence without changing checkpoint16
-        run: python3 -m research_core_v4.laboratory.frontier_pregate publish
+        run: python3 -m research_core_v4.laboratory.frontier_cached_support publish
         env:
           GH_TOKEN: ${{ github.token }}
-          PREGATE_SOURCE_SHA: 7e3474365ea4d846ab17d4e4209d236d2134a1b4
+          PREGATE_SOURCE_SHA: 1340ab28cc645f3a05acd75838de1618b0d18067
