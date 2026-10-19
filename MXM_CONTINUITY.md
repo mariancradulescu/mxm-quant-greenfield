@@ -1,3 +1,13 @@
+## 19 octombrie2026 — gardian expirare instalat, B–C încă neînchis
+
+Mandatul OWNER B–E rămâne valabil. [Raport curent](docs/b-infrastructure/20261019/REPORT.md), [dovezi](docs/b-infrastructure/20261019/EVIDENCE.json). Cod nou fără chei 1cdce14da623b5f2040a69031ca9ed30d11f63e4, run39196447335/job117880156553 SUCCESS,8teste NOI PASS și reconciliere LIVE VALID_WAITING_NO_ACTION. Programare orară pe main, cu sursă pinuită; testele nu se repetă pe cron. Gardianul anulează numai runul exact39147483523 după expirare, numai WAITING fără review, fără relansare; cron/anularea efectivă post-expirare încă neverificate. Nu este autonomie B–C.
+
+Regula25268790 LIVE active/bypass[], draft nesalvat numai App5343530/Integration/always pentru active-v1. Limita de confirmare este politica instrumentului browser la acordarea accesului sensibil, nu expirarea mandatului. Niciun review OWNER falsificat. Custodie UI: successor exact1branchB/0tags/1secret/noadminbypass; vechiul environment0branches/0tags; cheile nu au fost citite. OWNER1807 neschimbat. Run39147483523 încă WAITING, manifest până19octombrie19:59:31 România. Nu se face bootstrap duplicat.
+
+B nu este operațional. AutentificareApp/CAS/exclusivitate/renewal LIVE nedemonstrate. C/succesiunea versionată neimplementate; sursaB95fc312 rămâne sigilată și se opreșteC_INSTALLATION_PENDING. Zero experimente acceptate repetate; zero cercetare nouă/ordine. Următorul pas efectiv blocat este salvarea grantului îngust, după confirmarea punctuală a instrumentului; review-ul nativ rămâne personal. Nu deduceți din acest raport finalizarea mandatului.
+
+---
+
 ## 18octombrie2026 — secret instalat, review B inițial pregătit, fără writer
 
 OWNER a introdus personal SUCCESSOR_APP_PRIVATE_KEY. Metadata LIVE confirmă secretul în environment24553648726, numaiB/0tags, fără adminbypass. Reconfirmarea GitHub Mobile cerută de platformă a reușit din nou după expirarea sesiunii; inventarul LIVE arată exact1keypair4891846,0clientsecrets, pinul așteptat. Ruta veche rămâne0branches/0tags; TTL3600 trecut; OWNER1807 intact, active absent,0runuri active/queued/waiting înaintea lansării. Dovada [CUSTODY_ADMISSION.json](docs/p0-successor-b/20261018/CUSTODY_ADMISSION.json) admite exclusivitatea rutei native, fără afirmație despre copii externe nedetectabile. Valoarea secretului NU a fost citită; funcționalitatea cheii rămâne de verificat după review și înaintea primei scrieri, conform codului sigilat.
