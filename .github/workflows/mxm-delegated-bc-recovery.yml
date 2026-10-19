@@ -1,4 +1,4 @@
-name: MXM delegated BC ordinary recovery
+name: MXM delegated campaign ordinary recovery
 on:
   schedule:
     - cron: '7,22,37,52 * * * *'
@@ -16,10 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: fe4f0047a6a55866d4f7dcfdcce0f973c21c2f00
+          ref: ca99a5ad609a301fef8bd3efe0e902fe3fbe905b
           persist-credentials: false
       - name: Recover missed ordinary handoff from protected Git; never bootstrap
-        run: python3 -m research_core_v4.delegated_bc_20261019.watch
+        run: python3 -m research_core_v4.delegated_campaign_20261019.watch
         env:
           GH_TOKEN: ${{ github.token }}
-          BC_EXPECTED_SOURCE_SHA: fe4f0047a6a55866d4f7dcfdcce0f973c21c2f00
+          BC_EXPECTED_SOURCE_SHA: ca99a5ad609a301fef8bd3efe0e902fe3fbe905b
