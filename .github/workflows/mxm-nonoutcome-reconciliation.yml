@@ -1,5 +1,5 @@
 name: MXM nonoutcome reconciliation
-run-name: MXM NONOUTCOME RECONCILIATION 4cb04e769aef9ed98e072df67463776f222aaf84
+run-name: MXM NONOUTCOME RECONCILIATION 525faecddd04f420451c4aec1ebb89b5f806a28f
 on:
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
@@ -15,15 +15,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 4cb04e769aef9ed98e072df67463776f222aaf84, persist-credentials: false}
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+        with: {ref: 525faecddd04f420451c4aec1ebb89b5f806a28f, persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Check only new accounting and diagnostic contracts
         run: python3 -m unittest research_core_v4.laboratory.test_reconcile_nonoutcome -v
       - name: Reconcile preserved data without broker requests or economic outcomes
         run: python3 -m research_core_v4.laboratory.reconcile_nonoutcome worker
         env:
           GH_TOKEN: ${{ github.token }}
-          RECON_SOURCE_SHA: 4cb04e769aef9ed98e072df67463776f222aaf84
+          RECON_SOURCE_SHA: 525faecddd04f420451c4aec1ebb89b5f806a28f
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
@@ -39,8 +40,9 @@ jobs:
     permissions: {contents: write, actions: read}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 4cb04e769aef9ed98e072df67463776f222aaf84, persist-credentials: false}
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+        with: {ref: 525faecddd04f420451c4aec1ebb89b5f806a28f, persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mxm-nonoutcome-reconciliation-${{ github.run_id }}
@@ -49,4 +51,4 @@ jobs:
         run: python3 -m research_core_v4.laboratory.reconcile_nonoutcome publish
         env:
           GH_TOKEN: ${{ github.token }}
-          RECON_SOURCE_SHA: 4cb04e769aef9ed98e072df67463776f222aaf84
+          RECON_SOURCE_SHA: 525faecddd04f420451c4aec1ebb89b5f806a28f
