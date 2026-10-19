@@ -21,7 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {ref: 8f2197f047b12544e1736e31f4f93e642173ccd5, persist-credentials: false}
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Verify newly integrated functions and negative controls
         if: github.event_name == 'push'
         run: python3 -m unittest research_core_v4.laboratory.test_integration -v
@@ -55,7 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {ref: 8f2197f047b12544e1736e31f4f93e642173ccd5, persist-credentials: false}
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mxm-integrated-laboratory-${{ github.run_id }}
@@ -75,7 +77,8 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {ref: 8f2197f047b12544e1736e31f4f93e642173ccd5, persist-credentials: false}
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Continue an admissible programme from the exact encrypted checkpoint
         run: python3 -m research_core_v4.laboratory.handoff
         env:
