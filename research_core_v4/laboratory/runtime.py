@@ -4,7 +4,7 @@ from pathlib import Path
 from .common import *
 from .programs import Laboratory,validate_manifest,AUTHORITY
 from .budgets import historical_accounting,TrialBook
-from .data import DataCatalogue,Acquisition,native_collector
+from .data import DataCatalogue,Acquisition,native_collector,LazyNativeCollector
 from research_core_v4.autonomous_laboratory_20261019_v6.runtime import file_at,corpus,registry as preserved_registry
 from research_core_v4.successor_c_20261018 import readback as old
 from research_core_v4.remediation_p0_p4_20261015 import owner
@@ -13,7 +13,7 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-laboratory'
+SOURCE_BRANCH='mxm-o04-successor-code-laboratory-r2'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
@@ -28,8 +28,9 @@ def anchors(route):
       route.json('git/ref/heads/'+SOURCE_BRANCH)['object']['sha'],route.json('rulesets/25222248'))
 
 def read_state(route,oid):return strict_json(file_at(route,'program-state.json',oid))
-def validate_state(s):
-    need(s['schema']=='mxm.general-laboratory-public-state.v1' and s['pending'] is None and s['authority']==AUTHORITY,'PUBLIC_STATE')
+def validate_state(s,claimed_run=None):
+    pending_ok=s['pending'] is None if claimed_run is None else isinstance(s['pending'],dict) and s['pending']['run_id']==claimed_run
+    need(s['schema']=='mxm.general-laboratory-public-state.v1' and pending_ok and s['authority']==AUTHORITY,'PUBLIC_STATE')
     need(type(s['sequence']) is int and s['sequence']>=0 and s['orders']==0,'PUBLIC_SEQUENCE')
 
 def admission(route,ref,path):
@@ -83,7 +84,7 @@ def authentic_integration(key,tmp):
 def main():
     need(os.environ['GITHUB_REPOSITORY']==old.REPO and os.environ['GITHUB_REF_NAME']==old.BRANCH and os.environ['GITHUB_RUN_ATTEMPT']=='1'
       and os.environ['GITHUB_JOB']=='investigation' and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WORKLOAD')
-    route=GetOnly();anchors(route);parent=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha'];s=read_state(route,parent);validate_state(s)
+    route=GetOnly();anchors(route);parent=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha'];s=read_state(route,parent);validate_state(s,int(os.environ['GITHUB_RUN_ID']))
     expected=os.environ.get('LAB_PARENT_OID');need(not expected or parent==expected,'STALE_SEGMENT')
     admission_ref=os.environ.get('LAB_ADMISSION_REF');path=os.environ.get('LAB_ADMISSION_PATH')
     if not admission_ref:
@@ -92,7 +93,7 @@ def main():
         admission_ref=trigger['admission_ref'];path=trigger['admission_path']
     a=admission(route,admission_ref,path);history=historical_accounting(ROOT)
     # Native invocation before any external request is the one-shot segment receipt.
-    title='MXM LAB '+(expected or os.environ['GITHUB_SHA'])
+    title='MXM LAB '+(os.environ.get('LAB_DISPATCH_PARENT') or os.environ['GITHUB_SHA'])
     runs=route.json('actions/runs?per_page=100')['workflow_runs'];matches=[r for r in runs if r['path']==WF and r['display_title']==title]
     need(len(matches)==1 and matches[0]['id']==int(os.environ['GITHUB_RUN_ID']),'DUPLICATE_EXECUTION')
     from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
@@ -103,7 +104,7 @@ def main():
         if s['sequence']:
             blob=base64.b64decode(file_at(route,s['ciphertext_path'],parent));need(bytes_digest(blob)==s['ciphertext_sha256'],'CHECKPOINT_CIPHER_CHANGED')
             private=strict_json(unpack(owner.bounded_decrypt(blob,key,tmp)),max_elements=8000000)
-            need(private['sequence']==s['sequence'] and private['pending'] is None and private['source_sha']==os.environ['LAB_SOURCE_SHA'],'COLD_SOURCE_BINDING')
+            need(private['sequence']==s['sequence'] and private['pending'] is None and private['source_sha']==s.get('source_sha'),'COLD_SOURCE_BINDING')
             jobs=route.json('actions/runs/'+str(s['last_run_id'])+'/jobs?per_page=100')['jobs']
             need(all(any(j['name']==n and j['conclusion']=='success' for j in jobs) for n in ('investigation','durable-archive')),'COLD_NATIVE_COMPLETION')
         else:
@@ -111,6 +112,11 @@ def main():
             book=TrialBook({'RECEPTION':0,'V2':history['V2']['limit']},{'RECEPTION':0,'V2':history['V2']['used']})
             private={'schema':'mxm.general-laboratory-private-state.v1','source_sha':os.environ['LAB_SOURCE_SHA'],'sequence':0,'pending':None,'programmes':{},'trial_book':book.export(),
               'history':history,'data_inventory':inventory(ROOT),'authentic_integration':authentic_integration(key,tmp)}
+        if private['source_sha']!=os.environ['LAB_SOURCE_SHA']:
+            need(private['source_sha']=='8f2197f047b12544e1736e31f4f93e642173ccd5' and private['safe_stop'] is True and all(v['progress']['safe_stop'] for v in private['programmes'].values()),'SOURCE_MIGRATION_REQUIRES_CLOSED_PREDECESSOR')
+            private.setdefault('source_migrations',[]).append({'previous':private['source_sha'],'successor':os.environ['LAB_SOURCE_SHA'],'parent_oid':parent,'closed_programmes_replayed':False})
+            private['source_sha']=os.environ['LAB_SOURCE_SHA']
+        private['history']=history
         book=TrialBook.restore(private['trial_book']);executed=[];cache=None
         for _ in range(a['steps_per_segment']):
             m=select_programme(a,private)
@@ -121,10 +127,15 @@ def main():
             else:
                 # Runtime preflight binds all definitions before first outcome.
                 validate_manifest(m,history,book);lab=Laboratory(m,history,book,cache=DataCatalogue.restore(private['authentic_integration']['catalogue']))
-            if a['mode']=='DEVELOPMENT_RESEARCH':lab.authentic_corpus=corpus(key,tmp,preserved_registry())
+            if a['mode']=='DEVELOPMENT_RESEARCH':
+                from copy import deepcopy
+                lab.authentic_corpus=deepcopy(corpus(key,tmp,preserved_registry()))
+                lab.authentic_corpus['raw_quote_receipts'].extend(r['quote_point'] for r in lab.acquisition.receipts if r.get('quote_point'))
+                lazy=LazyNativeCollector({k:lab.acquisition.budget.get(k,0) for k in ('M5','H1','BID_ASK')});lab.acquisition.collector=lazy
             task=lab.next()
             if task is None:private['programmes'][m['id']]=lab.checkpoint();continue
             result=lab.execute(task);lab.next()
+            if a['mode']=='DEVELOPMENT_RESEARCH':lazy.close()
             private['programmes'][m['id']]=lab.checkpoint();book=lab.book
             executed.append({'programme':m['id'],'task':task,'classification':result['classification']})
         private['trial_book']=book.export();private['sequence']+=1;private['admission_sha256']=digest(a)
@@ -142,7 +153,7 @@ def main():
     receipt={'schema':'mxm.general-laboratory-receipt.v1','authority':AUTHORITY,'source_sha':os.environ['LAB_SOURCE_SHA'],'parent_oid':parent,
       'sequence':private['sequence'],'run_id':int(os.environ['GITHUB_RUN_ID']),'trigger_sha':os.environ['GITHUB_SHA'],
       'admission_ref':admission_ref,'admission_path':path,'admission_sha256':digest(a),'ciphertext_sha256':bytes_digest(target.read_bytes()),
-      'safe_stop':not more,'pending':None,'completed_steps':len(executed),'cold_restored':s['sequence']>0,'modified_cipher_rejected':True,
+      'safe_stop':not more,'pending':None,'durable_intent_consumed':True,'completed_steps':len(executed),'cold_restored':s['sequence']>0,'modified_cipher_rejected':True,
       'native_acquisition_state':private['authentic_integration']['native_probe']['state'],'authentic_cache_validated':True,
       'mode':a['mode'],'orders':0,'new_economic_outcomes':0 if a['mode']=='SYNTHETIC_RECEPTION' else None,
       'app_key_used':False,'active_authority_write':False,'cbot_qualified':False}

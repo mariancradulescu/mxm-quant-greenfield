@@ -84,6 +84,7 @@ class Acquisition:
         complete='CONFIRMED_COMPLETE' if state=='COMPLETE_EXACT_WINDOW' else 'UNRESOLVED'
         manifest={'instrument':plan['instrument'],'resolution':plan['kind'],'partition':'DEVELOPMENT','start_ms':plan['start_ms'],'end_ms':plan['end_ms'],'source':'PEPPERSTONE_OPEN_API_NATIVE_RESPONSE','source_sha256':digest(raw),'available_at_ms':plan['end_ms'],'session_semantics':'AUTHENTIC_GAPS_RETAINED;NO_SESSION_INFERENCE','completeness':complete,'account_scope':plan['account_scope']}
         ident=self.cache.ingest(manifest,rows);receipt={'state':state,'asset_id':ident,'native_receipts':raw,'plan_sha256':digest(plan),'budget_reserved':cap}
+        if plan['kind']=='BID_ASK':receipt['quote_point']=q
         self.receipts.append(receipt);return receipt
 
 
@@ -92,3 +93,14 @@ def native_collector(caps):
     # domain and explicit VIEW scope. Credentials are never read by catalogue code.
     from research_core_v4.cost_frequency_discovery_v1.collector_v1 import Collector
     return Collector({'M5':caps.get('M5',0),'BID_ASK':caps.get('BID_ASK',0),'NONHISTORY':0,'H1':caps.get('H1',0)})
+
+class LazyNativeCollector:
+    """Connect only on cache miss, after the durable segment intent exists."""
+    def __init__(self,caps):self.caps=caps;self.instance=None
+    def __getattr__(self,name):
+        need(name in ('m5','h1','quote'),'TRANSPORT_METHOD_WHITELIST')
+        if self.instance is None:
+            self.instance=native_collector(self.caps);self.instance.connect()
+        return getattr(self.instance,name)
+    def close(self):
+        if self.instance is not None:self.instance.close()

@@ -95,7 +95,7 @@ def replay(spec,evidence):
     # Include idle weeks/months rather than drop them from the certificate.
     start=utc_ms(spec['evaluation_start']);end=utc_ms(spec['evaluation_end']);need(start<end,'EVALUATION_INTERVAL')
     need(all(start<=utc_ms(e.timestamp_utc)<end for e in events),'EVENT_OUTSIDE_EVALUATION')
-    weeks={};months={};t=datetime.fromtimestamp(start/1000,timezone.utc)
+    weeks={};months={};t=datetime.fromtimestamp(start/1000,timezone.utc).replace(hour=0,minute=0,second=0,microsecond=0)
     while int(t.timestamp()*1000)<end:
         i=t.isocalendar();weeks[f'{i.year}-W{i.week:02d}']=0;months[f'{t.year:04d}-{t.month:02d}']=None;t+=timedelta(days=1)
     for k in weeks:weeks[k]=result.entries_by_iso_week.get(k,0)

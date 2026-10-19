@@ -20,15 +20,20 @@ def historical_accounting(root):
     # Preserve the entire checked-in later research namespace, with its own unit.
     # Closed nodes, power simulations and selection events are not V2 identities.
     later=[]
-    for path in sorted((root/'research_core_v4').rglob('*.json')):
+    paths=set()
+    for namespace in ('research_v3','research_core_v3','research_core_v4','adaptive_competition'):
+        paths.update((root/namespace).rglob('*.json'))
+    for path in sorted(paths):
         if '/laboratory/' in str(path):continue
         raw=path.read_bytes();later.append({'path':str(path.relative_to(root)),'sha256':bytes_digest(raw)})
+    selection_audit=json.loads((root/'research_core_v4/state/PROJECT_SELECTION_BIAS_AUDIT_V1.json').read_text())
     closures=json.loads((root/'research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json').read_text())
     adaptive=json.loads((root/'research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json').read_text())
     need(adaptive['new_selection_consumes_v2_economic_budget'] is False,'LATER_LANE_UNIT')
     return {'schema':'mxm.reconciled-typed-research-history.v1','legacy':{'used':v2['legacy_prior_attempts'],'unit':'ACCEPTED_LEGACY_ATTEMPTS'},
       'V2':{'limit':v2['v2_search_budget'],'used':used,'remaining':v2['v2_search_budget']-used,'charged':v2['budget_charged_candidate_ids']+extras,'result_observations':v2['economic_outcomes_opened']+len(extras)},
-      'V4':{'unit':'SEPARATELY_AUTHORIZED_PROGRAMS_AND_ADAPTIVE_SELECTION','closure_nodes':closures['nodes'],'source_index':later,'effective_independent_trial_count':None,'consumes_V2_identity_budget':False},
+      'V3':{'unit':'ACCEPTED_DEPENDENT_CELLS_FAMILIES_AND_ADAPTIVE_SELECTION','accepted_selection_bias_audit':selection_audit,'independent_count_invented':False},
+      'V4':{'selection_history':adaptive,'unit':'SEPARATELY_AUTHORIZED_PROGRAMS_AND_ADAPTIVE_SELECTION','closure_nodes':closures['nodes'],'source_index':later,'effective_independent_trial_count':None,'consumes_V2_identity_budget':False},
       'source_digests':{p:bytes_digest((root/p).read_bytes()) for p in sources},'reconciled':True,'unknown_effective_N_is_budget_exhaustion':False}
 
 class TrialBook:

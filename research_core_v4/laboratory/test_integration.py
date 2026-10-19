@@ -124,4 +124,14 @@ class IntegratedReception(unittest.TestCase):
         c['parameters']['causal_dsl']={'entry_delay_ms':1000,'hold_ms':60000,'trade_symbol_id':9999,'decision_times_ms':[T],
           'features':[{'name':'lag','asset':'x','field':'close','lag':1}],'direction_expression':{'feature':'lag'}}
         self.assertTrue(causal_intents(c,l.cache,{'x':asset})['missing'])
+    def test_durable_intent_blocks_new_push_retry_until_recovery(self):
+        from .claim import claim_state
+        state={'pending':None,'safe_stop':True,'sequence':4,'admission_sha256':'old'}
+        claim=claim_state(state,100,'new','a'*40,'b'*40)
+        self.assertEqual(claim['sequence'],4);self.assertFalse(claim['pending']['automatic_retry'])
+        with self.assertRaisesRegex(LabError,'PENDING_SEGMENT_REQUIRES_RECOVERY'):claim_state(claim,101,'new','c'*40,'b'*40)
+        with self.assertRaisesRegex(LabError,'PROGRAMME_ALREADY_STOPPED'):claim_state(state,100,'old','a'*40,'b'*40)
+    def test_partial_day_interval_includes_next_iso_week(self):
+        s,e=economic_fixture();s['evaluation_start']='2025-01-05T23:30:00Z';s['evaluation_end']='2025-01-06T12:02:00Z'
+        r=replay(s,e);self.assertEqual(set(r['entries_per_week']),{'2025-W01','2025-W02'});self.assertEqual(r['entries_per_week']['2025-W01'],0)
 if __name__=='__main__':unittest.main()
