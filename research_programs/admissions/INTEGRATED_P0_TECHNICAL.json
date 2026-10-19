@@ -1,0 +1,127 @@
+{
+  "schema": "mxm.laboratory-admission.v2",
+  "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+  "mode": "TECHNICAL_NONOUTCOME",
+  "economic_release": false,
+  "module_sha256": "970c4e873149fb477999538bc2968550322a24f3f149a005b91d51ab4b6822a7",
+  "workflow_sha256": "64d09143d13193987ee6046e891521f4fd609b17cd16ebba490a03cd12bffa0b",
+  "observer_workflow_sha256": "f0fa41c25146fe4383f00324a7f2400cac8c031a5190fe2234a7d8457809b36a",
+  "steps_per_segment": 1,
+  "source_sha": "541bfe0e7d1eea060aa38d9e1e46a6639b7db13b",
+  "programmes": [
+    {
+      "schema": "mxm.laboratory-program.v2",
+      "id": "INTEGRATED_P0_TECHNICAL_20261019",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "TECHNICAL_NONOUTCOME",
+      "economic_lane": "V2",
+      "family_id": "P0_TECHNICAL_INTEGRATION_20261019",
+      "budget": {
+        "steps": 3,
+        "broker_requests": 0,
+        "new_identities": 0
+      },
+      "prospective_at_ms": 1792441158903,
+      "provenance": {
+        "purpose": "NEW_INTEGRATION_CONTROL_TOKENS_ONLY;NO_ACCEPTED_RECEPTION_OR_STRATEGY_REPLAY",
+        "owner_mandate": "P0 integrated remediation 20261019",
+        "scientific_outcomes": 0
+      },
+      "source_sha256": "970c4e873149fb477999538bc2968550322a24f3f149a005b91d51ab4b6822a7",
+      "tasks": {
+        "control_a": {
+          "operator": "classify",
+          "priority": 1,
+          "trial_units": 0,
+          "dependencies": [],
+          "input": {
+            "result": {
+              "classification": "PROGRAMME_REPORT_SAVED",
+              "technical_token": "PIPELINE_A"
+            }
+          }
+        },
+        "control_b": {
+          "operator": "classify",
+          "priority": 2,
+          "trial_units": 0,
+          "dependencies": [
+            "control_a"
+          ],
+          "input": {
+            "result": {
+              "classification": "PROGRAMME_REPORT_SAVED",
+              "technical_token": "PIPELINE_B"
+            }
+          }
+        },
+        "control_report": {
+          "operator": "report",
+          "priority": 3,
+          "trial_units": 0,
+          "dependencies": [
+            "control_b"
+          ],
+          "input": {
+            "a": {
+              "result_of": "control_a"
+            },
+            "b": {
+              "result_of": "control_b"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "family_policies": [
+    {
+      "id": "P0_TECHNICAL_INTEGRATION_20261019",
+      "mode": "TECHNICAL_NONOUTCOME",
+      "lane": "V2",
+      "lane_cap": 84,
+      "identity_cap": 0,
+      "observation_cap": 0,
+      "decision_sha256": "970c4e873149fb477999538bc2968550322a24f3f149a005b91d51ab4b6822a7",
+      "novelty_justification": "Technical integration and fault recovery only; no economic hypothesis or independent confirmation is registered.",
+      "selection_history_ref": "docs/laboratory-completion/20261019/integrated/SCIENTIFIC_RECONCILIATION.md",
+      "adaptive_exposure": "Existing checkpoint is inspected without economic recomputation; control tokens are artificial."
+    }
+  ],
+  "programme_policies": [
+    {
+      "id": "INTEGRATED_P0_TECHNICAL_20261019",
+      "family": "P0_TECHNICAL_INTEGRATION_20261019",
+      "lane": "V2",
+      "identity_cap": 0,
+      "observation_cap": 0,
+      "manifest_sha256": "44d86ad9ba182500965a5385b8bdd84242435bd3bf7e95e6d73468db779aeead"
+    }
+  ],
+  "transition": {
+    "original_source": "b430a303dc76bd1ea07fbd7dd9e91dcc7c7e9ee5",
+    "original_ciphertext_sha256": "eb031d18ee5b517ea1d4c3e6378cb276c4f3f46e2da810b86b8aabcc01a3ba8f",
+    "original_public_sha256": "1f8d3ed42a276ad6c28a29d9c19d406fe45971dcdf8a239c589b090feff70e83",
+    "accepted_typed_baseline_sha256": "a10c6754da01fcb7140f6f459e4982ad77da8790cb5adf83aa041154880e7829",
+    "state_path": "typed-successor/program-state.json",
+    "original_state_mutation": false
+  },
+  "resource_budget": {
+    "technical_tasks": 3,
+    "normal_segments_max": 3,
+    "controlled_pre_exposure_crash": 1,
+    "economic_identities": 0,
+    "economic_outcomes": 0,
+    "broker_requests": 0,
+    "real_orders": 0
+  },
+  "fault_policy": {
+    "before_fence": "RECOVER_ONLY_ON_NATIVE_SKIPPED_FENCE_AND_WORKER",
+    "after_fence": "HOLD_WITHOUT_AUTOMATIC_REPLAY",
+    "uncertain_push_ack": "VERIFY_EXACT_REMOTE_COMMIT_AND_BYTES_WITHOUT_SECOND_PUSH",
+    "uncertain_dispatch_ack": "DURABLE_ISSUANCE_RECORD_NO_BLIND_RETRY"
+  }
+}
