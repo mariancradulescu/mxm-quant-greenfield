@@ -17,7 +17,7 @@ from research_core_v4.successor_c_20261018 import readback as old
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/nonoutcome-reconciliation'
 EVIDENCE='a54420b203cf0d662db472efa6660b9db7e7bbb1'
-SOURCE_BRANCH='mxm-o04-successor-code-nonoutcome-reconciliation-r1'
+SOURCE_BRANCH='mxm-o04-successor-code-nonoutcome-reconciliation-r2'
 ACTIVE='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 PROGRAMME='VOLUME_SURPRISE_CLOSE_LOCATION_PRESSURE_20261019_A'
 PREFIX='diagnostics/reconciliation-20261019-r1'
@@ -94,6 +94,64 @@ def diagnose_c033(saved,cache):
       'economic_outcomes_opened':0,'information_exposure':'NONOUTCOME_FEATURE_SUPPORT_AND_CONDITION_COUNTS_OPENED',
       'availability_semantics':'AVAILABLE_AT_EQUALS_BAR_CLOSE_IS_MODEL_NOT_ORIGINAL_RECEIPT_CERTIFICATE',
       'candidate_parameters_changed':False,'candidate_reopened':False},details
+
+def lifecycle_projection(entries,specs,forensic,recovery,stage_b,closure,selection):
+    frozen={e['candidate_id'] for e in entries if e['entry_type'] in ('CANDIDATE_FROZEN','CANDIDATE_REFROZEN_PRE_OUTCOME')}
+    results={}
+    for e in entries:
+        if e['entry_type']=='RESULT_RECORDED':
+            r=e['payload']['result']
+            results.setdefault(e['candidate_id'],[]).append({'sequence':e['sequence'],'stage':r['stage'],'status':r['status'],'spec_hash':e['spec_hash'],'result_hash':e['payload']['result_hash']})
+    invalid=set(forensic['groups']['frozen_spec_causally_invalid_requires_new_identity'])
+    matrix=[]
+    for cid in sorted(frozen):
+        spec=specs[cid];history=results.get(cid,[])
+        authority='NO_ECONOMIC_OUTCOME_OPENED' if not history else 'INVALID_FROZEN_CAUSAL_SPEC_NOT_ECONOMIC_REJECTION' if cid in invalid else 'PRESERVED_LATEST_RESULT_AUTHORITY'
+        corrected=recovery.get('candidates',{}).get(cid)
+        if corrected:authority='SAME_IDENTITY_CORRECTED_NO_NEW_ATTEMPT'
+        matrix.append({'candidate_id':cid,'mechanism':spec['mechanism'],'universe':spec['universe'],'active_spec_hash':spec['spec_hash'],
+          'outcome_opened':bool(history),'latest_recorded_status':history[-1]['status'] if history else None,
+          'authority_classification':authority,'result_history':history,
+          'forensic_classification':forensic.get('classifications',{}).get(cid),
+          'same_identity_recovery_status':corrected.get('status') if corrected else None})
+    survivors=[row['candidate_id'] for row in matrix if row['latest_recorded_status']=='DISCOVERY_SURVIVOR' and row['candidate_id'] not in invalid]
+    corrections=[]
+    for e in entries:
+        if e['entry_type']=='IMPLEMENTATION_CORRECTION':
+            fields=('bug','classification','new_v2_attempt_consumed','search_budget_decrement','search_budget_delta','candidate_spec_changed','same_identity','semantic_change','corrected_result_ref','invalidated_result_ref','authority_ref')
+            corrections.append({'candidate_id':e['candidate_id'],'sequence':e['sequence'],'payload':{k:e['payload'][k] for k in fields if k in e['payload']}})
+    scenarios={}
+    for cid,obj in stage_b.items():
+        scenarios[cid]={'label':obj.get('label'),'status':obj.get('status',obj.get('frozen_reporting',{}).get('feasibility_status')),
+          'scenario_boundary':obj.get('scenario_boundary'),'historical_certification':False,'live_or_HARD21_qualification':False}
+    return {'registered_V2_candidate_identities':len(frozen),'outcome_opened_V2_candidate_identities':len(results),
+      'unopened_candidate_ids':sorted(frozen-set(results)),'unopened_are_not_failed_or_exhausted_families':True,
+      'latest_screen_survivor_ids':survivors,'screen_survivor_is_not_certified_cbot':True,
+      'identity_matrix':matrix,'implementation_corrections':corrections,
+      'invalid_frozen_spec_ids':sorted(invalid),'same_identity_corrected_ids':sorted(recovery.get('candidates',{})),
+      'C025_latest_result_authority':results.get('V2-C025',[{}])[-1].get('status'),
+      'stage_B_current_configuration_scenarios':scenarios,
+      'V3_V4_closure_nodes':closure['node_count'],'V3_V4_closure_classifications':closure['classification_counts'],
+      'V3_V4_old_outcomes_or_pvalues_changed':closure['old_pvalues_or_verdicts_changed'],
+      'V4_selection_consumes_V2_identity_budget':selection['new_selection_consumes_v2_economic_budget'],
+      'V3_V4_effective_independent_N':'NOT_IDENTIFIED_NOT_NODE_COUNT','new_economic_outcomes':0,
+      'historical_result_values_recomputed':False}
+
+def historical_lifecycle():
+    from discovery.ledger import read_ledger
+    entries=read_ledger(ROOT/'discovery/ledger.jsonl')
+    specs={p.stem:json.loads(p.read_bytes()) for p in (ROOT/'discovery/candidates').glob('V2-C*.json')}
+    paths=['evidence/V2_CONSUMED_IDENTITY_FORENSIC_AUDIT_V3.json','evidence/SAME_IDENTITY_LIVE_EQUIVALENT_CORRECTION_RECOVERY_V1.json',
+      'research_core_v4/state/POST_QUOTE_V4_CLOSURE_LEDGER_V2.json','research_core_v4/state/V4_ADAPTIVE_SELECTION_HISTORY_V3.json']
+    forensic,recovery,closure,selection=[json.loads((ROOT/p).read_bytes()) for p in paths]
+    bpaths={'V2-C006':'m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json','V2-C012':'m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V2.json','V2-C031':'m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json'}
+    stage_b={cid:json.loads((ROOT/p).read_bytes()) for cid,p in bpaths.items()}
+    value=lifecycle_projection(entries,specs,forensic,recovery,stage_b,closure,selection)
+    need(value['registered_V2_candidate_identities']==32 and value['outcome_opened_V2_candidate_identities']==20 and len(value['unopened_candidate_ids'])==12,'IDENTITY_RECONCILIATION')
+    need(set(value['latest_screen_survivor_ids'])=={'V2-C006','V2-C012','V2-C031'},'SCREEN_SURVIVOR_RECONCILIATION')
+    need(value['C025_latest_result_authority']=='DATA_INSUFFICIENT','C025_CORRECTED_AUTHORITY')
+    value['source_sha256']={p:bytes_digest((ROOT/p).read_bytes()) for p in paths+list(bpaths.values())+['discovery/ledger.jsonl']}
+    return value
 
 def inventory_and_frontier(route,corpus):
     from .inventory import inventory
@@ -175,12 +233,13 @@ def worker():
         budget=budget_projection(historical_accounting(ROOT),private)
         budget['source_sha256']={p:bytes_digest((ROOT/p).read_bytes()) for p in ('RESEARCH_CONTRACT_V2.md','V2_SEARCH_BUDGET_V1.json','research_v3/SEARCH_BUDGET_GOVERNANCE_V2.json','research_core_v4/laboratory/budgets.py','research_core_v4/laboratory/programs.py')}
         cache=DataCatalogue.restore(private['shared_catalogue'])
+        lifecycle=historical_lifecycle()
         c033,distribution=diagnose_c033(private['programmes'][PROGRAMME],cache)
         frontier,assets=inventory_and_frontier(route,corpus(key,tmp,registry()))
         need(digest(private)==before,'ORIGINAL_PRIVATE_STATE_MUTATED')
         result={'schema':'mxm.nonoutcome-reconciliation-private.v1','source_sha':os.environ['RECON_SOURCE_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),
           'input_evidence_oid':EVIDENCE,'input_ciphertext_sha256':state['ciphertext_sha256'],'original_private_digest':before,
-          'budget_reconciliation':budget,'C033_diagnostic':c033,'C033_distributions':distribution,'data_frontier':frontier,'data_inventory':assets,
+          'budget_reconciliation':budget,'historical_lifecycle':lifecycle,'C033_diagnostic':c033,'C033_distributions':distribution,'data_frontier':frontier,'data_inventory':assets,
           'new_outcomes':0,'new_identity_reservations':0,'broker_requests':0,'orders':0,'original_state_mutated':False}
         raw=encoded(result);pub=ROOT/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem';need(public_spki_sha256(pub)==old.FP,'RECIPIENT')
         target=OUT/'diagnostic.mxmenc';encrypt_shard(gzip.compress(raw,mtime=0),public_key=pub,output=target)
@@ -198,7 +257,7 @@ def publish():
     need(os.environ['GITHUB_JOB']=='durable-reconciliation' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'RECON_PUBLISH_NO_KEYS')
     route=GetOnly();anchors(route)
     data=ROOT/'verification/reconciliation-input';r=strict_json((data/'receipt.json').read_bytes());blob=(data/'diagnostic.mxmenc').read_bytes()
-    allowed={'schema','source_sha','run_id','trigger_sha','input_evidence_oid','input_sequence','input_ciphertext_sha256','diagnostic_ciphertext_sha256','budget_reconciliation','C033_diagnostic','data_frontier','new_outcomes','new_identity_reservations','broker_requests','orders','original_state_mutated','original_program_state_sha256','app_key_used','active_authority_write','safe_stop','cbot_qualified'}
+    allowed={'schema','source_sha','run_id','trigger_sha','input_evidence_oid','input_sequence','input_ciphertext_sha256','diagnostic_ciphertext_sha256','budget_reconciliation','historical_lifecycle','C033_diagnostic','data_frontier','new_outcomes','new_identity_reservations','broker_requests','orders','original_state_mutated','original_program_state_sha256','app_key_used','active_authority_write','safe_stop','cbot_qualified'}
     need(set(r)==allowed,'RECON_PUBLIC_FIELDS')
     need(r['schema']=='mxm.nonoutcome-reconciliation-public.v1' and r['input_evidence_oid']==EVIDENCE and r['input_sequence']==16,'RECON_PUBLIC_BINDING')
     need(r['run_id']==int(os.environ['GITHUB_RUN_ID']) and r['source_sha']==os.environ['RECON_SOURCE_SHA'] and r['trigger_sha']==os.environ['GITHUB_SHA'],'RECON_NATIVE_BINDING')
