@@ -78,6 +78,7 @@ def preflight():
     route=workload('preflight');a,ref,path=definition(route);parent=current(route);s,initial=state_at(route,parent)
     need(s['pending'] is None,'PREFLIGHT_PENDING_REQUIRES_RECOVERY')
     expected=os.environ.get('LAB_PARENT_OID');need(not expected or expected==parent,'PREFLIGHT_STALE_PARENT')
+    if os.environ.get('GITHUB_EVENT_NAME')=='push':need(strict_json(file_at(route,TRIGGER,os.environ['GITHUB_SHA']))['expected_evidence_parent']==parent,'PREFLIGHT_STALE_TRIGGER')
     original=file_at(route,'program-state.json',parent);need(bytes_digest(original)==ORIGINAL_PUBLIC,'PREFLIGHT_ORIGINAL_CHANGED')
     from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
     os.umask(0o077);OUT.mkdir(parents=True,exist_ok=True)
