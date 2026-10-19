@@ -11,7 +11,7 @@ from .budgets import TrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
-OPS={'native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
+OPS={'quote_dependencies','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
 AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
 
@@ -130,6 +130,10 @@ class Laboratory:
             elif op=='acquire':
                 need(self.acquisition.budget.get(x['kind'],0)<=self.m['budget']['broker_requests'],'NETWORK_BUDGET')
                 value=self.acquisition.request(x);verdict='DATA_VALID' if self.cache.assets[value['asset_id']]['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
+            elif op=='quote_dependencies':
+                from .volume_pressure import quote_dependencies
+                value=quote_dependencies(self,x['generated'],x['policy'])
+                verdict=value['classification']
             elif op=='causal_intents':
                 from .science import causal_intents
                 value=causal_intents(x['candidate'],self.cache,x['assets']);verdict='CAUSAL_INTENTS_DEFINED' if not value['missing'] else 'DATA_INSUFFICIENT'

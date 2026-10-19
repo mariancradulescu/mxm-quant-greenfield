@@ -13,13 +13,13 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-laboratory-r3'
+SOURCE_BRANCH='mxm-o04-successor-code-laboratory-research-r4'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
 
 def module_digest():
-    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','economics.py','programs.py','science.py','sizing.py','inventory.py')})
+    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py')})
 
 def anchors(route):
     old.owner_unchanged(route)
@@ -117,7 +117,7 @@ def main():
             private={'schema':'mxm.general-laboratory-private-state.v1','source_sha':os.environ['LAB_SOURCE_SHA'],'sequence':0,'pending':None,'programmes':{},'trial_book':book.export(),
               'history':history,'data_inventory':inventory(ROOT),'authentic_integration':authentic_integration(key,tmp)}
         if private['source_sha']!=os.environ['LAB_SOURCE_SHA']:
-            need(private['source_sha'] in ('8f2197f047b12544e1736e31f4f93e642173ccd5','a54757ce89f613be91ea05bac9f46434dd9021c0') and private['safe_stop'] is True and all(v['progress']['safe_stop'] for v in private['programmes'].values()),'SOURCE_MIGRATION_REQUIRES_CLOSED_PREDECESSOR')
+            need(private['source_sha'] in ('8f2197f047b12544e1736e31f4f93e642173ccd5','a54757ce89f613be91ea05bac9f46434dd9021c0','f9bfc29c2cec87a87f9bd62bd5f38f1654c5b522') and private['safe_stop'] is True and all(v['progress']['safe_stop'] for v in private['programmes'].values()),'SOURCE_MIGRATION_REQUIRES_CLOSED_PREDECESSOR')
             private.setdefault('source_migrations',[]).append({'previous':private['source_sha'],'successor':os.environ['LAB_SOURCE_SHA'],'parent_oid':parent,'closed_programmes_replayed':False})
             private['source_sha']=os.environ['LAB_SOURCE_SHA']
         private['history']=history
@@ -177,6 +177,20 @@ def main():
       'native_acquisition_state':private['authentic_integration']['native_probe']['state'],'authentic_cache_validated':True,
       'mode':a['mode'],'orders':0,'new_economic_outcomes':0 if a['mode']=='SYNTHETIC_RECEPTION' else None,
       'app_key_used':False,'active_authority_write':False,'cbot_qualified':False}
+    receipt['research_progress']=[]
+    for m in a['programmes']:
+        saved=private['programmes'].get(m['id'])
+        if not saved:continue
+        results=saved['progress']['results']
+        data=[]
+        for name,result in results.items():
+            if result['operator']=='acquire':
+                asset=saved['catalogue']['assets'][result['value']['asset_id']]
+                data.append({'task':name,'instrument':asset['instrument'],'rows':asset['row_count'],'invalid':asset['invalid'],'conflicts':asset['conflicts'],'classification':result['classification']})
+        receipt['research_progress'].append({'programme':m['id'],'classifications':{k:v['classification'] for k,v in results.items()},'data':data,'safe_stop':saved['progress']['safe_stop']})
+    receipt['V2_budget_used']=private['trial_book']['used']['V2']
+    receipt['V2_budget_remaining']=private['trial_book']['limits']['V2']-private['trial_book']['used']['V2']
+    receipt['numerical_economics_encrypted']=True
     (OUT/'receipt.json').write_bytes(encoded(receipt));print(json.dumps(receipt,sort_keys=True))
 
 if __name__=='__main__':

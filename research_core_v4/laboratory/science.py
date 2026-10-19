@@ -25,6 +25,9 @@ def expression(node,context):
 def causal_intents(spec,cache,assets):
     """Deterministic expression evaluated only against completed bars."""
     from datetime import datetime,timezone
+    if 'volume_pressure' in spec['parameters']:
+        from .volume_pressure import volume_pressure_intents
+        return volume_pressure_intents(spec,cache,assets)
     rules=spec['parameters']['causal_dsl'];need(rules['entry_delay_ms']>0 and rules['hold_ms']>0,'CAUSAL_HORIZON')
     maps={}
     for name,asset in assets.items():
