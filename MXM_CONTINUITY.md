@@ -1,3 +1,13 @@
+# Recuperare Work și succesorul read-only V4 — 2026-10-19
+
+Autoritate recuperată exclusiv GitHub LIVE. Ultimul documentar anterior f39c22fd6213afc16ff460c5478b8e1c0a7c83e0 era complet salvat. Autoritatea activă rămâne07d1ddbe0b83753bbf189770af1911623fef8d6f, sequence3, pendingnull, REGISTERED_RESEARCH_COMPLETE_INSUFFICIENT_EVIDENCE. OWNER1807 rămâne a830c132521bd4348454653f713e04f6107484fe. STOP-ul și toate sursele sigilate sunt păstrate; zero bootstrap, coadă sau experiment acceptat relansat.
+
+Etapă nouă încheiată LIVE: SAVED_PILOT_JOINT_SUPPORT_COST_ATTRIBUTION_V1; sursă683dcfc8824580af97b605a0b1286d84b5ec3d79; ramură mxm-o04-successor-code-support-v4; sigiliu25374624 activ fără bypass. Run39207305338/job117912837468 SUCCESS;10teste noi native; tokencontentsread, fără App sau writer; analiză nouă a înregistrărilor individuale din rezultatul acceptat, fără replay. Ciphertextd5b04dbccefe935a5d1acae57ae5730b4f9908e44752c37b0bd53afc18c700c3; arhivă12166401090 păstrată în Git. În continuare fără calificare cBot, filluri/costuri istorice sau confirmare. Nu există campanie nelimitată de ipoteze. Următoarea etapă justificată: suport autentic pentru țintele originale lipsă, fără înlocuiri sau repetarea pilotului. Nu se pornește nimic din expirarea normală a lease-ului terminal.
+
+Raport de recuperare și stări IMPLEMENTAT / TESTAT SINTETIC / VERIFICAT LIVE / ÎNCĂ BLOCAT: docs/delegated-bc/20261019/WORK_SESSION_RECOVERY.md. Raportul original și toate dovezile sale rămân păstrate. Mandatul și delegarea operațională OWNER continuă conform instrucțiunilor curente; nu se revendică semnătură sau review personal nativ al OWNER.
+
+---
+
 ## 19 octombrie 2026 — OWNER operațional delegat; B–C și succesiune C verificate LIVE în limitele cozii înregistrate
 
 Mandatul persistent OWNER B–E include conducerea, evaluarea tehnică, instalarea și deploymentul operațiunilor legitim delegabile. OWNER păstrează proprietatea juridică, supravegherea și revocarea. Nu se cer aprobări conversaționale repetitive pentru operațiunile deja autorizate și nu se fabrică review-uri native.
