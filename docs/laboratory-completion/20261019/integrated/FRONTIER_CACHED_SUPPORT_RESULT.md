@@ -1,3 +1,5 @@
+> Actualizare verificată, 19 octombrie 2026: arhiva originală a fost recuperată durabil la 1f5cd4e6df827d61d3231edd48440c66aa14c0a5, fără repetarea analizei. Raportul de recuperare este CUSTODY_RECOVERY_AND_DATA_CONTINUITY.md. Mențiunile de publicare neconfirmată de mai jos descriu starea observată anterior; workflow-ul original nu este declarat SUCCESS.
+
 # MXM — B: suportul cotațiilor și autoritatea temporală a costurilor
 
 19 octombrie 2026. Continuarea finală, prospectivă, a FRONTIER_SUPPORT_PREGATE_B. Nu este o reluare V4–V6, C033 sau a recepției; s-a reutilizat numai cititorul corpusului păstrat, fără funcțiile lor de cercetare/replay.
