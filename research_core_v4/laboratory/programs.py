@@ -21,7 +21,7 @@ def validate_manifest(m,history,global_book):
     need(m['schema'] in ('mxm.laboratory-program.v1','mxm.laboratory-program.v2') and ID.fullmatch(m['id']) and type(m['version']) is int and m['version']>0,'PROGRAM_ID')
     need(m['authority']==AUTHORITY and m['partition']=='DEVELOPMENT' and m['orders']==0,'PROGRAM_SCOPE')
     need(m['mode'] in ('SYNTHETIC_RECEPTION','DEVELOPMENT_RESEARCH','TECHNICAL_NONOUTCOME'),'PROGRAM_MODE')
-    need(m['budget']['steps']>0 and m['budget']['steps']>=len(m['tasks']) and m['budget']['broker_requests']>=0,'PROGRAM_BUDGET')
+    need(type(m['budget']['steps']) is int and type(m['budget']['broker_requests']) is int and m['budget']['steps']>0 and m['budget']['steps']>=len(m['tasks']) and m['budget']['broker_requests']>=0,'PROGRAM_BUDGET')
     need(history['reconciled'],'HISTORICAL_BUDGET')
     if typed:
         need(m['mode'] in ('DEVELOPMENT_RESEARCH','TECHNICAL_NONOUTCOME') and isinstance(global_book,TypedTrialBook),'TYPED_RESEARCH_BOOK_REQUIRED');global_book.validate_programme(m)

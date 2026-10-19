@@ -8,6 +8,9 @@ ORIGINAL_CIPHER='eb031d18ee5b517ea1d4c3e6378cb276c4f3f46e2da810b86b8aabcc01a3ba8
 ORIGINAL_PUBLIC='1f8d3ed42a276ad6c28a29d9c19d406fe45971dcdf8a239c589b090feff70e83'
 STATE_PATH='typed-successor/program-state.json'
 
+def economic_gate(gate,source,protected):
+    need(gate.get('status')=='END_TO_END_OPERATIONAL_ACCEPTED' and gate.get('source_sha')==source and protected=={'main':True,'mxm-remediation-p0-p4-20261015-v1':True},'ECONOMIC_CONTROL_PLANE_GATE_CLOSED')
+
 def identity_budget(m):
     typed=m['schema']=='mxm.laboratory-program.v2';key='new_identities' if typed else 'new_V2_identities'
     need(key in m['budget'] and type(m['budget'][key]) is int and m['budget'][key]>=0,'IDENTITY_BUDGET_SCHEMA')
@@ -36,6 +39,21 @@ def migrate_private(private,state,history,candidates,source,original_public_sha)
     new['trial_book']=book.export();new['source_sha']=source
     new['typed_transition']={'original_source':ORIGINAL_SOURCE,'original_cipher':ORIGINAL_CIPHER,'original_public_sha256':ORIGINAL_PUBLIC,'original_private_sha256':before,'legacy_snapshot_sha256':book.baseline['legacy_snapshot_sha256'],'refunds':0}
     need(digest(private)==before,'TRANSITION_ORIGINAL_MUTATED');return new
+
+def typed_source_transition(private,state,authority,source):
+    need(authority['source_sha']=='541bfe0e7d1eea060aa38d9e1e46a6639b7db13b' and authority['sequence']==19 and authority['ciphertext_sha256']=='cb14705c8456668c273f3c19a55bde40839e5be13c92cb43ad36b5cd61dc71b5' and authority['private_sha256']=='47c34e6307d247e03c95f2727112bcbbaee7e40d6a07f104f20b16e622be8102','TYPED_SOURCE_TRANSITION_AUTHORITY')
+    need(private['source_sha']==state['source_sha']==authority['source_sha'] and private['sequence']==state['sequence']==authority['sequence'] and state['ciphertext_sha256']==authority['ciphertext_sha256'] and digest(private)==authority['private_sha256'],'TYPED_SOURCE_TRANSITION_PROVENANCE')
+    need(state['pending'] is None and state['safe_stop'] is True and private['pending'] is None and private['safe_stop'] is True and all(x['progress']['safe_stop'] for x in private['programmes'].values()),'TYPED_SOURCE_TRANSITION_OPEN_WORK')
+    new=deepcopy(private);new.setdefault('typed_source_migrations',[]).append({**authority,'successor_source_sha':source,'accounting_sha256':digest(accounting(private['trial_book'])),'refunds':0});new['source_sha']=source;return new
+
+def upgrade_fingerprint(book,candidates,source):
+    if book.hash_version==2:return
+    from .admission import semantic_hash
+    from discovery.canonical import verify_spec_hash
+    need({c['id'] for c in candidates}==set(book.baseline['identity_semantics']),'FINGERPRINT_ALL_PRESERVED_SPECS')
+    for c in candidates:
+        verify_spec_hash(c);need(semantic_hash(c)==book.baseline['identity_semantics'][c['id']],'FINGERPRINT_ORIGINAL_SPEC_CHANGED')
+    book._append('FINGERPRINT_INDEX_UPGRADED',{'previous_index_sha256':digest(book.semantic_registry),'identity_semantics':{c['id']:semantic_hash(c,2) for c in candidates},'source_spec_hashes':{c['id']:c['spec_hash'] for c in candidates},'source_sha':source})
 
 def register_and_validate(private,a,history):
     from .programs import validate_manifest
@@ -66,6 +84,12 @@ def can_recover_before_exposure(state,jobs):
     if len(by)!=len(jobs):return False
     claim=by.get('segment-intent');fence=by.get('execution-fence');worker=by.get('investigation')
     return bool(claim and claim['status']=='completed' and claim['conclusion']=='failure' and fence and worker and all(j['status']=='completed' and j['conclusion']=='skipped' for j in (fence,worker)))
+
+def recovered_public_base(intent):
+    base=deepcopy(intent['base_state']);c=intent['preflight']
+    need(base['pending'] is None,'RECOVERY_BASE_PENDING')
+    base['recovery_continuation']={'run_id':intent['pending']['run_id'],'admission_ref':c['admission_ref'],'admission_path':c['admission_path'],'admission_sha256':c['admission_sha256'],'preflight_sha256':digest(c)}
+    return base
 
 def require_jobs(jobs,names):
     for name in names:

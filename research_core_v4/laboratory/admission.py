@@ -6,8 +6,9 @@ identity. Programmes/families have finite, shared caps; lane names create no cap
 from copy import deepcopy
 from .common import need,digest
 
-def semantic_hash(candidate):
+def semantic_hash(candidate,version=1):
     value={k:v for k,v in candidate.items() if k not in ('id','candidate_id','spec_hash','provenance','created_at','created_utc')}
+    if version==2:value.pop('rationale',None)
     if isinstance(value.get('universe'),list):value['universe']=sorted(value['universe'],key=lambda x:repr(x))
     return digest(value)
 
@@ -20,7 +21,7 @@ class TypedTrialBook:
         need(baseline['legacy_snapshot']['used']['V2']==22 and baseline['legacy_snapshot_sha256']==digest(baseline['legacy_snapshot']),'ADMISSION_LEGACY_BINDING')
         need(baseline['legacy_snapshot']['identities']['V2:V2-C033']==baseline['C033_legacy_item'],'ADMISSION_C033_BINDING')
         need(baseline['C033_legacy_item']['state']=='RESERVED' and baseline['C033_legacy_item']['units']==1 and 'V2-C033' not in baseline['charged_ids'],'ADMISSION_C033_NOT_OUTCOME')
-        self.limits={'V2':84};self.items={};self.semantic_registry=dict(baseline['semantic_registry']);self.observation_ids=set()
+        self.limits={'V2':84};self.items={};self.semantic_registry=dict(baseline['semantic_registry']);self.observation_ids=set();self.hash_version=1;self.identity_semantics=dict(baseline.get('identity_semantics',{}))
         for ident in baseline['charged_ids']:self.items['V2:'+ident]={'lane':'V2','id':ident,'units':1,'opened':True,'legacy':True}
         self.items['V2:V2-C033']={'lane':'V2','id':'V2-C033','units':1,'opened':False,'legacy':True,'spec_hash':baseline['C033_legacy_item']['spec_hash']}
         for event in events or []:
@@ -36,7 +37,14 @@ class TypedTrialBook:
         return sum(x['units'] for x in self.items.values() if not x.get('legacy') and x.get(where)==ident)
 
     def _apply(self,kind,p):
-        if kind=='FAMILY_REGISTERED':
+        if kind=='FINGERPRINT_INDEX_UPGRADED':
+            need(self.hash_version==1 and not any(not x['legacy'] for x in self.items.values()) and p['previous_index_sha256']==digest(self.semantic_registry),'ADMISSION_FINGERPRINT_TRANSITION')
+            need(set(p['identity_semantics'])==set(self.baseline['identity_semantics']) and set(p['source_spec_hashes'])==set(p['identity_semantics']) and len(p['source_sha'])==40,'ADMISSION_FINGERPRINT_COVERAGE')
+            derived={}
+            for ident,h in p['identity_semantics'].items():
+                need(len(h)==64 and len(p['source_spec_hashes'][ident])==64,'ADMISSION_FINGERPRINT_BINDING');derived.setdefault(h,[]).append(ident)
+            self.semantic_registry={h:sorted(ids) for h,ids in derived.items()};self.identity_semantics=dict(p['identity_semantics']);self.hash_version=2
+        elif kind=='FAMILY_REGISTERED':
             technical=p.get('mode')=='TECHNICAL_NONOUTCOME'
             need(p['id'] not in self.families and type(p['identity_cap']) is int and type(p['observation_cap']) is int and ((p['identity_cap']==p['observation_cap']==0) if technical else (p['identity_cap']>0 and p['observation_cap']>0)),'ADMISSION_FAMILY_CAP')
             need(len(p['decision_sha256'])==64 and len(p['novelty_justification'])>=40 and p['selection_history_ref'] and p['adaptive_exposure'],'ADMISSION_NOVELTY_AND_EXPOSURE')
@@ -55,8 +63,8 @@ class TypedTrialBook:
             key=p['lane']+':'+p['id'];need(not any(x['id']==p['id'] for x in self.items.values()) and p['programme'] in self.programmes,'ADMISSION_IDENTITY_DUPLICATE')
             q=self.programmes[p['programme']];f=self.families[q['family']]
             need(p['lane']==q['lane'] and p['family']==q['family'] and p['units']==1,'ADMISSION_IDENTITY_SCOPE')
-            old=self.semantic_registry.get(p['semantic_hash']);known=self.baseline.get('identity_semantics',{}).get(p['id'])
-            need(len(p['spec_hash'])==64 and len(p['semantic_hash'])==64 and (old is None or old==p['id']) and (known is None or known==p['semantic_hash']),'ADMISSION_CROSS_LANE_SEMANTIC_DUPLICATE')
+            old=self.semantic_registry.get(p['semantic_hash']);known=self.identity_semantics.get(p['id'])
+            need(len(p['spec_hash'])==64 and len(p['semantic_hash'])==64 and (old is None or old==p['id'] or old==[p['id']]) and (known is None or known==p['semantic_hash']),'ADMISSION_CROSS_LANE_SEMANTIC_DUPLICATE')
             need(self.encumbered(p['lane'])+1<=self.limits[p['lane']] and self._used('programme',q['id'])+1<=q['identity_cap'] and self._used('family',f['id'])+1<=f['identity_cap'],'ADMISSION_FINITE_CAP_EXHAUSTED')
             self.items[key]={**deepcopy(p),'opened':False,'legacy':False};self.semantic_registry[p['semantic_hash']]=key
         elif kind=='ECONOMIC_OUTCOME_OPENED':
@@ -77,12 +85,13 @@ class TypedTrialBook:
         need(m['id'] in self.programmes,'ADMISSION_UNREGISTERED_PROGRAMME');q=self.programmes[m['id']]
         need(q['manifest_sha256']==digest(m) and m['economic_lane']==q['lane'] and m['family_id']==q['family'],'ADMISSION_MANIFEST_BINDING')
         need(m['budget']['new_identities']==q['identity_cap'],'ADMISSION_MANIFEST_CAP')
+        if m['mode']=='DEVELOPMENT_RESEARCH':need(self.hash_version==2,'ADMISSION_CAUSAL_FINGERPRINT_REQUIRED')
     @property
     def identities(self):return self.items
     def encumbered(self,lane):return sum(x['units'] for x in self.items.values() if x['lane']==lane)
     def reserve(self,lane,identity,spec_hash,units,*,candidate,programme):
         need(programme in self.programmes,'ADMISSION_UNREGISTERED_PROGRAMME')
-        self._append('IDENTITY_RESERVED',{'lane':lane,'id':identity,'spec_hash':spec_hash,'units':units,'semantic_hash':semantic_hash(candidate),'programme':programme,'family':self.programmes[programme]['family']})
+        self._append('IDENTITY_RESERVED',{'lane':lane,'id':identity,'spec_hash':spec_hash,'units':units,'semantic_hash':semantic_hash(candidate,self.hash_version),'programme':programme,'family':self.programmes[programme]['family']})
     def open_outcome(self,lane,identity,spec_hash):
         key=lane+':'+identity;x=self.items[key];need(x.get('spec_hash')==spec_hash and not x['legacy'],'ADMISSION_OUTCOME_BINDING')
         q=self.programmes[x['programme']];f=self.families[x['family']]
@@ -94,7 +103,9 @@ class TypedTrialBook:
     def view(self):
         lanes={lane:{'limit':limit,'outcome_charged':sum(x['units'] for x in self.items.values() if x['lane']==lane and x['opened']),
           'reservation_holds':sum(x['units'] for x in self.items.values() if x['lane']==lane and not x['opened']),'encumbered':self.encumbered(lane)} for lane,limit in self.limits.items()}
-        return {'lanes':lanes,'economic_observations':29+len(self.observation_ids),'new_events':len(self.events),'refunds':0,'universal_project_cap':None,'legacy_snapshot_sha256':self.baseline['legacy_snapshot_sha256']}
+        result={'lanes':lanes,'economic_observations':29+len(self.observation_ids),'new_events':len(self.events),'refunds':0,'universal_project_cap':None,'legacy_snapshot_sha256':self.baseline['legacy_snapshot_sha256']}
+        if self.hash_version==2:result['causal_identity_fingerprint_version']=2
+        return result
     def export(self):return {'schema':self.SCHEMA,'baseline':deepcopy(self.baseline),'events':deepcopy(self.events),'view':self.view()}
     @classmethod
     def restore(cls,v):
