@@ -15,6 +15,10 @@ PREFIX='diagnostics/frontier-support-pregate-B-cached'
 OUT=b.ROOT/'verification/frontier-cached-support'
 PLAN='research_programs/reconciliation/FRONTIER_SUPPORT_PREGATE_B_CACHED_EXECUTION.json'
 
+def native_worker_proof(jobs,run_id,head_sha):
+    matches=[j for j in jobs if j.get('name')=='pregate' and j.get('run_attempt')==1]
+    return len(matches)==1 and matches[0].get('id')==118148506560 and matches[0].get('run_id')==run_id and matches[0].get('head_sha')==head_sha and matches[0].get('status')=='completed' and matches[0].get('conclusion')=='success'
+
 def quote_reason(q):
     """Validate recorded causal bilateral support, never promote quotes to fills."""
     finite=lambda x:type(x) in (int,float) and math.isfinite(x)
@@ -115,7 +119,9 @@ def publish():
     need(r['parent_evidence']==PARENT and bytes_digest(blob)==r['ciphertext_sha256'] and blob.startswith(b'MXM_SHALLOW_M5_V2_ENC1\x00'),'CACHED_ENCRYPTED_ARTIFACT')
     need(route.json('git/ref/heads/mxm-o04-integrated-laboratory-evidence')['object']['sha']==PARENT,'CACHED_PUBLISH_STALE')
     original=file_at(route,'program-state.json',PARENT);need(bytes_digest(original)==r['original_state_sha256'],'CACHED_ORIGINAL_STATE')
-    jobs=route.json('actions/runs/'+os.environ['GITHUB_RUN_ID']+'/jobs?per_page=100')['jobs'];need(any(j['name']=='pregate' and j['conclusion']=='success' for j in jobs),'CACHED_NATIVE_SUCCESS')
+    # Bind the scientific worker's original attempt explicitly. The default jobs
+    # endpoint follows the latest transport retry and can omit the original job.
+    jobs=route.json('actions/runs/'+os.environ['GITHUB_RUN_ID']+'/attempts/1/jobs?per_page=100')['jobs'];need(native_worker_proof(jobs,int(os.environ['GITHUB_RUN_ID']),r['trigger_sha']),'CACHED_NATIVE_SUCCESS')
     files,manifest=chunk_ciphertext(blob,PREFIX);files[PREFIX+'/checkpoint.parts.json']=encoded(manifest);files[PREFIX+'/receipt.json']=encoded(r)
     oid=atomic_publish(route,PARENT,files,'Preserve final B cached quote and term support readback without outcomes or checkpoint16 change')
     need(file_at(route,'program-state.json',oid)==original,'CACHED_ORIGINAL_CHANGED')
