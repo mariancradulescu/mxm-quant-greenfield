@@ -2,10 +2,10 @@
   "schema": "mxm.frontier-pregate-B-support-gap-register.v1",
   "source_evidence": "ffaac1428220926509299d8cbca0f9d9fee35d3a",
   "programme": "FRONTIER_SUPPORT_PREGATE_B",
-  "status": "M5_STAGE_EXECUTED;ECONOMIC_GATE_NOT_PASSED",
+  "status": "FINAL_B_COMPUTE_RESULT_AVAILABLE;DURABLE_PUBLICATION_UNCONFIRMED;ECONOMIC_GATE_NOT_PASSED",
   "original_economic_budgets_unchanged": true,
   "resources_consumed": {
-    "workflow_runs": 1,
+    "workflow_runs": 2,
     "cipher_assets": 8,
     "cipher_bytes": 6064783,
     "new_identities": 0,
@@ -14,7 +14,7 @@
     "orders": 0
   },
   "resource_remainder": {
-    "workflow_runs": 1,
+    "workflow_runs": 0,
     "cipher_assets": 0,
     "download_bytes": 61044081
   },
@@ -107,13 +107,12 @@
     }
   ],
   "next_bounded_step": {
-    "scope": "READ_EXISTING_CACHED_CATALOG_AND_QUOTE_RECEIPTS_FOR_THE_SAME_FIXED_SAMPLE;NO_SHALLOW_REDOWNLOAD",
-    "max_additional_workflow_runs": 1,
-    "max_additional_cipher_assets": 0,
-    "broker_requests": 0,
+    "scope": "VERIFY_EXISTING_RUN_PUBLICATION_FIRST;THEN_LOCATE_OTHER_PRESERVED_MANIFEST_QUOTE_AND_DATED_TERMS_COVERAGE_WITHOUT_REPLAY",
+    "repeat_B_allowed": false,
+    "automatic_budget_extension": false,
     "new_economic_identities": 0,
     "new_outcomes": 0,
-    "output": "PER_INSTRUMENT_CAUSAL_COST_QUOTE_SUPPORT_AND_EXACT_GAPS_BEFORE_ANY_ACQUISITION_OR_ECONOMIC_ADMISSION"
+    "new_broker_acquisition_before_exact_prospective_plan": false
   },
   "interpretation": [
     "25 measured classes do not qualify an economic strategy or all members of a class",
@@ -122,5 +121,15 @@
     "Observed timestamp gaps are not certified broker closures or proven missing data",
     "No absence of catalogue flags implies EUR200 feasibility",
     "Selection is exposure-adaptive DEVELOPMENT, not independent confirmation"
-  ]
+  ],
+  "cached_support": {
+    "run_id": 39278529554,
+    "source_sha": "1340ab28cc645f3a05acd75838de1618b0d18067",
+    "quote_moments": 1284,
+    "valid_bilateral": 493,
+    "classes_with_valid_bilateral": 8,
+    "quote_moments_in_M5_period": 0,
+    "current_catalogue_field_coverage": 29,
+    "historical_terms_certified": false
+  }
 }
