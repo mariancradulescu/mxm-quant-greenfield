@@ -19,12 +19,15 @@ jobs:
     permissions: {contents: write, actions: write}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 541bfe0e7d1eea060aa38d9e1e46a6639b7db13b, persist-credentials: false}
+        with: {ref: d9909fb8e716b08d68eba0ea5b752f764b4d578f, persist-credentials: false}
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Recover only proven pre-exposure failure or continue a saved admitted successor
-        run: python3 -m research_core_v4.laboratory.integrated observer
+      - name: Verify sealed recovery guard and exact predecessor job outcomes
+        run: python3 -m unittest research_core_v4.laboratory.test_recovery_v2 -v
+      - name: Recover only a terminal native issuer with exact durable evidence
+        run: python3 -m research_core_v4.laboratory.recovery_v2
         env:
           GH_TOKEN: ${{ github.token }}
           LAB_SOURCE_SHA: 541bfe0e7d1eea060aa38d9e1e46a6639b7db13b
+          LAB_OBSERVER_SOURCE_SHA: d9909fb8e716b08d68eba0ea5b752f764b4d578f
           LAB_INTEGRATED_PROTOCOL: v2
