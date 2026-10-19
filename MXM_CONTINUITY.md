@@ -1,3 +1,19 @@
+# 19 octombrie 2026 — program funcțional finit V5 executat; B–E integral rămâne deschis
+
+Mandatul OWNER de finalizare a laboratorului existent este persistent. Universul larg Pepperstone este deschis în domeniile autorizate;1576/145 sunt repere istorice, nu plafon. Nu se reconstruiește laboratorul, nu se reia campania1807 sau coadaC V3, nu se cer alegeri/reviewuri tehnice OWNER.200EUR o singură dată, cont continuu, HARD21 final; fără tranzacții reale, furnizori ori cheltuieli noi.
+
+[Raport funcțional actual](docs/laboratory-completion/20261019/FINAL_FUNCTIONAL_REPORT.md). Progresul LIVE0d53b956… /cc99f349… /5d32292… a fost reconciliat și conservat. Regula nouă V5 a fost refuzată de verificarea automată în acea execuție; nu a fost reîncercată. Varianta mai restrânsă read-only9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9 folosește checkout imuabil și regula append-only existentă, fără nou ACL, cheie App sau writer. Nu se revendică sigiliu nativ update pentru această sursă.
+
+Run39216105583 SUCCESS: recovery117940214736 a verificat82checkpointuri autentificate din corpusul original; frontier117940719805 și admission117940913675 au continuat automat pe runneri noi, din checkpointuri criptate SHA-bound. Este **un**workflow cu3joburi, nu3workflow-uri. Followthrough39216926173/job117942846123 SUCCESS a reconciliat numai prefixul original salvat, fără predictor sau extinderea selecției. Verdict machine-side: ieșiri originale DATA_INSUFFICIENT; studiu distinct de perechi simultane/capital/cost DATA_INSUFFICIENT; prefix complet neidentificabil; nicio calificare cBot sau afirmație de neprofitabilitate.
+
+Toate3checkpointurile și rezultatul followthrough rămân criptate în Git. Arhiva mare are21părți în docs/laboratory-completion/20261019/recovery-39216105583.zip.parts/, cu RECOVERY_ARCHIVE_PARTS.json. Run39217580538 SUCCESS a reconstituit și verificat arhiva direct din Git, fără chei sau decriptare.9controale noi native au trecut pentru admiterea modificată și reconcilierea originalului;11controale V5 anterioare au fost reutilizate, nu repetate.
+
+Autoritatea activă rămâne07d1ddbe0b83753bbf189770af1911623fef8d6f, C V3 terminală corect, pendingnull. OWNER1807 a830c132521bd4348454653f713e04f6107484fe și toate protecțiile independente sunt neschimbate. Zero bootstrap, task C V3, pilot ori V4 relansate; zero cereri broker/ordine/noi încercări de strategie/protected openings.
+
+**Laboratorul integral și B–E nu sunt finalizate.** Decizia machine-side este SELECT_DIFFERENT_AUTHORIZED_DATA_SUPPORTED_MECHANISM; acea ipoteză următoare nu este încă instalată sau executată. Registrul/selectorul general de programe, contabilizarea globală a încercărilor, traseul candidat→cont continuu→confirmare și produsul C# rămân de integrat/demonstrat. Nu există o căutare nelimitată activă. Nu relansa recuperarea82arhive sau studiile încheiate. Lipsurile nu sunt0/pierdere și nu se repară prin ieșiri/filluri inventate.
+
+---
+
 # Recuperare Work și succesorul read-only V4 — 2026-10-19
 
 Autoritate recuperată exclusiv GitHub LIVE. Ultimul documentar anterior f39c22fd6213afc16ff460c5478b8e1c0a7c83e0 era complet salvat. Autoritatea activă rămâne07d1ddbe0b83753bbf189770af1911623fef8d6f, sequence3, pendingnull, REGISTERED_RESEARCH_COMPLETE_INSUFFICIENT_EVIDENCE. OWNER1807 rămâne a830c132521bd4348454653f713e04f6107484fe. STOP-ul și toate sursele sigilate sunt păstrate; zero bootstrap, coadă sau experiment acceptat relansat.
