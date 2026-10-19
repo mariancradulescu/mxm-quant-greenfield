@@ -11,6 +11,9 @@ PATH='.github/workflows/mxm-integrated-p0-recovery.yml'
 def workflow(source):
     return '''name: MXM integrated P0 ordinary recovery
 on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/mxm-integrated-p0-recovery.yml]
   schedule:
     - cron: '11,26,41,56 * * * *'
   workflow_run:
