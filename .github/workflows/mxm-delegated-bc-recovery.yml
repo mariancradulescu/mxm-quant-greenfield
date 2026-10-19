@@ -16,10 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: 9527c32a19416da289e4c05e2ed7a0d55f67a4b1
+          ref: fe4f0047a6a55866d4f7dcfdcce0f973c21c2f00
           persist-credentials: false
       - name: Recover missed ordinary handoff from protected Git; never bootstrap
         run: python3 -m research_core_v4.delegated_bc_20261019.watch
         env:
           GH_TOKEN: ${{ github.token }}
-          BC_EXPECTED_SOURCE_SHA: 9527c32a19416da289e4c05e2ed7a0d55f67a4b1
+          BC_EXPECTED_SOURCE_SHA: fe4f0047a6a55866d4f7dcfdcce0f973c21c2f00
