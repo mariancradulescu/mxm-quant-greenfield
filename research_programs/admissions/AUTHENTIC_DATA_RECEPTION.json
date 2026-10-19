@@ -1,0 +1,171 @@
+{
+  "schema": "mxm.laboratory-admission.v1",
+  "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+  "mode": "DEVELOPMENT_RESEARCH",
+  "module_sha256": "f49e19b38199e48a17ef754789f6deb44ad0ed2183305bd45ad2aea46a378bb5",
+  "steps_per_segment": 1,
+  "programme_generation": "NEW_ADMISSION_WITHOUT_CODE_CHANGE_MINIMUM_AUTHENTIC_DATA_ONLY",
+  "programmes": [
+    {
+      "schema": "mxm.laboratory-program.v1",
+      "id": "FUNCTIONAL_AUTHENTIC_DATA_CONTROL",
+      "version": 1,
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "partition": "DEVELOPMENT",
+      "orders": 0,
+      "mode": "DEVELOPMENT_RESEARCH",
+      "budget": {
+        "steps": 3,
+        "broker_requests": 3,
+        "new_V2_identities": 0
+      },
+      "prospective_at_ms": 1736251200000,
+      "provenance": "DIRECTOR_FUNCTIONAL_DATA_DIAGNOSTIC_NO_ALPHA_NO_ECONOMIC_OUTCOME",
+      "source_sha256": "f49e19b38199e48a17ef754789f6deb44ad0ed2183305bd45ad2aea46a378bb5",
+      "tasks": {
+        "native_data": {
+          "operator": "acquire",
+          "input": {
+            "provider": "PEPPERSTONE_OPEN_API",
+            "partition": "DEVELOPMENT",
+            "read_only": true,
+            "automatic_retries": 0,
+            "instrument": "EURGBP",
+            "kind": "M5",
+            "symbol_id": 9,
+            "digits": 5,
+            "start_ms": 1736247600000,
+            "end_ms": 1736251200000,
+            "max_pages": 3,
+            "account_scope": "b8bd610d0fe4395264e04bad98284c716d4b9d32fb46ce3ae6a2a9a1fd619636"
+          },
+          "dependencies": [],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        },
+        "causal_no_op": {
+          "operator": "causal_intents",
+          "input": {
+            "candidate": {
+              "id": "V2-C990006",
+              "mechanism": {
+                "family": "SYNTHETIC_RECEPTION"
+              },
+              "rationale": "Constant-zero diagnostic only; no trade decision, edge hypothesis, economic outcome or confirmation",
+              "universe": [
+                "EURGBP"
+              ],
+              "features": [],
+              "lookbacks": [],
+              "filters": [],
+              "parameters": {
+                "causal_dsl": {
+                  "entry_delay_ms": 1000,
+                  "hold_ms": 60000,
+                  "trade_symbol_id": 9,
+                  "decision_times_ms": [
+                    1736251200000
+                  ],
+                  "features": [
+                    {
+                      "name": "native_completed_close",
+                      "asset": "native",
+                      "field": "close",
+                      "lag": 0
+                    }
+                  ],
+                  "direction_expression": 0
+                }
+              },
+              "data": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "causal_availability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "normalization_training": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "timing": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "entry": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "exit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "maximum_hold": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "execution_assumptions": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "capital_semantics": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "cloud_portability": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "position_admission_policy": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "stage_a_economic_unit": {
+                "rule": "SYNTHETIC_DETERMINISTIC_RECEPTION_ONLY"
+              },
+              "direction": {
+                "rule": "FIXTURE_LONG"
+              },
+              "cost_state": {
+                "state": "CONSERVATIVE_BOUND"
+              },
+              "no_rescue_rule": {
+                "material_change_requires_new_identity": true
+              },
+              "provenance": {
+                "programme": "FUNCTIONAL_AUTHENTIC_DATA_CONTROL",
+                "prospective_at_ms": 1736164800000,
+                "synthetic_reception": true
+              }
+            },
+            "assets": {
+              "native": {
+                "field_of": "native_data",
+                "field": "asset_id"
+              }
+            }
+          },
+          "dependencies": [
+            "native_data"
+          ],
+          "when": {
+            "native_data": [
+              "DATA_VALID"
+            ]
+          },
+          "priority": 1,
+          "trial_units": 0
+        },
+        "preserve_data_report": {
+          "operator": "report",
+          "input": {
+            "native_data": {
+              "result_of": "native_data"
+            },
+            "causal_no_op": {
+              "result_of": "causal_no_op"
+            }
+          },
+          "dependencies": [
+            "native_data",
+            "causal_no_op"
+          ],
+          "when": {},
+          "priority": 1,
+          "trial_units": 0
+        }
+      }
+    }
+  ]
+}
