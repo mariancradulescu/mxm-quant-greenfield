@@ -1,7 +1,6 @@
 """Catalogue, quality/cache and generic bounded acquisition over existing collector."""
 from dataclasses import dataclass,field
 from .common import *
-DEVELOPMENT_END_MS=1789603200000
 KINDS={'M5','H1','BID_ASK'}
 
 def verify_quote_reference(reference):
@@ -77,6 +76,7 @@ class DataCatalogue:
         for original in rows:
             r=dict(original);t=utc_ms(r['t']);a=utc_ms(r.get('available_at',r['t']))
             need(m['start_ms']<=t<m['end_ms'] and a>=t,'ROW_TIME')
+            if m['partition']=='DEVELOPMENT':need(a<DEVELOPMENT_END_MS,'PROTECTED_ROW_AVAILABILITY')
             r['t']=t;r['available_at']=a
             key=(t,r.get('side','M5'))
             if m['resolution'] in ('M5','H1'):
@@ -130,7 +130,8 @@ class DataCatalogue:
         return True
     def view(self,asset_id,decision_ms):
         self.require_usable(asset_id)
-        m=self.assets[asset_id];need(m['partition']=='DEVELOPMENT','PROTECTED_READ_GATE')
+        m=self.assets[asset_id];need(m['partition']=='DEVELOPMENT' and
+             type(decision_ms) is int and decision_ms<DEVELOPMENT_END_MS,'PROTECTED_READ_GATE')
         return [r for r in self.rows[asset_id] if r['available_at']<=decision_ms]
     def gaps(self,asset_id,expected_times):
         m=self.assets[asset_id];actual={r['t'] for r in self.rows[asset_id]}
@@ -152,8 +153,24 @@ class DataCatalogue:
 
 class Acquisition:
     """Whitelist adapter. No orders, arbitrary endpoints, retries or new providers."""
-    def __init__(self,cache,collector,budget):self.cache=cache;self.collector=collector;self.budget=dict(budget);self.receipts=[];self.remaining=budget.get('TOTAL',sum(budget.values()))
+    def __init__(self,cache,collector,budget):
+        self.cache=cache;self.collector=collector;self.budget=dict(budget)
+        self.initial_budget=dict(budget);self.receipts=[]
+        self.remaining=budget.get('TOTAL',sum(budget.values()));self.check()
+    def check(self):
+        need(set(self.budget)==set(self.initial_budget) and set(self.budget)<=KINDS|{'TOTAL'},
+             'ACQUISITION_BUDGET_KEYS')
+        need(all(type(v) is int and v>=0 for v in self.initial_budget.values()) and
+             all(type(v) is int and 0<=v<=self.initial_budget[k] for k,v in self.budget.items()),
+             'ACQUISITION_BUDGET_RANGE')
+        cap=self.initial_budget.get('TOTAL',sum(self.initial_budget.values()))
+        spent=sum(self.initial_budget[k]-self.budget[k] for k in self.initial_budget if k!='TOTAL')
+        need(type(self.remaining) is int and 0<=self.remaining<=cap and
+             self.remaining+spent==cap and
+             ('TOTAL' not in self.budget or self.budget['TOTAL']==cap),
+             'ACQUISITION_RESOURCE_CONSERVATION')
     def request(self,plan):
+        self.check()
         need(plan['provider']=='PEPPERSTONE_OPEN_API' and plan['partition']=='DEVELOPMENT','DATA_DOMAIN')
         need(plan['kind'] in KINDS and 0<=plan['start_ms']<plan['end_ms']<=DEVELOPMENT_END_MS,'ACQUISITION_SCOPE')
         need(plan.get('read_only') is True and plan.get('automatic_retries',0)==0,'ACQUISITION_MODE')
@@ -162,6 +179,7 @@ class Acquisition:
         # Reserve the whole bounded call before any possible network send.
         cap=plan['max_pages'];need(type(cap) is int and cap==(2 if plan['kind']=='BID_ASK' else 3),'PAGE_CAP')
         need(self.budget.get(plan['kind'],0)>=cap and self.remaining>=cap,'ACQUISITION_BUDGET');self.budget[plan['kind']]-=cap;self.remaining-=cap
+        self.check()
         need(self.collector is not None,'ACQUISITION_TRANSPORT_UNAVAILABLE')
         if plan['kind'] in ('M5','H1'):
             period=300 if plan['kind']=='M5' else 3600

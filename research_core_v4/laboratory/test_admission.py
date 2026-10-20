@@ -5,7 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from copy import deepcopy
 from .admission import TypedTrialBook,bootstrap_typed_book,semantic_hash
-from .common import digest,need,number
+from .common import digest,need,number,DEVELOPMENT_END_MS
 
 def fixture():
     legacy={'limits':{'V2':84},'used':{'V2':22},'identities':{'V2:V2-C033':{'spec_hash':'c'*64,'units':1,'state':'RESERVED'}}}
@@ -89,7 +89,7 @@ class AdmissionTests(unittest.TestCase):
         def publish(spec,evidence):
             if evidence['trades']:self.assertEqual(calls,['opened'])
             return {'status':'FIXTURE_ONLY'}
-        ns={'native':SimpleNamespace(graph=lambda x:{},point=lambda q:q,account=lambda *a:account,
+        ns={'DEVELOPMENT_END_MS':DEVELOPMENT_END_MS,'native':SimpleNamespace(graph=lambda x:{},point=lambda q:q,account=lambda *a:account,
               currencies=lambda *a:{'EUR'},route=lambda *a:[]),'screen':publish,'need':need,'number':number,'digest':digest}
         exec(compile(ast.Module(body=[function],type_ignores=[]),'production-science-adapter','exec'),ns)
         intent={'symbol_id':1,'feature_available_ms':0,'decision_ms':0,'entry_ms':1000,'exit_ms':2000,'direction':1}

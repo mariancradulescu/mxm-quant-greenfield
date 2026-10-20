@@ -123,6 +123,14 @@ def preflight():
             candidates=[strict_json(x.read_bytes()) for x in sorted((ROOT/'discovery/candidates').glob('V2-C*.json'))]
             candidates.append(p['programmes']['VOLUME_SURPRISE_CLOSE_LOCATION_PRESSURE_20261019_A']['progress']['results']['freeze_pressure']['value'])
             upgrade_fingerprint(prior_book,candidates,os.environ['LAB_SOURCE_SHA']);p['trial_book']=prior_book.export()
+        if a['mode']=='DEVELOPMENT_RESEARCH' and prior_book.hash_version==2:
+            # Prospective transition only after both native reception gates.
+            # Technical checkpoint20 migration retains its exact ledger bytes.
+            candidates=[strict_json(x.read_bytes()) for x in sorted((ROOT/'discovery/candidates').glob('V2-C*.json'))]
+            candidates.append(p['programmes']['VOLUME_SURPRISE_CLOSE_LOCATION_PRESSURE_20261019_A']['progress']['results']['freeze_pressure']['value'])
+            prior_book.upgrade_semantic_schema(candidates,os.environ['LAB_SOURCE_SHA'])
+            p['trial_book']=prior_book.export()
+        if a['mode']=='DEVELOPMENT_RESEARCH':need(prior_book.hash_version==3,'SCHEMA_CANONICAL_FINGERPRINT_REQUIRED')
         book=register_and_validate(p,a,history);p['history']=history
         p.setdefault('programme_origins',{}).setdefault(digest(a),s['sequence'])
         p.setdefault('programme_accounting_origins',{}).setdefault(digest(a),accounting(book.export()))

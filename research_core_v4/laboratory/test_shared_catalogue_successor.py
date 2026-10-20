@@ -38,8 +38,8 @@ class SharedCatalogueSuccessor(unittest.TestCase):
         private={'programmes':{},'shared_catalogue':DataCatalogue().export()}
         a=Laboratory(ma,history,book)
         aid=a.cache.ingest(self.manifest('A'),[self.bar(0)])
-        a.acquisition.budget={'M5':2,'H1':0,'BID_ASK':0,'TOTAL':2}
-        a.acquisition.remaining=1
+        # This technical programme has zero acquisition authority. Nonzero
+        # resource conservation is exercised by test_resource_contracts.
         a.acquisition.receipts=[{'state':'ARTIFICIAL','plan_sha256':'e'*64}]
         a.execute(a.next())
         preserve_node(private,a)
@@ -60,15 +60,15 @@ class SharedCatalogueSuccessor(unittest.TestCase):
         # The restored A snapshot predates B; it must see B's valid shared refs.
         a2=Laboratory.restore(saved_a,history,shared_catalogue=private['shared_catalogue'])
         self.assertIn(bid,a2.cache.assets)
-        self.assertEqual(a2.acquisition.remaining,1)
-        self.assertEqual(a2.acquisition.budget['M5'],2)
+        self.assertEqual(a2.acquisition.remaining,0)
+        self.assertEqual(a2.acquisition.budget['M5'],0)
         self.assertEqual(a2.acquisition.receipts,saved_a['native_receipts'])
         a2.execute(a2.next())
         preserve_node(private,a2)
         self.assertEqual(private['shared_catalogue'],before)
         self.assertEqual(set(private['programmes']),{ma['id'],mb['id']})
         self.assertEqual(private['programmes'][mb['id']]['progress'],b.checkpoint()['progress'])
-        self.assertEqual(private['programmes'][ma['id']]['acquisition_remaining'],1)
+        self.assertEqual(private['programmes'][ma['id']]['acquisition_remaining'],0)
 
         # A direct stale checkpoint must never silently erase B from shared state.
         stale=Laboratory.restore(saved_a,history)

@@ -60,7 +60,7 @@
       "basis": "REPRODUCED",
       "status": "CODE_VERIFIED_NATIVE_PENDING",
       "implementation": "FINANCING requires matching active executed position; duplicate position/time financing rejected; position IDs cannot be reused after close. Positive/negative cash conservation tests. Additional chronological repair: strict eligible financing requires nonoverlapping causal accrual intervals, checked after matching the active executed position. Adjacent positive/negative intervals conserve cash; duplicate intervals with distinct charge timestamps are rejected.",
-      "remaining_acceptance": "Native economic path, dated accrual source/interval uniqueness and all-volume financing parity."
+      "remaining_acceptance": "Native economic path, dated accrual source/interval uniqueness and all-volume financing parity. Chronological source repair is merged in PR36 after CI39425533775/job118637016512:205 tests and13 immutable before failures; actual broker accrual/fill/stop-out fidelity remains open."
     },
     {
       "id": "A-07",
@@ -70,7 +70,7 @@
       "basis": "REPRODUCED",
       "status": "PARTIAL_CODE_VERIFIED",
       "implementation": "Adapter validates signal clocks, observed quote and FX availability. Eligible laboratory replay requires independent strict engine provenance and unchanged per-position signal. Screening adapter now rejects future signal/quote/FX availability before native gross calculation or outcome callback; includes commission-currency FX paths. Continuous account groups equivalent timezone spellings by physical UTC instant, validates matching mark identity, integer volumes and positive exit price/FX.",
-      "remaining_acceptance": "Authentic receipt provenance and financing/FX source clocks at scale; generic historical replay API retains explicit legacy compatibility (strict flag defaults false)."
+      "remaining_acceptance": "Authentic receipt provenance and financing/FX source clocks at scale; generic historical replay API retains explicit legacy compatibility (strict flag defaults false). PR36 native CI205 tests confirms the added screen/chronology contracts. No operational or economic acceptance inferred."
     },
     {
       "id": "SEC-01",
@@ -165,9 +165,9 @@
       "id": "REC-05",
       "aliases": [],
       "basis": "STATIC_CONFIRMED",
-      "status": "OPEN",
-      "implementation": "No historical accounting or protected cutoff changed.",
-      "remaining_acceptance": "Seal/validate skipped reasons, unify exact protected boundary from sealed authority, resource budget deltas."
+      "status": "PARTIAL_CODE_VERIFIED_RESOURCE_AND_BOUNDARY",
+      "implementation": "No historical accounting or protected cutoff changed. Restore now validates exact acquisition budget keys/types/ranges and total-minus-kind-reservations conservation, removing the vacuous check. Common protected cutoff is derived from byte-sealed original V2 budget and Wave01 authorities; all core data/DSL/economic consumers share1789646578000. Protected row availability and protected decision reads fail closed; originals remain unedited.",
+      "remaining_acceptance": "Native archived10-programme compatibility/readback with stronger resource validators; native resource-delta and protected-boundary probes. Skip reasons are already deterministically derived from sealed dependencies; complete native terminal reception remains outstanding."
     },
     {
       "id": "DAT-01",
@@ -198,7 +198,7 @@
       "aliases": [],
       "basis": "STATIC_CONFIRMED",
       "status": "PARTIAL_NATIVE_READBACK_BENCHMARK",
-      "implementation": "Native conserved-corpus measurement:11504 saved quote references,23008 side records,63symbols; exact archive/cipher and upstream producer run39216105583/source9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9 verified. Boundary extent is not continuous coverage. Repaired native run39411594407 measured2.210309076s,11504 references,23008 side records of which21191 have numeric positive price/timestamp;765108KiB producer RSS. No paired/continuous/executable-throughput claim. Native raw-receipt benchmark39413181712:979500 decoded records in2.721519521s,23008pages,1817empty sides retained;0partial/nonpositive records. Counts are not unique market events or executable trades. Independent run39414627830 verifies ordered reference SHA256d86697d221e51e23f7454b061acc97e7ab122bd9619b0ba99e7bdb0a28f11a2d and catalogue5c348228528e3602d22f157879e8b68964578fd72b6573e2b8a72636367983bb; decode/verify2.890872174s producer/3.007878149s cold.",
+      "implementation": "Native conserved-corpus measurement:11504 saved quote references,23008 side records,63symbols; exact archive/cipher and upstream producer run39216105583/source9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9 verified. Boundary extent is not continuous coverage. Repaired native run39411594407 measured2.210309076s,11504 references,23008 side records of which21191 have numeric positive price/timestamp;765108KiB producer RSS. No paired/continuous/executable-throughput claim. Native raw-receipt benchmark39413181712:979500 decoded records in2.721519521s,23008pages,1817empty sides retained;0partial/nonpositive records. Counts are not unique market events or executable trades. Independent run39414627830 verifies ordered reference SHA256d86697d221e51e23f7454b061acc97e7ab122bd9619b0ba99e7bdb0a28f11a2d and catalogue5c348228528e3602d22f157879e8b68964578fd72b6573e2b8a72636367983bb; decode/verify2.890872174s producer/3.007878149s cold. Generic DSL now binary-searches preindexed availability clocks per feature/decision instead of scanning every row each time; exact lag and staleness checks remain. This is a source complexity repair, not an authentic economic throughput claim.",
       "remaining_acceptance": "Document real instrument/session/interval support and benchmark chronological executable economic processing at scale before choosing storage/index changes."
     },
     {
@@ -215,9 +215,9 @@
       "id": "ACC-02",
       "aliases": [],
       "basis": "REPRODUCED_IN_EXTERNAL_AUDIT",
-      "status": "OPEN",
-      "implementation": "Existing historical fingerprints retained.",
-      "remaining_acceptance": "Schema whitelist/numeric canonicalization with exact anti-reset transition and metamorphic regressions."
+      "status": "CODE_VERIFIED_PROSPECTIVE_TRANSITION_NATIVE_PENDING",
+      "implementation": "Fingerprint v3 uses a schema allowlist, rejects unknown top-level fields, excludes declared identity/annotation metadata, canonicalizes finite numbers without Decimal-context rounding, and sorts the universe. An additive, exact-v2-spec-bound event derives every historical v3 hash itself while retaining all old indices/events/baseline. It cannot run after a new identity has been reserved; repeated/incomplete/changed-original transitions fail before mutation. Technical checkpoint20 migration does not activate it. Only the future eligible research preflight, after both reception gates, requires v3 before reservation.",
+      "remaining_acceptance": "Six artificial metamorphic/transition tests pass, including cross-lane numeric/cosmetic duplicate refusal and unchanged historical accounting. Native CI and eventual authorized prospective transition readback pending; no live ledger migration performed."
     },
     {
       "id": "ACC-03",
