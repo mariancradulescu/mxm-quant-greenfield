@@ -4,6 +4,28 @@ from . import checkpoint20_readback as m
 from .common import LabError
 
 class NativeReadbackTest(unittest.TestCase):
+    def test_legacy_trust_collision_is_reported_without_values_or_repair(self):
+        from .data import DataCatalogue
+        from .common import digest
+        manifest={'instrument':'PRIVATE_SYMBOL','resolution':'BID_ASK','partition':'DEVELOPMENT',
+            'start_ms':0,'end_ms':10,'source':'PRIVATE_ORIGIN','source_sha256':'a'*64,
+            'available_at_ms':10,'session_semantics':'POINT','completeness':'UNRESOLVED',
+            'account_scope':'PRIVATE_ACCOUNT'}
+        cat=DataCatalogue(); key=cat.ingest(manifest,[{'t':1,'side':'bid','price':1}])
+        old=cat.export(); meta=old['assets'].pop(key); rows=old['rows'].pop(key)
+        del meta['identity_version']
+        legacy=digest({'manifest':manifest,'normalized':rows});meta['id']=legacy
+        old['assets'][legacy]=meta;old['rows'][legacy]=rows
+        shared=deepcopy(old); shared['assets'][legacy]['trust']='AUTHENTICATED_NATIVE_CUSTODY'
+        original=deepcopy((shared,old))
+        result=m.catalogue_diagnostic(shared,old)
+        self.assertFalse(result['compatible'])
+        self.assertEqual(result['conflicts'][0]['changed_known_fields'],['trust'])
+        self.assertTrue(result['conflicts'][0]['same_rows'])
+        self.assertEqual((shared,old),original)
+        self.assertNotIn('PRIVATE_',str(result))
+        self.assertTrue(m.catalogue_diagnostic(old,old)['compatible'])
+
     def test_workflow_restricts_secret_scope_and_keeps_evidence_read_only(self):
         w=m.build_workflow('a'*40)
         self.assertEqual(w['on'],{'workflow_dispatch':{}})
