@@ -13,7 +13,7 @@ jobs:
         with: {path: installation, persist-credentials: false}
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: aa41ee31268bcf773f5f9299ac611d4bae7b88ff
+          ref: dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128
           path: code
           persist-credentials: false
       - name: Verify exact installable workflow and pinned code
@@ -23,7 +23,7 @@ jobs:
           import json,pathlib,subprocess
           from research_core_v4.laboratory.secret_isolation import build_workflow as isolation_workflow
           from research_core_v4.laboratory.checkpoint20_readback import build_workflow as checkpoint_workflow
-          expected='aa41ee31268bcf773f5f9299ac611d4bae7b88ff'
+          expected='dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128'
           assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==expected
           workflow=json.loads(pathlib.Path('../installation/.github/workflows/mxm-r3-secret-isolation.yml').read_bytes())
           assert workflow==isolation_workflow('e5add220235b14678a96972c2a7afb237d31a972')
