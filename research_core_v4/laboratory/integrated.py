@@ -345,30 +345,117 @@ def observer():
     dispatch_once(route,oid,s,ref,path)
 
 def fault_probes():
-    route=workload('fault-probes',True);parent=current(route);original=file_at(route,'program-state.json',parent);s,_=state_at(route,parent);need(s['safe_stop'] and not s['pending'],'PROBES_TERMINAL_ONLY')
-    # Real authorization-denial GET, using a deliberately invalid fixture token.
-    # The configured token is restored without logging or serializing it.
-    configured=os.environ['GH_TOKEN'];denied=False
+    """Native, keyless negative proofs, recorded to the evidence branch.
+
+    No economic programme or original checkpoint is executed. The controlled
+    ACK fault is enabled only inside this named proof job and restored even on
+    error; it cannot leak into ordinary publisher execution.
+    """
+    route=workload('fault-probes',True)
+    parent=current(route)
+    original=file_at(route,'program-state.json',parent)
+    state,_=state_at(route,parent)
+    need(state['safe_stop'] is True and state['pending'] is None,
+         'PROBES_TERMINAL_ONLY')
+    need(state['last_run_id']==int(os.environ['GITHUB_RUN_ID']),
+         'PROBES_NATIVE_RUN')
+    configured=os.environ['GH_TOKEN']
+    denied=False
     try:
         os.environ['GH_TOKEN']='MXM_INVALID_AUTHORIZATION_FIXTURE_ONLY'
         try:GetOnly().json('git/ref/heads/'+EVIDENCE_BRANCH)
-        except urllib.error.HTTPError as e:denied=e.code==401
+        except urllib.error.HTTPError as error:denied=error.code==401
     finally:os.environ['GH_TOKEN']=configured
     need(denied,'PROBES_TOKEN_LOSS_NOT_REJECTED')
-    manifest=strict_json(file_at(route,s['ciphertext_path'],parent));incomplete=False
+    manifest=strict_json(file_at(route,state['ciphertext_path'],parent))
+    incomplete=False
     try:
-        restore_ciphertext(manifest,lambda p:file_at(route,p,parent)[:-12] if p==manifest['parts'][0]['path'] else file_at(route,p,parent))
+        restore_ciphertext(manifest,lambda p:file_at(route,p,parent)[:-12]
+                           if p==manifest['parts'][0]['path']
+                           else file_at(route,p,parent))
     except Exception:incomplete=True
     need(incomplete,'PROBES_INCOMPLETE_CHECKPOINT_ACCEPTED')
+    # Actual keyless native process: source entry cannot decrypt without secret.
+    from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
+    missing_credentials_refused=False
+    with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as tmp:
+        try:_private_key_from_secret(Path(tmp))
+        except Exception:missing_credentials_refused=True
+    need(missing_credentials_refused,'PROBES_MISSING_PRIVATE_KEY_NOT_REFUSED')
+    # Historical pre-fence proof was actually exercised by native jobs, not
+    # re-created in an artificial strategy trial.
+    negative_run=39322312307
+    old_run=route.json('actions/runs/'+str(negative_run))
+    old_jobs=route.json('actions/runs/'+str(negative_run)+'/attempts/1/jobs?per_page=100')['jobs']
+    need(old_run['path']==WF and old_run['conclusion']=='failure' and
+         can_recover_before_exposure({'pending':{'phase':'PRE_EXPOSURE'}},old_jobs),
+         'PROBES_HISTORICAL_CRASH_PROOF')
+    old_path='typed-successor/recoveries/'+str(negative_run)+'.json'
+    recovered=strict_json(file_at(route,old_path,parent))
+    need(recovered['run_id']==negative_run and
+         recovered['no_economic_exposure'] is True and
+         recovered['refunds']==0,'PROBES_HISTORICAL_RECOVERY_PROOF')
+    # Deliberate ACK loss is exclusively inside this fault-probes workload.
+    ack_path='typed-successor/fault-probes/'+os.environ['GITHUB_RUN_ID']+'/ack.json'
+    ack_bytes=encoded({'kind':'SYNTHETIC_ACK_LOSS_CAS_NONOUTCOME',
+                       'native_run_id':int(os.environ['GITHUB_RUN_ID']),
+                       'checkpoint_cipher_sha256':state['ciphertext_sha256'],
+                       'orders':0,'new_outcomes':0})
+    prior_fault=os.environ.get('LAB_FAULT_ACK')
+    try:
+        os.environ['LAB_FAULT_ACK']='AFTER_PUSH'
+        ack_oid=atomic_publish(route,parent,{ack_path:ack_bytes},
+                               'Native controlled ACK-fault reconciliation only; no economic work')
+    finally:
+        if prior_fault is None:os.environ.pop('LAB_FAULT_ACK',None)
+        else:os.environ['LAB_FAULT_ACK']=prior_fault
+    need(file_at(route,ack_path,ack_oid)==ack_bytes and
+         file_at(route,'typed-successor/program-state.json',ack_oid)==
+         file_at(route,'typed-successor/program-state.json',parent),
+         'PROBES_ACK_EXACT_READBACK')
     from concurrent.futures import ThreadPoolExecutor
     def writer(name):
-        try:return {'writer':name,'accepted':True,'oid':atomic_publish(route,parent,{'typed-successor/fault-probes/'+os.environ['GITHUB_RUN_ID']+'/'+name+'.json':encoded({'probe':name,'not_economic':True})},'Controlled concurrent writer probe '+name)}
+        try:return {'writer':name,'accepted':True,'oid':atomic_publish(
+            route,ack_oid,{'typed-successor/fault-probes/'+
+                           os.environ['GITHUB_RUN_ID']+'/'+name+'.json':
+                           encoded({'probe':name,'not_economic':True})},
+            'Concurrent native evidence-plane writer proof '+name)}
         except Exception:return {'writer':name,'accepted':False}
-    with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(writer,['A','B']))
-    need(sum(r['accepted'] for r in results)==1,'PROBES_WRITER_EXCLUSION');oid=current(route);need(file_at(route,'program-state.json',oid)==original and state_at(route,oid)[0]==s,'PROBES_CHECKPOINT_CHANGED')
-    proof={'schema':'mxm.integrated-fault-probes.v2','run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':os.environ['LAB_SOURCE_SHA'],'concurrent_writers':results,'exactly_one_writer_accepted':True,'unauthorized_token_get_rejected_401':denied,'incomplete_checkpoint_rejected':incomplete,'original_unchanged':True,'typed_checkpoint_unchanged':True,'new_outcomes':0}
-    final=atomic_publish(route,oid,{'typed-successor/fault-probes/'+os.environ['GITHUB_RUN_ID']+'/result.json':encoded(proof)},'Preserve actual native concurrent-writer exclusion proof')
-    print('INTEGRATED_FAULT_PROBES '+json.dumps({'evidence_oid':final,'proof':proof},sort_keys=True))
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results=list(pool.map(writer,['A','B']))
+    need(sum(x['accepted'] for x in results)==1,
+         'PROBES_WRITER_EXCLUSION')
+    checkpoint_oid=current(route)
+    need(file_at(route,'program-state.json',checkpoint_oid)==original and
+         state_at(route,checkpoint_oid)[0]==state,
+         'PROBES_CHECKPOINT_CHANGED')
+    proof={
+        'schema':'mxm.e2e.native-negatives.v3',
+        'run_id':int(os.environ['GITHUB_RUN_ID']),
+        'source_sha':os.environ['LAB_SOURCE_SHA'],
+        'sequence':state['sequence'],
+        'ciphertext_sha256':state['ciphertext_sha256'],
+        'checkpoint_parent_oid':parent,
+        'ack_commit_oid':ack_oid,'ack_path':ack_path,
+        'ack_sha256':bytes_digest(ack_bytes),
+        'concurrent_writers':results,
+        'pre_fence_native_run_id':negative_run,
+        'pre_fence_recovery_path':old_path,
+        'unauthorized_get_http_code':401,
+        'incomplete_checkpoint_rejected':incomplete,
+        'missing_private_key_refused':missing_credentials_refused,
+        'original_public_sha256':bytes_digest(original),
+        'original_unchanged':True,'orders':0,'new_outcomes':0}
+    file_name='typed-successor/verification/R3_NEGATIVE_'+os.environ['GITHUB_RUN_ID']+'.json'
+    oid=atomic_publish(route,checkpoint_oid,{file_name:encoded(proof)},
+                        'Record native negative controls with exact lineage and CAS readback')
+    need(file_at(route,file_name,oid)==encoded(proof) and
+         file_at(route,'program-state.json',oid)==original,
+         'PROBES_NATIVE_RECORD_READBACK')
+    print('INTEGRATED_FAULT_PROBES_V3 '+json.dumps({
+        'evidence_oid':oid,'proof_path':file_name,'ack_commit_oid':ack_oid,
+        'concurrent_successes':1,'run_id':proof['run_id'],
+        'historical_crash_run':negative_run,'orders':0},sort_keys=True))
 
 def verify():
     """Decrypt published bytes in a fresh cold job and produce v3 proof.
