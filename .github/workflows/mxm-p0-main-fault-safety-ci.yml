@@ -1,0 +1,20 @@
+name: MXM P0 default control-plane fault isolation guard
+on:
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/mxm-integrated-p0.yml, .github/workflows/mxm-p0-main-fault-safety-ci.yml, verification/P0_FAULT_ISOLATION_GUARD.py]
+  push:
+    branches: [main]
+    paths: [.github/workflows/mxm-integrated-p0.yml, .github/workflows/mxm-p0-main-fault-safety-ci.yml, verification/P0_FAULT_ISOLATION_GUARD.py]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  static-boundary:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Prove ordinary path cannot inject faults
+        run: python3 verification/P0_FAULT_ISOLATION_GUARD.py
