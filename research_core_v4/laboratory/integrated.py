@@ -155,7 +155,7 @@ def execute():
         for _ in range(a['steps_per_segment']):
             m=next((m for m in a['programmes'] if m['id'] not in p['programmes'] or not p['programmes'][m['id']]['progress']['safe_stop']),None)
             if m is None:break
-            saved=p['programmes'].get(m['id']);lab=Laboratory.restore(saved,p['history']) if saved else Laboratory(m,p['history'],book,cache=DataCatalogue.restore(p['shared_catalogue']));lab.book=book
+            saved=p['programmes'].get(m['id']);lab=Laboratory.restore(saved,p['history'],shared_catalogue=p['shared_catalogue']) if saved else Laboratory(m,p['history'],book,cache=DataCatalogue.restore(p['shared_catalogue']));lab.book=book
             lazy=None
             try:
                 if a['mode']=='DEVELOPMENT_RESEARCH':
@@ -308,7 +308,7 @@ def verify():
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as folder:
         tmp=Path(folder);key,fp=_private_key_from_secret(tmp);p=open_private(route,s,oid,key,tmp);book=register_and_validate(p,a,p['history'])
         need(accounting(book.export())==s['accounting'] and book.baseline['legacy_snapshot']['used']['V2']==22,'VERIFY_PERSISTENT_TYPED_ACCOUNTING')
-        for m in a['programmes']:need(Laboratory.restore(p['programmes'][m['id']],p['history']).next() is None,'VERIFY_PROGRAMME_NOT_COMPLETE')
+        for m in a['programmes']:need(Laboratory.restore(p['programmes'][m['id']],p['history'],shared_catalogue=p['shared_catalogue']).next() is None,'VERIFY_PROGRAMME_NOT_COMPLETE')
         need(bytes_digest(file_at(route,'program-state.json',oid))==ORIGINAL_PUBLIC,'VERIFY_ORIGINAL_CHANGED')
         origin=p.get('programme_accounting_origins',{}).get(digest(a),{'economic_observations':29})
         proof={'schema':'mxm.integrated-cold-readback.v2','evidence_oid':oid,'run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':os.environ['LAB_SOURCE_SHA'],'sequence':s['sequence'],'ciphertext_sha256':s['ciphertext_sha256'],'private_sha256':digest(p),'accounting':s['accounting'],'all_admitted_programmes_complete':True,'original_unchanged':True,'new_outcomes':s['accounting']['economic_observations']-origin['economic_observations'],'orders':0,'economic_workflow_released':a['economic_release']}
