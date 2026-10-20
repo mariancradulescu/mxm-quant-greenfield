@@ -9,7 +9,7 @@ on:
       parent_oid: {description: Exact durable successor parent, type: string, required: true}
       admission_ref: {description: Immutable v2 admission, type: string, required: true}
       admission_path: {description: Bound admission path, type: string, required: true}
-      fault_before_fence: {description: Controlled technical fault, type: string, required: true, default: '0'}
+      fault_before_fence: {description: Legacy handoff field; ordinary execution always disables fault injection, type: string, required: true, default: '0'}
 permissions: {}
 concurrency:
   group: mxm-integrated-laboratory
@@ -74,7 +74,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           NATIVE_PREFLIGHT_RESULT: ${{ needs.preflight.result }}
-          LAB_FAULT_BEFORE_FENCE: ${{ github.event_name == 'push' && '1' || inputs.fault_before_fence }}
+          LAB_FAULT_BEFORE_FENCE: '0'
   execution-fence:
     needs: segment-intent
     runs-on: ubuntu-24.04
@@ -143,12 +143,11 @@ jobs:
           name: integrated-p0-worker-${{ github.run_id }}
           path: verification/integrated-p0-input/
       - id: archive
-        name: Publish typed checkpoint with deliberate lost-ACK reconciliation
+        name: Publish typed checkpoint; reconcile only genuine lost ACKs
         run: python3 -m research_core_v4.laboratory.publish
         env:
           GH_TOKEN: ${{ github.token }}
           NATIVE_WORKER_RESULT: ${{ needs.investigation.result }}
-          LAB_FAULT_ACK: AFTER_PUSH
   recover-before-exposure:
     needs: [preflight, segment-intent, execution-fence, investigation, durable-archive]
     if: always() && needs.preflight.result == 'success'
