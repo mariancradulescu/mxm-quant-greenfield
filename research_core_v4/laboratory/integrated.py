@@ -57,7 +57,7 @@ def definition(route):
     else:
         gate=strict_json(file_at(route,'typed-successor/END_TO_END_OPERATIONAL_ACCEPTANCE.json',a['technical_acceptance_ref']))
         need(a['economic_release'] is True,'ECONOMIC_LANE_HELD')
-        economic_gate(gate,os.environ['LAB_SOURCE_SHA'],{name:route.json('branches/'+name)['protected'] for name in ('main','mxm-remediation-p0-p4-20261015-v1')})
+        economic_gate(gate,os.environ['LAB_SOURCE_SHA'],{name:route.json('branches/'+name)['protected'] for name in ('main','mxm-remediation-p0-p4-20261015-v1')},route=route)
     need(type(a['steps_per_segment']) is int and 0<a['steps_per_segment']<=16 and len(a['programmes'])>0,'INTEGRATED_STEP_BUDGET')
     ids=[m['id'] for m in a['programmes']];need(len(set(ids))==len(ids),'INTEGRATED_PROGRAMME_DUPLICATE')
     need(all(m['mode']==a['mode'] and m['source_sha256']==module_digest() for m in a['programmes']),'INTEGRATED_PROGRAMME_BINDING')
