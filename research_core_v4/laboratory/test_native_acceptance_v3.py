@@ -30,6 +30,7 @@ class ArtificialRoute:
         self.storage={}
         self.current_head=HEAD
         self.divergent=False
+        self.divergent_ack=False
     def json(self,path):
         if path.startswith('contents/') and '?ref=' in path:
             import base64
@@ -47,7 +48,9 @@ class ArtificialRoute:
                     {'status':'ahead','ahead_by':1,'behind_by':0,
                      'base_commit':{'sha':HEAD}})
         if path=='compare/'+CHECKPOINT+'...'+'6'*40:
-            return {'status':'ahead','ahead_by':1,'behind_by':0,
+            return {'status':'diverged','ahead_by':1,'behind_by':1,
+                    'base_commit':{'sha':'9'*40}} if self.divergent_ack else {
+                    'status':'ahead','ahead_by':1,'behind_by':0,
                     'base_commit':{'sha':CHECKPOINT}}
         if path=='actions/runs/'+str(RUN):
             return {'id':RUN,'status':'completed' if self.run_ok else 'in_progress',
@@ -188,6 +191,18 @@ class IndependentNativeV3ContractTests(unittest.TestCase):
         proof['pre_fence_native_run_id']=10
         route.storage[(paths['negative'],HEAD)]=encoded(proof)
         with self.assertRaises(Exception):self.verify(route,gate)
+    def test_ack_native_proof_from_divergent_git_history_rejected(self):
+        route,gate,_=make_fixture()
+        route.divergent_ack=True
+        with self.assertRaises(Exception):self.verify(route,gate)
+    def test_missing_programme_budget_or_receipt_hash_rejected(self):
+        for key in ('acquisition_budget_sha256','native_receipts_sha256'):
+            route,gate,paths=make_fixture()
+            proof=__import__('json').loads(route.storage[(paths['cold'],HEAD)])
+            proof['programme_checkpoints'][0].pop(key)
+            route.storage[(paths['cold'],HEAD)]=encoded(proof)
+            with self.subTest(key=key),self.assertRaises(Exception):
+                self.verify(route,gate)
     def test_cold_schema_v2_rejected_even_with_native_jobs(self):
         route,gate,paths=make_fixture()
         proof=__import__('json').loads(route.storage[(paths['cold'],HEAD)])
