@@ -96,7 +96,7 @@ def preflight():
             candidates=[strict_json(x.read_bytes()) for x in sorted((ROOT/'discovery/candidates').glob('V2-C*.json'))]
             candidates.append(p['programmes']['VOLUME_SURPRISE_CLOSE_LOCATION_PRESSURE_20261019_A']['progress']['results']['freeze_pressure']['value'])
             p=migrate_private(p,s,history,candidates,os.environ['LAB_SOURCE_SHA'],bytes_digest(original))
-        elif p['source_sha']!=os.environ['LAB_SOURCE_SHA']:p=typed_source_transition(p,s,a['typed_predecessor'],os.environ['LAB_SOURCE_SHA'])
+        elif p['source_sha']!=os.environ['LAB_SOURCE_SHA']:p=typed_source_transition(p,s,a['typed_predecessor'],os.environ['LAB_SOURCE_SHA'],evidence_oid=parent)
         need(p['source_sha']==os.environ['LAB_SOURCE_SHA'] and 'typed_transition' in p,'PREFLIGHT_SUCCESSOR_SOURCE')
         prior_book=TypedTrialBook.restore(p['trial_book'])
         if prior_book.hash_version==1:
