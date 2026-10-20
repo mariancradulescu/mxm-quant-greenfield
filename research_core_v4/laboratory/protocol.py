@@ -101,6 +101,13 @@ def typed_source_transition(private,state,authority,source,evidence_oid=None):
     before_book=digest(private['trial_book']);before_catalogue=digest(private['shared_catalogue'])
     before=digest(private)
     new=deepcopy(private)
+    # The authenticated checkpoint20 contains legacy IDs that did not bind
+    # trust. Preserve every snapshot and append both conflicting metadata
+    # variants as read-blocking quarantine; never choose a favorable label.
+    if authority.get('source_sha')=='eab050084982916ad0c67798b38b947bac66b2b2':
+        from .execution import quarantine_legacy_trust_conflicts
+        new['shared_catalogue']=quarantine_legacy_trust_conflicts(private['shared_catalogue'],
+            [s['catalogue'] for s in private['programmes'].values()])
     new.setdefault('typed_source_migrations',[]).append({
         **authority,'successor_source_sha':source,
         'predecessor_evidence_oid':evidence_oid,
@@ -108,6 +115,8 @@ def typed_source_transition(private,state,authority,source,evidence_oid=None):
         'accounting_sha256':digest(accounting(private['trial_book'])),
         'shared_catalogue_sha256':before_catalogue,
         'trial_book_sha256':before_book,
+        'successor_shared_catalogue_sha256':digest(new['shared_catalogue']),
+        'provenance_quarantine_added':len(new['shared_catalogue']['quarantine'])-len(private['shared_catalogue']['quarantine']),
         'refunds':0,'closed_programmes_replayed':False
     })
     new['source_sha']=source
@@ -115,7 +124,9 @@ def typed_source_transition(private,state,authority,source,evidence_oid=None):
          and digest(private['shared_catalogue'])==before_catalogue,
          'TYPED_TRANSITION_MUTATED_PREDECESSOR')
     need(new['trial_book']==private['trial_book'] and
-         new['shared_catalogue']==private['shared_catalogue'] and
+         new['shared_catalogue']['assets']==private['shared_catalogue']['assets'] and
+         new['shared_catalogue']['rows']==private['shared_catalogue']['rows'] and
+         new['shared_catalogue']['quarantine'][:len(private['shared_catalogue']['quarantine'])]==private['shared_catalogue']['quarantine'] and
          new['programmes']==private['programmes'],
          'TYPED_TRANSITION_RESET')
     return new

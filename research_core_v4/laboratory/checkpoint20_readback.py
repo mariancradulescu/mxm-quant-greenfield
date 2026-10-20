@@ -36,9 +36,12 @@ def authority(state):
 
 
 def preserve_check(before, after):
+    need({'assets','rows','quarantine'}<=set(after.get('shared_catalogue',{})),'CP20_NO_RESET')
     need(after['sequence'] == before['sequence'] == 20 and
          after['trial_book'] == before['trial_book'] and
-         after['shared_catalogue'] == before['shared_catalogue'] and
+         after['shared_catalogue']['assets'] == before['shared_catalogue']['assets'] and
+         after['shared_catalogue']['rows'] == before['shared_catalogue']['rows'] and
+         after['shared_catalogue']['quarantine'][:len(before['shared_catalogue']['quarantine'])] == before['shared_catalogue']['quarantine'] and
          after['programmes'] == before['programmes'] and
          accounting(after['trial_book']) == accounting(before['trial_book']), 'CP20_NO_RESET')
     need(after['pending'] is before['pending'] is None, 'CP20_NO_OPEN_EXPOSURE')
@@ -190,7 +193,7 @@ def main(stage):
         for saved in private['programmes'].values():
             restored_lab=Laboratory.restore(saved,private['history'])
             need(restored_lab.checkpoint()==saved,'CP20_ARCHIVED_PROGRAMME_RESTORE')
-            diagnostics.append(catalogue_diagnostic(private['shared_catalogue'],saved['catalogue']))
+            diagnostics.append(catalogue_diagnostic(successor['shared_catalogue'],saved['catalogue']))
             restored_programmes+=1
         # Print only a public diagnostic before rejecting. A successful decrypt
         # must not hide a real incompatibility in the authentic saved state.
@@ -199,12 +202,21 @@ def main(stage):
             'catalogues':diagnostics,'authoritative_checkpoint_published':False,
             'operational_acceptance':False,'research_capability_accepted':False}))
         need(all(d['compatible'] for d in diagnostics),'CP20_SHARED_CATALOGUE_CONFLICT')
+        from .data import DataCatalogue
+        migrated_cache=DataCatalogue.restore(successor['shared_catalogue'])
+        blocked={q['asset_id'] for q in successor['shared_catalogue']['quarantine']
+                 if q.get('reason')=='LEGACY_TRUST_PROVENANCE_CONFLICT'}
+        for ident in blocked:
+            reject(lambda: migrated_cache.require_usable(ident),'QUARANTINED_ASSET_READ')
         proof = {'schema': 'mxm.checkpoint20-native-readback.v1', 'context': ctx,
             'stage': stage, 'predecessor_evidence_oid': EVIDENCE, 'sequence': 20,
             'ciphertext_sha256': bytes_digest(blob), 'private_sha256': digest(private),
             'migrated_private_sha256': digest(successor),
             'trial_book_sha256': digest(private['trial_book']),
             'shared_catalogue_sha256': digest(private['shared_catalogue']),
+            'successor_shared_catalogue_sha256':digest(successor['shared_catalogue']),
+            'quarantined_legacy_asset_count':sum(q.get('reason')=='LEGACY_TRUST_PROVENANCE_CONFLICT' for q in successor['shared_catalogue']['quarantine']),
+            'native_quarantined_asset_read_refusals':len(blocked),
             'programmes_sha256': digest(private['programmes']), 'accounting': accounting(private['trial_book']),
             'ciphertext_bytes': len(blob), 'checkpoint_parts': len(manifest['parts']),
             'archived_programmes_restored_without_execution': restored_programmes,

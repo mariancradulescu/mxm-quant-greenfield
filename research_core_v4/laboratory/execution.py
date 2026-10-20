@@ -9,18 +9,65 @@ def bind_native(lab,corpus,collector_factory=LazyNativeCollector):
     lab.authentic_corpus['raw_quote_receipts'].extend(r['quote_point'] for r in lab.acquisition.receipts if r.get('quote_point'))
     lazy=collector_factory({k:lab.acquisition.budget.get(k,0) for k in ('M5','H1','BID_ASK')});lab.acquisition.collector=lazy;return lazy
 
+def preserved_legacy_conflict(catalogue, ident, new_meta, old_meta):
+    if new_meta.get('identity_version') not in (None,1) or old_meta.get('identity_version') not in (None,1):
+        return False
+    if {k for k in set(new_meta)|set(old_meta) if new_meta.get(k)!=old_meta.get(k)}!={'trust'}:
+        return False
+    return any(q.get('reason')=='LEGACY_TRUST_PROVENANCE_CONFLICT' and
+               q.get('asset_id')==ident and new_meta in q.get('metadata_variants',[]) and
+               old_meta in q.get('metadata_variants',[]) for q in catalogue['quarantine'])
+
+
+def quarantine_legacy_trust_conflicts(shared, catalogues):
+    """Append immutable conflicting metadata variants; never choose better trust.
+
+    Used only after the exact closed predecessor private hash is authenticated.
+    Original assets, rows, programmes and ledgers remain byte-for-byte intact.
+    A quarantined identity cannot be queried or consumed by feature adapters.
+    """
+    from .data import DataCatalogue
+    from .common import digest
+    DataCatalogue.restore(shared)
+    result=deepcopy(shared)
+    variants={}
+    for saved in catalogues:
+        DataCatalogue.restore(saved)
+        need(set(saved['assets'])<=set(shared['assets']),'SHARED_CATALOGUE_LOST_ASSET')
+        need(shared['quarantine'][:len(saved['quarantine'])]==saved['quarantine'],
+             'SHARED_CATALOGUE_LOST_QUARANTINE')
+        for ident, old in saved['assets'].items():
+            new=shared['assets'][ident]
+            need(shared['rows'][ident]==saved['rows'][ident],'SHARED_CATALOGUE_PROVENANCE_CONFLICT')
+            if new==old:continue
+            need(new.get('identity_version') in (None,1) and old.get('identity_version') in (None,1) and
+                 {k for k in set(new)|set(old) if new.get(k)!=old.get(k)}=={'trust'},
+                 'SHARED_CATALOGUE_PROVENANCE_CONFLICT')
+            if preserved_legacy_conflict(result,ident,new,old):continue
+            variants.setdefault(ident,{})[digest(new)]=new
+            variants[ident][digest(old)]=old
+    for ident, values in sorted(variants.items()):
+        result['quarantine'].append({'reason':'LEGACY_TRUST_PROVENANCE_CONFLICT',
+            'asset_id':ident,'metadata_variants':[deepcopy(values[h]) for h in sorted(values)]})
+    for saved in catalogues:catalogue_extends(result,saved)
+    catalogue_extends(result,shared)
+    return result
+
+
 def catalogue_extends(new, old):
     """Fail closed if a shared cache lost any prior asset, provenance or quarantine.
 
-    Overlapping IDs must have exactly the same normalized rows and trust metadata;
-    quarantine is append-only, never deduplicated or silently repaired.
+    Overlapping rows are exact. Differing legacy trust is permitted only when
+    both complete metadata variants are retained in an explicit read-blocking
+    quarantine. No trust variant is selected, upgraded or silently repaired.
     """
     from .data import DataCatalogue
     DataCatalogue.restore(new)
     DataCatalogue.restore(old)
     need(set(old['assets']).issubset(new['assets']), 'SHARED_CATALOGUE_LOST_ASSET')
     for asset_id, old_meta in old['assets'].items():
-        need(new['assets'][asset_id] == old_meta and
+        need((new['assets'][asset_id] == old_meta or
+              preserved_legacy_conflict(new,asset_id,new['assets'][asset_id],old_meta)) and
              new['rows'][asset_id] == old['rows'][asset_id],
              'SHARED_CATALOGUE_PROVENANCE_CONFLICT')
     need(new['quarantine'][:len(old['quarantine'])] == old['quarantine'],

@@ -43,7 +43,7 @@ class NativeReadbackTest(unittest.TestCase):
 
     def test_no_reset_check_rejects_each_preserved_component(self):
         before={'sequence':20,'trial_book':{'used':{},'limits':{}},
-                'shared_catalogue':{'assets':{'x':1}},'programmes':{'A':{'value':1}},'pending':None}
+                'shared_catalogue':{'assets':{'x':1},'rows':{'x':[]},'quarantine':[]},'programmes':{'A':{'value':1}},'pending':None}
         after=deepcopy(before)
         m.preserve_check(before,after)
         for k,v in [('sequence',0),('trial_book',{'used':{},'limits':{'V2':84}}),

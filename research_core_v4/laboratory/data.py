@@ -50,13 +50,19 @@ class DataCatalogue:
         return ident
     def query(self,instrument,resolution,start_ms,end_ms,partition='DEVELOPMENT',authentic_only=False):
         ids=[k for k,m in self.assets.items() if m['instrument']==instrument and m['resolution']==resolution and m['partition']==partition and m['start_ms']<=start_ms and m['end_ms']>=end_ms and m['completeness']=='CONFIRMED_COMPLETE' and not m['conflicts'] and not m['invalid'] and self.structural_support(k,start_ms,end_ms) and (not authentic_only or m.get('trust') in ('AUTHENTICATED_NATIVE_CUSTODY','AUTHENTICATED_NATIVE_COLLECTION'))]
-        return sorted(ids)
+        return sorted(k for k in ids if not self.is_quarantined(k))
+    def is_quarantined(self,ident):
+        return any(q.get('reason')=='LEGACY_TRUST_PROVENANCE_CONFLICT' and
+                   q.get('asset_id')==ident for q in self.quarantine)
+    def require_usable(self,ident):
+        need(ident in self.assets and not self.is_quarantined(ident),'CACHE_PROVENANCE_QUARANTINED')
     def structural_support(self,ident,start_ms,end_ms):
         """Necessary support, never a certification of provenance or sessions.
 
         Updates are asynchronous. Carry forward only observed sides, never
         invent an opposite quote or treat absence as a closed session.
         """
+        if self.is_quarantined(ident):return False
         rows=[r for r in self.rows[ident] if start_ms<=r['t']<end_ms]
         if not rows:return False
         m=self.assets[ident]
@@ -68,6 +74,7 @@ class DataCatalogue:
             if len(quotes)==2 and quotes['bid']>quotes['ask']:return False
         return True
     def view(self,asset_id,decision_ms):
+        self.require_usable(asset_id)
         m=self.assets[asset_id];need(m['partition']=='DEVELOPMENT','PROTECTED_READ_GATE')
         return [r for r in self.rows[asset_id] if r['available_at']<=decision_ms]
     def gaps(self,asset_id,expected_times):

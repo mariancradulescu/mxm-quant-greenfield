@@ -31,6 +31,7 @@ def causal_intents(spec,cache,assets):
     rules=spec['parameters']['causal_dsl'];need(rules['entry_delay_ms']>0 and rules['hold_ms']>0,'CAUSAL_HORIZON')
     maps={}
     for name,asset in assets.items():
+        cache.require_usable(asset)
         m=cache.assets[asset];need(m['partition']=='DEVELOPMENT' and m['resolution'] in ('M5','H1'),'FEATURE_ASSET')
         need(m['invalid']==0 and m['conflicts']==0,'FEATURE_DATA_QUALITY')
         if not spec['provenance'].get('synthetic_reception'):need(m['source'].startswith(('PEPPERSTONE_','PRESERVED_AUTHENTIC_')),'UNAUTHENTIC_FEATURE_DATA')
