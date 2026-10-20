@@ -13,6 +13,7 @@ def volume_pressure_intents(spec,cache,assets):
     need(set(assets)==set(p['symbols']),'PRESSURE_UNIVERSE')
     intents=[];missing=[];support={}
     for name,sid in p['symbols'].items():
+        cache.require_usable(assets[name])
         asset=cache.assets[assets[name]]
         need(asset['partition']=='DEVELOPMENT' and asset['resolution']=='M5' and asset['instrument']==name,'PRESSURE_ASSET')
         need(asset.get('trust') in ('AUTHENTICATED_NATIVE_COLLECTION','AUTHENTICATED_NATIVE_CUSTODY'),'PRESSURE_AUTHENTICITY')
