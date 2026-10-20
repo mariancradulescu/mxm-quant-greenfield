@@ -4,6 +4,61 @@ from .common import *
 DEVELOPMENT_END_MS=1789603200000
 KINDS={'M5','H1','BID_ASK'}
 
+def verify_quote_reference(reference):
+    """Bind selected sides to conserved raw tick pages, without pairing feeds.
+
+    This checks receipt consistency, not independent broker authentication or
+    historical network availability. Caller must first verify encrypted corpus
+    custody. Empty/error/truncated windows remain visible and unresolved.
+    """
+    from m6.cost_evidence import decode_ctrader_tick_page
+    need(type(reference) is dict and type(reference.get('symbol_id')) is int and
+         reference['symbol_id']>0 and type(reference.get('boundary_ms')) is int and
+         reference['boundary_ms']>=60000,'QUOTE_RECEIPT_IDENTITY')
+    t=reference['boundary_ms'];sides=reference.get('sides');pages=reference.get('pages')
+    need(type(sides) is dict and set(sides)=={'bid','ask'} and
+         type(pages) is list and len(pages)<=2,'QUOTE_RECEIPT_SHAPE')
+    indexed={};ticks=0;nonpositive=0;partial=0;verified=0;empty=0;unresolved=0
+    for page in pages:
+        need(type(page) is dict and page.get('side') in ('bid','ask') and
+             page['side'] not in indexed and type(page.get('hasMore')) is bool and
+             type(page.get('encoded')) is list,'QUOTE_RAW_PAGE')
+        need(all(type(row) is dict and set(row)=={'timestamp','tick'} and
+             type(row['timestamp']) is type(row['tick']) is int for row in page['encoded']),
+             'QUOTE_RAW_ENCODING')
+        decoded=decode_ctrader_tick_page(page['encoded'])
+        need(all(t-60000<=z.timestamp_ms<=t for z in decoded),'QUOTE_RAW_CAUSAL_WINDOW')
+        indexed[page['side']]=(page,decoded)
+        ticks+=len(decoded);nonpositive+=sum(z.raw_tick<=0 for z in decoded)
+        partial+=int(page['hasMore'])
+    for side,value in sides.items():
+        need(type(value) is dict,'QUOTE_SIDE_RECEIPT')
+        state=value.get('state')
+        if side not in indexed:
+            need(state in ('TRANSPORT_UNRESOLVED','PROVIDER_ERROR') and
+                 not {'price','timestamp_ms'}&set(value),'QUOTE_RAW_SIDE_MISSING')
+            unresolved+=1;continue
+        page,decoded=indexed[side]
+        need(value.get('source_has_more') is page['hasMore'],'QUOTE_PAGINATION_CHANGED')
+        if not decoded:
+            need(state=='EMPTY_AUTHENTIC_WINDOW' and not {'price','timestamp_ms'}&set(value),
+                 'QUOTE_EMPTY_FABRICATED')
+            empty+=1;continue
+        # Match the collector's exact deterministic selection, including tied
+        # timestamps. All side revisions remain present in the raw page.
+        chosen=max(decoded,key=lambda z:z.timestamp_ms)
+        need(state=='AUTHENTIC_CAUSAL_QUOTE' and type(value.get('timestamp_ms')) is int and
+             value['timestamp_ms']==chosen.timestamp_ms and number(value.get('price')) and
+             value['price']==chosen.raw_tick/100000 and
+             type(value.get('age_ms')) is int and value['age_ms']==t-chosen.timestamp_ms,
+             'QUOTE_SELECTED_RAW_MISMATCH')
+        verified+=1
+    return {'raw_pages':len(pages),'decoded_tick_records':ticks,
+        'verified_selected_sides':verified,'empty_sides':empty,'unresolved_sides':unresolved,
+        'partial_pages':partial,'nonpositive_tick_records':nonpositive,
+        'receipt_sha256':digest(reference),'raw_pages_sha256':digest(pages),
+        'historical_network_availability_verified':False,'continuous_coverage_verified':False}
+
 @dataclass
 class DataCatalogue:
     assets:dict=field(default_factory=dict)
