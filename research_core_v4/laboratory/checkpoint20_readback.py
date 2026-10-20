@@ -52,6 +52,40 @@ def reject(call, label):
     need(False, 'CP20_NEGATIVE_ACCEPTED_' + label)
 
 
+def catalogue_diagnostic(shared, saved):
+    """Public counts/hashes only; never repair or relabel a conflicting asset."""
+    from .data import DataCatalogue
+    from .execution import catalogue_extends
+    DataCatalogue.restore(shared)
+    DataCatalogue.restore(saved)
+    allowed = {'trust', 'identity_version', 'row_count', 'normalized_sha256',
+               'completeness', 'source_sha256', 'available_at_ms', 'account_scope',
+               'conflicts', 'invalid', 'interpolated', 'session_semantics'}
+    conflicts = []
+    missing = 0
+    for ident, old in saved['assets'].items():
+        if ident not in shared['assets']:
+            missing += 1
+            continue
+        new = shared['assets'][ident]
+        changed = {k for k in set(old) | set(new) if old.get(k) != new.get(k)}
+        same_rows = shared['rows'][ident] == saved['rows'][ident]
+        if changed or not same_rows:
+            conflicts.append({'asset_id_sha256': digest(ident),
+                'shared_metadata_sha256': digest(new), 'saved_metadata_sha256': digest(old),
+                'changed_known_fields': sorted(changed & allowed),
+                'changed_other_field_count': len(changed - allowed), 'same_rows': same_rows,
+                'legacy_identity': old.get('identity_version') != 2})
+    compatible = True
+    try:
+        catalogue_extends(shared, saved)
+    except LabError:
+        compatible = False
+    return {'compatible': compatible, 'missing_asset_count': missing,
+            'conflicts': conflicts,
+            'quarantine_prefix_preserved': shared['quarantine'][:len(saved['quarantine'])] == saved['quarantine']}
+
+
 def anchors(route):
     for branch, expected in [('mxm-o04-integrated-laboratory-evidence', EVIDENCE),
         ('mxm-o04-successor-code-integrated-p0-r2', SOURCE),
@@ -151,13 +185,20 @@ def main(stage):
         # Exercise the repaired actual restore path on every authentic archived
         # programme. No task is selected/executed and no historic result replayed.
         from .programs import Laboratory
-        from .execution import catalogue_extends
         restored_programmes=0
+        diagnostics=[]
         for saved in private['programmes'].values():
             restored_lab=Laboratory.restore(saved,private['history'])
             need(restored_lab.checkpoint()==saved,'CP20_ARCHIVED_PROGRAMME_RESTORE')
-            catalogue_extends(private['shared_catalogue'],saved['catalogue'])
+            diagnostics.append(catalogue_diagnostic(private['shared_catalogue'],saved['catalogue']))
             restored_programmes+=1
+        # Print only a public diagnostic before rejecting. A successful decrypt
+        # must not hide a real incompatibility in the authentic saved state.
+        print(json.dumps({'schema':'mxm.cp20-catalogue-diagnostic.v1','context':ctx,
+            'archived_programmes_restored_without_execution':restored_programmes,
+            'catalogues':diagnostics,'authoritative_checkpoint_published':False,
+            'operational_acceptance':False,'research_capability_accepted':False}))
+        need(all(d['compatible'] for d in diagnostics),'CP20_SHARED_CATALOGUE_CONFLICT')
         proof = {'schema': 'mxm.checkpoint20-native-readback.v1', 'context': ctx,
             'stage': stage, 'predecessor_evidence_oid': EVIDENCE, 'sequence': 20,
             'ciphertext_sha256': bytes_digest(blob), 'private_sha256': digest(private),
