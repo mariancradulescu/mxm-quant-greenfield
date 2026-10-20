@@ -37,6 +37,17 @@ jobs:
       - name: New integration regression and affected typed accounting checks
         if: github.event_name == 'push'
         run: python3 -m unittest research_core_v4.laboratory.test_general_integration research_core_v4.laboratory.test_integrated_protocol research_core_v4.laboratory.test_admission -v
+      - name: P0-17 refuse unverified economic acceptance certificates
+        run: |
+          python3 - <<'PY'
+          from research_core_v4.laboratory.integrated import workload, definition
+          admission, _, _ = definition(workload('preflight'))
+          if admission['mode'] != 'TECHNICAL_NONOUTCOME':
+              raise SystemExit('P0-17_NATIVE_CERTIFICATE_VERIFICATION_NOT_INSTALLED')
+          print('P0-17 technical-only admission; economic mode blocked before claim')
+          PY
+        env:
+          GH_TOKEN: ${{ github.token }}
       - id: prepare
         name: Full validation and exact forward migration before any durable claim
         run: python3 -m research_core_v4.laboratory.integrated preflight
