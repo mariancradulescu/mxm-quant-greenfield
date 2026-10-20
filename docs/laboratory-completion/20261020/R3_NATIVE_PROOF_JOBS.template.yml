@@ -1,0 +1,70 @@
+# R3 integrated P0 native proof-jobs extension — NOT AN ACTIVE WORKFLOW.
+# Apply only to .github/workflows/mxm-integrated-p0.yml on the existing
+# execution branch after a separate, genuinely protected immutable R3 source
+# is sealed and the new prospective technical admission has matching digest.
+# Replace __R3_SEALED_SOURCE_SHA__ with an actual protected SHA via authorized
+# deployment; never checkout the mutable candidate branch or old R2 code.
+#
+# Current R2 workflow already has jobs preflight, segment-intent,
+# execution-fence, investigation, durable-archive and cold-readback.
+# The v3 cold-readback implementation MUST be run at source R3 and upload:
+# verification/integrated-p0/cold-readback.json (always if closed),
+# verification/integrated-p0/authentic-adapter.json (only if actually verified).
+#
+# Append the jobs below. Never change the existing economic hold before
+# separate native source protection and independent E2E acceptance.
+fault-probes:
+  needs: [preflight, durable-archive, cold-readback]
+  if: >-
+    needs.preflight.result == 'success' &&
+    needs.durable-archive.result == 'success' &&
+    needs.durable-archive.outputs.next == 'STOP' &&
+    needs.cold-readback.result == 'success'
+  runs-on: ubuntu-24.04
+  timeout-minutes: 8
+  permissions: {contents: write, actions: read}
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with: {ref: __R3_SEALED_SOURCE_SHA__, persist-credentials: false}
+    - run: |
+        python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+    - name: Actual keyless negative controls; no strategy data
+      run: python3 -m research_core_v4.laboratory.integrated fault-probes
+      env:
+        GH_TOKEN: ${{ github.token }}
+        LAB_SOURCE_SHA: __R3_SEALED_SOURCE_SHA__
+        LAB_INTEGRATED_PROTOCOL: v2
+
+attest-v3:
+  needs: [preflight, durable-archive, cold-readback, fault-probes]
+  if: >-
+    needs.preflight.result == 'success' &&
+    needs.durable-archive.result == 'success' &&
+    needs.durable-archive.outputs.next == 'STOP' &&
+    needs.cold-readback.result == 'success' &&
+    needs.fault-probes.result == 'success'
+  runs-on: ubuntu-24.04
+  timeout-minutes: 8
+  permissions: {contents: write, actions: read}
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with: {ref: __R3_SEALED_SOURCE_SHA__, persist-credentials: false}
+    - run: |
+        python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      with:
+        name: integrated-p0-cold-readback-${{ github.run_id }}
+        path: verification/integrated-p0-input/
+    - name: Independent keyless native job and immutable proof attestation
+      run: python3 -m research_core_v4.laboratory.attest_v3
+      env:
+        GH_TOKEN: ${{ github.token }}
+        LAB_SOURCE_SHA: __R3_SEALED_SOURCE_SHA__
+        LAB_INTEGRATED_PROTOCOL: v2
+        LAB_PARENT_OID: ${{ needs.durable-archive.outputs.evidence_oid }}
+# No certificate is issued by attest-v3 itself. Only after the WHOLE native
+# workflow is terminal SUCCESS may an independent read-only verifier evaluate
+# every proof, control-plane protection, immutable source SHA, the authentic
+# nonoutcome adapter and actual multi-program A->B->A progression. A separate
+# tightly scoped keyless certifier must publish accepted evidence by CAS.
+# No cron timing/guarantee is established here.
