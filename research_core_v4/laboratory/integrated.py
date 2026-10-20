@@ -434,14 +434,17 @@ def fault_probes():
         try:_private_key_from_secret(Path(tmp))
         except Exception:missing_credentials_refused=True
     need(missing_credentials_refused,'PROBES_MISSING_PRIVATE_KEY_NOT_REFUSED')
-    # Historical pre-fence proof was actually exercised by native jobs, not
-    # re-created in an artificial strategy trial.
-    negative_run=39322312307
+    # A pre-fence proof must have exercised this R3 source. An old R2 crash
+    # remains historical evidence and can never qualify the current source.
+    admitted,_,_=definition(route)
+    negative_run=admitted.get('native_pre_fence_run_id')
+    need(type(negative_run) is int and negative_run>0 and
+         negative_run!=int(os.environ['GITHUB_RUN_ID']),'PROBES_NATIVE_R3_CRASH_REFERENCE_REQUIRED')
     old_run=route.json('actions/runs/'+str(negative_run))
     old_jobs=route.json('actions/runs/'+str(negative_run)+'/attempts/1/jobs?per_page=100')['jobs']
     need(old_run['path']==WF and old_run['conclusion']=='failure' and
          can_recover_before_exposure({'pending':{'phase':'PRE_EXPOSURE'}},old_jobs),
-         'PROBES_HISTORICAL_CRASH_PROOF')
+         'PROBES_PRE_FENCE_CRASH_PROOF')
     old_path='typed-successor/recoveries/'+str(negative_run)+'.json'
     recovered=strict_json(file_at(route,old_path,parent))
     need(recovered['run_id']==negative_run and

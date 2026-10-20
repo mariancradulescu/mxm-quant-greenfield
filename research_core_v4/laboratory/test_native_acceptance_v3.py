@@ -32,8 +32,10 @@ class ArtificialRoute:
         self.divergent=False
         self.divergent_ack=False
     def data(self,path):
-        if path=='actions/jobs/106/logs':
-            return b'\n'.join(b'MXM_CAS_RESULT '+encoded(x) for x in self.cas_writers)
+        if path in ['actions/jobs/'+str(100+i)+'/logs' for i in range(len(JOB_NAMES))]+['actions/jobs/90/logs','actions/jobs/91/logs']:
+            prefix=('2026-10-20T12:00:00Z '+SOURCE+'\n').encode()
+            return prefix+(b'\n'.join(b'MXM_CAS_RESULT '+encoded(x) for x in self.cas_writers)
+                           if path=='actions/jobs/106/logs' else b'')
         raise KeyError(path)
     def json(self,path):
         if path.startswith('rules/branches/'):
@@ -73,15 +75,19 @@ class ArtificialRoute:
                     'head_branch':EXEC,'run_attempt':1,'head_sha':'9'*40}
         if path=='actions/runs/'+str(HISTORIC):
             return {'id':HISTORIC,'path':'.github/workflows/mxm-integrated-p0.yml',
-                    'conclusion':'failure'}
+                    'status':'completed','head_branch':EXEC,'head_sha':'8'*40,'run_attempt':1,'conclusion':'failure'}
         if path=='actions/runs/'+str(RUN)+'/attempts/1/jobs?per_page=100':
             jobs=[{'id':100+i,'run_id':RUN,'name':name,'status':'completed',
-                   'conclusion':'failure' if name==self.missing_job else 'success'}
+                   'conclusion':'failure' if name==self.missing_job else 'success',
+                   'steps':[{'name':'Checkout sealed source','number':2,'status':'completed','conclusion':'success'}]}
                   for i,name in enumerate(JOB_NAMES)]
             return {'jobs':jobs,'total_count':len(jobs)}
         if path=='actions/runs/'+str(HISTORIC)+'/attempts/1/jobs?per_page=100':
             states=('failure','skipped','skipped')
-            return {'jobs':[{'name':name,'status':'completed','conclusion':states[i]}
+            return {'jobs':[{'id':90,'name':'preflight','status':'completed','conclusion':'success',
+                 'steps':[{'name':'Checkout sealed source','number':2,'status':'completed','conclusion':'success'}]}]+
+                 [{'id':91+i,'name':name,'status':'completed','conclusion':states[i],
+                   'steps':[{'name':'Checkout sealed source','number':2,'status':'completed','conclusion':'success'}]}
                             for i,name in enumerate(NEG_NAMES)]}
         raise KeyError(path)
 
@@ -146,6 +152,12 @@ def make_fixture():
              'broker_requests':0,'native_wire_counts':{},
              'economic_release':False}
     route=ArtificialRoute();paths=proof_paths(RUN)
+    route.storage[('.github/workflows/mxm-integrated-p0.yml','9'*40)]=encoded({
+        'env':{'LAB_SOURCE_SHA':SOURCE,'LAB_INTEGRATED_PROTOCOL':'v2'},'jobs':{
+            name:{'steps':[{'name':'Checkout sealed source',
+                'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683',
+                'with':{'ref':SOURCE,'persist-credentials':False}}]} for name in JOB_NAMES}})
+    route.storage[('.github/workflows/mxm-integrated-p0.yml','8'*40)]=route.storage[('.github/workflows/mxm-integrated-p0.yml','9'*40)]
     route.cas_writers=deepcopy(neg['concurrent_writers'])
     for oid in ('6'*40,'7'*40):
         route.storage[('typed-successor/program-state.json',oid)]=encoded(state)
