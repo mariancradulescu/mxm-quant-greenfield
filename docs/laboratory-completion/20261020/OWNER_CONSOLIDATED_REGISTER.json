@@ -41,15 +41,15 @@
       "aliases": [],
       "basis": "REPRODUCED",
       "status": "CODE_VERIFIED_NATIVE_PENDING",
-      "implementation": "Complete reason and exact terminal task set required; no result/skipped overlap; task-result-journal bijection.",
-      "remaining_acceptance": "Native cold restore of fully terminal admitted tasks; skipped dependency proof hardening remains required."
+      "implementation": "Complete reason and exact terminal task set required; no result/skipped overlap; task-result-journal bijection. Three additional adversarial cases reproduced: all-task forged skips, skipped unfinished dependency, and dependency-reversed journal with recomputed hashes. Checkpoint restore now derives every skip from actual rejecting verdicts on the sealed DAG and checks executed dependency order/conditions. Four focused tests pass after three expected before failures.",
+      "remaining_acceptance": "Native cold restore through the additionally repaired dependency validator, then full admitted A-B-A and all-task completion on installed R3 runtime."
     },
     {
       "id": "A-05",
       "aliases": [],
       "basis": "REPRODUCED",
       "status": "CODE_VERIFIED_NATIVE_PENDING",
-      "implementation": "Worker seals journal count/head. Cold verifies endpoint, unique programme/task identity, result hashes and per-program order.",
+      "implementation": "Worker seals journal count/head. Cold verifies endpoint, unique programme/task identity, result hashes and per-program order. Recomputed journal hash chains cannot authorize dependency-reversed execution order; actual task dependency and verdict checks are enforced independently.",
       "remaining_acceptance": "Native A-B-A, cold decrypt and adversarial truncation/reordering proof."
     },
     {
@@ -113,9 +113,9 @@
         "C-01"
       ],
       "basis": "RISK_AND_NATIVE_EVIDENCE_MISSING",
-      "status": "OPEN",
-      "implementation": "Existing encryption and key material preserved.",
-      "remaining_acceptance": "Native wrong-key/mix/bitflip/cold restore; signing/decryption separation and rotation assessment without new unauthorized keys."
+      "status": "PARTIAL_NATIVE_CRYPTO_READBACK_VERIFIED",
+      "implementation": "Actual checkpoint20 readback run39408502799/jobs118580202563 and118580470623: exact cipher/private hash; wrong evidence parent, private mix, bitflip, ephemeral wrong-key and actual part truncation refused. Fresh job independently decrypts encrypted migrated handoff. Same existing OWNER recipient.",
+      "remaining_acceptance": "Full runtime fault/custody reception and signing/decryption separation/rotation assessment remain open; no new custody keys introduced."
     },
     {
       "id": "SEC-06",
@@ -149,9 +149,9 @@
       "id": "REC-03",
       "aliases": [],
       "basis": "STATIC_CONFIRMED",
-      "status": "OPEN",
-      "implementation": "Existing chunked cipher and release custody retained.",
-      "remaining_acceptance": "Real checkpoint sizes, release-backed immutable shard data/control split and authenticated benchmark; do not infer scale from synthetic tests."
+      "status": "PARTIAL_NATIVE_SIZE_MEASURED",
+      "implementation": "Actual checkpoint20 4709169 cipher bytes /19parts; existing preserved corpus archive5337440bytes/21parts, load/verify/decrypt2.609170689s on native Ubuntu runner. Peak processRSS743548KiB. No speculative extrapolation.",
+      "remaining_acceptance": "Sustained scalable history/cost/chronological processing and release-backed immutable corpus/control split remain unproven; Actions diagnostic archive is not authoritative checkpoint publication."
     },
     {
       "id": "REC-04",
@@ -197,9 +197,9 @@
       "id": "DAT-05",
       "aliases": [],
       "basis": "STATIC_CONFIRMED",
-      "status": "OPEN",
-      "implementation": "No speculative data-plane refactor.",
-      "remaining_acceptance": "Real authenticated benchmark and bounded chronological index if measurements justify it."
+      "status": "PARTIAL_NATIVE_READBACK_BENCHMARK",
+      "implementation": "Native conserved-corpus measurement:11504 saved quote references,23008 side records,63symbols; exact archive/cipher and upstream producer run39216105583/source9e2ac4b4d8bba8c13f0df8e9407f1b3d9a6a9db9 verified. Boundary extent is not continuous coverage.",
+      "remaining_acceptance": "Document real instrument/session/interval support and benchmark chronological executable economic processing at scale before choosing storage/index changes."
     },
     {
       "id": "ACC-01",

@@ -91,7 +91,33 @@ class Laboratory:
         need({e['task'] for e in s['journal']}==set(s['results']) and
              len({e['task'] for e in s['journal']})==len(s['journal']),
              'CHECKPOINT_TASK_RESULT_BIJECTION')
-        for e in s['journal']:need(digest(s['results'][e['task']])==e['result_sha256'],'CHECKPOINT_RESULT_CHANGED')
+        executed=set()
+        for e in s['journal']:
+            task=self.m['tasks'][e['task']]
+            need(digest(s['results'][e['task']])==e['result_sha256'],'CHECKPOINT_RESULT_CHANGED')
+            need(set(task['dependencies'])<=executed,'CHECKPOINT_DEPENDENCY_EVENT_ORDER')
+            need(all(d in s['results'] and s['results'][d]['classification'] in states
+                     for d,states in task.get('when',{}).items()) and
+                 not any(d in s['skipped'] for d in task['dependencies']),
+                 'CHECKPOINT_EXECUTED_DEPENDENCY_VERDICT')
+            executed.add(e['task'])
+        # A skip must be derivable from the sealed DAG and actual completed
+        # verdicts. Roots, unfinished dependencies, favorable conditions and
+        # mutually supporting forged skips cannot establish terminality.
+        unproven=set(s['skipped']);proven=set(s['results'])
+        need(all(reason=='DECLARED_DEPENDENCY_VERDICT' for reason in s['skipped'].values()),
+             'CHECKPOINT_SKIP_REASON')
+        while unproven:
+            ready=[ident for ident in sorted(unproven)
+                   if set(self.m['tasks'][ident]['dependencies'])<=proven]
+            need(ready,'CHECKPOINT_SKIP_UNPROVEN_DEPENDENCY')
+            for ident in ready:
+                task=self.m['tasks'][ident]
+                allowed=all(d in s['results'] and s['results'][d]['classification'] in states
+                            for d,states in task.get('when',{}).items()) and not any(
+                            d in s['skipped'] for d in task['dependencies'])
+                need(not allowed,'CHECKPOINT_SKIP_WITHOUT_REJECTING_VERDICT')
+                unproven.remove(ident);proven.add(ident)
         if s['safe_stop'] and s['stop_reason']=='AUTHORIZED_PROGRAMME_COMPLETE':
             need(set(s['results'])|set(s['skipped'])==set(self.m['tasks']),
                  'CHECKPOINT_INCOMPLETE_TERMINAL')

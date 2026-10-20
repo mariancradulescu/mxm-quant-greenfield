@@ -1,0 +1,36 @@
+test_all_tasks_cannot_be_forged_as_skipped (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_all_tasks_cannot_be_forged_as_skipped) ... FAIL
+test_real_dependency_verdicts_and_transitive_skips_restore (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_real_dependency_verdicts_and_transitive_skips_restore) ... ok
+test_rehashed_journal_cannot_reverse_dependency_execution (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_rehashed_journal_cannot_reverse_dependency_execution) ... FAIL
+test_unfinished_dependency_cannot_justify_skip (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_unfinished_dependency_cannot_justify_skip) ... FAIL
+
+======================================================================
+FAIL: test_all_tasks_cannot_be_forged_as_skipped (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_all_tasks_cannot_be_forged_as_skipped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_terminal_dependencies.py", line 19, in test_all_tasks_cannot_be_forged_as_skipped
+    with self.assertRaises(LabError):Laboratory.restore(cp,self.fixture.history)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+======================================================================
+FAIL: test_rehashed_journal_cannot_reverse_dependency_execution (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_rehashed_journal_cannot_reverse_dependency_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_terminal_dependencies.py", line 33, in test_rehashed_journal_cannot_reverse_dependency_execution
+    with self.assertRaises(LabError):Laboratory.restore(cp,self.fixture.history)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+======================================================================
+FAIL: test_unfinished_dependency_cannot_justify_skip (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_unfinished_dependency_cannot_justify_skip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_terminal_dependencies.py", line 24, in test_unfinished_dependency_cannot_justify_skip
+    with self.assertRaises(LabError):Laboratory.restore(cp,self.fixture.history)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.270s
+
+FAILED (failures=3)

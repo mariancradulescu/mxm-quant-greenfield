@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 import time
 from copy import deepcopy
-from .common import need, encoded, digest, bytes_digest, LabError
+from .common import need, encoded, digest, bytes_digest, LabError, number
 from .live_preflight_v3 import EVIDENCE, SOURCE, OWNER, ACTIVE
 from .protocol import verify_checkpoint20_public, typed_source_transition, accounting
 from .custody import restore_ciphertext
@@ -96,12 +96,15 @@ def inspect_corpus(key, tmp):
     quotes = data.get('raw_quote_receipts', [])
     need(isinstance(quotes, list) and len(quotes) > 0, 'CP20_PRESERVED_CORPUS_EMPTY')
     sides = 0
+    numeric_sides = 0
     symbols = set()
     times = []
     for row in quotes:
         symbols.add(str(row['symbol_id']))
         times.append(row['boundary_ms'])
         sides += len(row['sides'])
+        numeric_sides += sum(number(v.get('price')) and v['price'] > 0 and
+                             type(v.get('timestamp_ms')) is int for v in row['sides'].values())
     return {'classification': 'PRESERVED_ENCRYPTED_CORPUS_READBACK',
         'archive_sha256': registry_value['cached_input']['archive_sha256'],
         'ciphertext_sha256': registry_value['cached_input']['ciphertext_sha256'],
@@ -109,7 +112,9 @@ def inspect_corpus(key, tmp):
         'producer_source_sha': registry_value['cached_input']['source_sha'],
         'stored_archive_bytes': size, 'archive_parts': len(manifest['parts']),
         'load_verify_decrypt_seconds': elapsed, 'raw_quote_receipts': len(quotes),
-        'side_observations': sides, 'distinct_symbols': len(symbols),
+        'side_records': sides, 'numeric_price_timestamp_side_records': numeric_sides,
+        'count_semantics': 'SIDE_RECORDS_NOT_SYNCHRONOUS_QUOTE_PAIRS_OR_CONTINUOUS_COVERAGE',
+        'distinct_symbols': len(symbols),
         'first_boundary_ms': min(times), 'last_boundary_ms': max(times),
         'continuous_coverage_demonstrated': False, 'broker_requests': 0}
 
@@ -143,6 +148,16 @@ def main(stage):
         need(digest(private) == PRIVATE_SHA, 'CP20_PRIVATE_HASH')
         successor = typed_source_transition(private, state, auth, ctx['source_sha'], evidence_oid=EVIDENCE)
         preserve_check(private, successor)
+        # Exercise the repaired actual restore path on every authentic archived
+        # programme. No task is selected/executed and no historic result replayed.
+        from .programs import Laboratory
+        from .execution import catalogue_extends
+        restored_programmes=0
+        for saved in private['programmes'].values():
+            restored_lab=Laboratory.restore(saved,private['history'])
+            need(restored_lab.checkpoint()==saved,'CP20_ARCHIVED_PROGRAMME_RESTORE')
+            catalogue_extends(private['shared_catalogue'],saved['catalogue'])
+            restored_programmes+=1
         proof = {'schema': 'mxm.checkpoint20-native-readback.v1', 'context': ctx,
             'stage': stage, 'predecessor_evidence_oid': EVIDENCE, 'sequence': 20,
             'ciphertext_sha256': bytes_digest(blob), 'private_sha256': digest(private),
@@ -151,6 +166,7 @@ def main(stage):
             'shared_catalogue_sha256': digest(private['shared_catalogue']),
             'programmes_sha256': digest(private['programmes']), 'accounting': accounting(private['trial_book']),
             'ciphertext_bytes': len(blob), 'checkpoint_parts': len(manifest['parts']),
+            'archived_programmes_restored_without_execution': restored_programmes,
             'fetch_verify_seconds': fetch_seconds, 'decrypt_parse_seconds': decrypt_seconds,
             'orders': 0, 'broker_requests': 0, 'economic_outcomes': 0,
             'authoritative_checkpoint_published': False, 'operational_acceptance': False,
