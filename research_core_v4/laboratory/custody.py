@@ -215,7 +215,10 @@ def verify_native_source_control(route,observed):
              event.get('path')=='.github/workflows/mxm-integrated-p0.yml',
              'SOURCE_CONTROL_CERTIFIER_EVENT')
         run=str(event['id']);trigger=event['head_sha']
-    need(run.isdecimal() and int(run)>0 and os.environ.get('GITHUB_RUN_ATTEMPT')=='1' and
+    need(os.environ.get('GITHUB_JOB') in ('preflight','investigation','cold-readback',
+         'segment-intent','execution-fence','durable-archive','recover-before-exposure',
+         'scientific-handoff','fault-probes','attest-v3','certify-v3') and
+         run.isdecimal() and int(run)>0 and os.environ.get('GITHUB_RUN_ATTEMPT')=='1' and
          re.fullmatch('[a-f0-9]{40}',source) and re.fullmatch('[a-f0-9]{40}',trigger),
          'SOURCE_CONTROL_NATIVE_CONTEXT_REQUIRED')
     run_id=int(run)
