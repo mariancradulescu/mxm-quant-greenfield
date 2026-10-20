@@ -25,6 +25,8 @@ def verify_effective_controls(route):
     The only permitted evidence writer is the already authorized successor App,
     not a newly introduced credential or another workflow's shared GITHUB_TOKEN.
     """
+    from .custody import effective_controls_reader
+    route=effective_controls_reader(route)
     from research_core_v4.p0_successor_a_20261017.issuer import APP_ID
     snapshots={}
     for branch in ('main',EXEC,CODE,BRANCH):

@@ -28,7 +28,7 @@ class Route:
 
 class SourceFreeze(unittest.TestCase):
     def check(self,route):
-        with patch.dict(os.environ,{'LAB_SOURCE_SHA':SHA}),patch.object(runtime.old,'owner_unchanged'), \
+        with patch.dict(os.environ,{'LAB_SOURCE_SHA':SHA},clear=True),patch.object(runtime.old,'owner_unchanged'), \
              patch.object(runtime,'file_at',return_value=encoded({'revoked':False,'pending':None})), \
              patch.object(runtime.subprocess,'check_output',return_value=SHA+'\n'):
             runtime.anchors(route)

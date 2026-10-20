@@ -34,6 +34,8 @@ def workload(job,keyless=False):
     if job!='investigation' or os.environ.get('LAB_NATIVE_COLLECTION_ALLOWED')!='DEVELOPMENT_RESEARCH':need(not any(os.environ.get(k) for k in ('CTRADER_CLIENT_ID','CTRADER_CLIENT_SECRET','CTRADER_ACCESS_TOKEN')),'INTEGRATED_NO_BROKER_KEYS')
     if keyless:need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM'),'INTEGRATED_KEYLESS')
     route=GetOnly();anchors(route)
+    need(route.json('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA'],
+         'INTEGRATED_WORKFLOW_REF_MOVED_STOP_RECONCILE')
     active=strict_json(file_at(route,'state.json',AUTH));need(active['revoked'] is False and active['pending'] is None,'INTEGRATED_AUTHORITY_REVOKED_OR_PENDING')
     return route
 
@@ -102,6 +104,59 @@ def seal(private,key,tmp,target):
     except Exception:rejected=True
     need(rejected,'INTEGRATED_TAMPER_ACCEPTED')
 
+def transition_predecessor(route,state,parent,authority):
+    """Authenticate one failed pre-fence claim over the sealed checkpoint20.
+
+    Recovery only appends intent/proof and continuation metadata. It must not
+    make the exact original checkpoint authority unusable, nor turn an arbitrary
+    descendant or copied recovery label into a source migration grant.
+    """
+    origin=authority['evidence_oid']
+    if parent==origin:return state,origin
+    need(authority.get('source_sha')=='eab050084982916ad0c67798b38b947bac66b2b2' and
+         type(state.get('recovery_continuation')) is dict,'TRANSITION_RECOVERY_REQUIRED')
+    continuation=state['recovery_continuation'];prior=continuation.get('run_id')
+    need(type(prior) is int and prior>0,'TRANSITION_RECOVERY_RUN')
+    original=strict_json(file_at(route,STATE_PATH,origin))
+    verify_checkpoint20_public(original,authority,origin)
+    recovery_path='typed-successor/recoveries/'+str(prior)+'.json'
+    intent_path='typed-successor/intents/'+str(prior)+'.json'
+    recovery_commit=route.json('commits/'+parent)
+    need(len(recovery_commit.get('parents',[]))==1 and
+         {(f['filename'],f['status']) for f in recovery_commit.get('files',[])}==
+         {(STATE_PATH,'modified'),(recovery_path,'added')},'TRANSITION_EXACT_RECOVERY_COMMIT')
+    claim_oid=recovery_commit['parents'][0]['sha'];claim_commit=route.json('commits/'+claim_oid)
+    need([p['sha'] for p in claim_commit.get('parents',[])]==[origin] and
+         {(f['filename'],f['status']) for f in claim_commit.get('files',[])}==
+         {(STATE_PATH,'modified'),(intent_path,'added')},'TRANSITION_EXACT_CLAIM_COMMIT')
+    intent=strict_json(file_at(route,intent_path,parent));proof=strict_json(file_at(route,recovery_path,parent))
+    certificate=intent['preflight'];claim_state=strict_json(file_at(route,STATE_PATH,claim_oid))
+    need(intent['base_state']==original and recovered_public_base(intent)==state and
+         proof.get('run_id')==prior and proof.get('no_economic_exposure') is True and
+         proof.get('refunds')==0 and proof.get('base_state_sha256')==digest(original) and
+         intent['pending']==claim_state['pending'] and
+         {k:v for k,v in claim_state.items() if k!='pending'}==
+         {k:v for k,v in original.items() if k!='pending'} and
+         claim_state['pending']['run_id']==prior and claim_state['pending']['phase']=='PRE_EXPOSURE' and
+         claim_state['pending']['preflight_sha256']==digest(certificate),
+         'TRANSITION_RECOVERY_BYTES')
+    run=route.json('actions/runs/'+str(prior))
+    need(run.get('status')=='completed' and run.get('conclusion')=='failure' and
+         run.get('path')==WF and run.get('head_branch')=='mxm-remediation-p0-p4-20261015-v1' and
+         run.get('run_attempt')==1 and certificate.get('run_id')==prior and
+         certificate.get('source_sha')==os.environ['LAB_SOURCE_SHA'] and
+         certificate.get('parent_oid')==origin and certificate.get('trigger_sha')==run.get('head_sha'),
+         'TRANSITION_RECOVERY_NATIVE_RUN')
+    jobs=route.json('actions/runs/'+str(prior)+'/attempts/1/jobs?per_page=100')
+    need(jobs.get('total_count')==len(jobs['jobs']) and len(jobs['jobs'])<=100 and
+         can_recover_before_exposure(claim_state,jobs['jobs']),'TRANSITION_RECOVERY_NATIVE_GRAPH')
+    preflight=[j for j in jobs['jobs'] if j['name']=='preflight'];claim=[j for j in jobs['jobs'] if j['name']=='segment-intent']
+    require_jobs(preflight,['preflight'])
+    from .attest_v3 import native_checkout_provenance
+    native_checkout_provenance(route,prior,os.environ['LAB_SOURCE_SHA'],run['head_sha'],
+        {j['name']:j['id'] for j in preflight+claim})
+    return original,origin
+
 def preflight():
     route=workload('preflight');a,ref,path=definition(route);parent=current(route);s,initial=state_at(route,parent)
     need(s['pending'] is None,'PREFLIGHT_PENDING_REQUIRES_RECOVERY')
@@ -116,7 +171,9 @@ def preflight():
             candidates=[strict_json(x.read_bytes()) for x in sorted((ROOT/'discovery/candidates').glob('V2-C*.json'))]
             candidates.append(p['programmes']['VOLUME_SURPRISE_CLOSE_LOCATION_PRESSURE_20261019_A']['progress']['results']['freeze_pressure']['value'])
             p=migrate_private(p,s,history,candidates,os.environ['LAB_SOURCE_SHA'],bytes_digest(original))
-        elif p['source_sha']!=os.environ['LAB_SOURCE_SHA']:p=typed_source_transition(p,s,a['typed_predecessor'],os.environ['LAB_SOURCE_SHA'],evidence_oid=parent)
+        elif p['source_sha']!=os.environ['LAB_SOURCE_SHA']:
+            predecessor,origin=transition_predecessor(route,s,parent,a['typed_predecessor'])
+            p=typed_source_transition(p,predecessor,a['typed_predecessor'],os.environ['LAB_SOURCE_SHA'],evidence_oid=origin)
         need(p['source_sha']==os.environ['LAB_SOURCE_SHA'] and 'typed_transition' in p,'PREFLIGHT_SUCCESSOR_SOURCE')
         prior_book=TypedTrialBook.restore(p['trial_book'])
         if prior_book.hash_version==1:

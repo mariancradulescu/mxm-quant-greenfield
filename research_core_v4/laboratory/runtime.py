@@ -35,23 +35,33 @@ def source_admission(head,expected,branch_head,rule):
 def module_digest():
     return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py','operational_acceptance.py','handoff_recovery.py','evidence_v3.py','attest_v3.py','certify_v3.py')})
 
-def anchors(route):
+def anchors(route,*,allow_redacted_app_probe=False):
     old.owner_unchanged(route)
     need(route.json('git/ref/heads/mxm-o04-active-v1')['object']['sha']==AUTHORITY,'AUTHORITY_DRIFT')
     active=strict_json(file_at(route,'state.json',AUTHORITY));need(active['revoked'] is False and active['pending'] is None,'AUTHORITY_REVOKED_OR_PENDING')
     source_admission(subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),os.environ['LAB_SOURCE_SHA'],
       route.json('git/ref/heads/'+SOURCE_BRANCH)['object']['sha'],route.json('rulesets/25222248'))
-    # Append-only still permits a forward source update. All operational
-    # entry points, including custody readers, need the immutable freeze BEFORE
-    # any private-key use, worker start or App mint. Missing ACL fields are not
-    # positive evidence of an empty bypass list.
-    rules=route.json('rules/branches/'+SOURCE_BRANCH)
+    # Native read tokens redact bypass actors. Only the exact keyless App
+    # control probe may inspect such a policy before mint/use/revoke. It cannot
+    # publish. Custody readers independently verify its same-run native proof;
+    # live App scopes read the actual ACL directly, never infer omitted=[] .
+    from .custody import effective_controls_reader,verify_native_source_control
+    controls=effective_controls_reader(route)
+    rules=controls.json('rules/branches/'+SOURCE_BRANCH)
     need(type(rules) is list and {'update','deletion','non_fast_forward'}<=
          {r.get('type') for r in rules},'SOURCE_EFFECTIVE_FREEZE_REQUIRED')
     restrictions=[r for r in rules if r.get('type')=='update']
     for restriction in restrictions:
-        policy=route.json('rulesets/'+str(restriction['ruleset_id']))
-        need(policy.get('enforcement')=='active' and policy.get('bypass_actors')==[] and
+        policy=controls.json('rulesets/'+str(restriction['ruleset_id']))
+        if 'bypass_actors' not in policy:
+            if allow_redacted_app_probe:
+                from .custody import writer_metadata
+                identity=writer_metadata('source-controls')
+                need(identity['job']=='source-controls','SOURCE_ACL_PROBE_ONLY')
+            else:
+                policy=verify_native_source_control(route,policy)
+        need(policy.get('enforcement')=='active' and
+             (policy.get('bypass_actors')==[] or allow_redacted_app_probe and 'bypass_actors' not in policy) and
              policy.get('conditions',{}).get('ref_name')==
              {'include':['refs/heads/'+SOURCE_BRANCH],'exclude':[]} and
              {'creation','update','deletion','non_fast_forward'}<=

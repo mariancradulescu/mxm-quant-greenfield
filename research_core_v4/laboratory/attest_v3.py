@@ -71,7 +71,7 @@ def native_checkout_provenance(route,run_id,source,trigger,jobs):
     commands.update('python3 -m research_core_v4.laboratory.integrated '+operation
                     for operation in ('preflight','fence','recover','verify','fault-probes'))
     commands.update('python3 -m research_core_v4.laboratory.custody '+operation
-                    for operation in ('claim','fence','publish','recover','handoff','fault-probes','attest-v3'))
+                    for operation in ('source-controls','claim','fence','publish','recover','handoff','fault-probes','attest-v3'))
     def environment(value):
         env=value.get('env',{})
         need(type(env) is dict and not set(env)&{'PYTHONPATH','PYTHONHOME','PYTHONSTARTUP','PYTHONUSERBASE',

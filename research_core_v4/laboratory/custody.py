@@ -4,7 +4,7 @@ from pathlib import Path
 from .common import *
 _NATIVE_WRITER_SCOPE=None
 
-WRITER_JOBS={'claim':'segment-intent','fence':'execution-fence','publish':'durable-archive',
+WRITER_JOBS={'source-controls':'source-controls','claim':'segment-intent','fence':'execution-fence','publish':'durable-archive',
     'recover':'recover-before-exposure','handoff':'scientific-handoff',
     'fault-probes':'fault-probes','attest-v3':'attest-v3','certify-v3':'certify-v3'}
 
@@ -28,8 +28,9 @@ def build_native_workflow(source,predecessor):
          'durable-archive','recover-before-exposure','scientific-handoff','cold-readback'},
          'APP_WORKFLOW_EXISTING_DAG')
     workflow['permissions']={};workflow['env']['LAB_SOURCE_SHA']=source
+    workflow['on']['workflow_dispatch']['inputs']['fault_before_fence']['description']='Controlled TECHNICAL_NONOUTCOME pre-fence fault; no automatic continuation'
     workflow['concurrency']={'group':'mxm-integrated-laboratory','cancel-in-progress':False}
-    operations={v:k for k,v in WRITER_JOBS.items() if k!='certify-v3'}
+    operations={v:k for k,v in WRITER_JOBS.items() if k not in ('certify-v3','source-controls')}
     for name,job in workflow['jobs'].items():
         job['permissions']={'contents':'read','actions':'write' if name=='scientific-handoff' else 'read'}
         job['environment']='mxm-p0-successor-issuer-v1' if name in operations else 'mxm-r3-custody-v1'
@@ -48,6 +49,7 @@ def build_native_workflow(source,predecessor):
             if name in operations and 'run' in step and 'python3 -m research_core_v4.laboratory.' in step['run']:
                 step['run']='python3 -m research_core_v4.laboratory.custody '+operations[name]
                 step.setdefault('env',{})['SUCCESSOR_APP_PRIVATE_KEY']='${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}'
+                if name=='segment-intent':step['env']['LAB_FAULT_BEFORE_FENCE']="${{ inputs.fault_before_fence || '0' }}"
         if name=='cold-readback':
             artifact=next(s for s in job['steps'] if str(s.get('uses','')).startswith('actions/upload-artifact@'))
             artifact['with']['path']='verification/integrated-p0/cold-readback.json\nverification/integrated-p0/authentic-adapter.json\n'
@@ -66,6 +68,16 @@ def build_native_workflow(source,predecessor):
             'permissions':{'contents':'read','actions':'read'},'steps':steps}
     workflow['jobs']['fault-probes']=proof_job('fault-probes',['preflight','durable-archive','cold-readback'])
     workflow['jobs']['attest-v3']=proof_job('attest-v3',['preflight','durable-archive','cold-readback','fault-probes'])
+    workflow['jobs']['source-controls']={'if':workflow['jobs']['preflight']['if'],
+        'runs-on':'ubuntu-24.04','timeout-minutes':8,'environment':'mxm-p0-successor-issuer-v1',
+        'permissions':{'contents':'read','actions':'read'},'steps':[
+            {'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683',
+             'with':{'ref':source,'persist-credentials':False}},
+            {'run':'python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'},
+            {'run':'python3 -m research_core_v4.laboratory.custody source-controls',
+             'env':{'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}'}}]}
+    workflow['jobs']['preflight']['needs']='source-controls'
+    workflow['jobs']['scientific-handoff']['if']+=" && inputs.fault_before_fence != '1'"
     return workflow
 
 def build_certifier_workflow(source):
@@ -121,12 +133,15 @@ def run_native_writer(operation):
     from .integrated import definition
     from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
     from .operational_acceptance import verify_effective_controls
-    route=GetOnly();anchors(route)
+    route=GetOnly()
+    # Only the isolated read-only probe may mint when native bypass fields are
+    # redacted. Every data/workload job waits for its independent native proof.
+    anchors(route,allow_redacted_app_probe=operation=='source-controls')
     need(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==identity['source'],
          'APP_WRITER_CHECKOUT_PIN')
     need(subprocess.run(['git','diff','--quiet','HEAD','--'],capture_output=True).returncode==0,
          'APP_WRITER_MODIFIED_SOURCE')
-    if operation!='certify-v3':
+    if operation not in ('certify-v3','source-controls'):
         admission,_,_=definition(route)
         need(admission['mode']=='TECHNICAL_NONOUTCOME' and admission['economic_release'] is False,
              'APP_WRITER_TECHNICAL_ONLY')
@@ -145,16 +160,28 @@ def run_native_writer(operation):
                         headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})
                     with self.open(request) as response:value=response.read(limit+1)
                     need(len(value)<=limit,'APP_CONTROL_READ_SIZE');return value
+            controls=AppControls()
             def guard():
                 # Exact bypass actors are read as the actual existing App,
                 # while ordinary workflow/job reads keep native Actions scope.
                 # Do not swap process environment: the native CAS proof has
                 # two threads, each requiring the same independent reader.
-                verify_effective_controls(AppControls())
+                verify_effective_controls(controls)
                 anchors(GetOnly())
-            guard()
-            _NATIVE_WRITER_SCOPE={**identity,'token':token,'guard':guard}
+                need(GetOnly().json('git/ref/heads/'+os.environ['GITHUB_REF_NAME'])['object']['sha']==identity['trigger'],
+                     'APP_WRITER_WORKFLOW_REF_MOVED_STOP_RECONCILE')
+            _NATIVE_WRITER_SCOPE={**identity,'token':token,'guard':guard,'controls':controls}
             try:
+                guard()
+                if operation=='source-controls':
+                    from .runtime import SOURCE_BRANCH
+                    restrictions=[r for r in controls.json('rules/branches/'+SOURCE_BRANCH) if r['type']=='update']
+                    policies=[controls.json('rulesets/'+str(r['ruleset_id'])) for r in restrictions]
+                    print('MXM_SOURCE_CONTROL '+json.dumps({'schema':'mxm.native-source-control.v1',
+                        'run_id':int(os.environ['GITHUB_RUN_ID']),'attempt':1,
+                        'source_sha':identity['source'],'trigger_sha':identity['trigger'],
+                        'source_policies':policies,'writes':0,'orders':0,'economic_outcomes':0},sort_keys=True),flush=True)
+                    return
                 if operation=='attest-v3':
                     from .attest_v3 import publish
                     return publish()
@@ -167,6 +194,55 @@ def run_native_writer(operation):
     finally:
         private_key=None;os.environ['GH_TOKEN']=original_token
 
+def effective_controls_reader(route):
+    scope=_NATIVE_WRITER_SCOPE
+    if scope is not None and scope['job']==os.environ.get('GITHUB_JOB') and scope['source']==os.environ.get('LAB_SOURCE_SHA'):
+        return scope['controls']
+    return route
+
+def verify_native_source_control(route,observed):
+    """Read a same-run pinned job's real log; detect policy movement afterward.
+
+    This reuses the existing App and native proof verifier, not another key or
+    custodian. A passed unrelated/older job or copied favorable JSON is no grant.
+    """
+    import re
+    from .attest_v3 import native_checkout_provenance,native_jobs
+    run=os.environ.get('GITHUB_RUN_ID','');source=os.environ.get('LAB_SOURCE_SHA','');trigger=os.environ.get('GITHUB_SHA','')
+    if os.environ.get('GITHUB_JOB')=='certify-v3' and os.environ.get('GITHUB_EVENT_NAME')=='workflow_run':
+        event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_bytes())['workflow_run']
+        need(event.get('status')=='completed' and event.get('conclusion')=='success' and
+             event.get('path')=='.github/workflows/mxm-integrated-p0.yml',
+             'SOURCE_CONTROL_CERTIFIER_EVENT')
+        run=str(event['id']);trigger=event['head_sha']
+    need(os.environ.get('GITHUB_JOB') in ('preflight','investigation','cold-readback',
+         'segment-intent','execution-fence','durable-archive','recover-before-exposure',
+         'scientific-handoff','fault-probes','attest-v3','certify-v3') and
+         run.isdecimal() and int(run)>0 and os.environ.get('GITHUB_RUN_ATTEMPT')=='1' and
+         re.fullmatch('[a-f0-9]{40}',source) and re.fullmatch('[a-f0-9]{40}',trigger),
+         'SOURCE_CONTROL_NATIVE_CONTEXT_REQUIRED')
+    run_id=int(run)
+    need(route.json('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==trigger,
+         'SOURCE_CONTROL_WORKFLOW_REF_MOVED_STOP_RECONCILE')
+    jobs=native_jobs(route,run_id,('source-controls',),expected_head_sha=trigger)
+    native_checkout_provenance(route,run_id,source,trigger,jobs)
+    log=route.data('actions/jobs/'+str(jobs['source-controls'])+'/logs').decode('utf-8')
+    records=[json.loads(v) for v in re.findall(r'MXM_SOURCE_CONTROL (\{[^\r\n]*\})',log)]
+    need(len(records)==1,'SOURCE_CONTROL_NATIVE_LOG_RECORD_REQUIRED');proof=records[0]
+    need(proof.get('schema')=='mxm.native-source-control.v1' and proof.get('run_id')==run_id and
+         proof.get('attempt')==1 and proof.get('source_sha')==source and proof.get('trigger_sha')==trigger and
+         proof.get('writes')==proof.get('orders')==proof.get('economic_outcomes')==0,
+         'SOURCE_CONTROL_NATIVE_PROOF_BINDING')
+    matches=[p for p in proof.get('source_policies',[]) if p.get('id')==observed.get('id')]
+    need(len(matches)==1,'SOURCE_CONTROL_EXACT_POLICY_REQUIRED');policy=matches[0]
+    # Policy revision is independently re-read at each custody/worker entry.
+    # Never accept a bypass change hidden from the native reader's response.
+    fields=('id','enforcement','conditions','rules','updated_at')
+    need(type(observed.get('updated_at')) is str and
+         all(k in observed and k in policy and observed[k]==policy[k] for k in fields) and
+         policy.get('bypass_actors')==[],'SOURCE_CONTROL_POLICY_MOVED_OR_BYPASS')
+    return policy
+
 class CASRefused(LabError):
     """A native git push explicitly rejected its stale expected ref."""
     def __init__(self,parent,candidate,observed):
@@ -177,7 +253,7 @@ def atomic_publish(route,parent,files,message):
     from .runtime import EVIDENCE_BRANCH,read_state
     need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WRITER_NO_KEYS')
     scope=_NATIVE_WRITER_SCOPE
-    need(scope is not None and scope['job']==os.environ.get('GITHUB_JOB') and
+    need(scope is not None and scope.get('operation')!='source-controls' and scope['job']==os.environ.get('GITHUB_JOB') and
          scope['source']==os.environ.get('LAB_SOURCE_SHA'),'APP_WRITER_SCOPE_REQUIRED')
     scope['guard']()
     env={k:v for k,v in os.environ.items() if k not in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','SUCCESSOR_APP_PRIVATE_KEY')}
