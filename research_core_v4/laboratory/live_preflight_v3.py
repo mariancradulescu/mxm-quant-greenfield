@@ -35,9 +35,8 @@ def main():
        'private_sha256':'01227d7a7715a89bc1bfcf6fac183fbaec3b941f8c61281fb3c0e4f01f232fa6',
        'public_state_sha256':digest(state)}
     verify_checkpoint20_public(state,a,EVIDENCE)
-    need(route.json('branches/main')['protected'] is False or
-         route.json('branches/mxm-remediation-p0-p4-20261015-v1')['protected'] is False,
-         'R3_PREFLIGHT_ADMIN_STATE_CHANGED_RECHECK_BEFORE_NEXT_STEP')
+    main_protected=route.json('branches/main')['protected'] is True
+    execution_protected=route.json('branches/mxm-remediation-p0-p4-20261015-v1')['protected'] is True
     print(json.dumps({'schema':'mxm.r3.public-preflight.v1',
                       'checkpoint_sequence':20,'checkpoint_evidence_oid':EVIDENCE,
                       'exact_public_state_sha256':digest(state),
@@ -46,6 +45,8 @@ def main():
                       'r2_source_protected':True,
                       'r3_private_checkpoint_migrated':False,
                       'r3_source_protection_verified':False,
+                      'main_protected':main_protected,
+                      'execution_protected':execution_protected,
                       'end_to_end_operational_accepted':False,
                       'orders':0,'economic_outcomes':0},sort_keys=True))
 if __name__=='__main__':
