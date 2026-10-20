@@ -73,7 +73,7 @@ def register_and_validate(private,a,history):
             # Full restore checks the saved result journal and schema; definitions
             # were validated before their first claim. Never refreeze on resume.
             from .programs import Laboratory
-            Laboratory.restore(saved,history)
+            Laboratory.restore(saved,history,shared_catalogue=private['shared_catalogue'])
         else:validate_manifest(m,history,book)
     private['trial_book']=book.export();return book
 
