@@ -1,0 +1,26 @@
+name: MXM R3 native keyless ACL refusal probes
+on:
+  push:
+    branches: [mxm-r3-admin-isolation-20261020]
+    paths: [research_core_v4/laboratory/native_acl_probe.py, .github/workflows/mxm-r3-native-acl-probe.yml]
+permissions: {}
+jobs:
+  native-rule-refusals:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.event_name == 'push' && github.ref == 'refs/heads/mxm-r3-admin-isolation-20261020' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - name: Actual rule refusals; identical trees; no economic state mutation
+        run: python3 -m research_core_v4.laboratory.native_acl_probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mxm-r3-native-rule-refusals-${{ github.run_id }}
+          path: native-acl-proof.json
+          if-no-files-found: error
+          retention-days: 90
