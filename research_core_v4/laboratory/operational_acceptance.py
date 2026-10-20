@@ -9,7 +9,7 @@ the native workflow is terminal. Fail-closed if any producer is missing.
 import re
 from .common import need,digest,bytes_digest,encoded
 from .attest_v3 import (proof_paths,native_jobs,validate_public_state,
-                        validate_cold_artifact,validate_negative_artifact)
+                        validate_cold_artifact,validate_negative_artifact,native_checkout_provenance)
 from .evidence_v3 import COLD_SCHEMA,NEGATIVE_SCHEMA,ADAPTER_SCHEMA
 BRANCH='mxm-o04-integrated-laboratory-evidence'
 EXEC='mxm-remediation-p0-p4-20261015-v1'
@@ -91,6 +91,7 @@ def verify_operational_acceptance(route,gate,source,protected):
     jobs=native_jobs(route,run_id,('preflight','segment-intent',
         'execution-fence','investigation','durable-archive','cold-readback',
         'fault-probes','attest-v3'),require_completed_run=True,expected_head_sha=state.get('last_trigger_sha'))
+    source_material=native_checkout_provenance(route,run_id,source,state['last_trigger_sha'],jobs)
     expected=proof_paths(run_id)
     need(all(gate[k]==expected[v] for k,v in (
         ('issuer_path','issuer'),('cold_proof_path','cold'),
@@ -153,7 +154,8 @@ def verify_operational_acceptance(route,gate,source,protected):
          'V3_ORIGINAL_TRIAL_ACCOUNTING_CHANGED')
     return {'status':'END_TO_END_OPERATIONAL_ACCEPTED',
             'source_sha':source,'run_id':run_id,'checkpoint_oid':oid,
-            'ciphertext_sha256':state['ciphertext_sha256']}
+            'ciphertext_sha256':state['ciphertext_sha256'],
+            'native_checkout_provenance':source_material}
 
 def _artifact_state(route,oid):
     from .runtime import file_at

@@ -43,6 +43,87 @@ def native_jobs(route,run_id,names,require_completed_run=False,expected_head_sha
         found[name]=matched[0]['id']
     return found
 
+def native_checkout_provenance(route,run_id,source,trigger,jobs):
+    """Independently bind each successful job to immutable workflow and checkout.
+
+    Neither a source label in a proof nor run.head_sha establishes the code
+    used by its jobs. Read the actual YAML at the trigger and native step/log
+    evidence. Missing, conditional, duplicate or credential-retaining checkout
+    is a HOLD; no fallback to favorable artifact fields.
+    """
+    from .runtime import file_at
+    import yaml
+    from .common import bytes_digest
+    path='.github/workflows/mxm-integrated-p0.yml'
+    raw=file_at(route,path,trigger);workflow=yaml.safe_load(raw)
+    need(type(workflow) is dict and workflow.get('env',{}).get('LAB_SOURCE_SHA')==source and
+         workflow.get('env',{}).get('LAB_INTEGRATED_PROTOCOL')=='v2',
+         'V3_NATIVE_WORKFLOW_SOURCE_ENVIRONMENT')
+    metadata=route.json('actions/runs/'+str(run_id)+'/attempts/1/jobs?per_page=100')
+    need(metadata.get('total_count',len(metadata.get('jobs',[])))<=100,
+         'V3_NATIVE_CHECKOUT_JOB_LIST_INCOMPLETE')
+    records={};checkout='actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683'
+    allowed_actions={checkout,'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02',
+                     'actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093'}
+    commands={'python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'}
+    commands.update('python3 -m research_core_v4.laboratory.'+module
+                    for module in ('claim','runtime','publish','handoff','attest_v3'))
+    commands.update('python3 -m research_core_v4.laboratory.integrated '+operation
+                    for operation in ('preflight','fence','recover','verify','fault-probes'))
+    commands.update('python3 -m research_core_v4.laboratory.custody '+operation
+                    for operation in ('claim','fence','publish','recover','handoff','fault-probes','attest-v3'))
+    def environment(value):
+        env=value.get('env',{})
+        need(type(env) is dict and not set(env)&{'PYTHONPATH','PYTHONHOME','PYTHONSTARTUP','PYTHONUSERBASE',
+             'BASH_ENV','ENV','PATH','LD_PRELOAD','LD_LIBRARY_PATH'},
+             'V3_NATIVE_IMPORT_ENVIRONMENT_OVERRIDE')
+        need(all(k not in env or env[k]==v for k,v in
+                 (('LAB_SOURCE_SHA',source),('LAB_INTEGRATED_PROTOCOL','v2'))),
+             'V3_NATIVE_JOB_SOURCE_OVERRIDE')
+        defaults=value.get('defaults',{}).get('run',{})
+        need(defaults.get('working-directory','.')=='.' and
+             value.get('working-directory','.')=='.' and defaults.get('shell','bash')=='bash' and
+             value.get('shell','bash')=='bash','V3_NATIVE_WORKING_DIRECTORY')
+    environment(workflow)
+    for name,job_id in jobs.items():
+        definition=workflow.get('jobs',{}).get(name,{})
+        environment(definition)
+        need(not definition.get('continue-on-error') and 'container' not in definition,
+             'V3_NATIVE_JOB_EXECUTION_OVERRIDE')
+        steps=definition.get('steps',[])
+        for step in steps:
+            environment(step)
+            need('uses' not in step or step['uses'] in allowed_actions,
+                 'V3_NATIVE_UNPINNED_OR_UNKNOWN_ACTION')
+            need('run' not in step or type(step['run']) is str and step['run'].strip() in commands,
+                 'V3_NATIVE_UNKNOWN_EXECUTION_COMMAND')
+            if str(step.get('uses','')).startswith('actions/download-artifact@'):
+                need(step.get('with',{}).get('path','').rstrip('/')=='verification/integrated-p0-input',
+                     'V3_NATIVE_ARTIFACT_MAY_OVERWRITE_CODE')
+        checkouts=[s for s in steps if str(s.get('uses','')).startswith('actions/checkout@')]
+        need(len(checkouts)==1 and checkouts[0].get('uses')==checkout and
+             'if' not in checkouts[0] and checkouts[0].get('with',{}).get('ref')==source and
+             not checkouts[0].get('continue-on-error') and
+             checkouts[0].get('with',{}).get('path','.')=='.' and
+             checkouts[0].get('with',{}).get('repository','mariancradulescu/mxm-quant-greenfield')=='mariancradulescu/mxm-quant-greenfield' and
+             checkouts[0].get('with',{}).get('persist-credentials') is False,
+             'V3_NATIVE_CHECKOUT_DEFINITION')
+        expected_name=checkouts[0].get('name','Run '+checkout)
+        found=[j for j in metadata['jobs'] if j.get('id')==job_id and j.get('name')==name]
+        need(len(found)==1,'V3_NATIVE_CHECKOUT_JOB_ID')
+        actual=[s for s in found[0].get('steps',[]) if s.get('name')==expected_name]
+        need(len(actual)==1 and actual[0].get('status')=='completed' and
+             actual[0].get('conclusion')=='success','V3_NATIVE_CHECKOUT_STEP_NOT_SUCCESS')
+        log=route.data('actions/jobs/'+str(job_id)+'/logs')
+        need(type(log) is bytes and any(re.fullmatch(
+             r'(?:\ufeff?\d{4}-\d\d-\d\dT\S+Z\s+)?'+re.escape(source),line.strip())
+             for line in log.decode('utf-8',errors='strict').splitlines()),
+             'V3_NATIVE_ACTUAL_CHECKOUT_LOG')
+        records[name]={'job_id':job_id,'checkout_step':actual[0]['number'],
+                       'code_sha':source,'log_sha256':bytes_digest(log)}
+    return {'workflow_path':path,'workflow_head_sha':trigger,
+            'workflow_sha256':bytes_digest(raw),'jobs':records}
+
 def validate_cold_artifact(cold,adapter,state,run_id,source,checkpoint_oid):
     need(type(cold) is dict and cold.get('schema')==COLD_SCHEMA
          and cold.get('run_id')==run_id
@@ -157,15 +238,26 @@ def validate_negative_artifact(route,proof,run_id,source,state):
          and digest(ack)==proof['ack_sha256'],
          'V3_NATIVE_ACK_NOT_PERSISTED')
     prior=proof['pre_fence_native_run_id']
-    need(prior==39322312307,'V3_HISTORICAL_CRASH_ID')
+    need(type(prior) is int and prior>0 and prior!=run_id,'V3_NATIVE_CRASH_ID')
     negative_run=route.json('actions/runs/'+str(prior))
-    need(negative_run['conclusion']=='failure' and
-         negative_run['path']=='.github/workflows/mxm-integrated-p0.yml',
-         'V3_HISTORICAL_NATIVE_CRASH_NOT_PROVEN')
+    need(negative_run['status']=='completed' and negative_run['conclusion']=='failure' and
+         negative_run['path']=='.github/workflows/mxm-integrated-p0.yml' and
+         negative_run.get('head_branch')=='mxm-remediation-p0-p4-20261015-v1' and
+         negative_run.get('run_attempt')==1 and
+         re.fullmatch('[a-f0-9]{40}',negative_run.get('head_sha','')),
+         'V3_SAME_SOURCE_NATIVE_CRASH_NOT_PROVEN')
     jobs=route.json('actions/runs/'+str(prior)+'/attempts/1/jobs?per_page=100')['jobs']
     from .protocol import can_recover_before_exposure
     need(can_recover_before_exposure({'pending':{'phase':'PRE_EXPOSURE'}},jobs),
          'V3_PRE_FENCE_JOB_GRAPH_MISMATCH')
+    preflight=[j for j in jobs if j.get('name')=='preflight']
+    claim=[j for j in jobs if j.get('name')=='segment-intent']
+    need(len(preflight)==len(claim)==1 and preflight[0]['status']=='completed' and
+         preflight[0]['conclusion']=='success','V3_PRE_FENCE_PREFLIGHT_NOT_PROVEN')
+    native_checkout_provenance(route,prior,source,negative_run['head_sha'],
+        {j['name']:j['id'] for j in preflight+claim})
+    need(proof['pre_fence_recovery_path']=='typed-successor/recoveries/'+str(prior)+'.json',
+         'V3_PRE_FENCE_RECOVERY_PATH')
     historical=strict_json(file_at(route,proof['pre_fence_recovery_path'],
                                    proof['checkpoint_parent_oid']))
     need(historical['run_id']==prior and

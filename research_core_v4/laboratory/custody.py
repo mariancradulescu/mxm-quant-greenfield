@@ -2,6 +2,170 @@
 import base64,json,os,subprocess,tempfile
 from pathlib import Path
 from .common import *
+_NATIVE_WRITER_SCOPE=None
+
+WRITER_JOBS={'claim':'segment-intent','fence':'execution-fence','publish':'durable-archive',
+    'recover':'recover-before-exposure','handoff':'scientific-handoff',
+    'fault-probes':'fault-probes','attest-v3':'attest-v3','certify-v3':'certify-v3'}
+
+def build_native_workflow(source,predecessor):
+    """Install the same integrated DAG with scoped secrets and existing App.
+
+    Pure preparation; it does not install environments, admit work or dispatch.
+    The final source SHA is supplied only after its native CI/source seal.
+    """
+    from copy import deepcopy
+    import re
+    need(re.fullmatch('[a-f0-9]{40}',source or ''),'APP_WORKFLOW_SOURCE')
+    workflow=deepcopy(predecessor)
+    # PyYAML's YAML1.1 reader treats the native YAML key `on` as True.
+    # Emit an unambiguous JSON workflow regardless of the reader used.
+    if True in workflow:
+        need('on' not in workflow,'APP_WORKFLOW_AMBIGUOUS_TRIGGER')
+        workflow['on']=workflow.pop(True)
+    need(workflow.get('name')=='MXM integrated P0 technical recovery' and
+         set(workflow['jobs'])=={'preflight','segment-intent','execution-fence','investigation',
+         'durable-archive','recover-before-exposure','scientific-handoff','cold-readback'},
+         'APP_WORKFLOW_EXISTING_DAG')
+    workflow['permissions']={};workflow['env']['LAB_SOURCE_SHA']=source
+    workflow['concurrency']={'group':'mxm-integrated-laboratory','cancel-in-progress':False}
+    operations={v:k for k,v in WRITER_JOBS.items() if k!='certify-v3'}
+    for name,job in workflow['jobs'].items():
+        job['permissions']={'contents':'read','actions':'write' if name=='scientific-handoff' else 'read'}
+        job['environment']='mxm-p0-successor-issuer-v1' if name in operations else 'mxm-r3-custody-v1'
+        if name=='preflight':
+            job['steps']=[s for s in job['steps'] if s.get('name') not in (
+                'New integration regression and affected typed accounting checks',
+                'P0-17 refuse unverified economic acceptance certificates')]
+        for step in job['steps']:
+            if str(step.get('uses','')).startswith('actions/checkout@'):
+                step['with']={'ref':source,'persist-credentials':False}
+            env=step.get('env',{})
+            for key in ('CTRADER_CLIENT_ID','CTRADER_CLIENT_SECRET','CTRADER_ACCESS_TOKEN'):
+                env.pop(key,None)
+            if 'MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM' in env:
+                env['MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM']='${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}'
+            if name in operations and 'run' in step and 'python3 -m research_core_v4.laboratory.' in step['run']:
+                step['run']='python3 -m research_core_v4.laboratory.custody '+operations[name]
+                step.setdefault('env',{})['SUCCESSOR_APP_PRIVATE_KEY']='${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}'
+        if name=='cold-readback':
+            artifact=next(s for s in job['steps'] if str(s.get('uses','')).startswith('actions/upload-artifact@'))
+            artifact['with']['path']='verification/integrated-p0/cold-readback.json\nverification/integrated-p0/authentic-adapter.json\n'
+    def proof_job(operation,needs):
+        steps=[{'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683',
+                'with':{'ref':source,'persist-credentials':False}},
+               {'run':'python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'}]
+        if operation=='attest-v3':steps.append({'uses':'actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093',
+            'with':{'name':'integrated-p0-cold-readback-${{ github.run_id }}','path':'verification/integrated-p0-input/'}})
+        steps.append({'run':'python3 -m research_core_v4.laboratory.custody '+operation,
+            'env':{'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}',
+                   'LAB_PARENT_OID':'${{ needs.durable-archive.outputs.evidence_oid }}'}})
+        return {'needs':needs,'if':"needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'STOP' && needs.cold-readback.result == 'success'"+
+                (" && needs.fault-probes.result == 'success'" if operation=='attest-v3' else ''),
+            'runs-on':'ubuntu-24.04','timeout-minutes':8,'environment':'mxm-p0-successor-issuer-v1',
+            'permissions':{'contents':'read','actions':'read'},'steps':steps}
+    workflow['jobs']['fault-probes']=proof_job('fault-probes',['preflight','durable-archive','cold-readback'])
+    workflow['jobs']['attest-v3']=proof_job('attest-v3',['preflight','durable-archive','cold-readback','fault-probes'])
+    return workflow
+
+def build_certifier_workflow(source):
+    import re
+    need(re.fullmatch('[a-f0-9]{40}',source or ''),'APP_WORKFLOW_SOURCE')
+    return {'name':'MXM R3 native independent certification',
+        'on':{'workflow_run':{'workflows':['MXM integrated P0 technical recovery'],'types':['completed']}},
+        'permissions':{},'concurrency':{'group':'mxm-integrated-laboratory','cancel-in-progress':False},
+        'env':{'LAB_SOURCE_SHA':source,'LAB_INTEGRATED_PROTOCOL':'v2'},'jobs':{'certify-v3':{
+            'if':"github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1 && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1'",
+            'runs-on':'ubuntu-24.04','timeout-minutes':8,'environment':'mxm-p0-successor-issuer-v1',
+            'permissions':{'contents':'read','actions':'read'},'steps':[
+                {'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683','with':{'ref':source,'persist-credentials':False}},
+                {'run':'python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'},
+                {'run':'python3 -m research_core_v4.laboratory.custody certify-v3','env':{
+                    'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}'}}]}}}
+
+def writer_metadata(operation):
+    """Job identity is checked before any App key is read or token minted."""
+    import re
+    job=WRITER_JOBS.get(operation)
+    branch='main' if operation=='certify-v3' else 'mxm-remediation-p0-p4-20261015-v1'
+    path='.github/workflows/mxm-r3-certify-v3.yml' if operation=='certify-v3' else '.github/workflows/mxm-integrated-p0.yml'
+    source=os.environ.get('LAB_SOURCE_SHA','');trigger=os.environ.get('GITHUB_SHA','')
+    need(job and os.environ.get('GITHUB_REPOSITORY')=='mariancradulescu/mxm-quant-greenfield' and
+         os.environ.get('GITHUB_JOB')==job and os.environ.get('GITHUB_REF_NAME')==branch and
+         os.environ.get('GITHUB_RUN_ATTEMPT')=='1' and
+         os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2' and
+         re.fullmatch('[a-f0-9]{40}',source) and re.fullmatch('[a-f0-9]{40}',trigger) and
+         os.environ.get('GITHUB_WORKFLOW_SHA')==trigger and
+         os.environ.get('GITHUB_WORKFLOW_REF')=='mariancradulescu/mxm-quant-greenfield/'+path+'@refs/heads/'+branch,
+         'APP_WRITER_NATIVE_CONTEXT')
+    need(os.environ.get('GITHUB_EVENT_NAME') in
+         (('workflow_run',) if operation=='certify-v3' else ('push','workflow_dispatch')),
+         'APP_WRITER_EVENT')
+    need(not any(os.environ.get(k) for k in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','R3_CUSTODY_PRIVATE_KEY_PEM',
+         'CTRADER_CLIENT_ID','CTRADER_CLIENT_SECRET','CTRADER_ACCESS_TOKEN',
+         'R3_CTRADER_CLIENT_ID','R3_CTRADER_CLIENT_SECRET','R3_CTRADER_ACCESS_TOKEN')),
+         'APP_WRITER_NO_DECRYPTION_OR_BROKER_KEYS')
+    return {'source':source,'trigger':trigger,'job':job,'operation':operation}
+
+def run_native_writer(operation):
+    """Reuse the existing App mint/use/revoke in one process; never return a token.
+
+    No keyless GITHUB_TOKEN fallback. No App key/token in called workload env,
+    artifacts or outputs. All source/authority controls precede publication.
+    Installation of an environment grant is deliberately a separate operation.
+    """
+    global _NATIVE_WRITER_SCOPE
+    need(_NATIVE_WRITER_SCOPE is None,'APP_WRITER_NESTED_SCOPE')
+    identity=writer_metadata(operation)
+    from .runtime import anchors
+    from .integrated import definition
+    from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
+    from .operational_acceptance import verify_effective_controls
+    route=GetOnly();anchors(route)
+    need(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==identity['source'],
+         'APP_WRITER_CHECKOUT_PIN')
+    need(subprocess.run(['git','diff','--quiet','HEAD','--'],capture_output=True).returncode==0,
+         'APP_WRITER_MODIFIED_SOURCE')
+    if operation!='certify-v3':
+        admission,_,_=definition(route)
+        need(admission['mode']=='TECHNICAL_NONOUTCOME' and admission['economic_release'] is False,
+             'APP_WRITER_TECHNICAL_ONLY')
+    from research_core_v4.p0_successor_a_20261017.issuer import _app_token
+    need(bool(os.environ.get('SUCCESSOR_APP_PRIVATE_KEY')),'APP_WRITER_CREDENTIAL_NOT_INSTALLED')
+    private_key=os.environ.pop('SUCCESSOR_APP_PRIVATE_KEY')
+    original_token=os.environ['GH_TOKEN']
+    try:
+        with _app_token(private_key) as token:
+            private_key=None
+            class AppControls(GetOnly):
+                def data(self,path,limit=16*1024*1024):
+                    import urllib.request
+                    need(path.startswith(('rulesets/','rules/branches/')),'APP_CONTROL_READ_NAMESPACE')
+                    request=urllib.request.Request('https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/'+path,
+                        headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})
+                    with self.open(request) as response:value=response.read(limit+1)
+                    need(len(value)<=limit,'APP_CONTROL_READ_SIZE');return value
+            def guard():
+                # Exact bypass actors are read as the actual existing App,
+                # while ordinary workflow/job reads keep native Actions scope.
+                # Do not swap process environment: the native CAS proof has
+                # two threads, each requiring the same independent reader.
+                verify_effective_controls(AppControls())
+                anchors(GetOnly())
+            guard()
+            _NATIVE_WRITER_SCOPE={**identity,'token':token,'guard':guard}
+            try:
+                if operation=='attest-v3':
+                    from .attest_v3 import publish
+                    return publish()
+                if operation=='certify-v3':
+                    from .certify_v3 import main
+                    return main()
+                from . import integrated
+                return getattr(integrated,{'fault-probes':'fault_probes'}.get(operation,operation))()
+            finally:_NATIVE_WRITER_SCOPE=None
+    finally:
+        private_key=None;os.environ['GH_TOKEN']=original_token
 
 class CASRefused(LabError):
     """A native git push explicitly rejected its stale expected ref."""
@@ -12,8 +176,12 @@ class CASRefused(LabError):
 def atomic_publish(route,parent,files,message):
     from .runtime import EVIDENCE_BRANCH,read_state
     need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WRITER_NO_KEYS')
+    scope=_NATIVE_WRITER_SCOPE
+    need(scope is not None and scope['job']==os.environ.get('GITHUB_JOB') and
+         scope['source']==os.environ.get('LAB_SOURCE_SHA'),'APP_WRITER_SCOPE_REQUIRED')
+    scope['guard']()
     env={k:v for k,v in os.environ.items() if k not in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','SUCCESSOR_APP_PRIVATE_KEY')}
-    auth=base64.b64encode(('x-access-token:'+os.environ['GH_TOKEN']).encode()).decode();env.update(GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+auth)
+    auth=base64.b64encode(('x-access-token:'+scope['token']).encode()).decode();env.update(GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+auth)
     def git(directory,*args):
         v=subprocess.run(['git',*args],cwd=directory,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120);need(v.returncode==0,'ATOMIC_GIT_'+args[0].upper().replace('-','_'));return v.stdout.decode().strip()
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as td:
@@ -63,3 +231,8 @@ def restore_ciphertext(manifest,fetch):
         b=base64.b64decode(fetch(p['path']).strip(),validate=True);need(len(b)==p['length'] and bytes_digest(b)==p['sha256'],'CIPHER_PART_CHANGED');value.extend(b)
     need(len(value)==manifest['size'] and bytes_digest(value)==manifest['sha256'],'CIPHER_PARTS_AGGREGATE')
     return bytes(value)
+
+if __name__=='__main__':
+    import sys
+    need(len(sys.argv)==2 and sys.argv[1] in WRITER_JOBS,'APP_WRITER_OPERATION')
+    run_native_writer(sys.argv[1])
