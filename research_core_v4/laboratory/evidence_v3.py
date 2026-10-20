@@ -58,11 +58,52 @@ def cold_attestation(private, public, admission, evidence_oid, run_id, source_sh
     # Legacy records cannot fabricate a v3 execution order retrospectively.
     events=private.get('programme_execution_history',[])
     need(type(events) is list,'COLD_V3_EVENT_JOURNAL')
-    chain=[x['programme'] for x in events if
-           type(x) is dict and x.get('native_checkpoint_sequence') is not None]
-    aba=any(chain[i]==chain[k] and chain[i]!=chain[j]
-            for i in range(len(chain)) for j in range(i+1,len(chain))
-            for k in range(j+1,len(chain)))
+    previous=None
+    previous_ids=set()
+    names=[]
+    for i,event in enumerate(events):
+        need(type(event) is dict and
+             event.get('previous_event_sha256')==previous and
+             event.get('event_sha256')==
+             digest({k:v for k,v in event.items() if k!='event_sha256'})
+             and event.get('programme') in private['programmes'] and
+             type(event.get('native_checkpoint_sequence')) is int and
+             type(event.get('within_segment_step')) is int and
+             event['within_segment_step']>0,
+             'COLD_V3_NATIVE_JOURNAL_CHAIN')
+        saved=private['programmes'][event['programme']]
+        need(event['task'] in saved['progress']['results'] and
+             digest(saved['progress']['results'][event['task']])==
+             event['result_sha256'] and
+             event['programme_budget_remaining']>=0,
+             'COLD_V3_NATIVE_EVENT_RESULT')
+        before=event['catalogue_before_asset_ids']
+        after=event['catalogue_after_asset_ids']
+        need(before==sorted(set(before)) and
+             after==sorted(set(after)) and
+             set(before)<=set(after)<=set(shared.assets),
+             'COLD_V3_EVENT_ASSET_CONSERVATION')
+        if i:
+            need(set(before)==previous_ids and
+                 (event['native_checkpoint_sequence']>
+                  events[i-1]['native_checkpoint_sequence'] or
+                  (event['native_checkpoint_sequence']==
+                   events[i-1]['native_checkpoint_sequence'] and
+                   event['within_segment_step']>
+                   events[i-1]['within_segment_step'])),
+                 'COLD_V3_EVENT_ORDER_OR_CATALOGUE_DRIFT')
+        previous_ids=set(after);previous=event['event_sha256']
+        names.append(event['programme'])
+    # To count as native A-B-A, B must have added at least one preserved
+    # asset, and the later A must carry that asset forward.
+    aba=any(
+        names[i]==names[k] and names[i]!=names[j] and
+        bool(set(events[j]['catalogue_after_asset_ids'])-
+             set(events[j]['catalogue_before_asset_ids'])) and
+        set(events[j]['catalogue_after_asset_ids'])<=
+        set(events[k]['catalogue_before_asset_ids'])
+        for i in range(len(names)) for j in range(i+1,len(names))
+        for k in range(j+1,len(names)))
     actual_adapter=[]
     for item in programmes:
         saved=private['programmes'][item['id']]
@@ -115,7 +156,8 @@ def native_adapter_attestation(cold):
          cold['authentic_nonoutcome_results'],'V3_AUTHENTIC_PROOF_ABSENT')
     values=cold['authentic_nonoutcome_results']
     need(len({(x['programme'],x['task']) for x in values})==len(values) and
-         all(x['verified_quote_rows']>0 for x in values),
+         all(x['verified_quote_rows']>0 and x['preserved_corpus_sha256']==
+             values[0]['preserved_corpus_sha256'] for x in values),
          'V3_ADAPTER_EVIDENCE')
     return {'schema':ADAPTER_SCHEMA,'source_sha':cold['source_sha'],
             'checkpoint_oid':cold['evidence_oid'],
