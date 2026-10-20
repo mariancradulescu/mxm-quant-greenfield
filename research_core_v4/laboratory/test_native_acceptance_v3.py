@@ -46,6 +46,9 @@ class ArtificialRoute:
                      'base_commit':{'sha':'9'*40}} if self.divergent else
                     {'status':'ahead','ahead_by':1,'behind_by':0,
                      'base_commit':{'sha':HEAD}})
+        if path=='compare/'+CHECKPOINT+'...'+'6'*40:
+            return {'status':'ahead','ahead_by':1,'behind_by':0,
+                    'base_commit':{'sha':CHECKPOINT}}
         if path=='actions/runs/'+str(RUN):
             return {'id':RUN,'status':'completed' if self.run_ok else 'in_progress',
                     'conclusion':'success' if self.run_ok else None,
@@ -82,6 +85,10 @@ def make_fixture():
           'programme_execution_history_sha256':'1'*64,
           'programme_checkpoints':[
              {'id':x,'checkpoint_sha256':'2'*64,
+              'progress_sha256':'7'*64,'catalogue_sha256':'8'*64,
+              'acquisition_budget_sha256':'9'*64,
+              'native_receipts_sha256':'0'*64,
+              'acquisition_remaining':0,
               'steps_used':1,'safe_stop':True} for x in ('A','B')],
           'multi_program_A_B_A_verified':True,
           'budgets_and_quarantine_verified':True,
