@@ -13,24 +13,24 @@ from research_core_v4.remediation_p0_p4_20261015.safety import strict_json,unpac
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-integrated-p0-r3'
+SOURCE_BRANCH='mxm-r3-integrated-source-20261020'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
 
 def source_admission(head,expected,branch_head,rule):
-    from fnmatch import fnmatchcase
     need(re.fullmatch('[a-f0-9]{40}',expected or '') and head==expected==branch_head,
          'IMMUTABLE_SOURCE_PIN')
-    refs=rule.get('conditions',{}).get('ref_name',{});ref='refs/heads/'+SOURCE_BRANCH
+    refs=rule.get('conditions',{}).get('ref_name',{})
     need(rule.get('id')==25222248 and rule.get('enforcement')=='active' and
-         any(fnmatchcase(ref,p) for p in refs.get('include',[])) and
-         not any(fnmatchcase(ref,p) for p in refs.get('exclude',[])) and
+         refs=={'include':['refs/heads/mxm-o04-*'],'exclude':[]} and
          {'deletion','non_fast_forward','required_linear_history'}<=
          {r['type'] for r in rule.get('rules',[])} and
          rule.get('bypass_actors',[])==[], 'EXISTING_APPEND_ONLY_FENCE')
-    # This verifies only the historical append-only fence. Separate effective
-    # source/writer/credential authority checks remain mandatory for acceptance.
+    # Preserve the original authority/evidence fence exactly. Source history
+    # contains merges and cannot be recreated in its linear-only namespace.
+    # The source's separate exact creation/update/deletion/non-FF seal below
+    # forbids every mutation, including all history rewrites, without bypass.
 
 def module_digest():
     return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py','operational_acceptance.py','handoff_recovery.py','evidence_v3.py','attest_v3.py','certify_v3.py')})
