@@ -169,7 +169,16 @@ def execute():
                         from .runtime import corpus,preserved_registry
                         lab.authentic_corpus=corpus(key,tmp,preserved_registry())
                 task=lab.next()
-                if task is not None:result=lab.execute(task);done.append({'programme':m['id'],'task':task,'classification':result['classification']})
+                if task is not None:
+                    result=lab.execute(task)
+                    done.append({'programme':m['id'],'task':task,'classification':result['classification']})
+                    p.setdefault('programme_execution_history',[]).append({
+                        'programme':m['id'],'task':task,
+                        'result_sha256':digest(result),
+                        'native_checkpoint_sequence':s['sequence']+1,
+                        'within_segment_step':len(done),
+                        'catalogue_before_sha256':digest(p['shared_catalogue']),
+                        'programme_budget_remaining':lab.acquisition.remaining})
                 lab.next();preserve_node(p,lab);book=lab.book
             finally:
                 if lazy:
@@ -362,16 +371,44 @@ def fault_probes():
     print('INTEGRATED_FAULT_PROBES '+json.dumps({'evidence_oid':final,'proof':proof},sort_keys=True))
 
 def verify():
-    route=workload('cold-readback');oid=os.environ['LAB_PARENT_OID'];need(current(route)==oid,'VERIFY_PARENT');s,_=state_at(route,oid);need(s['safe_stop'] and s['pending'] is None,'VERIFY_NOT_TERMINAL');a,ref,path=definition(route)
+    """Decrypt published bytes in a fresh cold job and produce v3 proof.
+
+    The proof remains a GitHub Actions artifact until a separate keyless
+    evidence publisher has checked this job and committed its exact bytes.
+    No certificate is issued from this decrypting job.
+    """
+    route=workload('cold-readback')
+    oid=os.environ['LAB_PARENT_OID']
+    need(current(route)==oid,'VERIFY_PARENT')
+    state,_=state_at(route,oid)
+    need(state['safe_stop'] and state['pending'] is None,'VERIFY_NOT_TERMINAL')
+    admission,ref,path=definition(route)
+    from .evidence_v3 import cold_attestation,native_adapter_attestation
     from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as folder:
-        tmp=Path(folder);key,fp=_private_key_from_secret(tmp);p=open_private(route,s,oid,key,tmp);book=register_and_validate(p,a,p['history'])
-        need(accounting(book.export())==s['accounting'] and book.baseline['legacy_snapshot']['used']['V2']==22,'VERIFY_PERSISTENT_TYPED_ACCOUNTING')
-        for m in a['programmes']:need(Laboratory.restore(p['programmes'][m['id']],p['history'],shared_catalogue=p['shared_catalogue']).next() is None,'VERIFY_PROGRAMME_NOT_COMPLETE')
-        need(bytes_digest(file_at(route,'program-state.json',oid))==ORIGINAL_PUBLIC,'VERIFY_ORIGINAL_CHANGED')
-        origin=p.get('programme_accounting_origins',{}).get(digest(a),{'economic_observations':29})
-        proof={'schema':'mxm.integrated-cold-readback.v2','evidence_oid':oid,'run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':os.environ['LAB_SOURCE_SHA'],'sequence':s['sequence'],'ciphertext_sha256':s['ciphertext_sha256'],'private_sha256':digest(p),'accounting':s['accounting'],'all_admitted_programmes_complete':True,'original_unchanged':True,'new_outcomes':s['accounting']['economic_observations']-origin['economic_observations'],'orders':0,'economic_workflow_released':a['economic_release']}
-    OUT.mkdir(parents=True,exist_ok=True);(OUT/'cold-readback.json').write_bytes(encoded(proof));print('INTEGRATED_COLD_READBACK '+json.dumps(proof,sort_keys=True))
+        tmp=Path(folder);key,fp=_private_key_from_secret(tmp)
+        private=open_private(route,state,oid,key,tmp)
+        # Native decrypt validates ciphertext and private sequence/source; the
+        # producer also verifies every saved programme/cached shared asset.
+        proof=cold_attestation(private,state,admission,oid,
+                              int(os.environ['GITHUB_RUN_ID']),
+                              os.environ['LAB_SOURCE_SHA'])
+        adapter=None
+        if proof['authentic_nonoutcome_results']:
+            adapter=native_adapter_attestation(proof)
+        need(bytes_digest(file_at(route,'program-state.json',oid))==ORIGINAL_PUBLIC,
+             'VERIFY_ORIGINAL_CHANGED')
+        need(current(route)==oid,'VERIFY_PARENT_MOVED')
+    OUT.mkdir(parents=True,exist_ok=True)
+    (OUT/'cold-readback.json').write_bytes(encoded(proof))
+    if adapter is not None:
+        (OUT/'authentic-adapter.json').write_bytes(encoded(adapter))
+    print('INTEGRATED_COLD_READBACK_V3 '+json.dumps({
+        'source_sha':proof['source_sha'],'evidence_oid':oid,
+        'sequence':proof['sequence'],'programme_count':len(proof['programme_checkpoints']),
+        'multi_program_A_B_A_verified':proof['multi_program_A_B_A_verified'],
+        'authentic_nonoutcome_count':len(proof['authentic_nonoutcome_results']),
+        'economic_release':False,'orders':0},sort_keys=True))
 
 if __name__=='__main__':
     import sys
