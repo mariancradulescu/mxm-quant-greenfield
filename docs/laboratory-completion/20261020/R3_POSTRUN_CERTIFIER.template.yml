@@ -1,0 +1,45 @@
+# R3 POST-RUN CERTIFIER — INACTIVE WORKFLOW TEMPLATE, NOT A DEPLOYMENT.
+#
+# Deploy only on the protected existing default branch after:
+# 1. main and mxm-remediation-p0-p4-20261015-v1 are really protected;
+# 2. new R3 source commit is immutable and protected at CODE branch;
+# 3. workflow execution branch checks out exactly that immutable SHA;
+# 4. prospective technical admission binds new source/workflow module hashes;
+# 5. cold-readback, fault-probes, attest-v3 native chain is complete.
+#
+# Never enable on mutable/unprotected PR source or without the native cold
+# process proof. One workflow_run event after completion, not cron.
+name: MXM R3 native independent certification
+on:
+  workflow_run:
+    workflows: [MXM integrated P0 technical recovery]
+    types: [completed]
+permissions: {}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  certify-v3:
+    if: >-
+      github.repository == 'mariancradulescu/mxm-quant-greenfield' &&
+      github.run_attempt == 1 &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions: {contents: write, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: __R3_SEALED_SOURCE_SHA__, persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Independent native E2E verifier; deny unprotected/unfinished proofs
+        run: python3 -m research_core_v4.laboratory.certify_v3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LAB_SOURCE_SHA: __R3_SEALED_SOURCE_SHA__
+          LAB_INTEGRATED_PROTOCOL: v2
+#
+# This template is deliberately outside .github/workflows. Moving it into
+# .github/workflows is an authorized control-plane write that must be preceded
+# by effective branch/source protection. No test fixture can enable issuance.
