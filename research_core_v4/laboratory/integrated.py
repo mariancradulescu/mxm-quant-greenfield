@@ -161,6 +161,13 @@ def execute():
                 if a['mode']=='DEVELOPMENT_RESEARCH':
                     from .runtime import corpus,preserved_registry
                     lazy=bind_native(lab,corpus(key,tmp,preserved_registry()))
+                elif a['mode']=='TECHNICAL_NONOUTCOME':
+                    candidate=lab.next()
+                    if candidate and lab.m['tasks'][candidate]['operator']=='native_corpus_readonly':
+                        # Read the existing authenticated sealed corpus, not an
+                        # invented quote fixture and not a new broker collection.
+                        from .runtime import corpus,preserved_registry
+                        lab.authentic_corpus=corpus(key,tmp,preserved_registry())
                 task=lab.next()
                 if task is not None:result=lab.execute(task);done.append({'programme':m['id'],'task':task,'classification':result['classification']})
                 lab.next();preserve_node(p,lab);book=lab.book
