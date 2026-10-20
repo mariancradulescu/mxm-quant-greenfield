@@ -61,9 +61,20 @@ def validate_cold_artifact(cold,adapter,state,run_id,source,checkpoint_oid):
          'V3_COLD_ARTIFACT_BINDING')
     ids=[x['id'] for x in cold['programme_checkpoints']]
     need(len(ids)==len(set(ids)) and
-         all(x['safe_stop'] is True and x['steps_used']>=0 and
-             re.fullmatch('[a-f0-9]{64}',x['checkpoint_sha256'])
-             for x in cold['programme_checkpoints']),
+         all(x['safe_stop'] is True and type(x['steps_used']) is int
+             and x['steps_used']>=0 and
+             type(x['acquisition_remaining']) is int
+             and x['acquisition_remaining']>=0 and
+             all(type(x.get(k)) is str and re.fullmatch('[a-f0-9]{64}',x[k])
+                 for k in ('checkpoint_sha256','progress_sha256',
+                           'catalogue_sha256','acquisition_budget_sha256',
+                           'native_receipts_sha256'))
+             for x in cold['programme_checkpoints']) and
+         type(cold.get('programme_execution_history_sha256')) is str and
+         re.fullmatch('[a-f0-9]{64}',
+                      cold['programme_execution_history_sha256']) and
+         type(cold.get('private_sha256')) is str and
+         re.fullmatch('[a-f0-9]{64}',cold['private_sha256']),
          'V3_COLD_PROGRAMME_ATTESTATION')
     if adapter is None:
         need(not cold['authentic_nonoutcome_results'],
@@ -100,7 +111,18 @@ def validate_negative_artifact(route,proof,run_id,source,state):
          sum(x['accepted'] is True for x in writers)==1 and
          set(x['writer'] for x in writers)=={'A','B'},
          'V3_NATIVE_WRITER_COLLISION')
-    ack=strict_json(file_at(route,proof['ack_path'],proof['ack_commit_oid']))
+    ack_oid=proof['ack_commit_oid']
+    checkpoint_parent=proof['checkpoint_parent_oid']
+    need(type(ack_oid) is str and re.fullmatch('[a-f0-9]{40}',ack_oid)
+         and type(checkpoint_parent) is str and
+         re.fullmatch('[a-f0-9]{40}',checkpoint_parent),
+         'V3_NEGATIVE_COMMIT_IDENTITY')
+    relation=route.json('compare/'+checkpoint_parent+'...'+ack_oid)
+    need(relation.get('status')=='ahead' and
+         relation.get('ahead_by')==1 and relation.get('behind_by')==0 and
+         relation.get('base_commit',{}).get('sha')==checkpoint_parent,
+         'V3_ACK_PROOF_NOT_DIRECT_CAS_DESCENDANT')
+    ack=strict_json(file_at(route,proof['ack_path'],ack_oid))
     need(ack['native_run_id']==run_id and
          ack['checkpoint_cipher_sha256']==state['ciphertext_sha256'] and
          ack['orders']==ack['new_outcomes']==0
