@@ -1,0 +1,27 @@
+name: MXM R3 native unauthorized environment refusal probes
+on:
+  push:
+    branches: [mxm-r3-admin-isolation-20261020]
+    paths: [.github/workflows/mxm-r3-environment-denial-probe.yml]
+permissions: {contents: read}
+jobs:
+  unauthorized-custody:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Must never start on unauthorized branch
+        run: |
+          echo 'UNEXPECTED_ENVIRONMENT_ADMISSION'
+          exit 1
+  unauthorized-pepperstone:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    environment: mxm-r3-pepperstone-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Must never start on unauthorized branch
+        run: |
+          echo 'UNEXPECTED_ENVIRONMENT_ADMISSION'
+          exit 1
