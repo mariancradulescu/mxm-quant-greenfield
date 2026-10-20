@@ -1,0 +1,17 @@
+name: MXM P0 successor catalogue integration CI
+on:
+  push:
+    branches: [mxm-p0-integrated-cache-successor-20261020]
+  pull_request:
+    branches: [mxm-o04-successor-code-integrated-p0-r2]
+permissions: {contents: read}
+jobs:
+  shared-catalogue-regression:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - run: python3 -m unittest research_core_v4.laboratory.test_shared_catalogue_successor research_core_v4.laboratory.test_general_integration research_core_v4.laboratory.test_integrated_protocol -v
