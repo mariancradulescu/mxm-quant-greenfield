@@ -28,6 +28,8 @@ class ArtificialRoute:
         self.main_protected=True
         self.missing_job=None
         self.storage={}
+        self.current_head=HEAD
+        self.divergent=False
     def json(self,path):
         if path.startswith('contents/') and '?ref=' in path:
             import base64
@@ -38,7 +40,12 @@ class ArtificialRoute:
         if path=='branches/'+CODE or path=='branches/'+BRANCH:
             return {'protected':True}
         if path=='git/ref/heads/'+BRANCH:
-            return {'object':{'sha':HEAD}}
+            return {'object':{'sha':self.current_head}}
+        if path=='compare/'+HEAD+'...'+self.current_head:
+            return ({'status':'diverged','ahead_by':2,'behind_by':1,
+                     'base_commit':{'sha':'9'*40}} if self.divergent else
+                    {'status':'ahead','ahead_by':1,'behind_by':0,
+                     'base_commit':{'sha':HEAD}})
         if path=='actions/runs/'+str(RUN):
             return {'id':RUN,'status':'completed' if self.run_ok else 'in_progress',
                     'conclusion':'success' if self.run_ok else None,
@@ -195,6 +202,25 @@ class IndependentNativeV3ContractTests(unittest.TestCase):
             route,gate,_=make_fixture();gate[part]=value
             with self.subTest(part=part),self.assertRaises(Exception):
                 self.verify(route,gate)
+    def test_certificate_proof_ancestor_survives_native_append_only(self):
+        route,gate,_=make_fixture()
+        route.current_head='c'*40
+        self.assertEqual(self.verify(route,gate)['run_id'],RUN)
+        route.divergent=True
+        with self.assertRaises(Exception):self.verify(route,gate)
+    def test_certifier_denies_missing_protected_main_or_failed_run(self):
+        from .certify_v3 import eligible_certificate
+        route,gate,_=make_fixture()
+        # The mock branch has valid proof but no operator authority if either
+        # official control-plane protection is missing.
+        with patch('research_core_v4.laboratory.runtime.file_at',
+                   side_effect=lambda _,path,oid:route.storage[(path,oid)]):
+            with patch('research_core_v4.laboratory.certify_v3.verify_operational_acceptance',
+                       side_effect=RuntimeError('CONTROL_PLANE_NOT_PROTECTED')):
+                with self.assertRaises(Exception):
+                    eligible_certificate(route,RUN,SOURCE)
+        route.run_ok=False
+        with self.assertRaises(Exception):eligible_certificate(route,RUN,SOURCE)
     def test_cross_run_job_or_seal_binding_rejected(self):
         route,gate,paths=make_fixture()
         issuer=__import__('json').loads(route.storage[(paths['issuer'],HEAD)])
