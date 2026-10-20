@@ -169,17 +169,25 @@ def execute():
                         from .runtime import corpus,preserved_registry
                         lab.authentic_corpus=corpus(key,tmp,preserved_registry())
                 task=lab.next()
+                event=None
                 if task is not None:
+                    before_ids=sorted(p['shared_catalogue']['assets'])
                     result=lab.execute(task)
                     done.append({'programme':m['id'],'task':task,'classification':result['classification']})
-                    p.setdefault('programme_execution_history',[]).append({
+                    history=p.setdefault('programme_execution_history',[])
+                    event={
                         'programme':m['id'],'task':task,
                         'result_sha256':digest(result),
                         'native_checkpoint_sequence':s['sequence']+1,
                         'within_segment_step':len(done),
-                        'catalogue_before_sha256':digest(p['shared_catalogue']),
-                        'programme_budget_remaining':lab.acquisition.remaining})
+                        'catalogue_before_asset_ids':before_ids,
+                        'programme_budget_remaining':lab.acquisition.remaining,
+                        'previous_event_sha256':history[-1]['event_sha256'] if history else None}
                 lab.next();preserve_node(p,lab);book=lab.book
+                if event is not None:
+                    event['catalogue_after_asset_ids']=sorted(p['shared_catalogue']['assets'])
+                    event['event_sha256']=digest(event)
+                    p['programme_execution_history'].append(event)
             finally:
                 if lazy:
                     if lazy.instance is not None:
