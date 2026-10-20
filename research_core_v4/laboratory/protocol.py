@@ -40,11 +40,82 @@ def migrate_private(private,state,history,candidates,source,original_public_sha)
     new['typed_transition']={'original_source':ORIGINAL_SOURCE,'original_cipher':ORIGINAL_CIPHER,'original_public_sha256':ORIGINAL_PUBLIC,'original_private_sha256':before,'legacy_snapshot_sha256':book.baseline['legacy_snapshot_sha256'],'refunds':0}
     need(digest(private)==before,'TRANSITION_ORIGINAL_MUTATED');return new
 
-def typed_source_transition(private,state,authority,source):
-    need(authority['source_sha']=='541bfe0e7d1eea060aa38d9e1e46a6639b7db13b' and authority['sequence']==19 and authority['ciphertext_sha256']=='cb14705c8456668c273f3c19a55bde40839e5be13c92cb43ad36b5cd61dc71b5' and authority['private_sha256']=='47c34e6307d247e03c95f2727112bcbbaee7e40d6a07f104f20b16e622be8102','TYPED_SOURCE_TRANSITION_AUTHORITY')
-    need(private['source_sha']==state['source_sha']==authority['source_sha'] and private['sequence']==state['sequence']==authority['sequence'] and state['ciphertext_sha256']==authority['ciphertext_sha256'] and digest(private)==authority['private_sha256'],'TYPED_SOURCE_TRANSITION_PROVENANCE')
-    need(state['pending'] is None and state['safe_stop'] is True and private['pending'] is None and private['safe_stop'] is True and all(x['progress']['safe_stop'] for x in private['programmes'].values()),'TYPED_SOURCE_TRANSITION_OPEN_WORK')
-    new=deepcopy(private);new.setdefault('typed_source_migrations',[]).append({**authority,'successor_source_sha':source,'accounting_sha256':digest(accounting(private['trial_book'])),'refunds':0});new['source_sha']=source;return new
+def verify_checkpoint20_public(state, authority, evidence_oid):
+    """Exact *predecessor* binding; public metadata alone never certifies execution.
+
+    The running worker separately checks protected refs and decrypts the original
+    ciphertext. The archived private digest is checked in typed_source_transition.
+    """
+    need(authority.get('schema')=='mxm.integrated-typed-predecessor.v3',
+         'CHECKPOINT20_MIGRATION_SCHEMA')
+    need(authority.get('evidence_oid')==evidence_oid==
+         '09703adad6433f395a0506fa640f59bf3dba80b5',
+         'CHECKPOINT20_EXACT_EVIDENCE_PARENT')
+    need(authority.get('source_sha')==state.get('source_sha')==
+         'eab050084982916ad0c67798b38b947bac66b2b2',
+         'CHECKPOINT20_EXACT_SOURCE')
+    need(authority.get('sequence')==state.get('sequence')==20 and
+         state.get('pending') is None and state.get('safe_stop') is True and
+         state.get('orders')==0, 'CHECKPOINT20_CLOSED_AUTHORITY')
+    need(authority.get('ciphertext_sha256')==state.get('ciphertext_sha256')==
+         '0c94708365f296a91404d5bc770981fe0aab7432980e74cb867a64626bf66eca',
+         'CHECKPOINT20_EXACT_CIPHER')
+    need(authority.get('private_sha256')==
+         '01227d7a7715a89bc1bfcf6fac183fbaec3b941f8c61281fb3c0e4f01f232fa6',
+         'CHECKPOINT20_EXACT_PRIVATE')
+    need(authority.get('public_state_sha256')==digest(state),
+         'CHECKPOINT20_EXACT_PUBLIC_STATE')
+    need(state.get('last_run_id')==39322587530 and
+         state.get('original_public_sha256')==ORIGINAL_PUBLIC and
+         state.get('admission_sha256')==
+         '0df8c9d95c9de000893f165dc94b76e7889880420b1d4201d219ff63a4276501',
+         'CHECKPOINT20_ORIGINAL_AND_ADMISSION')
+    view=state.get('accounting',{});v=view.get('lanes',{}).get('V2',{})
+    need(v=={'encumbered':22,'limit':84,'outcome_charged':21,'reservation_holds':1}
+         and view.get('economic_observations')==29 and view.get('refunds')==0
+         and view.get('causal_identity_fingerprint_version')==2,
+         'CHECKPOINT20_ACCOUNTING_FROZEN')
+    return True
+
+
+def typed_source_transition(private,state,authority,source,evidence_oid=None):
+    """One closed, exact predecessor; no generic/open-state source upgrade."""
+    if authority.get('source_sha')=='541bfe0e7d1eea060aa38d9e1e46a6639b7db13b':
+        need(authority['sequence']==19 and authority['ciphertext_sha256']=='cb14705c8456668c273f3c19a55bde40839e5be13c92cb43ad36b5cd61dc71b5' and authority['private_sha256']=='47c34e6307d247e03c95f2727112bcbbaee7e40d6a07f104f20b16e622be8102','TYPED_SOURCE_TRANSITION_AUTHORITY')
+    elif authority.get('source_sha')=='eab050084982916ad0c67798b38b947bac66b2b2':
+        verify_checkpoint20_public(state,authority,evidence_oid)
+    else:
+        need(False,'TYPED_SOURCE_PREDECESSOR_NOT_AUTHORIZED')
+    need(private['source_sha']==state['source_sha']==authority['source_sha'] and
+         private['sequence']==state['sequence']==authority['sequence'] and
+         state['ciphertext_sha256']==authority['ciphertext_sha256'] and
+         digest(private)==authority['private_sha256'],
+         'TYPED_SOURCE_TRANSITION_PROVENANCE')
+    need(state['pending'] is None and state['safe_stop'] is True and
+         private['pending'] is None and private['safe_stop'] is True and
+         all(x['progress']['safe_stop'] for x in private['programmes'].values()),
+         'TYPED_SOURCE_TRANSITION_OPEN_WORK')
+    before_book=digest(private['trial_book']);before_catalogue=digest(private['shared_catalogue'])
+    before=digest(private)
+    new=deepcopy(private)
+    new.setdefault('typed_source_migrations',[]).append({
+        **authority,'successor_source_sha':source,
+        'predecessor_evidence_oid':evidence_oid,
+        'predecessor_private_sha256':before,
+        'accounting_sha256':digest(accounting(private['trial_book'])),
+        'shared_catalogue_sha256':before_catalogue,
+        'trial_book_sha256':before_book,
+        'refunds':0,'closed_programmes_replayed':False
+    })
+    new['source_sha']=source
+    need(digest(private)==before and digest(private['trial_book'])==before_book
+         and digest(private['shared_catalogue'])==before_catalogue,
+         'TYPED_TRANSITION_MUTATED_PREDECESSOR')
+    need(new['trial_book']==private['trial_book'] and
+         new['shared_catalogue']==private['shared_catalogue'] and
+         new['programmes']==private['programmes'],
+         'TYPED_TRANSITION_RESET')
+    return new
 
 def upgrade_fingerprint(book,candidates,source):
     if book.hash_version==2:return
