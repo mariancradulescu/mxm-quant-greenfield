@@ -1,3 +1,13 @@
+# Current source gate — immutable source before custody or workers
+
+PR40 merged through strict native CI39431691558/job118658072221 into candidatea1be05be97c02467287f7ff24569380ca836ee3d. The job checked out synthetic merge65f7d035517d1b59755a3e8a06a7e65314b89f77, reproduced15 provenance assertion failures on immutable9cc7447 and passed229 repaired tests. Full native log is retained in OWNER_CONSOLIDATED_PROVENANCE_NATIVE_CI.txt. The prepared10-job DAG also passes the independent provenance verifier in an explicitly artificial integration test.
+
+A further gate defect is repaired: runtime anchors previously checked only the original append-only source rule, which still allowed a forward source update. Every operational entry point now requires actual applied update/deletion/non-fast-forward rules and an active exact-R3 freeze with creation/update/deletion/non-fast-forward restrictions and explicitly empty bypass actors BEFORE custody use, worker start or App mint. Missing/redacted ACL fields remain a HOLD, never inferred empty. Three artificial methods reproduce10 assertion failures on immutable9cc7447;233 repaired tests pass locally. Native CI also measures the read token's actual ACL visibility so any unavailable permission is isolated explicitly rather than fabricated. No R3 ref/freeze, issuer grant, worker or checkpoint mutation is performed by this source-only repair.
+
+The unresolved post-fence worker case remains held: no receipt does not establish no execution, and there is no blind replay, invented trial charge or refund. Operational and research-capability receptions remain FALSE. Existing issuer delivery, a complete native fault/recovery campaign, durable R3 successor/cold reception and authentic chronological execution/cost/coverage/C# research capacity are still required. This source checkpoint is not laboratory completion.
+
+---
+
 # Current exclusive continuation — native resource readback and source provenance
 
 PR37 merged to protected candidate91a44bdfde4fb030cb4ac299339437e0093b3b84 after strict native CI39427158076/job118642488041:218 tests PASS and15 expected assertion failures/0 errors on immutable recovery9cc7447. PR38/39 installed only the finite read-only diagnostic pin via strict CI; executionfed48741ba47ae054f004f10fc4494243489e468/main63c11e31323b7cb20f74dfe1dd3143c558a910bc. No authority bypass.
