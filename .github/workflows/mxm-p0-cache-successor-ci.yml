@@ -99,6 +99,19 @@ jobs:
           assert result.testsRun==5 and len(result.failures)==15 and not result.errors
           print('MXM_CHECKOUT_BEFORE: immutable9cc7447;5 methods;15 expected assertion failures;0 errors;artificial native fixtures only')
           PY
+      - name: Reproduce mutable-source admission on immutable recovery source
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,sys,unittest
+          root=pathlib.Path.cwd();baseline=root/'.chronology-baseline'
+          sys.path.insert(0,str(baseline))
+          name='research_core_v4.laboratory.test_source_freeze'
+          spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_source_freeze.py')
+          module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))
+          assert result.testsRun==3 and len(result.failures)==10 and not result.errors
+          print('MXM_SOURCE_FREEZE_BEFORE: immutable9cc7447;3 methods;10 expected assertion failures;0 errors')
+          PY
       - name: All laboratory modules and continuous account regressions
         run: |
           python3 - <<'PY'
@@ -110,6 +123,18 @@ jobs:
           PY
       - name: Verify real protected OWNER/R2/checkpoint20 evidence via GitHub GET only
         run: python3 -m research_core_v4.laboratory.live_preflight_v3
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Measure native read-token visibility of existing control ACLs
+        run: |
+          python3 - <<'PY'
+          import json
+          from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
+          route=GetOnly()
+          for ident in (25222248,25461184,25461373,25461529):
+              policy=route.json('rulesets/'+str(ident))
+              print('MXM_NATIVE_ACL_VISIBILITY '+json.dumps({'ruleset':ident,'enforcement':policy['enforcement'],'updated_at':policy['updated_at'],'bypass_field_present':'bypass_actors' in policy,'bypass_actors':policy.get('bypass_actors')}))
+          PY
         env:
           GH_TOKEN: ${{ github.token }}
 

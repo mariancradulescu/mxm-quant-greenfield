@@ -31,6 +31,21 @@ class WriterDelivery(unittest.TestCase):
         self.assertEqual(certifier['jobs']['certify-v3']['permissions']['contents'],'read')
         self.assertEqual(certifier['on']['workflow_run']['types'],['completed'])
 
+    def test_every_prepared_operational_job_passes_independent_code_provenance(self):
+        import yaml
+        from .attest_v3 import native_checkout_provenance
+        from .common import encoded
+        baseline=Path(__file__).resolve().parents[2]/'docs/laboratory-completion/20261020/R3_EXISTING_OPERATIONAL_DAG_BASELINE.yml'
+        workflow=custody.build_native_workflow(SOURCE,yaml.safe_load(baseline.read_bytes()))
+        jobs={name:i+100 for i,name in enumerate(workflow['jobs'])}
+        route=SimpleNamespace(json=lambda path:{'total_count':len(jobs),'jobs':[
+            {'id':ident,'name':name,'steps':[{'name':'Run '+workflow['jobs'][name]['steps'][0]['uses'],
+              'status':'completed','conclusion':'success','number':2}]} for name,ident in jobs.items()]},
+            data=lambda path:('2026-10-20T12:00:00Z '+SOURCE+'\n').encode())
+        with patch('research_core_v4.laboratory.runtime.file_at',return_value=encoded(workflow)):
+            proof=native_checkout_provenance(route,123,SOURCE,TRIGGER,jobs)
+        self.assertEqual(set(proof['jobs']),set(jobs))
+
     def environment(self):
         return {'GITHUB_REPOSITORY':'mariancradulescu/mxm-quant-greenfield','GITHUB_JOB':'segment-intent',
             'GITHUB_REF_NAME':'mxm-remediation-p0-p4-20261015-v1','GITHUB_RUN_ATTEMPT':'1',

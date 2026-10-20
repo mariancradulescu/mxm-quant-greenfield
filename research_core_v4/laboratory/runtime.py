@@ -41,6 +41,22 @@ def anchors(route):
     active=strict_json(file_at(route,'state.json',AUTHORITY));need(active['revoked'] is False and active['pending'] is None,'AUTHORITY_REVOKED_OR_PENDING')
     source_admission(subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),os.environ['LAB_SOURCE_SHA'],
       route.json('git/ref/heads/'+SOURCE_BRANCH)['object']['sha'],route.json('rulesets/25222248'))
+    # Append-only still permits a forward source update. All operational
+    # entry points, including custody readers, need the immutable freeze BEFORE
+    # any private-key use, worker start or App mint. Missing ACL fields are not
+    # positive evidence of an empty bypass list.
+    rules=route.json('rules/branches/'+SOURCE_BRANCH)
+    need(type(rules) is list and {'update','deletion','non_fast_forward'}<=
+         {r.get('type') for r in rules},'SOURCE_EFFECTIVE_FREEZE_REQUIRED')
+    restrictions=[r for r in rules if r.get('type')=='update']
+    for restriction in restrictions:
+        policy=route.json('rulesets/'+str(restriction['ruleset_id']))
+        need(policy.get('enforcement')=='active' and policy.get('bypass_actors')==[] and
+             policy.get('conditions',{}).get('ref_name')==
+             {'include':['refs/heads/'+SOURCE_BRANCH],'exclude':[]} and
+             {'creation','update','deletion','non_fast_forward'}<=
+             {r.get('type') for r in policy.get('rules',[])},
+             'SOURCE_EXACT_NO_BYPASS_FREEZE_REQUIRED')
 
 def read_state(route,oid):return strict_json(file_at(route,'program-state.json',oid))
 def validate_state(s,claimed_run=None):
