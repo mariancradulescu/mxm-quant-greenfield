@@ -1,7 +1,7 @@
 """One finite GitHub-native move of existing credentials into restricted environments.
 
 No broker traffic, new keys, plaintext artifacts or user-provided destinations.
-Only the existing App may encrypt copies. Originals are removed only after two
+Only the existing App may publish sealed copies. Originals are removed only after two
 independent environment jobs verified distinct destination names (no repository
 secret fallback), native job completion and unchanged original metadata.
 """
@@ -131,18 +131,46 @@ def owner_fingerprint(value):
     return OWNER_FP
 
 
+def sodium_library():
+    import ctypes
+    import ctypes.util
+    name = ctypes.util.find_library('sodium')
+    need(name is not None, 'ISOLATION_SYSTEM_LIBSODIUM_REQUIRED')
+    lib = ctypes.CDLL(name)
+    need(lib.sodium_init() >= 0, 'ISOLATION_SODIUM_INIT')
+    lib.crypto_box_seal.argtypes = [ctypes.c_void_p, ctypes.c_void_p,
+                                   ctypes.c_ulonglong, ctypes.c_void_p]
+    lib.crypto_box_seal.restype = ctypes.c_int
+    return lib
+
+
+def seal(value, public_key):
+    import ctypes
+    raw = value.encode()
+    public = base64.b64decode(public_key, validate=True)
+    need(len(public) == 32, 'ISOLATION_GITHUB_PUBLIC_KEY')
+    lib = sodium_library()
+    cipher = ctypes.create_string_buffer(len(raw) + 48)
+    message = ctypes.create_string_buffer(raw)
+    recipient = ctypes.create_string_buffer(public)
+    need(lib.crypto_box_seal(cipher, message, len(raw), recipient) == 0,
+         'ISOLATION_GITHUB_SEAL_FAILED')
+    return base64.b64encode(cipher.raw).decode()
+
+
 def set_copy(token, environment, destination, value):
     need((environment, destination) in [(env, dst) for env, mapping in GROUPS.values()
                                        for dst in mapping.values()], 'ISOLATION_FIXED_DESTINATION')
-    # gh seals using GitHub's public key. Values go only through stdin. The child
-    # receives no repository credentials, App private key, or other source values.
-    with tempfile.TemporaryDirectory() as directory:
-        result = subprocess.run(['gh', 'secret', 'set', destination, '--repo', REPO,
-                                 '--env', environment], input=value.encode(),
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            env={'PATH': '/usr/bin:/bin', 'HOME': directory, 'GH_CONFIG_DIR': directory,
-                 'GH_HOST': 'github.com', 'GH_TOKEN': token, 'GH_PROMPT_DISABLED': '1'}, timeout=45)
-        need(result.returncode == 0, 'ISOLATION_SEALED_COPY_FAILED')
+    path = PREFIX + 'environments/' + environment + '/secrets/'
+    status, public = http(path + 'public-key', token)
+    need(status == 200, 'ISOLATION_ENV_PUBLIC_KEY')
+    # GitHub's required libsodium sealed-box protocol, using the already installed
+    # system library. Preserve every UTF-8 byte, including final CR/LF. Plaintext
+    # never enters a subprocess, artifact, HTTP body or model-visible channel.
+    encrypted = seal(value, public['key'])
+    status, _ = http(path + destination, token, 'PUT',
+                     {'encrypted_value': encrypted, 'key_id': public['key_id']})
+    need(status in (201, 204), 'ISOLATION_SEALED_COPY_FAILED')
 
 
 def secret_metadata(token, suffix):
