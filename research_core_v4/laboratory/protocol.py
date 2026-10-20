@@ -8,8 +8,11 @@ ORIGINAL_CIPHER='eb031d18ee5b517ea1d4c3e6378cb276c4f3f46e2da810b86b8aabcc01a3ba8
 ORIGINAL_PUBLIC='1f8d3ed42a276ad6c28a29d9c19d406fe45971dcdf8a239c589b090feff70e83'
 STATE_PATH='typed-successor/program-state.json'
 
-def economic_gate(gate,source,protected):
-    need(gate.get('status')=='END_TO_END_OPERATIONAL_ACCEPTED' and gate.get('source_sha')==source and protected=={'main':True,'mxm-remediation-p0-p4-20261015-v1':True},'ECONOMIC_CONTROL_PLANE_GATE_CLOSED')
+def economic_gate(gate,source,protected,route=None):
+    # Never trust a free-standing, user-writable JSON status or two booleans.
+    need(route is not None,'NATIVE_CERTIFICATE_ROUTE_REQUIRED')
+    from .operational_acceptance import verify_operational_acceptance
+    return verify_operational_acceptance(route,gate,source,protected)
 
 def identity_budget(m):
     typed=m['schema']=='mxm.laboratory-program.v2';key='new_identities' if typed else 'new_V2_identities'
