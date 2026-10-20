@@ -12,7 +12,12 @@ def economic_gate(gate,source,protected,route=None):
     # Never trust a free-standing, user-writable JSON status or two booleans.
     need(route is not None,'NATIVE_CERTIFICATE_ROUTE_REQUIRED')
     from .operational_acceptance import verify_operational_acceptance
-    return verify_operational_acceptance(route,gate,source,protected)
+    verify_operational_acceptance(route,gate,source,protected)
+    # OWNER requires two distinct receptions before research. The operational
+    # certificate cannot substitute for chronological capacity/cost/C# proof.
+    # No native research-capability verifier is installed yet: keep this lane
+    # closed until that evidence path is implemented and independently checked.
+    need(False,'RESEARCH_CAPABILITY_NATIVE_RECEPTION_NOT_IMPLEMENTED')
 
 def identity_budget(m):
     typed=m['schema']=='mxm.laboratory-program.v2';key='new_identities' if typed else 'new_V2_identities'
