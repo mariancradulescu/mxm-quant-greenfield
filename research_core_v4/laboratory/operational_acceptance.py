@@ -40,9 +40,19 @@ def verify_operational_acceptance(route,gate,source,protected):
          'V3_CONTROL_PLANE_PROTECTION')
     oid=gate['evidence_oid'];run_id=gate['run_id']
     need(type(oid) is str and re.fullmatch('[a-f0-9]{40}',oid) and
-         route.json('git/ref/heads/'+BRANCH)['object']['sha']==oid and
          type(run_id) is int and run_id>0,
-         'V3_EVIDENCE_CURRENT_AND_RUN_ID')
+         'V3_EVIDENCE_OID_AND_RUN_ID')
+    # The certificate itself (and later prospectively admitted segments)
+    # append commits to the evidence branch. The sealed technical proof must
+    # be an immutable ancestor, not necessarily the current HEAD.
+    head=route.json('git/ref/heads/'+BRANCH)['object']['sha']
+    if head!=oid:
+        relation=route.json('compare/'+oid+'...'+head)
+        need(relation.get('status')=='ahead' and
+             relation.get('ahead_by',0)>0 and
+             relation.get('behind_by')==0 and
+             relation.get('base_commit',{}).get('sha')==oid,
+             'V3_CERTIFICATE_NOT_IN_PROTECTED_ANCESTRY')
     state=_artifact_state(route,oid)
     validate_public_state(state,run_id,source)
     need(type(gate['sequence']) is int and state['sequence']==gate['sequence']
