@@ -1,7 +1,7 @@
-name: MXM R3 pinned secret-isolation installation CI
+name: MXM R3 protected technical installation CI
 on:
   pull_request:
-    branches: [mxm-remediation-p0-p4-20261015-v1]
+    branches: [main, mxm-remediation-p0-p4-20261015-v1]
 permissions: {contents: read}
 jobs:
   shared-catalogue-regression:
@@ -13,7 +13,7 @@ jobs:
         with: {path: installation, persist-credentials: false}
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: e5add220235b14678a96972c2a7afb237d31a972
+          ref: c21df44ebbc32cbaf34ade46e46776d777d02621
           path: code
           persist-credentials: false
       - name: Verify exact installable workflow and pinned code
@@ -21,11 +21,14 @@ jobs:
         run: |
           python3 - <<'PY'
           import json,pathlib,subprocess
-          from research_core_v4.laboratory.secret_isolation import build_workflow
-          expected='e5add220235b14678a96972c2a7afb237d31a972'
+          from research_core_v4.laboratory.secret_isolation import build_workflow as isolation_workflow
+          from research_core_v4.laboratory.checkpoint20_readback import build_workflow as checkpoint_workflow
+          expected='c21df44ebbc32cbaf34ade46e46776d777d02621'
           assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==expected
           workflow=json.loads(pathlib.Path('../installation/.github/workflows/mxm-r3-secret-isolation.yml').read_bytes())
-          assert workflow==build_workflow(expected)
+          assert workflow==isolation_workflow('e5add220235b14678a96972c2a7afb237d31a972')
+          checkpoint=json.loads(pathlib.Path('../installation/.github/workflows/mxm-r3-checkpoint20-readback.yml').read_bytes())
+          assert checkpoint==checkpoint_workflow(expected)
           print('Exact workflow, source SHA, four jobs, fixed secret mappings and restricted branch verified; no secrets used.')
           PY
       - working-directory: code
