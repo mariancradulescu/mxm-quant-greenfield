@@ -70,8 +70,8 @@ class ReplayResult:
 
 def _volume(e):
     vals=(e.volume_cents,e.min_volume_cents,e.step_volume_cents,e.max_volume_cents)
-    if any(v is None for v in vals): raise ReplayContractError("volume lattice unresolved")
-    v,lo,step,hi=map(int,vals)
+    if any(type(v) is not int for v in vals): raise ReplayContractError("volume lattice requires exact integers")
+    v,lo,step,hi=vals
     if lo<=0 or step<=0 or hi<lo or v<lo or v>hi or (v-lo)%step: raise ReplayContractError("non-executable volume")
 
 def _used(pos,kind):
@@ -110,7 +110,7 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
             if e.position_id in signals and signals[e.position_id]!=p:raise ReplayContractError('position signal changed')
             signals[e.position_id]=dict(p)
     seq.sort(key=lambda e:(_t(e.timestamp_utc),order[e.kind],e.priority,e.symbol,e.position_id))
-    pos={}; inactive=set(); financing_keys=set(); executed_units={}; decisions=[]; external=D(0); financing=D(0); costs=D(0); turnover=D(0); accepted=rejected=0
+    pos={}; inactive=set(); financing_keys=set(); accrual_intervals={}; executed_units={}; decisions=[]; external=D(0); financing=D(0); costs=D(0); turnover=D(0); accepted=rejected=0
     weekly={}; monthly={}; entries_week={}; peak=cash; maxdd=D(0); minfree=cash; minratio=None
     prev_ts=None; prev_snap=_snap(seq[0].timestamp_utc if seq else "1970-01-01T00:00:00Z",cash,pos,margin_type,external)
     used_time=eq_time=seconds_total=D(0); status="COMPLETE"; halt=None
@@ -125,8 +125,8 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
         if s.free_margin_eur<0: return "HALT_FREE_MARGIN","FREE_MARGIN_NEGATIVE"
         if guard is not None and s.margin_level_ratio is not None and s.margin_level_ratio<=guard: return "HALT_UNRESOLVED_BROKER_STOP_OUT","PATH_ENTERED_STOP_OUT_DEPENDENCY_GUARD"
         return None,None
-    for ts,grp in groupby(seq,key=lambda e:e.timestamp_utc):
-        batch=list(grp); now=_t(ts)
+    for now,grp in groupby(seq,key=lambda e:_t(e.timestamp_utc)):
+        batch=list(grp); ts=now.isoformat().replace('+00:00','Z')
         if prev_ts is not None:
             sec=D(str((now-prev_ts).total_seconds()))
             if sec<0: raise ReplayContractError("chronology regression")
@@ -134,6 +134,27 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
         prev_ts=now
         non_entries=[]; marks=[]; entries=[]
         for e in batch: (entries if e.kind=="ENTRY" else marks if e.kind=="MARK" else non_entries).append(e)
+        # All observations at one physical instant form an atomic portfolio
+        # mark. Assess risk before exits can release margin at that instant.
+        observations=marks+[e for e in non_entries if e.kind=='EXIT']
+        observed={}
+        for e in observations:
+            if e.position_id in inactive: continue
+            p=pos.get(e.position_id)
+            if p is None or p.symbol!=e.symbol or p.candidate_id!=e.candidate_id:
+                raise ReplayContractError("mark identity mismatch")
+            price=_d(e.price);rate=_d(e.quote_to_eur_rate)
+            if price<=0 or rate<=0: raise ReplayContractError("invalid observed mark/exit")
+            if e.position_id in observed and observed[e.position_id]!=(price,rate):
+                raise ReplayContractError("conflicting same-instant position observations")
+            observed[e.position_id]=(price,rate);p.mark=price;p.rate=rate
+        for e in marks: record(e,e.position_id not in inactive,"MARK_APPLIED" if e.position_id not in inactive else "SKIP_MARK_REJECTED_ENTRY")
+        snap=_snap(ts,cash,pos,margin_type,external); st,why=guard_snapshot(snap)
+        if st:
+            for e in non_entries:
+                if e.kind=='EXIT' and e.position_id not in inactive:
+                    record(e,False,'EXIT_WITHHELD_BEFORE_MARGIN_RELEASE')
+            status,halt=st,why; break
         for e in non_entries:
             cost=_d(e.transaction_cost_eur)
             if cost<0: raise ReplayContractError("negative cost")
@@ -149,6 +170,7 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                     e=replace(e,transaction_cost_eur=prices[key]);cost=_d(e.transaction_cost_eur)
                     if cost<0: raise ReplayContractError("negative sized exit cost")
                 price=_d(e.price); rate=_d(e.quote_to_eur_rate)
+                if price<=0 or rate<=0: raise ReplayContractError("invalid exit price or conversion")
                 gross=(D(1) if p.direction=="LONG" else D(-1))*(price-p.entry)*p.units*rate
                 cash+=gross-cost; costs+=cost; turnover+=abs(price*p.units*rate); del pos[e.position_id]; record(e,True,"EXIT_APPLIED")
             elif e.kind=="FINANCING":
@@ -157,6 +179,16 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                     raise ReplayContractError("financing requires matching active executed position")
                 funding_key=(e.position_id,_t(e.timestamp_utc))
                 if funding_key in financing_keys: raise ReplayContractError("duplicate financing accrual")
+                if require_causal_provenance:
+                    start=e.metadata.get('accrual_start_ms');end=e.metadata.get('accrual_end_ms')
+                    signal=signals[e.position_id];clock=int(_t(e.timestamp_utc).timestamp()*1000)
+                    if (type(start) is not int or type(end) is not int or
+                        not signal['entry_ms']<=start<end<=clock<signal['exit_ms']):
+                        raise ReplayContractError("missing or non-causal financing accrual interval")
+                    previous=accrual_intervals.setdefault(e.position_id,[])
+                    if any(start<old_end and old_start<end for old_start,old_end in previous):
+                        raise ReplayContractError("overlapping financing accrual")
+                    previous.append((start,end))
                 financing_keys.add(funding_key)
                 amt=_d(e.financing_eur)
                 if entry_transform is not None and e.position_id:
@@ -171,13 +203,6 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                 if e.kind=="DEPOSIT": cash+=amt; external+=amt; reason="DEPOSIT_EXTERNAL_CASHFLOW"
                 else: cash-=amt; external-=amt; reason="WITHDRAWAL_EXTERNAL_CASHFLOW"
                 record(e,True,reason)
-        for e in marks:
-            if e.position_id in inactive: continue
-            p=pos.get(e.position_id)
-            if p is None: raise ReplayContractError("mark references unknown position")
-            p.mark=_d(e.price); p.rate=_d(e.quote_to_eur_rate)
-            if p.mark<=0 or p.rate<=0: raise ReplayContractError("invalid mark")
-        for e in marks: record(e,e.position_id not in inactive,"MARK_APPLIED" if e.position_id not in inactive else "SKIP_MARK_REJECTED_ENTRY")
         snap=_snap(ts,cash,pos,margin_type,external); st,why=guard_snapshot(snap)
         if st: status,halt=st,why; break
         for e in entries:

@@ -89,10 +89,12 @@ class AdmissionTests(unittest.TestCase):
         def publish(spec,evidence):
             if evidence['trades']:self.assertEqual(calls,['opened'])
             return {'status':'FIXTURE_ONLY'}
-        ns={'native':SimpleNamespace(graph=lambda x:{},point=lambda q:q,account=lambda *a:account),'screen':publish,'need':need,'number':number,'digest':digest}
+        ns={'native':SimpleNamespace(graph=lambda x:{},point=lambda q:q,account=lambda *a:account,
+              currencies=lambda *a:{'EUR'},route=lambda *a:[]),'screen':publish,'need':need,'number':number,'digest':digest}
         exec(compile(ast.Module(body=[function],type_ignores=[]),'production-science-adapter','exec'),ns)
-        intent={'symbol_id':1,'entry_ms':1000,'exit_ms':2000,'direction':1}
-        corpus={'all_identity_status':[{'sid':1}],'catalog':{'full':{'1':{'digits':2}}},'raw_quote_receipts':[] if missing_quotes else [{'symbol_id':1,'boundary_ms':1000},{'symbol_id':1,'boundary_ms':2000}]}
+        intent={'symbol_id':1,'feature_available_ms':0,'decision_ms':0,'entry_ms':1000,'exit_ms':2000,'direction':1}
+        quotes=[{'symbol_id':1,'boundary_ms':t,'sides':{s:{'timestamp_ms':t} for s in ('bid','ask')}} for t in (1000,2000)]
+        corpus={'all_identity_status':[{'sid':1,'quote':'EUR'}],'catalog':{'full':{'1':{'digits':2}}},'raw_quote_receipts':[] if missing_quotes else quotes}
         ns['native_quote_screen']({}, {'intents':[] if empty else [intent],'missing':[],'feature_asset_sha256':'f'*64},corpus,{'state':'UNRESOLVED'},on_economic_open=lambda:calls.append('opened'))
         return calls
     def test_empty_intents_do_not_open_outcome(self):self.assertEqual(self.screen_fixture({'gross_eur':0},empty=True),[])

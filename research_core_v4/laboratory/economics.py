@@ -89,6 +89,8 @@ def replay(spec,evidence):
     need(evidence['cost_state'] in ('VERIFIED','CONSERVATIVE_BOUND'),'UNKNOWN_DEEP_COST')
     need(evidence['full_mark_path'] is True and evidence['dated_broker_terms'] is True,'DEEP_SUPPORT')
     need(spec['sizing_rule_frozen'] is True and spec['allocator_frozen'] is True,'POST_OUTCOME_RESCUE')
+    need(number(spec.get('broker_stop_out_guard')) and spec['broker_stop_out_guard']>0,
+         'STOP_OUT_CONTRACT_REQUIRED')
     need(spec['price_cost_convention'] in ('MID_PLUS_ALL_FRICTIONS','BID_ASK_PLUS_NONSPREAD_COSTS'),'COST_CONVENTION')
     events=[]
     for row in evidence['events']:
@@ -98,6 +100,7 @@ def replay(spec,evidence):
         need(meta.get('available_at_ms',utc_ms(row['timestamp_utc'])+1)<=utc_ms(row['timestamp_utc']),'REPLAY_AVAILABILITY')
         if row['kind'] in ('ENTRY','EXIT'):
             c=meta.get('cost_components_eur',{});need(all(number(c.get(k)) for k in COSTS),'REPLAY_MISSING_COST')
+            need(all(c[k]>=0 for k in COSTS if k!='funding'),'NEGATIVE_COST')
             need(c['funding']==0,'FUNDING_REQUIRES_SEPARATE_CASHFLOW')
             charged=sum(c[k] for k in COSTS if k!='funding')
             need(abs(float(row['transaction_cost_eur'])-charged)<1e-9,'COST_AGGREGATION')

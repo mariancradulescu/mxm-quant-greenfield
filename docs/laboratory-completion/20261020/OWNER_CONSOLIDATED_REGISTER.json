@@ -59,7 +59,7 @@
       ],
       "basis": "REPRODUCED",
       "status": "CODE_VERIFIED_NATIVE_PENDING",
-      "implementation": "FINANCING requires matching active executed position; duplicate position/time financing rejected; position IDs cannot be reused after close. Positive/negative cash conservation tests.",
+      "implementation": "FINANCING requires matching active executed position; duplicate position/time financing rejected; position IDs cannot be reused after close. Positive/negative cash conservation tests. Additional chronological repair: strict eligible financing requires nonoverlapping causal accrual intervals, checked after matching the active executed position. Adjacent positive/negative intervals conserve cash; duplicate intervals with distinct charge timestamps are rejected.",
       "remaining_acceptance": "Native economic path, dated accrual source/interval uniqueness and all-volume financing parity."
     },
     {
@@ -69,7 +69,7 @@
       ],
       "basis": "REPRODUCED",
       "status": "PARTIAL_CODE_VERIFIED",
-      "implementation": "Adapter validates signal clocks, observed quote and FX availability. Eligible laboratory replay requires independent strict engine provenance and unchanged per-position signal.",
+      "implementation": "Adapter validates signal clocks, observed quote and FX availability. Eligible laboratory replay requires independent strict engine provenance and unchanged per-position signal. Screening adapter now rejects future signal/quote/FX availability before native gross calculation or outcome callback; includes commission-currency FX paths. Continuous account groups equivalent timezone spellings by physical UTC instant, validates matching mark identity, integer volumes and positive exit price/FX.",
       "remaining_acceptance": "Authentic receipt provenance and financing/FX source clocks at scale; generic historical replay API retains explicit legacy compatibility (strict flag defaults false)."
     },
     {
@@ -248,9 +248,9 @@
         "E-05"
       ],
       "basis": "STATIC_AND_EVIDENCE_MISSING",
-      "status": "OPEN",
-      "implementation": "Shared account reused; orphan financing and strict eligible causal boundary repaired.",
-      "remaining_acceptance": "Event-by-event marks, mandatory stop-out contract, real costs/slippage/fills, dated FX/financing/margin, multi-strategy portfolio and C# parity."
+      "status": "PARTIAL_CODE_VERIFIED_CHRONOLOGY_NATIVE_PENDING",
+      "implementation": "Shared account reused; orphan financing and strict eligible causal boundary repaired. Strict laboratory replay requires an explicit positive stop-out guard and nonnegative primitive costs. Atomic same-instant mark/exit observations are assessed before margin release; withheld exits are not executions. This conservative guard is not a validated broker liquidation model.",
+      "remaining_acceptance": "Event-by-event marks, mandatory stop-out contract, real costs/slippage/fills, dated FX/financing/margin, multi-strategy portfolio and C# parity. New12-method artificial chronological contract suite produces13 expected assertion failures on immutable9cc7447 before repair;205 focused local tests pass after. Native CI proof pending."
     },
     {
       "id": "ECO-04",
@@ -320,5 +320,15 @@
       "implementation": "Screening survivor and technical acceptance remain separate from economic qualification.",
       "remaining_acceptance": "Qualified real net edge, robust confirmation and protected authorization; no LIVE/competition/protected forward."
     }
-  ]
+  ],
+  "execution_recovery": {
+    "owner_transfer": "2026-10-20 exclusive Director transfer; previous Work session withdrawn by OWNER",
+    "reconciled_candidate": "9cc74472858ebcb3a80a3a7f12ad67f348304d13",
+    "reconciled_execution": "022c6abbcfc31cf864fe0d663324c4e81d88e5ee",
+    "reconciled_evidence": "09703adad6433f395a0506fa640f59bf3dba80b5",
+    "checkpoint_sequence": 20,
+    "source_publication": "isolated patch ref with expected-head CAS; protected candidate PR and strict native CI; re-read base/head before merge",
+    "authoritative_publication": "HELD; existing App-only evidence ACL retained; no worker/checkpoint mutation authorized by this source patch",
+    "unidentified_write_policy": "stop affected mutations; reconcile exact parents and native origins; no blind retry"
+  }
 }

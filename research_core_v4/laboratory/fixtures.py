@@ -29,7 +29,7 @@ def economic_fixture():
             signal_provenance={'feature_available_ms':T,'decision_ms':T,
                 'entry_ms':T+1000,'exit_ms':T+61000,'feature_set_sha256':digest('SYNTHETIC_PRICE_PATH')})
     spec={'starting_equity_eur':200,'deposit_count':1,'sizing_rule_frozen':True,'allocator_frozen':True,'price_cost_convention':'MID_PLUS_ALL_FRICTIONS',
-      'account_type':'HEDGED','margin_type':'SUM','same_symbol_overlap_allowed':True,'evaluation_start':'2025-01-06T00:00:00Z','evaluation_end':'2025-01-20T00:00:00Z'}
+      'account_type':'HEDGED','margin_type':'SUM','broker_stop_out_guard':.5,'same_symbol_overlap_allowed':True,'evaluation_start':'2025-01-06T00:00:00Z','evaluation_end':'2025-01-20T00:00:00Z'}
     evidence={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','full_mark_path':True,'dated_broker_terms':True,'events':events}
     return spec,evidence
 
@@ -65,7 +65,8 @@ def native_path_fixture():
       'raw_quote_receipts':[quote(T+1000,100,101),quote(T+31000,100.5,101.5),quote(T+61000,102,103)]}
     costs={'spread':0.,'commission':.1,'slippage':0.,'funding':0.,'fx_conversion':0.}
     terms={'volume_cents':100,'min_volume_cents':100,'step_volume_cents':100,'max_volume_cents':10000,'margin_eur':20.,
-      'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64}],
+      'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64,
+          'available_at_ms':T+31000,'accrual_start_ms':T+1000,'accrual_end_ms':T+31000}],
       'source_sha256':'a'*64,'effective_start_ms':T,'effective_end_ms':T+100000}
     authority={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','prospectively_frozen':True,'source_sha256':'b'*64,
       'current_snapshot_is_historical':False,'by_intent':{digest(intent):terms},'mark_interval_ms':30000}
