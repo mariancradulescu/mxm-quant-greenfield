@@ -30,7 +30,7 @@ class SourceControlDelivery(unittest.TestCase):
             return original_json(path)
         route.json=query
         policy={'id':3,'enforcement':'active','bypass_actors':[],
-            'conditions':{'ref_name':{'include':['refs/heads/mxm-o04-successor-code-integrated-p0-r3'],'exclude':[]}},
+            'conditions':{'ref_name':{'include':['refs/heads/mxm-r3-integrated-source-20261020'],'exclude':[]}},
             'rules':[{'type':k} for k in ('creation','update','deletion','non_fast_forward')],
             'updated_at':'2026-10-20T12:00:00Z'}
         route.proof={'schema':'mxm.native-source-control.v1','run_id':RUN,'attempt':1,

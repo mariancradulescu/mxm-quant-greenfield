@@ -1,0 +1,39 @@
+MXM_NAMESPACE_BEFORE: immutable9cc7447;2 methods;3 expected assertion failures;0 errors
+test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) ... 
+  test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/*'], exclude=[]) ... FAIL
+  test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/mxm-o04-*'], exclude=['refs/heads/mxm-o04-active-v1']) ... FAIL
+test_immutable_source_does_not_require_rewriting_merge_history (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_immutable_source_does_not_require_rewriting_merge_history) ... FAIL
+
+======================================================================
+FAIL: test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/*'], exclude=[])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/55ecd14fe9b3/mxm-quant-greenfield/research_core_v4/laboratory/test_source_namespace.py", line 24, in test_historical_authority_fence_scope_cannot_change
+    with self.subTest(include=include,exclude=exclude),self.assertRaises(LabError):self.check(route)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+======================================================================
+FAIL: test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/mxm-o04-*'], exclude=['refs/heads/mxm-o04-active-v1'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/55ecd14fe9b3/mxm-quant-greenfield/research_core_v4/laboratory/test_source_namespace.py", line 24, in test_historical_authority_fence_scope_cannot_change
+    with self.subTest(include=include,exclude=exclude),self.assertRaises(LabError):self.check(route)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+======================================================================
+FAIL: test_immutable_source_does_not_require_rewriting_merge_history (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_immutable_source_does_not_require_rewriting_merge_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/55ecd14fe9b3/mxm-quant-greenfield/research_core_v4/laboratory/test_source_namespace.py", line 13, in test_immutable_source_does_not_require_rewriting_merge_history
+    self.assertEqual(runtime.SOURCE_BRANCH,'mxm-r3-integrated-source-20261020')
+AssertionError: 'mxm-o04-successor-code-integrated-p0-r3' != 'mxm-r3-integrated-source-20261020'
+- mxm-o04-successor-code-integrated-p0-r3
++ mxm-r3-integrated-source-20261020
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.003s
+
+FAILED (failures=3)

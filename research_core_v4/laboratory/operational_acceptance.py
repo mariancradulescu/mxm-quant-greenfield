@@ -13,7 +13,7 @@ from .attest_v3 import (proof_paths,native_jobs,validate_public_state,
 from .evidence_v3 import COLD_SCHEMA,NEGATIVE_SCHEMA,ADAPTER_SCHEMA
 BRANCH='mxm-o04-integrated-laboratory-evidence'
 EXEC='mxm-remediation-p0-p4-20261015-v1'
-CODE='mxm-o04-successor-code-integrated-p0-r3'
+from .runtime import SOURCE_BRANCH as CODE
 WORKFLOW='.github/workflows/mxm-integrated-p0.yml'
 FIELDS={'schema','status','source_sha','evidence_branch','evidence_oid','sequence',
         'run_id','checkpoint_cipher_sha256','native_receipt_path','issuer_path',
