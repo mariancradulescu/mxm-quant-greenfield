@@ -4,6 +4,18 @@ from . import checkpoint20_readback as m
 from .common import LabError
 
 class NativeReadbackTest(unittest.TestCase):
+    def test_cold_corpus_compares_receipt_commitments_and_counts_not_timings(self):
+        p={'archive_sha256':'a'*64,'ciphertext_sha256':'b'*64,
+           'ordered_raw_reference_sha256':'c'*64,'source_catalogue_sha256':'d'*64,
+           'raw_receipt_consistency':{'decoded_tick_records':5},'load_verify_decrypt_seconds':1}
+        c=deepcopy(p);c['load_verify_decrypt_seconds']=2
+        m.compare_corpus_benchmarks(p,c)
+        for key in ('archive_sha256','ordered_raw_reference_sha256','source_catalogue_sha256',
+                    'raw_receipt_consistency'):
+            bad=deepcopy(c);bad[key]='forged'
+            with self.subTest(key=key),self.assertRaises(LabError):m.compare_corpus_benchmarks(p,bad)
+        with self.assertRaises(LabError):m.compare_corpus_benchmarks({}, {})
+
     def test_legacy_trust_collision_is_reported_without_values_or_repair(self):
         from .data import DataCatalogue
         from .common import digest
