@@ -1,221 +1,508 @@
-name: MXM integrated P0 technical recovery
-run-name: MXM P0 ${{ inputs.parent_oid || github.sha }}
-on:
-  push:
-    branches: [mxm-remediation-p0-p4-20261015-v1]
-    paths: [research_programs/admissions/EXECUTE_INTEGRATED_P0.json]
-  workflow_dispatch:
-    inputs:
-      parent_oid: {description: Exact durable successor parent, type: string, required: true}
-      admission_ref: {description: Immutable v2 admission, type: string, required: true}
-      admission_path: {description: Bound admission path, type: string, required: true}
-      fault_before_fence: {description: Legacy handoff field; ordinary execution always disables fault injection, type: string, required: true, default: '0'}
-permissions: {}
-concurrency:
-  group: mxm-integrated-laboratory
-  cancel-in-progress: false
-env:
-  LAB_SOURCE_SHA: eab050084982916ad0c67798b38b947bac66b2b2
-  LAB_INTEGRATED_PROTOCOL: v2
-  LAB_ADMISSION_REF: ${{ inputs.admission_ref }}
-  LAB_ADMISSION_PATH: ${{ inputs.admission_path }}
-jobs:
-  preflight:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    permissions: {contents: read, actions: read}
-    outputs:
-      mode: ${{ steps.prepare.outputs.mode }}
-      admission_ref: ${{ steps.prepare.outputs.admission_ref }}
-      admission_path: ${{ steps.prepare.outputs.admission_path }}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: New integration regression and affected typed accounting checks
-        if: github.event_name == 'push'
-        run: python3 -m unittest research_core_v4.laboratory.test_general_integration research_core_v4.laboratory.test_integrated_protocol research_core_v4.laboratory.test_admission -v
-      - name: P0-17 refuse unverified economic acceptance certificates
-        run: |
-          python3 - <<'PY'
-          from research_core_v4.laboratory.integrated import workload, definition
-          admission, _, _ = definition(workload('preflight'))
-          if admission['mode'] != 'TECHNICAL_NONOUTCOME':
-              raise SystemExit('P0-17_NATIVE_CERTIFICATE_VERIFICATION_NOT_INSTALLED')
-          print('P0-17 technical-only admission; economic mode blocked before claim')
-          PY
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - id: prepare
-        name: Full validation and exact forward migration before any durable claim
-        run: python3 -m research_core_v4.laboratory.integrated preflight
-        env:
-          GH_TOKEN: ${{ github.token }}
-          LAB_PARENT_OID: ${{ inputs.parent_oid }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          OPENBLAS_NUM_THREADS: '1'
-          OMP_NUM_THREADS: '1'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: integrated-p0-preflight-${{ github.run_id }}
-          path: |
-            verification/integrated-p0/preflight.json
-            verification/integrated-p0/prepared.mxmenc
-          if-no-files-found: error
-  segment-intent:
-    needs: preflight
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    permissions: {contents: write, actions: read}
-    outputs:
-      claim_oid: ${{ steps.claim.outputs.claim_oid }}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: integrated-p0-preflight-${{ github.run_id }}
-          path: verification/integrated-p0-input/
-      - id: claim
-        run: python3 -m research_core_v4.laboratory.claim
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NATIVE_PREFLIGHT_RESULT: ${{ needs.preflight.result }}
-          LAB_FAULT_BEFORE_FENCE: '0'
-  execution-fence:
-    needs: segment-intent
-    runs-on: ubuntu-24.04
-    timeout-minutes: 6
-    permissions: {contents: write, actions: read}
-    outputs:
-      fence_oid: ${{ steps.fence.outputs.fence_oid }}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - id: fence
-        run: python3 -m research_core_v4.laboratory.integrated fence
-        env:
-          GH_TOKEN: ${{ github.token }}
-          LAB_PARENT_OID: ${{ needs.segment-intent.outputs.claim_oid }}
-  investigation:
-    needs: [preflight, execution-fence]
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    permissions: {contents: read, actions: read}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: integrated-p0-preflight-${{ github.run_id }}
-          path: verification/integrated-p0-input/
-      - name: Execute one fully admitted node using the existing Laboratory and native data adapter
-        run: python3 -m research_core_v4.laboratory.runtime
-        env:
-          GH_TOKEN: ${{ github.token }}
-          LAB_NATIVE_COLLECTION_ALLOWED: ${{ needs.preflight.outputs.mode }}
-          CTRADER_CLIENT_ID: ${{ needs.preflight.outputs.mode == 'DEVELOPMENT_RESEARCH' && secrets.CTRADER_CLIENT_ID || '' }}
-          CTRADER_CLIENT_SECRET: ${{ needs.preflight.outputs.mode == 'DEVELOPMENT_RESEARCH' && secrets.CTRADER_CLIENT_SECRET || '' }}
-          CTRADER_ACCESS_TOKEN: ${{ needs.preflight.outputs.mode == 'DEVELOPMENT_RESEARCH' && secrets.CTRADER_ACCESS_TOKEN || '' }}
-          LAB_PARENT_OID: ${{ needs.execution-fence.outputs.fence_oid }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          OPENBLAS_NUM_THREADS: '1'
-          OMP_NUM_THREADS: '1'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: integrated-p0-worker-${{ github.run_id }}
-          path: |
-            verification/integrated-p0/receipt.json
-            verification/integrated-p0/result.mxmenc
-          if-no-files-found: error
-  durable-archive:
-    needs: [preflight, investigation]
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    permissions: {contents: write, actions: read}
-    outputs:
-      evidence_oid: ${{ steps.archive.outputs.evidence_oid }}
-      next: ${{ steps.archive.outputs.next }}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: integrated-p0-worker-${{ github.run_id }}
-          path: verification/integrated-p0-input/
-      - id: archive
-        name: Publish typed checkpoint; reconcile only genuine lost ACKs
-        run: python3 -m research_core_v4.laboratory.publish
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NATIVE_WORKER_RESULT: ${{ needs.investigation.result }}
-  recover-before-exposure:
-    needs: [preflight, segment-intent, execution-fence, investigation, durable-archive]
-    if: always() && needs.preflight.result == 'success'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 6
-    permissions: {contents: write, actions: read}
-    outputs:
-      evidence_oid: ${{ steps.recover.outputs.evidence_oid }}
-      next: ${{ steps.recover.outputs.next }}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - id: recover
-        run: python3 -m research_core_v4.laboratory.integrated recover
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NATIVE_CHAIN_RESULTS: ${{ toJSON(needs) }}
-  scientific-handoff:
-    needs: [preflight, segment-intent, execution-fence, investigation, durable-archive, recover-before-exposure]
-    if: always() && ((needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'CONTINUE') || (needs.recover-before-exposure.result == 'success' && needs.recover-before-exposure.outputs.next == 'CONTINUE'))
-    runs-on: ubuntu-24.04
-    timeout-minutes: 6
-    permissions: {contents: write, actions: write}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Issue one native continuation from durable state and dependency evidence
-        run: python3 -m research_core_v4.laboratory.handoff
-        env:
-          GH_TOKEN: ${{ github.token }}
-          LAB_PARENT_OID: ${{ needs.recover-before-exposure.outputs.evidence_oid || needs.durable-archive.outputs.evidence_oid }}
-          NATIVE_CHAIN_RESULTS: ${{ toJSON(needs) }}
-  cold-readback:
-    needs: [preflight, durable-archive]
-    if: needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'STOP'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    permissions: {contents: read, actions: read}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: eab050084982916ad0c67798b38b947bac66b2b2, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Independently decrypt remote terminal successor in a cold job
-        run: python3 -m research_core_v4.laboratory.integrated verify
-        env:
-          GH_TOKEN: ${{ github.token }}
-          LAB_PARENT_OID: ${{ needs.durable-archive.outputs.evidence_oid }}
-          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM }}
-          OPENBLAS_NUM_THREADS: '1'
-          OMP_NUM_THREADS: '1'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: integrated-p0-cold-readback-${{ github.run_id }}
-          path: verification/integrated-p0/cold-readback.json
-          if-no-files-found: error
+{
+  "name": "MXM integrated P0 technical recovery",
+  "run-name": "MXM P0 ${{ inputs.parent_oid || github.sha }}",
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "env": {
+    "LAB_SOURCE_SHA": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+    "LAB_INTEGRATED_PROTOCOL": "v2",
+    "LAB_ADMISSION_REF": "${{ inputs.admission_ref }}",
+    "LAB_ADMISSION_PATH": "${{ inputs.admission_path }}"
+  },
+  "jobs": {
+    "preflight": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "outputs": {
+        "mode": "${{ steps.prepare.outputs.mode }}",
+        "admission_ref": "${{ steps.prepare.outputs.admission_ref }}",
+        "admission_path": "${{ steps.prepare.outputs.admission_path }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "id": "prepare",
+          "name": "Full validation and exact forward migration before any durable claim",
+          "run": "python3 -m research_core_v4.laboratory.integrated preflight",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_PARENT_OID": "${{ inputs.parent_oid }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
+            "OPENBLAS_NUM_THREADS": "1",
+            "OMP_NUM_THREADS": "1"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "integrated-p0-preflight-${{ github.run_id }}",
+            "path": "verification/integrated-p0/preflight.json\nverification/integrated-p0/prepared.mxmenc\n",
+            "if-no-files-found": "error"
+          }
+        }
+      ],
+      "environment": "mxm-r3-custody-v1",
+      "needs": "source-controls"
+    },
+    "segment-intent": {
+      "needs": "preflight",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "outputs": {
+        "claim_oid": "${{ steps.claim.outputs.claim_oid }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "integrated-p0-preflight-${{ github.run_id }}",
+            "path": "verification/integrated-p0-input/"
+          }
+        },
+        {
+          "id": "claim",
+          "run": "python3 -m research_core_v4.laboratory.custody claim",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "NATIVE_PREFLIGHT_RESULT": "${{ needs.preflight.result }}",
+            "LAB_FAULT_BEFORE_FENCE": "${{ inputs.fault_before_fence || '0' }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ],
+      "environment": "mxm-p0-successor-issuer-v1"
+    },
+    "execution-fence": {
+      "needs": "segment-intent",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 6,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "outputs": {
+        "fence_oid": "${{ steps.fence.outputs.fence_oid }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "id": "fence",
+          "run": "python3 -m research_core_v4.laboratory.custody fence",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_PARENT_OID": "${{ needs.segment-intent.outputs.claim_oid }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ],
+      "environment": "mxm-p0-successor-issuer-v1"
+    },
+    "investigation": {
+      "needs": [
+        "preflight",
+        "execution-fence"
+      ],
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "integrated-p0-preflight-${{ github.run_id }}",
+            "path": "verification/integrated-p0-input/"
+          }
+        },
+        {
+          "name": "Execute one fully admitted node using the existing Laboratory and native data adapter",
+          "run": "python3 -m research_core_v4.laboratory.runtime",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_NATIVE_COLLECTION_ALLOWED": "${{ needs.preflight.outputs.mode }}",
+            "LAB_PARENT_OID": "${{ needs.execution-fence.outputs.fence_oid }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
+            "OPENBLAS_NUM_THREADS": "1",
+            "OMP_NUM_THREADS": "1"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "integrated-p0-worker-${{ github.run_id }}",
+            "path": "verification/integrated-p0/receipt.json\nverification/integrated-p0/result.mxmenc\n",
+            "if-no-files-found": "error"
+          }
+        }
+      ],
+      "environment": "mxm-r3-custody-v1"
+    },
+    "durable-archive": {
+      "needs": [
+        "preflight",
+        "investigation"
+      ],
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "outputs": {
+        "evidence_oid": "${{ steps.archive.outputs.evidence_oid }}",
+        "next": "${{ steps.archive.outputs.next }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "integrated-p0-worker-${{ github.run_id }}",
+            "path": "verification/integrated-p0-input/"
+          }
+        },
+        {
+          "id": "archive",
+          "name": "Publish typed checkpoint; reconcile only genuine lost ACKs",
+          "run": "python3 -m research_core_v4.laboratory.custody publish",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "NATIVE_WORKER_RESULT": "${{ needs.investigation.result }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ],
+      "environment": "mxm-p0-successor-issuer-v1"
+    },
+    "recover-before-exposure": {
+      "needs": [
+        "preflight",
+        "segment-intent",
+        "execution-fence",
+        "investigation",
+        "durable-archive"
+      ],
+      "if": "always() && needs.preflight.result == 'success'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 6,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "outputs": {
+        "evidence_oid": "${{ steps.recover.outputs.evidence_oid }}",
+        "next": "${{ steps.recover.outputs.next }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "id": "recover",
+          "run": "python3 -m research_core_v4.laboratory.custody recover",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "NATIVE_CHAIN_RESULTS": "${{ toJSON(needs) }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ],
+      "environment": "mxm-p0-successor-issuer-v1"
+    },
+    "scientific-handoff": {
+      "needs": [
+        "preflight",
+        "segment-intent",
+        "execution-fence",
+        "investigation",
+        "durable-archive",
+        "recover-before-exposure"
+      ],
+      "if": "always() && ((needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'CONTINUE') || (needs.recover-before-exposure.result == 'success' && needs.recover-before-exposure.outputs.next == 'CONTINUE')) && inputs.fault_before_fence != '1'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 6,
+      "permissions": {
+        "contents": "read",
+        "actions": "write"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "name": "Issue one native continuation from durable state and dependency evidence",
+          "run": "python3 -m research_core_v4.laboratory.custody handoff",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_PARENT_OID": "${{ needs.recover-before-exposure.outputs.evidence_oid || needs.durable-archive.outputs.evidence_oid }}",
+            "NATIVE_CHAIN_RESULTS": "${{ toJSON(needs) }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ],
+      "environment": "mxm-p0-successor-issuer-v1"
+    },
+    "cold-readback": {
+      "needs": [
+        "preflight",
+        "durable-archive"
+      ],
+      "if": "needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'STOP'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\n"
+        },
+        {
+          "name": "Independently decrypt remote terminal successor in a cold job",
+          "run": "python3 -m research_core_v4.laboratory.integrated verify",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
+            "OPENBLAS_NUM_THREADS": "1",
+            "OMP_NUM_THREADS": "1"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "integrated-p0-cold-readback-${{ github.run_id }}",
+            "path": "verification/integrated-p0/cold-readback.json\nverification/integrated-p0/authentic-adapter.json\n",
+            "if-no-files-found": "error"
+          }
+        }
+      ],
+      "environment": "mxm-r3-custody-v1"
+    },
+    "fault-probes": {
+      "needs": [
+        "preflight",
+        "durable-archive",
+        "cold-readback"
+      ],
+      "if": "needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'STOP' && needs.cold-readback.result == 'success'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "environment": "mxm-p0-successor-issuer-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "run": "python3 -m research_core_v4.laboratory.custody fault-probes",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}"
+          }
+        }
+      ]
+    },
+    "attest-v3": {
+      "needs": [
+        "preflight",
+        "durable-archive",
+        "cold-readback",
+        "fault-probes"
+      ],
+      "if": "needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'STOP' && needs.cold-readback.result == 'success' && needs.fault-probes.result == 'success'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "environment": "mxm-p0-successor-issuer-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "integrated-p0-cold-readback-${{ github.run_id }}",
+            "path": "verification/integrated-p0-input/"
+          }
+        },
+        {
+          "run": "python3 -m research_core_v4.laboratory.custody attest-v3",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}"
+          }
+        }
+      ]
+    },
+    "source-controls": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref_name == 'mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "environment": "mxm-p0-successor-issuer-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "run": "python3 -m research_core_v4.laboratory.custody source-controls",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ]
+    }
+  },
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        "research_programs/admissions/EXECUTE_INTEGRATED_P0.json"
+      ]
+    },
+    "workflow_dispatch": {
+      "inputs": {
+        "parent_oid": {
+          "description": "Exact durable successor parent",
+          "type": "string",
+          "required": true
+        },
+        "admission_ref": {
+          "description": "Immutable v2 admission",
+          "type": "string",
+          "required": true
+        },
+        "admission_path": {
+          "description": "Bound admission path",
+          "type": "string",
+          "required": true
+        },
+        "fault_before_fence": {
+          "description": "Controlled TECHNICAL_NONOUTCOME pre-fence fault; no automatic continuation",
+          "type": "string",
+          "required": true,
+          "default": "0"
+        }
+      }
+    }
+  }
+}

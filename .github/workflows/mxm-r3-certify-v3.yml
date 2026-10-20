@@ -1,0 +1,53 @@
+{
+  "name": "MXM R3 native independent certification",
+  "on": {
+    "workflow_run": {
+      "workflows": [
+        "MXM integrated P0 technical recovery"
+      ],
+      "types": [
+        "completed"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "env": {
+    "LAB_SOURCE_SHA": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+    "LAB_INTEGRATED_PROTOCOL": "v2"
+  },
+  "jobs": {
+    "certify-v3": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1 && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "environment": "mxm-p0-successor-issuer-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "run": "python3 -m research_core_v4.laboratory.custody certify-v3",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+          }
+        }
+      ]
+    }
+  }
+}
