@@ -8,11 +8,11 @@ from .common import digest
 from .data import DataCatalogue
 from .programs import Laboratory
 from .execution import preserve_node
-from .test_integrated_protocol import ProtocolTests
+from .test_integrated_protocol import LaboratoryIntegrationTests
 
 class SharedCatalogueSuccessor(unittest.TestCase):
     def setup(self):
-        book, ma, history = ProtocolTests().setup_programme()
+        book, ma, history = LaboratoryIntegrationTests().setup_programme()
         mb = deepcopy(ma)
         mb['id'] = 'INTEGRATION_FIXTURE_B'
         book.register_programme({'id':mb['id'], 'family':'TECH_FIXTURE', 'lane':'V2',
