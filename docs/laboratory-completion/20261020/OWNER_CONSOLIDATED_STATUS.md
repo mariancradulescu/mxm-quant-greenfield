@@ -1,3 +1,13 @@
+# Existing issuer access transition applied after OWNER confirmation
+
+The exact confirmed deployment-policy change is saved and independently reloaded in GitHub UI: environment24553648726 now permits only main and mxm-remediation-p0-p4-20261015-v1, zero tags; Cv3 access removed. Existing SUCCESSOR_APP_PRIVATE_KEY remains dated18October; no key value was read and no key/App permission was changed by this action. Administrator bypass remains off. Heads main1d95fa5/exec35476d4/candidate40e4d98/evidence09703ad were unchanged at reconciliation.
+
+Operational incident: removing the last old selected rule briefly made GitHub permit all branches/tags, before the first exact new rule was saved. This was corrected; the final persistent policy is exactly two refs. The observed Actions inventory shows no new run during that interval (latest observed39470345466 created17:56UTC). This is an observation, not a claim that every possible credential-access channel was audited. Future replacements must add a restrictive destination rule before removing the final source rule.
+
+No operational worker/claim/checkpoint change was dispatched. R3 immutable source freeze and actual App source-control proof remain required. Both reception flags stay false. Detail: OWNER_CONSOLIDATED_ISSUER_ACCESS_APPLIED.json. Prior snapshots below are historical.
+
+---
+
 # Current installed state — exclusive continuation, receivers still held
 
 PR42 is merged to candidate31c0ba07ee3714e7398c656ea851f53c79872479. Source76590792a456a09ffa4d1cb453c4cb634c6aaabc passed strict native CI39434518494/job118667896183:242 tests. Its first run39434130074 had one artificial fixture error from inherited native environment; that failure is retained, the fixture is now hermetic and native proof consumers are restricted to known operational jobs. No failed run was reclassified as success.
