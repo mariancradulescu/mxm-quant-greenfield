@@ -42,6 +42,11 @@
           "run": "python3 - <<'PY'\nimport json,pathlib,subprocess,yaml\nfrom research_core_v4.laboratory.secret_isolation import build_workflow as isolation_workflow\nfrom research_core_v4.laboratory.checkpoint20_readback import build_workflow as checkpoint_workflow\nfrom research_core_v4.laboratory.custody import build_native_workflow,build_certifier_workflow\nexpected='76590792a456a09ffa4d1cb453c4cb634c6aaabc'\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==expected\ninstalled=pathlib.Path('../installation/.github/workflows')\nassert json.loads((installed/'mxm-r3-secret-isolation.yml').read_bytes())==isolation_workflow('e5add220235b14678a96972c2a7afb237d31a972')\nassert json.loads((installed/'mxm-r3-checkpoint20-readback.yml').read_bytes())==checkpoint_workflow('dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128')\nbaseline=yaml.safe_load(pathlib.Path('docs/laboratory-completion/20261020/R3_EXISTING_OPERATIONAL_DAG_BASELINE.yml').read_bytes())\nassert json.loads((installed/'mxm-integrated-p0.yml').read_bytes())==build_native_workflow(expected,baseline)\nassert json.loads((installed/'mxm-r3-certify-v3.yml').read_bytes())==build_certifier_workflow(expected)\nprint('EXACT_R3_INSTALLATION: source,11-job existing DAG, same-run App ACL proof, separated credentials, read-only native token, controlled pre-fence fault/no automatic handoff, independent post-run certifier; no secrets or worker execution in CI.')\nPY"
         },
         {
+          "name": "Existing static fault/credential boundary, exact R3 contract",
+          "working-directory": "installation",
+          "run": "python3 verification/P0_FAULT_ISOLATION_GUARD.py"
+        },
+        {
           "name": "Full laboratory and continuous account regressions",
           "working-directory": "code",
           "run": "python3 - <<'PY'\nimport pathlib,unittest\nnames=sorted(str(p.with_suffix('')).replace('/','.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))+['tests.test_continuous_account_replay_v2']\nresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))\nraise SystemExit(not result.wasSuccessful())\nPY"
