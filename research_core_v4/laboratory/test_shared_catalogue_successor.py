@@ -55,6 +55,7 @@ class SharedCatalogueSuccessor(unittest.TestCase):
         self.assertEqual(set(before['assets']),{aid,bid})
         self.assertTrue(before['assets'][bid]['conflicts'])
         self.assertTrue(before['assets'][bid]['invalid'])
+        self.assertEqual(before['assets'][bid]['source_sha256'],'a'*64)
 
         # The restored A snapshot predates B; it must see B's valid shared refs.
         a2=Laboratory.restore(saved_a,history,shared_catalogue=private['shared_catalogue'])
