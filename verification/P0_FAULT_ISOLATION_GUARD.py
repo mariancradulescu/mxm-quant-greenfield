@@ -5,7 +5,7 @@ Runs without market data, cloud credentials, GitHub write privileges or secrets.
 """
 from pathlib import Path
 
-def verify(root: Path) -> None:
+def _legacy_verify(root: Path) -> None:
     workflow = (root / ".github/workflows/mxm-integrated-p0.yml").read_text()
     assert "LAB_INTEGRATED_PROTOCOL: v2" in workflow
     assert "LAB_SOURCE_SHA: eab050084982916ad0c67798b38b947bac66b2b2" in workflow
@@ -24,6 +24,33 @@ def verify(root: Path) -> None:
     assert workflow.index("P0-17 refuse unverified economic acceptance certificates") < workflow.index("- id: prepare")
 
 
+def verify(root: Path) -> None:
+    import hashlib,json
+    raw=(root/'.github/workflows/mxm-integrated-p0.yml').read_bytes()
+    try: workflow=json.loads(raw)
+    except json.JSONDecodeError:
+        return _legacy_verify(root)
+    # Exact regenerated R3 contract, not a permissive JSON/YAML text search.
+    assert hashlib.sha256(raw).hexdigest()=='6726f08add0a4d71e00c130cfeb710c57856787a38065a9c00f06aba1f415779'
+    assert workflow['env']['LAB_SOURCE_SHA']=='76590792a456a09ffa4d1cb453c4cb634c6aaabc'
+    assert workflow['env']['LAB_INTEGRATED_PROTOCOL']=='v2'
+    assert workflow['jobs']['preflight']['needs']=='source-controls'
+    assert len(workflow['jobs'])==11 and workflow['permissions']=={}
+    assert workflow['on']['workflow_dispatch']['inputs']['fault_before_fence']['default']=='0'
+    assert "inputs.fault_before_fence != '1'" in workflow['jobs']['scientific-handoff']['if']
+    for name,job in workflow['jobs'].items():
+        assert job['permissions']['contents']=='read'
+        assert job['steps'][0]['with']=={'ref':'76590792a456a09ffa4d1cb453c4cb634c6aaabc','persist-credentials':False}
+        envs=[step.get('env',{}) for step in job['steps']]
+        assert not any(any(key.startswith('CTRADER_') for key in env) for env in envs)
+        key_steps=[s for s in job['steps'] if 'SUCCESSOR_APP_PRIVATE_KEY' in s.get('env',{})]
+        if key_steps:
+            assert job['environment']=='mxm-p0-successor-issuer-v1' and len(key_steps)==1
+            assert key_steps[0]['run'].startswith('python3 -m research_core_v4.laboratory.custody ')
+            assert not any('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM' in env for env in envs)
+        else: assert job['environment']=='mxm-r3-custody-v1'
+    assert not any('LAB_FAULT_ACK' in step.get('env',{}) for job in workflow['jobs'].values() for step in job['steps'])
+
 if __name__ == "__main__":
     verify(Path(__file__).resolve().parents[1])
-    print("P0-16 ordinary workflow fault injection: DISABLED; no runtime operations performed")
+    print("P0-16 exact legacy/R3 contract: ordinary default fault=0; controlled technical fault has no automatic handoff; scoped credentials; no runtime operations")
