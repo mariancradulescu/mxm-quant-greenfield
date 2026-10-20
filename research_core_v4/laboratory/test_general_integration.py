@@ -27,7 +27,8 @@ class GeneralIntegrationTests(unittest.TestCase):
         self.assertEqual(b.export(),before)
     def test_gate_rejects_missing_reception_or_unprotected_control_plane(self):
         source='a'*40;protected={'main':True,'mxm-remediation-p0-p4-20261015-v1':True};good={'status':'END_TO_END_OPERATIONAL_ACCEPTED','source_sha':source}
-        economic_gate(good,source,protected)
+        # Bare favorable JSON must NEVER be a valid source of economic authority.
+        with self.assertRaises(Exception):economic_gate(good,source,protected)
         for g,p in (({'status':'BLOCKED','source_sha':source},protected),(good,{**protected,'main':False}),({**good,'source_sha':'b'*40},protected)):
             with self.assertRaises(Exception):economic_gate(g,source,p)
     def test_recovered_new_admission_preserves_closed_predecessor_and_identity(self):
