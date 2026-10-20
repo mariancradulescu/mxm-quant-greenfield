@@ -1,50 +1,60 @@
-name: MXM R3 protected technical installation CI
-on:
-  pull_request:
-    branches: [main, mxm-remediation-p0-p4-20261015-v1]
-permissions: {contents: read}
-jobs:
-  shared-catalogue-regression:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 12
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {path: installation, persist-credentials: false}
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with:
-          ref: dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128
-          path: code
-          persist-credentials: false
-      - name: Verify exact installable workflow and pinned code
-        working-directory: code
-        run: |
-          python3 - <<'PY'
-          import json,pathlib,subprocess
-          from research_core_v4.laboratory.secret_isolation import build_workflow as isolation_workflow
-          from research_core_v4.laboratory.checkpoint20_readback import build_workflow as checkpoint_workflow
-          expected='dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128'
-          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==expected
-          workflow=json.loads(pathlib.Path('../installation/.github/workflows/mxm-r3-secret-isolation.yml').read_bytes())
-          assert workflow==isolation_workflow('e5add220235b14678a96972c2a7afb237d31a972')
-          checkpoint=json.loads(pathlib.Path('../installation/.github/workflows/mxm-r3-checkpoint20-readback.yml').read_bytes())
-          assert checkpoint==checkpoint_workflow(expected)
-          print('Exact workflow, source SHA, four jobs, fixed secret mappings and restricted branch verified; no secrets used.')
-          PY
-      - working-directory: code
-        run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Full laboratory and continuous account regressions
-        working-directory: code
-        run: |
-          python3 - <<'PY'
-          import pathlib,unittest
-          names=sorted(str(p.with_suffix('')).replace('/','.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))+['tests.test_continuous_account_replay_v2']
-          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
-          raise SystemExit(not result.wasSuccessful())
-          PY
-      - name: Protected historical anchors unchanged
-        working-directory: code
-        run: python3 -m research_core_v4.laboratory.live_preflight_v3
-        env:
-          GH_TOKEN: ${{ github.token }}
+{
+  "name": "MXM R3 protected technical installation CI",
+  "on": {
+    "pull_request": {
+      "branches": [
+        "main",
+        "mxm-remediation-p0-p4-20261015-v1"
+      ]
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "jobs": {
+    "shared-catalogue-regression": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield'",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 12,
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "path": "installation",
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "76590792a456a09ffa4d1cb453c4cb634c6aaabc",
+            "path": "code",
+            "persist-credentials": false
+          }
+        },
+        {
+          "working-directory": "code",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "name": "Verify exact generated source/workflow/credential boundaries",
+          "working-directory": "code",
+          "run": "python3 - <<'PY'\nimport json,pathlib,subprocess,yaml\nfrom research_core_v4.laboratory.secret_isolation import build_workflow as isolation_workflow\nfrom research_core_v4.laboratory.checkpoint20_readback import build_workflow as checkpoint_workflow\nfrom research_core_v4.laboratory.custody import build_native_workflow,build_certifier_workflow\nexpected='76590792a456a09ffa4d1cb453c4cb634c6aaabc'\nassert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==expected\ninstalled=pathlib.Path('../installation/.github/workflows')\nassert json.loads((installed/'mxm-r3-secret-isolation.yml').read_bytes())==isolation_workflow('e5add220235b14678a96972c2a7afb237d31a972')\nassert json.loads((installed/'mxm-r3-checkpoint20-readback.yml').read_bytes())==checkpoint_workflow('dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128')\nbaseline=yaml.safe_load(pathlib.Path('docs/laboratory-completion/20261020/R3_EXISTING_OPERATIONAL_DAG_BASELINE.yml').read_bytes())\nassert json.loads((installed/'mxm-integrated-p0.yml').read_bytes())==build_native_workflow(expected,baseline)\nassert json.loads((installed/'mxm-r3-certify-v3.yml').read_bytes())==build_certifier_workflow(expected)\nprint('EXACT_R3_INSTALLATION: source,11-job existing DAG, same-run App ACL proof, separated credentials, read-only native token, controlled pre-fence fault/no automatic handoff, independent post-run certifier; no secrets or worker execution in CI.')\nPY"
+        },
+        {
+          "name": "Full laboratory and continuous account regressions",
+          "working-directory": "code",
+          "run": "python3 - <<'PY'\nimport pathlib,unittest\nnames=sorted(str(p.with_suffix('')).replace('/','.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))+['tests.test_continuous_account_replay_v2']\nresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))\nraise SystemExit(not result.wasSuccessful())\nPY"
+        },
+        {
+          "name": "Protected historical anchors unchanged",
+          "working-directory": "code",
+          "run": "python3 -m research_core_v4.laboratory.live_preflight_v3",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          }
+        }
+      ]
+    }
+  }
+}
