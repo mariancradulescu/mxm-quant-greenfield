@@ -3,6 +3,12 @@ import base64,json,os,subprocess,tempfile
 from pathlib import Path
 from .common import *
 
+class CASRefused(LabError):
+    """A native git push explicitly rejected its stale expected ref."""
+    def __init__(self,parent,candidate,observed):
+        super().__init__('LAB_NATIVE_CAS_STALE_REFUSED')
+        self.parent=parent;self.candidate=candidate;self.observed=observed
+
 def atomic_publish(route,parent,files,message):
     from .runtime import EVIDENCE_BRANCH,read_state
     need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WRITER_NO_KEYS')
@@ -20,8 +26,15 @@ def atomic_publish(route,parent,files,message):
         git(d,'config','user.name','github-actions[bot]');git(d,'config','user.email','41898282+github-actions[bot]@users.noreply.github.com');git(d,'add',*files)
         git(d,'commit','-m',message);commit=git(d,'rev-parse','HEAD')
         try:
-            git(d,'push','--force-with-lease=refs/heads/'+EVIDENCE_BRANCH+':'+parent,'origin','HEAD:refs/heads/'+EVIDENCE_BRANCH)
+            result=subprocess.run(['git','push','--force-with-lease=refs/heads/'+EVIDENCE_BRANCH+':'+parent,'origin','HEAD:refs/heads/'+EVIDENCE_BRANCH],cwd=d,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120)
+            if result.returncode:
+                observed=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']
+                # Network/auth/permission errors are NOT evidence of CAS exclusion.
+                if b'(stale info)' in result.stderr and observed not in (parent,commit):
+                    raise CASRefused(parent,commit,observed)
+                need(False,'ATOMIC_GIT_PUSH')
             if os.environ.get('LAB_FAULT_ACK')=='AFTER_PUSH':raise ValueError('INJECTED_ACK_LOSS')
+        except CASRefused:raise
         except Exception:
             # A lost ACK is resolved by exact committed bytes, never a second push.
             from .runtime import file_at

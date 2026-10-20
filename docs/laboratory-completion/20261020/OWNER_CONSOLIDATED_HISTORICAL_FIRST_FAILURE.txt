@@ -1,0 +1,35 @@
+................diff --git a/checkpoint.txt b/checkpoint.txt
+new file mode 100644
+index 0000000..92b189f
+[master 702f3b8] [skip ci] Runtime V2 checkpoint conflict-test runtime
+ 1 file changed, 1 insertion(+)
+ create mode 100644 checkpoint.txt
+From /tmp/tmpeqzyhlli/remote
+ * branch            research   -> FETCH_HEAD
+   5d7a2d7..76036b9  research   -> origin/research
+From /tmp/tmpeqzyhlli/remote
+ * branch            research   -> FETCH_HEAD
+.[master dfbec6e] [skip ci] Runtime V2 checkpoint semantic-conflict-test runtime
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+From /tmp/tmpjxlh6hev/remote
+ * branch            research   -> FETCH_HEAD
+   4cc5c8f..92431c7  research   -> origin/research
+.............................................................................................................................E
+======================================================================
+ERROR: test_current_state (test_compact_semantic_closure_v2.ClosureTests.test_current_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/tests/test_compact_semantic_closure_v2.py", line 60, in test_current_state
+    def test_current_state(self):self.assertEqual(validate_root('.')['status'],'PASS_COMPACT_BASELINE_BOUNDARY')
+                                                  ^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/master1576_current_state_guard_v7.py", line 11, in validate_root
+    c.require(c.sha((root/x['ref']).read_bytes())==x['sha256'],'BINDING_DRIFT:'+x['ref'])
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/strict_reselection_v2.py", line 22, in require
+    if not ok:raise ValueError(code)
+              ^^^^^^^^^^^^^^^^^^^^^^
+ValueError: BINDING_DRIFT:.github/workflows/compact-baseline-closure-v2-offline.yml
+
+----------------------------------------------------------------------
+Ran 143 tests in 5.863s
+
+FAILED (errors=1)

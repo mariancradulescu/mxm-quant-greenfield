@@ -39,8 +39,28 @@ def workload(job,keyless=False):
 
 def current(route):return route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']
 
+def verify_monotone_checkpoint(route,oid,state):
+    """An ordinary forward commit cannot roll public state behind its archive."""
+    tree_sha=route.json('git/commits/'+oid)['tree']['sha']
+    for name in ('typed-successor','segments'):
+        tree=route.json('git/trees/'+tree_sha)
+        need(tree.get('truncated') is not True,'CHECKPOINT_TREE_INCOMPLETE')
+        matches=[x for x in tree['tree'] if x['path']==name and x['type']=='tree']
+        need(len(matches)==1,'CHECKPOINT_ARCHIVE_MISSING');tree_sha=matches[0]['sha']
+    tree=route.json('git/trees/'+tree_sha)
+    need(tree.get('truncated') is not True,'CHECKPOINT_SEGMENTS_INCOMPLETE')
+    sequences=[int(x['path']) for x in tree['tree'] if x['type']=='tree' and re.fullmatch('[0-9]+',x['path'])]
+    need(sequences and max(sequences)==state['sequence'],'CHECKPOINT_ROLLBACK_OR_UNARCHIVED_STATE')
+    receipt=strict_json(file_at(route,'typed-successor/segments/'+str(state['sequence'])+'/receipt.json',oid))
+    need(receipt['sequence']==state['sequence'] and receipt['source_sha']==state['source_sha'] and
+         receipt['ciphertext_sha256']==state['ciphertext_sha256'] and
+         receipt['accounting_after']==state['accounting'], 'CHECKPOINT_RECEIPT_STATE_MISMATCH')
+
 def state_at(route,oid):
-    try:return strict_json(file_at(route,STATE_PATH,oid)),False
+    try:
+        state=strict_json(file_at(route,STATE_PATH,oid))
+        verify_monotone_checkpoint(route,oid,state)
+        return state,False
     except urllib.error.HTTPError as e:
         if e.code!=404:raise
         s=strict_json(file_at(route,'program-state.json',oid));need(s['sequence']==16 and s['source_sha']==ORIGINAL_SOURCE and s['ciphertext_sha256']==ORIGINAL_CIPHER,'INITIAL_PREDECESSOR');return s,True
@@ -188,6 +208,9 @@ def execute():
                     event['catalogue_after_asset_ids']=sorted(p['shared_catalogue']['assets'])
                     event['event_sha256']=digest(event)
                     p['programme_execution_history'].append(event)
+                    p['programme_execution_history_seal']={
+                        'count':len(p['programme_execution_history']),
+                        'head_sha256':event['event_sha256']}
             finally:
                 if lazy:
                     if lazy.instance is not None:
@@ -198,7 +221,7 @@ def execute():
         p['safe_stop']=all(p['programmes'].get(m['id'],{}).get('progress',{}).get('safe_stop',False) for m in a['programmes'])
         seal(p,key,tmp,OUT/'result.mxmenc')
         r={'schema':'mxm.integrated-segment-receipt.v2','run_id':int(os.environ['GITHUB_RUN_ID']),'trigger_sha':os.environ['GITHUB_SHA'],'source_sha':os.environ['LAB_SOURCE_SHA'],
-          'parent_oid':parent,'sequence':p['sequence'],'state_path':STATE_PATH,'preflight_sha256':digest(c),'admission_ref':c['admission_ref'],'admission_path':c['admission_path'],'admission_sha256':digest(a),
+          'parent_oid':parent,'previous_public_state_sha256':digest(s),'sequence':p['sequence'],'state_path':STATE_PATH,'preflight_sha256':digest(c),'admission_ref':c['admission_ref'],'admission_path':c['admission_path'],'admission_sha256':digest(a),
           'ciphertext_sha256':bytes_digest((OUT/'result.mxmenc').read_bytes()),'accounting_before':before,'accounting_after':after,'completed':done,'safe_stop':p['safe_stop'],'cold_restored':True,
           'original_public_sha256':ORIGINAL_PUBLIC,'transition':p['typed_transition'],'private_sha256':digest(p),'pending':None,'orders':0,'new_outcomes':after['economic_observations']-before['economic_observations'],'new_economic_identities_opened':sum(v['outcome_charged'] for v in after['lanes'].values())-sum(v['outcome_charged'] for v in before['lanes'].values()),'new_identity_reservations':sum(v['encumbered'] for v in after['lanes'].values())-sum(v['encumbered'] for v in before['lanes'].values()),'broker_requests':sum(v for k,v in wire.items() if k in ('ProtoOAGetTickDataReq','ProtoOAGetTrendbarsReq')),'native_wire_counts':wire,'economic_release':a['economic_release'],'modified_cipher_rejected':True,'admission_start_sequence':p['programme_origins'][digest(a)]}
     need(current(route)==parent,'WORKER_EVIDENCE_MOVED');(OUT/'receipt.json').write_bytes(encoded(r));print('INTEGRATED_SEGMENT '+json.dumps(r,sort_keys=True))
@@ -207,6 +230,7 @@ def publish():
     route=workload('durable-archive',True);need(os.environ.get('NATIVE_WORKER_RESULT')=='success','PUBLISH_NATIVE_WORKER_SUCCESS')
     r=strict_json((INPUT/'receipt.json').read_bytes());blob=(INPUT/'result.mxmenc').read_bytes();a,ref,path=definition(route);parent=current(route);s,_=state_at(route,parent)
     need(r['schema']=='mxm.integrated-segment-receipt.v2' and r['parent_oid']==parent and r['run_id']==int(os.environ['GITHUB_RUN_ID']) and r['trigger_sha']==os.environ['GITHUB_SHA'] and r['source_sha']==os.environ['LAB_SOURCE_SHA'],'PUBLISH_NATIVE_BINDING')
+    need(r['previous_public_state_sha256']==digest(s),'PUBLISH_PUBLIC_PREDECESSOR_CHANGED')
     need(s['pending']['phase']=='EXECUTION_FENCED' and s['pending']['run_id']==r['run_id'] and s['pending']['preflight_sha256']==r['preflight_sha256'],'PUBLISH_FENCE_BINDING')
     need(r['admission_sha256']==digest(a) and r['admission_ref']==ref and r['admission_path']==path and r['sequence']==s['sequence']+1 and len(r['completed'])<=a['steps_per_segment'],'PUBLISH_ADMISSION_BUDGET')
     need(r['orders']==0 and r['economic_release']==a['economic_release'] and r['pending'] is None and r['modified_cipher_rejected'] is True and r['new_outcomes']==r['accounting_after']['economic_observations']-r['accounting_before']['economic_observations'],'PUBLISH_SCOPE')
@@ -287,8 +311,20 @@ def dispatch_once(route,oid,s,ref,path):
         commit=route.json('commits/'+oid)
         need(any(f.get('filename')==record_path and f.get('status')=='added'
                  for f in commit.get('files',[])),'DISPATCH_ORIGIN_NOT_HEAD_HOLD')
-        inventory=route.json('actions/runs?per_page=100')['workflow_runs']
-        decision=inspect_dispatch(record,oid,inventory,int(time()))
+        from .handoff_recovery import dispatch_inventory
+        now=int(time());inventory=dispatch_inventory(route,record['issued_at_unix'],now)
+        safe_failures=[]
+        for run in inventory:
+            if run.get('status')!='completed' or run.get('conclusion') not in ('failure','cancelled','timed_out'):continue
+            data=route.json('actions/runs/'+str(run['id'])+'/attempts/1/jobs?per_page=100')
+            jobs=data['jobs'];names={j['name']:j for j in jobs}
+            if (run.get('run_attempt')==1 and len(names)==len(jobs)==data.get('total_count') and
+                names.get('preflight',{}).get('conclusion') in ('failure','cancelled','timed_out') and
+                all(names.get(n,{}).get('conclusion')=='skipped' for n in
+                    ('segment-intent','execution-fence','investigation','durable-archive'))):
+                safe_failures.append(run['id'])
+        need(current(route)==oid and state_at(route,oid)[0]==s,'DISPATCH_STATE_MOVED_HOLD')
+        decision=inspect_dispatch(record,oid,inventory,now,preclaim_failed_run_ids=safe_failures)
         if decision!='REISSUE_AFTER_ATOMIC_STALE_PARENT_INVALIDATION':
             print(json.dumps({'state':decision,'record_path':record_path}));return
         retry={'schema':'mxm.native-dispatch-recovery.v1',
@@ -422,13 +458,21 @@ def fault_probes():
          file_at(route,'typed-successor/program-state.json',parent),
          'PROBES_ACK_EXACT_READBACK')
     from concurrent.futures import ThreadPoolExecutor
+    from .custody import CASRefused
     def writer(name):
-        try:return {'writer':name,'accepted':True,'oid':atomic_publish(
+        try:
+            result={'writer':name,'accepted':True,'expected_oid':ack_oid,'oid':atomic_publish(
             route,ack_oid,{'typed-successor/fault-probes/'+
                            os.environ['GITHUB_RUN_ID']+'/'+name+'.json':
                            encoded({'probe':name,'not_economic':True})},
             'Concurrent native evidence-plane writer proof '+name)}
-        except Exception:return {'writer':name,'accepted':False}
+        except CASRefused as refusal:
+            result={'writer':name,'accepted':False,'expected_oid':refusal.parent,
+                    'candidate_oid':refusal.candidate,'observed_oid':refusal.observed,
+                    'reason':'NATIVE_GIT_STALE_INFO'}
+        # Separate native job log, subsequently read by the keyless verifier.
+        print('MXM_CAS_RESULT '+json.dumps(result,sort_keys=True),flush=True)
+        return result
     with ThreadPoolExecutor(max_workers=2) as pool:
         results=list(pool.map(writer,['A','B']))
     need(sum(x['accepted'] for x in results)==1,
@@ -447,6 +491,7 @@ def fault_probes():
         'ack_commit_oid':ack_oid,'ack_path':ack_path,
         'ack_sha256':bytes_digest(ack_bytes),
         'concurrent_writers':results,
+        'cas_base_oid':ack_oid,'cas_final_oid':checkpoint_oid,
         'pre_fence_native_run_id':negative_run,
         'pre_fence_recovery_path':old_path,
         'unauthorized_get_http_code':401,

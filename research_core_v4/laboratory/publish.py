@@ -8,6 +8,7 @@ MAGIC=b'MXM_SHALLOW_M5_V2_ENC1\x00'
 ALLOWED={'schema','authority','source_sha','parent_oid','sequence','run_id','trigger_sha','admission_ref','admission_path','admission_sha256','ciphertext_sha256','safe_stop','pending','completed_steps','cold_restored','modified_cipher_rejected','mode','orders','new_economic_outcomes','app_key_used','active_authority_write','cbot_qualified','native_acquisition_state','authentic_cache_validated','durable_intent_consumed','authentic_data_controller_validated','reception_assertions_checked','research_progress','V2_budget_used','V2_budget_remaining','numerical_economics_encrypted'}
 
 def main():
+    need(os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2','EXPLICIT_INTEGRATED_PROTOCOL_REQUIRED')
     if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
         from .integrated import publish
         return publish()

@@ -11,13 +11,26 @@ from research_core_v4.successor_c_20261018 import readback as old
 from research_core_v4.remediation_p0_p4_20261015 import owner
 from research_core_v4.remediation_p0_p4_20261015.safety import strict_json,unpack
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
-from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
 SOURCE_BRANCH='mxm-o04-successor-code-integrated-p0-r3'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
+
+def source_admission(head,expected,branch_head,rule):
+    from fnmatch import fnmatchcase
+    need(re.fullmatch('[a-f0-9]{40}',expected or '') and head==expected==branch_head,
+         'IMMUTABLE_SOURCE_PIN')
+    refs=rule.get('conditions',{}).get('ref_name',{});ref='refs/heads/'+SOURCE_BRANCH
+    need(rule.get('id')==25222248 and rule.get('enforcement')=='active' and
+         any(fnmatchcase(ref,p) for p in refs.get('include',[])) and
+         not any(fnmatchcase(ref,p) for p in refs.get('exclude',[])) and
+         {'deletion','non_fast_forward','required_linear_history'}<=
+         {r['type'] for r in rule.get('rules',[])} and
+         rule.get('bypass_actors',[])==[], 'EXISTING_APPEND_ONLY_FENCE')
+    # This verifies only the historical append-only fence. Separate effective
+    # source/writer/credential authority checks remain mandatory for acceptance.
 
 def module_digest():
     return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py','operational_acceptance.py','handoff_recovery.py','evidence_v3.py','attest_v3.py','certify_v3.py')})
@@ -84,6 +97,7 @@ def authentic_integration(key,tmp):
     return {'catalogue':cat.export(),'authentic_quote_rows_validated':count,'source_ciphertext_sha256':preserved_registry()['cached_input']['ciphertext_sha256'],'native_probe':probe,'economic_outcomes_opened':0}
 
 def main():
+    need(os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2','EXPLICIT_INTEGRATED_PROTOCOL_REQUIRED')
     if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
         from .integrated import execute
         return execute()

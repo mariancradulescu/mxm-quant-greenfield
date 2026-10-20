@@ -27,6 +27,7 @@ def eligible_certificate(route,run_id,source):
     oid=route.json('git/ref/heads/'+BRANCH)['object']['sha']
     state=_artifact_state(route,oid)
     need(state['last_run_id']==run_id and state['source_sha']==source
+         and run.get('head_sha')==state.get('last_trigger_sha')
          and state['sequence']>=21 and state['safe_stop'] is True
          and state['pending'] is None,
          'V3_CERTIFIER_MISSING_LAST_NATIVE_CHECKPOINT')

@@ -112,7 +112,8 @@ def replay(spec,evidence):
         transform=policy(spec['sizing_policy'])
     result=replay_continuous_account(events,starting_equity_eur=200,account_type=spec['account_type'],
       total_margin_calculation_type=spec['margin_type'],same_symbol_overlap_allowed=spec['same_symbol_overlap_allowed'],
-      entry_margin_level_floor_ratio=spec.get('broker_entry_margin_floor'),unresolved_stop_out_guard_ratio=spec.get('broker_stop_out_guard'),entry_transform=transform)
+      entry_margin_level_floor_ratio=spec.get('broker_entry_margin_floor'),unresolved_stop_out_guard_ratio=spec.get('broker_stop_out_guard'),entry_transform=transform,
+      require_causal_provenance=True)
     # Include idle weeks/months rather than drop them from the certificate.
     start=utc_ms(spec['evaluation_start']);end=utc_ms(spec['evaluation_end']);need(start<end,'EVALUATION_INTERVAL')
     need(all(start<=utc_ms(e.timestamp_utc)<end for e in events),'EVENT_OUTSIDE_EVALUATION')

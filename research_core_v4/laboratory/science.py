@@ -47,7 +47,9 @@ def causal_intents(spec,cache,assets):
                 latest=max(latest,available[idx]['available_at'])
                 grid=300000 if cache.assets[assets[f['asset']]]['resolution']=='M5' else 3600000
                 # Exact clock lags: no compressed adjacency across missing bars.
-                if available[idx]['t']!=available[-1]['t']-f['lag']*grid:context[f['name']]=None
+                max_staleness=rules.get('staleness_max_ms',grid)
+                need(type(max_staleness) is int and 0<=max_staleness<=grid,'FEATURE_STALENESS_POLICY')
+                if available[idx]['t']!=available[-1]['t']-f['lag']*grid or decision-available[-1]['available_at']>max_staleness:context[f['name']]=None
         value=expression(rules['direction_expression'],context)
         if value is None:missing.append({'decision_ms':decision,'reason':'FEATURE_SUPPORT_MISSING'});continue
         direction=1 if value>0 else -1 if value<0 else 0
@@ -117,7 +119,20 @@ def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=Non
     for key in conflicts:quotes.pop(key,None)
     graph=native.graph(corpus['all_identity_status']);identities={int(r['sid']):r for r in corpus['all_identity_status']};events=[];missing=[]
     iso=lambda t:datetime.fromtimestamp(t/1000,timezone.utc).isoformat().replace('+00:00','Z')
+    def quote_available(q,t):
+        need(isinstance(q,dict) and native.point(q) is not None,'NATIVE_REPLAY_QUOTE_SUPPORT')
+        clocks=[]
+        for side in ('bid','ask'):
+            r=q['sides'][side];stamp=r['timestamp_ms'];available=r.get('available_at_ms',stamp)
+            need(type(stamp) is int and type(available) is int and stamp<=available<=t,
+                 'NATIVE_REPLAY_QUOTE_AVAILABILITY')
+            clocks.append(available)
+        return max(clocks)
     for intent in generated['intents']:
+        need(all(type(intent.get(k)) is int for k in
+             ('feature_available_ms','decision_ms','entry_ms','exit_ms')) and
+             intent['feature_available_ms']<=intent['decision_ms']<intent['entry_ms']<intent['exit_ms'],
+             'NATIVE_REPLAY_SIGNAL_CAUSALITY')
         token=digest(intent);terms=authority['by_intent'].get(token);sid=int(intent['symbol_id']);identity=identities.get(sid)
         if terms is None or identity is None:missing.append('DATED_BROKER_TERMS');continue
         required=('volume_cents','min_volume_cents','step_volume_cents','max_volume_cents','margin_eur','entry_cost_components_eur','exit_cost_components_eur','financing_cashflows','source_sha256','effective_start_ms','effective_end_ms')
@@ -131,9 +146,15 @@ def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=Non
         if any(p is None for p in points.values()):missing.append('ORIGINAL_ENTRY_EXIT_OR_MARK_QUOTE');continue
         direction=intent['direction'];need(direction in (-1,1),'NATIVE_REPLAY_DIRECTION');units=terms['volume_cents']/100
         entry=points[intent['entry_ms']]['ask' if direction>0 else 'bid'];position=candidate['id']+':'+token
+        provenance={k:intent[k] for k in ('feature_available_ms','decision_ms','entry_ms','exit_ms')}
+        provenance['feature_set_sha256']=generated['feature_asset_sha256']
         for t in clocks:
             kind='ENTRY' if t==intent['entry_ms'] else 'EXIT' if t==intent['exit_ms'] else 'MARK'
             price=entry if kind=='ENTRY' else points[t]['bid' if direction>0 else 'ask']
+            quote_clock=quote_available(quotes[(sid,t//1000)],t)
+            fx_path=native.route(identity['quote'],'EUR',graph)
+            if fx_path is None:missing.append('CAUSAL_SIGNED_FX');break
+            fx_clock=max([quote_available(quotes.get((fx_sid,t//1000)),t) for fx_sid,_ in fx_path],default=t)
             if on_economic_open is not None:on_economic_open()
             pnl=direction*units*(price-entry);amount=pnl if pnl else -1.
             eur=native.convert(amount,identity['quote'],'EUR',t//1000,quotes,graph)
@@ -146,14 +167,17 @@ def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=Non
                 need(components['spread']==components['funding']==0,'NATIVE_REPLAY_SPREAD_OR_FUNDING_DOUBLE_COUNT')
             row={'timestamp_utc':iso(t),'kind':kind,'candidate_id':candidate['id'],'symbol':identity.get('symbol',str(sid)),'position_id':position,'causal_state':True,
               'price':price,'quote_to_eur_rate':rate,'transaction_cost_eur':sum(components.values()) if components else 0,
-              'metadata':{'source_sha256':digest(quotes[(sid,t//1000)]),'available_at_ms':t,'cost_components_eur':components or {}}}
+              'metadata':{'source_sha256':digest(quotes[(sid,t//1000)]),'available_at_ms':t,
+                          'quote_available_at_ms':quote_clock,'fx_available_at_ms':fx_clock,
+                          'signal_provenance':provenance,'cost_components_eur':components or {}}}
             if kind=='ENTRY':row.update(direction='LONG' if direction>0 else 'SHORT',direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE',base_units=units,
               **{k:terms[k] for k in ('volume_cents','min_volume_cents','step_volume_cents','max_volume_cents','margin_eur')})
             events.append(row)
         for cashflow in terms['financing_cashflows']:
-            need(intent['entry_ms']<=cashflow['timestamp_ms']<=intent['exit_ms'] and number(cashflow['amount_eur']) and len(cashflow['source_sha256'])==64,'DATED_FINANCING')
+            need(intent['entry_ms']<cashflow['timestamp_ms']<intent['exit_ms'] and number(cashflow['amount_eur']) and len(cashflow['source_sha256'])==64,'DATED_FINANCING')
             events.append({'timestamp_utc':iso(cashflow['timestamp_ms']),'kind':'FINANCING','candidate_id':candidate['id'],'symbol':identity.get('symbol',str(sid)),'position_id':position,'causal_state':True,
-              'financing_eur':cashflow['amount_eur'],'metadata':{'source_sha256':cashflow['source_sha256'],'available_at_ms':cashflow['timestamp_ms']}})
+              'financing_eur':cashflow['amount_eur'],'metadata':{'source_sha256':cashflow['source_sha256'],'available_at_ms':cashflow['timestamp_ms'],
+                  'quote_available_at_ms':cashflow['timestamp_ms'],'fx_available_at_ms':cashflow['timestamp_ms'],'signal_provenance':provenance}})
     if missing or not events:return {'classification':'DATA_INSUFFICIENT','result':None,'missing_dependencies':dict(__import__('collections').Counter(missing)),'missing_is_loss':False}
     evidence={'screen_status':'DISCOVERY_SURVIVOR','cost_state':authority['cost_state'],'full_mark_path':True,'dated_broker_terms':True,'events':events}
     need(spec['price_cost_convention']=='BID_ASK_PLUS_NONSPREAD_COSTS','NATIVE_REPLAY_PRICE_CONVENTION')

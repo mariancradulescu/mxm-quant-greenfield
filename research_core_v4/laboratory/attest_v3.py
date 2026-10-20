@@ -19,11 +19,13 @@ def proof_paths(run_id):
             'negative':root+'NEGATIVE_'+str(run_id)+'.json',
             'issuer':root+'ISSUER_'+str(run_id)+'.json'}
 
-def native_jobs(route,run_id,names,require_completed_run=False):
+def native_jobs(route,run_id,names,require_completed_run=False,expected_head_sha=None):
     run=route.json('actions/runs/'+str(run_id))
     need(run['id']==run_id and run['path']=='.github/workflows/mxm-integrated-p0.yml'
          and run['head_branch']=='mxm-remediation-p0-p4-20261015-v1'
          and run['run_attempt']==1,'V3_NATIVE_RUN_IDENTITY')
+    need(type(expected_head_sha) is str and re.fullmatch('[a-f0-9]{40}',expected_head_sha)
+         and run.get('head_sha')==expected_head_sha,'V3_NATIVE_WORKFLOW_HEAD_MISMATCH')
     if require_completed_run:
         need(run['status']=='completed' and run['conclusion']=='success',
              'V3_NATIVE_RUN_NOT_TERMINAL_SUCCESS')
@@ -111,6 +113,32 @@ def validate_negative_artifact(route,proof,run_id,source,state):
          sum(x['accepted'] is True for x in writers)==1 and
          set(x['writer'] for x in writers)=={'A','B'},
          'V3_NATIVE_WRITER_COLLISION')
+    winner=next(x for x in writers if x['accepted'] is True)
+    loser=next(x for x in writers if x['accepted'] is not True)
+    base=proof.get('cas_base_oid');final=proof.get('cas_final_oid')
+    need(all(type(x) is str and re.fullmatch('[a-f0-9]{40}',x)
+             for x in (base,final,winner.get('oid'),loser.get('candidate_oid'))) and
+         base==proof['ack_commit_oid'] and final==winner['oid'] and
+         loser.get('observed_oid')==final and loser.get('candidate_oid')!=final and
+         loser.get('reason')=='NATIVE_GIT_STALE_INFO' and
+         all(x.get('expected_oid')==base for x in writers),
+         'V3_NATIVE_CAS_IDENTITIES')
+    commit=route.json('git/commits/'+final)
+    need(commit.get('sha')==final and
+         [p['sha'] for p in commit.get('parents',[])]==[base],
+         'V3_NATIVE_WINNER_COMMIT')
+    name=winner['writer'];path='typed-successor/fault-probes/'+str(run_id)+'/'+name+'.json'
+    need(strict_json(file_at(route,path,final))=={'probe':name,'not_economic':True},
+         'V3_NATIVE_WINNER_PAYLOAD')
+    from .protocol import STATE_PATH
+    need(file_at(route,STATE_PATH,base)==file_at(route,STATE_PATH,final),
+         'V3_NATIVE_CAS_STATE_CHANGED')
+    job=native_jobs(route,run_id,('fault-probes',),expected_head_sha=state.get('last_trigger_sha'))['fault-probes']
+    log=route.data('actions/jobs/'+str(job)+'/logs').decode('utf-8')
+    records=[strict_json(m.encode()) for m in re.findall(r'MXM_CAS_RESULT (\{[^\r\n]*\})',log)]
+    need(len(records)==2 and sorted(records,key=lambda x:x['writer'])==
+         sorted(writers,key=lambda x:x['writer']),
+         'V3_NATIVE_CAS_LOG_MISMATCH')
     ack_oid=proof['ack_commit_oid']
     checkpoint_parent=proof['checkpoint_parent_oid']
     need(type(ack_oid) is str and re.fullmatch('[a-f0-9]{40}',ack_oid)
@@ -160,7 +188,7 @@ def build_issuer(route,run_id,source,checkpoint_oid,cold,adapter,negative,state)
     validate_negative_artifact(route,negative,run_id,source,state)
     jobs=native_jobs(route,run_id,('preflight','segment-intent',
                 'execution-fence','investigation','durable-archive',
-                'cold-readback','fault-probes'))
+                'cold-readback','fault-probes'),expected_head_sha=state.get('last_trigger_sha'))
     return {'schema':'mxm.e2e.native-proof-issuer.v3',
             'source_sha':source,'run_id':run_id,
             'checkpoint_oid':checkpoint_oid,'sequence':state['sequence'],

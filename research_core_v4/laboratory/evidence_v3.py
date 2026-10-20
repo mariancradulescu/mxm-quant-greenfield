@@ -52,15 +52,23 @@ def cold_attestation(private, public, admission, evidence_oid, run_id, source_sh
             'safe_stop':saved['progress']['safe_stop']})
     admitted={m['id'] for m in admission['programmes']}
     need(all(x in private['programmes'] for x in admitted) and
-         all(private['programmes'][x]['progress']['safe_stop'] for x in admitted),
+         all(private['programmes'][x]['progress']['safe_stop'] and
+             private['programmes'][x]['progress']['stop_reason']=='AUTHORIZED_PROGRAMME_COMPLETE' and
+             set(private['programmes'][x]['progress']['results']).isdisjoint(private['programmes'][x]['progress']['skipped']) and
+             set(private['programmes'][x]['progress']['results'])|set(private['programmes'][x]['progress']['skipped'])==set(private['programmes'][x]['programme']['tasks'])
+             for x in admitted),
          'COLD_V3_ADMITTED_PROGRAMMES_OPEN')
     # The actual timeline, not a two-program count, proves A-B-A.
     # Legacy records cannot fabricate a v3 execution order retrospectively.
     events=private.get('programme_execution_history',[])
     need(type(events) is list,'COLD_V3_EVENT_JOURNAL')
+    need(private.get('programme_execution_history_seal')=={
+         'count':len(events),'head_sha256':events[-1]['event_sha256'] if events else None},
+         'COLD_V3_EVENT_ENDPOINT_CHANGED')
     previous=None
     previous_ids=set()
     names=[]
+    observed=set()
     for i,event in enumerate(events):
         need(type(event) is dict and
              event.get('previous_event_sha256')==previous and
@@ -72,6 +80,9 @@ def cold_attestation(private, public, admission, evidence_oid, run_id, source_sh
              event['within_segment_step']>0,
              'COLD_V3_NATIVE_JOURNAL_CHAIN')
         saved=private['programmes'][event['programme']]
+        identity=(event['programme'],event['task'])
+        need(identity not in observed,'COLD_V3_DUPLICATE_TASK_EVENT')
+        observed.add(identity)
         need(event['task'] in saved['progress']['results'] and
              digest(saved['progress']['results'][event['task']])==
              event['result_sha256'] and
@@ -94,6 +105,17 @@ def cold_attestation(private, public, admission, evidence_oid, run_id, source_sh
                  'COLD_V3_EVENT_ORDER_OR_CATALOGUE_DRIFT')
         previous_ids=set(after);previous=event['event_sha256']
         names.append(event['programme'])
+    # Every task in the current admission must be witnessed exactly once.
+    # A valid hash chain prefix is not evidence of terminality.
+    expected={(ident,task) for ident in admitted
+              for task in private['programmes'][ident]['progress']['results']}
+    need({x for x in observed if x[0] in admitted}==expected,
+         'COLD_V3_TASK_EVENT_BIJECTION')
+    for ident in admitted:
+        saved=private['programmes'][ident]
+        need([e['task'] for e in events if e['programme']==ident]==
+             [e['task'] for e in saved['progress']['journal']],
+             'COLD_V3_PROGRAMME_EVENT_ORDER')
     # To count as native A-B-A, B must have added at least one preserved
     # asset, and the later A must carry that asset forward.
     aba=any(

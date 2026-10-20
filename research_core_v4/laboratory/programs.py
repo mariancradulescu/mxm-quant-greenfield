@@ -81,14 +81,20 @@ class Laboratory:
         s=self.state;need(s['schema']=='mxm.laboratory-progress.v1' and s['manifest_sha256']==digest(self.m),'CHECKPOINT_MANIFEST_CHANGED')
         need(s['programme']==self.m['id'] and s['version']==self.m['version'],'CHECKPOINT_IDENTITY')
         need(set(s['results'])<=set(self.m['tasks']) and set(s['skipped'])<=set(self.m['tasks']),'CHECKPOINT_TASKS')
+        need(set(s['results']).isdisjoint(s['skipped']),'CHECKPOINT_TASK_TERMINAL_COLLISION')
         need(s['pending'] is None,'UNSAFE_PENDING_RESUME')
         need(s['steps_used']==len(s['results']) and s['steps_used']<=self.m['budget']['steps'],'CHECKPOINT_BUDGET')
         prev=None
         for i,e in enumerate(s['journal']):
             need(e['sequence']==i+1 and e['previous']==prev and e['sha256']==digest({k:v for k,v in e.items() if k!='sha256'}),'CHECKPOINT_JOURNAL_CHANGED');prev=e['sha256']
         need(len(s['journal'])==s['sequence']==len(s['results']),'CHECKPOINT_SEQUENCE')
+        need({e['task'] for e in s['journal']}==set(s['results']) and
+             len({e['task'] for e in s['journal']})==len(s['journal']),
+             'CHECKPOINT_TASK_RESULT_BIJECTION')
         for e in s['journal']:need(digest(s['results'][e['task']])==e['result_sha256'],'CHECKPOINT_RESULT_CHANGED')
         if s['safe_stop'] and s['stop_reason']=='AUTHORIZED_PROGRAMME_COMPLETE':
+            need(set(s['results'])|set(s['skipped'])==set(self.m['tasks']),
+                 'CHECKPOINT_INCOMPLETE_TERMINAL')
             for task,expect in self.m.get('acceptance',{}).items():
                 need(task in s['results'] and s['results'][task]['classification']==expect['classification'],'RECEPTION_CLASSIFICATION')
                 for path,expected in expect.get('value_equal',{}).items():

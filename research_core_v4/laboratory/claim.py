@@ -14,6 +14,7 @@ def claim_state(state,run_id,admission_sha,parent,source):
       'outcome_state':'NOT_KNOWN_UNTIL_AUTHENTIC_COMPLETION','automatic_retry':False}}
 
 def main():
+    need(os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2','EXPLICIT_INTEGRATED_PROTOCOL_REQUIRED')
     if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
         from .integrated import claim
         return claim()

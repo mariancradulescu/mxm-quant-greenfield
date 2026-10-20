@@ -62,6 +62,8 @@ class ColdV3ProducerTests(unittest.TestCase):
             event['catalogue_after_asset_ids']=sorted(p['shared_catalogue']['assets'])
             event['event_sha256']=digest(event)
             p['programme_execution_history'].append(event)
+            p['programme_execution_history_seal']={'count':len(p['programme_execution_history']),
+                                                   'head_sha256':event['event_sha256']}
         A=Laboratory(m,history,book,cache=DataCatalogue.restore(p['shared_catalogue']))
         step(A,A.next())
         B=Laboratory(mb,history,book,cache=DataCatalogue.restore(p['shared_catalogue']))

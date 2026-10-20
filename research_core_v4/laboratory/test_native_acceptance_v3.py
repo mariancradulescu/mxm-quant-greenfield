@@ -31,7 +31,21 @@ class ArtificialRoute:
         self.current_head=HEAD
         self.divergent=False
         self.divergent_ack=False
+    def data(self,path):
+        if path=='actions/jobs/106/logs':
+            return b'\n'.join(b'MXM_CAS_RESULT '+encoded(x) for x in self.cas_writers)
+        raise KeyError(path)
     def json(self,path):
+        if path.startswith('rules/branches/'):
+            branch=path[len('rules/branches/'):]
+            rules=[{'type':'deletion'},{'type':'non_fast_forward'}]
+            if branch in ('main',EXEC):
+                return rules+[{'type':'pull_request'},{'type':'required_status_checks','parameters':{'required_status_checks':[{'context':'shared-catalogue-regression'}]}}]
+            return rules+[{'type':'update','ruleset_id':1 if branch==CODE else 2}]
+        if path in ('rulesets/1','rulesets/2'):
+            return {'enforcement':'active','bypass_actors':[] if path=='rulesets/1' else [{'actor_id':5343530,'actor_type':'Integration','bypass_mode':'always'}]}
+        if path=='git/commits/'+'7'*40:
+            return {'sha':'7'*40,'parents':[{'sha':'6'*40}]}
         if path.startswith('contents/') and '?ref=' in path:
             import base64
             file_path,ref=path[len('contents/'):].split('?ref=',1)
@@ -56,7 +70,7 @@ class ArtificialRoute:
             return {'id':RUN,'status':'completed' if self.run_ok else 'in_progress',
                     'conclusion':'success' if self.run_ok else None,
                     'path':'.github/workflows/mxm-integrated-p0.yml',
-                    'head_branch':EXEC,'run_attempt':1}
+                    'head_branch':EXEC,'run_attempt':1,'head_sha':'9'*40}
         if path=='actions/runs/'+str(HISTORIC):
             return {'id':HISTORIC,'path':'.github/workflows/mxm-integrated-p0.yml',
                     'conclusion':'failure'}
@@ -72,7 +86,7 @@ class ArtificialRoute:
         raise KeyError(path)
 
 def make_fixture():
-    state={'source_sha':SOURCE,'sequence':21,'last_run_id':RUN,
+    state={'source_sha':SOURCE,'sequence':21,'last_run_id':RUN,'last_trigger_sha':'9'*40,
            'ciphertext_sha256':'c'*64,'accounting':{
                 'lanes':{'V2':{'outcome_charged':21,'reservation_holds':1,
                                 'encumbered':22,'limit':84}},
@@ -109,8 +123,10 @@ def make_fixture():
          'ack_commit_oid':'6'*40,'ack_path':'typed-successor/fault-probes/'
                     +str(RUN)+'/ack.json',
          'ack_sha256':None,
-         'concurrent_writers':[{'writer':'A','accepted':True,'oid':'7'*40},
-                               {'writer':'B','accepted':False}],
+         'concurrent_writers':[{'writer':'A','accepted':True,'oid':'7'*40,'expected_oid':'6'*40},
+                               {'writer':'B','accepted':False,'expected_oid':'6'*40,
+                                'candidate_oid':'8'*40,'observed_oid':'7'*40,'reason':'NATIVE_GIT_STALE_INFO'}],
+         'cas_base_oid':'6'*40,'cas_final_oid':'7'*40,
          'pre_fence_native_run_id':HISTORIC,
          'pre_fence_recovery_path':'typed-successor/recoveries/'
                        +str(HISTORIC)+'.json',
@@ -122,7 +138,7 @@ def make_fixture():
     ack={'native_run_id':RUN,'checkpoint_cipher_sha256':'c'*64,
          'orders':0,'new_outcomes':0}
     neg['ack_sha256']=digest(ack)
-    receipt={'schema':'mxm.integrated-segment-receipt.v2',
+    receipt={'schema':'mxm.integrated-segment-receipt.v2','trigger_sha':'9'*40,
              'run_id':RUN,'source_sha':SOURCE,'sequence':21,
              'ciphertext_sha256':'c'*64,'accounting_after':state['accounting'],
              'pending':None,'safe_stop':True,'orders':0,'new_outcomes':0,
@@ -130,6 +146,10 @@ def make_fixture():
              'broker_requests':0,'native_wire_counts':{},
              'economic_release':False}
     route=ArtificialRoute();paths=proof_paths(RUN)
+    route.cas_writers=deepcopy(neg['concurrent_writers'])
+    for oid in ('6'*40,'7'*40):
+        route.storage[('typed-successor/program-state.json',oid)]=encoded(state)
+    route.storage[('typed-successor/fault-probes/'+str(RUN)+'/A.json','7'*40)]=encoded({'probe':'A','not_economic':True})
     route.storage[('typed-successor/program-state.json',HEAD)]=encoded(state)
     route.storage[('typed-successor/program-state.json',CHECKPOINT)]=encoded(state)
     route.storage[(neg['ack_path'],neg['ack_commit_oid'])]=encoded(ack)

@@ -19,6 +19,35 @@ FIELDS={'schema','status','source_sha','evidence_branch','evidence_oid','sequenc
         'run_id','checkpoint_cipher_sha256','native_receipt_path','issuer_path',
         'cold_proof_path','negative_proof_path','authentic_adapter_path'}
 
+def verify_effective_controls(route):
+    """Read applied rules, including bypass actors; a branch flag is insufficient.
+
+    The only permitted evidence writer is the already authorized successor App,
+    not a newly introduced credential or another workflow's shared GITHUB_TOKEN.
+    """
+    from research_core_v4.p0_successor_a_20261017.issuer import APP_ID
+    snapshots={}
+    for branch in ('main',EXEC,CODE,BRANCH):
+        rules=route.json('rules/branches/'+branch)
+        need(type(rules) is list,'V3_EFFECTIVE_RULE_INVENTORY')
+        kinds={r['type'] for r in rules}
+        need({'deletion','non_fast_forward'}<=kinds,'V3_EFFECTIVE_HISTORY_PROTECTION')
+        if branch in ('main',EXEC):
+            need({'pull_request','required_status_checks'}<=kinds and
+                 any(r['type']=='required_status_checks' and
+                     r.get('parameters',{}).get('required_status_checks') for r in rules),
+                 'V3_EFFECTIVE_REVIEW_AND_CI_REQUIRED')
+        else:
+            restrictions=[r for r in rules if r['type']=='update']
+            need(restrictions,'V3_EFFECTIVE_UPDATE_RESTRICTION_REQUIRED')
+            expected=[] if branch==CODE else [{'actor_id':APP_ID,'actor_type':'Integration','bypass_mode':'always'}]
+            for restriction in restrictions:
+                policy=route.json('rulesets/'+str(restriction['ruleset_id']))
+                need(policy.get('enforcement')=='active' and policy.get('bypass_actors')==expected,
+                     'V3_EFFECTIVE_SOURCE_OR_WRITER_AUTHORITY')
+        snapshots[branch]=rules
+    return snapshots
+
 def _artifact(route,oid,path):
     from .runtime import file_at
     from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
@@ -38,6 +67,7 @@ def verify_operational_acceptance(route,gate,source,protected):
          route.json('branches/'+CODE)['protected'] is True and
          route.json('branches/'+BRANCH)['protected'] is True,
          'V3_CONTROL_PLANE_PROTECTION')
+    verify_effective_controls(route)
     oid=gate['evidence_oid'];run_id=gate['run_id']
     need(type(oid) is str and re.fullmatch('[a-f0-9]{40}',oid) and
          type(run_id) is int and run_id>0,
@@ -60,7 +90,7 @@ def verify_operational_acceptance(route,gate,source,protected):
          'V3_PUBLIC_STATE_CHANGED')
     jobs=native_jobs(route,run_id,('preflight','segment-intent',
         'execution-fence','investigation','durable-archive','cold-readback',
-        'fault-probes','attest-v3'),require_completed_run=True)
+        'fault-probes','attest-v3'),require_completed_run=True,expected_head_sha=state.get('last_trigger_sha'))
     expected=proof_paths(run_id)
     need(all(gate[k]==expected[v] for k,v in (
         ('issuer_path','issuer'),('cold_proof_path','cold'),
@@ -103,6 +133,7 @@ def verify_operational_acceptance(route,gate,source,protected):
          'V3_REAL_MULTI_PROGRAMME_AND_AUTHENTIC_INTEGRATION_NOT_PROVEN')
     rec=_artifact(route,oid,gate['native_receipt_path'])
     need(rec.get('schema')=='mxm.integrated-segment-receipt.v2' and
+         rec.get('trigger_sha')==state.get('last_trigger_sha') and
          rec.get('run_id')==run_id and
          rec.get('source_sha')==source and
          rec.get('sequence')==state['sequence'] and

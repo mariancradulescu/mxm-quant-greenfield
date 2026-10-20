@@ -12,13 +12,13 @@ class DataCatalogue:
     def ingest(self,manifest,rows,*,trust='UNVERIFIED'):
         required={'instrument','resolution','partition','start_ms','end_ms','source','source_sha256','available_at_ms','session_semantics','completeness','account_scope'}
         need(required<=set(manifest),'MANIFEST_FIELDS');m=dict(manifest)
-        need(not set(m)&{'id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust'},'MANIFEST_RESERVED_FIELDS')
+        need(not set(m)&{'id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust','identity_version'},'MANIFEST_RESERVED_FIELDS')
         need(m['partition'] in ('DEVELOPMENT','CONFIRMATION','PROTECTED'),'PARTITION')
         need(len(m['source_sha256'])==64 and m['source'] and m['account_scope'],'PROVENANCE')
         need(type(m['start_ms']) is int and type(m['end_ms']) is int and m['start_ms']<m['end_ms'],'INTERVAL')
         if m['partition']=='DEVELOPMENT':need(m['end_ms']<=DEVELOPMENT_END_MS,'PROTECTED_DATA')
         need(m['resolution'] in KINDS,'RESOLUTION_NOT_IMPLEMENTED')
-        normalized=[];seen={};conflicts=set();invalid=[]
+        normalized=[];seen={};conflicts=set();invalid=[];ranks={}
         for original in rows:
             r=dict(original);t=utc_ms(r['t']);a=utc_ms(r.get('available_at',r['t']))
             need(m['start_ms']<=t<m['end_ms'] and a>=t,'ROW_TIME')
@@ -31,20 +31,42 @@ class DataCatalogue:
                 good=good and r['low']<=min(r['open'],r['close'])<=max(r['open'],r['close'])<=r['high']
             else:good=r.get('side') in ('bid','ask') and number(r.get('price')) and r['price']>0
             if not good:invalid.append({'row_sha256':digest(r),'reason':'INVALID_NATIVE_VALUE_OR_GRID'});continue
+            if m['resolution']=='BID_ASK':
+                # Independent side streams have no fabricated cross-side
+                # sequence. Preserve every update in source order within side.
+                rank=ranks.get(key,0);ranks[key]=rank+1
+                r['source_side_rank']=rank;key=(*key,rank)
             if key in seen and seen[key]!=r:conflicts.add(key)
             else:seen[key]=r
         for k in conflicts:seen.pop(k,None)
         normalized=[seen[k] for k in sorted(seen)];self.quarantine.extend(invalid)
         self.quarantine.extend({'key':list(k),'reason':'CONFLICT_NO_FAVORABLE_DEDUPLICATION'} for k in sorted(conflicts))
         # The raw source identity is preserved separately from the normalized digest.
-        ident=digest({'manifest':m,'normalized':normalized})
+        m['identity_version']=2
+        ident=digest({'manifest':m,'normalized':normalized,'trust':trust})
         self.assets[ident]={**m,'id':ident,'normalized_sha256':digest(normalized),'row_count':len(normalized),
             'conflicts':len(conflicts),'invalid':len(invalid),'interpolated':False,'trust':trust}
         self.rows[ident]=normalized
         return ident
     def query(self,instrument,resolution,start_ms,end_ms,partition='DEVELOPMENT',authentic_only=False):
-        ids=[k for k,m in self.assets.items() if m['instrument']==instrument and m['resolution']==resolution and m['partition']==partition and m['start_ms']<=start_ms and m['end_ms']>=end_ms and m['completeness']=='CONFIRMED_COMPLETE' and not m['conflicts'] and not m['invalid'] and (not authentic_only or m.get('trust') in ('AUTHENTICATED_NATIVE_CUSTODY','AUTHENTICATED_NATIVE_COLLECTION'))]
+        ids=[k for k,m in self.assets.items() if m['instrument']==instrument and m['resolution']==resolution and m['partition']==partition and m['start_ms']<=start_ms and m['end_ms']>=end_ms and m['completeness']=='CONFIRMED_COMPLETE' and not m['conflicts'] and not m['invalid'] and self.structural_support(k,start_ms,end_ms) and (not authentic_only or m.get('trust') in ('AUTHENTICATED_NATIVE_CUSTODY','AUTHENTICATED_NATIVE_COLLECTION'))]
         return sorted(ids)
+    def structural_support(self,ident,start_ms,end_ms):
+        """Necessary support, never a certification of provenance or sessions.
+
+        Updates are asynchronous. Carry forward only observed sides, never
+        invent an opposite quote or treat absence as a closed session.
+        """
+        rows=[r for r in self.rows[ident] if start_ms<=r['t']<end_ms]
+        if not rows:return False
+        m=self.assets[ident]
+        if m['resolution']!='BID_ASK':return True
+        if {r['side'] for r in rows}!={'bid','ask'}:return False
+        quotes={}
+        for r in sorted(rows,key=lambda r:(r['available_at'],r['t'])):
+            quotes[r['side']]=r['price']
+            if len(quotes)==2 and quotes['bid']>quotes['ask']:return False
+        return True
     def view(self,asset_id,decision_ms):
         m=self.assets[asset_id];need(m['partition']=='DEVELOPMENT','PROTECTED_READ_GATE')
         return [r for r in self.rows[asset_id] if r['available_at']<=decision_ms]
@@ -57,7 +79,9 @@ class DataCatalogue:
         cat=cls()
         for ident,m in value['assets'].items():
             rows=value['rows'][ident];need(digest(rows)==m['normalized_sha256'],'CACHE_CHANGED')
-            need(digest({'manifest':{k:v for k,v in m.items() if k not in ('id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust')},'normalized':rows})==ident,'CACHE_MANIFEST_CHANGED')
+            basis={'manifest':{k:v for k,v in m.items() if k not in ('id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust')},'normalized':rows}
+            if m.get('identity_version')==2:basis['trust']=m['trust']
+            need(digest(basis)==ident,'CACHE_MANIFEST_CHANGED')
         # Detach snapshots before mutation: validation must never mutate their
         # source or a sibling programme's durable cache by reference.
         from copy import deepcopy

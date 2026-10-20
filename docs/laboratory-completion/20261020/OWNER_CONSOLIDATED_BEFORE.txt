@@ -1,0 +1,146 @@
+FFFFFFFFFFFF.F
+======================================================================
+FAIL: test_A01_empty_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A01_empty_not_usable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 19, in test_A01_empty_not_usable
+    self.assertEqual(self.cache([]).query('EURUSD','BID_ASK',60000,120000,authentic_only=True),[])
+AssertionError: Lists differ: ['eadb6af19782498e628e976c4aca399ca48bf4daf2321f0d904b27e39462d8ee'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'eadb6af19782498e628e976c4aca399ca48bf4daf2321f0d904b27e39462d8ee'
+
+- ['eadb6af19782498e628e976c4aca399ca48bf4daf2321f0d904b27e39462d8ee']
++ []
+
+======================================================================
+FAIL: test_A02_async_not_fabricated_and_crossed_rejected (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_async_not_fabricated_and_crossed_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 29, in test_A02_async_not_fabricated_and_crossed_rejected
+    self.assertEqual(c.query('EURUSD','BID_ASK',60000,120000,authentic_only=True),[])
+AssertionError: Lists differ: ['671f0432601a9d1351ee7a41f84381216a29b79de6c783e54c019ceb3de8f4c1'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'671f0432601a9d1351ee7a41f84381216a29b79de6c783e54c019ceb3de8f4c1'
+
+- ['671f0432601a9d1351ee7a41f84381216a29b79de6c783e54c019ceb3de8f4c1']
++ []
+
+======================================================================
+FAIL: test_A02_unilateral_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_unilateral_not_usable) (side='bid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 24, in test_A02_unilateral_not_usable
+    self.assertEqual(c.query('EURUSD','BID_ASK',60000,120000,authentic_only=True),[])
+AssertionError: Lists differ: ['d9965fa8a887b36649b3ea0d8dd9ea013a4d348d3290aec8d8b46f28377f383d'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'d9965fa8a887b36649b3ea0d8dd9ea013a4d348d3290aec8d8b46f28377f383d'
+
+- ['d9965fa8a887b36649b3ea0d8dd9ea013a4d348d3290aec8d8b46f28377f383d']
++ []
+
+======================================================================
+FAIL: test_A02_unilateral_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_unilateral_not_usable) (side='ask')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 24, in test_A02_unilateral_not_usable
+    self.assertEqual(c.query('EURUSD','BID_ASK',60000,120000,authentic_only=True),[])
+AssertionError: Lists differ: ['60fb2d852e309e81bce7b061da571685854729ab926cfb2fcd0f29913136e33f'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'60fb2d852e309e81bce7b061da571685854729ab926cfb2fcd0f29913136e33f'
+
+- ['60fb2d852e309e81bce7b061da571685854729ab926cfb2fcd0f29913136e33f']
++ []
+
+======================================================================
+FAIL: test_A03_forged_winner_not_certified (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A03_forged_winner_not_certified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 77, in test_A03_forged_winner_not_certified
+    with self.assertRaises((LabError,KeyError)):validate_negative_artifact(route,negative,RUN,SOURCE,state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'research_core_v4.laboratory.common.LabError'>, <class 'KeyError'>) not raised
+
+======================================================================
+FAIL: test_A04_hold_is_not_complete (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A04_hold_is_not_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 33, in test_A04_hold_is_not_complete
+    with self.assertRaises(LabError):f.attest(p,s,a)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+======================================================================
+FAIL: test_A05_truncated_journal (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A05_truncated_journal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 36, in test_A05_truncated_journal
+    with self.assertRaises(LabError):f.attest(p,s,a)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+======================================================================
+FAIL: test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) (events=[CapitalEvent(timestamp_utc='2025-01-06T12:01:00Z', kind='FINANCING', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction=None, direction_feasibility=None, volume_cents=None, min_volume_cents=None, step_volume_cents=None, max_volume_cents=None, margin_eur=Decimal('0'), price=None, base_units=None, quote_to_eur_rate=None, transaction_cost_eur=Decimal('0'), financing_eur=2, cashflow_eur=Decimal('0'), causal_state=True, metadata={})])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 51, in test_A06_orphan_closed_mismatch_duplicate
+    with self.subTest(events=events),self.assertRaises(ReplayContractError):self.replay(events)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ReplayContractError not raised
+
+======================================================================
+FAIL: test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) (events=[CapitalEvent(timestamp_utc='2025-01-06T12:00:00Z', kind='ENTRY', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:02:00Z', kind='EXIT', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:03:00Z', kind='FINANCING', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction=None, direction_feasibility=None, volume_cents=None, min_volume_cents=None, step_volume_cents=None, max_volume_cents=None, margin_eur=Decimal('0'), price=None, base_units=None, quote_to_eur_rate=None, transaction_cost_eur=Decimal('0'), financing_eur=2, cashflow_eur=Decimal('0'), causal_state=True, metadata={})])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 51, in test_A06_orphan_closed_mismatch_duplicate
+    with self.subTest(events=events),self.assertRaises(ReplayContractError):self.replay(events)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ReplayContractError not raised
+
+======================================================================
+FAIL: test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) (events=[CapitalEvent(timestamp_utc='2025-01-06T12:00:00Z', kind='ENTRY', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:01:00Z', kind='FINANCING', candidate_id='OTHER', symbol='EURUSD', position_id='P', priority=100, direction=None, direction_feasibility=None, volume_cents=None, min_volume_cents=None, step_volume_cents=None, max_volume_cents=None, margin_eur=Decimal('0'), price=None, base_units=None, quote_to_eur_rate=None, transaction_cost_eur=Decimal('0'), financing_eur=2, cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:02:00Z', kind='EXIT', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={})])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 51, in test_A06_orphan_closed_mismatch_duplicate
+    with self.subTest(events=events),self.assertRaises(ReplayContractError):self.replay(events)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ReplayContractError not raised
+
+======================================================================
+FAIL: test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) (events=[CapitalEvent(timestamp_utc='2025-01-06T12:00:00Z', kind='ENTRY', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:01:00Z', kind='FINANCING', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction=None, direction_feasibility=None, volume_cents=None, min_volume_cents=None, step_volume_cents=None, max_volume_cents=None, margin_eur=Decimal('0'), price=None, base_units=None, quote_to_eur_rate=None, transaction_cost_eur=Decimal('0'), financing_eur=2, cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:01:00Z', kind='FINANCING', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction=None, direction_feasibility=None, volume_cents=None, min_volume_cents=None, step_volume_cents=None, max_volume_cents=None, margin_eur=Decimal('0'), price=None, base_units=None, quote_to_eur_rate=None, transaction_cost_eur=Decimal('0'), financing_eur=2, cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:02:00Z', kind='EXIT', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={})])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 51, in test_A06_orphan_closed_mismatch_duplicate
+    with self.subTest(events=events),self.assertRaises(ReplayContractError):self.replay(events)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ReplayContractError not raised
+
+======================================================================
+FAIL: test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) (events=[CapitalEvent(timestamp_utc='2025-01-06T12:00:00Z', kind='ENTRY', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:01:00Z', kind='FINANCING', candidate_id='C', symbol='OTHER', position_id='P', priority=100, direction=None, direction_feasibility=None, volume_cents=None, min_volume_cents=None, step_volume_cents=None, max_volume_cents=None, margin_eur=Decimal('0'), price=None, base_units=None, quote_to_eur_rate=None, transaction_cost_eur=Decimal('0'), financing_eur=2, cashflow_eur=Decimal('0'), causal_state=True, metadata={}), CapitalEvent(timestamp_utc='2025-01-06T12:02:00Z', kind='EXIT', candidate_id='C', symbol='EURUSD', position_id='P', priority=100, direction='LONG', direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE', volume_cents=100, min_volume_cents=100, step_volume_cents=100, max_volume_cents=100, margin_eur=20, price=1, base_units=1, quote_to_eur_rate=1, transaction_cost_eur=Decimal('0'), financing_eur=Decimal('0'), cashflow_eur=Decimal('0'), causal_state=True, metadata={})])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 51, in test_A06_orphan_closed_mismatch_duplicate
+    with self.subTest(events=events),self.assertRaises(ReplayContractError):self.replay(events)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ReplayContractError not raised
+
+======================================================================
+FAIL: test_A07_adapter_rejects_future_signal_before_economic_open (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_adapter_rejects_future_signal_before_economic_open)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm/research_core_v4/laboratory/test_owner_consolidated.py", line 66, in test_A07_adapter_rejects_future_signal_before_economic_open
+    with self.assertRaises(LabError):native_replay(candidate('V2-C999','TEST'),generated,corpus,authority,spec,lambda:opened.append(1))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.169s
+
+FAILED (failures=13)

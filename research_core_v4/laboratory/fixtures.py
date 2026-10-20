@@ -24,6 +24,10 @@ def economic_fixture():
            'price':price,'quote_to_eur_rate':1,'metadata':{'source_sha256':digest('SYNTHETIC_PRICE_PATH'),'available_at_ms':T,'cost_components_eur':dict.fromkeys(('spread','commission','slippage','funding','fx_conversion'),0.)},'transaction_cost_eur':0.}
         if kind=='ENTRY':r.update(direction='LONG',direction_feasibility='EUR200_MIN_VOLUME_FEASIBLE',volume_cents=100,min_volume_cents=100,step_volume_cents=100,max_volume_cents=10000,base_units=1,margin_eur=20)
         events.append(r)
+    for r in events:
+        r['metadata'].update(quote_available_at_ms=T,fx_available_at_ms=T,
+            signal_provenance={'feature_available_ms':T,'decision_ms':T,
+                'entry_ms':T+1000,'exit_ms':T+61000,'feature_set_sha256':digest('SYNTHETIC_PRICE_PATH')})
     spec={'starting_equity_eur':200,'deposit_count':1,'sizing_rule_frozen':True,'allocator_frozen':True,'price_cost_convention':'MID_PLUS_ALL_FRICTIONS',
       'account_type':'HEDGED','margin_type':'SUM','same_symbol_overlap_allowed':True,'evaluation_start':'2025-01-06T00:00:00Z','evaluation_end':'2025-01-20T00:00:00Z'}
     evidence={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','full_mark_path':True,'dated_broker_terms':True,'events':events}

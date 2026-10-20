@@ -22,6 +22,20 @@ def _t(s):
     if x.tzinfo is None: raise ReplayContractError("timezone required")
     return x.astimezone(timezone.utc)
 
+def validate_causal_provenance(e):
+    """Strict research boundary; booleans cannot establish causal clocks."""
+    import re
+    m=e.metadata;p=m.get('signal_provenance',{})
+    keys=('feature_available_ms','decision_ms','entry_ms','exit_ms')
+    if not all(type(p.get(k)) is int for k in keys):raise ReplayContractError('missing causal signal clocks')
+    f,d,a,b=(p[k] for k in keys);t=int(_t(e.timestamp_utc).timestamp()*1000)
+    if not f<=d<a<b or not a<=t<=b:raise ReplayContractError('future signal or event outside position interval')
+    if e.kind=='ENTRY' and t!=a or e.kind=='EXIT' and t!=b:raise ReplayContractError('execution clock mismatch')
+    if not re.fullmatch('[a-f0-9]{64}',p.get('feature_set_sha256','')):raise ReplayContractError('unbound feature set')
+    for k in ('available_at_ms','quote_available_at_ms','fx_available_at_ms'):
+        if type(m.get(k)) is not int or m[k]>t:raise ReplayContractError('future or missing price/FX availability')
+    return p
+
 @dataclass(frozen=True)
 class CapitalEvent:
     timestamp_utc:str; kind:str; candidate_id:str=""; symbol:str=""; position_id:str=""; priority:int=100
@@ -78,7 +92,8 @@ def _keys(ts):
 
 def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eur:object,account_type:str,total_margin_calculation_type:str,
                               same_symbol_overlap_allowed:bool=True,entry_margin_level_floor_ratio:object|None=None,
-                              unresolved_stop_out_guard_ratio:object|None=None, entry_transform=None)->ReplayResult:
+                              unresolved_stop_out_guard_ratio:object|None=None, entry_transform=None,
+                              require_causal_provenance:bool=False)->ReplayResult:
     cash=_d(starting_equity_eur); account_type=account_type.upper(); margin_type=total_margin_calculation_type.upper()
     if cash<=0 or account_type not in ACCOUNT_TYPES or margin_type not in MARGIN_TYPES: raise ReplayContractError("invalid account contract")
     floor=None if entry_margin_level_floor_ratio is None else _d(entry_margin_level_floor_ratio)
@@ -86,11 +101,16 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
     if (floor is not None and floor<=0) or (guard is not None and guard<=0): raise ReplayContractError("margin guard must be positive")
     order={"EXIT":0,"FINANCING":1,"DEPOSIT":2,"WITHDRAWAL":2,"MARK":3,"ENTRY":4}
     seq=list(events)
+    signals={}
     for e in seq:
         if e.kind not in order or not e.causal_state: raise ReplayContractError("invalid/non-causal event")
         _t(e.timestamp_utc)
+        if require_causal_provenance:
+            p=validate_causal_provenance(e)
+            if e.position_id in signals and signals[e.position_id]!=p:raise ReplayContractError('position signal changed')
+            signals[e.position_id]=dict(p)
     seq.sort(key=lambda e:(_t(e.timestamp_utc),order[e.kind],e.priority,e.symbol,e.position_id))
-    pos={}; inactive=set(); executed_units={}; decisions=[]; external=D(0); financing=D(0); costs=D(0); turnover=D(0); accepted=rejected=0
+    pos={}; inactive=set(); financing_keys=set(); executed_units={}; decisions=[]; external=D(0); financing=D(0); costs=D(0); turnover=D(0); accepted=rejected=0
     weekly={}; monthly={}; entries_week={}; peak=cash; maxdd=D(0); minfree=cash; minratio=None
     prev_ts=None; prev_snap=_snap(seq[0].timestamp_utc if seq else "1970-01-01T00:00:00Z",cash,pos,margin_type,external)
     used_time=eq_time=seconds_total=D(0); status="COMPLETE"; halt=None
@@ -132,7 +152,12 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                 gross=(D(1) if p.direction=="LONG" else D(-1))*(price-p.entry)*p.units*rate
                 cash+=gross-cost; costs+=cost; turnover+=abs(price*p.units*rate); del pos[e.position_id]; record(e,True,"EXIT_APPLIED")
             elif e.kind=="FINANCING":
-                if e.position_id in inactive: record(e,False,"SKIP_FINANCING_REJECTED_ENTRY"); continue
+                p=pos.get(e.position_id)
+                if p is None or p.symbol!=e.symbol or p.candidate_id!=e.candidate_id:
+                    raise ReplayContractError("financing requires matching active executed position")
+                funding_key=(e.position_id,_t(e.timestamp_utc))
+                if funding_key in financing_keys: raise ReplayContractError("duplicate financing accrual")
+                financing_keys.add(funding_key)
                 amt=_d(e.financing_eur)
                 if entry_transform is not None and e.position_id:
                     from dataclasses import replace
@@ -164,7 +189,7 @@ def replay_continuous_account(events:Iterable[CapitalEvent],*,starting_equity_eu
                 e=transformed
             _volume(e); cost=_d(e.transaction_cost_eur)
             if cost<0 or e.direction not in {"LONG","SHORT"} or e.direction_feasibility not in {FEASIBLE,INFEASIBLE,UNRESOLVED}: raise ReplayContractError("invalid entry")
-            if e.position_id in pos or e.position_id in inactive: raise ReplayContractError("duplicate position id")
+            if e.position_id in pos or e.position_id in inactive or e.position_id in executed_units: raise ReplayContractError("duplicate position id")
             if account_type=="NETTED" and any(p.symbol==e.symbol for p in pos.values()): raise ReplayContractError("NETTED stream not pre-netted")
             reason=None
             if not same_symbol_overlap_allowed and any(p.symbol==e.symbol for p in pos.values()): reason="REJECT_SAME_SYMBOL_OVERLAP"
