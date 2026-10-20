@@ -79,17 +79,17 @@
         "C-02"
       ],
       "basis": "STATIC_CONFIRMED",
-      "status": "OPEN_ADMIN_AND_NATIVE",
-      "implementation": "Candidate inventory: 225 workflows, 14 secret references, 10 without environment, six contents-write declarations. No secret values read or copied.",
-      "remaining_acceptance": "Environment branch policies; actual secret scopes; remove repository copies only after verified replacement; disable uncontrolled historical writers in active control plane; native negative job."
+      "status": "PARTIAL_ADMIN_PREPARED_NATIVE_MIGRATION_PENDING",
+      "implementation": "Two empty restricted environments created: mxm-r3-custody-v1 (24791890420), mxm-r3-pepperstone-v1 (24792100903); exact execution branch only; no admin bypass. Finite machine-side migration implemented with distinct destination names, sealed stdin copy, two independent value-verifier jobs, native job identity/completion checks, metadata guards before deletion, per-secret recovery receipts, ephemeral exact-repository tokens and finally revocation. No secret values read by the assistant.",
+      "remaining_acceptance": "Native migration and readback, denial of unauthorized environment access, installation of scoped runtime secret references, closure of historical active secret paths. Existing App has only Contents write; temporary Environments write and Secrets write and exact execution-branch issuer environment access require action-time confirmation for browser security-sensitive access expansion."
     },
     {
       "id": "SEC-02",
       "aliases": [],
       "basis": "LIVE_CONFIRMED",
-      "status": "PARTIAL_CODE_VERIFIED_ADMIN_REQUIRED",
-      "implementation": "Applied-rules reader confirms main/exec empty, R3/evidence append-only only. Certificate now checks effective source freeze, review/CI rules and evidence App bypass identity 5343530 already present in existing authority code.",
-      "remaining_acceptance": "Install legitimate rules and least-privilege token delivery; ACL negative probes. Current keyless shared GITHUB_TOKEN publisher cannot satisfy App-only writer control without installation work."
+      "status": "PARTIAL_NATIVE_ACL_VERIFIED_INSTALLATION_PENDING",
+      "implementation": "Additive active rulesets 25461184 main/execution PR+strict Actions CI, 25461529 candidate PR+strict Actions CI, 25461373 evidence update restriction with only existing App 5343530 bypass. Original 25222248 unchanged. Native run39393774216/job118531356655/source8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b created identical-tree commit proposals then received explicit HTTP422 repository-rule refusals on all four refs; all heads unchanged. Proposal objects independently read from GitHub.",
+      "remaining_acceptance": "Freeze final R3 source with no bypass; install legitimate scoped token delivery and v3 workflow contracts; authorized App CAS race and native end-to-end reception. R2 GITHUB_TOKEN evidence writer now correctly denied; do not weaken ACL to restore it."
     },
     {
       "id": "SEC-03",

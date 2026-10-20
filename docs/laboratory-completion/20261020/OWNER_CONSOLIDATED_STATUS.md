@@ -18,7 +18,7 @@ Source base: `18e50ab0109f6f7ab80480ead865c5e4ee667337`, existing candidate bran
 
 ## 2. Operational acceptance
 
-**Not demonstrated.** No R3 workflow installation, checkpoint20 decryption/migration, native fault campaign or certificate was performed. Current rules are insufficient. `main` and execution branch returned empty applied-rule lists; R3 and evidence returned only deletion/non-fast-forward/linear-history. Native ACL, secret isolation, checkout provenance, interrupted-exposure resolution and authentic cold proof remain mandatory.
+**Not demonstrated.** No R3 workflow installation, checkpoint20 decryption/migration, native fault campaign or certificate was performed. At the initial source checkpoint main/execution had no applied rules. Subsequent owner-authenticated administration installed additive active rulesets 25461184 (main/execution PR+strict CI), 25461529 (candidate PR+strict CI) and 25461373 (evidence update restricted to existing App5343530). Native GITHUB_TOKEN Contents-write probes were refused with explicit repository-rule HTTP422 on all four refs, without moving any head. Final immutable R3 source freeze, scoped App publisher and v3 workflow installation remain outstanding. Native ACL, secret isolation, checkout provenance, interrupted-exposure resolution and authentic cold proof remain mandatory.
 
 ## 3. Research capability
 
@@ -32,7 +32,7 @@ Source base: `18e50ab0109f6f7ab80480ead865c5e4ee667337`, existing candidate bran
 
 - GitHub connector returned HTTP403 `Resource not accessible by integration` for `branches/main/protection`; its public fetch allowlist also rejected the applied-rules endpoint.
 - Direct public authenticated-free GET successfully read `rules/branches/{branch}` and is recorded in `OWNER_CONSOLIDATED_EFFECTIVE_RULES.json`. This supplies observation, not administrative mutation authority.
-- No administrative mutation capability for rulesets/environments/secrets is exposed by the connector. A browser fallback requires a separate tool-route permission; it must not be confused with a new B-E mandate or a request for the OWNER to operate GitHub manually.
+- The OWNER authorized browser fallback and completed GitHub Mobile sudo. Administrative rules and empty restricted environments were installed through the owner-authenticated UI. The connector remains insufficient for secret/environment mutations; its 403 is not an owner-account limitation.
 - Candidate inventory covers 225 workflows, 14 with secret references, 10 without environment and six with contents-write declarations. These are source references, not a claim that the corresponding repository secrets exist or were exposed.
 - Before patch: nine adversarial test methods produced 13 expected assertion failures on the audited code. After patch: **160/160 focused tests PASS** (all laboratory modules and account replay tests). Full names and raw results are retained beside this report.
 - Broad historic suite: **2304 run; 61 failures, 91 errors, 14 skipped**, 371.179 seconds. Not green. The first immutable-binding failure was independently reproduced on the unmodified audited source; the full unmodified baseline also runs 2304 tests with exactly 61 failures, 91 errors and 14 skips (183.890 seconds). The 152 failing test identities are identical, with no candidate-only failure. Individual historic root causes remain open. No frozen hash has been rewritten to conceal failures.
@@ -44,3 +44,14 @@ Source base: `18e50ab0109f6f7ab80480ead865c5e4ee667337`, existing candidate bran
 Implementation commit `d971598ca967ee31e40427994706992310b9fb5e` has a successful push-event run [39390365675](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39390365675), job `118520152533`, attempt 1. Checkout log independently reports that exact SHA; 160 tests passed in 0.855 seconds. The public anchor step confirms checkpoint20/R2/OWNER/active authority and explicitly reports operational acceptance false, R3 migration false and main/execution protected false. Separate PR-merge CI run `39390373684` also succeeded (job `118520175932`); it tests synthetic merge `f178de2f2d0ec1cc6e319d07a4c8877614b5f414`, not the push checkout. Evidence in OWNER_CONSOLIDATED_NATIVE_CI.json distinguishes them.
 
 This documentation successor changes no laboratory or account source code. Native end-to-end deployment and authentic research-capability reception remain unproven.
+
+
+## Native administrative checkpoint — subsequent to source CI
+
+PR #9 continues into the protected candidate of PR #8. Native keyless ACL run39393774216, attempt1, job118531356655, exact workflow/code SHA8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b succeeded. Its runner explicitly granted Contents write. GitHub created four identical-tree proposals (positive token control), then refused each protected ref update for repository-rule violations. Independent GET reads confirm proposal parent/tree. Full logs and responses: OWNER_CONSOLIDATED_NATIVE_ACL.log/json. This is ACL denial proof, not the separate two-writer CAS proof or E2E reception.
+
+Empty credential destinations mxm-r3-custody-v1 and mxm-r3-pepperstone-v1 allow exactly mxm-remediation-p0-p4-20261015-v1, no tags/wildcards, no administrator bypass. Existing environment rules untouched. Repository secret values were not retrieved. Native isolation code is prepared and tested, not executed: copy existing values with GitHub CLI encryption via stdin; distinct R3_ destination names prevent repository fallback; separate custody/Pepperstone verifiers; no original deletion unless both native jobs and all metadata guards pass; individual deletion receipts and ephemeral token revocation. No broker or economic request.
+
+App5343530 / installation172030470 remains scoped to this one repository, with only metadata read and Contents write. Native migration requires temporary Environments write and Secrets write, plus temporary exact execution-branch access to the existing issuer environment. No new key, app, person, custodian or approver is required. Browser policy requires action-time confirmation before this specific security-sensitive access expansion; preparation and non-sensitive work continue first. Existing repository copies remain until verified replacement.
+
+169 focused tests pass locally after ACL and isolation additions. Broad historical failures remain as previously reported. Operational reception false; research-capability reception false; new economic outcomes0; orders0.
