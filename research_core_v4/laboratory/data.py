@@ -58,7 +58,11 @@ class DataCatalogue:
         for ident,m in value['assets'].items():
             rows=value['rows'][ident];need(digest(rows)==m['normalized_sha256'],'CACHE_CHANGED')
             need(digest({'manifest':{k:v for k,v in m.items() if k not in ('id','normalized_sha256','row_count','conflicts','invalid','interpolated','trust')},'normalized':rows})==ident,'CACHE_MANIFEST_CHANGED')
-        cat.assets=value['assets'];cat.rows=value['rows'];cat.quarantine=value['quarantine'];return cat
+        # Detach snapshots before mutation: validation must never mutate their
+        # source or a sibling programme's durable cache by reference.
+        from copy import deepcopy
+        need(set(value['assets'])==set(value['rows']) and isinstance(value['quarantine'],list),'CACHE_KEYS_AND_QUARANTINE')
+        cat.assets=deepcopy(value['assets']);cat.rows=deepcopy(value['rows']);cat.quarantine=deepcopy(value['quarantine']);return cat
 
 class Acquisition:
     """Whitelist adapter. No orders, arbitrary endpoints, retries or new providers."""
