@@ -16,6 +16,13 @@ def verify(root: Path) -> None:
     assert "INJECTED_CRASH" not in workflow
     assert "secrets.SUCCESSOR_APP_PRIVATE_KEY" not in workflow
     assert "if: needs.durable-archive.result == 'success' && needs.durable-archive.outputs.next == 'STOP'" in workflow
+    # The sealed R2 implementation still trusts bare JSON status. Block
+    # all economic admissions at the workflow boundary until native E2E proof verification.
+    assert workflow.count("P0-17 refuse unverified economic acceptance certificates") == 1
+    assert "P0-17_NATIVE_CERTIFICATE_VERIFICATION_NOT_INSTALLED" in workflow
+    assert "admission['mode'] != 'TECHNICAL_NONOUTCOME'" in workflow
+    assert workflow.index("P0-17 refuse unverified economic acceptance certificates") < workflow.index("- id: prepare")
+
 
 if __name__ == "__main__":
     verify(Path(__file__).resolve().parents[1])
