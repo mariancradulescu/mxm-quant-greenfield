@@ -140,8 +140,10 @@ def inspect_corpus(key, tmp):
     raw_started=time.perf_counter()
     raw_totals={k:0 for k in ('raw_pages','decoded_tick_records','verified_selected_sides',
         'empty_sides','unresolved_sides','partial_pages','nonpositive_tick_records')}
+    reference_hashes=[]
     for row in quotes:
         raw_proof=verify_quote_reference(row)
+        reference_hashes.append(raw_proof['receipt_sha256'])
         for k in raw_totals:raw_totals[k]+=raw_proof[k]
         symbols.add(str(row['symbol_id']))
         times.append(row['boundary_ms'])
@@ -157,6 +159,8 @@ def inspect_corpus(key, tmp):
         'load_verify_decrypt_seconds': elapsed, 'raw_quote_receipts': len(quotes),
         'side_records': sides, 'numeric_price_timestamp_side_records': numeric_sides,
         'raw_receipt_consistency':raw_totals,
+        'ordered_raw_reference_sha256':digest(reference_hashes),
+        'source_catalogue_sha256':digest(data['catalog']),
         'raw_decode_verify_seconds':time.perf_counter()-raw_started,
         'historical_network_availability_verified':False,
         'decoded_tick_records_are_unique_market_events':False,
@@ -165,6 +169,15 @@ def inspect_corpus(key, tmp):
         'distinct_symbols': len(symbols),
         'first_boundary_ms': min(times), 'last_boundary_ms': max(times),
         'continuous_coverage_demonstrated': False, 'broker_requests': 0}
+
+
+def compare_corpus_benchmarks(producer, cold):
+    volatile={'load_verify_decrypt_seconds','raw_decode_verify_seconds'}
+    need({'archive_sha256','ciphertext_sha256','ordered_raw_reference_sha256',
+          'source_catalogue_sha256','raw_receipt_consistency'}<=set(producer),
+         'CP20_CORPUS_PROOF_MISSING')
+    need({k:v for k,v in producer.items() if k not in volatile}==
+         {k:v for k,v in cold.items() if k not in volatile},'CP20_COLD_CORPUS_MISMATCH')
 
 
 def main(stage):
@@ -270,6 +283,9 @@ def main(stage):
             restored = strict_json(unpack(owner.bounded_decrypt(archive, key, tmp)), max_elements=8000000)
             need(restored == successor, 'CP20_COLD_ENCRYPTED_RESTORE')
             preserve_check(private, restored)
+            proof['corpus_benchmark']=inspect_corpus(key,tmp)
+            compare_corpus_benchmarks(producer['corpus_benchmark'],proof['corpus_benchmark'])
+            proof['fresh_job_corpus_raw_readback']=True
             proof['producer_proof_sha256'] = digest(producer)
             proof['migrated_ciphertext_sha256'] = bytes_digest(archive)
             proof['fresh_job_encrypted_readback'] = True
