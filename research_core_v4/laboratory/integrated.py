@@ -10,7 +10,7 @@ from .protocol import *
 from .admission import TypedTrialBook
 from .programs import Laboratory
 from .data import DataCatalogue
-from .execution import bind_native,preserve_node
+from .execution import bind_native,preserve_node,next_admitted_programme
 from .budgets import historical_accounting
 from .runtime import ROOT,anchors,file_at,module_digest,EVIDENCE_BRANCH
 from .custody import atomic_publish,chunk_ciphertext,restore_ciphertext
@@ -173,7 +173,7 @@ def execute():
         need(digest(p)==c['prepared_private_sha256'] and p['sequence']==s['sequence'],'WORKER_PREFLIGHT_PRIVATE')
         book=register_and_validate(p,a,p['history']);before=accounting(book.export());done=[];wire={}
         for _ in range(a['steps_per_segment']):
-            m=next((m for m in a['programmes'] if m['id'] not in p['programmes'] or not p['programmes'][m['id']]['progress']['safe_stop']),None)
+            m=next_admitted_programme(p,a,book)
             if m is None:break
             saved=p['programmes'].get(m['id']);lab=Laboratory.restore(saved,p['history'],shared_catalogue=p['shared_catalogue']) if saved else Laboratory(m,p['history'],book,cache=DataCatalogue.restore(p['shared_catalogue']));lab.book=book
             lazy=None

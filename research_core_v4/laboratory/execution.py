@@ -3,6 +3,31 @@ from copy import deepcopy
 from .common import need
 from .data import LazyNativeCollector
 
+def next_admitted_programme(private, admission, book):
+    """Choose eligible nodes by sealed task priority across admitted programmes.
+
+    Ties retain prospective admission order. Validate every saved programme
+    before selection; an uncertain pending task cannot be bypassed.
+    """
+    from .programs import Laboratory
+    from .data import DataCatalogue
+    need(private.get('pending') is None,'PROGRAMME_SELECTION_PENDING_EXPOSURE')
+    candidates=[]
+    for index,manifest in enumerate(admission['programmes']):
+        saved=private['programmes'].get(manifest['id'])
+        need(saved is None or saved['programme']==manifest,'PROGRAMME_SELECTION_MANIFEST_CHANGED')
+        lab=Laboratory.restore(saved,private['history'],shared_catalogue=private['shared_catalogue']) if saved else Laboratory(
+            manifest,private['history'],book,cache=DataCatalogue.restore(private['shared_catalogue']))
+        lab.book=book
+        if saved and saved['progress']['safe_stop']:continue
+        task=lab.next()
+        if task is None:
+            preserve_node(private,lab)
+            continue
+        candidates.append((manifest['tasks'][task]['priority'],index,manifest))
+    return min(candidates,key=lambda row:row[:2])[2] if candidates else None
+
+
 def bind_native(lab,corpus,collector_factory=LazyNativeCollector):
     need(lab.m['mode']=='DEVELOPMENT_RESEARCH','NATIVE_BINDING_MODE')
     lab.authentic_corpus=deepcopy(corpus)
