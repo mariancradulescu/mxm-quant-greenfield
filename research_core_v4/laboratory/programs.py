@@ -185,8 +185,16 @@ class Laboratory:
         self.check();return deepcopy({'schema':'mxm.integrated-laboratory-checkpoint.v1','programme':self.m,'progress':self.state,
           'trial_book':self.book.export(),'catalogue':self.cache.export(),'acquisition_budget':self.acquisition.budget,'acquisition_remaining':self.acquisition.remaining,'native_receipts':self.acquisition.receipts})
     @classmethod
-    def restore(cls,value,history,collector=None):
+    def restore(cls,value,history,collector=None,*,shared_catalogue=None):
         need(value['schema']=='mxm.integrated-laboratory-checkpoint.v1','CHECKPOINT_SCHEMA')
         book=TypedTrialBook.restore(value['trial_book']) if value['trial_book'].get('schema')==TypedTrialBook.SCHEMA else TrialBook.restore(value['trial_book'])
-        obj=cls(value['programme'],history,book,DataCatalogue.restore(value['catalogue']),collector,state=value['progress'])
+        saved=DataCatalogue.restore(value['catalogue'])
+        if shared_catalogue is not None:
+            from .execution import catalogue_extends
+            shared=DataCatalogue.restore(shared_catalogue)
+            catalogue_extends(shared.export(),saved.export())
+            selected=shared
+        else:
+            selected=saved
+        obj=cls(value['programme'],history,book,selected,collector,state=value['progress'])
         obj.acquisition.budget=value['acquisition_budget'];obj.acquisition.remaining=value['acquisition_remaining'];obj.acquisition.receipts=value['native_receipts'];return obj
