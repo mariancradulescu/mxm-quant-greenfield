@@ -28,7 +28,7 @@ jobs:
           baseline=root/'.selector-baseline'
           assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='aa41ee31268bcf773f5f9299ac611d4bae7b88ff'
           source=(baseline/'research_core_v4/laboratory/integrated.py').read_text()
-          worker=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='worker')
+          worker=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='execute')
           nodes=[n.value for n in ast.walk(worker) if isinstance(n,ast.Assign) and len(n.targets)==1 and isinstance(n.targets[0],ast.Name) and n.targets[0].id=='m' and isinstance(n.value,ast.Call) and isinstance(n.value.func,ast.Name) and n.value.func.id=='next']
           assert len(nodes)==1
           code=compile(ast.Expression(nodes[0]),str(baseline/'research_core_v4/laboratory/integrated.py'),'eval')
