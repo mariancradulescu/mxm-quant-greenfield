@@ -29,6 +29,12 @@ class ArtificialRoute:
         self.missing_job=None
         self.storage={}
     def json(self,path):
+        if path.startswith('contents/') and '?ref=' in path:
+            import base64
+            file_path,ref=path[len('contents/'):].split('?ref=',1)
+            value=self.storage[(file_path,ref)]
+            return {'encoding':'base64','size':len(value),
+                    'content':base64.b64encode(value).decode('ascii')}
         if path=='branches/'+CODE or path=='branches/'+BRANCH:
             return {'protected':True}
         if path=='git/ref/heads/'+BRANCH:
