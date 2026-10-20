@@ -136,7 +136,13 @@ def inspect_corpus(key, tmp):
     numeric_sides = 0
     symbols = set()
     times = []
+    from .data import verify_quote_reference
+    raw_started=time.perf_counter()
+    raw_totals={k:0 for k in ('raw_pages','decoded_tick_records','verified_selected_sides',
+        'empty_sides','unresolved_sides','partial_pages','nonpositive_tick_records')}
     for row in quotes:
+        raw_proof=verify_quote_reference(row)
+        for k in raw_totals:raw_totals[k]+=raw_proof[k]
         symbols.add(str(row['symbol_id']))
         times.append(row['boundary_ms'])
         sides += len(row['sides'])
@@ -150,6 +156,11 @@ def inspect_corpus(key, tmp):
         'stored_archive_bytes': size, 'archive_parts': len(manifest['parts']),
         'load_verify_decrypt_seconds': elapsed, 'raw_quote_receipts': len(quotes),
         'side_records': sides, 'numeric_price_timestamp_side_records': numeric_sides,
+        'raw_receipt_consistency':raw_totals,
+        'raw_decode_verify_seconds':time.perf_counter()-raw_started,
+        'historical_network_availability_verified':False,
+        'decoded_tick_records_are_unique_market_events':False,
+        'economic_engine_throughput_demonstrated':False,
         'count_semantics': 'SIDE_RECORDS_NOT_SYNCHRONOUS_QUOTE_PAIRS_OR_CONTINUOUS_COVERAGE',
         'distinct_symbols': len(symbols),
         'first_boundary_ms': min(times), 'last_boundary_ms': max(times),

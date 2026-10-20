@@ -106,6 +106,8 @@ def preserved_pepperstone_nonoutcome(lab,corpus,limit):
          'AUTHENTIC_NONOUTCOME_CIPHER_BINDING')
     ids=[];rows=0
     for q in corpus['raw_quote_receipts'][:limit]:
+        from .data import verify_quote_reference
+        verify_quote_reference(q)
         t=q['boundary_ms'];sid=str(q['symbol_id'])
         need(sid in corpus['catalog']['full'] and
              type(t) is int and 60000<=t<DEVELOPMENT_END_MS,

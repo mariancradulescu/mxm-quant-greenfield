@@ -16,9 +16,10 @@ class PreservedCorpusBindingTests(unittest.TestCase):
         return {'catalog':{'full':{'1':{'digits':5}}},
                 'raw_quote_receipts':[{'symbol_id':1,'boundary_ms':t,
                   'sides':{'bid':{'state':'AUTHENTIC_CAUSAL_QUOTE',
-                                   'timestamp_ms':t-1000,'price':1.01},
+                                   'timestamp_ms':t-1000,'price':1.01,'age_ms':1000,'source_has_more':False},
                            'ask':{'state':'AUTHENTIC_CAUSAL_QUOTE',
-                                   'timestamp_ms':t-1000,'price':1.02}}}]}
+                                   'timestamp_ms':t-1000,'price':1.02,'age_ms':1000,'source_has_more':False}},
+                  'pages':[{'side':s,'hasMore':False,'encoded':[{'timestamp':t-1000,'tick':p}]} for s,p in [('bid',101000),('ask',102000)]]}]}
     def test_zero_wire_nonoutcome_operator_preserves_quote_provenance(self):
         lab=self.setup_lab()
         view=lab.book.view();budget=lab.acquisition.remaining
@@ -47,5 +48,15 @@ class PreservedCorpusBindingTests(unittest.TestCase):
             bad=self.fixture();bad['raw_quote_receipts'][0]['sides']['bid']['price']=-1
             with self.assertRaises(Exception):preserved_pepperstone_nonoutcome(lab,bad,1)
             with self.assertRaises(Exception):preserved_pepperstone_nonoutcome(lab,self.fixture(),33)
+
+    def test_selected_quote_must_match_conserved_raw_page(self):
+        for mutation in ('price','missing_page','pagination'):
+            corpus=self.fixture();q=corpus['raw_quote_receipts'][0]
+            if mutation=='price':q['sides']['bid']['price']=1.011
+            elif mutation=='missing_page':q['pages'].pop(0)
+            else:q['pages'][0]['hasMore']=True
+            with self.subTest(mutation=mutation),patch('research_core_v4.laboratory.runtime.preserved_registry',
+                return_value={'cached_input':{'ciphertext_sha256':'a'*64}}),self.assertRaises(Exception):
+                preserved_pepperstone_nonoutcome(self.setup_lab(),corpus,1)
 
 if __name__=='__main__':unittest.main()
