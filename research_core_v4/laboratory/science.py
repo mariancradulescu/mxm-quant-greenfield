@@ -25,6 +25,7 @@ def expression(node,context):
 def causal_intents(spec,cache,assets):
     """Deterministic expression evaluated only against completed bars."""
     from datetime import datetime,timezone
+    from bisect import bisect_right
     if 'volume_pressure' in spec['parameters']:
         from .volume_pressure import volume_pressure_intents
         return volume_pressure_intents(spec,cache,assets)
@@ -36,21 +37,23 @@ def causal_intents(spec,cache,assets):
         need(m['invalid']==0 and m['conflicts']==0,'FEATURE_DATA_QUALITY')
         if not spec['provenance'].get('synthetic_reception'):need(m['source'].startswith(('PEPPERSTONE_','PRESERVED_AUTHENTIC_')),'UNAUTHENTIC_FEATURE_DATA')
         maps[name]=sorted(cache.rows[asset],key=lambda r:r['available_at'])
+    availability={name:[row['available_at'] for row in rows] for name,rows in maps.items()}
     intents=[];missing=[]
     for decision in rules['decision_times_ms']:
-        need(decision<1789603200000,'PROTECTED_DECISION');d=datetime.fromtimestamp(decision/1000,timezone.utc)
+        need(type(decision) is int and decision+rules['entry_delay_ms']+rules['hold_ms']<DEVELOPMENT_END_MS,
+             'PROTECTED_DECISION');d=datetime.fromtimestamp(decision/1000,timezone.utc)
         context={'utc_hour':d.hour,'utc_weekday':d.weekday()};latest=0
         for f in rules['features']:
             need(f['field'] in ('open','high','low','close','volume') and type(f['lag']) is int and f['lag']>=0,'FEATURE_LAG')
-            available=[r for r in maps[f['asset']] if r['available_at']<=decision]
-            idx=len(available)-1-f['lag'];context[f['name']]=available[idx][f['field']] if idx>=0 else None
+            rows=maps[f['asset']];stop=bisect_right(availability[f['asset']],decision)
+            idx=stop-1-f['lag'];context[f['name']]=rows[idx][f['field']] if idx>=0 else None
             if idx>=0:
-                latest=max(latest,available[idx]['available_at'])
+                latest=max(latest,rows[idx]['available_at'])
                 grid=300000 if cache.assets[assets[f['asset']]]['resolution']=='M5' else 3600000
                 # Exact clock lags: no compressed adjacency across missing bars.
                 max_staleness=rules.get('staleness_max_ms',grid)
                 need(type(max_staleness) is int and 0<=max_staleness<=grid,'FEATURE_STALENESS_POLICY')
-                if available[idx]['t']!=available[-1]['t']-f['lag']*grid or decision-available[-1]['available_at']>max_staleness:context[f['name']]=None
+                if rows[idx]['t']!=rows[stop-1]['t']-f['lag']*grid or decision-rows[stop-1]['available_at']>max_staleness:context[f['name']]=None
         value=expression(rules['direction_expression'],context)
         if value is None:missing.append({'decision_ms':decision,'reason':'FEATURE_SUPPORT_MISSING'});continue
         direction=1 if value>0 else -1 if value<0 else 0
@@ -87,6 +90,7 @@ def native_quote_screen(spec,generated,corpus,terms_authority,on_economic_open=N
              ('feature_available_ms','decision_ms','entry_ms','exit_ms')) and
              intent['feature_available_ms']<=intent['decision_ms']<intent['entry_ms']<intent['exit_ms'],
              'NATIVE_SCREEN_SIGNAL_CAUSALITY')
+        need(intent['exit_ms']<DEVELOPMENT_END_MS,'NATIVE_SCREEN_PROTECTED_OUTCOME')
         sid=int(intent['symbol_id']);r=identities.get(sid);f=corpus['catalog']['full'].get(str(sid))
         need(intent['entry_ms']%1000==0 and intent['exit_ms']%1000==0,'QUOTE_NATIVE_TIME_GRID')
         entry=intent['entry_ms']//1000;exit=intent['exit_ms']//1000
@@ -158,6 +162,7 @@ def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=Non
              ('feature_available_ms','decision_ms','entry_ms','exit_ms')) and
              intent['feature_available_ms']<=intent['decision_ms']<intent['entry_ms']<intent['exit_ms'],
              'NATIVE_REPLAY_SIGNAL_CAUSALITY')
+        need(intent['exit_ms']<DEVELOPMENT_END_MS,'NATIVE_REPLAY_PROTECTED_OUTCOME')
         token=digest(intent);terms=authority['by_intent'].get(token);sid=int(intent['symbol_id']);identity=identities.get(sid)
         if terms is None or identity is None:missing.append('DATED_BROKER_TERMS');continue
         required=('volume_cents','min_volume_cents','step_volume_cents','max_volume_cents','margin_eur','entry_cost_components_eur','exit_cost_components_eur','financing_cashflows','source_sha256','effective_start_ms','effective_end_ms')

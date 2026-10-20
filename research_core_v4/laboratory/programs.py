@@ -78,6 +78,7 @@ class Laboratory:
           'version':self.m['version'],'sequence':0,'results':{},'skipped':{},'pending':None,'steps_used':0,'safe_stop':False,'stop_reason':None,'journal':[]}
         self.check()
     def check(self):
+        self.acquisition.check()
         s=self.state;need(s['schema']=='mxm.laboratory-progress.v1' and s['manifest_sha256']==digest(self.m),'CHECKPOINT_MANIFEST_CHANGED')
         need(s['programme']==self.m['id'] and s['version']==self.m['version'],'CHECKPOINT_IDENTITY')
         need(set(s['results'])<=set(self.m['tasks']) and set(s['skipped'])<=set(self.m['tasks']),'CHECKPOINT_TASKS')
@@ -173,7 +174,6 @@ class Laboratory:
                 asset=self.cache.ingest(x['manifest'],x['rows']);a=self.cache.assets[asset]
                 value={'asset_id':asset,'quality':a};verdict='DATA_VALID' if not a['invalid'] and not a['conflicts'] and a['row_count'] and a['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
             elif op=='acquire':
-                need(self.acquisition.budget.get(x['kind'],0)<=self.m['budget']['broker_requests'],'NETWORK_BUDGET')
                 value=self.acquisition.request(x);verdict='DATA_VALID' if self.cache.assets[value['asset_id']]['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
             elif op=='native_corpus_readonly':
                 need(self.m['mode']=='TECHNICAL_NONOUTCOME' and
@@ -235,4 +235,5 @@ class Laboratory:
         else:
             selected=saved
         obj=cls(value['programme'],history,book,selected,collector,state=value['progress'])
-        obj.acquisition.budget=value['acquisition_budget'];obj.acquisition.remaining=value['acquisition_remaining'];obj.acquisition.receipts=value['native_receipts'];return obj
+        obj.acquisition.budget=deepcopy(value['acquisition_budget']);obj.acquisition.remaining=value['acquisition_remaining'];obj.acquisition.receipts=deepcopy(value['native_receipts'])
+        obj.check();return obj

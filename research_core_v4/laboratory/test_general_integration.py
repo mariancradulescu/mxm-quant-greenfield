@@ -3,7 +3,7 @@ import ast,sys,types,unittest
 from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
-from .common import digest,need,number
+from .common import digest,need,number,DEVELOPMENT_END_MS
 from .admission import TypedTrialBook,semantic_hash
 from .test_admission import fixture
 from .execution import bind_native,preserve_node
@@ -49,7 +49,7 @@ class GeneralIntegrationTests(unittest.TestCase):
             {'symbol_id':1,'boundary_ms':t,'sides':{s:{'timestamp_ms':t} for s in ('bid','ask')}} for t in (1000,2000)]}
         lazy=bind_native(lab,corpus);self.assertIsNone(lazy.instance)
         tree=ast.parse(Path(__file__).with_name('science.py').read_text());node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='native_quote_screen')
-        env={'need':need,'digest':digest,'number':number,'native':types.SimpleNamespace(graph=lambda x:{},point=lambda x:x,account=lambda *a:{'gross_eur':0},
+        env={'DEVELOPMENT_END_MS':DEVELOPMENT_END_MS,'need':need,'digest':digest,'number':number,'native':types.SimpleNamespace(graph=lambda x:{},point=lambda x:x,account=lambda *a:{'gross_eur':0},
             currencies=lambda *a:{'EUR'},route=lambda *a:[]), 'screen':lambda *a:{'status':'COST_UNRESOLVED'}}
         exec(compile(ast.Module(body=[node],type_ignores=[]),'<exact-production-screen-with-artificial-dependencies>','exec'),env)
         module=types.ModuleType('research_core_v4.laboratory.science');module.native_quote_screen=env['native_quote_screen']

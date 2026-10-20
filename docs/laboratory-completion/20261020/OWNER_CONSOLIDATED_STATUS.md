@@ -1,3 +1,15 @@
+# Resource, partition and semantic source repair — exclusive continuation
+
+PR36 merged through strict native CI into b23dba90e9728be63eba923977b26b2859ee3caf. CI39425533775/job118637016512 tests synthetic PR merge36acd712f15e5992ba570db4135f8e1644c03316, not the later exact candidate push; the log demonstrates13 assertion failures on immutable9cc7447 and205 repaired tests PASS. Full native PR log is preserved. No authoritative reference/checkpoint or worker changed.
+
+Follow-up source repairs: acquisition restore enforces total/kind reservation conservation and rejects inflated/negative/boolean counters; the one protected cutoff comes from original byte-sealed V2 budget/Wave01 authorities,1789646578000 (2026-09-17T12:02:58Z); data views and row availability enforce it. Original authority files and historical programme snapshots are unmodified. Generic feature availability uses binary search without changing lag/staleness rules. The earlier synthetic shared-cache test injected nonzero acquisition counters into a zero-authority technical manifest; it now keeps that manifest's zero cap, while a separate fake-collector test demonstrates valid nonzero conservation and no refund.
+
+Semantic fingerprint v3 is schema-whitelisted, numeric-canonical and metadata-independent. The exact v2 original specifications must all be verified before one additive transition derives the new index. Old indices, baseline, events and charges remain; incomplete, changed-source, repeated and post-reservation upgrades fail closed. Only a future eligible research preflight after both reception gates activates it. Technical migration retains exact checkpoint20 ledger bytes. Six synthetic transition/metamorphic methods verify cross-lane duplicate refusal and conservation; no historical identity is opened or refunded.
+
+Before:9 artificial methods on immutable9cc7447 produce15 assertion failures and0 errors. After:218 focused tests PASS locally. Native CI and authentic archived-programme restore with the stronger resource validator remain pending at this source checkpoint. Every operational/research reception flag remains false. No new market data, research outcome, broker request, order, worker dispatch or authoritative publication.
+
+---
+
 # Exclusive execution recovery — chronological source repairs, 20 October 2026
 
 OWNER withdrew the previous Work session and designated this session sole Director. Fresh GitHub reads preserve candidate9cc74472858ebcb3a80a3a7f12ad67f348304d13, execution022c6abbcfc31cf864fe0d663324c4e81d88e5ee, evidence09703adad6433f395a0506fa640f59bf3dba80b5, OWNER1807 and active authority. No active/queued/waiting run was observed. This observation alone is not exclusive authority: code publication uses an isolated expected-head CAS ref and protected PR/strict CI; authoritative evidence updates remain App-only and held. An unidentified head movement stops affected publication and requires reconciliation, never blind retry.

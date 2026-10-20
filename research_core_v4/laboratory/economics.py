@@ -31,7 +31,7 @@ def screen(spec,evidence):
         for r in records:
             entry=utc_ms(r['entry_ms']);exit=utc_ms(r['exit_ms']);decision=utc_ms(r['decision_ms'])
             need(entry>decision and exit>entry and r['feature_available_ms']<=decision,'FUTURE_INFORMATION')
-            need(exit<1789603200000 and r['partition']=='DEVELOPMENT','PROTECTED_OUTCOME')
+            need(exit<DEVELOPMENT_END_MS and r['partition']=='DEVELOPMENT','PROTECTED_OUTCOME')
             need(all(len(r[k])==64 for k in ('source_sha256','execution_evidence_sha256')),'EXECUTION_PROVENANCE')
             need(r['execution_basis'] in ('AUTHENTIC_EXECUTION','CAUSAL_QUOTE_SIMULATION','SYNTHETIC_RECEPTION'),'EXECUTION_BASIS')
             need(number(r['gross_eur']),'GROSS_UNKNOWN');gross.append(r['gross_eur'])
@@ -95,7 +95,7 @@ def replay(spec,evidence):
     events=[]
     for row in evidence['events']:
         row=dict(row);need(row['kind'] in ('ENTRY','EXIT','MARK','FINANCING'),'CASH_RESET')
-        need(row.get('causal_state') is True and utc_ms(row['timestamp_utc'])<1789603200000,'CAUSAL_REPLAY')
+        need(row.get('causal_state') is True and utc_ms(row['timestamp_utc'])<DEVELOPMENT_END_MS,'CAUSAL_REPLAY')
         meta=row.get('metadata',{});need(len(meta.get('source_sha256',''))==64,'REPLAY_PROVENANCE')
         need(meta.get('available_at_ms',utc_ms(row['timestamp_utc'])+1)<=utc_ms(row['timestamp_utc']),'REPLAY_AVAILABILITY')
         if row['kind'] in ('ENTRY','EXIT'):

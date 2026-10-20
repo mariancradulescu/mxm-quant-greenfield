@@ -1,6 +1,6 @@
 """New research extractor checks, separate from accepted laboratory reception."""
 import unittest
-from .data import DataCatalogue
+from .data import DataCatalogue,DEVELOPMENT_END_MS
 from .common import LabError
 from .volume_pressure import volume_pressure_intents
 
@@ -35,6 +35,6 @@ class VolumePressure(unittest.TestCase):
     def test_future_and_synthetic_assets_rejected(self):
         d,s,c=self.setup_case();c.assets['a']['trust']='SYNTHETIC'
         with self.assertRaises(LabError):volume_pressure_intents(s,c,{'A':'a'})
-        d,s,c=self.setup_case();s['parameters']['volume_pressure']['decision_times_ms']=[1789603200000]
+        d,s,c=self.setup_case();s['parameters']['volume_pressure']['decision_times_ms']=[DEVELOPMENT_END_MS]
         with self.assertRaises(LabError):volume_pressure_intents(s,c,{'A':'a'})
 if __name__=='__main__':unittest.main()
