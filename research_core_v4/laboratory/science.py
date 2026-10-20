@@ -75,12 +75,36 @@ def native_quote_screen(spec,generated,corpus,terms_authority,on_economic_open=N
     if known:
         need(terms_authority['prospectively_frozen'] is True and len(terms_authority['source_sha256'])==64,'COST_AUTHORITY_PROVENANCE')
         need(terms_authority['current_snapshot_is_historical'] is False,'RETROSPECTIVE_CURRENT_TERMS')
+    def observed_at(q,t):
+        need(isinstance(q,dict) and native.point(q) is not None,'NATIVE_SCREEN_QUOTE_SUPPORT')
+        for side in ('bid','ask'):
+            row=q.get('sides',{}).get(side,{})
+            stamp=row.get('timestamp_ms');available=row.get('available_at_ms',stamp)
+            need(type(stamp) is int and type(available) is int and stamp<=available<=t,
+                 'NATIVE_SCREEN_QUOTE_AVAILABILITY')
     for intent in generated['intents']:
+        need(all(type(intent.get(k)) is int for k in
+             ('feature_available_ms','decision_ms','entry_ms','exit_ms')) and
+             intent['feature_available_ms']<=intent['decision_ms']<intent['entry_ms']<intent['exit_ms'],
+             'NATIVE_SCREEN_SIGNAL_CAUSALITY')
         sid=int(intent['symbol_id']);r=identities.get(sid);f=corpus['catalog']['full'].get(str(sid))
         need(intent['entry_ms']%1000==0 and intent['exit_ms']%1000==0,'QUOTE_NATIVE_TIME_GRID')
         entry=intent['entry_ms']//1000;exit=intent['exit_ms']//1000
         if not r or not f or not native.point(quotes.get((sid,entry))) or not native.point(quotes.get((sid,exit))):
             missing.append({'intent_sha256':digest(intent),'reason':'ORIGINAL_ENTRY_OR_EXIT_QUOTE_MISSING'});continue
+        routes=[native.route(ccy,'EUR',graph) for ccy in native.currencies(r,f)]
+        if int(f.get('preciseTradingCommissionRate',0)) and int(f['commissionType'])==1:
+            routes.append(native.route(r['quote'],'USD',graph))
+        if any(path is None for path in routes):
+            missing.append({'intent_sha256':digest(intent),'reason':'CAUSAL_FX_PATH_MISSING'});continue
+        complete=True
+        for t in (intent['entry_ms'],intent['exit_ms']):
+            for quote_sid in {sid}|{s for path in routes for s,_ in path}:
+                q=quotes.get((quote_sid,t//1000))
+                if native.point(q) is None:complete=False;continue
+                observed_at(q,t)
+        if not complete:
+            missing.append({'intent_sha256':digest(intent),'reason':'CAUSAL_FX_QUOTE_MISSING'});continue
         a=native.account(intent['direction'],r,f,entry,exit,(exit-entry)/3600,quotes,graph,0,0)
         if a is None:missing.append({'intent_sha256':digest(intent),'reason':'CAUSAL_FX_OR_NATIVE_COMMISSION_UNRESOLVED'});continue
         if on_economic_open is not None:on_economic_open()
@@ -165,6 +189,7 @@ def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=Non
             if components is not None:
                 from .economics import COSTS
                 need(set(components)==set(COSTS) and all(number(x) for x in components.values()),'NATIVE_REPLAY_ALL_COSTS')
+                need(all(components[k]>=0 for k in COSTS),'NATIVE_REPLAY_NEGATIVE_COST')
                 need(components['spread']==components['funding']==0,'NATIVE_REPLAY_SPREAD_OR_FUNDING_DOUBLE_COUNT')
             row={'timestamp_utc':iso(t),'kind':kind,'candidate_id':candidate['id'],'symbol':identity.get('symbol',str(sid)),'position_id':position,'causal_state':True,
               'price':price,'quote_to_eur_rate':rate,'transaction_cost_eur':sum(components.values()) if components else 0,
@@ -176,8 +201,14 @@ def native_replay(candidate,generated,corpus,authority,spec,on_economic_open=Non
             events.append(row)
         for cashflow in terms['financing_cashflows']:
             need(intent['entry_ms']<cashflow['timestamp_ms']<intent['exit_ms'] and number(cashflow['amount_eur']) and len(cashflow['source_sha256'])==64,'DATED_FINANCING')
+            start=cashflow.get('accrual_start_ms');end=cashflow.get('accrual_end_ms')
+            available=cashflow.get('available_at_ms')
+            need(all(type(v) is int for v in (start,end,available)) and
+                 intent['entry_ms']<=start<end<=cashflow['timestamp_ms'] and
+                 available<=cashflow['timestamp_ms'],'DATED_FINANCING_ACCRUAL_AVAILABILITY')
             events.append({'timestamp_utc':iso(cashflow['timestamp_ms']),'kind':'FINANCING','candidate_id':candidate['id'],'symbol':identity.get('symbol',str(sid)),'position_id':position,'causal_state':True,
-              'financing_eur':cashflow['amount_eur'],'metadata':{'source_sha256':cashflow['source_sha256'],'available_at_ms':cashflow['timestamp_ms'],
+              'financing_eur':cashflow['amount_eur'],'metadata':{'source_sha256':cashflow['source_sha256'],'available_at_ms':available,
+                  'accrual_start_ms':start,'accrual_end_ms':end,
                   'quote_available_at_ms':cashflow['timestamp_ms'],'fx_available_at_ms':cashflow['timestamp_ms'],'signal_provenance':provenance}})
     if missing or not events:return {'classification':'DATA_INSUFFICIENT','result':None,'missing_dependencies':dict(__import__('collections').Counter(missing)),'missing_is_loss':False}
     evidence={'screen_status':'DISCOVERY_SURVIVOR','cost_state':authority['cost_state'],'full_mark_path':True,'dated_broker_terms':True,'events':events}

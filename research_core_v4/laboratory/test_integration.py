@@ -144,7 +144,8 @@ class IntegratedReception(unittest.TestCase):
           'raw_quote_receipts':[q(T+1000,100,101),q(T+31000,100.5,101.5),q(T+61000,102,103)]}
         costs={'spread':0.,'commission':.1,'slippage':0.,'funding':0.,'fx_conversion':0.}
         terms={'volume_cents':100,'min_volume_cents':100,'step_volume_cents':100,'max_volume_cents':10000,'margin_eur':20.,
-          'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64}],
+          'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64,
+              'available_at_ms':T+31000,'accrual_start_ms':T+1000,'accrual_end_ms':T+31000}],
           'source_sha256':'a'*64,'effective_start_ms':T,'effective_end_ms':T+100000}
         authority={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','prospectively_frozen':True,'source_sha256':'b'*64,
           'current_snapshot_is_historical':False,'by_intent':{digest(intent):terms},'mark_interval_ms':30000}

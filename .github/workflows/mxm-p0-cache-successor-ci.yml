@@ -18,6 +18,11 @@ jobs:
           ref: aa41ee31268bcf773f5f9299ac611d4bae7b88ff
           path: .selector-baseline
           persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 9cc74472858ebcb3a80a3a7f12ad67f348304d13
+          path: .chronology-baseline
+          persist-credentials: false
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Reproduce two selector defects on immutable pre-repair source
@@ -46,6 +51,22 @@ jobs:
           result=unittest.TextTestRunner(verbosity=2).run(suite)
           assert result.testsRun==2 and len(result.failures)==2 and not result.errors
           print('MXM_NATIVE_SELECTOR_BEFORE: two expected semantic failures on immutable baseline aa41ee31268bcf773f5f9299ac611d4bae7b88ff; expression SHA256='+hashlib.sha256(ast.dump(nodes[0]).encode()).hexdigest())
+          PY
+      - name: Reproduce chronological defects on immutable recovery source
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,subprocess,sys,unittest
+          root=pathlib.Path.cwd();baseline=root/'.chronology-baseline'
+          assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='9cc74472858ebcb3a80a3a7f12ad67f348304d13'
+          sys.path.insert(0,str(baseline))
+          from competition import continuous_account_replay_v2 as engine
+          assert pathlib.Path(engine.__file__).resolve().is_relative_to(baseline.resolve())
+          name='research_core_v4.laboratory.test_chronological_contracts'
+          spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_chronological_contracts.py')
+          module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))
+          assert result.testsRun==12 and len(result.failures)==13 and not result.errors
+          print('MXM_CHRONOLOGY_BEFORE: immutable9cc7447;12 methods;13 expected assertion failures;0 errors;artificial inputs only')
           PY
       - name: All laboratory modules and continuous account regressions
         run: |

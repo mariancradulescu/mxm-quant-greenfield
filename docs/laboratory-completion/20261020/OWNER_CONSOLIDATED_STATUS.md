@@ -1,3 +1,15 @@
+# Exclusive execution recovery — chronological source repairs, 20 October 2026
+
+OWNER withdrew the previous Work session and designated this session sole Director. Fresh GitHub reads preserve candidate9cc74472858ebcb3a80a3a7f12ad67f348304d13, execution022c6abbcfc31cf864fe0d663324c4e81d88e5ee, evidence09703adad6433f395a0506fa640f59bf3dba80b5, OWNER1807 and active authority. No active/queued/waiting run was observed. This observation alone is not exclusive authority: code publication uses an isolated expected-head CAS ref and protected PR/strict CI; authoritative evidence updates remain App-only and held. An unidentified head movement stops affected publication and requires reconciliation, never blind retry.
+
+Additional source defects are reproduced on the immutable recovery source: UTC aliases split atomic marks; exits release margin before same-instant risk; missing mark identity checks; fractional volume coercion; nonpositive exit price/FX; omitted stop-out guard; negative primitive cost offset inside positive totals; repeat financing accrual at a different timestamp; screen signal/quote availability checked only after gross exposure. The existing account and adapters are repaired. Exit observations also enter the portfolio risk snapshot before exit execution. Broker stop-out remains a conservative dependency guard, not fabricated liquidation/fill parity.
+
+Evidence:12 new artificial test methods give13 expected assertion failures and0 errors on immutable9cc7447. After repair all205 laboratory/account tests pass locally. CI is extended to reproduce those exact before failures from a separate immutable checkout, then run the complete repaired suite in a fresh process. Source/native proof is not operational or research-capability reception. No strategy identity, outcome, broker request, order, worker dispatch, checkpoint publication, key or custodian is introduced. Saved historical checkpoint/programme bytes and frozen scientific definitions are untouched; synthetic fixtures now carry explicit stop-out/accrual contracts.
+
+The full technical fault campaign, protected R3 runtime and scoped App publisher installation, durable successor/cold readback, chronological continuous coverage, execution costs/margin/fill/FX/stop-out fidelity, research-capacity reception and remaining register rows remain open. Both reception flags remain false.
+
+---
+
 # MXM R3 — consolidated implementation checkpoint, 20 October 2026
 
 ## Latest verified checkpoint — supersedes earlier status snapshots retained below
