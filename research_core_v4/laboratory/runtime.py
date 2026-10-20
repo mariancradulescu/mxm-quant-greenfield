@@ -14,7 +14,7 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-integrated-p0-r2'
+SOURCE_BRANCH='mxm-o04-successor-code-integrated-p0-r3'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
