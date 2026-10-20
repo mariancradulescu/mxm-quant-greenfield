@@ -18,7 +18,8 @@ class WriterDelivery(unittest.TestCase):
         original=yaml.safe_load((root/'docs/laboratory-completion/20261020/R3_EXISTING_OPERATIONAL_DAG_BASELINE.yml').read_bytes())
         workflow=custody.build_native_workflow(SOURCE,original)
         self.assertIn('workflow_dispatch',workflow['on'])
-        self.assertEqual(len(workflow['jobs']),10)
+        self.assertEqual(len(workflow['jobs']),11)
+        self.assertEqual(workflow['jobs']['preflight']['needs'],'source-controls')
         for name,job in workflow['jobs'].items():
             self.assertEqual(job['permissions']['contents'],'read')
             self.assertEqual(job['steps'][0]['with'],{'ref':SOURCE,'persist-credentials':False})
@@ -95,6 +96,7 @@ class WriterDelivery(unittest.TestCase):
              patch.object(custody.subprocess,'run',return_value=SimpleNamespace(returncode=0)), \
              patch('research_core_v4.p0_successor_a_20261017.issuer._app_token',side_effect=token), \
              patch('research_core_v4.laboratory.operational_acceptance.verify_effective_controls'), \
+             patch('research_core_v4.remediation_p0_p4_20261015.rest29_v3.GetOnly.json',return_value={'object':{'sha':TRIGGER}}), \
              patch('research_core_v4.laboratory.integrated.claim',side_effect=workload):
             if fail:
                 with self.assertRaisesRegex(RuntimeError,'ARTIFICIAL_FAILURE'):custody.run_native_writer('claim')
