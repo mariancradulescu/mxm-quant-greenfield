@@ -27,24 +27,37 @@ class SecretIsolationTest(unittest.TestCase):
             with self.assertRaises(LabError):
                 m.validate_environment(env, {'total_count': 1, 'branch_policies': [{'name': name, 'type': kind}]}, env['name'])
 
-    def test_credential_never_in_child_args_or_environment(self):
-        value = 'fixture-sensitive-value-1234'
-        with patch.object(m.subprocess, 'run') as run:
-            run.return_value.returncode = 0
+    def test_copy_http_body_contains_only_ciphertext(self):
+        value = 'fixture-sensitive-value-1234\n\r\n'
+        with patch.object(m, 'http') as http, patch.object(m, 'seal', return_value='fixture-cipher') as seal:
+            http.side_effect = [(200, {'key': 'fixture-public', 'key_id': 'fixture-key-id'}), (201, {})]
             m.set_copy('ephemeral-fixture-token', 'mxm-r3-custody-v1', 'R3_CUSTODY_PRIVATE_KEY_PEM', value)
-            args, kw = run.call_args
-            self.assertEqual(kw['input'], value.encode())
-            self.assertNotIn(value, repr(args))
-            self.assertNotIn(value, repr(kw['env']))
-            self.assertEqual(kw['stdout'], subprocess.DEVNULL)
-            self.assertEqual(kw['stderr'], subprocess.DEVNULL)
-            self.assertEqual(set(kw['env']), {'PATH', 'HOME', 'GH_CONFIG_DIR', 'GH_HOST', 'GH_TOKEN', 'GH_PROMPT_DISABLED'})
+            seal.assert_called_once_with(value, 'fixture-public')
+            args = http.call_args_list[-1].args
+            self.assertEqual(args[2], 'PUT')
+            self.assertEqual(args[3], {'encrypted_value': 'fixture-cipher', 'key_id': 'fixture-key-id'})
+            self.assertNotIn(value, repr(http.call_args_list))
         with self.assertRaises(LabError):
             m.set_copy('fixture', 'other', 'R3_CUSTODY_PRIVATE_KEY_PEM', value)
-        with patch.object(m.subprocess, 'run') as run:
-            run.return_value.returncode = 1
+        with patch.object(m, 'http', return_value=(403, {})):
             with self.assertRaises(LabError):
                 m.set_copy('fixture', 'mxm-r3-custody-v1', 'R3_CUSTODY_PRIVATE_KEY_PEM', value)
+
+    def test_real_system_sealed_box_preserves_exact_bytes(self):
+        import ctypes,base64
+        lib = m.sodium_library()
+        public, private = ctypes.create_string_buffer(32), ctypes.create_string_buffer(32)
+        self.assertEqual(lib.crypto_box_keypair(public, private), 0)
+        lib.crypto_box_seal_open.argtypes = [ctypes.c_void_p, ctypes.c_void_p,
+            ctypes.c_ulonglong, ctypes.c_void_p, ctypes.c_void_p]
+        for value in ('fixture-key-with-final-newline\n', 'fixture-CRLF\r\n\r\n', 'fixture-utf8-ș\n', 'fixture-NUL-\x00-x'):
+            cipher = base64.b64decode(m.seal(value, base64.b64encode(public.raw).decode()))
+            raw = value.encode()
+            plain = ctypes.create_string_buffer(len(raw))
+            self.assertEqual(lib.crypto_box_seal_open(plain, cipher, len(cipher), public, private), 0)
+            self.assertEqual(plain.raw, raw)
+        with self.assertRaises(LabError):
+            m.seal('fixture', base64.b64encode(b'short').decode())
 
     def test_missing_and_mismatched_values_fail(self):
         nonce = 'a' * 64
