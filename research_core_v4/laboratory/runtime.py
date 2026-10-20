@@ -148,7 +148,7 @@ def main():
             if m is None:break
             saved=private['programmes'].get(m['id'])
             if saved:
-                lab=Laboratory.restore(saved,history);lab.book=book
+                lab=Laboratory.restore(saved,history,shared_catalogue=private['shared_catalogue']);lab.book=book
             else:
                 # Runtime preflight binds all definitions before first outcome.
                 validate_manifest(m,history,book);lab=Laboratory(m,history,book,cache=DataCatalogue.restore(private['shared_catalogue']))
@@ -161,7 +161,8 @@ def main():
             if task is None:private['programmes'][m['id']]=lab.checkpoint();continue
             result=lab.execute(task);lab.next()
             if a['mode']=='DEVELOPMENT_RESEARCH':lazy.close()
-            private['programmes'][m['id']]=lab.checkpoint();private['shared_catalogue']=lab.cache.export();book=lab.book
+            from .execution import preserve_node
+            preserve_node(private,lab);book=lab.book
             executed.append({'programme':m['id'],'task':task,'classification':result['classification']})
         private['trial_book']=book.export();private['sequence']+=1;private['admission_sha256']=digest(a)
         private['admission_ref']=admission_ref;private['admission_path']=path;private['last_run_id']=int(os.environ['GITHUB_RUN_ID']);private['parent_oid']=parent
