@@ -12,7 +12,7 @@ from .admission import TypedTrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
-OPS={'quote_dependencies','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
+OPS={'quote_dependencies','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report','native_corpus_readonly'}
 AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
 
@@ -33,7 +33,7 @@ def validate_manifest(m,history,global_book):
     charged=[]
     for ident,t in tasks.items():
         need(ID.fullmatch(ident) and t['operator'] in OPS,'OPERATOR')
-        if m['mode']=='TECHNICAL_NONOUTCOME':need(t['operator'] in ('classify','report') and m['budget']['new_identities']==m['budget']['broker_requests']==t['trial_units']==0,'TECHNICAL_NONOUTCOME_SCOPE')
+        if m['mode']=='TECHNICAL_NONOUTCOME':need(t['operator'] in ('classify','report','native_corpus_readonly') and m['budget']['new_identities']==m['budget']['broker_requests']==t['trial_units']==0,'TECHNICAL_NONOUTCOME_SCOPE')
         if typed:need(t['operator'] not in ('screen','replay','robustness','catalogue'),'TYPED_OPERATOR_REQUIRES_EXACT_OUTCOME_HOOK')
         need(type(t['priority']) is int and type(t['trial_units']) is int and t['trial_units']>=0,'TASK_BUDGET')
         need(set(t['dependencies'])<=set(tasks) and ident not in t['dependencies'],'DEPENDENCY')
@@ -143,6 +143,12 @@ class Laboratory:
             elif op=='acquire':
                 need(self.acquisition.budget.get(x['kind'],0)<=self.m['budget']['broker_requests'],'NETWORK_BUDGET')
                 value=self.acquisition.request(x);verdict='DATA_VALID' if self.cache.assets[value['asset_id']]['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
+            elif op=='native_corpus_readonly':
+                need(self.m['mode']=='TECHNICAL_NONOUTCOME' and
+                     hasattr(self,'authentic_corpus'),'AUTHENTIC_NONOUTCOME_ONLY')
+                from .execution import preserved_pepperstone_nonoutcome
+                value=preserved_pepperstone_nonoutcome(self,self.authentic_corpus,x['max_quotes'])
+                verdict=value['classification']
             elif op=='quote_dependencies':
                 from .volume_pressure import quote_dependencies
                 value=quote_dependencies(self,x['generated'],x['policy'])
