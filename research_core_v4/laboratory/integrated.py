@@ -233,19 +233,71 @@ def native_dependency_jobs():
     return [{'name':k,'status':'completed','conclusion':v['result']} for k,v in graph.items()]
 
 def dispatch_once(route,oid,s,ref,path):
+    """Immediate handoff plus one bounded recovery of a genuinely uncertain ACK.
+
+    A second dispatch is allowed only after an atomic new evidence-parent marker.
+    The first, delayed dispatch then has a stale parent and cannot claim/fence.
+    """
+    from time import time
+    from .handoff_recovery import inspect_dispatch
     record_path='typed-successor/dispatches/'+str(s['sequence'])+'-'+s['ciphertext_sha256']+'.json'
+    retry_path=record_path[:-5]+'.retry1.json'
+    need(s['pending'] is None and s['safe_stop'] is False,'DISPATCH_NO_OPEN_ADMITTED_WORK')
+    need(current(route)==oid,'HANDOFF_PARENT_CHANGED')
     try:
-        record=strict_json(file_at(route,record_path,oid));need(record['ciphertext_sha256']==s['ciphertext_sha256'],'DISPATCH_RECORD_BINDING')
-        print(json.dumps({'state':'DISPATCH_ALREADY_ISSUED_NO_BLIND_RETRY','record_path':record_path}));return
+        record=strict_json(file_at(route,record_path,oid))
+        need(record['ciphertext_sha256']==s['ciphertext_sha256'] and
+             record['admission_ref']==ref and record['admission_path']==path and
+             record['source_sha']==os.environ['LAB_SOURCE_SHA'] and
+             record['sequence']==s['sequence'],'DISPATCH_RECORD_BINDING')
+        try:
+            strict_json(file_at(route,retry_path,oid))
+            print(json.dumps({'state':'BOUNDED_RETRY_ALREADY_RECORDED_NO_REISSUE',
+                              'record_path':retry_path}));return
+        except urllib.error.HTTPError as e:
+            if e.code!=404:raise
+        if record.get('schema')!='mxm.native-dispatch-intent.v3':
+            print(json.dumps({'state':'LEGACY_UNCERTAIN_ACK_HELD',
+                              'record_path':record_path}));return
+        # Do not mistake an ancestor's record for a dispatch made at HEAD.
+        commit=route.json('commits/'+oid)
+        need(any(f.get('filename')==record_path and f.get('status')=='added'
+                 for f in commit.get('files',[])),'DISPATCH_ORIGIN_NOT_HEAD_HOLD')
+        inventory=route.json('actions/runs?per_page=100')['workflow_runs']
+        decision=inspect_dispatch(record,oid,inventory,int(time()))
+        if decision!='REISSUE_AFTER_ATOMIC_STALE_PARENT_INVALIDATION':
+            print(json.dumps({'state':decision,'record_path':record_path}));return
+        retry={'schema':'mxm.native-dispatch-recovery.v1',
+               'original_issuer_run_id':record['issuer_run_id'],
+               'original_dispatch_oid':oid,'sequence':s['sequence'],
+               'ciphertext_sha256':s['ciphertext_sha256'],
+               'retry_number':1,'no_economic_exposure_before_claim':True,
+               'reason':'OLDER_PARENT_NOW_INVALIDATED_BY_CAS'}
+        dispatch_oid=atomic_publish(route,oid,{retry_path:encoded(retry)},
+                       'One bounded handoff retry marker; invalidate original dispatch parent')
+        state='BOUNDED_NATIVE_REISSUE'
     except urllib.error.HTTPError as e:
         if e.code!=404:raise
-    need(current(route)==oid,'HANDOFF_PARENT_CHANGED')
-    record={'schema':'mxm.native-dispatch-intent.v2','parent_checkpoint_oid':oid,'ciphertext_sha256':s['ciphertext_sha256'],'sequence':s['sequence'],'source_sha':os.environ['LAB_SOURCE_SHA'],'admission_ref':ref,'admission_path':path,'issuer_run_id':int(os.environ['GITHUB_RUN_ID']),'automatic_post_retry':False}
-    dispatch_oid=atomic_publish(route,oid,{record_path:encoded(record)},'Record one native continuation issuance before workflow_dispatch; uncertain ACK cannot create duplicate issuance')
-    body={'ref':'mxm-remediation-p0-p4-20261015-v1','inputs':{'parent_oid':dispatch_oid,'admission_ref':ref,'admission_path':path,'fault_before_fence':'0'}}
-    req=urllib.request.Request('https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-integrated-p0.yml/dispatches',data=encoded(body),method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
-    with urllib.request.urlopen(req,timeout=30) as response:need(response.status==204,'HANDOFF_ACK_UNRESOLVED_NO_BLIND_RETRY')
-    print(json.dumps({'state':'INTEGRATED_NATIVE_CONTINUATION_DISPATCHED','parent_oid':dispatch_oid,'bootstrap':False,'dispatch_record':record_path}))
+        record={'schema':'mxm.native-dispatch-intent.v3','parent_checkpoint_oid':oid,
+                'ciphertext_sha256':s['ciphertext_sha256'],'sequence':s['sequence'],
+                'source_sha':os.environ['LAB_SOURCE_SHA'],'admission_ref':ref,
+                'admission_path':path,'issuer_run_id':int(os.environ['GITHUB_RUN_ID']),
+                'issued_at_unix':int(time()),'retry_budget':1,'automatic_post_retry':True}
+        dispatch_oid=atomic_publish(route,oid,{record_path:encoded(record)},
+                       'Durably record native handoff before workflow_dispatch; bounded missing-ACK recovery')
+        state='IMMEDIATE_NATIVE_HANDOFF'
+    body={'ref':'mxm-remediation-p0-p4-20261015-v1',
+          'inputs':{'parent_oid':dispatch_oid,'admission_ref':ref,
+                    'admission_path':path,'fault_before_fence':'0'}}
+    req=urllib.request.Request(
+        'https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-integrated-p0.yml/dispatches',
+        data=encoded(body),method='POST',
+        headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                 'Accept':'application/vnd.github+json','Content-Type':'application/json'})
+    with urllib.request.urlopen(req,timeout=30) as response:
+        need(response.status==204,'HANDOFF_ACK_UNRESOLVED_NO_BLIND_RETRY')
+    print(json.dumps({'state':state,'parent_oid':dispatch_oid,
+                      'bootstrap':False,'record_path':retry_path if state=='BOUNDED_NATIVE_REISSUE' else record_path}))
 
 def observer():
     need(os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield' and os.environ['GITHUB_REF_NAME']=='main' and os.environ['GITHUB_JOB']=='ordinary-recovery' and os.environ['GITHUB_RUN_ATTEMPT']=='1','OBSERVER_WORKLOAD')
