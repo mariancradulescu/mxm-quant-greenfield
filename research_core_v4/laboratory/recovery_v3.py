@@ -19,8 +19,8 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
 
 REPO='mariancradulescu/mxm-quant-greenfield'
-ENGINE='e9f3582eeff11697bf14e0ad26506f5d4347b46f'
-ENGINE_MODULE='bdeba1950e99da223cf7b594120fb57c7e703257378851b685b1e13c16283441'
+ENGINE='c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c'
+ENGINE_MODULE='31c03636f6c37717ba597170b5a914dc351dab6dd99ec114569639a3b3141507'
 PATH='.github/workflows/mxm-integrated-p0-recovery.yml'
 
 def build_workflow(source):
