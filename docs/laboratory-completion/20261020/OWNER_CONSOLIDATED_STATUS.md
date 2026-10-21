@@ -1,3 +1,31 @@
+# Current closed checkpoint26; r6 prepared, not installed — 2026-10-21
+
+Installed/frozen runtime remains9bad0e4832a2db433ca35a721775087e89a2c5cc at mxm-r3-integrated-source-20261021-r5, exact active no-bypass seal25524693. Main467d17c817710b9135d849b92cb8d3495a3789a7 and execution21f4187b7c2f8636757d22e3e6144b7b0c279de2 are unchanged. Existing administrative witness still binds r5; all prior seals, OWNER/R2 authorities and original evidence are preserved. No key/access reconfirmation or permission change is requested.
+
+Native39550161782 actually publishes checkpoint26 at55eb4d20354c15b494f5d40fcb022ac5c078cf87; independent cold119058762086 restores15 programmes, complete original A-B-A and one authentic Pepperstone nonoutcome result. Cipher820d50c4e8e9c3aa8902ffff3b1cdbe36479c249ee06e2c6b1e1e8511b56c4cd; privateb669aedc9053448819191be84932ea26a0c58051eeb246f89528106b994139f7; exact public digestf173ba6d68fd9676ed468d83b658c1af588275278b99ff781dec1ffd322bc57e. Current evidencef31da69bb5b68b60c438bd8e814353ca5cefe6af retains26 with pending=null/safe_stop=true. V2 remains84/22=21charged+1hold, observations29/refunds0. Two technical registration events bring new_events13; no economic identity/outcome/broker request/order.
+
+Native negative119059023712 confirms injected ACK reconciliation7e5d23e7 and actual winnerf31da69 through authenticated Git, first read/no second push. Loser raises CASRefused:LAB_NATIVE_CAS_STALE_REFUSED, then TemporaryDirectory cleanup raises OSError39 for pack and masks the original before its reply/result is retained. The loser full reply/candidate is therefore not retroactively claimed. Attestation and independent certificate are skipped. The failure, actual archive and cold logs are retained in full. Observer39550832004/job119059404761 sees terminal26, makes0dispatches and revokes existing token; this does not certify the failed negative.
+
+PR79 repairs disposable Git maintenance and preserves the primary exception during cleanup; an independent cleanup failure after normal completion still fails. Native source39551326302/job119060954290 passes279 tests, including actual Git configuration and exact artificial masking reproduction. Prepared engine17d8a922e5cab68152eba44889f277e1aa1c8617/module3436bba87d359d9bde02a374076ae913f313e317962032ef9ef03f57daad8d7a includes the exact closed26 grant in source-bound metadata, preserving all prior completed work.
+
+Existing observer binding80 and finite Pepperstone access helper83 are merged into the candidate only. Control-source74354d1ce74f080f1aac441cfe7a6efd56c1a921 keeps the same exact r6 core. Helper native39551712373/job119062175351 passes284 tests. It reuses existing isolated Pepperstone credentials, existing TLS/authentication, at most three exact VIEW authentication messages, expected fingerprint and live-account checks; arbitrary history/order requests are denied, and transport closes on failure. No credential refresh/update, App/custody key or evidence publisher is provided. These are artificial checks; actual broker authentication has not run and access/research reception is not claimed.
+
+Draft81 main17c3cee202d5672f91e7e456c4cd29ca2da4e922 and82 execution2080421ff410f43d97a66073eb1f991655636f26 contain exact generated existing DAG/certifier/observer, isolated access check and byte guard. Native39551784601/job119062403182 and39551793053/job119062429147 each verify exact generators and284 regressions. BOTH REMAIN UNMERGED: actual r6 freeze and administrative witness update are mandatory before installation.
+
+The local executor disconnected during patch application; the administrative browser then returned409 environment_offline:Environment is not connected. GitHub connector remains usable, so source repair, native validation, preparation and evidence archival continue there. No r6 ruleset was applied, no witness update/installation/dispatch/broker authentication was performed. The proposed ruleset JSON is preserved as unapplied configuration, never evidence of a freeze. This is a platform availability blockade, not a personal OWNER confirmation. No OWNER intervention is requested.
+
+Next legitimate continuation: recover platform availability; apply and read back the exact r6 no-bypass source seal, then bind the public witness to the actual returned id/revision; verify draft heads and merge installation; same-source finite pre-fence and normal26 continuation without task replay; actual isolated Pepperstone VIEW access check. Preserve every native failure and stop on changed refs or uncertain exposure.
+
+Temporary issuer all-ref exposure and bounded-review limitations remain unchanged: real temporary empty-list semantics, exact timestamps unavailable, no issuer-key use evidenced within the four inventoried17–19UTC runs, neither compromise nor its absence proven. Current issuer remains exact main/execution,0tags/admin bypass=false; key unchanged/unread.
+
+Operational acceptance=false; research capability=false. Full negatives/attest/certifier, REC-02 post-fence resolution, REC-03/DAT-04 sustained authentic chronological capacity, economic fidelity/statistics and126 historical native failures/errors remain open. No new economic research, LIVE order or cBot.
+
+![Installed r5 exact active source seal without bypass](R3_SOURCE_R5_SEAL25524693.jpg)
+
+Earlier sections below are dated history; this section defines current state.
+
+---
+
 # Current authenticated-Git confirmation reception — 2026-10-21
 
 Current immutable source 9bad0e4832a2db433ca35a721775087e89a2c5cc at mxm-r3-integrated-source-20261021-r5, active exact no-bypass seal25524693. Original source seals and OWNER/R2/evidence fences remain intact. Source PR74 native CI39549178812/job119054188771 passes277 laboratory/account regressions. Existing observer binding PR75 is control-sourcec4ac0c0abd6feef7a5baf40df047a9822016b55d. Protected PR76/77 installed main467d17c817710b9135d849b92cb8d3495a3789a7 / execution21f4187b7c2f8636757d22e3e6144b7b0c279de2 after exact generator/core/static and277 regressions. No new key, App scope or laboratory.
