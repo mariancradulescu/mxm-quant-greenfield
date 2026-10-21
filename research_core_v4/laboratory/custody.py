@@ -219,7 +219,12 @@ def run_native_writer(operation):
                     need(path.startswith(('rulesets/','rules/branches/')),'APP_CONTROL_READ_NAMESPACE')
                     request=urllib.request.Request('https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/'+path,
                         headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'})
-                    with self.open(request) as response:value=response.read(limit+1)
+                    try:
+                        with self.open(request) as response:value=response.read(limit+1)
+                    except urllib.error.HTTPError as error:
+                        print('MXM_APP_CONTROL_READ_FAILURE '+json.dumps(
+                            {'path':path,'http_status':error.code},sort_keys=True),flush=True)
+                        raise
                     need(len(value)<=limit,'APP_CONTROL_READ_SIZE');return value
             controls=AppControls()
             def guard():
@@ -372,4 +377,7 @@ def restore_ciphertext(manifest,fetch):
 if __name__=='__main__':
     import sys
     need(len(sys.argv)==2 and sys.argv[1] in WRITER_JOBS,'APP_WRITER_OPERATION')
-    run_native_writer(sys.argv[1])
+    # -m creates a separate __main__ module. Publishers and guards import the
+    # canonical package module, so the ephemeral scope must live there too.
+    from research_core_v4.laboratory.custody import run_native_writer as canonical_writer
+    canonical_writer(sys.argv[1])
