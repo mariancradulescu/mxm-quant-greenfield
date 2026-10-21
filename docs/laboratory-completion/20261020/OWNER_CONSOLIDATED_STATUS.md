@@ -1,3 +1,25 @@
+# Current R6 native technical reception; integral laboratory gates remain open — 2026-10-21
+
+Exact R6 source17d8a922e5cab68152eba44889f277e1aa1c8617 is now frozen by active no-bypass rule25533261. Existing issuer administrative witness was updated/read back to its exact revision; evidence App ACL25461373 and existing keys/scopes remain unchanged. Issuer is still exact main+execution, zero tags, administrator bypass=false. Protected PR81/82 installed main30eb20ccbbf89debb43c2b4d4b02c93958ef6594 and execution7249d8adef8c7d1896620693f4636fcf246c585e. Original R3/R4/R5 seals and historic evidence are retained.
+
+Native pre-fence39573031586 validates and decrypts checkpoint26, deliberately fails claim4b66e537 before fence; fence/worker are skipped. Recovery119132473800 commitscd950bcf and restores exact cipher26/pending=null/safe_stop=true/accounting. This run remains FAILURE by design; its original full logs are preserved. No trial/outcome/order/refund.
+
+Normal finite39573864554 executes only one new technical report, never repeats completed programmes, and publishes checkpoint27 atcaac0dcf. Cipher541bc097db625a70bce7a0af94e565a88e3c31ee4f8b1cacd486bbdb69d481ba; private9f5db6f9eb448018e96336fe2230155bee5f8b2ac10b171556fa029c9a198804. Independent cold119136609129 restores16 programmes, complete original A-B-A and one authentic preserved Pepperstone nonoutcome result. V2 stays21charged+1hold,29observations,0refunds; two technical registration events bring new_events15. Cipher bytes8651584/34parts were independently reassembled and every part/hash checked locally.
+
+Actual negative119137114028 reconciles lost ACKf3587dbc without a second push; A wins2a0da680; Bf5073cad is rejected with complete exact Git ref/current/expected reply. Cleanup no longer masks CASRefused. Original public/checkpoint bytes stay unchanged. Attest119137722954 publishes proofsd163214f; post-run independent native certifier39574967893/job119138111709 verifies the terminal real run, native logs, proofs and controls and publishes certificate1d311e96fb7e7674d7d65e69a5c0631d4ede0e90. Status END_TO_END_OPERATIONAL_ACCEPTED is the existing technical verifier's scoped verdict; it does NOT close the integral laboratory/research gates. Observer39574967905/job119138646053 subsequently sees complete programme, dispatches0, revokes token.
+
+Separate real Pepperstone access39572611692/job119130266019 authenticates explicit VIEW, exact known fingerprint and live account with exactly three authentication requests; history0/orders0/outcomes0. Artifact12332024524 archive SHA256600887804ec8b3edad2cdc71810f8490f9f221e04535cb2e37294de0286d4c0f was downloaded and checked; raw native log, receipt and archive are retained. This is authentic access reception, never chronological/economic reception.
+
+The previous409 environment_offline blockade is resolved in this new continuation. GitHub's native identity confirmation was required and completed; it was not renewed App authorization. Initial local full-suite attempt failed to import11 modules because protobuf was not installed; after installing the existing hash-pinned dependencies all284 laboratory/account tests pass. This does not replace any native acceptance. Historic2304 suite's61 failures/65errors/14skips remain retained and unresolved; no frozen bindings were rewritten or failures hidden.
+
+Integral operational acceptance=false; research capability=false. REC-02 post-fence exposure resolution, REC-03/DAT-04 sustained authentic chronological capacity, dated economic fidelity/statistics and historic residuals remain open. No new economic research, LIVE order or cBot is authorized by the technical certificate. The real temporary all-ref environment exposure and bounded incident-review limits remain unchanged; neither compromise nor its absence is inferred.
+
+![Exact active R6 source seal without bypass](R3_SOURCE_R6_SEAL25533261.jpg)
+
+Earlier sections below are dated history; this section defines current state.
+
+---
+
 # Current closed checkpoint26; r6 prepared, not installed — 2026-10-21
 
 Installed/frozen runtime remains9bad0e4832a2db433ca35a721775087e89a2c5cc at mxm-r3-integrated-source-20261021-r5, exact active no-bypass seal25524693. Main467d17c817710b9135d849b92cb8d3495a3789a7 and execution21f4187b7c2f8636757d22e3e6144b7b0c279de2 are unchanged. Existing administrative witness still binds r5; all prior seals, OWNER/R2 authorities and original evidence are preserved. No key/access reconfirmation or permission change is requested.
