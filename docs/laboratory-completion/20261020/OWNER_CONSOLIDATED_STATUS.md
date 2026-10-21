@@ -1,3 +1,33 @@
+# Current canonical CLI reception — 2026-10-21
+
+Current sealed source e9f3582eeff11697bf14e0ad26506f5d4347b46f at mxm-r3-integrated-source-20261021-r2; active exact no-bypass seal25522311. PR56 fixes the real -m/canonical writer scope split, demonstrated by a keyless subprocess failure before/pass after. Native source CI passes249 tests. Protected installations PR57 execution2a5dc1c0681efedc70046c1488e9b07d27ab593e / PR58 main f0f6b351b3f92870bfe239d56a24e707d65bfecd passed exact generated-contract CIs. Existing administrative environment witness is source/revision-bound to this exact seal; no App permissions or key changed. Earlier source snapshots/seals remain immutable.
+
+Native controlled fault39541188077: source-controls119029063115 SUCCESS with actual App policy verification; preflight119029182872 SUCCESS on authentic checkpoint20; segment-intent119029411034 fails with exact intentional LAB_INJECTED_CRASH_AFTER_CLAIM_BEFORE_FENCE; execution-fence/investigation/archive skipped; recover-before-exposure119029561693 SUCCESS; automatic handoff intentionally skipped. Actual remote evidence776963f99c580e76360ab9750c792e3e553491ae has sequence20, pending=null, original ciphertext unchanged, exact original V2 accounting22 encumbered=21charged+1hold,29observations,refunds0. Remote recovery receipt preserves old intent and binds no exposure to the native skipped worker. This proves controlled pre-fence recovery, not E2E.
+
+Normal finite admission b02c2ac8524b79d48096ed521702616c22b40f25 at research_programs/admissions/R3_NATIVE_TECHNICAL_RECEPTION_20261021_NORMAL.json prospectively binds native_pre_fence_run_id39541188077, same source/workflow, two programmes/three steps with A-B-A priority and authentic preserved Pepperstone corpus. First normal continuation has been dispatched from exact776963f9 with fault0; it remains unreceived until actual worker/archive/cold/negative/certifier evidence is independently verified. No broker request, economic outcome or order is admitted.
+
+The prior witnessed-source run39540319354 failed with HTTP404 before preflight. Independent fixed-path diagnostic39540701841/job119027536388 subsequently reads all exact policies/effective rule IDs with HTTP200 and revokes the token. The earlier404 remains an observed transient of undetermined cause; no source check was bypassed or worker blindly retried.
+
+Operational acceptance=false; research capability acceptance=false. This section supersedes earlier 'current source' statements below, retained as dated history.
+
+---
+
+# Current verified continuation — 2026-10-21
+
+R3 operational source is now d94c537cb0f393582f51d4b73355532f76727217 at mxm-r3-integrated-source-20261021, exact active immutable seal25522027 with no bypass. Previous source36668adf remains sealed25521657. This section supersedes earlier pending source/access statements below; the earlier entries are retained as history.
+
+Native first reception39539339189/job119023254239 failed LAB_V3_EFFECTIVE_SOURCE_OR_WRITER_AUTHORITY before preflight, claim or worker. Independent diagnostic39539611277/job119024095404 proves HTTP200 but missing bypass_actors for both exact source/evidence policies under the actual Contents-write App. Its token was revoked; writes/orders/outcomes0. Never infer omitted actors=[] or count this diagnostic as reception.
+
+PR51 implements a fail-closed existing-environment control witness: full owner-visible policies, exact source/ref, all live security fields and timezone-normalized exact policy revisions checked on every App control read. Missing, stale, broadened, conflicting or altered metadata rejects. No App permissions, key, custodian or security bypass added. Existing issuer variable R3_CONTROL_WITNESS was saved and UI-verified; old BC delegation retained. Native CI39539907722/job119025034314 passes248 laboratory/account tests. Full before/native diagnostic evidence is retained.
+
+Protected installation PR52 execution8ab44c12d02cad9cbc2c9a980175086a04b3d90c and PR53 main e90389457111788fb0270707e9671104a846efed pass required exact-generation/static guard CIs. The finite new technical admission854a8243205a973d5f0e037507f401207215b098 has two programmes/three tasks, zero broker requests/identities/outcomes/orders, preserved authentic Pepperstone reads, prospective A-B-A priority order and one controlled pre-fence fault. Its first native dispatch is under observation; no success is presumed.
+
+The incident review retains the true temporary all-ref exposure and its timing/evidence limits. Bounded native run inventory17:00–19:00UTC20October contains4 workflows; none references an environment or secret. This supports no evidenced issuer-key use within the examined inventory, not an exhaustive credential-access audit and not proof of compromise or its absence. Exact issuer targets remain main+execution,0tags,admin bypass false. No key value read/changed.
+
+Operational acceptance=false; research capability acceptance=false; no new economic research, broker request, order or cBot work. The remaining canonical register is intentionally open.
+
+---
+
 # Existing issuer access transition applied after OWNER confirmation
 
 The exact confirmed deployment-policy change is saved and independently reloaded in GitHub UI: environment24553648726 now permits only main and mxm-remediation-p0-p4-20261015-v1, zero tags; Cv3 access removed. Existing SUCCESSOR_APP_PRIVATE_KEY remains dated18October; no key value was read and no key/App permission was changed by this action. Administrator bypass remains off. Heads main1d95fa5/exec35476d4/candidate40e4d98/evidence09703ad were unchanged at reconciliation.
