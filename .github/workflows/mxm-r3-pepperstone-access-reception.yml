@@ -1,0 +1,54 @@
+{
+  "name": "MXM R3 Pepperstone access reception",
+  "on": {
+    "workflow_dispatch": {}
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "pepperstone-access": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 5,
+      "environment": "mxm-r3-pepperstone-v1",
+      "permissions": {
+        "contents": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "74354d1ce74f080f1aac441cfe7a6efd56c1a921",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "name": "Existing isolated Pepperstone VIEW authentication only",
+          "run": "python3 -m research_core_v4.laboratory.broker_access_reception",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_BROKER_ACCESS_SOURCE": "74354d1ce74f080f1aac441cfe7a6efd56c1a921",
+            "R3_CTRADER_CLIENT_ID": "${{ secrets.R3_CTRADER_CLIENT_ID }}",
+            "R3_CTRADER_CLIENT_SECRET": "${{ secrets.R3_CTRADER_CLIENT_SECRET }}",
+            "R3_CTRADER_ACCESS_TOKEN": "${{ secrets.R3_CTRADER_ACCESS_TOKEN }}"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "r3-pepperstone-access-${{ github.run_id }}",
+            "path": "verification/r3-pepperstone-access/report.json",
+            "if-no-files-found": "error"
+          }
+        }
+      ]
+    }
+  }
+}
