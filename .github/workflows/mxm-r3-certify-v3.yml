@@ -16,7 +16,7 @@
     "cancel-in-progress": false
   },
   "env": {
-    "LAB_SOURCE_SHA": "36668adfdb6d0cf433965ad573376434063652d6",
+    "LAB_SOURCE_SHA": "d94c537cb0f393582f51d4b73355532f76727217",
     "LAB_INTEGRATED_PROTOCOL": "v2"
   },
   "jobs": {
@@ -33,7 +33,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -44,7 +44,8 @@
           "run": "python3 -m research_core_v4.laboratory.custody certify-v3",
           "env": {
             "GH_TOKEN": "${{ github.token }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ]
