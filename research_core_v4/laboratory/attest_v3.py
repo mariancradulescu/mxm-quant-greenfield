@@ -204,6 +204,12 @@ def validate_negative_artifact(route,proof,run_id,source,state):
          loser.get('reason')=='NATIVE_GIT_EXPECTED_REF_REFUSED' and
          all(x.get('expected_oid')==base for x in writers),
          'V3_NATIVE_CAS_IDENTITIES')
+    from .custody import native_cas_rejection
+    from types import SimpleNamespace
+    reply=loser.get('native_reply')
+    need(type(reply) is str and len(reply)<=1024 and
+         native_cas_rejection(SimpleNamespace(stdout=reply.encode()),EVIDENCE_BRANCH,base,final),
+         'V3_NATIVE_CAS_REPLY_UNBOUND')
     commit=route.json('git/commits/'+final)
     need(commit.get('sha')==final and
          [p['sha'] for p in commit.get('parents',[])]==[base],

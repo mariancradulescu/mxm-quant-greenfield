@@ -311,11 +311,11 @@ def verify_native_source_control(route,observed):
 
 class CASRefused(LabError):
     """A native git push explicitly rejected its stale expected ref."""
-    def __init__(self,parent,candidate,observed):
+    def __init__(self,parent,candidate,observed,reply):
         super().__init__('LAB_NATIVE_CAS_STALE_REFUSED')
-        self.parent=parent;self.candidate=candidate;self.observed=observed
+        self.parent=parent;self.candidate=candidate;self.observed=observed;self.reply=reply
 
-def native_cas_rejection(result,branch):
+def native_cas_rejection(result,branch,parent=None,observed=None):
     """Recognize only Git's explicit old-value rejection, never a failed push.
 
     Git 2.55 can lose the receive-pack race after advertisement succeeds. Its
@@ -325,9 +325,17 @@ def native_cas_rejection(result,branch):
     prefix=b'!\tHEAD:refs/heads/'+branch.encode()+b'\t'
     lines=[line for line in result.stdout.splitlines() if line.startswith(prefix)]
     if len(lines)!=1:return False
-    return lines[0][len(prefix):] in (
+    status=lines[0][len(prefix):]
+    if status in (
         b'[rejected] (stale info)',
-        b'[remote rejected] (incorrect old value provided)')
+        b'[remote rejected] (incorrect old value provided)'):return True
+    # Native GitHub receive-pack reports the exact ref and both object IDs.
+    # Every byte is required; generic lock/network/ruleset failures are not CAS.
+    import re
+    if not all(type(x) is str and re.fullmatch('[a-f0-9]{40}',x) for x in (parent,observed)) or parent==observed:
+        return False
+    return status==("[remote rejected] (cannot lock ref 'refs/heads/"+branch+
+        "': is at "+observed+" but expected "+parent+")").encode()
 
 def atomic_publish(route,parent,files,message):
     from .runtime import EVIDENCE_BRANCH,read_state
@@ -354,8 +362,10 @@ def atomic_publish(route,parent,files,message):
             if result.returncode:
                 observed=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']
                 # Network/auth/permission errors are NOT evidence of CAS exclusion.
-                if native_cas_rejection(result,EVIDENCE_BRANCH) and observed not in (parent,commit) and [p.get('sha') for p in route.json('git/commits/'+observed).get('parents',[])]==[parent]:
-                    raise CASRefused(parent,commit,observed)
+                if native_cas_rejection(result,EVIDENCE_BRANCH,parent,observed) and observed not in (parent,commit) and [p.get('sha') for p in route.json('git/commits/'+observed).get('parents',[])]==[parent]:
+                    prefix=b'!\tHEAD:refs/heads/'+EVIDENCE_BRANCH.encode()+b'\t'
+                    reply=next(line.decode('ascii') for line in result.stdout.splitlines() if line.startswith(prefix))
+                    raise CASRefused(parent,commit,observed,reply)
                 print('MXM_ATOMIC_PUSH_UNCLASSIFIED '+json.dumps({'expected_oid':parent,'candidate_oid':commit,'observed_oid':observed,'returncode':result.returncode}),flush=True)
                 need(False,'ATOMIC_GIT_PUSH')
             if os.environ.get('LAB_FAULT_ACK')=='AFTER_PUSH':raise ValueError('INJECTED_ACK_LOSS')

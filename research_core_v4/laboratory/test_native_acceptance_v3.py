@@ -6,7 +6,7 @@ NEVER means that an actual native v3 job or encrypted market archive ran.
 import unittest
 from copy import deepcopy
 from unittest.mock import patch
-from .common import digest,encoded
+from .common import digest,encoded,LabError
 from .protocol import ORIGINAL_PUBLIC
 from .attest_v3 import (proof_paths,build_issuer,validate_cold_artifact,
                         validate_negative_artifact)
@@ -131,7 +131,8 @@ def make_fixture():
          'ack_sha256':None,
          'concurrent_writers':[{'writer':'A','accepted':True,'oid':'7'*40,'expected_oid':'6'*40},
                                {'writer':'B','accepted':False,'expected_oid':'6'*40,
-                                'candidate_oid':'8'*40,'observed_oid':'7'*40,'reason':'NATIVE_GIT_EXPECTED_REF_REFUSED'}],
+                                'candidate_oid':'8'*40,'observed_oid':'7'*40,'reason':'NATIVE_GIT_EXPECTED_REF_REFUSED',
+                                'native_reply':"!\tHEAD:refs/heads/"+BRANCH+"\t[remote rejected] (cannot lock ref 'refs/heads/"+BRANCH+"': is at "+'7'*40+" but expected "+'6'*40+")"}],
          'cas_base_oid':'6'*40,'cas_final_oid':'7'*40,
          'pre_fence_native_run_id':HISTORIC,
          'pre_fence_recovery_path':'typed-successor/recoveries/'
@@ -192,6 +193,14 @@ class IndependentNativeV3ContractTests(unittest.TestCase):
     def test_fully_linked_artificial_protocol_fixture(self):
         route,gate,_=make_fixture()
         self.assertEqual(self.verify(route,gate)['run_id'],RUN)
+    def test_consumer_independently_requires_exact_native_cas_reply(self):
+        import json
+        for replacement in (None,'generic push failed','!\tHEAD:refs/heads/OTHER\t[rejected] (stale info)'):
+            route,gate,paths=make_fixture();proof=json.loads(route.storage[(paths['negative'],HEAD)])
+            proof['concurrent_writers'][1]['native_reply']=replacement
+            state=json.loads(route.storage[('typed-successor/program-state.json',HEAD)])
+            with self.subTest(reply=replacement),self.assertRaisesRegex(LabError,'V3_NATIVE_CAS_REPLY_UNBOUND'):
+                validate_negative_artifact(route,proof,RUN,SOURCE,state)
     def test_bare_favorable_json_is_rejected(self):
         route,gate,_=make_fixture()
         with self.assertRaises(Exception):

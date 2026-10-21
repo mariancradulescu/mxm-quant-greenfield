@@ -98,6 +98,18 @@ def verify_checkpoint23_public(state,authority,evidence_oid):
          'CHECKPOINT23_EXACT_CLOSED_NATIVE_PREDECESSOR')
     return True
 
+def verify_checkpoint24_public(state,authority,evidence_oid):
+    """Exact native cold-restored continuation; fixed diagnostic ancestry."""
+    need(authority.get('schema')=='mxm.integrated-typed-predecessor.v3' and
+         authority.get('evidence_oid')==evidence_oid=='5d5be97cd4f316945aeea4268528b2f4262c8b07' and
+         authority.get('source_sha')==state.get('source_sha')=='c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c' and
+         authority.get('sequence')==state.get('sequence')==24 and
+         authority.get('ciphertext_sha256')==state.get('ciphertext_sha256')=='c231bd706622b915b4b7eca84f1fe53a4577f2585e22bbbae0713a566d401c67' and
+         authority.get('private_sha256')=='d0728bcd3c8b89b9dacde8466b4acd503cecb0706c8ff15f63f3ccab8910f0be' and
+         authority.get('public_state_sha256')==digest(state)=='4b1d83b077adc2c743d1c1625406cce6efbf4b6cba672b3d2555397ddb1f72a1',
+         'CHECKPOINT24_EXACT_CLOSED_NATIVE_PREDECESSOR')
+    return True
+
 def typed_source_transition(private,state,authority,source,evidence_oid=None):
     """One closed, exact predecessor; no generic/open-state source upgrade."""
     if authority.get('source_sha')=='541bfe0e7d1eea060aa38d9e1e46a6639b7db13b':
@@ -106,6 +118,8 @@ def typed_source_transition(private,state,authority,source,evidence_oid=None):
         verify_checkpoint20_public(state,authority,evidence_oid)
     elif authority.get('source_sha')=='e9f3582eeff11697bf14e0ad26506f5d4347b46f':
         verify_checkpoint23_public(state,authority,evidence_oid)
+    elif authority.get('source_sha')=='c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c':
+        verify_checkpoint24_public(state,authority,evidence_oid)
     else:
         need(False,'TYPED_SOURCE_PREDECESSOR_NOT_AUTHORIZED')
     need(private['source_sha']==state['source_sha']==authority['source_sha'] and
