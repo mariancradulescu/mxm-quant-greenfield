@@ -7,7 +7,7 @@ for key in ('SUCCESSOR_APP_PRIVATE_KEY','MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','R
 out=root/'verification/historical-suite';out.mkdir(parents=True,exist_ok=True)
 start=time.monotonic()
 with (out/'unittest.log').open('w') as log:
-    suite=unittest.defaultTestLoader.discover(str(root/'tests'),top_level_dir=str(root))
+    suite=unittest.defaultTestLoader.discover(str(root/'tests'))
     result=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)
 report={'schema':'mxm.historical-suite-native-diagnostic.v1',
     'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),
