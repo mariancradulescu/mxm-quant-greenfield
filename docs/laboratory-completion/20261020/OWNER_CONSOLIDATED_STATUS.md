@@ -1,3 +1,19 @@
+# Current verified continuation — 2026-10-21
+
+R3 operational source is now d94c537cb0f393582f51d4b73355532f76727217 at mxm-r3-integrated-source-20261021, exact active immutable seal25522027 with no bypass. Previous source36668adf remains sealed25521657. This section supersedes earlier pending source/access statements below; the earlier entries are retained as history.
+
+Native first reception39539339189/job119023254239 failed LAB_V3_EFFECTIVE_SOURCE_OR_WRITER_AUTHORITY before preflight, claim or worker. Independent diagnostic39539611277/job119024095404 proves HTTP200 but missing bypass_actors for both exact source/evidence policies under the actual Contents-write App. Its token was revoked; writes/orders/outcomes0. Never infer omitted actors=[] or count this diagnostic as reception.
+
+PR51 implements a fail-closed existing-environment control witness: full owner-visible policies, exact source/ref, all live security fields and timezone-normalized exact policy revisions checked on every App control read. Missing, stale, broadened, conflicting or altered metadata rejects. No App permissions, key, custodian or security bypass added. Existing issuer variable R3_CONTROL_WITNESS was saved and UI-verified; old BC delegation retained. Native CI39539907722/job119025034314 passes248 laboratory/account tests. Full before/native diagnostic evidence is retained.
+
+Protected installation PR52 execution8ab44c12d02cad9cbc2c9a980175086a04b3d90c and PR53 main e90389457111788fb0270707e9671104a846efed pass required exact-generation/static guard CIs. The finite new technical admission854a8243205a973d5f0e037507f401207215b098 has two programmes/three tasks, zero broker requests/identities/outcomes/orders, preserved authentic Pepperstone reads, prospective A-B-A priority order and one controlled pre-fence fault. Its first native dispatch is under observation; no success is presumed.
+
+The incident review retains the true temporary all-ref exposure and its timing/evidence limits. Bounded native run inventory17:00–19:00UTC20October contains4 workflows; none references an environment or secret. This supports no evidenced issuer-key use within the examined inventory, not an exhaustive credential-access audit and not proof of compromise or its absence. Exact issuer targets remain main+execution,0tags,admin bypass false. No key value read/changed.
+
+Operational acceptance=false; research capability acceptance=false; no new economic research, broker request, order or cBot work. The remaining canonical register is intentionally open.
+
+---
+
 # Existing issuer access transition applied after OWNER confirmation
 
 The exact confirmed deployment-policy change is saved and independently reloaded in GitHub UI: environment24553648726 now permits only main and mxm-remediation-p0-p4-20261015-v1, zero tags; Cv3 access removed. Existing SUCCESSOR_APP_PRIVATE_KEY remains dated18October; no key value was read and no key/App permission was changed by this action. Administrator bypass remains off. Heads main1d95fa5/exec35476d4/candidate40e4d98/evidence09703ad were unchanged at reconciliation.
