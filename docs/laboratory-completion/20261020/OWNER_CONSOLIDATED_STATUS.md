@@ -1,3 +1,21 @@
+# Current checkpoint23 continuation — 2026-10-21
+
+Native e9f3582 reception actually completed A-B-A through automatic handoffs39541523586 →39541989245 →39542478693, checkpoint21→22→23. B read authentic preserved Pepperstone corpus without broker request/outcome/order; independent cold job119034415827 verified A-B-A, restored complete programme/task history and exact accounting. Checkpoint23 cipher cbef49e3435b18c445a48b199c55bc990aee52bfd816efe500fdbab4b0ca6e07; private digest ee2b40a28bfc0f294dbe0652c4720e6082f7475818919cffb2724686df54e2be. V2 remains22=21charged+1hold, observations29/refunds0.
+
+Native fault-probes119034663215 reconciled actual lost ACK once at9bd9b0e0 and published one CAS winner fc6bc295. The other writer failed unclassified, so negatives/attestation/certification did not pass. Original loser stderr was not retained. A local real Git2.55 receive-pack race independently reproduces explicit old-value refusal rather than stale-info. PR61 adds exact porcelain destination/status recognition and independently observed direct winner-parent binding; generic auth/network/protection errors remain rejected. This is a correction pending native proof, not a retrospective PASS.
+
+Current exact sealed source c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c at mxm-r3-integrated-source-20261021-r3, no-bypass seal25523135. Previous seals unchanged. Required native CI39543508488 passes263 regressions. Installation PR63 execution63e1cf0122abc4d14ab7269461c87b9298986524 / PR64 main1820226981574cee52ec6538a1d15235baafc859 passed exact generator/core/static/full regressions. Public existing-environment witness is bound to the new exact source/policy revision; no App/key/access expansion.
+
+The existing periodic observer was upgraded in place. Actual run39543169234/job119035306552 authenticated source/policies and terminal checkpoint23, made0dispatches and revoked the existing App token. Its current control-source e0a85ca binds corrected engine c6bf702/module31c03636. This proves terminal observation; the full recovery/timeout/post-fence matrix remains open.
+
+Finite technical continuation admission2d7a70e5c8ea7629f075e6230fdac13723109676 binds exact closed checkpoint23/public/cipher/private hashes and one new report task only, with zero economic/broker/order budget. Current controlled-fault run39544033495 is under observation. The forward transition preserves completed A-B-A, catalogue and trial ledger without replay; actual native decrypt/publication remains required.
+
+Both original external audits have been read and reconciled. DAT-04 chronological capacity is now a distinct canonical row, rather than an alias of empty-cache A-01. REC-02 post-fence resolution, DAT-04/REC-03 chronological scale, authentic dated economic fidelity/statistics and unresolved historic suite failures remain open. Operational acceptance=false; research capability=false; no new economic research, LIVE orders or cBot.
+
+All earlier sections below are dated history, superseded for current state by this section.
+
+---
+
 # Current canonical CLI reception — 2026-10-21
 
 Current sealed source e9f3582eeff11697bf14e0ad26506f5d4347b46f at mxm-r3-integrated-source-20261021-r2; active exact no-bypass seal25522311. PR56 fixes the real -m/canonical writer scope split, demonstrated by a keyless subprocess failure before/pass after. Native source CI passes249 tests. Protected installations PR57 execution2a5dc1c0681efedc70046c1488e9b07d27ab593e / PR58 main f0f6b351b3f92870bfe239d56a24e707d65bfecd passed exact generated-contract CIs. Existing administrative environment witness is source/revision-bound to this exact seal; no App permissions or key changed. Earlier source snapshots/seals remain immutable.
