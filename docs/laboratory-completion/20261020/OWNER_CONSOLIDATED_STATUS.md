@@ -1,3 +1,25 @@
+# Current authenticated-Git confirmation reception — 2026-10-21
+
+Current immutable source 9bad0e4832a2db433ca35a721775087e89a2c5cc at mxm-r3-integrated-source-20261021-r5, active exact no-bypass seal25524693. Original source seals and OWNER/R2/evidence fences remain intact. Source PR74 native CI39549178812/job119054188771 passes277 laboratory/account regressions. Existing observer binding PR75 is control-sourcec4ac0c0abd6feef7a5baf40df047a9822016b55d. Protected PR76/77 installed main467d17c817710b9135d849b92cb8d3495a3789a7 / execution21f4187b7c2f8636757d22e3e6144b7b0c279de2 after exact generator/core/static and277 regressions. No new key, App scope or laboratory.
+
+Native39547187040 archived checkpoint25 at a35f3a2caea6d7b52806f1344b2708dca6ba4977; cold119049339690 independently restores completed A-B-A and authentic Pepperstone nonoutcome history. Cipher87e9cb973a4175bc4d0083525936bb268fb82885a5a6b87582995a7b53618337; privatec315e603b3204a23affec03114f4f31470ab332866ff3abc7a5f597138728a8a. V2 stays22=21charged+1hold, observations29/refunds0. Technical registration appended2 events (new_events11); no economic identity/outcome/broker request/order.
+
+Its negative job119049577327 reconciled ACK at838c6dca, correctly retained exact rejected CAS reply for5081c663 pointing to actual winnerd569a322, but the winning writer failed final REST head equality. The mismatching REST SHA was not recorded; metadata lag remains an inference. No certificate was issued. Raw failure and cold/receipt/public proofs are retained. PR74 confirms publication through authenticated Git ref advertisement, allows bounded read-only convergence only from the exact prior parent, stops immediately on unexpected SHA, and never repeats a push. Exact loser reply/ancestry and final race head also use the native Git service.
+
+Source-bound closed predecessor metadata is included in module digestb78a400de4871db4c2d47516c3b9648bb4014f131df41afb51e3b8f1516cb9b4. It preserves exact closed checkpoints23/24/25 and original20 authority, rejects forged/open/duplicate grants, and does not replay completed tasks. Same-source native39549707874 actually verifies source controls119055869840, decrypting preflight119055968318, intentional claim119056200151, skipped fence/worker and successful recovery119056429863. Claim8a31569bf49fb262b1414ebda0a76eaeb5b27475 and recoveryfd5055fb24b69ad249a1d4bcf610eac1aaf1afc4 both confirm exact Git ref on first read with no second push. Restored25 has pending=null, same cipher and accounting.
+
+Normal finite continuation39550161782 uses immutable admission1066da1a556de3d77aa5c118fefc379cc8e1784d, one report task, zero broker/economic/order budget, prospectively bound to the exact r5 pre-fence proof. It is under observation. Existing observer39549605557/job119055548716 conservatively reports OTHER_SOURCE_NO_BOOTSTRAP on the prior-source closed25, makes0dispatches and revokes token; no cross-source bootstrap is inferred.
+
+The temporary empty issuer deployment list really allowed all refs. The bounded17–19UTC native inventory and limitations remain in the existing incident review: no issuer-key use is evidenced in those four inventoried workflows; exact exposure timestamps and exhaustive credential audit are unavailable. Neither compromise nor absence of compromise is asserted. Current issuer remains exactly main/execution,0tags,admin bypass=false; key unchanged and unread.
+
+Operational acceptance=false; research capability=false. REC-02 post-fence exposure resolution, REC-03/DAT-04 sustained authentic chronological capability, actual economic fidelity/statistics and126 original native historical test failures/errors remain open. Passing tests and individual successful jobs do not close these gates. No new economic research, LIVE order or cBot.
+
+![Exact active source seal without bypass](R3_SOURCE_R5_SEAL25524693.jpg)
+
+Earlier sections below are dated history; this section defines current state.
+
+---
+
 # Current exact-native-reply reception — 2026-10-21
 
 Current sealed source c6f8b46685dec3b9f9ee2ee6dd3cf12f0609add2 at mxm-r3-integrated-source-20261021-r4, active exact no-bypass seal25523796. Existing source seals remain untouched. Native CI39545980009/job119044130934 passes270 laboratory/account regressions. Protected installations PR71 executionee5a012d57f4d2c793305ea090f10ef8c7104c3b / PR72 mainab2b6ff5287b17298a915b177cd231b9c0b692ed pass exact generator/core/static/full CI. Existing observer control-sourcec8f92477 and existing administrative witness bind the same exact engine/policy revision. No App/key/scope expansion.
