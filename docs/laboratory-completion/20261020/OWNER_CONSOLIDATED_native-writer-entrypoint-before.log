@@ -1,0 +1,30 @@
+test_cli_uses_same_module_scope_as_imported_publishers_and_guards (research_core_v4.laboratory.test_native_writer_entrypoint.NativeWriterEntrypoint.test_cli_uses_same_module_scope_as_imported_publishers_and_guards) ... FAIL
+
+======================================================================
+FAIL: test_cli_uses_same_module_scope_as_imported_publishers_and_guards (research_core_v4.laboratory.test_native_writer_entrypoint.NativeWriterEntrypoint.test_cli_uses_same_module_scope_as_imported_publishers_and_guards)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/41e543a438db/mxm-quant-greenfield/research_core_v4/laboratory/test_native_writer_entrypoint.py", line 23, in test_cli_uses_same_module_scope_as_imported_publishers_and_guards
+    self.assertEqual(result.returncode,0,result.stderr)
+AssertionError: 1 != 0 : <frozen runpy>:128: RuntimeWarning: 'research_core_v4.laboratory.custody' found in sys.modules after import of package 'research_core_v4.laboratory', but prior to execution of 'research_core_v4.laboratory.custody'; this may result in unpredictable behaviour
+Traceback (most recent call last):
+  File "<string>", line 11, in <module>
+  File "<frozen runpy>", line 229, in run_module
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/scratch/41e543a438db/mxm-quant-greenfield/research_core_v4/laboratory/custody.py", line 375, in <module>
+    run_native_writer(sys.argv[1])
+  File "/workspace/scratch/41e543a438db/mxm-quant-greenfield/research_core_v4/laboratory/custody.py", line 185, in run_native_writer
+    identity=writer_metadata(operation)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/41e543a438db/mxm-quant-greenfield/research_core_v4/laboratory/custody.py", line 159, in writer_metadata
+    need(job and os.environ.get('GITHUB_REPOSITORY')=='mariancradulescu/mxm-quant-greenfield' and
+  File "/workspace/scratch/41e543a438db/mxm-quant-greenfield/research_core_v4/laboratory/common.py", line 6, in need
+    if not ok:raise LabError('LAB_'+code)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+research_core_v4.laboratory.common.LabError: LAB_APP_WRITER_NATIVE_CONTEXT
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.068s
+
+FAILED (failures=1)
