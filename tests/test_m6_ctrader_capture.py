@@ -461,7 +461,9 @@ class CTraderCaptureCoreTests(unittest.TestCase):
         self.assertNotIn("getpass", entry)
 
     def test_29_workflow_installs_runtime_imports_preflights_and_builds_package(self):
-        workflow = (ROOT / ".github/workflows/m6_preparation.yml").read_text(encoding="utf-8")
+        from tests.historical_workflow_fixtures import historical_workflow_source, assert_current_quarantined
+        assert_current_quarantined('m6')
+        workflow = historical_workflow_source('m6')
         self.assertIn("pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt", workflow)
         self.assertIn("python -m py_compile", workflow)
         self.assertIn("runtime_sdk_preflight", workflow)
