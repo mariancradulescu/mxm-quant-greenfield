@@ -81,7 +81,10 @@ def definition(route):
         need(os.environ.get('LAB_FAULT_BEFORE_FENCE','0')!='1','CONFLICTING_CONTROLLED_FAULTS')
     if a['mode']=='TECHNICAL_NONOUTCOME':need(a['economic_release'] is False,'ECONOMIC_LANE_HELD')
     else:
-        gate=strict_json(file_at(route,'typed-successor/END_TO_END_OPERATIONAL_ACCEPTANCE.json',a['technical_acceptance_ref']))
+        from .certificate_registry import verify_registered_certificate
+        identity=a.get('technical_acceptance_identity')
+        need(type(identity) is dict and set(identity)=={'source_sha','run_id'},'TECHNICAL_CERTIFICATE_EXACT_IDENTITY')
+        gate=verify_registered_certificate(route,a['technical_acceptance_ref'],identity['source_sha'],identity['run_id'])
         need(a['economic_release'] is True,'ECONOMIC_LANE_HELD')
         economic_gate(gate,os.environ['LAB_SOURCE_SHA'],{name:route.json('branches/'+name)['protected'] for name in ('main','mxm-remediation-p0-p4-20261015-v1')},route=route)
     need(type(a['steps_per_segment']) is int and 0<a['steps_per_segment']<=16 and len(a['programmes'])>0,'INTEGRATED_STEP_BUDGET')

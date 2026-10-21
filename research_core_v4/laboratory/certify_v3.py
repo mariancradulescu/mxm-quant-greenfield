@@ -11,7 +11,9 @@ from .operational_acceptance import (verify_operational_acceptance,
                                       BRANCH,EXEC,CODE)
 from .attest_v3 import proof_paths
 
-CERT='typed-successor/END_TO_END_OPERATIONAL_ACCEPTANCE.json'
+from .certificate_registry import (certificate_path,validate_record,existing_record,
+    verify_registered_certificate,CERTIFIER_BRANCH,EXECUTION_SOURCE,RECOVERY_RUN,
+    RECOVERY_PROOF,LEGACY_CERT,SCHEMA)
 WORKFLOW='.github/workflows/mxm-integrated-p0.yml'
 
 def eligible_certificate(route,run_id,source):
@@ -54,7 +56,7 @@ def main():
     need(os.environ.get('GITHUB_REPOSITORY')=='mariancradulescu/mxm-quant-greenfield'
          and os.environ.get('GITHUB_REF_NAME')=='main'
          and os.environ.get('GITHUB_JOB')=='certify-v3'
-         and os.environ.get('GITHUB_EVENT_NAME')=='workflow_run'
+         and os.environ.get('GITHUB_EVENT_NAME') in ('workflow_run','workflow_dispatch')
          and os.environ.get('GITHUB_RUN_ATTEMPT')=='1',
          'V3_CERTIFIER_WORKLOAD')
     need(not any(os.environ.get(k) for k in (
@@ -62,32 +64,64 @@ def main():
          'CTRADER_CLIENT_ID','CTRADER_CLIENT_SECRET','CTRADER_ACCESS_TOKEN')),
          'V3_CERTIFIER_KEYLESS')
     event=json.loads(open(os.environ['GITHUB_EVENT_PATH'],encoding='utf-8').read())
-    observed=event['workflow_run']
-    need(observed['path']==WORKFLOW and observed['status']=='completed'
-         and observed['conclusion']=='success',
-         'V3_CERTIFIER_EVENT_NOT_TERMINAL_SUCCESS')
     route=GetOnly()
+    from .custody import effective_controls_reader
+    controls=effective_controls_reader(route)
+    restrictions=[r for r in controls.json('rules/branches/'+CERTIFIER_BRANCH) if r.get('type')=='update']
+    print('MXM_CERTIFIER_SOURCE_CONTROL '+json.dumps({'source_sha':os.environ['LAB_SOURCE_SHA'],
+        'run_id':int(os.environ['GITHUB_RUN_ID']),
+        'policies':[controls.json('rulesets/'+str(r['ruleset_id'])) for r in restrictions]},sort_keys=True),flush=True)
     # Validate source authority from checked-out protected R3 SHA (not a
     # mutable candidate PR ref). GitHub-native authentication is read-only.
-    anchors(route)
-    run_id=int(observed['id']);source=os.environ['LAB_SOURCE_SHA']
+    anchors(route,source_branch=CERTIFIER_BRANCH)
+    if os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch':
+        run_id=RECOVERY_RUN
+        observed=route.json('actions/runs/'+str(run_id))
+    else:observed=event['workflow_run'];run_id=int(observed['id'])
+    need(observed['path']==WORKFLOW and observed['status']=='completed' and observed['conclusion']=='success',
+         'V3_CERTIFIER_EVENT_NOT_TERMINAL_SUCCESS')
+    source=EXECUTION_SOURCE;path=certificate_path(source,run_id)
+    # A repeated certification is a verified read-only no-op. It never emits a
+    # second identity, rewrites R6 or invokes the completed investigation.
+    head=route.json('git/ref/heads/'+BRANCH)['object']['sha']
+    import urllib.error
+    try:old=file_at(route,path,head)
+    except urllib.error.HTTPError as error:
+        if error.code!=404:raise
+    else:
+        verify_registered_certificate(route,head,source,run_id)
+        print(json.dumps({'state':'CERTIFICATE_ALREADY_NATIVE_VERIFIED_NO_WRITE','path':path,'target_run_id':run_id}))
+        return
+    if os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch':
+        need(head==RECOVERY_PROOF,'CERTIFIER_RECOVERY_EXPECTED_HEAD')
     gate=eligible_certificate(route,run_id,source)
     oid=gate['evidence_oid']
+    issuer_run=int(os.environ['GITHUB_RUN_ID'])
+    inventory=route.json('actions/runs/'+str(issuer_run)+'/attempts/1/jobs?per_page=100')
+    need(inventory.get('total_count')==len(inventory.get('jobs',[]))==1,'CERTIFIER_ISSUER_INVENTORY')
+    job=inventory['jobs'][0]
+    need(job['name']=='certify-v3' and job['run_id']==issuer_run,'CERTIFIER_ISSUER_JOB')
+    record=validate_record({'schema':SCHEMA,'path':path,'gate':gate,
+        'issuer':{'source_sha':os.environ['LAB_SOURCE_SHA'],'trigger_sha':os.environ['GITHUB_SHA'],
+                  'run_id':issuer_run,'job_id':job['id']}},source,run_id)
+    legacy=file_at(route,LEGACY_CERT,oid)
     from .runtime import EVIDENCE_BRANCH
     need(EVIDENCE_BRANCH==BRANCH,'V3_CERTIFIER_EVIDENCE_NAMESPACE')
-    committed=atomic_publish(route,oid,{CERT:encoded(gate)},
+    need(not existing_record(route,oid,path,record),'CERTIFICATE_CONCURRENT_ALREADY_EXISTS')
+    committed=atomic_publish(route,oid,{path:encoded(record)},
              'Accept real R3 native E2E proof only after entire run success')
-    need(file_at(route,CERT,committed)==encoded(gate),
+    need(file_at(route,path,committed)==encoded(record) and file_at(route,LEGACY_CERT,committed)==legacy,
          'V3_CERTIFIER_REMOTE_BYTE_READBACK')
     # The certificate was bound to its immutable proof ancestor. Validate the
     # newly committed descendant relation and all underlying proofs again.
     protected={name:route.json('branches/'+name)['protected']
                for name in ('main',EXEC)}
     verify_operational_acceptance(route,gate,source,protected)
-    print(json.dumps({'schema':'mxm.e2e.native-certificate-issuance.v3',
+    print('MXM_CERTIFICATE_ISSUED '+json.dumps({'schema':'mxm.e2e.native-certificate-issuance.v4',
                       'status':'END_TO_END_OPERATIONAL_ACCEPTED',
                       'certificate_commit':committed,
-                      'proof_parent':oid,'run_id':run_id,
+                      'proof_parent':oid,'target_run_id':run_id,'path':path,
+                      'sha256':__import__('hashlib').sha256(encoded(record)).hexdigest(),
                       'real_orders':0,'economic_outcomes':0},sort_keys=True))
 
 if __name__=='__main__':main()
