@@ -1,3 +1,17 @@
+# Current canonical CLI reception — 2026-10-21
+
+Current sealed source e9f3582eeff11697bf14e0ad26506f5d4347b46f at mxm-r3-integrated-source-20261021-r2; active exact no-bypass seal25522311. PR56 fixes the real -m/canonical writer scope split, demonstrated by a keyless subprocess failure before/pass after. Native source CI passes249 tests. Protected installations PR57 execution2a5dc1c0681efedc70046c1488e9b07d27ab593e / PR58 main f0f6b351b3f92870bfe239d56a24e707d65bfecd passed exact generated-contract CIs. Existing administrative environment witness is source/revision-bound to this exact seal; no App permissions or key changed. Earlier source snapshots/seals remain immutable.
+
+Native controlled fault39541188077: source-controls119029063115 SUCCESS with actual App policy verification; preflight119029182872 SUCCESS on authentic checkpoint20; segment-intent119029411034 fails with exact intentional LAB_INJECTED_CRASH_AFTER_CLAIM_BEFORE_FENCE; execution-fence/investigation/archive skipped; recover-before-exposure119029561693 SUCCESS; automatic handoff intentionally skipped. Actual remote evidence776963f99c580e76360ab9750c792e3e553491ae has sequence20, pending=null, original ciphertext unchanged, exact original V2 accounting22 encumbered=21charged+1hold,29observations,refunds0. Remote recovery receipt preserves old intent and binds no exposure to the native skipped worker. This proves controlled pre-fence recovery, not E2E.
+
+Normal finite admission b02c2ac8524b79d48096ed521702616c22b40f25 at research_programs/admissions/R3_NATIVE_TECHNICAL_RECEPTION_20261021_NORMAL.json prospectively binds native_pre_fence_run_id39541188077, same source/workflow, two programmes/three steps with A-B-A priority and authentic preserved Pepperstone corpus. First normal continuation has been dispatched from exact776963f9 with fault0; it remains unreceived until actual worker/archive/cold/negative/certifier evidence is independently verified. No broker request, economic outcome or order is admitted.
+
+The prior witnessed-source run39540319354 failed with HTTP404 before preflight. Independent fixed-path diagnostic39540701841/job119027536388 subsequently reads all exact policies/effective rule IDs with HTTP200 and revokes the token. The earlier404 remains an observed transient of undetermined cause; no source check was bypassed or worker blindly retried.
+
+Operational acceptance=false; research capability acceptance=false. This section supersedes earlier 'current source' statements below, retained as dated history.
+
+---
+
 # Current verified continuation — 2026-10-21
 
 R3 operational source is now d94c537cb0f393582f51d4b73355532f76727217 at mxm-r3-integrated-source-20261021, exact active immutable seal25522027 with no bypass. Previous source36668adf remains sealed25521657. This section supersedes earlier pending source/access statements below; the earlier entries are retained as history.
