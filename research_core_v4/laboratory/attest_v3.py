@@ -201,7 +201,7 @@ def validate_negative_artifact(route,proof,run_id,source,state):
              for x in (base,final,winner.get('oid'),loser.get('candidate_oid'))) and
          base==proof['ack_commit_oid'] and final==winner['oid'] and
          loser.get('observed_oid')==final and loser.get('candidate_oid')!=final and
-         loser.get('reason')=='NATIVE_GIT_STALE_INFO' and
+         loser.get('reason')=='NATIVE_GIT_EXPECTED_REF_REFUSED' and
          all(x.get('expected_oid')==base for x in writers),
          'V3_NATIVE_CAS_IDENTITIES')
     commit=route.json('git/commits/'+final)

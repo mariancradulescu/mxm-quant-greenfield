@@ -315,6 +315,20 @@ class CASRefused(LabError):
         super().__init__('LAB_NATIVE_CAS_STALE_REFUSED')
         self.parent=parent;self.candidate=candidate;self.observed=observed
 
+def native_cas_rejection(result,branch):
+    """Recognize only Git's explicit old-value rejection, never a failed push.
+
+    Git 2.55 can lose the receive-pack race after advertisement succeeds. Its
+    remote reports `incorrect old value provided` rather than `stale info`.
+    --porcelain binds either response to the exact destination ref.
+    """
+    prefix=b'!\tHEAD:refs/heads/'+branch.encode()+b'\t'
+    lines=[line for line in result.stdout.splitlines() if line.startswith(prefix)]
+    if len(lines)!=1:return False
+    return lines[0][len(prefix):] in (
+        b'[rejected] (stale info)',
+        b'[remote rejected] (incorrect old value provided)')
+
 def atomic_publish(route,parent,files,message):
     from .runtime import EVIDENCE_BRANCH,read_state
     need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WRITER_NO_KEYS')
@@ -336,12 +350,13 @@ def atomic_publish(route,parent,files,message):
         git(d,'config','user.name','github-actions[bot]');git(d,'config','user.email','41898282+github-actions[bot]@users.noreply.github.com');git(d,'add',*files)
         git(d,'commit','-m',message);commit=git(d,'rev-parse','HEAD')
         try:
-            result=subprocess.run(['git','push','--force-with-lease=refs/heads/'+EVIDENCE_BRANCH+':'+parent,'origin','HEAD:refs/heads/'+EVIDENCE_BRANCH],cwd=d,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120)
+            result=subprocess.run(['git','push','--porcelain','--force-with-lease=refs/heads/'+EVIDENCE_BRANCH+':'+parent,'origin','HEAD:refs/heads/'+EVIDENCE_BRANCH],cwd=d,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120)
             if result.returncode:
                 observed=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']
                 # Network/auth/permission errors are NOT evidence of CAS exclusion.
-                if b'(stale info)' in result.stderr and observed not in (parent,commit):
+                if native_cas_rejection(result,EVIDENCE_BRANCH) and observed not in (parent,commit) and [p.get('sha') for p in route.json('git/commits/'+observed).get('parents',[])]==[parent]:
                     raise CASRefused(parent,commit,observed)
+                print('MXM_ATOMIC_PUSH_UNCLASSIFIED '+json.dumps({'expected_oid':parent,'candidate_oid':commit,'observed_oid':observed,'returncode':result.returncode}),flush=True)
                 need(False,'ATOMIC_GIT_PUSH')
             if os.environ.get('LAB_FAULT_ACK')=='AFTER_PUSH':raise ValueError('INJECTED_ACK_LOSS')
         except CASRefused:raise
