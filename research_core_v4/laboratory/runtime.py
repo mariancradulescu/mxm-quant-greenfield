@@ -13,7 +13,7 @@ from research_core_v4.remediation_p0_p4_20261015.safety import strict_json,unpac
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-r3-integrated-source-20261020'
+SOURCE_BRANCH='mxm-r3-integrated-source-20261021'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
