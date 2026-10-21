@@ -1,0 +1,66 @@
+{
+  "schema": "mxm.native-control-policy-witness.v1",
+  "source_sha": "c14785ee1835fdd9fcdd1fff8e72184566c727ee",
+  "source_ref": "mxm-r3-certifier-source-20261021-r8",
+  "policies": [
+    {
+      "id": 25553897,
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-r3-certifier-source-20261021-r8"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "creation"
+        },
+        {
+          "type": "update"
+        }
+      ],
+      "updated_at": "2026-10-21T16:33:16.133+02:00",
+      "bypass_actors": []
+    },
+    {
+      "id": 25461373,
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "mariancradulescu/mxm-quant-greenfield",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "refs/heads/mxm-o04-integrated-laboratory-evidence"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "update"
+        }
+      ],
+      "updated_at": "2026-10-20T10:16:47.404+02:00",
+      "bypass_actors": [
+        {
+          "actor_id": 5343530,
+          "actor_type": "Integration",
+          "bypass_mode": "always"
+        }
+      ]
+    }
+  ]
+}
