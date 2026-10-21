@@ -31,16 +31,18 @@ def verify(root: Path) -> None:
     except json.JSONDecodeError:
         return _legacy_verify(root)
     # Exact regenerated R3 contract, not a permissive JSON/YAML text search.
-    assert hashlib.sha256(raw).hexdigest()=='7a5ab66203e1449bf56e863730f03f9700ec13631a4d7aa5069eaeb893885884'
-    assert workflow['env']['LAB_SOURCE_SHA']=='17d8a922e5cab68152eba44889f277e1aa1c8617'
+    assert hashlib.sha256(raw).hexdigest()=='9675878aee193f0febed595e5d6b5d235db478ad45209c43cc296195b678199b'
+    assert workflow['env']['LAB_SOURCE_SHA']=='dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a'
     assert workflow['env']['LAB_INTEGRATED_PROTOCOL']=='v2'
     assert workflow['jobs']['preflight']['needs']=='source-controls'
     assert len(workflow['jobs'])==11 and workflow['permissions']=={}
     assert workflow['on']['workflow_dispatch']['inputs']['fault_before_fence']['default']=='0'
+    assert workflow['on']['workflow_dispatch']['inputs']['fault_after_fence']['default']==''
+    assert workflow['env']['LAB_FAULT_AFTER_FENCE']=="${{ inputs.fault_after_fence || '' }}"
     assert "inputs.fault_before_fence != '1'" in workflow['jobs']['scientific-handoff']['if']
     for name,job in workflow['jobs'].items():
         assert job['permissions']['contents']=='read'
-        assert job['steps'][0]['with']=={'ref':'17d8a922e5cab68152eba44889f277e1aa1c8617','persist-credentials':False}
+        assert job['steps'][0]['with']=={'ref':'dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a','persist-credentials':False}
         envs=[step.get('env',{}) for step in job['steps']]
         assert not any(any(key.startswith('CTRADER_') for key in env) for env in envs)
         key_steps=[s for s in job['steps'] if 'SUCCESSOR_APP_PRIVATE_KEY' in s.get('env',{})]

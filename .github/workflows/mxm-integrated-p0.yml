@@ -7,10 +7,11 @@
     "cancel-in-progress": false
   },
   "env": {
-    "LAB_SOURCE_SHA": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+    "LAB_SOURCE_SHA": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
     "LAB_INTEGRATED_PROTOCOL": "v2",
     "LAB_ADMISSION_REF": "${{ inputs.admission_ref }}",
-    "LAB_ADMISSION_PATH": "${{ inputs.admission_path }}"
+    "LAB_ADMISSION_PATH": "${{ inputs.admission_path }}",
+    "LAB_FAULT_AFTER_FENCE": "${{ inputs.fault_after_fence || '' }}"
   },
   "jobs": {
     "preflight": {
@@ -30,7 +31,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -76,7 +77,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -119,7 +120,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -154,7 +155,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -177,7 +178,8 @@
             "LAB_PARENT_OID": "${{ needs.execution-fence.outputs.fence_oid }}",
             "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
             "OPENBLAS_NUM_THREADS": "1",
-            "OMP_NUM_THREADS": "1"
+            "OMP_NUM_THREADS": "1",
+            "LAB_FAULT_AFTER_FENCE": "${{ inputs.fault_after_fence || '' }}"
           }
         },
         {
@@ -210,7 +212,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -261,7 +263,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -301,7 +303,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -338,7 +340,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -385,7 +387,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -422,7 +424,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -460,7 +462,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+            "ref": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
             "persist-credentials": false
           }
         },
@@ -509,6 +511,12 @@
           "type": "string",
           "required": true,
           "default": "0"
+        },
+        "fault_after_fence": {
+          "description": "Finite zero-outcome technical fault: BEFORE_DECRYPT, AFTER_RESTORE or AFTER_TASK; task is retired without replay",
+          "type": "string",
+          "required": false,
+          "default": ""
         }
       }
     }
