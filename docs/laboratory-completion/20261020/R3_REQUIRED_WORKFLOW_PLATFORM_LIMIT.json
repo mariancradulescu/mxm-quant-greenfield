@@ -1,0 +1,28 @@
+{
+  "schema": "mxm.repository-required-workflow-platform-limit.v1",
+  "repository": "mariancradulescu/mxm-quant-greenfield",
+  "owner_type": "User",
+  "owner_id": 322088485,
+  "actual_rule": 25461184,
+  "required_check": {
+    "type": "required_status_checks",
+    "parameters": {
+      "strict_required_status_checks_policy": true,
+      "do_not_enforce_on_create": false,
+      "required_status_checks": [
+        {
+          "context": "shared-catalogue-regression",
+          "integration_id": 15368
+        }
+      ]
+    }
+  },
+  "native_admin_ui": "https://github.com/mariancradulescu/mxm-quant-greenfield/settings/rules/25461184",
+  "observed_ui": "Require status checks to pass is present and enabled; Require workflows to pass before merging is absent from available repository-level rule choices",
+  "official_documentation": "https://docs.github.com/enterprise-cloud%40latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+  "official_status_semantics": "https://docs.github.com/enterprise-cloud%40latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/troubleshooting-rules",
+  "conclusion": "Organization/enterprise fixed required-workflow control is not available within the existing personal repository configuration; ordinary required status checks match job names and do not bind workflow/event identities.",
+  "scope_limit": "Proposed whole-workflow byte admission strengthens trusted reviewed CI, but does not simulate organization-level required workflows or an immutable external approver. No organization transfer/new system/new approver/new key is authorized or introduced.",
+  "operational_acceptance": false,
+  "research_capability_accepted": false
+}

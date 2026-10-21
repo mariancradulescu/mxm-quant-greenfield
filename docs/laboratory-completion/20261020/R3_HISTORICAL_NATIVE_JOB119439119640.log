@@ -1,0 +1,845 @@
+﻿2026-10-21T19:32:46.9673300Z Current runner version: '2.338.0'
+2026-10-21T19:32:46.9708490Z ##[group]Runner Image Provisioner
+2026-10-21T19:32:46.9709774Z Hosted Compute Agent
+2026-10-21T19:32:46.9710838Z Version: 20261012.601
+2026-10-21T19:32:46.9711862Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-21T19:32:46.9713104Z Build Date: 2026-10-12T17:48:21Z
+2026-10-21T19:32:46.9714280Z Worker ID: {6e371d75-2655-4a0c-af98-34eee7ecce73}
+2026-10-21T19:32:46.9715455Z Region: centralus
+2026-10-21T19:32:46.9716705Z Cloud: Azure
+2026-10-21T19:32:46.9717583Z ##[endgroup]
+2026-10-21T19:32:46.9720493Z ##[group]Operating System
+2026-10-21T19:32:46.9721614Z Ubuntu
+2026-10-21T19:32:46.9722560Z 24.04.5
+2026-10-21T19:32:46.9723545Z LTS
+2026-10-21T19:32:46.9724492Z ##[endgroup]
+2026-10-21T19:32:46.9725488Z ##[group]Runner Image
+2026-10-21T19:32:46.9727083Z Image: ubuntu-24.04
+2026-10-21T19:32:46.9728048Z Version: 20261012.334.1
+2026-10-21T19:32:46.9730786Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-21T19:32:46.9733821Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-21T19:32:46.9735606Z ##[endgroup]
+2026-10-21T19:32:46.9737798Z ##[group]GITHUB_TOKEN Permissions
+2026-10-21T19:32:46.9740843Z Contents: read
+2026-10-21T19:32:46.9741884Z Metadata: read
+2026-10-21T19:32:46.9743020Z ##[endgroup]
+2026-10-21T19:32:46.9746463Z Secret source: Actions
+2026-10-21T19:32:46.9748253Z Cache mode: write
+2026-10-21T19:32:46.9749824Z Prepare workflow directory
+2026-10-21T19:32:47.0113148Z Prepare all required actions
+2026-10-21T19:32:47.0169205Z Getting action download info
+2026-10-21T19:32:47.2945524Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+2026-10-21T19:32:47.4138619Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-21T19:32:47.6252784Z Complete job name: historic-suite
+2026-10-21T19:32:47.7035501Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T19:32:47.7037153Z with:
+2026-10-21T19:32:47.7037611Z   fetch-depth: 0
+2026-10-21T19:32:47.7038095Z   persist-credentials: false
+2026-10-21T19:32:47.7038691Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T19:32:47.7042842Z   token: ***
+2026-10-21T19:32:47.7043293Z   ssh-strict: true
+2026-10-21T19:32:47.7043740Z   ssh-user: git
+2026-10-21T19:32:47.7044178Z   clean: true
+2026-10-21T19:32:47.7044633Z   sparse-checkout-cone-mode: true
+2026-10-21T19:32:47.7045174Z   fetch-tags: false
+2026-10-21T19:32:47.7045635Z   show-progress: true
+2026-10-21T19:32:47.7046287Z   lfs: false
+2026-10-21T19:32:47.7046753Z   submodules: false
+2026-10-21T19:32:47.7047267Z   set-safe-directory: true
+2026-10-21T19:32:47.7048021Z ##[endgroup]
+2026-10-21T19:32:47.8055063Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T19:32:47.8058047Z ##[group]Getting Git version info
+2026-10-21T19:32:47.8059487Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-21T19:32:47.8061333Z [command]/usr/bin/git version
+2026-10-21T19:32:47.8143599Z git version 2.55.0
+2026-10-21T19:32:47.8169476Z ##[endgroup]
+2026-10-21T19:32:47.8182754Z Temporarily overriding HOME='/home/runner/work/_temp/2362b2f7-b4c8-4cee-b92e-90a45b1838bc' before making global git config changes
+2026-10-21T19:32:47.8185466Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T19:32:47.8189875Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T19:32:47.8248885Z Deleting the contents of '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-21T19:32:47.8252402Z ##[group]Initializing the repository
+2026-10-21T19:32:47.8258467Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T19:32:47.8385510Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T19:32:47.8387918Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T19:32:47.8389571Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T19:32:47.8390843Z hint: call:
+2026-10-21T19:32:47.8391536Z hint:
+2026-10-21T19:32:47.8392281Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T19:32:47.8393488Z hint:
+2026-10-21T19:32:47.8394654Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T19:32:47.8395996Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T19:32:47.8396861Z hint:
+2026-10-21T19:32:47.8397297Z hint: 	git branch -m <name>
+2026-10-21T19:32:47.8397791Z hint:
+2026-10-21T19:32:47.8398434Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T19:32:47.8399664Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.git/
+2026-10-21T19:32:47.8410805Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T19:32:47.8461337Z ##[endgroup]
+2026-10-21T19:32:47.8462629Z ##[group]Disabling automatic garbage collection
+2026-10-21T19:32:47.8464680Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T19:32:47.8497871Z ##[endgroup]
+2026-10-21T19:32:47.8499106Z ##[group]Setting up auth
+2026-10-21T19:32:47.8506037Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T19:32:47.8543314Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T19:32:47.8951152Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T19:32:47.8988878Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T19:32:47.9215959Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T19:32:47.9256915Z ##[endgroup]
+2026-10-21T19:32:47.9258207Z ##[group]Fetching the repository
+2026-10-21T19:32:47.9267425Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-21T19:32:54.1861959Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T19:32:54.1864182Z  * [new branch]        android-signed-decoder-recovery-draft-20261004 -> origin/android-signed-decoder-recovery-draft-20261004
+2026-10-21T19:32:54.1868902Z  * [new branch]        audit-current-wave-operational-delivery-v1 -> origin/audit-current-wave-operational-delivery-v1
+2026-10-21T19:32:54.1872739Z  * [new branch]        audit-current-wave-operational-stage0-v1 -> origin/audit-current-wave-operational-stage0-v1
+2026-10-21T19:32:54.1875687Z  * [new branch]        audit-operational-v2-calibration-v1 -> origin/audit-operational-v2-calibration-v1
+2026-10-21T19:32:54.1878975Z  * [new branch]        audit-operational-v2-certification-v1 -> origin/audit-operational-v2-certification-v1
+2026-10-21T19:32:54.1881570Z  * [new branch]        audit-operational-v2-depth-preflight-v1 -> origin/audit-operational-v2-depth-preflight-v1
+2026-10-21T19:32:54.1883251Z  * [new branch]        audit-operational-v2-depth-stage-v1 -> origin/audit-operational-v2-depth-stage-v1
+2026-10-21T19:32:54.1884715Z  * [new branch]        audit-operational-v2-depth-stage1-completed-v1 -> origin/audit-operational-v2-depth-stage1-completed-v1
+2026-10-21T19:32:54.1886804Z  * [new branch]        audit-operational-v2-depth-stage2-completed-v1 -> origin/audit-operational-v2-depth-stage2-completed-v1
+2026-10-21T19:32:54.1889867Z  * [new branch]        audit-operational-v2-depth-stage3-completed-v1 -> origin/audit-operational-v2-depth-stage3-completed-v1
+2026-10-21T19:32:54.1893184Z  * [new branch]        audit-operational-v2-depth-stage4-completed-v1 -> origin/audit-operational-v2-depth-stage4-completed-v1
+2026-10-21T19:32:54.1896717Z  * [new branch]        audit-operational-v2-depth-stage5-completed-v1 -> origin/audit-operational-v2-depth-stage5-completed-v1
+2026-10-21T19:32:54.1899975Z  * [new branch]        audit-operational-v2-extended-certification-v1 -> origin/audit-operational-v2-extended-certification-v1
+2026-10-21T19:32:54.1903451Z  * [new branch]        audit-operational-v2-extended-certification28-v2 -> origin/audit-operational-v2-extended-certification28-v2
+2026-10-21T19:32:54.1907832Z  * [new branch]        audit-operational-v2-extended-stage7-v1 -> origin/audit-operational-v2-extended-stage7-v1
+2026-10-21T19:32:54.1911163Z  * [new branch]        audit-operational-v2-stage7-recovery-attempt2-v1 -> origin/audit-operational-v2-stage7-recovery-attempt2-v1
+2026-10-21T19:32:54.1914718Z  * [new branch]        audit-operational-v2-stop-stage7-37738256226 -> origin/audit-operational-v2-stop-stage7-37738256226
+2026-10-21T19:32:54.1917419Z  * [new branch]        audit-progressive-depth-stage0-v1 -> origin/audit-progressive-depth-stage0-v1
+2026-10-21T19:32:54.1919225Z  * [new branch]        c012-corrected-stage-b-20260922 -> origin/c012-corrected-stage-b-20260922
+2026-10-21T19:32:54.1920797Z  * [new branch]        c012-stage-b-persist-staging-20260922 -> origin/c012-stage-b-persist-staging-20260922
+2026-10-21T19:32:54.1922446Z  * [new branch]        competition-performance-v1-20260921 -> origin/competition-performance-v1-20260921
+2026-10-21T19:32:54.1924038Z  * [new branch]        crm-adbe-m5-package-build-20261001 -> origin/crm-adbe-m5-package-build-20261001
+2026-10-21T19:32:54.1925585Z  * [new branch]        extended-k15-p24-ar025-38492f950475 -> origin/extended-k15-p24-ar025-38492f950475
+2026-10-21T19:32:54.1927833Z  * [new branch]        extended-k15-p24-ar050-38492f950475 -> origin/extended-k15-p24-ar050-38492f950475
+2026-10-21T19:32:54.1930792Z  * [new branch]        extended-k15-p24-centered-skew-38492f950475 -> origin/extended-k15-p24-centered-skew-38492f950475
+2026-10-21T19:32:54.1932682Z  * [new branch]        extended-k15-p24-contiguous-gaps-38492f950475 -> origin/extended-k15-p24-contiguous-gaps-38492f950475
+2026-10-21T19:32:54.1934374Z  * [new branch]        extended-k15-p24-heavy-t5-38492f950475 -> origin/extended-k15-p24-heavy-t5-38492f950475
+2026-10-21T19:32:54.1936628Z  * [new branch]        extended-k15-p24-heteroscedastic-38492f950475 -> origin/extended-k15-p24-heteroscedastic-38492f950475
+2026-10-21T19:32:54.1938719Z  * [new branch]        extended-k15-p24-isolated-missingness-38492f950475 -> origin/extended-k15-p24-isolated-missingness-38492f950475
+2026-10-21T19:32:54.1940620Z  * [new branch]        extended-k15-p24-normal-38492f950475 -> origin/extended-k15-p24-normal-38492f950475
+2026-10-21T19:32:54.1942419Z  * [new branch]        extended-k15-p24-strong-common-factors-38492f950475 -> origin/extended-k15-p24-strong-common-factors-38492f950475
+2026-10-21T19:32:54.1944315Z  * [new branch]        extended-k15-p24-variance-change-38492f950475 -> origin/extended-k15-p24-variance-change-38492f950475
+2026-10-21T19:32:54.1946294Z  * [new branch]        extended-k15-p28-ar025-38492f950475 -> origin/extended-k15-p28-ar025-38492f950475
+2026-10-21T19:32:54.1947781Z  * [new branch]        extended-k15-p28-ar050-38492f950475 -> origin/extended-k15-p28-ar050-38492f950475
+2026-10-21T19:32:54.1949374Z  * [new branch]        extended-k15-p28-centered-skew-38492f950475 -> origin/extended-k15-p28-centered-skew-38492f950475
+2026-10-21T19:32:54.1951154Z  * [new branch]        extended-k15-p28-contiguous-gaps-38492f950475 -> origin/extended-k15-p28-contiguous-gaps-38492f950475
+2026-10-21T19:32:54.1952887Z  * [new branch]        extended-k15-p28-heavy-t5-38492f950475 -> origin/extended-k15-p28-heavy-t5-38492f950475
+2026-10-21T19:32:54.1954580Z  * [new branch]        extended-k15-p28-heteroscedastic-38492f950475 -> origin/extended-k15-p28-heteroscedastic-38492f950475
+2026-10-21T19:32:54.1956975Z  * [new branch]        extended-k15-p28-isolated-missingness-38492f950475 -> origin/extended-k15-p28-isolated-missingness-38492f950475
+2026-10-21T19:32:54.1958669Z  * [new branch]        extended-k15-p28-normal-38492f950475 -> origin/extended-k15-p28-normal-38492f950475
+2026-10-21T19:32:54.1960354Z  * [new branch]        extended-k15-p28-strong-common-factors-38492f950475 -> origin/extended-k15-p28-strong-common-factors-38492f950475
+2026-10-21T19:32:54.1962167Z  * [new branch]        extended-k15-p28-variance-change-38492f950475 -> origin/extended-k15-p28-variance-change-38492f950475
+2026-10-21T19:32:54.1963678Z  * [new branch]        forensic-stabilization-20260922 -> origin/forensic-stabilization-20260922
+2026-10-21T19:32:54.1965015Z  * [new branch]        m6-prep-materialization-20260917 -> origin/m6-prep-materialization-20260917
+2026-10-21T19:32:54.1966397Z  * [new branch]        main                        -> origin/main
+2026-10-21T19:32:54.1967575Z  * [new branch]        mxm-autonomous-evidence-20261015-v1 -> origin/mxm-autonomous-evidence-20261015-v1
+2026-10-21T19:32:54.1969011Z  * [new branch]        mxm-autonomous-native-20261015-v1 -> origin/mxm-autonomous-native-20261015-v1
+2026-10-21T19:32:54.1970474Z  * [new branch]        mxm-economic-process-reset-20261014-v1 -> origin/mxm-economic-process-reset-20261014-v1
+2026-10-21T19:32:54.1972268Z  * [new branch]        mxm-final-redress-report-20261014 -> origin/mxm-final-redress-report-20261014
+2026-10-21T19:32:54.1974056Z  * [new branch]        mxm-full-frontier-readback-20261014-v1 -> origin/mxm-full-frontier-readback-20261014-v1
+2026-10-21T19:32:54.1975941Z  * [new branch]        mxm-level-pressure-development-20261014-v1 -> origin/mxm-level-pressure-development-20261014-v1
+2026-10-21T19:32:54.1977615Z  * [new branch]        mxm-native-1307-continuation-20261015-v1 -> origin/mxm-native-1307-continuation-20261015-v1
+2026-10-21T19:32:54.1979256Z  * [new branch]        mxm-o04-accepted-owner-1807-v1 -> origin/mxm-o04-accepted-owner-1807-v1
+2026-10-21T19:32:54.1980624Z  * [new branch]        mxm-o04-accepted-proof-20261016-v1 -> origin/mxm-o04-accepted-proof-20261016-v1
+2026-10-21T19:32:54.1981809Z  * [new branch]        mxm-o04-active-v1           -> origin/mxm-o04-active-v1
+2026-10-21T19:32:54.1983069Z  * [new branch]        mxm-o04-integrated-laboratory-evidence -> origin/mxm-o04-integrated-laboratory-evidence
+2026-10-21T19:32:54.1984441Z  * [new branch]        mxm-o04-issuer-code-v1      -> origin/mxm-o04-issuer-code-v1
+2026-10-21T19:32:54.1985544Z  * [new branch]        mxm-o04-issuer-code-v2      -> origin/mxm-o04-issuer-code-v2
+2026-10-21T19:32:54.1986895Z  * [new branch]        mxm-o04-issuer-code-v3      -> origin/mxm-o04-issuer-code-v3
+2026-10-21T19:32:54.1988019Z  * [new branch]        mxm-o04-preflight-code-v1   -> origin/mxm-o04-preflight-code-v1
+2026-10-21T19:32:54.1989189Z  * [new branch]        mxm-o04-preflight-code-v2   -> origin/mxm-o04-preflight-code-v2
+2026-10-21T19:32:54.1990340Z  * [new branch]        mxm-o04-proof-38863241929   -> origin/mxm-o04-proof-38863241929
+2026-10-21T19:32:54.1991595Z  * [new branch]        mxm-o04-proof-38863241929-candidate -> origin/mxm-o04-proof-38863241929-candidate
+2026-10-21T19:32:54.1992834Z  * [new branch]        mxm-o04-proof-38863652744   -> origin/mxm-o04-proof-38863652744
+2026-10-21T19:32:54.1994118Z  * [new branch]        mxm-o04-proof-38863652744-candidate -> origin/mxm-o04-proof-38863652744-candidate
+2026-10-21T19:32:54.1995448Z  * [new branch]        mxm-o04-scientific-evidence-v6 -> origin/mxm-o04-scientific-evidence-v6
+2026-10-21T19:32:54.1996909Z  * [new branch]        mxm-o04-stage-38876163425   -> origin/mxm-o04-stage-38876163425
+2026-10-21T19:32:54.1998072Z  * [new branch]        mxm-o04-stage-38876163425-side -> origin/mxm-o04-stage-38876163425-side
+2026-10-21T19:32:54.1999260Z  * [new branch]        mxm-o04-stage-authority-v1  -> origin/mxm-o04-stage-authority-v1
+2026-10-21T19:32:54.2000548Z  * [new branch]        mxm-o04-stage-custody-negative-v1 -> origin/mxm-o04-stage-custody-negative-v1
+2026-10-21T19:32:54.2002023Z  * [new branch]        mxm-o04-stage-reader-proof-v1 -> origin/mxm-o04-stage-reader-proof-v1
+2026-10-21T19:32:54.2003286Z  * [new branch]        mxm-o04-stage-spoof-20261016-v1 -> origin/mxm-o04-stage-spoof-20261016-v1
+2026-10-21T19:32:54.2004743Z  * [new branch]        mxm-o04-successor-a-synthetic-39003758610-1 -> origin/mxm-o04-successor-a-synthetic-39003758610-1
+2026-10-21T19:32:54.2006684Z  * [new branch]        mxm-o04-successor-a-synthetic-39003978636-1 -> origin/mxm-o04-successor-a-synthetic-39003978636-1
+2026-10-21T19:32:54.2008364Z  * [new branch]        mxm-o04-successor-a-synthetic-39004026709-1 -> origin/mxm-o04-successor-a-synthetic-39004026709-1
+2026-10-21T19:32:54.2010033Z  * [new branch]        mxm-o04-successor-code-B-publisher-proof-r1 -> origin/mxm-o04-successor-code-B-publisher-proof-r1
+2026-10-21T19:32:54.2011459Z  * [new branch]        mxm-o04-successor-code-a-v1 -> origin/mxm-o04-successor-code-a-v1
+2026-10-21T19:32:54.2012647Z  * [new branch]        mxm-o04-successor-code-b-v1 -> origin/mxm-o04-successor-code-b-v1
+2026-10-21T19:32:54.2013910Z  * [new branch]        mxm-o04-successor-code-bc-v1 -> origin/mxm-o04-successor-code-bc-v1
+2026-10-21T19:32:54.2015156Z  * [new branch]        mxm-o04-successor-code-bc-v2 -> origin/mxm-o04-successor-code-bc-v2
+2026-10-21T19:32:54.2016588Z  * [new branch]        mxm-o04-successor-code-c-v3 -> origin/mxm-o04-successor-code-c-v3
+2026-10-21T19:32:54.2023621Z  * [new branch]        mxm-o04-successor-code-frontier-accessibility-r1 -> origin/mxm-o04-successor-code-frontier-accessibility-r1
+2026-10-21T19:32:54.2025535Z  * [new branch]        mxm-o04-successor-code-frontier-pregate-b-r1 -> origin/mxm-o04-successor-code-frontier-pregate-b-r1
+2026-10-21T19:32:54.2027678Z  * [new branch]        mxm-o04-successor-code-frontier-pregate-b-r2 -> origin/mxm-o04-successor-code-frontier-pregate-b-r2
+2026-10-21T19:32:54.2029582Z  * [new branch]        mxm-o04-successor-code-integrated-p0-r1 -> origin/mxm-o04-successor-code-integrated-p0-r1
+2026-10-21T19:32:54.2031234Z  * [new branch]        mxm-o04-successor-code-integrated-p0-r2 -> origin/mxm-o04-successor-code-integrated-p0-r2
+2026-10-21T19:32:54.2033032Z  * [new branch]        mxm-o04-successor-code-lab-followthrough-v1 -> origin/mxm-o04-successor-code-lab-followthrough-v1
+2026-10-21T19:32:54.2035393Z  * [new branch]        mxm-o04-successor-code-lab-v5 -> origin/mxm-o04-successor-code-lab-v5
+2026-10-21T19:32:54.2038107Z  * [new branch]        mxm-o04-successor-code-lab-v5r1 -> origin/mxm-o04-successor-code-lab-v5r1
+2026-10-21T19:32:54.2040711Z  * [new branch]        mxm-o04-successor-code-laboratory -> origin/mxm-o04-successor-code-laboratory
+2026-10-21T19:32:54.2043812Z  * [new branch]        mxm-o04-successor-code-laboratory-r2 -> origin/mxm-o04-successor-code-laboratory-r2
+2026-10-21T19:32:54.2047265Z  * [new branch]        mxm-o04-successor-code-laboratory-r3 -> origin/mxm-o04-successor-code-laboratory-r3
+2026-10-21T19:32:54.2051203Z  * [new branch]        mxm-o04-successor-code-laboratory-research-r4 -> origin/mxm-o04-successor-code-laboratory-research-r4
+2026-10-21T19:32:54.2054897Z  * [new branch]        mxm-o04-successor-code-native-quote-reuse-r1 -> origin/mxm-o04-successor-code-native-quote-reuse-r1
+2026-10-21T19:32:54.2059035Z  * [new branch]        mxm-o04-successor-code-nonoutcome-reconciliation-r1 -> origin/mxm-o04-successor-code-nonoutcome-reconciliation-r1
+2026-10-21T19:32:54.2062382Z  * [new branch]        mxm-o04-successor-code-nonoutcome-reconciliation-r2 -> origin/mxm-o04-successor-code-nonoutcome-reconciliation-r2
+2026-10-21T19:32:54.2064838Z  * [new branch]        mxm-o04-successor-code-nonoutcome-reconciliation-r3 -> origin/mxm-o04-successor-code-nonoutcome-reconciliation-r3
+2026-10-21T19:32:54.2067588Z  * [new branch]        mxm-o04-successor-code-p0-recovery-observer-v2 -> origin/mxm-o04-successor-code-p0-recovery-observer-v2
+2026-10-21T19:32:54.2069788Z  * [new branch]        mxm-o04-successor-code-p0-recovery-observer-v3 -> origin/mxm-o04-successor-code-p0-recovery-observer-v3
+2026-10-21T19:32:54.2072442Z  * [new branch]        mxm-o04-successor-code-science-v6 -> origin/mxm-o04-successor-code-science-v6
+2026-10-21T19:32:54.2074780Z  * [new branch]        mxm-o04-successor-code-support-v4 -> origin/mxm-o04-successor-code-support-v4
+2026-10-21T19:32:54.2077065Z  * [new branch]        mxm-o04-successor-code-typed-admission-r1 -> origin/mxm-o04-successor-code-typed-admission-r1
+2026-10-21T19:32:54.2078973Z  * [new branch]        mxm-p0-certificate-safe-hold-20261020 -> origin/mxm-p0-certificate-safe-hold-20261020
+2026-10-21T19:32:54.2080591Z  * [new branch]        mxm-p0-fault-safety-20261020 -> origin/mxm-p0-fault-safety-20261020
+2026-10-21T19:32:54.2082327Z  * [new branch]        mxm-p0-integrated-cache-successor-20261020 -> origin/mxm-p0-integrated-cache-successor-20261020
+2026-10-21T19:32:54.2084401Z  * [new branch]        mxm-p0-main-certificate-safe-hold-20261020 -> origin/mxm-p0-main-certificate-safe-hold-20261020
+2026-10-21T19:32:54.2088023Z  * [new branch]        mxm-p0-main-fault-safety-20261020 -> origin/mxm-p0-main-fault-safety-20261020
+2026-10-21T19:32:54.2091843Z  * [new branch]        mxm-p0-successor-ci-default-registration-20261020 -> origin/mxm-p0-successor-ci-default-registration-20261020
+2026-10-21T19:32:54.2096453Z  * [new branch]        mxm-primary145-synthetic-a0861c7e9a7f120ee18f -> origin/mxm-primary145-synthetic-a0861c7e9a7f120ee18f
+2026-10-21T19:32:54.2100086Z  * [new branch]        mxm-r3-admin-isolation-20261020 -> origin/mxm-r3-admin-isolation-20261020
+2026-10-21T19:32:54.2103519Z  * [new branch]        mxm-r3-admin-native-evidence-20261020 -> origin/mxm-r3-admin-native-evidence-20261020
+2026-10-21T19:32:54.2106995Z  * [new branch]        mxm-r3-app-acl-diagnostic-20261021 -> origin/mxm-r3-app-acl-diagnostic-20261021
+2026-10-21T19:32:54.2110063Z  * [new branch]        mxm-r3-app-acl-path-diagnostic-20261021 -> origin/mxm-r3-app-acl-path-diagnostic-20261021
+2026-10-21T19:32:54.2113518Z  * [new branch]        mxm-r3-byte-preserving-isolation-20261020 -> origin/mxm-r3-byte-preserving-isolation-20261020
+2026-10-21T19:32:54.2115598Z  * [new branch]        mxm-r3-canonical-install-exec-20261021 -> origin/mxm-r3-canonical-install-exec-20261021
+2026-10-21T19:32:54.2117902Z  * [new branch]        mxm-r3-canonical-install-main-20261021 -> origin/mxm-r3-canonical-install-main-20261021
+2026-10-21T19:32:54.2119985Z  * [new branch]        mxm-r3-canonical-writer-entrypoint-20261021 -> origin/mxm-r3-canonical-writer-entrypoint-20261021
+2026-10-21T19:32:54.2121889Z  * [new branch]        mxm-r3-cas-install-exec-20261021 -> origin/mxm-r3-cas-install-exec-20261021
+2026-10-21T19:32:54.2124148Z  * [new branch]        mxm-r3-cas-install-main-20261021 -> origin/mxm-r3-cas-install-main-20261021
+2026-10-21T19:32:54.2126680Z  * [new branch]        mxm-r3-certifier-source-20261021-r8 -> origin/mxm-r3-certifier-source-20261021-r8
+2026-10-21T19:32:54.2128667Z  * [new branch]        mxm-r3-checkpoint20-exec-install-20261020 -> origin/mxm-r3-checkpoint20-exec-install-20261020
+2026-10-21T19:32:54.2131018Z  * [new branch]        mxm-r3-checkpoint20-main-register-20261020 -> origin/mxm-r3-checkpoint20-main-register-20261020
+2026-10-21T19:32:54.2133382Z  * [new branch]        mxm-r3-checkpoint20-private-readback-20261020 -> origin/mxm-r3-checkpoint20-private-readback-20261020
+2026-10-21T19:32:54.2135457Z  * [new branch]        mxm-r3-chronology-source-20261021 -> origin/mxm-r3-chronology-source-20261021
+2026-10-21T19:32:54.2137946Z  * [new branch]        mxm-r3-cleanup-observer-binding-20261021 -> origin/mxm-r3-cleanup-observer-binding-20261021
+2026-10-21T19:32:54.2140715Z  * [new branch]        mxm-r3-cleanup-prepared-exec-20261021 -> origin/mxm-r3-cleanup-prepared-exec-20261021
+2026-10-21T19:32:54.2143391Z  * [new branch]        mxm-r3-cleanup-prepared-main-20261021 -> origin/mxm-r3-cleanup-prepared-main-20261021
+2026-10-21T19:32:54.2146202Z  * [new branch]        mxm-r3-cold-corpus-exec-pin-20261020 -> origin/mxm-r3-cold-corpus-exec-pin-20261020
+2026-10-21T19:32:54.2149266Z  * [new branch]        mxm-r3-cold-corpus-main-pin-20261020 -> origin/mxm-r3-cold-corpus-main-pin-20261020
+2026-10-21T19:32:54.2152225Z  * [new branch]        mxm-r3-confirmed-issuer-access-20261020 -> origin/mxm-r3-confirmed-issuer-access-20261020
+2026-10-21T19:32:54.2155549Z  * [new branch]        mxm-r3-control-proof-recovered-lineage-20261020 -> origin/mxm-r3-control-proof-recovered-lineage-20261020
+2026-10-21T19:32:54.2160221Z  * [new branch]        mxm-r3-cp20-conflict-exec-pin-20261020 -> origin/mxm-r3-cp20-conflict-exec-pin-20261020
+2026-10-21T19:32:54.2165217Z  * [new branch]        mxm-r3-cp20-conflict-main-pin-20261020 -> origin/mxm-r3-cp20-conflict-main-pin-20261020
+2026-10-21T19:32:54.2170584Z  * [new branch]        mxm-r3-cp20-legacy-quarantine-20261020 -> origin/mxm-r3-cp20-legacy-quarantine-20261020
+2026-10-21T19:32:54.2175427Z  * [new branch]        mxm-r3-cp20-provenance-diagnostic-20261020 -> origin/mxm-r3-cp20-provenance-diagnostic-20261020
+2026-10-21T19:32:54.2180276Z  * [new branch]        mxm-r3-cp20-quarantine-exec-pin-20261020 -> origin/mxm-r3-cp20-quarantine-exec-pin-20261020
+2026-10-21T19:32:54.2183203Z  * [new branch]        mxm-r3-cp20-quarantine-main-pin-20261020 -> origin/mxm-r3-cp20-quarantine-main-pin-20261020
+2026-10-21T19:32:54.2186500Z  * [new branch]        mxm-r3-cp23-continuation-admission-20261021 -> origin/mxm-r3-cp23-continuation-admission-20261021
+2026-10-21T19:32:54.2190805Z  * [new branch]        mxm-r3-cp23-native-evidence-20261021 -> origin/mxm-r3-cp23-native-evidence-20261021
+2026-10-21T19:32:54.2196097Z  * [new branch]        mxm-r3-cp24-transport-native-evidence-20261021 -> origin/mxm-r3-cp24-transport-native-evidence-20261021
+2026-10-21T19:32:54.2200419Z  * [new branch]        mxm-r3-cp25-git-confirmation-evidence-20261021 -> origin/mxm-r3-cp25-git-confirmation-evidence-20261021
+2026-10-21T19:32:54.2204662Z  * [new branch]        mxm-r3-cp26-conserved-prepared-offline-evidence-20261021 -> origin/mxm-r3-cp26-conserved-prepared-offline-evidence-20261021
+2026-10-21T19:32:54.2208502Z  * [new branch]        mxm-r3-exact-native-reply-admission-20261021 -> origin/mxm-r3-exact-native-reply-admission-20261021
+2026-10-21T19:32:54.2211406Z  * [new branch]        mxm-r3-exact-reply-install-exec-20261021 -> origin/mxm-r3-exact-reply-install-exec-20261021
+2026-10-21T19:32:54.2214113Z  * [new branch]        mxm-r3-exact-reply-install-main-20261021 -> origin/mxm-r3-exact-reply-install-main-20261021
+2026-10-21T19:32:54.2217174Z  * [new branch]        mxm-r3-exclusive-chronology-repair-20261020 -> origin/mxm-r3-exclusive-chronology-repair-20261020
+2026-10-21T19:32:54.2220199Z  * [new branch]        mxm-r3-exclusive-native-reconciliation-20261020 -> origin/mxm-r3-exclusive-native-reconciliation-20261020
+2026-10-21T19:32:54.2223182Z  * [new branch]        mxm-r3-existing-observer-upgrade-20261021 -> origin/mxm-r3-existing-observer-upgrade-20261021
+2026-10-21T19:32:54.2227674Z  * [new branch]        mxm-r3-frozen-install-exec-20261021 -> origin/mxm-r3-frozen-install-exec-20261021
+2026-10-21T19:32:54.2231694Z  * [new branch]        mxm-r3-frozen-install-main-20261021 -> origin/mxm-r3-frozen-install-main-20261021
+2026-10-21T19:32:54.2236357Z  * [new branch]        mxm-r3-git-confirmation-admissions-20261021 -> origin/mxm-r3-git-confirmation-admissions-20261021
+2026-10-21T19:32:54.2240684Z  * [new branch]        mxm-r3-git-ref-confirmation-20261021 -> origin/mxm-r3-git-ref-confirmation-20261021
+2026-10-21T19:32:54.2244618Z  * [new branch]        mxm-r3-git-ref-install-exec-20261021 -> origin/mxm-r3-git-ref-install-exec-20261021
+2026-10-21T19:32:54.2247743Z  * [new branch]        mxm-r3-git-ref-install-main-20261021 -> origin/mxm-r3-git-ref-install-main-20261021
+2026-10-21T19:32:54.2250234Z  * [new branch]        mxm-r3-git-ref-observer-binding-20261021 -> origin/mxm-r3-git-ref-observer-binding-20261021
+2026-10-21T19:32:54.2253172Z  * [new branch]        mxm-r3-historical-native-diagnostic-20261021 -> origin/mxm-r3-historical-native-diagnostic-20261021
+2026-10-21T19:32:54.2257704Z  * [new branch]        mxm-r3-independent-cold-corpus-20261020 -> origin/mxm-r3-independent-cold-corpus-20261020
+2026-10-21T19:32:54.2260436Z  * [new branch]        mxm-r3-install-existing-observer-20261021 -> origin/mxm-r3-install-existing-observer-20261021
+2026-10-21T19:32:54.2263180Z  * [new branch]        mxm-r3-install-observer-transport-20261021 -> origin/mxm-r3-install-observer-transport-20261021
+2026-10-21T19:32:54.2266678Z  * [new branch]        mxm-r3-integrated-source-20261020 -> origin/mxm-r3-integrated-source-20261020
+2026-10-21T19:32:54.2268851Z  * [new branch]        mxm-r3-integrated-source-20261021 -> origin/mxm-r3-integrated-source-20261021
+2026-10-21T19:32:54.2271104Z  * [new branch]        mxm-r3-integrated-source-20261021-r2 -> origin/mxm-r3-integrated-source-20261021-r2
+2026-10-21T19:32:54.2273410Z  * [new branch]        mxm-r3-integrated-source-20261021-r3 -> origin/mxm-r3-integrated-source-20261021-r3
+2026-10-21T19:32:54.2275985Z  * [new branch]        mxm-r3-integrated-source-20261021-r4 -> origin/mxm-r3-integrated-source-20261021-r4
+2026-10-21T19:32:54.2278349Z  * [new branch]        mxm-r3-integrated-source-20261021-r5 -> origin/mxm-r3-integrated-source-20261021-r5
+2026-10-21T19:32:54.2280658Z  * [new branch]        mxm-r3-integrated-source-20261021-r6 -> origin/mxm-r3-integrated-source-20261021-r6
+2026-10-21T19:32:54.2282997Z  * [new branch]        mxm-r3-integrated-source-20261021-r7 -> origin/mxm-r3-integrated-source-20261021-r7
+2026-10-21T19:32:54.2285272Z  * [new branch]        mxm-r3-isolation-byte-pin-20261020 -> origin/mxm-r3-isolation-byte-pin-20261020
+2026-10-21T19:32:54.2288187Z  * [new branch]        mxm-r3-isolation-default-registration-20261020 -> origin/mxm-r3-isolation-default-registration-20261020
+2026-10-21T19:32:54.2291004Z  * [new branch]        mxm-r3-merge-history-source-seal-20261020 -> origin/mxm-r3-merge-history-source-seal-20261020
+2026-10-21T19:32:54.2293645Z  * [new branch]        mxm-r3-native-cas-cleanup-20261021 -> origin/mxm-r3-native-cas-cleanup-20261021
+2026-10-21T19:32:54.2296505Z  * [new branch]        mxm-r3-native-cas-protocol-fix-20261021 -> origin/mxm-r3-native-cas-protocol-fix-20261021
+2026-10-21T19:32:54.2299554Z  * [new branch]        mxm-r3-native-ci-reception-checkpoint-20261020 -> origin/mxm-r3-native-ci-reception-checkpoint-20261020
+2026-10-21T19:32:54.2302271Z  * [new branch]        mxm-r3-native-control-witness-20261021 -> origin/mxm-r3-native-control-witness-20261021
+2026-10-21T19:32:54.2304729Z  * [new branch]        mxm-r3-native-exact-ref-reply-20261021 -> origin/mxm-r3-native-exact-ref-reply-20261021
+2026-10-21T19:32:54.2307653Z  * [new branch]        mxm-r3-native-provenance-app-scope-20261020 -> origin/mxm-r3-native-provenance-app-scope-20261020
+2026-10-21T19:32:54.2310416Z  * [new branch]        mxm-r3-native-reception-admission-20261021 -> origin/mxm-r3-native-reception-admission-20261021
+2026-10-21T19:32:54.2313069Z  * [new branch]        mxm-r3-native-reception-evidence-20261021 -> origin/mxm-r3-native-reception-evidence-20261021
+2026-10-21T19:32:54.2316163Z  * [new branch]        mxm-r3-native-reception-research-hold-20261020 -> origin/mxm-r3-native-reception-research-hold-20261020
+2026-10-21T19:32:54.2319123Z  * [new branch]        mxm-r3-native-selector-cold-evidence-20261020 -> origin/mxm-r3-native-selector-cold-evidence-20261020
+2026-10-21T19:32:54.2321685Z  * [new branch]        mxm-r3-observer-cas-source-20261021 -> origin/mxm-r3-observer-cas-source-20261021
+2026-10-21T19:32:54.2324129Z  * [new branch]        mxm-r3-observer-exact-ref-source-20261021 -> origin/mxm-r3-observer-exact-ref-source-20261021
+2026-10-21T19:32:54.2327151Z  * [new branch]        mxm-r3-observer-transport-diagnostic-20261021 -> origin/mxm-r3-observer-transport-diagnostic-20261021
+2026-10-21T19:32:54.2330125Z  * [new branch]        mxm-r3-pepperstone-access-preparation-20261021 -> origin/mxm-r3-pepperstone-access-preparation-20261021
+2026-10-21T19:32:54.2333040Z  * [new branch]        mxm-r3-precredential-source-freeze-20261020 -> origin/mxm-r3-precredential-source-freeze-20261020
+2026-10-21T19:32:54.2336260Z  * [new branch]        mxm-r3-r6-finite-recovery-admission-20261021 -> origin/mxm-r3-r6-finite-recovery-admission-20261021
+2026-10-21T19:32:54.2338931Z  * [new branch]        mxm-r3-raw-receipt-consistency-20261020 -> origin/mxm-r3-raw-receipt-consistency-20261020
+2026-10-21T19:32:54.2341329Z  * [new branch]        mxm-r3-raw-receipt-exec-pin-20261020 -> origin/mxm-r3-raw-receipt-exec-pin-20261020
+2026-10-21T19:32:54.2343634Z  * [new branch]        mxm-r3-raw-receipt-main-pin-20261020 -> origin/mxm-r3-raw-receipt-main-pin-20261020
+2026-10-21T19:32:54.2346439Z  * [new branch]        mxm-r3-resource-partition-semantic-20261020 -> origin/mxm-r3-resource-partition-semantic-20261020
+2026-10-21T19:32:54.2349017Z  * [new branch]        mxm-r3-resource-readback-exec-20261020 -> origin/mxm-r3-resource-readback-exec-20261020
+2026-10-21T19:32:54.2351425Z  * [new branch]        mxm-r3-resource-readback-main-20261020 -> origin/mxm-r3-resource-readback-main-20261020
+2026-10-21T19:32:54.2354167Z  * [new branch]        mxm-r3-scoped-operational-install-exec-20261020 -> origin/mxm-r3-scoped-operational-install-exec-20261020
+2026-10-21T19:32:54.2357423Z  * [new branch]        mxm-r3-scoped-operational-install-main-20261020 -> origin/mxm-r3-scoped-operational-install-main-20261020
+2026-10-21T19:32:54.2360191Z  * [new branch]        mxm-r3-secret-isolation-install-20261020 -> origin/mxm-r3-secret-isolation-install-20261020
+2026-10-21T19:32:54.2362755Z  * [new branch]        mxm-r3-terminal-dependency-proof-20261020 -> origin/mxm-r3-terminal-dependency-proof-20261020
+2026-10-21T19:32:54.2365331Z  * [new branch]        mxm-r3-terminal-native-exec-pin-20261020 -> origin/mxm-r3-terminal-native-exec-pin-20261020
+2026-10-21T19:32:54.2368070Z  * [new branch]        mxm-r3-terminal-native-main-pin-20261020 -> origin/mxm-r3-terminal-native-main-pin-20261020
+2026-10-21T19:32:54.2370594Z  * [new branch]        mxm-r3-witness-install-exec-20261021 -> origin/mxm-r3-witness-install-exec-20261021
+2026-10-21T19:32:54.2372854Z  * [new branch]        mxm-r3-witness-install-main-20261021 -> origin/mxm-r3-witness-install-main-20261021
+2026-10-21T19:32:54.2375031Z  * [new branch]        mxm-remediation-p0-p4-20261015-v1 -> origin/mxm-remediation-p0-p4-20261015-v1
+2026-10-21T19:32:54.2377419Z  * [new branch]        mxm-root-cause-economic-20261014-v1 -> origin/mxm-root-cause-economic-20261014-v1
+2026-10-21T19:32:54.2379552Z  * [new branch]        mxm-root-cause-resume-20261014-v1 -> origin/mxm-root-cause-resume-20261014-v1
+2026-10-21T19:32:54.2381587Z  * [new branch]        performance-research-v3-20260922 -> origin/performance-research-v3-20260922
+2026-10-21T19:32:54.2383522Z  * [new branch]        pre-m6-closure-stage-20260917 -> origin/pre-m6-closure-stage-20260917
+2026-10-21T19:32:54.2385474Z  * [new branch]        pre-m6-integrity02-stage-20260917 -> origin/pre-m6-integrity02-stage-20260917
+2026-10-21T19:32:54.2387766Z  * [new branch]        recovery-byte-transfer-20260928 -> origin/recovery-byte-transfer-20260928
+2026-10-21T19:32:54.2389947Z  * [new branch]        support-only-depth-v2-211b733174627e49 -> origin/support-only-depth-v2-211b733174627e49
+2026-10-21T19:32:54.2392133Z  * [new branch]        support-only-v1-a770434a0c0108bd -> origin/support-only-v1-a770434a0c0108bd
+2026-10-21T19:32:54.2393975Z  * [new branch]        support-only-v1-arm-frozen  -> origin/support-only-v1-arm-frozen
+2026-10-21T19:32:54.2396130Z  * [new branch]        support-only-v1-final-delivery -> origin/support-only-v1-final-delivery
+2026-10-21T19:32:54.2398323Z  * [new branch]        support-only-v1-final-implementation -> origin/support-only-v1-final-implementation
+2026-10-21T19:32:54.2400589Z  * [new branch]        support-only-v1-final-result-frozen -> origin/support-only-v1-final-result-frozen
+2026-10-21T19:32:54.2402908Z  * [new branch]        support-only-v1-machine-final-preflight -> origin/support-only-v1-machine-final-preflight
+2026-10-21T19:32:54.2405215Z  * [new branch]        support-only-v1-machine-preflight -> origin/support-only-v1-machine-preflight
+2026-10-21T19:32:54.2407851Z  * [new branch]        support-only-v1-prearm-readiness -> origin/support-only-v1-prearm-readiness
+2026-10-21T19:32:54.2410000Z  * [new branch]        support-only-v1-preflight-accepted -> origin/support-only-v1-preflight-accepted
+2026-10-21T19:32:54.2476810Z  * [new branch]        support-only-v1-real-campaign -> origin/support-only-v1-real-campaign
+2026-10-21T19:32:54.2479229Z  * [new branch]        tmp-wave05-source-export-20260923 -> origin/tmp-wave05-source-export-20260923
+2026-10-21T19:32:54.2481292Z  * [new branch]        work/global-friction-triage-v7 -> origin/work/global-friction-triage-v7
+2026-10-21T19:32:54.2483104Z  * [new branch]        work/wave2-friction-v8      -> origin/work/wave2-friction-v8
+2026-10-21T19:32:54.2484862Z  * [new branch]        work/winner-first-friction-v9 -> origin/work/winner-first-friction-v9
+2026-10-21T19:32:54.2488577Z  * [new tag]           mxm-activity-clock-private-20261010_activity_clock_corrected_165a96f28b3f101b96d1-38071447179 -> mxm-activity-clock-private-20261010_activity_clock_corrected_165a96f28b3f101b96d1-38071447179
+2026-10-21T19:32:54.2492444Z  * [new tag]           mxm-aidr-locator-discovery-512c25b72d23-37956877105 -> mxm-aidr-locator-discovery-512c25b72d23-37956877105
+2026-10-21T19:32:54.2497108Z  * [new tag]           mxm-aidr-locator-extraction-claim-5c2f5c52c7d9369a1afba83948de67af482713738d70f662c66d2c0871c06be2 -> mxm-aidr-locator-extraction-claim-5c2f5c52c7d9369a1afba83948de67af482713738d70f662c66d2c0871c06be2
+2026-10-21T19:32:54.2501150Z  * [new tag]           mxm-aidr-locators-5c2f5c52c7d9-37960610158 -> mxm-aidr-locators-5c2f5c52c7d9-37960610158
+2026-10-21T19:32:54.2503421Z  * [new tag]           mxm-atomicity-v3-37917881441-beforereport -> mxm-atomicity-v3-37917881441-beforereport
+2026-10-21T19:32:54.2506091Z  * [new tag]           mxm-atomicity-v3-37921565944-aftercompletionref -> mxm-atomicity-v3-37921565944-aftercompletionref
+2026-10-21T19:32:54.2508825Z  * [new tag]           mxm-atomicity-v3-37921565944-afterpublicgit -> mxm-atomicity-v3-37921565944-afterpublicgit
+2026-10-21T19:32:54.2511160Z  * [new tag]           mxm-atomicity-v3-37921565944-afterreceipt -> mxm-atomicity-v3-37921565944-afterreceipt
+2026-10-21T19:32:54.2513357Z  * [new tag]           mxm-atomicity-v3-37921565944-afterreport -> mxm-atomicity-v3-37921565944-afterreport
+2026-10-21T19:32:54.2516067Z  * [new tag]           mxm-atomicity-v3-37921565944-beforecompletionreadback -> mxm-atomicity-v3-37921565944-beforecompletionreadback
+2026-10-21T19:32:54.2518758Z  * [new tag]           mxm-atomicity-v3-37921565944-beforepublicgit -> mxm-atomicity-v3-37921565944-beforepublicgit
+2026-10-21T19:32:54.2521068Z  * [new tag]           mxm-atomicity-v3-37921565944-beforereport -> mxm-atomicity-v3-37921565944-beforereport
+2026-10-21T19:32:54.2523362Z  * [new tag]           mxm-atomicity-v3-37921565944-ciphermismatch -> mxm-atomicity-v3-37921565944-ciphermismatch
+2026-10-21T19:32:54.2525484Z  * [new tag]           mxm-atomicity-v3-37921565944-normal -> mxm-atomicity-v3-37921565944-normal
+2026-10-21T19:32:54.2527716Z  * [new tag]           mxm-atomicity-v3-37921565944-rejectblob -> mxm-atomicity-v3-37921565944-rejectblob
+2026-10-21T19:32:54.2529868Z  * [new tag]           mxm-atomicity-v3-37921565944-rejectcommit -> mxm-atomicity-v3-37921565944-rejectcommit
+2026-10-21T19:32:54.2532079Z  * [new tag]           mxm-atomicity-v3-37921565944-rejectupdate -> mxm-atomicity-v3-37921565944-rejectupdate
+2026-10-21T19:32:54.2534376Z  * [new tag]           mxm-atomicity-v3-37921565944-releasemismatch -> mxm-atomicity-v3-37921565944-releasemismatch
+2026-10-21T19:32:54.2536492Z  * [new tag]           mxm-auto-20261015-g1321-s1  -> mxm-auto-20261015-g1321-s1
+2026-10-21T19:32:54.2538100Z  * [new tag]           mxm-auto-20261015-g1321-s1-consumed -> mxm-auto-20261015-g1321-s1-consumed
+2026-10-21T19:32:54.2539724Z  * [new tag]           mxm-auto-20261015-g1353-s2  -> mxm-auto-20261015-g1353-s2
+2026-10-21T19:32:54.2541494Z  * [new tag]           mxm-auto-20261015-g1353-s2-consumed -> mxm-auto-20261015-g1353-s2-consumed
+2026-10-21T19:32:54.2543099Z  * [new tag]           mxm-auto-20261015-g1380-s3  -> mxm-auto-20261015-g1380-s3
+2026-10-21T19:32:54.2544671Z  * [new tag]           mxm-auto-20261015-g1380-s3-consumed -> mxm-auto-20261015-g1380-s3-consumed
+2026-10-21T19:32:54.2546414Z  * [new tag]           mxm-auto-20261015-g1407-s4  -> mxm-auto-20261015-g1407-s4
+2026-10-21T19:32:54.2548011Z  * [new tag]           mxm-auto-20261015-g1407-s4-consumed -> mxm-auto-20261015-g1407-s4-consumed
+2026-10-21T19:32:54.2549598Z  * [new tag]           mxm-auto-20261015-g1439-s5  -> mxm-auto-20261015-g1439-s5
+2026-10-21T19:32:54.2551219Z  * [new tag]           mxm-auto-20261015-g1439-s5-consumed -> mxm-auto-20261015-g1439-s5-consumed
+2026-10-21T19:32:54.2552801Z  * [new tag]           mxm-auto-20261015-g1469-s6  -> mxm-auto-20261015-g1469-s6
+2026-10-21T19:32:54.2554386Z  * [new tag]           mxm-auto-20261015-g1469-s6-consumed -> mxm-auto-20261015-g1469-s6-consumed
+2026-10-21T19:32:54.2556108Z  * [new tag]           mxm-auto-20261015-g1485-s7  -> mxm-auto-20261015-g1485-s7
+2026-10-21T19:32:54.2557717Z  * [new tag]           mxm-auto-20261015-g1485-s7-consumed -> mxm-auto-20261015-g1485-s7-consumed
+2026-10-21T19:32:54.2559313Z  * [new tag]           mxm-auto-20261015-g1513-s8  -> mxm-auto-20261015-g1513-s8
+2026-10-21T19:32:54.2560904Z  * [new tag]           mxm-auto-20261015-g1513-s8-consumed -> mxm-auto-20261015-g1513-s8-consumed
+2026-10-21T19:32:54.2562497Z  * [new tag]           mxm-auto-20261015-g1540-s9  -> mxm-auto-20261015-g1540-s9
+2026-10-21T19:32:54.2564096Z  * [new tag]           mxm-auto-20261015-g1540-s9-consumed -> mxm-auto-20261015-g1540-s9-consumed
+2026-10-21T19:32:54.2565822Z  * [new tag]           mxm-auto-20261015-g1570-s10 -> mxm-auto-20261015-g1570-s10
+2026-10-21T19:32:54.2567456Z  * [new tag]           mxm-auto-20261015-g1570-s10-consumed -> mxm-auto-20261015-g1570-s10-consumed
+2026-10-21T19:32:54.2569220Z  * [new tag]           mxm-auto-20261015-g1595-s11 -> mxm-auto-20261015-g1595-s11
+2026-10-21T19:32:54.2570848Z  * [new tag]           mxm-auto-20261015-g1595-s11-consumed -> mxm-auto-20261015-g1595-s11-consumed
+2026-10-21T19:32:54.2572454Z  * [new tag]           mxm-auto-20261015-g1620-s12 -> mxm-auto-20261015-g1620-s12
+2026-10-21T19:32:54.2574068Z  * [new tag]           mxm-auto-20261015-g1620-s12-consumed -> mxm-auto-20261015-g1620-s12-consumed
+2026-10-21T19:32:54.2575847Z  * [new tag]           mxm-auto-20261015-g1647-s13 -> mxm-auto-20261015-g1647-s13
+2026-10-21T19:32:54.2577482Z  * [new tag]           mxm-auto-20261015-g1647-s13-consumed -> mxm-auto-20261015-g1647-s13-consumed
+2026-10-21T19:32:54.2579096Z  * [new tag]           mxm-auto-20261015-g1674-s14 -> mxm-auto-20261015-g1674-s14
+2026-10-21T19:32:54.2580694Z  * [new tag]           mxm-auto-20261015-g1674-s14-consumed -> mxm-auto-20261015-g1674-s14-consumed
+2026-10-21T19:32:54.2582324Z  * [new tag]           mxm-auto-20261015-g1679-s15 -> mxm-auto-20261015-g1679-s15
+2026-10-21T19:32:54.2583957Z  * [new tag]           mxm-auto-20261015-g1679-s15-consumed -> mxm-auto-20261015-g1679-s15-consumed
+2026-10-21T19:32:54.2585561Z  * [new tag]           mxm-auto-20261015-g1708-s16 -> mxm-auto-20261015-g1708-s16
+2026-10-21T19:32:54.2587306Z  * [new tag]           mxm-auto-20261015-g1708-s16-consumed -> mxm-auto-20261015-g1708-s16-consumed
+2026-10-21T19:32:54.2588915Z  * [new tag]           mxm-auto-20261015-g1737-s17 -> mxm-auto-20261015-g1737-s17
+2026-10-21T19:32:54.2590529Z  * [new tag]           mxm-auto-20261015-g1737-s17-consumed -> mxm-auto-20261015-g1737-s17-consumed
+2026-10-21T19:32:54.2592132Z  * [new tag]           mxm-auto-20261015-g1764-s18 -> mxm-auto-20261015-g1764-s18
+2026-10-21T19:32:54.2593746Z  * [new tag]           mxm-auto-20261015-g1764-s18-consumed -> mxm-auto-20261015-g1764-s18-consumed
+2026-10-21T19:32:54.2595363Z  * [new tag]           mxm-auto-20261015-g1789-s19 -> mxm-auto-20261015-g1789-s19
+2026-10-21T19:32:54.2597099Z  * [new tag]           mxm-auto-20261015-g1789-s19-consumed -> mxm-auto-20261015-g1789-s19-consumed
+2026-10-21T19:32:54.2599311Z  * [new tag]           mxm-autonomous-dispatch-proof-38564913748 -> mxm-autonomous-dispatch-proof-38564913748
+2026-10-21T19:32:54.2601410Z  * [new tag]           mxm-autonomous-economic-38679002289 -> mxm-autonomous-economic-38679002289
+2026-10-21T19:32:54.2603519Z  * [new tag]           mxm-autonomous-economic-38679002289-shard-0 -> mxm-autonomous-economic-38679002289-shard-0
+2026-10-21T19:32:54.2605861Z  * [new tag]           mxm-autonomous-native-proof-38679002289 -> mxm-autonomous-native-proof-38679002289
+2026-10-21T19:32:54.2608203Z  * [new tag]           mxm-autonomous-native-proof-38679002289-shard-0 -> mxm-autonomous-native-proof-38679002289-shard-0
+2026-10-21T19:32:54.2610535Z  * [new tag]           mxm-autonomous-native-proof-38679563793 -> mxm-autonomous-native-proof-38679563793
+2026-10-21T19:32:54.2612872Z  * [new tag]           mxm-autonomous-native-proof-38679563793-shard-0 -> mxm-autonomous-native-proof-38679563793-shard-0
+2026-10-21T19:32:54.2615210Z  * [new tag]           mxm-autonomous-native-proof-38680208144 -> mxm-autonomous-native-proof-38680208144
+2026-10-21T19:32:54.2617674Z  * [new tag]           mxm-autonomous-native-proof-38680208144-shard-0 -> mxm-autonomous-native-proof-38680208144-shard-0
+2026-10-21T19:32:54.2620007Z  * [new tag]           mxm-autonomous-native-proof-38680877428 -> mxm-autonomous-native-proof-38680877428
+2026-10-21T19:32:54.2622342Z  * [new tag]           mxm-autonomous-native-proof-38680877428-shard-0 -> mxm-autonomous-native-proof-38680877428-shard-0
+2026-10-21T19:32:54.2624657Z  * [new tag]           mxm-autonomous-native-proof-38681466522 -> mxm-autonomous-native-proof-38681466522
+2026-10-21T19:32:54.2627341Z  * [new tag]           mxm-autonomous-native-proof-38681466522-shard-0 -> mxm-autonomous-native-proof-38681466522-shard-0
+2026-10-21T19:32:54.2629691Z  * [new tag]           mxm-autonomous-native-proof-38682113934 -> mxm-autonomous-native-proof-38682113934
+2026-10-21T19:32:54.2632155Z  * [new tag]           mxm-autonomous-native-proof-38682113934-shard-0 -> mxm-autonomous-native-proof-38682113934-shard-0
+2026-10-21T19:32:54.2634477Z  * [new tag]           mxm-autonomous-native-proof-38682897882 -> mxm-autonomous-native-proof-38682897882
+2026-10-21T19:32:54.2637034Z  * [new tag]           mxm-autonomous-native-proof-38682897882-shard-0 -> mxm-autonomous-native-proof-38682897882-shard-0
+2026-10-21T19:32:54.2640997Z  * [new tag]           mxm-autonomous-native-proof-38683483802 -> mxm-autonomous-native-proof-38683483802
+2026-10-21T19:32:54.2643595Z  * [new tag]           mxm-autonomous-native-proof-38683483802-shard-0 -> mxm-autonomous-native-proof-38683483802-shard-0
+2026-10-21T19:32:54.2646092Z  * [new tag]           mxm-autonomous-native-proof-38684112906 -> mxm-autonomous-native-proof-38684112906
+2026-10-21T19:32:54.2648421Z  * [new tag]           mxm-autonomous-native-proof-38684112906-shard-0 -> mxm-autonomous-native-proof-38684112906-shard-0
+2026-10-21T19:32:54.2650753Z  * [new tag]           mxm-autonomous-native-proof-38684685849 -> mxm-autonomous-native-proof-38684685849
+2026-10-21T19:32:54.2653069Z  * [new tag]           mxm-autonomous-native-proof-38684685849-shard-0 -> mxm-autonomous-native-proof-38684685849-shard-0
+2026-10-21T19:32:54.2655381Z  * [new tag]           mxm-autonomous-native-proof-38685369376 -> mxm-autonomous-native-proof-38685369376
+2026-10-21T19:32:54.2657892Z  * [new tag]           mxm-autonomous-native-proof-38685369376-shard-0 -> mxm-autonomous-native-proof-38685369376-shard-0
+2026-10-21T19:32:54.2660202Z  * [new tag]           mxm-autonomous-native-proof-38686052568 -> mxm-autonomous-native-proof-38686052568
+2026-10-21T19:32:54.2662507Z  * [new tag]           mxm-autonomous-native-proof-38686052568-shard-0 -> mxm-autonomous-native-proof-38686052568-shard-0
+2026-10-21T19:32:54.2664812Z  * [new tag]           mxm-autonomous-native-proof-38686729406 -> mxm-autonomous-native-proof-38686729406
+2026-10-21T19:32:54.2667237Z  * [new tag]           mxm-autonomous-native-proof-38686729406-shard-0 -> mxm-autonomous-native-proof-38686729406-shard-0
+2026-10-21T19:32:54.2669717Z  * [new tag]           mxm-autonomous-native-proof-38687372030 -> mxm-autonomous-native-proof-38687372030
+2026-10-21T19:32:54.2672006Z  * [new tag]           mxm-autonomous-native-proof-38687372030-shard-0 -> mxm-autonomous-native-proof-38687372030-shard-0
+2026-10-21T19:32:54.2674321Z  * [new tag]           mxm-autonomous-native-proof-38688106312 -> mxm-autonomous-native-proof-38688106312
+2026-10-21T19:32:54.2676760Z  * [new tag]           mxm-autonomous-native-proof-38688106312-shard-0 -> mxm-autonomous-native-proof-38688106312-shard-0
+2026-10-21T19:32:54.2679068Z  * [new tag]           mxm-autonomous-native-proof-38688742813 -> mxm-autonomous-native-proof-38688742813
+2026-10-21T19:32:54.2681352Z  * [new tag]           mxm-autonomous-native-proof-38688742813-shard-0 -> mxm-autonomous-native-proof-38688742813-shard-0
+2026-10-21T19:32:54.2683642Z  * [new tag]           mxm-autonomous-native-proof-38689380585 -> mxm-autonomous-native-proof-38689380585
+2026-10-21T19:32:54.2686027Z  * [new tag]           mxm-autonomous-native-proof-38689380585-shard-0 -> mxm-autonomous-native-proof-38689380585-shard-0
+2026-10-21T19:32:54.2688305Z  * [new tag]           mxm-autonomous-native-proof-38690012092 -> mxm-autonomous-native-proof-38690012092
+2026-10-21T19:32:54.2690590Z  * [new tag]           mxm-autonomous-native-proof-38690012092-shard-0 -> mxm-autonomous-native-proof-38690012092-shard-0
+2026-10-21T19:32:54.2692842Z  * [new tag]           mxm-autonomous-native-proof-38690773683 -> mxm-autonomous-native-proof-38690773683
+2026-10-21T19:32:54.2695109Z  * [new tag]           mxm-autonomous-native-proof-38690773683-shard-0 -> mxm-autonomous-native-proof-38690773683-shard-0
+2026-10-21T19:32:54.2698530Z  * [new tag]           mxm-broker-native-liquidity-20261010_native_spread_liquidity_disjoint_5m_v1_a1793b6d -> mxm-broker-native-liquidity-20261010_native_spread_liquidity_disjoint_5m_v1_a1793b6d
+2026-10-21T19:32:54.2702591Z  * [new tag]           mxm-checkpoint100-recovery-v1-608008c49372fa53b5572d949dd686afabb0870a -> mxm-checkpoint100-recovery-v1-608008c49372fa53b5572d949dd686afabb0870a
+2026-10-21T19:32:54.2705418Z  * [new tag]           mxm-checkpoint512-recovery-38580110071 -> mxm-checkpoint512-recovery-38580110071
+2026-10-21T19:32:54.2708544Z  * [new tag]           mxm-cloud-native-covariance-20261010_native_joint_spread_mid_concordance_f17ae604 -> mxm-cloud-native-covariance-20261010_native_joint_spread_mid_concordance_f17ae604
+2026-10-21T19:32:54.2712995Z  * [new tag]           mxm-cloud-native-private-aggregate-20261010_native_joint_spread_mid_concordance_f17ae604-38039926683 -> mxm-cloud-native-private-aggregate-20261010_native_joint_spread_mid_concordance_f17ae604-38039926683
+2026-10-21T19:32:54.2717263Z  * [new tag]           mxm-complete-strategy-data-20261012_complete_strategy_v1-38216212474 -> mxm-complete-strategy-data-20261012_complete_strategy_v1-38216212474
+2026-10-21T19:32:54.2720067Z  * [new tag]           mxm-complete-strategy-one-use-20261012-v1 -> mxm-complete-strategy-one-use-20261012-v1
+2026-10-21T19:32:54.2722473Z  * [new tag]           mxm-complete-strategy-stage-a-one-use-20261012-v1 -> mxm-complete-strategy-stage-a-one-use-20261012-v1
+2026-10-21T19:32:54.2725084Z  * [new tag]           mxm-corrected-v3-independent-readback-37921565944 -> mxm-corrected-v3-independent-readback-37921565944
+2026-10-21T19:32:54.2728109Z  * [new tag]           mxm-cost-frequency-history-20261012_cost_frequency_v1-38197915724 -> mxm-cost-frequency-history-20261012_cost_frequency_v1-38197915724
+2026-10-21T19:32:54.2730691Z  * [new tag]           mxm-cost-frequency-one-use-20261012-v1 -> mxm-cost-frequency-one-use-20261012-v1
+2026-10-21T19:32:54.2733251Z  * [new tag]           mxm-cost-frequency-quotes-20261012_cost_frequency_v1-38197915724 -> mxm-cost-frequency-quotes-20261012_cost_frequency_v1-38197915724
+2026-10-21T19:32:54.2736470Z  * [new tag]           mxm-cost-frequency-screen-20261012_cost_frequency_v1-38197915724 -> mxm-cost-frequency-screen-20261012_cost_frequency_v1-38197915724
+2026-10-21T19:32:54.2739527Z  * [new tag]           mxm-critical-intervention-final-report-38565371709 -> mxm-critical-intervention-final-report-38565371709
+2026-10-21T19:32:54.2741947Z  * [new tag]           mxm-critical-preserve-20261014-38561983112 -> mxm-critical-preserve-20261014-38561983112
+2026-10-21T19:32:54.2745107Z  * [new tag]           mxm-cross-asset-liquidity-20261010_existing_quotepanel_crossclass_context_v1_d7164b9e -> mxm-cross-asset-liquidity-20261010_existing_quotepanel_crossclass_context_v1_d7164b9e
+2026-10-21T19:32:54.2749311Z  * [new tag]           mxm-diverse-wave-synthetic-launch-15ecb95f2ec1b66d28b03bc787658bf9c9b9c214 -> mxm-diverse-wave-synthetic-launch-15ecb95f2ec1b66d28b03bc787658bf9c9b9c214
+2026-10-21T19:32:54.2753426Z  * [new tag]           mxm-diverse-wave-v2-synthetic-launch-d05cb62f933da5fc10fc12ffa51a19880d78939f -> mxm-diverse-wave-v2-synthetic-launch-d05cb62f933da5fc10fc12ffa51a19880d78939f
+2026-10-21T19:32:54.2757171Z  * [new tag]           mxm-dom-information-20261014-dom-information-v1-38508921473 -> mxm-dom-information-20261014-dom-information-v1-38508921473
+2026-10-21T19:32:54.2759707Z  * [new tag]           mxm-dom-information-one-use-20261014-v1 -> mxm-dom-information-one-use-20261014-v1
+2026-10-21T19:32:54.2762179Z  * [new tag]           mxm-dom-information-owner-readback-complete-20261014-v1 -> mxm-dom-information-owner-readback-complete-20261014-v1
+2026-10-21T19:32:54.2764607Z  * [new tag]           mxm-dom-live-probe-one-use-20261013-v1 -> mxm-dom-live-probe-one-use-20261013-v1
+2026-10-21T19:32:54.2767138Z  * [new tag]           mxm-dom-live-probe-owner-readback-complete-20261013-v1 -> mxm-dom-live-probe-owner-readback-complete-20261013-v1
+2026-10-21T19:32:54.2769811Z  * [new tag]           mxm-dom-technical-20261013-dom-live-v1-38417047055 -> mxm-dom-technical-20261013-dom-live-v1-38417047055
+2026-10-21T19:32:54.2772731Z  * [new tag]           mxm-duration-20261014-duration-cost-precheck-v1-38527989736 -> mxm-duration-20261014-duration-cost-precheck-v1-38527989736
+2026-10-21T19:32:54.2775827Z  * [new tag]           mxm-duration-20261014-duration-one-pilot-v1-38528427815 -> mxm-duration-20261014-duration-one-pilot-v1-38528427815
+2026-10-21T19:32:54.2778199Z  * [new tag]           mxm-duration-pilot-one-use-20261014-v1 -> mxm-duration-pilot-one-use-20261014-v1
+2026-10-21T19:32:54.2780240Z  * [new tag]           mxm-duration-precheck-one-use-20261014-v1 -> mxm-duration-precheck-one-use-20261014-v1
+2026-10-21T19:32:54.2782448Z  * [new tag]           mxm-dynamic-exit-capture-one-use-20261012-v1 -> mxm-dynamic-exit-capture-one-use-20261012-v1
+2026-10-21T19:32:54.2785367Z  * [new tag]           mxm-dynamic-exit-checkpoints-20261012_dynamic_exit_capture_v1-38209738609 -> mxm-dynamic-exit-checkpoints-20261012_dynamic_exit_capture_v1-38209738609
+2026-10-21T19:32:54.2789048Z  * [new tag]           mxm-dynamic-exit-checkpoints-20261012_dynamic_exit_recovery_v1-38209357519 -> mxm-dynamic-exit-checkpoints-20261012_dynamic_exit_recovery_v1-38209357519
+2026-10-21T19:32:54.2792394Z  * [new tag]           mxm-dynamic-exit-checkpoints-20261012_dynamic_exit_v1-38209053002 -> mxm-dynamic-exit-checkpoints-20261012_dynamic_exit_v1-38209053002
+2026-10-21T19:32:54.2794858Z  * [new tag]           mxm-dynamic-exit-one-use-20261012-v1 -> mxm-dynamic-exit-one-use-20261012-v1
+2026-10-21T19:32:54.2797039Z  * [new tag]           mxm-dynamic-exit-recovery-one-use-20261012-v1 -> mxm-dynamic-exit-recovery-one-use-20261012-v1
+2026-10-21T19:32:54.2799319Z  * [new tag]           mxm-economic-bottleneck-20261014-38536026512 -> mxm-economic-bottleneck-20261014-38536026512
+2026-10-21T19:32:54.2801838Z  * [new tag]           mxm-economic-bottleneck-20261014-reconciliation-once-v1 -> mxm-economic-bottleneck-20261014-reconciliation-once-v1
+2026-10-21T19:32:54.2804899Z  * [new tag]           mxm-economic-bottleneck-public-safe-readback-once-20261014-v1 -> mxm-economic-bottleneck-public-safe-readback-once-20261014-v1
+2026-10-21T19:32:54.2807778Z  * [new tag]           mxm-economic-process-reset-20261014-v1 -> mxm-economic-process-reset-20261014-v1
+2026-10-21T19:32:54.2809949Z  * [new tag]           mxm-economic-process-reset-20261014-v1-shard-0 -> mxm-economic-process-reset-20261014-v1-shard-0
+2026-10-21T19:32:54.2813007Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_diag_bc3a78ee799f4694737d-38073677080 -> mxm-executable-diagnostic-relay-20261010_diag_bc3a78ee799f4694737d-38073677080
+2026-10-21T19:32:54.2816971Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_fields_c1281b36a655e4ccefa5-38074154560 -> mxm-executable-diagnostic-relay-20261010_fields_c1281b36a655e4ccefa5-38074154560
+2026-10-21T19:32:54.2820752Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_native_entry_economic_v2-38084013421 -> mxm-executable-diagnostic-relay-20261010_native_entry_economic_v2-38084013421
+2026-10-21T19:32:54.2824647Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_native_proven_response_recovery-38077972378 -> mxm-executable-diagnostic-relay-20261010_native_proven_response_recovery-38077972378
+2026-10-21T19:32:54.2828813Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_native_receipt_cause_readback-38078431756 -> mxm-executable-diagnostic-relay-20261010_native_receipt_cause_readback-38078431756
+2026-10-21T19:32:54.2832819Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_native_saved_failure_readback-38077813702 -> mxm-executable-diagnostic-relay-20261010_native_saved_failure_readback-38077813702
+2026-10-21T19:32:54.2836820Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_quotes_5a3d65f9907d527d5711-38073967516 -> mxm-executable-diagnostic-relay-20261010_quotes_5a3d65f9907d527d5711-38073967516
+2026-10-21T19:32:54.2840670Z  * [new tag]           mxm-executable-diagnostic-relay-20261010_saved_native_semantic_audit-38081134886 -> mxm-executable-diagnostic-relay-20261010_saved_native_semantic_audit-38081134886
+2026-10-21T19:32:54.2844424Z  * [new tag]           mxm-executable-diagnostic-relay-20261011_body_persistence-38125067899 -> mxm-executable-diagnostic-relay-20261011_body_persistence-38125067899
+2026-10-21T19:32:54.2848204Z  * [new tag]           mxm-executable-diagnostic-relay-20261011_integrated_alpha_campaign-38143933827 -> mxm-executable-diagnostic-relay-20261011_integrated_alpha_campaign-38143933827
+2026-10-21T19:32:54.2852129Z  * [new tag]           mxm-executable-diagnostic-relay-20261011_wide_greenfield_continuation_v1-38150775948 -> mxm-executable-diagnostic-relay-20261011_wide_greenfield_continuation_v1-38150775948
+2026-10-21T19:32:54.2856975Z  * [new tag]           mxm-executable-diagnostic-relay-20261011_wide_quote_completion_v1-38152844809 -> mxm-executable-diagnostic-relay-20261011_wide_quote_completion_v1-38152844809
+2026-10-21T19:32:54.2860766Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_complete_strategy_stage_a-38214353470 -> mxm-executable-diagnostic-relay-20261012_complete_strategy_stage_a-38214353470
+2026-10-21T19:32:54.2864424Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_complete_strategy_v1-38216212474 -> mxm-executable-diagnostic-relay-20261012_complete_strategy_v1-38216212474
+2026-10-21T19:32:54.2868205Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_cost_frequency_v1-38197915724 -> mxm-executable-diagnostic-relay-20261012_cost_frequency_v1-38197915724
+2026-10-21T19:32:54.2871744Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_dynamic_exit_capture_v1-38209738609 -> mxm-executable-diagnostic-relay-20261012_dynamic_exit_capture_v1-38209738609
+2026-10-21T19:32:54.2875421Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_dynamic_exit_recovery_v1-38209357519 -> mxm-executable-diagnostic-relay-20261012_dynamic_exit_recovery_v1-38209357519
+2026-10-21T19:32:54.2879240Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_exit_final_readback_v1-38210265400 -> mxm-executable-diagnostic-relay-20261012_exit_final_readback_v1-38210265400
+2026-10-21T19:32:54.2883221Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_information_source_readback_v1-38223705320 -> mxm-executable-diagnostic-relay-20261012_information_source_readback_v1-38223705320
+2026-10-21T19:32:54.2887814Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_native_numeric_private_decision_metrics_readback_v3-38244279805 -> mxm-executable-diagnostic-relay-20261012_native_numeric_private_decision_metrics_readback_v3-38244279805
+2026-10-21T19:32:54.2892344Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_predictive_feasibility_stopgo_v1-38221183658 -> mxm-executable-diagnostic-relay-20261012_predictive_feasibility_stopgo_v1-38221183658
+2026-10-21T19:32:54.2896785Z  * [new tag]           mxm-executable-diagnostic-relay-20261012_standing_native_saved_econ_recovery_exact_v3-38239902202 -> mxm-executable-diagnostic-relay-20261012_standing_native_saved_econ_recovery_exact_v3-38239902202
+2026-10-21T19:32:54.2900471Z  * [new tag]           mxm-executable-fields-20261010_fields_c1281b36a655e4ccefa5 -> mxm-executable-fields-20261010_fields_c1281b36a655e4ccefa5
+2026-10-21T19:32:54.2903809Z  * [new tag]           mxm-executable-quote-checkpoints-20261010_quotes_5a3d65f9907d527d5711-38073967516 -> mxm-executable-quote-checkpoints-20261010_quotes_5a3d65f9907d527d5711-38073967516
+2026-10-21T19:32:54.2907531Z  * [new tag]           mxm-executable-quote-completion-20261010_quotes_5a3d65f9907d527d5711 -> mxm-executable-quote-completion-20261010_quotes_5a3d65f9907d527d5711
+2026-10-21T19:32:54.2910799Z  * [new tag]           mxm-existing-support-diagnostic-20261010_diag_bc3a78ee799f4694737d -> mxm-existing-support-diagnostic-20261010_diag_bc3a78ee799f4694737d
+2026-10-21T19:32:54.2914214Z  * [new tag]           mxm-existing1576-synthetic-v1-f990524949a1534ee0ad4c77f6346de1a00b974f -> mxm-existing1576-synthetic-v1-f990524949a1534ee0ad4c77f6346de1a00b974f
+2026-10-21T19:32:54.2917322Z  * [new tag]           mxm-exit-final-readback-one-use-20261012-v1 -> mxm-exit-final-readback-one-use-20261012-v1
+2026-10-21T19:32:54.2920293Z  * [new tag]           mxm-extrema-h1-private-compact-h1_compact_private_transport_20261010_bd7c77b0 -> mxm-extrema-h1-private-compact-h1_compact_private_transport_20261010_bd7c77b0
+2026-10-21T19:32:54.2924130Z  * [new tag]           mxm-extrema-readback-oneuse-20261010_h1_extrema_existing_cipher_only_private_a9f6e1 -> mxm-extrema-readback-oneuse-20261010_h1_extrema_existing_cipher_only_private_a9f6e1
+2026-10-21T19:32:54.2928301Z  * [new tag]           mxm-factor-economic-completion-20261014-saved-factor-economics-v2-38515558554 -> mxm-factor-economic-completion-20261014-saved-factor-economics-v2-38515558554
+2026-10-21T19:32:54.2931678Z  * [new tag]           mxm-factor-economic-completion-one-use-20261014-v1 -> mxm-factor-economic-completion-one-use-20261014-v1
+2026-10-21T19:32:54.2934284Z  * [new tag]           mxm-factor-economic-completion-one-use-20261014-v2 -> mxm-factor-economic-completion-one-use-20261014-v2
+2026-10-21T19:32:54.2937483Z  * [new tag]           mxm-factor-economic-completion-owner-readback-complete-20261014-v2 -> mxm-factor-economic-completion-owner-readback-complete-20261014-v2
+2026-10-21T19:32:54.2941066Z  * [new tag]           mxm-factor-loading-drift-20261014-factor-loading-drift-v1-38513586733 -> mxm-factor-loading-drift-20261014-factor-loading-drift-v1-38513586733
+2026-10-21T19:32:54.2943981Z  * [new tag]           mxm-factor-loading-drift-one-use-20261014-v1 -> mxm-factor-loading-drift-one-use-20261014-v1
+2026-10-21T19:32:54.2946807Z  * [new tag]           mxm-factor-loading-drift-owner-readback-complete-20261014-v1 -> mxm-factor-loading-drift-owner-readback-complete-20261014-v1
+2026-10-21T19:32:54.2949391Z  * [new tag]           mxm-final-native-continuation-from-1102 -> mxm-final-native-continuation-from-1102
+2026-10-21T19:32:54.2951390Z  * [new tag]           mxm-final-native-continuation-from-1281 -> mxm-final-native-continuation-from-1281
+2026-10-21T19:32:54.2953372Z  * [new tag]           mxm-final-native-continuation-from-719 -> mxm-final-native-continuation-from-719
+2026-10-21T19:32:54.2955494Z  * [new tag]           mxm-final-native-continuation-from-912 -> mxm-final-native-continuation-from-912
+2026-10-21T19:32:54.2957388Z  * [new tag]           mxm-final-recovery-20261014-v1 -> mxm-final-recovery-20261014-v1
+2026-10-21T19:32:54.2959087Z  * [new tag]           mxm-final-recovery-20261014-v1-shard-0 -> mxm-final-recovery-20261014-v1-shard-0
+2026-10-21T19:32:54.2961305Z  * [new tag]           mxm-final-recovery-20261014-v1-synthetic-38601325059 -> mxm-final-recovery-20261014-v1-synthetic-38601325059
+2026-10-21T19:32:54.2964096Z  * [new tag]           mxm-final-recovery-20261014-v1-synthetic-38601325059-shard-0 -> mxm-final-recovery-20261014-v1-synthetic-38601325059-shard-0
+2026-10-21T19:32:54.2967171Z  * [new tag]           mxm-final-recovery-20261014-v1-synthetic-38601325059-shard-1 -> mxm-final-recovery-20261014-v1-synthetic-38601325059-shard-1
+2026-10-21T19:32:54.2970398Z  * [new tag]           mxm-finalization-v3-proof-27ed9bb3bb1d9e96d0a5a833cba78fcf385c8f12 -> mxm-finalization-v3-proof-27ed9bb3bb1d9e96d0a5a833cba78fcf385c8f12
+2026-10-21T19:32:54.2973820Z  * [new tag]           mxm-finalization-v3-proof-8529df2ef4b266c41f3510085c4d44bcea9e4d4b -> mxm-finalization-v3-proof-8529df2ef4b266c41f3510085c4d44bcea9e4d4b
+2026-10-21T19:32:54.2976945Z  * [new tag]           mxm-forward-cost-checkpoints-47564f30eba6-38025035835 -> mxm-forward-cost-checkpoints-47564f30eba6-38025035835
+2026-10-21T19:32:54.2979834Z  * [new tag]           mxm-forward-cost-diagnostic-47564f30eba6420c9dc4f380d621ebb6 -> mxm-forward-cost-diagnostic-47564f30eba6420c9dc4f380d621ebb6
+2026-10-21T19:32:54.2982553Z  * [new tag]           mxm-full-frontier-cipher-delivery-38560329919 -> mxm-full-frontier-cipher-delivery-38560329919
+2026-10-21T19:32:54.2984675Z  * [new tag]           mxm-full-frontier-readback-38559997137 -> mxm-full-frontier-readback-38559997137
+2026-10-21T19:32:54.2987104Z  * [new tag]           mxm-full-frontier-readback-38559997137-result -> mxm-full-frontier-readback-38559997137-result
+2026-10-21T19:32:54.2989174Z  * [new tag]           mxm-full-native-frontier-20261014-v1 -> mxm-full-native-frontier-20261014-v1
+2026-10-21T19:32:54.2991510Z  * [new tag]           mxm-full-native-frontier-20261014-v1-38555928258-bootstrap -> mxm-full-native-frontier-20261014-v1-38555928258-bootstrap
+2026-10-21T19:32:54.2994334Z  * [new tag]           mxm-full-native-frontier-20261014-v1-38555928258-worker_01 -> mxm-full-native-frontier-20261014-v1-38555928258-worker_01
+2026-10-21T19:32:54.2997743Z  * [new tag]           mxm-h1-compact-private-h1_compact_private_transport_20261010_bd7c77b0-38068196142 -> mxm-h1-compact-private-h1_compact_private_transport_20261010_bd7c77b0-38068196142
+2026-10-21T19:32:54.3000695Z  * [new tag]           mxm-independent-economic-order-20261014-v1 -> mxm-independent-economic-order-20261014-v1
+2026-10-21T19:32:54.3003040Z  * [new tag]           mxm-independent-economic-order-20261014-v1-shard-0 -> mxm-independent-economic-order-20261014-v1-shard-0
+2026-10-21T19:32:54.3005411Z  * [new tag]           mxm-information-source-readback-20261012-v1 -> mxm-information-source-readback-20261012-v1
+2026-10-21T19:32:54.3007609Z  * [new tag]           mxm-integrated-alpha-campaign-20261011 -> mxm-integrated-alpha-campaign-20261011
+2026-10-21T19:32:54.3010235Z  * [new tag]           mxm-integrated-history-20261011_integrated_alpha_campaign-38143933827 -> mxm-integrated-history-20261011_integrated_alpha_campaign-38143933827
+2026-10-21T19:32:54.3012940Z  * [new tag]           mxm-level-pressure-development-20261014-v1 -> mxm-level-pressure-development-20261014-v1
+2026-10-21T19:32:54.3015297Z  * [new tag]           mxm-level-pressure-development-20261014-v1-shard-0 -> mxm-level-pressure-development-20261014-v1-shard-0
+2026-10-21T19:32:54.3018350Z  * [new tag]           mxm-master1576-metadata-v1-58390a25c247086ef7bbcf1cd74ee3f2f8c8e102 -> mxm-master1576-metadata-v1-58390a25c247086ef7bbcf1cd74ee3f2f8c8e102
+2026-10-21T19:32:54.3021911Z  * [new tag]           mxm-master1576-v2-screen-attempt-233c8d2b323ecdf69145d4f744099ccdcc88a0ce -> mxm-master1576-v2-screen-attempt-233c8d2b323ecdf69145d4f744099ccdcc88a0ce
+2026-10-21T19:32:54.3024969Z  * [new tag]           mxm-native-1307-continuation-20261015-v1 -> mxm-native-1307-continuation-20261015-v1
+2026-10-21T19:32:54.3027306Z  * [new tag]           mxm-native-1307-continuation-20261015-v1-shard-0 -> mxm-native-1307-continuation-20261015-v1-shard-0
+2026-10-21T19:32:54.3029403Z  * [new tag]           mxm-native-body-persistence-20261011 -> mxm-native-body-persistence-20261011
+2026-10-21T19:32:54.3031656Z  * [new tag]           mxm-native-coverage-economic-completion-20261014-v1 -> mxm-native-coverage-economic-completion-20261014-v1
+2026-10-21T19:32:54.3034037Z  * [new tag]           mxm-native-coverage-expansion-38540231625 -> mxm-native-coverage-expansion-38540231625
+2026-10-21T19:32:54.3036421Z  * [new tag]           mxm-native-coverage-expansion-tranche1-20261014 -> mxm-native-coverage-expansion-tranche1-20261014
+2026-10-21T19:32:54.3038726Z  * [new tag]           mxm-native-economic-completion-38543479609 -> mxm-native-economic-completion-38543479609
+2026-10-21T19:32:54.3040748Z  * [new tag]           mxm-native-entry-economic-v2-20261010 -> mxm-native-entry-economic-v2-20261010
+2026-10-21T19:32:54.3042524Z  * [new tag]           mxm-native-frontier-next-from-195 -> mxm-native-frontier-next-from-195
+2026-10-21T19:32:54.3044200Z  * [new tag]           mxm-native-frontier-next-from-343 -> mxm-native-frontier-next-from-343
+2026-10-21T19:32:54.3046017Z  * [new tag]           mxm-native-frontier-next-from-512 -> mxm-native-frontier-next-from-512
+2026-10-21T19:32:54.3047890Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2 -> mxm-native-frontier-repaired-20261014-v2
+2026-10-21T19:32:54.3050130Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-shard-0 -> mxm-native-frontier-repaired-20261014-v2-shard-0
+2026-10-21T19:32:54.3052678Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-shard-1 -> mxm-native-frontier-repaired-20261014-v2-shard-1
+2026-10-21T19:32:54.3055125Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-shard-2 -> mxm-native-frontier-repaired-20261014-v2-shard-2
+2026-10-21T19:32:54.3057721Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-shard-3 -> mxm-native-frontier-repaired-20261014-v2-shard-3
+2026-10-21T19:32:54.3060666Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-storage-smoke-38563302227 -> mxm-native-frontier-repaired-20261014-v2-storage-smoke-38563302227
+2026-10-21T19:32:54.3064288Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-storage-smoke-38563302227-shard-0 -> mxm-native-frontier-repaired-20261014-v2-storage-smoke-38563302227-shard-0
+2026-10-21T19:32:54.3069710Z  * [new tag]           mxm-native-frontier-repaired-20261014-v2-storage-smoke-38563302227-shard-1 -> mxm-native-frontier-repaired-20261014-v2-storage-smoke-38563302227-shard-1
+2026-10-21T19:32:54.3075199Z  * [new tag]           mxm-native-history-20261010_native_bb80f4fb822639350896 -> mxm-native-history-20261010_native_bb80f4fb822639350896
+2026-10-21T19:32:54.3081018Z  * [new tag]           mxm-native-history-20261010_native_bb80f4fb822639350896_canonical_recovery -> mxm-native-history-20261010_native_bb80f4fb822639350896_canonical_recovery
+2026-10-21T19:32:54.3088598Z  * [new tag]           mxm-native-history-checkpoints-20261010_native_bb80f4fb822639350896_canonical_recovery-38077642338 -> mxm-native-history-checkpoints-20261010_native_bb80f4fb822639350896_canonical_recovery-38077642338
+2026-10-21T19:32:54.3097007Z  * [new tag]           mxm-native-history-checkpoints-20261010_native_proven_response_recovery-38077972378 -> mxm-native-history-checkpoints-20261010_native_proven_response_recovery-38077972378
+2026-10-21T19:32:54.3101297Z  * [new tag]           mxm-native-proven-response-recovery-20261010 -> mxm-native-proven-response-recovery-20261010
+2026-10-21T19:32:54.3103600Z  * [new tag]           mxm-native-receipt-cause-readback-20261010 -> mxm-native-receipt-cause-readback-20261010
+2026-10-21T19:32:54.3106418Z  * [new tag]           mxm-native-repair-error-classification-38565720217 -> mxm-native-repair-error-classification-38565720217
+2026-10-21T19:32:54.3109511Z  * [new tag]           mxm-native-round-barrier-20261010_native_nominal_barrier_reflection_e81ca724 -> mxm-native-round-barrier-20261010_native_nominal_barrier_reflection_e81ca724
+2026-10-21T19:32:54.3113634Z  * [new tag]           mxm-native-round-private-aggregate-20261010_native_nominal_barrier_reflection_e81ca724-38046117908 -> mxm-native-round-private-aggregate-20261010_native_nominal_barrier_reflection_e81ca724-38046117908
+2026-10-21T19:32:54.3117566Z  * [new tag]           mxm-native-round-readback-20261010_new_round_integrity_c37df82a -> mxm-native-round-readback-20261010_new_round_integrity_c37df82a
+2026-10-21T19:32:54.3121083Z  * [new tag]           mxm-native-round-verified-aggregate-20261010_new_round_integrity_c37df82a-38047209314 -> mxm-native-round-verified-aggregate-20261010_new_round_integrity_c37df82a-38047209314
+2026-10-21T19:32:54.3124184Z  * [new tag]           mxm-native-saved-failure-readback-20261010 -> mxm-native-saved-failure-readback-20261010
+2026-10-21T19:32:54.3127601Z  * [new tag]           mxm-native-update-asymmetry-20261010_bid_ask_asynchronous_activity_trade_side_directional_9c24e7 -> mxm-native-update-asymmetry-20261010_bid_ask_asynchronous_activity_trade_side_directional_9c24e7
+2026-10-21T19:32:54.3131622Z  * [new tag]           mxm-new-activity-clock-20261010_activity_clock_corrected_165a96f28b3f101b96d1 -> mxm-new-activity-clock-20261010_activity_clock_corrected_165a96f28b3f101b96d1
+2026-10-21T19:32:54.3135062Z  * [new tag]           mxm-new-activity-clock-20261010_activity_clock_cost_846e3028edfc0fd2fc5f -> mxm-new-activity-clock-20261010_activity_clock_cost_846e3028edfc0fd2fc5f
+2026-10-21T19:32:54.3138064Z  * [new tag]           mxm-new-economic-aa79777183b54ef6844e7a90ef1183e0 -> mxm-new-economic-aa79777183b54ef6844e7a90ef1183e0
+2026-10-21T19:32:54.3140533Z  * [new tag]           mxm-numeric-claim-synthetic-39416ed430933546 -> mxm-numeric-claim-synthetic-39416ed430933546
+2026-10-21T19:32:54.3142885Z  * [new tag]           mxm-numeric-synthetic-39416ed430933546-37910076143 -> mxm-numeric-synthetic-39416ed430933546-37910076143
+2026-10-21T19:32:54.3146554Z  * [new tag]           mxm-numeric-v2-claim-real-30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584 -> mxm-numeric-v2-claim-real-30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584
+2026-10-21T19:32:54.3151210Z  * [new tag]           mxm-numeric-v2-claim-real-40eed7455c8f149efa1ee2116154060d0bdadc16e81b050feb48fe21da1aa584 -> mxm-numeric-v2-claim-real-40eed7455c8f149efa1ee2116154060d0bdadc16e81b050feb48fe21da1aa584
+2026-10-21T19:32:54.3156135Z  * [new tag]           mxm-numeric-v2-claim-synthetic-30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584 -> mxm-numeric-v2-claim-synthetic-30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584
+2026-10-21T19:32:54.3161153Z  * [new tag]           mxm-numeric-v2-claim-synthetic-40eed7455c8f149efa1ee2116154060d0bdadc16e81b050feb48fe21da1aa584 -> mxm-numeric-v2-claim-synthetic-40eed7455c8f149efa1ee2116154060d0bdadc16e81b050feb48fe21da1aa584
+2026-10-21T19:32:54.3166233Z  * [new tag]           mxm-numeric-v2-claim-synthetic-9ebf6694050834c5bcd87d85c787cb4a942463d925bc4f775041186bd6b17109 -> mxm-numeric-v2-claim-synthetic-9ebf6694050834c5bcd87d85c787cb4a942463d925bc4f775041186bd6b17109
+2026-10-21T19:32:54.3169759Z  * [new tag]           mxm-numeric-v2-real-30b4191766bc-37950879700 -> mxm-numeric-v2-real-30b4191766bc-37950879700
+2026-10-21T19:32:54.3171917Z  * [new tag]           mxm-numeric-v2-real-40eed7455c8f-37927463493 -> mxm-numeric-v2-real-40eed7455c8f-37927463493
+2026-10-21T19:32:54.3175647Z  * [new tag]           mxm-numeric-v2-recovery-synthetic-acfafd9099b783d9ffa02f8ccc1c65ad78d549e33be4087c9cf705ceb85401ca -> mxm-numeric-v2-recovery-synthetic-acfafd9099b783d9ffa02f8ccc1c65ad78d549e33be4087c9cf705ceb85401ca
+2026-10-21T19:32:54.3181110Z  * [new tag]           mxm-numeric-v2-recovery-synthetic-dc9782865798c748a730d61d05c2724761d3f9e20224850b6274bc58b43bf8a0 -> mxm-numeric-v2-recovery-synthetic-dc9782865798c748a730d61d05c2724761d3f9e20224850b6274bc58b43bf8a0
+2026-10-21T19:32:54.3184871Z  * [new tag]           mxm-numeric-v2-synthetic-30b4191766bc-37944184266 -> mxm-numeric-v2-synthetic-30b4191766bc-37944184266
+2026-10-21T19:32:54.3187416Z  * [new tag]           mxm-numeric-v2-synthetic-40eed7455c8f-37913950839 -> mxm-numeric-v2-synthetic-40eed7455c8f-37913950839
+2026-10-21T19:32:54.3189859Z  * [new tag]           mxm-numeric-v2-synthetic-9ebf66940508-37932855834 -> mxm-numeric-v2-synthetic-9ebf66940508-37932855834
+2026-10-21T19:32:54.3193488Z  * [new tag]           mxm-numeric-v3-complete-real-30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584 -> mxm-numeric-v3-complete-real-30b4191766bcb522b65fa695a57ec365b796e1ba4c9dc2fb2d479651a81b8584
+2026-10-21T19:32:54.3198424Z  * [new tag]           mxm-numeric-v3-complete-real-40eed7455c8f149efa1ee2116154060d0bdadc16e81b050feb48fe21da1aa584 -> mxm-numeric-v3-complete-real-40eed7455c8f149efa1ee2116154060d0bdadc16e81b050feb48fe21da1aa584
+2026-10-21T19:32:54.3203458Z  * [new tag]           mxm-numeric-v3-complete-synthetic-147266c2a7c754c73610b0e4c78c06b98cc385d6fcebb9bcdbdaf747c0f5525c -> mxm-numeric-v3-complete-synthetic-147266c2a7c754c73610b0e4c78c06b98cc385d6fcebb9bcdbdaf747c0f5525c
+2026-10-21T19:32:54.3208693Z  * [new tag]           mxm-numeric-v3-complete-synthetic-151a06ce16586513590dff1d14ae4b81762b7403d17965ed9a8225eebfd4e347 -> mxm-numeric-v3-complete-synthetic-151a06ce16586513590dff1d14ae4b81762b7403d17965ed9a8225eebfd4e347
+2026-10-21T19:32:54.3213859Z  * [new tag]           mxm-numeric-v3-complete-synthetic-1ffc814c715d7ecb198b2e8c83dbd7451cc0047ad3364240a5e3d2abdac7d268 -> mxm-numeric-v3-complete-synthetic-1ffc814c715d7ecb198b2e8c83dbd7451cc0047ad3364240a5e3d2abdac7d268
+2026-10-21T19:32:54.3219242Z  * [new tag]           mxm-numeric-v3-complete-synthetic-469773f728b6fec8e8d4af8869bb1f85a59331e2760d2644d31f10318f29b462 -> mxm-numeric-v3-complete-synthetic-469773f728b6fec8e8d4af8869bb1f85a59331e2760d2644d31f10318f29b462
+2026-10-21T19:32:54.3224370Z  * [new tag]           mxm-numeric-v3-complete-synthetic-52d22f4e2bc9405663b4f0c1e084ca9d4142dd7a81317909d66c512110da84cc -> mxm-numeric-v3-complete-synthetic-52d22f4e2bc9405663b4f0c1e084ca9d4142dd7a81317909d66c512110da84cc
+2026-10-21T19:32:54.3229656Z  * [new tag]           mxm-numeric-v3-complete-synthetic-5fd7f0fec685dfce31b9eab90703300bb3d948f732d53837b69cd8c77aa78d77 -> mxm-numeric-v3-complete-synthetic-5fd7f0fec685dfce31b9eab90703300bb3d948f732d53837b69cd8c77aa78d77
+2026-10-21T19:32:54.3234811Z  * [new tag]           mxm-numeric-v3-complete-synthetic-634a6ef69d280c68e2e4473270e86a2ae1cd80399ff963f0e7f53a6db8bcf366 -> mxm-numeric-v3-complete-synthetic-634a6ef69d280c68e2e4473270e86a2ae1cd80399ff963f0e7f53a6db8bcf366
+2026-10-21T19:32:54.3240070Z  * [new tag]           mxm-numeric-v3-complete-synthetic-6cd9dc19b016f83f3e8715f0b6f146dc0e470d37ae78cde928b85d96d00130f9 -> mxm-numeric-v3-complete-synthetic-6cd9dc19b016f83f3e8715f0b6f146dc0e470d37ae78cde928b85d96d00130f9
+2026-10-21T19:32:54.3245208Z  * [new tag]           mxm-numeric-v3-complete-synthetic-79a807f58d8295b253fb83360dd0ac01eaed1902465d5e7d42fbd0165816f51c -> mxm-numeric-v3-complete-synthetic-79a807f58d8295b253fb83360dd0ac01eaed1902465d5e7d42fbd0165816f51c
+2026-10-21T19:32:54.3250483Z  * [new tag]           mxm-numeric-v3-complete-synthetic-81d46c0fc8c2de9b94f1e224a925f16b33ae73ba89a65a6bdc7880fcbbd40c23 -> mxm-numeric-v3-complete-synthetic-81d46c0fc8c2de9b94f1e224a925f16b33ae73ba89a65a6bdc7880fcbbd40c23
+2026-10-21T19:32:54.3255643Z  * [new tag]           mxm-numeric-v3-complete-synthetic-926592954e5ef0f19ea6b517f01bf72146baa53e8bcafa09f3c61554da9cffb9 -> mxm-numeric-v3-complete-synthetic-926592954e5ef0f19ea6b517f01bf72146baa53e8bcafa09f3c61554da9cffb9
+2026-10-21T19:32:54.3260922Z  * [new tag]           mxm-numeric-v3-complete-synthetic-b4946c44392e09cdf4d752bfe4a3e03c1f7ee58675437ac5bedc092415ebd637 -> mxm-numeric-v3-complete-synthetic-b4946c44392e09cdf4d752bfe4a3e03c1f7ee58675437ac5bedc092415ebd637
+2026-10-21T19:32:54.3266399Z  * [new tag]           mxm-numeric-v3-complete-synthetic-dfc0ecdd70a347f2cc47bae53101722db9eb44abdc1612c1b227cee8d74d16f7 -> mxm-numeric-v3-complete-synthetic-dfc0ecdd70a347f2cc47bae53101722db9eb44abdc1612c1b227cee8d74d16f7
+2026-10-21T19:32:54.3271630Z  * [new tag]           mxm-numeric-v3-complete-synthetic-ed354b896cdffbf4e322e29ad5b6a80c0076962add81a1943d7aa042e6fbfaec -> mxm-numeric-v3-complete-synthetic-ed354b896cdffbf4e322e29ad5b6a80c0076962add81a1943d7aa042e6fbfaec
+2026-10-21T19:32:54.3276876Z  * [new tag]           mxm-numeric-v3-complete-synthetic-f641a49177bf64014ff90b0a075f43a8f2e7ff93be08ee37ca175aa04c46983f -> mxm-numeric-v3-complete-synthetic-f641a49177bf64014ff90b0a075f43a8f2e7ff93be08ee37ca175aa04c46983f
+2026-10-21T19:32:54.3281467Z  * [new tag]           mxm-owner-breadth-3f3726b0f54534196619d9facf91dc714b7aaf55338d2b1854ad5286fd9e5c4a -> mxm-owner-breadth-3f3726b0f54534196619d9facf91dc714b7aaf55338d2b1854ad5286fd9e5c4a
+2026-10-21T19:32:54.3285493Z  * [new tag]           mxm-owner-breadth-c6f190820855888f3a442936fc43dc50ebd42d0f63253477060b09ad2375f29d -> mxm-owner-breadth-c6f190820855888f3a442936fc43dc50ebd42d0f63253477060b09ad2375f29d
+2026-10-21T19:32:54.3289887Z  * [new tag]           mxm-owner-cloud-native-private-readback-20261010_completed_cloud_native_cov_privateverify_b61427 -> mxm-owner-cloud-native-private-readback-20261010_completed_cloud_native_cov_privateverify_b61427
+2026-10-21T19:32:54.3293362Z  * [new tag]           mxm-owner-cost-coverage-1384e1699c6a-37978512058 -> mxm-owner-cost-coverage-1384e1699c6a-37978512058
+2026-10-21T19:32:54.3296884Z  * [new tag]           mxm-owner-cost-coverage-1384e1699c6a4e163e80ee8c72b8c1aa14cdfa53d2b54e87c36a48604d5a3e38 -> mxm-owner-cost-coverage-1384e1699c6a4e163e80ee8c72b8c1aa14cdfa53d2b54e87c36a48604d5a3e38
+2026-10-21T19:32:54.3301787Z  * [new tag]           mxm-owner-cost-coverage-complete-1384e1699c6a4e163e80ee8c72b8c1aa14cdfa53d2b54e87c36a48604d5a3e38 -> mxm-owner-cost-coverage-complete-1384e1699c6a4e163e80ee8c72b8c1aa14cdfa53d2b54e87c36a48604d5a3e38
+2026-10-21T19:32:54.3306849Z  * [new tag]           mxm-owner-delivery-recovery-e604f7d1688b94d5a6e7e5df198e35b4827f8b15bfdeb41d4e1b6b69269ae995 -> mxm-owner-delivery-recovery-e604f7d1688b94d5a6e7e5df198e35b4827f8b15bfdeb41d4e1b6b69269ae995
+2026-10-21T19:32:54.3310315Z  * [new tag]           mxm-owner-extrema-oneuse-v1-20261010-c80af48 -> mxm-owner-extrema-oneuse-v1-20261010-c80af48
+2026-10-21T19:32:54.3312513Z  * [new tag]           mxm-owner-extrema-recovery-v1-20261010-59cd69 -> mxm-owner-extrema-recovery-v1-20261010-59cd69
+2026-10-21T19:32:54.3314984Z  * [new tag]           mxm-owner-frontier-activityclock-20261010_act-38071447179 -> mxm-owner-frontier-activityclock-20261010_act-38071447179
+2026-10-21T19:32:54.3317893Z  * [new tag]           mxm-owner-frontier-bodypersistence-20261011_bod-38125067899 -> mxm-owner-frontier-bodypersistence-20261011_bod-38125067899
+2026-10-21T19:32:54.3320592Z  * [new tag]           mxm-owner-frontier-breadth-3f3726b0f545-38021764655 -> mxm-owner-frontier-breadth-3f3726b0f545-38021764655
+2026-10-21T19:32:54.3323072Z  * [new tag]           mxm-owner-frontier-breadth-c6f190820855-38021587401 -> mxm-owner-frontier-breadth-c6f190820855-38021587401
+2026-10-21T19:32:54.3325830Z  * [new tag]           mxm-owner-frontier-brokerliquidity-20261010_nat-38030268766 -> mxm-owner-frontier-brokerliquidity-20261010_nat-38030268766
+2026-10-21T19:32:54.3328657Z  * [new tag]           mxm-owner-frontier-cloudcovariance-20261010_nat-38039926683 -> mxm-owner-frontier-cloudcovariance-20261010_nat-38039926683
+2026-10-21T19:32:54.3332350Z  * [new tag]           mxm-owner-frontier-complete-activityclock-20261010_activity_clock_corrected_165a96f28b3f101b96d1 -> mxm-owner-frontier-complete-activityclock-20261010_activity_clock_corrected_165a96f28b3f101b96d1
+2026-10-21T19:32:54.3336453Z  * [new tag]           mxm-owner-frontier-complete-bodypersistence-20261011_body_persistence -> mxm-owner-frontier-complete-bodypersistence-20261011_body_persistence
+2026-10-21T19:32:54.3340981Z  * [new tag]           mxm-owner-frontier-complete-breadth-3f3726b0f54534196619d9facf91dc714b7aaf55338d2b1854ad5286fd9e5c4a -> mxm-owner-frontier-complete-breadth-3f3726b0f54534196619d9facf91dc714b7aaf55338d2b1854ad5286fd9e5c4a
+2026-10-21T19:32:54.3346129Z  * [new tag]           mxm-owner-frontier-complete-brokerliquidity-20261010_native_spread_liquidity_disjoint_5m_v1_a1793b6d -> mxm-owner-frontier-complete-brokerliquidity-20261010_native_spread_liquidity_disjoint_5m_v1_a1793b6d
+2026-10-21T19:32:54.3350862Z  * [new tag]           mxm-owner-frontier-complete-cloudcovariance-20261010_native_joint_spread_mid_concordance_f17ae604 -> mxm-owner-frontier-complete-cloudcovariance-20261010_native_joint_spread_mid_concordance_f17ae604
+2026-10-21T19:32:54.3355019Z  * [new tag]           mxm-owner-frontier-complete-completestrategy-20261012_complete_strategy_v1 -> mxm-owner-frontier-complete-completestrategy-20261012_complete_strategy_v1
+2026-10-21T19:32:54.3358683Z  * [new tag]           mxm-owner-frontier-complete-costfrequency-20261012_cost_frequency_v1 -> mxm-owner-frontier-complete-costfrequency-20261012_cost_frequency_v1
+2026-10-21T19:32:54.3362253Z  * [new tag]           mxm-owner-frontier-complete-costuniverse-e76f372bb8304e2992cb863d1a67daa4 -> mxm-owner-frontier-complete-costuniverse-e76f372bb8304e2992cb863d1a67daa4
+2026-10-21T19:32:54.3366857Z  * [new tag]           mxm-owner-frontier-complete-crossassetliquidity-20261010_existing_quotepanel_crossclass_context_v1_d7164b9e -> mxm-owner-frontier-complete-crossassetliquidity-20261010_existing_quotepanel_crossclass_context_v1_d7164b9e
+2026-10-21T19:32:54.3371185Z  * [new tag]           mxm-owner-frontier-complete-dynamicexit-20261012_dynamic_exit_capture_v1 -> mxm-owner-frontier-complete-dynamicexit-20261012_dynamic_exit_capture_v1
+2026-10-21T19:32:54.3374824Z  * [new tag]           mxm-owner-frontier-complete-dynamicexit-20261012_dynamic_exit_recovery_v1 -> mxm-owner-frontier-complete-dynamicexit-20261012_dynamic_exit_recovery_v1
+2026-10-21T19:32:54.3378808Z  * [new tag]           mxm-owner-frontier-complete-economicreadback-aa79777183b54ef6844e7a90ef1183e0 -> mxm-owner-frontier-complete-economicreadback-aa79777183b54ef6844e7a90ef1183e0
+2026-10-21T19:32:54.3384786Z  * [new tag]           mxm-owner-frontier-complete-executablecoverage-20261010_diag_bc3a78ee799f4694737d -> mxm-owner-frontier-complete-executablecoverage-20261010_diag_bc3a78ee799f4694737d
+2026-10-21T19:32:54.3388966Z  * [new tag]           mxm-owner-frontier-complete-executablefields-20261010_fields_c1281b36a655e4ccefa5 -> mxm-owner-frontier-complete-executablefields-20261010_fields_c1281b36a655e4ccefa5
+2026-10-21T19:32:54.3392910Z  * [new tag]           mxm-owner-frontier-complete-executablequotes-20261010_quotes_5a3d65f9907d527d5711 -> mxm-owner-frontier-complete-executablequotes-20261010_quotes_5a3d65f9907d527d5711
+2026-10-21T19:32:54.3396884Z  * [new tag]           mxm-owner-frontier-complete-exitfinalreadback-20261012_exit_final_readback_v1 -> mxm-owner-frontier-complete-exitfinalreadback-20261012_exit_final_readback_v1
+2026-10-21T19:32:54.3400928Z  * [new tag]           mxm-owner-frontier-complete-extrema-20261010_extrema_frozen_exact_transport_recovery_59cd69 -> mxm-owner-frontier-complete-extrema-20261010_extrema_frozen_exact_transport_recovery_59cd69
+2026-10-21T19:32:54.3404925Z  * [new tag]           mxm-owner-frontier-complete-forwardcost-47564f30eba6420c9dc4f380d621ebb6 -> mxm-owner-frontier-complete-forwardcost-47564f30eba6420c9dc4f380d621ebb6
+2026-10-21T19:32:54.3409574Z  * [new tag]           mxm-owner-frontier-complete-fullcost-63ef6ac16cece0c6f1bc86442d688268859386877cb9ba554f13386bbb4e7515 -> mxm-owner-frontier-complete-fullcost-63ef6ac16cece0c6f1bc86442d688268859386877cb9ba554f13386bbb4e7515
+2026-10-21T19:32:54.3414163Z  * [new tag]           mxm-owner-frontier-complete-integratedalpha-20261011_integrated_alpha_campaign -> mxm-owner-frontier-complete-integratedalpha-20261011_integrated_alpha_campaign
+2026-10-21T19:32:54.3418300Z  * [new tag]           mxm-owner-frontier-complete-multiregime-e76f372bb8304e2992cb863d1a67daa4 -> mxm-owner-frontier-complete-multiregime-e76f372bb8304e2992cb863d1a67daa4
+2026-10-21T19:32:54.3422802Z  * [new tag]           mxm-owner-frontier-complete-nativeasymmetry-20261010_bid_ask_asynchronous_activity_trade_side_directional_9c24e7 -> mxm-owner-frontier-complete-nativeasymmetry-20261010_bid_ask_asynchronous_activity_trade_side_directional_9c24e7
+2026-10-21T19:32:54.3427941Z  * [new tag]           mxm-owner-frontier-complete-nativecontinuity2-20261012_standing_native_saved_econ_recovery_exact_v3 -> mxm-owner-frontier-complete-nativecontinuity2-20261012_standing_native_saved_econ_recovery_exact_v3
+2026-10-21T19:32:54.3432754Z  * [new tag]           mxm-owner-frontier-complete-nativedecision-20261012_native_numeric_private_decision_metrics_readback_v3 -> mxm-owner-frontier-complete-nativedecision-20261012_native_numeric_private_decision_metrics_readback_v3
+2026-10-21T19:32:54.3437206Z  * [new tag]           mxm-owner-frontier-complete-nativeeconomicv2-20261010_native_entry_economic_v2 -> mxm-owner-frontier-complete-nativeeconomicv2-20261010_native_entry_economic_v2
+2026-10-21T19:32:54.3441053Z  * [new tag]           mxm-owner-frontier-complete-nativefailure-20261010_native_saved_failure_readback -> mxm-owner-frontier-complete-nativefailure-20261010_native_saved_failure_readback
+2026-10-21T19:32:54.3445173Z  * [new tag]           mxm-owner-frontier-complete-nativequalification-20261010_native_proven_response_recovery -> mxm-owner-frontier-complete-nativequalification-20261010_native_proven_response_recovery
+2026-10-21T19:32:54.3449399Z  * [new tag]           mxm-owner-frontier-complete-nativereceipts-20261010_native_receipt_cause_readback -> mxm-owner-frontier-complete-nativereceipts-20261010_native_receipt_cause_readback
+2026-10-21T19:32:54.3453649Z  * [new tag]           mxm-owner-frontier-complete-nativeround-20261010_native_nominal_barrier_reflection_e81ca724 -> mxm-owner-frontier-complete-nativeround-20261010_native_nominal_barrier_reflection_e81ca724
+2026-10-21T19:32:54.3457956Z  * [new tag]           mxm-owner-frontier-complete-nativesemantics-20261010_saved_native_semantic_audit -> mxm-owner-frontier-complete-nativesemantics-20261010_saved_native_semantic_audit
+2026-10-21T19:32:54.3462167Z  * [new tag]           mxm-owner-frontier-complete-predictivefeasibility-20261012_predictive_feasibility_stopgo_v1 -> mxm-owner-frontier-complete-predictivefeasibility-20261012_predictive_feasibility_stopgo_v1
+2026-10-21T19:32:54.3466225Z  * [new tag]           mxm-owner-frontier-complete-quotepath-20261012_quotepath_empirical_v1 -> mxm-owner-frontier-complete-quotepath-20261012_quotepath_empirical_v1
+2026-10-21T19:32:54.3470548Z  * [new tag]           mxm-owner-frontier-complete-quotes-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2 -> mxm-owner-frontier-complete-quotes-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2
+2026-10-21T19:32:54.3475987Z  * [new tag]           mxm-owner-frontier-complete-readback-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0 -> mxm-owner-frontier-complete-readback-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0
+2026-10-21T19:32:54.3480718Z  * [new tag]           mxm-owner-frontier-complete-strategyfeasibility-20261012_complete_strategy_stage_a -> mxm-owner-frontier-complete-strategyfeasibility-20261012_complete_strategy_stage_a
+2026-10-21T19:32:54.3485519Z  * [new tag]           mxm-owner-frontier-complete-transition-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2 -> mxm-owner-frontier-complete-transition-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2
+2026-10-21T19:32:54.3491123Z  * [new tag]           mxm-owner-frontier-complete-variance-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0 -> mxm-owner-frontier-complete-variance-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0
+2026-10-21T19:32:54.3496236Z  * [new tag]           mxm-owner-frontier-complete-wideeconomiccompletion-20261011_wide_quote_completion_v1 -> mxm-owner-frontier-complete-wideeconomiccompletion-20261011_wide_quote_completion_v1
+2026-10-21T19:32:54.3500375Z  * [new tag]           mxm-owner-frontier-complete-widegreenfield-20261011_wide_greenfield_continuation_v1 -> mxm-owner-frontier-complete-widegreenfield-20261011_wide_greenfield_continuation_v1
+2026-10-21T19:32:54.3503834Z  * [new tag]           mxm-owner-frontier-completestrategy-20261012_com-38216212474 -> mxm-owner-frontier-completestrategy-20261012_com-38216212474
+2026-10-21T19:32:54.3506743Z  * [new tag]           mxm-owner-frontier-costfrequency-20261012_cos-38197915724 -> mxm-owner-frontier-costfrequency-20261012_cos-38197915724
+2026-10-21T19:32:54.3509490Z  * [new tag]           mxm-owner-frontier-costuniverse-e76f372bb830-38023906138 -> mxm-owner-frontier-costuniverse-e76f372bb830-38023906138
+2026-10-21T19:32:54.3512414Z  * [new tag]           mxm-owner-frontier-crossassetliquidity-20261010_exi-38030720468 -> mxm-owner-frontier-crossassetliquidity-20261010_exi-38030720468
+2026-10-21T19:32:54.3515236Z  * [new tag]           mxm-owner-frontier-dynamicexit-20261012_dyn-38209357519 -> mxm-owner-frontier-dynamicexit-20261012_dyn-38209357519
+2026-10-21T19:32:54.3517941Z  * [new tag]           mxm-owner-frontier-dynamicexit-20261012_dyn-38209738609 -> mxm-owner-frontier-dynamicexit-20261012_dyn-38209738609
+2026-10-21T19:32:54.3520746Z  * [new tag]           mxm-owner-frontier-economicreadback-aa79777183b5-38024642121 -> mxm-owner-frontier-economicreadback-aa79777183b5-38024642121
+2026-10-21T19:32:54.3523743Z  * [new tag]           mxm-owner-frontier-executablecoverage-20261010_dia-38073677080 -> mxm-owner-frontier-executablecoverage-20261010_dia-38073677080
+2026-10-21T19:32:54.3526788Z  * [new tag]           mxm-owner-frontier-executablefields-20261010_fie-38074154560 -> mxm-owner-frontier-executablefields-20261010_fie-38074154560
+2026-10-21T19:32:54.3529799Z  * [new tag]           mxm-owner-frontier-executablequotes-20261010_quo-38073967516 -> mxm-owner-frontier-executablequotes-20261010_quo-38073967516
+2026-10-21T19:32:54.3532719Z  * [new tag]           mxm-owner-frontier-exitfinalreadback-20261012_exi-38210265400 -> mxm-owner-frontier-exitfinalreadback-20261012_exi-38210265400
+2026-10-21T19:32:54.3535358Z  * [new tag]           mxm-owner-frontier-extrema-20261010_ext-38060301091 -> mxm-owner-frontier-extrema-20261010_ext-38060301091
+2026-10-21T19:32:54.3538050Z  * [new tag]           mxm-owner-frontier-forwardcost-47564f30eba6-38025035835 -> mxm-owner-frontier-forwardcost-47564f30eba6-38025035835
+2026-10-21T19:32:54.3540681Z  * [new tag]           mxm-owner-frontier-fullcost-63ef6ac16cec-37980922343 -> mxm-owner-frontier-fullcost-63ef6ac16cec-37980922343
+2026-10-21T19:32:54.3543371Z  * [new tag]           mxm-owner-frontier-integratedalpha-20261011_int-38143933827 -> mxm-owner-frontier-integratedalpha-20261011_int-38143933827
+2026-10-21T19:32:54.3546248Z  * [new tag]           mxm-owner-frontier-multiregime-e76f372bb830-38023906138 -> mxm-owner-frontier-multiregime-e76f372bb830-38023906138
+2026-10-21T19:32:54.3549033Z  * [new tag]           mxm-owner-frontier-nativeasymmetry-20261010_bid-38035824064 -> mxm-owner-frontier-nativeasymmetry-20261010_bid-38035824064
+2026-10-21T19:32:54.3551891Z  * [new tag]           mxm-owner-frontier-nativecontinuity2-20261012_sta-38239902202 -> mxm-owner-frontier-nativecontinuity2-20261012_sta-38239902202
+2026-10-21T19:32:54.3554749Z  * [new tag]           mxm-owner-frontier-nativedecision-20261012_nat-38244279805 -> mxm-owner-frontier-nativedecision-20261012_nat-38244279805
+2026-10-21T19:32:54.3557712Z  * [new tag]           mxm-owner-frontier-nativeeconomicv2-20261010_nat-38084013421 -> mxm-owner-frontier-nativeeconomicv2-20261010_nat-38084013421
+2026-10-21T19:32:54.3560491Z  * [new tag]           mxm-owner-frontier-nativefailure-20261010_nat-38077813702 -> mxm-owner-frontier-nativefailure-20261010_nat-38077813702
+2026-10-21T19:32:54.3563501Z  * [new tag]           mxm-owner-frontier-nativequalification-20261010_nat-38077972378 -> mxm-owner-frontier-nativequalification-20261010_nat-38077972378
+2026-10-21T19:32:54.3566536Z  * [new tag]           mxm-owner-frontier-nativereceipts-20261010_nat-38078431756 -> mxm-owner-frontier-nativereceipts-20261010_nat-38078431756
+2026-10-21T19:32:54.3569195Z  * [new tag]           mxm-owner-frontier-nativeround-20261010_nat-38046117908 -> mxm-owner-frontier-nativeround-20261010_nat-38046117908
+2026-10-21T19:32:54.3571910Z  * [new tag]           mxm-owner-frontier-nativesemantics-20261010_sav-38081134886 -> mxm-owner-frontier-nativesemantics-20261010_sav-38081134886
+2026-10-21T19:32:54.3574923Z  * [new tag]           mxm-owner-frontier-predictivefeasibility-20261012_pre-38221183658 -> mxm-owner-frontier-predictivefeasibility-20261012_pre-38221183658
+2026-10-21T19:32:54.3577857Z  * [new tag]           mxm-owner-frontier-quotepath-20261012_quo-38288144447 -> mxm-owner-frontier-quotepath-20261012_quo-38288144447
+2026-10-21T19:32:54.3580354Z  * [new tag]           mxm-owner-frontier-quotes-02df6bb66df3-37979775170 -> mxm-owner-frontier-quotes-02df6bb66df3-37979775170
+2026-10-21T19:32:54.3583921Z  * [new tag]           mxm-owner-frontier-quotes-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2 -> mxm-owner-frontier-quotes-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2
+2026-10-21T19:32:54.3587651Z  * [new tag]           mxm-owner-frontier-readback-7f67bd3210dc-38019033781 -> mxm-owner-frontier-readback-7f67bd3210dc-38019033781
+2026-10-21T19:32:54.3590449Z  * [new tag]           mxm-owner-frontier-strategyfeasibility-20261012_com-38214353470 -> mxm-owner-frontier-strategyfeasibility-20261012_com-38214353470
+2026-10-21T19:32:54.3593305Z  * [new tag]           mxm-owner-frontier-transition-02df6bb66df3-37979775170 -> mxm-owner-frontier-transition-02df6bb66df3-37979775170
+2026-10-21T19:32:54.3597354Z  * [new tag]           mxm-owner-frontier-transition-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2 -> mxm-owner-frontier-transition-02df6bb66df3ed7b0109e6e7e1d3969edf77a8af765b63fd3d559242ee00e2d2
+2026-10-21T19:32:54.3601102Z  * [new tag]           mxm-owner-frontier-variance-7f67bd3210dc-38019033781 -> mxm-owner-frontier-variance-7f67bd3210dc-38019033781
+2026-10-21T19:32:54.3604008Z  * [new tag]           mxm-owner-frontier-wideeconomiccompletion-20261011_wid-38152844809 -> mxm-owner-frontier-wideeconomiccompletion-20261011_wid-38152844809
+2026-10-21T19:32:54.3607138Z  * [new tag]           mxm-owner-frontier-widegreenfield-20261011_wid-38150775948 -> mxm-owner-frontier-widegreenfield-20261011_wid-38150775948
+2026-10-21T19:32:54.3610874Z  * [new tag]           mxm-owner-full-cost-capture-63ef6ac16cece0c6f1bc86442d688268859386877cb9ba554f13386bbb4e7515 -> mxm-owner-full-cost-capture-63ef6ac16cece0c6f1bc86442d688268859386877cb9ba554f13386bbb4e7515
+2026-10-21T19:32:54.3614616Z  * [new tag]           mxm-owner-fullcost-checkpoints-63ef6ac16cec-37980922343 -> mxm-owner-fullcost-checkpoints-63ef6ac16cec-37980922343
+2026-10-21T19:32:54.3618665Z  * [new tag]           mxm-owner-native-directional-private-readback-20261010_existing_native_directional_privaterelay_a2b91c53 -> mxm-owner-native-directional-private-readback-20261010_existing_native_directional_privaterelay_a2b91c53
+2026-10-21T19:32:54.3623572Z  * [new tag]           mxm-owner-recovery-readback-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0 -> mxm-owner-recovery-readback-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0
+2026-10-21T19:32:54.3628454Z  * [new tag]           mxm-owner-recovery-variance-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0 -> mxm-owner-recovery-variance-7f67bd3210dc6c473ea2c11cc2c3ba9ea39aaaa513b33e644eef9532db2e2aa0
+2026-10-21T19:32:54.3632392Z  * [new tag]           mxm-owner-regime-costuniverse-e76f372bb8304e2992cb863d1a67daa4 -> mxm-owner-regime-costuniverse-e76f372bb8304e2992cb863d1a67daa4
+2026-10-21T19:32:54.3635490Z  * [new tag]           mxm-owner-regime-multiregime-e76f372bb8304e2992cb863d1a67daa4 -> mxm-owner-regime-multiregime-e76f372bb8304e2992cb863d1a67daa4
+2026-10-21T19:32:54.3639612Z  * [new tag]           mxm-owner-secure-private-readback-20261010_aes256gcm_ephemeral_owner_private_two_results_b4e2cb8e -> mxm-owner-secure-private-readback-20261010_aes256gcm_ephemeral_owner_private_two_results_b4e2cb8e
+2026-10-21T19:32:54.3643198Z  * [new tag]           mxm-predictive-feasibility-stopgo-one-use-20261012-v1 -> mxm-predictive-feasibility-stopgo-one-use-20261012-v1
+2026-10-21T19:32:54.3645654Z  * [new tag]           mxm-primary145-synthetic-a0861c7e9a7f120ee18f -> mxm-primary145-synthetic-a0861c7e9a7f120ee18f
+2026-10-21T19:32:54.3649515Z  * [new tag]           mxm-private-cloud-native-verified-aggregate-20261010_completed_cloud_native_cov_privateverify_b61427-38041491813 -> mxm-private-cloud-native-verified-aggregate-20261010_completed_cloud_native_cov_privateverify_b61427-38041491813
+2026-10-21T19:32:54.3654405Z  * [new tag]           mxm-private-extrema-h1-readback-20261010_h1_extrema_existing_cipher_only_private_a9f6e1-38067734185 -> mxm-private-extrema-h1-readback-20261010_h1_extrema_existing_cipher_only_private_a9f6e1-38067734185
+2026-10-21T19:32:54.3659421Z  * [new tag]           mxm-private-native-directional-aggregate-20261010_existing_native_directional_privaterelay_a2b91c53-38036223659 -> mxm-private-native-directional-aggregate-20261010_existing_native_directional_privaterelay_a2b91c53-38036223659
+2026-10-21T19:32:54.3664202Z  * [new tag]           mxm-private-relay-only-20261010_aes256gcm_ephemeral_owner_private_two_results_b4e2cb8e-38032260534 -> mxm-private-relay-only-20261010_aes256gcm_ephemeral_owner_private_two_results_b4e2cb8e-38032260534
+2026-10-21T19:32:54.3667626Z  * [new tag]           mxm-quote-path-empirical-one-use-20261012-v1 -> mxm-quote-path-empirical-one-use-20261012-v1
+2026-10-21T19:32:54.3669963Z  * [new tag]           mxm-quotepath-owner-readback-complete-20261013-v1 -> mxm-quotepath-owner-readback-complete-20261013-v1
+2026-10-21T19:32:54.3672731Z  * [new tag]           mxm-quotepath-recipient-recovery-20261013-v1-38308602177 -> mxm-quotepath-recipient-recovery-20261013-v1-38308602177
+2026-10-21T19:32:54.3675409Z  * [new tag]           mxm-quotepath-recipient-summary-one-use-20261013-v1 -> mxm-quotepath-recipient-summary-one-use-20261013-v1
+2026-10-21T19:32:54.3677683Z  * [new tag]           mxm-root-cause-economic-20261014-v1 -> mxm-root-cause-economic-20261014-v1
+2026-10-21T19:32:54.3679578Z  * [new tag]           mxm-root-cause-economic-20261014-v1-shard-0 -> mxm-root-cause-economic-20261014-v1-shard-0
+2026-10-21T19:32:54.3681573Z  * [new tag]           mxm-root-cause-resume-proof-20261014-v1 -> mxm-root-cause-resume-proof-20261014-v1
+2026-10-21T19:32:54.3683677Z  * [new tag]           mxm-root-cause-resume-proof-20261014-v1-shard-0 -> mxm-root-cause-resume-proof-20261014-v1-shard-0
+2026-10-21T19:32:54.3685945Z  * [new tag]           mxm-saved-native-semantic-audit-20261010 -> mxm-saved-native-semantic-audit-20261010
+2026-10-21T19:32:54.3690617Z  * [new tag]           mxm-shallow-m5-v2-5a15b55ce82e12889139e74a1b213d146fcf36a97ceb763fa0a321a83721d115 -> mxm-shallow-m5-v2-5a15b55ce82e12889139e74a1b213d146fcf36a97ceb763fa0a321a83721d115
+2026-10-21T19:32:54.3694741Z  * [new tag]           mxm-shallow-m5-v2-v4-ac8322bd8e44786c3f6e1c5707079bc7eaa370c8db44f9053b9b84dfac3a2ce0 -> mxm-shallow-m5-v2-v4-ac8322bd8e44786c3f6e1c5707079bc7eaa370c8db44f9053b9b84dfac3a2ce0
+2026-10-21T19:32:54.3698848Z  * [new tag]           mxm-standing-native-owner-private-decision-extract-oneuse-20261012-v3 -> mxm-standing-native-owner-private-decision-extract-oneuse-20261012-v3
+2026-10-21T19:32:54.3702347Z  * [new tag]           mxm-standing-native-saved-econ-recovery-exact-one-use-20261012-v3 -> mxm-standing-native-saved-econ-recovery-exact-one-use-20261012-v3
+2026-10-21T19:32:54.3705540Z  * [new tag]           mxm-standing-native-saved-econ-recovery-one-use-20261012-v1 -> mxm-standing-native-saved-econ-recovery-one-use-20261012-v1
+2026-10-21T19:32:54.3708844Z  * [new tag]           mxm-technical-native-replay-20261010_technical_stream_only_842b -> mxm-technical-native-replay-20261010_technical_stream_only_842b
+2026-10-21T19:32:54.3712027Z  * [new tag]           mxm-technical-native-replay-20261010_technical_stream_only_842b-38057012588 -> mxm-technical-native-replay-20261010_technical_stream_only_842b-38057012588
+2026-10-21T19:32:54.3715343Z  * [new tag]           mxm-timestamp-access-v1-f5dbdbaf03263fcde267333fda290e5344fcae8a -> mxm-timestamp-access-v1-f5dbdbaf03263fcde267333fda290e5344fcae8a
+2026-10-21T19:32:54.3718638Z  * [new tag]           mxm-timestamp-masks-v1-f5dbdbaf03263fcde267333fda290e5344fcae8a -> mxm-timestamp-masks-v1-f5dbdbaf03263fcde267333fda290e5344fcae8a
+2026-10-21T19:32:54.3721505Z  * [new tag]           mxm-wide-greenfield-continuation-one-use-20261011-v1 -> mxm-wide-greenfield-continuation-one-use-20261011-v1
+2026-10-21T19:32:54.3724670Z  * [new tag]           mxm-wide-greenfield-history-20261011_wide_greenfield_continuation_v1-38150775948 -> mxm-wide-greenfield-history-20261011_wide_greenfield_continuation_v1-38150775948
+2026-10-21T19:32:54.3728209Z  * [new tag]           mxm-wide-greenfield-history-20261011_wide_greenfield_v1-38150485478 -> mxm-wide-greenfield-history-20261011_wide_greenfield_v1-38150485478
+2026-10-21T19:32:54.3730709Z  * [new tag]           mxm-wide-greenfield-one-use-20261011-v1 -> mxm-wide-greenfield-one-use-20261011-v1
+2026-10-21T19:32:54.3733296Z  * [new tag]           mxm-wide-quote-completion-20261011_wide_quote_completion_v1-38152844809 -> mxm-wide-quote-completion-20261011_wide_quote_completion_v1-38152844809
+2026-10-21T19:32:54.3736206Z  * [new tag]           mxm-wide-quotes-completion-one-use-20261011-v1 -> mxm-wide-quotes-completion-one-use-20261011-v1
+2026-10-21T19:32:54.3738209Z  * [new tag]           mxm690-storage-recovery-38595715613 -> mxm690-storage-recovery-38595715613
+2026-10-21T19:32:54.3740994Z [command]/usr/bin/git branch --list --remote origin/mxm-p0-integrated-cache-successor-20261020
+2026-10-21T19:32:54.3742705Z   origin/mxm-p0-integrated-cache-successor-20261020
+2026-10-21T19:32:54.3744818Z [command]/usr/bin/git rev-parse refs/remotes/origin/mxm-p0-integrated-cache-successor-20261020
+2026-10-21T19:32:54.3746311Z a734c6dd9bde83f4c84c0800da89aff70592f880
+2026-10-21T19:32:54.3748065Z ##[endgroup]
+2026-10-21T19:32:54.3748911Z ##[group]Determining the checkout info
+2026-10-21T19:32:54.3749914Z ##[endgroup]
+2026-10-21T19:32:54.3750468Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T19:32:54.3752296Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T19:32:54.3754379Z ##[group]Checking out the ref
+2026-10-21T19:32:54.3756430Z [command]/usr/bin/git checkout --progress --force -B mxm-p0-integrated-cache-successor-20261020 refs/remotes/origin/mxm-p0-integrated-cache-successor-20261020
+2026-10-21T19:32:54.9438649Z Switched to a new branch 'mxm-p0-integrated-cache-successor-20261020'
+2026-10-21T19:32:54.9443910Z branch 'mxm-p0-integrated-cache-successor-20261020' set up to track 'origin/mxm-p0-integrated-cache-successor-20261020'.
+2026-10-21T19:32:54.9490879Z ##[endgroup]
+2026-10-21T19:32:54.9541707Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T19:32:54.9572378Z a734c6dd9bde83f4c84c0800da89aff70592f880
+2026-10-21T19:32:54.9582561Z ##[group]Removing auth
+2026-10-21T19:32:54.9586785Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T19:32:54.9620367Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T19:32:54.9852521Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T19:32:54.9883427Z http.https://github.com/.extraheader
+2026-10-21T19:32:54.9891787Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T19:32:54.9927558Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T19:32:55.0152664Z ##[endgroup]
+2026-10-21T19:32:55.0357162Z ##[group]Run python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+2026-10-21T19:32:55.0358450Z [36;1mpython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock[0m
+2026-10-21T19:32:55.0654195Z shell: /usr/bin/bash -e {0}
+2026-10-21T19:32:55.0654626Z ##[endgroup]
+2026-10-21T19:32:56.4709651Z Defaulting to user installation because normal site-packages is not writeable
+2026-10-21T19:32:57.3693094Z Collecting cffi==2.1.1 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 1))
+2026-10-21T19:32:57.4277736Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+2026-10-21T19:32:57.4670030Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.8/221.8 kB 5.8 MB/s eta 0:00:00
+2026-10-21T19:32:57.7381396Z Collecting cryptography==46.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 2))
+2026-10-21T19:32:57.7537924Z   Downloading cryptography-46.0.3-cp311-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+2026-10-21T19:32:57.8549629Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 44.9 MB/s eta 0:00:00
+2026-10-21T19:32:58.1080351Z Collecting numpy==2.2.6 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 3))
+2026-10-21T19:32:58.1218485Z   Downloading numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.5 MB)
+2026-10-21T19:32:58.2248248Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.5/16.5 MB 155.6 MB/s eta 0:00:00
+2026-10-21T19:32:58.4630816Z Collecting protobuf==5.29.5 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 4))
+2026-10-21T19:32:58.4767002Z   Downloading protobuf-5.29.5-cp38-abi3-manylinux2014_x86_64.whl (319 kB)
+2026-10-21T19:32:58.4824400Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 319.9/319.9 kB 87.6 MB/s eta 0:00:00
+2026-10-21T19:32:58.5066725Z Collecting pycparser==3.11 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 5))
+2026-10-21T19:32:58.5200047Z   Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-21T19:32:58.5250564Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.2/51.2 kB 17.0 MB/s eta 0:00:00
+2026-10-21T19:32:58.5762734Z Collecting pyyaml==6.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 6))
+2026-10-21T19:32:58.5896516Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-21T19:32:58.5973439Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 139.1 MB/s eta 0:00:00
+2026-10-21T19:32:58.9043219Z Installing collected packages: pyyaml, pycparser, protobuf, numpy, cffi, cryptography
+2026-10-21T19:33:01.1147948Z Successfully installed cffi-2.1.1 cryptography-46.0.3 numpy-2.2.6 protobuf-5.29.5 pycparser-3.11 pyyaml-6.0.3
+2026-10-21T19:33:01.3607277Z ##[group]Run python3 -m research_core_v4.laboratory.historical_suite_diagnostic
+2026-10-21T19:33:01.3607869Z [36;1mpython3 -m research_core_v4.laboratory.historical_suite_diagnostic[0m
+2026-10-21T19:33:01.3675095Z shell: /usr/bin/bash -e {0}
+2026-10-21T19:33:01.3675344Z ##[endgroup]
+2026-10-21T19:33:03.3901138Z [master 6a80d17] [skip ci] Runtime V2 checkpoint conflict-test runtime
+2026-10-21T19:33:03.3901583Z  1 file changed, 1 insertion(+)
+2026-10-21T19:33:03.3901850Z  create mode 100644 checkpoint.txt
+2026-10-21T19:33:03.4005185Z From /tmp/tmpwxf8_x1y/remote
+2026-10-21T19:33:03.4005683Z  * branch            research   -> FETCH_HEAD
+2026-10-21T19:33:03.4006439Z    5efa693..bb6b4d6  research   -> origin/research
+2026-10-21T19:33:03.4401495Z From /tmp/tmpwxf8_x1y/remote
+2026-10-21T19:33:03.5441874Z  * branch            research   -> FETCH_HEAD
+2026-10-21T19:33:03.5442640Z [master 2eb9ee5] [skip ci] Runtime V2 checkpoint semantic-conflict-test runtime
+2026-10-21T19:33:03.5443326Z  1 file changed, 1 insertion(+), 1 deletion(-)
+2026-10-21T19:33:03.5542339Z From /tmp/tmpm9jp_f_b/remote
+2026-10-21T19:33:03.5542822Z  * branch            research   -> FETCH_HEAD
+2026-10-21T19:33:03.5543161Z    6d6702b..57a5944  research   -> origin/research
+2026-10-21T19:33:50.5048058Z From /tmp/tmpqcmf_yqa/remote
+2026-10-21T19:33:50.5049125Z  + 214928d...b26a6c1 performance-research-v3-20260922 -> origin/performance-research-v3-20260922  (forced update)
+2026-10-21T19:34:10.4957741Z /usr/lib/python3.12/zipfile/__init__.py:1620: UserWarning: Duplicate name: 'prepared.json'
+2026-10-21T19:34:10.4961267Z   return self._open_to_write(zinfo, force_zip64=force_zip64)
+2026-10-21T19:36:26.3547283Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3549113Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3549804Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3550526Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3551149Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3551790Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3552486Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3553168Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3553910Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3554567Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3555262Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3556190Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3556899Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3557603Z [LARGE-DATA AUDIT] 1/2 files | 6/10 bytes | 60.00% | ETA 0.0m
+2026-10-21T19:36:26.3558322Z [LARGE-DATA AUDIT] 2/2 files | 10/10 bytes | 100.00% | ETA 0.0m
+2026-10-21T19:36:26.3559071Z [BOOTSTRAP] Installing Android-safe protobuf runtime...
+2026-10-21T19:36:26.3559642Z [BOOTSTRAP] protobuf missing
+2026-10-21T19:36:26.3560214Z [BOOTSTRAP] Source builds are disabled; Rust/cryptography are not used.
+2026-10-21T19:36:26.3561072Z [BOOTSTRAP PASS] protobuf 3.20.1 installed. Rust is not required.
+2026-10-21T19:36:26.3561827Z [BOOTSTRAP] Installing Android-safe protobuf runtime...
+2026-10-21T19:36:26.3562411Z [BOOTSTRAP] protobuf missing
+2026-10-21T19:36:26.3562970Z [BOOTSTRAP] Source builds are disabled; Rust/cryptography are not used.
+2026-10-21T19:36:26.3563838Z [BOOTSTRAP FAIL] Universal protobuf wheel installation failed.
+2026-10-21T19:36:26.3564975Z No OAuth or broker capture was attempted. Check Pydroid internet access and RUN this same file again.
+2026-10-21T19:36:26.3566556Z RESULT_WRITTEN 274e085724cfb7bc7b7d04c1ac141f945b4ebaa452237d060593d2a5325c658a
+2026-10-21T19:36:26.3568014Z RESULT_WRITTEN 274e085724cfb7bc7b7d04c1ac141f945b4ebaa452237d060593d2a5325c658a
+2026-10-21T19:36:26.3569093Z RESULT_WRITTEN 274e085724cfb7bc7b7d04c1ac141f945b4ebaa452237d060593d2a5325c658a
+2026-10-21T19:36:26.3570065Z RESULT_WRITTEN 274e085724cfb7bc7b7d04c1ac141f945b4ebaa452237d060593d2a5325c658a
+2026-10-21T19:36:26.3571032Z RESULT_WRITTEN d1b3b23fefd9b020621e70a8f7d333d2833cd76d831960842bd89614d0e92f6e
+2026-10-21T19:36:26.3574660Z {"economic_reception": false, "errors": 46, "failures": 66, "job": "historic-suite", "log_sha256": "205f5bc4b5aed4b10947bdc5458f60df98fca26f69d839b2f9109e852ebbacdb", "market_worker_invoked": false, "operational_reception": false, "passed": false, "production_credentials_supplied": false, "run_id": "39662566970", "schema": "mxm.historical-suite-native-diagnostic.v1", "seconds": 204.922, "shallow": "false", "skipped": 14, "source_sha": "a734c6dd9bde83f4c84c0800da89aff70592f880", "tests": 2308}
+2026-10-21T19:36:26.5000174Z ##[error]Process completed with exit code 1.
+2026-10-21T19:36:26.5104177Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-21T19:36:26.5104597Z with:
+2026-10-21T19:36:26.5104803Z   name: historic-suite-39662566970
+2026-10-21T19:36:26.5105085Z   path: verification/historical-suite/
+2026-10-21T19:36:26.5105359Z   if-no-files-found: error
+2026-10-21T19:36:26.5105591Z   compression-level: 6
+2026-10-21T19:36:26.5105995Z   overwrite: false
+2026-10-21T19:36:26.5106205Z   include-hidden-files: false
+2026-10-21T19:36:26.5106446Z ##[endgroup]
+2026-10-21T19:36:26.6762726Z (node:6634) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-21T19:36:26.6764054Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-21T19:36:26.6839997Z With the provided path, there will be 2 files uploaded
+2026-10-21T19:36:26.6843107Z Artifact name is valid!
+2026-10-21T19:36:26.6843969Z Root directory input is valid!
+2026-10-21T19:36:26.9488566Z Beginning upload of artifact content to blob storage
+2026-10-21T19:36:27.0237114Z (node:6634) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-21T19:36:27.2724428Z Uploaded bytes 432540
+2026-10-21T19:36:27.3143219Z Finished uploading artifact content to blob storage!
+2026-10-21T19:36:27.3144434Z SHA256 digest of uploaded artifact zip is 3507a4ff4b56c07ad11be35530b1d4dde6be700136032a0b6619c0a796d8d96f
+2026-10-21T19:36:27.3146370Z Finalizing artifact upload
+2026-10-21T19:36:27.5522829Z Artifact historic-suite-39662566970.zip successfully finalized. Artifact ID 12377325184
+2026-10-21T19:36:27.5524635Z Artifact historic-suite-39662566970 has been successfully uploaded! Final size is 432540 bytes. Artifact ID is 12377325184
+2026-10-21T19:36:27.5532691Z Artifact download URL: https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39662566970/artifacts/12377325184
+2026-10-21T19:36:27.5762205Z Post job cleanup.
+2026-10-21T19:36:27.6626457Z [command]/usr/bin/git version
+2026-10-21T19:36:27.6648793Z git version 2.55.0
+2026-10-21T19:36:27.6694220Z Temporarily overriding HOME='/home/runner/work/_temp/f8724b66-cd25-412e-a104-f919fb3e73b6' before making global git config changes
+2026-10-21T19:36:27.6695551Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T19:36:27.6701018Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T19:36:27.6741637Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T19:36:27.6777950Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T19:36:27.7028163Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T19:36:27.7065279Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T19:36:27.7513299Z Cleaning up orphan processes
+2026-10-21T19:36:27.7776751Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
