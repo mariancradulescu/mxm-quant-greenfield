@@ -10,7 +10,7 @@ class SourceNamespace(unittest.TestCase):
     def test_immutable_source_does_not_require_rewriting_merge_history(self):
         # GitHub rejects creation under the historical linear-only namespace.
         # The operational source instead requires the exact immutable seal.
-        self.assertEqual(runtime.SOURCE_BRANCH,'mxm-r3-integrated-source-20261021-r5')
+        self.assertEqual(runtime.SOURCE_BRANCH,'mxm-r3-integrated-source-20261021-r6')
         self.check(Route())
 
     def test_historical_authority_fence_scope_cannot_change(self):

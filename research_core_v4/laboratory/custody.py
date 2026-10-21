@@ -1,5 +1,5 @@
 """Shared existing native git transaction for keyless evidence-plane writers."""
-import base64,json,os,subprocess,tempfile
+import base64,contextlib,json,os,subprocess,sys,tempfile
 from pathlib import Path
 from .common import *
 _NATIVE_WRITER_SCOPE=None
@@ -352,8 +352,27 @@ def parse_ref_advertisement(raw,branch):
 def writer_git_environment(scope):
     env={k:v for k,v in os.environ.items() if k not in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','SUCCESSOR_APP_PRIVATE_KEY')}
     auth=base64.b64encode(('x-access-token:'+scope['token']).encode()).decode()
-    env.update(GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+auth)
+    # Disposable clones must not detach maintenance into temporary Git stores.
+    env.update(GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='3',
+        GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+auth,
+        GIT_CONFIG_KEY_1='gc.auto',GIT_CONFIG_VALUE_1='0',
+        GIT_CONFIG_KEY_2='maintenance.auto',GIT_CONFIG_VALUE_2='false')
     return env
+
+@contextlib.contextmanager
+def publication_directory():
+    """Cleanup must not replace an already verified native CAS refusal."""
+    directory=tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP'))
+    try:
+        yield Path(directory.name)
+    finally:
+        original_error=sys.exc_info()[1]
+        try:directory.cleanup()
+        except OSError as error:
+            print('MXM_NATIVE_TEMP_CLEANUP '+json.dumps({'failure_class':type(error).__name__,
+                'errno':error.errno,'primary_error_preserved':original_error is not None,
+                'contains_custody_keys_or_app_token':False}),flush=True)
+            if original_error is None:raise
 
 def native_evidence_head():
     """Read-only ref identity under the same existing native App scope."""
@@ -397,8 +416,8 @@ def atomic_publish(route,parent,files,message):
     env=writer_git_environment(scope)
     def git(directory,*args):
         v=subprocess.run(['git',*args],cwd=directory,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120);need(v.returncode==0,'ATOMIC_GIT_'+args[0].upper().replace('-','_'));return v.stdout.decode().strip()
-    with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as td:
-        d=Path(td);git(d,'init','-q');git(d,'remote','add','origin','https://github.com/mariancradulescu/mxm-quant-greenfield.git');git(d,'fetch','--depth=1','origin',parent);git(d,'checkout','--detach','FETCH_HEAD')
+    with publication_directory() as d:
+        git(d,'init','-q');git(d,'remote','add','origin','https://github.com/mariancradulescu/mxm-quant-greenfield.git');git(d,'fetch','--depth=1','origin',parent);git(d,'checkout','--detach','FETCH_HEAD')
         for path,content in files.items():
             need(not path.startswith('/') and '..' not in path.split('/') and path not in ('','.git') and not path.startswith('.git/'),'EVIDENCE_PATH')
             p=d/path
