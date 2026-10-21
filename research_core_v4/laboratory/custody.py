@@ -337,6 +337,56 @@ def native_cas_rejection(result,branch,parent=None,observed=None):
     return status==("[remote rejected] (cannot lock ref 'refs/heads/"+branch+
         "': is at "+observed+" but expected "+parent+")").encode()
 
+def advertised_ref(git,directory,branch):
+    """Read the ref from Git's authenticated publication service."""
+    import re
+    raw=git(directory,'ls-remote','--exit-code','origin','refs/heads/'+branch)
+    return parse_ref_advertisement(raw,branch)
+
+def parse_ref_advertisement(raw,branch):
+    import re
+    match=re.fullmatch(r'([a-f0-9]{40})\t'+re.escape('refs/heads/'+branch),raw)
+    need(match is not None,'ATOMIC_GIT_REF_ADVERTISEMENT')
+    return match.group(1)
+
+def writer_git_environment(scope):
+    env={k:v for k,v in os.environ.items() if k not in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','SUCCESSOR_APP_PRIVATE_KEY')}
+    auth=base64.b64encode(('x-access-token:'+scope['token']).encode()).decode()
+    env.update(GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+auth)
+    return env
+
+def native_evidence_head():
+    """Read-only ref identity under the same existing native App scope."""
+    from .runtime import EVIDENCE_BRANCH
+    scope=_NATIVE_WRITER_SCOPE
+    need(scope is not None and scope.get('operation')!='source-controls' and
+         scope['job']==os.environ.get('GITHUB_JOB') and scope['source']==os.environ.get('LAB_SOURCE_SHA') and
+         not any(os.environ.get(k) for k in ('SUCCESSOR_APP_PRIVATE_KEY','MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','R3_CUSTODY_PRIVATE_KEY_PEM')),
+         'APP_REF_READER_SCOPE_REQUIRED')
+    scope['guard']()
+    result=subprocess.run(['git','ls-remote','--exit-code','https://github.com/mariancradulescu/mxm-quant-greenfield.git',
+        'refs/heads/'+EVIDENCE_BRANCH],env=writer_git_environment(scope),capture_output=True,timeout=60)
+    need(result.returncode==0,'ATOMIC_NATIVE_REF_READ')
+    return parse_ref_advertisement(result.stdout.decode().strip(),EVIDENCE_BRANCH)
+
+def confirm_publication(read_ref,expected,parent,*,pause=None):
+    """Finite read-only convergence; never repeats a publication.
+
+    Only the exact previous parent can be a delayed advertisement. An
+    unexpected concurrent commit stops immediately, even after push success.
+    """
+    import time
+    pause=time.sleep if pause is None else pause
+    for attempt in range(5):
+        observed=read_ref()
+        print('MXM_NATIVE_REF_CONFIRMATION '+json.dumps({'expected_oid':expected,
+            'observed_oid':observed,'read_attempt':attempt+1,
+            'transport':'AUTHENTICATED_GIT_REF_ADVERTISEMENT','second_push':False}),flush=True)
+        if observed==expected:return observed
+        need(observed==parent,'ATOMIC_PUSH_UNRESOLVED_OR_CONCURRENT_WRITER')
+        if attempt<4:pause(0.5)
+    need(False,'ATOMIC_REF_READ_DID_NOT_CONVERGE')
+
 def atomic_publish(route,parent,files,message):
     from .runtime import EVIDENCE_BRANCH,read_state
     need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM') and not os.environ.get('SUCCESSOR_APP_PRIVATE_KEY'),'WRITER_NO_KEYS')
@@ -344,8 +394,7 @@ def atomic_publish(route,parent,files,message):
     need(scope is not None and scope.get('operation')!='source-controls' and scope['job']==os.environ.get('GITHUB_JOB') and
          scope['source']==os.environ.get('LAB_SOURCE_SHA'),'APP_WRITER_SCOPE_REQUIRED')
     scope['guard']()
-    env={k:v for k,v in os.environ.items() if k not in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','SUCCESSOR_APP_PRIVATE_KEY')}
-    auth=base64.b64encode(('x-access-token:'+scope['token']).encode()).decode();env.update(GIT_TERMINAL_PROMPT='0',GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',GIT_CONFIG_VALUE_0='AUTHORIZATION: basic '+auth)
+    env=writer_git_environment(scope)
     def git(directory,*args):
         v=subprocess.run(['git',*args],cwd=directory,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120);need(v.returncode==0,'ATOMIC_GIT_'+args[0].upper().replace('-','_'));return v.stdout.decode().strip()
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as td:
@@ -360,9 +409,12 @@ def atomic_publish(route,parent,files,message):
         try:
             result=subprocess.run(['git','push','--porcelain','--force-with-lease=refs/heads/'+EVIDENCE_BRANCH+':'+parent,'origin','HEAD:refs/heads/'+EVIDENCE_BRANCH],cwd=d,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=120)
             if result.returncode:
-                observed=route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']
+                observed=advertised_ref(git,d,EVIDENCE_BRANCH)
                 # Network/auth/permission errors are NOT evidence of CAS exclusion.
-                if native_cas_rejection(result,EVIDENCE_BRANCH,parent,observed) and observed not in (parent,commit) and [p.get('sha') for p in route.json('git/commits/'+observed).get('parents',[])]==[parent]:
+                if native_cas_rejection(result,EVIDENCE_BRANCH,parent,observed) and observed not in (parent,commit):
+                    git(d,'fetch','--depth=2','origin',observed)
+                    need(git(d,'rev-list','--parents','-n','1',observed).split()==[observed,parent],
+                         'ATOMIC_NATIVE_WINNER_PARENT_MISMATCH')
                     prefix=b'!\tHEAD:refs/heads/'+EVIDENCE_BRANCH.encode()+b'\t'
                     reply=next(line.decode('ascii') for line in result.stdout.splitlines() if line.startswith(prefix))
                     raise CASRefused(parent,commit,observed,reply)
@@ -373,10 +425,11 @@ def atomic_publish(route,parent,files,message):
         except Exception:
             # A lost ACK is resolved by exact committed bytes, never a second push.
             from .runtime import file_at
-            need(route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']==commit,'ATOMIC_PUSH_UNRESOLVED_OR_CONCURRENT_WRITER')
+            confirm_publication(lambda:advertised_ref(git,d,EVIDENCE_BRANCH),commit,parent)
             need(all(file_at(route,p,commit)==v for p,v in files.items()),'ATOMIC_COMMITTED_BYTES_MISMATCH')
             print(json.dumps({'state':'ATOMIC_ACK_RECONCILED_BY_EXACT_REMOTE_BYTES','commit':commit,'second_push':False}))
-    need(route.json('git/ref/heads/'+EVIDENCE_BRANCH)['object']['sha']==commit,'ATOMIC_ACK_AMBIGUOUS')
+        else:
+            confirm_publication(lambda:advertised_ref(git,d,EVIDENCE_BRANCH),commit,parent)
     return commit
 
 def chunk_ciphertext(blob,prefix,part_size=256000):

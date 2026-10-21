@@ -86,29 +86,53 @@ def verify_checkpoint20_public(state, authority, evidence_oid):
     return True
 
 
-def verify_checkpoint23_public(state,authority,evidence_oid):
-    """Exact completed native A/B/A predecessor, never a generic upgrade grant."""
-    need(authority.get('schema')=='mxm.integrated-typed-predecessor.v3' and
-         authority.get('evidence_oid')==evidence_oid=='fc6bc295f326a84134dcc57149afe9bfe393f5af' and
-         authority.get('source_sha')==state.get('source_sha')=='e9f3582eeff11697bf14e0ad26506f5d4347b46f' and
-         authority.get('sequence')==state.get('sequence')==23 and
-         authority.get('ciphertext_sha256')==state.get('ciphertext_sha256')=='cbef49e3435b18c445a48b199c55bc990aee52bfd816efe500fdbab4b0ca6e07' and
-         authority.get('private_sha256')=='ee2b40a28bfc0f294dbe0652c4720e6082f7475818919cffb2724686df54e2be' and
-         authority.get('public_state_sha256')==digest(state)=='59ca9739a246581fd2673395a5d47fed4216bf5b65925643b09ab2f83b561383',
-         'CHECKPOINT23_EXACT_CLOSED_NATIVE_PREDECESSOR')
+def validate_closed_native_authorities(document):
+    import re
+    fields={'schema','evidence_oid','source_sha','sequence','ciphertext_sha256','private_sha256','public_state_sha256'}
+    need(type(document) is dict and set(document)=={'schema','entries'} and
+         document['schema']=='mxm.closed-native-predecessor-authority.v1' and
+         type(document['entries']) is list and 0<len(document['entries'])<=128,
+         'CLOSED_PREDECESSOR_AUTHORITY_SCHEMA')
+    seen=set();origins=set()
+    for row in document['entries']:
+        need(type(row) is dict and set(row)==fields and
+             row['schema']=='mxm.integrated-typed-predecessor.v3' and
+             type(row['sequence']) is int and row['sequence']>=21 and
+             all(type(row[k]) is str and re.fullmatch('[a-f0-9]{40}',row[k]) for k in ('evidence_oid','source_sha')) and
+             all(type(row[k]) is str and re.fullmatch('[a-f0-9]{64}',row[k]) for k in ('ciphertext_sha256','private_sha256','public_state_sha256')),
+             'CLOSED_PREDECESSOR_AUTHORITY_ENTRY')
+        key=(row['source_sha'],row['sequence'])
+        need(key not in seen and row['evidence_oid'] not in origins,'CLOSED_PREDECESSOR_AUTHORITY_DUPLICATE')
+        seen.add(key);origins.add(row['evidence_oid'])
+    return document['entries']
+
+def closed_native_authorities():
+    # This metadata is within the immutable source and module digest. An
+    # admission cannot supply or expand it. No new key or authority channel.
+    from pathlib import Path
+    from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
+    return validate_closed_native_authorities(strict_json(
+        (Path(__file__).parent/'authorities/closed_native_predecessors.json').read_bytes()))
+
+def verify_closed_native_predecessor(state,authority,evidence_oid):
+    matches=[row for row in closed_native_authorities() if row==authority]
+    need(len(matches)==1 and authority['evidence_oid']==evidence_oid and
+         state.get('source_sha')==authority['source_sha'] and
+         state.get('sequence')==authority['sequence'] and
+         state.get('ciphertext_sha256')==authority['ciphertext_sha256'] and
+         digest(state)==authority['public_state_sha256'] and
+         state.get('pending') is None and state.get('safe_stop') is True and state.get('orders')==0,
+         'EXACT_CLOSED_NATIVE_PREDECESSOR')
     return True
 
+def verify_checkpoint23_public(state,authority,evidence_oid):
+    need(authority.get('sequence')==23,'CHECKPOINT23_EXACT_SEQUENCE')
+    return verify_closed_native_predecessor(state,authority,evidence_oid)
+
 def verify_checkpoint24_public(state,authority,evidence_oid):
-    """Exact native cold-restored continuation; fixed diagnostic ancestry."""
-    need(authority.get('schema')=='mxm.integrated-typed-predecessor.v3' and
-         authority.get('evidence_oid')==evidence_oid=='5d5be97cd4f316945aeea4268528b2f4262c8b07' and
-         authority.get('source_sha')==state.get('source_sha')=='c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c' and
-         authority.get('sequence')==state.get('sequence')==24 and
-         authority.get('ciphertext_sha256')==state.get('ciphertext_sha256')=='c231bd706622b915b4b7eca84f1fe53a4577f2585e22bbbae0713a566d401c67' and
-         authority.get('private_sha256')=='d0728bcd3c8b89b9dacde8466b4acd503cecb0706c8ff15f63f3ccab8910f0be' and
-         authority.get('public_state_sha256')==digest(state)=='4b1d83b077adc2c743d1c1625406cce6efbf4b6cba672b3d2555397ddb1f72a1',
-         'CHECKPOINT24_EXACT_CLOSED_NATIVE_PREDECESSOR')
-    return True
+    need(authority.get('sequence')==24,'CHECKPOINT24_EXACT_SEQUENCE')
+    return verify_closed_native_predecessor(state,authority,evidence_oid)
+
 
 def typed_source_transition(private,state,authority,source,evidence_oid=None):
     """One closed, exact predecessor; no generic/open-state source upgrade."""
@@ -116,12 +140,8 @@ def typed_source_transition(private,state,authority,source,evidence_oid=None):
         need(authority['sequence']==19 and authority['ciphertext_sha256']=='cb14705c8456668c273f3c19a55bde40839e5be13c92cb43ad36b5cd61dc71b5' and authority['private_sha256']=='47c34e6307d247e03c95f2727112bcbbaee7e40d6a07f104f20b16e622be8102','TYPED_SOURCE_TRANSITION_AUTHORITY')
     elif authority.get('source_sha')=='eab050084982916ad0c67798b38b947bac66b2b2':
         verify_checkpoint20_public(state,authority,evidence_oid)
-    elif authority.get('source_sha')=='e9f3582eeff11697bf14e0ad26506f5d4347b46f':
-        verify_checkpoint23_public(state,authority,evidence_oid)
-    elif authority.get('source_sha')=='c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c':
-        verify_checkpoint24_public(state,authority,evidence_oid)
     else:
-        need(False,'TYPED_SOURCE_PREDECESSOR_NOT_AUTHORIZED')
+        verify_closed_native_predecessor(state,authority,evidence_oid)
     need(private['source_sha']==state['source_sha']==authority['source_sha'] and
          private['sequence']==state['sequence']==authority['sequence'] and
          state['ciphertext_sha256']==authority['ciphertext_sha256'] and
