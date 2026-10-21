@@ -8,7 +8,7 @@ WRITER_JOBS={'source-controls':'source-controls','claim':'segment-intent','fence
     'recover':'recover-before-exposure','handoff':'scientific-handoff',
     'fault-probes':'fault-probes','attest-v3':'attest-v3','certify-v3':'certify-v3'}
 
-def resolve_control_policy(observed, witness, source):
+def resolve_control_policy(observed, witness, source,source_ref=None):
     """Resolve redacted actors using the existing admin-controlled environment.
 
     The App cannot read bypass actors with Contents write. The environment
@@ -20,6 +20,7 @@ def resolve_control_policy(observed, witness, source):
     """
     from datetime import datetime,timezone
     from .runtime import SOURCE_BRANCH
+    SOURCE_BRANCH=SOURCE_BRANCH if source_ref is None else source_ref
     need(type(witness) is dict and witness.get('schema')=='mxm.native-control-policy-witness.v1'
          and witness.get('source_sha')==source and
          witness.get('source_ref')==SOURCE_BRANCH,
@@ -142,17 +143,19 @@ def build_certifier_workflow(source):
     import re
     need(re.fullmatch('[a-f0-9]{40}',source or ''),'APP_WORKFLOW_SOURCE')
     return {'name':'MXM R3 native independent certification',
-        'on':{'workflow_run':{'workflows':['MXM integrated P0 technical recovery'],'types':['completed']}},
+        'on':{'workflow_run':{'workflows':['MXM integrated P0 technical recovery'],'types':['completed']},
+              'workflow_dispatch':{}},
         'permissions':{},'concurrency':{'group':'mxm-integrated-laboratory','cancel-in-progress':False},
         'env':{'LAB_SOURCE_SHA':source,'LAB_INTEGRATED_PROTOCOL':'v2'},'jobs':{'certify-v3':{
-            'if':"github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1 && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1'",
+            'if':"github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/main' && github.run_attempt == 1 && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'mxm-remediation-p0-p4-20261015-v1'))",
             'runs-on':'ubuntu-24.04','timeout-minutes':8,'environment':'mxm-p0-successor-issuer-v1',
             'permissions':{'contents':'read','actions':'read'},'steps':[
                 {'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683','with':{'ref':source,'persist-credentials':False}},
                 {'run':'python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'},
                 {'run':'python3 -m research_core_v4.laboratory.custody certify-v3','env':{
                     'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}',
-                    'R3_CONTROL_WITNESS':'${{ vars.R3_CONTROL_WITNESS }}'}}]}}}
+                    'R3_CONTROL_WITNESS':'${{ vars.R3_CERTIFIER_CONTROL_WITNESS }}',
+                    'R3_EXECUTION_CONTROL_WITNESS':'${{ vars.R3_CONTROL_WITNESS }}'}}]}}}
 
 def writer_metadata(operation):
     """Job identity is checked before any App key is read or token minted."""
@@ -170,7 +173,7 @@ def writer_metadata(operation):
          os.environ.get('GITHUB_WORKFLOW_REF')=='mariancradulescu/mxm-quant-greenfield/'+path+'@refs/heads/'+branch,
          'APP_WRITER_NATIVE_CONTEXT')
     need(os.environ.get('GITHUB_EVENT_NAME') in
-         (('workflow_run',) if operation=='certify-v3' else ('push','workflow_dispatch')),
+         (('workflow_run','workflow_dispatch') if operation=='certify-v3' else ('push','workflow_dispatch')),
          'APP_WRITER_EVENT')
     need(not any(os.environ.get(k) for k in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','R3_CUSTODY_PRIVATE_KEY_PEM',
          'CTRADER_CLIENT_ID','CTRADER_CLIENT_SECRET','CTRADER_ACCESS_TOKEN',
@@ -195,7 +198,12 @@ def run_native_writer(operation):
     route=GetOnly()
     # Only the isolated read-only probe may mint when native bypass fields are
     # redacted. Every data/workload job waits for its independent native proof.
-    anchors(route,allow_redacted_app_probe=operation=='source-controls')
+    certifier_branch=None
+    if operation=='certify-v3':
+        from .certificate_registry import CERTIFIER_BRANCH,pre_mint_certifier
+        certifier_branch=CERTIFIER_BRANCH
+        pre_mint_certifier(route,identity)
+    else:anchors(route,allow_redacted_app_probe=operation=='source-controls')
     need(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==identity['source'],
          'APP_WRITER_CHECKOUT_PIN')
     need(subprocess.run(['git','diff','--quiet','HEAD','--'],capture_output=True).returncode==0,
@@ -217,7 +225,12 @@ def run_native_writer(operation):
                     if path.startswith('rulesets/') and any(r.get('type')=='update' for r in observed.get('rules',[])):
                         from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
                         witness=strict_json(os.environ.get('R3_CONTROL_WITNESS','').encode())
-                        return resolve_control_policy(observed,witness,identity['source'])
+                        ref=certifier_branch
+                        if operation=='certify-v3' and observed.get('id') not in {p['id'] for p in witness['policies']}:
+                            from .certificate_registry import EXECUTION_SOURCE,EXECUTION_BRANCH
+                            witness=strict_json(os.environ.get('R3_EXECUTION_CONTROL_WITNESS','').encode())
+                            return resolve_control_policy(observed,witness,EXECUTION_SOURCE,EXECUTION_BRANCH)
+                        return resolve_control_policy(observed,witness,identity['source'],ref)
                     return observed
                 def data(self,path,limit=16*1024*1024):
                     import urllib.request
@@ -238,7 +251,7 @@ def run_native_writer(operation):
                 # Do not swap process environment: the native CAS proof has
                 # two threads, each requiring the same independent reader.
                 verify_effective_controls(controls)
-                anchors(GetOnly())
+                anchors(GetOnly(),source_branch=certifier_branch)
                 need(GetOnly().json('git/ref/heads/'+os.environ['GITHUB_REF_NAME'])['object']['sha']==identity['trigger'],
                      'APP_WRITER_WORKFLOW_REF_MOVED_STOP_RECONCILE')
             _NATIVE_WRITER_SCOPE={**identity,'token':token,'guard':guard,'controls':controls}

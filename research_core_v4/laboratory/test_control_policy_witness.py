@@ -71,7 +71,10 @@ class ControlPolicyWitness(unittest.TestCase):
                     env=step.get('env',{})
                     self.assertEqual('R3_CONTROL_WITNESS' in env,'SUCCESSOR_APP_PRIVATE_KEY' in env)
                     if 'R3_CONTROL_WITNESS' in env:
-                        self.assertEqual(env['R3_CONTROL_WITNESS'],'${{ vars.R3_CONTROL_WITNESS }}')
+                        expected='${{ vars.R3_CERTIFIER_CONTROL_WITNESS }}' if workflow['name']=='MXM R3 native independent certification' else '${{ vars.R3_CONTROL_WITNESS }}'
+                        self.assertEqual(env['R3_CONTROL_WITNESS'],expected)
+                        if workflow['name']=='MXM R3 native independent certification':
+                            self.assertEqual(env['R3_EXECUTION_CONTROL_WITNESS'],'${{ vars.R3_CONTROL_WITNESS }}')
                         self.assertEqual(job['environment'],'mxm-p0-successor-issuer-v1')
 
 if __name__=='__main__':unittest.main()
