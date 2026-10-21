@@ -1,0 +1,105 @@
+{
+  "name": "MXM R3 finite authentic chronology reception",
+  "on": {
+    "workflow_dispatch": {}
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "chronology-collect": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 15,
+      "environment": "mxm-r3-pepperstone-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "run": "python3 -m research_core_v4.laboratory.chronology_reception chronology-collect",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_CHRONOLOGY_SOURCE": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "R3_CHRONOLOGY_CONTROL_WITNESS": "${{ vars.R3_CHRONOLOGY_CONTROL_WITNESS }}",
+            "R3_CTRADER_CLIENT_ID": "${{ secrets.R3_CTRADER_CLIENT_ID }}",
+            "R3_CTRADER_CLIENT_SECRET": "${{ secrets.R3_CTRADER_CLIENT_SECRET }}",
+            "R3_CTRADER_ACCESS_TOKEN": "${{ secrets.R3_CTRADER_ACCESS_TOKEN }}"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "r3-chronology-${{ github.run_id }}",
+            "path": "verification/r3-chronology/capture.mxmenc\nverification/r3-chronology/producer.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1"
+    },
+    "chronology-cold": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 15,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "r3-chronology-${{ github.run_id }}",
+            "path": "verification/r3-chronology"
+          }
+        },
+        {
+          "run": "python3 -m research_core_v4.laboratory.chronology_reception chronology-cold",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_CHRONOLOGY_SOURCE": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "R3_CHRONOLOGY_CONTROL_WITNESS": "${{ vars.R3_CHRONOLOGY_CONTROL_WITNESS }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "r3-chronology-cold-${{ github.run_id }}",
+            "path": "verification/r3-chronology/cold.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "needs": "chronology-collect",
+      "if": "always()"
+    }
+  }
+}
