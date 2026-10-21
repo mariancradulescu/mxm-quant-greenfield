@@ -516,26 +516,43 @@
       "mitigation": "Exact restrictive branch targets are installed. Future transitions must add/verify restrictive targets before removing the final old target. Actual App scoped mint/read/revoke reception remains pending."
     }
   },
-  "current_source_sha": "d94c537cb0f393582f51d4b73355532f76727217",
-  "source_ref": "mxm-r3-integrated-source-20261021",
-  "source_seal_ruleset": 25522027,
+  "current_source_sha": "e9f3582eeff11697bf14e0ad26506f5d4347b46f",
+  "source_ref": "mxm-r3-integrated-source-20261021-r2",
+  "source_seal_ruleset": 25522311,
   "current_native_control_reception": {
-    "prior_failure_run": 39539339189,
-    "diagnostic_run": 39539611277,
-    "diagnostic_job": 119024095404,
-    "actual_contents_write_app_redacts_actors": true,
-    "diagnostic_token_revoked": true,
-    "source_repair_pr": 51,
-    "native_source_ci": 39539907722,
-    "native_source_job": 119025034314,
-    "tests": 248,
+    "source_repair_pr": 56,
+    "tests": 249,
     "installation_prs": [
-      52,
-      53
+      57,
+      58
     ],
-    "execution_sha": "8ab44c12d02cad9cbc2c9a980175086a04b3d90c",
-    "main_sha": "e90389457111788fb0270707e9671104a846efed",
-    "configuration": "Existing restricted issuer environment R3_CONTROL_WITNESS, exact source/ref and live policy security fields/revisions; no key or App permission change",
+    "execution_sha": "2a5dc1c0681efedc70046c1488e9b07d27ab593e",
+    "main_sha": "f0f6b351b3f92870bfe239d56a24e707d65bfecd",
+    "source_controls": {
+      "run": 39541188077,
+      "job": 119029063115,
+      "status": "success"
+    },
+    "preflight": {
+      "run": 39541188077,
+      "job": 119029182872,
+      "status": "success"
+    },
+    "intentional_prefence_fault": {
+      "run": 39541188077,
+      "job": 119029411034,
+      "exact_error": "LAB_INJECTED_CRASH_AFTER_CLAIM_BEFORE_FENCE",
+      "worker": "skipped"
+    },
+    "native_recovery": {
+      "job": 119029561693,
+      "status": "success",
+      "evidence_oid": "776963f99c580e76360ab9750c792e3e553491ae",
+      "sequence": 20,
+      "pending": null,
+      "refunds": 0
+    },
+    "normal_admission_ref": "b02c2ac8524b79d48096ed521702616c22b40f25",
     "operational_acceptance": false
   }
 }
