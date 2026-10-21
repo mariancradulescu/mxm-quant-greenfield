@@ -29,7 +29,9 @@ def build_workflow(source):
         'on':{'push':{'branches':['main'],'paths':[PATH]},
               'schedule':[{'cron':'11,26,41,56 * * * *'}],
               'workflow_run':{'workflows':['MXM integrated P0 technical recovery'],'types':['completed']},
-              'workflow_dispatch':{}},'permissions':{},
+              'workflow_dispatch':{'inputs':{'cas_transport_probe':{
+                  'description':'Manual fixed-path CAS reply diagnostic on closed checkpoint; no reception claim',
+                  'type':'boolean','default':False,'required':True}}}},'permissions':{},
         'concurrency':{'group':'mxm-integrated-laboratory','cancel-in-progress':False,'queue':'max'},
         'jobs':{'ordinary-recovery':{
             'if':"github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1",
@@ -46,7 +48,8 @@ def build_workflow(source):
                  'env':{'GH_TOKEN':'${{ github.token }}','LAB_SOURCE_SHA':ENGINE,
                         'LAB_INTEGRATED_PROTOCOL':'v2','LAB_OBSERVER_SOURCE_SHA':source,
                         'SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}',
-                        'R3_CONTROL_WITNESS':'${{ vars.R3_CONTROL_WITNESS }}'}}]}}}
+                        'R3_CONTROL_WITNESS':'${{ vars.R3_CONTROL_WITNESS }}',
+                        'LAB_CAS_TRANSPORT_DIAGNOSTIC':"${{ github.event_name == 'workflow_dispatch' && inputs.cas_transport_probe && '1' || '0' }}"}}]}}}
 
 def context(route):
     source=os.environ.get('LAB_OBSERVER_SOURCE_SHA','');trigger=os.environ.get('GITHUB_SHA','')
@@ -193,7 +196,10 @@ def observe(route):
 def main():
     route=GetOnly()
     with observer_scope(route) as identity:
-        result=observe(route)
+        if os.environ.get('LAB_CAS_TRANSPORT_DIAGNOSTIC')=='1':
+            from .transport_diagnostic import observe_transport
+            result=observe_transport(route)
+        else:result=observe(route)
         print('MXM_R3_OBSERVER '+json.dumps({**identity,**result,'orders':0,'new_economic_outcomes':0},sort_keys=True))
     print('MXM_R3_OBSERVER_EXISTING_TOKEN_REVOKED',flush=True)
 
