@@ -1,3 +1,17 @@
+# Current R7 checkpoint28 and certificate identity repair — 2026-10-21
+
+R7 source dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a remains installed on execution7f3cf674746692f7d697ab14389557a1852ae488, active no-bypass seal25536784. Native39581281683 completed checkpoint28 with17 conserved programmes, cold/ACK/CAS/attestation success. No completed investigation was rerun.
+
+The original independent certifier39582457892 failed LAB_DUPLICATE_EVIDENCE_WRITE because valid R6 already occupies the legacy path. Full failed log is retained in PR93. Dedicated certifier source c14785ee1835fdd9fcdd1fff8e72184566c727ee passed301 native tests, was frozen by active no-bypass25553897 and installed MAIN ONLY in PR94 after exact installation CI293+301. Existing App/key/issuer environment, two branches/zero tags/admin bypass false remain. The original R7 witness is retained separately.
+
+Native issuer39618855314/job119286594687 appended only typed-successor/certificates/dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a/39581281683.json in78820efbbb0bedf69ea3f09df6dab73b2333a70c. Legacy R6 bytes and checkpoint28 are unchanged. Independent native consumer39619546157/job119289018823 re-read completed issuer workflow/job/checkout/log/seal/commit and all R7 underlying proofs, returned CERTIFICATE_ALREADY_NATIVE_VERIFIED_NO_WRITE; no second push or evidence change.
+
+Three distinct R7 zero-outcome technical post-fence admissions remain prospective next work. Economic exposure uncertainty stays HOLD. Full operational acceptance=false; research capability=false; outcomes0/orders0. Sustained authentic chronology, dated economic fidelity and historical residual defects remain open. No new research, LIVE order or cBot is authorized by the technical certificate.
+
+The historical test helper no longer overrides unittest.TestCase.fail. A direct failure-hook regression passes; archived binding failures remain failures and no immutable hash was rebaselined. The existing native historical diagnostic is triggered for this test change and retains full red output.
+
+Previous snapshots below are historical.
+
 # Current R6 native technical reception; integral laboratory gates remain open — 2026-10-21
 
 Exact R6 source17d8a922e5cab68152eba44889f277e1aa1c8617 is now frozen by active no-bypass rule25533261. Existing issuer administrative witness was updated/read back to its exact revision; evidence App ACL25461373 and existing keys/scopes remain unchanged. Issuer is still exact main+execution, zero tags, administrator bypass=false. Protected PR81/82 installed main30eb20ccbbf89debb43c2b4d4b02c93958ef6594 and execution7249d8adef8c7d1896620693f4636fcf246c585e. Original R3/R4/R5 seals and historic evidence are retained.
