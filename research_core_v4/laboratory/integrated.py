@@ -75,6 +75,10 @@ def definition(route):
     a=strict_json(file_at(route,path,ref));need(a['schema']=='mxm.laboratory-admission.v2' and a['authority']==AUTH and a['module_sha256']==module_digest(),'INTEGRATED_ADMISSION_SOURCE')
     need(bytes_digest(file_at(route,WF,os.environ['GITHUB_SHA']))==a['workflow_sha256'],'ORCHESTRATION_WORKFLOW_DRIFT')
     need(a['mode'] in ('TECHNICAL_NONOUTCOME','DEVELOPMENT_RESEARCH'),'INTEGRATED_ADMISSION_MODE')
+    if os.environ.get('LAB_FAULT_AFTER_FENCE'):
+        from .post_fence_technical import inject
+        inject('ADMISSION_VALIDATION_ONLY',a)
+        need(os.environ.get('LAB_FAULT_BEFORE_FENCE','0')!='1','CONFLICTING_CONTROLLED_FAULTS')
     if a['mode']=='TECHNICAL_NONOUTCOME':need(a['economic_release'] is False,'ECONOMIC_LANE_HELD')
     else:
         gate=strict_json(file_at(route,'typed-successor/END_TO_END_OPERATIONAL_ACCEPTANCE.json',a['technical_acceptance_ref']))
@@ -161,6 +165,9 @@ def transition_predecessor(route,state,parent,authority):
 def preflight():
     route=workload('preflight');a,ref,path=definition(route);parent=current(route);s,initial=state_at(route,parent)
     need(s['pending'] is None,'PREFLIGHT_PENDING_REQUIRES_RECOVERY')
+    from .post_fence_technical import refuse_replay,verify_inventory
+    verify_inventory(route,parent,s)
+    refuse_replay(s,a)
     expected=os.environ.get('LAB_PARENT_OID');need(not expected or expected==parent,'PREFLIGHT_STALE_PARENT')
     if os.environ.get('GITHUB_EVENT_NAME')=='push':need(strict_json(file_at(route,TRIGGER,os.environ['GITHUB_SHA']))['expected_evidence_parent']==parent,'PREFLIGHT_STALE_TRIGGER')
     original=file_at(route,'program-state.json',parent);need(bytes_digest(original)==ORIGINAL_PUBLIC,'PREFLIGHT_ORIGINAL_CHANGED')
@@ -231,12 +238,15 @@ def fence():
 def execute():
     route=workload('investigation');c,a=certificate(route);parent=current(route);need(parent==os.environ['LAB_PARENT_OID'],'WORKER_STALE_FENCE');s,_=state_at(route,parent)
     need(s['pending']['phase']=='EXECUTION_FENCED' and s['pending']['run_id']==int(os.environ['GITHUB_RUN_ID']) and s['pending']['preflight_sha256']==digest(c),'WORKER_DURABLE_FENCE')
+    from .post_fence_technical import inject
+    inject('BEFORE_DECRYPT',a)
     blob=(INPUT/'prepared.mxmenc').read_bytes();need(bytes_digest(blob)==c['prepared_cipher_sha256'],'WORKER_PREPARED_CIPHER')
     from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
     OUT.mkdir(parents=True,exist_ok=True);os.umask(0o077)
     with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP')) as folder:
         tmp=Path(folder);key,fp=_private_key_from_secret(tmp);p=strict_json(unpack(owner.bounded_decrypt(blob,key,tmp)),max_elements=8000000)
         need(digest(p)==c['prepared_private_sha256'] and p['sequence']==s['sequence'],'WORKER_PREFLIGHT_PRIVATE')
+        inject('AFTER_RESTORE',a)
         book=register_and_validate(p,a,p['history']);before=accounting(book.export());done=[];wire={}
         for _ in range(a['steps_per_segment']):
             m=next_admitted_programme(p,a,book)
@@ -259,6 +269,7 @@ def execute():
                 if task is not None:
                     before_ids=sorted(p['shared_catalogue']['assets'])
                     result=lab.execute(task)
+                    inject('AFTER_TASK',a)
                     done.append({'programme':m['id'],'task':task,'classification':result['classification']})
                     history=p.setdefault('programme_execution_history',[])
                     event={
@@ -317,6 +328,9 @@ def publish():
 def recover():
     route=workload('recover-before-exposure',True);definition(route);oid=current(route);s,_=state_at(route,oid)
     if not s['pending']:output(next='NONE');return
+    if s['pending'].get('phase')=='EXECUTION_FENCED':
+        from .post_fence_technical import recover_native
+        return recover_native(route,oid,s)
     jobs=native_dependency_jobs() if s['pending']['run_id']==int(os.environ['GITHUB_RUN_ID']) else route.json('actions/runs/'+str(s['pending']['run_id'])+'/attempts/1/jobs?per_page=100')['jobs']
     if not can_recover_before_exposure(s,jobs):output(next='HELD');print(json.dumps({'state':'AMBIGUOUS_EXPOSURE_HELD_NO_RETRY'}));return
     intent=strict_json(file_at(route,'typed-successor/intents/'+str(s['pending']['run_id'])+'.json',oid));base=intent['base_state']
@@ -329,6 +343,8 @@ def recover():
 def handoff():
     route=workload('scientific-handoff',True);oid=os.environ['LAB_PARENT_OID'];need(current(route)==oid,'HANDOFF_STALE_SUCCESSOR');s,_=state_at(route,oid);need(s['pending'] is None,'HANDOFF_PENDING')
     a,ref,path=definition(route)
+    if digest(a) in {v['admission_sha256'] for v in s.get('retired_technical_admissions',{}).values()}:
+        print(json.dumps({'state':'RETIRED_TECHNICAL_ADMISSION_NO_DISPATCH','dispatches':0}));return
     if s['safe_stop'] and s.get('admission_sha256')==digest(a) and not s.get('recovery_continuation'):print(json.dumps({'state':'INTEGRATED_PROGRAMME_COMPLETE_NO_DISPATCH'}));return
     need(s['sequence']<=s.get('admission_start_sequence',s['sequence'])+sum(m['budget']['steps'] for m in a['programmes']),'HANDOFF_FINITE_TOTAL')
     jobs=native_dependency_jobs();names={j['name']:j for j in jobs}
@@ -592,6 +608,8 @@ def verify():
     need(current(route)==oid,'VERIFY_PARENT')
     state,_=state_at(route,oid)
     need(state['safe_stop'] and state['pending'] is None,'VERIFY_NOT_TERMINAL')
+    from .post_fence_technical import verify_inventory
+    verify_inventory(route,oid,state)
     admission,ref,path=definition(route)
     from .evidence_v3 import cold_attestation,native_adapter_attestation
     from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret

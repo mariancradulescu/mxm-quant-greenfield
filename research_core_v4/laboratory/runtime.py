@@ -13,7 +13,7 @@ from research_core_v4.remediation_p0_p4_20261015.safety import strict_json,unpac
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-r3-integrated-source-20261021-r6'
+SOURCE_BRANCH='mxm-r3-integrated-source-20261021-r7'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
@@ -33,7 +33,7 @@ def source_admission(head,expected,branch_head,rule):
     # forbids every mutation, including all history rewrites, without bypass.
 
 def module_digest():
-    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py','operational_acceptance.py','handoff_recovery.py','evidence_v3.py','attest_v3.py','certify_v3.py','authorities/closed_native_predecessors.json')})
+    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py','operational_acceptance.py','handoff_recovery.py','evidence_v3.py','attest_v3.py','certify_v3.py','authorities/closed_native_predecessors.json','post_fence_technical.py')})
 
 def anchors(route,*,allow_redacted_app_probe=False):
     old.owner_unchanged(route)

@@ -11,7 +11,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from .common import need,encoded,bytes_digest,digest
+from .common import need,encoded,bytes_digest,digest,LabError
 from . import custody,integrated as engine,runtime
 from .protocol import STATE_PATH,ORIGINAL_PUBLIC,can_recover_before_exposure,recovered_public_base,require_jobs
 from .attest_v3 import native_checkout_provenance
@@ -19,8 +19,8 @@ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
 
 REPO='mariancradulescu/mxm-quant-greenfield'
-ENGINE='17d8a922e5cab68152eba44889f277e1aa1c8617'
-ENGINE_MODULE='3436bba87d359d9bde02a374076ae913f313e317962032ef9ef03f57daad8d7a'
+ENGINE='dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a'
+ENGINE_MODULE='1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10'
 PATH='.github/workflows/mxm-integrated-p0-recovery.yml'
 
 def build_workflow(source):
@@ -144,11 +144,21 @@ def observe(route):
     if initial or state.get('source_sha')!=ENGINE:
         return {'state':'OTHER_SOURCE_NO_BOOTSTRAP','dispatches':0}
     if state['pending'] is None and state['safe_stop']:
+        if state.get('retired_technical_admissions'):
+            return {'state':'RETIRED_TECHNICAL_WORK_SAFE_HOLD_NO_DISPATCH','dispatches':0}
         return {'state':'ADMITTED_PROGRAMME_COMPLETE_NO_DISPATCH','dispatches':0}
     prior=state['pending']['run_id'] if state['pending'] else state['last_run_id']
     run=route.json('actions/runs/'+str(prior));metadata=route.json('actions/runs/'+str(prior)+'/attempts/1/jobs?per_page=100')
     jobs=metadata['jobs'];need(run.get('id')==prior and len(jobs)==metadata.get('total_count') and
          all(j.get('run_id')==prior for j in jobs),'R3_OBSERVER_COMPLETE_JOB_INVENTORY')
+    if (state.get('pending') or {}).get('phase')=='EXECUTION_FENCED' and run.get('status')=='completed':
+        from .post_fence_technical import recover_native
+        intent=strict_json(runtime.file_at(route,'typed-successor/intents/'+str(prior)+'.json',oid))
+        os.environ['LAB_ADMISSION_REF']=intent['preflight']['admission_ref']
+        os.environ['LAB_ADMISSION_PATH']=intent['preflight']['admission_path']
+        retired=recover_native(route,oid,state)
+        return {'state':'POST_FENCE_TECHNICAL_RETIRED_NO_REPLAY' if retired else
+                'POST_FENCE_EXPOSURE_HELD_NO_REPLAY','dispatches':0}
     action=predecessor(state,run,jobs)
     if action in ('WAIT_ACTIVE_NATIVE_RUN','HOLD_AMBIGUOUS_EXPOSURE'):
         return {'state':action,'dispatches':0}
@@ -184,6 +194,10 @@ def observe(route):
                 return {'state':'CONTROLLED_TECHNICAL_FAULT_NO_AUTOMATIC_DISPATCH','dispatches':0}
     os.environ['LAB_ADMISSION_REF']=ref;os.environ['LAB_ADMISSION_PATH']=path
     admission,ref,path=engine.definition(route)
+    from .post_fence_technical import refuse_replay
+    try:refuse_replay(state,admission)
+    except LabError:
+        return {'state':'RETIRED_TECHNICAL_ADMISSION_NO_DISPATCH','dispatches':0}
     need(admission['mode']=='TECHNICAL_NONOUTCOME' and admission['economic_release'] is False,
          'R3_OBSERVER_TECHNICAL_ONLY')
     need(state['sequence']<=state.get('admission_start_sequence',state['sequence'])+

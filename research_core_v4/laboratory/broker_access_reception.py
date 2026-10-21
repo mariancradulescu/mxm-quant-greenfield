@@ -10,8 +10,8 @@ from .runtime import module_digest,SOURCE_BRANCH
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
 
-ENGINE='17d8a922e5cab68152eba44889f277e1aa1c8617'
-ENGINE_MODULE='3436bba87d359d9bde02a374076ae913f313e317962032ef9ef03f57daad8d7a'
+ENGINE='dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a'
+ENGINE_MODULE='1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10'
 REPO='mariancradulescu/mxm-quant-greenfield'
 BRANCH='mxm-remediation-p0-p4-20261015-v1'
 PATH='.github/workflows/mxm-r3-pepperstone-access-reception.yml'
