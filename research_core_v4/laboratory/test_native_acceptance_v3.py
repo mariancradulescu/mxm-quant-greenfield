@@ -131,7 +131,7 @@ def make_fixture():
          'ack_sha256':None,
          'concurrent_writers':[{'writer':'A','accepted':True,'oid':'7'*40,'expected_oid':'6'*40},
                                {'writer':'B','accepted':False,'expected_oid':'6'*40,
-                                'candidate_oid':'8'*40,'observed_oid':'7'*40,'reason':'NATIVE_GIT_STALE_INFO'}],
+                                'candidate_oid':'8'*40,'observed_oid':'7'*40,'reason':'NATIVE_GIT_EXPECTED_REF_REFUSED'}],
          'cas_base_oid':'6'*40,'cas_final_oid':'7'*40,
          'pre_fence_native_run_id':HISTORIC,
          'pre_fence_recovery_path':'typed-successor/recoveries/'
