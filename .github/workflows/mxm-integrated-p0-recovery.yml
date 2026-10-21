@@ -53,7 +53,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "9c75793f76b8fbe198ff15fbea23a68ae9ae5901",
+            "ref": "c8f9247787f761055c880fec3138efd92c9ab1e9",
             "persist-credentials": false
           }
         },
@@ -69,9 +69,9 @@
           "run": "python3 -m research_core_v4.laboratory.recovery_v3",
           "env": {
             "GH_TOKEN": "${{ github.token }}",
-            "LAB_SOURCE_SHA": "c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c",
+            "LAB_SOURCE_SHA": "c6f8b46685dec3b9f9ee2ee6dd3cf12f0609add2",
             "LAB_INTEGRATED_PROTOCOL": "v2",
-            "LAB_OBSERVER_SOURCE_SHA": "9c75793f76b8fbe198ff15fbea23a68ae9ae5901",
+            "LAB_OBSERVER_SOURCE_SHA": "c8f9247787f761055c880fec3138efd92c9ab1e9",
             "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
             "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}",
             "LAB_CAS_TRANSPORT_DIAGNOSTIC": "${{ github.event_name == 'workflow_dispatch' && inputs.cas_transport_probe && '1' || '0' }}"
