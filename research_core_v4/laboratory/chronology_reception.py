@@ -323,6 +323,8 @@ def main(phase):
         result['ciphertext_sha256']=bytes_digest((OUT/'capture.mxmenc').read_bytes())
         result['accepted']=(result['provider_window_complete'] and result['bid_events']>0 and
             result['ask_events']>0 and result['chronological_events_processed']>=POLICY['minimum_quote_events'])
+        if phase=='chronology-cold':
+            result['accepted']=result['accepted'] and result['native_producer_conclusion']=='success'
     except Exception as error:
         result['failure_class']=type(error).__name__
         if type(error).__name__=='LabError' and re.fullmatch('[A-Z][A-Z0-9_]{2,100}',str(error)):
