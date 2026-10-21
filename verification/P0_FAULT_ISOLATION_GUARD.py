@@ -31,8 +31,8 @@ def verify(root: Path) -> None:
     except json.JSONDecodeError:
         return _legacy_verify(root)
     # Exact regenerated R3 contract, not a permissive JSON/YAML text search.
-    assert hashlib.sha256(raw).hexdigest()=='e470795917615da056b4ffedacdfe7571e2b0c99eedff5ae1683cf2ba78359be'
-    assert workflow['env']['LAB_SOURCE_SHA']=='c6f8b46685dec3b9f9ee2ee6dd3cf12f0609add2'
+    assert hashlib.sha256(raw).hexdigest()=='24eb7e6770411ab646539b85ecce38a15f3173ab1752165bb2da019aab143ef7'
+    assert workflow['env']['LAB_SOURCE_SHA']=='9bad0e4832a2db433ca35a721775087e89a2c5cc'
     assert workflow['env']['LAB_INTEGRATED_PROTOCOL']=='v2'
     assert workflow['jobs']['preflight']['needs']=='source-controls'
     assert len(workflow['jobs'])==11 and workflow['permissions']=={}
@@ -40,7 +40,7 @@ def verify(root: Path) -> None:
     assert "inputs.fault_before_fence != '1'" in workflow['jobs']['scientific-handoff']['if']
     for name,job in workflow['jobs'].items():
         assert job['permissions']['contents']=='read'
-        assert job['steps'][0]['with']=={'ref':'c6f8b46685dec3b9f9ee2ee6dd3cf12f0609add2','persist-credentials':False}
+        assert job['steps'][0]['with']=={'ref':'9bad0e4832a2db433ca35a721775087e89a2c5cc','persist-credentials':False}
         envs=[step.get('env',{}) for step in job['steps']]
         assert not any(any(key.startswith('CTRADER_') for key in env) for env in envs)
         key_steps=[s for s in job['steps'] if 'SUCCESSOR_APP_PRIVATE_KEY' in s.get('env',{})]
