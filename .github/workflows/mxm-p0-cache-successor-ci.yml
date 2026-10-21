@@ -162,7 +162,8 @@ jobs:
         with:
           ref: 4fa9f8316d9cfd40bc17f32df20332bbc1dc5418
           persist-credentials: false
-      - run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Exact existing R7 core and prospective chronology helper source
         run: |
           python3 - <<'PY'
