@@ -7,6 +7,7 @@ on:
 permissions: {contents: read}
 jobs:
   shared-catalogue-regression:
+    needs: workflow-boundary-source-regression
     if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
@@ -245,3 +246,57 @@ jobs:
           result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
           raise SystemExit(not result.wasSuccessful())
           PY
+
+  workflow-boundary-source-regression:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 33490c04e27124354ec2eee0d0eb126b413373ce
+          path: .workflow-boundary-source
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ba265381fb8d39a18dd99b8698005bc103720913
+          path: .boundary-original-main
+          sparse-checkout: |
+            .github/workflows
+            verification/P0_FAULT_ISOLATION_GUARD.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 36ffe2999aae332b2d408c9d12d32bfabfa70802
+          path: .boundary-original-exec
+          sparse-checkout: |
+            .github/workflows
+            verification/P0_FAULT_ISOLATION_GUARD.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - working-directory: .workflow-boundary-source
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Bind complete original inventories and reproduce unknown-workflow gap without credentials
+        working-directory: .workflow-boundary-source
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,subprocess
+          from verification import R3_WORKFLOW_BOUNDARY as b
+          from research_core_v4.laboratory.runtime import module_digest
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='33490c04e27124354ec2eee0d0eb126b413373ce'
+          assert module_digest()=='1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10'
+          provenance=json.loads((b.SNAPSHOTS/'PROVENANCE.json').read_bytes())
+          for mode,folder in [('main','../.boundary-original-main'),('exec','../.boundary-original-exec')]:
+              root=pathlib.Path(folder)
+              assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==provenance[mode]['source_sha']
+              paths={str(p.relative_to(root)) for p in (root/'.github/workflows').iterdir() if p.suffix.lower() in ('.yml','.yaml')}
+              assert paths==set(b.baseline(mode))
+              assert all((root/path).read_bytes()==raw.encode() for path,raw in b.baseline(mode).items())
+          assert pathlib.Path('../.boundary-original-exec/verification/P0_FAULT_ISOLATION_GUARD.py').read_bytes()==(b.SNAPSHOTS/'previous_guard.py.txt').read_bytes()
+          print('MXM_NATIVE_BOUNDARY_ORIGINS: exact35 main +238 execution workflows; original installed guard reproduced; no key or environment access')
+          PY
+      - working-directory: .workflow-boundary-source
+        run: python3 verification/R3_WORKFLOW_BOUNDARY.py self-test
