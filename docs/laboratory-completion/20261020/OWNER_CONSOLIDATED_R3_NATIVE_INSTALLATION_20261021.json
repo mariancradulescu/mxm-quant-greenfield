@@ -1,0 +1,139 @@
+{
+  "schema": "mxm.r3.native-installation-reception.v1",
+  "source": "36668adfdb6d0cf433965ad573376434063652d6",
+  "source_ref": "mxm-r3-integrated-source-20261020",
+  "seal": {
+    "id": 25521657,
+    "enforcement": "active",
+    "bypass_actors": [],
+    "rules": [
+      "creation",
+      "update",
+      "deletion",
+      "non_fast_forward"
+    ]
+  },
+  "installations": {
+    "execution": {
+      "pr": 48,
+      "head": "8a7f8e97b9f4acd143dd683fd1ac4039a7dac365",
+      "ci": 39539013396,
+      "job": 119022209449
+    },
+    "main": {
+      "pr": 49,
+      "head": "f3b17aaa852ba271adb24a603ee1ea1834de466a",
+      "ci": 39539043475,
+      "job": 119022305349
+    }
+  },
+  "tests": 244,
+  "first_native_run": {
+    "id": 39539339189,
+    "job": 119023254239,
+    "result": "SOURCE_CONTROL_FAILURE_NO_PREFLIGHT_OR_WORKER",
+    "error": "LAB_V3_EFFECTIVE_SOURCE_OR_WRITER_AUTHORITY"
+  },
+  "diagnostic": {
+    "id": 39539611277,
+    "job": 119024095404,
+    "result": "BYPASS_ACTORS_REDACTED_WITH_CONTENTS_WRITE",
+    "token_revoked": true,
+    "writes": 0,
+    "policies": [
+      {
+        "http_status": 200,
+        "keys": [
+          "_links",
+          "conditions",
+          "created_at",
+          "current_user_can_bypass",
+          "enforcement",
+          "id",
+          "name",
+          "node_id",
+          "rules",
+          "source",
+          "source_type",
+          "target",
+          "updated_at"
+        ],
+        "orders": 0,
+        "policy": {
+          "conditions": {
+            "ref_name": {
+              "exclude": [],
+              "include": [
+                "refs/heads/mxm-r3-integrated-source-20261020"
+              ]
+            }
+          },
+          "enforcement": "active",
+          "id": 25521657,
+          "rules": [
+            {
+              "type": "deletion"
+            },
+            {
+              "type": "non_fast_forward"
+            },
+            {
+              "type": "creation"
+            },
+            {
+              "type": "update"
+            }
+          ],
+          "updated_at": "2026-10-21T03:27:27.395Z"
+        },
+        "ruleset_id": 25521657,
+        "run_id": 39539611277,
+        "writes": 0
+      },
+      {
+        "http_status": 200,
+        "keys": [
+          "_links",
+          "conditions",
+          "created_at",
+          "current_user_can_bypass",
+          "enforcement",
+          "id",
+          "name",
+          "node_id",
+          "rules",
+          "source",
+          "source_type",
+          "target",
+          "updated_at"
+        ],
+        "orders": 0,
+        "policy": {
+          "conditions": {
+            "ref_name": {
+              "exclude": [],
+              "include": [
+                "refs/heads/mxm-o04-integrated-laboratory-evidence"
+              ]
+            }
+          },
+          "enforcement": "active",
+          "id": 25461373,
+          "rules": [
+            {
+              "type": "update"
+            }
+          ],
+          "updated_at": "2026-10-20T08:16:47.404Z"
+        },
+        "ruleset_id": 25461373,
+        "run_id": 39539611277,
+        "writes": 0
+      }
+    ]
+  },
+  "operational_acceptance": false,
+  "research_capability_accepted": false,
+  "new_economic_outcomes": 0,
+  "orders": 0
+}
