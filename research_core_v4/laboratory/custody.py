@@ -8,6 +8,55 @@ WRITER_JOBS={'source-controls':'source-controls','claim':'segment-intent','fence
     'recover':'recover-before-exposure','handoff':'scientific-handoff',
     'fault-probes':'fault-probes','attest-v3':'attest-v3','certify-v3':'certify-v3'}
 
+def resolve_control_policy(observed, witness, source):
+    """Resolve redacted actors using the existing admin-controlled environment.
+
+    The App cannot read bypass actors with Contents write. The environment
+    variable is supplied only to the existing issuer jobs; it is neither an
+    admission input nor a workload artifact. Every read still checks the live
+    policy identity, scope, complete rules and exact revision before using its
+    owner-visible actor inventory. Any subsequent ACL edit requires a new
+    administrative witness. No additional App permission or key is needed.
+    """
+    from datetime import datetime,timezone
+    from .runtime import SOURCE_BRANCH
+    need(type(witness) is dict and witness.get('schema')=='mxm.native-control-policy-witness.v1'
+         and witness.get('source_sha')==source and
+         witness.get('source_ref')==SOURCE_BRANCH,
+         'CONTROL_WITNESS_SOURCE')
+    policies=witness.get('policies')
+    need(type(policies) is list and len(policies)==2 and
+         len({p.get('id') for p in policies})==2,'CONTROL_WITNESS_INVENTORY')
+    matches=[p for p in policies if p.get('id')==observed.get('id')]
+    need(len(matches)==1,'CONTROL_WITNESS_POLICY_REQUIRED');sealed=matches[0]
+    fields=('id','target','source_type','source','enforcement','conditions','rules')
+    need(all(k in observed and k in sealed and observed[k]==sealed[k] for k in fields),
+         'CONTROL_WITNESS_LIVE_POLICY_CHANGED')
+    def revision(value):
+        need(type(value) is str,'CONTROL_WITNESS_REVISION_REQUIRED')
+        try:time=datetime.fromisoformat(value.replace('Z','+00:00'))
+        except ValueError:need(False,'CONTROL_WITNESS_REVISION_INVALID')
+        need(time.tzinfo is not None,'CONTROL_WITNESS_REVISION_TIMEZONE')
+        return time.astimezone(timezone.utc)
+    need(revision(observed.get('updated_at'))==revision(sealed.get('updated_at')),
+         'CONTROL_WITNESS_REVISION_CHANGED')
+    refs=sealed['conditions'].get('ref_name')
+    if refs=={'include':['refs/heads/'+SOURCE_BRANCH],'exclude':[]}:
+        expected=[]
+        need({'creation','update','deletion','non_fast_forward'}<=
+             {r.get('type') for r in sealed['rules']},'CONTROL_WITNESS_SOURCE_FREEZE')
+    else:
+        need(refs=={'include':['refs/heads/mxm-o04-integrated-laboratory-evidence'],'exclude':[]},
+             'CONTROL_WITNESS_TARGET')
+        expected=[{'actor_id':5343530,'actor_type':'Integration','bypass_mode':'always'}]
+    need(sealed.get('bypass_actors')==expected and sealed['enforcement']=='active' and
+         sealed['target']=='branch' and sealed['source_type']=='Repository' and
+         sealed['source']=='mariancradulescu/mxm-quant-greenfield',
+         'CONTROL_WITNESS_ACTORS')
+    need('bypass_actors' not in observed or observed['bypass_actors']==expected,
+         'CONTROL_WITNESS_VISIBLE_ACTOR_CONFLICT')
+    return {**observed,'bypass_actors':expected}
+
 def build_native_workflow(source,predecessor):
     """Install the same integrated DAG with scoped secrets and existing App.
 
@@ -78,6 +127,10 @@ def build_native_workflow(source,predecessor):
              'env':{'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}'}}]}
     workflow['jobs']['preflight']['needs']='source-controls'
     workflow['jobs']['scientific-handoff']['if']+=" && inputs.fault_before_fence != '1'"
+    for job in workflow['jobs'].values():
+        for step in job['steps']:
+            if 'SUCCESSOR_APP_PRIVATE_KEY' in step.get('env',{}):
+                step['env']['R3_CONTROL_WITNESS']='${{ vars.R3_CONTROL_WITNESS }}'
     return workflow
 
 def build_certifier_workflow(source):
@@ -93,7 +146,8 @@ def build_certifier_workflow(source):
                 {'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683','with':{'ref':source,'persist-credentials':False}},
                 {'run':'python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'},
                 {'run':'python3 -m research_core_v4.laboratory.custody certify-v3','env':{
-                    'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}'}}]}}}
+                    'GH_TOKEN':'${{ github.token }}','SUCCESSOR_APP_PRIVATE_KEY':'${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}',
+                    'R3_CONTROL_WITNESS':'${{ vars.R3_CONTROL_WITNESS }}'}}]}}}
 
 def writer_metadata(operation):
     """Job identity is checked before any App key is read or token minted."""
@@ -153,6 +207,13 @@ def run_native_writer(operation):
         with _app_token(private_key) as token:
             private_key=None
             class AppControls(GetOnly):
+                def json(self,path):
+                    observed=super().json(path)
+                    if path.startswith('rulesets/') and any(r.get('type')=='update' for r in observed.get('rules',[])):
+                        from research_core_v4.remediation_p0_p4_20261015.safety import strict_json
+                        witness=strict_json(os.environ.get('R3_CONTROL_WITNESS','').encode())
+                        return resolve_control_policy(observed,witness,identity['source'])
+                    return observed
                 def data(self,path,limit=16*1024*1024):
                     import urllib.request
                     need(path.startswith(('rulesets/','rules/branches/')),'APP_CONTROL_READ_NAMESPACE')
