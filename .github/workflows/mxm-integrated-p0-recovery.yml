@@ -1,36 +1,73 @@
-name: MXM integrated P0 ordinary recovery
-on:
-  push:
-    branches: [main]
-    paths: [.github/workflows/mxm-integrated-p0-recovery.yml]
-  schedule:
-    - cron: '11,26,41,56 * * * *'
-  workflow_run:
-    workflows: [MXM integrated P0 technical recovery]
-    types: [completed]
-  workflow_dispatch:
-permissions: {}
-concurrency:
-  group: mxm-integrated-laboratory
-  cancel-in-progress: false
-  queue: max
-jobs:
-  ordinary-recovery:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
-    runs-on: ubuntu-24.04
-    timeout-minutes: 6
-    permissions: {contents: write, actions: write}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with: {ref: 49ee16f38183b885699d2f3d7977ea8cbdb4ee0e, persist-credentials: false}
-      - run: |
-          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Verify sealed recovery guard and exact predecessor job outcomes
-        run: python3 -m unittest research_core_v4.laboratory.test_recovery_v2 -v
-      - name: Recover only a terminal native issuer with exact durable evidence
-        run: python3 -m research_core_v4.laboratory.recovery_v2
-        env:
-          GH_TOKEN: ${{ github.token }}
-          LAB_SOURCE_SHA: eab050084982916ad0c67798b38b947bac66b2b2
-          LAB_OBSERVER_SOURCE_SHA: 49ee16f38183b885699d2f3d7977ea8cbdb4ee0e
-          LAB_INTEGRATED_PROTOCOL: v2
+{
+  "name": "MXM integrated P0 ordinary recovery",
+  "on": {
+    "push": {
+      "branches": [
+        "main"
+      ],
+      "paths": [
+        ".github/workflows/mxm-integrated-p0-recovery.yml"
+      ]
+    },
+    "schedule": [
+      {
+        "cron": "11,26,41,56 * * * *"
+      }
+    ],
+    "workflow_run": {
+      "workflows": [
+        "MXM integrated P0 technical recovery"
+      ],
+      "types": [
+        "completed"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false,
+    "queue": "max"
+  },
+  "jobs": {
+    "ordinary-recovery": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 8,
+      "environment": "mxm-p0-successor-issuer-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "write"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "45e088c556fc9061be34d2c68f6098249a22c9be",
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "name": "Verify observer role, bounded recovery and exact engine module identity",
+          "run": "python3 -m unittest research_core_v4.laboratory.test_recovery_v3 -v"
+        },
+        {
+          "name": "Observe durable R3 state; recover only proven pre-exposure failures or missing handoffs",
+          "run": "python3 -m research_core_v4.laboratory.recovery_v3",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "LAB_SOURCE_SHA": "e9f3582eeff11697bf14e0ad26506f5d4347b46f",
+            "LAB_INTEGRATED_PROTOCOL": "v2",
+            "LAB_OBSERVER_SOURCE_SHA": "45e088c556fc9061be34d2c68f6098249a22c9be",
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
+          }
+        }
+      ]
+    }
+  }
+}
