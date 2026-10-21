@@ -1,3 +1,23 @@
+# Current exact-native-reply reception — 2026-10-21
+
+Current sealed source c6f8b46685dec3b9f9ee2ee6dd3cf12f0609add2 at mxm-r3-integrated-source-20261021-r4, active exact no-bypass seal25523796. Existing source seals remain untouched. Native CI39545980009/job119044130934 passes270 laboratory/account regressions. Protected installations PR71 executionee5a012d57f4d2c793305ea090f10ef8c7104c3b / PR72 mainab2b6ff5287b17298a915b177cd231b9c0b692ed pass exact generator/core/static/full CI. Existing observer control-sourcec8f92477 and existing administrative witness bind the same exact engine/policy revision. No App/key/scope expansion.
+
+Actual closed checkpoint24 comes from native39544420340: one new technical report from exact completed checkpoint23, no completed A-B-A task replay. Cipher c231bd706622b915b4b7eca84f1fe53a4577f2585e22bbbae0713a566d401c67; private digest d0728bcd3c8b89b9dacde8466b4acd503cecb0706c8ff15f63f3ccab8910f0be. Independent cold119040352306 restores13 programmes and preserves A-B-A plus authentic Pepperstone nonoutcome result. Economic accounting stays V2 22=21charged+1hold, observations29/refunds0. Two registration events were appended (new_events9); no economic identity/reservation/outcome/broker request/order.
+
+Its fault-probes119040616661 reconciles ACK once and gets one winner8315fcae, but rejects the unclassified loser; no attest/certificate. The original complete response was then captured through the existing scoped observer manual fixed-path diagnostic39545517767/job119042695840. Two new noncheckpoint proposals share exact8315fcae parent. A wins5d5be97; B65999ba is refused with exact native cannot-lock-ref text identifying full ref, observed winner and expected parent. Both public checkpoint files remain byte-identical; existing App token is revoked. This is actual transport evidence, not retrospective acceptance of either failed integrated run.
+
+PR69 now recognizes every byte of that exact ref/old/new response, verifies direct winner-parent independently, persists the reply in original job output/negative artifact and rechecks it in the independent consumer. Generic errors remain rejected. Current finite technical admission1782ec9d binds only exact closed/cold-restored checkpoint24, one new report and zero economic/broker/order budget; controlled pre-fence run39546697033 is under observation. Completed work is preserved.
+
+TST-01 has now run natively on full Git history:39545332902/job119042111015,2304 tests,61failures/65errors/14skips,205.197s. Original raw artifact12320958348 has SHA256 ca345abd16a434b1fd456dfa4262bd81666314293444677e7f64ec579de311a2, downloaded and checked before archival. Inner log digest786117ee96c2e740d516f1eccb0ebcec0ebc0a2c9274283c325c64ab2091bff8 also checked.26 local GPG socket errors are absent natively.126 native failures/errors remain open: many target deliberately archived security workflows or superseded states; unittest.fail override recursion and other issues also remain. No frozen binding was rewritten and the failed suite is not represented as PASS.
+
+Operational acceptance=false; research capability=false. REC-02 post-fence recovery, REC-03/DAT-04 chronological sustained capability, dated economic fidelity/statistics and historic residuals remain open. No new economic research, LIVE order or cBot work.
+
+![Exact active source seal without bypass](R3_SOURCE_R4_SEAL25523796.jpg)
+
+Earlier sections below are dated history; this section defines current state.
+
+---
+
 # Current checkpoint23 continuation — 2026-10-21
 
 Native e9f3582 reception actually completed A-B-A through automatic handoffs39541523586 →39541989245 →39542478693, checkpoint21→22→23. B read authentic preserved Pepperstone corpus without broker request/outcome/order; independent cold job119034415827 verified A-B-A, restored complete programme/task history and exact accounting. Checkpoint23 cipher cbef49e3435b18c445a48b199c55bc990aee52bfd816efe500fdbab4b0ca6e07; private digest ee2b40a28bfc0f294dbe0652c4720e6082f7475818919cffb2724686df54e2be. V2 remains22=21charged+1hold, observations29/refunds0.
