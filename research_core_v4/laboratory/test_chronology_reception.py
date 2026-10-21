@@ -1,5 +1,6 @@
 """Artificial wire fixtures only; no connection, credential or market outcome."""
-import base64,copy,unittest
+import base64,copy,json,tempfile,unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 from m6.ctrader_proto import OpenApiMessages_pb2 as m
@@ -110,5 +111,14 @@ class ChronologyReceptionTests(unittest.TestCase):
         with self.assertRaises(LabError):c.verify_source_witness(route,witness,source)
         live['updated_at']=policy['updated_at'];live['bypass_actors']=[{'actor_id':1}]
         with self.assertRaises(LabError):c.verify_source_witness(route,witness,source)
+    def test_failed_native_producer_cannot_receive_acceptance_from_favorable_metrics(self):
+        metrics={'provider_window_complete':True,'bid_events':10000,'ask_events':10000,
+                 'chronological_events_processed':20000,'native_producer_conclusion':'failure'}
+        with tempfile.TemporaryDirectory() as folder:
+            out=Path(folder);(out/'capture.mxmenc').write_bytes(b'artificial encrypted artifact placeholder')
+            with patch.object(c,'OUT',out),patch.object(c,'context',return_value={}),\
+                 patch.object(c,'cold',return_value=metrics):
+                self.assertEqual(c.main('chronology-cold'),1)
+            self.assertFalse(json.loads((out/'cold.json').read_bytes())['accepted'])
 
 if __name__=='__main__':unittest.main()
