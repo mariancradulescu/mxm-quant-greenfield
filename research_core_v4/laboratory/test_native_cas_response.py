@@ -9,6 +9,20 @@ import unittest
 from .custody import native_cas_rejection
 
 class NativeCASResponse(unittest.TestCase):
+    def test_actual_native_github_reply_binds_both_objects_and_exact_ref(self):
+        # Captured run39545517767/job119042695840, not an inferred failure.
+        parent='8315fcae9028b24b5d85305063c9055a379a67cf'
+        observed='5d5be97cd4f316945aeea4268528b2f4262c8b07'
+        branch='mxm-o04-integrated-laboratory-evidence'
+        row=("!\tHEAD:refs/heads/"+branch+"\t[remote rejected] (cannot lock ref 'refs/heads/"+branch+"': is at "+observed+" but expected "+parent+")\nDone\n").encode()
+        result=SimpleNamespace(stdout=row)
+        self.assertTrue(native_cas_rejection(result,branch,parent,observed))
+        for b,p,o in [('other',parent,observed),(branch,'0'*40,observed),(branch,parent,'0'*40),
+                      (branch,None,observed),(branch,parent,parent)]:
+            self.assertFalse(native_cas_rejection(result,b,p,o))
+        for fragment in [observed,parent,"cannot lock ref 'refs/heads/"]:
+            self.assertFalse(native_cas_rejection(SimpleNamespace(stdout=row.replace(fragment.encode(),b'ALTERED')),branch,parent,observed))
+
     def test_exact_destination_and_old_value_only(self):
         for reason in ('[rejected] (stale info)','[remote rejected] (incorrect old value provided)'):
             row=('!\tHEAD:refs/heads/probe\t'+reason+'\n').encode()

@@ -113,12 +113,13 @@ def transition_predecessor(route,state,parent,authority):
     """
     origin=authority['evidence_oid']
     if parent==origin:return state,origin
-    need(authority.get('source_sha') in ('eab050084982916ad0c67798b38b947bac66b2b2','e9f3582eeff11697bf14e0ad26506f5d4347b46f') and
+    need(authority.get('source_sha') in ('eab050084982916ad0c67798b38b947bac66b2b2','e9f3582eeff11697bf14e0ad26506f5d4347b46f','c6bf7027647d9b1e8e1a4dac50008c3ec0543c1c') and
          type(state.get('recovery_continuation')) is dict,'TRANSITION_RECOVERY_REQUIRED')
     continuation=state['recovery_continuation'];prior=continuation.get('run_id')
     need(type(prior) is int and prior>0,'TRANSITION_RECOVERY_RUN')
     original=strict_json(file_at(route,STATE_PATH,origin))
-    if authority.get('sequence')==23:verify_checkpoint23_public(original,authority,origin)
+    if authority.get('sequence')==24:verify_checkpoint24_public(original,authority,origin)
+    elif authority.get('sequence')==23:verify_checkpoint23_public(original,authority,origin)
     else:verify_checkpoint20_public(original,authority,origin)
     recovery_path='typed-successor/recoveries/'+str(prior)+'.json'
     intent_path='typed-successor/intents/'+str(prior)+'.json'
@@ -538,7 +539,7 @@ def fault_probes():
         except CASRefused as refusal:
             result={'writer':name,'accepted':False,'expected_oid':refusal.parent,
                     'candidate_oid':refusal.candidate,'observed_oid':refusal.observed,
-                    'reason':'NATIVE_GIT_EXPECTED_REF_REFUSED'}
+                    'reason':'NATIVE_GIT_EXPECTED_REF_REFUSED','native_reply':refusal.reply}
         # Separate native job log, subsequently read by the keyless verifier.
         print('MXM_CAS_RESULT '+json.dumps(result,sort_keys=True),flush=True)
         return result
