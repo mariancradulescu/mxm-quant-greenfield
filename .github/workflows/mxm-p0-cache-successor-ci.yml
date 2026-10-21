@@ -25,6 +25,28 @@ jobs:
           persist-credentials: false
       - run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 13c9861c0805de44cee082b6f3b2474795a32ef4
+          path: .publication-test-baseline
+          persist-credentials: false
+      - name: Reproduce historical import contamination and verify isolated publication
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,subprocess,sys,types,unittest
+          from unittest.mock import patch
+          baseline=pathlib.Path('.publication-test-baseline')
+          assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='13c9861c0805de44cee082b6f3b2474795a32ef4'
+          spec=importlib.util.spec_from_file_location('publication_test_baseline',baseline/'tests/test_research_core_v4_publication_only.py')
+          old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)
+          with patch.dict(sys.modules,{'research_core_v4.numeric_worker_v1':types.ModuleType('preexisting_unrelated_import')}):
+              before=unittest.TestResult();old.PublicationOnlyTests('test_23_no_scientific_imports').run(before)
+              assert before.testsRun==1 and len(before.failures)==1 and not before.errors
+              print('PUBLICATION_IMPORT_BEFORE: one expected failure on immutable 13c986 test')
+              from tests.test_research_core_v4_publication_only import PublicationOnlyTests
+              after=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(PublicationOnlyTests))
+              assert after.testsRun==28 and after.wasSuccessful()
+          PY
       - name: Reproduce two selector defects on immutable pre-repair source
         run: |
           python3 - <<'PY'

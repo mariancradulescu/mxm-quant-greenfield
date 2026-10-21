@@ -1,0 +1,37 @@
+BEFORE: original native diagnostic39620745031 has test_23_no_scientific_imports failure due shared sys.modules. Reproduced independently with only a preexisting fake module: tests=1, failures=1, errors=0.
+AFTER: identical contamination preserved in parent, actual publication.verify_evidence executes in fresh interpreter; no scientific module allowed.
+test_01_reproduce_native_integer_key_false_rejection (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_01_reproduce_native_integer_key_false_rejection) ... ok
+test_02_valid_bundle_exact_byte_identity (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_02_valid_bundle_exact_byte_identity) ... ok
+test_03_changed_raw_bytes_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_03_changed_raw_bytes_rejected) ... ok
+test_04_altered_embedded_digest_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_04_altered_embedded_digest_rejected) ... ok
+test_05_wrong_artifact_id_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_05_wrong_artifact_id_rejected) ... ok
+test_06_wrong_raw_file_sha_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_06_wrong_raw_file_sha_rejected) ... ok
+test_07_wrong_prepared_sha_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_07_wrong_prepared_sha_rejected) ... ok
+test_08_provenance_mismatch_rejected_even_with_valid_self_digest (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_08_provenance_mismatch_rejected_even_with_valid_self_digest) ... ok
+test_09_wrong_arm_commit_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_09_wrong_arm_commit_rejected) ... ok
+test_10_wrong_fence_commit_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_10_wrong_fence_commit_rejected) ... ok
+test_11_second_identical_result_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_11_second_identical_result_rejected) ... ok
+test_12_second_different_result_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_12_second_different_result_rejected) ... ok
+test_13_nonzero_accepted_count_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_13_nonzero_accepted_count_rejected) ... ok
+test_14_wrong_zip_digest_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_14_wrong_zip_digest_rejected) ... ok
+test_15_wrong_run_owner_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_15_wrong_run_owner_rejected) ... ok
+test_16_rerun_attempt_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_16_rerun_attempt_rejected) ... ok
+test_17_wrong_fence_prepared_binding_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_17_wrong_fence_prepared_binding_rejected) ... ok
+test_18_wrong_arm_document_bytes_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_18_wrong_arm_document_bytes_rejected) ... ok
+test_19_duplicate_self_member_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_19_duplicate_self_member_rejected) ... ok
+test_20_duplicate_nested_member_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_20_duplicate_nested_member_rejected) ... ok
+test_21_first_middle_last_and_only_self_field (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_21_first_middle_last_and_only_self_field) ... ok
+test_22_generic_positive_negative_zero_fixtures_same_acceptance (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_22_generic_positive_negative_zero_fixtures_same_acceptance) ... ok
+test_23_no_scientific_imports (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_23_no_scientific_imports) ... ok
+test_24_local_opening_lock_member_corruption_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_24_local_opening_lock_member_corruption_rejected) ... ok
+test_25_failure_member_corruption_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_25_failure_member_corruption_rejected) ... ok
+test_26_missing_self_digest_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_26_missing_self_digest_rejected) ... ok
+test_27_duplicate_archive_member_rejected (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_27_duplicate_archive_member_rejected) ... /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/zipfile/__init__.py:1625: UserWarning: Duplicate name: 'prepared.json'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+ok
+test_28_installed_transaction_delegates_to_byte_verifier (tests.test_research_core_v4_publication_only.PublicationOnlyTests.test_28_installed_transaction_delegates_to_byte_verifier) ... ok
+
+----------------------------------------------------------------------
+Ran 28 tests in 0.058s
+
+OK
