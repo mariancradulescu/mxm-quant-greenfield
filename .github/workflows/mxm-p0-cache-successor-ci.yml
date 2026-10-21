@@ -30,6 +30,49 @@ jobs:
           ref: 13c9861c0805de44cee082b6f3b2474795a32ef4
           path: .publication-test-baseline
           persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: db23bc18b85214a71bfb093b8416e3f51ade175c
+          path: .historical-staging-source
+          sparse-checkout: .github/workflows/v4-asymmetric-staging-bootstrap.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: fe551a1c45f63209b63f90459c2b8366a68662a6
+          path: .historical-m6-source
+          sparse-checkout: .github/workflows/m6_preparation.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Verify historical fixture origins and retain installed legacy denial
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,subprocess,unittest
+          from tests.historical_workflow_fixtures import FIXTURES,historical_workflow_source,assert_current_quarantined
+          for name,folder in [('staging','.historical-staging-source'),('m6','.historical-m6-source')]:
+              sha,path,_,_=FIXTURES[name]
+              assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=folder,text=True).strip()==sha
+              assert (pathlib.Path(folder)/path).read_bytes()==historical_workflow_source(name).encode()
+              assert_current_quarantined(name)
+          def old_module(name):
+              path=pathlib.Path('.publication-test-baseline/tests')/(name+'.py')
+              spec=importlib.util.spec_from_file_location('old_'+name,path)
+              module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+          old=old_module('test_research_core_v4_staging_publish')
+          before=unittest.TestResult()
+          unittest.defaultTestLoader.loadTestsFromTestCase(old.StagingPublishTests).run(before)
+          assert before.testsRun==12 and len(before.errors)==12 and not before.failures
+          assert all('ValueError:' in trace and 'not in list' in trace for _,trace in before.errors)
+          old_m6=old_module('test_m6_ctrader_capture')
+          m6_before=unittest.TestResult()
+          old_m6.CTraderCaptureCoreTests('test_29_workflow_installs_runtime_imports_preflights_and_builds_package').run(m6_before)
+          assert m6_before.testsRun==1 and len(m6_before.failures)==1 and not m6_before.errors
+          print('HISTORICAL_WORKFLOW_BEFORE:12 expected shell lookup errors and1 expected archived M6 workflow failure on immutable13c986 test source')
+          names=['tests.test_historical_workflow_fixtures','tests.test_research_core_v4_staging_publish','tests.test_m6_ctrader_capture']
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+          assert result.testsRun==55 and result.wasSuccessful()
+          print('HISTORICAL_WORKFLOW_AFTER:55 real synthetic tests; original Git-bound scripts tested; installed legacy workflows remain disabled')
+          PY
       - name: Reproduce historical import contamination and verify isolated publication
         run: |
           python3 - <<'PY'
