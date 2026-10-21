@@ -1,0 +1,95 @@
+{
+  "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+  "economic_release": false,
+  "family_policies": [
+    {
+      "adaptive_exposure": "No economic values are recomputed or opened; preserved raw quotes only.",
+      "decision_sha256": "fdbcec057077af89858dbe4e2affdde580f8af09d9981ed7341f366b388db45a",
+      "id": "R3_NATIVE_POST_FENCE_20261021_AFTER_TASK",
+      "identity_cap": 0,
+      "lane": "V2",
+      "lane_cap": 84,
+      "mode": "TECHNICAL_NONOUTCOME",
+      "novelty_justification": "Technical conservation and recovery only; no economic hypothesis.",
+      "observation_cap": 0,
+      "selection_history_ref": "docs/laboratory-completion/20261020/OWNER_CONSOLIDATED_REGISTER.json"
+    }
+  ],
+  "fault_policy": {
+    "after_fence": "HOLD_WITHOUT_AUTOMATIC_REPLAY",
+    "before_fence": "RECOVER_ONLY_ON_NATIVE_SKIPPED_FENCE_AND_WORKER",
+    "uncertain_dispatch_ack": "DURABLE_ISSUANCE_RECORD_NO_BLIND_RETRY",
+    "uncertain_push_ack": "VERIFY_EXACT_REMOTE_COMMIT_AND_BYTES_WITHOUT_SECOND_PUSH"
+  },
+  "mode": "TECHNICAL_NONOUTCOME",
+  "module_sha256": "1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10",
+  "observer_workflow_sha256": "37887bb400f750a22398229534c6f18d8dbe276fec6f093c2e82b88469ef94aa",
+  "programme_policies": [
+    {
+      "family": "R3_NATIVE_POST_FENCE_20261021_AFTER_TASK",
+      "id": "R3_NATIVE_POST_FENCE_20261021_AFTER_TASK_REPORT",
+      "identity_cap": 0,
+      "lane": "V2",
+      "manifest_sha256": "ab92477fa00cd68483bdba0ce0f2098231100a9d1fbd23a423cbfa01c8cd7c85",
+      "observation_cap": 0
+    }
+  ],
+  "programmes": [
+    {
+      "authority": "07d1ddbe0b83753bbf189770af1911623fef8d6f",
+      "budget": {
+        "broker_requests": 0,
+        "new_identities": 0,
+        "steps": 1
+      },
+      "economic_lane": "V2",
+      "family_id": "R3_NATIVE_POST_FENCE_20261021_AFTER_TASK",
+      "id": "R3_NATIVE_POST_FENCE_20261021_AFTER_TASK_REPORT",
+      "mode": "TECHNICAL_NONOUTCOME",
+      "orders": 0,
+      "partition": "DEVELOPMENT",
+      "prospective_at_ms": 1792575793445,
+      "provenance": {
+        "owner_mandate": "Existing B-E laboratory functional reception",
+        "purpose": "Retire possibly executed technical report without task replay or false completion"
+      },
+      "schema": "mxm.laboratory-program.v2",
+      "source_sha256": "1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10",
+      "tasks": {
+        "finite_technical_task": {
+          "dependencies": [],
+          "input": {
+            "purpose": "Retire possibly executed technical report without task replay or false completion"
+          },
+          "operator": "report",
+          "priority": 1,
+          "trial_units": 0
+        }
+      },
+      "version": 1
+    }
+  ],
+  "resource_budget": {
+    "broker_requests": 0,
+    "controlled_pre_exposure_crash": 1,
+    "economic_identities": 0,
+    "economic_outcomes": 0,
+    "normal_segments_max": 1,
+    "real_orders": 0,
+    "technical_tasks": 1,
+    "controlled_post_fence_crashes": 1
+  },
+  "schema": "mxm.laboratory-admission.v2",
+  "source_sha": "dbd0a42bf73f9ae5847a90a4ed159d21e0d7197a",
+  "steps_per_segment": 1,
+  "typed_predecessor": {
+    "schema": "mxm.integrated-typed-predecessor.v3",
+    "evidence_oid": "1d311e96fb7e7674d7d65e69a5c0631d4ede0e90",
+    "source_sha": "17d8a922e5cab68152eba44889f277e1aa1c8617",
+    "sequence": 27,
+    "ciphertext_sha256": "541bc097db625a70bce7a0af94e565a88e3c31ee4f8b1cacd486bbdb69d481ba",
+    "private_sha256": "9f5db6f9eb448018e96336fe2230155bee5f8b2ac10b171556fa029c9a198804",
+    "public_state_sha256": "df5e4f513bd335b9319e29838b70e7f3495ae74b5ecbab481e20d28fe94d3232"
+  },
+  "workflow_sha256": "9675878aee193f0febed595e5d6b5d235db478ad45209c43cc296195b678199b"
+}
