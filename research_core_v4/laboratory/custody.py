@@ -78,6 +78,8 @@ def build_native_workflow(source,predecessor):
          'APP_WORKFLOW_EXISTING_DAG')
     workflow['permissions']={};workflow['env']['LAB_SOURCE_SHA']=source
     workflow['on']['workflow_dispatch']['inputs']['fault_before_fence']['description']='Controlled TECHNICAL_NONOUTCOME pre-fence fault; no automatic continuation'
+    workflow['on']['workflow_dispatch']['inputs']['fault_after_fence']={'description':'Finite zero-outcome technical fault: BEFORE_DECRYPT, AFTER_RESTORE or AFTER_TASK; task is retired without replay','type':'string','required':False,'default':''}
+    workflow['env']['LAB_FAULT_AFTER_FENCE']="${{ inputs.fault_after_fence || '' }}"
     workflow['concurrency']={'group':'mxm-integrated-laboratory','cancel-in-progress':False}
     operations={v:k for k,v in WRITER_JOBS.items() if k not in ('certify-v3','source-controls')}
     for name,job in workflow['jobs'].items():
@@ -102,6 +104,9 @@ def build_native_workflow(source,predecessor):
         if name=='cold-readback':
             artifact=next(s for s in job['steps'] if str(s.get('uses','')).startswith('actions/upload-artifact@'))
             artifact['with']['path']='verification/integrated-p0/cold-readback.json\nverification/integrated-p0/authentic-adapter.json\n'
+        if name=='investigation':
+            step=next(s for s in job['steps'] if 'python3 -m research_core_v4.laboratory.' in s.get('run',''))
+            step.setdefault('env',{})['LAB_FAULT_AFTER_FENCE']="${{ inputs.fault_after_fence || '' }}"
     def proof_job(operation,needs):
         steps=[{'uses':'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683',
                 'with':{'ref':source,'persist-credentials':False}},
