@@ -1,0 +1,201 @@
+﻿2026-10-21T03:49:50.2656378Z Current runner version: '2.337.0'
+2026-10-21T03:49:50.2681783Z ##[group]Runner Image Provisioner
+2026-10-21T03:49:50.2682963Z Hosted Compute Agent
+2026-10-21T03:49:50.2683888Z Version: 20261012.601
+2026-10-21T03:49:50.2684831Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-21T03:49:50.2685788Z Build Date: 2026-10-12T17:48:21Z
+2026-10-21T03:49:50.2687146Z Worker ID: {0da9a126-973e-493f-911d-85f03278b9c1}
+2026-10-21T03:49:50.2688152Z Region: southcentralus
+2026-10-21T03:49:50.2688939Z Cloud: Azure
+2026-10-21T03:49:50.2689741Z ##[endgroup]
+2026-10-21T03:49:50.2691432Z ##[group]Operating System
+2026-10-21T03:49:50.2692321Z Ubuntu
+2026-10-21T03:49:50.2693125Z 24.04.5
+2026-10-21T03:49:50.2693862Z LTS
+2026-10-21T03:49:50.2694640Z ##[endgroup]
+2026-10-21T03:49:50.2695446Z ##[group]Runner Image
+2026-10-21T03:49:50.2696534Z Image: ubuntu-24.04
+2026-10-21T03:49:50.2697446Z Version: 20261012.334.1
+2026-10-21T03:49:50.2699125Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-21T03:49:50.2700880Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-21T03:49:50.2702098Z ##[endgroup]
+2026-10-21T03:49:50.2703579Z ##[group]GITHUB_TOKEN Permissions
+2026-10-21T03:49:50.2706065Z Contents: read
+2026-10-21T03:49:50.2706917Z Metadata: read
+2026-10-21T03:49:50.2707705Z ##[endgroup]
+2026-10-21T03:49:50.2710058Z Secret source: Actions
+2026-10-21T03:49:50.2711337Z Cache mode: write
+2026-10-21T03:49:50.2712316Z Prepare workflow directory
+2026-10-21T03:49:50.3036599Z Prepare all required actions
+2026-10-21T03:49:50.3084346Z Getting action download info
+2026-10-21T03:49:50.5542565Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+2026-10-21T03:49:50.7529716Z Complete job name: app-control-diagnostic
+2026-10-21T03:49:50.8251561Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T03:49:50.8252882Z with:
+2026-10-21T03:49:50.8253704Z   ref: 36668adfdb6d0cf433965ad573376434063652d6
+2026-10-21T03:49:50.8254656Z   persist-credentials: false
+2026-10-21T03:49:50.8255584Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T03:49:50.8260064Z   token: ***
+2026-10-21T03:49:50.8260826Z   ssh-strict: true
+2026-10-21T03:49:50.8261608Z   ssh-user: git
+2026-10-21T03:49:50.8262395Z   clean: true
+2026-10-21T03:49:50.8263156Z   sparse-checkout-cone-mode: true
+2026-10-21T03:49:50.8264027Z   fetch-depth: 1
+2026-10-21T03:49:50.8264816Z   fetch-tags: false
+2026-10-21T03:49:50.8265576Z   show-progress: true
+2026-10-21T03:49:50.8266594Z   lfs: false
+2026-10-21T03:49:50.8267343Z   submodules: false
+2026-10-21T03:49:50.8268147Z   set-safe-directory: true
+2026-10-21T03:49:50.8269196Z ##[endgroup]
+2026-10-21T03:49:50.9261473Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T03:49:50.9265031Z ##[group]Getting Git version info
+2026-10-21T03:49:50.9266474Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-21T03:49:50.9268651Z [command]/usr/bin/git version
+2026-10-21T03:49:50.9341814Z git version 2.55.0
+2026-10-21T03:49:50.9362671Z ##[endgroup]
+2026-10-21T03:49:50.9377250Z Temporarily overriding HOME='/home/runner/work/_temp/9583253f-b134-4210-9946-f2be5266fc03' before making global git config changes
+2026-10-21T03:49:50.9379283Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T03:49:50.9383834Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T03:49:50.9440262Z Deleting the contents of '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-21T03:49:50.9445439Z ##[group]Initializing the repository
+2026-10-21T03:49:50.9450579Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T03:49:50.9540708Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T03:49:50.9543336Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T03:49:50.9545400Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T03:49:50.9547298Z hint: call:
+2026-10-21T03:49:50.9548838Z hint:
+2026-10-21T03:49:50.9550179Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T03:49:50.9551700Z hint:
+2026-10-21T03:49:50.9553237Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T03:49:50.9555208Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T03:49:50.9557060Z hint:
+2026-10-21T03:49:50.9558273Z hint: 	git branch -m <name>
+2026-10-21T03:49:50.9559974Z hint:
+2026-10-21T03:49:50.9561679Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T03:49:50.9564117Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.git/
+2026-10-21T03:49:50.9569463Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T03:49:50.9616546Z ##[endgroup]
+2026-10-21T03:49:50.9618273Z ##[group]Disabling automatic garbage collection
+2026-10-21T03:49:50.9619625Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T03:49:50.9651900Z ##[endgroup]
+2026-10-21T03:49:50.9653345Z ##[group]Setting up auth
+2026-10-21T03:49:50.9658803Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T03:49:50.9689113Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T03:49:51.0004977Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T03:49:51.0038850Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T03:49:51.0232198Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T03:49:51.0271297Z ##[endgroup]
+2026-10-21T03:49:51.0272746Z ##[group]Fetching the repository
+2026-10-21T03:49:51.0278903Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 36668adfdb6d0cf433965ad573376434063652d6
+2026-10-21T03:49:55.1821353Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T03:49:55.1824591Z  * branch            36668adfdb6d0cf433965ad573376434063652d6 -> FETCH_HEAD
+2026-10-21T03:49:55.1831840Z ##[endgroup]
+2026-10-21T03:49:55.1835105Z ##[group]Determining the checkout info
+2026-10-21T03:49:55.1838066Z ##[endgroup]
+2026-10-21T03:49:55.1840076Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T03:49:55.1886718Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T03:49:55.1918656Z ##[group]Checking out the ref
+2026-10-21T03:49:55.1922219Z [command]/usr/bin/git checkout --progress --force 36668adfdb6d0cf433965ad573376434063652d6
+2026-10-21T03:49:55.8324482Z Note: switching to '36668adfdb6d0cf433965ad573376434063652d6'.
+2026-10-21T03:49:55.8325411Z 
+2026-10-21T03:49:55.8326370Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T03:49:55.8327605Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T03:49:55.8328749Z state without impacting any branches by switching back to a branch.
+2026-10-21T03:49:55.8329339Z 
+2026-10-21T03:49:55.8329829Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T03:49:55.8330611Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T03:49:55.8331098Z 
+2026-10-21T03:49:55.8331352Z   git switch -c <new-branch-name>
+2026-10-21T03:49:55.8331789Z 
+2026-10-21T03:49:55.8332102Z Or undo this operation with:
+2026-10-21T03:49:55.8332397Z 
+2026-10-21T03:49:55.8332934Z   git switch -
+2026-10-21T03:49:55.8333314Z 
+2026-10-21T03:49:55.8333792Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T03:49:55.8334299Z 
+2026-10-21T03:49:55.8334850Z HEAD is now at 36668ad Preserve R3 merge history under exact immutable source seal; reject historical fence scope drift
+2026-10-21T03:49:55.8353031Z ##[endgroup]
+2026-10-21T03:49:55.8397353Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T03:49:55.8421921Z 36668adfdb6d0cf433965ad573376434063652d6
+2026-10-21T03:49:55.8429973Z ##[group]Removing auth
+2026-10-21T03:49:55.8433539Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T03:49:55.8459841Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T03:49:55.8643608Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T03:49:55.8668369Z http.https://github.com/.extraheader
+2026-10-21T03:49:55.8674843Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T03:49:55.8713863Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T03:49:55.8894672Z ##[endgroup]
+2026-10-21T03:49:55.9092962Z ##[group]Run python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+2026-10-21T03:49:55.9094321Z [36;1mpython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock[0m
+2026-10-21T03:49:55.9260237Z shell: /usr/bin/bash -e {0}
+2026-10-21T03:49:55.9260977Z ##[endgroup]
+2026-10-21T03:49:58.3969646Z Defaulting to user installation because normal site-packages is not writeable
+2026-10-21T03:50:00.8476312Z Collecting cffi==2.1.1 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 1))
+2026-10-21T03:50:00.9184866Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+2026-10-21T03:50:00.9613498Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.8/221.8 kB 5.2 MB/s eta 0:00:00
+2026-10-21T03:50:01.1819857Z Collecting cryptography==46.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 2))
+2026-10-21T03:50:01.1987757Z   Downloading cryptography-46.0.3-cp311-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+2026-10-21T03:50:01.3240641Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 36.1 MB/s eta 0:00:00
+2026-10-21T03:50:01.5298875Z Collecting numpy==2.2.6 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 3))
+2026-10-21T03:50:01.5479487Z   Downloading numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.5 MB)
+2026-10-21T03:50:01.7292755Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.5/16.5 MB 69.0 MB/s eta 0:00:00
+2026-10-21T03:50:01.9365308Z Collecting protobuf==5.29.5 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 4))
+2026-10-21T03:50:01.9535306Z   Downloading protobuf-5.29.5-cp38-abi3-manylinux2014_x86_64.whl (319 kB)
+2026-10-21T03:50:01.9595747Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 319.9/319.9 kB 78.6 MB/s eta 0:00:00
+2026-10-21T03:50:01.9827503Z Collecting pycparser==3.11 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 5))
+2026-10-21T03:50:01.9978957Z   Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-21T03:50:02.0022269Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.2/51.2 kB 17.0 MB/s eta 0:00:00
+2026-10-21T03:50:02.0466935Z Collecting pyyaml==6.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 6))
+2026-10-21T03:50:02.0612812Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-21T03:50:02.0714288Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 98.5 MB/s eta 0:00:00
+2026-10-21T03:50:02.3297345Z Installing collected packages: pyyaml, pycparser, protobuf, numpy, cffi, cryptography
+2026-10-21T03:50:04.4881991Z Successfully installed cffi-2.1.1 cryptography-46.0.3 numpy-2.2.6 protobuf-5.29.5 pycparser-3.11 pyyaml-6.0.3
+2026-10-21T03:50:04.6482429Z ##[group]Run python3 - <<'PY'
+2026-10-21T03:50:04.6483068Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T03:50:04.6483602Z [36;1mimport json,os,subprocess,urllib.error[0m
+2026-10-21T03:50:04.6484222Z [36;1mfrom research_core_v4.laboratory.common import need[0m
+2026-10-21T03:50:04.6484967Z [36;1mfrom research_core_v4.p0_successor_a_20261017.issuer import _app_token,http,REPO[0m
+2026-10-21T03:50:04.6485801Z [36;1mfrom research_core_v4.laboratory.operational_acceptance import verify_effective_controls[0m
+2026-10-21T03:50:04.6487369Z [36;1mneed(os.environ['GITHUB_REPOSITORY']==REPO and os.environ['GITHUB_REF']=='refs/heads/main' and os.environ['GITHUB_RUN_ATTEMPT']=='1' and os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch' and os.environ['GITHUB_JOB']=='app-control-diagnostic','APP_DIAGNOSTIC_CONTEXT')[0m
+2026-10-21T03:50:04.6488965Z [36;1mneed(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='36668adfdb6d0cf433965ad573376434063652d6','APP_DIAGNOSTIC_SOURCE')[0m
+2026-10-21T03:50:04.6490255Z [36;1mneed(not any(os.environ.get(k) for k in ('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM','R3_CUSTODY_PRIVATE_KEY_PEM','CTRADER_ACCESS_TOKEN','R3_CTRADER_ACCESS_TOKEN')),'APP_DIAGNOSTIC_NO_CUSTODY_OR_BROKER')[0m
+2026-10-21T03:50:04.6491305Z [36;1mkey=os.environ.pop('SUCCESSOR_APP_PRIVATE_KEY')[0m
+2026-10-21T03:50:04.6491867Z [36;1mwith _app_token(key) as token:[0m
+2026-10-21T03:50:04.6492408Z [36;1m    key=None[0m
+2026-10-21T03:50:04.6493109Z [36;1m    for branch in ('mxm-r3-integrated-source-20261021','mxm-o04-integrated-laboratory-evidence'):[0m
+2026-10-21T03:50:04.6493888Z [36;1m        status,rules=http('/repos/'+REPO+'/rules/branches/'+branch,token)[0m
+2026-10-21T03:50:04.6494782Z [36;1m        print('MXM_APP_EFFECTIVE_RULES '+json.dumps({'branch':branch,'http_status':status,'rules':rules},sort_keys=True),flush=True)[0m
+2026-10-21T03:50:04.6495601Z [36;1m    for ident in (25521657,25522027,25461373):[0m
+2026-10-21T03:50:04.6496338Z [36;1m        print('MXM_APP_ACL_REQUEST ruleset='+str(ident),flush=True)[0m
+2026-10-21T03:50:04.6497061Z [36;1m        try: status,policy=http('/repos/'+REPO+'/rulesets/'+str(ident),token)[0m
+2026-10-21T03:50:04.6497755Z [36;1m        except urllib.error.HTTPError as error:[0m
+2026-10-21T03:50:04.6498475Z [36;1m            print('MXM_APP_ACL_ERROR '+json.dumps({'ruleset_id':ident,'http_status':error.code}),flush=True)[0m
+2026-10-21T03:50:04.6499195Z [36;1m            continue[0m
+2026-10-21T03:50:04.6500429Z [36;1m        print('MXM_APP_ACL_DIAGNOSTIC '+json.dumps({'run_id':int(os.environ['GITHUB_RUN_ID']),'ruleset_id':ident,'http_status':status,'keys':sorted(policy),'policy':{k:policy[k] for k in ('id','enforcement','conditions','rules','updated_at','bypass_actors') if k in policy},'writes':0,'orders':0},sort_keys=True),flush=True)[0m
+2026-10-21T03:50:04.6501799Z [36;1mprint('MXM_APP_DIAGNOSTIC_TOKEN_REVOKED writes=0 orders=0 economic_outcomes=0',flush=True)[0m
+2026-10-21T03:50:04.6502517Z [36;1mPY[0m
+2026-10-21T03:50:04.6545501Z shell: /usr/bin/bash -e {0}
+2026-10-21T03:50:04.6546222Z env:
+2026-10-21T03:50:04.6552789Z   SUCCESSOR_APP_PRIVATE_KEY: ***
+2026-10-21T03:50:04.6553358Z ##[endgroup]
+2026-10-21T03:50:06.0781608Z MXM_APP_EFFECTIVE_RULES {"branch": "mxm-r3-integrated-source-20261021", "http_status": 200, "rules": [{"ruleset_id": 25522027, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "deletion"}, {"ruleset_id": 25522027, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "non_fast_forward"}, {"ruleset_id": 25522027, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "creation"}, {"ruleset_id": 25522027, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "update"}]}
+2026-10-21T03:50:06.3314343Z MXM_APP_EFFECTIVE_RULES {"branch": "mxm-o04-integrated-laboratory-evidence", "http_status": 200, "rules": [{"ruleset_id": 25222248, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "deletion"}, {"ruleset_id": 25222248, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "non_fast_forward"}, {"ruleset_id": 25222248, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "required_linear_history"}, {"ruleset_id": 25461373, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "update"}]}
+2026-10-21T03:50:06.3318381Z MXM_APP_ACL_REQUEST ruleset=25521657
+2026-10-21T03:50:06.5906802Z MXM_APP_ACL_DIAGNOSTIC {"http_status": 200, "keys": ["_links", "conditions", "created_at", "current_user_can_bypass", "enforcement", "id", "name", "node_id", "rules", "source", "source_type", "target", "updated_at"], "orders": 0, "policy": {"conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/mxm-r3-integrated-source-20261020"]}}, "enforcement": "active", "id": 25521657, "rules": [{"type": "deletion"}, {"type": "non_fast_forward"}, {"type": "creation"}, {"type": "update"}], "updated_at": "2026-10-21T03:27:27.395Z"}, "ruleset_id": 25521657, "run_id": 39540701841, "writes": 0}
+2026-10-21T03:50:06.5909987Z MXM_APP_ACL_REQUEST ruleset=25522027
+2026-10-21T03:50:06.8471661Z MXM_APP_ACL_DIAGNOSTIC {"http_status": 200, "keys": ["_links", "conditions", "created_at", "current_user_can_bypass", "enforcement", "id", "name", "node_id", "rules", "source", "source_type", "target", "updated_at"], "orders": 0, "policy": {"conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/mxm-r3-integrated-source-20261021"]}}, "enforcement": "active", "id": 25522027, "rules": [{"type": "deletion"}, {"type": "non_fast_forward"}, {"type": "creation"}, {"type": "update"}], "updated_at": "2026-10-21T03:42:14.631Z"}, "ruleset_id": 25522027, "run_id": 39540701841, "writes": 0}
+2026-10-21T03:50:06.8473761Z MXM_APP_ACL_REQUEST ruleset=25461373
+2026-10-21T03:50:07.1173488Z MXM_APP_ACL_DIAGNOSTIC {"http_status": 200, "keys": ["_links", "conditions", "created_at", "current_user_can_bypass", "enforcement", "id", "name", "node_id", "rules", "source", "source_type", "target", "updated_at"], "orders": 0, "policy": {"conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/mxm-o04-integrated-laboratory-evidence"]}}, "enforcement": "active", "id": 25461373, "rules": [{"type": "update"}], "updated_at": "2026-10-20T08:16:47.404Z"}, "ruleset_id": 25461373, "run_id": 39540701841, "writes": 0}
+2026-10-21T03:50:07.3642670Z MXM_APP_DIAGNOSTIC_TOKEN_REVOKED writes=0 orders=0 economic_outcomes=0
+2026-10-21T03:50:07.4040558Z Post job cleanup.
+2026-10-21T03:50:07.4831669Z [command]/usr/bin/git version
+2026-10-21T03:50:07.4867502Z git version 2.55.0
+2026-10-21T03:50:07.4902648Z Temporarily overriding HOME='/home/runner/work/_temp/739f3f0e-641e-4e13-bd4f-737ab4f342ae' before making global git config changes
+2026-10-21T03:50:07.4904284Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T03:50:07.4905908Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T03:50:07.4944582Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T03:50:07.4976813Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T03:50:07.5187596Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T03:50:07.5219024Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T03:50:07.5569128Z Cleaning up orphan processes
+2026-10-21T03:50:07.5857691Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
