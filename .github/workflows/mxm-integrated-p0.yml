@@ -7,7 +7,7 @@
     "cancel-in-progress": false
   },
   "env": {
-    "LAB_SOURCE_SHA": "36668adfdb6d0cf433965ad573376434063652d6",
+    "LAB_SOURCE_SHA": "d94c537cb0f393582f51d4b73355532f76727217",
     "LAB_INTEGRATED_PROTOCOL": "v2",
     "LAB_ADMISSION_REF": "${{ inputs.admission_ref }}",
     "LAB_ADMISSION_PATH": "${{ inputs.admission_path }}"
@@ -30,7 +30,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -76,7 +76,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -97,7 +97,8 @@
             "GH_TOKEN": "${{ github.token }}",
             "NATIVE_PREFLIGHT_RESULT": "${{ needs.preflight.result }}",
             "LAB_FAULT_BEFORE_FENCE": "${{ inputs.fault_before_fence || '0' }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ],
@@ -118,7 +119,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -131,7 +132,8 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}",
             "LAB_PARENT_OID": "${{ needs.segment-intent.outputs.claim_oid }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ],
@@ -152,7 +154,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -208,7 +210,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -229,7 +231,8 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}",
             "NATIVE_WORKER_RESULT": "${{ needs.investigation.result }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ],
@@ -258,7 +261,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -271,7 +274,8 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}",
             "NATIVE_CHAIN_RESULTS": "${{ toJSON(needs) }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ],
@@ -297,7 +301,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -311,7 +315,8 @@
             "GH_TOKEN": "${{ github.token }}",
             "LAB_PARENT_OID": "${{ needs.recover-before-exposure.outputs.evidence_oid || needs.durable-archive.outputs.evidence_oid }}",
             "NATIVE_CHAIN_RESULTS": "${{ toJSON(needs) }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ],
@@ -333,7 +338,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -380,7 +385,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -392,7 +397,8 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}",
             "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
-            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}"
+            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ]
@@ -416,7 +422,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -435,7 +441,8 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}",
             "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
-            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}"
+            "LAB_PARENT_OID": "${{ needs.durable-archive.outputs.evidence_oid }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ]
@@ -453,7 +460,7 @@
         {
           "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
           "with": {
-            "ref": "36668adfdb6d0cf433965ad573376434063652d6",
+            "ref": "d94c537cb0f393582f51d4b73355532f76727217",
             "persist-credentials": false
           }
         },
@@ -464,7 +471,8 @@
           "run": "python3 -m research_core_v4.laboratory.custody source-controls",
           "env": {
             "GH_TOKEN": "${{ github.token }}",
-            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}"
+            "SUCCESSOR_APP_PRIVATE_KEY": "${{ secrets.SUCCESSOR_APP_PRIVATE_KEY }}",
+            "R3_CONTROL_WITNESS": "${{ vars.R3_CONTROL_WITNESS }}"
           }
         }
       ]
