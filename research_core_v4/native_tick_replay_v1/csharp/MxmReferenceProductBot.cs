@@ -26,6 +26,10 @@ public sealed class MxmReferenceProductBot : Robot {
  public int MaxMxmAccountPositions {get;set;}=1;
  [Parameter("Minimum Free Margin Reserve EUR",DefaultValue=0,MinValue=0)]
  public double MinimumFreeMarginReserveEur {get;set;}=0;
+ [Parameter("Max Estimated MXM Stop Risk Percent",DefaultValue=2.0,MinValue=0.1,MaxValue=100.0)]
+ public double MaxEstimatedMxmStopRiskPercent {get;set;}=2.0;
+ [Parameter("Estimated Round Trip Friction Reserve EUR",DefaultValue=0.2,MinValue=0.0)]
+ public double EstimatedRoundTripFrictionReserveEur {get;set;}=0.2;
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
@@ -96,6 +100,51 @@ public sealed class MxmReferenceProductBot : Robot {
   // Exact historical broker commissions are not known here; commission=0
   // means this is an estimated account gate, never a fill/fee certificate.
   if(admit!=MxmCapitalAdmission.Admit){Print("MXM_CAPITAL_HOLD_"+admit);return;}
+  // Complete-account MXM estimated stop exposure. Do not interpret a stop
+  // as a maximum loss, or this snapshot as an atomic inter-cBot lock.
+  if(!double.IsFinite(MaxEstimatedMxmStopRiskPercent) ||
+     MaxEstimatedMxmStopRiskPercent<=0 || MaxEstimatedMxmStopRiskPercent>100 ||
+     !double.IsFinite(EstimatedRoundTripFrictionReserveEur) ||
+     EstimatedRoundTripFrictionReserveEur<0 || StopLossPips<=0) {
+    Print("MXM_STOP_RISK_INPUT_UNVERIFIED_SAFE_HOLD");return;
+  }
+  double newStopRisk=Symbol.AmountRisked(units,StopLossPips);
+  if(!double.IsFinite(newStopRisk)||newStopRisk<=0) {
+    Print("MXM_NEW_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
+  }
+  double existingRisk=0;
+  int protectedExisting=0;
+  foreach(var active in Positions.FindAll(Label)) {
+   // No new orders if ANY existing MXM position has no broker stop
+   // or if its symbol/volume/pip geometry cannot be validated.
+   if(!active.StopLoss.HasValue || !double.IsFinite(active.StopLoss.Value) ||
+      !double.IsFinite(active.EntryPrice) || !double.IsFinite(active.VolumeInUnits) ||
+      !double.IsFinite(active.Symbol.PipSize) || active.Symbol.PipSize<=0 ||
+      active.EntryPrice<=0 || active.VolumeInUnits<=0) {
+    Print("MXM_EXISTING_STOP_UNVERIFIED_SAFE_HOLD");return;
+   }
+   double distancePips=Math.Abs(active.EntryPrice-active.StopLoss.Value)/active.Symbol.PipSize;
+   if(!double.IsFinite(distancePips)||distancePips<0) {
+    Print("MXM_EXISTING_STOP_DISTANCE_UNVERIFIED_SAFE_HOLD");return;
+   }
+   double risk=active.Symbol.AmountRisked(active.VolumeInUnits,distancePips);
+   if(!double.IsFinite(risk)||risk<0) {
+    Print("MXM_EXISTING_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
+   }
+   existingRisk+=risk;
+   protectedExisting++;
+   if(!double.IsFinite(existingRisk)) {
+    Print("MXM_EXISTING_STOP_RISK_SUM_UNVERIFIED_SAFE_HOLD");return;
+   }
+  }
+  string stopRiskGate=MxmStopRiskAdmission.Check(
+   (decimal)Account.Equity,(decimal)existingRisk,(decimal)newStopRisk,
+   (decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
+   (decimal)EstimatedRoundTripFrictionReserveEur,
+   (decimal)EstimatedRoundTripFrictionReserveEur*protectedExisting);
+  if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
+   Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
+  }
   var placed=ExecuteMarketOrder(direction,SymbolName,units,Label,StopLossPips,null);
   if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
  }
