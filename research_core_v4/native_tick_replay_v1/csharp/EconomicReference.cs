@@ -25,7 +25,7 @@ sealed class Replay {
  long lastT=-1,bidAt=-1,askAt=-1,barStart=-1;
  decimal bid,ask,closeOfBar,realized=200m,peak=200m,maxDrawdown=0m,totalCosts=0m;
  int pendingSignal,ambiguousGroups,gapBars,invalidSnapshots,entries,exits;
- int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits;
+ int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false,StrategyMode mode=StrategyMode.Adaptive,
    int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0){
@@ -49,6 +49,10 @@ sealed class Replay {
  }
  void Open(long t,int direction) {
   if(pos is not null)throw new InvalidDataException("MARGIN_OR_POSITION");
+  // cTrader product adapter refuses margin above 40% of actual free margin.
+  // At flat EUR200, a modeled EUR90 or EUR150 ticket must NOT become a fill.
+  // This scenario has no other positions; flat free margin equals realized cash.
+  if(margin>realized*0.4m){marginHeadroomRejections++;return;}
   if(Equity(bid,ask)<margin+commission || realized<margin+commission)return; // deterministic skipped order; no invented fill
   decimal price=direction>0?ask+ExecutionFriction:bid-ExecutionFriction;
   pos=new Position{Direction=direction,OpenT=t,OpenPrice=price};
@@ -164,6 +168,7 @@ sealed class Replay {
      fx_eur_per_usd=Round(Fx),commission_eur_per_side=commission,slippage_price_units=Slippage,
      extra_spread_price_units=extraHalfSpread*2m,margin_eur=margin,financing_eur=0m,
      quote_stop_loss_pips=stopPips,observed_quote_stop_fill_not_broker_certified=true,
+     max_margin_fraction_of_free_margin=0.4m,other_positions_and_actual_broker_margin_not_verified=true,
      original_bid_ask_spread_is_already_in_fill_prices=true,slippage_and_extra_spread_are_already_in_fill_prices=true,
      cost_total_is_diagnostic_including_embedded_execution_friction_not_additional_cash_debit=true},
    price_path_timestamps_are_not_historical_arrival_times=true,
@@ -171,7 +176,7 @@ sealed class Replay {
    economic_identity_opened=false,
    terminal_position_exit_is_assumed_not_historical_fill=Simulated,
    initial_equity_eur=200m,final_equity_eur=Simulated?Round(realized):(decimal?)null,
-   economic_entries=entries,economic_exits=exits,charged_cost_eur=Round(totalCosts),
+   economic_entries=entries,economic_exits=exits,margin_headroom_rejections=marginHeadroomRejections,charged_cost_eur=Round(totalCosts),
    maximum_absolute_drawdown_eur=Round(maxDrawdown),modeled_stop_exits=stopTriggeredExits,
    // Complete ISO weeks require independent interval-coverage evidence, never infer from four-hour capture.
    hard21=false,full_iso_weeks_evaluated=0,entries_per_iso_week=Simulated?WeekCounts(ticks):new Dictionary<string,int>(),
@@ -232,6 +237,7 @@ static class Program {
      using var e=JsonDocument.Parse(JsonSerializer.Serialize(outcome));var j=e.RootElement;
      matrix.Add(new {family=family.ToString(),timeframe_minutes=tf,cost_case=cost.name,modeled_stop_loss_pips=stops,
       modeled_stop_exits=j.GetProperty("modeled_stop_exits").GetInt32(),
+      margin_headroom_rejections=j.GetProperty("margin_headroom_rejections").GetInt32(),
       initial_equity_eur=200,final_equity_eur=j.GetProperty("final_equity_eur").GetDecimal(),
       net_pnl_eur=j.GetProperty("final_equity_eur").GetDecimal()-200m,
       entries=j.GetProperty("economic_entries").GetInt32(),exits=j.GetProperty("economic_exits").GetInt32(),
