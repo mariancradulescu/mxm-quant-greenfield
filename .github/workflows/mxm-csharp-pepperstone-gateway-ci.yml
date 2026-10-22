@@ -151,7 +151,8 @@ jobs:
           q=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
           assert 'STOP_QUOTE_MODEL' in q and 'MODELED' not in p
           assert 'modeled_stop_loss_pips' in q and 'slippage_eur=Round(PriceUnits*Slippage*Fx)' in q
-          assert 'margin>realized*maxMarginFraction' in q and 'margin_headroom_rejections' in q
+          assert 'MxmCapitalAdmission.Check(realized,realized,margin,commission,' in q and 'margin_headroom_rejections' in q
+          assert 'MxmCapitalAdmission.Check' in p and 'Positions.FindAll(Label).Length' in p
           print('MXM_CSHARP_COLD_START_AND_STOP_SCENARIO_STRUCTURAL_PARITY')
           PY
       - name: Verify gateway never carries secrets in pull request jobs

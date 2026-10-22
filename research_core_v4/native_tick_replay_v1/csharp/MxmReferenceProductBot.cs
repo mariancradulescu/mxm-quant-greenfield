@@ -22,6 +22,10 @@ public sealed class MxmReferenceProductBot : Robot {
  public int BarMinutes {get;set;}
  [Parameter("Max Margin Fraction",DefaultValue=0.4,MinValue=0.1,MaxValue=1.0)]
  public double MaxMarginFraction {get;set;}=0.4;
+ [Parameter("Max MXM Account Positions",DefaultValue=1,MinValue=1)]
+ public int MaxMxmAccountPositions {get;set;}=1;
+ [Parameter("Minimum Free Margin Reserve EUR",DefaultValue=0,MinValue=0)]
+ public double MinimumFreeMarginReserveEur {get;set;}=0;
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
@@ -76,10 +80,22 @@ public sealed class MxmReferenceProductBot : Robot {
   if(desired==0)return;
   // Inspect actual broker minimum/step/margin; do not assume EUR200 volume feasibility.
   if(Account.Equity<=0||Account.FreeMargin<=0||Account.Asset.Name!="EUR")return;
+  // This is an account-wide snapshot, not atomic inter-instance order locking.
+  // Broker book (all symbols using this MXM label), not local kernel memory, is authoritative.
+  int accountOwned=Positions.FindAll(Label).Length;
+  if(!double.IsFinite(Account.Equity)||!double.IsFinite(Account.FreeMargin)||
+     !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MinimumFreeMarginReserveEur)||
+     MinimumFreeMarginReserveEur<0)return;
   double units=Symbol.NormalizeVolumeInUnits(Math.Max(RequestedUnits,Symbol.VolumeInUnitsMin),RoundingMode.Up);
   if(units<=0 || units>Symbol.VolumeInUnitsMax)return;
   double margin=Symbol.GetEstimatedMargin(direction,units);
-  if(double.IsNaN(margin)||margin<=0||margin>Account.FreeMargin*MaxMarginFraction)return;
+  if(!double.IsFinite(margin)||margin<=0)return;
+  string admit=MxmCapitalAdmission.Check((decimal)Account.Equity,(decimal)Account.FreeMargin,
+    (decimal)margin,0m,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
+    accountOwned,MaxMxmAccountPositions);
+  // Exact historical broker commissions are not known here; commission=0
+  // means this is an estimated account gate, never a fill/fee certificate.
+  if(admit!=MxmCapitalAdmission.Admit){Print("MXM_CAPITAL_HOLD_"+admit);return;}
   var placed=ExecuteMarketOrder(direction,SymbolName,units,Label,StopLossPips,null);
   if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
  }
