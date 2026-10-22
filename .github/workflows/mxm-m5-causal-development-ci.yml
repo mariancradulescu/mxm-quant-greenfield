@@ -1,0 +1,37 @@
+name: MXM M5 causal development no-secret scientific gate
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-m5-causal-development-ci.yml
+      - .github/workflows/mxm-m5-causal-development.yml
+      - research_core_v4/laboratory/M5_CAUSAL_GROSS_DEVELOPMENT_V1.json
+      - research_core_v4/laboratory/m5_causal_gross_development.py
+permissions: {contents: read}
+jobs:
+  scientific-causal-selftest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify immutable declared paired identities and fail-closed time
+        run: |
+          python3 -m research_core_v4.laboratory.m5_causal_gross_development --selftest
+          python3 - <<'PY'
+          import pathlib,json,ast
+          root=pathlib.Path('research_core_v4/laboratory')
+          code=(root/'m5_causal_gross_development.py').read_text()
+          ast.parse(code)
+          spec=json.loads((root/'M5_CAUSAL_GROSS_DEVELOPMENT_V1.json').read_text())
+          assert spec['scientific_budget']['finite_predeclared_model_leaves']==4
+          assert spec['temporal_policy']['entire_window_marked_exposed']
+          assert not spec['temporal_policy']['confirmation_opened']
+          assert not spec['temporal_policy']['protected_forward_opened']
+          assert 'i+2' in code and 'i+2+hold' in code
+          assert 'orders":0' in code and 'historical_fills_proven":False' in code
+          w=pathlib.Path('.github/workflows/mxm-m5-causal-development.yml').read_text()
+          assert 'environment: mxm-r3-custody-v1' in w and 'pull_request:' not in w
+          assert 'permissions: {contents: read}' in w
+          print('MXM_CAUSAL_MODEL_DEPENDENT_EXPOSURE_REGISTERED_NO_SECRET_PASS')
+          PY
