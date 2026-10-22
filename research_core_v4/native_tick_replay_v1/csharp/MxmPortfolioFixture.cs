@@ -40,4 +40,11 @@ Require(MxmStopRiskAdmission.Check(200m,2m,3m,.02m,.2m,.2m)
  =="REJECT_AGGREGATE_STOP_RISK_EXCESS","AGGREGATE_RISK");
 Require(MxmCapitalAdmission.Check(200m,110m,40m,0m,.8m,0m,1,1)
  =="REJECT_ACCOUNT_POSITION_CAP","ACCOUNT_POSITION_CAP");
+Require(MxmAccountIsolation.Check(0,0,0)==MxmAccountIsolation.Admit,"FLAT_ACCOUNT");
+Require(MxmAccountIsolation.Check(2,2,0)==MxmAccountIsolation.Admit,"ALL_OWNED_POSITIONS");
+Require(MxmAccountIsolation.Check(2,1,0)=="REJECT_FOREIGN_ACCOUNT_POSITION","FOREIGN_POSITION");
+Require(MxmAccountIsolation.Check(1,0,0)=="REJECT_FOREIGN_ACCOUNT_POSITION","UNMANAGED_POSITION");
+Require(MxmAccountIsolation.Check(0,0,1)=="REJECT_ACCOUNT_PENDING_ORDER","PENDING_BROKER_ORDER");
+Require(MxmAccountIsolation.Check(1,2,0)=="REJECT_INCONSISTENT_ACCOUNT_BOOK","PHANTOM_OWNED_COUNT");
+Require(MxmAccountIsolation.Check(-1,0,0)=="REJECT_INCONSISTENT_ACCOUNT_BOOK","INVALID_BOOK");
 Console.WriteLine("MXM_ONE_ROBOT_MULTISYMBOL_SERIAL_BARS_AND_SHARED_EUR200_ADMISSION_SYNTHETIC_PASS_NO_ATOMIC_CLOUD_CLAIM");

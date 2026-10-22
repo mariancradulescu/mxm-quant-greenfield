@@ -30,6 +30,13 @@ jobs:
           assert 'series.ClosePrices.Last(0)' in src
           assert 'ApplyPortfolioDecision(instrument,instrumentName' in src
           assert 'Positions.FindAll(Label)' in src
+          assert 'foreach(var accountPosition in Positions)' in src
+          assert 'foreach(var brokerPendingOrder in PendingOrders)' in src
+          assert 'MxmAccountIsolation.Check(' in src
+          assert src.index('MxmAccountIsolation.Check(')<src.index('ExecuteMarketOrder(')
+          gate=(Path('research_core_v4/native_tick_replay_v1/csharp')/'MxmAccountIsolation.cs').read_text()
+          assert 'REJECT_FOREIGN_ACCOUNT_POSITION' in gate
+          assert 'REJECT_ACCOUNT_PENDING_ORDER' in gate
           assert 'EnableDemoTrading && !Account.IsLive' in src
           assert 'Portfolio Symbols (comma separated)",DefaultValue=""' in src
           print('MXM_ONE_BOT_MULTISYMBOL_ACCOUNT_GATE_SYNTHETIC_NO_CLOUD_LOCK_CLAIM_PASS')
