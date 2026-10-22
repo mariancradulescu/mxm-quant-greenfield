@@ -59,7 +59,7 @@ public sealed class MxmReferenceProductBot : Robot {
    var current=owned[0];
    // A neutral signal has no broker order unless this specific exit policy is selected.
    // A discontinuity is never reinterpreted as a valid causal neutral exit.
-   bool neutralExit=contiguous && exitMode==ExitMode.NeutralFlat && desired==0;
+   bool neutralExit=contiguous && kernel.CompletedBars>=6 && exitMode==ExitMode.NeutralFlat && desired==0;
    // Age measured against the existing position's actual broker entry time.
    bool horizonExit=exitMode==ExitMode.Horizon12 &&
      (Bars.OpenTimes.Last(0)-current.EntryTime).TotalMinutes>=12*BarMinutes;

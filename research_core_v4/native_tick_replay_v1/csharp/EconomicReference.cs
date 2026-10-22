@@ -146,7 +146,7 @@ sealed class Replay {
     }
     if(stopped)pendingSignal=0; // no optimistic same-event re-entry after stop
     if(!stopped && pos is not null && barChanged &&
-       ((exitPolicy==ExitMode.NeutralFlat && contiguousDecision && pendingSignal==0) ||
+       ((exitPolicy==ExitMode.NeutralFlat && contiguousDecision && kernel.CompletedBars>=6 && pendingSignal==0) ||
         (exitPolicy==ExitMode.Horizon12 && t-pos.OpenT>=BarMs*12L))){
       if(exitPolicy==ExitMode.NeutralFlat){Close(t,"NEUTRAL_POLICY_EXIT");neutralPolicyExits++;}
       else {Close(t,"HORIZON12_POLICY_EXIT");horizonPolicyExits++;}
