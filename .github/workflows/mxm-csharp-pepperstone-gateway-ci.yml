@@ -38,9 +38,14 @@ jobs:
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-reference
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --model-fixture unused verification/csharp-modeled-fixture
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --zero-spread-fixture unused verification/csharp-locked-quote
           python3 - <<'PY'
           import json
           from decimal import Decimal as D
+          z=json.load(open('verification/csharp-locked-quote/reference-report.json'))
+          assert z['classification']=='SYNTHETIC_MATHEMATICAL_ONLY'
+          assert z['zero_spread_accepted_snapshots']>0 and z['crossed_snapshots']==0 and z['invalid_quote_snapshots']==0
+          assert z['economic_entries']==z['economic_exits']>=1 and z['initial_equity_eur']==200
           a=json.load(open('verification/csharp-reference/reference-report.json'))
           b=json.load(open('verification/csharp-modeled-fixture/reference-report.json'))
           assert a['classification']=='SYNTHETIC_MATHEMATICAL_ONLY'

@@ -25,8 +25,8 @@ public sealed class MxmReferenceProductBot : Robot {
   // The position book is authoritative on restart. No serialized direction or replayed orders.
   if(Positions.FindAll(Label,SymbolName).Length>1)Print("MXM_DUPLICATE_OWNED_POSITIONS_SAFE_HOLD");
  }
- protected override void OnBarClosed() {
-  // OnBarClosed fires on the opening of the NEXT bar. Last(1) is the completed bar.
+ protected override void OnBar() {
+  // OnBar has the just-opened live bar at Last(0), so Last(1) is unambiguously closed.
   if(Bars.Count<3)return;
   if((Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes!=5)kernel.Reset();
   int desired=kernel.OnCompletedBar((decimal)Bars.ClosePrices.Last(1));

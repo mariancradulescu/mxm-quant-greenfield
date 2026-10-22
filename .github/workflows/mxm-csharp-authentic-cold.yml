@@ -76,11 +76,17 @@ jobs:
           r=json.loads(p.read_bytes())
           assert r['classification']=='OBSERVED_PEPPERSTONE_QUOTES_ASSUMPTION_SCENARIO_UNCERTIFIED'
           assert r['raw_events']==28212 and not r['authenticated_market_corpus'] and not r['broker_historical_costs_verified']
+          assert r['cross_side_same_ms_order_unknown_groups']==11414
+          assert r['crossed_snapshots']==0 and r['stale_snapshots']==0
+          assert r['zero_spread_accepted_snapshots']>0
+          assert r['feature_price_basis'].startswith('BID_LAST_OBSERVED')
           assert not r['economic_identity_opened'] and not r['historical_execution_fills_proven'] and not r['cTrader_native_backtest']
           assert r['economic_entries']==r['economic_exits']==len([x for x in r['ledger'] if x['kind']=='ENTRY'])
           assert r['initial_equity_eur']==200 and r['hard21']==all(x>=21 for x in r['entries_per_iso_week'].values())
           assert all(x['equity_eur']>=0 for x in r['equity']) or r['economic_entries']==0
-          safe={k:r[k] for k in ('schema','classification','raw_events','bar_decisions','same_ms_conflict_groups','gap_bars','invalid_quote_snapshots','economic_entries','economic_exits','charged_cost_eur','cTrader_native_backtest','pepperstone_historical_fills_proven')}
+          safe={k:r[k] for k in ('schema','classification','raw_events','bar_decisions','same_ms_conflict_groups','gap_bars','invalid_quote_snapshots','cross_side_same_ms_order_unknown_groups',
+            'zero_spread_accepted_snapshots','missing_side_snapshots','crossed_snapshots',
+            'stale_snapshots','feature_price_basis','economic_entries','economic_exits','charged_cost_eur','cTrader_native_backtest','pepperstone_historical_fills_proven')}
           safe.update(orders=0,economic_outcomes=0,full_results_withheld=True,original_source_run=39660692230,
             scenario_classification=r['classification'],scenario_entries=r['economic_entries'],
             scenario_exits=r['economic_exits'],scenario_initial_equity_eur=r['initial_equity_eur'],
