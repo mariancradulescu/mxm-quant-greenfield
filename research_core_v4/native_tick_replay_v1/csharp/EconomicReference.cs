@@ -255,6 +255,41 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
+   if(args.Length==3 && (args[0]=="--risk-capacity-research"||args[0]=="--risk-capacity-fixture")){
+    bool artificial=args[0]=="--risk-capacity-fixture";
+    if(!artificial&&!File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
+    var original=artificial?Fixture():Read(args[1]);
+    var capacities=new List<object>();
+    var fractions=new[]{0.005m,0.01m,0.02m};
+    var feeReserves=new[]{0.20m,1.00m};
+    foreach(var fraction in fractions)foreach(var reserve in feeReserves){
+     var outc=new Replay(false,true,StrategyMode.Adaptive,5,0.00005m,0.20m,
+       0.00004m,90m,12,0.8m,ExitMode.ReverseOnly,0m,fraction,reserve).Run(original);
+     using var result=JsonDocument.Parse(JsonSerializer.Serialize(outc));var z=result.RootElement;
+     capacities.Add(new {max_estimated_stop_risk_fraction=fraction,
+      assumed_cost_reserve_eur=reserve,modeled_entries=z.GetProperty("economic_entries").GetInt32(),
+      modeled_exits=z.GetProperty("economic_exits").GetInt32(),
+      stop_risk_rejections=z.GetProperty("stop_risk_rejections").GetInt32(),
+      margin_headroom_rejections=z.GetProperty("margin_headroom_rejections").GetInt32(),
+      final_assumption_only_equity_eur=z.GetProperty("final_equity_eur").GetDecimal()});
+    }
+    Directory.CreateDirectory(args[2]);
+    var diagnostic=new {schema="mxm.csharp.pepperstone.exposed-stop-risk-capacity.v1",
+      classification=artificial?"ARTIFICIAL_STOP_RISK_CAPACITY_ONLY":"ORIGINAL_PEPPERSTONE_BIDASK_EXPOSED_COUNTERFACTUAL_UNCERTIFIED",
+      source_authentication_must_be_bound_externally=true,
+      reused_quotes=original.Count,original_run_id=artificial?0:39660692230,
+      initial_unreset_account_eur=200,model_leaves=capacities.Count,
+      not_certified_minimum_broker_ticket=true,
+      no_broker_historical_cost_margin_or_swap_authority=true,
+      actual_broker_orders=0,new_broker_requests=0,hard21=false,
+      independent_scientific_trial=false,selected_candidate=false,
+      capacities};
+    File.WriteAllText(Path.Combine(args[2],"stop-risk-capacity.json"),
+      JsonSerializer.Serialize(diagnostic,new JsonSerializerOptions{WriteIndented=true}));
+    Console.WriteLine(JsonSerializer.Serialize(new {status="MXM_ORIGINAL_QUOTE_STOP_RISK_CAPACITY_ONLY",
+      leaves=capacities.Count,orders=0,independent_selection=false}));
+    return 0;
+   }
    if(args.Length==1 && args[0]=="--stop-risk-fixture"){
     string Check(decimal eq,decimal existing,decimal proposed,decimal fraction,decimal fee,decimal existingFee)
      =>MxmStopRiskAdmission.Check(eq,existing,proposed,fraction,fee,existingFee);

@@ -38,3 +38,21 @@ jobs:
           assert 'ExecuteMarketOrder(' in source and source.index('MxmStopRiskAdmission.Check(')<source.index('ExecuteMarketOrder(')
           print('MXM_ACCOUNT_WIDE_STOP_RISK_DEMO_ONLY_NO_SECRET_PASS')
           PY
+      - name: Run predeclared six-cell stop-risk capacity matrix on artificial prices only
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --risk-capacity-fixture unused verification/stop-risk-capacity-artificial
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('verification/stop-risk-capacity-artificial/stop-risk-capacity.json').read_text())
+          assert x['classification']=='ARTIFICIAL_STOP_RISK_CAPACITY_ONLY' and x['original_run_id']==0
+          assert x['model_leaves']==6 and x['source_authentication_must_be_bound_externally']
+          assert {z['max_estimated_stop_risk_fraction'] for z in x['capacities']}=={0.005,0.01,0.02}
+          assert {z['assumed_cost_reserve_eur'] for z in x['capacities']}=={0.2,1.0}
+          assert all(z['modeled_entries']==z['modeled_exits'] and
+                     z['stop_risk_rejections']>=0 for z in x['capacities'])
+          assert all(z['modeled_entries']==0 for z in x['capacities'] if z['max_estimated_stop_risk_fraction']==0.005)
+          assert any(z['modeled_entries']>0 for z in x['capacities'] if z['max_estimated_stop_risk_fraction']==0.02)
+          assert not x['selected_candidate'] and not x['independent_scientific_trial'] and x['actual_broker_orders']==0
+          print('MXM_FINITE_RISK_CAPACITY_ARTIFICIAL_NEGATIVE_AND_POSITIVE_GATE_PASS')
+          PY

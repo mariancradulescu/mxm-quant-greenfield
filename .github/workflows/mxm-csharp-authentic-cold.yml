@@ -61,6 +61,7 @@ jobs:
           PY
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-scenario "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-scenario"
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-research "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-research"
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --risk-capacity-research "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-stop-risk-capacity"
           python3 -m research_core_v4.laboratory.csharp_account_cross_engine "${RUNNER_TEMP}/mxm-csharp-scenario/reference-report.json" --out verification/csharp-authentic-aggregate/independent-account-receipt.json
           python3 - <<'PY'
           import json,os,pathlib
@@ -107,6 +108,22 @@ jobs:
           assert all(z['entries']==0 for z in research['models'] if z['margin_eur']>200*z['max_margin_fraction_of_free_margin'])
           assert all(z['modeled_stop_exits']>=0 and (z['modeled_stop_exits']==0 if z['modeled_stop_loss_pips']==0 else True) for z in research['models'])
           assert all(z['initial_equity_eur']==200 and z['entries']==z['exits'] and not z['hard21'] for z in research['models'])
+          capacity=json.loads((temp/'mxm-csharp-stop-risk-capacity/stop-risk-capacity.json').read_bytes())
+          assert capacity['schema']=='mxm.csharp.pepperstone.exposed-stop-risk-capacity.v1'
+          assert capacity['classification']=='ORIGINAL_PEPPERSTONE_BIDASK_EXPOSED_COUNTERFACTUAL_UNCERTIFIED'
+          assert capacity['original_run_id']==39660692230 and capacity['reused_quotes']==28212
+          assert capacity['model_leaves']==len(capacity['capacities'])==6
+          assert not capacity['independent_scientific_trial'] and not capacity['selected_candidate']
+          assert capacity['actual_broker_orders']==capacity['new_broker_requests']==0 and not capacity['hard21']
+          assert {z['max_estimated_stop_risk_fraction'] for z in capacity['capacities']}=={0.005,0.01,0.02}
+          assert {z['assumed_cost_reserve_eur'] for z in capacity['capacities']}=={0.2,1.0}
+          assert all(z['modeled_entries']==z['modeled_exits'] and
+                     z['stop_risk_rejections']>=0 and z['margin_headroom_rejections']>=0
+                     for z in capacity['capacities'])
+          safe.update(risk_capacity_engineering_leaves=6,
+            risk_capacity_source="SAME_ORIGINAL_EXPOSED_QUOTES_NO_NEW_ECONOMIC_IDENTITY",
+            risk_capacity_unverified_broker_stop_and_cost_authority=True,
+            risk_capacity_model_cells=capacity['capacities'])
           safe.update(orders=0,economic_outcomes=0,full_results_withheld=True,original_source_run=39660692230,
             economic_research_classification=research['classification'],research_model_count=216,
             no_new_economic_identity=True,no_complete_iso_week=True,scientific_selection_authorized=False,
@@ -125,7 +142,7 @@ jobs:
             scenario_assumption=r['account_convention'],scenario_unverified_fx_margin_swap_and_fills=True,
             preserved_corpus_sha256=bridge['ciphertext_sha256'],derived_stream_sha256=bridge['derived_ticks_sha256'])
           out=pathlib.Path('verification/csharp-authentic-aggregate');out.mkdir(parents=True,exist_ok=True)
-          full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,
+          full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
                          'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
           public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')
