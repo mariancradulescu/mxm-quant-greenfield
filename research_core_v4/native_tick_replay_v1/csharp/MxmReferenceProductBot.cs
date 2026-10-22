@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using cAlgo.API;
+using cAlgo.API.Internals;
 using Mxm.Replay;
 
 namespace cAlgo.Robots {
