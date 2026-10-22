@@ -1,0 +1,56 @@
+name: MXM CSharp authenticated chronology nonoutcome
+on:
+  workflow_dispatch: {}
+permissions: {}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  bounded-cold-to-csharp:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/main' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: mxm-r3-custody-v1
+    permissions: {contents: read, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+      - name: Reuse exact ORIGINAL Pepperstone evidence; zero broker requests
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: r3-chronology-39660692230
+          run-id: 39660692230
+          github-token: ${{ github.token }}
+          path: verification/r3-chronology
+      - name: Decrypt only inside existing protected custody and validate every raw native page
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          python3 -m research_core_v4.laboratory.chronology_csharp_bridge verification/r3-chronology/capture.mxmenc "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson"
+      - name: Execute exact CSharp decision kernel on authentically decoded quotes without economic fills
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-nonoutcome "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-output"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'mxm-csharp-output/reference-report.json'
+          r=json.loads(p.read_bytes())
+          assert r['classification']=='AUTHENTIC_CHRONOLOGY_NONOUTCOME_ONLY'
+          assert r['authenticated_market_corpus'] and r['raw_events']==28212
+          assert r['economic_entries']==r['economic_exits']==0 and r['charged_cost_eur']==0
+          assert r['pepperstone_historical_fills_proven'] is False and r['cTrader_native_backtest'] is False
+          safe={k:r[k] for k in ('schema','classification','raw_events','bar_decisions','same_ms_conflict_groups','gap_bars','invalid_quote_snapshots','economic_entries','economic_exits','charged_cost_eur','cTrader_native_backtest','pepperstone_historical_fills_proven')}
+          safe.update(orders=0,economic_outcomes=0,full_results_withheld=True,original_source_run=39660692230)
+          out=pathlib.Path('verification/csharp-authentic-aggregate');out.mkdir(parents=True,exist_ok=True)
+          (out/'receipt.json').write_text(json.dumps(safe,sort_keys=True))
+          print('MXM_AUTHENTIC_NONOUTCOME_AGGREGATE',json.dumps(safe,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-authentic-nonoutcome-aggregate
+          path: verification/csharp-authentic-aggregate/receipt.json
+          if-no-files-found: error
+          retention-days: 30

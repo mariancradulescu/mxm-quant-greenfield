@@ -20,6 +20,13 @@ jobs:
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
           find research_core_v4/native_tick_replay_v1/csharp/bin -name '*.algo' -print -quit | grep -q .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-reference-algo-disabled-default
+          path: research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/*.algo
+          if-no-files-found: error
+          retention-days: 30
       - name: Machine-side deterministic account reference (NOT Pepperstone market backtest)
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-reference
