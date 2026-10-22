@@ -1,0 +1,41 @@
+name: MXM finite M5 causal DEVELOPMENT gross diagnostic
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-m5-causal-development.yml
+      - research_core_v4/laboratory/m5_causal_gross_development.py
+      - research_core_v4/laboratory/M5_CAUSAL_GROSS_DEVELOPMENT_V1.json
+  workflow_dispatch: {}
+permissions: {}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  exact-registered-causal-development:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify precommitted four-leaf science, causality and negative time fence
+        run: |
+          python3 -m research_core_v4.laboratory.m5_causal_gross_development --selftest
+      - name: Read existing Pepperstone 100 shard dataset inside existing authorized custody and preserve exposed outcomes encrypted
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          python3 -m research_core_v4.laboratory.m5_causal_gross_development --protected-output verification/mxm-m5-causal-development
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: mxm-m5-causal-development-encrypted-v1
+          path: |
+            verification/mxm-m5-causal-development/receipt.json
+            verification/mxm-m5-causal-development/full-development-result.mxmenc
+          if-no-files-found: error
+          retention-days: 30
