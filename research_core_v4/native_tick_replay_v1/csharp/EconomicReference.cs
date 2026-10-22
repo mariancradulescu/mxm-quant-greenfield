@@ -255,9 +255,10 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
-   if(args.Length==3 && args[0]=="--risk-capacity-research"){
-    if(!File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
-    var original=Read(args[1]);
+   if(args.Length==3 && (args[0]=="--risk-capacity-research"||args[0]=="--risk-capacity-fixture")){
+    bool artificial=args[0]=="--risk-capacity-fixture";
+    if(!artificial&&!File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
+    var original=artificial?Fixture():Read(args[1]);
     var capacities=new List<object>();
     var fractions=new[]{0.005m,0.01m,0.02m};
     var feeReserves=new[]{0.20m,1.00m};
@@ -274,8 +275,9 @@ static class Program {
     }
     Directory.CreateDirectory(args[2]);
     var diagnostic=new {schema="mxm.csharp.pepperstone.exposed-stop-risk-capacity.v1",
-      classification="ORIGINAL_PEPPERSTONE_BIDASK_EXPOSED_COUNTERFACTUAL_UNCERTIFIED",
-      reused_quotes=original.Count,original_run_id=39660692230,
+      classification=artificial?"ARTIFICIAL_STOP_RISK_CAPACITY_ONLY":"ORIGINAL_PEPPERSTONE_BIDASK_EXPOSED_COUNTERFACTUAL_UNCERTIFIED",
+      source_authentication_must_be_bound_externally=true,
+      reused_quotes=original.Count,original_run_id=artificial?0:39660692230,
       initial_unreset_account_eur=200,model_leaves=capacities.Count,
       not_certified_minimum_broker_ticket=true,
       no_broker_historical_cost_margin_or_swap_authority=true,
