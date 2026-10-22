@@ -32,7 +32,7 @@ public sealed record MxmReplayParameters(
  StrategyMode Strategy, decimal MaxMarginFraction,
  int MaxPositions, decimal MinimumFreeMarginReserveEur,
  decimal MaxEstimatedStopRiskFraction, decimal RoundTripRiskReserveEur,
- int BarMinutes=5
+ int BarMinutes=5, int MaxQuoteAgeSeconds=300
 );
 
 /// <summary>
@@ -66,7 +66,7 @@ public sealed class MxmPortfolioAccountReplay {
  bool halted;
  public MxmPortfolioAccountReplay(IEnumerable<string> symbols,MxmReplayParameters settings) {
   parameters=settings;
-  if(settings.BarMinutes<1 || settings.MaxPositions<1 ||
+  if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
      settings.MaxMarginFraction<=0 || settings.MaxMarginFraction>1 ||
      settings.MaxEstimatedStopRiskFraction<=0 || settings.MaxEstimatedStopRiskFraction>1 ||
      settings.MinimumFreeMarginReserveEur<0 || settings.RoundTripRiskReserveEur<0)
@@ -111,6 +111,16 @@ public sealed class MxmPortfolioAccountReplay {
    position.Units,balance,tick.CommissionPerSideEur,gross));
  }
  void Enter(string symbol,int desired,MxmQuote tick) {
+  // No admission against absent, future or stale marks on any other open
+  // instrument. Broker arrival ordering of same-ms quotes remains unproven.
+  foreach(var existing in open.Keys) {
+   var latest=state[existing].Latest;
+   if(latest==null || latest.Utc>tick.Utc ||
+      (tick.Utc-latest.Utc).TotalSeconds>parameters.MaxQuoteAgeSeconds) {
+    rejected.Add("REJECT_UNVERIFIED_OR_STALE_ACCOUNT_MARK");
+    return;
+   }
+  }
   var equity=MarkedEquity();
   var free=equity-Margin();
   string isolation=MxmAccountIsolation.Check(open.Count,open.Count,0);
