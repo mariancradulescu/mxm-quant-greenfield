@@ -232,11 +232,56 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
-   if(args.Length!=3 || !(args[0]=="--fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--model-fixture"||args[0]=="--authentic-nonoutcome"||args[0]=="--authentic-scenario"||args[0]=="--authentic-research"||args[0]=="--research-fixture"))
+   if(args.Length!=3 || !(args[0]=="--fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--model-fixture"||args[0]=="--authentic-nonoutcome"||args[0]=="--authentic-scenario"||args[0]=="--authentic-research"||args[0]=="--research-fixture"||args[0]=="--exit-research"||args[0]=="--exit-fixture"))
     throw new ArgumentException("USAGE: --fixture unused OUT | --model-fixture unused OUT | --authentic-nonoutcome INPUT.ndjson OUT | --authentic-scenario INPUT.ndjson OUT");
-   bool fixture=args[0]=="--fixture"||args[0]=="--model-fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--research-fixture";
+   bool fixture=args[0]=="--fixture"||args[0]=="--model-fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--research-fixture"||args[0]=="--exit-fixture";
    if(!fixture && !File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
    var ticks=fixture?(args[0]=="--zero-spread-fixture"?ZeroSpreadFixture():Fixture()):Read(args[1]);
+   if(args[0]=="--exit-research"||args[0]=="--exit-fixture"){
+    // One preregistered, finite exit-policy sensitivity on an already exposed source.
+    // NEVER infer independent selection, actual fills, cost authority or HARD21.
+    var models=new List<object>();
+    var modes=new[]{ExitMode.ReverseOnly,ExitMode.NeutralFlat,ExitMode.Horizon12};
+    var families=new[]{StrategyMode.Adaptive,StrategyMode.TrendOnly,StrategyMode.RangeFade,StrategyMode.Breakout};
+    var frames=new[]{1,5,15};
+    var stops=new[]{0,12};
+    var cases=new[]{
+      new {name="LOW_UNVERIFIED",slip=0.00002m,fee=0.10m,spread=0.00002m,margin=50m},
+      new {name="BASE_UNVERIFIED",slip=0.00005m,fee=0.20m,spread=0.00004m,margin=90m},
+      new {name="STRESS_UNVERIFIED",slip=0.00010m,fee=0.40m,spread=0.00010m,margin=150m}};
+    foreach(var family in families)foreach(var tf in frames)
+     foreach(var cost in cases)foreach(var stop in stops)foreach(var exit in modes){
+      var outcome=new Replay(false,true,family,tf,cost.slip,cost.fee,cost.spread,cost.margin,stop,0.8m,exit).Run(ticks);
+      using var json=JsonDocument.Parse(JsonSerializer.Serialize(outcome));var j=json.RootElement;
+      models.Add(new {
+       family=family.ToString(),timeframe_minutes=tf,cost_case=cost.name,
+       stop_loss_pips=stop,exit_policy=exit.ToString(),margin_fraction=0.8m,
+       assumed_margin_eur=cost.margin,charged_fee_each_side_eur=cost.fee,
+       initial_equity_eur=200m,final_equity_eur=j.GetProperty("final_equity_eur").GetDecimal(),
+       modeled_entries=j.GetProperty("economic_entries").GetInt32(),
+       modeled_exits=j.GetProperty("economic_exits").GetInt32(),
+       modeled_neutral_exits=j.GetProperty("modeled_neutral_exits").GetInt32(),
+       modeled_horizon_exits=j.GetProperty("modeled_horizon_exits").GetInt32(),
+       modeled_stop_exits=j.GetProperty("modeled_stop_exits").GetInt32(),
+       margin_rejections=j.GetProperty("margin_headroom_rejections").GetInt32(),
+       max_drawdown_eur=j.GetProperty("maximum_absolute_drawdown_eur").GetDecimal(),
+       hypothetical_total_friction_eur=j.GetProperty("charged_cost_eur").GetDecimal(),
+       causal_signals=j.GetProperty("bar_decisions").GetInt32()
+      });
+    }
+    Directory.CreateDirectory(args[2]);
+    var full=new {schema="mxm.csharp.exposed-quote-exit-lifecycle-sensitivity.v1",
+     classification=args[0]=="--exit-fixture"?"ARTIFICIAL_QUOTES_ONLY":"REUSED_AUTHENTIC_QUOTES_DEVELOPMENT_EXPOSED_NO_SELECTION",
+     existing_source_reused_with_no_independent_confirmation=true,
+     model_leaves=models.Count,underlying_source_events=ticks.Count,complete_iso_utc_weeks=0,
+     no_broker_historical_cost_margin_liquidity_fx_authority=true,
+     no_portfolio_robustness_or_hard21_claim=true,orders=0,selected_candidate=false,
+     individual_model_results=models};
+    File.WriteAllText(Path.Combine(args[2],"exit-lifecycle.json"),JsonSerializer.Serialize(full,new JsonSerializerOptions{WriteIndented=true}));
+    Console.WriteLine(JsonSerializer.Serialize(new {status="MXM_EXIT_LIFECYCLE_MODEL_EXPOSURE",
+     models=models.Count,classification=full.classification,orders=0}));
+    return 0;
+   }
    if(args[0]=="--authentic-research"||args[0]=="--research-fixture"){
     var matrix=new List<object>(); var families=new[]{StrategyMode.Adaptive,StrategyMode.TrendOnly,StrategyMode.RangeFade,StrategyMode.Breakout};
     var frames=new[]{1,5,15};
