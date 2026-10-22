@@ -125,7 +125,7 @@ jobs:
               if z['margin_eur']>200*z['max_margin_fraction_of_free_margin']:
                   assert z['entries']==z['exits']==0 and z['final_equity_eur']==200
               assert z['margin_headroom_rejections']>=0
-              g[(z['family'],z['timeframe_minutes'],z['modeled_stop_loss_pips'],z['max_margin_fraction_of_free_margin'])][z['cost_case']=(Decimal(str(z['net_pnl_eur'])),z['entries'])
+              g[(z['family'],z['timeframe_minutes'],z['modeled_stop_loss_pips'],z['max_margin_fraction_of_free_margin'])][z['cost_case']]=(Decimal(str(z['net_pnl_eur'])),z['entries'])
           assert len(g)==72 and all({'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'}==set(v) for v in g.values())
           # Cost monotonicity is meaningful only for identical executed trade
           # counts. A refused order has no P&L and is not a profitable strategy.
