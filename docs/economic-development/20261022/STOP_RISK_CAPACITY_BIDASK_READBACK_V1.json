@@ -1,0 +1,78 @@
+{
+  "schema": "mxm.csharp.account-risk-capacity-original-pepperstone-readback.v1",
+  "scientific_classification": "DEVELOPMENT_EXPOSED_ENGINEERING_CAPACITY_ONLY_NO_INDEPENDENT_ECONOMIC_SELECTION",
+  "repo": "mariancradulescu/mxm-quant-greenfield",
+  "precommitted_spec": "research_core_v4/native_tick_replay_v1/csharp/STOP_RISK_CAPACITY_DIAGNOSTIC_V1.json",
+  "experiment_source_run": 39660692230,
+  "execution_workflow_run": 39810418021,
+  "source_head_sha": "1485d7e23aed709455b626a9ef72dace63c6010d",
+  "quote_cipher_sha256": "f1d828d94b304e2af1f310701f92dcb31db935a8db7fc3f8772087adf5499346",
+  "encrypted_private_result_sha256": "a1313519c3f58216586b989d97e1c0c7c688ca059d81a5771d6d6e24574afd8b",
+  "plaintext_result_sha256_locked_custody_only": "6a01eda25770876ae6d91b6d86f4eb5d90825c244715d253730bf922ea3ccf85",
+  "artifact_id": 12439462449,
+  "original_bid_events": 14003,
+  "original_ask_events": 14209,
+  "original_quote_events": 28212,
+  "model_baseline": "Adaptive M5, 12-pip quote stop, 1000 modeled units, EUR90 unverified margin, 80pct unverified margin fraction, assumed EURUSD 1.10 USD/EUR conversion, synthetic BASE friction",
+  "initial_eur": 200,
+  "scenario_units_are_broker_certified": false,
+  "bidask_are_broker_fills": false,
+  "post_result_parameter_selection": false,
+  "independent_cash_replay_parity": "PASS_CASH_ONLY_NOT_MTM_OR_EXECUTION",
+  "risk_cells": [
+    {
+      "risk_fraction": 0.005,
+      "roundtrip_cost_reserve_eur": 0.2,
+      "modeled_entries": 0,
+      "stop_risk_rejections": 23,
+      "hypothetical_final_equity_eur": 200
+    },
+    {
+      "risk_fraction": 0.005,
+      "roundtrip_cost_reserve_eur": 1,
+      "modeled_entries": 0,
+      "stop_risk_rejections": 23,
+      "hypothetical_final_equity_eur": 200
+    },
+    {
+      "risk_fraction": 0.01,
+      "roundtrip_cost_reserve_eur": 0.2,
+      "modeled_entries": 7,
+      "stop_risk_rejections": 0,
+      "hypothetical_final_equity_eur": 197.381818
+    },
+    {
+      "risk_fraction": 0.01,
+      "roundtrip_cost_reserve_eur": 1,
+      "modeled_entries": 0,
+      "stop_risk_rejections": 23,
+      "hypothetical_final_equity_eur": 200
+    },
+    {
+      "risk_fraction": 0.02,
+      "roundtrip_cost_reserve_eur": 0.2,
+      "modeled_entries": 7,
+      "stop_risk_rejections": 0,
+      "hypothetical_final_equity_eur": 197.381818
+    },
+    {
+      "risk_fraction": 0.02,
+      "roundtrip_cost_reserve_eur": 1,
+      "modeled_entries": 7,
+      "stop_risk_rejections": 0,
+      "hypothetical_final_equity_eur": 197.381818
+    }
+  ],
+  "research_disposition": "NO_PROMOTION_NO_EXECUTABLE_EDGE",
+  "hard21": false,
+  "full_iso_utc_weeks": 0,
+  "live_orders": 0,
+  "broker_requests": 0,
+  "protected_forward_opened": false,
+  "confirmation_opened": false,
+  "canonical_V2_trial_ledger_modified": false,
+  "owner_checkpoint_modified": false,
+  "history_limit": "single previously exposed roughly four hour BID/ASK capture",
+  "caveat": "2% risk budget with model cost assumptions admits 7 entries losing about EUR2.62; stricter regimes hold EUR200 by making zero transactions; absence of trades is not an economic edge",
+  "retention": "This public readback is durable in Git; full encrypted model artifact #12439462449 remains only under time-limited GitHub Actions retention until separately archived"
+}
