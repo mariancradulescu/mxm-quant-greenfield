@@ -1,0 +1,48 @@
+name: MXM CSharp shared EUR200 admission no-secret CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/native_tick_replay_v1/csharp/**
+      - .github/workflows/mxm-csharp-eur200-admission-ci.yml
+permissions: {contents: read}
+jobs:
+  exact-common-capital-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile CSharp simulator and original real cTrader product with shared admission
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+      - name: Execute account-global cap, dynamic equity, reserve and margin fraction negatives
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --capital-fixture
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-capital-parity
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research_core_v4/native_tick_replay_v1/csharp')
+          bot=(p/'MxmReferenceProductBot.cs').read_text()
+          sim=(p/'EconomicReference.cs').read_text()
+          policy=(p/'MxmCapitalAdmission.cs').read_text()
+          assert 'Positions.FindAll(Label).Length' in bot
+          assert 'MxmCapitalAdmission.Check' in bot and 'MxmCapitalAdmission.Check' in sim
+          assert 'MaxMxmAccountPositions' in bot and 'MinimumFreeMarginReserveEur' in bot
+          assert 'EnableDemoTrading && !Account.IsLive' in bot
+          assert 'REJECT_ACCOUNT_POSITION_CAP' in policy
+          assert 'REJECT_FREE_MARGIN_RESERVE' in policy
+          assert 'REJECT_MARGIN_FRACTION' in policy
+          assert 'actual_cbot_has_nonatomic_account_snapshot=true' in sim
+          v=json.loads(Path('verification/csharp-capital-parity/reference-report.json').read_text())
+          assert v['economic_entries']==v['economic_exits']==7
+          assert v['final_equity_eur']==201.27
+          assert v['modeled_assumptions']['minimum_free_margin_reserve_eur']==0
+          assert v['modeled_assumptions']['max_model_owned_positions']==1
+          assert v['capital_reserve_rejections']>=0
+          assert not v['pepperstone_historical_fills_proven'] and not v['economic_identity_opened']
+          print('MXM_SHARED_EUR200_ACCOUNT_GATE_REFERENCE_AND_DEMO_PRODUCT_PASS')
+          PY
