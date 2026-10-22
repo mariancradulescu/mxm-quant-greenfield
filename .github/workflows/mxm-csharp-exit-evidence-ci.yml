@@ -1,0 +1,29 @@
+name: MXM CSharp exit economic result provenance CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - docs/economic-development/20261022/CSHARP_EXIT_LIFECYCLE_EXPOSED_RESULT_V1.md
+      - .github/workflows/mxm-csharp-exit-evidence-ci.yml
+permissions: {contents: read}
+jobs:
+  verify-evidence-provenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Ensure explicit original evidence IDs and no unsupported economic admission
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('docs/economic-development/20261022/CSHARP_EXIT_LIFECYCLE_EXPOSED_RESULT_V1.md').read_text()
+          for needle in ('39777231786','39776838582','12424029423',
+                         'c4419724f29b1520c6ab34c7dc0ec69badfbf7245f0fdfb6f489a8b7697056f0',
+                         '28,212','216','NO PROMOTION','HARD21','30-day Actions retention',
+                         'Broker','PR #117'):
+              assert needle.lower() in p.lower(),needle
+          assert 'not an EUR200 multi-symbol portfolio' in p.lower()
+          assert 'actual execution' in p.lower()
+          print('MXM_EXIT_AUTHENTIC_EXPOSURE_SOURCE_AND_NO_PROMOTION_RECORDED')
+          PY
