@@ -193,7 +193,7 @@ public sealed class MxmReferenceProductBot : Robot {
    if(!double.IsFinite(distancePips)||distancePips<0) {
     Print("MXM_EXISTING_STOP_DISTANCE_UNVERIFIED_SAFE_HOLD");return;
    }
-   double risk=active.instrument.AmountRisked(active.VolumeInUnits,distancePips);
+   double risk=active.Symbol.AmountRisked(active.VolumeInUnits,distancePips);
    if(!double.IsFinite(risk)||risk<0) {
     Print("MXM_EXISTING_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
    }
