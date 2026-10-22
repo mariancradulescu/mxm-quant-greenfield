@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using cAlgo.API;
 using Mxm.Replay;
 
@@ -8,8 +10,13 @@ namespace cAlgo.Robots {
 [Robot(TimeZone=TimeZones.UTC,AccessRights=AccessRights.None)]
 public sealed class MxmReferenceProductBot : Robot {
  const string Label="MXM_CSHARP_REFERENCE_V1";
- MxmDecisionKernel kernel=new();
+ // This Robot intentionally has no separately-trading chart-local kernel.
  ExitMode exitMode=ExitMode.ReverseOnly;
+ [Parameter("Portfolio Symbols (comma separated)",DefaultValue="")]
+ public string PortfolioSymbols {get;set;}="";
+ readonly Dictionary<string,MxmDecisionKernel> portfolioKernels=new(StringComparer.OrdinalIgnoreCase);
+ readonly Dictionary<string,Bars> subscribedBars=new(StringComparer.OrdinalIgnoreCase);
+ MxmPortfolioSequencer? sequencer;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
  public bool EnableDemoTrading {get;set;}
  [Parameter("Stop Loss Pips",DefaultValue=12,MinValue=1)]
@@ -43,34 +50,92 @@ public sealed class MxmReferenceProductBot : Robot {
    (BarMinutes==5 && TimeFrame==cAlgo.API.TimeFrame.Minute5) ||
    (BarMinutes==15 && TimeFrame==cAlgo.API.TimeFrame.Minute15);
   if(!supported){Print("MXM_UNSUPPORTED_TIMEFRAME_HOLD");Stop();return;}
-  kernel=new MxmDecisionKernel(mode);
-  // Deterministic cold start: the historical replay and the live cBot both
-  // learn from six complete bars AFTER the start. Preloading pre-start bars
-  // would create different signals at the identical observed BID timestamps.
-  // Existing labelled positions remain broker-owned and are reconciled below.
-  // The position book is authoritative on restart. No serialized direction or replayed orders.
-  if(Positions.FindAll(Label,SymbolName).Length>1)Print("MXM_DUPLICATE_OWNED_POSITIONS_SAFE_HOLD");
+  // There is one owning Robot instance and a single sequential order path.
+  // No independent per-chart signal bot may open another portfolio position.
+  // Explicit roster required: empty configuration does NOT trade even on DEMO.
+  var names=PortfolioSymbols.Split(',').Select(x=>x.Trim())
+   .Where(x=>x.Length>0).ToArray();
+  if(names.Length==0 || names.Length>16 ||
+     names.Distinct(StringComparer.OrdinalIgnoreCase).Count()!=names.Length) {
+   Print("MXM_PORTFOLIO_ROSTER_INVALID_OR_EMPTY_SAFE_HOLD");Stop();return;
+  }
+  // A portfolio that excludes an existing MXM-labelled position cannot safely
+  // claim to orchestrate the complete account, including on cold restart.
+  foreach(var position in Positions.FindAll(Label)) {
+   if(!names.Contains(position.SymbolName,StringComparer.OrdinalIgnoreCase)) {
+    Print("MXM_UNMANAGED_EXISTING_MXM_POSITION_SAFE_HOLD");Stop();return;
+   }
+  }
+  var resolved=new List<string>();
+  foreach(var name in names) {
+   var instrument=Symbols.GetSymbol(name);
+   if(instrument==null || !string.Equals(instrument.Name,name,StringComparison.OrdinalIgnoreCase)){
+    Print("MXM_UNKNOWN_OR_AMBIGUOUS_PORTFOLIO_SYMBOL_SAFE_HOLD_"+name);Stop();return;
+   }
+   resolved.Add(instrument.Name);
+  }
+  sequencer=new MxmPortfolioSequencer(resolved);
+  // Subscribe only after full validation. Each symbol has independent cold
+  // six-complete-bar strategy state; there is ONE shared real broker account.
+  foreach(var name in resolved) {
+   var series=MarketData.GetBars(TimeFrame,name);
+   if(series==null){Print("MXM_PORTFOLIO_SERIES_MISSING_SAFE_HOLD_"+name);Stop();return;}
+   subscribedBars.Add(name,series);
+   portfolioKernels.Add(name,new MxmDecisionKernel(mode));
+  }
+  foreach(var series in subscribedBars.Values)series.BarClosed+=OnPortfolioBarClosed;
+  Print("MXM_SINGLE_ROBOT_PORTFOLIO_BARS_READY_NO_INTERINSTANCE_MUTEX_"+resolved.Count);
  }
- protected override void OnBar() {
-  // OnBar has the just-opened live bar at Last(0), so Last(1) is unambiguously closed.
-  if(Bars.Count<3)return;
-  bool contiguous=(Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes==BarMinutes;
-  if(!contiguous)kernel.Reset();
-  int desired=kernel.OnCompletedBar((decimal)Bars.ClosePrices.Last(1));
-  // Backtesting is simulation; realtime LIVE trading is never authorized.
+ // Deliberately no legacy per-chart order path. All symbols, including chart
+ // symbol, enter via one Bars.BarClosed dispatcher, never OnBar plus BarClosed.
+ protected override void OnBar() { }
+ protected override void OnStop() {
+  foreach(var series in subscribedBars.Values)series.BarClosed-=OnPortfolioBarClosed;
+ }
+ void OnPortfolioBarClosed(BarClosedEventArgs args) {
+  var series=args.Bars;
+  if(series.Count<2 || sequencer==null)return;
+  var instrumentName=series.SymbolName;
+  DateTime closedOpenTime=series.OpenTimes.Last(0);
+  if(!sequencer.TryEnter(instrumentName,closedOpenTime,out var reason)){
+   // Duplicate/stale bars are normal after feed reload and must not trade twice.
+   if(reason=="REENTRANT_OR_CONCURRENT_DECISION"){
+    Print("MXM_REENTRANT_PORTFOLIO_CALLBACK_SAFE_STOP");Stop();
+   }
+   return;
+  }
+  try {
+   var instrument=Symbols.GetSymbol(instrumentName);
+   if(instrument==null || !portfolioKernels.TryGetValue(instrumentName,out var kernel)){
+    Print("MXM_PORTFOLIO_SYMBOL_DISAPPEARED_SAFE_STOP");Stop();return;
+   }
+   bool contiguous=(series.OpenTimes.Last(0)-series.OpenTimes.Last(1)).TotalMinutes==BarMinutes;
+   if(!contiguous)kernel.Reset();
+   // Bars.BarClosed excludes the newly opened bar; Last(0) IS the closed one.
+   // No historical warm-start or double-processed boundary tick.
+   int desired=kernel.OnCompletedBar((decimal)series.ClosePrices.Last(0));
+   var currentOpenTime=closedOpenTime.AddMinutes(BarMinutes);
+   ApplyPortfolioDecision(instrument,instrumentName,desired,contiguous,kernel.CompletedBars,currentOpenTime);
+  } catch(Exception e) {
+   Print("MXM_PORTFOLIO_CALLBACK_UNVERIFIED_SAFE_STOP_"+e.GetType().Name);
+   Stop();
+  } finally {sequencer.Exit();}
+ }
+ void ApplyPortfolioDecision(Symbol instrument,string instrumentName,int desired,
+  bool contiguous,int completedBars,DateTime currentOpenTime) {
   bool simulation=IsBacktesting;
-  if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || !Symbol.MarketHours.IsOpened())return;
-  var owned=Positions.FindAll(Label,SymbolName);
+  if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || !instrument.MarketHours.IsOpened())return;
+  var owned=Positions.FindAll(Label,instrumentName);
   if(owned.Length>1){Print("MXM_MULTIPLE_POSITIONS_SAFE_HOLD");return;}
   TradeType direction=desired>0?TradeType.Buy:TradeType.Sell;
   if(owned.Length==1){
    var current=owned[0];
    // A neutral signal has no broker order unless this specific exit policy is selected.
    // A discontinuity is never reinterpreted as a valid causal neutral exit.
-   bool neutralExit=contiguous && kernel.CompletedBars>=6 && exitMode==ExitMode.NeutralFlat && desired==0;
+   bool neutralExit=contiguous && completedBars>=6 && exitMode==ExitMode.NeutralFlat && desired==0;
    // Age measured against the existing position's actual broker entry time.
    bool horizonExit=exitMode==ExitMode.Horizon12 &&
-     (Bars.OpenTimes.Last(0)-current.EntryTime).TotalMinutes>=12*BarMinutes;
+     (currentOpenTime-current.EntryTime).TotalMinutes>=12*BarMinutes;
    if(neutralExit || horizonExit){
     var closed=ClosePosition(current);
     if(!closed.IsSuccessful)Print("MXM_POLICY_EXIT_FAILED_SAFE_HOLD");
@@ -90,9 +155,9 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!double.IsFinite(Account.Equity)||!double.IsFinite(Account.FreeMargin)||
      !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MinimumFreeMarginReserveEur)||
      MinimumFreeMarginReserveEur<0)return;
-  double units=Symbol.NormalizeVolumeInUnits(Math.Max(RequestedUnits,Symbol.VolumeInUnitsMin),RoundingMode.Up);
-  if(units<=0 || units>Symbol.VolumeInUnitsMax)return;
-  double margin=Symbol.GetEstimatedMargin(direction,units);
+  double units=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
+  if(units<=0 || units>instrument.VolumeInUnitsMax)return;
+  double margin=instrument.GetEstimatedMargin(direction,units);
   if(!double.IsFinite(margin)||margin<=0)return;
   string admit=MxmCapitalAdmission.Check((decimal)Account.Equity,(decimal)Account.FreeMargin,
     (decimal)margin,0m,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
@@ -108,7 +173,7 @@ public sealed class MxmReferenceProductBot : Robot {
      EstimatedRoundTripFrictionReserveEur<0 || StopLossPips<=0) {
     Print("MXM_STOP_RISK_INPUT_UNVERIFIED_SAFE_HOLD");return;
   }
-  double newStopRisk=Symbol.AmountRisked(units,StopLossPips);
+  double newStopRisk=instrument.AmountRisked(units,StopLossPips);
   if(!double.IsFinite(newStopRisk)||newStopRisk<=0) {
     Print("MXM_NEW_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
   }
@@ -127,7 +192,7 @@ public sealed class MxmReferenceProductBot : Robot {
    if(!double.IsFinite(distancePips)||distancePips<0) {
     Print("MXM_EXISTING_STOP_DISTANCE_UNVERIFIED_SAFE_HOLD");return;
    }
-   double risk=active.Symbol.AmountRisked(active.VolumeInUnits,distancePips);
+   double risk=active.instrument.AmountRisked(active.VolumeInUnits,distancePips);
    if(!double.IsFinite(risk)||risk<0) {
     Print("MXM_EXISTING_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
    }
@@ -145,7 +210,7 @@ public sealed class MxmReferenceProductBot : Robot {
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
   }
-  var placed=ExecuteMarketOrder(direction,SymbolName,units,Label,StopLossPips,null);
+  var placed=ExecuteMarketOrder(direction,instrumentName,units,Label,StopLossPips,null);
   if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
  }
 }
