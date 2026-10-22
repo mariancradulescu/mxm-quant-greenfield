@@ -41,6 +41,41 @@ jobs:
           assert 'Portfolio Symbols (comma separated)",DefaultValue=""' in src
           print('MXM_ONE_BOT_MULTISYMBOL_ACCOUNT_GATE_SYNTHETIC_NO_CLOUD_LOCK_CLAIM_PASS')
           PY
+      - name: Replay two instruments through one CSharp EUR200 BIDASK marked account with independent Decimal verification
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplayFixture.csproj -c Release
+          python3 - <<'PY'
+          from pathlib import Path
+          from decimal import Decimal as D
+          import json
+          p=Path('verification/csharp-multisymbol-single-account/artificial-replay.json')
+          s=json.loads(p.read_text(),parse_float=D)
+          assert s['classification']=='ARTIFICIAL_OR_UNCERTIFIED_QUOTES_SINGLE_ACCOUNT_CAUSAL_DEVELOPMENT_ONLY'
+          assert s['initial_capital_eur']==200 and s['final_cash_eur']==D('199.8')
+          ledger=s['ledger']
+          assert len(ledger)==2 and all(z['kind']=='ENTRY' for z in ledger)
+          assert len({z['symbol'] for z in ledger})==2
+          # Independent Python ledger: one continuous cash account, never a
+          # fresh EUR200 account per symbol. Both commissions are applied once.
+          cash=D(200)-sum((z['commission_eur'] for z in ledger),D(0))
+          assert cash==s['final_cash_eur']
+          longs={x['symbol']:x for x in ledger if x['direction']==1}
+          shorts={x['symbol']:x for x in ledger if x['direction']==-1}
+          assert set(longs)=={'EURUSD'} and set(shorts)=={'GBPUSD'}
+          # Last TWO independent synthetic quotes at i=7:
+          liquidation=(D('1.1013')-longs['EURUSD']['price'])*longs['EURUSD']['units']
+          liquidation+=(shorts['GBPUSD']['price']-D('1.1987'))*shorts['GBPUSD']['units']
+          eq=cash+liquidation
+          used=D(70)*2
+          assert eq==s['marked_equity_eur']==D('200.2')
+          assert used==s['used_margin_eur']==140
+          assert eq-used==s['free_margin_eur']==D('60.2')
+          assert s['entries_by_iso_week']=={'2026-W35':2}
+          assert s['complete_iso_utc_weeks']==0
+          assert not s['hard21_proven'] and not s['broker_fills_proven'] and not s['costs_broker_verified']
+          assert s['accepted_entries']==2 and s['open_positions']==2
+          print('MXM_TWO_SYMBOL_ONE_EUR200_CSHARP_PYTHON_INDEPENDENT_MTM_PARITY_SYNTHETIC_PASS_NO_HARD21')
+          PY
       - name: Execute account-global cap, dynamic equity, reserve and margin fraction negatives
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --capital-fixture
