@@ -144,8 +144,8 @@ jobs:
           import pathlib
           p=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
           assert 'protected override void OnBar()' in p
-          assert 'Bars.ClosePrices.Last(1)' in p
-          assert 'Bars.ClosePrices[i]' not in p
+          assert 'series.ClosePrices.Last(0)' in p
+          assert 'series.ClosePrices[i]' not in p
           assert 'StopLossPips' in p and 'MaxMarginFraction' in p and 'MxmDecisionKernel(mode)' in p
           assert 'if(!placed.IsSuccessful)' in p
           q=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
