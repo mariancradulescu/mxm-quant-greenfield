@@ -1,0 +1,50 @@
+name: MXM CSharp entire-position exit-lifecycle nonsecret CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/native_tick_replay_v1/csharp/**
+      - .github/workflows/mxm-csharp-exit-lifecycle-ci.yml
+      - .github/workflows/mxm-csharp-exit-lifecycle-cold.yml
+permissions: {contents: read}
+jobs:
+  exit-lifecycle-mathematical-fixture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile cTrader product and executable reference with exact shared CSharp kernel
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.csproj -c Release
+      - name: Verify three exit policies on mathematical fixture only, no broker credentials
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --exit-fixture unused verification/csharp-exit-fixture
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('verification/csharp-exit-fixture/exit-lifecycle.json').read_text())
+          assert x['schema']=='mxm.csharp.exposed-quote-exit-lifecycle-sensitivity.v1'
+          assert x['classification']=='ARTIFICIAL_QUOTES_ONLY'
+          assert x['model_leaves']==216 and x['orders']==0 and not x['selected_candidate']
+          rows=x['individual_model_results']
+          assert len(rows)==216
+          assert {z['exit_policy'] for z in rows}=={'ReverseOnly','NeutralFlat','Horizon12'}
+          assert {z['family'] for z in rows}=={'Adaptive','TrendOnly','RangeFade','Breakout'}
+          assert {z['timeframe_minutes'] for z in rows}=={1,5,15}
+          assert all(z['modeled_entries']==z['modeled_exits'] for z in rows)
+          assert all(z['modeled_neutral_exits']==0 for z in rows if z['exit_policy']!='NeutralFlat')
+          assert all(z['modeled_horizon_exits']==0 for z in rows if z['exit_policy']!='Horizon12')
+          assert all(z['modeled_neutral_exits']+z['modeled_horizon_exits']+
+                     z['modeled_stop_exits']<=z['modeled_exits'] for z in rows)
+          spec=json.loads(Path('research_core_v4/native_tick_replay_v1/csharp/EXIT_LIFECYCLE_FINITE_DEVELOPMENT_V1.json').read_text())
+          assert spec['scientific_accounting']['dependent_counterfactual_model_leaves']==216
+          assert spec['scientific_accounting']['source_is_development_exposed']
+          assert not spec['scientific_accounting']['confirmation_opened']
+          bot=Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          assert 'EnableDemoTrading && !Account.IsLive' in bot
+          assert 'ExitMode.NeutralFlat' in bot and 'ExitMode.Horizon12' in bot
+          assert 'MXM_POLICY_EXIT_FAILED_SAFE_HOLD' in bot
+          print('MXM_EXIT_LIFECYCLE_COMPLETE_MATHEMATICAL_FIXTURE_PASS')
+          PY
