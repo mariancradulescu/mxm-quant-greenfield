@@ -1,0 +1,46 @@
+{
+  "schema": "mxm.csharp.exposed-risk-capacity-diagnostic-precommit.v1",
+  "program_id": "MXM_ACCOUNT_STOP_RISK_CAPACITY_20261022_V1",
+  "scientific_status": "ENGINEERING_COUNTERFACTUAL_ON_ALREADY_EXPOSED_AUTHENTIC_BID_ASK_NO_NEW_ECONOMIC_IDENTITY",
+  "purpose": "Quantify whether a 200 EUR single-symbol minimum-model ticket survives account wide stop risk gate and friction reserve sensitivity, with shared CSharp admission",
+  "exact_previous_source_run": 39660692230,
+  "source_events": 28212,
+  "source_reuse_only": true,
+  "study_identity": {
+    "mode": "Adaptive",
+    "minutes": 5,
+    "stop_loss_pips": 12,
+    "margin_eur_unverified": 90,
+    "margin_fraction_unverified": 0.8,
+    "units_unverified": 1000,
+    "fee_eur_per_side_unverified": 0.2,
+    "slippage_price_unverified": 0.00005,
+    "extra_spread_unverified": 0.00004,
+    "fx_rate_assumed_usd_per_eur": 1.1
+  },
+  "fixed_matrix": {
+    "max_estimated_stop_risk_fractions": [
+      0.005,
+      0.01,
+      0.02
+    ],
+    "estimated_roundtrip_friction_reserve_eur": [
+      0.2,
+      1
+    ],
+    "dependent_cells": 6
+  },
+  "limits": {
+    "no_live_orders": true,
+    "no_new_broker_requests": true,
+    "no_forward": true,
+    "no_independent_confirmation": true,
+    "account_risk_is_an_estimate_only": true,
+    "stop_not_maximum_loss": true,
+    "units_and_historical_margin_not_certified": true,
+    "canonical_V2_trial_book_unchanged": true,
+    "do_not_promote_on_basis_of_this_result": true,
+    "full_iso_utc_weeks": 0,
+    "hard21": false
+  }
+}
