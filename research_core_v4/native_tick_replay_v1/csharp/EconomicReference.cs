@@ -16,7 +16,7 @@ sealed class Replay {
  readonly bool synthetic,scenario;
  bool Simulated=>synthetic||scenario;
  decimal Fx=>scenario?1m/1.10m:1m;
- readonly decimal slippage, commission, extraHalfSpread, margin;
+ readonly decimal slippage, commission, extraHalfSpread, margin, maxMarginFraction;
  readonly int stopPips;
  decimal Slippage=>slippage;
  decimal PriceUnits=>1000m;
@@ -28,11 +28,11 @@ sealed class Replay {
  int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false,StrategyMode mode=StrategyMode.Adaptive,
-   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0){
-  if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0)throw new ArgumentOutOfRangeException();
+   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m){
+  if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0 || maxMarginFraction<=0m || maxMarginFraction>1m)throw new ArgumentOutOfRangeException();
   synthetic=fixture;scenario=modeledScenario;family=mode;BarMs=checked((long)minutes*60000L);
   slippage=slip??(scenario?0.00002m:0.00001m);
-  commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;
+  commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;this.maxMarginFraction=maxMarginFraction;
   if(slippage<0||commission<0)throw new ArgumentOutOfRangeException();
   kernel=new MxmDecisionKernel(mode);
  }
@@ -49,10 +49,9 @@ sealed class Replay {
  }
  void Open(long t,int direction) {
   if(pos is not null)throw new InvalidDataException("MARGIN_OR_POSITION");
-  // cTrader product adapter refuses margin above 40% of actual free margin.
-  // At flat EUR200, a modeled EUR90 or EUR150 ticket must NOT become a fill.
-  // This scenario has no other positions; flat free margin equals realized cash.
-  if(margin>realized*0.4m){marginHeadroomRejections++;return;}
+  // Product adapter's free-margin fraction is configurable, never proof of broker acceptance.
+  // This scenario has no other positions; modeled flat free margin equals realized cash.
+  if(margin>realized*maxMarginFraction){marginHeadroomRejections++;return;}
   if(Equity(bid,ask)<margin+commission || realized<margin+commission)return; // deterministic skipped order; no invented fill
   decimal price=direction>0?ask+ExecutionFriction:bid-ExecutionFriction;
   pos=new Position{Direction=direction,OpenT=t,OpenPrice=price};
@@ -168,7 +167,7 @@ sealed class Replay {
      fx_eur_per_usd=Round(Fx),commission_eur_per_side=commission,slippage_price_units=Slippage,
      extra_spread_price_units=extraHalfSpread*2m,margin_eur=margin,financing_eur=0m,
      quote_stop_loss_pips=stopPips,observed_quote_stop_fill_not_broker_certified=true,
-     max_margin_fraction_of_free_margin=0.4m,other_positions_and_actual_broker_margin_not_verified=true,
+     max_margin_fraction_of_free_margin=maxMarginFraction,other_positions_and_actual_broker_margin_not_verified=true,
      original_bid_ask_spread_is_already_in_fill_prices=true,slippage_and_extra_spread_are_already_in_fill_prices=true,
      cost_total_is_diagnostic_including_embedded_execution_friction_not_additional_cash_debit=true},
    price_path_timestamps_are_not_historical_arrival_times=true,
@@ -229,15 +228,16 @@ static class Program {
     var matrix=new List<object>(); var families=new[]{StrategyMode.Adaptive,StrategyMode.TrendOnly,StrategyMode.RangeFade,StrategyMode.Breakout};
     var frames=new[]{1,5,15};
     var stopModes=new[]{0,12}; // sensitivity to actual Robot default 12-pip stop vs no stop
+    var marginFractions=new[]{0.4m,0.6m,0.8m}; // prospectively declared, not broker authority
     var cases=new[]{new {name="LOW_UNVERIFIED",slip=0.00002m,fee=0.10m,spread=0.00002m,margin=50m},
                      new {name="BASE_UNVERIFIED",slip=0.00005m,fee=0.20m,spread=0.00004m,margin=90m},
                      new {name="STRESS_UNVERIFIED",slip=0.00010m,fee=0.40m,spread=0.00010m,margin=150m}};
-    foreach(var family in families)foreach(var tf in frames)foreach(var cost in cases)foreach(var stops in stopModes){
-     var outcome=new Replay(false,true,family,tf,cost.slip,cost.fee,cost.spread,cost.margin,stops).Run(ticks);
+    foreach(var family in families)foreach(var tf in frames)foreach(var cost in cases)foreach(var stops in stopModes)foreach(var fraction in marginFractions){
+     var outcome=new Replay(false,true,family,tf,cost.slip,cost.fee,cost.spread,cost.margin,stops,fraction).Run(ticks);
      using var e=JsonDocument.Parse(JsonSerializer.Serialize(outcome));var j=e.RootElement;
      matrix.Add(new {family=family.ToString(),timeframe_minutes=tf,cost_case=cost.name,modeled_stop_loss_pips=stops,
       modeled_stop_exits=j.GetProperty("modeled_stop_exits").GetInt32(),
-      margin_headroom_rejections=j.GetProperty("margin_headroom_rejections").GetInt32(),
+      margin_headroom_rejections=j.GetProperty("margin_headroom_rejections").GetInt32(),max_margin_fraction_of_free_margin=fraction,
       initial_equity_eur=200,final_equity_eur=j.GetProperty("final_equity_eur").GetDecimal(),
       net_pnl_eur=j.GetProperty("final_equity_eur").GetDecimal()-200m,
       entries=j.GetProperty("economic_entries").GetInt32(),exits=j.GetProperty("economic_exits").GetInt32(),

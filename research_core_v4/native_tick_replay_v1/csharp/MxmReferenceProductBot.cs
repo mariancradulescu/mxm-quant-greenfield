@@ -17,6 +17,8 @@ public sealed class MxmReferenceProductBot : Robot {
  public string RegimeFamily {get;set;}="Adaptive";
  [Parameter("Bar Minutes",DefaultValue=5,MinValue=1)]
  public int BarMinutes {get;set;}
+ [Parameter("Max Margin Fraction",DefaultValue=0.4,MinValue=0.1,MaxValue=1.0)]
+ public double MaxMarginFraction {get;set;}=0.4;
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
@@ -56,7 +58,7 @@ public sealed class MxmReferenceProductBot : Robot {
   double units=Symbol.NormalizeVolumeInUnits(Math.Max(RequestedUnits,Symbol.VolumeInUnitsMin),RoundingMode.Up);
   if(units<=0 || units>Symbol.VolumeInUnitsMax)return;
   double margin=Symbol.GetEstimatedMargin(direction,units);
-  if(double.IsNaN(margin)||margin<=0||margin>Account.FreeMargin*0.4)return;
+  if(double.IsNaN(margin)||margin<=0||margin>Account.FreeMargin*MaxMarginFraction)return;
   var placed=ExecuteMarketOrder(direction,SymbolName,units,Label,StopLossPips,null);
   if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
  }

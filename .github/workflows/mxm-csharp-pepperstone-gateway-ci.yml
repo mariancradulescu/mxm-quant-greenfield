@@ -111,7 +111,7 @@ jobs:
           from decimal import Decimal
           m=json.load(open('verification/csharp-research-fixture/research.json'))
           assert m['classification']=='ARTIFICIAL_QUOTES_COST_MATRIX_ONLY'
-          assert m['model_count']==72 and m['full_iso_weeks']==0 and m['no_independent_trial_or_advantage']
+          assert m['model_count']==216 and m['full_iso_weeks']==0 and m['no_independent_trial_or_advantage']
           assert len({z['family'] for z in m['models']})==4
           assert {z['timeframe_minutes'] for z in m['models']}=={1,5,15}
           assert {z['modeled_stop_loss_pips'] for z in m['models']}=={0,12}
@@ -120,20 +120,23 @@ jobs:
               assert z['initial_equity_eur']==200 and z['entries']==z['exits'] and not z['hard21']
               assert abs(Decimal(str(z['net_pnl_eur']))-
                          (Decimal(str(z['final_equity_eur']))-Decimal(200)))<Decimal('.000002')
-              # The product's 40% free-margin gate rejects EUR90/EUR150
-              # margins on a single untouched EUR200 capital account.
-              if z['margin_eur']>80:
+              # At the initial EUR200 equity, unaffordable assumed margins
+              # must never create fictitious fills. Later equity is lower after loss.
+              if z['margin_eur']>200*z['max_margin_fraction_of_free_margin']:
                   assert z['entries']==z['exits']==0 and z['final_equity_eur']==200
               assert z['margin_headroom_rejections']>=0
-              g[(z['family'],z['timeframe_minutes'],z['modeled_stop_loss_pips'])][z['cost_case']]=(Decimal(str(z['net_pnl_eur'])),z['entries'])
-          assert len(g)==24 and all({'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'}==set(v) for v in g.values())
+              g[(z['family'],z['timeframe_minutes'],z['modeled_stop_loss_pips'],z['max_margin_fraction_of_free_margin'])][z['cost_case']]=(Decimal(str(z['net_pnl_eur'])),z['entries'])
+          assert len(g)==72 and all({'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'}==set(v) for v in g.values())
           # Cost monotonicity is meaningful only for identical executed trade
           # counts. A refused order has no P&L and is not a profitable strategy.
           assert all(v['LOW_UNVERIFIED'][0]>=v['BASE_UNVERIFIED'][0]>=v['STRESS_UNVERIFIED'][0]
                      for v in g.values() if len({x[1] for x in v.values()})==1)
-          assert any(z['margin_headroom_rejections']>0 for z in m['models'] if z['margin_eur']>80)
+          assert {z['max_margin_fraction_of_free_margin'] for z in m['models']}=={0.4,0.6,0.8}
+          assert any(z['margin_headroom_rejections']>0 for z in m['models'] if z['margin_eur']>200*z['max_margin_fraction_of_free_margin'])
+          assert any(z['entries']>0 for z in m['models'] if z['margin_eur']==90 and z['max_margin_fraction_of_free_margin']==0.6)
+          assert any(z['entries']>0 for z in m['models'] if z['margin_eur']==150 and z['max_margin_fraction_of_free_margin']==0.8)
           print('MXM_CSHARP_RESEARCH_MATRIX_ARTIFICIAL_ONLY',
-                json.dumps({'models':m['model_count'],'families':4,'timeframes':[1,5,15],'cost_cases':3,'stop_modes':[0,12]}))
+                json.dumps({'models':m['model_count'],'families':4,'timeframes':[1,5,15],'cost_cases':3,'stop_modes':[0,12],'margin_fractions':[0.4,0.6,0.8]}))
           PY
       - name: Check cTrader and offline cold-start equivalence at strategy boundary
         run: |
@@ -143,12 +146,12 @@ jobs:
           assert 'protected override void OnBar()' in p
           assert 'Bars.ClosePrices.Last(1)' in p
           assert 'Bars.ClosePrices[i]' not in p
-          assert 'StopLossPips' in p and 'MxmDecisionKernel(mode)' in p
+          assert 'StopLossPips' in p and 'MaxMarginFraction' in p and 'MxmDecisionKernel(mode)' in p
           assert 'if(!placed.IsSuccessful)' in p
           q=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
           assert 'STOP_QUOTE_MODEL' in q and 'MODELED' not in p
           assert 'modeled_stop_loss_pips' in q and 'slippage_eur=Round(PriceUnits*Slippage*Fx)' in q
-          assert 'margin>realized*0.4m' in q and 'margin_headroom_rejections' in q
+          assert 'margin>realized*maxMarginFraction' in q and 'margin_headroom_rejections' in q
           print('MXM_CSHARP_COLD_START_AND_STOP_SCENARIO_STRUCTURAL_PARITY')
           PY
       - name: Verify gateway never carries secrets in pull request jobs
