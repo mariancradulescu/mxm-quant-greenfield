@@ -23,6 +23,7 @@ jobs:
         with: {persist-credentials: false}
       - name: Verify precommitted four-leaf science, causality and negative time fence
         run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
           python3 -m research_core_v4.laboratory.m5_causal_gross_development --selftest
       - name: Read existing Pepperstone 100 shard dataset inside existing authorized custody and preserve exposed outcomes encrypted
         env:
