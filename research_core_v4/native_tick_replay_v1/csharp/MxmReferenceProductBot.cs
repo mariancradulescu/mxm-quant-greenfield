@@ -153,6 +153,20 @@ public sealed class MxmReferenceProductBot : Robot {
   // This is an account-wide snapshot, not atomic inter-instance order locking.
   // Broker book (all symbols using this MXM label), not local kernel memory, is authoritative.
   int accountOwned=Positions.FindAll(Label).Length;
+  int allAccountPositions=0;
+  foreach(var accountPosition in Positions)allAccountPositions++;
+  int accountPendingOrders=0;
+  foreach(var brokerPendingOrder in PendingOrders)accountPendingOrders++;
+  // The capital is unique and continuously shared. No new order can be
+  // admitted while an unowned position or any broker pending order can
+  // change exposure behind this robot's account-wide budget. Owned exits
+  // above remain permitted, to reduce risk rather than seize foreign trades.
+  string isolation=MxmAccountIsolation.Check(
+   allAccountPositions,accountOwned,accountPendingOrders);
+  if(isolation!=MxmAccountIsolation.Admit){
+   Print("MXM_SHARED_ACCOUNT_ISOLATION_HOLD_"+isolation);return;
+  }
+  // This is a broker snapshot, NOT an atomic inter-instance lease.
   if(!double.IsFinite(Account.Equity)||!double.IsFinite(Account.FreeMargin)||
      !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MinimumFreeMarginReserveEur)||
      MinimumFreeMarginReserveEur<0)return;
