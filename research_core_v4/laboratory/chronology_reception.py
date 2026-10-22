@@ -163,6 +163,21 @@ def verify_tree(tree,receipts,account,side):
     need(all(a[0]<=b[0] for a,b in zip(rows,rows[1:])),'CHRONOLOGY_NOT_ORDERED')
     return rows,complete,used
 
+def quote_update_gap_witness(rows,start_ms,end_ms):
+    """Bound actual update spacing, never infer market closures, fills or quote arrival."""
+    need(type(start_ms) is int and type(end_ms) is int and start_ms<end_ms,'CHRONOLOGY_GAP_WINDOW')
+    stamps=[t for t,_ in rows]
+    need(all(type(t) is int and start_ms<=t<end_ms for t in stamps)
+         and all(a<=b for a,b in zip(stamps,stamps[1:])),'CHRONOLOGY_GAP_TIMESTAMPS')
+    spans=[b-a for a,b in zip([start_ms]+stamps,stamps+[end_ms])]
+    return {'quote_updates':len(stamps),'distinct_update_ms':len(set(stamps)),
+            'longest_no_update_interval_ms':max(spans),
+            'intervals_over_5s':sum(d>5000 for d in spans),
+            'intervals_over_60s':sum(d>60000 for d in spans),
+            'first_update_delay_ms':stamps[0]-start_ms if stamps else None,
+            'last_update_to_window_end_ms':end_ms-stamps[-1] if stamps else None,
+            'semantics':'OBSERVED_UPDATES_ONLY_NOT_MARKET_CLOSURE_OR_HISTORICAL_ARRIVAL'}
+
 def replay(private):
     from m6.ctrader_proto import OpenApiMessages_pb2 as m
     from research_core_v4.shallow_m5_support_v2_production import _fingerprint,ACCOUNT_FINGERPRINT_SHA256
@@ -202,6 +217,8 @@ def replay(private):
         if last_bid is not None and last_ask is not None:crossed+=int(last_ask<last_bid)
     seconds=time.monotonic()-started
     return {'provider_window_complete':bc and ac,'bid_events':len(bid),'ask_events':len(ask),
+            'quote_update_gaps':{'BID':quote_update_gap_witness(bid,POLICY['from_ms'],POLICY['to_ms']),
+                                 'ASK':quote_update_gap_witness(ask,POLICY['from_ms'],POLICY['to_ms'])},
             'chronological_events_processed':events,'chronological_seconds':seconds,
             'events_per_second':events/max(seconds,1e-9),'same_ms_cross_side_order_unknown':ambiguous,
             'crossed_causal_snapshots':crossed,'history_requests':len(receipts)-2,'metadata_requests':2,
