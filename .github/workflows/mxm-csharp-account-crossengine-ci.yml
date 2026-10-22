@@ -1,0 +1,43 @@
+name: MXM CSharp to continuous EUR200 account independent cash crosscheck
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/csharp_account_cross_engine.py
+      - .github/workflows/mxm-csharp-account-crossengine-ci.yml
+      - .github/workflows/mxm-csharp-authentic-cold.yml
+permissions: {contents: read}
+jobs:
+  synthetic-crossengine:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Run original mathematical account samples, no broker credentials
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/mxm-crossengine-fixture
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --model-fixture unused verification/mxm-crossengine-model-fixture
+          python3 -m research_core_v4.laboratory.csharp_account_cross_engine verification/mxm-crossengine-fixture/reference-report.json --out verification/mxm-crossengine-fixture/independent-account-receipt.json
+          python3 -m research_core_v4.laboratory.csharp_account_cross_engine verification/mxm-crossengine-model-fixture/reference-report.json --out verification/mxm-crossengine-model-fixture/independent-account-receipt.json
+      - name: Verify capital, fee, signed PnL and negative ledger tamper cases
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from research_core_v4.laboratory.csharp_account_cross_engine import cash_parity,ParityFailure
+          for p in (Path('verification/mxm-crossengine-fixture'),Path('verification/mxm-crossengine-model-fixture')):
+              x=json.loads((p/'independent-account-receipt.json').read_text())
+              assert x['entry_count']==x['exit_count']==7 and x['shared_initial_capital_eur']==200
+              assert abs(float(x['cash_difference_eur']))<.0005 and x['orders']==0
+              assert float(x['explicit_commission_debit_eur'])==1.4
+              assert x['embedded_price_slippage_and_spread_not_charged_twice']
+              assert x['full_iso_week_coverage']==0 and not x['hard21']
+              raw=json.loads((p/'reference-report.json').read_text())
+              raw['final_equity_eur']+=1
+              try:cash_parity(raw)
+              except ParityFailure as ex:assert 'CASH_MISMATCH' in str(ex)
+              else:raise AssertionError('tampered terminal balance accepted')
+          print('MXM_TWO_INDEPENDENT_ACCOUNT_ENGINES_SYNTHETIC_CASH_PARITY_PASS')
+          PY

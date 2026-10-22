@@ -61,6 +61,7 @@ jobs:
           PY
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-scenario "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-scenario"
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-research "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-research"
+          python3 -m research_core_v4.laboratory.csharp_account_cross_engine "${RUNNER_TEMP}/mxm-csharp-scenario/reference-report.json" --out verification/csharp-authentic-aggregate/independent-account-receipt.json
           python3 - <<'PY'
           import json,os,pathlib
           from research_core_v4.laboratory.common import encoded,bytes_digest,need
@@ -75,6 +76,12 @@ jobs:
                bridge['economic_outcomes']==bridge['orders']==bridge['fills']==0,'CSHARP_BRIDGE_BOUND')
           p=temp/'mxm-csharp-scenario/reference-report.json'
           r=json.loads(p.read_bytes())
+          from pathlib import Path
+          independent=json.loads(Path('verification/csharp-authentic-aggregate/independent-account-receipt.json').read_text())
+          assert independent['entry_count']==r['economic_entries'] and independent['exit_count']==r['economic_exits']
+          assert independent['classification']=='SAME_LEDGER_INDEPENDENT_ACCOUNT_ENGINE_NOT_INDEPENDENT_MARKET_EVIDENCE'
+          assert abs(float(independent['cash_difference_eur']))<0.0005
+          assert independent['orders']==0 and independent['full_iso_week_coverage']==0 and independent['hard21'] is False
           assert r['classification']=='OBSERVED_PEPPERSTONE_QUOTES_ASSUMPTION_SCENARIO_UNCERTIFIED'
           assert r['raw_events']==28212 and not r['authenticated_market_corpus'] and not r['broker_historical_costs_verified']
           assert r['cross_side_same_ms_order_unknown_groups']==11414
@@ -118,12 +125,14 @@ jobs:
             scenario_assumption=r['account_convention'],scenario_unverified_fx_margin_swap_and_fills=True,
             preserved_corpus_sha256=bridge['ciphertext_sha256'],derived_stream_sha256=bridge['derived_ticks_sha256'])
           out=pathlib.Path('verification/csharp-authentic-aggregate');out.mkdir(parents=True,exist_ok=True)
-          full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,
+          full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,
                          'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
           public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')
           ciphertext=out/'modeled-reference.mxmenc'
           encrypt_shard(full,public_key=public,output=ciphertext)
+          safe['independent_cash_replay_parity']='PASS_CASH_ONLY_NOT_MTM_OR_EXECUTION'
+          safe['independent_cash_replay_abs_error_eur']=abs(float(independent['cash_difference_eur']))
           safe['modeled_ciphertext_sha256']=bytes_digest(ciphertext.read_bytes())
           safe['modeled_private_sha256']=bytes_digest(full)
           (out/'receipt.json').write_bytes(encoded(safe))
