@@ -111,19 +111,35 @@ jobs:
           from decimal import Decimal
           m=json.load(open('verification/csharp-research-fixture/research.json'))
           assert m['classification']=='ARTIFICIAL_QUOTES_COST_MATRIX_ONLY'
-          assert m['model_count']==36 and m['full_iso_weeks']==0 and m['no_independent_trial_or_advantage']
+          assert m['model_count']==72 and m['full_iso_weeks']==0 and m['no_independent_trial_or_advantage']
           assert len({z['family'] for z in m['models']})==4
           assert {z['timeframe_minutes'] for z in m['models']}=={1,5,15}
+          assert {z['modeled_stop_loss_pips'] for z in m['models']}=={0,12}
           g=defaultdict(dict)
           for z in m['models']:
               assert z['initial_equity_eur']==200 and z['entries']==z['exits'] and not z['hard21']
               assert abs(Decimal(str(z['net_pnl_eur']))-
                          (Decimal(str(z['final_equity_eur']))-Decimal(200)))<Decimal('.000002')
-              g[(z['family'],z['timeframe_minutes'])][z['cost_case']]=Decimal(str(z['net_pnl_eur']))
-          assert len(g)==12 and all({'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'}==set(v) for v in g.values())
+              g[(z['family'],z['timeframe_minutes'],z['modeled_stop_loss_pips'])][z['cost_case']]=Decimal(str(z['net_pnl_eur']))
+          assert len(g)==24 and all({'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'}==set(v) for v in g.values())
           assert all(v['LOW_UNVERIFIED']>=v['BASE_UNVERIFIED']>=v['STRESS_UNVERIFIED'] for v in g.values())
           print('MXM_CSHARP_RESEARCH_MATRIX_ARTIFICIAL_ONLY',
-                json.dumps({'models':m['model_count'],'families':4,'timeframes':[1,5,15],'cost_cases':3}))
+                json.dumps({'models':m['model_count'],'families':4,'timeframes':[1,5,15],'cost_cases':3,'stop_modes':[0,12]}))
+          PY
+      - name: Check cTrader and offline cold-start equivalence at strategy boundary
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          p=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          assert 'protected override void OnBar()' in p
+          assert 'Bars.ClosePrices.Last(1)' in p
+          assert 'Bars.ClosePrices[i]' not in p
+          assert 'StopLossPips' in p and 'MxmDecisionKernel(mode)' in p
+          assert 'if(!placed.IsSuccessful)' in p
+          q=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
+          assert 'STOP_QUOTE_MODEL' in q and 'MODELED' not in p
+          assert 'modeled_stop_loss_pips' in q and 'slippage_eur=Round(PriceUnits*Slippage*Fx)' in q
+          print('MXM_CSHARP_COLD_START_AND_STOP_SCENARIO_STRUCTURAL_PARITY')
           PY
       - name: Verify gateway never carries secrets in pull request jobs
         run: |
