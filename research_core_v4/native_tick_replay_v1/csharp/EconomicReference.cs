@@ -21,6 +21,7 @@ sealed class Replay {
  long lastT=-1,bidAt=-1,askAt=-1,barStart=-1;
  decimal bid,ask,closeOfBar,realized=200m,peak=200m,maxDrawdown=0m,totalCosts=0m;
  int pendingSignal,ambiguousGroups,gapBars,invalidSnapshots,entries,exits;
+ int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false){synthetic=fixture;scenario=modeledScenario;}
  static decimal Round(decimal x)=>Math.Round(x,6,MidpointRounding.ToEven);
@@ -79,6 +80,7 @@ sealed class Replay {
   }
   foreach(var group in ticks.GroupBy(x=>x.T)){
    var g=group.ToArray();long t=g[0].T;
+   if(g.Any(x=>x.Side=="bid")&&g.Any(x=>x.Side=="ask"))crossSideSameMsGroups++;
    if(g.Where(x=>x.Side=="bid").Select(x=>x.Raw).Distinct().Count()>1 ||
       g.Where(x=>x.Side=="ask").Select(x=>x.Raw).Distinct().Count()>1){
     ambiguousGroups++;continue; // Different same-ms revisions have no trusted cross-side order.
@@ -87,9 +89,13 @@ sealed class Replay {
     if(x.Side=="bid"){bid=x.Raw/100000m;bidAt=t;}
     else {ask=x.Raw/100000m;askAt=t;}
    }
-   if(bidAt<0||askAt<0||bid<=0m||ask<=bid){invalidSnapshots++;continue;}
+   if(bidAt<0||askAt<0||bid<=0m||ask<=0m){invalidSnapshots++;missingSideSnapshots++;continue;}
+   if(ask<bid){invalidSnapshots++;crossedSnapshots++;continue;}
+   // A locked BID=ASK quote is non-crossed, not intrinsically invalid.
+   // Historical FIFO/liquidity at a zero spread remains unproven.
+   if(ask==bid)zeroSpreadSnapshots++;
    // These are last-observed sides, not a historical arrival-time certification.
-   if(t-bidAt>300000||t-askAt>300000){invalidSnapshots++;continue;}
+   if(t-bidAt>300000||t-askAt>300000){invalidSnapshots++;staleSnapshots++;continue;}
    long bar=t/BarMs*BarMs;
    if(barStart>=0 && bar!=barStart) {
     if(bar==barStart+BarMs){
@@ -100,8 +106,8 @@ sealed class Replay {
      kernel.Reset();pendingSignal=0;
     }
    }
-   if(bar!=barStart){barStart=bar;closeOfBar=(bid+ask)/2m;}
-   else closeOfBar=(bid+ask)/2m;
+   if(bar!=barStart){barStart=bar;closeOfBar=bid;}
+   else closeOfBar=bid;
    if(Simulated){
     if(pendingSignal!=0){
      if(pos is not null && pos.Direction!=pendingSignal)Close(t);
@@ -133,7 +139,10 @@ sealed class Replay {
    economic_entries=entries,economic_exits=exits,charged_cost_eur=Round(totalCosts),
    maximum_absolute_drawdown_eur=Round(maxDrawdown),hard21=Simulated && WeekCounts(ticks).Values.All(n=>n>=21),entries_per_iso_week=Simulated?WeekCounts(ticks):new Dictionary<string,int>(),
    raw_events=ticks.Count,bar_decisions=signals.Count,
-   same_ms_conflict_groups=ambiguousGroups,gap_bars=gapBars,invalid_quote_snapshots=invalidSnapshots,
+   feature_price_basis="BID_LAST_OBSERVED_QUOTE_APPROXIMATES_NATIVE_CTRADER_BID_CLOSE_NOT_PARITY_CERTIFICATE",
+   same_ms_conflict_groups=ambiguousGroups,cross_side_same_ms_order_unknown_groups=crossSideSameMsGroups,
+   gap_bars=gapBars,invalid_quote_snapshots=invalidSnapshots,missing_side_snapshots=missingSideSnapshots,
+   crossed_snapshots=crossedSnapshots,stale_snapshots=staleSnapshots,zero_spread_accepted_snapshots=zeroSpreadSnapshots,
    ledger=trades,equity=equityPath,causal_signals=signals
   };
  }
@@ -153,6 +162,10 @@ static class Program {
   }
   return list;
  }
+ static List<Quote> ZeroSpreadFixture(){
+  var original=Fixture();var reference=original.Where(x=>x.Side=="bid").ToDictionary(x=>x.T,x=>x.Raw);
+  return original.Select(x=>x.Side=="ask"?new Quote(x.T,x.Side,reference[x.T]):x).ToList();
+ }
  static List<Quote> Read(string file){
   var rows=new List<Quote>();
   foreach(string line in File.ReadLines(file)){
@@ -165,11 +178,11 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
-   if(args.Length!=3 || !(args[0]=="--fixture"||args[0]=="--model-fixture"||args[0]=="--authentic-nonoutcome"||args[0]=="--authentic-scenario"))
+   if(args.Length!=3 || !(args[0]=="--fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--model-fixture"||args[0]=="--authentic-nonoutcome"||args[0]=="--authentic-scenario"))
     throw new ArgumentException("USAGE: --fixture unused OUT | --model-fixture unused OUT | --authentic-nonoutcome INPUT.ndjson OUT | --authentic-scenario INPUT.ndjson OUT");
-   bool fixture=args[0]=="--fixture"||args[0]=="--model-fixture";
+   bool fixture=args[0]=="--fixture"||args[0]=="--model-fixture"||args[0]=="--zero-spread-fixture";
    if(!fixture && !File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
-   var report=new Replay(fixture,args[0]=="--model-fixture"||args[0]=="--authentic-scenario").Run(fixture?Fixture():Read(args[1]));
+   var report=new Replay(fixture,args[0]=="--model-fixture"||args[0]=="--authentic-scenario").Run(fixture?(args[0]=="--zero-spread-fixture"?ZeroSpreadFixture():Fixture()):Read(args[1]));
    Directory.CreateDirectory(args[2]);
    var options=new JsonSerializerOptions{WriteIndented=true};
    File.WriteAllText(Path.Combine(args[2],"reference-report.json"),JsonSerializer.Serialize(report,options));
