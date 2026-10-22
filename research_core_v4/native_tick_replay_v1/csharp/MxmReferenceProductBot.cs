@@ -17,6 +17,8 @@ public sealed class MxmReferenceProductBot : Robot {
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
   kernel.Reset();
+  // Reference kernel consumes M5 only. No silent timeframe substitution.
+  if(TimeFrame!=cAlgo.API.TimeFrame.Minute5){Print("MXM_REQUIRES_M5");Stop();return;}
   // The current running bar must not be a warmup feature.
   for(int i=Math.Max(0,Bars.Count-7);i<Bars.Count-1;i++)
    kernel.OnCompletedBar((decimal)Bars.ClosePrices[i]);
@@ -24,9 +26,13 @@ public sealed class MxmReferenceProductBot : Robot {
   if(Positions.FindAll(Label,SymbolName).Length>1)Print("MXM_DUPLICATE_OWNED_POSITIONS_SAFE_HOLD");
  }
  protected override void OnBarClosed() {
-  int desired=kernel.OnCompletedBar((decimal)Bars.ClosePrices.Last(0));
-  // Never permit LIVE orders under the present mandate, even if parameter is enabled.
-  if(!EnableDemoTrading || Account.IsLive || desired==0 || !Symbol.MarketHours.IsOpened())return;
+  // OnBarClosed fires on the opening of the NEXT bar. Last(1) is the completed bar.
+  if(Bars.Count<3)return;
+  if((Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes!=5)kernel.Reset();
+  int desired=kernel.OnCompletedBar((decimal)Bars.ClosePrices.Last(1));
+  // Backtesting is simulation; realtime LIVE trading is never authorized.
+  bool simulation=IsBacktesting;
+  if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || desired==0 || !Symbol.MarketHours.IsOpened())return;
   var owned=Positions.FindAll(Label,SymbolName);
   if(owned.Length>1){Print("MXM_MULTIPLE_POSITIONS_SAFE_HOLD");return;}
   TradeType direction=desired>0?TradeType.Buy:TradeType.Sell;

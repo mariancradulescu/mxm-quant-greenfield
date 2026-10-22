@@ -40,6 +40,22 @@ jobs:
           assert r['pepperstone_historical_fills_proven'] is False and r['cTrader_native_backtest'] is False
           assert len(r['ledger'])==2*r['economic_entries'] and len(r['equity'])>len(r['ledger'])
           assert r['bar_decisions']>0 and r['hard21'] is False
+          from decimal import Decimal
+          from collections import defaultdict
+          ledger=r['ledger']
+          entries=[x for x in ledger if x['kind']=='ENTRY']
+          exits=[x for x in ledger if x['kind']=='EXIT']
+          assert r['economic_entries']==len(entries)==len(exits)==3
+          assert all(a['timestamp_ms']<=b['timestamp_ms'] and a['direction']==b['direction'] for a,b in zip(entries,exits))
+          assert r['entries_per_iso_week']=={'2025-W02':3}
+          expected=Decimal('200')+sum(Decimal(str(x['gross_price_pnl_eur']))-Decimal('0.2') for x in exits)
+          assert expected==Decimal(str(r['final_equity_eur']))==Decimal('202.47')
+          assert Decimal(str(r['charged_cost_eur']))==Decimal('0.66')
+          path=r['equity'];peak=Decimal('200');dd=Decimal(0)
+          for point in path:
+              eq=Decimal(str(point['equity_eur']))
+              peak=max(peak,eq);dd=max(dd,peak-eq)
+          assert dd==Decimal(str(r['maximum_absolute_drawdown_eur']))==Decimal('0.96')
           print('CSHARP_MATHEMATICAL_REFERENCE',json.dumps({k:r[k] for k in ('initial_equity_eur','final_equity_eur','economic_entries','economic_exits','charged_cost_eur','maximum_absolute_drawdown_eur','bar_decisions','hard21','classification')},sort_keys=True))
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

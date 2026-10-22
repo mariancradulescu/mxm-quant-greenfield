@@ -46,6 +46,26 @@ sealed class Replay {
    balance_eur=Round(realized),entry_timestamp_ms=pos.OpenT});
   pos=null;
  }
+ Dictionary<string,int> WeekCounts(IReadOnlyList<Quote> ticks){
+  var counts=new Dictionary<string,int>();
+  if(ticks.Count==0)return counts;
+  var start=DateTimeOffset.FromUnixTimeMilliseconds(ticks[0].T).UtcDateTime;
+  var end=DateTimeOffset.FromUnixTimeMilliseconds(ticks[ticks.Count-1].T).UtcDateTime;
+  var monday=start.Date.AddDays(-(((int)start.DayOfWeek+6)%7));
+  while(monday<=end){
+   var k=System.Globalization.ISOWeek.GetYear(monday)+"-W"+System.Globalization.ISOWeek.GetWeekOfYear(monday).ToString("D2");
+   counts[k]=0;monday=monday.AddDays(7);
+  }
+  foreach(var row in trades){
+   // Ledger rows are anonymous event records; no economic counting from signals.
+   var item=JsonSerializer.SerializeToElement(row);
+   if(item.GetProperty("kind").GetString()!="ENTRY")continue;
+   var t=DateTimeOffset.FromUnixTimeMilliseconds(item.GetProperty("timestamp_ms").GetInt64()).UtcDateTime;
+   var k=System.Globalization.ISOWeek.GetYear(t)+"-W"+System.Globalization.ISOWeek.GetWeekOfYear(t).ToString("D2");
+   counts[k]++;
+  }
+  return counts;
+ }
  public object Run(IReadOnlyList<Quote> ticks) {
   if(ticks.Count==0)throw new InvalidDataException("EMPTY_TICK_INPUT");
   for(int i=0;i<ticks.Count;i++){
@@ -102,7 +122,7 @@ sealed class Replay {
    account_convention=synthetic?"FIXTURE_EURUSD_QUOTE_TO_EUR_AT_1;MIN_1000_UNITS;MARGIN_EUR50;PER_SIDE_FEE_EUR0.10;SLIPPAGE_0.00001;NOT_PEPPERSTONE_TERMS":"NONE_NO_ECONOMIC_FILLS",
    initial_equity_eur=200m,final_equity_eur=synthetic?Round(realized):(decimal?)null,
    economic_entries=entries,economic_exits=exits,charged_cost_eur=Round(totalCosts),
-   maximum_absolute_drawdown_eur=Round(maxDrawdown),hard21=false,
+   maximum_absolute_drawdown_eur=Round(maxDrawdown),hard21=synthetic && WeekCounts(ticks).Values.All(n=>n>=21),entries_per_iso_week=synthetic?WeekCounts(ticks):new Dictionary<string,int>(),
    raw_events=ticks.Count,bar_decisions=signals.Count,
    same_ms_conflict_groups=ambiguousGroups,gap_bars=gapBars,invalid_quote_snapshots=invalidSnapshots,
    ledger=trades,equity=equityPath,causal_signals=signals
