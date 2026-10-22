@@ -1,0 +1,302 @@
+name: MXM P0 successor catalogue integration CI
+on:
+  push:
+    branches: [mxm-p0-integrated-cache-successor-20261020]
+  pull_request:
+    branches: [mxm-o04-successor-code-integrated-p0-r2, mxm-p0-integrated-cache-successor-20261020]
+permissions: {contents: read}
+jobs:
+  shared-catalogue-regression:
+    needs: workflow-boundary-source-regression
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: aa41ee31268bcf773f5f9299ac611d4bae7b88ff
+          path: .selector-baseline
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 9cc74472858ebcb3a80a3a7f12ad67f348304d13
+          path: .chronology-baseline
+          persist-credentials: false
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 13c9861c0805de44cee082b6f3b2474795a32ef4
+          path: .publication-test-baseline
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: db23bc18b85214a71bfb093b8416e3f51ade175c
+          path: .historical-staging-source
+          sparse-checkout: .github/workflows/v4-asymmetric-staging-bootstrap.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: fe551a1c45f63209b63f90459c2b8366a68662a6
+          path: .historical-m6-source
+          sparse-checkout: .github/workflows/m6_preparation.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Verify historical fixture origins and retain installed legacy denial
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,subprocess,unittest
+          from tests.historical_workflow_fixtures import FIXTURES,historical_workflow_source,assert_current_quarantined
+          for name,folder in [('staging','.historical-staging-source'),('m6','.historical-m6-source')]:
+              sha,path,_,_=FIXTURES[name]
+              assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=folder,text=True).strip()==sha
+              assert (pathlib.Path(folder)/path).read_bytes()==historical_workflow_source(name).encode()
+              assert_current_quarantined(name)
+          def old_module(name):
+              path=pathlib.Path('.publication-test-baseline/tests')/(name+'.py')
+              spec=importlib.util.spec_from_file_location('old_'+name,path)
+              module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+          old=old_module('test_research_core_v4_staging_publish')
+          before=unittest.TestResult()
+          unittest.defaultTestLoader.loadTestsFromTestCase(old.StagingPublishTests).run(before)
+          assert before.testsRun==12 and len(before.errors)==12 and not before.failures
+          assert all('ValueError:' in trace and 'not in list' in trace for _,trace in before.errors)
+          old_m6=old_module('test_m6_ctrader_capture')
+          m6_before=unittest.TestResult()
+          old_m6.CTraderCaptureCoreTests('test_29_workflow_installs_runtime_imports_preflights_and_builds_package').run(m6_before)
+          assert m6_before.testsRun==1 and len(m6_before.failures)==1 and not m6_before.errors
+          print('HISTORICAL_WORKFLOW_BEFORE:12 expected shell lookup errors and1 expected archived M6 workflow failure on immutable13c986 test source')
+          names=['tests.test_historical_workflow_fixtures','tests.test_research_core_v4_staging_publish','tests.test_m6_ctrader_capture']
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+          assert result.testsRun==55 and result.wasSuccessful()
+          print('HISTORICAL_WORKFLOW_AFTER:55 real synthetic tests; original Git-bound scripts tested; installed legacy workflows remain disabled')
+          PY
+      - name: Reproduce historical import contamination and verify isolated publication
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,subprocess,sys,types,unittest
+          from unittest.mock import patch
+          baseline=pathlib.Path('.publication-test-baseline')
+          assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='13c9861c0805de44cee082b6f3b2474795a32ef4'
+          spec=importlib.util.spec_from_file_location('publication_test_baseline',baseline/'tests/test_research_core_v4_publication_only.py')
+          old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)
+          with patch.dict(sys.modules,{'research_core_v4.numeric_worker_v1':types.ModuleType('preexisting_unrelated_import')}):
+              before=unittest.TestResult();old.PublicationOnlyTests('test_23_no_scientific_imports').run(before)
+              assert before.testsRun==1 and len(before.failures)==1 and not before.errors
+              print('PUBLICATION_IMPORT_BEFORE: one expected failure on immutable 13c986 test')
+              from tests.test_research_core_v4_publication_only import PublicationOnlyTests
+              after=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(PublicationOnlyTests))
+              assert after.testsRun==28 and after.wasSuccessful()
+          PY
+      - name: Reproduce two selector defects on immutable pre-repair source
+        run: |
+          python3 - <<'PY'
+          import ast,hashlib,importlib.util,pathlib,subprocess,sys,unittest
+          root=pathlib.Path.cwd()
+          baseline=root/'.selector-baseline'
+          assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='aa41ee31268bcf773f5f9299ac611d4bae7b88ff'
+          source=(baseline/'research_core_v4/laboratory/integrated.py').read_text()
+          worker=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='execute')
+          nodes=[n.value for n in ast.walk(worker) if isinstance(n,ast.Assign) and len(n.targets)==1 and isinstance(n.targets[0],ast.Name) and n.targets[0].id=='m' and isinstance(n.value,ast.Call) and isinstance(n.value.func,ast.Name) and n.value.func.id=='next']
+          assert len(nodes)==1
+          code=compile(ast.Expression(nodes[0]),str(baseline/'research_core_v4/laboratory/integrated.py'),'eval')
+          sys.path.insert(0,str(baseline))
+          from research_core_v4.laboratory import execution
+          assert pathlib.Path(execution.__file__).resolve().is_relative_to(baseline.resolve())
+          def legacy(private,admission,book):
+              return eval(code,{'p':private,'a':admission,'__builtins__':{'next':next}})
+          execution.next_admitted_programme=legacy
+          name='research_core_v4.laboratory.test_integrated_programme_selection'
+          spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_integrated_programme_selection.py')
+          module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          case=module.IntegratedProgrammeSelectionTests
+          suite=unittest.TestSuite(case(n) for n in ('test_prospective_priorities_produce_actual_A_B_resume_A','test_ambiguous_pending_programme_is_never_scheduled_around'))
+          result=unittest.TextTestRunner(verbosity=2).run(suite)
+          assert result.testsRun==2 and len(result.failures)==2 and not result.errors
+          print('MXM_NATIVE_SELECTOR_BEFORE: two expected semantic failures on immutable baseline aa41ee31268bcf773f5f9299ac611d4bae7b88ff; expression SHA256='+hashlib.sha256(ast.dump(nodes[0]).encode()).hexdigest())
+          PY
+      - name: Reproduce chronological defects on immutable recovery source
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,subprocess,sys,unittest
+          root=pathlib.Path.cwd();baseline=root/'.chronology-baseline'
+          assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='9cc74472858ebcb3a80a3a7f12ad67f348304d13'
+          sys.path.insert(0,str(baseline))
+          from competition import continuous_account_replay_v2 as engine
+          assert pathlib.Path(engine.__file__).resolve().is_relative_to(baseline.resolve())
+          name='research_core_v4.laboratory.test_chronological_contracts'
+          spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_chronological_contracts.py')
+          module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))
+          assert result.testsRun==12 and len(result.failures)==13 and not result.errors
+          print('MXM_CHRONOLOGY_BEFORE: immutable9cc7447;12 methods;13 expected assertion failures;0 errors;artificial inputs only')
+          PY
+      - name: Reproduce resource, partition and semantic defects on immutable source
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,sys,unittest
+          root=pathlib.Path.cwd();baseline=root/'.chronology-baseline'
+          sys.path.insert(0,str(baseline))
+          suite=unittest.TestSuite()
+          for short in ('test_resource_contracts','test_partition_authority','test_semantic_schema'):
+              name='research_core_v4.laboratory.'+short
+              spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory'/(short+'.py'))
+              module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+              if short=='test_semantic_schema':
+                  suite.addTests(module.SemanticSchema(k) for k in ('test_numeric_cosmetic_and_universe_equivalence','test_unknown_top_level_field_is_not_a_new_identity'))
+              else:suite.addTests(unittest.defaultTestLoader.loadTestsFromModule(module))
+          result=unittest.TextTestRunner(verbosity=2).run(suite)
+          assert result.testsRun==9 and len(result.failures)==15 and not result.errors
+          print('MXM_RESOURCE_PARTITION_SEMANTIC_BEFORE: immutable9cc7447;9 methods;15 expected assertion failures;0 errors')
+          PY
+      - name: Reproduce checkout provenance defects on immutable recovery source
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,sys,unittest
+          root=pathlib.Path.cwd();baseline=root/'.chronology-baseline'
+          sys.path.insert(0,str(baseline))
+          name='research_core_v4.laboratory.test_checkout_provenance'
+          spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_checkout_provenance.py')
+          module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))
+          assert result.testsRun==5 and len(result.failures)==15 and not result.errors
+          print('MXM_CHECKOUT_BEFORE: immutable9cc7447;5 methods;15 expected assertion failures;0 errors;artificial native fixtures only')
+          PY
+      - name: Reproduce mutable-source admission on immutable recovery source
+        run: |
+          python3 - <<'PY'
+          import importlib.util,pathlib,sys,unittest
+          root=pathlib.Path.cwd();baseline=root/'.chronology-baseline'
+          sys.path.insert(0,str(baseline))
+          name='research_core_v4.laboratory.test_source_freeze'
+          spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_source_freeze.py')
+          module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))
+          assert result.testsRun==3 and len(result.failures)==10 and not result.errors
+          print('MXM_SOURCE_FREEZE_BEFORE: immutable9cc7447;3 methods;10 expected assertion failures;0 errors')
+          PY
+      - name: Reproduce source namespace and historical fence drift defects
+        run: |
+          python3 - <<'PYCODE'
+          import importlib.util,pathlib,sys,unittest
+          root=pathlib.Path.cwd();sys.path.insert(0,str(root/'.chronology-baseline'))
+          for stem in ('test_source_freeze','test_source_namespace'):
+              name='research_core_v4.laboratory.'+stem
+              spec=importlib.util.spec_from_file_location(name,root/('research_core_v4/laboratory/'+stem+'.py'))
+              module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))
+          assert result.testsRun==2 and len(result.failures)==3 and not result.errors
+          print('MXM_NAMESPACE_BEFORE: immutable9cc7447;2 methods;3 expected assertion failures;0 errors')
+          PYCODE
+      - name: All laboratory modules and continuous account regressions
+        run: |
+          python3 - <<'PY'
+          import pathlib, unittest
+          names = sorted(str(p.with_suffix('')).replace('/', '.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))
+          names.append('tests.test_continuous_account_replay_v2')
+          result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+          raise SystemExit(not result.wasSuccessful())
+          PY
+      - name: Verify real protected OWNER/R2/checkpoint20 evidence via GitHub GET only
+        run: python3 -m research_core_v4.laboratory.live_preflight_v3
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Measure native read-token visibility of existing control ACLs
+        run: |
+          python3 - <<'PY'
+          import json
+          from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
+          route=GetOnly()
+          for ident in (25222248,25461184,25461373,25461529):
+              policy=route.json('rulesets/'+str(ident))
+              print('MXM_NATIVE_ACL_VISIBILITY '+json.dumps({'ruleset':ident,'enforcement':policy['enforcement'],'updated_at':policy['updated_at'],'bypass_field_present':'bypass_actors' in policy,'bypass_actors':policy.get('bypass_actors')}))
+          PY
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+
+  chronology-source-regression:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          persist-credentials: false
+      - run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Exact existing R7 core and prospective chronology helper source
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          from research_core_v4.laboratory.runtime import module_digest
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='d2fae5641b759b1c8c24161d83d62d39e104eafd'
+          assert module_digest()=='1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10'
+          PY
+      - name: Full304 existing laboratory and finite chronology adversarial regressions
+        run: |
+          python3 - <<'PY'
+          import pathlib,unittest
+          names=sorted(str(p.with_suffix('')).replace('/','.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))+['tests.test_continuous_account_replay_v2']
+          result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+          raise SystemExit(not result.wasSuccessful())
+          PY
+
+  workflow-boundary-source-regression:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 33490c04e27124354ec2eee0d0eb126b413373ce
+          path: .workflow-boundary-source
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ba265381fb8d39a18dd99b8698005bc103720913
+          path: .boundary-original-main
+          sparse-checkout: |
+            .github/workflows
+            verification/P0_FAULT_ISOLATION_GUARD.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 36ffe2999aae332b2d408c9d12d32bfabfa70802
+          path: .boundary-original-exec
+          sparse-checkout: |
+            .github/workflows
+            verification/P0_FAULT_ISOLATION_GUARD.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - working-directory: .workflow-boundary-source
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Bind complete original inventories and reproduce unknown-workflow gap without credentials
+        working-directory: .workflow-boundary-source
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,subprocess
+          from verification import R3_WORKFLOW_BOUNDARY as b
+          from research_core_v4.laboratory.runtime import module_digest
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='33490c04e27124354ec2eee0d0eb126b413373ce'
+          assert module_digest()=='1ae2c01634358007de8d079941022533980c47d9b55b1285854c9d3ef841be10'
+          provenance=json.loads((b.SNAPSHOTS/'PROVENANCE.json').read_bytes())
+          for mode,folder in [('main','../.boundary-original-main'),('exec','../.boundary-original-exec')]:
+              root=pathlib.Path(folder)
+              assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()==provenance[mode]['source_sha']
+              paths={str(p.relative_to(root)) for p in (root/'.github/workflows').iterdir() if p.suffix.lower() in ('.yml','.yaml')}
+              assert paths==set(b.baseline(mode))
+              assert all((root/path).read_bytes()==raw.encode() for path,raw in b.baseline(mode).items())
+          assert pathlib.Path('../.boundary-original-exec/verification/P0_FAULT_ISOLATION_GUARD.py').read_bytes()==(b.SNAPSHOTS/'previous_guard.py.txt').read_bytes()
+          print('MXM_NATIVE_BOUNDARY_ORIGINS: exact35 main +238 execution workflows; original installed guard reproduced; no key or environment access')
+          PY
+      - working-directory: .workflow-boundary-source
+        run: python3 verification/R3_WORKFLOW_BOUNDARY.py self-test

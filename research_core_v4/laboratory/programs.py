@@ -12,7 +12,7 @@ from .admission import TypedTrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
-OPS={'quote_dependencies','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
+OPS={'quote_dependencies','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report','native_corpus_readonly'}
 AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
 
@@ -33,7 +33,7 @@ def validate_manifest(m,history,global_book):
     charged=[]
     for ident,t in tasks.items():
         need(ID.fullmatch(ident) and t['operator'] in OPS,'OPERATOR')
-        if m['mode']=='TECHNICAL_NONOUTCOME':need(t['operator'] in ('classify','report') and m['budget']['new_identities']==m['budget']['broker_requests']==t['trial_units']==0,'TECHNICAL_NONOUTCOME_SCOPE')
+        if m['mode']=='TECHNICAL_NONOUTCOME':need(t['operator'] in ('classify','report','native_corpus_readonly') and m['budget']['new_identities']==m['budget']['broker_requests']==t['trial_units']==0,'TECHNICAL_NONOUTCOME_SCOPE')
         if typed:need(t['operator'] not in ('screen','replay','robustness','catalogue'),'TYPED_OPERATOR_REQUIRES_EXACT_OUTCOME_HOOK')
         need(type(t['priority']) is int and type(t['trial_units']) is int and t['trial_units']>=0,'TASK_BUDGET')
         need(set(t['dependencies'])<=set(tasks) and ident not in t['dependencies'],'DEPENDENCY')
@@ -78,17 +78,50 @@ class Laboratory:
           'version':self.m['version'],'sequence':0,'results':{},'skipped':{},'pending':None,'steps_used':0,'safe_stop':False,'stop_reason':None,'journal':[]}
         self.check()
     def check(self):
+        self.acquisition.check()
         s=self.state;need(s['schema']=='mxm.laboratory-progress.v1' and s['manifest_sha256']==digest(self.m),'CHECKPOINT_MANIFEST_CHANGED')
         need(s['programme']==self.m['id'] and s['version']==self.m['version'],'CHECKPOINT_IDENTITY')
         need(set(s['results'])<=set(self.m['tasks']) and set(s['skipped'])<=set(self.m['tasks']),'CHECKPOINT_TASKS')
+        need(set(s['results']).isdisjoint(s['skipped']),'CHECKPOINT_TASK_TERMINAL_COLLISION')
         need(s['pending'] is None,'UNSAFE_PENDING_RESUME')
         need(s['steps_used']==len(s['results']) and s['steps_used']<=self.m['budget']['steps'],'CHECKPOINT_BUDGET')
         prev=None
         for i,e in enumerate(s['journal']):
             need(e['sequence']==i+1 and e['previous']==prev and e['sha256']==digest({k:v for k,v in e.items() if k!='sha256'}),'CHECKPOINT_JOURNAL_CHANGED');prev=e['sha256']
         need(len(s['journal'])==s['sequence']==len(s['results']),'CHECKPOINT_SEQUENCE')
-        for e in s['journal']:need(digest(s['results'][e['task']])==e['result_sha256'],'CHECKPOINT_RESULT_CHANGED')
+        need({e['task'] for e in s['journal']}==set(s['results']) and
+             len({e['task'] for e in s['journal']})==len(s['journal']),
+             'CHECKPOINT_TASK_RESULT_BIJECTION')
+        executed=set()
+        for e in s['journal']:
+            task=self.m['tasks'][e['task']]
+            need(digest(s['results'][e['task']])==e['result_sha256'],'CHECKPOINT_RESULT_CHANGED')
+            need(set(task['dependencies'])<=executed,'CHECKPOINT_DEPENDENCY_EVENT_ORDER')
+            need(all(d in s['results'] and s['results'][d]['classification'] in states
+                     for d,states in task.get('when',{}).items()) and
+                 not any(d in s['skipped'] for d in task['dependencies']),
+                 'CHECKPOINT_EXECUTED_DEPENDENCY_VERDICT')
+            executed.add(e['task'])
+        # A skip must be derivable from the sealed DAG and actual completed
+        # verdicts. Roots, unfinished dependencies, favorable conditions and
+        # mutually supporting forged skips cannot establish terminality.
+        unproven=set(s['skipped']);proven=set(s['results'])
+        need(all(reason=='DECLARED_DEPENDENCY_VERDICT' for reason in s['skipped'].values()),
+             'CHECKPOINT_SKIP_REASON')
+        while unproven:
+            ready=[ident for ident in sorted(unproven)
+                   if set(self.m['tasks'][ident]['dependencies'])<=proven]
+            need(ready,'CHECKPOINT_SKIP_UNPROVEN_DEPENDENCY')
+            for ident in ready:
+                task=self.m['tasks'][ident]
+                allowed=all(d in s['results'] and s['results'][d]['classification'] in states
+                            for d,states in task.get('when',{}).items()) and not any(
+                            d in s['skipped'] for d in task['dependencies'])
+                need(not allowed,'CHECKPOINT_SKIP_WITHOUT_REJECTING_VERDICT')
+                unproven.remove(ident);proven.add(ident)
         if s['safe_stop'] and s['stop_reason']=='AUTHORIZED_PROGRAMME_COMPLETE':
+            need(set(s['results'])|set(s['skipped'])==set(self.m['tasks']),
+                 'CHECKPOINT_INCOMPLETE_TERMINAL')
             for task,expect in self.m.get('acceptance',{}).items():
                 need(task in s['results'] and s['results'][task]['classification']==expect['classification'],'RECEPTION_CLASSIFICATION')
                 for path,expected in expect.get('value_equal',{}).items():
@@ -141,8 +174,13 @@ class Laboratory:
                 asset=self.cache.ingest(x['manifest'],x['rows']);a=self.cache.assets[asset]
                 value={'asset_id':asset,'quality':a};verdict='DATA_VALID' if not a['invalid'] and not a['conflicts'] and a['row_count'] and a['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
             elif op=='acquire':
-                need(self.acquisition.budget.get(x['kind'],0)<=self.m['budget']['broker_requests'],'NETWORK_BUDGET')
                 value=self.acquisition.request(x);verdict='DATA_VALID' if self.cache.assets[value['asset_id']]['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
+            elif op=='native_corpus_readonly':
+                need(self.m['mode']=='TECHNICAL_NONOUTCOME' and
+                     hasattr(self,'authentic_corpus'),'AUTHENTIC_NONOUTCOME_ONLY')
+                from .execution import preserved_pepperstone_nonoutcome
+                value=preserved_pepperstone_nonoutcome(self,self.authentic_corpus,x['max_quotes'])
+                verdict=value['classification']
             elif op=='quote_dependencies':
                 from .volume_pressure import quote_dependencies
                 value=quote_dependencies(self,x['generated'],x['policy'])
@@ -185,8 +223,17 @@ class Laboratory:
         self.check();return deepcopy({'schema':'mxm.integrated-laboratory-checkpoint.v1','programme':self.m,'progress':self.state,
           'trial_book':self.book.export(),'catalogue':self.cache.export(),'acquisition_budget':self.acquisition.budget,'acquisition_remaining':self.acquisition.remaining,'native_receipts':self.acquisition.receipts})
     @classmethod
-    def restore(cls,value,history,collector=None):
+    def restore(cls,value,history,collector=None,*,shared_catalogue=None):
         need(value['schema']=='mxm.integrated-laboratory-checkpoint.v1','CHECKPOINT_SCHEMA')
         book=TypedTrialBook.restore(value['trial_book']) if value['trial_book'].get('schema')==TypedTrialBook.SCHEMA else TrialBook.restore(value['trial_book'])
-        obj=cls(value['programme'],history,book,DataCatalogue.restore(value['catalogue']),collector,state=value['progress'])
-        obj.acquisition.budget=value['acquisition_budget'];obj.acquisition.remaining=value['acquisition_remaining'];obj.acquisition.receipts=value['native_receipts'];return obj
+        saved=DataCatalogue.restore(value['catalogue'])
+        if shared_catalogue is not None:
+            from .execution import catalogue_extends
+            shared=DataCatalogue.restore(shared_catalogue)
+            catalogue_extends(shared.export(),saved.export())
+            selected=shared
+        else:
+            selected=saved
+        obj=cls(value['programme'],history,book,selected,collector,state=value['progress'])
+        obj.acquisition.budget=deepcopy(value['acquisition_budget']);obj.acquisition.remaining=value['acquisition_remaining'];obj.acquisition.receipts=deepcopy(value['native_receipts'])
+        obj.check();return obj

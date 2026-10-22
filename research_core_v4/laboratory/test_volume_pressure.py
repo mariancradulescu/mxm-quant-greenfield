@@ -1,6 +1,6 @@
 """New research extractor checks, separate from accepted laboratory reception."""
 import unittest
-from types import SimpleNamespace
+from .data import DataCatalogue,DEVELOPMENT_END_MS
 from .common import LabError
 from .volume_pressure import volume_pressure_intents
 
@@ -12,7 +12,7 @@ class VolumePressure(unittest.TestCase):
         rows[-1].update(open=100.,high=102.,low=98.,close=101.5,volume=20.)
         spec={'parameters':{'volume_pressure':{'prior_bars':12,'volume_multiple':2,'close_location_threshold':.8,
           'entry_delay_ms':1000,'hold_ms':1800000,'symbols':{'A':9},'decision_times_ms':[decision]}}}
-        cache=SimpleNamespace(assets={'a':{'partition':'DEVELOPMENT','resolution':'M5','instrument':'A',
+        cache=DataCatalogue(assets={'a':{'partition':'DEVELOPMENT','resolution':'M5','instrument':'A',
           'trust':'AUTHENTICATED_NATIVE_COLLECTION','invalid':0,'conflicts':0}},rows={'a':rows})
         return decision,spec,cache
     def test_exact_known_pressure_and_no_overlap_horizon(self):
@@ -35,6 +35,6 @@ class VolumePressure(unittest.TestCase):
     def test_future_and_synthetic_assets_rejected(self):
         d,s,c=self.setup_case();c.assets['a']['trust']='SYNTHETIC'
         with self.assertRaises(LabError):volume_pressure_intents(s,c,{'A':'a'})
-        d,s,c=self.setup_case();s['parameters']['volume_pressure']['decision_times_ms']=[1789603200000]
+        d,s,c=self.setup_case();s['parameters']['volume_pressure']['decision_times_ms']=[DEVELOPMENT_END_MS]
         with self.assertRaises(LabError):volume_pressure_intents(s,c,{'A':'a'})
 if __name__=='__main__':unittest.main()

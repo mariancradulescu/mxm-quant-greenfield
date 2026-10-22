@@ -1,0 +1,56 @@
+{
+  "name": "MXM R3 historic suite diagnostic",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-p0-integrated-cache-successor-20261020"
+      ],
+      "paths": [
+        ".github/workflows/mxm-r3-historical-suite-diagnostic.yml",
+        "research_core_v4/laboratory/historical_suite_diagnostic.py",
+        "tests/test_master1576_real_execution_architecture_v1.py",
+        "tests/test_research_core_v4_publication_only.py",
+        "tests/test_research_core_v4_staging_publish.py",
+        "tests/test_m6_ctrader_capture.py",
+        "tests/historical_workflow_fixtures.py",
+        "tests/test_historical_workflow_fixtures.py",
+        "docs/laboratory-completion/20261020/historical-workflow-fixtures/**"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "jobs": {
+    "historic-suite": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "fetch-depth": 0,
+            "persist-credentials": false
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock"
+        },
+        {
+          "name": "Run original full suite without production credentials; retain failures",
+          "run": "python3 -m research_core_v4.laboratory.historical_suite_diagnostic"
+        },
+        {
+          "if": "always()",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "historic-suite-${{ github.run_id }}",
+            "path": "verification/historical-suite/",
+            "if-no-files-found": "error"
+          }
+        }
+      ]
+    }
+  }
+}

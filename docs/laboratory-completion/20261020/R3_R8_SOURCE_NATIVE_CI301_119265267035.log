@@ -1,0 +1,1442 @@
+﻿2026-10-21T13:58:14.4643969Z Current runner version: '2.338.0'
+2026-10-21T13:58:14.4664333Z ##[group]Runner Image Provisioner
+2026-10-21T13:58:14.4664998Z Hosted Compute Agent
+2026-10-21T13:58:14.4665574Z Version: 20261012.601
+2026-10-21T13:58:14.4666116Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-21T13:58:14.4666781Z Build Date: 2026-10-12T17:48:21Z
+2026-10-21T13:58:14.4667336Z Worker ID: {558adfb5-56e8-4eff-866e-b66493298a48}
+2026-10-21T13:58:14.4667901Z Region: westus3
+2026-10-21T13:58:14.4668402Z Cloud: Azure
+2026-10-21T13:58:14.4668868Z ##[endgroup]
+2026-10-21T13:58:14.4670372Z ##[group]Operating System
+2026-10-21T13:58:14.4670908Z Ubuntu
+2026-10-21T13:58:14.4671337Z 24.04.5
+2026-10-21T13:58:14.4671802Z LTS
+2026-10-21T13:58:14.4672252Z ##[endgroup]
+2026-10-21T13:58:14.4672693Z ##[group]Runner Image
+2026-10-21T13:58:14.4673311Z Image: ubuntu-24.04
+2026-10-21T13:58:14.4673768Z Version: 20261012.334.1
+2026-10-21T13:58:14.4674852Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-21T13:58:14.4676091Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-21T13:58:14.4676883Z ##[endgroup]
+2026-10-21T13:58:14.4677727Z ##[group]GITHUB_TOKEN Permissions
+2026-10-21T13:58:14.4679369Z Contents: read
+2026-10-21T13:58:14.4679889Z Metadata: read
+2026-10-21T13:58:14.4680702Z ##[endgroup]
+2026-10-21T13:58:14.4682344Z Secret source: Actions
+2026-10-21T13:58:14.4683197Z Cache mode: write
+2026-10-21T13:58:14.4683743Z Prepare workflow directory
+2026-10-21T13:58:14.4959372Z Prepare all required actions
+2026-10-21T13:58:14.5012612Z Getting action download info
+2026-10-21T13:58:14.7758234Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+2026-10-21T13:58:15.0080729Z Complete job name: shared-catalogue-regression
+2026-10-21T13:58:15.0703536Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T13:58:15.0704718Z with:
+2026-10-21T13:58:15.0705235Z   persist-credentials: false
+2026-10-21T13:58:15.0705872Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:15.0709384Z   token: ***
+2026-10-21T13:58:15.0709724Z   ssh-strict: true
+2026-10-21T13:58:15.0710062Z   ssh-user: git
+2026-10-21T13:58:15.0710529Z   clean: true
+2026-10-21T13:58:15.0710875Z   sparse-checkout-cone-mode: true
+2026-10-21T13:58:15.0711278Z   fetch-depth: 1
+2026-10-21T13:58:15.0711604Z   fetch-tags: false
+2026-10-21T13:58:15.0711947Z   show-progress: true
+2026-10-21T13:58:15.0712286Z   lfs: false
+2026-10-21T13:58:15.0712607Z   submodules: false
+2026-10-21T13:58:15.0712947Z   set-safe-directory: true
+2026-10-21T13:58:15.0713623Z ##[endgroup]
+2026-10-21T13:58:15.1506075Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:15.1508186Z ##[group]Getting Git version info
+2026-10-21T13:58:15.1509301Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-21T13:58:15.1510853Z [command]/usr/bin/git version
+2026-10-21T13:58:15.1555598Z git version 2.55.0
+2026-10-21T13:58:15.1575704Z ##[endgroup]
+2026-10-21T13:58:15.1587495Z Temporarily overriding HOME='/home/runner/work/_temp/a0ceae41-6e3d-45d4-858a-e0c1cb8b7930' before making global git config changes
+2026-10-21T13:58:15.1589294Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T13:58:15.1591934Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T13:58:15.1636432Z Deleting the contents of '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-21T13:58:15.1639788Z ##[group]Initializing the repository
+2026-10-21T13:58:15.1643534Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T13:58:15.1753437Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T13:58:15.1754950Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T13:58:15.1756487Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T13:58:15.1757729Z hint: call:
+2026-10-21T13:58:15.1758802Z hint:
+2026-10-21T13:58:15.1759786Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T13:58:15.1760782Z hint:
+2026-10-21T13:58:15.1761496Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T13:58:15.1762703Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T13:58:15.1763631Z hint:
+2026-10-21T13:58:15.1764146Z hint: 	git branch -m <name>
+2026-10-21T13:58:15.1764721Z hint:
+2026-10-21T13:58:15.1765475Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T13:58:15.1766925Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.git/
+2026-10-21T13:58:15.1768955Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:15.1815710Z ##[endgroup]
+2026-10-21T13:58:15.1816654Z ##[group]Disabling automatic garbage collection
+2026-10-21T13:58:15.1819402Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T13:58:15.1848216Z ##[endgroup]
+2026-10-21T13:58:15.1849272Z ##[group]Setting up auth
+2026-10-21T13:58:15.1854392Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:58:15.1883704Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:58:15.2190451Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:58:15.2232959Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:58:15.2420602Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T13:58:15.2457434Z ##[endgroup]
+2026-10-21T13:58:15.2458068Z ##[group]Fetching the repository
+2026-10-21T13:58:15.2464905Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +bfe27ddfa2440db2830ff53104b30645860e43b2:refs/remotes/pull/93/merge
+2026-10-21T13:58:20.0724945Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:20.0726302Z  * [new ref]         bfe27ddfa2440db2830ff53104b30645860e43b2 -> pull/93/merge
+2026-10-21T13:58:20.0729437Z ##[endgroup]
+2026-10-21T13:58:20.0731321Z ##[group]Determining the checkout info
+2026-10-21T13:58:20.0732503Z ##[endgroup]
+2026-10-21T13:58:20.0735359Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T13:58:20.0784944Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T13:58:20.0813509Z ##[group]Checking out the ref
+2026-10-21T13:58:20.0817240Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/93/merge
+2026-10-21T13:58:20.6183969Z Note: switching to 'refs/remotes/pull/93/merge'.
+2026-10-21T13:58:20.6184464Z 
+2026-10-21T13:58:20.6184734Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T13:58:20.6185358Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T13:58:20.6185969Z state without impacting any branches by switching back to a branch.
+2026-10-21T13:58:20.6186336Z 
+2026-10-21T13:58:20.6186604Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T13:58:20.6187157Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T13:58:20.6187497Z 
+2026-10-21T13:58:20.6187643Z   git switch -c <new-branch-name>
+2026-10-21T13:58:20.6187867Z 
+2026-10-21T13:58:20.6188085Z Or undo this operation with:
+2026-10-21T13:58:20.6188285Z 
+2026-10-21T13:58:20.6188425Z   git switch -
+2026-10-21T13:58:20.6188941Z 
+2026-10-21T13:58:20.6189614Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T13:58:20.6190014Z 
+2026-10-21T13:58:20.6190591Z HEAD is now at bfe27dd Merge c14785ee1835fdd9fcdd1fff8e72184566c727ee into 09ad76f2dcd4bd1d77cd27f38caa803510ef4fc6
+2026-10-21T13:58:20.6218451Z ##[endgroup]
+2026-10-21T13:58:20.6261238Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T13:58:20.6284409Z bfe27ddfa2440db2830ff53104b30645860e43b2
+2026-10-21T13:58:20.6292316Z ##[group]Removing auth
+2026-10-21T13:58:20.6294922Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:58:20.6322116Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:58:20.6573786Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:58:20.6574926Z http.https://github.com/.extraheader
+2026-10-21T13:58:20.6576029Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T13:58:20.6588225Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:58:20.6777641Z ##[endgroup]
+2026-10-21T13:58:20.6990500Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T13:58:20.6990880Z with:
+2026-10-21T13:58:20.6991119Z   ref: aa41ee31268bcf773f5f9299ac611d4bae7b88ff
+2026-10-21T13:58:20.6991400Z   path: .selector-baseline
+2026-10-21T13:58:20.6991639Z   persist-credentials: false
+2026-10-21T13:58:20.6991910Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:20.6993863Z   token: ***
+2026-10-21T13:58:20.6994066Z   ssh-strict: true
+2026-10-21T13:58:20.6994279Z   ssh-user: git
+2026-10-21T13:58:20.6994477Z   clean: true
+2026-10-21T13:58:20.6994695Z   sparse-checkout-cone-mode: true
+2026-10-21T13:58:20.6994963Z   fetch-depth: 1
+2026-10-21T13:58:20.6995165Z   fetch-tags: false
+2026-10-21T13:58:20.6995375Z   show-progress: true
+2026-10-21T13:58:20.6995582Z   lfs: false
+2026-10-21T13:58:20.6995773Z   submodules: false
+2026-10-21T13:58:20.6995982Z   set-safe-directory: true
+2026-10-21T13:58:20.6996206Z ##[endgroup]
+2026-10-21T13:58:20.7645085Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:20.7654042Z ##[group]Getting Git version info
+2026-10-21T13:58:20.7655185Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.selector-baseline'
+2026-10-21T13:58:20.7680382Z [command]/usr/bin/git version
+2026-10-21T13:58:20.7714206Z git version 2.55.0
+2026-10-21T13:58:20.7731285Z ##[endgroup]
+2026-10-21T13:58:20.7738958Z Temporarily overriding HOME='/home/runner/work/_temp/a065da88-4cbf-49af-b97a-f0a8bd3fffdb' before making global git config changes
+2026-10-21T13:58:20.7740028Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T13:58:20.7743502Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.selector-baseline
+2026-10-21T13:58:20.7774410Z ##[group]Initializing the repository
+2026-10-21T13:58:20.7775279Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.selector-baseline
+2026-10-21T13:58:20.7809602Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T13:58:20.7810801Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T13:58:20.7811705Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T13:58:20.7812420Z hint: call:
+2026-10-21T13:58:20.7812863Z hint:
+2026-10-21T13:58:20.7813400Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T13:58:20.7813998Z hint:
+2026-10-21T13:58:20.7814569Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T13:58:20.7815732Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T13:58:20.7816422Z hint:
+2026-10-21T13:58:20.7816877Z hint: 	git branch -m <name>
+2026-10-21T13:58:20.7817365Z hint:
+2026-10-21T13:58:20.7817983Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T13:58:20.7819279Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.selector-baseline/.git/
+2026-10-21T13:58:20.7821520Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:20.7848425Z ##[endgroup]
+2026-10-21T13:58:20.7849051Z ##[group]Disabling automatic garbage collection
+2026-10-21T13:58:20.7852420Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T13:58:20.7878127Z ##[endgroup]
+2026-10-21T13:58:20.7878710Z ##[group]Setting up auth
+2026-10-21T13:58:20.7883592Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:58:20.7919455Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:58:20.8116159Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:58:20.8176118Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:58:20.8382856Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T13:58:20.8422516Z ##[endgroup]
+2026-10-21T13:58:20.8423155Z ##[group]Fetching the repository
+2026-10-21T13:58:20.8431135Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin aa41ee31268bcf773f5f9299ac611d4bae7b88ff
+2026-10-21T13:58:25.7347912Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:25.7348435Z  * branch            aa41ee31268bcf773f5f9299ac611d4bae7b88ff -> FETCH_HEAD
+2026-10-21T13:58:25.7350861Z ##[endgroup]
+2026-10-21T13:58:25.7351451Z ##[group]Determining the checkout info
+2026-10-21T13:58:25.7356190Z ##[endgroup]
+2026-10-21T13:58:25.7359125Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T13:58:25.7397643Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T13:58:25.7424355Z ##[group]Checking out the ref
+2026-10-21T13:58:25.7428217Z [command]/usr/bin/git checkout --progress --force aa41ee31268bcf773f5f9299ac611d4bae7b88ff
+2026-10-21T13:58:26.2568437Z Note: switching to 'aa41ee31268bcf773f5f9299ac611d4bae7b88ff'.
+2026-10-21T13:58:26.2568859Z 
+2026-10-21T13:58:26.2569089Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T13:58:26.2569939Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T13:58:26.2570896Z state without impacting any branches by switching back to a branch.
+2026-10-21T13:58:26.2571272Z 
+2026-10-21T13:58:26.2571545Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T13:58:26.2572090Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T13:58:26.2572401Z 
+2026-10-21T13:58:26.2572551Z   git switch -c <new-branch-name>
+2026-10-21T13:58:26.2572775Z 
+2026-10-21T13:58:26.2572896Z Or undo this operation with:
+2026-10-21T13:58:26.2573102Z 
+2026-10-21T13:58:26.2573210Z   git switch -
+2026-10-21T13:58:26.2573391Z 
+2026-10-21T13:58:26.2573649Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T13:58:26.2574031Z 
+2026-10-21T13:58:26.2574384Z HEAD is now at aa41ee3 Independently cold-decode conserved corpus and bind raw reference commitments
+2026-10-21T13:58:26.2607244Z ##[endgroup]
+2026-10-21T13:58:26.2676211Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T13:58:26.2701511Z aa41ee31268bcf773f5f9299ac611d4bae7b88ff
+2026-10-21T13:58:26.2710436Z ##[group]Removing auth
+2026-10-21T13:58:26.2713789Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:58:26.2744592Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:58:26.2935194Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:58:26.2958027Z http.https://github.com/.extraheader
+2026-10-21T13:58:26.2964672Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T13:58:26.2994521Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:58:26.3178630Z ##[endgroup]
+2026-10-21T13:58:26.3335608Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T13:58:26.3335916Z with:
+2026-10-21T13:58:26.3336114Z   ref: 9cc74472858ebcb3a80a3a7f12ad67f348304d13
+2026-10-21T13:58:26.3336361Z   path: .chronology-baseline
+2026-10-21T13:58:26.3336569Z   persist-credentials: false
+2026-10-21T13:58:26.3336794Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:26.3338681Z   token: ***
+2026-10-21T13:58:26.3338853Z   ssh-strict: true
+2026-10-21T13:58:26.3339026Z   ssh-user: git
+2026-10-21T13:58:26.3339190Z   clean: true
+2026-10-21T13:58:26.3339369Z   sparse-checkout-cone-mode: true
+2026-10-21T13:58:26.3339578Z   fetch-depth: 1
+2026-10-21T13:58:26.3339745Z   fetch-tags: false
+2026-10-21T13:58:26.3339919Z   show-progress: true
+2026-10-21T13:58:26.3340296Z   lfs: false
+2026-10-21T13:58:26.3340466Z   submodules: false
+2026-10-21T13:58:26.3340641Z   set-safe-directory: true
+2026-10-21T13:58:26.3340840Z ##[endgroup]
+2026-10-21T13:58:26.3985298Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:26.3986358Z ##[group]Getting Git version info
+2026-10-21T13:58:26.3987042Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.chronology-baseline'
+2026-10-21T13:58:26.4016392Z [command]/usr/bin/git version
+2026-10-21T13:58:26.4048904Z git version 2.55.0
+2026-10-21T13:58:26.4063819Z ##[endgroup]
+2026-10-21T13:58:26.4074203Z Temporarily overriding HOME='/home/runner/work/_temp/4fb43f27-513c-4c1e-b298-3aef8a1e306b' before making global git config changes
+2026-10-21T13:58:26.4075254Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T13:58:26.4078204Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.chronology-baseline
+2026-10-21T13:58:26.4136936Z ##[group]Initializing the repository
+2026-10-21T13:58:26.4141281Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.chronology-baseline
+2026-10-21T13:58:26.4177273Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T13:58:26.4178121Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T13:58:26.4178963Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T13:58:26.4179605Z hint: call:
+2026-10-21T13:58:26.4179969Z hint:
+2026-10-21T13:58:26.4180528Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T13:58:26.4181038Z hint:
+2026-10-21T13:58:26.4181544Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T13:58:26.4182331Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T13:58:26.4182927Z hint:
+2026-10-21T13:58:26.4183293Z hint: 	git branch -m <name>
+2026-10-21T13:58:26.4183706Z hint:
+2026-10-21T13:58:26.4184234Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T13:58:26.4185281Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.chronology-baseline/.git/
+2026-10-21T13:58:26.4188047Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:26.4214698Z ##[endgroup]
+2026-10-21T13:58:26.4215190Z ##[group]Disabling automatic garbage collection
+2026-10-21T13:58:26.4218851Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T13:58:26.4252105Z ##[endgroup]
+2026-10-21T13:58:26.4252575Z ##[group]Setting up auth
+2026-10-21T13:58:26.4252959Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:58:26.4292428Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:58:26.4496590Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:58:26.4528438Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:58:26.4732582Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T13:58:26.4797081Z ##[endgroup]
+2026-10-21T13:58:26.4797718Z ##[group]Fetching the repository
+2026-10-21T13:58:26.4809314Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 9cc74472858ebcb3a80a3a7f12ad67f348304d13
+2026-10-21T13:58:32.7662321Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T13:58:32.7663251Z  * branch            9cc74472858ebcb3a80a3a7f12ad67f348304d13 -> FETCH_HEAD
+2026-10-21T13:58:32.7666837Z ##[endgroup]
+2026-10-21T13:58:32.7667320Z ##[group]Determining the checkout info
+2026-10-21T13:58:32.7669034Z ##[endgroup]
+2026-10-21T13:58:32.7675551Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T13:58:32.9729780Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T13:58:33.0841021Z ##[group]Checking out the ref
+2026-10-21T13:58:33.0846223Z [command]/usr/bin/git checkout --progress --force 9cc74472858ebcb3a80a3a7f12ad67f348304d13
+2026-10-21T13:58:33.6401554Z Note: switching to '9cc74472858ebcb3a80a3a7f12ad67f348304d13'.
+2026-10-21T13:58:33.6401839Z 
+2026-10-21T13:58:33.6402018Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T13:58:33.6402394Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T13:58:33.6402754Z state without impacting any branches by switching back to a branch.
+2026-10-21T13:58:33.6402959Z 
+2026-10-21T13:58:33.6403115Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T13:58:33.6403459Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T13:58:33.6403660Z 
+2026-10-21T13:58:33.6403782Z   git switch -c <new-branch-name>
+2026-10-21T13:58:33.6403937Z 
+2026-10-21T13:58:33.6404020Z Or undo this operation with:
+2026-10-21T13:58:33.6404157Z 
+2026-10-21T13:58:33.6404233Z   git switch -
+2026-10-21T13:58:33.6404330Z 
+2026-10-21T13:58:33.6404500Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T13:58:33.6404724Z 
+2026-10-21T13:58:33.6405061Z HEAD is now at 9cc7447 Merge pull request #35 from mariancradulescu/mxm-r3-native-ci-reception-checkpoint-20261020
+2026-10-21T13:58:33.6441769Z ##[endgroup]
+2026-10-21T13:58:33.6482036Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T13:58:33.6505189Z 9cc74472858ebcb3a80a3a7f12ad67f348304d13
+2026-10-21T13:58:33.6513005Z ##[group]Removing auth
+2026-10-21T13:58:33.6516038Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:58:33.6544287Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:58:33.6745421Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:58:33.6766907Z http.https://github.com/.extraheader
+2026-10-21T13:58:33.6773640Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T13:58:33.6804307Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:58:33.6988205Z ##[endgroup]
+2026-10-21T13:58:33.7106306Z ##[group]Run python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+2026-10-21T13:58:33.7107098Z [36;1mpython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock[0m
+2026-10-21T13:58:33.7324953Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:33.7325200Z ##[endgroup]
+2026-10-21T13:58:35.3896843Z Defaulting to user installation because normal site-packages is not writeable
+2026-10-21T13:58:36.4481347Z Collecting cffi==2.1.1 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 1))
+2026-10-21T13:58:36.4953349Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+2026-10-21T13:58:36.5303597Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.8/221.8 kB 6.5 MB/s eta 0:00:00
+2026-10-21T13:58:36.7287714Z Collecting cryptography==46.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 2))
+2026-10-21T13:58:36.7394131Z   Downloading cryptography-46.0.3-cp311-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+2026-10-21T13:58:36.8495242Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 41.0 MB/s eta 0:00:00
+2026-10-21T13:58:37.0239089Z Collecting numpy==2.2.6 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 3))
+2026-10-21T13:58:37.0359398Z   Downloading numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.5 MB)
+2026-10-21T13:58:37.4123441Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.5/16.5 MB 28.9 MB/s eta 0:00:00
+2026-10-21T13:58:37.7854473Z Collecting protobuf==5.29.5 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 4))
+2026-10-21T13:58:37.7958927Z   Downloading protobuf-5.29.5-cp38-abi3-manylinux2014_x86_64.whl (319 kB)
+2026-10-21T13:58:37.8498817Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 319.9/319.9 kB 5.9 MB/s eta 0:00:00
+2026-10-21T13:58:38.0966874Z Collecting pycparser==3.11 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 5))
+2026-10-21T13:58:38.1066434Z   Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-21T13:58:38.1508854Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.2/51.2 kB 966.4 kB/s eta 0:00:00
+2026-10-21T13:58:38.3427128Z Collecting pyyaml==6.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 6))
+2026-10-21T13:58:38.3529777Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-21T13:58:38.6712195Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 2.5 MB/s eta 0:00:00
+2026-10-21T13:58:38.8964567Z Installing collected packages: pyyaml, pycparser, protobuf, numpy, cffi, cryptography
+2026-10-21T13:58:40.6940559Z Successfully installed cffi-2.1.1 cryptography-46.0.3 numpy-2.2.6 protobuf-5.29.5 pycparser-3.11 pyyaml-6.0.3
+2026-10-21T13:58:40.8327974Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:58:40.8328258Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:58:40.8328565Z [36;1mimport ast,hashlib,importlib.util,pathlib,subprocess,sys,unittest[0m
+2026-10-21T13:58:40.8328899Z [36;1mroot=pathlib.Path.cwd()[0m
+2026-10-21T13:58:40.8329126Z [36;1mbaseline=root/'.selector-baseline'[0m
+2026-10-21T13:58:40.8329595Z [36;1massert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='aa41ee31268bcf773f5f9299ac611d4bae7b88ff'[0m
+2026-10-21T13:58:40.8330453Z [36;1msource=(baseline/'research_core_v4/laboratory/integrated.py').read_text()[0m
+2026-10-21T13:58:40.8330945Z [36;1mworker=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='execute')[0m
+2026-10-21T13:58:40.8331824Z [36;1mnodes=[n.value for n in ast.walk(worker) if isinstance(n,ast.Assign) and len(n.targets)==1 and isinstance(n.targets[0],ast.Name) and n.targets[0].id=='m' and isinstance(n.value,ast.Call) and isinstance(n.value.func,ast.Name) and n.value.func.id=='next'][0m
+2026-10-21T13:58:40.8332519Z [36;1massert len(nodes)==1[0m
+2026-10-21T13:58:40.8332886Z [36;1mcode=compile(ast.Expression(nodes[0]),str(baseline/'research_core_v4/laboratory/integrated.py'),'eval')[0m
+2026-10-21T13:58:40.8333276Z [36;1msys.path.insert(0,str(baseline))[0m
+2026-10-21T13:58:40.8333544Z [36;1mfrom research_core_v4.laboratory import execution[0m
+2026-10-21T13:58:40.8333932Z [36;1massert pathlib.Path(execution.__file__).resolve().is_relative_to(baseline.resolve())[0m
+2026-10-21T13:58:40.8334300Z [36;1mdef legacy(private,admission,book):[0m
+2026-10-21T13:58:40.8334617Z [36;1m    return eval(code,{'p':private,'a':admission,'__builtins__':{'next':next}})[0m
+2026-10-21T13:58:40.8334953Z [36;1mexecution.next_admitted_programme=legacy[0m
+2026-10-21T13:58:40.8335287Z [36;1mname='research_core_v4.laboratory.test_integrated_programme_selection'[0m
+2026-10-21T13:58:40.8335815Z [36;1mspec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_integrated_programme_selection.py')[0m
+2026-10-21T13:58:40.8336499Z [36;1mmodule=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)[0m
+2026-10-21T13:58:40.8337190Z [36;1mcase=module.IntegratedProgrammeSelectionTests[0m
+2026-10-21T13:58:40.8337993Z [36;1msuite=unittest.TestSuite(case(n) for n in ('test_prospective_priorities_produce_actual_A_B_resume_A','test_ambiguous_pending_programme_is_never_scheduled_around'))[0m
+2026-10-21T13:58:40.8338578Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(suite)[0m
+2026-10-21T13:58:40.8338943Z [36;1massert result.testsRun==2 and len(result.failures)==2 and not result.errors[0m
+2026-10-21T13:58:40.8339710Z [36;1mprint('MXM_NATIVE_SELECTOR_BEFORE: two expected semantic failures on immutable baseline aa41ee31268bcf773f5f9299ac611d4bae7b88ff; expression SHA256='+hashlib.sha256(ast.dump(nodes[0]).encode()).hexdigest())[0m
+2026-10-21T13:58:40.8340518Z [36;1mPY[0m
+2026-10-21T13:58:40.8397529Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:40.8397743Z ##[endgroup]
+2026-10-21T13:58:40.9584200Z test_prospective_priorities_produce_actual_A_B_resume_A (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_prospective_priorities_produce_actual_A_B_resume_A) ... FAIL
+2026-10-21T13:58:40.9591035Z test_ambiguous_pending_programme_is_never_scheduled_around (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_ambiguous_pending_programme_is_never_scheduled_around) ... FAIL
+2026-10-21T13:58:40.9592152Z 
+2026-10-21T13:58:40.9592305Z ======================================================================
+2026-10-21T13:58:40.9593452Z FAIL: test_prospective_priorities_produce_actual_A_B_resume_A (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_prospective_priorities_produce_actual_A_B_resume_A)
+2026-10-21T13:58:40.9594897Z ----------------------------------------------------------------------
+2026-10-21T13:58:40.9595299Z Traceback (most recent call last):
+2026-10-21T13:58:40.9596258Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_integrated_programme_selection.py", line 31, in test_prospective_priorities_produce_actual_A_B_resume_A
+2026-10-21T13:58:40.9597446Z     self.assertEqual(executed,[('SCHED_A','first'),('SCHED_B','first'),('SCHED_A','second'),('SCHED_B','second')])
+2026-10-21T13:58:40.9598632Z AssertionError: Lists differ: [('SC[21 chars]CHED_A', 'second'), ('SCHED_B', 'first'), ('SC[13 chars]nd')] != [('SC[21 chars]CHED_B', 'first'), ('SCHED_A', 'second'), ('SC[13 chars]nd')]
+2026-10-21T13:58:40.9599216Z 
+2026-10-21T13:58:40.9599324Z First differing element 1:
+2026-10-21T13:58:40.9599581Z ('SCHED_A', 'second')
+2026-10-21T13:58:40.9599815Z ('SCHED_B', 'first')
+2026-10-21T13:58:40.9599958Z 
+2026-10-21T13:58:40.9600060Z   [('SCHED_A', 'first'),
+2026-10-21T13:58:40.9600474Z +  ('SCHED_B', 'first'),
+2026-10-21T13:58:40.9600707Z    ('SCHED_A', 'second'),
+2026-10-21T13:58:40.9600957Z -  ('SCHED_B', 'first'),
+2026-10-21T13:58:40.9601197Z    ('SCHED_B', 'second')]
+2026-10-21T13:58:40.9601348Z 
+2026-10-21T13:58:40.9601491Z ======================================================================
+2026-10-21T13:58:40.9602526Z FAIL: test_ambiguous_pending_programme_is_never_scheduled_around (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_ambiguous_pending_programme_is_never_scheduled_around)
+2026-10-21T13:58:40.9603599Z ----------------------------------------------------------------------
+2026-10-21T13:58:40.9603968Z Traceback (most recent call last):
+2026-10-21T13:58:40.9604855Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_integrated_programme_selection.py", line 41, in test_ambiguous_pending_programme_is_never_scheduled_around
+2026-10-21T13:58:40.9606034Z     with self.assertRaises(LabError):next_admitted_programme(private,admission,book)
+2026-10-21T13:58:40.9606535Z AssertionError: LabError not raised
+2026-10-21T13:58:40.9606743Z 
+2026-10-21T13:58:40.9606910Z ----------------------------------------------------------------------
+2026-10-21T13:58:40.9607962Z MXM_NATIVE_SELECTOR_BEFORE: two expected semantic failures on immutable baseline aa41ee31268bcf773f5f9299ac611d4bae7b88ff; expression SHA256=6b8166c59aeb5d54cf9ab4643a1e74eea33759f1cbdd6048728e7f8c7423749f
+2026-10-21T13:58:40.9609057Z Ran 2 tests in 0.004s
+2026-10-21T13:58:40.9610544Z 
+2026-10-21T13:58:40.9610696Z FAILED (failures=2)
+2026-10-21T13:58:40.9714079Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:58:40.9714345Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:58:40.9714612Z [36;1mimport importlib.util,pathlib,subprocess,sys,unittest[0m
+2026-10-21T13:58:40.9714969Z [36;1mroot=pathlib.Path.cwd();baseline=root/'.chronology-baseline'[0m
+2026-10-21T13:58:40.9715490Z [36;1massert subprocess.check_output(['git','rev-parse','HEAD'],cwd=baseline,text=True).strip()=='9cc74472858ebcb3a80a3a7f12ad67f348304d13'[0m
+2026-10-21T13:58:40.9715961Z [36;1msys.path.insert(0,str(baseline))[0m
+2026-10-21T13:58:40.9716273Z [36;1mfrom competition import continuous_account_replay_v2 as engine[0m
+2026-10-21T13:58:40.9716692Z [36;1massert pathlib.Path(engine.__file__).resolve().is_relative_to(baseline.resolve())[0m
+2026-10-21T13:58:40.9717091Z [36;1mname='research_core_v4.laboratory.test_chronological_contracts'[0m
+2026-10-21T13:58:40.9717644Z [36;1mspec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_chronological_contracts.py')[0m
+2026-10-21T13:58:40.9718276Z [36;1mmodule=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)[0m
+2026-10-21T13:58:40.9718841Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))[0m
+2026-10-21T13:58:40.9719346Z [36;1massert result.testsRun==12 and len(result.failures)==13 and not result.errors[0m
+2026-10-21T13:58:40.9719880Z [36;1mprint('MXM_CHRONOLOGY_BEFORE: immutable9cc7447;12 methods;13 expected assertion failures;0 errors;artificial inputs only')[0m
+2026-10-21T13:58:40.9720470Z [36;1mPY[0m
+2026-10-21T13:58:40.9776713Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:40.9776940Z ##[endgroup]
+2026-10-21T13:58:41.0550620Z test_adjacent_funding_intervals_conserve_cash (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_adjacent_funding_intervals_conserve_cash) ... ok
+2026-10-21T13:58:41.0555338Z test_equivalent_utc_instants_form_one_atomic_mark_batch (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_equivalent_utc_instants_form_one_atomic_mark_batch) ... FAIL
+2026-10-21T13:58:41.0556928Z test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) ... 
+2026-10-21T13:58:41.0558547Z   test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) (field='price') ... FAIL
+2026-10-21T13:58:41.0561168Z   test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) (field='quote_to_eur_rate') ... FAIL
+2026-10-21T13:58:41.0562888Z test_exit_quote_itself_cannot_escape_stop_out_guard (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_quote_itself_cannot_escape_stop_out_guard) ... FAIL
+2026-10-21T13:58:41.0569006Z test_financing_intervals_cannot_be_recharged_at_another_timestamp (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_financing_intervals_cannot_be_recharged_at_another_timestamp) ... FAIL
+2026-10-21T13:58:41.0570701Z test_fractional_or_boolean_volume_is_not_coerced (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_fractional_or_boolean_volume_is_not_coerced) ... 
+2026-10-21T13:58:41.0571898Z   test_fractional_or_boolean_volume_is_not_coerced (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_fractional_or_boolean_volume_is_not_coerced) (volume=100.5) ... FAIL
+2026-10-21T13:58:41.0575976Z test_laboratory_replay_requires_explicit_stop_out_contract (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_laboratory_replay_requires_explicit_stop_out_contract) ... FAIL
+2026-10-21T13:58:41.0578129Z test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) ... 
+2026-10-21T13:58:41.0579811Z   test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) (field='candidate_id') ... FAIL
+2026-10-21T13:58:41.0581697Z   test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) (field='symbol') ... FAIL
+2026-10-21T13:58:41.0584698Z test_mark_risk_precedes_same_instant_exit_margin_release (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_risk_precedes_same_instant_exit_margin_release) ... FAIL
+2026-10-21T13:58:41.3715022Z test_native_screen_rejects_future_signal_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_future_signal_before_opening) ... FAIL
+2026-10-21T13:58:41.3724011Z test_native_screen_rejects_late_quote_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_late_quote_before_opening) ... FAIL
+2026-10-21T13:58:41.3730872Z test_negative_component_cannot_hide_in_positive_total_cost (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_negative_component_cannot_hide_in_positive_total_cost) ... FAIL
+2026-10-21T13:58:41.3731726Z 
+2026-10-21T13:58:41.3741056Z MXM_CHRONOLOGY_BEFORE: immutable9cc7447;12 methods;13 expected assertion failures;0 errors;artificial inputs only
+2026-10-21T13:58:41.3750874Z ======================================================================
+2026-10-21T13:58:41.3761503Z FAIL: test_equivalent_utc_instants_form_one_atomic_mark_batch (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_equivalent_utc_instants_form_one_atomic_mark_batch)
+2026-10-21T13:58:41.3762901Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3763556Z Traceback (most recent call last):
+2026-10-21T13:58:41.3764770Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 32, in test_equivalent_utc_instants_form_one_atomic_mark_batch
+2026-10-21T13:58:41.3765819Z     self.assertEqual(result.status,'COMPLETE')
+2026-10-21T13:58:41.3766312Z AssertionError: 'HALT_UNRESOLVED_BROKER_STOP_OUT' != 'COMPLETE'
+2026-10-21T13:58:41.3766764Z - HALT_UNRESOLVED_BROKER_STOP_OUT
+2026-10-21T13:58:41.3767076Z + COMPLETE
+2026-10-21T13:58:41.3767214Z 
+2026-10-21T13:58:41.3767219Z 
+2026-10-21T13:58:41.3767373Z ======================================================================
+2026-10-21T13:58:41.3768479Z FAIL: test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) (field='price')
+2026-10-21T13:58:41.3769536Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3769965Z Traceback (most recent call last):
+2026-10-21T13:58:41.3771058Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 81, in test_exit_price_and_conversion_must_be_positive
+2026-10-21T13:58:41.3772119Z     with self.subTest(field=field),self.assertRaises(ReplayContractError):
+2026-10-21T13:58:41.3772623Z AssertionError: ReplayContractError not raised
+2026-10-21T13:58:41.3772871Z 
+2026-10-21T13:58:41.3773015Z ======================================================================
+2026-10-21T13:58:41.3774085Z FAIL: test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) (field='quote_to_eur_rate')
+2026-10-21T13:58:41.3775489Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3775931Z Traceback (most recent call last):
+2026-10-21T13:58:41.3776886Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 81, in test_exit_price_and_conversion_must_be_positive
+2026-10-21T13:58:41.3778058Z     with self.subTest(field=field),self.assertRaises(ReplayContractError):
+2026-10-21T13:58:41.3778583Z AssertionError: ReplayContractError not raised
+2026-10-21T13:58:41.3778843Z 
+2026-10-21T13:58:41.3778993Z ======================================================================
+2026-10-21T13:58:41.3780053Z FAIL: test_exit_quote_itself_cannot_escape_stop_out_guard (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_quote_itself_cannot_escape_stop_out_guard)
+2026-10-21T13:58:41.3781332Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3781778Z Traceback (most recent call last):
+2026-10-21T13:58:41.3782752Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 49, in test_exit_quote_itself_cannot_escape_stop_out_guard
+2026-10-21T13:58:41.3783868Z     self.assertEqual(result.status,'HALT_UNRESOLVED_BROKER_STOP_OUT')
+2026-10-21T13:58:41.3784435Z AssertionError: 'COMPLETE' != 'HALT_UNRESOLVED_BROKER_STOP_OUT'
+2026-10-21T13:58:41.3784864Z - COMPLETE
+2026-10-21T13:58:41.3785127Z + HALT_UNRESOLVED_BROKER_STOP_OUT
+2026-10-21T13:58:41.3785334Z 
+2026-10-21T13:58:41.3785347Z 
+2026-10-21T13:58:41.3785487Z ======================================================================
+2026-10-21T13:58:41.3786679Z FAIL: test_financing_intervals_cannot_be_recharged_at_another_timestamp (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_financing_intervals_cannot_be_recharged_at_another_timestamp)
+2026-10-21T13:58:41.3788120Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3788564Z Traceback (most recent call last):
+2026-10-21T13:58:41.3789611Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 107, in test_financing_intervals_cannot_be_recharged_at_another_timestamp
+2026-10-21T13:58:41.3791030Z     with self.assertRaisesRegex(ReplayContractError,'accrual'):
+2026-10-21T13:58:41.3791516Z AssertionError: ReplayContractError not raised
+2026-10-21T13:58:41.3791786Z 
+2026-10-21T13:58:41.3791924Z ======================================================================
+2026-10-21T13:58:41.3792956Z FAIL: test_fractional_or_boolean_volume_is_not_coerced (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_fractional_or_boolean_volume_is_not_coerced) (volume=100.5)
+2026-10-21T13:58:41.3793999Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3794451Z Traceback (most recent call last):
+2026-10-21T13:58:41.3795407Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 75, in test_fractional_or_boolean_volume_is_not_coerced
+2026-10-21T13:58:41.3796500Z     with self.subTest(volume=volume),self.assertRaises(ReplayContractError):
+2026-10-21T13:58:41.3797037Z AssertionError: ReplayContractError not raised
+2026-10-21T13:58:41.3797301Z 
+2026-10-21T13:58:41.3797436Z ======================================================================
+2026-10-21T13:58:41.3798508Z FAIL: test_laboratory_replay_requires_explicit_stop_out_contract (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_laboratory_replay_requires_explicit_stop_out_contract)
+2026-10-21T13:58:41.3799614Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3800051Z Traceback (most recent call last):
+2026-10-21T13:58:41.3801418Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 87, in test_laboratory_replay_requires_explicit_stop_out_contract
+2026-10-21T13:58:41.3802502Z     with self.assertRaisesRegex(LabError,'STOP_OUT'):
+2026-10-21T13:58:41.3802916Z AssertionError: LabError not raised
+2026-10-21T13:58:41.3803142Z 
+2026-10-21T13:58:41.3803284Z ======================================================================
+2026-10-21T13:58:41.3804383Z FAIL: test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) (field='candidate_id')
+2026-10-21T13:58:41.3805468Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3805894Z Traceback (most recent call last):
+2026-10-21T13:58:41.3806807Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 69, in test_mark_must_match_active_candidate_and_symbol
+2026-10-21T13:58:41.3807878Z     with self.subTest(field=field),self.assertRaises(ReplayContractError):
+2026-10-21T13:58:41.3808382Z AssertionError: ReplayContractError not raised
+2026-10-21T13:58:41.3808648Z 
+2026-10-21T13:58:41.3808785Z ======================================================================
+2026-10-21T13:58:41.3809819Z FAIL: test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) (field='symbol')
+2026-10-21T13:58:41.3811032Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3811447Z Traceback (most recent call last):
+2026-10-21T13:58:41.3812389Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 69, in test_mark_must_match_active_candidate_and_symbol
+2026-10-21T13:58:41.3813755Z     with self.subTest(field=field),self.assertRaises(ReplayContractError):
+2026-10-21T13:58:41.3814285Z AssertionError: ReplayContractError not raised
+2026-10-21T13:58:41.3814555Z 
+2026-10-21T13:58:41.3814693Z ======================================================================
+2026-10-21T13:58:41.3815802Z FAIL: test_mark_risk_precedes_same_instant_exit_margin_release (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_risk_precedes_same_instant_exit_margin_release)
+2026-10-21T13:58:41.3816950Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3817395Z Traceback (most recent call last):
+2026-10-21T13:58:41.3818395Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 42, in test_mark_risk_precedes_same_instant_exit_margin_release
+2026-10-21T13:58:41.3819530Z     self.assertEqual(result.status,'HALT_UNRESOLVED_BROKER_STOP_OUT')
+2026-10-21T13:58:41.3820375Z AssertionError: 'COMPLETE' != 'HALT_UNRESOLVED_BROKER_STOP_OUT'
+2026-10-21T13:58:41.3820811Z - COMPLETE
+2026-10-21T13:58:41.3821067Z + HALT_UNRESOLVED_BROKER_STOP_OUT
+2026-10-21T13:58:41.3821288Z 
+2026-10-21T13:58:41.3821293Z 
+2026-10-21T13:58:41.3821444Z ======================================================================
+2026-10-21T13:58:41.3822535Z FAIL: test_native_screen_rejects_future_signal_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_future_signal_before_opening)
+2026-10-21T13:58:41.3823652Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3824083Z Traceback (most recent call last):
+2026-10-21T13:58:41.3825074Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 119, in test_native_screen_rejects_future_signal_before_opening
+2026-10-21T13:58:41.3826123Z     self.assertEqual(opened,[])
+2026-10-21T13:58:41.3826702Z AssertionError: Lists differ: [True] != []
+2026-10-21T13:58:41.3826955Z 
+2026-10-21T13:58:41.3827100Z First list contains 1 additional elements.
+2026-10-21T13:58:41.3827449Z First extra element 0:
+2026-10-21T13:58:41.3827712Z True
+2026-10-21T13:58:41.3827833Z 
+2026-10-21T13:58:41.3827931Z - [True]
+2026-10-21T13:58:41.3828157Z + []
+2026-10-21T13:58:41.3828277Z 
+2026-10-21T13:58:41.3828430Z ======================================================================
+2026-10-21T13:58:41.3829503Z FAIL: test_native_screen_rejects_late_quote_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_late_quote_before_opening)
+2026-10-21T13:58:41.3830713Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3831142Z Traceback (most recent call last):
+2026-10-21T13:58:41.3832116Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 129, in test_native_screen_rejects_late_quote_before_opening
+2026-10-21T13:58:41.3833193Z     with self.assertRaisesRegex(LabError,'AVAILABILITY'):
+2026-10-21T13:58:41.3833608Z AssertionError: LabError not raised
+2026-10-21T13:58:41.3833841Z 
+2026-10-21T13:58:41.3833985Z ======================================================================
+2026-10-21T13:58:41.3835039Z FAIL: test_negative_component_cannot_hide_in_positive_total_cost (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_negative_component_cannot_hide_in_positive_total_cost)
+2026-10-21T13:58:41.3836119Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3836534Z Traceback (most recent call last):
+2026-10-21T13:58:41.3837510Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_chronological_contracts.py", line 96, in test_negative_component_cannot_hide_in_positive_total_cost
+2026-10-21T13:58:41.3838781Z     with self.assertRaisesRegex(LabError,'NEGATIVE_COST'):
+2026-10-21T13:58:41.3839213Z AssertionError: LabError not raised
+2026-10-21T13:58:41.3839428Z 
+2026-10-21T13:58:41.3839619Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.3840036Z Ran 12 tests in 0.319s
+2026-10-21T13:58:41.3840378Z 
+2026-10-21T13:58:41.3840487Z FAILED (failures=13)
+2026-10-21T13:58:41.4038315Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:58:41.4038589Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:58:41.4038827Z [36;1mimport importlib.util,pathlib,sys,unittest[0m
+2026-10-21T13:58:41.4039155Z [36;1mroot=pathlib.Path.cwd();baseline=root/'.chronology-baseline'[0m
+2026-10-21T13:58:41.4039457Z [36;1msys.path.insert(0,str(baseline))[0m
+2026-10-21T13:58:41.4039683Z [36;1msuite=unittest.TestSuite()[0m
+2026-10-21T13:58:41.4040029Z [36;1mfor short in ('test_resource_contracts','test_partition_authority','test_semantic_schema'):[0m
+2026-10-21T13:58:41.4040636Z [36;1m    name='research_core_v4.laboratory.'+short[0m
+2026-10-21T13:58:41.4041041Z [36;1m    spec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory'/(short+'.py'))[0m
+2026-10-21T13:58:41.4041575Z [36;1m    module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)[0m
+2026-10-21T13:58:41.4041999Z [36;1m    if short=='test_semantic_schema':[0m
+2026-10-21T13:58:41.4042526Z [36;1m        suite.addTests(module.SemanticSchema(k) for k in ('test_numeric_cosmetic_and_universe_equivalence','test_unknown_top_level_field_is_not_a_new_identity'))[0m
+2026-10-21T13:58:41.4043146Z [36;1m    else:suite.addTests(unittest.defaultTestLoader.loadTestsFromModule(module))[0m
+2026-10-21T13:58:41.4043541Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(suite)[0m
+2026-10-21T13:58:41.4043911Z [36;1massert result.testsRun==9 and len(result.failures)==15 and not result.errors[0m
+2026-10-21T13:58:41.4044419Z [36;1mprint('MXM_RESOURCE_PARTITION_SEMANTIC_BEFORE: immutable9cc7447;9 methods;15 expected assertion failures;0 errors')[0m
+2026-10-21T13:58:41.4044828Z [36;1mPY[0m
+2026-10-21T13:58:41.4099180Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:41.4099411Z ##[endgroup]
+2026-10-21T13:58:41.7864858Z test_full_page_reservation_conserves_total_and_kind_across_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_full_page_reservation_conserves_total_and_kind_across_restore) ... ok
+2026-10-21T13:58:41.9494737Z test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) ... 
+2026-10-21T13:58:41.9495878Z   test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='total') ... FAIL
+2026-10-21T13:58:41.9502934Z   test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='kind') ... FAIL
+2026-10-21T13:58:41.9510374Z   test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='negative') ... FAIL
+2026-10-21T13:58:41.9517767Z   test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='boolean') ... FAIL
+2026-10-21T13:58:41.9524892Z   test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='inconsistent') ... FAIL
+2026-10-21T13:58:41.9526983Z test_missing_transport_reserves_once_without_refund (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_missing_transport_reserves_once_without_refund) ... ok
+2026-10-21T13:58:41.9528829Z test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) ... 
+2026-10-21T13:58:41.9531080Z   test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.common') ... FAIL
+2026-10-21T13:58:41.9533128Z   test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.data') ... FAIL
+2026-10-21T13:58:41.9535143Z   test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.economics') ... FAIL
+2026-10-21T13:58:41.9537116Z   test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.science') ... FAIL
+2026-10-21T13:58:41.9539130Z   test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.volume_pressure') ... FAIL
+2026-10-21T13:58:41.9541222Z test_historical_bar_with_protected_availability_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_historical_bar_with_protected_availability_is_refused) ... FAIL
+2026-10-21T13:58:41.9542807Z test_modified_original_authority_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_modified_original_authority_is_refused) ... FAIL
+2026-10-21T13:58:41.9544330Z test_protected_decision_cannot_read_development_cache (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_protected_decision_cannot_read_development_cache) ... FAIL
+2026-10-21T13:58:41.9547510Z test_numeric_cosmetic_and_universe_equivalence (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_numeric_cosmetic_and_universe_equivalence) ... FAIL
+2026-10-21T13:58:41.9550642Z test_unknown_top_level_field_is_not_a_new_identity (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_unknown_top_level_field_is_not_a_new_identity) ... FAIL
+2026-10-21T13:58:41.9551452Z 
+2026-10-21T13:58:41.9551608Z ======================================================================
+2026-10-21T13:58:41.9552704Z FAIL: test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='total')
+2026-10-21T13:58:41.9553802Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9554224Z Traceback (most recent call last):
+2026-10-21T13:58:41.9555189Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_resource_contracts.py", line 27, in test_inflated_remaining_or_kind_budget_is_rejected_on_restore
+2026-10-21T13:58:41.9556328Z     with self.subTest(mode=mode),self.assertRaisesRegex(LabError,'ACQUISITION'):
+2026-10-21T13:58:41.9556796Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9557005Z 
+2026-10-21T13:58:41.9557146Z ======================================================================
+2026-10-21T13:58:41.9558192Z FAIL: test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='kind')
+2026-10-21T13:58:41.9559248Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9559981Z Traceback (most recent call last):
+2026-10-21T13:58:41.9561017Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_resource_contracts.py", line 27, in test_inflated_remaining_or_kind_budget_is_rejected_on_restore
+2026-10-21T13:58:41.9562228Z     with self.subTest(mode=mode),self.assertRaisesRegex(LabError,'ACQUISITION'):
+2026-10-21T13:58:41.9562686Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9562868Z 
+2026-10-21T13:58:41.9562993Z ======================================================================
+2026-10-21T13:58:41.9564040Z FAIL: test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='negative')
+2026-10-21T13:58:41.9565104Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9565489Z Traceback (most recent call last):
+2026-10-21T13:58:41.9566422Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_resource_contracts.py", line 27, in test_inflated_remaining_or_kind_budget_is_rejected_on_restore
+2026-10-21T13:58:41.9567467Z     with self.subTest(mode=mode),self.assertRaisesRegex(LabError,'ACQUISITION'):
+2026-10-21T13:58:41.9567930Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9568123Z 
+2026-10-21T13:58:41.9568252Z ======================================================================
+2026-10-21T13:58:41.9569292Z FAIL: test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='boolean')
+2026-10-21T13:58:41.9570471Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9570889Z Traceback (most recent call last):
+2026-10-21T13:58:41.9571794Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_resource_contracts.py", line 27, in test_inflated_remaining_or_kind_budget_is_rejected_on_restore
+2026-10-21T13:58:41.9572827Z     with self.subTest(mode=mode),self.assertRaisesRegex(LabError,'ACQUISITION'):
+2026-10-21T13:58:41.9573285Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9573483Z 
+2026-10-21T13:58:41.9573604Z ======================================================================
+2026-10-21T13:58:41.9574679Z FAIL: test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) (mode='inconsistent')
+2026-10-21T13:58:41.9575731Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9576097Z Traceback (most recent call last):
+2026-10-21T13:58:41.9576928Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_resource_contracts.py", line 27, in test_inflated_remaining_or_kind_budget_is_rejected_on_restore
+2026-10-21T13:58:41.9577875Z     with self.subTest(mode=mode),self.assertRaisesRegex(LabError,'ACQUISITION'):
+2026-10-21T13:58:41.9578289Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9578478Z 
+2026-10-21T13:58:41.9578595Z ======================================================================
+2026-10-21T13:58:41.9579592Z FAIL: test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.common')
+2026-10-21T13:58:41.9580745Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9581101Z Traceback (most recent call last):
+2026-10-21T13:58:41.9581876Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 16, in test_all_consumers_use_exact_original_sealed_cutoff
+2026-10-21T13:58:41.9582939Z     self.assertEqual(getattr(module,'DEVELOPMENT_END_MS',None),expected)
+2026-10-21T13:58:41.9583336Z AssertionError: None != 1789646578000
+2026-10-21T13:58:41.9583531Z 
+2026-10-21T13:58:41.9583658Z ======================================================================
+2026-10-21T13:58:41.9584789Z FAIL: test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.data')
+2026-10-21T13:58:41.9585830Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9586193Z Traceback (most recent call last):
+2026-10-21T13:58:41.9586993Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 16, in test_all_consumers_use_exact_original_sealed_cutoff
+2026-10-21T13:58:41.9587882Z     self.assertEqual(getattr(module,'DEVELOPMENT_END_MS',None),expected)
+2026-10-21T13:58:41.9588325Z AssertionError: 1789603200000 != 1789646578000
+2026-10-21T13:58:41.9588553Z 
+2026-10-21T13:58:41.9588671Z ======================================================================
+2026-10-21T13:58:41.9589678Z FAIL: test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.economics')
+2026-10-21T13:58:41.9590847Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9591202Z Traceback (most recent call last):
+2026-10-21T13:58:41.9591973Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 16, in test_all_consumers_use_exact_original_sealed_cutoff
+2026-10-21T13:58:41.9592884Z     self.assertEqual(getattr(module,'DEVELOPMENT_END_MS',None),expected)
+2026-10-21T13:58:41.9593305Z AssertionError: None != 1789646578000
+2026-10-21T13:58:41.9593502Z 
+2026-10-21T13:58:41.9593625Z ======================================================================
+2026-10-21T13:58:41.9594623Z FAIL: test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.science')
+2026-10-21T13:58:41.9595638Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9595978Z Traceback (most recent call last):
+2026-10-21T13:58:41.9596755Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 16, in test_all_consumers_use_exact_original_sealed_cutoff
+2026-10-21T13:58:41.9597680Z     self.assertEqual(getattr(module,'DEVELOPMENT_END_MS',None),expected)
+2026-10-21T13:58:41.9598066Z AssertionError: None != 1789646578000
+2026-10-21T13:58:41.9598258Z 
+2026-10-21T13:58:41.9598382Z ======================================================================
+2026-10-21T13:58:41.9599389Z FAIL: test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) (module='research_core_v4.laboratory.volume_pressure')
+2026-10-21T13:58:41.9600583Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9600967Z Traceback (most recent call last):
+2026-10-21T13:58:41.9601818Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 16, in test_all_consumers_use_exact_original_sealed_cutoff
+2026-10-21T13:58:41.9602728Z     self.assertEqual(getattr(module,'DEVELOPMENT_END_MS',None),expected)
+2026-10-21T13:58:41.9603133Z AssertionError: 1789603200000 != 1789646578000
+2026-10-21T13:58:41.9603343Z 
+2026-10-21T13:58:41.9603467Z ======================================================================
+2026-10-21T13:58:41.9604502Z FAIL: test_historical_bar_with_protected_availability_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_historical_bar_with_protected_availability_is_refused)
+2026-10-21T13:58:41.9605438Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9605957Z Traceback (most recent call last):
+2026-10-21T13:58:41.9606756Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 30, in test_historical_bar_with_protected_availability_is_refused
+2026-10-21T13:58:41.9607685Z     with self.assertRaisesRegex(LabError,'PROTECTED_ROW_AVAILABILITY'):
+2026-10-21T13:58:41.9608115Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9608317Z 
+2026-10-21T13:58:41.9608450Z ======================================================================
+2026-10-21T13:58:41.9609327Z FAIL: test_modified_original_authority_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_modified_original_authority_is_refused)
+2026-10-21T13:58:41.9610342Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9610726Z Traceback (most recent call last):
+2026-10-21T13:58:41.9611559Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 20, in test_modified_original_authority_is_refused
+2026-10-21T13:58:41.9612414Z     self.assertTrue(callable(loader))
+2026-10-21T13:58:41.9612723Z AssertionError: False is not true
+2026-10-21T13:58:41.9612923Z 
+2026-10-21T13:58:41.9613055Z ======================================================================
+2026-10-21T13:58:41.9613972Z FAIL: test_protected_decision_cannot_read_development_cache (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_protected_decision_cannot_read_development_cache)
+2026-10-21T13:58:41.9614891Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9615258Z Traceback (most recent call last):
+2026-10-21T13:58:41.9616113Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_partition_authority.py", line 36, in test_protected_decision_cannot_read_development_cache
+2026-10-21T13:58:41.9617053Z     with self.assertRaisesRegex(LabError,'PROTECTED_READ_GATE'):
+2026-10-21T13:58:41.9617459Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9617661Z 
+2026-10-21T13:58:41.9617788Z ======================================================================
+2026-10-21T13:58:41.9618587Z FAIL: test_numeric_cosmetic_and_universe_equivalence (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_numeric_cosmetic_and_universe_equivalence)
+2026-10-21T13:58:41.9619424Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9619788Z Traceback (most recent call last):
+2026-10-21T13:58:41.9620672Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_semantic_schema.py", line 30, in test_numeric_cosmetic_and_universe_equivalence
+2026-10-21T13:58:41.9621567Z     self.assertEqual(semantic_hash(original,3),semantic_hash(changed,3))
+2026-10-21T13:58:41.9622425Z AssertionError: '2628226f01a1add7bc16cdb9c308d4bf25fb8f45163d53253e19cb5be35ba347' != 'd62a8aa98c47c5cadf54a837fc8883f7ef617b23f6d9074209df341546ee398c'
+2026-10-21T13:58:41.9623308Z - 2628226f01a1add7bc16cdb9c308d4bf25fb8f45163d53253e19cb5be35ba347
+2026-10-21T13:58:41.9623818Z + d62a8aa98c47c5cadf54a837fc8883f7ef617b23f6d9074209df341546ee398c
+2026-10-21T13:58:41.9624128Z 
+2026-10-21T13:58:41.9624132Z 
+2026-10-21T13:58:41.9624264Z ======================================================================
+2026-10-21T13:58:41.9625052Z FAIL: test_unknown_top_level_field_is_not_a_new_identity (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_unknown_top_level_field_is_not_a_new_identity)
+2026-10-21T13:58:41.9626021Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9626378Z Traceback (most recent call last):
+2026-10-21T13:58:41.9627211Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_semantic_schema.py", line 38, in test_unknown_top_level_field_is_not_a_new_identity
+2026-10-21T13:58:41.9628341Z     with self.assertRaisesRegex(LabError,'SEMANTIC_SCHEMA_FIELDS'):semantic_hash(value,3)
+2026-10-21T13:58:41.9628831Z AssertionError: LabError not raised
+2026-10-21T13:58:41.9629016Z 
+2026-10-21T13:58:41.9629183Z ----------------------------------------------------------------------
+2026-10-21T13:58:41.9629540Z Ran 9 tests in 0.352s
+2026-10-21T13:58:41.9629697Z 
+2026-10-21T13:58:41.9629794Z FAILED (failures=15)
+2026-10-21T13:58:41.9630464Z MXM_RESOURCE_PARTITION_SEMANTIC_BEFORE: immutable9cc7447;9 methods;15 expected assertion failures;0 errors
+2026-10-21T13:58:41.9916840Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:58:41.9917115Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:58:41.9917345Z [36;1mimport importlib.util,pathlib,sys,unittest[0m
+2026-10-21T13:58:41.9917679Z [36;1mroot=pathlib.Path.cwd();baseline=root/'.chronology-baseline'[0m
+2026-10-21T13:58:41.9917987Z [36;1msys.path.insert(0,str(baseline))[0m
+2026-10-21T13:58:41.9918288Z [36;1mname='research_core_v4.laboratory.test_checkout_provenance'[0m
+2026-10-21T13:58:41.9918768Z [36;1mspec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_checkout_provenance.py')[0m
+2026-10-21T13:58:41.9919343Z [36;1mmodule=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)[0m
+2026-10-21T13:58:41.9919907Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))[0m
+2026-10-21T13:58:41.9920736Z [36;1massert result.testsRun==5 and len(result.failures)==15 and not result.errors[0m
+2026-10-21T13:58:41.9921282Z [36;1mprint('MXM_CHECKOUT_BEFORE: immutable9cc7447;5 methods;15 expected assertion failures;0 errors;artificial native fixtures only')[0m
+2026-10-21T13:58:41.9921720Z [36;1mPY[0m
+2026-10-21T13:58:41.9976504Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:41.9976710Z ##[endgroup]
+2026-10-21T13:58:42.1395870Z test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) ... 
+2026-10-21T13:58:42.1397000Z   test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) (mode='skip') ... FAIL
+2026-10-21T13:58:42.1408273Z   test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) (mode='credentials') ... FAIL
+2026-10-21T13:58:42.1418457Z   test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) (mode='second') ... FAIL
+2026-10-21T13:58:42.1428641Z test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) ... 
+2026-10-21T13:58:42.1429737Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='source') ... FAIL
+2026-10-21T13:58:42.1438387Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='python') ... FAIL
+2026-10-21T13:58:42.1448348Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='directory') ... FAIL
+2026-10-21T13:58:42.1458151Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='repository') ... FAIL
+2026-10-21T13:58:42.1467674Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='path') ... FAIL
+2026-10-21T13:58:42.1477236Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='action') ... FAIL
+2026-10-21T13:58:42.1487195Z   test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='run') ... FAIL
+2026-10-21T13:58:42.1496635Z test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) ... 
+2026-10-21T13:58:42.1497605Z   test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) (value=b'') ... FAIL
+2026-10-21T13:58:42.1505948Z   test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) (value=b'2026-10-20T12:00:00Z 1111111111111111111111111111111111111111\n') ... FAIL
+2026-10-21T13:58:42.1515493Z test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) ... 
+2026-10-21T13:58:42.1516536Z   test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) (key='LAB_SOURCE_SHA') ... FAIL
+2026-10-21T13:58:42.1525546Z   test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) (key='LAB_INTEGRATED_PROTOCOL') ... FAIL
+2026-10-21T13:58:42.1537332Z test_wrong_checkout_in_one_native_job_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_wrong_checkout_in_one_native_job_is_rejected) ... FAIL
+2026-10-21T13:58:42.1538207Z 
+2026-10-21T13:58:42.1538385Z ======================================================================
+2026-10-21T13:58:42.1539618Z FAIL: test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) (mode='skip')
+2026-10-21T13:58:42.1540724Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1541001Z Traceback (most recent call last):
+2026-10-21T13:58:42.1541609Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 40, in test_conditional_or_credential_retaining_checkout_is_rejected
+2026-10-21T13:58:42.1542297Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1542628Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1542769Z 
+2026-10-21T13:58:42.1542866Z ======================================================================
+2026-10-21T13:58:42.1543566Z FAIL: test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) (mode='credentials')
+2026-10-21T13:58:42.1544426Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1544689Z Traceback (most recent call last):
+2026-10-21T13:58:42.1545277Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 40, in test_conditional_or_credential_retaining_checkout_is_rejected
+2026-10-21T13:58:42.1545953Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1546273Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1546407Z 
+2026-10-21T13:58:42.1546498Z ======================================================================
+2026-10-21T13:58:42.1547286Z FAIL: test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) (mode='second')
+2026-10-21T13:58:42.1548002Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1548263Z Traceback (most recent call last):
+2026-10-21T13:58:42.1548837Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 40, in test_conditional_or_credential_retaining_checkout_is_rejected
+2026-10-21T13:58:42.1549498Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1549811Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1549947Z 
+2026-10-21T13:58:42.1550033Z ======================================================================
+2026-10-21T13:58:42.1550785Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='source')
+2026-10-21T13:58:42.1551459Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1551731Z Traceback (most recent call last):
+2026-10-21T13:58:42.1552290Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1552950Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1553272Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1553414Z 
+2026-10-21T13:58:42.1553505Z ======================================================================
+2026-10-21T13:58:42.1554149Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='python')
+2026-10-21T13:58:42.1554809Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1555074Z Traceback (most recent call last):
+2026-10-21T13:58:42.1555638Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1556298Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1556610Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1556748Z 
+2026-10-21T13:58:42.1556833Z ======================================================================
+2026-10-21T13:58:42.1557470Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='directory')
+2026-10-21T13:58:42.1558139Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1558391Z Traceback (most recent call last):
+2026-10-21T13:58:42.1558946Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1559762Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1560075Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1560310Z 
+2026-10-21T13:58:42.1560395Z ======================================================================
+2026-10-21T13:58:42.1561194Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='repository')
+2026-10-21T13:58:42.1562176Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1562557Z Traceback (most recent call last):
+2026-10-21T13:58:42.1563614Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1564598Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1565059Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1565244Z 
+2026-10-21T13:58:42.1565373Z ======================================================================
+2026-10-21T13:58:42.1566282Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='path')
+2026-10-21T13:58:42.1567380Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1567812Z Traceback (most recent call last):
+2026-10-21T13:58:42.1568674Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1569696Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1570306Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1570517Z 
+2026-10-21T13:58:42.1570654Z ======================================================================
+2026-10-21T13:58:42.1571625Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='action')
+2026-10-21T13:58:42.1572617Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1572992Z Traceback (most recent call last):
+2026-10-21T13:58:42.1573820Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1574849Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1575367Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1575592Z 
+2026-10-21T13:58:42.1575738Z ======================================================================
+2026-10-21T13:58:42.1576739Z FAIL: test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) (mode='run')
+2026-10-21T13:58:42.1577766Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1578169Z Traceback (most recent call last):
+2026-10-21T13:58:42.1579062Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 66, in test_job_import_or_working_directory_override_is_rejected
+2026-10-21T13:58:42.1580366Z     with self.subTest(mode=mode),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1580873Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1581342Z 
+2026-10-21T13:58:42.1581490Z ======================================================================
+2026-10-21T13:58:42.1582485Z FAIL: test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) (value=b'')
+2026-10-21T13:58:42.1583510Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1583949Z Traceback (most recent call last):
+2026-10-21T13:58:42.1584882Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 46, in test_missing_or_wrong_actual_checkout_log_is_rejected
+2026-10-21T13:58:42.1586000Z     with self.subTest(value=value),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1586548Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1586978Z 
+2026-10-21T13:58:42.1587132Z ======================================================================
+2026-10-21T13:58:42.1588391Z FAIL: test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) (value=b'2026-10-20T12:00:00Z 1111111111111111111111111111111111111111\n')
+2026-10-21T13:58:42.1589626Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1590049Z Traceback (most recent call last):
+2026-10-21T13:58:42.1591069Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 46, in test_missing_or_wrong_actual_checkout_log_is_rejected
+2026-10-21T13:58:42.1592118Z     with self.subTest(value=value),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1592679Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1592912Z 
+2026-10-21T13:58:42.1593071Z ======================================================================
+2026-10-21T13:58:42.1594224Z FAIL: test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) (key='LAB_SOURCE_SHA')
+2026-10-21T13:58:42.1595397Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1595819Z Traceback (most recent call last):
+2026-10-21T13:58:42.1596790Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 52, in test_source_or_protocol_environment_mismatch_is_rejected
+2026-10-21T13:58:42.1597919Z     with self.subTest(key=key),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1598452Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1598709Z 
+2026-10-21T13:58:42.1598852Z ======================================================================
+2026-10-21T13:58:42.1599967Z FAIL: test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) (key='LAB_INTEGRATED_PROTOCOL')
+2026-10-21T13:58:42.1601298Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1601726Z Traceback (most recent call last):
+2026-10-21T13:58:42.1602688Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 52, in test_source_or_protocol_environment_mismatch_is_rejected
+2026-10-21T13:58:42.1603823Z     with self.subTest(key=key),self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1604354Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1604578Z 
+2026-10-21T13:58:42.1604728Z ======================================================================
+2026-10-21T13:58:42.1605695Z FAIL: test_wrong_checkout_in_one_native_job_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_wrong_checkout_in_one_native_job_is_rejected)
+2026-10-21T13:58:42.1606811Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1607217Z Traceback (most recent call last):
+2026-10-21T13:58:42.1608103Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_checkout_provenance.py", line 30, in test_wrong_checkout_in_one_native_job_is_rejected
+2026-10-21T13:58:42.1609112Z     with self.assertRaises(Exception):self.verify(route,gate)
+2026-10-21T13:58:42.1609559Z AssertionError: Exception not raised
+2026-10-21T13:58:42.1609781Z 
+2026-10-21T13:58:42.1609973Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.1610539Z Ran 5 tests in 0.031s
+2026-10-21T13:58:42.1610712Z 
+2026-10-21T13:58:42.1610833Z FAILED (failures=15)
+2026-10-21T13:58:42.1611710Z MXM_CHECKOUT_BEFORE: immutable9cc7447;5 methods;15 expected assertion failures;0 errors;artificial native fixtures only
+2026-10-21T13:58:42.1710394Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:58:42.1710677Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:58:42.1710915Z [36;1mimport importlib.util,pathlib,sys,unittest[0m
+2026-10-21T13:58:42.1711248Z [36;1mroot=pathlib.Path.cwd();baseline=root/'.chronology-baseline'[0m
+2026-10-21T13:58:42.1711561Z [36;1msys.path.insert(0,str(baseline))[0m
+2026-10-21T13:58:42.1711836Z [36;1mname='research_core_v4.laboratory.test_source_freeze'[0m
+2026-10-21T13:58:42.1712285Z [36;1mspec=importlib.util.spec_from_file_location(name,root/'research_core_v4/laboratory/test_source_freeze.py')[0m
+2026-10-21T13:58:42.1712835Z [36;1mmodule=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)[0m
+2026-10-21T13:58:42.1713394Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))[0m
+2026-10-21T13:58:42.1713894Z [36;1massert result.testsRun==3 and len(result.failures)==10 and not result.errors[0m
+2026-10-21T13:58:42.1714402Z [36;1mprint('MXM_SOURCE_FREEZE_BEFORE: immutable9cc7447;3 methods;10 expected assertion failures;0 errors')[0m
+2026-10-21T13:58:42.1714771Z [36;1mPY[0m
+2026-10-21T13:58:42.1768489Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:42.1768699Z ##[endgroup]
+2026-10-21T13:58:42.2632083Z test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) ... 
+2026-10-21T13:58:42.2633806Z   test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) (mode='no_update') ... FAIL
+2026-10-21T13:58:42.2644243Z   test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) (mode='no_deletion') ... FAIL
+2026-10-21T13:58:42.2653764Z   test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) (mode='no_nonff') ... FAIL
+2026-10-21T13:58:42.2663654Z test_exact_applied_no_bypass_source_freeze_admits (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_exact_applied_no_bypass_source_freeze_admits) ... ok
+2026-10-21T13:58:42.2671864Z test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) ... 
+2026-10-21T13:58:42.2673612Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='omitted') ... FAIL
+2026-10-21T13:58:42.2682187Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='app') ... FAIL
+2026-10-21T13:58:42.2692033Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='disabled') ... FAIL
+2026-10-21T13:58:42.2701057Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='wildcard') ... FAIL
+2026-10-21T13:58:42.2710903Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='excluded') ... FAIL
+2026-10-21T13:58:42.2720079Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='no_creation') ... FAIL
+2026-10-21T13:58:42.2729575Z   test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='no_update') ... FAIL
+2026-10-21T13:58:42.2730683Z 
+2026-10-21T13:58:42.2730847Z ======================================================================
+2026-10-21T13:58:42.2732013Z FAIL: test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) (mode='no_update')
+2026-10-21T13:58:42.2733083Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2733480Z Traceback (most recent call last):
+2026-10-21T13:58:42.2734396Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 42, in test_append_only_or_missing_applied_freeze_cannot_start_operation
+2026-10-21T13:58:42.2735444Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2735904Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2736108Z 
+2026-10-21T13:58:42.2736244Z ======================================================================
+2026-10-21T13:58:42.2737302Z FAIL: test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) (mode='no_deletion')
+2026-10-21T13:58:42.2738398Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2738792Z Traceback (most recent call last):
+2026-10-21T13:58:42.2739674Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 42, in test_append_only_or_missing_applied_freeze_cannot_start_operation
+2026-10-21T13:58:42.2740805Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2741255Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2741447Z 
+2026-10-21T13:58:42.2741600Z ======================================================================
+2026-10-21T13:58:42.2742563Z FAIL: test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) (mode='no_nonff')
+2026-10-21T13:58:42.2743551Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2743916Z Traceback (most recent call last):
+2026-10-21T13:58:42.2744758Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 42, in test_append_only_or_missing_applied_freeze_cannot_start_operation
+2026-10-21T13:58:42.2745707Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2746343Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2746526Z 
+2026-10-21T13:58:42.2746657Z ======================================================================
+2026-10-21T13:58:42.2747637Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='omitted')
+2026-10-21T13:58:42.2748608Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2748984Z Traceback (most recent call last):
+2026-10-21T13:58:42.2749841Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2751043Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2751509Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2751867Z 
+2026-10-21T13:58:42.2752016Z ======================================================================
+2026-10-21T13:58:42.2753006Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='app')
+2026-10-21T13:58:42.2754116Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2754534Z Traceback (most recent call last):
+2026-10-21T13:58:42.2755469Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2756574Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2757066Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2757277Z 
+2026-10-21T13:58:42.2757430Z ======================================================================
+2026-10-21T13:58:42.2758481Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='disabled')
+2026-10-21T13:58:42.2759593Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2760011Z Traceback (most recent call last):
+2026-10-21T13:58:42.2761099Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2762216Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2762820Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2763036Z 
+2026-10-21T13:58:42.2763187Z ======================================================================
+2026-10-21T13:58:42.2764228Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='wildcard')
+2026-10-21T13:58:42.2765313Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2765756Z Traceback (most recent call last):
+2026-10-21T13:58:42.2766680Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2767756Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2768223Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2768416Z 
+2026-10-21T13:58:42.2768530Z ======================================================================
+2026-10-21T13:58:42.2769427Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='excluded')
+2026-10-21T13:58:42.2770720Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2771129Z Traceback (most recent call last):
+2026-10-21T13:58:42.2772103Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2773178Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2773656Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2773865Z 
+2026-10-21T13:58:42.2773994Z ======================================================================
+2026-10-21T13:58:42.2775077Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='no_creation')
+2026-10-21T13:58:42.2776366Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2776799Z Traceback (most recent call last):
+2026-10-21T13:58:42.2777764Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2778881Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2779376Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2779601Z 
+2026-10-21T13:58:42.2779736Z ======================================================================
+2026-10-21T13:58:42.2780949Z FAIL: test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) (mode='no_update')
+2026-10-21T13:58:42.2782077Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2782519Z Traceback (most recent call last):
+2026-10-21T13:58:42.2783483Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_freeze.py", line 53, in test_missing_bypass_actors_or_disabled_or_wrong_scope_refused
+2026-10-21T13:58:42.2784579Z     with self.subTest(mode=mode),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.2785072Z AssertionError: LabError not raised
+2026-10-21T13:58:42.2785292Z 
+2026-10-21T13:58:42.2785468Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.2785889Z Ran 3 tests in 0.011s
+2026-10-21T13:58:42.2786091Z 
+2026-10-21T13:58:42.2786204Z FAILED (failures=10)
+2026-10-21T13:58:42.2787548Z MXM_SOURCE_FREEZE_BEFORE: immutable9cc7447;3 methods;10 expected assertion failures;0 errors
+2026-10-21T13:58:42.2895033Z ##[group]Run python3 - <<'PYCODE'
+2026-10-21T13:58:42.2895305Z [36;1mpython3 - <<'PYCODE'[0m
+2026-10-21T13:58:42.2895547Z [36;1mimport importlib.util,pathlib,sys,unittest[0m
+2026-10-21T13:58:42.2895917Z [36;1mroot=pathlib.Path.cwd();sys.path.insert(0,str(root/'.chronology-baseline'))[0m
+2026-10-21T13:58:42.2896323Z [36;1mfor stem in ('test_source_freeze','test_source_namespace'):[0m
+2026-10-21T13:58:42.2896627Z [36;1m    name='research_core_v4.laboratory.'+stem[0m
+2026-10-21T13:58:42.2897030Z [36;1m    spec=importlib.util.spec_from_file_location(name,root/('research_core_v4/laboratory/'+stem+'.py'))[0m
+2026-10-21T13:58:42.2897568Z [36;1m    module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)[0m
+2026-10-21T13:58:42.2898129Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(module))[0m
+2026-10-21T13:58:42.2898654Z [36;1massert result.testsRun==2 and len(result.failures)==3 and not result.errors[0m
+2026-10-21T13:58:42.2899125Z [36;1mprint('MXM_NAMESPACE_BEFORE: immutable9cc7447;2 methods;3 expected assertion failures;0 errors')[0m
+2026-10-21T13:58:42.2899488Z [36;1mPYCODE[0m
+2026-10-21T13:58:42.2953194Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:42.2953406Z ##[endgroup]
+2026-10-21T13:58:42.3809425Z test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) ... 
+2026-10-21T13:58:42.3810663Z   test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/*'], exclude=[]) ... FAIL
+2026-10-21T13:58:42.3821733Z   test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/mxm-o04-*'], exclude=['refs/heads/mxm-o04-active-v1']) ... FAIL
+2026-10-21T13:58:42.3825433Z test_immutable_source_does_not_require_rewriting_merge_history (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_immutable_source_does_not_require_rewriting_merge_history) ... FAIL
+2026-10-21T13:58:42.3826295Z 
+2026-10-21T13:58:42.3826394Z ======================================================================
+2026-10-21T13:58:42.3827078Z FAIL: test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/*'], exclude=[])
+2026-10-21T13:58:42.3827795Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.3828086Z Traceback (most recent call last):
+2026-10-21T13:58:42.3828680Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_namespace.py", line 24, in test_historical_authority_fence_scope_cannot_change
+2026-10-21T13:58:42.3829393Z     with self.subTest(include=include,exclude=exclude),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.3829761Z AssertionError: LabError not raised
+2026-10-21T13:58:42.3829925Z 
+2026-10-21T13:58:42.3830023Z ======================================================================
+2026-10-21T13:58:42.3830976Z FAIL: test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) (include=['refs/heads/mxm-o04-*'], exclude=['refs/heads/mxm-o04-active-v1'])
+2026-10-21T13:58:42.3831761Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.3832032Z Traceback (most recent call last):
+2026-10-21T13:58:42.3832590Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_namespace.py", line 24, in test_historical_authority_fence_scope_cannot_change
+2026-10-21T13:58:42.3833500Z     with self.subTest(include=include,exclude=exclude),self.assertRaises(LabError):self.check(route)
+2026-10-21T13:58:42.3833880Z AssertionError: LabError not raised
+2026-10-21T13:58:42.3834025Z 
+2026-10-21T13:58:42.3834117Z ======================================================================
+2026-10-21T13:58:42.3834757Z FAIL: test_immutable_source_does_not_require_rewriting_merge_history (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_immutable_source_does_not_require_rewriting_merge_history)
+2026-10-21T13:58:42.3835403Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.3835658Z Traceback (most recent call last):
+2026-10-21T13:58:42.3836235Z   File "/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v4/laboratory/test_source_namespace.py", line 13, in test_immutable_source_does_not_require_rewriting_merge_history
+2026-10-21T13:58:42.3836923Z     self.assertEqual(runtime.SOURCE_BRANCH,'mxm-r3-integrated-source-20261021-r7')
+2026-10-21T13:58:42.3837409Z AssertionError: 'mxm-o04-successor-code-integrated-p0-r3' != 'mxm-r3-integrated-source-20261021-r7'
+2026-10-21T13:58:42.3837807Z - mxm-o04-successor-code-integrated-p0-r3
+2026-10-21T13:58:42.3838056Z + mxm-r3-integrated-source-20261021-r7
+2026-10-21T13:58:42.3838336Z 
+2026-10-21T13:58:42.3838339Z 
+2026-10-21T13:58:42.3838460Z ----------------------------------------------------------------------
+2026-10-21T13:58:42.3838720Z Ran 2 tests in 0.003s
+2026-10-21T13:58:42.3838831Z 
+2026-10-21T13:58:42.3838907Z FAILED (failures=3)
+2026-10-21T13:58:42.3839205Z MXM_NAMESPACE_BEFORE: immutable9cc7447;2 methods;3 expected assertion failures;0 errors
+2026-10-21T13:58:42.3980536Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:58:42.3980804Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:58:42.3981004Z [36;1mimport pathlib, unittest[0m
+2026-10-21T13:58:42.3981425Z [36;1mnames = sorted(str(p.with_suffix('')).replace('/', '.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))[0m
+2026-10-21T13:58:42.3981928Z [36;1mnames.append('tests.test_continuous_account_replay_v2')[0m
+2026-10-21T13:58:42.3982406Z [36;1mresult = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))[0m
+2026-10-21T13:58:42.3982852Z [36;1mraise SystemExit(not result.wasSuccessful())[0m
+2026-10-21T13:58:42.3983091Z [36;1mPY[0m
+2026-10-21T13:58:42.4040378Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:42.4040680Z ##[endgroup]
+2026-10-21T13:58:42.9495688Z test_baseline_preserved (research_core_v4.laboratory.test_admission.AdmissionTests.test_baseline_preserved) ... ok
+2026-10-21T13:58:42.9497627Z test_changed_historical_identity_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_changed_historical_identity_rejected) ... ok
+2026-10-21T13:58:42.9501315Z test_distinct_lane_has_explicit_finite_cap (research_core_v4.laboratory.test_admission.AdmissionTests.test_distinct_lane_has_explicit_finite_cap) ... ok
+2026-10-21T13:58:42.9503108Z test_duplicate_observation_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_duplicate_observation_rejected) ... ok
+2026-10-21T13:58:42.9542528Z test_empty_intents_do_not_open_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_empty_intents_do_not_open_outcome) ... ok
+2026-10-21T13:58:42.9545858Z test_family_cap_not_changed_after_registration (research_core_v4.laboratory.test_admission.AdmissionTests.test_family_cap_not_changed_after_registration) ... ok
+2026-10-21T13:58:42.9547380Z test_hold_not_refunded_or_reopened (research_core_v4.laboratory.test_admission.AdmissionTests.test_hold_not_refunded_or_reopened) ... ok
+2026-10-21T13:58:42.9585047Z test_missing_account_does_not_open_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_missing_account_does_not_open_outcome) ... ok
+2026-10-21T13:58:42.9622483Z test_missing_quotes_do_not_open_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_missing_quotes_do_not_open_outcome) ... ok
+2026-10-21T13:58:42.9626054Z test_no_observation_without_exposure (research_core_v4.laboratory.test_admission.AdmissionTests.test_no_observation_without_exposure) ... ok
+2026-10-21T13:58:42.9628939Z test_observation_cap_checked_before_further_exposure (research_core_v4.laboratory.test_admission.AdmissionTests.test_observation_cap_checked_before_further_exposure) ... ok
+2026-10-21T13:58:42.9634704Z test_reservation_is_not_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_reservation_is_not_outcome) ... ok
+2026-10-21T13:58:42.9636883Z test_same_unopened_identity_not_blanket_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_same_unopened_identity_not_blanket_rejected) ... ok
+2026-10-21T13:58:42.9651587Z test_semantic_hash_ignores_only_identity_metadata_and_universe_order (research_core_v4.laboratory.test_admission.AdmissionTests.test_semantic_hash_ignores_only_identity_metadata_and_universe_order) ... ok
+2026-10-21T13:58:42.9653376Z test_semantic_rename_blocked_across_lanes (research_core_v4.laboratory.test_admission.AdmissionTests.test_semantic_rename_blocked_across_lanes) ... ok
+2026-10-21T13:58:42.9654895Z test_shared_family_cap_not_reset_by_programme (research_core_v4.laboratory.test_admission.AdmissionTests.test_shared_family_cap_not_reset_by_programme) ... ok
+2026-10-21T13:58:42.9689618Z test_supported_gross_opens_even_with_unknown_costs (research_core_v4.laboratory.test_admission.AdmissionTests.test_supported_gross_opens_even_with_unknown_costs) ... ok
+2026-10-21T13:58:42.9694100Z test_tampered_journal_and_view_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_tampered_journal_and_view_rejected) ... ok
+2026-10-21T13:58:42.9696736Z test_existing_authentication_sends_exact_three_view_requests_and_closes (research_core_v4.laboratory.test_broker_access_reception.BrokerAccessReception.test_existing_authentication_sends_exact_three_view_requests_and_closes) ... ok
+2026-10-21T13:58:42.9721613Z test_historical_or_order_request_cannot_escape_authentication_guard (research_core_v4.laboratory.test_broker_access_reception.BrokerAccessReception.test_historical_or_order_request_cannot_escape_authentication_guard) ... ok
+2026-10-21T13:58:42.9731576Z test_partial_connect_failure_still_closes_transport (research_core_v4.laboratory.test_broker_access_reception.BrokerAccessReception.test_partial_connect_failure_still_closes_transport) ... ok
+2026-10-21T13:58:42.9733523Z test_trade_scope_refused_before_account_authentication (research_core_v4.laboratory.test_broker_access_reception.BrokerAccessReception.test_trade_scope_refused_before_account_authentication) ... ok
+2026-10-21T13:58:42.9735561Z test_workflow_uses_only_existing_isolated_broker_role_and_read_token (research_core_v4.laboratory.test_broker_access_reception.BrokerAccessReception.test_workflow_uses_only_existing_isolated_broker_role_and_read_token) ... ok
+2026-10-21T13:58:42.9737622Z test_collision_no_overwrite_and_only_404_means_absent (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_collision_no_overwrite_and_only_404_means_absent) ... ok
+2026-10-21T13:58:42.9739623Z test_complete_native_origin_required_before_full_gate_consumer (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_complete_native_origin_required_before_full_gate_consumer) ... ok
+2026-10-21T13:58:42.9741969Z test_forged_source_run_or_path_even_with_rehashed_payload_refused (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_forged_source_run_or_path_even_with_rehashed_payload_refused) ... ok
+2026-10-21T13:58:42.9756892Z test_issuer_job_checkout_provenance_and_log_hash_are_not_favorable_flags (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_issuer_job_checkout_provenance_and_log_hash_are_not_favorable_flags) ... ok
+2026-10-21T13:58:42.9772628Z test_native_failure_inflight_rerun_wrong_workflow_or_trigger_refused (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_native_failure_inflight_rerun_wrong_workflow_or_trigger_refused) ... ok
+2026-10-21T13:58:42.9774816Z test_redacted_live_actors_need_exact_native_seal_revision (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_redacted_live_actors_need_exact_native_seal_revision) ... ok
+2026-10-21T13:58:42.9782720Z test_replacement_and_unrelated_native_commit_refused (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_replacement_and_unrelated_native_commit_refused) ... ok
+2026-10-21T13:58:42.9784901Z test_source_and_execution_identities_do_not_collide_with_r6_or_each_other (research_core_v4.laboratory.test_certificate_registry.CertificateRegistryTests.test_source_and_execution_identities_do_not_collide_with_r6_or_each_other) ... ok
+2026-10-21T13:58:43.0066391Z test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) ... ok
+2026-10-21T13:58:43.0493981Z test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) ... ok
+2026-10-21T13:58:43.0613618Z test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) ... ok
+2026-10-21T13:58:43.0735813Z test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) ... ok
+2026-10-21T13:58:43.0798308Z test_wrong_checkout_in_one_native_job_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_wrong_checkout_in_one_native_job_is_rejected) ... ok
+2026-10-21T13:58:43.0800085Z test_exact_public_checkpoint20_is_eligible_for_verified_decryption (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_exact_public_checkpoint20_is_eligible_for_verified_decryption) ... ok
+2026-10-21T13:58:43.0804261Z test_no_public_field_or_evidence_ref_can_be_renamed (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_no_public_field_or_evidence_ref_can_be_renamed) ... ok
+2026-10-21T13:58:43.0818774Z test_no_synthetic_private_can_masquerade_as_sealed_checkpoint (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_no_synthetic_private_can_masquerade_as_sealed_checkpoint) ... ok
+2026-10-21T13:58:43.0820907Z test_prior_closed_checkpoint19_has_distinct_lineage (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_prior_closed_checkpoint19_has_distinct_lineage) ... ok
+2026-10-21T13:58:43.0822792Z test_cold_corpus_compares_receipt_commitments_and_counts_not_timings (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_cold_corpus_compares_receipt_commitments_and_counts_not_timings) ... ok
+2026-10-21T13:58:43.0824679Z test_legacy_trust_collision_is_reported_without_values_or_repair (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_legacy_trust_collision_is_reported_without_values_or_repair) ... ok
+2026-10-21T13:58:43.0826492Z test_no_reset_check_rejects_each_preserved_component (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_no_reset_check_rejects_each_preserved_component) ... ok
+2026-10-21T13:58:43.0828014Z test_positive_call_is_not_a_negative_probe (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_positive_call_is_not_a_negative_probe) ... ok
+2026-10-21T13:58:43.0829580Z test_public_checkpoint_is_immutable_not_a_favorable_label (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_public_checkpoint_is_immutable_not_a_favorable_label) ... ok
+2026-10-21T13:58:43.0831578Z test_workflow_restricts_secret_scope_and_keeps_evidence_read_only (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_workflow_restricts_secret_scope_and_keeps_evidence_read_only) ... ok
+2026-10-21T13:58:43.0833501Z test_authentic_public_receipt_cannot_authorize_fabricated_private (research_core_v4.laboratory.test_checkpoint23_forward_migration.Checkpoint23Migration.test_authentic_public_receipt_cannot_authorize_fabricated_private) ... ok
+2026-10-21T13:58:43.0842292Z test_exact_native_closed_state_and_no_public_authority_substitution (research_core_v4.laboratory.test_checkpoint23_forward_migration.Checkpoint23Migration.test_exact_native_closed_state_and_no_public_authority_substitution) ... ok
+2026-10-21T13:58:43.0849346Z test_only_exact_closed_native_state_is_eligible (research_core_v4.laboratory.test_checkpoint24_forward_migration.Checkpoint24Migration.test_only_exact_closed_native_state_is_eligible) ... ok
+2026-10-21T13:58:43.0851564Z test_public_authority_cannot_substitute_for_private_decryption (research_core_v4.laboratory.test_checkpoint24_forward_migration.Checkpoint24Migration.test_public_authority_cannot_substitute_for_private_decryption) ... ok
+2026-10-21T13:58:43.0859245Z test_adjacent_funding_intervals_conserve_cash (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_adjacent_funding_intervals_conserve_cash) ... ok
+2026-10-21T13:58:43.0861756Z test_equivalent_utc_instants_form_one_atomic_mark_batch (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_equivalent_utc_instants_form_one_atomic_mark_batch) ... ok
+2026-10-21T13:58:43.0864114Z test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) ... ok
+2026-10-21T13:58:43.0865743Z test_exit_quote_itself_cannot_escape_stop_out_guard (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_quote_itself_cannot_escape_stop_out_guard) ... ok
+2026-10-21T13:58:43.0869363Z test_financing_intervals_cannot_be_recharged_at_another_timestamp (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_financing_intervals_cannot_be_recharged_at_another_timestamp) ... ok
+2026-10-21T13:58:43.0871328Z test_fractional_or_boolean_volume_is_not_coerced (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_fractional_or_boolean_volume_is_not_coerced) ... ok
+2026-10-21T13:58:43.0873081Z test_laboratory_replay_requires_explicit_stop_out_contract (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_laboratory_replay_requires_explicit_stop_out_contract) ... ok
+2026-10-21T13:58:43.0874750Z test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) ... ok
+2026-10-21T13:58:43.0876539Z test_mark_risk_precedes_same_instant_exit_margin_release (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_risk_precedes_same_instant_exit_margin_release) ... ok
+2026-10-21T13:58:43.0878660Z test_native_screen_rejects_future_signal_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_future_signal_before_opening) ... ok
+2026-10-21T13:58:43.0881087Z test_native_screen_rejects_late_quote_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_late_quote_before_opening) ... ok
+2026-10-21T13:58:43.0882599Z test_negative_component_cannot_hide_in_positive_total_cost (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_negative_component_cannot_hide_in_positive_total_cost) ... ok
+2026-10-21T13:58:43.0892553Z test_exact_checkpoint25_is_authorized_without_new_code_branch (research_core_v4.laboratory.test_closed_native_authority.ClosedNativeAuthority.test_exact_checkpoint25_is_authorized_without_new_code_branch) ... ok
+2026-10-21T13:58:43.0895933Z test_malformed_or_duplicate_authority_table_is_refused (research_core_v4.laboratory.test_closed_native_authority.ClosedNativeAuthority.test_malformed_or_duplicate_authority_table_is_refused) ... ok
+2026-10-21T13:58:43.0943443Z test_abandoned_or_unfinished_program_not_accepted (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_abandoned_or_unfinished_program_not_accepted) ... ok
+2026-10-21T13:58:43.0990939Z test_actual_lab_A_B_A_bring_B_new_assets_to_A (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_actual_lab_A_B_A_bring_B_new_assets_to_A) ... ok
+2026-10-21T13:58:43.1020318Z test_false_order_or_refund_rejected (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_false_order_or_refund_rejected) ... ok
+2026-10-21T13:58:43.1064413Z test_modified_event_hash_cannot_be_certified (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_modified_event_hash_cannot_be_certified) ... ok
+2026-10-21T13:58:43.1095188Z test_removed_B_asset_rejected_at_cold_restore (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_removed_B_asset_rejected_at_cold_restore) ... ok
+2026-10-21T13:58:43.1103986Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T13:58:43.1107714Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T13:58:43.1111795Z test_every_live_security_field_and_revision_is_bound (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_every_live_security_field_and_revision_is_bound) ... ok
+2026-10-21T13:58:43.1113388Z test_exact_live_revision_resolves_only_redacted_actor_inventory (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_exact_live_revision_resolves_only_redacted_actor_inventory) ... ok
+2026-10-21T13:58:43.1117226Z test_omission_is_not_empty_and_witness_cannot_broaden_authority (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_omission_is_not_empty_and_witness_cannot_broaden_authority) ... ok
+2026-10-21T13:58:43.1254962Z test_witness_is_environment_configuration_only_for_issuer_jobs (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_witness_is_environment_configuration_only_for_issuer_jobs) ... ok
+2026-10-21T13:58:43.1256165Z test_current_and_archived_is_ambiguous (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_current_and_archived_is_ambiguous) ... ok
+2026-10-21T13:58:43.1257275Z test_current_enabled_does_not_qualify_execution (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_current_enabled_does_not_qualify_execution) ... ok
+2026-10-21T13:58:43.1258400Z test_duplicate_native_ids_rejected (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_duplicate_native_ids_rejected) ... ok
+2026-10-21T13:58:43.1259218Z test_id_reuse_name_drift_not_same_identity (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_id_reuse_name_drift_not_same_identity) ... ok
+2026-10-21T13:58:43.1260081Z test_missing_disabled_archived_are_distinct (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_missing_disabled_archived_are_distinct) ... ok
+2026-10-21T13:58:43.1261160Z test_new_ids_are_not_filtered_out_by_historical_cap (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_new_ids_are_not_filtered_out_by_historical_cap) ... ok
+2026-10-21T13:58:43.1262122Z test_terms_reference_not_dated_cost_or_margin_certificate (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_terms_reference_not_dated_cost_or_margin_certificate) ... ok
+2026-10-21T13:58:43.1291091Z test_authentic_quote_is_not_fill (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_authentic_quote_is_not_fill) ... ok
+2026-10-21T13:58:43.1292099Z test_future_and_timestamp_mismatch_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_future_and_timestamp_mismatch_fail) ... ok
+2026-10-21T13:58:43.1293225Z test_native_proof_binds_original_attempt_and_does_not_accept_retry (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_native_proof_binds_original_attempt_and_does_not_accept_retry) ... ok
+2026-10-21T13:58:43.1294135Z test_unknown_pagination_and_nan_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_unknown_pagination_and_nan_fail) ... ok
+2026-10-21T13:58:43.1295005Z test_window_and_conflict_do_not_create_economic_results (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_window_and_conflict_do_not_create_economic_results) ... ok
+2026-10-21T13:58:43.1325330Z test_contiguous_support_without_outcomes_or_mutation (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_contiguous_support_without_outcomes_or_mutation) ... ok
+2026-10-21T13:58:43.1326517Z test_gap_does_not_certify_session (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_gap_does_not_certify_session) ... ok
+2026-10-21T13:58:43.1328955Z test_protected_and_duplicate_rows_fail (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_protected_and_duplicate_rows_fail) ... ok
+2026-10-21T13:58:43.1330693Z test_zero_volume_not_missing_or_profit_evidence (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_zero_volume_not_missing_or_profit_evidence) ... ok
+2026-10-21T13:58:43.1389779Z test_actual_freeze_native_callback_checkpoint_chain (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_actual_freeze_native_callback_checkpoint_chain) ... ok
+2026-10-21T13:58:43.1394180Z test_binding_keeps_reserved_resource_budget_and_original_corpus (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_binding_keeps_reserved_resource_budget_and_original_corpus) ... ok
+2026-10-21T13:58:43.1397364Z test_cosmetic_rationale_rename_cannot_reserve_an_extra_identity (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_cosmetic_rationale_rename_cannot_reserve_an_extra_identity) ... ok
+2026-10-21T13:58:43.1398467Z test_gate_rejects_missing_reception_or_unprotected_control_plane (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_gate_rejects_missing_reception_or_unprotected_control_plane) ... ok
+2026-10-21T13:58:43.1400949Z test_index_upgrade_preserves_legacy_and_roundtrips (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_index_upgrade_preserves_legacy_and_roundtrips) ... ok
+2026-10-21T13:58:43.1402093Z test_rationale_and_identity_labels_cannot_avoid_causal_fingerprint (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_rationale_and_identity_labels_cannot_avoid_causal_fingerprint) ... ok
+2026-10-21T13:58:43.1403230Z test_recovered_new_admission_preserves_closed_predecessor_and_identity (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_recovered_new_admission_preserves_closed_predecessor_and_identity) ... ok
+2026-10-21T13:58:43.1409941Z test_shared_cache_and_remaining_survive_checkpoint (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_shared_cache_and_remaining_survive_checkpoint) ... ok
+2026-10-21T13:58:43.1411119Z test_ambiguous_duplicates_hold (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_ambiguous_duplicates_hold) ... ok
+2026-10-21T13:58:43.1412120Z test_live_run_never_reissued (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_live_run_never_reissued) ... ok
+2026-10-21T13:58:43.1413034Z test_lost_ack_can_reissue_only_after_durable_cas_marker (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_lost_ack_can_reissue_only_after_durable_cas_marker) ... ok
+2026-10-21T13:58:43.1413950Z test_no_unbounded_retry_or_partial_run_inventory (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_no_unbounded_retry_or_partial_run_inventory) ... ok
+2026-10-21T13:58:43.1414753Z test_short_grace_does_not_retry (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_short_grace_does_not_retry) ... ok
+2026-10-21T13:58:43.1415522Z test_unrelated_run_does_not_count_as_issued (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_unrelated_run_does_not_count_as_issued) ... ok
+2026-10-21T13:58:43.1421155Z test_ambiguous_pending_programme_is_never_scheduled_around (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_ambiguous_pending_programme_is_never_scheduled_around) ... ok
+2026-10-21T13:58:43.1427113Z test_global_pending_and_changed_saved_manifest_are_refused (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_global_pending_and_changed_saved_manifest_are_refused) ... ok
+2026-10-21T13:58:43.1470208Z test_prospective_priorities_produce_actual_A_B_resume_A (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_prospective_priorities_produce_actual_A_B_resume_A) ... ok
+2026-10-21T13:58:43.1476570Z test_ties_follow_sealed_admission_order (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_ties_follow_sealed_admission_order) ... ok
+2026-10-21T13:58:43.1485445Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T13:58:43.1489116Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T13:58:43.1490048Z test_budget_schema_compatibility (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_budget_schema_compatibility) ... ok
+2026-10-21T13:58:43.1491188Z test_c033_hold_cannot_be_erased_from_public_report (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_c033_hold_cannot_be_erased_from_public_report) ... ok
+2026-10-21T13:58:43.1517481Z test_checkpoint_roundtrip_and_incomplete_part_rejected (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_checkpoint_roundtrip_and_incomplete_part_rejected) ... ok
+2026-10-21T13:58:43.1519733Z test_legacy_and_typed_reports_do_not_infer_same_units (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_legacy_and_typed_reports_do_not_infer_same_units) ... ok
+2026-10-21T13:58:43.1520741Z test_only_proven_pre_fence_crash_recoverable (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_only_proven_pre_fence_crash_recoverable) ... ok
+2026-10-21T13:58:43.1530019Z test_path_escape_and_reordered_parts_rejected (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_path_escape_and_reordered_parts_rejected) ... ok
+2026-10-21T13:58:43.1531052Z test_running_or_duplicate_job_is_not_proof_of_no_exposure (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_running_or_duplicate_job_is_not_proof_of_no_exposure) ... ok
+2026-10-21T13:58:43.1532209Z test_technical_run_conserves_every_accounting_field (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_technical_run_conserves_every_accounting_field) ... ok
+2026-10-21T13:58:43.1533131Z test_workflow_success_cannot_substitute_skipped_worker (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_workflow_success_cannot_substitute_skipped_worker) ... ok
+2026-10-21T13:58:43.3329854Z test_acquisition_cache_first_and_bounded_whitelist (research_core_v4.laboratory.test_integration.IntegratedReception.test_acquisition_cache_first_and_bounded_whitelist) ... ok
+2026-10-21T13:58:43.3331109Z test_budget_exhausted_and_duplicate_identity (research_core_v4.laboratory.test_integration.IntegratedReception.test_budget_exhausted_and_duplicate_identity) ... ok
+2026-10-21T13:58:43.3358822Z test_changed_result_manifest_and_cache_fail_closed (research_core_v4.laboratory.test_integration.IntegratedReception.test_changed_result_manifest_and_cache_fail_closed) ... ok
+2026-10-21T13:58:43.3426057Z test_chunked_atomic_ciphertext_and_corrupt_part (research_core_v4.laboratory.test_integration.IntegratedReception.test_chunked_atomic_ciphertext_and_corrupt_part) ... ok
+2026-10-21T13:58:43.3499901Z test_complete_branching_economic_integration_and_cold_resume (research_core_v4.laboratory.test_integration.IntegratedReception.test_complete_branching_economic_integration_and_cold_resume) ... ok
+2026-10-21T13:58:43.3508675Z test_cycles_invalid_operator_and_post_outcome_tuning (research_core_v4.laboratory.test_integration.IntegratedReception.test_cycles_invalid_operator_and_post_outcome_tuning) ... ok
+2026-10-21T13:58:43.3511197Z test_data_quality_dedup_conflict_and_causality (research_core_v4.laboratory.test_integration.IntegratedReception.test_data_quality_dedup_conflict_and_causality) ... ok
+2026-10-21T13:58:43.3529418Z test_duplicate_execution_and_unsafe_resume (research_core_v4.laboratory.test_integration.IntegratedReception.test_duplicate_execution_and_unsafe_resume) ... ok
+2026-10-21T13:58:43.3530956Z test_durable_intent_blocks_new_push_retry_until_recovery (research_core_v4.laboratory.test_integration.IntegratedReception.test_durable_intent_blocks_new_push_retry_until_recovery) ... ok
+2026-10-21T13:58:43.3546391Z test_frozen_account_sizing_and_common_factor_contention (research_core_v4.laboratory.test_integration.IntegratedReception.test_frozen_account_sizing_and_common_factor_contention) ... ok
+2026-10-21T13:58:43.3563634Z test_future_information_and_missing_deep_cost (research_core_v4.laboratory.test_integration.IntegratedReception.test_future_information_and_missing_deep_cost) ... ok
+2026-10-21T13:58:43.3573990Z test_gap_lags_are_not_compressed (research_core_v4.laboratory.test_integration.IntegratedReception.test_gap_lags_are_not_compressed) ... ok
+2026-10-21T13:58:43.3584700Z test_general_causal_dsl_cross_symbol_and_temporal_features (research_core_v4.laboratory.test_integration.IntegratedReception.test_general_causal_dsl_cross_symbol_and_temporal_features) ... ok
+2026-10-21T13:58:43.3585619Z test_historical_budget_reconciled_without_refund (research_core_v4.laboratory.test_integration.IntegratedReception.test_historical_budget_reconciled_without_refund) ... ok
+2026-10-21T13:58:43.3588191Z test_invalid_candidate_before_execution (research_core_v4.laboratory.test_integration.IntegratedReception.test_invalid_candidate_before_execution) ... ok
+2026-10-21T13:58:43.3598800Z test_native_cost_adapter_unknown_terms_and_missing_exit (research_core_v4.laboratory.test_integration.IntegratedReception.test_native_cost_adapter_unknown_terms_and_missing_exit) ... ok
+2026-10-21T13:58:43.3606196Z test_native_quote_path_into_shared_account_and_unresolved_gates (research_core_v4.laboratory.test_integration.IntegratedReception.test_native_quote_path_into_shared_account_and_unresolved_gates) ... ok
+2026-10-21T13:58:43.3609505Z test_partial_day_interval_includes_next_iso_week (research_core_v4.laboratory.test_integration.IntegratedReception.test_partial_day_interval_includes_next_iso_week) ... ok
+2026-10-21T13:58:43.3737666Z test_reception_assertions_block_false_success (research_core_v4.laboratory.test_integration.IntegratedReception.test_reception_assertions_block_false_success) ... ok
+2026-10-21T13:58:43.3740428Z test_rejected_position_has_no_simulated_financing_charge (research_core_v4.laboratory.test_integration.IntegratedReception.test_rejected_position_has_no_simulated_financing_charge) ... ok
+2026-10-21T13:58:43.3761927Z test_screen_reporting_and_broker_metadata_are_bound (research_core_v4.laboratory.test_integration.IntegratedReception.test_screen_reporting_and_broker_metadata_are_bound) ... ok
+2026-10-21T13:58:43.3763639Z test_synthetic_catalogue_never_satisfies_native_cache (research_core_v4.laboratory.test_integration.IntegratedReception.test_synthetic_catalogue_never_satisfies_native_cache) ... ok
+2026-10-21T13:58:43.3870251Z test_three_distinct_programme_graphs_without_source_change (research_core_v4.laboratory.test_integration.IntegratedReception.test_three_distinct_programme_graphs_without_source_change) ... ok
+2026-10-21T13:58:43.3898807Z test_unknown_cost_is_not_zero_or_a_loss (research_core_v4.laboratory.test_integration.IntegratedReception.test_unknown_cost_is_not_zero_or_a_loss) ... ok
+2026-10-21T13:58:43.3900368Z test_both_feature_paths_refuse_quarantined_inputs (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_both_feature_paths_refuse_quarantined_inputs) ... ok
+2026-10-21T13:58:43.3912947Z test_migration_preserves_variants_but_refuses_query_and_view (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_migration_preserves_variants_but_refuses_query_and_view) ... ok
+2026-10-21T13:58:43.3918035Z test_only_exact_legacy_trust_conflicts_are_repairable (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_only_exact_legacy_trust_conflicts_are_repairable) ... ok
+2026-10-21T13:58:43.3920419Z test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) ... ok
+2026-10-21T13:58:43.3991479Z test_ack_native_proof_from_divergent_git_history_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_ack_native_proof_from_divergent_git_history_rejected) ... ok
+2026-10-21T13:58:43.4024300Z test_bare_favorable_json_is_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_bare_favorable_json_is_rejected) ... ok
+2026-10-21T13:58:43.4117919Z test_certificate_proof_ancestor_survives_native_append_only (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_certificate_proof_ancestor_survives_native_append_only) ... ok
+2026-10-21T13:58:43.4168776Z test_certifier_denies_missing_protected_main_or_failed_run (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_certifier_denies_missing_protected_main_or_failed_run) ... ok
+2026-10-21T13:58:43.4234931Z test_cold_schema_v2_rejected_even_with_native_jobs (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_cold_schema_v2_rejected_even_with_native_jobs) ... ok
+2026-10-21T13:58:43.4335445Z test_consumer_independently_requires_exact_native_cas_reply (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_consumer_independently_requires_exact_native_cas_reply) ... ok
+2026-10-21T13:58:43.4397780Z test_cross_run_job_or_seal_binding_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_cross_run_job_or_seal_binding_rejected) ... ok
+2026-10-21T13:58:43.4497211Z test_exact_cipher_or_accounting_change_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_exact_cipher_or_accounting_change_rejected) ... ok
+2026-10-21T13:58:43.4561660Z test_fake_boolean_positive_cannot_replace_native_history (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_fake_boolean_positive_cannot_replace_native_history) ... ok
+2026-10-21T13:58:43.4655797Z test_fully_linked_artificial_protocol_fixture (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_fully_linked_artificial_protocol_fixture) ... ok
+2026-10-21T13:58:43.4787330Z test_missing_aba_or_authentic_proof_must_hold (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_missing_aba_or_authentic_proof_must_hold) ... ok
+2026-10-21T13:58:43.4915274Z test_missing_programme_budget_or_receipt_hash_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_missing_programme_budget_or_receipt_hash_rejected) ... ok
+2026-10-21T13:58:43.5179555Z test_skipped_or_failed_native_job_is_not_acceptance (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_skipped_or_failed_native_job_is_not_acceptance) ... ok
+2026-10-21T13:58:43.5427818Z test_tampered_or_missing_v3_proof_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_tampered_or_missing_v3_proof_rejected) ... ok
+2026-10-21T13:58:43.5494523Z test_unprotected_control_plane_and_incomplete_native_run_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_unprotected_control_plane_and_incomplete_native_run_rejected) ... ok
+2026-10-21T13:58:43.5496278Z test_effective_rules_not_protected_boolean (research_core_v4.laboratory.test_native_acl_probe.NativeACLTest.test_effective_rules_not_protected_boolean) ... ok
+2026-10-21T13:58:43.5498014Z test_generic_forbidden_is_not_rule_denial (research_core_v4.laboratory.test_native_acl_probe.NativeACLTest.test_generic_forbidden_is_not_rule_denial) ... ok
+2026-10-21T13:58:43.5502657Z MXM_ACL_RESULT {"after": "parent", "before": "parent", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "type": "pull_request"}, {"ruleset_id": 25461184, "type": "required_status_checks"}], "positive_commit_status": 201, "proposal": "proposal", "response": {"message": "Repository rule violations found"}, "response_sha256": "915ede0e41347ceb17303d280330e2f347d43b7b40a6094ea4a070ae192bd8ba", "rule": {"bypass_actors": [], "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main"]}}, "enforcement": "active", "id": 25461184, "rules": [{"type": "pull_request"}, {"parameters": {"required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "target": "branch"}, "ruleset_id": 25461184, "tree": "tree", "update_status": 422}
+2026-10-21T13:58:43.5506073Z test_successful_write_and_generic_denial_fail (research_core_v4.laboratory.test_native_acl_probe.NativeACLTest.test_successful_write_and_generic_denial_fail) ... ok
+2026-10-21T13:58:43.5509071Z MXM_ACL_RESULT {"after": "parent", "before": "parent", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "type": "pull_request"}, {"ruleset_id": 25461184, "type": "required_status_checks"}], "positive_commit_status": 201, "proposal": "proposal", "response": {"message": "Resource not accessible by integration"}, "response_sha256": "dbd2648a8b38caac0472f43bcced1701e42f7203978df2b4d17740e551ca3f4a", "rule": {"bypass_actors": [], "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main"]}}, "enforcement": "active", "id": 25461184, "rules": [{"type": "pull_request"}, {"parameters": {"required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "target": "branch"}, "ruleset_id": 25461184, "tree": "tree", "update_status": 403}
+2026-10-21T13:58:43.5513197Z MXM_ACL_RESULT {"after": "parent", "before": "parent", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "type": "pull_request"}, {"ruleset_id": 25461184, "type": "required_status_checks"}], "positive_commit_status": 201, "proposal": "proposal", "response": {"message": "accepted"}, "response_sha256": "1fc93842ea759dac2e4f66e160d7e17edbd374ff8a088291884a33796efdf731", "rule": {"bypass_actors": [], "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main"]}}, "enforcement": "active", "id": 25461184, "rules": [{"type": "pull_request"}, {"parameters": {"required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "target": "branch"}, "ruleset_id": 25461184, "tree": "tree", "update_status": 200}
+2026-10-21T13:58:43.5515564Z test_actual_native_github_reply_binds_both_objects_and_exact_ref (research_core_v4.laboratory.test_native_cas_response.NativeCASResponse.test_actual_native_github_reply_binds_both_objects_and_exact_ref) ... ok
+2026-10-21T13:58:43.5516514Z test_exact_destination_and_old_value_only (research_core_v4.laboratory.test_native_cas_response.NativeCASResponse.test_exact_destination_and_old_value_only) ... ok
+2026-10-21T13:58:43.9440908Z test_real_concurrent_receive_pack_and_stale_advertisement (research_core_v4.laboratory.test_native_cas_response.NativeCASResponse.test_real_concurrent_receive_pack_and_stale_advertisement) ... ok
+2026-10-21T13:58:43.9444843Z MXM_NATIVE_TEMP_CLEANUP {"failure_class": "OSError", "errno": 39, "primary_error_preserved": true, "contains_custody_keys_or_app_token": false}
+2026-10-21T13:58:43.9445693Z MXM_NATIVE_TEMP_CLEANUP {"failure_class": "OSError", "errno": 39, "primary_error_preserved": false, "contains_custody_keys_or_app_token": false}
+2026-10-21T13:58:43.9451402Z test_pack_cleanup_cannot_replace_original_cas_refusal (research_core_v4.laboratory.test_native_git_cleanup.NativeGitCleanup.test_pack_cleanup_cannot_replace_original_cas_refusal) ... ok
+2026-10-21T13:58:43.9502816Z test_real_git_disables_both_automatic_maintenance_paths (research_core_v4.laboratory.test_native_git_cleanup.NativeGitCleanup.test_real_git_disables_both_automatic_maintenance_paths) ... ok
+2026-10-21T13:58:43.9537259Z test_authentic_quote_is_not_fill (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_authentic_quote_is_not_fill) ... ok
+2026-10-21T13:58:43.9538548Z test_future_and_timestamp_mismatch_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_future_and_timestamp_mismatch_fail) ... ok
+2026-10-21T13:58:43.9540071Z test_native_proof_binds_original_attempt_and_does_not_accept_retry (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_native_proof_binds_original_attempt_and_does_not_accept_retry) ... ok
+2026-10-21T13:58:43.9541844Z test_unknown_pagination_and_nan_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_unknown_pagination_and_nan_fail) ... ok
+2026-10-21T13:58:43.9542782Z test_window_and_conflict_do_not_create_economic_results (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_window_and_conflict_do_not_create_economic_results) ... ok
+2026-10-21T13:58:43.9589036Z test_conflicts_are_not_promoted (research_core_v4.laboratory.test_native_quote_reuse.ReuseContract.test_conflicts_are_not_promoted) ... ok
+2026-10-21T13:58:43.9590402Z test_exact_window_preserves_source_and_identity (research_core_v4.laboratory.test_native_quote_reuse.ReuseContract.test_exact_window_preserves_source_and_identity) ... ok
+2026-10-21T13:58:43.9591852Z test_unmatched_or_other_window_does_not_repair_gap (research_core_v4.laboratory.test_native_quote_reuse.ReuseContract.test_unmatched_or_other_window_does_not_repair_gap) ... ok
+2026-10-21T13:58:43.9593389Z test_delayed_parent_may_converge_without_second_write (research_core_v4.laboratory.test_native_ref_confirmation.NativeRefConfirmation.test_delayed_parent_may_converge_without_second_write) ... ok
+2026-10-21T13:58:43.9595248Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9597288Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 2, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9599309Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "read_attempt": 3, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9600840Z test_exact_git_protocol_destination_required (research_core_v4.laboratory.test_native_ref_confirmation.NativeRefConfirmation.test_exact_git_protocol_destination_required) ... ok
+2026-10-21T13:58:43.9601777Z test_unchanged_or_unexpected_ref_is_never_success (research_core_v4.laboratory.test_native_ref_confirmation.NativeRefConfirmation.test_unchanged_or_unexpected_ref_is_never_success) ... ok
+2026-10-21T13:58:43.9602869Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9604103Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 2, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9605295Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 3, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9606696Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 4, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9607970Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 5, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9609149Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "cccccccccccccccccccccccccccccccccccccccc", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:43.9925933Z test_cli_uses_same_module_scope_as_imported_publishers_and_guards (research_core_v4.laboratory.test_native_writer_entrypoint.NativeWriterEntrypoint.test_cli_uses_same_module_scope_as_imported_publishers_and_guards) ... ok
+2026-10-21T13:58:43.9936173Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T13:58:43.9939953Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T13:58:43.9945365Z test_no_fabrication_on_missing_or_invalid_input (research_core_v4.laboratory.test_nonoutcome_adapter.PreservedCorpusBindingTests.test_no_fabrication_on_missing_or_invalid_input) ... ok
+2026-10-21T13:58:43.9956438Z test_selected_quote_must_match_conserved_raw_page (research_core_v4.laboratory.test_nonoutcome_adapter.PreservedCorpusBindingTests.test_selected_quote_must_match_conserved_raw_page) ... ok
+2026-10-21T13:58:43.9961931Z test_zero_wire_nonoutcome_operator_preserves_quote_provenance (research_core_v4.laboratory.test_nonoutcome_adapter.PreservedCorpusBindingTests.test_zero_wire_nonoutcome_operator_preserves_quote_provenance) ... ok
+2026-10-21T13:58:43.9963389Z test_A01_empty_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A01_empty_not_usable) ... ok
+2026-10-21T13:58:43.9964718Z test_A02_async_not_fabricated_and_crossed_rejected (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_async_not_fabricated_and_crossed_rejected) ... ok
+2026-10-21T13:58:43.9966084Z test_A02_unilateral_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_unilateral_not_usable) ... ok
+2026-10-21T13:58:44.0001448Z test_A03_forged_winner_not_certified (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A03_forged_winner_not_certified) ... ok
+2026-10-21T13:58:44.0197027Z test_A03_mutated_cas_facts_and_native_logs (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A03_mutated_cas_facts_and_native_logs) ... ok
+2026-10-21T13:58:44.0242655Z test_A04_hold_is_not_complete (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A04_hold_is_not_complete) ... ok
+2026-10-21T13:58:44.0375394Z test_A05_reordered_rechained_duplicate_and_orphan_events (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A05_reordered_rechained_duplicate_and_orphan_events) ... ok
+2026-10-21T13:58:44.0419188Z test_A05_truncated_journal (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A05_truncated_journal) ... ok
+2026-10-21T13:58:44.0423864Z test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) ... ok
+2026-10-21T13:58:44.0426629Z test_A06_valid_positive_negative_conservation (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_valid_positive_negative_conservation) ... ok
+2026-10-21T13:58:44.0428551Z test_A07_adapter_rejects_future_signal_before_economic_open (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_adapter_rejects_future_signal_before_economic_open) ... ok
+2026-10-21T13:58:44.0429683Z test_A07_adapter_rejects_late_quote (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_adapter_rejects_late_quote) ... ok
+2026-10-21T13:58:44.0433951Z test_A07_engine_independently_rejects_clocks (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_engine_independently_rejects_clocks) ... ok
+2026-10-21T13:58:44.0435484Z test_DAT01_preserves_same_millisecond_side_revisions (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_DAT01_preserves_same_millisecond_side_revisions) ... ok
+2026-10-21T13:58:44.0436996Z test_DAT02_trust_mutation_rejected_on_restore (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_DAT02_trust_mutation_rejected_on_restore) ... ok
+2026-10-21T13:58:44.0438461Z test_I04_different_native_workflow_head_refused (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_I04_different_native_workflow_head_refused) ... ok
+2026-10-21T13:58:44.0439887Z test_REC01_filtered_inventory_paginates (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_REC01_filtered_inventory_paginates) ... ok
+2026-10-21T13:58:44.0441511Z test_REC01_retry_requires_independent_preclaim_failure (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_REC01_retry_requires_independent_preclaim_failure) ... ok
+2026-10-21T13:58:44.0469623Z test_REC04_missing_protocol_refuses_before_network (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_REC04_missing_protocol_refuses_before_network) ... ok
+2026-10-21T13:58:44.0471335Z test_SEC02_protected_boolean_does_not_replace_effective_authority (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_SEC02_protected_boolean_does_not_replace_effective_authority) ... ok
+2026-10-21T13:58:44.0474287Z test_SEC03_forward_commit_rollback_or_receipt_tamper_refused (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_SEC03_forward_commit_rollback_or_receipt_tamper_refused) ... ok
+2026-10-21T13:58:44.0475948Z test_SEC04_additive_rule_and_timestamp_changes_allowed (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_SEC04_additive_rule_and_timestamp_changes_allowed) ... ok
+2026-10-21T13:58:44.0477212Z test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) ... ok
+2026-10-21T13:58:44.0478350Z test_historical_bar_with_protected_availability_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_historical_bar_with_protected_availability_is_refused) ... ok
+2026-10-21T13:58:44.0482007Z test_modified_original_authority_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_modified_original_authority_is_refused) ... ok
+2026-10-21T13:58:44.0483659Z test_protected_decision_cannot_read_development_cache (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_protected_decision_cannot_read_development_cache) ... ok
+2026-10-21T13:58:44.0487696Z test_changed_native_identity_or_base_cannot_clear_fence (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_changed_native_identity_or_base_cannot_clear_fence) ... ok
+2026-10-21T13:58:44.0489162Z test_cross_run_or_duplicate_job_id_is_rejected (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_cross_run_or_duplicate_job_id_is_rejected) ... ok
+2026-10-21T13:58:44.0516952Z test_finite_fault_points_never_apply_to_an_economic_admission (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_finite_fault_points_never_apply_to_an_economic_admission) ... ok
+2026-10-21T13:58:44.0531064Z test_inventory_cannot_drop_a_retirement_or_relabel_completion (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_inventory_cannot_drop_a_retirement_or_relabel_completion) ... ok
+2026-10-21T13:58:44.0535050Z test_real_terminal_graph_is_required (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_real_terminal_graph_is_required) ... ok
+2026-10-21T13:58:44.0537123Z test_retirement_preserves_cipher_ledger_and_does_not_claim_completion (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_retirement_preserves_cipher_ledger_and_does_not_claim_completion) ... ok
+2026-10-21T13:58:44.0551260Z test_retirement_requires_independent_native_graph_after_rehashing (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_retirement_requires_independent_native_graph_after_rehashing) ... ok
+2026-10-21T13:58:44.0553601Z test_uncertain_task_is_retired_even_under_a_new_admission_hash (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_uncertain_task_is_retired_even_under_a_new_admission_hash) ... ok
+2026-10-21T13:58:44.0555289Z test_unknown_exposure_cannot_be_declared_technical (research_core_v4.laboratory.test_post_fence_technical.TechnicalPostFence.test_unknown_exposure_cannot_be_declared_technical) ... ok
+2026-10-21T13:58:44.0557196Z test_exact_original_and_linear_recovery_successor_are_conserved (research_core_v4.laboratory.test_public_checkpoint_lineage.PublicCheckpointLineage.test_exact_original_and_linear_recovery_successor_are_conserved) ... ok
+2026-10-21T13:58:44.0558379Z test_fork_cycle_spoof_and_insufficient_history_do_not_authorize_origin (research_core_v4.laboratory.test_public_checkpoint_lineage.PublicCheckpointLineage.test_fork_cycle_spoof_and_insufficient_history_do_not_authorize_origin) ... ok
+2026-10-21T13:58:44.1709019Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "1d2a428c0b05c4142fd89bbf1d6d0d1d6e9db8cc", "observed_oid": "1d2a428c0b05c4142fd89bbf1d6d0d1d6e9db8cc", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:44.1795207Z test_lost_ack_verifies_remote_bytes_without_second_push (research_core_v4.laboratory.test_publisher_git_confirmation.PublisherGitConfirmation.test_lost_ack_verifies_remote_bytes_without_second_push) ... ok
+2026-10-21T13:58:44.2407369Z {"state": "ATOMIC_ACK_RECONCILED_BY_EXACT_REMOTE_BYTES", "commit": "1d2a428c0b05c4142fd89bbf1d6d0d1d6e9db8cc", "second_push": false}
+2026-10-21T13:58:44.2408342Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "1d2a428c0b05c4142fd89bbf1d6d0d1d6e9db8cc", "observed_oid": "1d2a428c0b05c4142fd89bbf1d6d0d1d6e9db8cc", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T13:58:44.2478379Z test_success_uses_native_git_ref_when_rest_stays_at_parent (research_core_v4.laboratory.test_publisher_git_confirmation.PublisherGitConfirmation.test_success_uses_native_git_ref_when_rest_stays_at_parent) ... ok
+2026-10-21T13:58:44.2479783Z test_all_same_millisecond_revisions_are_decoded (research_core_v4.laboratory.test_raw_quote_receipts.RawQuoteReceiptTests.test_all_same_millisecond_revisions_are_decoded) ... ok
+2026-10-21T13:58:44.2481419Z test_async_empty_and_partial_remain_distinct (research_core_v4.laboratory.test_raw_quote_receipts.RawQuoteReceiptTests.test_async_empty_and_partial_remain_distinct) ... ok
+2026-10-21T13:58:44.2483388Z test_raw_clock_type_identity_and_duplicate_pages_are_rejected (research_core_v4.laboratory.test_raw_quote_receipts.RawQuoteReceiptTests.test_raw_clock_type_identity_and_duplicate_pages_are_rejected) ... ok
+2026-10-21T13:58:44.2541963Z test_contract_charges_and_existing_reservation_are_distinct_without_refund (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_contract_charges_and_existing_reservation_are_distinct_without_refund) ... ok
+2026-10-21T13:58:44.2543426Z test_diagnostic_fails_if_sealed_zero_is_contradicted (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_diagnostic_fails_if_sealed_zero_is_contradicted) ... ok
+2026-10-21T13:58:44.2545162Z test_nonzero_constant_is_distinct_from_zero (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_nonzero_constant_is_distinct_from_zero) ... ok
+2026-10-21T13:58:44.2546354Z test_zero_volume_does_not_erase_individual_price_condition_counts (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_zero_volume_does_not_erase_individual_price_condition_counts) ... ok
+2026-10-21T13:58:44.2708825Z test_arbitrary_descendant_or_extra_write_cannot_authorize_migration (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_arbitrary_descendant_or_extra_write_cannot_authorize_migration) ... ok
+2026-10-21T13:58:44.2915390Z test_changed_accounting_cipher_continuation_or_claim_is_held (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_changed_accounting_cipher_continuation_or_claim_is_held) ... ok
+2026-10-21T13:58:44.2985687Z test_exact_recovery_retains_original_migration_authority_without_replay (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_exact_recovery_retains_original_migration_authority_without_replay) ... ok
+2026-10-21T13:58:44.3055508Z test_wrong_source_native_checkout_is_not_recovery_evidence (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_wrong_source_native_checkout_is_not_recovery_evidence) ... ok
+2026-10-21T13:58:44.3063608Z test_closed_or_foreign_state_cannot_bootstrap_or_dispatch (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_closed_or_foreign_state_cannot_bootstrap_or_dispatch) ... ok
+2026-10-21T13:58:44.3065931Z test_controlled_fault_flag_requires_exact_native_job_log (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_controlled_fault_flag_requires_exact_native_job_log) ... ok
+2026-10-21T13:58:44.3076734Z test_existing_app_scope_is_revoked_and_cleared_after_failure (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_existing_app_scope_is_revoked_and_cleared_after_failure) ... ok
+2026-10-21T13:58:44.3089052Z test_existing_app_scope_is_revoked_and_cleared_after_success (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_existing_app_scope_is_revoked_and_cleared_after_success) ... ok
+2026-10-21T13:58:44.3090765Z test_generated_existing_watchdog_has_no_native_write_or_custody_authority (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_generated_existing_watchdog_has_no_native_write_or_custody_authority) ... ok
+2026-10-21T13:58:44.3091784Z test_only_native_terminal_preexposure_failure_is_recoverable (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_only_native_terminal_preexposure_failure_is_recoverable) ... ok
+2026-10-21T13:58:44.3095472Z test_wrong_native_context_rejects_before_code_or_key_access (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_wrong_native_context_rejects_before_code_or_key_access) ... ok
+2026-10-21T13:58:44.3096750Z test_wrong_predecessor_branch_attempt_or_workflow_is_not_authority (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_wrong_predecessor_branch_attempt_or_workflow_is_not_authority) ... ok
+2026-10-21T13:58:44.3098663Z test_operational_acceptance_alone_cannot_release_research (research_core_v4.laboratory.test_research_reception_hold.ResearchReceptionHoldTests.test_operational_acceptance_alone_cannot_release_research) ... ok
+2026-10-21T13:58:44.4754853Z test_full_page_reservation_conserves_total_and_kind_across_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_full_page_reservation_conserves_total_and_kind_across_restore) ... ok
+2026-10-21T13:58:44.6439205Z test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) ... ok
+2026-10-21T13:58:44.6441425Z test_missing_transport_reserves_once_without_refund (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_missing_transport_reserves_once_without_refund) ... ok
+2026-10-21T13:58:44.6458113Z test_cleanup_checks_every_metadata_before_first_delete (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_cleanup_checks_every_metadata_before_first_delete) ... ok
+2026-10-21T13:58:44.6462486Z test_copy_http_body_contains_only_ciphertext (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_copy_http_body_contains_only_ciphertext) ... ok
+2026-10-21T13:58:44.6464008Z test_installable_workflow_is_exact_and_has_no_arbitrary_inputs (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_installable_workflow_is_exact_and_has_no_arbitrary_inputs) ... ok
+2026-10-21T13:58:44.6465511Z test_missing_and_mismatched_values_fail (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_missing_and_mismatched_values_fail) ... ok
+2026-10-21T13:58:44.6466941Z test_native_terminal_jobs_and_exact_receipts_required (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_native_terminal_jobs_and_exact_receipts_required) ... ok
+2026-10-21T13:58:44.7220744Z test_real_system_sealed_box_preserves_exact_bytes (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_real_system_sealed_box_preserves_exact_bytes) ... ok
+2026-10-21T13:58:44.7222270Z test_wildcards_tags_and_bypass_are_refused (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_wildcards_tags_and_bypass_are_refused) ... ok
+2026-10-21T13:58:44.7232422Z test_additive_transition_retains_all_history_and_roundtrips (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_additive_transition_retains_all_history_and_roundtrips) ... ok
+2026-10-21T13:58:44.7246410Z test_changed_missing_or_repeated_transition_refused_without_mutation (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_changed_missing_or_repeated_transition_refused_without_mutation) ... ok
+2026-10-21T13:58:44.7271417Z test_equivalent_cross_lane_reservation_does_not_reset_capacity (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_equivalent_cross_lane_reservation_does_not_reset_capacity) ... ok
+2026-10-21T13:58:44.7273889Z test_large_integers_are_not_rounded_by_decimal_context (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_large_integers_are_not_rounded_by_decimal_context) ... ok
+2026-10-21T13:58:44.7278535Z test_numeric_cosmetic_and_universe_equivalence (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_numeric_cosmetic_and_universe_equivalence) ... ok
+2026-10-21T13:58:44.7279766Z test_unknown_top_level_field_is_not_a_new_identity (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_unknown_top_level_field_is_not_a_new_identity) ... ok
+2026-10-21T13:58:44.7289578Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T13:58:44.7293409Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T13:58:44.7322093Z test_A_B_resume_A_keeps_shared_assets_quarantine_and_budgets (research_core_v4.laboratory.test_shared_catalogue_successor.SharedCatalogueSuccessor.test_A_B_resume_A_keeps_shared_assets_quarantine_and_budgets) ... ok
+2026-10-21T13:58:44.7328675Z test_conflicting_common_asset_metadata_fails_closed (research_core_v4.laboratory.test_shared_catalogue_successor.SharedCatalogueSuccessor.test_conflicting_common_asset_metadata_fails_closed) ... ok
+2026-10-21T13:58:44.7330235Z test_partition_isolation (research_core_v4.laboratory.test_shared_catalogue_successor.SharedCatalogueSuccessor.test_partition_isolation) ... ok
+2026-10-21T13:58:44.7336378Z test_app_control_scope_cannot_publish_any_evidence (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_app_control_scope_cannot_publish_any_evidence) ... ok
+2026-10-21T13:58:44.7755552Z test_changed_redacted_policy_or_nonempty_bypass_is_held (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_changed_redacted_policy_or_nonempty_bypass_is_held) ... ok
+2026-10-21T13:58:44.7824268Z test_independent_successful_same_run_pinned_control_job_admits (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_independent_successful_same_run_pinned_control_job_admits) ... ok
+2026-10-21T13:58:44.8165359Z test_old_source_run_trigger_or_attempt_is_not_authority (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_old_source_run_trigger_or_attempt_is_not_authority) ... ok
+2026-10-21T13:58:44.8475214Z test_successful_job_label_requires_real_successful_checkout (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_successful_job_label_requires_real_successful_checkout) ... ok
+2026-10-21T13:58:44.8497918Z test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) ... ok
+2026-10-21T13:58:44.8505989Z test_exact_applied_no_bypass_source_freeze_admits (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_exact_applied_no_bypass_source_freeze_admits) ... ok
+2026-10-21T13:58:44.8555314Z test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) ... ok
+2026-10-21T13:58:44.8570811Z test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) ... ok
+2026-10-21T13:58:44.8578390Z test_immutable_source_does_not_require_rewriting_merge_history (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_immutable_source_does_not_require_rewriting_merge_history) ... ok
+2026-10-21T13:58:45.0245811Z test_all_tasks_cannot_be_forged_as_skipped (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_all_tasks_cannot_be_forged_as_skipped) ... ok
+2026-10-21T13:58:45.0343403Z test_real_dependency_verdicts_and_transitive_skips_restore (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_real_dependency_verdicts_and_transitive_skips_restore) ... ok
+2026-10-21T13:58:45.0417101Z test_rehashed_journal_cannot_reverse_dependency_execution (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_rehashed_journal_cannot_reverse_dependency_execution) ... ok
+2026-10-21T13:58:45.0428514Z test_unfinished_dependency_cannot_justify_skip (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_unfinished_dependency_cannot_justify_skip) ... ok
+2026-10-21T13:58:45.0433670Z test_no_scope_or_schedule_can_reach_transport (research_core_v4.laboratory.test_transport_diagnostic.TransportDiagnosticTests.test_no_scope_or_schedule_can_reach_transport) ... ok
+2026-10-21T13:58:45.0434895Z test_only_fixed_new_diagnostic_paths (research_core_v4.laboratory.test_transport_diagnostic.TransportDiagnosticTests.test_only_fixed_new_diagnostic_paths) ... ok
+2026-10-21T13:58:45.0436388Z test_replies_redact_raw_and_encoded_authority (research_core_v4.laboratory.test_transport_diagnostic.TransportDiagnosticTests.test_replies_redact_raw_and_encoded_authority) ... ok
+2026-10-21T13:58:45.0437739Z test_exact_known_pressure_and_no_overlap_horizon (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_exact_known_pressure_and_no_overlap_horizon) ... ok
+2026-10-21T13:58:45.0438971Z test_future_and_synthetic_assets_rejected (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_future_and_synthetic_assets_rejected) ... ok
+2026-10-21T13:58:45.0440051Z test_no_volume_shock_and_zero_volume_are_not_signals (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_no_volume_shock_and_zero_volume_are_not_signals) ... ok
+2026-10-21T13:58:45.0441294Z test_unknown_clock_or_late_receipt_does_not_compress_history (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_unknown_clock_or_late_receipt_does_not_compress_history) ... ok
+2026-10-21T13:58:45.0784908Z test_every_prepared_operational_job_passes_independent_code_provenance (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_every_prepared_operational_job_passes_independent_code_provenance) ... ok
+2026-10-21T13:58:45.1332519Z test_failure_clears_scope_and_revokes_without_retry (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_failure_clears_scope_and_revokes_without_retry) ... ok
+2026-10-21T13:58:45.1338434Z test_native_github_token_alone_cannot_publish (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_native_github_token_alone_cannot_publish) ... ok
+2026-10-21T13:58:45.1351754Z test_no_owner_or_broker_key_may_enter_writer_context (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_no_owner_or_broker_key_may_enter_writer_context) ... ok
+2026-10-21T13:58:45.1489136Z test_prepared_workflow_reuses_dag_and_separates_credentials (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_prepared_workflow_reuses_dag_and_separates_credentials) ... ok
+2026-10-21T13:58:45.2015837Z test_scoped_mint_use_revoke_keeps_key_and_token_out_of_workload_environment (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_scoped_mint_use_revoke_keeps_key_and_token_out_of_workload_environment) ... ok
+2026-10-21T13:58:45.2038048Z test_wrong_job_ref_attempt_or_workflow_is_refused_before_credentials (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_wrong_job_ref_attempt_or_workflow_is_refused_before_credentials) ... ok
+2026-10-21T13:58:45.2040242Z test_external_cashflow_neutral_nav (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_external_cashflow_neutral_nav) ... ok
+2026-10-21T13:58:45.2043019Z test_financing_cost_compounding_and_metrics (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_financing_cost_compounding_and_metrics) ... ok
+2026-10-21T13:58:45.2044537Z test_rejected_entry_future_events_skip_not_crash (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_rejected_entry_future_events_skip_not_crash) ... ok
+2026-10-21T13:58:45.2047075Z test_same_timestamp_marks_are_atomic (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_same_timestamp_marks_are_atomic) ... ok
+2026-10-21T13:58:45.2048303Z test_stop_out_unknown_fails_closed (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_stop_out_unknown_fails_closed) ... ok
+2026-10-21T13:58:45.2048897Z 
+2026-10-21T13:58:45.2049068Z ----------------------------------------------------------------------
+2026-10-21T13:58:45.2049493Z Ran 301 tests in 2.256s
+2026-10-21T13:58:45.2049665Z 
+2026-10-21T13:58:45.2049761Z OK
+2026-10-21T13:58:45.2481705Z ##[group]Run python3 -m research_core_v4.laboratory.live_preflight_v3
+2026-10-21T13:58:45.2482104Z [36;1mpython3 -m research_core_v4.laboratory.live_preflight_v3[0m
+2026-10-21T13:58:45.2536101Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:58:45.2536312Z env:
+2026-10-21T13:58:45.2538342Z   GH_TOKEN: ***
+2026-10-21T13:58:45.2538536Z ##[endgroup]
+2026-10-21T13:59:08.3716131Z {"active_authority_unchanged": true, "checkpoint_evidence_oid": "09703adad6433f395a0506fa640f59bf3dba80b5", "checkpoint_sequence": 20, "end_to_end_operational_certificate_issued": false, "evidence_lineage": {"head": "5034b7a5769def9692ecd3d51eae49e440da4a6a", "origin": "09703adad6433f395a0506fa640f59bf3dba80b5", "successor_commits": 56}, "exact_public_state_sha256": "57664d1192228a97e4dc88d3b36081872da532e0515df5e02d7df8d113ca4f91", "execution_protected": true, "main_protected": true, "new_economic_outcomes": 0, "orders": 0, "owner_anchor_unchanged": true, "private_migration_and_runtime_acceptance_evaluated": false, "r2_source_protected": true, "schema": "mxm.r3.public-preflight.v2"}
+2026-10-21T13:59:08.3881410Z ##[group]Run python3 - <<'PY'
+2026-10-21T13:59:08.3881803Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T13:59:08.3882101Z [36;1mimport json[0m
+2026-10-21T13:59:08.3882542Z [36;1mfrom research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly[0m
+2026-10-21T13:59:08.3883039Z [36;1mroute=GetOnly()[0m
+2026-10-21T13:59:08.3883380Z [36;1mfor ident in (25222248,25461184,25461373,25461529):[0m
+2026-10-21T13:59:08.3883825Z [36;1m    policy=route.json('rulesets/'+str(ident))[0m
+2026-10-21T13:59:08.3885027Z [36;1m    print('MXM_NATIVE_ACL_VISIBILITY '+json.dumps({'ruleset':ident,'enforcement':policy['enforcement'],'updated_at':policy['updated_at'],'bypass_field_present':'bypass_actors' in policy,'bypass_actors':policy.get('bypass_actors')}))[0m
+2026-10-21T13:59:08.3886116Z [36;1mPY[0m
+2026-10-21T13:59:08.3950541Z shell: /usr/bin/bash -e {0}
+2026-10-21T13:59:08.3950765Z env:
+2026-10-21T13:59:08.3952751Z   GH_TOKEN: ***
+2026-10-21T13:59:08.3953006Z ##[endgroup]
+2026-10-21T13:59:10.0679242Z MXM_NATIVE_ACL_VISIBILITY {"ruleset": 25222248, "enforcement": "active", "updated_at": "2026-10-16T06:41:41.359Z", "bypass_field_present": false, "bypass_actors": null}
+2026-10-21T13:59:10.0680665Z MXM_NATIVE_ACL_VISIBILITY {"ruleset": 25461184, "enforcement": "active", "updated_at": "2026-10-20T08:10:59.161Z", "bypass_field_present": false, "bypass_actors": null}
+2026-10-21T13:59:10.0681817Z MXM_NATIVE_ACL_VISIBILITY {"ruleset": 25461373, "enforcement": "active", "updated_at": "2026-10-20T08:16:47.404Z", "bypass_field_present": false, "bypass_actors": null}
+2026-10-21T13:59:10.0682955Z MXM_NATIVE_ACL_VISIBILITY {"ruleset": 25461529, "enforcement": "active", "updated_at": "2026-10-20T08:19:44.135Z", "bypass_field_present": false, "bypass_actors": null}
+2026-10-21T13:59:10.0863234Z Post job cleanup.
+2026-10-21T13:59:10.1536714Z [command]/usr/bin/git version
+2026-10-21T13:59:10.1573762Z git version 2.55.0
+2026-10-21T13:59:10.1606249Z Temporarily overriding HOME='/home/runner/work/_temp/c97a3974-0001-4dd4-9b73-c15c648a776e' before making global git config changes
+2026-10-21T13:59:10.1607162Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T13:59:10.1611435Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.chronology-baseline
+2026-10-21T13:59:10.1644612Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:59:10.1673433Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:59:10.1884674Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:59:10.1952107Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:59:10.2458087Z Post job cleanup.
+2026-10-21T13:59:10.3170757Z [command]/usr/bin/git version
+2026-10-21T13:59:10.3209313Z git version 2.55.0
+2026-10-21T13:59:10.3281231Z Temporarily overriding HOME='/home/runner/work/_temp/682cb2d6-2585-4fe4-b0fe-f11fa405f28a' before making global git config changes
+2026-10-21T13:59:10.3282357Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T13:59:10.3283483Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.selector-baseline
+2026-10-21T13:59:10.3300946Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:59:10.3357431Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:59:10.3566225Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:59:10.3595813Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:59:10.3988186Z Post job cleanup.
+2026-10-21T13:59:10.4683682Z [command]/usr/bin/git version
+2026-10-21T13:59:10.4718012Z git version 2.55.0
+2026-10-21T13:59:10.4751231Z Temporarily overriding HOME='/home/runner/work/_temp/fba031f7-0bea-41a5-991d-19e7e8707fb3' before making global git config changes
+2026-10-21T13:59:10.4751946Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T13:59:10.4756152Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-21T13:59:10.4789689Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T13:59:10.4817799Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T13:59:10.5023556Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T13:59:10.5053041Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T13:59:10.5411709Z Cleaning up orphan processes
+2026-10-21T13:59:10.5661091Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

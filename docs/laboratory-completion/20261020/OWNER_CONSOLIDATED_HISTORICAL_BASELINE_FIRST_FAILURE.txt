@@ -1,0 +1,19 @@
+E
+======================================================================
+ERROR: test_current_state (tests.test_compact_semantic_closure_v2.ClosureTests.test_current_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-baseline/tests/test_compact_semantic_closure_v2.py", line 60, in test_current_state
+    def test_current_state(self):self.assertEqual(validate_root('.')['status'],'PASS_COMPACT_BASELINE_BOUNDARY')
+                                                  ^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/2f4ce99cba3e/mxm-baseline/research_core_v4/master1576_current_state_guard_v7.py", line 11, in validate_root
+    c.require(c.sha((root/x['ref']).read_bytes())==x['sha256'],'BINDING_DRIFT:'+x['ref'])
+  File "/workspace/scratch/2f4ce99cba3e/mxm-baseline/research_core_v4/strict_reselection_v2.py", line 22, in require
+    if not ok:raise ValueError(code)
+              ^^^^^^^^^^^^^^^^^^^^^^
+ValueError: BINDING_DRIFT:.github/workflows/compact-baseline-closure-v2-offline.yml
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)

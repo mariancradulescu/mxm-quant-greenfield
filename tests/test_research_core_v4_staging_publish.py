@@ -1,4 +1,4 @@
-"""Execute the installed workflow shell against disposable Git repositories.
+"""Execute the byte-bound historical shell against disposable Git repositories.
 
 Synthetic completed-staging fixtures exercise publication, not decryption or
 market evaluation. The audit fixture deliberately requires a complete state.
@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from tests.historical_workflow_fixtures import historical_workflow_source, assert_current_quarantined
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / '.github/workflows/v4-asymmetric-staging-bootstrap.yml'
@@ -20,7 +21,8 @@ STATE = 'research_core_v4/state'
 
 
 def shell_step(name, source=None):
-    lines = (source or WORKFLOW.read_text()).splitlines()
+    assert_current_quarantined('staging')
+    lines = (historical_workflow_source('staging') if source is None else source).splitlines()
     start = lines.index('      - name: ' + name)
     run = next(i for i in range(start + 1, len(lines)) if lines[i] == '        run: |')
     end = run + 1

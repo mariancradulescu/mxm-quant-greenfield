@@ -91,10 +91,23 @@ class PublicationOnlyTests(unittest.TestCase):
   for value in (-999,0,999):
    raw=emitted({'synthetic':{2:value,10:-value}});_,proof=p.original_byte_self_digest(raw);self.assertEqual(proof['original_raw_sha256'],p.sha(raw))
  def test_23_no_scientific_imports(self):
-  import sys
-  self.verify()
-  for name in ('research_core_v4.development_execution_runner_v1','research_core_v4.response_evaluator_v3','research_core_v4.numeric_worker_v1'):
-   self.assertNotIn(name,sys.modules)
+  # Test publication's dependency boundary in a fresh interpreter. Other
+  # historical tests legitimately import these modules in the parent process.
+  import sys,base64
+  script="""import base64,json,sys
+from research_core_v4 import publication_only_v1 as publication
+value=json.load(sys.stdin)
+value['arm_raw']=base64.b64decode(value['arm_raw'])
+value['fence_raw']=base64.b64decode(value['fence_raw'])
+publication.verify_evidence(base64.b64decode(value.pop('archive')),**value)
+for name in ('research_core_v4.development_execution_runner_v1','research_core_v4.response_evaluator_v3','research_core_v4.numeric_worker_v1'):
+    assert name not in sys.modules, name
+"""
+  payload={'archive':base64.b64encode(self.archive).decode(),'identity':self.identity,
+           'run':self.run,'history':self.history,'arm_raw':base64.b64encode(self.arm).decode(),
+           'fence_raw':base64.b64encode(self.fence).decode(),'expected':self.expected}
+  result=subprocess.run([sys.executable,'-c',script],input=json.dumps(payload),text=True,capture_output=True)
+  self.assertEqual(result.returncode,0,result.stdout+result.stderr)
  def test_24_local_opening_lock_member_corruption_rejected(self):
   self.expected['member_hashes'][p.RAW_NAME+'.opening.lock']='0'*64
   with self.assertRaises(PermissionError):self.verify()

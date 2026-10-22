@@ -1,0 +1,16 @@
+test_failed_native_producer_cannot_receive_acceptance_from_favorable_metrics (research_core_v4.laboratory.test_chronology_reception.ChronologyReceptionTests.test_failed_native_producer_cannot_receive_acceptance_from_favorable_metrics) ... MXM_FINITE_CHRONOLOGY {"accepted": true, "ask_events": 10000, "bid_events": 10000, "chronological_events_processed": 20000, "ciphertext_sha256": "2de612cb8b389f85c04099a741d1c68950f587083feb094a892533b98e207b52", "economic_outcomes": 0, "native_producer_conclusion": "failure", "orders": 0, "phase": "chronology-cold", "policy": {"automatic_retry": false, "economic_outcomes": 0, "from_ms": 1788940800000, "history_request_cap": 512, "max_private_bytes": 100000000, "max_wire_bytes": 50000000, "minimum_quote_events": 10000, "orders": 0, "schema": "mxm.finite-chronology-policy.v1", "scope": "TRANSPORT_AND_CHRONOLOGY_ONLY", "symbol_id": 1, "symbol_name": "EURUSD", "to_ms": 1788955200000}, "provider_window_complete": true, "research_capability_accepted": false, "schema": "mxm.finite-native-chronology-public.v1"}
+FAIL
+
+======================================================================
+FAIL: test_failed_native_producer_cannot_receive_acceptance_from_favorable_metrics (research_core_v4.laboratory.test_chronology_reception.ChronologyReceptionTests.test_failed_native_producer_cannot_receive_acceptance_from_favorable_metrics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/05283d763657/mxm-quant-greenfield/research_core_v4/laboratory/test_chronology_reception.py", line 121, in test_failed_native_producer_cannot_receive_acceptance_from_favorable_metrics
+    self.assertEqual(c.main('chronology-cold'),1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (failures=1)
+EXPECTED_ASSERTION_REPRODUCED_ON_IMMUTABLE_PREPARATION_SOURCE; ARTIFICIAL_FIXTURE_ONLY; NO_BROKER_OR_CUSTODY_KEY

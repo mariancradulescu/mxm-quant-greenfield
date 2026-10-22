@@ -1,0 +1,610 @@
+﻿2026-10-21T05:25:48.3280329Z Current runner version: '2.337.0'
+2026-10-21T05:25:48.3306548Z ##[group]Runner Image Provisioner
+2026-10-21T05:25:48.3307510Z Hosted Compute Agent
+2026-10-21T05:25:48.3308117Z Version: 20261015.610
+2026-10-21T05:25:48.3309685Z Commit: 267fdb4e8bbec4ab5ea31367f3a00d5c480c7656
+2026-10-21T05:25:48.3311143Z Build Date: 2026-10-14T17:06:54Z
+2026-10-21T05:25:48.3312253Z Worker ID: {8d18417b-e1df-4f28-985b-5311adef1dbc}
+2026-10-21T05:25:48.3313456Z Region: eastus2
+2026-10-21T05:25:48.3314164Z Cloud: Azure
+2026-10-21T05:25:48.3314743Z ##[endgroup]
+2026-10-21T05:25:48.3317258Z ##[group]Operating System
+2026-10-21T05:25:48.3317923Z Ubuntu
+2026-10-21T05:25:48.3318536Z 24.04.5
+2026-10-21T05:25:48.3319076Z LTS
+2026-10-21T05:25:48.3319632Z ##[endgroup]
+2026-10-21T05:25:48.3320276Z ##[group]Runner Image
+2026-10-21T05:25:48.3321221Z Image: ubuntu-24.04
+2026-10-21T05:25:48.3321897Z Version: 20261018.339.1
+2026-10-21T05:25:48.3323208Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261018.339/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-21T05:25:48.3324886Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261018.339
+2026-10-21T05:25:48.3325865Z ##[endgroup]
+2026-10-21T05:25:48.3327053Z ##[group]GITHUB_TOKEN Permissions
+2026-10-21T05:25:48.3329352Z Contents: read
+2026-10-21T05:25:48.3330048Z Metadata: read
+2026-10-21T05:25:48.3330651Z ##[endgroup]
+2026-10-21T05:25:48.3333538Z Secret source: Actions
+2026-10-21T05:25:48.3334704Z Cache mode: write
+2026-10-21T05:25:48.3335657Z Prepare workflow directory
+2026-10-21T05:25:48.3669894Z Prepare all required actions
+2026-10-21T05:25:48.3718032Z Getting action download info
+2026-10-21T05:25:48.5951994Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+2026-10-21T05:25:48.7958353Z Complete job name: shared-catalogue-regression
+2026-10-21T05:25:48.8832486Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T05:25:48.8833703Z with:
+2026-10-21T05:25:48.8834161Z   path: installation
+2026-10-21T05:25:48.8834669Z   persist-credentials: false
+2026-10-21T05:25:48.8835269Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:48.8838936Z   token: ***
+2026-10-21T05:25:48.8839395Z   ssh-strict: true
+2026-10-21T05:25:48.8839852Z   ssh-user: git
+2026-10-21T05:25:48.8840294Z   clean: true
+2026-10-21T05:25:48.8840761Z   sparse-checkout-cone-mode: true
+2026-10-21T05:25:48.8841507Z   fetch-depth: 1
+2026-10-21T05:25:48.8841964Z   fetch-tags: false
+2026-10-21T05:25:48.8842426Z   show-progress: true
+2026-10-21T05:25:48.8842885Z   lfs: false
+2026-10-21T05:25:48.8843315Z   submodules: false
+2026-10-21T05:25:48.8843789Z   set-safe-directory: true
+2026-10-21T05:25:48.8844545Z ##[endgroup]
+2026-10-21T05:25:48.9877544Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:48.9880330Z ##[group]Getting Git version info
+2026-10-21T05:25:48.9882115Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/installation'
+2026-10-21T05:25:48.9884192Z [command]/usr/bin/git version
+2026-10-21T05:25:48.9942300Z git version 2.55.0
+2026-10-21T05:25:48.9965933Z ##[endgroup]
+2026-10-21T05:25:48.9980757Z Temporarily overriding HOME='/home/runner/work/_temp/62638755-161c-4d6e-a324-f151b6c9d9cf' before making global git config changes
+2026-10-21T05:25:48.9983455Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T05:25:48.9986379Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/installation
+2026-10-21T05:25:49.0047256Z ##[group]Initializing the repository
+2026-10-21T05:25:49.0053433Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/installation
+2026-10-21T05:25:49.0172156Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T05:25:49.0174345Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T05:25:49.0176507Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T05:25:49.0177941Z hint: call:
+2026-10-21T05:25:49.0179132Z hint:
+2026-10-21T05:25:49.0180679Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T05:25:49.0182210Z hint:
+2026-10-21T05:25:49.0183606Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T05:25:49.0185092Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T05:25:49.0185932Z hint:
+2026-10-21T05:25:49.0186379Z hint: 	git branch -m <name>
+2026-10-21T05:25:49.0186882Z hint:
+2026-10-21T05:25:49.0187538Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T05:25:49.0188756Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/installation/.git/
+2026-10-21T05:25:49.0193050Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:49.0246408Z ##[endgroup]
+2026-10-21T05:25:49.0247529Z ##[group]Disabling automatic garbage collection
+2026-10-21T05:25:49.0251234Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T05:25:49.0289246Z ##[endgroup]
+2026-10-21T05:25:49.0290210Z ##[group]Setting up auth
+2026-10-21T05:25:49.0297293Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T05:25:49.0335791Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T05:25:49.0744802Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T05:25:49.0788177Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T05:25:49.1058485Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T05:25:49.1110258Z ##[endgroup]
+2026-10-21T05:25:49.1111775Z ##[group]Fetching the repository
+2026-10-21T05:25:49.1120647Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +93cc1b2172da0f38d123726ec864d453edb5f76a:refs/remotes/pull/77/merge
+2026-10-21T05:25:52.6794855Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:52.6797363Z  * [new ref]         93cc1b2172da0f38d123726ec864d453edb5f76a -> pull/77/merge
+2026-10-21T05:25:52.6807943Z ##[endgroup]
+2026-10-21T05:25:52.6810246Z ##[group]Determining the checkout info
+2026-10-21T05:25:52.6813259Z ##[endgroup]
+2026-10-21T05:25:52.6818160Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T05:25:52.6882868Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T05:25:52.6926666Z ##[group]Checking out the ref
+2026-10-21T05:25:52.6931433Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/77/merge
+2026-10-21T05:25:53.3314956Z Note: switching to 'refs/remotes/pull/77/merge'.
+2026-10-21T05:25:53.3315823Z 
+2026-10-21T05:25:53.3316091Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T05:25:53.3316676Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T05:25:53.3317234Z state without impacting any branches by switching back to a branch.
+2026-10-21T05:25:53.3317557Z 
+2026-10-21T05:25:53.3317794Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T05:25:53.3318311Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T05:25:53.3318594Z 
+2026-10-21T05:25:53.3318733Z   git switch -c <new-branch-name>
+2026-10-21T05:25:53.3318933Z 
+2026-10-21T05:25:53.3319069Z Or undo this operation with:
+2026-10-21T05:25:53.3319315Z 
+2026-10-21T05:25:53.3319431Z   git switch -
+2026-10-21T05:25:53.3319611Z 
+2026-10-21T05:25:53.3319886Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T05:25:53.3320481Z 
+2026-10-21T05:25:53.3321149Z HEAD is now at 93cc1b2 Merge 6a814d87f86a984b32cbd71104d629caa83de3cf into ee5a012d57f4d2c793305ea090f10ef8c7104c3b
+2026-10-21T05:25:53.3381232Z ##[endgroup]
+2026-10-21T05:25:53.3439851Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T05:25:53.3474381Z 93cc1b2172da0f38d123726ec864d453edb5f76a
+2026-10-21T05:25:53.3484800Z ##[group]Removing auth
+2026-10-21T05:25:53.3488414Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T05:25:53.3529347Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T05:25:53.3781439Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T05:25:53.3821480Z http.https://github.com/.extraheader
+2026-10-21T05:25:53.3829441Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T05:25:53.3873949Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T05:25:53.4121539Z ##[endgroup]
+2026-10-21T05:25:53.4473342Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-21T05:25:53.4473854Z with:
+2026-10-21T05:25:53.4474142Z   ref: c4ac0c0abd6feef7a5baf40df047a9822016b55d
+2026-10-21T05:25:53.4474482Z   path: code
+2026-10-21T05:25:53.4474737Z   persist-credentials: false
+2026-10-21T05:25:53.4475070Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:53.4477715Z   token: ***
+2026-10-21T05:25:53.4477975Z   ssh-strict: true
+2026-10-21T05:25:53.4478226Z   ssh-user: git
+2026-10-21T05:25:53.4478462Z   clean: true
+2026-10-21T05:25:53.4478722Z   sparse-checkout-cone-mode: true
+2026-10-21T05:25:53.4479045Z   fetch-depth: 1
+2026-10-21T05:25:53.4479285Z   fetch-tags: false
+2026-10-21T05:25:53.4479534Z   show-progress: true
+2026-10-21T05:25:53.4479785Z   lfs: false
+2026-10-21T05:25:53.4480024Z   submodules: false
+2026-10-21T05:25:53.4480280Z   set-safe-directory: true
+2026-10-21T05:25:53.4480555Z ##[endgroup]
+2026-10-21T05:25:53.5400723Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:53.5402157Z ##[group]Getting Git version info
+2026-10-21T05:25:53.5403088Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/code'
+2026-10-21T05:25:53.5441512Z [command]/usr/bin/git version
+2026-10-21T05:25:53.5488214Z git version 2.55.0
+2026-10-21T05:25:53.5512850Z ##[endgroup]
+2026-10-21T05:25:53.5528221Z Temporarily overriding HOME='/home/runner/work/_temp/9b95cab5-0573-4dd1-b903-d08c1e8d201e' before making global git config changes
+2026-10-21T05:25:53.5529680Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T05:25:53.5534513Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/code
+2026-10-21T05:25:53.5575853Z ##[group]Initializing the repository
+2026-10-21T05:25:53.5581909Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/code
+2026-10-21T05:25:53.5626949Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-21T05:25:53.5628304Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-21T05:25:53.5629582Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-21T05:25:53.5630697Z hint: call:
+2026-10-21T05:25:53.5631752Z hint:
+2026-10-21T05:25:53.5632366Z hint: 	git config --global init.defaultBranch <name>
+2026-10-21T05:25:53.5632963Z hint:
+2026-10-21T05:25:53.5633569Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-21T05:25:53.5634535Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-21T05:25:53.5635622Z hint:
+2026-10-21T05:25:53.5636046Z hint: 	git branch -m <name>
+2026-10-21T05:25:53.5636510Z hint:
+2026-10-21T05:25:53.5637167Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-21T05:25:53.5638495Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/code/.git/
+2026-10-21T05:25:53.5641965Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:53.5680398Z ##[endgroup]
+2026-10-21T05:25:53.5681561Z ##[group]Disabling automatic garbage collection
+2026-10-21T05:25:53.5684833Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-21T05:25:53.5720193Z ##[endgroup]
+2026-10-21T05:25:53.5721295Z ##[group]Setting up auth
+2026-10-21T05:25:53.5727800Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T05:25:53.5764951Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T05:25:53.6039585Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T05:25:53.6080774Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T05:25:53.6353861Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-21T05:25:53.6410427Z ##[endgroup]
+2026-10-21T05:25:53.6411562Z ##[group]Fetching the repository
+2026-10-21T05:25:53.6422214Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin c4ac0c0abd6feef7a5baf40df047a9822016b55d
+2026-10-21T05:25:56.6738801Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-21T05:25:56.6740082Z  * branch            c4ac0c0abd6feef7a5baf40df047a9822016b55d -> FETCH_HEAD
+2026-10-21T05:25:56.6745088Z ##[endgroup]
+2026-10-21T05:25:56.6745869Z ##[group]Determining the checkout info
+2026-10-21T05:25:56.6748441Z ##[endgroup]
+2026-10-21T05:25:56.6755582Z [command]/usr/bin/git sparse-checkout disable
+2026-10-21T05:25:56.6813619Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-21T05:25:56.6856709Z ##[group]Checking out the ref
+2026-10-21T05:25:56.6862038Z [command]/usr/bin/git checkout --progress --force c4ac0c0abd6feef7a5baf40df047a9822016b55d
+2026-10-21T05:25:57.3397590Z Note: switching to 'c4ac0c0abd6feef7a5baf40df047a9822016b55d'.
+2026-10-21T05:25:57.3398733Z 
+2026-10-21T05:25:57.3399084Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-21T05:25:57.3399894Z changes and commit them, and you can discard any commits you make in this
+2026-10-21T05:25:57.3400687Z state without impacting any branches by switching back to a branch.
+2026-10-21T05:25:57.3401525Z 
+2026-10-21T05:25:57.3401872Z If you want to create a new branch to retain commits you create, you may
+2026-10-21T05:25:57.3402604Z do so (now or later) by using -c with the switch command. Example:
+2026-10-21T05:25:57.3403020Z 
+2026-10-21T05:25:57.3403194Z   git switch -c <new-branch-name>
+2026-10-21T05:25:57.3403478Z 
+2026-10-21T05:25:57.3403659Z Or undo this operation with:
+2026-10-21T05:25:57.3403930Z 
+2026-10-21T05:25:57.3404083Z   git switch -
+2026-10-21T05:25:57.3404304Z 
+2026-10-21T05:25:57.3404662Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-21T05:25:57.3405174Z 
+2026-10-21T05:25:57.3405603Z HEAD is now at c4ac0c0 Bind existing ordinary observer to sealed Git ref confirmation engine
+2026-10-21T05:25:57.3448055Z ##[endgroup]
+2026-10-21T05:25:57.3516464Z [command]/usr/bin/git log -1 --format=%H
+2026-10-21T05:25:57.3555949Z c4ac0c0abd6feef7a5baf40df047a9822016b55d
+2026-10-21T05:25:57.3569092Z ##[group]Removing auth
+2026-10-21T05:25:57.3575365Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T05:25:57.3621373Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T05:25:57.3870574Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T05:25:57.3908445Z http.https://github.com/.extraheader
+2026-10-21T05:25:57.3916076Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-21T05:25:57.3959918Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T05:25:57.4209619Z ##[endgroup]
+2026-10-21T05:25:57.4360252Z ##[group]Run python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+2026-10-21T05:25:57.4361630Z [36;1mpython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock[0m
+2026-10-21T05:25:57.4529188Z shell: /usr/bin/bash -e {0}
+2026-10-21T05:25:57.4529502Z ##[endgroup]
+2026-10-21T05:25:57.8782169Z Defaulting to user installation because normal site-packages is not writeable
+2026-10-21T05:25:58.3760517Z Collecting cffi==2.1.1 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 1))
+2026-10-21T05:25:58.4179780Z   Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+2026-10-21T05:25:58.4452792Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.8/221.8 kB 8.6 MB/s eta 0:00:00
+2026-10-21T05:25:58.7015285Z Collecting cryptography==46.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 2))
+2026-10-21T05:25:58.7126117Z   Downloading cryptography-46.0.3-cp311-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+2026-10-21T05:25:58.8679688Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 29.0 MB/s eta 0:00:00
+2026-10-21T05:25:59.1202490Z Collecting numpy==2.2.6 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 3))
+2026-10-21T05:25:59.1278853Z   Downloading numpy-2.2.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.5 MB)
+2026-10-21T05:25:59.2985218Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.5/16.5 MB 112.2 MB/s eta 0:00:00
+2026-10-21T05:25:59.5394737Z Collecting protobuf==5.29.5 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 4))
+2026-10-21T05:25:59.5485440Z   Downloading protobuf-5.29.5-cp38-abi3-manylinux2014_x86_64.whl (319 kB)
+2026-10-21T05:25:59.5560828Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 319.9/319.9 kB 57.0 MB/s eta 0:00:00
+2026-10-21T05:25:59.5804591Z Collecting pycparser==3.11 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 5))
+2026-10-21T05:25:59.5873551Z   Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+2026-10-21T05:25:59.5918321Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.2/51.2 kB 15.0 MB/s eta 0:00:00
+2026-10-21T05:25:59.6421632Z Collecting pyyaml==6.0.3 (from -r research_core_v4/remediation_p0_p4_20261015/requirements.lock (line 6))
+2026-10-21T05:25:59.6497489Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-10-21T05:25:59.6581439Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 125.3 MB/s eta 0:00:00
+2026-10-21T05:25:59.9470473Z Installing collected packages: pyyaml, pycparser, protobuf, numpy, cffi, cryptography
+2026-10-21T05:26:02.6280124Z Successfully installed cffi-2.1.1 cryptography-46.0.3 numpy-2.2.6 protobuf-5.29.5 pycparser-3.11 pyyaml-6.0.3
+2026-10-21T05:26:02.8006486Z ##[group]Run python3 - <<'PY'
+2026-10-21T05:26:02.8006818Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T05:26:02.8007093Z [36;1mimport json,pathlib,subprocess,yaml[0m
+2026-10-21T05:26:02.8007798Z [36;1mfrom research_core_v4.laboratory.secret_isolation import build_workflow as isolation_workflow[0m
+2026-10-21T05:26:02.8008510Z [36;1mfrom research_core_v4.laboratory.checkpoint20_readback import build_workflow as checkpoint_workflow[0m
+2026-10-21T05:26:02.8009212Z [36;1mfrom research_core_v4.laboratory.custody import build_native_workflow,build_certifier_workflow[0m
+2026-10-21T05:26:02.8009754Z [36;1mexpected='9bad0e4832a2db433ca35a721775087e89a2c5cc'[0m
+2026-10-21T05:26:02.8010181Z [36;1mcontrol_source='c4ac0c0abd6feef7a5baf40df047a9822016b55d'[0m
+2026-10-21T05:26:02.8010722Z [36;1massert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==control_source[0m
+2026-10-21T05:26:02.8011638Z [36;1mfrom research_core_v4.laboratory.runtime import module_digest[0m
+2026-10-21T05:26:02.8012232Z [36;1mfrom research_core_v4.laboratory.recovery_v3 import build_workflow as observer_workflow,ENGINE_MODULE[0m
+2026-10-21T05:26:02.8012751Z [36;1massert module_digest()==ENGINE_MODULE[0m
+2026-10-21T05:26:02.8013132Z [36;1minstalled=pathlib.Path('../installation/.github/workflows')[0m
+2026-10-21T05:26:02.8013834Z [36;1massert json.loads((installed/'mxm-r3-secret-isolation.yml').read_bytes())==isolation_workflow('e5add220235b14678a96972c2a7afb237d31a972')[0m
+2026-10-21T05:26:02.8014831Z [36;1massert json.loads((installed/'mxm-r3-checkpoint20-readback.yml').read_bytes())==checkpoint_workflow('dfb4a984d2ef1f63edeea42f0ad6fa520bf7c128')[0m
+2026-10-21T05:26:02.8015798Z [36;1mbaseline=yaml.safe_load(pathlib.Path('docs/laboratory-completion/20261020/R3_EXISTING_OPERATIONAL_DAG_BASELINE.yml').read_bytes())[0m
+2026-10-21T05:26:02.8016653Z [36;1massert json.loads((installed/'mxm-integrated-p0.yml').read_bytes())==build_native_workflow(expected,baseline)[0m
+2026-10-21T05:26:02.8017394Z [36;1massert json.loads((installed/'mxm-r3-certify-v3.yml').read_bytes())==build_certifier_workflow(expected)[0m
+2026-10-21T05:26:02.8018140Z [36;1massert json.loads((installed/'mxm-integrated-p0-recovery.yml').read_bytes())==observer_workflow(control_source)[0m
+2026-10-21T05:26:02.8019394Z [36;1mprint('EXACT_R3_INSTALLATION: source,11-job existing DAG, same-run App ACL proof, separated credentials, read-only native token, controlled pre-fence fault/no automatic handoff, independent post-run certifier; no secrets or worker execution in CI.')[0m
+2026-10-21T05:26:02.8020372Z [36;1mPY[0m
+2026-10-21T05:26:02.8073383Z shell: /usr/bin/bash -e {0}
+2026-10-21T05:26:02.8073637Z ##[endgroup]
+2026-10-21T05:26:03.1229975Z EXACT_R3_INSTALLATION: source,11-job existing DAG, same-run App ACL proof, separated credentials, read-only native token, controlled pre-fence fault/no automatic handoff, independent post-run certifier; no secrets or worker execution in CI.
+2026-10-21T05:26:03.1417832Z ##[group]Run python3 verification/P0_FAULT_ISOLATION_GUARD.py
+2026-10-21T05:26:03.1418307Z [36;1mpython3 verification/P0_FAULT_ISOLATION_GUARD.py[0m
+2026-10-21T05:26:03.1469027Z shell: /usr/bin/bash -e {0}
+2026-10-21T05:26:03.1469315Z ##[endgroup]
+2026-10-21T05:26:03.1802198Z P0-16 exact legacy/R3 contract: ordinary default fault=0; controlled technical fault has no automatic handoff; scoped credentials; no runtime operations
+2026-10-21T05:26:03.1881154Z ##[group]Run python3 - <<'PY'
+2026-10-21T05:26:03.1881514Z [36;1mpython3 - <<'PY'[0m
+2026-10-21T05:26:03.1881771Z [36;1mimport pathlib,unittest[0m
+2026-10-21T05:26:03.1882472Z [36;1mnames=sorted(str(p.with_suffix('')).replace('/','.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))+['tests.test_continuous_account_replay_v2'][0m
+2026-10-21T05:26:03.1883426Z [36;1mresult=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))[0m
+2026-10-21T05:26:03.1884012Z [36;1mraise SystemExit(not result.wasSuccessful())[0m
+2026-10-21T05:26:03.1884309Z [36;1mPY[0m
+2026-10-21T05:26:03.1935168Z shell: /usr/bin/bash -e {0}
+2026-10-21T05:26:03.1935428Z ##[endgroup]
+2026-10-21T05:26:03.7472545Z test_baseline_preserved (research_core_v4.laboratory.test_admission.AdmissionTests.test_baseline_preserved) ... ok
+2026-10-21T05:26:03.7475891Z test_changed_historical_identity_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_changed_historical_identity_rejected) ... ok
+2026-10-21T05:26:03.7480316Z test_distinct_lane_has_explicit_finite_cap (research_core_v4.laboratory.test_admission.AdmissionTests.test_distinct_lane_has_explicit_finite_cap) ... ok
+2026-10-21T05:26:03.7484715Z test_duplicate_observation_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_duplicate_observation_rejected) ... ok
+2026-10-21T05:26:03.7539009Z test_empty_intents_do_not_open_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_empty_intents_do_not_open_outcome) ... ok
+2026-10-21T05:26:03.7543652Z test_family_cap_not_changed_after_registration (research_core_v4.laboratory.test_admission.AdmissionTests.test_family_cap_not_changed_after_registration) ... ok
+2026-10-21T05:26:03.7545737Z test_hold_not_refunded_or_reopened (research_core_v4.laboratory.test_admission.AdmissionTests.test_hold_not_refunded_or_reopened) ... ok
+2026-10-21T05:26:03.7596405Z test_missing_account_does_not_open_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_missing_account_does_not_open_outcome) ... ok
+2026-10-21T05:26:03.7644981Z test_missing_quotes_do_not_open_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_missing_quotes_do_not_open_outcome) ... ok
+2026-10-21T05:26:03.7649888Z test_no_observation_without_exposure (research_core_v4.laboratory.test_admission.AdmissionTests.test_no_observation_without_exposure) ... ok
+2026-10-21T05:26:03.7654663Z test_observation_cap_checked_before_further_exposure (research_core_v4.laboratory.test_admission.AdmissionTests.test_observation_cap_checked_before_further_exposure) ... ok
+2026-10-21T05:26:03.7664473Z test_reservation_is_not_outcome (research_core_v4.laboratory.test_admission.AdmissionTests.test_reservation_is_not_outcome) ... ok
+2026-10-21T05:26:03.7667395Z test_same_unopened_identity_not_blanket_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_same_unopened_identity_not_blanket_rejected) ... ok
+2026-10-21T05:26:03.7669901Z test_semantic_hash_ignores_only_identity_metadata_and_universe_order (research_core_v4.laboratory.test_admission.AdmissionTests.test_semantic_hash_ignores_only_identity_metadata_and_universe_order) ... ok
+2026-10-21T05:26:03.7672509Z test_semantic_rename_blocked_across_lanes (research_core_v4.laboratory.test_admission.AdmissionTests.test_semantic_rename_blocked_across_lanes) ... ok
+2026-10-21T05:26:03.7675434Z test_shared_family_cap_not_reset_by_programme (research_core_v4.laboratory.test_admission.AdmissionTests.test_shared_family_cap_not_reset_by_programme) ... ok
+2026-10-21T05:26:03.7732786Z test_supported_gross_opens_even_with_unknown_costs (research_core_v4.laboratory.test_admission.AdmissionTests.test_supported_gross_opens_even_with_unknown_costs) ... ok
+2026-10-21T05:26:03.7740013Z test_tampered_journal_and_view_rejected (research_core_v4.laboratory.test_admission.AdmissionTests.test_tampered_journal_and_view_rejected) ... ok
+2026-10-21T05:26:03.8135450Z test_conditional_or_credential_retaining_checkout_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_conditional_or_credential_retaining_checkout_is_rejected) ... ok
+2026-10-21T05:26:03.8722718Z test_job_import_or_working_directory_override_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_job_import_or_working_directory_override_is_rejected) ... ok
+2026-10-21T05:26:03.8890489Z test_missing_or_wrong_actual_checkout_log_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_missing_or_wrong_actual_checkout_log_is_rejected) ... ok
+2026-10-21T05:26:03.9056268Z test_source_or_protocol_environment_mismatch_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_source_or_protocol_environment_mismatch_is_rejected) ... ok
+2026-10-21T05:26:03.9140604Z test_wrong_checkout_in_one_native_job_is_rejected (research_core_v4.laboratory.test_checkout_provenance.CheckoutProvenance.test_wrong_checkout_in_one_native_job_is_rejected) ... ok
+2026-10-21T05:26:03.9143808Z test_exact_public_checkpoint20_is_eligible_for_verified_decryption (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_exact_public_checkpoint20_is_eligible_for_verified_decryption) ... ok
+2026-10-21T05:26:03.9149666Z test_no_public_field_or_evidence_ref_can_be_renamed (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_no_public_field_or_evidence_ref_can_be_renamed) ... ok
+2026-10-21T05:26:03.9152651Z test_no_synthetic_private_can_masquerade_as_sealed_checkpoint (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_no_synthetic_private_can_masquerade_as_sealed_checkpoint) ... ok
+2026-10-21T05:26:03.9155406Z test_prior_closed_checkpoint19_has_distinct_lineage (research_core_v4.laboratory.test_checkpoint20_forward_migration.Checkpoint20ForwardTests.test_prior_closed_checkpoint19_has_distinct_lineage) ... ok
+2026-10-21T05:26:03.9158168Z test_cold_corpus_compares_receipt_commitments_and_counts_not_timings (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_cold_corpus_compares_receipt_commitments_and_counts_not_timings) ... ok
+2026-10-21T05:26:03.9164214Z test_legacy_trust_collision_is_reported_without_values_or_repair (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_legacy_trust_collision_is_reported_without_values_or_repair) ... ok
+2026-10-21T05:26:03.9166914Z test_no_reset_check_rejects_each_preserved_component (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_no_reset_check_rejects_each_preserved_component) ... ok
+2026-10-21T05:26:03.9172840Z test_positive_call_is_not_a_negative_probe (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_positive_call_is_not_a_negative_probe) ... ok
+2026-10-21T05:26:03.9175286Z test_public_checkpoint_is_immutable_not_a_favorable_label (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_public_checkpoint_is_immutable_not_a_favorable_label) ... ok
+2026-10-21T05:26:03.9177959Z test_workflow_restricts_secret_scope_and_keeps_evidence_read_only (research_core_v4.laboratory.test_checkpoint20_native_readback.NativeReadbackTest.test_workflow_restricts_secret_scope_and_keeps_evidence_read_only) ... ok
+2026-10-21T05:26:03.9180789Z test_authentic_public_receipt_cannot_authorize_fabricated_private (research_core_v4.laboratory.test_checkpoint23_forward_migration.Checkpoint23Migration.test_authentic_public_receipt_cannot_authorize_fabricated_private) ... ok
+2026-10-21T05:26:03.9197736Z test_exact_native_closed_state_and_no_public_authority_substitution (research_core_v4.laboratory.test_checkpoint23_forward_migration.Checkpoint23Migration.test_exact_native_closed_state_and_no_public_authority_substitution) ... ok
+2026-10-21T05:26:03.9213640Z test_only_exact_closed_native_state_is_eligible (research_core_v4.laboratory.test_checkpoint24_forward_migration.Checkpoint24Migration.test_only_exact_closed_native_state_is_eligible) ... ok
+2026-10-21T05:26:03.9216808Z test_public_authority_cannot_substitute_for_private_decryption (research_core_v4.laboratory.test_checkpoint24_forward_migration.Checkpoint24Migration.test_public_authority_cannot_substitute_for_private_decryption) ... ok
+2026-10-21T05:26:03.9226513Z test_adjacent_funding_intervals_conserve_cash (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_adjacent_funding_intervals_conserve_cash) ... ok
+2026-10-21T05:26:03.9232907Z test_equivalent_utc_instants_form_one_atomic_mark_batch (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_equivalent_utc_instants_form_one_atomic_mark_batch) ... ok
+2026-10-21T05:26:03.9235428Z test_exit_price_and_conversion_must_be_positive (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_price_and_conversion_must_be_positive) ... ok
+2026-10-21T05:26:03.9238196Z test_exit_quote_itself_cannot_escape_stop_out_guard (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_exit_quote_itself_cannot_escape_stop_out_guard) ... ok
+2026-10-21T05:26:03.9241201Z test_financing_intervals_cannot_be_recharged_at_another_timestamp (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_financing_intervals_cannot_be_recharged_at_another_timestamp) ... ok
+2026-10-21T05:26:03.9243855Z test_fractional_or_boolean_volume_is_not_coerced (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_fractional_or_boolean_volume_is_not_coerced) ... ok
+2026-10-21T05:26:03.9246383Z test_laboratory_replay_requires_explicit_stop_out_contract (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_laboratory_replay_requires_explicit_stop_out_contract) ... ok
+2026-10-21T05:26:03.9248945Z test_mark_must_match_active_candidate_and_symbol (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_must_match_active_candidate_and_symbol) ... ok
+2026-10-21T05:26:03.9251709Z test_mark_risk_precedes_same_instant_exit_margin_release (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_mark_risk_precedes_same_instant_exit_margin_release) ... ok
+2026-10-21T05:26:03.9254413Z test_native_screen_rejects_future_signal_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_future_signal_before_opening) ... ok
+2026-10-21T05:26:03.9257376Z test_native_screen_rejects_late_quote_before_opening (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_native_screen_rejects_late_quote_before_opening) ... ok
+2026-10-21T05:26:03.9259878Z test_negative_component_cannot_hide_in_positive_total_cost (research_core_v4.laboratory.test_chronological_contracts.ChronologicalContracts.test_negative_component_cannot_hide_in_positive_total_cost) ... ok
+2026-10-21T05:26:03.9273479Z test_exact_checkpoint25_is_authorized_without_new_code_branch (research_core_v4.laboratory.test_closed_native_authority.ClosedNativeAuthority.test_exact_checkpoint25_is_authorized_without_new_code_branch) ... ok
+2026-10-21T05:26:03.9278002Z test_malformed_or_duplicate_authority_table_is_refused (research_core_v4.laboratory.test_closed_native_authority.ClosedNativeAuthority.test_malformed_or_duplicate_authority_table_is_refused) ... ok
+2026-10-21T05:26:03.9346339Z test_abandoned_or_unfinished_program_not_accepted (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_abandoned_or_unfinished_program_not_accepted) ... ok
+2026-10-21T05:26:03.9415492Z test_actual_lab_A_B_A_bring_B_new_assets_to_A (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_actual_lab_A_B_A_bring_B_new_assets_to_A) ... ok
+2026-10-21T05:26:03.9459120Z test_false_order_or_refund_rejected (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_false_order_or_refund_rejected) ... ok
+2026-10-21T05:26:03.9523630Z test_modified_event_hash_cannot_be_certified (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_modified_event_hash_cannot_be_certified) ... ok
+2026-10-21T05:26:03.9568669Z test_removed_B_asset_rejected_at_cold_restore (research_core_v4.laboratory.test_cold_producer_v3.ColdV3ProducerTests.test_removed_B_asset_rejected_at_cold_restore) ... ok
+2026-10-21T05:26:03.9582901Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T05:26:03.9589349Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T05:26:03.9597002Z test_every_live_security_field_and_revision_is_bound (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_every_live_security_field_and_revision_is_bound) ... ok
+2026-10-21T05:26:03.9599926Z test_exact_live_revision_resolves_only_redacted_actor_inventory (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_exact_live_revision_resolves_only_redacted_actor_inventory) ... ok
+2026-10-21T05:26:03.9606447Z test_omission_is_not_empty_and_witness_cannot_broaden_authority (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_omission_is_not_empty_and_witness_cannot_broaden_authority) ... ok
+2026-10-21T05:26:03.9799297Z test_witness_is_environment_configuration_only_for_issuer_jobs (research_core_v4.laboratory.test_control_policy_witness.ControlPolicyWitness.test_witness_is_environment_configuration_only_for_issuer_jobs) ... ok
+2026-10-21T05:26:03.9802287Z test_current_and_archived_is_ambiguous (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_current_and_archived_is_ambiguous) ... ok
+2026-10-21T05:26:03.9804849Z test_current_enabled_does_not_qualify_execution (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_current_enabled_does_not_qualify_execution) ... ok
+2026-10-21T05:26:03.9807163Z test_duplicate_native_ids_rejected (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_duplicate_native_ids_rejected) ... ok
+2026-10-21T05:26:03.9809452Z test_id_reuse_name_drift_not_same_identity (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_id_reuse_name_drift_not_same_identity) ... ok
+2026-10-21T05:26:03.9812094Z test_missing_disabled_archived_are_distinct (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_missing_disabled_archived_are_distinct) ... ok
+2026-10-21T05:26:03.9839295Z test_new_ids_are_not_filtered_out_by_historical_cap (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_new_ids_are_not_filtered_out_by_historical_cap) ... ok
+2026-10-21T05:26:03.9841968Z test_terms_reference_not_dated_cost_or_margin_certificate (research_core_v4.laboratory.test_frontier_accessibility.AccessibilityTests.test_terms_reference_not_dated_cost_or_margin_certificate) ... ok
+2026-10-21T05:26:03.9859172Z test_authentic_quote_is_not_fill (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_authentic_quote_is_not_fill) ... ok
+2026-10-21T05:26:03.9861811Z test_future_and_timestamp_mismatch_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_future_and_timestamp_mismatch_fail) ... ok
+2026-10-21T05:26:03.9864176Z test_native_proof_binds_original_attempt_and_does_not_accept_retry (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_native_proof_binds_original_attempt_and_does_not_accept_retry) ... ok
+2026-10-21T05:26:03.9866442Z test_unknown_pagination_and_nan_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_unknown_pagination_and_nan_fail) ... ok
+2026-10-21T05:26:03.9868802Z test_window_and_conflict_do_not_create_economic_results (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_window_and_conflict_do_not_create_economic_results) ... ok
+2026-10-21T05:26:03.9905385Z test_contiguous_support_without_outcomes_or_mutation (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_contiguous_support_without_outcomes_or_mutation) ... ok
+2026-10-21T05:26:03.9907402Z test_gap_does_not_certify_session (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_gap_does_not_certify_session) ... ok
+2026-10-21T05:26:03.9910485Z test_protected_and_duplicate_rows_fail (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_protected_and_duplicate_rows_fail) ... ok
+2026-10-21T05:26:03.9913204Z test_zero_volume_not_missing_or_profit_evidence (research_core_v4.laboratory.test_frontier_pregate.SupportContract.test_zero_volume_not_missing_or_profit_evidence) ... ok
+2026-10-21T05:26:03.9993109Z test_actual_freeze_native_callback_checkpoint_chain (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_actual_freeze_native_callback_checkpoint_chain) ... ok
+2026-10-21T05:26:04.0001428Z test_binding_keeps_reserved_resource_budget_and_original_corpus (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_binding_keeps_reserved_resource_budget_and_original_corpus) ... ok
+2026-10-21T05:26:04.0006803Z test_cosmetic_rationale_rename_cannot_reserve_an_extra_identity (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_cosmetic_rationale_rename_cannot_reserve_an_extra_identity) ... ok
+2026-10-21T05:26:04.0009611Z test_gate_rejects_missing_reception_or_unprotected_control_plane (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_gate_rejects_missing_reception_or_unprotected_control_plane) ... ok
+2026-10-21T05:26:04.0013665Z test_index_upgrade_preserves_legacy_and_roundtrips (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_index_upgrade_preserves_legacy_and_roundtrips) ... ok
+2026-10-21T05:26:04.0016318Z test_rationale_and_identity_labels_cannot_avoid_causal_fingerprint (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_rationale_and_identity_labels_cannot_avoid_causal_fingerprint) ... ok
+2026-10-21T05:26:04.0019178Z test_recovered_new_admission_preserves_closed_predecessor_and_identity (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_recovered_new_admission_preserves_closed_predecessor_and_identity) ... ok
+2026-10-21T05:26:04.0029913Z test_shared_cache_and_remaining_survive_checkpoint (research_core_v4.laboratory.test_general_integration.GeneralIntegrationTests.test_shared_cache_and_remaining_survive_checkpoint) ... ok
+2026-10-21T05:26:04.0032428Z test_ambiguous_duplicates_hold (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_ambiguous_duplicates_hold) ... ok
+2026-10-21T05:26:04.0034230Z test_live_run_never_reissued (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_live_run_never_reissued) ... ok
+2026-10-21T05:26:04.0036289Z test_lost_ack_can_reissue_only_after_durable_cas_marker (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_lost_ack_can_reissue_only_after_durable_cas_marker) ... ok
+2026-10-21T05:26:04.0038601Z test_no_unbounded_retry_or_partial_run_inventory (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_no_unbounded_retry_or_partial_run_inventory) ... ok
+2026-10-21T05:26:04.0040627Z test_short_grace_does_not_retry (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_short_grace_does_not_retry) ... ok
+2026-10-21T05:26:04.0042851Z test_unrelated_run_does_not_count_as_issued (research_core_v4.laboratory.test_handoff_recovery.HandoffRecoveryTests.test_unrelated_run_does_not_count_as_issued) ... ok
+2026-10-21T05:26:04.0051106Z test_ambiguous_pending_programme_is_never_scheduled_around (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_ambiguous_pending_programme_is_never_scheduled_around) ... ok
+2026-10-21T05:26:04.0061809Z test_global_pending_and_changed_saved_manifest_are_refused (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_global_pending_and_changed_saved_manifest_are_refused) ... ok
+2026-10-21T05:26:04.0126576Z test_prospective_priorities_produce_actual_A_B_resume_A (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_prospective_priorities_produce_actual_A_B_resume_A) ... ok
+2026-10-21T05:26:04.0137677Z test_ties_follow_sealed_admission_order (research_core_v4.laboratory.test_integrated_programme_selection.IntegratedProgrammeSelectionTests.test_ties_follow_sealed_admission_order) ... ok
+2026-10-21T05:26:04.0151932Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T05:26:04.0158387Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T05:26:04.0162478Z test_budget_schema_compatibility (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_budget_schema_compatibility) ... ok
+2026-10-21T05:26:04.0164443Z test_c033_hold_cannot_be_erased_from_public_report (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_c033_hold_cannot_be_erased_from_public_report) ... ok
+2026-10-21T05:26:04.0199226Z test_checkpoint_roundtrip_and_incomplete_part_rejected (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_checkpoint_roundtrip_and_incomplete_part_rejected) ... ok
+2026-10-21T05:26:04.0202567Z test_legacy_and_typed_reports_do_not_infer_same_units (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_legacy_and_typed_reports_do_not_infer_same_units) ... ok
+2026-10-21T05:26:04.0204718Z test_only_proven_pre_fence_crash_recoverable (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_only_proven_pre_fence_crash_recoverable) ... ok
+2026-10-21T05:26:04.0219615Z test_path_escape_and_reordered_parts_rejected (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_path_escape_and_reordered_parts_rejected) ... ok
+2026-10-21T05:26:04.0222095Z test_running_or_duplicate_job_is_not_proof_of_no_exposure (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_running_or_duplicate_job_is_not_proof_of_no_exposure) ... ok
+2026-10-21T05:26:04.0224219Z test_technical_run_conserves_every_accounting_field (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_technical_run_conserves_every_accounting_field) ... ok
+2026-10-21T05:26:04.0232671Z test_workflow_success_cannot_substitute_skipped_worker (research_core_v4.laboratory.test_integrated_protocol.ProtocolTests.test_workflow_success_cannot_substitute_skipped_worker) ... ok
+2026-10-21T05:26:04.3150789Z test_acquisition_cache_first_and_bounded_whitelist (research_core_v4.laboratory.test_integration.IntegratedReception.test_acquisition_cache_first_and_bounded_whitelist) ... ok
+2026-10-21T05:26:04.3153298Z test_budget_exhausted_and_duplicate_identity (research_core_v4.laboratory.test_integration.IntegratedReception.test_budget_exhausted_and_duplicate_identity) ... ok
+2026-10-21T05:26:04.3192280Z test_changed_result_manifest_and_cache_fail_closed (research_core_v4.laboratory.test_integration.IntegratedReception.test_changed_result_manifest_and_cache_fail_closed) ... ok
+2026-10-21T05:26:04.3268132Z test_chunked_atomic_ciphertext_and_corrupt_part (research_core_v4.laboratory.test_integration.IntegratedReception.test_chunked_atomic_ciphertext_and_corrupt_part) ... ok
+2026-10-21T05:26:04.3367724Z test_complete_branching_economic_integration_and_cold_resume (research_core_v4.laboratory.test_integration.IntegratedReception.test_complete_branching_economic_integration_and_cold_resume) ... ok
+2026-10-21T05:26:04.3378526Z test_cycles_invalid_operator_and_post_outcome_tuning (research_core_v4.laboratory.test_integration.IntegratedReception.test_cycles_invalid_operator_and_post_outcome_tuning) ... ok
+2026-10-21T05:26:04.3382331Z test_data_quality_dedup_conflict_and_causality (research_core_v4.laboratory.test_integration.IntegratedReception.test_data_quality_dedup_conflict_and_causality) ... ok
+2026-10-21T05:26:04.3406815Z test_duplicate_execution_and_unsafe_resume (research_core_v4.laboratory.test_integration.IntegratedReception.test_duplicate_execution_and_unsafe_resume) ... ok
+2026-10-21T05:26:04.3409102Z test_durable_intent_blocks_new_push_retry_until_recovery (research_core_v4.laboratory.test_integration.IntegratedReception.test_durable_intent_blocks_new_push_retry_until_recovery) ... ok
+2026-10-21T05:26:04.3428205Z test_frozen_account_sizing_and_common_factor_contention (research_core_v4.laboratory.test_integration.IntegratedReception.test_frozen_account_sizing_and_common_factor_contention) ... ok
+2026-10-21T05:26:04.3450752Z test_future_information_and_missing_deep_cost (research_core_v4.laboratory.test_integration.IntegratedReception.test_future_information_and_missing_deep_cost) ... ok
+2026-10-21T05:26:04.3464396Z test_gap_lags_are_not_compressed (research_core_v4.laboratory.test_integration.IntegratedReception.test_gap_lags_are_not_compressed) ... ok
+2026-10-21T05:26:04.3478576Z test_general_causal_dsl_cross_symbol_and_temporal_features (research_core_v4.laboratory.test_integration.IntegratedReception.test_general_causal_dsl_cross_symbol_and_temporal_features) ... ok
+2026-10-21T05:26:04.3480285Z test_historical_budget_reconciled_without_refund (research_core_v4.laboratory.test_integration.IntegratedReception.test_historical_budget_reconciled_without_refund) ... ok
+2026-10-21T05:26:04.3483524Z test_invalid_candidate_before_execution (research_core_v4.laboratory.test_integration.IntegratedReception.test_invalid_candidate_before_execution) ... ok
+2026-10-21T05:26:04.3498081Z test_native_cost_adapter_unknown_terms_and_missing_exit (research_core_v4.laboratory.test_integration.IntegratedReception.test_native_cost_adapter_unknown_terms_and_missing_exit) ... ok
+2026-10-21T05:26:04.3507858Z test_native_quote_path_into_shared_account_and_unresolved_gates (research_core_v4.laboratory.test_integration.IntegratedReception.test_native_quote_path_into_shared_account_and_unresolved_gates) ... ok
+2026-10-21T05:26:04.3512142Z test_partial_day_interval_includes_next_iso_week (research_core_v4.laboratory.test_integration.IntegratedReception.test_partial_day_interval_includes_next_iso_week) ... ok
+2026-10-21T05:26:04.3687925Z test_reception_assertions_block_false_success (research_core_v4.laboratory.test_integration.IntegratedReception.test_reception_assertions_block_false_success) ... ok
+2026-10-21T05:26:04.3691583Z test_rejected_position_has_no_simulated_financing_charge (research_core_v4.laboratory.test_integration.IntegratedReception.test_rejected_position_has_no_simulated_financing_charge) ... ok
+2026-10-21T05:26:04.3720216Z test_screen_reporting_and_broker_metadata_are_bound (research_core_v4.laboratory.test_integration.IntegratedReception.test_screen_reporting_and_broker_metadata_are_bound) ... ok
+2026-10-21T05:26:04.3722390Z test_synthetic_catalogue_never_satisfies_native_cache (research_core_v4.laboratory.test_integration.IntegratedReception.test_synthetic_catalogue_never_satisfies_native_cache) ... ok
+2026-10-21T05:26:04.3870310Z test_three_distinct_programme_graphs_without_source_change (research_core_v4.laboratory.test_integration.IntegratedReception.test_three_distinct_programme_graphs_without_source_change) ... ok
+2026-10-21T05:26:04.3910077Z test_unknown_cost_is_not_zero_or_a_loss (research_core_v4.laboratory.test_integration.IntegratedReception.test_unknown_cost_is_not_zero_or_a_loss) ... ok
+2026-10-21T05:26:04.3913460Z test_both_feature_paths_refuse_quarantined_inputs (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_both_feature_paths_refuse_quarantined_inputs) ... ok
+2026-10-21T05:26:04.3930355Z test_migration_preserves_variants_but_refuses_query_and_view (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_migration_preserves_variants_but_refuses_query_and_view) ... ok
+2026-10-21T05:26:04.3937751Z test_only_exact_legacy_trust_conflicts_are_repairable (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_only_exact_legacy_trust_conflicts_are_repairable) ... ok
+2026-10-21T05:26:04.3940421Z test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) ... ok
+2026-10-21T05:26:04.4037406Z test_ack_native_proof_from_divergent_git_history_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_ack_native_proof_from_divergent_git_history_rejected) ... ok
+2026-10-21T05:26:04.4082122Z test_bare_favorable_json_is_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_bare_favorable_json_is_rejected) ... ok
+2026-10-21T05:26:04.4209027Z test_certificate_proof_ancestor_survives_native_append_only (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_certificate_proof_ancestor_survives_native_append_only) ... ok
+2026-10-21T05:26:04.4270681Z test_certifier_denies_missing_protected_main_or_failed_run (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_certifier_denies_missing_protected_main_or_failed_run) ... ok
+2026-10-21T05:26:04.4359410Z test_cold_schema_v2_rejected_even_with_native_jobs (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_cold_schema_v2_rejected_even_with_native_jobs) ... ok
+2026-10-21T05:26:04.4495148Z test_consumer_independently_requires_exact_native_cas_reply (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_consumer_independently_requires_exact_native_cas_reply) ... ok
+2026-10-21T05:26:04.4579217Z test_cross_run_job_or_seal_binding_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_cross_run_job_or_seal_binding_rejected) ... ok
+2026-10-21T05:26:04.4715075Z test_exact_cipher_or_accounting_change_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_exact_cipher_or_accounting_change_rejected) ... ok
+2026-10-21T05:26:04.4802005Z test_fake_boolean_positive_cannot_replace_native_history (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_fake_boolean_positive_cannot_replace_native_history) ... ok
+2026-10-21T05:26:04.4927626Z test_fully_linked_artificial_protocol_fixture (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_fully_linked_artificial_protocol_fixture) ... ok
+2026-10-21T05:26:04.5099365Z test_missing_aba_or_authentic_proof_must_hold (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_missing_aba_or_authentic_proof_must_hold) ... ok
+2026-10-21T05:26:04.5273410Z test_missing_programme_budget_or_receipt_hash_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_missing_programme_budget_or_receipt_hash_rejected) ... ok
+2026-10-21T05:26:04.5634358Z test_skipped_or_failed_native_job_is_not_acceptance (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_skipped_or_failed_native_job_is_not_acceptance) ... ok
+2026-10-21T05:26:04.5968274Z test_tampered_or_missing_v3_proof_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_tampered_or_missing_v3_proof_rejected) ... ok
+2026-10-21T05:26:04.6061192Z test_unprotected_control_plane_and_incomplete_native_run_rejected (research_core_v4.laboratory.test_native_acceptance_v3.IndependentNativeV3ContractTests.test_unprotected_control_plane_and_incomplete_native_run_rejected) ... ok
+2026-10-21T05:26:04.6063791Z test_effective_rules_not_protected_boolean (research_core_v4.laboratory.test_native_acl_probe.NativeACLTest.test_effective_rules_not_protected_boolean) ... ok
+2026-10-21T05:26:04.6066042Z test_generic_forbidden_is_not_rule_denial (research_core_v4.laboratory.test_native_acl_probe.NativeACLTest.test_generic_forbidden_is_not_rule_denial) ... ok
+2026-10-21T05:26:04.6072760Z MXM_ACL_RESULT {"after": "parent", "before": "parent", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "type": "required_status_checks"}, {"ruleset_id": 25461184, "type": "pull_request"}], "positive_commit_status": 201, "proposal": "proposal", "response": {"message": "Repository rule violations found"}, "response_sha256": "915ede0e41347ceb17303d280330e2f347d43b7b40a6094ea4a070ae192bd8ba", "rule": {"bypass_actors": [], "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main"]}}, "enforcement": "active", "id": 25461184, "rules": [{"type": "pull_request"}, {"parameters": {"required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "target": "branch"}, "ruleset_id": 25461184, "tree": "tree", "update_status": 422}
+2026-10-21T05:26:04.6079589Z MXM_ACL_RESULT {"after": "parent", "before": "parent", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "type": "required_status_checks"}, {"ruleset_id": 25461184, "type": "pull_request"}], "positive_commit_status": 201, "proposal": "proposal", "response": {"message": "Resource not accessible by integration"}, "response_sha256": "dbd2648a8b38caac0472f43bcced1701e42f7203978df2b4d17740e551ca3f4a", "rule": {"bypass_actors": [], "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main"]}}, "enforcement": "active", "id": 25461184, "rules": [{"type": "pull_request"}, {"parameters": {"required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "target": "branch"}, "ruleset_id": 25461184, "tree": "tree", "update_status": 403}
+2026-10-21T05:26:04.6084958Z MXM_ACL_RESULT {"after": "parent", "before": "parent", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "type": "required_status_checks"}, {"ruleset_id": 25461184, "type": "pull_request"}], "positive_commit_status": 201, "proposal": "proposal", "response": {"message": "accepted"}, "response_sha256": "1fc93842ea759dac2e4f66e160d7e17edbd374ff8a088291884a33796efdf731", "rule": {"bypass_actors": [], "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main"]}}, "enforcement": "active", "id": 25461184, "rules": [{"type": "pull_request"}, {"parameters": {"required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "target": "branch"}, "ruleset_id": 25461184, "tree": "tree", "update_status": 200}
+2026-10-21T05:26:04.6088013Z test_successful_write_and_generic_denial_fail (research_core_v4.laboratory.test_native_acl_probe.NativeACLTest.test_successful_write_and_generic_denial_fail) ... ok
+2026-10-21T05:26:04.6089268Z test_actual_native_github_reply_binds_both_objects_and_exact_ref (research_core_v4.laboratory.test_native_cas_response.NativeCASResponse.test_actual_native_github_reply_binds_both_objects_and_exact_ref) ... ok
+2026-10-21T05:26:04.6090525Z test_exact_destination_and_old_value_only (research_core_v4.laboratory.test_native_cas_response.NativeCASResponse.test_exact_destination_and_old_value_only) ... ok
+2026-10-21T05:26:04.7157580Z test_real_concurrent_receive_pack_and_stale_advertisement (research_core_v4.laboratory.test_native_cas_response.NativeCASResponse.test_real_concurrent_receive_pack_and_stale_advertisement) ... ok
+2026-10-21T05:26:04.7199586Z test_authentic_quote_is_not_fill (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_authentic_quote_is_not_fill) ... ok
+2026-10-21T05:26:04.7201520Z test_future_and_timestamp_mismatch_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_future_and_timestamp_mismatch_fail) ... ok
+2026-10-21T05:26:04.7203618Z test_native_proof_binds_original_attempt_and_does_not_accept_retry (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_native_proof_binds_original_attempt_and_does_not_accept_retry) ... ok
+2026-10-21T05:26:04.7205458Z test_unknown_pagination_and_nan_fail (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_unknown_pagination_and_nan_fail) ... ok
+2026-10-21T05:26:04.7207185Z test_window_and_conflict_do_not_create_economic_results (research_core_v4.laboratory.test_frontier_cached_support.CachedSupport.test_window_and_conflict_do_not_create_economic_results) ... ok
+2026-10-21T05:26:04.7264733Z test_conflicts_are_not_promoted (research_core_v4.laboratory.test_native_quote_reuse.ReuseContract.test_conflicts_are_not_promoted) ... ok
+2026-10-21T05:26:04.7266538Z test_exact_window_preserves_source_and_identity (research_core_v4.laboratory.test_native_quote_reuse.ReuseContract.test_exact_window_preserves_source_and_identity) ... ok
+2026-10-21T05:26:04.7268626Z test_unmatched_or_other_window_does_not_repair_gap (research_core_v4.laboratory.test_native_quote_reuse.ReuseContract.test_unmatched_or_other_window_does_not_repair_gap) ... ok
+2026-10-21T05:26:04.7270795Z test_delayed_parent_may_converge_without_second_write (research_core_v4.laboratory.test_native_ref_confirmation.NativeRefConfirmation.test_delayed_parent_may_converge_without_second_write) ... ok
+2026-10-21T05:26:04.7273555Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7276860Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 2, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7279170Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "read_attempt": 3, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7280611Z test_exact_git_protocol_destination_required (research_core_v4.laboratory.test_native_ref_confirmation.NativeRefConfirmation.test_exact_git_protocol_destination_required) ... ok
+2026-10-21T05:26:04.7282169Z test_unchanged_or_unexpected_ref_is_never_success (research_core_v4.laboratory.test_native_ref_confirmation.NativeRefConfirmation.test_unchanged_or_unexpected_ref_is_never_success) ... ok
+2026-10-21T05:26:04.7283658Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7285284Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 2, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7286905Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 3, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7288515Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 4, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7290332Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "read_attempt": 5, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7292285Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "observed_oid": "cccccccccccccccccccccccccccccccccccccccc", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.7695518Z test_cli_uses_same_module_scope_as_imported_publishers_and_guards (research_core_v4.laboratory.test_native_writer_entrypoint.NativeWriterEntrypoint.test_cli_uses_same_module_scope_as_imported_publishers_and_guards) ... ok
+2026-10-21T05:26:04.7709475Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T05:26:04.7715485Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T05:26:04.7723296Z test_no_fabrication_on_missing_or_invalid_input (research_core_v4.laboratory.test_nonoutcome_adapter.PreservedCorpusBindingTests.test_no_fabrication_on_missing_or_invalid_input) ... ok
+2026-10-21T05:26:04.7739011Z test_selected_quote_must_match_conserved_raw_page (research_core_v4.laboratory.test_nonoutcome_adapter.PreservedCorpusBindingTests.test_selected_quote_must_match_conserved_raw_page) ... ok
+2026-10-21T05:26:04.7747252Z test_zero_wire_nonoutcome_operator_preserves_quote_provenance (research_core_v4.laboratory.test_nonoutcome_adapter.PreservedCorpusBindingTests.test_zero_wire_nonoutcome_operator_preserves_quote_provenance) ... ok
+2026-10-21T05:26:04.7749066Z test_A01_empty_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A01_empty_not_usable) ... ok
+2026-10-21T05:26:04.7750658Z test_A02_async_not_fabricated_and_crossed_rejected (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_async_not_fabricated_and_crossed_rejected) ... ok
+2026-10-21T05:26:04.7752602Z test_A02_unilateral_not_usable (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A02_unilateral_not_usable) ... ok
+2026-10-21T05:26:04.7800481Z test_A03_forged_winner_not_certified (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A03_forged_winner_not_certified) ... ok
+2026-10-21T05:26:04.8065899Z test_A03_mutated_cas_facts_and_native_logs (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A03_mutated_cas_facts_and_native_logs) ... ok
+2026-10-21T05:26:04.8128963Z test_A04_hold_is_not_complete (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A04_hold_is_not_complete) ... ok
+2026-10-21T05:26:04.8315300Z test_A05_reordered_rechained_duplicate_and_orphan_events (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A05_reordered_rechained_duplicate_and_orphan_events) ... ok
+2026-10-21T05:26:04.8376780Z test_A05_truncated_journal (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A05_truncated_journal) ... ok
+2026-10-21T05:26:04.8383650Z test_A06_orphan_closed_mismatch_duplicate (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_orphan_closed_mismatch_duplicate) ... ok
+2026-10-21T05:26:04.8387973Z test_A06_valid_positive_negative_conservation (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A06_valid_positive_negative_conservation) ... ok
+2026-10-21T05:26:04.8390131Z test_A07_adapter_rejects_future_signal_before_economic_open (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_adapter_rejects_future_signal_before_economic_open) ... ok
+2026-10-21T05:26:04.8392613Z test_A07_adapter_rejects_late_quote (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_adapter_rejects_late_quote) ... ok
+2026-10-21T05:26:04.8398762Z test_A07_engine_independently_rejects_clocks (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_A07_engine_independently_rejects_clocks) ... ok
+2026-10-21T05:26:04.8400652Z test_DAT01_preserves_same_millisecond_side_revisions (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_DAT01_preserves_same_millisecond_side_revisions) ... ok
+2026-10-21T05:26:04.8402669Z test_DAT02_trust_mutation_rejected_on_restore (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_DAT02_trust_mutation_rejected_on_restore) ... ok
+2026-10-21T05:26:04.8404495Z test_I04_different_native_workflow_head_refused (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_I04_different_native_workflow_head_refused) ... ok
+2026-10-21T05:26:04.8406254Z test_REC01_filtered_inventory_paginates (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_REC01_filtered_inventory_paginates) ... ok
+2026-10-21T05:26:04.8407793Z test_REC01_retry_requires_independent_preclaim_failure (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_REC01_retry_requires_independent_preclaim_failure) ... ok
+2026-10-21T05:26:04.8444645Z test_REC04_missing_protocol_refuses_before_network (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_REC04_missing_protocol_refuses_before_network) ... ok
+2026-10-21T05:26:04.8446759Z test_SEC02_protected_boolean_does_not_replace_effective_authority (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_SEC02_protected_boolean_does_not_replace_effective_authority) ... ok
+2026-10-21T05:26:04.8451092Z test_SEC03_forward_commit_rollback_or_receipt_tamper_refused (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_SEC03_forward_commit_rollback_or_receipt_tamper_refused) ... ok
+2026-10-21T05:26:04.8452909Z test_SEC04_additive_rule_and_timestamp_changes_allowed (research_core_v4.laboratory.test_owner_consolidated.OwnerAuditRegressions.test_SEC04_additive_rule_and_timestamp_changes_allowed) ... ok
+2026-10-21T05:26:04.8454253Z test_all_consumers_use_exact_original_sealed_cutoff (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_all_consumers_use_exact_original_sealed_cutoff) ... ok
+2026-10-21T05:26:04.8455796Z test_historical_bar_with_protected_availability_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_historical_bar_with_protected_availability_is_refused) ... ok
+2026-10-21T05:26:04.8461814Z test_modified_original_authority_is_refused (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_modified_original_authority_is_refused) ... ok
+2026-10-21T05:26:04.8464462Z test_protected_decision_cannot_read_development_cache (research_core_v4.laboratory.test_partition_authority.PartitionAuthority.test_protected_decision_cannot_read_development_cache) ... ok
+2026-10-21T05:26:04.8466095Z test_exact_original_and_linear_recovery_successor_are_conserved (research_core_v4.laboratory.test_public_checkpoint_lineage.PublicCheckpointLineage.test_exact_original_and_linear_recovery_successor_are_conserved) ... ok
+2026-10-21T05:26:04.8467939Z test_fork_cycle_spoof_and_insufficient_history_do_not_authorize_origin (research_core_v4.laboratory.test_public_checkpoint_lineage.PublicCheckpointLineage.test_fork_cycle_spoof_and_insufficient_history_do_not_authorize_origin) ... ok
+2026-10-21T05:26:04.9276124Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "4b1a1691a41514d973289c7dcfb5747f471d6707", "observed_oid": "4b1a1691a41514d973289c7dcfb5747f471d6707", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:04.9377833Z test_lost_ack_verifies_remote_bytes_without_second_push (research_core_v4.laboratory.test_publisher_git_confirmation.PublisherGitConfirmation.test_lost_ack_verifies_remote_bytes_without_second_push) ... ok
+2026-10-21T05:26:05.0171386Z {"state": "ATOMIC_ACK_RECONCILED_BY_EXACT_REMOTE_BYTES", "commit": "4b1a1691a41514d973289c7dcfb5747f471d6707", "second_push": false}
+2026-10-21T05:26:05.0172789Z MXM_NATIVE_REF_CONFIRMATION {"expected_oid": "4b1a1691a41514d973289c7dcfb5747f471d6707", "observed_oid": "4b1a1691a41514d973289c7dcfb5747f471d6707", "read_attempt": 1, "transport": "AUTHENTICATED_GIT_REF_ADVERTISEMENT", "second_push": false}
+2026-10-21T05:26:05.0257655Z test_success_uses_native_git_ref_when_rest_stays_at_parent (research_core_v4.laboratory.test_publisher_git_confirmation.PublisherGitConfirmation.test_success_uses_native_git_ref_when_rest_stays_at_parent) ... ok
+2026-10-21T05:26:05.0259375Z test_all_same_millisecond_revisions_are_decoded (research_core_v4.laboratory.test_raw_quote_receipts.RawQuoteReceiptTests.test_all_same_millisecond_revisions_are_decoded) ... ok
+2026-10-21T05:26:05.0261782Z test_async_empty_and_partial_remain_distinct (research_core_v4.laboratory.test_raw_quote_receipts.RawQuoteReceiptTests.test_async_empty_and_partial_remain_distinct) ... ok
+2026-10-21T05:26:05.0264836Z test_raw_clock_type_identity_and_duplicate_pages_are_rejected (research_core_v4.laboratory.test_raw_quote_receipts.RawQuoteReceiptTests.test_raw_clock_type_identity_and_duplicate_pages_are_rejected) ... ok
+2026-10-21T05:26:05.0333003Z test_contract_charges_and_existing_reservation_are_distinct_without_refund (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_contract_charges_and_existing_reservation_are_distinct_without_refund) ... ok
+2026-10-21T05:26:05.0335270Z test_diagnostic_fails_if_sealed_zero_is_contradicted (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_diagnostic_fails_if_sealed_zero_is_contradicted) ... ok
+2026-10-21T05:26:05.0337283Z test_nonzero_constant_is_distinct_from_zero (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_nonzero_constant_is_distinct_from_zero) ... ok
+2026-10-21T05:26:05.0339679Z test_zero_volume_does_not_erase_individual_price_condition_counts (research_core_v4.laboratory.test_reconcile_nonoutcome.DiagnosticContract.test_zero_volume_does_not_erase_individual_price_condition_counts) ... ok
+2026-10-21T05:26:05.0563138Z test_arbitrary_descendant_or_extra_write_cannot_authorize_migration (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_arbitrary_descendant_or_extra_write_cannot_authorize_migration) ... ok
+2026-10-21T05:26:05.0845575Z test_changed_accounting_cipher_continuation_or_claim_is_held (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_changed_accounting_cipher_continuation_or_claim_is_held) ... ok
+2026-10-21T05:26:05.0940355Z test_exact_recovery_retains_original_migration_authority_without_replay (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_exact_recovery_retains_original_migration_authority_without_replay) ... ok
+2026-10-21T05:26:05.1036631Z test_wrong_source_native_checkout_is_not_recovery_evidence (research_core_v4.laboratory.test_recovered_transition.RecoveredTransition.test_wrong_source_native_checkout_is_not_recovery_evidence) ... ok
+2026-10-21T05:26:05.1047801Z test_closed_or_foreign_state_cannot_bootstrap_or_dispatch (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_closed_or_foreign_state_cannot_bootstrap_or_dispatch) ... ok
+2026-10-21T05:26:05.1051180Z test_controlled_fault_flag_requires_exact_native_job_log (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_controlled_fault_flag_requires_exact_native_job_log) ... ok
+2026-10-21T05:26:05.1066478Z test_existing_app_scope_is_revoked_and_cleared_after_failure (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_existing_app_scope_is_revoked_and_cleared_after_failure) ... ok
+2026-10-21T05:26:05.1081430Z test_existing_app_scope_is_revoked_and_cleared_after_success (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_existing_app_scope_is_revoked_and_cleared_after_success) ... ok
+2026-10-21T05:26:05.1083507Z test_generated_existing_watchdog_has_no_native_write_or_custody_authority (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_generated_existing_watchdog_has_no_native_write_or_custody_authority) ... ok
+2026-10-21T05:26:05.1085391Z test_only_native_terminal_preexposure_failure_is_recoverable (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_only_native_terminal_preexposure_failure_is_recoverable) ... ok
+2026-10-21T05:26:05.1089754Z test_wrong_native_context_rejects_before_code_or_key_access (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_wrong_native_context_rejects_before_code_or_key_access) ... ok
+2026-10-21T05:26:05.1091980Z test_wrong_predecessor_branch_attempt_or_workflow_is_not_authority (research_core_v4.laboratory.test_recovery_v3.R3ObserverTests.test_wrong_predecessor_branch_attempt_or_workflow_is_not_authority) ... ok
+2026-10-21T05:26:05.1094686Z test_operational_acceptance_alone_cannot_release_research (research_core_v4.laboratory.test_research_reception_hold.ResearchReceptionHoldTests.test_operational_acceptance_alone_cannot_release_research) ... ok
+2026-10-21T05:26:05.3568405Z test_full_page_reservation_conserves_total_and_kind_across_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_full_page_reservation_conserves_total_and_kind_across_restore) ... ok
+2026-10-21T05:26:05.6034416Z test_inflated_remaining_or_kind_budget_is_rejected_on_restore (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_inflated_remaining_or_kind_budget_is_rejected_on_restore) ... ok
+2026-10-21T05:26:05.6036696Z test_missing_transport_reserves_once_without_refund (research_core_v4.laboratory.test_resource_contracts.ResourceContracts.test_missing_transport_reserves_once_without_refund) ... ok
+2026-10-21T05:26:05.6061549Z test_cleanup_checks_every_metadata_before_first_delete (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_cleanup_checks_every_metadata_before_first_delete) ... ok
+2026-10-21T05:26:05.6068260Z test_copy_http_body_contains_only_ciphertext (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_copy_http_body_contains_only_ciphertext) ... ok
+2026-10-21T05:26:05.6070662Z test_installable_workflow_is_exact_and_has_no_arbitrary_inputs (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_installable_workflow_is_exact_and_has_no_arbitrary_inputs) ... ok
+2026-10-21T05:26:05.6073236Z test_missing_and_mismatched_values_fail (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_missing_and_mismatched_values_fail) ... ok
+2026-10-21T05:26:05.6075262Z test_native_terminal_jobs_and_exact_receipts_required (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_native_terminal_jobs_and_exact_receipts_required) ... ok
+2026-10-21T05:26:05.6210259Z test_real_system_sealed_box_preserves_exact_bytes (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_real_system_sealed_box_preserves_exact_bytes) ... ok
+2026-10-21T05:26:05.6212707Z test_wildcards_tags_and_bypass_are_refused (research_core_v4.laboratory.test_secret_isolation.SecretIsolationTest.test_wildcards_tags_and_bypass_are_refused) ... ok
+2026-10-21T05:26:05.6228312Z test_additive_transition_retains_all_history_and_roundtrips (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_additive_transition_retains_all_history_and_roundtrips) ... ok
+2026-10-21T05:26:05.6249903Z test_changed_missing_or_repeated_transition_refused_without_mutation (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_changed_missing_or_repeated_transition_refused_without_mutation) ... ok
+2026-10-21T05:26:05.6282943Z test_equivalent_cross_lane_reservation_does_not_reset_capacity (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_equivalent_cross_lane_reservation_does_not_reset_capacity) ... ok
+2026-10-21T05:26:05.6287916Z test_large_integers_are_not_rounded_by_decimal_context (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_large_integers_are_not_rounded_by_decimal_context) ... ok
+2026-10-21T05:26:05.6296104Z test_numeric_cosmetic_and_universe_equivalence (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_numeric_cosmetic_and_universe_equivalence) ... ok
+2026-10-21T05:26:05.6298283Z test_unknown_top_level_field_is_not_a_new_identity (research_core_v4.laboratory.test_semantic_schema.SemanticSchema.test_unknown_top_level_field_is_not_a_new_identity) ... ok
+2026-10-21T05:26:05.6313400Z test_actual_laboratory_cold_restart_with_typed_book (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_actual_laboratory_cold_restart_with_typed_book) ... ok
+2026-10-21T05:26:05.6320147Z test_invalid_dag_and_technical_economic_operator_rejected_preclaim (research_core_v4.laboratory.test_integrated_protocol.LaboratoryIntegrationTests.test_invalid_dag_and_technical_economic_operator_rejected_preclaim) ... ok
+2026-10-21T05:26:05.6362338Z test_A_B_resume_A_keeps_shared_assets_quarantine_and_budgets (research_core_v4.laboratory.test_shared_catalogue_successor.SharedCatalogueSuccessor.test_A_B_resume_A_keeps_shared_assets_quarantine_and_budgets) ... ok
+2026-10-21T05:26:05.6373017Z test_conflicting_common_asset_metadata_fails_closed (research_core_v4.laboratory.test_shared_catalogue_successor.SharedCatalogueSuccessor.test_conflicting_common_asset_metadata_fails_closed) ... ok
+2026-10-21T05:26:05.6375188Z test_partition_isolation (research_core_v4.laboratory.test_shared_catalogue_successor.SharedCatalogueSuccessor.test_partition_isolation) ... ok
+2026-10-21T05:26:05.6384282Z test_app_control_scope_cannot_publish_any_evidence (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_app_control_scope_cannot_publish_any_evidence) ... ok
+2026-10-21T05:26:05.6951063Z test_changed_redacted_policy_or_nonempty_bypass_is_held (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_changed_redacted_policy_or_nonempty_bypass_is_held) ... ok
+2026-10-21T05:26:05.7046239Z test_independent_successful_same_run_pinned_control_job_admits (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_independent_successful_same_run_pinned_control_job_admits) ... ok
+2026-10-21T05:26:05.7508755Z test_old_source_run_trigger_or_attempt_is_not_authority (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_old_source_run_trigger_or_attempt_is_not_authority) ... ok
+2026-10-21T05:26:05.7931168Z test_successful_job_label_requires_real_successful_checkout (research_core_v4.laboratory.test_source_control_delivery.SourceControlDelivery.test_successful_job_label_requires_real_successful_checkout) ... ok
+2026-10-21T05:26:05.7962889Z test_append_only_or_missing_applied_freeze_cannot_start_operation (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_append_only_or_missing_applied_freeze_cannot_start_operation) ... ok
+2026-10-21T05:26:05.7975209Z test_exact_applied_no_bypass_source_freeze_admits (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_exact_applied_no_bypass_source_freeze_admits) ... ok
+2026-10-21T05:26:05.8046998Z test_missing_bypass_actors_or_disabled_or_wrong_scope_refused (research_core_v4.laboratory.test_source_freeze.SourceFreeze.test_missing_bypass_actors_or_disabled_or_wrong_scope_refused) ... ok
+2026-10-21T05:26:05.8068794Z test_historical_authority_fence_scope_cannot_change (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_historical_authority_fence_scope_cannot_change) ... ok
+2026-10-21T05:26:05.8080433Z test_immutable_source_does_not_require_rewriting_merge_history (research_core_v4.laboratory.test_source_namespace.SourceNamespace.test_immutable_source_does_not_require_rewriting_merge_history) ... ok
+2026-10-21T05:26:06.0643237Z test_all_tasks_cannot_be_forged_as_skipped (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_all_tasks_cannot_be_forged_as_skipped) ... ok
+2026-10-21T05:26:06.0779194Z test_real_dependency_verdicts_and_transitive_skips_restore (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_real_dependency_verdicts_and_transitive_skips_restore) ... ok
+2026-10-21T05:26:06.0882815Z test_rehashed_journal_cannot_reverse_dependency_execution (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_rehashed_journal_cannot_reverse_dependency_execution) ... ok
+2026-10-21T05:26:06.0898895Z test_unfinished_dependency_cannot_justify_skip (research_core_v4.laboratory.test_terminal_dependencies.TerminalDependencyTests.test_unfinished_dependency_cannot_justify_skip) ... ok
+2026-10-21T05:26:06.0906007Z test_no_scope_or_schedule_can_reach_transport (research_core_v4.laboratory.test_transport_diagnostic.TransportDiagnosticTests.test_no_scope_or_schedule_can_reach_transport) ... ok
+2026-10-21T05:26:06.0908633Z test_only_fixed_new_diagnostic_paths (research_core_v4.laboratory.test_transport_diagnostic.TransportDiagnosticTests.test_only_fixed_new_diagnostic_paths) ... ok
+2026-10-21T05:26:06.0911071Z test_replies_redact_raw_and_encoded_authority (research_core_v4.laboratory.test_transport_diagnostic.TransportDiagnosticTests.test_replies_redact_raw_and_encoded_authority) ... ok
+2026-10-21T05:26:06.0913341Z test_exact_known_pressure_and_no_overlap_horizon (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_exact_known_pressure_and_no_overlap_horizon) ... ok
+2026-10-21T05:26:06.0915428Z test_future_and_synthetic_assets_rejected (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_future_and_synthetic_assets_rejected) ... ok
+2026-10-21T05:26:06.0917547Z test_no_volume_shock_and_zero_volume_are_not_signals (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_no_volume_shock_and_zero_volume_are_not_signals) ... ok
+2026-10-21T05:26:06.0919892Z test_unknown_clock_or_late_receipt_does_not_compress_history (research_core_v4.laboratory.test_volume_pressure.VolumePressure.test_unknown_clock_or_late_receipt_does_not_compress_history) ... ok
+2026-10-21T05:26:06.1382845Z test_every_prepared_operational_job_passes_independent_code_provenance (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_every_prepared_operational_job_passes_independent_code_provenance) ... ok
+2026-10-21T05:26:06.2193345Z test_failure_clears_scope_and_revokes_without_retry (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_failure_clears_scope_and_revokes_without_retry) ... ok
+2026-10-21T05:26:06.2198543Z test_native_github_token_alone_cannot_publish (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_native_github_token_alone_cannot_publish) ... ok
+2026-10-21T05:26:06.2216362Z test_no_owner_or_broker_key_may_enter_writer_context (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_no_owner_or_broker_key_may_enter_writer_context) ... ok
+2026-10-21T05:26:06.2411991Z test_prepared_workflow_reuses_dag_and_separates_credentials (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_prepared_workflow_reuses_dag_and_separates_credentials) ... ok
+2026-10-21T05:26:06.3195548Z test_scoped_mint_use_revoke_keeps_key_and_token_out_of_workload_environment (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_scoped_mint_use_revoke_keeps_key_and_token_out_of_workload_environment) ... ok
+2026-10-21T05:26:06.3228508Z test_wrong_job_ref_attempt_or_workflow_is_refused_before_credentials (research_core_v4.laboratory.test_writer_delivery.WriterDelivery.test_wrong_job_ref_attempt_or_workflow_is_refused_before_credentials) ... ok
+2026-10-21T05:26:06.3231649Z test_external_cashflow_neutral_nav (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_external_cashflow_neutral_nav) ... ok
+2026-10-21T05:26:06.3235388Z test_financing_cost_compounding_and_metrics (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_financing_cost_compounding_and_metrics) ... ok
+2026-10-21T05:26:06.3238372Z test_rejected_entry_future_events_skip_not_crash (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_rejected_entry_future_events_skip_not_crash) ... ok
+2026-10-21T05:26:06.3242043Z test_same_timestamp_marks_are_atomic (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_same_timestamp_marks_are_atomic) ... ok
+2026-10-21T05:26:06.3244312Z test_stop_out_unknown_fails_closed (tests.test_continuous_account_replay_v2.ContinuousReplayV2Tests.test_stop_out_unknown_fails_closed) ... ok
+2026-10-21T05:26:06.3245363Z 
+2026-10-21T05:26:06.3245783Z ----------------------------------------------------------------------
+2026-10-21T05:26:06.3246311Z Ran 277 tests in 2.578s
+2026-10-21T05:26:06.3246536Z 
+2026-10-21T05:26:06.3246644Z OK
+2026-10-21T05:26:06.3873917Z ##[group]Run python3 -m research_core_v4.laboratory.live_preflight_v3
+2026-10-21T05:26:06.3874916Z [36;1mpython3 -m research_core_v4.laboratory.live_preflight_v3[0m
+2026-10-21T05:26:06.3961893Z shell: /usr/bin/bash -e {0}
+2026-10-21T05:26:06.3962295Z env:
+2026-10-21T05:26:06.3966936Z   GH_TOKEN: ***
+2026-10-21T05:26:06.3967274Z ##[endgroup]
+2026-10-21T05:26:13.8904900Z {"active_authority_unchanged": true, "checkpoint_evidence_oid": "09703adad6433f395a0506fa640f59bf3dba80b5", "checkpoint_sequence": 20, "end_to_end_operational_certificate_issued": false, "evidence_lineage": {"head": "d569a322e1692162e30a4539fe9a4f7bfc624266", "origin": "09703adad6433f395a0506fa640f59bf3dba80b5", "successor_commits": 30}, "exact_public_state_sha256": "57664d1192228a97e4dc88d3b36081872da532e0515df5e02d7df8d113ca4f91", "execution_protected": true, "main_protected": true, "new_economic_outcomes": 0, "orders": 0, "owner_anchor_unchanged": true, "private_migration_and_runtime_acceptance_evaluated": false, "r2_source_protected": true, "schema": "mxm.r3.public-preflight.v2"}
+2026-10-21T05:26:13.9164372Z Post job cleanup.
+2026-10-21T05:26:14.0063746Z [command]/usr/bin/git version
+2026-10-21T05:26:14.0111729Z git version 2.55.0
+2026-10-21T05:26:14.0154349Z Temporarily overriding HOME='/home/runner/work/_temp/8c1c0b48-b620-4445-a88f-410df84f57c7' before making global git config changes
+2026-10-21T05:26:14.0155638Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T05:26:14.0159991Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/code
+2026-10-21T05:26:14.0202382Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T05:26:14.0241937Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T05:26:14.0510779Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T05:26:14.0567982Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T05:26:14.1117305Z Post job cleanup.
+2026-10-21T05:26:14.2066505Z [command]/usr/bin/git version
+2026-10-21T05:26:14.2115344Z git version 2.55.0
+2026-10-21T05:26:14.2157660Z Temporarily overriding HOME='/home/runner/work/_temp/3c0fa4f9-147b-498d-853d-87b964558bc4' before making global git config changes
+2026-10-21T05:26:14.2159014Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-21T05:26:14.2165294Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/installation
+2026-10-21T05:26:14.2209344Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-21T05:26:14.2250578Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-21T05:26:14.2518237Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-21T05:26:14.2558564Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-21T05:26:14.3061378Z Cleaning up orphan processes
+2026-10-21T05:26:14.3498083Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -11,23 +11,65 @@ from research_core_v4.successor_c_20261018 import readback as old
 from research_core_v4.remediation_p0_p4_20261015 import owner
 from research_core_v4.remediation_p0_p4_20261015.safety import strict_json,unpack
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
-from research_core_v4.laboratory_completion_20261019_v2.runtime import source_admission
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'verification/integrated-laboratory'
-SOURCE_BRANCH='mxm-o04-successor-code-integrated-p0-r2'
+SOURCE_BRANCH='mxm-r3-integrated-source-20261021-r7'
 EVIDENCE_BRANCH='mxm-o04-integrated-laboratory-evidence'
 WF='.github/workflows/mxm-integrated-laboratory.yml'
 ADMISSION='research_programs/admissions/FUNCTIONAL_RECEPTION.json'
 
-def module_digest():
-    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py')})
+def source_admission(head,expected,branch_head,rule):
+    need(re.fullmatch('[a-f0-9]{40}',expected or '') and head==expected==branch_head,
+         'IMMUTABLE_SOURCE_PIN')
+    refs=rule.get('conditions',{}).get('ref_name',{})
+    need(rule.get('id')==25222248 and rule.get('enforcement')=='active' and
+         refs=={'include':['refs/heads/mxm-o04-*'],'exclude':[]} and
+         {'deletion','non_fast_forward','required_linear_history'}<=
+         {r['type'] for r in rule.get('rules',[])} and
+         rule.get('bypass_actors',[])==[], 'EXISTING_APPEND_ONLY_FENCE')
+    # Preserve the original authority/evidence fence exactly. Source history
+    # contains merges and cannot be recreated in its linear-only namespace.
+    # The source's separate exact creation/update/deletion/non-FF seal below
+    # forbids every mutation, including all history rewrites, without bypass.
 
-def anchors(route):
+def module_digest():
+    return digest({p:bytes_digest((ROOT/'research_core_v4/laboratory'/p).read_bytes()) for p in ('common.py','data.py','budgets.py','admission.py','economics.py','programs.py','science.py','sizing.py','inventory.py','volume_pressure.py','runtime.py','claim.py','publish.py','handoff.py','custody.py','protocol.py','integrated.py','execution.py','operational_acceptance.py','handoff_recovery.py','evidence_v3.py','attest_v3.py','certify_v3.py','authorities/closed_native_predecessors.json','post_fence_technical.py','certificate_registry.py')})
+
+def anchors(route,*,allow_redacted_app_probe=False,source_branch=None):
+    # A dedicated immutable certifier revision may inspect an already finished
+    # workload. It has its own exact source seal; workers retain their source.
+    source_branch=SOURCE_BRANCH if source_branch is None else source_branch
     old.owner_unchanged(route)
     need(route.json('git/ref/heads/mxm-o04-active-v1')['object']['sha']==AUTHORITY,'AUTHORITY_DRIFT')
     active=strict_json(file_at(route,'state.json',AUTHORITY));need(active['revoked'] is False and active['pending'] is None,'AUTHORITY_REVOKED_OR_PENDING')
     source_admission(subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),os.environ['LAB_SOURCE_SHA'],
-      route.json('git/ref/heads/'+SOURCE_BRANCH)['object']['sha'],route.json('rulesets/25222248'))
+      route.json('git/ref/heads/'+source_branch)['object']['sha'],route.json('rulesets/25222248'))
+    # Native read tokens redact bypass actors. Only the exact keyless App
+    # control probe may inspect such a policy before mint/use/revoke. It cannot
+    # publish. Custody readers independently verify its same-run native proof;
+    # live App scopes read the actual ACL directly, never infer omitted=[] .
+    from .custody import effective_controls_reader,verify_native_source_control
+    controls=effective_controls_reader(route)
+    rules=controls.json('rules/branches/'+source_branch)
+    need(type(rules) is list and {'update','deletion','non_fast_forward'}<=
+         {r.get('type') for r in rules},'SOURCE_EFFECTIVE_FREEZE_REQUIRED')
+    restrictions=[r for r in rules if r.get('type')=='update']
+    for restriction in restrictions:
+        policy=controls.json('rulesets/'+str(restriction['ruleset_id']))
+        if 'bypass_actors' not in policy:
+            if allow_redacted_app_probe:
+                from .custody import writer_metadata
+                identity=writer_metadata('source-controls')
+                need(identity['job']=='source-controls','SOURCE_ACL_PROBE_ONLY')
+            else:
+                policy=verify_native_source_control(route,policy)
+        need(policy.get('enforcement')=='active' and
+             (policy.get('bypass_actors')==[] or allow_redacted_app_probe and 'bypass_actors' not in policy) and
+             policy.get('conditions',{}).get('ref_name')==
+             {'include':['refs/heads/'+source_branch],'exclude':[]} and
+             {'creation','update','deletion','non_fast_forward'}<=
+             {r.get('type') for r in policy.get('rules',[])},
+             'SOURCE_EXACT_NO_BYPASS_FREEZE_REQUIRED')
 
 def read_state(route,oid):return strict_json(file_at(route,'program-state.json',oid))
 def validate_state(s,claimed_run=None):
@@ -84,6 +126,7 @@ def authentic_integration(key,tmp):
     return {'catalogue':cat.export(),'authentic_quote_rows_validated':count,'source_ciphertext_sha256':preserved_registry()['cached_input']['ciphertext_sha256'],'native_probe':probe,'economic_outcomes_opened':0}
 
 def main():
+    need(os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2','EXPLICIT_INTEGRATED_PROTOCOL_REQUIRED')
     if os.environ.get('LAB_INTEGRATED_PROTOCOL')=='v2':
         from .integrated import execute
         return execute()
@@ -148,7 +191,7 @@ def main():
             if m is None:break
             saved=private['programmes'].get(m['id'])
             if saved:
-                lab=Laboratory.restore(saved,history);lab.book=book
+                lab=Laboratory.restore(saved,history,shared_catalogue=private['shared_catalogue']);lab.book=book
             else:
                 # Runtime preflight binds all definitions before first outcome.
                 validate_manifest(m,history,book);lab=Laboratory(m,history,book,cache=DataCatalogue.restore(private['shared_catalogue']))
@@ -161,7 +204,8 @@ def main():
             if task is None:private['programmes'][m['id']]=lab.checkpoint();continue
             result=lab.execute(task);lab.next()
             if a['mode']=='DEVELOPMENT_RESEARCH':lazy.close()
-            private['programmes'][m['id']]=lab.checkpoint();private['shared_catalogue']=lab.cache.export();book=lab.book
+            from .execution import preserve_node
+            preserve_node(private,lab);book=lab.book
             executed.append({'programme':m['id'],'task':task,'classification':result['classification']})
         private['trial_book']=book.export();private['sequence']+=1;private['admission_sha256']=digest(a)
         private['admission_ref']=admission_ref;private['admission_path']=path;private['last_run_id']=int(os.environ['GITHUB_RUN_ID']);private['parent_oid']=parent

@@ -31,7 +31,7 @@ def screen(spec,evidence):
         for r in records:
             entry=utc_ms(r['entry_ms']);exit=utc_ms(r['exit_ms']);decision=utc_ms(r['decision_ms'])
             need(entry>decision and exit>entry and r['feature_available_ms']<=decision,'FUTURE_INFORMATION')
-            need(exit<1789603200000 and r['partition']=='DEVELOPMENT','PROTECTED_OUTCOME')
+            need(exit<DEVELOPMENT_END_MS and r['partition']=='DEVELOPMENT','PROTECTED_OUTCOME')
             need(all(len(r[k])==64 for k in ('source_sha256','execution_evidence_sha256')),'EXECUTION_PROVENANCE')
             need(r['execution_basis'] in ('AUTHENTIC_EXECUTION','CAUSAL_QUOTE_SIMULATION','SYNTHETIC_RECEPTION'),'EXECUTION_BASIS')
             need(number(r['gross_eur']),'GROSS_UNKNOWN');gross.append(r['gross_eur'])
@@ -89,15 +89,18 @@ def replay(spec,evidence):
     need(evidence['cost_state'] in ('VERIFIED','CONSERVATIVE_BOUND'),'UNKNOWN_DEEP_COST')
     need(evidence['full_mark_path'] is True and evidence['dated_broker_terms'] is True,'DEEP_SUPPORT')
     need(spec['sizing_rule_frozen'] is True and spec['allocator_frozen'] is True,'POST_OUTCOME_RESCUE')
+    need(number(spec.get('broker_stop_out_guard')) and spec['broker_stop_out_guard']>0,
+         'STOP_OUT_CONTRACT_REQUIRED')
     need(spec['price_cost_convention'] in ('MID_PLUS_ALL_FRICTIONS','BID_ASK_PLUS_NONSPREAD_COSTS'),'COST_CONVENTION')
     events=[]
     for row in evidence['events']:
         row=dict(row);need(row['kind'] in ('ENTRY','EXIT','MARK','FINANCING'),'CASH_RESET')
-        need(row.get('causal_state') is True and utc_ms(row['timestamp_utc'])<1789603200000,'CAUSAL_REPLAY')
+        need(row.get('causal_state') is True and utc_ms(row['timestamp_utc'])<DEVELOPMENT_END_MS,'CAUSAL_REPLAY')
         meta=row.get('metadata',{});need(len(meta.get('source_sha256',''))==64,'REPLAY_PROVENANCE')
         need(meta.get('available_at_ms',utc_ms(row['timestamp_utc'])+1)<=utc_ms(row['timestamp_utc']),'REPLAY_AVAILABILITY')
         if row['kind'] in ('ENTRY','EXIT'):
             c=meta.get('cost_components_eur',{});need(all(number(c.get(k)) for k in COSTS),'REPLAY_MISSING_COST')
+            need(all(c[k]>=0 for k in COSTS if k!='funding'),'NEGATIVE_COST')
             need(c['funding']==0,'FUNDING_REQUIRES_SEPARATE_CASHFLOW')
             charged=sum(c[k] for k in COSTS if k!='funding')
             need(abs(float(row['transaction_cost_eur'])-charged)<1e-9,'COST_AGGREGATION')
@@ -112,7 +115,8 @@ def replay(spec,evidence):
         transform=policy(spec['sizing_policy'])
     result=replay_continuous_account(events,starting_equity_eur=200,account_type=spec['account_type'],
       total_margin_calculation_type=spec['margin_type'],same_symbol_overlap_allowed=spec['same_symbol_overlap_allowed'],
-      entry_margin_level_floor_ratio=spec.get('broker_entry_margin_floor'),unresolved_stop_out_guard_ratio=spec.get('broker_stop_out_guard'),entry_transform=transform)
+      entry_margin_level_floor_ratio=spec.get('broker_entry_margin_floor'),unresolved_stop_out_guard_ratio=spec.get('broker_stop_out_guard'),entry_transform=transform,
+      require_causal_provenance=True)
     # Include idle weeks/months rather than drop them from the certificate.
     start=utc_ms(spec['evaluation_start']);end=utc_ms(spec['evaluation_end']);need(start<end,'EVALUATION_INTERVAL')
     need(all(start<=utc_ms(e.timestamp_utc)<end for e in events),'EVENT_OUTSIDE_EVALUATION')

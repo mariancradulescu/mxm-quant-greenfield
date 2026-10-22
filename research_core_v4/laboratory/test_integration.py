@@ -140,11 +140,12 @@ class IntegratedReception(unittest.TestCase):
         m=programme();c=DiscoveryEngine().freeze_candidate(m['tasks']['admit_candidate']['input']['candidate'])
         def q(t,bid,ask):return {'symbol_id':9999,'boundary_ms':t,'sides':{side:{'state':'AUTHENTIC_CAUSAL_QUOTE','timestamp_ms':t,'price':price,'age_ms':0,'source_has_more':False} for side,price in [('bid',bid),('ask',ask)]}}
         intent={'decision_ms':T,'feature_available_ms':T,'entry_ms':T+1000,'exit_ms':T+61000,'direction':1,'symbol_id':9999}
-        g={'intents':[intent],'missing':[]};corpus={'all_identity_status':[{'sid':9999,'symbol':'SYNTHETIC','class':'SYNTHETIC_FOREX','base':'EUR','quote':'EUR','reasons':[]}],
+        g={'intents':[intent],'missing':[],'feature_asset_sha256':digest('synthetic')};corpus={'all_identity_status':[{'sid':9999,'symbol':'SYNTHETIC','class':'SYNTHETIC_FOREX','base':'EUR','quote':'EUR','reasons':[]}],
           'raw_quote_receipts':[q(T+1000,100,101),q(T+31000,100.5,101.5),q(T+61000,102,103)]}
         costs={'spread':0.,'commission':.1,'slippage':0.,'funding':0.,'fx_conversion':0.}
         terms={'volume_cents':100,'min_volume_cents':100,'step_volume_cents':100,'max_volume_cents':10000,'margin_eur':20.,
-          'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64}],
+          'entry_cost_components_eur':costs,'exit_cost_components_eur':costs,'financing_cashflows':[{'timestamp_ms':T+31000,'amount_eur':-.05,'source_sha256':'a'*64,
+              'available_at_ms':T+31000,'accrual_start_ms':T+1000,'accrual_end_ms':T+31000}],
           'source_sha256':'a'*64,'effective_start_ms':T,'effective_end_ms':T+100000}
         authority={'screen_status':'DISCOVERY_SURVIVOR','cost_state':'CONSERVATIVE_BOUND','prospectively_frozen':True,'source_sha256':'b'*64,
           'current_snapshot_is_historical':False,'by_intent':{digest(intent):terms},'mark_interval_ms':30000}
@@ -162,7 +163,9 @@ class IntegratedReception(unittest.TestCase):
         s,e=economic_fixture();e['events'][0]['margin_eur']=300
         e['events'].append({'timestamp_utc':'2025-01-06T12:00:30Z','kind':'FINANCING','position_id':'p1','candidate_id':'V2-C990001','symbol':'SYNTHETIC',
           'causal_state':True,'financing_eur':-99,'metadata':{'source_sha256':'a'*64,'available_at_ms':T}})
-        r=replay(s,e);self.assertEqual(r['replay']['terminal_broker_equity_eur'],'200');self.assertEqual(r['replay']['financing_eur'],'0')
+        from competition.continuous_account_replay_v2 import ReplayContractError
+        e['events'][-1]['metadata'].update(e['events'][0]['metadata'])
+        with self.assertRaisesRegex(ReplayContractError,'active executed position'):replay(s,e)
     def test_chunked_atomic_ciphertext_and_corrupt_part(self):
         from .custody import chunk_ciphertext,restore_ciphertext
         blob=b'SYNTHETIC_ENCRYPTED_ENVELOPE_TEST'*30000;files,m=chunk_ciphertext(blob,'segments/test')

@@ -1,0 +1,634 @@
+{
+  "command": "python -m unittest discover -s tests",
+  "source": "candidate working tree based on 18e50ab0109f6f7ab80480ead865c5e4ee667337",
+  "tests": 2304,
+  "failures": 61,
+  "errors": 91,
+  "skipped": 14,
+  "seconds": 371.179,
+  "green": false,
+  "failure_test_ids": [
+    {
+      "kind": "ERROR",
+      "test": "test_current_state (test_compact_semantic_closure_v2.ClosureTests.test_current_state)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_current_canonical_guard (test_current_testability_frontier_v1.FrontierTests.test_current_canonical_guard)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_current_canonical_state (test_exact_candidate_certification_v3.ExactTests.test_current_canonical_state)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_01_repaired_current_state (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_01_repaired_current_state)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_05_nested_current_authority_cannot_be_stale (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_05_nested_current_authority_cannot_be_stale)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_07_explicit_historical_namespace_preserved (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_07_explicit_historical_namespace_preserved)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_01_constructible_durable_authorization_commit (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_01_constructible_durable_authorization_commit)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_07_live_drift (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_07_live_drift)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_09_existing_result_before_secret (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_09_existing_result_before_secret)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_10_local_result_before_secret (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_10_local_result_before_secret)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_11_inventory_drift (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_11_inventory_drift)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_13_ephemeral_arm_deterministic (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_13_ephemeral_arm_deterministic)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_14_original_worker_accepts_derived_arm (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_14_original_worker_accepts_derived_arm)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_15_cleanup_success (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_15_cleanup_success)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_16_cleanup_failure (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_16_cleanup_failure)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_17_one_time_claim_before_secret (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_17_one_time_claim_before_secret)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_18_missing_receipt_cannot_execute (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_18_missing_receipt_cannot_execute)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_19_complete_path_publication (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_19_complete_path_publication)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_20_partial_asset_result_not_published (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_20_partial_asset_result_not_published)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_21_partial_rows_not_published (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_21_partial_rows_not_published)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_22_raw_price_output_rejected (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_22_raw_price_output_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_23_result_digest_changed_rejected (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_23_result_digest_changed_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_25_workflow_secret_and_trigger_boundaries (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_25_workflow_secret_and_trigger_boundaries)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_32_final_state_hash_binding_when_materialized (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_32_final_state_hash_binding_when_materialized)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_33_worker_failure_cleans_arm_and_no_publication (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_33_worker_failure_cleans_arm_and_no_publication)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_34_arm_bytes_equal_across_private_locations (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_34_arm_bytes_equal_across_private_locations)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_35_missing_inventory_asset_fails_before_secret (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_35_missing_inventory_asset_fails_before_secret)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_26_existing_encryption_format_roundtrip_and_cleanup (test_master1576_screen_v2.SyntheticCryptoTests.test_26_existing_encryption_format_roundtrip_and_cleanup)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_27_crypto_failure_cleanup (test_master1576_screen_v2.SyntheticCryptoTests.test_27_crypto_failure_cleanup)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_28_key_fingerprint_rejects_before_plaintext (test_master1576_screen_v2.SyntheticCryptoTests.test_28_key_fingerprint_rejects_before_plaintext)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_33_crypto_to_structural_reducer_integration (test_master1576_screen_v2.SyntheticCryptoTests.test_33_crypto_to_structural_reducer_integration)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_01_successor_guard (test_project_wide_reselection_v1.ReselectionTests.test_01_successor_guard)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_06_historical_namespace_exemption (test_project_wide_reselection_v1.ReselectionTests.test_06_historical_namespace_exemption)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_16_offline_guard_no_network (test_project_wide_reselection_v1.ReselectionTests.test_16_offline_guard_no_network)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_19_canonical_current_selection_absent (test_project_wide_reselection_v1.ReselectionTests.test_19_canonical_current_selection_absent)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_after_fence_before_worker_is_unknown_not_a_null (test_research_core_v4_actual_path.ActualPathTests.test_after_fence_before_worker_is_unknown_not_a_null)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_ancestor_remote_reset_denied (test_research_core_v4_actual_path.ActualPathTests.test_ancestor_remote_reset_denied)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_binding_corruption (test_research_core_v4_actual_path.ActualPathTests.test_binding_corruption)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_complete_result_recovery_without_second_worker (test_research_core_v4_actual_path.ActualPathTests.test_complete_result_recovery_without_second_worker)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_constructible_arm_and_real_synthetic_crypto_prelock (test_research_core_v4_actual_path.ActualPathTests.test_constructible_arm_and_real_synthetic_crypto_prelock)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_corrupt_ciphertext_rejected (test_research_core_v4_actual_path.ActualPathTests.test_corrupt_ciphertext_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_corrupted_recovered_prepared_attestation_denied (test_research_core_v4_actual_path.ActualPathTests.test_corrupted_recovered_prepared_attestation_denied)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_crash_classification_total_state_table (test_research_core_v4_actual_path.ActualPathTests.test_crash_classification_total_state_table)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_nonisolated_arm_commit (test_research_core_v4_actual_path.ActualPathTests.test_nonisolated_arm_commit)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_preprepare_failure_has_no_fence (test_research_core_v4_actual_path.ActualPathTests.test_preprepare_failure_has_no_fence)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_prepublication_race_even_ancestor_reset (test_research_core_v4_actual_path.ActualPathTests.test_prepublication_race_even_ancestor_reset)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_push_acknowledgement_loss_is_idempotent (test_research_core_v4_actual_path.ActualPathTests.test_push_acknowledgement_loss_is_idempotent)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_ref_race_after_fetch_before_push_rejects_ancestor_reset (test_research_core_v4_actual_path.ActualPathTests.test_ref_race_after_fetch_before_push_rejects_ancestor_reset)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_rerun_rejected_before_decrypt (test_research_core_v4_actual_path.ActualPathTests.test_rerun_rejected_before_decrypt)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_result_push_failure_preserves_raw_for_publication_only (test_research_core_v4_actual_path.ActualPathTests.test_result_push_failure_preserves_raw_for_publication_only)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_success_atomic_result_and_replay_denied (test_research_core_v4_actual_path.ActualPathTests.test_success_atomic_result_and_replay_denied)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_worker_partial_opening_failure_never_reexecutes (test_research_core_v4_actual_path.ActualPathTests.test_worker_partial_opening_failure_never_reexecutes)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_wrong_event_head (test_research_core_v4_actual_path.ActualPathTests.test_wrong_event_head)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_live_authority_v3_bindings_match_production_support_v2_preoutcome (test_research_core_v4_execution_binding.ExecutionBindingTests.test_live_authority_v3_bindings_match_production_support_v2_preoutcome)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_v4_canonical_state_is_valid_under_recovery_control_plane (test_research_core_v4_method.ResearchCoreV4MethodTests.test_v4_canonical_state_is_valid_under_recovery_control_plane)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_recovery_v2_is_prepared_but_not_armed (test_research_core_v4_recovery_v2.RecoveryV2AuditTests.test_recovery_v2_is_prepared_but_not_armed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_fail_closed_prearm_blocked (test_research_core_v4_recovery_v3.RecoveryV3Tests.test_fail_closed_prearm_blocked)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_acknowledgement_loss_leaves_complete_remote_and_replay_closed (test_research_core_v4_staging_publish.StagingPublishTests.test_acknowledgement_loss_leaves_complete_remote_and_replay_closed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_actual_publish_and_next_step_environment (test_research_core_v4_staging_publish.StagingPublishTests.test_actual_publish_and_next_step_environment)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_arm_lock_and_result_each_prevent_publication (test_research_core_v4_staging_publish.StagingPublishTests.test_arm_lock_and_result_each_prevent_publication)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_audit_failure_prevents_publication (test_research_core_v4_staging_publish.StagingPublishTests.test_audit_failure_prevents_publication)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_dirty_worktree_fails_closed (test_research_core_v4_staging_publish.StagingPublishTests.test_dirty_worktree_fails_closed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_missing_activation_head_fails_closed (test_research_core_v4_staging_publish.StagingPublishTests.test_missing_activation_head_fails_closed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_original_remote_equals_local_contradiction_is_detected (test_research_core_v4_staging_publish.StagingPublishTests.test_original_remote_equals_local_contradiction_is_detected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_original_undefined_variable_is_detected (test_research_core_v4_staging_publish.StagingPublishTests.test_original_undefined_variable_is_detected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_payload_changed_in_local_transaction_fails_closed (test_research_core_v4_staging_publish.StagingPublishTests.test_payload_changed_in_local_transaction_fails_closed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_pre_publish_interruption_then_restart (test_research_core_v4_staging_publish.StagingPublishTests.test_pre_publish_interruption_then_restart)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_race_after_fetch_rejected_even_for_ancestor (test_research_core_v4_staging_publish.StagingPublishTests.test_race_after_fetch_rejected_even_for_ancestor)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_stale_remote_ref_fails_closed (test_research_core_v4_staging_publish.StagingPublishTests.test_stale_remote_ref_fails_closed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_execution_equivalence_proof (test_shallow_m5_support_v2_boundary_v4.BoundaryV4Tests.test_execution_equivalence_proof)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_corrupted_encrypted_asset_fails (test_shallow_m5_support_v2_production.ProductionArchitectureTests.test_corrupted_encrypted_asset_fails)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_encrypt_decrypt_synthetic_shard_byte_equivalence (test_shallow_m5_support_v2_production.ProductionArchitectureTests.test_encrypt_decrypt_synthetic_shard_byte_equivalence)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_wrong_private_key_fails (test_shallow_m5_support_v2_production.ProductionArchitectureTests.test_wrong_private_key_fails)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_EXECUTION_PATH_EQUIVALENCE_TO_V2 (test_shallow_m5_support_v2_production_v3.V3GateTests.test_EXECUTION_PATH_EQUIVALENCE_TO_V2)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_acceptance_authority_hash_matches_durable_state_bindings (test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_acceptance_authority_hash_matches_durable_state_bindings)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_shallow_m5_v4_canonical_state_consistency.V4CanonicalStateConsistencyTests)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_guard_valid (test_shared_baseline_campaign_v1.CampaignTests.test_guard_valid)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_26_successor_current_state_guard (test_strict_reselection_v2.StrictFirewallTests.test_26_successor_current_state_guard)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_29_current_guard_and_six_pointers (test_strict_selection_functional_v1.FunctionalTests.test_29_current_guard_and_six_pointers)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_30_current_state_guard_six_pointer_regressions (test_strict_semantic_certification_v1.SemanticTests.test_30_current_state_guard_six_pointer_regressions)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_32_next_execution_and_closed_boundary_regressions (test_strict_semantic_certification_v1.SemanticTests.test_32_next_execution_and_closed_boundary_regressions)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_real_reused_encryption_synthetic_key_and_old_reader_rejection (test_telemetry_quarantine_v1.Fixtures.test_real_reused_encryption_synthetic_key_and_old_reader_rejection)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_frozen_bindings_and_scope (test_v3_winner_first_friction.WinnerFirstFrictionTests.test_frozen_bindings_and_scope)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_real_geometry_is_bounded_and_has_no_stage0 (test_v3_winner_first_friction.WinnerFirstFrictionTests.test_real_geometry_is_bounded_and_has_no_stage0)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_sampling_uses_at_most_two_strata_per_month_and_three_windows_per_hour (test_v3_winner_first_friction.WinnerFirstFrictionTests.test_sampling_uses_at_most_two_strata_per_month_and_three_windows_per_hour)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_current_governance (test_v4_post_quote_preoutcome.Audit.test_current_governance)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_no_null_claim_or_unblocked_response (test_v4_post_quote_preoutcome.Audit.test_no_null_claim_or_unblocked_response)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_old_quote_wave_nested_state_preserved (test_v4_post_quote_preoutcome.Audit.test_old_quote_wave_nested_state_preserved)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_real_authority_mutations_fail (test_v4_post_quote_preoutcome.Audit.test_real_authority_mutations_fail)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_state_boundaries_and_legacy_freeze (test_v4_post_wave_records.PostWaveRecordChecks.test_state_boundaries_and_legacy_freeze)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_v4_private_proof_verifier.PrivateProofTests)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_current_context_exposes_requested_frontier_content (test_general_ai_reasoning_provider.GeneralAIReasoningProviderTests.test_current_context_exposes_requested_frontier_content)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_29_workflow_installs_runtime_imports_preflights_and_builds_package (test_m6_ctrader_capture.CTraderCaptureCoreTests.test_29_workflow_installs_runtime_imports_preflights_and_builds_package)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_02_original_stale_status_regression (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_02_original_stale_status_regression)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_current_authority_and_hash_everywhere (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere) (state=0, field='current_authority')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_current_authority_and_hash_everywhere (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere) (state=0, field='current_authority_sha256')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_current_authority_and_hash_everywhere (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere) (state=1, field='current_authority')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_current_authority_and_hash_everywhere (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere) (state=1, field='current_authority_sha256')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_current_authority_and_hash_everywhere (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere) (state=2, field='current_authority')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_current_authority_and_hash_everywhere (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere) (state=2, field='current_authority_sha256')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_06_new_unrecognized_current_field_arm_pending_rejected (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_06_new_unrecognized_current_field_arm_pending_rejected)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_08_diagnostic_statuses_are_explicit_records (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_08_diagnostic_statuses_are_explicit_records)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_09_original_record_fields_budget_and_history_unchanged (test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_09_original_record_fields_budget_and_history_unchanged)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_20_canonical_state_authority_next_and_budget (test_master1576_post_screen_v1.PostScreenTests.test_20_canonical_state_authority_next_and_budget)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_22_no_new_workflow_secret_or_market_route (test_master1576_post_screen_v1.PostScreenTests.test_22_no_new_workflow_secret_or_market_route)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_12_all_states_bound_consistently (test_master1576_post_shallow_protocol_v1.ProtocolAcceptance.test_12_all_states_bound_consistently)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_14_changes_allowlist (test_master1576_post_shallow_protocol_v1.ProtocolAcceptance.test_14_changes_allowlist)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_15_no_broker_screen_or_decryption_entrypoint (test_master1576_post_shallow_protocol_v1.ProtocolAcceptance.test_15_no_broker_screen_or_decryption_entrypoint)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_27_preservation_and_real_files_absent (test_master1576_real_execution_architecture_v1.ArchitectureTests.test_27_preservation_and_real_files_absent)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_35_final_rebind_when_preflight_materialized (test_master1576_screen_v2.GovernanceBindingTests.test_35_final_rebind_when_preflight_materialized)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_36_exact_diff_preserves_historical_bytes (test_master1576_screen_v2.GovernanceBindingTests.test_36_exact_diff_preserves_historical_bytes)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_03_authority_and_hash_all_current_paths (test_project_wide_reselection_v1.ReselectionTests.test_03_authority_and_hash_all_current_paths)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_stale_arm_regression (test_project_wide_reselection_v1.ReselectionTests.test_04_stale_arm_regression)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_05_stale_V6_plan_regression (test_project_wide_reselection_v1.ReselectionTests.test_05_stale_V6_plan_regression)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_07_budget_and_closed_boundary_injections (test_project_wide_reselection_v1.ReselectionTests.test_07_budget_and_closed_boundary_injections)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_08_current_status_drift (test_project_wide_reselection_v1.ReselectionTests.test_08_current_status_drift)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_18_workflow_no_secret_no_market_no_dispatch (test_project_wide_reselection_v1.ReselectionTests.test_18_workflow_no_secret_no_market_no_dispatch)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_20_no_other_repository_changes (test_project_wide_reselection_v1.ReselectionTests.test_20_no_other_repository_changes)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_23_no_scientific_imports (test_research_core_v4_publication_only.PublicationOnlyTests.test_23_no_scientific_imports)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_zero_v4_arm_prearm (test_shallow_m5_support_v2_boundary_v4.BoundaryV4Tests.test_zero_v4_arm_prearm)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_four_strictly_sequential_segment_job_plan (test_shallow_m5_support_v2_production.ProductionArchitectureTests.test_four_strictly_sequential_segment_job_plan)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_zero_workflow_dispatch (test_shallow_m5_support_v2_production_v2.V2DurabilityTests.test_zero_workflow_dispatch)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_ARM_V2_CANNOT_AUTHORIZE_V3_WORKFLOW (test_shallow_m5_support_v2_production_v3.V3GateTests.test_ARM_V2_CANNOT_AUTHORIZE_V3_WORKFLOW)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_ARM_V3_ABSENT_FAILS (test_shallow_m5_support_v2_production_v3.V3GateTests.test_ARM_V3_ABSENT_FAILS)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_ZERO_ARM (test_shallow_m5_support_v2_production_v3.V3GateTests.test_ZERO_ARM)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_ZERO_WORKFLOW_DISPATCH (test_shallow_m5_support_v2_production_v3.V3GateTests.test_ZERO_WORKFLOW_DISPATCH)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_forensic_arm_absent_before_arm_commit (test_shallow_m5_v3_boundary_forensic_probe.BoundaryForensicProbeTests.test_forensic_arm_absent_before_arm_commit)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_current_authority_points_to_existing_acceptance_authority (test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_current_authority_points_to_existing_acceptance_authority)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_exact_production_hash_preservation (test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_exact_production_hash_preservation) (path='.github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_exact_production_hash_preservation (test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_exact_production_hash_preservation) (path='.github/workflows/breadth-first-shallow-m5-support-v2-production-v3.yml')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_three_canonical_operation_pointers_equal (test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_three_canonical_operation_pointers_equal)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_zero_arm (test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_zero_arm) (path='research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json')"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_all_immutable_bindings (test_shared_baseline_campaign_v1.CampaignTests.test_all_immutable_bindings)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_change_allowlist (test_shared_baseline_campaign_v1.CampaignTests.test_change_allowlist)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_stale_arm_fails (test_shared_baseline_campaign_v1.CampaignTests.test_stale_arm_fails)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_workflow_no_market_secret_or_dispatch (test_shared_baseline_campaign_v1.CampaignTests.test_workflow_no_market_secret_or_dispatch)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_24_all_historical_files_byte_identical (test_strict_reselection_v2.StrictFirewallTests.test_24_all_historical_files_byte_identical)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_28_current_authority_and_hash_drift_denied (test_strict_reselection_v2.StrictFirewallTests.test_28_current_authority_and_hash_drift_denied)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_29_stale_V1_and_shallow_current_pointers_denied (test_strict_reselection_v2.StrictFirewallTests.test_29_stale_V1_and_shallow_current_pointers_denied)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_30_budget_closed_boundaries_and_no_response (test_strict_reselection_v2.StrictFirewallTests.test_30_budget_closed_boundaries_and_no_response)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_31_workflow_no_secret_no_dispatch_no_write (test_strict_reselection_v2.StrictFirewallTests.test_31_workflow_no_secret_no_dispatch_no_write)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_32_exact_change_allowlist (test_strict_reselection_v2.StrictFirewallTests.test_32_exact_change_allowlist)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_27_all_immutable_authorities_preserved (test_strict_selection_functional_v1.FunctionalTests.test_27_all_immutable_authorities_preserved)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_30_all_current_authority_paths_fail_closed (test_strict_selection_functional_v1.FunctionalTests.test_30_all_current_authority_paths_fail_closed)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_32_workflow_no_secret_no_write_no_dispatch (test_strict_selection_functional_v1.FunctionalTests.test_32_workflow_no_secret_no_write_no_dispatch)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_33_exact_change_allowlist (test_strict_selection_functional_v1.FunctionalTests.test_33_exact_change_allowlist)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_28_accepted_artifacts_and_prior_guards_immutable (test_strict_semantic_certification_v1.SemanticTests.test_28_accepted_artifacts_and_prior_guards_immutable)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_31_nested_authority_and_hash_regressions (test_strict_semantic_certification_v1.SemanticTests.test_31_nested_authority_and_hash_regressions)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_34_workflow_read_only_no_secret_no_dispatch (test_strict_semantic_certification_v1.SemanticTests.test_34_workflow_read_only_no_secret_no_dispatch)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_35_exact_change_allowlist (test_strict_semantic_certification_v1.SemanticTests.test_35_exact_change_allowlist)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_report_and_source_bindings (test_v4_post_quote_preoutcome.Audit.test_report_and_source_bindings)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_real_evaluator_and_runner_default_denied (test_v4_variance_composition.Adversarial.test_real_evaluator_and_runner_default_denied)"
+    }
+  ],
+  "full_output_sha256": "c4f60a254b138bcf94d42844096d23a3b3ee02543a95a5dced743ccd5f9f0bea",
+  "attribution": "All 152 failing test identities are present on the unmodified audited source. No new failing identity in the candidate. The broad suite remains red; individual root causes are not all remediated.",
+  "baseline_comparison": {
+    "source_sha": "18e50ab0109f6f7ab80480ead865c5e4ee667337",
+    "tests": 2304,
+    "failures": 61,
+    "errors": 91,
+    "skipped": 14,
+    "seconds": 183.89,
+    "baseline_output_sha256": "83c0413122b47fb9bf3721348fa37498f8d08b48fc32bd8351e8b70a408e86dd",
+    "identical_failing_test_ids": true,
+    "candidate_only_failures": [],
+    "baseline_only_failures": []
+  }
+}

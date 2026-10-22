@@ -1,0 +1,174 @@
+﻿2026-10-20T08:29:35.2410341Z Current runner version: '2.337.0'
+2026-10-20T08:29:35.2446394Z ##[group]Runner Image Provisioner
+2026-10-20T08:29:35.2447671Z Hosted Compute Agent
+2026-10-20T08:29:35.2448844Z Version: 20261015.610
+2026-10-20T08:29:35.2449961Z Commit: 267fdb4e8bbec4ab5ea31367f3a00d5c480c7656
+2026-10-20T08:29:35.2451745Z Build Date: 2026-10-14T17:06:54Z
+2026-10-20T08:29:35.2453034Z Worker ID: {fee4c8c7-de7a-4791-bc21-0f285f990577}
+2026-10-20T08:29:35.2454210Z Region: eastus
+2026-10-20T08:29:35.2455274Z Cloud: Azure
+2026-10-20T08:29:35.2456241Z ##[endgroup]
+2026-10-20T08:29:35.2458663Z ##[group]Operating System
+2026-10-20T08:29:35.2459767Z Ubuntu
+2026-10-20T08:29:35.2460629Z 24.04.5
+2026-10-20T08:29:35.2461971Z LTS
+2026-10-20T08:29:35.2462821Z ##[endgroup]
+2026-10-20T08:29:35.2464036Z ##[group]Runner Image
+2026-10-20T08:29:35.2465063Z Image: ubuntu-24.04
+2026-10-20T08:29:35.2465939Z Version: 20261018.339.1
+2026-10-20T08:29:35.2468667Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261018.339/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-20T08:29:35.2471887Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261018.339
+2026-10-20T08:29:35.2473608Z ##[endgroup]
+2026-10-20T08:29:35.2475572Z ##[group]GITHUB_TOKEN Permissions
+2026-10-20T08:29:35.2478609Z Contents: write
+2026-10-20T08:29:35.2479867Z Metadata: read
+2026-10-20T08:29:35.2481161Z ##[endgroup]
+2026-10-20T08:29:35.2484256Z Secret source: Actions
+2026-10-20T08:29:35.2486054Z Cache mode: write
+2026-10-20T08:29:35.2487623Z Prepare workflow directory
+2026-10-20T08:29:35.2984444Z Prepare all required actions
+2026-10-20T08:29:35.3058769Z Getting action download info
+2026-10-20T08:29:35.4982429Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+2026-10-20T08:29:35.6015834Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-20T08:29:35.8152733Z Complete job name: native-rule-refusals
+2026-10-20T08:29:35.8951107Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+2026-10-20T08:29:35.8952285Z with:
+2026-10-20T08:29:35.8952849Z   ref: 8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b
+2026-10-20T08:29:35.8953474Z   persist-credentials: false
+2026-10-20T08:29:35.8954060Z   repository: mariancradulescu/mxm-quant-greenfield
+2026-10-20T08:29:35.8957968Z   token: ***
+2026-10-20T08:29:35.8958404Z   ssh-strict: true
+2026-10-20T08:29:35.8958841Z   ssh-user: git
+2026-10-20T08:29:35.8959264Z   clean: true
+2026-10-20T08:29:35.8959720Z   sparse-checkout-cone-mode: true
+2026-10-20T08:29:35.8960241Z   fetch-depth: 1
+2026-10-20T08:29:35.8960922Z   fetch-tags: false
+2026-10-20T08:29:35.8961449Z   show-progress: true
+2026-10-20T08:29:35.8961895Z   lfs: false
+2026-10-20T08:29:35.8962315Z   submodules: false
+2026-10-20T08:29:35.8962765Z   set-safe-directory: true
+2026-10-20T08:29:35.8963515Z ##[endgroup]
+2026-10-20T08:29:36.0014664Z Syncing repository: mariancradulescu/mxm-quant-greenfield
+2026-10-20T08:29:36.0018028Z ##[group]Getting Git version info
+2026-10-20T08:29:36.0019473Z Working directory is '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-20T08:29:36.0021695Z [command]/usr/bin/git version
+2026-10-20T08:29:36.0134216Z git version 2.55.0
+2026-10-20T08:29:36.0157695Z ##[endgroup]
+2026-10-20T08:29:36.0180034Z Temporarily overriding HOME='/home/runner/work/_temp/a19d9365-e2ba-4485-b327-0c219def0cd6' before making global git config changes
+2026-10-20T08:29:36.0182812Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T08:29:36.0187110Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-20T08:29:36.0243332Z Deleting the contents of '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield'
+2026-10-20T08:29:36.0249411Z ##[group]Initializing the repository
+2026-10-20T08:29:36.0256263Z [command]/usr/bin/git init /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-20T08:29:36.0392065Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-20T08:29:36.0393663Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-20T08:29:36.0395436Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-20T08:29:36.0396538Z hint: call:
+2026-10-20T08:29:36.0397349Z hint:
+2026-10-20T08:29:36.0398350Z hint: 	git config --global init.defaultBranch <name>
+2026-10-20T08:29:36.0399539Z hint:
+2026-10-20T08:29:36.0400639Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-20T08:29:36.0402608Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-20T08:29:36.0403958Z hint:
+2026-10-20T08:29:36.0404732Z hint: 	git branch -m <name>
+2026-10-20T08:29:36.0405566Z hint:
+2026-10-20T08:29:36.0406663Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-20T08:29:36.0408764Z Initialized empty Git repository in /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/.git/
+2026-10-20T08:29:36.0413501Z [command]/usr/bin/git remote add origin https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-20T08:29:36.0475171Z ##[endgroup]
+2026-10-20T08:29:36.0476598Z ##[group]Disabling automatic garbage collection
+2026-10-20T08:29:36.0479504Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-20T08:29:36.0519117Z ##[endgroup]
+2026-10-20T08:29:36.0520526Z ##[group]Setting up auth
+2026-10-20T08:29:36.0527892Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T08:29:36.0566151Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T08:29:36.1012977Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T08:29:36.1043388Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T08:29:36.1327574Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-20T08:29:36.1380361Z ##[endgroup]
+2026-10-20T08:29:36.1381942Z ##[group]Fetching the repository
+2026-10-20T08:29:36.1391055Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b
+2026-10-20T08:29:39.0223995Z From https://github.com/mariancradulescu/mxm-quant-greenfield
+2026-10-20T08:29:39.0226445Z  * branch            8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b -> FETCH_HEAD
+2026-10-20T08:29:39.0231586Z ##[endgroup]
+2026-10-20T08:29:39.0233751Z ##[group]Determining the checkout info
+2026-10-20T08:29:39.0235912Z ##[endgroup]
+2026-10-20T08:29:39.0263564Z [command]/usr/bin/git sparse-checkout disable
+2026-10-20T08:29:39.0335877Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-20T08:29:39.0383896Z ##[group]Checking out the ref
+2026-10-20T08:29:39.0389459Z [command]/usr/bin/git checkout --progress --force 8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b
+2026-10-20T08:29:39.6793927Z Note: switching to '8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b'.
+2026-10-20T08:29:39.6794417Z 
+2026-10-20T08:29:39.6794724Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-20T08:29:39.6795349Z changes and commit them, and you can discard any commits you make in this
+2026-10-20T08:29:39.6795995Z state without impacting any branches by switching back to a branch.
+2026-10-20T08:29:39.6801153Z 
+2026-10-20T08:29:39.6801729Z If you want to create a new branch to retain commits you create, you may
+2026-10-20T08:29:39.6802867Z do so (now or later) by using -c with the switch command. Example:
+2026-10-20T08:29:39.6803431Z 
+2026-10-20T08:29:39.6803690Z   git switch -c <new-branch-name>
+2026-10-20T08:29:39.6804468Z 
+2026-10-20T08:29:39.6804727Z Or undo this operation with:
+2026-10-20T08:29:39.6805086Z 
+2026-10-20T08:29:39.6805322Z   git switch -
+2026-10-20T08:29:39.6805639Z 
+2026-10-20T08:29:39.6806174Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-20T08:29:39.6806860Z 
+2026-10-20T08:29:39.6807484Z HEAD is now at 8b3cb65 Probe actual GitHub rule refusals with native keyless writer and unchanged trees
+2026-10-20T08:29:39.6848204Z ##[endgroup]
+2026-10-20T08:29:39.6918147Z [command]/usr/bin/git log -1 --format=%H
+2026-10-20T08:29:39.6960996Z 8b3cb6586cf65f0fdad3f4555d23ef0e93500e3b
+2026-10-20T08:29:39.6987639Z ##[group]Removing auth
+2026-10-20T08:29:39.6988136Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T08:29:39.7020018Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T08:29:39.7276132Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T08:29:39.7315469Z http.https://github.com/.extraheader
+2026-10-20T08:29:39.7323964Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-20T08:29:39.7369234Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T08:29:39.7614611Z ##[endgroup]
+2026-10-20T08:29:39.7830345Z ##[group]Run python3 -m research_core_v4.laboratory.native_acl_probe
+2026-10-20T08:29:39.7831234Z [36;1mpython3 -m research_core_v4.laboratory.native_acl_probe[0m
+2026-10-20T08:29:39.8013789Z shell: /usr/bin/bash -e {0}
+2026-10-20T08:29:39.8014171Z env:
+2026-10-20T08:29:39.8017618Z   GH_TOKEN: ***
+2026-10-20T08:29:39.8017905Z ##[endgroup]
+2026-10-20T08:29:42.8620301Z MXM_ACL_RESULT {"after": "f5a2cb05d372d1d4e17483715778254eaf210242", "before": "f5a2cb05d372d1d4e17483715778254eaf210242", "branch": "main", "effective_rules": [{"ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "deletion"}, {"ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "non_fast_forward"}, {"parameters": {"allowed_merge_methods": ["merge", "squash", "rebase"], "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_extra_approval_for_unattributed_changes": true, "require_last_push_approval": false, "required_approving_review_count": 0, "required_review_thread_resolution": false, "required_reviewers": []}, "ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "pull_request"}, {"parameters": {"do_not_enforce_on_create": false, "required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "required_status_checks"}], "positive_commit_status": 201, "proposal": "0c07d74de14d3bbb68f860bb7c4f3fab0391800b", "response": {"documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference", "message": "Repository rule violations found\n\nChanges must be made through a pull request.\n\nRequired status check \"shared-catalogue-regression\" is expected.\n\n", "status": "422"}, "response_sha256": "981fba79376ff56e5e33ad9624843d346c1de4545f4057fc7fb73332f0eafee6", "rule": {"_links": {"html": {"href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25461184"}, "self": {"href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25461184"}}, "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main", "refs/heads/mxm-remediation-p0-p4-20261015-v1"]}}, "created_at": "2026-10-20T08:10:58.963Z", "current_user_can_bypass": "never", "enforcement": "active", "id": 25461184, "name": "MXM R3 main execution protected CI 20261020", "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGEgcA", "rules": [{"type": "deletion"}, {"type": "non_fast_forward"}, {"parameters": {"allowed_merge_methods": ["merge", "squash", "rebase"], "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_extra_approval_for_unattributed_changes": true, "require_last_push_approval": false, "required_approving_review_count": 0, "required_review_thread_resolution": false, "required_reviewers": []}, "type": "pull_request"}, {"parameters": {"do_not_enforce_on_create": false, "required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "source": "mariancradulescu/mxm-quant-greenfield", "source_type": "Repository", "target": "branch", "updated_at": "2026-10-20T08:10:59.161Z"}, "ruleset_id": 25461184, "tree": "285c5ebe04f05d9eda736953e916a3f27c95b793", "update_status": 422}
+2026-10-20T08:29:46.8676383Z MXM_ACL_RESULT {"after": "c2e7e3075303c3cbc8c1b08c7636f35901d4feeb", "before": "c2e7e3075303c3cbc8c1b08c7636f35901d4feeb", "branch": "mxm-remediation-p0-p4-20261015-v1", "effective_rules": [{"ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "deletion"}, {"ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "non_fast_forward"}, {"parameters": {"allowed_merge_methods": ["merge", "squash", "rebase"], "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_extra_approval_for_unattributed_changes": true, "require_last_push_approval": false, "required_approving_review_count": 0, "required_review_thread_resolution": false, "required_reviewers": []}, "ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "pull_request"}, {"parameters": {"do_not_enforce_on_create": false, "required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "ruleset_id": 25461184, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "required_status_checks"}], "positive_commit_status": 201, "proposal": "bf86ff13f48b86bf6376710c74fdca245c75d11f", "response": {"documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference", "message": "Repository rule violations found\n\nChanges must be made through a pull request.\n\nRequired status check \"shared-catalogue-regression\" is expected.\n\n", "status": "422"}, "response_sha256": "981fba79376ff56e5e33ad9624843d346c1de4545f4057fc7fb73332f0eafee6", "rule": {"_links": {"html": {"href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25461184"}, "self": {"href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25461184"}}, "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/main", "refs/heads/mxm-remediation-p0-p4-20261015-v1"]}}, "created_at": "2026-10-20T08:10:58.963Z", "current_user_can_bypass": "never", "enforcement": "active", "id": 25461184, "name": "MXM R3 main execution protected CI 20261020", "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGEgcA", "rules": [{"type": "deletion"}, {"type": "non_fast_forward"}, {"parameters": {"allowed_merge_methods": ["merge", "squash", "rebase"], "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_extra_approval_for_unattributed_changes": true, "require_last_push_approval": false, "required_approving_review_count": 0, "required_review_thread_resolution": false, "required_reviewers": []}, "type": "pull_request"}, {"parameters": {"do_not_enforce_on_create": false, "required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "source": "mariancradulescu/mxm-quant-greenfield", "source_type": "Repository", "target": "branch", "updated_at": "2026-10-20T08:10:59.161Z"}, "ruleset_id": 25461184, "tree": "91f7a74a21226fdc68df2a01b3ff62467c23ac3a", "update_status": 422}
+2026-10-20T08:29:50.7665011Z MXM_ACL_RESULT {"after": "45e5501c28d6a4952541ed0a43d8728a49f02cb1", "before": "45e5501c28d6a4952541ed0a43d8728a49f02cb1", "branch": "mxm-p0-integrated-cache-successor-20261020", "effective_rules": [{"ruleset_id": 25461529, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "deletion"}, {"ruleset_id": 25461529, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "non_fast_forward"}, {"parameters": {"allowed_merge_methods": ["merge", "squash", "rebase"], "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_extra_approval_for_unattributed_changes": true, "require_last_push_approval": false, "required_approving_review_count": 0, "required_review_thread_resolution": false, "required_reviewers": []}, "ruleset_id": 25461529, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "pull_request"}, {"parameters": {"do_not_enforce_on_create": false, "required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "ruleset_id": 25461529, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "required_status_checks"}], "positive_commit_status": 201, "proposal": "4aadcf56f1fd974ed3f5e7dc90cae8e9ad8fcadd", "response": {"documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference", "message": "Repository rule violations found\n\nChanges must be made through a pull request.\n\nRequired status check \"shared-catalogue-regression\" is expected.\n\n", "status": "422"}, "response_sha256": "981fba79376ff56e5e33ad9624843d346c1de4545f4057fc7fb73332f0eafee6", "rule": {"_links": {"html": {"href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25461529"}, "self": {"href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25461529"}}, "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/mxm-p0-integrated-cache-successor-20261020"]}}, "created_at": "2026-10-20T08:19:44.009Z", "current_user_can_bypass": "never", "enforcement": "active", "id": 25461529, "name": "MXM R3 candidate protected CI no bypass 20261020", "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGEgxk", "rules": [{"type": "deletion"}, {"type": "non_fast_forward"}, {"parameters": {"allowed_merge_methods": ["merge", "squash", "rebase"], "dismiss_stale_reviews_on_push": false, "require_code_owner_review": false, "require_extra_approval_for_unattributed_changes": true, "require_last_push_approval": false, "required_approving_review_count": 0, "required_review_thread_resolution": false, "required_reviewers": []}, "type": "pull_request"}, {"parameters": {"do_not_enforce_on_create": false, "required_status_checks": [{"context": "shared-catalogue-regression", "integration_id": 15368}], "strict_required_status_checks_policy": true}, "type": "required_status_checks"}], "source": "mariancradulescu/mxm-quant-greenfield", "source_type": "Repository", "target": "branch", "updated_at": "2026-10-20T08:19:44.135Z"}, "ruleset_id": 25461529, "tree": "055da112ea3eeae972118bab9fab3b0e03875c68", "update_status": 422}
+2026-10-20T08:29:53.1486777Z MXM_ACL_RESULT {"after": "09703adad6433f395a0506fa640f59bf3dba80b5", "before": "09703adad6433f395a0506fa640f59bf3dba80b5", "branch": "mxm-o04-integrated-laboratory-evidence", "effective_rules": [{"ruleset_id": 25222248, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "deletion"}, {"ruleset_id": 25222248, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "non_fast_forward"}, {"ruleset_id": 25222248, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "required_linear_history"}, {"ruleset_id": 25461373, "ruleset_source": "mariancradulescu/mxm-quant-greenfield", "ruleset_source_type": "Repository", "type": "update"}], "positive_commit_status": 201, "proposal": "d181393aca15077749a0fcc7073ddb744c115976", "response": {"documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference", "message": "Repository rule violations found\n\nCannot update this protected ref.\n\n", "status": "422"}, "response_sha256": "012477c7817859b71df15cbba3055da3c44066d03de9565c2a3d83f21b301993", "rule": {"_links": {"html": {"href": "https://github.com/mariancradulescu/mxm-quant-greenfield/rules/25461373"}, "self": {"href": "https://api.github.com/repos/mariancradulescu/mxm-quant-greenfield/rulesets/25461373"}}, "conditions": {"ref_name": {"exclude": [], "include": ["refs/heads/mxm-o04-integrated-laboratory-evidence"]}}, "created_at": "2026-10-20T08:16:47.166Z", "current_user_can_bypass": "never", "enforcement": "active", "id": 25461373, "name": "MXM R3 evidence authorized successor App only 20261020", "node_id": "RRS_lACqUmVwb3NpdG9yec5R6FaSzgGEgn0", "rules": [{"type": "update"}], "source": "mariancradulescu/mxm-quant-greenfield", "source_type": "Repository", "target": "branch", "updated_at": "2026-10-20T08:16:47.404Z"}, "ruleset_id": 25461373, "tree": "4ac9711aa6e860e4f91ad027737cf5f6bb29f66c", "update_status": 422}
+2026-10-20T08:29:53.1669762Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-10-20T08:29:53.1670215Z with:
+2026-10-20T08:29:53.1670461Z   name: mxm-r3-native-rule-refusals-39393774216
+2026-10-20T08:29:53.1671166Z   path: native-acl-proof.json
+2026-10-20T08:29:53.1671447Z   if-no-files-found: error
+2026-10-20T08:29:53.1671683Z   retention-days: 90
+2026-10-20T08:29:53.1671914Z   compression-level: 6
+2026-10-20T08:29:53.1672150Z   overwrite: false
+2026-10-20T08:29:53.1672375Z   include-hidden-files: false
+2026-10-20T08:29:53.1672621Z ##[endgroup]
+2026-10-20T08:29:53.3475300Z (node:2353) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-20T08:29:53.3476176Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-20T08:29:53.3528244Z With the provided path, there will be 1 file uploaded
+2026-10-20T08:29:53.3541959Z Artifact name is valid!
+2026-10-20T08:29:53.3560105Z Root directory input is valid!
+2026-10-20T08:29:53.5639659Z Beginning upload of artifact content to blob storage
+2026-10-20T08:29:53.5834354Z (node:2353) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-20T08:29:53.6286127Z Uploaded bytes 2072
+2026-10-20T08:29:53.6469031Z Finished uploading artifact content to blob storage!
+2026-10-20T08:29:53.6470461Z SHA256 digest of uploaded artifact zip is 65ecba003a69178d546a785733fe834b12e515777c7a72bd90ed0c2cc2affb57
+2026-10-20T08:29:53.6472702Z Finalizing artifact upload
+2026-10-20T08:29:53.8902512Z Artifact mxm-r3-native-rule-refusals-39393774216.zip successfully finalized. Artifact ID 12251056152
+2026-10-20T08:29:53.8904715Z Artifact mxm-r3-native-rule-refusals-39393774216 has been successfully uploaded! Final size is 2072 bytes. Artifact ID is 12251056152
+2026-10-20T08:29:53.8912084Z Artifact download URL: https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39393774216/artifacts/12251056152
+2026-10-20T08:29:53.9150994Z Post job cleanup.
+2026-10-20T08:29:54.0114459Z [command]/usr/bin/git version
+2026-10-20T08:29:54.0170142Z git version 2.55.0
+2026-10-20T08:29:54.0220940Z Temporarily overriding HOME='/home/runner/work/_temp/6cd0804a-ae12-4fa7-a713-e4f790f74e38' before making global git config changes
+2026-10-20T08:29:54.0225815Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T08:29:54.0228459Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield
+2026-10-20T08:29:54.0269515Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T08:29:54.0308035Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T08:29:54.0581035Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T08:29:54.0620287Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T08:29:54.1046381Z Cleaning up orphan processes
+2026-10-20T08:29:54.1384268Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

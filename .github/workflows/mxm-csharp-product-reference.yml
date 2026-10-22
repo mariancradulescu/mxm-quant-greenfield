@@ -1,0 +1,108 @@
+name: MXM CSharp product reference CI
+on:
+  pull_request:
+    branches: [mxm-p0-integrated-cache-successor-20261020, main]
+  workflow_dispatch: {}
+permissions: {contents: read}
+jobs:
+  machine-side-csharp-reference:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify dotnet runner and compile actual CSharp decision kernel and EUR200 harness
+        run: |
+          dotnet --info
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+      - name: Compile cloud-facing cBot with same CSharp kernel; do not run or deploy
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+          find research_core_v4/native_tick_replay_v1/csharp/bin -name '*.algo' -print -quit | grep -q .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-reference-algo-disabled-default
+          path: research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/*.algo
+          if-no-files-found: error
+          retention-days: 30
+      - name: Machine-side deterministic account reference (NOT Pepperstone market backtest)
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-reference
+          python3 - <<'PY'
+          import json
+          p='verification/csharp-reference/reference-report.json'
+          r=json.load(open(p))
+          assert r['classification']=='SYNTHETIC_MATHEMATICAL_ONLY'
+          assert r['initial_equity_eur']==200 and r['economic_entries']==r['economic_exits']>=1
+          assert r['charged_cost_eur']>0 and r['maximum_absolute_drawdown_eur']>=0
+          assert r['pepperstone_historical_fills_proven'] is False and r['cTrader_native_backtest'] is False
+          assert len(r['ledger'])==2*r['economic_entries'] and len(r['equity'])>len(r['ledger'])
+          assert r['bar_decisions']>0 and r['hard21'] is False
+          from decimal import Decimal
+          from collections import defaultdict
+          ledger=r['ledger']
+          entries=[x for x in ledger if x['kind']=='ENTRY']
+          exits=[x for x in ledger if x['kind']=='EXIT']
+          assert r['economic_entries']==len(entries)==len(exits) and len(entries)>=1
+          assert all(a['timestamp_ms']<=b['timestamp_ms'] and a['direction']==b['direction'] for a,b in zip(entries,exits))
+          assert r['entries_per_iso_week']=={'2025-W02':len(entries)}
+          expected=Decimal('200')+sum(Decimal(str(x['gross_price_pnl_eur']))-Decimal('0.2') for x in exits)
+          assert abs(expected-Decimal(str(r['final_equity_eur'])))<Decimal('0.00001')
+          assert Decimal(str(r['charged_cost_eur']))==Decimal('0.22')*len(entries)
+          path=r['equity'];peak=Decimal('200');dd=Decimal(0)
+          for point in path:
+              eq=Decimal(str(point['equity_eur']))
+              peak=max(peak,eq);dd=max(dd,peak-eq)
+          assert dd==Decimal(str(r['maximum_absolute_drawdown_eur']))
+          print('CSHARP_MATHEMATICAL_REFERENCE',json.dumps({k:r[k] for k in ('initial_equity_eur','final_equity_eur','economic_entries','economic_exits','charged_cost_eur','maximum_absolute_drawdown_eur','bar_decisions','hard21','classification')},sort_keys=True))
+          PY
+      - name: Differential account accounting for separate conservative model assumptions (artificial quotes only)
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --model-fixture unused verification/csharp-modeled-fixture
+          python3 - <<'PY'
+          import json
+          from decimal import Decimal as D
+          r=json.load(open('verification/csharp-modeled-fixture/reference-report.json'))
+          assert r['classification']=='ARTIFICIAL_SCENARIO_COST_FX_TEST_ONLY'
+          assert r['initial_equity_eur']==200 and not r['cTrader_native_backtest']
+          assert not r['broker_historical_costs_verified'] and not r['authenticated_market_corpus']
+          entries=[x for x in r['ledger'] if x['kind']=='ENTRY']
+          exits=[x for x in r['ledger'] if x['kind']=='EXIT']
+          assert len(entries)==len(exits)>=1 and not r['hard21']
+          expected=D('200')+sum(D(str(x['gross_price_pnl_eur']))-D('0.2') for x in exits)
+          assert abs(expected-D(str(r['final_equity_eur'])))<D('0.00001')
+          assert abs(D(str(r['charged_cost_eur']))-(D('.2')+D('0.04')/D('1.10'))*len(entries))<D('0.00001')
+          assert r['maximum_absolute_drawdown_eur']>=0
+          print('CSHARP_ASSUMPTION_MODEL_ARTIFICIAL_ONLY',json.dumps({k:r[k] for k in ('classification','economic_entries','final_equity_eur','charged_cost_eur','maximum_absolute_drawdown_eur')}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-modeled-quote-fixture
+          path: verification/csharp-modeled-fixture/reference-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: csharp-machine-side-reference
+          path: verification/csharp-reference/reference-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  linux-ctrader-cli-metadata-noauth:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile .algo without account access
+        run: dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+      - name: Probe official Spotware Linux CLI compatibility without credentials, data downloads or trading
+        run: |
+          docker pull ghcr.io/spotware/ctrader-console:latest
+          docker run --rm --network none --read-only --mount type=bind,src="${PWD}/research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0",dst=/mnt/mxm,readonly ghcr.io/spotware/ctrader-console:latest metadata /mnt/mxm/native_tick_replay_v1.algo

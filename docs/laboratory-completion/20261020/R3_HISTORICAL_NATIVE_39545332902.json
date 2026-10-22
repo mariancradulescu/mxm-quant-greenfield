@@ -1,0 +1,598 @@
+{
+  "schema": "mxm.historical-suite-native-diagnostic.v1",
+  "source_sha": "81ed2129261a9484b9124b3666b2117e97c1b9b3",
+  "shallow": "false",
+  "run_id": "39545332902",
+  "job": "historic-suite",
+  "tests": 2304,
+  "failures": 61,
+  "errors": 65,
+  "skipped": 14,
+  "seconds": 205.197,
+  "skip_records": [
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_false_lossless_flag",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_missing_node",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_network_count",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_original_time_changed_even_rechecksummed",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_price_field_rejected",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_raw_hash_changed",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_support_hash_changed",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_valid_proof_frozen_decision",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_private_proof_intake.PrivateProofIntakeTests.test_wrong_verifier_authority",
+      "reason": "accepted private proof and compact return attachments required"
+    },
+    {
+      "test": "test_v4_probe_return_intake.UploadedCompactIntakeTests.test_raw_member_rejected_without_opening",
+      "reason": "uploaded compact return fixture not present"
+    },
+    {
+      "test": "test_v4_probe_return_intake.UploadedCompactIntakeTests.test_resealed_count_mask_disagreement_rejected",
+      "reason": "uploaded compact return fixture not present"
+    },
+    {
+      "test": "test_v4_probe_return_intake.UploadedCompactIntakeTests.test_resealed_raw_binding_change_rejected",
+      "reason": "uploaded compact return fixture not present"
+    },
+    {
+      "test": "test_v4_probe_return_intake.UploadedCompactIntakeTests.test_resealed_trace_scope_change_rejected",
+      "reason": "uploaded compact return fixture not present"
+    },
+    {
+      "test": "test_v4_probe_return_intake.UploadedCompactIntakeTests.test_valid_compact_does_not_invent_raw_checkpoint_proof",
+      "reason": "uploaded compact return fixture not present"
+    }
+  ],
+  "log_sha256": "786117ee96c2e740d516f1eccb0ebcec0ebc0a2c9274283c325c64ab2091bff8",
+  "passed": false,
+  "economic_reception": false,
+  "operational_reception": false,
+  "production_credentials_supplied": false,
+  "market_worker_invoked": false,
+  "error_records": [
+    {
+      "test": "test_compact_semantic_closure_v2.ClosureTests.test_current_state",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/compact-baseline-closure-v2-offline.yml"
+    },
+    {
+      "test": "test_current_testability_frontier_v1.FrontierTests.test_current_canonical_guard",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/current-testability-pre-support-v1-offline.yml"
+    },
+    {
+      "test": "test_exact_candidate_certification_v3.ExactTests.test_current_canonical_state",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/exact-candidate-semantic-closure-v3-offline.yml"
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_01_repaired_current_state",
+      "exception": "ValueError: IMMUTABLE_ARTIFACT_DRIFT"
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_05_nested_current_authority_cannot_be_stale",
+      "exception": "KeyError: 'shallow_m5_v2_operational_rebind'"
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_07_explicit_historical_namespace_preserved",
+      "exception": "ValueError: CURRENT_ACTION_DRIFT"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_01_constructible_durable_authorization_commit",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_07_live_drift",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_09_existing_result_before_secret",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_10_local_result_before_secret",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_11_inventory_drift",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_13_ephemeral_arm_deterministic",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_14_original_worker_accepts_derived_arm",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_15_cleanup_success",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_16_cleanup_failure",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_17_one_time_claim_before_secret",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_18_missing_receipt_cannot_execute",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_19_complete_path_publication",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_20_partial_asset_result_not_published",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_21_partial_rows_not_published",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_22_raw_price_output_rejected",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_23_result_digest_changed_rejected",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_25_workflow_secret_and_trigger_boundaries",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_32_final_state_hash_binding_when_materialized",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_33_worker_failure_cleans_arm_and_no_publication",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_34_arm_bytes_equal_across_private_locations",
+      "exception": "research_core_v4.master1576_screen_v2.ScreenError: ARCHITECTURE_HASH_FAILURE"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_35_missing_inventory_asset_fails_before_secret",
+      "exception": "RecursionError: maximum recursion depth exceeded"
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_01_successor_guard",
+      "exception": "ValueError: CURRENT_ACTION_DRIFT"
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_06_historical_namespace_exemption",
+      "exception": "ValueError: CURRENT_ACTION_DRIFT"
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_16_offline_guard_no_network",
+      "exception": "ValueError: CURRENT_ACTION_DRIFT"
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_19_canonical_current_selection_absent",
+      "exception": "KeyError: 'project_wide_information_source_reselection'"
+    },
+    {
+      "test": "test_research_core_v4_execution_binding.ExecutionBindingTests.test_live_authority_v3_bindings_match_production_support_v2_preoutcome",
+      "exception": "PermissionError: RECOVERY_V3_CONTROL_FAIL canonical result exists"
+    },
+    {
+      "test": "test_research_core_v4_method.ResearchCoreV4MethodTests.test_v4_canonical_state_is_valid_under_recovery_control_plane",
+      "exception": "PermissionError: RECOVERY_V3_CONTROL_FAIL canonical result exists"
+    },
+    {
+      "test": "test_research_core_v4_recovery_v2.RecoveryV2AuditTests.test_recovery_v2_is_prepared_but_not_armed",
+      "exception": "PermissionError: CRASH_RECOVERY_CONTROL_FAIL recovery authority state invalid"
+    },
+    {
+      "test": "test_research_core_v4_recovery_v3.RecoveryV3Tests.test_fail_closed_prearm_blocked",
+      "exception": "PermissionError: RECOVERY_V3_CONTROL_FAIL canonical result exists"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_acknowledgement_loss_leaves_complete_remote_and_replay_closed",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_actual_publish_and_next_step_environment",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_arm_lock_and_result_each_prevent_publication",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_audit_failure_prevents_publication",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_dirty_worktree_fails_closed",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_missing_activation_head_fails_closed",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_original_remote_equals_local_contradiction_is_detected",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_original_undefined_variable_is_detected",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_payload_changed_in_local_transaction_fails_closed",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_pre_publish_interruption_then_restart",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_race_after_fetch_rejected_even_for_ancestor",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_research_core_v4_staging_publish.StagingPublishTests.test_stale_remote_ref_fails_closed",
+      "exception": "ValueError: '      - name: Publish completed staging transaction with one branch ref update' is not in list"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_boundary_v4.BoundaryV4Tests.test_execution_equivalence_proof",
+      "exception": "PermissionError: V4_HISTORICAL_OR_EVIDENCE_HASH_DRIFT"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production_v3.V3GateTests.test_EXECUTION_PATH_EQUIVALENCE_TO_V2",
+      "exception": "PermissionError: PREARM_PROVIDER_AUTHORITY_BINDING_FAILURE"
+    },
+    {
+      "test": "test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_acceptance_authority_hash_matches_durable_state_bindings",
+      "exception": "KeyError: 'shallow_m5_v2_current_operation'"
+    },
+    {
+      "test": "setUpClass (test_shallow_m5_v4_canonical_state_consistency.V4CanonicalStateConsistencyTests)",
+      "exception": "KeyError: 'shallow_m5_v2_current_operation'"
+    },
+    {
+      "test": "test_shared_baseline_campaign_v1.CampaignTests.test_guard_valid",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/shared-baseline-campaign-offline.yml"
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_26_successor_current_state_guard",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/project-wide-reselection-offline.yml"
+    },
+    {
+      "test": "test_strict_selection_functional_v1.FunctionalTests.test_29_current_guard_and_six_pointers",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/project-wide-reselection-offline.yml"
+    },
+    {
+      "test": "test_strict_semantic_certification_v1.SemanticTests.test_30_current_state_guard_six_pointer_regressions",
+      "exception": "ValueError: BINDING_DRIFT:.github/workflows/project-wide-reselection-offline.yml"
+    },
+    {
+      "test": "test_strict_semantic_certification_v1.SemanticTests.test_32_next_execution_and_closed_boundary_regressions",
+      "exception": "KeyError: 'strict_v2_semantic_certification'"
+    },
+    {
+      "test": "test_v3_winner_first_friction.WinnerFirstFrictionTests.test_frozen_bindings_and_scope",
+      "exception": "FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v3/state/WINNER_FIRST_FRICTION_SAMPLING_FREEZE_V1.json'"
+    },
+    {
+      "test": "test_v3_winner_first_friction.WinnerFirstFrictionTests.test_real_geometry_is_bounded_and_has_no_stage0",
+      "exception": "m6._ctrader_capture_base.CaptureContractError: winner-first sampling freeze missing: research_core_v3/state/WINNER_FIRST_FRICTION_SAMPLING_FREEZE_V1.json"
+    },
+    {
+      "test": "test_v3_winner_first_friction.WinnerFirstFrictionTests.test_sampling_uses_at_most_two_strata_per_month_and_three_windows_per_hour",
+      "exception": "FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/mxm-quant-greenfield/mxm-quant-greenfield/research_core_v3/state/WINNER_FIRST_FRICTION_SAMPLING_FREEZE_V1.json'"
+    },
+    {
+      "test": "test_v4_post_quote_preoutcome.Audit.test_current_governance",
+      "exception": "PermissionError: PUBLICATION_ONLY_FAIL_CLOSED prospective boundary response_execution_authorized"
+    },
+    {
+      "test": "test_v4_post_quote_preoutcome.Audit.test_no_null_claim_or_unblocked_response",
+      "exception": "KeyError: 'next_prospective_wave'"
+    },
+    {
+      "test": "test_v4_post_quote_preoutcome.Audit.test_old_quote_wave_nested_state_preserved",
+      "exception": "KeyError: 'next_prospective_wave'"
+    },
+    {
+      "test": "test_v4_post_quote_preoutcome.Audit.test_real_authority_mutations_fail",
+      "exception": "KeyError: 'next_prospective_wave'"
+    },
+    {
+      "test": "test_v4_post_wave_records.PostWaveRecordChecks.test_state_boundaries_and_legacy_freeze",
+      "exception": "KeyError: 'next_prospective_wave'"
+    },
+    {
+      "test": "setUpClass (test_v4_private_proof_verifier.PrivateProofTests)",
+      "exception": "FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/mxm-quant-greenfield/MXM_V4_QUOTE_SUPPORT_PROBE_ANDROID_V1_RECOVERY_FINAL.zip'"
+    }
+  ],
+  "failure_records": [
+    {
+      "test": "test_general_ai_reasoning_provider.GeneralAIReasoningProviderTests.test_current_context_exposes_requested_frontier_content",
+      "exception": "AssertionError: 237622 not less than 120000"
+    },
+    {
+      "test": "test_m6_ctrader_capture.CTraderCaptureCoreTests.test_29_workflow_installs_runtime_imports_preflights_and_builds_package",
+      "exception": "AssertionError: 'pip install --only-binary=:all: --no-deps -r tools/requirements-m6-capture.txt' not found in 'name: \"Archived by P0-P4 remediation: m6_preparation\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_02_original_stale_status_regression",
+      "exception": "AssertionError: \"V4_TOP_STATUS_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere (state=0, field='current_authority')",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere (state=0, field='current_authority_sha256')",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_HASH_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere (state=1, field='current_authority')",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere (state=1, field='current_authority_sha256')",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_HASH_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere (state=2, field='current_authority')",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_04_current_authority_and_hash_everywhere (state=2, field='current_authority_sha256')",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_HASH_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_06_new_unrecognized_current_field_arm_pending_rejected",
+      "exception": "AssertionError: \"SUPERSEDED_SHALLOW_ARM_STATE\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_08_diagnostic_statuses_are_explicit_records",
+      "exception": "AssertionError: \"DIAGNOSTIC_STATUS_SEMANTICS_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_master1576_current_state_guard_v1.CurrentStateGuardTests.test_09_original_record_fields_budget_and_history_unchanged",
+      "exception": "'historical_strict_v2_exact_candidate_closure'"
+    },
+    {
+      "test": "test_master1576_post_screen_v1.PostScreenTests.test_20_canonical_state_authority_next_and_budget",
+      "exception": ""
+    },
+    {
+      "test": "test_master1576_post_screen_v1.PostScreenTests.test_22_no_new_workflow_secret_or_market_route",
+      "exception": "AssertionError: 'workflow_dispatch' unexpectedly found in 'name: \"Archived by P0-P4 remediation: master1576-post-screen-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_master1576_post_shallow_protocol_v1.ProtocolAcceptance.test_12_all_states_bound_consistently",
+      "exception": ""
+    },
+    {
+      "test": "test_master1576_post_shallow_protocol_v1.ProtocolAcceptance.test_14_changes_allowlist",
+      "exception": "AssertionError: {'research_core_v4/p0_owner_governance_20261017/native_observation.py', 'research_core_v4/master1576_current_state_guard_v7.py', 'research_core_v4/autonomous_native_20261015_v1/test_runtime.py', 'research_core_v4/native_coverage_economic_completion_20261014_v1/RECIPIENT_READY_V1.json', 'docs/p0-admin/20261016/NATIVE_RULESETS.json', 'research_core_v4/native_semantic_audit_v1/EXECUTION_V1.json', 'docs/laboratory-completion/20261020/OWNER_CONSOLIDATED_TERMINAL_AFTER.txt', 'docs/labo"
+    },
+    {
+      "test": "test_master1576_post_shallow_protocol_v1.ProtocolAcceptance.test_15_no_broker_screen_or_decryption_entrypoint",
+      "exception": "AssertionError: 'workflow_dispatch' unexpectedly found in 'name: \"Archived by P0-P4 remediation: master1576-post-shallow-protocol-v1-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_master1576_real_execution_architecture_v1.ArchitectureTests.test_27_preservation_and_real_files_absent",
+      "exception": "AssertionError: True is not false"
+    },
+    {
+      "test": "test_master1576_screen_v2.GovernanceBindingTests.test_35_final_rebind_when_preflight_materialized",
+      "exception": ""
+    },
+    {
+      "test": "test_master1576_screen_v2.GovernanceBindingTests.test_36_exact_diff_preserves_historical_bytes",
+      "exception": "AssertionError: {'research_core_v4/p0_owner_governance_20261017/native_observation.py', 'research_core_v4/native_coverage_economic_completion_20261014_v1/test_v1.py', 'research_core_v4/dynamic_exit_diagnostic_v1/DESIGN_FREEZE_V1.json', 'research_core_v4/master1576_current_state_guard_v7.py', 'research_core_v4/integrated_alpha_campaign_v1/input-065.b64', 'research_core_v4/autonomous_native_20261015_v1/test_runtime.py', 'research_core_v4/state/STRICT_PREOUTCOME_V2_ISOLATED_PACKET_TOP_OF_BOOK_QUOTE"
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_03_authority_and_hash_all_current_paths",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_04_stale_arm_regression",
+      "exception": "AssertionError: \"STALE_SHALLOW_ARM_STATE\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_05_stale_V6_plan_regression",
+      "exception": "AssertionError: \"STALE_V6_CURRENT_POINTER\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_07_budget_and_closed_boundary_injections",
+      "exception": "AssertionError: \"BUDGET_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_08_current_status_drift",
+      "exception": "AssertionError: \"V4_TOP_STATUS_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_18_workflow_no_secret_no_market_no_dispatch",
+      "exception": "AssertionError: 'contents: read' not found in 'name: \"Archived by P0-P4 remediation: project-wide-reselection-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_project_wide_reselection_v1.ReselectionTests.test_20_no_other_repository_changes",
+      "exception": "'research_core_v4/remediation_p0_p4_20261015/closure_index.json'"
+    },
+    {
+      "test": "test_research_core_v4_publication_only.PublicationOnlyTests.test_23_no_scientific_imports",
+      "exception": "AssertionError: 'research_core_v4.development_execution_runner_v1' unexpectedly found in {'sys': <module 'sys' (built-in)>, 'builtins': <module 'builtins' (built-in)>, '_frozen_importlib': <module '_frozen_importlib' (frozen)>, '_imp': <module '_imp' (built-in)>, '_thread': <module '_thread' (built-in)>, '_warnings': <module '_warnings' (built-in)>, '_weakref': <module '_weakref' (built-in)>, '_io': <module '_io' (built-in)>, 'marshal': <module 'marshal' (built-in)>, 'posix': <module 'posix' (bu"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_boundary_v4.BoundaryV4Tests.test_zero_v4_arm_prearm",
+      "exception": "AssertionError: True is not false"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production.ProductionArchitectureTests.test_four_strictly_sequential_segment_job_plan",
+      "exception": "AssertionError: 'segment-1:' not found in 'name: \"Archived by P0-P4 remediation: breadth-first-shallow-m5-support-v2-production\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production_v2.V2DurabilityTests.test_zero_workflow_dispatch",
+      "exception": "AssertionError: 'workflow_dispatch' unexpectedly found in 'name: \"Archived by P0-P4 remediation: breadth-first-shallow-m5-support-v2-production-v2\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production_v3.V3GateTests.test_ARM_V2_CANNOT_AUTHORIZE_V3_WORKFLOW",
+      "exception": "AssertionError: 'PRODUCTION_ARM_V3.json' not found in 'name: \"Archived by P0-P4 remediation: breadth-first-shallow-m5-support-v2-production-v3\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production_v3.V3GateTests.test_ARM_V3_ABSENT_FAILS",
+      "exception": "AssertionError: \"PRODUCTION_ARM_V3_ABSENT\" does not match \"PREARM_PROVIDER_AUTHORITY_BINDING_FAILURE\""
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production_v3.V3GateTests.test_ZERO_ARM",
+      "exception": "AssertionError: True is not false"
+    },
+    {
+      "test": "test_shallow_m5_support_v2_production_v3.V3GateTests.test_ZERO_WORKFLOW_DISPATCH",
+      "exception": "AssertionError: 'workflow_dispatch' unexpectedly found in 'name: \"Archived by P0-P4 remediation: breadth-first-shallow-m5-support-v2-production-v3\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_shallow_m5_v3_boundary_forensic_probe.BoundaryForensicProbeTests.test_forensic_arm_absent_before_arm_commit",
+      "exception": "AssertionError: True is not false"
+    },
+    {
+      "test": "test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_current_authority_points_to_existing_acceptance_authority",
+      "exception": ""
+    },
+    {
+      "test": "test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_exact_production_hash_preservation (path='.github/workflows/breadth-first-shallow-m5-support-v2-production-v2.yml')",
+      "exception": ""
+    },
+    {
+      "test": "test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_exact_production_hash_preservation (path='.github/workflows/breadth-first-shallow-m5-support-v2-production-v3.yml')",
+      "exception": ""
+    },
+    {
+      "test": "test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_three_canonical_operation_pointers_equal",
+      "exception": ""
+    },
+    {
+      "test": "test_shallow_m5_v3_canonical_state_consistency.CanonicalV3OperationConsistencyTests.test_zero_arm (path='research_core_v4/state/BREADTH_FIRST_SHALLOW_M5_SUPPORT_V2_PRODUCTION_ARM_V3.json')",
+      "exception": "AssertionError: True is not false"
+    },
+    {
+      "test": "test_shared_baseline_campaign_v1.CampaignTests.test_all_immutable_bindings",
+      "exception": " : .github/workflows/project-wide-reselection-offline.yml"
+    },
+    {
+      "test": "test_shared_baseline_campaign_v1.CampaignTests.test_change_allowlist",
+      "exception": "'research_core_v4/remediation_p0_p4_20261015/closure_index.json'"
+    },
+    {
+      "test": "test_shared_baseline_campaign_v1.CampaignTests.test_stale_arm_fails",
+      "exception": "AssertionError: \"STALE_ARM\" does not match \"ACTION_DRIFT\""
+    },
+    {
+      "test": "test_shared_baseline_campaign_v1.CampaignTests.test_workflow_no_market_secret_or_dispatch",
+      "exception": "AssertionError: 'workflow_dispatch' unexpectedly found in 'name: \"Archived by P0-P4 remediation: shared-baseline-campaign-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_24_all_historical_files_byte_identical",
+      "exception": "AssertionError: b'name: \"Archived by P0-P4 remediation: pr[258 chars]ED\\n' != b\"name: Project Wide Outcome Blind Informa[1012 chars]v1\\n\""
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_28_current_authority_and_hash_drift_denied",
+      "exception": "AssertionError: \"CURRENT_AUTHORITY_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_29_stale_V1_and_shallow_current_pointers_denied",
+      "exception": "AssertionError: \"STALE_CURRENT_STAGE\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_30_budget_closed_boundaries_and_no_response",
+      "exception": "AssertionError: \"CLOSED_BOUNDARY_DRIFT\" does not match \"CURRENT_ACTION_DRIFT\""
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_31_workflow_no_secret_no_dispatch_no_write",
+      "exception": "AssertionError: 'contents: read' not found in 'name: \"Archived by P0-P4 remediation: strict-reselection-v2-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_strict_reselection_v2.StrictFirewallTests.test_32_exact_change_allowlist",
+      "exception": "'research_core_v4/remediation_p0_p4_20261015/closure_index.json'"
+    },
+    {
+      "test": "test_strict_selection_functional_v1.FunctionalTests.test_27_all_immutable_authorities_preserved",
+      "exception": "AssertionError: b'name: \"Archived by P0-P4 remediation: pr[258 chars]ED\\n' != b\"name: Project Wide Outcome Blind Informa[1012 chars]v1\\n\""
+    },
+    {
+      "test": "test_strict_selection_functional_v1.FunctionalTests.test_30_all_current_authority_paths_fail_closed",
+      "exception": "AssertionError: \"AUTHORITY_DRIFT\" does not match \"ACTION_DRIFT\""
+    },
+    {
+      "test": "test_strict_selection_functional_v1.FunctionalTests.test_32_workflow_no_secret_no_write_no_dispatch",
+      "exception": "AssertionError: 'contents: read' not found in 'name: \"Archived by P0-P4 remediation: strict-selection-functional-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_strict_selection_functional_v1.FunctionalTests.test_33_exact_change_allowlist",
+      "exception": "'research_core_v4/remediation_p0_p4_20261015/closure_index.json'"
+    },
+    {
+      "test": "test_strict_semantic_certification_v1.SemanticTests.test_28_accepted_artifacts_and_prior_guards_immutable",
+      "exception": "AssertionError: b'name: \"Archived by P0-P4 remediation: pr[258 chars]ED\\n' != b\"name: Project Wide Outcome Blind Informa[1012 chars]v1\\n\""
+    },
+    {
+      "test": "test_strict_semantic_certification_v1.SemanticTests.test_31_nested_authority_and_hash_regressions",
+      "exception": "AssertionError: \"AUTHORITY_DRIFT\" does not match \"ACTION_DRIFT\""
+    },
+    {
+      "test": "test_strict_semantic_certification_v1.SemanticTests.test_34_workflow_read_only_no_secret_no_dispatch",
+      "exception": "AssertionError: 'contents: read' not found in 'name: \"Archived by P0-P4 remediation: strict-semantic-certification-offline\"\\non:\\n  workflow_dispatch:\\npermissions: {}\\njobs:\\n  expected_policy_stop:\\n    if: ${{ false }}\\n    runs-on: ubuntu-24.04\\n    timeout-minutes: 1\\n    steps:\\n      - run: echo EXPECTED_POLICY_STOP_LEGACY_AUTHORITY_SUPERSEDED\\n'"
+    },
+    {
+      "test": "test_strict_semantic_certification_v1.SemanticTests.test_35_exact_change_allowlist",
+      "exception": "'research_core_v4/remediation_p0_p4_20261015/closure_index.json'"
+    },
+    {
+      "test": "test_v4_post_quote_preoutcome.Audit.test_report_and_source_bindings",
+      "exception": ""
+    },
+    {
+      "test": "test_v4_variance_composition.Adversarial.test_real_evaluator_and_runner_default_denied",
+      "exception": "AssertionError: \"NO_REAL_OPENING_AUTHORITY\" does not match \"immutable exact parent freeze\""
+    }
+  ],
+  "archive_sha256": "ca345abd16a434b1fd456dfa4262bd81666314293444677e7f64ec579de311a2",
+  "artifact_id": 12320958348,
+  "job_id": 119042111015,
+  "raw_artifact_retained": "R3_HISTORICAL_NATIVE_39545332902.zip",
+  "local_comparison": {
+    "tests": 2304,
+    "failures": 61,
+    "errors": 91,
+    "skipped": 14,
+    "crypto_environment_socket_denied": true,
+    "native_crypto_errors": 0,
+    "not_fully_attributed": true
+  }
+}
+

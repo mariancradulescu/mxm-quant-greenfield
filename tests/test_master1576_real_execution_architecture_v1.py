@@ -66,9 +66,13 @@ class ArchitectureTests(unittest.TestCase):
     def setUp(self):
         self.net=patch('urllib.request.urlopen',side_effect=AssertionError('Real network forbidden'));self.net.start()
         self.f=GitFixture();self.addCleanup(self.f.close);self.addCleanup(self.net.stop)
-    def fail(self,code,call=None):
+    def assert_screen_refused(self,code,call=None):
         with self.assertRaises(w.ScreenError) as e:(call or self.f.validate)()
         self.assertEqual(e.exception.code,code)
+    def test_unittest_failure_hook_remains_standard(self):
+        self.assertIs(type(self).fail,unittest.TestCase.fail)
+        with self.assertRaisesRegex(AssertionError,'distinct diagnostic'):
+            self.fail('distinct diagnostic')
     def synthetic_worker(self,root,arm):
         original=subprocess.check_output
         def git_output(args,*a,**kw):
@@ -91,27 +95,27 @@ class ArchitectureTests(unittest.TestCase):
         self.assertNotIn(self.f.head,l.raw(self.f.root,l.AUTH).decode());self.assertEqual(c['head'],self.f.head)
         self.assertEqual(run(self.f.root,'diff-tree','--no-commit-id','--name-status','-r','HEAD'),'A\t'+l.AUTH)
     def test_02_schema_exact(self):
-        self.f.auth['extra']=1;self.f.rebuild();self.fail('DURABLE_AUTHORIZATION_SCHEMA_FAILURE')
+        self.f.auth['extra']=1;self.f.rebuild();self.assert_screen_refused('DURABLE_AUTHORIZATION_SCHEMA_FAILURE')
     def test_03_wrong_status(self):
-        self.f.auth['status']='OTHER';self.f.rebuild();self.fail('DURABLE_AUTHORIZATION_SCHEMA_FAILURE')
+        self.f.auth['status']='OTHER';self.f.rebuild();self.assert_screen_refused('DURABLE_AUTHORIZATION_SCHEMA_FAILURE')
     def test_04_wrong_parent(self):
-        self.f.auth['authorized_parent_head']='a'*40;self.f.rebuild();self.fail('AUTHORIZED_PARENT_FAILURE')
+        self.f.auth['authorized_parent_head']='a'*40;self.f.rebuild();self.assert_screen_refused('AUTHORIZED_PARENT_FAILURE')
     def test_05_extra_changed_file(self):
-        self.f.rebuild(extra=True);self.fail('AUTHORIZATION_ONLY_COMMIT_FAILURE')
+        self.f.rebuild(extra=True);self.assert_screen_refused('AUTHORIZATION_ONLY_COMMIT_FAILURE')
     def test_06_hash_drift(self):
-        self.f.auth['protocol_sha256']='a'*64;self.f.rebuild();self.fail('AUTHORIZATION_HASH_FAILURE')
+        self.f.auth['protocol_sha256']='a'*64;self.f.rebuild();self.assert_screen_refused('AUTHORIZATION_HASH_FAILURE')
     def test_07_live_drift(self):
-        self.f.provider.head='a'*40;self.fail('LIVE_BRANCH_DRIFT')
+        self.f.provider.head='a'*40;self.assert_screen_refused('LIVE_BRANCH_DRIFT')
     def test_08_rerun_before_secret(self):
-        self.f.event['run_attempt']='2';self.fail('RUN_ATTEMPT_FAILURE',self.f.presecret);self.assertFalse(self.f.provider.claims)
+        self.f.event['run_attempt']='2';self.assert_screen_refused('RUN_ATTEMPT_FAILURE',self.f.presecret);self.assertFalse(self.f.provider.claims)
     def test_09_existing_result_before_secret(self):
-        self.f.provider.result=True;self.fail('RESULT_ALREADY_PRESENT',self.f.presecret);self.assertFalse(self.f.provider.claims)
+        self.f.provider.result=True;self.assert_screen_refused('RESULT_ALREADY_PRESENT',self.f.presecret);self.assertFalse(self.f.provider.claims)
     def test_10_local_result_before_secret(self):
-        write(self.f.root,l.RESULT,{});self.fail('RESULT_ALREADY_PRESENT',self.f.presecret)
+        write(self.f.root,l.RESULT,{});self.assert_screen_refused('RESULT_ALREADY_PRESENT',self.f.presecret)
     def test_11_inventory_drift(self):
-        self.f.provider.inv['assets'][0]['digest']='sha256:'+'0'*64;self.fail('ASSET_INVENTORY_FAILURE',self.f.presecret);self.assertFalse(self.f.provider.claims)
+        self.f.provider.inv['assets'][0]['digest']='sha256:'+'0'*64;self.assert_screen_refused('ASSET_INVENTORY_FAILURE',self.f.presecret);self.assertFalse(self.f.provider.claims)
     def test_12_auth_worktree_substitute(self):
-        a=copy.deepcopy(self.f.auth);a['worker_sha256']='a'*64;write(self.f.root,l.AUTH,a);self.fail('AUTHORIZATION_WORKTREE_DRIFT')
+        a=copy.deepcopy(self.f.auth);a['worker_sha256']='a'*64;write(self.f.root,l.AUTH,a);self.assert_screen_refused('AUTHORIZATION_WORKTREE_DRIFT')
     def test_13_ephemeral_arm_deterministic(self):
         c=self.f.validate();a=w.canonical(l.arm_value(c));b=w.canonical(l.arm_value(c));self.assertEqual(a,b)
         self.assertEqual(l.arm_value(c)['execution_head'],self.f.head);self.assertEqual(len(l.arm_value(c)),8)
@@ -125,7 +129,7 @@ class ArchitectureTests(unittest.TestCase):
             with l.ephemeral_arm(self.f.validate()) as p:parent=p.parent;raise RuntimeError('Synthetic failure')
         self.assertFalse(parent.exists())
     def test_17_one_time_claim_before_secret(self):
-        self.f.presecret();self.assertEqual(len(self.f.provider.claims),1);self.fail('ATTEMPT_ALREADY_CLAIMED',self.f.presecret)
+        self.f.presecret();self.assertEqual(len(self.f.provider.claims),1);self.assert_screen_refused('ATTEMPT_ALREADY_CLAIMED',self.f.presecret)
     def test_18_missing_receipt_cannot_execute(self):
         called=[]
         with cwd(self.f.root),self.assertRaises(FileNotFoundError):l.execute(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed,worker_call=lambda *a:called.append(1))
@@ -135,18 +139,18 @@ class ArchitectureTests(unittest.TestCase):
         self.assertEqual(r['status'],'PUBLISHED_COMPLETE_STRUCTURAL_RESULT');self.assertEqual(len(self.f.provider.published),1);self.assertEqual(self.f.provider.published[0][0],l.RESULT)
     def test_20_partial_asset_result_not_published(self):
         self.complete();r=l.load(self.f.root,l.RESULT);r['processed_asset_count']=99;write(self.f.root,l.RESULT,r)
-        self.fail('PARTIAL_RESULT_FORBIDDEN',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed));self.assertFalse(self.f.provider.published)
+        self.assert_screen_refused('PARTIAL_RESULT_FORBIDDEN',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed));self.assertFalse(self.f.provider.published)
     def test_21_partial_rows_not_published(self):
         self.complete();r=l.load(self.f.root,l.RESULT);r['processed_canonical_row_count']-=1;write(self.f.root,l.RESULT,r)
-        self.fail('PARTIAL_RESULT_FORBIDDEN',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed))
+        self.assert_screen_refused('PARTIAL_RESULT_FORBIDDEN',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed))
     def test_22_raw_price_output_rejected(self):
         self.complete();r=l.load(self.f.root,l.RESULT);r['identities'][0]['RAW_OHLC']=[1];write(self.f.root,l.RESULT,r)
-        self.fail('OUTPUT_SCHEMA_FAILURE',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed))
+        self.assert_screen_refused('OUTPUT_SCHEMA_FAILURE',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed))
     def test_23_result_digest_changed_rejected(self):
         self.complete();r=l.load(self.f.root,l.RESULT);r['identities'][0]['FIRST_TIMESTAMP']='2026-08-20T00:05:00Z';write(self.f.root,l.RESULT,r)
-        self.fail('PUBLICATION_RESULT_DIGEST_FAILURE',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed))
+        self.assert_screen_refused('PUBLICATION_RESULT_DIGEST_FAILURE',lambda:l.publish(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed))
     def test_24_output_path_exact(self):
-        self.f.auth['output_path']='different.json';self.f.rebuild();self.fail('RESULT_PATH_FAILURE')
+        self.f.auth['output_path']='different.json';self.f.rebuild();self.assert_screen_refused('RESULT_PATH_FAILURE')
     def test_25_workflow_secret_and_trigger_boundaries(self):
         text=l.raw(ROOT,l.WORKFLOW).decode();self.assertEqual(re.findall(r'secrets\.([A-Z0-9_]+)',text),['MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM'])
         self.assertNotIn('workflow'+'_dispatch',text);self.assertNotIn('CTRADER',text);self.assertNotIn('cancel-in-progress: true',text)
@@ -179,12 +183,12 @@ class ArchitectureTests(unittest.TestCase):
         p=l.GitHubProvider('SYNTHETIC');calls=[];heads=iter([self.f.head,'e'*40]);p.live_head=lambda:next(heads)
         def api(path,method='GET',body=None,allow404=False):
             calls.append(method);return {'tree':{'sha':'t'*40},'sha':'c'*40}
-        p.api=api;self.fail('PUBLICATION_HEAD_DRIFT',lambda:p.publish_result(l.RESULT,b'{}',self.f.head));self.assertNotIn('PATCH',calls)
+        p.api=api;self.assert_screen_refused('PUBLICATION_HEAD_DRIFT',lambda:p.publish_result(l.RESULT,b'{}',self.f.head));self.assertNotIn('PATCH',calls)
     def test_30_wrong_event_fails_closed(self):
-        self.f.event['event_name']='workflow_dispatch';self.fail('WRONG_GITHUB_EVENT')
+        self.f.event['event_name']='workflow_dispatch';self.assert_screen_refused('WRONG_GITHUB_EVENT')
     def test_31_parent_state_bound(self):
         # State mutation cannot pass the single authorization-file commit law.
-        write(self.f.root,l.STATES[0],{});run(self.f.root,'add','.');run(self.f.root,'commit','-qm','Unauthorized second file');self.f.event['sha']=run(self.f.root,'rev-parse','HEAD');self.fail('AUTHORIZED_PARENT_FAILURE')
+        write(self.f.root,l.STATES[0],{});run(self.f.root,'add','.');run(self.f.root,'commit','-qm','Unauthorized second file');self.f.event['sha']=run(self.f.root,'rev-parse','HEAD');self.assert_screen_refused('AUTHORIZED_PARENT_FAILURE')
     def test_32_final_state_hash_binding_when_materialized(self):
         if not (ROOT/l.PROOF).exists():return
         for s in l.STATES:
@@ -196,7 +200,7 @@ class ArchitectureTests(unittest.TestCase):
     def test_33_worker_failure_cleans_arm_and_no_publication(self):
         self.f.presecret();seen=[]
         def worker(root,arm):seen.append(arm.parent);raise w.ScreenError('SYNTHETIC_WORKER_FAILURE')
-        with cwd(self.f.root):self.fail('SYNTHETIC_WORKER_FAILURE',lambda:l.execute(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed,worker_call=worker))
+        with cwd(self.f.root):self.assert_screen_refused('SYNTHETIC_WORKER_FAILURE',lambda:l.execute(self.f.root,event=self.f.event,provider=self.f.provider,receipt=self.f.receipt,completed_receipt=self.f.completed,worker_call=worker))
         self.assertFalse(seen[0].exists());self.assertFalse(self.f.completed.exists());self.assertFalse(self.f.provider.published)
         self.assertEqual(len(self.f.provider.claims),1)
     def test_34_arm_bytes_equal_across_private_locations(self):
@@ -205,11 +209,11 @@ class ArchitectureTests(unittest.TestCase):
         with l.ephemeral_arm(c) as p:b=p.read_bytes();two=p
         self.assertNotEqual(one,two);self.assertEqual(a,b)
     def test_35_missing_inventory_asset_fails_before_secret(self):
-        self.f.provider.inv['assets'].pop();self.fail('ASSET_INVENTORY_FAILURE',self.f.presecret);self.assertFalse(self.f.provider.claims)
+        self.f.provider.inv['assets'].pop();self.assert_screen_refused('ASSET_INVENTORY_FAILURE',self.f.presecret);self.assertFalse(self.f.provider.claims)
     def test_36_missing_authorization_rejected(self):
-        (self.f.root/l.AUTH).unlink();self.fail('NO_DURABLE_AUTHORIZATION',self.f.presecret)
+        (self.f.root/l.AUTH).unlink();self.assert_screen_refused('NO_DURABLE_AUTHORIZATION',self.f.presecret)
     def test_37_publisher_path_allowlist(self):
-        p=l.GitHubProvider('SYNTHETIC');self.fail('RESULT_PATH_FAILURE',lambda:p.publish_result('arbitrary.json',b'{}',self.f.head))
+        p=l.GitHubProvider('SYNTHETIC');self.assert_screen_refused('RESULT_PATH_FAILURE',lambda:p.publish_result('arbitrary.json',b'{}',self.f.head))
     def test_38_accepted_manifest_release_primary_governance_preserved(self):
         arch=l.load(ROOT,l.ARCH)
         for key in ['final_manifest','segment_1','segment_2','segment_3','segment_4','master','PRIMARY145','discovery','selection']:

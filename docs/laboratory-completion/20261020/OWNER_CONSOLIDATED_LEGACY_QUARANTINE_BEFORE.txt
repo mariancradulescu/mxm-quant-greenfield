@@ -1,0 +1,50 @@
+test_migration_preserves_variants_but_refuses_query_and_view (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_migration_preserves_variants_but_refuses_query_and_view) ... ERROR
+test_only_exact_legacy_trust_conflicts_are_repairable (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_only_exact_legacy_trust_conflicts_are_repairable) ... ERROR
+test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) ... 
+  test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) (path='query') ... FAIL
+  test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) (path='view') ... FAIL
+
+======================================================================
+ERROR: test_migration_preserves_variants_but_refuses_query_and_view (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_migration_preserves_variants_but_refuses_query_and_view)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_legacy_provenance_quarantine.py", line 32, in test_migration_preserves_variants_but_refuses_query_and_view
+    from .execution import quarantine_legacy_trust_conflicts
+ImportError: cannot import name 'quarantine_legacy_trust_conflicts' from 'research_core_v4.laboratory.execution' (/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/execution.py)
+
+======================================================================
+ERROR: test_only_exact_legacy_trust_conflicts_are_repairable (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_only_exact_legacy_trust_conflicts_are_repairable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_legacy_provenance_quarantine.py", line 48, in test_only_exact_legacy_trust_conflicts_are_repairable
+    from .execution import quarantine_legacy_trust_conflicts
+ImportError: cannot import name 'quarantine_legacy_trust_conflicts' from 'research_core_v4.laboratory.execution' (/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/execution.py)
+
+======================================================================
+FAIL: test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) (path='query')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_legacy_provenance_quarantine.py", line 28, in test_quarantined_legacy_asset_cannot_be_read_or_declared_complete
+    self.assertEqual(cat.query('X','BID_ASK',0,10,authentic_only=True),[])
+AssertionError: Lists differ: ['409e7a14cac20c03506cafdd4fe45f3ae7d0f0314777806f9b1c7ff90934720e'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'409e7a14cac20c03506cafdd4fe45f3ae7d0f0314777806f9b1c7ff90934720e'
+
+- ['409e7a14cac20c03506cafdd4fe45f3ae7d0f0314777806f9b1c7ff90934720e']
++ []
+
+======================================================================
+FAIL: test_quarantined_legacy_asset_cannot_be_read_or_declared_complete (research_core_v4.laboratory.test_legacy_provenance_quarantine.LegacyQuarantineTests.test_quarantined_legacy_asset_cannot_be_read_or_declared_complete) (path='view')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/2f4ce99cba3e/mxm-admin/research_core_v4/laboratory/test_legacy_provenance_quarantine.py", line 29, in test_quarantined_legacy_asset_cannot_be_read_or_declared_complete
+    with self.subTest(path='view'),self.assertRaises(LabError):cat.view(ident,10)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: LabError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=2, errors=2)
