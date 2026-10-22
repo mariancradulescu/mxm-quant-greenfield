@@ -17,6 +17,7 @@ sealed class Replay {
  bool Simulated=>synthetic||scenario;
  decimal Fx=>scenario?1m/1.10m:1m;
  readonly decimal slippage, commission, extraHalfSpread, margin;
+ readonly int stopPips;
  decimal Slippage=>slippage;
  decimal PriceUnits=>1000m;
  decimal ExecutionFriction=>slippage+extraHalfSpread;
@@ -24,14 +25,14 @@ sealed class Replay {
  long lastT=-1,bidAt=-1,askAt=-1,barStart=-1;
  decimal bid,ask,closeOfBar,realized=200m,peak=200m,maxDrawdown=0m,totalCosts=0m;
  int pendingSignal,ambiguousGroups,gapBars,invalidSnapshots,entries,exits;
- int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups;
+ int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false,StrategyMode mode=StrategyMode.Adaptive,
-   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m){
-  if(minutes<1 || marginEur<=0m || extraSpread<0m)throw new ArgumentOutOfRangeException();
+   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0){
+  if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0)throw new ArgumentOutOfRangeException();
   synthetic=fixture;scenario=modeledScenario;family=mode;BarMs=checked((long)minutes*60000L);
   slippage=slip??(scenario?0.00002m:0.00001m);
-  commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;
+  commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;
   if(slippage<0||commission<0)throw new ArgumentOutOfRangeException();
   kernel=new MxmDecisionKernel(mode);
  }
@@ -57,7 +58,7 @@ sealed class Replay {
    additional_spread_scenario_eur=Round(PriceUnits*extraHalfSpread*Fx),quoted_bid=Round(bid),quoted_ask=Round(ask),
    margin_eur=margin,balance_eur=Round(realized)});
  }
- void Close(long t) {
+ void Close(long t,string reason="REVERSE_SIGNAL") {
   if(pos is null)throw new InvalidDataException("NO_POSITION");
   decimal exit=pos.Direction>0?bid-ExecutionFriction:ask+ExecutionFriction;
   decimal pnl=pos.Direction*PriceUnits*(exit-pos.OpenPrice)*Fx;
@@ -66,7 +67,7 @@ sealed class Replay {
    gross_price_pnl_eur=Round(pnl),charged_commission_eur=Round(commission),
    slippage_eur=Round(PriceUnits*Slippage*Fx),additional_spread_scenario_eur=Round(PriceUnits*extraHalfSpread*Fx),
    quoted_bid=Round(bid),quoted_ask=Round(ask),
-   balance_eur=Round(realized),entry_timestamp_ms=pos.OpenT});
+   balance_eur=Round(realized),entry_timestamp_ms=pos.OpenT,exit_reason=reason});
   pos=null;
  }
  Dictionary<string,int> WeekCounts(IReadOnlyList<Quote> ticks){
@@ -127,7 +128,17 @@ sealed class Replay {
    if(bar!=barStart){barStart=bar;closeOfBar=bid;}
    else closeOfBar=bid;
    if(Simulated){
-    if(pendingSignal!=0){
+    // cTrader cBot has a stop; model its observable quote-side trigger without
+    // claiming a broker stop fill. On a gap, exit at the NEXT observed quote,
+    // plus the selected adverse execution friction, never at the ideal stop level.
+    bool stopped=false;
+    if(pos is not null && stopPips>0 &&
+       (pos.Direction==1 ? bid<=pos.OpenPrice-stopPips*0.0001m
+                         : ask>=pos.OpenPrice+stopPips*0.0001m)){
+      Close(t,"STOP_QUOTE_MODEL");stopTriggeredExits++;stopped=true;
+    }
+    if(stopped)pendingSignal=0; // no optimistic same-event re-entry after stop
+    if(!stopped && pendingSignal!=0){
      if(pos is not null && pos.Direction!=pendingSignal)Close(t);
      if(pos is null)Open(t,pendingSignal);
      pendingSignal=0;
@@ -136,7 +147,7 @@ sealed class Replay {
    }
    lastT=t;
   }
-  if(Simulated && pos is not null){Close(lastT);Mark(lastT);}
+  if(Simulated && pos is not null){Close(lastT,"FORCED_DATASET_END_NOT_BROKER_FILL");Mark(lastT);}
   if(synthetic && (entries<1||entries!=exits||realized<=0||totalCosts<=0))
    throw new InvalidDataException("REFERENCE_FIXTURE_DID_NOT_EXERCISE_ACCOUNT");
   return new {
@@ -152,6 +163,7 @@ sealed class Replay {
    modeled_assumptions=new {family=family.ToString(),bar_minutes=(int)(BarMs/60000L),position_units=1000,
      fx_eur_per_usd=Round(Fx),commission_eur_per_side=commission,slippage_price_units=Slippage,
      extra_spread_price_units=extraHalfSpread*2m,margin_eur=margin,financing_eur=0m,
+     quote_stop_loss_pips=stopPips,observed_quote_stop_fill_not_broker_certified=true,
      original_bid_ask_spread_is_already_in_fill_prices=true,slippage_and_extra_spread_are_already_in_fill_prices=true,
      cost_total_is_diagnostic_including_embedded_execution_friction_not_additional_cash_debit=true},
    price_path_timestamps_are_not_historical_arrival_times=true,
@@ -160,7 +172,7 @@ sealed class Replay {
    terminal_position_exit_is_assumed_not_historical_fill=Simulated,
    initial_equity_eur=200m,final_equity_eur=Simulated?Round(realized):(decimal?)null,
    economic_entries=entries,economic_exits=exits,charged_cost_eur=Round(totalCosts),
-   maximum_absolute_drawdown_eur=Round(maxDrawdown),
+   maximum_absolute_drawdown_eur=Round(maxDrawdown),modeled_stop_exits=stopTriggeredExits,
    // Complete ISO weeks require independent interval-coverage evidence, never infer from four-hour capture.
    hard21=false,full_iso_weeks_evaluated=0,entries_per_iso_week=Simulated?WeekCounts(ticks):new Dictionary<string,int>(),
    raw_events=ticks.Count,bar_decisions=signals.Count,
@@ -211,13 +223,15 @@ static class Program {
    if(args[0]=="--authentic-research"||args[0]=="--research-fixture"){
     var matrix=new List<object>(); var families=new[]{StrategyMode.Adaptive,StrategyMode.TrendOnly,StrategyMode.RangeFade,StrategyMode.Breakout};
     var frames=new[]{1,5,15};
+    var stopModes=new[]{0,12}; // sensitivity to actual Robot default 12-pip stop vs no stop
     var cases=new[]{new {name="LOW_UNVERIFIED",slip=0.00002m,fee=0.10m,spread=0.00002m,margin=50m},
                      new {name="BASE_UNVERIFIED",slip=0.00005m,fee=0.20m,spread=0.00004m,margin=90m},
                      new {name="STRESS_UNVERIFIED",slip=0.00010m,fee=0.40m,spread=0.00010m,margin=150m}};
-    foreach(var family in families)foreach(var tf in frames)foreach(var cost in cases){
-     var outcome=new Replay(false,true,family,tf,cost.slip,cost.fee,cost.spread,cost.margin).Run(ticks);
+    foreach(var family in families)foreach(var tf in frames)foreach(var cost in cases)foreach(var stops in stopModes){
+     var outcome=new Replay(false,true,family,tf,cost.slip,cost.fee,cost.spread,cost.margin,stops).Run(ticks);
      using var e=JsonDocument.Parse(JsonSerializer.Serialize(outcome));var j=e.RootElement;
-     matrix.Add(new {family=family.ToString(),timeframe_minutes=tf,cost_case=cost.name,
+     matrix.Add(new {family=family.ToString(),timeframe_minutes=tf,cost_case=cost.name,modeled_stop_loss_pips=stops,
+      modeled_stop_exits=j.GetProperty("modeled_stop_exits").GetInt32(),
       initial_equity_eur=200,final_equity_eur=j.GetProperty("final_equity_eur").GetDecimal(),
       net_pnl_eur=j.GetProperty("final_equity_eur").GetDecimal()-200m,
       entries=j.GetProperty("economic_entries").GetInt32(),exits=j.GetProperty("economic_exits").GetInt32(),

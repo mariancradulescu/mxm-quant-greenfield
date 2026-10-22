@@ -91,16 +91,19 @@ jobs:
           research=json.loads((temp/'mxm-csharp-research/research.json').read_bytes())
           assert research['schema']=='mxm.csharp.authentic-exploratory-sensitivity.v1'
           assert research['classification']=='REAL_PEPPERSTONE_QUOTES_COUNTERFACTUAL_MODELS_UNCERTIFIED_NO_SCIENTIFIC_SELECTION'
-          assert research['raw_events']==28212 and research['model_count']==36 and research['full_iso_weeks']==0
+          assert research['raw_events']==28212 and research['model_count']==72 and research['full_iso_weeks']==0
           assert research['no_independent_trial_or_advantage'] and not research['economic_identity_consumed']
           assert len({z['family'] for z in research['models']})==4
           assert {z['timeframe_minutes'] for z in research['models']}=={1,5,15}
+          assert {z['modeled_stop_loss_pips'] for z in research['models']}=={0,12}
+          assert all(z['modeled_stop_exits']>=0 and (z['modeled_stop_exits']==0 if z['modeled_stop_loss_pips']==0 else True) for z in research['models'])
           assert all(z['initial_equity_eur']==200 and z['entries']==z['exits'] and not z['hard21'] for z in research['models'])
           safe.update(orders=0,economic_outcomes=0,full_results_withheld=True,original_source_run=39660692230,
-            economic_research_classification=research['classification'],research_model_count=36,
+            economic_research_classification=research['classification'],research_model_count=72,
             no_new_economic_identity=True,no_complete_iso_week=True,scientific_selection_authorized=False,
             sensitivity_M5=[{'family':z['family'],'cost_case':z['cost_case'],
-              'entries':z['entries'],'exits':z['exits'],'net_pnl_eur':z['net_pnl_eur'],
+              'entries':z['entries'],'exits':z['exits'],'modeled_stop_loss_pips':z['modeled_stop_loss_pips'],
+              'modeled_stop_exits':z['modeled_stop_exits'],'net_pnl_eur':z['net_pnl_eur'],
               'final_equity_eur':z['final_equity_eur'],'modeled_cost_eur':z['modeled_cost_eur'],
               'max_drawdown_eur':z['max_drawdown_eur'],'hard21':False}
               for z in research['models'] if z['timeframe_minutes']==5],

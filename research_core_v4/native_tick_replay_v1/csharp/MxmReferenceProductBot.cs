@@ -28,9 +28,10 @@ public sealed class MxmReferenceProductBot : Robot {
    (BarMinutes==15 && TimeFrame==cAlgo.API.TimeFrame.Minute15);
   if(!supported){Print("MXM_UNSUPPORTED_TIMEFRAME_HOLD");Stop();return;}
   kernel=new MxmDecisionKernel(mode);
-  // The current running bar must not be a warmup feature.
-  for(int i=Math.Max(0,Bars.Count-7);i<Bars.Count-1;i++)
-   kernel.OnCompletedBar((decimal)Bars.ClosePrices[i]);
+  // Deterministic cold start: the historical replay and the live cBot both
+  // learn from six complete bars AFTER the start. Preloading pre-start bars
+  // would create different signals at the identical observed BID timestamps.
+  // Existing labelled positions remain broker-owned and are reconciled below.
   // The position book is authoritative on restart. No serialized direction or replayed orders.
   if(Positions.FindAll(Label,SymbolName).Length>1)Print("MXM_DUPLICATE_OWNED_POSITIONS_SAFE_HOLD");
  }
