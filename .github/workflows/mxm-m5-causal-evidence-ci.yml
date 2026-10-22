@@ -1,0 +1,30 @@
+name: MXM causal development durable ciphertext evidence CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - docs/economic-development/20261022/**
+      - .github/workflows/mxm-m5-causal-evidence-ci.yml
+permissions: {contents: read}
+jobs:
+  verify-durable-ciphertext:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Match original protected artifact bytes without decrypting
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,base64
+          p=Path('docs/economic-development/20261022/m5-causal-full-development.mxmenc.b64')
+          ciphertext=base64.b64decode(p.read_text().strip(),validate=True)
+          assert len(ciphertext)==1494
+          assert ciphertext.startswith(b'MXM_SHALLOW_M5_V2_ENC1\0')
+          assert hashlib.sha256(ciphertext).hexdigest()=='c0b1cf525adaadeeda03a0ba044a1d0c773078c233863dd594547229011a35cd'
+          receipt=Path('docs/economic-development/20261022/M5_CAUSAL_DEVELOPMENT_RECEPTION.md').read_text()
+          assert 'NO CANDIDATE PROMOTION' in receipt
+          assert '39773660094' in receipt and '21 outcome-charged' in receipt
+          print('MXM_DURABLE_ENCRYPTED_CAUSAL_DEV_RECEIPT_SHA256_MATCH')
+          PY
