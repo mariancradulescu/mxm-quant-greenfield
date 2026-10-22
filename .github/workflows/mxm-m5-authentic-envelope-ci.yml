@@ -1,0 +1,31 @@
+name: MXM preserved M5 envelope no-secret CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/m5_authentic_envelope.py
+      - .github/workflows/mxm-m5-authentic-envelope.yml
+      - .github/workflows/mxm-m5-authentic-envelope-ci.yml
+permissions: {contents: read}
+jobs:
+  no-secret-market-envelope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Synthetic time-boundary and full-horizon geometry
+        run: |
+          python3 -m research_core_v4.laboratory.m5_authentic_envelope --selftest
+          python3 - <<'PY'
+          import pathlib
+          p=pathlib.Path('research_core_v4/laboratory/m5_authentic_envelope.py').read_text()
+          w=pathlib.Path('.github/workflows/mxm-m5-authentic-envelope.yml').read_text()
+          assert 'historical_fills' in p and '"economic_orders": 0' in p
+          assert 'PROTECTED_START' in p and '"2026-09-17T00:00:00Z"' in p
+          assert 'get_quote' not in p and 'cTrader' in p
+          assert "environment: mxm-r3-custody-v1" in w
+          assert 'on:\n  push:' in w and 'pull_request:' not in w
+          assert 'permissions: {contents: read}' in w and 'workflow_dispatch: {}' in w
+          print('MXM_M5_NO_SECRET_GATEWAY_AND_EXISTING_CUSTODY_PASS')
+          PY
