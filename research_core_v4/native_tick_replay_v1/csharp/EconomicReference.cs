@@ -270,13 +270,13 @@ static class Program {
     Must(Check(200m,0m,1m,1.01m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
     Must(Check(150m,2m,.9m,.02m,.1m,0m),MxmStopRiskAdmission.Admit);
     var artificial=Fixture();
-    var baseline=new Replay(true,true,stopLossPips:12,maxEstimatedStopRiskFraction:.02m,
+    var baseline=new Replay(false,true,stopLossPips:12,maxEstimatedStopRiskFraction:.02m,
       estimatedStopRiskFrictionReserveEur:.20m).Run(artificial);
     using var okDoc=JsonDocument.Parse(JsonSerializer.Serialize(baseline));
     if(okDoc.RootElement.GetProperty("economic_entries").GetInt32()<1 ||
        okDoc.RootElement.GetProperty("stop_risk_rejections").GetInt32()!=0)
      throw new InvalidDataException("STOP_RISK_POSITIVE_ARTIFICIAL_FIXTURE");
-    var rejected=new Replay(true,true,stopLossPips:12,maxEstimatedStopRiskFraction:.005m,
+    var rejected=new Replay(false,true,stopLossPips:12,maxEstimatedStopRiskFraction:.005m,
       estimatedStopRiskFrictionReserveEur:.20m).Run(artificial);
     using var noDoc=JsonDocument.Parse(JsonSerializer.Serialize(rejected));
     if(noDoc.RootElement.GetProperty("economic_entries").GetInt32()!=0 ||
