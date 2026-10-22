@@ -49,3 +49,18 @@ jobs:
           path: verification/csharp-reference/reference-report.json
           if-no-files-found: warn
           retention-days: 30
+
+  linux-ctrader-cli-metadata-noauth:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile .algo without account access
+        run: dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+      - name: Probe official Spotware Linux CLI compatibility without credentials, data downloads or trading
+        run: |
+          docker pull ghcr.io/spotware/ctrader-console:latest
+          docker run --rm --network none --read-only --mount type=bind,src="${PWD}/research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0",dst=/mnt/mxm,readonly ghcr.io/spotware/ctrader-console:latest metadata /mnt/mxm/native_tick_replay_v1.algo
