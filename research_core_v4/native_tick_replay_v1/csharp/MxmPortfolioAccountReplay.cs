@@ -149,7 +149,8 @@ public sealed class MxmPortfolioAccountReplay {
   Need(!halted && trades.Count==0 && balance==200m,"REPLAY_NOT_FRESH");
   DateTime last=default;
   foreach(var e in feed) {
-   Need(e!=null && e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
+   if(e is null)throw new ArgumentException("NULL_PORTFOLIO_FEED_EVENT");
+   Need(e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
    Need(e.Utc>=last,"OUT_OF_ORDER_GLOBAL_FEED");
    last=e.Utc;
    if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
