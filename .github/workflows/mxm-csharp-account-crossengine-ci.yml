@@ -31,7 +31,7 @@ jobs:
               x=json.loads((p/'independent-account-receipt.json').read_text())
               assert x['entry_count']==x['exit_count']==7 and x['shared_initial_capital_eur']==200
               assert abs(float(x['cash_difference_eur']))<.0005 and x['orders']==0
-              assert x['explicit_commission_debit_eur']=='1.4'
+              assert float(x['explicit_commission_debit_eur'])==1.4
               assert x['embedded_price_slippage_and_spread_not_charged_twice']
               assert x['full_iso_week_coverage']==0 and not x['hard21']
               raw=json.loads((p/'reference-report.json').read_text())
