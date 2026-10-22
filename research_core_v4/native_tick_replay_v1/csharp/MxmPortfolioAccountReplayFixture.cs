@@ -49,6 +49,16 @@ Require(!balanced.BrokerFillsProven && !balanced.CostsBrokerVerified,
 var limited=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(positions:1)).Run(Series());
 Require(limited.AcceptedEntries==1 && limited.OpenPositions==1 &&
  limited.Rejections.Contains("REJECT_ACCOUNT_POSITION_CAP"),"ONE_GLOBAL_POSITION_CAP");
+// Same timestamp on two independent feeds does NOT prove real broker
+// precedence. The capital-constrained allocation changes if the observation
+// order changes; do not infer a qualified asset selection from this replay.
+var swappedFeed=Series();
+for(int i=0;i<8;i++) {
+ (swappedFeed[4*i+2],swappedFeed[4*i+3])=(swappedFeed[4*i+3],swappedFeed[4*i+2]);
+}
+var swapped=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(positions:1)).Run(swappedFeed);
+Require(swapped.AcceptedEntries==1 && swapped.Ledger[0].Symbol=="GBPUSD" &&
+ limited.Ledger[0].Symbol=="EURUSD","SAME_TIMESTAMP_ALLOCATION_ORDER_AMBIGUITY");
 var tightMargin=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},
  Params(marginFraction:.30m)).Run(Series());
 Require(tightMargin.AcceptedEntries==0 &&
