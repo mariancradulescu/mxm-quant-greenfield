@@ -84,8 +84,7 @@ public sealed class MxmPortfolioAccountReplay {
  decimal MarkedEquity() {
   decimal value=balance;
   foreach(var pair in open) {
-   var tick=state[pair.Key].Latest;
-   Need(tick!=null,"MISSING_POSITION_QUOTE");
+   var tick=state[pair.Key].Latest ?? throw new ArgumentException("MISSING_POSITION_QUOTE");
    var h=pair.Value;
    value+=(h.Direction>0?tick.Bid-h.Entry:h.Entry-tick.Ask)*h.Units*tick.QuoteToEur;
   }
@@ -143,7 +142,7 @@ public sealed class MxmPortfolioAccountReplay {
    Need(e!=null && e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
    Need(e.Utc>=last,"OUT_OF_ORDER_GLOBAL_FEED");
    last=e.Utc;
-   Need(state.TryGetValue(e.Symbol,out var st),"UNREGISTERED_SYMBOL");
+   if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
    if(e is MxmBarClose bar) {
     Need(bar.Close>0 && (st!.LastBar==default || bar.Utc>st.LastBar),"INVALID_BAR");
     if(st.LastBar!=default && (bar.Utc-st.LastBar).TotalMinutes!=parameters.BarMinutes)st.Kernel.Reset();
