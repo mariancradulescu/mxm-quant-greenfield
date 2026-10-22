@@ -26,3 +26,4 @@ public static class MxmStopRiskAdmission {
   return Admit;
  }
 }
+}
