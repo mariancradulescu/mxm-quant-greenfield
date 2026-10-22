@@ -1,0 +1,40 @@
+name: MXM CSharp account-wide stop-risk admission no-secret CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/native_tick_replay_v1/csharp/**
+      - .github/workflows/mxm-csharp-stop-risk-ci.yml
+permissions: {contents: read}
+jobs:
+  validate-account-stop-risk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile actual Cloud-compatible CSharp product and deterministic reference
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+      - name: Validate same EUR stop-risk law on artificial threshold, existing risk, friction and no-stop cases
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --stop-risk-fixture
+          python3 - <<'PY'
+          import pathlib
+          source=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          helper=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmStopRiskAdmission.cs').read_text()
+          sim=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
+          assert 'Symbol.AmountRisked(units,StopLossPips)' in source
+          assert 'Positions.FindAll(Label)' in source
+          assert 'active.StopLoss.HasValue' in source
+          assert 'active.Symbol.AmountRisked(active.VolumeInUnits,distancePips)' in source
+          assert 'MxmStopRiskAdmission.Check(' in source and 'MxmStopRiskAdmission.Check(' in sim
+          assert 'EnableDemoTrading && !Account.IsLive' in source
+          assert 'DefaultValue=2.0' in source and 'EstimatedRoundTripFrictionReserveEur' in source
+          assert 'ADMIT_STOP_RISK_ESTIMATE_ONLY' in helper and 'REJECT_AGGREGATE_STOP_RISK_EXCESS' in helper
+          assert 'stop_risk_rejections' in sim and 'maxEstimatedStopRiskFraction=0m' in sim
+          assert 'ExecuteMarketOrder(' in source and source.index('MxmStopRiskAdmission.Check(')<source.index('ExecuteMarketOrder(')
+          print('MXM_ACCOUNT_WIDE_STOP_RISK_DEMO_ONLY_NO_SECRET_PASS')
+          PY

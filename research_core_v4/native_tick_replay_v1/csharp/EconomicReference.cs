@@ -19,7 +19,7 @@ sealed class Replay {
  decimal Fx=>scenario?1m/1.10m:1m;
  readonly decimal slippage, commission, extraHalfSpread, margin, maxMarginFraction;
  readonly int stopPips;
- readonly decimal minimumFreeMarginReserve;
+ readonly decimal minimumFreeMarginReserve, maxEstimatedAccountStopRiskFraction, riskFrictionReserve;
  decimal Slippage=>slippage;
  decimal PriceUnits=>1000m;
  decimal ExecutionFriction=>slippage+extraHalfSpread;
@@ -27,14 +27,14 @@ sealed class Replay {
  long lastT=-1,bidAt=-1,askAt=-1,barStart=-1;
  decimal bid,ask,closeOfBar,realized=200m,peak=200m,maxDrawdown=0m,totalCosts=0m;
  int pendingSignal,ambiguousGroups,gapBars,invalidSnapshots,entries,exits;
- int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections,capitalReserveRejections,neutralPolicyExits,horizonPolicyExits;
+ int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections,capitalReserveRejections,stopRiskRejections,neutralPolicyExits,horizonPolicyExits;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false,StrategyMode mode=StrategyMode.Adaptive,
-   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m,ExitMode exitMode=ExitMode.ReverseOnly,decimal minimumFreeMarginReserveEur=0m){
-  if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0 || maxMarginFraction<=0m || maxMarginFraction>1m || minimumFreeMarginReserveEur<0m)throw new ArgumentOutOfRangeException();
+   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m,ExitMode exitMode=ExitMode.ReverseOnly,decimal minimumFreeMarginReserveEur=0m,decimal maxEstimatedStopRiskFraction=0m,decimal estimatedStopRiskFrictionReserveEur=0m){
+  if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0 || maxMarginFraction<=0m || maxMarginFraction>1m || minimumFreeMarginReserveEur<0m || maxEstimatedStopRiskFraction<0m || maxEstimatedStopRiskFraction>1m || estimatedStopRiskFrictionReserveEur<0m)throw new ArgumentOutOfRangeException();
   synthetic=fixture;scenario=modeledScenario;family=mode;exitPolicy=exitMode;BarMs=checked((long)minutes*60000L);
   slippage=slip??(scenario?0.00002m:0.00001m);
-  commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;this.maxMarginFraction=maxMarginFraction;minimumFreeMarginReserve=minimumFreeMarginReserveEur;
+  commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;this.maxMarginFraction=maxMarginFraction;minimumFreeMarginReserve=minimumFreeMarginReserveEur;maxEstimatedAccountStopRiskFraction=maxEstimatedStopRiskFraction;riskFrictionReserve=estimatedStopRiskFrictionReserveEur;
   if(slippage<0||commission<0)throw new ArgumentOutOfRangeException();
   kernel=new MxmDecisionKernel(mode);
  }
@@ -60,6 +60,15 @@ sealed class Replay {
    if(gate=="REJECT_MARGIN_FRACTION")marginHeadroomRejections++;
    else capitalReserveRejections++;
    return;
+  }
+  // Optional pure stop-risk gate for the exact same-account EUR budget law.
+  // The existing research matrices are kept byte-for-byte behavior-identical
+  // when the optional fraction is zero; zero is NOT a product safe default.
+  if(maxEstimatedAccountStopRiskFraction>0m){
+   decimal expectedStopRisk=stopPips>0 ? PriceUnits*stopPips*0.0001m*Fx : 0m;
+   string riskGate=MxmStopRiskAdmission.Check(realized,0m,expectedStopRisk,
+     maxEstimatedAccountStopRiskFraction,riskFrictionReserve,0m);
+   if(riskGate!=MxmStopRiskAdmission.Admit){stopRiskRejections++;return;}
   }
   if(Equity(bid,ask)<margin+commission)return; // fail closed; no invented fill
   decimal price=direction>0?ask+ExecutionFriction:bid-ExecutionFriction;
@@ -190,6 +199,9 @@ sealed class Replay {
      max_margin_fraction_of_free_margin=maxMarginFraction,minimum_free_margin_reserve_eur=minimumFreeMarginReserve,
      max_model_owned_positions=1,account_wide_other_symbols_not_modeled=true,
      actual_cbot_has_nonatomic_account_snapshot=true,other_positions_and_actual_broker_margin_not_verified=true,
+     max_estimated_account_stop_risk_fraction=maxEstimatedAccountStopRiskFraction,
+     estimated_stop_risk_friction_reserve_eur=riskFrictionReserve,
+     simulated_stop_risk_gate_does_not_certify_actual_broker_stop=true,
      original_bid_ask_spread_is_already_in_fill_prices=true,slippage_and_extra_spread_are_already_in_fill_prices=true,
      cost_total_is_diagnostic_including_embedded_execution_friction_not_additional_cash_debit=true},
    price_path_timestamps_are_not_historical_arrival_times=true,
@@ -198,7 +210,7 @@ sealed class Replay {
    terminal_position_exit_is_assumed_not_historical_fill=Simulated,
    initial_equity_eur=200m,final_equity_eur=Simulated?Round(realized):(decimal?)null,
    economic_entries=entries,economic_exits=exits,margin_headroom_rejections=marginHeadroomRejections,
-   capital_reserve_rejections=capitalReserveRejections,charged_cost_eur=Round(totalCosts),
+   capital_reserve_rejections=capitalReserveRejections,stop_risk_rejections=stopRiskRejections,charged_cost_eur=Round(totalCosts),
    maximum_absolute_drawdown_eur=Round(maxDrawdown),modeled_stop_exits=stopTriggeredExits,
    modeled_neutral_exits=neutralPolicyExits,modeled_horizon_exits=horizonPolicyExits,
    // Complete ISO weeks require independent interval-coverage evidence, never infer from four-hour capture.
@@ -243,6 +255,36 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
+   if(args.Length==1 && args[0]=="--stop-risk-fixture"){
+    string Check(decimal eq,decimal existing,decimal proposed,decimal fraction,decimal fee,decimal existingFee)
+     =>MxmStopRiskAdmission.Check(eq,existing,proposed,fraction,fee,existingFee);
+    void Must(string actual,string expected){if(actual!=expected)
+      throw new InvalidDataException("STOP_RISK_FIXTURE_"+actual+"_EXPECTED_"+expected);}
+    Must(Check(200m,0m,1.1m,.02m,.2m,0m),MxmStopRiskAdmission.Admit);
+    Must(Check(200m,0m,4.1m,.02m,.2m,0m),"REJECT_AGGREGATE_STOP_RISK_EXCESS");
+    Must(Check(200m,2.7m,1.1m,.02m,.3m,.2m),"REJECT_AGGREGATE_STOP_RISK_EXCESS");
+    Must(Check(200m,3.9m,.05m,.02m,.1m,.1m),"REJECT_EXISTING_STOP_RISK_EXHAUSTED");
+    Must(Check(200m,0m,0m,.02m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
+    Must(Check(200m,-1m,1m,.02m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
+    Must(Check(200m,0m,1m,0m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
+    Must(Check(200m,0m,1m,1.01m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
+    Must(Check(150m,2m,.9m,.02m,.1m,0m),MxmStopRiskAdmission.Admit);
+    var artificial=Fixture();
+    var baseline=new Replay(false,true,stopLossPips:12,maxEstimatedStopRiskFraction:.02m,
+      estimatedStopRiskFrictionReserveEur:.20m).Run(artificial);
+    using var okDoc=JsonDocument.Parse(JsonSerializer.Serialize(baseline));
+    if(okDoc.RootElement.GetProperty("economic_entries").GetInt32()<1 ||
+       okDoc.RootElement.GetProperty("stop_risk_rejections").GetInt32()!=0)
+     throw new InvalidDataException("STOP_RISK_POSITIVE_ARTIFICIAL_FIXTURE");
+    var rejected=new Replay(false,true,stopLossPips:12,maxEstimatedStopRiskFraction:.005m,
+      estimatedStopRiskFrictionReserveEur:.20m).Run(artificial);
+    using var noDoc=JsonDocument.Parse(JsonSerializer.Serialize(rejected));
+    if(noDoc.RootElement.GetProperty("economic_entries").GetInt32()!=0 ||
+       noDoc.RootElement.GetProperty("stop_risk_rejections").GetInt32()<1)
+     throw new InvalidDataException("STOP_RISK_NEGATIVE_ARTIFICIAL_FIXTURE");
+    Console.WriteLine("{\"status\":\"MXM_STOP_RISK_FULL_ACCOUNT_GATE_FIXTURE_PASS\",\"cases\":11,\"broker_orders\":0}");
+    return 0;
+   }
    if(args.Length==1 && args[0]=="--capital-fixture"){
     // All values in EUR; no broker requests and no market outcomes.
     string Check(decimal eq,decimal free,decimal margin,decimal fee,decimal fraction,decimal reserve,int owned,int cap)
