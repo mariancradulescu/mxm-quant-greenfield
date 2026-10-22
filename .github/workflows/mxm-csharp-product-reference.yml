@@ -1,0 +1,40 @@
+name: MXM CSharp product reference CI
+on:
+  pull_request:
+    branches: [mxm-p0-integrated-cache-successor-20261020, main]
+  workflow_dispatch: {}
+permissions: {contents: read}
+jobs:
+  machine-side-csharp-reference:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify dotnet runner and compile actual CSharp decision kernel and EUR200 harness
+        run: |
+          dotnet --info
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+      - name: Machine-side deterministic account reference (NOT Pepperstone market backtest)
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-reference
+          python3 - <<'PY'
+          import json
+          p='verification/csharp-reference/reference-report.json'
+          r=json.load(open(p))
+          assert r['classification']=='SYNTHETIC_MATHEMATICAL_ONLY'
+          assert r['initial_equity_eur']==200 and r['economic_entries']==r['economic_exits']>=1
+          assert r['charged_cost_eur']>0 and r['maximum_absolute_drawdown_eur']>=0
+          assert r['pepperstone_historical_fills_proven'] is False and r['cTrader_native_backtest'] is False
+          assert len(r['ledger'])==2*r['economic_entries'] and len(r['equity'])>len(r['ledger'])
+          assert r['bar_decisions']>0 and r['hard21'] is False
+          print('CSHARP_MATHEMATICAL_REFERENCE',json.dumps({k:r[k] for k in ('initial_equity_eur','final_equity_eur','economic_entries','economic_exits','charged_cost_eur','maximum_absolute_drawdown_eur','bar_decisions','hard21','classification')},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: csharp-machine-side-reference
+          path: verification/csharp-reference/reference-report.json
+          if-no-files-found: warn
+          retention-days: 30
