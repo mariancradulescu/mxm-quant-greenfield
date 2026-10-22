@@ -193,3 +193,4 @@ public sealed class MxmPortfolioAccountReplay {
    new Dictionary<string,int>(entriesByWeek),trades.ToArray(),rejected.ToArray());
  }
 }
+}
