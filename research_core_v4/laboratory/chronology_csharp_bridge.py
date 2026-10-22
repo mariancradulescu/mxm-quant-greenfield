@@ -48,13 +48,15 @@ def export(cipher_path,output):
                     f.write(encoded({'t':bid[i][0],'side':'bid','raw':bid[i][1]})+b'\n');i+=1
                 while j<len(ask) and ask[j][0]==t:
                     f.write(encoded({'t':ask[j][0],'side':'ask','raw':ask[j][1]})+b'\n');j+=1
-        return {'schema':'mxm.csharp.authenticated-nonoutcome-bridge.v1',
+        receipt={'schema':'mxm.csharp.authenticated-nonoutcome-bridge.v1',
                 'source_run':SOURCE_RUN,'native_source_sha':SOURCE_SHA,
                 'ciphertext_sha256':CIPHER_SHA256,'private_sha256':PRIVATE_SHA256,
                 'derived_ticks_sha256':bytes_digest(out.read_bytes()),
                 'verified_bid_events':len(bid),'verified_ask_events':len(ask),
                 'historical_arrival_proven':False,'historical_costs_proven':False,
                 'orders':0,'economic_outcomes':0,'fills':0}
+        Path(str(out)+'.receipt.json').write_bytes(encoded(receipt))
+        return receipt
 if __name__=='__main__':
     need(len(sys.argv)==3,'CSHARP_EXPORT_ARGUMENTS')
     print('MXM_CSHARP_AUTHENTIC_READONLY '+json.dumps(export(sys.argv[1],sys.argv[2]),sort_keys=True),flush=True)
