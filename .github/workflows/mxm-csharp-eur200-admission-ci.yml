@@ -18,6 +18,22 @@ jobs:
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
           test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+      - name: Validate one serial multi-symbol CSharp portfolio on two artificial streams
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioFixture.csproj -c Release
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          assert 'PortfolioSymbols.Split' in src and 'new MxmPortfolioSequencer(resolved)' in src
+          assert 'series.BarClosed+=OnPortfolioBarClosed' in src
+          assert 'protected override void OnBar() { }' in src
+          assert 'series.ClosePrices.Last(0)' in src
+          assert 'ApplyPortfolioDecision(instrument,instrumentName' in src
+          assert 'Positions.FindAll(Label)' in src
+          assert 'EnableDemoTrading && !Account.IsLive' in src
+          assert 'Portfolio Symbols (comma separated)",DefaultValue=""' in src
+          print('MXM_ONE_BOT_MULTISYMBOL_ACCOUNT_GATE_SYNTHETIC_NO_CLOUD_LOCK_CLAIM_PASS')
+          PY
       - name: Execute account-global cap, dynamic equity, reserve and margin fraction negatives
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --capital-fixture
