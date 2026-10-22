@@ -1,0 +1,111 @@
+name: MXM CSharp authenticated chronology nonoutcome
+on:
+  # Secret-bearing code executes only after standard PR/required-CI merge into the
+  # existing protected execution branch; no bypass or secrets on pull requests.
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-csharp-authentic-cold.yml
+      - research_core_v4/native_tick_replay_v1/csharp/**
+      - research_core_v4/laboratory/chronology_csharp_bridge.py
+  workflow_dispatch: {}
+permissions: {}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  bounded-cold-to-csharp:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: mxm-r3-custody-v1
+    permissions: {contents: read, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Pin independent original Pepperstone source checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
+      - run: |
+          test "$(git -C .sealed-chronology-source rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+      - name: Reuse exact ORIGINAL Pepperstone evidence; zero broker requests
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: r3-chronology-39660692230
+          run-id: 39660692230
+          github-token: ${{ github.token }}
+          path: verification/r3-chronology
+      - name: Decrypt only inside existing protected custody and validate every raw native page
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
+          cd .sealed-chronology-source
+          python3 -m research_core_v4.laboratory.chronology_csharp_bridge "${GITHUB_WORKSPACE}/verification/r3-chronology/capture.mxmenc" "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson"
+      - name: Execute exact CSharp decision kernel on authentically decoded quotes without economic fills
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-nonoutcome "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-output"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'mxm-csharp-output/reference-report.json'
+          r=json.loads(p.read_bytes())
+          assert r['classification']=='AUTHENTIC_CHRONOLOGY_NONOUTCOME_ONLY'
+          assert not r['authenticated_market_corpus'] and r['raw_events']==28212
+          assert r['economic_entries']==r['economic_exits']==0 and r['charged_cost_eur']==0
+          assert r['pepperstone_historical_fills_proven'] is False and r['cTrader_native_backtest'] is False
+          PY
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-scenario "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-scenario"
+          python3 - <<'PY'
+          import json,os,pathlib
+          from research_core_v4.laboratory.common import encoded,bytes_digest,need
+          from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
+          from research_core_v4.successor_c_20261018.readback import FP
+          temp=pathlib.Path(os.environ['RUNNER_TEMP'])
+          bridge=json.loads((temp/'mxm-authentic-ticks.ndjson.receipt.json').read_bytes())
+          stream=temp/'mxm-authentic-ticks.ndjson'
+          need(bridge['source_run']==39660692230 and
+               bridge['verified_bid_events']==14003 and bridge['verified_ask_events']==14209 and
+               bridge['derived_ticks_sha256']==bytes_digest(stream.read_bytes()) and
+               bridge['economic_outcomes']==bridge['orders']==bridge['fills']==0,'CSHARP_BRIDGE_BOUND')
+          p=temp/'mxm-csharp-scenario/reference-report.json'
+          r=json.loads(p.read_bytes())
+          assert r['classification']=='OBSERVED_PEPPERSTONE_QUOTES_ASSUMPTION_SCENARIO_UNCERTIFIED'
+          assert r['raw_events']==28212 and not r['authenticated_market_corpus'] and not r['broker_historical_costs_verified']
+          assert not r['economic_identity_opened'] and not r['historical_execution_fills_proven'] and not r['cTrader_native_backtest']
+          assert r['economic_entries']==r['economic_exits']==len([x for x in r['ledger'] if x['kind']=='ENTRY'])
+          assert r['initial_equity_eur']==200 and r['hard21']==all(x>=21 for x in r['entries_per_iso_week'].values())
+          assert all(x['equity_eur']>=0 for x in r['equity']) or r['economic_entries']==0
+          safe={k:r[k] for k in ('schema','classification','raw_events','bar_decisions','same_ms_conflict_groups','gap_bars','invalid_quote_snapshots','economic_entries','economic_exits','charged_cost_eur','cTrader_native_backtest','pepperstone_historical_fills_proven')}
+          safe.update(orders=0,economic_outcomes=0,full_results_withheld=True,original_source_run=39660692230,
+            scenario_classification=r['classification'],scenario_entries=r['economic_entries'],
+            scenario_exits=r['economic_exits'],scenario_initial_equity_eur=r['initial_equity_eur'],
+            scenario_final_equity_eur=r['final_equity_eur'],scenario_drawdown_eur=r['maximum_absolute_drawdown_eur'],
+            scenario_modeled_costs_eur=r['charged_cost_eur'],scenario_hard21=r['hard21'],
+            scenario_assumption=r['account_convention'],scenario_unverified_fx_margin_swap_and_fills=True,
+            preserved_corpus_sha256=bridge['ciphertext_sha256'],derived_stream_sha256=bridge['derived_ticks_sha256'])
+          out=pathlib.Path('verification/csharp-authentic-aggregate');out.mkdir(parents=True,exist_ok=True)
+          full=encoded({'bridge':bridge,'modeled_reference':r,
+                         'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
+          public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
+          need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')
+          ciphertext=out/'modeled-reference.mxmenc'
+          encrypt_shard(full,public_key=public,output=ciphertext)
+          safe['modeled_ciphertext_sha256']=bytes_digest(ciphertext.read_bytes())
+          safe['modeled_private_sha256']=bytes_digest(full)
+          (out/'receipt.json').write_bytes(encoded(safe))
+          print('MXM_AUTHENTIC_REFERENCE_AGGREGATE',json.dumps(safe,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-authentic-nonoutcome-aggregate
+          path: |
+            verification/csharp-authentic-aggregate/receipt.json
+            verification/csharp-authentic-aggregate/modeled-reference.mxmenc
+          if-no-files-found: error
+          retention-days: 30

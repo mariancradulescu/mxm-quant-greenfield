@@ -1,0 +1,70 @@
+name: MXM CSharp Pepperstone protected gateway CI
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+permissions: {contents: read}
+jobs:
+  shared-catalogue-regression:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Checkout immutable authentic-native decoder and R7 integration source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
+      - name: Bind immutable decoder and run its existing regression suite
+        run: |
+          test "$(git -C .sealed-chronology-source rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
+          python3 -m pip install --only-binary=:all: --require-hashes -r .sealed-chronology-source/research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          (cd .sealed-chronology-source && python3 - <<'PY'
+          import pathlib,unittest
+          names=sorted(str(p.with_suffix('')).replace('/','.') for p in pathlib.Path('research_core_v4/laboratory').glob('test_*.py'))
+          names+=['tests.test_continuous_account_replay_v2']
+          r=unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.loadTestsFromNames(names))
+          raise SystemExit(not r.wasSuccessful())
+          PY
+          )
+      - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+      - name: Real machine-side account paths on two known artificial regimes; provenance never promoted
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-reference
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --model-fixture unused verification/csharp-modeled-fixture
+          python3 - <<'PY'
+          import json
+          from decimal import Decimal as D
+          a=json.load(open('verification/csharp-reference/reference-report.json'))
+          b=json.load(open('verification/csharp-modeled-fixture/reference-report.json'))
+          assert a['classification']=='SYNTHETIC_MATHEMATICAL_ONLY'
+          assert b['classification']=='ARTIFICIAL_SCENARIO_COST_FX_TEST_ONLY'
+          assert a['economic_entries']==a['economic_exits']==b['economic_entries']==b['economic_exits']==7
+          for x in (a,b):
+              assert x['initial_equity_eur']==200 and not x['authenticated_market_corpus'] and not x['cTrader_native_backtest']
+              assert not x['pepperstone_historical_fills_proven'] and not x['economic_identity_opened']
+              gross=sum(D(str(z['gross_price_pnl_eur'])) for z in x['ledger'] if z['kind']=='EXIT')
+              net=D('200')+gross-D('0.2')*x['economic_entries']
+              assert abs(net-D(str(x['final_equity_eur'])))<D('.00001')
+              assert not x['hard21'] and x['entries_per_iso_week']=={'2025-W02':7}
+          assert a['final_equity_eur']==201.27 and b['final_equity_eur']==200.90
+          print('MXM_CSHARP_EXEC_GATE_PASS_REAL_BINARY_SYNTHETIC_QUOTES_ONLY')
+          PY
+      - name: Verify gateway never carries secrets in pull request jobs
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          w=pathlib.Path('.github/workflows/mxm-csharp-authentic-cold.yml').read_text()
+          assert 'environment: mxm-r3-custody-v1' in w
+          assert "refs/heads/mxm-remediation-p0-p4-20261015-v1" in w
+          assert 'push:' in w and 'pull_request:' not in w and 'pull_request_target:' not in w
+          assert 'd2fae5641b759b1c8c24161d83d62d39e104eafd' in w
+          assert 'secrets.R3_CUSTODY_PRIVATE_KEY_PEM' in w
+          print('GATEWAY_PROTECTED_EXEC_ONLY_NO_PR_KEY')
+          PY
