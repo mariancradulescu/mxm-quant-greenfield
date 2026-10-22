@@ -12,6 +12,7 @@ sealed class Position {
 sealed class Replay {
  readonly long BarMs;
  readonly StrategyMode family;
+ readonly ExitMode exitPolicy;
  readonly MxmDecisionKernel kernel;
  readonly bool synthetic,scenario;
  bool Simulated=>synthetic||scenario;
@@ -25,12 +26,12 @@ sealed class Replay {
  long lastT=-1,bidAt=-1,askAt=-1,barStart=-1;
  decimal bid,ask,closeOfBar,realized=200m,peak=200m,maxDrawdown=0m,totalCosts=0m;
  int pendingSignal,ambiguousGroups,gapBars,invalidSnapshots,entries,exits;
- int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections;
+ int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections,neutralPolicyExits,horizonPolicyExits;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false,StrategyMode mode=StrategyMode.Adaptive,
-   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m){
+   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m,ExitMode exitMode=ExitMode.ReverseOnly){
   if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0 || maxMarginFraction<=0m || maxMarginFraction>1m)throw new ArgumentOutOfRangeException();
-  synthetic=fixture;scenario=modeledScenario;family=mode;BarMs=checked((long)minutes*60000L);
+  synthetic=fixture;scenario=modeledScenario;family=mode;exitPolicy=exitMode;BarMs=checked((long)minutes*60000L);
   slippage=slip??(scenario?0.00002m:0.00001m);
   commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;this.maxMarginFraction=maxMarginFraction;
   if(slippage<0||commission<0)throw new ArgumentOutOfRangeException();
@@ -119,9 +120,12 @@ sealed class Replay {
    // These are last-observed sides, not a historical arrival-time certification.
    if(t-bidAt>300000||t-askAt>300000){invalidSnapshots++;staleSnapshots++;continue;}
    long bar=t/BarMs*BarMs;
-   if(barStart>=0 && bar!=barStart) {
+   bool barChanged=bar!=barStart;
+   bool contiguousDecision=false;
+   if(barStart>=0 && barChanged) {
     if(bar==barStart+BarMs){
      pendingSignal=kernel.OnCompletedBar(closeOfBar);
+     contiguousDecision=true;
      signals.Add(new{decision_ms=bar,completed_bar_end_ms=bar,completed_close=Round(closeOfBar),direction=pendingSignal});
     }else{
      gapBars+=(int)Math.Min(1000000,(bar-barStart)/BarMs-1);
@@ -141,6 +145,13 @@ sealed class Replay {
       Close(t,"STOP_QUOTE_MODEL");stopTriggeredExits++;stopped=true;
     }
     if(stopped)pendingSignal=0; // no optimistic same-event re-entry after stop
+    if(!stopped && pos is not null && barChanged &&
+       ((exitPolicy==ExitMode.NeutralFlat && contiguousDecision && pendingSignal==0) ||
+        (exitPolicy==ExitMode.Horizon12 && t-pos.OpenT>=BarMs*12L))){
+      if(exitPolicy==ExitMode.NeutralFlat){Close(t,"NEUTRAL_POLICY_EXIT");neutralPolicyExits++;}
+      else {Close(t,"HORIZON12_POLICY_EXIT");horizonPolicyExits++;}
+      pendingSignal=0;stopped=true; // never reopen at same market event
+    }
     if(!stopped && pendingSignal!=0){
      if(pos is not null && pos.Direction!=pendingSignal)Close(t);
      if(pos is null)Open(t,pendingSignal);
@@ -167,6 +178,7 @@ sealed class Replay {
      fx_eur_per_usd=Round(Fx),commission_eur_per_side=commission,slippage_price_units=Slippage,
      extra_spread_price_units=extraHalfSpread*2m,margin_eur=margin,financing_eur=0m,
      quote_stop_loss_pips=stopPips,observed_quote_stop_fill_not_broker_certified=true,
+     exit_policy=exitPolicy.ToString(),horizon_policy_bars=exitPolicy==ExitMode.Horizon12?12:0,
      max_margin_fraction_of_free_margin=maxMarginFraction,other_positions_and_actual_broker_margin_not_verified=true,
      original_bid_ask_spread_is_already_in_fill_prices=true,slippage_and_extra_spread_are_already_in_fill_prices=true,
      cost_total_is_diagnostic_including_embedded_execution_friction_not_additional_cash_debit=true},
@@ -177,6 +189,7 @@ sealed class Replay {
    initial_equity_eur=200m,final_equity_eur=Simulated?Round(realized):(decimal?)null,
    economic_entries=entries,economic_exits=exits,margin_headroom_rejections=marginHeadroomRejections,charged_cost_eur=Round(totalCosts),
    maximum_absolute_drawdown_eur=Round(maxDrawdown),modeled_stop_exits=stopTriggeredExits,
+   modeled_neutral_exits=neutralPolicyExits,modeled_horizon_exits=horizonPolicyExits,
    // Complete ISO weeks require independent interval-coverage evidence, never infer from four-hour capture.
    hard21=false,full_iso_weeks_evaluated=0,entries_per_iso_week=Simulated?WeekCounts(ticks):new Dictionary<string,int>(),
    raw_events=ticks.Count,bar_decisions=signals.Count,
