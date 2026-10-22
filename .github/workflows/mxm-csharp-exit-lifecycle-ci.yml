@@ -17,7 +17,7 @@ jobs:
       - name: Compile cTrader product and executable reference with exact shared CSharp kernel
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
-          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
       - name: Verify three exit policies on mathematical fixture only, no broker credentials
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --exit-fixture unused verification/csharp-exit-fixture
