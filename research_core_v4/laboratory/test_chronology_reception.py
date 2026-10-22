@@ -38,6 +38,33 @@ class ChronologyReceptionTests(unittest.TestCase):
         from research_core_v4.shallow_m5_support_v2_production import ACCOUNT_FINGERPRINT_SHA256
         with patch('research_core_v4.shallow_m5_support_v2_production._fingerprint',return_value=ACCOUNT_FINGERPRINT_SHA256):
             return c.replay(private)
+    def test_quote_update_gaps_count_edges_and_same_ms_revisions(self):
+        rows=[(1000,11),(1000,12),(7000,13),(71001,14)]
+        r=c.quote_update_gap_witness(rows,0,100000)
+        self.assertEqual(r['quote_updates'],4)
+        self.assertEqual(r['distinct_update_ms'],3)
+        self.assertEqual(r['longest_no_update_interval_ms'],64001)
+        self.assertEqual(r['intervals_over_5s'],3)
+        self.assertEqual(r['intervals_over_60s'],1)
+        self.assertEqual(r['first_update_delay_ms'],1000)
+        self.assertEqual(r['last_update_to_window_end_ms'],28999)
+        self.assertIn('NOT_MARKET_CLOSURE',r['semantics'])
+    def test_missing_side_or_invalid_sequence_never_fabricates_coverage(self):
+        r=c.quote_update_gap_witness([],0,100000)
+        self.assertEqual(r['quote_updates'],0)
+        self.assertEqual(r['longest_no_update_interval_ms'],100000)
+        self.assertIsNone(r['first_update_delay_ms'])
+        self.assertIsNone(r['last_update_to_window_end_ms'])
+        for rows in ([(5,1),(4,1)],[(100000,1)]):
+            with self.assertRaises(LabError):c.quote_update_gap_witness(rows,0,100000)
+    def test_quote_gap_witness_never_certifies_economic_fidelity(self):
+        r=self.replay(fixture())
+        self.assertEqual(r['quote_update_gaps']['BID']['quote_updates'],1)
+        self.assertEqual(r['quote_update_gaps']['ASK']['quote_updates'],1)
+        self.assertGreater(r['quote_update_gaps']['BID']['longest_no_update_interval_ms'],60000)
+        self.assertFalse(r['continuous_market_coverage_proven'])
+        self.assertFalse(r['economic_fidelity_accepted'])
+        self.assertEqual(r['economic_outcomes'],0)
     def test_complete_fixture_preserves_order_ambiguity_and_does_not_certify_economics(self):
         r=self.replay(fixture());self.assertTrue(r['provider_window_complete'])
         self.assertEqual(r['chronological_events_processed'],2);self.assertEqual(r['same_ms_cross_side_order_unknown'],1)
