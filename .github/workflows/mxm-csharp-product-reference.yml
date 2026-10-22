@@ -16,6 +16,10 @@ jobs:
         run: |
           dotnet --info
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+      - name: Compile cloud-facing cBot with same CSharp kernel; do not run or deploy
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+          find research_core_v4/native_tick_replay_v1/csharp/bin -name '*.algo' -print -quit | grep -q .
       - name: Machine-side deterministic account reference (NOT Pepperstone market backtest)
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --fixture unused verification/csharp-reference
