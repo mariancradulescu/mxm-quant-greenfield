@@ -5,6 +5,8 @@ on:
     paths:
       - docs/economic-development/20261022/STOP_RISK_CAPACITY_BIDASK_READBACK_V1.json
       - .github/workflows/mxm-csharp-stop-risk-capacity-readback-ci.yml
+      - research_core_v4/native_tick_replay_v1/csharp/verify_stop_risk_capacity_receipt.py
+      - research_core_v4/native_tick_replay_v1/csharp/test_stop_risk_capacity_receipt.py
 permissions: {contents: read}
 jobs:
   exact-native-source-and-no-promotion:
@@ -39,3 +41,7 @@ jobs:
           assert a['research_disposition']=='NO_PROMOTION_NO_EXECUTABLE_EDGE'
           print('MXM_EXPOSED_STOP_RISK_CAPACITY_DURABLE_READBACK_PASS')
           PY
+      - name: Independently reject mutated risk-capacity receipts and fake HARD21/promotions
+        run: |
+          python3 research_core_v4/native_tick_replay_v1/csharp/verify_stop_risk_capacity_receipt.py
+          python3 research_core_v4/native_tick_replay_v1/csharp/test_stop_risk_capacity_receipt.py -v
