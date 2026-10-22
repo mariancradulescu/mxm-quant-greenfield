@@ -9,12 +9,15 @@ namespace cAlgo.Robots {
 public sealed class MxmReferenceProductBot : Robot {
  const string Label="MXM_CSHARP_REFERENCE_V1";
  MxmDecisionKernel kernel=new();
+ ExitMode exitMode=ExitMode.ReverseOnly;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
  public bool EnableDemoTrading {get;set;}
  [Parameter("Stop Loss Pips",DefaultValue=12,MinValue=1)]
  public int StopLossPips {get;set;}
  [Parameter("Regime Family",DefaultValue="Adaptive")]
  public string RegimeFamily {get;set;}="Adaptive";
+ [Parameter("Exit Mode",DefaultValue="ReverseOnly")]
+ public string ExitPolicy {get;set;}="ReverseOnly";
  [Parameter("Bar Minutes",DefaultValue=5,MinValue=1)]
  public int BarMinutes {get;set;}
  [Parameter("Max Margin Fraction",DefaultValue=0.4,MinValue=0.1,MaxValue=1.0)]
@@ -24,6 +27,9 @@ public sealed class MxmReferenceProductBot : Robot {
  protected override void OnStart() {
   if(!Enum.TryParse<StrategyMode>(RegimeFamily,true,out var mode)){
    Print("MXM_UNKNOWN_FAMILY_SAFE_HOLD");Stop();return;
+  }
+  if(!Enum.TryParse<ExitMode>(ExitPolicy,true,out exitMode)){
+   Print("MXM_INVALID_EXIT_MODE_SAFE_HOLD");Stop();return;
   }
   bool supported=(BarMinutes==1 && TimeFrame==cAlgo.API.TimeFrame.Minute) ||
    (BarMinutes==5 && TimeFrame==cAlgo.API.TimeFrame.Minute5) ||
@@ -40,19 +46,34 @@ public sealed class MxmReferenceProductBot : Robot {
  protected override void OnBar() {
   // OnBar has the just-opened live bar at Last(0), so Last(1) is unambiguously closed.
   if(Bars.Count<3)return;
-  if((Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes!=BarMinutes)kernel.Reset();
+  bool contiguous=(Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes==BarMinutes;
+  if(!contiguous)kernel.Reset();
   int desired=kernel.OnCompletedBar((decimal)Bars.ClosePrices.Last(1));
   // Backtesting is simulation; realtime LIVE trading is never authorized.
   bool simulation=IsBacktesting;
-  if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || desired==0 || !Symbol.MarketHours.IsOpened())return;
+  if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || !Symbol.MarketHours.IsOpened())return;
   var owned=Positions.FindAll(Label,SymbolName);
   if(owned.Length>1){Print("MXM_MULTIPLE_POSITIONS_SAFE_HOLD");return;}
   TradeType direction=desired>0?TradeType.Buy:TradeType.Sell;
   if(owned.Length==1){
-   if(owned[0].TradeType==direction)return;
-   var result=ClosePosition(owned[0]);
+   var current=owned[0];
+   // A neutral signal has no broker order unless this specific exit policy is selected.
+   // A discontinuity is never reinterpreted as a valid causal neutral exit.
+   bool neutralExit=contiguous && exitMode==ExitMode.NeutralFlat && desired==0;
+   // Age measured against the existing position's actual broker entry time.
+   bool horizonExit=exitMode==ExitMode.Horizon12 &&
+     (Bars.OpenTimes.Last(0)-current.EntryTime).TotalMinutes>=12*BarMinutes;
+   if(neutralExit || horizonExit){
+    var closed=ClosePosition(current);
+    if(!closed.IsSuccessful)Print("MXM_POLICY_EXIT_FAILED_SAFE_HOLD");
+    return; // Never manufacture a same-bar entry after a discretionary exit.
+   }
+   if(desired==0)return;
+   if(current.TradeType==direction)return;
+   var result=ClosePosition(current);
    if(!result.IsSuccessful){Print("MXM_CLOSE_FAILED_SAFE_HOLD");return;}
   }
+  if(desired==0)return;
   // Inspect actual broker minimum/step/margin; do not assume EUR200 volume feasibility.
   if(Account.Equity<=0||Account.FreeMargin<=0||Account.Asset.Name!="EUR")return;
   double units=Symbol.NormalizeVolumeInUnits(Math.Max(RequestedUnits,Symbol.VolumeInUnitsMin),RoundingMode.Up);

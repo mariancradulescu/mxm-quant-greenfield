@@ -5,6 +5,8 @@ namespace Mxm.Replay {
 /// Regime classification uses ONLY six already completed bars. No retrospective fitting,
 /// external data, Python signal authority, platform calls or mutable cloud resources.</summary>
 public enum StrategyMode { Adaptive, TrendOnly, RangeFade, Breakout }
+/// <summary>Prospective exit management hypotheses. Defaults preserve the original behavior.</summary>
+public enum ExitMode { ReverseOnly, NeutralFlat, Horizon12 }
 public sealed class MxmDecisionKernel {
  readonly StrategyMode family;
  public MxmDecisionKernel(StrategyMode mode=StrategyMode.Adaptive){family=mode;}

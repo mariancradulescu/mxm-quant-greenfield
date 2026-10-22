@@ -12,6 +12,7 @@ sealed class Position {
 sealed class Replay {
  readonly long BarMs;
  readonly StrategyMode family;
+ readonly ExitMode exitPolicy;
  readonly MxmDecisionKernel kernel;
  readonly bool synthetic,scenario;
  bool Simulated=>synthetic||scenario;
@@ -25,12 +26,12 @@ sealed class Replay {
  long lastT=-1,bidAt=-1,askAt=-1,barStart=-1;
  decimal bid,ask,closeOfBar,realized=200m,peak=200m,maxDrawdown=0m,totalCosts=0m;
  int pendingSignal,ambiguousGroups,gapBars,invalidSnapshots,entries,exits;
- int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections;
+ int missingSideSnapshots,crossedSnapshots,staleSnapshots,zeroSpreadSnapshots,crossSideSameMsGroups,stopTriggeredExits,marginHeadroomRejections,neutralPolicyExits,horizonPolicyExits;
  Position? pos;
  public Replay(bool fixture,bool modeledScenario=false,StrategyMode mode=StrategyMode.Adaptive,
-   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m){
+   int minutes=5,decimal? slip=null,decimal? fee=null,decimal extraSpread=0m,decimal marginEur=50m,int stopLossPips=0,decimal maxMarginFraction=0.4m,ExitMode exitMode=ExitMode.ReverseOnly){
   if(minutes<1 || marginEur<=0m || extraSpread<0m || stopLossPips<0 || maxMarginFraction<=0m || maxMarginFraction>1m)throw new ArgumentOutOfRangeException();
-  synthetic=fixture;scenario=modeledScenario;family=mode;BarMs=checked((long)minutes*60000L);
+  synthetic=fixture;scenario=modeledScenario;family=mode;exitPolicy=exitMode;BarMs=checked((long)minutes*60000L);
   slippage=slip??(scenario?0.00002m:0.00001m);
   commission=fee??0.10m;extraHalfSpread=extraSpread/2m;margin=marginEur;stopPips=stopLossPips;this.maxMarginFraction=maxMarginFraction;
   if(slippage<0||commission<0)throw new ArgumentOutOfRangeException();
@@ -119,9 +120,12 @@ sealed class Replay {
    // These are last-observed sides, not a historical arrival-time certification.
    if(t-bidAt>300000||t-askAt>300000){invalidSnapshots++;staleSnapshots++;continue;}
    long bar=t/BarMs*BarMs;
-   if(barStart>=0 && bar!=barStart) {
+   bool barChanged=bar!=barStart;
+   bool contiguousDecision=false;
+   if(barStart>=0 && barChanged) {
     if(bar==barStart+BarMs){
      pendingSignal=kernel.OnCompletedBar(closeOfBar);
+     contiguousDecision=true;
      signals.Add(new{decision_ms=bar,completed_bar_end_ms=bar,completed_close=Round(closeOfBar),direction=pendingSignal});
     }else{
      gapBars+=(int)Math.Min(1000000,(bar-barStart)/BarMs-1);
@@ -141,6 +145,13 @@ sealed class Replay {
       Close(t,"STOP_QUOTE_MODEL");stopTriggeredExits++;stopped=true;
     }
     if(stopped)pendingSignal=0; // no optimistic same-event re-entry after stop
+    if(!stopped && pos is not null && barChanged &&
+       ((exitPolicy==ExitMode.NeutralFlat && contiguousDecision && pendingSignal==0) ||
+        (exitPolicy==ExitMode.Horizon12 && t-pos.OpenT>=BarMs*12L))){
+      if(exitPolicy==ExitMode.NeutralFlat){Close(t,"NEUTRAL_POLICY_EXIT");neutralPolicyExits++;}
+      else {Close(t,"HORIZON12_POLICY_EXIT");horizonPolicyExits++;}
+      pendingSignal=0;stopped=true; // never reopen at same market event
+    }
     if(!stopped && pendingSignal!=0){
      if(pos is not null && pos.Direction!=pendingSignal)Close(t);
      if(pos is null)Open(t,pendingSignal);
@@ -167,6 +178,7 @@ sealed class Replay {
      fx_eur_per_usd=Round(Fx),commission_eur_per_side=commission,slippage_price_units=Slippage,
      extra_spread_price_units=extraHalfSpread*2m,margin_eur=margin,financing_eur=0m,
      quote_stop_loss_pips=stopPips,observed_quote_stop_fill_not_broker_certified=true,
+     exit_policy=exitPolicy.ToString(),horizon_policy_bars=exitPolicy==ExitMode.Horizon12?12:0,
      max_margin_fraction_of_free_margin=maxMarginFraction,other_positions_and_actual_broker_margin_not_verified=true,
      original_bid_ask_spread_is_already_in_fill_prices=true,slippage_and_extra_spread_are_already_in_fill_prices=true,
      cost_total_is_diagnostic_including_embedded_execution_friction_not_additional_cash_debit=true},
@@ -177,6 +189,7 @@ sealed class Replay {
    initial_equity_eur=200m,final_equity_eur=Simulated?Round(realized):(decimal?)null,
    economic_entries=entries,economic_exits=exits,margin_headroom_rejections=marginHeadroomRejections,charged_cost_eur=Round(totalCosts),
    maximum_absolute_drawdown_eur=Round(maxDrawdown),modeled_stop_exits=stopTriggeredExits,
+   modeled_neutral_exits=neutralPolicyExits,modeled_horizon_exits=horizonPolicyExits,
    // Complete ISO weeks require independent interval-coverage evidence, never infer from four-hour capture.
    hard21=false,full_iso_weeks_evaluated=0,entries_per_iso_week=Simulated?WeekCounts(ticks):new Dictionary<string,int>(),
    raw_events=ticks.Count,bar_decisions=signals.Count,
@@ -219,11 +232,56 @@ static class Program {
  }
  public static int Main(string[] args){
   try {
-   if(args.Length!=3 || !(args[0]=="--fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--model-fixture"||args[0]=="--authentic-nonoutcome"||args[0]=="--authentic-scenario"||args[0]=="--authentic-research"||args[0]=="--research-fixture"))
+   if(args.Length!=3 || !(args[0]=="--fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--model-fixture"||args[0]=="--authentic-nonoutcome"||args[0]=="--authentic-scenario"||args[0]=="--authentic-research"||args[0]=="--research-fixture"||args[0]=="--exit-research"||args[0]=="--exit-fixture"))
     throw new ArgumentException("USAGE: --fixture unused OUT | --model-fixture unused OUT | --authentic-nonoutcome INPUT.ndjson OUT | --authentic-scenario INPUT.ndjson OUT");
-   bool fixture=args[0]=="--fixture"||args[0]=="--model-fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--research-fixture";
+   bool fixture=args[0]=="--fixture"||args[0]=="--model-fixture"||args[0]=="--zero-spread-fixture"||args[0]=="--research-fixture"||args[0]=="--exit-fixture";
    if(!fixture && !File.Exists(args[1]))throw new FileNotFoundException("AUTHENTIC_INPUT_REQUIRED");
    var ticks=fixture?(args[0]=="--zero-spread-fixture"?ZeroSpreadFixture():Fixture()):Read(args[1]);
+   if(args[0]=="--exit-research"||args[0]=="--exit-fixture"){
+    // One preregistered, finite exit-policy sensitivity on an already exposed source.
+    // NEVER infer independent selection, actual fills, cost authority or HARD21.
+    var models=new List<object>();
+    var modes=new[]{ExitMode.ReverseOnly,ExitMode.NeutralFlat,ExitMode.Horizon12};
+    var families=new[]{StrategyMode.Adaptive,StrategyMode.TrendOnly,StrategyMode.RangeFade,StrategyMode.Breakout};
+    var frames=new[]{1,5,15};
+    var stops=new[]{0,12};
+    var cases=new[]{
+      new {name="LOW_UNVERIFIED",slip=0.00002m,fee=0.10m,spread=0.00002m,margin=50m},
+      new {name="BASE_UNVERIFIED",slip=0.00005m,fee=0.20m,spread=0.00004m,margin=90m},
+      new {name="STRESS_UNVERIFIED",slip=0.00010m,fee=0.40m,spread=0.00010m,margin=150m}};
+    foreach(var family in families)foreach(var tf in frames)
+     foreach(var cost in cases)foreach(var stop in stops)foreach(var exit in modes){
+      var outcome=new Replay(false,true,family,tf,cost.slip,cost.fee,cost.spread,cost.margin,stop,0.8m,exit).Run(ticks);
+      using var json=JsonDocument.Parse(JsonSerializer.Serialize(outcome));var j=json.RootElement;
+      models.Add(new {
+       family=family.ToString(),timeframe_minutes=tf,cost_case=cost.name,
+       stop_loss_pips=stop,exit_policy=exit.ToString(),margin_fraction=0.8m,
+       assumed_margin_eur=cost.margin,charged_fee_each_side_eur=cost.fee,
+       initial_equity_eur=200m,final_equity_eur=j.GetProperty("final_equity_eur").GetDecimal(),
+       modeled_entries=j.GetProperty("economic_entries").GetInt32(),
+       modeled_exits=j.GetProperty("economic_exits").GetInt32(),
+       modeled_neutral_exits=j.GetProperty("modeled_neutral_exits").GetInt32(),
+       modeled_horizon_exits=j.GetProperty("modeled_horizon_exits").GetInt32(),
+       modeled_stop_exits=j.GetProperty("modeled_stop_exits").GetInt32(),
+       margin_rejections=j.GetProperty("margin_headroom_rejections").GetInt32(),
+       max_drawdown_eur=j.GetProperty("maximum_absolute_drawdown_eur").GetDecimal(),
+       hypothetical_total_friction_eur=j.GetProperty("charged_cost_eur").GetDecimal(),
+       causal_signals=j.GetProperty("bar_decisions").GetInt32()
+      });
+    }
+    Directory.CreateDirectory(args[2]);
+    var full=new {schema="mxm.csharp.exposed-quote-exit-lifecycle-sensitivity.v1",
+     classification=args[0]=="--exit-fixture"?"ARTIFICIAL_QUOTES_ONLY":"REUSED_AUTHENTIC_QUOTES_DEVELOPMENT_EXPOSED_NO_SELECTION",
+     existing_source_reused_with_no_independent_confirmation=true,
+     model_leaves=models.Count,underlying_source_events=ticks.Count,complete_iso_utc_weeks=0,
+     no_broker_historical_cost_margin_liquidity_fx_authority=true,
+     no_portfolio_robustness_or_hard21_claim=true,orders=0,selected_candidate=false,
+     individual_model_results=models};
+    File.WriteAllText(Path.Combine(args[2],"exit-lifecycle.json"),JsonSerializer.Serialize(full,new JsonSerializerOptions{WriteIndented=true}));
+    Console.WriteLine(JsonSerializer.Serialize(new {status="MXM_EXIT_LIFECYCLE_MODEL_EXPOSURE",
+     models=models.Count,classification=full.classification,orders=0}));
+    return 0;
+   }
    if(args[0]=="--authentic-research"||args[0]=="--research-fixture"){
     var matrix=new List<object>(); var families=new[]{StrategyMode.Adaptive,StrategyMode.TrendOnly,StrategyMode.RangeFade,StrategyMode.Breakout};
     var frames=new[]{1,5,15};
