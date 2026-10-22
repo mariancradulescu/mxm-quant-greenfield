@@ -1,0 +1,125 @@
+name: MXM CSharp authenticated entire-position lifecycle sensitivity
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-csharp-exit-lifecycle-cold.yml
+      - research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmDecisionKernel.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs
+      - research_core_v4/native_tick_replay_v1/csharp/EXIT_LIFECYCLE_FINITE_DEVELOPMENT_V1.json
+  workflow_dispatch: {}
+permissions: {}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  native-csharp-exit-sensitivity:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    permissions: {contents: read, actions: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Checkout sealed native chronology source, unmodified original
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
+      - name: Preflight original provenance and pinned CSharp compiler
+        run: |
+          test "$(git -C .sealed-chronology-source rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+      - name: Reuse original Pepperstone native ciphertext, without connecting broker
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: r3-chronology-39660692230
+          run-id: 39660692230
+          github-token: ${{ github.token }}
+          path: verification/r3-chronology
+      - name: Decrypt original native evidence only in pre-existing protected environment
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
+          cd .sealed-chronology-source
+          python3 -m research_core_v4.laboratory.chronology_csharp_bridge "${GITHUB_WORKSPACE}/verification/r3-chronology/capture.mxmenc" "${RUNNER_TEMP}/mxm-exit-authentic-quotes.ndjson"
+      - name: Compare preregistered full lifecycle policies on same original quotes
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --exit-research "${RUNNER_TEMP}/mxm-exit-authentic-quotes.ndjson" "${RUNNER_TEMP}/mxm-exit-authentic-result"
+          python3 - <<'PY'
+          import json,os,pathlib,collections
+          from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
+          from research_core_v4.successor_c_20261018.readback import FP
+          from research_core_v4.laboratory.common import encoded,bytes_digest,need
+          temp=pathlib.Path(os.environ['RUNNER_TEMP'])
+          quote=temp/'mxm-exit-authentic-quotes.ndjson'
+          bridge=json.loads(pathlib.Path(str(quote)+'.receipt.json').read_bytes())
+          need(bridge['source_run']==39660692230 and bridge['verified_bid_events']==14003 and
+               bridge['verified_ask_events']==14209 and bridge['derived_ticks_sha256']==bytes_digest(quote.read_bytes())
+               and bridge['economic_outcomes']==bridge['fills']==bridge['orders']==0,
+               'CSHARP_EXIT_NATIVE_SOURCE_FAIL')
+          result=json.loads((temp/'mxm-exit-authentic-result/exit-lifecycle.json').read_bytes())
+          models=result['individual_model_results']
+          need(result['schema']=='mxm.csharp.exposed-quote-exit-lifecycle-sensitivity.v1' and
+               result['classification']=='REUSED_AUTHENTIC_QUOTES_DEVELOPMENT_EXPOSED_NO_SELECTION' and
+               result['model_leaves']==len(models)==216 and result['underlying_source_events']==28212 and
+               result['orders']==0 and not result['selected_candidate'] and
+               result['complete_iso_utc_weeks']==0 and
+               result['existing_source_reused_with_no_independent_confirmation'],
+               'CSHARP_EXIT_SCOPE_FAIL')
+          need({z['exit_policy'] for z in models}=={'ReverseOnly','NeutralFlat','Horizon12'} and
+               {z['family'] for z in models}=={'Adaptive','TrendOnly','RangeFade','Breakout'} and
+               {z['timeframe_minutes'] for z in models}=={1,5,15} and
+               {z['stop_loss_pips'] for z in models}=={0,12} and
+               {z['cost_case'] for z in models}=={'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'},
+               'CSHARP_EXIT_DESIGN_DRIFT')
+          for z in models:
+              need(z['initial_equity_eur']==200 and z['modeled_entries']==z['modeled_exits'] and
+                   z['modeled_neutral_exits']+z['modeled_horizon_exits']+z['modeled_stop_exits']<=z['modeled_exits'],
+                   'CSHARP_EXIT_ACCOUNT_LEDGER')
+          need(all(z['modeled_neutral_exits']==0 for z in models if z['exit_policy']!='NeutralFlat') and
+               all(z['modeled_horizon_exits']==0 for z in models if z['exit_policy']!='Horizon12'),
+               'CSHARP_EXIT_LIFECYCLE_ISOLATION')
+          spec=json.loads(pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EXIT_LIFECYCLE_FINITE_DEVELOPMENT_V1.json').read_bytes())
+          need(spec['scientific_accounting']['dependent_counterfactual_model_leaves']==216 and
+               spec['scientific_accounting']['source_is_development_exposed'] and
+               not spec['scientific_accounting']['confirmation_opened'],'CSHARP_EXIT_PRECOMMIT')
+          out=pathlib.Path('verification/csharp-exit-lifecycle-authentic');out.mkdir(parents=True,exist_ok=True)
+          public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
+          need(public_spki_sha256(public)==FP,'CSHARP_EXIT_RECIPIENT')
+          ciphertext=out/'exposed-exit-lifecycle.mxmenc'
+          encrypt_shard(encoded({'original_quote_bridge':bridge,'complete_development_exit_comparison':result}),
+              public_key=public,output=ciphertext)
+          safe={'schema':'mxm.csharp.exit-lifecycle-exploratory-aggregate.v1',
+             'source_run':39660692230,'native_bid_events':14003,'native_ask_events':14209,
+             'dependent_model_leaves':216,'precommitted_exit_policies':['ReverseOnly','NeutralFlat','Horizon12'],
+             'historical_fee_margin_swap_fx_authority':False,'independent_confirmation':False,
+             'same_original_quote_window_development_exposed':True,'historical_broker_orders':0,
+             'is_native_ctrader_fill_replay':False,'full_iso_utc_weeks':0,'hard21':False,
+             'selected_candidate':False,'eur200_final_validated_live_balance':None,
+             'artifact_ciphertext_sha256':bytes_digest(ciphertext.read_bytes()),
+             'modeled_M5_comparison':[{'family':z['family'],'cost_case':z['cost_case'],
+                'policy':z['exit_policy'],'stop_pips':z['stop_loss_pips'],
+                'entries':z['modeled_entries'],'neutral_exits':z['modeled_neutral_exits'],
+                'horizon_exits':z['modeled_horizon_exits'],'stops':z['modeled_stop_exits'],
+                'final_simulated_eur':z['final_equity_eur'],
+                'modeled_drawdown_eur':z['max_drawdown_eur']}
+                for z in models if z['timeframe_minutes']==5]}
+          (out/'receipt.json').write_bytes(encoded(safe))
+          print('MXM_CSHARP_AUTHENTIC_EXIT_LIFECYCLE_AGGREGATE',json.dumps(safe,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-authentic-exit-lifecycle-exposed
+          path: |
+            verification/csharp-exit-lifecycle-authentic/receipt.json
+            verification/csharp-exit-lifecycle-authentic/exposed-exit-lifecycle.mxmenc
+          if-no-files-found: error
+          retention-days: 30
