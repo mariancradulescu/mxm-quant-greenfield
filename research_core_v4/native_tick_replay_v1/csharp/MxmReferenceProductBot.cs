@@ -8,17 +8,26 @@ namespace cAlgo.Robots {
 [Robot(TimeZone=TimeZones.UTC,AccessRights=AccessRights.None)]
 public sealed class MxmReferenceProductBot : Robot {
  const string Label="MXM_CSHARP_REFERENCE_V1";
- readonly MxmDecisionKernel kernel=new();
+ MxmDecisionKernel kernel=new();
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
  public bool EnableDemoTrading {get;set;}
  [Parameter("Stop Loss Pips",DefaultValue=12,MinValue=1)]
  public int StopLossPips {get;set;}
+ [Parameter("Regime Family",DefaultValue="Adaptive")]
+ public string RegimeFamily {get;set;}="Adaptive";
+ [Parameter("Bar Minutes",DefaultValue=5,MinValue=1)]
+ public int BarMinutes {get;set;}
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
-  kernel.Reset();
-  // Reference kernel consumes M5 only. No silent timeframe substitution.
-  if(TimeFrame!=cAlgo.API.TimeFrame.Minute5){Print("MXM_REQUIRES_M5");Stop();return;}
+  if(!Enum.TryParse<StrategyMode>(RegimeFamily,true,out var mode)){
+   Print("MXM_UNKNOWN_FAMILY_SAFE_HOLD");Stop();return;
+  }
+  bool supported=(BarMinutes==1 && TimeFrame==cAlgo.API.TimeFrame.Minute) ||
+   (BarMinutes==5 && TimeFrame==cAlgo.API.TimeFrame.Minute5) ||
+   (BarMinutes==15 && TimeFrame==cAlgo.API.TimeFrame.Minute15);
+  if(!supported){Print("MXM_UNSUPPORTED_TIMEFRAME_HOLD");Stop();return;}
+  kernel=new MxmDecisionKernel(mode);
   // The current running bar must not be a warmup feature.
   for(int i=Math.Max(0,Bars.Count-7);i<Bars.Count-1;i++)
    kernel.OnCompletedBar((decimal)Bars.ClosePrices[i]);
@@ -28,7 +37,7 @@ public sealed class MxmReferenceProductBot : Robot {
  protected override void OnBar() {
   // OnBar has the just-opened live bar at Last(0), so Last(1) is unambiguously closed.
   if(Bars.Count<3)return;
-  if((Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes!=5)kernel.Reset();
+  if((Bars.OpenTimes.Last(1)-Bars.OpenTimes.Last(2)).TotalMinutes!=BarMinutes)kernel.Reset();
   int desired=kernel.OnCompletedBar((decimal)Bars.ClosePrices.Last(1));
   // Backtesting is simulation; realtime LIVE trading is never authorized.
   bool simulation=IsBacktesting;
@@ -47,7 +56,8 @@ public sealed class MxmReferenceProductBot : Robot {
   if(units<=0 || units>Symbol.VolumeInUnitsMax)return;
   double margin=Symbol.GetEstimatedMargin(direction,units);
   if(double.IsNaN(margin)||margin<=0||margin>Account.FreeMargin*0.4)return;
-  ExecuteMarketOrder(direction,SymbolName,units,Label,StopLossPips,null);
+  var placed=ExecuteMarketOrder(direction,SymbolName,units,Label,StopLossPips,null);
+  if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
  }
 }
 }

@@ -61,6 +61,70 @@ jobs:
           assert a['final_equity_eur']==201.27 and b['final_equity_eur']==200.90
           print('MXM_CSHARP_EXEC_GATE_PASS_REAL_BINARY_SYNTHETIC_QUOTES_ONLY')
           PY
+      - name: Reconcile EVERY trade, equity mark and execution friction without charging slippage twice
+        run: |
+          python3 - <<'PY'
+          import json
+          from decimal import Decimal as D
+          for file in ('verification/csharp-reference/reference-report.json','verification/csharp-modeled-fixture/reference-report.json'):
+              r=json.load(open(file))
+              params=r['modeled_assumptions']
+              fx=D(str(params['fx_eur_per_usd']))
+              slip=D(str(params['slippage_price_units']))
+              extra=D(str(params['extra_spread_price_units']))/2
+              fee=D(str(params['commission_eur_per_side']))
+              cash=D('200')
+              ledger=r['ledger']
+              for z in ledger:
+                  p=lambda k:D(str(z[k]))
+                  assert abs(p('slippage_eur')-D('1000')*slip*fx)<D('.000002'),(file,z)
+                  assert abs(p('additional_spread_scenario_eur')-D('1000')*extra*fx)<D('.000002')
+                  assert abs(p('charged_commission_eur')-fee)<D('.000002')
+                  if z['kind']=='ENTRY':
+                      expect=p('quoted_ask')+slip+extra if z['direction']==1 else p('quoted_bid')-slip-extra
+                      cash-=fee
+                  else:
+                      expect=p('quoted_bid')-slip-extra if z['direction']==1 else p('quoted_ask')+slip+extra
+                      cash+=p('gross_price_pnl_eur')-fee
+                  assert abs(p('price')-expect)<D('.000002')
+                  assert abs(p('balance_eur')-cash)<D('.000025')
+              assert abs(D(str(r['final_equity_eur']))-cash)<D('.000025')
+              costsum=sum(D(str(z['charged_commission_eur']))+D(str(z['slippage_eur']))+
+                          D(str(z['additional_spread_scenario_eur'])) for z in ledger)
+              assert abs(costsum-D(str(r['charged_cost_eur'])))<D('.000035')
+              for mark in r['equity']:
+                  balance=D(str(mark['balance_eur']))
+                  pos=mark['position_direction']
+                  mtm=balance if pos==0 else balance+D(pos)*D('1000')*(
+                      D(str(mark['marked_bid' if pos==1 else 'marked_ask']))-
+                      D(str(mark['position_open_price'])))*D(str(mark['quote_conversion_eur_per_usd']))
+                  assert abs(D(str(mark['equity_eur']))-mtm)<D('.000025')
+              assert r['full_iso_weeks_evaluated']==0 and r['hard21'] is False
+              print('MXM_RECONCILED_ACCOUNT_AND_CASH',file,len(ledger),len(r['equity']))
+          PY
+      - name: Run four shared CSharp regime families across three bar granularities and three hypothetical cost scenarios
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --research-fixture unused verification/csharp-research-fixture
+          python3 - <<'PY'
+          import json
+          from collections import defaultdict
+          from decimal import Decimal
+          m=json.load(open('verification/csharp-research-fixture/research.json'))
+          assert m['classification']=='ARTIFICIAL_QUOTES_COST_MATRIX_ONLY'
+          assert m['model_count']==36 and m['full_iso_weeks']==0 and m['no_independent_trial_or_advantage']
+          assert len({z['family'] for z in m['models']})==4
+          assert {z['timeframe_minutes'] for z in m['models']}=={1,5,15}
+          g=defaultdict(dict)
+          for z in m['models']:
+              assert z['initial_equity_eur']==200 and z['entries']==z['exits'] and not z['hard21']
+              assert abs(Decimal(str(z['net_pnl_eur']))-
+                         (Decimal(str(z['final_equity_eur']))-Decimal(200)))<Decimal('.000002')
+              g[(z['family'],z['timeframe_minutes'])][z['cost_case']]=Decimal(str(z['net_pnl_eur']))
+          assert len(g)==12 and all({'LOW_UNVERIFIED','BASE_UNVERIFIED','STRESS_UNVERIFIED'}==set(v) for v in g.values())
+          assert all(v['LOW_UNVERIFIED']>=v['BASE_UNVERIFIED']>=v['STRESS_UNVERIFIED'] for v in g.values())
+          print('MXM_CSHARP_RESEARCH_MATRIX_ARTIFICIAL_ONLY',
+                json.dumps({'models':m['model_count'],'families':4,'timeframes':[1,5,15],'cost_cases':3}))
+          PY
       - name: Verify gateway never carries secrets in pull request jobs
         run: |
           python3 - <<'PY'
