@@ -1,9 +1,9 @@
 name: MXM CSharp authenticated chronology nonoutcome
 on:
-  # Secret-bearing code executes only after legitimate approval and merge onto protected main.
-  # No PR head, pull_request_target, mutable external action, or unreviewed code can read custody.
+  # Secret-bearing code executes only after standard PR/required-CI merge into the
+  # existing protected R3 candidate branch; no bypass or secrets on pull requests.
   push:
-    branches: [main]
+    branches: [mxm-p0-integrated-cache-successor-20261020]
     paths:
       - .github/workflows/mxm-csharp-authentic-cold.yml
       - research_core_v4/native_tick_replay_v1/csharp/**
@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   bounded-cold-to-csharp:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/main' && github.run_attempt == 1
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-p0-integrated-cache-successor-20261020' && github.run_attempt == 1
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: mxm-r3-custody-v1
