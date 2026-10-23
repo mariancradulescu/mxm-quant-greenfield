@@ -14,7 +14,8 @@ class DurableNativeChronologyTest(unittest.TestCase):
     def test_preserved_native_workflow_archives_match_github_digests(self):
         # Original downloaded GitHub archive digests, independent of manifests.
         pins = {39899227676: '63b692a455fc679ef45a9c106e62c485221449f4810dafa794f4e267fac61fa9',
-                39900816580: '89b9dc5bc2676ab37b04c4948d0a49700e490e184324a5cdd179d7703c6a3ddf'}
+                39900816580: '89b9dc5bc2676ab37b04c4948d0a49700e490e184324a5cdd179d7703c6a3ddf',
+                39905699224: '84491cb9d9363b9a48db4f46299338c0a8e6c7a9ac239a6ef695a5baef4a0fb5'}
         for run, pin in pins.items():
             root = ROOT.parent / 'protected-evidence' / str(run)
             m = json.loads((root/'MANIFEST.json').read_text())
