@@ -10,6 +10,7 @@ on:
       - research_core_v4/laboratory/chronology_csharp_bridge.py
       - research_core_v4/laboratory/durable_native_chronology.py
       - research_core_v4/laboratory/captured_symbol_terms.py
+      - research_core_v4/laboratory/csharp_native_portfolio_independent_mark.py
       - docs/economic-development/20261023/native-chronology-39660692230/**
   workflow_dispatch: {}
 permissions: {}
@@ -78,6 +79,10 @@ jobs:
                'PORTFOLIO_NOT_PROMOTED_OR_AUTHORIZED')
           print('MXM_AUTHENTIC_SOURCE_EXPOSED_EURUSD_CSHARP_ACCOUNT_ENGINE_ONLY_PASS')
           PY
+      - name: Apply captured commission components and quote-side FX to same unchanged strategy and source
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-captured-terms-eurusd "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-captured-components" "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson.symbol-terms.json"
+          python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-captured-components/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-csharp-captured-components/independent-mark.json"
       - name: Evaluate same CSharp decision kernel and exploratory economic sensitivity on verified authentic quotes
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-nonoutcome "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-output"
@@ -234,7 +239,35 @@ jobs:
             captured_precise_commission_rate_decoded=terms['commission_rate'] is not None,
             captured_minimum_commission_semantics_known=terms['minimum_commission_semantics_known'],
             captured_terms_do_not_prove_historical_execution=True)
-          full=encoded({'bridge':bridge,'captured_original_native_symbol_terms':terms,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
+          captured=json.loads((temp/'mxm-csharp-captured-components/portfolio-exposed-quote-readback.json').read_bytes())
+          captured_check=json.loads((temp/'mxm-csharp-captured-components/independent-mark.json').read_bytes())
+          need(captured['valuation_mode']=='CAPTURED_COMMISSION_AND_QUOTE_SIDE_FX_COMPONENTS_ONLY' and
+               captured['captured_terms_sha256']==bridge['captured_symbol_terms_sha256'] and
+               captured['derived_stream_sha256']==bridge['derived_ticks_sha256'] and
+               captured['account']['initial_capital_eur']==200 and
+               captured_check['market_source_sha256']==bridge['derived_ticks_sha256'] and
+               captured_check['captured_commission_component_checked'] is True and
+               captured_check['quote_side_fx_conversion_checked'] is True and
+               float(captured_check['cash_abs_difference_eur'])<=0.000001 and
+               float(captured_check['equity_abs_difference_eur'])<=0.000001 and
+               captured['all_cost_components_verified'] is False and
+               captured['captured_terms_are_historical'] is False and
+               captured['account']['hard21_proven'] is False and
+               captured_check['broker_historical_costs_verified'] is False,
+               'CAPTURED_COMPONENT_SCENARIO_INDEPENDENT_CASH_AND_FX_PARITY')
+          safe.update(captured_components_scenario_only=True,
+            captured_components_entries=captured['account']['accepted_entries'],
+            captured_components_exits=captured['account']['executed_exits'],
+            captured_components_cash_eur=captured['account']['final_cash_eur'],
+            captured_components_equity_eur=captured['account']['marked_equity_eur'],
+            captured_components_independent_arithmetic_pass=True,
+            captured_components_all_costs_verified=False,
+            captured_components_historical_fees_verified=False,
+            captured_components_new_scientific_trial=False)
+          full=encoded({'bridge':bridge,'captured_original_native_symbol_terms':terms,
+                         'captured_commission_quote_side_fx_component_scenario':captured,
+                         'independent_captured_component_arithmetic':captured_check,
+                         'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
                          'native_exposed_quote_continuous_account_model':nativeportfolio,'independent_native_quote_terminal_cash_and_mtm':native_terminal_mark,'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
           public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')

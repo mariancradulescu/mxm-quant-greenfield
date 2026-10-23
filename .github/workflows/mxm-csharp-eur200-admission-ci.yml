@@ -5,6 +5,7 @@ on:
     paths:
       - research_core_v4/native_tick_replay_v1/csharp/**
       - research_core_v4/laboratory/csharp_native_portfolio_independent_mark.py
+      - research_core_v4/laboratory/captured_cost_scenario_checks.py
       - .github/workflows/mxm-csharp-eur200-admission-ci.yml
 permissions: {contents: read}
 jobs:
@@ -171,6 +172,11 @@ jobs:
           if dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --artificial-fixture verification/mxm-invalid-native-quotes.ndjson verification/mxm-portfolio-invalid; then
             echo 'Invalid native quote stream accepted'; exit 1
           fi
+      - name: Execute actual CSharp captured-component and quote-side FX scenario on artificial native shape
+        run: |
+          python3 -m research_core_v4.laboratory.captured_cost_scenario_checks prepare verification/captured-cost-fixture
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --artificial-captured-terms-fixture verification/captured-cost-fixture/quotes.ndjson verification/captured-cost-fixture/out verification/captured-cost-fixture/terms.json
+          python3 -m research_core_v4.laboratory.captured_cost_scenario_checks verify verification/captured-cost-fixture
       - name: Execute account-global cap, dynamic equity, reserve and margin fraction negatives
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --capital-fixture

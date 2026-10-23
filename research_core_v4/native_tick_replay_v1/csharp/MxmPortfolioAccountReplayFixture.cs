@@ -29,6 +29,35 @@ static List<MxmAccountFeed> Series(int bars=8,bool executableQuotes=true) {
 static MxmReplayParameters Params(int positions=2,decimal marginFraction=.8m,decimal riskFraction=.03m)=>
  new(StrategyMode.TrendOnly,marginFraction,positions,0m,riskFraction,.2m);
 var balanced=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(Series());
+// Current-snapshot money semantics are a counterfactual, not actual fees.
+var cost=new MxmEurUsdCapturedCosts(100000,100000000,100000,10000000,1,3000000000,1000000,"USD");
+Require(cost.Allows(1000m) && !cost.Allows(500m) && !cost.Allows(1500m),"CENTS_VOLUME_LATTICE");
+Require(cost.FeeEur(1000m,1.10m,1.10m,1.11m)==.03m,"USD_MILLION_COMMISSION_TO_EUR");
+Require((cost with {CommissionType=2,PreciseRate=300000000}).FeeEur(1000m,1.10m,1.10m,1.11m)==.03m/1.10m,
+ "USD_PER_LOT_USES_LOT_SIZE_NOT_NOTIONAL");
+Require((cost with {CommissionType=3,PreciseRate=10000}).FeeEur(1000m,1.10m,1.10m,1.11m)==1m,
+ "PERCENT_RATE_IS_NOT_FRACTION_OR_CURRENCY_RATE");
+Require((cost with {MinimumAsset="EUR",PreciseMinimum=5000000}).FeeEur(1000m,1.10m,1.10m,1.11m)==.05m,
+ "EUR_MINIMUM_FEE_NOT_RECONVERTED");
+Require(MxmEurUsdCapturedCosts.ConvertSignedUsd(111m,1.10m,1.11m)==100m &&
+ MxmEurUsdCapturedCosts.ConvertSignedUsd(-110m,1.10m,1.11m)==-100m,"SIGNED_EXECUTABLE_FX_SIDES");
+var dynamicFeed=Series();
+for(int i=0;i<dynamicFeed.Count;i++)if(dynamicFeed[i] is MxmQuote q && q.Symbol=="EURUSD")
+ dynamicFeed[i]=q with {QuoteToEur=1m/q.Ask,QuoteLossToEur=1m/q.Bid,CapturedCosts=cost};
+var dynamic=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(dynamicFeed);
+var eurEntry=dynamic.Ledger.Single(x=>x.Symbol=="EURUSD" && x.Kind=="ENTRY");
+Require(eurEntry.CommissionEur!=.10m && dynamic.AcceptedEntries==2,
+ "CAPTURED_FEE_COMPONENT_ACTUALLY_USED_BY_SHARED_ACCOUNT");
+Require(!dynamic.CostsBrokerVerified && !dynamic.Hard21Proven,"NO_CAPTURED_SNAPSHOT_PROMOTION");
+var lossFeed=new List<MxmAccountFeed>(dynamicFeed);
+var adverse=new MxmQuote(new DateTime(2026,8,24,12,40,1,DateTimeKind.Utc),"EURUSD",
+ 1.099m,1.0991m,1m/1.0991m,1000m,70m,.1m,0m,1m,1m/1.099m,cost);
+lossFeed.Add(adverse);
+var lossMark=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(lossFeed);
+decimal usdLoss=(adverse.Bid-eurEntry.Price)*1000m;
+Require(usdLoss<0 && Math.Abs(lossMark.MarkedEquityEur-
+ (lossMark.FinalCashEur+usdLoss/adverse.Bid+.2m))<.0000001m,"LOSING_POSITION_USES_BID_FX_NOT_GAIN_SIDE");
+Console.WriteLine("MXM_CAPTURED_COMMISSION_COMPONENT_AND_SIGNED_BIDASK_FX_SYNTHETIC_PASS_NOT_HISTORICAL_COSTS");
 Require(balanced.InitialCapitalEur==200m,"SINGLE_START_CAPITAL");
 Require(balanced.AcceptedEntries==2 && balanced.OpenPositions==2 && balanced.ExecutedExits==0,
  "TWO_INSTRUMENTS_ONE_BROKER_ACCOUNT");
