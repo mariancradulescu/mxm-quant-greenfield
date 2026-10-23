@@ -42,6 +42,13 @@ def attribute(report):
     cash = D(200)
     entries=exits=0
     counts=Counter()
+    # Single-position lifecycle audit of the SAME modeled ledger, not a new
+    # strategy trial or a claim of broker execution. Never infer profitability
+    # from a missing exit, overbooked entry, or incompatible direction.
+    active_entry=None
+    exit_counts=Counter()
+    exit_nets=Counter()
+    holding_minutes=[]
     previous=None
     for e in a['ledger']:
         need(e['kind'] in ('ENTRY','EXIT') and
@@ -60,11 +67,26 @@ def attribute(report):
         fee+=cost
         if e['kind']=='ENTRY':
             need(number(e['gross_eur'])==0,'ENTRY_HAS_GROSS')
+            need(active_entry is None,'OVERLAPPING_ACCOUNT_POSITIONS')
+            active_entry=(stamp,e['direction'],cost)
             cash-=cost
             entries+=1
             counts[stamp.date().isoformat()]+=1
         else:
+            need(active_entry is not None and
+                 active_entry[1]==e['direction'],'UNPAIRED_OR_WRONG_DIRECTION_EXIT')
+            duration=D(str((stamp-active_entry[0]).total_seconds()))/D(60)
+            need(duration>0,'NONCAUSAL_HOLDING_TIME')
+            reason=e.get('reason')
+            need(reason is None or reason in
+                 ('REVERSAL','OBSERVED_QUOTE_STOP','NEUTRAL_FLAT','HORIZON12'),
+                 'UNKNOWN_EXIT_REASON')
+            label=reason or 'UNLABELED'
             realized=number(e['gross_eur'])
+            exit_counts[label]+=1
+            exit_nets[label]+=realized-cost-active_entry[2]
+            holding_minutes.append(duration)
+            active_entry=None
             gross+=realized
             cash+=realized-cost
             exits+=1
@@ -75,6 +97,12 @@ def attribute(report):
          entries==report['modeled_entries_in_requested_iso_week'] and
          (entries>=21)==report['modeled_21_entry_threshold_met'],
          'ENTRY_EXIT_AND_WEEK_COUNTS')
+    need((active_entry is not None)==(a['open_positions']==1),
+         'OPEN_POSITION_LIFECYCLE_MISMATCH')
+    need(sum(exit_counts.values())==exits,'EXIT_REASON_RECOUNT')
+    open_entry_fee=active_entry[2] if active_entry is not None else D(0)
+    need(abs(sum(exit_nets.values(),D(0))-open_entry_fee-(gross-fee))
+         <=D('0.000001'),'CLOSED_TRADE_FEE_AND_OPEN_ENTRY_IDENTITY')
     cash_end=number(a['final_cash_eur'])
     equity=number(a['marked_equity_eur'])
     need(abs(cash-cash_end)<=D('0.000001'),'FINAL_CASH_MISMATCH')
@@ -83,6 +111,12 @@ def attribute(report):
     full_net=realized_net+floating
     need(abs(full_net-(equity-D(200)))<=D('0.000001'),'NET_EQUITY_IDENTITY')
     need(len(counts)<=7,'DAILY_COUNT')
+    same_ledger_without_commissions=gross+floating
+    ordered_durations=sorted(holding_minutes)
+    middle=len(ordered_durations)//2
+    median_duration=(ordered_durations[middle] if len(ordered_durations)%2
+      else (ordered_durations[middle-1]+ordered_durations[middle])/D(2)
+      ) if ordered_durations else None
     return {
       'schema':'mxm.csharp.week37.exploratory-account-loss-attribution.v1',
       'classification':'SAME_AUTHENTIC_WEEK_UNCERTIFIED_COUNTERFACTUAL_NO_NEW_STRATEGY_TRIAL',
@@ -99,6 +133,21 @@ def attribute(report):
       'final_modeled_bidask_equity_eur':str(equity),
       'net_modeled_marked_equity_pnl_eur':str(full_net),
       'modeled_max_drawdown_eur':str(number(a['max_drawdown_eur'])),
+      'closed_positions_by_exit_reason':dict(sorted(exit_counts.items())),
+      'closed_position_net_pnl_by_exit_reason_eur':
+        {k:str(v) for k,v in sorted(exit_nets.items())},
+      'closed_position_holding_minutes_min':
+        str(ordered_durations[0]) if ordered_durations else None,
+      'closed_position_holding_minutes_median':
+        str(median_duration) if median_duration is not None else None,
+      'closed_position_holding_minutes_max':
+        str(ordered_durations[-1]) if ordered_durations else None,
+      'open_entry_commission_eur':str(open_entry_fee),
+      'static_zero_commission_same_ledger_pnl_eur':
+        str(same_ledger_without_commissions),
+      'unchanged_ledger_remains_negative_even_at_zero_commission':
+        same_ledger_without_commissions<0,
+      'static_zero_commission_is_not_a_new_account_replay':True,
       'spread_and_slippage_already_in_modeled_prices':True,
       'gross_pnl_is_after_spread_and_slippage_not_precost_midprice_alpha':True,
       'commissions_snapshot_not_dated_historical':True,
