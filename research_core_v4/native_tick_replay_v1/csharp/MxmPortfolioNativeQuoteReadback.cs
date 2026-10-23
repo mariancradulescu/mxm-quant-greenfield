@@ -34,7 +34,8 @@ namespace Mxm.PortfolioNativeQuote {
    return result;
   }
   public static object Run(string input,bool exactExistingSource=true,string? termsPath=null,
-   bool weekSource=false,bool productDefaultStop12=false,bool week35=false,decimal slip=0.00002m){
+   bool weekSource=false,bool productDefaultStop12=false,bool week35=false,decimal slip=0.00002m,StrategyMode week35Strategy=StrategyMode.Breakout){
+   Need(!week35 || (week35Strategy==StrategyMode.Breakout || week35Strategy==StrategyMode.TrendOnly || week35Strategy==StrategyMode.RangeFade),"W35_UNREGISTERED_FAMILY");
    Need(!week35 || (weekSource && productDefaultStop12),"W35_FIXED_STOP_REQUIRED");
    Need(!week35 || (slip==0.00002m || slip==0.00004m),"W35_UNREGISTERED_SLIPPAGE");
    Need(!weekSource || !exactExistingSource,"CONTRADICTORY_NATIVE_SOURCE");
@@ -102,11 +103,13 @@ namespace Mxm.PortfolioNativeQuote {
    Need(feeds.Count>0 && accepted>0,"NO_REPLAYABLE_SNAPSHOTS");
    // Parameters are fixed DEVELOPMENT counterfactual, NOT a fitted edge.
    var engine=new MxmPortfolioAccountReplay(new[]{"EURUSD"},
-    new MxmReplayParameters(week35?StrategyMode.Breakout:StrategyMode.Adaptive,0.4m,1,0m,0.02m,0.2m,5,300));
+    new MxmReplayParameters(week35?week35Strategy:StrategyMode.Adaptive,0.4m,1,0m,0.02m,0.2m,5,300));
    var account=engine.Run(feeds);
    return new {
     schema="mxm.csharp.native-exposed-quote-to-one-account.v1",
-    classification=week35?"PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED":
+    classification=week35?(week35Strategy==StrategyMode.Breakout?
+      "PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED":
+      "PINNED_PEPPERSTONE_WEEK35_REMAINING_FAMILY_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"):
       productDefaultStop12?
       "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED":
       weekSource?"PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":
@@ -130,7 +133,7 @@ namespace Mxm.PortfolioNativeQuote {
     multi_instrument_native_data_available=false,
     synthetic_quote_events_injected=(exactExistingSource||weekSource)?0:ticks.Count,
     modeled_parameters=new {
-      strategy=week35?"Breakout":"Adaptive",bar_minutes=5,max_positions=1,
+      strategy=week35?week35Strategy.ToString():"Adaptive",bar_minutes=5,max_positions=1,
       product_default_stop12=productDefaultStop12,
       product_stop_pips=productDefaultStop12?12:0,
       product_stop_distance_quote=productStopDistance,
@@ -171,16 +174,21 @@ namespace Mxm.PortfolioNativeQuote {
        args[0]=="--native-week-product-stop12-eurusd" ||
        args[0]=="--native-week35-breakout-stop12" ||
        args[0]=="--native-week35-breakout-stop12-stress" ||
+       args[0]=="--native-week35-trend-stop12" || args[0]=="--native-week35-trend-stop12-stress" ||
+       args[0]=="--native-week35-range-stop12" || args[0]=="--native-week35-range-stop12-stress" ||
        args[0]=="--artificial-captured-terms-fixture");
     Need(captured || (args.Length==3&&
       (args[0]=="--native-exposed-eurusd"||args[0]=="--artificial-fixture")),
       "EXPLICIT_NONOUTCOME_MODE_REQUIRED");
-    bool week35=args[0]=="--native-week35-breakout-stop12" || args[0]=="--native-week35-breakout-stop12-stress";
+    bool trend=args[0]=="--native-week35-trend-stop12" || args[0]=="--native-week35-trend-stop12-stress";
+    bool range=args[0]=="--native-week35-range-stop12" || args[0]=="--native-week35-range-stop12-stress";
+    bool week35=trend || range || args[0]=="--native-week35-breakout-stop12" || args[0]=="--native-week35-breakout-stop12-stress";
     bool week=week35 || args[0]=="--native-week-captured-terms-eurusd" ||
       args[0]=="--native-week-product-stop12-eurusd";
     bool stop12=week35 || args[0]=="--native-week-product-stop12-eurusd";
     bool native=week || args[0]=="--native-exposed-eurusd" || args[0]=="--native-captured-terms-eurusd";
-    var data=Run(args[1],native&&!week,captured?args[3]:null,week,stop12,week35,args[0]=="--native-week35-breakout-stop12-stress"?0.00004m:0.00002m);
+    var data=Run(args[1],native&&!week,captured?args[3]:null,week,stop12,week35,args[0].EndsWith("-stress",StringComparison.Ordinal)?0.00004m:0.00002m,
+      trend?StrategyMode.TrendOnly:range?StrategyMode.RangeFade:StrategyMode.Breakout);
     Directory.CreateDirectory(args[2]);
     var output=Path.Combine(args[2],"portfolio-exposed-quote-readback.json");
     File.WriteAllText(output,JsonSerializer.Serialize(data,new JsonSerializerOptions{
