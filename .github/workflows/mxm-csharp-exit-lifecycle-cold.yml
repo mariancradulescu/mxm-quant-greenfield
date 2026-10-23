@@ -8,6 +8,10 @@ on:
       - research_core_v4/native_tick_replay_v1/csharp/MxmDecisionKernel.cs
       - research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs
       - research_core_v4/native_tick_replay_v1/csharp/EXIT_LIFECYCLE_FINITE_DEVELOPMENT_V1.json
+      - research_core_v4/laboratory/chronology_csharp_bridge.py
+      - research_core_v4/laboratory/captured_symbol_terms.py
+      - research_core_v4/laboratory/durable_native_chronology.py
+      - docs/economic-development/20261023/native-chronology-39660692230/**
   workflow_dispatch: {}
 permissions: {}
 concurrency:
@@ -36,17 +40,13 @@ jobs:
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
       - name: Reuse original Pepperstone native ciphertext, without connecting broker
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: r3-chronology-39660692230
-          run-id: 39660692230
-          github-token: ${{ github.token }}
-          path: verification/r3-chronology
+        run: python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
       - name: Decrypt original native evidence only in pre-existing protected environment
         env:
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
         run: |
           cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
+          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/captured_symbol_terms.py
           cd .sealed-chronology-source
           python3 -m research_core_v4.laboratory.chronology_csharp_bridge "${GITHUB_WORKSPACE}/verification/r3-chronology/capture.mxmenc" "${RUNNER_TEMP}/mxm-exit-authentic-quotes.ndjson"
       - name: Compare preregistered full lifecycle policies on same original quotes
