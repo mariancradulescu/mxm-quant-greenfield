@@ -19,6 +19,7 @@ public sealed class MxmReferenceProductBot : Robot {
  readonly Dictionary<string,Bars> subscribedBars=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,Symbol> subscribedSymbols=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmCausalIntent> causalIntents=new(StringComparer.OrdinalIgnoreCase);
+ readonly Dictionary<string,MxmBrokerIntentFence> brokerIntentFences=new(StringComparer.OrdinalIgnoreCase);
  bool applyingDecision;
  MxmPortfolioSequencer? sequencer;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
@@ -89,6 +90,14 @@ public sealed class MxmReferenceProductBot : Robot {
    subscribedSymbols.Add(name,Symbols.GetSymbol(name));
    causalIntents.Add(name,new MxmCausalIntent());
   }
+  // Seed from the actual recovered broker book; cold start has no intent.
+  foreach(var name in resolved) {
+   var recovered=Positions.FindAll(Label,name);
+   if(recovered.Length>1){Print("MXM_MULTIPLE_RECOVERED_POSITIONS_SAFE_STOP");Stop();return;}
+   brokerIntentFences.Add(name,new MxmBrokerIntentFence(causalIntents[name],BarMinutes,
+    recovered.Length==0?null:recovered[0].Id));
+  }
+  Positions.Closed+=OnBrokerPositionClosed;
   foreach(var series in subscribedBars.Values)series.BarClosed+=OnPortfolioBarClosed;
   foreach(var instrument in subscribedSymbols.Values)instrument.Tick+=OnPortfolioTick;
   Print("MXM_SINGLE_ROBOT_PORTFOLIO_BARS_READY_NO_INTERINSTANCE_MUTEX_"+resolved.Count);
@@ -96,7 +105,28 @@ public sealed class MxmReferenceProductBot : Robot {
  // Deliberately no legacy per-chart order path. All symbols, including chart
  // symbol, enter via one Bars.BarClosed dispatcher, never OnBar plus BarClosed.
  protected override void OnBar() { }
+ long? BrokerPositionId(string symbolName) {
+  var owned=Positions.FindAll(Label,symbolName);
+  if(owned.Length>1)throw new InvalidOperationException("AMBIGUOUS_OWNED_POSITION_IDENTITY");
+  return owned.Length==0?null:owned[0].Id;
+ }
+ DateTime BrokerClock()=>DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
+ void OnBrokerPositionClosed(PositionClosedEventArgs args) {
+  // Never seize, modify or cancel another owner's position or pending order.
+  if(args.Position.Label!=Label ||
+     !brokerIntentFences.TryGetValue(args.Position.SymbolName,out var fence))return;
+  try {
+   fence.Closed(args.Position.Id,args.Reason==PositionCloseReason.Closed,BrokerClock());
+   Print("MXM_BROKER_CLOSE_FENCE reason={0} revision={1} symbol={2}",
+    args.Reason,fence.Capture().Revision,args.Position.SymbolName);
+  } catch(Exception e) {
+   foreach(var intent in causalIntents.Values)intent.Clear();
+   Print("MXM_BROKER_CLOSE_RECONCILIATION_SAFE_STOP_"+e.GetType().Name);Stop();
+  }
+ }
  protected override void OnStop() {
+  Positions.Closed-=OnBrokerPositionClosed;
+  foreach(var fence in brokerIntentFences.Values)fence.Reset();
   foreach(var series in subscribedBars.Values)series.BarClosed-=OnPortfolioBarClosed;
   foreach(var instrument in subscribedSymbols.Values)instrument.Tick-=OnPortfolioTick;
   foreach(var intent in causalIntents.Values)intent.Clear();
@@ -133,8 +163,13 @@ public sealed class MxmReferenceProductBot : Robot {
    int desired=kernel.OnCompletedBar((decimal)series.ClosePrices.Last(0));
    // Publish only. The tick delivering this callback must not execute its signal.
    // UTC is the robot's declared clock; cTrader DateTime Kind is normalized here.
+   var fence=brokerIntentFences[instrumentName];
+   fence.Observe(BrokerPositionId(instrumentName),observedUtc);
    causalIntents[instrumentName].Publish(desired,contiguous,kernel.CompletedBars,
     DateTime.SpecifyKind(currentOpenTime,DateTimeKind.Utc),observedUtc,BarMinutes);
+   // A stop notification before BarClosed must also suppress a new publication
+   // for that same boundary; the next genuinely new bar may proceed normally.
+   if(!fence.CanPublish(currentOpenTime))causalIntents[instrumentName].Clear();
   } catch(Exception e) {
    Print("MXM_PORTFOLIO_CALLBACK_UNVERIFIED_SAFE_STOP_"+e.GetType().Name);
    Stop();
@@ -148,20 +183,26 @@ public sealed class MxmReferenceProductBot : Robot {
    if(!double.IsFinite(args.Bid) || !double.IsFinite(args.Ask) ||
       args.Bid<=0 || args.Ask<args.Bid)return;
    if(applyingDecision){Print("MXM_REENTRANT_EXECUTION_SAFE_STOP");Stop();return;}
+   var fence=brokerIntentFences[args.SymbolName];
+   // The book may have changed before its Closed callback is dispatched.
+   fence.Observe(BrokerPositionId(args.SymbolName),quoteUtc);
+   var lease=fence.Capture();
    if(!queue.TryConsume(quoteUtc,out var intent))return;
    applyingDecision=true;acquired=true;
    // Consumed BEFORE broker calls. A rejected or unknown result cannot retry
    // the same intent on every tick or fabricate a broker fill.
    ApplyPortfolioDecision(args.Symbol,args.SymbolName,intent!.Desired,
-    intent.Contiguous,intent.CompletedBars,intent.BoundaryUtc);
+    intent.Contiguous,intent.CompletedBars,intent.BoundaryUtc,lease);
   } catch(Exception e) {
    Print("MXM_PORTFOLIO_TICK_UNVERIFIED_SAFE_STOP_"+e.GetType().Name);Stop();
   } finally {if(acquired)applyingDecision=false;}
  }
  void ApplyPortfolioDecision(Symbol instrument,string instrumentName,int desired,
-  bool contiguous,int completedBars,DateTime currentOpenTime) {
+  bool contiguous,int completedBars,DateTime currentOpenTime,MxmBrokerDecisionLease lease) {
   bool simulation=IsBacktesting;
   if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || !instrument.MarketHours.IsOpened())return;
+  var fence=brokerIntentFences[instrumentName];
+  if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),BrokerClock()))return;
   var owned=Positions.FindAll(Label,instrumentName);
   if(owned.Length>1){Print("MXM_MULTIPLE_POSITIONS_SAFE_HOLD");return;}
   TradeType direction=desired>0?TradeType.Buy:TradeType.Sell;
@@ -177,8 +218,15 @@ public sealed class MxmReferenceProductBot : Robot {
     if(!closed.IsSuccessful)Print("MXM_POLICY_EXIT_FAILED_SAFE_HOLD");
     return; // No entry following a discretionary policy exit on this intent.
    }
+   if(!fence.BeginReversal(lease,current.Id,BrokerPositionId(instrumentName),BrokerClock()))return;
    var result=ClosePosition(current);
-   if(!result.IsSuccessful){Print("MXM_CLOSE_FAILED_SAFE_HOLD");return;}
+   // A successful call alone cannot certify whether a concurrent broker stop
+   // closed the position. Require the matching Closed event and identity.
+   if(!fence.FinishReversal(lease,current.Id,result.IsSuccessful,result.Position?.Id,
+      BrokerPositionId(instrumentName),BrokerClock(),out var continuation)) {
+    Print("MXM_REVERSAL_CLOSE_UNRECONCILED_NO_SAME_INTENT_ENTRY");return;
+   }
+   lease=continuation!;
   }
   if(desired==0)return;
   // Inspect actual broker minimum/step/margin; do not assume EUR200 volume feasibility.
@@ -267,7 +315,14 @@ public sealed class MxmReferenceProductBot : Robot {
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
   }
+  // Last local admission check, after all expensive risk/margin calculations.
+  // This does not make the broker check+order atomic or lock other instances.
+  if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),BrokerClock())) {
+   Print("MXM_BROKER_BOOK_CHANGED_NO_STALE_INTENT_ENTRY");return;
+  }
   var placed=ExecuteMarketOrder(direction,instrumentName,units,Label,StopLossPips,null);
+  Print("MXM_ORDER_CALL_RETURNED fenceRevision={0} intentBoundary={1:O} symbol={2} success={3}",
+   lease.Revision,currentOpenTime,instrumentName,placed.IsSuccessful);
   if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
  }
 }
