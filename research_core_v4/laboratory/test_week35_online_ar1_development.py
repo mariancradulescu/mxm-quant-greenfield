@@ -17,6 +17,10 @@ class OnlineAr1Tests(W35BreakoutTests):
         upload=next(x['with'] for x in steps if 'uses' in x and x['uses'].startswith('actions/upload-artifact@'))
         self.assertEqual(set(upload['path'].splitlines()),{output+'/receipt.json',output+'/full-result.mxmenc'})
         self.assertEqual(upload['if-no-files-found'],'error')
+    def test_closed_source_is_preserved_but_changed_current_code_cannot_execute_old_study(self):
+        validate_spec()
+        with self.assertRaisesRegex(ValueError,'W35_FROZEN_IMPLEMENTATION'):
+            validate_spec(require_current_implementation=True)
     def test_frozen_one_learner_two_leaves_no_refit(self):
         s=validate_spec();self.assertEqual(s['strategies'],['OnlineAr1'])
         self.assertEqual(s['budget']['dependent_model_leaves'],2)

@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[2]
 SPEC=ROOT/'research_core_v4/laboratory/WEEK35_ONLINE_AR1_DEVELOPMENT_V1.json'
 SPEC_SHA='4fb321c8a3f3938440d161e4dd0320880726e9b9aa59651da1318556a4c79cbc'
 LABEL='PINNED_PEPPERSTONE_WEEK35_ONLINE_AR1_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED'
-def validate_spec():
+def validate_spec(require_current_implementation=False):
     raw=SPEC.read_bytes();need(bytes_digest(raw)==SPEC_SHA,'W35_PRECOMMIT_CHANGED')
     value=json.loads(raw)
     need(value['strategies']==['OnlineAr1'] and value['initial_capital_eur']==200 and
@@ -17,8 +17,11 @@ def validate_spec():
          'W35_FIXED_FINITE_SCOPE')
     kernel=ROOT/'research_core_v4/native_tick_replay_v1/csharp/MxmDecisionKernel.cs'
     need(bytes_digest(kernel.read_bytes())==value['kernel_sha256'],'W35_NO_KERNEL_REFIT')
-    for path,expected in value['implementation_sha256'].items():
-        need(bytes_digest((ROOT/path).read_bytes())==expected,'W35_FROZEN_IMPLEMENTATION_'+path)
+    from .closed_online_ar1_implementation import verify_closed_implementation
+    verify_closed_implementation(value['implementation_sha256'])
+    if require_current_implementation:
+        for path,expected in value['implementation_sha256'].items():
+            need(bytes_digest((ROOT/path).read_bytes())==expected,'W35_FROZEN_IMPLEMENTATION_'+path)
     need(value['exit'].startswith('NeutralFlat') and value['learner']=={
         'window_pairs':256,'minimum_pairs':128,'ridge_bps_squared':64,'beta_clip':[-.95,.95],
         'signal_threshold_bps':2,'shock_reset_abs_return_bps':100,
@@ -30,7 +33,7 @@ def validate_spec():
     return value
 
 def context():
-    validate_spec()
+    validate_spec(require_current_implementation=True)
     need(os.environ.get('GITHUB_REPOSITORY')=='mariancradulescu/mxm-quant-greenfield' and
          os.environ.get('GITHUB_REF')=='refs/heads/mxm-remediation-p0-p4-20261015-v1' and
          os.environ.get('GITHUB_EVENT_NAME') in ('push','workflow_dispatch') and
