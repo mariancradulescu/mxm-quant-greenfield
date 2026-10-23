@@ -4,6 +4,7 @@ market evidence, cTrader broker fills, true costs, financing, or HARD21.
 """
 from __future__ import annotations
 import argparse
+from bisect import bisect_right
 from collections import defaultdict
 from datetime import datetime, timezone
 from decimal import Decimal as D, getcontext
@@ -147,12 +148,25 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
     require(report["classification"] in (
         "ARTIFICIAL_QUOTE_STREAM_ONLY",
         "ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
-        "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED"
+        "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
+        "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"
     ), "REPORT_CLASSIFICATION")
+    product_stop12=(report["classification"] ==
+        "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED")
+    if product_stop12:
+        p=report["modeled_parameters"]
+        require(p["product_default_stop12"] is True and
+                p["product_stop_pips"]==12 and
+                number(p["product_stop_distance_quote"])==D("0.0012") and
+                p["product_stop_geometry_source"]==
+                "CAPTURED_EURUSD_SNAPSHOT_PIP_POSITION_4_CTRADER_DEFAULT_12_PIPS",
+                "PRODUCT_STOP12_DECLARED_EXACT_GEOMETRY")
     book, source = authenticated_shape_quotes(tick_file)
     require(report["derived_stream_sha256"] == source["sha256"], "SOURCE_HASH")
     require(report["quote_events"] == source["source_events"], "EVENT_COUNT")
-    if report["classification"] == "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":
+    if report["classification"] in (
+        "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
+        "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"):
         require(source["source_events"] == 685474 and
                 report["original_native_run_id"] == 39917922508 and
                 report["authenticated_requested_iso_week_input"] == "2026-W37" and
@@ -201,11 +215,19 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
     positions = {}
     counts = defaultdict(int)
     prior = -1
+    stop_entry_time=None
+    snapshot_times=sorted(book) if product_stop12 else []
+    observed_stop_exits=0
     for event in account["ledger"]:
-        require(set(event) == {
+        ledger_columns={
             "kind", "utc", "symbol", "direction", "price", "units",
             "cash_eur", "commission_eur", "gross_eur"
-        }, "LEDGER_SCHEMA")
+        }
+        if product_stop12:
+            require(set(event) in (ledger_columns,ledger_columns|{"reason"}),
+                    "LEDGER_SCHEMA")
+        else:
+            require(set(event)==ledger_columns,"LEDGER_SCHEMA")
         ts = tick_ms(event["utc"])
         require(ts >= prior, "LEDGER_CHRONOLOGY")
         prior = ts
@@ -224,12 +246,39 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
             equal(price, expected, "WRONG_SIDE_OF_SPREAD_ENTRY", D("0.0000000001"))
             equal(event["gross_eur"], 0, "ENTRY_GROSS_NONZERO")
             cash -= actual_fee
+            if product_stop12:
+                stop_price=price-D(direction)*D("0.0012")
+                require(stop_price>0 and
+                        (bid>stop_price if direction==1 else ask<stop_price),
+                        "PRODUCT_STOP_ALREADY_TOUCHED_AT_ENTRY")
+                stop_entry_time=ts
             positions["EURUSD"] = (direction, price, units)
             counts["entries"] += 1
         elif event["kind"] == "EXIT":
             require("EURUSD" in positions, "EXIT_WITHOUT_ENTRY")
             original_direction, initial, size = positions["EURUSD"]
             require(direction == original_direction, "EXIT_DIRECTION_CHANGED")
+            if product_stop12:
+                reason=event.get("reason")
+                require(reason in ("REVERSAL","NEUTRAL_FLAT","HORIZON12",
+                                  "OBSERVED_QUOTE_STOP"),"PRODUCT_STOP_EXIT_REASON")
+                stop_price=initial-D(direction)*D("0.0012")
+                require(stop_entry_time is not None,"PRODUCT_STOP_MISSING_ENTRY_CLOCK")
+                first_touch=None
+                lo=bisect_right(snapshot_times,stop_entry_time)
+                hi=bisect_right(snapshot_times,ts)
+                for observed in snapshot_times[lo:hi]:
+                    touch_bid,touch_ask=book[observed]
+                    if (touch_bid<=stop_price if direction==1 else touch_ask>=stop_price):
+                        first_touch=observed
+                        break
+                if first_touch is not None:
+                    require(first_touch==ts and reason=="OBSERVED_QUOTE_STOP",
+                            "PRODUCT_STOP_MUST_TRIGGER_ON_FIRST_OBSERVED_SIDE")
+                    observed_stop_exits+=1
+                else:
+                    require(reason!="OBSERVED_QUOTE_STOP",
+                            "PRODUCT_STOP_WITHOUT_OBSERVED_SIDE_TRIGGER")
             expected = bid - slip if direction == 1 else ask + slip
             equal(price, expected, "WRONG_SIDE_OF_SPREAD_EXIT", D("0.0000000001"))
             quote_gross = (price - initial) * size * D(direction)
@@ -237,6 +286,7 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
             equal(event["gross_eur"], gross, "GROSS_PNL_DRIFT")
             cash += gross - actual_fee
             del positions["EURUSD"]
+            stop_entry_time=None
             counts["exits"] += 1
         else:
             raise MarkParityError("MXM_CSHARP_NATIVE_MARK_PARITY_UNKNOWN_KIND")
@@ -268,6 +318,8 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
         "ledger_entry_count": counts["entries"],
         "ledger_exit_count": counts["exits"],
         "open_positions": len(positions),
+        "product_default_stop12_replayed": product_stop12,
+        "product_first_observed_stop_exits_independently_checked": observed_stop_exits,
         "cash_abs_difference_eur": str(abs(cash-number(account["final_cash_eur"]))),
         "equity_abs_difference_eur": str(abs(equity-number(account["marked_equity_eur"]))),
         "full_iso_weeks_verified": 0,
