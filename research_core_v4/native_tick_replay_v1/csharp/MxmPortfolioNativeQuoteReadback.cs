@@ -12,6 +12,8 @@ namespace Mxm.PortfolioNativeQuote {
   const long BarMs=300000L;
   const long MaxSideAgeMs=300000L;
   const int ExpectedNativeEvents=28212;
+  const int ExpectedWeekEvents=685474;
+  const long WeekStartMs=1788739200000L,WeekEndMs=1789344000000L;
   static void Need(bool ok,string msg) {
    if(!ok)throw new InvalidDataException("MXM_AUTHENTIC_PORTFOLIO_READBACK_"+msg);
   }
@@ -31,14 +33,18 @@ namespace Mxm.PortfolioNativeQuote {
    Need(result.Count>0,"EMPTY_NATIVE_STREAM");
    return result;
   }
-  public static object Run(string input,bool exactExistingSource=true,string? termsPath=null){
+  public static object Run(string input,bool exactExistingSource=true,string? termsPath=null,bool weekSource=false){
+   Need(!weekSource || !exactExistingSource,"CONTRADICTORY_NATIVE_SOURCE");
    var bytes=File.ReadAllBytes(input);
    var hash=Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
    var ticks=Parse(input);
-   var costs=termsPath==null?null:MxmEurUsdCapturedCosts.Load(termsPath,exactExistingSource);
+   var costs=termsPath==null?null:MxmEurUsdCapturedCosts.Load(termsPath,exactExistingSource,weekSource);
    string? termsSha=termsPath==null?null:
     Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(termsPath))).ToLowerInvariant();
    if(exactExistingSource)Need(ticks.Count==ExpectedNativeEvents,"ORIGINAL_EVENT_COUNT");
+   if(weekSource)Need(ticks.Count==ExpectedWeekEvents &&
+     ticks[0].T>=WeekStartMs && ticks[^1].T<WeekEndMs &&
+     ticks.All(z=>z.T>=WeekStartMs && z.T<WeekEndMs),"PINNED_WEEK_EVENT_OR_TIME_BOUND");
    int ambiguous=0,cross=0,stale=0,accepted=0,completeBarDecisions=0,zero=0;
    long bidTime=-1,askTime=-1,barBucket=-1;
    decimal bid=0,ask=0,lastBarBid=0;
@@ -86,8 +92,9 @@ namespace Mxm.PortfolioNativeQuote {
    var account=engine.Run(feeds);
    return new {
     schema="mxm.csharp.native-exposed-quote-to-one-account.v1",
-    classification=exactExistingSource?"ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":"ARTIFICIAL_QUOTE_STREAM_ONLY",
-    original_native_run_id=exactExistingSource?39660692230:0,
+    classification=weekSource?"PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":
+      exactExistingSource?"ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":"ARTIFICIAL_QUOTE_STREAM_ONLY",
+    original_native_run_id=weekSource?39917922508:exactExistingSource?39660692230:0,
     original_source_is_independently_crypto_authenticated_here=false,
     provenance_digest_must_match_pinned_protected_bridge=true,
     derived_stream_sha256=hash,
@@ -104,7 +111,7 @@ namespace Mxm.PortfolioNativeQuote {
     completed_bar_decision_events=completeBarDecisions,
     actual_symbols=1,
     multi_instrument_native_data_available=false,
-    synthetic_quote_events_injected=exactExistingSource?0:ticks.Count,
+    synthetic_quote_events_injected=(exactExistingSource||weekSource)?0:ticks.Count,
     modeled_parameters=new {
       strategy="Adaptive",bar_minutes=5,max_positions=1,
       units=1000,quote_to_eur=costs==null?1m/1.10m:(decimal?)null,
@@ -121,6 +128,10 @@ namespace Mxm.PortfolioNativeQuote {
     historical_broker_fills_proven=false,
     historical_quote_arrival_order_proven=false,
     one_full_iso_utc_week_proven=false,
+    authenticated_requested_iso_week_input=weekSource?"2026-W37":null,
+    modeled_entries_in_requested_iso_week=weekSource?account.EntriesByIsoWeek.GetValueOrDefault("2026-W37"):0,
+    modeled_21_entry_threshold_met=weekSource && account.EntriesByIsoWeek.GetValueOrDefault("2026-W37")>=21,
+    weekly_provider_pages_broker_execution_proof=false,
     hard21_proven=false,
     scientific_confirmation_opened=false,
     new_broker_requests=0,
@@ -130,12 +141,15 @@ namespace Mxm.PortfolioNativeQuote {
   public static int Main(string[] args){
    try{
     bool captured=args.Length==4 &&
-      (args[0]=="--native-captured-terms-eurusd" || args[0]=="--artificial-captured-terms-fixture");
+      (args[0]=="--native-captured-terms-eurusd" ||
+       args[0]=="--native-week-captured-terms-eurusd" ||
+       args[0]=="--artificial-captured-terms-fixture");
     Need(captured || (args.Length==3&&
       (args[0]=="--native-exposed-eurusd"||args[0]=="--artificial-fixture")),
       "EXPLICIT_NONOUTCOME_MODE_REQUIRED");
-    bool native=args[0]=="--native-exposed-eurusd" || args[0]=="--native-captured-terms-eurusd";
-    var data=Run(args[1],native,captured?args[3]:null);
+    bool week=args[0]=="--native-week-captured-terms-eurusd";
+    bool native=week || args[0]=="--native-exposed-eurusd" || args[0]=="--native-captured-terms-eurusd";
+    var data=Run(args[1],native&&!week,captured?args[3]:null,week);
     Directory.CreateDirectory(args[2]);
     var output=Path.Combine(args[2],"portfolio-exposed-quote-readback.json");
     File.WriteAllText(output,JsonSerializer.Serialize(data,new JsonSerializerOptions{
