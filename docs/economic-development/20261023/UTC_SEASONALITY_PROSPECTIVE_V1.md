@@ -1,0 +1,29 @@
+# One causal same-UTC-hour profile: finite economic DEVELOPMENT decision
+
+Continue from official `ef6e7e235948f7602b73188a3123f13c259b6aa6` (PR165–166). Preserve all prior rejected fixed configurations, their outcome exposure, C033/canonical V2, existing authorities and checkpoints. Do not repeat Adaptive diagnostics or rescue the rejected CompressionRelease configuration. One distinct hypothesis is recurring intraday directional pressure, estimated online from earlier occurrences of the same UTC hour. This differs from last-return AR1, short trend/fade, completed-channel compression/release and fixed opening-range rules. It does not reopen any old exact session-time, quote/catchup or mean-reversion exit closure or claim that the general concept of seasonality is new.
+
+## One fixed causal law
+
+Maintain 24 bounded profiles, one per UTC hour. A valid completed H1 observation requires exactly twelve contiguous original M5 bars beginning at minute00. Its sample is the indicative open05-to-open55 return, expressed in bps and rounded to eight decimals away from zero. Only after the final M5 bar is complete may the sample enter that elapsed hour's profile. At this boundary, predict the UPCOMING hour from its five latest completed earlier occurrences. Sum strictly >+50bps predicts long; strictly <-50bps predicts short; otherwise neutral. Fewer than five samples means neutral. No fitted constants, grid, weekday/session selection or winning instrument/UTC-slot subset. All24 slots and all1576 source ordinals remain in scope.
+
+A gap invalidates the incomplete H1 observation; it does not fabricate bars or erase legitimately prior completed profiles. An explicit cold reset discards all profiles. The C# learner retains at most120 samples, plus one partial hour. No trained-state persistence or broker order path is added. Research C# lives inside the existing laboratory and is compiled separately from the trading Robot; unqualified hypotheses do not become new trading selectors.
+
+All of Aug20–Sep16 was already outcome exposed. The first original source segment (Aug20–26) contributes causal training only, with zero episodes. Evaluation begins Aug27; this is a warmup convention inside DEVELOPMENT, not an independent train/test or confirmation split. Profiles keep updating causally during evaluation and holds. Preserve genuine source gaps and cross-segment episodes.
+
+Indicative entry uses signal-bar-open+2 M5 steps: one full M5 step after the completed H1 decision boundary, at upcoming minute05. Exit is entry+10 steps (50 minutes), at minute55. At most one pending OR active episode per ordinal. Missing and terminal paths are censored, never priced at a manufactured exit. These nominal source timestamps are not historical receipt-time or fill evidence. Gross sums across separate ordinal channels are not a continuously funded EUR200 portfolio.
+
+## Frozen decision before new outcomes
+
+Use all100 original ciphertext shards, all3355389 original rows and all1576 ordinals already preserved; verify original manifest, release, cipher/plaintext, row and identity commitments. No new broker requests, external research inputs or protected/confirmation interval opening.
+
+One mechanism/model, four DEPENDENT arithmetic round-trip friction references0/5/10/20bps. They are hypothetical references, not Pepperstone historical fees, bid/ask execution, slippage, funding or margin certification. All gates required even for `REFERENCE_SCREEN_SURVIVOR_UNCONFIRMED`: >=1000 completed episodes; pooled mean gross strictly >5bps; mean gross strictly >5bps in EACH evaluation source segment2/3/4; censored fraction <=20%; top5 absolute ordinal gross contributions <=50% of all absolute ordinal contributions. Report every gate privately. Segments and channels are dependent observations, not independent trials. No significance or universal-null claim.
+
+Any failed gate ends advancement of THIS exact fixed candidate. No threshold/hour/roster/horizon rescue or automatic followup collection. A pass would still need separately admitted independent economic validation, authentic historical costs and broker feasibility, one EUR200 capital path, effective HARD21 and native cTrader reception. No filler trades to reach21. The overall B–E mandate remains open irrespective of this finite program's result.
+
+## Reconciliation, custody and finite authority
+
+Incremental bounded-state C# is checked against independent Python full-hour array indexing/Decimal. Reconcile every ordinal's rows, completed training hours, ready/candidate counts, all candidate-signal and completed-episode signature SHA256, completed/censored/week counts, gross and entry-source-block totals to1e-8bps. This is independent implementation checking of the SAME observations, not independent market evidence.
+
+The immutable JSON specification pins the kernel, CLI/project, independent reference, original source readers, protected workflow and normalized orchestrator (only its self-referential spec digest literal is normalized). Native execution checks those commitments before custody access, exact canonical clean source/workflow SHA, job/ref/attempt and absence of writer/broker credentials. Existing custody/read-only release access only. The C# child environment omits custody key and GitHub tokens; this is credential hygiene, not an OS security boundary. Encrypt full original outputs and reconciliation/provenance to the existing recipient. Preserve the original artifact and publish only qualitative disposition/provenance.
+
+Budget: one finite dependent DEVELOPMENT program, one candidate, four arithmetic references, zero formal V2 trials, zero automatic retries, zero unregistered followups. C033, OWNER1807, canonical V2, DEVELOPMENT / CONFIRMATION / PROTECTED separations and all existing authorities remain unchanged. No LIVE/DEMO broker orders, Cloud activation, new provider, spending or claim of native execution/product acceptance.
