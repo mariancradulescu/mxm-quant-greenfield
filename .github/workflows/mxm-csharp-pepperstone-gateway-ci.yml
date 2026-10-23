@@ -50,6 +50,8 @@ jobs:
           cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/
           cp research_core_v4/laboratory/test_week_chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/
           (cd .sealed-chronology-source && python3 -m unittest research_core_v4.laboratory.test_week_chronology_csharp_bridge -v)
+      - name: Verify unchanged-week gross/commission/mark attribution under no-key accounting fixtures
+        run: python3 -m unittest research_core_v4.laboratory.test_csharp_week_account_attribution -v
       - name: Decode actual protobuf symbol shapes; missing defaults, cents and precise fee units
         run: python3 -m unittest research_core_v4.laboratory.test_captured_symbol_terms -v
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
