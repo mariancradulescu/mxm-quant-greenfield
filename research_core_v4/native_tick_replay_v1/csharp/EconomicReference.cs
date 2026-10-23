@@ -291,6 +291,28 @@ static class Program {
     return 0;
    }
    if(args.Length==1 && args[0]=="--stop-risk-fixture"){
+    void Geometry(int direction,decimal bid,decimal ask,decimal stop,decimal expected) {
+     var reason=MxmStopRiskGeometry.TryDistance(direction,bid,ask,stop,.0001m,out var distance);
+     if(reason!=MxmStopRiskGeometry.Valid || distance!=expected)
+      throw new InvalidDataException("STOP_RISK_MARK_TO_STOP_FIXTURE");
+    }
+    Geometry(1,1.105m,1.1052m,1.100m,50m); // Stop at old entry is NOT zero equity risk.
+    Geometry(-1,1.095m,1.0952m,1.1002m,50m);
+    Geometry(1,1.105m,1.1052m,1.103m,20m); // Profit-locking stop still has giveback.
+    Geometry(-1,1.095m,1.0952m,1.0972m,20m);
+    Geometry(1,1.099m,1.0992m,1.098m,10m); // Losing position: remaining, not sunk loss.
+    foreach(var item in new[]{
+      (1,1.10m,1.1002m,1.10m,.0001m),
+      (1,1.10m,1.1002m,1.1001m,.0001m),
+      (-1,1.10m,1.1002m,1.1002m,.0001m),
+      (-1,1.10m,1.1002m,1.10m,.0001m),
+      (1,1.10m,1.09m,1.08m,.0001m),
+      (1,1.10m,1.11m,1.09m,0m),
+      (0,1.10m,1.11m,1.09m,.0001m)}) {
+     if(MxmStopRiskGeometry.TryDistance(item.Item1,item.Item2,item.Item3,item.Item4,
+        item.Item5,out _) == MxmStopRiskGeometry.Valid)
+      throw new InvalidDataException("STOP_RISK_INVALID_OR_TOUCHED_MARK_ACCEPTED");
+    }
     string Check(decimal eq,decimal existing,decimal proposed,decimal fraction,decimal fee,decimal existingFee)
      =>MxmStopRiskAdmission.Check(eq,existing,proposed,fraction,fee,existingFee);
     void Must(string actual,string expected){if(actual!=expected)
@@ -304,6 +326,12 @@ static class Program {
     Must(Check(200m,0m,1m,0m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
     Must(Check(200m,0m,1m,1.01m,.2m,0m),"REJECT_INVALID_OR_UNVERIFIED_STOP_RISK");
     Must(Check(150m,2m,.9m,.02m,.1m,0m),MxmStopRiskAdmission.Admit);
+    // Artificial EUR0.10/pip: 50 pips current-equity giveback is EUR5,
+    // rather than the entry-based zero used by the defective adapter.
+    MxmStopRiskGeometry.TryDistance(1,1.105m,1.1052m,1.100m,.0001m,out var liveDistance);
+    Must(Check(200m,0m,1m,.02m,.2m,0m),MxmStopRiskAdmission.Admit);
+    Must(Check(200m,liveDistance*.1m,1m,.02m,.2m,0m),"REJECT_EXISTING_STOP_RISK_EXHAUSTED");
+    Console.WriteLine("MXM_LONG_SHORT_CURRENT_LIQUIDATION_MARK_TO_STOP_EQUITY_RISK_SYNTHETIC_PASS_NO_GUARANTEED_FILL");
     var artificial=Fixture();
     var baseline=new Replay(false,true,stopLossPips:12,maxEstimatedStopRiskFraction:.02m,
       estimatedStopRiskFrictionReserveEur:.20m).Run(artificial);

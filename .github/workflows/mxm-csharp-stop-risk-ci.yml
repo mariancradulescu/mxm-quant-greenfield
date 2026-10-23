@@ -30,6 +30,12 @@ jobs:
           assert 'Positions.FindAll(Label)' in source
           assert 'active.StopLoss.HasValue' in source
           assert 'active.Symbol.AmountRisked(active.VolumeInUnits,distancePips)' in source
+          assert 'MxmStopRiskGeometry.TryDistance(' in source
+          assert '(decimal)active.Symbol.Bid,(decimal)active.Symbol.Ask' in source
+          assert 'Math.Abs(active.EntryPrice-active.StopLoss.Value)' not in source
+          geometry=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmStopRiskGeometry.cs').read_text()
+          assert 'bid-stop:stop-ask' in geometry
+          assert 'REJECT_STOP_TOUCHED_OR_PASSED_ACK_UNRESOLVED' in geometry
           assert 'MxmStopRiskAdmission.Check(' in source and 'MxmStopRiskAdmission.Check(' in sim
           assert 'EnableDemoTrading && !Account.IsLive' in source
           assert 'DefaultValue=2.0' in source and 'EstimatedRoundTripFrictionReserveEur' in source

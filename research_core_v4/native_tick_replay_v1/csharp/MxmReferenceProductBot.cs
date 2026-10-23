@@ -235,11 +235,20 @@ public sealed class MxmReferenceProductBot : Robot {
    // or if its symbol/volume/pip geometry cannot be validated.
    if(!active.StopLoss.HasValue || !double.IsFinite(active.StopLoss.Value) ||
       !double.IsFinite(active.EntryPrice) || !double.IsFinite(active.VolumeInUnits) ||
+      !double.IsFinite(active.Symbol.Bid) || !double.IsFinite(active.Symbol.Ask) ||
       !double.IsFinite(active.Symbol.PipSize) || active.Symbol.PipSize<=0 ||
       active.EntryPrice<=0 || active.VolumeInUnits<=0) {
     Print("MXM_EXISTING_STOP_UNVERIFIED_SAFE_HOLD");return;
    }
-   double distancePips=Math.Abs(active.EntryPrice-active.StopLoss.Value)/active.Symbol.PipSize;
+   // Account.Equity already includes floating PnL. Estimate its potential
+   // drawdown to the stop from the CURRENT BID (long) / ASK (short).
+   string geometry=MxmStopRiskGeometry.TryDistance(active.TradeType==TradeType.Buy?1:-1,
+    (decimal)active.Symbol.Bid,(decimal)active.Symbol.Ask,(decimal)active.StopLoss.Value,
+    (decimal)active.Symbol.PipSize,out var currentDistancePips);
+   if(geometry!=MxmStopRiskGeometry.Valid) {
+    Print("MXM_EXISTING_MARK_TO_STOP_HOLD_"+geometry);return;
+   }
+   double distancePips=(double)currentDistancePips;
    if(!double.IsFinite(distancePips)||distancePips<0) {
     Print("MXM_EXISTING_STOP_DISTANCE_UNVERIFIED_SAFE_HOLD");return;
    }
