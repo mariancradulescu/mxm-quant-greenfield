@@ -44,6 +44,13 @@ public sealed record MxmEurUsdCapturedCosts(long MinCents,long MaxCents,long Ste
   decimal minimumEur=MinimumAsset=="EUR"?minimum:minimum/bid;
   return Math.Max(variableEur,minimumEur);
  }
+ // Exact current cTrader product DEFAULT is 12 pips, and the captured
+ // EURUSD metadata must explicitly show pipPosition=4/digits=5. This
+ // snapshot cannot certify historical stop minimums or actual broker fills.
+ public static decimal ProductDefaultStop12Distance(int? digits,int? pipPosition) {
+  Need(digits==5 && pipPosition==4,"PRODUCT_STOP12_PIP_GEOMETRY_UNKNOWN");
+  return 0.0012m;
+ }
  public static MxmEurUsdCapturedCosts Load(string path,bool nativeSource,bool weekSource=false) {
   Need(!weekSource || !nativeSource,"CONTRADICTORY_SOURCE");
   using var doc=JsonDocument.Parse(File.ReadAllBytes(path));var root=doc.RootElement;
