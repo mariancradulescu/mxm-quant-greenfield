@@ -42,7 +42,7 @@ public sealed record MxmReplayParameters(
  StrategyMode Strategy, decimal MaxMarginFraction,
  int MaxPositions, decimal MinimumFreeMarginReserveEur,
  decimal MaxEstimatedStopRiskFraction, decimal RoundTripRiskReserveEur,
- int BarMinutes=5, int MaxQuoteAgeSeconds=300, ExitMode ExitPolicy=ExitMode.ReverseOnly
+ int BarMinutes=5, int MaxQuoteAgeSeconds=300, ExitMode ExitPolicy=ExitMode.ReverseOnly, bool OnlineAr1=false
 );
 
 /// <summary>
@@ -56,12 +56,12 @@ public sealed record MxmReplayParameters(
 /// </summary>
 public sealed class MxmPortfolioAccountReplay {
  sealed class State {
-  public readonly MxmDecisionKernel Kernel;
+  public readonly MxmDecisionSource Kernel;
   public DateTime LastBar;
   public DateTime LastQuote;
   public MxmQuote? Latest;
   public readonly MxmCausalIntent Intent=new();
-  public State(StrategyMode mode) {Kernel=new MxmDecisionKernel(mode);}
+  public State(StrategyMode mode,bool onlineAr1) {Kernel=new MxmDecisionSource(new MxmDecisionKernel(mode),onlineAr1);}
  }
  sealed record Holding(int Direction,decimal Entry,decimal Units,decimal Margin,
   decimal StopRisk,decimal QuoteToEur,DateTime EntryUtc,decimal? StopPrice);
@@ -80,10 +80,11 @@ public sealed class MxmPortfolioAccountReplay {
      settings.MaxMarginFraction<=0 || settings.MaxMarginFraction>1 ||
      settings.MaxEstimatedStopRiskFraction<=0 || settings.MaxEstimatedStopRiskFraction>1 ||
      settings.MinimumFreeMarginReserveEur<0 || settings.RoundTripRiskReserveEur<0 ||
-     !Enum.IsDefined(typeof(ExitMode),settings.ExitPolicy))
+     !Enum.IsDefined(typeof(ExitMode),settings.ExitPolicy) ||
+     (settings.OnlineAr1 && (settings.BarMinutes!=5 || settings.ExitPolicy!=ExitMode.NeutralFlat)))
    throw new ArgumentException("INVALID_EUR200_PORTFOLIO_SETTINGS");
   foreach(var raw in symbols) {
-   if(string.IsNullOrWhiteSpace(raw) || !state.TryAdd(raw.Trim(),new State(settings.Strategy)))
+   if(string.IsNullOrWhiteSpace(raw) || !state.TryAdd(raw.Trim(),new State(settings.Strategy,settings.OnlineAr1)))
     throw new ArgumentException("INVALID_OR_DUPLICATE_SYMBOL");
   }
   if(state.Count==0)throw new ArgumentException("EMPTY_PORTFOLIO");

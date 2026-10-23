@@ -1,0 +1,82 @@
+{
+  "bar_minutes": 5,
+  "benchmark": "cash EUR200, no trades",
+  "budget": {
+    "canonical_C033_preserved": true,
+    "dependent_model_leaves": 2,
+    "formal_V2_trials": 0,
+    "independent_confirmation": 0,
+    "lane": "B-E finite dependent DEVELOPMENT: one new causal adaptive mechanism; exposed W35 reuse; no canonical V2 admission or recycled independent trial",
+    "mechanisms": 1,
+    "reproduction": "same fixed identity only; never new independent evidence",
+    "unregistered_followups": 0
+  },
+  "capital_policy": "one continuous EUR200 account per alternative scenario; alternatives are not concurrent funded accounts or weekly resets",
+  "cloud": false,
+  "commission": "captured W35 snapshot components; not historical fee certification",
+  "confirmation_opened": false,
+  "decision": "Reject this fixed model if both terminal marked equities <=200; otherwise INCONCLUSIVE only. Zero trades cannot qualify. Stop after two dependent leaves, no tuning or automatic followups.",
+  "exit": "NeutralFlat plus first observed quote-side stop; same-boundary stop revocation",
+  "friction_reserve_eur": 0.2,
+  "fx": "USD gains /ASK; losses and USD fees /BID",
+  "hard21": false,
+  "id": "MXM_W35_ONLINE_AR1_20261023_V1",
+  "implementation_sha256": {
+    "research_core_v4/laboratory/csharp_native_portfolio_independent_mark.py": "bdaf0e19f2fb01e375382aa18a21e4aff2e434e90e6695b0376df7061954624f",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCapitalAdmission.cs": "bf30274cc5cf57c64dd4f5329b6ddd0d6c56153be97e86539150d497648eab98",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCausalIntent.cs": "d93b950555828971b212f848d426f27747c27ff4406038217298b4d8ae31faf2",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmExitPolicy.cs": "4eba82aca5f84a28305eb9151d147a6ccdc1d81ab2a6fa102f169fad9a29dde9",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmOnlineAr1Kernel.cs": "5bc99048425454de76c40f53d9585ba788023aa69e5e9e9622b9b586784c3a85",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplay.cs": "36c102c4272c220a5e61bd1405158b1c25cb49c6db72af2d6d082c658186506b",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.cs": "09327f2a29d3694b6141ddcb17521d8dd826110dc06a62dd91a2eea203436a21",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs": "70e6654aea91bbca575e6ca84b81874562133eba82ab1263a6a9ea7a1bbf367f",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmStopRiskAdmission.cs": "80eea56f8d4952484714df9120b61296bb24d7d61f59d8b4608bbbd25d2f90c2"
+  },
+  "initial_capital_eur": 200,
+  "kernel_sha256": "8a5910b5f552907ac456c18331e4f9f1c66364d7350224357bab4446b592db32",
+  "learner": {
+    "beta_clip": [
+      -0.95,
+      0.95
+    ],
+    "cold_restart": "discard learned state, rewarm from newly completed bars; no learned-state persistence claim",
+    "configuration_selection": "engineering priors frozen before new outputs; not estimated from W35",
+    "gap": "reset shared causal strategy state on noncontiguous bars",
+    "intercept": "rolling meanY - beta * meanX",
+    "minimum_pairs": 128,
+    "positive_result_is_confirmed": false,
+    "ridge_bps_squared": 64,
+    "shock_reset_abs_return_bps": 100,
+    "signal_threshold_bps": 2,
+    "window_pairs": 256
+  },
+  "margin_eur": 50,
+  "max_margin_fraction": 0.4,
+  "max_positions": 1,
+  "max_stop_risk_fraction": 0.02,
+  "mechanism": "Prospectively fixed causal rolling centered ridge AR(1) on completed M5 close returns in bps; update through current return, forecast NEXT return. Abstain inside fixed +/-2bps band. Not a refit of rejected fixed reference families.",
+  "omissions": [
+    "historical fees/financing/swap/effective dates",
+    "native broker fills/callback/crash recovery",
+    "same-ms cross-side precedence",
+    "executable liquidity and historic margin",
+    "future closing fee and slippage on any terminal open position",
+    "multi-week/multi-instrument robustness"
+  ],
+  "orders": 0,
+  "partition": "DEVELOPMENT_ALREADY_M5_EXPOSED",
+  "protected_opened": false,
+  "schema": "mxm.week35.online-ar1-development.v1",
+  "slippage_quote_per_side": [
+    2e-05,
+    4e-05
+  ],
+  "source_ciphertext_sha256": "0d1badd1a944eeac7a67f1f7c87e05d26c1ea14ea016a0ea25fbb40ce7cb92ee",
+  "source_events": 683022,
+  "source_run": 39946364621,
+  "stop_pips": 12,
+  "strategies": [
+    "OnlineAr1"
+  ],
+  "units": 1000
+}

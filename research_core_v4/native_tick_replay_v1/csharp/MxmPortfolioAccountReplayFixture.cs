@@ -36,6 +36,43 @@ foreach(var bad in new (int?,int?)[]{(5,null),(null,4),(4,4),(5,5)}) {
  catch(InvalidDataException){rejected=true;}
  Require(rejected,"NO_GUESSED_PIP_GEOMETRY");
 }
+// Artificial alternating returns are a causal learnability fixture, not market evidence.
+var learner=new MxmOnlineAr1Kernel();var replayLearner=new MxmOnlineAr1Kernel();
+decimal testClose=1m;int nonzero=0;
+for(int i=0;i<700;i++) {
+ if(i>0)testClose*=1m+(i%2==0?.0005m:-.0005m);
+ int signal=learner.OnCompletedBar(testClose);
+ Require(signal==replayLearner.OnCompletedBar(testClose),"ONLINE_DETERMINISTIC_PREFIX");
+ Require(learner.TrainingPairs<=256,"ONLINE_BOUNDED_MEMORY");
+ if(i<129)Require(signal==0,"ONLINE_NO_ENTRY_DURING_WARMUP");
+ if(i>140){Require(learner.Beta<-.8m,"ONLINE_NEGATIVE_AR1_LEARNED");
+  Require(signal==(i%2==0?-1:1),"ONLINE_NEXT_RETURN_DIRECTION");nonzero++;}
+}
+Require(nonzero>0,"ONLINE_NONVACUOUS_SIGNAL_TEST");
+Require(learner.OnCompletedBar(testClose*1.02m)==0 && learner.TrainingPairs==0,
+ "ONLINE_SHOCK_FORCES_COLD_REWARM");
+learner.Reset();Require(learner.CompletedBars==0 && learner.ForecastBps==0,"ONLINE_EXPLICIT_RESET");
+foreach(var family in Enum.GetValues<StrategyMode>()) {
+ var oldKernel=new MxmDecisionKernel(family);var routed=new MxmDecisionSource(new MxmDecisionKernel(family));
+ for(int i=0;i<30;i++)Require(oldKernel.OnCompletedBar(1m+i*.0001m)==routed.OnCompletedBar(1m+i*.0001m),"LEGACY_ROUTE_PARITY");
+}
+Console.WriteLine("MXM_ONLINE_AR1_CAUSAL_WARMUP_BOUND_SHOCK_LEGACY_PARITY_PASS");
+var onlineFeeds=new List<MxmAccountFeed>();testClose=1m;
+var onlineStart=new DateTime(2026,8,24,0,0,0,DateTimeKind.Utc);
+for(int i=0;i<170;i++) {
+ if(i>0 && i<160)testClose*=1m+(i%2==0?.0005m:-.0005m);
+ var at=onlineStart.AddMinutes(5*i);
+ onlineFeeds.Add(new MxmBarClose(at,"EURUSD",testClose));
+ onlineFeeds.Add(new MxmQuote(at.AddSeconds(1),"EURUSD",testClose-.00001m,testClose+.00001m,
+  1m,1000m,50m,.01m,0m,1.2m,StopDistanceQuote:.0012m));
+}
+var onlineAccount=new MxmPortfolioAccountReplay(new[]{"EURUSD"},
+ new MxmReplayParameters(StrategyMode.Adaptive,.4m,1,0m,.02m,.2m,5,300,ExitMode.NeutralFlat,true)).Run(onlineFeeds);
+Require(onlineAccount.InitialCapitalEur==200m && onlineAccount.AcceptedEntries>0 &&
+ onlineAccount.OpenPositions==0 && onlineAccount.Ledger.Any(x=>x.Reason=="NEUTRAL_FLAT"),
+ "ONLINE_SHARED_ACCOUNT_AND_NEUTRAL_EXIT");
+Require(onlineAccount.Ledger.Where(x=>x.Kind=="ENTRY").All(x=>
+ x.Utc>=onlineStart.AddMinutes(5*129).AddSeconds(1)),"ONLINE_ACCOUNT_NO_WARMUP_FILLS");
 var balanced=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(Series());
 // Current-snapshot money semantics are a counterfactual, not actual fees.
 var cost=new MxmEurUsdCapturedCosts(100000,100000000,100000,10000000,1,3000000000,1000000,"USD");

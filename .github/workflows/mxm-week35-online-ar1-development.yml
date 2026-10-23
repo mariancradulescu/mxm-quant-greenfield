@@ -1,0 +1,81 @@
+{
+  "name": "MXM W35 online AR1 finite DEVELOPMENT",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-week35-online-ar1-development.yml"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "online-ar1-development": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 25,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read"
+      },
+      "env": {
+        "LAB_CHRONOLOGY_PROFILE": "W35"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".sealed-chronology-source",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit exact prospectively fixed finite DEVELOPMENT program before custody access",
+          "run": "python3 -m research_core_v4.laboratory.week35_online_ar1_development admit"
+        },
+        {
+          "name": "Restore durable source and prepare exact original wire decoder",
+          "run": "test \"$(git -C .sealed-chronology-source rev-parse HEAD)\" = d2fae5641b759b1c8c24161d83d62d39e104eafd\npython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m research_core_v4.laboratory.durable_week35_chronology --out \"${RUNNER_TEMP}/mxm-w35/source\"\ncp research_core_v4/laboratory/week_chronology_reception.py .sealed-chronology-source/research_core_v4/laboratory/\ncp research_core_v4/laboratory/week35_chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/\ncp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Decode only exact authenticated W35 inside existing custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .sealed-chronology-source\npython3 -m research_core_v4.laboratory.week35_chronology_csharp_bridge \"${RUNNER_TEMP}/mxm-w35/source/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-w35/ticks.ndjson\""
+        },
+        {
+          "name": "Execute one frozen online CSharp learner under both cost scenarios; reconcile both ledgers",
+          "run": "dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release\nfor family in OnlineAr1; do\n  tag=online-ar1\n  for scenario in base stress; do\n    mode=\"--native-week35-${tag}-stop12\"\n    if [ \"$scenario\" = stress ]; then mode=\"${mode}-stress\"; fi\n    dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- \"$mode\" \"${RUNNER_TEMP}/mxm-w35/ticks.ndjson\" \"${RUNNER_TEMP}/mxm-w35/${family}/${scenario}\" \"${RUNNER_TEMP}/mxm-w35/ticks.ndjson.symbol-terms.json\"\n    python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark \"${RUNNER_TEMP}/mxm-w35/ticks.ndjson\" \"${RUNNER_TEMP}/mxm-w35/${family}/${scenario}/portfolio-exposed-quote-readback.json\" --captured-terms \"${RUNNER_TEMP}/mxm-w35/ticks.ndjson.symbol-terms.json\" --out \"${RUNNER_TEMP}/mxm-w35/${family}/${scenario}/independent-mark.json\"\n  done\ndone"
+        },
+        {
+          "name": "Apply predeclared cash comparison and encrypt full result without promoting a winner",
+          "run": "python3 -m research_core_v4.laboratory.week35_online_ar1_development \"${RUNNER_TEMP}/mxm-w35\" verification/week35-online-ar1-development"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "week35-online-ar1-development-${{ github.run_id }}",
+            "path": "verification/week35-remaining-families-development/receipt.json\nverification/week35-remaining-families-development/full-result.mxmenc",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
