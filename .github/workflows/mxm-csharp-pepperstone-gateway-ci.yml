@@ -68,6 +68,8 @@ jobs:
         run: python3 -m unittest research_core_v4.laboratory.test_captured_symbol_terms -v
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj -c Release -- --selftest
+          python3 -m unittest research_core_v4.laboratory.test_compression_development -v
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplayFixture.csproj -c Release
