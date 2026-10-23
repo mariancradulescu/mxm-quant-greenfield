@@ -21,6 +21,7 @@ public sealed class MxmReferenceProductBot : Robot {
  readonly Dictionary<string,MxmCausalIntent> causalIntents=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmBrokerIntentFence> brokerIntentFences=new(StringComparer.OrdinalIgnoreCase);
  bool applyingDecision;
+ readonly MxmOrderProtection orderProtection=new();
  MxmPortfolioSequencer? sequencer;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
  public bool EnableDemoTrading {get;set;}
@@ -99,6 +100,15 @@ public sealed class MxmReferenceProductBot : Robot {
   foreach(var name in resolved) {
    var recovered=Positions.FindAll(Label,name);
    if(recovered.Length>1){Print("MXM_MULTIPLE_RECOVERED_POSITIONS_SAFE_STOP");Stop();return;}
+   if(recovered.Length==1) {
+    var active=recovered[0];var instrument=subscribedSymbols[name];
+    var recoveryProtection=new MxmOrderProtection().Reconcile(true,active.Id,
+     Label,name,active.TradeType==TradeType.Buy?1:-1,active.VolumeInUnits,
+     StopLossPips,instrument.PipSize,instrument.TickSize,Array.Empty<long>(),ProtectionBook());
+    if(!recoveryProtection.Accepted) {
+     Print("MXM_RECOVERED_POSITION_PROTECTION_SAFE_STOP_"+recoveryProtection.Reason);Stop();return;
+    }
+   }
    brokerIntentFences.Add(name,new MxmBrokerIntentFence(causalIntents[name],BarMinutes,
     recovered.Length==0?null:recovered[0].Id));
   }
@@ -130,6 +140,7 @@ public sealed class MxmReferenceProductBot : Robot {
   }
  }
  protected override void OnStop() {
+  Timer.Stop();
   Positions.Closed-=OnBrokerPositionClosed;
   foreach(var fence in brokerIntentFences.Values)fence.Reset();
   foreach(var series in subscribedBars.Values)series.BarClosed-=OnPortfolioBarClosed;
@@ -137,6 +148,7 @@ public sealed class MxmReferenceProductBot : Robot {
   foreach(var intent in causalIntents.Values)intent.Clear();
  }
  void OnPortfolioBarClosed(BarClosedEventArgs args) {
+  if(orderProtection.Halted)return;
   var series=args.Bars;
   if(series.Count<2 || sequencer==null)return;
   var instrumentName=series.SymbolName;
@@ -181,6 +193,7 @@ public sealed class MxmReferenceProductBot : Robot {
   } finally {sequencer.Exit();}
  }
  void OnPortfolioTick(SymbolTickEventArgs args) {
+  if(orderProtection.Halted)return;
   if(!causalIntents.TryGetValue(args.SymbolName,out var queue))return;
   bool acquired=false;
   try {
@@ -325,10 +338,52 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),BrokerClock())) {
    Print("MXM_BROKER_BOOK_CHANGED_NO_STALE_INTENT_ENTRY");return;
   }
-  var placed=ExecuteMarketOrder(direction,instrumentName,units,Label,StopLossPips,null);
+  var beforeIds=Positions.Select(x=>(long)x.Id).ToArray();
+  TradeResult placed;
+  try {placed=ExecuteMarketOrder(direction,instrumentName,units,Label,StopLossPips,null);}
+  catch(Exception e) {
+   orderProtection.HaltUnknown();
+   LatchProtectionHalt();
+   Print("MXM_ORDER_CALL_EXCEPTION_UNKNOWN_OUTCOME_HALTED_"+e.GetType().Name);
+   return; // No returned identity: never infer which broker position to close.
+  }
   Print("MXM_ORDER_CALL_RETURNED fenceRevision={0} intentBoundary={1:O} symbol={2} success={3}",
    lease.Revision,currentOpenTime,instrumentName,placed.IsSuccessful);
-  if(!placed.IsSuccessful)Print("MXM_ORDER_REJECTED_NO_SYNTHETIC_FILL");
+  var protection=orderProtection.Reconcile(placed.IsSuccessful,placed.Position?.Id,
+   Label,instrumentName,desired>0?1:-1,units,StopLossPips,instrument.PipSize,instrument.TickSize,
+   beforeIds,ProtectionBook());
+  Print("MXM_ORDER_PROTECTION_"+protection.Reason);
+  if(protection.Halt) {
+   LatchProtectionHalt();
+  }
+ }
+ void LatchProtectionHalt() {
+  foreach(var intent in causalIntents.Values)intent.Clear();
+  // Halt stays latched even after successful flattening. No new entry or retry.
+  // Timer retries only the attributable returned position, never foreign exposure.
+  Timer.Start(TimeSpan.FromSeconds(5));
+  TryDefensiveClose();
+ }
+ MxmProtectionPosition[] ProtectionBook()=>Positions.Select(x=>new MxmProtectionPosition(
+  x.Id,x.Label,x.SymbolName,x.TradeType==TradeType.Buy?1:-1,
+  x.VolumeInUnits,x.EntryPrice,x.StopLoss)).ToArray();
+ protected override void OnTimer() {
+  if(!orderProtection.Halted || applyingDecision)return;
+  TryDefensiveClose();
+ }
+ void TryDefensiveClose() {
+  try {
+   long? id=orderProtection.DefensiveCloseId(ProtectionBook());
+   if(id==null)return; // Ambiguous identity stays halted; no guessed close.
+   var candidate=Positions.FirstOrDefault(x=>x.Id==id);
+   if(candidate==null)return;
+   var result=ClosePosition(candidate);
+   bool absent=!Positions.Any(x=>x.Id==id);
+   Print("MXM_DEFENSIVE_CLOSE id={0} success={1} absent={2} ADMISSION_REMAINS_HALTED",
+    id,result.IsSuccessful,absent);
+  } catch(Exception e) {
+   Print("MXM_DEFENSIVE_CLOSE_UNVERIFIED_HALTED_"+e.GetType().Name);
+  }
  }
 }
 }

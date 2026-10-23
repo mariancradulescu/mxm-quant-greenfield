@@ -120,6 +120,54 @@ foreach(string variant in new[]{"matching","stop","wrong_id","no_event","failed"
  var lease=fenceB.Capture();fenceB.Reset();
  Require(!fenceB.IsCurrent(lease,51,utc.AddSeconds(3)),"STOP_RESET_REVOKES_CONSUMED_LEASE");
 }
+// Old product accepts IsSuccessful alone, even when no stop was attached.
+var good=new MxmProtectionPosition(90,"OWNER","EURUSD",1,1000,1.1,1.0988);
+MxmProtectionVerdict Check(MxmOrderProtection guard,bool ok=true,long? id=90,
+ MxmProtectionPosition[]? book=null,long[]? before=null,int direction=1)=>
+ guard.Reconcile(ok,id,"OWNER","EURUSD",direction,1000,12,.0001,.00001,
+  before??Array.Empty<long>(),book??new[]{good});
+Require(Check(new()).Accepted,"POSTFILL_VALID_LONG");
+Require(Check(new(),book:new[]{good with {Direction=-1,Stop=1.1012}},direction:-1).Accepted,
+ "POSTFILL_VALID_SHORT");
+Require(Check(new(),book:new[]{good with {Stop=1.098795}}).Accepted,"ONE_TICK_ROUNDING_BOUND");
+foreach(var bad in new[]{good with {Stop=null},good with {Stop=double.NaN},
+ good with {Stop=1.101},good with {Stop=1.0987},good with {Units=999},
+ good with {Units=double.PositiveInfinity},good with {Entry=0},good with {Direction=-1},
+ good with {Id=91},good with {Label="FOREIGN"},good with {Symbol="GBPUSD"}}) {
+ var guard=new MxmOrderProtection();
+ var verdict=Check(guard,book:new[]{bad});
+ Require(verdict.Halt && !verdict.Accepted,"POSTFILL_INVALID_BOOK_HALTS");
+ Require(!Check(guard).Accepted && guard.Halted,"POSTFILL_LATCH_CANNOT_SELF_RESET");
+ bool attributable=bad.Id==90 && bad.Label=="OWNER" && bad.Symbol=="EURUSD";
+ Require(guard.DefensiveCloseId(new[]{bad})==(attributable?90L:(long?)null),
+  "ONLY_ATTRIBUTABLE_ID_CAN_BE_CLOSED");
+ Require(guard.DefensiveCloseId(new[]{bad with {Label="FOREIGN"}})==null,"RETRY_RECHECKS_OWNERSHIP");
+ Require(guard.DefensiveCloseId(Array.Empty<MxmProtectionPosition>())==null,"DISAPPEARED_NO_CLOSE");
+}
+foreach(var scenario in new[]{"NO_ID","NO_BOOK","FAILED_WITH_POSITION","PREEXISTING","MULTIPLE"}) {
+ var guard=new MxmOrderProtection();
+ var verdict=Check(guard,ok:scenario!="FAILED_WITH_POSITION",id:scenario=="NO_ID"?null:90,
+  book:scenario=="NO_BOOK"?Array.Empty<MxmProtectionPosition>():
+   scenario=="MULTIPLE"?new[]{good,good with {Id=91}}:new[]{good},
+  before:scenario=="PREEXISTING"?new long[]{90}:Array.Empty<long>());
+ Require(verdict.Halt,"AMBIGUOUS_OUTCOME_HALTS_"+scenario);
+ if(scenario=="NO_ID" || scenario=="PREEXISTING")
+  Require(guard.DefensiveCloseId(new[]{good})==null,"NO_INFERRED_OWNERSHIP_"+scenario);
+}
+var unknown=new MxmOrderProtection();unknown.HaltUnknown();
+Require(unknown.Halted && unknown.DefensiveCloseId(new[]{good})==null && !Check(unknown).Accepted,
+ "EXCEPTION_WITHOUT_IDENTITY_HALTS_WITHOUT_SEIZING_BOOK");
+var rejected=new MxmOrderProtection();
+Require(!Check(rejected,ok:false,id:null,book:Array.Empty<MxmProtectionPosition>()).Halt,
+ "CLEAN_REJECTION_NO_SYNTHETIC_FILL");
+// Fake broker retry sequence: first close rejects, second book still contains ID;
+// later absence suppresses another close but never reopens admission.
+var retry=new MxmOrderProtection();Check(retry,book:new[]{good with {Stop=null}});
+Require(retry.DefensiveCloseId(new[]{good})==90 && retry.DefensiveCloseId(new[]{good})==90,
+ "DEFENSIVE_CLOSE_RETRY_SAME_ID");
+Require(retry.DefensiveCloseId(Array.Empty<MxmProtectionPosition>())==null && retry.Halted,
+ "FLATTENED_REMAINS_HALTED");
+Console.WriteLine("MXM_POSTFILL_PROTECTION_IDENTITY_STOP_LATCH_RETRY_PASS_NOT_NATIVE_PROOF");
 var output=Path.Combine("verification","broker-intent-fence","synthetic-contract.json");
 Directory.CreateDirectory(Path.GetDirectoryName(output)!);
 File.WriteAllText(output,JsonSerializer.Serialize(new {
