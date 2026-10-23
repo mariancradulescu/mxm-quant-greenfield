@@ -34,14 +34,16 @@ namespace Mxm.PortfolioNativeQuote {
    return result;
   }
   public static object Run(string input,bool exactExistingSource=true,string? termsPath=null,
-   bool weekSource=false,bool productDefaultStop12=false){
+   bool weekSource=false,bool productDefaultStop12=false,bool week35=false,decimal slip=0.00002m){
+   Need(!week35 || (weekSource && productDefaultStop12),"W35_FIXED_STOP_REQUIRED");
+   Need(!week35 || (slip==0.00002m || slip==0.00004m),"W35_UNREGISTERED_SLIPPAGE");
    Need(!weekSource || !exactExistingSource,"CONTRADICTORY_NATIVE_SOURCE");
    Need(!productDefaultStop12 || (weekSource && termsPath!=null),
     "PRODUCT_STOP12_REQUIRES_AUTHENTIC_WEEK_TERMS");
    var bytes=File.ReadAllBytes(input);
    var hash=Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
    var ticks=Parse(input);
-   var costs=termsPath==null?null:MxmEurUsdCapturedCosts.Load(termsPath,exactExistingSource,weekSource);
+   var costs=termsPath==null?null:MxmEurUsdCapturedCosts.Load(termsPath,exactExistingSource,weekSource,week35);
    string? termsSha=termsPath==null?null:
     Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(termsPath))).ToLowerInvariant();
    decimal? productStopDistance=null;
@@ -53,9 +55,9 @@ namespace Mxm.PortfolioNativeQuote {
     productStopDistance=MxmEurUsdCapturedCosts.ProductDefaultStop12Distance(digits,pip);
    }
    if(exactExistingSource)Need(ticks.Count==ExpectedNativeEvents,"ORIGINAL_EVENT_COUNT");
-   if(weekSource)Need(ticks.Count==ExpectedWeekEvents &&
-     ticks[0].T>=WeekStartMs && ticks[^1].T<WeekEndMs &&
-     ticks.All(z=>z.T>=WeekStartMs && z.T<WeekEndMs),"PINNED_WEEK_EVENT_OR_TIME_BOUND");
+   if(weekSource)Need(ticks.Count==(week35?683022:ExpectedWeekEvents) &&
+     ticks[0].T>=(week35?1787529600000L:WeekStartMs) && ticks[^1].T<(week35?1788134400000L:WeekEndMs) &&
+     ticks.All(z=>z.T>=(week35?1787529600000L:WeekStartMs) && z.T<(week35?1788134400000L:WeekEndMs)),"PINNED_WEEK_EVENT_OR_TIME_BOUND");
    int ambiguous=0,cross=0,stale=0,accepted=0,completeBarDecisions=0,zero=0;
    long bidTime=-1,askTime=-1,barBucket=-1;
    decimal bid=0,ask=0,lastBarBid=0;
@@ -93,22 +95,23 @@ namespace Mxm.PortfolioNativeQuote {
     // One quote per original millisecond, never fabricate a later timestamp.
     // All monetary terms below are explicit NON-BROKER-VERIFIED assumptions.
     feeds.Add(new MxmQuote(stamp,"EURUSD",bid,ask,costs==null?1m/1.10m:1m/ask,
-      1000m,50m,0.10m,0.00002m,1.2m,costs==null?null:1m/bid,costs,
+      1000m,50m,0.10m,slip,1.2m,costs==null?null:1m/bid,costs,
       productStopDistance));
     accepted++;
    }
    Need(feeds.Count>0 && accepted>0,"NO_REPLAYABLE_SNAPSHOTS");
    // Parameters are fixed DEVELOPMENT counterfactual, NOT a fitted edge.
    var engine=new MxmPortfolioAccountReplay(new[]{"EURUSD"},
-    new MxmReplayParameters(StrategyMode.Adaptive,0.4m,1,0m,0.02m,0.2m,5,300));
+    new MxmReplayParameters(week35?StrategyMode.Breakout:StrategyMode.Adaptive,0.4m,1,0m,0.02m,0.2m,5,300));
    var account=engine.Run(feeds);
    return new {
     schema="mxm.csharp.native-exposed-quote-to-one-account.v1",
-    classification=productDefaultStop12?
+    classification=week35?"PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED":
+      productDefaultStop12?
       "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED":
       weekSource?"PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":
       exactExistingSource?"ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":"ARTIFICIAL_QUOTE_STREAM_ONLY",
-    original_native_run_id=weekSource?39917922508:exactExistingSource?39660692230:0,
+    original_native_run_id=week35?39946364621:weekSource?39917922508:exactExistingSource?39660692230:0,
     original_source_is_independently_crypto_authenticated_here=false,
     provenance_digest_must_match_pinned_protected_bridge=true,
     derived_stream_sha256=hash,
@@ -127,7 +130,7 @@ namespace Mxm.PortfolioNativeQuote {
     multi_instrument_native_data_available=false,
     synthetic_quote_events_injected=(exactExistingSource||weekSource)?0:ticks.Count,
     modeled_parameters=new {
-      strategy="Adaptive",bar_minutes=5,max_positions=1,
+      strategy=week35?"Breakout":"Adaptive",bar_minutes=5,max_positions=1,
       product_default_stop12=productDefaultStop12,
       product_stop_pips=productDefaultStop12?12:0,
       product_stop_distance_quote=productStopDistance,
@@ -141,7 +144,7 @@ namespace Mxm.PortfolioNativeQuote {
       omitted_cost_authorities=productDefaultStop12?
        "HISTORICAL_EFFECTIVE_DATES;BROKER_FX_FEES;MONEY_ROUNDING;FINANCING;MARGIN;BROKER_STOP_TRIGGER_SLIPPAGE_FILL;ACTUAL_FILLS":
        "HISTORICAL_EFFECTIVE_DATES;BROKER_FX_FEES;MONEY_ROUNDING;FINANCING;MARGIN;STOPS;ACTUAL_FILLS",
-      slip_price_per_side=0.00002m,stop_risk_eur=1.2m,
+      slip_price_per_side=slip,stop_risk_eur=1.2m,
       max_stop_risk_fraction=0.02m,friction_reserve_eur=0.2m,
       historical_broker_terms_verified=false
     },
@@ -150,9 +153,9 @@ namespace Mxm.PortfolioNativeQuote {
     historical_broker_fills_proven=false,
     historical_quote_arrival_order_proven=false,
     one_full_iso_utc_week_proven=false,
-    authenticated_requested_iso_week_input=weekSource?"2026-W37":null,
-    modeled_entries_in_requested_iso_week=weekSource?account.EntriesByIsoWeek.GetValueOrDefault("2026-W37"):0,
-    modeled_21_entry_threshold_met=weekSource && account.EntriesByIsoWeek.GetValueOrDefault("2026-W37")>=21,
+    authenticated_requested_iso_week_input=week35?"2026-W35":weekSource?"2026-W37":null,
+    modeled_entries_in_requested_iso_week=weekSource?account.EntriesByIsoWeek.GetValueOrDefault(week35?"2026-W35":"2026-W37"):0,
+    modeled_21_entry_threshold_met=weekSource && account.EntriesByIsoWeek.GetValueOrDefault(week35?"2026-W35":"2026-W37")>=21,
     weekly_provider_pages_broker_execution_proof=false,
     hard21_proven=false,
     scientific_confirmation_opened=false,
@@ -166,15 +169,18 @@ namespace Mxm.PortfolioNativeQuote {
       (args[0]=="--native-captured-terms-eurusd" ||
        args[0]=="--native-week-captured-terms-eurusd" ||
        args[0]=="--native-week-product-stop12-eurusd" ||
+       args[0]=="--native-week35-breakout-stop12" ||
+       args[0]=="--native-week35-breakout-stop12-stress" ||
        args[0]=="--artificial-captured-terms-fixture");
     Need(captured || (args.Length==3&&
       (args[0]=="--native-exposed-eurusd"||args[0]=="--artificial-fixture")),
       "EXPLICIT_NONOUTCOME_MODE_REQUIRED");
-    bool week=args[0]=="--native-week-captured-terms-eurusd" ||
+    bool week35=args[0]=="--native-week35-breakout-stop12" || args[0]=="--native-week35-breakout-stop12-stress";
+    bool week=week35 || args[0]=="--native-week-captured-terms-eurusd" ||
       args[0]=="--native-week-product-stop12-eurusd";
-    bool stop12=args[0]=="--native-week-product-stop12-eurusd";
+    bool stop12=week35 || args[0]=="--native-week-product-stop12-eurusd";
     bool native=week || args[0]=="--native-exposed-eurusd" || args[0]=="--native-captured-terms-eurusd";
-    var data=Run(args[1],native&&!week,captured?args[3]:null,week,stop12);
+    var data=Run(args[1],native&&!week,captured?args[3]:null,week,stop12,week35,args[0]=="--native-week35-breakout-stop12-stress"?0.00004m:0.00002m);
     Directory.CreateDirectory(args[2]);
     var output=Path.Combine(args[2],"portfolio-exposed-quote-readback.json");
     File.WriteAllText(output,JsonSerializer.Serialize(data,new JsonSerializerOptions{

@@ -94,7 +94,14 @@ def captured_fee_reference(path, report):
     require(snapshot['schema'] == 'mxm.captured-native-symbol-terms.v1' and
             snapshot['symbol_id'] == 1 and not snapshot['historical_commission_proven'] and
             not snapshot['dated_historical_volume_rules_proven'], 'CAPTURED_TERMS_SCOPE')
-    if report['classification'] in (
+    if report['classification']=='PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED':
+        require(snapshot['source_crypto_authenticated_by_week_native_replay'] is True and
+                snapshot['source_run']==39946364621 and
+                snapshot['source_code_sha']=='b54ee59548846ad8013b25965dbe4bcb19d4a978' and
+                snapshot['source_private_sha256']=='2b37063a948d7b761a7f854e59649793ba1d5ff5e30a7e5255b03f4042cadb13' and
+                snapshot['source_ciphertext_sha256']=='0d1badd1a944eeac7a67f1f7c87e05d26c1ea14ea016a0ea25fbb40ce7cb92ee',
+                'CAPTURED_W35_NATIVE_BINDING')
+    elif report['classification'] in (
         'PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED',
         'PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED'):
         require(snapshot['source_crypto_authenticated_by_week_native_replay'] is True and
@@ -149,11 +156,13 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
             "REPORT_SCHEMA")
     require(report["classification"] in (
         "ARTIFICIAL_QUOTE_STREAM_ONLY",
+        "PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED",
         "ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
         "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
         "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"
     ), "REPORT_CLASSIFICATION")
-    product_stop12=(report["classification"] ==
+    week35=report["classification"]=="PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"
+    product_stop12=week35 or (report["classification"] ==
         "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED")
     if product_stop12:
         p=report["modeled_parameters"]
@@ -176,6 +185,14 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
                 not report["one_full_iso_utc_week_proven"] and
                 all(1788739200000 <= ts < 1789344000000 for ts in book),
                 "WEEK_DEVELOPMENT_ONLY_INTERVAL")
+    if week35:
+        require(source['source_events']==683022 and report['original_native_run_id']==39946364621 and
+                report['authenticated_requested_iso_week_input']=='2026-W35' and
+                all(1787529600000<=ts<1788134400000 for ts in book) and
+                report['modeled_parameters']['strategy']=='Breakout' and
+                number(report['modeled_parameters']['slip_price_per_side']) in (D('.00002'),D('.00004')) and
+                not report['one_full_iso_utc_week_proven'] and
+                not report['weekly_provider_pages_broker_execution_proof'], 'W35_FIXED_DEVELOPMENT_SCOPE')
     require(report["grouped_atomic_usable_snapshots"] == len(book),
             "ATOMIC_SNAPSHOT_COUNT")
     for field, label in (("ambiguous_same_side_ms_revisions_skipped", "ambiguous"),
