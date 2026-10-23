@@ -28,6 +28,14 @@ static List<MxmAccountFeed> Series(int bars=8,bool executableQuotes=true) {
 }
 static MxmReplayParameters Params(int positions=2,decimal marginFraction=.8m,decimal riskFraction=.03m)=>
  new(StrategyMode.TrendOnly,marginFraction,positions,0m,riskFraction,.2m);
+Require(MxmEurUsdCapturedCosts.ProductDefaultStop12Distance(5,4)==.0012m,
+ "CTRADER_PRODUCT_DEFAULT_12_PIPS_ON_EXPLICIT_EURUSD_GEOMETRY");
+foreach(var bad in new (int?,int?)[]{(5,null),(null,4),(4,4),(5,5)}) {
+ bool rejected=false;
+ try {MxmEurUsdCapturedCosts.ProductDefaultStop12Distance(bad.Item1,bad.Item2);}
+ catch(InvalidDataException){rejected=true;}
+ Require(rejected,"NO_GUESSED_PIP_GEOMETRY");
+}
 var balanced=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(Series());
 // Current-snapshot money semantics are a counterfactual, not actual fees.
 var cost=new MxmEurUsdCapturedCosts(100000,100000000,100000,10000000,1,3000000000,1000000,"USD");
