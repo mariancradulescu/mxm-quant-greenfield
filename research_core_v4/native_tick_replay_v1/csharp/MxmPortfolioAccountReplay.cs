@@ -9,7 +9,13 @@ namespace Mxm.Replay {
 // margins and costs MUST come from an external, separately authenticated source
 // for any claim beyond explicit counterfactual engineering. These are never fills.
 public abstract record MxmAccountFeed(DateTime Utc, string Symbol);
-public sealed record MxmBarClose(DateTime Utc, string Symbol, decimal Close) : MxmAccountFeed(Utc, Symbol);
+// Utc is the ACTUAL time the first next-bar quote was observed and the
+// closed bar became actionable. BoundaryUtc is the fixed 5m bucket boundary
+// used only for deciding whether consecutive completed bars are contiguous.
+// The two clocks MUST NOT be conflated: first-tick arrival has feed jitter.
+public sealed record MxmBarClose(
+ DateTime Utc, string Symbol, decimal Close, DateTime? BoundaryUtc=null
+) : MxmAccountFeed(Utc, Symbol);
 public sealed record MxmQuote(
  DateTime Utc, string Symbol, decimal Bid, decimal Ask, decimal QuoteToEur,
  decimal ExecutableUnits, decimal InitialMarginEur, decimal CommissionPerSideEur,
@@ -155,9 +161,19 @@ public sealed class MxmPortfolioAccountReplay {
    last=e.Utc;
    if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
    if(e is MxmBarClose bar) {
-    Need(bar.Close>0 && (st!.LastBar==default || bar.Utc>st.LastBar),"INVALID_BAR");
-    if(st.LastBar!=default && (bar.Utc-st.LastBar).TotalMinutes!=parameters.BarMinutes)st.Kernel.Reset();
-    st.LastBar=bar.Utc;
+    // A broker's first tick of a new bar does NOT arrive at the exact
+    // timestamp of its UTC bucket boundary. Check continuous bar identity
+    // against the boundary and execution causality against observed Utc.
+    DateTime boundary=bar.BoundaryUtc??bar.Utc;
+    Need(boundary.Kind==DateTimeKind.Utc &&
+         boundary<=bar.Utc && boundary!=default &&
+         (bar.Utc-boundary).TotalMinutes<parameters.BarMinutes &&
+         bar.Close>0 && (st!.LastBar==default || boundary>st.LastBar),
+         "INVALID_BAR_BOUNDARY_OR_NONCAUSAL_ARRIVAL");
+    if(st.LastBar!=default &&
+       (boundary-st.LastBar).TotalMinutes!=parameters.BarMinutes)
+      st.Kernel.Reset();
+    st.LastBar=boundary;
     var signal=st.Kernel.OnCompletedBar(bar.Close);
     // Pending signals never skip execution to reuse an older quote.
     // Replaced intents before a tradable quote are NOT broker executions.
