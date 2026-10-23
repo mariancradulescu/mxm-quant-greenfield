@@ -43,4 +43,24 @@ class OnlineAr1Tests(W35BreakoutTests):
                         self.assertEqual(independent_terminal_mark('synthetic',report,path)['terminal_open_stop_paths_independently_checked'],1)
                     else:
                         with self.assertRaises(MarkParityError):independent_terminal_mark('synthetic',report,path)
+class OnlineResultPreservationTests(unittest.TestCase):
+    def test_pinned_reproduction_original_failure_and_receipt_without_key(self):
+        from .verify_week35_online_ar1_result import verify
+        result=verify();self.assertFalse(result['decrypted'])
+        self.assertFalse(result['original_ciphertext_preserved'])
+        self.assertFalse(result['independent_evidence'])
+    def test_corrupted_archive_receipt_source_and_false_original_claim_rejected(self):
+        import shutil
+        from .verify_week35_online_ar1_result import ROOT,verify
+        for mode in ('part','receipt','source','original'):
+            with tempfile.TemporaryDirectory() as folder:
+                path=Path(folder)/'evidence';shutil.copytree(ROOT,path)
+                if mode=='part':(path/'part-00.b64').write_text('AAAA')
+                elif mode=='receipt':(path/'receipt.json').write_text('{}')
+                else:
+                    p=path/'MANIFEST.json';m=json.loads(p.read_bytes())
+                    if mode=='source':m['source_commit']='0'*40
+                    else:m['original_ciphertext_preserved']=True
+                    p.write_text(json.dumps(m))
+                with self.subTest(mode=mode),self.assertRaises(ValueError):verify(path)
 if __name__=='__main__':unittest.main()
