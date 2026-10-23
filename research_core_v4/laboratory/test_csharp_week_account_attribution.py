@@ -37,7 +37,7 @@ class AttributionTests(unittest.TestCase):
     self.assertFalse(r['hard21_proven'])
     self.assertEqual(r['closed_positions_by_exit_reason'],{'UNLABELED':1})
     self.assertEqual(r['closed_position_net_pnl_by_exit_reason_eur'],{'UNLABELED':'-0.6'})
-    self.assertEqual(r['closed_position_holding_minutes_median'],'10')
+    self.assertEqual(D(r['closed_position_holding_minutes_median']),D('10'))
     self.assertEqual(r['static_zero_commission_same_ledger_pnl_eur'],'-0.4')
     self.assertTrue(r['unchanged_ledger_remains_negative_even_at_zero_commission'])
  def test_altered_source_or_promotion_fails(self):
