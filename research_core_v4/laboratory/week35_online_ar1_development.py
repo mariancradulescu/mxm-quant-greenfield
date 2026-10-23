@@ -60,9 +60,9 @@ def finalize(tmp,out):
     full={'schema':'mxm.week35.online-ar1-private-result.v1','spec_sha256':SPEC_SHA,'native_source_commit':sha,
           'bridge':bridge,'models':{},'benchmark_eur':200,'capital_is_shared_across_scenarios':False,
           'scenarios_are_alternatives_not_concurrent_accounts':True}
-    verdicts={}
+    verdicts={};activity={}
     for family in ('OnlineAr1',):
-        full['models'][family]={};equities=[]
+        full['models'][family]={};equities=[];activity[family]={}
         for scenario,slip in (('base',D('.00002')),('stress',D('.00004'))):
             folder=tmp/family/scenario;reportbytes=(folder/'portfolio-exposed-quote-readback.json').read_bytes()
             report=json.loads(reportbytes,parse_float=D)
@@ -85,6 +85,9 @@ def finalize(tmp,out):
                  D(mark['equity_abs_difference_eur'])<D('.000001') and not mark['hard21'] and
                  mark['terminal_open_stop_paths_independently_checked']==a['open_positions'],
                  'W35_INDEPENDENT_ACCOUNT_AND_STOP_CHECKS')
+            activity[family][scenario]=('NO_MODELED_ENTRIES' if a['accepted_entries']==0 else
+                'BELOW_MODELED_21_ENTRY_THRESHOLD' if a['accepted_entries']<21 else
+                'MODELED_ENTRY_THRESHOLD_ONLY_NOT_HARD21')
             equity=D(str(a['marked_equity_eur']));equities.append(equity)
             gross=sum((D(str(e['gross_eur'])) for e in a['ledger']),D(0))
             fees=sum((D(str(e['commission_eur'])) for e in a['ledger']),D(0))
@@ -106,7 +109,7 @@ def finalize(tmp,out):
         'run_id':int(os.environ['GITHUB_RUN_ID']),'source_run':39946364621,'spec_sha256':SPEC_SHA,
         'source_ciphertext_sha256':bridge['ciphertext_sha256'],'source_private_sha256':bridge['private_sha256'],
         'derived_ticks_sha256':bridge['derived_ticks_sha256'],'dependent_model_leaves':2,'mechanisms':1,
-        'partition':'DEVELOPMENT_ALREADY_M5_EXPOSED','disposition':verdict,'family_dispositions':verdicts,'edge_confirmed':False,
+        'partition':'DEVELOPMENT_ALREADY_M5_EXPOSED','disposition':verdict,'family_dispositions':verdicts,'activity_classification':activity,'edge_confirmed':False,
         'hard21_proven':False,'native_ctrader_fills_proven':False,'historical_costs_proven':False,
         'independent_confirmation':False,'canonical_V2_ledger_mutated':False,'C033_reservation_preserved':True,
         'orders':0,'new_broker_requests':0,'cloud_activated':False,'full_private_sha256':bytes_digest(raw),
