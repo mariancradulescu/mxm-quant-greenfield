@@ -1,5 +1,6 @@
 """No-key regression: both fixed W37 development models use W37 custody, not R3."""
 import hashlib
+from decimal import Decimal as D
 import json
 import tempfile
 import unittest
@@ -47,7 +48,7 @@ class WeekCustodyRoutingTests(unittest.TestCase):
         for label in WEEK_CLASSIFICATIONS:
             with self.subTest(label=label):
                 fee=self.reference(snapshot(),label)
-                self.assertEqual(fee(1000,1.10,1.10,1.11),0.03)
+                self.assertEqual(fee(D('1000'),D('1.10'),D('1.10'),D('1.11')),D('0.03'))
 
     def test_w37_source_mismatch_refuses_both_modes(self):
         for label in WEEK_CLASSIFICATIONS:
