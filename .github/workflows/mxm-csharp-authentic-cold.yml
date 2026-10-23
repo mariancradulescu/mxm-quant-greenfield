@@ -330,6 +330,9 @@ jobs:
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-captured-terms-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
           python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-week-csharp/independent-mark.json"
+      - name: Independently attribute unchanged full-week CSharp ledger gross, fees and open MTM
+        run: |
+          python3 -m research_core_v4.laboratory.csharp_week_account_attribution "${RUNNER_TEMP}/mxm-week-csharp/portfolio-exposed-quote-readback.json" --out "${RUNNER_TEMP}/mxm-week-csharp/attribution.json"
       - name: Produce nonpromotable development receipt and encrypt the full model under existing public recipient
         run: |
           python3 - <<'PY'
@@ -342,6 +345,7 @@ jobs:
           report=json.loads((tmp/'mxm-week-csharp/portfolio-exposed-quote-readback.json').read_bytes())
           independent=json.loads((tmp/'mxm-week-csharp/independent-mark.json').read_bytes())
           terms=json.loads((tmp/'mxm-week-ticks.ndjson.symbol-terms.json').read_bytes())
+          attribution=json.loads((tmp/'mxm-week-csharp/attribution.json').read_bytes())
           need(bridge['source_run']==39917922508 and bridge['verified_bid_events']==342248 and
                bridge['verified_ask_events']==343226 and bridge['partition']=='DEVELOPMENT' and
                bridge['orders']==bridge['fills']==bridge['new_broker_requests']==0 and
@@ -374,7 +378,15 @@ jobs:
           need(sum(x['kind']=='ENTRY' for x in ledger)==report['account']['accepted_entries'] and
                sum(x['kind']=='EXIT' for x in ledger)==report['account']['executed_exits'],
                'WEEK_CSHARP_ENTRY_EXIT_RECOUNT')
-          full=encoded({'bridge':bridge,'terms':terms,'modeled_csharp':report,'independent_cash_and_mark':independent})
+          need(attribution['input_source_run']==39917922508 and
+               attribution['modeled_entries']==report['account']['accepted_entries'] and
+               attribution['modeled_exits']==report['account']['executed_exits'] and
+               attribution['final_modeled_bidask_equity_eur']==str(report['account']['marked_equity_eur']) and
+               not attribution['hard21_proven'] and not attribution['economic_edge_proven'] and
+               attribution['new_strategy_trials']==attribution['real_orders']==0,
+               'WEEK_ATTRIBUTION_SAME_ACCOUNT_AND_NO_PROMOTION')
+          full=encoded({'bridge':bridge,'terms':terms,'modeled_csharp':report,
+                        'independent_cash_and_mark':independent,'account_loss_attribution':attribution})
           recipient=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(recipient)==FP,'WEEK_CSHARP_ORIGINAL_RECIPIENT')
           output=pathlib.Path('verification/csharp-week-development');output.mkdir(parents=True,exist_ok=True)
@@ -393,6 +405,13 @@ jobs:
             'modeled_terminal_cash_eur':report['account']['final_cash_eur'],
             'modeled_terminal_bidask_equity_eur':report['account']['marked_equity_eur'],
             'modeled_max_drawdown_eur':report['account']['max_drawdown_eur'],
+            'modeled_realized_gross_pnl_eur':attribution['realized_gross_pnl_eur'],
+            'modeled_charged_commissions_eur':attribution['modeled_total_commissions_eur'],
+            'modeled_realized_net_cash_pnl_eur':attribution['realized_net_cash_pnl_eur'],
+            'modeled_open_liquidation_pnl_eur':attribution['unrealized_liquidation_mark_pnl_eur'],
+            'modeled_total_net_marked_pnl_eur':attribution['net_modeled_marked_equity_pnl_eur'],
+            'modeled_entries_by_utc_date':attribution['modeled_entry_counts_by_utc_date'],
+            'friction_price_effect_already_in_gross':True,
             'modeled_open_positions':report['account']['open_positions'],
             'independent_cash_abs_diff_eur':independent['cash_abs_difference_eur'],
             'independent_equity_abs_diff_eur':independent['equity_abs_difference_eur'],
