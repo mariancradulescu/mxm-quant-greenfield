@@ -63,7 +63,8 @@ namespace Mxm.PortfolioNativeQuote {
      // Do not join gaps into synthetic bars; six complete bars must again
      // be accumulated before the shared CSharp kernel can place an order.
      if(bucket==barBucket+BarMs && lastBarBid>0) {
-      feeds.Add(new MxmBarClose(stamp,"EURUSD",lastBarBid));
+      feeds.Add(new MxmBarClose(stamp,"EURUSD",lastBarBid,
+       DateTimeOffset.FromUnixTimeMilliseconds(bucket).UtcDateTime));
       completeBarDecisions++;
      }
     }

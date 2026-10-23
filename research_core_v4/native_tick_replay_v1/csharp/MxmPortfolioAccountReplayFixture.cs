@@ -46,6 +46,29 @@ Require(balanced.EntriesByIsoWeek.TryGetValue("2026-W35",out var week) && week==
 Require(!balanced.BrokerFillsProven && !balanced.CostsBrokerVerified,
  "NO_BROKER_EXECUTION_OR_COST_CLAIM");
 
+// Native first-tick callback jitter must NOT cold-reset a mathematically
+// consecutive five-minute bar sequence. But no order may happen before the
+// actual observed first tick, only at a later executable quote.
+var jitterFeed=Series();
+for(int i=0;i<8;i++){
+ var original=(MxmBarClose)jitterFeed[i*4];
+ var jitter=original.Utc.AddMilliseconds(70+(i%3)*113);
+ jitterFeed[i*4]=new MxmBarClose(jitter,"EURUSD",original.Close,original.Utc);
+ var second=(MxmBarClose)jitterFeed[i*4+1];
+ jitterFeed[i*4+1]=new MxmBarClose(jitter,"GBPUSD",second.Close,second.Utc);
+}
+var jittered=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(jitterFeed);
+Require(jittered.AcceptedEntries==2 && jittered.MarkedEquityEur==balanced.MarkedEquityEur,
+ "FIRST_TICK_ARRIVAL_JITTER_DOES_NOT_RESET_CONTIGUOUS_BARS");
+Require(jittered.Ledger.All(z=>z.Utc.Millisecond==0 && z.Utc.Second==1),
+ "SAME_CALLBACK_PRICE_NOT_TREATED_AS_EXECUTABLE");
+var futureBoundary=Series();
+var first=(MxmBarClose)futureBoundary[0];
+futureBoundary[0]=new MxmBarClose(first.Utc,first.Symbol,first.Close,first.Utc.AddMinutes(5));
+bool impossibleBoundary=false;
+try{new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(futureBoundary);}
+catch(ArgumentException e){impossibleBoundary=e.Message.Contains("INVALID_BAR_BOUNDARY_OR_NONCAUSAL_ARRIVAL");}
+Require(impossibleBoundary,"REJECT_FUTURE_BAR_BOUNDARY");
 var limited=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(positions:1)).Run(Series());
 Require(limited.AcceptedEntries==1 && limited.OpenPositions==1 &&
  limited.Rejections.Contains("REJECT_ACCOUNT_POSITION_CAP"),"ONE_GLOBAL_POSITION_CAP");
