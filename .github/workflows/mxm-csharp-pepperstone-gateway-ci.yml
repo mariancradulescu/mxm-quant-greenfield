@@ -34,6 +34,8 @@ jobs:
           cp research_core_v4/laboratory/week_chronology_reception.py .sealed-chronology-source/research_core_v4/laboratory/
           cp research_core_v4/laboratory/test_week_chronology_reception.py .sealed-chronology-source/research_core_v4/laboratory/
           (cd .sealed-chronology-source && python3 -m unittest research_core_v4.laboratory.test_chronology_reception research_core_v4.laboratory.test_week_chronology_reception -v)
+          cp research_core_v4/laboratory/test_week35_chronology_profile.py .sealed-chronology-source/research_core_v4/laboratory/
+          (cd .sealed-chronology-source && python3 -m unittest research_core_v4.laboratory.test_week35_chronology_profile -v)
       - name: Validate both ACTUAL cold bridge installation closures without any custody key
         run: |
           python3 -m unittest research_core_v4.laboratory.test_cold_bridge_consumer_closure -v
