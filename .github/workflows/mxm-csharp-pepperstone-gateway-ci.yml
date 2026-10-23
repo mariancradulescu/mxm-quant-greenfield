@@ -189,7 +189,9 @@ jobs:
           assert 'series.ClosePrices.Last(0)' in p
           assert 'series.ClosePrices[i]' not in p
           assert 'StopLossPips' in p and 'MaxMarginFraction' in p and 'MxmDecisionKernel(mode)' in p
-          assert 'if(!placed.IsSuccessful)' in p
+          assert 'orderProtection.Reconcile(placed.IsSuccessful,placed.Position?.Id,' in p
+          assert 'if(protection.Halt)' in p and 'LatchProtectionHalt();' in p
+          assert 'orderProtection.HaltUnknown();' in p
           q=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
           assert 'STOP_QUOTE_MODEL' in q and 'MODELED' not in p
           assert 'modeled_stop_loss_pips' in q and 'slippage_eur=Round(PriceUnits*Slippage*Fx)' in q
