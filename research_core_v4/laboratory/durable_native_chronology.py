@@ -25,25 +25,28 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def decode_archive(root, expected_archive_sha):
+def decode_archive(root, expected_archive_sha, *, max_archive_bytes=LIMIT, max_parts=128, part_size=16384):
     """Byte-only integrity helper; callers decide scientific/source authority."""
+    need(type(max_archive_bytes) is int and 0 < max_archive_bytes <= 8*1024*1024 and
+         type(max_parts) is int and 0 < max_parts <= 512 and
+         type(part_size) is int and part_size in (16384,32768), 'DECODER_BOUNDS')
     root = Path(root)
     m = json.loads((root / 'MANIFEST.json').read_text())
     need(m['schema'] == 'mxm.durable-encrypted-native-chronology.v1', 'SCHEMA')
     need(m['archive_sha256'] == expected_archive_sha, 'PINNED_ARCHIVE_DIGEST')
-    need(type(m['archive_bytes']) is int and 0 < m['archive_bytes'] <= LIMIT, 'ARCHIVE_SIZE')
-    need(type(m['parts']) is list and 0 < len(m['parts']) <= 128, 'PART_COUNT')
+    need(type(m['archive_bytes']) is int and 0 < m['archive_bytes'] <= max_archive_bytes, 'ARCHIVE_SIZE')
+    need(type(m['parts']) is list and 0 < len(m['parts']) <= max_parts, 'PART_COUNT')
     chunks = []
     total = 0
     for i, part in enumerate(m['parts']):
         need(part['index'] == i and part['path'] == f'part-{i:02d}.b64', 'PART_ORDER_OR_PATH')
-        need(type(part['bytes']) is int and 0 < part['bytes'] <= 16384, 'PART_SIZE')
+        need(type(part['bytes']) is int and 0 < part['bytes'] <= part_size, 'PART_SIZE')
         path = root / part['path']
-        need(not path.is_symlink() and path.stat().st_size <= 22000, 'PART_FILE')
+        need(not path.is_symlink() and path.stat().st_size <= 4*((part_size+2)//3)+2, 'PART_FILE')
         raw = base64.b64decode(path.read_text().strip(), validate=True)
         need(len(raw) == part['bytes'] and digest(raw) == part['sha256'], 'PART_DIGEST')
         total += len(raw)
-        need(total <= LIMIT, 'TOTAL_SIZE')
+        need(total <= max_archive_bytes, 'TOTAL_SIZE')
         chunks.append(raw)
     archive = b''.join(chunks)
     need(len(archive) == m['archive_bytes'] and digest(archive) == expected_archive_sha,
@@ -54,7 +57,7 @@ def decode_archive(root, expected_archive_sha):
         # Do not extractall: neither traversal nor duplicate member names allowed.
         names = z.namelist()
         need(len(names) == 2 and set(names) == allowed, 'MEMBER_PATHS_OR_DUPLICATES')
-        need(sum(v.file_size for v in z.infolist()) <= LIMIT, 'MEMBER_SIZE')
+        need(sum(v.file_size for v in z.infolist()) <= max_archive_bytes, 'MEMBER_SIZE')
         result = {}
         for name in sorted(allowed):
             data = z.read(name)
