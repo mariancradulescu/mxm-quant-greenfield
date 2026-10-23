@@ -7,6 +7,16 @@ from .test_week35_breakout_development import W35BreakoutTests
 from .csharp_native_portfolio_independent_mark import independent_terminal_mark,MarkParityError
 from .test_terminal_open_stop_completeness import fixture
 class OnlineAr1Tests(W35BreakoutTests):
+    def test_uploaded_members_match_actual_finalizer_output_directory(self):
+        import shlex
+        from .week35_online_ar1_development import ROOT
+        w=json.loads((ROOT/'.github/workflows/mxm-week35-online-ar1-development.yml').read_bytes())
+        steps=w['jobs']['online-ar1-development']['steps']
+        finalize=next(x['run'] for x in steps if 'run' in x and 'week35_online_ar1_development' in x['run'] and ' admit' not in x['run'])
+        output=shlex.split(finalize)[-1]
+        upload=next(x['with'] for x in steps if 'uses' in x and x['uses'].startswith('actions/upload-artifact@'))
+        self.assertEqual(set(upload['path'].splitlines()),{output+'/receipt.json',output+'/full-result.mxmenc'})
+        self.assertEqual(upload['if-no-files-found'],'error')
     def test_frozen_one_learner_two_leaves_no_refit(self):
         s=validate_spec();self.assertEqual(s['strategies'],['OnlineAr1'])
         self.assertEqual(s['budget']['dependent_model_leaves'],2)
