@@ -359,8 +359,8 @@ foreach(var recoveryInput in new[]{stopBeforeBar,nextWeek}) {
  var settings=Params(riskFraction:.1m);
  var baselineRecovery=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings).Run(recoveryInput);
  for(int cut=0;cut<=recoveryInput.Count;cut++) {
-  var first=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings);first.Run(recoveryInput.Take(cut));
-  var capsule=first.CaptureReplay(artificialSource);
+  var prefixEngine=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings);prefixEngine.Run(recoveryInput.Take(cut));
+  var capsule=prefixEngine.CaptureReplay(artificialSource);
   var restored=MxmPortfolioAccountReplay.RestoreReplay(capsule.Payload,capsule.Sha256,artificialSource,settings,new[]{"EURUSD","GBPUSD"});
   Require(JsonSerializer.Serialize(baselineRecovery)==JsonSerializer.Serialize(restored.Continue(recoveryInput.Skip(cut),cut)),
    "TWO_SYMBOL_STOP_REVOCATION_AND_WEEK_ROLLOVER_PARITY");
