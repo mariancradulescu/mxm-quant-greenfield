@@ -166,6 +166,19 @@ Require(stopped.Ledger.Single(x=>x.Kind=="EXIT" && x.Direction==1).Price==1.0979
  stopped.Ledger.Single(x=>x.Kind=="EXIT" && x.Direction==-1).Price==1.20222m,"GAP_NOT_FILLED_AT_REQUESTED_STOP");
 Require(stopped.FinalCashEur==193.12m && stopped.MarkedEquityEur==193.12m &&
  stopped.UsedMarginEur==0 && stopped.FreeMarginEur==193.12m,"STOP_FEES_PNL_MARGIN_RELEASE");
+// A newly published valid direction must not reopen after the stop on the
+// very quote that would otherwise consume it, or on the following quote.
+var simultaneous=Series(7);
+for(int i=0;i<simultaneous.Count;i++)if(simultaneous[i] is MxmQuote q) {
+ if(q.Utc>=stopTime)simultaneous[i]=q with {
+  Bid=q.Symbol=="EURUSD"?1.0980m:1.2020m,
+  Ask=q.Symbol=="EURUSD"?1.0982m:1.2022m,StopDistanceQuote=.0012m};
+ else simultaneous[i]=q with {StopDistanceQuote=.0012m};
+}
+simultaneous.Add(new MxmQuote(stopTime.AddSeconds(1),"EURUSD",1.0980m,1.0982m,1m,1000m,70m,.1m,0m,1m,StopDistanceQuote:.0012m));
+var noReentry=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(riskFraction:.1m)).Run(simultaneous);
+Require(noReentry.AcceptedEntries==2 && noReentry.ExecutedExits==2 && noReentry.OpenPositions==0,
+ "STOP_PRIORITY_CLEARS_VALID_INTENT_AND_FORBIDS_NEXT_QUOTE_REENTRY");
 var touched=Series(6);
 for(int i=0;i<touched.Count;i++)if(touched[i] is MxmQuote q)
  touched[i]=q with {StopDistanceQuote=.0001m};

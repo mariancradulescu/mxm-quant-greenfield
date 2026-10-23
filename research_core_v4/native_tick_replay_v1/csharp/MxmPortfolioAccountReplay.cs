@@ -141,7 +141,8 @@ public sealed class MxmPortfolioAccountReplay {
   decimal fee=Fee(tick,tick.ExecutableUnits,price);
   // A stop already touched by the entry spread/slippage is not admitted.
   if(tick.StopDistanceQuote is decimal entryDistance &&
-     (desired>0 ? price-entryDistance>=tick.Bid : price+entryDistance<=tick.Ask)) {
+     (price-desired*entryDistance<=0 ||
+      (desired>0 ? price-entryDistance>=tick.Bid : price+entryDistance<=tick.Ask))) {
    rejected.Add("REJECT_STOP_ALREADY_TOUCHED_AT_ENTRY");return;
   }
   // No admission against absent, future or stale marks on any other open
