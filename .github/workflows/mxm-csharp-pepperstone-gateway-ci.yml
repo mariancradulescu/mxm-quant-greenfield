@@ -43,11 +43,14 @@ jobs:
           python3 -m unittest research_core_v4.laboratory.test_durable_native_chronology research_core_v4.laboratory.test_durable_week_chronology -v
           python3 -m research_core_v4.laboratory.durable_week_chronology --out verification/week-chronology
           python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
+      - name: Test full-week source identity and negative custody-access invariants, no key
+        run: python3 -m unittest research_core_v4.laboratory.test_week_chronology_csharp_bridge -v
       - name: Decode actual protobuf symbol shapes; missing defaults, cents and precise fee units
         run: python3 -m unittest research_core_v4.laboratory.test_captured_symbol_terms -v
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
           test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
       - name: Real machine-side account paths on two known artificial regimes; provenance never promoted
