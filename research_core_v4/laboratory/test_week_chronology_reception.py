@@ -165,4 +165,18 @@ class InstalledWorkflowTests(unittest.TestCase):
         source=next(s['env']['LAB_CHRONOLOGY_SOURCE'] for s in wf['jobs']['chronology-collect']['steps'] if 'env' in s)
         self.assertEqual(wf,c.build_workflow(source))
 
+class NativeAuthorityReferenceTests(unittest.TestCase):
+    def test_each_code_and_owner_authority_reference_is_a_hard_admission_condition(self):
+        source='a'*40;trigger='b'*40
+        refs={c.SOURCE_BRANCH:c.ENGINE,c.BRANCH:trigger,c.SOURCE_REF:source,
+          'mxm-o04-active-v1':c.AUTHORITY,
+          'mxm-o04-accepted-owner-1807-v1':'a830c132521bd4348454653f713e04f6107484fe'}
+        route=SimpleNamespace(json=lambda p:{'object':{'sha':refs[p.removeprefix('git/ref/heads/')]}})
+        c.verify_refs(route,source,trigger)
+        for name in list(refs):
+            old=refs[name];refs[name]='f'*40
+            with self.subTest(name=name),self.assertRaisesRegex(LabError,'AUTHORITY_REF_MOVED'):
+                c.verify_refs(route,source,trigger)
+            refs[name]=old
+
 if __name__=='__main__':unittest.main()

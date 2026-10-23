@@ -8,7 +8,7 @@ import base64,gzip,json,os,re,subprocess,tempfile,time
 from pathlib import Path
 from .common import need,encoded,bytes_digest
 from .broker_access_reception import ENGINE,ENGINE_MODULE,REPO,BRANCH,SECRET_NAMES,AUTH_TYPES
-from .runtime import module_digest,SOURCE_BRANCH,file_at
+from .runtime import module_digest,SOURCE_BRANCH,file_at,AUTHORITY
 from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
 from research_core_v4.remediation_p0_p4_20261015.safety import strict_json,unpack
 
@@ -63,6 +63,13 @@ def one_shot_history(value,run_id):
          value['workflow_runs'][0]['id']==run_id and
          value['workflow_runs'][0]['run_attempt']==1,'WEEK_ONE_SHOT_ALREADY_STARTED')
 
+def verify_refs(route,source,trigger):
+    expected={SOURCE_BRANCH:ENGINE,BRANCH:trigger,SOURCE_REF:source,
+      'mxm-o04-active-v1':AUTHORITY,
+      'mxm-o04-accepted-owner-1807-v1':'a830c132521bd4348454653f713e04f6107484fe'}
+    for name,sha in expected.items():
+        need(route.json('git/ref/heads/'+name)['object']['sha']==sha,'WEEK_SOURCE_OR_AUTHORITY_REF_MOVED')
+
 def context(route,phase):
     source=os.environ.get('LAB_CHRONOLOGY_SOURCE','');trigger=os.environ.get('GITHUB_SHA','')
     need(os.environ.get('GITHUB_REPOSITORY')==REPO and os.environ.get('GITHUB_REF_NAME')==BRANCH and
@@ -81,9 +88,7 @@ def context(route,phase):
       subprocess.run(['git','-C','.week-code','diff','--quiet','HEAD','--'],capture_output=True).returncode==0 and
       Path(MODULE).read_bytes()==Path('.week-code',MODULE).read_bytes() and
       module_digest()==ENGINE_MODULE,'WEEK_UNMODIFIED_PINNED_CODE_AND_NATIVE_ENGINE')
-    need(route.json('git/ref/heads/'+SOURCE_BRANCH)['object']['sha']==ENGINE and
-      route.json('git/ref/heads/'+BRANCH)['object']['sha']==trigger and
-      route.json('git/ref/heads/'+SOURCE_REF)['object']['sha']==source,'WEEK_PINNED_REF_MOVED')
+    verify_refs(route,source,trigger)
     need(strict_json(file_at(route,PATH,trigger))==build_workflow(source),'WEEK_WORKFLOW_CHANGED')
     run_id=int(os.environ['GITHUB_RUN_ID'])
     one_shot_history(route.json('actions/workflows/'+PATH.split('/')[-1]+'/runs?per_page=100'),run_id)
