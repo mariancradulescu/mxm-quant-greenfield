@@ -13,6 +13,7 @@ from decimal import Decimal as D, InvalidOperation
 from pathlib import Path
 
 EXPECTED = 'PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED'
+EXPECTED_PRODUCT_STOP12 = 'PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED'
 
 def need(ok, reason):
     if not ok:
@@ -25,8 +26,9 @@ def number(x):
     return z
 
 def attribute(report):
+    product_stop12=report['classification']==EXPECTED_PRODUCT_STOP12
     need(report['schema']=='mxm.csharp.native-exposed-quote-to-one-account.v1' and
-         report['classification']==EXPECTED and
+         report['classification'] in (EXPECTED,EXPECTED_PRODUCT_STOP12) and
          report['original_native_run_id']==39917922508 and
          report['quote_events']==685474 and
          report['authenticated_requested_iso_week_input']=='2026-W37' and
@@ -34,6 +36,12 @@ def attribute(report):
          not report['hard21_proven'] and not report['all_cost_components_verified'] and
          report['new_broker_requests']==report['live_orders']==0,
          'PROVENANCE_AND_LIMITATIONS')
+    policy=report['modeled_parameters']
+    if product_stop12:
+        need(policy['product_default_stop12'] is True and
+             policy['product_stop_pips']==12 and
+             number(policy['product_stop_distance_quote'])==D('0.0012'),
+             'PRODUCT_STOP12_NO_REFIT')
     a=report['account']
     need(number(a['initial_capital_eur'])==D(200) and
          not a['hard21_proven'] and not a['broker_fills_proven'] and
@@ -119,6 +127,7 @@ def attribute(report):
       ) if ordered_durations else None
     return {
       'schema':'mxm.csharp.week37.exploratory-account-loss-attribution.v1',
+      'model_variant':'PRODUCT_DEFAULT_STOP12' if product_stop12 else 'LEGACY_NO_STOP',
       'classification':'SAME_AUTHENTIC_WEEK_UNCERTIFIED_COUNTERFACTUAL_NO_NEW_STRATEGY_TRIAL',
       'input_source_run':39917922508,'iso_week':'2026-W37',
       'initial_cash_eur':'200',
