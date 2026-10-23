@@ -61,4 +61,22 @@ class CompressionDevelopmentTests(unittest.TestCase):
                                 text=True,capture_output=True,check=True)
             result=json.loads(proc.stdout,parse_float=D);self.assertEqual(len(result),1576)
             reconcile(result[0],reference(rows));reconcile(result[-1],reference([]))
+class CompressionResultPreservationTests(unittest.TestCase):
+    def test_original_zip_ciphertext_receipt_and_failed_disposition(self):
+        from .verify_compression_result import verify
+        value=verify();self.assertEqual(value['disposition'],'GROSS_FAIL');self.assertFalse(value['decrypted'])
+    def test_altered_part_receipt_source_and_promotion_refused(self):
+        import tempfile,shutil
+        from .verify_compression_result import ROOT,verify
+        for mode in ('part','receipt','source','promotion'):
+            with tempfile.TemporaryDirectory() as folder:
+                root=Path(folder)/'evidence';shutil.copytree(ROOT,root)
+                if mode=='part':(root/'part-00.b64').write_text('AAAA')
+                elif mode=='receipt':(root/'receipt.json').write_text('{}')
+                else:
+                    p=root/'MANIFEST.json';m=json.loads(p.read_bytes())
+                    if mode=='source':m['source_commit']='0'*40
+                    else:m['economic_edge_confirmed']=True
+                    p.write_text(json.dumps(m))
+                with self.subTest(mode=mode),self.assertRaises(ValueError):verify(root)
 if __name__=='__main__':unittest.main()
