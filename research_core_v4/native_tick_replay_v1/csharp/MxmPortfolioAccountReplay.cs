@@ -26,7 +26,8 @@ public sealed record MxmQuote(
 public sealed record MxmPortfolioTrade(
  string Kind, DateTime Utc, string Symbol, int Direction, decimal Price,
  decimal Units, decimal CashEur, decimal CommissionEur, decimal GrossEur,
- string Reason="LEGACY"
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ string? Reason=null
 );
 public sealed record MxmPortfolioAccountReport(
  string Classification, decimal InitialCapitalEur, decimal FinalCashEur,
@@ -131,7 +132,8 @@ public sealed class MxmPortfolioAccountReplay {
   balance+=gross-fee;
   open.Remove(symbol);exits++;
   trades.Add(new MxmPortfolioTrade("EXIT",tick.Utc,symbol,position.Direction,price,
-   position.Units,balance,fee,gross,reason));
+   position.Units,balance,fee,gross,
+   reason=="REVERSAL" && position.StopPrice==null && parameters.ExitPolicy==ExitMode.ReverseOnly?null:reason));
  }
  void Enter(string symbol,int desired,MxmQuote tick) {
   if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
