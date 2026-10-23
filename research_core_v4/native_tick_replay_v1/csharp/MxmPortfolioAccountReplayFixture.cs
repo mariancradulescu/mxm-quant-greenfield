@@ -93,6 +93,21 @@ Require(tightRisk.AcceptedEntries==0 &&
 var noFutureQuotes=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(Series(8,false));
 Require(noFutureQuotes.AcceptedEntries==0 && noFutureQuotes.MarkedEquityEur==200m,
  "BAR_CLOSE_CANNOT_FILL_USING_BAR_PRICE");
+var noFillAtClose=Series(6,false);
+var finalBar=(MxmBarClose)noFillAtClose[noFillAtClose.Count-2];
+MxmQuote After(DateTime time)=>new(time,"EURUSD",1.1009m,1.1011m,1m,1000m,70m,.1m,0m,1m);
+noFillAtClose.Add(After(finalBar.Utc));
+Require(new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(noFillAtClose)
+ .AcceptedEntries==0,"NO_TICK_AT_SIGNAL_TIMESTAMP_FILL");
+noFillAtClose.Add(After(finalBar.Utc.AddSeconds(1)));
+Require(new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(noFillAtClose)
+ .AcceptedEntries==1,"STRICTLY_LATER_SYMBOL_QUOTE_FILLS");
+var expiredFeed=Series(6,false);
+// First quote after feed silence can arrive BEFORE BarClosed at next boundary.
+// An expired direction must not execute merely because no new bar was delivered.
+expiredFeed.Add(After(finalBar.Utc.AddMinutes(5)));
+Require(new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(expiredFeed)
+ .AcceptedEntries==0,"NO_STALE_INTENT_ON_SESSION_REOPEN_QUOTE");
 var invalid=Series();invalid[3]=new MxmQuote(
  ((MxmQuote)invalid[3]).Utc,"GBPUSD",1.20m,1.19m,1m,1000m,70m,.1m,0m,1m);
 bool rejectedInvalid=false;

@@ -1,0 +1,42 @@
+using System;
+
+namespace Mxm.Replay {
+/// <summary>In-memory decision, never a broker pending order or durable ACK.</summary>
+public sealed record MxmDecisionIntent(int Desired, bool Contiguous, int CompletedBars,
+ DateTime BoundaryUtc, DateTime ObservedUtc, DateTime ExpiresUtc);
+
+/// <summary>
+/// Shared by the product and replay: a closed-bar decision may be consumed
+/// once, only on a strictly later symbol quote, before the next bar boundary.
+/// Consume before invoking the broker, including on rejection/ambiguous ACK.
+/// A cold instance has no intent to replay. This is not broker idempotency.
+/// </summary>
+public sealed class MxmCausalIntent {
+ MxmDecisionIntent? pending;
+ DateTime lastBoundary;
+ public void Publish(int desired,bool contiguous,int completedBars,
+                     DateTime boundaryUtc,DateTime observedUtc,int barMinutes) {
+  if(desired < -1 || desired > 1 || completedBars<0 || barMinutes<1 ||
+     boundaryUtc.Kind!=DateTimeKind.Utc || observedUtc.Kind!=DateTimeKind.Utc ||
+     boundaryUtc==default || boundaryUtc<=lastBoundary || observedUtc<boundaryUtc ||
+     observedUtc>=boundaryUtc.AddMinutes(barMinutes))
+   throw new ArgumentException("INVALID_CAUSAL_INTENT_CLOCK_OR_DECISION");
+  lastBoundary=boundaryUtc;
+  pending=new MxmDecisionIntent(desired,contiguous,completedBars,boundaryUtc,
+    observedUtc,boundaryUtc.AddMinutes(barMinutes));
+ }
+ public void Clear() {pending=null;}
+ public bool TryConsume(DateTime quoteUtc,out MxmDecisionIntent? intent) {
+  intent=null;
+  if(quoteUtc.Kind!=DateTimeKind.Utc || quoteUtc==default)
+   throw new ArgumentException("INVALID_CAUSAL_QUOTE_UTC");
+  if(pending==null)return false;
+  // Expiry is evaluated even if Tick precedes BarClosed on the next boundary.
+  if(quoteUtc>=pending.ExpiresUtc){pending=null;return false;}
+  if(quoteUtc<=pending.ObservedUtc)return false;
+  intent=pending;
+  pending=null;
+  return true;
+ }
+}
+}

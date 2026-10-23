@@ -47,4 +47,43 @@ Require(MxmAccountIsolation.Check(1,0,0)=="REJECT_FOREIGN_ACCOUNT_POSITION","UNM
 Require(MxmAccountIsolation.Check(0,0,1)=="REJECT_ACCOUNT_PENDING_ORDER","PENDING_BROKER_ORDER");
 Require(MxmAccountIsolation.Check(1,2,0)=="REJECT_INCONSISTENT_ACCOUNT_BOOK","PHANTOM_OWNED_COUNT");
 Require(MxmAccountIsolation.Check(-1,0,0)=="REJECT_INCONSISTENT_ACCOUNT_BOOK","INVALID_BOOK");
+
+// Actual shared product/replay gate: artificial callback arrival ordering,
+// no broker calls. Equal-time ticks may arrive before OR after BarClosed.
+var intentA=new MxmCausalIntent();
+var intentB=new MxmCausalIntent();
+Require(!intentA.TryConsume(utc,out _),"NO_COLD_START_INTENT");
+intentA.Publish(1,true,6,utc,utc.AddMilliseconds(113),5);
+intentB.Publish(-1,true,6,utc,utc.AddMilliseconds(113),5);
+Require(!intentA.TryConsume(utc,out _),"NO_EARLIER_QUOTE");
+Require(!intentA.TryConsume(utc.AddMilliseconds(113),out _),"NO_SAME_CALLBACK_FILL");
+Require(intentB.TryConsume(utc.AddMilliseconds(114),out var sell) && sell!.Desired==-1,
+ "SYMBOL_B_INDEPENDENT_LATER_QUOTE");
+Require(intentA.TryConsume(utc.AddMilliseconds(115),out var buy) && buy!.Desired==1,
+ "SYMBOL_A_INDEPENDENT_LATER_QUOTE");
+Require(!intentA.TryConsume(utc.AddSeconds(1),out _),"REJECTED_OR_UNKNOWN_ACK_CANNOT_RETRY_INTENT");
+Require(!intentB.TryConsume(utc.AddSeconds(1),out _),"ONE_CONSUMPTION_PER_SYMBOL");
+intentA.Publish(1,true,7,utc.AddMinutes(5),utc.AddMinutes(5),5);
+Require(!intentA.TryConsume(utc.AddMinutes(10),out _),"EXPIRE_BEFORE_NEXT_BAR_CALLBACK");
+Require(!intentA.TryConsume(utc.AddMinutes(10).AddSeconds(1),out _),"EXPIRED_STAYS_CLEARED");
+intentA.Publish(1,true,8,utc.AddMinutes(10),utc.AddMinutes(10),5);
+intentA.Clear();
+Require(!intentA.TryConsume(utc.AddMinutes(10).AddSeconds(1),out _),"STOP_OR_GAP_CLEARS_INTENT");
+intentA.Publish(1,true,9,utc.AddMinutes(15),utc.AddMinutes(15),5);
+intentA.Publish(0,true,10,utc.AddMinutes(20),utc.AddMinutes(20),5);
+Require(intentA.TryConsume(utc.AddMinutes(20).AddSeconds(1),out var neutral) && neutral!.Desired==0,
+ "NEW_NEUTRAL_REPLACES_OLD_DIRECTION");
+bool invalidIntent=false;
+try{intentA.Publish(1,true,11,utc.AddMinutes(25),utc.AddMinutes(30),5);}
+catch(ArgumentException){invalidIntent=true;}
+Require(invalidIntent,"NO_DELAYED_SESSION_REOPEN_INTENT");
+invalidIntent=false;
+try{intentA.Publish(1,true,11,utc.AddMinutes(25),utc.AddMinutes(24),5);}
+catch(ArgumentException){invalidIntent=true;}
+Require(invalidIntent,"NO_FUTURE_BOUNDARY_INTENT");
+invalidIntent=false;
+try{intentA.TryConsume(DateTime.SpecifyKind(utc,DateTimeKind.Unspecified),out _);}
+catch(ArgumentException){invalidIntent=true;}
+Require(invalidIntent,"NO_UNKNOWN_QUOTE_TIMEZONE");
+Console.WriteLine("MXM_SHARED_PRODUCT_REPLAY_LATER_QUOTE_ONCE_ONLY_INTENT_AND_EXPIRY_SYNTHETIC_PASS");
 Console.WriteLine("MXM_ONE_ROBOT_MULTISYMBOL_SERIAL_BARS_AND_SHARED_EUR200_ADMISSION_SYNTHETIC_PASS_NO_ATOMIC_CLOUD_CLAIM");

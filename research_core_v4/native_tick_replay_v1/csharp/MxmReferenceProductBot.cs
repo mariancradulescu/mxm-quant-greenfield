@@ -17,6 +17,9 @@ public sealed class MxmReferenceProductBot : Robot {
  public string PortfolioSymbols {get;set;}="";
  readonly Dictionary<string,MxmDecisionKernel> portfolioKernels=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,Bars> subscribedBars=new(StringComparer.OrdinalIgnoreCase);
+ readonly Dictionary<string,Symbol> subscribedSymbols=new(StringComparer.OrdinalIgnoreCase);
+ readonly Dictionary<string,MxmCausalIntent> causalIntents=new(StringComparer.OrdinalIgnoreCase);
+ bool applyingDecision;
  MxmPortfolioSequencer? sequencer;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
  public bool EnableDemoTrading {get;set;}
@@ -83,8 +86,11 @@ public sealed class MxmReferenceProductBot : Robot {
    if(series==null){Print("MXM_PORTFOLIO_SERIES_MISSING_SAFE_HOLD_"+name);Stop();return;}
    subscribedBars.Add(name,series);
    portfolioKernels.Add(name,new MxmDecisionKernel(mode));
+   subscribedSymbols.Add(name,Symbols.GetSymbol(name));
+   causalIntents.Add(name,new MxmCausalIntent());
   }
   foreach(var series in subscribedBars.Values)series.BarClosed+=OnPortfolioBarClosed;
+  foreach(var instrument in subscribedSymbols.Values)instrument.Tick+=OnPortfolioTick;
   Print("MXM_SINGLE_ROBOT_PORTFOLIO_BARS_READY_NO_INTERINSTANCE_MUTEX_"+resolved.Count);
  }
  // Deliberately no legacy per-chart order path. All symbols, including chart
@@ -92,6 +98,8 @@ public sealed class MxmReferenceProductBot : Robot {
  protected override void OnBar() { }
  protected override void OnStop() {
   foreach(var series in subscribedBars.Values)series.BarClosed-=OnPortfolioBarClosed;
+  foreach(var instrument in subscribedSymbols.Values)instrument.Tick-=OnPortfolioTick;
+  foreach(var intent in causalIntents.Values)intent.Clear();
  }
  void OnPortfolioBarClosed(BarClosedEventArgs args) {
   var series=args.Bars;
@@ -110,17 +118,45 @@ public sealed class MxmReferenceProductBot : Robot {
    if(instrument==null || !portfolioKernels.TryGetValue(instrumentName,out var kernel)){
     Print("MXM_PORTFOLIO_SYMBOL_DISAPPEARED_SAFE_STOP");Stop();return;
    }
+   var observedUtc=DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
+   var currentOpenTime=DateTime.SpecifyKind(closedOpenTime.AddMinutes(BarMinutes),DateTimeKind.Utc);
+   // A weekend/reconnect tick can close the last OLD session bar. That bar
+   // is not a fresh decision, even if its predecessor was contiguous.
+   if(observedUtc>=currentOpenTime.AddMinutes(BarMinutes)) {
+    kernel.Reset();causalIntents[instrumentName].Clear();
+    Print("MXM_DELAYED_BAR_EXPIRED_COLD_REWARM_"+instrumentName);return;
+   }
    bool contiguous=(series.OpenTimes.Last(0)-series.OpenTimes.Last(1)).TotalMinutes==BarMinutes;
    if(!contiguous)kernel.Reset();
    // Bars.BarClosed excludes the newly opened bar; Last(0) IS the closed one.
    // No historical warm-start or double-processed boundary tick.
    int desired=kernel.OnCompletedBar((decimal)series.ClosePrices.Last(0));
-   var currentOpenTime=closedOpenTime.AddMinutes(BarMinutes);
-   ApplyPortfolioDecision(instrument,instrumentName,desired,contiguous,kernel.CompletedBars,currentOpenTime);
+   // Publish only. The tick delivering this callback must not execute its signal.
+   // UTC is the robot's declared clock; cTrader DateTime Kind is normalized here.
+   causalIntents[instrumentName].Publish(desired,contiguous,kernel.CompletedBars,
+    DateTime.SpecifyKind(currentOpenTime,DateTimeKind.Utc),observedUtc,BarMinutes);
   } catch(Exception e) {
    Print("MXM_PORTFOLIO_CALLBACK_UNVERIFIED_SAFE_STOP_"+e.GetType().Name);
    Stop();
   } finally {sequencer.Exit();}
+ }
+ void OnPortfolioTick(SymbolTickEventArgs args) {
+  if(!causalIntents.TryGetValue(args.SymbolName,out var queue))return;
+  bool acquired=false;
+  try {
+   var quoteUtc=DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
+   if(!double.IsFinite(args.Bid) || !double.IsFinite(args.Ask) ||
+      args.Bid<=0 || args.Ask<args.Bid)return;
+   if(applyingDecision){Print("MXM_REENTRANT_EXECUTION_SAFE_STOP");Stop();return;}
+   if(!queue.TryConsume(quoteUtc,out var intent))return;
+   applyingDecision=true;acquired=true;
+   // Consumed BEFORE broker calls. A rejected or unknown result cannot retry
+   // the same intent on every tick or fabricate a broker fill.
+   ApplyPortfolioDecision(args.Symbol,args.SymbolName,intent!.Desired,
+    intent.Contiguous,intent.CompletedBars,intent.BoundaryUtc);
+  } catch(Exception e) {
+   Print("MXM_PORTFOLIO_TICK_UNVERIFIED_SAFE_STOP_"+e.GetType().Name);Stop();
+  } finally {if(acquired)applyingDecision=false;}
  }
  void ApplyPortfolioDecision(Symbol instrument,string instrumentName,int desired,
   bool contiguous,int completedBars,DateTime currentOpenTime) {
