@@ -15,7 +15,7 @@ public sealed class MxmReferenceProductBot : Robot {
  ExitMode exitMode=ExitMode.ReverseOnly;
  [Parameter("Portfolio Symbols (comma separated)",DefaultValue="")]
  public string PortfolioSymbols {get;set;}="";
- readonly Dictionary<string,MxmDecisionKernel> portfolioKernels=new(StringComparer.OrdinalIgnoreCase);
+ readonly Dictionary<string,MxmDecisionSource> portfolioKernels=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,Bars> subscribedBars=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,Symbol> subscribedSymbols=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmCausalIntent> causalIntents=new(StringComparer.OrdinalIgnoreCase);
@@ -45,10 +45,15 @@ public sealed class MxmReferenceProductBot : Robot {
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
-  if(!Enum.TryParse<StrategyMode>(RegimeFamily,true,out var mode)){
+  bool onlineAr1=string.Equals(RegimeFamily,"OnlineAr1",StringComparison.OrdinalIgnoreCase);
+  var mode=StrategyMode.Adaptive;
+  if(!onlineAr1 && (!Enum.TryParse<StrategyMode>(RegimeFamily,true,out mode) ||
+     !Enum.IsDefined(typeof(StrategyMode),mode))){
    Print("MXM_UNKNOWN_FAMILY_SAFE_HOLD");Stop();return;
   }
-  if(!Enum.TryParse<ExitMode>(ExitPolicy,true,out exitMode)){
+  if(!Enum.TryParse<ExitMode>(ExitPolicy,true,out exitMode) ||
+     !Enum.IsDefined(typeof(ExitMode),exitMode) ||
+     (onlineAr1 && (BarMinutes!=5 || exitMode!=ExitMode.NeutralFlat))){
    Print("MXM_INVALID_EXIT_MODE_SAFE_HOLD");Stop();return;
   }
   bool supported=(BarMinutes==1 && TimeFrame==cAlgo.API.TimeFrame.Minute) ||
@@ -81,12 +86,12 @@ public sealed class MxmReferenceProductBot : Robot {
   }
   sequencer=new MxmPortfolioSequencer(resolved);
   // Subscribe only after full validation. Each symbol has independent cold
-  // six-complete-bar strategy state; there is ONE shared real broker account.
+  // strategy state (online learner cold-rewarms at least 128 pairs); there is ONE shared real broker account.
   foreach(var name in resolved) {
    var series=MarketData.GetBars(TimeFrame,name);
    if(series==null){Print("MXM_PORTFOLIO_SERIES_MISSING_SAFE_HOLD_"+name);Stop();return;}
    subscribedBars.Add(name,series);
-   portfolioKernels.Add(name,new MxmDecisionKernel(mode));
+   portfolioKernels.Add(name,new MxmDecisionSource(new MxmDecisionKernel(mode),onlineAr1));
    subscribedSymbols.Add(name,Symbols.GetSymbol(name));
    causalIntents.Add(name,new MxmCausalIntent());
   }
