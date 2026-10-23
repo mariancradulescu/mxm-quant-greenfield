@@ -44,13 +44,24 @@ public sealed record MxmEurUsdCapturedCosts(long MinCents,long MaxCents,long Ste
   decimal minimumEur=MinimumAsset=="EUR"?minimum:minimum/bid;
   return Math.Max(variableEur,minimumEur);
  }
- public static MxmEurUsdCapturedCosts Load(string path,bool nativeSource) {
+ public static MxmEurUsdCapturedCosts Load(string path,bool nativeSource,bool weekSource=false) {
+  Need(!weekSource || !nativeSource,"CONTRADICTORY_SOURCE");
   using var doc=JsonDocument.Parse(File.ReadAllBytes(path));var root=doc.RootElement;
   Need(root.GetProperty("schema").GetString()=="mxm.captured-native-symbol-terms.v1" &&
    root.GetProperty("symbol_id").GetInt32()==1 &&
    !root.GetProperty("historical_commission_proven").GetBoolean() &&
    !root.GetProperty("dated_historical_volume_rules_proven").GetBoolean(),"SNAPSHOT_NOT_HISTORY");
-  if(nativeSource) {
+  if(weekSource) {
+   Need(root.GetProperty("source_crypto_authenticated_by_week_native_replay").GetBoolean() &&
+    root.GetProperty("source_run").GetInt64()==39917922508 &&
+    root.GetProperty("source_code_sha").GetString()=="120db3391ed1f4105120274b73a9259690eeeb64" &&
+    root.GetProperty("source_private_sha256").GetString()=="8dde8355c79f3f379bf14f1fd47a8ed5815646cafbcfc287762fb68c2c2e7b51" &&
+    root.GetProperty("source_ciphertext_sha256").GetString()==
+     "2403c74dfd81ab410f9b9c3bdabf4f3d5a5a4df0133cd0adc03933a364d539b6" &&
+    root.GetProperty("classification").GetString()==
+     "AUTHENTICATED_WEEK_CAPTURE_SNAPSHOT_NOT_DATED_HISTORICAL_EXECUTION_TERMS",
+     "WEEK_SOURCE_BINDING");
+  } else if(nativeSource) {
    Need(root.GetProperty("source_crypto_authenticated_by_original_native_replay").GetBoolean() &&
     root.GetProperty("source_run").GetInt64()==39660692230 &&
     root.GetProperty("source_ciphertext_sha256").GetString()==

@@ -11,6 +11,10 @@ on:
       - research_core_v4/laboratory/durable_native_chronology.py
       - research_core_v4/laboratory/captured_symbol_terms.py
       - research_core_v4/laboratory/csharp_native_portfolio_independent_mark.py
+      - research_core_v4/laboratory/week_chronology_csharp_bridge.py
+      - research_core_v4/laboratory/week_chronology_reception.py
+      - research_core_v4/laboratory/durable_week_chronology.py
+      - docs/economic-development/20261023/native-week-39917922508/**
       - docs/economic-development/20261023/native-chronology-39660692230/**
   workflow_dispatch: {}
 permissions: {}
@@ -287,5 +291,124 @@ jobs:
           path: |
             verification/csharp-authentic-aggregate/receipt.json
             verification/csharp-authentic-aggregate/modeled-reference.mxmenc
+          if-no-files-found: error
+          retention-days: 30
+
+  weekly-cold-to-csharp:
+    # An additional job of the EXISTING protected CSharp pipeline; no new
+    # custody, provider connection, authority, or GitHub credential.
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    environment: mxm-r3-custody-v1
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Pin original authenticated Pepperstone wire decoder
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
+      - name: Restore exact new-week ciphertext without key or market access
+        run: |
+          test "$(git -C .sealed-chronology-source rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          python3 -m research_core_v4.laboratory.durable_week_chronology --out "${RUNNER_TEMP}/mxm-week-chronology"
+          cp research_core_v4/laboratory/week_chronology_reception.py .sealed-chronology-source/research_core_v4/laboratory/
+          cp research_core_v4/laboratory/week_chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/
+          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/
+      - name: Decrypt exact authenticated week ONLY in existing protected environment
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          cd .sealed-chronology-source
+          python3 -m research_core_v4.laboratory.week_chronology_csharp_bridge "${RUNNER_TEMP}/mxm-week-chronology/capture.mxmenc" "${RUNNER_TEMP}/mxm-week-ticks.ndjson"
+      - name: Execute one continuous EUR200 CSharp week and independently check cash and terminal equity
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-captured-terms-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
+          python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-week-csharp/independent-mark.json"
+      - name: Produce nonpromotable development receipt and encrypt the full model under existing public recipient
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          from research_core_v4.laboratory.common import bytes_digest,encoded,need
+          from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
+          from research_core_v4.successor_c_20261018.readback import FP
+          tmp=pathlib.Path(os.environ['RUNNER_TEMP'])
+          bridge=json.loads((tmp/'mxm-week-ticks.ndjson.receipt.json').read_bytes())
+          report=json.loads((tmp/'mxm-week-csharp/portfolio-exposed-quote-readback.json').read_bytes())
+          independent=json.loads((tmp/'mxm-week-csharp/independent-mark.json').read_bytes())
+          terms=json.loads((tmp/'mxm-week-ticks.ndjson.symbol-terms.json').read_bytes())
+          need(bridge['source_run']==39917922508 and bridge['verified_bid_events']==342248 and
+               bridge['verified_ask_events']==343226 and bridge['partition']=='DEVELOPMENT' and
+               bridge['orders']==bridge['fills']==bridge['new_broker_requests']==0 and
+               bridge['derived_ticks_sha256']==report['derived_stream_sha256']==bytes_digest((tmp/'mxm-week-ticks.ndjson').read_bytes()),
+               'WEEK_CSHARP_BRIDGE_PROVENANCE')
+          need(report['classification']=='PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED' and
+               report['original_native_run_id']==39917922508 and report['quote_events']==685474 and
+               report['synthetic_quote_events_injected']==0 and
+               report['authenticated_requested_iso_week_input']=='2026-W37' and
+               report['account']['initial_capital_eur']==200 and
+               report['account']['complete_iso_utc_weeks']==0 and
+               report['account']['broker_fills_proven'] is False and
+               report['account']['hard21_proven'] is False and
+               report['hard21_proven'] is False and
+               not report['historical_quote_arrival_order_proven'] and
+               not report['one_full_iso_utc_week_proven'] and
+               not report['scientific_confirmation_opened'] and
+               report['new_broker_requests']==report['live_orders']==0,
+               'WEEK_CSHARP_MODEL_ONLY_NO_PROMOTION')
+          need(terms['source_run']==39917922508 and
+               report['captured_terms_sha256']==bridge['captured_symbol_terms_sha256'] and
+               independent['market_source_sha256']==bridge['derived_ticks_sha256'] and
+               float(independent['cash_abs_difference_eur'])<=0.000001 and
+               float(independent['equity_abs_difference_eur'])<=0.000001 and
+               not independent['independent_native_broker_execution'] and
+               not independent['broker_historical_costs_verified'] and
+               not independent['hard21'],
+               'WEEK_CSHARP_INDEPENDENT_ACCOUNT_RECONCILIATION')
+          ledger=report['account']['ledger']
+          need(sum(x['kind']=='ENTRY' for x in ledger)==report['account']['accepted_entries'] and
+               sum(x['kind']=='EXIT' for x in ledger)==report['account']['executed_exits'],
+               'WEEK_CSHARP_ENTRY_EXIT_RECOUNT')
+          full=encoded({'bridge':bridge,'terms':terms,'modeled_csharp':report,'independent_cash_and_mark':independent})
+          recipient=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
+          need(public_spki_sha256(recipient)==FP,'WEEK_CSHARP_ORIGINAL_RECIPIENT')
+          output=pathlib.Path('verification/csharp-week-development');output.mkdir(parents=True,exist_ok=True)
+          cipher=output/'model.mxmenc'
+          encrypt_shard(full,public_key=recipient,output=cipher)
+          receipt={'schema':'mxm.csharp.week37.development-receipt.v1',
+            'classification':'AUTHENTIC_WEEK_QUOTES_MODELED_EUR200_UNVERIFIED_COSTS_AND_FILLS',
+            'source_run':39917922508,'iso_week':'2026-W37','partition':'DEVELOPMENT',
+            'source_cipher_sha256':bridge['ciphertext_sha256'],
+            'derived_stream_sha256':bridge['derived_ticks_sha256'],
+            'quote_events':685474,'initial_eur':200,
+            'modeled_entries':report['account']['accepted_entries'],
+            'modeled_exits':report['account']['executed_exits'],
+            'modeled_entries_iso_week':report['modeled_entries_in_requested_iso_week'],
+            'modeled_entry_threshold_21_met':report['modeled_21_entry_threshold_met'],
+            'modeled_terminal_cash_eur':report['account']['final_cash_eur'],
+            'modeled_terminal_bidask_equity_eur':report['account']['marked_equity_eur'],
+            'modeled_max_drawdown_eur':report['account']['max_drawdown_eur'],
+            'modeled_open_positions':report['account']['open_positions'],
+            'independent_cash_abs_diff_eur':independent['cash_abs_difference_eur'],
+            'independent_equity_abs_diff_eur':independent['equity_abs_difference_eur'],
+            'modeled_output_cipher_sha256':bytes_digest(cipher.read_bytes()),
+            'all_historical_costs_verified':False,'broker_fills_proven':False,
+            'real_hard21_proven':False,'independent_confirmation':False,
+            'economic_edge_proven':False,'real_orders':0,'new_broker_requests':0}
+          (output/'receipt.json').write_bytes(encoded(receipt))
+          print('MXM_WEEK37_DEVELOPMENT_ONLY',json.dumps(receipt,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: csharp-week37-development-modeled
+          path: |
+            verification/csharp-week-development/receipt.json
+            verification/csharp-week-development/model.mxmenc
           if-no-files-found: error
           retention-days: 30
