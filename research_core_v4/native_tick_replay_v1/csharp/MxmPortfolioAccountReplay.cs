@@ -228,7 +228,7 @@ public sealed class MxmPortfolioAccountReplay {
        protectedPosition.StopPrice is decimal stop &&
        (protectedPosition.Direction>0 ? quote.Bid<=stop : quote.Ask>=stop)) {
      Exit(quote.Symbol,quote,"OBSERVED_QUOTE_STOP");
-     st.Intent.Clear();stopped=true;
+     st.Intent.RevokeThroughBoundary(quote.Utc,parameters.BarMinutes);stopped=true;
     }
     if(!halted && !stopped && st.Intent.TryConsume(quote.Utc,out var intent)) {
      int signal=intent!.Desired;

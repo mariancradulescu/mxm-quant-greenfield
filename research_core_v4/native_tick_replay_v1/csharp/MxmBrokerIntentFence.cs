@@ -13,7 +13,6 @@ public sealed class MxmBrokerIntentFence {
  readonly int barMinutes;
  long revision;
  long? positionId;
- DateTime blockedThroughBoundary;
  long? requestedReversalId;
  bool requestedCloseObserved;
  public MxmBrokerIntentFence(MxmCausalIntent queue,int barMinutes,long? initialPositionId) {
@@ -28,10 +27,8 @@ public sealed class MxmBrokerIntentFence {
  void Invalidate(DateTime observedUtc) {
   Clock(observedUtc);
   checked {revision++;}
-  queue.Clear();requestedReversalId=null;requestedCloseObserved=false;
-  long width=TimeSpan.TicksPerMinute*barMinutes;
-  var boundary=new DateTime(observedUtc.Ticks/width*width,DateTimeKind.Utc);
-  if(boundary>blockedThroughBoundary)blockedThroughBoundary=boundary;
+  queue.RevokeThroughBoundary(observedUtc,barMinutes);
+  requestedReversalId=null;requestedCloseObserved=false;
  }
  public void Observe(long? actualPositionId,DateTime observedUtc) {
   Clock(observedUtc);
@@ -41,7 +38,7 @@ public sealed class MxmBrokerIntentFence {
  }
  public bool CanPublish(DateTime boundaryUtc) {
   Clock(boundaryUtc);
-  return boundaryUtc>blockedThroughBoundary;
+  return queue.CanPublish(boundaryUtc);
  }
  public MxmBrokerDecisionLease Capture()=>new(revision,positionId);
  public bool IsCurrent(MxmBrokerDecisionLease lease,long? actualPositionId,DateTime observedUtc) {
