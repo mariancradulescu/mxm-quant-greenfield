@@ -51,6 +51,7 @@ jobs:
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-exposed-eurusd "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-native-portfolio"
+          python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-native-portfolio/portfolio-exposed-quote-readback.json" --out "${RUNNER_TEMP}/mxm-csharp-native-portfolio/independent-terminal-mark.json"
           python3 - <<'PY'
           import os,json,pathlib
           from research_core_v4.laboratory.common import bytes_digest,need
@@ -173,6 +174,17 @@ jobs:
             preserved_corpus_sha256=bridge['ciphertext_sha256'],derived_stream_sha256=bridge['derived_ticks_sha256'])
           out=pathlib.Path('verification/csharp-authentic-aggregate');out.mkdir(parents=True,exist_ok=True)
           nativeportfolio=json.loads((temp/'mxm-csharp-native-portfolio/portfolio-exposed-quote-readback.json').read_bytes())
+          native_terminal_mark=json.loads((temp/'mxm-csharp-native-portfolio/independent-terminal-mark.json').read_bytes())
+          need(native_terminal_mark['classification']=='INDEPENDENT_ARITHMETIC_SAME_EXPOSED_NATIVE_QUOTES_UNVERIFIED_EXECUTION' and
+               native_terminal_mark['market_source_sha256']==bridge['derived_ticks_sha256'] and
+               native_terminal_mark['source_native_quote_events']==28212 and
+               native_terminal_mark['full_iso_weeks_verified']==0 and
+               not native_terminal_mark['hard21'] and not native_terminal_mark['independent_native_broker_execution'] and
+               not native_terminal_mark['broker_historical_costs_verified'] and native_terminal_mark['orders']==0 and
+               float(native_terminal_mark['equity_abs_difference_eur'])<=0.000001 and
+               float(native_terminal_mark['cash_abs_difference_eur'])<=0.000001,
+               'INDEPENDENT_NATIVE_TERMINAL_BIDASK_MTM_PARITY')
+
           need(nativeportfolio['derived_stream_sha256']==bridge['derived_ticks_sha256'] and
                nativeportfolio['actual_symbols']==1 and nativeportfolio['quote_events']==28212 and
                nativeportfolio['new_broker_requests']==0 and nativeportfolio['live_orders']==0,
@@ -190,6 +202,9 @@ jobs:
           safe.update(native_portfolio_completed_bar_events=nativeportfolio['completed_bar_decision_events'],
             native_portfolio_usable_atomic_quote_snapshots=nativeportfolio['grouped_atomic_usable_snapshots'],
             native_portfolio_rejections_by_type=dict(Counter(nativeportfolio['account']['rejections'])))
+          safe.update(native_portfolio_independent_terminal_bidask_mtm_arithmetic_pass=True,
+            native_portfolio_independent_terminal_cash_diff_eur=float(native_terminal_mark['cash_abs_difference_eur']),
+            native_portfolio_independent_terminal_equity_diff_eur=float(native_terminal_mark['equity_abs_difference_eur']))
           safe.update(native_portfolio_source_original=True,native_portfolio_input_symbols=1,
             native_portfolio_full_iso_utc_weeks=0,
             native_portfolio_entry_scenarios=nativeportfolio['account']['accepted_entries'],
@@ -200,7 +215,7 @@ jobs:
             native_portfolio_independent_full_mtm_parity_not_proven=True,
             native_portfolio_not_qualified=True,native_portfolio_hard21=False)
           full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
-                         'native_exposed_quote_continuous_account_model':nativeportfolio,'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
+                         'native_exposed_quote_continuous_account_model':nativeportfolio,'independent_native_quote_terminal_cash_and_mtm':native_terminal_mark,'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
           public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')
           ciphertext=out/'modeled-reference.mxmenc'
