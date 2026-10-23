@@ -4,6 +4,7 @@ on:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
       - research_core_v4/native_tick_replay_v1/csharp/**
+      - research_core_v4/laboratory/csharp_native_portfolio_independent_mark.py
       - .github/workflows/mxm-csharp-eur200-admission-ci.yml
 permissions: {contents: read}
 jobs:
@@ -125,6 +126,30 @@ jobs:
           assert abs(a['free_margin_eur']-(a['marked_equity_eur']-D(50)))<D('0.000001')
           assert not a['hard21_proven'] and not a['broker_fills_proven']
           print('MXM_ARTIFICIAL_NATIVE_QUOTE_SHAPE_CAUSAL_CSHARP_INDEPENDENT_MTM_PASS')
+          PY
+          python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark verification/mxm-artificial-native-quotes.ndjson verification/mxm-portfolio-native-fixture/portfolio-exposed-quote-readback.json --out verification/mxm-portfolio-native-fixture/independent-mark.json
+          python3 - <<'PY'
+          from pathlib import Path
+          from decimal import Decimal as D
+          import json
+          from research_core_v4.laboratory.csharp_native_portfolio_independent_mark import independent_terminal_mark,MarkParityError
+          tick=Path('verification/mxm-artificial-native-quotes.ndjson')
+          original=json.loads(Path('verification/mxm-portfolio-native-fixture/portfolio-exposed-quote-readback.json').read_text(),parse_float=D)
+          receipt=json.loads(Path('verification/mxm-portfolio-native-fixture/independent-mark.json').read_text())
+          assert receipt['ledger_entry_count']==1 and receipt['ledger_exit_count']==0
+          assert receipt['open_positions']==1 and receipt['full_iso_weeks_verified']==0 and not receipt['hard21']
+          assert D(receipt['cash_abs_difference_eur'])<=D('0.000001')
+          assert D(receipt['equity_abs_difference_eur'])<=D('0.000001')
+          original['account']['marked_equity_eur']+=D(1)
+          try:independent_terminal_mark(tick,original)
+          except MarkParityError as e:assert 'TERMINAL_LIQUIDATION_MTM' in str(e)
+          else:raise AssertionError('tampered marked equity accepted')
+          original['account']['marked_equity_eur']-=D(1)
+          original['account']['ledger'][0]['price']+=D('0.001')
+          try:independent_terminal_mark(tick,original)
+          except MarkParityError as e:assert 'WRONG_SIDE_OF_SPREAD_ENTRY' in str(e)
+          else:raise AssertionError('tampered executable-side fill accepted')
+          print('MXM_PYTHON_INDEPENDENT_NATIVE_PORTFOLIO_TERMINAL_MTM_NEGATIVES_PASS')
           PY
           python3 - <<'PY'
           from pathlib import Path
