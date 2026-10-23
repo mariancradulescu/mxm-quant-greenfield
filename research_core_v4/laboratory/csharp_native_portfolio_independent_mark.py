@@ -94,7 +94,8 @@ def captured_fee_reference(path, report):
     require(snapshot['schema'] == 'mxm.captured-native-symbol-terms.v1' and
             snapshot['symbol_id'] == 1 and not snapshot['historical_commission_proven'] and
             not snapshot['dated_historical_volume_rules_proven'], 'CAPTURED_TERMS_SCOPE')
-    if report['classification']=='PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED':
+    if report['classification'] in ('PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED',
+        'PINNED_PEPPERSTONE_WEEK35_REMAINING_FAMILY_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED'):
         require(snapshot['source_crypto_authenticated_by_week_native_replay'] is True and
                 snapshot['source_run']==39946364621 and
                 snapshot['source_code_sha']=='b54ee59548846ad8013b25965dbe4bcb19d4a978' and
@@ -157,11 +158,14 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
     require(report["classification"] in (
         "ARTIFICIAL_QUOTE_STREAM_ONLY",
         "PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED",
+        "PINNED_PEPPERSTONE_WEEK35_REMAINING_FAMILY_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED",
         "ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
         "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
         "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"
     ), "REPORT_CLASSIFICATION")
-    week35=report["classification"]=="PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED"
+    week35=report["classification"] in (
+        "PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED",
+        "PINNED_PEPPERSTONE_WEEK35_REMAINING_FAMILY_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED")
     product_stop12=week35 or (report["classification"] ==
         "PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED")
     if product_stop12:
@@ -189,7 +193,8 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
         require(source['source_events']==683022 and report['original_native_run_id']==39946364621 and
                 report['authenticated_requested_iso_week_input']=='2026-W35' and
                 all(1787529600000<=ts<1788134400000 for ts in book) and
-                report['modeled_parameters']['strategy']=='Breakout' and
+                report['modeled_parameters']['strategy'] in (('Breakout',) if report['classification']==
+                 'PINNED_PEPPERSTONE_WEEK35_BREAKOUT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED' else ('TrendOnly','RangeFade')) and
                 number(report['modeled_parameters']['slip_price_per_side']) in (D('.00002'),D('.00004')) and
                 not report['one_full_iso_utc_week_proven'] and
                 not report['weekly_provider_pages_broker_execution_proof'], 'W35_FIXED_DEVELOPMENT_SCOPE')
