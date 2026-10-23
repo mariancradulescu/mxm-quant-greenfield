@@ -47,6 +47,36 @@ jobs:
           cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
           cd .sealed-chronology-source
           python3 -m research_core_v4.laboratory.chronology_csharp_bridge "${GITHUB_WORKSPACE}/verification/r3-chronology/capture.mxmenc" "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson"
+      - name: Execute CSharp single-account portfolio model against exact pinned authenticated Pepperstone quotes (development only)
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-exposed-eurusd "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-native-portfolio"
+          python3 - <<'PY'
+          import os,json,pathlib
+          from research_core_v4.laboratory.common import bytes_digest,need
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])
+          bridge=json.loads((root/'mxm-authentic-ticks.ndjson.receipt.json').read_text())
+          native=json.loads((root/'mxm-csharp-native-portfolio/portfolio-exposed-quote-readback.json').read_text())
+          need(bridge['source_run']==39660692230 and bridge['verified_bid_events']==14003 and
+               bridge['verified_ask_events']==14209 and bridge['orders']==bridge['fills']==0,
+               'ORIGINAL_NATIVE_CUSTODY_AND_NO_TRADING')
+          need(native['derived_stream_sha256']==bridge['derived_ticks_sha256']==
+               bytes_digest((root/'mxm-authentic-ticks.ndjson').read_bytes()),
+               'PORTFOLIO_SOURCE_HASH_CUSTODY_BINDING')
+          need(native['classification']=='ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED' and
+               native['original_native_run_id']==39660692230 and native['quote_events']==28212 and
+               native['actual_symbols']==1 and not native['multi_instrument_native_data_available'] and
+               native['synthetic_quote_events_injected']==0 and native['new_broker_requests']==native['live_orders']==0,
+               'PORTFOLIO_EXPOSED_SINGLE_SYMBOL_ONLY')
+          account=native['account']
+          need(account['initial_capital_eur']==200 and account['complete_iso_utc_weeks']==0 and
+               not account['hard21_proven'] and not native['historical_broker_fills_proven'] and
+               not native['historical_quote_arrival_order_proven'] and
+               not native['scientific_confirmation_opened'] and
+               not account['broker_fills_proven'] and not account['costs_broker_verified'],
+               'PORTFOLIO_NOT_PROMOTED_OR_AUTHORIZED')
+          print('MXM_AUTHENTIC_SOURCE_EXPOSED_EURUSD_CSHARP_ACCOUNT_ENGINE_ONLY_PASS')
+          PY
       - name: Evaluate same CSharp decision kernel and exploratory economic sensitivity on verified authentic quotes
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --authentic-nonoutcome "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson" "${RUNNER_TEMP}/mxm-csharp-output"
@@ -142,8 +172,31 @@ jobs:
             scenario_assumption=r['account_convention'],scenario_unverified_fx_margin_swap_and_fills=True,
             preserved_corpus_sha256=bridge['ciphertext_sha256'],derived_stream_sha256=bridge['derived_ticks_sha256'])
           out=pathlib.Path('verification/csharp-authentic-aggregate');out.mkdir(parents=True,exist_ok=True)
+          nativeportfolio=json.loads((temp/'mxm-csharp-native-portfolio/portfolio-exposed-quote-readback.json').read_bytes())
+          need(nativeportfolio['derived_stream_sha256']==bridge['derived_ticks_sha256'] and
+               nativeportfolio['actual_symbols']==1 and nativeportfolio['quote_events']==28212 and
+               nativeportfolio['new_broker_requests']==0 and nativeportfolio['live_orders']==0,
+               'PORTFOLIO_REPLAY_NATIVE_PROVENANCE')
+          cash=__import__('decimal').Decimal('200')
+          for trade in nativeportfolio['account']['ledger']:
+              if trade['kind']=='ENTRY':
+                  cash-=__import__('decimal').Decimal(str(trade['commission_eur']))
+              elif trade['kind']=='EXIT':
+                  cash+=__import__('decimal').Decimal(str(trade['gross_eur']))-__import__('decimal').Decimal(str(trade['commission_eur']))
+              else:raise ValueError('UNRECOGNIZED_ACCOUNT_LEDGER_ENTRY')
+              need(abs(cash-__import__('decimal').Decimal(str(trade['cash_eur'])))<__import__('decimal').Decimal('0.000001'),'ONE_ACCOUNT_CASH_LEDGER')
+          need(abs(cash-__import__('decimal').Decimal(str(nativeportfolio['account']['final_cash_eur'])))<__import__('decimal').Decimal('0.000001'),'CONTINUOUS_ACCOUNT_FINAL_CASH')
+          safe.update(native_portfolio_source_original=True,native_portfolio_input_symbols=1,
+            native_portfolio_full_iso_utc_weeks=0,
+            native_portfolio_entry_scenarios=nativeportfolio['account']['accepted_entries'],
+            native_portfolio_exit_scenarios=nativeportfolio['account']['executed_exits'],
+            native_portfolio_cash_model_eur=nativeportfolio['account']['final_cash_eur'],
+            native_portfolio_marked_equity_model_eur=nativeportfolio['account']['marked_equity_eur'],
+            native_portfolio_unverified_broker_terms=True,
+            native_portfolio_independent_full_mtm_parity_not_proven=True,
+            native_portfolio_not_qualified=True,native_portfolio_hard21=False)
           full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
-                         'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
+                         'native_exposed_quote_continuous_account_model':nativeportfolio,'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
           public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')
           ciphertext=out/'modeled-reference.mxmenc'
