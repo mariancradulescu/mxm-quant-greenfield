@@ -44,8 +44,10 @@ jobs:
           assert not spec['scientific_accounting']['confirmation_opened']
           bot=Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
           assert 'EnableDemoTrading && !Account.IsLive' in bot
-          assert 'ExitMode.NeutralFlat' in bot and 'ExitMode.Horizon12' in bot
-          assert 'contiguous && completedBars>=6 && exitMode==ExitMode.NeutralFlat' in bot
+          policy=Path('research_core_v4/native_tick_replay_v1/csharp/MxmExitPolicy.cs').read_text()
+          assert 'MxmExitPolicy.Reason(' in bot
+          assert 'ExitMode.NeutralFlat' in policy and 'ExitMode.Horizon12' in policy
+          assert 'contiguous && completedBars>=6 && mode==ExitMode.NeutralFlat' in policy
           simulator=Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
           assert 'contiguousDecision && kernel.CompletedBars>=6 && pendingSignal==0' in simulator
           assert 'MXM_POLICY_EXIT_FAILED_SAFE_HOLD' in bot
