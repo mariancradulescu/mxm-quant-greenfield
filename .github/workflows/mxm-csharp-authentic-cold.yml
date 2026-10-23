@@ -14,6 +14,7 @@ on:
       - research_core_v4/laboratory/week_chronology_csharp_bridge.py
       - research_core_v4/laboratory/week_chronology_reception.py
       - research_core_v4/laboratory/durable_week_chronology.py
+      - research_core_v4/laboratory/csharp_week_account_attribution.py
       - docs/economic-development/20261023/native-week-39917922508/**
       - docs/economic-development/20261023/native-chronology-39660692230/**
   workflow_dispatch: {}
@@ -387,7 +388,12 @@ jobs:
                abs(D(attribution['final_modeled_cash_eur'])-
                    D(str(report['account']['final_cash_eur'])))<=D('0.000001') and
                not attribution['hard21_proven'] and not attribution['economic_edge_proven'] and
-               attribution['new_strategy_trials']==attribution['real_orders']==0,
+               attribution['new_strategy_trials']==attribution['real_orders']==0 and
+               attribution['static_zero_commission_is_not_a_new_account_replay'] and
+               sum(attribution['closed_positions_by_exit_reason'].values())==report['account']['executed_exits'] and
+               abs(D(attribution['static_zero_commission_same_ledger_pnl_eur'])-
+                   D(attribution['realized_gross_pnl_eur'])-
+                   D(attribution['unrealized_liquidation_mark_pnl_eur']))<=D('0.000001'),
                'WEEK_ATTRIBUTION_SAME_ACCOUNT_AND_NO_PROMOTION')
           full=encoded({'bridge':bridge,'terms':terms,'modeled_csharp':report,
                         'independent_cash_and_mark':independent,'account_loss_attribution':attribution})
@@ -414,6 +420,12 @@ jobs:
             'modeled_realized_net_cash_pnl_eur':attribution['realized_net_cash_pnl_eur'],
             'modeled_open_liquidation_pnl_eur':attribution['unrealized_liquidation_mark_pnl_eur'],
             'modeled_total_net_marked_pnl_eur':attribution['net_modeled_marked_equity_pnl_eur'],
+            'static_zero_commission_same_ledger_pnl_eur':attribution['static_zero_commission_same_ledger_pnl_eur'],
+            'unchanged_ledger_remains_negative_at_zero_commission':attribution['unchanged_ledger_remains_negative_even_at_zero_commission'],
+            'closed_positions_by_exit_reason':attribution['closed_positions_by_exit_reason'],
+            'closed_position_net_pnl_by_exit_reason_eur':attribution['closed_position_net_pnl_by_exit_reason_eur'],
+            'closed_position_holding_minutes_median':attribution['closed_position_holding_minutes_median'],
+            'closed_position_holding_minutes_max':attribution['closed_position_holding_minutes_max'],
             'modeled_entries_by_utc_date':attribution['modeled_entry_counts_by_utc_date'],
             'friction_price_effect_already_in_gross':True,
             'modeled_open_positions':report['account']['open_positions'],
