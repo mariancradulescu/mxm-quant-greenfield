@@ -167,19 +167,16 @@ public sealed class MxmReferenceProductBot : Robot {
   TradeType direction=desired>0?TradeType.Buy:TradeType.Sell;
   if(owned.Length==1){
    var current=owned[0];
-   // A neutral signal has no broker order unless this specific exit policy is selected.
-   // A discontinuity is never reinterpreted as a valid causal neutral exit.
-   bool neutralExit=contiguous && completedBars>=6 && exitMode==ExitMode.NeutralFlat && desired==0;
-   // Age measured against the existing position's actual broker entry time.
-   bool horizonExit=exitMode==ExitMode.Horizon12 &&
-     (currentOpenTime-current.EntryTime).TotalMinutes>=12*BarMinutes;
-   if(neutralExit || horizonExit){
+   string? exitReason=MxmExitPolicy.Reason(exitMode,desired,
+    current.TradeType==TradeType.Buy?1:-1,contiguous,completedBars,
+    DateTime.SpecifyKind(currentOpenTime,DateTimeKind.Utc),
+    DateTime.SpecifyKind(current.EntryTime,DateTimeKind.Utc),BarMinutes);
+   if(exitReason==null)return;
+   if(exitReason!="REVERSAL") {
     var closed=ClosePosition(current);
     if(!closed.IsSuccessful)Print("MXM_POLICY_EXIT_FAILED_SAFE_HOLD");
-    return; // Never manufacture a same-bar entry after a discretionary exit.
+    return; // No entry following a discretionary policy exit on this intent.
    }
-   if(desired==0)return;
-   if(current.TradeType==direction)return;
    var result=ClosePosition(current);
    if(!result.IsSuccessful){Print("MXM_CLOSE_FAILED_SAFE_HOLD");return;}
   }

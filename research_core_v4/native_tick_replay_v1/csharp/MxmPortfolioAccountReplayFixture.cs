@@ -149,6 +149,51 @@ try {new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(unsort
 catch(ArgumentException x){rejectedTime=x.Message.Contains("OUT_OF_ORDER_GLOBAL_FEED");}
 Require(rejectedTime,"NO_LOOKAHEAD_GLOBAL_ORDER");
 
+// Optional lifecycle extension: no historical replay is run by these fixtures.
+var stops=Series(6);
+for(int i=0;i<stops.Count;i++)if(stops[i] is MxmQuote q)
+ stops[i]=q with {StopDistanceQuote=.0012m,SlipPerSideQuote=.00002m};
+var stopTime=new DateTime(2026,8,24,12,30,1,DateTimeKind.Utc);
+// Both stops gap beyond the requested price; first observed side plus adverse
+// slippage is used. There is no fresh intent and no synthetic boundary fill.
+stops.Add(new MxmQuote(stopTime,"EURUSD",1.0980m,1.0982m,1m,1000m,70m,.1m,.00002m,1m,StopDistanceQuote:.0012m));
+stops.Add(new MxmQuote(stopTime,"GBPUSD",1.2020m,1.2022m,1m,1000m,70m,.1m,.00002m,1m,StopDistanceQuote:.0012m));
+var stopped=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(riskFraction:.1m)).Run(stops);
+Require(stopped.AcceptedEntries==2 && stopped.ExecutedExits==2 && stopped.OpenPositions==0,
+ "STOPS_ON_QUOTES_WITHOUT_BAR_INTENTS_BOTH_DIRECTIONS");
+Require(stopped.Ledger.Where(x=>x.Kind=="EXIT").All(x=>x.Reason=="OBSERVED_QUOTE_STOP"),"STOP_EXIT_REASON");
+Require(stopped.Ledger.Single(x=>x.Kind=="EXIT" && x.Direction==1).Price==1.09798m &&
+ stopped.Ledger.Single(x=>x.Kind=="EXIT" && x.Direction==-1).Price==1.20222m,"GAP_NOT_FILLED_AT_REQUESTED_STOP");
+Require(stopped.FinalCashEur==193.12m && stopped.MarkedEquityEur==193.12m &&
+ stopped.UsedMarginEur==0 && stopped.FreeMarginEur==193.12m,"STOP_FEES_PNL_MARGIN_RELEASE");
+var touched=Series(6);
+for(int i=0;i<touched.Count;i++)if(touched[i] is MxmQuote q)
+ touched[i]=q with {StopDistanceQuote=.0001m};
+Require(new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(touched)
+ .Rejections.Contains("REJECT_STOP_ALREADY_TOUCHED_AT_ENTRY"),"SPREAD_TOUCHES_NEW_STOP");
+var horizon=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},
+ Params() with {ExitPolicy=ExitMode.Horizon12}).Run(Series(20));
+Require(horizon.ExecutedExits==2 && horizon.AcceptedEntries==4 &&
+ horizon.Ledger.Where(x=>x.Kind=="EXIT").All(x=>x.Reason=="HORIZON12" && x.Utc.Minute==30),
+ "HORIZON_USES_ENTRY_TIME_NOT_ROUNDED_ENTRY_BAR");
+Require(horizon.Ledger.Where(x=>x.Kind=="EXIT").All(x=>
+ !horizon.Ledger.Any(y=>y.Kind=="ENTRY" && y.Utc==x.Utc && y.Symbol==x.Symbol)),
+ "NO_SAME_INTENT_REENTRY_AFTER_HORIZON");
+var neutralFeed=Series(14);
+for(int i=0;i<neutralFeed.Count;i++)if(neutralFeed[i] is MxmBarClose b && i/4>=6)
+ neutralFeed[i]=b with {Close=b.Symbol=="EURUSD"?1.1010m:1.1990m};
+var neutral=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},
+ Params() with {ExitPolicy=ExitMode.NeutralFlat}).Run(neutralFeed);
+Require(neutral.ExecutedExits==2 && neutral.AcceptedEntries==2 && neutral.OpenPositions==0 &&
+ neutral.Ledger.Where(x=>x.Kind=="EXIT").All(x=>x.Reason=="NEUTRAL_FLAT"),"NEUTRAL_FLAT_POLICY");
+Require(MxmExitPolicy.Reason(ExitMode.NeutralFlat,0,1,false,6,stopTime,stopTime.AddHours(-2),5)==null,
+ "GAP_NOT_REINTERPRETED_AS_NEUTRAL");
+var lifecyclePath=Path.Combine("verification","csharp-multisymbol-single-account","lifecycle-replay.json");
+Directory.CreateDirectory(Path.GetDirectoryName(lifecyclePath)!);
+File.WriteAllText(lifecyclePath,JsonSerializer.Serialize(stopped,new JsonSerializerOptions{
+ PropertyNamingPolicy=JsonNamingPolicy.SnakeCaseLower,WriteIndented=true}));
+Console.WriteLine("MXM_SHARED_EXIT_POLICY_AND_OBSERVED_GAP_STOP_SYNTHETIC_PASS_NOT_BROKER_STOP_ROUTING");
+
 var path=Path.Combine("verification","csharp-multisymbol-single-account","artificial-replay.json");
 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 File.WriteAllText(path,JsonSerializer.Serialize(balanced,new JsonSerializerOptions{

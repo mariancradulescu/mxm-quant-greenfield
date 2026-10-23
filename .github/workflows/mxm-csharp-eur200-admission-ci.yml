@@ -85,6 +85,26 @@ jobs:
           assert not s['hard21_proven'] and not s['broker_fills_proven'] and not s['costs_broker_verified']
           assert s['accepted_entries']==2 and s['open_positions']==2
           print('MXM_TWO_SYMBOL_ONE_EUR200_CSHARP_PYTHON_INDEPENDENT_MTM_PARITY_SYNTHETIC_PASS_NO_HARD21')
+          stop=json.loads(Path('verification/csharp-multisymbol-single-account/lifecycle-replay.json').read_text(),parse_float=D)
+          cash=D(200);book={}
+          for row in stop['ledger']:
+              symbol=row['symbol'];fee=row['commission_eur']
+              if row['kind']=='ENTRY':
+                  assert symbol not in book
+                  book[symbol]=row;cash-=fee
+              else:
+                  entry=book.pop(symbol)
+                  expected=D('1.09798') if entry['direction']==1 else D('1.20222')
+                  assert row['price']==expected and row['reason']=='OBSERVED_QUOTE_STOP'
+                  gross=(expected-entry['price'])*entry['units']*entry['direction']
+                  assert row['gross_eur']==gross
+                  cash+=gross-fee
+              assert row['cash_eur']==cash
+          assert not book and cash==D('193.12')==stop['final_cash_eur']==stop['marked_equity_eur']
+          assert stop['used_margin_eur']==0 and stop['free_margin_eur']==cash
+          assert stop['accepted_entries']==stop['executed_exits']==2
+          assert not stop['broker_fills_proven'] and not stop['hard21_proven']
+          print('MXM_INDEPENDENT_DECIMAL_TWO_SIDED_GAP_STOP_CASH_AND_RELEASED_MARGIN_PASS')
           PY
       - name: Replay bounded artificial BIDASK native-envelope shape through same CSharp EUR200 engine
         run: |
