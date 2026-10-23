@@ -33,6 +33,8 @@ jobs:
         run: |
           python3 -m unittest research_core_v4.laboratory.test_durable_native_chronology -v
           python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
+      - name: Decode actual protobuf symbol shapes; missing defaults, cents and precise fee units
+        run: python3 -m unittest research_core_v4.laboratory.test_captured_symbol_terms -v
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
