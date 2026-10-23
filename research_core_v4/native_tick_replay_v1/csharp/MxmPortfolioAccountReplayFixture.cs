@@ -350,4 +350,25 @@ var poisoned=new MxmPortfolioAccountReplay(new[]{"EURUSD"},Params());
 try{poisoned.Run(new MxmAccountFeed[]{new MxmBarClose(onlineStart,"WRONG",1m)});}catch(ArgumentException){}
 bool poisonRefused=false;try{poisoned.CaptureReplay(artificialSource);}catch(ArgumentException){poisonRefused=true;}
 Require(poisonRefused,"FAILED_SEGMENT_CANNOT_CHECKPOINT");
-Console.WriteLine("MXM_FULL_ACCOUNT_EVERY_CUT_AND_EIGHT_COLD_PROCESS_RECOVERIES_PASS_NO_CAPITAL_RESET");
+var nextWeek=stops.Concat(Series(8).Select<MxmAccountFeed,MxmAccountFeed>(item=>item switch {
+ MxmBarClose b=>b with {Utc=b.Utc.AddDays(7)},
+ MxmQuote q=>q with {Utc=q.Utc.AddDays(7)},
+ _=>throw new ArgumentException("FIXTURE_FEED_KIND")
+})).ToList();
+foreach(var recoveryInput in new[]{stopBeforeBar,nextWeek}) {
+ var settings=Params(riskFraction:.1m);
+ var baselineRecovery=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings).Run(recoveryInput);
+ for(int cut=0;cut<=recoveryInput.Count;cut++) {
+  var first=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings);first.Run(recoveryInput.Take(cut));
+  var capsule=first.CaptureReplay(artificialSource);
+  var restored=MxmPortfolioAccountReplay.RestoreReplay(capsule.Payload,capsule.Sha256,artificialSource,settings,new[]{"EURUSD","GBPUSD"});
+  Require(JsonSerializer.Serialize(baselineRecovery)==JsonSerializer.Serialize(restored.Continue(recoveryInput.Skip(cut),cut)),
+   "TWO_SYMBOL_STOP_REVOCATION_AND_WEEK_ROLLOVER_PARITY");
+ }
+ if(ReferenceEquals(recoveryInput,nextWeek))Require(baselineRecovery.EntriesByIsoWeek.Count==2 &&
+  baselineRecovery.FinalCashEur<200m && baselineRecovery.MaxDrawdownEur>=stopped.MaxDrawdownEur,
+  "NEXT_WEEK_CARRIES_LOSSES_DRAWDOWN_AND_SINGLE_CAPITAL");
+}
+MxmPortfolioReplayRecoveryProbe.Verify(stopBeforeBar,Params(riskFraction:.1m),new[]{"EURUSD","GBPUSD"},
+ artificialSource,resumed,new[]{25,26});
+Console.WriteLine("MXM_FULL_ACCOUNT_EVERY_CUT_AND_TEN_COLD_PROCESS_RECOVERIES_PASS_NO_CAPITAL_RESET");
