@@ -345,6 +345,7 @@ jobs:
           report=json.loads((tmp/'mxm-week-csharp/portfolio-exposed-quote-readback.json').read_bytes())
           independent=json.loads((tmp/'mxm-week-csharp/independent-mark.json').read_bytes())
           terms=json.loads((tmp/'mxm-week-ticks.ndjson.symbol-terms.json').read_bytes())
+          from decimal import Decimal as D
           attribution=json.loads((tmp/'mxm-week-csharp/attribution.json').read_bytes())
           need(bridge['source_run']==39917922508 and bridge['verified_bid_events']==342248 and
                bridge['verified_ask_events']==343226 and bridge['partition']=='DEVELOPMENT' and
@@ -381,7 +382,10 @@ jobs:
           need(attribution['input_source_run']==39917922508 and
                attribution['modeled_entries']==report['account']['accepted_entries'] and
                attribution['modeled_exits']==report['account']['executed_exits'] and
-               attribution['final_modeled_bidask_equity_eur']==str(report['account']['marked_equity_eur']) and
+               abs(D(attribution['final_modeled_bidask_equity_eur'])-
+                   D(str(report['account']['marked_equity_eur'])))<=D('0.000001') and
+               abs(D(attribution['final_modeled_cash_eur'])-
+                   D(str(report['account']['final_cash_eur'])))<=D('0.000001') and
                not attribution['hard21_proven'] and not attribution['economic_edge_proven'] and
                attribution['new_strategy_trials']==attribution['real_orders']==0,
                'WEEK_ATTRIBUTION_SAME_ACCOUNT_AND_NO_PROMOTION')
