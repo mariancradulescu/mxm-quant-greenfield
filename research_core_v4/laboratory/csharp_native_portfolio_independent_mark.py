@@ -85,7 +85,54 @@ def authenticated_shape_quotes(path):
                       source_events=len(seq), sha256=sha256(original).hexdigest())
 
 
-def independent_terminal_mark(tick_file, report):
+def captured_fee_reference(path, report):
+    """Independent Decimal interpretation of raw snapshot; never use C# fee output."""
+    raw_bytes = Path(path).read_bytes()
+    require(sha256(raw_bytes).hexdigest() == report['captured_terms_sha256'], 'CAPTURED_TERMS_HASH')
+    snapshot = json.loads(raw_bytes)
+    require(snapshot['schema'] == 'mxm.captured-native-symbol-terms.v1' and
+            snapshot['symbol_id'] == 1 and not snapshot['historical_commission_proven'] and
+            not snapshot['dated_historical_volume_rules_proven'], 'CAPTURED_TERMS_SCOPE')
+    if report['classification'] != 'ARTIFICIAL_QUOTE_STREAM_ONLY':
+        require(snapshot['source_crypto_authenticated_by_original_native_replay'] is True and
+                snapshot['source_run'] == 39660692230 and snapshot['source_ciphertext_sha256'] ==
+                'f1d828d94b304e2af1f310701f92dcb31db935a8db7fc3f8772087adf5499346',
+                'CAPTURED_NATIVE_BINDING')
+    else:
+        require(snapshot['classification'] == 'ARTIFICIAL_CAPTURED_TERMS_FIXTURE_ONLY', 'CAPTURED_FIXTURE_SCOPE')
+    fields = snapshot['raw_optional_fields']
+    def integer(key):
+        v = fields.get(key)
+        require(type(v) is int, 'CAPTURED_OPTIONAL_MISSING_' + key)
+        return v
+    low, high, step = (integer(k) for k in ('minVolume', 'maxVolume', 'stepVolume'))
+    require(0 < low <= high and step > 0 and low % step == 0, 'CAPTURED_VOLUME_GEOMETRY')
+    units = number(report['modeled_parameters']['units'])
+    cents = units * 100
+    require(cents == cents.to_integral_value() and low <= cents <= high and cents % step == 0,
+            'CAPTURED_MODEL_VOLUME')
+    kind, rate, minimum = (integer(k) for k in
+        ('commissionType', 'preciseTradingCommissionRate', 'preciseMinCommission'))
+    require(kind in (1, 2, 3) and rate >= 0 and minimum >= 0, 'CAPTURED_FEE_GEOMETRY')
+    minimum_kind = integer('minCommissionType')
+    asset = 'USD' if minimum_kind == 2 else fields.get('minCommissionAsset') if minimum_kind == 1 else None
+    require(asset in ('EUR', 'USD'), 'CAPTURED_MINIMUM_ASSET')
+    if kind == 2:
+        require(integer('lotSize') > 0, 'CAPTURED_LOT_SIZE')
+    def fee(size, price, bid, ask):
+        if kind == 1:
+            usd = size * price * D(rate) / D(10**14)
+        elif kind == 2:
+            usd = size * D(100) / D(integer('lotSize')) * D(rate) / D(10**8)
+        else:
+            usd = size * price * D(rate) / D(10**7)
+        minimum_eur = D(minimum)/D(10**8)
+        if asset == 'USD': minimum_eur /= bid
+        return max(usd/bid, minimum_eur)
+    return fee
+
+
+def independent_terminal_mark(tick_file, report, captured_terms=None):
     require(report["schema"] == "mxm.csharp.native-exposed-quote-to-one-account.v1",
             "REPORT_SCHEMA")
     require(report["classification"] in (
@@ -109,11 +156,19 @@ def independent_terminal_mark(tick_file, report):
             not report["hard21_proven"], "NO_EXECUTION_OR_PROMOTION")
     terms = report["modeled_parameters"]
     units = number(terms["units"])
-    fx = number(terms["quote_to_eur"])
-    fee = number(terms["commission_eur_per_side"])
+    dynamic = report.get('valuation_mode') == 'CAPTURED_COMMISSION_AND_QUOTE_SIDE_FX_COMPONENTS_ONLY'
+    if dynamic:
+        require(captured_terms is not None and not report['all_cost_components_verified'] and
+                not report['captured_terms_are_historical'], 'CAPTURED_COMPONENTS_ONLY')
+        fee_reference = captured_fee_reference(captured_terms, report)
+        fx = fee = None
+    else:
+        require(captured_terms is None, 'UNEXPECTED_CAPTURED_TERMS')
+        fx = number(terms["quote_to_eur"])
+        fee = number(terms["commission_eur_per_side"])
     slip = number(terms["slip_price_per_side"])
     margin = number(terms["margin_eur"])
-    require(units > 0 and fx > 0 and fee >= 0 and slip >= 0 and margin > 0 and
+    require(units > 0 and (dynamic or (fx > 0 and fee >= 0)) and slip >= 0 and margin > 0 and
             not terms["historical_broker_terms_verified"],
             "UNVERIFIED_MONETARY_TERMS")
     account = report["account"]
@@ -140,16 +195,17 @@ def independent_terminal_mark(tick_file, report):
         require(event["symbol"] == "EURUSD", "FOREIGN_LEDGER_SYMBOL")
         require(event["direction"] in (-1, 1), "BAD_DIRECTION")
         require(number(event["units"]) == units, "VOLUME_DRIFT")
-        equal(event["commission_eur"], fee, "FEE_DRIFT")
         bid, ask = book[ts]
         direction = event["direction"]
         price = number(event["price"])
+        actual_fee = fee_reference(units, price, bid, ask) if dynamic else fee
+        equal(event["commission_eur"], actual_fee, "FEE_DRIFT")
         if event["kind"] == "ENTRY":
             require("EURUSD" not in positions, "DUPLICATE_OPEN")
             expected = ask + slip if direction == 1 else bid - slip
             equal(price, expected, "WRONG_SIDE_OF_SPREAD_ENTRY", D("0.0000000001"))
             equal(event["gross_eur"], 0, "ENTRY_GROSS_NONZERO")
-            cash -= fee
+            cash -= actual_fee
             positions["EURUSD"] = (direction, price, units)
             counts["entries"] += 1
         elif event["kind"] == "EXIT":
@@ -158,9 +214,10 @@ def independent_terminal_mark(tick_file, report):
             require(direction == original_direction, "EXIT_DIRECTION_CHANGED")
             expected = bid - slip if direction == 1 else ask + slip
             equal(price, expected, "WRONG_SIDE_OF_SPREAD_EXIT", D("0.0000000001"))
-            gross = (price - initial) * size * fx * D(direction)
+            quote_gross = (price - initial) * size * D(direction)
+            gross = quote_gross/(ask if quote_gross >= 0 else bid) if dynamic else quote_gross*fx
             equal(event["gross_eur"], gross, "GROSS_PNL_DRIFT")
-            cash += gross - fee
+            cash += gross - actual_fee
             del positions["EURUSD"]
             counts["exits"] += 1
         else:
@@ -175,8 +232,8 @@ def independent_terminal_mark(tick_file, report):
     last_bid, last_ask = book[last_ts]
     equity = cash
     for direction, entry, size in positions.values():
-        equity += ((last_bid - entry) if direction == 1 else
-                   (entry - last_ask)) * size * fx
+        quote_pnl = ((last_bid - entry) if direction == 1 else (entry - last_ask)) * size
+        equity += quote_pnl/(last_ask if quote_pnl >= 0 else last_bid) if dynamic else quote_pnl*fx
     used_margin = margin * len(positions)
     equal(account["marked_equity_eur"], equity, "TERMINAL_LIQUIDATION_MTM")
     equal(account["used_margin_eur"], used_margin, "SHARED_MARGIN")
@@ -199,6 +256,9 @@ def independent_terminal_mark(tick_file, report):
         "hard21": False,
         "independent_native_broker_execution": False,
         "broker_historical_costs_verified": False,
+        "captured_commission_component_checked": dynamic,
+        "quote_side_fx_conversion_checked": dynamic,
+        "all_cost_components_verified": False,
         "new_broker_requests": 0,
         "orders": 0,
     }
@@ -209,9 +269,10 @@ def main():
     p.add_argument("native_quotes")
     p.add_argument("portfolio_report")
     p.add_argument("--out", required=True)
+    p.add_argument("--captured-terms")
     args = p.parse_args()
     report = json.loads(Path(args.portfolio_report).read_text(), parse_float=D)
-    result = independent_terminal_mark(args.native_quotes, report)
+    result = independent_terminal_mark(args.native_quotes, report, args.captured_terms)
     path = Path(args.out)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(result, sort_keys=True, separators=(",", ":"))+"\n")

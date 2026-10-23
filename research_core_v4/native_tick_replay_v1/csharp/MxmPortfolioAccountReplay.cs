@@ -19,7 +19,8 @@ public sealed record MxmBarClose(
 public sealed record MxmQuote(
  DateTime Utc, string Symbol, decimal Bid, decimal Ask, decimal QuoteToEur,
  decimal ExecutableUnits, decimal InitialMarginEur, decimal CommissionPerSideEur,
- decimal SlipPerSideQuote, decimal EstimatedStopRiskEur
+ decimal SlipPerSideQuote, decimal EstimatedStopRiskEur,
+ decimal? QuoteLossToEur=null, MxmEurUsdCapturedCosts? CapturedCosts=null
 ) : MxmAccountFeed(Utc, Symbol);
 public sealed record MxmPortfolioTrade(
  string Kind, DateTime Utc, string Symbol, int Direction, decimal Price,
@@ -91,12 +92,17 @@ public sealed class MxmPortfolioAccountReplay {
   foreach(var pair in open) {
    var tick=state[pair.Key].Latest ?? throw new ArgumentException("MISSING_POSITION_QUOTE");
    var h=pair.Value;
-   value+=(h.Direction>0?tick.Bid-h.Entry:h.Entry-tick.Ask)*h.Units*tick.QuoteToEur;
+   decimal usd=(h.Direction>0?tick.Bid-h.Entry:h.Entry-tick.Ask)*h.Units;
+   value+=ConvertQuote(tick,usd);
   }
   return value;
  }
  decimal Margin()=>open.Values.Sum(x=>x.Margin);
  decimal StopRisk()=>open.Values.Sum(x=>x.StopRisk);
+ static decimal ConvertQuote(MxmQuote quote,decimal amount)=>
+  amount*(amount>=0?quote.QuoteToEur:quote.QuoteLossToEur??quote.QuoteToEur);
+ static decimal Fee(MxmQuote quote,decimal units,decimal price)=>
+  quote.CapturedCosts?.FeeEur(units,price,quote.Bid,quote.Ask)??quote.CommissionPerSideEur;
  void Mark() {
   decimal equity=MarkedEquity();
   if(equity>peak)peak=equity;
@@ -109,13 +115,19 @@ public sealed class MxmPortfolioAccountReplay {
  void Exit(string symbol,MxmQuote tick) {
   var position=open[symbol];
   decimal price=position.Direction>0?tick.Bid-tick.SlipPerSideQuote:tick.Ask+tick.SlipPerSideQuote;
-  decimal gross=(price-position.Entry)*position.Units*tick.QuoteToEur*position.Direction;
-  balance+=gross-tick.CommissionPerSideEur;
+  decimal gross=ConvertQuote(tick,(price-position.Entry)*position.Units*position.Direction);
+  decimal fee=Fee(tick,position.Units,price);
+  balance+=gross-fee;
   open.Remove(symbol);exits++;
   trades.Add(new MxmPortfolioTrade("EXIT",tick.Utc,symbol,position.Direction,price,
-   position.Units,balance,tick.CommissionPerSideEur,gross));
+   position.Units,balance,fee,gross));
  }
  void Enter(string symbol,int desired,MxmQuote tick) {
+  if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
+   rejected.Add("REJECT_CAPTURED_VOLUME_LATTICE");return;
+  }
+  decimal price=desired>0?tick.Ask+tick.SlipPerSideQuote:tick.Bid-tick.SlipPerSideQuote;
+  decimal fee=Fee(tick,tick.ExecutableUnits,price);
   // No admission against absent, future or stale marks on any other open
   // instrument. Broker arrival ordering of same-ms quotes remains unproven.
   foreach(var existing in open.Keys) {
@@ -130,7 +142,7 @@ public sealed class MxmPortfolioAccountReplay {
   var free=equity-Margin();
   string isolation=MxmAccountIsolation.Check(open.Count,open.Count,0);
   string admission=isolation==MxmAccountIsolation.Admit ?
-   MxmCapitalAdmission.Check(equity,free,tick.InitialMarginEur,tick.CommissionPerSideEur,
+   MxmCapitalAdmission.Check(equity,free,tick.InitialMarginEur,fee,
      parameters.MaxMarginFraction,parameters.MinimumFreeMarginReserveEur,open.Count,parameters.MaxPositions)
    : isolation;
   if(admission!=MxmCapitalAdmission.Admit) {rejected.Add(admission);return;}
@@ -138,17 +150,16 @@ public sealed class MxmPortfolioAccountReplay {
    parameters.MaxEstimatedStopRiskFraction,parameters.RoundTripRiskReserveEur,
    parameters.RoundTripRiskReserveEur*open.Count);
   if(risk!=MxmStopRiskAdmission.Admit){rejected.Add(risk);return;}
-  decimal price=desired>0?tick.Ask+tick.SlipPerSideQuote:tick.Bid-tick.SlipPerSideQuote;
   // A quote can never buy from bid or sell from ask. One continuous cash
   // balance pays each explicit entry fee once; spread resides in prices.
-  balance-=tick.CommissionPerSideEur;
+  balance-=fee;
   open.Add(symbol,new Holding(desired,price,tick.ExecutableUnits,
    tick.InitialMarginEur,tick.EstimatedStopRiskEur,tick.QuoteToEur));
   accepted++;
   string week=Week(tick.Utc);
   entriesByWeek[week]=entriesByWeek.GetValueOrDefault(week)+1;
   trades.Add(new MxmPortfolioTrade("ENTRY",tick.Utc,symbol,desired,price,
-   tick.ExecutableUnits,balance,tick.CommissionPerSideEur,0m));
+   tick.ExecutableUnits,balance,fee,0m));
  }
  public MxmPortfolioAccountReport Run(IEnumerable<MxmAccountFeed> feed) {
   Need(!halted && trades.Count==0 && balance==200m,"REPLAY_NOT_FRESH");
@@ -182,7 +193,9 @@ public sealed class MxmPortfolioAccountReplay {
     Need(quote.Bid>0 && quote.Ask>=quote.Bid && quote.QuoteToEur>0 &&
       quote.ExecutableUnits>0 && quote.InitialMarginEur>0 &&
       quote.CommissionPerSideEur>=0 && quote.SlipPerSideQuote>=0 &&
+      (quote.QuoteLossToEur==null || quote.QuoteLossToEur>=quote.QuoteToEur) &&
       quote.EstimatedStopRiskEur>0,"INVALID_EXECUTION_QUOTE");
+    Need(quote.CapturedCosts==null || quote.Symbol=="EURUSD","CAPTURED_COSTS_ONLY_EURUSD");
     Need(st!.LastQuote==default || quote.Utc>st.LastQuote,"DUPLICATE_OR_STALE_QUOTE");
     st.Latest=quote;st.LastQuote=quote.Utc;
     if(!halted && st.Intent.TryConsume(quote.Utc,out var intent)) {

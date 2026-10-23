@@ -31,10 +31,13 @@ namespace Mxm.PortfolioNativeQuote {
    Need(result.Count>0,"EMPTY_NATIVE_STREAM");
    return result;
   }
-  public static object Run(string input,bool exactExistingSource=true){
+  public static object Run(string input,bool exactExistingSource=true,string? termsPath=null){
    var bytes=File.ReadAllBytes(input);
    var hash=Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
    var ticks=Parse(input);
+   var costs=termsPath==null?null:MxmEurUsdCapturedCosts.Load(termsPath,exactExistingSource);
+   string? termsSha=termsPath==null?null:
+    Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(termsPath))).ToLowerInvariant();
    if(exactExistingSource)Need(ticks.Count==ExpectedNativeEvents,"ORIGINAL_EVENT_COUNT");
    int ambiguous=0,cross=0,stale=0,accepted=0,completeBarDecisions=0,zero=0;
    long bidTime=-1,askTime=-1,barBucket=-1;
@@ -72,8 +75,8 @@ namespace Mxm.PortfolioNativeQuote {
     lastBarBid=bid;
     // One quote per original millisecond, never fabricate a later timestamp.
     // All monetary terms below are explicit NON-BROKER-VERIFIED assumptions.
-    feeds.Add(new MxmQuote(stamp,"EURUSD",bid,ask,1m/1.10m,
-      1000m,50m,0.10m,0.00002m,1.2m));
+    feeds.Add(new MxmQuote(stamp,"EURUSD",bid,ask,costs==null?1m/1.10m:1m/ask,
+      1000m,50m,0.10m,0.00002m,1.2m,costs==null?null:1m/bid,costs));
     accepted++;
    }
    Need(feeds.Count>0 && accepted>0,"NO_REPLAYABLE_SNAPSHOTS");
@@ -88,6 +91,10 @@ namespace Mxm.PortfolioNativeQuote {
     original_source_is_independently_crypto_authenticated_here=false,
     provenance_digest_must_match_pinned_protected_bridge=true,
     derived_stream_sha256=hash,
+    valuation_mode=costs==null?"LEGACY_FIXED_HYPOTHETICAL_TERMS":"CAPTURED_COMMISSION_AND_QUOTE_SIDE_FX_COMPONENTS_ONLY",
+    captured_terms_sha256=termsSha,
+    captured_terms_are_historical=false,
+    all_cost_components_verified=false,
     quote_events=ticks.Count,
     grouped_atomic_usable_snapshots=accepted,
     ambiguous_same_side_ms_revisions_skipped=ambiguous,
@@ -100,8 +107,11 @@ namespace Mxm.PortfolioNativeQuote {
     synthetic_quote_events_injected=exactExistingSource?0:ticks.Count,
     modeled_parameters=new {
       strategy="Adaptive",bar_minutes=5,max_positions=1,
-      units=1000,quote_to_eur=1m/1.10m,
-      margin_eur=50m,commission_eur_per_side=0.10m,
+      units=1000,quote_to_eur=costs==null?1m/1.10m:(decimal?)null,
+      margin_eur=50m,commission_eur_per_side=costs==null?0.10m:(decimal?)null,
+      conversion_policy=costs==null?"FIXED_UNVERIFIED":"POSITIVE_USD_DIV_ASK_NEGATIVE_USD_AND_USD_FEES_DIV_BID",
+      commission_turnover_usd_policy="EUR_UNITS_TIMES_MODELED_FILL_NOT_ACTUAL_BROKER_BASE_TO_USD",
+      omitted_cost_authorities="HISTORICAL_EFFECTIVE_DATES;BROKER_FX_FEES;MONEY_ROUNDING;FINANCING;MARGIN;STOPS;ACTUAL_FILLS",
       slip_price_per_side=0.00002m,stop_risk_eur=1.2m,
       max_stop_risk_fraction=0.02m,friction_reserve_eur=0.2m,
       historical_broker_terms_verified=false
@@ -119,10 +129,13 @@ namespace Mxm.PortfolioNativeQuote {
   }
   public static int Main(string[] args){
    try{
-    Need(args.Length==3&&
-      (args[0]=="--native-exposed-eurusd"||args[0]=="--artificial-fixture"),
+    bool captured=args.Length==4 &&
+      (args[0]=="--native-captured-terms-eurusd" || args[0]=="--artificial-captured-terms-fixture");
+    Need(captured || (args.Length==3&&
+      (args[0]=="--native-exposed-eurusd"||args[0]=="--artificial-fixture")),
       "EXPLICIT_NONOUTCOME_MODE_REQUIRED");
-    var data=Run(args[1],args[0]=="--native-exposed-eurusd");
+    bool native=args[0]=="--native-exposed-eurusd" || args[0]=="--native-captured-terms-eurusd";
+    var data=Run(args[1],native,captured?args[3]:null);
     Directory.CreateDirectory(args[2]);
     var output=Path.Combine(args[2],"portfolio-exposed-quote-readback.json");
     File.WriteAllText(output,JsonSerializer.Serialize(data,new JsonSerializerOptions{
