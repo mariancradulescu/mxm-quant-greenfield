@@ -172,7 +172,8 @@ var output=Path.Combine("verification","broker-intent-fence","synthetic-contract
 Directory.CreateDirectory(Path.GetDirectoryName(output)!);
 File.WriteAllText(output,JsonSerializer.Serialize(new {
  schema="mxm.broker-intent-fence.synthetic-contract.v1",checks,interleavings,
- old_product_counterexample_reproduced=true,native_ctrader_callbacks_observed=false,
+ old_product_counterexample_reproduced=true,postfill_protection_contract_passed=true,
+ postfill_identity_stop_halt_defensive_retry_tested=true,native_ctrader_callbacks_observed=false,
  broker_orders=0,scientific_trials=0,hard21=false
 },new JsonSerializerOptions{WriteIndented=true}));
 Console.WriteLine("MXM_BROKER_CLOSE_FENCE_COUNTEREXAMPLE_AND_INTERLEAVINGS_PASS_NOT_NATIVE_CALLBACK_PROOF");

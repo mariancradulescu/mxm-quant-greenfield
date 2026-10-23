@@ -77,6 +77,14 @@ jobs:
           r=json.loads(Path('verification/broker-intent-fence/synthetic-contract.json').read_text())
           assert r['checks']>=40 and r['interleavings']>=3
           assert r['old_product_counterexample_reproduced']
+          assert r['postfill_protection_contract_passed']
+          assert r['postfill_identity_stop_halt_defensive_retry_tested']
+          assert 'orderProtection.Reconcile(placed.IsSuccessful,placed.Position?.Id,' in bot
+          assert 'Timer.Start(TimeSpan.FromSeconds(5))' in bot
+          assert 'orderProtection.DefensiveCloseId(ProtectionBook())' in bot
+          assert 'MXM_RECOVERED_POSITION_PROTECTION_SAFE_STOP_' in bot
+          for callback in (bars,ticks):
+              assert callback.index('if(orderProtection.Halted)return;')<callback.index('try {')
           assert not r['native_ctrader_callbacks_observed'] and not r['hard21']
           assert r['broker_orders']==r['scientific_trials']==0
           print('MXM_REAL_PRODUCT_BROKER_CLOSE_WIRING_AND_LEASE_ADMISSION_CHECK_PASS_NATIVE_RECEIPT_STILL_REQUIRED')
