@@ -76,6 +76,61 @@ jobs:
           assert s['accepted_entries']==2 and s['open_positions']==2
           print('MXM_TWO_SYMBOL_ONE_EUR200_CSHARP_PYTHON_INDEPENDENT_MTM_PARITY_SYNTHETIC_PASS_NO_HARD21')
           PY
+      - name: Replay bounded artificial BIDASK native-envelope shape through same CSharp EUR200 engine
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime,timezone
+          from pathlib import Path
+          from json import dumps
+          start=int(datetime(2026,8,24,12,tzinfo=timezone.utc).timestamp()*1000)
+          p=Path('verification/mxm-artificial-native-quotes.ndjson')
+          p.parent.mkdir(parents=True,exist_ok=True)
+          with p.open('w') as output:
+              for i in range(10):
+                  bid=110000+i*20
+                  for offset in (0,1000):
+                      for side,raw in (('bid',bid),('ask',bid+10)):
+                          output.write(dumps({'t':start+i*300000+offset,'side':side,'raw':raw})+'\\n')
+          PY
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release -- --artificial-fixture verification/mxm-artificial-native-quotes.ndjson verification/mxm-portfolio-native-fixture
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from decimal import Decimal as D
+          p=Path('verification/mxm-portfolio-native-fixture/portfolio-exposed-quote-readback.json')
+          r=json.loads(p.read_text(),parse_float=D)
+          assert r['classification']=='ARTIFICIAL_QUOTE_STREAM_ONLY'
+          assert r['original_native_run_id']==0 and r['synthetic_quote_events_injected']==40
+          assert r['quote_events']==40 and r['grouped_atomic_usable_snapshots']==20
+          assert r['completed_bar_decision_events']==9 and r['actual_symbols']==1
+          assert not r['historical_broker_fills_proven'] and not r['hard21_proven']
+          a=r['account'];assert a['initial_capital_eur']==200
+          assert a['accepted_entries']>=1 and a['complete_iso_utc_weeks']==0
+          assert a['open_positions']==1 and a['executed_exits']==0
+          entries=[z for z in a['ledger'] if z['kind']=='ENTRY']
+          assert len(entries)==a['accepted_entries']==1
+          entry=entries[0]
+          cash=D(200)-sum(z['commission_eur'] for z in entries)
+          assert cash==a['final_cash_eur']
+          last_bid=D('1.1018')
+          mtm=cash+(last_bid-entry['price'])*entry['units']/D('1.10')
+          assert abs(mtm-a['marked_equity_eur'])<D('0.000001')
+          assert a['used_margin_eur']==50 and a['free_margin_eur']==a['marked_equity_eur']-50
+          assert not a['hard21_proven'] and not a['broker_fills_proven']
+          print('MXM_ARTIFICIAL_NATIVE_QUOTE_SHAPE_CAUSAL_CSHARP_INDEPENDENT_MTM_PASS')
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('verification/mxm-artificial-native-quotes.ndjson')
+          rows=p.read_text().splitlines()
+          raw=json.loads(rows[0]);raw['side']='future'
+          rows[0]=json.dumps(raw)
+          Path('verification/mxm-invalid-native-quotes.ndjson').write_text('\\n'.join(rows)+'\\n')
+          PY
+          if dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --artificial-fixture verification/mxm-invalid-native-quotes.ndjson verification/mxm-portfolio-invalid; then
+            echo 'Invalid native quote stream accepted'; exit 1
+          fi
       - name: Execute account-global cap, dynamic equity, reserve and margin fraction negatives
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --capital-fixture
