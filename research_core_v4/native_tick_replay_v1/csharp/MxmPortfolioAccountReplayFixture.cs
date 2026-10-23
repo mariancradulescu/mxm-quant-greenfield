@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.Json;
 using Mxm.Replay;
 
+if(MxmPortfolioReplayRecoveryProbe.TryWorker(args,out int workerExit)){Environment.ExitCode=workerExit;return;}
+
 static void Require(bool ok,string code) {
  if(!ok)throw new Exception("MXM_ACCOUNT_PORTFOLIO_FIXTURE_"+code);
 }
@@ -312,3 +314,61 @@ Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 File.WriteAllText(path,JsonSerializer.Serialize(balanced,new JsonSerializerOptions{
  PropertyNamingPolicy=JsonNamingPolicy.SnakeCaseLower,WriteIndented=true}));
 Console.WriteLine("MXM_AUTHENTIC_CSHARP_KERNEL_TWO_SYMBOL_EUR200_BIDASK_SINGLE_ACCOUNT_SYNTHETIC_PASS_NO_BROKER_FILL_NO_HARD21");
+
+// Recovery preserves full financial and decision history, not just final cash.
+const string artificialSource="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+foreach(bool online in new[]{false,true}) {
+ var policy=new MxmReplayParameters(StrategyMode.TrendOnly,.4m,1,0m,.02m,.2m,5,300,
+  online?ExitMode.NeutralFlat:ExitMode.ReverseOnly,online);
+ var input=onlineFeeds;
+ var expected=new MxmPortfolioAccountReplay(new[]{"EURUSD"},policy).Run(input);
+ for(int cut=0;cut<=input.Count;cut++) {
+  var before=new MxmPortfolioAccountReplay(new[]{"EURUSD"},policy);before.Run(input.Take(cut));
+  var capsule=before.CaptureReplay(artificialSource);
+  var recovered=MxmPortfolioAccountReplay.RestoreReplay(capsule.Payload,capsule.Sha256,artificialSource,policy,new[]{"EURUSD"});
+  var after=recovered.Continue(input.Skip(cut),capsule.NextEventOrdinal);
+  Require(JsonSerializer.Serialize(expected)==JsonSerializer.Serialize(after),"EVERY_EVENT_CUT_IDENTICAL_FULL_REPORT");
+  if(cut==input.Count/2) {
+   var changed=(byte[])capsule.Payload.Clone();changed[changed.Length/2]^=1;
+   bool refused=false;try{MxmPortfolioAccountReplay.RestoreReplay(changed,capsule.Sha256,artificialSource,policy,new[]{"EURUSD"});}
+   catch(ArgumentException){refused=true;}Require(refused,"CORRUPTED_CHECKPOINT_REFUSED");
+   foreach(int variant in new[]{0,1,2}) {
+    refused=false;try{MxmPortfolioAccountReplay.RestoreReplay(capsule.Payload,capsule.Sha256,
+     variant==0?new string('b',64):artificialSource,variant==1?policy with {MaxPositions=2}:policy,
+     variant==2?new[]{"GBPUSD"}:new[]{"EURUSD"});}
+    catch(ArgumentException){refused=true;}Require(refused,"WRONG_SOURCE_SETTINGS_ROSTER_REFUSED");
+   }
+   refused=false;try{recovered.Continue(Array.Empty<MxmAccountFeed>(),capsule.NextEventOrdinal);}
+   catch(ArgumentException){refused=true;}Require(refused,"OLD_CURSOR_REFUSED_AFTER_CONTINUATION");
+  }
+ }
+ var proof=MxmPortfolioReplayRecoveryProbe.Verify(input,policy,new[]{"EURUSD"},artificialSource,expected,new[]{259,260,261,320});
+ Require(proof.AllReportsIdentical && proof.ColdProcesses==4 && !proof.NativeCtraderRecovery,"NEW_PROCESS_RECOVERY_PARITY");
+}
+// A partially failed segment cannot emit or capture a misleading valid prefix.
+var poisoned=new MxmPortfolioAccountReplay(new[]{"EURUSD"},Params());
+try{poisoned.Run(new MxmAccountFeed[]{new MxmBarClose(onlineStart,"WRONG",1m)});}catch(ArgumentException){}
+bool poisonRefused=false;try{poisoned.CaptureReplay(artificialSource);}catch(ArgumentException){poisonRefused=true;}
+Require(poisonRefused,"FAILED_SEGMENT_CANNOT_CHECKPOINT");
+var nextWeek=stops.Concat(Series(8).Select<MxmAccountFeed,MxmAccountFeed>(item=>item switch {
+ MxmBarClose b=>b with {Utc=b.Utc.AddDays(7)},
+ MxmQuote q=>q with {Utc=q.Utc.AddDays(7)},
+ _=>throw new ArgumentException("FIXTURE_FEED_KIND")
+})).ToList();
+foreach(var recoveryInput in new[]{stopBeforeBar,nextWeek}) {
+ var settings=Params(riskFraction:.1m);
+ var baselineRecovery=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings).Run(recoveryInput);
+ for(int cut=0;cut<=recoveryInput.Count;cut++) {
+  var prefixEngine=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},settings);prefixEngine.Run(recoveryInput.Take(cut));
+  var capsule=prefixEngine.CaptureReplay(artificialSource);
+  var restored=MxmPortfolioAccountReplay.RestoreReplay(capsule.Payload,capsule.Sha256,artificialSource,settings,new[]{"EURUSD","GBPUSD"});
+  Require(JsonSerializer.Serialize(baselineRecovery)==JsonSerializer.Serialize(restored.Continue(recoveryInput.Skip(cut),cut)),
+   "TWO_SYMBOL_STOP_REVOCATION_AND_WEEK_ROLLOVER_PARITY");
+ }
+ if(ReferenceEquals(recoveryInput,nextWeek))Require(baselineRecovery.EntriesByIsoWeek.Count==2 &&
+  baselineRecovery.FinalCashEur<200m && baselineRecovery.MaxDrawdownEur>=stopped.MaxDrawdownEur,
+  "NEXT_WEEK_CARRIES_LOSSES_DRAWDOWN_AND_SINGLE_CAPITAL");
+}
+MxmPortfolioReplayRecoveryProbe.Verify(stopBeforeBar,Params(riskFraction:.1m),new[]{"EURUSD","GBPUSD"},
+ artificialSource,resumed,new[]{25,26});
+Console.WriteLine("MXM_FULL_ACCOUNT_EVERY_CUT_AND_TEN_COLD_PROCESS_RECOVERIES_PASS_NO_CAPITAL_RESET");

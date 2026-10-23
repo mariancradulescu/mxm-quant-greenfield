@@ -8,6 +8,9 @@ namespace Mxm.Replay {
 // Accounting-only quote stream. Amounts, conversion rates, broker minima,
 // margins and costs MUST come from an external, separately authenticated source
 // for any claim beyond explicit counterfactual engineering. These are never fills.
+[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName="$feed")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmBarClose),"bar")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmQuote),"quote")]
 public abstract record MxmAccountFeed(DateTime Utc, string Symbol);
 // Utc is the ACTUAL time the first next-bar quote was observed and the
 // closed bar became actionable. BoundaryUtc is the fixed 5m bucket boundary
@@ -54,7 +57,7 @@ public sealed record MxmReplayParameters(
 /// No financing/partial fill/real stop routing or native cTrader fill proof.
 /// These omissions are explicit blockers to economic/candidate qualification.
 /// </summary>
-public sealed class MxmPortfolioAccountReplay {
+public sealed partial class MxmPortfolioAccountReplay {
  sealed class State {
   public readonly MxmDecisionSource Kernel;
   public DateTime LastBar;
@@ -73,7 +76,9 @@ public sealed class MxmPortfolioAccountReplay {
  readonly MxmReplayParameters parameters;
  decimal balance=200m,peak=200m,drawdown=0m;
  int accepted,exits;
- bool halted;
+ bool halted,started,faulted;
+ long processedEvents;
+ DateTime lastFeed;
  public MxmPortfolioAccountReplay(IEnumerable<string> symbols,MxmReplayParameters settings) {
   parameters=settings;
   if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
@@ -89,7 +94,7 @@ public sealed class MxmPortfolioAccountReplay {
   }
   if(state.Count==0)throw new ArgumentException("EMPTY_PORTFOLIO");
  }
- static void Need(bool ok,string code) {
+ static void Need([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool ok,string code) {
   if(!ok)throw new ArgumentException("MXM_PORTFOLIO_REPLAY_"+code);
  }
  static string Week(DateTime utc)=>ISOWeek.GetYear(utc)+"-W"+ISOWeek.GetWeekOfYear(utc).ToString("D2",CultureInfo.InvariantCulture);
@@ -185,13 +190,19 @@ public sealed class MxmPortfolioAccountReplay {
    tick.ExecutableUnits,balance,fee,0m));
  }
  public MxmPortfolioAccountReport Run(IEnumerable<MxmAccountFeed> feed) {
-  Need(!halted && trades.Count==0 && balance==200m,"REPLAY_NOT_FRESH");
-  DateTime last=default;
+  Need(!started && !faulted,"REPLAY_NOT_FRESH");
+  return Continue(feed,0);
+ }
+ /// <summary>Resume the SAME model account at an exact event ordinal; never fund it again.</summary>
+ public MxmPortfolioAccountReport Continue(IEnumerable<MxmAccountFeed> feed,long expectedNextOrdinal){
+  Need(!halted && !faulted && expectedNextOrdinal==processedEvents,"REPLAY_CURSOR_OR_FAULT");
+  started=true;
+  try {
   foreach(var e in feed) {
    if(e is null)throw new ArgumentException("NULL_PORTFOLIO_FEED_EVENT");
    Need(e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
-   Need(e.Utc>=last,"OUT_OF_ORDER_GLOBAL_FEED");
-   last=e.Utc;
+   Need(e.Utc>=lastFeed,"OUT_OF_ORDER_GLOBAL_FEED");
+   lastFeed=e.Utc;
    if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
    if(e is MxmBarClose bar) {
     // A broker's first tick of a new bar does NOT arrive at the exact
@@ -244,9 +255,14 @@ public sealed class MxmPortfolioAccountReplay {
      } else if(signal!=0)Enter(quote.Symbol,signal,quote);
     }
    } else throw new ArgumentException("UNRECOGNIZED_PORTFOLIO_EVENT");
-   Mark();
+   Mark();processedEvents++;
    if(halted)break;
   }
+  } catch {faulted=true;throw;}
+  return Report();
+ }
+ public MxmPortfolioAccountReport Report(){
+  Need(!faulted,"REPLAY_FAULTED_NO_REPORT");
   decimal equity=MarkedEquity(),used=Margin();
   return new MxmPortfolioAccountReport(
    "ARTIFICIAL_OR_UNCERTIFIED_QUOTES_SINGLE_ACCOUNT_CAUSAL_DEVELOPMENT_ONLY",

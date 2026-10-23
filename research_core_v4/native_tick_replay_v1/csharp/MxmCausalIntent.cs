@@ -11,10 +11,26 @@ public sealed record MxmDecisionIntent(int Desired, bool Contiguous, int Complet
 /// Consume before invoking the broker, including on rejection/ambiguous ACK.
 /// A cold instance has no intent to replay. This is not broker idempotency.
 /// </summary>
+internal sealed record MxmIntentReplayState(MxmDecisionIntent? Pending,DateTime LastBoundary,DateTime BlockedThroughBoundary);
 public sealed class MxmCausalIntent {
  MxmDecisionIntent? pending;
  DateTime lastBoundary;
  DateTime blockedThroughBoundary;
+ // Offline account replay only. Native cTrader cold starts never restore an intent.
+ internal MxmIntentReplayState CaptureReplayState()=>new(pending,lastBoundary,blockedThroughBoundary);
+ internal void RestoreReplayState(MxmIntentReplayState s,int barMinutes){
+  if((s.LastBoundary!=default && s.LastBoundary.Kind!=DateTimeKind.Utc) ||
+     (s.BlockedThroughBoundary!=default && s.BlockedThroughBoundary.Kind!=DateTimeKind.Utc))
+   throw new ArgumentException("INVALID_REPLAY_INTENT_CLOCK");
+  if(s.Pending is MxmDecisionIntent p &&
+     (p.Desired < -1 || p.Desired>1 || p.CompletedBars<0 ||
+      p.BoundaryUtc.Kind!=DateTimeKind.Utc || p.ObservedUtc.Kind!=DateTimeKind.Utc ||
+      p.BoundaryUtc!=s.LastBoundary || p.BoundaryUtc<=s.BlockedThroughBoundary ||
+      p.ObservedUtc<p.BoundaryUtc || p.ObservedUtc>=p.ExpiresUtc ||
+      p.ExpiresUtc!=p.BoundaryUtc.AddMinutes(barMinutes)))
+   throw new ArgumentException("INVALID_REPLAY_PENDING_INTENT");
+  pending=s.Pending;lastBoundary=s.LastBoundary;blockedThroughBoundary=s.BlockedThroughBoundary;
+ }
  public bool CanPublish(DateTime boundaryUtc) {
   if(boundaryUtc.Kind!=DateTimeKind.Utc || boundaryUtc==default)
    throw new ArgumentException("INVALID_CAUSAL_BOUNDARY_UTC");

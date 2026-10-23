@@ -332,7 +332,7 @@ jobs:
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-captured-terms-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
           python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-week-csharp/independent-mark.json"
           # Counterfactual using existing cTrader product default 12 pips, not W37-fitted.
-          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-product-stop12-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp-product-stop12" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-product-stop12-recovery-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp-product-stop12" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
           python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp-product-stop12/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-week-csharp-product-stop12/independent-mark.json"
       - name: Independently attribute unchanged full-week CSharp ledger gross, fees and open MTM
         run: |
@@ -402,6 +402,14 @@ jobs:
                    D(attribution['realized_gross_pnl_eur'])-
                    D(attribution['unrealized_liquidation_mark_pnl_eur']))<=D('0.000001'),
                'WEEK_ATTRIBUTION_SAME_ACCOUNT_AND_NO_PROMOTION')
+          recovery=product['recovery_consistency']
+          need(recovery['schema']=='mxm.csharp.single-account.cold-process-recovery.v1' and
+               recovery['source_sha256']==bridge['derived_ticks_sha256'] and
+               recovery['cold_processes']==4 and len(set(recovery['cut_ordinals']))==4 and
+               recovery['all_reports_identical'] and recovery['initial_capital_eur']==200 and
+               not recovery['native_ctrader_recovery'] and recovery['new_strategy_trials']==recovery['orders']==0,
+               'WEEK_CSHARP_FULL_ACCOUNT_COLD_PROCESS_RECOVERY')
+          print('MXM_CSHARP_COLD_PROCESS_RECOVERY',json.dumps(recovery,sort_keys=True))
           need(product['classification']==
                'PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED' and
                product['modeled_parameters']['product_default_stop12'] is True and
@@ -447,6 +455,7 @@ jobs:
           receipt={'schema':'mxm.csharp.week37.development-receipt.v1',
             'classification':'AUTHENTIC_WEEK_QUOTES_MODELED_EUR200_UNVERIFIED_COSTS_AND_FILLS',
             'source_run':39917922508,'iso_week':'2026-W37','partition':'DEVELOPMENT',
+            'cold_process_recovery':recovery,
             'source_cipher_sha256':bridge['ciphertext_sha256'],
             'derived_stream_sha256':bridge['derived_ticks_sha256'],
             'quote_events':685474,'initial_eur':200,
