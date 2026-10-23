@@ -25,6 +25,16 @@ POLICY={'schema':'mxm.week-chronology-policy.v1','symbol_id':1,'symbol_name':'EU
  'max_collection_seconds':1200,'minimum_quote_events':10000,'orders':0,'economic_outcomes':0,
  'scope':'DEVELOPMENT_TRANSPORT_ONLY','automatic_retry':False,
  'iso_week':'2026-W37','strategy_trials':0,'confirmation_opened':False}
+# Only these prospectively registered profiles are admissible. No user-supplied
+# timestamps, symbols, request caps or arbitrary remote configurations.
+PROFILE=os.environ.get('LAB_CHRONOLOGY_PROFILE','W37')
+need(PROFILE in ('W37','W35'),'WEEK_UNREGISTERED_PROFILE')
+if PROFILE=='W35':
+    PATH='.github/workflows/mxm-week35-chronology-reception.yml'
+    SOURCE_REF='mxm-week35-chronology-code-20261023'
+    OUT=Path('verification/week35-chronology')
+    POLICY={**POLICY,'from_ms':1787529600000,'to_ms':1788134400000,'iso_week':'2026-W35'}
+
 CHECKOUT='actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683'
 UPLOAD='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
 DOWNLOAD='actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093'
@@ -49,10 +59,12 @@ def build_workflow(source):
           'if-no-files-found':'error','retention-days':90}})
         result={'runs-on':'ubuntu-24.04','timeout-minutes':25,'environment':environment,
           'permissions':{'contents':'read','actions':'read'},'steps':steps}
+        if PROFILE!='W37':result['env']={'LAB_CHRONOLOGY_PROFILE':PROFILE}
         if name=='chronology-cold':result.update(needs='chronology-collect',**{'if':'always()'})
         else:result['if']="github.repository == '"+REPO+"' && github.ref == 'refs/heads/"+BRANCH+"' && github.run_attempt == 1"
         return result
-    return {'name':'MXM one complete ISO week VIEW chronology acquisition',
+    return {'name':('MXM one complete ISO week VIEW chronology acquisition' if PROFILE=='W37' else
+                    'MXM W35 complete ISO week VIEW chronology acquisition'),
       'on':{'push':{'branches':[BRANCH],'paths':[PATH]},'workflow_dispatch':{}},
       'permissions':{},'concurrency':{'group':'mxm-integrated-laboratory','cancel-in-progress':False},
       'jobs':{'chronology-collect':job('chronology-collect','mxm-r3-pepperstone-v1'),
