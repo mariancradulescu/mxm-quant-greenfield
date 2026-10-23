@@ -51,8 +51,8 @@ public sealed record MxmEurUsdCapturedCosts(long MinCents,long MaxCents,long Ste
   Need(digits==5 && pipPosition==4,"PRODUCT_STOP12_PIP_GEOMETRY_UNKNOWN");
   return 0.0012m;
  }
- public static MxmEurUsdCapturedCosts Load(string path,bool nativeSource,bool weekSource=false) {
-  Need(!weekSource || !nativeSource,"CONTRADICTORY_SOURCE");
+ public static MxmEurUsdCapturedCosts Load(string path,bool nativeSource,bool weekSource=false,bool week35=false) {
+  Need((!weekSource || !nativeSource) && (!week35 || weekSource),"CONTRADICTORY_SOURCE");
   using var doc=JsonDocument.Parse(File.ReadAllBytes(path));var root=doc.RootElement;
   Need(root.GetProperty("schema").GetString()=="mxm.captured-native-symbol-terms.v1" &&
    root.GetProperty("symbol_id").GetInt32()==1 &&
@@ -60,11 +60,11 @@ public sealed record MxmEurUsdCapturedCosts(long MinCents,long MaxCents,long Ste
    !root.GetProperty("dated_historical_volume_rules_proven").GetBoolean(),"SNAPSHOT_NOT_HISTORY");
   if(weekSource) {
    Need(root.GetProperty("source_crypto_authenticated_by_week_native_replay").GetBoolean() &&
-    root.GetProperty("source_run").GetInt64()==39917922508 &&
-    root.GetProperty("source_code_sha").GetString()=="120db3391ed1f4105120274b73a9259690eeeb64" &&
-    root.GetProperty("source_private_sha256").GetString()=="8dde8355c79f3f379bf14f1fd47a8ed5815646cafbcfc287762fb68c2c2e7b51" &&
+    root.GetProperty("source_run").GetInt64()==(week35?39946364621:39917922508) &&
+    root.GetProperty("source_code_sha").GetString()==(week35?"b54ee59548846ad8013b25965dbe4bcb19d4a978":"120db3391ed1f4105120274b73a9259690eeeb64") &&
+    root.GetProperty("source_private_sha256").GetString()==(week35?"2b37063a948d7b761a7f854e59649793ba1d5ff5e30a7e5255b03f4042cadb13":"8dde8355c79f3f379bf14f1fd47a8ed5815646cafbcfc287762fb68c2c2e7b51") &&
     root.GetProperty("source_ciphertext_sha256").GetString()==
-     "2403c74dfd81ab410f9b9c3bdabf4f3d5a5a4df0133cd0adc03933a364d539b6" &&
+     (week35?"0d1badd1a944eeac7a67f1f7c87e05d26c1ea14ea016a0ea25fbb40ce7cb92ee":"2403c74dfd81ab410f9b9c3bdabf4f3d5a5a4df0133cd0adc03933a364d539b6") &&
     root.GetProperty("classification").GetString()==
      "AUTHENTICATED_WEEK_CAPTURE_SNAPSHOT_NOT_DATED_HISTORICAL_EXECUTION_TERMS",
      "WEEK_SOURCE_BINDING");

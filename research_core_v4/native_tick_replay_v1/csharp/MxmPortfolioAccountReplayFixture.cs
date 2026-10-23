@@ -39,6 +39,35 @@ foreach(var bad in new (int?,int?)[]{(5,null),(null,4),(4,4),(5,5)}) {
 var balanced=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params()).Run(Series());
 // Current-snapshot money semantics are a counterfactual, not actual fees.
 var cost=new MxmEurUsdCapturedCosts(100000,100000000,100000,10000000,1,3000000000,1000000,"USD");
+// Synthetic metadata parser regression only: matching public commitments do
+// not decrypt or authenticate a market source. The protected bridge does that.
+var sourceTerms=Path.GetTempFileName();
+string Week35Terms(long run,string cipher)=>JsonSerializer.Serialize(new {
+ schema="mxm.captured-native-symbol-terms.v1",symbol_id=1,
+ historical_commission_proven=false,dated_historical_volume_rules_proven=false,
+ source_crypto_authenticated_by_week_native_replay=true,source_run=run,
+ source_code_sha="b54ee59548846ad8013b25965dbe4bcb19d4a978",
+ source_private_sha256="2b37063a948d7b761a7f854e59649793ba1d5ff5e30a7e5255b03f4042cadb13",
+ source_ciphertext_sha256=cipher,
+ classification="AUTHENTICATED_WEEK_CAPTURE_SNAPSHOT_NOT_DATED_HISTORICAL_EXECUTION_TERMS",
+ raw_optional_fields=new {minVolume=100000L,maxVolume=100000000L,stepVolume=100000L,
+  commissionType=1,minCommissionType=1,minCommissionAsset="USD",
+  preciseTradingCommissionRate=3000000000L,preciseMinCommission=1000000L}
+});
+try {
+ const string w35Cipher="0d1badd1a944eeac7a67f1f7c87e05d26c1ea14ea016a0ea25fbb40ce7cb92ee";
+ File.WriteAllText(sourceTerms,Week35Terms(39946364621,w35Cipher));
+ Require(MxmEurUsdCapturedCosts.Load(sourceTerms,false,true,true).Allows(1000m),
+  "W35_MATCHING_FIXED_SOURCE_PROFILE");
+ foreach(var bad in new (long,string,bool)[]{(39917922508,w35Cipher,true),
+  (39946364621,"not-original-cipher",true),(39946364621,w35Cipher,false)}) {
+  File.WriteAllText(sourceTerms,Week35Terms(bad.Item1,bad.Item2));
+  bool refused=false;
+  try {MxmEurUsdCapturedCosts.Load(sourceTerms,false,true,bad.Item3);}
+  catch(InvalidDataException){refused=true;}
+  Require(refused,"W35_CROSS_WEEK_OR_CIPHER_SOURCE_REJECTED");
+ }
+} finally {File.Delete(sourceTerms);}
 Require(cost.Allows(1000m) && !cost.Allows(500m) && !cost.Allows(1500m),"CENTS_VOLUME_LATTICE");
 Require(cost.FeeEur(1000m,1.10m,1.10m,1.11m)==.03m,"USD_MILLION_COMMISSION_TO_EUR");
 Require((cost with {CommissionType=2,PreciseRate=300000000}).FeeEur(1000m,1.10m,1.10m,1.11m)==.03m/1.10m,
