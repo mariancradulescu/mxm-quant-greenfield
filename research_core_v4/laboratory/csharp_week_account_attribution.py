@@ -36,8 +36,8 @@ def attribute(report):
          not report['hard21_proven'] and not report['all_cost_components_verified'] and
          report['new_broker_requests']==report['live_orders']==0,
          'PROVENANCE_AND_LIMITATIONS')
-    policy=report['modeled_parameters']
     if product_stop12:
+        policy=report['modeled_parameters']
         need(policy['product_default_stop12'] is True and
              policy['product_stop_pips']==12 and
              number(policy['product_stop_distance_quote'])==D('0.0012'),
