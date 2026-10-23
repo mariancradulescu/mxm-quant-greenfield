@@ -1,6 +1,6 @@
 # cTrader order outcome and broker stop reconciliation
 
-Baseline: `da47a6e39294b40fc8dc51bcc4926e44811f44df` (PR164). Product repair; zero scientific trials and no market-outcome reads. The CompressionRelease `GROSS_FAIL` closure remains in force. No failed strategy is promoted or retuned.
+Baseline: `da47a6e39294b40fc8dc51bcc4926e44811f44df` (PR164). Product repair; zero new scientific trials and no new research outcome reads during implementation. Existing merge-triggered protected DEVELOPMENT replays are technical regressions on already preserved sources, not independent economic observations. The CompressionRelease `GROSS_FAIL` closure remains in force. No failed strategy is promoted or retuned.
 
 ## Material defect and behavior
 
@@ -23,3 +23,9 @@ These are artificial contract checks and compilation, **not native cTrader execu
 Economic edge after costs, HARD21 and final product acceptance remain open. This repair prevents unverified order outcomes from silently returning to normal trading; it does not make any rejected research strategy competitive. Existing DEVELOPMENT / CONFIRMATION / PROTECTED boundaries and all authority checkpoints remain unchanged.
 
 Technical API reference: [official Robot.ExecuteMarketOrder](https://help.ctrader.com/ctrader-algo/references/General/Robot/ExecuteMarketOrder/) (consulted 2026-10-23). The six-argument overload requests stop distance in pips and returns a `TradeResult`; the source remains compiled against the existing pinned cTrader.Automate 1.0.21 package.
+
+## Integrated verification receipt
+
+Product PR165 merged as `1f9e5abcaa7c38f8b5176271f449a9c5b57af74b`, from final source head `50bb28e2595993df09758a4f780500cb9adea598`. All five required checks passed. Account gate run [39999349839](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/39999349839/job/120571090756) compiled the actual `.algo` and emitted `MXM_POSTFILL_PROTECTION_IDENTITY_STOP_LATCH_RETRY_PASS_NOT_NATIVE_PROOF` from the actual C# fixture. The first CI attempt exposed an obsolete textual assertion requiring the former rejection-log branch; CI was updated to require the new reconciliation path and latch wiring. No failed check was waived.
+
+The merge automatically invoked the unchanged protected chronology and lifecycle workflows because their existing path filters include this adaptor. Those workflows decrypt the already preserved DEVELOPMENT sources inside custody and rerun the same registered programs; they make no new broker requests and are not new independent trials. Their outcome status is recorded in `CTRADER_POSTFILL_VERIFICATION_V1.json`. Duplicate economic ciphertext is not repackaged as new economic evidence. This technical receipt preserves provenance pointers and artificial-contract status only; it does not reinterpret earlier negative economic results or certify native execution.
