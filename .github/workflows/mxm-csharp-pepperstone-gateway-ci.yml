@@ -29,6 +29,11 @@ jobs:
           raise SystemExit(not r.wasSuccessful())
           PY
           )
+      - name: Validate bounded full ISO week VIEW extension over the original immutable decoder
+        run: |
+          cp research_core_v4/laboratory/week_chronology_reception.py .sealed-chronology-source/research_core_v4/laboratory/
+          cp research_core_v4/laboratory/test_week_chronology_reception.py .sealed-chronology-source/research_core_v4/laboratory/
+          (cd .sealed-chronology-source && python3 -m unittest research_core_v4.laboratory.test_chronology_reception research_core_v4.laboratory.test_week_chronology_reception -v)
       - name: Validate both ACTUAL cold bridge installation closures without any custody key
         run: |
           python3 -m unittest research_core_v4.laboratory.test_cold_bridge_consumer_closure -v

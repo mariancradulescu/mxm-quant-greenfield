@@ -130,7 +130,6 @@ class ChronologyReceptionTests(unittest.TestCase):
                 self.assertEqual(c.main('chronology-cold'),1)
             self.assertFalse(json.loads((out/'cold.json').read_bytes())['accepted'])
 
-if __name__=='__main__':unittest.main()
 
 class WeekRoleIsolationTests(unittest.TestCase):
     def test_wrong_role_credentials_rejected_before_any_git_or_network_read(self):
@@ -157,3 +156,13 @@ class WeekRoleIsolationTests(unittest.TestCase):
             out=Path(folder);(out/'producer.json').write_text('{}');(out/'capture.mxmenc').write_bytes(b'fixture')
             with patch.object(c,'OUT',out),self.assertRaisesRegex(LabError,'NATIVE_PRODUCER_RECEIPT'):
                 c.cold(route,identity)
+
+class InstalledWorkflowTests(unittest.TestCase):
+    def test_actual_installed_workflow_is_exact_generated_contract_if_present(self):
+        path=Path('..')/c.PATH
+        if not path.exists():self.skipTest('Broker workflow not installed by source-only change')
+        wf=json.loads(path.read_bytes())
+        source=next(s['env']['LAB_CHRONOLOGY_SOURCE'] for s in wf['jobs']['chronology-collect']['steps'] if 'env' in s)
+        self.assertEqual(wf,c.build_workflow(source))
+
+if __name__=='__main__':unittest.main()
