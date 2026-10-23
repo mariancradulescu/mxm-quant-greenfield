@@ -318,7 +318,20 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
     last_ts = max(book)
     last_bid, last_ask = book[last_ts]
     equity = cash
+    terminal_open_stop_checks=0
     for direction, entry, size in positions.values():
+        if product_stop12:
+            require(stop_entry_time is not None, "PRODUCT_STOP_MISSING_ENTRY_CLOCK")
+            stop_price=entry-D(direction)*D("0.0012")
+            # An omitted EXIT has no ledger row on which to run the earlier
+            # first-touch check. Scan the entire remaining observed suffix,
+            # including the terminal quote: recovery cannot erase a stop touch.
+            lo=bisect_right(snapshot_times,stop_entry_time)
+            for observed in snapshot_times[lo:]:
+                stop_bid,stop_ask=book[observed]
+                require(stop_bid>stop_price if direction==1 else stop_ask<stop_price,
+                        "PRODUCT_STOP_OPEN_POSITION_MISSED_OBSERVED_TOUCH")
+            terminal_open_stop_checks+=1
         quote_pnl = ((last_bid - entry) if direction == 1 else (entry - last_ask)) * size
         equity += quote_pnl/(last_ask if quote_pnl >= 0 else last_bid) if dynamic else quote_pnl*fx
     used_margin = margin * len(positions)
@@ -339,6 +352,7 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
         "open_positions": len(positions),
         "product_default_stop12_replayed": product_stop12,
         "product_first_observed_stop_exits_independently_checked": observed_stop_exits,
+        "terminal_open_stop_paths_independently_checked": terminal_open_stop_checks,
         "cash_abs_difference_eur": str(abs(cash-number(account["final_cash_eur"]))),
         "equity_abs_difference_eur": str(abs(equity-number(account["marked_equity_eur"]))),
         "full_iso_weeks_verified": 0,
