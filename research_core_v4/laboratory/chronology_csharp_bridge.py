@@ -1,7 +1,7 @@
 """Read an IMMUTABLE existing native Pepperstone ciphertext using existing MXM custody.
 Produces only the bounded authenticated historical BID/ASK stream, never fills.
 Invoked only in protected GitHub custody environment; never accepts arbitrary inputs."""
-import json,sys,tempfile
+import base64,json,sys,tempfile
 from pathlib import Path
 from . import chronology_reception as native
 from .common import need,encoded,bytes_digest
@@ -37,6 +37,21 @@ def export(cipher_path,output):
         bid,bc,_=native.verify_tree(private['trees']['BID'],private['receipts'],private['account'],1)
         ask,ac,_=native.verify_tree(private['trees']['ASK'],private['receipts'],private['account'],2)
         need(bc and ac and len(bid)+len(ask)==28212,'CSHARP_EVENT_REDECODE')
+        # Reuse the ORIGINAL SymbolById response already authenticated by
+        # native.replay above. No new broker request and no fee backdating.
+        from .captured_symbol_terms import captured_symbol_terms
+        request,response=native.decode_record(private['receipts'][1],private['account'])
+        need(type(request).__name__=='ProtoOASymbolByIdReq' and list(request.symbolId)==[1] and
+             type(response).__name__=='ProtoOASymbolByIdRes' and len(response.symbol)==1,
+             'CSHARP_ORIGINAL_SYMBOL_TERMS_BINDING')
+        terms=captured_symbol_terms(response.symbol[0])
+        terms.update(source_crypto_authenticated_by_original_native_replay=True,
+          source_run=SOURCE_RUN,native_source_sha=SOURCE_SHA,source_ciphertext_sha256=CIPHER_SHA256,
+          source_private_sha256=PRIVATE_SHA256,
+          original_metadata_response_wire_sha256=bytes_digest(base64.b64decode(
+              private['receipts'][1]['response_envelope_b64'],validate=True)),
+          classification='AUTHENTICATED_CAPTURE_SNAPSHOT_NOT_DATED_HISTORICAL_EXECUTION_TERMS')
+        terms_bytes=encoded(terms)
         # Same-ms order across sides is unknowable. Group atomically downstream;
         # this deterministic serializer order is NOT a broker event precedence.
         i=j=0;out=Path(output);out.parent.mkdir(parents=True,exist_ok=True)
@@ -48,11 +63,13 @@ def export(cipher_path,output):
                     f.write(encoded({'t':bid[i][0],'side':'bid','raw':bid[i][1]})+b'\n');i+=1
                 while j<len(ask) and ask[j][0]==t:
                     f.write(encoded({'t':ask[j][0],'side':'ask','raw':ask[j][1]})+b'\n');j+=1
+        Path(str(out)+'.symbol-terms.json').write_bytes(terms_bytes)
         receipt={'schema':'mxm.csharp.authenticated-nonoutcome-bridge.v1',
                 'source_run':SOURCE_RUN,'native_source_sha':SOURCE_SHA,
                 'ciphertext_sha256':CIPHER_SHA256,'private_sha256':PRIVATE_SHA256,
                 'derived_ticks_sha256':bytes_digest(out.read_bytes()),
                 'verified_bid_events':len(bid),'verified_ask_events':len(ask),
+                'captured_symbol_terms_sha256':bytes_digest(terms_bytes),
                 'historical_arrival_proven':False,'historical_costs_proven':False,
                 'orders':0,'economic_outcomes':0,'fills':0}
         Path(str(out)+'.receipt.json').write_bytes(encoded(receipt))

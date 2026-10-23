@@ -9,6 +9,7 @@ on:
       - research_core_v4/native_tick_replay_v1/csharp/**
       - research_core_v4/laboratory/chronology_csharp_bridge.py
       - research_core_v4/laboratory/durable_native_chronology.py
+      - research_core_v4/laboratory/captured_symbol_terms.py
       - docs/economic-development/20261023/native-chronology-39660692230/**
   workflow_dispatch: {}
 permissions: {}
@@ -43,6 +44,7 @@ jobs:
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
         run: |
           cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
+          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/captured_symbol_terms.py
           cd .sealed-chronology-source
           python3 -m research_core_v4.laboratory.chronology_csharp_bridge "${GITHUB_WORKSPACE}/verification/r3-chronology/capture.mxmenc" "${RUNNER_TEMP}/mxm-authentic-ticks.ndjson"
       - name: Execute CSharp single-account portfolio model against exact pinned authenticated Pepperstone quotes (development only)
@@ -212,7 +214,27 @@ jobs:
             native_portfolio_unverified_broker_terms=True,
             native_portfolio_independent_full_mtm_parity_not_proven=True,
             native_portfolio_not_qualified=True,native_portfolio_hard21=False)
-          full=encoded({'bridge':bridge,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
+          terms_bytes=(temp/'mxm-authentic-ticks.ndjson.symbol-terms.json').read_bytes()
+          terms=json.loads(terms_bytes)
+          need(bytes_digest(terms_bytes)==bridge['captured_symbol_terms_sha256'] and
+               terms['source_crypto_authenticated_by_original_native_replay'] is True and
+               terms['source_run']==bridge['source_run']==39660692230 and
+               terms['source_ciphertext_sha256']==bridge['ciphertext_sha256'] and
+               terms['source_private_sha256']==bridge['private_sha256'] and
+               terms['modeled_units_checked']=='1000' and
+               terms['historical_commission_proven'] is False and
+               terms['dated_historical_volume_rules_proven'] is False and
+               terms['orders']==terms['new_broker_requests']==0,
+               'CAPTURED_SYMBOL_TERMS_ORIGINAL_WIRE_CUSTODY_BINDING')
+          safe.update(captured_symbol_terms_present=True,
+            captured_symbol_terms_sha256=bridge['captured_symbol_terms_sha256'],
+            captured_volume_fields_present=terms['volume_fields_present'],
+            captured_volume_geometry_unambiguous=terms['unambiguous_volume_geometry'],
+            model_volume_on_captured_native_lattice=terms['modeled_volume_on_captured_lattice'],
+            captured_precise_commission_rate_decoded=terms['commission_rate'] is not None,
+            captured_minimum_commission_semantics_known=terms['minimum_commission_semantics_known'],
+            captured_terms_do_not_prove_historical_execution=True)
+          full=encoded({'bridge':bridge,'captured_original_native_symbol_terms':terms,'research_matrix':research,'modeled_reference':r,'independent_continuous_account_cash_parity':independent,'stop_risk_capacity':capacity,
                          'native_exposed_quote_continuous_account_model':nativeportfolio,'independent_native_quote_terminal_cash_and_mtm':native_terminal_mark,'nonoutcome_reference':json.loads((temp/'mxm-csharp-output/reference-report.json').read_bytes())})
           public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(public)==FP,'CSHARP_MODELED_CUSTODY_RECIPIENT')
