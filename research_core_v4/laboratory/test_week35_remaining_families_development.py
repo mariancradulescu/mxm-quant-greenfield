@@ -33,4 +33,20 @@ class RemainingFamiliesTests(W35BreakoutTests):
                     else:
                         result=independent_terminal_mark('synthetic',report,path)
                         self.assertEqual(result['terminal_open_stop_paths_independently_checked'],1)
+class RemainingResultPreservationTests(unittest.TestCase):
+    def test_original_archive_and_receipt_verify_without_key(self):
+        from .verify_week35_remaining_result import verify
+        self.assertFalse(verify()['decrypted'])
+    def test_changed_part_receipt_or_source_cannot_be_accepted(self):
+        import shutil,tempfile,json
+        from pathlib import Path
+        from .verify_week35_remaining_result import ROOT,verify
+        for mode in ('part','receipt','source'):
+            with tempfile.TemporaryDirectory() as folder:
+                root=Path(folder)/'evidence';shutil.copytree(ROOT,root)
+                if mode=='part':(root/'part-00.b64').write_text('AAAA')
+                elif mode=='receipt':(root/'receipt.json').write_text('{}')
+                else:
+                    p=root/'MANIFEST.json';m=json.loads(p.read_bytes());m['source_commit']='0'*40;p.write_text(json.dumps(m))
+                with self.subTest(mode=mode),self.assertRaises(ValueError):verify(root)
 if __name__=='__main__':unittest.main()
