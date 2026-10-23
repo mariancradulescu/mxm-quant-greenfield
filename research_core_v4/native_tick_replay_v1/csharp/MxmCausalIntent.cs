@@ -14,6 +14,22 @@ public sealed record MxmDecisionIntent(int Desired, bool Contiguous, int Complet
 public sealed class MxmCausalIntent {
  MxmDecisionIntent? pending;
  DateTime lastBoundary;
+ DateTime blockedThroughBoundary;
+ public bool CanPublish(DateTime boundaryUtc) {
+  if(boundaryUtc.Kind!=DateTimeKind.Utc || boundaryUtc==default)
+   throw new ArgumentException("INVALID_CAUSAL_BOUNDARY_UTC");
+  return boundaryUtc>blockedThroughBoundary;
+ }
+ // A broker stop can precede BarClosed. Clear alone cannot prevent that
+ // callback from publishing another decision for the already revoked bar.
+ public void RevokeThroughBoundary(DateTime observedUtc,int barMinutes) {
+  if(observedUtc.Kind!=DateTimeKind.Utc || observedUtc==default || barMinutes<1)
+   throw new ArgumentException("INVALID_CAUSAL_REVOCATION_CLOCK");
+  long width=checked(TimeSpan.TicksPerMinute*barMinutes);
+  var boundary=new DateTime(observedUtc.Ticks/width*width,DateTimeKind.Utc);
+  if(boundary>blockedThroughBoundary)blockedThroughBoundary=boundary;
+  Clear();
+ }
  public void Publish(int desired,bool contiguous,int completedBars,
                      DateTime boundaryUtc,DateTime observedUtc,int barMinutes) {
   if(desired < -1 || desired > 1 || completedBars<0 || barMinutes<1 ||
@@ -22,6 +38,7 @@ public sealed class MxmCausalIntent {
      observedUtc>=boundaryUtc.AddMinutes(barMinutes))
    throw new ArgumentException("INVALID_CAUSAL_INTENT_CLOCK_OR_DECISION");
   lastBoundary=boundaryUtc;
+  if(!CanPublish(boundaryUtc)){Clear();return;}
   pending=new MxmDecisionIntent(desired,contiguous,completedBars,boundaryUtc,
     observedUtc,boundaryUtc.AddMinutes(barMinutes));
  }

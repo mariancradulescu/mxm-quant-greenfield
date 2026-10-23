@@ -187,6 +187,32 @@ simultaneous.Add(new MxmQuote(stopTime.AddSeconds(1),"EURUSD",1.0980m,1.0982m,1m
 var noReentry=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(riskFraction:.1m)).Run(simultaneous);
 Require(noReentry.AcceptedEntries==2 && noReentry.ExecutedExits==2 && noReentry.OpenPositions==0,
  "STOP_PRIORITY_CLEARS_VALID_INTENT_AND_FORBIDS_NEXT_QUOTE_REENTRY");
+// Reverse callback ordering: quote stop BEFORE BarClosed at the same UTC
+// boundary. Neither that publication nor another tick may resurrect the intent.
+var stopBeforeBar=Series(6);
+for(int i=0;i<stopBeforeBar.Count;i++)if(stopBeforeBar[i] is MxmQuote q)
+ stopBeforeBar[i]=q with {StopDistanceQuote=.0012m};
+var reopenBoundary=stopTime.AddSeconds(-1);
+MxmQuote StopQuote(DateTime t,string symbol)=>new(t,symbol,
+ symbol=="EURUSD"?1.0980m:1.2020m,symbol=="EURUSD"?1.0982m:1.2022m,
+ 1m,1000m,70m,.1m,0m,1m,StopDistanceQuote:.0012m);
+foreach(var symbol in new[]{"EURUSD","GBPUSD"})stopBeforeBar.Add(StopQuote(reopenBoundary,symbol));
+stopBeforeBar.Add(new MxmBarClose(reopenBoundary,"EURUSD",1.1012m));
+stopBeforeBar.Add(new MxmBarClose(reopenBoundary,"GBPUSD",1.1988m));
+foreach(var symbol in new[]{"EURUSD","GBPUSD"})stopBeforeBar.Add(StopQuote(reopenBoundary.AddSeconds(1),symbol));
+var reverseOrder=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(riskFraction:.1m)).Run(stopBeforeBar);
+Require(reverseOrder.AcceptedEntries==2 && reverseOrder.ExecutedExits==2 &&
+ reverseOrder.OpenPositions==0,"STOP_BEFORE_BAR_CANNOT_REPUBLISH_SAME_BOUNDARY");
+// Revocation is per symbol and finite: the next complete bar may publish.
+var nextBoundary=reopenBoundary.AddMinutes(5);
+stopBeforeBar.Add(new MxmBarClose(nextBoundary,"EURUSD",1.1014m));
+stopBeforeBar.Add(new MxmBarClose(nextBoundary,"GBPUSD",1.1986m));
+foreach(var symbol in new[]{"EURUSD","GBPUSD"})stopBeforeBar.Add(StopQuote(nextBoundary.AddSeconds(1),symbol));
+var resumed=new MxmPortfolioAccountReplay(new[]{"EURUSD","GBPUSD"},Params(riskFraction:.1m)).Run(stopBeforeBar);
+Require(resumed.AcceptedEntries==4 && resumed.ExecutedExits==2 && resumed.OpenPositions==2 &&
+ resumed.Ledger.Where(x=>x.Kind=="ENTRY").Skip(2).All(x=>x.Utc==nextBoundary.AddSeconds(1)),
+ "STOP_REVOCATION_EXPIRES_ONLY_ON_GENUINELY_NEW_BOUNDARY");
+Console.WriteLine("MXM_STOP_CALLBACK_ORDER_BOTH_DIRECTIONS_SYNTHETIC_PASS_NO_SAME_BAR_RESURRECTION");
 var touched=Series(6);
 for(int i=0;i<touched.Count;i++)if(touched[i] is MxmQuote q)
  touched[i]=q with {StopDistanceQuote=.0001m};

@@ -32,6 +32,21 @@ foreach(bool isLong in new[]{true,false}) {
  Require(queue.TryConsume(utc.AddMinutes(5).AddSeconds(1),out _) &&
   fence.IsCurrent(recovered,null,utc.AddMinutes(5).AddSeconds(1)),"FRESH_POST_STOP_BAR_MAY_ENTER");
 }
+// The queue itself now owns the revocation boundary. Consumers cannot
+// accidentally resurrect an intent by omitting an adapter-side CanPublish.
+{
+ var queue=new MxmCausalIntent();
+ queue.RevokeThroughBoundary(utc.AddSeconds(2),5);
+ queue.Clear(); // Clear must not remove the stop barrier.
+ queue.Publish(1,true,8,utc,utc.AddSeconds(3),5);
+ Require(!queue.TryConsume(utc.AddSeconds(4),out _),"QUEUE_REJECTS_POST_STOP_SAME_BAR_PUBLICATION");
+ queue.RevokeThroughBoundary(utc.AddMinutes(-5),5); // Late notification cannot move it backwards.
+ Require(!queue.CanPublish(utc),"DELAYED_REVOCATION_CANNOT_LOWER_BARRIER");
+ queue.Publish(-1,true,9,utc.AddMinutes(5),utc.AddMinutes(5),5);
+ Require(queue.TryConsume(utc.AddMinutes(5).AddSeconds(1),out var next) && next!.Desired==-1,
+ "QUEUE_ACCEPTS_NEXT_BOUNDARY_EXACTLY_ONCE");
+ Require(!queue.TryConsume(utc.AddMinutes(5).AddSeconds(2),out _),"NEW_INTENT_STILL_SINGLE_CONSUMPTION");
+}
 // All causal permutations of publication, broker removal, close notification
 // and tick consumption with removal preceding consumption. No chosen native
 // ordering is assumed and none is certified by this mathematical enumeration.
