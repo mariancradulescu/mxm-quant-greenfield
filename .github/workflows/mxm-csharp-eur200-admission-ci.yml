@@ -51,6 +51,36 @@ jobs:
           assert 'Portfolio Symbols (comma separated)",DefaultValue=""' in src
           print('MXM_ONE_BOT_MULTISYMBOL_ACCOUNT_GATE_SYNTHETIC_NO_CLOUD_LOCK_CLAIM_PASS')
           PY
+      - name: Reproduce old broker-stop intent defect and exercise reconciled product fence without broker orders
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmBrokerIntentFenceFixture.csproj -c Release
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('research_core_v4/native_tick_replay_v1/csharp')
+          bot=(p/'MxmReferenceProductBot.cs').read_text()
+          assert 'Positions.Closed+=OnBrokerPositionClosed' in bot
+          assert 'Positions.Closed-=OnBrokerPositionClosed' in bot
+          closed=bot[bot.index('void OnBrokerPositionClosed'):bot.index('protected override void OnStop')]
+          assert closed.index('args.Position.Label!=Label')<closed.index('fence.Closed(')
+          assert 'brokerIntentFences.TryGetValue(args.Position.SymbolName' in closed
+          assert 'args.Reason==PositionCloseReason.Closed' in closed
+          ticks=bot[bot.index('void OnPortfolioTick'):bot.index('void ApplyPortfolioDecision')]
+          assert ticks.index('fence.Observe(')<ticks.index('fence.Capture()')<ticks.index('queue.TryConsume(')
+          apply=bot[bot.index('void ApplyPortfolioDecision'):]
+          assert apply.count('fence.IsCurrent(')==2
+          assert apply.index('fence.BeginReversal(')<apply.index('var result=ClosePosition(current)')<apply.index('fence.FinishReversal(')
+          assert apply.rindex('fence.IsCurrent(')<apply.index('ExecuteMarketOrder(')
+          assert 'result.Position?.Id' in apply and 'lease=continuation!' in apply
+          bars=bot[bot.index('void OnPortfolioBarClosed'):bot.index('void OnPortfolioTick')]
+          assert bars.index('fence.Observe(')<bars.index('.Publish(')<bars.index('fence.CanPublish(')
+          r=json.loads(Path('verification/broker-intent-fence/synthetic-contract.json').read_text())
+          assert r['checks']>=40 and r['interleavings']>=3
+          assert r['old_product_counterexample_reproduced']
+          assert not r['native_ctrader_callbacks_observed'] and not r['hard21']
+          assert r['broker_orders']==r['scientific_trials']==0
+          print('MXM_REAL_PRODUCT_BROKER_CLOSE_WIRING_AND_LEASE_ADMISSION_CHECK_PASS_NATIVE_RECEIPT_STILL_REQUIRED')
+          PY
       - name: Replay two instruments through one CSharp EUR200 BIDASK marked account with independent Decimal verification
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplayFixture.csproj -c Release
