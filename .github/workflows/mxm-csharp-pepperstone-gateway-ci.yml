@@ -66,6 +66,10 @@ jobs:
         run: python3 -m unittest research_core_v4.laboratory.test_csharp_week_account_attribution research_core_v4.laboratory.test_csharp_week_source_routing -v
       - name: Decode actual protobuf symbol shapes; missing defaults, cents and precise fee units
         run: python3 -m unittest research_core_v4.laboratory.test_captured_symbol_terms -v
+      - name: Compile and reconcile unqualified UTC seasonality against independent artificial-hour arrays
+        run: |
+          dotnet run --project research_core_v4/laboratory/csharp/seasonality/MxmSeasonalityDevelopment.csproj -c Release -- --selftest
+          python3 -m unittest research_core_v4.laboratory.test_seasonality_development -v
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj -c Release -- --selftest
