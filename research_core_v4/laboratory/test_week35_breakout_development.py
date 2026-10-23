@@ -25,4 +25,20 @@ class W35BreakoutTests(WeekCustodyRoutingTests):
         self.assertTrue(disposition([D(201),D(202)]).startswith('INCONCLUSIVE'))
         with self.assertRaises(ValueError):disposition([D(201)])
         with self.assertRaises(ValueError):disposition([D('NaN'),D(201)])
+class W35ResultPreservationTests(unittest.TestCase):
+    def test_original_committed_archive_verifies_without_key(self):
+        from .verify_week35_breakout_result import verify
+        r=verify();self.assertFalse(r['decrypted']);self.assertFalse(r['economic_retest'])
+    def test_corrupt_archive_or_receipt_or_provenance_is_rejected(self):
+        import shutil,tempfile,json
+        from pathlib import Path
+        from .verify_week35_breakout_result import verify,ROOT
+        for mode in ('archive','receipt','source'):
+            with tempfile.TemporaryDirectory() as folder:
+                root=Path(folder)/'result';shutil.copytree(ROOT,root)
+                if mode=='archive':(root/'artifact.zip.b64').write_text('AAAA')
+                elif mode=='receipt':(root/'receipt.json').write_text('{}')
+                else:
+                    p=root/'MANIFEST.json';m=json.loads(p.read_bytes());m['source_commit']='0'*40;p.write_text(json.dumps(m))
+                with self.subTest(mode=mode),self.assertRaises(ValueError):verify(root)
 if __name__=='__main__':unittest.main()
