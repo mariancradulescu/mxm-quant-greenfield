@@ -82,7 +82,7 @@ namespace Mxm.PortfolioNativeQuote {
    var account=engine.Run(feeds);
    return new {
     schema="mxm.csharp.native-exposed-quote-to-one-account.v1",
-    classification="ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
+    classification=exactExistingSource?"ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":"ARTIFICIAL_QUOTE_STREAM_ONLY",
     original_native_run_id=exactExistingSource?39660692230:0,
     original_source_is_independently_crypto_authenticated_here=false,
     provenance_digest_must_match_pinned_protected_bridge=true,
@@ -96,7 +96,7 @@ namespace Mxm.PortfolioNativeQuote {
     completed_bar_decision_events=completeBarDecisions,
     actual_symbols=1,
     multi_instrument_native_data_available=false,
-    synthetic_quote_events_injected=0,
+    synthetic_quote_events_injected=exactExistingSource?0:ticks.Count,
     modeled_parameters=new {
       strategy="Adaptive",bar_minutes=5,max_positions=1,
       units=1000,quote_to_eur=1m/1.10m,
@@ -118,14 +118,15 @@ namespace Mxm.PortfolioNativeQuote {
   }
   public static int Main(string[] args){
    try{
-    Need(args.Length==3&&args[0]=="--native-exposed-eurusd",
+    Need(args.Length==3&&
+      (args[0]=="--native-exposed-eurusd"||args[0]=="--artificial-fixture"),
       "EXPLICIT_NONOUTCOME_MODE_REQUIRED");
-    var data=Run(args[1]);
+    var data=Run(args[1],args[0]=="--native-exposed-eurusd");
     Directory.CreateDirectory(args[2]);
     var output=Path.Combine(args[2],"portfolio-exposed-quote-readback.json");
     File.WriteAllText(output,JsonSerializer.Serialize(data,new JsonSerializerOptions{
       WriteIndented=true,PropertyNamingPolicy=JsonNamingPolicy.SnakeCaseLower}));
-    Console.WriteLine("MXM_CSHARP_AUTHENTIC_EXPOSED_EURUSD_SINGLE_ACCOUNT_MODEL_READBACK_DONE_NO_PROVEN_EDGE");
+    Console.WriteLine("MXM_CSHARP_QUOTE_TO_SINGLE_ACCOUNT_MODEL_READBACK_DONE_NO_PROVEN_EDGE");
     return 0;
    }catch(Exception e){
     Console.Error.WriteLine("MXM_CSHARP_PORTFOLIO_NATIVE_READBACK_FAILED_"+e.GetType().Name);
