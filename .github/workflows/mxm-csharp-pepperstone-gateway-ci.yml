@@ -59,6 +59,7 @@ jobs:
           python3 -m unittest research_core_v4.laboratory.test_week35_breakout_development research_core_v4.laboratory.test_week35_remaining_families_development research_core_v4.laboratory.test_week35_online_ar1_development -v
           python3 -m research_core_v4.laboratory.verify_week35_breakout_result
           python3 -m research_core_v4.laboratory.verify_week35_remaining_result
+          python3 -m research_core_v4.laboratory.verify_week35_online_ar1_result
       - name: Verify unchanged-week gross/commission/mark attribution under no-key accounting fixtures
         run: python3 -m unittest research_core_v4.laboratory.test_csharp_week_account_attribution research_core_v4.laboratory.test_csharp_week_source_routing -v
       - name: Decode actual protobuf symbol shapes; missing defaults, cents and precise fee units
