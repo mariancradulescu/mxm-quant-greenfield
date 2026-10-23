@@ -112,8 +112,14 @@ jobs:
           entry=entries[0]
           cash=D(200)-sum(z['commission_eur'] for z in entries)
           assert cash==a['final_cash_eur']
-          last_bid=D('1.1018')
-          mtm=cash+(last_bid-entry['price'])*entry['units']/D('1.10')
+          last_bid=D('1.1018');last_ask=D('1.1019')
+          assert entry['direction'] in (-1,1)
+          mtm=cash+(last_bid-entry['price'] if entry['direction']==1
+                    else entry['price']-last_ask)*entry['units']/D('1.10')
+          print('INDEPENDENT_MTM_COMPARE',{'direction':entry['direction'],
+            'entry':str(entry['price']),'equity_python':str(mtm),
+            'equity_csharp':str(a['marked_equity_eur']),
+            'difference':str(mtm-a['marked_equity_eur'])})
           assert abs(mtm-a['marked_equity_eur'])<D('0.000001')
           assert a['used_margin_eur']==50 and a['free_margin_eur']==a['marked_equity_eur']-50
           assert not a['hard21_proven'] and not a['broker_fills_proven']
