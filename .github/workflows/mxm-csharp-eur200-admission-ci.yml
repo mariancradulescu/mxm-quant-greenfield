@@ -90,7 +90,7 @@ jobs:
                   bid=110000+i*20
                   for offset in (0,1000):
                       for side,raw in (('bid',bid),('ask',bid+10)):
-                          output.write(dumps({'t':start+i*300000+offset,'side':side,'raw':raw})+'\\n')
+                          output.write(dumps({'t':start+i*300000+offset,'side':side,'raw':raw})+'\n')
           PY
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release -- --artificial-fixture verification/mxm-artificial-native-quotes.ndjson verification/mxm-portfolio-native-fixture
           python3 - <<'PY'
@@ -126,7 +126,7 @@ jobs:
           rows=p.read_text().splitlines()
           raw=json.loads(rows[0]);raw['side']='future'
           rows[0]=json.dumps(raw)
-          Path('verification/mxm-invalid-native-quotes.ndjson').write_text('\\n'.join(rows)+'\\n')
+          Path('verification/mxm-invalid-native-quotes.ndjson').write_text('\n'.join(rows)+'\n')
           PY
           if dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --artificial-fixture verification/mxm-invalid-native-quotes.ndjson verification/mxm-portfolio-invalid; then
             echo 'Invalid native quote stream accepted'; exit 1
