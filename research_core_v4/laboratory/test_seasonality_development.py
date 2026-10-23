@@ -104,3 +104,25 @@ class SeasonalityDevelopmentTests(unittest.TestCase):
             fail=subprocess.run(['dotnet',str(assembly),'--development-stream'],
               input=''.join(json.dumps(p)+'\n' for p in contents),text=True,capture_output=True)
             self.assertNotEqual(fail.returncode,0)
+
+
+class SeasonalityResultPreservationTests(unittest.TestCase):
+    def test_exact_original_zip_cipher_receipt_and_failed_reference_gate(self):
+        from .verify_seasonality_result import verify
+        value=verify();self.assertEqual(value['disposition'],'REFERENCE_FRICTION_FAIL')
+        self.assertFalse(value['decrypted']);self.assertFalse(value['economic_rerun'])
+
+    def test_corrupt_part_receipt_source_and_false_promotion_refused(self):
+        import shutil
+        from .verify_seasonality_result import ROOT,verify
+        for mode in ('part','receipt','source','promotion'):
+            with tempfile.TemporaryDirectory() as folder:
+                root=Path(folder)/'evidence';shutil.copytree(ROOT,root)
+                if mode=='part':(root/'part-00.b64').write_text('AAAA')
+                elif mode=='receipt':(root/'receipt.json').write_text('{}')
+                else:
+                    p=root/'MANIFEST.json';m=json.loads(p.read_bytes())
+                    if mode=='source':m['source_commit']='0'*40
+                    else:m['economic_edge_confirmed']=True
+                    p.write_text(json.dumps(m))
+                with self.subTest(mode=mode),self.assertRaises(ValueError):verify(root)

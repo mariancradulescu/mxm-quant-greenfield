@@ -70,6 +70,7 @@ jobs:
         run: |
           dotnet run --project research_core_v4/laboratory/csharp/seasonality/MxmSeasonalityDevelopment.csproj -c Release -- --selftest
           python3 -m unittest research_core_v4.laboratory.test_seasonality_development -v
+          python3 -m research_core_v4.laboratory.verify_seasonality_result
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj -c Release -- --selftest

@@ -1,0 +1,25 @@
+# UTC-hour profile: reference friction failure, exact candidate stopped
+
+The one frozen `MXM_UTC_SEASONALITY_20261023_V1` program completed in native GitHub run [40018030252](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40018030252), job [120635049524](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40018030252/job/120635049524), **SUCCESS**, at canonical source `4c879c3148ee031041497930f4ef50df5c7e80df`. This is C# computation inside protected custody, not native cTrader platform/broker execution.
+
+**Disposition: `REFERENCE_FRICTION_FAIL`. Stop advancement of this exact fixed candidate.** From the immutable decision priority, this means completed support reached its >=1000 reference gate and pooled gross was positive, but mean gross did not strictly exceed the precommitted hypothetical5bps reference. This qualitative interpretation is entailed by the pinned code/receipt; exact metrics remain in the original encrypted result. It is not a claim that actual Pepperstone costs equal5bps, that historical after-cost PnL was measured, or that every later gate passed. The finding does not reject all intraday seasonal mechanisms.
+
+No threshold reduction, hour/ordinal winner selection, horizon rescue, new quote collection for this failed configuration or trading selector follows this outcome. Gross positivity alone does not justify promotion. The four friction deductions are dependent arithmetic references, not new models, authentic cost reconstruction or independent confirmation. Historical closures and adverse results remain unchanged.
+
+## Verified execution and original evidence
+
+All100 original source shards /3355389 M5 rows /1576 ordinals were verified. The entire Aug20–Sep16 source was already exposed DEVELOPMENT. The first source segment only warmed profiles; evaluation began Aug27. Completed hours were causally constructed from twelve original contiguous M5 bars, with no missing-bar interpolation. No CONFIRMATION / PROTECTED market interval was opened.
+
+The actual incremental C# outputs reconciled with the independent array-index Python Decimal reference for ALL1576 ordinals: training/ready/candidate/completed/censored/week counts, candidate-signal and episode signature hashes, gross sums and entry-source-segment totals. This checks independent implementations on the SAME evidence, not independent market replication.
+
+PR167 source head `1ff05a9e2c75dcad035ac8a7002cf74189f1b051` passed both required checks before merge. [Gateway CI40017763582](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40017763582/job/120634136185) compiled the actual C# screen and ran all9 artificial tests without a skipped compiled comparison; the other required check [40017763584](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40017763584) also passed. The artifact's native job also passed its pre-custody compiler/reference tests. No failing check or mismatch was waived.
+
+Original artifact `12529970530` is preserved exactly, not reproduced: ZIP385476bytes SHA256 `fa04235b0e4f9f45c919bd052b5b55c75daf3aec76577b17caef1b20b41f777d`; original encrypted full result384371bytes SHA256 `bbf02de22ec8359f453b5df26a2dfb667c2fecbd0db1b48408190a19d5d626e8`. Its original1213byte receipt is retained byte-for-byte. Twelve bounded Base64 parts reconstruct the original ZIP under `utc-seasonality-result-40018030252/`. Full private result commitment: `83e85724154968205892e6a2bb99e36903ad9cf985442fc7b4b860e4740d6b5d`. Immutable specification SHA256: `88be4ce14f6664104a548c3415fdbd2594821df123f8301ac41e54ab5a1b12ed`.
+
+Offline command `python3 -m research_core_v4.laboratory.verify_seasonality_result` validates original ZIP/cipher/receipt, source and program commitments, warmup/evaluation scope, full reconciliation counts, failed disposition and no-promotion fields. Negative tests reject corrupted parts/receipt, altered provenance and a false edge claim. No decryption or market rerun is needed for preservation checks. Original source ciphertext, full result and custody separation remain intact; Work did not receive the custody key or decrypt private results.
+
+## Product and economic status
+
+The learner is unqualified C# research inside the existing laboratory, with bounded120-sample memory. It has no new Robot selector or order path. This stage did not simulate one shared EUR200 account, dated fees/funding/margin, authentic bid/ask fills or HARD21; it cannot close those requirements. Native cTrader callbacks/crash/recovery acceptance and robust independent after-cost competitiveness remain open.
+
+One finite dependent DEVELOPMENT program and four arithmetic references were executed, with no unregistered rescue/followup, canonical V2/C033 mutation, new broker request, LIVE/DEMO order, Cloud activation, external provider or spending. Existing authorities, checkpoints, OWNER1807 and scientific separations remain unchanged. This closes a materially distinct candidate without spending on unjustified additional data. The full B–E objective remains unfinished.
