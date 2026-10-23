@@ -94,7 +94,9 @@ def captured_fee_reference(path, report):
     require(snapshot['schema'] == 'mxm.captured-native-symbol-terms.v1' and
             snapshot['symbol_id'] == 1 and not snapshot['historical_commission_proven'] and
             not snapshot['dated_historical_volume_rules_proven'], 'CAPTURED_TERMS_SCOPE')
-    if report['classification'] == 'PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED':
+    if report['classification'] in (
+        'PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED',
+        'PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED'):
         require(snapshot['source_crypto_authenticated_by_week_native_replay'] is True and
                 snapshot['source_run'] == 39917922508 and snapshot['source_code_sha'] ==
                 '120db3391ed1f4105120274b73a9259690eeeb64' and
