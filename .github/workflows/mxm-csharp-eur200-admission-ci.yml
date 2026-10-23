@@ -29,7 +29,15 @@ jobs:
           assert 'series.BarClosed+=OnPortfolioBarClosed' in src
           assert 'protected override void OnBar() { }' in src
           assert 'series.ClosePrices.Last(0)' in src
-          assert 'ApplyPortfolioDecision(instrument,instrumentName' in src
+          assert 'instrument.Tick+=OnPortfolioTick' in src
+          assert 'instrument.Tick-=OnPortfolioTick' in src
+          assert 'ApplyPortfolioDecision(args.Symbol,args.SymbolName' in src
+          bars=src[src.index('void OnPortfolioBarClosed'):src.index('void OnPortfolioTick')]
+          ticks=src[src.index('void OnPortfolioTick'):src.index('void ApplyPortfolioDecision')]
+          assert 'ApplyPortfolioDecision(' not in bars and '.Publish(' in bars
+          assert 'kernel.Reset();causalIntents[instrumentName].Clear()' in bars
+          assert ticks.index('queue.TryConsume(')<ticks.index('ApplyPortfolioDecision(')
+          assert 'new MxmCausalIntent()' in src
           assert 'Positions.FindAll(Label)' in src
           assert 'foreach(var accountPosition in Positions)' in src
           assert 'foreach(var brokerPendingOrder in PendingOrders)' in src

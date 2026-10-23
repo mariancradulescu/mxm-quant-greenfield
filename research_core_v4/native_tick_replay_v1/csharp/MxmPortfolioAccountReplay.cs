@@ -55,8 +55,7 @@ public sealed class MxmPortfolioAccountReplay {
   public DateTime LastBar;
   public DateTime LastQuote;
   public MxmQuote? Latest;
-  public int? Pending;
-  public DateTime PendingAt;
+  public readonly MxmCausalIntent Intent=new();
   public State(StrategyMode mode) {Kernel=new MxmDecisionKernel(mode);}
  }
  sealed record Holding(int Direction,decimal Entry,decimal Units,decimal Margin,
@@ -177,8 +176,8 @@ public sealed class MxmPortfolioAccountReplay {
     var signal=st.Kernel.OnCompletedBar(bar.Close);
     // Pending signals never skip execution to reuse an older quote.
     // Replaced intents before a tradable quote are NOT broker executions.
-    st.Pending=st.Kernel.CompletedBars>=6?signal:null;
-    st.PendingAt=bar.Utc;
+    st.Intent.Publish(signal,true,st.Kernel.CompletedBars,boundary,bar.Utc,parameters.BarMinutes);
+    if(st.Kernel.CompletedBars<6)st.Intent.Clear();
    } else if(e is MxmQuote quote) {
     Need(quote.Bid>0 && quote.Ask>=quote.Bid && quote.QuoteToEur>0 &&
       quote.ExecutableUnits>0 && quote.InitialMarginEur>0 &&
@@ -186,9 +185,8 @@ public sealed class MxmPortfolioAccountReplay {
       quote.EstimatedStopRiskEur>0,"INVALID_EXECUTION_QUOTE");
     Need(st!.LastQuote==default || quote.Utc>st.LastQuote,"DUPLICATE_OR_STALE_QUOTE");
     st.Latest=quote;st.LastQuote=quote.Utc;
-    if(st.Pending.HasValue && quote.Utc>st.PendingAt && !halted) {
-     int signal=st.Pending.Value;
-     st.Pending=null;
+    if(!halted && st.Intent.TryConsume(quote.Utc,out var intent)) {
+     int signal=intent!.Desired;
      if(open.TryGetValue(quote.Symbol,out var position)) {
       // This model deliberately matches the product's default ReverseOnly
       // policy, not unimplemented cTrader stop/horizon/neutral behavior.
