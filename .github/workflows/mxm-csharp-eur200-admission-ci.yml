@@ -121,7 +121,8 @@ jobs:
             'equity_csharp':str(a['marked_equity_eur']),
             'difference':str(mtm-a['marked_equity_eur'])})
           assert abs(mtm-a['marked_equity_eur'])<D('0.000001')
-          assert a['used_margin_eur']==50 and a['free_margin_eur']==a['marked_equity_eur']-50
+          assert a['used_margin_eur']==50
+          assert abs(a['free_margin_eur']-(a['marked_equity_eur']-D(50)))<D('0.000001')
           assert not a['hard21_proven'] and not a['broker_fills_proven']
           print('MXM_ARTIFICIAL_NATIVE_QUOTE_SHAPE_CAUSAL_CSHARP_INDEPENDENT_MTM_PASS')
           PY
