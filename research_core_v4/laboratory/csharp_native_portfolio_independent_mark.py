@@ -93,7 +93,16 @@ def captured_fee_reference(path, report):
     require(snapshot['schema'] == 'mxm.captured-native-symbol-terms.v1' and
             snapshot['symbol_id'] == 1 and not snapshot['historical_commission_proven'] and
             not snapshot['dated_historical_volume_rules_proven'], 'CAPTURED_TERMS_SCOPE')
-    if report['classification'] != 'ARTIFICIAL_QUOTE_STREAM_ONLY':
+    if report['classification'] == 'PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED':
+        require(snapshot['source_crypto_authenticated_by_week_native_replay'] is True and
+                snapshot['source_run'] == 39917922508 and snapshot['source_code_sha'] ==
+                '120db3391ed1f4105120274b73a9259690eeeb64' and
+                snapshot['source_private_sha256'] ==
+                '8dde8355c79f3f379bf14f1fd47a8ed5815646cafbcfc287762fb68c2c2e7b51' and
+                snapshot['source_ciphertext_sha256'] ==
+                '2403c74dfd81ab410f9b9c3bdabf4f3d5a5a4df0133cd0adc03933a364d539b6',
+                'CAPTURED_WEEK_NATIVE_BINDING')
+    elif report['classification'] != 'ARTIFICIAL_QUOTE_STREAM_ONLY':
         require(snapshot['source_crypto_authenticated_by_original_native_replay'] is True and
                 snapshot['source_run'] == 39660692230 and snapshot['source_ciphertext_sha256'] ==
                 'f1d828d94b304e2af1f310701f92dcb31db935a8db7fc3f8772087adf5499346',
@@ -137,11 +146,20 @@ def independent_terminal_mark(tick_file, report, captured_terms=None):
             "REPORT_SCHEMA")
     require(report["classification"] in (
         "ARTIFICIAL_QUOTE_STREAM_ONLY",
-        "ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED"
+        "ORIGINAL_PEPPERSTONE_QUOTES_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED",
+        "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED"
     ), "REPORT_CLASSIFICATION")
     book, source = authenticated_shape_quotes(tick_file)
     require(report["derived_stream_sha256"] == source["sha256"], "SOURCE_HASH")
     require(report["quote_events"] == source["source_events"], "EVENT_COUNT")
+    if report["classification"] == "PINNED_PEPPERSTONE_WEEK37_SINGLE_SYMBOL_MODELED_TERMS_DEVELOPMENT_EXPOSED":
+        require(source["source_events"] == 685474 and
+                report["original_native_run_id"] == 39917922508 and
+                report["authenticated_requested_iso_week_input"] == "2026-W37" and
+                not report["weekly_provider_pages_broker_execution_proof"] and
+                not report["one_full_iso_utc_week_proven"] and
+                all(1788739200000 <= ts < 1789344000000 for ts in book),
+                "WEEK_DEVELOPMENT_ONLY_INTERVAL")
     require(report["grouped_atomic_usable_snapshots"] == len(book),
             "ATOMIC_SNAPSHOT_COUNT")
     for field, label in (("ambiguous_same_side_ms_revisions_skipped", "ambiguous"),
