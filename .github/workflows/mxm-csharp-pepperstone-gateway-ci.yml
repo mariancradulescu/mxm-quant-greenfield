@@ -40,7 +40,8 @@ jobs:
           python3 -m research_core_v4.laboratory.cold_bridge_consumer_closure .sealed-chronology-source
       - name: Offline original encrypted archive restoration and corruption/provenance negatives
         run: |
-          python3 -m unittest research_core_v4.laboratory.test_durable_native_chronology -v
+          python3 -m unittest research_core_v4.laboratory.test_durable_native_chronology research_core_v4.laboratory.test_durable_week_chronology -v
+          python3 -m research_core_v4.laboratory.durable_week_chronology --out verification/week-chronology
           python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
       - name: Decode actual protobuf symbol shapes; missing defaults, cents and precise fee units
         run: python3 -m unittest research_core_v4.laboratory.test_captured_symbol_terms -v
