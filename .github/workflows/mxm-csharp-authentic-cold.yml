@@ -331,9 +331,13 @@ jobs:
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-captured-terms-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
           python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-week-csharp/independent-mark.json"
+          # Counterfactual using existing cTrader product default 12 pips, not W37-fitted.
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj -c Release --no-build -- --native-week-product-stop12-eurusd "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp-product-stop12" "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json"
+          python3 -m research_core_v4.laboratory.csharp_native_portfolio_independent_mark "${RUNNER_TEMP}/mxm-week-ticks.ndjson" "${RUNNER_TEMP}/mxm-week-csharp-product-stop12/portfolio-exposed-quote-readback.json" --captured-terms "${RUNNER_TEMP}/mxm-week-ticks.ndjson.symbol-terms.json" --out "${RUNNER_TEMP}/mxm-week-csharp-product-stop12/independent-mark.json"
       - name: Independently attribute unchanged full-week CSharp ledger gross, fees and open MTM
         run: |
           python3 -m research_core_v4.laboratory.csharp_week_account_attribution "${RUNNER_TEMP}/mxm-week-csharp/portfolio-exposed-quote-readback.json" --out "${RUNNER_TEMP}/mxm-week-csharp/attribution.json"
+          python3 -m research_core_v4.laboratory.csharp_week_account_attribution "${RUNNER_TEMP}/mxm-week-csharp-product-stop12/portfolio-exposed-quote-readback.json" --out "${RUNNER_TEMP}/mxm-week-csharp-product-stop12/attribution.json"
       - name: Produce nonpromotable development receipt and encrypt the full model under existing public recipient
         run: |
           python3 - <<'PY'
@@ -348,6 +352,9 @@ jobs:
           terms=json.loads((tmp/'mxm-week-ticks.ndjson.symbol-terms.json').read_bytes())
           from decimal import Decimal as D
           attribution=json.loads((tmp/'mxm-week-csharp/attribution.json').read_bytes())
+          product=json.loads((tmp/'mxm-week-csharp-product-stop12/portfolio-exposed-quote-readback.json').read_bytes())
+          product_mark=json.loads((tmp/'mxm-week-csharp-product-stop12/independent-mark.json').read_bytes())
+          product_account=json.loads((tmp/'mxm-week-csharp-product-stop12/attribution.json').read_bytes())
           need(bridge['source_run']==39917922508 and bridge['verified_bid_events']==342248 and
                bridge['verified_ask_events']==343226 and bridge['partition']=='DEVELOPMENT' and
                bridge['orders']==bridge['fills']==bridge['new_broker_requests']==0 and
@@ -395,8 +402,43 @@ jobs:
                    D(attribution['realized_gross_pnl_eur'])-
                    D(attribution['unrealized_liquidation_mark_pnl_eur']))<=D('0.000001'),
                'WEEK_ATTRIBUTION_SAME_ACCOUNT_AND_NO_PROMOTION')
+          need(product['classification']==
+               'PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED' and
+               product['modeled_parameters']['product_default_stop12'] is True and
+               product['modeled_parameters']['product_stop_pips']==12 and
+               D(str(product['modeled_parameters']['product_stop_distance_quote']))==D('0.0012') and
+               product['derived_stream_sha256']==bridge['derived_ticks_sha256'] and
+               product['captured_terms_sha256']==bridge['captured_symbol_terms_sha256'] and
+               product['original_native_run_id']==39917922508 and product['quote_events']==685474 and
+               product['account']['initial_capital_eur']==200 and
+               product['new_broker_requests']==product['live_orders']==0 and
+               not product['hard21_proven'] and not product['historical_broker_fills_proven'] and
+               not product['all_cost_components_verified'] and
+               not product['scientific_confirmation_opened'] and
+               not product['one_full_iso_utc_week_proven'] and
+               product_mark['market_source_sha256']==bridge['derived_ticks_sha256'] and
+               product_mark['product_default_stop12_replayed'] is True and
+               product_mark['source_native_quote_events']==685474 and
+               product_mark['ledger_entry_count']==product['account']['accepted_entries'] and
+               product_mark['ledger_exit_count']==product['account']['executed_exits'] and
+               D(product_mark['cash_abs_difference_eur'])<=D('0.000001') and
+               D(product_mark['equity_abs_difference_eur'])<=D('0.000001') and
+               not product_mark['hard21'] and not product_mark['independent_native_broker_execution'] and
+               product_account['model_variant']=='PRODUCT_DEFAULT_STOP12' and
+               not product_account['hard21_proven'] and not product_account['economic_edge_proven'] and
+               product_account['new_strategy_trials']==product_account['real_orders']==0 and
+               product_account['modeled_entries']==product['account']['accepted_entries'] and
+               product_account['modeled_exits']==product['account']['executed_exits'] and
+               product_account['closed_positions_by_exit_reason'].get('OBSERVED_QUOTE_STOP',0)==
+               product_mark['product_first_observed_stop_exits_independently_checked'] and
+               abs(D(product_account['final_modeled_bidask_equity_eur'])-
+                   D(str(product['account']['marked_equity_eur'])))<=D('0.000001'),
+               'WEEK_FIXED_PRODUCT_DEFAULT_STOP12_SAME_AUTHENTIC_ACCOUNT_NO_PROMOTION')
           full=encoded({'bridge':bridge,'terms':terms,'modeled_csharp':report,
-                        'independent_cash_and_mark':independent,'account_loss_attribution':attribution})
+                        'independent_cash_and_mark':independent,'account_loss_attribution':attribution,
+                        'modeled_csharp_fixed_product_stop12':product,
+                        'independent_fixed_product_stop12_cash_mark_and_first_stop':product_mark,
+                        'fixed_product_stop12_account_attribution':product_account})
           recipient=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
           need(public_spki_sha256(recipient)==FP,'WEEK_CSHARP_ORIGINAL_RECIPIENT')
           output=pathlib.Path('verification/csharp-week-development');output.mkdir(parents=True,exist_ok=True)
@@ -432,6 +474,26 @@ jobs:
             'independent_cash_abs_diff_eur':independent['cash_abs_difference_eur'],
             'independent_equity_abs_diff_eur':independent['equity_abs_difference_eur'],
             'modeled_output_cipher_sha256':bytes_digest(cipher.read_bytes()),
+            'product_default_stop12_development_only':{
+              'strategy':'Adaptive',
+              'risk_policy_source':'CTRADER_DEFAULT_STOP_LOSS_PIPS_12_CAPTURED_EURUSD_PIP_POSITION_4',
+              'stop_quote_distance':'0.0012',
+              'source_run':39917922508,'initial_eur':200,
+              'modeled_entries':product['account']['accepted_entries'],
+              'modeled_exits':product['account']['executed_exits'],
+              'modeled_observed_quote_stop_exits':product_mark['product_first_observed_stop_exits_independently_checked'],
+              'modeled_terminal_bidask_equity_eur':product['account']['marked_equity_eur'],
+              'modeled_max_drawdown_eur':product['account']['max_drawdown_eur'],
+              'modeled_net_marked_pnl_eur':product_account['net_modeled_marked_equity_pnl_eur'],
+              'modeled_gross_pnl_eur':product_account['realized_gross_pnl_eur'],
+              'modeled_commissions_eur':product_account['modeled_total_commissions_eur'],
+              'independent_cash_abs_diff_eur':product_mark['cash_abs_difference_eur'],
+              'independent_equity_abs_diff_eur':product_mark['equity_abs_difference_eur'],
+              'independent_historical_stop_execution_proven':False,
+              'historical_broker_costs_verified':False,
+              'real_orders':0,'real_hard21_proven':False,'economic_edge_proven':False,
+              'scientific_confirmation':False,'strategy_tuned_on_week37':False,
+              'same_original_development_week_not_independent_sample':True},
             'all_historical_costs_verified':False,'broker_fills_proven':False,
             'real_hard21_proven':False,'independent_confirmation':False,
             'economic_edge_proven':False,'real_orders':0,'new_broker_requests':0}

@@ -86,6 +86,18 @@ class AttributionTests(unittest.TestCase):
     self.assertFalse(r['unchanged_ledger_remains_negative_even_at_zero_commission'])
     self.assertEqual(r['static_zero_commission_same_ledger_pnl_eur'],'0.5')
     self.assertFalse(r['economic_edge_proven'])
+ def test_declared_product_default_stop12_accounting_without_promotion(self):
+    a=sample()
+    a['classification']='PINNED_PEPPERSTONE_WEEK37_PRODUCT_DEFAULT_STOP12_MODELED_TERMS_DEVELOPMENT_EXPOSED'
+    a['modeled_parameters']={'product_default_stop12':True,'product_stop_pips':12,
+      'product_stop_distance_quote':'0.0012'}
+    a['account']['ledger'][1]['reason']='OBSERVED_QUOTE_STOP'
+    result=attribute(a)
+    self.assertEqual(result['model_variant'],'PRODUCT_DEFAULT_STOP12')
+    self.assertEqual(result['closed_positions_by_exit_reason'],{'OBSERVED_QUOTE_STOP':1})
+    self.assertFalse(result['hard21_proven'])
+    a['modeled_parameters']['product_stop_distance_quote']='0.0013'
+    with self.assertRaisesRegex(ValueError,'PRODUCT_STOP12_NO_REFIT'):attribute(a)
  def test_outside_week_rejected(self):
     a=sample();a['account']['ledger'][0]['utc']='2026-09-14T00:00:00Z'
     with self.assertRaisesRegex(ValueError,'OUT_OF_WEEK_EVENT'):attribute(a)
