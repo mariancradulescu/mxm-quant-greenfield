@@ -17,7 +17,7 @@ jobs:
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
-          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net8.0/native_tick_replay_v1.algo
       - name: Validate same EUR stop-risk law on artificial threshold, existing risk, friction and no-stop cases
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --stop-risk-fixture

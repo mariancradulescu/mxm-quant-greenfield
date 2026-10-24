@@ -19,7 +19,24 @@ jobs:
         run: |
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
-          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+          test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net8.0/native_tick_replay_v1.algo
+      - name: Read actual net8 algo metadata in pinned vendor cTrader CLI without credentials or networking
+        run: |
+          python3 -m unittest research_core_v4.laboratory.test_ctrader_cli_metadata -v
+          curl --fail --silent --show-error --location --connect-timeout 20 --max-time 150 --max-filesize 120000000 https://getctrader.spotware.com/cli/homebrew/ctrader-cli-5.9.0-linux-x64.tar.gz --output "${RUNNER_TEMP}/mxm-ctrader-cli.tar.gz"
+          python3 -m research_core_v4.laboratory.install_pinned_ctrader_cli "${RUNNER_TEMP}/mxm-ctrader-cli.tar.gz" "${RUNNER_TEMP}/mxm-pinned-cli"
+          python3 -m research_core_v4.laboratory.ctrader_cli_metadata "${RUNNER_TEMP}/mxm-pinned-cli/ctrader-cli" research_core_v4/native_tick_replay_v1/csharp/bin/Release/net8.0/native_tick_replay_v1.algo verification/ctrader-cli-metadata
+      - name: Retain actual product package and original offline native CLI metadata proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ctrader-cli-offline-metadata-${{ github.run_id }}
+          path: |
+            verification/ctrader-cli-metadata
+            research_core_v4/native_tick_replay_v1/csharp/bin/Release/net8.0/native_tick_replay_v1.algo
+            research_core_v4/native_tick_replay_v1/csharp/bin/Release/net8.0/MxmReferenceBot.dll
+          if-no-files-found: error
+          retention-days: 90
       - name: Kill prepared and submitted entry workers; cold-process recovery must never replay unknown requests
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpointFixture.csproj -c Release
