@@ -8,7 +8,7 @@ PR165's `MxmOrderProtection.Halted` is in memory. A newly constructed Robot has 
 
 `MxmEntryCheckpoint` now saves and reads back a unique PENDING attempt before any opening broker call. The marker includes schema, account-scope commitment, random attempt identity, symbol, direction and source bar boundary. It is a safety checkpoint, not a restored trading signal, financial ledger, broker request ID or broker idempotency guarantee. It never authorizes a replay.
 
-At startup, only absence on first use or the exact READY value for this account scope may initialize the barrier. Any other value, including partial, corrupt, unknown-version or pending data, blocks startup without overwriting it. Startup also performs an explicit READY save/readback probe. No user parameter bypasses this barrier. The key is <=50 alphanumeric/space characters, scoped by the existing owner label, normalized broker name, account number and DEMO/LIVE identity; strategy, roster and timeframe changes cannot select a different key. A different broker/account identity or storage domain is a different scope; deletion/migration of storage is not detected by an external authority anchor.
+At startup, only absence on first use or the exact READY value for this account scope may initialize the barrier. Any other nonempty value, including partial, corrupt, unknown-version or pending data, blocks startup without overwriting it. Missing/empty storage is treated as first use: deletion or truncation to empty is not distinguishable from first installation without an external authority anchor, and is not certified by this change. Startup also performs an explicit READY save/readback probe. No user parameter bypasses this barrier. The key is <=50 alphanumeric/space characters, scoped by the existing owner label, normalized broker name, account number and DEMO/LIVE identity; strategy, roster and timeframe changes cannot select a different key. A different broker/account identity or storage domain is a different scope; deletion/migration of storage is not detected by an external authority anchor.
 
 The native adapter uses explicit `LocalStorageScope.Type`, with `Flush` on writes and `Reload` before reads, so the same algorithm/account can see its marker across local instance restarts. No new access rights are requested. All risk/margin/account snapshots follow the potentially slow before-call write. Immediately before calling the broker, the adapter rechecks the position fence and bar-intent expiry. A known local rejection before the call can clear the prepared marker; once the call is marked attempted, only the existing returned-result/book/stop reconciliation can complete it. An unsuccessful API result, even with no returned identity and an empty observed book, does not disarm the marker: this adapter has no separately proven durable negative acknowledgment. It therefore halts conservatively for reconciliation, including ordinary rejected calls, rather than infer that the request never reached the broker. This reduces availability until a trustworthy rejection/reconciliation route is qualified. An exception, unknown result, protection fault or inability to complete storage leaves admission halted. The marker is not cleared by Stop, a new instance, a changed strategy/roster or a successful defensive close.
 
@@ -31,3 +31,40 @@ Existing no-secret account CI compiles the actual `.algo`, executes the fixture,
 The account remains the real continuously shared broker account; no capital epoch or EUR200 balance reset is added. Robust after-cost economic advantage, effective HARD21 and complete native cTrader operational acceptance remain open. Existing authority/checkpoints, C033, canonical V2 and DEVELOPMENT / CONFIRMATION / PROTECTED separations remain unchanged. No external research provider, new data acquisition, LIVE/DEMO broker order or Cloud activation is authorized or performed here.
 
 Official technical references consulted 2026-10-24: [storage methods, error handling and Cloud limitations](https://help.ctrader.com/ctrader-algo/references/Localstorage/LocalStorage/), [scope, explicit flush/reload and backtesting behavior](https://help.ctrader.com/ctrader-algo/guides/local-storage/), [environment identity](https://help.ctrader.com/ctrader-algo/references/Application/Application/EnvironmentType/), [storage callback exception](https://help.ctrader.com/ctrader-algo/references/Localstorage/LocalStorageException/). Compile-time compatibility is checked against the existing pinned cTrader.Automate1.0.21 package; documentation alone is not account/platform acceptance.
+
+## Integrated execution and original proof
+
+PR169 final source `a974627f1f49b8cb7201a8804fe0ce71cc37be53` passed all5 required checks and merged as `8440e6b6ab411b47709ac3eb7e4307db35158350`. The actual `.algo` compiled successfully. [Account CI40070023180/job120801249253](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40070023180/job/120801249253) executed58 checks,4 hard kills and8 new OS processes. Source/test/integration tree equality was verified: `a13900b81ac3b03f66d4d70d87349638c18e1d99`. The proof's `source_sha` is the actual PR test merge `b24d179c9d3b647e5e664c0cd23c22714b6089ec`, not the PR head or final merge; its two parents are baseline2765efb and sourcea974627.
+
+| Artificial cut | Restart initialization | Simulated resubmissions |
+|---|---|---|
+| Prepared, before simulated broker call | Blocked | 0 |
+| Submitted, after simulated broker call | Blocked | 0 |
+| Halted after simulated broker call | Blocked | 0 |
+| Reconciled, READY persisted | Admitted | 0 |
+
+All actual broker orders and new scientific trials in this fixture are zero. It remains artificial file-store evidence; the proof itself explicitly sets native platform/storage reception, economic edge and HARD21 to false.
+
+Original CI artifact12550243741 is retained exactly under `entry-checkpoint-40070023180/`:495byte ZIP SHA256 `1cdfc51a0611e03ba91f4184e0249cd4ad14f935c7b38ba7992b98c94dc730fc`, single original965byte `proof.json` SHA256 `d312000c7ac102be2702b4b7fcf7dc42d341f8e015cc22d27ad308846f86b868`. `original.zip.b64` reconstructs the original archive; `proof.json` is the exact member copy, not a new execution or reconstructed result. `MANIFEST.json` records original provenance, required checks and limits. The bytes are wholly synthetic, with no market data, real account identity or custody key.
+
+Merge-triggered existing protected [chronology/account40070122457](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40070122457) and [lifecycle40070122454](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40070122454) both completed SUCCESS on8440e6b, including both bounded-source and W37 continuous-account jobs. These reuse existing preserved DEVELOPMENT evidence and registered programs, without new broker requests. They neither exercise this native LocalStorage adapter nor create independent economic evidence. Their market outputs are not repackaged here as new results.
+
+Offline preservation check (no SDK, decryption or market replay):
+
+```python
+import base64, hashlib, io, json, zipfile
+from pathlib import Path
+p = Path('docs/economic-development/20261024/entry-checkpoint-40070023180')
+raw = base64.b64decode((p/'original.zip.b64').read_text().strip(), validate=True)
+assert len(raw) == 495
+assert hashlib.sha256(raw).hexdigest() == '1cdfc51a0611e03ba91f4184e0249cd4ad14f935c7b38ba7992b98c94dc730fc'
+with zipfile.ZipFile(io.BytesIO(raw)) as z:
+    assert z.namelist() == ['proof.json']
+    proof = z.read('proof.json')
+assert proof == (p/'proof.json').read_bytes() and len(proof) == 965
+assert hashlib.sha256(proof).hexdigest() == 'd312000c7ac102be2702b4b7fcf7dc42d341f8e015cc22d27ad308846f86b868'
+v = json.loads(proof)
+assert v['checks'] == 58 and v['hard_kills'] == 4 and v['new_os_processes'] == 8
+assert all(x['resubmissions'] == 0 for x in v['cases'])
+assert not v['native_storage_durability_proven'] and v['broker_orders'] == 0
+```
