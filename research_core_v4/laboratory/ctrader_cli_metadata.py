@@ -46,7 +46,7 @@ def run(cli,artifact,dest):
     cli=Path(cli).resolve();artifact=Path(artifact).resolve();dest=Path(dest).resolve()
     need(cli.is_file() and artifact.is_file() and artifact.suffix=='.algo','EXACT_NATIVE_INPUTS')
     assembly=artifact.parent/'MxmReferenceBot.dll';raw=assembly.read_bytes()
-    need(b'.NETCoreApp,Version=v8.0' in raw and b'MxmReferenceProductBot' in raw,'ACTUAL_NET8_PRODUCT_ASSEMBLY')
+    need(b'.NETCoreApp,Version=v6.0' in raw and b'MxmReferenceProductBot' in raw,'ACTUAL_CANONICAL_NET6_PRODUCT_ASSEMBLY')
     dest.mkdir(parents=True,exist_ok=False)
     with tempfile.TemporaryDirectory(prefix='mxm-cli-offline-') as tmp:
         home=Path(tmp);bad=home/'malformed.algo';bad.write_text('This is deliberately not an algo package.\n')
@@ -65,7 +65,7 @@ def run(cli,artifact,dest):
           'vendor_formula_commit':'42a7eacb26a4c28b84df39ca7e5689e4b909fa2c',
           'vendor_reference_commit':'12c6042077b6e6dd6bc0deda8fabd1be724d3059',
           'artifact_name':artifact.name,'artifact_bytes':artifact.stat().st_size,'artifact_sha256':digest(artifact.read_bytes()),
-          'product_assembly_sha256':digest(raw),'product_target_framework':'net8.0',
+          'product_assembly_sha256':digest(raw),'product_target_framework':'net6.0',
           'metadata_stdout_sha256':digest((dest/'metadata.stdout.txt').read_bytes()),
           'native_metadata_returncode':valid['returncode'],'native_malformed_returncode':malformed['returncode'],
           'parameters_verified':parameters,'isolation':[{k:v for k,v in z.items() if k not in ('stdout','stderr','command')}
