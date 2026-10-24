@@ -59,6 +59,9 @@ def check_adapter():
     record=bot[bot.index('bool RecordProtectedEntry'):bot.index('void ReportRecordedWeeks')]
     need('position.Id,position.SymbolName' in record and 'position.EntryTime' in record and
          '(decimal)position.VolumeInUnits' in record,'BROKER_IDENTITY_NOT_SIGNAL_OR_CLOCK')
+    native_read=bot[bot.index('string? ReadConfirmedEntries'):bot.index('void WriteConfirmedEntries')]
+    need('CheckEntryStorage();return MxmConfirmedEntryLedger.NormalizeNativeRead(value);' in native_read,
+         'NATIVE_EMPTY_KEY_CONTRACT_AFTER_FAULT_CHECK')
     need('confirmedEntries?.Halt();' in bot and 'LocalStorage.Flush(LocalStorageScope.Type)' in bot and
          'LocalStorage.Reload(LocalStorageScope.Type)' in bot,'DURABLE_FAULT_POISON')
     need('MxmConfirmedEntryLedger.cs' in (BASE/'MxmReferenceBot.csproj').read_text(),'ACTUAL_PRODUCT_INCLUDES_LEDGER')

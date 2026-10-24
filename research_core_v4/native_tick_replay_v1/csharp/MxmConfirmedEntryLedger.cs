@@ -34,6 +34,9 @@ public sealed class MxmConfirmedEntryLedger {
  }
  static string Hash(string value)=>Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
  static bool Utc(DateTime time)=>time.Kind==DateTimeKind.Utc && time!=default;
+ // cTrader GetString documents an empty string for an absent key.
+ // Translate only at the native adapter boundary; whitespace/malformed values remain corrupt.
+ public static string? NormalizeNativeRead(string? value)=>string.IsNullOrEmpty(value)?null:value;
  public void Halt()=>Halted=true;
  bool Fail(){Halt();return false;}
  static string Encode(Payload value){

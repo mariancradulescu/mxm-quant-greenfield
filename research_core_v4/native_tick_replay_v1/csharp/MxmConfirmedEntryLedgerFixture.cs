@@ -36,6 +36,11 @@ static class ConfirmedEntryLedgerFixture {
   var store=new Store();var ledger=Ledger(store);Need(ledger.Initialize(Start),"FIRST_USE");
   Need(ledger.StorageKey.Length<=50 && ledger.StorageKey.All(c=>char.IsAsciiLetterOrDigit(c)||c==' '),"NATIVE_KEY");
   Need(ledger.StorageKey!=new MxmEntryCheckpoint(new Store(),Scope).StorageKey,"SEPARATE_BARRIER_KEY");
+  var nativeMissing=new Store{Value=""};
+  var nativeLedger=Ledger(new MxmDelegateEntryStore(
+   ()=>MxmConfirmedEntryLedger.NormalizeNativeRead(nativeMissing.Read()),nativeMissing.Write));
+  Need(nativeLedger.Initialize(Start) && nativeMissing.Value!.Length>0,"DOCUMENTED_NATIVE_EMPTY_KEY_INITIALIZES");
+  Need(MxmConfirmedEntryLedger.NormalizeNativeRead(" ")==" ","NATIVE_WHITESPACE_REMAINS_CORRUPT");
   DateTime sunday=Start.AddDays(7).AddSeconds(-1),monday=Start.AddDays(7);
   for(int id=1;id<=21;id++)Need(ledger.RecordConfirmed(Entry(id,sunday,monday)),"BROKER_ENTRY_TIME_WEEK");
   Need(ledger.RecordConfirmed(Entry(22,monday)),"NEXT_WEEK_ENTRY");

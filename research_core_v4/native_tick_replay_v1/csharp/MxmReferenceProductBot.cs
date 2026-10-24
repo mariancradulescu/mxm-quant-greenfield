@@ -427,7 +427,7 @@ public sealed class MxmReferenceProductBot : Robot {
  string? ReadConfirmedEntries() {
   CheckEntryStorage();LocalStorage.Reload(LocalStorageScope.Type);CheckEntryStorage();
   string? value=LocalStorage.GetString(confirmedEntries!.StorageKey,LocalStorageScope.Type);
-  CheckEntryStorage();return value;
+  CheckEntryStorage();return MxmConfirmedEntryLedger.NormalizeNativeRead(value);
  }
  void WriteConfirmedEntries(string value) {
   CheckEntryStorage();LocalStorage.SetString(confirmedEntries!.StorageKey,value,LocalStorageScope.Type);
