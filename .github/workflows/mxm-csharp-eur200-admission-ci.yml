@@ -20,6 +20,40 @@ jobs:
           dotnet build research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release
           dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
           test -s research_core_v4/native_tick_replay_v1/csharp/bin/Release/net6.0/native_tick_replay_v1.algo
+      - name: Kill prepared and submitted entry workers; cold-process recovery must never replay unknown requests
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpointFixture.csproj -c Release
+          python3 - <<'PYGUARD'
+          import json
+          from pathlib import Path
+          bot=Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          start=bot[bot.index('protected override void OnStart'):bot.index('protected override void OnBar')]
+          assert start.index('entryCheckpoint.Initialize()')<start.index('series.BarClosed+=')
+          assert 'Application.EnvironmentType!=cAlgo.API.EnvironmentType.Desktop' in start
+          apply=bot[bot.index('void ApplyPortfolioDecision'):bot.index('string? ReadEntryCheckpoint')]
+          assert apply.index('entryCheckpoint.Prepare(')<apply.index('MxmAccountIsolation.Check(')<apply.index('MxmCapitalAdmission.Check(')
+          assert apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('brokerAttempted=true')<apply.index('ExecuteMarketOrder(')
+          assert apply.index('orderProtection.Reconcile(')<apply.index('entryCheckpoint.CompleteReconciled()')
+          assert 'finalClock>=currentOpenTime.AddMinutes(BarMinutes)' in apply
+          assert '!brokerAttempted && !orderProtection.Halted' in apply
+          assert 'LocalStorage.Flush(LocalStorageScope.Type)' in bot and 'LocalStorage.Reload(LocalStorageScope.Type)' in bot
+          assert 'protected override void OnException(Exception exception)' in bot
+          assert 'entryStorageFault=true;entryCheckpoint?.Halt();orderProtection.HaltUnknown();' in bot
+          assert 'entryCheckpoint?.Halt(); // Never clear' in bot
+          proof=json.loads(Path('verification/entry-checkpoint/proof.json').read_text())
+          assert proof['hard_kills']==4 and proof['new_os_processes']==8 and proof['checks']>=40
+          assert all(x['resubmissions']==0 for x in proof['cases'])
+          assert not proof['native_ctrader_execution'] and not proof['native_storage_durability_proven']
+          assert proof['broker_orders']==proof['new_scientific_trials']==0
+          print('MXM_NATIVE_ADAPTER_CHECKPOINT_BEFORE_BROKER_AND_FAULT_WIRING_PASS_NATIVE_STORAGE_RECEPTION_OPEN')
+          PYGUARD
+      - name: Retain artificial process-recovery proof without market data or secrets
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: entry-checkpoint-artificial-${{ github.run_id }}
+          path: verification/entry-checkpoint/proof.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Validate one serial multi-symbol CSharp portfolio on two artificial streams
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioFixture.csproj -c Release
