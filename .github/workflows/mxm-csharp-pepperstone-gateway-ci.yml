@@ -71,6 +71,10 @@ jobs:
           dotnet run --project research_core_v4/laboratory/csharp/seasonality/MxmSeasonalityDevelopment.csproj -c Release -- --selftest
           python3 -m unittest research_core_v4.laboratory.test_seasonality_development -v
           python3 -m research_core_v4.laboratory.verify_seasonality_result
+      - name: Compile one delayed-target path-state learner and independently verify all artificial target/forecast ledgers
+        run: |
+          dotnet run --project research_core_v4/laboratory/csharp/pathstate/MxmPathStateDevelopment.csproj -c Release -- --selftest
+          python3 -m unittest research_core_v4.laboratory.test_pathstate_development -v
       - name: Verify preserved native vendor metadata and reject false operational promotion without running the CLI
         run: |
           python3 -m unittest research_core_v4.laboratory.test_native_cli_evidence research_core_v4.laboratory.test_ctrader_cli_metadata -v
