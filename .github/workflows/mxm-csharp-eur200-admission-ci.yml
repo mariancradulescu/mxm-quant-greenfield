@@ -71,6 +71,17 @@ jobs:
           path: verification/entry-checkpoint/proof.json
           if-no-files-found: error
           retention-days: 90
+      - name: Persist confirmed entry lower bounds before READY; independently check ISO weeks and cold recovery
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmConfirmedEntryLedgerFixture.csproj -c Release
+          python3 -m research_core_v4.laboratory.confirmed_entry_ledger_checks verification/confirmed-entry-ledger/proof.json
+      - name: Retain original artificial confirmed-entry ledger proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: confirmed-entry-ledger-artificial-${{ github.run_id }}
+          path: verification/confirmed-entry-ledger/proof.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Validate one serial multi-symbol CSharp portfolio on two artificial streams
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioFixture.csproj -c Release

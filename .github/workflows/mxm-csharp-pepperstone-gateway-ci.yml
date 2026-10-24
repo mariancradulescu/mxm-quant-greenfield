@@ -75,6 +75,8 @@ jobs:
         run: |
           python3 -m unittest research_core_v4.laboratory.test_native_cli_evidence research_core_v4.laboratory.test_ctrader_cli_metadata -v
           python3 -m research_core_v4.laboratory.verify_native_cli_metadata
+          python3 -m unittest research_core_v4.laboratory.test_confirmed_entry_ledger_evidence -v
+          python3 -m research_core_v4.laboratory.verify_confirmed_entry_ledger_result
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj -c Release -- --selftest
