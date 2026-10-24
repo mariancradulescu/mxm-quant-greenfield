@@ -23,6 +23,7 @@ public sealed class MxmReferenceProductBot : Robot {
  bool applyingDecision;
  readonly MxmOrderProtection orderProtection=new();
  MxmEntryCheckpoint? entryCheckpoint;
+ MxmConfirmedEntryLedger? confirmedEntries;
  bool entryStorageFault;
  MxmPortfolioSequencer? sequencer;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
@@ -100,6 +101,14 @@ public sealed class MxmReferenceProductBot : Robot {
     orderProtection.HaltUnknown();
     Print("MXM_UNRESOLVED_ENTRY_CHECKPOINT_OR_STORAGE_FAULT_SAFE_STOP");Stop();return;
    }
+   IMxmEntryCheckpointStore fillStore=IsBacktesting?new MxmMemoryEntryStore():
+    new MxmDelegateEntryStore(ReadConfirmedEntries,WriteConfirmedEntries);
+   confirmedEntries=new MxmConfirmedEntryLedger(fillStore,scope);
+   if(!confirmedEntries.Initialize(BrokerClock())) {
+    orderProtection.HaltUnknown();entryCheckpoint.Halt();
+    Print("MXM_CONFIRMED_ENTRY_LEDGER_UNVERIFIED_SAFE_STOP");Stop();return;
+   }
+   ReportRecordedWeeks();
   }catch(Exception e) {
    orderProtection.HaltUnknown();
    Print("MXM_ENTRY_CHECKPOINT_STARTUP_SAFE_STOP_"+e.GetType().Name);Stop();return;
@@ -266,7 +275,8 @@ public sealed class MxmReferenceProductBot : Robot {
    lease=continuation!;
   }
   if(desired==0)return;
-  if(entryCheckpoint==null || !entryCheckpoint.Prepare(instrumentName,desired>0?1:-1,currentOpenTime)) {
+  if(confirmedEntries==null || !confirmedEntries.VerifyCurrent(BrokerClock()) ||
+     entryCheckpoint==null || !entryCheckpoint.Prepare(instrumentName,desired>0?1:-1,currentOpenTime)) {
    orderProtection.HaltUnknown();LatchProtectionHalt();return;
   }
   bool brokerAttempted=false;
@@ -391,6 +401,11 @@ public sealed class MxmReferenceProductBot : Robot {
    // Keep PENDING rather than assume the request cannot have reached the broker.
    orderProtection.HaltUnknown();LatchProtectionHalt();
    Print("MXM_UNSUCCESSFUL_ORDER_REQUIRES_RECONCILIATION_NO_CHECKPOINT_CLEAR");
+  }else if(!RecordProtectedEntry(placed.Position!)) {
+   // Keep the pre-call pending marker if a confirmed entry cannot be saved.
+   // No successful READY transition may outrun this durable lower-bound ledger.
+   orderProtection.HaltUnknown();LatchProtectionHalt();
+   Print("MXM_CONFIRMED_ENTRY_PERSISTENCE_FAILED_PENDING_RETAINED");
   }else if(!entryCheckpoint.CompleteReconciled()) {
    orderProtection.HaltUnknown();LatchProtectionHalt();
   }
@@ -409,6 +424,28 @@ public sealed class MxmReferenceProductBot : Robot {
   CheckEntryStorage();LocalStorage.SetString(entryCheckpoint!.StorageKey,value,LocalStorageScope.Type);
   CheckEntryStorage();LocalStorage.Flush(LocalStorageScope.Type);CheckEntryStorage();
  }
+ string? ReadConfirmedEntries() {
+  CheckEntryStorage();LocalStorage.Reload(LocalStorageScope.Type);CheckEntryStorage();
+  string? value=LocalStorage.GetString(confirmedEntries!.StorageKey,LocalStorageScope.Type);
+  CheckEntryStorage();return value;
+ }
+ void WriteConfirmedEntries(string value) {
+  CheckEntryStorage();LocalStorage.SetString(confirmedEntries!.StorageKey,value,LocalStorageScope.Type);
+  CheckEntryStorage();LocalStorage.Flush(LocalStorageScope.Type);CheckEntryStorage();
+ }
+ bool RecordProtectedEntry(Position position) {
+  if(confirmedEntries==null || !confirmedEntries.RecordConfirmed(new MxmConfirmedEntry(
+    position.Id,position.SymbolName,position.TradeType==TradeType.Buy?1:-1,
+    (decimal)position.VolumeInUnits,DateTime.SpecifyKind(position.EntryTime,DateTimeKind.Utc),BrokerClock())))return false;
+  ReportRecordedWeeks();return !confirmedEntries.Halted && !entryStorageFault;
+ }
+ void ReportRecordedWeeks() {
+  if(confirmedEntries==null)return;
+  // Calendar completeness never asserts broker-history coverage or native reception.
+  // Backtesting uses a fresh isolated memory ledger, never a real execution claim.
+  Print("MXM_RECORDED_PROTECTED_ENTRY_LOWER_BOUND simulation={0} weeks={1}",IsBacktesting,
+   System.Text.Json.JsonSerializer.Serialize(confirmedEntries.Snapshot(BrokerClock())));
+ }
  void CheckEntryStorage() {
   if(entryStorageFault)throw new InvalidOperationException("ENTRY_STORAGE_CALLBACK_FAULT");
  }
@@ -417,11 +454,13 @@ public sealed class MxmReferenceProductBot : Robot {
   // Poison first; a matching memory echo must never erase this fault.
   if(entryStorageFault)return; // Avoid recursive failure while stopping an already poisoned instance.
   entryStorageFault=true;entryCheckpoint?.Halt();orderProtection.HaltUnknown();
+  confirmedEntries?.Halt();
   foreach(var intent in causalIntents.Values)intent.Clear();
   Print("MXM_UNHANDLED_EXCEPTION_ENTRY_CHECKPOINT_SAFE_STOP_"+exception.GetType().Name);Stop();
  }
  void LatchProtectionHalt() {
   entryCheckpoint?.Halt(); // Never clear the durable unresolved attempt, even after flattening.
+  confirmedEntries?.Halt();
   foreach(var intent in causalIntents.Values)intent.Clear();
   // Halt stays latched even after successful flattening. No new entry or retry.
   // Timer retries only the attributable returned position, never foreign exposure.
