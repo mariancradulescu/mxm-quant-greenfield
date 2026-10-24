@@ -1,13 +1,17 @@
 import copy,json,shutil,tempfile,unittest
 from pathlib import Path
 from .confirmed_entry_ledger_checks import check
-from .verify_confirmed_entry_ledger_result import verify,ARCHIVE
+from .verify_confirmed_entry_ledger_result import verify,ARCHIVE,FINAL_ARCHIVE
 class OriginalConfirmedEntryEvidenceTests(unittest.TestCase):
     def test_exact_originals_validate_without_native_execution(self):
         result=verify()
         self.assertEqual(result['original_archives_verified'],2)
         self.assertFalse(result['hard21_proven']);self.assertFalse(result['cli_executed'])
         self.assertFalse(result['native_storage_reception'])
+    def test_native_missing_key_correction_has_its_own_original_evidence(self):
+        result=verify(FINAL_ARCHIVE)
+        self.assertEqual(result['original_archives_verified'],2)
+        self.assertFalse(result['hard21_proven']);self.assertFalse(result['native_storage_reception'])
     def test_corruption_false_promotion_and_provenance_fail(self):
         for mode in ('part','proof','source','promotion'):
             with self.subTest(mode=mode),tempfile.TemporaryDirectory() as tmp:
