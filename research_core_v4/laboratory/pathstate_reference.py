@@ -7,7 +7,9 @@ START='2026-08-20T00:00:00Z';END='2026-09-17T00:00:00Z';EVALUATE='2026-08-27T00:
 def need(ok,why):
     if not ok:raise ValueError('MXM_PATH_STATE_REFERENCE_'+why)
 def digest(lines):return hashlib.sha256(''.join(lines).encode()).hexdigest()
-def rounded(value):return value.quantize(D('.00000001'),rounding=ROUND_HALF_UP)
+def rounded(value):
+    result=value.quantize(D('.00000001'),rounding=ROUND_HALF_UP)
+    return result.copy_abs() if result==0 else result
 def reference(rows,trace=False):
     clocks=[];opens=[];closes=[];runs=[];run=0
     for row in rows:

@@ -11,7 +11,7 @@ from . import m5_authentic_envelope as env
 from .m5_causal_gross_development import load_market_geometry,parse_rows
 ROOT=env.ROOT
 SPEC=ROOT/'research_core_v4/laboratory/PATHSTATE_DEVELOPMENT_V1.json'
-SPEC_SHA='04b8a31d561f25d2d1366342b646ece176831770d363565749667194fb7d5b46'
+SPEC_SHA='e9ff40a442915698daf4912baf43eb432dc9ee6313e102748f1c2fcb42f229a8'
 PROJECT='research_core_v4/laboratory/csharp/pathstate/MxmPathStateDevelopment.csproj'
 WORKFLOW='.github/workflows/mxm-pathstate-development.yml'
 def validate_spec(active=False):

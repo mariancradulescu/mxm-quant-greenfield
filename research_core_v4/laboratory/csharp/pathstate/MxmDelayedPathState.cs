@@ -44,6 +44,7 @@ public sealed class MxmDelayedPathState {
    if(openUtc==label.Exit){
     if(label.Price==null)throw new InvalidOperationException("MISSING_TARGET_ENTRY");
     decimal y=Math.Round((open-label.Price.Value)/label.Price.Value*10000m,8,MidpointRounding.AwayFromZero);
+    if(y==0)y=0m; // Canonical unsigned zero in cross-language signature formatting.
     var cell=labels[label.Cell];cell.Enqueue(y);if(cell.Count>Window)cell.Dequeue();
     TrainingLabels++;LastMatured=new(label.Origin,label.Cell,y);
    }
@@ -63,6 +64,7 @@ public sealed class MxmDelayedPathState {
   if(memory.Count<Minimum)return 0;
   Ready=true;ReadyForecasts++;
   ForecastBps=Math.Round(memory.Sum()/(memory.Count+Prior),8,MidpointRounding.AwayFromZero);
+  if(ForecastBps==0)ForecastBps=0m;
   return ForecastBps>ThresholdBps?1:ForecastBps<-ThresholdBps?-1:0;
  }
 }

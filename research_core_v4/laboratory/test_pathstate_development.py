@@ -2,7 +2,7 @@ import copy,datetime as dt,json,os,subprocess,tempfile,unittest
 from decimal import Decimal as D
 from pathlib import Path
 from unittest.mock import patch
-from .pathstate_reference import reference,reconcile
+from .pathstate_reference import reference,reconcile,rounded
 from .pathstate_development import ROOT,SPEC,validate_spec,context,first_native_run,decide
 
 def rows(n=2880,direction=1):
@@ -44,6 +44,7 @@ class PathStateDevelopmentTests(unittest.TestCase):
         self.assertGreaterEqual(damaged['Censored'],1)
         self.assertEqual(reference(rows(17))['TrainingLabels'],0)
     def test_zero_returns_are_not_bearish_states(self):
+        self.assertEqual(format(rounded(D("-.000000001")),".8f"),"0.00000000")
         a=rows(100)
         for row in a:row.update(open='100',high='101',low='99',close='100')
         v=reference(a);self.assertEqual(v['TrainingLabels'],0);self.assertEqual(v['ReadyForecasts'],0)
