@@ -94,6 +94,13 @@ static class EntryCheckpointFixture {
   Need(!conflict.CompleteReconciled() && changed.Value=="OTHER_ATTEMPT","NEVER_CLEAR_CHANGED_CHECKPOINT");
   var resolved=new Store();var success=Guard(resolved);Need(success.Initialize() && success.Prepare("EURUSD",1,Boundary) &&
    success.MarkSubmitted() && success.CompleteReconciled() && Guard(resolved).Initialize(),"RECONCILED_READY_CAN_RESTART");
+  var declined=new Store();var uncertain=Guard(declined);
+  Need(uncertain.Initialize() && uncertain.Prepare("EURUSD",1,Boundary) && uncertain.MarkSubmitted(),"UNSUCCESSFUL_BASELINE");
+  var negative=new MxmOrderProtection().Reconcile(false,null,"OWNER","EURUSD",1,1000,12,.0001,.00001,
+   Array.Empty<long>(),Array.Empty<MxmProtectionPosition>());
+  Need(!negative.Accepted && !negative.Halt,"OLD_FALSE_EMPTY_BOOK_IS_NOT_POSITIVE_FILL_ACK");
+  uncertain.Halt();Need(!uncertain.CompleteReconciled() && !Guard(declined).Initialize(),
+   "UNSUCCESSFUL_RESULT_CANNOT_DISARM_DURABLE_PENDING");
   var flat=new Store();var stopped=Guard(flat);Need(stopped.Initialize() && stopped.Prepare("EURUSD",1,Boundary) &&
    stopped.MarkSubmitted(),"HALT_BASELINE");stopped.Halt();
   Need(!stopped.CompleteReconciled() && !Guard(flat).Initialize(),"FLAT_BOOK_OR_HALT_CANNOT_CLEAR_UNKNOWN");

@@ -386,6 +386,11 @@ public sealed class MxmReferenceProductBot : Robot {
   Print("MXM_ORDER_PROTECTION_"+protection.Reason);
   if(protection.Halt) {
    LatchProtectionHalt();
+  }else if(!protection.Accepted) {
+   // An unsuccessful API result plus an empty book is not a durable negative ACK.
+   // Keep PENDING rather than assume the request cannot have reached the broker.
+   orderProtection.HaltUnknown();LatchProtectionHalt();
+   Print("MXM_UNSUCCESSFUL_ORDER_REQUIRES_RECONCILIATION_NO_CHECKPOINT_CLEAR");
   }else if(!entryCheckpoint.CompleteReconciled()) {
    orderProtection.HaltUnknown();LatchProtectionHalt();
   }
