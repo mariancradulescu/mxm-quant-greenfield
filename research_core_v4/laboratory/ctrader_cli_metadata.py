@@ -8,13 +8,18 @@ TARBALL_SHA='da0f5fb0c58980be9143fafca9839de784084b6e323321d9e03e5c3e64bec562'
 def need(ok,why):
     if not ok:raise ValueError('MXM_NATIVE_CLI_METADATA_'+why)
 def digest(raw):return hashlib.sha256(raw).hexdigest()
+def no_external_routes(text):
+    rows=[line.split() for line in text.splitlines() if line.strip()]
+    entries=[row for row in rows if row[0]!='Iface']
+    need(all(len(row)>=8 for row in entries),'ROUTE_TABLE_SCHEMA')
+    need(not entries,'NO_EXTERNAL_IPV4_ROUTES_'+repr(entries))
+    return 0
 def worker(cli,artifact,kind,host_namespace,expected_uid):
     namespace=os.readlink('/proc/self/ns/net')
     status=Path('/proc/self/status').read_text()
     need(namespace!=host_namespace and os.getuid()==int(expected_uid)!=0,'NETWORK_NAMESPACE_AND_NONROOT')
     need(re.search(r'^NoNewPrivs:\s+1$',status,re.M) and re.search(r'^CapEff:\s+0+$',status,re.M) and re.search(r'^CapBnd:\s+0+$',status,re.M),'DROPPED_PRIVILEGES')
-    routes=Path('/proc/net/route').read_text().splitlines()
-    need(len(routes)==1,'NO_EXTERNAL_IPV4_ROUTES')
+    no_external_routes(Path('/proc/net/route').read_text())
     need(set(os.environ)=={'HOME','PATH','LANG'},'CREDENTIAL_FREE_ENVIRONMENT')
     for fd in (0,1,2):need(not stat.S_ISSOCK(os.fstat(fd).st_mode),'NO_INHERITED_NETWORK_STDIO')
     need(kind in ('version','metadata','malformed'),'COMMAND_ALLOWLIST')
