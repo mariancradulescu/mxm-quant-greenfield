@@ -6,7 +6,7 @@ using cAlgo.API.Internals;
 using Mxm.Replay;
 
 namespace cAlgo.Robots {
-/// <summary>Source-compatible cloud-facing adapter; never activated by the CI workflow.
+/// <summary>Native account adapter; never activated by CI. Durable entry barrier requires Desktop.
 /// OnBarClosed uses the exact same C# decision state as the machine-side reference.</summary>
 [Robot(TimeZone=TimeZones.UTC,AccessRights=AccessRights.None)]
 public sealed class MxmReferenceProductBot : Robot {
@@ -22,6 +22,8 @@ public sealed class MxmReferenceProductBot : Robot {
  readonly Dictionary<string,MxmBrokerIntentFence> brokerIntentFences=new(StringComparer.OrdinalIgnoreCase);
  bool applyingDecision;
  readonly MxmOrderProtection orderProtection=new();
+ MxmEntryCheckpoint? entryCheckpoint;
+ bool entryStorageFault;
  MxmPortfolioSequencer? sequencer;
  [Parameter("Enable DEMO Trading",DefaultValue=false)]
  public bool EnableDemoTrading {get;set;}
@@ -84,6 +86,23 @@ public sealed class MxmReferenceProductBot : Robot {
     Print("MXM_UNKNOWN_OR_AMBIGUOUS_PORTFOLIO_SYMBOL_SAFE_HOLD_"+name);Stop();return;
    }
    resolved.Add(instrument.Name);
+  }
+  try {
+   if(!IsBacktesting && Application.EnvironmentType!=cAlgo.API.EnvironmentType.Desktop) {
+    Print("MXM_ENTRY_PERSISTENCE_ENVIRONMENT_UNQUALIFIED_SAFE_STOP");Stop();return;
+   }
+   string scope=IsBacktesting?"ISOLATED_BACKTEST":MxmEntryCheckpoint.AccountScope(
+    Account.BrokerName,Account.Number,Account.IsLive);
+   IMxmEntryCheckpointStore store=IsBacktesting?new MxmMemoryEntryStore():
+    new MxmDelegateEntryStore(ReadEntryCheckpoint,WriteEntryCheckpoint);
+   entryCheckpoint=new MxmEntryCheckpoint(store,scope);
+   if(!entryCheckpoint.Initialize()) {
+    orderProtection.HaltUnknown();
+    Print("MXM_UNRESOLVED_ENTRY_CHECKPOINT_OR_STORAGE_FAULT_SAFE_STOP");Stop();return;
+   }
+  }catch(Exception e) {
+   orderProtection.HaltUnknown();
+   Print("MXM_ENTRY_CHECKPOINT_STARTUP_SAFE_STOP_"+e.GetType().Name);Stop();return;
   }
   sequencer=new MxmPortfolioSequencer(resolved);
   // Subscribe only after full validation. Each symbol has independent cold
@@ -247,6 +266,12 @@ public sealed class MxmReferenceProductBot : Robot {
    lease=continuation!;
   }
   if(desired==0)return;
+  if(entryCheckpoint==null || !entryCheckpoint.Prepare(instrumentName,desired>0?1:-1,currentOpenTime)) {
+   orderProtection.HaltUnknown();LatchProtectionHalt();return;
+  }
+  bool brokerAttempted=false;
+  try {
+  // All account/risk snapshots are taken AFTER the potentially slow durable write.
   // Inspect actual broker minimum/step/margin; do not assume EUR200 volume feasibility.
   if(Account.Equity<=0||Account.FreeMargin<=0||Account.Asset.Name!="EUR")return;
   // This is an account-wide snapshot, not atomic inter-instance order locking.
@@ -335,11 +360,17 @@ public sealed class MxmReferenceProductBot : Robot {
   }
   // Last local admission check, after all expensive risk/margin calculations.
   // This does not make the broker check+order atomic or lock other instances.
-  if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),BrokerClock())) {
-   Print("MXM_BROKER_BOOK_CHANGED_NO_STALE_INTENT_ENTRY");return;
+  var finalClock=BrokerClock();
+  if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),finalClock) ||
+     finalClock<currentOpenTime || finalClock>=currentOpenTime.AddMinutes(BarMinutes)) {
+   Print("MXM_BROKER_BOOK_CHANGED_OR_EXPIRED_NO_STALE_INTENT_ENTRY");return;
   }
   var beforeIds=Positions.Select(x=>(long)x.Id).ToArray();
   TradeResult placed;
+  if(orderProtection.Halted || !entryCheckpoint.MarkSubmitted()) {
+   orderProtection.HaltUnknown();LatchProtectionHalt();return;
+  }
+  brokerAttempted=true; // Durable pending marker exists BEFORE this side effect.
   try {placed=ExecuteMarketOrder(direction,instrumentName,units,Label,StopLossPips,null);}
   catch(Exception e) {
    orderProtection.HaltUnknown();
@@ -355,9 +386,42 @@ public sealed class MxmReferenceProductBot : Robot {
   Print("MXM_ORDER_PROTECTION_"+protection.Reason);
   if(protection.Halt) {
    LatchProtectionHalt();
+  }else if(!protection.Accepted) {
+   // An unsuccessful API result plus an empty book is not a durable negative ACK.
+   // Keep PENDING rather than assume the request cannot have reached the broker.
+   orderProtection.HaltUnknown();LatchProtectionHalt();
+   Print("MXM_UNSUCCESSFUL_ORDER_REQUIRES_RECONCILIATION_NO_CHECKPOINT_CLEAR");
+  }else if(!entryCheckpoint.CompleteReconciled()) {
+   orderProtection.HaltUnknown();LatchProtectionHalt();
+  }
+  } finally {
+   if(!brokerAttempted && !orderProtection.Halted && !entryCheckpoint.CompleteNotSubmitted()) {
+    orderProtection.HaltUnknown();LatchProtectionHalt();
+   }
   }
  }
+ string? ReadEntryCheckpoint() {
+  CheckEntryStorage();LocalStorage.Reload(LocalStorageScope.Type);CheckEntryStorage();
+  string? value=LocalStorage.GetString(entryCheckpoint!.StorageKey,LocalStorageScope.Type);
+  CheckEntryStorage();return value;
+ }
+ void WriteEntryCheckpoint(string value) {
+  CheckEntryStorage();LocalStorage.SetString(entryCheckpoint!.StorageKey,value,LocalStorageScope.Type);
+  CheckEntryStorage();LocalStorage.Flush(LocalStorageScope.Type);CheckEntryStorage();
+ }
+ void CheckEntryStorage() {
+  if(entryStorageFault)throw new InvalidOperationException("ENTRY_STORAGE_CALLBACK_FAULT");
+ }
+ protected override void OnException(Exception exception) {
+  // LocalStorage can notify OnException instead of throwing at the call site.
+  // Poison first; a matching memory echo must never erase this fault.
+  if(entryStorageFault)return; // Avoid recursive failure while stopping an already poisoned instance.
+  entryStorageFault=true;entryCheckpoint?.Halt();orderProtection.HaltUnknown();
+  foreach(var intent in causalIntents.Values)intent.Clear();
+  Print("MXM_UNHANDLED_EXCEPTION_ENTRY_CHECKPOINT_SAFE_STOP_"+exception.GetType().Name);Stop();
+ }
  void LatchProtectionHalt() {
+  entryCheckpoint?.Halt(); // Never clear the durable unresolved attempt, even after flattening.
   foreach(var intent in causalIntents.Values)intent.Clear();
   // Halt stays latched even after successful flattening. No new entry or retry.
   // Timer retries only the attributable returned position, never foreign exposure.
