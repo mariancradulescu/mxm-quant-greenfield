@@ -25,3 +25,17 @@ Native CI results and final integration provenance are recorded in the PR after 
 No new market data, economic outcome, parameter variant or rejected-strategy rescue is justified by this engineering change. The prior compression gross rejection and UTC-seasonality hypothetical-friction rejection remain binding for those fixed candidates. No robust after-cost edge, independently validated candidate, continuously funded profitable EUR200 path or effective HARD21 has been demonstrated. This change supplies a missing measurement component for the eventual native product; it is not economic performance progress.
 
 No custody key, new provider, broker connection/order, Cloud activation, scientific partition, V2/C033 budget, OWNER1807 or privileged authority is changed. Known limits: absent storage cannot distinguish first installation from complete deletion/rollback without an external anchor; a matching old READY plus rolled-back journal is not externally detectable; a crash after an actual fill before journal save may undercount and remains unresolved through the pending barrier. No automated recovery of that unknown request is claimed. The journal stops rather than pruning or resetting after100000 recorded identities. Full native durability/coverage reception and qualified after-cost research remain necessary in the existing B–E mandate.
+
+## Executed original evidence
+
+PR173 initial code head `ef24beb02446a68bf6eb5be028741f5d6baa1154` passed ALL5 applicable native CI checks. Account gate [40125946805/job120967247199](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40125946805/job/120967247199) compiled the actual `.algo`, read its original package through pinned vendor CLI (metadata return0; malformed return1), and executed80 artificial ledger assertions,3hard kills and6new processes. Python independently reconciled22 artificial entries/four ISO weeks. Local inspection of the ORIGINAL downloaded proof additionally rejected five false-promotion/week/count/digest/barrier tamper cases. Other successful checks:40125946766,40125946767,40125946811,40125946816. Source tested was the GitHub PR merge `f677c9aa75b59c3e4cd3ae5938f0643fc31e5af6`, not a native cTrader broker run.
+
+Exact original artifacts are durably preserved under `confirmed-entry-ledger-40125946805/`: ledger ZIP12573621254 (1004bytes, SHA256 `3fd39e8e5c1ba263b8de19b67c67169b25788dcf19137bf601825e4fd750d560`) and original compiled product/vendor CLI ZIP12573536406 (77292bytes, SHA256 `cad33135ae4dbb474337ef74fef2cad6d0a30cfccf33c8bcd2c3e9de70044a24`). The original proof and CLI receipt are also copied byte-for-byte; archives are never reconstructed from logs or reruns. Manifest commits every member/part and the exact tested implementation bytes. Subsequent documentary preservation changes do not modify those implementation bytes; later builds may embed a different source commit and are not relabeled as these original binaries.
+
+Offline verification, no keys, market access or CLI execution:
+
+```sh
+python3 -m research_core_v4.laboratory.verify_confirmed_entry_ledger_result
+```
+
+Native LocalStorage durability, broker callbacks/history and unknown-order reconciliation remain unaccepted; neither this original compiled package nor the80artificial assertions establish economic edge or HARD21.
