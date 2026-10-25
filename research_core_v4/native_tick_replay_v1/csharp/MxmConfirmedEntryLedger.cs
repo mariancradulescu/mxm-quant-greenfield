@@ -26,6 +26,8 @@ public sealed class MxmConfirmedEntryLedger {
  public bool Halted {get;private set;}
  public string StorageKey {get;}
  public DateTime StartedUtc=>state?.StartedUtc??throw new InvalidOperationException("LEDGER_NOT_READY");
+ public bool RestoredFromExisting {get;private set;}
+ public string ScopeFingerprint=>scope;
  public int Count=>state?.Entries.Length??0;
  public MxmConfirmedEntryLedger(IMxmEntryCheckpointStore store,string accountScope){
   if(store==null || string.IsNullOrWhiteSpace(accountScope) || accountScope.Length>1024)
@@ -47,13 +49,13 @@ public sealed class MxmConfirmedEntryLedger {
   if(Halted || store.Read()!=raw || Halted)return Fail();
   state=next;persisted=raw;return true;
  }
- public bool Initialize(DateTime observedUtc){
+ public bool Initialize(DateTime observedUtc,bool requireExisting=false){
   if(Halted || state!=null || !Utc(observedUtc))return Fail();
   try {
    string? prior=store.Read();if(Halted)return Fail();
    // Null means a first measurement, including upgrade from the old adapter.
    // Empty/corrupt/noncanonical existing values are never overwritten as first use.
-   if(prior==null)return Commit(new(1,scope,observedUtc,Array.Empty<MxmConfirmedEntry>()));
+   if(prior==null)return requireExisting?Fail():Commit(new(1,scope,observedUtc,Array.Empty<MxmConfirmedEntry>()));
    var envelope=JsonSerializer.Deserialize<Envelope>(prior);
    if(envelope==null || envelope.Payload==null || envelope.Sha256!=Hash(envelope.Payload))return Fail();
    var decoded=JsonSerializer.Deserialize<Payload>(envelope.Payload);
@@ -67,7 +69,7 @@ public sealed class MxmConfirmedEntryLedger {
    }
    // Reload and verify before accepting the recovered immutable snapshot.
    if(store.Read()!=prior || Halted)return Fail();
-   state=decoded;persisted=prior;return true;
+   state=decoded;persisted=prior;RestoredFromExisting=true;return true;
   }catch{return Fail();}
  }
  static bool Valid(MxmConfirmedEntry? value,DateTime start,DateTime now)=>value!=null &&

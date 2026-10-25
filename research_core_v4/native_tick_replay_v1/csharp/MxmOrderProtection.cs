@@ -28,7 +28,19 @@ public sealed class MxmOrderProtection {
   if(!successful && resultId==null && owned.Length==0)
    return new(false,false,"REJECTED_NO_OBSERVED_POSITION");
   if(!successful)reason="FAILED_CALL_WITH_OBSERVED_POSITION";
-  else if(resultId==null || resultId<=0)reason="MISSING_RETURNED_IDENTITY";
+  else reason=ValidateOpenPosition(resultId,expectedLabel,expectedSymbol,direction,units,
+   stopPips,pipSize,tickSize,beforeIds,book);
+  if(reason.Length==0)return new(true,false,"BOOK_AND_STOP_RECONCILED");
+  Halted=true;return new(false,true,reason);
+ }
+ /// <summary>Protection-only book validation. It observes no API acknowledgement
+ /// and cannot latch a defensive-close identity or execute an order.</summary>
+ public static string ValidateOpenPosition(long? resultId,string expectedLabel,string expectedSymbol,
+  int direction,double units,double stopPips,double pipSize,double tickSize,
+  IReadOnlyCollection<long> beforeIds,IReadOnlyCollection<MxmProtectionPosition> book){
+  var owned=book.Where(x=>x.Label==expectedLabel && x.Symbol==expectedSymbol).ToArray();
+  string reason="";
+  if(resultId==null || resultId<=0)reason="MISSING_RETURNED_IDENTITY";
   else if(beforeIds.Contains(resultId.Value))reason="PREEXISTING_RETURNED_IDENTITY";
   else if(owned.Length!=1 || owned[0].Id!=resultId)reason="BOOK_IDENTITY_MISMATCH";
   else {
@@ -48,8 +60,7 @@ public sealed class MxmOrderProtection {
      reason="STOP_GEOMETRY_OUTSIDE_REQUEST";
    }
   }
-  if(reason.Length==0)return new(true,false,"BOOK_AND_STOP_RECONCILED");
-  Halted=true;return new(false,true,reason);
+  return reason;
  }
  public void HaltUnknown() {Halted=true;mayFlatten=false;returnedId=null;}
  public long? DefensiveCloseId(IReadOnlyCollection<MxmProtectionPosition> book) {

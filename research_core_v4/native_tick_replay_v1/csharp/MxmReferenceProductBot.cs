@@ -97,17 +97,26 @@ public sealed class MxmReferenceProductBot : Robot {
    IMxmEntryCheckpointStore store=IsBacktesting?new MxmMemoryEntryStore():
     new MxmDelegateEntryStore(ReadEntryCheckpoint,WriteEntryCheckpoint);
    entryCheckpoint=new MxmEntryCheckpoint(store,scope);
-   if(!entryCheckpoint.Initialize()) {
+   var recoveryInspection=entryCheckpoint.InspectRecovery();
+   if(recoveryInspection==MxmEntryRecoveryInspection.Blocked ||
+      (recoveryInspection==MxmEntryRecoveryInspection.Normal && !entryCheckpoint.Initialize())) {
     orderProtection.HaltUnknown();
     Print("MXM_UNRESOLVED_ENTRY_CHECKPOINT_OR_STORAGE_FAULT_SAFE_STOP");Stop();return;
    }
    IMxmEntryCheckpointStore fillStore=IsBacktesting?new MxmMemoryEntryStore():
     new MxmDelegateEntryStore(ReadConfirmedEntries,WriteConfirmedEntries);
    confirmedEntries=new MxmConfirmedEntryLedger(fillStore,scope);
-   if(!confirmedEntries.Initialize(BrokerClock())) {
+   if(!confirmedEntries.Initialize(BrokerClock(),requireExisting:recoveryInspection==MxmEntryRecoveryInspection.Recoverable)) {
     orderProtection.HaltUnknown();entryCheckpoint.Halt();
     Print("MXM_CONFIRMED_ENTRY_LEDGER_UNVERIFIED_SAFE_STOP");Stop();return;
    }
+   if(recoveryInspection==MxmEntryRecoveryInspection.Recoverable &&
+      !entryCheckpoint.RecoverVerifiedOpen(confirmedEntries,RecoveryBook(),PendingOrders.Count,BrokerClock())) {
+    orderProtection.HaltUnknown();confirmedEntries.Halt();
+    Print("MXM_ENTRY_RECOVERY_SAFE_STOP_"+entryCheckpoint.RecoveryReason);Stop();return;
+   }
+   if(recoveryInspection==MxmEntryRecoveryInspection.Recoverable)
+    Print("MXM_ENTRY_RECOVERY_"+entryCheckpoint.RecoveryReason);
    ReportRecordedWeeks();
   }catch(Exception e) {
    orderProtection.HaltUnknown();
@@ -130,11 +139,11 @@ public sealed class MxmReferenceProductBot : Robot {
    if(recovered.Length>1){Print("MXM_MULTIPLE_RECOVERED_POSITIONS_SAFE_STOP");Stop();return;}
    if(recovered.Length==1) {
     var active=recovered[0];var instrument=subscribedSymbols[name];
-    var recoveryProtection=new MxmOrderProtection().Reconcile(true,active.Id,
+    var recoveryProtection=MxmOrderProtection.ValidateOpenPosition(active.Id,
      Label,name,active.TradeType==TradeType.Buy?1:-1,active.VolumeInUnits,
      StopLossPips,instrument.PipSize,instrument.TickSize,Array.Empty<long>(),ProtectionBook());
-    if(!recoveryProtection.Accepted) {
-     Print("MXM_RECOVERED_POSITION_PROTECTION_SAFE_STOP_"+recoveryProtection.Reason);Stop();return;
+    if(recoveryProtection.Length!=0) {
+     Print("MXM_RECOVERED_POSITION_PROTECTION_SAFE_STOP_"+recoveryProtection);Stop();return;
     }
    }
    brokerIntentFences.Add(name,new MxmBrokerIntentFence(causalIntents[name],BarMinutes,
@@ -275,8 +284,14 @@ public sealed class MxmReferenceProductBot : Robot {
    lease=continuation!;
   }
   if(desired==0)return;
+  if(!double.IsFinite(RequestedUnits) || RequestedUnits<=0)return;
+  double units=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
+  if(!double.IsFinite(units) || units<=0 || units>instrument.VolumeInUnitsMax)return;
+  double stopPips=StopLossPips,pipSize=instrument.PipSize,tickSize=instrument.TickSize;
+  var beforeIds=Positions.Select(x=>(long)x.Id).OrderBy(x=>x).ToArray();
   if(confirmedEntries==null || !confirmedEntries.VerifyCurrent(BrokerClock()) ||
-     entryCheckpoint==null || !entryCheckpoint.Prepare(instrumentName,desired>0?1:-1,currentOpenTime)) {
+     entryCheckpoint==null || !entryCheckpoint.PrepareRecoverable(instrumentName,desired>0?1:-1,currentOpenTime,
+      BrokerClock(),currentOpenTime.AddMinutes(BarMinutes),Label,units,stopPips,pipSize,tickSize,beforeIds)) {
    orderProtection.HaltUnknown();LatchProtectionHalt();return;
   }
   bool brokerAttempted=false;
@@ -304,8 +319,9 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!double.IsFinite(Account.Equity)||!double.IsFinite(Account.FreeMargin)||
      !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MinimumFreeMarginReserveEur)||
      MinimumFreeMarginReserveEur<0)return;
-  double units=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
-  if(units<=0 || units>instrument.VolumeInUnitsMax)return;
+  double currentUnits=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
+  if(!double.IsFinite(currentUnits) || currentUnits!=units || units>instrument.VolumeInUnitsMax ||
+     StopLossPips!=stopPips || instrument.PipSize!=pipSize || instrument.TickSize!=tickSize)return;
   double margin=instrument.GetEstimatedMargin(direction,units);
   if(!double.IsFinite(margin)||margin<=0)return;
   string admit=MxmCapitalAdmission.Check((decimal)Account.Equity,(decimal)Account.FreeMargin,
@@ -319,10 +335,10 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!double.IsFinite(MaxEstimatedMxmStopRiskPercent) ||
      MaxEstimatedMxmStopRiskPercent<=0 || MaxEstimatedMxmStopRiskPercent>100 ||
      !double.IsFinite(EstimatedRoundTripFrictionReserveEur) ||
-     EstimatedRoundTripFrictionReserveEur<0 || StopLossPips<=0) {
+     EstimatedRoundTripFrictionReserveEur<0 || stopPips<=0) {
     Print("MXM_STOP_RISK_INPUT_UNVERIFIED_SAFE_HOLD");return;
   }
-  double newStopRisk=instrument.AmountRisked(units,StopLossPips);
+  double newStopRisk=instrument.AmountRisked(units,stopPips);
   if(!double.IsFinite(newStopRisk)||newStopRisk<=0) {
     Print("MXM_NEW_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
   }
@@ -375,13 +391,17 @@ public sealed class MxmReferenceProductBot : Robot {
      finalClock<currentOpenTime || finalClock>=currentOpenTime.AddMinutes(BarMinutes)) {
    Print("MXM_BROKER_BOOK_CHANGED_OR_EXPIRED_NO_STALE_INTENT_ENTRY");return;
   }
-  var beforeIds=Positions.Select(x=>(long)x.Id).ToArray();
+  if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
+   Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
+  }
+  string? requestComment=entryCheckpoint.SubmissionComment;
+  if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
   TradeResult placed;
   if(orderProtection.Halted || !entryCheckpoint.MarkSubmitted()) {
    orderProtection.HaltUnknown();LatchProtectionHalt();return;
   }
   brokerAttempted=true; // Durable pending marker exists BEFORE this side effect.
-  try {placed=ExecuteMarketOrder(direction,instrumentName,units,Label,StopLossPips,null);}
+  try {placed=ExecuteMarketOrder(direction,instrumentName,units,Label,stopPips,null,requestComment);}
   catch(Exception e) {
    orderProtection.HaltUnknown();
    LatchProtectionHalt();
@@ -391,7 +411,7 @@ public sealed class MxmReferenceProductBot : Robot {
   Print("MXM_ORDER_CALL_RETURNED fenceRevision={0} intentBoundary={1:O} symbol={2} success={3}",
    lease.Revision,currentOpenTime,instrumentName,placed.IsSuccessful);
   var protection=orderProtection.Reconcile(placed.IsSuccessful,placed.Position?.Id,
-   Label,instrumentName,desired>0?1:-1,units,StopLossPips,instrument.PipSize,instrument.TickSize,
+   Label,instrumentName,desired>0?1:-1,units,stopPips,pipSize,tickSize,
    beforeIds,ProtectionBook());
   Print("MXM_ORDER_PROTECTION_"+protection.Reason);
   if(protection.Halt) {
@@ -467,6 +487,10 @@ public sealed class MxmReferenceProductBot : Robot {
   Timer.Start(TimeSpan.FromSeconds(5));
   TryDefensiveClose();
  }
+ MxmEntryRecoveryPosition[] RecoveryBook()=>Positions.Select(x=>new MxmEntryRecoveryPosition(
+  new MxmProtectionPosition(x.Id,x.Label,x.SymbolName,x.TradeType==TradeType.Buy?1:-1,
+   x.VolumeInUnits,x.EntryPrice,x.StopLoss),x.Comment,
+  DateTime.SpecifyKind(x.EntryTime,DateTimeKind.Utc),x.Symbol.PipSize,x.Symbol.TickSize)).ToArray();
  MxmProtectionPosition[] ProtectionBook()=>Positions.Select(x=>new MxmProtectionPosition(
   x.Id,x.Label,x.SymbolName,x.TradeType==TradeType.Buy?1:-1,
   x.VolumeInUnits,x.EntryPrice,x.StopLoss)).ToArray();
