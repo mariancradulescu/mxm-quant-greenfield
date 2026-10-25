@@ -102,5 +102,10 @@ Need(MxmUsdPairAccountInput.FromGbpAlignment(ready with {Purpose="FX_VALUATION_O
 Refuse(()=>MxmUsdPairAccountInput.FromGbpAlignment(ready with {FxBidMs=ready.T},assumptions),"READY_BOOLEAN_CANNOT_HIDE_FUTURE_FX");
 var missingGbp=Account();
 Refuse(()=>missingGbp.Continue(new[]{new MxmInstrumentQuoteUnavailable(last.AddMilliseconds(1),"GBPUSD","CROSSED")},missingGbp.NextEventOrdinal),"BAD_FUNDED_INSTRUMENT_CANNOT_SKIP_UNKNOWN_PATH");
+var invalidFlat=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());
+invalidFlat.Run(new MxmAccountFeed[]{Fx(t),new MxmUsdConversionUnavailable(t.AddMilliseconds(1),"TEMPORARILY_UNKNOWN")});
+var invalidSaved=invalidFlat.CaptureReplay(source);
+var invalidRestored=MxmPortfolioAccountReplay.RestoreReplay(invalidSaved.Payload,invalidSaved.Sha256,source,Settings(),new[]{"GBPUSD"});
+Refuse(()=>invalidRestored.Continue(new[]{new MxmUsdEurMark(t.AddMilliseconds(2),t,t.AddMilliseconds(2),1.12m,1.13m)},invalidRestored.NextEventOrdinal),"INVALIDATION_AND_RESTORE_CANNOT_ERASE_FX_CLOCK_ANCHOR");
 Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,
  broker_orders=0,native_ctrader_runtime_reception=false,economic_edge_proven=false,hard21_proven=false}));

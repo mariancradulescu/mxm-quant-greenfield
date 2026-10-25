@@ -92,6 +92,7 @@ public sealed partial class MxmPortfolioAccountReplay {
  long processedEvents;
  DateTime lastFeed;
  MxmUsdEurMark? usdEurMark;
+ bool usdConversionInvalid;
  public const int SharedUsdMaxAgeMilliseconds=5000;
  public MxmPortfolioAccountReplay(IEnumerable<string> symbols,MxmReplayParameters settings) {
   parameters=settings;
@@ -122,7 +123,7 @@ public sealed partial class MxmPortfolioAccountReplay {
   (now-fx.AskUtc).TotalMilliseconds<=SharedUsdMaxAgeMilliseconds);
  void ValidateSharedValuation() {
   if(!parameters.UseSharedUsdConversion || open.Count==0)return;
-  Need(usdEurMark!=null && ValidFx(usdEurMark,lastFeed),"OPEN_EXPOSURE_FX_UNPRICEABLE");
+  Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,lastFeed),"OPEN_EXPOSURE_FX_UNPRICEABLE");
   foreach(var symbol in open.Keys) {
    var q=state[symbol].Latest;
    Need(q!=null && q.Utc<=lastFeed && (lastFeed-q.Utc).TotalSeconds<=parameters.MaxQuoteAgeSeconds,
@@ -135,13 +136,13 @@ public sealed partial class MxmPortfolioAccountReplay {
    Need(fx.Utc>prior.Utc && fx.BidUtc>=prior.BidUtc && fx.AskUtc>=prior.AskUtc &&
     (fx.BidUtc!=prior.BidUtc || fx.Bid==prior.Bid) &&
     (fx.AskUtc!=prior.AskUtc || fx.Ask==prior.Ask),"FX_CLOCK_REGRESSION_OR_CONFLICT");
-  usdEurMark=fx;
+  usdEurMark=fx;usdConversionInvalid=false;
   foreach(var st in state.Values)if(st.Latest is MxmQuote q)
    st.Latest=q with {QuoteToEur=1m/fx.Ask,QuoteLossToEur=1m/fx.Bid};
  }
  void VerifyQuoteFx(MxmQuote q){
   if(!parameters.UseSharedUsdConversion)return;
-  Need(usdEurMark!=null && ValidFx(usdEurMark,q.Utc) && usdEurMark.Utc<q.Utc &&
+  Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,q.Utc) && usdEurMark.Utc<q.Utc &&
    usdEurMark.BidUtc<q.Utc && usdEurMark.AskUtc<q.Utc,"EXECUTION_REQUIRES_STRICT_PRIOR_FRESH_FX");
   Need(q.QuoteToEur==1m/usdEurMark!.Ask && q.QuoteLossToEur==1m/usdEurMark.Bid,
    "EXECUTION_CONVERSION_NOT_CURRENT_SIGNED_FX");
@@ -259,7 +260,7 @@ public sealed partial class MxmPortfolioAccountReplay {
    }
    if(e is MxmUsdConversionUnavailable unavailable){
     Need(parameters.UseSharedUsdConversion && unavailable.Symbol=="EURUSD" && !string.IsNullOrWhiteSpace(unavailable.Reason),"UNREGISTERED_FX_INVALIDATION");
-    usdEurMark=null;
+    usdConversionInvalid=true; // Keep accepted clocks/values as an immutable continuity anchor.
     foreach(var item in state.Values)item.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);
     // Never carry open exposure through an unknown conversion interval and
     // later report a conveniently priced capital path.
