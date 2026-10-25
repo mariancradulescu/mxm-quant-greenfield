@@ -48,7 +48,7 @@ jobs:
           assert start.index('entryCheckpoint.Initialize()')<start.index('series.BarClosed+=')
           assert 'Application.EnvironmentType!=cAlgo.API.EnvironmentType.Desktop' in start
           apply=bot[bot.index('void ApplyPortfolioDecision'):bot.index('string? ReadEntryCheckpoint')]
-          assert apply.index('entryCheckpoint.Prepare(')<apply.index('MxmAccountIsolation.Check(')<apply.index('MxmCapitalAdmission.Check(')
+          assert apply.index('entryCheckpoint.PrepareRecoverable(')<apply.index('MxmAccountIsolation.Check(')<apply.index('MxmCapitalAdmission.Check(')
           assert apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('brokerAttempted=true')<apply.index('ExecuteMarketOrder(')
           assert apply.index('orderProtection.Reconcile(')<apply.index('else if(!protection.Accepted)')<apply.index('entryCheckpoint.CompleteReconciled()')
           assert 'finalClock>=currentOpenTime.AddMinutes(BarMinutes)' in apply
@@ -80,6 +80,17 @@ jobs:
         with:
           name: confirmed-entry-ledger-artificial-${{ github.run_id }}
           path: verification/confirmed-entry-ledger/proof.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Recover only exactly correlated protected open entries in new OS processes, never resubmit
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmEntryRecoveryFixture.csproj -c Release
+          python3 -m research_core_v4.laboratory.correlated_entry_recovery_checks verification/correlated-entry-recovery/proof.json
+      - name: Retain original artificial correlated-entry recovery proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: correlated-entry-recovery-artificial-${{ github.run_id }}
+          path: verification/correlated-entry-recovery/proof.json
           if-no-files-found: error
           retention-days: 90
       - name: Validate one serial multi-symbol CSharp portfolio on two artificial streams

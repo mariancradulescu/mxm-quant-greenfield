@@ -26,7 +26,9 @@ jobs:
           source=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
           helper=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmStopRiskAdmission.cs').read_text()
           sim=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs').read_text()
-          assert 'instrument.AmountRisked(units,StopLossPips)' in source
+          assert 'instrument.AmountRisked(units,stopPips)' in source
+          assert 'double stopPips=StopLossPips,pipSize=instrument.PipSize,tickSize=instrument.TickSize' in source
+          assert 'StopLossPips!=stopPips' in source
           assert 'Positions.FindAll(Label)' in source
           assert 'active.StopLoss.HasValue' in source
           assert 'active.Symbol.AmountRisked(active.VolumeInUnits,distancePips)' in source

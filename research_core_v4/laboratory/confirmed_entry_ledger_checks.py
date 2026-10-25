@@ -50,7 +50,7 @@ def check_adapter():
     apply=bot[bot.index('void ApplyPortfolioDecision'):bot.index('string? ReadEntryCheckpoint')]
     need(startup.index('entryCheckpoint.Initialize()')<startup.index('confirmedEntries.Initialize(')<
          startup.index('series.BarClosed+='),'NO_SUBSCRIPTION_BEFORE_JOURNAL')
-    need(apply.index('confirmedEntries.VerifyCurrent(')<apply.index('entryCheckpoint.Prepare(')<
+    need(apply.index('confirmedEntries.VerifyCurrent(')<apply.index('entryCheckpoint.PrepareRecoverable(')<
          apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('ExecuteMarketOrder('),'PRECALL_DURABLE_ADMISSION')
     need(apply.index('orderProtection.Reconcile(')<apply.index('else if(!protection.Accepted)')<
          apply.index('RecordProtectedEntry(placed.Position!)')<apply.index('entryCheckpoint.CompleteReconciled()'),
