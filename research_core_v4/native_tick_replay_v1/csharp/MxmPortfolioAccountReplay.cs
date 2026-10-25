@@ -27,7 +27,11 @@ public sealed record MxmQuote(
  decimal ExecutableUnits, decimal InitialMarginEur, decimal CommissionPerSideEur,
  decimal SlipPerSideQuote, decimal EstimatedStopRiskEur,
  decimal? QuoteLossToEur=null, MxmEurUsdCapturedCosts? CapturedCosts=null,
- decimal? StopDistanceQuote=null
+ decimal? StopDistanceQuote=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ DateTime? BidSourceUtc=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ DateTime? AskSourceUtc=null
 ) : MxmAccountFeed(Utc, Symbol);
 // Explicit EURUSD conversion observation. It is NEVER a GBP execution quote.
 public sealed record MxmUsdEurMark(DateTime Utc,DateTime BidUtc,DateTime AskUtc,
@@ -121,12 +125,19 @@ public sealed partial class MxmPortfolioAccountReplay {
   (fx.BidUtc>fx.AskUtc?fx.BidUtc:fx.AskUtc)==fx.Utc && fx.Utc<=now &&
   (!requireFresh || (now-fx.BidUtc).TotalMilliseconds<=SharedUsdMaxAgeMilliseconds &&
   (now-fx.AskUtc).TotalMilliseconds<=SharedUsdMaxAgeMilliseconds);
+ bool ValidInstrumentMark(MxmQuote q,DateTime now,bool requireFresh=true)=>
+  q.Bid>0 && q.Ask>=q.Bid && q.Utc<=now && q.BidSourceUtc.HasValue && q.AskSourceUtc.HasValue &&
+  q.BidSourceUtc.Value.Kind==DateTimeKind.Utc && q.AskSourceUtc.Value.Kind==DateTimeKind.Utc &&
+  q.BidSourceUtc.Value!=default && q.AskSourceUtc.Value!=default &&
+  q.BidSourceUtc<=q.Utc && q.AskSourceUtc<=q.Utc &&
+  (!requireFresh || (now-q.BidSourceUtc.Value).TotalMilliseconds<=Math.Min(5000d,parameters.MaxQuoteAgeSeconds*1000d) &&
+                   (now-q.AskSourceUtc.Value).TotalMilliseconds<=Math.Min(5000d,parameters.MaxQuoteAgeSeconds*1000d));
  void ValidateSharedValuation() {
   if(!parameters.UseSharedUsdConversion || open.Count==0)return;
   Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,lastFeed),"OPEN_EXPOSURE_FX_UNPRICEABLE");
   foreach(var symbol in open.Keys) {
    var q=state[symbol].Latest;
-   Need(q!=null && q.Utc<=lastFeed && (lastFeed-q.Utc).TotalSeconds<=parameters.MaxQuoteAgeSeconds,
+   Need(q!=null && ValidInstrumentMark(q,lastFeed),
     "OPEN_EXPOSURE_INSTRUMENT_MARK_STALE");
   }
  }
@@ -142,6 +153,7 @@ public sealed partial class MxmPortfolioAccountReplay {
  }
  void VerifyQuoteFx(MxmQuote q){
   if(!parameters.UseSharedUsdConversion)return;
+  Need(ValidInstrumentMark(q,q.Utc),"EXECUTION_INSTRUMENT_SIDE_CLOCKS_UNVERIFIED");
   Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,q.Utc) && usdEurMark.Utc<q.Utc &&
    usdEurMark.BidUtc<q.Utc && usdEurMark.AskUtc<q.Utc,"EXECUTION_REQUIRES_STRICT_PRIOR_FRESH_FX");
   Need(q.QuoteToEur==1m/usdEurMark!.Ask && q.QuoteLossToEur==1m/usdEurMark.Bid,

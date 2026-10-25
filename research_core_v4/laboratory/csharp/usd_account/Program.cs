@@ -13,7 +13,7 @@ List<MxmAccountFeed> Start(int direction=1){
   var at=t.AddMinutes(5*i);decimal mid=1.25m+direction*i*.0002m;
   events.Add(Fx(at));events.Add(new MxmBarClose(at,"GBPUSD",mid));
   events.Add(new MxmQuote(at.AddSeconds(1),"GBPUSD",mid-.0001m,mid+.0001m,
-   1m/1.11m,1000m,50m,.1m,0m,1m,1m/1.10m,StopDistanceQuote:.0012m));
+   1m/1.11m,1000m,50m,.1m,0m,1m,1m/1.10m,StopDistanceQuote:.0012m,BidSourceUtc:at.AddSeconds(1),AskSourceUtc:at.AddSeconds(1)));
  }
  return events;
 }
@@ -33,6 +33,7 @@ foreach(int direction in new[]{1,-1}){
   // No fixed stop in this derived mark example: original accepted stop remains active.
   // Choose short bid from its ASK liquidation side to make the desired sign exact.
   if(direction<0)q=q with {Ask=entry.Price-pnlSign*.001m,Bid=entry.Price-pnlSign*.001m-.0002m};
+  q=q with {BidSourceUtc=q.Utc,AskSourceUtc=q.Utc};
   var before=active.Continue(new[]{q},active.NextEventOrdinal);
   Need(before.OpenPositions==1,"MARK_EXAMPLE_STOP_NOT_TRIGGERED");
   var mark=Fx(q.Utc.AddMilliseconds(1),1.20m,1.21m);
@@ -56,8 +57,8 @@ foreach(int direction in new[]{1,-1}){
  }
 }
 var owned=Account();var last=Start().Last().Utc;
-Refuse(()=>owned.Continue(new[]{Fx(last.AddSeconds(301))},owned.NextEventOrdinal),"OPEN_STALE_INSTRUMENT_MARK_REJECTED");
-// The new FX itself is fresh above; the configured instrument quote age is300s.
+Refuse(()=>owned.Continue(new[]{Fx(last.AddSeconds(6))},owned.NextEventOrdinal),"OPEN_STALE_INSTRUMENT_MARK_REJECTED");
+// The new FX itself is fresh above; the shared-mode instrument side ages are capped at5000ms.
 // A separately stale FX side is invalid regardless of exposure.
 var stale=Account();
 Refuse(()=>stale.Continue(new[]{new MxmUsdEurMark(last.AddSeconds(1),last.AddSeconds(-6),last.AddSeconds(1),1.1m,1.11m)},stale.NextEventOrdinal),"ONE_FX_SIDE_STALE");
@@ -107,6 +108,14 @@ invalidFlat.Run(new MxmAccountFeed[]{Fx(t),new MxmUsdConversionUnavailable(t.Add
 var invalidSaved=invalidFlat.CaptureReplay(source);
 var invalidRestored=MxmPortfolioAccountReplay.RestoreReplay(invalidSaved.Payload,invalidSaved.Sha256,source,Settings(),new[]{"GBPUSD"});
 Refuse(()=>invalidRestored.Continue(new[]{new MxmUsdEurMark(t.AddMilliseconds(2),t,t.AddMilliseconds(2),1.12m,1.13m)},invalidRestored.NextEventOrdinal),"INVALIDATION_AND_RESTORE_CANNOT_ERASE_FX_CLOCK_ANCHOR");
+var staleSide=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());staleSide.Run(new[]{Fx(t)});
+Refuse(()=>staleSide.Continue(new[]{new MxmQuote(t.AddSeconds(1),"GBPUSD",1.25m,1.2502m,1m/1.11m,1000m,50m,.1m,0m,1m,1m/1.10m,
+ BidSourceUtc:t.AddSeconds(-5),AskSourceUtc:t.AddSeconds(1))},staleSide.NextEventOrdinal),"NEW_TICK_CANNOT_REFRESH_OLD_OPPOSITE_SIDE");
+var sourceClock=Account();var sourceCapsule=sourceClock.CaptureReplay(source);
+using(var sourceJson=JsonDocument.Parse(sourceCapsule.Payload)){
+ var quote=sourceJson.RootElement.GetProperty("Symbols")[0].GetProperty("Latest");
+ Need(quote.GetProperty("BidSourceUtc").GetDateTime()==last && quote.GetProperty("AskSourceUtc").GetDateTime()==last,"CHECKPOINT_PRESERVES_BOTH_INSTRUMENT_SOURCE_CLOCKS");
+}
 var feeModel=new MxmEurUsdCapturedCosts(100000,100000000,100000,10000000,1,3000000000,0,"USD");
 var euroFeed=Start().Select(e=>e switch {
  MxmBarClose bar=>bar with {Symbol="EURUSD"},

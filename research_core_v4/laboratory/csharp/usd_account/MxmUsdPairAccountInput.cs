@@ -26,6 +26,6 @@ public static class MxmUsdPairAccountInput {
   decimal fxBid=s.FxBidRaw!.Value/100000m,fxAsk=s.FxAskRaw!.Value/100000m;
   return new MxmQuote(Utc(s.T),"GBPUSD",s.GbpBidRaw!.Value/100000m,s.GbpAskRaw!.Value/100000m,
    1m/fxAsk,a.Units,a.MarginEur,a.CommissionPerSideEur,a.SlippageQuote,a.EstimatedStopRiskEur,
-   1m/fxBid,StopDistanceQuote:a.StopDistanceQuote);
+   1m/fxBid,StopDistanceQuote:a.StopDistanceQuote,BidSourceUtc:Utc(s.GbpBidMs!.Value),AskSourceUtc:Utc(s.GbpAskMs!.Value));
  }
 }
