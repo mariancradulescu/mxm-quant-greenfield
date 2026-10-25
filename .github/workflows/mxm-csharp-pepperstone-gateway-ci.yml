@@ -45,6 +45,8 @@ jobs:
       - name: Offline original encrypted archive restoration and corruption/provenance negatives
         run: |
           python3 -m unittest research_core_v4.laboratory.test_durable_native_chronology research_core_v4.laboratory.test_durable_week_chronology research_core_v4.laboratory.test_durable_week35_chronology -v
+          python3 -m unittest research_core_v4.laboratory.test_durable_gbpusd_week37_chronology -v
+          python3 -m research_core_v4.laboratory.durable_gbpusd_week37_chronology --out verification/durable-gbpusd-week37
           python3 -m research_core_v4.laboratory.durable_week_chronology --out verification/week-chronology
           python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
       - name: Test full-week source identity and negative custody-access invariants, no key
