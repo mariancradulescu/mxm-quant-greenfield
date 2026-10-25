@@ -60,9 +60,9 @@ public static class MxmEntryRecovery {
   if(!Utc(match.EntryUtc) || match.EntryUtc<r.PreparedUtc || match.EntryUtc>now)
    return Refuse("BROKER_ENTRY_TIME_UNVERIFIED");
   if(match.PipSize!=r.PipSize || match.TickSize!=r.TickSize)return Refuse("BROKER_SYMBOL_GEOMETRY_CHANGED");
-  var protection=new MxmOrderProtection().Reconcile(true,match.Position.Id,r.Label,r.Symbol,r.Direction,r.Units,
+  string protection=MxmOrderProtection.ValidateOpenPosition(match.Position.Id,r.Label,r.Symbol,r.Direction,r.Units,
    r.StopPips,r.PipSize,r.TickSize,r.BeforeIds,book.Select(x=>x.Position).ToArray());
-  return protection.Accepted?new(true,"EXACT_CORRELATED_OPEN_POSITION_AND_STOP",match):Refuse(protection.Reason);
+  return protection.Length==0?new(true,"EXACT_CORRELATED_OPEN_POSITION_AND_STOP",match):Refuse(protection);
  }
 }
 }

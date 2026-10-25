@@ -29,6 +29,8 @@ def adapter():
          'POSITIVE_ATTRIBUTION_AND_DURABLE_COUNT_BEFORE_READY')
     need('!ledger.RestoredFromExisting' in recover and 'ledger.ScopeFingerprint!=scopeHash' in recover and
          'store.Read()!=recoveryRaw || Halted || ledger.Halted' in recover,'NO_MISSING_WRONG_SCOPE_OR_CALLBACK_POISON_CLEAR')
+    matcher=(BASE/'MxmEntryRecovery.cs').read_text()
+    need('ValidateOpenPosition(' in matcher and '.Reconcile(true,' not in matcher,'NO_SYNTHESIZED_API_ACKNOWLEDGEMENT')
     need('ExecuteMarketOrder' not in recover and 'ClosePosition' not in recover,'RECOVERY_HAS_NO_TRADING_SIDE_EFFECT')
     need('DefaultValue=false' in bot and 'EnableDemoTrading && !Account.IsLive' in bot,'AUTHORITY_DEFAULTS_UNCHANGED')
     return {'adapter_checked':True,'broker_orders':0,'native_runtime_reception':False}

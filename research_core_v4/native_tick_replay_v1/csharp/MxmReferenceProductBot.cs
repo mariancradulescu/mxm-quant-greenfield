@@ -139,11 +139,11 @@ public sealed class MxmReferenceProductBot : Robot {
    if(recovered.Length>1){Print("MXM_MULTIPLE_RECOVERED_POSITIONS_SAFE_STOP");Stop();return;}
    if(recovered.Length==1) {
     var active=recovered[0];var instrument=subscribedSymbols[name];
-    var recoveryProtection=new MxmOrderProtection().Reconcile(true,active.Id,
+    var recoveryProtection=MxmOrderProtection.ValidateOpenPosition(active.Id,
      Label,name,active.TradeType==TradeType.Buy?1:-1,active.VolumeInUnits,
      StopLossPips,instrument.PipSize,instrument.TickSize,Array.Empty<long>(),ProtectionBook());
-    if(!recoveryProtection.Accepted) {
-     Print("MXM_RECOVERED_POSITION_PROTECTION_SAFE_STOP_"+recoveryProtection.Reason);Stop();return;
+    if(recoveryProtection.Length!=0) {
+     Print("MXM_RECOVERED_POSITION_PROTECTION_SAFE_STOP_"+recoveryProtection);Stop();return;
     }
    }
    brokerIntentFences.Add(name,new MxmBrokerIntentFence(causalIntents[name],BarMinutes,
