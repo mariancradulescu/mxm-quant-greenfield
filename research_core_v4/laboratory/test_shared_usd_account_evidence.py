@@ -3,7 +3,7 @@ import copy,json,tempfile,shutil,unittest
 from pathlib import Path
 from decimal import Decimal as D
 from .shared_usd_account_checks import original,verify
-ROOT=Path(__file__).resolve().parents[2]/'docs/economic-development/20261025/shared-usd-account-40202484274'
+ROOT=Path(__file__).resolve().parents[2]/'docs/economic-development/20261025/shared-usd-account-40203167634'
 class SharedUsdEvidence(unittest.TestCase):
     def test_actual_original(self):self.assertTrue(original()['original_archive_verified'])
     def test_refund_or_invented_equity(self):
