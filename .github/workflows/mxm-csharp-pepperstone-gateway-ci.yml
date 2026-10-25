@@ -88,6 +88,8 @@ jobs:
           python3 -m research_core_v4.laboratory.verify_confirmed_entry_ledger_result
           python3 -m unittest research_core_v4.laboratory.test_correlated_entry_recovery_evidence -v
           python3 -m research_core_v4.laboratory.verify_correlated_entry_recovery
+      - name: Compile simultaneous USD quote source alignment and independently check strict-prior FX
+        run: MXM_REQUIRE_PAIRED_CSHARP=1 python3 -m unittest research_core_v4.laboratory.test_usd_pair_alignment research_core_v4.laboratory.test_usd_pair_native_reception -v
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj -c Release -- --selftest
