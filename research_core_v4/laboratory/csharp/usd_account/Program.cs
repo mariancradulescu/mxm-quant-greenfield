@@ -107,5 +107,21 @@ invalidFlat.Run(new MxmAccountFeed[]{Fx(t),new MxmUsdConversionUnavailable(t.Add
 var invalidSaved=invalidFlat.CaptureReplay(source);
 var invalidRestored=MxmPortfolioAccountReplay.RestoreReplay(invalidSaved.Payload,invalidSaved.Sha256,source,Settings(),new[]{"GBPUSD"});
 Refuse(()=>invalidRestored.Continue(new[]{new MxmUsdEurMark(t.AddMilliseconds(2),t,t.AddMilliseconds(2),1.12m,1.13m)},invalidRestored.NextEventOrdinal),"INVALIDATION_AND_RESTORE_CANNOT_ERASE_FX_CLOCK_ANCHOR");
-Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,
+var feeModel=new MxmEurUsdCapturedCosts(100000,100000000,100000,10000000,1,3000000000,0,"USD");
+var euroFeed=Start().Select(e=>e switch {
+ MxmBarClose bar=>bar with {Symbol="EURUSD"},
+ MxmQuote q=>q with {Symbol="EURUSD",CapturedCosts=feeModel},
+ _=>e
+}).ToArray();
+var euroAccount=new MxmPortfolioAccountReplay(new[]{"EURUSD"},Settings());var feeReport=euroAccount.Run(euroFeed);
+var feeTrade=feeReport.Ledger.Single();decimal expectedFee=feeTrade.Units*feeTrade.Price*30m/1000000m/1.10m;
+Need(feeTrade.CommissionEur==expectedFee && feeReport.FinalCashEur==200m-expectedFee,"CAPTURED_USD_FEE_USES_ADMITTED_FX_BID");
+Need(feeTrade.CommissionEur!=feeTrade.Units*feeTrade.Price*30m/1000000m/(feeTrade.Price-.0002m),"EXECUTION_PRICE_IS_NOT_CONVERSION_AUTHORITY");
+var feeCase=new{units=feeTrade.Units,execution_price=feeTrade.Price,usd_per_million=30m,fx_bid=1.10m,commission_eur=feeTrade.CommissionEur,cash_eur=feeReport.FinalCashEur};
+var badGbpCost=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());
+Refuse(()=>badGbpCost.Run(Start().Select(e=>e is MxmQuote q?q with {CapturedCosts=feeModel}:e)),"NO_UNVERIFIED_GBP_CAPTURED_FEE_PROMOTION");
+var rearmed=MxmPortfolioAccountReplay.RestoreReplay(invalidSaved.Payload,invalidSaved.Sha256,source,Settings(),new[]{"GBPUSD"});
+rearmed.Continue(new[]{Fx(t.AddMilliseconds(2),1.20m,1.21m)},rearmed.NextEventOrdinal);
+Need(rearmed.Report().FinalCashEur==200m && rearmed.Report().AcceptedEntries==0,"NEW_VALID_OBSERVATION_REARMS_FLAT_ACCOUNT_WITHOUT_REFUND");
+Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,fee_case=feeCase,
  broker_orders=0,native_ctrader_runtime_reception=false,economic_edge_proven=false,hard21_proven=false}));

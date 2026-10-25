@@ -20,6 +20,11 @@ def verify(value):
             need(abs(equity-D(str(x['equity_eur'])))<D('1e-24') and
                  D(str(x['restored_equity_eur']))==D(str(x['equity_eur'])) and
                  abs(final-D(str(x['final_equity_eur'])))<D('1e-24'),'SIGNED_CONVERSION_AND_RECOVERY_ARITHMETIC')
+    f=value['fee_case']
+    with localcontext() as ctx:
+        ctx.prec=65
+        expected=D(str(f['units']))*D(str(f['execution_price']))*D(str(f['usd_per_million']))/D(1000000)/D(str(f['fx_bid']))
+        need(abs(expected-D(str(f['commission_eur'])))<D('1e-24') and abs(D(str(f['cash_eur']))-(D(200)-expected))<D('1e-24'),'ADMITTED_FX_BID_FOR_CAPTURED_USD_FEE')
     need(value['broker_orders']==0 and all(value[k] is False for k in ('native_ctrader_runtime_reception','economic_edge_proven','hard21_proven')),'NO_NATIVE_OR_ECONOMIC_PROMOTION')
     return {'artificial_funded_cases':4,'compiled_checks':value['checks'],'signed_fx_and_cold_recovery_independently_checked':True,
             'broker_orders':0,'economic_edge_proven':False,'hard21_proven':False,'native_ctrader_runtime_reception':False}
