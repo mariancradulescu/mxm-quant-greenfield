@@ -28,7 +28,30 @@ def verify(value):
     need(value['broker_orders']==0 and all(value[k] is False for k in ('native_ctrader_runtime_reception','economic_edge_proven','hard21_proven')),'NO_NATIVE_OR_ECONOMIC_PROMOTION')
     return {'artificial_funded_cases':4,'compiled_checks':value['checks'],'signed_fx_and_cold_recovery_independently_checked':True,
             'broker_orders':0,'economic_edge_proven':False,'hard21_proven':False,'native_ctrader_runtime_reception':False}
+def original(folder=None):
+    import base64,hashlib,io,zipfile
+    root=Path(__file__).resolve().parents[2]
+    folder=Path(folder) if folder is not None else root/'docs/economic-development/20261025/shared-usd-account-40202484274'
+    sha=lambda b:hashlib.sha256(b).hexdigest()
+    manifest=(folder/'MANIFEST.json').read_bytes()
+    need(sha(manifest)=='dc95b075ddcca1f0f62361cab160e15e2a56d4d915cf21851a917b9157f6b7bc','ORIGINAL_MANIFEST')
+    m=json.loads(manifest);encoded=(folder/'artifact.zip.b64').read_bytes();need(len(encoded)<4096,'BOUNDED_ORIGINAL')
+    archive=base64.b64decode(encoded.strip(),validate=True)
+    need(len(archive)==584 and sha(archive)=='ea72634f54a08803e283f663eb54193a7cd95ec3e8bebc7a8f265440d31d5000','ORIGINAL_ARCHIVE')
+    with zipfile.ZipFile(io.BytesIO(archive)) as z:
+        need(z.namelist()==['proof.json'] and z.infolist()[0].file_size==1839,'ORIGINAL_MEMBERS')
+        raw=z.read('proof.json')
+    need(sha(raw)==m['proof_sha256'] and (folder/'proof.json').read_bytes()==raw,'ORIGINAL_PROOF_COPY')
+    need(m['run_id']==40202484274 and m['job_id']==121196402142 and m['artifact_id']==12602237221 and
+         m['source_head']=='43e1c425c036723580a347562038e6186a171bfd' and
+         m['test_merge']=='9a2ba1c94ce2b45df05852fb96802de8c90a9f20','ORIGINAL_NATIVE_PROVENANCE')
+    result=verify(json.loads(raw,parse_float=D))
+    changed=[p for p,h in m['implementation_sha256'].items() if not (root/p).is_file() or sha((root/p).read_bytes())!=h]
+    result.update(original_archive_verified=True,source_run=40202484274,current_csharp_matches_original=not changed,changed_implementation_paths=changed)
+    return result
 if __name__=='__main__':
     import sys
-    need(len(sys.argv)==2,'PROOF_ARGUMENT');value=json.loads(Path(sys.argv[1]).read_bytes(),parse_float=D)
-    print(json.dumps(verify(value),sort_keys=True))
+    if sys.argv[1:]==['--original']:print(json.dumps(original(),sort_keys=True))
+    else:
+        need(len(sys.argv)==2,'PROOF_ARGUMENT');value=json.loads(Path(sys.argv[1]).read_bytes(),parse_float=D)
+        print(json.dumps(verify(value),sort_keys=True))
