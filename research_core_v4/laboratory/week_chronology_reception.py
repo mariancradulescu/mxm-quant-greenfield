@@ -28,12 +28,17 @@ POLICY={'schema':'mxm.week-chronology-policy.v1','symbol_id':1,'symbol_name':'EU
 # Only these prospectively registered profiles are admissible. No user-supplied
 # timestamps, symbols, request caps or arbitrary remote configurations.
 PROFILE=os.environ.get('LAB_CHRONOLOGY_PROFILE','W37')
-need(PROFILE in ('W37','W35'),'WEEK_UNREGISTERED_PROFILE')
+need(PROFILE in ('W37','W35','GBPUSD_W37'),'WEEK_UNREGISTERED_PROFILE')
 if PROFILE=='W35':
     PATH='.github/workflows/mxm-week35-chronology-reception.yml'
     SOURCE_REF='mxm-week35-chronology-code-20261023'
     OUT=Path('verification/week35-chronology')
     POLICY={**POLICY,'from_ms':1787529600000,'to_ms':1788134400000,'iso_week':'2026-W35'}
+elif PROFILE=='GBPUSD_W37':
+    PATH='.github/workflows/mxm-gbpusd-week37-chronology-reception.yml'
+    SOURCE_REF='mxm-gbpusd-week37-chronology-code-20261025'
+    OUT=Path('verification/gbpusd-week37-chronology')
+    POLICY={**POLICY,'symbol_id':2,'symbol_name':'GBPUSD'}
 
 CHECKOUT='actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683'
 UPLOAD='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02'
@@ -64,7 +69,8 @@ def build_workflow(source):
         else:result['if']="github.repository == '"+REPO+"' && github.ref == 'refs/heads/"+BRANCH+"' && github.run_attempt == 1"
         return result
     return {'name':('MXM one complete ISO week VIEW chronology acquisition' if PROFILE=='W37' else
-                    'MXM W35 complete ISO week VIEW chronology acquisition'),
+                    ('MXM W35 complete ISO week VIEW chronology acquisition' if PROFILE=='W35' else
+                     'MXM GBPUSD W37 complete ISO week VIEW chronology acquisition')),
       'on':{'push':{'branches':[BRANCH],'paths':[PATH]},'workflow_dispatch':{}},
       'permissions':{},'concurrency':{'group':'mxm-integrated-laboratory','cancel-in-progress':False},
       'jobs':{'chronology-collect':job('chronology-collect','mxm-r3-pepperstone-v1'),
@@ -172,6 +178,14 @@ def verify_tree(tree,receipts,account,side):
     need(all(a[0]<=b[0] for a,b in zip(rows,rows[1:])),'CHRONOLOGY_NOT_ORDERED')
     return rows,complete,used
 
+def validate_catalogue(catalogue):
+    from m6.ctrader_proto import OpenApiMessages_pb2 as m
+    need(isinstance(catalogue,m.ProtoOASymbolsListRes),'CHRONOLOGY_NATIVE_SYMBOL_CATALOGUE')
+    by_id=[s for s in catalogue.symbol if s.symbolId==POLICY['symbol_id']]
+    by_name=[s for s in catalogue.symbol if s.symbolName==POLICY['symbol_name']]
+    need(len(by_id)==len(by_name)==1 and by_id[0].symbolName==POLICY['symbol_name'] and
+         by_name[0].symbolId==POLICY['symbol_id'],'CHRONOLOGY_NATIVE_SYMBOL_NAME')
+
 def replay(private):
     from m6.ctrader_proto import OpenApiMessages_pb2 as m
     from research_core_v4.shallow_m5_support_v2_production import _fingerprint,ACCOUNT_FINGERPRINT_SHA256
@@ -185,8 +199,7 @@ def replay(private):
     req,res=decode_record(receipts[0],account)
     need(isinstance(req,m.ProtoOASymbolsListReq) and isinstance(res,m.ProtoOASymbolsListRes),
          'CHRONOLOGY_NATIVE_SYMBOL_CATALOGUE')
-    symbols=[s for s in res.symbol if s.symbolId==POLICY['symbol_id']]
-    need(len(symbols)==1 and symbols[0].symbolName==POLICY['symbol_name'],'CHRONOLOGY_NATIVE_SYMBOL_NAME')
+    validate_catalogue(res)
     req,res=decode_record(receipts[1],account)
     need(isinstance(req,m.ProtoOASymbolByIdReq) and list(req.symbolId)==[POLICY['symbol_id']] and
          isinstance(res,m.ProtoOASymbolByIdRes) and len(res.symbol)==1 and
@@ -275,7 +288,9 @@ def collect(identity):
         need(all(os.environ.get(k) for k in SECRET_NAMES),'CHRONOLOGY_EXISTING_CREDENTIALS')
         values=tuple(os.environ.pop(k) for k in SECRET_NAMES);transport.connect()
         private['account']=authenticate_segment(transport,*values);values=None
-        send(m.ProtoOASymbolsListReq(ctidTraderAccountId=private['account']))
+        _,catalogue=send(m.ProtoOASymbolsListReq(ctidTraderAccountId=private['account']))
+        # Authenticate the requested identity BEFORE any symbol-specific call.
+        validate_catalogue(catalogue)
         send(m.ProtoOASymbolByIdReq(ctidTraderAccountId=private['account'],symbolId=[POLICY['symbol_id']]))
         for name,side in (('BID',1),('ASK',2)):
             private['trees'][name]=split_collect(send,private['account'],side,POLICY['from_ms'],POLICY['to_ms']-1,
