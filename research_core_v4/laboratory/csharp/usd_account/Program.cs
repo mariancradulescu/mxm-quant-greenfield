@@ -1,0 +1,106 @@
+using System.Text.Json;
+using Mxm.Replay;
+using Mxm.Research;
+int checks=0;
+void Need(bool ok,string why){checks++;if(!ok)throw new Exception("SHARED_USD_FIXTURE_"+why);}
+var t=new DateTime(2026,9,7,0,0,0,DateTimeKind.Utc);
+var source=new string('a',64);
+MxmReplayParameters Settings(bool mode=true)=>new(StrategyMode.TrendOnly,.8m,2,0m,.03m,.2m,UseSharedUsdConversion:mode);
+MxmUsdEurMark Fx(DateTime stamp,decimal bid=1.10m,decimal ask=1.11m)=>new(stamp,stamp,stamp,bid,ask);
+List<MxmAccountFeed> Start(int direction=1){
+ var events=new List<MxmAccountFeed>();
+ for(int i=0;i<6;i++){
+  var at=t.AddMinutes(5*i);decimal mid=1.25m+direction*i*.0002m;
+  events.Add(Fx(at));events.Add(new MxmBarClose(at,"GBPUSD",mid));
+  events.Add(new MxmQuote(at.AddSeconds(1),"GBPUSD",mid-.0001m,mid+.0001m,
+   1m/1.11m,1000m,50m,.1m,0m,1m,1m/1.10m,StopDistanceQuote:.0012m));
+ }
+ return events;
+}
+MxmPortfolioAccountReplay Account(int direction=1){
+ var a=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());var r=a.Run(Start(direction));
+ Need(r.AcceptedEntries==1 && r.OpenPositions==1 && r.InitialCapitalEur==200m,"ONE_INITIAL_CONTINUOUS_ACCOUNT");return a;
+}
+void Refuse(Action action,string why){bool bad=false;try{action();}catch(ArgumentException){bad=true;}Need(bad,why);}
+var proofs=new List<object>();
+foreach(int direction in new[]{1,-1}){
+ var a=Account(direction);var entry=a.Report().Ledger.Single();var now=Start().Last().Utc;
+ // Create either positive or negative floating USD without another strategy bar.
+ foreach(int pnlSign in new[]{1,-1}){
+  var active=Account(direction);decimal bid=entry.Price+direction*pnlSign*.001m;
+  decimal ask=bid+.0002m;
+  var q=new MxmQuote(now.AddMilliseconds(500),"GBPUSD",bid,ask,1m/1.11m,1000m,50m,.1m,0m,1m,1m/1.10m);
+  // No fixed stop in this derived mark example: original accepted stop remains active.
+  // Choose short bid from its ASK liquidation side to make the desired sign exact.
+  if(direction<0)q=q with {Ask=entry.Price-pnlSign*.001m,Bid=entry.Price-pnlSign*.001m-.0002m};
+  var before=active.Continue(new[]{q},active.NextEventOrdinal);
+  Need(before.OpenPositions==1,"MARK_EXAMPLE_STOP_NOT_TRIGGERED");
+  var mark=Fx(q.Utc.AddMilliseconds(1),1.20m,1.21m);
+  var after=active.Continue(new[]{mark},active.NextEventOrdinal);
+  decimal usd=direction>0?(q.Bid-entry.Price)*1000m:(entry.Price-q.Ask)*1000m;
+  decimal expected=after.FinalCashEur+(usd>=0?usd/1.21m:usd/1.20m);
+  Need(after.MarkedEquityEur==expected,"CURRENT_SIGNED_FX_MARK");
+  Need(after.AcceptedEntries==before.AcceptedEntries && after.ExecutedExits==before.ExecutedExits &&
+   after.FinalCashEur==before.FinalCashEur && after.UsedMarginEur==before.UsedMarginEur,"FX_ONLY_NO_ORDER_CASH_OR_MARGIN_CHANGE");
+  var capsule=active.CaptureReplay(source);
+  var restored=MxmPortfolioAccountReplay.RestoreReplay(capsule.Payload,capsule.Sha256,source,Settings(),new[]{"GBPUSD"});
+  Need(JsonSerializer.Serialize(restored.Report())==JsonSerializer.Serialize(after),"EXACT_FX_EXPOSURE_COLD_RESTORE");
+  decimal coldEquity=restored.Report().MarkedEquityEur;
+  var next=Fx(mark.Utc.AddMilliseconds(1),1.30m,1.31m);
+  var direct=active.Continue(new[]{next},active.NextEventOrdinal);var resumed=restored.Continue(new[]{next},restored.NextEventOrdinal);
+  Need(JsonSerializer.Serialize(direct)==JsonSerializer.Serialize(resumed),"NO_RESTORE_FUNDING_OR_PNL_RESET");
+  proofs.Add(new{direction,pnl_sign=pnlSign,entry_price=entry.Price,mark_bid=q.Bid,mark_ask=q.Ask,units=1000m,
+   cash_eur=after.FinalCashEur,fx_bid=mark.Bid,fx_ask=mark.Ask,equity_eur=after.MarkedEquityEur,entries=after.AcceptedEntries,
+   exits=after.ExecutedExits,restored_equity_eur=coldEquity,final_fx_bid=next.Bid,final_fx_ask=next.Ask,
+   final_equity_eur=resumed.MarkedEquityEur,margin_eur=after.UsedMarginEur});
+ }
+}
+var owned=Account();var last=Start().Last().Utc;
+Refuse(()=>owned.Continue(new[]{Fx(last.AddSeconds(301))},owned.NextEventOrdinal),"OPEN_STALE_INSTRUMENT_MARK_REJECTED");
+// The new FX itself is fresh above; the configured instrument quote age is300s.
+// A separately stale FX side is invalid regardless of exposure.
+var stale=Account();
+Refuse(()=>stale.Continue(new[]{new MxmUsdEurMark(last.AddSeconds(1),last.AddSeconds(-6),last.AddSeconds(1),1.1m,1.11m)},stale.NextEventOrdinal),"ONE_FX_SIDE_STALE");
+Refuse(()=>stale.Report(),"FAULT_CANNOT_RETURN_FAVOURABLE_REPORT");
+var unavailable=Account();
+Refuse(()=>unavailable.Continue(new[]{new MxmUsdConversionUnavailable(last.AddMilliseconds(1),"SOURCE_REJECTED")},unavailable.NextEventOrdinal),"OPEN_UNKNOWN_FX_HALTS");
+Refuse(()=>unavailable.CaptureReplay(source),"NO_FAULTED_CHECKPOINT");
+var flat=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());flat.Run(new[]{new MxmUsdConversionUnavailable(t,"NO_INITIAL_FX")});
+var emptyCapsule=flat.CaptureReplay(source);
+Need(MxmPortfolioAccountReplay.RestoreReplay(emptyCapsule.Payload,emptyCapsule.Sha256,source,Settings(),new[]{"GBPUSD"}).Report().FinalCashEur==200m,"FLAT_MISSING_FX_RECOVERY_NOT_FUNDED_AGAIN");
+var same=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());same.Run(new[]{Fx(t)});
+Refuse(()=>same.Continue(new[]{new MxmQuote(t,"GBPUSD",1.25m,1.2502m,1m/1.11m,1000m,50m,.1m,0m,1m,1m/1.1m)},same.NextEventOrdinal),"SAME_TIMESTAMP_FX_NOT_EXECUTION_AUTHORITY");
+var wrong=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());wrong.Run(new[]{Fx(t)});
+Refuse(()=>wrong.Continue(new[]{new MxmQuote(t.AddMilliseconds(1),"GBPUSD",1.25m,1.2502m,1m/1.2502m,1000m,50m,.1m,0m,1m,1m/1.25m)},wrong.NextEventOrdinal),"GBP_PRICE_CANNOT_CONVERT_USD_TO_EUR");
+var legacy=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings(false));
+Refuse(()=>legacy.Run(new[]{Fx(t)}),"SHARED_FX_NOT_OPTED_IN");
+Refuse(()=>new MxmPortfolioAccountReplay(new[]{"USDJPY"},Settings()),"UNREGISTERED_QUOTE_CURRENCY");
+foreach(var invalid in new[]{Fx(t) with {Symbol="GBPUSD"},new MxmUsdEurMark(t,t.AddMilliseconds(1),t,1.1m,1.11m),Fx(t,1.12m,1.11m),Fx(t,0m,1.11m)}){
+ var a=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());
+ Refuse(()=>a.Run(new[]{invalid}),"FUTURE_CROSSED_OR_NONPOSITIVE_FX");
+}
+var conflict=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());conflict.Run(new[]{Fx(t)});
+Refuse(()=>conflict.Continue(new[]{new MxmUsdEurMark(t.AddSeconds(1),t,t.AddSeconds(1),1.12m,1.13m)},conflict.NextEventOrdinal),"SAME_SIDE_TIME_CHANGED_PRICE");
+var pending=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());var warm=Start();var pendingQuote=(MxmQuote)warm.Last();warm.RemoveAt(warm.Count-1);
+pending.Run(warm);var boundary=warm.Last().Utc;
+pending.Continue(new[]{Fx(boundary.AddMilliseconds(500),1.20m,1.21m)},pending.NextEventOrdinal);
+Need(pending.Report().AcceptedEntries==0,"FX_VALUATION_DOES_NOT_CONSUME_PENDING_ENTRY");
+pending.Continue(new[]{pendingQuote with {QuoteToEur=1m/1.21m,QuoteLossToEur=1m/1.20m}},pending.NextEventOrdinal);
+Need(pending.Report().AcceptedEntries==1,"ONLY_LATER_INSTRUMENT_QUOTE_EXECUTES_PENDING_INTENT");
+var flatStale=new MxmPortfolioAccountReplay(new[]{"GBPUSD"},Settings());flatStale.Run(new MxmAccountFeed[]{Fx(t),new MxmBarClose(t.AddSeconds(10),"GBPUSD",1.25m,t)});
+var flatSaved=flatStale.CaptureReplay(source);
+Need(MxmPortfolioAccountReplay.RestoreReplay(flatSaved.Payload,flatSaved.Sha256,source,Settings(),new[]{"GBPUSD"}).Report().FinalCashEur==200m,"STALE_FLAT_FX_CHECKPOINT_RESTORES_WITHOUT_ADMISSION");
+Refuse(()=>MxmPortfolioAccountReplay.RestoreReplay(flatSaved.Payload,flatSaved.Sha256,source,Settings(false),new[]{"GBPUSD"}),"CHECKPOINT_MODE_CANNOT_BE_SWITCHED");
+var stamp=new DateTimeOffset(t).ToUnixTimeMilliseconds();
+var assumptions=new MxmUsdAccountAssumptions(1000m,50m,.1m,0m,1m,.0012m);
+var ready=new AlignedUsdSnapshot(stamp+1000,"GBP_QUOTE_GROUP","READY_STRICT_PRIOR_FX",125000,stamp+1000,125020,stamp+1000,110000,stamp,111000,stamp,null,null);
+var mapped=MxmUsdPairAccountInput.FromGbpAlignment(ready,assumptions);
+Need(mapped is MxmQuote native && native.QuoteToEur==1m/1.11m && native.QuoteLossToEur==1m/1.10m,"TYPED_SOURCE_BINDS_EXACT_SHARED_FX");
+Need(MxmUsdPairAccountInput.FromGbpAlignment(ready with {Code="GBP_CROSSED"},assumptions) is MxmInstrumentQuoteUnavailable,"BAD_GBP_SOURCE_NOT_BAD_GLOBAL_CURRENCY");
+Need(MxmUsdPairAccountInput.FromGbpAlignment(ready with {Code="FX_STALE"},assumptions) is MxmUsdConversionUnavailable,"BAD_CURRENCY_INVALIDATES_SHARED_EXPOSURE");
+Need(MxmUsdPairAccountInput.FromGbpAlignment(ready with {Purpose="FX_VALUATION_ONLY",T=stamp},assumptions) is MxmUsdEurMark,"FX_ROLE_NEVER_MAPS_TO_GBP_QUOTE");
+Refuse(()=>MxmUsdPairAccountInput.FromGbpAlignment(ready with {FxBidMs=ready.T},assumptions),"READY_BOOLEAN_CANNOT_HIDE_FUTURE_FX");
+var missingGbp=Account();
+Refuse(()=>missingGbp.Continue(new[]{new MxmInstrumentQuoteUnavailable(last.AddMilliseconds(1),"GBPUSD","CROSSED")},missingGbp.NextEventOrdinal),"BAD_FUNDED_INSTRUMENT_CANNOT_SKIP_UNKNOWN_PATH");
+Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,
+ broker_orders=0,native_ctrader_runtime_reception=false,economic_edge_proven=false,hard21_proven=false}));

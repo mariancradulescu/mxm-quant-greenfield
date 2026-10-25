@@ -16,7 +16,8 @@ public sealed partial class MxmPortfolioAccountReplay {
  sealed record AccountReplayState(int Version,string CodeIdentity,string SourceSha256,MxmReplayParameters Parameters,
   long NextEventOrdinal,DateTime LastFeed,bool Halted,decimal Balance,decimal Peak,decimal Drawdown,
   int Accepted,int Exits,SymbolReplayState[] Symbols,PositionReplayState[] Positions,
-  MxmPortfolioTrade[] Ledger,string[] Rejections,Dictionary<string,int> Weeks);
+  MxmPortfolioTrade[] Ledger,string[] Rejections,Dictionary<string,int> Weeks,
+  [property:JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] MxmUsdEurMark? UsdEurMark=null);
  static readonly JsonSerializerOptions CapsuleJson=new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Disallow};
  static string CodeIdentity()=>Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(
   typeof(MxmPortfolioAccountReplay).Assembly.Location))).ToLowerInvariant();
@@ -32,7 +33,7 @@ public sealed partial class MxmPortfolioAccountReplay {
     p.Value.Kernel.CaptureReplayState(),p.Value.Intent.CaptureReplayState())).ToArray(),
    open.Select(p=>new PositionReplayState(p.Key,p.Value.Direction,p.Value.Entry,p.Value.Units,p.Value.Margin,
     p.Value.StopRisk,p.Value.QuoteToEur,p.Value.EntryUtc,p.Value.StopPrice)).ToArray(),
-   trades.ToArray(),rejected.ToArray(),new Dictionary<string,int>(entriesByWeek));
+   trades.ToArray(),rejected.ToArray(),new Dictionary<string,int>(entriesByWeek),usdEurMark);
   byte[] payload=JsonSerializer.SerializeToUtf8Bytes(value,CapsuleJson);
   Need(payload.Length<=32000000,"CHECKPOINT_TOO_LARGE");
   return new(payload,Convert.ToHexString(SHA256.HashData(payload)).ToLowerInvariant(),processedEvents);
@@ -80,6 +81,13 @@ public sealed partial class MxmPortfolioAccountReplay {
     p.EntryUtc<=s.LastFeed && result.state[p.Symbol].Latest!=null,"CHECKPOINT_POSITION");
    result.open.Add(p.Symbol,new Holding(p.Direction,p.Entry,p.Units,p.Margin,p.StopRisk,p.QuoteToEur,p.EntryUtc,p.StopPrice));
   }
+  Need(expectedParameters.UseSharedUsdConversion || s.UsdEurMark==null,"CHECKPOINT_UNREGISTERED_FX_MODE");
+  if(s.UsdEurMark is MxmUsdEurMark fx){
+   Need(expectedParameters.UseSharedUsdConversion && result.ValidFx(fx,s.LastFeed,requireFresh:s.Positions.Length>0),"CHECKPOINT_INVALID_SHARED_FX");
+   foreach(var item in result.state.Values)if(item.Latest is MxmQuote q)
+    Need(q.QuoteToEur==1m/fx.Ask && q.QuoteLossToEur==1m/fx.Bid,"CHECKPOINT_SHARED_FX_MARK_MISMATCH");
+  }else Need(!expectedParameters.UseSharedUsdConversion || s.Positions.Length==0,"CHECKPOINT_OPEN_EXPOSURE_WITHOUT_FX");
+  result.usdEurMark=s.UsdEurMark;
   result.balance=s.Balance;result.peak=s.Peak;result.drawdown=s.Drawdown;result.accepted=s.Accepted;result.exits=s.Exits;
   result.trades.AddRange(s.Ledger);result.rejected.AddRange(s.Rejections);
   foreach(var p in s.Weeks)result.entriesByWeek.Add(p.Key,p.Value);

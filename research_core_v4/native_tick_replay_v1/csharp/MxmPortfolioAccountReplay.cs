@@ -11,6 +11,9 @@ namespace Mxm.Replay {
 [System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName="$feed")]
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmBarClose),"bar")]
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmQuote),"quote")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmUsdEurMark),"usd-eur-mark")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmUsdConversionUnavailable),"usd-conversion-unavailable")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmInstrumentQuoteUnavailable),"instrument-quote-unavailable")]
 public abstract record MxmAccountFeed(DateTime Utc, string Symbol);
 // Utc is the ACTUAL time the first next-bar quote was observed and the
 // closed bar became actionable. BoundaryUtc is the fixed 5m bucket boundary
@@ -26,6 +29,13 @@ public sealed record MxmQuote(
  decimal? QuoteLossToEur=null, MxmEurUsdCapturedCosts? CapturedCosts=null,
  decimal? StopDistanceQuote=null
 ) : MxmAccountFeed(Utc, Symbol);
+// Explicit EURUSD conversion observation. It is NEVER a GBP execution quote.
+public sealed record MxmUsdEurMark(DateTime Utc,DateTime BidUtc,DateTime AskUtc,
+ decimal Bid,decimal Ask) : MxmAccountFeed(Utc,"EURUSD");
+public sealed record MxmUsdConversionUnavailable(DateTime Utc,string Reason)
+ : MxmAccountFeed(Utc,"EURUSD");
+public sealed record MxmInstrumentQuoteUnavailable(DateTime Utc,string Symbol,string Reason)
+ : MxmAccountFeed(Utc,Symbol);
 public sealed record MxmPortfolioTrade(
  string Kind, DateTime Utc, string Symbol, int Direction, decimal Price,
  decimal Units, decimal CashEur, decimal CommissionEur, decimal GrossEur,
@@ -45,7 +55,9 @@ public sealed record MxmReplayParameters(
  StrategyMode Strategy, decimal MaxMarginFraction,
  int MaxPositions, decimal MinimumFreeMarginReserveEur,
  decimal MaxEstimatedStopRiskFraction, decimal RoundTripRiskReserveEur,
- int BarMinutes=5, int MaxQuoteAgeSeconds=300, ExitMode ExitPolicy=ExitMode.ReverseOnly, bool OnlineAr1=false
+ int BarMinutes=5, int MaxQuoteAgeSeconds=300, ExitMode ExitPolicy=ExitMode.ReverseOnly, bool OnlineAr1=false,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+ bool UseSharedUsdConversion=false
 );
 
 /// <summary>
@@ -79,6 +91,8 @@ public sealed partial class MxmPortfolioAccountReplay {
  bool halted,started,faulted;
  long processedEvents;
  DateTime lastFeed;
+ MxmUsdEurMark? usdEurMark;
+ public const int SharedUsdMaxAgeMilliseconds=5000;
  public MxmPortfolioAccountReplay(IEnumerable<string> symbols,MxmReplayParameters settings) {
   parameters=settings;
   if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
@@ -93,12 +107,47 @@ public sealed partial class MxmPortfolioAccountReplay {
     throw new ArgumentException("INVALID_OR_DUPLICATE_SYMBOL");
   }
   if(state.Count==0)throw new ArgumentException("EMPTY_PORTFOLIO");
+  if(settings.UseSharedUsdConversion && state.Keys.Any(x=>x!="EURUSD" && x!="GBPUSD"))
+   throw new ArgumentException("SHARED_USD_CONVERSION_REQUIRES_EXPLICIT_SUPPORTED_USD_QUOTES");
  }
  static void Need([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool ok,string code) {
   if(!ok)throw new ArgumentException("MXM_PORTFOLIO_REPLAY_"+code);
  }
  static string Week(DateTime utc)=>ISOWeek.GetYear(utc)+"-W"+ISOWeek.GetWeekOfYear(utc).ToString("D2",CultureInfo.InvariantCulture);
+ bool ValidFx(MxmUsdEurMark fx,DateTime now,bool requireFresh=true)=>fx.Symbol=="EURUSD" && fx.Utc.Kind==DateTimeKind.Utc && fx.Utc!=default &&
+  fx.BidUtc.Kind==DateTimeKind.Utc && fx.AskUtc.Kind==DateTimeKind.Utc && fx.BidUtc!=default && fx.AskUtc!=default &&
+  fx.Bid>0 && fx.Ask>=fx.Bid && fx.BidUtc<=fx.Utc && fx.AskUtc<=fx.Utc &&
+  (fx.BidUtc>fx.AskUtc?fx.BidUtc:fx.AskUtc)==fx.Utc && fx.Utc<=now &&
+  (!requireFresh || (now-fx.BidUtc).TotalMilliseconds<=SharedUsdMaxAgeMilliseconds &&
+  (now-fx.AskUtc).TotalMilliseconds<=SharedUsdMaxAgeMilliseconds);
+ void ValidateSharedValuation() {
+  if(!parameters.UseSharedUsdConversion || open.Count==0)return;
+  Need(usdEurMark!=null && ValidFx(usdEurMark,lastFeed),"OPEN_EXPOSURE_FX_UNPRICEABLE");
+  foreach(var symbol in open.Keys) {
+   var q=state[symbol].Latest;
+   Need(q!=null && q.Utc<=lastFeed && (lastFeed-q.Utc).TotalSeconds<=parameters.MaxQuoteAgeSeconds,
+    "OPEN_EXPOSURE_INSTRUMENT_MARK_STALE");
+  }
+ }
+ void ApplyFx(MxmUsdEurMark fx){
+  Need(parameters.UseSharedUsdConversion && ValidFx(fx,lastFeed),"INVALID_OR_STALE_SHARED_FX");
+  if(usdEurMark is MxmUsdEurMark prior)
+   Need(fx.Utc>prior.Utc && fx.BidUtc>=prior.BidUtc && fx.AskUtc>=prior.AskUtc &&
+    (fx.BidUtc!=prior.BidUtc || fx.Bid==prior.Bid) &&
+    (fx.AskUtc!=prior.AskUtc || fx.Ask==prior.Ask),"FX_CLOCK_REGRESSION_OR_CONFLICT");
+  usdEurMark=fx;
+  foreach(var st in state.Values)if(st.Latest is MxmQuote q)
+   st.Latest=q with {QuoteToEur=1m/fx.Ask,QuoteLossToEur=1m/fx.Bid};
+ }
+ void VerifyQuoteFx(MxmQuote q){
+  if(!parameters.UseSharedUsdConversion)return;
+  Need(usdEurMark!=null && ValidFx(usdEurMark,q.Utc) && usdEurMark.Utc<q.Utc &&
+   usdEurMark.BidUtc<q.Utc && usdEurMark.AskUtc<q.Utc,"EXECUTION_REQUIRES_STRICT_PRIOR_FRESH_FX");
+  Need(q.QuoteToEur==1m/usdEurMark!.Ask && q.QuoteLossToEur==1m/usdEurMark.Bid,
+   "EXECUTION_CONVERSION_NOT_CURRENT_SIGNED_FX");
+ }
  decimal MarkedEquity() {
+  ValidateSharedValuation();
   decimal value=balance;
   foreach(var pair in open) {
    var tick=state[pair.Key].Latest ?? throw new ArgumentException("MISSING_POSITION_QUOTE");
@@ -119,8 +168,10 @@ public sealed partial class MxmPortfolioAccountReplay {
  });
  static decimal ConvertQuote(MxmQuote quote,decimal amount)=>
   amount*(amount>=0?quote.QuoteToEur:quote.QuoteLossToEur??quote.QuoteToEur);
- static decimal Fee(MxmQuote quote,decimal units,decimal price)=>
-  quote.CapturedCosts?.FeeEur(units,price,quote.Bid,quote.Ask)??quote.CommissionPerSideEur;
+ decimal Fee(MxmQuote quote,decimal units,decimal price)=>
+  quote.CapturedCosts?.FeeEur(units,price,
+   parameters.UseSharedUsdConversion?usdEurMark!.Bid:quote.Bid,
+   parameters.UseSharedUsdConversion?usdEurMark!.Ask:quote.Ask)??quote.CommissionPerSideEur;
  void Mark() {
   decimal equity=MarkedEquity();
   if(equity>peak)peak=equity;
@@ -203,7 +254,24 @@ public sealed partial class MxmPortfolioAccountReplay {
    Need(e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
    Need(e.Utc>=lastFeed,"OUT_OF_ORDER_GLOBAL_FEED");
    lastFeed=e.Utc;
+   if(e is MxmUsdEurMark fx){
+    ApplyFx(fx);Mark();processedEvents++;continue;
+   }
+   if(e is MxmUsdConversionUnavailable unavailable){
+    Need(parameters.UseSharedUsdConversion && unavailable.Symbol=="EURUSD" && !string.IsNullOrWhiteSpace(unavailable.Reason),"UNREGISTERED_FX_INVALIDATION");
+    usdEurMark=null;
+    foreach(var item in state.Values)item.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);
+    // Never carry open exposure through an unknown conversion interval and
+    // later report a conveniently priced capital path.
+    Mark();processedEvents++;continue;
+   }
    if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
+   if(e is MxmInstrumentQuoteUnavailable missing){
+    Need(parameters.UseSharedUsdConversion && !string.IsNullOrWhiteSpace(missing.Reason),"UNREGISTERED_INSTRUMENT_INVALIDATION");
+    st!.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);
+    Need(!open.ContainsKey(e.Symbol),"OPEN_EXPOSURE_INSTRUMENT_UNPRICEABLE");
+    Mark();processedEvents++;continue;
+   }
    if(e is MxmBarClose bar) {
     // A broker's first tick of a new bar does NOT arrive at the exact
     // timestamp of its UTC bucket boundary. Check continuous bar identity
@@ -224,6 +292,7 @@ public sealed partial class MxmPortfolioAccountReplay {
     st.Intent.Publish(signal,true,st.Kernel.CompletedBars,boundary,bar.Utc,parameters.BarMinutes);
     if(st.Kernel.CompletedBars<6)st.Intent.Clear();
    } else if(e is MxmQuote quote) {
+    VerifyQuoteFx(quote);
     Need(quote.Bid>0 && quote.Ask>=quote.Bid && quote.QuoteToEur>0 &&
       quote.ExecutableUnits>0 && quote.InitialMarginEur>0 &&
       quote.CommissionPerSideEur>=0 && quote.SlipPerSideQuote>=0 &&

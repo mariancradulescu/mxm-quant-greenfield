@@ -93,6 +93,18 @@ jobs:
           MXM_REQUIRE_PAIRED_CSHARP=1 python3 -m unittest research_core_v4.laboratory.test_usd_pair_alignment research_core_v4.laboratory.test_usd_pair_native_reception -v
           python3 -m unittest research_core_v4.laboratory.test_usd_pair_source_evidence -v
           python3 -m research_core_v4.laboratory.verify_usd_pair_source_reception
+      - name: Fund the same CSharp EUR200 account and verify FX-only marking and cold restore independently
+        run: |
+          mkdir -p verification/shared-usd-account
+          dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release > verification/shared-usd-account/proof.json
+          python3 -m research_core_v4.laboratory.shared_usd_account_checks verification/shared-usd-account/proof.json
+      - name: Preserve original artificial funded-account FX proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: shared-usd-account-artificial-${{ github.run_id }}
+          path: verification/shared-usd-account/proof.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Compile shared CSharp strategy, simulator and actual cTrader .algo
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj -c Release -- --selftest
