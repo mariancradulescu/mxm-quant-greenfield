@@ -30,6 +30,60 @@ static List<MxmAccountFeed> Series(int bars=8,bool executableQuotes=true) {
 }
 static MxmReplayParameters Params(int positions=2,decimal marginFraction=.8m,decimal riskFraction=.03m)=>
  new(StrategyMode.TrendOnly,marginFraction,positions,0m,riskFraction,.2m);
+// Prospective sizing mode: synthetic only, real single C# EUR200 account.
+// Matches native selector and existing fee/stop/OWNER gates on declared LINEAR
+// volume->margin/risk scenario. Not historical cTrader terms or actual fills.
+const string sizeScenario="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const string sizePolicy="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+var sizeStart=new DateTime(2026,8,24,12,0,0,DateTimeKind.Utc);
+var sizedQuoteUtc=sizeStart.AddMilliseconds(200);
+var sizeParams=new MxmReplayParameters(StrategyMode.TrendOnly,.4m,1,120m,.01m,.2m,
+ ExplicitPolicySha256:sizePolicy,NativeSizingScenarioSha256:sizeScenario);
+var sizeDecision=new MxmExplicitDecision(sizeStart,"EURUSD",1,1,
+ sizeStart.AddMilliseconds(100),sizeStart.AddSeconds(5),sizePolicy);
+var sizeQuote=new MxmQuote(sizedQuoteUtc,"EURUSD",1.1998m,1.2m,1m,
+ 1000m,100m,.02m,0m,1.5m,
+ BidSourceUtc:sizedQuoteUtc,AskSourceUtc:sizedQuoteUtc,
+ NativeSizingScenarioSha256:sizeScenario,BrokerVolumeMinUnits:100m,
+ BrokerVolumeMaxUnits:1000m,BrokerVolumeStepUnits:100m);
+var sizeAccount=new MxmPortfolioAccountReplay(new[]{"EURUSD"},sizeParams);
+var sizeReport=sizeAccount.Run(new MxmAccountFeed[]{sizeDecision,sizeQuote});
+Require(sizeReport.AcceptedEntries==1 && sizeReport.OpenPositions==1 &&
+ sizeReport.InitialCapitalEur==200m && sizeReport.Ledger.Single().Units==700m &&
+ !sizeReport.Hard21Proven && !sizeReport.CostsBrokerVerified,
+ "PROSPECTIVE_SINGLE_ACCOUNT_SIZING_700_NO_BROKER");
+Require(MxmNativeVolumeSearch.LargestAffordable(100m,1000m,100m,1000m,v=>
+ MxmCapitalAdmission.Check(200m,200m,v/10m,.02m,.4m,120m,0,1)==MxmCapitalAdmission.Admit &&
+ MxmStopRiskAdmission.Check(200m,0m,v*.0015m,.01m,.2m,0m)==MxmStopRiskAdmission.Admit &&
+ MxmOwnerEntryEnvelope.Check(200m,v/10m,.02m,v*.0015m,.2m)==MxmOwnerEntryEnvelope.Admit)==700m,
+ "SAME_NATIVE_SEARCH_AND_OWNER_LAWS_700");
+var sizeCapsule=sizeAccount.CaptureReplay(new string('c',64));
+var sizeRecovered=MxmPortfolioAccountReplay.RestoreReplay(sizeCapsule.Payload,
+ sizeCapsule.Sha256,new string('c',64),sizeParams,new[]{"EURUSD"}).Report();
+Require(sizeRecovered.Ledger.Single().Units==700m &&
+ sizeRecovered.MarkedEquityEur==sizeReport.MarkedEquityEur &&
+ sizeRecovered.EntriesByIsoWeek.SequenceEqual(sizeReport.EntriesByIsoWeek),
+ "SCENARIO_COLD_RESTORE_NO_CAPITAL_RESET");
+bool sizeScenarioSwapRefused=false;
+try {MxmPortfolioAccountReplay.RestoreReplay(sizeCapsule.Payload,sizeCapsule.Sha256,
+ new string('c',64),sizeParams with {NativeSizingScenarioSha256=new string('d',64)},
+ new[]{"EURUSD"});}
+catch(ArgumentException){sizeScenarioSwapRefused=true;}
+Require(sizeScenarioSwapRefused,"SCENARIO_SWAP_REJECTED");
+bool missingSizingQuoteRefused=false;
+try {new MxmPortfolioAccountReplay(new[]{"EURUSD"},sizeParams).Run(
+ new MxmAccountFeed[]{sizeDecision,sizeQuote with {BrokerVolumeStepUnits=null}});}
+catch(ArgumentException){missingSizingQuoteRefused=true;}
+Require(missingSizingQuoteRefused,"MISSING_BROKER_STEP_FAULTS_PROSPECTIVE_ACCOUNT");
+var oldFixedParams=sizeParams with {NativeSizingScenarioSha256=null};
+var oldFixedQuote=sizeQuote with {NativeSizingScenarioSha256=null,
+ BrokerVolumeMinUnits=null,BrokerVolumeMaxUnits=null,BrokerVolumeStepUnits=null};
+var oldFixedResult=new MxmPortfolioAccountReplay(new[]{"EURUSD"},oldFixedParams)
+ .Run(new MxmAccountFeed[]{sizeDecision,oldFixedQuote});
+Require(oldFixedResult.AcceptedEntries==0 &&
+ oldFixedResult.Rejections.Contains("REJECT_MARGIN_FRACTION"),
+ "LEGACY_FIXED_SIZE_STILL_REJECTS_1000");
+Console.WriteLine("MXM_PROSPECTIVE_SIZING_SINGLE_ACCOUNT_ARTIFICIAL_PARITY_COLD_PASS");
 Require(MxmEurUsdCapturedCosts.ProductDefaultStop12Distance(5,4)==.0012m,
  "CTRADER_PRODUCT_DEFAULT_12_PIPS_ON_EXPLICIT_EURUSD_GEOMETRY");
 foreach(var bad in new (int?,int?)[]{(5,null),(null,4),(4,4),(5,5)}) {
