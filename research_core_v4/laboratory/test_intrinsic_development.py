@@ -4,6 +4,7 @@ from decimal import Decimal as D
 from pathlib import Path
 from .intrinsic_reference import reference,reconcile
 from .intrinsic_development import ROOT,PROJECT,run_segments,workflow,spec
+from .common import LabError
 class IntrinsicTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
