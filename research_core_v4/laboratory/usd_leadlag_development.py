@@ -81,7 +81,7 @@ def result(folder,destination):
     private=encoded(details);encrypt_shard(gzip.compress(private,mtime=0),public_key=public,output=out/'full-result.mxmenc')
     receipt={'schema':'mxm.usd-leadlag-public.v1','run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':os.environ['GITHUB_SHA'],
       'spec_sha256':SPEC_SHA,'source_rows':1960588,'source_runs':{s:v['run'] for s,v in SOURCES.items()},
-      'independent_all_decisions_and_episodes_reconciled':True,'disposition':verdict,'hypotheses':1,'model_leaves':1,
+      'independent_all_decisions_and_episodes_reconciled':True,'disposition':verdict,'screen_gates':metrics['gates'],'hypotheses':1,'model_leaves':1,
       'dependent_fee_slippage_scenarios':1,'partition':'DEVELOPMENT_ALREADY_EXPOSED','private_sha256':bytes_digest(private),
       'ciphertext_sha256':bytes_digest((out/'full-result.mxmenc').read_bytes()),'csharp_sha256':bytes_digest(raw),
       'capital_replay':False,'hard21_proven':False,'edge_confirmed':False,'historical_costs_proven':False,
