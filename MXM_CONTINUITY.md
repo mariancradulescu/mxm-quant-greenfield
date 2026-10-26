@@ -1,3 +1,11 @@
+# 26 octombrie2026 — recuperare Work și admitere preventivă a sursei
+
+Reconciliat LIVE995903eea5bfe043c1cc96a7831db7d61f7d08e2; PR187–189 integrate. Readback40286679891/job121451871522 este deja SUCCESS și nu a fost relansat. Exact ambele originale ZIP au fost restaurate/verificate local: rezultat criptat4612bytes9fda9674… și evaluator60510bytes80fdea40…. Publicarea lor pe GitHub a fost respinsă de auto-review de două ori, inclusiv după verificarea destinației/provenienței. Nu se ocolește respingerea; binarele/arhivele nu sunt incluse în această integrare. Originalele Actions și readback-ul rămân intacte, dar păstrarea durabilă în Git este încă incompletă.
+
+Modelul intrinsec rămâne închis DATA_LIMITED: toate2129692 observații verificate, o singură secvență C# executată; fără cont complet pe trei săptămâni, concluzie NET pentru întreaga politică, HARD21 sau recepție operațională cTrader. Se instalează un singur diagnostic finit read-only asupra contractelor tuturor celor trei surse și asupra faultului original, fără repetarea economiei. [Metodologie și limite](docs/economic-development/20261026/INTEGRATED_EXECUTION_AND_SOURCE_PREFLIGHT_V1.md). Diagnostic nativ PENDING la instalare. Autoritatea07d1ddbe… și OWNER1807a830c132… neschimbate; zero ordine/Cloud/broker requests noi. B–E OPEN. Snapshoturile următoare rămân istorice.
+
+---
+
 # 26 octombrie2026 — continuare din GitHub LIVE: finanțare în contul comun și sursa lipsă W36
 
 Recuperare din `5b034fb4998f9ec2e4b6978c35f3dc2902519b0a`, fără lucrări B–E noi active/queued. Drafturile istorice PR8/104 nu au fost confundate cu o execuție economică nouă. Autoritatea07d1ddbe... și OWNER1807a830c132... rămân neschimbate. Mandatul B–E continuă în rol DIRECTOR; auditorul rămâne independent.

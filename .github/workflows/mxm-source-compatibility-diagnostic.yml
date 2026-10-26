@@ -1,0 +1,71 @@
+{
+  "name": "MXM finite source compatibility and original fault diagnostic",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-source-compatibility-diagnostic.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "source-compatibility": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".sealed-chronology-source",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit one diagnostic before custody access",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.source_compatibility_diagnostic admit"
+        },
+        {
+          "name": "Verify original bytes and real schemas before any decryption",
+          "run": "python3 -m unittest research_core_v4.laboratory.test_account_source_preflight research_core_v4.laboratory.test_source_compatibility_diagnostic -v\npython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m research_core_v4.laboratory.durable_week35_chronology --out \"${RUNNER_TEMP}/mxm-source-admission/W35\"\npython3 -m research_core_v4.laboratory.durable_week36_chronology --out \"${RUNNER_TEMP}/mxm-source-admission/W36\"\npython3 -m research_core_v4.laboratory.durable_week_chronology --out \"${RUNNER_TEMP}/mxm-source-admission/W37\"\ncp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/three_week_source_recovery.py .sealed-chronology-source/research_core_v4/laboratory/\n"
+        },
+        {
+          "name": "Reauthenticate existing sources without model or new broker request",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .sealed-chronology-source\npython3 -m research_core_v4.laboratory.three_week_source_recovery W35 \"${RUNNER_TEMP}/mxm-source-admission/W35/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-source-admission/W35.ndjson\"\npython3 -m research_core_v4.laboratory.three_week_source_recovery W36 \"${RUNNER_TEMP}/mxm-source-admission/W36/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-source-admission/W36.ndjson\"\npython3 -m research_core_v4.laboratory.three_week_source_recovery W37 \"${RUNNER_TEMP}/mxm-source-admission/W37/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-source-admission/W37.ndjson\"\n"
+        },
+        {
+          "name": "Source preflight and whitelist-only original fault readback without economic replay",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.source_compatibility_diagnostic diagnose \"${RUNNER_TEMP}/mxm-source-admission\""
+        }
+      ]
+    }
+  }
+}
