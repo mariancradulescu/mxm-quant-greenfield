@@ -15,7 +15,7 @@
   "decision": "DATA_LIMITED first if censoring exceeds5%; then support, gross, scenario net and all-five-day gates. Any rejection stops this fixed model with no tune or automatic successor. A pass is only DEVELOPMENT_SURVIVOR_UNCONFIRMED, requires separate continuousEUR200/margin/risk and actual-cost admission before confirmation. HARD21 remains unproven.",
   "economics": "1000 GBP base units as a normalization, not observed executable minimum. Long buysASK/sellsBID, short sellsBID/buysASK. Observed spread included. One MODEL reference feeUSD10/100000 base units roundtrip=.10USD and0.1pip slippage per side=.02USD. netUSD=grossUSD-.12USD; signed net converted using exit strictly prior EURASK for gains/EURBID for losses. No additional fee grid. Historic fees, minima, slippage, fills and margin unproven.",
   "entry": "First valid GBP quote at or after decision+5000ms, no later than+10000ms. Any invalid GBP route after decision cancels/censors. One pending/active episode only.",
-  "exit": "First valid GBP quote at/after actual entry+60000ms, no later than+65000ms, absolute decision+80000ms. Invalid route, session escape, timeout or terminal holding is censored, not zero, stop or free exit. Censor locks new episodes through decision+80000ms.",
+  "exit": "First valid GBP quote at/after actual entry+60000ms, no later than+65000ms, absolute decision+80000ms. Session escape, timeout or terminal holding is censored, never a free exit. Invalid intermediate quotes during a fixed hold are counted as UnmarkedGroups, cannot exit or mark risk, and do not erase exposure. Invalid quotes before entry cancel/censor. No stop or continuous equity claim. Censor locks new episodes through decision+80000ms.",
   "gates": {
     "all_five_days_net_positive": true,
     "censor_fraction_max": 0.05,
@@ -25,11 +25,11 @@
   },
   "hypothesis": "A completed approximately60sec EURUSD common USD shock not yet matched by GBPUSD predicts GBPUSD catch-up over the next60sec. Fixed unit elasticity, no fitted beta, spread-conditioned signal. Distinct from price-level pair OLS reversion and closed single-instrument models. Microstructure efficiency and source-time uncertainty may make it unexploitable.",
   "implementation_sha256": {
-    "research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.cs": "1d2d9247d2332c0d1d0e7787f28d9e7cb0964476533eaf1d2338f99f8839260b",
+    "research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.cs": "2d8c1576d89c2dedff7ff6f7e6b1ddf908cf09cc5868d04165838017a3ee5498",
     "research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.csproj": "4cef16e7b835a4e4da3a4c1afb92c6cf4f5fb2c1b8eaa04209fd8af0225ef91c",
     "research_core_v4/laboratory/csharp/usd_leadlag/Program.cs": "eb3a4e489dba4c1e22542f60f24de8f70dcb986fb5d2e90f8b9f8b2a0a662ffe",
     "research_core_v4/laboratory/csharp/usd_pair/MxmUsdPairAlignment.cs": "8c471d14a4ffda422606c3c50c100a8dad5d04c412ddfb97cd2fc0c2e42962f9",
-    "research_core_v4/laboratory/usd_leadlag_reference.py": "bde8d563e6d94a2540a31491d53f3eb98f97b22e39a040176f86d7a372b6eccb",
+    "research_core_v4/laboratory/usd_leadlag_reference.py": "2d646ff7fb45317f0f0606f61a8998f0b2a513a7160590fef8ad2717cf834c24",
     "research_core_v4/laboratory/usd_pair_alignment.py": "261b594ac4c3bab2417f72cfd3cfee615928d0af18162db1c58dd0ee2c792025",
     "research_core_v4/laboratory/usd_pair_native_reception.py": "752e4c1c5421e85f5297616ff31104b07df980d7c5299d4e79ba02f39083baee"
   },
@@ -40,6 +40,7 @@
   "new_broker_requests": 0,
   "orders": 0,
   "partition": "DEVELOPMENT_ALREADY_EXPOSED",
+  "preinput_design_note": "Before any authentic input/output, review of known alignment coverage identified that unmarked intermediate observations cannot liquidate an endpoint-only fixed-hold screen. They are counted and retained as explicit unobservable risk; only valid entry/exit endpoints settle. Original conservative canceled-all-holes draft remains in PR history, never economically executed.",
   "privacy": "Every economic number, decision and episode encrypted to existing custody public key; public only source counts, identity, parity and disposition.",
   "protected_opened": false,
   "sampling": "Exactly first GBP update of each UTC minute; it must be within5000ms after boundary, with valid GBP sides and strictly prior valid EUR sides age<=5000ms. Consecutive minute samples required; compare mid returns at actual sample times. Invalid/late sample breaks history. Source-time proxy, not historical arrival.",

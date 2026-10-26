@@ -41,24 +41,25 @@ def reference(rows):
         for index,sign in candidates:
             d=rows[index][0]
             if d<busy or d<=blocked:continue
-            signals+=1;entered=None;done=False
+            signals+=1;entered=None;done=False;unmarked=0
             for r in islice(rows,index+1,None):
                 t,code,b,a,fb,fa=r
-                if code!='READY_STRICT_PRIOR_FX' or t>d+80000 or not session(t):
+                if t>d+80000 or not session(t):
                     busy=t;blocked=max(blocked,d+80000);censored+=1;done=True;break
                 if entered is None:
-                    if t>d+10000:
+                    if code!='READY_STRICT_PRIOR_FX' or t>d+10000:
                         busy=t;blocked=max(blocked,d+80000);censored+=1;done=True;break
                     if t>=d+5000:entered=r
                 elif t>entered[0]+65000:
                     busy=t;blocked=max(blocked,d+80000);censored+=1;done=True;break
+                elif code!='READY_STRICT_PRIOR_FX':unmarked+=1
                 elif t>=entered[0]+60000:
                     ep=D(entered[3] if sign>0 else entered[2])/100000
                     xp=D(b if sign>0 else a)/100000
                     gross=sign*(xp-ep)*1000;net=gross-D('.12')
                     eur=net/(D(fa if net>=0 else fb)/100000)
                     episodes.append(dict(Decision=d,Entry=entered[0],Exit=t,Direction=sign,EntryPrice=ep,
-                      ExitPrice=xp,GrossUsd=gross,NetUsd=net,NetEur=eur))
+                      ExitPrice=xp,GrossUsd=gross,NetUsd=net,NetEur=eur,UnmarkedGroups=unmarked))
                     busy=t;done=True;break
             if not done:censored+=1;busy=2**63
         return {'Signals':signals,'Complete':len(episodes),'Censored':censored,

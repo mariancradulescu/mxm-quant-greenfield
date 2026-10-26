@@ -7,7 +7,7 @@ from .usd_leadlag_reference import read_routes,reference,reconcile,decide
 from .usd_pair_native_reception import REPO,BRANCH,NATIVE,SOURCES,CHECKOUT,UPLOAD,one_shot
 ROOT=Path(__file__).resolve().parents[2]
 SPEC=ROOT/'research_core_v4/laboratory/USD_LEADLAG_DEVELOPMENT_V1.json'
-SPEC_SHA='01d9eab3552e3a38041a3b4ae5cd8dcc86b4863ec3f28dce4d63d3205cc45b31'
+SPEC_SHA='0f6b3d903990213ebb5840f4ce0123f397ef329708490a09808f8cf785a40ce1'
 WORKFLOW='.github/workflows/mxm-usd-leadlag-development.yml'
 PROJECT='research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.csproj'
 

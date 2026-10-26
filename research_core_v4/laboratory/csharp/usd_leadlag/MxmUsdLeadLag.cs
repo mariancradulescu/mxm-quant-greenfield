@@ -2,11 +2,11 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 namespace Mxm.Research;
-public sealed record LeadLagEpisode(long Decision,long Entry,long Exit,int Direction,decimal EntryPrice,decimal ExitPrice,decimal GrossUsd,decimal NetUsd,decimal NetEur);
+public sealed record LeadLagEpisode(long Decision,long Entry,long Exit,int Direction,decimal EntryPrice,decimal ExitPrice,decimal GrossUsd,decimal NetUsd,decimal NetEur,int UnmarkedGroups);
 public sealed record LeadLagResult(int Signals,int Complete,int Censored,string DecisionSha256,List<LeadLagEpisode> Episodes);
 // Finite DEVELOPMENT screen only: unit-ticket economics, no capital/portfolio simulator.
 public sealed class MxmUsdLeadLag {
- long minute=-1,blockedUntil=-1; AlignedUsdSnapshot? prior,pending,entry; int direction,signals,censored;
+ long minute=-1,blockedUntil=-1; AlignedUsdSnapshot? prior,pending,entry; int direction,signals,censored,unmarked;
  readonly List<LeadLagEpisode> episodes=new();
  readonly StringBuilder decisions=new();
  static decimal Mid(long? b,long? a)=>(b!.Value+a!.Value)/2m;
@@ -18,11 +18,12 @@ public sealed class MxmUsdLeadLag {
   bool ready=s.Code=="READY_STRICT_PRIOR_FX";
   // Advance an existing episode before making any new decision at this quote.
   if(pending is not null){
-   if(!ready || s.T>pending.T+80000 || !Session(s.T)){Cancel(s.T);}
+   if(s.T>pending.T+80000 || !Session(s.T)){Cancel(s.T);}
    else if(entry is null){
-    if(s.T>pending.T+10000)Cancel(s.T);
+    if(!ready || s.T>pending.T+10000)Cancel(s.T);
     else if(s.T>=pending.T+5000)entry=s;
    }else if(s.T>entry.T+65000){Cancel(s.T);}
+   else if(!ready){unmarked++;}
    else if(s.T>=entry.T+60000){
     decimal ep=(direction>0?entry.GbpAskRaw!.Value:entry.GbpBidRaw!.Value)/100000m;
     decimal xp=(direction>0?s.GbpBidRaw!.Value:s.GbpAskRaw!.Value)/100000m;
@@ -30,7 +31,7 @@ public sealed class MxmUsdLeadLag {
     // USD10/100k round trip plus0.1pip per side on1000 units; MODEL not certified terms.
     decimal net=gross-.10m-.02m;
     decimal eur=net/(net>=0?s.FxAskRaw!.Value/100000m:s.FxBidRaw!.Value/100000m);
-    episodes.Add(new(pending.T,entry.T,s.T,direction,ep,xp,gross,net,eur));pending=null;entry=null;
+    episodes.Add(new(pending.T,entry.T,s.T,direction,ep,xp,gross,net,eur,unmarked));pending=null;entry=null;
    }
   }
   long bucket=s.T/60000;
@@ -46,7 +47,7 @@ public sealed class MxmUsdLeadLag {
    if(spread>0 && Math.Abs(fx)>=4m*spread && sign*(fx-gbp)>=2m*spread)sig=sign;
   }
   decisions.Append(s.T.ToString(CultureInfo.InvariantCulture)).Append(',').Append(sig).Append('\n');
-  if(sig!=0 && pending is null && s.T>blockedUntil){pending=s;direction=sig;signals++;}
+  if(sig!=0 && pending is null && s.T>blockedUntil){pending=s;direction=sig;unmarked=0;signals++;}
  }
  public LeadLagResult Finish(){if(pending is not null)Cancel(pending.T);return new(signals,episodes.Count,censored,
   Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(decisions.ToString()))).ToLowerInvariant(),episodes);}
