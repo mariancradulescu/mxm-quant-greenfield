@@ -118,7 +118,9 @@ def reconcile(reports,expected):
         for row,ref in zip(a['Ledger'],e['ledger']):
             need(set(row)==set(ref),'LEDGER_FIELDS')
             for key in ref:
-                if key=='Utc':need(int(datetime.fromisoformat(row[key].replace('Z','+00:00')).timestamp()*1000)==ref[key],'EXECUTION_CLOCK')
+                if key=='Utc':
+                    delta=datetime.fromisoformat(row[key].replace('Z','+00:00'))-datetime(1970,1,1,tzinfo=timezone.utc)
+                    need(delta.days*86400000+delta.seconds*1000+delta.microseconds//1000==ref[key],'EXECUTION_CLOCK')
                 elif key in ('Price','Units','CashEur','CommissionEur','GrossEur'):close(row[key],ref[key])
                 else:need(row[key]==ref[key],'ORDER_EVENT')
         close(a['FinalCashEur'],e['cash']);close(a['MarkedEquityEur'],e['equity']);close(a['MaxDrawdownEur'],e['drawdown'])

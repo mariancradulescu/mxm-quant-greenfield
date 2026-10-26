@@ -21,7 +21,7 @@ class IntrinsicTests(unittest.TestCase):
             path=folder/f'week-{w}.ndjson';lines=[]
             for i in range(601):
                 x=i%40;raw=110000+4*(x if x<=20 else 40-x)
-                for side,price in [('bid',raw),('ask',raw+4)]:lines.append({'t':start+i*1000,'side':side,'raw':price})
+                for side,price in [('bid',raw),('ask',raw+4)]:lines.append({'t':start+i*1000+(i%3)*113,'side':side,'raw':price})
             day=start//86400000*86400000
             for offset in (0,250):
                 for side,price in [('bid',110000),('ask',110004)]:lines.append({'t':day+57300000+offset,'side':side,'raw':price})

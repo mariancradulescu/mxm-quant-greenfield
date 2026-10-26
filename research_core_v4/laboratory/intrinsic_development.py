@@ -7,7 +7,7 @@ from .intrinsic_reference import reference,reconcile
 from .three_week_source import FOLDERS,RUNS,ROWS,NATIVE
 ROOT=Path(__file__).resolve().parents[2]
 SPEC=ROOT/'research_core_v4/laboratory/INTRINSIC_ACCOUNT_DEVELOPMENT_V1.json'
-SPEC_SHA='0528074efe7ac4ee01fa21f3baa348ba3bfe78de2f8d9631a1ebf3484de35de7'
+SPEC_SHA='61da70636bd4eb9a316ab7c7365836290f510be510e3d862247da493d6135b12'
 PATH='.github/workflows/mxm-intrinsic-account-development.yml'
 PROJECT='research_core_v4/laboratory/csharp/intrinsic/MxmIntrinsicAccount.csproj'
 REPO='mariancradulescu/mxm-quant-greenfield';BRANCH='mxm-remediation-p0-p4-20261015-v1'
