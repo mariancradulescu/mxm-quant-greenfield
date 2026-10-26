@@ -1,0 +1,14 @@
+# OWNER absolute EUR entry envelope for the native C# product — 26 October 2026
+
+Continuation from official branch HEAD `6ab02cd05662bc07f4a56ef65312aba918040265`, after PR194–195.
+
+## Material gap
+The real Robot previously used operator-adjustable fractions and defaults that did not independently guarantee OWNER's absolute EUR limits. A configured margin fraction can rise above the EUR80 per-ticket maximum; the default free-margin reserve was EUR0; a 2% stop-risk fraction on EUR200 is EUR4 before friction. These are safety-envelope omissions, not a discovered profitable strategy. Existing immutable model trials, account replay, native storage tests, commission floor and accepted negative outcomes are not reopened.
+
+## Change (native ENTRY path only)
+The pure `MxmOwnerEntryEnvelope` enforces EUR80 maximum estimated ticket margin, EUR120 minimum estimated free margin after ticket margin and estimated entry commission, and EUR2 maximum estimated proposed stop exposure plus declared round-trip friction. Exact threshold equality passes. Invalid/negative/overflowing amounts fail closed. The configured `MxmCapitalAdmission`, aggregate `MxmStopRiskAdmission`, account isolation, broker-intent fence and durable pending marker still run. The new envelope runs after broker-owned stop calculations and before the final lease/book check and `ExecuteMarketOrder`. Parameter defaults are set to EUR120 reserve and 1% account-risk reference. Raising a parameter cannot bypass the immutable absolute envelope. It does not enforce a new limit on existing exits or disturb recovery of a broker-owned position.
+
+## Scope limits
+At present, the native Robot lacks independently authenticated current commission/FX/stop-gap pricing. The gate passes zero as an explicitly **unknown** entry-commission estimate inherited from the existing snapshot (NOT a claim that broker charges zero); the EUR120 post-entry figure is therefore an **estimate**, not guaranteed net available cash. Two-sided general fee adapter remains in the *existing offline account replay*, not in native Robot; integration requires authenticated symbol-specific fee/FX and broker reconciliation before native fee adequacy can be certified. `AmountRisked` and declared friction are estimates, not a EUR2 realized-loss guarantee across broker stop gaps or price discontinuities. Account capital funded once, independent real broker transactions, HARD21 and native cTrader callback acceptance remain unproven.
+
+Deterministic artificial C# fixture checks equality, over-cap risk/margin, under-reserve and unknown inputs; required CI must compile the actual net6 cBot and verify code-path ordering and that original economic fixture remains unchanged. No broker orders, DEMO/LIVE/Cloud activation, secrets, source acquisition, budget refund, new model, economic rerun or authority changes. B–E remains OPEN.
