@@ -28,6 +28,18 @@ foreach(var kind in types)foreach(var minType in new[]{0,1}) {
    0.01m,0m)=="REJECT_OWNER_POST_ENTRY_RESERVE_LT_120",
    "OWNER_FEE_REDUCES_FREE_RESERVE");
 }
+// Final pre-order recheck with independent hypothetical changed conversion.
+var boundTerms=new MxmNativeCommissionTerms(0,0,"USD","EUR",7m,.1m,100000m);
+var early=MxmNativeCommission.Price(boundTerms,1000m,1.2m,1.2002m,1m,.9m,.9m,1m);
+var costlierFx=MxmNativeCommission.Price(boundTerms,1000m,1.2m,1.2002m,1m,1.1m,.9m,1m);
+var cheaperFx=MxmNativeCommission.Price(boundTerms,1000m,1.2m,1.2002m,1m,.8m,.9m,1m);
+Need(MxmNativeCommission.StillCovered(early,early),"REPRICE_IDENTICAL_ALLOWED");
+Need(!MxmNativeCommission.StillCovered(early,costlierFx),"REPRICE_INCREASE_REJECTED");
+Need(MxmNativeCommission.StillCovered(early,cheaperFx),"REPRICE_DECREASE_KEEPS_EARLIER_RESERVE");
+Need(!MxmNativeCommission.StillCovered(early,
+ early with {RoundTripReserveEur=0m}),"REPRICE_FALSE_BROKER_RESERVE_REJECTED");
+Need(!MxmNativeCommission.StillCovered(early,
+ early with {Classification="EXACT_BROKER_CHARGE"}),"REPRICE_FALSE_CLAIM_REJECTED");
 void Reject(MxmNativeCommissionTerms t,decimal qUsd=1m,decimal usdEur=.9m,
  decimal quoteEur=.9m,decimal minEur=1m,decimal volume=1000m,
  decimal bid=1.2m,decimal ask=1.2002m) {
