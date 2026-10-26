@@ -46,7 +46,7 @@ def validate_exit(raw):
     need(isinstance(triggers,dict) and set(triggers)=={'push'},'EXIT_NO_DISPATCH_OR_SCHEDULE')
     push=triggers['push']
     need(push['branches']==['mxm-remediation-p0-p4-20261015-v1'] and
-         set(push['paths'])==EXIT_ALLOWED and len(push['paths'])==1,'EXIT_NO_BROAD_TRIGGER')
+         set(push['paths'])==EXIT_ALLOWED and len(push['paths'])==len(EXIT_ALLOWED),'EXIT_NO_BROAD_TRIGGER')
     need(config['permissions']=={} and
          set(config['jobs'])=={'native-csharp-exit-sensitivity'},'EXIT_NO_PRIVILEGE_OR_NEW_JOB')
     job=config['jobs']['native-csharp-exit-sensitivity']
