@@ -98,6 +98,16 @@ jobs:
           assert 'MxmOwnerEntryEnvelope.Check(' in source
           assert 'MxmCapitalAdmission.Check(' in source
           assert 'MxmStopRiskAdmission.Check(' in source
+          selection=source[source.index('double SelectAffordableNativeUnits('):source.index('decimal CostRate(')]
+          assert 'TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting)' in selection
+          assert 'MxmAccountIsolation.Check(allPositions,owned,PendingOrders.Count)' in selection
+          assert 'MxmStopRiskAdmission.Check(equity,(decimal)existingRisk,(decimal)risk,riskPercent,' in selection
+          assert 'friction,friction*protectedExisting' in selection
+          assert selection.count('riskBookBefore.SequenceEqual(CaptureNativeRiskBook())')>=2
+          actual=source[source.index('void ApplyPortfolioDecision'):source.index('// Sample all relevant existing-position')]
+          assert 'TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting)' in actual
+          assert actual.index('entryCheckpoint.PrepareRecoverable(')<actual.index('TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting)')
+          assert actual.index('TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting)')<actual.index('MxmStopRiskAdmission.Check(')<actual.index('entryCheckpoint.MarkSubmitted()')
           assert source.index('MxmNativeFinalAccountFence.Check(')<source.index('ExecuteMarketOrder(')
           assert 'NormalizeVolumeInUnits(Math.Max(RequestedUnits' not in source
           print('MXM_NATIVE_VOLUME_CAPPED_BEFORE_DURABLE_INTENT_AND_RECHECKED_AFTER')

@@ -368,40 +368,8 @@ public sealed class MxmReferenceProductBot : Robot {
   // Freeze the exact owned position identities/stop/volume/other-symbol marks
   // BEFORE any risk computation; order book IDs alone cannot detect a changed stop.
   var originalRiskBook=CaptureNativeRiskBook();
-  double existingRisk=0;
-  int protectedExisting=0;
-  foreach(var active in Positions.FindAll(Label)) {
-   // No new orders if ANY existing MXM position has no broker stop
-   // or if its symbol/volume/pip geometry cannot be validated.
-   if(!active.StopLoss.HasValue || !double.IsFinite(active.StopLoss.Value) ||
-      !double.IsFinite(active.EntryPrice) || !double.IsFinite(active.VolumeInUnits) ||
-      !double.IsFinite(active.Symbol.Bid) || !double.IsFinite(active.Symbol.Ask) ||
-      !double.IsFinite(active.Symbol.PipSize) || active.Symbol.PipSize<=0 ||
-      active.EntryPrice<=0 || active.VolumeInUnits<=0) {
-    Print("MXM_EXISTING_STOP_UNVERIFIED_SAFE_HOLD");return;
-   }
-   // Account.Equity already includes floating PnL. Estimate its potential
-   // drawdown to the stop from the CURRENT BID (long) / ASK (short).
-   string geometry=MxmStopRiskGeometry.TryDistance(active.TradeType==TradeType.Buy?1:-1,
-    (decimal)active.Symbol.Bid,(decimal)active.Symbol.Ask,(decimal)active.StopLoss.Value,
-    (decimal)active.Symbol.PipSize,out var currentDistancePips);
-   if(geometry!=MxmStopRiskGeometry.Valid) {
-    Print("MXM_EXISTING_MARK_TO_STOP_HOLD_"+geometry);return;
-   }
-   double distancePips=(double)currentDistancePips;
-   if(!double.IsFinite(distancePips)||distancePips<0) {
-    Print("MXM_EXISTING_STOP_DISTANCE_UNVERIFIED_SAFE_HOLD");return;
-   }
-   double risk=active.Symbol.AmountRisked(active.VolumeInUnits,distancePips);
-   if(!double.IsFinite(risk)||risk<0) {
-    Print("MXM_EXISTING_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
-   }
-   existingRisk+=risk;
-   protectedExisting++;
-   if(!double.IsFinite(existingRisk)) {
-    Print("MXM_EXISTING_STOP_RISK_SUM_UNVERIFIED_SAFE_HOLD");return;
-   }
-  }
+  if(!TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting))
+   return;
   if(!originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
    Print("MXM_RISK_BOOK_CHANGED_DURING_ESTIMATE_HOLD");return;
   }
@@ -519,6 +487,45 @@ public sealed class MxmReferenceProductBot : Robot {
  // The preliminary broker-lattice choice is NOT admission and has no side
  // effect. Its selected volume MUST be independently revalidated after the
  // durable prepared intent, with the unchanged original complete-account gates.
+ // Compute CURRENT mark-to-stop exposure from every owned broker position.
+ // Same function used before sizing AND after the durable entry marker. Both
+ // are estimates; a changed broker risk book is explicitly checked by caller.
+ bool TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting) {
+  existingRisk=0d;protectedExisting=0;
+    foreach(var active in Positions.FindAll(Label)) {
+     // No new orders if ANY existing MXM position has no broker stop
+     // or if its symbol/volume/pip geometry cannot be validated.
+     if(!active.StopLoss.HasValue || !double.IsFinite(active.StopLoss.Value) ||
+        !double.IsFinite(active.EntryPrice) || !double.IsFinite(active.VolumeInUnits) ||
+        !double.IsFinite(active.Symbol.Bid) || !double.IsFinite(active.Symbol.Ask) ||
+        !double.IsFinite(active.Symbol.PipSize) || active.Symbol.PipSize<=0 ||
+        active.EntryPrice<=0 || active.VolumeInUnits<=0) {
+      Print("MXM_EXISTING_STOP_UNVERIFIED_SAFE_HOLD");return false;
+     }
+     // Account.Equity already includes floating PnL. Estimate its potential
+     // drawdown to the stop from the CURRENT BID (long) / ASK (short).
+     string geometry=MxmStopRiskGeometry.TryDistance(active.TradeType==TradeType.Buy?1:-1,
+      (decimal)active.Symbol.Bid,(decimal)active.Symbol.Ask,(decimal)active.StopLoss.Value,
+      (decimal)active.Symbol.PipSize,out var currentDistancePips);
+     if(geometry!=MxmStopRiskGeometry.Valid) {
+      Print("MXM_EXISTING_MARK_TO_STOP_HOLD_"+geometry);return false;
+     }
+     double distancePips=(double)currentDistancePips;
+     if(!double.IsFinite(distancePips)||distancePips<0) {
+      Print("MXM_EXISTING_STOP_DISTANCE_UNVERIFIED_SAFE_HOLD");return false;
+     }
+     double risk=active.Symbol.AmountRisked(active.VolumeInUnits,distancePips);
+     if(!double.IsFinite(risk)||risk<0) {
+      Print("MXM_EXISTING_STOP_RISK_UNVERIFIED_SAFE_HOLD");return false;
+     }
+     existingRisk+=risk;
+     protectedExisting++;
+     if(!double.IsFinite(existingRisk)) {
+      Print("MXM_EXISTING_STOP_RISK_SUM_UNVERIFIED_SAFE_HOLD");return false;
+     }
+    }
+  return true;
+ }
  double SelectAffordableNativeUnits(Symbol symbol,TradeType direction,
   double requested,double stopPips) {
   if(!double.IsFinite(requested)||!double.IsFinite(stopPips)||stopPips<=0 ||
@@ -537,7 +544,20 @@ public sealed class MxmReferenceProductBot : Robot {
    decimal equity=(decimal)Account.Equity,free=(decimal)Account.FreeMargin;
    decimal friction=(decimal)EstimatedRoundTripFrictionReserveEur;
    decimal riskPercent=(decimal)(MaxEstimatedMxmStopRiskPercent/100.0);
+   // An existing protected position consumes BOTH account stop-risk
+   // headroom and its existing friction. A zero-exposure preflight can
+   // otherwise choose an over-large ticket and waste a durable intent.
    int owned=Positions.FindAll(Label).Length;
+   int allPositions=0;
+   foreach(var position in Positions)allPositions++;
+   if(MxmAccountIsolation.Check(allPositions,owned,PendingOrders.Count)!=MxmAccountIsolation.Admit){
+    Print("MXM_PRE_SIZING_SHARED_ACCOUNT_ISOLATION_HOLD");return 0d;
+   }
+   var riskBookBefore=CaptureNativeRiskBook();
+   if(!TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting) ||
+      !riskBookBefore.SequenceEqual(CaptureNativeRiskBook())) {
+    Print("MXM_PRE_SIZING_EXISTING_RISK_UNVERIFIED_HOLD");return 0d;
+   }
    decimal? chosen=MxmNativeVolumeSearch.LargestAffordable(
      (decimal)symbol.VolumeInUnitsMin,(decimal)symbol.VolumeInUnitsMax,
      (decimal)symbol.VolumeInUnitsStep,(decimal)requested,amount=>{
@@ -557,8 +577,8 @@ public sealed class MxmReferenceProductBot : Robot {
      if(MxmCapitalAdmission.Check(equity,free,(decimal)margin,fee.PerSideCeilingEur,
        (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
        owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
-     if(MxmStopRiskAdmission.Check(equity,0m,(decimal)risk,riskPercent,
-       friction,0m)!=MxmStopRiskAdmission.Admit)return false;
+     if(MxmStopRiskAdmission.Check(equity,(decimal)existingRisk,(decimal)risk,riskPercent,
+       friction,friction*protectedExisting)!=MxmStopRiskAdmission.Admit)return false;
      return MxmOwnerEntryEnvelope.Check(free,(decimal)margin,
        fee.PerSideCeilingEur,(decimal)risk,friction)==MxmOwnerEntryEnvelope.Admit;
     }catch(Exception){return false;}
@@ -566,6 +586,10 @@ public sealed class MxmReferenceProductBot : Robot {
    if(!chosen.HasValue) {
     Print("MXM_NO_BROKER_LATTICE_VOLUME_ADMISSIBLE_WITH_CURRENT_FEES_AND_CAPITAL");
     return 0d;
+   }
+   if(!riskBookBefore.SequenceEqual(CaptureNativeRiskBook()) ||
+      Positions.FindAll(Label).Length!=owned) {
+    Print("MXM_PRE_SIZING_BROKER_EXPOSURE_CHANGED_HOLD");return 0d;
    }
    return (double)chosen.Value;
   }catch(Exception e) {
