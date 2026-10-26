@@ -51,3 +51,4 @@ public static class MxmNativeCommission {
   }catch(OverflowException){throw new ArgumentException("MXM_NATIVE_COMMISSION_OVERFLOW");}
  }
 }
+}

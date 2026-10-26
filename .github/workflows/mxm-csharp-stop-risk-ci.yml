@@ -63,7 +63,8 @@ jobs:
           assert main.index('CurrentNativeCommission(')<main.index('MxmCapitalAdmission.Check(')
           assert 'nativeFee.PerSideCeilingEur' in main
           assert 'nativeFee.RoundTripReserveEur' in main
-          assert main.index('MxmNativeCommission.Price(')<main.index('ExecuteMarketOrder(')
+          assert main.index('CurrentNativeCommission(')<main.index('ExecuteMarketOrder(')
+          assert 'MxmNativeCommission.Price(terms,' in main
           assert 'MXM_NATIVE_FEE_SNAPSHOT_CHANGED_BEFORE_ORDER_HOLD' in main
           assert p.count('SymbolCommissionType.')==4
           assert p.count('SymbolMinCommissionType.')==2
