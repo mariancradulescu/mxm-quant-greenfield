@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Restore exact authorized originals without custody or economic replay
+        run: |
+          python3 -m research_core_v4.laboratory.verify_intrinsic_result
+          python3 -m unittest research_core_v4.laboratory.test_intrinsic_result -v
       - name: Verify real source admission and finite diagnostic before costly evaluation
         run: python3 -m unittest research_core_v4.laboratory.test_account_source_preflight research_core_v4.laboratory.test_source_compatibility_diagnostic -v
       - name: Compile and independently reconcile prospective intrinsic-time account on artificial paths
