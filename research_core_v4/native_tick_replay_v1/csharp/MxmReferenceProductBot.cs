@@ -40,10 +40,10 @@ public sealed class MxmReferenceProductBot : Robot {
  public double MaxMarginFraction {get;set;}=0.4;
  [Parameter("Max MXM Account Positions",DefaultValue=1,MinValue=1)]
  public int MaxMxmAccountPositions {get;set;}=1;
- [Parameter("Minimum Free Margin Reserve EUR",DefaultValue=0,MinValue=0)]
- public double MinimumFreeMarginReserveEur {get;set;}=0;
- [Parameter("Max Estimated MXM Stop Risk Percent",DefaultValue=2.0,MinValue=0.1,MaxValue=100.0)]
- public double MaxEstimatedMxmStopRiskPercent {get;set;}=2.0;
+ [Parameter("Minimum Free Margin Reserve EUR",DefaultValue=120,MinValue=0)]
+ public double MinimumFreeMarginReserveEur {get;set;}=120;
+ [Parameter("Max Estimated MXM Stop Risk Percent",DefaultValue=1.0,MinValue=0.1,MaxValue=100.0)]
+ public double MaxEstimatedMxmStopRiskPercent {get;set;}=1.0;
  [Parameter("Estimated Round Trip Friction Reserve EUR",DefaultValue=0.2,MinValue=0.0)]
  public double EstimatedRoundTripFrictionReserveEur {get;set;}=0.2;
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
@@ -383,6 +383,15 @@ public sealed class MxmReferenceProductBot : Robot {
    (decimal)EstimatedRoundTripFrictionReserveEur*protectedExisting);
   if(stopRiskGate!=MxmStopRiskAdmission.Admit) {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
+  }
+  // Immutable OWNER absolute limits supplement configured percent/reserve.
+  // Commission=0 is inherited UNKNOWN (not a claim of free broker execution);
+  // post-entry reserve and EUR2 proposed risk remain estimates, never guarantees.
+  string ownerEnvelope=MxmOwnerEntryEnvelope.Check(
+   (decimal)Account.FreeMargin,(decimal)margin,0m,(decimal)newStopRisk,
+   (decimal)EstimatedRoundTripFrictionReserveEur);
+  if(ownerEnvelope!=MxmOwnerEntryEnvelope.Admit) {
+   Print("MXM_OWNER_ENTRY_ENVELOPE_HOLD_"+ownerEnvelope);return;
   }
   // Last local admission check, after all expensive risk/margin calculations.
   // This does not make the broker check+order atomic or lock other instances.
