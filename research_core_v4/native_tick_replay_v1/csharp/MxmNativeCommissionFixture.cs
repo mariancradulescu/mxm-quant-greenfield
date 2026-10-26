@@ -29,7 +29,7 @@ foreach(var kind in types)foreach(var minType in new[]{0,1}) {
    "OWNER_FEE_REDUCES_FREE_RESERVE");
 }
 // Final pre-order recheck with independent hypothetical changed conversion.
-var boundTerms=new MxmNativeCommissionTerms(0,0,"USD","EUR",7m,.1m,100000m);
+var boundTerms=new MxmNativeCommissionTerms(0,0,"USD","EUR",350m,.01m,100000m);
 var early=MxmNativeCommission.Price(boundTerms,1000m,1.2m,1.2002m,1m,.9m,.9m,1m);
 var costlierFx=MxmNativeCommission.Price(boundTerms,1000m,1.2m,1.2002m,1m,1.1m,.9m,1m);
 var cheaperFx=MxmNativeCommission.Price(boundTerms,1000m,1.2m,1.2002m,1m,.8m,.9m,1m);

@@ -30,8 +30,8 @@ public static class MxmNativeCommission {
      earlier.PerSideCeilingEur<earlier.SellEur ||
      later.PerSideCeilingEur<later.BuyEur ||
      later.PerSideCeilingEur<later.SellEur ||
-     earlier.RoundTripReserveEur!=2m*earlier.PerSideCeilingEur ||
-     later.RoundTripReserveEur!=2m*later.PerSideCeilingEur)return false;
+     earlier.RoundTripReserveEur/2m!=earlier.PerSideCeilingEur ||
+     later.RoundTripReserveEur/2m!=later.PerSideCeilingEur)return false;
   return later.PerSideCeilingEur<=earlier.PerSideCeilingEur;
  }
  public static MxmNativeCommissionEstimate Price(MxmNativeCommissionTerms terms,
