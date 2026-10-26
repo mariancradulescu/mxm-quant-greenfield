@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile and independently reconcile prospective intrinsic-time account on artificial paths
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/intrinsic/MxmIntrinsicAccount.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_intrinsic_development -v
       - name: Compile prospective USD shock-lag kernel and verify independent artificial source paths
         run: |
           dotnet build research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.csproj -c Release
