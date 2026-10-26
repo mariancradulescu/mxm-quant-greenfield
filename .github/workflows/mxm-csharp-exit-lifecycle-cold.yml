@@ -1,25 +1,18 @@
 name: MXM CSharp authenticated entire-position lifecycle sensitivity
+# Retired completed fixed-source 216-leaf comparison. Historic step bodies
+# retained for audit; no economic rerun from a native Robot/library edit.
 on:
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
       - .github/workflows/mxm-csharp-exit-lifecycle-cold.yml
-      - research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs
-      - research_core_v4/native_tick_replay_v1/csharp/MxmDecisionKernel.cs
-      - research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs
-      - research_core_v4/native_tick_replay_v1/csharp/EXIT_LIFECYCLE_FINITE_DEVELOPMENT_V1.json
-      - research_core_v4/laboratory/chronology_csharp_bridge.py
-      - research_core_v4/laboratory/captured_symbol_terms.py
-      - research_core_v4/laboratory/durable_native_chronology.py
-      - docs/economic-development/20261023/native-chronology-39660692230/**
-  workflow_dispatch: {}
 permissions: {}
 concurrency:
   group: mxm-integrated-laboratory
   cancel-in-progress: false
 jobs:
   native-csharp-exit-sensitivity:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    if: ${{ false }}
     environment: mxm-r3-custody-v1
     runs-on: ubuntu-24.04
     timeout-minutes: 24
