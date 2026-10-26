@@ -324,11 +324,25 @@ public sealed class MxmReferenceProductBot : Robot {
      StopLossPips!=stopPips || instrument.PipSize!=pipSize || instrument.TickSize!=tickSize)return;
   double margin=instrument.GetEstimatedMargin(direction,units);
   if(!double.IsFinite(margin)||margin<=0)return;
+  // Native symbol properties are observed NOW; no unsupported historic terms or
+  // assumed zero entry fee. FX via AssetConverter is an estimate, not an exact
+  // future fee or independent timestamped loss-side price.
+  double feeBookBid=instrument.Bid,feeBookAsk=instrument.Ask;
+  var feeType=instrument.CommissionType;
+  var feeMinimumType=instrument.MinCommissionType;
+  double feeRate=instrument.Commission,feeMinimum=instrument.MinCommission;
+  MxmNativeCommissionEstimate nativeFee;
+  try {nativeFee=CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk);}
+  catch(Exception e){
+   Print("MXM_NATIVE_FEE_UNVERIFIED_SAFE_HOLD_"+e.GetType().Name);return;
+  }
+  if((decimal)EstimatedRoundTripFrictionReserveEur<nativeFee.RoundTripReserveEur) {
+   Print("MXM_NATIVE_FEE_EXCEEDS_DECLARED_FRICTION_RESERVE_HOLD");return;
+  }
   string admit=MxmCapitalAdmission.Check((decimal)Account.Equity,(decimal)Account.FreeMargin,
-    (decimal)margin,0m,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
+    (decimal)margin,nativeFee.PerSideCeilingEur,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
     accountOwned,MaxMxmAccountPositions);
-  // Exact historical broker commissions are not known here; commission=0
-  // means this is an estimated account gate, never a fill/fee certificate.
+  // No claim that API-estimated commission equals an eventual broker charge.
   if(admit!=MxmCapitalAdmission.Admit){Print("MXM_CAPITAL_HOLD_"+admit);return;}
   // Complete-account MXM estimated stop exposure. Do not interpret a stop
   // as a maximum loss, or this snapshot as an atomic inter-cBot lock.
@@ -385,10 +399,10 @@ public sealed class MxmReferenceProductBot : Robot {
    Print("MXM_ACCOUNT_STOP_RISK_HOLD_"+stopRiskGate);return;
   }
   // Immutable OWNER absolute limits supplement configured percent/reserve.
-  // Commission=0 is inherited UNKNOWN (not a claim of free broker execution);
-  // post-entry reserve and EUR2 proposed risk remain estimates, never guarantees.
+  // Native observed fees are estimates, not actual future fill charges;
+  // EUR120 reserve and EUR2 proposed risk remain estimates, not guarantees.
   string ownerEnvelope=MxmOwnerEntryEnvelope.Check(
-   (decimal)Account.FreeMargin,(decimal)margin,0m,(decimal)newStopRisk,
+   (decimal)Account.FreeMargin,(decimal)margin,nativeFee.PerSideCeilingEur,(decimal)newStopRisk,
    (decimal)EstimatedRoundTripFrictionReserveEur);
   if(ownerEnvelope!=MxmOwnerEntryEnvelope.Admit) {
    Print("MXM_OWNER_ENTRY_ENVELOPE_HOLD_"+ownerEnvelope);return;
@@ -399,6 +413,12 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),finalClock) ||
      finalClock<currentOpenTime || finalClock>=currentOpenTime.AddMinutes(BarMinutes)) {
    Print("MXM_BROKER_BOOK_CHANGED_OR_EXPIRED_NO_STALE_INTENT_ENTRY");return;
+  }
+  if(instrument.Bid!=feeBookBid || instrument.Ask!=feeBookAsk ||
+     instrument.CommissionType!=feeType || instrument.Commission!=feeRate ||
+     instrument.MinCommissionType!=feeMinimumType ||
+     instrument.MinCommission!=feeMinimum) {
+   Print("MXM_NATIVE_FEE_SNAPSHOT_CHANGED_BEFORE_ORDER_HOLD");return;
   }
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
@@ -443,6 +463,46 @@ public sealed class MxmReferenceProductBot : Robot {
     orderProtection.HaltUnknown();LatchProtectionHalt();
    }
   }
+ }
+ // Never infer asset names from ticker substrings or hardcode EURUSD.
+ decimal CostRate(string from,string to) {
+  if(string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to))
+   throw new ArgumentException("NATIVE_COST_ASSET_MISSING");
+  if(from==to)return 1m;
+  double converted=AssetConverter.Convert(1d,from,to);
+  if(!double.IsFinite(converted)||converted<=0d)
+   throw new ArgumentException("NATIVE_COST_FX_UNAVAILABLE");
+  return checked((decimal)converted);
+ }
+ MxmNativeCommissionEstimate CurrentNativeCommission(Symbol instrument,
+  double volume,double bid,double ask) {
+  if(!double.IsFinite(volume)||!double.IsFinite(bid)||!double.IsFinite(ask) ||
+    !double.IsFinite(instrument.Commission)||!double.IsFinite(instrument.MinCommission))
+   throw new ArgumentException("NATIVE_FEE_UNVERIFIED_AMOUNT");
+  int kind=instrument.CommissionType switch {
+   SymbolCommissionType.UsdPerMillionUsdVolume=>0,
+   SymbolCommissionType.UsdPerOneLot=>1,
+   SymbolCommissionType.PercentageOfTradingVolume=>2,
+   SymbolCommissionType.QuoteCurrencyPerOneLot=>3,
+   _=>throw new ArgumentException("NATIVE_FEE_UNKNOWN_TYPE")
+  };
+  int minKind=instrument.MinCommissionType switch {
+   SymbolMinCommissionType.Asset=>0,
+   SymbolMinCommissionType.QuoteAsset=>1,
+   _=>throw new ArgumentException("NATIVE_FEE_UNKNOWN_MINIMUM_TYPE")
+  };
+  string quoteAsset=instrument.QuoteAsset?.Name??"";
+  string minimumAsset=minKind==0?instrument.MinCommissionAsset?.Name??"":quoteAsset;
+  var terms=new MxmNativeCommissionTerms(kind,minKind,quoteAsset,minimumAsset,
+   checked((decimal)instrument.Commission),checked((decimal)instrument.MinCommission),
+   (decimal)instrument.LotSize);
+  decimal qUsd=kind==0 && terms.Commission>0m?CostRate(quoteAsset,"USD"):0m;
+  decimal usdEur=(kind==0 || kind==1) && terms.Commission>0m?CostRate("USD","EUR"):0m;
+  decimal qEur=((kind==2 || kind==3) && terms.Commission>0m ||
+    minKind==1 && terms.Minimum>0m)?CostRate(quoteAsset,"EUR"):0m;
+  decimal minEur=minKind==0 && terms.Minimum>0m?CostRate(minimumAsset,"EUR"):0m;
+  return MxmNativeCommission.Price(terms,checked((decimal)volume),
+   checked((decimal)bid),checked((decimal)ask),qUsd,usdEur,qEur,minEur);
  }
  string? ReadEntryCheckpoint() {
   CheckEntryStorage();LocalStorage.Reload(LocalStorageScope.Type);CheckEntryStorage();
