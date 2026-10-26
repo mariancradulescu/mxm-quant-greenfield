@@ -52,9 +52,35 @@ Require(sizeReport.AcceptedEntries==1 && sizeReport.OpenPositions==1 &&
  sizeReport.InitialCapitalEur==200m && sizeReport.Ledger.Single().Units==700m &&
  !sizeReport.Hard21Proven && !sizeReport.CostsBrokerVerified,
  "PROSPECTIVE_SINGLE_ACCOUNT_SIZING_700_NO_BROKER");
+Require(MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,.10m,.10m),
+ "EXACT_TWO_SIDED_FEE_RESERVE_BOUNDARY");
+Require(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,.101m,.09m),
+ "WORSE_BUY_SIDE_FEE_MUST_REJECT");
+Require(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,.09m,.101m),
+ "WORSE_SELL_SIDE_FEE_MUST_REJECT");
+Require(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,.11m,.0m),
+ "DO_NOT_TREAT_ONE_ENTRY_FEE_AS_FULL_ROUNDTRIP");
+Require(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,-.01m,.01m),
+ "NEGATIVE_UNKNOWN_FEE_FAIL_CLOSED");
+Require(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(decimal.MaxValue,
+ decimal.MaxValue,decimal.MaxValue),"OVERFLOW_FAIL_CLOSED");
+var expensiveFee=sizeQuote with {CommissionPerSideEur=.11m};
+var expensiveAccount=new MxmPortfolioAccountReplay(new[]{"EURUSD"},sizeParams).Run(
+ new MxmAccountFeed[]{sizeDecision,expensiveFee});
+Require(expensiveAccount.AcceptedEntries==0 &&
+ expensiveAccount.Rejections.Contains("REJECT_PROSPECTIVE_NATIVE_SIZING_NO_AFFORDABLE_VOLUME"),
+ "EXPENSIVE_FLAT_FEE_CANNOT_DOWN_SIZE_INTO_UNDERFUNDED_ROUNDTRIP");
+var affordableFee=sizeQuote with {CommissionPerSideEur=.10m};
+var affordableAccount=new MxmPortfolioAccountReplay(new[]{"EURUSD"},sizeParams).Run(
+ new MxmAccountFeed[]{sizeDecision,affordableFee});
+Require(affordableAccount.AcceptedEntries==1 &&
+ affordableAccount.Ledger.Single().Units==700m &&
+ affordableAccount.Ledger.Single().CommissionEur==.10m,
+ "EXACT_RESERVE_BOUNDARY_RETAINS_SINGLE_ACCOUNT_AND_MODELED_FEE");
 Require(MxmNativeVolumeSearch.LargestAffordable(100m,1000m,100m,1000m,v=>
  MxmCapitalAdmission.Check(200m,200m,v/10m,.02m,.4m,120m,0,1)==MxmCapitalAdmission.Admit &&
  MxmStopRiskAdmission.Check(200m,0m,v*.0015m,.01m,.2m,0m)==MxmStopRiskAdmission.Admit &&
+ MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,.02m,.02m) &&
  MxmOwnerEntryEnvelope.Check(200m,v/10m,.02m,v*.0015m,.2m)==MxmOwnerEntryEnvelope.Admit)==700m,
  "SAME_NATIVE_SEARCH_AND_OWNER_LAWS_700");
 var sizeCapsule=sizeAccount.CaptureReplay(new string('c',64));

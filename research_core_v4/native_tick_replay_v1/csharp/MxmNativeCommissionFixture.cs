@@ -40,6 +40,10 @@ Need(!MxmNativeCommission.StillCovered(early,
  early with {RoundTripReserveEur=0m}),"REPRICE_FALSE_BROKER_RESERVE_REJECTED");
 Need(!MxmNativeCommission.StillCovered(early,
  early with {Classification="EXACT_BROKER_CHARGE"}),"REPRICE_FALSE_CLAIM_REJECTED");
+Need(MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(early.RoundTripReserveEur,early.BuyEur,early.SellEur),
+ "NATIVE_QUOTED_BOTH_SIDES_RESERVE_RECONCILIATION");
+Need(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(early.PerSideCeilingEur,early.BuyEur,early.SellEur),
+ "ONE_FEE_NOT_TWO_SIDE_RESERVE");
 void Reject(MxmNativeCommissionTerms t,decimal qUsd=1m,decimal usdEur=.9m,
  decimal quoteEur=.9m,decimal minEur=1m,decimal volume=1000m,
  decimal bid=1.2m,decimal ask=1.2002m) {

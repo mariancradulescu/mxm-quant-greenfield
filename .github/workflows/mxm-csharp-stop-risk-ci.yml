@@ -72,7 +72,9 @@ jobs:
           assert 'CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk)' in main
           assert main.index('CurrentNativeCommission(')<main.index('MxmCapitalAdmission.Check(')
           assert 'nativeFee.PerSideCeilingEur' in main
-          assert 'nativeFee.RoundTripReserveEur' in main
+          assert 'MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(' in main
+          assert 'nativeFee.BuyEur,nativeFee.SellEur' in main
+          assert main.index('RoundTripFeeReserveCovers(')<main.index('MxmCapitalAdmission.Check(')
           assert main.index('CurrentNativeCommission(')<main.index('ExecuteMarketOrder(')
           assert 'MxmNativeCommission.Price(terms,' in main
           assert 'MXM_NATIVE_FEE_SNAPSHOT_CHANGED_BEFORE_ORDER_HOLD' in main
