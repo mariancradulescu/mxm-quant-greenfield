@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Integrate conservative commission bounds into the existing account and test cold recovery
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/commission_account/MxmCommissionAccount.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_commission_account research_core_v4.laboratory.test_commission_feasibility -v
+          python3 -m research_core_v4.laboratory.commission_feasibility
       - name: Decode broad captured commission terms and reconcile all artificial fee cases
         run: |
           dotnet build research_core_v4/laboratory/csharp/commission/MxmCommission.csproj -c Release
