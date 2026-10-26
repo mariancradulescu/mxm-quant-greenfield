@@ -10,7 +10,7 @@ This is a **distinct** legacy workflow from the two jobs already retired in PR19
 
 ## Deterministic retirement
 
-This PR removes `workflow_dispatch` and **every C#/strategy/archive push trigger** from the historical scorer. Its sole permitted push path is the workflow file itself; both branch and job limits remain official, and its one job has literal `${{ false }}` before runner, environment, secrets or economic steps.
+This PR removes `workflow_dispatch` and **every C#/strategy/archive push trigger** from the historical scorer. Its permitted push paths are only the workflow itself plus the three mandatory historical bridge-import dependency paths (chronology_csharp_bridge.py, captured_symbol_terms.py, durable_native_chronology.py), preserving existing producer-consumer closure; both branch and job limits remain official, and its one job has literal `${{ false }}` before runner, environment, secrets or economic steps.
 
 Every original job step, command, recipient, permission and guarded environment is retained for audit. Exact original raw step-tail SHA256 `51499c4e9db536969cf8b63c17e61985e75de46ae18ccba71371a0f11d90898d`. The original full workflow remains at the official `f36131aef32ae5021be98d9bf265f29819333185`. A structural no-secret regression rejects changed step bytes, resurrected job, widened triggers, manual dispatch, permission drift and new jobs. The existing PR195 retirement tests stay intact.
 
