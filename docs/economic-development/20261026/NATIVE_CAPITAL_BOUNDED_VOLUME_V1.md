@@ -1,0 +1,13 @@
+# Broker-grid bounded native volume — 26 October 2026
+
+Continuation of existing B–E mandate from official 2507222cf43ec5277f358f4d931babc5b415130b. Before this modification the cBot requested a fixed size and rounded UP even if broker minimum exceeded RequestedUnits, then durable-prepared an intent which could not pass shared EUR200 account margin, stop, fee or OWNER safety gates. A smaller legal lot may preserve a signal without breaching existing constraints.
+
+## Integration
+Treat RequestedUnits as an upper cap, not a floor: never increase it to a broker minimum. On an existing consumed causal intent, compute the largest affordable min+N*step broker-lattice quantity at or below cap, subject to the broker min/max, current GetEstimatedMargin, AmountRisked, two-sided native commission with actual AssetConverter inputs, declared roundtrip friction, current shared EUR account admission, configured stop-risk percentage and immutable OWNER EUR80/120/2 limits. Preliminary choice executes no order, contains no historical signal, no strategy optimization and no new broker request. Monotone bounded binary search uses at most 65-70 probes; it never enumerates every lot. If no candidate has provable estimates, HOLD.
+
+Critically, selection happens BEFORE durable PrepareRecoverable, which saves the chosen actual volume. After the durable save the unchanged actual Robot path revalidates all broker account isolation/position exposure, stop geometry, full margin and OWNER gates, fee/FX repricing, broker identity and final account-state fence. No alternate try on the same intent, no permission change or bypass. Existing exits are unchanged; selecting a volume has no effect on risk of existing positions.
+
+## Scientific scope
+This is a NEW native sizing behavior and any prospective economic policy must bind its sizing identity before evaluation; previously completed fixed-size outcomes cannot be reinterpreted as outcomes of this implementation. Monotonic affordability assumes ordinary broker fee/stop/margin response to larger volumes; broker tiers/nonmonotone anomalies can lead to missed feasible sizes, but cannot pass a candidate without the later full gates. Sampled current broker/API estimates are not historical authentic margin/fee/FX, future stop gap bound, order receipt or native cTrader cold recovery.
+
+Artificial no-secret tests cover requested caps, fractional broker step, too-expensive minimum, quote/capital/risk/fee bounds, gigantic grids and strict account gate reuse. Existing net6 cBot build and all required CI remain authoritative. No historical economic rerun, custodial source read, new broker action, DEMO/LIVE orders, Cloud, deposit/reset, V2/C033 model budget changes. HARD21 and after-cost robustness unproven.

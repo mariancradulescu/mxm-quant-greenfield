@@ -83,6 +83,23 @@ jobs:
           assert p.count('SymbolMinCommissionType.')==2
           print('MXM_NATIVE_CTRADER_BROKER_ADVERTISED_FEE_ESTIMATE_WIRED_BEFORE_ORDER_NO_ACTUAL_FILLS')
           PYFEE
+      - name: Test native broker-volume selection against unchanged OWNER and EUR account laws
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmNativeVolumeSearchFixture.csproj -c Release
+          python3 - <<'PYVOL'
+          from pathlib import Path
+          source=Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          entry=source[source.index('void ApplyPortfolioDecision'):source.index('decimal CostRate(')]
+          assert entry.index('SelectAffordableNativeUnits(instrument,direction,RequestedUnits,stopPips)')<entry.index('entryCheckpoint.PrepareRecoverable(')<entry.index('ExecuteMarketOrder(')
+          assert 'MxmNativeVolumeSearch.LargestAffordable(' in source
+          assert 'symbol.NormalizeVolumeInUnits(candidate,RoundingMode.Down)' in source
+          assert 'MxmOwnerEntryEnvelope.Check(' in source
+          assert 'MxmCapitalAdmission.Check(' in source
+          assert 'MxmStopRiskAdmission.Check(' in source
+          assert source.index('MxmNativeFinalAccountFence.Check(')<source.index('ExecuteMarketOrder(')
+          assert 'NormalizeVolumeInUnits(Math.Max(RequestedUnits' not in source
+          print('MXM_NATIVE_VOLUME_CAPPED_BEFORE_DURABLE_INTENT_AND_RECHECKED_AFTER')
+          PYVOL
       - name: Run predeclared six-cell stop-risk capacity matrix on artificial prices only
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --risk-capacity-fixture unused verification/stop-risk-capacity-artificial

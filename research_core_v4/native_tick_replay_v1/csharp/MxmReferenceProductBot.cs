@@ -285,9 +285,11 @@ public sealed class MxmReferenceProductBot : Robot {
   }
   if(desired==0)return;
   if(!double.IsFinite(RequestedUnits) || RequestedUnits<=0)return;
-  double units=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
-  if(!double.IsFinite(units) || units<=0 || units>instrument.VolumeInUnitsMax)return;
   double stopPips=StopLossPips,pipSize=instrument.PipSize,tickSize=instrument.TickSize;
+  // The caller's requested units form a CAP. Search the broker lattice within
+  // that cap BEFORE committing an irreversible durable pending order intent.
+  double units=SelectAffordableNativeUnits(instrument,direction,RequestedUnits,stopPips);
+  if(!double.IsFinite(units) || units<=0 || units>instrument.VolumeInUnitsMax)return;
   var beforeIds=Positions.Select(x=>(long)x.Id).OrderBy(x=>x).ToArray();
   if(confirmedEntries==null || !confirmedEntries.VerifyCurrent(BrokerClock()) ||
      entryCheckpoint==null || !entryCheckpoint.PrepareRecoverable(instrumentName,desired>0?1:-1,currentOpenTime,
@@ -322,7 +324,7 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!double.IsFinite(initialEquity)||!double.IsFinite(initialFreeMargin)||
      !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MinimumFreeMarginReserveEur)||
      MinimumFreeMarginReserveEur<0)return;
-  double currentUnits=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
+  double currentUnits=instrument.NormalizeVolumeInUnits(units,RoundingMode.Down);
   if(!double.IsFinite(currentUnits) || currentUnits!=units || units>instrument.VolumeInUnitsMax ||
      StopLossPips!=stopPips || instrument.PipSize!=pipSize || instrument.TickSize!=tickSize)return;
   double margin=instrument.GetEstimatedMargin(direction,units);
@@ -513,6 +515,62 @@ public sealed class MxmReferenceProductBot : Robot {
   .Select(x=>new NativeRiskMark(x.Id,x.SymbolName,x.TradeType,x.VolumeInUnits,
     x.EntryPrice,x.StopLoss,x.Symbol.Bid,x.Symbol.Ask,x.Symbol.PipSize,x.Symbol.TickSize))
   .OrderBy(x=>x.Id).ToArray();
+ // The preliminary broker-lattice choice is NOT admission and has no side
+ // effect. Its selected volume MUST be independently revalidated after the
+ // durable prepared intent, with the unchanged original complete-account gates.
+ double SelectAffordableNativeUnits(Symbol symbol,TradeType direction,
+  double requested,double stopPips) {
+  if(!double.IsFinite(requested)||!double.IsFinite(stopPips)||stopPips<=0 ||
+     !double.IsFinite(symbol.VolumeInUnitsMin)||!double.IsFinite(symbol.VolumeInUnitsMax)||
+     !double.IsFinite(symbol.VolumeInUnitsStep)||
+     !double.IsFinite(Account.Equity)||!double.IsFinite(Account.FreeMargin)||
+     !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MaxEstimatedMxmStopRiskPercent)||
+     !double.IsFinite(MinimumFreeMarginReserveEur)||
+     !double.IsFinite(EstimatedRoundTripFrictionReserveEur) ||
+     Account.Asset.Name!="EUR" ||
+     requested<symbol.VolumeInUnitsMin || Account.Equity<=0 ||
+     Account.FreeMargin<=0 || MaxEstimatedMxmStopRiskPercent<=0 ||
+     MaxEstimatedMxmStopRiskPercent>100 || EstimatedRoundTripFrictionReserveEur<0)
+   return 0d;
+  try {
+   decimal equity=(decimal)Account.Equity,free=(decimal)Account.FreeMargin;
+   decimal friction=(decimal)EstimatedRoundTripFrictionReserveEur;
+   decimal riskPercent=(decimal)(MaxEstimatedMxmStopRiskPercent/100.0);
+   int owned=Positions.FindAll(Label).Length;
+   decimal? chosen=MxmNativeVolumeSearch.LargestAffordable(
+     (decimal)symbol.VolumeInUnitsMin,(decimal)symbol.VolumeInUnitsMax,
+     (decimal)symbol.VolumeInUnitsStep,(decimal)requested,amount=>{
+    try {
+     double candidate=(double)amount;
+     double normalized=symbol.NormalizeVolumeInUnits(candidate,RoundingMode.Down);
+     if(!double.IsFinite(normalized)||normalized!=candidate ||
+        candidate<symbol.VolumeInUnitsMin || candidate>symbol.VolumeInUnitsMax)
+      return false;
+     double margin=symbol.GetEstimatedMargin(direction,candidate);
+     double risk=symbol.AmountRisked(candidate,stopPips);
+     if(!double.IsFinite(margin)||!double.IsFinite(risk)||margin<=0||risk<=0)
+      return false;
+     var fee=CurrentNativeCommission(symbol,candidate,symbol.Bid,symbol.Ask);
+     if(friction<fee.RoundTripReserveEur)return false;
+     if(MxmCapitalAdmission.Check(equity,free,(decimal)margin,fee.PerSideCeilingEur,
+       (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
+       owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
+     if(MxmStopRiskAdmission.Check(equity,0m,(decimal)risk,riskPercent,
+       friction,0m)!=MxmStopRiskAdmission.Admit)return false;
+     return MxmOwnerEntryEnvelope.Check(free,(decimal)margin,
+       fee.PerSideCeilingEur,(decimal)risk,friction)==MxmOwnerEntryEnvelope.Admit;
+    }catch(Exception){return false;}
+   });
+   if(!chosen.HasValue) {
+    Print("MXM_NO_BROKER_LATTICE_VOLUME_ADMISSIBLE_WITH_CURRENT_FEES_AND_CAPITAL");
+    return 0d;
+   }
+   return (double)chosen.Value;
+  }catch(Exception e) {
+   Print("MXM_NATIVE_VOLUME_SEARCH_UNVERIFIED_HOLD_"+e.GetType().Name);
+   return 0d;
+  }
+ }
  // Never infer asset names from ticker substrings or hardcode EURUSD.
  decimal CostRate(string from,string to) {
   if(string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to))
