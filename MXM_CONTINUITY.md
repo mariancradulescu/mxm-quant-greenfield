@@ -1,3 +1,13 @@
+# 26 octombrie2026 — oprirea recalculării automate a modelelor vechi; dovezi cost–cont păstrate
+
+Recuperat din6291d3eb87e7d567a54b7c2afbc307ccdcea3b70/PR194. Toate5CI finale SUCCESS.22verificări C#,3procese reci, capital200EUR o singură dată și Decimal pentru cash/fill/fees. Original ARTIFICIAL stdout4123bytesd267d89d… și receipt public de cost9d66509e… sunt păstrate exact/reformatat explicit în `docs/economic-development/20261026/commission-account-40342741128/`. Nu sunt date de cont real sau native Robot acceptance.999cazuri trec numai pragul de taxă,577nerezolvate fărăpreț; zero avantaj/HARD21 certificat.
+
+[Defectul de eficiență](docs/economic-development/20261026/RETIRE_REDUNDANT_AUTHENTIC_REPLAY_V1.md): vechiul `mxm-csharp-authentic-cold.yml` etichetat nonoutcome reexecuta de fapt scorere fixe4h/W37laoricefișierC#nou.40343195669SUCCESS este o asemenea repetare, nu dovadă nouă și nu progres științific independent. Nu cosmetizăm acest comportament. Se retrag wildcard-ul/dispatch-ul și se blochează determinist ambele joburi înainte de mediu/chei, păstrând corpurile/permisiunile/proveniența originale. Verificările CI fărăchei și programele finite admise rămân active. Nu se repetă rularea veche pentru a proba retragerea; post-push trebuie observate numai joburi SKIPPED fărăpași.
+
+Stare la instalare: CI/observație nativă retirement obligatorii înainte de închidere. Autorități/OWNER1807 neschimbate; zero ordine/Cloud/date noi/V2/C033/refunduri/noi rezultate independente. B–E OPEN, OWNER operations NONE. Următoarea cercetare distinctă trebuie admisă explicit pe surse/cost/cont adecvate. Snapshoturile următoare sunt istorice.
+
+---
+
 # 26 octombrie2026 — comisioane legate conservator la cont și frontieră de cost fără date noi
 
 Recuperare din0ef4448652cec5f5c38703c8e358a2c282c106f7/PR193; toate5CI SUCCESS, inclusiv gateway40330956246/job121599930429 și1576termeni reconciliați. Recepția EUR40319142037SUCCESS și modelul vechi DATA_LIMITED rămân intacte, fără repetare.

@@ -1,30 +1,22 @@
 name: MXM CSharp authenticated chronology nonoutcome
+# Retired: these fixed original-source economic computations are complete.
+# Retain historical job bodies for audit; false gates stop before environment/key
+# access. New research uses a separate prospectively admitted finite operation.
 on:
-  # Secret-bearing code executes only after standard PR/required-CI merge into the
-  # existing protected execution branch; no bypass or secrets on pull requests.
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
       - .github/workflows/mxm-csharp-authentic-cold.yml
-      - research_core_v4/native_tick_replay_v1/csharp/**
       - research_core_v4/laboratory/chronology_csharp_bridge.py
-      - research_core_v4/laboratory/durable_native_chronology.py
       - research_core_v4/laboratory/captured_symbol_terms.py
-      - research_core_v4/laboratory/csharp_native_portfolio_independent_mark.py
-      - research_core_v4/laboratory/week_chronology_csharp_bridge.py
-      - research_core_v4/laboratory/week_chronology_reception.py
-      - research_core_v4/laboratory/durable_week_chronology.py
-      - research_core_v4/laboratory/csharp_week_account_attribution.py
-      - docs/economic-development/20261023/native-week-39917922508/**
-      - docs/economic-development/20261023/native-chronology-39660692230/**
-  workflow_dispatch: {}
+      - research_core_v4/laboratory/durable_native_chronology.py
 permissions: {}
 concurrency:
   group: mxm-integrated-laboratory
   cancel-in-progress: false
 jobs:
   bounded-cold-to-csharp:
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    if: ${{ false }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: mxm-r3-custody-v1
@@ -298,7 +290,7 @@ jobs:
   weekly-cold-to-csharp:
     # An additional job of the EXISTING protected CSharp pipeline; no new
     # custody, provider connection, authority, or GitHub credential.
-    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    if: ${{ false }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     environment: mxm-r3-custody-v1

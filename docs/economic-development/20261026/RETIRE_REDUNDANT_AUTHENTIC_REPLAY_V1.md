@@ -1,0 +1,27 @@
+# Stop automatic repetition of completed fixed-source evaluations
+
+## Material process defect, acknowledged
+
+Inspection of post-merge40343195669/jobs121643091377 and121643091939 found that `mxm-csharp-authentic-cold.yml` does more than source reception: it decrypts original4hour/W37sources and repeats fixed previous portfolio/scenario/sensitivity scorers. It labels them nonoutcomes, preserves original inputs and creates no new independent market evidence, but this is still redundant scientific/economic computation. New unrelated `csharp/**` files triggered it automatically, including after PR193(40331447694) andPR194(40343195669). Both ran SUCCESS; no orders/new broker requests or authority changes. Statements that the new adapter/fee work itself did not invoke a strategy remain true, but do NOT imply that no inherited automatic workflow repeated old model computations. This correction explicitly acknowledges that separate behavior.
+
+Identical source/configuration reapplication is not a new independent trial, result rescue, confirmation, budget refund or advantage. Existing first accepted evidence/negative/data-limited dispositions and scientific identities remain authoritative. Do not reinterpret these automatic repeats as new research progress, and do not repeat them to verify this retirement.
+
+## Retirement without erasing history or weakening custody
+
+Preserve original workflow raw SHA256c904135cba61d350d391b69fe6e2d4bbf9ff6b31fd520bd21ae26fb38f84d161 at official6291d3eb87e7d567a54b7c2afbc307ccdcea3b70. Its original step bodies remain byte-equivalent as parsed JSON, SHA256bounded9b28c1979b311eda150d204e0fa2593eb5916cc0106647e1ba5e2082373f68b3 /weekly8f0773e549b9c748d19b5541ae0fad54979f426124d4d6bba93b2ef7ddc5b5e7. Original guarded environment, read-only permissions, source decoder/ref, decryption/producer code and results are retained for audit in Git; no new custody/writer/authority or replay is installed.
+
+Both retired jobs now have deterministic `${{ false }}` job conditions, evaluated BEFORE runner/environment/key access. Remove manual dispatch and the C#wildcard/archive/strategy-change triggers; retain only the workflow and3legacy bridge dependency paths needed by the existing historical import-closure contract. A change to those paths can create a SKIPPED historical workflow record, never a native model job. An unrelated new C#library no longer even triggers it.
+
+Existing no-key required CI/artificial cost/cash/stop/cold-recovery tests continue. Existing finite prospectively admitted source receptions/research workflows are untouched. Future authentic execution requires its own finite source/context/budget admission; the old fixed-source scorers cannot reactivate merely because a library changes. No skipped test or weakened native access is substituted for scientific validation.
+
+New tests enforce: every retired job hard-false, exact narrow event/branch/path set, no manual/schedule event, original job bodies/permissions/environment unchanged. They reject resurrected jobs, broad triggers, changed bodies and privilege additions. Existing both-consumer import/trigger/restore tests remain unchanged and PASS locally. The previous loose substring secret-scope gateway check is replaced by structural retirement validation; all no-key protections are stronger. Required native CI must pass, then official push must show both retired jobs SKIPPED with no steps/runner allocation, before this is called observed retirement.
+
+## Preserve the completed commission result
+
+PR194 official6291d3eb87e7d567a54b7c2afbc307ccdcea3b70, final source5220eb8c5e37403030f357fffa662268ee2bab8b, tree d479a531d7831bfce22e3f895604123b85e446e4, tested merge30ed46f4c6e3e8c8291d340ef9b970b6b32b3ae8 same tree. All5FINAL CI SUCCESS40342741122/40342741307/40342741128/40342741131/40342741245. Gateway job121641477081 executed22C#artificial checks, actual3cold workers, every-cut one-capital restore and independent cash/fee checks. The intermediate proof-print test failure was fixed before merge; not waived as success.
+
+Exact original ARTIFICIAL C#stdout4123bytes SHA256d267d89d0fe9186751c163949d046b13f0f6412d66fb314f948d6fc8af5df691 is now in `commission-account-40342741128/original-artificial-stdout.json`, copied from the native log's checksummed original-byte envelope, not rebuilt/reexecuted. It contains ONLY fixture prices/currency/fictional TESTUSD scope, no private market account data. Reformatted PUBLIC nonmarket source-cost receipt SHA2569d66509eb8812169e5b2d362a187128bd5aad3b411b5429d2a0627b330da4d59 is stored beside it. Integrity/no-promotion tests reject corruption or favourable substitution.
+
+Actual all1576C#/Decimal cost floors reconciled:999fee-hurdle-only,577cost unresolved,0risk-floor rejection and0of the21ENTRY-only fee cash hurdles above initial capital in the fixedUSD/EUR0.9scenario. These are nonmarket necessary constraints, not admissible trades, price-supported fees, expected profit, independent market evidence, cash reset or HARD21. Preserve all unknown spread/slippage/financing/FX/term-date/price/risk/margin requirements. No new directional model or market economic outcome.
+
+B–E OPEN. No robust edge, continuous market EUR200/HARD21 or native cTrader operational acceptance. Robot remains unmodified; quote-adapter integration is with the existing replay account. No OWNER operation required. Retirement-time native status PENDING until CI/official skipped-jobs evidence; do not turn Work interruption into a rerun.

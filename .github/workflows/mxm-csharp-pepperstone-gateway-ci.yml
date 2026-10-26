@@ -279,15 +279,5 @@ jobs:
           assert 'MxmCapitalAdmission.Check' in p and 'Positions.FindAll(Label).Length' in p
           print('MXM_CSHARP_COLD_START_AND_STOP_SCENARIO_STRUCTURAL_PARITY')
           PY
-      - name: Verify gateway never carries secrets in pull request jobs
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          w=pathlib.Path('.github/workflows/mxm-csharp-authentic-cold.yml').read_text()
-          assert 'environment: mxm-r3-custody-v1' in w
-          assert "refs/heads/mxm-remediation-p0-p4-20261015-v1" in w
-          assert 'push:' in w and 'pull_request:' not in w and 'pull_request_target:' not in w
-          assert 'd2fae5641b759b1c8c24161d83d62d39e104eafd' in w
-          assert 'secrets.R3_CUSTODY_PRIVATE_KEY_PEM' in w
-          print('GATEWAY_PROTECTED_EXEC_ONLY_NO_PR_KEY')
-          PY
+      - name: Verify retired fixed-source replay cannot access keys or restart automatically
+        run: python3 -m unittest research_core_v4.laboratory.test_retired_authentic_replay research_core_v4.laboratory.test_commission_account_evidence -v
