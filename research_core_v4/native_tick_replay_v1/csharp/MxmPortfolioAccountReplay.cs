@@ -318,6 +318,15 @@ public sealed partial class MxmPortfolioAccountReplay {
       var trial=tick with {ExecutableUnits=candidate,
        InitialMarginEur=tick.InitialMarginEur*ratio,
        EstimatedStopRiskEur=tick.EstimatedStopRiskEur*ratio};
+      // Model both BUY ask+slip and SELL bid-slip, not just the
+      // requested direction: native reserves twice the WORSE side fee.
+      decimal sellFill=trial.Bid-trial.SlipPerSideQuote;
+      decimal buyFill=trial.Ask+trial.SlipPerSideQuote;
+      if(sellFill<=0m || buyFill<=0m)return false;
+      decimal trialBuyFee=Fee(trial,candidate,buyFill);
+      decimal trialSellFee=Fee(trial,candidate,sellFill);
+      if(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(
+         parameters.RoundTripRiskReserveEur,trialBuyFee,trialSellFee))return false;
       decimal trialFee=Fee(trial,candidate,price);
       decimal trialRisk=trial.StopDistanceQuote is decimal dist ?
        -ConvertQuote(trial,-dist*candidate) : trial.EstimatedStopRiskEur;
@@ -344,6 +353,20 @@ public sealed partial class MxmPortfolioAccountReplay {
    rejected.Add("REJECT_CAPTURED_VOLUME_LATTICE");return;
   }
   decimal fee=Fee(tick,tick.ExecutableUnits,price);
+  if(parameters.NativeSizingScenarioSha256!=null) {
+   // Reconfirm the same two-sided funding at the actual selected size:
+   // selected entry fee alone is not a funded exit/roundtrip estimate.
+   decimal finalSellFill=tick.Bid-tick.SlipPerSideQuote;
+   decimal finalBuyFill=tick.Ask+tick.SlipPerSideQuote;
+   if(finalSellFill<=0m || finalBuyFill<=0m ||
+      !MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(
+        parameters.RoundTripRiskReserveEur,
+        Fee(tick,tick.ExecutableUnits,finalBuyFill),
+        Fee(tick,tick.ExecutableUnits,finalSellFill))) {
+    rejected.Add("REJECT_PROSPECTIVE_ROUNDTRIP_FEE_RESERVE_UNDERFUNDED");
+    return;
+   }
+  }
   string isolation=MxmAccountIsolation.Check(open.Count,open.Count,0);
   string admission=isolation==MxmAccountIsolation.Admit ?
    MxmCapitalAdmission.Check(equity,free,tick.InitialMarginEur,fee,

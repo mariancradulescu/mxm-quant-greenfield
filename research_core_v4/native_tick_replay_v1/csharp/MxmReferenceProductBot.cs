@@ -344,7 +344,8 @@ public sealed class MxmReferenceProductBot : Robot {
   catch(Exception e){
    Print("MXM_NATIVE_FEE_UNVERIFIED_SAFE_HOLD_"+e.GetType().Name);return;
   }
-  if((decimal)EstimatedRoundTripFrictionReserveEur<nativeFee.RoundTripReserveEur) {
+  if(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(
+    (decimal)EstimatedRoundTripFrictionReserveEur,nativeFee.BuyEur,nativeFee.SellEur)) {
    Print("MXM_NATIVE_FEE_EXCEEDS_DECLARED_FRICTION_RESERVE_HOLD");return;
   }
   string admit=MxmCapitalAdmission.Check((decimal)initialEquity,(decimal)initialFreeMargin,
@@ -551,7 +552,8 @@ public sealed class MxmReferenceProductBot : Robot {
      if(!double.IsFinite(margin)||!double.IsFinite(risk)||margin<=0||risk<=0)
       return false;
      var fee=CurrentNativeCommission(symbol,candidate,symbol.Bid,symbol.Ask);
-     if(friction<fee.RoundTripReserveEur)return false;
+     if(!MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(
+       friction,fee.BuyEur,fee.SellEur))return false;
      if(MxmCapitalAdmission.Check(equity,free,(decimal)margin,fee.PerSideCeilingEur,
        (decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
        owned,MaxMxmAccountPositions)!=MxmCapitalAdmission.Admit)return false;
