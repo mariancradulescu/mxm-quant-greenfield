@@ -40,6 +40,16 @@ Require(MxmStopRiskAdmission.Check(200m,2m,3m,.02m,.2m,.2m)
  =="REJECT_AGGREGATE_STOP_RISK_EXCESS","AGGREGATE_RISK");
 Require(MxmCapitalAdmission.Check(200m,110m,40m,0m,.8m,0m,1,1)
  =="REJECT_ACCOUNT_POSITION_CAP","ACCOUNT_POSITION_CAP");
+// Native OWNER absolute caps: the replay law above remains unchanged.
+Require(MxmOwnerEntryEnvelope.Check(200m,80m,0m,1.8m,0.2m)==MxmOwnerEntryEnvelope.Admit,"OWNER_ALL_THREE_LIMITS_EQUALITY");
+Require(MxmOwnerEntryEnvelope.Check(200m,80.01m,0m,1m,0.2m)=="REJECT_OWNER_TICKET_MARGIN_GT_80","OWNER_ABSOLUTE_MARGIN_NOT_CONFIG_FRACTION");
+Require(MxmOwnerEntryEnvelope.Check(200m,80m,0.01m,1m,0.2m)=="REJECT_OWNER_POST_ENTRY_RESERVE_LT_120","OWNER_RESERVE_POST_COMMISSION");
+Require(MxmOwnerEntryEnvelope.Check(200m,80m,0m,1.81m,0.2m)=="REJECT_OWNER_NEW_ENTRY_RISK_GT_2","OWNER_RISK_INCLUDES_FRICTION");
+Require(MxmOwnerEntryEnvelope.Check(250m,80m,0m,2m,0.01m)=="REJECT_OWNER_NEW_ENTRY_RISK_GT_2","OWNER_RISK_CAP_NOT_EQUITY_RELATIVE");
+Require(MxmOwnerEntryEnvelope.Check(250m,80m,0m,2m,0m)==MxmOwnerEntryEnvelope.Admit,"OWNER_COMPOUNDING_EQUITY_NO_NEW_RESET");
+Require(MxmOwnerEntryEnvelope.Check(200m,0m,0m,1m,0.2m)=="REJECT_UNVERIFIED_OWNER_INPUT","OWNER_ZERO_MARGIN");
+Require(MxmOwnerEntryEnvelope.Check(200m,80m,-0.01m,1m,0.2m)=="REJECT_UNVERIFIED_OWNER_INPUT","OWNER_NEGATIVE_FEE");
+Require(MxmOwnerEntryEnvelope.Check(200m,80m,0m,decimal.MaxValue,1m)=="REJECT_UNVERIFIED_OWNER_INPUT","OWNER_OVERFLOW");
 Require(MxmAccountIsolation.Check(0,0,0)==MxmAccountIsolation.Admit,"FLAT_ACCOUNT");
 Require(MxmAccountIsolation.Check(2,2,0)==MxmAccountIsolation.Admit,"ALL_OWNED_POSITIONS");
 Require(MxmAccountIsolation.Check(2,1,0)=="REJECT_FOREIGN_ACCOUNT_POSITION","FOREIGN_POSITION");
