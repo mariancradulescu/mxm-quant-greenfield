@@ -52,6 +52,23 @@ jobs:
           print('MXM_OWNER_ABSOLUTE_ENTRY_ENVELOPE_WIRED_BEFORE_BROKER_CALL')
           print('MXM_ACCOUNT_WIDE_STOP_RISK_DEMO_ONLY_NO_SECRET_PASS')
           PY
+      - name: Reconcile all native Symbol fee types with existing independent captured-terms calculator
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmNativeCommissionFixture.csproj -c Release
+          python3 - <<'PYFEE'
+          from pathlib import Path
+          p=Path('research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text()
+          main=p[p.index('void ApplyPortfolioDecision'):p.index('string? ReadEntryCheckpoint')]
+          assert 'CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk)' in main
+          assert main.index('CurrentNativeCommission(')<main.index('MxmCapitalAdmission.Check(')
+          assert 'nativeFee.PerSideCeilingEur' in main
+          assert 'nativeFee.RoundTripReserveEur' in main
+          assert main.index('MxmNativeCommission.Price(')<main.index('ExecuteMarketOrder(')
+          assert 'MXM_NATIVE_FEE_SNAPSHOT_CHANGED_BEFORE_ORDER_HOLD' in main
+          assert p.count('SymbolCommissionType.')==4
+          assert p.count('SymbolMinCommissionType.')==2
+          print('MXM_NATIVE_CTRADER_BROKER_ADVERTISED_FEE_ESTIMATE_WIRED_BEFORE_ORDER_NO_ACTUAL_FILLS')
+          PYFEE
       - name: Run predeclared six-cell stop-risk capacity matrix on artificial prices only
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj -c Release --no-build -- --risk-capacity-fixture unused verification/stop-risk-capacity-artificial
