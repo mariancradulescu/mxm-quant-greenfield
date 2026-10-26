@@ -31,7 +31,7 @@ jobs:
           python3 -m research_core_v4.laboratory.verify_intrinsic_result
           python3 -m unittest research_core_v4.laboratory.test_intrinsic_result -v
       - name: Verify real source admission and finite diagnostic before costly evaluation
-        run: python3 -m unittest research_core_v4.laboratory.test_account_source_preflight research_core_v4.laboratory.test_source_compatibility_diagnostic -v
+        run: python3 -m unittest research_core_v4.laboratory.test_account_source_preflight research_core_v4.laboratory.test_source_compatibility_diagnostic research_core_v4.laboratory.test_source_exposure_capacity -v
       - name: Compile and independently reconcile prospective intrinsic-time account on artificial paths
         run: |
           dotnet build research_core_v4/laboratory/csharp/intrinsic/MxmIntrinsicAccount.csproj -c Release
