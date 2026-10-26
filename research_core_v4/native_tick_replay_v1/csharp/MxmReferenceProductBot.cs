@@ -298,7 +298,10 @@ public sealed class MxmReferenceProductBot : Robot {
   try {
   // All account/risk snapshots are taken AFTER the potentially slow durable write.
   // Inspect actual broker minimum/step/margin; do not assume EUR200 volume feasibility.
-  if(Account.Equity<=0||Account.FreeMargin<=0||Account.Asset.Name!="EUR")return;
+  // Read one estimated account observation after durable preparation.
+  double initialEquity=Account.Equity,initialFreeMargin=Account.FreeMargin;
+  if(!double.IsFinite(initialEquity)||!double.IsFinite(initialFreeMargin)||
+     initialEquity<=0||initialFreeMargin<=0||Account.Asset.Name!="EUR")return;
   // This is an account-wide snapshot, not atomic inter-instance order locking.
   // Broker book (all symbols using this MXM label), not local kernel memory, is authoritative.
   int accountOwned=Positions.FindAll(Label).Length;
@@ -316,7 +319,7 @@ public sealed class MxmReferenceProductBot : Robot {
    Print("MXM_SHARED_ACCOUNT_ISOLATION_HOLD_"+isolation);return;
   }
   // This is a broker snapshot, NOT an atomic inter-instance lease.
-  if(!double.IsFinite(Account.Equity)||!double.IsFinite(Account.FreeMargin)||
+  if(!double.IsFinite(initialEquity)||!double.IsFinite(initialFreeMargin)||
      !double.IsFinite(MaxMarginFraction)||!double.IsFinite(MinimumFreeMarginReserveEur)||
      MinimumFreeMarginReserveEur<0)return;
   double currentUnits=instrument.NormalizeVolumeInUnits(Math.Max(RequestedUnits,instrument.VolumeInUnitsMin),RoundingMode.Up);
@@ -342,7 +345,7 @@ public sealed class MxmReferenceProductBot : Robot {
   if((decimal)EstimatedRoundTripFrictionReserveEur<nativeFee.RoundTripReserveEur) {
    Print("MXM_NATIVE_FEE_EXCEEDS_DECLARED_FRICTION_RESERVE_HOLD");return;
   }
-  string admit=MxmCapitalAdmission.Check((decimal)Account.Equity,(decimal)Account.FreeMargin,
+  string admit=MxmCapitalAdmission.Check((decimal)initialEquity,(decimal)initialFreeMargin,
     (decimal)margin,nativeFee.PerSideCeilingEur,(decimal)MaxMarginFraction,(decimal)MinimumFreeMarginReserveEur,
     accountOwned,MaxMxmAccountPositions);
   // No claim that API-estimated commission equals an eventual broker charge.
@@ -359,6 +362,9 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!double.IsFinite(newStopRisk)||newStopRisk<=0) {
     Print("MXM_NEW_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
   }
+  // Freeze the exact owned position identities/stop/volume/other-symbol marks
+  // BEFORE any risk computation; order book IDs alone cannot detect a changed stop.
+  var originalRiskBook=CaptureNativeRiskBook();
   double existingRisk=0;
   int protectedExisting=0;
   foreach(var active in Positions.FindAll(Label)) {
@@ -393,8 +399,11 @@ public sealed class MxmReferenceProductBot : Robot {
     Print("MXM_EXISTING_STOP_RISK_SUM_UNVERIFIED_SAFE_HOLD");return;
    }
   }
+  if(!originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
+   Print("MXM_RISK_BOOK_CHANGED_DURING_ESTIMATE_HOLD");return;
+  }
   string stopRiskGate=MxmStopRiskAdmission.Check(
-   (decimal)Account.Equity,(decimal)existingRisk,(decimal)newStopRisk,
+   (decimal)initialEquity,(decimal)existingRisk,(decimal)newStopRisk,
    (decimal)(MaxEstimatedMxmStopRiskPercent/100.0),
    (decimal)EstimatedRoundTripFrictionReserveEur,
    (decimal)EstimatedRoundTripFrictionReserveEur*protectedExisting);
@@ -405,7 +414,7 @@ public sealed class MxmReferenceProductBot : Robot {
   // Native observed fees are estimates, not actual future fill charges;
   // EUR120 reserve and EUR2 proposed risk remain estimates, not guarantees.
   string ownerEnvelope=MxmOwnerEntryEnvelope.Check(
-   (decimal)Account.FreeMargin,(decimal)margin,nativeFee.PerSideCeilingEur,(decimal)newStopRisk,
+   (decimal)initialFreeMargin,(decimal)margin,nativeFee.PerSideCeilingEur,(decimal)newStopRisk,
    (decimal)EstimatedRoundTripFrictionReserveEur);
   if(ownerEnvelope!=MxmOwnerEntryEnvelope.Admit) {
    Print("MXM_OWNER_ENTRY_ENVELOPE_HOLD_"+ownerEnvelope);return;
@@ -435,6 +444,22 @@ public sealed class MxmReferenceProductBot : Robot {
    }
   }catch(Exception e) {
    Print("MXM_NATIVE_FEE_RECHECK_UNVERIFIED_HOLD_"+e.GetType().Name);return;
+  }
+  if(!originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
+   Print("MXM_RISK_BOOK_CHANGED_BEFORE_SUBMISSION_HOLD");return;
+  }
+  double finalEquity=Account.Equity,finalFreeMargin=Account.FreeMargin;
+  double finalMargin=instrument.GetEstimatedMargin(direction,units);
+  double finalNewStopRisk=instrument.AmountRisked(units,stopPips);
+  if(!double.IsFinite(finalEquity)||!double.IsFinite(finalFreeMargin)||
+     !double.IsFinite(finalMargin)||!double.IsFinite(finalNewStopRisk)) {
+   Print("MXM_FINAL_ACCOUNT_OBSERVATION_UNVERIFIED_HOLD");return;
+  }
+  string finalAccount=MxmNativeFinalAccountFence.Check(
+   new MxmNativeEntrySnapshot((decimal)initialEquity,(decimal)initialFreeMargin,(decimal)margin,(decimal)newStopRisk),
+   new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin,(decimal)finalMargin,(decimal)finalNewStopRisk));
+  if(finalAccount!=MxmNativeFinalAccountFence.Admit) {
+   Print("MXM_FINAL_ACCOUNT_CHANGE_HOLD_"+finalAccount);return;
   }
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
@@ -480,6 +505,14 @@ public sealed class MxmReferenceProductBot : Robot {
    }
   }
  }
+ // Sample all relevant existing-position risk inputs; a same-ID position can
+ // change stop/size/marks during the durable admission path.
+ sealed record NativeRiskMark(long Id,string Symbol,TradeType Side,double Units,
+  double EntryPrice,double? StopLoss,double Bid,double Ask,double PipSize,double TickSize);
+ NativeRiskMark[] CaptureNativeRiskBook()=>Positions.FindAll(Label)
+  .Select(x=>new NativeRiskMark(x.Id,x.SymbolName,x.TradeType,x.VolumeInUnits,
+    x.EntryPrice,x.StopLoss,x.Symbol.Bid,x.Symbol.Ask,x.Symbol.PipSize,x.Symbol.TickSize))
+  .OrderBy(x=>x.Id).ToArray();
  // Never infer asset names from ticker substrings or hardcode EURUSD.
  decimal CostRate(string from,string to) {
   if(string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to))

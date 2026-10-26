@@ -49,6 +49,16 @@ jobs:
           owner=pathlib.Path('research_core_v4/native_tick_replay_v1/csharp/MxmOwnerEntryEnvelope.cs').read_text()
           assert 'MaxTicketMarginEur=80m' in owner and 'MinimumPostEntryFreeMarginEur=120m' in owner
           assert 'MaxEstimatedNewEntryLossEur=2m' in owner
+          section=source[source.index('void ApplyPortfolioDecision'):source.index('string? ReadEntryCheckpoint')]
+          assert 'var originalRiskBook=CaptureNativeRiskBook()' in section
+          assert 'MXM_RISK_BOOK_CHANGED_DURING_ESTIMATE_HOLD' in section
+          assert 'MXM_RISK_BOOK_CHANGED_BEFORE_SUBMISSION_HOLD' in section
+          assert section.index('MxmNativeFinalAccountFence.Check(')<section.index('entryCheckpoint.MarkSubmitted()')<section.index('ExecuteMarketOrder(')
+          assert 'new MxmNativeEntrySnapshot((decimal)initialEquity,(decimal)initialFreeMargin' in section
+          assert 'new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin' in section
+          assert section.count('CaptureNativeRiskBook()')>=3
+          assert 'instrument.GetEstimatedMargin(direction,units)' in section
+          assert 'instrument.AmountRisked(units,stopPips)' in section
           print('MXM_OWNER_ABSOLUTE_ENTRY_ENVELOPE_WIRED_BEFORE_BROKER_CALL')
           print('MXM_ACCOUNT_WIDE_STOP_RISK_DEMO_ONLY_NO_SECRET_PASS')
           PY
