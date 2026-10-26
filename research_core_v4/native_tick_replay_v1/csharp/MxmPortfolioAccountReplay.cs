@@ -357,8 +357,8 @@ public sealed partial class MxmPortfolioAccountReplay {
    parameters.RoundTripRiskReserveEur*open.Count);
   if(risk!=MxmStopRiskAdmission.Admit){rejected.Add(risk);return;}
   if(parameters.NativeSizingScenarioSha256!=null) {
-   decimal stop=tick.StopDistanceQuote is decimal distance ?
-     -ConvertQuote(tick,-distance*tick.ExecutableUnits):tick.EstimatedStopRiskEur;
+   decimal stop=tick.StopDistanceQuote is decimal ownerStopDistance ?
+     -ConvertQuote(tick,-ownerStopDistance*tick.ExecutableUnits):tick.EstimatedStopRiskEur;
    string owner=MxmOwnerEntryEnvelope.Check(free,tick.InitialMarginEur,fee,stop,
       parameters.RoundTripRiskReserveEur);
    if(owner!=MxmOwnerEntryEnvelope.Admit) {rejected.Add(owner);return;}
