@@ -1,0 +1,77 @@
+{
+  "name": "MXM finite USD leader follower DEVELOPMENT",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-usd-leadlag-development.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "usd-leadlag-development": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".sealed-chronology-source",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit one exact prospective model before custody",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.usd_leadlag_development admit"
+        },
+        {
+          "name": "Compile CSharp and verify causal synthetic cases before economic inputs",
+          "run": "dotnet build research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_usd_leadlag_development -v\npython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m research_core_v4.laboratory.durable_week_chronology --out \"${RUNNER_TEMP}/mxm-leadlag/eur-source\"\npython3 -m research_core_v4.laboratory.durable_gbpusd_week37_chronology --out \"${RUNNER_TEMP}/mxm-leadlag/gbp-source\"\ncp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/usd_pair_native_reception.py research_core_v4/laboratory/usd_pair_alignment.py .sealed-chronology-source/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Decode original sources inside unchanged existing custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .sealed-chronology-source\npython3 -m research_core_v4.laboratory.usd_pair_native_reception export EURUSD \"${RUNNER_TEMP}/mxm-leadlag/eur-source/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-leadlag/eur.ndjson\"\npython3 -m research_core_v4.laboratory.usd_pair_native_reception export GBPUSD \"${RUNNER_TEMP}/mxm-leadlag/gbp-source/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-leadlag/gbp.ndjson\""
+        },
+        {
+          "name": "Run one CSharp candidate and independent offline selection; encrypt every economic number",
+          "run": "umask 077\ndotnet run --project research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.csproj -c Release --no-build -- \"${RUNNER_TEMP}/mxm-leadlag/eur.ndjson\" \"${RUNNER_TEMP}/mxm-leadlag/gbp.ndjson\" \"${RUNNER_TEMP}/mxm-leadlag/csharp.json\"\npython3 -m research_core_v4.laboratory.usd_leadlag_development result \"${RUNNER_TEMP}/mxm-leadlag\" verification/usd-leadlag-development"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "usd-leadlag-development-${{ github.run_id }}",
+            "path": "verification/usd-leadlag-development/receipt.json\nverification/usd-leadlag-development/full-result.mxmenc",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
