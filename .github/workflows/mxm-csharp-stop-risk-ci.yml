@@ -66,6 +66,9 @@ jobs:
           assert main.index('CurrentNativeCommission(')<main.index('ExecuteMarketOrder(')
           assert 'MxmNativeCommission.Price(terms,' in main
           assert 'MXM_NATIVE_FEE_SNAPSHOT_CHANGED_BEFORE_ORDER_HOLD' in main
+          assert main.index('MxmNativeCommission.StillCovered(')<main.index('ExecuteMarketOrder(')
+          assert 'MXM_NATIVE_FEE_INCREASED_BEFORE_ORDER_HOLD' in main
+          assert 'feeQuoteAsset' in main and 'feeMinimumAsset' in main and 'feeLotSize' in main
           assert p.count('SymbolCommissionType.')==4
           assert p.count('SymbolMinCommissionType.')==2
           print('MXM_NATIVE_CTRADER_BROKER_ADVERTISED_FEE_ESTIMATE_WIRED_BEFORE_ORDER_NO_ACTUAL_FILLS')

@@ -331,6 +331,9 @@ public sealed class MxmReferenceProductBot : Robot {
   var feeType=instrument.CommissionType;
   var feeMinimumType=instrument.MinCommissionType;
   double feeRate=instrument.Commission,feeMinimum=instrument.MinCommission;
+  long feeLotSize=instrument.LotSize;
+  string feeQuoteAsset=instrument.QuoteAsset?.Name??"";
+  string feeMinimumAsset=instrument.MinCommissionAsset?.Name??"";
   MxmNativeCommissionEstimate nativeFee;
   try {nativeFee=CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk);}
   catch(Exception e){
@@ -417,8 +420,21 @@ public sealed class MxmReferenceProductBot : Robot {
   if(instrument.Bid!=feeBookBid || instrument.Ask!=feeBookAsk ||
      instrument.CommissionType!=feeType || instrument.Commission!=feeRate ||
      instrument.MinCommissionType!=feeMinimumType ||
-     instrument.MinCommission!=feeMinimum) {
+     instrument.MinCommission!=feeMinimum || instrument.LotSize!=feeLotSize ||
+     (instrument.QuoteAsset?.Name??"")!=feeQuoteAsset ||
+     (instrument.MinCommissionAsset?.Name??"")!=feeMinimumAsset) {
    Print("MXM_NATIVE_FEE_SNAPSHOT_CHANGED_BEFORE_ORDER_HOLD");return;
+  }
+  // A slow durable/risk path can outlive a cost-FX snapshot. Reprice the
+  // advertised symbol and conversion just before submission; any increased
+  // fee would invalidate the earlier cash reserve and is never silently used.
+  try {
+   var latestFee=CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk);
+   if(!MxmNativeCommission.StillCovered(nativeFee,latestFee)) {
+    Print("MXM_NATIVE_FEE_INCREASED_BEFORE_ORDER_HOLD");return;
+   }
+  }catch(Exception e) {
+   Print("MXM_NATIVE_FEE_RECHECK_UNVERIFIED_HOLD_"+e.GetType().Name);return;
   }
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;

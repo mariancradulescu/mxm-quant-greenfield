@@ -16,6 +16,24 @@ public sealed record MxmNativeCommissionEstimate(
  string Classification="CURRENT_NATIVE_SYMBOL_FEE_ESTIMATE_NOT_BROKER_CHARGE");
 public static class MxmNativeCommission {
  static void Need(bool ok,string why){if(!ok)throw new ArgumentException("MXM_NATIVE_COMMISSION_"+why);}
+ // A second, later fee observation may be cheaper without weakening the
+ // original reservation. Higher or unverified later fees invalidate entry.
+ // Pure admission gate: no conversion, account, order or timestamp guessed.
+ public static bool StillCovered(MxmNativeCommissionEstimate earlier,
+  MxmNativeCommissionEstimate later) {
+  if(earlier==null || later==null ||
+     earlier.Classification!="CURRENT_NATIVE_SYMBOL_FEE_ESTIMATE_NOT_BROKER_CHARGE" ||
+     later.Classification!=earlier.Classification ||
+     earlier.BuyEur<0m || earlier.SellEur<0m ||
+     later.BuyEur<0m || later.SellEur<0m ||
+     earlier.PerSideCeilingEur<earlier.BuyEur ||
+     earlier.PerSideCeilingEur<earlier.SellEur ||
+     later.PerSideCeilingEur<later.BuyEur ||
+     later.PerSideCeilingEur<later.SellEur ||
+     earlier.RoundTripReserveEur/2m!=earlier.PerSideCeilingEur ||
+     later.RoundTripReserveEur/2m!=later.PerSideCeilingEur)return false;
+  return later.PerSideCeilingEur<=earlier.PerSideCeilingEur;
+ }
  public static MxmNativeCommissionEstimate Price(MxmNativeCommissionTerms terms,
   decimal units,decimal bid,decimal ask,decimal quoteToUsd,
   decimal usdToEur,decimal quoteToEur,decimal minimumAssetToEur) {
