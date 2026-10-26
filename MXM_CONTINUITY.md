@@ -1,3 +1,13 @@
+# 26 octombrie2026 — intrare EUR tipizată și cauza exactă a faultului original
+
+Recuperat LIVE din6196df508bc6f611ea9e2a12b551257a8791488e. Ordinary recovery40311868491/job121534754821 SUCCESS confirmă STOP terminal, bootstrap_dispatches0; nu se reia coada. Autorități neschimbate. Nicio nouă execuție economică sau colectare activă.
+
+[Recepția prospectivă EUR](docs/economic-development/20261026/EUR_TYPED_BOOK_PROSPECTIVE_RECEPTION_V1.md): reutilizează MxmUsdPairAlignment existent, fără ceas/motor/laborator paralel. Noul adaptor EUR produce MxmQuote cu ambele source timestamps sau eveniment explicit unavailable; păstrează5secunde, stop/risc și faultul pe expuneri imposibil de marcat. Locked books sunt deja acceptate de infrastructura GBP/cont; nu devin filluri dovedite sau tranzacții gratuite. Politica intrinsecă închisă rămâne nemodificată DATA_LIMITED.
+
+Un singur workflow finit read-only va autentifica ORIGINALUL cursor C#/referință și digestul W35, apoi va reconcilia fiecare grup de sursă C#/Python pe toate3săptămânile, fără replay de strategie/cont pe date autentice. Recepție nativă PENDING la instalare; .NET absent local, compilare/test nativ obligatoriu înainte de integrare. Zero modele/rezultate economice/cereri broker/ordine/Cloud/protected openings. B–E OPEN; niciun edge/HARD21/runtime cTrader certificat. OWNER operations NONE. Snapshoturile următoare rămân istorice.
+
+---
+
 # 26 octombrie2026 — originale autorizate păstrate; diagnosticul nativ reconciliat
 
 Recuperare din d8b04a5df0f16925b9bf686c57e3f2be071aa946/PR190, fără execuții active sau rezultate duplicate. OWNER a autorizat explicit publicarea celor două originale cerute după respingerea automată. Arhivele exacte rezultat4612bytes9fda9674… și evaluator60510bytes80fdea40… sunt păstrate în `docs/economic-development/20261026/intrinsic-result-40285218660/`; manifestdc1b53d7…; DLLdcce9bd8… legat de receiptul original. Verificator offline fără chei/decriptare/replay/compiler. Blocajul publicării este rezolvat; respingerile de mai jos sunt istorice. Confirmarea conversațională nu este review nativ GitHub și nu extinde autorizarea ordinelor/Cloud/custodiei.
