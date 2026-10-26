@@ -1,4 +1,4 @@
-import json,shutil,subprocess,unittest
+import base64,hashlib,json,shutil,subprocess,unittest
 from decimal import Decimal as D
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -22,4 +22,5 @@ class BoundAccount(unittest.TestCase):
         self.assertEqual(p['BuyCost']['UnroundedFeeEur'],buy);self.assertEqual(p['SellCost']['UnroundedFeeEur'],sell)
         self.assertEqual(p['ChargedPerSideCeilingEur'],max(buy,sell));self.assertLessEqual(2*max(buy,sell),r['parameters']['RoundTripRiskReserveEur'])
         self.assertFalse(a['CostsBrokerVerified']);self.assertFalse(a['Hard21Proven'])
+        raw=p.stdout.encode();print('MXM_COMMISSION_ACCOUNT_ORIGINAL '+json.dumps({'classification':'ARTIFICIAL_QUOTES_AND_FX_ONLY','bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'original_stdout_b64':base64.b64encode(raw).decode()},sort_keys=True))
 if __name__=='__main__':unittest.main()
