@@ -1,0 +1,77 @@
+{
+  "name": "MXM bounded intrinsic account first-outcome technical recovery",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-intrinsic-account-recovery.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "intrinsic-account-recovery": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".sealed-chronology-source",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit the exact finite prospective model before key access",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.intrinsic_recovery admit"
+        },
+        {
+          "name": "Compile and reconcile artificial continuous-account paths without secrets",
+          "run": "dotnet build research_core_v4/laboratory/csharp/intrinsic/MxmIntrinsicAccount.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_intrinsic_development research_core_v4.laboratory.test_intrinsic_recovery -v\npython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m research_core_v4.laboratory.durable_week35_chronology --out \"${RUNNER_TEMP}/mxm-intrinsic/W35\"\npython3 -m research_core_v4.laboratory.durable_week36_chronology --out \"${RUNNER_TEMP}/mxm-intrinsic/W36\"\npython3 -m research_core_v4.laboratory.durable_week_chronology --out \"${RUNNER_TEMP}/mxm-intrinsic/W37\"\ncp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/three_week_source_recovery.py .sealed-chronology-source/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Reauthenticate and decode only the three exact originals in existing custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .sealed-chronology-source\npython3 -m research_core_v4.laboratory.three_week_source_recovery W35 \"${RUNNER_TEMP}/mxm-intrinsic/W35/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-intrinsic/W35.ndjson\"\npython3 -m research_core_v4.laboratory.three_week_source_recovery W36 \"${RUNNER_TEMP}/mxm-intrinsic/W36/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-intrinsic/W36.ndjson\"\npython3 -m research_core_v4.laboratory.three_week_source_recovery W37 \"${RUNNER_TEMP}/mxm-intrinsic/W37/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-intrinsic/W37.ndjson\"\n"
+        },
+        {
+          "name": "Execute one fixed account across fresh processes and independently reconcile then encrypt",
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.intrinsic_recovery result \"${RUNNER_TEMP}/mxm-intrinsic\" verification/intrinsic-account-development"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "intrinsic-account-recovery-${{ github.run_id }}",
+            "path": "verification/intrinsic-account-development/receipt.json\nverification/intrinsic-account-development/full-result.mxmenc\nverification/intrinsic-account-development/recovery.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
