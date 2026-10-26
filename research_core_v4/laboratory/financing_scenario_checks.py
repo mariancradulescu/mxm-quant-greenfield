@@ -111,9 +111,39 @@ def negatives(p):
         raise ValueError('FINANCING_SCENARIO_TAMPER_ACCEPTED_' + str(i))
     return len(mutations)
 
+def original(folder=None):
+    import base64, hashlib, io, zipfile
+    root = Path(__file__).resolve().parents[2]
+    folder = Path(folder) if folder is not None else root / 'docs/economic-development/20261026/financing-account-40275418143'
+    sha = lambda b: hashlib.sha256(b).hexdigest()
+    manifest = (folder / 'MANIFEST.json').read_bytes()
+    need(sha(manifest) == '035a4672b3ed84779ed77f2e8120f1db8d347cbf3a72c0e6881f7543d71cb1da', 'ORIGINAL_MANIFEST')
+    m = json.loads(manifest); encoded = (folder / 'artifact.zip.b64').read_bytes()
+    need(len(encoded) < 4096, 'ORIGINAL_ARCHIVE_BOUND')
+    archive = base64.b64decode(encoded.strip(), validate=True)
+    need(len(archive) == m['archive_bytes'] == 1458 and sha(archive) == m['archive_sha256'], 'ORIGINAL_ARCHIVE')
+    with zipfile.ZipFile(io.BytesIO(archive)) as z:
+        need(z.namelist() == ['proof.json'] and z.infolist()[0].file_size == 7923, 'ORIGINAL_MEMBERS')
+        raw = z.read('proof.json')
+    need(len(raw) == m['proof_bytes'] and sha(raw) == m['proof_sha256'] and
+         (folder / 'proof.json').read_bytes() == raw, 'ORIGINAL_PROOF')
+    need(m['run_id'] == 40275418143 and m['job_id'] == 121417029454 and m['artifact_id'] == 12630066771 and
+         m['source_head'] == 'd62bed7a6212f05de784f5c8c54fb62afd5e7096' and
+         m['test_merge'] == '66f048309efe2fdad501ed484f808596b6052d69', 'ORIGINAL_NATIVE_PROVENANCE')
+    p = json.loads(raw, parse_float=D); result = verify(p['financing'])
+    from .shared_usd_account_checks import verify as shared_verify
+    shared_verify(p)
+    changed = [p for p, h in m['implementation_sha256'].items() if not (root / p).is_file() or sha((root / p).read_bytes()) != h]
+    result.update(original_archive_verified=True, source_run=m['run_id'],
+                  current_compiled_sources_match_original=not changed, changed_implementation_paths=changed)
+    return result
+
 if __name__ == '__main__':
     import sys
-    p = json.loads(Path(sys.argv[1]).read_bytes(), parse_float=D)
-    result = verify(p['financing'])
-    result['independent_tamper_negatives'] = negatives(p['financing'])
+    if sys.argv[1:] == ['--original']:
+        result = original()
+    else:
+        p = json.loads(Path(sys.argv[1]).read_bytes(), parse_float=D)
+        result = verify(p['financing'])
+        result['independent_tamper_negatives'] = negatives(p['financing'])
     print(json.dumps(result, sort_keys=True))
