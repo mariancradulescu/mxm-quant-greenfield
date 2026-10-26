@@ -11,6 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Decode broad captured commission terms and reconcile all artificial fee cases
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/commission/MxmCommission.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_universe_commission -v
+          python3 -m research_core_v4.laboratory.universe_commission_checks
+          python3 -m unittest research_core_v4.laboratory.test_eur_book_evidence -v
       - name: Compile reusable EUR source input and reconcile strict guards before native reception
         run: |
           dotnet build research_core_v4/laboratory/csharp/eur_book/MxmEurBook.csproj -c Release
