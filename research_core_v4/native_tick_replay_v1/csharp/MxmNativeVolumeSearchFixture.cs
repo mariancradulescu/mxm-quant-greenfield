@@ -29,6 +29,25 @@ bool Afford(decimal volume) {
 Eq(Find(100m,1000m,100m,1000m,Afford)==700m,"STRICT_SHARED_EUR_ACCOUNT_EXACT_GRID");
 Eq(!Afford(800m),"STRICT_CASH_RESERVE_REJECTS_80_PLUS_FEE");
 Eq(!Afford(1300m),"OWNER_RISK_REJECTS_EXCESS");
+// The exact SAME maximum-volume selector must price previously owned risk
+// before allocating the remaining EUR200 stop-risk capacity. The original
+// post-durable gate independently recomputes the complete broker book.
+bool AffordWithOneOwned(decimal volume) {
+ decimal margin=volume*.1m,stop=volume*.0015m,commission=.02m;
+ return MxmCapitalAdmission.Check(equity,freeMargin,margin,commission,
+     .4m,120m,1,2)==MxmCapitalAdmission.Admit &&
+   MxmStopRiskAdmission.Check(equity,.8m,stop,.01m,.2m,.2m)==MxmStopRiskAdmission.Admit &&
+   MxmOwnerEntryEnvelope.Check(freeMargin,margin,commission,stop,.2m)==MxmOwnerEntryEnvelope.Admit &&
+   MxmOwnerEntryEnvelope.RoundTripFeeReserveCovers(.2m,commission,commission);
+}
+Eq(Find(100m,1000m,100m,1000m,AffordWithOneOwned)==500m,
+ "EXISTING_POSITION_AND_FRICTION_SHRINK_SECOND_TICKET_TO_500");
+Eq(!AffordWithOneOwned(600m),"UNCOUNTED_EXISTING_STOP_RISK_WOULD_OVERADMIT");
+Eq(MxmStopRiskAdmission.Check(200m,1.9m,.1m,.01m,.2m,.2m)!=MxmStopRiskAdmission.Admit,
+ "EXISTING_STOP_EXHAUSTED_NO_TICKET");
+Eq(Find(100m,1000m,100m,1000m,v=>
+ MxmStopRiskAdmission.Check(200m,1.9m,v*.0015m,.01m,.2m,.2m)==MxmStopRiskAdmission.Admit)==null,
+ "EXHAUSTED_CAPACITY_FAIL_CLOSED_AT_BROKER_MINIMUM");
 int calls=0;
 var many=Find(100m,9999999900m,100m,9999999900m,v=>{calls++;return v<=600m;});
 Eq(many==600m && calls<=70,"BOUNDED_NO_FULL_SCAN");
