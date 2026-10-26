@@ -106,6 +106,7 @@ jobs:
           mkdir -p verification/shared-usd-account
           dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release > verification/shared-usd-account/proof.json
           python3 -m research_core_v4.laboratory.shared_usd_account_checks verification/shared-usd-account/proof.json
+          python3 -m research_core_v4.laboratory.financing_scenario_checks verification/shared-usd-account/proof.json
           python3 -m research_core_v4.laboratory.shared_usd_account_checks --original
           python3 -m unittest research_core_v4.laboratory.test_shared_usd_account_evidence -v
       - name: Preserve original artificial funded-account FX proof
