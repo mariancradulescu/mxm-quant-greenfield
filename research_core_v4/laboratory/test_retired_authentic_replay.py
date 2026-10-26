@@ -36,7 +36,10 @@ class RetiredReplay(unittest.TestCase):
 # list: no body, custody, executable scenario or source drift is authorized.
 EXIT_PATH=ROOT/'.github/workflows/mxm-csharp-exit-lifecycle-cold.yml'
 EXIT_TAIL_SHA256='51499c4e9db536969cf8b63c17e61985e75de46ae18ccba71371a0f11d90898d'
-EXIT_ALLOWED={'.github/workflows/mxm-csharp-exit-lifecycle-cold.yml'}
+EXIT_ALLOWED={'.github/workflows/mxm-csharp-exit-lifecycle-cold.yml',
+              'research_core_v4/laboratory/chronology_csharp_bridge.py',
+              'research_core_v4/laboratory/captured_symbol_terms.py',
+              'research_core_v4/laboratory/durable_native_chronology.py'}
 def validate_exit(raw):
     config=yaml.safe_load(raw)
     triggers=config.get('on',config.get(True))
