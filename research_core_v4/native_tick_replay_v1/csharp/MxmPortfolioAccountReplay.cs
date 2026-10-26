@@ -15,6 +15,7 @@ namespace Mxm.Replay {
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmUsdConversionUnavailable),"usd-conversion-unavailable")]
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmInstrumentQuoteUnavailable),"instrument-quote-unavailable")]
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmFinancingCashflow),"financing-scenario")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmExplicitDecision),"explicit-decision")]
 public abstract record MxmAccountFeed(DateTime Utc, string Symbol);
 // Utc is the ACTUAL time the first next-bar quote was observed and the
 // closed bar became actionable. BoundaryUtc is the fixed 5m bucket boundary
@@ -46,6 +47,10 @@ public sealed record MxmInstrumentQuoteUnavailable(DateTime Utc,string Symbol,st
 public sealed record MxmFinancingCashflow(DateTime Utc,string Symbol,
  DateTime PositionEntryUtc,int Direction,decimal Units,DateTime AccrualStartUtc,
  DateTime AccrualEndUtc,decimal AmountEur,string ScenarioSha256) : MxmAccountFeed(Utc,Symbol);
+// A policy decision is not a fill. Consume once on a later admissible quote.
+public sealed record MxmExplicitDecision(DateTime Utc,string Symbol,long Sequence,int Desired,
+ DateTime ValidFromUtc,DateTime ExpiresUtc,string PolicySha256) : MxmAccountFeed(Utc,Symbol);
+internal sealed record MxmExplicitPolicyState(MxmExplicitDecision? Pending,long LastSequence,DateTime BlockedThrough);
 public sealed record MxmPortfolioTrade(
  string Kind, DateTime Utc, string Symbol, int Direction, decimal Price,
  decimal Units, decimal CashEur, decimal CommissionEur, decimal GrossEur,
@@ -71,7 +76,9 @@ public sealed record MxmReplayParameters(
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
  bool UseSharedUsdConversion=false,
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
- string? FinancingScenarioSha256=null
+ string? FinancingScenarioSha256=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ string? ExplicitPolicySha256=null
 );
 
 /// <summary>
@@ -91,6 +98,9 @@ public sealed partial class MxmPortfolioAccountReplay {
   public DateTime LastQuote;
   public MxmQuote? Latest;
   public readonly MxmCausalIntent Intent=new();
+  public MxmExplicitDecision? PolicyPending;
+  public long PolicySequence;
+  public DateTime PolicyBlockedThrough;
   public State(StrategyMode mode,bool onlineAr1) {Kernel=new MxmDecisionSource(new MxmDecisionKernel(mode),onlineAr1);}
  }
  sealed record Holding(int Direction,decimal Entry,decimal Units,decimal Margin,
@@ -113,6 +123,7 @@ public sealed partial class MxmPortfolioAccountReplay {
  public MxmPortfolioAccountReplay(IEnumerable<string> symbols,MxmReplayParameters settings) {
   parameters=settings;
   Need(settings.FinancingScenarioSha256==null || IsDigest(settings.FinancingScenarioSha256),"INVALID_FINANCING_SCENARIO_IDENTITY");
+  Need(settings.ExplicitPolicySha256==null || IsDigest(settings.ExplicitPolicySha256),"INVALID_EXPLICIT_POLICY_IDENTITY");
   if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
      settings.MaxMarginFraction<=0 || settings.MaxMarginFraction>1 ||
      settings.MaxEstimatedStopRiskFraction<=0 || settings.MaxEstimatedStopRiskFraction>1 ||
@@ -239,6 +250,26 @@ public sealed partial class MxmPortfolioAccountReplay {
   trades.Add(new MxmPortfolioTrade("FINANCING",f.Utc,f.Symbol,position.Direction,0m,
    position.Units,balance,0m,f.AmountEur,"EXPLICIT_EUR_FINANCING_SCENARIO",f));
  }
+ void PublishExplicit(State st,MxmExplicitDecision d){
+  Need(parameters.ExplicitPolicySha256!=null && d.PolicySha256==parameters.ExplicitPolicySha256 &&
+   d.Sequence==st.PolicySequence+1 && d.Desired is >=-1 and <=1 &&
+   d.ValidFromUtc.Kind==DateTimeKind.Utc && d.ExpiresUtc.Kind==DateTimeKind.Utc &&
+   d.ValidFromUtc>d.Utc && d.ExpiresUtc>d.ValidFromUtc &&
+   (d.ExpiresUtc-d.Utc).TotalSeconds<=parameters.MaxQuoteAgeSeconds,"EXPLICIT_POLICY_IDENTITY_SEQUENCE_OR_CLOCK");
+  st.PolicySequence=d.Sequence;
+  st.PolicyPending=d.Utc>st.PolicyBlockedThrough?d:null;
+ }
+ void ConsumeExplicit(State st,MxmQuote q){
+  var d=st.PolicyPending;if(d==null)return;
+  if(q.Utc>=d.ExpiresUtc){st.PolicyPending=null;return;}
+  if(q.Utc<d.ValidFromUtc || q.Utc<=d.Utc)return;
+  st.PolicyPending=null; // Consumed even when risk/capital admission refuses.
+  if(open.TryGetValue(q.Symbol,out var p)){
+   if(d.Desired==p.Direction)return;
+   Exit(q.Symbol,q,d.Desired==0?"EXPLICIT_POLICY_FLAT":"EXPLICIT_POLICY_REVERSAL");
+  }
+  if(d.Desired!=0 && !halted)Enter(q.Symbol,d.Desired,q);
+ }
  void Enter(string symbol,int desired,MxmQuote tick) {
   if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
    rejected.Add("REJECT_CAPTURED_VOLUME_LATTICE");return;
@@ -307,22 +338,28 @@ public sealed partial class MxmPortfolioAccountReplay {
    if(e is MxmUsdConversionUnavailable unavailable){
     Need(parameters.UseSharedUsdConversion && unavailable.Symbol=="EURUSD" && !string.IsNullOrWhiteSpace(unavailable.Reason),"UNREGISTERED_FX_INVALIDATION");
     usdConversionInvalid=true; // Keep accepted clocks/values as an immutable continuity anchor.
-    foreach(var item in state.Values)item.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);
+    foreach(var item in state.Values){item.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);
+     item.PolicyPending=null;item.PolicyBlockedThrough=e.Utc;}
     // Never carry open exposure through an unknown conversion interval and
     // later report a conveniently priced capital path.
     Mark();processedEvents++;continue;
    }
    if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
+   if(e is MxmExplicitDecision explicitDecision){
+    PublishExplicit(st!,explicitDecision);Mark();processedEvents++;continue;
+   }
    if(e is MxmFinancingCashflow financing){
     ApplyFinancing(financing);Mark();processedEvents++;continue;
    }
    if(e is MxmInstrumentQuoteUnavailable missing){
-    Need(parameters.UseSharedUsdConversion && !string.IsNullOrWhiteSpace(missing.Reason),"UNREGISTERED_INSTRUMENT_INVALIDATION");
+    Need((parameters.UseSharedUsdConversion || parameters.ExplicitPolicySha256!=null) && !string.IsNullOrWhiteSpace(missing.Reason),"UNREGISTERED_INSTRUMENT_INVALIDATION");
+    st!.PolicyPending=null;st.PolicyBlockedThrough=e.Utc;
     st!.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);
     Need(!open.ContainsKey(e.Symbol),"OPEN_EXPOSURE_INSTRUMENT_UNPRICEABLE");
     Mark();processedEvents++;continue;
    }
    if(e is MxmBarClose bar) {
+    Need(parameters.ExplicitPolicySha256==null,"CANNOT_MIX_EXPLICIT_POLICY_AND_BAR_KERNEL");
     // A broker's first tick of a new bar does NOT arrive at the exact
     // timestamp of its UTC bucket boundary. Check continuous bar identity
     // against the boundary and execution causality against observed Utc.
@@ -342,6 +379,7 @@ public sealed partial class MxmPortfolioAccountReplay {
     st.Intent.Publish(signal,true,st.Kernel.CompletedBars,boundary,bar.Utc,parameters.BarMinutes);
     if(st.Kernel.CompletedBars<6)st.Intent.Clear();
    } else if(e is MxmQuote quote) {
+    if(parameters.ExplicitPolicySha256!=null)Need(ValidInstrumentMark(quote,quote.Utc),"EXPLICIT_POLICY_REQUIRES_FRESH_SOURCE_SIDES");
     VerifyQuoteFx(quote);
     Need(quote.Bid>0 && quote.Ask>=quote.Bid && quote.QuoteToEur>0 &&
       quote.ExecutableUnits>0 && quote.InitialMarginEur>0 &&
@@ -360,8 +398,10 @@ public sealed partial class MxmPortfolioAccountReplay {
        (protectedPosition.Direction>0 ? quote.Bid<=stop : quote.Ask>=stop)) {
      Exit(quote.Symbol,quote,"OBSERVED_QUOTE_STOP");
      st.Intent.RevokeThroughBoundary(quote.Utc,parameters.BarMinutes);stopped=true;
+     st.PolicyPending=null;st.PolicyBlockedThrough=quote.Utc;
     }
-    if(!halted && !stopped && st.Intent.TryConsume(quote.Utc,out var intent)) {
+    if(!halted && !stopped && parameters.ExplicitPolicySha256!=null)ConsumeExplicit(st,quote);
+    if(!halted && !stopped && parameters.ExplicitPolicySha256==null && st.Intent.TryConsume(quote.Utc,out var intent)) {
      int signal=intent!.Desired;
      if(open.TryGetValue(quote.Symbol,out var position)) {
       string? reason=MxmExitPolicy.Reason(parameters.ExitPolicy,signal,position.Direction,

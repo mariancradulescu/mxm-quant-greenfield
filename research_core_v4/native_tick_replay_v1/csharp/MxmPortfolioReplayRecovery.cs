@@ -10,7 +10,8 @@ public sealed record MxmReplayCapsule(byte[] Payload,string Sha256,long NextEven
 /// <summary>Offline counterfactual state, never a broker order/ACK or native Robot restore.</summary>
 public sealed partial class MxmPortfolioAccountReplay {
  sealed record SymbolReplayState(string Symbol,DateTime LastBar,DateTime LastQuote,
-  MxmQuote? Latest,MxmDecisionReplayState Kernel,MxmIntentReplayState Intent);
+  MxmQuote? Latest,MxmDecisionReplayState Kernel,MxmIntentReplayState Intent,
+  [property:JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] MxmExplicitPolicyState? ExplicitPolicy=null);
  sealed record PositionReplayState(string Symbol,int Direction,decimal Entry,decimal Units,decimal Margin,
   decimal StopRisk,decimal QuoteToEur,DateTime EntryUtc,decimal? StopPrice);
  sealed record AccountReplayState(int Version,string CodeIdentity,string SourceSha256,MxmReplayParameters Parameters,
@@ -31,7 +32,8 @@ public sealed partial class MxmPortfolioAccountReplay {
   var value=new AccountReplayState(1,CodeIdentity(),authenticatedSourceSha256,parameters,
    processedEvents,lastFeed,halted,balance,peak,drawdown,accepted,exits,
    state.Select(p=>new SymbolReplayState(p.Key,p.Value.LastBar,p.Value.LastQuote,p.Value.Latest,
-    p.Value.Kernel.CaptureReplayState(),p.Value.Intent.CaptureReplayState())).ToArray(),
+    p.Value.Kernel.CaptureReplayState(),p.Value.Intent.CaptureReplayState(),
+    parameters.ExplicitPolicySha256==null?null:new MxmExplicitPolicyState(p.Value.PolicyPending,p.Value.PolicySequence,p.Value.PolicyBlockedThrough))).ToArray(),
    open.Select(p=>new PositionReplayState(p.Key,p.Value.Direction,p.Value.Entry,p.Value.Units,p.Value.Margin,
     p.Value.StopRisk,p.Value.QuoteToEur,p.Value.EntryUtc,p.Value.StopPrice)).ToArray(),
    trades.ToArray(),rejected.ToArray(),new Dictionary<string,int>(entriesByWeek),usdEurMark,usdConversionInvalid);
@@ -98,6 +100,18 @@ public sealed partial class MxmPortfolioAccountReplay {
      string.Equals(item.Latest.Symbol,item.Symbol,StringComparison.OrdinalIgnoreCase)),"CHECKPOINT_SYMBOL_CLOCK");
    var st=result.state[item.Symbol];st.LastBar=item.LastBar;st.LastQuote=item.LastQuote;st.Latest=item.Latest;
    st.Kernel.RestoreReplayState(item.Kernel);st.Intent.RestoreReplayState(item.Intent,expectedParameters.BarMinutes);
+   if(expectedParameters.ExplicitPolicySha256==null)Need(item.ExplicitPolicy==null,"CHECKPOINT_UNREGISTERED_EXPLICIT_POLICY");
+   else {
+    var e=item.ExplicitPolicy;Need(e!=null && e.LastSequence>=0 &&
+     (e.BlockedThrough==default || e.BlockedThrough.Kind==DateTimeKind.Utc && e.BlockedThrough<=s.LastFeed),"CHECKPOINT_POLICY_STATE");
+    if(e!.Pending is MxmExplicitDecision d)Need(d.Symbol==item.Symbol && d.Sequence==e.LastSequence && d.Sequence>0 &&
+     d.PolicySha256==expectedParameters.ExplicitPolicySha256 && d.Desired is >=-1 and <=1 &&
+     d.Utc.Kind==DateTimeKind.Utc && d.Utc>e.BlockedThrough && d.Utc<=s.LastFeed &&
+     d.ValidFromUtc.Kind==DateTimeKind.Utc && d.ExpiresUtc.Kind==DateTimeKind.Utc &&
+     d.ValidFromUtc>d.Utc && d.ExpiresUtc>d.ValidFromUtc &&
+     (d.ExpiresUtc-d.Utc).TotalSeconds<=expectedParameters.MaxQuoteAgeSeconds,"CHECKPOINT_POLICY_PENDING");
+    st.PolicyPending=e.Pending;st.PolicySequence=e.LastSequence;st.PolicyBlockedThrough=e.BlockedThrough;
+   }
   }
   foreach(var p in s.Positions){
    Need(liveEntries.TryGetValue(p.Symbol,out var entry) && entry.Utc==p.EntryUtc &&
