@@ -28,12 +28,17 @@ POLICY={'schema':'mxm.week-chronology-policy.v1','symbol_id':1,'symbol_name':'EU
 # Only these prospectively registered profiles are admissible. No user-supplied
 # timestamps, symbols, request caps or arbitrary remote configurations.
 PROFILE=os.environ.get('LAB_CHRONOLOGY_PROFILE','W37')
-need(PROFILE in ('W37','W35','GBPUSD_W37'),'WEEK_UNREGISTERED_PROFILE')
+need(PROFILE in ('W37','W35','GBPUSD_W37','W36'),'WEEK_UNREGISTERED_PROFILE')
 if PROFILE=='W35':
     PATH='.github/workflows/mxm-week35-chronology-reception.yml'
     SOURCE_REF='mxm-week35-chronology-code-20261023'
     OUT=Path('verification/week35-chronology')
     POLICY={**POLICY,'from_ms':1787529600000,'to_ms':1788134400000,'iso_week':'2026-W35'}
+elif PROFILE=='W36':
+    PATH='.github/workflows/mxm-week36-chronology-reception.yml'
+    SOURCE_REF='mxm-week36-chronology-code-20261026'
+    OUT=Path('verification/week36-chronology')
+    POLICY={**POLICY,'from_ms':1788134400000,'to_ms':1788739200000,'iso_week':'2026-W36'}
 elif PROFILE=='GBPUSD_W37':
     PATH='.github/workflows/mxm-gbpusd-week37-chronology-reception.yml'
     SOURCE_REF='mxm-gbpusd-week37-chronology-code-20261025'
@@ -70,7 +75,8 @@ def build_workflow(source):
         return result
     return {'name':('MXM one complete ISO week VIEW chronology acquisition' if PROFILE=='W37' else
                     ('MXM W35 complete ISO week VIEW chronology acquisition' if PROFILE=='W35' else
-                     'MXM GBPUSD W37 complete ISO week VIEW chronology acquisition')),
+                     ('MXM W36 complete ISO week VIEW chronology acquisition' if PROFILE=='W36' else
+                      'MXM GBPUSD W37 complete ISO week VIEW chronology acquisition'))),
       'on':{'push':{'branches':[BRANCH],'paths':[PATH]},'workflow_dispatch':{}},
       'permissions':{},'concurrency':{'group':'mxm-integrated-laboratory','cancel-in-progress':False},
       'jobs':{'chronology-collect':job('chronology-collect','mxm-r3-pepperstone-v1'),
