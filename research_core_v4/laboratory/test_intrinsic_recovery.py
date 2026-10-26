@@ -27,7 +27,13 @@ class RecoveryTests(unittest.TestCase):
             if mode=='retry':r['run_attempt']=2
             with self.subTest(mode=mode),self.assertRaises(LabError):no_original_outcome(r,j,a)
     def test_exact_new_scope_keeps_original_policy_and_roles(self):
-        p=plan();self.assertEqual(p['additional_technical_attempts'],1);self.assertEqual(p['new_scientific_models'],0)
+        # Historical technical recovery cannot be re-admitted with later
+        # shared account code. This is expected and protective; the preserved
+        # encrypted original receipt remains independently verifiable.
+        with self.assertRaisesRegex(LabError,'INTRINSIC_FROZEN_IMPLEMENTATION'):
+            plan()
+        p=json.loads((ROOT/'research_core_v4/laboratory/INTRINSIC_TECHNICAL_RECOVERY_V1.json').read_bytes())
+        self.assertEqual(p['additional_technical_attempts'],1);self.assertEqual(p['new_scientific_models'],0)
         w=workflow();self.assertEqual(len(w['jobs']),1)
         j=w['jobs']['intrinsic-account-recovery'];self.assertEqual(j['permissions'],{'contents':'read','actions':'read'})
         self.assertEqual(len([s for s in j['steps'] if 'MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM' in s.get('env',{})]),1)
