@@ -19,7 +19,8 @@ public static class MxmNativeCommission {
  public static MxmNativeCommissionEstimate Price(MxmNativeCommissionTerms terms,
   decimal units,decimal bid,decimal ask,decimal quoteToUsd,
   decimal usdToEur,decimal quoteToEur,decimal minimumAssetToEur) {
-  Need(terms!=null && terms.Type>=0 && terms.Type<=3 &&
+  if(terms==null)throw new ArgumentException("MXM_NATIVE_COMMISSION_MISSING_TERMS");
+  Need(terms.Type>=0 && terms.Type<=3 &&
    terms.MinimumType>=0 && terms.MinimumType<=1 &&
    !string.IsNullOrWhiteSpace(terms.QuoteAsset) &&
    !string.IsNullOrWhiteSpace(terms.MinimumAsset) &&

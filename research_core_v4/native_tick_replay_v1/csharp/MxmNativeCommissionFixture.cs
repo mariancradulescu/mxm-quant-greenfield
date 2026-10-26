@@ -25,9 +25,8 @@ foreach(var kind in types)foreach(var minType in new[]{0,1}) {
  Need(z.RoundTripReserveEur==2m*z.PerSideCeilingEur &&
   z.Classification.Contains("NOT_BROKER_CHARGE"),"TWO_SIDE_RESERVE_NO_PROMOTION");
  Need(MxmOwnerEntryEnvelope.Check(200m,80m,z.PerSideCeilingEur,
-   1m,z.RoundTripReserveEur)==
-  (z.PerSideCeilingEur>0m?"REJECT_OWNER_POST_ENTRY_RESERVE_LT_120":
-   MxmOwnerEntryEnvelope.Admit),"OWNER_FEE_REDUCES_FREE_RESERVE");
+   0.01m,0m)=="REJECT_OWNER_POST_ENTRY_RESERVE_LT_120",
+   "OWNER_FEE_REDUCES_FREE_RESERVE");
 }
 void Reject(MxmNativeCommissionTerms t,decimal qUsd=1m,decimal usdEur=.9m,
  decimal quoteEur=.9m,decimal minEur=1m,decimal volume=1000m,
