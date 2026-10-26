@@ -1,3 +1,15 @@
+# 26 octombrie2026 — comisioane legate conservator la cont și frontieră de cost fără date noi
+
+Recuperare din0ef4448652cec5f5c38703c8e358a2c282c106f7/PR193; toate5CI SUCCESS, inclusiv gateway40330956246/job121599930429 și1576termeni reconciliați. Recepția EUR40319142037SUCCESS și modelul vechi DATA_LIMITED rămân intacte, fără repetare.
+
+[Integrarea cost–cont](docs/economic-development/20261026/COMMISSION_ACCOUNT_AND_COST_FRONTIER_V1.md) păstrează motorul/capsulele/ledgerele existente nemodificate. Adaptorul calculează ambele taxe buy/sell și transmite plafonul conservator prin canalul existent; cere rezervă pentru2plafoane curente, identități/scenariu/FX/source clocks valide și refuză costurile amestecate. Nu este taxă broker exactă. Fixture actual C# cu200EUR o singură dată, ledger verificat Decimal și3procese reci; nu replay autentic sau Robot nativ. Compilare/recepție nativă obligatorie înainte de integrare.
+
+Scenariu finit NONMARKET, sursa1576deja existentă, FXcostUSD/EUR0.9declarat, fără prețuri/retururi:999trec numai pragul de comision minim,577rămân nerezolvate fără prețul umplerii. Nu devin instrumente eligibile/tranzacții/profit și nu se resetează capital. Costul a21intrări nu este confundat cu42filluri sau dovada HARD21. PR194 păstrează outputul nativ obligatoriu; implementarea/politica au fost definite înaintea acelui rezultat.
+
+Zero cereri broker, modele direcționale/rezultate de piață noi, ordine/Cloud/protected/V2/C033/authority changes. B–E OPEN, OWNER operations NONE. Următoarea admitere de mecanism distinct trebuie să folosească această disciplină de sursă/cost/risc, nu să redeschidă respingerile. Snapshoturile următoare sunt istorice.
+
+---
+
 # 26 octombrie2026 — recepție EUR SUCCESS păstrată; comisioane explicite pentru universul larg
 
 Recuperat LIVE după PR192/3be1c18f182049edd10a641fac26d55895751776, fără lucrări GitHub noi sau execuție de reluat. Recepție40319142037/job121559298015 SUCCESS, nu se repetă. Cursorul C#/referință ORIGINAL, contextul și digestul sursei W35 identifică exact faultul ca OBSERVED_LOCKED/BID=ASK. Politica veche rămâne închisă DATA_LIMITED, fără retuning. Toate1208751grupuri/2129692observații au fost reconciliate de C#/Python; ceasul paired existent și limita5secunde reutilizate. Dovadă publică ef2e4fd7… în `docs/economic-development/20261026/eur-book-40319142037/receipt.json`. Nici cont pe3săptămâni, nici edge, HARD21 sau runtime cTrader nu sunt certificate.
