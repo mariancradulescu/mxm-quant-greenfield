@@ -14,6 +14,7 @@ namespace Mxm.Replay {
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmUsdEurMark),"usd-eur-mark")]
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmUsdConversionUnavailable),"usd-conversion-unavailable")]
 [System.Text.Json.Serialization.JsonDerivedType(typeof(MxmInstrumentQuoteUnavailable),"instrument-quote-unavailable")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(MxmFinancingCashflow),"financing-scenario")]
 public abstract record MxmAccountFeed(DateTime Utc, string Symbol);
 // Utc is the ACTUAL time the first next-bar quote was observed and the
 // closed bar became actionable. BoundaryUtc is the fixed 5m bucket boundary
@@ -40,11 +41,18 @@ public sealed record MxmUsdConversionUnavailable(DateTime Utc,string Reason)
  : MxmAccountFeed(Utc,"EURUSD");
 public sealed record MxmInstrumentQuoteUnavailable(DateTime Utc,string Symbol,string Reason)
  : MxmAccountFeed(Utc,Symbol);
+// Explicit signed EUR cash booking supplied by a frozen SCENARIO. This is
+// neither a rate calculator nor evidence of historical broker swap charges.
+public sealed record MxmFinancingCashflow(DateTime Utc,string Symbol,
+ DateTime PositionEntryUtc,int Direction,decimal Units,DateTime AccrualStartUtc,
+ DateTime AccrualEndUtc,decimal AmountEur,string ScenarioSha256) : MxmAccountFeed(Utc,Symbol);
 public sealed record MxmPortfolioTrade(
  string Kind, DateTime Utc, string Symbol, int Direction, decimal Price,
  decimal Units, decimal CashEur, decimal CommissionEur, decimal GrossEur,
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
- string? Reason=null
+ string? Reason=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ MxmFinancingCashflow? Financing=null
 );
 public sealed record MxmPortfolioAccountReport(
  string Classification, decimal InitialCapitalEur, decimal FinalCashEur,
@@ -61,7 +69,9 @@ public sealed record MxmReplayParameters(
  decimal MaxEstimatedStopRiskFraction, decimal RoundTripRiskReserveEur,
  int BarMinutes=5, int MaxQuoteAgeSeconds=300, ExitMode ExitPolicy=ExitMode.ReverseOnly, bool OnlineAr1=false,
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
- bool UseSharedUsdConversion=false
+ bool UseSharedUsdConversion=false,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ string? FinancingScenarioSha256=null
 );
 
 /// <summary>
@@ -70,7 +80,8 @@ public sealed record MxmReplayParameters(
 /// Signals from closed bars may trade ONLY on a STRICTLY LATER broker quote;
 /// the same close cannot become an executable fill or a look-ahead price.
 /// Optional fixed stop triggers model first observed BID/ASK and adverse slippage.
-/// No financing/partial fill/real stop routing or native cTrader fill proof.
+/// Explicit scenario financing only; no automatic swap calendar, partial fill,
+/// real stop routing or native cTrader fill proof.
 /// These omissions are explicit blockers to economic/candidate qualification.
 /// </summary>
 public sealed partial class MxmPortfolioAccountReplay {
@@ -89,6 +100,7 @@ public sealed partial class MxmPortfolioAccountReplay {
  readonly List<MxmPortfolioTrade> trades=new();
  readonly List<string> rejected=new();
  readonly Dictionary<string,int> entriesByWeek=new();
+ readonly Dictionary<string,DateTime> financingThrough=new(StringComparer.OrdinalIgnoreCase);
  readonly MxmReplayParameters parameters;
  decimal balance=200m,peak=200m,drawdown=0m;
  int accepted,exits;
@@ -100,6 +112,7 @@ public sealed partial class MxmPortfolioAccountReplay {
  public const int SharedUsdMaxAgeMilliseconds=5000;
  public MxmPortfolioAccountReplay(IEnumerable<string> symbols,MxmReplayParameters settings) {
   parameters=settings;
+  Need(settings.FinancingScenarioSha256==null || IsDigest(settings.FinancingScenarioSha256),"INVALID_FINANCING_SCENARIO_IDENTITY");
   if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
      settings.MaxMarginFraction<=0 || settings.MaxMarginFraction>1 ||
      settings.MaxEstimatedStopRiskFraction<=0 || settings.MaxEstimatedStopRiskFraction>1 ||
@@ -200,10 +213,31 @@ public sealed partial class MxmPortfolioAccountReplay {
   decimal gross=ConvertQuote(tick,(price-position.Entry)*position.Units*position.Direction);
   decimal fee=Fee(tick,position.Units,price);
   balance+=gross-fee;
-  open.Remove(symbol);exits++;
+  open.Remove(symbol);financingThrough.Remove(symbol);exits++;
   trades.Add(new MxmPortfolioTrade("EXIT",tick.Utc,symbol,position.Direction,price,
    position.Units,balance,fee,gross,
    reason=="REVERSAL" && position.StopPrice==null && parameters.ExitPolicy==ExitMode.ReverseOnly?null:reason));
+ }
+ static void CheckFinancing(MxmFinancingCashflow f,string symbol,DateTime entry,int direction,
+  decimal units,DateTime? through,string? scenario){
+  Need(scenario!=null && f.ScenarioSha256==scenario && IsDigest(scenario),"FINANCING_SCENARIO_NOT_ADMITTED");
+  Need(f.Symbol==symbol && f.PositionEntryUtc==entry && f.Direction==direction && f.Units==units,
+   "FINANCING_POSITION_MISMATCH");
+  Need(f.Utc.Kind==DateTimeKind.Utc && f.PositionEntryUtc.Kind==DateTimeKind.Utc &&
+   f.AccrualStartUtc.Kind==DateTimeKind.Utc && f.AccrualEndUtc.Kind==DateTimeKind.Utc &&
+   f.AccrualStartUtc>=entry && f.AccrualEndUtc>f.AccrualStartUtc && f.AccrualEndUtc<=f.Utc &&
+   (!through.HasValue || f.AccrualStartUtc>=through.Value),"FINANCING_PERIOD_FUTURE_DUPLICATE_OR_OVERLAP");
+ }
+ void ApplyFinancing(MxmFinancingCashflow f){
+  Need(open.TryGetValue(f.Symbol,out var position),"FINANCING_REQUIRES_CURRENT_OPEN_POSITION");
+  CheckFinancing(f,f.Symbol,position!.EntryUtc,position.Direction,position.Units,
+   financingThrough.TryGetValue(f.Symbol,out var through)?through:null,parameters.FinancingScenarioSha256);
+  // Financing is already EUR-denominated. Never multiply it by instrument
+  // price or FX again. Price-path validity remains required for funded equity.
+  ValidateSharedValuation();
+  balance+=f.AmountEur;financingThrough[f.Symbol]=f.AccrualEndUtc;
+  trades.Add(new MxmPortfolioTrade("FINANCING",f.Utc,f.Symbol,position.Direction,0m,
+   position.Units,balance,0m,f.AmountEur,"EXPLICIT_EUR_FINANCING_SCENARIO",f));
  }
  void Enter(string symbol,int desired,MxmQuote tick) {
   if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
@@ -279,6 +313,9 @@ public sealed partial class MxmPortfolioAccountReplay {
     Mark();processedEvents++;continue;
    }
    if(!state.TryGetValue(e.Symbol,out var st))throw new ArgumentException("UNREGISTERED_SYMBOL");
+   if(e is MxmFinancingCashflow financing){
+    ApplyFinancing(financing);Mark();processedEvents++;continue;
+   }
    if(e is MxmInstrumentQuoteUnavailable missing){
     Need(parameters.UseSharedUsdConversion && !string.IsNullOrWhiteSpace(missing.Reason),"UNREGISTERED_INSTRUMENT_INVALIDATION");
     st!.Intent.RevokeThroughBoundary(e.Utc,parameters.BarMinutes);

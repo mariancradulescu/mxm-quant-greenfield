@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Mxm.Replay;
 using Mxm.Research;
+if(MxmPortfolioReplayRecoveryProbe.TryWorker(args,out int workerExit)){Environment.ExitCode=workerExit;return;}
 int checks=0;
 void Need(bool ok,string why){checks++;if(!ok)throw new Exception("SHARED_USD_FIXTURE_"+why);}
 var t=new DateTime(2026,9,7,0,0,0,DateTimeKind.Utc);
@@ -132,5 +133,6 @@ Refuse(()=>badGbpCost.Run(Start().Select(e=>e is MxmQuote q?q with {CapturedCost
 var rearmed=MxmPortfolioAccountReplay.RestoreReplay(invalidSaved.Payload,invalidSaved.Sha256,source,Settings(),new[]{"GBPUSD"});
 rearmed.Continue(new[]{Fx(t.AddMilliseconds(2),1.20m,1.21m)},rearmed.NextEventOrdinal);
 Need(rearmed.Report().FinalCashEur==200m && rearmed.Report().AcceptedEntries==0,"NEW_VALID_OBSERVATION_REARMS_FLAT_ACCOUNT_WITHOUT_REFUND");
-Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,fee_case=feeCase,
+var financing=MxmFinancingFixture.Run();
+Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,fee_case=feeCase,financing,
  broker_orders=0,native_ctrader_runtime_reception=false,economic_edge_proven=false,hard21_proven=false}));

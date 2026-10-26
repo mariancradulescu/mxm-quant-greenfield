@@ -56,14 +56,37 @@ public sealed partial class MxmPortfolioAccountReplay {
    s.Positions.Select(x=>x.Symbol).Distinct(StringComparer.OrdinalIgnoreCase).Count()==s.Positions.Length &&
    s.Positions.All(x=>result.state.ContainsKey(x.Symbol)),"CHECKPOINT_ROSTER");
   decimal ledgerCash=200m;
+  var liveEntries=new Dictionary<string,MxmPortfolioTrade>(StringComparer.OrdinalIgnoreCase);
+  DateTime previousBooking=default;
   foreach(var item in s.Ledger){
+   Need(item.Utc.Kind==DateTimeKind.Utc && item.Utc>=previousBooking && item.Utc<=s.LastFeed &&
+    result.state.ContainsKey(item.Symbol),"CHECKPOINT_LEDGER_BOOKING_CLOCK");
+   previousBooking=item.Utc;
+   if(item.Kind=="ENTRY"){
+    Need(item.Financing==null && liveEntries.TryAdd(item.Symbol,item),"CHECKPOINT_ENTRY_LIFECYCLE");
+    result.financingThrough.Remove(item.Symbol);
+   }else if(item.Kind=="EXIT"){
+    Need(item.Financing==null && liveEntries.Remove(item.Symbol,out var prior) &&
+     prior.Direction==item.Direction && prior.Units==item.Units,"CHECKPOINT_EXIT_LIFECYCLE");
+    result.financingThrough.Remove(item.Symbol);
+   }else if(item.Kind=="FINANCING"){
+    Need(item.Financing!=null && liveEntries.TryGetValue(item.Symbol,out var prior),"CHECKPOINT_FINANCING_LIFECYCLE");
+    // Need's flow annotation cannot establish definite assignment after &&.
+    var entry=liveEntries[item.Symbol];var f=item.Financing!;
+    CheckFinancing(f,item.Symbol,entry.Utc,entry.Direction,entry.Units,
+     result.financingThrough.TryGetValue(item.Symbol,out var through)?through:null,expectedParameters.FinancingScenarioSha256);
+    Need(f.Utc==item.Utc && item.Direction==entry.Direction && item.Units==entry.Units &&
+     item.Price==0m && item.CommissionEur==0m && item.GrossEur==f.AmountEur &&
+     item.Reason=="EXPLICIT_EUR_FINANCING_SCENARIO","CHECKPOINT_FINANCING_CASH_BINDING");
+    result.financingThrough[item.Symbol]=f.AccrualEndUtc;
+   }else Need(false,"CHECKPOINT_LEDGER_UNKNOWN_KIND");
    ledgerCash=item.Kind=="ENTRY"?ledgerCash-item.CommissionEur:ledgerCash+(item.GrossEur-item.CommissionEur);
    Need(ledgerCash==item.CashEur && item.CommissionEur>=0,"CHECKPOINT_LEDGER_CASH_PATH");
   }
   Need(s.NextEventOrdinal>=0 && (s.NextEventOrdinal==0?s.LastFeed==default:
    s.LastFeed.Kind==DateTimeKind.Utc && s.LastFeed!=default) && s.Accepted>=0 && s.Exits>=0 &&
    s.Ledger.Count(x=>x.Kind=="ENTRY")==s.Accepted && s.Ledger.Count(x=>x.Kind=="EXIT")==s.Exits &&
-   s.Ledger.All(x=>x.Kind is "ENTRY" or "EXIT") && s.Accepted-s.Exits==s.Positions.Length &&
+   s.Accepted-s.Exits==s.Positions.Length && liveEntries.Count==s.Positions.Length &&
    ledgerCash==s.Balance && s.Drawdown>=0,
    "CHECKPOINT_CONTINUOUS_CAPITAL_LEDGER");
   var weeks=s.Ledger.Where(x=>x.Kind=="ENTRY").GroupBy(x=>Week(x.Utc)).ToDictionary(x=>x.Key,x=>x.Count());
@@ -77,6 +100,8 @@ public sealed partial class MxmPortfolioAccountReplay {
    st.Kernel.RestoreReplayState(item.Kernel);st.Intent.RestoreReplayState(item.Intent,expectedParameters.BarMinutes);
   }
   foreach(var p in s.Positions){
+   Need(liveEntries.TryGetValue(p.Symbol,out var entry) && entry.Utc==p.EntryUtc &&
+    entry.Direction==p.Direction && entry.Units==p.Units && entry.Price==p.Entry,"CHECKPOINT_OPEN_POSITION_LEDGER");
    Need((p.Direction==1 || p.Direction==-1) && p.Entry>0 && p.Units>0 && p.Margin>0 && p.StopRisk>0 &&
     p.QuoteToEur>0 && (p.StopPrice==null || p.StopPrice>0) && p.EntryUtc.Kind==DateTimeKind.Utc &&
     p.EntryUtc<=s.LastFeed && result.state[p.Symbol].Latest!=null,"CHECKPOINT_POSITION");
