@@ -58,7 +58,13 @@ class IntrinsicTests(unittest.TestCase):
             self.assertTrue(reconcile(actual,reference([path])))
             self.assertIsNone(actual[0]['account']);self.assertIn('UNPRICEABLE',actual[0]['fault'])
     def test_frozen_registration_and_separate_key_step(self):
-        s=spec();self.assertEqual(s['budget']['models'],1);self.assertEqual(s['budget']['native_attempts'],1)
+        # The historical one-shot economic executable was frozen at its own
+        # source tree. The NEW optional sizing changed the shared account;
+        # its frozen scientific registration MUST fail closed on modern code.
+        with self.assertRaisesRegex(LabError,'INTRINSIC_FROZEN_IMPLEMENTATION'):
+            spec()
+        s=json.loads((ROOT/'research_core_v4/laboratory/INTRINSIC_ACCOUNT_DEVELOPMENT_V1.json').read_bytes())
+        self.assertEqual(s['budget']['models'],1);self.assertEqual(s['budget']['native_attempts'],1)
         w=workflow();job=w['jobs']['intrinsic-account-development'];self.assertEqual(job['permissions'],{'contents':'read','actions':'read'})
         keys=[x for x in job['steps'] if 'MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM' in x.get('env',{})]
         self.assertEqual(len(keys),1);self.assertIn('existing custody',keys[0]['name'])
