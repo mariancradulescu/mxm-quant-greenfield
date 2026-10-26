@@ -33,7 +33,15 @@ public sealed record MxmQuote(
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
  DateTime? BidSourceUtc=null,
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
- DateTime? AskSourceUtc=null
+ DateTime? AskSourceUtc=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ string? NativeSizingScenarioSha256=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ decimal? BrokerVolumeMinUnits=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ decimal? BrokerVolumeMaxUnits=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ decimal? BrokerVolumeStepUnits=null
 ) : MxmAccountFeed(Utc, Symbol);
 // Explicit EURUSD conversion observation. It is NEVER a GBP execution quote.
 public sealed record MxmUsdEurMark(DateTime Utc,DateTime BidUtc,DateTime AskUtc,
@@ -78,7 +86,9 @@ public sealed record MxmReplayParameters(
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
  string? FinancingScenarioSha256=null,
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
- string? ExplicitPolicySha256=null
+ string? ExplicitPolicySha256=null,
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ string? NativeSizingScenarioSha256=null
 );
 
 /// <summary>
@@ -124,6 +134,7 @@ public sealed partial class MxmPortfolioAccountReplay {
   parameters=settings;
   Need(settings.FinancingScenarioSha256==null || IsDigest(settings.FinancingScenarioSha256),"INVALID_FINANCING_SCENARIO_IDENTITY");
   Need(settings.ExplicitPolicySha256==null || IsDigest(settings.ExplicitPolicySha256),"INVALID_EXPLICIT_POLICY_IDENTITY");
+  Need(settings.NativeSizingScenarioSha256==null || IsDigest(settings.NativeSizingScenarioSha256),"INVALID_PROSPECTIVE_NATIVE_SIZING_SCENARIO");
   if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
      settings.MaxMarginFraction<=0 || settings.MaxMarginFraction>1 ||
      settings.MaxEstimatedStopRiskFraction<=0 || settings.MaxEstimatedStopRiskFraction>1 ||
@@ -271,11 +282,12 @@ public sealed partial class MxmPortfolioAccountReplay {
   if(d.Desired!=0 && !halted)Enter(q.Symbol,d.Desired,q);
  }
  void Enter(string symbol,int desired,MxmQuote tick) {
-  if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
+  if(parameters.NativeSizingScenarioSha256==null &&
+     tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
    rejected.Add("REJECT_CAPTURED_VOLUME_LATTICE");return;
   }
   decimal price=desired>0?tick.Ask+tick.SlipPerSideQuote:tick.Bid-tick.SlipPerSideQuote;
-  decimal fee=Fee(tick,tick.ExecutableUnits,price);
+  // Fees are finally priced after optional volume selection.
   // A stop already touched by the entry spread/slippage is not admitted.
   if(tick.StopDistanceQuote is decimal entryDistance &&
      (price-desired*entryDistance<=0 ||
@@ -294,6 +306,44 @@ public sealed partial class MxmPortfolioAccountReplay {
   }
   var equity=MarkedEquity();
   var free=equity-Margin();
+  if(parameters.NativeSizingScenarioSha256!=null) {
+   decimal original=tick.ExecutableUnits;
+   decimal priorExistingStop=StopRisk();
+   decimal? selected=MxmNativeVolumeSearch.LargestAffordable(
+    tick.BrokerVolumeMinUnits!.Value,tick.BrokerVolumeMaxUnits!.Value,
+    tick.BrokerVolumeStepUnits!.Value,original,candidate=>{
+     try {checked {
+      if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(candidate))return false;
+      decimal ratio=candidate/original;
+      var trial=tick with {ExecutableUnits=candidate,
+       InitialMarginEur=tick.InitialMarginEur*ratio,
+       EstimatedStopRiskEur=tick.EstimatedStopRiskEur*ratio};
+      decimal trialFee=Fee(trial,candidate,price);
+      decimal trialRisk=trial.StopDistanceQuote is decimal dist ?
+       -ConvertQuote(trial,-dist*candidate) : trial.EstimatedStopRiskEur;
+      return MxmCapitalAdmission.Check(equity,free,trial.InitialMarginEur,trialFee,
+        parameters.MaxMarginFraction,parameters.MinimumFreeMarginReserveEur,
+        open.Count,parameters.MaxPositions)==MxmCapitalAdmission.Admit &&
+       MxmStopRiskAdmission.Check(equity,priorExistingStop,trialRisk,
+        parameters.MaxEstimatedStopRiskFraction,parameters.RoundTripRiskReserveEur,
+        parameters.RoundTripRiskReserveEur*open.Count)==MxmStopRiskAdmission.Admit &&
+       MxmOwnerEntryEnvelope.Check(free,trial.InitialMarginEur,trialFee,trialRisk,
+        parameters.RoundTripRiskReserveEur)==MxmOwnerEntryEnvelope.Admit;
+     }}catch(Exception){return false;}
+    });
+   if(!selected.HasValue) {
+    rejected.Add("REJECT_PROSPECTIVE_NATIVE_SIZING_NO_AFFORDABLE_VOLUME");
+    return;
+   }
+   decimal ratio=selected.Value/original;
+   tick=tick with {ExecutableUnits=selected.Value,
+    InitialMarginEur=tick.InitialMarginEur*ratio,
+    EstimatedStopRiskEur=tick.EstimatedStopRiskEur*ratio};
+  }
+  if(tick.CapturedCosts!=null && !tick.CapturedCosts.Allows(tick.ExecutableUnits)) {
+   rejected.Add("REJECT_CAPTURED_VOLUME_LATTICE");return;
+  }
+  decimal fee=Fee(tick,tick.ExecutableUnits,price);
   string isolation=MxmAccountIsolation.Check(open.Count,open.Count,0);
   string admission=isolation==MxmAccountIsolation.Admit ?
    MxmCapitalAdmission.Check(equity,free,tick.InitialMarginEur,fee,
@@ -306,6 +356,13 @@ public sealed partial class MxmPortfolioAccountReplay {
    parameters.MaxEstimatedStopRiskFraction,parameters.RoundTripRiskReserveEur,
    parameters.RoundTripRiskReserveEur*open.Count);
   if(risk!=MxmStopRiskAdmission.Admit){rejected.Add(risk);return;}
+  if(parameters.NativeSizingScenarioSha256!=null) {
+   decimal stop=tick.StopDistanceQuote is decimal ownerStopDistance ?
+     -ConvertQuote(tick,-ownerStopDistance*tick.ExecutableUnits):tick.EstimatedStopRiskEur;
+   string owner=MxmOwnerEntryEnvelope.Check(free,tick.InitialMarginEur,fee,stop,
+      parameters.RoundTripRiskReserveEur);
+   if(owner!=MxmOwnerEntryEnvelope.Admit) {rejected.Add(owner);return;}
+  }
   // A quote can never buy from bid or sell from ask. One continuous cash
   // balance pays each explicit entry fee once; spread resides in prices.
   balance-=fee;
@@ -388,6 +445,14 @@ public sealed partial class MxmPortfolioAccountReplay {
       quote.EstimatedStopRiskEur>0 &&
       (quote.StopDistanceQuote==null || quote.StopDistanceQuote>0),"INVALID_EXECUTION_QUOTE");
     Need(quote.CapturedCosts==null || quote.Symbol=="EURUSD","CAPTURED_COSTS_ONLY_EURUSD");
+    if(parameters.NativeSizingScenarioSha256==null)
+     Need(quote.NativeSizingScenarioSha256==null &&
+      quote.BrokerVolumeMinUnits==null && quote.BrokerVolumeMaxUnits==null &&
+      quote.BrokerVolumeStepUnits==null,"UNREGISTERED_NATIVE_SIZING_QUOTE");
+    else
+     Need(quote.NativeSizingScenarioSha256==parameters.NativeSizingScenarioSha256 &&
+      quote.BrokerVolumeMinUnits>0m && quote.BrokerVolumeMaxUnits>=quote.BrokerVolumeMinUnits &&
+      quote.BrokerVolumeStepUnits>0m,"SIZING_QUOTE_BROKER_GEOMETRY_NOT_BOUND_TO_SCENARIO");
     Need(st!.LastQuote==default || quote.Utc>st.LastQuote,"DUPLICATE_OR_STALE_QUOTE");
     st.Latest=quote;st.LastQuote=quote.Utc;
     // Stop checks do not need a fresh bar intent. Use the FIRST observed
