@@ -15,6 +15,10 @@ jobs:
         run: |
           dotnet build research_core_v4/laboratory/csharp/usd_leadlag/MxmUsdLeadLag.csproj -c Release
           python3 -m unittest research_core_v4.laboratory.test_usd_leadlag_development -v
+      - name: Verify original encrypted USD common-shock result without economic rerun
+        run: |
+          python3 -m research_core_v4.laboratory.verify_usd_leadlag_result
+          python3 -m unittest research_core_v4.laboratory.test_usd_leadlag_result -v
       - name: Checkout immutable authentic-native decoder and R7 integration source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
