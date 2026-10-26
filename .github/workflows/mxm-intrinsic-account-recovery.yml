@@ -52,6 +52,16 @@
           "run": "dotnet build research_core_v4/laboratory/csharp/intrinsic/MxmIntrinsicAccount.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_intrinsic_development research_core_v4.laboratory.test_intrinsic_recovery -v\npython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m research_core_v4.laboratory.durable_week35_chronology --out \"${RUNNER_TEMP}/mxm-intrinsic/W35\"\npython3 -m research_core_v4.laboratory.durable_week36_chronology --out \"${RUNNER_TEMP}/mxm-intrinsic/W36\"\npython3 -m research_core_v4.laboratory.durable_week_chronology --out \"${RUNNER_TEMP}/mxm-intrinsic/W37\"\ncp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/three_week_source_recovery.py .sealed-chronology-source/research_core_v4/laboratory/"
         },
         {
+          "name": "Preserve exact compiled evaluator for same-assembly cold recovery",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "intrinsic-account-evaluator-${{ github.run_id }}",
+            "path": "research_core_v4/laboratory/csharp/intrinsic/bin/Release/net8.0/MxmIntrinsicAccount.dll\nresearch_core_v4/laboratory/csharp/intrinsic/bin/Release/net8.0/MxmIntrinsicAccount.deps.json\nresearch_core_v4/laboratory/csharp/intrinsic/bin/Release/net8.0/MxmIntrinsicAccount.runtimeconfig.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        },
+        {
           "name": "Reauthenticate and decode only the three exact originals in existing custody",
           "env": {
             "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"

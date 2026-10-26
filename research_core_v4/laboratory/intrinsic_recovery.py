@@ -6,7 +6,7 @@ from . import intrinsic_development as original
 ROOT=original.ROOT
 PATH='.github/workflows/mxm-intrinsic-account-recovery.yml'
 PLAN=ROOT/'research_core_v4/laboratory/INTRINSIC_TECHNICAL_RECOVERY_V1.json'
-RECOVERY_SHA='401d8abe31347ac17b0508e4c291a85f5e185129832fc6f6065c05f3e0b5d6f3'
+RECOVERY_SHA='f7d3d65c8bc74031e9107c9a3acd2063483d8b625c2834adf42268fb9cac1d3f'
 FAILED=40283113616;FAILED_JOB=121440966951
 FAILED_HEAD='250ba6d79959aa710718d6dafee8b464e2ae9690'
 def plan():
@@ -24,6 +24,12 @@ def workflow():
     steps[5]['run']=steps[5]['run'].replace('laboratory.intrinsic_development result','laboratory.intrinsic_recovery result')
     steps[6]['with']['name']='intrinsic-account-recovery-${{ github.run_id }}'
     steps[6]['with']['path']+='\nverification/intrinsic-account-development/recovery.json'
+    # Capture exact public code bytes before custody/economic inputs. The
+    # account capsule pins this assembly; a later rebuild is not that proof.
+    binary='research_core_v4/laboratory/csharp/intrinsic/bin/Release/net8.0/MxmIntrinsicAccount'
+    steps.insert(4,{'name':'Preserve exact compiled evaluator for same-assembly cold recovery','uses':original.UPLOAD,
+      'with':{'name':'intrinsic-account-evaluator-${{ github.run_id }}','path':binary+'.dll\n'+binary+'.deps.json\n'+binary+'.runtimeconfig.json',
+       'if-no-files-found':'error','retention-days':90}})
     return w
 def no_original_outcome(run,jobs,artifacts):
     need(run['id']==FAILED and run['head_sha']==FAILED_HEAD and run['run_attempt']==1 and run['status']=='completed' and run['conclusion']=='failure','RECOVERY_ORIGINAL_FAILED_RUN')
@@ -59,6 +65,7 @@ def result(folder,destination):
       'original_failed_head':FAILED_HEAD,'original_economic_execution':'SKIPPED','recovery_run':int(os.environ['GITHUB_RUN_ID']),
       'source_sha':os.environ['GITHUB_SHA'],'original_policy_spec_sha256':original.SPEC_SHA,'technical_recovery_spec_sha256':RECOVERY_SHA,
       'scientific_parameters_changed':False,'new_scientific_model':False,'original_native_attempt_refunded':False,
+      'evaluator_dll_sha256':bytes_digest((ROOT/'research_core_v4/laboratory/csharp/intrinsic/bin/Release/net8.0/MxmIntrinsicAccount.dll').read_bytes()),
       'orders':0,'new_broker_requests':0,'hard21_proven':False,'economic_edge_proven':False}
     (Path(destination)/'recovery.json').write_bytes(encoded(receipt))
 if __name__=='__main__':
