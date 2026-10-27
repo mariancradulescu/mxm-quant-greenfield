@@ -281,7 +281,11 @@ def collect(identity):
         else:
             p['cleanup_state']='CONNECTION_CLOSED_AT_DEADLINE_UNSUBSCRIBE_NOT_ACKNOWLEDGED'
         p['complete']=True
-    except Exception as exc:p['failure_class']=type(exc).__name__
+    except Exception as exc:
+        p['failure_class']=type(exc).__name__
+        code=str(exc)
+        if type(exc).__name__=='LabError' and code.startswith('LAB_SPOT_') and len(code)<=120 and all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789' for c in code):
+            p['failure_code']=code
     finally:
         tr.close()
         for k in BROKER:os.environ.pop(k,None)
@@ -298,6 +302,7 @@ def collect(identity):
     result={'schema':'mxm.native-spot-observation-public.v1',**identity,'role':'spot-collect','accepted':p['complete'],
       'cipher_sha256':bytes_digest((output/'capture.mxmenc').read_bytes()),'private_sha256':bytes_digest(raw),
       'profile':verified if verified is not None else p['producer_profile'],'failure_class':p['failure_class'],
+      'failure_code':p.get('failure_code','NONE' if p['complete'] else 'PRIVATE_OR_UNCLASSIFIED_TRANSPORT_FAILURE'),
       'cleanup_state':p.get('cleanup_state','NOT_REACHED'),
       'classification':POLICY['classification'],'new_broker_connections':p['connection_epochs'],
       'historical_costs_proven':False,'economic_edge_proven':False,'hard21_proven':False,'orders':0,'strategy_trials':0}
