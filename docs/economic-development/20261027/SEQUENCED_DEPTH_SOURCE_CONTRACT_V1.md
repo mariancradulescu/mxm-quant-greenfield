@@ -1,0 +1,34 @@
+# Distinct source contract: sequenced depth state, before any new contact
+
+Continued from PR222/7273efc0024fd036f07683c73312d2a5a7629d26. Its five required suites succeeded on the first head28037a0b26b1ab07e57f6abf51433884d730c818:40504978684 gateway/job122191863112,40504978664 stop risk,40504978642 exits,40504978486 R3 technical,40504978930 shared EUR200. Gateway executed all11new risk-observation tests without skip and built the actual net6cTrader.algo. This is compiled/artificial reception, not Robot callbacks or broker fills.
+
+## Protocol research and decision
+
+Primary sources checked27October2026:
+
+* [cTrader FIX specification](https://help.ctrader.com/fix/specification/), Market Data Request/Full Refresh/Incremental Refresh and Standard Header: the request documents263values1/2,264values0/1, and incremental updates. Depth snapshots/updates expose entry identifiers and sizes. Updates describe New/Delete actions. Server message sequences and transmission time are header fields; the heartbeat concerns connection liveness.
+* [Open API symbol data](https://help.ctrader.com/open-api/symbol-data/): live spot BID/ASK fields are optional; depth uses new/deleted quote entries.
+
+These documents do not establish support for a periodic standalone263=0snapshot poll, firm liquidity, unchanged-entry freshness or execution at displayed size. A protocol migration must not be justified by generic FIX features absent from this implementation's specification. This is a documentation finding/inference, not a captured Pepperstone FIX session result or proof that another authorised source cannot help.
+
+Decision: implement and verify atomic sequence/state reconstruction before considering contact. This provides a materially different observable—integrity of the declared snapshot plus incremental state—while retaining separate entry observation clocks. No resubscription loop, live probe or repeated six-minute source census is installed. Existing historical/diagnostic age criteria and all closed economic verdicts remain frozen.
+
+## Reusable CSharp receiver component
+
+No sequenced depth receiver existed in the CSharp product/laboratory at reconciliation. `MxmSequencedDepthBook` is compiled into the same native product, using shared `MxmBookShape`. It is deliberately a typed receiver state machine, not another account/economic engine. The native Robot does not instantiate or subscribe it before authentic source admission. No raw FIX parser, socket, credentials, trading capability or source authenticity assertion is added.
+
+A caller must establish a verified session baseline, configured symbol identity and the mapping of wire fields to normalized entries. Every server message must advance the sequence, including admin and other-symbol messages. The single-symbol book consumes a whole full snapshot or whole ordered incremental batch atomically. Missing/duplicate/out-of-order sequences, unknown delete, duplicate new ID, invalid price/size/side, symbol mismatch or unsupported action invalidate and clear the book. A partial valid prefix of a bad message never appears as a usable book. Recovery requires an explicitly verified new baseline/epoch and a fresh complete snapshot; it cannot infer state across a gap or restore a last-known book silently. Clock regression latches the object even across new sessions. Bounds limit entries and message batches; arithmetic overflow holds and clears.
+
+Snapshots replace the entire book. Incremental deletion can reveal an older best level. The output preserves THAT entry's older explicit observation time, rather than calling the newly exposed level a fresh quote. Updates elsewhere, admin messages, heartbeats and repeated reads do not refresh carried level times. Best-price displayed sizes aggregate explicit entries at that level and remain displayed quantities, never an executable-size certificate. Crossed/locked/empty states retain descriptive shared geometry and are not turned into fills. `Ready` means protocol state initialized, not healthy market/trade admission. ExecutabilityProven, ContinuousObservationProven and SourceAuthenticationProven remain false.
+
+A future raw receiver must verify frame integrity, credentials/session identity, message/group structure, every sequence and request/symbol correlation before calling this component. Wire IDs/sizes missing from a spot-only message must not be synthesized as depth. FIX gap-fill/PossDup/resend handling is NOT implemented here; unhandled discontinuity holds until a separately verified synchronization boundary. Sending time is transmission time, not a per-entry fresh observation guarantee. No output is adapted into the existing native cost/risk observer as a new callback or substituted into old economic studies.
+
+## Verification and scientific boundary
+
+Required CI compiles the exact product component; independent Python replays a separate entry dictionary and compares every state field on250deterministic message paths, plus fixtures for replacement/atomic failure/gap/duplicate/delete/restart/clock/admin/older-best/empty/size/locked cases. Full existing risk/entry/account/cTrader suites remain mandatory. Local .NET absent; compiled tests fail rather than skip in Actions. At PR installation the new component's CI is pending; source contact and native callback reception remain unexecuted.
+
+No new economic hypothesis is reserved or tested. The spread-reversion identity remains closed DATA_LIMITED; no model/output/spec/hash changes or private outcome decryption occur. This contract can support a future prospectively registered depth/size or state-based mechanism if authentic availability, causal timestamps, coverage and dated costs pass. It does not qualify one. A depth mechanism must be distinct from the closed unilateral-spread trial, with its own budget, complete unresolved-path treatment and no favourable retrospective threshold/roster selection. The entire authorised Pepperstone universe stays open; choose contacts by missing contract information rather than realised returns. Existing1576metadata identities are not reranked here.
+
+Next actual source admission: demonstrate an available authorised quote-only session and a bounded request that can supply entry IDs, sizes and complete sequence context; fix instrument/interval/request budget/exclusions and custody conservation before first input. If these prerequisites are absent, retain SOURCE_NOT_ADMITTED, not zero cost or synthetic authenticity. Do not assume an Open API token supplies FIX credentials. No login/account setup is requested in this continuation.
+
+Zero new broker requests/connections, LIVE/DEMO orders, Cloud activation, source captures, model trials, private result openings, capital resets or authority/writer/custody changes. EUR200/HARD21, operational native Robot reception and robust after-cost advantage remain unproven. OWNER operations NONE.

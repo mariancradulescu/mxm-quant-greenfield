@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile atomic sequenced depth receiver and reconcile independent complete-message oracle
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/sequenced_depth/MxmSequencedDepth.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_sequenced_depth -v
       - name: Compile complete-account native risk observation leases and compare independent state oracle
         run: |
           dotnet build research_core_v4/laboratory/csharp/risk_observation/MxmRiskObservation.csproj -c Release
