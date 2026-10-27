@@ -1,0 +1,27 @@
+# Preserve unobserved funded intervals before explicit account updates
+
+## Functional defect
+
+The existing C# shared account validates explicit-policy incoming BID/ASK side ages, but only shared-USD mode validated the entire open book at mark time. In addition, a new quote/FX observation could overwrite its previous mark before that validation. For example, a position last marked at2ms followed by a fully fresh quote at5003ms could appear valid after overwrite, despite the old observation's5000ms lifetime expiring at5002ms. An explicit exit could then liquidate later and conceal the unknown interval. The same issue can affect another owned symbol or an FX-only refresh. This is an artificial code-level counterexample, not a new authenticated market outcome or assertion about any conserved original result.
+
+## Integrated correction
+
+Use the SAME account and source-clock validator, with all open instrument marks checked for explicit policies as well as shared-USD valuation. Before EVERY explicit-policy event changes the feed clock or any book/FX/policy/financing/position state, require every existing observation at the arriving event's timestamp. A fresh update cannot repair an already expired funded interval. The maximum age remains min(5000ms,configured stricter limit); exact expiry is inclusive. Unknown exposure faults the account and prevents a favourable Report, checkpoint export or continuation. Later quotes cannot resurrect it. An unfunded flat gap can rewarm normally; that neither manufactures a position nor funds the account again.
+
+Cold restoration validates the same explicit-policy source clocks and original observation ages. It does not reset timestamps. A self-consistent recomputed checksum cannot satisfy missing semantic source-age evidence. The existing capsule format, code/source binding, single EUR200 initial balance and cursor remain. Frozen legacy bar-kernel execution retains its prior contract. All old specifications, evaluators and original results remain preserved; no market/account replay, retuning or historical reclassification is performed.
+
+This is integrated in the existing prospective economic account, not a second engine and not the native Robot's actual broker-execution path. The Robot retains PR222's separate observation lease. Neither an observation-age rule nor artificial accounting establishes continuous firm liquidity, executable loss FX, fills, operational cTrader reception or HARD21.
+
+## Verification
+
+Required gateway compiles the real production account/recovery code and compares event-by-event entry/exit/open-position/fault results with an independent Python side-clock/state oracle. Cases cover same-symbol healing, exact expiry and +1ms, an otherwise executable flat exit, another instrument's event, an old opposite side, a stricter1000ms profile, new FX over stale FX, cold rehydration, recomputed-checksum stale restoration, flat rewarm and120deterministic multi-event paths. A fault must block Report and further continuations. Existing commission-account, native EUR input, shared-USD, source, risk, recovery and cTrader build checks remain required. Local Python wiring/evidence guards pass; no local .NET, so compiled CI is required before merge.
+
+## Scientific continuation and limits
+
+This prevents the next slower/explicit mechanism from earning an apparently complete account path by refreshing after missing exposure. It does not reopen the DATA_LIMITED GBPUSD spread trial or relax its criteria. No new directional identity or response is opened here.
+
+The source admission assessment has three distinct findings. Existing historical source outcomes are not a universal Pepperstone profitability verdict. The old DOM diagnostic is explicitly excluded from economic research. Its actual pinned OpenApiMessages.proto ProtoOADepthEvent fields are account/symbol/newQuotes/deletedQuotes; ProtoOADepthQuote contains ID, size and optional BID/ASK, with no server session sequence, per-entry source timestamp or complete-snapshot flag. Consequently, a local receipt counter cannot be supplied as an authenticated FIX sequence or used to establish PR223 source admission. Existing OpenAPI VIEW authentication does not establish FIX credentials. These are protocol/partition findings, not evidence that all future depth information is unusable.
+
+A distinct slower mechanism must bind completed-bar feature causality, quote-side entry/exit, dated costs, unresolved exposure and this now-enforced single-account path before a funded trial. A future depth-flow mechanism must define observables actually exposed by its authorised protocol, with a separate development partition and finite budget before contact. Reusing the same six-minute spot diagnostic, relabelling technical DOM bytes, inventing synchronization fields or rerunning the closed identity cannot provide those missing facts. No such redundant operation is launched.
+
+Zero new broker requests, economic trials/outcomes, protected openings, orders LIVE/DEMO, Cloud activation, authority/custody changes or capital resets. Robust net edge, broker-executed HARD21 and native cTrader operational reception remain open. OWNER operations NONE.

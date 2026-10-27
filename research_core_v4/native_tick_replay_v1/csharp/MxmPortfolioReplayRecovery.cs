@@ -122,7 +122,7 @@ public sealed partial class MxmPortfolioAccountReplay {
    result.open.Add(p.Symbol,new Holding(p.Direction,p.Entry,p.Units,p.Margin,p.StopRisk,p.QuoteToEur,p.EntryUtc,p.StopPrice));
   }
   Need(expectedParameters.UseSharedUsdConversion || s.UsdEurMark==null && !s.UsdConversionInvalid,"CHECKPOINT_UNREGISTERED_FX_MODE");
-  if(expectedParameters.UseSharedUsdConversion)
+  if(expectedParameters.UseSharedUsdConversion || expectedParameters.ExplicitPolicySha256!=null)
    foreach(var item in result.state.Values)if(item.Latest is MxmQuote q)
     Need(result.ValidInstrumentMark(q,s.LastFeed,requireFresh:result.open.ContainsKey(q.Symbol)),"CHECKPOINT_INSTRUMENT_SIDE_CLOCKS");
   if(s.UsdEurMark is MxmUsdEurMark fx){

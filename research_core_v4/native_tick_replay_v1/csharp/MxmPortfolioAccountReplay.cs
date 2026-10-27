@@ -167,15 +167,17 @@ public sealed partial class MxmPortfolioAccountReplay {
   q.BidSourceUtc<=q.Utc && q.AskSourceUtc<=q.Utc &&
   (!requireFresh || (now-q.BidSourceUtc.Value).TotalMilliseconds<=Math.Min(5000d,parameters.MaxQuoteAgeSeconds*1000d) &&
                    (now-q.AskSourceUtc.Value).TotalMilliseconds<=Math.Min(5000d,parameters.MaxQuoteAgeSeconds*1000d));
- void ValidateSharedValuation() {
-  if(!parameters.UseSharedUsdConversion || open.Count==0)return;
-  Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,lastFeed),"OPEN_EXPOSURE_FX_UNPRICEABLE");
+ void ValidateOpenValuationAt(DateTime now) {
+  if(open.Count==0 || (!parameters.UseSharedUsdConversion && parameters.ExplicitPolicySha256==null))return;
+  if(parameters.UseSharedUsdConversion)
+   Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,now),"OPEN_EXPOSURE_FX_UNPRICEABLE");
   foreach(var symbol in open.Keys) {
    var q=state[symbol].Latest;
-   Need(q!=null && ValidInstrumentMark(q,lastFeed),
+   Need(q!=null && ValidInstrumentMark(q,now),
     "OPEN_EXPOSURE_INSTRUMENT_MARK_STALE");
   }
  }
+ void ValidateSharedValuation()=>ValidateOpenValuationAt(lastFeed);
  void ApplyFx(MxmUsdEurMark fx){
   Need(parameters.UseSharedUsdConversion && ValidFx(fx,lastFeed),"INVALID_OR_STALE_SHARED_FX");
   if(usdEurMark is MxmUsdEurMark prior)
@@ -411,6 +413,12 @@ public sealed partial class MxmPortfolioAccountReplay {
    if(e is null)throw new ArgumentException("NULL_PORTFOLIO_FEED_EVENT");
    Need(e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
    Need(e.Utc>=lastFeed,"OUT_OF_ORDER_GLOBAL_FEED");
+   // Prospective explicit policies cannot heal an unobserved funded interval
+   // by overwriting its overdue mark/FX with the arriving quote. Check EVERY
+   // open instrument and the prior FX clock BEFORE any incoming state change,
+   // exit, financing or policy event. Legacy frozen bar-kernel paths retain
+   // their original accounting contract; this is no historical rerun/retune.
+   if(parameters.ExplicitPolicySha256!=null)ValidateOpenValuationAt(e.Utc);
    lastFeed=e.Utc;
    if(e is MxmUsdEurMark fx){
     ApplyFx(fx);Mark();processedEvents++;continue;
