@@ -11,6 +11,19 @@ void Require(bool value,string reason) {
  checks++;
 }
 var utc=new DateTime(2026,10,23,10,0,0,DateTimeKind.Utc);
+// Artificial slow admission: the broker book is unchanged, but the bar ends
+// between the preliminary check and submission. Identity alone still passes.
+{
+ var queue=new MxmCausalIntent();var fence=new MxmBrokerIntentFence(queue,5,null);
+ var lease=fence.Capture();
+ Require(fence.IsCurrentWithinBar(lease,null,utc,utc.AddMinutes(5).AddTicks(-1)),"BEFORE_EXPIRY_LAST_TICK");
+ Require(fence.IsCurrent(lease,null,utc.AddMinutes(5)),"IDENTITY_ALONE_DOES_NOT_ENFORCE_EXPIRY");
+ Require(!fence.IsCurrentWithinBar(lease,null,utc,utc.AddMinutes(5)),"EXACT_EXPIRY_NO_SUBMISSION");
+ Require(!fence.IsCurrentWithinBar(lease,null,utc,utc.AddMinutes(6)),"SLOW_ADMISSION_CANNOT_EXTEND_INTENT");
+ Require(!fence.IsCurrentWithinBar(lease,null,utc,utc.AddTicks(-1)),"CLOCK_BEFORE_BOUNDARY_HOLD");
+ Require(fence.IsCurrentWithinBar(lease,null,utc,utc),"LOWER_BOUND_INCLUSIVE");
+ Require(!fence.IsCurrentWithinBar(lease,42,utc,utc.AddSeconds(1)),"BOOK_CHANGED_AT_FINAL_SUBMISSION");
+}
 MxmCausalIntent Pending() {
  var queue=new MxmCausalIntent();queue.Publish(1,true,8,utc,utc,5);return queue;
 }
