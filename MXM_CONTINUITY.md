@@ -1,3 +1,15 @@
+# 27 octombrie2026 — un trial economic autentic închis și control nativ preț–cost integrat
+
+PR220/414220cca9c0ecb2f7eb71910d1b199011f24520 integrat; toate5CI SUCCESS din prima,13teste noi economie/sursă/scope, boundaryde lease al prețului și cTrader.algo verificate. Comisioanele native dependente de valoare rețin acum și lifetime-ul observației PREȚULUI ticketului, inclusiv fărăFX, cu același validator și control final după risc. Lot-fee/zero nu cer artificial preț proaspăt. Robotul nu primește o familie de tranzacționare necalificată din studiul nou.
+
+[Execuție40498420580](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40498420580), job122169671751 SUCCESS attempt1: o ipoteză nouă preregistrată de revenire după lărgirea unilaterală a spreadului GBPUSD, pe întregul original W37 —1275114evenimente/812355grupuri. Toategrupurile/deciziile/episoadele/cazurile cenzurate reconciliate C#/Python; rezultate economice criptate și readback separat în custodia existentă. Verdict original DATA_LIMITED: cenzurare>pragul5%, trasee complete nemarcate, headroom gross nepozitiv pe episoadele complete și gate all5days neîndeplinit; gate support>=100 trecut. Nu se atribuie0rezultatelor lipsă și nu se generalizează asupra pieței/universului. Identitatea este ÎNCHISĂ fără retuning sau replay finanțat/NET.
+
+[Rezultat, limite și originale](docs/economic-development/20261027/SPREAD_REVERSION_NATIVE_RESULT_V1.md): artefact12732241452 ZIP566725bytes347a96c6… păstrat exact în16părți, manifestb0b022e2…; ciphertext545319bytesbf8418b7…; evaluatorul ORIGINAL45568bytes4bc0b433… și receptele exacte sunt conservate/restaurabile offline. Nicio decriptare înWork. Spec169a1dce… și implementările înghețate înainte deinput nu sunt modificate. Nu se reia diagnosticul1140mesaje sau un model închis.
+
+Buget consumat:1ipoteză nouă/1model/1attempt, dependentDEVELOPMENT, fără refunds/V2/C033/confirmation/protected. Normalizarea1000unități și grossUSD după spread sunt componente condiționate, NU comisioane0, cash/EUR, contnou sau HARD21. Capitalul continuu200EUR, autoritățile active/OWNER1807/evidence și custodia sunt păstrate. Zero brokerrequests noi/ordine/Cloud/resetări. Următoarea admitere cere mecanism distinct justificat și suport temporal/expunere/costreal, fără resalvarea configurației. EdgeNET/HARD21/recepția operațională Robot rămân nedemonstrate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie2026 — control de preț pentru cost și o ipoteză economică distinctă preregistrată
 
 Continuare LIVEea5db2b1ee28861947410a3bc10ec4aff1ae1e85/PR218–219, fără lucrări ulterioare pe ramura oficială. [Operațiunea integrată](docs/economic-development/20261027/SPREAD_REVERSION_PROSPECTIVE_V1.md) completează lease-ul nativ al costurilor dependente de PREȚUL ticketului, inclusiv când nu este necesar FX; același validator de book/epocă/vârstă și același control final după risc. Lot-fee/zero nu cer artificial un preț nou. Controalele de cont/OWNER/recuperare și ceasul simulat sunt păstrate; CI compilat/cTrader obligatoriu.
