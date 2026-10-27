@@ -20,6 +20,7 @@ public sealed class MxmReferenceProductBot : Robot {
  readonly Dictionary<string,Symbol> subscribedSymbols=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmCausalIntent> causalIntents=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmBrokerIntentFence> brokerIntentFences=new(StringComparer.OrdinalIgnoreCase);
+ readonly Dictionary<string,MxmBookObservation<double>> bookObservations=new(StringComparer.OrdinalIgnoreCase);
  bool applyingDecision;
  readonly MxmOrderProtection orderProtection=new();
  MxmEntryCheckpoint? entryCheckpoint;
@@ -131,6 +132,9 @@ public sealed class MxmReferenceProductBot : Robot {
    subscribedBars.Add(name,series);
    portfolioKernels.Add(name,new MxmDecisionSource(new MxmDecisionKernel(mode),onlineAr1));
    subscribedSymbols.Add(name,Symbols.GetSymbol(name));
+   var observation=MxmBookObservations.NativeSnapshots();
+   observation.BeginEpoch(Environment.TickCount64);
+   bookObservations.Add(name,observation);
    causalIntents.Add(name,new MxmCausalIntent());
   }
   // Seed from the actual recovered broker book; cold start has no intent.
@@ -183,6 +187,14 @@ public sealed class MxmReferenceProductBot : Robot {
   foreach(var series in subscribedBars.Values)series.BarClosed-=OnPortfolioBarClosed;
   foreach(var instrument in subscribedSymbols.Values)instrument.Tick-=OnPortfolioTick;
   foreach(var intent in causalIntents.Values)intent.Clear();
+  foreach(var observation in bookObservations.Values) {
+   try {
+   var view=observation.Snapshot(Environment.TickCount64);
+   Print("MXM_BOOK_OBSERVATION_LOCAL_CALLBACKS events={0} bidChanges={1} askChanges={2} transport={3} executable=false",
+    view.Events,view.BidChanges,view.AskChanges,view.ReportedTransport);
+   observation.EndEpoch(Environment.TickCount64);
+   } catch(Exception e){Print("MXM_BOOK_OBSERVATION_STOP_FAULT_"+e.GetType().Name);}
+  }
  }
  void OnPortfolioBarClosed(BarClosedEventArgs args) {
   if(orderProtection.Halted)return;
@@ -235,6 +247,11 @@ public sealed class MxmReferenceProductBot : Robot {
   bool acquired=false;
   try {
    var quoteUtc=DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
+   // Both sides are supplied by this callback. This is NOT the original
+   // OpenAPI field mask or an event timestamp. Never substitute Server.Time
+   // for the absent source stamp; local receipt and change clocks stay distinct.
+   bookObservations[args.SymbolName].Observe(args.Bid,args.Ask,Environment.TickCount64,
+    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),null);
    // Geometry only. Preserve the original native noncrossed rule (including
    // locked books); source-quality consumers separately require positive spread.
    if(!MxmBookShape.NonCrossed(MxmBookShape.ClassifyNative(args.Bid,args.Ask)))return;
