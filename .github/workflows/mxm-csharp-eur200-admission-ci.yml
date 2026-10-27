@@ -51,7 +51,9 @@ jobs:
           assert apply.index('entryCheckpoint.PrepareRecoverable(')<apply.index('MxmAccountIsolation.Check(')<apply.index('MxmCapitalAdmission.Check(')
           assert apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('brokerAttempted=true')<apply.index('ExecuteMarketOrder(')
           assert apply.index('orderProtection.Reconcile(')<apply.index('else if(!protection.Accepted)')<apply.index('entryCheckpoint.CompleteReconciled()')
-          assert 'finalClock>=currentOpenTime.AddMinutes(BarMinutes)' in apply
+          assert 'fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,finalClock)' in apply
+          assert 'fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,submissionClock)' in apply
+          assert apply.index('var submissionClock=BrokerClock();')<apply.index('entryCheckpoint.MarkSubmitted()')
           assert '!brokerAttempted && !orderProtection.Halted' in apply
           assert 'LocalStorage.Flush(LocalStorageScope.Type)' in bot and 'LocalStorage.Reload(LocalStorageScope.Type)' in bot
           assert 'protected override void OnException(Exception exception)' in bot
