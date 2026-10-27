@@ -51,7 +51,9 @@ jobs:
           assert apply.index('entryCheckpoint.PrepareRecoverable(')<apply.index('MxmAccountIsolation.Check(')<apply.index('MxmCapitalAdmission.Check(')
           assert apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('brokerAttempted=true')<apply.index('ExecuteMarketOrder(')
           assert apply.index('orderProtection.Reconcile(')<apply.index('else if(!protection.Accepted)')<apply.index('entryCheckpoint.CompleteReconciled()')
-          assert 'finalClock>=currentOpenTime.AddMinutes(BarMinutes)' in apply
+          assert 'fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,finalClock)' in apply
+          assert 'fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,submissionClock)' in apply
+          assert apply.index('var submissionClock=BrokerClock();')<apply.index('entryCheckpoint.MarkSubmitted()')
           assert '!brokerAttempted && !orderProtection.Halted' in apply
           assert 'LocalStorage.Flush(LocalStorageScope.Type)' in bot and 'LocalStorage.Reload(LocalStorageScope.Type)' in bot
           assert 'protected override void OnException(Exception exception)' in bot
@@ -141,9 +143,9 @@ jobs:
           ticks=bot[bot.index('void OnPortfolioTick'):bot.index('void ApplyPortfolioDecision')]
           assert ticks.index('fence.Observe(')<ticks.index('fence.Capture()')<ticks.index('queue.TryConsume(')
           apply=bot[bot.index('void ApplyPortfolioDecision'):]
-          assert apply.count('fence.IsCurrent(')==2
+          assert apply.count('fence.IsCurrent(')==1 and apply.count('fence.IsCurrentWithinBar(')==2
           assert apply.index('fence.BeginReversal(')<apply.index('var result=ClosePosition(current)')<apply.index('fence.FinishReversal(')
-          assert apply.rindex('fence.IsCurrent(')<apply.index('ExecuteMarketOrder(')
+          assert apply.rindex('fence.IsCurrentWithinBar(')<apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('ExecuteMarketOrder(')
           assert 'result.Position?.Id' in apply and 'lease=continuation!' in apply
           bars=bot[bot.index('void OnPortfolioBarClosed'):bot.index('void OnPortfolioTick')]
           assert bars.index('fence.Observe(')<bars.index('.Publish(')<bars.index('fence.CanPublish(')

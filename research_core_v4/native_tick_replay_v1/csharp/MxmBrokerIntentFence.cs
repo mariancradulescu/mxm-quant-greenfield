@@ -45,6 +45,15 @@ public sealed class MxmBrokerIntentFence {
   Observe(actualPositionId,observedUtc);
   return lease.Revision==revision && lease.PositionId==positionId;
  }
+ // A consumed decision still expires while account/fee/risk checks run.
+ // Call again at submission, using a new broker clock observation.
+ public bool IsCurrentWithinBar(MxmBrokerDecisionLease lease,long? actualPositionId,
+  DateTime boundaryUtc,DateTime observedUtc) {
+  Clock(boundaryUtc);
+  bool current=IsCurrent(lease,actualPositionId,observedUtc);
+  return current && observedUtc>=boundaryUtc &&
+   observedUtc.Ticks-boundaryUtc.Ticks<TimeSpan.TicksPerMinute*(long)barMinutes;
+ }
  // Called only after the adapter has checked label AND configured symbol.
  // Only a matching, explicitly requested reversal with reason Closed can
  // acknowledge a local close. StopLoss/StopOut/TakeProfit/unknown always revoke.

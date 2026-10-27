@@ -390,11 +390,10 @@ public sealed class MxmReferenceProductBot : Robot {
   if(ownerEnvelope!=MxmOwnerEntryEnvelope.Admit) {
    Print("MXM_OWNER_ENTRY_ENVELOPE_HOLD_"+ownerEnvelope);return;
   }
-  // Last local admission check, after all expensive risk/margin calculations.
+  // Preliminary lease check before the final fee/account/risk rechecks.
   // This does not make the broker check+order atomic or lock other instances.
   var finalClock=BrokerClock();
-  if(!fence.IsCurrent(lease,BrokerPositionId(instrumentName),finalClock) ||
-     finalClock<currentOpenTime || finalClock>=currentOpenTime.AddMinutes(BarMinutes)) {
+  if(!fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,finalClock)) {
    Print("MXM_BROKER_BOOK_CHANGED_OR_EXPIRED_NO_STALE_INTENT_ENTRY");return;
   }
   if(instrument.Bid!=feeBookBid || instrument.Ask!=feeBookAsk ||
@@ -445,6 +444,12 @@ public sealed class MxmReferenceProductBot : Robot {
   }
   string? requestComment=entryCheckpoint.SubmissionComment;
   if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
+  // A successful earlier check does not extend the consumed bar's lifetime.
+  // No further price/fee/risk calculations or durable IO follow this sample.
+  var submissionClock=BrokerClock();
+  if(!fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,submissionClock)) {
+   Print("MXM_FINAL_SUBMISSION_LEASE_CHANGED_OR_BAR_EXPIRED_HOLD");return;
+  }
   TradeResult placed;
   if(orderProtection.Halted || !entryCheckpoint.MarkSubmitted()) {
    orderProtection.HaltUnknown();LatchProtectionHalt();return;
