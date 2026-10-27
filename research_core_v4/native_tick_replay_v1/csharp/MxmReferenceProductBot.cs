@@ -422,13 +422,21 @@ public sealed class MxmReferenceProductBot : Robot {
   double finalEquity=Account.Equity,finalFreeMargin=Account.FreeMargin;
   double finalMargin=instrument.GetEstimatedMargin(direction,units);
   double finalNewStopRisk=instrument.AmountRisked(units,stopPips);
+  // Book identity alone does not establish that an API risk estimate is
+  // unchanged. Resample ALL owned exposure, not just the proposed ticket.
+  // This does not certify fresh FX inside AmountRisked (PipValue is static).
+  if(!TryEstimateOwnedStopExposure(out double finalExistingRisk,out int finalProtectedExisting) ||
+     finalProtectedExisting!=protectedExisting ||
+     !originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
+   Print("MXM_FINAL_EXISTING_EXPOSURE_UNVERIFIED_OR_CHANGED_HOLD");return;
+  }
   if(!double.IsFinite(finalEquity)||!double.IsFinite(finalFreeMargin)||
      !double.IsFinite(finalMargin)||!double.IsFinite(finalNewStopRisk)) {
    Print("MXM_FINAL_ACCOUNT_OBSERVATION_UNVERIFIED_HOLD");return;
   }
   string finalAccount=MxmNativeFinalAccountFence.Check(
-   new MxmNativeEntrySnapshot((decimal)initialEquity,(decimal)initialFreeMargin,(decimal)margin,(decimal)newStopRisk),
-   new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin,(decimal)finalMargin,(decimal)finalNewStopRisk));
+   new MxmNativeEntrySnapshot((decimal)initialEquity,(decimal)initialFreeMargin,(decimal)margin,(decimal)newStopRisk,(decimal)existingRisk),
+   new MxmNativeEntrySnapshot((decimal)finalEquity,(decimal)finalFreeMargin,(decimal)finalMargin,(decimal)finalNewStopRisk,(decimal)finalExistingRisk));
   if(finalAccount!=MxmNativeFinalAccountFence.Admit) {
    Print("MXM_FINAL_ACCOUNT_CHANGE_HOLD_"+finalAccount);return;
   }

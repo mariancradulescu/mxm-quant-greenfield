@@ -51,7 +51,7 @@ Require(MxmOwnerEntryEnvelope.Check(200m,0m,0m,1m,0.2m)=="REJECT_UNVERIFIED_OWNE
 Require(MxmOwnerEntryEnvelope.Check(200m,80m,-0.01m,1m,0.2m)=="REJECT_UNVERIFIED_OWNER_INPUT","OWNER_NEGATIVE_FEE");
 Require(MxmOwnerEntryEnvelope.Check(200m,80m,0m,decimal.MaxValue,1m)=="REJECT_UNVERIFIED_OWNER_INPUT","OWNER_OVERFLOW");
 // Current native broker-account observations are sampled, never atomic.
-var baseBook=new MxmNativeEntrySnapshot(200m,200m,60m,1m);
+var baseBook=new MxmNativeEntrySnapshot(200m,200m,60m,1m,0m);
 Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook)==MxmNativeFinalAccountFence.Admit,"FINAL_SNAPSHOT_EQUAL");
 Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook with {EquityEur=205m,FreeMarginEur=203m})==MxmNativeFinalAccountFence.Admit,"FINAL_ACCOUNT_IMPROVED_NO_RECAPITALIZATION");
 Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook with {EquityEur=199.99m,FreeMarginEur=199.99m})=="REJECT_ACCOUNT_EQUITY_DECLINED_BEFORE_ORDER","FINAL_EQUITY_DRIFT");
@@ -62,6 +62,15 @@ Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook with {FreeMarginEur=2
 Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook with {EquityEur=0m})=="REJECT_INVALID_OR_UNVERIFIED_FINAL_ACCOUNT_SNAPSHOT","FINAL_BAD_EQUITY");
 Require(MxmNativeFinalAccountFence.Check(baseBook,null!)=="REJECT_INVALID_OR_UNVERIFIED_FINAL_ACCOUNT_SNAPSHOT","FINAL_MISSING");
 Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook with {TicketMarginEur=0m})=="REJECT_INVALID_OR_UNVERIFIED_FINAL_ACCOUNT_SNAPSHOT","FINAL_NO_MARGIN");
+// EUR conversion may change with identical existing position/quote identities.
+// Improved equity must not hide a larger existing mark-to-stop estimate.
+var ownedBook=baseBook with {ExistingStopRiskEur=.8m};
+Require(MxmNativeFinalAccountFence.Check(ownedBook,ownedBook)==MxmNativeFinalAccountFence.Admit,"FINAL_EXISTING_RISK_EQUAL");
+Require(MxmNativeFinalAccountFence.Check(ownedBook,ownedBook with {ExistingStopRiskEur=.79m})==MxmNativeFinalAccountFence.Admit,"FINAL_EXISTING_RISK_DECREASED");
+Require(MxmNativeFinalAccountFence.Check(ownedBook,ownedBook with {EquityEur=205m,FreeMarginEur=203m,ExistingStopRiskEur=.81m})=="REJECT_EXISTING_STOP_RISK_INCREASED_BEFORE_ORDER","FINAL_EXISTING_FX_DRIFT_DESPITE_EQUITY_GAIN");
+Require(MxmNativeFinalAccountFence.Check(ownedBook,ownedBook with {ExistingStopRiskEur=-.01m})=="REJECT_INVALID_OR_UNVERIFIED_FINAL_ACCOUNT_SNAPSHOT","FINAL_EXISTING_NEGATIVE");
+Require(MxmNativeFinalAccountFence.Check(ownedBook with {ExistingStopRiskEur=-.01m},ownedBook)=="REJECT_INVALID_OR_UNVERIFIED_FINAL_ACCOUNT_SNAPSHOT","INITIAL_EXISTING_NEGATIVE");
+Require(MxmNativeFinalAccountFence.Check(baseBook,baseBook with {ExistingStopRiskEur=.01m})=="REJECT_EXISTING_STOP_RISK_INCREASED_BEFORE_ORDER","FINAL_NEW_UNEXPECTED_EXPOSURE");
 Require(MxmAccountIsolation.Check(0,0,0)==MxmAccountIsolation.Admit,"FLAT_ACCOUNT");
 Require(MxmAccountIsolation.Check(2,2,0)==MxmAccountIsolation.Admit,"ALL_OWNED_POSITIONS");
 Require(MxmAccountIsolation.Check(2,1,0)=="REJECT_FOREIGN_ACCOUNT_POSITION","FOREIGN_POSITION");
