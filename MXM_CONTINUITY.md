@@ -1,3 +1,13 @@
+# 27 octombrie2026 — risc nativ integrat și contract de sursă cu secvență/depth
+
+PR222 integrat7273efc0024fd036f07683c73312d2a5a7629d26, toate5CI SUCCESS din prima; gateway40504978684/job122191863112 a executat11teste noi fărăskip și a compilat produsulcTrader. Dimensionarea și admiterea finală verifică lease-ul tuturor mark-urilor contului, fără refresh favorabil sau observații fabricate după restart. LossFX/stopfill rămân distincte și nedovedite.
+
+[Cercetare de protocol și componentă C#](docs/economic-development/20261027/SEQUENCED_DEPTH_SOURCE_CONTRACT_V1.md): specificația oficială FIX nu justifică presupunerea unui poll de snapshot263=0. Noul receiver tipizat reconstruiește atomic fullsnapshot+New/Delete pe fiecare secvență de sesiune, invalidează book-ul la gap/duplicat/updateambiguu și cere epocă verificată+snapshot nou. Ștergerea unui nivel păstrează vârsta nivelului vechi devenitbest; heartbeat/mesajealte-niveluri/read nu întineresc observațiile. Se compilează în produsul existent, fără conectare/instanțiere în Robot sau pretinsa autentificare/executabilitate. CI nou PENDING la instalare; recepție sursă SOURCE_NOT_ADMITTED.
+
+Ipoteza economică anterioară rămâne închisă DATA_LIMITED; originale/spec/cod înghețat intacte. Zero noi modele/rezultate/cereri broker/ordine/Cloud/resetări, autorități/custodie neschimbate. UniversulPepperstone rămâne deschis; următorul contact trebuie să furnizeze câmpuri lipsă demonstrabile și să aibă protocol prospectiv/buget/excluderi. Nicio migrare oarbă sau colectare repetată. EdgeNET/HARD21/recepție operațională Robot rămân nedemonstrate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie2026 — dependențele de observație ale riscului întregului cont
 
 Continuare LIVE72d96e888ff2f3b3f888987d770ae4b10df4b907/PR220–221, fără lucrări ulterioare pe ramura oficială. [Integrarea și frontiera economică](docs/economic-development/20261027/COMPLETE_ACCOUNT_RISK_OBSERVATION_V1.md) acoperă dimensionarea și admiterea finală cu lease-ul comun al TUTUROR mark-urilor: ticket propus plus poziții existente, inclusiv fee0/perlot. Validatorul de observație este reutilizat; epocile/prețurile/vârstele trebuie să corespundă și expirarea originală nu se prelungește prin refresh egal. Snapshoturile native și AmountRisked rămân estimări, nu lossFX proaspăt sau pierdere maximă garantată.

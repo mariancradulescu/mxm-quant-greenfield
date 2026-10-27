@@ -16,7 +16,7 @@ This does NOT replace AmountRisked/PipValue with observed loss conversion, estab
 
 Required gateway compiles the actual production component and compares it with an independent Python state/expiry oracle. Artificial cases cover oldest existing mark, inclusive expiry boundary, no renewal by unchanged quotes, same-clock epoch reset, native-price mismatch, missing source, changed prices, transport down, partial fields, duplicate conflicts, clock regression, locked geometry and500 deterministic multi-source actions. Native wiring checks confirm placement relative to sizing, final risk and durable submission. Full cTrader package and all existing required suites must pass before merge. Local .NET is absent; compiled assertions cannot silently skip in GitHub Actions.
 
-At installation CI is pending. Compilation and artificial parity are not operational Robot/callback/storage reception, broker execution or economic validation. No source/private result is decrypted in Work; no market economic outcome is rerun.
+PR222 is integrated at7273efc0024fd036f07683c73312d2a5a7629d26. All five required suites passed on the first head28037a0b26b1ab07e57f6abf51433884d730c818; gateway40504978684/job122191863112 executed all11new tests without skip and compiled the actual cTrader.algo. Compilation and artificial parity are not operational Robot/callback/storage reception, broker execution or economic validation. No source/private result is decrypted in Work; no market economic outcome is rerun.
 
 ## Economic decision after the authentic closed trial
 
