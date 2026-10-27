@@ -1,3 +1,13 @@
+# 27 octombrie2026 — dependențele de observație ale riscului întregului cont
+
+Continuare LIVE72d96e888ff2f3b3f888987d770ae4b10df4b907/PR220–221, fără lucrări ulterioare pe ramura oficială. [Integrarea și frontiera economică](docs/economic-development/20261027/COMPLETE_ACCOUNT_RISK_OBSERVATION_V1.md) acoperă dimensionarea și admiterea finală cu lease-ul comun al TUTUROR mark-urilor: ticket propus plus poziții existente, inclusiv fee0/perlot. Validatorul de observație este reutilizat; epocile/prețurile/vârstele trebuie să corespundă și expirarea originală nu se prelungește prin refresh egal. Snapshoturile native și AmountRisked rămân estimări, nu lossFX proaspăt sau pierdere maximă garantată.
+
+CI compilat/paritate C#/Python și produs cTrader obligatorii înainte de integrare; PENDING la instalare. Nu se fabrică observații la cold recovery și nu se restaurează lease-uri tranzitorii drept dovadă. Ledgerele/recuperarea persistentă și capitalul continuu200EUR sunt păstrate.
+
+Ipoteza spread-reversion DATA_LIMITED rămâne închisă, implementările/spec/originalele intacte. Frontiera economică distinge surse pentru expunere rapidă de features pe bare lente; nici mesajele dese, nici OHLC/depth nu certifică filluri sau trasee de stop. Următoarea admitere cere un mecanism distinct și aplicabilitate temporală a surselor/costurilor, fără retuning, noi colectări oarbe sau model pe suport inadecvat. Zero noi trialuri/rezultate economice/cereri broker/ordine/Cloud/resetări/authority writes. EdgeNET/HARD21/recepție Robot rămân nedemonstrate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie2026 — un trial economic autentic închis și control nativ preț–cost integrat
 
 PR220/414220cca9c0ecb2f7eb71910d1b199011f24520 integrat; toate5CI SUCCESS din prima,13teste noi economie/sursă/scope, boundaryde lease al prețului și cTrader.algo verificate. Comisioanele native dependente de valoare rețin acum și lifetime-ul observației PREȚULUI ticketului, inclusiv fărăFX, cu același validator și control final după risc. Lot-fee/zero nu cer artificial preț proaspăt. Robotul nu primește o familie de tranzacționare necalificată din studiul nou.
