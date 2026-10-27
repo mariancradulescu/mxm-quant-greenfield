@@ -1,3 +1,11 @@
+# 27 octombrie 2026 — contract de observație nativă separat de executabilitate
+
+Continuare LIVE din61fb9462cde8b70e752274889f9c629072aa6868/PR214; fără lucrări noi pe ramura oficială. Autoritățile active/OWNER/evidence neschimbate. [Contractul C#](docs/economic-development/20261027/NATIVE_BOOK_OBSERVATION_CONTRACT_V1.md) separă evenimentul, observația explicită a fiecărei laturi, schimbarea valorii și epoca locală. Produsul nativ alimentează aceeași componentă cu snapshoturi double; raw fields folosesc decimal exact. Tăcerea păstrează ultima geometrie descriptivă și mărește vârsta, fără prospețime sau executabilitate inventate. DOWN/epocă nouă șterg starea; UP nu o reînvie. Ticks nu certifică transportul. Contoarele sunt tranzitorii și nu înlocuiesc ledgerele durabile ale contului.
+
+Compilarea produsului și paritatea independentă pe fixture artificiale sunt obligatorii în CI înainte de integrare; .NET absent local. Predicatul nativ, rezultatele istorice stricte, excluderea capturii originale și politica ordinelor sunt păstrate. Zero cereri broker, modele economice, ordine, Cloud sau resetări. Avantajul net, HARD21 și recepția operațională Robot rămân nedemonstrate. Următoarea reutilizare finită justificată: marjele la volumul minim și termenii contemporani deja capturați, distinct de censusurile finalizate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie 2026 — cauzele sursei verificate independent în C# și integrarea geometriei în produs
 
 PR #213 integrat `9b268d814eb21e446f8447b388326cbbaff52ec0`, toate cinci CI SUCCESS din prima execuție. Produsul cTrader și profilarea C# folosesc `MxmBookShape`: geometrie descriptivă separată de politica apelantului. Predicatul nativ existent finit/pozitiv/neîncrucișat, inclusiv locked, este păstrat; consumatorul de calitate cere în continuare spread pozitiv. 106 verificări compilate ale predicatului/cazurilor-limită, paritate pe 1.000 evenimente artificiale și toate controalele de capital/risc/recuperare au trecut. Nicio nouă admitere de ordine.
