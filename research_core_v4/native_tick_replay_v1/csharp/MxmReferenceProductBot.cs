@@ -235,8 +235,9 @@ public sealed class MxmReferenceProductBot : Robot {
   bool acquired=false;
   try {
    var quoteUtc=DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
-   if(!double.IsFinite(args.Bid) || !double.IsFinite(args.Ask) ||
-      args.Bid<=0 || args.Ask<args.Bid)return;
+   // Geometry only. Preserve the original native noncrossed rule (including
+   // locked books); source-quality consumers separately require positive spread.
+   if(!MxmBookShape.NonCrossed(MxmBookShape.ClassifyNative(args.Bid,args.Ask)))return;
    if(applyingDecision){Print("MXM_REENTRANT_EXECUTION_SAFE_STOP");Stop();return;}
    var fence=brokerIntentFences[args.SymbolName];
    // The book may have changed before its Closed callback is dispatched.
