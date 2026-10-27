@@ -1,3 +1,17 @@
+# 27 octombrie 2026 — control final de expirare C# și observație spot nativă recepționată
+
+PR #210 integrat `e16049b9ab855aa4d4811d394352cea2ebeae37a`, toate cinci CI finale SUCCESS: verificarea expirării intenției și identității brokerului este repetată imediat înaintea trimiterii, după ultimele calcule. Șapte probe C# noi de limită/identitate, recuperarea existentă și pachetul cTrader au trecut; nu sunt callbackuri/tranzacții native recepționate.
+
+PR #211 integrat `d16db0a9e40ca2f48f8b9f0d483ca3b131d173e1`. [Execuția 40455704891](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40455704891): producer122028419045 și cold122030445035 SUCCESS, o singură încercare VIEW, 15 teste de protocol/protobuf executate anterior în CI. Trei instrumente fixate prospectiv, 360 secunde după abonare, 1.140 mesaje: EURUSD336/179valide, GBPUSD482/440valide, SpotCrude322/321valide. **Zero intervale observate >=5minute** la pragul fix5secunde; la SpotCrude pauzele fragmentează observații altfel valide. Cele șase intervale GBPUSD W37 istorice rămân neschimbate. Nu confunda ferestrele/ceasurile, o observație validă cu lichiditate continuă sau acest rezultat cu absența universală a avantajului.
+
+[Rezultatul și limitele](docs/economic-development/20261027/NATIVE_SPOT_OBSERVATION_RESULT_V1.md) și originalele criptate/publice sunt conservate în `docs/economic-development/20261027/native-spot-40455704891/`. Restauratorul offline verifică originalele fără cheie sau broker. Fluxul s-a închis la termen cu posibilă ultimă ramă incompletă, fără ACK de dezabonare, reconectare sau extrapolare. Profilarea este același algoritm în ambele joburi, declarat explicit. API VIEW funcțional nu este recepție operațională Robot cTrader.
+
+Intervalul întreg05:31:01.143636–05:37:04.067853UTC din27octombrie este diagnostic DEVELOPMENT_SOURCE_QUALITY_ONLY, exclus din confirmare pentru orice identitate intersectată; niciun răspuns direcțional nu este admis pe această captură. Metadatele/marjele native contemporane nu devin termeni istorici sau execuții reale. Următoarea admitere economică cere un protocol prospectiv distinct pentru traseul expunerii/răspuns și aplicabilitatea datată a costurilor/FX/marjei. Nu relansați pilotul ori modelele înghețate.
+
+Continuarea OWNER după #207–209 păstrează autoritățile și mandatul B–E. O conexiune VIEW, 11 cereri business plus heartbeat-uri; zero modele/rezultate economice noi, ordine, Cloud, resetări de capital sau schimbări de custodie/autoritate. B–E rămâne OPEN; avantajul net, HARD21 și recepția operațională cTrader rămân necalificate. OWNER operations NONE. Snapshoturile următoare sunt istorice; reconciliați mereu GitHub LIVE înaintea continuării.
+
+---
+
 # 27 octombrie 2026 — continuitate recuperată, C# extins și sursă GBPUSD evaluată autentic
 
 Mandatul B–E continuă conform [transferului OWNER](docs/mandates/MXM_CONTINUATION_B_E_20261027.md), fără restart. PR #207 integrat `bb10d63187d2f89c730ca1b0165287ece1220c91`: verificarea finală recalculează și compară estimările de risc ale pozițiilor existente; cinci CI SUCCESS, inclusiv compilarea pachetului cTrader și fixture C#. Estimarea API nu certifică FX proaspăt sau recepție operațională.

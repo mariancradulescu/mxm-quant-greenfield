@@ -34,6 +34,10 @@ jobs:
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
           python3 -m unittest research_core_v4.laboratory.test_spot_observation_profile research_core_v4.laboratory.test_spot_observation_reception -v
+      - name: Restore exact original native spot evidence without custody or broker access
+        run: |
+          python3 -m research_core_v4.laboratory.durable_spot_observation
+          python3 -m unittest research_core_v4.laboratory.test_durable_spot_observation -v
       - name: Verify real source admission and finite diagnostic before costly evaluation
         run: |
           python3 -m unittest research_core_v4.laboratory.test_account_source_preflight research_core_v4.laboratory.test_source_compatibility_diagnostic research_core_v4.laboratory.test_source_exposure_capacity research_core_v4.laboratory.test_gbpusd_source_exposure -v
