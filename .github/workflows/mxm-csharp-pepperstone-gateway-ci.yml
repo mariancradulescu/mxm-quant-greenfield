@@ -38,6 +38,10 @@ jobs:
         run: |
           dotnet build research_core_v4/laboratory/csharp/spot_source/MxmSpotSource.csproj -c Release
           python3 -m unittest research_core_v4.laboratory.test_spot_source_causes research_core_v4.laboratory.test_spot_source_cause_reception -v
+      - name: Verify original CSharp source cause receipt without source replay
+        run: |
+          python3 -m research_core_v4.laboratory.verify_spot_source_cause_result
+          python3 -m unittest research_core_v4.laboratory.test_spot_source_cause_result -v
       - name: Restore exact original native spot evidence without custody or broker access
         run: |
           python3 -m research_core_v4.laboratory.durable_spot_observation

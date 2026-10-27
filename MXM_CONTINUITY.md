@@ -1,3 +1,17 @@
+# 27 octombrie 2026 — cauzele sursei verificate independent în C# și integrarea geometriei în produs
+
+PR #213 integrat `9b268d814eb21e446f8447b388326cbbaff52ec0`, toate cinci CI SUCCESS din prima execuție. Produsul cTrader și profilarea C# folosesc `MxmBookShape`: geometrie descriptivă separată de politica apelantului. Predicatul nativ existent finit/pozitiv/neîncrucișat, inclusiv locked, este păstrat; consumatorul de calitate cere în continuare spread pozitiv. 106 verificări compilate ale predicatului/cazurilor-limită, paritate pe 1.000 evenimente artificiale și toate controalele de capital/risc/recuperare au trecut. Nicio nouă admitere de ordine.
+
+[Execuția autentică 40463984769](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40463984769), job122054897374 SUCCESS, o singură încercare în custodie: toate cele1.140mesaje originale40455704891 și întregul profil strict au fost reconciliate independent C#/Python, fără o nouă colectare, broker, model sau răspuns direcțional. Cele190cazuri vechi locked/crossed sunt **190locked BID=ASK, zero crossed**;125apar în mesaje cu ambele câmpuri,65după actualizări parțiale. Nu au fost observate repetări explicite de preț egal după inițializare; compatibil cu un flux de schimbări, fără a fi o garanție universală de valabilitate a cotațiilor. La SpotCrude șapte pauze >5secunde între observații valide explică cele opt intervale; tăcerea nu demonstrează lipsa lichidității. Zero erori ale ceasului serverului în mesajele primite nu certifică sincronizarea sau cotațiile dintre ele.
+
+[Rezultatul și decizia](docs/economic-development/20261027/NATIVE_SPOT_SOURCE_CAUSE_RESULT_V1.md). Artefactul public original12715701511 și receiptul exact sunt conservate în `spot-source-causes-40463984769/`, verificabile offline fără cheie/replay. Profilul strict940valide/200indisponibile/zerointervale>=5minute, originalul criptat, intervalul diagnostic exclus din confirmare și interdicția de testare a răspunsurilor sunt **neschimbate**. Geometria pozitivă950 nu reprezintă observațiile consumer-valide940 și nici tranzacții executabile.
+
+Nu repetați capturi/censusuri sau modelele vechi pentru un rezultat favorabil; nu fabricați prospețime prin reabonare. Următoarea admitere economică cere un protocol prospectiv pe date viitoare care separă ceasul de schimbare/observare/starea book-ului și dovada executării, plus aplicabilitatea datată a costurilor/FX/marjei și un mecanism distinct. Nu relaxați retrospectiv criteriile sau etichetele surselor existente. Universul autorizat și alte expuneri rămân deschise.
+
+Recuperarea programată40459818375 a verificat succesul issuerului anterior și a raportat REGISTERED_RESEARCH_COMPLETE_INSUFFICIENT_EVIDENCE, bootstrap_dispatches=0; nu se relansează. Autoritățile și custodia sunt păstrate. B–E OPEN; avantaj net/HARD21/recepție operațională Robot necalificate. Operațiunea nouă de analiză: zero cereri broker, modele/rezultate economice, ordine, Cloud sau resetări de capital. OWNER operations NONE. Snapshoturile următoare sunt istorice; reconciliați GitHub LIVE înaintea continuării.
+
+---
+
 # 27 octombrie 2026 — control final de expirare C# și observație spot nativă recepționată
 
 PR #210 integrat `e16049b9ab855aa4d4811d394352cea2ebeae37a`, toate cinci CI finale SUCCESS: verificarea expirării intenției și identității brokerului este repetată imediat înaintea trimiterii, după ultimele calcule. Șapte probe C# noi de limită/identitate, recuperarea existentă și pachetul cTrader au trecut; nu sunt callbackuri/tranzacții native recepționate.
