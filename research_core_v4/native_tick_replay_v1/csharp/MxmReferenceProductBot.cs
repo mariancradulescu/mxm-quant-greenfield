@@ -380,7 +380,7 @@ public sealed class MxmReferenceProductBot : Robot {
   double margin=instrument.GetEstimatedMargin(direction,units);
   if(!double.IsFinite(margin)||margin<=0)return;
   // Native symbol properties are observed NOW; no unsupported historic terms or
-  // assumed zero entry fee. FX via AssetConverter is an estimate, not an exact
+  // assumed zero entry fee. Observed cost-FX is an estimate, not an exact
   // future fee or independent timestamped loss-side price.
   double feeBookBid=instrument.Bid,feeBookAsk=instrument.Ask;
   var feeType=instrument.CommissionType;
@@ -411,13 +411,16 @@ public sealed class MxmReferenceProductBot : Robot {
      EstimatedRoundTripFrictionReserveEur<0 || stopPips<=0) {
     Print("MXM_STOP_RISK_INPUT_UNVERIFIED_SAFE_HOLD");return;
   }
+  var originalRiskBook=CaptureNativeRiskBook();
+  MxmNativeRiskObservationLease riskObservationLease;
+  try {riskObservationLease=CaptureRiskObservationLease(instrument,feeBookBid,feeBookAsk,originalRiskBook);}
+  catch(Exception e) {Print("MXM_RISK_OBSERVATION_UNVERIFIED_HOLD_"+e.GetType().Name);return;}
   double newStopRisk=instrument.AmountRisked(units,stopPips);
   if(!double.IsFinite(newStopRisk)||newStopRisk<=0) {
     Print("MXM_NEW_STOP_RISK_UNVERIFIED_SAFE_HOLD");return;
   }
   // Freeze the exact owned position identities/stop/volume/other-symbol marks
   // BEFORE any risk computation; order book IDs alone cannot detect a changed stop.
-  var originalRiskBook=CaptureNativeRiskBook();
   if(!TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting))
    return;
   if(!originalRiskBook.SequenceEqual(CaptureNativeRiskBook())) {
@@ -500,8 +503,13 @@ public sealed class MxmReferenceProductBot : Robot {
   if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
   // A successful earlier check does not extend the consumed bar's lifetime.
   // No further price/fee/risk calculations or durable IO follow this sample.
+  // Final complete-account mark lease after risk/IO. Read-only observation
+  // checks do not refresh the original lease or certify internal loss FX.
+  try {riskObservationLease.Verify(ObservationClockMs(),ReadNativeRiskObservation);}
+  catch(Exception e) {Print("MXM_FINAL_RISK_OBSERVATION_HOLD_"+e.GetType().Name);return;}
   long fxSubmissionClock=ObservationClockMs();
-  if(finalCostFxExpires.HasValue && (fxSubmissionClock<finalCostFxCheckedAt || fxSubmissionClock>finalCostFxExpires.Value)) {
+  if(fxSubmissionClock>riskObservationLease.ExpiresAtMs ||
+     finalCostFxExpires.HasValue && (fxSubmissionClock<finalCostFxCheckedAt || fxSubmissionClock>finalCostFxExpires.Value)) {
    Print("MXM_FINAL_COST_FX_OBSERVATION_LEASE_EXPIRED_HOLD");return;
   }
   var submissionClock=BrokerClock();
@@ -625,6 +633,7 @@ public sealed class MxmReferenceProductBot : Robot {
     Print("MXM_PRE_SIZING_SHARED_ACCOUNT_ISOLATION_HOLD");return 0d;
    }
    var riskBookBefore=CaptureNativeRiskBook();
+   var sizingObservationLease=CaptureRiskObservationLease(symbol,symbol.Bid,symbol.Ask,riskBookBefore);
    if(!TryEstimateOwnedStopExposure(out double existingRisk,out int protectedExisting) ||
       !riskBookBefore.SequenceEqual(CaptureNativeRiskBook())) {
     Print("MXM_PRE_SIZING_EXISTING_RISK_UNVERIFIED_HOLD");return 0d;
@@ -662,11 +671,27 @@ public sealed class MxmReferenceProductBot : Robot {
       Positions.FindAll(Label).Length!=owned) {
     Print("MXM_PRE_SIZING_BROKER_EXPOSURE_CHANGED_HOLD");return 0d;
    }
+   sizingObservationLease.Verify(ObservationClockMs(),ReadNativeRiskObservation);
    return (double)chosen.Value;
   }catch(Exception e) {
    Print("MXM_NATIVE_VOLUME_SEARCH_UNVERIFIED_HOLD_"+e.GetType().Name);
    return 0d;
   }
+ }
+ // Match native quote properties to the locally observed callback book. Never
+ // synthesize a callback at sizing/startup or resurrect one after recovery.
+ MxmObservedFxBook? ReadNativeRiskObservation(string source) {
+  long now=ObservationClockMs();var observed=ReadObservedCostBook(source,now);
+  if(!observedSymbols.TryGetValue(source,out var native) ||
+    !double.IsFinite(native.Bid) || !double.IsFinite(native.Ask) || observed==null ||
+    observed.Bid!=checked((decimal)native.Bid) || observed.Ask!=checked((decimal)native.Ask))
+   throw new ArgumentException("RISK_OBSERVATION_NATIVE_SOURCE_MISMATCH");
+  return observed;
+ }
+ MxmNativeRiskObservationLease CaptureRiskObservationLease(Symbol proposed,double bid,double ask,NativeRiskMark[] owned) {
+  var quotes=owned.Select(x=>new MxmNativeRiskQuote(x.Symbol,checked((decimal)x.Bid),checked((decimal)x.Ask)))
+   .Prepend(new MxmNativeRiskQuote(proposed.Name,checked((decimal)bid),checked((decimal)ask)));
+  return MxmNativeRiskObservationLease.Capture(quotes,ObservationClockMs(),ReadNativeRiskObservation);
  }
  // Explicit metadata paths and locally observed callback books only. Costs
  // use ASK / inverse BID, never an unspecified credit/midpoint conversion.
