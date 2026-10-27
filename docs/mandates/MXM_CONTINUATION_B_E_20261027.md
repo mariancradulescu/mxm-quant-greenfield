@@ -11,3 +11,11 @@ Technical C# development must continue alongside economic research even while ed
 No unauthorized LIVE/DEMO orders or Cloud activation. No repeated approval requests for already authorized operations and no delegation of GitHub operator work to OWNER. Continue actual GitHub execution instead of stopping at plans or reports, and continue beyond a PR when justified work remains possible. Preserve verifiable evidence and distinguish functional, scientific and economic progress. The auditor stays independent/read-only and does not become an executive gate.
 
 This records the material instructions in the OWNER transfer; the earlier canonical mandate and compatible constraints remain binding. It is not a claim that the final product, native acceptance, HARD21 or economic edge has been achieved.
+
+## Further explicit OWNER transfer, recovered from PR223
+
+The new-chat instruction continues the same B–E mandate, without restart, reconstruction, repeated approvals or changed delegated authorities. OWNER's last independently verified official HEAD is30aef42f92d750673adbc51d1af65ff118fcbd96, PR222–223. Recover later/partial work from GitHub LIVE before execution and do not duplicate completed runs. Preserve engineering/scientific/operational autonomy across the entire C# product and authorised Pepperstone universe. Continue technical integration and distinct prospective economic research in parallel; do not treat CI, .algo compilation or artificial parity as native operational reception or economic validation.
+
+The unilateral GBPUSD spread-widening reversion identity is closed DATA_LIMITED, without retuning, rerun or favourable reinterpretation. PR223's depth component has artificial reception only and no admitted authentic source. Decide further integration from actually available authorised protocols and credentials; do not assume FIX credentials or broker capability. Maintain original custody, protected partitions, risk limits and single continuous EUR200, with effective broker-executed HARD21 as an unproven final requirement. No unauthorised LIVE/DEMO orders, Cloud activation, access expansion or authority changes. The Director continues concrete execution and reports verifiable results; OWNER operations NONE.
+
+Provenance is the explicit conversation instruction, not a GitHub review or auditor signature.

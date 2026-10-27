@@ -20,7 +20,13 @@ try {
    try {
     switch(a.GetProperty("op").GetString()) {
      case "observe":
-      decimal? Price(string name)=>a.GetProperty(name).ValueKind==JsonValueKind.Null?null:a.GetProperty(name).GetDecimal();
+      // Artificial boundary fixtures carry decimal strings so Python/JSON
+      // binary floats cannot erase the exact remainder being tested.
+      decimal? Price(string name){
+       var value=a.GetProperty(name);
+       return value.ValueKind==JsonValueKind.Null?null:value.ValueKind==JsonValueKind.String?
+        decimal.Parse(value.GetString()!,NumberStyles.Float,CultureInfo.InvariantCulture):value.GetDecimal();
+      }
       states[a.GetProperty("source").GetString()!].Observe(Price("bid"),Price("ask"),now,now,null);break;
      case "begin":states[a.GetProperty("source").GetString()!].BeginEpoch(now);break;
      case "end":states[a.GetProperty("source").GetString()!].EndEpoch(now);break;

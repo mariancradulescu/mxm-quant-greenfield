@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 namespace Mxm.Replay {
 public sealed record MxmFxInstrument(string Source,string BaseAsset,string QuoteAsset);
 public sealed record MxmFxLeg(string Source,bool Reverse);
@@ -63,6 +64,42 @@ public sealed class MxmObservedCostFx {
   }
   throw new ArgumentException("FX_NO_DECLARED_PATH_WITHIN_THREE_LEGS");
  }
+ // Decimal division/multiplication round to the 96-bit decimal domain BEFORE
+ // Round(...,18,ToPositiveInfinity). A tiny positive remainder can disappear
+ // there, violating the advertised debit-side upper rounding. Preserve exact
+ // integer ratios until a single ceiling to the representable decimal grid.
+ static (BigInteger Coefficient,int Scale) Parts(decimal value) {
+  if(value<=0m)throw new ArgumentException("FX_NONPOSITIVE_COST_RATE");
+  var bits=decimal.GetBits(value);
+  return ((BigInteger)(uint)bits[0]+((BigInteger)(uint)bits[1]<<32)+
+   ((BigInteger)(uint)bits[2]<<64),(bits[3]>>16)&255);
+ }
+ static decimal CeilingRatio(BigInteger numerator,BigInteger denominator) {
+  if(numerator<=0 || denominator<=0)throw new ArgumentException("FX_NONPOSITIVE_COST_RATE");
+  int scale=18;
+  BigInteger coefficient=BigInteger.DivRem(numerator*BigInteger.Pow(10,scale),denominator,out var remainder);
+  if(remainder>0)coefficient++;
+  BigInteger maximum=(BigInteger.One<<96)-1;
+  // Large valid decimals have fewer than18fractional places. Coarsen upward
+  // only as far as required to fit, never truncate, underflow or return zero.
+  while(coefficient>maximum && scale>0) {
+   coefficient=BigInteger.DivRem(coefficient,10,out remainder);
+   if(remainder>0)coefficient++;
+   scale--;
+  }
+  if(coefficient>maximum)throw new OverflowException();
+  return new decimal((int)(uint)(coefficient&uint.MaxValue),
+   (int)(uint)((coefficient>>32)&uint.MaxValue),
+   (int)(uint)((coefficient>>64)&uint.MaxValue),false,(byte)scale);
+ }
+ static decimal LegCeiling(decimal value,bool reverse) {
+  var p=Parts(value);var unit=BigInteger.Pow(10,p.Scale);
+  return reverse?CeilingRatio(unit,p.Coefficient):CeilingRatio(p.Coefficient,unit);
+ }
+ static decimal ProductCeiling(decimal left,decimal right) {
+  var a=Parts(left);var b=Parts(right);
+  return CeilingRatio(a.Coefficient*b.Coefficient,BigInteger.Pow(10,a.Scale+b.Scale));
+ }
  public static long RequireObservedBookAge(MxmObservedFxBook? b,string source,long now) {
   var v=b?.Observation;
   if(now<0)throw new ArgumentException("FX_INVALID_RECEIPT_CLOCK_OR_READER");
@@ -88,9 +125,8 @@ public sealed class MxmObservedCostFx {
     long age=RequireObservedBookAge(b,leg.Source,now);maximumAge=Math.Max(maximumAge,age);
     // Cover a debit in FROM asset using TO: buy base at ASK or sell
     // quote at inverse BID. Credit valuation requires a separate contract.
-    decimal legRate=leg.Reverse?1m/b!.Bid!.Value:b!.Ask!.Value;
-    legRate=decimal.Round(legRate,18,MidpointRounding.ToPositiveInfinity);
-    rate=decimal.Round(rate*legRate,18,MidpointRounding.ToPositiveInfinity);
+    decimal legRate=LegCeiling(leg.Reverse?b!.Bid!.Value:b!.Ask!.Value,leg.Reverse);
+    rate=ProductCeiling(rate,legRate);
    }
   }}catch(OverflowException){throw new ArgumentException("FX_COST_RATE_OVERFLOW");}
   return new(rate,path,maximumAge);
