@@ -1,0 +1,87 @@
+{
+  "name": "MXM observed cost FX integrated original-source reception",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-observed-cost-fx-reception.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "observed-cost-fx": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 12,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".cost-fx-native",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit exact one-shot existing evidence scope before custody",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.observed_cost_fx_reception admit"
+        },
+        {
+          "name": "Compile actual observed cost FX and validate independent artificial paths without keys",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/observed_cost_fx/MxmObservedCostFx.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_observed_cost_fx research_core_v4.laboratory.test_observed_cost_fx_reception -v\npython3 -m research_core_v4.laboratory.durable_spot_observation --out \"${RUNNER_TEMP}/mxm-observed-cost-fx/original\"\ncp research_core_v4/laboratory/observed_cost_fx_reception.py research_core_v4/laboratory/observed_cost_fx.py research_core_v4/laboratory/current_margin_evidence.py research_core_v4/laboratory/universe_commission_checks.py research_core_v4/laboratory/durable_spot_observation.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py .cost-fx-native/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Authenticate original source and export complete existing event and metadata input only in custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .cost-fx-native\npython3 -m research_core_v4.laboratory.observed_cost_fx_reception export \"${RUNNER_TEMP}/mxm-observed-cost-fx/original/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-observed-cost-fx/input.json\""
+        },
+        {
+          "name": "Reconcile every source cost component CSharp Decimal and encrypt the private ledger without keys",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.observed_cost_fx_reception finalize \"${RUNNER_TEMP}/mxm-observed-cost-fx\""
+        },
+        {
+          "name": "Read back encrypted result in a separate native custody process",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .cost-fx-native\npython3 -m research_core_v4.laboratory.observed_cost_fx_reception cold"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "observed-cost-fx-${{ github.run_id }}",
+            "path": "verification/observed-cost-fx/receipt.json\nverification/observed-cost-fx/ledger.mxmenc\nverification/observed-cost-fx/cold.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
