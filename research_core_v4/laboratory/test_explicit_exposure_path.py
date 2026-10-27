@@ -8,18 +8,19 @@ def d(t,seq=1,direction=1,s='A'):return dict(op='decision',t=t,seq=seq,d=directi
 def opened():return [q(0),d(1),q(2)]
 def oracle(case):
     marks={};quote_times={};pending={};sequences={};blocked={};positions={};entries=exits=0;last=None;fault=False;fx=None;out=[]
-    cap=min(5000,case.get('maxAge',300)*1000);shared=case.get('shared',False)
+    cap=min(5000,case.get('maxAge',300)*1000);shared=case.get('shared',False);strict=not case.get('legacy',False)
     def valid(mark,t,limit):return mark is not None and all(0<=t-v<=limit for v in mark)
     def exposure(t):return all(valid(marks.get(s),t,cap) for s in positions) and (not shared or valid(fx,t,5000))
     for a in case['actions']:
-        op=a['op'];t=a['t'];s=a.get('s',case['symbols'][0]);restore=op=='restore-aged'
+        op=a['op'];t=a['t'];s=a.get('s',case['symbols'][0]);restore=op in ('restore-aged','restore-contract-flip')
         try:
             if fault:raise ValueError()
             if restore:
-                if positions and not exposure(t):raise ValueError()
+                if op=='restore-contract-flip':raise ValueError()
+                if positions and (shared or strict) and not exposure(t):raise ValueError()
                 last=t
             elif op not in ('cold','report'):
-                if t<0 or last is not None and t<last or positions and not exposure(t):raise ValueError()
+                if t<0 or last is not None and t<last or strict and positions and not exposure(t):raise ValueError()
                 last=t
                 if op=='fx':
                     if not shared:raise ValueError()
@@ -45,7 +46,7 @@ def oracle(case):
                             if s in positions and desired!=positions[s]:del positions[s];exits+=1
                             if desired and s not in positions:positions[s]=desired;entries+=1
                 else:raise ValueError()
-            if positions and not exposure(last):raise ValueError()
+            if positions and (shared or strict) and not exposure(last):raise ValueError()
             out.append(dict(status='OK',entries=entries,exits=exits,open=len(positions),funding=200,hard21=False,broker_fills=False))
         except ValueError:
             if not restore:fault=True
@@ -93,6 +94,14 @@ class ExposurePathCompiled(unittest.TestCase):
     def test_recomputed_checksum_does_not_approve_stale_open_checkpoint(self):
         out=self.check(opened()+[dict(op='restore-aged',t=5003)])
         self.assertEqual(out[-1],dict(status='HOLD',report_blocked=False))
+    def test_new_contract_does_not_reinterpret_frozen_legacy_explicit_semantics(self):
+        old=self.check(opened()+[q(5003)],legacy=True)
+        new=self.check(opened()+[q(5003)])
+        self.assertEqual((old[-1]['status'],new[-1]['status']),('OK','HOLD'))
+    def test_cold_restore_cannot_drop_or_change_registered_exposure_contract(self):
+        for legacy in (False,True):
+            out=self.check(opened()+[dict(op='restore-contract-flip',t=2)],legacy=legacy)
+            self.assertEqual(out[-1],dict(status='HOLD',report_blocked=False))
     def test_flat_gap_can_rewarm_without_fictitious_open_exposure_or_second_funding(self):
         out=self.check([q(0),q(10000),d(10001),q(10002),d(10003,2,0),q(10004),dict(op='cold',t=10004),q(20000)])
         self.assertEqual((out[-1]['entries'],out[-1]['exits'],out[-1]['open'],out[-1]['funding']),(1,1,0,200))

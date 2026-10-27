@@ -6,11 +6,13 @@ using var data=JsonDocument.Parse(File.ReadAllBytes(args[0]));
 var output=new List<object>();
 foreach(var scenario in data.RootElement.EnumerateArray()) {
  bool shared=scenario.TryGetProperty("shared",out var x) && x.GetBoolean();
+ bool legacy=scenario.TryGetProperty("legacy",out var old) && old.GetBoolean();
  int maxAge=scenario.TryGetProperty("maxAge",out var age)?age.GetInt32():300;
  string policy=new('e',64),source=new('a',64);
  var symbols=scenario.GetProperty("symbols").EnumerateArray().Select(v=>v.GetString()!).ToArray();
  var settings=new MxmReplayParameters(StrategyMode.TrendOnly,.8m,4,0m,.5m,0m,
-  MaxQuoteAgeSeconds:maxAge,UseSharedUsdConversion:shared,ExplicitPolicySha256:policy);
+  MaxQuoteAgeSeconds:maxAge,UseSharedUsdConversion:shared,ExplicitPolicySha256:policy,
+  RequireObservedExposurePath:!legacy);
  var account=new MxmPortfolioAccountReplay(symbols,settings);account.Run(Array.Empty<MxmAccountFeed>());
  DateTime start=new(2026,1,5,0,0,0,DateTimeKind.Utc);
  decimal fxBid=1.1m,fxAsk=1.11m;
@@ -24,6 +26,10 @@ foreach(var scenario in data.RootElement.EnumerateArray()) {
    if(op=="cold") {
     var saved=account.CaptureReplay(source);
     account=MxmPortfolioAccountReplay.RestoreReplay(saved.Payload,saved.Sha256,source,settings,symbols);
+   }else if(op=="restore-contract-flip") {
+    var saved=account.CaptureReplay(source);
+    account=MxmPortfolioAccountReplay.RestoreReplay(saved.Payload,saved.Sha256,source,
+     settings with {RequireObservedExposurePath=legacy},symbols);
    }else if(op=="restore-aged") {
     var saved=account.CaptureReplay(source);var node=JsonNode.Parse(saved.Payload)!;
     node["LastFeed"]=now;byte[] altered=JsonSerializer.SerializeToUtf8Bytes(node);
