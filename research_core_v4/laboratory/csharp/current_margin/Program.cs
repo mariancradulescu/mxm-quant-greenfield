@@ -1,5 +1,25 @@
 using System.Text.Json;
 using Mxm.Replay;
+// This public-receipt mode authenticates no source by itself. Its caller must
+// verify the immutable receipt first; it never prices a market fill or reads FX.
+if(args.Length==3 && args[0]=="--commission-components") {
+ using var receipt=JsonDocument.Parse(File.ReadAllBytes(args[1]));var components=new List<object>();
+ foreach(var panel in receipt.RootElement.GetProperty("panel").EnumerateArray()) {
+  long id=panel.GetProperty("symbol_id").GetInt64();
+  if(panel.GetProperty("terms").ValueKind==JsonValueKind.Null) {
+   components.Add(new {symbol_id=id,status="COST_UNRESOLVED"});continue;
+  }
+  var terms=JsonSerializer.Deserialize<MxmCommissionTerms>(panel.GetProperty("terms"))!;
+  if(!MxmInstrumentCommission.Valid(terms) || terms.SymbolId!=id)throw new ArgumentException("PUBLIC_MARGIN_TERMS_IDENTITY");
+  decimal? declaredBase=terms.Kind is 2 or 4?(decimal)terms.MinimumVolume/terms.LotSize*terms.Rate:null;
+  string? baseAsset=terms.Kind==2?"USD":terms.Kind==4?terms.QuoteAsset:null;
+  var floor=MxmCommissionFloorCalculator.Compute(terms,new Dictionary<string,decimal>());
+  components.Add(new {symbol_id=id,status="DECLARED_COMPONENTS_NOT_ACTUAL_CHARGES",declared_base_per_fill=declaredBase,
+   declared_base_asset=baseAsset,declared_minimum_per_fill=terms.Minimum,declared_minimum_asset=terms.MinimumAsset,
+   no_fx_no_price_floor=floor,source_authenticated_in_program=false,full_entry_admission=false,total_trading_cost_proven=false});
+ }
+ File.WriteAllText(args[2],JsonSerializer.Serialize(components)+"\n");return;
+}
 if(args.Length!=2)throw new ArgumentException("CURRENT_MARGIN_EXACT_ARGUMENTS");
 using var doc=JsonDocument.Parse(File.ReadAllBytes(args[0]));var result=new List<object>();
 foreach(var i in doc.RootElement.EnumerateArray()) {
