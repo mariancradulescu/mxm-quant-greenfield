@@ -14,7 +14,7 @@ def adapter():
     need('requireExisting:recoveryInspection==MxmEntryRecoveryInspection.Recoverable' in start,'NO_RECREATED_LOST_LEDGER')
     need('RecoveryBook(),PendingOrders.Count,BrokerClock()' in start and 'ExecuteMarketOrder' not in start,'STARTUP_READS_BOOK_ONLY')
     need(apply.index('entryCheckpoint.PrepareRecoverable(')<apply.index('MxmAccountIsolation.Check(')<
-         apply.index('MxmCapitalAdmission.Check(')<apply.rindex('fence.IsCurrent(')<
+         apply.index('MxmCapitalAdmission.Check(')<apply.rindex('fence.IsCurrentWithinBar(')<
          apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('brokerAttempted=true')<apply.index('ExecuteMarketOrder('),
          'CORRELATION_DURABLE_BEFORE_FRESH_RISK_AND_ONE_CALL')
     need('ExecuteMarketOrder(direction,instrumentName,units,Label,stopPips,null,requestComment)' in apply and
