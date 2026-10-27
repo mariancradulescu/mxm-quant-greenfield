@@ -218,17 +218,18 @@ def evaluate():
  need(all(actual[k]==v for k,v in expected.items()) and actual['input_sha256']==source['input_sha256'],'FINANCING_EVERY_DECISION_EPISODE_CENSOR_PARITY')
  result,gates=verdict(expected);out=ROOT/OUT;out.mkdir(exist_ok=True,parents=True)
  binary=ROOT/'research_core_v4/laboratory/csharp/financing_carry/bin/Release/net8.0/MxmFinancingCarry.dll';need(bytes_digest(binary.read_bytes())==actual['evaluator_sha256'],'FINANCING_ACTUAL_BINARY')
- private={'source':source,'actual_csharp':actual,'disposition':result,'gates':gates};raw=encoded(private)
+ observability={'swap_pair_fields_explicit_any':any('swapLong' in x['full'] and 'swapShort' in x['full'] for x in rows['rows']),'swap_type_explicit_any':any('swapCalculationType' in x['full'] for x in rows['rows']),'complete_calendar_explicit_any':any(all(k in x['full'] for k in ('swapPeriod','swapTime','swapRollover3Days','skipSWAPPeriods','chargeSwapAtWeekends')) for x in rows['rows']),'account_type_explicit':rows['account_type'] is not None,'swap_free_flag_explicit':rows['swap_free'] is not None,'account_standard_carry_basis':rows['account_type']==0 and rows['swap_free'] is False}
+ private={'source':source,'actual_csharp':actual,'disposition':result,'gates':gates,'source_observability':observability};raw=encoded(private)
  public=ROOT/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem';need(public_spki_sha256(public)==FP,'FINANCING_RECIPIENT')
  encrypt_shard(gzip.compress(raw,mtime=0),public_key=public,output=out/'result.mxmenc');(out/'evaluator.dll').write_bytes(binary.read_bytes())
  receipt={'schema':'mxm.financing-carry-development-public.v1',**source['identity'],'source_rows':len(rows['rows']),'capture_job':source['capture_job'],'source_cipher_sha256':source['source_cipher_sha256'],'contact_start_utc':source['contact_start_utc'],'contact_end_utc':source['contact_end_utc'],'disposition':result,'gates':gates,
- 'model_trials':1,'new_hypotheses':1,'all_universe_financing_rows_independently_reconciled':True,'result_private_sha256':bytes_digest(raw),'result_cipher_sha256':bytes_digest((out/'result.mxmenc').read_bytes()),'evaluator_sha256':actual['evaluator_sha256'],
+ 'source_observability':observability,'model_trials':1,'new_hypotheses':1,'all_universe_financing_rows_independently_reconciled':True,'result_private_sha256':bytes_digest(raw),'result_cipher_sha256':bytes_digest((out/'result.mxmenc').read_bytes()),'evaluator_sha256':actual['evaluator_sha256'],
  'capital_replay':False,'net_edge_proven':False,'hard21_proven':False,'broker_fills_proven':False,'native_robot_operational_reception_proven':False,'costs_defaulted_to_zero':False,'orders':0,'new_broker_contacts_in_evaluation':0,'next_action':'STOP_FIXED_IDENTITY_NO_RETUNE_OR_AUTOMATIC_FOLLOWUP'}
  (out/'receipt.json').write_bytes(encoded(receipt)+b'\n');print('MXM_FINANCING_ECONOMIC '+encoded(receipt).decode(),flush=True)
 def cold():
  admit(native=True,keyrole='custody')
  main=ROOT.parent;out=main/OUT;r=json.loads((out/'receipt.json').read_bytes());p,h=decrypt(out/'result.mxmenc')
- need(h==r['result_private_sha256'] and bytes_digest((out/'result.mxmenc').read_bytes())==r['result_cipher_sha256'] and p['source']['identity']['source_sha']==os.environ['GITHUB_SHA'] and p['disposition']==r['disposition'] and p['gates']==r['gates'] and bytes_digest((out/'evaluator.dll').read_bytes())==r['evaluator_sha256'],'FINANCING_SEPARATE_RESULT_READBACK')
+ need(h==r['result_private_sha256'] and bytes_digest((out/'result.mxmenc').read_bytes())==r['result_cipher_sha256'] and p['source']['identity']['source_sha']==os.environ['GITHUB_SHA'] and p['disposition']==r['disposition'] and p['gates']==r['gates'] and p['source_observability']==r['source_observability'] and bytes_digest((out/'evaluator.dll').read_bytes())==r['evaluator_sha256'],'FINANCING_SEPARATE_RESULT_READBACK')
  c={'schema':'mxm.financing-carry-cold.v1','source_sha':os.environ['GITHUB_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),'result_cipher_sha256':r['result_cipher_sha256'],'disposition':r['disposition'],'separate_custody_process_readback':True,'algorithm_reexecuted':False,'orders':0}
  (out/'cold.json').write_bytes(encoded(c)+b'\n');print('MXM_FINANCING_COLD '+encoded(c).decode(),flush=True)
 if __name__=='__main__':
