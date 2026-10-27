@@ -1,0 +1,80 @@
+{
+  "name": "MXM existing contemporary minimum-volume margin evidence",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-current-margin-reception.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "current-margin": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 12,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".margin-native",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit exact one-shot existing evidence scope before custody",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.current_margin_reception admit"
+        },
+        {
+          "name": "Compile shared margin and cost decoders and verify artificial boundaries without keys",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/current_margin/MxmCurrentMargin.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_current_margin_evidence research_core_v4.laboratory.test_current_margin_reception -v\npython3 -m research_core_v4.laboratory.durable_spot_observation --out \"${RUNNER_TEMP}/mxm-current-margin/original\"\ncp research_core_v4/laboratory/current_margin_reception.py research_core_v4/laboratory/current_margin_evidence.py research_core_v4/laboratory/universe_commission_checks.py research_core_v4/laboratory/durable_spot_observation.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py .margin-native/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Authenticate original source and export only existing metadata and margin responses",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .margin-native\npython3 -m research_core_v4.laboratory.current_margin_reception export \"${RUNNER_TEMP}/mxm-current-margin/original/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-current-margin/input.json\""
+        },
+        {
+          "name": "Reconcile every contemporary estimate CSharp Decimal and independent Python",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.current_margin_reception finalize \"${RUNNER_TEMP}/mxm-current-margin\""
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "current-margin-${{ github.run_id }}",
+            "path": "verification/current-margin/receipt.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
