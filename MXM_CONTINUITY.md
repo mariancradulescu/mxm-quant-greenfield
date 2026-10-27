@@ -1,3 +1,13 @@
+# 27 octombrie2026 — control de preț pentru cost și o ipoteză economică distinctă preregistrată
+
+Continuare LIVEea5db2b1ee28861947410a3bc10ec4aff1ae1e85/PR218–219, fără lucrări ulterioare pe ramura oficială. [Operațiunea integrată](docs/economic-development/20261027/SPREAD_REVERSION_PROSPECTIVE_V1.md) completează lease-ul nativ al costurilor dependente de PREȚUL ticketului, inclusiv când nu este necesar FX; același validator de book/epocă/vârstă și același control final după risc. Lot-fee/zero nu cer artificial un preț nou. Controalele de cont/OWNER/recuperare și ceasul simulat sunt păstrate; CI compilat/cTrader obligatoriu.
+
+Un singur trial nou DEVELOPMENT dependent: revenire după lărgire unilaterală a spreadului GBPUSD, pe întregul original W37 existent40179011821, cu250ms delay/1000ms hold/3000ms holdoff fixe. Spec169a1dce04bc7fa1fe3f0fc37aa7378566d08da9ec4d6817cc6d4d66df3e7eed și implementări hash-înghețate înaintea inputului. Reutilizează cursorul atomic original și referința independentă; nu reia modelele închise, V2/C033 ori diagnosticul1140mesaje și nu colectează broker. Doar headroom USD după spread, înainte de costuri necunoscute; NU comisioane0, net, cont200nou sau HARD21. Fiecare caz nerezolvat rămâne explicit și blochează calificarea conform regulii fixe.
+
+Recepție nativă economică PENDING la instalare; buget1ipoteză/1model/1attempt, fără retuning/followupautomat/confirmation. Toate cifrele economice criptate, original C# output și DLL conservate, readback separat în custodia existentă. Autoritățile, capitalul continuu200EUR și criteriile istorice rămân intacte. Zero ordine/Cloud/resetări/brokerrequests noi. B–E OPEN; edgeNET/HARD21/recepție Robot necalificate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie2026 — FX de cost integrat; recepție autentică completă și rezultat criptat conservat
 
 PR218/e923f37efc2df64b82bd15c26fb60ffe44b9b64f integrat cu toate5CI SUCCESS din prima;13teste noi executate fărăskip și cTrader.algo compilat. Comisionul nativ folosește graph metadata explicit, ASK/inversBID pentru debit, traseu unic minim ales înaintea prețurilor, ceasuri de observație și lease final verificat după risc. Nu folosește conversie opacă sau fallbackfavorabil/stale.

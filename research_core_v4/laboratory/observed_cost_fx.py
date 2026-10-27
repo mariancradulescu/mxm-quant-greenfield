@@ -52,6 +52,11 @@ def fixture_reference(data):
         for a in data['actions']:
             op=a['op'];t=a['now']
             if op=='observe':update(books[a['source']],a['bid'],a['ask'],t)
+            elif op=='age':
+                try:
+                    info=rate([dict(Source=a['source'],BaseAsset='A',QuoteAsset='B')],books,'A','B',t)
+                    out.append(dict(status='LEASE',age=info['MaximumSideAgeMs']))
+                except FxHold as ex:out.append(dict(status='HOLD',reason=str(ex)))
             elif op=='clock':
                 from datetime import datetime,timezone
                 if not a['simulation']:

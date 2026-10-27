@@ -29,6 +29,13 @@ class CostFxCompiled(unittest.TestCase):
           dict(op='clock',simulation=True,now=1,utc='1960-10-27T00:00:00Z'),
           dict(op='clock',simulation=False,now=-1,utc='2026-10-27T00:00:00Z')])
         self.assertTrue(all(x['status']=='HOLD' for x in r))
+    def test_price_observation_lease_has_its_own_age_without_any_foreign_exchange(self):
+        r=self.check([instrument('ticket','A','B')],[obs('ticket',0,100,101),
+          dict(op='age',source='ticket',now=5000),dict(op='age',source='ticket',now=5001),
+          obs('ticket',5002,100,None),dict(op='age',source='ticket',now=5002),
+          obs('ticket',5003,None,101),dict(op='age',source='ticket',now=5003)])
+        self.assertEqual([x['status'] for x in r],['LEASE','HOLD','HOLD','LEASE'])
+        self.assertEqual(r[-1]['age'],1)
     def test_epoch_reset_has_no_inherited_quote(self):
         self.check([instrument('x','EUR','USD')],[obs('x',1,1,1.1),dict(op='end',source='x',now=2),rate('USD','EUR',2),dict(op='begin',source='x',now=3),obs('x',4,1,None),rate('USD','EUR',4),obs('x',5,None,1.1),rate('USD','EUR',5)])
     def test_metadata_shortest_route_selected_before_health_and_no_stale_longer_fallback(self):
@@ -54,6 +61,11 @@ class NativeWiring(unittest.TestCase):
         b=n.ROOT/'research_core_v4/native_tick_replay_v1/csharp';s=(b/'MxmReferenceProductBot.cs').read_text()
         self.assertIn('MxmObservedCostFx.ObservationClock(IsBacktesting,Environment.TickCount64,IsBacktesting?BrokerClock():default)',s)
         self.assertNotIn('long now=Environment.TickCount64',s)
+        fee=s[s.index('MxmNativeCommissionEstimate CurrentNativeCommission'):s.index('string? ReadEntryCheckpoint')]
+        self.assertIn('if((kind==0 || kind==2) && terms.Commission>0m)',fee)
+        self.assertIn('MxmObservedCostFx.RequireObservedBookAge(observed,instrument.Name,now)',fee)
+        self.assertIn('RetainCostObservationLease(now,age)',fee)
+        self.assertIn('NATIVE_FEE_TICKET_BOOK_CHANGED',fee)
         self.assertNotIn('AssetConverter.Convert(',s);self.assertIn('costFx.CostRate(from,to,now',s)
         self.assertIn('conversionNames.Contains(x.Name,StringComparer.OrdinalIgnoreCase)',s)
         self.assertIn('public string CostConversionSymbols',s);self.assertIn('MxmObservedCostFx.cs',(b/'MxmReferenceBot.csproj').read_text())

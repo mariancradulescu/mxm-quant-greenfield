@@ -671,19 +671,21 @@ public sealed class MxmReferenceProductBot : Robot {
  // Explicit metadata paths and locally observed callback books only. Costs
  // use ASK / inverse BID, never an unspecified credit/midpoint conversion.
  // Missing source or >5s receipt age means no estimate, not no liquidity.
+ MxmObservedFxBook? ReadObservedCostBook(string source,long now) {
+  if(!bookObservations.TryGetValue(source,out var state))return null;
+  var book=state.ReadBook(now);
+  decimal? Price(double? value)=>!value.HasValue || !double.IsFinite(value.Value)?null:checked((decimal)value.Value);
+  return new MxmObservedFxBook(source,Price(book.Bid),Price(book.Ask),book.Observation);
+ }
+ void RetainCostObservationLease(long now,long maximumAge) {
+  long expires=checked(now+MxmObservedCostFx.MaximumSideAgeMs-maximumAge);
+  costFxEstimateValidUntilMs=costFxEstimateValidUntilMs.HasValue?Math.Min(costFxEstimateValidUntilMs.Value,expires):expires;
+ }
  decimal CostRate(string from,string to) {
   if(costFx==null)throw new ArgumentException("NATIVE_COST_FX_NOT_INITIALIZED");
   long now=ObservationClockMs();
-  var estimate=costFx.CostRate(from,to,now,source=> {
-   if(!bookObservations.TryGetValue(source,out var state))return null;
-   var book=state.ReadBook(now);
-   decimal? Price(double? value)=>!value.HasValue || !double.IsFinite(value.Value)?null:checked((decimal)value.Value);
-   return new MxmObservedFxBook(source,Price(book.Bid),Price(book.Ask),book.Observation);
-  });
-  if(estimate.Path.Length>0) {
-   long expires=checked(now+MxmObservedCostFx.MaximumSideAgeMs-estimate.MaximumSideAgeMs);
-   costFxEstimateValidUntilMs=costFxEstimateValidUntilMs.HasValue?Math.Min(costFxEstimateValidUntilMs.Value,expires):expires;
-  }
+  var estimate=costFx.CostRate(from,to,now,source=>ReadObservedCostBook(source,now));
+  if(estimate.Path.Length>0)RetainCostObservationLease(now,estimate.MaximumSideAgeMs);
   return estimate.Rate;
  }
  MxmNativeCommissionEstimate CurrentNativeCommission(Symbol instrument,
@@ -709,6 +711,16 @@ public sealed class MxmReferenceProductBot : Robot {
   var terms=new MxmNativeCommissionTerms(kind,minKind,quoteAsset,minimumAsset,
    checked((decimal)instrument.Commission),checked((decimal)instrument.MinCommission),
    (decimal)instrument.LotSize);
+  // Notional/percentage commission depends on the ticket PRICE as well as
+  // FX. Retain its observed price lease even when every asset is already EUR.
+  // Fixed-per-lot or explicitly zero rates do not invent a price dependency.
+  if((kind==0 || kind==2) && terms.Commission>0m) {
+   long now=ObservationClockMs();var observed=ReadObservedCostBook(instrument.Name,now);
+   long age=MxmObservedCostFx.RequireObservedBookAge(observed,instrument.Name,now);
+   if(observed!.Bid!=checked((decimal)bid) || observed.Ask!=checked((decimal)ask))
+    throw new ArgumentException("NATIVE_FEE_TICKET_BOOK_CHANGED");
+   RetainCostObservationLease(now,age);
+  }
   decimal qUsd=kind==0 && terms.Commission>0m?CostRate(quoteAsset,"USD"):0m;
   decimal usdEur=(kind==0 || kind==1) && terms.Commission>0m?CostRate("USD","EUR"):0m;
   decimal qEur=((kind==2 || kind==3) && terms.Commission>0m ||
