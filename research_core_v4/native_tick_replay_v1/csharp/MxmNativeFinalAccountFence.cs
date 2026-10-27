@@ -3,12 +3,12 @@ namespace Mxm.Replay {
 /// <summary>
 /// Last estimated account snapshot immediately before a potential broker order.
 /// Conservative monotonic revalidation: after initial admission, equity/free
-/// margin cannot have fallen, nor ticket margin/stop exposure increased.
+/// margin cannot have fallen, nor ticket margin/new OR existing stop exposure increased.
 /// Position/price/stop book identity is checked separately by the Robot.
 /// Neither snapshot is atomic, nor a guarantee of broker fills/risk.
 /// </summary>
 public sealed record MxmNativeEntrySnapshot(decimal EquityEur,decimal FreeMarginEur,
- decimal TicketMarginEur,decimal ProposedStopRiskEur);
+ decimal TicketMarginEur,decimal ProposedStopRiskEur,decimal ExistingStopRiskEur);
 public static class MxmNativeFinalAccountFence {
  public const string Admit="FINAL_NATIVE_ACCOUNT_SNAPSHOT_ESTIMATE_ONLY";
  public static string Check(MxmNativeEntrySnapshot initial,MxmNativeEntrySnapshot final) {
@@ -16,7 +16,8 @@ public static class MxmNativeFinalAccountFence {
     initial.FreeMarginEur<=0m || final.FreeMarginEur<=0m ||
     initial.FreeMarginEur>initial.EquityEur || final.FreeMarginEur>final.EquityEur ||
     initial.TicketMarginEur<=0m || final.TicketMarginEur<=0m ||
-    initial.ProposedStopRiskEur<=0m || final.ProposedStopRiskEur<=0m)
+    initial.ProposedStopRiskEur<=0m || final.ProposedStopRiskEur<=0m ||
+    initial.ExistingStopRiskEur<0m || final.ExistingStopRiskEur<0m)
    return "REJECT_INVALID_OR_UNVERIFIED_FINAL_ACCOUNT_SNAPSHOT";
   if(final.EquityEur<initial.EquityEur)
    return "REJECT_ACCOUNT_EQUITY_DECLINED_BEFORE_ORDER";
@@ -26,6 +27,8 @@ public static class MxmNativeFinalAccountFence {
    return "REJECT_TICKET_MARGIN_INCREASED_BEFORE_ORDER";
   if(final.ProposedStopRiskEur>initial.ProposedStopRiskEur)
    return "REJECT_PROPOSED_STOP_RISK_INCREASED_BEFORE_ORDER";
+  if(final.ExistingStopRiskEur>initial.ExistingStopRiskEur)
+   return "REJECT_EXISTING_STOP_RISK_INCREASED_BEFORE_ORDER";
   return Admit;
  }
 }
