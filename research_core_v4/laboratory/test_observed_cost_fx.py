@@ -19,6 +19,16 @@ class CostFxCompiled(unittest.TestCase):
     def test_same_value_observation_age_is_not_last_change_and_silence_holds(self):
         r=self.check([instrument('x','EUR','USD')],[obs('x',0,1,1.1),rate('USD','EUR',5000),rate('USD','EUR',5001),obs('x',5002,1,None),rate('USD','EUR',5002),obs('x',5003,None,1.1),rate('USD','EUR',5003)])
         self.assertEqual([x['status'] for x in r],['ESTIMATE','HOLD','HOLD','ESTIMATE'])
+    def test_backtest_clock_uses_simulated_time_independent_of_process_speed(self):
+        r=self.check([], [dict(op='clock',simulation=True,now=1,utc='2026-10-27T00:00:00Z'),
+          dict(op='clock',simulation=True,now=2,utc='2026-10-27T00:01:00Z'),
+          dict(op='clock',simulation=False,now=3,utc='2026-10-27T00:01:00Z')])
+        self.assertEqual(r[1]['value']-r[0]['value'],60000);self.assertEqual(r[2]['value'],3)
+    def test_clock_domain_invalid_inputs_do_not_default_to_wall_or_unity(self):
+        r=self.check([], [dict(op='clock',simulation=True,now=1,utc='2026-10-27T00:00:00'),
+          dict(op='clock',simulation=True,now=1,utc='1960-10-27T00:00:00Z'),
+          dict(op='clock',simulation=False,now=-1,utc='2026-10-27T00:00:00Z')])
+        self.assertTrue(all(x['status']=='HOLD' for x in r))
     def test_epoch_reset_has_no_inherited_quote(self):
         self.check([instrument('x','EUR','USD')],[obs('x',1,1,1.1),dict(op='end',source='x',now=2),rate('USD','EUR',2),dict(op='begin',source='x',now=3),obs('x',4,1,None),rate('USD','EUR',4),obs('x',5,None,1.1),rate('USD','EUR',5)])
     def test_metadata_shortest_route_selected_before_health_and_no_stale_longer_fallback(self):
@@ -42,7 +52,10 @@ class CostFxCompiled(unittest.TestCase):
 class NativeWiring(unittest.TestCase):
     def test_actual_native_uses_shared_observed_cost_graph_and_separate_conversion_roster(self):
         b=n.ROOT/'research_core_v4/native_tick_replay_v1/csharp';s=(b/'MxmReferenceProductBot.cs').read_text()
+        self.assertIn('MxmObservedCostFx.ObservationClock(IsBacktesting,Environment.TickCount64,IsBacktesting?BrokerClock():default)',s)
+        self.assertNotIn('long now=Environment.TickCount64',s)
         self.assertNotIn('AssetConverter.Convert(',s);self.assertIn('costFx.CostRate(from,to,now',s)
+        self.assertIn('conversionNames.Contains(x.Name,StringComparer.OrdinalIgnoreCase)',s)
         self.assertIn('public string CostConversionSymbols',s);self.assertIn('MxmObservedCostFx.cs',(b/'MxmReferenceBot.csproj').read_text())
         tick=s[s.index('void OnPortfolioTick'):s.index('void ApplyPortfolioDecision')]
         self.assertLess(tick.index('.Observe(args.Bid,args.Ask'),tick.index('causalIntents.TryGetValue'))

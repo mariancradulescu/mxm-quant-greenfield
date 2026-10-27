@@ -95,7 +95,8 @@ class Wiring(unittest.TestCase):
         b=ROOT/'research_core_v4/native_tick_replay_v1/csharp';s=(b/'MxmReferenceProductBot.cs').read_text()
         self.assertIn('MxmBookObservations.NativeSnapshots()',s)
         tick=s[s.index('void OnPortfolioTick'):s.index('void ApplyPortfolioDecision')]
-        self.assertIn('DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),null)',tick)
+        self.assertIn('ObservationUtcMs(),null)',tick)
+        self.assertIn('IsBacktesting?new DateTimeOffset(BrokerClock()).ToUnixTimeMilliseconds():DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()',s)
         self.assertNotIn('ReportTransport(',s)
         self.assertLess(tick.index('.Observe(args.Bid,args.Ask'),tick.index('queue.TryConsume'))
         self.assertIn('MxmBookShape.NonCrossed(MxmBookShape.ClassifyNative(args.Bid,args.Ask))',tick)
