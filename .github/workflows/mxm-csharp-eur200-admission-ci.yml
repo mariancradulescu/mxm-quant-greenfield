@@ -143,9 +143,9 @@ jobs:
           ticks=bot[bot.index('void OnPortfolioTick'):bot.index('void ApplyPortfolioDecision')]
           assert ticks.index('fence.Observe(')<ticks.index('fence.Capture()')<ticks.index('queue.TryConsume(')
           apply=bot[bot.index('void ApplyPortfolioDecision'):]
-          assert apply.count('fence.IsCurrent(')==2
+          assert apply.count('fence.IsCurrent(')==1 and apply.count('fence.IsCurrentWithinBar(')==2
           assert apply.index('fence.BeginReversal(')<apply.index('var result=ClosePosition(current)')<apply.index('fence.FinishReversal(')
-          assert apply.rindex('fence.IsCurrent(')<apply.index('ExecuteMarketOrder(')
+          assert apply.rindex('fence.IsCurrentWithinBar(')<apply.index('entryCheckpoint.MarkSubmitted()')<apply.index('ExecuteMarketOrder(')
           assert 'result.Position?.Id' in apply and 'lease=continuation!' in apply
           bars=bot[bot.index('void OnPortfolioBarClosed'):bot.index('void OnPortfolioTick')]
           assert bars.index('fence.Observe(')<bars.index('.Publish(')<bars.index('fence.CanPublish(')
