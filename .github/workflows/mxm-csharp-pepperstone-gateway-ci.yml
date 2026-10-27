@@ -34,10 +34,15 @@ jobs:
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
           python3 -m unittest research_core_v4.laboratory.test_spot_observation_profile research_core_v4.laboratory.test_spot_observation_reception -v
+      - name: Verify exact original current-margin evidence without custody
+        run: |
+          python3 -m research_core_v4.laboratory.verify_current_margin_result
+          python3 -m unittest research_core_v4.laboratory.test_current_margin_result -v
       - name: Verify contemporary minimum-volume evidence without prices or secrets
         run: |
           dotnet build research_core_v4/laboratory/csharp/current_margin/MxmCurrentMargin.csproj -c Release
-          python3 -m unittest research_core_v4.laboratory.test_current_margin_evidence research_core_v4.laboratory.test_current_margin_reception -v
+          python3 -m unittest research_core_v4.laboratory.test_current_margin_evidence research_core_v4.laboratory.test_current_margin_reception research_core_v4.laboratory.test_current_margin_public_components -v
+          python3 -m research_core_v4.laboratory.current_margin_public_components
       - name: Compile actual native observation state and reconcile all artificial clocks independently
         run: |
           dotnet build research_core_v4/laboratory/csharp/book_observation/MxmBookObservation.csproj -c Release
