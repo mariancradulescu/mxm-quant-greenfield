@@ -1,0 +1,154 @@
+{
+  "name": "MXM one universe-wide current financing carry screen",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-financing-carry-development.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "capture": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "environment": "mxm-r3-pepperstone-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".financing-native",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit one frozen finite model and partition before keys",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.financing_carry_development admit"
+        },
+        {
+          "name": "Check independent artificial policy and exact native extension without keys",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/financing_carry/MxmFinancingCarry.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_financing_carry -v\npython3 -m research_core_v4.laboratory.financing_carry_development install"
+        },
+        {
+          "name": "One bounded VIEW metadata contact; no market subscriptions or orders",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "R3_CTRADER_CLIENT_ID": "${{ secrets.R3_CTRADER_CLIENT_ID }}",
+            "R3_CTRADER_CLIENT_SECRET": "${{ secrets.R3_CTRADER_CLIENT_SECRET }}",
+            "R3_CTRADER_ACCESS_TOKEN": "${{ secrets.R3_CTRADER_ACCESS_TOKEN }}"
+          },
+          "run": "umask 077\ncd .financing-native\npython3 -m research_core_v4.laboratory.financing_carry_development capture"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "financing-carry-source-${{ github.run_id }}",
+            "path": "verification/financing-carry/capture.mxmenc\nverification/financing-carry/producer.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1"
+    },
+    "evaluate": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".financing-native",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit one frozen finite model and partition before keys",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.financing_carry_development admit"
+        },
+        {
+          "name": "Check independent artificial policy and exact native extension without keys",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/financing_carry/MxmFinancingCarry.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_financing_carry -v\npython3 -m research_core_v4.laboratory.financing_carry_development install"
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "financing-carry-source-${{ github.run_id }}",
+            "path": "verification/financing-carry"
+          }
+        },
+        {
+          "name": "Authenticate every original wire event and export only in custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\ncd .financing-native\npython3 -m research_core_v4.laboratory.financing_carry_development export"
+        },
+        {
+          "name": "Execute one actual CSharp model; reconcile independent array reference and encrypt",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.financing_carry_development evaluate"
+        },
+        {
+          "name": "Read back original encrypted result in a separate custody process",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\ncd .financing-native\npython3 -m research_core_v4.laboratory.financing_carry_development cold"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "financing-carry-result-${{ github.run_id }}",
+            "path": "verification/financing-carry/receipt.json\nverification/financing-carry/result.mxmenc\nverification/financing-carry/evaluator.dll\nverification/financing-carry/cold.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "needs": "capture"
+    }
+  }
+}
