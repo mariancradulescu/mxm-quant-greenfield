@@ -20,6 +20,11 @@ public sealed class MxmReferenceProductBot : Robot {
  readonly Dictionary<string,Symbol> subscribedSymbols=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmCausalIntent> causalIntents=new(StringComparer.OrdinalIgnoreCase);
  readonly Dictionary<string,MxmBrokerIntentFence> brokerIntentFences=new(StringComparer.OrdinalIgnoreCase);
+ [Parameter("Cost Conversion Symbols (comma separated)",DefaultValue="")]
+ public string CostConversionSymbols {get;set;}="";
+ readonly Dictionary<string,Symbol> observedSymbols=new(StringComparer.OrdinalIgnoreCase);
+ MxmObservedCostFx? costFx;
+ long? costFxEstimateValidUntilMs;
  readonly Dictionary<string,MxmBookObservation<double>> bookObservations=new(StringComparer.OrdinalIgnoreCase);
  bool applyingDecision;
  readonly MxmOrderProtection orderProtection=new();
@@ -74,6 +79,24 @@ public sealed class MxmReferenceProductBot : Robot {
      names.Distinct(StringComparer.OrdinalIgnoreCase).Count()!=names.Length) {
    Print("MXM_PORTFOLIO_ROSTER_INVALID_OR_EMPTY_SAFE_HOLD");Stop();return;
   }
+  var conversionNames=CostConversionSymbols.Split(',').Select(x=>x.Trim()).Where(x=>x.Length>0).ToArray();
+  if(conversionNames.Length>16 || conversionNames.Distinct(StringComparer.OrdinalIgnoreCase).Count()!=conversionNames.Length) {
+   Print("MXM_COST_CONVERSION_ROSTER_INVALID_SAFE_STOP");Stop();return;
+  }
+  // Resolve every declared observation source before storage or subscriptions.
+  foreach(var name in names.Concat(conversionNames).Distinct(StringComparer.OrdinalIgnoreCase)) {
+   var source=Symbols.GetSymbol(name);
+   bool conversionOnly=conversionNames.Contains(name,StringComparer.OrdinalIgnoreCase);
+   if(source==null || !string.Equals(source.Name,name,StringComparison.OrdinalIgnoreCase) ||
+      conversionOnly && (string.IsNullOrWhiteSpace(source.BaseAsset?.Name) ||
+       string.IsNullOrWhiteSpace(source.QuoteAsset?.Name) || source.BaseAsset.Name==source.QuoteAsset.Name)) {
+    Print("MXM_COST_SOURCE_METADATA_UNVERIFIED_SAFE_STOP");Stop();return;
+   }
+   observedSymbols.Add(source.Name,source);
+  }
+  costFx=new MxmObservedCostFx(observedSymbols.Values
+   .Where(x=>!string.IsNullOrWhiteSpace(x.BaseAsset?.Name) && !string.IsNullOrWhiteSpace(x.QuoteAsset?.Name) && x.BaseAsset.Name!=x.QuoteAsset.Name)
+   .Select(x=>new MxmFxInstrument(x.Name,x.BaseAsset.Name,x.QuoteAsset.Name)));
   // A portfolio that excludes an existing MXM-labelled position cannot safely
   // claim to orchestrate the complete account, including on cold restart.
   foreach(var position in Positions.FindAll(Label)) {
@@ -132,9 +155,6 @@ public sealed class MxmReferenceProductBot : Robot {
    subscribedBars.Add(name,series);
    portfolioKernels.Add(name,new MxmDecisionSource(new MxmDecisionKernel(mode),onlineAr1));
    subscribedSymbols.Add(name,Symbols.GetSymbol(name));
-   var observation=MxmBookObservations.NativeSnapshots();
-   observation.BeginEpoch(Environment.TickCount64);
-   bookObservations.Add(name,observation);
    causalIntents.Add(name,new MxmCausalIntent());
   }
   // Seed from the actual recovered broker book; cold start has no intent.
@@ -153,9 +173,13 @@ public sealed class MxmReferenceProductBot : Robot {
    brokerIntentFences.Add(name,new MxmBrokerIntentFence(causalIntents[name],BarMinutes,
     recovered.Length==0?null:recovered[0].Id));
   }
+  foreach(var name in observedSymbols.Keys) {
+   var observation=MxmBookObservations.NativeSnapshots();
+   observation.BeginEpoch(Environment.TickCount64);bookObservations.Add(name,observation);
+  }
   Positions.Closed+=OnBrokerPositionClosed;
   foreach(var series in subscribedBars.Values)series.BarClosed+=OnPortfolioBarClosed;
-  foreach(var instrument in subscribedSymbols.Values)instrument.Tick+=OnPortfolioTick;
+  foreach(var instrument in observedSymbols.Values)instrument.Tick+=OnPortfolioTick;
   Print("MXM_SINGLE_ROBOT_PORTFOLIO_BARS_READY_NO_INTERINSTANCE_MUTEX_"+resolved.Count);
  }
  // Deliberately no legacy per-chart order path. All symbols, including chart
@@ -185,7 +209,7 @@ public sealed class MxmReferenceProductBot : Robot {
   Positions.Closed-=OnBrokerPositionClosed;
   foreach(var fence in brokerIntentFences.Values)fence.Reset();
   foreach(var series in subscribedBars.Values)series.BarClosed-=OnPortfolioBarClosed;
-  foreach(var instrument in subscribedSymbols.Values)instrument.Tick-=OnPortfolioTick;
+  foreach(var instrument in observedSymbols.Values)instrument.Tick-=OnPortfolioTick;
   foreach(var intent in causalIntents.Values)intent.Clear();
   foreach(var observation in bookObservations.Values) {
    try {
@@ -243,7 +267,6 @@ public sealed class MxmReferenceProductBot : Robot {
  }
  void OnPortfolioTick(SymbolTickEventArgs args) {
   if(orderProtection.Halted)return;
-  if(!causalIntents.TryGetValue(args.SymbolName,out var queue))return;
   bool acquired=false;
   try {
    var quoteUtc=DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
@@ -252,6 +275,9 @@ public sealed class MxmReferenceProductBot : Robot {
    // for the absent source stamp; local receipt and change clocks stay distinct.
    bookObservations[args.SymbolName].Observe(args.Bid,args.Ask,Environment.TickCount64,
     DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),null);
+   // Conversion-only callbacks refresh source state without a strategy kernel,
+   // bars, consumed intent, account operation or HARD21 entry.
+   if(!causalIntents.TryGetValue(args.SymbolName,out var queue))return;
    // Geometry only. Preserve the original native noncrossed rule (including
    // locked books); source-quality consumers separately require positive spread.
    if(!MxmBookShape.NonCrossed(MxmBookShape.ClassifyNative(args.Bid,args.Ask)))return;
@@ -425,8 +451,12 @@ public sealed class MxmReferenceProductBot : Robot {
   // A slow durable/risk path can outlive a cost-FX snapshot. Reprice the
   // advertised symbol and conversion just before submission; any increased
   // fee would invalidate the earlier cash reserve and is never silently used.
+  long? finalCostFxExpires=null;
+  long finalCostFxCheckedAt=0;
   try {
    var latestFee=CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk);
+   finalCostFxExpires=costFxEstimateValidUntilMs;
+   finalCostFxCheckedAt=Environment.TickCount64;
    if(!MxmNativeCommission.StillCovered(nativeFee,latestFee)) {
     Print("MXM_NATIVE_FEE_INCREASED_BEFORE_ORDER_HOLD");return;
    }
@@ -464,6 +494,10 @@ public sealed class MxmReferenceProductBot : Robot {
   if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
   // A successful earlier check does not extend the consumed bar's lifetime.
   // No further price/fee/risk calculations or durable IO follow this sample.
+  long fxSubmissionClock=Environment.TickCount64;
+  if(finalCostFxExpires.HasValue && (fxSubmissionClock<finalCostFxCheckedAt || fxSubmissionClock>finalCostFxExpires.Value)) {
+   Print("MXM_FINAL_COST_FX_OBSERVATION_LEASE_EXPIRED_HOLD");return;
+  }
   var submissionClock=BrokerClock();
   if(!fence.IsCurrentWithinBar(lease,BrokerPositionId(instrumentName),currentOpenTime,submissionClock)) {
    Print("MXM_FINAL_SUBMISSION_LEASE_CHANGED_OR_BAR_EXPIRED_HOLD");return;
@@ -628,18 +662,27 @@ public sealed class MxmReferenceProductBot : Robot {
    return 0d;
   }
  }
- // Never infer asset names from ticker substrings or hardcode EURUSD.
+ // Explicit metadata paths and locally observed callback books only. Costs
+ // use ASK / inverse BID, never an unspecified credit/midpoint conversion.
+ // Missing source or >5s receipt age means no estimate, not no liquidity.
  decimal CostRate(string from,string to) {
-  if(string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to))
-   throw new ArgumentException("NATIVE_COST_ASSET_MISSING");
-  if(from==to)return 1m;
-  double converted=AssetConverter.Convert(1d,from,to);
-  if(!double.IsFinite(converted)||converted<=0d)
-   throw new ArgumentException("NATIVE_COST_FX_UNAVAILABLE");
-  return checked((decimal)converted);
+  if(costFx==null)throw new ArgumentException("NATIVE_COST_FX_NOT_INITIALIZED");
+  long now=Environment.TickCount64;
+  var estimate=costFx.CostRate(from,to,now,source=> {
+   if(!bookObservations.TryGetValue(source,out var state))return null;
+   var book=state.ReadBook(now);
+   decimal? Price(double? value)=>!value.HasValue || !double.IsFinite(value.Value)?null:checked((decimal)value.Value);
+   return new MxmObservedFxBook(source,Price(book.Bid),Price(book.Ask),book.Observation);
+  });
+  if(estimate.Path.Length>0) {
+   long expires=checked(now+MxmObservedCostFx.MaximumSideAgeMs-estimate.MaximumSideAgeMs);
+   costFxEstimateValidUntilMs=costFxEstimateValidUntilMs.HasValue?Math.Min(costFxEstimateValidUntilMs.Value,expires):expires;
+  }
+  return estimate.Rate;
  }
  MxmNativeCommissionEstimate CurrentNativeCommission(Symbol instrument,
   double volume,double bid,double ask) {
+  costFxEstimateValidUntilMs=null;
   if(!double.IsFinite(volume)||!double.IsFinite(bid)||!double.IsFinite(ask) ||
     !double.IsFinite(instrument.Commission)||!double.IsFinite(instrument.MinCommission))
    throw new ArgumentException("NATIVE_FEE_UNVERIFIED_AMOUNT");

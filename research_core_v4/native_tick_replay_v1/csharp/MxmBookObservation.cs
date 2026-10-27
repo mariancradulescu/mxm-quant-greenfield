@@ -19,6 +19,7 @@ public sealed record MxmBookObservationView(long Epoch,bool SessionOpen,bool Fau
  public bool ExecutabilityProven=>false;
  public bool ContinuousObservationProven=>false;
 }
+public sealed record MxmBookObservationValues<T>(T? Bid,T? Ask,MxmBookObservationView Observation) where T:struct;
 public sealed class MxmBookObservation<T> where T:struct {
  readonly Func<T?,T?,MxmBookShapeKind> classify;
  readonly MxmObservationOrigin origin;
@@ -62,6 +63,7 @@ public sealed class MxmBookObservation<T> where T:struct {
    ask=askField;askObserved=now;askServer=serverMs;
   }
  }
+ public MxmBookObservationValues<T> ReadBook(long now)=>new(bid,ask,Snapshot(now));
  public MxmBookObservationView Snapshot(long now) {
   Clock(now);
   long? Age(long? stamp)=>stamp.HasValue?checked(now-stamp.Value):null;

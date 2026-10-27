@@ -1,3 +1,13 @@
+# 27 octombrie2026 — integrare FX de cost pe observații native, fără conversie opacă
+
+Continuare LIVE3859e9c164eccf0ad82814585fdd7636a2d1bbf3/PR215–217, fără lucrări ulterioare/parțiale pe ramura oficială. [Integrarea prospectivă](docs/economic-development/20261027/OBSERVED_COST_FX_INTEGRATION_V1.md) leagă comisionul nativ de book-urile observate și metadata BaseAsset/QuoteAsset; ASK/inversBID pentru debit, traseu unic minim de maximum3laturi ales înaintea prețurilor, fără fallback stale/favorabil sau FX implicit1. Roster separat de observație pentru conversii fără strategii/ordine, reutilizare dacă sursa este deja în portofoliu. Ceasul observației rămâne distinct de schimbare;5secunde este politică prospectivă de estimare, nu expirare a lichidității sau criteriu istoric modificat.
+
+Verificări compilate C#/Python și produs cTrader obligatorii înainte de integrare. O singură recepție finită reutilizează originalul1140evenimente+termeni, fără broker/model/răspuns direcțional; toate valorile derivate se reconciliază și se criptează către destinatarul existent, apoi se verifică într-un proces separat de custodie. Recepție nativă PENDING la instalare. Nu recalifică profilul strict, snapshotul inițial, locked books sau intervalul diagnostic exclus. Nu demonstrează sursă sincronizată, charge real, lossFX, riscstop, all-in costs sau edge.
+
+Autorități și capital continuu200EUR păstrate; zero broker requests/ordine/Cloud/resetări/model economic. B–E OPEN; HARD21/edgeNET/recepție operațională Robot necalificate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie 2026 — observație nativă integrată și marje minime autentice verificate
 
 PR215/6259adcf09c86a9b9e5a6b88e8f80999248d7283 și PR216/b87f2c0334efe7e559f515bdd599a73a58d814b0 integrate; toate5CI pentru fiecare SUCCESS din prima. Produsul C# separă ceasurile de eveniment/observație/schimbare și epoca locală, fără transport sau executabilitate deduse;8teste noi compilate/structurale și cTrader.algo verificate. Protocolul de marjă are12teste preventive executate, fără skips în CI.
