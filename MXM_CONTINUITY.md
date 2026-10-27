@@ -1,3 +1,15 @@
+# 27 octombrie 2026 — continuitate recuperată, C# extins și sursă GBPUSD evaluată autentic
+
+Mandatul B–E continuă conform [transferului OWNER](docs/mandates/MXM_CONTINUATION_B_E_20261027.md), fără restart. PR #207 integrat `bb10d63187d2f89c730ca1b0165287ece1220c91`: verificarea finală recalculează și compară estimările de risc ale pozițiilor existente; cinci CI SUCCESS, inclusiv compilarea pachetului cTrader și fixture C#. Estimarea API nu certifică FX proaspăt sau recepție operațională.
+
+PR #208 integrat `01ee51857fc3c98baba05893c9bd67b0b29eda5f`; [execuția autentică 40452507002](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40452507002), job122018256467 SUCCESS: arhiva GBPUSD W37 existentă, 1.275.114 evenimente, 812.355 grupuri, 685.704 valide, 126.651 indisponibile, **6 intervale observate de minimum cinci minute** la aceleași praguri ca EURUSD. Originalul ZIP public și receiptul sunt păstrate exact, cu verificator offline. [Rezultat și limite](docs/economic-development/20261027/GBPUSD_SOURCE_EXPOSURE_NATIVE_RESULT_V1.md). Nu sunt șase tranzacții, dovadă de lichiditate continuă sau avantaj economic. EURUSD W35–W37 și identitățile economice înghețate rămân neschimbate.
+
+Stare durabilă LIVE recitită: evidence `e49f08f360267d6fc4d128826590eb6bce051a58`, checkpoint29, pending=null, safe_stop=true. Observer40436786452: RETIRED_TECHNICAL_WORK_SAFE_HOLD_NO_DISPATCH. Active `07d1ddbe0b83753bbf189770af1911623fef8d6f` și OWNER1807 `a830c132521bd4348454653f713e04f6107484fe` nemodificate. Aceste valori actualizează interpretarea snapshoturilor istorice R2/checkpoint20 de mai jos; nu le restaurați ca stare curentă.
+
+Următoarea admitere cere politică prospectivă pentru întregul traseu al expunerii și dovezi datate pentru cost/FX/marjă. Prioritatea pentru surse suplimentare este proiectarea unui protocol finit de observații native spot cu ceasuri de recepție și termeni contemporani prin ruta VIEW existentă; nu este încă instalat și nu admite automat un model. Zero modele noi, rezultate economice, solicitări broker, ordine, Cloud, resetări de capital sau schimbări de autoritate. B–E OPEN; edge/HARD21/recepția operațională cTrader rămân necalificate. OWNER operations NONE.
+
+---
+
 # 26 octombrie2026 — oprirea recalculării automate a modelelor vechi; dovezi cost–cont păstrate
 
 Recuperat din6291d3eb87e7d567a54b7c2afbc307ccdcea3b70/PR194. Toate5CI finale SUCCESS.22verificări C#,3procese reci, capital200EUR o singură dată și Decimal pentru cash/fill/fees. Original ARTIFICIAL stdout4123bytesd267d89d… și receipt public de cost9d66509e… sunt păstrate exact/reformatat explicit în `docs/economic-development/20261026/commission-account-40342741128/`. Nu sunt date de cont real sau native Robot acceptance.999cazuri trec numai pragul de taxă,577nerezolvate fărăpreț; zero avantaj/HARD21 certificat.
