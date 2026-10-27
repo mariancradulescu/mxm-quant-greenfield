@@ -56,6 +56,34 @@ class CostFxCompiled(unittest.TestCase):
             t+=rng.choice([1,100,6000]);src=rng.choice(i)['Source'];bid=rng.randint(1,100000)/10000
             actions.append(obs(src,t,bid,bid+rng.randint(0,100)/10000));a,b=rng.sample(['A','B','C','D'],2);actions.append(rate(a,b,t))
         self.check(i,actions)
+    def test_reciprocal_remainder_below_decimal_resolution_is_still_rounded_up(self):
+        r=self.check([instrument('x','A','B')],[obs('x',0,'999999999999999999','999999999999999999'),rate('B','A',0)])
+        self.assertEqual(r[0]['estimate']['Rate'],n.D('2e-18'))
+    def test_composition_cannot_discard_sub_decimal_positive_remainder(self):
+        r=self.check([instrument('x','A','B'),instrument('y','B','C')],
+          [obs('x',0,'1e-18','1e-18'),obs('y',0,'1.000000000000000001','1.000000000000000001'),rate('A','C',0)])
+        self.assertEqual(r[0]['estimate']['Rate'],n.D('2e-18'))
+    def test_full_decimal_range_coarsens_only_upward_and_never_underflows(self):
+        maximum=str(2**96-1)
+        for bid in ('1e-28','1e-18','0.0000000001','0.7','3','1e28',maximum):
+            r=self.check([instrument('x','A','B')],[obs('x',0,bid,bid),rate('A','B',0),rate('B','A',0)])
+            for row,exact in zip(r,(n.Fraction(n.D(bid)),1/n.Fraction(n.D(bid)))):
+                self.assertGreaterEqual(n.Fraction(row['estimate']['Rate']),exact)
+                self.assertGreater(row['estimate']['Rate'],0)
+    def test_unrepresentable_composed_debit_rate_holds_without_wrapping_or_zero(self):
+        r=self.check([instrument('x','A','B'),instrument('y','B','C')],
+          [obs('x',0,'1e28','1e28'),obs('y',0,10,10),rate('A','C',0)])
+        self.assertEqual(r,[dict(status='HOLD',reason='FX_COST_RATE_OVERFLOW')])
+    def test_exact_rational_random_decimal_scale_paths(self):
+        rng=random.Random(224);inst=[instrument('x','A','B'),instrument('y','B','C')];actions=[]
+        for t in range(80):
+            for src in ('x','y'):
+                # Keep composition within range but exercise all28input scales.
+                coefficient=rng.randrange(1,10**12);places=rng.randrange(0,29)
+                price=str(n.D((0,tuple(map(int,str(coefficient))),-places)))
+                actions.append(obs(src,t,price,price))
+            actions.extend([rate('A','C',t),rate('C','A',t)])
+        self.check(inst,actions)
 class NativeWiring(unittest.TestCase):
     def test_actual_native_uses_shared_observed_cost_graph_and_separate_conversion_roster(self):
         b=n.ROOT/'research_core_v4/native_tick_replay_v1/csharp';s=(b/'MxmReferenceProductBot.cs').read_text()

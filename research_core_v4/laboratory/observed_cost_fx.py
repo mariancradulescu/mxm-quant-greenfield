@@ -2,6 +2,7 @@
 import json,subprocess,tempfile
 from collections import deque,Counter
 from decimal import Decimal as D,localcontext,ROUND_CEILING
+from fractions import Fraction
 from pathlib import Path
 from .common import need,encoded,bytes_digest
 from .universe_commission_checks import terms,fee
@@ -10,6 +11,15 @@ PROJECT='research_core_v4/laboratory/csharp/observed_cost_fx/MxmObservedCostFx.c
 AGE=5000
 class FxHold(ValueError):pass
 def ceil18(x):return x.quantize(D('1e-18'),rounding=ROUND_CEILING)
+def rational_ceiling(x):
+    """Independent rational oracle for upward rounding in CSharp decimal range."""
+    maximum=2**96-1
+    for places in range(18,-1,-1):
+        scaled=x*10**places
+        coefficient=-(-scaled.numerator//scaled.denominator)
+        if 0<coefficient<=maximum:
+            return D((0,tuple(map(int,str(coefficient))),-places))
+    raise FxHold('FX_COST_RATE_OVERFLOW')
 def route(instruments,source,target):
     if not source or not target:raise FxHold('FX_MISSING_ASSET')
     if source==target:return []
@@ -43,7 +53,8 @@ def rate(instruments,books,source,target,t):
         if not b or not b['open'] or bid is None or ask is None or bid<=0 or ask<bid or b['bt']>t or b['at']>t or t-b['bt']>AGE or t-b['at']>AGE:
             raise FxHold('FX_REQUIRED_BOOK_UNOBSERVED_INVALID_OR_TOO_OLD')
         max_age=max(max_age,t-b['bt'],t-b['at'])
-        value=ceil18(value*ceil18(1/bid if leg['Reverse'] else ask))
+        leg_value=Fraction(1)/Fraction(bid) if leg['Reverse'] else Fraction(ask)
+        value=rational_ceiling(Fraction(value)*Fraction(rational_ceiling(leg_value)))
     return dict(Rate=value,Path=path,MaximumSideAgeMs=max_age,Classification='OBSERVED_UPWARD_ROUNDED_COST_SIDE_ESTIMATE_NOT_BROKER_CHARGE',ExecutabilityProven=False,SourceTimestampCertified=False)
 def fixture_reference(data):
     books={i['Source']:empty() for i in data['instruments']};out=[]
