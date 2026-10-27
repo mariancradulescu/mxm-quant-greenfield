@@ -52,6 +52,16 @@ def fixture_reference(data):
         for a in data['actions']:
             op=a['op'];t=a['now']
             if op=='observe':update(books[a['source']],a['bid'],a['ask'],t)
+            elif op=='clock':
+                from datetime import datetime,timezone
+                if not a['simulation']:
+                    out.append(dict(status='CLOCK',value=t) if t>=0 else dict(status='HOLD',reason='FX_INVALID_PROCESS_CLOCK'))
+                elif not a['utc'].endswith('Z'):
+                    out.append(dict(status='HOLD',reason='FX_INVALID_SIMULATION_CLOCK'))
+                else:
+                    stamp=datetime.fromisoformat(a['utc'].replace('Z','+00:00'));delta=stamp-datetime(1970,1,1,tzinfo=timezone.utc)
+                    value=delta.days*86400000+delta.seconds*1000+delta.microseconds//1000
+                    out.append(dict(status='CLOCK',value=value) if value>=0 else dict(status='HOLD',reason='FX_INVALID_SIMULATION_CLOCK'))
             elif op in ('begin','end'):
                 b=empty();b['open']=op=='begin';books[a['source']]=b
             else:

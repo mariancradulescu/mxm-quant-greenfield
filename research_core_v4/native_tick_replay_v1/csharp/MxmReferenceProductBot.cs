@@ -94,7 +94,11 @@ public sealed class MxmReferenceProductBot : Robot {
    }
    observedSymbols.Add(source.Name,source);
   }
+  // A tradable instrument with two asset names is not automatically an
+  // authorized conversion quote. Eligibility requires the explicit cost roster,
+  // including when that same source is already subscribed for strategy bars.
   costFx=new MxmObservedCostFx(observedSymbols.Values
+   .Where(x=>conversionNames.Contains(x.Name,StringComparer.OrdinalIgnoreCase))
    .Where(x=>!string.IsNullOrWhiteSpace(x.BaseAsset?.Name) && !string.IsNullOrWhiteSpace(x.QuoteAsset?.Name) && x.BaseAsset.Name!=x.QuoteAsset.Name)
    .Select(x=>new MxmFxInstrument(x.Name,x.BaseAsset.Name,x.QuoteAsset.Name)));
   // A portfolio that excludes an existing MXM-labelled position cannot safely
@@ -175,7 +179,7 @@ public sealed class MxmReferenceProductBot : Robot {
   }
   foreach(var name in observedSymbols.Keys) {
    var observation=MxmBookObservations.NativeSnapshots();
-   observation.BeginEpoch(Environment.TickCount64);bookObservations.Add(name,observation);
+   observation.BeginEpoch(ObservationClockMs());bookObservations.Add(name,observation);
   }
   Positions.Closed+=OnBrokerPositionClosed;
   foreach(var series in subscribedBars.Values)series.BarClosed+=OnPortfolioBarClosed;
@@ -190,6 +194,8 @@ public sealed class MxmReferenceProductBot : Robot {
   if(owned.Length>1)throw new InvalidOperationException("AMBIGUOUS_OWNED_POSITION_IDENTITY");
   return owned.Length==0?null:owned[0].Id;
  }
+ long ObservationClockMs()=>MxmObservedCostFx.ObservationClock(IsBacktesting,Environment.TickCount64,IsBacktesting?BrokerClock():default);
+ long ObservationUtcMs()=>IsBacktesting?new DateTimeOffset(BrokerClock()).ToUnixTimeMilliseconds():DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
  DateTime BrokerClock()=>DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
  void OnBrokerPositionClosed(PositionClosedEventArgs args) {
   // Never seize, modify or cancel another owner's position or pending order.
@@ -213,10 +219,10 @@ public sealed class MxmReferenceProductBot : Robot {
   foreach(var intent in causalIntents.Values)intent.Clear();
   foreach(var observation in bookObservations.Values) {
    try {
-   var view=observation.Snapshot(Environment.TickCount64);
-   Print("MXM_BOOK_OBSERVATION_LOCAL_CALLBACKS events={0} bidChanges={1} askChanges={2} transport={3} executable=false",
-    view.Events,view.BidChanges,view.AskChanges,view.ReportedTransport);
-   observation.EndEpoch(Environment.TickCount64);
+   var view=observation.Snapshot(ObservationClockMs());
+   Print("MXM_BOOK_OBSERVATION_LOCAL_CALLBACKS events={0} bidChanges={1} askChanges={2} transport={3} simulation={4} executable=false",
+    view.Events,view.BidChanges,view.AskChanges,view.ReportedTransport,IsBacktesting);
+   observation.EndEpoch(ObservationClockMs());
    } catch(Exception e){Print("MXM_BOOK_OBSERVATION_STOP_FAULT_"+e.GetType().Name);}
   }
  }
@@ -273,8 +279,8 @@ public sealed class MxmReferenceProductBot : Robot {
    // Both sides are supplied by this callback. This is NOT the original
    // OpenAPI field mask or an event timestamp. Never substitute Server.Time
    // for the absent source stamp; local receipt and change clocks stay distinct.
-   bookObservations[args.SymbolName].Observe(args.Bid,args.Ask,Environment.TickCount64,
-    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),null);
+   bookObservations[args.SymbolName].Observe(args.Bid,args.Ask,ObservationClockMs(),
+    ObservationUtcMs(),null);
    // Conversion-only callbacks refresh source state without a strategy kernel,
    // bars, consumed intent, account operation or HARD21 entry.
    if(!causalIntents.TryGetValue(args.SymbolName,out var queue))return;
@@ -456,7 +462,7 @@ public sealed class MxmReferenceProductBot : Robot {
   try {
    var latestFee=CurrentNativeCommission(instrument,units,feeBookBid,feeBookAsk);
    finalCostFxExpires=costFxEstimateValidUntilMs;
-   finalCostFxCheckedAt=Environment.TickCount64;
+   finalCostFxCheckedAt=ObservationClockMs();
    if(!MxmNativeCommission.StillCovered(nativeFee,latestFee)) {
     Print("MXM_NATIVE_FEE_INCREASED_BEFORE_ORDER_HOLD");return;
    }
@@ -494,7 +500,7 @@ public sealed class MxmReferenceProductBot : Robot {
   if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
   // A successful earlier check does not extend the consumed bar's lifetime.
   // No further price/fee/risk calculations or durable IO follow this sample.
-  long fxSubmissionClock=Environment.TickCount64;
+  long fxSubmissionClock=ObservationClockMs();
   if(finalCostFxExpires.HasValue && (fxSubmissionClock<finalCostFxCheckedAt || fxSubmissionClock>finalCostFxExpires.Value)) {
    Print("MXM_FINAL_COST_FX_OBSERVATION_LEASE_EXPIRED_HOLD");return;
   }
@@ -667,7 +673,7 @@ public sealed class MxmReferenceProductBot : Robot {
  // Missing source or >5s receipt age means no estimate, not no liquidity.
  decimal CostRate(string from,string to) {
   if(costFx==null)throw new ArgumentException("NATIVE_COST_FX_NOT_INITIALIZED");
-  long now=Environment.TickCount64;
+  long now=ObservationClockMs();
   var estimate=costFx.CostRate(from,to,now,source=> {
    if(!bookObservations.TryGetValue(source,out var state))return null;
    var book=state.ReadBook(now);

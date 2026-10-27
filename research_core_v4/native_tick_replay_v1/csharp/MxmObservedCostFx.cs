@@ -15,6 +15,19 @@ public sealed record MxmObservedCostFxEstimate(decimal Rate,MxmFxLeg[] Path,long
 /// A local callback observation is not a firm quote or source timestamp proof.</summary>
 public sealed class MxmObservedCostFx {
  public const long MaximumSideAgeMs=5000;
+ // Native backtest events must age on simulated time, independent of process
+ // speed. This is observation-time bookkeeping, never a source event stamp.
+ public static long ObservationClock(bool simulation,long processMonotonicMs,DateTime simulatedUtc) {
+  if(!simulation) {
+   if(processMonotonicMs<0)throw new ArgumentException("FX_INVALID_PROCESS_CLOCK");
+   return processMonotonicMs;
+  }
+  if(simulatedUtc.Kind!=DateTimeKind.Utc || simulatedUtc==default)
+   throw new ArgumentException("FX_INVALID_SIMULATION_CLOCK");
+  long stamp=new DateTimeOffset(simulatedUtc).ToUnixTimeMilliseconds();
+  if(stamp<0)throw new ArgumentException("FX_INVALID_SIMULATION_CLOCK");
+  return stamp;
+ }
  readonly MxmFxInstrument[] instruments;
  readonly Dictionary<(string,string),MxmFxLeg[]> routes=new();
  public MxmObservedCostFx(IEnumerable<MxmFxInstrument> declared) {

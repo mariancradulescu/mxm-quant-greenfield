@@ -24,6 +24,10 @@ try {
       states[a.GetProperty("source").GetString()!].Observe(Price("bid"),Price("ask"),now,now,null);break;
      case "begin":states[a.GetProperty("source").GetString()!].BeginEpoch(now);break;
      case "end":states[a.GetProperty("source").GetString()!].EndEpoch(now);break;
+     case "clock":
+      var sim=a.GetProperty("simulation").GetBoolean();
+      var utc=DateTime.Parse(a.GetProperty("utc").GetString()!,CultureInfo.InvariantCulture,DateTimeStyles.RoundtripKind);
+      output.Add(new {status="CLOCK",value=MxmObservedCostFx.ObservationClock(sim,now,utc)});break;
      case "rate":
       var estimate=graph.CostRate(a.GetProperty("from").GetString()!,a.GetProperty("to").GetString()!,now,s=>Book(s,now));
       output.Add(new {status="ESTIMATE",estimate});break;
