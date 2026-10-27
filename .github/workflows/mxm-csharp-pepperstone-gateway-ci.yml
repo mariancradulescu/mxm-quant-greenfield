@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile prospective universe financing carry screen before any source contact
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/financing_carry/MxmFinancingCarry.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_financing_carry -v
       - name: Verify exact original authentic depth-size outcome without keys or model replay
         run: |
           python3 -m research_core_v4.laboratory.verify_depth_pressure_result
