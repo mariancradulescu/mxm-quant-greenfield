@@ -63,14 +63,10 @@ public sealed class MxmObservedCostFx {
   }
   throw new ArgumentException("FX_NO_DECLARED_PATH_WITHIN_THREE_LEGS");
  }
- public MxmObservedCostFxEstimate CostRate(string from,string to,long now,
-  Func<string,MxmObservedFxBook?> readBook) {
-  if(now<0 || readBook==null)throw new ArgumentException("FX_INVALID_RECEIPT_CLOCK_OR_READER");
-  var path=Route(from,to);decimal rate=1m;long maximumAge=0;
-  try {checked {
-   foreach(var leg in path) {
-    var b=readBook(leg.Source);var v=b?.Observation;
-    if(b==null || b.Source!=leg.Source || v==null || !v.SessionOpen || v.Faulted || v.Epoch<=0 ||
+ public static long RequireObservedBookAge(MxmObservedFxBook? b,string source,long now) {
+  var v=b?.Observation;
+  if(now<0)throw new ArgumentException("FX_INVALID_RECEIPT_CLOCK_OR_READER");
+    if(b==null || b.Source!=source || v==null || !v.SessionOpen || v.Faulted || v.Epoch<=0 ||
        v.ReportedTransport==MxmReportedTransport.Down ||
        v.Origin is not (MxmObservationOrigin.RawPartialFields or MxmObservationOrigin.NativeCallbackSnapshot) || !b.Bid.HasValue || !b.Ask.HasValue ||
        b.Bid<=0 || b.Ask<b.Bid || !MxmBookShape.NonCrossed(v.Shape) ||
@@ -80,10 +76,19 @@ public sealed class MxmObservedCostFx {
        v.BidObservedMs>v.LastEventMs || v.AskObservedMs>v.LastEventMs ||
        now-v.BidObservedMs.Value>MaximumSideAgeMs || now-v.AskObservedMs.Value>MaximumSideAgeMs)
      throw new ArgumentException("FX_REQUIRED_BOOK_UNOBSERVED_INVALID_OR_TOO_OLD");
-    long age=Math.Max(now-v.BidObservedMs.Value,now-v.AskObservedMs.Value);maximumAge=Math.Max(maximumAge,age);
+  return Math.Max(now-v!.BidObservedMs!.Value,now-v.AskObservedMs!.Value);
+ }
+ public MxmObservedCostFxEstimate CostRate(string from,string to,long now,
+  Func<string,MxmObservedFxBook?> readBook) {
+  if(now<0 || readBook==null)throw new ArgumentException("FX_INVALID_RECEIPT_CLOCK_OR_READER");
+  var path=Route(from,to);decimal rate=1m;long maximumAge=0;
+  try {checked {
+   foreach(var leg in path) {
+    var b=readBook(leg.Source);
+    long age=RequireObservedBookAge(b,leg.Source,now);maximumAge=Math.Max(maximumAge,age);
     // Cover a debit in FROM asset using TO: buy base at ASK or sell
     // quote at inverse BID. Credit valuation requires a separate contract.
-    decimal legRate=leg.Reverse?1m/b.Bid.Value:b.Ask.Value;
+    decimal legRate=leg.Reverse?1m/b!.Bid!.Value:b!.Ask!.Value;
     legRate=decimal.Round(legRate,18,MidpointRounding.ToPositiveInfinity);
     rate=decimal.Round(rate*legRate,18,MidpointRounding.ToPositiveInfinity);
    }

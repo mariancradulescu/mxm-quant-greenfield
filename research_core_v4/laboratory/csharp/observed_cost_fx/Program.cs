@@ -24,6 +24,9 @@ try {
       states[a.GetProperty("source").GetString()!].Observe(Price("bid"),Price("ask"),now,now,null);break;
      case "begin":states[a.GetProperty("source").GetString()!].BeginEpoch(now);break;
      case "end":states[a.GetProperty("source").GetString()!].EndEpoch(now);break;
+     case "age":
+      string ticket=a.GetProperty("source").GetString()!;
+      output.Add(new {status="LEASE",age=MxmObservedCostFx.RequireObservedBookAge(Book(ticket,now),ticket,now)});break;
      case "clock":
       var sim=a.GetProperty("simulation").GetBoolean();
       var utc=DateTime.Parse(a.GetProperty("utc").GetString()!,CultureInfo.InvariantCulture,DateTimeStyles.RoundtripKind);
