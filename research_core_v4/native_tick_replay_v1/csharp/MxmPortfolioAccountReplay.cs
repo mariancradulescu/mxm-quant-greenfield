@@ -88,7 +88,11 @@ public sealed record MxmReplayParameters(
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
  string? ExplicitPolicySha256=null,
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
- string? NativeSizingScenarioSha256=null
+ string? NativeSizingScenarioSha256=null,
+ // A new prospective contract. Default omission conserves frozen old explicit
+ // evaluator semantics and serialized settings; never reinterpret old results.
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+ bool RequireObservedExposurePath=false
 );
 
 /// <summary>
@@ -135,6 +139,8 @@ public sealed partial class MxmPortfolioAccountReplay {
   Need(settings.FinancingScenarioSha256==null || IsDigest(settings.FinancingScenarioSha256),"INVALID_FINANCING_SCENARIO_IDENTITY");
   Need(settings.ExplicitPolicySha256==null || IsDigest(settings.ExplicitPolicySha256),"INVALID_EXPLICIT_POLICY_IDENTITY");
   Need(settings.NativeSizingScenarioSha256==null || IsDigest(settings.NativeSizingScenarioSha256),"INVALID_PROSPECTIVE_NATIVE_SIZING_SCENARIO");
+  Need(!settings.RequireObservedExposurePath || settings.ExplicitPolicySha256!=null,
+   "OBSERVED_EXPOSURE_PATH_REQUIRES_PROSPECTIVE_EXPLICIT_POLICY");
   if(settings.BarMinutes<1 || settings.MaxQuoteAgeSeconds<1 || settings.MaxPositions<1 ||
      settings.MaxMarginFraction<=0 || settings.MaxMarginFraction>1 ||
      settings.MaxEstimatedStopRiskFraction<=0 || settings.MaxEstimatedStopRiskFraction>1 ||
@@ -167,15 +173,17 @@ public sealed partial class MxmPortfolioAccountReplay {
   q.BidSourceUtc<=q.Utc && q.AskSourceUtc<=q.Utc &&
   (!requireFresh || (now-q.BidSourceUtc.Value).TotalMilliseconds<=Math.Min(5000d,parameters.MaxQuoteAgeSeconds*1000d) &&
                    (now-q.AskSourceUtc.Value).TotalMilliseconds<=Math.Min(5000d,parameters.MaxQuoteAgeSeconds*1000d));
- void ValidateSharedValuation() {
-  if(!parameters.UseSharedUsdConversion || open.Count==0)return;
-  Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,lastFeed),"OPEN_EXPOSURE_FX_UNPRICEABLE");
+ void ValidateOpenValuationAt(DateTime now) {
+  if(open.Count==0 || (!parameters.UseSharedUsdConversion && !parameters.RequireObservedExposurePath))return;
+  if(parameters.UseSharedUsdConversion)
+   Need(!usdConversionInvalid && usdEurMark!=null && ValidFx(usdEurMark,now),"OPEN_EXPOSURE_FX_UNPRICEABLE");
   foreach(var symbol in open.Keys) {
    var q=state[symbol].Latest;
-   Need(q!=null && ValidInstrumentMark(q,lastFeed),
+   Need(q!=null && ValidInstrumentMark(q,now),
     "OPEN_EXPOSURE_INSTRUMENT_MARK_STALE");
   }
  }
+ void ValidateSharedValuation()=>ValidateOpenValuationAt(lastFeed);
  void ApplyFx(MxmUsdEurMark fx){
   Need(parameters.UseSharedUsdConversion && ValidFx(fx,lastFeed),"INVALID_OR_STALE_SHARED_FX");
   if(usdEurMark is MxmUsdEurMark prior)
@@ -411,6 +419,12 @@ public sealed partial class MxmPortfolioAccountReplay {
    if(e is null)throw new ArgumentException("NULL_PORTFOLIO_FEED_EVENT");
    Need(e.Utc.Kind==DateTimeKind.Utc && e.Utc!=default,"INVALID_UTC");
    Need(e.Utc>=lastFeed,"OUT_OF_ORDER_GLOBAL_FEED");
+   // Prospective explicit policies cannot heal an unobserved funded interval
+   // by overwriting its overdue mark/FX with the arriving quote. Check EVERY
+   // open instrument and the prior FX clock BEFORE any incoming state change,
+   // exit, financing or policy event. Legacy frozen explicit/bar paths retain
+   // their original accounting contract; this is no historical rerun/retune.
+   if(parameters.RequireObservedExposurePath)ValidateOpenValuationAt(e.Utc);
    lastFeed=e.Utc;
    if(e is MxmUsdEurMark fx){
     ApplyFx(fx);Mark();processedEvents++;continue;
