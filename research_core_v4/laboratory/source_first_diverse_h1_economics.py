@@ -19,7 +19,6 @@ H=3600
 START=int(dt.datetime(2026,8,3,tzinfo=dt.timezone.utc).timestamp())
 END=int(dt.datetime(2026,8,31,tzinfo=dt.timezone.utc).timestamp())
 SOURCES={
- 1:(631098100,"c33f401a97d06e2efe31e49f37a1f977238b41b66eb1d939b1d6700fb2530915"),
  5:(631095492,"75602c6520cadce8e878e7dce607aa896dd025b3388b16b1f722699ebc455850"),
  111:(631086728,"2538248862212f2c7258a0e5183fc8e5b283f7c6fc84fd44de1fd4bf7948a16e"),
  250:(631098274,"809e20a51550ad50bc6ac4a8df524deba47d640f5a0d35454b496ffd2a9d3c2f")
@@ -76,13 +75,16 @@ def support(corpus):
    "response_missing":len(c)-response,"response_complete_fraction":response/len(c) if c else 0,
    "calendar_weeks":dict(sorted(w.items())),"eligible_weeks":sum(z>0 for z in w.values()),
    "passed":len(c)>=80 and len(w)>=3 and response>=0.90*len(c)}
- paired=0
- for t in causal_times(corpus[250]):
-  if (all(t-j*H in corpus[111] for j in (0,1,2)) and
-      all(fulfilled(corpus[sid],t) for sid in (111,250))):paired+=1
+ ref_support={}
+ for sid in TARGETS:
+  refsid=111 if sid in (5,250) else 250
+  decisions=causal_times(corpus[sid])
+  joint=sum(all(t-j*H in corpus[refsid] for j in (0,1,2)) and
+            fulfilled(corpus[sid],t) for t in decisions)
+  ref_support[str(sid)]={"reference_symbol_id":refsid,"joint_supported_decisions_and_settlement":joint}
  # Source evidence must justify each family, not merely the aggregate row count.
- passed=all(x["passed"] for x in profiles.values()) and paired>=60
- return {"profiles":profiles,"paired_copper_oil_support":paired,
+ passed=all(x["passed"] for x in profiles.values()) and all(x["joint_supported_decisions_and_settlement"]>=60 for x in ref_support.values())
+ return {"profiles":profiles,"reference_pair_support":ref_support,
   "source_admission": "PASS_BEFORE_IDENTITIES" if passed else "STOP_NO_IDENTITY_ADMITTED",
   "session_filter_frozen_before_outcomes":True,
   "market_closed_vs_collection_gap_disambiguated":False,
@@ -160,7 +162,6 @@ def selftest():
   for sid in TARGETS:
    p=1.0+0.01*sid+0.001*math.sin(i*0.5+sid)
    source[sid][ts]=(p,p+.0007,p-.0007,p+.0001)
-  source[1][ts]=(1.1,1.11,1.09,1.1)
  a=support(source)
  need(a["source_admission"]=="PASS_BEFORE_IDENTITIES" and len(evaluate(source,a))==3,"SELFTEST_PATH")
  source[250].clear()
