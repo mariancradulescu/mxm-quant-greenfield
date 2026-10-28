@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[2];HOME=ROOT.parent if ROOT.name=='.basis-
 REPO='mariancradulescu/mxm-quant-greenfield';BRANCH='mxm-remediation-p0-p4-20261015-v1';NATIVE='d2fae5641b759b1c8c24161d83d62d39e104eafd'
 PATH='.github/workflows/mxm-commodity-anchor-h1.yml';MODULE='research_core_v4.laboratory.commodity_anchor_development';PROJECT='research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj'
 SPEC='research_core_v4/laboratory/COMMODITY_ANCHOR_H1_V1.json'
-SPEC_SHA='2e19d0228b3b1adc1dbcd5881848c14496d9ce7d7cdc62cbec9b6adcb6d33ff3'
+SPEC_SHA='f135ebf57cee3302f70e399695ec7dff40123fed3d2c3996933b5727a016f7e1'
 OUT=HOME/'verification/commodity-anchor';FP='464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11'
 START=1779840000000;EVAL=1780272000000;END=1782691200000 # partial warmup week then four complete June weeks
 CHECKOUT='actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683';UPLOAD='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02';DOWNLOAD='actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093'

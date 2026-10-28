@@ -27,3 +27,4 @@ public sealed class MxmCommodityAnchorKernel {
   samples.Enqueue(new(time,basis));if(samples.Count>48)samples.Dequeue();previous=time;return result;
  }
 }
+}
