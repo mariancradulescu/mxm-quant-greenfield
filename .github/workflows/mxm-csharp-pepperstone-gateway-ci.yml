@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Verify exact original quote-innovation first outcome without market decryption or economic replay
+        run: |
+          python3 -m research_core_v4.laboratory.verify_quote_innovation_result
+          python3 -m unittest research_core_v4.laboratory.test_quote_innovation_original -v
       - name: Verify first-outcome recovery refuses any previously executed economics
         run: python3 -m unittest research_core_v4.laboratory.test_quote_innovation_recovery -v
       - name: Compile causal quote-innovation learner and independent completed-minute reference
