@@ -48,8 +48,14 @@ class InnovationTests(unittest.TestCase):
    self.assertNotEqual(r.returncode,0)
  def test_strict_exposure_loss_is_not_capital_refund(self):
   with tempfile.TemporaryDirectory() as tmp:
-   f=Path(tmp);p=self.path(f);a=self.run_policy([p],f)
-   self.assertTrue(reconcile(a,reference([p])))
+   f=Path(tmp);p=f/'exposure.ndjson';t=1787554800000;lines=[]
+   for i in range(70*60):
+    bid=110000+i
+    for side,v in [('bid',bid),('ask',bid if i==3902 else bid+5)]:lines.append({'t':t+i*1000,'side':side,'raw':v})
+   p.write_text(''.join(json.dumps(e)+'\n' for e in lines));a=self.run_policy([p],f)
+   self.assertTrue(reconcile(a,reference([p])));self.assertIsNone(a['account']);self.assertIn('UNPRICEABLE',a['fault'])
+   prefix=a['last_verified_prefix_account'];self.assertGreater(prefix['AcceptedEntries'],0);self.assertEqual(prefix['OpenPositions'],1)
+   self.assertLess(prefix['FinalCashEur'],200);self.assertEqual(a['rows'],8400)
    self.assertFalse(a['economic_edge_proven']);self.assertFalse(a['hard21_proven'])
  def test_reference_error_includes_missing_targets(self):
   s=[{'forecasts':[{'bucket':0,'mid':'1','prediction':'2'},{'bucket':60000,'mid':'1.0001','prediction':'1'},{'bucket':180000,'mid':'1.1','prediction':'1'}]}]

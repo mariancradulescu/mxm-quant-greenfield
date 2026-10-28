@@ -7,7 +7,7 @@ from .quote_innovation_reference import reference,reconcile,forecast_errors
 from .three_week_source import FOLDERS,RUNS,ROWS,NATIVE
 ROOT=Path(__file__).resolve().parents[2]
 SPEC=ROOT/'research_core_v4/laboratory/INNOVATION_ACCOUNT_DEVELOPMENT_V1.json'
-SPEC_SHA='560c18565662a1e86c3d660c55af3c1a5fa1d8ca8e943676ab3f44a66ea45bde'
+SPEC_SHA='f862e51eec67a93d8c48f0972b70b68031c54be2b7f4f7cdddd71831fa2bf18e'
 PATH='.github/workflows/mxm-quote_innovation-account-development.yml'
 PROJECT='research_core_v4/laboratory/csharp/quote_innovation/MxmQuoteInnovation.csproj'
 REPO='mariancradulescu/mxm-quant-greenfield';BRANCH='mxm-remediation-p0-p4-20261015-v1'

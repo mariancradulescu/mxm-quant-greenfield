@@ -91,8 +91,9 @@ def reconcile(actual,expected):
  for key in ('summaries','audits','prediction_sha256','decision_sha256','learned_samples'):
   if actual[key]!=expected[key]:raise ValueError('INNOVATION_REFERENCE_'+key)
  if actual['initial_funding_count']!=1 or actual['initial_capital_eur']!=200:raise ValueError('INNOVATION_CAPITAL')
- if actual['account'] is not None:
-  a=actual['account'];cash=D(200)
+ for a in (actual['account'],actual.get('last_verified_prefix_account')):
+  if a is None:continue
+  cash=D(200)
   for t in a['Ledger']:
    cash+=D(str(t['GrossEur']))-D(str(t['CommissionEur']))
    if abs(cash-D(str(t['CashEur'])))>D('.0000001'):raise ValueError('INNOVATION_LEDGER_CASH')

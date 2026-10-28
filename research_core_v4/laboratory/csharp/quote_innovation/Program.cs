@@ -19,13 +19,13 @@ string outputPath=args[0],policy=args[1],context=args[2];string[] paths=args.Ski
 var settings=new MxmReplayParameters(StrategyMode.TrendOnly,.4m,1,120m,.01m,.2m,
  MaxQuoteAgeSeconds:5,ExplicitPolicySha256:policy,NativeSizingScenarioSha256:policy,RequireObservedExposurePath:true);
 var account=new MxmPortfolioAccountReplay(new[]{"EURUSD"},settings);account.Run(Array.Empty<MxmAccountFeed>());
-var kernel=new MxmQuoteInnovationKernel();string? fault=null;long sequence=0,rows=0,groups=0,predictions=0,signals=0,invalid=0;
+var kernel=new MxmQuoteInnovationKernel();MxmPortfolioAccountReport? lastKnown=null;string? fault=null;long sequence=0,rows=0,groups=0,predictions=0,signals=0,invalid=0;
 long nextAllowed=0,flatDue=0;var audits=new List<object>();var summaries=new List<object>();
 using var predictionsHash=IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 using var decisionsHash=IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 void Feed(MxmAccountFeed e) {
  if(fault!=null)return;
- try{account.Continue(new[]{e},account.NextEventOrdinal);}catch(ArgumentException ex){fault=ex.Message;}
+ try{lastKnown=account.Report();account.Continue(new[]{e},account.NextEventOrdinal);}catch(ArgumentException ex){fault=ex.Message;}
 }
 void Decision(long t,int desired){
  sequence++;var utc=DateTimeOffset.FromUnixTimeMilliseconds(t).UtcDateTime;
@@ -95,6 +95,7 @@ MxmPortfolioAccountReport? report=null;if(fault==null)report=account.Report();
 var result=new{schema="mxm.quote-innovation-development.v1",policy,context,rows,groups,predictions,signals,invalid,
  prediction_sha256=Convert.ToHexString(predictionsHash.GetHashAndReset()).ToLowerInvariant(),
  decision_sha256=Convert.ToHexString(decisionsHash.GetHashAndReset()).ToLowerInvariant(),summaries,audits,account=report,fault,
+ last_verified_prefix_account=fault==null?null:lastKnown,
  learned_samples=kernel.Capture().Samples.Length,initial_funding_count=1,initial_capital_eur=200,
  economic_edge_proven=false,hard21_proven=false,historical_costs_proven=false,broker_fills_proven=false,orders=0};
 File.WriteAllText(outputPath,JsonSerializer.Serialize(result));
