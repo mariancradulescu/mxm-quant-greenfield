@@ -22,7 +22,8 @@ class Compiled(unittest.TestCase):
  def check(self,ps):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d);(p/'in').write_text(''.join(json.dumps(x)+'\n' for x in ps))
-   subprocess.run(['dotnet','run','--project',str(ROOT/PROJECT),'-c','Release','--no-build','--',str(p/'in'),str(p/'out')],check=True,capture_output=True)
+   run=subprocess.run(['dotnet','run','--project',str(ROOT/PROJECT),'-c','Release','--no-build','--',str(p/'in'),str(p/'out')],capture_output=True)
+   self.assertEqual(run.returncode,0,run.stderr.decode())
    actual=json.loads((p/'out').read_bytes());self.assertEqual(actual,reference(ps));return actual
  def test_peer_residual_both_directions_and_delayed_future_open(self):
   for sign in (-1,1):

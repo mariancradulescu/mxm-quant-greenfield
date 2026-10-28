@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 static class PeerResidual {
  sealed record Row([property:JsonPropertyName("time_utc")]string Time,[property:JsonPropertyName("open")]decimal Open,
   [property:JsonPropertyName("high")]decimal High,[property:JsonPropertyName("low")]decimal Low,[property:JsonPropertyName("close")]decimal Close);
- sealed record Packet(int Ordinal,int Group,bool Eligible,long[] EligibleTimes,Row[] Rows);
+ sealed record Packet(int Ordinal,int Group,bool Eligible,[property:JsonPropertyName("eligible_times")]long[] EligibleTimes,Row[] Rows);
  sealed record Feature(long T,int Ordinal,int Group,bool Eligible,long Move);
  sealed record Decision(long T,int N,int? Ordinal,int? Group,int? Direction,long? Residual2,long? Entry,long? Exit,string Status,long? GrossUnits);
  static readonly JsonSerializerOptions Options=new(){PropertyNameCaseInsensitive=true,NumberHandling=JsonNumberHandling.AllowReadingFromString};
