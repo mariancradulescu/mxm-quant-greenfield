@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[2]/'research_core_v4/native_tick_replay_v1
 class Integration(unittest.TestCase):
  def test_reload_follows_account_and_precedes_all_final_lifetime_checks(self):
   s=(ROOT/'MxmReferenceProductBot.cs').read_text();p=s[s.index('void ApplyPortfolioDecision'):s.index('sealed record NativeRiskMark')]
-  self.assertLess(p.index('double finalNewStopRisk='),p.index('entryCheckpoint.VerifyPreparedCurrent()'))
+  self.assertLess(p.index('entryCheckpoint.VerifyPreparedCurrent()'),p.index('double finalNewStopRisk='))
   tail=p[p.index('entryCheckpoint.VerifyPreparedCurrent()'):]
   self.assertLess(tail.index('riskObservationLease.Verify('),tail.index('entryCheckpoint.MarkSubmitted()'))
   self.assertLess(tail.index('var submissionClock=BrokerClock()'),tail.index('entryCheckpoint.MarkSubmitted()'))

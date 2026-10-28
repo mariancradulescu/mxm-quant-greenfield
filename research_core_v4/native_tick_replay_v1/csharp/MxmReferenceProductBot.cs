@@ -444,6 +444,13 @@ public sealed class MxmReferenceProductBot : Robot {
   if(ownerEnvelope!=MxmOwnerEntryEnvelope.Admit) {
    Print("MXM_OWNER_ENTRY_ENVELOPE_HOLD_"+ownerEnvelope);return;
   }
+  // Reload the exact durable prepared intent after potentially slow account
+  // calculations. Never overwrite a missing/changed marker or infer no send.
+  // Final observation and bar lifetimes are sampled AFTER this storage IO.
+  if(!entryCheckpoint.VerifyPreparedCurrent()) {
+   orderProtection.HaltUnknown();LatchProtectionHalt();
+   Print("MXM_PREPARED_INTENT_STORAGE_CHANGED_BEFORE_ORDER_SAFE_STOP");return;
+  }
   // Preliminary lease check before the final fee/account/risk rechecks.
   // This does not make the broker check+order atomic or lock other instances.
   var finalClock=BrokerClock();
@@ -499,13 +506,6 @@ public sealed class MxmReferenceProductBot : Robot {
   }
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
-  }
-  // Reload the exact durable prepared intent after potentially slow account
-  // calculations. Never overwrite a missing/changed marker or infer no send.
-  // Final observation and bar lifetimes are sampled AFTER this storage IO.
-  if(!entryCheckpoint.VerifyPreparedCurrent()) {
-   orderProtection.HaltUnknown();LatchProtectionHalt();
-   Print("MXM_PREPARED_INTENT_STORAGE_CHANGED_BEFORE_ORDER_SAFE_STOP");return;
   }
   string? requestComment=entryCheckpoint.SubmissionComment;
   if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
