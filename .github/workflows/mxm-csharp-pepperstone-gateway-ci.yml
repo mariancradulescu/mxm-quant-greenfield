@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile prospective H1 commodity anchor and shared EUR200 scenario before source access
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_commodity_anchor -v
       - name: Compile native observation purpose fence and reject every account mutation in read-only or stopped mode
         run: |
           dotnet build research_core_v4/laboratory/csharp/native_run/MxmNativeRun.csproj -c Release
@@ -411,3 +415,12 @@ jobs:
           PY
       - name: Verify retired fixed-source replay cannot access keys or restart automatically
         run: python3 -m unittest research_core_v4.laboratory.test_retired_authentic_replay research_core_v4.laboratory.test_commission_account_evidence -v
+
+      - name: Prepare exact already-compiled order-free reception package without import or activation
+        run: python3 -m research_core_v4.laboratory.native_observation_delivery
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-observation-delivery-${{ github.run_id }}
+          path: verification/native-observation-delivery/*
+          if-no-files-found: error
+          retention-days: 90
