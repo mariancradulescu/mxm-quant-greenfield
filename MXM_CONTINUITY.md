@@ -1,3 +1,11 @@
+# 28 octombrie2026 — intenția persistentă verificată înainte de admiterea finală nativă
+
+Continuare LIVE fc6235717ba3f6135a9071d501d2534f269b96c8. [Corecția funcțională](docs/economic-development/20261028/DURABLE_PREPARED_INTENT_RECHECK_V1.md) recitește exact markerul persistent după calculele de cont/risc și înaintea ultimelor verificări de prospețime/expirare. Lipsa/schimbarea/coruperea sau eroarea de citire opresc fără ordin și fără ștergere/suprascriere. Nu este lock atomic între instanțe sau recepție LocalStorage cTrader; limita de proprietar unic rămâne.
+
+Teste compilate de checkpoint/cold recovery și controale de integrare obligatorii înainte de merge. Configurațiile economice și recepția time-only40650642477 rămân închise fără retuning/replay; nu este justificată o nouă identitate doar prin alți parametri pe aceeași arhivă. Autoritățile/custodia/partițiile/capitalul unic200EUR și riscul sunt păstrate. Zero cereri broker/ordine/Cloud/resetări. Recepția Robot, edgeNET, contul autentic calificat, HARD21 și B–E integral rămân deschise. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 28 octombrie2026 — recepție autentică a suportului temporal și corecție nativă integrate
 
 PR234 integrat02df7a28893d6394e70ce861819e5aeef2390e7d, toate5CI SUCCESS pe sursafcce8bbb…,12teste noi fărăskip și produs.algo compilat; arborele sursei/testului/integrării este identic. Robotul nu mai combină starea veche cu bare recente completate de platformă după callbackuri neprocesate; reset și încălzire nouă, per instrument, fără noi strategii/permisiuni.

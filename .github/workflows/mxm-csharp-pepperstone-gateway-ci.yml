@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Bind final native submission to the exact durable prepared intent
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpointFixture.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_prepared_intent_recheck -v
       - name: Verify original time-only support bundle without custody or support recomputation
         run: |
           python3 -m research_core_v4.laboratory.verify_support_topology_result
