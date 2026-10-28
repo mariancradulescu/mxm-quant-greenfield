@@ -43,9 +43,13 @@
           "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_commodity_anchor -v"
         },
         {
-          "name": "Reuse exact existing encrypted handoff without decrypting or contacting broker",
+          "name": "Reuse original H1 ciphertexts and retain only declared post-announcement calendar",
           "id": "cache",
-          "run": "umask 077\npython3 -m research_core_v4.laboratory.commodity_anchor_reference_units cache"
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.commodity_anchor_reference_units cache",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          }
         },
         {
           "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",

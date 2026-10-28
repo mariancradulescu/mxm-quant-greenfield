@@ -8,9 +8,9 @@ REPO='mariancradulescu/mxm-quant-greenfield';BRANCH='mxm-remediation-p0-p4-20261
 PATH='.github/workflows/mxm-commodity-anchor-reference-units.yml';MODULE='research_core_v4.laboratory.commodity_anchor_reference_units';PROJECT='research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj'
 SPEC='research_core_v4/laboratory/COMMODITY_ANCHOR_H1_V1.json'
 SPEC_SHA='f135ebf57cee3302f70e399695ec7dff40123fed3d2c3996933b5727a016f7e1'
-TRANSPORT_SHA='588bd967d8bab59a407e8487f76b854b44bed950547acd1af91beb9ccb98ebfa'
+TRANSPORT_SHA='276d516f61179dae7aed5f265bf352e1100a4c8dc56fc8df3756b3430a472720'
 OUT=HOME/'verification/commodity-anchor';FP='464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11'
-START=1779840000000;EVAL=1780272000000;END=1782691200000 # partial warmup week then four complete June weeks
+START=1785283200000;EVAL=1785715200000;END=1788134400000 # partial warmup week then four complete June weeks
 CHECKOUT='actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683';UPLOAD='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02';DOWNLOAD='actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093'
 INSTALL='python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock'
 CACHE={1:{'release_id':409747426,'asset_id':631098100,'ciphertext_sha256':'c33f401a97d06e2efe31e49f37a1f977238b41b66eb1d939b1d6700fb2530915'},250:{'release_id':409747426,'asset_id':631098274,'ciphertext_sha256':'809e20a51550ad50bc6ac4a8df524deba47d640f5a0d35454b496ffd2a9d3c2f'}}
@@ -23,6 +23,7 @@ def frozen():
  need(bytes_digest((HOME/'research_core_v4/laboratory/COMMODITY_ANCHOR_REFERENCE_UNITS_V1.json').read_bytes())==TRANSPORT_SHA,'ANCHOR_TRANSPORT_SPEC')
  own='\n'.join("TRANSPORT_SHA='FROZEN_TRANSPORT_SHA'" if x.startswith('TRANSPORT_SHA=') else x for x in Path(__file__).read_text().splitlines())+'\n'
  need(bytes_digest(own.encode())==transport['normalized_transport_sha256'] and transport['economic_spec_sha256']==SPEC_SHA,'ANCHOR_TRANSPORT_CODE')
+ need(transport['source_start_ms']==START and transport['evaluation_start_ms']==EVAL and transport['end_ms']==END,'ANCHOR_DECLARED_SOURCE_CALENDAR')
  need(bytes_digest((HOME/'docs/economic-development/20261028/COMMODITY_REFERENCE_UNITS_ADMISSION_V1.md').read_bytes())==transport['admission_document_sha256'],'ANCHOR_UNIT_ADMISSION_DOCUMENT')
  return s
 def context():
@@ -33,7 +34,7 @@ def workflow():
  cache=job('mxm-r3-custody-v1');cache['if']=f"github.repository == '{REPO}' && github.ref == 'refs/heads/{BRANCH}' && github.run_attempt == 1";cache['outputs']={'clear':'${{ steps.cache.outputs.clear }}'}
  cache['steps'] += [{'name':'Admit exact finite source and model before keys','env':{'GH_TOKEN':'${{ github.token }}'},'run':'python3 -m '+MODULE+' admit'},
   {'name':'Compile shared account and independent artificial H1 policy before custody','run':INSTALL+'\ndotnet build '+PROJECT+' -c Release\npython3 -m unittest research_core_v4.laboratory.test_commodity_anchor -v'},
-  {'name':'Reuse exact existing encrypted handoff without decrypting or contacting broker','id':'cache','run':'umask 077\npython3 -m '+MODULE+' cache'},
+  {'name':'Reuse original H1 ciphertexts and retain only declared post-announcement calendar','id':'cache','env':{'GH_TOKEN':'${{ github.token }}','MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM':'${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}'},'run':'umask 077\npython3 -m '+MODULE+' cache'},
   {'uses':UPLOAD,'with':{'name':'anchor-cache-${{ github.run_id }}','path':'verification/commodity-anchor/cache.json\nverification/commodity-anchor/cache-input.mxmenc','if-no-files-found':'error','retention-days':90}}]
  collect=job('mxm-r3-pepperstone-v1');collect.update(needs='source-cache',**{'if':"needs.source-cache.outputs.clear == 'true'"})
  collect['steps'] += [{'uses':CHECKOUT,'with':{'ref':NATIVE,'path':'.basis-native','persist-credentials':False}},
@@ -88,22 +89,34 @@ def terms_from_identity():
  return {'units':d['minVolume']/100,'step_units':d['stepVolume']/100,'max_units':d['maxVolume']/100,'fee_usd':float(D(d['minVolume'])*D(d['preciseTradingCommissionRate'])/D(100000000)/D(d['lotSize'])),'pnl_rate':d['pnlConversionFeeRate']/10000}
 def cache():
  context();identity();terms_from_identity();OUT.mkdir(parents=True,exist_ok=True)
- from .verify_commodity_anchor_original import verify,DIR
- verify()
- with zipfile.ZipFile(DIR/'runtime-original.zip') as z:
-  for name in ('cache.json','cache-input.mxmenc'):(OUT/name).write_bytes(z.read(name))
- r=json.loads((OUT/'cache.json').read_bytes());need(r['run_id']==40709936368 and r['existing_source_overlap_rows']=={'1':545,'250':521} and r['new_collection_admitted'],'ANCHOR_REUSE_AUTHENTICATED_HANDOFF')
- print('MXM_ANCHOR_CACHE '+encoded({'run_id':int(os.environ['GITHUB_RUN_ID']),'reused_original_cache_run':40709936368,'cache_input_sha256':r['cache_input_sha256'],'new_decryptions':0,'new_broker_requests':0,'new_models':0,'orders':0}).decode(),flush=True)
- with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('clear=true\n')
+ from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
+ from research_core_v4.owner_recovery_v1.runtime_v1 import load_asset
+ from research_core_v4.remediation_p0_p4_20261015.rest29_v3 import GetOnly
+ proofs=[];overlap={};retained={}
+ with tempfile.TemporaryDirectory() as d:
+  key,fp=_private_key_from_secret(Path(d));need(fp==FP,'ANCHOR_CACHE_CUSTODY')
+  for sid,b in CACHE.items():
+   value,proof=load_asset(key,fp,Path(d),b);need(value['schema']=='mxm.wide.private.h1.v1' and value['identity']['sid']==sid and value['same_native_account'] is True,'ANCHOR_CACHE_ORIGINAL')
+   retained[str(sid)]={'identity':value['identity'],'rows':[[int(t)*1000]+v[:4] for t,v in sorted(value['bars'].items(),key=lambda z:int(z[0])) if START<=int(t)*1000<END],'proof':proof}
+   overlap[str(sid)]=len(retained[str(sid)]['rows']);proofs.append(proof)
+ route=GetOnly();assets=route.json('releases/409747426')['assets'];anchor_cached=any(x['name']=='h1-7393.mxmenc' for x in assets)
+ clear=all(n>=128 for n in overlap.values()) and not anchor_cached
+ from research_core_v4.shallow_m5_support_v2_production import encrypt_shard
+ public=HOME/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem'
+ encrypt_shard(gzip.compress(encoded({'retained':retained,'run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':os.environ['GITHUB_SHA']}),mtime=0),public_key=public,output=OUT/'cache-input.mxmenc')
+ r={'schema':'mxm.anchor-cache-admission.v1','run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':os.environ['GITHUB_SHA'],'existing_source_overlap_rows':overlap,'anchor_asset_already_present':anchor_cached,'new_collection_admitted':clear,'new_history_symbols':[7393] if clear else [],'cache_input_sha256':bytes_digest((OUT/'cache-input.mxmenc').read_bytes()),'cache_reuse_original_provenance_not_all_independent_wire_redecode':True,'predecessor_run':40707021640,'proofs':proofs,'new_models':0,'new_broker_requests':0,'orders':0}
+ (OUT/'cache.json').write_bytes(encoded(r));print('MXM_ANCHOR_CACHE '+encoded(r).decode(),flush=True)
+ with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('clear='+str(clear).lower()+'\n')
+
 def collect():
  context();need(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==NATIVE and (ROOT/'research_core_v4/laboratory/commodity_anchor_reference_units.py').read_bytes()==(HOME/'research_core_v4/laboratory/commodity_anchor_reference_units.py').read_bytes(),'ANCHOR_PINNED_DECODER')
  need(not os.environ.get('MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM'),'ANCHOR_NO_CUSTODY_IN_BROKER_PROCESS')
- OUT.mkdir(parents=True,exist_ok=True);cache=json.loads((OUT/'cache.json').read_bytes());need(cache['run_id']==40709936368 and cache['new_collection_admitted'],'ANCHOR_ORIGINAL_HANDOFF_SCOPE')
+ OUT.mkdir(parents=True,exist_ok=True);cache=json.loads((OUT/'cache.json').read_bytes());need(cache['run_id']==int(os.environ['GITHUB_RUN_ID']) and cache['new_collection_admitted'],'ANCHOR_ORIGINAL_HANDOFF_SCOPE')
  from research_core_v4.cost_frequency_discovery_v1.collector_v1 import Collector
  from research_core_v4.owner_frontier_v1.execute_historical_quotes_v1 import m
  from datetime import datetime,timezone
  prior,by=identity();terms=terms_from_identity()
- p={'contact_start_utc':datetime.now(timezone.utc).isoformat(),'schema':'mxm.anchor-native-source.v1','source_sha':os.environ['GITHUB_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),'spec_sha256':SPEC_SHA,'complete':False,'metadata':[],'history':[],'failure_class':None,'cache':cache,'reused_metadata_source_run':40709936368,'reused_metadata_identity_sha256':IDENTITY_SHA,'reference_quote':'USC','reference_fx_conversion_assumed':False,'panel':{str(k):{'digits':v['digits']} for k,v in by.items()}}
+ p={'contact_start_utc':datetime.now(timezone.utc).isoformat(),'schema':'mxm.anchor-native-source.v1','source_sha':os.environ['GITHUB_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),'source_admission_sha256':TRANSPORT_SHA,'spec_sha256':SPEC_SHA,'complete':False,'metadata':[],'history':[],'failure_class':None,'cache':cache,'reused_metadata_source_run':40709936368,'reused_metadata_identity_sha256':IDENTITY_SHA,'reference_quote':'USC','reference_fx_conversion_assumed':False,'panel':{str(k):{'digits':v['digits']} for k,v in by.items()}}
  class Panel(Collector):
   def send(self,req,historical=False):
    if type(req).__name__=='ProtoOAExpectedMarginReq':
@@ -134,7 +147,7 @@ def export():
  raw=decrypt(OUT/'source.mxmenc');need(bytes_digest(raw)==r['private_sha256'],'ANCHOR_SOURCE_PLAIN');p=json.loads(raw)
  need(p['source_sha']==os.environ['GITHUB_SHA'] and p['spec_sha256']==SPEC_SHA and p['run_id']==int(os.environ['GITHUB_RUN_ID']),'ANCHOR_SOURCE_IDENTITY')
  cache=json.loads((OUT/'cache.json').read_bytes());need(bytes_digest((OUT/'cache-input.mxmenc').read_bytes())==cache['cache_input_sha256'],'ANCHOR_CACHE_HANDOFF')
- reused=json.loads(decrypt(OUT/'cache-input.mxmenc'));need(reused['run_id']==40709936368 and reused['source_sha']=='88c2907a125581cb6c6b84654565688cb91a2db5','ANCHOR_CACHE_HANDOFF_SCOPE')
+ reused=json.loads(decrypt(OUT/'cache-input.mxmenc'));need(reused['run_id']==int(os.environ['GITHUB_RUN_ID']) and reused['source_sha']==os.environ['GITHUB_SHA'],'ANCHOR_CACHE_HANDOFF_SCOPE')
  temp=Path(os.environ['RUNNER_TEMP'])/'commodity-anchor';temp.mkdir(parents=True,exist_ok=True)
  if not p['complete']:
   (temp/'admission.json').write_bytes(encoded({'admitted':False,'reason':'SOURCE_OR_CONTEMPORARY_TERMS_UNRESOLVED','producer':r}));return
@@ -163,9 +176,27 @@ def export():
  overlap=set(z[0] for z in by[1]) & set(z[0] for z in by[250]) & set(z[0] for z in by[7393])
  if len(overlap)<128:
   (temp/'admission.json').write_bytes(encoded({'admitted':False,'reason':'INSUFFICIENT_JOINT_H1_SUPPORT','joint_hours':len(overlap),'producer':r}));return
- data={'policy':SPEC_SHA,'start':START,'evaluation_start':EVAL,'end':END,'terms':p['terms'],'target':by[250],'anchor':by[7393],'fx':by[1]}
+ capacity=time_capacity(by)
+ if any(v<21 for v in capacity.values()):
+  (temp/'admission.json').write_bytes(encoded({'admitted':False,'reason':'TIME_SUPPORT_CANNOT_MEET_UNCHANGED_WEEKLY_GATE','joint_hours':len(overlap),'opportunity_capacity_by_week':capacity,'producer':r}));return
+ data={'policy':TRANSPORT_SHA,'start':START,'evaluation_start':EVAL,'end':END,'terms':p['terms'],'target':by[250],'anchor':by[7393],'fx':by[1]}
  need(all(all(len(z)==5 and z[0]%3600000==0 and min(z[1:])>0 and z[3]<=min(z[1],z[4])<=max(z[1],z[4])<=z[2] for z in h) for h in by.values()),'ANCHOR_INPUT_OHLC')
- (temp/'input.json').write_bytes(encoded(data));(temp/'admission.json').write_bytes(encoded({'admitted':True,'input_sha256':bytes_digest((temp/'input.json').read_bytes()),'original_rows_redecoded':len(by[7393]),'authenticated_cached_rows':len(by[1])+len(by[250])}))
+ (temp/'input.json').write_bytes(encoded(data));(temp/'admission.json').write_bytes(encoded({'admitted':True,'input_sha256':bytes_digest((temp/'input.json').read_bytes()),'original_rows_redecoded':len(by[7393]),'authenticated_cached_rows':len(by[1])+len(by[250]),'opportunity_capacity_by_week':capacity}))
+
+def time_capacity(by):
+ # Source timestamp upper bound only; never filters forecasts or the actual account cohort.
+ t={row[0] for row in by[250]};q={row[0] for row in by[7393]};f={row[0] for row in by[1]}
+ from datetime import datetime,timezone
+ counts={}
+ for w in (32,33,34,35):
+  busy=-1;n=0
+  for moment in range(EVAL,END,3600000):
+   utc=datetime.fromtimestamp(moment/1000,timezone.utc)
+   if utc.isocalendar().week!=w or utc.weekday()>=5 or not 7<=utc.hour<17:continue
+   support=moment-3600000 in t and moment-3600000 in q and all(moment+k*3600000 in t & f for k in (0,1,2))
+   if support and moment>=busy:n+=1;busy=moment+7200000
+  counts['2026-W'+str(w)]=n
+ return counts
 
 def cache_digest():return bytes_digest((OUT/'cache-input.mxmenc').read_bytes())
 
@@ -177,7 +208,7 @@ def evaluate():
   subprocess.run(['dotnet','run','--project',PROJECT,'-c','Release','--no-build','--',str(temp/'input.json'),str(temp/'actual.json')],check=True,capture_output=True)
   actual=json.loads((temp/'actual.json').read_bytes(),parse_float=D);need(actual['input_sha256']==a['input_sha256'] and reconcile(actual,data),'ANCHOR_CAUSAL_REFERENCE')
   account=actual['account'];complete=actual['fault'] is None and account is not None and account['OpenPositions']==0
-  frequency=complete and all(account['EntriesByIsoWeek'].get('2026-W'+str(w),0)>=21 for w in (23,24,25,26))
+  frequency=complete and all(account['EntriesByIsoWeek'].get('2026-W'+str(w),0)>=21 for w in (32,33,34,35))
   net=complete and D(str(account['MarkedEquityEur']))>200
   gates={'complete_conditional_account':complete,'net_positive_in_declared_scenario':net,'every_complete_week_21_modeled_entries':bool(frequency),'drawdown_at_most40eur':complete and D(str(account['MaxDrawdownEur']))<=40,'every_complete_week_net_positive':complete and len(actual['weekMarks'])==5 and all(D(str(b))>D(str(a)) for a,b in zip(actual['weekMarks'],actual['weekMarks'][1:]))}
   verdict='DATA_LIMITED' if not complete else 'NET_FAIL_SCENARIO' if not net else 'HARD21_FAIL_SCENARIO' if not frequency else 'TEMPORAL_OR_DRAWDOWN_FAIL_SCENARIO' if not gates['every_complete_week_net_positive'] or not gates['drawdown_at_most40eur'] else 'CONDITIONAL_SCENARIO_SURVIVOR_NOT_QUALIFIED'
@@ -192,7 +223,7 @@ def evaluate():
   if report is not None:
    fields=('Classification','InitialCapitalEur','FinalCashEur','MarkedEquityEur','UsedMarginEur','FreeMarginEur','MaxDrawdownEur','AcceptedEntries','ExecutedExits','RejectedEntries','OpenPositions','CompleteIsoUtcWeeks','EntriesByIsoWeek')
    account_summary={k:str(report[k]) if isinstance(report[k],D) else report[k] for k in fields}
- r={'conditional_account_summary':account_summary,'conditional_week_equity_marks':[str(x) for x in actual['weekMarks']] if actual is not None else [],'schema':'mxm.commodity-anchor-public.v1','source_sha':os.environ['GITHUB_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),'spec_sha256':SPEC_SHA,'disposition':verdict,'gates':gates,'reference_quote':'USC','reference_fx_conversion_assumed':False,'reused_metadata_source_run':40709936368,'source_rows':producer['rows'],'native_h1_requests':producer['request_counts'].get('H1',0),'metadata_requests':producer['request_counts'].get('panel',0),'models_executed':int(actual is not None),'conditional_cost_scenarios':int(actual is not None),'causal_forecasts':len(actual['decisions']) if actual is not None else 0,'causal_proposals':len(actual['proposals']) if actual is not None else 0,'account_fault':actual['fault'] if actual is not None else None,'source_sha256':producer['cipher_sha256'],'private_sha256':bytes_digest(private_result),'cipher_sha256':bytes_digest((OUT/'result.mxmenc').read_bytes()),'evaluator_sha256':bytes_digest(binary.read_bytes()),'native_rows_independently_redecoded':False,'new_anchor_rows_independently_redecoded':a.get('original_rows_redecoded',0),'authenticated_cached_rows':a.get('authenticated_cached_rows',0),'cache_input_sha256':cache_digest(),'forecasts_independently_reconciled':bool(a['admitted']),'initial_capital_eur':200,'initial_funding_count':int(actual is not None),'historical_costs_proven':False,'observed_bidask_path':False,'actual_fills_proven':False,'hard21_proven':False,'economic_edge_proven':False,'independent_confirmation':False,'protected_opened':False,'closed_configuration_reexecuted':False,'orders':0,'cloud_activated':False,'automatic_followup':False,'next_action':'CLOSE_FIXED_MODEL_NO_RETUNE' if actual is not None else 'STOP_SOURCE_PRECONDITION_NO_MODEL_NO_AUTOMATIC_RETRY'}
+ r={'source_calendar_ms':{'start':START,'evaluation_start':EVAL,'end':END},'source_support_reason':a.get('reason'),'opportunity_capacity_by_week':a.get('opportunity_capacity_by_week',{}),'conditional_account_summary':account_summary,'conditional_week_equity_marks':[str(x) for x in actual['weekMarks']] if actual is not None else [],'schema':'mxm.commodity-anchor-public.v1','source_sha':os.environ['GITHUB_SHA'],'run_id':int(os.environ['GITHUB_RUN_ID']),'spec_sha256':SPEC_SHA,'disposition':verdict,'gates':gates,'reference_quote':'USC','reference_fx_conversion_assumed':False,'reused_metadata_source_run':40709936368,'source_rows':producer['rows'],'native_h1_requests':producer['request_counts'].get('H1',0),'metadata_requests':producer['request_counts'].get('panel',0),'models_executed':int(actual is not None),'conditional_cost_scenarios':int(actual is not None),'causal_forecasts':len(actual['decisions']) if actual is not None else 0,'causal_proposals':len(actual['proposals']) if actual is not None else 0,'account_fault':actual['fault'] if actual is not None else None,'source_sha256':producer['cipher_sha256'],'private_sha256':bytes_digest(private_result),'cipher_sha256':bytes_digest((OUT/'result.mxmenc').read_bytes()),'evaluator_sha256':bytes_digest(binary.read_bytes()),'native_rows_independently_redecoded':False,'new_anchor_rows_independently_redecoded':a.get('original_rows_redecoded',0),'authenticated_cached_rows':a.get('authenticated_cached_rows',0),'cache_input_sha256':cache_digest(),'forecasts_independently_reconciled':bool(a['admitted']),'initial_capital_eur':200,'initial_funding_count':int(actual is not None),'historical_costs_proven':False,'observed_bidask_path':False,'actual_fills_proven':False,'hard21_proven':False,'economic_edge_proven':False,'independent_confirmation':False,'protected_opened':False,'closed_configuration_reexecuted':False,'orders':0,'cloud_activated':False,'automatic_followup':False,'next_action':'CLOSE_FIXED_MODEL_NO_RETUNE' if actual is not None else 'STOP_SOURCE_PRECONDITION_NO_MODEL_NO_AUTOMATIC_RETRY'}
  (OUT/'receipt.json').write_bytes(encoded(r));print('MXM_COMMODITY_ANCHOR '+encoded(r).decode(),flush=True)
 
 def cold():
