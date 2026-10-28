@@ -147,6 +147,7 @@ public sealed class MxmReferenceProductBot : Robot {
    if(recoveryInspection==MxmEntryRecoveryInspection.Recoverable)
     Print("MXM_ENTRY_RECOVERY_"+entryCheckpoint.RecoveryReason);
    ReportRecordedWeeks();
+   ReportBrokerOpeningFacts();
   }catch(Exception e) {
    orderProtection.HaltUnknown();
    Print("MXM_ENTRY_CHECKPOINT_STARTUP_SAFE_STOP_"+e.GetType().Name);Stop();return;
@@ -828,7 +829,6 @@ public sealed class MxmReferenceProductBot : Robot {
   }
  }
  void ReportRecordedWeeks() {
-  ReportBrokerOpeningFacts();
   if(confirmedEntries==null)return;
   // Calendar completeness never asserts broker-history coverage or native reception.
   // Backtesting uses a fresh isolated memory ledger, never a real execution claim.

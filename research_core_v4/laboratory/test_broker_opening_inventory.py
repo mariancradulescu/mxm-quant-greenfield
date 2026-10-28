@@ -67,5 +67,5 @@ class NativeIntegration(unittest.TestCase):
  def test_actual_robot_reads_broker_deal_links_without_trading_or_storage_writes(self):
   s=(ROOT/'research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs').read_text();p=s[s.index(' MxmBrokerOpeningInventory ReadBrokerOpeningFacts'):s.index(' void ReportRecordedWeeks')]
   self.assertIn('position.Deals',p);self.assertIn('trade.ClosingDeal.Closing',p)
-  self.assertIn('DealPositionImpact.Opening',p);self.assertIn('!HasBrokerOpeningRecoveryProof()',s);self.assertIn('proof.Correlated && proof.RequestedUnitsObserved',p);self.assertIn('ReportBrokerOpeningFacts();',s)
+  self.assertIn('DealPositionImpact.Opening',p);self.assertIn('!HasBrokerOpeningRecoveryProof()',s);self.assertIn('proof.Correlated && proof.RequestedUnitsObserved',p);self.assertIn('ReportBrokerOpeningFacts();',s);self.assertNotIn('ReportBrokerOpeningFacts();',s[s.index(' void ReportRecordedWeeks()'):s.index(' void CheckEntryStorage()')])
   for forbidden in ('ExecuteMarketOrder','ClosePosition(','.Write(','.SetString(','.CompleteReconciled(','.RecordConfirmed('):self.assertNotIn(forbidden,p)
