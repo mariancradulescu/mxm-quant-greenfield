@@ -231,8 +231,8 @@ public sealed class MxmReferenceProductBot : Robot {
   var series=args.Bars;
   if(series.Count<2 || sequencer==null)return;
   var instrumentName=series.SymbolName;
-  DateTime closedOpenTime=series.OpenTimes.Last(0);
-  if(!sequencer.TryEnter(instrumentName,closedOpenTime,out var reason)){
+  DateTime closedOpenTime=DateTime.SpecifyKind(series.OpenTimes.Last(0),DateTimeKind.Utc);
+  if(!sequencer.TryEnter(instrumentName,closedOpenTime,BarMinutes,out bool processedContiguous,out var reason)){
    // Duplicate/stale bars are normal after feed reload and must not trade twice.
    if(reason=="REENTRANT_OR_CONCURRENT_DECISION"){
     Print("MXM_REENTRANT_PORTFOLIO_CALLBACK_SAFE_STOP");Stop();
@@ -252,8 +252,9 @@ public sealed class MxmReferenceProductBot : Robot {
     kernel.Reset();causalIntents[instrumentName].Clear();
     Print("MXM_DELAYED_BAR_EXPIRED_COLD_REWARM_"+instrumentName);return;
    }
-   bool contiguous=(series.OpenTimes.Last(0)-series.OpenTimes.Last(1)).TotalMinutes==BarMinutes;
-   if(!contiguous)kernel.Reset();
+   bool contiguous=processedContiguous &&
+    (series.OpenTimes.Last(0)-series.OpenTimes.Last(1)).TotalMinutes==BarMinutes;
+   if(!contiguous){kernel.Reset();causalIntents[instrumentName].Clear();}
    // Bars.BarClosed excludes the newly opened bar; Last(0) IS the closed one.
    // No historical warm-start or double-processed boundary tick.
    int desired=kernel.OnCompletedBar((decimal)series.ClosePrices.Last(0));

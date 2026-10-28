@@ -12,6 +12,20 @@ public sealed class MxmPortfolioSequencer {
  readonly Dictionary<string, DateTime> latest = new(StringComparer.OrdinalIgnoreCase);
  bool processing;
  public int SymbolCount => allowed.Count;
+ // Adjacent bars in a reloaded platform array do not establish that this
+ // instance processed the intervening callbacks. Sample our own accepted
+ // predecessor atomically with consuming the next callback.
+ public bool TryEnter(string symbol,DateTime closedBarOpen,int barMinutes,
+  out bool processedContiguous,out string reason) {
+  processedContiguous=false;
+  if(barMinutes<1 || closedBarOpen.Kind!=DateTimeKind.Utc) {
+   reason="INVALID_PROCESSED_BAR_CLOCK";return false;
+  }
+  bool adjacent=latest.TryGetValue(symbol,out var prior) &&
+   closedBarOpen.Ticks-prior.Ticks==checked(TimeSpan.TicksPerMinute*(long)barMinutes);
+  if(!TryEnter(symbol,closedBarOpen,out reason))return false;
+  processedContiguous=adjacent;return true;
+ }
  public MxmPortfolioSequencer(IEnumerable<string> symbols) {
   allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
   foreach(var name in symbols) {

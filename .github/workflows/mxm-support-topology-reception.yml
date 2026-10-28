@@ -1,0 +1,85 @@
+{
+  "name": "MXM original M5 time-only support topology reception",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-support-topology-reception.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "support-topology": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit exact finite time-only source reception before custody",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.support_topology_reception admit"
+        },
+        {
+          "name": "Compile independent support geometry and synthetic gap negatives before source access",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/support_topology/MxmSupportTopology.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_support_topology -v"
+        },
+        {
+          "name": "Authenticate all original shards in existing custody and export timestamps only",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.support_topology_reception export"
+        },
+        {
+          "name": "Compute actual CSharp support and reconcile every cell with independent run-interval reference",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.support_topology_reception evaluate"
+        },
+        {
+          "name": "Read back exact original encrypted topology in a separate custody process without recomputation",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.support_topology_reception cold"
+        },
+        {
+          "name": "Emit only original ciphertext DLL and receipts as a bounded restorable bundle",
+          "run": "python3 -m research_core_v4.laboratory.support_topology_reception preserve"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "support-topology-${{ github.run_id }}",
+            "path": "verification/support-topology/receipt.json\nverification/support-topology/result.mxmenc\nverification/support-topology/evaluator.dll\nverification/support-topology/cold.json\nverification/support-topology/runtime-original.zip",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}

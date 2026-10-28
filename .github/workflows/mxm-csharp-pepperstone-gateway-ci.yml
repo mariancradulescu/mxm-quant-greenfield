@@ -11,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile processed callback continuity and prevent stale history after native reload
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/processed_bars/MxmProcessedBars.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_processed_bar_continuity -v
+      - name: Compile time-only source geometry and reconcile independent gap and boundary reference
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/support_topology/MxmSupportTopology.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_support_topology -v
       - name: Verify original peer-residual outcome without keys or economic replay
         run: |
           python3 -m research_core_v4.laboratory.verify_peer_residual_result
