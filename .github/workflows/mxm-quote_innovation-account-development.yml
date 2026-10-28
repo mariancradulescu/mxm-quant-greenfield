@@ -1,0 +1,88 @@
+{
+  "name": "MXM one causal quote-innovation continuous EUR200 DEVELOPMENT",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-quote_innovation-account-development.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "quote_innovation-account-development": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".sealed-chronology-source",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit the exact finite prospective model before key access",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.quote_innovation_development admit"
+        },
+        {
+          "name": "Compile and reconcile artificial continuous-account paths without secrets",
+          "run": "dotnet build research_core_v4/laboratory/csharp/quote_innovation/MxmQuoteInnovation.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_quote_innovation_development -v\npython3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m research_core_v4.laboratory.durable_week35_chronology --out \"${RUNNER_TEMP}/mxm-quote_innovation/W35\"\npython3 -m research_core_v4.laboratory.durable_week36_chronology --out \"${RUNNER_TEMP}/mxm-quote_innovation/W36\"\npython3 -m research_core_v4.laboratory.durable_week_chronology --out \"${RUNNER_TEMP}/mxm-quote_innovation/W37\"\ncp research_core_v4/laboratory/week_chronology_reception.py research_core_v4/laboratory/three_week_source.py .sealed-chronology-source/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Reauthenticate and decode only the three exact originals in existing custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .sealed-chronology-source\npython3 -m research_core_v4.laboratory.three_week_source W35 \"${RUNNER_TEMP}/mxm-quote_innovation/W35/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-quote_innovation/W35.ndjson\"\npython3 -m research_core_v4.laboratory.three_week_source W36 \"${RUNNER_TEMP}/mxm-quote_innovation/W36/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-quote_innovation/W36.ndjson\"\npython3 -m research_core_v4.laboratory.three_week_source W37 \"${RUNNER_TEMP}/mxm-quote_innovation/W37/capture.mxmenc\" \"${RUNNER_TEMP}/mxm-quote_innovation/W37.ndjson\"\n"
+        },
+        {
+          "name": "Execute one causal learner and one continuous account; reconcile forecasts and cash without keys",
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.quote_innovation_development result \"${RUNNER_TEMP}/mxm-quote_innovation\" verification/quote_innovation-account-development"
+        },
+        {
+          "name": "Cold read original result without rerunning the model",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.quote_innovation_development cold"
+        },
+        {
+          "name": "Preserve exact original ciphertext and evaluator without decryption",
+          "run": "python3 -m research_core_v4.laboratory.quote_innovation_development preserve"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "quote_innovation-account-development-${{ github.run_id }}",
+            "path": "verification/quote_innovation-account-development/receipt.json\nverification/quote_innovation-account-development/full-result.mxmenc\nverification/quote_innovation-account-development/cold.json\nverification/quote_innovation-account-development/evaluator.dll\nverification/quote_innovation-account-development/runtime-original.zip",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
