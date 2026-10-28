@@ -1,0 +1,88 @@
+{
+  "name": "MXM authentic displayed financing components in shared CSharp account",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-displayed-financing-reception.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "financing-units": {
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 15,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".financing-unit-native",
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit original source and one no-broker component reception before custody",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.displayed_financing_reception admit"
+        },
+        {
+          "name": "Compile exact funding components and continuous-account/cold-process checks without keys",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/displayed_financing/MxmDisplayedFinancing.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_displayed_financing -v\npython3 -m research_core_v4.laboratory.displayed_financing_reception prepare"
+        },
+        {
+          "name": "Authenticate original raw wire and export terms only under existing custody",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .financing-unit-native\npython3 -m research_core_v4.laboratory.displayed_financing_reception export"
+        },
+        {
+          "name": "Calculate all native minimum-volume signed components CSharp and reconcile exact rational Python",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.displayed_financing_reception evaluate"
+        },
+        {
+          "name": "Separate custody readback of exact original encrypted component ledger without calculation replay",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\ncd .financing-unit-native\npython3 -m research_core_v4.laboratory.displayed_financing_reception cold"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "displayed-financing-${{ github.run_id }}",
+            "path": "verification/displayed-financing/receipt.json\nverification/displayed-financing/ledger.mxmenc\nverification/displayed-financing/evaluator.dll\nverification/displayed-financing/cold.json",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ]
+    }
+  }
+}
