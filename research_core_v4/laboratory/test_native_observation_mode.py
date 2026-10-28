@@ -63,6 +63,6 @@ class NativeIntegration(unittest.TestCase):
    self.assertNotIn(forbidden,s)
   self.assertIn('ReportBrokerOpeningFacts();',s);self.assertIn('nativeReceptionBook.Observe',s);self.assertIn('nativeReceptionRunId',s);self.assertIn('durableRecovery=false',s)
  def test_stop_and_exception_cannot_fall_through_to_account_recovery(self):
-  s=method(self.s,'OnStop');self.assertLess(s.index('ObservationLatched'),s.index('Timer.Stop'))
+  s=method(self.s,'OnStop');self.assertLess(s.index('ObservationLatched'),s.index('Timer.Stop'));self.assertNotIn('nativeRun.Stop()',s[s.index('Timer.Stop'):])
   s=method(self.s,'OnException');self.assertLess(s.index('ObservationLatched'),s.index('entryStorageFault'))
 if __name__=='__main__':unittest.main()

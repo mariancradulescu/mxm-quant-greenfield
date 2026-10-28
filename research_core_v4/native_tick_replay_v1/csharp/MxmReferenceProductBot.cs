@@ -300,7 +300,8 @@ public sealed class MxmReferenceProductBot : Robot {
  }
  protected override void OnStop() {
   if(nativeRun.ObservationLatched){StopNativeObservation();return;}
-  nativeRun.Stop();
+  // Preserve original Desktop cleanup/reconciliation behavior. Only the
+  // observation purpose is latched stopped before its private unsubscribe.
 
   Timer.Stop();
   Positions.Closed-=OnBrokerPositionClosed;
