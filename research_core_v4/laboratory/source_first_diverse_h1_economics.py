@@ -78,8 +78,8 @@ def support(corpus):
    "passed":len(c)>=80 and len(w)>=3 and response>=0.90*len(c)}
  paired=0
  for t in causal_times(corpus[250]):
-  if all(t-j*H in corpus[111] for j in (0,1,2)) and
-     all(fulfilled(corpus[sid],t) for sid in (111,250)):paired+=1
+  if (all(t-j*H in corpus[111] for j in (0,1,2)) and
+      all(fulfilled(corpus[sid],t) for sid in (111,250))):paired+=1
  # Source evidence must justify each family, not merely the aggregate row count.
  passed=all(x["passed"] for x in profiles.values()) and paired>=60
  return {"profiles":profiles,"paired_copper_oil_support":paired,
