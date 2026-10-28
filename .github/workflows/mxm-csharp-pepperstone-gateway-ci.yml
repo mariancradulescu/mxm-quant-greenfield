@@ -14,7 +14,7 @@ jobs:
       - name: Compile prospective H1 commodity anchor and shared EUR200 scenario before source access
         run: |
           dotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release
-          python3 -m unittest research_core_v4.laboratory.test_commodity_anchor -v
+          python3 -m unittest research_core_v4.laboratory.test_commodity_anchor research_core_v4.laboratory.test_anchor_cache_reuse -v
       - name: Compile native observation purpose fence and reject every account mutation in read-only or stopped mode
         run: |
           dotnet build research_core_v4/laboratory/csharp/native_run/MxmNativeRun.csproj -c Release
