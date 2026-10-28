@@ -131,7 +131,7 @@ def evaluate(oil,fx,cost):
   net=gross-costs
   # Do not promote if some signaled trades cannot be settled with fixed rules.
   valid=raw>0 and settled==raw and not missing["RIGHT_CENSORED"] and not missing["ENTRY_OR_EXIT_SUPPORT_MISSING"]
-  status=("DATA_INSUFFICIENT" if not valid else "GROSS_EDGE_FAIL" if gross<=0 else "COARSE_NET_FAIL" if net<=0 else "EXPLORATORY_POSITIVE_NOT_CERTIFIED")
+  status=("NO_CAUSAL_SIGNALS" if raw==0 else "DATA_INSUFFICIENT" if not valid else "GROSS_EDGE_FAIL" if gross<=0 else "COARSE_NET_FAIL" if net<=0 else "EXPLORATORY_POSITIVE_NOT_CERTIFIED")
   weeks=[str(2026)+"-W"+str(w) for w in (32,33,34,35)]
   sums={w:{k:round(v,8) if isinstance(v,float) else v for k,v in by_week[w].items()} for w in weeks}
   result.append({"id":model,"status":status,"causal_signals":raw,"settled_opportunities":settled,
@@ -159,6 +159,9 @@ def main():
   and os.environ.get("GITHUB_EVENT_NAME")=="push"
   and os.environ.get("GITHUB_RUN_ATTEMPT")=="1","EXACT_CONTEXT")
  s,cost=validate()
+ from research_core_v4.laboratory.budgets import historical_accounting
+ accounting=historical_accounting(ROOT)
+ need(accounting["reconciled"] and accounting["V2"]["remaining"]>=3,"SCIENTIFIC_BUDGET")
  from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
  from research_core_v4.successor_c_20261018.readback import FP
  from research_core_v4.owner_recovery_v1.runtime_v1 import load_asset
@@ -173,7 +176,7 @@ def main():
  result=evaluate(sources[250],sources[1],cost)
  doc={"schema":"mxm.v4.finite-comparative-development-result.v1",
   "run_id":int(os.environ["GITHUB_RUN_ID"]),"source_head":os.environ["GITHUB_SHA"],
-  "source_provenance":provenance,"manifest_sha256":sha((ROOT/SPEC).read_bytes()),
+  "source_provenance":provenance,"scoped_preoutcome_budget":{"existing_v2_used_not_changed":accounting["V2"]["used"],"existing_v2_remaining_not_refunded":accounting["V2"]["remaining"],"separately_counted_v4_development_trials":3},"manifest_sha256":sha((ROOT/SPEC).read_bytes()),
   "cost_authority_sha256":sha((ROOT/AUTH).read_bytes()),
   "source_window":["2026-08-03T00:00:00Z","2026-08-31T00:00:00Z"],
   "source_rows":{str(k):len(v) for k,v in sources.items()},
