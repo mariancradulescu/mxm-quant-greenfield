@@ -18,3 +18,6 @@ The legacy repository `mariancradulescu/mxm-quant-director` is READ-ONLY evidenc
 - No live orders and no competition start without explicit user authorization.
 
 Authoritative controls are intentionally minimal: `TRUTH_CAPSULE_V1.json`, `RESEARCH_CONTRACT_V2.md`, `CURRENT_STATE.json`, `data/DATA_MANIFEST.json`, and append-only `discovery/ledger.jsonl`.
+## Current delivery feasibility
+
+The source-backed [28 October2026 feasibility and critical path](docs/convergence/20261028/FEASIBILITY_AND_CRITICAL_PATH_V1.md) distinguishes documented Cloud storage incompatibility, unreceived Desktop/CLI capabilities, necessary EUR200 margin bounds, unresolved all-in economics and the no-orders boundary. It changes neither the binding objective nor authority. Build/CI success is not final operational/economic acceptance.
