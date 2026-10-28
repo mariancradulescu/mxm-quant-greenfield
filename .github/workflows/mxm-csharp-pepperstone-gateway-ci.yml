@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Validate one finite multi-mechanism economic programme before any source or key access
+        run: |
+          python3 -m research_core_v4.laboratory.finite_comparative_20261028_v1 --selftest
+          python3 -c 'from research_core_v4.laboratory.finite_comparative_20261028_v1 import validate; validate()'
       - name: Compile prospective H1 commodity anchor and shared EUR200 scenario before source access
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
