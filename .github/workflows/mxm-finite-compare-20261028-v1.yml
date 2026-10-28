@@ -43,11 +43,37 @@ jobs:
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-remediation-p0-p4-20261015-v1 --jq .object.sha)" = "$GITHUB_SHA"
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-active-v1 --jq .object.sha)" = "07d1ddbe0b83753bbf189770af1911623fef8d6f"
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-accepted-owner-1807-v1 --jq .object.sha)" = "a830c132521bd4348454653f713e04f6107484fe"
-          # The exact predecessor was rejected by YAML parser before creating any job.
-          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/actions/runs/40736989235 --jq .conclusion)" = "failure"
-          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/actions/runs/40736989235/jobs --jq .total_count)" = "0"
-          # One non-started parser-failure plus exactly one current official push.
-          test "$(gh api 'repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-finite-compare-20261028-v1.yml/runs?event=push&branch=mxm-remediation-p0-p4-20261015-v1&per_page=100' --jq .total_count)" = "2"
+          # All previous attempts are exact bounded pre-economics technical failures.
+          # Never re-execute after any model step has started, including ambiguous failure.
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo="mariancradulescu/mxm-quant-greenfield"
+          def api(path):
+              return json.loads(subprocess.check_output(["gh","api","repos/"+repo+"/"+path],text=True))
+          def must(condition,code):
+              if not condition:raise RuntimeError("COMPARE_FAIL_CLOSED_"+code)
+          current=int(os.environ["GITHUB_RUN_ID"])
+          path="actions/workflows/mxm-finite-compare-20261028-v1.yml/runs?event=push&branch=mxm-remediation-p0-p4-20261015-v1&per_page=100"
+          response=api(path);runs=response["workflow_runs"]
+          expected={40736989235,40737524654,40738420079,current}
+          must(response["total_count"]==len(runs)==4 and {x["id"] for x in runs}==expected,"EXACT_ATTEMPT_SET")
+          by={x["id"]:x for x in runs}
+          must(by[current]["head_sha"]==os.environ["GITHUB_SHA"] and by[current]["run_attempt"]==1,"CURRENT_ID")
+          for prior in (40736989235,40737524654):
+              r=by[prior]
+              must(r["head_sha"]=="1e53bdfd31231ea7d51d4807d0ab62e520db1b00" and r["conclusion"]=="failure","PARSER_PREDECESSOR")
+              must(api("actions/runs/"+str(prior)+"/jobs")["total_count"]==0,"PARSER_ZERO_JOBS")
+          prior=by[40738420079]
+          must(prior["head_sha"]=="0387ebd1225d0994b418c02ec7039232519ca8f0" and prior["conclusion"]=="failure","ADMISSION_PREDECESSOR")
+          jobs=api("actions/runs/40738420079/jobs")["jobs"]
+          must(len(jobs)==2,"ADMISSION_JOB_COUNT")
+          economic=[x for x in jobs if x["name"]=="economic-discovery"]
+          must(len(economic)==1 and economic[0]["conclusion"]=="failure","ADMISSION_STOP")
+          steps={x["name"]:x["conclusion"] for x in economic[0]["steps"]}
+          must(steps.get("Verify exact official HEAD, authority refs and one finite push invocation")=="failure","GATE_BEFORE_CUSTODY")
+          must(steps.get("Execute three fixed authentic causal Stage A screening mechanisms in existing custody")=="skipped","ZERO_ECONOMIC_MODELS")
+          print("MXM_EXACT_PREOUTCOME_FAILURES_VALIDATED_NO_MODEL_REEXECUTION")
+          PY
       - name: Install existing exact locked dependencies
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
