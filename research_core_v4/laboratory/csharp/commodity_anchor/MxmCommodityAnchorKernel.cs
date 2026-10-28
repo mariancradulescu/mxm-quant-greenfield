@@ -17,11 +17,11 @@ public sealed class MxmCommodityAnchorKernel {
  public MxmAnchorDecision Completed(long time,decimal target,decimal anchor) {
   if(time%3600000!=0 || time<=previous || target<=0 || anchor<=0)throw new ArgumentException("ANCHOR_COMPLETED_SOURCE");
   while(samples.Count>0 && time-samples.Peek().Time>7*86400000L)samples.Dequeue();
-  decimal basis=target-anchor,mean=0,variance=0;int direction=0;
+  decimal basis=target/anchor,mean=0,variance=0;int direction=0;
   if(samples.Count==48) {
    mean=samples.Average(s=>s.Basis);variance=samples.Average(s=>(s.Basis-mean)*(s.Basis-mean));
    decimal deviation=basis-mean;
-   if(Math.Abs(deviation)>.30m && deviation*deviation>variance)direction=deviation>0?-1:1;
+   if(Math.Abs(deviation*anchor)>.30m && deviation*deviation>variance)direction=deviation>0?-1:1;
   }
   var result=new MxmAnchorDecision(time,samples.Count,basis,mean,variance,direction);
   samples.Enqueue(new(time,basis));if(samples.Count>48)samples.Dequeue();previous=time;return result;

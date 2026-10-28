@@ -31,6 +31,10 @@ class AnchorTests(unittest.TestCase):
   ms=int(datetime.fromisoformat(first['Utc'].replace('Z','+00:00')).timestamp()*1000)
   broken=copy.deepcopy(d);broken['target']=[x for x in d['target'] if x[0]!=ms+3600000]
   r=self.run_model(broken);self.assertTrue(reconcile(r,broken));self.assertIsNone(r['account']);self.assertIsNotNone(r['fault']);self.assertGreater(r['last_verified_prefix']['AcceptedEntries'],0)
+ def test_anchor_unit_rescaling_does_not_manufacture_signal_or_cash(self):
+  d=self.data();a=self.run_model(d);b=copy.deepcopy(d)
+  b['anchor']=[[r[0]]+[v*100 for v in r[1:]] for r in d['anchor']];z=self.run_model(b)
+  self.assertTrue(reconcile(z,b));self.assertEqual([r['Direction'] for r in a['decisions']],[r['Direction'] for r in z['decisions']]);self.assertEqual(a['proposals'],z['proposals']);self.assertEqual(a['account'],z['account'])
  def test_cash_and_forecast_tampering_refused(self):
   d=self.data();a=self.run_model(d)
   for kind in ('cash','forecast'):

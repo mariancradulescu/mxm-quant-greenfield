@@ -10,10 +10,10 @@ def _reference(data):
  history=[];results=[]
  for t in range(data['start'],data['end'],3600000):
   if t not in target or t not in fx or t-3600000 not in target or t-3600000 not in anchor:continue
-  history=[x for x in history if t-x[0]<=7*86400000];basis=target[t-3600000][3]-anchor[t-3600000][3];mean=variance=D(0);direction=0
+  history=[x for x in history if t-x[0]<=7*86400000];basis=target[t-3600000][3]/anchor[t-3600000][3];mean=variance=D(0);direction=0
   if len(history)==48:
    vals=[b for _,b in history];mean=sum(vals)/48;variance=sum((v-mean)**2 for v in vals)/48;delta=basis-mean
-   if abs(delta)>D('.30') and delta*delta>variance:direction=-1 if delta>0 else 1
+   if abs(delta*anchor[t-3600000][3])>D('.30') and delta*delta>variance:direction=-1 if delta>0 else 1
   results.append({'Time':t,'Count':len(history),'Basis':basis,'Mean':mean,'Variance':variance,'Direction':direction});history=(history+[(t,basis)])[-48:]
  return results
 
