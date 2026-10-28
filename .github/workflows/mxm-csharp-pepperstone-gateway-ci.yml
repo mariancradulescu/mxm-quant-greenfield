@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile native observation purpose fence and reject every account mutation in read-only or stopped mode
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/native_run/MxmNativeRun.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_native_observation_mode -v
       - name: Verify exact original quote-innovation first outcome without market decryption or economic replay
         run: |
           python3 -m research_core_v4.laboratory.verify_quote_innovation_result
