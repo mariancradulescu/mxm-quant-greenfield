@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile prospective cross-sectional peer policy and reconcile independent causal reference
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/peer_residual/MxmPeerResidual.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_peer_residual -v
       - name: Verify original authentic financing component ledger without custody or recalculation
         run: |
           python3 -m research_core_v4.laboratory.verify_displayed_financing_result
