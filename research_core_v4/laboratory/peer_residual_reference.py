@@ -23,7 +23,7 @@ def reference(packets):
   opens[ordinal]={t:r['open'] for t,r in rows.items()}
   for d in sorted(t+300 for t in rows if (t+300)%3600==0 and t+300<END):
    if all(d-300*k in rows for k in range(1,13)):
-    by_time[d].append((ordinal,p['group'],p['eligible'],move(rows[d-3600]['open'],rows[d-300]['close'])))
+    by_time[d].append((ordinal,p['group'],p['eligible'] and d in p['eligible_times'],move(rows[d-3600]['open'],rows[d-300]['close'])))
  signature=''.join(f'{t},{o},{g},{int(e)},{q}\n' for t,fs in sorted(by_time.items()) for o,g,e,q in sorted(fs))
  ledger=[]
  for d in range(EVAL,END,3600):

@@ -1,7 +1,7 @@
 import copy,json,os,shutil,subprocess,tempfile,unittest
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
-from .peer_residual_reference import reference,verdict
+from .peer_residual_reference import reference,verdict,EVAL,END
 ROOT=Path(__file__).resolve().parents[2];PROJECT='research_core_v4/laboratory/csharp/peer_residual/MxmPeerResidual.csproj'
 def packets(sign=1):
  start=datetime(2026,8,27,tzinfo=timezone.utc);out=[]
@@ -11,7 +11,7 @@ def packets(sign=1):
    p='100';c=str(100+sign) if ordinal==1 and k==11 else '100'
    if ordinal==1 and k>=13:p=c='100' # future entry is not the feature closing price
    rows.append(dict(time_utc=(start+timedelta(minutes=5*k)).isoformat().replace('+00:00','Z'),open=p,close=c,high='102',low='98',tick_volume='4'))
-  out.append(dict(ordinal=ordinal,group=0,eligible=True,rows=rows))
+  out.append(dict(ordinal=ordinal,group=0,eligible=True,eligible_times=list(range(EVAL,END,3600)),rows=rows))
  return out
 class Compiled(unittest.TestCase):
  @classmethod
@@ -57,3 +57,12 @@ class Scope(unittest.TestCase):
   with patch.dict(os.environ,{},clear=True),patch.object(n.subprocess,'check_output') as git:
    with self.assertRaises(ValueError):n.context(custody=True)
    git.assert_not_called()
+
+ def test_current_reference_calendar_does_not_infer_future_session(self):
+  from .peer_residual_development import reference_hours
+  full={'scheduleTimeZone':'UTC','schedule':[{'startSecond':86400+9*3600,'endSecond':86400+10*3600}],'holiday':[]}
+  hours=reference_hours(full)
+  from .peer_residual_reference import sec
+  self.assertIn(sec('2026-08-31T09:00:00Z'),hours)
+  self.assertNotIn(sec('2026-08-31T10:00:00Z'),hours)
+  del full['holiday'];self.assertEqual(reference_hours(full),[])

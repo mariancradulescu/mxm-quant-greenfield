@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 static class PeerResidual {
  sealed record Row([property:JsonPropertyName("time_utc")]string Time,[property:JsonPropertyName("open")]decimal Open,
   [property:JsonPropertyName("high")]decimal High,[property:JsonPropertyName("low")]decimal Low,[property:JsonPropertyName("close")]decimal Close);
- sealed record Packet(int Ordinal,int Group,bool Eligible,Row[] Rows);
+ sealed record Packet(int Ordinal,int Group,bool Eligible,long[] EligibleTimes,Row[] Rows);
  sealed record Feature(long T,int Ordinal,int Group,bool Eligible,long Move);
  sealed record Decision(long T,int N,int? Ordinal,int? Group,int? Direction,long? Residual2,long? Entry,long? Exit,string Status,long? GrossUnits);
  static readonly JsonSerializerOptions Options=new(){PropertyNameCaseInsensitive=true,NumberHandling=JsonNumberHandling.AllowReadingFromString};
@@ -23,13 +23,13 @@ static class PeerResidual {
   Need(args.Length==2,"ARGUMENTS");var data=new Dictionary<int,Dictionary<long,(decimal Open,decimal Close)>>();
   var features=new SortedDictionary<long,List<Feature>>();long rows=0;var signature=new StringBuilder();
   foreach(string line in File.ReadLines(args[0])){
-   var p=JsonSerializer.Deserialize<Packet>(line,Options)!;Need(p.Ordinal is >=1 and <=1576 && p.Group>=0 && p.Rows!=null && !data.ContainsKey(p.Ordinal),"IDENTITY");
-   var map=new Dictionary<long,(decimal Open,decimal Close)>();long previous=-1;
+   var p=JsonSerializer.Deserialize<Packet>(line,Options)!;Need(p.Ordinal is >=1 and <=1576 && p.Group>=0 && p.Rows!=null && p.EligibleTimes!=null && !data.ContainsKey(p.Ordinal),"IDENTITY");
+   var map=new Dictionary<long,(decimal Open,decimal Close)>();var eligibleTimes=new HashSet<long>(p.EligibleTimes!);long previous=-1;
    foreach(var r in p.Rows!){long t=Sec(r.Time);Need(r.Time.EndsWith("Z",StringComparison.Ordinal) && t>=First && t<End && t%300==0 && t>previous && r.Low>0 && r.High>=r.Low && r.Open>=r.Low && r.Open<=r.High && r.Close>=r.Low && r.Close<=r.High,"SOURCE_FENCE_CHRONOLOGY_OHLC");map.Add(t,(r.Open,r.Close));previous=t;rows++;}
    data.Add(p.Ordinal,map);
    foreach(long d in map.Keys.Select(t=>t+300).Where(t=>t%3600==0 && t<End).OrderBy(t=>t)){
     if(!Enumerable.Range(1,12).All(k=>map.ContainsKey(d-k*300)))continue;
-    var f=new Feature(d,p.Ordinal,p.Group,p.Eligible,Move(map[d-3600].Open,map[d-300].Close));
+    var f=new Feature(d,p.Ordinal,p.Group,p.Eligible && eligibleTimes.Contains(d),Move(map[d-3600].Open,map[d-300].Close));
     if(!features.ContainsKey(d))features[d]=new();features[d].Add(f);
    }
   }

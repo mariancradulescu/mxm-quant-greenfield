@@ -15,7 +15,8 @@ POLICY={'model_id':'MXM_CROSS_SECTIONAL_PEER_RESIDUAL_REVERSION_20261028_V1','ne
  'feature':'TWELVE_CONTIGUOUS_PRIOR_COMPLETED_M5_OPEN_TO_CLOSE_MOVE_ROUNDED_8_BPS',
  'peer':'SAME_FROZEN_ASSET_CLASS_LEAVE_ONE_OUT_MEDIAN_AT_LEAST_TEN_OTHER_OBSERVED_FEATURES',
  'selection':'ONE_GLOBAL_LARGEST_ABSOLUTE_PEER_RESIDUAL_PER_UTC_HOUR_ORDINAL_TIEBREAK',
- 'target_eligibility':'OCT03_CURRENT_REFERENCE_STRUCTURALLY_ELIGIBLE_BOTH_MIN_MARGINS_LE80_NOT_HISTORICAL_PROOF',
+ 'target_eligibility':'OCT03_CURRENT_REFERENCE_STRUCTURALLY_ELIGIBLE_BOTH_MIN_MARGINS_LE80_AND_FULL_REFERENCE_SESSION_HORIZON_NOT_HISTORICAL_PROOF',
+ 'calendar':'REUSE_STRICT_DAY_INTERVALS_EXPLICIT_HOLIDAY_LIST_AND_TIMEZONE_KNOWN_REFERENCE_INTERVAL_AT_LEAST60MIN_CONTAINS_ENTRY_THROUGH_EXIT_NO_PAST_VALIDITY_CLAIM',
  'threshold_bps':20,'direction':'OPPOSITE_PEER_RESIDUAL','entry_minutes_after_decision':5,'exit_minutes_after_decision':55,
  'missing_future':'CENSOR_ORIGINAL_SELECTION_NO_REPLACEMENT_REQUIRE_ALL11_M5_OPEN_ROWS',
  'evaluation_start':'2026-08-27T00:00:00Z','end_exclusive':'2026-09-17T00:00:00Z','feature_rounding':'EXACT_RATIONAL_NEAREST_8_BPS_AWAY_FROM_ZERO',
@@ -54,6 +55,16 @@ def admit():
  runs=route.json('actions/workflows/'+PATH.split('/')[-1]+'/runs?per_page=100');need(runs['total_count']==len(runs['workflow_runs'])==1 and runs['workflow_runs'][0]['id']==int(os.environ['GITHUB_RUN_ID']) and runs['workflow_runs'][0]['run_attempt']==1,'PEER_ONE_ATTEMPT')
  return {'run_id':int(os.environ['GITHUB_RUN_ID']),'source_sha':head,'spec_sha256':bytes_digest((ROOT/SPEC).read_bytes())}
 def temporary():return Path(os.environ['RUNNER_TEMP'])/'mxm-peer-residual'
+def reference_hours(full):
+ from datetime import datetime,timedelta,timezone
+ from .peer_residual_reference import EVAL,END
+ from research_core_v4.quote_probe_plan_v1 import day_intervals
+ if not all(k in full for k in ('schedule','scheduleTimeZone','holiday')):return []
+ try:
+  first=datetime.fromtimestamp(EVAL,timezone.utc).date()-timedelta(days=2)
+  intervals=[(int(a.timestamp()),int(b.timestamp())) for day in range(25) for a,b in day_intervals(full,first+timedelta(days=day))]
+  return [d for d in range(EVAL,END,3600) if any(a<=d+300 and d+3300<b for a,b in intervals)]
+ except (ValueError,KeyError,TypeError):return []
 def export():
  context(custody=True);entries,manifest_sha=load_market_geometry()
  from .universe_commission_checks import snapshot
@@ -62,6 +73,7 @@ def export():
  from research_core_v4.shallow_m5_support_v2_production import decrypt_synthetic_package
  source,_=snapshot();meta={x['symbol_id']:x for x in source['rows']};master=load_master(ROOT);groups={g:i for i,g in enumerate(sorted({x['asset_class'] for x in master}))}
  need(len(meta)==len(master)==1576,'PEER_REFERENCE_UNIVERSE')
+ allowed={x['symbol_id']:reference_hours(meta[x['symbol_id']]['current_full_metadata']) for x in master}
  temp=temporary();temp.mkdir(mode=0o700,exist_ok=True);total=shards=packets=0
  with tempfile.TemporaryDirectory(prefix='mxm-peer-source-') as d:
   root=Path(d);key,fp=_private_key_from_secret(root);need(fp=='464d2429313b8a417d26e478dab32aa1fa606471db1239a9fcfc6daa3329cb11','PEER_EXISTING_CUSTODY')
@@ -83,7 +95,7 @@ def export():
      if rows:parse_rows(rows)
      identity=master[ordinal-1];m=meta[identity['symbol_id']];need(m['symbol']==identity['symbol'] and m['asset_class']==identity['asset_class'],'PEER_EXACT_REFERENCE_MAPPING')
      eligible=m['status']=='STRUCTURALLY_ELIGIBLE' and Decimal(m['buy_min_margin_eur'])<=80 and Decimal(m['sell_min_margin_eur'])<=80
-     stream.write(encoded({'ordinal':ordinal,'group':groups[identity['asset_class']],'eligible':eligible,'rows':rows})+b'\n');packets+=1
+     stream.write(encoded({'ordinal':ordinal,'group':groups[identity['asset_class']],'eligible':eligible,'eligible_times':allowed[identity['symbol_id']],'rows':rows})+b'\n');packets+=1
  need((total,shards,packets)==(3355389,100,1576),'PEER_COMPLETE_SOURCE')
  (temp/'bridge.json').write_bytes(encoded({'manifest_sha256':manifest_sha,'input_sha256':file_hash(temp/'input.jsonl'),'rows':total,'shards':shards,'packets':packets,'reference_metadata_capture':source['completed_utc']}))
  print('MXM_PEER_ORIGINAL_SOURCE_AUTHENTICATED rows=3355389 shards=100 identities=1576',flush=True)
