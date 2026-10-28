@@ -126,6 +126,13 @@ public sealed class MxmEntryCheckpoint {
    RecoveryReason="RECOVERED_CONFIRMED_OPEN_POSITION_NO_RESUBMISSION";return true;
   }catch{RecoveryReason="RECOVERY_EXCEPTION_NO_ADMISSION";return Fail();}
  }
+ // Native adapter calls this after account calculations and BEFORE final
+ // observation/bar expiry checks. A reload may block, so it must not follow
+ // the last freshness checks. This is not inter-instance atomic locking.
+ public bool VerifyPreparedCurrent(){
+  if(Halted || phase!=Phase.Prepared || pending==null)return Fail();
+  try {return store.Read()==pending && !Halted || Fail();}catch{return Fail();}
+ }
  public bool MarkSubmitted(){
   if(Halted || phase!=Phase.Prepared)return Fail();
   phase=Phase.Submitted;return true;

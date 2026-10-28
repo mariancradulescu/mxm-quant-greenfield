@@ -92,6 +92,20 @@ static class EntryCheckpointFixture {
   var changed=new Store();var conflict=Guard(changed);Need(conflict.Initialize() && conflict.Prepare("EURUSD",1,Boundary) &&
    conflict.MarkSubmitted(),"CONFLICT_BASELINE");changed.Value="OTHER_ATTEMPT";
   Need(!conflict.CompleteReconciled() && changed.Value=="OTHER_ATTEMPT","NEVER_CLEAR_CHANGED_CHECKPOINT");
+  foreach(string replacement in new[]{"OTHER_ATTEMPT","", "garbage"}) {
+   var disk=new Store();var guard=Guard(disk);
+   Need(guard.Initialize() && guard.Prepare("EURUSD",1,Boundary),"RELOAD_PREPARE");
+   disk.Value=replacement;
+   Need(!guard.VerifyPreparedCurrent() && guard.Halted && !guard.MarkSubmitted() && disk.Value==replacement,
+    "CHANGED_OR_MISSING_DURABLE_INTENT_NEVER_SUBMITS_OR_OVERWRITES");
+  }
+  var unreadable=new Store();var unreadableGuard=Guard(unreadable);
+  Need(unreadableGuard.Initialize() && unreadableGuard.Prepare("EURUSD",1,Boundary),"RELOAD_FAULT_PREPARE");
+  unreadable.FailRead=true;
+  Need(!unreadableGuard.VerifyPreparedCurrent() && !unreadableGuard.MarkSubmitted(),"RELOAD_READ_FAULT_NO_SUBMIT");
+  var intact=new Store();var intactGuard=Guard(intact);
+  Need(intactGuard.Initialize() && intactGuard.Prepare("EURUSD",1,Boundary) &&
+   intactGuard.VerifyPreparedCurrent() && intactGuard.MarkSubmitted(),"EXACT_DURABLE_INTENT_RECHECK_ADMITS");
   var resolved=new Store();var success=Guard(resolved);Need(success.Initialize() && success.Prepare("EURUSD",1,Boundary) &&
    success.MarkSubmitted() && success.CompleteReconciled() && Guard(resolved).Initialize(),"RECONCILED_READY_CAN_RESTART");
   var declined=new Store();var uncertain=Guard(declined);

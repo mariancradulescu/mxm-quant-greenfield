@@ -500,6 +500,13 @@ public sealed class MxmReferenceProductBot : Robot {
   if(!Positions.Select(x=>(long)x.Id).OrderBy(x=>x).SequenceEqual(beforeIds) || PendingOrders.Count!=0) {
    Print("MXM_ACCOUNT_BOOK_CHANGED_AFTER_DURABLE_PREPARE_NO_ENTRY");return;
   }
+  // Reload the exact durable prepared intent after potentially slow account
+  // calculations. Never overwrite a missing/changed marker or infer no send.
+  // Final observation and bar lifetimes are sampled AFTER this storage IO.
+  if(!entryCheckpoint.VerifyPreparedCurrent()) {
+   orderProtection.HaltUnknown();LatchProtectionHalt();
+   Print("MXM_PREPARED_INTENT_STORAGE_CHANGED_BEFORE_ORDER_SAFE_STOP");return;
+  }
   string? requestComment=entryCheckpoint.SubmissionComment;
   if(requestComment==null) {orderProtection.HaltUnknown();LatchProtectionHalt();return;}
   // A successful earlier check does not extend the consumed bar's lifetime.
