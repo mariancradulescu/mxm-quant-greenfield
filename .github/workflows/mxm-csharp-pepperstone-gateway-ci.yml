@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Integrate current displayed financing units with the existing continuous account and cold recovery
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/displayed_financing/MxmDisplayedFinancing.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_displayed_financing -v
       - name: Verify original authenticated financing source and result without keys or replay
         run: |
           python3 -m research_core_v4.laboratory.verify_financing_carry_result
