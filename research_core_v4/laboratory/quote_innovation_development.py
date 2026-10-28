@@ -7,7 +7,7 @@ from .quote_innovation_reference import reference,reconcile,forecast_errors
 from .three_week_source import FOLDERS,RUNS,ROWS,NATIVE
 ROOT=Path(__file__).resolve().parents[2]
 SPEC=ROOT/'research_core_v4/laboratory/INNOVATION_ACCOUNT_DEVELOPMENT_V1.json'
-SPEC_SHA='047ba47a9a6607e87d2cd6aff9ee38b37d44273084ece3a7835c94fa49b2a8cf'
+SPEC_SHA='560c18565662a1e86c3d660c55af3c1a5fa1d8ca8e943676ab3f44a66ea45bde'
 PATH='.github/workflows/mxm-quote_innovation-account-development.yml'
 PROJECT='research_core_v4/laboratory/csharp/quote_innovation/MxmQuoteInnovation.csproj'
 REPO='mariancradulescu/mxm-quant-greenfield';BRANCH='mxm-remediation-p0-p4-20261015-v1'
@@ -69,7 +69,10 @@ def disposition(actual,errors):
     predictive={str(i+35):e['model_beats_zero_mse'] for i,e in enumerate(errors)}
     account_complete=actual['fault'] is None and a is not None and a['OpenPositions']==0
     gates={'all_three_source_blocks_model_mse_below_zero_forecast':all(predictive.values()),
-      'predictive_by_week':predictive,'complete_continuous_account':account_complete,
+      'predictive_by_week':predictive,
+      'causal_signal_upper_bound_by_week':{str(i+35):x['signals'] for i,x in enumerate(actual['summaries'])},
+      'each_week_at_least21_causal_proposals':all(x['signals']>=21 for x in actual['summaries']),
+      'complete_continuous_account':account_complete,
       'net_positive_scenario':account_complete and D(str(a['MarkedEquityEur']))>200,
       'all_three_weeks_21_modeled_entries':account_complete and all(a['EntriesByIsoWeek'].get(f'2026-W{i}',0)>=21 for i in (35,36,37)),
       'drawdown_at_most_40eur':account_complete and D(str(a['MaxDrawdownEur']))<=40}
