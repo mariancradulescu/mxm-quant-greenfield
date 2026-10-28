@@ -9,10 +9,11 @@ static class SupportTopology {
  public static void Main(string[] args) {
   Need(args.Length==2);var output=new List<Cell>();var ids=new HashSet<int>();long total=0;
   foreach(string line in File.ReadLines(args[0])) {
-   var p=JsonSerializer.Deserialize<Packet>(line,Options)!;
-   Need(p!=null && p.Ordinal>=1 && p.Ordinal<=1576 && ids.Add(p.Ordinal) && p.Slots!=null && p.Slots.Length<=8064);
+   var p=JsonSerializer.Deserialize<Packet>(line,Options)??throw new ArgumentException("SUPPORT_TOPOLOGY_NULL_PACKET");
+   if(p.Slots==null)throw new ArgumentException("SUPPORT_TOPOLOGY_NULL_SLOTS");
+   Need(p.Ordinal>=1 && p.Ordinal<=1576 && ids.Add(p.Ordinal) && p.Slots.Length<=8064);
    var present=new bool[8064];int previous=-1;
-   foreach(int t in p!.Slots){Need(t>previous && t>=0 && t<8064);present[t]=true;previous=t;total++;}
+   foreach(int t in p.Slots){Need(t>previous && t>=0 && t<8064);present[t]=true;previous=t;total++;}
    var prefix=new int[8065];for(int t=0;t<8064;t++)prefix[t+1]=prefix[t]+(present[t]?1:0);
    bool Full(int lo,int hi)=>lo>=0 && hi<8064 && prefix[hi+1]-prefix[lo]==hi-lo+1;
    for(int block=0;block<4;block++) {

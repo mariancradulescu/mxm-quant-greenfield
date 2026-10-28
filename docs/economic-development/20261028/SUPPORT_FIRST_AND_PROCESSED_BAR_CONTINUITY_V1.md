@@ -35,3 +35,5 @@ After-cost robust edge, authentic continuousEUR200 economic qualification, actua
 ## Preventive CI history
 
 Initial gateway40649605714/job122686336831 compiled the production sequencer without warnings, then rejected the artificial harness input: the Python fixture encoded close as a JSON string while the harness required a number. The fixture now supplies a numeric close. No product guard, economic criterion or source geometry was relaxed, and no custody/source access occurred. The final exact source must pass all mandatory checks; this failed run is not promoted as acceptance.
+
+The second gateway40649822328/job122687028994 passed all five continuity tests, then rejected the time-only analyzer under warnings-as-errors(CS8602): a custom runtime Need guard did not prove non-null slots to the C# compiler. Explicit null rejection now supplies that proof without suppression or weakening warnings. Again no custody/source access occurred.
