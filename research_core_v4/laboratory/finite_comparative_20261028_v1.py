@@ -24,7 +24,7 @@ def validate():
  s=json.loads((ROOT/SPEC).read_bytes())
  need(s["schema"]=="mxm.v4.finite-multimechanism-stage-a.v1" and s["state"]=="FROZEN_BEFORE_OUTCOMES","FROZEN")
  need(s["identities"]==list(IDENTITIES) and s["identity_reservations"]==3 and s["max_outcomes"]==3,"ATTEMPTS")
- need(s["source"]==SOURCE and s["start_utc"]=="2026-08-03T00:00:00Z" and s["end_utc"]=="2026-08-31T00:00:00Z","SOURCE")
+ need(s["source"]=={str(k):v for k,v in SOURCE.items()} and s["start_utc"]=="2026-08-03T00:00:00Z" and s["end_utc"]=="2026-08-31T00:00:00Z","SOURCE")
  need(s["notional_eur"]==1000 and s["hold_h"]==2 and s["entry_delay_h"]==1,"TIMING")
  need(s["authorities"]["cost"]==AUTH and s["protected_forward_opened"] is False and s["broker_requests"]==0 and s["orders"]==0,"BOUNDARIES")
  cost=json.loads((ROOT/AUTH).read_bytes())
