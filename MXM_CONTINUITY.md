@@ -1,3 +1,13 @@
+# 28 octombrie2026 — reconstrucție C# a faptelor de execuție broker, pas concret cătreCloud
+
+ContinuareLIVE ba63bfcb861b24ebc21fe2135fa5a4a343eb9630. OWNER reiterează arhitectura: cercetare/replay economic machine-sideGitHub cu sursePepperstone/nucleuC# existente; produsfinalCloud/Mobile. LimitărileCLI/Cloud nu blochează cercetarea machine-side și grileleM5 nu restrâng universul sau rezoluțiile.
+
+[Capabilitatea efectivă](docs/cloud-recovery/20261028/BROKER_OPENING_FACT_RECONSTRUCTION_V1.md): coreC# comun reconstruiește fapte pozitive de openingfills prin Position.Deals și HistoricalTrade.ClosingDeal.Closing, direct în adaptorulRobotului. DealId elimină duplicarea referințelor din partialcloses/openbook; OrderId grupează partialfills fără intrăriinventate. Identitățile conflictuale invalideazăsnapshotul. Instanțe reci reproducaceleașifapte fărăLocalStorage; scopeulcontului leagădigestul. Corelațiapozitivă cu intenția ORIGINALĂ distinge partial/fullobserved, dar nu poateștergepending/retrimiteordin sau inventaintențielipsă.
+
+CI compilat/harness/independentPython și produs.algo obligatorii înainte deintegrare. Nu este recepțienativăCloud sau istoricbrokercomplet. Capital/cashflows/stopprotection/HARD21 rămân necertificate; firstobservedfill nu estedovada primuluifilloriginal. Gardurile deactivare/persistență suntpăstrate. Zero noimodele/trialurieconomice/colectăribroker/ordine/Cloud/resetări; autorități/custodie/partiții/risc neschimbate. B–EOPEN. OWNER operations NONE. Snapshoturileurmătoaresuntistorice.
+
+---
+
 # 28 octombrie2026 — fezabilitate finală și convergență, fără altă remediere locală
 
 Continuare LIVE df7888874abac0b1f571e88b4b8ed1d74fc3ea24. [Evaluarea critică și traseul decisiv](docs/convergence/20261028/FEASIBILITY_AND_CRITICAL_PATH_V1.md) disting limite structurale, capabilități neprimite și dovezi economice lipsă. Documentația oficială per metodă precizează înCloud: SetString doar înmemoria rulării, Flush fărăpersistență, Reload fărădisc. Designul actual de pending/fillledger NU oferă recuperare dupărestartCloud; un roundtrip înmemorie nu poate demonstra contrariul. Nu se elimină gardulDesktop și nu se creează serviciu extern.

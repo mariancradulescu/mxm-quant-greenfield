@@ -139,7 +139,8 @@ public sealed class MxmReferenceProductBot : Robot {
     Print("MXM_CONFIRMED_ENTRY_LEDGER_UNVERIFIED_SAFE_STOP");Stop();return;
    }
    if(recoveryInspection==MxmEntryRecoveryInspection.Recoverable &&
-      !entryCheckpoint.RecoverVerifiedOpen(confirmedEntries,RecoveryBook(),PendingOrders.Count,BrokerClock())) {
+      (!HasBrokerOpeningRecoveryProof() ||
+       !entryCheckpoint.RecoverVerifiedOpen(confirmedEntries,RecoveryBook(),PendingOrders.Count,BrokerClock()))) {
     orderProtection.HaltUnknown();confirmedEntries.Halt();
     Print("MXM_ENTRY_RECOVERY_SAFE_STOP_"+entryCheckpoint.RecoveryReason);Stop();return;
    }
@@ -786,7 +787,48 @@ public sealed class MxmReferenceProductBot : Robot {
     (decimal)position.VolumeInUnits,DateTime.SpecifyKind(position.EntryTime,DateTimeKind.Utc),BrokerClock())))return false;
   ReportRecordedWeeks();return !confirmedEntries.Halted && !entryStorageFault;
  }
+ // One-hop native deal links provide confirmed opening fills even when the
+ // position is now closed. Partial closes can reference the same opening deal
+ // repeatedly; the common core deduplicates by DealId, then groups by OrderId.
+ MxmBrokerOpeningInventory ReadBrokerOpeningFacts() {
+  var facts=new List<MxmBrokerOpeningFill>();
+  void Add(Deal deal) {
+   if(deal.PositionImpact!=DealPositionImpact.Opening ||
+     (deal.Status!=DealStatus.Filled && deal.Status!=DealStatus.PartiallyFilled))return;
+   if(facts.Count>=100000 || !double.IsFinite(deal.VolumeInUnits) ||
+     !deal.ExecutionPrice.HasValue || !double.IsFinite(deal.ExecutionPrice.Value))
+    throw new ArgumentException("NATIVE_BROKER_OPENING_FACTS_UNVERIFIED");
+   facts.Add(new MxmBrokerOpeningFill(deal.Id,deal.OrderId,deal.PositionId,deal.SymbolName,
+    deal.TradeType==TradeType.Buy?1:-1,checked((decimal)deal.VolumeInUnits),
+    checked((decimal)deal.ExecutionPrice.Value),DateTime.SpecifyKind(deal.ExecutionTime,DateTimeKind.Utc),
+    deal.Label??"",deal.Comment??""));
+  }
+  foreach(var position in Positions)foreach(var deal in position.Deals)Add(deal);
+  foreach(var trade in History)foreach(var opening in trade.ClosingDeal.Closing)Add(opening);
+  return new MxmBrokerOpeningInventory(MxmEntryCheckpoint.AccountScope(Account.BrokerName,Account.Number,Account.IsLive),
+   BrokerClock(),facts);
+ }
+ bool HasBrokerOpeningRecoveryProof() {
+  var request=entryCheckpoint?.RecoveryIntentSnapshot;
+  if(request==null)return false;
+  var proof=ReadBrokerOpeningFacts().ObservePending(request);
+  // This is additional positive corroboration, not a replacement for the
+  // original durable intent, existing ledger, live book and broker stop checks.
+  return proof.Correlated && proof.RequestedUnitsObserved;
+ }
+ void ReportBrokerOpeningFacts() {
+  try {
+   var inventory=ReadBrokerOpeningFacts();
+   Print("MXM_BROKER_OPENING_FACTS simulation={0} deals={1} orders={2} digest={3} complete=false capital=false hard21=false clearPending=false",
+    IsBacktesting,inventory.Fills.Length,inventory.Orders.Length,inventory.FactsSha256);
+  } catch(Exception e) {
+   // This read-only inventory has no authority to release a pending barrier,
+   // admit an order, alter a ledger or infer an empty account on read failure.
+   Print("MXM_BROKER_OPENING_FACTS_UNAVAILABLE_"+e.GetType().Name);
+  }
+ }
  void ReportRecordedWeeks() {
+  ReportBrokerOpeningFacts();
   if(confirmedEntries==null)return;
   // Calendar completeness never asserts broker-history coverage or native reception.
   // Backtesting uses a fresh isolated memory ledger, never a real execution claim.
