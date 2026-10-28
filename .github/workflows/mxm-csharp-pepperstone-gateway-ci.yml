@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Compile causal quote-innovation learner and independent completed-minute reference
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/quote_innovation/MxmQuoteInnovation.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_quote_innovation_development -v
       - name: Reconstruct broker-confirmed opening order facts without LocalStorage or order permission
         run: |
           dotnet build research_core_v4/laboratory/csharp/broker_opening/MxmBrokerOpening.csproj -c Release
