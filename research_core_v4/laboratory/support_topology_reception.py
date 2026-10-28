@@ -1,5 +1,5 @@
 """One original-source TIME-ONLY observability reception, not an economic trial."""
-import base64,collections,gzip,hashlib,json,os,subprocess,sys,tempfile
+import base64,collections,gzip,hashlib,json,os,subprocess,sys,tempfile,zipfile
 from datetime import datetime,timezone
 from pathlib import Path
 from .common import need,encoded,bytes_digest
@@ -31,7 +31,8 @@ def workflow():
  {'name':'Authenticate all original shards in existing custody and export timestamps only','env':{'GH_TOKEN':'${{ github.token }}','MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM':'${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}'},'run':'umask 077\npython3 -m '+MODULE+' export'},
  {'name':'Compute actual CSharp support and reconcile every cell with independent run-interval reference','env':{'GH_TOKEN':'${{ github.token }}'},'run':'umask 077\npython3 -m '+MODULE+' evaluate'},
  {'name':'Read back exact original encrypted topology in a separate custody process without recomputation','env':{'MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM':'${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}'},'run':'umask 077\npython3 -m '+MODULE+' cold'},
- {'uses':UPLOAD,'if':'always()','with':{'name':'support-topology-${{ github.run_id }}','path':OUT+'/receipt.json\n'+OUT+'/result.mxmenc\n'+OUT+'/evaluator.dll\n'+OUT+'/cold.json','if-no-files-found':'error','retention-days':90}}
+ {'name':'Emit only original ciphertext DLL and receipts as a bounded restorable bundle','run':'python3 -m '+MODULE+' preserve'},
+ {'uses':UPLOAD,'if':'always()','with':{'name':'support-topology-${{ github.run_id }}','path':OUT+'/receipt.json\n'+OUT+'/result.mxmenc\n'+OUT+'/evaluator.dll\n'+OUT+'/cold.json\n'+OUT+'/runtime-original.zip','if-no-files-found':'error','retention-days':90}}
  ]}}}
 def validate():
  spec=json.loads((ROOT/SPEC).read_bytes());need(spec['policy']==POLICY,'TOPOLOGY_FROZEN_POLICY')
@@ -127,10 +128,21 @@ def cold():
   key,fp=_private_key_from_secret(Path(d));need(fp==FP,'TOPOLOGY_COLD_CUSTODY');raw=unpack(owner.bounded_decrypt(cipher,key,Path(d)),max_bytes=12000000);p=strict_json(raw,max_elements=1000000)
  need(bytes_digest(cipher)==r['cipher_sha256'] and bytes_digest(raw)==r['private_sha256'] and p['identity']=={k:r[k] for k in ('run_id','source_sha','spec_sha256')} and p['summary']['disposition']==r['disposition'] and bytes_digest((out/'evaluator.dll').read_bytes())==r['actual_evaluator_sha256'],'TOPOLOGY_ORIGINAL_COLD_READBACK')
  c={'schema':'mxm.time-only-support-cold.v1','run_id':r['run_id'],'source_sha':r['source_sha'],'cipher_sha256':r['cipher_sha256'],'disposition':r['disposition'],'separate_custody_process_readback':True,'algorithm_reexecuted':False,'orders':0};(out/'cold.json').write_bytes(encoded(c)+b'\n');print('MXM_SUPPORT_TOPOLOGY_COLD '+encoded(c).decode(),flush=True)
+def preserve():
+ context();out=ROOT/OUT;members=('receipt.json','cold.json','result.mxmenc','evaluator.dll')
+ need(all((out/p).is_file() and not (out/p).is_symlink() for p in members),'TOPOLOGY_BUNDLE_MEMBERS')
+ r=json.loads((out/'receipt.json').read_bytes());c=json.loads((out/'cold.json').read_bytes())
+ need(r['cipher_sha256']==c['cipher_sha256']==bytes_digest((out/'result.mxmenc').read_bytes()) and r['actual_evaluator_sha256']==bytes_digest((out/'evaluator.dll').read_bytes()) and c['algorithm_reexecuted'] is False,'TOPOLOGY_ORIGINAL_BUNDLE_LINKS')
+ with zipfile.ZipFile(out/'runtime-original.zip','x',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+  for p in members:z.write(out/p,p)
+ bundle=(out/'runtime-original.zip').read_bytes();need(len(bundle)<1500000,'TOPOLOGY_BUNDLE_BOUND')
+ print('MXM_ORIGINAL_SUPPORT_BUNDLE '+encoded({'bytes':len(bundle),'sha256':bytes_digest(bundle),'run_id':r['run_id'],'kind':'RUNTIME_ORIGINAL_OUTPUT_BUNDLE_NOT_ACTIONS_TRANSPORT_ZIP','members':{p:{'bytes':(out/p).stat().st_size,'sha256':bytes_digest((out/p).read_bytes())} for p in members}}).decode(),flush=True)
+ for i in range(0,len(bundle),16384):print('MXM_ORIGINAL_SUPPORT_PART '+str(i//16384)+' '+base64.b64encode(bundle[i:i+16384]).decode(),flush=True)
 if __name__=='__main__':
  os.umask(0o077);command=sys.argv[1:]
  if command==['admit']:admit()
  elif command==['export']:export()
  elif command==['evaluate']:evaluate()
  elif command==['cold']:cold()
+ elif command==['preserve']:preserve()
  else:raise ValueError('TOPOLOGY_EXACT_PHASE')

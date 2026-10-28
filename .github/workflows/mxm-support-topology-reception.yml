@@ -66,11 +66,15 @@
           "run": "umask 077\npython3 -m research_core_v4.laboratory.support_topology_reception cold"
         },
         {
+          "name": "Emit only original ciphertext DLL and receipts as a bounded restorable bundle",
+          "run": "python3 -m research_core_v4.laboratory.support_topology_reception preserve"
+        },
+        {
           "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
           "if": "always()",
           "with": {
             "name": "support-topology-${{ github.run_id }}",
-            "path": "verification/support-topology/receipt.json\nverification/support-topology/result.mxmenc\nverification/support-topology/evaluator.dll\nverification/support-topology/cold.json",
+            "path": "verification/support-topology/receipt.json\nverification/support-topology/result.mxmenc\nverification/support-topology/evaluator.dll\nverification/support-topology/cold.json\nverification/support-topology/runtime-original.zip",
             "if-no-files-found": "error",
             "retention-days": 90
           }

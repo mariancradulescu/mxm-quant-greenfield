@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 PROJECT=ROOT/'research_core_v4/laboratory/csharp/processed_bars/MxmProcessedBars.csproj'
 def bar(k,symbol='a',platform_adjacent=True):
- return dict(symbol=symbol,utc=(datetime(2026,10,26,tzinfo=timezone.utc)+timedelta(minutes=5*k)).isoformat().replace('+00:00','Z'),platform_adjacent=platform_adjacent,close=str(100+k))
+ return dict(symbol=symbol,utc=(datetime(2026,10,26,tzinfo=timezone.utc)+timedelta(minutes=5*k)).isoformat().replace('+00:00','Z'),platform_adjacent=platform_adjacent,close=100+k)
 class Compiled(unittest.TestCase):
  @classmethod
  def setUpClass(cls):
