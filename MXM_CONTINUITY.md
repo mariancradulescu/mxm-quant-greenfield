@@ -1,3 +1,15 @@
+# 28 octombrie2026 — recepție autentică a suportului temporal și corecție nativă integrate
+
+PR234 integrat02df7a28893d6394e70ce861819e5aeef2390e7d, toate5CI SUCCESS pe sursafcce8bbb…,12teste noi fărăskip și produs.algo compilat; arborele sursei/testului/integrării este identic. Robotul nu mai combină starea veche cu bare recente completate de platformă după callbackuri neprocesate; reset și încălzire nouă, per instrument, fără noi strategii/permisiuni.
+
+[Execuție40650642477](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40650642477), job122689643153 attempt1 SUCCESS: toate100originale/3355389M5/1576identități autentificate,18912celule TIME-ONLY reconciliate exact C#/Python, rezultat criptat și readback separat fără recalcul. Niciuna dintre geometriile1/12/288bare nu trece simultan condiția grilei fără semnale în TOATE4blocurile: denominator pozitiv și maximum5%lipsuri interne. False NU înseamnă că toate4blocurile au eșuat. Nu este cenzurarea unui semnal, stabilitate a randamentelor, costuri certificate sau calificare economică.
+
+[Rezultat, decizie și originale](docs/economic-development/20261028/SUPPORT_TOPOLOGY_NATIVE_RESULT_AND_DIRECTOR_DECISION_V1.md): nu consum o nouă identitate doar pentru alt prag/orizont/roster pe aceeași arhivă; următorul mecanism distinct cere dependențe de suport/cost/capital și selecție DEVELOPMENT declarate prospectiv. Zero noi modele/identități de strategie. Bundle-ul ORIGINAL de runtime258333bytes/7bde79a3… păstrează exact ciphertext/DLL/recepte în16părți; nu este ZIP-ul transport Actions. Fără decriptare înWork/rebuild sau replay economic. Verificator offline și negative noi; CI de conservare obligatoriu înaintea integrării.
+
+Peer-residual rămâne închis: cenzurarea blochează calificarea, iar eșecul temporal este separat un semnal economic nefavorabil despre mecanism, fără generalizare la univers. Autoritate07d1ddbe…/OWNER1807/evidencee49f08f3… neschimbate; typedseq29/pendingnull/safe_stop/zeroordine verificateLIVE. Zero brokerrequests noi/ordine/Cloud/resetări. EdgeNET/HARD21/contul unic200EUR calificat/recepție Robot/B–E integral rămân nedemonstrate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 28 octombrie2026 — suport înaintea unei noi identități și continuitatea callbackurilor native
 
 Continuare LIVE din a065c6a73b1d73a2e30ebd91a6508e90a228cb99/PR232–233, fără execuții ulterioare sau joburi active la reconciliere. Autoritatea activă07d1ddbe… și OWNER1807a830c132… sunt păstrate. Configurația peer-residual rămâne închisă definitiv: cenzurarea excesivă blochează calificarea, iar **eșecul temporal este separat un semnal economic nefavorabil despre mecanismul evaluat**; rezultatele favorabile ale subsetului complet nu repară niciun eșec. Nu se generalizează asupra universului Pepperstone.
