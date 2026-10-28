@@ -36,7 +36,9 @@ def readback():
   full={int(x.symbolId):x for x in values['ProtoOASymbolByIdReq'].symbol}
   def project(sid):
    x=light.get(sid);f=full.get(sid)
-   return {'symbol_id':sid,'light_present':x is not None,'name':x.symbolName if x is not None else None,'base':assets.get(int(x.baseAssetId)) if x is not None else None,'quote':assets.get(int(x.quoteAssetId)) if x is not None else None,'enabled':bool(x.enabled) if x is not None else None,'full_present':f is not None,'digits':int(f.digits) if f is not None else None}
+   fields=('minVolume','stepVolume','maxVolume','lotSize','commissionType','preciseTradingCommissionRate','preciseMinCommission','pnlConversionFeeRate','tradingMode','enableShortSelling')
+   declared={k:int(getattr(f,k)) if f is not None and k in f.DESCRIPTOR.fields_by_name and f.HasField(k) else None for k in fields}
+   return {'contemporary_declared_terms_not_historical_costs':declared,'symbol_id':sid,'light_present':x is not None,'name':x.symbolName if x is not None else None,'base':assets.get(int(x.baseAssetId)) if x is not None else None,'quote':assets.get(int(x.quoteAssetId)) if x is not None else None,'enabled':bool(x.enabled) if x is not None else None,'full_present':f is not None,'digits':int(f.digits) if f is not None else None}
   requested=[project(s) for s in (1,250,7393)]
   oil=sorted(s for s,x in light.items() if any(v in x.symbolName.upper() for v in ('CRUDE','WTI','OIL','BRENT')))[:16]
   same=all(full.get(s) is not None and light.get(s) is not None and light[s].symbolName==name and assets.get(int(light[s].quoteAssetId))=='USD' for s,name in [(250,'SpotCrude'),(7393,'WTOIL-PERP')])
