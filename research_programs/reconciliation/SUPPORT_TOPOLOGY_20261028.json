@@ -1,0 +1,60 @@
+{
+  "schema": "mxm.time-only-source-reception-precommit.v1",
+  "policy": {
+    "schema": "mxm.time-only-support-topology-policy.v1",
+    "source_rows": 3355389,
+    "source_shards": 100,
+    "source_identities": 1576,
+    "source_manifest_sha256": "cc28c61a7788fc9d18bd54a343bc0e2c7467b27f1dbb111bf54185f9f0f16cb4",
+    "source_start": "2026-08-20T00:00:00Z",
+    "source_end_exclusive": "2026-09-17T00:00:00Z",
+    "source_blocks": 4,
+    "slots_per_block": 2016,
+    "profiles": [
+      {
+        "lookback": 1,
+        "hold": 1
+      },
+      {
+        "lookback": 12,
+        "hold": 12
+      },
+      {
+        "lookback": 288,
+        "hold": 288
+      }
+    ],
+    "decision_grid": "EVERY_M5_SLOT_NO_SIGNAL_OR_PRICE_FILTER",
+    "feature": "ALL_PRIOR_LOOKBACK_M5_TIMESTAMPS_PRESENT",
+    "response": "DELAY_ONE_SLOT_THEN_HOLD_PLUS_ONE_TIMESTAMPS_ALL_PRESENT",
+    "right_boundary": "RETAIN_CAUSAL_DECISION_SEPARATE_OUTSIDE_ARCHIVE_FROM_INTERNAL_MISSINGNESS",
+    "missing_components": "ENTRY_EXIT_INTERIOR_NONEXCLUSIVE_COUNTS_NO_IMPUTATION",
+    "segment_boundary": "CONTEXT_AND_RESPONSE_MAY_CROSS_CONTIGUOUS_SOURCE_BLOCKS_NOT_FINAL_ARCHIVE_BOUNDARY",
+    "interpretation": "UNSELECTED_OBSERVATION_GRID_NOT_SIGNAL_CONDITIONED_CENSORING_OR_RETURN_STABILITY",
+    "prices_exported": false,
+    "new_strategy_identities": 0,
+    "model_trials": 0,
+    "native_attempts": 1,
+    "new_broker_requests": 0,
+    "orders": 0,
+    "cloud": false,
+    "capital_replay": false,
+    "independent_confirmation": false,
+    "protected_opened": false,
+    "automatic_retry": false,
+    "automatic_followup": false,
+    "closed_identities_reexecuted": false
+  },
+  "implementation_sha256": {
+    "research_core_v4/laboratory/support_topology_reception.py": "c31ae8cc96cd3fca6ef1154c5bae64416f4a15269508d68357b8a850b30076bd",
+    "research_core_v4/laboratory/support_topology_reference.py": "310dbb1122a87681974cde3c900327f8b6f27c06cc65c196187bbd309e18598c",
+    "research_core_v4/laboratory/test_support_topology.py": "2258206fb2b9706cacf38c5cb4be20b4e55c57f89ba8f2d43b1f91cb17ba7b0a",
+    "research_core_v4/laboratory/csharp/support_topology/Program.cs": "7ae2233ca70915b51eb8930b125e92bdf6a67f3f39d83b43756f1112959bb917",
+    "research_core_v4/laboratory/csharp/support_topology/MxmSupportTopology.csproj": "96e0c1367111bf87860763d455706b239f0d12367cc72507e8771ab7c02c292e",
+    ".github/workflows/mxm-support-topology-reception.yml": "710e4823c5f8ca5e71e116d9e214c83a0137a4478f668c738542c86b6f0b2355",
+    "research_core_v4/laboratory/m5_authentic_envelope.py": "a9f83104a1cc3bea547bd706addc9f0424ac6cf0cdb900f2ef49d4b0b67d078f",
+    "research_core_v4/laboratory/m5_causal_gross_development.py": "4c3cd03190ee712874d571aff691c0afff0c657de6dc8ebdcdba0c71c425325d"
+  },
+  "prior_peer_residual": "CLOSED_DATA_LIMITED_CENSOR_FAILURE_AND_DISTINCT_ADVERSE_TEMPORAL_FAILURE_PRESERVED",
+  "source_exposure": "ALREADY_EXPOSED_DEVELOPMENT_NOT_CONFIRMATION"
+}

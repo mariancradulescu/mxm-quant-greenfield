@@ -1,3 +1,13 @@
+# 28 octombrie2026 — suport înaintea unei noi identități și continuitatea callbackurilor native
+
+Continuare LIVE din a065c6a73b1d73a2e30ebd91a6508e90a228cb99/PR232–233, fără execuții ulterioare sau joburi active la reconciliere. Autoritatea activă07d1ddbe… și OWNER1807a830c132… sunt păstrate. Configurația peer-residual rămâne închisă definitiv: cenzurarea excesivă blochează calificarea, iar **eșecul temporal este separat un semnal economic nefavorabil despre mecanismul evaluat**; rezultatele favorabile ale subsetului complet nu repară niciun eșec. Nu se generalizează asupra universului Pepperstone.
+
+[Implementare, protocol și limite](docs/economic-development/20261028/SUPPORT_FIRST_AND_PROCESSED_BAR_CONTINUITY_V1.md): înaintea unei noi identități de strategie, o singură recepție time-only reutilizează toate100originale/3355389M5/1576identități, fără export de prețuri sau evaluare de randamente. C# și referință independentă reconciliază18912celule de suport, cu lipsurile interne și frontiera arhivei distincte. Zero noi modele/identități de strategie; rezultatul autentic PENDING la instalare. Suportul grilei fără semnale nu certifică cenzurarea condiționată de semnal, stabilitatea randamentelor, costuri sau execuție și nu permite salvarea unui model închis.
+
+Produsul nativ cere acum continuitatea callbackurilor efectiv procesate, pe lângă ultimele două bare din platformă. După callbackuri lipsă/reload, kernelul și intenția veche sunt resetate înaintea noii bare, chiar dacă istoricul platformei a fost completat. CI compilat obligatoriu înainte de integrare. Nu este recepție operațională Robot. Net8/SDK/cTID/Desktop rămân limite explicite; zero ordine/Cloud/brokerrequests noi/resetări/custodie sau autorități modificate. EdgeNET/HARD21/contul200EUR autentic calificat/B–E integral rămân nedemonstrate. OWNER operations NONE. Snapshoturile următoare sunt istorice.
+
+---
+
 # 27 octombrie2026 — risc nativ integrat și contract de sursă cu secvență/depth
 
 PR222 integrat7273efc0024fd036f07683c73312d2a5a7629d26, toate5CI SUCCESS din prima; gateway40504978684/job122191863112 a executat11teste noi fărăskip și a compilat produsulcTrader. Dimensionarea și admiterea finală verifică lease-ul tuturor mark-urilor contului, fără refresh favorabil sau observații fabricate după restart. LossFX/stopfill rămân distincte și nedovedite.
