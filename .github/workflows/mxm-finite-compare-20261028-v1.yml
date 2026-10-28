@@ -43,9 +43,14 @@ jobs:
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-remediation-p0-p4-20261015-v1 --jq .object.sha)" = "$GITHUB_SHA"
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-active-v1 --jq .object.sha)" = "07d1ddbe0b83753bbf189770af1911623fef8d6f"
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-accepted-owner-1807-v1 --jq .object.sha)" = "a830c132521bd4348454653f713e04f6107484fe"
-          test "$(gh api 'repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-finite-compare-20261028-v1.yml/runs?event=push&branch=mxm-remediation-p0-p4-20261015-v1&per_page=100' --jq .total_count)" = "1"
+          # The exact predecessor was rejected by YAML parser before creating any job.
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/actions/runs/40736989235 --jq .conclusion)" = "failure"
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/actions/runs/40736989235/jobs --jq .total_count)" = "0"
+          # One non-started parser-failure plus exactly one current official push.
+          test "$(gh api 'repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-finite-compare-20261028-v1.yml/runs?event=push&branch=mxm-remediation-p0-p4-20261015-v1&per_page=100' --jq .total_count)" = "2"
       - name: Install existing exact locked dependencies
-        run: python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
       - name: Execute three fixed authentic causal Stage A screening mechanisms in existing custody
         env:
           GH_TOKEN: ${{ github.token }}
