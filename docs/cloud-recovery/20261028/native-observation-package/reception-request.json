@@ -1,0 +1,40 @@
+{
+  "schema": "mxm.native-observation-reception-request.v1",
+  "package": "MxmNativeObservation.algo",
+  "package_sha256": "897e4f55aae5d2a646e6bf9e0984528761dc7c9c34b56222eb5e64dbde7d116c",
+  "algorithm_type": "cAlgo.Robots.MxmReferenceProductBot",
+  "parameter_display_names": {
+    "NativeObservationOnly": "Native Observation Only",
+    "EnableDemoTrading": "Enable DEMO Trading"
+  },
+  "target": "EXISTING_OWNER_PEPPERSTONE_EUR_ACCOUNT_UNCHANGED",
+  "chart_symbol": "EURUSD",
+  "chart_timeframe": "m5",
+  "parameters": {
+    "NativeObservationOnly": true,
+    "EnableDemoTrading": false
+  },
+  "instance_limit": 1,
+  "operation": "IMPORT_EXACT_PACKAGE_IF_NEEDED_THEN_ONE_CONTROLLED_CLOUD_START_AND_STOP",
+  "observation_minutes": 10,
+  "activation_authorized": false,
+  "orders_authorized": false,
+  "new_accounts_or_funding": false,
+  "access_scope_extension": false,
+  "required_runtime_resource": "LEGITIMATE_AUTHENTICATED_CTRADER_CTID_SESSION_FOR_EXISTING_ACCOUNT",
+  "acceptance": [
+    "ACTUAL_ENVIRONMENT_CLOUD_AND_REALTIME",
+    "READY_WITH_CORRECT_RUN_AND_ACCOUNT_SCOPE",
+    "ACTUAL_FIRST_TICK_AND_CLOSED_BAR_CALLBACKS",
+    "BROKER_FACTS_AVAILABLE_OR_EXPLICIT_UNAVAILABLE",
+    "EXPLICIT_STOP_FOR_SAME_RUN",
+    "ZERO_ORDER_AND_CONTROL_STORAGE_OPERATIONS"
+  ],
+  "does_not_certify": [
+    "TRADING_RESTART_RECOVERY",
+    "LOST_ORIGINAL_INTENT",
+    "CONTINUOUS_EUR200_QUALIFICATION",
+    "HARD21",
+    "NET_EDGE"
+  ]
+}
