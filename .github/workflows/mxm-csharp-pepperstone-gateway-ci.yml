@@ -16,7 +16,7 @@ jobs:
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
           dotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release
           python3 -m research_core_v4.laboratory.verify_commodity_anchor_original --self-test
-          python3 -m unittest research_core_v4.laboratory.test_anchor_original_readback research_core_v4.laboratory.test_commodity_anchor research_core_v4.laboratory.test_anchor_cache_reuse -v
+          python3 -m unittest research_core_v4.laboratory.test_anchor_reference_units research_core_v4.laboratory.test_anchor_original_readback research_core_v4.laboratory.test_commodity_anchor research_core_v4.laboratory.test_anchor_cache_reuse -v
       - name: Compile native observation purpose fence and reject every account mutation in read-only or stopped mode
         run: |
           dotnet build research_core_v4/laboratory/csharp/native_run/MxmNativeRun.csproj -c Release

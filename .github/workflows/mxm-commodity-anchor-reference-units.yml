@@ -1,0 +1,185 @@
+{
+  "name": "MXM first reference-unit-aware commodity account evaluation",
+  "on": {
+    "push": {
+      "branches": [
+        "mxm-remediation-p0-p4-20261015-v1"
+      ],
+      "paths": [
+        ".github/workflows/mxm-commodity-anchor-reference-units.yml"
+      ]
+    }
+  },
+  "permissions": {},
+  "concurrency": {
+    "group": "mxm-integrated-laboratory",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "source-cache": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "name": "Admit exact finite source and model before keys",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.commodity_anchor_reference_units admit"
+        },
+        {
+          "name": "Compile shared account and independent artificial H1 policy before custody",
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_commodity_anchor -v"
+        },
+        {
+          "name": "Reuse original H1 ciphertexts and retain only declared post-announcement calendar",
+          "id": "cache",
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.commodity_anchor_reference_units cache",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          }
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "anchor-cache-${{ github.run_id }}",
+            "path": "verification/commodity-anchor/cache.json\nverification/commodity-anchor/cache-input.mxmenc",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "if": "github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1",
+      "outputs": {
+        "clear": "${{ steps.cache.outputs.clear }}"
+      }
+    },
+    "basis-collect": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "environment": "mxm-r3-pepperstone-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "d2fae5641b759b1c8c24161d83d62d39e104eafd",
+            "path": ".basis-native",
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "anchor-cache-${{ github.run_id }}",
+            "path": "verification/commodity-anchor"
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ncp research_core_v4/laboratory/commodity_anchor_reference_units.py .basis-native/research_core_v4/laboratory/"
+        },
+        {
+          "name": "Reuse two cached sources and request only missing anchor plus four metadata responses",
+          "env": {
+            "R3_CTRADER_CLIENT_ID": "${{ secrets.R3_CTRADER_CLIENT_ID }}",
+            "R3_CTRADER_CLIENT_SECRET": "${{ secrets.R3_CTRADER_CLIENT_SECRET }}",
+            "R3_CTRADER_ACCESS_TOKEN": "${{ secrets.R3_CTRADER_ACCESS_TOKEN }}"
+          },
+          "run": "umask 077\ncd .basis-native\npython3 -m research_core_v4.laboratory.commodity_anchor_reference_units collect"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "if": "always()",
+          "with": {
+            "name": "anchor-source-${{ github.run_id }}",
+            "path": "verification/commodity-anchor/source.mxmenc\nverification/commodity-anchor/producer.json\nverification/commodity-anchor/cache.json\nverification/commodity-anchor/cache-input.mxmenc",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "needs": "source-cache",
+      "if": "needs.source-cache.outputs.clear == 'true'"
+    },
+    "basis-evaluate": {
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 20,
+      "environment": "mxm-r3-custody-v1",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "steps": [
+        {
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false
+          }
+        },
+        {
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "name": "anchor-source-${{ github.run_id }}",
+            "path": "verification/commodity-anchor"
+          }
+        },
+        {
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release"
+        },
+        {
+          "name": "Authenticate captured source and export exact private model input",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.commodity_anchor_reference_units export"
+        },
+        {
+          "name": "One prospective conditional CSharp account and independent causal forecast audit",
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.commodity_anchor_reference_units evaluate"
+        },
+        {
+          "name": "Cold original output readback without model rerun",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
+          },
+          "run": "python3 -m research_core_v4.laboratory.commodity_anchor_reference_units cold"
+        },
+        {
+          "name": "Preserve exact source result evaluator and public receipts",
+          "run": "python3 -m research_core_v4.laboratory.commodity_anchor_reference_units preserve"
+        },
+        {
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "anchor-result-${{ github.run_id }}",
+            "path": "verification/commodity-anchor/*.json\nverification/commodity-anchor/*.mxmenc\nverification/commodity-anchor/*.dll\nverification/commodity-anchor/*.zip",
+            "if-no-files-found": "error",
+            "retention-days": 90
+          }
+        }
+      ],
+      "needs": "basis-collect"
+    }
+  }
+}
