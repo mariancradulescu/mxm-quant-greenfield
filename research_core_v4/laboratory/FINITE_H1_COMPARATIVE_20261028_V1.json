@@ -1,0 +1,104 @@
+{
+  "schema": "mxm.v4.finite-multimechanism-stage-a.v1",
+  "state": "FROZEN_BEFORE_OUTCOMES",
+  "purpose": "THREE_DISTINCT_CAUSAL_ECONOMIC_DEVELOPMENT_SCREENS",
+  "original_research_contract": "RESEARCH_CONTRACT_V2.md",
+  "original_runtime_contract": "research_v3/RESEARCH_CONTRACT_V3.json",
+  "original_v4_research_protocol": "research_core_v4/state/V4_DISCOVERY_PROTOCOL_V2.json",
+  "original_base_head": "7a3df0fe92fd620b6acff1eeca6db287c2e5efe9",
+  "identity_reservations": 3,
+  "max_outcomes": 3,
+  "identities": [
+    "V4-COMP-20261028-WICK",
+    "V4-COMP-20261028-ONLINE",
+    "V4-COMP-20261028-FX"
+  ],
+  "mechanisms": [
+    {
+      "id": "V4-COMP-20261028-WICK",
+      "family": "INTRABAR_TAIL_REJECTION",
+      "causal_hypothesis": "Exceptionally wide H1 wick after significant range; downside or upside tail exhaustion predicts subsequent opposite price move",
+      "parameters": {
+        "range_multiple": 2.5,
+        "wick_share": 0.6,
+        "scale_h": 24,
+        "hold_h": 2,
+        "rearm_h": 3
+      }
+    },
+    {
+      "id": "V4-COMP-20261028-ONLINE",
+      "family": "CAUSAL_ONLINE_CONDITIONAL_STATE",
+      "causal_hypothesis": "Past settled response of same-sign locally abnormal hourly moves forecasts next 2h conditional expected return; on-line sample minimum and cost hurdle",
+      "parameters": {
+        "training_lag_h": [
+          5,
+          100
+        ],
+        "minimum_labels": 12,
+        "scale_h": 24,
+        "cost_hurdle_multiple": 1.5,
+        "hold_h": 2,
+        "rearm_h": 3
+      }
+    },
+    {
+      "id": "V4-COMP-20261028-FX",
+      "family": "CROSS_MARKET_MACRO_INFORMATION_TRANSFER",
+      "causal_hypothesis": "Abnormal prior-completed EURUSD movement contains USD-denomination information about delayed oil price direction while oil movement is locally quiet",
+      "parameters": {
+        "fx_abnormal_multiple": 2,
+        "oil_quiet_multiple": 1,
+        "scale_h": 24,
+        "hold_h": 2,
+        "rearm_h": 3
+      }
+    }
+  ],
+  "source": {
+    "1": {
+      "release_id": 409747426,
+      "asset_id": 631098100,
+      "ciphertext_sha256": "c33f401a97d06e2efe31e49f37a1f977238b41b66eb1d939b1d6700fb2530915"
+    },
+    "250": {
+      "release_id": 409747426,
+      "asset_id": 631098274,
+      "ciphertext_sha256": "809e20a51550ad50bc6ac4a8df524deba47d640f5a0d35454b496ffd2a9d3c2f"
+    }
+  },
+  "source_instrument_names": {
+    "1": "EURUSD_CONTEXT_ONLY",
+    "250": "SpotCrude_ECONOMIC_TARGET"
+  },
+  "source_partition": "DEVELOPMENT_ONLY",
+  "start_utc": "2026-08-03T00:00:00Z",
+  "end_utc": "2026-08-31T00:00:00Z",
+  "decision_rule": "H1_COMPLETED_BAR_T_ONLY",
+  "entry_delay_h": 1,
+  "hold_h": 2,
+  "entry": "SECOND_FOLLOWING_OBSERVED_H1_OPEN_AFTER_COMPLETED_DECISION_WITH_EXACT_GRID",
+  "exit": "EXACT_H1_OPEN_TWO_HOURS_AFTER_ENTRY_WITH_MISSINGNESS_NOT_HIDDEN",
+  "notional_eur": 1000,
+  "cost_bound": "SPOTCRUDE_FROZEN_ROUNDTRIP_P75_OF_P95_EFFECTIVE_SPREAD_AND_COMMISSION_FRACTION",
+  "cost_state": "CONSERVATIVE_BOUND",
+  "cost_exclusions": [
+    "historical_bidask_fill_truth",
+    "historical_funding",
+    "historical_slippage",
+    "broker_active_equity_realization"
+  ],
+  "authorities": {
+    "cost": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+    "governance": "research_core_v4/laboratory/budgets.py",
+    "custody": "mxm-r3-custody-v1"
+  },
+  "accounting": "V4_SEPARATE_EXPLICIT_FINITE_TRIAL_SCOPE_NO_V2_REFUND_OR_BUDGET_EXPANSION",
+  "outcomes_are_DEVELOPMENT_not_confirmation": true,
+  "stage_b_not_automatically_authorized": true,
+  "protected_forward_opened": false,
+  "broker_requests": 0,
+  "orders": 0,
+  "cloud": false,
+  "allowed_retry_count": 0
+}
