@@ -1,0 +1,35 @@
+# Cross-sectional peer-residual screen: authentic execution, DATA_LIMITED, fixed identity closed
+
+Native run [40641460227](https://github.com/mariancradulescu/mxm-quant-greenfield/actions/runs/40641460227), job122660331816, attempt1, SUCCESS; source50f539beccc61e2fbc0dcf9ab45c931bb04a642c, PR232. All100 preserved Pepperstone release shards,3355389 original M5 rows and1576 source identities were authenticated under existing custody. No new broker request, account, provider or data collection. The entire source remains already-exposed DEVELOPMENT; no protected/confirmation input was opened.
+
+## Economic outcome
+
+**DATA_LIMITED.** The minimum100 complete-episode support gate passed, but the precommitted <=5% censoring gate failed. The criterion requiring each of the three evaluation source blocks to exceed the fixed hypothetical5bps reference also failed. Positive gross and mean above the5bps reference in the COMPLETED SUBSET, and a passed concentration gate, do not repair censoring or temporal instability. No positive strategy/edge, net return, broker realizability or universe-wide negative conclusion follows. Exact counts, selected identities, moves, reference-friction metrics and all decision/episode records remain encrypted.
+
+The identity is closed without retuning, rerun, extension, alternative ranking, horizon/calendar rescue, target replacement or automatic followup. One new dependent DEVELOPMENT hypothesis/model/trial was consumed. The other closed identities (including GBPUSD spread, SpotCrude depth and paired financing) remain unchanged. No V2/C033 budget or protected-data permission was recycled.
+
+## Scientific information and limits
+
+This was a new cross-sectional within-class leave-one-out peer-residual question with one global hourly target, rather than another threshold on a closed univariate mechanism. Features use only the12 preceding contiguous completed M5 bars. Target choice uses no future entry/exit support; missing future observations retain/censor the original selection. The final pre-outcome policy additionally required the complete planned interval to lie inside a known CURRENT-reference session, using the existing strict timezone/holiday resolver. Excess censoring persisted despite that reference calendar gate. This does not identify its cause as broker failure, calendar error, historical closure, illiquidity or a specific missing-data process.
+
+All causal feature hashes and EVERY hourly selection, no-signal, completed and censored record from actual C# matched the independent Python full-array/leave-one-out/rational reference exactly. Exact8-fractional-bps return quantization is part of the frozen arithmetic, not broker price precision or execution evidence. The first source week supplied history only; evaluation covered the three remaining source blocks. The new policy was fixed before its new computation, after historical source/project exposure. This is not independent confirmation or an effective independent sample-size estimate.
+
+The October3 reference catalogue supplies frozen classes, structural/minimum-ticket margin eligibility and calendar windows. It does not establish historical universe membership, sessions, margin, tradability or costs for August/September. Indicative M5 opens are not contemporaneous executable bid/ask, fill prices or observed network availability. Corporate actions, conversion, funding, slippage, commissions and actual settlement/execution remain unresolved. Fixed hypothetical roundtrip friction5/10/20/40bps is a sensitivity screen; no cost is assumed zero or certified as all-in. The newer authentic financing snapshot was not backdated into this window. There is no funded-account or compounding replay, capital reset or fictitious parallel account.
+
+The result adds authentic information about this policy and the limits of the preserved source. It cannot be rescued by reporting only its favorable completed subset or by relabeling hypothetical cost deductions as net economics. It does not establish that the whole authorized Pepperstone universe lacks edge.
+
+## Functional and operational progress
+
+A C# synchronized cross-sectional policy now consumes the existing full authenticated multi-instrument corpus and records a complete causal selection/episode audit. It reuses the established custody/source pipeline and existing calendar resolver. No second laboratory, source collector, privileged writer or hypothesis-invention system was built. Keyless C#/Python computation produced the original encrypted result and actual evaluator DLL; a later custody process read back the exact result without policy replay. These are stages of one investigation, not two distinct investigations or proof of full autonomous scientific continuation.
+
+PR232 final source897e27ef9ec729796c5235ac1031bdc79245decd passed mandatory gateway40640902777/job122658546402 and protected-technical40640902792. Ten new compiled/reference/calendar/scope tests executed without skips; existing product regressions and .algo build passed. The pre-outcome calendar amendment initially failed synthetic CI40640632990/job122657687844 because eligible_times was not explicitly mapped to the C# property; explicit JSON binding corrected this without removing the required calendar guard. No private corpus or economic outcome had been accessed at that failure. Final normal merge50f539beccc61e2fbc0dcf9ab45c931bb04a642c had the exact tested tree.
+
+Native cTrader Robot operational reception was not performed or promoted. Strategy activation, order/storage/risk controls, authority/custody and unique capital rules were unchanged. No LIVE/DEMO order or Cloud activation. Robust after-cost edge, authentic continuousEUR200 qualification, broker-executed HARD21, full scientific continuation and native Robot acceptance remain open. OWNER operations NONE.
+
+## Preserved originals
+
+Original artifact12795887578, `peer-residual-40641460227`:50351bytes, SHA25672d994ed373b5db0cc1fee3913ecd5cc14200b7c846096f92a7431d8451dd7de. Four bounded Base64 parts reconstruct the exact original ZIP with result.mxmenc, actual evaluator.dll and exact receipt.json/cold.json. Manifest SHA2565a3d2669e4b6d6d7cd5a1fd960e9ebca4588257057f127af81967b9e7e9221a0. Actual evaluator SHA256e07a13a46dda90650068e6cc577dccbffcb522a43059aafe6af318ee68b01406; cipher SHA256f93666ba1333f2d4e8094dfaafbe00fe89403eaed9a6be4154cd2de90e4a8649.
+
+Source manifest SHA256cc28c61a7788fc9d18bd54a343bc0e2c7467b27f1dbb111bf54185f9f0f16cb4; frozen spec SHA2560b7c31f2c6f1d27394b6e08104f3214e515dfc89ca312635cea90c33a6ece310. No original was rebuilt, source decrypted in Work or economic calculation rerun during preservation. Existing source archives were not redundantly copied.
+
+Offline byte verification: `python3 -m research_core_v4.laboratory.verify_peer_residual_result`. It verifies original ZIP/member/DLL hashes, frozen source/spec links, exact receipts, native identities, cold readback and the complete original gate vector, including both failed gates. Tamper/symlink tests reject altered/favorable claims without custody or policy execution.
