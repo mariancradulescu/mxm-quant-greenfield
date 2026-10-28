@@ -32,6 +32,10 @@ public sealed class MxmEntryCheckpoint {
  string? recoveryRaw;
  bool inspected;
  public string? SubmissionComment=>!Halted && (phase==Phase.Prepared || phase==Phase.Submitted)?preparedRecovery?.Comment:null;
+ // A detached copy for broker-fact corroboration; callers cannot mutate the
+ // original pre-call book identity held by the recovery barrier.
+ public MxmRecoverableEntry? RecoveryIntentSnapshot=>!Halted && phase==Phase.New && recovery!=null
+  ?recovery with {BeforeIds=recovery.BeforeIds.ToArray()}:null;
  public string RecoveryReason {get;private set;}="NOT_RECOVERED";
  Phase phase;
  string? pending;
