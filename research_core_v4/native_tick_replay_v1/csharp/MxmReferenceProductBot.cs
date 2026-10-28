@@ -11,6 +11,17 @@ namespace cAlgo.Robots {
 [Robot(TimeZone=TimeZones.UTC,AccessRights=AccessRights.None)]
 public sealed class MxmReferenceProductBot : Robot {
  const string Label="MXM_CSHARP_REFERENCE_V1";
+ [Parameter("Native Observation Only",DefaultValue=false)]
+ public bool NativeObservationOnly {get;set;}
+ readonly MxmNativeRunFence nativeRun=new();
+ readonly string nativeReceptionRunId=Guid.NewGuid().ToString("N");
+ string? nativeReceptionScopeFingerprint;
+ MxmBookObservation<double>? nativeReceptionBook;
+ Bars? nativeReceptionBars;
+ Symbol? nativeReceptionSymbol;
+ long nativeReceptionBarCallbacks,nativeReceptionRepeatedBars;
+ DateTime? nativeReceptionLastBar;
+
  // This Robot intentionally has no separately-trading chart-local kernel.
  ExitMode exitMode=ExitMode.ReverseOnly;
  [Parameter("Portfolio Symbols (comma separated)",DefaultValue="")]
@@ -55,6 +66,14 @@ public sealed class MxmReferenceProductBot : Robot {
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
+  bool runIsSimulation=NativeObservationOnly ?
+   IsBacktesting || RunningMode!=cAlgo.API.RunningMode.RealTime : IsBacktesting;
+  if(!nativeRun.Begin(NativeObservationOnly,EnableDemoTrading,runIsSimulation,
+     Application.EnvironmentType.ToString(),out var runReason)) {
+   Print("MXM_"+runReason);Stop();return;
+  }
+  if(nativeRun.IsObserving){StartNativeObservation();return;}
+
   bool onlineAr1=string.Equals(RegimeFamily,"OnlineAr1",StringComparison.OrdinalIgnoreCase);
   var mode=StrategyMode.Adaptive;
   if(!onlineAr1 && (!Enum.TryParse<StrategyMode>(RegimeFamily,true,out mode) ||
@@ -191,6 +210,72 @@ public sealed class MxmReferenceProductBot : Robot {
  // Deliberately no legacy per-chart order path. All symbols, including chart
  // symbol, enter via one Bars.BarClosed dispatcher, never OnBar plus BarClosed.
  protected override void OnBar() { }
+ // Same Robot, explicitly order-free native reception. No strategy, ledger,
+ // intent store, order event handler, timer, subscription polling or network I/O.
+ void StartNativeObservation() {
+  try {
+   nativeReceptionScopeFingerprint=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+    System.Text.Encoding.UTF8.GetBytes(MxmEntryCheckpoint.AccountScope(Account.BrokerName,Account.Number,Account.IsLive)))).ToLowerInvariant();
+   nativeReceptionSymbol=Symbols.GetSymbol(SymbolName);
+   nativeReceptionBars=MarketData.GetBars(TimeFrame,SymbolName);
+   if(nativeReceptionSymbol==null || nativeReceptionBars==null)
+    throw new InvalidOperationException("NATIVE_OBSERVATION_SOURCE_UNAVAILABLE");
+   nativeReceptionBook=MxmBookObservations.NativeSnapshots();
+   nativeReceptionBook.BeginEpoch(Environment.TickCount64);
+   nativeReceptionSymbol.Tick+=OnNativeReceptionTick;
+   nativeReceptionBars.BarClosed+=OnNativeReceptionBarClosed;
+   Print("MXM_NATIVE_OBSERVATION_ONLY_READY environment={0} simulation={1} run={2} accountScope={3} ordersAllowed=false storageTouched=false intentRecovery=false capital=false hard21=false",
+    Application.EnvironmentType,IsBacktesting,nativeReceptionRunId,nativeReceptionScopeFingerprint);
+   // Existing read-only reconstruction: a failure is UNAVAILABLE, never empty
+   // proof, absent-intent proof, complete history or permission to resume.
+   ReportBrokerOpeningFacts();
+  } catch(Exception e) {
+   nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_START_UNAVAILABLE_"+e.GetType().Name);Stop();
+  }
+ }
+ void OnNativeReceptionTick(SymbolTickEventArgs args) {
+  if(!nativeRun.IsObserving || nativeReceptionBook==null)return;
+  try {
+   // Platform snapshot/receipt clocks are not original wire-field presence,
+   // historical arrival time, liquidity, executable price or a broker fill.
+   nativeReceptionBook.Observe(args.Bid,args.Ask,Environment.TickCount64,
+    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),null);
+   var view=nativeReceptionBook.Snapshot(Environment.TickCount64);
+   if(view.Events==1)ReportNativeObservation("FIRST_TICK");
+  } catch(Exception e) {
+   nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_CALLBACK_STOP_"+e.GetType().Name);Stop();
+  }
+ }
+ void OnNativeReceptionBarClosed(BarClosedEventArgs args) {
+  if(!nativeRun.IsObserving)return;
+  try {
+   nativeReceptionBarCallbacks=checked(nativeReceptionBarCallbacks+1);
+   if(args.Bars.Count<1)throw new InvalidOperationException("NATIVE_CLOSED_BAR_UNAVAILABLE");
+   DateTime closed=DateTime.SpecifyKind(args.Bars.OpenTimes.Last(0),DateTimeKind.Utc);
+   if(nativeReceptionLastBar.HasValue && closed<=nativeReceptionLastBar.Value)
+    nativeReceptionRepeatedBars=checked(nativeReceptionRepeatedBars+1);
+   if(!nativeReceptionLastBar.HasValue || closed>nativeReceptionLastBar.Value)nativeReceptionLastBar=closed;
+   ReportNativeObservation("BAR_CALLBACK");
+  } catch(Exception e) {
+   nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_BAR_STOP_"+e.GetType().Name);Stop();
+  }
+ }
+ void ReportNativeObservation(string phase) {
+  if(nativeReceptionBook==null)return;
+  var view=nativeReceptionBook.Snapshot(Environment.TickCount64);
+  Print("MXM_NATIVE_OBSERVATION phase={0} environment={1} bars={2} repeatedBars={3} observation={4} run={5} accountScope={6} accountMutation=false executable=false durableRecovery=false capital=false hard21=false",
+   phase,Application.EnvironmentType,nativeReceptionBarCallbacks,nativeReceptionRepeatedBars,
+   System.Text.Json.JsonSerializer.Serialize(view),nativeReceptionRunId,nativeReceptionScopeFingerprint);
+ }
+ void StopNativeObservation() {
+  // Latch before unsubscribe/report: late or reentrant callbacks stay inert.
+  nativeRun.Stop();
+  if(nativeReceptionSymbol!=null)nativeReceptionSymbol.Tick-=OnNativeReceptionTick;
+  if(nativeReceptionBars!=null)nativeReceptionBars.BarClosed-=OnNativeReceptionBarClosed;
+  try {
+   ReportNativeObservation("STOP");nativeReceptionBook?.EndEpoch(Environment.TickCount64);
+  } catch(Exception e){Print("MXM_NATIVE_OBSERVATION_STOP_UNAVAILABLE_"+e.GetType().Name);}
+ }
  long? BrokerPositionId(string symbolName) {
   var owned=Positions.FindAll(Label,symbolName);
   if(owned.Length>1)throw new InvalidOperationException("AMBIGUOUS_OWNED_POSITION_IDENTITY");
@@ -200,6 +285,7 @@ public sealed class MxmReferenceProductBot : Robot {
  long ObservationUtcMs()=>IsBacktesting?new DateTimeOffset(BrokerClock()).ToUnixTimeMilliseconds():DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
  DateTime BrokerClock()=>DateTime.SpecifyKind(Server.TimeInUtc,DateTimeKind.Utc);
  void OnBrokerPositionClosed(PositionClosedEventArgs args) {
+  if(nativeRun.BlocksAccountMutation)return;
   // Never seize, modify or cancel another owner's position or pending order.
   if(args.Position.Label!=Label ||
      !brokerIntentFences.TryGetValue(args.Position.SymbolName,out var fence))return;
@@ -213,6 +299,9 @@ public sealed class MxmReferenceProductBot : Robot {
   }
  }
  protected override void OnStop() {
+  if(nativeRun.ObservationLatched){StopNativeObservation();return;}
+  nativeRun.Stop();
+
   Timer.Stop();
   Positions.Closed-=OnBrokerPositionClosed;
   foreach(var fence in brokerIntentFences.Values)fence.Reset();
@@ -229,6 +318,7 @@ public sealed class MxmReferenceProductBot : Robot {
   }
  }
  void OnPortfolioBarClosed(BarClosedEventArgs args) {
+  if(nativeRun.BlocksAccountMutation)return;
   if(orderProtection.Halted)return;
   var series=args.Bars;
   if(series.Count<2 || sequencer==null)return;
@@ -275,6 +365,7 @@ public sealed class MxmReferenceProductBot : Robot {
   } finally {sequencer.Exit();}
  }
  void OnPortfolioTick(SymbolTickEventArgs args) {
+  if(nativeRun.BlocksAccountMutation)return;
   if(orderProtection.Halted)return;
   bool acquired=false;
   try {
@@ -307,6 +398,7 @@ public sealed class MxmReferenceProductBot : Robot {
  }
  void ApplyPortfolioDecision(Symbol instrument,string instrumentName,int desired,
   bool contiguous,int completedBars,DateTime currentOpenTime,MxmBrokerDecisionLease lease) {
+  if(nativeRun.BlocksAccountMutation)return;
   bool simulation=IsBacktesting;
   if(!(simulation || (EnableDemoTrading && !Account.IsLive)) || !instrument.MarketHours.IsOpened())return;
   var fence=brokerIntentFences[instrumentName];
@@ -765,20 +857,24 @@ public sealed class MxmReferenceProductBot : Robot {
    checked((decimal)bid),checked((decimal)ask),qUsd,usdEur,qEur,minEur);
  }
  string? ReadEntryCheckpoint() {
+  nativeRun.DemandAccountMutationPath();
   CheckEntryStorage();LocalStorage.Reload(LocalStorageScope.Type);CheckEntryStorage();
   string? value=LocalStorage.GetString(entryCheckpoint!.StorageKey,LocalStorageScope.Type);
   CheckEntryStorage();return value;
  }
  void WriteEntryCheckpoint(string value) {
+  nativeRun.DemandAccountMutationPath();
   CheckEntryStorage();LocalStorage.SetString(entryCheckpoint!.StorageKey,value,LocalStorageScope.Type);
   CheckEntryStorage();LocalStorage.Flush(LocalStorageScope.Type);CheckEntryStorage();
  }
  string? ReadConfirmedEntries() {
+  nativeRun.DemandAccountMutationPath();
   CheckEntryStorage();LocalStorage.Reload(LocalStorageScope.Type);CheckEntryStorage();
   string? value=LocalStorage.GetString(confirmedEntries!.StorageKey,LocalStorageScope.Type);
   CheckEntryStorage();return MxmConfirmedEntryLedger.NormalizeNativeRead(value);
  }
  void WriteConfirmedEntries(string value) {
+  nativeRun.DemandAccountMutationPath();
   CheckEntryStorage();LocalStorage.SetString(confirmedEntries!.StorageKey,value,LocalStorageScope.Type);
   CheckEntryStorage();LocalStorage.Flush(LocalStorageScope.Type);CheckEntryStorage();
  }
@@ -839,6 +935,10 @@ public sealed class MxmReferenceProductBot : Robot {
   if(entryStorageFault)throw new InvalidOperationException("ENTRY_STORAGE_CALLBACK_FAULT");
  }
  protected override void OnException(Exception exception) {
+  if(nativeRun.ObservationLatched) {
+   nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_EXCEPTION_STOP_"+exception.GetType().Name);Stop();return;
+  }
+
   // LocalStorage can notify OnException instead of throwing at the call site.
   // Poison first; a matching memory echo must never erase this fault.
   if(entryStorageFault)return; // Avoid recursive failure while stopping an already poisoned instance.
@@ -848,6 +948,7 @@ public sealed class MxmReferenceProductBot : Robot {
   Print("MXM_UNHANDLED_EXCEPTION_ENTRY_CHECKPOINT_SAFE_STOP_"+exception.GetType().Name);Stop();
  }
  void LatchProtectionHalt() {
+  if(nativeRun.BlocksAccountMutation)return;
   entryCheckpoint?.Halt(); // Never clear the durable unresolved attempt, even after flattening.
   confirmedEntries?.Halt();
   foreach(var intent in causalIntents.Values)intent.Clear();
@@ -864,10 +965,12 @@ public sealed class MxmReferenceProductBot : Robot {
   x.Id,x.Label,x.SymbolName,x.TradeType==TradeType.Buy?1:-1,
   x.VolumeInUnits,x.EntryPrice,x.StopLoss)).ToArray();
  protected override void OnTimer() {
+  if(nativeRun.BlocksAccountMutation)return;
   if(!orderProtection.Halted || applyingDecision)return;
   TryDefensiveClose();
  }
  void TryDefensiveClose() {
+  if(nativeRun.BlocksAccountMutation)return;
   try {
    long? id=orderProtection.DefensiveCloseId(ProtectionBook());
    if(id==null)return; // Ambiguous identity stays halted; no guessed close.
