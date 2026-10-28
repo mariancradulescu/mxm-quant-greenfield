@@ -1,0 +1,72 @@
+name: MXM source-first diverse H1 comparative economics
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-source-first-diverse-h1-20261028.yml
+      - research_core_v4/laboratory/source_first_diverse_h1_economics.py
+      - research_core_v4/laboratory/SOURCE_FIRST_DIVERSE_H1_20261028_V1.json
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-source-first-diverse-h1-20261028.yml
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  no-source-preflight:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Check fixed source contracts and support-first guard without secret or outcomes
+        run: |
+          python3 -m research_core_v4.laboratory.source_first_diverse_h1_economics selftest
+          python3 -c 'from research_core_v4.laboratory.source_first_diverse_h1_economics import validate; validate()'
+  authentic-source-then-economics:
+    needs: no-source-preflight
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: mxm-r3-custody-v1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Admit a single authentic source-first execution under original authorities
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-remediation-p0-p4-20261015-v1 --jq .object.sha)" = "$GITHUB_SHA"
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-active-v1 --jq .object.sha)" = "07d1ddbe0b83753bbf189770af1911623fef8d6f"
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-accepted-owner-1807-v1 --jq .object.sha)" = "a830c132521bd4348454653f713e04f6107484fe"
+          python3 - <<'PY'
+          import json,os,subprocess
+          q="repos/mariancradulescu/mxm-quant-greenfield/actions/workflows/mxm-source-first-diverse-h1-20261028.yml/runs?per_page=100"
+          v=json.loads(subprocess.check_output(["gh","api",q],text=True))
+          assert v["total_count"]==len(v["workflow_runs"]) and v["total_count"]<=100
+          pushes=[r for r in v["workflow_runs"] if r["event"]=="push"]
+          assert len(pushes)==1 and pushes[0]["id"]==int(os.environ["GITHUB_RUN_ID"]) and pushes[0]["run_attempt"]==1,"ONE_OFFICIAL_PUSH"
+          assert any(r["event"]=="pull_request" and r["conclusion"]=="success" for r in v["workflow_runs"]),"PREOUTCOME_PR_VERIFIED"
+          print("MXM_SINGLE_SOURCE_FIRST_ATTEMPT_ADMITTED_NO_MODEL_YET")
+          PY
+      - name: Install existing locked requirements
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Authenticate original H1, test real temporal support, then conditionally open economic identities
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.source_first_diverse_h1_economics run
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-source-first-diverse-h1-${{ github.run_id }}
+          path: verification/source-first-diverse-h1/receipt.json
+          if-no-files-found: error
+          retention-days: 90

@@ -1,0 +1,77 @@
+{
+  "schema": "mxm.source-first-comparative-development.v1",
+  "mandate": "EXISTING_OWNER_B_E_RESEARCH_CONTRACT_V2_SOURCE_FIRST",
+  "parent_head": "7cdb84227751daf64cc80f8e06c40d3b3525e87f",
+  "source_release_id": 409747426,
+  "fixed_source_ids": [
+    5,
+    111,
+    250
+  ],
+  "target_ids": [
+    5,
+    111,
+    250
+  ],
+  "source_names": {
+    "5": "AUDUSD",
+    "111": "Copper",
+    "250": "SpotCrude"
+  },
+  "evaluation_interval": [
+    "2026-08-03T00:00:00Z",
+    "2026-08-31T00:00:00Z"
+  ],
+  "source_partition": "DEVELOPMENT",
+  "source_policy": "EXACT_ORIGINAL_CIPHERTEXT_HASH_VERIFIED_NATIVE_CUSTODY_NO_NEW_COLLECTION",
+  "decision_session_utc": [
+    7,
+    15
+  ],
+  "exclude_weekends": true,
+  "lookback_exact_hours": 2,
+  "entry_delay_after_completed_bar_hours": 1,
+  "hold_hours": 2,
+  "missing_source_semantics": "NO_IMPUTATION_UNEXPECTED_MISSINGNESS_CONSERVATIVE_STOP;DO_NOT_LABEL_MISSING_CALENDAR_MARKET_CLOSED_WITHOUT_SCHEDULE",
+  "preflight_before_economic_identity": true,
+  "preflight_price_blind": true,
+  "min_causal_decisions_per_target": 80,
+  "min_observable_response_fraction": 0.9,
+  "min_eligible_weeks": 3,
+  "cross_market_joint_response_min": 60,
+  "mechanisms": [
+    "MOMENTUM_IMPULSE",
+    "VOLATILITY_COMPRESSION",
+    "CROSS_ASSET_RESIDUAL"
+  ],
+  "conditional_identity_names": [
+    "V4-SUP-20261028-IMPULSE",
+    "V4-SUP-20261028-COMPRESSION",
+    "V4-SUP-20261028-RESIDUAL"
+  ],
+  "mechanism_fixed_rules": {
+    "MOMENTUM_IMPULSE": "range(t)>1.15*range(t-1) and |return_close(t)|>0.45*range(t) -> follow sign",
+    "VOLATILITY_COMPRESSION": "range(t)<0.8*range(t-1) and |prior_return|>0.55*prior_range -> fade prior direction",
+    "CROSS_ASSET_RESIDUAL": "target_close_return - contemporaneous_reference_close_return has abs>=0.00035 -> fade residual; Copper<->SpotCrude and AUDUSD<-Copper"
+  },
+  "max_new_identity_reservations": 3,
+  "all_three_identities_admitted_only_if_source_support_passes": true,
+  "dependent_target_market_cells": 9,
+  "stage_a_fixed_notional_eur": 1000,
+  "cost_authority": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+  "stage_a_cost_confidence": "FROZEN_CONSERVATIVE_BOUND_NOT_HISTORICAL_TOTAL_COST",
+  "stage_b": "SEPARATE_LATER_ACCOUNT_REPLAY_ONLY_AFTER_POSITIVE_NET_AND_SUPPORT;NOT_AUTO",
+  "scientific_budget": "V4_SEPARATELY_AUTHORIZED_DEVELOPMENT_FAMILY_UNITS_NOT_V2_REFUND_OR_EXTENSION",
+  "no_outcome_based_source_selection": true,
+  "prior_closed_V4_H1_CANDIDATES_excluded": [
+    "V4-COMP-20261028-WICK",
+    "V4-COMP-20261028-ONLINE",
+    "V4-COMP-20261028-FX"
+  ],
+  "max_attempts": 1,
+  "new_broker_requests": 0,
+  "orders": 0,
+  "cloud": false,
+  "protected_opened": false,
+  "no_automatic_retry": true
+}
