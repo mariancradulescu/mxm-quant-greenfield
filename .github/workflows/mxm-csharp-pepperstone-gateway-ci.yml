@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Verify original time-only support bundle without custody or support recomputation
+        run: |
+          python3 -m research_core_v4.laboratory.verify_support_topology_result
+          python3 -m unittest research_core_v4.laboratory.test_support_topology_original -v
       - name: Compile processed callback continuity and prevent stale history after native reload
         run: |
           dotnet build research_core_v4/laboratory/csharp/processed_bars/MxmProcessedBars.csproj -c Release

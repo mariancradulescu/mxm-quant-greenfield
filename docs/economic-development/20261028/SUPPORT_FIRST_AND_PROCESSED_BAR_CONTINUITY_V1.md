@@ -1,3 +1,5 @@
+> Subsequent result: the single native reception40650642477 completed SUCCESS. See [original result, decision and limits](SUPPORT_TOPOLOGY_NATIVE_RESULT_AND_DIRECTOR_DECISION_V1.md). PENDING statements below describe the prospective installation stage.
+
 # Support before another economic identity; native processed-bar continuity
 
 ## Live reconciliation and decision
