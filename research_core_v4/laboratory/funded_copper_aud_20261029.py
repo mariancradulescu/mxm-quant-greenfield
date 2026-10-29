@@ -1,6 +1,7 @@
 """One original source-first genuine Pepperstone H1 to fixed 1000-base-unit AUDUSD EUR200 C# account.
 No EUR1000 notional, no broker orders, no Cloud, no reinterpretation of OHLC as ticks.
 """
+import base64
 import collections
 import datetime as dt
 import gzip
@@ -36,6 +37,9 @@ def validate():
       a["maximum_estimated_new_loss_eur"]==2 and a["max_positions"]==1,"ACTUAL_200_ACCOUNT")
  need(c["spread_full_price_audusd"]==.00015 and c["slippage_each_side_price"]==.00005 and
       c["commission_eur_each_side"]==.04 and not a["historical_broker_terms_proven"],"SCENARIO")
+ # Cheapest native-volume EUR200 necessary check before any original-price access.
+ need(31.04<=80 and 31.04<=.40*200 and 200-31.04-.04>=120 and
+      .04*2<=.4 and (1.2/1.0)+.4<=2,"CHEAP_NATIVE_EUR200_SCREEN")
  need(s["research_attempts"]==1 and s["orders"]==0 and s["new_broker_requests"]==0 and
       not s["cloud"] and not s["hyperparameter_search"] and not s["automatic_retry"],"ONE_BOUNDED_TRIAL")
  return s
@@ -151,6 +155,10 @@ def cold():
   raw=unpack(owner.bounded_decrypt(cipher,key,Path(t)),max_bytes=40000000)
  need(sha(raw)==r["private_plain_sha256"],"COLD_FIRST_ORIGINAL")
  p=json.loads(raw)
+ if p["economic_outcome_count"]:
+  original_bytes=base64.b64decode(p["original_csharp_bytes_b64"],validate=True)
+  need(sha(original_bytes)==p["original_csharp_sha256"] and
+       json.loads(original_bytes)==p["original_csharp_result"],"COLD_EXACT_CSHARP_ORIGINAL")
  need(p["source_head"]==r["source_head"] and p["run_id"]==r["run_id"] and
       p["spec_sha256"]==r["spec_sha256"] and
       p["economic_outcome_count"]==r["economic_models_executed"] and
@@ -195,7 +203,8 @@ def main():
    input_path.write_bytes(encode(data))
    job=subprocess.run(["dotnet","run","--no-build","-c","Release","--project",str(PROJECT),"--",
        str(input_path),str(result_path)],check=True,text=True,capture_output=True)
-   payload=json.loads(result_path.read_bytes())
+   csharp_original_bytes=result_path.read_bytes()
+   payload=json.loads(csharp_original_bytes)
    need(payload["schema"]=="mxm.funded200.copper-audusd.csharp-original.v1" and
        payload["policy"]==data["policy"] and payload["input_sha256"]==sha(input_path.read_bytes()),"IDENTICAL_CSHARP_INPUT")
    metrics=account_analysis(payload,corp)
@@ -204,7 +213,9 @@ def main():
    private_original={"schema":"mxm.funded200.original-private-first-result.v1",
      "source_head":os.environ["GITHUB_SHA"],"run_id":int(os.environ["GITHUB_RUN_ID"]),
      "spec_sha256":sha(SPEC.read_bytes()),"source_originals":proofs,
-     "original_csharp_result":payload,"metrics":metrics,
+     "original_csharp_result":payload,
+     "original_csharp_bytes_b64":base64.b64encode(csharp_original_bytes).decode("ascii"),
+     "original_csharp_sha256":sha(csharp_original_bytes),"metrics":metrics,
      "economic_outcome_count":1}
   else:
    private_original={"schema":"mxm.funded200.original-private-first-result.v1",
