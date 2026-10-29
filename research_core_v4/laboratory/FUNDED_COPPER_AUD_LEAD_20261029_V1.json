@@ -1,0 +1,76 @@
+{
+  "schema": "mxm.v4.real-200-copper-audusd-development.v1",
+  "identity": "V4-20261029-COPPER-TO-AUDUSD-CAUSAL-TRANSFER",
+  "purpose": "ONE_DISTINCT_CAUSAL_COPPER_MACRO_SHOCK_TO_UNRESPONSIVE_AUDUSD",
+  "closed_overlap": "NOT_V4_RESIDUAL_FADE_NOT_EURUSD_OIL_USD_LEADLAG_NOT_POOLED_RIDGE_NOT_SESSIONS_INVENTORY",
+  "source": "ORIGINAL_AUTHENTICATED_PEPPERSTONE_H1_RELEASE_409747426",
+  "sources": {
+    "EURUSD": {
+      "sid": 1,
+      "asset_id": 631098100,
+      "sha256": "c33f401a97d06e2efe31e49f37a1f977238b41b66eb1d939b1d6700fb2530915"
+    },
+    "AUDUSD": {
+      "sid": 5,
+      "asset_id": 631095492,
+      "sha256": "75602c6520cadce8e878e7dce607aa896dd025b3388b16b1f722699ebc455850"
+    },
+    "Copper": {
+      "sid": 111,
+      "asset_id": 631086728,
+      "sha256": "2538248862212f2c7258a0e5183fc8e5b283f7c6fc84fd44de1fd4bf7948a16e"
+    }
+  },
+  "interval": [
+    "2026-08-03T00:00:00Z",
+    "2026-08-31T00:00:00Z"
+  ],
+  "exposure": "EXPOSED_DEVELOPMENT_UNSUITABLE_FOR_INDEPENDENT_CONFIRMATION",
+  "future_source_admission": "TIMESTAMPS_ONLY_AT_LEAST_100_COMMON_FULL_PAST_4H_SESSION_DECISIONS_AND_90PCT_POSSIBLE_2H_RESPONSE",
+  "time_rule": "EACH_COMPLETED_H1_COPPER_AND_AUD_BAR_AT_T_MINUS_1_VISIBLE_AT_TIME_T;ALL_T_MINUS_4_REFERENCES_VISIBLE",
+  "session_rule": "WEEKDAYS_07_15_UTC_DECISION_T_OPEN;ENTRY_T_PLUS_1_H1_OPEN;HOLD_2H;SINGLE_AUDUSD",
+  "direction_rule": "IF_COPPER_COMPLETED_3H_RETURN_ABS_GT_0.004_AND_AUDUSD_COMPLETED_3H_RETURN_ABS_LT_0.001_GO_WITH_COPPER_DIRECTION",
+  "training": "NONE",
+  "hyperparameter_search": false,
+  "automatic_retry": false,
+  "account": {
+    "starting_eur": 200,
+    "deposit_events": 1,
+    "reset_count": 0,
+    "mode": "C_SHARP_EXISTING_MXM_PORTFOLIO_ACCOUNT_REPLAY",
+    "minimum_volume_aud_base_units": 1000,
+    "max_volume_aud_base_units": 1000,
+    "step_volume_aud_base_units": 1000,
+    "native_minimum_margin_buy_eur": 31.04,
+    "native_minimum_margin_sell_eur": 31.04,
+    "maximum_margin_fraction": 0.4,
+    "max_positions": 1,
+    "minimum_free_margin_eur": 120,
+    "maximum_estimated_new_loss_eur": 2,
+    "stop_risk_fraction_of_equity": 0.01,
+    "stop_distance_audusd": 0.0012,
+    "roundtrip_risk_reserve_eur": 0.4,
+    "current_broker_capture_date": "2026-09-22",
+    "historical_broker_terms_proven": false
+  },
+  "scenario": {
+    "spread_full_price_audusd": 0.00015,
+    "slippage_each_side_price": 0.00005,
+    "commission_eur_each_side": 0.04,
+    "fx_eurusd_markup_fraction": 0.0003,
+    "source_price_type": "H1_OPEN_AND_ADVERSE_INTRABAR_OHLC_SCENARIO_NOT_BIDASK_AND_NOT_OBSERVED_TICKS",
+    "funding": "INTRADAY_ZERO_MODELED_NO_HISTORICAL_FUNDING_PROOF",
+    "conservative_cost_stress": "SECOND_FIXED_POSTRUN_ALGEBRAIC_MINUS_0.00010_AUDUSD_ROUNDTRIP_TIMES_1000_LOSS_SIDE_EURUSD_ONLY"
+  },
+  "unit": "ALL_CSHARP_ACCOUNT_RESULT_IN_ACTUAL_MIN_TICKET_EUR_CASH_NOT_STAGE_A_1000EUR_REFERENCE",
+  "weekly_monthly": "ONE_EQUITY_PATH_REPORT_ISO_UTC_AND_CALENDAR_UTC_NO_RESET",
+  "new_broker_requests": 0,
+  "orders": 0,
+  "cloud": false,
+  "protected_forward_opened": false,
+  "owner_limits_changed": false,
+  "independent_robustness": false,
+  "hard21_system_certified": false,
+  "research_attempts": 1,
+  "dependent_target_cells": 1
+}
