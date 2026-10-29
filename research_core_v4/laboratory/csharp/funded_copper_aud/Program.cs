@@ -51,8 +51,9 @@ for(long t=start;t<end;t+=H){
   account=MxmPortfolioAccountReplay.RestoreReplay(save.Payload,save.Sha256,policy,config,new[]{"AUDUSD"});
   restores++;
  }
- var exists=aud.TryGetValue(t,out var current)&&fx.TryGetValue(t,out var currency);
- if(!exists || current==null || currency==null){
+ bool hasAud=aud.TryGetValue(t,out var current);
+ bool hasFx=fx.TryGetValue(t,out var currency);
+ if(!hasAud || !hasFx || current==null || currency==null){
   missing++;
   if(account.Report().OpenPositions>0) Feed(new MxmInstrumentQuoteUnavailable(U(t),"AUDUSD","MISSING_H1_REFERENCE_EXPOSURE"));
   continue;
