@@ -167,6 +167,7 @@ public sealed class MxmReferenceProductBot : Robot {
     Print("MXM_ENTRY_RECOVERY_"+entryCheckpoint.RecoveryReason);
    ReportRecordedWeeks();
    ReportBrokerOpeningFacts();
+   ReportBrokerCashflowFacts();
   }catch(Exception e) {
    orderProtection.HaltUnknown();
    Print("MXM_ENTRY_CHECKPOINT_STARTUP_SAFE_STOP_"+e.GetType().Name);Stop();return;
@@ -229,6 +230,7 @@ public sealed class MxmReferenceProductBot : Robot {
    // Existing read-only reconstruction: a failure is UNAVAILABLE, never empty
    // proof, absent-intent proof, complete history or permission to resume.
    ReportBrokerOpeningFacts();
+   ReportBrokerCashflowFacts();
   } catch(Exception e) {
    nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_START_UNAVAILABLE_"+e.GetType().Name);Stop();
   }
@@ -913,6 +915,44 @@ public sealed class MxmReferenceProductBot : Robot {
   // This is additional positive corroboration, not a replacement for the
   // original durable intent, existing ledger, live book and broker stop checks.
   return proof.Correlated && proof.RequestedUnitsObserved;
+ }
+ // Read original deposit/withdrawal transactions directly from the broker
+ // account API. This path is read-only and does not need LocalStorage.
+ // A native collection is not guaranteed complete or atomic: a count change,
+ // malformed fact or unsupported API read yields UNAVAILABLE, never zero flow.
+ MxmBrokerCashflowInventory ReadBrokerCashflowFacts() {
+  if(!string.Equals(Account.Asset.Name,"EUR",StringComparison.OrdinalIgnoreCase))
+   throw new ArgumentException("NATIVE_CASHFLOW_ACCOUNT_CURRENCY_NOT_EUR");
+  int startCount=Transactions.Count;
+  if(startCount<0 || startCount>100000)
+   throw new ArgumentException("NATIVE_CASHFLOW_COLLECTION_UNBOUNDED");
+  var items=new List<MxmBrokerCashflowFact>();
+  foreach(var tx in Transactions) {
+   if(items.Count>=100000 || !double.IsFinite(tx.Amount) ||
+     !double.IsFinite(tx.Balance) || tx.Time.Kind==DateTimeKind.Local ||
+     (tx.Type!=TransactionType.Deposit && tx.Type!=TransactionType.Withdrawal))
+    throw new ArgumentException("NATIVE_CASHFLOW_FACT_UNVERIFIED");
+   items.Add(new MxmBrokerCashflowFact(tx.Id,
+    DateTime.SpecifyKind(tx.Time,DateTimeKind.Utc),
+    tx.Type==TransactionType.Deposit?"Deposit":"Withdrawal",
+    checked((decimal)tx.Amount),checked((decimal)tx.Balance)));
+  }
+  if(items.Count!=startCount || Transactions.Count!=startCount)
+   throw new ArgumentException("NATIVE_CASHFLOW_COLLECTION_CHANGED");
+  return new MxmBrokerCashflowInventory(
+   MxmEntryCheckpoint.AccountScope(Account.BrokerName,Account.Number,Account.IsLive),
+   Account.Asset.Name,BrokerClock(),items);
+ }
+ void ReportBrokerCashflowFacts() {
+  try {
+   var inventory=ReadBrokerCashflowFacts();
+   Print("MXM_BROKER_CASHFLOW_OBSERVED simulation={0} count={1} depositEur={2} withdrawalEur={3} netExternalEur={4} digest={5} fullHistory=false anchor=false strategyNav=false orderPermission=false",
+    IsBacktesting,inventory.Facts.Length,inventory.ObservedDepositsEur,
+    inventory.ObservedWithdrawalsEur,inventory.ObservedNetExternalFlowEur,
+    inventory.FactsSha256);
+  } catch(Exception e) {
+   Print("MXM_BROKER_CASHFLOW_UNAVAILABLE_"+e.GetType().Name);
+  }
  }
  void ReportBrokerOpeningFacts() {
   try {

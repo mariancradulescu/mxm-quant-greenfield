@@ -45,6 +45,9 @@ jobs:
         run: |
           dotnet build research_core_v4/laboratory/csharp/broker_opening/MxmBrokerOpening.csproj -c Release
           python3 -m unittest research_core_v4.laboratory.test_broker_opening_inventory -v
+      - name: Reconstruct original EUR external cashflows without creating orders or anchoring strategy NAV
+        run: |
+          DOTNET_ROLL_FORWARD=Major dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmBrokerCashflowFixture.csproj -c Release
       - name: Bind final native submission to the exact durable prepared intent
         run: |
           dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpointFixture.csproj -c Release
