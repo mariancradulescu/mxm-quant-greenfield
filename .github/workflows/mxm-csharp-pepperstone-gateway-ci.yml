@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Receive the shared EUR200 programme account across cold CSharp processes
+        run: |
+          set -eu
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_funded_account -v
       - name: Admit distinct prospective quote triangle with complete individual audit before any new source or identity
         run: |
           dotnet build research_core_v4/laboratory/csharp/quote_triangle/MxmQuoteTriangle.csproj -c Release

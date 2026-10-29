@@ -11,7 +11,7 @@ from .budgets import TrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
-OPS={'native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
+OPS={'funded_csharp','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
 AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
 
@@ -23,6 +23,8 @@ def validate_manifest(m,history,global_book):
     need(history['reconciled'] and m['budget']['new_V2_identities']<=history['V2']['remaining'],'HISTORICAL_BUDGET')
     need(type(m['prospective_at_ms']) is int and m['provenance'] and len(m['source_sha256'])==64,'PROGRAM_PROVENANCE')
     tasks=m['tasks'];need(bool(tasks) and len(tasks)==len(set(tasks)),'TASKS')
+    need(sum(t['operator']=='funded_csharp' for t in tasks.values())<=1,
+         'ONE_CONTINUOUS_CSHARP_ACCOUNT_PER_PROGRAMME')
     charged=[]
     for ident,t in tasks.items():
         need(ID.fullmatch(ident) and t['operator'] in OPS,'OPERATOR')
@@ -48,6 +50,14 @@ def validate_manifest(m,history,global_book):
                 need(t['input'].get('corpus')=={'bound_authentic_corpus':True},'AUTHENTIC_CORPUS_BINDING')
                 ref=t['input'].get('candidate',{}).get('result_of');need(ref in tasks and tasks[ref]['operator']=='freeze','ECONOMICS_REQUIRES_PROSPECTIVE_REGISTRY')
         if t['operator']=='acquire':need(m['mode']=='DEVELOPMENT_RESEARCH','SYNTHETIC_NETWORK_FORBIDDEN')
+        if t['operator']=='funded_csharp':
+            ref=t['input'].get('candidate',{}).get('result_of')
+            need(ref in tasks and ref in t['dependencies'] and tasks[ref]['operator']=='freeze',
+                 'FUNDED_REQUIRES_REGISTERED_CANDIDATE')
+            need(set(t['input'])=={'candidate','feed'},'FUNDED_INPUT_CONTRACT')
+            if m['mode']=='DEVELOPMENT_RESEARCH':
+                need(t['input']['feed']=={'bound_authenticated_csharp_feed':True},
+                     'FUNDED_AUTHENTIC_ADAPTER_REQUIRED')
     need(len(charged)==len(set(charged)) and sum(t['trial_units'] for t in tasks.values())<=m['budget']['new_V2_identities'],'PROGRAM_TRIAL_TOTAL')
     visiting=set();done=set()
     def visit(k):
@@ -101,6 +111,12 @@ class Laboratory:
         return None
     def resolve(self,value):
         if isinstance(value,dict):
+            if set(value)=={'bound_authenticated_csharp_feed'}:
+                need(value['bound_authenticated_csharp_feed'] is True and
+                     hasattr(self,'authenticated_csharp_feed'),'FUNDED_AUTHENTIC_SOURCE_UNAVAILABLE')
+                # Source authentication belongs to the existing custody adapter,
+                # never to a manifest's self-declared boolean or source checksum.
+                return deepcopy(self.authenticated_csharp_feed)
             if set(value)=={'native_acquisition_plan'}:
                 need(hasattr(self,'authentic_corpus'),'AUTHENTIC_CORPUS_UNAVAILABLE')
                 plan=deepcopy(value['native_acquisition_plan']);sid=str(plan['symbol_id']);terms=self.authentic_corpus['catalog']['full'].get(sid)
@@ -124,7 +140,15 @@ class Laboratory:
         # invocation identity and evidence-parent CAS provide durable exclusion.
         try:
             x=self.resolve(t['input']);op=t['operator']
-            if op=='catalogue':
+            if op=='funded_csharp':
+                from .funded_account import execute
+                synthetic=self.m['mode']=='SYNTHETIC_RECEPTION'
+                value=execute(x['candidate'],x['feed'],synthetic);verdict=value['classification']
+                lane='RECEPTION' if synthetic else 'V2'
+                item=self.book.identities[lane+':'+x['candidate']['id']]
+                if item['state']=='RESERVED':self.book.finish(lane,x['candidate']['id'],x['candidate']['spec_hash'])
+                else:need(item['state']=='OBSERVED' and item['spec_hash']==x['candidate']['spec_hash'],'FUNDED_TRIAL_BINDING')
+            elif op=='catalogue':
                 asset=self.cache.ingest(x['manifest'],x['rows']);a=self.cache.assets[asset]
                 value={'asset_id':asset,'quality':a};verdict='DATA_VALID' if not a['invalid'] and not a['conflicts'] and a['row_count'] and a['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
             elif op=='acquire':
