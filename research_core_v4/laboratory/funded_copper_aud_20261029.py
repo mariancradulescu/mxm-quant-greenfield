@@ -126,6 +126,7 @@ def selftest():
   i=(t-START)//H
   for sid in SOURCES:
    price=1.07+sid*.005+.000001*i
+   if sid==111:price+=.03*((i//6)%2) # deterministic Copper-only artificial dislocation: exercise actual EUR200 order admission
    corp[sid][t]=(price,price+.001,price-.001,price+.0001)
  need(support(corp)["classification"]=="SOURCE_ADMITTED_BEFORE_ECONOMIC_IDENTITY","TEST_SUPPORT")
  # Execute the C# product on non-market artificial OHLC. It must preserve EUR200 and never create 1000EUR starting cash.
@@ -137,7 +138,10 @@ def selftest():
    check=True,capture_output=True,text=True)
   v=json.loads(b.read_bytes())
   need(v["initial_cash_eur"]==200 and v["deposit_count"]==1 and v["reset_count"]==0 and
-       v["model"]=="COPPER_SHOCK_TO_UNRESPONSIVE_AUDUSD","TEST_CSHARP_SOURCEFREE_ACCOUNT")
+       v["model"]=="COPPER_SHOCK_TO_UNRESPONSIVE_AUDUSD" and
+       v["account"]["AcceptedEntries"]>0 and
+       all(z["Units"]==1000 for z in v["account"]["Ledger"] if z["Kind"] in ("ENTRY","EXIT")),
+       "TEST_CSHARP_SOURCEFREE_ACCOUNT_AND_NATIVE_MINIMUM_ENTRY")
  corp[111]={}
  need(support(corp)["classification"]=="SOURCE_STOP_NO_IDENTITY","TEST_STOP_BEFORE_IDENTITY")
  print("MXM_COPPER_AUD_FUNDED200_PREFLIGHT_SUCCESS no originals unlocked")
