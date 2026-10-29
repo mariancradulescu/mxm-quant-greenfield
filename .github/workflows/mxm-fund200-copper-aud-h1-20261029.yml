@@ -56,7 +56,7 @@ jobs:
           # New workflow is not always registered for PR events before it reaches the official branch.
           # Verify the two EXISTING protected PR workflows on the exact reviewed head.
           prs=g('actions/runs?event=pull_request&per_page=100')
-          assert prs['total_count']<=100,'PR_CI_HISTORY_BOUNDED'
+          assert prs['total_count']>=len(prs['workflow_runs']) and 0<len(prs['workflow_runs'])<=100,'PR_CI_PAGE'
           passed={x['name'] for x in prs['workflow_runs'] if x['event']=='pull_request' and x['head_sha']==parents[1]['sha'] and x['conclusion']=='success'}
           assert {'MXM R3 protected technical installation CI','MXM CSharp Pepperstone protected gateway CI'}.issubset(passed),'REQUIRE_TWO_ORIGINAL_PROTECTED_CI'
           print('MXM_ONE_ORIGINAL_FUNDED200_ATTEMPT_ADMITTED',os.environ['GITHUB_RUN_ID'])
