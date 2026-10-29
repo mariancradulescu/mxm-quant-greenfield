@@ -2,6 +2,7 @@ using System.Text.Json;
 using Mxm.Replay;
 using Mxm.Research;
 if(MxmPortfolioReplayRecoveryProbe.TryWorker(args,out int workerExit)){Environment.ExitCode=workerExit;return;}
+if(MxmHistoricalSourceFixture.TryRun(args))return;
 // AUTHENTIC SOURCE-TO-C# RECEIPT: native dated BID/ASK, no fabricated EURUSD FX,
 // commissions, margin, fills, entry signals, or source receipt-clock semantics.
 if(args.Length==4 && args[0]=="--w33-authentic-panel-source-gate"){

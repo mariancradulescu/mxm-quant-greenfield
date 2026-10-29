@@ -447,6 +447,7 @@ public sealed partial class MxmPortfolioAccountReplay {
  /// <summary>Resume the SAME model account at an exact event ordinal; never fund it again.</summary>
  public MxmPortfolioAccountReport Continue(IEnumerable<MxmAccountFeed> feed,long expectedNextOrdinal){
   Need(!halted && !faulted && expectedNextOrdinal==processedEvents,"REPLAY_CURSOR_OR_FAULT");
+  Need(historicalSource==null || processingHistoricalSource,"HISTORICAL_SOURCE_CANNOT_PROMOTE_EXECUTION");
   started=true;
   try {
   foreach(var e in feed) {
