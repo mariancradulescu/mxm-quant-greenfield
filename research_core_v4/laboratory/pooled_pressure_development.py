@@ -143,11 +143,15 @@ def selftest():
    p=1.+sid*.01+.0002*math.sin(i*.3+sid)
    corpus[sid][t]=(p,p+.001,p-.001,p+.0001*math.cos(i))
  support(corpus);a=evaluate(corpus)
- cutoff=src.END-86400
+ cutoff=src.END-3*86400
+ changed=0
  for sid in corpus:
   for t in list(corpus[sid]):
-   if t>=cutoff:corpus[sid][t]=tuple(v*1.2 for v in corpus[sid][t])
+   if t>=cutoff:
+    corpus[sid][t]=tuple(v*1.2 for v in corpus[sid][t]);changed+=1
+ need(changed>0,'POOL_POISON_NONEMPTY')
  b=evaluate(corpus)
+ need(a['weekly']['2026-W33']==b['weekly']['2026-W33'] and a['weekly']['2026-W34']==b['weekly']['2026-W34'],'POOL_PAST_OUTCOMES_INVARIANT')
  need([v for v in a['fit_log'] if v['fit_decision_utc']<cutoff]==
       [v for v in b['fit_log'] if v['fit_decision_utc']<cutoff],'POOL_FUTURE_POISON')
  need(all(v['latest_label_settlement_utc']+2*src.H<v['fit_decision_utc'] for v in a['fit_log']),'POOL_PURGED_LABELS')
