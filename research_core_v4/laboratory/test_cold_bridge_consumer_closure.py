@@ -9,9 +9,16 @@ class ColdBridgeClosureTest(unittest.TestCase):
         self.text=Path('.github/workflows/mxm-csharp-exit-lifecycle-cold.yml').read_text()
 
     def test_current_both_consumers_have_complete_contract(self):
-        for name in ('mxm-csharp-exit-lifecycle-cold.yml','mxm-csharp-authentic-cold.yml'):
+        for name in ('mxm-csharp-exit-lifecycle-cold.yml','mxm-csharp-authentic-cold.yml','mxm-source-first-diverse-h1-20261028.yml'):
             result=contract(Path('.github/workflows',name).read_text(),Path.cwd(),self.original)
             self.assertEqual(len(result),2)
+
+    def test_no_actual_workflow_consumer_is_missing_from_the_installation_contract(self):
+        from .cold_bridge_consumer_closure import COMMAND
+        paths=[p for p in Path('.github/workflows').glob('*.yml') if COMMAND in p.read_text()]
+        self.assertEqual(len(paths),3)
+        for p in paths:
+            self.assertEqual(len(contract(p.read_text(),Path.cwd(),self.original)),2)
 
     def test_actual_missing_dependency_failure_is_detected_before_keys(self):
         line='          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/captured_symbol_terms.py\n'

@@ -18,6 +18,7 @@ jobs:
       - name: Compile prospective H1 commodity anchor and shared EUR200 scenario before source access
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          python3 -m unittest tests.test_historical_workflow_fixtures tests.test_m6_ctrader_capture tests.test_research_core_v4_publication_only tests.test_research_core_v4_staging_publish research_core_v4.laboratory.test_chronology_gap_recovery -v
           dotnet build research_core_v4/laboratory/csharp/commodity_anchor/MxmCommodityAnchor.csproj -c Release
           python3 -m research_core_v4.laboratory.verify_commodity_anchor_account_result --self-test
           python3 -m research_core_v4.laboratory.verify_commodity_anchor_original --self-test

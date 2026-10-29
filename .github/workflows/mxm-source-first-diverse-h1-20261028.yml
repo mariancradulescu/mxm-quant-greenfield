@@ -7,11 +7,17 @@ on:
       - research_core_v4/laboratory/source_first_diverse_h1_economics.py
       - research_core_v4/laboratory/SOURCE_FIRST_DIVERSE_H1_20261028_V1.json
       - research_core_v4/laboratory/pooled_pressure_development.py
+      - research_core_v4/laboratory/chronology_csharp_bridge.py
+      - research_core_v4/laboratory/captured_symbol_terms.py
+      - research_core_v4/laboratory/durable_native_chronology.py
       - research_core_v4/laboratory/POOLED_PRESSURE_20261029_V1.json
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
       - .github/workflows/mxm-source-first-diverse-h1-20261028.yml
+      - research_core_v4/laboratory/chronology_csharp_bridge.py
+      - research_core_v4/laboratory/captured_symbol_terms.py
+      - research_core_v4/laboratory/durable_native_chronology.py
 permissions: {contents: read, actions: read}
 concurrency:
   group: mxm-integrated-laboratory
@@ -27,8 +33,8 @@ jobs:
       - name: Check fixed source contracts and support-first guard without secret or outcomes
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-          python3 -m research_core_v4.laboratory.pooled_pressure_development selftest
-          python3 -c 'from research_core_v4.laboratory.pooled_pressure_development import validate; validate()'
+          python3 -m unittest research_core_v4.laboratory.test_chronology_gap_recovery -v
+          python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
   authentic-source-then-economics:
     needs: no-source-preflight
     if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.event_name == 'push' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
@@ -38,6 +44,12 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Checkout the original immutable native decoder for non-economic readback
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-chronology-source
+          persist-credentials: false
       - name: Admit a single authentic source-first execution under original authorities
         env:
           GH_TOKEN: ${{ github.token }}
@@ -54,7 +66,7 @@ jobs:
           pushes=[r for r in v["workflow_runs"] if r["event"]=="push" and r["head_sha"]==os.environ["GITHUB_SHA"]]
           os.environ["MXM_PROSPECTIVE_PR_HEAD"]=json.loads(subprocess.check_output(["gh","api","repos/mariancradulescu/mxm-quant-greenfield/commits/"+os.environ["GITHUB_SHA"]],text=True))["parents"][1]["sha"]
           prior=[r for r in v["workflow_runs"] if r["event"]=="push" and r["head_sha"]!=os.environ["GITHUB_SHA"]]
-          assert len(prior)==1 and prior[0]["id"]==40770145814 and prior[0]["conclusion"]=="success","PRESERVE_ORIGINAL_THREE_FAMILIES"
+          assert {r["id"] for r in prior}=={40770145814,40822274147} and all(r["conclusion"]=="success" for r in prior),"PRESERVE_ALL_COMPLETED_ECONOMIC_OUTCOMES"
           assert len(pushes)==1 and pushes[0]["id"]==int(os.environ["GITHUB_RUN_ID"]) and pushes[0]["run_attempt"]==1,"ONE_OFFICIAL_PUSH"
           assert any(r["event"]=="pull_request" and r["conclusion"]=="success" and r["head_sha"]==os.environ.get("MXM_PROSPECTIVE_PR_HEAD") for r in v["workflow_runs"]),"PREOUTCOME_PR_VERIFIED"
           print("MXM_SINGLE_SOURCE_FIRST_ATTEMPT_ADMITTED_NO_MODEL_YET")
@@ -62,14 +74,32 @@ jobs:
       - name: Install existing locked requirements
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
-      - name: Authenticate original H1, test real temporal support, then conditionally open economic identities
+      - name: Authenticate existing original BID ASK pages and receive recovered gap witness without economics
         env:
           GH_TOKEN: ${{ github.token }}
           MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
         run: |
           set -eu
           umask 077
-          python3 -m research_core_v4.laboratory.pooled_pressure_development run
+          test "$(git -C .sealed-chronology-source rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
+          python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
+          cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
+          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/captured_symbol_terms.py
+          (cd .sealed-chronology-source && python3 -m research_core_v4.laboratory.chronology_csharp_bridge "$GITHUB_WORKSPACE/verification/r3-chronology/capture.mxmenc" "$RUNNER_TEMP/mxm-recovered-gap-source.ndjson")
+          mkdir -p verification/source-first-diverse-h1
+          cp "$RUNNER_TEMP/mxm-recovered-gap-source.ndjson.receipt.json" verification/source-first-diverse-h1/receipt.json
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('verification/source-first-diverse-h1/receipt.json')
+          v=json.loads(p.read_bytes())
+          assert v['source_run']==39660692230 and v['verified_bid_events']==14003 and v['verified_ask_events']==14209
+          assert v['economic_outcomes']==v['orders']==v['fills']==0 and v['continuous_market_coverage_proven'] is False
+          assert set(v['quote_update_gaps'])=={'BID','ASK'}
+          v.update(readback_run_id=int(os.environ['GITHUB_RUN_ID']),readback_source_sha=os.environ['GITHUB_SHA'],
+                   recovered_from_pr=104,new_broker_requests=0,closed_economic_models_reexecuted=0,cloud_activated=False)
+          p.write_text(json.dumps(v,sort_keys=True,separators=(',',':'))+'\n')
+          print('MXM_RECOVERED_AUTHENTIC_GAP_WITNESS '+json.dumps(v,sort_keys=True))
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: mxm-source-first-diverse-h1-${{ github.run_id }}

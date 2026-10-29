@@ -15,6 +15,21 @@ CIPHER_SHA256='f1d828d94b304e2af1f310701f92dcb31db935a8db7fc3f8772087adf5499346'
 PRIVATE_SHA256='73b854b9d621c965f46c93e22e88c60cb9512c9f07d2ff51fa5df5eae478ba20'
 SOURCE_SHA='d2fae5641b759b1c8c24161d83d62d39e104eafd'
 TRIGGER_SHA='36ffe2999aae332b2d408c9d12d32bfabfa70802'
+def quote_update_gap_witness(rows,start_ms,end_ms):
+    """Bound actual update spacing, never infer market closures, fills or quote arrival."""
+    need(type(start_ms) is int and type(end_ms) is int and start_ms<end_ms,'CHRONOLOGY_GAP_WINDOW')
+    stamps=[t for t,_ in rows]
+    need(all(type(t) is int and start_ms<=t<end_ms for t in stamps)
+         and all(a<=b for a,b in zip(stamps,stamps[1:])),'CHRONOLOGY_GAP_TIMESTAMPS')
+    spans=[b-a for a,b in zip([start_ms]+stamps,stamps+[end_ms])]
+    return {'quote_updates':len(stamps),'distinct_update_ms':len(set(stamps)),
+            'longest_no_update_interval_ms':max(spans),
+            'intervals_over_5s':sum(d>5000 for d in spans),
+            'intervals_over_60s':sum(d>60000 for d in spans),
+            'first_update_delay_ms':stamps[0]-start_ms if stamps else None,
+            'last_update_to_window_end_ms':end_ms-stamps[-1] if stamps else None,
+            'semantics':'OBSERVED_UPDATES_ONLY_NOT_MARKET_CLOSURE_OR_HISTORICAL_ARRIVAL'}
+
 def export(cipher_path,output):
     cipher=Path(cipher_path).read_bytes()
     need(bytes_digest(cipher)==CIPHER_SHA256,'CSHARP_AUTHENTIC_CIPHER_CHANGED')
@@ -69,6 +84,9 @@ def export(cipher_path,output):
                 'ciphertext_sha256':CIPHER_SHA256,'private_sha256':PRIVATE_SHA256,
                 'derived_ticks_sha256':bytes_digest(out.read_bytes()),
                 'verified_bid_events':len(bid),'verified_ask_events':len(ask),
+                'quote_update_gaps':{'BID':quote_update_gap_witness(bid,native.POLICY['from_ms'],native.POLICY['to_ms']),
+                                     'ASK':quote_update_gap_witness(ask,native.POLICY['from_ms'],native.POLICY['to_ms'])},
+                'continuous_market_coverage_proven':False,
                 'captured_symbol_terms_sha256':bytes_digest(terms_bytes),
                 'historical_arrival_proven':False,'historical_costs_proven':False,
                 'orders':0,'economic_outcomes':0,'fills':0}
