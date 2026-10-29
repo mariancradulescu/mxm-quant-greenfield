@@ -68,6 +68,8 @@ One pending/active episode and fixed8secondholdoff from EACH proposal. Entry is 
 admissible positive target quote250–3000ms after decision. Exit is first admissible
 positive target quote1000–4000ms after actual modeled entry. Local monotonic receipt
 clocks govern these as-if availability windows; they are not broker latency guarantees.
+Check the PRIOR target/FX state at each incoming event clock BEFORE any refreshing
+field is applied; a new quote cannot heal an unknown exposure interval.
 Unknown/stale/crossed target or FX marks cancel a pending episode or censor an open
 one; every such episode remains in the full population with unknown outcome. Source
 end/deadlines never fabricate liquidation. Locked marks remain observable, not model

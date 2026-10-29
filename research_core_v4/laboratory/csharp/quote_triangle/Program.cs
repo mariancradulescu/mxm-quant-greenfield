@@ -15,6 +15,7 @@ foreach(var row in root.GetProperty("events").EnumerateArray()){
  sequence=seq;arrival=ns;received=utc;
  long? server=row.GetProperty("server_ms").ValueKind==JsonValueKind.Null?null:row.GetProperty("server_ms").GetInt64();
  decimal? Side(string key)=>row.GetProperty(key).ValueKind==JsonValueKind.Null?null:row.GetProperty(key).GetInt64()/100000m;
+ bool priorMarkable=books[2].View(ns,utc).Markable&&books[1].View(ns,utc).Markable;
  books[sid].Observe(Side("bid"),Side("ask"),ns,utc,server);
  View V(int id)=>books[id].View(ns,utc);
  var target=V(2);var fx=V(1);var cross=V(9);
@@ -28,13 +29,13 @@ foreach(var row in root.GetProperty("events").EnumerateArray()){
    .0012m*units/fx.Bid!.Value+2m*fee<=2m;
  }
  decimal? synthBid=fx.Markable&&cross.Markable?fx.Bid/cross.Ask:null,synthAsk=fx.Markable&&cross.Markable?fx.Ask/cross.Bid:null;
- snapshots.Add(new(sid,seq,ns,utc,target,fx,cross,synthBid,synthAsk,fee,affordable));
+ snapshots.Add(new(sid,seq,ns,utc,target,fx,cross,synthBid,synthAsk,fee,affordable,priorMarkable));
 }
 var own=snapshots.Where(s=>s.Symbol==2).ToArray();long[] clocks=own.Select(s=>s.Ns).ToArray();
 int Lower(long value){int lo=0,hi=clocks.Length;while(lo<hi){int m=(lo+hi)/2;if(clocks[m]<value)lo=m+1;else hi=m;}return lo;}
 bool Ready(Snapshot s)=>s.Target.Positive && s.Fx.Markable && s.Cross.Markable && s.Fee.HasValue && s.Affordable;
 var locations=snapshots.Select((s,i)=>(s.Sequence,i)).ToDictionary(x=>x.Sequence,x=>x.i);
-var bad=new int[snapshots.Count+1];for(int i=0;i<snapshots.Count;i++)bad[i+1]=bad[i]+(!snapshots[i].Target.Markable||!snapshots[i].Fx.Markable?1:0);
+var bad=new int[snapshots.Count+1];for(int i=0;i<snapshots.Count;i++)bad[i+1]=bad[i]+(!snapshots[i].PriorExposureMarkable||!snapshots[i].Target.Markable||!snapshots[i].Fx.Markable?1:0);
 int potential=0,complete=0;
 foreach(var s in own.Where(Ready)){
  potential++;int j=Lower(s.Ns+250000000L);
@@ -48,7 +49,7 @@ foreach(var s in own.Where(Ready)){
 }
 bool admitted=potential>=100 && complete>=.8m*potential;
 var journal=new List<object>();var episodes=new List<object>();long ordinal=0,identity=0,busy=-1;Episode? pending=null,active=null;
-object Context(Snapshot s)=>new{source_symbol=s.Symbol,target=s.Target,fx=s.Fx,synthetic=new{bid=s.SyntheticBid,ask=s.SyntheticAsk,cross=s.Cross},
+object Context(Snapshot s)=>new{source_symbol=s.Symbol,prior_exposure_markable=s.PriorExposureMarkable,target=s.Target,fx=s.Fx,synthetic=new{bid=s.SyntheticBid,ask=s.SyntheticAsk,cross=s.Cross},
  cost_state="CONTEMPORANEOUS_COMMISSION_REFERENCE_UNKNOWN_TOTAL_COST",margin_state=new{dated_estimate_eur=margin,capital_reference_eur=200,full_entry_admission=false},
  risk_state=new{estimated_stop_distance_quote=.0012m,affordable=s.Affordable,stop_fill_proven=false},fee_per_side_ceiling_eur=s.Fee};
 object Fill(Snapshot s,int direction,bool exit){decimal price=(exit?direction>0?s.Target.Bid:s.Target.Ask:direction>0?s.Target.Ask:s.Target.Bid)!.Value;
@@ -65,8 +66,8 @@ if(admitted){
   bool wrote=false;
   if(pending!=null && s.Ns>pending.Decision.Ns+3000000000L){Censor(s,"ENTRY_DEADLINE");wrote=true;}
   if(active!=null && s.Ns>active.Entry!.Ns+4000000000L){Censor(s,"EXIT_DEADLINE");wrote=true;}
-  if(active!=null && (!s.Target.Markable||!s.Fx.Markable)){Log(s,"MARK_UNAVAILABLE","EXPOSED_PATH_UNPRICEABLE",active.Direction,active.Id);Censor(s,"EXPOSED_PATH_UNPRICEABLE");wrote=true;}
-  if(pending!=null && (!s.Target.Markable||!s.Fx.Markable)){Censor(s,"PREENTRY_SOURCE_INVALID");wrote=true;}
+  if(active!=null && (!s.PriorExposureMarkable||!s.Target.Markable||!s.Fx.Markable)){Log(s,"MARK_UNAVAILABLE","EXPOSED_PATH_UNPRICEABLE",active.Direction,active.Id);Censor(s,"EXPOSED_PATH_UNPRICEABLE");wrote=true;}
+  if(pending!=null && (!s.PriorExposureMarkable||!s.Target.Markable||!s.Fx.Markable)){Censor(s,"PREENTRY_SOURCE_INVALID");wrote=true;}
   if(s.Symbol!=2)continue;
   if(active!=null && s.Ns>=active.Entry!.Ns+1000000000L && s.Target.Positive && s.Fx.Markable && s.Fee.HasValue){
    var e=active;decimal ep=e.Direction>0?e.Entry!.Target.Ask!.Value:e.Entry!.Target.Bid!.Value;
@@ -112,5 +113,5 @@ sealed class Book {
  }
  public MxmObservedFxBook Fx(long ns){var x=book.ReadBook(ns/1000000);return new("1",x.Bid,x.Ask,x.Observation);}
 }
-sealed record Snapshot(int Symbol,long Sequence,long Ns,long Utc,View Target,View Fx,View Cross,decimal? SyntheticBid,decimal? SyntheticAsk,decimal? Fee,bool Affordable);
+sealed record Snapshot(int Symbol,long Sequence,long Ns,long Utc,View Target,View Fx,View Cross,decimal? SyntheticBid,decimal? SyntheticAsk,decimal? Fee,bool Affordable,bool PriorExposureMarkable);
 sealed record Episode(long Id,int Direction,Snapshot Decision,Snapshot? Entry);

@@ -25,7 +25,7 @@ POLICY={**source.POLICY,'schema':'mxm.prospective-triad-source-policy.v1','symbo
  'numerical_hurdle_guard_quote':'1e-20','maximum_new_identities_after_source_admission':1,'minimum_completed_episodes_for_screen':20,
  'zero_unpriced_or_censored_episodes_for_survivor':True,'current_terms_are_actual_total_costs':False,
  'locked_reference_and_risk_marks':'EXISTING_NATIVE_NONCROSSED_PREDICATE_NO_LOCKED_EXECUTION',
- 'initial_capital_reference_eur':200,'margin_cap_eur':80,'free_margin_reserve_eur':120,'risk_reference_eur':2,
+ 'guard_before_incoming_refresh':True,'initial_capital_reference_eur':200,'margin_cap_eur':80,'free_margin_reserve_eur':120,'risk_reference_eur':2,
  'stop_reference_quote':.0012,'round_trip_fee_reserve_eur':.2,'funding_and_actual_slippage':'UNRESOLVED',
  'cost_scenarios':['OBSERVED_BIDASK_AND_CURRENT_COMMISSION_REFERENCE','ADVERSE_ONE_PIP_ROUNDTRIP_PLUS_COMMISSION'],
  'strategy_trials':0,'source_only_prior_intervals_reused':False}
@@ -164,7 +164,7 @@ def evaluate():
  private=encoded(dict(schema='mxm.first-execution-triad-research-private.v1',identity=identity,
   source_private_sha256=data['source_private_sha256'],source_input_sha256=bytes_digest(path.read_bytes()),
   original_csharp_json_b64=base64.b64encode(actual_path.read_bytes()).decode(),audit=audit,
-  arithmetic_reconciliation=checked,disposition=disposition,gross_eur=str(gross),net_commission_reference_eur=str(net),
+  arithmetic_reconciliation=checked,disposition=disposition,cashflow_population='COMPLETE_EPISODES_ONLY_UNKNOWN_CENSORS_RETAINED',gross_eur=str(gross),net_commission_reference_eur=str(net),
   net_adverse_one_pip_roundtrip_eur=str(stressed),funding_actual_slippage_and_fills='UNRESOLVED',full_capital_replay=False))
  from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
  from research_core_v4.successor_c_20261018.readback import FP
@@ -178,7 +178,7 @@ def evaluate():
   actual_evaluator_sha256=bytes_digest(binary.read_bytes()),private_sha256=bytes_digest(private),ciphertext_sha256=bytes_digest((out/'result.mxmenc').read_bytes()),
   source_private_sha256=data['source_private_sha256'],source_input_sha256=bytes_digest(path.read_bytes()),
   contact_interval=data['contact_interval'],entire_interval_excluded_from_confirmation=True,
-  gross_positive=gross>0,net_reference_positive=net>0,net_stress_positive=stressed>0,
+  gross_positive=(gross>0 if actual['models'] and not censored else None),net_reference_positive=(net>0 if actual['models'] and not censored else None),net_stress_positive=(stressed>0 if actual['models'] and not censored else None),
   initial_capital_reference_eur=200,capital_replay=False,historical_total_costs_proven=False,actual_fills_proven=False,
   economic_edge_proven=False,hard21_proven=False,independent_confirmation=False,orders=0,cloud_activated=False,
   prior_closed_models_reexecuted=False,formal_V2_C033_changed=False,terminal='STOP_FIXED_PROCEDURE_NO_RETUNE_NO_AUTOMATIC_RETRY')

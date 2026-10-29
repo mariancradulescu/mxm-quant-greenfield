@@ -43,6 +43,11 @@ class ScopeTests(unittest.TestCase):
   a=validate([row],target_events=1,source_sha256='a'*64,policy_sha256='b'*64)
   raw=json.dumps([row],default=str).replace('"1.234567890123456789012345678"','1.234567890123456789012345678')
   self.assertEqual(a,validate(json.loads(raw,parse_float=Decimal),target_events=1,source_sha256='a'*64,policy_sha256='b'*64))
+ def test_incoming_refresh_cannot_heal_unknown_prior_mark_interval(self):
+  data=fixture();rows=data['events'][:9];last=copy.deepcopy(rows[-1]);last['sequence']+=1
+  last['arrival_ns']+=6000000000;last['received_ms']+=6000;last['server_ms']+=6000;rows.append(last)
+  data['events']=rows;v=source_views(data)
+  self.assertFalse(v[-1]['PriorExposureMarkable']);self.assertTrue(v[-1]['Target']['Markable'])
  def test_forbidden_context_and_secrets_fail_before_git_or_network(self):
   with patch.dict(os.environ,{},clear=True),patch.object(n.subprocess,'check_output') as git:
    with self.assertRaises(ValueError):n.admit()

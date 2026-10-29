@@ -8,21 +8,22 @@ def source_views(data):
  books={sid:dict(first=True,maximum=None,bid=None,ask=None) for sid in (1,2,9)};result=[]
  term=terms(dict(symbol_id=2,quote_asset='USD',full=data['target_terms']));units=D(term['MinimumVolume'])/100
  previous_ns=previous_utc=previous_seq=-1
+ def view(sid):
+  b=books[sid];x,y=b['bid'],b['ask'];ok=all(v is not None and v[2] is not None and v[0]>0 and 0<=utc-v[2]<=5000 and 0<=ns-v[1]<=5000000000 for v in (x,y)) and y[0]>=x[0]
+  return dict(Bid=x[0] if x else None,Ask=y[0] if y else None,BidArrival=x[1] if x else None,AskArrival=y[1] if y else None,
+   BidServer=x[2] if x else None,AskServer=y[2] if y else None,Markable=ok,Positive=bool(ok and y[0]>x[0]))
  with localcontext() as ctx:
   ctx.prec=55
   for event in data['events']:
    sid=event['symbol'];ns=event['arrival_ns'];utc=event['received_ms'];seq=event['sequence'];b=books[sid];server=event['server_ms']
    need(seq>previous_seq and ns>=previous_ns and utc>=previous_utc,'TRIAD_REFERENCE_CHRONOLOGY')
    previous_ns,previous_utc,previous_seq=ns,utc,seq
+   prior_markable=view(2)['Markable'] and view(1)['Markable']
    valid=server is not None and 0<=utc-server<=5000 and (b['maximum'] is None or server>=b['maximum'])
    if server is not None:b['maximum']=max(server,b['maximum']) if b['maximum'] is not None else server
    for side in ('bid','ask'):
     if event[side] is not None:b[side]=(D(event[side])/100000,ns,server if valid and not b['first'] else None)
    b['first']=False
-   def view(sid):
-    b=books[sid];x,y=b['bid'],b['ask'];ok=all(v is not None and v[2] is not None and v[0]>0 and 0<=utc-v[2]<=5000 and 0<=ns-v[1]<=5000000000 for v in (x,y)) and y[0]>=x[0]
-    return dict(Bid=x[0] if x else None,Ask=y[0] if y else None,BidArrival=x[1] if x else None,AskArrival=y[1] if y else None,
-     BidServer=x[2] if x else None,AskServer=y[2] if y else None,Markable=ok,Positive=bool(ok and y[0]>x[0]))
    t,f,c=view(2),view(1),view(9);ceiling=None;affordable=False
    if t['Markable'] and f['Markable']:
     fx=(1/f['Bid']).quantize(D('1e-18'),rounding=ROUND_CEILING)
@@ -31,13 +32,13 @@ def source_views(data):
     affordable=0<m<=80 and D(200)-m-ceiling>=120 and 2*ceiling<=D('.2') and D('.0012')*units/f['Bid']+2*ceiling<=2
    result.append(dict(Symbol=sid,Sequence=seq,Ns=ns,Utc=utc,Target=t,Fx=f,Cross=c,
     SyntheticBid=f['Bid']/c['Ask'] if f['Markable'] and c['Markable'] else None,
-    SyntheticAsk=f['Ask']/c['Bid'] if f['Markable'] and c['Markable'] else None,Fee=ceiling,Affordable=affordable))
+    SyntheticAsk=f['Ask']/c['Bid'] if f['Markable'] and c['Markable'] else None,Fee=ceiling,Affordable=affordable,PriorExposureMarkable=prior_markable))
  return result
 
 def admission(views):
  own=[s for s in views if s['Symbol']==2];clocks=[s['Ns'] for s in own];positions={s['Sequence']:i for i,s in enumerate(views)}
  bad=[0]
- for s in views:bad.append(bad[-1]+int(not s['Target']['Markable'] or not s['Fx']['Markable']))
+ for s in views:bad.append(bad[-1]+int(not s['PriorExposureMarkable'] or not s['Target']['Markable'] or not s['Fx']['Markable']))
  potential=complete=0
  for s in own:
   if not(s['Target']['Positive'] and s['Fx']['Markable'] and s['Cross']['Markable'] and s['Fee'] is not None and s['Affordable']):continue
@@ -63,7 +64,7 @@ def reconcile(data,actual):
   for name,view in (('target',s['Target']),('fx',s['Fx'])):
    need(row['context'][name]['Markable']==view['Markable'] and row['context'][name]['Positive']==view['Positive'],'TRIAD_EVERY_AUDITED_BOOK_HEALTH')
    for key in ('Bid','Ask','BidArrival','AskArrival','BidServer','AskServer'):need(close(row['context'][name][key],view[key]),'TRIAD_EVERY_SOURCE_SIDE_AND_CLOCK')
-  need(row['context']['source_symbol']==s['Symbol'],'TRIAD_ORIGINAL_EVENT_SYMBOL')
+  need(row['context']['source_symbol']==s['Symbol'] and row['context']['prior_exposure_markable']==s['PriorExposureMarkable'],'TRIAD_ORIGINAL_EVENT_SYMBOL_AND_PRIOR_MARK')
   for key in ('Bid','Ask','BidArrival','AskArrival','BidServer','AskServer'):
    need(close(row['context']['synthetic']['cross'][key],s['Cross'][key]),'TRIAD_CROSS_SOURCE_CONTEXT')
   need(close(row['context']['synthetic']['bid'],s['SyntheticBid']) and close(row['context']['synthetic']['ask'],s['SyntheticAsk']) and
