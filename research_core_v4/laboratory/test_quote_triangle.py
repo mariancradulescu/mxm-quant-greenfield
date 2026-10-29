@@ -36,6 +36,13 @@ class ScopeTests(unittest.TestCase):
   old=copy.deepcopy(n.source.POLICY);fn=n.source.partition
   with n.configured():self.assertEqual(n.source.POLICY['symbols'],n.POLICY['symbols']);self.assertEqual(n.source.partition(),n.partition())
   self.assertEqual(n.source.POLICY,old);self.assertIs(n.source.partition,fn)
+ def test_exact_decimal_journal_hash_survives_original_json_readback(self):
+  from decimal import Decimal
+  row=dict(ordinal=1,source_sequence=1,received_ms=1,arrival_ns=1,state='ABSTAIN',reason='TEST',direction=0,opportunity_id=None,
+   context=dict(source_symbol=2,target=dict(Bid=Decimal('1.234567890123456789012345678')),fx=None,synthetic=None,cost_state='UNRESOLVED',margin_state=None,risk_state=None),modeled_fill=None)
+  a=validate([row],target_events=1,source_sha256='a'*64,policy_sha256='b'*64)
+  raw=json.dumps([row],default=str).replace('"1.234567890123456789012345678"','1.234567890123456789012345678')
+  self.assertEqual(a,validate(json.loads(raw,parse_float=Decimal),target_events=1,source_sha256='a'*64,policy_sha256='b'*64))
  def test_forbidden_context_and_secrets_fail_before_git_or_network(self):
   with patch.dict(os.environ,{},clear=True),patch.object(n.subprocess,'check_output') as git:
    with self.assertRaises(ValueError):n.admit()

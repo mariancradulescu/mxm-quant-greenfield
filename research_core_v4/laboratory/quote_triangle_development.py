@@ -193,7 +193,7 @@ def cold():
   key,fp=_private_key_from_secret(Path(tmp));need(fp==FP,'TRIAD_COLD_EXISTING_RECIPIENT')
   raw=unpack(owner.bounded_decrypt(cipher,key,Path(tmp)),max_bytes=32000000);p=strict_json(raw,max_elements=3000000)
  need(p['identity']==identity and r['ciphertext_sha256']==bytes_digest(cipher) and r['private_sha256']==bytes_digest(raw) and p['disposition']==r['disposition'],'TRIAD_COMPLETE_COLD_RESULT')
- actual=json.loads(base64.b64decode(p['original_csharp_json_b64']))
+ actual=json.loads(base64.b64decode(p['original_csharp_json_b64']),parse_float=D)
  if actual['models']:
   from .economic_journal import validate as journal_validate
   audit=journal_validate(actual['journal'],target_events=actual['target_events'],source_sha256=p['source_private_sha256'],policy_sha256=identity['spec_sha256'])
