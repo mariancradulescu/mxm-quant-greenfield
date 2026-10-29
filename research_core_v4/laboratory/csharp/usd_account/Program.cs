@@ -185,6 +185,34 @@ var fxOnly=Fx(feed.Last().Utc.AddMilliseconds(1),1.2m,1.21m);
 var panelDirect=panel.Continue(new[]{fxOnly},panel.NextEventOrdinal);
 Need(JsonSerializer.Serialize(panelRestored.Continue(new[]{fxOnly},panelRestored.NextEventOrdinal))==JsonSerializer.Serialize(panelDirect),
  "DECLARED_PANEL_RECOVERY_AND_FX_ONLY_PARITY");
+// Exercise the SAME funded three-symbol account after a durable checkpoint, not
+// three separately replenished tests. Market prices, margin and fees are artificial.
+var postRecoveryQuotes=roster.Select((symbol,index)=>{
+ var at=fxOnly.Utc.AddMilliseconds(index+1);
+ decimal mid=(index+1)*10m+.06m;
+ return (MxmAccountFeed)new MxmQuote(at,symbol,mid-.0001m,mid+.0001m,
+  1m/1.21m,1m,50m,.1m,0m,1m,1m/1.20m,
+  BidSourceUtc:at,AskSourceUtc:at);
+}).ToArray();
+var directMarked=panel.Continue(postRecoveryQuotes,panel.NextEventOrdinal);
+var restoredMarked=panelRestored.Continue(postRecoveryQuotes,panelRestored.NextEventOrdinal);
+Need(JsonSerializer.Serialize(restoredMarked)==JsonSerializer.Serialize(directMarked),
+ "PANEL_THREE_POST_RESTART_QUOTES_IDENTICAL_CASH_RISK_AND_EQUITY");
+Need(directMarked.OpenPositions==3 && directMarked.AcceptedEntries==3 &&
+ directMarked.FinalCashEur==199.7m && directMarked.UsedMarginEur==150m &&
+ directMarked.Ledger.Count==3 && directMarked.MarkedEquityEur>panelDirect.MarkedEquityEur,
+ "PANEL_POST_RESTART_MARKS_ALL_POSITIONS_NO_DUPLICATE_FUNDING_OR_ENTRIES");
+var fundedCapsule=panelRestored.CaptureReplay(source);
+var fundedAgain=MxmPortfolioAccountReplay.RestoreReplay(fundedCapsule.Payload,fundedCapsule.Sha256,
+ source,declared,roster);
+Need(JsonSerializer.Serialize(fundedAgain.Report())==JsonSerializer.Serialize(directMarked),
+ "PANEL_SECOND_COLD_RESTORE_PRESERVES_FUNDED_THREE_SYMBOL_MARK");
+var staleFunded=MxmPortfolioAccountReplay.RestoreReplay(fundedCapsule.Payload,fundedCapsule.Sha256,
+ source,declared,roster);
+var staleAt=postRecoveryQuotes.Last().Utc.AddSeconds(6);
+Refuse(()=>staleFunded.Continue(new[]{new MxmUsdEurMark(staleAt,fxOnly.Utc,staleAt,1.22m,1.23m)},
+ staleFunded.NextEventOrdinal),"STALE_FX_BID_HALTS_ALL_THREE_FUNDED_EXPOSURES");
+Refuse(()=>staleFunded.CaptureReplay(source),"HALTED_THREE_POSITION_BOOK_CANNOT_CHECKPOINT");
 Refuse(()=>MxmPortfolioAccountReplay.RestoreReplay(panelCapsule.Payload,panelCapsule.Sha256,source,
  declared with {UsdQuoteMetadataJson=Registration(new string('b',64))},roster),"DECLARED_SOURCE_CANNOT_CHANGE_ON_RESTORE");
 foreach(string bad in new[]{Registration(source).Replace("USD\"}","JPY\"}"),
