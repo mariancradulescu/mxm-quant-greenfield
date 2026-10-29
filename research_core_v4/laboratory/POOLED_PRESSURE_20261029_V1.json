@@ -1,0 +1,82 @@
+{
+  "schema": "mxm.prospective-pooled-pressure.v1",
+  "identity": "V4-POOL-20261029-PRESSURE",
+  "parent_head": "d2d5b70bd160515748137215ccf19a6c2fe321e6",
+  "target_ids": [
+    5,
+    111,
+    250
+  ],
+  "target_names": [
+    "AUDUSD",
+    "Copper",
+    "SpotCrude"
+  ],
+  "hypothesis": "Shared normalized OHLC pressure and nonlinear location interactions, cross-market context and clock may predict delayed returns beyond a zero and a causal per-market mean forecast. A pooled regularized mapping is distinct from fixed sign fades, impulse continuation, residual convergence and the closed single-market sign-state learner.",
+  "features": [
+    "return_now",
+    "return_previous",
+    "body",
+    "close_location",
+    "range",
+    "other_1_return",
+    "other_2_return",
+    "return_x_location",
+    "body_x_location",
+    "sin_hour",
+    "cos_hour",
+    "is_aud",
+    "is_copper"
+  ],
+  "label": "(open(t+4h)/open(t+2h)-1)/max(completed_range_fraction(t),frozen_market_cost_fraction)",
+  "ridge_alpha": 1.0,
+  "objective": "MEAN_SQUARED_STANDARDIZED_RESPONSE_ERROR_PLUS_ALPHA_L2",
+  "intercept": "UNPENALIZED",
+  "feature_normalization": "TRAINING_ONLY_MEAN_AND_STD_ZERO_STD_REPLACED_BY_ONE",
+  "hyperparameter_search": false,
+  "training": "EXPANDING_FROM_2026_08_03_FIRST_WEEK_INITIAL_TRAINING_ONLY",
+  "minimum_training_rows": 90,
+  "label_embargo_hours": 2,
+  "retraining": "FIRST_ELIGIBLE_DECISION_EACH_UTC_DAY_NO_INTRADAY_REFIT",
+  "evaluation_start_utc": "2026-08-10T00:00:00Z",
+  "evaluation_end_utc": "2026-08-31T00:00:00Z",
+  "entry_delay_hours": 1,
+  "hold_hours": 2,
+  "session_utc": [
+    7,
+    15
+  ],
+  "weekdays_only": true,
+  "session_scope_reason": "Reuse proven authentic source support, not outcome ranking; not a universal product session restriction",
+  "direction": "SIGN_OF_RETURN_FORECAST_ONLY_WHEN_ABS_FORECAST_GT_1_5_TIMES_FROZEN_COARSE_COST",
+  "volume_stage_a": "FIXED_1000_EUR_NORMALIZATION_NO_EXECUTABLE_SIZE_OR_ACCOUNT_PROFIT_CLAIM",
+  "overlap": "EACH_MARKET_FIXED_TWO_HOUR_OPPORTUNITY_SERIALIZATION_NOT_SYSTEM_CONCURRENCY_LIMIT",
+  "missing": "NO_IMPUTATION_NO_RESPONSE_PADDING_FUTURE_MISSING_SIGNAL_RETAINED_AND_CENSORED",
+  "cost_authority": "evidence/COMPETITION_ULTRA_FAST_STAGE_A_COARSE_COST_AUTHORITY_V1.json",
+  "cost_scenarios": [
+    "FROZEN_COARSE",
+    "TWICE_COARSE",
+    "TWICE_COARSE_PLUS_2BPS_ROUNDTRIP"
+  ],
+  "benchmarks": [
+    "ZERO_FORECAST",
+    "TRAINING_ONLY_PER_MARKET_MEAN"
+  ],
+  "source_first": true,
+  "source_release_id": 409747426,
+  "hard21_role": "SYSTEM_ONLY_NOT_COMPONENT_EDGE_GATE",
+  "parent_closed_compression_preserved": true,
+  "stage_b": "ONLY_NEW_SURVIVOR_MAY_ADVANCE_TO_EXISTING_CSHARP_200_EUR_REALIZATION_NO_COMPONENT_HARD21_GATE",
+  "independent_confirmation": false,
+  "source_partition": "PREVIOUSLY_EXPOSED_DEVELOPMENT_NOT_INDEPENDENT_CONFIRMATION",
+  "scientific_unit": "ONE_NEW_POOLED_LEARNING_PROCEDURE_THREE_DEPENDENT_MARKET_CELLS_NO_PARAMETER_SEARCH_NO_V2_REFUND",
+  "no_retuning": true,
+  "max_authentic_attempts": 1,
+  "orders": 0,
+  "new_broker_requests": 0,
+  "cloud": false,
+  "protected_opened": false,
+  "contract_v2_sha256": "f7d7fdca2c4a77bc36f3a3153641f9fff295dc14fcb9f7f5fa507b025c561b96",
+  "contract_v3_sha256": "168cdc3955109b71bf3a4a1e6ed8df05a0f178a0452a1c22745d6999d1903630",
+  "implementation_sha256": "73dd73f908917500115923ed760954e740b8e9c0079904e80db97bf83867a69c"
+}
