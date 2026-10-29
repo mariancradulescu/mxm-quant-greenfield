@@ -43,8 +43,12 @@ later bounded cost-source design, not StageB or qualification. C# registration o
 the independently decoded USD roster is checked without replaying market events.
 No new engine, workflow, trial budget, key, account, permission or authority.
 
-Execution state: implementation awaiting required protected CI and one genuine
-source run. No collection or compiled product result is claimed before receipt.
+Execution state at this source commit: prospective. The required CI, original
+source receipt, permanent public result and resulting Director decision are kept
+in PR256: https://github.com/mariancradulescu/mxm-quant-greenfield/pull/256 .
+No collection or compiled product result is claimed before that receipt. Later
+changes to the shared core deliberately leave historical model hash gates closed;
+the regression tests verify refusal without rewriting frozen specifications.
 
 ---
 

@@ -32,7 +32,9 @@ def partition():
     return {'schema':'mxm.prospective-source-quality-partition.v1','policy_sha256':POLICY_SHA,
       'classification':POLICY['classification'],'from_ms':POLICY['from_ms'],'to_ms':POLICY['to_ms'],
       'symbols':POLICY['symbols'],'confirmation_eligible':False,'response_testing_allowed':False,
-      'prior_evidence_reclassified':False,'new_strategy_trial':False,'protected_opened':False}
+      'prior_evidence_reclassified':False,'new_strategy_trial':False,'protected_opened':False,
+      'current_metadata_interval':'ACTUAL_CONTACT_INTERVAL_EXCLUDED_FROM_CONFIRMATION',
+      'exclusion_scope':'ALL_IDENTITIES_INTERSECTING_ANY_NEW_QUOTE_OR_METADATA_INFORMATION'}
 
 def workflow():
     w=old.workflow();w['name']='MXM finite W33 panel quote support and USD registration'
@@ -136,7 +138,8 @@ def verify_private(p):
           assets.get(light.quoteAssetId)=='USD' and all(s.HasField(k) and getattr(s,k)>0 for k in ('minVolume','maxVolume','stepVolume')),
           'PANEL_EXPLICIT_USD_VOLUME_METADATA')
         need(req.symbolId==sid and list(req.volume)==[s.minVolume] and margin.HasField('moneyDigits') and
-          len(margin.margin)==1 and margin.margin[0].volume==s.minVolume,'PANEL_CURRENT_NATIVE_MARGIN')
+          len(margin.margin)==1 and margin.margin[0].volume==s.minVolume and
+          all(margin.margin[0].HasField(k) and getattr(margin.margin[0],k)>0 for k in ('buyMargin','sellMargin')),'PANEL_CURRENT_NATIVE_MARGIN')
         quote_assets.append({'symbol':name,'symbol_id':sid,'quote_asset':'USD'})
         terms.append({'symbol':name,'volume_min_centunits':int(s.minVolume),'volume_step_centunits':int(s.stepVolume),
           'volume_max_centunits':int(s.maxVolume),'margin_money_digits':int(margin.moneyDigits),
@@ -237,11 +240,16 @@ def collect(identity):
         for k in BROKER:os.environ.pop(k,None)
         p.update(contact_end_ns=time.monotonic_ns(),contact_end_utc=datetime.now(timezone.utc).isoformat(),
           wire_bytes=wire_bytes,connection_attempts=tr.attempts)
+        profile=None
+        if p['complete']:
+            try:profile=verify_private(p)
+            except Exception as exc:
+                p['complete']=False;p['failure_class']=type(exc).__name__
+                if re.fullmatch(r'LAB_[A-Z0-9_]{1,110}',str(exc)):p['failure_code']=str(exc)
         raw=encoded(p);need(len(raw)<=POLICY['max_private_bytes'],'PANEL_PRIVATE_CAP')
         output=ROOT.parent/OUT;output.mkdir(parents=True,exist_ok=True)
         public=ROOT/'research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem';need(public_spki_sha256(public)==FP,'PANEL_EXISTING_RECIPIENT')
         encrypt_shard(gzip.compress(raw,mtime=0),public_key=public,output=output/'capture.mxmenc')
-    profile=verify_private(p) if p['complete'] else None
     result={'schema':'mxm.panel-quote-support-public.v1',**identity,'role':'spot-collect','accepted':p['complete'],
       'profile':profile,'failure_class':p['failure_class'],'failure_code':p.get('failure_code'),
       'failure_request_type':p.get('failure_request_type'),'provider_error_code':p.get('provider_error_code'),'cipher_sha256':bytes_digest((output/'capture.mxmenc').read_bytes()),
@@ -270,7 +278,8 @@ def cold(identity):
         p=strict_json(raw,max_elements=3_000_000);need(p['identity']==identity,'PANEL_PRIVATE_NATIVE_IDENTITY')
         profile=verify_private(p);need(producer['accepted'] is True and profile==producer['profile'],'PANEL_SEPARATE_READBACK_PARITY')
     result={**producer,'role':'spot-cold','native_producer_job':source[0]['id'],'independently_redecoded_original_wire':True,
-      'contact_start_utc':p['contact_start_utc'],'contact_end_utc':p['contact_end_utc']}
+      'contact_start_utc':p['contact_start_utc'],'contact_end_utc':p['contact_end_utc'],
+      'entire_current_metadata_contact_interval_excluded_from_confirmation':True}
     declaration={'schema':'mxm.declared-quote-assets.v1','source_sha256':producer['private_sha256'],'symbols':profile['quote_assets']}
     (output/'quote-assets.json').write_bytes(encoded(declaration)+b'\n')
     (output/'cold.json').write_bytes(encoded(result)+b'\n');print('MXM_PANEL_COLD '+encoded(result).decode(),flush=True)
