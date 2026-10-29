@@ -4,7 +4,9 @@ from . import commodity_anchor_reference_units as r
 from . import commodity_anchor_development as original
 class ReferenceUnits(unittest.TestCase):
  def test_exact_source_denominations_and_unchanged_economic_branch(self):
-  r.frozen();_,by=r.identity();self.assertEqual(by[7393]['quote'],'USC');self.assertEqual(by[250]['quote'],'USD')
+  # Shared core evolved; the closed economic identity must reject this tree.
+  with self.assertRaisesRegex(ValueError,'ANCHOR_IMPLEMENTATION'):r.frozen()
+  _,by=r.identity();self.assertEqual(by[7393]['quote'],'USC');self.assertEqual(by[250]['quote'],'USD')
   terms=r.terms_from_identity();self.assertEqual(terms['units'],1);self.assertEqual(terms['fee_usd'],0);self.assertEqual(terms['pnl_rate'],0)
   a=ast.parse(Path(r.__file__).read_text());b=ast.parse(Path(original.__file__).read_text())
   def branch(t):return next(x for x in next(f for f in t.body if isinstance(f,ast.FunctionDef) and f.name=='evaluate').body if isinstance(x,ast.If))

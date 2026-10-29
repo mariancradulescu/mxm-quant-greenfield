@@ -4,7 +4,9 @@ from . import commodity_anchor_cache_reuse as r
 from . import commodity_anchor_development as original
 class CacheReuseScope(unittest.TestCase):
  def test_transport_preserves_original_economic_code_and_roles(self):
-  r.frozen();a=ast.parse(Path(r.__file__).read_text());b=ast.parse(Path(original.__file__).read_text())
+  # Shared core evolved; the closed economic identity must reject this tree.
+  with self.assertRaisesRegex(ValueError,'ANCHOR_IMPLEMENTATION'):r.frozen()
+  a=ast.parse(Path(r.__file__).read_text());b=ast.parse(Path(original.__file__).read_text())
   # Actual economics and cold original readback are unchanged; public count fields may differ.
   fa=next(x for x in a.body if isinstance(x,ast.FunctionDef) and x.name=='evaluate');fb=next(x for x in b.body if isinstance(x,ast.FunctionDef) and x.name=='evaluate')
   ea=next(x for x in fa.body if isinstance(x,ast.If));eb=next(x for x in fb.body if isinstance(x,ast.If))

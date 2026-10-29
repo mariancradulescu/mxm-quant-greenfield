@@ -45,7 +45,12 @@ class AnchorTests(unittest.TestCase):
 class Scope(unittest.TestCase):
  def test_frozen_policy_roles_and_no_automatic_retry(self):
   from .commodity_anchor_development import frozen,workflow,START,EVAL,END
-  s=frozen();self.assertEqual(s['models_max'],1);self.assertEqual(s['capital_eur'],200);self.assertLess(START,EVAL);self.assertLess(END,1789603200000)
+  # Preserve the frozen registration; modern shared core is not its executable.
+  with self.assertRaisesRegex(ValueError,'ANCHOR_IMPLEMENTATION'):frozen()
+  from .commodity_anchor_development import HOME,SPEC,SPEC_SHA
+  from .common import bytes_digest
+  raw=(HOME/SPEC).read_bytes();self.assertEqual(bytes_digest(raw),SPEC_SHA)
+  s=json.loads(raw);self.assertEqual(s['models_max'],1);self.assertEqual(s['capital_eur'],200);self.assertLess(START,EVAL);self.assertLess(END,1789603200000)
   w=workflow();self.assertEqual(len(w['jobs']),3);self.assertNotIn('SUCCESSOR_APP_PRIVATE_KEY',json.dumps(w))
   for job in w['jobs'].values():
    self.assertEqual(job['permissions'],{'contents':'read','actions':'read'})
