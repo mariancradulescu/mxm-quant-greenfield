@@ -37,7 +37,10 @@ scenario replay, common risk/fee/volume governors and cold-process recovery proo
 exist. Native order-free observation code exists. These are different acceptance
 levels: the live product still rejects non-Desktop persistence environments;
 Cloud restart durability/callback reception and the actual broker execution path
-are unreceived. No source-only change here can honestly certify them. This
+are unreceived. No source-only change here can honestly certify them. One bounded existing-custody
+readback authenticates the original39660692230cipher/pages and emits only the
+recovered gap witness, using the already existing source-first two-job route;
+no strategy, new source collection or closed economics is executed. This
 recovery improves the data-to-C#evidence seam; it does not change trading behavior
 or constitute a new whole-product native receipt.
 
