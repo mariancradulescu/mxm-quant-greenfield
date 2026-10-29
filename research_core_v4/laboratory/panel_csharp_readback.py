@@ -9,6 +9,7 @@ import hashlib
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -21,7 +22,6 @@ from research_core_v4.remediation_p0_p4_20261015.safety import strict_json, unpa
 from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
 from research_core_v4.successor_c_20261018.readback import FP
 
-MANIFEST_SHA = "PLACEHOLDER"
 SOURCE = "ed6e38aa3feac5cf4882952017752e8a627023bf"
 EVIDENCE_HEAD = "1f05b49cbfbdac1f8fc6f063f4861ae1f35734fa"
 COUNTS = {("AUDUSD", "bid"): 637, ("AUDUSD", "ask"): 667,
@@ -44,11 +44,15 @@ def export(folder, tick_path, declaration_path, public_path):
          os.environ.get("R3_CTRADER_REFRESH_TOKEN") is None and
          os.environ.get("SUCCESSOR_APP_PRIVATE_KEY") is None, "W33_CUSTODY_ONLY_NO_BROKER_ACCESS")
     evidence = Path(folder)
+    evidence_repo = evidence.parents[2]
     manifest_raw = read_regular(evidence / "MANIFEST.json", 20000)
-    need(bytes_digest(manifest_raw) == MANIFEST_SHA, "W33_PINNED_MANIFEST")
+    need(subprocess.check_output(["git", "-C", str(evidence_repo), "rev-parse", "HEAD"],
+                                 text=True).strip() == EVIDENCE_HEAD, "W33_EVIDENCE_COMMIT")
     manifest = json.loads(manifest_raw)
     need(manifest["schema"] == "mxm.original-native-source-support-archive.v1" and
          manifest["source_run"] == 40836352578 and manifest["source_head"] == SOURCE and
+         manifest["cipher_sha256"] == "ec679913595c747da7e54947c1424d6ce7ef773cc952302f57e34901ffc4f3bf" and
+         manifest["private_sha256"] == "4a5531b87136ae065acf7019d4601d209f27bab3df9489ce7fc13494ad4f3e42" and
          manifest["native_decoder"] == panel.NATIVE and
          manifest["source_attempt"] == 1 and manifest["source_conclusion"] == "success" and
          manifest["total_historical_tick_events"] == 2969 and
