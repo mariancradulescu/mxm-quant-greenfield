@@ -22,11 +22,17 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-native
+          persist-credentials: false
       - name: Build existing CSharp account and original source-only contracts without keys
         run: |
           python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
           python3 -m py_compile research_core_v4/laboratory/panel_csharp_readback.py
-          python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v
+          cp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .sealed-native/research_core_v4/laboratory/
+          (cd .sealed-native && PANEL_TEST_MAIN_ROOT="$GITHUB_WORKSPACE" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)
           dotnet build research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release
           python3 - <<'PY'
           from pathlib import Path
