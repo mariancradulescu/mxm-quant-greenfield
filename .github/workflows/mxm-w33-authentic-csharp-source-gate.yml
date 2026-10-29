@@ -39,6 +39,7 @@ jobs:
           a=Path('research_core_v4/laboratory/panel_csharp_readback.py').read_text()
           b=Path('research_core_v4/laboratory/csharp/usd_account/Program.cs').read_text()
           assert 'ProtoOANewOrderReq' not in a
+          assert 'len(sys.argv) == 6' in a and 'export(*sys.argv[2:])' in a
           section=b.split('// AUTHENTIC SOURCE-TO-C# RECEIPT:')[1].split('// Source-only registration')[0]
           assert '--w33-authentic-panel-source-gate' in section and 'new MxmQuote(' not in section
           print('MXM_W33_AUTHENTIC_CSHARP_NO_KEY_CONTRACT_PASS')
