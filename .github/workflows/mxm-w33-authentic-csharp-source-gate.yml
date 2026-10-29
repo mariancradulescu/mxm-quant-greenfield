@@ -1,0 +1,105 @@
+name: MXM W33 authentic native quotes to CSharp account gate
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/panel_csharp_readback.py
+      - research_core_v4/laboratory/csharp/usd_account/Program.cs
+      - .github/workflows/mxm-w33-authentic-csharp-source-gate.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-w33-authentic-csharp-source-gate.yml]
+permissions: {}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  compile-no-key:
+    if: github.event_name == 'pull_request' && github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-native
+          persist-credentials: false
+      - name: Build existing CSharp account and original source-only contracts without keys
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          python3 -m py_compile research_core_v4/laboratory/panel_csharp_readback.py
+          cp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .sealed-native/research_core_v4/laboratory/
+          (cd .sealed-native && PANEL_TEST_MAIN_ROOT="$GITHUB_WORKSPACE" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)
+          dotnet build research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release
+          python3 - <<'PY'
+          from pathlib import Path
+          a=Path('research_core_v4/laboratory/panel_csharp_readback.py').read_text()
+          b=Path('research_core_v4/laboratory/csharp/usd_account/Program.cs').read_text()
+          assert 'ProtoOANewOrderReq' not in a
+          section=b.split('// AUTHENTIC SOURCE-TO-C# RECEIPT:')[1].split('// Source-only registration')[0]
+          assert '--w33-authentic-panel-source-gate' in section and 'new MxmQuote(' not in section
+          print('MXM_W33_AUTHENTIC_CSHARP_NO_KEY_CONTRACT_PASS')
+          PY
+  authentic-w33-account:
+    if: github.event_name == 'push' && github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: mxm-r3-custody-v1
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 1f05b49cbfbdac1f8fc6f063f4861ae1f35734fa
+          path: .panel-evidence
+          persist-credentials: false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: d2fae5641b759b1c8c24161d83d62d39e104eafd
+          path: .sealed-native
+          persist-credentials: false
+      - name: Bind immutable evidence and original native decoder; compile existing CSharp account
+        run: |
+          test "$(git -C .panel-evidence rev-parse HEAD)" = 1f05b49cbfbdac1f8fc6f063f4861ae1f35734fa
+          test "$(git -C .sealed-native rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release
+          cp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/panel_csharp_readback.py .sealed-native/research_core_v4/laboratory/
+      - name: Decrypt original W33 native wire within existing custody; zero broker access
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          umask 077
+          cd .sealed-native
+          python3 -m research_core_v4.laboratory.panel_csharp_readback --original-w33 "$GITHUB_WORKSPACE/.panel-evidence/docs/economic-development/20261029/panel-quote-support-40836352578" "$RUNNER_TEMP/w33-quotes.ndjson" "$RUNNER_TEMP/w33-declaration.json" "$GITHUB_WORKSPACE/verification/w33-authentic-account-source-bridge.json"
+      - name: Inspect authentic historical BIDASK inside CSharp and preserve EUR200 account without false FX
+        run: |
+          umask 077
+          dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release --no-build -- --w33-authentic-panel-source-gate "$RUNNER_TEMP/w33-declaration.json" "$RUNNER_TEMP/w33-quotes.ndjson" verification/w33-authentic-account-source-gate.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os
+          source=json.loads(Path('verification/w33-authentic-account-source-bridge.json').read_bytes())
+          c=json.loads(Path('verification/w33-authentic-account-source-gate.json').read_bytes())
+          assert source['native_run']==40836352578 and source['events']==2969 and source['six_sides_complete']
+          assert source['derived_stream_sha256']==hashlib.sha256(Path(os.environ['RUNNER_TEMP'],'w33-quotes.ndjson').read_bytes()).hexdigest()
+          assert c['original_quote_events']==2969 and c['final_cash_eur']==c['initial_capital_eur']==200
+          assert c['independent_producer_source_sha256']==source['private_declaration_sha256']
+          assert c['source_prices_inspected_in_real_csharp'] and c['authenticated_source_bound_cold_recovery']
+          assert c['account_market_quote_events_admitted']==c['entries']==c['decisions']==c['broker_orders']==0
+          assert not c['economic_edge_proven'] and not c['historical_eurusd_conversion_proven'] and not c['dated_margin_and_costs_proven']
+          print('MXM_W33_NATIVE_WIRE_CSHARP_SOURCE_GATE_PASS_NO_FILLS_NO_FX_INVENTION')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: w33-authentic-csharp-public-${{ github.run_id }}
+          path: |
+            verification/w33-authentic-account-source-bridge.json
+            verification/w33-authentic-account-source-gate.json
+          if-no-files-found: error
+          retention-days: 90
