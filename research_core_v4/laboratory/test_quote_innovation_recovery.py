@@ -25,7 +25,13 @@ class RecoveryTests(unittest.TestCase):
    if mode=='attempt':rr['run_attempt']=2
    with self.subTest(mode=mode),self.assertRaises(LabError):no_original_outcome(rr,jj,aa)
  def test_unchanged_science_one_finite_technical_attempt_and_readonly_roles(self):
-  p=plan();self.assertEqual(p['additional_technical_attempts'],1);self.assertEqual(p['new_scientific_models'],0)
+  # Preserve first-outcome recovery provenance; never admit its closed model
+  # with the later shared-account executable.
+  with self.assertRaisesRegex(LabError,'INNOVATION_FROZEN_IMPLEMENTATION'):plan()
+  from .quote_innovation_recovery import PLAN,PLAN_SHA
+  from .common import bytes_digest
+  raw=PLAN.read_bytes();self.assertEqual(bytes_digest(raw),PLAN_SHA)
+  p=json.loads(raw);self.assertEqual(p['additional_technical_attempts'],1);self.assertEqual(p['new_scientific_models'],0)
   w=workflow();self.assertEqual(len(w['jobs']),1);j=w['jobs']['quote-innovation-recovery']
   self.assertEqual(j['permissions'],{'contents':'read','actions':'read'})
   self.assertIn('three_week_source_recovery',j['steps'][4]['run'])
