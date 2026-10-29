@@ -38,7 +38,8 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
       - name: Admit exactly one official post-review genuine EUR200 economic attempt
-        env: {GH_TOKEN: ${{ github.token }}}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
           test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-remediation-p0-p4-20261015-v1 --jq .object.sha)" = "$GITHUB_SHA"
@@ -50,7 +51,13 @@ jobs:
           v=g('actions/workflows/mxm-fund200-copper-aud-h1-20261029.yml/runs?per_page=100')
           assert v['total_count']==len(v['workflow_runs']) and v['total_count']<=100,'NO_UNBOUNDED_ATTEMPT_HISTORY'
           runs=v['workflow_runs'];live=[x for x in runs if x['event']=='push']
-          assert len(live)==1 and live[0]['id']==int(os.environ['GITHUB_RUN_ID']) and live[0]['head_sha']==os.environ['GITHUB_SHA'] and live[0]['run_attempt']==1,'ONLY_ONE_FIRST_MODEL'
+          current=int(os.environ['GITHUB_RUN_ID'])
+          prior_id=40918284020
+          original=g('actions/runs/'+str(prior_id))
+          original_jobs=g('actions/runs/'+str(prior_id)+'/jobs')
+          assert original['head_sha']=='a57abffe0910030a29755c33bcb8aedf02a7aba2' and original['conclusion']=='failure' and original['run_attempt']==1 and original_jobs['total_count']==0,'PRIOR_INVALID_WORKFLOW_ZERO_JOBS'
+          assert ({x['id'] for x in live}.issubset({current,prior_id}) and
+                  len([x for x in live if x['id']==current and x['head_sha']==os.environ['GITHUB_SHA'] and x['run_attempt']==1])==1),'ONLY_FIRST_MODEL_AFTER_PARSER_FAILURE'
           parents=g('commits/'+os.environ['GITHUB_SHA'])['parents']
           assert len(parents)==2,'REQUIRE_REVIEW_MERGE'
           # New workflow is not always registered for PR events before it reaches the official branch.
