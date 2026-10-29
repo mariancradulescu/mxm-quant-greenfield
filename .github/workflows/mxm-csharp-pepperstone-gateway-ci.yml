@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Admit distinct prospective quote triangle with complete individual audit before any new source or identity
+        run: |
+          dotnet build research_core_v4/laboratory/csharp/quote_triangle/MxmQuoteTriangle.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_quote_triangle -v
       - name: Validate one finite multi-mechanism economic programme before any source or key access
         run: |
           python3 -m research_core_v4.laboratory.finite_comparative_20261028_v1 --selftest

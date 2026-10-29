@@ -150,7 +150,7 @@ def verify_private(p):
             need(reqenv.IsInitialized() and req.IsInitialized() and reqenv.clientMsgId==env.clientMsgId and
               type(req).__name__==name and int(req.ctidTraderAccountId)==account,'SPOT_NATIVE_REQUEST_ACCOUNT')
             if name in ('ProtoOASymbolByIdReq','ProtoOASubscribeSpotsReq','ProtoOAUnsubscribeSpotsReq'):
-                need(list(req.symbolId)==[1,2,250],'SPOT_EXACT_REQUEST_PANEL')
+                need(list(req.symbolId)==[int(x) for x in POLICY['symbols']],'SPOT_EXACT_REQUEST_PANEL')
             if name=='ProtoOASubscribeSpotsReq':need(req.HasField('subscribeToSpotTimestamp') and req.subscribeToSpotTimestamp,'SPOT_TIMESTAMP_REQUEST')
             if name=='ProtoOAExpectedMarginReq':
                 need(req.symbolId not in margin_ids,'SPOT_MARGIN_UNIQUE_SYMBOL');margin_ids.add(req.symbolId)
@@ -162,7 +162,7 @@ def verify_private(p):
     assets={int(a.assetId):a.name for a in responses[4].asset};trader=responses[3].trader
     need('pepperstone' in trader.brokerName.casefold() and assets.get(int(trader.depositAssetId))=='EUR','SPOT_NATIVE_PEPPERSTONE_EUR')
     lights={int(s.symbolId):s for s in responses[5].symbol};fulls={int(s.symbolId):s for s in responses[6].symbol}
-    need(set(fulls)=={1,2,250} and margin_ids=={1,2,250},'SPOT_FULL_PANEL_METADATA')
+    need(set(fulls)=={int(x) for x in POLICY['symbols']} and margin_ids=={int(x) for x in POLICY['symbols']},'SPOT_FULL_PANEL_METADATA')
     for key,name in POLICY['symbols'].items():
         sid=int(key);need(sid in lights and lights[sid].symbolName==name and lights[sid].enabled and
           fulls[sid].HasField('minVolume') and fulls[sid].minVolume>0,'SPOT_EXACT_ENABLED_PANEL')
@@ -175,7 +175,7 @@ def verify_private(p):
       p['connection_epochs']==1 and p['wire_bytes']<=POLICY['max_wire_bytes'] and
       p['received_envelopes']<=POLICY['max_received_envelopes'],'SPOT_NATIVE_DURATION_AND_RESOURCE_READBACK')
     need(len(p['market'])<=POLICY['max_market_events'],'SPOT_EVENT_CAP')
-    profiler=SpotProfile([1,2,250])
+    profiler=SpotProfile([int(x) for x in POLICY['symbols']])
     for row in p['market']:
         stamp=datetime.fromisoformat(row['receive_utc'])
         need(start<=stamp<=end and p['contact_start_ns']<=row['receive_monotonic_ns']<=p['contact_end_ns'],'SPOT_RECEIPT_WINDOW')
@@ -183,7 +183,7 @@ def verify_private(p):
     result=profiler.result();need(result==p['producer_profile'],'SPOT_COLD_ALL_EVENTS_PROFILE_PARITY')
     return result
 
-def collect(identity):
+def collect(identity,metadata_guard=None):
     from collections import Counter
     from m6.ctrader_transport import decode_envelope,extract_payload
     from m6.ctrader_proto import OpenApiMessages_pb2 as m
@@ -193,7 +193,7 @@ def collect(identity):
     p={'schema':'mxm.native-spot-observation-private.v1','identity':identity,'policy':POLICY,'complete':False,
       'receipts':[],'market':[],'failure_class':None,'account':None}
     start=datetime.now(timezone.utc);end=start+timedelta(seconds=POLICY['maximum_contact_seconds'])
-    profiler=SpotProfile([1,2,250]);wire_bytes=0;received_count=0;market_canonical_bytes=0;counts=Counter()
+    profiler=SpotProfile([int(x) for x in POLICY['symbols']]);wire_bytes=0;received_count=0;market_canonical_bytes=0;counts=Counter()
     def handle(msg,stamp,env):
         nonlocal market_canonical_bytes
         need(len(p['market'])<POLICY['max_market_events'],'SPOT_MARKET_CAP')
@@ -258,13 +258,14 @@ def collect(identity):
         lights={int(s.symbolId):s for s in req(m.ProtoOASymbolsListReq(ctidTraderAccountId=account,includeArchivedSymbols=False)).symbol}
         for key,name in POLICY['symbols'].items():
             sid=int(key);need(sid in lights and lights[sid].symbolName==name and lights[sid].enabled,'SPOT_EXACT_PANEL_BEFORE_SYMBOL_REQUEST')
-        tr.selected={1,2,250}
-        full={int(s.symbolId):s for s in req(m.ProtoOASymbolByIdReq(ctidTraderAccountId=account,symbolId=[1,2,250])).symbol}
-        need(set(full)=={1,2,250},'SPOT_FULL_PANEL')
-        for sid in (1,2,250):
+        tr.selected={int(x) for x in POLICY['symbols']}
+        full={int(s.symbolId):s for s in req(m.ProtoOASymbolByIdReq(ctidTraderAccountId=account,symbolId=[int(x) for x in POLICY['symbols']])).symbol}
+        need(set(full)=={int(x) for x in POLICY['symbols']},'SPOT_FULL_PANEL')
+        for sid in tuple(int(x) for x in POLICY['symbols']):
             need(full[sid].HasField('minVolume') and full[sid].minVolume>0,'SPOT_OBSERVED_MINIMUM_VOLUME')
             req(m.ProtoOAExpectedMarginReq(ctidTraderAccountId=account,symbolId=sid,volume=[full[sid].minVolume]))
-        req(m.ProtoOASubscribeSpotsReq(ctidTraderAccountId=account,symbolId=[1,2,250],subscribeToSpotTimestamp=True))
+        if metadata_guard is not None:metadata_guard(p)
+        req(m.ProtoOASubscribeSpotsReq(ctidTraderAccountId=account,symbolId=[int(x) for x in POLICY['symbols']],subscribeToSpotTimestamp=True))
         deadline=min(tr.contact_deadline-20,tr._clock()+POLICY['capture_seconds_after_subscription'])
         need(deadline-tr._clock()>=POLICY['capture_seconds_after_subscription']-1,'SPOT_FULL_PROSPECTIVE_WINDOW_AVAILABLE')
         p['subscription_start_ns']=time.monotonic_ns();print('MXM_NATIVE_SPOT_SOURCE_ACTIVE_NO_MODEL_NO_ORDERS',flush=True)
@@ -276,7 +277,7 @@ def collect(identity):
         # Never reconnect or invent successful unsubscription in that case.
         if tr.connected:
             tr.market_capture_enabled=False;tr.cleanup=True;tr.cleanup_end=tr._clock()+15
-            req(m.ProtoOAUnsubscribeSpotsReq(ctidTraderAccountId=account,symbolId=[1,2,250]))
+            req(m.ProtoOAUnsubscribeSpotsReq(ctidTraderAccountId=account,symbolId=[int(x) for x in POLICY['symbols']]))
             p['cleanup_state']='UNSUBSCRIBE_ACKNOWLEDGED'
         else:
             p['cleanup_state']='CONNECTION_CLOSED_AT_DEADLINE_UNSUBSCRIBE_NOT_ACKNOWLEDGED'
@@ -284,7 +285,7 @@ def collect(identity):
     except Exception as exc:
         p['failure_class']=type(exc).__name__
         code=str(exc)
-        if type(exc).__name__=='LabError' and code.startswith('LAB_SPOT_') and len(code)<=120 and all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789' for c in code):
+        if type(exc).__name__=='LabError' and code.startswith(('LAB_SPOT_','LAB_TRIAD_')) and len(code)<=120 and all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789' for c in code):
             p['failure_code']=code
     finally:
         tr.close()

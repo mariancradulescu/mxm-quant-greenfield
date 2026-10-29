@@ -71,7 +71,9 @@ class Scope(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,'NATIVE_CONTEXT'):n.admit()
    git.assert_not_called()
  def test_frozen_spec_binds_all_actual_implementations_and_no_diagnostic_reuse(self):
-  s=n.spec(ROOT);self.assertEqual(s['policy']['model_trials_max'],1);self.assertFalse(n.partition()['prior_diagnostic_or_protected_data_reclassified'])
+  with self.assertRaisesRegex(ValueError,'PRESSURE_EXACT_IMPLEMENTATION'):n.spec(ROOT)
+  self.assertFalse(n.partition()['prior_diagnostic_or_protected_data_reclassified'])
+  frozen=json.loads((ROOT/n.SPEC).read_bytes());self.assertEqual(frozen['policy']['model_trials_max'],1)
  def test_verdict_support_and_censoring_precede_any_positive_headroom(self):
   self.assertEqual(verdict(dict(signals=1,episodes=[dict(gross_raw=100)],censors=[]))[0],'DATA_LIMITED')
   self.assertEqual(verdict(dict(signals=100,episodes=[dict(gross_raw=-1)]*100,censors=[]))[0],'GROSS_NONPOSITIVE')
