@@ -7,11 +7,17 @@ on:
       - research_core_v4/laboratory/source_first_diverse_h1_economics.py
       - research_core_v4/laboratory/SOURCE_FIRST_DIVERSE_H1_20261028_V1.json
       - research_core_v4/laboratory/pooled_pressure_development.py
+      - research_core_v4/laboratory/chronology_csharp_bridge.py
+      - research_core_v4/laboratory/captured_symbol_terms.py
+      - research_core_v4/laboratory/durable_native_chronology.py
       - research_core_v4/laboratory/POOLED_PRESSURE_20261029_V1.json
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
       - .github/workflows/mxm-source-first-diverse-h1-20261028.yml
+      - research_core_v4/laboratory/chronology_csharp_bridge.py
+      - research_core_v4/laboratory/captured_symbol_terms.py
+      - research_core_v4/laboratory/durable_native_chronology.py
 permissions: {contents: read, actions: read}
 concurrency:
   group: mxm-integrated-laboratory
@@ -77,8 +83,8 @@ jobs:
           umask 077
           test "$(git -C .sealed-chronology-source rev-parse HEAD)" = d2fae5641b759b1c8c24161d83d62d39e104eafd
           python3 -m research_core_v4.laboratory.durable_native_chronology --out verification/r3-chronology
-          cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/
-          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/
+          cp research_core_v4/laboratory/chronology_csharp_bridge.py .sealed-chronology-source/research_core_v4/laboratory/chronology_csharp_bridge.py
+          cp research_core_v4/laboratory/captured_symbol_terms.py .sealed-chronology-source/research_core_v4/laboratory/captured_symbol_terms.py
           (cd .sealed-chronology-source && python3 -m research_core_v4.laboratory.chronology_csharp_bridge "$GITHUB_WORKSPACE/verification/r3-chronology/capture.mxmenc" "$RUNNER_TEMP/mxm-recovered-gap-source.ndjson")
           mkdir -p verification/source-first-diverse-h1
           cp "$RUNNER_TEMP/mxm-recovered-gap-source.ndjson.receipt.json" verification/source-first-diverse-h1/receipt.json
