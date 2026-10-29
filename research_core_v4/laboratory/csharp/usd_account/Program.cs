@@ -2,6 +2,21 @@ using System.Text.Json;
 using Mxm.Replay;
 using Mxm.Research;
 if(MxmPortfolioReplayRecoveryProbe.TryWorker(args,out int workerExit)){Environment.ExitCode=workerExit;return;}
+// Source-only registration entry point: no historical ticks enter the event engine.
+if(args.Length==2 && args[0]=="--register-usd-quotes"){
+ string declaration=File.ReadAllText(args[1]);using var doc=JsonDocument.Parse(declaration);
+ var names=doc.RootElement.GetProperty("symbols").EnumerateArray().Select(x=>x.GetProperty("symbol").GetString()!).ToArray();
+ var config=new MxmReplayParameters(StrategyMode.TrendOnly,.8m,3,0m,.03m,.2m,
+  UseSharedUsdConversion:true,UsdQuoteMetadataJson:declaration);
+ var account=new MxmPortfolioAccountReplay(names,config);var report=account.Run(Array.Empty<MxmAccountFeed>());
+ string sourceId=doc.RootElement.GetProperty("source_sha256").GetString()!;var saved=account.CaptureReplay(sourceId);
+ var restored=MxmPortfolioAccountReplay.RestoreReplay(saved.Payload,saved.Sha256,sourceId,config,names);
+ if(JsonSerializer.Serialize(restored.Report())!=JsonSerializer.Serialize(report))throw new Exception("SOURCE_REGISTRATION_RECOVERY");
+ Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.usd-source-registration.v1",source_sha256=sourceId,
+  symbols=names,initial_capital_eur=report.InitialCapitalEur,cash_eur=report.FinalCashEur,
+  entries=report.AcceptedEntries,open_positions=report.OpenPositions,cold_restore_parity=true,
+  market_events=0,orders=0,historical_costs_proven=false,economic_edge_proven=false,native_ctrader_runtime_reception=false}));return;
+}
 int checks=0;
 void Need(bool ok,string why){checks++;if(!ok)throw new Exception("SHARED_USD_FIXTURE_"+why);}
 var t=new DateTime(2026,9,7,0,0,0,DateTimeKind.Utc);
@@ -133,6 +148,46 @@ Refuse(()=>badGbpCost.Run(Start().Select(e=>e is MxmQuote q?q with {CapturedCost
 var rearmed=MxmPortfolioAccountReplay.RestoreReplay(invalidSaved.Payload,invalidSaved.Sha256,source,Settings(),new[]{"GBPUSD"});
 rearmed.Continue(new[]{Fx(t.AddMilliseconds(2),1.20m,1.21m)},rearmed.NextEventOrdinal);
 Need(rearmed.Report().FinalCashEur==200m && rearmed.Report().AcceptedEntries==0,"NEW_VALID_OBSERVATION_REARMS_FLAT_ACCOUNT_WITHOUT_REFUND");
+// Artificial multi-instrument funding/recovery: not a market-performance test.
+var roster=new[]{"AUDUSD","Copper","SpotCrude"};
+string Registration(string digest)=>JsonSerializer.Serialize(new{schema="mxm.declared-quote-assets.v1",
+ source_sha256=digest,symbols=new[]{new{symbol="AUDUSD",symbol_id=5,quote_asset="USD"},
+ new{symbol="Copper",symbol_id=111,quote_asset="USD"},new{symbol="SpotCrude",symbol_id=250,quote_asset="USD"}}});
+var declared=Settings() with {MaxPositions=3,UsdQuoteMetadataJson=Registration(source)};
+var panel=new MxmPortfolioAccountReplay(roster,declared);var feed=new List<MxmAccountFeed>();
+for(int i=0;i<6;i++){
+ var at=t.AddMinutes(5*i);feed.Add(Fx(at));
+ for(int j=0;j<roster.Length;j++){
+  decimal mid=(j+1)*10m+i*.01m;feed.Add(new MxmBarClose(at,roster[j],mid));
+  feed.Add(new MxmQuote(at.AddSeconds(1),roster[j],mid-.0001m,mid+.0001m,
+   1m/1.11m,1m,50m,.1m,0m,1m,1m/1.10m,BidSourceUtc:at.AddSeconds(1),AskSourceUtc:at.AddSeconds(1)));
+ }
+}
+// Keep simultaneous quote timestamps: no fabricated ordering of historical sides.
+feed=feed.OrderBy(e=>e.Utc).ToList();var panelReport=panel.Run(feed);
+Need(panelReport.AcceptedEntries==3 && panelReport.OpenPositions==3 && panelReport.InitialCapitalEur==200m &&
+ panelReport.UsedMarginEur==150m && panelReport.FinalCashEur==199.7m,"DECLARED_PANEL_ONE_ACCOUNT_AND_SHARED_MARGIN");
+var panelCapsule=panel.CaptureReplay(source);
+var panelRestored=MxmPortfolioAccountReplay.RestoreReplay(panelCapsule.Payload,panelCapsule.Sha256,source,declared,roster);
+var fxOnly=Fx(feed.Last().Utc.AddMilliseconds(1),1.2m,1.21m);
+var panelDirect=panel.Continue(new[]{fxOnly},panel.NextEventOrdinal);
+Need(JsonSerializer.Serialize(panelRestored.Continue(new[]{fxOnly},panelRestored.NextEventOrdinal))==JsonSerializer.Serialize(panelDirect),
+ "DECLARED_PANEL_RECOVERY_AND_FX_ONLY_PARITY");
+Refuse(()=>MxmPortfolioAccountReplay.RestoreReplay(panelCapsule.Payload,panelCapsule.Sha256,source,
+ declared with {UsdQuoteMetadataJson=Registration(new string('b',64))},roster),"DECLARED_SOURCE_CANNOT_CHANGE_ON_RESTORE");
+foreach(string bad in new[]{Registration(source).Replace("USD\"}","JPY\"}"),
+ Registration(source).Replace("250","111"),Registration(source).Replace("SpotCrude","USDJPY"),
+ Registration(source).Replace("\"schema\":","\"extra\":true,\"schema\":"),
+ Registration(source).Replace("\"symbol_id\":5","\"symbol_id\":5,\"symbol_id\":5"),
+ Registration("bad"),"{}","[]","null","{",Registration(source).Replace("\"USD\"","42")})
+ Refuse(()=>new MxmPortfolioAccountReplay(roster,declared with {UsdQuoteMetadataJson=bad}),"INVALID_DECLARATION");
+Refuse(()=>new MxmPortfolioAccountReplay(roster,declared with {UseSharedUsdConversion=false}),"DECLARATION_REQUIRES_FX_MODE");
+Refuse(()=>new MxmPortfolioAccountReplay(new[]{"AUDUSD","Copper"},declared),"DECLARATION_ROSTER_MUST_MATCH");
+Refuse(()=>new MxmPortfolioAccountReplay(roster,Settings()),"NO_IMPLICIT_NEW_CURRENCY_REGISTRATION");
+Need(!JsonSerializer.Serialize(Settings()).Contains("UsdQuoteMetadataJson"),"LEGACY_SETTINGS_SERIALIZATION_UNCHANGED");
+var declaredPanel=new{symbols=roster,initial_capital_eur=panelDirect.InitialCapitalEur,entries=panelDirect.AcceptedEntries,
+ margin_eur=panelDirect.UsedMarginEur,cash_eur=panelDirect.FinalCashEur,equity_eur=panelDirect.MarkedEquityEur,
+ declaration_is_broker_authentication=false,synthetic_only=true};
 var financing=MxmFinancingFixture.Run();
-Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,fee_case=feeCase,financing,
+Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,fee_case=feeCase,financing,declared_panel=declaredPanel,
  broker_orders=0,native_ctrader_runtime_reception=false,economic_edge_proven=false,hard21_proven=false}));
