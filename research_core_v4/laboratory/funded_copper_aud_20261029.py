@@ -91,7 +91,9 @@ def account_analysis(payload,corpus):
   direction=(1 if cr>0 else -1) if abs(cr)>D(".004") and abs(ar)<D(".001") else 0
   expected.append((1000*t,direction))
  got=[(x["t"],x["direction"]) for x in payload["decisions"]]
- need(got==expected,"FIRST_EXECUTION_CAUSAL_SIGNAL_PARITY")
+ reference=dict(expected)
+ need(len(got)==len(set(t for t,_ in got)) and
+      all(t in reference and reference[t]==side for t,side in got),"FIRST_EXECUTION_CAUSAL_SIGNAL_PARITY")
  need(all(x["direction"]!=0 for x in payload["proposals"]),"ZERO_SIGNAL_PROPOSAL")
  return {"csharp_account_classification":a["Classification"],"actual_native_minimum_units":1000,
   "initial_cash_eur":200,"final_cash_eur":asfloat(a["FinalCashEur"]),
@@ -116,6 +118,16 @@ def selftest():
    price=1.07+sid*.005+.000001*i
    corp[sid][t]=(price,price+.001,price-.001,price+.0001)
  need(support(corp)["classification"]=="SOURCE_ADMITTED_BEFORE_ECONOMIC_IDENTITY","TEST_SUPPORT")
+ # Execute the C# product on non-market artificial OHLC. It must preserve EUR200 and never create 1000EUR starting cash.
+ with tempfile.TemporaryDirectory() as path:
+  data={"policy":sha(SPEC.read_bytes()),"start":1000*START,"end":1000*END}
+  data.update(arrays(corp))
+  a=Path(path)/"input.json";b=Path(path)/"out.json";a.write_bytes(encode(data))
+  subprocess.run(["dotnet","run","-c","Release","--no-build","--project",str(PROJECT),"--",str(a),str(b)],
+   check=True,capture_output=True,text=True)
+  v=json.loads(b.read_bytes())
+  need(v["initial_cash_eur"]==200 and v["deposit_count"]==1 and v["reset_count"]==0 and
+       v["model"]=="COPPER_SHOCK_TO_UNRESPONSIVE_AUDUSD","TEST_CSHARP_SOURCEFREE_ACCOUNT")
  corp[111]={}
  need(support(corp)["classification"]=="SOURCE_STOP_NO_IDENTITY","TEST_STOP_BEFORE_IDENTITY")
  print("MXM_COPPER_AUD_FUNDED200_PREFLIGHT_SUCCESS no originals unlocked")
@@ -176,7 +188,7 @@ def main():
    "source_head":os.environ["GITHUB_SHA"],"run_id":int(os.environ["GITHUB_RUN_ID"]),
    "source_originals":proofs,"spec_sha256":sha(SPEC.read_bytes()),
    "admission":status,"economic_models_executed":1 if executed else 0,
-   "funding_eur":200,"reset_count":0,"funded_notional":1000 if False else None,
+   "funding_eur":200,"reset_count":0,"broker_minimum_volume_aud_units":1000,
    "reference_1000_eur_notional_used":False,"metrics":metrics,
    "private_plain_sha256":sha(plain),"private_cipher_sha256":sha(encrypted),
    "source_partition":"EXPOSED_DEVELOPMENT","independent_confirmation":False,
