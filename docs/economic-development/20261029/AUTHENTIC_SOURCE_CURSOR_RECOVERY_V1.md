@@ -59,3 +59,18 @@ certification remain separate. HARD21 applies to the final combined system.
 
 Work continues after this milestone where a lawful, informative next action exists;
 this document does not declare B–E, economic qualification or the product complete.
+
+## Material CI transport failure, bounded correction
+
+Original PR260 CSharp compile/new-seam22checks and five CI suites pass. The sixth
+required check twice times out on its official103434349byte Spotware5.9.0archive:
+40855240124 initial job123384434473 receives1227486bytes in150seconds; retry
+job123386638144 receives1391146bytes in150seconds. Neither is waived or called PASS.
+
+Fetch the SAME official URL in32finite byte ranges, bounded420seconds and the same
+103434349payload bytes. Require206, exact Content-Range/Content-Length, no content
+encoding, no alternate resource or retry, exact final original SHA256 before atomic
+publication. Existing extraction pin and actual credential-free/network-isolated
+vendor metadata/malformed-package execution remain mandatory and unchanged.
+Range spoof/truncation/ignored-range/corruption/ordering/deadline tests are necessary
+for this observed transport repair. This does not change product/runtime acceptance.
