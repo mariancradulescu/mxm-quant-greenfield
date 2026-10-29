@@ -167,6 +167,7 @@ public sealed class MxmReferenceProductBot : Robot {
     Print("MXM_ENTRY_RECOVERY_"+entryCheckpoint.RecoveryReason);
    ReportRecordedWeeks();
    ReportBrokerOpeningFacts();
+   ReportBrokerHistoricalOrders();
    ReportBrokerCashflowFacts();
   }catch(Exception e) {
    orderProtection.HaltUnknown();
@@ -230,6 +231,7 @@ public sealed class MxmReferenceProductBot : Robot {
    // Existing read-only reconstruction: a failure is UNAVAILABLE, never empty
    // proof, absent-intent proof, complete history or permission to resume.
    ReportBrokerOpeningFacts();
+   ReportBrokerHistoricalOrders();
    ReportBrokerCashflowFacts();
   } catch(Exception e) {
    nativeRun.Stop();Print("MXM_NATIVE_OBSERVATION_START_UNAVAILABLE_"+e.GetType().Name);Stop();
@@ -952,6 +954,42 @@ public sealed class MxmReferenceProductBot : Robot {
     inventory.FactsSha256);
   } catch(Exception e) {
    Print("MXM_BROKER_CASHFLOW_UNAVAILABLE_"+e.GetType().Name);
+  }
+ }
+ // Broker-owned order status provides positive evidence for past submissions.
+ // A missing row is not a negative acknowledgement, complete broker history,
+ // proof of request idempotency or permission to resume Cloud orders.
+ MxmHistoricalOrderInventory ReadBrokerHistoricalOrders(){
+  int before=HistoricalOrders.Count;
+  if(before<0 || before>100000)
+   throw new ArgumentException("NATIVE_HISTORICAL_ORDERS_UNBOUNDED");
+  var facts=new List<MxmHistoricalOrderFact>();
+  foreach(var order in HistoricalOrders.FindAll(Label)){
+   if(facts.Count>=100000 || !double.IsFinite(order.VolumeInUnits) ||
+      order.FilledVolumeInUnits.HasValue &&
+      !double.IsFinite(order.FilledVolumeInUnits.Value))
+    throw new ArgumentException("NATIVE_HISTORICAL_ORDER_INVALID");
+   facts.Add(new MxmHistoricalOrderFact(order.Id,order.SymbolName,
+    order.TradeType==TradeType.Buy?1:-1,order.Label??"",order.Comment??"",
+    order.Status.ToString(),
+    DateTime.SpecifyKind(order.SubmittedTime,DateTimeKind.Utc),
+    checked((decimal)order.VolumeInUnits),
+    order.FilledVolumeInUnits.HasValue?
+     checked((decimal?)order.FilledVolumeInUnits.Value):null));
+  }
+  if(HistoricalOrders.Count!=before)
+   throw new ArgumentException("NATIVE_HISTORICAL_ORDER_COLLECTION_CHANGED");
+  return new MxmHistoricalOrderInventory(
+   MxmEntryCheckpoint.AccountScope(Account.BrokerName,Account.Number,Account.IsLive),
+   BrokerClock(),facts);
+ }
+ void ReportBrokerHistoricalOrders(){
+  try{
+   var inventory=ReadBrokerHistoricalOrders();
+   Print("MXM_NATIVE_HISTORICAL_ORDERS_OBSERVED simulation={0} count={1} digest={2} complete=false negativeAck=false idempotency=false lateFillExcluded=false maySubmit=false",
+    IsBacktesting,inventory.Orders.Length,inventory.FactsSha256);
+  } catch(Exception e){
+   Print("MXM_NATIVE_HISTORICAL_ORDERS_UNAVAILABLE_"+e.GetType().Name);
   }
  }
  void ReportBrokerOpeningFacts() {

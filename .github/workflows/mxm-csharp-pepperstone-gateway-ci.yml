@@ -41,6 +41,8 @@ jobs:
         run: |
           dotnet build research_core_v4/laboratory/csharp/quote_innovation/MxmQuoteInnovation.csproj -c Release
           python3 -m unittest research_core_v4.laboratory.test_quote_innovation_development -v
+      - name: Prove unknown in-flight broker order cannot be retried from empty Cloud history
+        run: dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmHistoricalOrderFixture.csproj -c Release
       - name: Reconstruct broker-confirmed opening order facts without LocalStorage or order permission
         run: |
           dotnet build research_core_v4/laboratory/csharp/broker_opening/MxmBrokerOpening.csproj -c Release
