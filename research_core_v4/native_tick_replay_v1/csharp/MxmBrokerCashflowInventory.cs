@@ -42,7 +42,8 @@ public sealed class MxmBrokerCashflowInventory {
   ScopeFingerprint=Hash(accountScope);ObservedUtc=observedUtc;
   var byId=new Dictionary<long,MxmBrokerCashflowFact>();
   foreach(var item in observations) {
-   Need(item!=null && byId.Count<=100000 && item.Id>0 &&
+   if(item is null)throw new ArgumentException("BROKER_CASHFLOW_NULL_FACT");
+   Need(byId.Count<100000 && item.Id>0 &&
     Utc(item.TimeUtc) && item.TimeUtc<=observedUtc &&
     (item.Kind=="Deposit" || item.Kind=="Withdrawal") &&
     item.RawAmountEur!=0m);
