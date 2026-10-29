@@ -62,6 +62,10 @@ class InnovationTests(unittest.TestCase):
   e=forecast_errors(s)[0];self.assertEqual(e['matched'],1);self.assertEqual(e['missing_target'],2);self.assertFalse(e['model_beats_zero_mse'])
  def test_frozen_scope_and_key_separation(self):
   from .quote_innovation_development import spec,workflow
-  s=spec();self.assertEqual(s['models'],1);self.assertFalse(s['independent_confirmation'])
+  with self.assertRaisesRegex(ValueError,'INNOVATION_FROZEN_IMPLEMENTATION'):spec()
+  from .quote_innovation_development import SPEC,SPEC_SHA
+  from .common import bytes_digest
+  raw=SPEC.read_bytes();self.assertEqual(bytes_digest(raw),SPEC_SHA)
+  s=json.loads(raw);self.assertEqual(s['models'],1);self.assertFalse(s['independent_confirmation'])
   w=workflow();self.assertNotIn('CTRADER_ACCESS_TOKEN',json.dumps(w));self.assertNotIn('contents: write',json.dumps(w))
 if __name__=='__main__':unittest.main()

@@ -92,7 +92,11 @@ public sealed record MxmReplayParameters(
  // A new prospective contract. Default omission conserves frozen old explicit
  // evaluator semantics and serialized settings; never reinterpret old results.
  [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
- bool RequireObservedExposurePath=false
+ bool RequireObservedExposurePath=false,
+ // Caller authenticates the broker source before declaring its USD quote roster.
+ // Immutable JSON is included in recovery parameter identity; this is not cost proof.
+ [property:System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+ string? UsdQuoteMetadataJson=null
 );
 
 /// <summary>
@@ -153,8 +157,38 @@ public sealed partial class MxmPortfolioAccountReplay {
     throw new ArgumentException("INVALID_OR_DUPLICATE_SYMBOL");
   }
   if(state.Count==0)throw new ArgumentException("EMPTY_PORTFOLIO");
-  if(settings.UseSharedUsdConversion && state.Keys.Any(x=>x!="EURUSD" && x!="GBPUSD"))
+  if(settings.UsdQuoteMetadataJson!=null)ValidateUsdQuoteMetadata(settings.UsdQuoteMetadataJson);
+  else if(settings.UseSharedUsdConversion && state.Keys.Any(x=>x!="EURUSD" && x!="GBPUSD"))
    throw new ArgumentException("SHARED_USD_CONVERSION_REQUIRES_EXPLICIT_SUPPORTED_USD_QUOTES");
+ }
+ // Explicit currencies from a source-bound declaration, never inferred from a name.
+ // Deliberately retain the old two-symbol contract when no declaration is supplied.
+ void ValidateUsdQuoteMetadata(string json) {
+  Need(parameters.UseSharedUsdConversion,"QUOTE_METADATA_REQUIRES_SHARED_USD");
+  Need(json.Length<=1_000_000,"QUOTE_METADATA_SIZE");
+  try {
+   using var doc=System.Text.Json.JsonDocument.Parse(json);
+   var root=doc.RootElement;
+   bool Fields(System.Text.Json.JsonElement e,params string[] fields)=>
+    e.ValueKind==System.Text.Json.JsonValueKind.Object &&
+    e.EnumerateObject().Select(p=>p.Name).OrderBy(x=>x,StringComparer.Ordinal)
+     .SequenceEqual(fields.OrderBy(x=>x,StringComparer.Ordinal));
+   Need(Fields(root,"schema","source_sha256","symbols"),"QUOTE_METADATA_FIELDS");
+   Need(root.GetProperty("schema").GetString()=="mxm.declared-quote-assets.v1" &&
+    IsDigest(root.GetProperty("source_sha256").GetString()??""),"QUOTE_METADATA_SOURCE");
+   var rows=root.GetProperty("symbols");
+   Need(rows.ValueKind==System.Text.Json.JsonValueKind.Array,"QUOTE_METADATA_ROSTER");
+   var names=new HashSet<string>(StringComparer.Ordinal);var ids=new HashSet<long>();
+   foreach(var row in rows.EnumerateArray()) {
+    Need(Fields(row,"symbol","symbol_id","quote_asset"),"QUOTE_METADATA_SYMBOL_FIELDS");
+    string? name=row.GetProperty("symbol").GetString();
+    Need(name!=null && state.Keys.Contains(name,StringComparer.Ordinal) && names.Add(name) &&
+     row.GetProperty("symbol_id").TryGetInt64(out long id) && id>0 && ids.Add(id) &&
+     row.GetProperty("quote_asset").GetString()=="USD","QUOTE_METADATA_USD_ROSTER");
+   }
+   Need(names.SetEquals(state.Keys),"QUOTE_METADATA_EXACT_ROSTER");
+  } catch(System.Text.Json.JsonException) {throw new ArgumentException("MXM_PORTFOLIO_REPLAY_QUOTE_METADATA_JSON");}
+    catch(InvalidOperationException) {throw new ArgumentException("MXM_PORTFOLIO_REPLAY_QUOTE_METADATA_TYPES");}
  }
  static void Need([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool ok,string code) {
   if(!ok)throw new ArgumentException("MXM_PORTFOLIO_REPLAY_"+code);

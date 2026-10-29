@@ -33,7 +33,7 @@ class SpotScopeTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'SECRET_ROLE_SEPARATION'):n.admission(n.ROOT)
                 git.assert_not_called()
     def test_generated_workflow_has_separate_roles_no_dispatch_or_write(self):
-        w=n.workflow();self.assertEqual(json.loads((n.ROOT/n.PATH).read_bytes()),w)
+        w=n.workflow();self.assertEqual(json.loads((n.ROOT/'docs/laboratory-completion/20261020/historical-workflow-fixtures/spot-observation.json').read_bytes()),w)
         self.assertEqual(w['on'],{'push':{'branches':[n.BRANCH],'paths':[n.PATH]}})
         collect=w['jobs']['spot-collect'];cold=w['jobs']['spot-cold']
         self.assertEqual(cold['needs'],'spot-collect');self.assertEqual(cold['if'],'always()')

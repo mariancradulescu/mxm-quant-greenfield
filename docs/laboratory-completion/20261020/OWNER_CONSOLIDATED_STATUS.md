@@ -1,3 +1,57 @@
+# Current integrated continuation — 29 October 2026, after PR255
+
+Entry official HEAD5f3a26a831a6fe0ea3e4a8ff75be77f6c41b9bf2, reconciled LIVE.
+PR1/8/104 are closed; PR255 and source-only40829873124 are complete. Their
+28,212-event readback is not repeated. Earlier entries below remain historical.
+
+Material problem: the common C# EUR200 account currently hardcodes EURUSD/GBPUSD
+for shared USD conversion, excluding explicitly USD-quoted AUDUSD/Copper/SpotCrude.
+Reuse its signed FX, global margin/risk and recovery; add only a source-bound,
+immutable USD quote roster with strict schema/duplicate/currency validation.
+Default omission preserves the prior two-symbol contract and old settings JSON.
+A declaration is not authentication: the caller must validate native broker wire.
+Recovery requires exactly the same declaration. Artificial three-instrument
+exposure/cold-restore cases are engineering checks, not economic performance.
+Native Cloud durable recovery and actual order/callback reception remain open.
+
+Economic uncertainty: the existing authentic friction source is a sample of
+10-minute windows in W34–W37, with no W33 windows or transferred raw/conversion
+ticks. AUDUSD has19valid windows; Copper/SpotCrude16each. This cannot resolve the
+sign of the69PR254opportunities or reconstruct transaction-local historical costs.
+Original ZIP SHA256dd0736c3156abfa057303a9b2a31ef3db36b02d66afc5fa33ddccc7f416f5d3d;
+friction-summary SHA256bcc40b93ece5c2737bd0cc422ccf02019057ddb9f7fd4d53aa746f659a590d7a.
+No closed identity, model, forecast, outcome or protected data is rerun/opened.
+
+Prospective next intervention, fixed before broker contact: one source-only
+W33pilot, 11August2026 10:00–10:10UTC, complete AUDUSD5/Copper111/SpotCrude250panel,
+BID and ASK, maximum24historical requests plus7metadata and3VIEWauthentication
+requests, maximum180seconds/16MBwire. Reuse the existing two-role spot workflow,
+sealed d2fae564decoder, split/hasMore verifier and existing custody. Preserve the
+original live spot workflow in historical fixtures; do not repeat that pilot.
+No window shift, retries, instrument salvage, arrival-time fabrication or model
+selection follows its result. Quote timestamps are not historical receipt times;
+current broker volume/margin facts are not August cost terms. Source-quality
+exposure stays DEVELOPMENT and excluded from independent confirmation.
+
+Why this before another model: the last pooled procedure changes sign under
+execution-cost stress, and another exposed-corpus model cannot answer whether
+real quote evidence is even obtainable. A ten-minute whole-panel availability
+question costs far less than another economic evaluation. If the fixed panel has
+missing/truncated sides, stop this route and record the source limitation; do not
+claim a negative economic identity. If it has support, the result permits only a
+later bounded cost-source design, not StageB or qualification. C# registration of
+the independently decoded USD roster is checked without replaying market events.
+No new engine, workflow, trial budget, key, account, permission or authority.
+
+Execution state at this source commit: prospective. The required CI, original
+source receipt, permanent public result and resulting Director decision are kept
+in PR256: https://github.com/mariancradulescu/mxm-quant-greenfield/pull/256 .
+No collection or compiled product result is claimed before that receipt. Later
+changes to the shared core deliberately leave historical model hash gates closed;
+the regression tests verify refusal without rewriting frozen specifications.
+
+---
+
 # Current integrated reconciliation — 29 October 2026
 
 Entry official HEAD282d1a7d5dd5c1e16d1f0512e0ef48428511eaa2. This is a Director

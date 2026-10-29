@@ -1,5 +1,5 @@
 {
-  "name": "MXM finite native spot receipt-clock source pilot",
+  "name": "MXM finite W33 panel quote support and USD registration",
   "on": {
     "push": {
       "branches": [
@@ -44,11 +44,11 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}"
           },
-          "run": "python3 -m research_core_v4.laboratory.spot_observation_reception admit"
+          "run": "python3 -m research_core_v4.laboratory.panel_quote_support admit"
         },
         {
           "name": "Verify source-only contract and install exact extension into existing decoder",
-          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m unittest research_core_v4.laboratory.test_spot_observation_profile research_core_v4.laboratory.test_spot_observation_reception -v\ncp research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py .spot-native/research_core_v4/laboratory/"
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ncp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .spot-native/research_core_v4/laboratory/\n(cd .spot-native && PANEL_TEST_MAIN_ROOT=\"$GITHUB_WORKSPACE\" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)"
         },
         {
           "name": "Finite VIEW source collection",
@@ -58,14 +58,14 @@
             "R3_CTRADER_CLIENT_SECRET": "${{ secrets.R3_CTRADER_CLIENT_SECRET }}",
             "R3_CTRADER_ACCESS_TOKEN": "${{ secrets.R3_CTRADER_ACCESS_TOKEN }}"
           },
-          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.spot_observation_reception spot-collect"
+          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.panel_quote_support spot-collect"
         },
         {
           "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
           "if": "always()",
           "with": {
-            "name": "spot-observation-producer-${{ github.run_id }}",
-            "path": "verification/spot-observation/capture.mxmenc\nverification/spot-observation/producer.json",
+            "name": "panel-support-producer-${{ github.run_id }}",
+            "path": "verification/panel-quote-support/capture.mxmenc\nverification/panel-quote-support/producer.json",
             "if-no-files-found": "error",
             "retention-days": 90
           }
@@ -101,17 +101,17 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}"
           },
-          "run": "python3 -m research_core_v4.laboratory.spot_observation_reception admit"
+          "run": "python3 -m research_core_v4.laboratory.panel_quote_support admit"
         },
         {
           "name": "Verify source-only contract and install exact extension into existing decoder",
-          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\npython3 -m unittest research_core_v4.laboratory.test_spot_observation_profile research_core_v4.laboratory.test_spot_observation_reception -v\ncp research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py .spot-native/research_core_v4/laboratory/"
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ncp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .spot-native/research_core_v4/laboratory/\n(cd .spot-native && PANEL_TEST_MAIN_ROOT=\"$GITHUB_WORKSPACE\" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)"
         },
         {
           "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
           "with": {
-            "name": "spot-observation-producer-${{ github.run_id }}",
-            "path": "verification/spot-observation"
+            "name": "panel-support-producer-${{ github.run_id }}",
+            "path": "verification/panel-quote-support"
           }
         },
         {
@@ -120,14 +120,18 @@
             "GH_TOKEN": "${{ github.token }}",
             "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
           },
-          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.spot_observation_reception spot-cold"
+          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.panel_quote_support spot-cold"
+        },
+        {
+          "name": "Admit independently decoded USD roster to existing C# account without market replay",
+          "run": "dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release -- --register-usd-quotes verification/panel-quote-support/quote-assets.json > verification/panel-quote-support/registration.json\ncat verification/panel-quote-support/registration.json"
         },
         {
           "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
           "if": "always()",
           "with": {
-            "name": "spot-observation-cold-${{ github.run_id }}",
-            "path": "verification/spot-observation/cold.json",
+            "name": "panel-support-cold-${{ github.run_id }}",
+            "path": "verification/panel-quote-support/cold.json\nverification/panel-quote-support/quote-assets.json\nverification/panel-quote-support/registration.json",
             "if-no-files-found": "error",
             "retention-days": 90
           }
