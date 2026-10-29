@@ -91,6 +91,7 @@ public static class MxmHistoricalSourceFixture {
    initial_capital_eur=report.InitialCapitalEur,final_cash_eur=report.FinalCashEur,entries=report.AcceptedEntries,
    decisions=0,broker_orders=0,broker_requests=0,new_economic_models=0,source_clock_is_historical_not_receipt_clock=true,
    historical_costs_proven=false,economic_edge_proven=false,native_cloud_recovery_proven=false};
+  Durable(args[3]+".private-capsule",expected.Payload);
   File.WriteAllText(args[3],JsonSerializer.Serialize(receipt)+"\n");Console.WriteLine("MXM_AUTHENTIC_SOURCE_CURSOR_RECOVERY "+JsonSerializer.Serialize(receipt));return true;
  }
  static void Fixture(){

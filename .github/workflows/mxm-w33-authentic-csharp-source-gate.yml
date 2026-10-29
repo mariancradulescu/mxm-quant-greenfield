@@ -101,11 +101,40 @@ jobs:
           assert not c['economic_edge_proven'] and not c['historical_costs_proven'] and not c['native_cloud_recovery_proven']
           print('MXM_AUTHENTIC_SOURCE_CURSOR_AND_ACCOUNT_COLD_RECOVERY_PASS')
           PY
+      - name: Preserve actual source/account capsule encrypted to the existing recipient and retain actual evaluator
+        run: |
+          umask 077
+          cd .sealed-native
+          python3 - <<'PYPRIVATE'
+          import gzip,hashlib,json,os,pathlib,shutil
+          from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
+          from research_core_v4.successor_c_20261018.readback import FP
+          main=pathlib.Path(os.environ['GITHUB_WORKSPACE'])
+          folder=main/'verification'
+          receipt=folder/'w33-authentic-account-source-gate.json'
+          r=json.loads(receipt.read_bytes())
+          raw_path=folder/'w33-authentic-account-source-gate.json.private-capsule'
+          raw=raw_path.read_bytes()
+          assert hashlib.sha256(raw).hexdigest()==r['capsule_sha256']
+          public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
+          assert public_spki_sha256(public)==FP
+          cipher=folder/'w33-source-recovery.mxmenc'
+          encrypt_shard(gzip.compress(raw,mtime=0),public_key=public,output=cipher)
+          dll=main/'research_core_v4/laboratory/csharp/usd_account/bin/Release/net8.0/MxmSharedUsdAccountFixture.dll'
+          assert hashlib.sha256(dll.read_bytes()).hexdigest()==r['assembly_sha256']
+          shutil.copyfile(dll,folder/'w33-source-recovery-evaluator.dll')
+          raw_path.unlink()
+          r.update(capsule_encrypted_to_existing_recipient=True,capsule_cipher_sha256=hashlib.sha256(cipher.read_bytes()).hexdigest(),private_capsule_exported=False)
+          receipt.write_text(json.dumps(r,sort_keys=True,separators=(',',':'))+'\n')
+          print('MXM_ACTUAL_SOURCE_ACCOUNT_CAPSULE_ENCRYPTED_AND_EVALUATOR_RETAINED')
+          PYPRIVATE
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: w33-authentic-csharp-public-${{ github.run_id }}
           path: |
             verification/w33-authentic-account-source-bridge.json
             verification/w33-authentic-account-source-gate.json
+            verification/w33-source-recovery.mxmenc
+            verification/w33-source-recovery-evaluator.dll
           if-no-files-found: error
           retention-days: 90

@@ -28,7 +28,9 @@ penultimate group, then process the remaining source groups. Require byte-for-by
 equality of the ENTIRE final account capsule, including source books and cursor,
 against uninterrupted ingestion. This is offline process recovery, not native Cloud
 durability, broker callbacks or fills. Private source/capsules stay in custody runner;
-only counts, booleans and hashes leave it. Final cash remains EUR200; zero market
+the actual final source/account capsule leaves it only encrypted to the existing
+recipient, alongside counts/booleans/hashes and the actual compiled evaluator.
+Private capsule plaintext is deleted before the explicit artifact upload. Final cash remains EUR200; zero market
 execution quotes, entries, decisions, models, new broker requests or orders.
 
 Artificial regression cases are necessary for this new seam: missing-side prefixes,
