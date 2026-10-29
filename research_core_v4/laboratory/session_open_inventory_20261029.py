@@ -129,19 +129,47 @@ def selftest():
     need(len(rows)==sum(x["decisions"] for x in r["per_market"].values()),"TEST_ROW_PRESERVATION")
     need(all(x["side"]==0 or x["entry_utc"]>x["usable_at_utc"] for x in rows),"TEST_CAUSAL_DELAY")
     cutoff=src.END-7*86400
-    old=[x for x in rows if x["decision_bar_utc"]<dt.datetime.fromtimestamp(cutoff,dt.timezone.utc).isoformat()]
+    old=[x for x in rows if x["exit_utc"]<dt.datetime.fromtimestamp(cutoff,dt.timezone.utc).isoformat()]
     for sid in m:
         for t in list(m[sid]):
             if t>=cutoff:
                 m[sid][t]=tuple(v*1.11 for v in m[sid][t])
     new,_=evaluate(m)
-    need(old==[x for x in new if x["decision_bar_utc"]<dt.datetime.fromtimestamp(cutoff,dt.timezone.utc).isoformat()],"TEST_NO_FUTURE_LEAK")
+    need(old==[x for x in new if x["exit_utc"]<dt.datetime.fromtimestamp(cutoff,dt.timezone.utc).isoformat()],"TEST_NO_FUTURE_LEAK")
     m[250]={}
     need(support(m)["source_admission"]=="SOURCE_STOP_NO_ECONOMIC_IDENTITY","TEST_SOURCE_GATE")
     print("MXM_SESSION_INVENTORY_PREFLIGHT_PASS no source decryption, no broker requests, no economic result")
+def cold():
+    """Independent read of sealed FIRST execution. No model, original H1 or market data is opened."""
+    from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
+    from research_core_v4.successor_c_20261018.readback import FP
+    from research_core_v4.remediation_p0_p4_20261015 import owner
+    from research_core_v4.remediation_p0_p4_20261015.safety import unpack
+    r=json.loads((OUT/"receipt.json").read_bytes())
+    cipher=(OUT/"private.mxmenc").read_bytes()
+    need(digest(cipher)==r["private_cipher_sha256"],"COLD_CIPHER_HASH")
+    with tempfile.TemporaryDirectory() as path:
+        key,fp=_private_key_from_secret(Path(path));need(fp==FP,"COLD_KEY_SCOPE")
+        content=unpack(owner.bounded_decrypt(cipher,key,Path(path)),max_bytes=20000000)
+    need(digest(content)==r["private_plaintext_sha256"],"COLD_PLAIN_HASH")
+    j=json.loads(content)
+    need(j["source_head"]==r["source_head"] and j["run_id"]==r["run_id"] and
+         j["spec_sha256"]==r["spec_sha256"] and
+         j["source_admission"]==r["source_admission"] and
+         j["metrics"]==r["metrics"] and
+         len(j["individual_decision_ledger"])==r["individual_decisions_encrypted"] and
+         j["prior_closed_models_executed"]==0 and j["orders"]==0,"COLD_INDIVIDUAL_LEDGER")
+    marker={"schema":"mxm.session-inventory-cold-first-execution.v1",
+      "run_id":r["run_id"],"source_head":r["source_head"],
+      "cipher_sha256":r["private_cipher_sha256"],
+      "read_back_individual_rows":len(j["individual_decision_ledger"]),
+      "reexecuted_model":False,"original_h1_source_reopened":False,"orders":0}
+    (OUT/"cold.json").write_bytes(dump(marker))
+    print("MXM_SESSION_INVENTORY_COLD "+dump(marker).decode(),flush=True)
 def main():
     import sys
     if sys.argv[1:]==["selftest"]:selftest();return
+    if sys.argv[1:]==["cold"]:cold();return
     need(sys.argv[1:]==["run"],"RUN_MODE")
     s,projection=validate()
     need(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield" and
