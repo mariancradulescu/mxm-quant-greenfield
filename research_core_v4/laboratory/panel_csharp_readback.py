@@ -44,7 +44,7 @@ def export(folder, tick_path, declaration_path, public_path):
          os.environ.get("R3_CTRADER_REFRESH_TOKEN") is None and
          os.environ.get("SUCCESSOR_APP_PRIVATE_KEY") is None, "W33_CUSTODY_ONLY_NO_BROKER_ACCESS")
     evidence = Path(folder)
-    evidence_repo = evidence.parents[2]
+    evidence_repo = evidence.parents[3]
     manifest_raw = read_regular(evidence / "MANIFEST.json", 20000)
     need(subprocess.check_output(["git", "-C", str(evidence_repo), "rev-parse", "HEAD"],
                                  text=True).strip() == EVIDENCE_HEAD, "W33_EVIDENCE_COMMIT")
