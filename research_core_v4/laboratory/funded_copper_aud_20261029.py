@@ -131,9 +131,33 @@ def selftest():
  corp[111]={}
  need(support(corp)["classification"]=="SOURCE_STOP_NO_IDENTITY","TEST_STOP_BEFORE_IDENTITY")
  print("MXM_COPPER_AUD_FUNDED200_PREFLIGHT_SUCCESS no originals unlocked")
+def cold():
+ """Verify the original encrypted CSharp-first economic outcome; no CSharp model rerun or H1 source loading."""
+ from research_core_v4.asymmetric_recovery_v4_gate import _private_key_from_secret
+ from research_core_v4.successor_c_20261018.readback import FP
+ from research_core_v4.remediation_p0_p4_20261015 import owner
+ from research_core_v4.remediation_p0_p4_20261015.safety import unpack
+ r=json.loads((OUT/"receipt.json").read_bytes())
+ cipher=(OUT/"private.mxmenc").read_bytes()
+ need(sha(cipher)==r["private_cipher_sha256"],"COLD_CIPHER")
+ with tempfile.TemporaryDirectory() as t:
+  key,fp=_private_key_from_secret(Path(t));need(fp==FP,"COLD_RECIPIENT")
+  raw=unpack(owner.bounded_decrypt(cipher,key,Path(t)),max_bytes=40000000)
+ need(sha(raw)==r["private_plain_sha256"],"COLD_FIRST_ORIGINAL")
+ p=json.loads(raw)
+ need(p["source_head"]==r["source_head"] and p["run_id"]==r["run_id"] and
+      p["spec_sha256"]==r["spec_sha256"] and
+      p["economic_outcome_count"]==r["economic_models_executed"] and
+      (not p["economic_outcome_count"] or p["metrics"]==r["metrics"]),"COLD_FIRST_RESULT_BINDING")
+ a={"schema":"mxm.funded200-copper-aud-independent-cold.v1","run_id":r["run_id"],
+    "cipher_sha256":r["private_cipher_sha256"],"original_csharp_result_preserved":True,
+    "original_csharp_model_rerun":False,"original_broker_source_reopened":False,"orders":0}
+ (OUT/"cold.json").write_bytes(encode(a))
+ print("MXM_FUNDED200_COLD "+encode(a).decode(),flush=True)
 def main():
  import sys
  if sys.argv[1:]==["selftest"]:selftest();return
+ if sys.argv[1:]==["cold"]:cold();return
  need(sys.argv[1:]==["run"],"RUN")
  validate()
  need(os.environ.get("GITHUB_REPOSITORY")=="mariancradulescu/mxm-quant-greenfield" and
