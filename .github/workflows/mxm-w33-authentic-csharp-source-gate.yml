@@ -1,10 +1,12 @@
-name: MXM W33 authentic native quotes to CSharp account gate
+name: MXM authentic historical source cursor and account cold recovery
 on:
   pull_request:
     branches: [mxm-remediation-p0-p4-20261015-v1]
     paths:
       - research_core_v4/laboratory/panel_csharp_readback.py
-      - research_core_v4/laboratory/csharp/usd_account/Program.cs
+      - research_core_v4/laboratory/csharp/usd_account/**
+      - research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplay.cs
+      - research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioReplayRecovery.cs
       - .github/workflows/mxm-w33-authentic-csharp-source-gate.yml
   push:
     branches: [mxm-remediation-p0-p4-20261015-v1]
@@ -34,6 +36,7 @@ jobs:
           cp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .sealed-native/research_core_v4/laboratory/
           (cd .sealed-native && PANEL_TEST_MAIN_ROOT="$GITHUB_WORKSPACE" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)
           dotnet build research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release
+          dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release --no-build -- --historical-source-fixture
           python3 - <<'PY'
           from pathlib import Path
           a=Path('research_core_v4/laboratory/panel_csharp_readback.py').read_text()
@@ -78,10 +81,10 @@ jobs:
           umask 077
           cd .sealed-native
           python3 -m research_core_v4.laboratory.panel_csharp_readback --original-w33 "$GITHUB_WORKSPACE/.panel-evidence/docs/economic-development/20261029/panel-quote-support-40836352578" "$RUNNER_TEMP/w33-quotes.ndjson" "$RUNNER_TEMP/w33-declaration.json" "$GITHUB_WORKSPACE/verification/w33-authentic-account-source-bridge.json"
-      - name: Inspect authentic historical BIDASK inside CSharp and preserve EUR200 account without false FX
+      - name: Recover authentic source books and cursor inside the same CSharp account across three cold processes
         run: |
           umask 077
-          dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release --no-build -- --w33-authentic-panel-source-gate "$RUNNER_TEMP/w33-declaration.json" "$RUNNER_TEMP/w33-quotes.ndjson" verification/w33-authentic-account-source-gate.json
+          dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release --no-build -- --w33-cursor-recovery "$RUNNER_TEMP/w33-declaration.json" "$RUNNER_TEMP/w33-quotes.ndjson" verification/w33-authentic-account-source-gate.json
           python3 - <<'PY'
           from pathlib import Path
           import json,hashlib,os
@@ -90,17 +93,48 @@ jobs:
           assert source['native_run']==40836352578 and source['events']==2969 and source['six_sides_complete']
           assert source['derived_stream_sha256']==hashlib.sha256(Path(os.environ['RUNNER_TEMP'],'w33-quotes.ndjson').read_bytes()).hexdigest()
           assert c['original_quote_events']==2969 and c['final_cash_eur']==c['initial_capital_eur']==200
-          assert c['independent_producer_source_sha256']==source['private_declaration_sha256']
-          assert c['source_prices_inspected_in_real_csharp'] and c['authenticated_source_bound_cold_recovery']
-          assert c['account_market_quote_events_admitted']==c['entries']==c['decisions']==c['broker_orders']==0
-          assert not c['economic_edge_proven'] and not c['historical_eurusd_conversion_proven'] and not c['dated_margin_and_costs_proven']
-          print('MXM_W33_NATIVE_WIRE_CSHARP_SOURCE_GATE_PASS_NO_FILLS_NO_FX_INVENTION')
+          assert c['source_sha256']==source['private_declaration_sha256'] and c['stream_sha256']==source['derived_stream_sha256']
+          assert c['cold_processes']==3 and c['all_capsule_bytes_identical']
+          assert c['source_books_and_side_clocks_recovered'] and c['source_and_account_cursor_atomic']
+          assert c['account_events']==c['atomic_groups'] and c['atomic_groups']>0
+          assert c['entries']==c['decisions']==c['broker_orders']==c['broker_requests']==c['new_economic_models']==0
+          assert not c['economic_edge_proven'] and not c['historical_costs_proven'] and not c['native_cloud_recovery_proven']
+          print('MXM_AUTHENTIC_SOURCE_CURSOR_AND_ACCOUNT_COLD_RECOVERY_PASS')
           PY
+      - name: Preserve actual source/account capsule encrypted to the existing recipient and retain actual evaluator
+        run: |
+          umask 077
+          cd .sealed-native
+          python3 - <<'PYPRIVATE'
+          import gzip,hashlib,json,os,pathlib,shutil
+          from research_core_v4.shallow_m5_support_v2_production import encrypt_shard,public_spki_sha256
+          from research_core_v4.successor_c_20261018.readback import FP
+          main=pathlib.Path(os.environ['GITHUB_WORKSPACE'])
+          folder=main/'verification'
+          receipt=folder/'w33-authentic-account-source-gate.json'
+          r=json.loads(receipt.read_bytes())
+          raw_path=folder/'w33-authentic-account-source-gate.json.private-capsule'
+          raw=raw_path.read_bytes()
+          assert hashlib.sha256(raw).hexdigest()==r['capsule_sha256']
+          public=pathlib.Path('research_core_v4/keys/MXM_V4_INPUT_BUNDLE_PUBLIC_KEY.pem')
+          assert public_spki_sha256(public)==FP
+          cipher=folder/'w33-source-recovery.mxmenc'
+          encrypt_shard(gzip.compress(raw,mtime=0),public_key=public,output=cipher)
+          dll=main/'research_core_v4/laboratory/csharp/usd_account/bin/Release/net8.0/MxmSharedUsdAccountFixture.dll'
+          assert hashlib.sha256(dll.read_bytes()).hexdigest()==r['assembly_sha256']
+          shutil.copyfile(dll,folder/'w33-source-recovery-evaluator.dll')
+          raw_path.unlink()
+          r.update(capsule_encrypted_to_existing_recipient=True,capsule_cipher_sha256=hashlib.sha256(cipher.read_bytes()).hexdigest(),private_capsule_exported=False)
+          receipt.write_text(json.dumps(r,sort_keys=True,separators=(',',':'))+'\n')
+          print('MXM_ACTUAL_SOURCE_ACCOUNT_CAPSULE_ENCRYPTED_AND_EVALUATOR_RETAINED')
+          PYPRIVATE
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: w33-authentic-csharp-public-${{ github.run_id }}
           path: |
             verification/w33-authentic-account-source-bridge.json
             verification/w33-authentic-account-source-gate.json
+            verification/w33-source-recovery.mxmenc
+            verification/w33-source-recovery-evaluator.dll
           if-no-files-found: error
           retention-days: 90
