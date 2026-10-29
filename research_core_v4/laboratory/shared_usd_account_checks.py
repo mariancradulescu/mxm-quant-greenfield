@@ -25,6 +25,12 @@ def verify(value):
         ctx.prec=65
         expected=D(str(f['units']))*D(str(f['execution_price']))*D(str(f['usd_per_million']))/D(1000000)/D(str(f['fx_bid']))
         need(abs(expected-D(str(f['commission_eur'])))<D('1e-24') and abs(D(str(f['cash_eur']))-(D(200)-expected))<D('1e-24'),'ADMITTED_FX_BID_FOR_CAPTURED_USD_FEE')
+    if 'declared_panel' in value:
+        p=value['declared_panel']
+        need(p['symbols']==['AUDUSD','Copper','SpotCrude'] and D(str(p['initial_capital_eur']))==200 and
+          D(str(p['cash_eur']))==D('199.7') and D(str(p['margin_eur']))==150 and p['entries']==3 and
+          p['margin_limited_entries']==p['risk_limited_entries']==1 and p['synthetic_only'] is True and
+          p['declaration_is_broker_authentication'] is False,'DECLARED_PANEL_SINGLE_CAPITAL_AND_SHARED_GOVERNORS')
     need(value['broker_orders']==0 and all(value[k] is False for k in ('native_ctrader_runtime_reception','economic_edge_proven','hard21_proven')),'NO_NATIVE_OR_ECONOMIC_PROMOTION')
     return {'artificial_funded_cases':4,'compiled_checks':value['checks'],'signed_fx_and_cold_recovery_independently_checked':True,
             'broker_orders':0,'economic_edge_proven':False,'hard21_proven':False,'native_ctrader_runtime_reception':False}

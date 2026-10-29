@@ -167,6 +167,18 @@ for(int i=0;i<6;i++){
 feed=feed.OrderBy(e=>e.Utc).ToList();var panelReport=panel.Run(feed);
 Need(panelReport.AcceptedEntries==3 && panelReport.OpenPositions==3 && panelReport.InitialCapitalEur==200m &&
  panelReport.UsedMarginEur==150m && panelReport.FinalCashEur==199.7m,"DECLARED_PANEL_ONE_ACCOUNT_AND_SHARED_MARGIN");
+var marginLimited=new MxmPortfolioAccountReplay(roster,declared);
+var marginReport=marginLimited.Run(feed.Select(e=>e is MxmQuote q?q with {InitialMarginEur=90m}:e));
+Need(marginReport.AcceptedEntries==1 && marginReport.RejectedEntries==2 && marginReport.UsedMarginEur==90m &&
+ marginReport.Rejections.All(x=>x=="REJECT_MARGIN_FRACTION"),"PANEL_MARGIN_USES_REMAINING_SHARED_FREE_MARGIN");
+var riskLimited=new MxmPortfolioAccountReplay(roster,declared with {MaxEstimatedStopRiskFraction=.011m});
+var riskReport=riskLimited.Run(feed);
+Need(riskReport.AcceptedEntries==1 && riskReport.RejectedEntries==2 &&
+ riskReport.Rejections.All(x=>x=="REJECT_AGGREGATE_STOP_RISK_EXCESS"),"PANEL_COMBINED_STOP_RISK_AND_FRICTION_RESERVE");
+var declaredEmpty=new MxmPortfolioAccountReplay(roster,declared);declaredEmpty.Run(Array.Empty<MxmAccountFeed>());
+var declaredEmptySaved=declaredEmpty.CaptureReplay(source);
+Need(MxmPortfolioAccountReplay.RestoreReplay(declaredEmptySaved.Payload,declaredEmptySaved.Sha256,source,declared,roster).Report().FinalCashEur==200m,
+ "SOURCE_ONLY_EMPTY_REGISTRATION_CAN_RESTORE_WITHOUT_MARKET_EVENTS");
 var panelCapsule=panel.CaptureReplay(source);
 var panelRestored=MxmPortfolioAccountReplay.RestoreReplay(panelCapsule.Payload,panelCapsule.Sha256,source,declared,roster);
 var fxOnly=Fx(feed.Last().Utc.AddMilliseconds(1),1.2m,1.21m);
@@ -187,6 +199,7 @@ Refuse(()=>new MxmPortfolioAccountReplay(roster,Settings()),"NO_IMPLICIT_NEW_CUR
 Need(!JsonSerializer.Serialize(Settings()).Contains("UsdQuoteMetadataJson"),"LEGACY_SETTINGS_SERIALIZATION_UNCHANGED");
 var declaredPanel=new{symbols=roster,initial_capital_eur=panelDirect.InitialCapitalEur,entries=panelDirect.AcceptedEntries,
  margin_eur=panelDirect.UsedMarginEur,cash_eur=panelDirect.FinalCashEur,equity_eur=panelDirect.MarkedEquityEur,
+ margin_limited_entries=marginReport.AcceptedEntries,risk_limited_entries=riskReport.AcceptedEntries,
  declaration_is_broker_authentication=false,synthetic_only=true};
 var financing=MxmFinancingFixture.Run();
 Console.WriteLine(JsonSerializer.Serialize(new{schema="mxm.shared-usd-account.artificial.v1",checks,proofs,fee_case=feeCase,financing,declared_panel=declaredPanel,
