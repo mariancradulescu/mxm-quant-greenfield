@@ -53,7 +53,12 @@ jobs:
           assert len(live)==1 and live[0]['id']==int(os.environ['GITHUB_RUN_ID']) and live[0]['head_sha']==os.environ['GITHUB_SHA'] and live[0]['run_attempt']==1,'ONLY_ONE_FIRST_MODEL'
           parents=g('commits/'+os.environ['GITHUB_SHA'])['parents']
           assert len(parents)==2,'REQUIRE_REVIEW_MERGE'
-          assert any(x['event']=='pull_request' and x['head_sha']==parents[1]['sha'] and x['conclusion']=='success' for x in runs),'NO_PRE_ECONOMIC_CI'
+          # New workflow is not always registered for PR events before it reaches the official branch.
+          # Verify the two EXISTING protected PR workflows on the exact reviewed head.
+          prs=g('actions/runs?event=pull_request&per_page=100')
+          assert prs['total_count']<=100,'PR_CI_HISTORY_BOUNDED'
+          passed={x['name'] for x in prs['workflow_runs'] if x['event']=='pull_request' and x['head_sha']==parents[1]['sha'] and x['conclusion']=='success'}
+          assert {'MXM R3 protected technical installation CI','MXM CSharp Pepperstone protected gateway CI'}.issubset(passed),'REQUIRE_TWO_ORIGINAL_PROTECTED_CI'
           print('MXM_ONE_ORIGINAL_FUNDED200_ATTEMPT_ADMITTED',os.environ['GITHUB_RUN_ID'])
           PY
       - name: Install only existing pinned dependencies and native CSharp account binary
