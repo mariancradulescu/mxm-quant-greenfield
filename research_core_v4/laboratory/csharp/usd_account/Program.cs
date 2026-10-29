@@ -2,6 +2,93 @@ using System.Text.Json;
 using Mxm.Replay;
 using Mxm.Research;
 if(MxmPortfolioReplayRecoveryProbe.TryWorker(args,out int workerExit)){Environment.ExitCode=workerExit;return;}
+// AUTHENTIC SOURCE-TO-C# RECEIPT: native dated BID/ASK, no fabricated EURUSD FX,
+// commissions, margin, fills, entry signals, or source receipt-clock semantics.
+if(args.Length==4 && args[0]=="--w33-authentic-panel-source-gate"){
+ void Gate(bool ok,string why){if(!ok)throw new ArgumentException("AUTHENTIC_W33_"+why);}
+ using var declarationDoc=JsonDocument.Parse(File.ReadAllBytes(args[1]));
+ string declaration=File.ReadAllText(args[1]);
+ string authenticatedSource=declarationDoc.RootElement.GetProperty("source_sha256").GetString()!;
+ var roster=new[]{"AUDUSD","Copper","SpotCrude"};
+ var configured=new MxmReplayParameters(StrategyMode.TrendOnly,.8m,3,0m,.03m,.2m,
+  UseSharedUsdConversion:true,UsdQuoteMetadataJson:declaration);
+ var count=new Dictionary<string,int>(StringComparer.Ordinal);
+ foreach(var symbol in roster)foreach(var side in new[]{"bid","ask"})count[symbol+"/"+side]=0;
+ var original=new List<(long T,string Symbol,string Side,long Raw)>();
+ long previous=-1;
+ foreach(var line in File.ReadLines(args[2])){
+  using var json=JsonDocument.Parse(line);var r=json.RootElement;
+  string[] fields={"symbol","t","side","raw"};
+  Gate(r.ValueKind==JsonValueKind.Object &&
+   r.EnumerateObject().Select(p=>p.Name).OrderBy(x=>x,StringComparer.Ordinal)
+    .SequenceEqual(fields.OrderBy(x=>x,StringComparer.Ordinal)),"EXACT_NATIVE_ROW_FIELDS");
+  long t=r.GetProperty("t").GetInt64(),raw=r.GetProperty("raw").GetInt64();
+  string symbol=r.GetProperty("symbol").GetString()!,side=r.GetProperty("side").GetString()!;
+  Gate(t>=1786442400000L && t<1786443000000L && t>=previous &&
+   raw>0 && count.ContainsKey(symbol+"/"+side),"HISTORICAL_PANEL_SCOPE");
+  original.Add((t,symbol,side,raw));count[symbol+"/"+side]++;previous=t;
+  Gate(original.Count<=2969,"EVENT_CAP");
+ }
+ var expected=new Dictionary<string,int>{{"AUDUSD/bid",637},{"AUDUSD/ask",667},
+  {"Copper/bid",208},{"Copper/ask",210},{"SpotCrude/bid",623},{"SpotCrude/ask",624}};
+ Gate(original.Count==2969 && count.All(p=>p.Value==expected[p.Key]),
+  "EXACT_ORIGINAL_SIDE_COUNTS");
+ var bid=new Dictionary<string,(long T,long Raw)>(),ask=new Dictionary<string,(long T,long Raw)>();
+ var valid=roster.ToDictionary(s=>s,s=>0);var crossed=roster.ToDictionary(s=>s,s=>0);
+ var locked=roster.ToDictionary(s=>s,s=>0);var aged=roster.ToDictionary(s=>s,s=>0);
+ var ambiguous=roster.ToDictionary(s=>s,s=>0);var incomplete=roster.ToDictionary(s=>s,s=>0);
+ foreach(var group in original.GroupBy(r=>(r.T,r.Symbol)).OrderBy(g=>g.Key.T).ThenBy(g=>g.Key.Symbol,StringComparer.Ordinal)){
+  string symbol=group.Key.Symbol;long t=group.Key.T;
+  var bids=group.Where(x=>x.Side=="bid").Select(x=>x.Raw).Distinct().ToArray();
+  var asks=group.Where(x=>x.Side=="ask").Select(x=>x.Raw).Distinct().ToArray();
+  if(bids.Length>1 || asks.Length>1){ambiguous[symbol]++;continue;}
+  if(bids.Length==1)bid[symbol]=(t,bids[0]);
+  if(asks.Length==1)ask[symbol]=(t,asks[0]);
+  if(!bid.TryGetValue(symbol,out var b)||!ask.TryGetValue(symbol,out var a)){
+   incomplete[symbol]++;continue;
+  }
+  // Source timestamps can establish update gaps, NOT historical receipt freshness.
+  if(t-b.T>5000 || t-a.T>5000){aged[symbol]++;continue;}
+  if(a.Raw<b.Raw)crossed[symbol]++;
+  else if(a.Raw==b.Raw)locked[symbol]++;
+  else valid[symbol]++;
+ }
+ Gate(valid.Values.Sum()>0,"NO_COMPLETE_POSITIVE_HISTORICAL_BOOKS");
+ // The real quotes can be inspected, but must NOT enter a funded execution
+ // event until contemporary EURUSD and historical risk/cost terms exist.
+ var account=new MxmPortfolioAccountReplay(roster,configured);
+ var initial=account.Run(new MxmAccountFeed[]{
+  new MxmUsdConversionUnavailable(DateTimeOffset.FromUnixTimeMilliseconds(original[0].T).UtcDateTime,
+   "HISTORICAL_EURUSD_AND_COST_AUTHORITY_ABSENT")});
+ Gate(initial.InitialCapitalEur==200m && initial.FinalCashEur==200m &&
+  initial.AcceptedEntries==0 && initial.OpenPositions==0 &&
+  !initial.Hard21Proven,"NO_FAKE_HISTORICAL_ACCOUNT_TRADES");
+ var saved=account.CaptureReplay(authenticatedSource);
+ var cold=MxmPortfolioAccountReplay.RestoreReplay(saved.Payload,saved.Sha256,
+  authenticatedSource,configured,roster);
+ Gate(JsonSerializer.Serialize(cold.Report())==JsonSerializer.Serialize(initial) &&
+  cold.NextEventOrdinal==account.NextEventOrdinal,"AUTHENTIC_GATE_COLD_ACCOUNT_PARITY");
+ var receipt=new{schema="mxm.csharp.authentic-w33-source-account-gate.v1",
+  original_quote_events=original.Count,sides=count,
+  atomic_positive_books=valid,atomic_crossed_books=crossed,
+  atomic_locked_books=locked,atomic_aged_side_books=aged,
+  atomic_ambiguous_same_ms_books=ambiguous,atomic_missing_side_books=incomplete,
+  source_clock_is_historical_not_receipt_clock=true,
+  independent_producer_source_sha256=authenticatedSource,
+  registered_symbols=roster,initial_capital_eur=initial.InitialCapitalEur,
+  final_cash_eur=initial.FinalCashEur,
+  source_prices_inspected_in_real_csharp=true,
+  source_prices_promoted_to_executable_quotes=false,
+  account_market_quote_events_admitted=0,decisions=0,entries=0,
+  open_positions=0,account_events=account.NextEventOrdinal,
+  authenticated_source_bound_cold_recovery=true,
+  historical_eurusd_conversion_proven=false,
+  dated_margin_and_costs_proven=false,broker_orders=0,hard21_proven=false,
+  economic_edge_proven=false,native_ctrader_runtime_reception=false};
+ File.WriteAllText(args[3],JsonSerializer.Serialize(receipt)+"\n");
+ Console.WriteLine("MXM_W33_AUTHENTIC_SOURCE_TO_CSHARP_FAIL_CLOSED "+JsonSerializer.Serialize(receipt));
+ return;
+}
 // Source-only registration entry point: no historical ticks enter the event engine.
 if(args.Length==2 && args[0]=="--register-usd-quotes"){
  string declaration=File.ReadAllText(args[1]);using var doc=JsonDocument.Parse(declaration);
