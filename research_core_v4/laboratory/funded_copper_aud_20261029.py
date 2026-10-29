@@ -64,7 +64,7 @@ def account_analysis(payload,corpus):
  a=payload["account"];ledger=a["Ledger"];cash=D(200);gross=D(0);fees=D(0);entry=None
  by_week=collections.defaultdict(lambda:dict(entries=0,exits=0,realized_net_eur=D(0)))
  by_month=collections.defaultdict(lambda:dict(entries=0,exits=0,realized_net_eur=D(0)))
- executed=0
+ executed=0;extra_stress=D(0)
  for x in ledger:
   k=x["Kind"];need(k in ("ENTRY","EXIT"),"ACCOUNT_NONTRADE_LEDGER")
   stamp=dt.datetime.fromisoformat(x["Utc"].replace("Z","+00:00"));week=stamp.strftime("%G-W%V");month=stamp.strftime("%Y-%m")
@@ -74,6 +74,10 @@ def account_analysis(payload,corpus):
   else:
    need(entry is not None and x["Units"]==1000 and x["Symbol"]=="AUDUSD" and x["Direction"]==entry["Direction"],"MATCHED_EXIT")
    entry=None;executed+=1;by_week[week]["exits"]+=1;by_month[month]["exits"]+=1
+   fx_hour=(int(stamp.timestamp())//H)*H
+   fx_at=corpus[1].get(fx_hour)
+   need(fx_at is not None and D(str(fx_at[0]))>D(".0003"),"LOSS_SIDE_FX_AT_EACH_EXIT")
+   extra_stress+=D(".00010")*D(1000)/(D(str(fx_at[0]))-D(".0003"))
   fee=D(str(x["CommissionEur"]));g=D(str(x["GrossEur"]));fees+=fee;gross+=g;cash+=g-fee
   by_week[week]["realized_net_eur"]+=g-fee;by_month[month]["realized_net_eur"]+=g-fee
   need(abs(cash-D(str(x["CashEur"])))<D(".0000001"),"UNBROKEN_CASH_PATH")
@@ -99,6 +103,8 @@ def account_analysis(payload,corpus):
   "initial_cash_eur":200,"final_cash_eur":asfloat(a["FinalCashEur"]),
   "final_marked_equity_eur":asfloat(a["MarkedEquityEur"]),
   "gross_realized_eur":float(gross),"fees_eur":float(fees),"net_cash_eur":float(gross-fees),
+  "additional_adverse_roundtrip_1pip_stress_eur":float(extra_stress),
+  "stress_net_cash_eur":float(gross-fees-extra_stress),
   "accepted_entries":a["AcceptedEntries"],"completed_exits":a["ExecutedExits"],
   "rejected_entries":a["RejectedEntries"],"open_positions":a["OpenPositions"],
   "modeled_max_drawdown_eur":asfloat(a["MaxDrawdownEur"]),
