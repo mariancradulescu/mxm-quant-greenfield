@@ -14,7 +14,7 @@ class ScopeTests(unittest.TestCase):
         for key in ('automatic_retry','confirmation_eligible'):self.assertIs(n.POLICY[key],False)
         self.assertEqual(n.POLICY_SHA,bytes_digest(encoded(n.POLICY)))
         root=Path(os.environ.get('PANEL_TEST_MAIN_ROOT',n.ROOT))
-        self.assertEqual(json.loads((root/n.PATH).read_bytes()),n.workflow())
+        self.assertEqual(json.loads((root/'docs/laboratory-completion/20261020/historical-workflow-fixtures/panel-quote-support.json').read_bytes()),n.workflow())
         self.assertEqual(json.loads((root/n.PARTITION).read_bytes()),n.partition())
     def test_wrong_context_and_secrets_refused_before_io(self):
         env={'GITHUB_REPOSITORY':n.REPO,'GITHUB_REF_NAME':n.BRANCH,'GITHUB_EVENT_NAME':'push','GITHUB_RUN_ATTEMPT':'1',

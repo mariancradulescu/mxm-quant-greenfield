@@ -1,5 +1,5 @@
 {
-  "name": "MXM finite W33 panel quote support and USD registration",
+  "name": "MXM prospective triad source admission and complete private economic journal",
   "on": {
     "push": {
       "branches": [
@@ -18,7 +18,7 @@
   "jobs": {
     "spot-collect": {
       "runs-on": "ubuntu-24.04",
-      "timeout-minutes": 12,
+      "timeout-minutes": 20,
       "environment": "mxm-r3-pepperstone-v1",
       "permissions": {
         "contents": "read",
@@ -44,11 +44,11 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}"
           },
-          "run": "python3 -m research_core_v4.laboratory.panel_quote_support admit"
+          "run": "python3 -m research_core_v4.laboratory.quote_triangle_development admit"
         },
         {
           "name": "Verify source-only contract and install exact extension into existing decoder",
-          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ncp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .spot-native/research_core_v4/laboratory/\n(cd .spot-native && PANEL_TEST_MAIN_ROOT=\"$GITHUB_WORKSPACE\" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)"
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/quote_triangle/MxmQuoteTriangle.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_quote_triangle -v\npython3 -m research_core_v4.laboratory.quote_triangle_development install"
         },
         {
           "name": "Finite VIEW source collection",
@@ -58,14 +58,14 @@
             "R3_CTRADER_CLIENT_SECRET": "${{ secrets.R3_CTRADER_CLIENT_SECRET }}",
             "R3_CTRADER_ACCESS_TOKEN": "${{ secrets.R3_CTRADER_ACCESS_TOKEN }}"
           },
-          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.panel_quote_support spot-collect"
+          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.quote_triangle_development spot-collect"
         },
         {
           "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
           "if": "always()",
           "with": {
-            "name": "panel-support-producer-${{ github.run_id }}",
-            "path": "verification/panel-quote-support/capture.mxmenc\nverification/panel-quote-support/producer.json",
+            "name": "quote-triad-source-${{ github.run_id }}",
+            "path": "verification/quote-triangle/capture.mxmenc\nverification/quote-triangle/producer.json",
             "if-no-files-found": "error",
             "retention-days": 90
           }
@@ -75,7 +75,7 @@
     },
     "spot-cold": {
       "runs-on": "ubuntu-24.04",
-      "timeout-minutes": 8,
+      "timeout-minutes": 20,
       "environment": "mxm-r3-custody-v1",
       "permissions": {
         "contents": "read",
@@ -101,17 +101,17 @@
           "env": {
             "GH_TOKEN": "${{ github.token }}"
           },
-          "run": "python3 -m research_core_v4.laboratory.panel_quote_support admit"
+          "run": "python3 -m research_core_v4.laboratory.quote_triangle_development admit"
         },
         {
           "name": "Verify source-only contract and install exact extension into existing decoder",
-          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ncp research_core_v4/laboratory/panel_quote_support.py research_core_v4/laboratory/spot_observation_reception.py research_core_v4/laboratory/spot_observation_profile.py research_core_v4/laboratory/test_panel_quote_support.py .spot-native/research_core_v4/laboratory/\n(cd .spot-native && PANEL_TEST_MAIN_ROOT=\"$GITHUB_WORKSPACE\" python3 -m unittest research_core_v4.laboratory.test_panel_quote_support -v)"
+          "run": "python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock\ndotnet build research_core_v4/laboratory/csharp/quote_triangle/MxmQuoteTriangle.csproj -c Release\npython3 -m unittest research_core_v4.laboratory.test_quote_triangle -v\npython3 -m research_core_v4.laboratory.quote_triangle_development install"
         },
         {
           "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
           "with": {
-            "name": "panel-support-producer-${{ github.run_id }}",
-            "path": "verification/panel-quote-support"
+            "name": "quote-triad-source-${{ github.run_id }}",
+            "path": "verification/quote-triangle"
           }
         },
         {
@@ -120,18 +120,33 @@
             "GH_TOKEN": "${{ github.token }}",
             "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}"
           },
-          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.panel_quote_support spot-cold"
+          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.quote_triangle_development export"
         },
         {
-          "name": "Admit independently decoded USD roster to existing C# account without market replay",
-          "run": "dotnet run --project research_core_v4/laboratory/csharp/usd_account/MxmSharedUsdAccountFixture.csproj -c Release -- --register-usd-quotes verification/panel-quote-support/quote-assets.json > verification/panel-quote-support/registration.json\ncat verification/panel-quote-support/registration.json"
+          "name": "Source admission before identity; evaluate once in CSharp and preserve individual ledger encrypted",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\npython3 -m research_core_v4.laboratory.quote_triangle_development evaluate"
+        },
+        {
+          "name": "Read original complete encrypted result in a separate custody process without model replay",
+          "env": {
+            "MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM": "${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}",
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "run": "umask 077\ncd .spot-native\npython3 -m research_core_v4.laboratory.quote_triangle_development cold"
+        },
+        {
+          "name": "Retain original result bytes without decryption or repeated economics",
+          "run": "python3 -m research_core_v4.laboratory.quote_triangle_development preserve"
         },
         {
           "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
           "if": "always()",
           "with": {
-            "name": "panel-support-cold-${{ github.run_id }}",
-            "path": "verification/panel-quote-support/cold.json\nverification/panel-quote-support/quote-assets.json\nverification/panel-quote-support/registration.json",
+            "name": "quote-triad-result-${{ github.run_id }}",
+            "path": "verification/quote-triangle/receipt.json\nverification/quote-triangle/result.mxmenc\nverification/quote-triangle/evaluator.dll\nverification/quote-triangle/cold.json\nverification/quote-triangle/runtime-original.zip",
             "if-no-files-found": "error",
             "retention-days": 90
           }
