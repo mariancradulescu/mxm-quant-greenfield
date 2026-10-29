@@ -52,12 +52,31 @@ jobs:
           assert v['total_count']==len(v['workflow_runs']) and v['total_count']<=100,'NO_UNBOUNDED_ATTEMPT_HISTORY'
           runs=v['workflow_runs'];live=[x for x in runs if x['event']=='push']
           current=int(os.environ['GITHUB_RUN_ID'])
-          prior_id=40918284020
-          original=g('actions/runs/'+str(prior_id))
-          original_jobs=g('actions/runs/'+str(prior_id)+'/jobs')
-          assert original['head_sha']=='a57abffe0910030a29755c33bcb8aedf02a7aba2' and original['conclusion']=='failure' and original['run_attempt']==1 and original_jobs['total_count']==0,'PRIOR_INVALID_WORKFLOW_ZERO_JOBS'
-          assert ({x['id'] for x in live}.issubset({current,prior_id}) and
-                  len([x for x in live if x['id']==current and x['head_sha']==os.environ['GITHUB_SHA'] and x['run_attempt']==1])==1),'ONLY_FIRST_MODEL_AFTER_PARSER_FAILURE'
+          # Strict first-execution inventory: all previously observed push runs are pinned.
+          parser_only={40915812883,40915861611,40916285477,40916462130,40916814748,
+                       40916933626,40917206500,40918284020,40918445002}
+          previous_preflight_only=40919534406
+          expected_prior=parser_only|{previous_preflight_only}
+          actual_prior={x['id'] for x in live if x['id']!=current}
+          assert actual_prior==expected_prior,'UNKNOWN_OR_MISSING_PREVIOUS_PUSH'
+          assert sum(x['id']==current and x['head_sha']==os.environ['GITHUB_SHA'] and x['run_attempt']==1 for x in live)==1,'NOT_UNIQUE_FIRST_AUTHENTIC_RUN'
+          for x in live:
+              if x['id']==current:continue
+              result=g('actions/runs/'+str(x['id']))
+              jobs=g('actions/runs/'+str(x['id'])+'/jobs')
+              assert result['conclusion']=='failure' and result['run_attempt']==1,'EARLIER_EXECUTION_NOT_SAFE'
+              if x['id'] in parser_only:
+                  assert jobs['total_count']==0 and not jobs['jobs'],'PARSER_RUN_EXECUTED_JOB'
+              else:
+                  assert x['id']==previous_preflight_only and len(jobs['jobs'])==2 and jobs['total_count']==2,'UNEXPECTED_JOB_HISTORY'
+                  by_name={j['name']:j for j in jobs['jobs']}
+                  assert by_name['account-preflight']['conclusion']=='success','PREVIOUS_SYNTHETIC_GATE'
+                  economic=by_name['first-authentic-economic-account']
+                  steps={s['name']:s['conclusion'] for s in economic['steps']}
+                  assert steps.get('Admit exactly one official post-review genuine EUR200 economic attempt')=='failure','NOT_PREMODEL_STOP'
+                  assert steps.get('Authenticate original Pepperstone H1 and execute one EUR200 CSharp minimum-volume account')=='skipped','PREVIOUS_ECONOMIC_MODEL_ALREADY_RAN'
+                  assert steps.get('Cold read original encrypted actual funded account result without economic replay')=='skipped','PREVIOUS_RESULT_ALREADY_RAN'
+          print('EXACT_PRIOR_EXECUTION_INVENTORY_PRESERVED_NO_ECONOMIC_MODEL_YET')
           parents=g('commits/'+os.environ['GITHUB_SHA'])['parents']
           assert len(parents)==2,'REQUIRE_REVIEW_MERGE'
           # New workflow is not always registered for PR events before it reaches the official branch.
