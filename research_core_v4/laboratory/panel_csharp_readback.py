@@ -131,5 +131,5 @@ def export(folder, tick_path, declaration_path, public_path):
         print("MXM_ORIGINAL_W33_NATIVE_WIRE_TO_CSHARP_READY " + json.dumps(receipt, sort_keys=True))
 
 if __name__ == "__main__":
-    need(len(sys.argv) == 5 and sys.argv[1] == "--original-w33", "W33_READBACK_ARGUMENTS")
+    need(len(sys.argv) == 6 and sys.argv[1] == "--original-w33", "W33_READBACK_ARGUMENTS")
     export(*sys.argv[2:])
