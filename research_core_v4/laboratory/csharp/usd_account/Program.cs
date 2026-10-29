@@ -35,9 +35,9 @@ if(args.Length==4 && args[0]=="--w33-authentic-panel-source-gate"){
   "EXACT_ORIGINAL_SIDE_COUNTS");
  var bid=new Dictionary<string,(long T,long Raw)>();
  var ask=new Dictionary<string,(long T,long Raw)>();
- var valid=roster.ToDictionary(s=>s,s=>0);var crossed=roster.ToDictionary(s=>s,s=>0);
- var locked=roster.ToDictionary(s=>s,s=>0);var aged=roster.ToDictionary(s=>s,s=>0);
- var ambiguous=roster.ToDictionary(s=>s,s=>0);var incomplete=roster.ToDictionary(s=>s,s=>0);
+ var valid=w33Roster.ToDictionary(s=>s,s=>0);var crossed=w33Roster.ToDictionary(s=>s,s=>0);
+ var locked=w33Roster.ToDictionary(s=>s,s=>0);var aged=w33Roster.ToDictionary(s=>s,s=>0);
+ var ambiguous=w33Roster.ToDictionary(s=>s,s=>0);var incomplete=w33Roster.ToDictionary(s=>s,s=>0);
  foreach(var group in original.GroupBy(r=>(r.T,r.Symbol)).OrderBy(g=>g.Key.T).ThenBy(g=>g.Key.Symbol,StringComparer.Ordinal)){
   string symbol=group.Key.Symbol;long groupMs=group.Key.T;
   var bids=group.Where(x=>x.Side=="bid").Select(x=>x.Raw).Distinct().ToArray();
