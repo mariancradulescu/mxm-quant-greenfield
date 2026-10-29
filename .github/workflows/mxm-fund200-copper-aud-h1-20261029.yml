@@ -1,0 +1,87 @@
+name: MXM authentic copper to AUDUSD one EUR200 CSharp economic trial
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-fund200-copper-aud-h1-20261029.yml
+      - research_core_v4/laboratory/funded_copper_aud_20261029.py
+      - research_core_v4/laboratory/FUNDED_COPPER_AUD_LEAD_20261029_V1.json
+      - research_core_v4/laboratory/csharp/funded_copper_aud/**
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-fund200-copper-aud-h1-20261029.yml
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  account-preflight:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile actual unmodified EUR200 CSharp account and validate artificial native minimum-ticket cases
+        run: |
+          set -eu
+          dotnet build research_core_v4/laboratory/csharp/funded_copper_aud/MxmFundedCopperAud.csproj -c Release
+          python3 -m research_core_v4.laboratory.funded_copper_aud_20261029 selftest
+  first-authentic-economic-account:
+    needs: account-preflight
+    if: github.event_name == 'push' && github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: mxm-r3-custody-v1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Admit exactly one official post-review genuine EUR200 economic attempt
+        env: {GH_TOKEN: ${{ github.token }}}
+        run: |
+          set -eu
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-remediation-p0-p4-20261015-v1 --jq .object.sha)" = "$GITHUB_SHA"
+          test "$(gh api repos/mariancradulescu/mxm-quant-greenfield/git/ref/heads/mxm-o04-accepted-owner-1807-v1 --jq .object.sha)" = "a830c132521bd4348454653f713e04f6107484fe"
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def g(s):return json.loads(subprocess.check_output(['gh','api',repo+s],text=True))
+          v=g('actions/workflows/mxm-fund200-copper-aud-h1-20261029.yml/runs?per_page=100')
+          assert v['total_count']==len(v['workflow_runs']) and v['total_count']<=100,'NO_UNBOUNDED_ATTEMPT_HISTORY'
+          runs=v['workflow_runs'];live=[x for x in runs if x['event']=='push']
+          assert len(live)==1 and live[0]['id']==int(os.environ['GITHUB_RUN_ID']) and live[0]['head_sha']==os.environ['GITHUB_SHA'] and live[0]['run_attempt']==1,'ONLY_ONE_FIRST_MODEL'
+          parents=g('commits/'+os.environ['GITHUB_SHA'])['parents']
+          assert len(parents)==2,'REQUIRE_REVIEW_MERGE'
+          assert any(x['event']=='pull_request' and x['head_sha']==parents[1]['sha'] and x['conclusion']=='success' for x in runs),'NO_PRE_ECONOMIC_CI'
+          print('MXM_ONE_ORIGINAL_FUNDED200_ATTEMPT_ADMITTED',os.environ['GITHUB_RUN_ID'])
+          PY
+      - name: Install only existing pinned dependencies and native CSharp account binary
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/funded_copper_aud/MxmFundedCopperAud.csproj -c Release
+      - name: Authenticate original Pepperstone H1 and execute one EUR200 CSharp minimum-volume account
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.funded_copper_aud_20261029 run
+      - name: Cold read original encrypted actual funded account result without economic replay
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.funded_copper_aud_20261029 cold
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-fund200-copper-aud-first-${{ github.run_id }}
+          path: |
+            verification/funded-copper-aud-20261029/receipt.json
+            verification/funded-copper-aud-20261029/private.mxmenc
+            verification/funded-copper-aud-20261029/cold.json
+          if-no-files-found: error
+          retention-days: 90
