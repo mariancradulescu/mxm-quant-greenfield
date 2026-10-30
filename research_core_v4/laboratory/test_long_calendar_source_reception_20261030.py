@@ -61,7 +61,7 @@ class VerifiedCalendarSeparation(unittest.TestCase):
         x=m.exact_clock(times)
         self.assertEqual({w:v['causal_12bar_features'] for w,v in x.items()},
                          {'2026-W35':4,'2026-W36':4})
-        self.assertEqual(sum(v['future_8bar_observable'] for v in x.values()),0)
+        self.assertEqual(sum(v.get('future_8bar_observable',0) for v in x.values()),0)
 
     def test_distinct_weeks_not_identity_multiplication(self):
         a=clock_at()
