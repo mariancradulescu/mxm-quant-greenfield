@@ -1,0 +1,104 @@
+name: MXM integrated EUR200 equity adaptive risk research
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/equity_risk_research.py
+      - research_core_v4/laboratory/test_equity_risk_research.py
+      - research_core_v4/laboratory/csharp/risk_research/**
+      - .github/workflows/mxm-equity-risk-research-20261030.yml
+      - docs/convergence/20261030/EQUITY_RISK_REDESIGN.md
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-equity-risk-research-20261030.yml]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  no-source-risk-research-acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compile offline CSharp equity-adaptive risk without native bot or broker
+        run: |
+          set -eu
+          dotnet build research_core_v4/laboratory/csharp/risk_research/MxmRiskResearch.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_equity_risk_research -v
+  cold-original-economic-risk-research:
+    needs: [no-source-risk-research-acceptance]
+    if: github.event_name == 'push' && github.run_attempt == 1 && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1'
+    environment: mxm-r3-custody-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Admit one reviewed same-source offline risk study without reexecuting any economic model
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def get(path):
+              return json.loads(subprocess.check_output(['gh','api',repo+path],text=True))
+          def need(x,s):
+              if not x: raise ValueError('MXM_RISK_CUSTODY_'+s)
+          need(os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield' and
+               os.environ['GITHUB_REF']=='refs/heads/mxm-remediation-p0-p4-20261015-v1' and
+               os.environ['GITHUB_RUN_ATTEMPT']=='1','SCOPE')
+          need(get('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA'],'BRANCH_HEAD_MOVED')
+          need(get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']=='a830c132521bd4348454653f713e04f6107484fe','OWNER_SOURCE_ANCHOR')
+          asset=get('actions/artifacts/12954864256')
+          need(asset['workflow_run']['id']==41005510200 and
+               asset['workflow_run']['head_sha']=='7fc1926d6a9e9ed8d1e85bb87d337fecd3309721' and
+               asset['size_in_bytes']==403201 and
+               asset['digest']=='sha256:912a2085b350ba520f6ed8059939b0e5b4fda02c9e33bb2699f8cec7a9fdf340' and
+               asset['name']=='mxm-integrated-portfolio-original-41005510200' and not asset['expired'],
+               'ORIGINAL_ARTIFACT_CHANGED')
+          history=get('actions/workflows/mxm-equity-risk-research-20261030.yml/runs?per_page=100')
+          need(history['total_count']==len(history['workflow_runs']) and history['total_count']<=100,'COMPLETE_RUN_INVENTORY')
+          pushed=[r for r in history['workflow_runs'] if r['event']=='push']
+          need(len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID']) and
+               pushed[0]['head_sha']==os.environ['GITHUB_SHA'],'ONLY_ONE_ORIGINAL_COLD_STUDY')
+          parents=get('commits/'+os.environ['GITHUB_SHA'])['parents']
+          need(len(parents)==2,'PROTECTED_REVIEWED_MERGE_REQUIRED')
+          print('MXM_COLD_RISK_STUDY_ADMITTED_NO_NEW_STRATEGY_TRIAL')
+          PY
+      - name: Download original existing encrypted CSharp portfolio result, no model replay
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          mkdir -p verification/portfolio-programme-20261030
+          gh run download 41005510200 -R mariancradulescu/mxm-quant-greenfield \
+            -n mxm-integrated-portfolio-original-41005510200 \
+            -D verification/portfolio-programme-20261030
+          test -f verification/portfolio-programme-20261030/private.mxmenc
+          test -f verification/portfolio-programme-20261030/receipt.json
+          test -f verification/portfolio-programme-20261030/cold.json
+      - name: Pinned dependencies and isolated offline CSharp risk study only
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/risk_research/MxmRiskResearch.csproj -c Release
+      - name: Independent cold original account reconciliation plus offline risk stress
+        id: research
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.equity_risk_research cold
+      - name: Preserve private encrypted risk comparison and aggregate public evidence
+        if: steps.research.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-original-equity-risk-study-${{ github.run_id }}
+          path: verification/risk-research-20261030/
+          if-no-files-found: error
+          retention-days: 90
