@@ -25,14 +25,18 @@ class DeliveryReadback(unittest.TestCase):
 
     def test_all_overlapping_weeks_have_strict_hard21_upper_bound(self):
         r=self.result
-        self.assertEqual(r['max_same_iso_week_optimistic_combined_entries'],17)
+        self.assertEqual(r['max_same_iso_week_recorded_accepted_entries_sum'],17)
+        self.assertEqual(r['all_reported_rejected_entries'],3)
+        self.assertEqual(r['max_weekly_optimistic_bound_including_all_rejections'],20)
         self.assertEqual(r['peak_sum_even_if_on_different_weeks'],20)
         self.assertEqual(r['status'],'CERTAINLY_BELOW_HARD21_FROM_FROZEN_CANDIDATES')
         self.assertEqual(len(r['weekly_upper_bounds']),13)
         for row in r['weekly_upper_bounds']:
             self.assertEqual(sum(row['separate_account_entry_counts'].values()),
-                             row['optimistic_joint_entries_upper_bound'])
-            self.assertLess(row['optimistic_joint_entries_upper_bound'],HARD21)
+                             row['recorded_accepted_entries_sum'])
+            self.assertEqual(row['absolute_bound_if_all_original_rejections_added'],
+                             row['recorded_accepted_entries_sum']+3)
+            self.assertLess(row['absolute_bound_if_all_original_rejections_added'],HARD21)
             self.assertGreater(row['shortfall_to_HARD21_at_least'],0)
 
     def test_owner_current_risk_bounds_are_not_legacy_stage_b_promotion(self):
