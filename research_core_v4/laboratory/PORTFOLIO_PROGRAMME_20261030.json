@@ -1,0 +1,203 @@
+{
+  "schema": "mxm.registered-portfolio-policy.v1",
+  "id": "V4-PORTFOLIO-RELATIVE-EFFICIENCY-20261030",
+  "programme": "PORTFOLIO_RELATIVE_EFFICIENCY_20261030",
+  "partition": "DEVELOPMENT",
+  "prospective_at_ms": 1793318400000,
+  "orders": 0,
+  "cloud": false,
+  "max_authentic_attempts": 1,
+  "mechanism": {
+    "name": "JOINT_CROSS_MARKET_DIRECTIONAL_EFFICIENCY_INVENTORY",
+    "definition": "Twelve-hour signed displacement divided by observed adjacent hourly absolute returns; relative deviation from contemporaneous median across AUDUSD, Copper and SpotCrude. Persistent single portfolio target, flat when unsupported or dispersion absent.",
+    "distinct_from_closed": "Not single-symbol six-bar trend, one-hour impulse, cross-market residual fade, Copper shock transfer, pooled ridge or sign-context learning. This is a new joint target-inventory policy; no prior configuration is retuned or replayed.",
+    "novelty_claim": "Distinct registered project procedure only, not a claim of academic novelty.",
+    "dependent_market_cells": 3,
+    "model_searches": 0
+  },
+  "source": {
+    "release_id": 409747426,
+    "partition": "EXPOSED_DEVELOPMENT_NOT_CONFIRMATION",
+    "start": "2026-08-03T00:00:00Z",
+    "end": "2026-08-31T00:00:00Z",
+    "assets": {
+      "1": {
+        "asset_id": 631098100,
+        "sha256": "c33f401a97d06e2efe31e49f37a1f977238b41b66eb1d939b1d6700fb2530915"
+      },
+      "5": {
+        "asset_id": 631095492,
+        "sha256": "75602c6520cadce8e878e7dce607aa896dd025b3388b16b1f722699ebc455850"
+      },
+      "111": {
+        "asset_id": 631086728,
+        "sha256": "2538248862212f2c7258a0e5183fc8e5b283f7c6fc84fd44de1fd4bf7948a16e"
+      },
+      "250": {
+        "asset_id": 631098274,
+        "sha256": "809e20a51550ad50bc6ac4a8df524deba47d640f5a0d35454b496ffd2a9d3c2f"
+      }
+    },
+    "preflight": "All fixed weekday hours 07..17 UTC for all four sources; at least 40 joint historical feature timestamps. No price-based admission or future-filtered signal selection.",
+    "new_broker_requests": 0
+  },
+  "timing": {
+    "feature_end": "Last completed H1 close visible at its exact end; 12h endpoint required and at least 9 observed adjacent hourly pairs. Gaps are not compressed.",
+    "decision": "Weekday hours 07..15 UTC; explicitly flat at 16 UTC decision.",
+    "execution_delay_hours": 1,
+    "expiry_seconds_after_valid_from": 1,
+    "intrabar": "Open, adverse-to-prior-known-target extreme +1s, other extreme +1800s, close +3599s. Constructed reference scenario, never claimed actual tick ordering.",
+    "normalization_training": "No training or outcome-dependent normalization; signed efficiency clipped to [-1,1]."
+  },
+  "target": {
+    "roster": [
+      "AUDUSD",
+      "Copper",
+      "SpotCrude"
+    ],
+    "maximum_positions": 1,
+    "minimum_cross_market_dispersion": 0.5,
+    "minimum_absolute_median_deviation": 0.25,
+    "selection": "Largest absolute median deviation; lexical symbol tie-break; long positive deviation, short negative. Same target retains inventory; targets on other symbols close before the newly selected target quote.",
+    "missing_feature": "FLAT, not backfilled or a stale previous signal."
+  },
+  "risk": {
+    "initial_eur": 200,
+    "deposit_count": 1,
+    "reset_count": 0,
+    "max_margin_fraction": 0.4,
+    "free_margin_reserve_eur": 120,
+    "max_stop_risk_equity_fraction": 0.01,
+    "max_new_loss_eur": 2,
+    "max_ticket_margin_eur": 80,
+    "roundtrip_reserve_eur": 0.4,
+    "HARD21": "Whole-system requirement, never forced entries or a per-mechanism gate."
+  },
+  "cost_scenario": {
+    "historical_terms_proven": false,
+    "historical_bidask_proven": false,
+    "minimum_volume_and_margin_capture": "2026-09-22; necessary current-term evidence, not historical applicability",
+    "fx": "EURUSD H1 open plus/minus 0.0003, held as declared reference within hour.",
+    "funding": "Zero modeled because all inventory must close by 17 UTC; no historical funding or swap proof.",
+    "benchmark": "Same initial EUR200 cash, zero exposure, zero return; no alternate strategy selected after seeing outcome.",
+    "instruments": {
+      "AUDUSD": {
+        "units": 1000,
+        "margin_eur": 31.04,
+        "spread": 0.00015,
+        "slippage": 5e-05,
+        "fee_eur": 0.04,
+        "stop": 0.0012
+      },
+      "Copper": {
+        "units": 20,
+        "margin_eur": 11.95,
+        "spread": 0.005,
+        "slippage": 0.001,
+        "fee_eur": 0,
+        "stop": 0.02
+      },
+      "SpotCrude": {
+        "units": 1,
+        "margin_eur": 8.53,
+        "spread": 0.04,
+        "slippage": 0.01,
+        "fee_eur": 0,
+        "stop": 0.5
+      }
+    }
+  },
+  "closure": {
+    "net_nonpositive": "CLOSE_NO_PROMOTION_NO_RETUNING",
+    "positive": "DEVELOPMENT_SCENARIO_ONLY; no claim of robust edge; costs, independent confirmation and native reception remain required.",
+    "missing_source": "Stop before policy outcome, no artificial completion.",
+    "ambiguity": "Stop without automatic retry.",
+    "protected_partition_opened": false,
+    "closed_models_rerun": 0
+  },
+  "implementation_sha256": {
+    ".github/workflows/mxm-portfolio-programme-20261030.yml": "5d0c5dd142b97eb7db1597e41e24f135968af1fff16195bb8f18d1f4da41ded0",
+    "docs/economic-development/20261029/compression-decision/broker-minimum-volume-projection.json": "9a78920d4cbcae9304f543be0f46c5298d88e71cf15c23b2f78b7f3af028a049",
+    "research_core_v4/laboratory/csharp/portfolio_policy/MxmPortfolioPolicy.csproj": "e43912475905b97145b90b2739c98833e2105a80708879ce2a871e07a77a88bc",
+    "research_core_v4/laboratory/csharp/portfolio_policy/Program.cs": "eaaa876125ec13d574edf113d782148743f4e602413be1bad9248b148aba7139",
+    "research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj": "9c6d3ca399c37b12cef5c2b79ded128545593725cc0ea7dca53f29af63a4adab",
+    "research_core_v4/laboratory/csharp/shared_account/Program.cs": "1d4ee619278f535c68123c7529eefea6f675a6b0ecc56d401e65e5a2802cef87",
+    "research_core_v4/laboratory/funded_account.py": "46f2ca8db78f9006c8cdd94a6cb0a4edee87886bc0e1e40fd039738ab894c98d",
+    "research_core_v4/laboratory/portfolio_programme.py": "f0a6fdecc0263e1287cf403339253391522683f2293d73401a847100d83ab28b",
+    "research_core_v4/laboratory/programs.py": "d68bfa918928050b8d23fff0e47858934edea2d63d428b318dc300c6ebff3433",
+    "research_core_v4/laboratory/test_portfolio_programme.py": "4d7ceaec184686bbc4e290e314234f7e8d79f34ca483fcbd06faf8055928b28a",
+    "research_core_v4/native_tick_replay_v1/csharp/EconomicReference.cs": "ead3d534ba6f1ae05200541d99fe253d8c652c89d33ed3517fbe7136033934b3",
+    "research_core_v4/native_tick_replay_v1/csharp/EconomicReference.csproj": "e9672374be95607caa7403694059ca16e732992f291fb3f5d23d893763a84a2e",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmAccountIsolation.cs": "16c2a068131b44e995227bd78961830a54cdc7d17b836990862e442869ddb1bb",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBookObservation.cs": "0ef63c4a45ce920737144a0ebad7ff041aec9fa352731ddafc4851ed57aaaa60",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBookShape.cs": "3c444654cf28047778af29c44649f96b3006434349d3233212365d8b5ffe1193",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerCashflowFixture.cs": "569fdea3547086093727e1ff471c84987b09e91cdb6383f2cffa49edf2f5bbb8",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerCashflowFixture.csproj": "0dbf9f840c0815a901b75effb73d48782f764019006d09355d2b57483aa70036",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerCashflowInventory.cs": "145a7b80b66f098256b6bb5df83a950d77fa8ee5e8eb4184a469fda9b1c68db2",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerIntentFence.cs": "db3b484a9b44b2c2f306863ba979fce8d80f8d15192c2518ecdf07083a613b5f",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerIntentFenceFixture.cs": "9ddcd0b8032527319a90deb5322db132f337a09c4176f446a4ec6e224e127802",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerIntentFenceFixture.csproj": "9597b77de5fbdd78ddcd780dd70b8d3ce2bacd94005d8bd93d188b29528a96e3",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmBrokerOpeningInventory.cs": "d5a5af60c205196637ba69c6ef9a96a1e6a3c1dfee38652968d215d03a37acaa",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCapitalAdmission.cs": "bf30274cc5cf57c64dd4f5329b6ddd0d6c56153be97e86539150d497648eab98",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCausalIntent.cs": "0312737a084b4180e9612cd6d511613d9dd15742f12131e5b85a6d57e69ed16f",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCommissionFloor.cs": "8f38270ce730508ad333211244b8c85505b8d8060f54ab654ed0fc0d2096adb5",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCommissionQuoteAdapter.cs": "70e8b6230cced6c1af06e8ced38d11f9a4ea2d0cfc5118649748c9fb56acb41d",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.cs": "82800ea2e21470c350dc4d7bfac54b7b068453ea415766ffa7178b3fa76fc203",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCompressionDevelopment.csproj": "671cb431fa172045655fb01aa8c2404f7f5336412f3b933b316816331b6ba036",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmCompressionReleaseKernel.cs": "e0042054bf056937d183c1d120990b8dcb07efcfadaf47e7f4cfffbf23d19c5b",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmConfirmedEntryLedger.cs": "70cc83a1db543b0b676f220d3a95abe3a7a7c3d190f492a4200985c78de74e98",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmConfirmedEntryLedgerFixture.cs": "f26981a66d10673b801d0c4bfa1ecf7f12c2e21c45eb2bd649d8bd0b23c7ea72",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmConfirmedEntryLedgerFixture.csproj": "9e6573c720ac6e354f7554be784e9dde8c8abba0f6bd6f831e18ca22a1a062fe",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmDecisionKernel.cs": "8a5910b5f552907ac456c18331e4f9f1c66364d7350224357bab4446b592db32",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmDisplayedFinancing.cs": "9f100dee59e5ea955d69cb6ed43640b6acfeb9125e185ca05bcaf8379946a333",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpoint.cs": "a0efb1660fd8a7a39aad0268b7ad529e39e85cc25eb50e309e5b19fc58d5f28c",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpointFixture.cs": "4a4710cde45f06a9043d7c4d070e2e956b7c9961f5fd06b4428f6a812f21ed91",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEntryCheckpointFixture.csproj": "b2a4ce3ce4816e93d52bd49d03d671fadf4eb257fed7dee74013ae8e1aa8e6ff",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEntryRecovery.cs": "d706622e4d8c64f2578590255f036750add49490a09ce7fc8597342ff35a11e3",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEntryRecoveryFixture.cs": "e0defaff925b041ab288d2485cdce6f9fc5401f8a42321a054acb72835724d1b",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEntryRecoveryFixture.csproj": "64d70d6c4d0f1bc05d3d10a0342e19c364be3274cc3ae3df2ed59a961a7b554d",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmEurUsdCapturedCosts.cs": "c81ce0d457e4843d38354a300d3bda59f40c3580ad7b239788025fe304e94467",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmExitPolicy.cs": "4eba82aca5f84a28305eb9151d147a6ccdc1d81ab2a6fa102f169fad9a29dde9",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmExpectedMarginObservation.cs": "1fe1c1147074a39e3c12c2f096efc3a2cf7d982fbbfa21aa7817afd58a1b6d4d",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmFinancingScenarioAdapter.cs": "e970685f1b3a57e261b91dcbceecb9bcd02d14ed0a6083f53b2c83f0c051dd1b",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmHistoricalOrderFixture.cs": "771a3edf57282978716a50f47f41c93ceb7367f665006309d4eda6d9aed6c760",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmHistoricalOrderFixture.csproj": "3d76c6b0c0de80601d499733e05e7cb5ef25ee8ab57f51998651fd5888f74d22",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmHistoricalOrderInventory.cs": "f65087b6d93b53c5273ecefb7ff23d9b3184f9224950e15e7c85df886b8dac9f",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmInstrumentCommission.cs": "34c9515f5d27baba172c5947bae40a55953b6e92990cff9f91d0b1f1081539aa",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeCommission.cs": "cadd2d9d4ba03c68868cf3dfdd53a355989937c4b5e3a6ed62832a72c3ac9a98",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeCommissionFixture.cs": "0fc86258ab092636a5d9954cd56a4b80b6372035586de545ff8f38a70f58ffcb",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeCommissionFixture.csproj": "a5e533ad2d7b9f2906dc0e03855929ca0079f779310e2930fd7d749847e710ae",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeFinalAccountFence.cs": "7db6f990647ab5c3bdf7c4d64e9916898be0d841e13d889b9a4727eff501f6a2",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeRiskObservationLease.cs": "e00e04ddd9a715b233791d2f3b548265cc5b1e4bf2c3c8df9a2c56bfd7017837",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeRunFence.cs": "39423dbb5a6d7ee53f759032ec8899a891ed0a2e2bd823cc140860dbb3c06b4e",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeVolumeSearch.cs": "22bf692261c450f67dea10a46b918d75af25e627481111c019c589dc7a850183",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeVolumeSearchFixture.cs": "329efbd359487351dadee06e283f98c83e3094bbc7d87562a60e648c317cc3a1",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmNativeVolumeSearchFixture.csproj": "34115fa559a7b31ee401f076086f895d50890d33a4588a6e1b51f15a8f7f45dc",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmObservedCostFx.cs": "b140854b4030c0a1e507cfb61e72423a91e568144089937bf983f90437b148cd",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmOnlineAr1Kernel.cs": "25aa04d14f60ffffbb89272ca065e16308cbfb14b829cea093ce93cfabe91159",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmOrderProtection.cs": "1f99f75bf61d9037a04ad0116408e08197dca8b12ac6ef4401895dbe15182be7",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmOwnerEntryEnvelope.cs": "62c177276a481ea51ce9ac50119edef8094895c97c81373ea2f7b21a0c1f3b74",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplay.cs": "7fc3f787d037aef8616787a99c37ed2273f00a15af6cedadff0ce515b4ec2b1b",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplayFixture.cs": "372a09e978cf31a041d9c3eb0fcc4bf82cde3bdcf9d5cbac427de3a74ce732a8",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioAccountReplayFixture.csproj": "545b08077555cca0d7b84394fa3af540892246bd281f0a83bff3d4a005b39b63",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioFixture.cs": "adfe2d2a8512b512a603ac9636ac626f8307c350e0eeef0f5b680a5e3e164d04",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioFixture.csproj": "0ddc8101d77e1b25fc954035a9ff1d8213eaaad4f13870a4c295e1f6e109088b",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.cs": "baa25736106cdcb706c3171f164b68e471054c6d83337b148cc88468b9759300",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioNativeQuoteReadback.csproj": "44dc916420853b304376b1c0217105d8ea1b306d95c13cabec53a59d08bcbc0d",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioReplayRecovery.cs": "cbfebb92b8b37dcbb40e83e6f52c9d835514b1c4badf8eab00201332d9d42f66",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioReplayRecoveryProbe.cs": "4f26c1746686885415b03864088c081c6e92f3d5610794a43d2a47f82568e5f3",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmPortfolioSequencer.cs": "ba8e05e9b736fd712c19a0ca27f96f170b0dd9c7727bec51b4144a19677e8ae7",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmQuoteInnovationKernel.cs": "770c49399f7cf0418af9cb52689efd2c837b7648d78e9c617bbe68843afde10a",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj": "c788eb1dd1daa88e4e74cbc9167464cadd3ae157b5487326b610293e3f71f075",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs": "1eb091544449afe7b178b0cbc0b0ae1738ad6c38c1191a79036eab653e466ca4",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmRelativeStrengthNativeObservation.cs": "8f20644ecaf037d5f5924813852d2da7081332a9c731f63ec9b5cc9387a2ef99",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmRelativeStrengthPortfolio.cs": "bc862dfca2c3d9f4b6f9ae7522894e14750070de0315bb23da4cbadadbaf0bb4",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmSequencedDepthBook.cs": "67bbc1308ba14f462eb24ad74c959c42fb46565d767d27e0ab293159c9862dde",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmStopRiskAdmission.cs": "80eea56f8d4952484714df9120b61296bb24d7d61f59d8b4608bbbd25d2f90c2",
+    "research_core_v4/native_tick_replay_v1/csharp/MxmStopRiskGeometry.cs": "59874213c06103a17f84c1fead5c9e895e8d37aebd50a867bfb525ca091f5b45",
+    "research_core_v4/native_tick_replay_v1/csharp/NativeCompatible.csproj": "5990cfab2fff93adb32a95dd1991663d78fe4517d38044c194ced90010ef01f6",
+    "research_core_v4/native_tick_replay_v1/csharp/Program.cs": "8073dc54a68f6e3187cb0f7588a05eaf2e9cefc30fcb995cc7928271bca93cd4",
+    "research_core_v4/native_tick_replay_v1/csharp/Replay.csproj": "d99effa5e22b20cac3b15186ece695a61e05ad6fec6fc7787eab7e65bf714e1d",
+    "research_core_v4/native_tick_replay_v1/csharp/StreamKernel.cs": "add7b9f5f7a020980ef0e7e2c4367338f47501b3502ee921b509e29519b11a53"
+  }
+}
