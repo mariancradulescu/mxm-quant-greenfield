@@ -1,0 +1,62 @@
+name: MXM single evolving cBot HEAD and historical reference non-mutation
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/native_tick_replay_v1/operational/**
+      - research_core_v4/laboratory/broker_full_universe_source_aperture_20261030.py
+      - docs/economic-development/20261030/BROKER_FULL_UNIVERSE_EUR200_SOURCE_APERTURE.json
+      - docs/economic-development/20261030/OPERATIONAL_BOT_FROZEN_PROVENANCE_SEPARATION.md
+      - .github/workflows/mxm-operational-native-single-product-ci.yml
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  frozen-provenance-and-one-operational-bot:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Preserve the exact historically registered product and one operational source
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import hashlib,json,pathlib,xml.etree.ElementTree as ET
+          root=pathlib.Path('.')
+          frozen=root/'research_core_v4/native_tick_replay_v1/csharp/MxmReferenceProductBot.cs'
+          working=root/'research_core_v4/native_tick_replay_v1/operational/MxmReferenceProductBot.cs'
+          extra=root/'research_core_v4/native_tick_replay_v1/operational/MxmNativeEconomicObservation.cs'
+          spec=json.loads((root/'research_core_v4/laboratory/PORTFOLIO_PROGRAMME_20261030.json').read_text())
+          for name,expected in spec['implementation_sha256'].items():
+              actual=hashlib.sha256((root/name).read_bytes()).hexdigest()
+              assert actual==expected,(name,'FROZEN_REGISTERED_ECONOMIC_IMPLEMENTATION_CHANGED')
+          assert frozen.read_bytes()!=working.read_bytes()
+          assert 'public sealed partial class MxmReferenceProductBot : Robot' in working.read_text()
+          assert 'if(phase=="BAR_CALLBACK")ReportNativeMinimumTicketAperture();' in working.read_text()
+          helper=extra.read_text()
+          assert 'nativeRun.IsObserving' in helper and 'expectedNetEUR=UNKNOWN' in helper
+          assert all(s not in helper for s in ('ExecuteMarketOrder','PlaceLimitOrder','PlaceStopOrder','ClosePosition(','ModifyPosition(','CancelPendingOrder(','LocalStorage','HttpClient'))
+          product=ET.parse(root/'research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj').getroot()
+          historical=ET.parse(root/'research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj').getroot()
+          def props(x):return {c.tag:c.text for group in x.findall('PropertyGroup') for c in group}
+          assert props(product).get('AlgoPublish')=='false' and props(historical).get('AlgoPublish')=='false'
+          assert props(product).get('AlgoName')==props(historical).get('AlgoName')=='MxmReferenceProductBot'
+          all_sources=[c.attrib['Include'] for group in product.findall('ItemGroup') for c in group if c.tag=='Compile']
+          assert len(all_sources)==len(set(all_sources))
+          assert all_sources.count('MxmReferenceProductBot.cs')==1 and all_sources.count('MxmNativeEconomicObservation.cs')==1
+          assert '../csharp/MxmReferenceProductBot.cs' not in all_sources
+          assert sum(pathlib.Path(s).name=='MxmReferenceProductBot.cs' for s in all_sources)==1
+          print('FROZEN_83_SOURCE_SHA256_IDS_UNCHANGED; ONE_EVOLVING_CBOT_BUILD; OBSERVATION_READ_ONLY; NO_ORDERS')
+          PY
+      - name: Compile frozen historical reference only to preserve scientific source receipt
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/csharp/MxmReferenceBot.csproj -c Release
+      - name: Compile the only evolving native cTrader operational artifact with all existing safety shared kernels
+        run: |
+          dotnet build research_core_v4/native_tick_replay_v1/operational/MxmOperationalProductBot.csproj -c Release
+      - name: Existing broker ambiguous order and native purpose fail closed checks
+        run: |
+          dotnet run --project research_core_v4/native_tick_replay_v1/csharp/MxmHistoricalOrderFixture.csproj -c Release
+          dotnet build research_core_v4/laboratory/csharp/native_run/MxmNativeRun.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_native_observation_mode -v
