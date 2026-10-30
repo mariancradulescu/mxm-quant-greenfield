@@ -272,63 +272,6 @@ public sealed partial class MxmReferenceProductBot : Robot {
   Print("MXM_NATIVE_OBSERVATION phase={0} environment={1} bars={2} repeatedBars={3} observation={4} run={5} accountScope={6} accountMutation=false executable=false durableRecovery=false capital=false hard21=false",
    phase,Application.EnvironmentType,nativeReceptionBarCallbacks,nativeReceptionRepeatedBars,
    System.Text.Json.JsonSerializer.Serialize(view),nativeReceptionRunId,nativeReceptionScopeFingerprint);
-  // One bounded economic quote preview per observed completed bar. No trading
-  // intent, volume selection, price-dependent strategy logic or broker order.
-  if(phase=="BAR_CALLBACK")ReportNativeMinimumTicketAperture();
- }
- // Quotes, margin and pip-risk are native snapshots, not firm execution
- // prices, historical broker costs or proof of a positive EUR expectancy.
- // In particular, unknown commission/funding/contract PnL prohibits NET.
- void ReportNativeMinimumTicketAperture() {
-  if(!nativeRun.IsObserving)return;
-  try {
-   if(nativeReceptionSymbol==null || nativeReceptionBook==null)
-    throw new ArgumentException("NATIVE_ECONOMICS_SOURCE_MISSING");
-   var now=Environment.TickCount64;
-   var book=nativeReceptionBook.ReadBook(now);
-   var view=book.Observation;
-   if(!view.SessionOpen || view.Faulted || view.Events==0 ||
-      view.Origin!=MxmObservationOrigin.NativeCallbackSnapshot ||
-      !MxmBookShape.NonCrossed(view.Shape) ||
-      !book.Bid.HasValue || !book.Ask.HasValue ||
-      !view.BidAgeMs.HasValue || !view.AskAgeMs.HasValue ||
-      view.BidAgeMs.Value>5000 || view.AskAgeMs.Value>5000)
-    throw new ArgumentException("OBSERVED_NATIVE_BOOK_ABSENT_OR_STALE");
-   var symbol=nativeReceptionSymbol;
-   double bid=book.Bid.Value,ask=book.Ask.Value;
-   if(!double.IsFinite(bid) || !double.IsFinite(ask) || bid<=0 || ask<bid ||
-      bid!=symbol.Bid || ask!=symbol.Ask)
-    throw new ArgumentException("NATIVE_QUOTE_OR_CALLBACK_MISMATCH");
-   double min=symbol.VolumeInUnitsMin,step=symbol.VolumeInUnitsStep,
-    max=symbol.VolumeInUnitsMax,stopPips=StopLossPips;
-   if(!double.IsFinite(min) || !double.IsFinite(step) || !double.IsFinite(max) ||
-      min<=0 || step<=0 || max<min || stopPips<=0 ||
-      symbol.NormalizeVolumeInUnits(min,RoundingMode.Down)!=min ||
-      Account.Asset?.Name!="EUR" || !double.IsFinite(Account.Equity) ||
-      !double.IsFinite(Account.FreeMargin) || Account.Equity<=0 ||
-      Account.FreeMargin<0 || Account.FreeMargin>Account.Equity)
-    throw new ArgumentException("NATIVE_VOLUME_OR_EUR_ACCOUNT_UNVERIFIED");
-   double buyMargin=symbol.GetEstimatedMargin(TradeType.Buy,min),
-    sellMargin=symbol.GetEstimatedMargin(TradeType.Sell,min),
-    illustrativeStopRisk=symbol.AmountRisked(min,stopPips);
-   if(!double.IsFinite(buyMargin)||!double.IsFinite(sellMargin)||
-      !double.IsFinite(illustrativeStopRisk)||
-      buyMargin<=0 || sellMargin<=0 || illustrativeStopRisk<=0)
-    throw new ArgumentException("NATIVE_MARGIN_OR_STOP_ESTIMATE_UNAVAILABLE");
-   double spreadBps=10000d*(ask-bid)/((ask+bid)/2d);
-   if(!double.IsFinite(spreadBps) || spreadBps<0)
-    throw new ArgumentException("NATIVE_SPREAD_UNVERIFIED");
-   // This preview does NOT apply the production gate or infer the commission
-   // from a missing broker field; it only identifies a necessary condition.
-   string marginOnly=buyMargin<=Account.FreeMargin && sellMargin<=Account.FreeMargin
-     ?"NECESSARY_CURRENT_MARGIN_ONLY":"ONE_OR_BOTH_DIRECTIONS_MARGIN_UNAVAILABLE";
-   Print("MXM_NATIVE_MIN_TICKET_ECONOMIC_APERTURE symbol={0} minUnits={1} stepUnits={2} bid={3} ask={4} spreadBps={5:F5} minBuyMarginEUR={6:F4} minSellMarginEUR={7:F4} illustrativeStopPips={8} illustrativeStopRiskEUR={9:F4} observedEquityEUR={10:F4} observedFreeMarginEUR={11:F4} marginStatus={12} quoteReceiptAgeMs={13} roundtripCommissionEUR=UNKNOWN slippageEUR=UNKNOWN contractNetEUR=UNKNOWN expectedEdgeEUR=UNKNOWN brokerFill=false HARD21=false CloudRecovery=false purpose=OBSERVATION_ONLY",
-     symbol.Name,min,step,bid,ask,spreadBps,buyMargin,sellMargin,stopPips,illustrativeStopRisk,
-     Account.Equity,Account.FreeMargin,marginOnly,Math.Max(view.BidAgeMs.Value,view.AskAgeMs.Value));
-  }catch(Exception e){
-   Print("MXM_NATIVE_MIN_TICKET_ECONOMIC_APERTURE_UNAVAILABLE reason={0} accountMutation=false",
-     e.GetType().Name);
-  }
  }
  void StopNativeObservation() {
   // Latch before unsubscribe/report: late or reentrant callbacks stay inert.
