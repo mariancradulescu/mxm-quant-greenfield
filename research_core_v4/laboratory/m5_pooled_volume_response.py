@@ -71,7 +71,8 @@ def inspect(rows,segment):
         need(set(row)=={"time_utc","open","high","low","close","tick_volume"},"ROW_SCHEMA")
         d=dt.datetime.fromisoformat(row["time_utc"].replace("Z","+00:00"))
         t=int(d.timestamp())
-        need(d.utcoffset()==dt.timedelta(0) and t>=start and t<=stop and t%300==0
+        need(row["time_utc"].endswith("Z") and d.utcoffset()==dt.timedelta(0)
+             and t>=start and t<=stop and t%300==0
              and t>prev and row["time_utc"] < END,"M5_TIMESTAMP_OR_PROTECTED")
         vals=[float(row[f]) for f in ("open","high","low","close")]
         vol=int(row["tick_volume"])
@@ -83,7 +84,8 @@ def inspect(rows,segment):
 
 
 def features(stamp,bars,i):
-    if i<FEATURE_LOOKBACK or stamp[i]-stamp[i-FEATURE_LOOKBACK]!=FEATURE_LOOKBACK*BAR:
+    if i<FEATURE_LOOKBACK or any(stamp[k]-stamp[k-1]!=BAR
+        for k in range(i-FEATURE_LOOKBACK+1,i+1)):
         return None
     cur=bars[i]
     prev=bars[i-24:i]
