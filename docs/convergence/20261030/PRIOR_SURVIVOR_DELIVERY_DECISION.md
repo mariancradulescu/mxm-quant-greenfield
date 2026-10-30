@@ -1,0 +1,31 @@
+# Integrated EUR200 programme decision from closed positive Stage B outcomes
+
+**30 October 2026 — OWNER B–E fundamental redesign, no new trial.** Reconciled official parent `14f7d8b417c88e286af239bd6cb532aa555b7ccb`. This is a portfolio PRODUCT decision based on immutable, already-completed Stage B records—not a new backtest, strategy, account, economic outcome, source request, Cloud operation or change to a candidate.
+
+The 30 October first genuine integrated portfolio scenario (run 41005510200, PR272–273) remains negative: EUR200 → EUR178.52143601045014, modelled NET −EUR21.47856398954986. The original cold economic forensic run 41011291898 apportioned that loss into negative ex-post mid-reference EUR14.37747576083068, modeled execution friction EUR6.06108822871918, and commissions EUR1.04. Even eliminating the modeled friction does not produce a positive gross hypothesis. This exact identity is closed, not tuned.
+
+## Salvage the already-recorded positive evidence without pretending it is the final portfolio
+
+Three previously completed Stage B candidate scenarios have positive individually simulated EUR200 final cash: C006 +EUR58.6947216647057 over 246 weeks and 108 entries; C012 +EUR57.84259369263856 over 246 weeks and 35 entries; C031 +EUR13.00444834224848 over 13 weeks and 126 accepted entries. These are three **separate** accounts and three separate source horizons, not one jointly capitalized C# path. Adding their EUR profits or drawing a combined equity curve would be scientifically invalid.
+
+The programmatic owner-contract check is `python3 -m research_core_v4.laboratory.portfolio_delivery_gate report`. It uses SHA-pinned exact Git-tracked source blobs and never invokes a policy, market feed, C# account model or external provider. Its result is accepted only on complete common weekly coverage.
+
+**Product bottleneck #1 — system frequency.** C031's common observed interval is 2026-W25 through W37. On each of these 13 ISO weeks, summing original accepted entries from all three **separately evaluated** candidates is only an *optimistic upper bound* for any joint program. The largest **recorded accepted-entry sum** is 17 entries in W25 (C031 15 + C006 2 + C012 0). C031 also reports **three rejected entries** without an ISO-week allocation in the summary. Conservatively assign **all three rejected entries to every single week**, as though a different funded account could admit them: even this impossible-for-every-week simultaneous best case is bounded at **20** in W25, still below systemic HARD21=21. C006/C012 report zero margin-blocked trades. The bound applies **only to the fixed recorded accepted and rejected signals of these three frozen Stage B paths**, not to new opportunity generation, model redesign, new source windows or a different prospective portfolio whose decisions can change. A true combined EUR200 account was not run. Independently maximizing each accepted-count series on different weeks gives 15+3+2=20, but the correct matched-week accepted maximum is 17. Therefore none of the 13 overlapping weeks demonstrates that these exact recorded signal sets, even generously salvaging all reported rejections, could have reached HARD21. This finding **does not** imply any global market impossibility or a per-mechanism HARD21 requirement.
+
+**Product bottleneck #2 — current OWNER capital and exposure contract.** The original C012 Stage B current-broker-configuration scenario admitted a peak EUR129.04 ticket margin, above today's OWNER EUR80 maximum; it cannot be treated as risk-admissible just because its original margin-only scenario finished at EUR257.84. C031 reports a minimum *path* free margin EUR69.74870621477253, below EUR120; however this aggregate minimum is **not timestamped to a particular new-entry admission**, so it cannot by itself prove that OWNER's reserve-at-entry rule was violated. It instead leaves entry-level reserve and native risk compliance **unverified**; positive scenario NAV cannot certify them. C006's peak EUR33.38 ticket margin is below the EUR80 absolute ceiling, but its summary has no complete proof of per-event current reserve, 1% system stop risk, commissions, broker stops or historical point-in-time cost terms. A necessary pass is **not** a permission to deploy it. Historical margin certification is false in all three stored records. Their individually modeled positive NET is not independent robust edge.
+
+## Integrated economic direction
+
+Do not reexecute C006, C012, C031, change their thresholds, combine their PnLs, raise EUR200, silently discard idle weeks, or count simulated signals as actual HARD21. Keep their original positive findings as unqualified DEVELOPMENT information, not completed portfolio qualification.
+
+The economic bottleneck to solve next is **genuinely new, high-density, after-cost predictive information** that can clear a *single* continuous EUR200 account's minimum-volume, margin/reserve, 1% stop-risk and risk-allocation constraints. Treat source time/quote support, actual broker costs/FX, serial execution, pending results, and chronological independent validation as properties of the one product—not as post-hoc add-ons to a winning strategy. Low-density candidates can be considered components once economically qualified, but cannot alone fill the systemic execution floor. Do not mine this already-exposed overlapping 13-week cohort as independent validation for a new algorithm.
+
+This readback makes **zero** new scientific trials, zero C# account replays, zero native orders and zero Cloud activations. No asset or funding source outside authorized Pepperstone/cTrader data is used. Spotware Cloud order-finality questions remain an independent product blocker; existing observation-only permissions and fail-closed gating are unchanged.
+
+## Exact archived source contracts
+
+- `m6/results/V2-C006_STAGE_B_CURRENT_CONFIG_V1.json` — pinned Git blob `0234d84f09a168ff70da4c07b9ccde49159010fc`.
+- `m6/results/V2-C012_STAGE_B_CURRENT_CONFIG_V1.json` — pinned Git blob `8c3b1fcdad6b43fcfed2af0919f3ddffd3b541f7`.
+- `m6/results/V2-C031_STAGE_B_CURRENT_CONFIG_V1.json` — pinned Git blob `8ece3eea143413198008b9a3926e5e0f810c7293`.
+
+Historical Stage B results remain byte-identical; this check neither alters nor promotes them.
