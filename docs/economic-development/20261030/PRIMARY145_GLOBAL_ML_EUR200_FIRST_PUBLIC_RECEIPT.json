@@ -1,0 +1,279 @@
+{
+  "schema": "mxm.integrated.authentic-primary145-global-ml-min-ticket-development-closure.v1",
+  "date_utc": "2026-10-30",
+  "partition": "EXPOSED_DEVELOPMENT_NOT_HELD_OUT_CONFIRMATION",
+  "source": {
+    "original_archives_sha256": [
+      "09d999a595436de73c5edbb3d4a84002dc8b8779dc94393473d43afe1c3d9259",
+      "37a47cb9ff8bc9cce50aee830c1bd286b9db359df1200d4e4b9a0ce35f8fd12e"
+    ],
+    "broker_native_snapshot_zip_sha256": "9553fd3b60f4f5dc8428c30d19cde7d7a13cad12de18a27a93785836e97f5f77",
+    "broker_capture_utc": "2026-09-22T04:12:43.448107Z",
+    "source_market_count": 145,
+    "source_qualifying_feature_rows": 773855
+  },
+  "actual_executed_scripts_sha256": {
+    "mxm_annual_crossasset_walkforward_20261030.py": "14e65a4a69f8c3b34951dbf27aac9431b4185d2ac8379b16328821865b8d6f0f",
+    "mxm_annual145_ml_minimum_ticket_account_diagnostic_20261030.py": "027588469175a06592cbe0f5977d9a91c51d188d9ac583d5659f9d12b45606fa"
+  },
+  "original_receipt_sha256": {
+    "ml_public": "2804d6d489641994f3f6af646d6db1cb10bce590048da51a425c668200de631c",
+    "ml_private": "ea10f66d6abffdf57aea992da547184adee4f5008510ce73602c1c3fef174718",
+    "cash_public": "92ea9a403ec793aaf6bb0745a2444779b1a401b5a08d4f05b6277eee36711b2b",
+    "cash_private": "28ac6550353cfb0c58a852db7648fc73de3c870d85eb5a9ec90f50dfbf6de53c"
+  },
+  "method": {
+    "model": "One fixed LightGBM Huber nonlinear cross-asset forward regression, normalized by causal rolling 3h M5 volatility; 13 prior weeks training; 4-week forward unseen-in-training blocks; 10 refits, no tuning after result.",
+    "features": "30min/60min/175min causal log-close displacement over rolling hourly volatility; 30min high-low range; tick volume current-vs-3h; log volatility; time-of-day sin/cos",
+    "decision": "At most 1 across all 145 markets per UTC hour; predicted gross magnitude >20bps, direction from sign; entry t+5min original M5 open, exit t+60min original M5 open; no forced HARD21; all 145 identities fixed by source manifest.",
+    "unobserved_spreads_and_slippage": "Price-only open-to-open return, gross; 2/5/10/20/40bps are HYPOTHETICAL fixed cost scenarios.",
+    "no_retuning": true
+  },
+  "price_only_result": {
+    "completed_test_weeks": 37,
+    "raw_model_proposals": 435,
+    "weeks_with_at_least_21_proposals": 6,
+    "gross_signed_bps_aggregate": 11813.2719,
+    "hypothetical_cost_20bps_signed_bps_aggregate": 3113.2718,
+    "positive_week_net_20bps": 19,
+    "top_five_net_20bps_aggregate": 8922.7772,
+    "net_20bps_without_five_largest_winners": -5809.5054,
+    "observed_source_weekly_aggregates": [
+      {
+        "week": "2026-W01",
+        "proposals": 4,
+        "hypothetical_net20bps_sum": 127.2628
+      },
+      {
+        "week": "2026-W02",
+        "proposals": 5,
+        "hypothetical_net20bps_sum": -334.7816
+      },
+      {
+        "week": "2026-W03",
+        "proposals": 10,
+        "hypothetical_net20bps_sum": -282.0628
+      },
+      {
+        "week": "2026-W04",
+        "proposals": 9,
+        "hypothetical_net20bps_sum": -981.9487
+      },
+      {
+        "week": "2026-W05",
+        "proposals": 8,
+        "hypothetical_net20bps_sum": -271.142
+      },
+      {
+        "week": "2026-W06",
+        "proposals": 26,
+        "hypothetical_net20bps_sum": 487.7612
+      },
+      {
+        "week": "2026-W07",
+        "proposals": 21,
+        "hypothetical_net20bps_sum": 662.2778
+      },
+      {
+        "week": "2026-W08",
+        "proposals": 4,
+        "hypothetical_net20bps_sum": 13.7056
+      },
+      {
+        "week": "2026-W09",
+        "proposals": 5,
+        "hypothetical_net20bps_sum": 126.1839
+      },
+      {
+        "week": "2026-W10",
+        "proposals": 0,
+        "hypothetical_net20bps_sum": 0
+      },
+      {
+        "week": "2026-W11",
+        "proposals": 8,
+        "hypothetical_net20bps_sum": -425.1696
+      },
+      {
+        "week": "2026-W12",
+        "proposals": 2,
+        "hypothetical_net20bps_sum": 831.2632
+      },
+      {
+        "week": "2026-W13",
+        "proposals": 6,
+        "hypothetical_net20bps_sum": 140.6319
+      },
+      {
+        "week": "2026-W14",
+        "proposals": 1,
+        "hypothetical_net20bps_sum": -42.1134
+      },
+      {
+        "week": "2026-W15",
+        "proposals": 12,
+        "hypothetical_net20bps_sum": 478.5447
+      },
+      {
+        "week": "2026-W16",
+        "proposals": 19,
+        "hypothetical_net20bps_sum": -1830.5205
+      },
+      {
+        "week": "2026-W17",
+        "proposals": 10,
+        "hypothetical_net20bps_sum": -289.6673
+      },
+      {
+        "week": "2026-W18",
+        "proposals": 3,
+        "hypothetical_net20bps_sum": -67.1722
+      },
+      {
+        "week": "2026-W19",
+        "proposals": 7,
+        "hypothetical_net20bps_sum": 2196.7284
+      },
+      {
+        "week": "2026-W20",
+        "proposals": 1,
+        "hypothetical_net20bps_sum": -253.0913
+      },
+      {
+        "week": "2026-W21",
+        "proposals": 6,
+        "hypothetical_net20bps_sum": -389.0434
+      },
+      {
+        "week": "2026-W22",
+        "proposals": 10,
+        "hypothetical_net20bps_sum": -571.7794
+      },
+      {
+        "week": "2026-W23",
+        "proposals": 16,
+        "hypothetical_net20bps_sum": -489.3911
+      },
+      {
+        "week": "2026-W24",
+        "proposals": 7,
+        "hypothetical_net20bps_sum": -79.4016
+      },
+      {
+        "week": "2026-W25",
+        "proposals": 9,
+        "hypothetical_net20bps_sum": 185.3208
+      },
+      {
+        "week": "2026-W26",
+        "proposals": 22,
+        "hypothetical_net20bps_sum": 1650.256
+      },
+      {
+        "week": "2026-W27",
+        "proposals": 6,
+        "hypothetical_net20bps_sum": 225.8104
+      },
+      {
+        "week": "2026-W28",
+        "proposals": 5,
+        "hypothetical_net20bps_sum": 68.5604
+      },
+      {
+        "week": "2026-W29",
+        "proposals": 21,
+        "hypothetical_net20bps_sum": -941.8712
+      },
+      {
+        "week": "2026-W30",
+        "proposals": 14,
+        "hypothetical_net20bps_sum": 609.1033
+      },
+      {
+        "week": "2026-W31",
+        "proposals": 9,
+        "hypothetical_net20bps_sum": -700.4277
+      },
+      {
+        "week": "2026-W32",
+        "proposals": 17,
+        "hypothetical_net20bps_sum": -960.9559
+      },
+      {
+        "week": "2026-W33",
+        "proposals": 9,
+        "hypothetical_net20bps_sum": 214.1549
+      },
+      {
+        "week": "2026-W34",
+        "proposals": 12,
+        "hypothetical_net20bps_sum": 853.3812
+      },
+      {
+        "week": "2026-W35",
+        "proposals": 11,
+        "hypothetical_net20bps_sum": 24.4622
+      },
+      {
+        "week": "2026-W36",
+        "proposals": 24,
+        "hypothetical_net20bps_sum": 1242.2885
+      },
+      {
+        "week": "2026-W37",
+        "proposals": 76,
+        "hypothetical_net20bps_sum": 1886.1143
+      }
+    ],
+    "note": "Unweighted sums of different asset returns in bps are NOT one EUR200 funded account."
+  },
+  "minimum_ticket_cash_proxy": {
+    "single_initial_capital_eur": 200,
+    "unresolved_nonusd_or_nonlinear_episodes": 15,
+    "original_selection_episodes_with_linear_USD_cash_proxy": 420,
+    "crypto_spot_cfd_episodes": 350,
+    "usd_share_cfd_episodes": 70,
+    "median_minimum_notional_proxy_eur": 3.28388,
+    "assumed_eur_per_usd": 0.9,
+    "dated_2026_09_22_margin_not_historical": true,
+    "all_435_original_price_outcomes_reconciled": true,
+    "captured_minimum_volume_and_declared_commission_used": true,
+    "declared_commission_PLUS_hypothetical_roundtrip_cost_bps": {
+      "10": {
+        "ending_eur": 201.2952,
+        "net_eur": 1.2952,
+        "peak_to_trough_drawdown_eur": 5.2615
+      },
+      "20": {
+        "ending_eur": 197.7363,
+        "net_eur": -2.2637,
+        "peak_to_trough_drawdown_eur": 5.9029
+      },
+      "40": {
+        "ending_eur": 190.6183,
+        "net_eur": -9.3817,
+        "peak_to_trough_drawdown_eur": 10.686
+      },
+      "80": {
+        "ending_eur": 176.3823,
+        "net_eur": -23.6177,
+        "peak_to_trough_drawdown_eur": 24.1301
+      }
+    },
+    "unqualified_episodes_not_replaced_or_cherry_picked": true
+  },
+  "safety": {
+    "real_historical_bid_ask_fees_slippage_or_funding": false,
+    "fully_certified_continuous_EUR200_account": false,
+    "observed_broker_executions": 0,
+    "certified_systemic_HARD21": false,
+    "cTrader_Cloud_accepted": false,
+    "orders_sent": 0,
+    "live_demo_cloud_activated": false,
+    "production_CSharp_modified": false,
+    "protected_forward_opened": false,
+    "private_market_prices_or_episodes_uploaded_to_GitHub": false
+  },
+  "decision": "CLOSE_EXACT_NONLINEAR_145_POLICY_NO_ROBUST_NET_OR_HARD21_NO_RETUNING_NO_PROMOTION",
+  "scope_law": "This closes only this exact frozen policy, training frequency, universe/timing/cost proxy. Never infer general no-edge for crypto, FX, H1, all 145, machine learning or all Pepperstone instruments."
+}
