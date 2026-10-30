@@ -9,7 +9,7 @@ namespace cAlgo.Robots {
 /// <summary>Native account adapter; never activated by CI. Durable entry barrier requires Desktop.
 /// OnBarClosed uses the exact same C# decision state as the machine-side reference.</summary>
 [Robot(TimeZone=TimeZones.UTC,AccessRights=AccessRights.None)]
-public sealed class MxmReferenceProductBot : Robot {
+public sealed partial class MxmReferenceProductBot : Robot {
  const string Label="MXM_CSHARP_REFERENCE_V1";
  [Parameter("Native Observation Only",DefaultValue=false)]
  public bool NativeObservationOnly {get;set;}
@@ -66,6 +66,7 @@ public sealed class MxmReferenceProductBot : Robot {
  [Parameter("Requested Units",DefaultValue=1000,MinValue=1)]
  public double RequestedUnits {get;set;}
  protected override void OnStart() {
+  if(ObserveRelativeStrengthPolicy && !NativeObservationOnly){Print("MXM_POLICY_OBSERVATION_REQUIRES_ORDER_FREE_MODE");Stop();return;}
   bool runIsSimulation=NativeObservationOnly ?
    IsBacktesting || RunningMode!=cAlgo.API.RunningMode.RealTime : IsBacktesting;
   if(!nativeRun.Begin(NativeObservationOnly,EnableDemoTrading,runIsSimulation,
@@ -222,6 +223,7 @@ public sealed class MxmReferenceProductBot : Robot {
    nativeReceptionBars=MarketData.GetBars(TimeFrame,SymbolName);
    if(nativeReceptionSymbol==null || nativeReceptionBars==null)
     throw new InvalidOperationException("NATIVE_OBSERVATION_SOURCE_UNAVAILABLE");
+   StartRelativeStrengthObservation();
    nativeReceptionBook=MxmBookObservations.NativeSnapshots();
    nativeReceptionBook.BeginEpoch(Environment.TickCount64);
    nativeReceptionSymbol.Tick+=OnNativeReceptionTick;
@@ -274,6 +276,7 @@ public sealed class MxmReferenceProductBot : Robot {
  void StopNativeObservation() {
   // Latch before unsubscribe/report: late or reentrant callbacks stay inert.
   nativeRun.Stop();
+  StopRelativeStrengthObservation();
   if(nativeReceptionSymbol!=null)nativeReceptionSymbol.Tick-=OnNativeReceptionTick;
   if(nativeReceptionBars!=null)nativeReceptionBars.BarClosed-=OnNativeReceptionBarClosed;
   try {

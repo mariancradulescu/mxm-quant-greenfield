@@ -57,8 +57,9 @@ def observed_periods(observations):
             period['exact_calendar_boundary_equity_proven'] = False
     return out
 
-def execute(candidate, feed, synthetic, chunk_size=10000):
+def execute(candidate, feed, synthetic, chunk_size=None, observer=None):
     validate_feed(feed, candidate['spec_hash'], synthetic)
+    if chunk_size is None:chunk_size=feed.get('execution_chunk_size',10000)
     need(type(chunk_size) is int and 1 <= chunk_size <= 100000, 'FUNDED_CHUNK_BOUND')
     # Binding includes ALL event bytes and policy/settings, not just a caller's
     # source label. It remains a checksum, not source authentication.
@@ -76,8 +77,13 @@ def execute(candidate, feed, synthetic, chunk_size=10000):
             subprocess.run(['dotnet', 'run', '--no-build', '-c', 'Release', '--project', str(PROJECT),
                             '--', str(inp), prior, str(output)], check=True, capture_output=True,
                            text=True, timeout=180)
-            raw = output.read_bytes(); result = json.loads(raw)
+            raw = output.read_bytes()
             capsule = Path(str(output) + '.capsule').read_bytes()
+            if observer is not None:
+                observer({'phase':'CSHARP_ORIGINAL_BEFORE_VALIDATION','first_ordinal':offset,
+                          'result_base64':__import__('base64').b64encode(raw).decode(),
+                          'capsule_base64':__import__('base64').b64encode(capsule).decode()})
+            result = json.loads(raw)
             need(result['Schema'] == 'mxm.shared-funded-account.result.v1' and
                  result['SourceSha256'] == binding and result['ExpectedOrdinal'] == offset and
                  result['NextEventOrdinal'] == offset + len(batch), 'FUNDED_RESULT_CURSOR')
@@ -87,6 +93,9 @@ def execute(candidate, feed, synthetic, chunk_size=10000):
             need(prior_sha == result['CheckpointSha256'], 'FUNDED_CAPSULE_DIGEST')
             chunks.append({'first_ordinal': offset, 'next_ordinal': result['NextEventOrdinal'],
                            'result_sha256': hashlib.sha256(raw).hexdigest(), 'capsule_sha256': prior_sha})
+            if feed.get('preserve_chunk_originals',False):
+                chunks[-1]['original_result_base64']=__import__('base64').b64encode(raw).decode()
+                chunks[-1]['original_capsule_base64']=__import__('base64').b64encode(capsule).decode()
             observations.extend(result['Observations']); prior = str(output) + '.capsule'
         account = result['Account']
         # Every original sample, ledger and final capsule remains in the private

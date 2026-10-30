@@ -1,0 +1,52 @@
+name: MXM integrated authentic EUR200 portfolio programme
+on:
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-portfolio-programme-20261030.yml]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  first-integrated-outcome:
+    if: github.repository == 'mariancradulescu/mxm-quant-greenfield' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: mxm-r3-custody-v1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install existing pinned dependencies and compile shared policy and account
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+          dotnet build research_core_v4/laboratory/csharp/portfolio_policy/MxmPortfolioPolicy.csproj -c Release
+          dotnet build research_core_v4/laboratory/csharp/shared_account/MxmSharedAccount.csproj -c Release
+          python3 -m unittest research_core_v4.laboratory.test_portfolio_programme -v
+      - name: Admit only the first reviewed official programme execution
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m research_core_v4.laboratory.portfolio_programme admit
+      - name: Authenticate source and execute one registered joint policy on one continuous EUR200
+        id: research
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.portfolio_programme run
+      - name: Cold-read encrypted originals without replaying the model or reopening sources
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.portfolio_programme cold
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && (steps.research.outcome == 'success' || steps.research.outcome == 'failure')
+        with:
+          name: mxm-integrated-portfolio-original-${{ github.run_id }}
+          path: verification/portfolio-programme-20261030/
+          if-no-files-found: error
+          retention-days: 90

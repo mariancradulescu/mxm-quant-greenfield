@@ -11,9 +11,20 @@ from .budgets import TrialBook
 from .data import DataCatalogue,Acquisition
 from .economics import screen,replay,robustness
 from discovery.engine import DiscoveryEngine
-OPS={'funded_csharp','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
+OPS={'freeze_portfolio_policy','funded_csharp','native_replay','causal_intents','native_screen','catalogue','acquire','freeze','screen','replay','robustness','classify','report'}
 AUTHORITY='07d1ddbe0b83753bbf189770af1911623fef8d6f'
 ID=re.compile(r'^[A-Za-z0-9_-]{1,96}$')
+
+def freeze_portfolio_policy(policy,manifest):
+    need(policy['schema']=='mxm.registered-portfolio-policy.v1' and
+         policy['id'].startswith('V4-') and ID.fullmatch(policy['id']),'PORTFOLIO_POLICY_ID')
+    need(policy['programme']==manifest['id'] and policy['partition']=='DEVELOPMENT' and
+         policy['prospective_at_ms']==manifest['prospective_at_ms'],'PORTFOLIO_POLICY_PROVENANCE')
+    for field in ('mechanism','source','timing','target','risk','cost_scenario','closure','implementation_sha256'):
+        need(isinstance(policy.get(field),dict) and policy[field],'PORTFOLIO_POLICY_DEFINITION')
+    need(policy['orders']==0 and policy['cloud'] is False and policy['max_authentic_attempts']==1,
+         'PORTFOLIO_POLICY_SCOPE')
+    return {**deepcopy(policy),'spec_hash':digest(policy)}
 
 def validate_manifest(m,history,global_book):
     need(m['schema']=='mxm.laboratory-program.v1' and ID.fullmatch(m['id']) and type(m['version']) is int and m['version']>0,'PROGRAM_ID')
@@ -32,7 +43,13 @@ def validate_manifest(m,history,global_book):
         need(set(t['dependencies'])<=set(tasks) and ident not in t['dependencies'],'DEPENDENCY')
         need(set(t.get('when',{}))<=set(t['dependencies']),'CONDITIONAL_DEPENDENCY')
         need(all(isinstance(v,list) and v for v in t.get('when',{}).values()),'CONDITIONAL_VERDICTS')
-        need(t['operator']=='freeze' or t['trial_units']==0,'TRIAL_UNIT_LOCATION')
+        need(t['operator'] in ('freeze','freeze_portfolio_policy') or t['trial_units']==0,'TRIAL_UNIT_LOCATION')
+        if t['operator']=='freeze_portfolio_policy':
+            policy=freeze_portfolio_policy(t['input']['policy'],m)
+            need(m['mode']=='DEVELOPMENT_RESEARCH' and t['trial_units']==1 and
+                 m['budget'].get('new_v4_policies')==1 and global_book.limits.get('V4')==1,
+                 'FINITE_PORTFOLIO_POLICY_BUDGET')
+            need('V4:'+policy['id'] not in global_book.identities,'PORTFOLIO_POLICY_ALREADY_RESERVED')
         if t['operator']=='freeze':
             candidate=DiscoveryEngine().freeze_candidate(t['input']['candidate'],persist=False)
             need(candidate['provenance'].get('programme')==m['id'],'CANDIDATE_PROGRAMME')
@@ -52,13 +69,14 @@ def validate_manifest(m,history,global_book):
         if t['operator']=='acquire':need(m['mode']=='DEVELOPMENT_RESEARCH','SYNTHETIC_NETWORK_FORBIDDEN')
         if t['operator']=='funded_csharp':
             ref=t['input'].get('candidate',{}).get('result_of')
-            need(ref in tasks and ref in t['dependencies'] and tasks[ref]['operator']=='freeze',
+            need(ref in tasks and ref in t['dependencies'] and tasks[ref]['operator'] in ('freeze','freeze_portfolio_policy'),
                  'FUNDED_REQUIRES_REGISTERED_CANDIDATE')
             need(set(t['input'])=={'candidate','feed'},'FUNDED_INPUT_CONTRACT')
             if m['mode']=='DEVELOPMENT_RESEARCH':
                 need(t['input']['feed']=={'bound_authenticated_csharp_feed':True},
                      'FUNDED_AUTHENTIC_ADAPTER_REQUIRED')
-    need(len(charged)==len(set(charged)) and sum(t['trial_units'] for t in tasks.values())<=m['budget']['new_V2_identities'],'PROGRAM_TRIAL_TOTAL')
+    need(len(charged)==len(set(charged)) and sum(t['trial_units'] for t in tasks.values() if t['operator']=='freeze')<=m['budget']['new_V2_identities'],'PROGRAM_TRIAL_TOTAL')
+    need(sum(t['trial_units'] for t in tasks.values() if t['operator']=='freeze_portfolio_policy')<=m['budget'].get('new_v4_policies',0),'PORTFOLIO_PROGRAM_TRIAL_TOTAL')
     visiting=set();done=set()
     def visit(k):
         need(k not in visiting,'CYCLIC_PROGRAMME')
@@ -143,11 +161,15 @@ class Laboratory:
             if op=='funded_csharp':
                 from .funded_account import execute
                 synthetic=self.m['mode']=='SYNTHETIC_RECEPTION'
-                value=execute(x['candidate'],x['feed'],synthetic);verdict=value['classification']
-                lane='RECEPTION' if synthetic else 'V2'
+                value=execute(x['candidate'],x['feed'],synthetic,observer=getattr(self,'funded_observer',None));verdict=value['classification']
+                lane='RECEPTION' if synthetic else ('V4' if x['candidate'].get('schema')=='mxm.registered-portfolio-policy.v1' else 'V2')
                 item=self.book.identities[lane+':'+x['candidate']['id']]
                 if item['state']=='RESERVED':self.book.finish(lane,x['candidate']['id'],x['candidate']['spec_hash'])
                 else:need(item['state']=='OBSERVED' and item['spec_hash']==x['candidate']['spec_hash'],'FUNDED_TRIAL_BINDING')
+            elif op=='freeze_portfolio_policy':
+                value=freeze_portfolio_policy(x['policy'],self.m)
+                self.book.reserve('V4',value['id'],value['spec_hash'],t['trial_units'])
+                verdict='PROSPECTIVELY_ADMITTED'
             elif op=='catalogue':
                 asset=self.cache.ingest(x['manifest'],x['rows']);a=self.cache.assets[asset]
                 value={'asset_id':asset,'quality':a};verdict='DATA_VALID' if not a['invalid'] and not a['conflicts'] and a['row_count'] and a['completeness']=='CONFIRMED_COMPLETE' else 'DATA_INSUFFICIENT'
