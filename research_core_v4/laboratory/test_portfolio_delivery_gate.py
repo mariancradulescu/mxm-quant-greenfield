@@ -43,7 +43,7 @@ class DeliveryReadback(unittest.TestCase):
         x=self.result['candidates']
         self.assertEqual(x['V2-C012']['owner_margin_80'],'NECESSARY_MARGIN_CAP_FAIL')
         self.assertEqual(x['V2-C031']['owner_free_reserve_120'],
-                         'OBSERVED_SCENARIO_FREE_RESERVE_FAIL')
+                         'OBSERVED_PATH_MIN_FREE_LT_120_ENTRY_COMPLIANCE_UNRESOLVED')
         self.assertEqual(x['V2-C006']['owner_margin_80'],
                          'MARGIN_CAP_NECESSARY_PASS_ONLY')
         self.assertEqual(x['V2-C006']['owner_free_reserve_120'],'FREE_RESERVE_NOT_PROVEN')
