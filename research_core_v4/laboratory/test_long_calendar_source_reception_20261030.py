@@ -38,6 +38,31 @@ class VerifiedCalendarSeparation(unittest.TestCase):
         self.assertLess(x['causal_12bar_features'],109)
         self.assertLess(x['future_8bar_observable'],101)
 
+    def test_observed_weekend_crypto_bars_are_eligible(self):
+        # Weekends may be genuinely traded by an accepted broker crypto CFD.
+        a=clock_at('2026-08-29T00:00:00+00:00')
+        x=m.exact_clock([a+i*300 for i in range(120)])
+        self.assertEqual(list(x),['2026-W35'])
+        self.assertEqual(x['2026-W35']['causal_12bar_features'],109)
+        self.assertEqual(x['2026-W35']['future_8bar_observable'],101)
+        self.assertEqual(x['2026-W35']['future_8bar_missing'],8)
+
+    def test_real_sunday_to_monday_cross_week_history_is_not_discarded(self):
+        a=clock_at('2026-08-30T23:00:00+00:00')
+        x=m.exact_clock([a+i*300 for i in range(25)])
+        self.assertEqual(x['2026-W35']['causal_12bar_features'],1)
+        self.assertEqual(x['2026-W36']['causal_12bar_features'],13)
+        self.assertEqual(x['2026-W36']['future_8bar_observable'],5)
+
+    def test_absent_weekend_not_interpolated_into_forex_session(self):
+        friday=clock_at('2026-08-28T00:00:00+00:00')
+        monday=clock_at('2026-08-31T00:00:00+00:00')
+        times=[friday+i*300 for i in range(15)]+[monday+i*300 for i in range(15)]
+        x=m.exact_clock(times)
+        self.assertEqual({w:v['causal_12bar_features'] for w,v in x.items()},
+                         {'2026-W35':4,'2026-W36':4})
+        self.assertEqual(sum(v.get('future_8bar_observable',0) for v in x.values()),0)
+
     def test_distinct_weeks_not_identity_multiplication(self):
         a=clock_at()
         b=clock_at('2026-08-31T00:00:00+00:00')
