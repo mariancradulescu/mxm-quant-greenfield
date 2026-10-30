@@ -38,9 +38,19 @@ public sealed partial class MxmReferenceProductBot {
    double buyMargin=symbol.GetEstimatedMargin(TradeType.Buy,min);
    double sellMargin=symbol.GetEstimatedMargin(TradeType.Sell,min);
    double stopRisk=symbol.AmountRisked(min,StopLossPips);
+   // AmountRisked is the platform's account-currency pip-risk estimate,
+   // NOT a broker commission or actual executable spread cost. Comparing a
+   // cash prediction to spread bps alone is invalid for tiny minimum tickets.
+   if(!double.IsFinite(symbol.PipSize) || symbol.PipSize<=0)
+    throw new ArgumentException("NATIVE_ECONOMIC_PIP_SIZE_UNVERIFIED");
+   double spreadPips=(ask-bid)/symbol.PipSize;
+   double cashPerPip=symbol.AmountRisked(min,1.0);
+   double spreadCashEstimate=symbol.AmountRisked(min,Math.Max(0d,spreadPips));
    double spreadBps=10000*(ask-bid)/((ask+bid)/2);
    if(!double.IsFinite(buyMargin)||!double.IsFinite(sellMargin)||
       !double.IsFinite(stopRisk)||!double.IsFinite(spreadBps)||
+      !double.IsFinite(cashPerPip)||!double.IsFinite(spreadCashEstimate)||
+      !double.IsFinite(spreadPips)||cashPerPip<=0||spreadCashEstimate<0||
       buyMargin<=0||sellMargin<=0||stopRisk<=0||spreadBps<0)
     throw new ArgumentException("NATIVE_ECONOMIC_MARGIN_STOP_OR_SPREAD_INVALID");
    string status=buyMargin<=Account.FreeMargin && sellMargin<=Account.FreeMargin
@@ -49,6 +59,10 @@ public sealed partial class MxmReferenceProductBot {
       symbol.Name,min,step,bid,ask,spreadBps,buyMargin,sellMargin,StopLossPips,
       stopRisk,Account.Equity,Account.FreeMargin,
       Math.Max(view.BidAgeMs.Value,view.AskAgeMs.Value),status);
+   // Separate receipt, purpose-latched read-only: not a fee, fill or a
+   // time-stamped certified EUR settlement price.
+   Print("MXM_NATIVE_MIN_TICKET_PIP_CASH_ESTIMATE symbol={0} volumeUnits={1} observedSpreadPips={2:F5} nativeCashPerPipEUR={3:F6} nativeObservedSpreadRiskEUR={4:F6} profitForecastEUR=UNKNOWN commissionEUR=UNKNOWN slippageEUR=UNKNOWN payoffVerified=false accountMutation=false",
+      symbol.Name,min,spreadPips,cashPerPip,spreadCashEstimate);
   } catch(Exception e) {
    // A read-only unavailable observation is never interpreted as low cost,
    // a missing position or permission to mutate an account.

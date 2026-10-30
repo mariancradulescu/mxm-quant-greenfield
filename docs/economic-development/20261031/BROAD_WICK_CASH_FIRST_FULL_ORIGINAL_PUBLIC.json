@@ -1,0 +1,67 @@
+{
+  "capital": {
+    "continuous": true,
+    "initial_eur": 200,
+    "margin_cap_eur": 80,
+    "minimum_reserve_eur": 120,
+    "single_position": true,
+    "stop_risk_limit_eur": 1.8
+  },
+  "closed_originals_reused_or_retuned": false,
+  "cost_assumption": {
+    "cash_floor_extra_eur": 0.2,
+    "eur_per_usd": 0.9,
+    "fee": "Declared captured per-side minimum USD 2026-09-22 (NOT actual historical charge)",
+    "roundtrip_spread_slippage_bps": 10
+  },
+  "forward_account_result": {
+    "account_path_censored": 0,
+    "cash_summary_by_asset_class": {
+      "Crypto Currency (Spot)": 0.363708,
+      "Energies (Spot)": -5.31126,
+      "US Equities": 5.314254
+    },
+    "considered_decisions": 88,
+    "evaluated_episodes": 88,
+    "evaluated_weeks": 34,
+    "final_cash_eur": 200.366702,
+    "max_closed_equity_drawdown_eur": 18.796158,
+    "net_cash_eur": 0.366702,
+    "rejections": {},
+    "source_supported_proposals": 98,
+    "stop_count": 30,
+    "weeks_with_21_model_entries": 0,
+    "winning_weeks": 19
+  },
+  "limitations": {
+    "HARD21_proven": false,
+    "actual_historical_bid_ask_spread_slippage": false,
+    "broker_contract_settlement_verified": false,
+    "broker_fills": 0,
+    "commission_historical_certified": false,
+    "historical_margin_certified": false,
+    "native_cloud_certified": false,
+    "net_edge_robust_or_independently_confirmed": false,
+    "product_payoff_multiplier_verified": false,
+    "source_usd_eur_time_aligned": false,
+    "stops_broker_filled": false
+  },
+  "orders": 0,
+  "policy": "Fixed causal last-completed M5 wick rejection + past 60m USD min-ticket wick cash headroom; one shared EUR200 account, strict 5m later original open, fixed 60m holding with first adverse native OHLC stop. ONE first outcome, NO retune.",
+  "private_ledger_sha256": "8348a88815996d5436ea1b2783381f7061a37a251b6df2a36cda16f291da0409",
+  "protected_source_opened": false,
+  "sample": {
+    "by_class": {
+      "Crypto Currency (Spot)": 28,
+      "Energies (Spot)": 1,
+      "Forex (Spot)": 1,
+      "Forwards - Indices": 1,
+      "US Equities": 31
+    },
+    "eligible_broker_only_sources": 62,
+    "end_utc": "2026-09-14T00:00:00Z",
+    "start_utc": "2026-01-05T00:00:00Z"
+  },
+  "schema": "mxm.broad-157-original-m5-wick-rejection-single-eur200-development-first.v1",
+  "source": "Original DELTA128 + SELECTED29 annual M5, 157 broker ID mapping; source eligibility USD quoted, commission type2 USD and minimum EUR80 margin is CAUSAL PRICE-BLIND."
+}
