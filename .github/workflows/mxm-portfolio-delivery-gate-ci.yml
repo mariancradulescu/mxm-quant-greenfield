@@ -1,0 +1,34 @@
+name: MXM continuous EUR200 economic delivery gate
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/portfolio_delivery_gate.py
+      - research_core_v4/laboratory/test_portfolio_delivery_gate.py
+      - .github/workflows/mxm-portfolio-delivery-gate-ci.yml
+      - docs/convergence/20261030/PRIOR_SURVIVOR_DELIVERY_DECISION.md
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - .github/workflows/mxm-portfolio-delivery-gate-ci.yml
+permissions: {contents: read}
+jobs:
+  original-result-economic-decision:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Test existing closed Stage B original identities and owner contract
+        run: |
+          set -eu
+          python3 -m unittest research_core_v4.laboratory.test_portfolio_delivery_gate -v
+          python3 -m research_core_v4.laboratory.portfolio_delivery_gate report > /tmp/mxm-survivors-decision.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/mxm-survivors-decision.json'))
+          assert x['max_same_iso_week_optimistic_combined_entries']==17
+          assert x['all_overlapping_weeks_below_HARD21']
+          assert x['new_economic_executions']==x['live_demo_orders']==x['cloud_activations']==0
+          print("MXM_EXISTING_200_EUR_SURVIVORS_INSUFFICIENT_FOR_HARD21; NO_NEW_ECONOMIC_EXECUTION")
+          PY
