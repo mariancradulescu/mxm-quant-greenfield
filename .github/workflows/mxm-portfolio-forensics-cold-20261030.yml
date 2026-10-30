@@ -1,0 +1,96 @@
+name: MXM frozen portfolio cold economic attribution
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/portfolio_forensics.py
+      - research_core_v4/laboratory/test_portfolio_forensics.py
+      - .github/workflows/mxm-portfolio-forensics-cold-20261030.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-portfolio-forensics-cold-20261030.yml]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  no-secret-structural:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Cold forensic arithmetic and guard tests, no originals
+        run: python3 -m unittest research_core_v4.laboratory.test_portfolio_forensics -v
+  first-cold-attribution:
+    if: github.event_name == 'push' && github.run_attempt == 1
+    needs: [no-secret-structural]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    environment: mxm-r3-custody-v1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Verify frozen source, reviewed merge and unique first readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def get(path):return json.loads(subprocess.check_output(['gh','api',repo+path],text=True))
+          def need(value,code):
+              if not value:raise RuntimeError('MXM_COLD_FORENSIC_'+code)
+          need(os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield' and
+               os.environ['GITHUB_REF']=='refs/heads/mxm-remediation-p0-p4-20261015-v1' and
+               os.environ['GITHUB_RUN_ATTEMPT']=='1','RUN_SCOPE')
+          need(get('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA'],'HEAD_CHANGED')
+          need(get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']=='a830c132521bd4348454653f713e04f6107484fe','OWNER_ANCHOR')
+          artifact=get('actions/artifacts/12954864256')
+          need(artifact['workflow_run']['id']==41005510200 and
+               artifact['workflow_run']['head_sha']=='7fc1926d6a9e9ed8d1e85bb87d337fecd3309721' and
+               artifact['name']=='mxm-integrated-portfolio-original-41005510200' and
+               artifact['size_in_bytes']==403201 and not artifact['expired'] and
+               artifact['digest']=='sha256:912a2085b350ba520f6ed8059939b0e5b4fda02c9e33bb2699f8cec7a9fdf340','FROZEN_SOURCE_CHANGED')
+          runs=get('actions/workflows/mxm-portfolio-forensics-cold-20261030.yml/runs?per_page=100')
+          need(runs['total_count']==len(runs['workflow_runs']) and runs['total_count']<=100,'RUN_INVENTORY_INCOMPLETE')
+          pushed=[r for r in runs['workflow_runs'] if r['event']=='push']
+          need(len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID']) and
+               pushed[0]['head_sha']==os.environ['GITHUB_SHA'],'NOT_FIRST_AUTHORIZED_READBACK')
+          parents=get('commits/'+os.environ['GITHUB_SHA'])['parents']
+          need(len(parents)==2,'NOT_REVIEWED_MERGE')
+          print('MXM_FROZEN_SOURCE_COLD_READBACK_ADMITTED; NEW_ECONOMIC_TRIALS=0')
+          PY
+      - name: Download original published artifact (no model execution)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          mkdir -p verification/portfolio-programme-20261030
+          gh run download 41005510200 -R mariancradulescu/mxm-quant-greenfield \
+            -n mxm-integrated-portfolio-original-41005510200 \
+            -D verification/portfolio-programme-20261030
+          test -f verification/portfolio-programme-20261030/receipt.json
+          test -f verification/portfolio-programme-20261030/private.mxmenc
+          test -f verification/portfolio-programme-20261030/cold.json
+      - name: Existing pinned dependencies, no API or order capability
+        run: |
+          set -eu
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: Attribute original CSharp funded ledger in authorized custody
+        id: forensic
+        env:
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.portfolio_forensics cold
+      - name: Publish only public totals and encrypted detailed diagnostic
+        if: steps.forensic.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-cold-economic-attribution-${{ github.run_id }}
+          path: verification/portfolio-forensics-20261030/
+          if-no-files-found: error
+          retention-days: 90
