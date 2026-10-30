@@ -226,7 +226,7 @@ def aggregate(model,evaluation_file):
             wins+=int(g>0)
             for fee in COST_STRESS:net[fee]+=g-fee
     n=counters['settled'];l=counters['mse_labels']
-    need(l>=MIN_EVAL,"EVAL_SUPPORT")
+    need(l>=MIN_EVAL and counters['causal_proposals']<=MAX_SIGNALS,"EVAL_SUPPORT_AND_BUDGET")
     return {'train':training,'coefficients':coefs,
       'evaluation_examples':counters['evaluated_with_past_support'],
       'evaluation_labels':l,
@@ -244,7 +244,32 @@ def aggregate(model,evaluation_file):
       'independent_confirmation':False}
 
 
+def verify_frozen_spec():
+    spec=json.loads((ROOT/"research_core_v4/laboratory/M5_POOLED_VOLUME_RESPONSE_20261030_V1.json").read_bytes())
+    need(spec["schema"]=="mxm.v4.m5-pooled-ohlcv-response-precommit.v1" and
+         spec["id"]==FROZEN_ID and
+         spec["source_partition"]=="EXPOSED_DEVELOPMENT_NOT_INDEPENDENT_CONFIRMATION" and
+         spec["training_before_utc"]==SPLIT and
+         spec["evaluation_from_utc"]==SPLIT and
+         spec["source_window"]=="2026-08-20T00:00:00Z_2026-09-16T23:55:00Z" and
+         spec["feature_lookback_bars"]==FEATURE_LOOKBACK and
+         spec["entry_delay_bars_after_completed_signal"]==ENTRY_DELAY and
+         spec["exit_after_signal_bars"]==EXIT_BARS and
+         spec["candidate_spacing_decision_bars"]==STRIDE and
+         spec["minimum_trained_examples"]==MIN_TRAIN and
+         spec["minimum_eval_examples"]==MIN_EVAL and
+         spec["l2_regularization_per_training_row"]==REGULARIZATION and
+         spec["forecast_to_trade_threshold_in_bps"]==BPS_HURDLE and
+         spec["cost_sensitivities_bps_per_round_trip"]==list(COST_STRESS) and
+         spec["hyperparameter_grid"] is False and
+         spec["live_demo_orders"]==0 and
+         spec["new_broker_requests"]==0 and
+         spec["historical_models_rerun"]==0,"FROZEN_ECONOMIC_HYPOTHESIS_CHANGED")
+    return spec
+
+
 def selftest():
+    verify_frozen_spec()
     t=int(dt.datetime(2026,9,2,tzinfo=dt.timezone.utc).timestamp())
     times=[t+300*i for i in range(150)]
     bars=[]
@@ -271,6 +296,7 @@ def selftest():
 
 
 def authenticated_source_run():
+    verify_frozen_spec()
     need(os.getenv('GITHUB_REPOSITORY')==REPO and
          os.getenv('GITHUB_REF')=='refs/heads/mxm-remediation-p0-p4-20261015-v1' and
          os.getenv('GITHUB_EVENT_NAME')=='push' and
