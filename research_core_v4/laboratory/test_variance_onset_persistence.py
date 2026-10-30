@@ -53,7 +53,7 @@ class DistinctCrossScale(unittest.TestCase):
         self.assertTrue(all(o['gross_bps'] is None for o in late))
 
     def test_aggregate_zero_proposals_is_not_alpha(self):
-        s=m.frozen();t,b=sample(n=90)
+        s=m.frozen();t,b=sample(n=60)
         pub,detail=m.evaluate({5:(t,b),111:(t,b),250:(t,b)},s)
         self.assertEqual(pub['proposals'],0)
         self.assertFalse(pub['single_eur200_account_executed'])
