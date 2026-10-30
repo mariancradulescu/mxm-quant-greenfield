@@ -1,0 +1,83 @@
+name: MXM one authentic true-scale variance-onset economic trial
+on:
+  pull_request:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths:
+      - research_core_v4/laboratory/variance_onset_persistence.py
+      - research_core_v4/laboratory/test_variance_onset_persistence.py
+      - research_core_v4/laboratory/VARIANCE_ONSET_PERSISTENCE_20261030_V1.json
+      - docs/economic-development/20261030/VARIANCE_ONSET_PERSISTENCE_FIRST_DECISION.md
+      - .github/workflows/mxm-variance-onset-persistence-20261030.yml
+  push:
+    branches: [mxm-remediation-p0-p4-20261015-v1]
+    paths: [.github/workflows/mxm-variance-onset-persistence-20261030.yml]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: mxm-integrated-laboratory
+  cancel-in-progress: false
+jobs:
+  no-key-source-blind-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Structural true-scale synthetic economic reference
+        run: |
+          set -eu
+          python3 -m unittest research_core_v4.laboratory.test_variance_onset_persistence -v
+          python3 -m research_core_v4.laboratory.variance_onset_persistence selftest
+  first-pinned-original-economic-evaluation:
+    if: github.event_name == 'push' && github.run_attempt == 1 && github.ref == 'refs/heads/mxm-remediation-p0-p4-20261015-v1'
+    needs: no-key-source-blind-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    environment: mxm-r3-custody-v1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Unique reviewed original and authorized frozen-source preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import json,os,subprocess
+          repo='repos/mariancradulescu/mxm-quant-greenfield/'
+          def get(p):return json.loads(subprocess.check_output(['gh','api',repo+p],text=True))
+          def need(x,k):
+              if not x:raise ValueError('MXM_ONSET_CUSTODY_'+k)
+          need(os.environ['GITHUB_REPOSITORY']=='mariancradulescu/mxm-quant-greenfield' and
+               os.environ['GITHUB_EVENT_NAME']=='push' and
+               os.environ['GITHUB_REF']=='refs/heads/mxm-remediation-p0-p4-20261015-v1' and
+               os.environ['GITHUB_RUN_ATTEMPT']=='1','OWNER_READ_ONLY_LANE')
+          need(get('git/ref/heads/mxm-remediation-p0-p4-20261015-v1')['object']['sha']==os.environ['GITHUB_SHA'],'CURRENT_OFFICIAL_HEAD')
+          need(get('git/ref/heads/mxm-o04-accepted-owner-1807-v1')['object']['sha']=='a830c132521bd4348454653f713e04f6107484fe','SOURCE_AUTHORITY')
+          hist=get('actions/workflows/mxm-variance-onset-persistence-20261030.yml/runs?per_page=100')
+          need(hist['total_count']<=100 and hist['total_count']==len(hist['workflow_runs']),'RUN_HISTORY_COMPLETE')
+          pushed=[r for r in hist['workflow_runs'] if r['event']=='push']
+          need(len(pushed)==1 and pushed[0]['id']==int(os.environ['GITHUB_RUN_ID']) and
+               pushed[0]['head_sha']==os.environ['GITHUB_SHA'],'FIRST_FROZEN_TRIAL_ONLY')
+          need(len(get('commits/'+os.environ['GITHUB_SHA'])['parents'])==2,'REVIEWED_MERGE')
+          print('MXM_VARIANCE_ONSET_ONE_UNTUNED_DEVELOPMENT_IDENTITY_ADMITTED')
+          PY
+      - name: Install existing audited dependencies
+        run: |
+          python3 -m pip install --only-binary=:all: --require-hashes -r research_core_v4/remediation_p0_p4_20261015/requirements.lock
+      - name: One real-source cryptographic read and finite frozen price-vs-cost evaluation
+        id: model
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MXM_V4_INPUT_BUNDLE_PRIVATE_KEY_PEM: ${{ secrets.R3_CUSTODY_PRIVATE_KEY_PEM }}
+        run: |
+          set -eu
+          umask 077
+          python3 -m research_core_v4.laboratory.variance_onset_persistence protected
+      - name: Preserve encrypted detail and aggregate public evidence, no orders
+        if: steps.model.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mxm-variance-onset-original-${{ github.run_id }}
+          path: verification/variance-onset-20261030/
+          retention-days: 90
+          if-no-files-found: error
